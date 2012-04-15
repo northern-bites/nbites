@@ -23,11 +23,10 @@ class V4L2ImageTranscriber: public ThreadedImageTranscriber {
 
 public:
 
-    V4L2ImageTranscriber(boost::shared_ptr<Synchro> synchro,
-            boost::shared_ptr<Sensors> s);
+    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s);
     virtual ~V4L2ImageTranscriber();
 
-    void setSettings(const Camera::Settings& settings);
+    void setNewSettings(const Camera::Settings& settings);
     const Camera::Settings* getSettings() const {
         return &settings;
     }
@@ -42,12 +41,8 @@ public:
      * Note: this method blocks until it gets a new image
      */
     bool captureNew();
-    const unsigned char* getImage() const;
     unsigned long long getTimeStamp() const;
 
-    Camera switchToUpper();
-    Camera switchToLower();
-    Camera switchCamera(Camera camera);
     void assertCameraSettings();
 
     /**
@@ -55,8 +50,7 @@ public:
      */
     void writeCameraSettings();
 
-    void initTable(std::string path);
-    void initTable(unsigned char* buffer);
+    void initTable(const std::string& path);
 
 private:
     Camera::Settings settings;
@@ -66,7 +60,7 @@ private:
 #endif
 
     enum {
-        frameBufferCount = 2, /**< Amount of available frame buffers. */
+        frameBufferCount = 4, /**< Amount of available frame buffers. */
         WIDTH = 640, HEIGHT = 480, SIZE = WIDTH * HEIGHT * 2
     };
     int fd;
@@ -83,6 +77,7 @@ private:
     int getControlSetting(unsigned int id);
     bool setControlSetting(unsigned int id, int value);
 
+    void initSettings(const Camera::Settings& set);
     void initOpenI2CAdapter();
     void initSelectCamera();
     void initOpenVideoDevice();
@@ -91,7 +86,6 @@ private:
     void initSetFrameRate();
     void initRequestAndMapBuffers();
     void initQueueAllBuffers();
-    void initDefaultControlSettings();
     void startCapturing();
 
     enum {
