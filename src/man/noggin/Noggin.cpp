@@ -308,37 +308,106 @@ void Noggin::updateLocalization()
     // FieldObjects
 
     VisualFieldObject fo;
-    fo = *vision->bgrp;
+    // We should now never see a blue goal post. 
+    // fo = *vision->bgrp;
 
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
-    }
+    // if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
+    //     PointObservation seen(fo);
+    //     pt_observations.push_back(seen);
+    // }
 
-    fo = *vision->bglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
-    }
+    // fo = *vision->bglp;
+    // if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
+    //     PointObservation seen(fo);
+    //     pt_observations.push_back(seen);
+    // }
 
+    // If the robot is on the opposing side, the CLOSER goal posts
+    // are the opposing ("blue") goal posts. Otherwise, the closer
+    // posts are their own posts.
     fo = *vision->ygrp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    {
+      if(loc->isOnOpposingSide())
+      {
+	if(fo.getDistance() < (FIELD_WHITE_WIDTH * 0.5f))
+	{
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    &ConcreteFieldObject::blueGoalRightPostList;
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  std::cout << "See opposing yellow right post (" << fo.toString() << ") at distance "
+		    << fo.getDistance() << " (offender.)" << std::endl;
+	}
+	else
+	{
+	  std::cout << "See own yellow right post (" << fo.getID() << ") at distance "
+		    << fo.getDistance() << " (offender.)" << std::endl;
+	}
+      }
+      else
+      {
+	if(fo.getDistance() > (FIELD_WHITE_WIDTH * 0.5f))
+	{
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    &ConcreteFieldObject::blueGoalRightPostList;
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  std::cout << "See opposing yellow right post (" << fo.getID() << ") at distance "
+		    << fo.getDistance() << " (defender.)" << std::endl;
+      	}
+	else
+	{
+	  std::cout << "See own yellow right post (" << fo.getID() << ") at distance "
+		    << fo.getDistance() << " (defender.)" << std::endl;
+	}
+      }
+      PointObservation seen(fo);
+      pt_observations.push_back(seen);
     }
 
     fo = *vision->yglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    {
+      if(loc->isOnOpposingSide())
+      {
+	if(fo.getDistance() < (0.5f * FIELD_WHITE_WIDTH))
+	{
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    &ConcreteFieldObject::blueGoalLeftPostList;
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  std::cout << "See opposing yellow left post (" << fo.getID() << ") at distance "
+		    << fo.getDistance() << " (offender.)" << std::endl;
+	}
+	else
+	{
+	  std::cout << "See own yellow left post (" << fo.getID() << ") at distance "
+		    << fo.getDistance() << " (offender.)" << std::endl;
+	}
+      }
+      else
+      {
+	if(fo.getDistance() > (0.5f * FIELD_WHITE_WIDTH))
+	{
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    &ConcreteFieldObject::blueGoalLeftPostList;
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  std::cout << "See opposing yellow left post (" << fo.getID() << ") at distance "
+		    << fo.getDistance() << " (defender.)" << std::endl;	
+	}
+	else
+	{
+	  std::cout << "See own yellow left post (" << fo.getID() << ") at distance "
+		    << fo.getDistance() << " (defender.)" << std::endl;
+	}
+      }
         PointObservation seen(fo);
         pt_observations.push_back(seen);
     }
 
-#       ifdef DEBUG_POST_OBSERVATIONS
-    vector<PointObservation>::iterator i;
-    for(i = pt_observations.begin(); i != pt_observations.end(); ++i){
-        cout << "Spotted post: " << *i << endl;
+    vector<PointObservation>::iterator obsIter;
+    for(obsIter = pt_observations.begin(); obsIter != pt_observations.end(); ++obsIter)
+    {
+      std::cout << "Spotted post: " << *obsIter << std::endl;
     }
-#       endif
 
 
     // Field Cross

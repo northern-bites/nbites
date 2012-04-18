@@ -18,6 +18,10 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("h", &PyLoc::getHEst)
         .add_property("radH", &PyLoc::getRadHEst)
 
+        // If a player is an offender, then he is closer to the 
+        // opposing goal.
+        .add_property("onOpposingSide", &PyLoc::isOnOpposingSide)
+
         .add_property("ballDistance", &PyLoc::getBallDistance)
         .add_property("ballBearing", &PyLoc::getBallBearingDeg)
 
@@ -59,6 +63,7 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("lastOdoY", &PyLoc::getOdoY)
         .add_property("lastOdoTheta", &PyLoc::getOdoTheta)
         // functional
+        .def("setOnOpposingSide", &PyLoc::setOnOpposingSide)
         .def("reset", &PyLoc::reset, "reset the localization system")
         .def("resetBall", &PyLoc::resetBall)
         .def("blueGoalieReset", &PyLoc::blueGoalieReset,
