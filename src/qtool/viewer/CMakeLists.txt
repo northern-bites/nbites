@@ -51,6 +51,8 @@ target_link_libraries(
   treemodel
   image
   memory
+  vision
+  _sensors
   ${QT_LIBRARIES}
 
   )

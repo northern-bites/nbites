@@ -6,12 +6,20 @@ namespace qtool {
 namespace viewer {
 
 using namespace data;
+using boost::shared_ptr;
 using namespace man::memory;
 using namespace qtool::image;
 
 VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager),
-                 roboImageViewer(memoryManager->getMemory()->getMImage(), this) {
+                 roboImageViewer(memoryManager->getMemory()->getMImage(), this),
+		 speech(new Speech()),
+		 sensors(new Sensors(speech)){
+
+    memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
+    pose = shared_ptr<NaoPose> (new NaoPose(sensors));
+    vision = shared_ptr<Vision> (new Vision(pose));
+
 
     this->setCentralWidget(&roboImageViewer);
     memoryManager->connectSlotToMObject(&roboImageViewer,

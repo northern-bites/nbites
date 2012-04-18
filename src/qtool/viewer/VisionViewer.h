@@ -14,8 +14,11 @@
 #include <QWidget>
 #include <QtGui>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 #include "man/memory/Memory.h"
+#include "man/vision/Vision.h"
+#include "man/corpus/NaoPose.h"
 #include "image/BMPYUVImage.h"
 #include "data/RobotMemoryManager.h"
 #include "BMPImageViewer.h"
@@ -35,6 +38,10 @@ private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
     viewer::RoboImageViewer roboImageViewer;
+    boost::shared_ptr<Vision> vision;
+    boost::shared_ptr<NaoPose> pose;
+    boost::shared_ptr<Speech> speech;
+    boost::shared_ptr<Sensors> sensors;
 
 };
 
