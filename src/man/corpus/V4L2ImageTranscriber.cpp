@@ -15,15 +15,14 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
-#ifdef USE_USERPTR
-#include <malloc.h> // memalign
-#endif
 
 #undef __STRICT_ANSI__
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
 //#include <linux/i2c.h>
 #define __STRICT_ANSI__
+
+#include <cerrno>
 
 #include "ImageAcquisition.h"
 #include "Profiler.h"
@@ -84,7 +83,7 @@ V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s) :
     initRequestAndMapBuffers();
     initQueueAllBuffers();
 
-    initSettings(settings);
+    initSettings();
 
     assertCameraSettings();
 
@@ -99,16 +98,10 @@ V4L2ImageTranscriber::~V4L2ImageTranscriber() {
 
     // unmap buffers
     for (int i = 0; i < frameBufferCount; ++i)
-#ifdef USE_USERPTR
-        free(mem[i]);
-#else
         munmap(mem[i], memLength[i]);
-#endif
 
     // close the device
-#ifndef NO_NAO_EXTENSIONS
     close(cameraAdapterFd);
-#endif
     close(fd);
     free(buf);
 }
@@ -150,45 +143,45 @@ void V4L2ImageTranscriber::initTable(const string& filename)
 }
 
 void V4L2ImageTranscriber::initOpenI2CAdapter() {
-#ifndef NO_NAO_EXTENSIONS
     cameraAdapterFd = open("/dev/i2c-0", O_RDWR);
+
     if(cameraAdapterFd == -1)
         printf("Camera adapter FD is WRONG.\n");
     if(ioctl(cameraAdapterFd, 0x703, 8) == -1)
         printf("Opening I2C adapter failed.\n");
-//    CHECK_SUCCESS(i2c_smbus_read_byte_data(cameraAdapterFd, 170) >= 2);
-// at least Nao V3
-#endif
 }
 
 void V4L2ImageTranscriber::initSelectCamera() {
-#ifndef NO_NAO_EXTENSIONS
-    unsigned char cmd[2] = { 0x02, 0 };
-    i2c_smbus_write_block_data(cameraAdapterFd, 220, 1, cmd); // select camera
-#endif
+    unsigned char cmd[2] = { Camera::BOTTOM, 0 };
+    i2c_smbus_write_block_data(cameraAdapterFd, 220, 1, cmd);
 }
 
 void V4L2ImageTranscriber::initOpenVideoDevice() {
     // open device
+#if ROBOT_TYPE == NAO_NEXTGEN
+    fd = open("/dev/video1", O_RDWR);
+#else
     fd = open("/dev/video0", O_RDWR);
+#endif
+
     if(fd == -1)
         printf("Video Device FD is WRONG.\n");
 }
 
 void V4L2ImageTranscriber::initSetCameraDefaults() {
     // set default parameters
-#ifndef NO_NAO_EXTENSIONS
+#if ROBOT_TYPE == NAO_RL_33
     struct v4l2_control control;
     memset(&control, 0, sizeof(control));
     control.id = V4L2_CID_CAM_INIT;
     control.value = 0;
     if(ioctl(fd, VIDIOC_S_CTRL, &control) == -1)
-        printf("Setting default parameters failed.\n");
+        perror("Setting default parameters failed:\n");
+#endif
 
     v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
     if(ioctl(fd, VIDIOC_S_STD, &esid0) == -1)
-        printf("Setting default parameters failed.\n");
-#endif
+        printf("Setting default parameters failed. 2\n");
 }
 
 void V4L2ImageTranscriber::initSetImageFormat() {
@@ -228,11 +221,7 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
     memset(&rb, 0, sizeof(struct v4l2_requestbuffers));
     rb.count = frameBufferCount;
     rb.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-#ifdef USE_USERPTR
-    rb.memory = V4L2_MEMORY_USERPTR;
-#else
     rb.memory = V4L2_MEMORY_MMAP;
-#endif
     if(ioctl(fd, VIDIOC_REQBUFS, &rb) == -1)
         printf("Requesting buffers failed.\n");
     if(rb.count != frameBufferCount)
@@ -243,11 +232,6 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
             sizeof(struct v4l2_buffer)));
     for(    int i = 0; i < frameBufferCount; ++i)
     {
-#ifdef USE_USERPTR
-        memLength[i] = SIZE;
-        mem[i] = malloc(SIZE);
-        printf("malloc : %lu\n", (long unsigned) mem[i]);
-#else
         buf->index = i;
         buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf->memory = V4L2_MEMORY_MMAP;
@@ -258,7 +242,6 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
                       MAP_SHARED, fd, buf->m.offset);
         if(mem[i] == MAP_FAILED)
             printf("Map failed.\n");
-#endif
     }
 }
 
@@ -267,41 +250,100 @@ void V4L2ImageTranscriber::initQueueAllBuffers() {
     for (int i = 0; i < frameBufferCount; ++i) {
         buf->index = i;
         buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-#ifdef USE_USERPTR
-        buf->memory = V4L2_MEMORY_USERPTR;
-        buf->m.userptr = (unsigned long) mem[i];
-        buf->length = memLength[i];
-#else
         buf->memory = V4L2_MEMORY_MMAP;
-#endif
         if(ioctl(fd, VIDIOC_QBUF, buf) == -1)
             printf("Queueing a buffer failed.\n");
     }
 }
 
-void V4L2ImageTranscriber::initSettings(const Camera::Settings& set)
+void V4L2ImageTranscriber::enumerate_menu ()
 {
-    // make sure all auto stuff is OFF!
-    setControlSetting(V4L2_CID_AUTOEXPOSURE , 0);
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
-    setControlSetting(V4L2_CID_AUTOGAIN, 0);
-    setControlSetting(V4L2_CID_HUE_AUTO, 0);
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, V4L2_EXPOSURE_MANUAL);
+    {
+        printf ("  Menu items:\n");
+
+        memset (&querymenu, 0, sizeof (querymenu));
+        querymenu.id = queryctrl.id;
+
+        for (querymenu.index = queryctrl.minimum;
+             querymenu.index <= queryctrl.maximum;
+             querymenu.index++) {
+            if (0 == ioctl (fd, VIDIOC_QUERYMENU, &querymenu)) {
+                printf ("  %s\n", querymenu.name);
+            }
+        }
+    }
+
+    memset (&queryctrl, 0, sizeof (queryctrl));
+
+    for (queryctrl.id = V4L2_CID_BASE;
+         queryctrl.id < V4L2_CID_LASTP1;
+         queryctrl.id++) {
+        if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl)) {
+            if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
+                continue;
+
+            printf ("Control %s\n", queryctrl.name);
+
+            if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
+                enumerate_menu ();
+        } else {
+            if (errno == EINVAL)
+                continue;
+
+            perror ("VIDIOC_QUERYCTRL");
+            exit (EXIT_FAILURE);
+        }
+    }
+
+    for (queryctrl.id = V4L2_CID_PRIVATE_BASE;;
+         queryctrl.id++) {
+        if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl)) {
+            if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
+                continue;
+
+            printf ("Control %s\n", queryctrl.name);
+
+            if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
+                enumerate_menu ();
+        } else {
+            if (errno == EINVAL)
+                break;
+
+            perror ("VIDIOC_QUERYCTRL");
+            exit (EXIT_FAILURE);
+        }
+    }
+}
+
+void V4L2ImageTranscriber::initSettings()
+{
     // The following should be 1 if we're using the top camera (?)
     setControlSetting(V4L2_CID_HFLIP, 0);
     setControlSetting(V4L2_CID_VFLIP, 0);
 
-    setControlSetting(V4L2_CID_EXPOSURE,
-                      (settings.exposure = set.exposure));
-    setControlSetting(V4L2_CID_BRIGHTNESS,
-                      (settings.brightness = set.brightness));
-    setControlSetting(V4L2_CID_CONTRAST,
-                      (settings.contrast = set.contrast));
-    setControlSetting(V4L2_CID_GAIN, (settings.gain = set.gain));
-    setControlSetting(V4L2_CID_BLUE_BALANCE,
-                      (settings.blue_chroma = set.blue_chroma));
-    setControlSetting(V4L2_CID_RED_BALANCE,
-                      (settings.red_chroma = set.red_chroma));
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
+
+    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
+
+    setControlSetting(V4L2_CID_CONTRAST, settings.brightness);
+    setControlSetting(V4L2_CID_SATURATION, 150);
+
+    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
+    setControlSetting(V4L2_CID_SHARPNESS, 3);
+
+    setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION, 0);
+
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 0);
+
+    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
+
+    if(settings.gain != Camera::KEEP_DEFAULT)
+        setControlSetting(V4L2_CID_GAIN, settings.gain);
+    if(settings.blue_chroma != Camera::KEEP_DEFAULT)
+        setControlSetting(V4L2_CID_BLUE_BALANCE, settings.blue_chroma);
+    if(settings.red_chroma != Camera::KEEP_DEFAULT)
+        setControlSetting(V4L2_CID_BLUE_BALANCE, settings.red_chroma);
+
 }
 
 void V4L2ImageTranscriber::startCapturing() {
@@ -460,9 +502,10 @@ bool V4L2ImageTranscriber::waitForImage() {
 bool V4L2ImageTranscriber::captureNew() {
     // dequeue a frame buffer (this call blocks when there is
     // no new image available)
+    assertCameraSettings();
+
     if(ioctl(fd, VIDIOC_DQBUF, buf) == -1)
         printf("Dequeueing the frame buffer failed.\n");
-    //timeStamp = SystemCall::getCurrentSystemTime();
     if(buf->bytesused != SIZE) printf("Wrong size!.\n");
     currentBuf = buf;
 
@@ -487,51 +530,74 @@ int V4L2ImageTranscriber::getControlSetting(unsigned int id) {
     struct v4l2_queryctrl queryctrl;
     queryctrl.id = id;
     if (ioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) < 0)
+    {
+        printf("Control DNE.\n");
         return -1;
+    }
     if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED
         )
+    {
+        printf("Control not available.\n");
         return -1; // not available
+    }
     if (queryctrl.type != V4L2_CTRL_TYPE_BOOLEAN
             && queryctrl.type != V4L2_CTRL_TYPE_INTEGER
             && queryctrl.type != V4L2_CTRL_TYPE_MENU)
+    {
+        printf("Control not supported.\n");
         return -1; // not supported
+    }
 
     struct v4l2_control control_s;
     control_s.id = id;
     if (ioctl(fd, VIDIOC_G_CTRL, &control_s) < 0)
+    {
+        printf("Getting control id %d failed.\n", id);
         return -1;
+    }
     if (control_s.value == queryctrl.default_value)
-        return -1;
+    {
+        printf("Warning: Control id %d is still default.\n", id);
+    }
     return control_s.value;
 }
 
 bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     struct v4l2_queryctrl queryctrl;
+    bool ok = true;
     queryctrl.id = id;
+    printf("Control number %d.\n", id);
     if (ioctl(fd, VIDIOC_QUERYCTRL, &queryctrl) < 0)
-        return false;
-    if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED
-        )
-        return false; // not available
+    {
+        printf("  Control DNE.\n");
+        ok = false;
+    }
+    if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
+    {
+        printf("  Control disabled.\n");
+        ok = false; // not available
+    }
     if (queryctrl.type != V4L2_CTRL_TYPE_BOOLEAN
             && queryctrl.type != V4L2_CTRL_TYPE_INTEGER
             && queryctrl.type != V4L2_CTRL_TYPE_MENU)
-        return false; // not supported
-
-    // clip value
-    if (value < queryctrl.minimum)
-        value = queryctrl.minimum;
-    if (value > queryctrl.maximum)
-        value = queryctrl.maximum;
-    if (value < 0)
-        value = queryctrl.default_value;
+    {
+        printf("  Control not supported.\n");
+        ok = false;
+    }
 
     struct v4l2_control control_s;
     control_s.id = id;
     control_s.value = value;
-    if (ioctl(fd, VIDIOC_S_CTRL, &control_s) < 0)
-        return false;
-    return true;
+    while(getControlSetting(id) != value)
+    {
+        printf("trying %d.\n", id);
+        if (ioctl(fd, VIDIOC_S_CTRL, &control_s) < 0)
+        {
+            printf("  Control setting failed anyway.\n");
+            ok = false;
+        }
+    }
+    return ok;
 }
 
 void V4L2ImageTranscriber::assertCameraSettings() {
@@ -561,38 +627,38 @@ void V4L2ImageTranscriber::assertCameraSettings() {
     int gain = getControlSetting(V4L2_CID_GAIN);
 
     if (exposure != settings.exposure) {
-        printf("CAMERA::Exposure setting is wrong:");
+        printf("CAMERA::WARNING::Exposure setting is wrong:");
         printf(" is %d, not %d.\n", exposure, settings.exposure);
         allFine = false;
     }
     if (brightness != settings.brightness) {
-        printf("CAMERA::Brightnes setting is wrong:");
+        printf("CAMERA::WARNING::Brightness setting is wrong:");
         printf(" is %d, not %d.\n", brightness, settings.brightness);
         allFine = false;
     }
     if (contrast != settings.contrast) {
-        printf("CAMERA::Contrast setting is wrong:");
+        printf("CAMERA::WARNING::Contrast setting is wrong:");
         printf(" is %d, not %d.\n", contrast, settings.contrast);
         allFine = false;
     }
     if (red != settings.red_chroma) {
-        printf("CAMERA::Red chroma setting is wrong:");
+        printf("CAMERA::WARNING::Red chroma setting is wrong:");
         printf(" is %d, not %d.\n", red, settings.red_chroma);
         allFine = false;
     }
     if (blue != settings.blue_chroma) {
-        printf("CAMERA::Blue chroma setting is wrong:");
+        printf("CAMERA::WARNING::Blue chroma setting is wrong:");
         printf(" is %d, not %d.\n", blue, settings.blue_chroma);
         allFine = false;
     }
     if (gain != settings.gain) {
-        printf("CAMERA::Gain setting is wrong:");
+        printf("CAMERA::WARNING::Gain setting is wrong:");
         printf(" is %d, not %d.\n", gain, settings.gain);
         allFine = false;
     }
 
     if (allFine) {
-        printf("CAMERA::Camera settings match settings stored in hardware/driver.\n");
+        printf("CAMERA::Settings match settings stored in hardware/driver.\n");
     }
 }
 

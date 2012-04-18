@@ -55,9 +55,7 @@ public:
 private:
     Camera::Settings settings;
 
-#ifndef NO_NAO_EXTENSIONS
     int cameraAdapterFd;
-#endif
 
     enum {
         frameBufferCount = 4, /**< Amount of available frame buffers. */
@@ -65,8 +63,10 @@ private:
     };
     int fd;
     void* mem[frameBufferCount]; /**< Frame buffer addresses. */
-    int memLength[frameBufferCount]; /**< The length of each frame buffer. */
-    struct v4l2_buffer* buf; /**< Reusable parameter struct for some ioctl calls. */
+    int memLength[frameBufferCount]; /* The length of each frame buffer. */
+    /* Reusable parameter struct for some ioctl calls. */
+    struct v4l2_buffer* buf;
+
     struct v4l2_buffer* currentBuf; /**< The last dequeued frame buffer. */
     unsigned long long timeStamp;
 
@@ -77,7 +77,7 @@ private:
     int getControlSetting(unsigned int id);
     bool setControlSetting(unsigned int id, int value);
 
-    void initSettings(const Camera::Settings& set);
+    void initSettings();
     void initOpenI2CAdapter();
     void initSelectCamera();
     void initOpenVideoDevice();
@@ -87,6 +87,10 @@ private:
     void initRequestAndMapBuffers();
     void initQueueAllBuffers();
     void startCapturing();
+
+    void enumerate_menu();
+    struct v4l2_queryctrl queryctrl;
+    struct v4l2_querymenu querymenu;
 
     enum {
         y0 = 0,

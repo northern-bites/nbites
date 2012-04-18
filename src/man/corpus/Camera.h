@@ -13,8 +13,8 @@ class Camera {
 
 public:
     enum Type {
-        TOP = 0,
-        BOTTOM = 1
+        TOP = 0x01,
+        BOTTOM = 0x02
     };
 
     static const int KEEP_DEFAULT = -1;
@@ -45,7 +45,7 @@ public:
     static const int DEFAULT_GAIN = 40;
     static const int DEFAULT_BLUECHROMA = KEEP_DEFAULT;
     static const int DEFAULT_REDCHROMA = KEEP_DEFAULT;
-    static const int DEFAULT_BRIGHTNESS = KEEP_DEFAULT;
+    static const int DEFAULT_BRIGHTNESS = 130;
     static const int DEFAULT_CONTRAST = 60;
     static const int DEFAULT_SATURATION = 130;
     static const int DEFAULT_HUE = KEEP_DEFAULT;
