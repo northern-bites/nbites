@@ -45,10 +45,10 @@ public:
     static const int DEFAULT_GAIN = 40;
     static const int DEFAULT_BLUECHROMA = KEEP_DEFAULT;
     static const int DEFAULT_REDCHROMA = KEEP_DEFAULT;
-    static const int DEFAULT_BRIGHTNESS = 130;
+    static const int DEFAULT_BRIGHTNESS = 80;
     static const int DEFAULT_CONTRAST = 60;
     static const int DEFAULT_SATURATION = 130;
-    static const int DEFAULT_HUE = KEEP_DEFAULT;
+    static const int DEFAULT_HUE = 0;
     static const int DEFAULT_EXPOSURE = 60;
 #else
     static const int DEFAULT_AUTO_GAIN = false; // AUTO GAIN OFF

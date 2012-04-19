@@ -88,7 +88,9 @@ private:
     void initQueueAllBuffers();
     void startCapturing();
 
+    // Can be used to get info about controls
     void enumerate_menu();
+    void enumerate_controls();
     struct v4l2_queryctrl queryctrl;
     struct v4l2_querymenu querymenu;
 
