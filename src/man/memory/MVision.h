@@ -36,11 +36,22 @@ public:
      */
     void updateData();
 
+    boost::shared_ptr<const proto::PVision> get() const {return data; }
+
 private:
     //update helper methods
     void update(proto::PVision::PVisualDetection* visual_detection,
             VisualDetection* visualDetection);
-
+    void update(proto::PVision::PVisualLandmark* visual_landmark,
+	    VisualLandmark* visualLandmark);
+    void update(proto::PVision::PVisualFieldObject* visual_field_object,
+	    VisualFieldObject* visualFieldObject);
+    void update(proto::PVision::PVisualRobot* visual_robot,
+	    VisualRobot* visualRobot);
+    void update(proto::PVision::PVisualLine* visual_line,
+		boost::shared_ptr<VisualLine> visualLine);
+    void update(proto::PVision::PVisualCross* visual_cross,
+	    VisualCross* visualCross);
 private:
     boost::shared_ptr<Vision> vision;
     PVision_ptr data;
