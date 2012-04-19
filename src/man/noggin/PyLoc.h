@@ -140,7 +140,7 @@ public:
     // Odometry
     const float getOdoX() const { return loc->getLastOdo().x; }
     const float getOdoY() const { return loc->getLastOdo().y; }
-    const float getOdoTheta() const { return loc->getLastOdo().theta; }
+    const float getOdoThetaDeg() const { return loc->getLastOdo().theta * TO_DEG; }
 
 };
 
