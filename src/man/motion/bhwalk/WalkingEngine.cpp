@@ -258,8 +258,16 @@ void WalkingEngine::update()
     torsoMatrixProvider.update(theTorsoMatrix, theFilteredSensorData, theRobotDimensions, theRobotModel,
             theGroundContactState, theDamageConfiguration);
 
-    motionSelector.update(theMotionSelection, theMotionRequest, walkingEngineOutput,
-            theGroundContactState, theDamageConfiguration, theFrameInfo);
+//    motionSelector.update(theMotionSelection, theMotionRequest, walkingEngineOutput,
+//            theGroundContactState, theDamageConfiguration, theFrameInfo);
+    //motion selector surrogate
+    theMotionSelection.walkRequest = theMotionRequest.walkRequest;
+    theMotionSelection.targetMotion = theMotionRequest.motion;
+    for (int i = 0 ; i < MotionRequest::numOfMotions; i++) {
+        theMotionSelection.ratios[i] = 0;
+    }
+    theMotionSelection.ratios[theMotionSelection.targetMotion] = 1.0f;
+
 
     static bool calibrated = false;
     if (calibrated != theInertiaSensorData.calibrated) {
