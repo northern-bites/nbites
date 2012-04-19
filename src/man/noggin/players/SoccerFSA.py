@@ -5,7 +5,6 @@
 from man.motion import HeadMoves
 import man.motion as motion
 from ..util import FSA
-from ..navigator import NavHelper as helper
 from . import CoreSoccerStates
 
 class SoccerFSA(FSA.FSA):
@@ -61,22 +60,9 @@ class SoccerFSA(FSA.FSA):
         Wrapper method to easily change the walk vector of the robot
         """
         if x == 0 and y == 0 and theta == 0:
-            self.stopWalking()
+            self.stand()
         else:
             self.brain.nav.walk(x,y,theta)
-
-    def getWalk(self):
-        """
-        returns a tuple of current walk parameters
-        """
-        nav = self.brain.nav
-        return (nav.walkX, nav.walkY, nav.walkTheta)
-
-    def setDestination(self, x, y, theta, gain=1.0):
-        """
-        Wrapper method to set the robot's destination
-        """
-        self.brain.nav.setDest(x, y, theta, gain)
 
     def stand(self):
         """ Set the navigator/motion engine to stand"""
@@ -86,7 +72,7 @@ class SoccerFSA(FSA.FSA):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
-        self.brain.nav.stand()
+        self.brain.nav.stop()
 
     def ballMoved(self):
         """
@@ -104,14 +90,6 @@ class SoccerFSA(FSA.FSA):
     def saveBallPosition(self):
         self.lastBall_x = self.brain.ball.loc.x
         self.lastBall_y = self.brain.ball.loc.y
-
-    def atDestinationCloser(self):
-        nav = self.brain.nav
-        return helper.atDestinationCloser(self.brain.my, nav.dest)
-
-    def atHeading(self):
-        nav = self.brain.nav
-        return helper.atHeading(self.brain.my, nav.dest.h)
 
 ##### Direct Motion Calls
     def gainsOff(self):

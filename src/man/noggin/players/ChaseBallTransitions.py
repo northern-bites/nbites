@@ -30,11 +30,11 @@ def ballInPosition(player):
         return False
 
     #Get the current kick sweet spot information
-    (bestX, bestY, bestH) = player.brain.kickDecider.getIdealKickPosition()
+    position = player.brain.kickDecider.getIdealKickPosition()
 
-    return (0 < bestX < constants.BALL_X_OFFSET and
-                bestY < constants.BALL_Y_OFFSET and
-                bestH < constants.GOOD_ENOUGH_H)
+    return (0 < position.relX < constants.BALL_X_OFFSET and
+                position.relY < constants.BALL_Y_OFFSET and
+                position.relH < constants.GOOD_ENOUGH_H)
 
 def ballNearPosition(player):
     """
@@ -56,16 +56,6 @@ def shouldKickAgain(player):
     Ball hasn't changed enough to warrant new kick decision.
     """
     return (shouldKick(player) and ballNearPosition(player))
-
-def ballTooFar(player):
-    """
-    Navigator is almost at its destination, but we're still far away
-    from the ball
-    """
-    if player.brain.nav.nearDestination and player.brain.ball.dist > 30:
-        print "ballTooFar"
-        return True
-    return False
 
 def shouldOrbit(player):
     """
