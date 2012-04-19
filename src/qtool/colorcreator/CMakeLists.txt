@@ -49,4 +49,6 @@ target_link_libraries(
   colorcreator
   data
   ${QT_LIBRARIES}
+  man
+
   )

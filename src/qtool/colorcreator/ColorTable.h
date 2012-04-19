@@ -23,6 +23,7 @@ class ColorTable
 public:
     ColorTable();
     byte*** getTable() {return table; }
+    uint8_t* getLinearTable();
     void read(QString filename);
     byte getColor(byte y, byte u, byte v);
     void setColor(byte y, byte u, byte v, byte col);

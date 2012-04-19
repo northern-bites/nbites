@@ -7,7 +7,7 @@
  */
 
 #include "ColorTableCreator.h"
-
+#include "corpus/alconnect/ALConstants.h"
 
 #include <QMouseEvent>
 
@@ -17,16 +17,33 @@ namespace qtool {
     namespace colorcreator {
         using namespace qtool::data;
         using namespace qtool::image;
+        using namespace boost;
+        using namespace man::memory::proto;
 
         ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
                                              QWidget *parent) :
             QWidget(parent), dataManager(dataManager),
             image(new BMPYUVImage(dataManager->getMemory()->getMImage(),
-                                  BMPYUVImage::RGB, this))
+                                  BMPYUVImage::RGB, this)),
+            // threshImage(new ThresholdedImage(dataManager->getMemory()
+            //                                 ->getMImage(), this)),
+            params(Y0, U0, V0, Y1, U1, V1, YLIMIT, ULIMIT, VLIMIT)
             // imageViewer(image, this)
         {
+            rawThreshImage = shared_ptr<PImage>(new PImage);
+            rawThreshImage->set_width(AVERAGED_IMAGE_WIDTH);
+            rawThreshImage->set_height(AVERAGED_IMAGE_HEIGHT);
+
+            // HACK HACK HACK
+            rawThreshImage->mutable_image()->assign(16*AVERAGED_IMAGE_SIZE,'0');
+            rawThresh = (uint16_t*)(rawThreshImage->mutable_image()->data());
+
+            threshImage = new ThresholdedImage(rawThreshImage, this);
+
             imageViewer = new viewer::BMPImageViewerListener(image, this);
-            rightImageViewer = new viewer::BMPImageViewer(image, this);
+            thresholdedImageViewer = new viewer::BMPImageViewer(threshImage, this);
+            colorTable = new ColorTable();
+
             QHBoxLayout* mainLayout = new QHBoxLayout;
             QHBoxLayout* leftLayout = new QHBoxLayout;
 
@@ -35,14 +52,29 @@ namespace qtool {
             dataManager->connectSlotToMObject(imageViewer,
                                               SLOT(updateView()),
                                               MIMAGE_ID);
-            dataManager->connectSlotToMObject(rightImageViewer,
+            dataManager->connectSlotToMObject(thresholdedImageViewer,
                                               SLOT(updateView()),
                                               MIMAGE_ID);
-            QObject::connect(imageViewer, SIGNAL(fetchColorToDefine(int,int)),
-                             this, SLOT(updateColorTable(int,int)));
+            QObject::connect(imageViewer, SIGNAL(fetchColorToDefine(byte,byte,byte)),
+                             this, SLOT(updateColorTable(byte,byte,byte)));
+
+            //set up the color selection combo box
+            for (int i = 0; i < image::NUM_COLORS; i++) {
+                colorSelect.addItem(image::Color_label[i].c_str());
+            }
+            connect(&colorSelect, SIGNAL(currentIndexChanged(int)),
+                    this, SLOT(updateColorSelection(int)));
+            colorSelect.setCurrentIndex(STARTING_COLOR);
+            rightLayout->addWidget(&colorSelect);
+
+            saveColorTableBtn.setText("Save Color Table");
+            rightLayout->addWidget(&saveColorTableBtn);
+            connect(&saveColorTableBtn, SIGNAL(clicked()),
+                    this, SLOT(saveColorTableBtnPushed()));
 
             leftLayout->addWidget(imageViewer);
-            rightLayout->addWidget(rightImageViewer);
+            rightLayout->addWidget(thresholdedImageViewer);
+
             mainLayout->addLayout(leftLayout);
             mainLayout->addLayout(rightLayout);
 
@@ -76,11 +108,27 @@ namespace qtool {
         }
 
         void ColorTableCreator::updateThresholdedImage(){
+            // current color table is 'colorTable'
+            uint8_t* yuv = (uint8_t*) dataManager->getMemory()->getMImage()->get()->image().data();
+            //qDebug() << "Start acquiring thresholded image";
+
+            // ImageAcquisition::acquire_image_fast(colorTable->getLinearTable(),
+            //                                       params,
+            //                                       yuv,
+            //                                       rawThresh);
+            thresholdedImageViewer->updateView();
+            //qDebug() << "No Segfault after the raw image is acquired";
         }
 
-        void ColorTableCreator::updateColorTable(int x, int y)
+        void ColorTableCreator::updateColorTable(byte y, byte u, byte v)
         {
-            printf("X: %d, Y: %d\n",x,y);
+            colorTable->setColor(y,u,v,currentColor);
+            updateThresholdedImage();
+        }
+
+        void ColorTableCreator::updateColorSelection(int color)
+        {
+            currentColor = color;
         }
     }
 }

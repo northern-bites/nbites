@@ -102,7 +102,10 @@ byte ColorTable::getColor(byte y, byte u, byte v)
 
 void ColorTable::setColor(byte y, byte u, byte v, byte col)
 {
-    table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] | col;
+    QTextStream out(stdout);
+    out << y/2 << " " << u/2 << " " << v/2;
+    table[v / 2][u / 2][y / 2] |= col;
+
 }
 
 void ColorTable::unSetColor(byte y, byte u, byte v, byte col)
@@ -110,6 +113,29 @@ void ColorTable::unSetColor(byte y, byte u, byte v, byte col)
     byte allCol = 0xFF;
     col = col ^ allCol;
     table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] & col;
+}
+
+uint8_t* ColorTable::getLinearTable()
+{
+    QTextStream out(stdout);
+    uint8_t* linearTable = new uint8_t[128*128*128];
+    byte V_MAX = 128, U_MAX = 128, Y_MAX = 128;
+    int index = 0;
+    out << "Start write loop";
+    // loop through all possible table values - our tables are v-u-y
+    for (byte z = 0; z < V_MAX; z++)
+    {
+        for (byte x = 0; x < U_MAX; x++)
+        {
+            for (byte y = 0; y < Y_MAX; y++)
+            {
+                linearTable[index] = table[y][x][z];
+                index++;
+            }
+        }
+    }
+    return linearTable;
+
 }
 
 /* Write out a color table using bitwise definitions

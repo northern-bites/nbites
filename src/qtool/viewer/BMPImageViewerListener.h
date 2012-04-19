@@ -7,6 +7,7 @@
 #include <QtDebug>
 #include <QMouseEvent>
 #include "BMPImageViewer.h"
+#include "../image/BMPYUVImage.h"
 
 namespace qtool {
     namespace viewer {
@@ -15,12 +16,17 @@ namespace qtool {
 
              public:
 
-             BMPImageViewerListener(image::BMPImage* image,
+             BMPImageViewerListener(image::BMPYUVImage* image,
                                     QWidget *parent = NULL);
             void mouseReleaseEvent ( QMouseEvent *event);
 
             signals:
-            void fetchColorToDefine(int x,int y);
+            void fetchColorToDefine(byte y, byte u, byte v);
+
+            private:
+            unsigned width;
+            unsigned height;
+            image::BMPYUVImage* givenImage;
 
         };
     }
