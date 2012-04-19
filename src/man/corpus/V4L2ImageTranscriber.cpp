@@ -340,6 +340,7 @@ void V4L2ImageTranscriber::enumerate_controls()
 
 void V4L2ImageTranscriber::initSettings()
 {
+#if ROBOT_TYPE == NAO_NEXTGEN
     // Horizontal and Vertical flip
     setControlSetting(9963796, 0);
     setControlSetting(9963797, 0);
@@ -371,9 +372,6 @@ void V4L2ImageTranscriber::initSettings()
     // White Balance?
     setControlSetting(9963789, -60);
 
-    // Backlight compensation
-    //setControlSetting(9963804, 2);
-
     // Auto exposure off
     setControlSetting(10094849, 0);
 
@@ -382,8 +380,25 @@ void V4L2ImageTranscriber::initSettings()
 
     // Gain
     setControlSetting(9963795, settings.gain);
+#else
+    // make sure all auto stuff is OFF!
+    setControlSetting(V4L2_CID_AUTOEXPOSURE , 0);
+    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
+    setControlSetting(V4L2_CID_AUTOGAIN, 0);
+    setControlSetting(V4L2_CID_HUE_AUTO, 0);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, V4L2_EXPOSURE_MANUAL);
+    // The following should be 1 if we're using the top camera (?)
+    setControlSetting(V4L2_CID_HFLIP, 0);
+    setControlSetting(V4L2_CID_VFLIP, 0);
 
-    // White balance ... ?
+    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
+    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
+    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
+    setControlSetting(V4L2_CID_GAIN, settings.gain);
+    setControlSetting(V4L2_CID_BLUE_BALANCE, settings.blue_chroma);
+    setControlSetting(V4L2_CID_RED_BALANCE, settings.red_chroma);
+#endif
+
 }
 
 void V4L2ImageTranscriber::startCapturing() {
