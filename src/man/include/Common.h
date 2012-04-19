@@ -61,6 +61,14 @@ typedef unsigned int uint;
 typedef unsigned char byte;
 #endif
 
+#define CHECK_SUCCESS(x) {\
+        int result; \
+        if( (result = (x)) < 0) { \
+            printf("Problem with " #x ", returned %i\n", result); \
+            perror("Error message"); \
+        } \
+}
+
 #include <time.h>
 #include <sys/time.h>
 
