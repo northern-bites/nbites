@@ -341,52 +341,37 @@ void V4L2ImageTranscriber::enumerate_controls()
 void V4L2ImageTranscriber::initSettings()
 {
 #if ROBOT_TYPE == NAO_NEXTGEN
-    // Horizontal and Vertical flip
-    setControlSetting(9963796, 0);
-    setControlSetting(9963797, 0);
+    // ORDER BELOW IS SUPER IMPORTANT
+    setControlSetting(V4L2_CID_HFLIP, 0);
+    setControlSetting(V4L2_CID_VFLIP, 0);
 
-    // Trying auto wb on?
-    setControlSetting(9963788, 1);
+    // Auto WB, exposure on (buggy driver, blah)
+    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 1);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
 
-    // Auto exposure on
-    setControlSetting(10094849, 1);
-
-    // Brightness CANNOT
-    setControlSetting(9963776, settings.brightness);
+    // Set brightness when above are off
+    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
 
     // Auto white balance off
-    setControlSetting(9963788, 0);
+    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
 
-    // Contrast
-    setControlSetting(9963777, settings.contrast);
+    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
+    setControlSetting(V4L2_CID_SATURATION, settings.saturation);
+    setControlSetting(V4L2_CID_HUE, settings.hue);
+    setControlSetting(V4L2_CID_SHARPNESS, 3);
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, -60);
 
-    // Saturation
-    setControlSetting(9963778, settings.saturation);
+    // Auto exposure back off
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 0);
 
-    // Hue
-    setControlSetting(9963779, settings.hue);
-
-    // Sharpness
-    setControlSetting(9963803, 3);
-
-    // White Balance?
-    setControlSetting(9963789, -60);
-
-    // Auto exposure off
-    setControlSetting(10094849, 0);
-
-    // Exposure
-    setControlSetting(9963793, settings.exposure);
-
-    // Gain
-    setControlSetting(9963795, settings.gain);
+    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
+    setControlSetting(V4L2_CID_GAIN, settings.gain);
 #else
     // make sure all auto stuff is OFF!
     setControlSetting(V4L2_CID_AUTOEXPOSURE , 0);
     setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
     setControlSetting(V4L2_CID_AUTOGAIN, 0);
-    setControlSetting(V4L2_CID_HUE_AUTO, 0);
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, V4L2_EXPOSURE_MANUAL);
+
     // The following should be 1 if we're using the top camera (?)
     setControlSetting(V4L2_CID_HFLIP, 0);
     setControlSetting(V4L2_CID_VFLIP, 0);

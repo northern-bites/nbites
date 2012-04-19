@@ -52,12 +52,12 @@ public:
     static const int DEFAULT_EXPOSURE = 60;
 #else
     static const int DEFAULT_AUTO_GAIN = false; // AUTO GAIN OFF
-    static const int DEFAULT_GAIN = 28;
-    static const int DEFAULT_BLUECHROMA = 133;
-    static const int DEFAULT_REDCHROMA = 64;
-    static const int DEFAULT_BRIGHTNESS = 130;
-    static const int DEFAULT_CONTRAST = 93;
-    static const int DEFAULT_SATURATION = 151;
+    static const int DEFAULT_GAIN = 27;
+    static const int DEFAULT_BLUECHROMA = 120;
+    static const int DEFAULT_REDCHROMA = 85;
+    static const int DEFAULT_BRIGHTNESS = 150;
+    static const int DEFAULT_CONTRAST = 88;
+    static const int DEFAULT_SATURATION = 150;
     static const int DEFAULT_HUE = 0;
     static const int DEFAULT_EXPOSURE = 129;
 #endif
