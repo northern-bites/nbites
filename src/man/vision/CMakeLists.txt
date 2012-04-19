@@ -174,6 +174,7 @@ IF( VISIONLINK )
                         ${VISION_TARGET}
                         ${SENSORS_TARGET}
                         ${NBINCLUDE_TARGET}
+			${ROBOT_INTERFACE_TARGET}
                        )
 ENDIF( VISIONLINK )
 
