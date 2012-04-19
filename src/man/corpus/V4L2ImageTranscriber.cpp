@@ -285,7 +285,8 @@ void V4L2ImageTranscriber::enumerate_controls()
                 continue;
 
             printf ("Control %s", queryctrl.name);
-            printf (" has id %d ", queryctrl.id);
+            printf (" has id %d,", queryctrl.id);
+            printf (" steps %d,", queryctrl.step);
             printf (" and min %d, max %d.\n\n", queryctrl.minimum,
                     queryctrl.maximum);
 
