@@ -52,6 +52,9 @@ BOOST_PYTHON_MODULE(objects)
     class_<RelRobotLocation, bases<RelLocation> >("RelRobotLocation",
                                                   init<float, float, float>())
         .add_property("relH", &RelRobotLocation::getRelH, &RelRobotLocation::setRelH)
+        .def(self - other<boost::python::tuple>())
+        .def("rotate", &RelRobotLocation::rotate)
+        .def("within", &RelRobotLocation::within)
         .def("__str__", &RelRobotLocation::toString)
         ;
 
