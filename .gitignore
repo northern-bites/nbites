@@ -49,3 +49,4 @@ src/remote/dist/javadoc/
 ext/*
 lib/*
 /util/scripts/nbites.bash
+/.metadata
