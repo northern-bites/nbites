@@ -34,6 +34,15 @@ class Color
     typedef unsigned int RGB;
 
 public:
+    static ColorID getColorIDFromBitColor(int bits) {
+        for (int i = 0; i < NUM_COLORS; i++) {
+            if (bits == Color_bits[i]) {
+                return (ColorID) i;
+            }
+        }
+        return Grey;
+    }
+
     static MixedColorID getMixedColorIDFromBitColor(int bits) {
         switch(bits) {
         case GREEN_BIT | BLUE_BIT :

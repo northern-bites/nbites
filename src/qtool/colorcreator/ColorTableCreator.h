@@ -60,7 +60,7 @@ namespace qtool {
             QComboBox colorSelect;
             int currentColor;
             ColorParams params;
-            uint16_t* rawThresh;
+            uint8_t* rawThresh;
 
             boost::shared_ptr<man::memory::proto::PImage> rawThreshImage;
             // Octavians idea for name

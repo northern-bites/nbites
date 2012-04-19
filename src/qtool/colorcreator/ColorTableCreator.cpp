@@ -8,7 +8,6 @@
 
 #include "ColorTableCreator.h"
 #include "corpus/alconnect/ALConstants.h"
-
 #include <QMouseEvent>
 
 #include <QFileDialog>
@@ -35,8 +34,8 @@ namespace qtool {
             rawThreshImage->set_height(AVERAGED_IMAGE_HEIGHT);
 
             // HACK HACK HACK
-            rawThreshImage->mutable_image()->assign(16*AVERAGED_IMAGE_SIZE,'0');
-            rawThresh = (uint16_t*)(rawThreshImage->mutable_image()->data());
+            rawThreshImage->mutable_image()->assign(COLOR_IMAGE_BYTE_SIZE,'0');
+            rawThresh = (uint8_t*)(rawThreshImage->mutable_image()->data());
 
             threshImage = new ThresholdedImage(rawThreshImage, this);
 
@@ -112,10 +111,22 @@ namespace qtool {
             uint8_t* yuv = (uint8_t*) dataManager->getMemory()->getMImage()->get()->image().data();
             //qDebug() << "Start acquiring thresholded image";
 
-            // ImageAcquisition::acquire_image_fast(colorTable->getLinearTable(),
-            //                                       params,
-            //                                       yuv,
-            //                                       rawThresh);
+//             ImageAcquisition::acquire_image_fast(colorTable->getLinearTable(),
+//                                                   params,
+//                                                   yuv,
+//                                                   rawThresh);
+//            byte** y_image = image->getYUVImage()->getYImage();
+//            byte** u_image = image->getYUVImage()->getUImage();
+//            byte** v_image = image->getYUVImage()->getVImage();
+            for (int i = 0; i < rawThreshImage->height(); i++) {
+                for (int j = 0; j < rawThreshImage->width(); j++) {
+                    int thresh_index = rawThreshImage->width() * i + j;
+                    rawThresh[thresh_index] = colorTable->getColor(
+                            image->getYUVImage()->getY(2*i, 2*j),
+                            image->getYUVImage()->getU(2*i, 2*j),
+                            image->getYUVImage()->getV(2*i, 2*j));
+                }
+            }
             thresholdedImageViewer->updateView();
             //qDebug() << "No Segfault after the raw image is acquired";
         }

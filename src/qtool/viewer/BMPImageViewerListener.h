@@ -10,24 +10,24 @@
 #include "../image/BMPYUVImage.h"
 
 namespace qtool {
-    namespace viewer {
-        class BMPImageViewerListener: public BMPImageViewer {
-             Q_OBJECT
+namespace viewer {
+class BMPImageViewerListener: public BMPImageViewer {
+    Q_OBJECT
 
-             public:
+public:
 
-             BMPImageViewerListener(image::BMPYUVImage* image,
-                                    QWidget *parent = NULL);
-            void mouseReleaseEvent ( QMouseEvent *event);
+    BMPImageViewerListener(image::BMPYUVImage* image,
+            QWidget *parent = NULL);
+    void mouseReleaseEvent ( QMouseEvent *event);
 
-            signals:
-            void fetchColorToDefine(byte y, byte u, byte v);
+    signals:
+    void fetchColorToDefine(byte y, byte u, byte v);
 
-            private:
-            unsigned width;
-            unsigned height;
-            image::BMPYUVImage* givenImage;
+private:
+    unsigned width;
+    unsigned height;
+    image::BMPYUVImage* givenImage;
 
-        };
-    }
+};
+}
 }

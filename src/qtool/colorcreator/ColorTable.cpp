@@ -129,7 +129,7 @@ uint8_t* ColorTable::getLinearTable()
         {
             for (byte y = 0; y < Y_MAX; y++)
             {
-                linearTable[index] = table[y][x][z];
+                linearTable[index] = table[z][x][y];
                 index++;
             }
         }

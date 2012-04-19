@@ -23,8 +23,8 @@ void ThresholdedImage::buildBitmap() {
     for (int j = 0; j < getHeight(); ++j) {
         QRgb* bitmapLine = (QRgb*) bitmap.scanLine(j);
         for (int i = 0; i < getWidth(); ++i) {
-            int color = rawImage->image()[j*rawImage->width() + i];
-            bitmapLine[i] = Color_RGB[color];
+            byte color = rawImage->image()[j*rawImage->width() + i];
+            bitmapLine[i] = Color_RGB[Color::getColorIDFromBitColor(color)];
         }
     }
 }
