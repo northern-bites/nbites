@@ -13,7 +13,7 @@ namespace motion {
 using namespace boost;
 using namespace std;
 
-//#define DEBUG_BHWALK
+#define DEBUG_BHWALK
 #ifdef DEBUG_BHWALK
 #define bhwalk_out std::cout
 #else
@@ -167,18 +167,18 @@ void BHWalkProvider::hardReset() {
 
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
     WalkRequest* walkRequest = &(walkingEngine.theMotionRequest.walkRequest);
-    walkRequest->mode = WalkRequest::speedMode;
+    walkRequest->mode = WalkRequest::percentageSpeedMode;
 
-    if (command->theta_rads == 0 && command->x_mms == 0 && command->y_mms == 0) {
+    if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
         this->stand();
         return;
     }
 
     walkingEngine.theMotionRequest.motion = MotionRequest::walk;
 
-    walkRequest->speed.rotation = command->theta_rads;
-    walkRequest->speed.translation.x = command->x_mms;
-    walkRequest->speed.translation.y = command->y_mms;
+    walkRequest->speed.rotation = command->theta_percent;
+    walkRequest->speed.translation.x = command->x_percent;
+    walkRequest->speed.translation.y = command->y_percent;
 
     bhwalk_out << "BHWalk speed walk requested with command ";
     bhwalk_out << *(command.get());
