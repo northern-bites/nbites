@@ -86,7 +86,7 @@ void MotionSelector::update(MotionSelection& motionSelection,
     const unsigned deltaTime(theFrameInfo.getTimeSince(lastExecution));
     const int interpolationTime = prevMotion == MotionRequest::specialAction && lastActiveSpecialAction == SpecialActionRequest::playDead ? playDeadDelay : interpolationTimes[motionSelection.targetMotion];
     float delta((float)deltaTime / interpolationTime);
-    ASSERT(SystemCall::getMode() == SystemCall::logfileReplay || delta > 0.00001f);
+//    ASSERT(SystemCall::getMode() == SystemCall::logfileReplay || delta > 0.00001f);
     float sum(0);
     for(int i = 0; i < MotionRequest::numOfMotions; i++)
     {

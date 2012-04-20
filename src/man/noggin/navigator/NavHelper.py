@@ -62,10 +62,11 @@ def getOrbitLocation(radius, angle):
     """
     Returns the RelRobotLocation destination of an orbit
     """
-    #@todo:this is kind of ugly
-    dest = RelRobotLocation(radius, 0, 0)
-    dest.rotate(-angle)
-    return RelRobotLocation(radius - dest.relX, -dest.relY, -angle)
+    #@todo: pretty good aproximation for small radiuses and angles
+    if angle > 0:
+        return RelRobotLocation(0.1, radius, -angle)
+    else:
+        return RelRobotLocation(0.1, -radius, -angle)
     
 
 def setSpeed(nav, speeds):

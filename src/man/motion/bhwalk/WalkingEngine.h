@@ -8,7 +8,7 @@
 
 //#include "Tools/Module/Module.h"
 //#include "Modules/Infrastructure/NaoProvider.h"
-//#include "MotionSelector.h"
+#include "MotionSelector.h"
 #include "Modules/Sensing/JointFilter.h"
 #include "Modules/Sensing/RobotModelProvider.h"
 #include "Modules/Sensing/TorsoMatrixProvider.h"
@@ -601,7 +601,7 @@ private:
 
   WalkingEngineOutput walkingEngineOutput;
 
-//  MotionSelector motionSelector;
+  MotionSelector motionSelector;
   MotionSelection theMotionSelection;
   MotionInfo theMotionInfo;
   OdometryData theOdometryData;

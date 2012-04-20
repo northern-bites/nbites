@@ -25,7 +25,7 @@ def gamePlaying(player):
     
     if player.firstFrame():
         player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        player.brain.nav.walkTo(RelRobotLocation(0.1, 7, -45), Navigator.CLOSE_ENOUGH, 0.2)
+        player.brain.nav.orbitAngle(7, -45)
 
     #if player.brain.ball.vis.on:
     # player.brain.sensors.saveFrame()

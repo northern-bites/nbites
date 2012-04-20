@@ -146,7 +146,7 @@ class Navigator(FSA.FSA):
         destination; a solution would be to enque several smaller
         walkTo's or something
         """
-        self.walkTo(helper.getOrbitLocation(radius, angle), CLOSE_ENOUGH, 0.1)
+        self.walkTo(helper.getOrbitLocation(radius, angle), CLOSE_ENOUGH, SLOW_SPEED)
 
         
 

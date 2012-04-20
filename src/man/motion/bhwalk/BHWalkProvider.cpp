@@ -145,6 +145,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     if (requestedToStop && walkingEngine.walkingEngineOutput.isLeavingPossible) {
         inactive();
         requestedToStop = false;
+        //reset odometry - this allows the walk to not "freak out" when we come back
+        //from other providers
+        walkingEngine.theOdometryData = OdometryData();
     }
 }
 
@@ -163,6 +166,9 @@ MotionModel BHWalkProvider::getOdometryUpdate() {
 
 void BHWalkProvider::hardReset() {
     stand();
+    inactive();
+    //reset odometry
+    walkingEngine.theOdometryData = OdometryData();
 }
 
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {

@@ -72,8 +72,8 @@ def walkingTo(nav):
     
     deltaOdo = helper.getDeltaOdometry(loc, walkingTo.startingOdometry)
     walkingTo.deltaDest = dest - (deltaOdo.relX, deltaOdo.relY, deltaOdo.relH)
-    print "Delta dest {0}".format(walkingTo.deltaDest)
-    print str(dest)
+#    print "Delta dest {0}".format(walkingTo.deltaDest)
+#    print str(dest)
     print str(deltaOdo)
     #walk the rest of the way
     helper.setDestination(nav, walkingTo.deltaDest, walkingTo.speed)
