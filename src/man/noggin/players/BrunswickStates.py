@@ -13,7 +13,7 @@ def gameInitial(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.stopWalking()
+        player.brain.nav.stop()
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False

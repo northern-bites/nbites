@@ -57,7 +57,7 @@ BOOST_PYTHON_MODULE(_localization)
         // Odometry
         .add_property("lastOdoX", &PyLoc::getOdoX)
         .add_property("lastOdoY", &PyLoc::getOdoY)
-        .add_property("lastOdoTheta", &PyLoc::getOdoTheta)
+        .add_property("lastOdoTheta", &PyLoc::getOdoThetaDeg)
         // functional
         .def("reset", &PyLoc::reset, "reset the localization system")
         .def("resetBall", &PyLoc::resetBall)

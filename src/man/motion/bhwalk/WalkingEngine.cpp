@@ -260,6 +260,14 @@ void WalkingEngine::update()
 
     motionSelector.update(theMotionSelection, theMotionRequest, walkingEngineOutput,
             theGroundContactState, theDamageConfiguration, theFrameInfo);
+    //motion selector surrogate
+//    theMotionSelection.walkRequest = theMotionRequest.walkRequest;
+//    theMotionSelection.targetMotion = theMotionRequest.motion;
+//    for (int i = 0 ; i < MotionRequest::numOfMotions; i++) {
+//        theMotionSelection.ratios[i] = 0;
+//    }
+//    theMotionSelection.ratios[theMotionSelection.targetMotion] = 1.0f;
+
 
     static bool calibrated = false;
     if (calibrated != theInertiaSensorData.calibrated) {
@@ -306,7 +314,9 @@ void WalkingEngine::update()
   }
 
   //this is what motion combinator does more or less
-  theOdometryData += walkingEngineOutput.odometryOffset;
+  if (theMotionSelection.ratios[MotionRequest::walk] > .99f) {
+      theOdometryData += walkingEngineOutput.odometryOffset;
+  }
   theMotionInfo.motion = theMotionRequest.motion;
   theMotionInfo.isMotionStable = true;
   theMotionInfo.walkRequest = walkingEngineOutput.executedWalk;

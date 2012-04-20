@@ -145,6 +145,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     if (requestedToStop && walkingEngine.walkingEngineOutput.isLeavingPossible) {
         inactive();
         requestedToStop = false;
+        //reset odometry - this allows the walk to not "freak out" when we come back
+        //from other providers
+        walkingEngine.theOdometryData = OdometryData();
     }
 }
 
@@ -163,22 +166,25 @@ MotionModel BHWalkProvider::getOdometryUpdate() {
 
 void BHWalkProvider::hardReset() {
     stand();
+    inactive();
+    //reset odometry
+    walkingEngine.theOdometryData = OdometryData();
 }
 
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
     WalkRequest* walkRequest = &(walkingEngine.theMotionRequest.walkRequest);
-    walkRequest->mode = WalkRequest::speedMode;
+    walkRequest->mode = WalkRequest::percentageSpeedMode;
 
-    if (command->theta_rads == 0 && command->x_mms == 0 && command->y_mms == 0) {
+    if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
         this->stand();
         return;
     }
 
     walkingEngine.theMotionRequest.motion = MotionRequest::walk;
 
-    walkRequest->speed.rotation = command->theta_rads;
-    walkRequest->speed.translation.x = command->x_mms;
-    walkRequest->speed.translation.y = command->y_mms;
+    walkRequest->speed.rotation = command->theta_percent;
+    walkRequest->speed.translation.x = command->x_percent;
+    walkRequest->speed.translation.y = command->y_percent;
 
     bhwalk_out << "BHWalk speed walk requested with command ";
     bhwalk_out << *(command.get());

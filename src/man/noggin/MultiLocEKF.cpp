@@ -279,7 +279,10 @@ void MultiLocEKF::updateLocalization(const MotionModel& u,
 // Update expected position based on odometry
 void MultiLocEKF::odometryUpdate(const MotionModel& u)
 {
-    DeltaMotionModel deltaOdometry = u - lastOdometry;
+    DeltaMotionModel deltaOdometry;
+    if (u.isValid()) {
+        deltaOdometry = u - lastOdometry;
+    } // if odometry is invalid leave deltaOdometry be (0, 0, 0)
     timeUpdate(deltaOdometry);
     limitAPrioriUncert();
     lastOdometry = u;

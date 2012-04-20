@@ -8,9 +8,9 @@ include( ../../cmake/base_definitions.cmake )
 add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 
 set( bhwalk_srcs BHWalkProvider.cpp
+				 MotionSelector.cpp
                  WalkingEngine.cpp
                  WalkingEngineKick.cpp
-                 MotionSelector.cpp
                  Modules/Infrastructure/NaoProvider.cpp
                  Modules/Sensing/TorsoMatrixProvider.cpp
                  Modules/Sensing/RobotModelProvider.cpp

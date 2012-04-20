@@ -118,7 +118,6 @@ namespace noggin {
         RelRobotLocation operator- (const RobotLocation& other) const;
         RobotLocation operator+ (const RelRobotLocation& other) const;
         RelRobotLocation getRelRobotLocationOf(const RobotLocation& other) const;
-
         // Extra getter
         virtual const degrees getH(){ return h*TO_DEG; }
 
@@ -184,9 +183,17 @@ namespace noggin {
         RelRobotLocation(float dx = 0, float dy = 0, degrees dh = 0);
         virtual ~RelRobotLocation() {};
         RelRobotLocation(const RelRobotLocation& other);
+        virtual RelRobotLocation operator- (boost::python::tuple delta) const;
 
         virtual const degrees getRelH() const { return relH*TO_DEG; }
         virtual void setRelH(degrees _h){ relH = _h*TO_RAD; }
+
+        virtual void rotate(degrees theta);
+
+        //region is a (x, y, h) tuple
+        //check if this rel robot location is within the ellipse specified by
+        // x, y and the heading specified by h
+        bool within(boost::python::tuple region) const;
 
         // For python
         boost::python::str toString();

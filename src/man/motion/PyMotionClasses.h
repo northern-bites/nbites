@@ -157,14 +157,9 @@ private:
 
 class PyWalkCommand : public PyMotionCommand {
 public:
-    PyWalkCommand(float x_cms, float m_cms, float theta_degs) {
-        //All python units should be in CM and DEG per second
-        //C++ is in mm and rads, so we need to convert
-        command = WalkCommand::ptr(
-	    new WalkCommand(x_cms*CM_TO_MM,
-			    m_cms*CM_TO_MM,
-			    theta_degs*TO_RAD)
-	    );
+    PyWalkCommand(float x_percent, float y_percent, float theta_percent) {
+        // Since it's a scalar magnitude, conversion doesn't matter
+        command = WalkCommand::ptr(new WalkCommand(x_percent, y_percent, theta_percent));
     }
 
     WalkCommand::ptr getCommand() const {

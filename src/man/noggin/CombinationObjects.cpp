@@ -191,8 +191,44 @@ namespace noggin {
     }
 
     RelRobotLocation::RelRobotLocation(const RelRobotLocation& other)
-    : RelLocation(other.getRelX(), other.getRelY()), relH(other.getRelH())
+    : RelLocation(other.getRelX(), other.getRelY()), relH(other.getRelH()*TO_RAD)
     {
+    }
+
+    RelRobotLocation RelRobotLocation::operator- (boost::python::tuple delta) const {
+        return RelRobotLocation(getRelX() - boost::python::extract<float>(delta[0]),
+                                getRelY() - boost::python::extract<float>(delta[1]),
+                                getRelH() - boost::python::extract<float>(delta[2]));
+    }
+
+    void RelRobotLocation::rotate(degrees theta) {
+        radians theta_r = theta*TO_RAD;
+
+        float sint, cost;
+        sincosf(theta_r, &sint, &cost);
+        float new_x = relX * cost - relY * sint;
+        float new_y = relX * sint + relY * cost;
+
+        relX = new_x;
+        relY = new_y;
+        relH += theta_r;
+    }
+
+    bool RelRobotLocation::within(boost::python::tuple region) const {
+
+        //check heading
+        float h = boost::python::extract<float>(region[2])*TO_RAD;
+
+        if (std::fabs(relH) > h)
+            return false;
+
+        //check xy-region through an ellipse check
+
+        float x = boost::python::extract<float>(region[0]);
+        float y = boost::python::extract<float>(region[1]);
+        // (relX/x)^2 + (relY/y)^2 < 1
+        // http://www.wolframalpha.com/input/?i=x%5E2%2Fa%5E2+%2B+y%5E2%2Fb%5E2+%3C%3D+1
+        return (relX*relX)/(x*x) + (relY*relY)/(y*y) <= 1;
     }
 
     boost::python::str RelRobotLocation::toString()
