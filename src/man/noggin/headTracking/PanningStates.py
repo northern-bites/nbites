@@ -19,7 +19,7 @@ def scanBall(tracker):
         constants.TRACKER_FRAMES_ON_TRACK_THRESH):
 
         tracker.activeLocOn = False
-        return tracker.goNow('tracking')
+        return tracker.goNow('ballTracking')
 
     if not tracker.brain.motion.isHeadActive():
         if ball.dist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
@@ -45,7 +45,7 @@ def spinScanBall(tracker):
         tracker.activeLocOn = False
         return tracker.goNow('ballSpinTracking')
 
-    if nav.walkTheta > 0:
+    if nav.isSpinningLeft():
         tracker.headMove = HeadMoves.LEFT_EDGE_SCAN_BALL
     else:
         tracker.headMove = HeadMoves.RIGHT_EDGE_SCAN_BALL
