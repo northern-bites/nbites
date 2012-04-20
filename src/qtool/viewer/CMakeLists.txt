@@ -53,6 +53,7 @@ target_link_libraries(
   memory
   vision
   _sensors
+  _robot_connect
   ${QT_LIBRARIES}
 
   )

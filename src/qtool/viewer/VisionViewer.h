@@ -17,9 +17,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "man/memory/Memory.h"
-//#include "man/memory/MVision.h"
-//#include "man/vision/Vision.h"
-//#include "man/corpus/NaoPose.h"
+#include "man/corpus/offlineconnect/OfflineImageTranscriber.h"
+#include "image/ThresholdedImage.h"
 #include "image/BMPYUVImage.h"
 #include "data/RobotMemoryManager.h"
 #include "BMPImageViewer.h"
@@ -37,16 +36,19 @@ public:
 
 public slots:
     void update();
+    void loadColorTable();
 
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
-    viewer::RoboImageViewer roboImageViewer;
+    image::ThresholdedImage* visionImage;
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;
     man::memory::MVision::ptr offlineMVision;
+    boost::shared_ptr<man::memory::proto::PImage> rawImage;
+    man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
 
 };
 
