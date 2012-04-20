@@ -131,6 +131,12 @@ void Noggin::initializeLocalization()
     printf("Initializing localization modules\n");
 #   endif
 
+    std::cout << "Checking for posts with distances greater than "
+	      << (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)
+	      << " and less than "
+	      << (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)
+	      << std::endl;
+
     // Initialize the localization module
     loc = shared_ptr<LocSystem>(new MultiLocEKF());
 
@@ -311,26 +317,17 @@ void Noggin::updateLocalization()
     // FieldObjects
 
     VisualFieldObject fo;
-    // We should now never see a blue goal post. 
-    // fo = *vision->bgrp;
-
-    // if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-    //     PointObservation seen(fo);
-    //     pt_observations.push_back(seen);
-    // }
-
-    // fo = *vision->bglp;
-    // if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-    //     PointObservation seen(fo);
-    //     pt_observations.push_back(seen);
-    // }
-
     // If the robot is on the opposing side, the CLOSER goal posts
-    // are the opposing ("blue") goal posts. Otherwise, the closer
+    // are the opposing goal posts. Otherwise, the closer
     // posts are their own posts.
+    // If teamColor == TEAM_RED, then the opposing goal posts are 
+    // yellow; otherwise, the opposing goal posts are "blue". 
     bool bluePost = false;
     fo = *vision->ygrp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    // There is a 120 cm "no posts" zone to avoid mislabeling a goal. 
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE
+       && (fo.getDistance() > (FIELD_WHITE_WIDTH * 0.5f + CENTER_CIRCLE_RADIUS)
+	   || fo.getDistance() < (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)) ) 
     {
       if(loc->isOnOpposingSide())
       {
@@ -377,7 +374,9 @@ void Noggin::updateLocalization()
     }
 
     fo = *vision->yglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE
+       && (fo.getDistance() > (FIELD_WHITE_WIDTH * 0.5f + CENTER_CIRCLE_RADIUS)
+	   || fo.getDistance() < (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)) )
     {
       if(loc->isOnOpposingSide())
       {
