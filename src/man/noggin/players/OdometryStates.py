@@ -3,16 +3,21 @@ import copy
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import man.motion.StiffnessModes as StiffnessModes
-from objects import RobotLocation
+from ..navigator import NavStates
+from objects import RobotLocation, RelRobotLocation
 
 ####Change these for picture taking####
 FRAME_SAVE_RATE = 1
 NUM_FRAMES_TO_SAVE = 150
 
-FRONT_SIDE_SPIN = (((1, 0, 0), 150),
-                   ((0, 1, 0), 150),
-                   ((0, 0, 1), 150),
-                   ((0.8, 0.8, 0.2), 150))
+FRONT_SIDE_SPIN = (((20, 0, 0), 50),
+                   ((0, 0, 45), 100),
+                   ((20, 0, 0), 100),
+                   ((0, 0, -20), 200),
+                   ((0, 20, 0), 200),
+                   ((0, -15, 0), 200),
+                   ((20, 20, 0), 200),
+                   ((0.8, 0.8, 0.2), 50))
 
 SPIN_WALK = (((0, 0, 1), 50),
              ((1, 0, 0), 150))
@@ -45,13 +50,12 @@ def gamePlaying(player):
         my_current_loc = player.brain.my
         my_current_odo = RobotLocation(loc.lastOdoX, loc.lastOdoY, loc.lastOdoTheta)
         
-        delta_loc = my_current_loc - player.my_last_loc
-        delta_odo = my_current_odo - player.my_last_odo
+#        delta_loc = my_current_loc - player.my_last_loc
+#        delta_odo = my_current_odo - player.my_last_odo
         
-        player.printf("Odometry: {0}".format(my_current_odo - player.my_last_odo))
-        player.printf("Odometry distance {0}, bearing: {1}".format(delta_odo.dist, delta_odo.bearing))
-        player.printf("Loc: {0}".format(my_current_loc - player.my_last_loc))
-        player.printf("Loc distance {0}, bearing: {1}".format(delta_loc.dist, delta_loc.bearing))
+        if (player.testCounter > 0):
+            player.printf("Odometry: {0}".format(my_current_odo - player.my_last_odo))
+            player.printf("Delta Odo {0}".format(NavStates.walkingTo.deltaDest))
         
         player.my_last_loc = RobotLocation(my_current_loc.x, 
                                            my_current_loc.y,
@@ -66,7 +70,7 @@ def gamePlaying(player):
         player.testCounter += 1
         player.numTestFrames = command[1]
         walkVector = command[0]
-        player.brain.nav.walk(*walkVector)
+        player.brain.nav.walkTo(RelRobotLocation(*walkVector))
     
     if player.counter == player.numTestFrames:
         return player.goNow('nextCommand')

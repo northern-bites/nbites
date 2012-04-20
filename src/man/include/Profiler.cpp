@@ -14,6 +14,10 @@ using namespace std;
 static const char *PCOMPONENT_NAMES[] = {
   "Main Loop",
   "GetImage",
+  "Dequeue buf",
+  "Acquire image",
+  "Queue buf",
+
   "Vision",
   "Transform",
   "ThreshRuns",

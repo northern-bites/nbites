@@ -20,6 +20,8 @@ public:
         return MotionModel(x - other.x, y - other.y, theta - other.theta);
     }
 
+    bool isValid() const { return x != 0.0f && y != 0.0f && theta != 0.0f; }
+
     float x;
     float y;
     float theta;

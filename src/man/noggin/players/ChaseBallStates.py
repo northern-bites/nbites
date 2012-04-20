@@ -4,6 +4,7 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
+from ..navigator import Navigator
 from ..playbook.PBConstants import GOALIE
 from objects import RelRobotLocation
 
@@ -23,12 +24,10 @@ def chase(player):
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.nav.goTo(player.brain.ball.loc,
-                              1.0,
-                              constants.CLOSE_ENOUGH, False)
+        player.brain.nav.chaseBall()
         
     # most of the time going to chase will kick back to here, lets us reset
-    if transitions.shouldFindBallKick(player):
+    if transitions.shouldFindBall(player):
         return player.goLater('chase')
         
     if transitions.shouldPrepareForKick(player):
@@ -56,16 +55,13 @@ def positionForKick(player):
         kickDecider.decideKick()
 
     #only enque the new goTo destination once
-    if player.firstFrame():    
-        player.idealKickPosition = RelRobotLocation(*kickDecider.getIdealKickPosition())      
-        player.brain.nav.goTo(player.idealKickPosition, 
-                              constants.KICK_POSITIONING_GAIN,
-                              constants.CLOSE_ENOUGH, False)
+    if player.firstFrame():          
+        player.brain.nav.goTo(kickDecider.getIdealKickPosition(), 
+                              Navigator.CLOSE_ENOUGH,
+                              Navigator.FULL_SPEED,
+                              Navigator.ADAPTIVE)
     else:
-        (bestX, bestY, bestH) = kickDecider.getIdealKickPosition()
-        player.idealKickPosition.relX = bestX
-        player.idealKickPosition.relY = bestY
-        player.idealKickPosition.relH = bestH
+        player.brain.nav.updateDest(kickDecider.getIdealKickPosition())
         
 
     # most of the time going to chase will kick back to here, lets us reset
@@ -112,7 +108,7 @@ def orbitBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.brain.nav.orbitAngle(90) # TODO HACK HACK
+        player.brain.nav.orbitAngle(10, 90) # TODO HACK HACK
 
     if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
         player.inKickingState = False

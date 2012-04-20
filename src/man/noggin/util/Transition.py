@@ -2,7 +2,9 @@ import Queue
 
 SOME_OF_THE_TIME = .5
 MOST_OF_THE_TIME = .75
+ALL_OF_THE_TIME = 1
 
+INSTANT = 1
 LOW_PRECISION = 10
 OK_PRECISION = 20
 
@@ -72,7 +74,7 @@ class CountTransition:
         if self.fifo.qsize() > self.frameWindow:
             self.count -= self.fifo.get()
         
-        if self.count > self.threshold * self.frameWindow:
+        if self.count >= self.threshold * self.frameWindow:
             return True 
         else:
             return False

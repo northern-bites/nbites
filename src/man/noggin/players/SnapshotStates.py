@@ -2,6 +2,8 @@ import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
 import man.motion.StiffnessModes as StiffnessModes
 from ..navigator import BrunswickSpeeds as speeds
+from objects import RelRobotLocation
+from ..navigator import Navigator
 
 ####Change these for picture taking####
 FRAME_SAVE_RATE = 1
@@ -23,7 +25,7 @@ def gamePlaying(player):
     
     if player.firstFrame():
         player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        player.brain.nav.walk(0, 0, 1)
+        player.brain.nav.orbitAngle(7, -45)
 
     #if player.brain.ball.vis.on:
     # player.brain.sensors.saveFrame()
