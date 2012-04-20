@@ -17,8 +17,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "man/memory/Memory.h"
-#include "man/vision/Vision.h"
-#include "man/corpus/NaoPose.h"
+//#include "man/memory/MVision.h"
+//#include "man/vision/Vision.h"
+//#include "man/corpus/NaoPose.h"
 #include "image/BMPYUVImage.h"
 #include "data/RobotMemoryManager.h"
 #include "BMPImageViewer.h"
@@ -34,6 +35,9 @@ class VisionViewer : public QMainWindow{
 public:
     VisionViewer(data::RobotMemoryManager::const_ptr memoryManager);
 
+public slots:
+    void update();
+
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
@@ -42,6 +46,7 @@ private:
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;
+    man::memory::MVision::ptr offlineMVision;
 
 };
 

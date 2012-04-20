@@ -19,7 +19,9 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
     vision = shared_ptr<Vision> (new Vision(pose));
-
+    offlineMVision = shared_ptr<MVision> (new MVision(vision));
+    
+    memoryManager->connectSlotToMObject(this, SLOT(update()), MIMAGE_ID);
 
     this->setCentralWidget(&roboImageViewer);
     memoryManager->connectSlotToMObject(&roboImageViewer,
@@ -45,5 +47,13 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     }
 
 }
+
+void VisionViewer::update(){
+  sensors->updateVisionAngles();
+  vision->notifyImage(sensors->getImage());
+  offlineMVision->updateData();
+
+}
+
 }
 }
