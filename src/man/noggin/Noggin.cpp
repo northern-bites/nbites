@@ -305,6 +305,9 @@ void Noggin::updateLocalization()
     vector<PointObservation> pt_observations;
     vector<CornerObservation> corner_observations;
 
+    // Get team of the robot for localization.
+    uint8 teamColor = (*gc->getMyTeam()).teamColor;
+
     // FieldObjects
 
     VisualFieldObject fo;
@@ -325,6 +328,7 @@ void Noggin::updateLocalization()
     // If the robot is on the opposing side, the CLOSER goal posts
     // are the opposing ("blue") goal posts. Otherwise, the closer
     // posts are their own posts.
+    bool bluePost = false;
     fo = *vision->ygrp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
     {
@@ -333,10 +337,14 @@ void Noggin::updateLocalization()
 	if(fo.getDistance() < (FIELD_WHITE_WIDTH * 0.5f))
 	{
 	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
-	    &ConcreteFieldObject::blueGoalRightPostList;
+	    (teamColor == TEAM_RED) ?
+	    &ConcreteFieldObject::blueGoalRightPostList
+	    : &ConcreteFieldObject::yellowGoalRightPostList;
+
 	  fo.setPossibleFieldObjects(possibleFieldObjects);
 	  std::cout << "See opposing yellow right post (" << fo.toString() << ") at distance "
 		    << fo.getDistance() << " (offender.)" << std::endl;
+	  bluePost = true;
 	}
 	else
 	{
@@ -349,10 +357,14 @@ void Noggin::updateLocalization()
 	if(fo.getDistance() > (FIELD_WHITE_WIDTH * 0.5f))
 	{
 	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
-	    &ConcreteFieldObject::blueGoalRightPostList;
+	    (teamColor == TEAM_RED) ?
+	    &ConcreteFieldObject::blueGoalRightPostList
+	    : &ConcreteFieldObject::yellowGoalRightPostList;
+
 	  fo.setPossibleFieldObjects(possibleFieldObjects);
 	  std::cout << "See opposing yellow right post (" << fo.getID() << ") at distance "
 		    << fo.getDistance() << " (defender.)" << std::endl;
+	  bluePost = true;
       	}
 	else
 	{
@@ -376,6 +388,7 @@ void Noggin::updateLocalization()
 	  fo.setPossibleFieldObjects(possibleFieldObjects);
 	  std::cout << "See opposing yellow left post (" << fo.getID() << ") at distance "
 		    << fo.getDistance() << " (offender.)" << std::endl;
+	  bluePost = true;
 	}
 	else
 	{
@@ -392,6 +405,7 @@ void Noggin::updateLocalization()
 	  fo.setPossibleFieldObjects(possibleFieldObjects);
 	  std::cout << "See opposing yellow left post (" << fo.getID() << ") at distance "
 		    << fo.getDistance() << " (defender.)" << std::endl;	
+	  bluePost = true;
 	}
 	else
 	{
@@ -403,12 +417,21 @@ void Noggin::updateLocalization()
         pt_observations.push_back(seen);
     }
 
+    if(pt_observations.size() > 0)
+    {
+      std::cout << "Looking at " << (bluePost ? "BLUE " : "YELLOW ") << " posts." << std::endl;
+    }
+
     vector<PointObservation>::iterator obsIter;
     for(obsIter = pt_observations.begin(); obsIter != pt_observations.end(); ++obsIter)
     {
       std::cout << "Spotted post: " << *obsIter << std::endl;
+      std::cout << "Possibilities: " << std::endl;
+      std::vector<PointLandmark> p = (*obsIter).getPossibilities();
+      std::vector<PointLandmark>::iterator goalIter = p.begin();
+      for(; goalIter != p.end(); ++goalIter)
+	std::cout << *goalIter << std::endl;
     }
-
 
     // Field Cross
     if (vision->cross->getDistance() > 0 &&
