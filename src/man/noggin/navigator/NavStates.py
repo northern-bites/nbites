@@ -43,7 +43,7 @@ def goToPosition(nav):
     else:
         speed = goToPosition.speed
 
-    print "distance {0} and speed {1}".format(relDest.dist, speed)
+#    print "distance {0} and speed {1}".format(relDest.dist, speed)
 
     #reduce the speed if we're close to the target
     helper.setDestination(nav, relDest, speed)
@@ -74,7 +74,7 @@ def walkingTo(nav):
     walkingTo.deltaDest = dest - (deltaOdo.relX, deltaOdo.relY, deltaOdo.relH)
 #    print "Delta dest {0}".format(walkingTo.deltaDest)
 #    print str(dest)
-    print str(deltaOdo)
+#    print str(deltaOdo)
     #walk the rest of the way
     helper.setDestination(nav, walkingTo.deltaDest, walkingTo.speed)
     

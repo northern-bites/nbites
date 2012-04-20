@@ -13,7 +13,7 @@ namespace motion {
 using namespace boost;
 using namespace std;
 
-#define DEBUG_BHWALK
+//#define DEBUG_BHWALK
 #ifdef DEBUG_BHWALK
 #define bhwalk_out std::cout
 #else
