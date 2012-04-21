@@ -55,9 +55,9 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("hUncert", &PyLoc::getHUncert)
         .add_property("radHUncert", &PyLoc::getRadHUncert)
         // Odometry
-        .add_property("lastOdoF", &PyLoc::getOdoF)
-        .add_property("lastOdoL", &PyLoc::getOdoL)
-        .add_property("lastOdoR", &PyLoc::getOdoR)
+        .add_property("lastOdoX", &PyLoc::getOdoX)
+        .add_property("lastOdoY", &PyLoc::getOdoY)
+        .add_property("lastOdoTheta", &PyLoc::getOdoThetaDeg)
         // functional
         .def("reset", &PyLoc::reset, "reset the localization system")
         .def("resetBall", &PyLoc::resetBall)

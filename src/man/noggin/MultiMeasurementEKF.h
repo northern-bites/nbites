@@ -285,7 +285,7 @@ public:
 
 protected:
    // Pure virtual methods to be specified by implementing class
-   virtual StateVector associateTimeUpdate(UpdateModel u_k) = 0;
+   virtual StateVector associateTimeUpdate(const UpdateModel& u_k) = 0;
    virtual void incorporateMeasurement(const Measurement1& z,
                                        StateMeasurementMatrix1 &H_k,
                                        MeasurementMatrix1 &R_k,

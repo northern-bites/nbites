@@ -7,6 +7,19 @@ from math import (cos,
                   sin,
                   sqrt)
 
+def mapRange(x, x_start, x_end, y_start, y_end):
+    """
+    Maps x in from the range x_start, x_end to the corresponding value
+    in the range y_start, y_end
+    """
+    if x <= x_start:
+        return y_start
+    elif x >= x_end:
+        return y_end
+    else:
+        ratio = (x - x_start)/(x_end - x_start)
+        return (ratio * (y_end - y_start)) + y_start
+
 def sub180Angle(angle):
     """
     Returns the angle identitical to the input angle that is between -180 and

@@ -138,9 +138,9 @@ public:
     }
 
     // Odometry
-    const float getOdoF() const { return loc->getLastOdo().deltaF; }
-    const float getOdoL() const { return loc->getLastOdo().deltaL; }
-    const float getOdoR() const { return loc->getLastOdo().deltaR; }
+    const float getOdoX() const { return loc->getLastOdo().x; }
+    const float getOdoY() const { return loc->getLastOdo().y; }
+    const float getOdoThetaDeg() const { return loc->getLastOdo().theta * TO_DEG; }
 
 };
 

@@ -34,7 +34,6 @@ private:
     inline bool is_wired_if(const char* if_name) const;
 
 private:
-    int connection_check_rate;
     //address_buffer - contains the last address returned by get_ip
     char* address_buffer;
 };

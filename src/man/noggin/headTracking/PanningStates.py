@@ -45,7 +45,7 @@ def spinScanBall(tracker):
         tracker.activeLocOn = False
         return tracker.goNow('ballSpinTracking')
 
-    if nav.walkTheta > 0:
+    if nav.isSpinningLeft():
         tracker.headMove = HeadMoves.LEFT_EDGE_SCAN_BALL
     else:
         tracker.headMove = HeadMoves.RIGHT_EDGE_SCAN_BALL

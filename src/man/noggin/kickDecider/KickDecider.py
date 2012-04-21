@@ -3,6 +3,7 @@ import KickInformation
 import KickingConstants as constants
 import noggin_constants as NogginConstants
 from ..playbook import PBConstants
+from objects import RelRobotLocation
 
 class KickDecider(object):
     """
@@ -31,6 +32,19 @@ class KickDecider(object):
         sets a particular kick
         """
         self.info.kick = k
+        
+    def getIdealKickPosition(self):
+        """
+        gets an ideal position for the robot to be in
+        for the kick to work
+        """
+        (kick_x, kick_y, kick_heading) = self.info.kick.getPosition()
+        ballLoc = self.brain.ball.loc
+        myLoc = self.brain.my
+        
+        return RelRobotLocation(ballLoc.relX - kick_x, 
+                                ballLoc.relY - kick_y, 
+                                kick_heading - myLoc.h)
 
     def getSweetMove(self):
         """

@@ -78,7 +78,7 @@ def doneStanding(guard):
     """
     if guard.firstFrame():
         guard.brain.player.gainsOn()
-        guard.brain.motion.walkPose()
+        guard.brain.player.stand()
 
     # Swtich player out of safe mode. Put in the Game Controller
     # state so that if game conditions have changed, it doens't do

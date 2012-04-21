@@ -174,13 +174,13 @@ private:
                                         MeasurementVector &V_k);
 
     inline void updateFrameLength();
-    inline void updatePosition(const MotionModel& odo,
+    inline void updatePosition(const DeltaMotionModel& deltaOdometry,
                                StateVector& deltaBall);
-    inline void updateVelocity(const MotionModel& odo,
+    inline void updateVelocity(const DeltaMotionModel& deltaOdometry,
                                StateVector& deltaBall);
-    inline void updateAcceleration(const MotionModel& odo,
+    inline void updateAcceleration(const DeltaMotionModel& deltaOdometry,
                                    StateVector& deltaBall);
-    inline void calculateTimeUpdateJacobian(const MotionModel& odo,
+    inline void calculateTimeUpdateJacobian(const DeltaMotionModel& deltaOdometry,
                                             StateVector& deltaBall);
 
     virtual void beforeCorrectionFinish();
@@ -190,7 +190,7 @@ private:
     void initMatrices();
     float applyFriction(float vel);
     StateVector transformStateWithOdometry(const StateVector& x,
-                                           const MotionModel& odo);
+                                           const DeltaMotionModel& deltaOdometry);
     MeasurementVector
     calculateObservedState(const RangeBearingMeasurement& z,
                            const StateVector& xhat_k_prev);
@@ -201,7 +201,8 @@ private:
     PoseEst robotPose;
     long long int lastUpdateTime;
     float dt;
-    MotionModel curOdo;
+    MotionModel lastOdometry;
+    DeltaMotionModel curDeltaOdometry;
     int errorCounter;
 
     const static float BETA_BALL;

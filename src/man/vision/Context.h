@@ -40,15 +40,12 @@ class Context; // forward reference
 #include "Field.h"
 
 enum facing {
-    FACING_BLUE_GOAL = 0,
-    FACING_YELLOW_GOAL,
+    FACING_GOAL = 0,
     FACING_SIDELINE,
     FACING_UNKNOWN
 };
 
 enum half {
-    HALF_BLUE = 0,
-    HALF_YELLOW,
     HALF_UNKNOWN
 };
 
@@ -67,12 +64,12 @@ public:
     void setOLCorner() {oCorner++; lCorner++;}
     void setILCorner() {iCorner++; lCorner++;}
     void setCCCorner() {cCorner++; seeCenterCircle = true;}
-    void setRightYellowPost() {rightYellowPost = true; yellowPost = true;}
-    void setLeftYellowPost() {leftYellowPost = true; yellowPost = true;}
-    void setUnknownYellowPost() {unknownYellowPost = true; yellowPost = true;}
-    void setRightBluePost() {rightBluePost = true; bluePost = true;}
-    void setLeftBluePost() {leftBluePost = true; bluePost = true;}
-    void setUnknownBluePost() {unknownBluePost = true; bluePost = true;}
+    void setRightYellowPost() {rightPost = true; seePost = true;}
+    void setLeftYellowPost() {leftPost = true; seePost = true;}
+    void setUnknownYellowPost() {unknownPost = true; seePost = true;}
+    void setRightBluePost() {rightPost = true; seePost = true;}
+    void setLeftBluePost() {leftPost = true; seePost = true;}
+    void setUnknownBluePost() {unknownPost = true; seePost = true;}
     void setUnknownCross() {unknownCross = true; cross = true;}
     void setYellowCross() {yellowCross = true; cross = true;}
     void setBlueCross() {blueCross = true; cross = true;}
@@ -87,13 +84,13 @@ public:
     int  getLCorner() {return lCorner;}
     int  getILCorner() {return iCorner;}
     int  getOLCorner() {return oCorner;}
-    bool getRightYellowPost() {return rightYellowPost;}
-    bool getLeftYellowPost() {return leftYellowPost;}
-    bool getUnknownYellowPost() {return unknownYellowPost;}
-    bool getYellowPost() {return yellowPost;}
-    bool getRightBluePost() {return rightBluePost;}
-    bool getLeftBluePost() {return leftBluePost;}
-    bool getUnknownBluePost() {return unknownBluePost;}
+    bool getRightYellowPost() {return rightPost;}
+    bool getLeftYellowPost() {return leftPost;}
+    bool getUnknownYellowPost() {return unknownPost;}
+    bool getYellowPost() {return seePost;}
+    bool getRightBluePost() {return rightPost;}
+    bool getLeftBluePost() {return leftPost;}
+    bool getUnknownBluePost() {return unknownPost;}
     bool getCross() {return cross;}
     bool getUnknownCross() {return unknownCross;}
     bool getYellowCross() {return yellowCross;}
@@ -218,14 +215,10 @@ private:
     facing face;
     half fieldHalf;
 
-    bool rightYellowPost;
-    bool leftYellowPost;
-    bool unknownYellowPost;
-    bool yellowPost;
-    bool rightBluePost;
-    bool leftBluePost;
-    bool unknownBluePost;
-    bool bluePost;
+    bool rightPost;
+    bool leftPost;
+    bool unknownPost;
+    bool seePost;
     int  tCorner;
     int  lCorner;
     int  iCorner;

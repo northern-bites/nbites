@@ -38,7 +38,6 @@ protected:
 
 protected:
     image::BMPImage* image;
-    image::BMPImage* overlay;
     QLabel imagePlaceholder;
 
 };
