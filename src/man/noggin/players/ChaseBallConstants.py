@@ -23,7 +23,7 @@ SHOULD_KICK_AGAIN_Y = 9
 ##        navigator's PFK. Otherwise there can be bad looping.
 BALL_X_OFFSET = 2
 BALL_Y_OFFSET = 2
-GOOD_ENOUGH_H = 15
+GOOD_ENOUGH_H = 6
 
 # Should dribble should and should stop dribbling
 SHOULD_DRIBBLE_X = 68.
