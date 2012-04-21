@@ -99,6 +99,8 @@ def position(player):
 def watch(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
+        if player.lastDiffState == 'kickBall':
+            player.brain.nav.stand()
 
     #if player.brain.ball.dist < 100:
     #    player.executeMove(SweetMoves.GOALIE_SQUAT)
@@ -117,14 +119,14 @@ def kickBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if player.brain.ball.vis.relY < 0:
+        if player.brain.ball.loc.relY < 0:
             kick = SweetMoves.RIGHT_BIG_KICK
         else:
             kick = SweetMoves.LEFT_BIG_KICK
 
         player.executeMove(kick)
 
-    if player.counter < 10 and player.brain.nav.isStopped():
+    if player.counter > 10 and player.brain.nav.isStopped():
         return player.goLater('watch')
 
     return player.stay()
