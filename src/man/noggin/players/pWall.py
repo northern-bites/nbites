@@ -1,5 +1,6 @@
 from . import SoccerFSA
 from . import WallStates
+from . import PaceStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
