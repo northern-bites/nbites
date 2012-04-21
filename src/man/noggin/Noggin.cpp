@@ -132,8 +132,8 @@ void Noggin::initializeLocalization()
 #   endif
 
     std::cout << "Checking for posts with distances greater than "
-	      << (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)
-	      << " and less than "
+	      << (FIELD_WHITE_WIDTH * 0.5f + CENTER_CIRCLE_RADIUS)
+	      << " or less than "
 	      << (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)
 	      << std::endl;
 
