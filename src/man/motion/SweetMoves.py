@@ -511,7 +511,9 @@ KICK_DIST_INTERVAL = MAX_KICK_DIST - MIN_KICK_DIST
 INTERVAL_RATIO = KICK_HIP_INTERVAL / KICK_DIST_INTERVAL
 
 def LEFT_D_KICK(y,dist):
-    kick_leg_hip_roll=y*2.0;
+    y = 15
+    dist = 400
+    kick_leg_hip_roll=y*2;
 
     if kick_leg_hip_roll>20.0:
         kick_leg_hip_roll=20.0
@@ -538,28 +540,36 @@ def LEFT_D_KICK(y,dist):
         ((80.,40.,-50.,-70.),
          (0.,0.,-35.,73.,-37.,-13.),
          (0.,0,-38.,76.,-37.,-13.),
-         (80.,-40.,50.,70.),0.5,0, stiff.NORMAL_STIFFNESSES),
+         (80.,-40.,50.,70.),
+         .5,0, stiff.NORMAL_STIFFNESSES),
 
         # Lift/cock leg
         ((80.,0.,-50.,-90.),
          (0.,kick_leg_hip_roll-10., -20.,120.,-37.,-20.),
-         (0.,0,-40.,86.,-37.,-20.),
+         (0.,0,-45.,70.,-35.,-15.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         .5,0, stiff.NORMAL_STIFFNESSES),
+         1.,0, stiff.NORMAL_STIFFNESSES),
 
         # kick left leg
         ((80.,0.,-50.,-90.),
-         (0.,kick_leg_hip_roll-5., kick_hip_pitch-5, 60.,10.,-20.),
-         (0.,0.,-40.,86.,-37.,-20.),
+         (0.,kick_leg_hip_roll-5., kick_hip_pitch-5, 75.,-10.,-20.),
+         (0.,1.,-45.,86.,-37.,-13.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         .20,0, stiff.NORMAL_STIFFNESSES),
+         .3,0, stiff.NORMAL_STIFFNESSES),
 
-        # return to normal position
-        ((60., 35., 0.,0.),
-         (0.0,  0.0,  -22., 50., -30., 0.0),
-         (0.0,  0.0,  -21., 52., -30., 0.0),
-         (60., -35, 0., 0.),
-         .5,0, stiff.LOW_HEAD_STIFFNESSES)
+        #recover
+        ((80.,40.,-50.,-70.),
+         (0.,0.,-35.,73.,-45.,-13.),
+         (0.,0,-45.,80.,-37.,-13.),
+         (80.,-40.,50.,70.),
+         .5,0, stiff.NORMAL_STIFFNESSES),
+
+        # # return to normal position
+        # ((60., 35., 0.,0.),
+        #  (0.0,  0.0,  -22., 50., -30., 0.0),
+        #  (0.0,  0.0,  -21., 52., -30., 0.0),
+        #  (60., -35, 0., 0.),
+        #  1.5,0, stiff.LOW_HEAD_STIFFNESSES)
         )
 
 STAND_FOR_KICK_LEFT = (
@@ -1072,28 +1082,31 @@ SHORT_QUICK_LEFT_KICK = (
 
     #swing to the right
     ((80.,40.,-50.,-70.),
-     (0.,0.,-40.,81.,-40.,-13.),
-     (0.,1,-38.,76.,-40.,-13.),
-     (80.,-40.,50.,70.),.4,0, stiff.NORMAL_STIFFNESSES),
+     (0.,0.,-35.,65.,-28.,-14.),
+     (0.,2,-38.,76.,-37.,-14.),
+     (80.,-40.,50.,70.),
+     .6,0, stiff.NORMAL_STIFFNESSES),
 
     # Lift/cock leg
-    ((80.,0.,-50.,-90.),
-     (0.,5.5, -40.,110.,-68.,-20.),
-     (0.,2,-40.,86.,-45.,-16.),
+    ((80.,40.,-50.,-90.),
+     (0.,5.5, -40.,75.,-35.,-14.),
+     (0.,2,-38.,76.,-37.,-17.),
      (80.,-40,50.,70.),
-     .4,0, stiff.NORMAL_STIFFNESSES),
+     .5,0, stiff.NORMAL_STIFFNESSES),
 
-    # kick left leg
-    ((80.,0.,-50.,-90.),
-     (0.,10.5, -70, 100.,-30,-20.),
-     (0.,1.,-40.,86.,-45.,-20.),
-     (80.,45,50.,70.),
-     .2,0, stiff.NORMAL_STIFFNESSES),
+    # Kick?
+    ((80.,80.,-50.,-40.),
+     (0.,5, -50.,37.,5.,-14.),
+     (0.,2,-38.,76.,-37.,-17.),
+     (80.,-25,50.,70.),
+     .3,0, stiff.NORMAL_STIFFNESSES),
 
-     ((80.,40.,-50.,-70.),
-     (0.,0.,-40.,76.,-40.,-13.),
-     (0.,0,-40.,76.,-40.,-13.),
-     (80.,-40.,50.,70.),.4,0, stiff.NORMAL_STIFFNESSES),)
+    # Recover
+    ((80.,40.,-50.,-70.),
+     (0.,0.,-35.,65.,-28.,-14.),
+     (0.,2,-38.,76.,-37.,-14.),
+     (80.,-40.,50.,70.),
+     .4,0, stiff.NORMAL_STIFFNESSES),)
 
 SHORT_QUICK_RIGHT_KICK = mirrorMove(SHORT_QUICK_LEFT_KICK)
 
