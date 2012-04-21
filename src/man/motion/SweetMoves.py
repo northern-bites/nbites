@@ -555,7 +555,7 @@ def LEFT_D_KICK(y,dist):
          (0.,kick_leg_hip_roll-5., kick_hip_pitch-5, 75.,-10.,-20.),
          (0.,1.,-45.,86.,-37.,-13.),
          (80.,support_arm_shoulder_roll,50.,70.),
-         .2,0, stiff.NORMAL_STIFFNESSES),
+         .3,0, stiff.NORMAL_STIFFNESSES),
 
         #recover
         ((80.,40.,-50.,-70.),
