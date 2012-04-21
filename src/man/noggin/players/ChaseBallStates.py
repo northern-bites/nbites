@@ -8,6 +8,7 @@ from ..navigator import Navigator
 from ..playbook.PBConstants import GOALIE
 import man.motion.HeadMoves as HeadMoves
 import man.noggin.kickDecider.HackKickInformation as hackKick
+import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation
 
 def chase(player):
@@ -34,7 +35,12 @@ def approachBall(player):
         return player.goLater('chase')
         
     if transitions.shouldPrepareForKick(player) or player.brain.nav.isAtPosition():
-        return player.goNow('prepareForKick')
+        if player.shouldKickOff:
+            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
+            player.shouldKickOff = False
+            return player.goNow('positionForKick')
+        else:
+            return player.goNow('prepareForKick')
     else:
         return player.stay()
 
@@ -71,7 +77,7 @@ def positionForKick(player):
     kick_pos = player.kick.getPosition()
     positionForKick.kickPose = RelRobotLocation(ballLoc.relX - kick_pos[0] - 3,
                                                 ballLoc.relY - kick_pos[1],
-                                                0)
+                                                ballLoc.bearing)
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -80,7 +86,7 @@ def positionForKick(player):
     #only enque the new goTo destination once
     if player.firstFrame():    
         player.brain.nav.goTo(positionForKick.kickPose, 
-                              Navigator.CLOSE_ENOUGH,
+                              (3.0, 3.0, 45),
                               Navigator.CAREFUL_SPEED,
                               Navigator.ADAPTIVE)
     else:

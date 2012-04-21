@@ -304,14 +304,14 @@ GOALIE_POST_RIGHT_SCAN = (((-115.,10.), 0.6, 1, stiff.LOW_HEAD_STIFFNESSES),
                           (( 115.,10.), 0.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 KICK_SCAN = (
-    ((  0.0,-40.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( 30.0,-25.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( 65.0,-20.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES),
-    (( 30.0,-25.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES),
-    ((  0.0,-40.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-30.0,-25.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-65.0,-20.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-30.0,-25.0),.5,  1, stiff.LOW_HEAD_STIFFNESSES))
+    ((  0.0,-40.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 30.0,-25.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 65.0,-20.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    (( 30.0,-25.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((  0.0,-40.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0,-25.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0,-20.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-30.0,-25.0),.4,  1, stiff.LOW_HEAD_STIFFNESSES))
 
 SIDEKICK_PAN_LEFT = (
     ((0.0,30.0),0.3,1,stiff.LOW_HEAD_STIFFNESSES),
