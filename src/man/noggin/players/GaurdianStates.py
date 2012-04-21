@@ -1,6 +1,7 @@
 import time
 from objects import RelRobotLocation
 from ..navigator import Navigator
+from ..kickDecider import kicks
 
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
@@ -13,7 +14,6 @@ def gameInitial(player):
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
-        player.iFell = False
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -47,9 +47,6 @@ def gamePenalized(player):
     return player.stay()
 
 def fallen(player):
-    if player.firstFrame():
-        player.iFell = True
-
     return player.stay()
 
 def gameFinished(player):
@@ -67,8 +64,7 @@ def gamePlaying(player):
         player.brain.tracker.trackBall()
 
     # Came from penalized? Fell recently? Become a chaser!
-    if player.lastDiffState == 'gamePenalized' or \
-            player.iFell:
+    if player.lastDiffState == 'gamePenalized':
         print "become a chaser!" #/* ** */ ADD CHASER CODE
 
     return player.goLater('gaurd')
@@ -101,7 +97,7 @@ def omniApproach(player):
         return player.goLater('omniPositionForKick')
 
     # If lost the ball, stop and chill.
-    if transitions.shouldFindBall():
+    if transitions.shouldFindBall(player):
         return player.goLater('gaurd')
 
     # Approach with all speed!
@@ -124,7 +120,7 @@ def omniPositionForKick(player):
         player.brain.nav.updateDest(getKickPosition(player))
 
     # Did we lose the ball?
-    if transitions.shouldFindBall():
+    if transitions.shouldFindBall(player):
         return player.goLater('gaurd')
 
     # At position?
@@ -133,16 +129,18 @@ def omniPositionForKick(player):
             position.relY < constants.BALL_Y_OFFSET and
             position.relH < constants.GOOD_ENOUGH_H):
         print "kicking!" # KICK IT!!!$@%&!!
+        player.brain.nav.stop()
+        player.executeMove(kicks.BIG_STRAIGHT_KICK.sweetMove) #check this @!
     else:
         print "orbiting!" # ORBIT
 
     return player.stay()
 
 def getKickPosition(player):
-    kick = player.brain.kickDecider.kicks.LEFT_DYNAMIC_STRAIGHT_KICK #check this @!
+    kick = kicks.BIG_STRAIGHT_KICK #check this @!
     ballLoc = player.brain.ball.loc
     (kick_x, kick_y, kick_heading) = kick.getPosition()
-    dest = relRobotLocation(ballLoc.relX - kick_x,
+    dest = RelRobotLocation(ballLoc.relX - kick_x,
                             ballLoc.relY - kick_y,
                             0)
     return dest
