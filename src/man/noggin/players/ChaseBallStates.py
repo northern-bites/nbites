@@ -77,7 +77,7 @@ def positionForKick(player):
     kick_pos = player.kick.getPosition()
     positionForKick.kickPose = RelRobotLocation(ballLoc.relX - kick_pos[0] - 3,
                                                 ballLoc.relY - kick_pos[1],
-                                                0)
+                                                ballLoc.bearing)
 
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -86,7 +86,7 @@ def positionForKick(player):
     #only enque the new goTo destination once
     if player.firstFrame():    
         player.brain.nav.goTo(positionForKick.kickPose, 
-                              Navigator.CLOSE_ENOUGH,
+                              (3.0, 3.0, 45),
                               Navigator.CAREFUL_SPEED,
                               Navigator.ADAPTIVE)
     else:
