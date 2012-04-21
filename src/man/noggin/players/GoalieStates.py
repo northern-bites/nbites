@@ -1,4 +1,5 @@
 import time
+from objects import RelRobotLocation
 
 import man.motion.SweetMoves as SweetMoves
 
@@ -78,8 +79,14 @@ def gameFinished(player):
     return player.stay()
 
 def position(player):
-    # step forward  
-    return player.goNow('watch')  
+    # step forward
+    if player.firstFrame():
+        player.brain.nav.walkTo(RelRobotLocation(10,0,0))
+
+    if player.nav.isStopped():
+        return player.goNow('watch')
+
+    return player.stay()
 
 def watch(player):
     if player.firstFrame():
