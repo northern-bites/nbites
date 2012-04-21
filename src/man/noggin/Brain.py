@@ -259,7 +259,6 @@ class Brain(object):
         for packet in temp:
             if len(packet) == Constants.NUM_PACKET_ELEMENTS:
                 packet = Packet.Packet(packet)
-                print str(packet)
                 if packet.playerNumber != self.my.playerNumber:
                     self.teamMembers[packet.playerNumber-1].update(packet)
                 if Constants.LOG_COMM:
