@@ -58,7 +58,7 @@ namespace qtool
       void updateCurveStyle(int id);
 
       // For protocol buffer message handling.
-      void updateMotionSensors();
+      void updateLocalization();
 
     protected:
       QGridLayout *layout;
@@ -87,9 +87,10 @@ namespace qtool
       
       //RTool* R;
 
+      // For protocol buffer graphing. 
       qtool::data::DataManager::ptr dataManager;
 
-      man::memory::MObject::const_ptr motionSensors;
+      man::memory::MLocalization::PLoc_ptr localization;
 
     };
   }

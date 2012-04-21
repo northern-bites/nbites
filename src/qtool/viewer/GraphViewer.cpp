@@ -11,8 +11,8 @@ namespace qtool
     {
       // Setup signals for protocol buffer messages.
       dataManager->connectSlotToMObject(this, 
-					SLOT( updateMotionSensors() ), 
-					man::memory::MMOTION_SENSORS_ID);
+					SLOT( updateLocalization() ), 
+					man::memory::MLOCALIZATION_ID);
 
       updateGraphButton = new QPushButton(tr("Update Graph"), this);
       graphTitleInput   = new QLineEdit(tr("Default Plot"), this);
@@ -66,10 +66,7 @@ namespace qtool
 
       this->setLayout(layout);
 
-      motionSensors = dataManager->getMemory()->getMObject(man::memory::MMOTION_SENSORS_ID);
-      man::memory::ProtoMessage_const_ptr motionSensorsMessage = motionSensors->getProtoMessage();
-      //std::cout << motionSensorsMessage->timestamp() << std::endl;
-      //std::cout << motionSensorsMessage->body_temperatures << std::endl;
+      man::memory::MLocalization::const_ptr loc = dataManager->getMemory()->getMObject(man::memory::MLOCALIZATION_ID);
    }
 
     GraphViewer::~GraphViewer()
@@ -138,10 +135,9 @@ namespace qtool
       }
     }
 
-    void GraphViewer::updateMotionSensors()
+    void GraphViewer::updateLocalization()
     {
-      std::cout << "Updating Motion Sensor message..." << std::endl;
-      motionSensors = dataManager->getMemory()->getMObject(man::memory::MMOTION_SENSORS_ID);
+      std::cout << "Updating localization..." << std::endl;
     }
   }
 }
