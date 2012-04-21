@@ -48,12 +48,14 @@ def gamePlaying(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
+    return player.goLater('position')
 
 def gamePenalized(player):
     if player.firstFrame():
-        player.brain.stopLogging()
+        player.brain.logger.stopLogging()
         player.inKickingState = False
         player.stopWalking
+        player.executeMove(SweetMoves.SIT_POS)
         player.penalizeHeads()
 
     return player.stay()
@@ -81,9 +83,15 @@ def gameFinished(player):
 def position(player):
     # step forward
     if player.firstFrame():
-        player.brain.nav.walkTo(RelRobotLocation(10,0,0))
+        player.brain.nav.walkTo(RelRobotLocation(15,0,0),
+                                #player.brain.nav.CLOSE_ENOUGH,
+                                (3,3,10),
+                                #player.brain.nav.SLOW_SPEED)
+                                0.2)
 
-    if player.nav.isStopped():
+    # Just in case walkTo fails, eventually stop anyway
+    if player.brain.nav.isStopped() or player.counter > 300:
+        player.brain.nav.stop()
         return player.goNow('watch')
 
     return player.stay()
@@ -112,7 +120,7 @@ def saveIt(player):
     return player.stay()
 
 def upUpUP(player):
-    if player.firstFrame:
+    if player.firstFrame():
         player.upDelay = 0
 
     if player.motion.isBodyActive():

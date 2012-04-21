@@ -7,7 +7,7 @@ from objects import Location
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
-        SOccerFSA.SoccerFSA.__init__(self,brain)
+        SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(GoalieStates)
 
         self.setName('pGoalie')
@@ -24,6 +24,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if (gcState == 'gamePlaying'):
             # Make sure gamePlaying gets run
             if (self.brain.gameController.counter == 2):
-                self.switchTo('watch')
+                self.switchTo('position')
 
         SoccerFSA.SoccerFSA.run(self)
