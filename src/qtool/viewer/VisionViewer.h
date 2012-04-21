@@ -20,6 +20,7 @@
 #include "man/corpus/offlineconnect/OfflineImageTranscriber.h"
 #include "image/ThresholdedImage.h"
 #include "image/BMPYUVImage.h"
+#include "image/VisualInfoImage.h"
 #include "data/RobotMemoryManager.h"
 #include "BMPImageViewer.h"
 #include "ChannelImageViewer.h"

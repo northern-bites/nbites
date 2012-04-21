@@ -35,12 +35,23 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     this->addToolBar(toolBar);
 
     visionImage = new ThresholdedImage(rawImage, this);
+    VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
+
+    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(), this);
+    OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
     
-    BMPImageViewer *imageViewer = new BMPImageViewer(visionImage, this);
+    BMPImageViewer *imageViewer = new BMPImageViewer(combo, this);
+    BMPImageViewer *visionViewer = new BMPImageViewer(visionImage, this);
+
+    QTabWidget* imageTabs = new QTabWidget();
+    imageTabs->addTab(imageViewer, tr("Raw Image"));
+    imageTabs->addTab(visionViewer, tr("Vision Image"));
     
     memoryManager->connectSlotToMObject(this, SLOT(update()), MIMAGE_ID);
 
-    this->setCentralWidget(imageViewer);
+    this->setCentralWidget(imageTabs);
+    memoryManager->connectSlotToMObject(visionViewer,
+					SLOT(updateView()), MIMAGE_ID);
     memoryManager->connectSlotToMObject(imageViewer,
 					SLOT(updateView()), MIMAGE_ID);
 
