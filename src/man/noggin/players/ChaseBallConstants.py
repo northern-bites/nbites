@@ -8,7 +8,7 @@ BALL_OFF_KICK_THRESH = 120
 
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
-PREPARE_FOR_KICK_DIST = 40.0
+PREPARE_FOR_KICK_DIST = 35.0
 
 # Should spin to ball
 SHOULD_SPIN_TO_KICK_X = 9.5
