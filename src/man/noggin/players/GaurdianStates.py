@@ -2,6 +2,7 @@ import time
 from objects import RelRobotLocation
 from ..navigator import Navigator
 from ..kickDecider import kicks
+from man.motion import SweetMoves
 
 import man.motion.SweetMoves as SweetMoves
 import man.motion.HeadMoves as HeadMoves
@@ -130,17 +131,17 @@ def omniPositionForKick(player):
             position.relH < constants.GOOD_ENOUGH_H):
         print "kicking!" # KICK IT!!!$@%&!!
         player.brain.nav.stop()
-        player.executeMove(kicks.BIG_STRAIGHT_KICK.sweetMove) #check this @!
+        player.executeMove(SweetMoves.LEFT_BIG_KICK) #check this @!
     else:
         print "orbiting!" # ORBIT
 
     return player.stay()
 
 def getKickPosition(player):
-    kick = kicks.BIG_STRAIGHT_KICK #check this @!
+    kick = kicks.SHORT_QUICK_LEFT_KICK #check this @!
     ballLoc = player.brain.ball.loc
     (kick_x, kick_y, kick_heading) = kick.getPosition()
-    dest = RelRobotLocation(ballLoc.relX - kick_x,
+    dest = RelRobotLocation(ballLoc.relX - kick_x - 3,
                             ballLoc.relY - kick_y,
                             0)
     return dest
