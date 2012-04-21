@@ -11,19 +11,21 @@ def kickBallExecute(player):
     Kick the ball
     """
     if player.firstFrame():
+        player.brain.speech.say("Kick it")
         player.brain.tracker.trackBall()
 
-        kick = player.brain.kickDecider.getSweetMove()
+        kick = player.kick.sweetMove
 
-        if transitions.ballInPosition(player) and kick is not None:
-            player.executeMove(kick)
-        else:
+#        if transitions.ballInPosition(player) and kick is not None:
+        player.executeMove(kick)
+        return player.stay()
+#        else:
             #Either it's close and we can't kick it now or it's far
             #away and we should search.
-            return player.goLater('chase')
 
     if player.counter > 10 and player.brain.nav.isStopped():
-        return player.goLater('afterKick')
+        return player.goLater('chase')
+#        return player.goLater('afterKick')
 
     return player.stay()
 

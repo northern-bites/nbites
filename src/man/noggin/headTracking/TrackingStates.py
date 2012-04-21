@@ -34,13 +34,16 @@ def tracking(tracker):
     #if tracker.target.loc.dist > minActiveDist:
     #    return tracker.goLater('activeTracking')
 
-    tracker.helper.trackObject()
+    if tracker.target.vis.on:
+        tracker.helper.trackObject()
+#    else: 
+#        tracker.helper.lookToPoint(tracker.target)
 
-    if not tracker.target.vis.on:
+    if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if tracker.target.vis.framesOff > \
                 constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-            return tracker.goLater(tracker.lastDiffState)
+            return tracker.goLater('ballTracking')
         return tracker.stay()
 
     return tracker.stay()

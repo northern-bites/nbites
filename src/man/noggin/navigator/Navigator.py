@@ -18,7 +18,7 @@ KEEP_SAME_SPEED = -1
 ADAPTIVE = True
 #goTo precision
 GENERAL_AREA = (5.0, 5.0, 20)
-CLOSE_ENOUGH = (3, 3, 10)
+CLOSE_ENOUGH = (3.5, 3.5, 10)
 PRECISELY = (1.0, 1.0, 5)
 #directions - left is positive (in terms of rotation or y) and right is negative
 LEFT = 1

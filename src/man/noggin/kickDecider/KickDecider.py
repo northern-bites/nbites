@@ -42,7 +42,7 @@ class KickDecider(object):
         ballLoc = self.brain.ball.loc
         myLoc = self.brain.my
         
-        return RelRobotLocation(ballLoc.relX - kick_x, 
+        return RelRobotLocation(ballLoc.relX - kick_x - constants.APPROACH_BALL_HACK, 
                                 ballLoc.relY - kick_y, 
                                 kick_heading - myLoc.h)
 
