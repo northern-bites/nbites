@@ -108,7 +108,7 @@ def watch(player):
 
     # If ball comes close enough, kick it away.
     if player.brain.ball.vis.framesOn > 5 and \
-            player.brain.ball.vis.dist < 15:
+            player.brain.ball.vis.dist < 18:
         return player.goLater('kickBall')
 
     return player.stay()
@@ -130,7 +130,6 @@ def kickBall(player):
         return player.goLater('watch')
 
     return player.stay()
-        
 
 def saveIt(player):
     if player.firstFrame():
