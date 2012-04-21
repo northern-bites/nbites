@@ -62,7 +62,15 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     std::vector<QTreeView> messageViewers; 
     for (MObject_ID id = FIRST_OBJECT_ID;
             id != LAST_OBJECT_ID; id++) {
-        if (id != MIMAGE_ID) {
+        if (id == MVISION_ID) {
+            QDockWidget* dockWidget = 
+                   new QDockWidget("Offline Vision", this);
+            MObjectViewer* view = new MObjectViewer(offlineMVision->getProtoMessage());
+	    dockWidget->setWidget(view);
+            this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+            memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
+	}
+        if (id != MIMAGE_ID && id != MVISION_ID) {
             QDockWidget* dockWidget =
                     new QDockWidget(QString(MObject_names[id].c_str()), this);
             MObjectViewer* view = new MObjectViewer(

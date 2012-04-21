@@ -17,7 +17,6 @@ using overseer::OverseerClient;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
- 	colorScrollArea(new QScrollArea()),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCalibrate(new ColorCalibrate(dataManager)),
@@ -47,9 +46,7 @@ QTool::QTool() : QMainWindow(),
 
     this->setCentralWidget(toolTabs);
 
-    colorScrollArea->setWidget(colorCalibrate);
-
-    toolTabs->addTab(colorScrollArea, tr("Color Creator"));
+    toolTabs->addTab(colorCalibrate, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
     toolTabs->addTab(visionViewer, tr("Vision Viewer"));
