@@ -106,12 +106,6 @@ V4L2ImageTranscriber::~V4L2ImageTranscriber() {
     free(buf);
 }
 
-/**************************
- *                        *
- *     INIT METHODS       *
- *                        *
- *************************/
-
 void V4L2ImageTranscriber::initTable(const string& filename)
 {
     FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
@@ -285,7 +279,8 @@ void V4L2ImageTranscriber::enumerate_controls()
                 continue;
 
             printf ("Control %s", queryctrl.name);
-            printf (" has id %d ", queryctrl.id);
+            printf (" has id %d,", queryctrl.id);
+            printf (" steps %d,", queryctrl.step);
             printf (" and min %d, max %d.\n\n", queryctrl.minimum,
                     queryctrl.maximum);
 
@@ -392,13 +387,6 @@ void V4L2ImageTranscriber::startCapturing() {
         printf("Start capture failed.\n");
 }
 
-
-/**************************
- *                        *
- *    THREAD METHODS      *
- *                        *
- *************************/
-
 int V4L2ImageTranscriber::start()
 {
     return Thread::start();
@@ -466,12 +454,6 @@ void V4L2ImageTranscriber::stop()
     running = false;
     Thread::stop();
 }
-
-/**************************
- *                        *
- *    EXTRA METHODS       *
- *                        *
- *************************/
 
 void V4L2ImageTranscriber::setNewSettings(const Camera::Settings& newset) {
     if (newset.exposure != settings.exposure)
