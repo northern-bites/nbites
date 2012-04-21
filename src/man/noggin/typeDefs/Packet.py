@@ -119,7 +119,7 @@ class Packet:
         #        self.ballDist, self.ballBearing, self.ballVelX, self.ballVelY))
         return (("teamNumber: {0} playerNumber: {1} color: {2}\n" +
                  "chaseTime: {3}\n" +
-                 "dist: {4} bearing: {5} on: ({6}, {6})").format(
+                 "dist: {4} bearing: {5} on: ({6}, {7})").format(
                 self.teamNumber, self.playerNumber, self.color,
                 self.chaseTime,
                 self.ballDist, self.ballBearing, self.ballOn,
