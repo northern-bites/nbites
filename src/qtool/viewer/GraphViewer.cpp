@@ -66,7 +66,8 @@ namespace qtool
 
       this->setLayout(layout);
 
-      man::memory::MLocalization::const_ptr loc = dataManager->getMemory()->getMObject(man::memory::MLOCALIZATION_ID);
+      localization = dataManager->getMemory()->getMLocalization();
+
    }
 
     GraphViewer::~GraphViewer()
@@ -137,7 +138,14 @@ namespace qtool
 
     void GraphViewer::updateLocalization()
     {
-      std::cout << "Updating localization..." << std::endl;
+      float xEst = localization->get()->x_est();
+      float yEst = localization->get()->y_est();
+      float hEst = localization->get()->h_est();
+      std::cout << "Updating localization... (" 
+		<< xEst << ", " 
+		<< yEst << ", "
+		<< hEst << ") "
+		<< std::endl;
     }
   }
 }

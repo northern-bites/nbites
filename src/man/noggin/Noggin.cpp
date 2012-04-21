@@ -131,12 +131,8 @@ void Noggin::initializeLocalization()
     printf("Initializing localization modules\n");
 #   endif
 
-    // Initialize the landmark map.
-    // @todo check these. Another possible source of error!
-    landmarkMap.push_back(Landmark());
-
     locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
-    locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem(landmarkMap));
+    locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem());
 
     loc = shared_ptr<LocSystem>(new PF::ParticleFilter(100, FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT, locMotionSystem, locVisionSystem));
 
@@ -304,13 +300,13 @@ void Noggin::runStep ()
 
 void Noggin::updateLocalization()
 {
-    ::MotionModel odometery = motion_interface->getOdometryUpdate();
+    const ::MotionModel odometry = motion_interface->getOdometryUpdate();
 
-    // First, update the odometry data and feed to the motion handler.
-    // @todo this could be a big source of error. What is f, l, and r??
-    locMotionSystem->feedStep(PF::Step(odometery.deltaF, 
-				       odometery.deltaL, 
-				       odometery.deltaR));
+    const PF::OdometryMeasurement odo(odometry.x,
+				      odometry.y,
+				      odometry.theta);
+
+    locMotionSystem->setCurrentOdometry(odo);
 
     std::vector<PF::Observation> observations;
     std::vector<Landmark> landmarks;
@@ -390,19 +386,19 @@ void Noggin::updateLocalization()
     locVisionSystem->feedObservations(observations);
 
     std::cout << "Updated motion with " 
-              << locMotionSystem->getLastStep();
+              << locMotionSystem->getLastOdometry();
 
-    if(observations.size() > 0)
-    {
-      std::cout << "Updating localization with the following observations: "
-		<< std::endl;
-      std::vector<PF::Observation>::iterator obsIter;
-      for(obsIter = observations.begin(); obsIter != observations.end();
-	  obsIter++)
-      {
-          std::cout << *obsIter << std::endl;
-      }
-    }
+    // if(observations.size() > 0)
+    // {
+    //   std::cout << "Updating localization with the following observations: "
+    // 		<< std::endl;
+    //   std::vector<PF::Observation>::iterator obsIter;
+    //   for(obsIter = observations.begin(); obsIter != observations.end();
+    // 	  obsIter++)
+    //   {
+    //       std::cout << *obsIter << std::endl;
+    //   }
+    // }
 
     // Now, run the particle filter.
     MotionModel u_t;
@@ -462,13 +458,13 @@ void Noggin::updateLocalization()
 #       endif
     }
 
-    ballEKF->updateModel(odometery, m, loc->getCurrentEstimate());
+    ballEKF->updateModel(odometry, m, loc->getCurrentEstimate());
 
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {
         // Print out odometry and ball readings
-        outputFile << odometery.deltaF << " " << odometery.deltaL << " "
-                   << odometery.deltaR << " " << m.distance
+        outputFile << odometry.deltaF << " " << odometry.deltaL << " "
+                   << odometry.deltaR << " " << m.distance
                    << " " << m.bearing;
         // Print out observation information
         for (unsigned int x = 0; x < observations.size(); ++x) {

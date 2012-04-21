@@ -13,24 +13,24 @@
 class VisionSystem; 
 
 /**
- * Holds information about a single step.
+ * Holds information about an odometry measurement.
  */
 namespace PF
 {
-    struct Step
+    struct OdometryMeasurement
     {
-         Step(float dX = 0.0f, float dY = 0.0f, float dA = 0.0f)
-	 : dx(dX), dy(dY), da(dA)
+         OdometryMeasurement(float X = 0.0f, float Y = 0.0f, float H = 0.0f)
+	 : x(X), y(Y), h(H)
 	{ }
 	
-	float dx;
-	float dy;
-	float da;
+	float x;
+	float y;
+	float h;
 	
-	friend std::ostream& operator<<(std::ostream& out, Step s)
+	friend std::ostream& operator<<(std::ostream& out, OdometryMeasurement o)
 	{
-	    out << "Step taken, (" << s.dx << ", "
-		<< s.dy << ", " << s.da << ")" << "\n";
+	    out << "Last odometry measurement, (" << o.x << ", "
+		<< o.y << ", " << o.h << ")" << "\n";
 	    return out;
 	}
     };
@@ -48,16 +48,17 @@ class MotionSystem : public PF::MotionModel
     MotionSystem();
     ~MotionSystem() { }
 
-    void feedStep(float dx, float dy, float da);
-    void feedStep(PF::Step s);
-    PF::Step noisyStep();
+    void setCurrentOdometry(const PF::OdometryMeasurement &current);
+    void setLastOdometry(const PF::OdometryMeasurement &last);
+    PF::OdometryMeasurement noisyDeltaOdometry(const PF::OdometryMeasurement &newOdometry);
     PF::ParticleSet update(PF::ParticleSet particles);
 
-    PF::Step getLastStep() const { return lastStep; }
+    PF::OdometryMeasurement getLastOdometry() const { return lastOdometry; }
 
  private:
     bool moved;
-    PF::Step lastStep;
+    PF::OdometryMeasurement currentOdometry;
+    PF::OdometryMeasurement lastOdometry;
 };
 
 #endif // MOTION_SYSTEM_H

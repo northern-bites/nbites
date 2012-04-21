@@ -1,8 +1,6 @@
 /**
  * Basic implementation of a particle filter for 
- * robot localization purposes. Based on concepts
- * outlined in Probabilistic Robotics
- * [Thrun, Burgard and Fox 2005].
+ * robot localization purposes. 
  *
  * @todo Future work includes adding an 
  *       Augmented MCL algorithm implementation
@@ -37,18 +35,18 @@ namespace PF
      */
     struct Location
     {
-	Location(float X = 0.0f, float Y = 0.0f, float A = 0.0f)
-	: x(X), y(Y), angle(A)
+	Location(float X = 0.0f, float Y = 0.0f, float H = 0.0f)
+	: x(X), y(Y), heading(H)
 	{ }
 
 	float x;
 	float y;
-	float angle;
+	float heading;
 
 	friend std::ostream& operator<<(std::ostream& out, Location l)
 	{
 	    out << "location (" << l.x << ", "
-		<< l.y << ", " << l.angle << ")" << "\n";
+		<< l.y << ", " << l.heading << ")" << "\n";
 	    return out;
 	}
     };
@@ -91,7 +89,7 @@ namespace PF
 
 	void setX(float x) { location.x = x; }
 	void setY(float y) { location.y = y; }
-	void setA(float a) { location.angle = a; }
+	void setH(float h) { location.heading = h; }
 
 	friend bool operator <(const LocalizationParticle& first, 
 			       const LocalizationParticle& second);
@@ -149,7 +147,7 @@ namespace PF
 	/**
 	 * @todo implement a reset method for the particle filter.
 	 */
-	void reset() { }
+	void reset();
 
 	void blueGoalieReset() { }
 	void redGoalieReset() { }
@@ -157,9 +155,9 @@ namespace PF
 
 	PoseEst getCurrentEstimate() const { return PoseEst(); }
 	PoseEst getCurrentUncertainty() const { return PoseEst(); }
-	float getXEst() const { return 0.0f; }
-	float getYEst() const { return 0.0f; }
-	float getHEst() const { return 0.0f; }
+	float getXEst() const { return xEstimate; }
+	float getYEst() const { return yEstimate; }
+	float getHEst() const { return hEstimate; }
 	float getHEstDeg() const { return 0.0f; }
 	float getXUncert() const { return 0.0f; }
 	float getYUncert() const { return 0.0f; }
@@ -191,6 +189,10 @@ namespace PF
 	// Spatial dimensions
 	float width;
 	float height;
+
+	float xEstimate;
+	float yEstimate;
+	float hEstimate;
 
 	ParticleSet particles;
 	boost::shared_ptr<MotionModel> motionModel;
@@ -269,7 +271,7 @@ namespace PF
     {
 	float x0 = origin.x;
 	float y0 = origin.y;
-	float rotate = origin.angle;
+	float rotate = origin.heading;
 
 	// Translate and rotate.
 	float x_prime = (x - x0) * std::cos(rotate) + (y - y0) * std::sin(rotate);

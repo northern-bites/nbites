@@ -80,8 +80,6 @@ private:
     boost::shared_ptr<ClickableButton> leftFootButton;
     boost::shared_ptr<ClickableButton> rightFootButton;
 
-    LandmarkMap landmarkMap;
-
     boost::shared_ptr<MotionSystem> locMotionSystem;
     boost::shared_ptr<VisionSystem> locVisionSystem;
 

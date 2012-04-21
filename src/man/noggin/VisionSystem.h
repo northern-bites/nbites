@@ -103,16 +103,13 @@ namespace PF
     };
 }
 
-typedef std::vector<Landmark> LandmarkMap;
-
 /**
  * @class VisionSystem
  */
 class VisionSystem : public PF::SensorModel
 {
  public:
-    VisionSystem(LandmarkMap m);
-    ~VisionSystem() { }
+  VisionSystem();
 
     PF::ParticleSet update(PF::ParticleSet particles);
 
@@ -121,7 +118,6 @@ class VisionSystem : public PF::SensorModel
     void feedObservations(std::vector<PF::Observation> newObs);
 
  private:
-    LandmarkMap map;
     bool hasNewObs;
     std::vector<PF::Observation> currentObservations;
 };

@@ -82,20 +82,34 @@ namespace PF
 	if(motionUpdate && motionModel)
 	{
 	    particles = motionModel->update(particles);
-	    std::cout << "Motion update complete." << std::endl;
+	    //std::cout << "Motion update complete." << std::endl;
 	}
 	
 
 	if(sensorUpdate && sensorModel)
 	{  
 	    particles = sensorModel->update(particles);
-	    std::cout << "Sensor update complete." << std::endl;
+	    //std::cout << "Sensor update complete." << std::endl;
 	}
 
 	if(sensorModel->hasUpdated())
 	{
 	    resample();
-	    std::cout << "Resample complete." << std::endl;
+	    Location estimate = this->getBestParticle().getLocation();
+	    if(xEstimate - estimate.x > 0.001f || 
+	       yEstimate - estimate.y > 0.001f ||
+	       hEstimate - estimate.heading > 0.001f)
+	    {
+	      std::cout << "New guess at (" <<
+		estimate.x << ", " <<
+		estimate.y << ", " <<
+		estimate.heading << ")" << std::endl;
+	    }
+
+	    xEstimate = estimate.x;
+	    yEstimate = estimate.y;
+	    hEstimate = estimate.heading;
+	    //std::cout << "Resample complete." << std::endl;
 	}
     }
 
@@ -174,10 +188,20 @@ namespace PF
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	{
 	    std::cout << "Particle (" << (*iter).getLocation().x << ", "
-		      << (*iter).getLocation().y << ", " << (*iter).getLocation().angle
+		      << (*iter).getLocation().y << ", " << (*iter).getLocation().heading
 		      << ") with weight " << (*iter).getWeight() << std::endl;
 	}
 #endif
 
     }
+
+  void ParticleFilter::reset()
+  {
+    // @todo
+  }
+
+  void resetLocTo(float x, float y, float h)
+  {
+    // @todo
+  }
 }

@@ -65,7 +65,7 @@ public:
     MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
     MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
     MImage::const_ptr getMImage() const {return mImage;}
-
+    MLocalization::const_ptr getMLocalization() const { return mLocalization; }
     MObject::const_ptr getMObject(MObject_ID id) const;
     MObject::ptr getMutableMObject(MObject_ID id);
 

@@ -90,7 +90,7 @@ namespace qtool
       // For protocol buffer graphing. 
       qtool::data::DataManager::ptr dataManager;
 
-      man::memory::MLocalization::PLoc_ptr localization;
+      man::memory::MLocalization::const_ptr localization;
 
     };
   }

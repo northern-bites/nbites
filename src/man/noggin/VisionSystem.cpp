@@ -3,8 +3,8 @@
 /**
  * Constructor
  */
-VisionSystem::VisionSystem(LandmarkMap m = LandmarkMap())
-  : PF::SensorModel(), map(m), hasNewObs(false)
+VisionSystem::VisionSystem()
+  : PF::SensorModel(), hasNewObs(false)
 { }
 
 /**
@@ -18,7 +18,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::vector<PF::Observation> obs = currentObservations;
     if(obs.size() == 0)
     {
-        std::cout << "Nothing seen, do not update weights." << std::endl;
+      //std::cout << "Nothing seen, do not update weights." << std::endl;
         return particles;
     }
 
@@ -57,19 +57,26 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	        // Since the observation is unambiguous, use the first observation.
 		Landmark l = o.possibilities[0];
 		PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
-		std::cout << "hypoth dist = " << hypothesisVector.magnitude
-			  << " hypoth ang = " << hypothesisVector.direction;
-		std::cout << " act dist = " << o.distance
-			  << " act ang = " << o.angle;
+		//std::cout << "hypoth dist = " << hypothesisVector.magnitude
+		//	  << " hypoth ang = " << hypothesisVector.direction;
+		//std::cout << " act dist = " << o.distance
+		//        << " act ang = " << o.angle;
 		float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
 		float angleDiff = std::abs(o.angle - hypothesisVector.direction);
 		// For now, generate a new importance weight as the inverse of 
 		// the difference between the distances multiplied by the 
 		// inverse of the difference between the angles.
+		if(distanceDiff < 0.001f)
+		  std::cout << "distance difference close to 0!" << std::endl;
+
 		float distanceProb = 1.0f/distanceDiff;
+
+		if(angleDiff < 0.001f)
+		  std::cout << "angle difference close to 0!" << std::endl;
+
 		float angleProb = 1.0f/angleDiff;
 		float probability = distanceProb * angleProb;
-		std::cout << " prob = " << probability << std::endl;
+		//std::cout << " prob = " << probability << std::endl;
 		// Assuming conditional independence between measurements.
 		if(totalWeight == 0.0f)
 		    totalWeight = probability;
@@ -120,8 +127,8 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
             std::cout << " with new weight " << (*partIter).getWeight() << std::endl;
 #endif
         }
-        else
-            std::cout << "Nothing seen, will not update weight." << std::endl;
+        //else
+	  //std::cout << "Nothing seen, will not update weight." << std::endl;
     }
 
     return particles;
