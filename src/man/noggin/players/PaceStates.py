@@ -6,15 +6,16 @@ States for the hacked defender to pace through.
 
 def pace(player):
     if player.firstFrame():
-        counter = 0
-        destinationArray = [RelRobotLocation(0, 10, 0),
-                            RelRobotLocation(-10, 0, 0),
-                            RelRobotLocation(0, -10, 0),
-                            RelRobotLocation(10, 0, 0)]
+        player.pacingCounter = 0
+        player.destinationArray = [#RelRobotLocation(7, 0, 0),
+                            RelRobotLocation(0, -7, 0),
+                            #RelRobotLocation(-7, 0, 0),
+                            RelRobotLocation(0, 7, 0)]
 
     if player.brain.nav.isStopped():
-        player.brain.nav.walkTo(destinationArray[counter])
-        counter += 1
+        if player.pacingCounter > 3:
+            player.pacingCounter = 0
+        player.brain.nav.walkTo(player.destinationArray[player.pacingCounter])
+        player.pacingCounter += 1
 
-    if counter == 4:
-        counter = 0
+    return player.stay()

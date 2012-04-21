@@ -36,4 +36,6 @@ def gamePlaying(player):
     # Pan for ball or stare if ball is on vision
     player.brain.tracker.trackBall()
 
-    return player.goLater('pace')
+    #If this is reliable, do it?
+    #return player.goLater('pace')
+    return player.stay()
