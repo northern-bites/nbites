@@ -100,9 +100,9 @@ def watch(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
 
-    if player.brain.ball.dist < 100:
-        player.executeMove(SweetMoves.GOALIE_SQUAT)
-        return player.goLater('saveIt')
+    #if player.brain.ball.dist < 100:
+    #    player.executeMove(SweetMoves.GOALIE_SQUAT)
+    #    return player.goLater('saveIt')
     return player.stay()
 
 def saveIt(player):
