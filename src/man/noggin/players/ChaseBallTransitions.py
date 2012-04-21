@@ -17,11 +17,11 @@ def shouldPrepareForKick(player):
     """
     We're close enough to prepare for a kick
     """
-    ball = player.brain.ball.loc
-    return ball.dist < constants.PREPARE_FOR_KICK_DIST
+    ball = player.brain.ball
+    return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
     
 
-def ballInPosition(player):
+def ballInPosition(player, kickPose):
     """
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
@@ -30,11 +30,11 @@ def ballInPosition(player):
         return False
 
     #Get the current kick sweet spot information
-    position = player.brain.kickDecider.getIdealKickPosition()
+    
 
-    return (0 < position.relX < constants.BALL_X_OFFSET and
-                position.relY < constants.BALL_Y_OFFSET and
-                position.relH < constants.GOOD_ENOUGH_H)
+    return (0 < kickPose.relX < constants.BALL_X_OFFSET and
+                fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
+                fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
 def ballNearPosition(player):
     """

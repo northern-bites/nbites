@@ -45,10 +45,17 @@ SHORT_LEFT_SIDE_KICK = Kick("L_Short_Side", x = 12.5, y = 5,
 SHORT_RIGHT_SIDE_KICK = Kick("R_Short_Side", x = 12.5, y = -15,
                              move=SweetMoves.GOOGZ_SHORT_RIGHT_SIDE_KICK)
 
-LEFT_DYNAMIC_STRAIGHT_KICK =  Kick("L_D_Straight", y =  5,
-                                   move=SweetMoves.DREW_KICK)
-RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", y = -5,
-                                   move=SweetMoves.DREW_KICK)
+#usopen12 hack
+LEFT_DYNAMIC_STRAIGHT_KICK =  Kick("L_D_Straight", x = 11, y =  3,
+                                   move=SweetMoves.LEFT_BIG_KICK)
+RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", x = 11, y = -3,
+                                   move=SweetMoves.RIGHT_BIG_KICK)
+
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_D_Straight", x = 11, y =  3,
+                                   move=SweetMoves.SHORT_QUICK_LEFT_KICK)
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_D_Straight", x = 11, y = -3,
+                                   move=SweetMoves.SHORT_QUICK_RIGHT_KICK)
+
 
 # used when we haven't decided what kick to do yet
 ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)

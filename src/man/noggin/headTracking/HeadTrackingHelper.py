@@ -125,6 +125,8 @@ class HeadTrackingHelper(object):
         if hasattr(target, "loc"):
             target = target.loc
 
+        print str(target.relX) + " " + str(target.relY)
+
         headMove = motion.CoordHeadCommand(relX = target.relX,
                                            relY = target.relY,
                                            relZ = height)

@@ -48,8 +48,8 @@ def goToPosition(nav):
     #reduce the speed if we're close to the target
     helper.setDestination(nav, relDest, speed)
 
-    if navTrans.shouldAvoidObstacle(nav):
-        return nav.goLater('avoidObstacle')
+#    if navTrans.shouldAvoidObstacle(nav):
+#        return nav.goLater('avoidObstacle')
 
     return Transition.getNextState(nav, goToPosition)
 
