@@ -14,7 +14,6 @@ def chase(player):
     """
     Super State to determine what to do from various situations
     """
-    return player.goNow('approachBall')
     
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
@@ -82,7 +81,7 @@ def positionForKick(player):
     if player.firstFrame():    
         player.brain.nav.goTo(positionForKick.kickPose, 
                               Navigator.CLOSE_ENOUGH,
-                              Navigator.FULL_SPEED,
+                              Navigator.CAREFUL_SPEED,
                               Navigator.ADAPTIVE)
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
