@@ -43,7 +43,7 @@ def spinScanBall(tracker):
     if tracker.target == ball and \
             tracker.target.vis.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
-        return tracker.goNow('ballSpinTracking')
+        return tracker.goNow('tracking')
 
     if nav.isSpinningLeft():
         tracker.headMove = HeadMoves.LEFT_EDGE_SCAN_BALL

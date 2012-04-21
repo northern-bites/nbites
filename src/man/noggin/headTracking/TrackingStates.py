@@ -12,6 +12,8 @@ def ballTracking(tracker):
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
+        if tracker.brain.player.currentState == 'spinFindBall':
+            return tracker.goNow('ballSpinTracking')
         return tracker.goNow('scanBall')
 
 def tracking(tracker):
@@ -49,12 +51,12 @@ def tracking(tracker):
     return tracker.stay()
 
 def ballSpinTracking(tracker):
-    '''Super state which handles following/refinding the ball'''
-    if tracker.target.vis.framesOff <= \
-            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-        return tracker.goNow('tracking')
-    else:
-        return tracker.goNow('spinScanBall')
+#    '''Super state which handles following/refinding the ball'''
+#    if tracker.target.vis.framesOff <= \
+#            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+#        return tracker.goNow('tracking')
+#    else:
+    return tracker.goNow('spinScanBall')
 
 def activeTracking(tracker):
     """
