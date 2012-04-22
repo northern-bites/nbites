@@ -146,6 +146,9 @@ namespace qtool
 		<< yEst << ", "
 		<< hEst << ") "
 		<< std::endl;
+
+      std::cout << "Counted " << localization->get()->particles_size()
+		<< "." << std::endl;
     }
   }
 }
