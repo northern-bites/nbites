@@ -81,9 +81,9 @@ def gameFinished(player):
     return player.stay()
 
 def position(player):
-    # step forward
+    # step forward - NOPE, hacked out
     if player.firstFrame():
-        player.brain.nav.walkTo(RelRobotLocation(15,0,0),
+        """player.brain.nav.walkTo(RelRobotLocation(15,0,0),
                                 #player.brain.nav.CLOSE_ENOUGH,
                                 (3,3,10),
                                 #player.brain.nav.SLOW_SPEED)
@@ -92,9 +92,9 @@ def position(player):
     # Just in case walkTo fails, eventually stop anyway
     if player.brain.nav.isStopped() or player.counter > 300:
         player.brain.nav.stop()
-        return player.goNow('watch')
+        return player.goNow('watch')"""
 
-    return player.stay()
+    return player.goLater('watch')
 
 def watch(player):
     if player.firstFrame():
