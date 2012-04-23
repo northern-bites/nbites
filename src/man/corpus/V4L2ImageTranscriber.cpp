@@ -2,9 +2,12 @@
  * V4L2ImageTranscriber.cpp
  *
  *  Created on: Jun 27, 2011
- *      Author: oneamtu
- *      Credits go to Colin Graf and Thomas Rofer of BHuman from where this
- *      code is mostly inspired from
+ *      Author: Octavian Neamtu
+ *     Updated: April 18, 2012
+ *      Author: Lizzie Mamantov
+ *
+ * Based on B-Human 2011 code release.
+ * See header file for license and further information.
  */
 
 #include "V4L2ImageTranscriber.h"
