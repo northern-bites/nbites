@@ -37,6 +37,8 @@ void MLocalization::updateData() {
     // Get the particles, and update the protobuf accordingly. 
     PF::ParticleSet particles = boost::static_pointer_cast<PF::ParticleFilter>(locSystem)->getParticles();
 
+    //std::cout << "Updating " << particles.size() << " particles." << std::endl;
+
     PLoc::Particle *particle;
     for(PF::ParticleIt iter = particles.begin(); iter != particles.end(); ++iter)
     {

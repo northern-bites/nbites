@@ -100,10 +100,10 @@ namespace PF
 	       yEstimate - estimate.y > 0.001f ||
 	       hEstimate - estimate.heading > 0.001f)
 	    {
-	      std::cout << "New guess at (" <<
-		estimate.x << ", " <<
-		estimate.y << ", " <<
-		estimate.heading << ")" << std::endl;
+	      // std::cout << "New guess at (" <<
+	      // 	estimate.x << ", " <<
+	      // 	estimate.y << ", " <<
+	      // 	estimate.heading << ")" << std::endl;
 	    }
 
 	    xEstimate = estimate.x;

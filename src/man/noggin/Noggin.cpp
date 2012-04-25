@@ -385,8 +385,8 @@ void Noggin::updateLocalization()
     // Update the localiztion vision interface with Observations.
     locVisionSystem->feedObservations(observations);
 
-    std::cout << "Updated motion with " 
-              << locMotionSystem->getLastOdometry();
+    // std::cout << "Updated motion with " 
+    //           << locMotionSystem->getLastOdometry();
 
     // if(observations.size() > 0)
     // {

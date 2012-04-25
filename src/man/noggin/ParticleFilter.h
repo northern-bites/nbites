@@ -140,8 +140,8 @@ namespace PF
 	{
 	    // Do nothing with this data.
 	    run();
-	    std::cout << "Best particle "
-	              << this->getBestParticle();
+	    /* std::cout << "Best particle " */
+	    /*           << this->getBestParticle(); */
 	}
 
 	/**

@@ -35,14 +35,14 @@ PF::OdometryMeasurement MotionSystem::noisyDeltaOdometry(const PF::OdometryMeasu
   float deltaY = newOdometry.y - lastOdometry.y;
   float deltaH = newOdometry.h - lastOdometry.h;
   
-  if(deltaX > 0.0001f &&
-     deltaY > 0.0001f &&
-     deltaH > 0.0001f)
-  {
-    std::cout << "Updating (delta x, delta y, delta h) = (" 
-	      << deltaX << ", " << deltaY << ", " 
-	      << deltaH << ")" << std::endl;
-  }
+  // if(deltaX > 0.0001f &&
+  //    deltaY > 0.0001f &&
+  //    deltaH > 0.0001f)
+  // {
+  //   std::cout << "Updating (delta x, delta y, delta h) = (" 
+  // 	      << deltaX << ", " << deltaY << ", " 
+  // 	      << deltaH << ")" << std::endl;
+  // }
 
   setLastOdometry(newOdometry);
 
