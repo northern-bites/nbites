@@ -661,7 +661,7 @@ void Comm::send () throw(socket_error)
 
         if (gc->isManuallyPenalized())
             returnPacket.message = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
-	else
+		else
             returnPacket.message = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
 
         memcpy(returnPacket.header,
@@ -685,8 +685,8 @@ void Comm::send () throw(socket_error)
 	{
         // Set the header.
         const CommPacketHeader header = { PACKET_HEADER, timer.timestamp(),
-					  lastPacketNumber++, gc->team(), gc->player(),
-					  gc->color() };
+										  lastPacketNumber++, gc->team(), gc->player(),
+										  gc->color() };
 
         memcpy(&buf[0], &header, sizeof(header));
         // variable Python extra data
@@ -716,14 +716,14 @@ void Comm::send(const char *msg, int len, sockaddr_in &addr) throw(socket_error)
 
     while (result == -2)
     {
-	// send the udp message
+		// send the udp message
         result = ::sendto(sockn, msg, len, 0, (struct sockaddr*)&addr,
                           sizeof(broadcast_addr));
         // except if error is blocking error
         if (result == -1 && errno == EAGAIN)
-	{
+		{
             result = -2;
-	    cout << "Comm::send() : EAGAIN error!" << endl;
+			cout << "Comm::send() : EAGAIN error!" << endl;
             nanosleep(&interval, &remainder);
         }
     }
@@ -744,7 +744,7 @@ void Comm::send(const char *msg, int len, sockaddr_in &addr) throw(socket_error)
     timer.packetSent();
 #ifdef DEBUG_COMM
     cout << Thread::name << ": Last packet sent at " << timer.lastPacketSentAt()
-	 << "." << endl;
+		 << "." << endl;
 #endif
 }
 
@@ -763,12 +763,12 @@ void Comm::receive() throw(socket_error)
     // While no error, handle the packet and continue to receive new ones.
     while (result > 0)
     {
-	// Received a packet! Update the average delay.
-	if(timer.lastPacketReceivedAt() != 0)
-	    updateAverageDelay();
+		// Received a packet! Update the average delay.
+		if(timer.lastPacketReceivedAt() != 0)
+			updateAverageDelay();
 
-	totalPacketsReceived++;
-	updatePercentReceived();
+		totalPacketsReceived++;
+		updatePercentReceived();
         // Handle messages from not for GameController.
         handle_comm(recv_addr, &buf[0], result);
         // Continue checking for new messages...
