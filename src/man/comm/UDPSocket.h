@@ -6,6 +6,8 @@
 #ifndef UDPSocket_H
 #define UDPSocket_H
 
+#include <cstring>
+
 struct sockaddr;
 struct sockaddr_in;
 
@@ -45,11 +47,12 @@ public:
 	bool setBlocking(bool enable);
 
 	/**
-	 * Set Time-To-Live (TTL) which corresponds to # of router hops.
+	 * Set Multicast Time-To-Live (TTL) which corresponds to
+	 * the number of router hops until the packet dies.
 	 * @param ttl: The byte-length value for TTL.
 	 * @return:    true for success, false for error.
 	 */
-	bool setTTL(const char ttl);
+	bool setMulticastTTL(const char ttl);
 
 	/**
 	 * Set receive buffer size. Will set the size of the receiving
@@ -98,14 +101,14 @@ public:
 	 * @return:        Number of bytes read or -1 if error occured.
 	 */
 	int receiveFrom(char* data, int datalen,
-					struct socckaddr* from = NULL, int addrlen = -1);
+					struct sockaddr* from = NULL, int* addrlen = NULL);
 
 	/**
 	 * Recieve any information in the socket's buffer. Does not
 	 * gather information about the sender. Uses receiveFrom.
 	 * @param data: Buffer to which the data will be moved.
 	 * @param len:  Number of bytes to read from the socket.
-	 * @return:     Number of bytes read or -1 if error occured.
+	 * @return:     Number of bytes read or -1 on error.
 	 */
 	int receive(char* data, int len) {return receiveFrom(data, len);}
 
@@ -114,7 +117,7 @@ public:
 	 * settable with setTarget(ip, port).
 	 * @param data: Information to send to the target.
 	 * @param len:  Number of bytes to send to the target.
-	 * @return:     Number of bytes written to the socket.
+	 * @return:     Number of bytes written or -1 on error.
 	 */
 	int sendToTarget(const char* data, const int len);
 

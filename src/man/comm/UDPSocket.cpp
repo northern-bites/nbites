@@ -23,6 +23,7 @@
 
 #include "commconfig.h"
 
+
 UDPSocket::UDPSocket()
 {
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -43,6 +44,8 @@ bool UDPSocket::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
 	memset(addr, 0, sizeof(struct sockaddr_in));
 	addr -> sin_family = AF_INET;
 	addr -> sin_port   = htons(port);
+
+	// Fill in addr->sin_addr at the same time as checking validity!
 	if (1 != inet_pton(AF_INET, addrStr, &(addr->sin_addr.s_addr)))
 	{
 		std::cerr << addrStr << " is not a valid dotted IPv4 address" << std::endl;
@@ -54,7 +57,7 @@ bool UDPSocket::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
 bool UDPSocket::setTarget(const char* ip, int port)
 {
 	struct sockaddr_in* addr = (struct sockaddr_in*)target;
-	return (!resolve(addrStr, port, addr)) ? true: false;
+	return resolve(ip, port, addr);
 }
 
 bool UDPSocket::setBroadcast(bool enable)
@@ -92,12 +95,13 @@ bool UDPSocket::setBlocking(bool enable)
 	return result;
 }
 
-bool UDPSocket::setTTL(const char ttl)
+bool UDPSocket::setMulticastTTL(const char ttl)
 {
 	if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL,
 				   &ttl, sizeof(unsigned char)        ) < 0)
 	{
-		std::cerr << "Unable to set TTL to " << ttl << std::endl;
+		std::cerr << "Unable to set Multicast TTL to "
+				  << ttl << std::endl;
 		return false;
 	}
 	return true;
@@ -113,6 +117,7 @@ bool UDPSocket::setRcvBufSize(unsigned int size)
 		return false;
 	}
 
+	// Ensure we set the Buffer correctly
 	int result;
 	socklen_t result_len = sizeof(result);
 	if (0 == getsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*) &result, &result_len))
@@ -124,7 +129,7 @@ bool UDPSocket::setRcvBufSize(unsigned int size)
 		return true;
 	}
 
-	std::cerr << "UDPSocket::setRcvBufSize() could not get SO_RCVBUF."
+	std::cerr << "UDPSocket::setRcvBufSize() could not verify SO_RCVBUF."
 			  << std::endl;
 	return false;
 }
@@ -146,6 +151,7 @@ bool UDPSocket::joinMulticast(const char* addrStr)
 	if (!resolve(addrStr, 0, &group))
 		return false;
 
+	// Ensure address is a valid Multicast group address.
 	if (IN_MULTICAST(ntohl(group.sin_addr.s_addr)))
 	{
 		struct ip_mreq mreq;
@@ -173,6 +179,7 @@ bool UDPSocket::joinMulticast(const char* addrStr)
 				couldJoin = true;
 			}
 		}
+
 		if (!couldJoin)
 		{
 			std::cerr << "Failed to join multicast group " << addrStr
@@ -181,22 +188,23 @@ bool UDPSocket::joinMulticast(const char* addrStr)
 		}
 		return true;
 	}
+
 	else
 		std::cerr << addrStr << " is not a multicast address." << std::endl;
 	return false;
 }
 
-bool bind(const char* addrStr, int port);
+bool UDPSocket::bind(const char* addrStr, int port)
 {
 	static const int one = 1;
 	struct sockaddr_in addr;
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(port);
 	addr.sin_family = AF_INET;
-	if (inet_pton(AF_INET, addr_str, &(addr.sin_addr)) )
+	if (inet_pton(AF_INET, addrStr, &(addr.sin_addr)) )
 	{
 		std::cerr << "UDPSocket::bind() failed: invalid address "
-				  << addr_str << std::endl;
+				  << addrStr << std::endl;
 		return false;
 	}
 
@@ -217,4 +225,38 @@ bool bind(const char* addrStr, int port);
 	}
 
 	return true;
+}
+
+int UDPSocket::receiveFrom(char* data, int datalen,
+				struct sockaddr* from, int* addrlen)
+{
+	ssize_t nread;
+
+	nread = ::recvfrom(sock, data, datalen, 0, from, (socklen_t *) addrlen);
+	if (nread < 0)
+	{
+		// If the error is a blocking error, i.e. there is no data to read:
+		if (errno == EAGAIN)
+			return 0;
+		else
+		{
+			std::cerr << "UDPSocket::receiveFrom() failed: "
+					  << strerror(errno) << std::endl;
+		}
+	}
+	return nread;
+}
+
+int UDPSocket::sendToTarget(const char* data, const int len)
+{
+	ssize_t nwritten;
+
+	nwritten = ::sendto(sock, data, len, 0, target, sizeof(struct sockaddr_in));
+	if (nwritten < 0)
+	{
+		std::cerr << "UDPSocket::sendToTarget() failed: "
+				  << strerror(errno) << std::endl;
+	}
+
+	return nwritten;
 }
