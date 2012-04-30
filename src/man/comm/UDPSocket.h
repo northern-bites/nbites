@@ -8,6 +8,7 @@
 
 #include <cstring>
 
+// Define structs so we can compile without including socket header.
 struct sockaddr;
 struct sockaddr_in;
 
