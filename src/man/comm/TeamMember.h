@@ -21,9 +21,11 @@ public:
 	 * Updates the Object with the time the packet was received
 	 * and with the contents of the packet.
 	 * @param time:   Time that this packet was received.
-	 * @param packet: float values for this packet.
+	 * @param seqNum: The sequence number for this packet.
+	 * @param packet: Float values for this packet.
+	 * @return:       The number of packets dropped/delayed from this mate.
 	 */
-	void update(llong time, float* packet);
+	int update(llong time, int seqNum, float* packet);
 
 	/***********************
 	 * Getters and Setters *
@@ -73,6 +75,9 @@ public:
 	void  setLastPacketTime(llong t) {_lastPacketTime = t;}
 	llong lastPacketTime() {return _lastPacketTime;}
 
+	void  setLastSeqNum(int sn) {_lastSeqNum = sn;}
+	int   lastSeqNum() {return _lastSeqNum;}
+
 	void  setActive(bool a) {_active = a;}
 	bool  active() {return _active;}
 
@@ -95,6 +100,7 @@ private:
 	float _subRole;           // Playbook SubRole
 
 	llong _lastPacketTime;    // Time that the last packet was received.
+	int   _lastSeqNum;        // The sequence number of the last packet recieved.
 	bool  _active;            // Is the robot active.
 };
 #endif

@@ -10,7 +10,7 @@ TeamMember::TeamMember(int num)
 {
 }
 
-void TeamMember::update(llong time, float* packet)
+int TeamMember::update(llong time, int seqNum, float* packet)
 {
 	setLastPacketTime(time);
 	setActive(true);
@@ -30,4 +30,8 @@ void TeamMember::update(llong time, float* packet)
 	setChaseTime(*++ptr);
 	setRole(*++ptr);
 	setSubRole(*++ptr);
+
+	int missedPackets = seqNum - lastSeqNum() - 1;
+	setLastSeqNum(seqNum);
+	return missedPackets;
 }
