@@ -46,9 +46,9 @@ PF::OdometryMeasurement MotionSystem::noisyDeltaOdometry(const PF::OdometryMeasu
 
   setLastOdometry(newOdometry);
 
-  return PF::OdometryMeasurement(deltaX + PF::sampleNormal(0.0f, std::sqrt(std::abs(deltaX))),
-				 deltaY + PF::sampleNormal(0.0f, std::sqrt(std::abs(deltaY))),
-				 deltaH + PF::sampleNormal(0.0f, std::sqrt(std::abs(deltaH))));
+  return PF::OdometryMeasurement(deltaX + PF::sampleNormal(0.0f, 5.0f + std::sqrt(std::abs(deltaX))),
+				 deltaY + PF::sampleNormal(0.0f, 5.0f + std::sqrt(std::abs(deltaY))),
+				 deltaH + PF::sampleNormal(0.0f, 0.2f + std::sqrt(std::abs(deltaH))));
 }
 
 /**

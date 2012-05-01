@@ -10,9 +10,9 @@ namespace qtool
 	dataManager(dataManager)
     {
       // Setup signals for protocol buffer messages.
-      dataManager->connectSlotToMObject(this, 
-					SLOT( updateLocalization() ), 
-					man::memory::MLOCALIZATION_ID);
+      // dataManager->connectSlotToMObject(this, 
+      // 					SLOT( updateLocalization() ), 
+      // 					man::memory::MLOCALIZATION_ID);
 
       updateGraphButton = new QPushButton(tr("Update Graph"), this);
       graphTitleInput   = new QLineEdit(tr("Default Plot"), this);
@@ -138,17 +138,7 @@ namespace qtool
 
     void GraphViewer::updateLocalization()
     {
-      float xEst = localization->get()->x_est();
-      float yEst = localization->get()->y_est();
-      float hEst = localization->get()->h_est();
-      std::cout << "Updating localization... (" 
-		<< xEst << ", " 
-		<< yEst << ", "
-		<< hEst << ") "
-		<< std::endl;
 
-      std::cout << "Counted " << localization->get()->particles_size()
-		<< "." << std::endl;
     }
   }
 }

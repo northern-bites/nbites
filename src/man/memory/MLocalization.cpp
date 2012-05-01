@@ -34,6 +34,14 @@ void MLocalization::updateData() {
     this->data->set_y_uncert(locSystem->getYUncert());
     this->data->set_h_uncert(locSystem->getHUncert());
 
+    this->data->clear_particles();
+
+    // PLoc::Particle *particles = this->data->add_particles();
+    // particles->set_x(123.4f);
+    // particles->set_y(67.89f);
+    // particles->set_h(3.14159f);
+    // particles->set_w(0.1947f);
+
     // Get the particles, and update the protobuf accordingly. 
     PF::ParticleSet particles = boost::static_pointer_cast<PF::ParticleFilter>(locSystem)->getParticles();
 
