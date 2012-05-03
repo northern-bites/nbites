@@ -32,7 +32,7 @@ class FastYUVToBMPImage : public image::BMPImage {
 
 public:
     FastYUVToBMPImage(data::RoboImage::const_ptr rawImage, QObject *parent = 0);
-    virtual ~FastYUVToBMPImage() {}
+    virtual ~FastYUVToBMPImage();
 
     virtual unsigned getWidth() const {
         return roboImage->get()->width();
@@ -48,7 +48,7 @@ protected:
 private:
     data::RoboImage::const_ptr roboImage;
     QImage qimage;
-//    byte* rgb_image;
+    byte* rgb_image;
 };
 
 }
