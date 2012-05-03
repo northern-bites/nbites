@@ -51,6 +51,8 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
       	updateParticles.push_back(PF::LocalizationParticle(PF::Location(x, y, h), w));
       }
 
+      std::cout << "Updating " << localizationStream->get()->particles_size() << " particles." << std::endl;
+
       paintLocalization->updateWithParticles(updateParticles);
 
       fieldView->updateView();

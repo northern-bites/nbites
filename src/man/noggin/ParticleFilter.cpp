@@ -83,8 +83,7 @@ namespace PF
 	{
 	    particles = motionModel->update(particles);
 	    //std::cout << "Motion update complete." << std::endl;
-	}
-	
+	}	
 
 	if(sensorUpdate && sensorModel)
 	{  

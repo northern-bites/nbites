@@ -13,7 +13,7 @@ using viewer::BallEKFViewer;
 using viewer::FieldViewer;
 using offline::OfflineViewer;
 using overseer::OverseerClient;
-using viewer::GraphViewer;
+  //using viewer::GraphViewer;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
