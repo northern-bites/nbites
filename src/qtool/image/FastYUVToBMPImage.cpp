@@ -21,7 +21,11 @@ using namespace data;
 using namespace std;
 
 FastYUVToBMPImage::FastYUVToBMPImage(RoboImage::const_ptr roboImage, QObject* parent) :
-        BMPImage(parent), roboImage(roboImage) {
+        BMPImage(parent), roboImage(roboImage), rgb_image(NULL) {
+}
+
+FastYUVToBMPImage::~FastYUVToBMPImage() {
+    free(rgb_image);
 }
 
 void FastYUVToBMPImage::buildBitmap() {
@@ -50,7 +54,10 @@ void FastYUVToBMPImage::buildBitmap() {
         return;
     }
 
-    byte* rgb_image = (byte*) calloc(image_height*image_width*4, sizeof(byte));
+    int image_size = image_height*image_width*4;
+    if (image_size > sizeof(rgb_image)) {
+        rgb_image = (byte*) realloc(rgb_image, image_size);
+    }
     //TODO: integrate the stride  or format of the image with image info in MImage
     sws_scale(image_convert_context,
             &yuyv_image_data,
@@ -63,7 +70,7 @@ void FastYUVToBMPImage::buildBitmap() {
 
     sws_freeContext(image_convert_context);
 
-    qimage = QImage(rgb_image, image_width, image_height, QImage::Format_ARGB32);
+    qimage = QImage(rgb_image, image_width, image_height, QImage::Format_ARGB32_Premultiplied);
     bitmap.convertFromImage(qimage);
 }
 
