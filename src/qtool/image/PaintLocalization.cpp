@@ -8,7 +8,7 @@ namespace qtool
     PaintLocalization::PaintLocalization(QObject *parent):
       BMPImage(parent)
     {
-      bitmap = QImage(FIELD_WIDTH, FIELD_HEIGHT, QImage::Format_ARGB32_Premultiplied);
+      bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
 
       lastParticles.push_back(PF::LocalizationParticle(PF::Location(50.0f, 50.0f, 0.1f), 0.0f));
     }
@@ -20,10 +20,8 @@ namespace qtool
       buildBitmap();
     }
 
-    void PaintLocalization::drawParticle(PF::LocalizationParticle particle, QImage& bitmap)
+    void PaintLocalization::drawParticle(PF::LocalizationParticle particle, QPixmap& bitmap)
     {
-      bitmap.fill(0x00000000);
-
       QPainter painter(&bitmap);
 
       QPoint particleCenter(particle.getLocation().x,
@@ -41,10 +39,11 @@ namespace qtool
 
     void PaintLocalization::buildBitmap()
     {
+        bitmap.fill(Qt::transparent);
       PF::ParticleIt i = lastParticles.begin();
       for(; i != lastParticles.end(); ++i)
       {
-	this->drawParticle(*i, bitmap);
+          this->drawParticle(*i, bitmap);
       }
     }
   }

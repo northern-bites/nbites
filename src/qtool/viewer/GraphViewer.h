@@ -38,7 +38,7 @@
 
 /*       //void initializeR(int argc/\* = 3*\/,  */
 /*       //char *argv[]/\* = {"R", "--no-save", "--silent"}*\/); */
-      
+
 /*       /\** */
 /*        * */
 /*        * Styles: */
@@ -80,7 +80,6 @@
 /*       QLabel *xAxisTitleLabel; */
 /*       QLabel *yAxisTitleLabel; */
 /*       QLabel *plotOptionsLabel; */
-      
 /*       QwtPlot *centralPlot; */
 
 /*       QVector<QwtPlotCurve *> curves; */

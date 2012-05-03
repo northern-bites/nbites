@@ -35,9 +35,9 @@ public:
 
     unsigned int getWidth() const { return width;}
     unsigned int getHeight() const { return height;}
-    byte** getYImage() { return yImg;}
-    byte** getUImage() { return uImg;}
-    byte** getVImage() { return vImg;}
+    const byte** getYImage() const { return (const byte**) yImg;}
+    const byte** getUImage() const { return (const byte**) uImg;}
+    const byte** getVImage() const { return (const byte**) vImg;}
 
     bool areWithinImage(int x, int y) const {
         return 0 <= x && x < getWidth() && 0 <= y && y < getHeight();
