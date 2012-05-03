@@ -28,11 +28,20 @@ void MObjectViewer::createNewTreeModel() {
 }
 
 void MObjectViewer::updateView() {
-    treeModel->revalidateModel();
-    QModelIndex top = treeModel->index(0, 0, QModelIndex());
-    QModelIndex bottom = treeModel->index(treeModel->rowCount(QModelIndex())-1,
-            treeModel->columnCount(QModelIndex())-1, QModelIndex());
-    emit dataChanged(top, bottom);
+    if (this->isVisible()) {
+        treeModel->revalidateModel();
+        QModelIndex top = treeModel->index(0, 0, QModelIndex());
+        QModelIndex bottom = treeModel->index(treeModel->rowCount(QModelIndex())-1,
+                treeModel->columnCount(QModelIndex())-1, QModelIndex());
+        emit dataChanged(top, bottom);
+    }
+}
+
+void MObjectViewer::showEvent(QShowEvent * e) {
+    QWidget::showEvent(e);
+    //explicitely update the bitmap when the widget becomes visible again
+    //since it might have changed!
+    this->updateView();
 }
 
 }
