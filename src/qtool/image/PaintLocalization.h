@@ -38,7 +38,7 @@ namespace qtool
       void updateWithParticles(PF::ParticleSet particles);
 
     protected:
-      void drawParticle(PF::LocalizationParticle particle, QImage& bitmap);
+      void drawParticle(PF::LocalizationParticle particle, QPixmap& bitmap);
 
       virtual void buildBitmap();
 

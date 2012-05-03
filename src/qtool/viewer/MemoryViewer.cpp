@@ -24,8 +24,8 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     BMPImageViewer* imageViewer;
 
     //if(overlayCheckBox->isChecked()){
-      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
-      OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
+//      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
+      OverlayedImage* combo = new OverlayedImage(rawBMP, NULL, this);//shapes, this);
     
       imageViewer = new BMPImageViewer(combo, this);
       //}

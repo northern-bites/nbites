@@ -17,9 +17,9 @@
 #include <QLineEdit>
 #include <QVector>
 #include <QButtonGroup>
-#include <qwt/qwt_plot.h>
-#include <qwt/qwt_text.h>
-#include <qwt/qwt_plot_curve.h>
+//#include <qwt/qwt_plot.h>
+//#include <qwt/qwt_text.h>
+//#include <qwt/qwt_plot_curve.h>
 //#include "R/RTool.h"
 #include <cmath>
 #include <iostream>
@@ -48,9 +48,9 @@ namespace qtool
        *  QwtPlotCurve::Steps
        *  QwtPlotCurve::Dots
        */ 
-      void plotCurve(QVector<double> x, QVector<double> y, 
-		     QString title = "curve", 
-		     QwtPlotCurve::CurveStyle style = QwtPlotCurve::Lines);
+//      void plotCurve(QVector<double> x, QVector<double> y,
+//		     QString title = "curve",
+//		     QwtPlotCurve::CurveStyle style = QwtPlotCurve::Lines);
 
     private slots:
       void updateGraph();
@@ -81,9 +81,9 @@ namespace qtool
       QLabel *yAxisTitleLabel;
       QLabel *plotOptionsLabel;
       
-      QwtPlot *centralPlot;
+//      QwtPlot *centralPlot;
 
-      QVector<QwtPlotCurve *> curves;
+//      QVector<QwtPlotCurve *> curves;
       
       //RTool* R;
 

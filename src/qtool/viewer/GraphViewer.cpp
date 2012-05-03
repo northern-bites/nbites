@@ -49,7 +49,7 @@ namespace qtool
 
       connect(plotOptionsGroup, SIGNAL( buttonPressed(int) ), this, SLOT( updateCurveStyle(int) ));
 
-      centralPlot = new QwtPlot(QwtText("Default Plot"));
+//      centralPlot = new QwtPlot(QwtText("Default Plot"));
 
       // Set some default curve data. 
       QVector<double> xData;
@@ -59,10 +59,10 @@ namespace qtool
 	xData.push_back((double)i);
 	yData.push_back(std::sqrt((double)i));
       }
-      plotCurve(xData, yData, "f(x) = sqrt(x)", QwtPlotCurve::Lines);
+//      plotCurve(xData, yData, "f(x) = sqrt(x)", QwtPlotCurve::Lines);
 
       layout->addLayout(graphOptions, 1, 0, Qt::AlignTop);
-      layout->addWidget(centralPlot, 0, 0, 1, 1);
+//      layout->addWidget(centralPlot, 0, 0, 1, 1);
 
       this->setLayout(layout);
 
@@ -74,14 +74,14 @@ namespace qtool
     {
       //delete R;
       //R = 0;
-      delete centralPlot;
-      centralPlot = 0;
-      delete graphOptions;
-      graphOptions = 0;
-      delete graphTitleOption;
-      graphTitleOption = 0;
-      delete plotOptions;
-      plotOptions = 0;
+//      delete centralPlot;
+//      centralPlot = 0;
+//      delete graphOptions;
+//      graphOptions = 0;
+//      delete graphTitleOption;
+//      graphTitleOption = 0;
+//      delete plotOptions;
+//      plotOptions = 0;
     }
 
     //void GraphViewer::initializeR(int argc, char *argv[])
@@ -92,48 +92,48 @@ namespace qtool
     //}
     //}
 
-    void GraphViewer::plotCurve(QVector<double> x, QVector<double> y, QString title,
-				QwtPlotCurve::CurveStyle style)
-    {
-      QwtPlotCurve *curve = new QwtPlotCurve(title);
-
-      curve->setStyle(style);
-
-      curves.push_back(curve);
-
-      curve->attach(centralPlot);
-
-      curve->setSamples(x, y);
-
-      centralPlot->replot();
-    }
+//    void GraphViewer::plotCurve(QVector<double> x, QVector<double> y, QString title,
+//				QwtPlotCurve::CurveStyle style)
+//    {
+//      QwtPlotCurve *curve = new QwtPlotCurve(title);
+//
+//      curve->setStyle(style);
+//
+//      curves.push_back(curve);
+//
+//      curve->attach(centralPlot);
+//
+//      curve->setSamples(x, y);
+//
+//      centralPlot->replot();
+//    }
 
     void GraphViewer::updateGraph()
     {
       //std::cout << "Updating graph..." << std::endl;
 
-      centralPlot->setTitle(graphTitleInput->text());
-      centralPlot->setAxisTitle(QwtPlot::xBottom, xAxisTitleInput->text());
-      centralPlot->setAxisTitle(QwtPlot::yLeft, yAxisTitleInput->text());
+//      centralPlot->setTitle(graphTitleInput->text());
+//      centralPlot->setAxisTitle(QwtPlot::xBottom, xAxisTitleInput->text());
+//      centralPlot->setAxisTitle(QwtPlot::yLeft, yAxisTitleInput->text());
     }
 
     void GraphViewer::updateCurveStyle(int id)
     {
       //std::cout << "Updating curve style..." << std::endl;
-      if(id == plotOptionsGroup->id(setPlotLineButton))
-      {
-	curves[0]->setStyle(QwtPlotCurve::Lines);
-	centralPlot->replot();
-      }
-      else if(id == plotOptionsGroup->id(setPlotDotsButton))
-      {
-	curves[0]->setStyle(QwtPlotCurve::Dots);
-	centralPlot->replot();
-      }
-      else
-      {
-      	std::cout << "GraphViewer::updateCurveStyle() bad id!" << std::endl;
-      }
+//      if(id == plotOptionsGroup->id(setPlotLineButton))
+//      {
+//	curves[0]->setStyle(QwtPlotCurve::Lines);
+//	centralPlot->replot();
+//      }
+//      else if(id == plotOptionsGroup->id(setPlotDotsButton))
+//      {
+//	curves[0]->setStyle(QwtPlotCurve::Dots);
+//	centralPlot->replot();
+//      }
+//      else
+//      {
+//      	std::cout << "GraphViewer::updateCurveStyle() bad id!" << std::endl;
+//      }
     }
 
     void GraphViewer::updateLocalization()

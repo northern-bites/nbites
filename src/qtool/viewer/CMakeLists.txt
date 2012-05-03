@@ -12,7 +12,7 @@ include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS}) #-DR_HOME=/usr/lib/R)
 
 #find_library(R_LIBRARY R PATHS)
-find_library(QWT_LIBRARY qwt PATHS)
+#find_library(QWT_LIBRARY qwt PATHS)
 
 ########### Sources
 
@@ -58,6 +58,6 @@ target_link_libraries(
   memory
   ${QT_LIBRARIES}
   #${R_LIBRARY} 
-  ${QWT_LIBRARY}
+  #${QWT_LIBRARY}
 
   )
