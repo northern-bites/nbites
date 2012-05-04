@@ -47,6 +47,8 @@ protected:
 
 private:
     data::RoboImage::const_ptr roboImage;
+    QImage qimage;
+//    byte* rgb_image;
 };
 
 }

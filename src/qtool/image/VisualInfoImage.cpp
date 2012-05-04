@@ -16,7 +16,7 @@ namespace image {
 void VisualInfoImage::buildBitmap() {
      int image_width = 640;
      int image_height = 480;
-     bitmap= QImage(image_width,image_height, QImage::Format_ARGB32);
+     bitmap= QPixmap(image_width, image_height);
      
      const PVision::PVisualBall ballData = visionData->get()->visual_ball();
      drawBall(ballData);

@@ -50,7 +50,7 @@ void FastYUVToBMPImage::buildBitmap() {
         return;
     }
 
-    byte* rgb_image = (byte*) malloc(image_height*image_width*4);
+    byte* rgb_image = (byte*) calloc(image_height*image_width*4, sizeof(byte));
     //TODO: integrate the stride  or format of the image with image info in MImage
     sws_scale(image_convert_context,
             &yuyv_image_data,
@@ -63,7 +63,8 @@ void FastYUVToBMPImage::buildBitmap() {
 
     sws_freeContext(image_convert_context);
 
-    bitmap = QImage(rgb_image, image_width, image_height, QImage::Format_ARGB32);
+    qimage = QImage(rgb_image, image_width, image_height, QImage::Format_ARGB32);
+    bitmap.convertFromImage(qimage);
 }
 
 }
