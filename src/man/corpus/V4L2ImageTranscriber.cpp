@@ -145,7 +145,7 @@ void V4L2ImageTranscriber::initTable(const string& filename)
     }
 
 #ifndef OFFLINE
-    printf("CAMERA::Loaded colortable %s\n",filename.c_str());
+    printf("CAMERA::Loaded colortable %s.\n",filename.c_str());
 #endif
 
     fclose(fp);
