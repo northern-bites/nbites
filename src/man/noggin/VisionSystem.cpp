@@ -24,9 +24,8 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 
     if(!hasNewObservations())
     {
-#ifdef DEBUG_LOCALIZATION
         std::cout << "No new observations, do not update weights." << std::endl;
-#endif
+
 	setUpdated(false);
 	return particles;
     }
@@ -57,27 +56,22 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	        // Since the observation is unambiguous, use the first observation.
 		Landmark l = o.possibilities[0];
 		PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
-		//std::cout << "hypoth dist = " << hypothesisVector.magnitude
-		//	  << " hypoth ang = " << hypothesisVector.direction;
-		//std::cout << " act dist = " << o.distance
-		//        << " act ang = " << o.angle;
-		float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
-		float angleDiff = std::abs(o.angle - hypothesisVector.direction);
-		// For now, generate a new importance weight as the inverse of 
-		// the difference between the distances multiplied by the 
-		// inverse of the difference between the angles.
-		if(distanceDiff < 0.001f)
-		  std::cout << "distance difference close to 0!" << std::endl;
 
-		float distanceProb = 1.0f/distanceDiff;
+		float distanceDiff = o.distance - hypothesisVector.magnitude;
+		//std::cout << "distanceDiff = " << distanceDiff << std::endl;
+		float angleDiff = NBMath::subPIAngle(o.angle) - NBMath::subPIAngle(hypothesisVector.direction);
+		//std::cout << "angleDiff = " << angleDiff << std::endl;
 
-		if(angleDiff < 0.001f)
-		  std::cout << "angle difference close to 0!" << std::endl;
+		boost::math::normal_distribution<float> pDist(0.0f, 15.00f);
 
-		float angleProb = 1.0f/angleDiff;
+		float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
+
+		boost::math::normal_distribution<float> pAngle(0.0f, 1.40f);
+
+		float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 		float probability = distanceProb * angleProb;
 		//std::cout << " prob = " << probability << std::endl;
-		// Assuming conditional independence between measurements.
+
 		if(totalWeight == 0.0f)
 		    totalWeight = probability;
 		else
@@ -87,33 +81,36 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    }
 	    else
 	    {
-		// Deal with ambiguous observations. For now, take the most likely 
+	    	// Deal with ambiguous observations. For now, take the most likely 
 	        // measurement. @todo
+	      //	      std::cout << "Using an ambiguous landmark." << std::endl;
 	        std::vector<Landmark>::iterator landmarkIter;
 		float maxWeight = 0.0f;
-		// Loop through all possibilities, and use the most likely measurement.
+	    	// Loop through all possibilities.
 	        for(landmarkIter = o.possibilities.begin(); 
-		    landmarkIter != o.possibilities.end(); 
-		    ++landmarkIter)
+	    	    landmarkIter != o.possibilities.end(); 
+	    	    ++landmarkIter)
 	        {
-		    Landmark l = *landmarkIter;
-		    PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
-		    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
-		    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
-		    float distanceProb = 1.0f/distanceDiff;
-		    float angleProb = 1.0f/angleDiff;
-		    float probability = distanceProb * angleProb;
-		    if(probability > maxWeight)
+	    	    Landmark l = *landmarkIter;
+	    	    PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
+	    	    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
+	    	    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
+		    boost::math::normal_distribution<float> pDist(0.0f, 15.00f);
+	    	    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff)/*1.0f/distanceDiff*/;
+		    boost::math::normal_distribution<float> pAngle(0.0f, 1.40f);
+	    	    float angleProb = boost::math::pdf<float>(pAngle, angleDiff)/*1.0f/angleDiff*/;
+	    	    float probability = distanceProb * angleProb;
+	    	    if(probability > maxWeight)
                         maxWeight = probability;		  
 	        }
-		// Since we are assuming conditional independence, compound the
-		// probabilities of measurement for each individual observation.
-		if(totalWeight == 0.0f)
-		    totalWeight = maxWeight;
-		else
-		    totalWeight *= maxWeight;
+	    	// Since we are assuming conditional independence, compound the
+	    	// probabilities of measurement for each individual observation.
+	    	if(totalWeight == 0.0f)
+	    	    totalWeight = maxWeight;
+	    	else
+	    	    totalWeight *= maxWeight;
 
-		count++;
+	    	count++;
 	    }
 	}
         // Make sure that we have made an observation before updating weights.

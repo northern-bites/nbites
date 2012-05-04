@@ -140,8 +140,8 @@ namespace PF
 	{
 	    // Do nothing with this data.
 	    run();
-	    /* std::cout << "Best particle " */
-	    /*           << this->getBestParticle(); */
+	    std::cout << "Best particle "
+	              << this->getBestParticle();
 	}
 
 	/**
@@ -271,7 +271,7 @@ namespace PF
     {
 	float x0 = origin.x;
 	float y0 = origin.y;
-	float rotate = origin.heading;
+	float rotate = NBMath::subPIAngle(origin.heading);
 
 	// Translate and rotate.
 	float x_prime = (x - x0) * std::cos(rotate) + (y - y0) * std::sin(rotate);

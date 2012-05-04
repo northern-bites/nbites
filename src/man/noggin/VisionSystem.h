@@ -11,6 +11,8 @@
 #include <string>
 #include "ParticleFilter.h"
 #include "ConcreteFieldObject.h"
+#include "NBMath.h"
+#include <boost/math/distributions.hpp>
 
 /**
  * Holds a known landmark.

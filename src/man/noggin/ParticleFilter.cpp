@@ -1,4 +1,4 @@
-#include "ParticleFilter.h"
+ #include "ParticleFilter.h"
 
 namespace PF
 {
@@ -95,20 +95,24 @@ namespace PF
 	{
 	    resample();
 	    Location estimate = this->getBestParticle().getLocation();
-	    if(xEstimate - estimate.x > 0.001f || 
-	       yEstimate - estimate.y > 0.001f ||
-	       hEstimate - estimate.heading > 0.001f)
-	    {
-	      // std::cout << "New guess at (" <<
-	      // 	estimate.x << ", " <<
-	      // 	estimate.y << ", " <<
-	      // 	estimate.heading << ")" << std::endl;
-	    }
+	    // if(xEstimate - estimate.x > 0.001f || 
+	    //    yEstimate - estimate.y > 0.001f ||
+	    //    hEstimate - estimate.heading > 0.001f)
+	    // {
+	    //   // std::cout << "New guess at (" <<
+	    //   // 	estimate.x << ", " <<
+	    //   // 	estimate.y << ", " <<
+	    //   // 	estimate.heading << ")" << std::endl;
+	    // }
 
 	    xEstimate = estimate.x;
 	    yEstimate = estimate.y;
 	    hEstimate = estimate.heading;
 	    //std::cout << "Resample complete." << std::endl;
+	}
+	else
+	{
+	  std::cout << "No sensor update." << std::endl;
 	}
     }
 
