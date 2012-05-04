@@ -61,6 +61,17 @@ enum v4l2_exposure_auto_type {
 
 #endif /* LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26) */
 
+// For checking the ioctls; prints error if one occurs
+#define VERIFY(x, str) {                               \
+        if( (x) < 0) {                                 \
+            printf("CAMERA ERROR::");                  \
+            printf(str);                               \
+            printf("\n");                              \
+            printf("System Error Message: %s\n",        \
+                   strerror(errno));                   \
+        }                                              \
+    }
+
 namespace man {
 namespace corpus {
 
@@ -96,8 +107,8 @@ V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s) :
 V4L2ImageTranscriber::~V4L2ImageTranscriber() {
     // disable streaming
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if(ioctl(fd, VIDIOC_STREAMOFF, &type) == -1)
-        printf("Capture stop failed.\n");
+    VERIFY((ioctl(fd, VIDIOC_STREAMOFF, &type)),
+           "Capture stop failed.");
 
     // unmap buffers
     for (int i = 0; i < frameBufferCount; ++i)
@@ -114,7 +125,8 @@ void V4L2ImageTranscriber::initTable(const string& filename)
     FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
 
     if (fp == NULL) {
-        printf("initTable() FAILED to open filename: %s", filename.c_str());
+        printf("CAMERA::ERROR::initTable() FAILED to open filename: %s\n",
+               filename.c_str());
 #ifdef OFFLINE
         exit(0);
 #else
@@ -143,9 +155,9 @@ void V4L2ImageTranscriber::initOpenI2CAdapter() {
     cameraAdapterFd = open("/dev/i2c-0", O_RDWR);
 
     if(cameraAdapterFd == -1)
-        printf("Camera adapter FD is WRONG.\n");
-    if(ioctl(cameraAdapterFd, 0x703, 8) == -1)
-        printf("Opening I2C adapter failed.\n");
+        printf("CAMERA::ERROR::Camera adapter FD is WRONG.\n");
+    VERIFY((ioctl(cameraAdapterFd, 0x703, 8)),
+           "Opening I2C adapter failed.");
 }
 
 void V4L2ImageTranscriber::initSelectCamera() {
@@ -162,7 +174,7 @@ void V4L2ImageTranscriber::initOpenVideoDevice() {
 #endif
 
     if(fd == -1)
-        printf("Video Device FD is WRONG.\n");
+        printf("CAMERA::ERROR::Video Device FD is WRONG.\n");
 }
 
 void V4L2ImageTranscriber::initSetCameraDefaults() {
@@ -172,13 +184,13 @@ void V4L2ImageTranscriber::initSetCameraDefaults() {
     memset(&control, 0, sizeof(control));
     control.id = V4L2_CID_CAM_INIT;
     control.value = 0;
-    if(ioctl(fd, VIDIOC_S_CTRL, &control) == -1)
-        perror("Setting default parameters failed:\n");
+    VERIFY((ioctl(fd, VIDIOC_S_CTRL, &control)),
+           "Setting default parameters failed.");
 #endif
 
     v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
-    if(ioctl(fd, VIDIOC_S_STD, &esid0) == -1)
-        printf("Setting default parameters failed. 2\n");
+    VERIFY((ioctl(fd, VIDIOC_S_STD, &esid0)),
+           "Setting default parameters failed.");
 }
 
 void V4L2ImageTranscriber::initSetImageFormat() {
@@ -190,13 +202,11 @@ void V4L2ImageTranscriber::initSetImageFormat() {
     fmt.fmt.pix.height = HEIGHT;
     fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
-    if(ioctl(fd, VIDIOC_S_FMT, &fmt) == -1)
-    {
-        printf("Setting image format failed");
-    }
+    VERIFY((ioctl(fd, VIDIOC_S_FMT, &fmt)),
+           "Setting image format failed.");
 
     if(fmt.fmt.pix.sizeimage != SIZE)
-        printf("Size setting is WRONG.\n");
+        printf("CAMERA ERROR::Size setting is WRONG.\n");
 }
 
 void V4L2ImageTranscriber::initSetFrameRate() {
@@ -204,12 +214,12 @@ void V4L2ImageTranscriber::initSetFrameRate() {
     struct v4l2_streamparm fps;
     memset(&fps, 0, sizeof(struct v4l2_streamparm));
     fps.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if(ioctl(fd, VIDIOC_G_PARM, &fps) == -1)
-        printf("Getting FPS failed.\n");
+    VERIFY((ioctl(fd, VIDIOC_G_PARM, &fps)),
+           "Getting FPS failed.");
     fps.parm.capture.timeperframe.numerator = 1;
     fps.parm.capture.timeperframe.denominator = 30;
-    if(ioctl(fd, VIDIOC_S_PARM, &fps) == -1)
-        printf("Setting FPS failed.\n");;
+    VERIFY((ioctl(fd, VIDIOC_S_PARM, &fps)),
+           "Setting FPS failed.");
 }
 
 void V4L2ImageTranscriber::initRequestAndMapBuffers() {
@@ -219,10 +229,11 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
     rb.count = frameBufferCount;
     rb.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     rb.memory = V4L2_MEMORY_MMAP;
-    if(ioctl(fd, VIDIOC_REQBUFS, &rb) == -1)
-        printf("Requesting buffers failed.\n");
+    VERIFY((ioctl(fd, VIDIOC_REQBUFS, &rb)),
+           "Requesting buffers failed.");
+
     if(rb.count != frameBufferCount)
-        printf("Buffer count is WRONG.\n");
+        printf("CAMERA ERROR::Buffer count is WRONG.\n");
 
     // map or prepare the buffers
     buf = static_cast<struct v4l2_buffer*>(calloc(1,
@@ -232,13 +243,13 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
         buf->index = i;
         buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf->memory = V4L2_MEMORY_MMAP;
-        if(ioctl(fd, VIDIOC_QUERYBUF, buf) == -1)
-            printf("Querying buffer failed.\n");
+        VERIFY((ioctl(fd, VIDIOC_QUERYBUF, buf)),
+               "Querying buffer failed.");
         memLength[i] = buf->length;
         mem[i] = mmap(0, buf->length, PROT_READ | PROT_WRITE,
                       MAP_SHARED, fd, buf->m.offset);
         if(mem[i] == MAP_FAILED)
-            printf("Map failed.\n");
+            printf("CAMERA ERROR::Map failed.\n");
     }
 }
 
@@ -253,22 +264,8 @@ void V4L2ImageTranscriber::initQueueAllBuffers() {
     }
 }
 
-void V4L2ImageTranscriber::enumerate_menu ()
-{
-    printf ("  Menu items:\n");
-
-    memset (&querymenu, 0, sizeof (querymenu));
-    querymenu.id = queryctrl.id;
-
-    for (querymenu.index = queryctrl.minimum;
-         querymenu.index <= queryctrl.maximum;
-         querymenu.index++) {
-        if (0 == ioctl (fd, VIDIOC_QUERYMENU, &querymenu)) {
-            printf ("  %s\n", querymenu.name);
-        }
-    }
-}
-
+// Taken from V4L2 specs example
+// If you need to determine info about driver, use this method
 void V4L2ImageTranscriber::enumerate_controls()
 {
     memset (&queryctrl, 0, sizeof (queryctrl));
@@ -318,7 +315,9 @@ void V4L2ImageTranscriber::enumerate_controls()
         }
     }
 
-    // auto exposure is weird
+    /* have to look for auto exposure separately
+       some controls may be much further than the loop looks!
+       this is just the most important right now */
     queryctrl.id = V4L2_CID_EXPOSURE_AUTO;
 
     if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl))
@@ -334,6 +333,22 @@ void V4L2ImageTranscriber::enumerate_controls()
 
     if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
                 enumerate_menu ();
+}
+
+void V4L2ImageTranscriber::enumerate_menu ()
+{
+    printf ("  Menu items:\n");
+
+    memset (&querymenu, 0, sizeof (querymenu));
+    querymenu.id = queryctrl.id;
+
+    for (querymenu.index = queryctrl.minimum;
+         querymenu.index <= (unsigned)queryctrl.maximum;
+         querymenu.index++) {
+        if (0 == ioctl (fd, VIDIOC_QUERYMENU, &querymenu)) {
+            printf ("  %s\n", querymenu.name);
+        }
+    }
 }
 
 void V4L2ImageTranscriber::initSettings()
@@ -386,8 +401,8 @@ void V4L2ImageTranscriber::initSettings()
 
 void V4L2ImageTranscriber::startCapturing() {
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if(ioctl(fd, VIDIOC_STREAMON, &type) == -1)
-        printf("Start capture failed.\n");
+    VERIFY((ioctl(fd, VIDIOC_STREAMON, &type)),
+           "Start capture failed.");
 }
 
 int V4L2ImageTranscriber::start()
@@ -528,9 +543,10 @@ bool V4L2ImageTranscriber::captureNew() {
     // dequeue a frame buffer (this call blocks when there is
     // no new image available)
 
-    if(ioctl(fd, VIDIOC_DQBUF, buf) == -1)
-        printf("Dequeueing the frame buffer failed.\n");
-    if(buf->bytesused != SIZE) printf("Wrong size!.\n");
+    VERIFY((ioctl(fd, VIDIOC_DQBUF, buf)),
+           "Dequeueing the frame buffer failed.");
+    if(buf->bytesused != SIZE)
+        printf("CAMERA ERROR::Wrong buffer size!.\n");
     currentBuf = buf;
 
     static bool shout = true;
@@ -544,8 +560,8 @@ bool V4L2ImageTranscriber::captureNew() {
 
 bool V4L2ImageTranscriber::releaseBuffer() {
     if (currentBuf) {
-        if(ioctl(fd, VIDIOC_QBUF, currentBuf) == -1)
-            printf("Releasing buffer failed.\n");
+        VERIFY((ioctl(fd, VIDIOC_QBUF, currentBuf)),
+               "Releasing buffer failed.");
     }
     return true;
 }
@@ -566,6 +582,7 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     struct v4l2_control control_s;
     control_s.id = id;
     control_s.value = value;
+    // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
     {
         if (ioctl(fd, VIDIOC_S_CTRL, &control_s) < 0)
@@ -583,8 +600,8 @@ void V4L2ImageTranscriber::assertCameraSettings() {
     struct v4l2_streamparm fps;
     memset(&fps, 0, sizeof(fps));
     fps.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if(ioctl(fd, VIDIOC_G_PARM, &fps) == -1)
-        printf("Camera::assertCameraSettings::Getting settings failed\n");
+    VERIFY((ioctl(fd, VIDIOC_G_PARM, &fps)),
+           "Getting settings failed");
 
     if (fps.parm.capture.timeperframe.numerator != 1) {
         printf("CAMERA::fps.parm.capture.timeperframe.numerator is wrong.\n");
@@ -595,7 +612,7 @@ void V4L2ImageTranscriber::assertCameraSettings() {
         allFine = false;
     }
 
-    // check camera settings
+    // check camera settings against what the driver has
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
     int brightness = getControlSetting(V4L2_CID_BRIGHTNESS);
     int contrast = getControlSetting(V4L2_CID_CONTRAST);
