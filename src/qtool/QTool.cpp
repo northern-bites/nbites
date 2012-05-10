@@ -16,6 +16,7 @@ using overseer::OverseerClient;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
+ 	colorScrollArea(new QScrollArea()),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCalibrate(new ColorCalibrate(dataManager)),
@@ -25,7 +26,7 @@ QTool::QTool() : QMainWindow(),
         fieldViewer(new FieldViewer(dataManager)),
         overseerClient(new OverseerClient(dataManager, this)) {
 
-    this->setWindowTitle(tr("HackTool"));
+    this->setWindowTitle(tr("The New Tool of Awesome"));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
@@ -44,7 +45,9 @@ QTool::QTool() : QMainWindow(),
 
     this->setCentralWidget(toolTabs);
 
-    toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
+    colorScrollArea->setWidget(colorCalibrate);
+
+    toolTabs->addTab(colorScrollArea, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
