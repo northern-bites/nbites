@@ -21,7 +21,8 @@
 #include <ifaddrs.h>
 #include <cstdio>
 
-#include "commconfig.h"
+//#include "commconfig.h"  
+#define DEBUG_COMM
 
 
 UDPSocket::UDPSocket()
@@ -194,7 +195,7 @@ bool UDPSocket::joinMulticast(const char* addrStr)
 	return false;
 }
 
-bool UDPSocket::bind(const char* addrStr, int port)
+bool UDPSocket::bind(const char* addrStr = "", int port)
 {
 	static const int one = 1;
 	struct sockaddr_in addr;
