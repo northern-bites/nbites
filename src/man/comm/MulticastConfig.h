@@ -3,12 +3,14 @@
  * @author Josh Zalinger and Wils Dawson 5/11/12
  */
 
-#define NUM_ROBOTS 9
+#include <string>
+
+#define NUM_ROBOTS 9    // Total number of robots we have
 
 typedef struct robot_ip_pair_t
 {
-	char name[10];
-	char ip[15];
+	std::string name;
+	std::string ip;
 }robot_ip_pair;
 
 static const robot_ip_pair wash   = {"wash"  , "139.140.218.9" };
