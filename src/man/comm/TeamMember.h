@@ -6,7 +6,8 @@
 #ifndef TeamMember_H
 #define TeamMember_H
 
-#include "CommDef.h"
+//#include "CommDef.h"
+typedef long long llong;   
 
 class TeamMember
 {
@@ -25,7 +26,7 @@ public:
 	 * @param packet: Float values for this packet.
 	 * @return:       The number of packets dropped/delayed from this mate.
 	 */
-	int update(llong time, int seqNum, float* packet);
+	unsigned int update(llong time, unsigned int seqNum, float* packet);
 
 	/***********************
 	 * Getters and Setters *
@@ -75,8 +76,8 @@ public:
 	void  setLastPacketTime(llong t) {_lastPacketTime = t;}
 	llong lastPacketTime() {return _lastPacketTime;}
 
-	void  setLastSeqNum(int sn) {_lastSeqNum = sn;}
-	int   lastSeqNum() {return _lastSeqNum;}
+	void  setLastSeqNum(unsigned int sn) {_lastSeqNum = sn;}
+	unsigned int   lastSeqNum() {return _lastSeqNum;}
 
 	void  setActive(bool a) {_active = a;}
 	bool  active() {return _active;}
@@ -100,7 +101,7 @@ private:
 	float _subRole;           // Playbook SubRole
 
 	llong _lastPacketTime;    // Time that the last packet was received.
-	int   _lastSeqNum;        // The sequence number of the last packet recieved.
+	unsigned int _lastSeqNum; // The sequence number of the last packet recieved.
 	bool  _active;            // Is the robot active.
 };
 #endif

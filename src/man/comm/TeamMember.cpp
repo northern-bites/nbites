@@ -10,7 +10,7 @@ TeamMember::TeamMember(int num)
 {
 }
 
-int TeamMember::update(llong time, int seqNum, float* packet)
+unsigned int TeamMember::update(llong time, unsigned int seqNum, float* packet)
 {
 	setLastPacketTime(time);
 	setActive(true);
@@ -31,7 +31,7 @@ int TeamMember::update(llong time, int seqNum, float* packet)
 	setRole(*++ptr);
 	setSubRole(*++ptr);
 
-	int missedPackets = seqNum - lastSeqNum() - 1;
+	unsigned int missedPackets = seqNum - lastSeqNum() - 1;
 	setLastSeqNum(seqNum);
 	return missedPackets;
 }
