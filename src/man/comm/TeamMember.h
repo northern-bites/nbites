@@ -28,6 +28,12 @@ public:
 	 */
 	unsigned int update(llong time, unsigned int seqNum, float* packet);
 
+	/**
+	 * Generates packet from data.
+	 * @return: float pointer to packet data.
+	 */
+	float* generatePacket();
+
 	/***********************
 	 * Getters and Setters *
 	 ***********************/

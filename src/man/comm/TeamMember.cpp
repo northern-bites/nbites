@@ -35,3 +35,25 @@ unsigned int TeamMember::update(llong time, unsigned int seqNum, float* packet)
 	setLastSeqNum(seqNum);
 	return missedPackets;
 }
+
+float* TeamMember::generatePacket()
+{
+	float* ptr;
+	float* packet = ptr;
+
+	*  ptr = myX();
+	*++ptr = myY();
+	*++ptr = myH();
+	*++ptr = myXUncert();
+	*++ptr = myYUncert();
+	*++ptr = myHUncert();
+	*++ptr = ballDist();
+	*++ptr = ballBearing();
+	*++ptr = ballDistUncert();
+	*++ptr = ballBearingUncert();
+	*++ptr = chaseTime();
+	*++ptr = role();
+	*++ptr = subRole();
+
+	return packet;
+}
