@@ -52,6 +52,6 @@ void TeamMember::generatePacket(float* packet)
 
 void TeamMember::updateSequenceNumber(int sn)
 {
-	setDelayedPackets(delayedPackets() + sn-lastSeqNum());
+	setDelayedPackets(delayedPackets() + sn - lastSeqNum() - 1);
 	setLastSeqNum(sn);
 }
