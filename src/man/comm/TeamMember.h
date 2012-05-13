@@ -9,6 +9,8 @@
 //#include "CommDef.h"
 typedef long long llong;   
 
+static const int NUM_DATA_FIELDS = 13;
+
 class TeamMember
 {
 public:
@@ -33,6 +35,11 @@ public:
 	 * @return: float pointer to packet data.
 	 */
 	float* generatePacket();
+
+	/**
+	 * @return: Size of the packet data in bytes
+	 */
+	int sizeOfData();
 
 	/***********************
 	 * Getters and Setters *
@@ -92,6 +99,11 @@ private:
 	TeamMember();            // Disallow default constructor.
 
 	int   _playerNumber;      // The player number
+
+	/**************************************************************
+	 * The following are data fields. If adding or removing data, *
+	 * you should update the NUM_DATA_FIELDS constant at the top  *
+	 **************************************************************/
 	float _myX;               // The global x location on the field.
 	float _myY;               // The global y location on the field.
 	float _myH;               // The global heading on the field.

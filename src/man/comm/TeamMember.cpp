@@ -57,3 +57,8 @@ float* TeamMember::generatePacket()
 
 	return packet;
 }
+
+int TeamMember::sizeOfData()
+{
+	return NUM_DATA_FIELDS * sizeof(float);
+}
