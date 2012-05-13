@@ -47,6 +47,15 @@ public:
 	 */
 	TeamMember* getTeamMate(int player){return team[player-1];}
 
+	/**
+	 * Checks to see if there are any inactive teamMembers.
+	 * Inactive defined as haven't gotten a packet from them in a while.
+	 * Behaviors might also set inactive if robot is penalized.
+	 * @param time:   Timestamp of current time.
+	 * @param player: My player number (ignore me)
+	 */
+    void checkDeadTeammates(llong time, int player);
+
 private:
 	/**
 	 * Sets up the socket to be used

@@ -13,8 +13,10 @@
 
 //#include "commconfig.h"  
 #define DEBUG_COMM  
+//#include "CommDef.h"  
 static const int TEAM_PORT = 4000;  
-#define UNIQUE_ID "B"  
+static const char* UNIQUE_ID = "B";  
+static const llong TEAMMATE_DEAD_THRESHOLD = 3000000;  
 static const int NUM_HEADER_BYTES = 16;
 
 TeamConnect::TeamConnect()
@@ -120,6 +122,7 @@ float* TeamConnect::buildHeader(char* packet, TeamMember* robot)
 	robot->setLastSeqNum(sn);
 
 	llong* lptr = (llong*)++iptr;
+	// TODO
 	//*lptr = CommTime->timeStamp();
 	*lptr = 0;
 	lptr += sizeof(llong);
@@ -218,4 +221,17 @@ bool TeamConnect::verifyHeader(char* header)
 		return false;
 	}
 	return true;
+}
+
+void TeamConnect::checkDeadTeammates(llong time, int player)
+{
+	TeamMember* mate;
+	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+	{
+		mate = team[i];
+		if (mate->playerNumber() == player)
+			continue;
+		if (time - mate->lastPacketTime() > TEAMMATE_DEAD_THRESHOLD)
+			mate->setActive(false);
+	}
 }
