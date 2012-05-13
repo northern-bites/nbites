@@ -10,9 +10,8 @@ TeamMember::TeamMember(int num)
 {
 }
 
-unsigned int TeamMember::update(llong time, unsigned int seqNum, float* packet)
+void TeamMember::update(float* packet)
 {
-	setLastPacketTime(time);
 	setActive(true);
 
 	float* ptr = packet;
@@ -30,16 +29,11 @@ unsigned int TeamMember::update(llong time, unsigned int seqNum, float* packet)
 	setChaseTime(*++ptr);
 	setRole(*++ptr);
 	setSubRole(*++ptr);
-
-	unsigned int missedPackets = seqNum - lastSeqNum() - 1;
-	setLastSeqNum(seqNum);
-	return missedPackets;
 }
 
-float* TeamMember::generatePacket()
+void TeamMember::generatePacket(float* packet)
 {
-	float* ptr;
-	float* packet = ptr;
+	float* ptr = packet;
 
 	*  ptr = myX();
 	*++ptr = myY();
@@ -54,11 +48,10 @@ float* TeamMember::generatePacket()
 	*++ptr = chaseTime();
 	*++ptr = role();
 	*++ptr = subRole();
-
-	return packet;
 }
 
-int TeamMember::sizeOfData()
+void TeamMember::updateSequenceNumber(int sn)
 {
-	return NUM_DATA_FIELDS * sizeof(float);
+	setDelayedPackets(delayedPackets() + sn-lastSeqNum());
+	setLastSeqNum(sn);
 }

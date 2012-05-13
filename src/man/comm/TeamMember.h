@@ -26,20 +26,25 @@ public:
 	 * @param time:   Time that this packet was received.
 	 * @param seqNum: The sequence number for this packet.
 	 * @param packet: Float values for this packet.
-	 * @return:       The number of packets dropped/delayed from this mate.
 	 */
-	unsigned int update(llong time, unsigned int seqNum, float* packet);
+	void update(float* packet);
 
 	/**
 	 * Generates packet from data.
-	 * @return: float pointer to packet data.
+	 * @param packet: Pointer to where the packet payload should be stored.
 	 */
-	float* generatePacket();
+	void generatePacket(float* packet);
 
 	/**
+	 * Sets the new sequence number and keeps track of delayed packets.
+	 * @param sn: New sequence number.
+	 */
+	void updateSequenceNumber(int sn);
+
+    /**
 	 * @return: Size of the packet data in bytes
 	 */
-	int sizeOfData();
+	static int sizeOfData(){return NUM_DATA_FIELDS*sizeof(float);}
 
 	/***********************
 	 * Getters and Setters *
@@ -89,8 +94,11 @@ public:
 	void  setLastPacketTime(llong t) {_lastPacketTime = t;}
 	llong lastPacketTime() {return _lastPacketTime;}
 
-	void  setLastSeqNum(unsigned int sn) {_lastSeqNum = sn;}
-	unsigned int   lastSeqNum() {return _lastSeqNum;}
+	void  setLastSeqNum(int sn) {_lastSeqNum = sn;}
+	int   lastSeqNum() {return _lastSeqNum;}
+
+	void  setDelayedPackets(int d) {_delayedPackets = d;}
+	int   delayedPackets() {return _delayedPackets;}
 
 	void  setActive(bool a) {_active = a;}
 	bool  active() {return _active;}
@@ -118,8 +126,9 @@ private:
 	float _role;              // Playbook Role
 	float _subRole;           // Playbook SubRole
 
+	int   _delayedPackets;    // Number of packets that have been delayed.
 	llong _lastPacketTime;    // Time that the last packet was received.
-	unsigned int _lastSeqNum; // The sequence number of the last packet recieved.
+	int   _lastSeqNum;        // The sequence number of the last packet used.
 	bool  _active;            // Is the robot active.
 };
 #endif
