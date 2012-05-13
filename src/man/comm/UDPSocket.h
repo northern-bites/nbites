@@ -31,7 +31,7 @@ public:
 	 * @param port: The port used for the data transfer.
 	 * @return:     true for success, false for error.
 	 */
-	bool setTarget(const char* ip, int port);
+	bool setTarget(const char* ip, const int port);
 
 	/**
 	 * Set broadcast mode.
@@ -92,7 +92,7 @@ public:
 	bool bind(const char* addrStr, int port);
 
 	/**
-	 * Receive any information in the socket's buffer and gather
+	 * Receive some datagram in the socket's buffer and gather
 	 * information about who sent the packet.
 	 * @param data:    Buffer to which the data will be moved.
 	 * @param datalen: Number of bytes to read from the socket.
@@ -105,7 +105,7 @@ public:
 					struct sockaddr* from = NULL, int* addrlen = NULL);
 
 	/**
-	 * Recieve any information in the socket's buffer. Does not
+	 * Recieve some datagram in the socket's buffer. Does not
 	 * gather information about the sender. Uses receiveFrom.
 	 * @param data: Buffer to which the data will be moved.
 	 * @param len:  Number of bytes to read from the socket.

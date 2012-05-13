@@ -55,7 +55,7 @@ bool UDPSocket::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
 	return true;
 }
 
-bool UDPSocket::setTarget(const char* ip, int port)
+bool UDPSocket::setTarget(const char* ip, const int port)
 {
 	struct sockaddr_in* addr = (struct sockaddr_in*)target;
 	return resolve(ip, port, addr);
@@ -195,7 +195,7 @@ bool UDPSocket::joinMulticast(const char* addrStr)
 	return false;
 }
 
-bool UDPSocket::bind(const char* addrStr = "", int port)
+bool UDPSocket::bind(const char* addrStr = "", int port = 0)
 {
 	static const int one = 1;
 	struct sockaddr_in addr;
