@@ -1,3 +1,8 @@
+/**
+ * Class to hold time related information.
+ * @author Wils Dawson 5/13/12 adapted from old version.
+ */
+
 #include <cstdlib>
 
 #include "CommTimer.h"

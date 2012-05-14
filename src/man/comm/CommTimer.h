@@ -1,3 +1,7 @@
+/**
+ * Class to hold time related information.
+ * @author Wils Dawson 5/13/12 adapted from old version.
+ */
 
 #ifndef CommTimer_H
 #define CommTimer_H
