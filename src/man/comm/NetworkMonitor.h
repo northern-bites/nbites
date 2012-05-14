@@ -26,6 +26,9 @@
  * latencies, as well as monitor the trend in packet loss.
  * @author Ellis Ratner
  * @date June 2011
+ *
+ * Modified to have more encapsulation and for use in new system.
+ * @author Wils Dawson 5/13/12
  */
 
 #ifndef NETWORK_MONITOR_H
@@ -46,8 +49,14 @@ public:
      */
     ~NetworkMonitor();
 
+	/**
+	 * Resets the boxcar filter, latency, and droppedPackets information.
+	 */
     void Reset();
 
+	/**
+	 * Input for boxcar filter.
+	 */
     double X(double);
 
     /**
@@ -66,10 +75,21 @@ public:
      */
     void packetsDropped(int numDropped);
 
-
+	/**
+	 * @return: The total number of packets recieved.
+	 */
     const int totalPacketsReceived() const;
+
+	/**
+	 * @return: The total number of packets delayed.
+	 */
     const int totalPacketsDropped() const;
-    const int totalPackets() const { return totalPacketsReceived() + totalPacketsDropped(); }
+
+	/**
+	 * @return: The total number of packets that we know were sent.
+	 */
+    const int totalPackets() const { return (totalPacketsReceived() +
+											 totalPacketsDropped()); }
 
     /**
      * Finds the bin in the latency histogram with the highest number of
@@ -83,8 +103,9 @@ public:
      * Determines whether network health has deteriorated by using shifts in
      * the latency peak and significant increases in packet loss as criteria.
      * Sends warning notifications.
+	 * @return: true on healthy, false on unhealthy
      */
-    void performHealthCheck();
+    bool performHealthCheck();
 
     /**
      * Saves a report on network health to ~/nbites/log/network.xls on the robot,

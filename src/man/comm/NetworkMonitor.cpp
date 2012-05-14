@@ -99,7 +99,7 @@ int NetworkMonitor::findPeakLatency()
     return maxBin;
 }
 
-void NetworkMonitor::performHealthCheck()
+bool NetworkMonitor::performHealthCheck()
 {
     // Find the initial latency peak;
 	// don't look before there are too few data samples,
@@ -107,7 +107,7 @@ void NetworkMonitor::performHealthCheck()
     if(totalPackets() > 200 && totalPackets() < 250)
     {
 		initialLatencyPeak = findPeakLatency();
-		return;
+		return true;
     }
 
     using namespace std;
@@ -117,11 +117,13 @@ void NetworkMonitor::performHealthCheck()
     {
 		int peak = findPeakLatency();
 		// Check to see if the latency has changed drastically.
-		if(initialLatencyPeak != 0 && peak - initialLatencyPeak >= LATENCY_CHANGE_THRESHOLD)
+		if(initialLatencyPeak != 0 &&
+		   peak - initialLatencyPeak >= LATENCY_CHANGE_THRESHOLD)
 		{
 			cout << "NETWORK WARNING: packet latency has increased significantly!"
 				 << endl;
 			setSentWarning(true);
+			return false;
 		}
 		// Also, are we dropping more packets than we should be suddenly?
 		if(Y() > PACKETS_DROPPED_THRESHOLD)
@@ -129,8 +131,10 @@ void NetworkMonitor::performHealthCheck()
 			cout << "NETWORK WARNING: packets dropped on average has increased to "
 				 << Y() << "!" << endl;
 			setSentWarning(true);
+			return false;
 		}
     }
+	return true;
 }
 
 void NetworkMonitor::logOutput()
@@ -142,7 +146,6 @@ void NetworkMonitor::logOutput()
 
     if(logFile.is_open())
     {
-		using namespace std;
 		const int width = 12;
 
 		logFile << "Network Monitor Report" << endl;
