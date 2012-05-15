@@ -19,7 +19,7 @@ public:
 	 * Constructor
 	 * @param f: Pointer to the function we should use for time.
 	 */
-    CommTimer(llong (*f)());
+    CommTimer(llong(*f)());
 
 	/**
 	 * @return: The current time on this robot after starting.
@@ -33,7 +33,7 @@ public:
 	 * before sending the next packet. This aids in
 	 * avoiding regular spectrum interference.
 	 */
-    void packetSent();
+    void teamPacketSent();
 
 	/**
 	 * @return: true on GO, false on WAIT

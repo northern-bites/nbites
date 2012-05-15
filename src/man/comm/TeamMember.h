@@ -104,7 +104,7 @@ public:
 	bool  active() {return _active;}
 
 private:
-	TeamMember();            // Disallow default constructor.
+	TeamMember();             // Disallow default constructor.
 
 	int   _playerNumber;      // The player number
 
