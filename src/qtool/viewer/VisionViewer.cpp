@@ -35,6 +35,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     this->addToolBar(toolBar);
 
     visionImage = new ThresholdedImage(rawImage, this);
+    //visionImage->scaleBitmap_640_480();
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
     FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(), this);
@@ -92,6 +93,7 @@ void VisionViewer::update(){
   rawImage->mutable_image()->assign(reinterpret_cast<const char *>
 				    (vision->thresh->thresholded),
 				    AVERAGED_IMAGE_SIZE);
+  // visionImage->scaleBitmap_640_480();
 
 }
 

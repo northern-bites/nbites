@@ -36,5 +36,9 @@ void ThresholdedImage::buildBitmap() {
         }
     }
 }
+
+void ThresholdedImage::scaleBitmap_640_480() {
+    bitmap.scaled(640, 480);
+}
 }
 }

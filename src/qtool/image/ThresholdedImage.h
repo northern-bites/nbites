@@ -25,6 +25,7 @@ public:
     virtual ~ThresholdedImage() {};
 
     void buildBitmap();
+    void scaleBitmap_640_480();
 
     unsigned getWidth() const { return rawImage->width(); }
     unsigned getHeight() const { return rawImage->height(); }
