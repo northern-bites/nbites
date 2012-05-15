@@ -17,9 +17,11 @@
 static const int TEAM_PORT = 4000;  
 static const char* UNIQUE_ID = "B";  
 static const llong TEAMMATE_DEAD_THRESHOLD = 3000000;  
+static const llong MIN_PACKET_DELAY = 0;  
 static const int NUM_HEADER_BYTES = 16;
 
-TeamConnect::TeamConnect()
+TeamConnect::TeamConnect(CommTimer* t)
+	: timer(t)
 {
 	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
 	{
@@ -122,9 +124,7 @@ float* TeamConnect::buildHeader(char* packet, TeamMember* robot)
 	robot->setLastSeqNum(sn);
 
 	llong* lptr = (llong*)++iptr;
-	// TODO
-	//*lptr = CommTime->timeStamp();
-	*lptr = 0;
+	*lptr = timer->timestamp();
 	lptr += sizeof(llong);
 
 	float* fptr = (float*)++lptr;
@@ -191,6 +191,15 @@ int TeamConnect::verify(char* packet, int player)
 
 	llong* lptr = (llong*)++iptr;
 	llong ts = *lptr;
+
+	// Now attempt to syncronize the clocks of this robot and
+	// the robot from which we just received. Eventually the
+	// two clocks will reach an equilibrium point (within a
+	// reasonable margin of error) without the use of internet
+	// based clock syncronizing (don't need outside world).
+	llong currtime = timer->timestamp();
+	if (ts + MIN_PACKET_DELAY > currtime)
+		timer->setOffset(ts + MIN_PACKET_DELAY - currtime);
 	robot->setLastPacketTime(ts);
 	return playerNum;
 }
@@ -225,13 +234,13 @@ bool TeamConnect::verifyHeader(char* header)
 
 void TeamConnect::checkDeadTeammates(llong time, int player)
 {
-	TeamMember* mate;
+	TeamMember* robot;
 	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
 	{
-		mate = team[i];
-		if (mate->playerNumber() == player)
-			continue;
-		if (time - mate->lastPacketTime() > TEAMMATE_DEAD_THRESHOLD)
-			mate->setActive(false);
+		robot = team[i];
+		if (robot->playerNumber() == player)
+			robot->setActive(true);
+		else if (time - robot->lastPacketTime() > TEAMMATE_DEAD_THRESHOLD)
+			robot->setActive(false);
 	}
 }

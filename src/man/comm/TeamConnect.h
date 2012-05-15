@@ -6,6 +6,7 @@
 #ifndef TeamConnect_H
 #define TeamConnect_H
 
+#include "CommTimer.h"
 #include "TeamMember.h"
 #include "UDPSocket.h"
 
@@ -18,7 +19,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	TeamConnect();
+	TeamConnect(CommTimer* t);
 
 	/**
 	 * Destructor.
@@ -90,6 +91,7 @@ private:
 	 */
 	bool verifyHeader(char* header);
 
+	CommTimer* timer;
 	TeamMember* team[NUM_PLAYERS_PER_TEAM];
 	UDPSocket*  socket;
 	int teamNumber;
