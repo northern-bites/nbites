@@ -41,8 +41,9 @@ class NetworkMonitor : public Boxcar
 public:
     /**
      * Class constructor
+	 * @param time: The time at which the monitor is constructed.
      */
-    NetworkMonitor();
+    NetworkMonitor(long long time);
 
     /**
      * Class destructor.
@@ -110,8 +111,9 @@ public:
     /**
      * Saves a report on network health to ~/nbites/log/network.xls on the robot,
      * including a histogram of the latency and of dropped packets.
+	 * @param time: The current time to make sure we don't output too often.
      */
-    void logOutput();
+    void logOutput(long long time);
 
     /**
      * Sets a flag indicating whether or not a network health deterioration
@@ -127,6 +129,7 @@ private:
     long long lastPacketReceivedAt;
     int initialLatencyPeak;
     bool sentWarning;
+	long long lastOutput;
 };
 
 #endif // NETWORK_MONITOR_H

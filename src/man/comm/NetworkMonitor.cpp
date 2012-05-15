@@ -24,13 +24,14 @@ static const int BOXCAR_WIDTH = 20;
 static const int LATENCY_CHANGE_THRESHOLD = 4;
 static const double PACKETS_DROPPED_THRESHOLD = 0.3333f;
 
-NetworkMonitor::NetworkMonitor()
+NetworkMonitor::NetworkMonitor(long long time)
     :  Boxcar(BOXCAR_WIDTH),
        latency(NUM_BINS_LATENCY, LOW_BIN_LATENCY,
 			   HIGH_BIN_LATENCY, LOG_SCALE_LATENCY),
        droppedPackets(NUM_BINS_DROPPED, LOW_BIN_DROPPED,
 					  HIGH_BIN_DROPPED, LOG_SCALE_DROPPED),
-       lastPacketReceivedAt(0), initialLatencyPeak(0), sentWarning(false)
+       lastPacketReceivedAt(0), initialLatencyPeak(0),
+	   sentWarning(false), lastOutput(time)
 {
     Reset();
 }
@@ -137,9 +138,17 @@ bool NetworkMonitor::performHealthCheck()
 	return true;
 }
 
-void NetworkMonitor::logOutput()
+void NetworkMonitor::logOutput(long long time)
 {
     using namespace std;
+
+	// Don't log too often.
+	if (time - lastOutput <= 30 * 1000000)
+		return;
+
+	// Update sent warning to false now and change the output time.
+	setSentWarning(false);
+	lastOutput = time;
 
     ofstream logFile;
     logFile.open("/home/nao/nbites/log/network.xls", ios::out);
