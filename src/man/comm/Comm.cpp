@@ -117,7 +117,7 @@ void Comm::receive()
 {
 	pthread_mutex_lock (&comm_mutex);
 
-    teamConnect->receive(myPlayerNumber());
+    teamConnect->receive(0);
 
 	pthread_mutex_unlock (&comm_mutex);
 }
