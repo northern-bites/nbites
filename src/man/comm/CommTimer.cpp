@@ -11,7 +11,7 @@ CommTimer::CommTimer(llong (*f)())
     : time(f), epoch(time())
 {
 	// Initialize nextSendDelay so that we immediately send.
-    nextSendTime = time();
+    nextSendTime = timestamp();
 	// Seed psuedo-random number generator with current time.
 	// Should be significanly different on each robot so that they won't align.
     srand(static_cast<int>(nextSendTime));

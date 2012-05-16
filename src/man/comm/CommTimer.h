@@ -19,7 +19,7 @@ public:
 	 * Constructor
 	 * @param f: Pointer to the function we should use for time.
 	 */
-    CommTimer(llong(*f)());
+    CommTimer(llong (*f)());
 
 	/**
 	 * @return: The current time on this robot after starting.

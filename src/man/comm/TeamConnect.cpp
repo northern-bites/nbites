@@ -20,8 +20,8 @@ static const llong TEAMMATE_DEAD_THRESHOLD = 3000000;
 static const llong MIN_PACKET_DELAY = 0;  
 static const int NUM_HEADER_BYTES = 16;
 
-TeamConnect::TeamConnect(CommTimer* t)
-	: timer(t)
+TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
+	: timer(t), monitor(m)
 {
 	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
 	{
@@ -110,6 +110,7 @@ void TeamConnect::send(int player, int burst = 1)
 	{
 		socket->sendToTarget(&packet[0], sizeof(packet));
 	}
+	std::cout << "Sent a packet" << std::endl;
 }
 
 float* TeamConnect::buildHeader(char* packet, TeamMember* robot)
@@ -119,7 +120,7 @@ float* TeamConnect::buildHeader(char* packet, TeamMember* robot)
 	*cptr = *UNIQUE_ID;
 	cptr += sizeof(UNIQUE_ID);  // Advance pointer.
 
-	*cptr   = (char)teamNumber;
+	*cptr   = (char)teamNumber();
 	*++cptr = (char)robot->playerNumber();
 
 	int* iptr = (int*)++cptr;
@@ -138,22 +139,36 @@ float* TeamConnect::buildHeader(char* packet, TeamMember* robot)
 void TeamConnect::receive(int player)
 {
 	char packet[NUM_HEADER_BYTES + TeamMember::sizeOfData()];
+	int result, playerNumber;
+	float* payload;
+	TeamMember* robot;
 
-	int result = socket->receive(&packet[0], sizeof(packet));
+	do
+	{
+		memset(&packet[0], 0, NUM_HEADER_BYTES + TeamMember::sizeOfData());
 
-	if (result <= 0)
-		return;
+		result = socket->receive(&packet[0], sizeof(packet));
 
-	int playerNumber = verify(&packet[0], player);
+		if (result <= 0)
+			break;
 
-	float* payload = (float*)(&packet[0] + NUM_HEADER_BYTES);
-	TeamMember* robot = team[playerNumber -1];
+		playerNumber = verify(&packet[0], player);
+		if (playerNumber == 0)
+			continue;  // Bad Packet.
 
-	robot->update(payload);
+		payload = (float*)(&packet[0] + NUM_HEADER_BYTES);
+		robot = team[playerNumber -1];
+
+		robot->update(payload);
+		std::cout << "Received a packet!" << std::endl;
+	} while (result > 0);
 }
 
 int TeamConnect::verify(char* packet, int player)
 {
+	// Save the current time for later.
+	llong currtime = timer->timestamp();
+
 	if (!verifyHeader(packet))
 		return 0;
 
@@ -194,7 +209,9 @@ int TeamConnect::verify(char* packet, int player)
 	}
 
 	// Success! Update seqNum and timeStamp and parse!
-	robot->updateSequenceNumber(seqNumber);
+	int lastSeqNum = robot->lastSeqNum();
+	int delayed = seqNumber - lastSeqNum - 1;
+	robot->setLastSeqNum(seqNumber);
 
 	llong* lptr = (llong*)++iptr;
 	llong ts = *lptr;
@@ -204,10 +221,19 @@ int TeamConnect::verify(char* packet, int player)
 	// two clocks will reach an equilibrium point (within a
 	// reasonable margin of error) without the use of internet
 	// based clock syncronizing (don't need outside world).
-	llong currtime = timer->timestamp();
+	int newOffset = 0;
+
 	if (ts + MIN_PACKET_DELAY > currtime)
-		timer->setOffset(ts + MIN_PACKET_DELAY - currtime);
+	{
+		newOffset = ts + MIN_PACKET_DELAY - currtime;
+		timer->setOffset(newOffset);
+	}
 	robot->setLastPacketTime(ts);
+
+	// Update the monitor
+	monitor->packetsDropped(delayed);
+	monitor->packetReceived(ts, currtime + newOffset);
+
 	return playerNum;
 }
 
@@ -228,7 +254,7 @@ bool TeamConnect::verifyHeader(char* header)
 	ptr += sizeof(UNIQUE_ID);
 
 	// Assumes teamNumber can fit in one byte.
-	if (memcmp(ptr, &teamNumber, 1))
+	if (memcmp(ptr, &_teamNumber, 1))
 	{
 #ifdef DEBUG_COMM
 		std::cout << "Received packet with bad teamNumber"

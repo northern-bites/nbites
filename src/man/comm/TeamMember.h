@@ -35,12 +35,6 @@ public:
 	 */
 	void generatePacket(float* packet);
 
-	/**
-	 * Sets the new sequence number and keeps track of delayed packets.
-	 * @param sn: New sequence number.
-	 */
-	void updateSequenceNumber(int sn);
-
     /**
 	 * @return: Size of the packet data in bytes
 	 */
@@ -97,9 +91,6 @@ public:
 	void  setLastSeqNum(int sn) {_lastSeqNum = sn;}
 	int   lastSeqNum() {return _lastSeqNum;}
 
-	void  setDelayedPackets(int d) {_delayedPackets = d;}
-	int   delayedPackets() {return _delayedPackets;}
-
 	void  setActive(bool a) {_active = a;}
 	bool  active() {return _active;}
 
@@ -126,7 +117,6 @@ private:
 	float _role;              // Playbook Role
 	float _subRole;           // Playbook SubRole
 
-	int   _delayedPackets;    // Number of packets that have been delayed.
 	llong _lastPacketTime;    // Time that the last packet was received.
 	int   _lastSeqNum;        // The sequence number of the last packet used.
 	bool  _active;            // Is the robot active.

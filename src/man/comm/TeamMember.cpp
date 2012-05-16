@@ -49,9 +49,3 @@ void TeamMember::generatePacket(float* packet)
 	*++ptr = role();
 	*++ptr = subRole();
 }
-
-void TeamMember::updateSequenceNumber(int sn)
-{
-	setDelayedPackets(delayedPackets() + sn - lastSeqNum() - 1);
-	setLastSeqNum(sn);
-}

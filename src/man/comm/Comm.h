@@ -119,17 +119,15 @@ public:
 	void setMyPlayerNumber(int p) {_myPlayerNumber = p;}
 	int  myPlayerNumber() {return _myPlayerNumber;}
 
+	void setTeamNumber(int tn);
+	int  teamNumber();
+
 private:
 	/**
 	 * @param p: Returns if non-zero, otherwise returns 'myPlayerNumber'
 	 *           If 'myPlayerNumber' is 0, print a message. Prepare for error.
 	 */
 	int checkPlayerNumber(int p);
-
-	/**
-	 * Updates the burstRate according to network health.
-	 */
-	void updateBurst(){return;}  
 
 	pthread_mutex_t  comm_mutex;  // Mutex lock for threaded data access.
 	NetworkMonitor*  monitor;

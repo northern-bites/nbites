@@ -104,9 +104,10 @@ public:
      * Determines whether network health has deteriorated by using shifts in
      * the latency peak and significant increases in packet loss as criteria.
      * Sends warning notifications.
-	 * @return: true on healthy, false on unhealthy
+	 * @param time: Current time
+	 * @return:     1 on GOOD, 2 on OK, 3 on BAD
      */
-    bool performHealthCheck();
+    int performHealthCheck(long long time);
 
     /**
      * Saves a report on network health to ~/nbites/log/network.xls on the robot,
@@ -126,9 +127,9 @@ private:
     SignalMonitor latency;
     SignalMonitor droppedPackets;
 
-    long long lastPacketReceivedAt;
-    int initialLatencyPeak;
-    bool sentWarning;
+	int       latencyPeak;
+    bool      sentWarning;
+	long long warningTime;
 	long long lastOutput;
 };
 

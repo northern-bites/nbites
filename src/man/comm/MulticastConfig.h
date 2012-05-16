@@ -5,7 +5,7 @@
 
 #include <string>
 
-#define NUM_ROBOTS 9    // Total number of robots we have
+static const int NUM_ROBOTS = 9;    // Total number of robots we have
 
 typedef struct robot_ip_pair_t
 {

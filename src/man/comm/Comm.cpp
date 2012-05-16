@@ -40,14 +40,16 @@ static long long monotonic_micro_time(void)
 Comm::Comm()
 //	: Thread("Comm")  
 {
-	_myPlayerNumber = 2;  
 	running = true;  
 	burstRate = 2;  
 
 	timer = new CommTimer(&monotonic_micro_time);
-	teamConnect = new TeamConnect(timer);
 	monitor = new NetworkMonitor(timer->timestamp());
+
+	teamConnect = new TeamConnect(timer, monitor);
+
 	pthread_mutex_init(&comm_mutex, NULL);
+
 	std::cout << "Comm Constructed" << std::endl;
 }
 
@@ -87,9 +89,9 @@ void Comm::run()
 		teamConnect->checkDeadTeammates(timer->timestamp(), myPlayerNumber());
 
 		// Update the monitor.
-		monitor->performHealthCheck(timer->timestamp());
+		int health = monitor->performHealthCheck(timer->timestamp());
 
-		updateBurst();  // pass this an int (-1, 0, 1) from performHealthCheck()
+		burstRate = health;
 
 		monitor->logOutput(timer->timestamp());
 
@@ -106,6 +108,7 @@ void Comm::send()
 	pthread_mutex_lock (&comm_mutex);
 
 	teamConnect->send(myPlayerNumber(), burstRate);
+	timer->teamPacketSent();
 
 	pthread_mutex_unlock (&comm_mutex);
 }
@@ -120,8 +123,8 @@ void Comm::receive()
 }
 
 void Comm::setLocData(int p,
-				float x , float y , float h ,
-				float xu, float yu, float hu)
+					  float x , float y , float h ,
+					  float xu, float yu, float hu)
 {
 	int player = checkPlayerNumber(p);
 	pthread_mutex_lock (&comm_mutex);
@@ -132,8 +135,8 @@ void Comm::setLocData(int p,
 }
 
 void Comm::setBallData(int p,
-				 float d , float b ,
-				 float du, float bu)
+					   float d , float b ,
+					   float du, float bu)
 {
 	int player = checkPlayerNumber(p);
 	pthread_mutex_lock (&comm_mutex);
@@ -163,4 +166,14 @@ int Comm::checkPlayerNumber(int p)
 				  << "Set Comm's player number through brain first!" << std::endl;
 	}
 	return player;
+}
+
+void Comm::setTeamNumber(int tn)
+{
+	teamConnect->setTeamNumber(tn);
+}
+
+int Comm::teamNumber()
+{
+	return teamConnect->teamNumber();
 }

@@ -7,6 +7,7 @@
 #define TeamConnect_H
 
 #include "CommTimer.h"
+#include "NetworkMonitor.h"
 #include "TeamMember.h"
 #include "UDPSocket.h"
 
@@ -19,7 +20,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	TeamConnect(CommTimer* t);
+	TeamConnect(CommTimer* t, NetworkMonitor* m);
 
 	/**
 	 * Destructor.
@@ -96,6 +97,9 @@ public:
 	void setBehaviorData(int p,
 						 float r, float sr, float ct);
 
+	void setTeamNumber(int tn) {_teamNumber=tn;}
+	int  teamNumber() {return _teamNumber;}
+
 private:
 	/**
 	 * Sets up the socket to be used
@@ -130,9 +134,10 @@ private:
 	 */
 	bool verifyHeader(char* header);
 
-	CommTimer* timer;
-	TeamMember* team[NUM_PLAYERS_PER_TEAM];
-	UDPSocket*  socket;
-	int teamNumber;
+	CommTimer*      timer;
+	NetworkMonitor* monitor;
+	TeamMember*     team[NUM_PLAYERS_PER_TEAM];
+	UDPSocket*      socket;
+	int             _teamNumber;
 };
 #endif

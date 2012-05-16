@@ -19,9 +19,13 @@ static const bool LOG_SCALE_DROPPED = false;
 static const int PACKET_RECEIVED = 0;
 static const int PACKET_DROPPED = 1;
 
-static const int BOXCAR_WIDTH = 20;
+// Constants for the Boxcar
+static const int BOXCAR_WIDTH = 150;
+// TODO: find actual constants...
+static const double NETWORK_BAD  = 10.0f;
+static const double NETWORK_GOOD = 2.0f;
 
-static const int LATENCY_CHANGE_THRESHOLD = 4;
+// Not currently used, but might be useful as a sanity check
 static const double PACKETS_DROPPED_THRESHOLD = 0.3333f;
 
 NetworkMonitor::NetworkMonitor(long long time)
@@ -30,10 +34,11 @@ NetworkMonitor::NetworkMonitor(long long time)
 			   HIGH_BIN_LATENCY, LOG_SCALE_LATENCY),
        droppedPackets(NUM_BINS_DROPPED, LOW_BIN_DROPPED,
 					  HIGH_BIN_DROPPED, LOG_SCALE_DROPPED),
-       lastPacketReceivedAt(0), initialLatencyPeak(0),
-	   sentWarning(false), lastOutput(time)
+       latencyPeak(0), sentWarning(false), lastOutput(time)
 {
     Reset();
+
+	std::cout << "Monitor Constructed" << std::endl;
 }
 
 NetworkMonitor::~NetworkMonitor()
@@ -58,13 +63,11 @@ void NetworkMonitor::packetReceived(long long timeSent, long long timeReceived)
     // Add the packet as not dropped.
     droppedPackets.X(0.0f);
 
-    if(totalPackets() <= 1)
-		lastPacketReceivedAt = timeReceived;
-    else
-    {
-		// Calculate the latency. Add to latency monitor.
-        latency.X(double(timeReceived - timeSent));
-    }
+	// Calculate the latency.
+	latency.X(double(timeReceived - timeSent));
+
+	// Boxcar
+	X(timeReceived - timeSent);
 }
 
 void NetworkMonitor::packetsDropped(int numDropped)
@@ -100,54 +103,43 @@ int NetworkMonitor::findPeakLatency()
     return maxBin;
 }
 
-bool NetworkMonitor::performHealthCheck()
+int NetworkMonitor::performHealthCheck(long long time)
 {
-    // Find the initial latency peak;
-	// don't look before there are too few data samples,
-    // and settle on one bin after a few frames.
-    if(totalPackets() > 200 && totalPackets() < 250)
-    {
-		initialLatencyPeak = findPeakLatency();
-		return true;
-    }
+	if (time - warningTime > 30 * 1000000)  //TODO: switch to MICROS_PER_SECOND  
+	{
+		setSentWarning(false);
+	}
 
-    using namespace std;
-
-    // Limit the number of warning messages sent so as not to clog the logs.
-    if(!sentWarning)
-    {
-		int peak = findPeakLatency();
-		// Check to see if the latency has changed drastically.
-		if(initialLatencyPeak != 0 &&
-		   peak - initialLatencyPeak >= LATENCY_CHANGE_THRESHOLD)
+	double health = Y();
+	// Check to see if the latency has changed drastically.
+	if (health > NETWORK_BAD)
+	{
+		if(!sentWarning)
 		{
-			cout << "NETWORK WARNING: packet latency has increased significantly!"
-				 << endl;
+			std::cout << "NETWORK WARNING: Latency is BAD at: " << health
+					  << std::endl;
+			warningTime = time;
 			setSentWarning(true);
-			return false;
 		}
-		// Also, are we dropping more packets than we should be suddenly?
-		if(Y() > PACKETS_DROPPED_THRESHOLD)
-		{
-			cout << "NETWORK WARNING: packets dropped on average has increased to "
-				 << Y() << "!" << endl;
-			setSentWarning(true);
-			return false;
-		}
-    }
-	return true;
+		return 3;
+	}
+	// Also, are we dropping more packets than we should be suddenly?
+	if(health < NETWORK_GOOD)
+	{
+		return 1;
+	}
+	return 2;
 }
 
 void NetworkMonitor::logOutput(long long time)
 {
     using namespace std;
 
-	// Don't log too often.
-	if (time - lastOutput <= 30 * 1000000)
+	// Don't log too often. ~30 sec.
+	if (time - lastOutput <= 30 * 1000000)  //TODO: switch to MICROS_PER_SECOND  
 		return;
 
-	// Update sent warning to false now and change the output time.
-	setSentWarning(false);
+	// Update the output time.
 	lastOutput = time;
 
     ofstream logFile;
