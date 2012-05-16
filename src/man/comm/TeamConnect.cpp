@@ -15,7 +15,7 @@
 #define DEBUG_COMM  
 //#include "CommDef.h"  
 static const int TEAM_PORT = 4000;  
-#define UNIQUE_ID "B"  
+#define UNIQUE_ID "B"  // Keep this as a define so that it stays 2 bytes, not 4.  
 static const llong TEAMMATE_DEAD_THRESHOLD = 3000000;  
 static const llong MIN_PACKET_DELAY = 0;  
 static const int NUM_HEADER_BYTES = 16;
