@@ -32,6 +32,8 @@ UDPSocket::UDPSocket()
 
 	if (sock == -1)
 		std::cerr << "\nError Constructing UDPSocket!" << std::endl;
+
+	std::cout << "Socket Constructed" << std::endl;
 }
 
 UDPSocket::~UDPSocket()

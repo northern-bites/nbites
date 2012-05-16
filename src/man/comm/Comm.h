@@ -32,9 +32,11 @@
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
 
-class Comm : public Thread
+class Comm// : public Thread
 {
 public:
+	bool running;  
+
 	/**
 	 * Constructor.
 	 */
@@ -43,7 +45,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~Comm();
+	virtual ~Comm();
 
 	/**
 	 * Starts the thread.
@@ -69,6 +71,11 @@ public:
 	 * Receives any data that is waiting.
 	 */
 	void receive();
+
+/*****************************************************
+ * When updating the following functions, be sure to *
+ * update them in TeamConnect as well!               *
+ *****************************************************/
 
 	/**
 	 * Sets all data from loc that we want to communicate.
@@ -118,6 +125,11 @@ private:
 	 *           If 'myPlayerNumber' is 0, print a message. Prepare for error.
 	 */
 	int checkPlayerNumber(int p);
+
+	/**
+	 * Updates the burstRate according to network health.
+	 */
+	void updateBurst(){return;}  
 
 	pthread_mutex_t  comm_mutex;  // Mutex lock for threaded data access.
 	NetworkMonitor*  monitor;

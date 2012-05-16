@@ -26,10 +26,13 @@ TeamConnect::TeamConnect(CommTimer* t)
 	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
 	{
 		team[i] = new TeamMember(i+1);
+		std::cout << "TeamMember " << i << " Constructed" << std::endl;
 	}
 
 	socket = new UDPSocket();
 	setUpSocket();
+
+	std::cout << "TeamConnect Constructed" << std::endl;
 }
 
 TeamConnect::~TeamConnect()
@@ -50,6 +53,7 @@ void TeamConnect::setUpSocket()
 
 	std::string ipTarget = "255.255.255.255";
 	static char buf[100] = {0};
+
 	if (!buf[0])
 	{
 		std::string name;
@@ -61,10 +65,8 @@ void TeamConnect::setUpSocket()
 			goto end;
 		}
 		else
-		{
 			name = buf;
-			name = name.erase(name.find('.')-1);
-		}
+
 		for (int i = 0; i < NUM_ROBOTS; ++i)
 		{
 			if (robotIPs[i].name.compare(name) == 0)
@@ -88,7 +90,9 @@ end:
 	//join team's multicast...
 	for (int i = 0; i < NUM_ROBOTS; ++i)
 	{
-		socket->joinMulticast(robotIPs[i].ip.c_str());
+		ipTarget = robotIPs[i].ip;
+		ipTarget = "239" + ipTarget.substr(ipTarget.find('.'));
+		socket->joinMulticast(ipTarget.c_str());
 	}
 }
 
@@ -135,7 +139,10 @@ void TeamConnect::receive(int player)
 {
 	char packet[NUM_HEADER_BYTES + TeamMember::sizeOfData()];
 
-	socket->receive(&packet[0], sizeof(packet));
+	int result = socket->receive(&packet[0], sizeof(packet));
+
+	if (result <= 0)
+		return;
 
 	int playerNumber = verify(&packet[0], player);
 
@@ -243,4 +250,41 @@ void TeamConnect::checkDeadTeammates(llong time, int player)
 		else if (time - robot->lastPacketTime() > TEAMMATE_DEAD_THRESHOLD)
 			robot->setActive(false);
 	}
+}
+
+
+void TeamConnect::setLocData(int p,
+							 float x , float y , float h ,
+							 float xu, float yu, float hu)
+{
+	TeamMember* robot = team[p-1];
+
+	robot->setMyX(x);
+	robot->setMyY(y);
+	robot->setMyH(h);
+	robot->setMyXUncert(xu);
+	robot->setMyYUncert(yu);
+	robot->setMyHUncert(hu);
+}
+
+void TeamConnect::setBallData(int p,
+							  float d , float b ,
+							  float du, float bu)
+{
+	TeamMember* robot = team[p-1];
+
+	robot->setBallDist(d);
+	robot->setBallBearing(b);
+	robot->setBallDistUncert(bu);
+	robot->setBallBearingUncert(bu);
+}
+
+void TeamConnect::setBehaviorData(int p,
+								  float r, float sr, float ct)
+{
+	TeamMember* robot = team[p-1];
+
+	robot->setRole(r);
+	robot->setSubRole(sr);
+	robot->setChaseTime(ct);
 }
