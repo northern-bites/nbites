@@ -15,7 +15,7 @@
 #define DEBUG_COMM  
 //#include "CommDef.h"  
 static const int TEAM_PORT = 4000;  
-static const char* UNIQUE_ID = "B";  
+#define UNIQUE_ID "B"  
 static const llong TEAMMATE_DEAD_THRESHOLD = 3000000;  
 static const llong MIN_PACKET_DELAY = 0;  
 static const int NUM_HEADER_BYTES = 16;
@@ -86,6 +86,9 @@ void TeamConnect::setUpSocket()
 
 end:
 	socket->setTarget(ipTarget.c_str(), TEAM_PORT);
+
+// HACK!!!  
+	socket->setTarget("139.140.213.74", TEAM_PORT);
 
 	//join team's multicast...
 	for (int i = 0; i < NUM_ROBOTS; ++i)
