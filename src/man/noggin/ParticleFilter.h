@@ -65,6 +65,28 @@ namespace PF
 	float direction;
     };
 
+    struct ParticleFilterParams
+    {
+	int fieldHeight;                // Field height. 
+	int fieldWidth;                 // Field width.
+	int numParticles;               // Size of particle population.
+	float sigma_d;                  // Variance for distance sampling.
+	float sigma_h;                  // Variance for heading sampling.
+	float alpha_fast;               // Weight factor for fast exponential weight filter.
+	float alpha_slow;               // Weight factor for slow exponential weight filter.
+    };
+
+    static const ParticleFilterParams DEFAULT_PARAMS = 
+    {
+	FIELD_WHITE_HEIGHT,
+	FIELD_WHITE_WIDTH,
+	125,
+	15.00f,
+	1.40f,
+	0.2f,
+	0.05f
+    };
+
     class MotionModel;
     class SensorModel;
 
@@ -140,8 +162,8 @@ namespace PF
 	{
 	    // Do nothing with this data.
 	    run();
-	    std::cout << "Best particle "
-	              << this->getBestParticle();
+	    /* std::cout << "Best particle " */
+	    /*           << this->getBestParticle(); */
 	}
 
 	/**
@@ -151,7 +173,7 @@ namespace PF
 
 	void blueGoalieReset() { }
 	void redGoalieReset() { }
-	void resetLocTo(float x, float y, float h) { }
+	void resetLocTo(float x, float y, float h);
 
 	PoseEst getCurrentEstimate() const { return PoseEst(); }
 	PoseEst getCurrentUncertainty() const { return PoseEst(); }
@@ -193,6 +215,10 @@ namespace PF
 	float xEstimate;
 	float yEstimate;
 	float hEstimate;
+
+	float averageWeight;
+	float wFast;
+	float wSlow;
 
 	ParticleSet particles;
 	boost::shared_ptr<MotionModel> motionModel;

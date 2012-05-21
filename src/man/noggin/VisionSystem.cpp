@@ -40,6 +40,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::cout << "Using current location " << currentLocation << std::endl;
 #endif 
 
+    // @todo add these as parameters.
+    const float SIGMA_D = 15.00f;
+    const float SIGMA_H = 1.40f;
+
     PF::ParticleIt partIter;
     for(partIter = particles.begin(); partIter != particles.end(); ++partIter)
     {
@@ -62,11 +66,11 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 		float angleDiff = NBMath::subPIAngle(o.angle) - NBMath::subPIAngle(hypothesisVector.direction);
 		//std::cout << "angleDiff = " << angleDiff << std::endl;
 
-		boost::math::normal_distribution<float> pDist(0.0f, 15.00f);
+		boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
 
 		float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 
-		boost::math::normal_distribution<float> pAngle(0.0f, 1.40f);
+		boost::math::normal_distribution<float> pAngle(0.0f, SIGMA_H);
 
 		float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 		float probability = distanceProb * angleProb;
@@ -81,9 +85,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    }
 	    else
 	    {
-	    	// Deal with ambiguous observations. For now, take the most likely 
-	        // measurement. @todo
-	      //	      std::cout << "Using an ambiguous landmark." << std::endl;
+		// Take the most likely landmark. 
 	        std::vector<Landmark>::iterator landmarkIter;
 		float maxWeight = 0.0f;
 	    	// Loop through all possibilities.
@@ -95,16 +97,17 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    	    PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
 	    	    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
 	    	    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
-		    boost::math::normal_distribution<float> pDist(0.0f, 15.00f);
+		    boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
 	    	    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff)/*1.0f/distanceDiff*/;
-		    boost::math::normal_distribution<float> pAngle(0.0f, 1.40f);
+		    boost::math::normal_distribution<float> pAngle(0.0f, SIGMA_H);
 	    	    float angleProb = boost::math::pdf<float>(pAngle, angleDiff)/*1.0f/angleDiff*/;
 	    	    float probability = distanceProb * angleProb;
 	    	    if(probability > maxWeight)
                         maxWeight = probability;		  
 	        }
-	    	// Since we are assuming conditional independence, compound the
-	    	// probabilities of measurement for each individual observation.
+
+		// Assign the total weight to be the product of the current total
+		// and the newly calculated weight based on current observation.
 	    	if(totalWeight == 0.0f)
 	    	    totalWeight = maxWeight;
 	    	else
@@ -119,6 +122,13 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 #ifdef DEBUG_LOCALIZATION
             std::cout << "Updating particle of previous weight " << (*partIter).getWeight();
 #endif
+	    // @todo although this should never happen, it is possible that underflow 
+	    // errors cause nan's, which would be problematic for resampling. 
+	    if(std::isnan(totalWeight) || std::abs(totalWeight) == HUGE_VAL)
+	    {
+		std::cout << "Invalid weight calculated!" << std::endl;
+		totalWeight = 0.0f;
+	    }
             (*partIter).setWeight(totalWeight);
 #ifdef DEBUG_LOCALIZATION
             std::cout << " with new weight " << (*partIter).getWeight() << std::endl;

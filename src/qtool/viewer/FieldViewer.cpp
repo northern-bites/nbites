@@ -53,6 +53,8 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
 
       std::cout << "Updating " << localizationStream->get()->particles_size() << " particles." << std::endl;
 
+      paintLocalization->updateEstimates(xEst, yEst, hEst);
+
       paintLocalization->updateWithParticles(updateParticles);
 
       fieldView->updateView();

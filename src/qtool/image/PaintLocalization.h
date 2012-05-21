@@ -36,13 +36,18 @@ namespace qtool
       unsigned getHeight() const { return FIELD_HEIGHT; }
 
       void updateWithParticles(PF::ParticleSet particles);
+      void updateEstimates(float x, float y, float h);
 
     protected:
       void drawParticle(PF::LocalizationParticle particle, QPixmap& bitmap);
+      void drawEstimate(QPixmap& bitmap);
 
       virtual void buildBitmap();
 
       PF::ParticleSet lastParticles;
+      float lastXEst;
+      float lastYEst;
+      float lastHEst;
 
     };
   }

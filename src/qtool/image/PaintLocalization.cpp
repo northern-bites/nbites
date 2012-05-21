@@ -6,11 +6,10 @@ namespace qtool
   {
 
     PaintLocalization::PaintLocalization(QObject *parent):
-      BMPImage(parent)
+      BMPImage(parent), lastParticles(), lastXEst(FIELD_HEIGHT*0.5f), 
+      lastYEst(FIELD_WIDTH*0.5f), lastHEst(0.0f)
     {
       bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
-
-      lastParticles.push_back(PF::LocalizationParticle(PF::Location(50.0f, 50.0f, 0.1f), 0.0f));
     }
     
     void PaintLocalization::updateWithParticles(PF::ParticleSet particles)
@@ -18,6 +17,13 @@ namespace qtool
       lastParticles = particles;
 
       buildBitmap();
+    }
+    
+    void PaintLocalization::updateEstimates(float x, float y, float h)
+    {
+      lastXEst = x;
+      lastYEst = y;
+      lastHEst = h;
     }
 
     void PaintLocalization::drawParticle(PF::LocalizationParticle particle, QPixmap& bitmap)
@@ -28,23 +34,43 @@ namespace qtool
 			    particle.getLocation().y);
 
       painter.drawEllipse(particleCenter,
-			  10,
-			  10);
+			  5,
+			  5);
 
       painter.drawLine(particle.getLocation().x,
 		       particle.getLocation().y,
-		       10 * std::cos(particle.getLocation().heading) + particle.getLocation().x,
-		       10 * std::sin(particle.getLocation().heading) + particle.getLocation().y);
+		       5 * std::cos(particle.getLocation().heading) + particle.getLocation().x,
+		       5 * std::sin(particle.getLocation().heading) + particle.getLocation().y);
     }
 
     void PaintLocalization::buildBitmap()
     {
-        bitmap.fill(Qt::transparent);
+      bitmap.fill(Qt::transparent);
+
       PF::ParticleIt i = lastParticles.begin();
       for(; i != lastParticles.end(); ++i)
       {
           this->drawParticle(*i, bitmap);
       }
+
+      drawEstimate(bitmap);
     }
+
+    void PaintLocalization::drawEstimate(QPixmap& bitmap)
+    {
+      QPainter painter(&bitmap);
+
+      painter.setPen(Qt::red);
+
+      painter.drawEllipse(QPoint(lastXEst, lastYEst),
+			  10,
+			  10);
+
+      painter.drawLine(lastXEst,
+		       lastYEst,
+		       10 * std::cos(lastHEst) + lastXEst,
+		       10 * std::sin(lastHEst) + lastYEst);
+    }
+
   }
 }

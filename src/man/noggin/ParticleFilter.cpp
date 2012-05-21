@@ -1,4 +1,4 @@
- #include "ParticleFilter.h"
+#include "ParticleFilter.h"
 
 namespace PF
 {
@@ -32,7 +32,9 @@ namespace PF
     ParticleFilter::ParticleFilter(int particles, float w, float h,
 				   boost::shared_ptr<MotionModel> motion, 
 				   boost::shared_ptr<SensorModel> sensor)
-      : numParticles(particles), width(w), height(h)
+	: numParticles(particles), width(w), height(h), xEstimate(0.0f),
+	  yEstimate(0.0f), hEstimate(0.0f), averageWeight(0.0f),
+	  wFast(0.0f), wSlow(0.0f)
     {
 	motionModel = motion;
 	sensorModel = sensor;
@@ -82,13 +84,11 @@ namespace PF
 	if(motionUpdate && motionModel)
 	{
 	    particles = motionModel->update(particles);
-	    //std::cout << "Motion update complete." << std::endl;
 	}	
 
 	if(sensorUpdate && sensorModel)
 	{  
 	    particles = sensorModel->update(particles);
-	    //std::cout << "Sensor update complete." << std::endl;
 	}
 
 	if(sensorModel->hasUpdated())
@@ -112,7 +112,7 @@ namespace PF
 	}
 	else
 	{
-	  std::cout << "No sensor update." << std::endl;
+	    std::cout << "No sensor update." << std::endl;
 	}
     }
 
@@ -127,10 +127,6 @@ namespace PF
         // Sort the particles in ascending order.
         std::sort(particles.begin(), particles.end());
 
-	//ParticleIt iter;
-	//for(iter = particles.begin(); iter != particles.end(); ++iter)
-	  //	    std::cout << *iter << std::endl;
-	
 	// The last particle should have the greatest weight.
 	return particles[particles.size()-1];
     }
@@ -143,17 +139,31 @@ namespace PF
      */
     void ParticleFilter::resample()
     {
-	// Normalize the particle weights.
+	// Normalize the particle weights, and find the average weight.
 	float sum = 0.0f;
 	ParticleIt iter;
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	    sum += (*iter).getWeight();
+
+	averageWeight = sum/(numParticles*1.0f);
 
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	{
 	    float weight = (*iter).getWeight();
 	    (*iter).setWeight(weight/sum);
 	}
+
+	// @todo add these as parameters
+	const float ALPHA_SLOW = 0.05f;
+	const float ALPHA_FAST = 0.2f;
+
+	// Update exponential filters for long-term and short-term weights.
+	wSlow = wSlow + ALPHA_SLOW*(averageWeight - wSlow);
+	wFast = wFast + ALPHA_FAST*(averageWeight - wFast);
+
+	float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
+	if(injectionProb > 0)
+	    std::cout << injectionProb << std::endl;
 
 	// Map each normalized weight to the corresponding particle.
 	std::map<float, LocalizationParticle> cdf;
@@ -172,16 +182,26 @@ namespace PF
 	
 	float rand;
 	ParticleSet newParticles;
+	int numParticlesInjected = 0;
 	// Sample numParticles particles with replacement according to the
 	// normalized weights, and place them in a new particle set.
 	for(int i = 0; i < numParticles; ++i)
 	{
 	    rand = (float)gen();
+
+	    if(rand <= injectionProb)
+		numParticlesInjected++;
+
 	    newParticles.push_back(cdf.upper_bound(rand)->second);
 	}
 
 	particles = newParticles;
 
+	if(numParticlesInjected > 0)
+	{
+	    std::cout << "Injected " << numParticlesInjected << " random particles." 
+		      << std::endl;
+	}
 
 #ifdef DEBUG_LOCALIZATION
 	LocalizationParticle best = getBestParticle();
@@ -198,13 +218,13 @@ namespace PF
 
     }
 
-  void ParticleFilter::reset()
-  {
-    // @todo
-  }
+    void ParticleFilter::reset()
+    {
+	// @todo
+    }
 
-  void resetLocTo(float x, float y, float h)
-  {
-    // @todo
-  }
+    void ParticleFilter::resetLocTo(float x, float y, float h)
+    {
+	// @todo
+    }
 }
