@@ -4,7 +4,7 @@
  * Constructor
  */
 VisionSystem::VisionSystem()
-  : PF::SensorModel(), hasNewObs(false)
+    : PF::SensorModel()
 { }
 
 /**
@@ -18,21 +18,16 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::vector<PF::Observation> obs = currentObservations;
     if(obs.size() == 0)
     {
-      //std::cout << "Nothing seen, do not update weights." << std::endl;
-        return particles;
-    }
-
-    if(!hasNewObservations())
-    {
-        std::cout << "No new observations, do not update weights." << std::endl;
+	std::cout << "Nothing seen, do not update weights." << std::endl;
 
 	setUpdated(false);
-	return particles;
+
+        return particles;
     }
+    else
+	std::cout << "#obs = " << obs.size() << std::endl;
 
     setUpdated(true);
-
-    hasNewObs = false;
 
     std::vector<PF::Observation>::iterator obsIter;
 
@@ -62,9 +57,8 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 		PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
 
 		float distanceDiff = o.distance - hypothesisVector.magnitude;
-		//std::cout << "distanceDiff = " << distanceDiff << std::endl;
+
 		float angleDiff = NBMath::subPIAngle(o.angle) - NBMath::subPIAngle(hypothesisVector.direction);
-		//std::cout << "angleDiff = " << angleDiff << std::endl;
 
 		boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
 
@@ -74,7 +68,6 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 
 		float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 		float probability = distanceProb * angleProb;
-		//std::cout << " prob = " << probability << std::endl;
 
 		if(totalWeight == 0.0f)
 		    totalWeight = probability;
@@ -98,9 +91,9 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    	    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
 	    	    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
 		    boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
-	    	    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff)/*1.0f/distanceDiff*/;
+	    	    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 		    boost::math::normal_distribution<float> pAngle(0.0f, SIGMA_H);
-	    	    float angleProb = boost::math::pdf<float>(pAngle, angleDiff)/*1.0f/angleDiff*/;
+	    	    float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 	    	    float probability = distanceProb * angleProb;
 	    	    if(probability > maxWeight)
                         maxWeight = probability;		  
@@ -134,8 +127,6 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
             std::cout << " with new weight " << (*partIter).getWeight() << std::endl;
 #endif
         }
-        //else
-	  //std::cout << "Nothing seen, will not update weight." << std::endl;
     }
 
     return particles;
@@ -150,10 +141,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
  */
 void VisionSystem::feedObservations(std::vector<PF::Observation> newObs)
 {
-    if(newObs.size() > 0)
-	hasNewObs = true;
-    else
-	hasNewObs = false;
+    // if(newObs.size() > 0)
+    // 	hasNewObs = true;
+    // else
+    // 	hasNewObs = false;
   
     currentObservations = newObs;
 }

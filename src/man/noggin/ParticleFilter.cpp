@@ -91,29 +91,22 @@ namespace PF
 	    particles = sensorModel->update(particles);
 	}
 
+	// Only resample if the sensor model has updated particle weights. 
 	if(sensorModel->hasUpdated())
 	{
 	    resample();
-	    Location estimate = this->getBestParticle().getLocation();
-	    // if(xEstimate - estimate.x > 0.001f || 
-	    //    yEstimate - estimate.y > 0.001f ||
-	    //    hEstimate - estimate.heading > 0.001f)
-	    // {
-	    //   // std::cout << "New guess at (" <<
-	    //   // 	estimate.x << ", " <<
-	    //   // 	estimate.y << ", " <<
-	    //   // 	estimate.heading << ")" << std::endl;
-	    // }
-
-	    xEstimate = estimate.x;
-	    yEstimate = estimate.y;
-	    hEstimate = estimate.heading;
-	    //std::cout << "Resample complete." << std::endl;
 	}
 	else
 	{
-	    std::cout << "No sensor update." << std::endl;
+	    //std::cout << "No sensor update." << std::endl;
 	}
+
+	// Update estimates.
+	Location estimate = this->getBestParticle().getLocation();
+
+	xEstimate = estimate.x;
+	yEstimate = estimate.y;
+	hEstimate = estimate.heading;
     }
 
     /**
@@ -218,9 +211,39 @@ namespace PF
 
     }
 
+    /**
+     * Clears the existing particle set and generates a new,
+     * uniform distribution of particles bounded by the 
+     * dimensions of the field.
+     */
     void ParticleFilter::reset()
     {
-	// @todo
+	// Clear the existing particles. 
+	particles.clear();
+
+	boost::mt19937 rng;
+	rng.seed(std::time(0));
+
+        boost::uniform_real<float> xBounds(0.0f, width);
+	boost::uniform_real<float> yBounds(0.0f, height);
+	boost::uniform_real<float> angleBounds(0, 2.0f*boost::math::constants::pi<float>());
+
+	boost::variate_generator<boost::mt19937&, 
+				 boost::uniform_real<float> > xGen(rng, xBounds);
+	boost::variate_generator<boost::mt19937&,
+				 boost::uniform_real<float> > yGen(rng, yBounds);
+	boost::variate_generator<boost::mt19937&,
+				 boost::uniform_real<float> > angleGen(rng, angleBounds);
+
+	// Assign uniform weight.
+	float weight = 1.0f/(numParticles*1.0f);
+
+	for(int i = 0; i < numParticles; ++i)
+	{
+	    LocalizationParticle p(Location(xGen(), yGen(), angleGen()), weight);
+
+	    particles.push_back(p);
+	}
     }
 
     void ParticleFilter::resetLocTo(float x, float y, float h)

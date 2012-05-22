@@ -154,21 +154,16 @@ namespace PF
 
 	/**
 	 * Methods inherited from LocSystem. For now, they don't really
-	 * do anything, since LocSystem will change soon.
+	 * do anything, since LocSystem will change soon (maybe? @todo)
 	 */
 	void updateLocalization(const ::MotionModel& u_t,
 				const std::vector<PointObservation>& pt_z,
 				const std::vector<CornerObservation>& c_z)
 	{
-	    // Do nothing with this data.
+	    // Just run the next iteration of the particle filter. 
 	    run();
-	    /* std::cout << "Best particle " */
-	    /*           << this->getBestParticle(); */
 	}
 
-	/**
-	 * @todo implement a reset method for the particle filter.
-	 */
 	void reset();
 
 	void blueGoalieReset() { }

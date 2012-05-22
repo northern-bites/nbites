@@ -385,30 +385,13 @@ void Noggin::updateLocalization()
     // Update the localiztion vision interface with Observations.
     locVisionSystem->feedObservations(observations);
 
-    // std::cout << "Updated motion with " 
-    //           << locMotionSystem->getLastOdometry();
-
-    // if(observations.size() > 0)
-    // {
-    //   std::cout << "Updating localization with the following observations: "
-    // 		<< std::endl;
-    //   std::vector<PF::Observation>::iterator obsIter;
-    //   for(obsIter = observations.begin(); obsIter != observations.end();
-    // 	  obsIter++)
-    //   {
-    //       std::cout << *obsIter << std::endl;
-    //   }
-    // }
-
     // Now, run the particle filter.
     MotionModel u_t;
     std::vector<PointObservation> pt_z;
     std::vector<CornerObservation> c_z;
     loc->updateLocalization(u_t, pt_z, c_z);
 
-
     // END LOCALIZATION UPDATE //
-
 
     // Ball Tracking
     if (vision->ball->getDistance() > 0.0) {

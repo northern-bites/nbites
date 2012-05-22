@@ -111,16 +111,16 @@ namespace PF
 class VisionSystem : public PF::SensorModel
 {
  public:
-  VisionSystem();
+    VisionSystem();
 
     PF::ParticleSet update(PF::ParticleSet particles);
 
-    bool hasNewObservations() const { return hasNewObs; }
+    //bool hasNewObservations() const { return hasNewObs; }
     
     void feedObservations(std::vector<PF::Observation> newObs);
 
  private:
-    bool hasNewObs;
+    //bool hasNewObs;
     std::vector<PF::Observation> currentObservations;
 };
 

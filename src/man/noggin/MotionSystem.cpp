@@ -6,19 +6,19 @@
 MotionSystem::MotionSystem()
     : PF::MotionModel(), moved(false)
 { 
-  
+    
 }
 
 void MotionSystem::setCurrentOdometry(const PF::OdometryMeasurement &current)
 {
-  moved = true;
+    moved = true;
 
-  currentOdometry = current;
+    currentOdometry = current;
 }
 
 void MotionSystem::setLastOdometry(const PF::OdometryMeasurement &last)
 {
-  lastOdometry = last;
+    lastOdometry = last;
 }
 
 /**
@@ -46,9 +46,9 @@ PF::OdometryMeasurement MotionSystem::noisyDeltaOdometry(const PF::OdometryMeasu
 
   setLastOdometry(newOdometry);
 
-  return PF::OdometryMeasurement(deltaX + PF::sampleNormal(0.0f, 4.25f + std::sqrt(std::abs(deltaX))),
-				 deltaY + PF::sampleNormal(0.0f, 4.25f + std::sqrt(std::abs(deltaY))),
-				 NBMath::subPIAngle(deltaH + PF::sampleNormal(0.0f, 0.1f + std::sqrt(std::abs(deltaH)))));
+  return PF::OdometryMeasurement(deltaX + PF::sampleNormal(0.0f, 4.25f + std::sqrt(0.5f*std::abs(deltaX))),
+				 deltaY + PF::sampleNormal(0.0f, 4.25f + std::sqrt(0.5f*std::abs(deltaY))),
+				 NBMath::subPIAngle(deltaH + PF::sampleNormal(0.0f, 0.1f + std::sqrt(0.5f*std::abs(deltaH)))));
 }
 
 /**
