@@ -6,7 +6,7 @@ if [ $# -ne 1 ]; then
 fi
 
 PACKAGES="build-essential cmake git-core \
-python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
+python2.7-dev emacs cmake-curses-gui ccache curl aptitude \
 ant qt4-dev-tools"
 
 echo "Are you on 64-bit linux?(y/n)"
@@ -57,9 +57,17 @@ robocup=robocup.bowdoin.edu:/mnt/research/robocup
 nbites_dir=$PWD/../..
 lib_dir=$nbites_dir/lib
 
-naoqi=naoqi-sdk-$naoqi_version-linux-nbites.tar.gz
+naoqi=naoqi-sdk-$naoqi_version-linux32.tar.gz
+atom=nbites-atom-toolchain-$naoqi_version.tar.gz
+geode=nbites-geode-toolchain-$naoqi_version.tar.gz
+
 naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
-naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux
+atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
+geode_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$geode
+
+naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
+atom_local=$lib_dir/atomtoolchain
+geode_local=$lib_dir/geodetoolchain
 
 if [ $IS64BIT == 'y' ]; then
     ext=ext-nbites-linux64.tar.gz
@@ -76,11 +84,23 @@ echo "Downloading NaoQi"
 mkdir -p $lib_dir
 rsync -v $USER_NAME@$naoqi_robocup $lib_dir/
 
+echo "Downloading Atom toolchain"
+rsync -v $USER_NAME@$atom_robocup $lib_dir/
+
+echo "Downloading Geode toolchain"
+rsync -v $USER_NAME@$geode_robocup $lib_dir/
+
 echo "Unpacking NaoQi"
 
 pushd $lib_dir
 tar -xzf $naoqi
 rm $naoqi
+
+mkdir $atom_local
+tar -xzf $atom -C $atom_local --strip-components 1
+
+mkdir $geode_local
+tar -xzf $geode -C $geode_local --strip-components 1
 popd
 
 if [ $IS64BIT == 'y' ]; then

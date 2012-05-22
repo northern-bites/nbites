@@ -40,7 +40,7 @@
 #include "MotionSwitchboardInterface.h"
 
 #include "Kinematics.h"
-#include "WalkProvider.h"
+#include "bhwalk/BHWalkProvider.h"
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
@@ -61,6 +61,8 @@
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
 #endif
+
+using namespace man::motion;
 
 class MotionSwitchboard : public MotionSwitchboardInterface {
 public:
@@ -85,7 +87,6 @@ public:
     void sendMotionCommand(const UnfreezeCommand::ptr command);
     void sendMotionCommand(const StepCommand::ptr command);
     void sendMotionCommand(const DestinationCommand::ptr command);
-    void walkPose();
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
@@ -93,7 +94,7 @@ public:
 	curProvider->requestStop();
     }
 
-    bool isWalkActive(){return walkProvider.isActive();}
+    bool isWalkActive(){return walkProvider.isWalkActive();}
     bool isHeadActive(){return headProvider.isActive();}
     bool isBodyActive(){return curProvider->isActive();}
 
@@ -121,6 +122,9 @@ private:
     void swapHeadProvider();
     int realityCheckJoints();
 
+    static vector<float> getBodyJointsFromProvider(MotionProvider* provider);
+    vector<BodyJointCommand::ptr> generateNextBodyProviderTransitions();
+
 #ifdef DEBUG_JOINTS_OUTPUT
     void initDebugLogs();
     void closeDebugLogs();
@@ -129,7 +133,7 @@ private:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    WalkProvider walkProvider;
+    BHWalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
     NullHeadProvider nullHeadProvider;
@@ -148,7 +152,6 @@ private:
 
     int frameCount;
     bool running;
-    bool shouldWalkPose;
     mutable bool newJoints; //Way to track if we ever use the same joints twice
     mutable bool newInputJoints;
 

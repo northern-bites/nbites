@@ -2,7 +2,7 @@ from ..navigator import BrunswickSpeeds as speeds
 
 RELOC_SPIN_FRAME_THRESH = 200
 
-RELOC_SPIN_SPEED = speeds.MAX_SPIN_MAGNITUDE
+RELOC_SPIN_SPEED = 0.8
 RELOC_X_SPEED = 0.5
 
 AT_POSITION_KICK_DIST = 25

@@ -89,9 +89,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     metaGait.tick_gait();
 
     if(nextCommand){
-        stepGenerator.setSpeed(nextCommand->x_mms,
-                               nextCommand->y_mms,
-                               nextCommand->theta_rads);
+        stepGenerator.setSpeed(nextCommand->x_percent,
+                               nextCommand->y_percent,
+                               nextCommand->theta_percent);
         if (nextDestCommand )
         nextDestCommand->finishedExecuting();
     }

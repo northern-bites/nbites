@@ -29,9 +29,18 @@ namespace noggin {
         return (x != other.x || y != other.y);
     }
 
+    RelLocation Location::operator - (const Location& other) const
+    {
+        return RelLocation(x - other.x, y - other.y);
+    }
+
     boost::python::tuple Location::toTupleXY()
     {
         return boost::python::make_tuple(x, y);
+    }
+
+    RelLocation Location::getRelLocationOf(const Location& other) const {
+        return other - *this;
     }
 
     const float Location::distTo(const Location& other)
@@ -120,6 +129,20 @@ namespace noggin {
         return (x != other.x || y != other.y || h != other.h);
     }
 
+    RelRobotLocation RobotLocation::operator - (const RobotLocation& other) const
+    {
+        return RelRobotLocation(x - other.x, y - other.y, h - other.h);
+    }
+
+    RobotLocation RobotLocation::operator+ (const RelRobotLocation& other) const
+    {
+        return RobotLocation(x + other.getRelX(), y + other.getRelY(), h + other.getRelH());
+    }
+
+    RelRobotLocation RobotLocation::getRelRobotLocationOf(const RobotLocation& other) const {
+        return other - *this;
+    }
+
     const degrees RobotLocation::getRelativeBearing(Location& other)
     {
         return (NBMath::subPIAngle(headingToInRad(other) - h))*TO_DEG;
@@ -143,27 +166,77 @@ namespace noggin {
 
 //////////// RelLocation Methods ///////////////
 
-    RelLocation::RelLocation(RobotLocation& my, float dx, float dy, degrees dh)
-        : RobotLocation(my.getX() + dx, my.getY() + dy, my.getH() + dh),
-          relX(dx), relY(dy), relH(dh*TO_RAD)
+    RelLocation::RelLocation(float dx, float dy)
+        : relX(dx), relY(dy)
     {
     }
 
     RelLocation::RelLocation(const RelLocation& other)
-        :RobotLocation(other.x, other.y, other.h), relX(other.relX),
-         relY(other.relY), relH(other.relH)
+        :relX(other.getRelX()), relY(other.getRelY())
     {
     }
 
     boost::python::str RelLocation::toString()
     {
-        std::string info = "x = " + boost::lexical_cast<std::string>(x) +
-            ", y = " + boost::lexical_cast<std::string>(y) + ", h = " +
-            boost::lexical_cast<std::string>(h*TO_DEG) +
-            " (in degrees), relx = " + boost::lexical_cast<std::string>(relX)
-            + ", rely = " + boost::lexical_cast<std::string>(relY) +
-            ", relh = " + boost::lexical_cast<std::string>(relH) +
-            " (in degrees)";
+        std::string info = "relx = " + boost::lexical_cast<std::string>(relX)
+            + ", rely = " + boost::lexical_cast<std::string>(relY);
+        return *(new boost::python::str(info));
+    }
+
+//////////// RelRobotLocation Methods ///////////////
+
+    RelRobotLocation::RelRobotLocation(float dx, float dy, degrees dh)
+    : RelLocation(dx, dy), relH(dh*TO_RAD)
+    {
+    }
+
+    RelRobotLocation::RelRobotLocation(const RelRobotLocation& other)
+    : RelLocation(other.getRelX(), other.getRelY()), relH(other.getRelH()*TO_RAD)
+    {
+    }
+
+    RelRobotLocation RelRobotLocation::operator- (boost::python::tuple delta) const {
+        return RelRobotLocation(getRelX() - boost::python::extract<float>(delta[0]),
+                                getRelY() - boost::python::extract<float>(delta[1]),
+                                getRelH() - boost::python::extract<float>(delta[2]));
+    }
+
+    void RelRobotLocation::rotate(degrees theta) {
+        radians theta_r = theta*TO_RAD;
+
+        float sint, cost;
+        sincosf(theta_r, &sint, &cost);
+        float new_x = relX * cost - relY * sint;
+        float new_y = relX * sint + relY * cost;
+
+        relX = new_x;
+        relY = new_y;
+        relH += theta_r;
+    }
+
+    bool RelRobotLocation::within(boost::python::tuple region) const {
+
+        //check heading
+        float h = boost::python::extract<float>(region[2])*TO_RAD;
+
+        if (std::fabs(relH) > h)
+            return false;
+
+        //check xy-region through an ellipse check
+
+        float x = boost::python::extract<float>(region[0]);
+        float y = boost::python::extract<float>(region[1]);
+        // (relX/x)^2 + (relY/y)^2 < 1
+        // http://www.wolframalpha.com/input/?i=x%5E2%2Fa%5E2+%2B+y%5E2%2Fb%5E2+%3C%3D+1
+        return (relX*relX)/(x*x) + (relY*relY)/(y*y) <= 1;
+    }
+
+    boost::python::str RelRobotLocation::toString()
+    {
+        std::string info = "relx = " + boost::lexical_cast<std::string>(relX)
+                + ", rely = " + boost::lexical_cast<std::string>(relY) +
+                ", relh = " + boost::lexical_cast<std::string>(getRelH()) +
+                " (in degrees)";
         return *(new boost::python::str(info));
     }
 

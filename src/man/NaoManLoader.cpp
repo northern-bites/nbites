@@ -7,12 +7,13 @@
 #include "corpus/RoboGuardian.h"
 #include "corpus/alconnect/NaoEnactor.h"
 #include "corpus/alconnect/ALTranscriber.h"
-#include "corpus/alconnect/ALImageTranscriber.h"
+#include "corpus/V4L2ImageTranscriber.h"
 #include "corpus/alconnect/ALSpeech.h"
 #include "corpus/alconnect/NaoLights.h"
 
 using namespace std;
 using boost::shared_ptr;
+using namespace man::corpus;
 
 static shared_ptr<TMan> man_pointer;
 
@@ -24,7 +25,7 @@ void loadMan(boost::shared_ptr<AL::ALBroker> broker) {
     shared_ptr<Sensors> sensors(new Sensors(speech));
     shared_ptr<Transcriber> transcriber(new ALTranscriber(broker, sensors));
     shared_ptr<ThreadedImageTranscriber>
-        imageTranscriber(new ALImageTranscriber(sensors, broker));
+        imageTranscriber(new V4L2ImageTranscriber(sensors));
     shared_ptr<MotionEnactor>
         enactor(new NaoEnactor(sensors, transcriber, broker));
     shared_ptr<Lights> lights(new NaoLights(broker));
