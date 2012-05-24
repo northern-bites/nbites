@@ -32,6 +32,7 @@ void ThresholdedImage::buildBitmap() {
 		mix++;
 	      }
 	    }
+	    if (threshColor == 0) threshColor = Color_RGB[0];
             bitmapLine[i] = threshColor;
         }
     }
@@ -40,5 +41,10 @@ void ThresholdedImage::buildBitmap() {
 void ThresholdedImage::scaleBitmap_640_480() {
     bitmap.scaled(640, 480);
 }
+
+void ThresholdedImage::scaleBitmap_320_240() {
+    bitmap.scaled(320, 240);
+}
+
 }
 }

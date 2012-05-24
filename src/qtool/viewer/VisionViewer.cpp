@@ -34,8 +34,34 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     toolBar->addWidget(loadTableButton);
     this->addToolBar(toolBar);
 
+    QCheckBox* horizonDebug = new QCheckBox(tr("Horizon Debug"));
+    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setHorizonDebug()));
+    toolBar->addWidget(horizonDebug);
+    QCheckBox* shootingDebug = new QCheckBox(tr("Shooting Debug"));
+    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setShootingDebug()));
+    toolBar->addWidget(shootingDebug);
+    QCheckBox* openFieldDebug = new QCheckBox(tr("Open Field Debug"));
+    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setOpenFieldDebug()));
+    toolBar->addWidget(openFieldDebug);
+    QCheckBox* EdgeDetectionDebug = new QCheckBox(tr("Edge Detection Debug"));
+    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setEdgeDetectDebug()));
+    toolBar->addWidget(EdgeDetectionDebug);
+    QCheckBox* houghDebug = new QCheckBox(tr("Hough Debug"));
+    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setHoughDebug()));
+    toolBar->addWidget(houghDebug);
+    QCheckBox* robotsDebug = new QCheckBox(tr("Robots Debug"));
+    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setRobotsDebug()));
+    toolBar->addWidget(robotsDebug);
+
+    horizonD = false;
+    shootD = false;
+    openFieldD = false;
+    edgeDetectD = false;
+    houghD = false;
+    robotsD = false;
+
+
     visionImage = new ThresholdedImage(rawImage, this);
-    //visionImage->scaleBitmap_640_480();
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
     FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(), this);
@@ -93,7 +119,6 @@ void VisionViewer::update(){
   rawImage->mutable_image()->assign(reinterpret_cast<const char *>
 				    (vision->thresh->thresholded),
 				    AVERAGED_IMAGE_SIZE);
-  // visionImage->scaleBitmap_640_480();
 
 }
 
@@ -103,6 +128,37 @@ void VisionViewer::loadColorTable(){
 							tr("Table Files (*.mtb)"));
   imageTranscribe->initTable(colorTablePath.toStdString());
 
+}
+
+void VisionViewer::setHorizonDebug(){
+  if (horizonD == false) horizonD = true;
+  else horizonD = false;
+  vision->thresh->setHorizonDebug(horizonD);
+}
+void VisionViewer::setShootingDebug(){
+  if (shootD == false) shootD = true;
+  else shootD = false;
+  vision->thresh->setDebugShooting(shootD);
+}
+void VisionViewer::setOpenFieldDebug(){
+  if (openFieldD == false) openFieldD = true;
+  else openFieldD = false;
+  vision->thresh->setDebugOpenField(openFieldD);
+}
+void VisionViewer::setEdgeDetectDebug(){
+  if (edgeDetectD == false) edgeDetectD = true;
+  else edgeDetectD = false;
+  vision->thresh->setDebugEdgeDetection(edgeDetectD);
+}
+void VisionViewer::setHoughDebug(){
+  if (houghD == false) houghD = true;
+  else houghD = false;
+  vision->thresh->setDebugHoughTransform(houghD);
+}
+void VisionViewer::setRobotsDebug(){
+  if (robotsD == false) robotsD = true;
+  else robotsD = false;
+  vision->thresh->setDebugRobots(robotsD);
 }
 
 

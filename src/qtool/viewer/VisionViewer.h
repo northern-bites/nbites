@@ -38,6 +38,12 @@ public:
 public slots:
     void update();
     void loadColorTable();
+    void setHorizonDebug();
+    void setShootingDebug();
+    void setOpenFieldDebug();
+    void setEdgeDetectDebug();
+    void setHoughDebug();
+    void setRobotsDebug();
 
 private:
     std::vector<QDockWidget*> dockWidget;
@@ -50,6 +56,8 @@ private:
     man::memory::MVision::ptr offlineMVision;
     boost::shared_ptr<man::memory::proto::PImage> rawImage;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
+
+    bool horizonD, shootD, openFieldD, edgeDetectD, houghD, robotsD;
 
 };
 

@@ -26,6 +26,7 @@ public:
 
     void buildBitmap();
     void scaleBitmap_640_480();
+    void scaleBitmap_320_240();
 
     unsigned getWidth() const { return rawImage->width(); }
     unsigned getHeight() const { return rawImage->height(); }
