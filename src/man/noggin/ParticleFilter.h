@@ -189,9 +189,9 @@ namespace PF
 
 	bool isActive() const { return true; }
 	
-        void setXEst(float xEst) { }
-	void setYEst(float yEst) { }
-	void setHEst(float hEst) { }
+        void setXEst(float xEst) { xEstimate = xEst; }
+	void setYEst(float yEst) { yEstimate = yEst; }
+	void setHEst(float hEst) { hEstimate = hEst; }
 	void setXUncert(float uncertX) { }
 	void setYUncert(float uncertY) { }
 	void setHUncert(float uncertH) { }

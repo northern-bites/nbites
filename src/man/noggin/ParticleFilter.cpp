@@ -16,6 +16,7 @@ namespace PF
     /**
      * Used to compare two particles by weight, primarily for 
      * use with the sorting algorithm.
+     *
      * @param first the first particle.
      * @param second the second particle.
      * @return weight of first < weight of second ? true : false
@@ -138,6 +139,13 @@ namespace PF
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	    sum += (*iter).getWeight();
 
+	if(sum == 0)
+	{
+	    std::cout << "\n\n\nZERO SUM!\n\n\n" << std::endl;
+	    reset();
+	    return;
+	}
+
 	averageWeight = sum/(numParticles*1.0f);
 
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
@@ -155,8 +163,8 @@ namespace PF
 	wFast = wFast + ALPHA_FAST*(averageWeight - wFast);
 
 	float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
-	if(injectionProb > 0)
-	    std::cout << injectionProb << std::endl;
+	//if(injectionProb > 0)
+	//    std::cout << injectionProb << std::endl;
 
 	// Map each normalized weight to the corresponding particle.
 	std::map<float, LocalizationParticle> cdf;
@@ -165,14 +173,30 @@ namespace PF
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	{
 	    LocalizationParticle particle = (*iter);
+
 	    cdf[prev + particle.getWeight()] = particle;
 	    prev += particle.getWeight();
 	}
 
+	std::cout << "sum = " << sum << std::endl;
+	std::cout << "tot = " << prev << std::endl;
+
 	boost::mt19937 rng;
 	rng.seed(static_cast<unsigned>(std::time(0)));
 	boost::uniform_01<boost::mt19937> gen(rng);
-	
+
+	// For random particle injection. 
+	// boost::uniform_real<float> xBounds(0.0f, width);
+	// boost::uniform_real<float> yBounds(0.0f, height);
+	// boost::uniform_real<float> angleBounds(0, 2.0f*boost::math::constants::pi<float>());
+
+	// boost::variate_generator<boost::mt19937&, 
+	// 			 boost::uniform_real<float> > xGen(rng, xBounds);
+	// boost::variate_generator<boost::mt19937&,
+	// 			 boost::uniform_real<float> > yGen(rng, yBounds);
+	// boost::variate_generator<boost::mt19937&,
+	// 			 boost::uniform_real<float> > angleGen(rng, angleBounds);
+
 	float rand;
 	ParticleSet newParticles;
 	int numParticlesInjected = 0;
@@ -184,16 +208,20 @@ namespace PF
 
 	    if(rand <= injectionProb)
 		numParticlesInjected++;
-
-	    newParticles.push_back(cdf.upper_bound(rand)->second);
+		//{
+		//LocalizationParticle p(Location(xGen(), yGen(), angleGen()), 0.0f);
+		//newParticles.push_back(p);
+		//}
+	    //else
+		newParticles.push_back(cdf.upper_bound(rand)->second);
 	}
 
 	particles = newParticles;
 
 	if(numParticlesInjected > 0)
 	{
-	    std::cout << "Injected " << numParticlesInjected << " random particles." 
-		      << std::endl;
+	    //std::cout << "Injected " << numParticlesInjected << " random particles." 
+	    //	      << std::endl;
 	}
 
 #ifdef DEBUG_LOCALIZATION
@@ -246,8 +274,35 @@ namespace PF
 	}
     }
 
+    /**
+     * Resets localization to the given x, y, and heading.
+     *
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param h the heading (radians).
+     */
     void ParticleFilter::resetLocTo(float x, float y, float h)
     {
-	// @todo
+	const float SIGMA_RESET_X = 15.0f;
+	const float SIGMA_RESET_Y = 15.0f;
+	const float SIGMA_RESET_H = 0.2f;
+
+	// Reset the estimates. 
+	xEstimate = x;
+	yEstimate = y;
+	hEstimate = h;
+
+	particles.clear();
+
+	float weight = 1.0f/(numParticles*1.0f);
+
+	for(int i = 0; i < numParticles; ++i)
+	{
+	    LocalizationParticle p(Location(sampleNormal(x, SIGMA_RESET_X),
+				            sampleNormal(y, SIGMA_RESET_Y),
+				            sampleNormal(h, SIGMA_RESET_H)), weight);
+
+	    particles.push_back(p);
+	}
     }
 }

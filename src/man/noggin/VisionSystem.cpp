@@ -18,14 +18,14 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::vector<PF::Observation> obs = currentObservations;
     if(obs.size() == 0)
     {
-	std::cout << "Nothing seen, do not update weights." << std::endl;
+	//std::cout << "Nothing seen, do not update weights." << std::endl;
 
 	setUpdated(false);
 
         return particles;
     }
-    else
-	std::cout << "#obs = " << obs.size() << std::endl;
+    // else
+    // 	std::cout << "#obs = " << obs.size() << std::endl;
 
     setUpdated(true);
 
@@ -122,12 +122,17 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 		std::cout << "Invalid weight calculated!" << std::endl;
 		totalWeight = 0.0f;
 	    }
+	    // std::cout << "(" << (*partIter).getLocation().x
+	    // 	      << ", " << (*partIter).getLocation().y
+	    // 	      << ", " << (*partIter).getLocation().heading
+	    // 	      << ") : " << totalWeight << std::endl;
             (*partIter).setWeight(totalWeight);
 #ifdef DEBUG_LOCALIZATION
             std::cout << " with new weight " << (*partIter).getWeight() << std::endl;
 #endif
         }
     }
+    //std::cout << "---------------------------------------------" << std::endl;
 
     return particles;
 }
@@ -141,10 +146,5 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
  */
 void VisionSystem::feedObservations(std::vector<PF::Observation> newObs)
 {
-    // if(newObs.size() > 0)
-    // 	hasNewObs = true;
-    // else
-    // 	hasNewObs = false;
-  
     currentObservations = newObs;
 }
