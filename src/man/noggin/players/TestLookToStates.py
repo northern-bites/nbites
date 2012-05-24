@@ -18,7 +18,7 @@ def gamePenalized(player):
 def standup(player):
     player.gainsOn()
     if player.firstFrame():
-        player.walkPose()
+        player.stand()
         return player.stay()
     return player.goLater('lookState0')
 
@@ -218,6 +218,6 @@ def lookLeftFar(player):
 def done(player):
     if player.firstFrame():
         player.brain.tracker.setNeutralHead()
-        player.walkPose()
+        player.stand()
         return player.stay()
     return player.stay()

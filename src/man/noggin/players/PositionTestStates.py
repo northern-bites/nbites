@@ -11,7 +11,7 @@ def gameInitial(player):
 
 def gameReady(player):
     if player.firstFrame():
-        player.standup()
+        player.stand()
         player.brain.tracker.locPans()
 
     return player.goLater('playbookPosition')

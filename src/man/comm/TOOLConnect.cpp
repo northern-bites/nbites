@@ -253,8 +253,8 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
                 ballEKF->getGlobalXVelocityUncert(),
                 ballEKF->getGlobalYVelocityUncert();
 
-          loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
-                        loc->getLastOdo().deltaR;
+          loc_values += loc->getLastOdo().x, loc->getLastOdo().y,
+                        loc->getLastOdo().theta;
         } else
           for (int i = 0; i < 19; i++)
             loc_values += 0;

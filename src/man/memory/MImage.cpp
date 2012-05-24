@@ -8,6 +8,8 @@
 
 #include "MImage.h"
 
+#include <cstdio>
+
 namespace man {
 namespace memory {
 

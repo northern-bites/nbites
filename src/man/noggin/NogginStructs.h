@@ -42,29 +42,29 @@ public:
             y += o.y;
             h += o.h;
         }
-    PoseEst operator+ (const MotionModel u_t)
-        {
-            // Translate the relative change into the global coordinate system
-            // And add that to the current estimate
-            float sinh, cosh;
-            sincosf(h, &sinh, &cosh);
-            return PoseEst(x + u_t.deltaF * cosh -
-                           u_t.deltaL * sinh,
-                           y + u_t.deltaF * sinh +
-                           u_t.deltaL * cosh,
-                           h + u_t.deltaR);
-        }
-    void operator+= (const MotionModel u_t)
-        {
-            float sinh, cosh;
-            sincosf(h, &sinh, &cosh);
-
-            // Translate the relative change into the global coordinate system
-            // And add that to the current estimate
-            x += u_t.deltaF * cosh - u_t.deltaL * sinh;
-            y += u_t.deltaF * sinh + u_t.deltaL * cosh;
-            h += u_t.deltaR;
-        }
+//    PoseEst operator+ (const MotionModel u_t)
+//        {
+//            // Translate the relative change into the global coordinate system
+//            // And add that to the current estimate
+//            float sinh, cosh;
+//            sincosf(h, &sinh, &cosh);
+//            return PoseEst(x + u_t.deltaF * cosh -
+//                           u_t.deltaL * sinh,
+//                           y + u_t.deltaF * sinh +
+//                           u_t.deltaL * cosh,
+//                           h + u_t.deltaR);
+//        }
+//    void operator+= (const MotionModel u_t)
+//        {
+//            float sinh, cosh;
+//            sincosf(h, &sinh, &cosh);
+//
+//            // Translate the relative change into the global coordinate system
+//            // And add that to the current estimate
+//            x += u_t.deltaF * cosh - u_t.deltaL * sinh;
+//            y += u_t.deltaF * sinh + u_t.deltaL * cosh;
+//            h += u_t.deltaR;
+//        }
 
     friend std::ostream& operator<< (std::ostream &o, const PoseEst &c)
         {

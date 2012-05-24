@@ -91,7 +91,7 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
 SET( @ROBOT_NAME@
-  "spock"
+  "river"
   CACHE STRING
   "The NAME of the robot"
   )
@@ -145,6 +145,7 @@ INCLUDE_DIRECTORIES(
   ${COMM_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
   ${MOTION_INCLUDE_DIR}
+  ${BHWALK_INCLUDE_DIR}
   ${NOGGIN_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${WEBOTS_INCLUDE_DIR}
