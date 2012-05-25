@@ -77,9 +77,11 @@ namespace corpus {
 
 using boost::shared_ptr;
 
-V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s) :
+    V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
+                                               Camera::Type which) :
         ThreadedImageTranscriber(s, "V4L2ImageTranscriber"),
         settings(Camera::getDefaultSettings()),
+        cameraType(which),
         currentBuf(0),
         timeStamp(0),
         image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
@@ -152,7 +154,10 @@ void V4L2ImageTranscriber::initTable(const string& filename)
 }
 
 void V4L2ImageTranscriber::initOpenI2CAdapter() {
-    cameraAdapterFd = open("/dev/i2c-0", O_RDWR);
+    if(cameraType == Camera::TOP)
+        cameraAdapterFd = open("/dev/i2c-camera0", O_RDWR);
+    else
+        cameraAdapterFd = open("/dev/i2c-camera1", O_RDWR);
 
     if(cameraAdapterFd == -1)
         printf("CAMERA::ERROR::Camera adapter FD is WRONG.\n");
@@ -161,17 +166,16 @@ void V4L2ImageTranscriber::initOpenI2CAdapter() {
 }
 
 void V4L2ImageTranscriber::initSelectCamera() {
-    unsigned char cmd[2] = { Camera::BOTTOM, 0 };
+    unsigned char cmd[2] = { cameraType, 0 };
     i2c_smbus_write_block_data(cameraAdapterFd, 220, 1, cmd);
 }
 
 void V4L2ImageTranscriber::initOpenVideoDevice() {
     // open device
-#if ROBOT_TYPE == NAO_NEXTGEN
-    fd = open("/dev/video1", O_RDWR);
-#else
-    fd = open("/dev/video0", O_RDWR);
-#endif
+    if(cameraType == Camera::TOP)
+        fd = open("/dev/video0", O_RDWR);
+    else
+        fd = open("/dev/video1", O_RDWR);
 
     if(fd == -1)
         printf("CAMERA::ERROR::Video Device FD is WRONG.\n");
@@ -379,15 +383,24 @@ void V4L2ImageTranscriber::initSettings()
 
     setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
     setControlSetting(V4L2_CID_GAIN, settings.gain);
+
+    // The following should be 1 if we're using the top camera (?)
+    if(cameraType == Camera::TOP)
+    {
+        setControlSetting(V4L2_CID_HFLIP, 1);
+        setControlSetting(V4L2_CID_VFLIP, 1);
+    }
+    else
+    {
+        setControlSetting(V4L2_CID_HFLIP, 0);
+        setControlSetting(V4L2_CID_VFLIP, 0);
+    }
+
 #else
     // make sure all auto stuff is OFF!
     setControlSetting(V4L2_CID_AUTOEXPOSURE , 0);
     setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
     setControlSetting(V4L2_CID_AUTOGAIN, 0);
-
-    // The following should be 1 if we're using the top camera (?)
-    setControlSetting(V4L2_CID_HFLIP, 0);
-    setControlSetting(V4L2_CID_VFLIP, 0);
 
     setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
     setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
@@ -546,7 +559,7 @@ bool V4L2ImageTranscriber::captureNew() {
     VERIFY((ioctl(fd, VIDIOC_DQBUF, buf)),
            "Dequeueing the frame buffer failed.");
     if(buf->bytesused != SIZE)
-        printf("CAMERA ERROR::Wrong buffer size!.\n");
+        printf("CAMERA::ERROR::Wrong buffer size!.\n");
     currentBuf = buf;
 
     static bool shout = true;

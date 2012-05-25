@@ -78,7 +78,7 @@ class V4L2ImageTranscriber: public ThreadedImageTranscriber {
 
 public:
 
-    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s);
+    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s, Camera::Type which);
     virtual ~V4L2ImageTranscriber();
 
     void setNewSettings(const Camera::Settings& settings);
@@ -109,6 +109,7 @@ public:
 
 private:
     Camera::Settings settings;
+    Camera::Type cameraType;
 
     int cameraAdapterFd;
 
