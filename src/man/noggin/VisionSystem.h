@@ -115,13 +115,15 @@ class VisionSystem : public PF::SensorModel
 
     PF::ParticleSet update(PF::ParticleSet particles);
 
-    //bool hasNewObservations() const { return hasNewObs; }
-    
     void feedObservations(std::vector<PF::Observation> newObs);
 
  private:
-    //bool hasNewObs;
     std::vector<PF::Observation> currentObservations;
+
+    // Normal distributions for calculating weights of particles
+    // based on visual observations.
+    boost::math::normal_distribution<float> distanceDistribution;
+    boost::math::normal_distribution<float> angleDistribution;
 };
 
 #endif // VISION_SYSTEM_H

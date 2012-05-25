@@ -134,7 +134,7 @@ void Noggin::initializeLocalization()
     locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
     locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem());
 
-    loc = shared_ptr<LocSystem>(new PF::ParticleFilter(125, FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT, locMotionSystem, locVisionSystem));
+    loc = shared_ptr<LocSystem>(new PF::ParticleFilter(locMotionSystem, locVisionSystem));
 
     ballEKF = shared_ptr<BallEKF>(new BallEKF());
 

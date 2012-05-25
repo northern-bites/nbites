@@ -5,7 +5,14 @@
  */
 VisionSystem::VisionSystem()
     : PF::SensorModel()
-{ }
+{ 
+    // @todo add these as parameters.
+    const float SIGMA_D = 15.00f;
+    const float SIGMA_B = 1.40f;
+
+    boost::math::normal_distribution<float> distanceDistribution(0.0f, SIGMA_D);
+    boost::math::normal_distribution<float> angleDistribution(0.0f, SIGMA_B);
+}
 
 /**
  * Update particle weights based on current visual observations.
@@ -35,9 +42,6 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::cout << "Using current location " << currentLocation << std::endl;
 #endif 
 
-    // @todo add these as parameters.
-    const float SIGMA_D = 15.00f;
-    const float SIGMA_H = 1.40f;
 
     PF::ParticleIt partIter;
     for(partIter = particles.begin(); partIter != particles.end(); ++partIter)
@@ -52,27 +56,19 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    PF::Observation o = (*obsIter);
 	    if(!o.isAmbiguous())
 	    {
-	        // Since the observation is unambiguous, use the first observation.
+	        // Since the observation is unambiguous, there is only one possibility.
 		Landmark l = o.possibilities[0];
 		PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
-
 		float distanceDiff = o.distance - hypothesisVector.magnitude;
-
 		float angleDiff = NBMath::subPIAngle(o.angle) - NBMath::subPIAngle(hypothesisVector.direction);
-
-		boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
-
-		float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
-
-		boost::math::normal_distribution<float> pAngle(0.0f, SIGMA_H);
-
-		float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
-		float probability = distanceProb * angleProb;
+		float distanceWeight = boost::math::pdf<float>(distanceDistribution, distanceDiff);
+		float angleWeight = boost::math::pdf<float>(angleDistribution, angleDiff);
+		float weight = distanceWeight * angleWeight;
 
 		if(totalWeight == 0.0f)
-		    totalWeight = probability;
+		    totalWeight = weight;
 		else
-		    totalWeight *= probability;
+		    totalWeight *= weight;
 
 		count++;
 	    }
@@ -90,13 +86,11 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    	    PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
 	    	    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
 	    	    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
-		    boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
-	    	    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
-		    boost::math::normal_distribution<float> pAngle(0.0f, SIGMA_H);
-	    	    float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
-	    	    float probability = distanceProb * angleProb;
-	    	    if(probability > maxWeight)
-                        maxWeight = probability;		  
+	    	    float distanceWeight = boost::math::pdf<float>(distanceDistribution, distanceDiff);
+	    	    float angleWeight = boost::math::pdf<float>(angleDistribution, angleDiff);
+	    	    float weight = distanceWeight * angleWeight;
+	    	    if(weight > maxWeight)
+                        maxWeight = weight;		  
 	        }
 
 		// Assign the total weight to be the product of the current total
@@ -138,9 +132,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 }
 
 /**
- * Provides the vision module with a new set of observations, and 
- * resets the flag so that the observations will be used on 
- * the next update iteration.
+ * Provides the vision module with a new set of observations. 
  *
  * @param newObs the new vector of observations.
  */

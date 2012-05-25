@@ -2,12 +2,8 @@
  * Basic implementation of a particle filter for 
  * robot localization purposes. 
  *
- * @todo Future work includes adding an 
- *       Augmented MCL algorithm implementation
- *       to better address issues of robot
- *       kidnapping. 
- *
  * @author Ellis Ratner <eratner@bowdoin.edu>
+ * @date   May 2012
  */
 #ifndef PARTICLE_FILTER_H
 #define PARTICLE_FILTER_H
@@ -140,9 +136,9 @@ namespace PF
     class ParticleFilter : public LocSystem
     {
     public:
-        ParticleFilter(int particles, float w, float h,
-		       boost::shared_ptr<MotionModel> motion, 
-		       boost::shared_ptr<SensorModel> sensor);
+        ParticleFilter(boost::shared_ptr<MotionModel> motion, 
+		       boost::shared_ptr<SensorModel> sensor,
+	               ParticleFilterParams params = DEFAULT_PARAMS);
 	~ParticleFilter();
 
 	void run(bool motionUpdate = true, bool sensorUpdate = true);
@@ -200,6 +196,8 @@ namespace PF
 
     private:
 	void resample();
+
+	ParticleFilterParams parameters;
 
 	int numParticles;
 
