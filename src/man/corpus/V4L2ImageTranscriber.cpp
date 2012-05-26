@@ -527,11 +527,13 @@ bool V4L2ImageTranscriber::waitForImage() {
         sensors->updateVisionAngles();
         PROF_ENTER(P_ACQUIRE_IMAGE);
 #ifdef CAN_SAVE_FRAMES
-       if (sensors->getWriteableNaoImage() != NULL) {
-           _copy_image(current_image, sensors->getWriteableNaoImage());
+       if (sensors->getWriteableNaoImage(cameraType) != NULL) {
+           _copy_image(current_image,
+                       sensors->getWriteableNaoImage(cameraType));
            sensors->notifyNewNaoImage();
            ImageAcquisition::acquire_image_fast(table, params,
-                                                sensors->getNaoImage(), image);
+                                               sensors->getNaoImage(cameraType),
+                                               image);
        } else {
            ImageAcquisition::acquire_image_fast(table, params,
                                                 current_image, image);
@@ -544,7 +546,7 @@ bool V4L2ImageTranscriber::waitForImage() {
         PROF_ENTER(P_QBUF);
         this->releaseBuffer();
         PROF_EXIT(P_QBUF);
-        sensors->setImage(image);
+        sensors->setImage(image, cameraType);
         return true;
     } else {
         printf("Warning - the buffer we dequeued was NULL\n");

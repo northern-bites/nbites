@@ -23,7 +23,9 @@ using proto::PImage;
         MObject(id, data),
         sensors(sensors),
         data(data),
-        thresholded_data(new PImage()) {
+        thresholded_data(new PImage()),
+        cameraType(type)
+    {
 
     //Note (Octavian): This is a pretty dumb way to get the image data
     // (ideally you would want to just copy the image - that saves any
@@ -39,7 +41,7 @@ using proto::PImage;
     image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
     char* image_string_data = const_cast<char *>(image_string->data());
     if (sensors.get()) {
-        sensors->setNaoImagePointer(image_string_data, type);
+        sensors->setNaoImagePointer(image_string_data, cameraType);
     }
 }
 
@@ -57,7 +59,7 @@ void MImage::updateData() {
     //debugging purposes
     #ifdef OFFLINE
     this->thresholded_data->mutable_image()->assign(
-            reinterpret_cast<const char *>(sensors->getColorImage()),
+            reinterpret_cast<const char *>(sensors->getColorImage(cameraType)),
             AVERAGED_IMAGE_SIZE);
     this->thresholded_data->set_width(AVERAGED_IMAGE_WIDTH);
     this->thresholded_data->set_height(AVERAGED_IMAGE_HEIGHT);
