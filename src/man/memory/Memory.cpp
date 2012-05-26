@@ -17,7 +17,7 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
         mVision(new MVision(vision_ptr)),
         mVisionSensors(new MVisionSensors(sensors_ptr)),
         mMotionSensors(new MMotionSensors(sensors_ptr)),
-        mImage(new MImage(sensors_ptr)),
+        mImage(new MImage(sensors_ptr, corpus::Camera::BOTTOM)),
         mLocalization(new MLocalization(loc_ptr))
 {
 
