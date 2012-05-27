@@ -34,21 +34,12 @@ PF::OdometryMeasurement MotionSystem::noisyDeltaOdometry(const PF::OdometryMeasu
   float deltaX = newOdometry.x - lastOdometry.x;
   float deltaY = newOdometry.y - lastOdometry.y;
   float deltaH = newOdometry.h - lastOdometry.h;
-  
-  // if(deltaX > 0.0001f &&
-  //    deltaY > 0.0001f &&
-  //    deltaH > 0.0001f)
-  // {
-  //   std::cout << "Updating (delta x, delta y, delta h) = (" 
-  // 	      << deltaX << ", " << deltaY << ", " 
-  // 	      << deltaH << ")" << std::endl;
-  // }
 
   setLastOdometry(newOdometry);
 
-  return PF::OdometryMeasurement(deltaX + PF::sampleNormal(0.0f, 4.25f + std::sqrt(0.5f*std::abs(deltaX))),
-				 deltaY + PF::sampleNormal(0.0f, 4.25f + std::sqrt(0.5f*std::abs(deltaY))),
-				 NBMath::subPIAngle(deltaH + PF::sampleNormal(0.0f, 0.1f + std::sqrt(0.5f*std::abs(deltaH)))));
+  return PF::OdometryMeasurement(deltaX + PF::sampleNormal(0.0f, 6.0f + std::sqrt(std::abs(deltaX))),
+				 deltaY + PF::sampleNormal(0.0f, 6.0f + std::sqrt(std::abs(deltaY))),
+				 NBMath::subPIAngle(deltaH + PF::sampleNormal(0.0f, 0.125f + std::sqrt(std::abs(deltaH)))));
 }
 
 /**

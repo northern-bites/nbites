@@ -3,16 +3,9 @@
 /**
  * Constructor
  */
-VisionSystem::VisionSystem()
-    : PF::SensorModel()
-{ 
-    // @todo add these as parameters.
-    const float SIGMA_D = 15.00f;
-    const float SIGMA_B = 1.40f;
-
-    boost::math::normal_distribution<float> distanceDistribution(0.0f, SIGMA_D);
-    boost::math::normal_distribution<float> angleDistribution(0.0f, SIGMA_B);
-}
+VisionSystem::VisionSystem(LocalizationVisionParams params)
+    : PF::SensorModel(), parameters(params)
+{ }
 
 /**
  * Update particle weights based on current visual observations.
@@ -42,7 +35,6 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::cout << "Using current location " << currentLocation << std::endl;
 #endif 
 
-
     PF::ParticleIt partIter;
     for(partIter = particles.begin(); partIter != particles.end(); ++partIter)
     {
@@ -61,14 +53,20 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 		PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
 		float distanceDiff = o.distance - hypothesisVector.magnitude;
 		float angleDiff = NBMath::subPIAngle(o.angle) - NBMath::subPIAngle(hypothesisVector.direction);
-		float distanceWeight = boost::math::pdf<float>(distanceDistribution, distanceDiff);
-		float angleWeight = boost::math::pdf<float>(angleDistribution, angleDiff);
-		float weight = distanceWeight * angleWeight;
+
+		boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
+
+		float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
+
+		boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
+
+		float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
+		float probability = distanceProb * angleProb;
 
 		if(totalWeight == 0.0f)
-		    totalWeight = weight;
+		    totalWeight = probability;
 		else
-		    totalWeight *= weight;
+		    totalWeight *= probability;
 
 		count++;
 	    }
@@ -86,11 +84,13 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    	    PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
 	    	    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
 	    	    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
-	    	    float distanceWeight = boost::math::pdf<float>(distanceDistribution, distanceDiff);
-	    	    float angleWeight = boost::math::pdf<float>(angleDistribution, angleDiff);
-	    	    float weight = distanceWeight * angleWeight;
-	    	    if(weight > maxWeight)
-                        maxWeight = weight;		  
+		    boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
+	    	    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
+		    boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
+	    	    float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
+	    	    float probability = distanceProb * angleProb;
+	    	    if(probability > maxWeight)
+                        maxWeight = probability;		  
 	        }
 
 		// Assign the total weight to be the product of the current total
