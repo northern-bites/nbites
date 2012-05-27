@@ -1,5 +1,6 @@
 
 #include "OfflineViewer.h"
+#include "Camera.h"
 #include "image/ThresholdedImage.h"
 
 namespace qtool {
@@ -67,7 +68,8 @@ void OfflineViewer::loadMan() {
     mainLayout->addWidget(manMemoryViewer);
     //add the thresholded image to the memory viewer
     ThresholdedImage* threshImage = new ThresholdedImage(
-            offlineControl->getManMemory()->getMImage()->getThresholded(), this);
+        offlineControl->getManMemory()->getMImage(Camera::BOTTOM)->
+        getThresholded(), this);
     manMemoryManager->connectSlotToMObject(threshImage,
             SLOT(updateBitmap()), MIMAGE_ID);
 
