@@ -3,8 +3,8 @@
 /**
  * Constructor
  */
-VisionSystem::VisionSystem()
-    : PF::SensorModel()
+VisionSystem::VisionSystem(LocalizationVisionParams params)
+    : PF::SensorModel(), parameters(params)
 { }
 
 /**
@@ -35,10 +35,6 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     std::cout << "Using current location " << currentLocation << std::endl;
 #endif 
 
-    // @todo add these as parameters.
-    const float SIGMA_D = 15.00f;
-    const float SIGMA_H = 1.40f;
-
     PF::ParticleIt partIter;
     for(partIter = particles.begin(); partIter != particles.end(); ++partIter)
     {
@@ -60,11 +56,11 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 
 		float angleDiff = NBMath::subPIAngle(o.angle) - NBMath::subPIAngle(hypothesisVector.direction);
 
-		boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
+		boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
 
 		float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 
-		boost::math::normal_distribution<float> pAngle(0.0f, SIGMA_H);
+		boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
 
 		float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 		float probability = distanceProb * angleProb;
@@ -90,9 +86,9 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 	    	    PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
 	    	    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
 	    	    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
-		    boost::math::normal_distribution<float> pDist(0.0f, SIGMA_D);
+		    boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
 	    	    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
-		    boost::math::normal_distribution<float> pAngle(0.0f, SIGMA_H);
+		    boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
 	    	    float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 	    	    float probability = distanceProb * angleProb;
 	    	    if(probability > maxWeight)

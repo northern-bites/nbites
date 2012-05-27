@@ -105,22 +105,33 @@ namespace PF
     };
 }
 
+struct LocalizationVisionParams
+{
+    float sigma_d;       // Variance for calculating distance weights.
+    float sigma_h;       // Variance for calculating heading weights.
+};
+
+static const LocalizationVisionParams DEFAULT_LOCVIS_PARAMS = 
+{
+    15.00f,
+    1.25f
+};
+
 /**
  * @class VisionSystem
  */
 class VisionSystem : public PF::SensorModel
 {
  public:
-    VisionSystem();
+    VisionSystem(LocalizationVisionParams params = DEFAULT_LOCVIS_PARAMS);
 
     PF::ParticleSet update(PF::ParticleSet particles);
 
-    //bool hasNewObservations() const { return hasNewObs; }
-    
     void feedObservations(std::vector<PF::Observation> newObs);
 
  private:
-    //bool hasNewObs;
+    LocalizationVisionParams parameters;
+
     std::vector<PF::Observation> currentObservations;
 };
 

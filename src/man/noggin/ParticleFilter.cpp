@@ -30,12 +30,12 @@ namespace PF
 	return (w1 < w2) ? true : false;
     }
 
-    ParticleFilter::ParticleFilter(int particles, float w, float h,
-				   boost::shared_ptr<MotionModel> motion, 
-				   boost::shared_ptr<SensorModel> sensor)
-	: numParticles(particles), width(w), height(h), xEstimate(0.0f),
-	  yEstimate(0.0f), hEstimate(0.0f), averageWeight(0.0f),
-	  wFast(0.0f), wSlow(0.0f)
+    ParticleFilter::ParticleFilter(boost::shared_ptr<MotionModel> motion, 
+				   boost::shared_ptr<SensorModel> sensor,
+	                           ParticleFilterParams params)
+	: parameters(params), xEstimate(0.0f), yEstimate(0.0f), 
+	  hEstimate(0.0f), averageWeight(0.0f), wFast(0.0f), 
+	  wSlow(0.0f)
     {
 	motionModel = motion;
 	sensorModel = sensor;
@@ -43,8 +43,8 @@ namespace PF
 	boost::mt19937 rng;
 	rng.seed(std::time(0));
 
-        boost::uniform_real<float> xBounds(0.0f, width);
-	boost::uniform_real<float> yBounds(0.0f, height);
+        boost::uniform_real<float> xBounds(0.0f, parameters.fieldWidth);
+	boost::uniform_real<float> yBounds(0.0f, parameters.fieldHeight);
 	boost::uniform_real<float> angleBounds(0, 2.0f*boost::math::constants::pi<float>());
 
 	boost::variate_generator<boost::mt19937&, 
@@ -55,12 +55,12 @@ namespace PF
 				 boost::uniform_real<float> > angleGen(rng, angleBounds);
 
 	// Assign uniform weight.
-	float weight = 1.0f/(particles*1.0f);
+	float weight = 1.0f/(parameters.numParticles*1.0f);
 #ifdef DEBUG_LOCALIZATION
 	std::cout << "Weight = " << weight << "." << std::endl;
 #endif
 
-	for(int i = 0; i < particles; ++i)
+	for(int i = 0; i < parameters.numParticles; ++i)
 	{
 	    LocalizationParticle p(Location(xGen(), yGen(), angleGen()), weight);
 
@@ -146,7 +146,7 @@ namespace PF
 	    return;
 	}
 
-	averageWeight = sum/(numParticles*1.0f);
+	averageWeight = sum/(parameters.numParticles*1.0f);
 
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	{
@@ -154,32 +154,28 @@ namespace PF
 	    (*iter).setWeight(weight/sum);
 	}
 
-	// @todo add these as parameters
-	const float ALPHA_SLOW = 0.05f;
-	const float ALPHA_FAST = 0.2f;
+	 // Update exponential filters for long-term and short-term weights.
+	 wSlow = wSlow + parameters.alpha_slow*(averageWeight - wSlow);
+	 wFast = wFast + parameters.alpha_fast*(averageWeight - wFast);
 
-	// Update exponential filters for long-term and short-term weights.
-	wSlow = wSlow + ALPHA_SLOW*(averageWeight - wSlow);
-	wFast = wFast + ALPHA_FAST*(averageWeight - wFast);
+	 float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
+	 //if(injectionProb > 0)
+	 //    std::cout << injectionProb << std::endl;
 
-	float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
-	//if(injectionProb > 0)
-	//    std::cout << injectionProb << std::endl;
+	 // Map each normalized weight to the corresponding particle.
+	 std::map<float, LocalizationParticle> cdf;
 
-	// Map each normalized weight to the corresponding particle.
-	std::map<float, LocalizationParticle> cdf;
+	 float prev = 0.0f;
+	 for(iter = particles.begin(); iter != particles.end(); ++iter)
+	 {
+	     LocalizationParticle particle = (*iter);
 
-	float prev = 0.0f;
-	for(iter = particles.begin(); iter != particles.end(); ++iter)
-	{
-	    LocalizationParticle particle = (*iter);
+	     cdf[prev + particle.getWeight()] = particle;
+	     prev += particle.getWeight();
+	 }
 
-	    cdf[prev + particle.getWeight()] = particle;
-	    prev += particle.getWeight();
-	}
-
-	std::cout << "sum = " << sum << std::endl;
-	std::cout << "tot = " << prev << std::endl;
+	// std::cout << "sum = " << sum << std::endl;
+	// std::cout << "tot = " << prev << std::endl;
 
 	boost::mt19937 rng;
 	rng.seed(static_cast<unsigned>(std::time(0)));
@@ -202,7 +198,7 @@ namespace PF
 	int numParticlesInjected = 0;
 	// Sample numParticles particles with replacement according to the
 	// normalized weights, and place them in a new particle set.
-	for(int i = 0; i < numParticles; ++i)
+	for(int i = 0; i < parameters.numParticles; ++i)
 	{
 	    rand = (float)gen();
 
@@ -252,8 +248,8 @@ namespace PF
 	boost::mt19937 rng;
 	rng.seed(std::time(0));
 
-        boost::uniform_real<float> xBounds(0.0f, width);
-	boost::uniform_real<float> yBounds(0.0f, height);
+        boost::uniform_real<float> xBounds(0.0f, parameters.fieldWidth);
+	boost::uniform_real<float> yBounds(0.0f, parameters.fieldHeight);
 	boost::uniform_real<float> angleBounds(0, 2.0f*boost::math::constants::pi<float>());
 
 	boost::variate_generator<boost::mt19937&, 
@@ -264,9 +260,9 @@ namespace PF
 				 boost::uniform_real<float> > angleGen(rng, angleBounds);
 
 	// Assign uniform weight.
-	float weight = 1.0f/(numParticles*1.0f);
+	float weight = 1.0f/(parameters.numParticles*1.0f);
 
-	for(int i = 0; i < numParticles; ++i)
+	for(int i = 0; i < parameters.numParticles; ++i)
 	{
 	    LocalizationParticle p(Location(xGen(), yGen(), angleGen()), weight);
 
@@ -294,9 +290,10 @@ namespace PF
 
 	particles.clear();
 
-	float weight = 1.0f/(numParticles*1.0f);
+	// @todo assign weights properly
+	float weight = 1.0f/(parameters.numParticles*1.0f);
 
-	for(int i = 0; i < numParticles; ++i)
+	for(int i = 0; i < parameters.numParticles; ++i)
 	{
 	    LocalizationParticle p(Location(sampleNormal(x, SIGMA_RESET_X),
 				            sampleNormal(y, SIGMA_RESET_Y),

@@ -70,8 +70,6 @@ namespace PF
 	int fieldHeight;                // Field height. 
 	int fieldWidth;                 // Field width.
 	int numParticles;               // Size of particle population.
-	float sigma_d;                  // Variance for distance sampling.
-	float sigma_h;                  // Variance for heading sampling.
 	float alpha_fast;               // Weight factor for fast exponential weight filter.
 	float alpha_slow;               // Weight factor for slow exponential weight filter.
     };
@@ -80,9 +78,7 @@ namespace PF
     {
 	FIELD_WHITE_HEIGHT,
 	FIELD_WHITE_WIDTH,
-	125,
-	15.00f,
-	1.40f,
+	150,
 	0.2f,
 	0.05f
     };
@@ -140,9 +136,9 @@ namespace PF
     class ParticleFilter : public LocSystem
     {
     public:
-        ParticleFilter(int particles, float w, float h,
-		       boost::shared_ptr<MotionModel> motion, 
-		       boost::shared_ptr<SensorModel> sensor);
+        ParticleFilter(boost::shared_ptr<MotionModel> motion, 
+		       boost::shared_ptr<SensorModel> sensor,
+	               ParticleFilterParams params = DEFAULT_PARAMS);
 	~ParticleFilter();
 
 	void run(bool motionUpdate = true, bool sensorUpdate = true);
@@ -201,11 +197,7 @@ namespace PF
     private:
 	void resample();
 
-	int numParticles;
-
-	// Spatial dimensions
-	float width;
-	float height;
+	ParticleFilterParams parameters;
 
 	float xEstimate;
 	float yEstimate;
