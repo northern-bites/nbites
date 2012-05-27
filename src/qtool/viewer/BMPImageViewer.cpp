@@ -24,9 +24,9 @@ void BMPImageViewer::setupUI() {
 void BMPImageViewer::updateView() {
     if (this->isVisible()) {
         image->updateBitmap();
-        QImage* qimage = image->getBitmap();
+        QPixmap* qimage = image->getBitmap();
         if (qimage) {
-            imagePlaceholder.setPixmap(QPixmap::fromImage(*(qimage)));
+            imagePlaceholder.setPixmap(*qimage);
         } else {
             imagePlaceholder.setText("Underlying Null image pointer!");
         }

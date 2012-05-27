@@ -68,7 +68,7 @@ clean_soft:
 $(EXECUTABLE): build
 
 run: $(EXECUTABLE)
-	$(EXECUTABLE)
+	$(EXECUTABLE) # add R_HOME=/usr/lib/R to the beginning for R to work.
 
 debug: 
 	$(MKDIR) -p $(BIN_DIR); \
@@ -77,7 +77,7 @@ debug:
 
 run_gdb: debug
 	$(GDB) $(EXECUTABLE)
-	
+
 overseer_server: $(GEN_MAKEFILE)
 	$(MAKE) $(OVERSEER_SERVER_TARGET) $(MAKE_FLAGS) -C $(BIN_DIR); \
 	$(MKDIR) -p $(OVERSEER_DESTINATION_DIR); \

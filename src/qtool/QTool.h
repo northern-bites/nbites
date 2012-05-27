@@ -20,6 +20,7 @@
 #include "viewer/FieldViewer.h"
 #include "remote/RobotSelect.h"
 #include "overseer/OverseerClient.h"
+//#include "viewer/GraphViewer.h"
 
 #ifndef NBITES_DIR
 #define NBITES_DIR "~/nbites"
@@ -53,6 +54,7 @@ private:
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
     overseer::OverseerClient* overseerClient;
+    //viewer::GraphViewer* graphViewer;
 
     QPushButton* prevButton;
     QPushButton* nextButton;

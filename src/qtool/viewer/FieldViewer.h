@@ -18,6 +18,7 @@
 
 #include "data/DataManager.h"
 #include "image/PaintField.h"
+#include "image/PaintLocalization.h"
 #include "BMPImageViewer.h"
 
 namespace qtool {
@@ -29,12 +30,18 @@ class FieldViewer : public QMainWindow{
 public:
     FieldViewer(data::DataManager::ptr dataManager);
 
+private slots:
+    void updateLocalization();
+
 private:
     std::vector<QDockWidget*> dockWidget;
     data::DataManager::ptr dataManager;
     image::PaintField* paintField;
+    image::PaintLocalization* paintLocalization;
     BMPImageViewer* fieldView;
-
+    image::OverlayedImage *particlesOnField;
+    man::memory::MLocalization::const_ptr localizationStream;
+    
 };
 
 }

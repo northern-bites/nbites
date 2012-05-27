@@ -88,6 +88,7 @@ void ColorCalibrate::updateThresholdedImage() {
     //the thresholded image is the same size as the image
     if (thresholdedImage.width() != image->getWidth()
             || thresholdedImage.height() != image->getHeight()) {
+        //TODO: should be ARGB premultiplied?
         thresholdedImage = QImage(image->getWidth(),
                                   image->getHeight(),
                                   QImage::Format_RGB32);
@@ -96,10 +97,15 @@ void ColorCalibrate::updateThresholdedImage() {
     //threshold the image
     for (int j = 0; j < thresholdedImage.height(); j++) {
         QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
-        QRgb* bitmapLine = (QRgb*) (image->getBitmap()->scanLine(j));
-            for (int i = 0; i < thresholdedImage.width(); i++) {
+        const YUVImage* yuvImage = image->getYUVImage();
+
+        const byte** yImage = yuvImage->getYImage();
+        const byte** uImage = yuvImage->getUImage();
+        const byte** vImage = yuvImage->getVImage();
+
+        for (int i = 0; i < thresholdedImage.width(); i++) {
             Color color;
-            color.setRgb(bitmapLine[i]);
+            color.setYuv(yImage[i][j], uImage[i][j], vImage[i][j]);
             //default color
             thresholdedImageLine[i] = image::Grey;
             //temporary variables for blending colors
