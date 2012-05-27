@@ -17,6 +17,24 @@ def gameInitial(player):
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
+        # Reset localization to proper starting position by player number.
+        # Locations are defined in the wiki.
+        if player.brain.my.playerNumber == 1:
+            player.brain.loc.resetLocTo(BLUE_GOALBOX_RIGHT_X,
+                                        FIELD_WHITE_BOTTOM_SIDLELINE_Y,
+                                        90)
+        elif player.brain.my.playerNumber == 2:
+            player.brain.loc.resetLocTo(LANDMARK_BLUE_GOAL_CROSS_X,
+                                        FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        90)
+        elif player.brain.my.playerNumber == 3:
+            player.brain.loc.resetLocTo(LANDMARKBLUE_GOAL_CROSS_X,
+                                        FIELD_WHITE_TOP_SIDELINE_Y,
+                                        -90)
+        elif player.brain.my.playerNumber == 4:
+            player.brain.loc.resetLocTo(BLUE_GOALBOX_RIGHT_X,
+                                        FIELD_WHITE_TOP_SIDELINE_Y,
+                                        -90)
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -51,7 +69,10 @@ def gameReady(player):
         return player.goLater('relocalize')
 
     elif player.lastDiffState == 'gamePenalized':
-        player.brain.resetLocalization()
+        player.brain.loc.resetLocTo(player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
+                                    player.brain.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                    #player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
+                                    90)
         return player.goLater('afterPenalty')
 
     #See above about rules(2011) - we should still reposition after goals
