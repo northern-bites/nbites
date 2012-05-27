@@ -7,7 +7,7 @@
 #include "corpus/RoboGuardian.h"
 #include "corpus/alconnect/NaoEnactor.h"
 #include "corpus/alconnect/ALTranscriber.h"
-#include "corpus/V4L2ImageTranscriber.h"
+#include "corpus/NaoImageTranscriber.h"
 #include "corpus/alconnect/ALSpeech.h"
 #include "corpus/alconnect/NaoLights.h"
 #include "corpus/Camera.h"
@@ -26,7 +26,7 @@ void loadMan(boost::shared_ptr<AL::ALBroker> broker) {
     shared_ptr<Sensors> sensors(new Sensors(speech));
     shared_ptr<Transcriber> transcriber(new ALTranscriber(broker, sensors));
     shared_ptr<ThreadedImageTranscriber>
-        imageTranscriber(new V4L2ImageTranscriber(sensors, Camera::BOTTOM));
+        imageTranscriber(new NaoImageTranscriber(sensors, "image"));
     shared_ptr<MotionEnactor>
         enactor(new NaoEnactor(sensors, transcriber, broker));
     shared_ptr<Lights> lights(new NaoLights(broker));

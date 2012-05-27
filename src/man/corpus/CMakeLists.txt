@@ -106,6 +106,7 @@ IF(BUILDING_FOR_A_REMOTE_NAO)
     alconnect/NaoRGBLight
     alconnect/ALSpeech
     V4L2ImageTranscriber
+    NaoImageTranscriber
     )
 ENDIF()
 

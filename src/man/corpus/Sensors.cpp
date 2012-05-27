@@ -677,15 +677,13 @@ const uint8_t* Sensors::getColorImage(Camera::Type which) const {
 void Sensors::setNaoImagePointer(char* _naoImage, Camera::Type which) {
     if(which == Camera::BOTTOM)
     {
-        cout << "Set bottom image ptr." << endl;
         bottomImage = reinterpret_cast<uint8_t*>(_naoImage);
-        roboImage.updateImagePointer(bottomImage);
+        // roboImage.updateImagePointer(bottomImage);
     }
     else
     {
-        cout << "Set top image ptr." << endl;
         topImage = reinterpret_cast<uint8_t*>(_naoImage);
-        roboImage.updateImagePointer(topImage);
+        //  roboImage.updateImagePointer(topImage);
     }
 }
 

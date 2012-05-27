@@ -74,7 +74,7 @@
 namespace man {
 namespace corpus {
 
-class V4L2ImageTranscriber: public ThreadedImageTranscriber {
+class V4L2ImageTranscriber: public ImageTranscriber {
 
 public:
 
@@ -86,12 +86,10 @@ public:
         return &settings;
     }
 
-    int start();
-    void run();
-    void stop();
     bool waitForImage();
     bool releaseBuffer();
     void releaseImage(){}
+
     /**
      * Note: this method blocks until it gets a new image
      */
