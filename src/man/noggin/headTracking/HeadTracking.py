@@ -65,7 +65,6 @@ class HeadTracking(FSA.FSA):
 
     def kickScan(self):
         self.switchTo('kickScan')
-        
 
     def trackBall(self):
         """
@@ -100,6 +99,7 @@ class HeadTracking(FSA.FSA):
         self.activeLocOn = False
         self.switchTo('locPans')
 
+    # Marked for deprecation
     def activeLoc(self):
         """
         If ball is visible and close, track it via vision values.
@@ -118,6 +118,7 @@ class HeadTracking(FSA.FSA):
     # and activeLoc because they are the only states
     # that directly initially call activeTracking
 
+    # Marked for deprecation
     def activeLocGoaliePos(self):
         """looks at the ball for shorter amount of time than activeLoc"""
         self.target = self.brain.ball

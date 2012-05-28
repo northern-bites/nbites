@@ -184,7 +184,7 @@ def avoidLeftObstacle(nav):
 
 def avoidRightObstacle(nav):
     """
-    dodges left if we only detect something to the left of us
+    dodges left if we only detect something to the right of us
     """
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
