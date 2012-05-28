@@ -65,8 +65,8 @@ BOOST_PYTHON_MODULE(_localization)
              "reset the localization system")
         .def("redGoalieReset", &PyLoc::redGoalieReset,
              "reset the localization system")
-		.def("resetLocTo", &PyLoc::resetLocTo,
-			 "reset the localiation system to a specific location")
+	.def("resetLocTo", &PyLoc::resetLocTo,
+	     "reset the localiation system to a specific location")
         ;
 }
 
