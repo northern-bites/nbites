@@ -194,6 +194,7 @@ def look(tracker):
     return tracker.stay()
 
 #us open 12 hack
+# Marked for deprecation.
 def kickScan(tracker):
     """
     Pan up quickly, back to original angles, then stop.
@@ -207,7 +208,7 @@ def kickScan(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goNow('returnHeadsPan')
-    
+
     return tracker.stay()
 
 def scanQuickUp(tracker):
