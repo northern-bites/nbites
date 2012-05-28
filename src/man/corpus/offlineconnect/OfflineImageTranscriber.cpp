@@ -2,6 +2,7 @@
 #include "OfflineImageTranscriber.h"
 #include "ImageAcquisition.h"
 #include "VisionDef.h" // IMAGE_BYTE_SIZE
+#include "Camera.h"
 
 using namespace std;
 
@@ -53,18 +54,18 @@ void OfflineImageTranscriber::initTable(const string &filename) {
 }
 
 void OfflineImageTranscriber::acquireNewImage() {
-    if (sensors->getWriteableNaoImage() != NULL) {
+    if (sensors->getWriteableNaoImage(Camera::BOTTOM) != NULL) {
         // TODO:
         // this is how we make the image that gets passed to man offline
         // appear valid in the memory viewer; this is slow; investigate a
         // better way to do this
-        memcpy(sensors->getWriteableNaoImage(),
+        memcpy(sensors->getWriteableNaoImage(Camera::BOTTOM),
               reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
                NAO_IMAGE_BYTE_SIZE);
         ImageAcquisition::acquire_image_fast(table, params,
-                sensors->getNaoImage(),
+                                             sensors->getNaoImage(Camera::BOTTOM),
                 image);
-        sensors->setImage(image);
+        sensors->setImage(image, Camera::BOTTOM);
         sensors->notifyNewNaoImage();
     } else {
         ImageAcquisition::acquire_image_fast(table, params,

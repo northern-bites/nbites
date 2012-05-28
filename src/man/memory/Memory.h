@@ -29,6 +29,7 @@ class Memory; //forward declaration
 #include "MVisionSensors.h"
 #include "MMotionSensors.h"
 #include "MImage.h"
+#include "Camera.h"
 #include "MLocalization.h"
 #include "Sensors.h"
 #include "Profiler.h"
@@ -64,7 +65,7 @@ public:
     MVision::const_ptr getMVision() const {return mVision;}
     MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
     MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
-    MImage::const_ptr getMImage() const {return mImage;}
+    MImage::const_ptr getMImage(corpus::Camera::Type which) const;
 
     MObject::const_ptr getMObject(MObject_ID id) const;
     MObject::ptr getMutableMObject(MObject_ID id);
@@ -79,7 +80,8 @@ private:
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
-    boost::shared_ptr<MImage> mImage;
+    boost::shared_ptr<MImage> bottomMImage;
+    boost::shared_ptr<MImage> topMImage;
     boost::shared_ptr<MLocalization> mLocalization;
 };
 }

@@ -70,24 +70,6 @@ using boost::shared_ptr;
 Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr)
 {
-
-    // loads the color table on the MS into memory
-#if ROBOT(NAO_RL)
-# if ! defined WEBOTS_BACKEND && ! defined OFFLINE
-    initTable("/home/nao/nbites/lib/table/table.mtb");
-# elif defined WEBOTS_BACKEND
-    initTable(string(string(getenv("WEBOTS_HOME"))+
-                     "/projects/contests/robotstadium/" +
-                     "controllers/nao_team_1/lib/table.mtb"));
-
-# endif
-
-#elif ROBOT(NAO_SIM)
-#  error Compressed table not set up for simulator Nao yet
-#else
-#  error Undefined robot type
-#endif // OFFLINE
-
     // Set up object recognition object pointers
     field = new Field(vision, this);
     context = new Context(vision, this, field);

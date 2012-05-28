@@ -12,6 +12,7 @@
 #include "MObject.h"
 #include "Sensors.h"
 #include "ClassHelper.h"
+#include "Camera.h"
 
 namespace man {
 namespace memory {
@@ -27,6 +28,7 @@ public:
 
 public:
     MImage(boost::shared_ptr<Sensors> sensors,
+           corpus::Camera::Type type,
            PImage_ptr data = PImage_ptr(new proto::PImage));
     virtual ~MImage();
     /**
@@ -44,6 +46,7 @@ private:
     boost::shared_ptr<Sensors> sensors;
     PImage_ptr data;
     PImage_ptr thresholded_data;
+    corpus::Camera::Type cameraType;
 };
 }
 }

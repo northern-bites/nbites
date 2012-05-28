@@ -1,5 +1,6 @@
 
 #include "MemoryViewer.h"
+#include "Camera.h"
 #include <vector>
 #include "image/FastYUVToBMPImage.h"
 
@@ -9,10 +10,12 @@ namespace viewer {
 using namespace data;
 using namespace man::memory;
 using namespace qtool::image;
+using namespace man::corpus;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager) {
-    MImage::const_ptr rawMImage = memoryManager->getMemory()->getMImage();
+    MImage::const_ptr rawMImage = memoryManager->getMemory()->
+        getMImage(Camera::TOP);
     FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(rawMImage, this);
 
 
