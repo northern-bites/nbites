@@ -284,23 +284,144 @@ namespace PF
 	const float SIGMA_RESET_Y = 15.0f;
 	const float SIGMA_RESET_H = 0.2f;
 
-	// Reset the estimates. 
+	const float TOTAL_UNITS = 2*boost::math::constants::pi<float>() +
+	                            parameters.fieldWidth + parameters.fieldHeight;
+
+	// We want to weight x,y,& h equally in our maginitude vector for scoring
+	const float COEFF_RESET_X = TOTAL_UNITS / parameters.fieldWidth;
+	const float COEFF_RESET_Y = TOTAL_UNITS / parameters.fieldHeight;
+	const float COEFF_RESET_H = TOTAL_UNITS / 2*boost::math::constants::pi<float>();
+
+	// Determine the worst particle that could be chosen with the gaussian
+	// Multiply by 3 standard deviations to assume particles are within 99%
+	// of the distribution
+	const float WORST_MAGNITUDE = sqrt( pow (3 * COEFF_RESET_X * SIGMA_RESET_X, 2)
+					    + pow (3 * COEFF_RESET_Y * SIGMA_RESET_Y, 2)
+					    + pow (3 * COEFF_RESET_H * SIGMA_RESET_H, 2));
+
+	float scoreSum = 0;
+
+	// Reset the estimates.
 	xEstimate = x;
 	yEstimate = y;
 	hEstimate = h;
 
 	particles.clear();
 
-	// @todo assign weights properly
-	float weight = 1.0f/(parameters.numParticles*1.0f);
-
 	for(int i = 0; i < parameters.numParticles; ++i)
 	{
-	    LocalizationParticle p(Location(sampleNormal(x, SIGMA_RESET_X),
-				            sampleNormal(y, SIGMA_RESET_Y),
-				            sampleNormal(h, SIGMA_RESET_H)), weight);
+	    // Get the new particles x,y, and h
+	    float pX = sampleNormal(x, SIGMA_RESET_X);
+	    float pY = sampleNormal(y, SIGMA_RESET_Y);
+	    float pH = sampleNormal(h, SIGMA_RESET_H);
 
+	    //Determine the particles score
+	    float score = WORST_MAGNITUDE - sqrt( pow (COEFF_RESET_X * (x+pX), 2)
+						  + pow (COEFF_RESET_Y * (y+pY), 2)
+						  + pow (COEFF_RESET_H * (h+pH), 2));
+
+	    LocalizationParticle p(Location(pX,pY,pH), score);
+
+	    scoreSum += score;
 	    particles.push_back(p);
 	}
+
+	// Normalize the particles weights
+	PF::ParticleIt partIter;
+	for(partIter = particles.begin(); partIter != particles.end(); partIter++)
+	{
+	    LocalizationParticle p = *partIter;
+	    p.setWeight(p.getWeight()/scoreSum);
+	}
+
     }
+
+    /**
+     * Overloaded resetLocTo, resets Loc to 2 possible Locations
+     *
+     * @param x the first Locations x-coordinate.
+     * @param y the first Locations y-coordinate.
+     * @param h the first Locations heading (radians).
+     * @param x_ the second Locations x-coordinate.
+     * @param y_ the second Locations y-coordinate.
+     * @param h_ the second Locations heading (radians).
+     */
+    void ParticleFilter::resetLocTo(float x, float y, float h,
+				    float x_, float y_, float h_)
+    {
+	const float SIGMA_RESET_X = 15.0f;
+	const float SIGMA_RESET_Y = 15.0f;
+	const float SIGMA_RESET_H = 0.2f;
+
+	const float TOTAL_UNITS = 2*boost::math::constants::pi<float>() +
+	                            parameters.fieldWidth + parameters.fieldHeight;
+
+	// We want to weight x,y,& h equally in our maginitude vector for scoring
+	const float COEFF_RESET_X = TOTAL_UNITS / parameters.fieldWidth;
+	const float COEFF_RESET_Y = TOTAL_UNITS / parameters.fieldHeight;
+	const float COEFF_RESET_H = TOTAL_UNITS / 2*boost::math::constants::pi<float>();
+
+	// Determine the worst particle that could be chosen with the gaussian
+	// Multiply by 3 standard deviations to assume particles are within 99%
+	// of the distribution
+	const float WORST_MAGNITUDE = sqrt( pow (3 * COEFF_RESET_X * SIGMA_RESET_X, 2)
+					    + pow (3 * COEFF_RESET_Y * SIGMA_RESET_Y, 2)
+					    + pow (3 * COEFF_RESET_H * SIGMA_RESET_H, 2));
+
+	float scoreSum = 0;
+
+	// Reset the estimates. Choose the first location for convention
+	xEstimate = x;
+	yEstimate = y;
+	hEstimate = h;
+
+	particles.clear();
+
+	for(int i = 0; i < (parameters.numParticles / 2); ++i)
+	{
+	    // Get the new particles x,y, and h
+	    float pX = sampleNormal(x, SIGMA_RESET_X);
+	    float pY = sampleNormal(y, SIGMA_RESET_Y);
+	    float pH = sampleNormal(h, SIGMA_RESET_H);
+
+	    //Determine the particles score
+	    float score = WORST_MAGNITUDE - sqrt( pow (COEFF_RESET_X * (x+pX), 2)
+						  + pow (COEFF_RESET_Y * (y+pY), 2)
+						  + pow (COEFF_RESET_H * (h+pH), 2));
+
+	    LocalizationParticle p(Location(pX,pY,pH), score);
+
+	    scoreSum += score;
+	    particles.push_back(p);
+	}
+
+	for(int i = 0; i < ((parameters.numParticles + 1) / 2); ++i)
+	{
+	    // Get the new particles x,y, and h
+	    float pX = sampleNormal(x_, SIGMA_RESET_X);
+	    float pY = sampleNormal(y_, SIGMA_RESET_Y);
+	    float pH = sampleNormal(h_, SIGMA_RESET_H);
+
+	    //Determine the particles score
+	    float score = WORST_MAGNITUDE - sqrt( pow (COEFF_RESET_X * (x_+pX), 2)
+						  + pow (COEFF_RESET_Y * (y_+pY), 2)
+						  + pow (COEFF_RESET_H * (h_+pH), 2));
+
+	    LocalizationParticle p(Location(pX,pY,pH), score);
+
+	    scoreSum += score;
+	    particles.push_back(p);
+	}
+
+	// Normalize the particles weights
+	PF::ParticleIt partIter;
+	for(partIter = particles.begin(); partIter != particles.end(); partIter++)
+	{
+	    LocalizationParticle p = *partIter;
+	    p.setWeight(p.getWeight()/scoreSum);
+	}
+
+    }
+
+
 }

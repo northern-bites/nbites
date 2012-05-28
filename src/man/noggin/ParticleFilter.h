@@ -1,6 +1,6 @@
 /**
- * Basic implementation of a particle filter for 
- * robot localization purposes. 
+ * Basic implementation of a particle filter for
+ * robot localization purposes.
  *
  * @author Ellis Ratner <eratner@bowdoin.edu>
  * @date   May 2012
@@ -25,7 +25,7 @@ namespace PF
 {
     /**
      * Contains a complete field location (x, y, angle).
-     * Note that the angle is defined as increasing in the 
+     * Note that the angle is defined as increasing in the
      * counter-clockwise direction, and is 0 and 2*PI
      * at 12 o'clock (parallel to the positive y axis.)
      */
@@ -63,14 +63,14 @@ namespace PF
 
     struct ParticleFilterParams
     {
-	int fieldHeight;                // Field height. 
+	int fieldHeight;                // Field height.
 	int fieldWidth;                 // Field width.
 	int numParticles;               // Size of particle population.
 	float alpha_fast;               // Weight factor for fast exponential weight filter.
 	float alpha_slow;               // Weight factor for slow exponential weight filter.
     };
 
-    static const ParticleFilterParams DEFAULT_PARAMS = 
+    static const ParticleFilterParams DEFAULT_PARAMS =
     {
 	FIELD_WHITE_HEIGHT,
 	FIELD_WHITE_WIDTH,
@@ -88,11 +88,11 @@ namespace PF
      * represents a single localization hypothesis.
      */
     class LocalizationParticle
-    { 
+    {
     public:
 	LocalizationParticle(Location l, float w);
 	LocalizationParticle();
-	
+
 	~LocalizationParticle() { }
 
 	Location getLocation() const { return location; }
@@ -105,7 +105,7 @@ namespace PF
 	void setY(float y) { location.y = y; }
 	void setH(float h) { location.heading = h; }
 
-	friend bool operator <(const LocalizationParticle& first, 
+	friend bool operator <(const LocalizationParticle& first,
 			       const LocalizationParticle& second);
 
 	friend std::ostream& operator<<(std::ostream& out, LocalizationParticle p)
@@ -132,7 +132,7 @@ namespace PF
     class ParticleFilter : public LocSystem
     {
     public:
-        ParticleFilter(boost::shared_ptr<MotionModel> motion, 
+        ParticleFilter(boost::shared_ptr<MotionModel> motion,
 		       boost::shared_ptr<SensorModel> sensor,
 	               ParticleFilterParams params = DEFAULT_PARAMS);
 	~ParticleFilter();
@@ -152,7 +152,7 @@ namespace PF
 				const std::vector<PointObservation>& pt_z,
 				const std::vector<CornerObservation>& c_z)
 	{
-	    // Just run the next iteration of the particle filter. 
+	    // Just run the next iteration of the particle filter.
 	    run();
 	}
 
@@ -176,11 +176,11 @@ namespace PF
 
 	std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
 
-	
+
 	std::vector<CornerObservation> getLastCornerObservations() const { return std::vector<CornerObservation>(); }
 
 	bool isActive() const { return true; }
-	
+
         void setXEst(float xEst) { xEstimate = xEst; }
 	void setYEst(float yEst) { yEstimate = yEst; }
 	void setHEst(float hEst) { hEstimate = hEst; }
@@ -210,7 +210,7 @@ namespace PF
 
     /**
      * The abstract interface for providing motion updates
-     * to the particle filter. Must implement a control 
+     * to the particle filter. Must implement a control
      * update method.
      */
     class MotionModel
@@ -236,7 +236,7 @@ namespace PF
 
 	/**
 	 * These methods allow the client to access information as
-	 * to whether or not the SensorModel has performed an 
+	 * to whether or not the SensorModel has performed an
 	 * update on the latest iteration.
 	 */
 	bool hasUpdated() const { return updated; }
@@ -251,7 +251,7 @@ namespace PF
      * mean and standard deviation (sigma.)
      * @param mean the mean of the data.
      * @param sigma the standard deviation of the data.
-     * @return A random sample of the specified normal 
+     * @return A random sample of the specified normal
      *         distribution.
      */
     static float sampleNormal(float mean, float sigma)
@@ -261,14 +261,14 @@ namespace PF
 
 	boost::normal_distribution<float> dist(mean, sigma);
 
-	boost::variate_generator<boost::mt19937&, 
+	boost::variate_generator<boost::mt19937&,
 	    boost::normal_distribution<float> > sample(rng, dist);
 
 	return sample();
     }
 
     /**
-     * Finds the position vector to the point (x, y) in the 
+     * Finds the position vector to the point (x, y) in the
      * specified coordinate frame.
      * @param origin the specified origin of the coordinate
      *               frame.
