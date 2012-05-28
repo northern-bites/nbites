@@ -45,7 +45,7 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.LEFT_BIG_KICK)
+        player.executeMove(SweetMoves.SHORT_QUICK_LEFT_KICK)
     if player.brain.nav.isStopped() and player.counter > 1:
         return player.goLater('done')
     return player.stay()
