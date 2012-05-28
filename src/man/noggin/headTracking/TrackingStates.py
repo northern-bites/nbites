@@ -38,7 +38,7 @@ def tracking(tracker):
 
     if tracker.target.vis.on:
         tracker.helper.trackObject()
-#    else: 
+#    else:
 #        tracker.helper.lookToPoint(tracker.target)
 
     if not tracker.target.vis.on and tracker.counter > 15:

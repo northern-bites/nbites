@@ -28,10 +28,10 @@ def goToPosition(nav):
     Absolute locations get transformed to relative locations based on current loc
     For relative locations we use our bearing to that point as the heading 
     """
-        
+
     relDest = helper.getRelativeDestination(nav.brain.my, goToPosition.dest)
     goToPosition.deltaDest = relDest # cache it for later use
-        
+
 #    if nav.counter % 10 is 0:
 #        print "going to " + str(relDest)
 #        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX, 

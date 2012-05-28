@@ -42,17 +42,17 @@ class Navigator(FSA.FSA):
 
         self.shouldAvoidObstacleLeftCounter = 0
         self.shouldAvoidObstacleRightCounter = 0
-        
+
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination)
-        self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition, 
+        self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition,
                                                                   Transition.SOME_OF_THE_TIME,
                                                                   Transition.LOW_PRECISION)
         self.walkingToTransition = Transition.CountTransition(navTrans.walkedEnough,
                                                               Transition.ALL_OF_THE_TIME,
                                                               Transition.INSTANT)
-        
+
         NavStates.goToPosition.transitions = { NavStates.atPosition: self.atLocPositionTransition }
         NavStates.atPosition.transitions = { NavStates.goToPosition: self.locRepositionTransition }
         NavStates.walkingTo.transitions = { NavStates.standing: self.walkingToTransition }
@@ -69,39 +69,39 @@ class Navigator(FSA.FSA):
 
     def positionPlaybook(self):
         self.goTo(self.brain.play.getPosition())
-        
+
     def chaseBall(self):
         self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, FULL_SPEED)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, adaptive = False):
         """
         General go to method
-        Ideal for going to a field position, or for going to a 
+        Ideal for going to a field position, or for going to a
         relative location that we can track/see
-        
-        @param dest: must be a Location, RobotLocation, RelLocation 
+
+        @param dest: must be a Location, RobotLocation, RelLocation
         or RelRobotLocation.
         If you want to update the destination, you can just modify the instance
         you passed to goTo (so for example if you passed ball.loc as a destination,
         then you wouldn't have to do anything since the ball's position updates
         automatically).
         Alternatively, you can use updateDest to change the destination.
-        This is especially important if dest is a relative location, 
-        since there's no way for the robot to keep track of how close it is to the 
+        This is especially important if dest is a relative location,
+        since there's no way for the robot to keep track of how close it is to the
         location, so if you don't update it it will keep walking to that destination
         indefinitely
-        @param speedGain: controls how fast the robot does the goTo; use provided 
+        @param speedGain: controls how fast the robot does the goTo; use provided
         constants for some good ballparks
-        @param precision: a tuple of deltaX, deltaY, deltaH for how close you want to get 
+        @param precision: a tuple of deltaX, deltaY, deltaH for how close you want to get
         to the location
         @param adaptive: if true, then the speed is adapted to how close the target is
         and the speed paramater is interpreted as the maximum speed
         """
-        
+
         self.updateDest(dest, speed)
         NavStates.goToPosition.precision = precision
         NavStates.goToPosition.adaptive = adaptive
-        
+
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
 
