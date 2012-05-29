@@ -107,6 +107,14 @@ def gameSet(player):
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
 
+    # For the goalie, reset loc every frame.
+    # This way, garaunteed to have correctly set loc and be standing in that
+    #  location for a frame before gamePlaying begins.
+    if player.brain.play.isRole(GOALIE):
+        player.brain.loc.resetLocTo(player.brain.FIELD_WHITE_LEFT_SIDELINE_X,
+                                    player.brain.MIDFIELD_Y,
+                                    0)
+
     return player.stay()
 
 def gamePlaying(player):
@@ -119,7 +127,12 @@ def gamePlaying(player):
             if player.lastStateTime > 25:
                 # 25 is arbitrary. This check is meant to catch human error and
                 # possible 0 sec. penalties for the goalie
-                player.brain.resetLocalization()
+                player.brain.loc.resetLocTo(player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            player.brain.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                            90,
+                                            player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
+                                            -90)
                 return player.goLater('afterPenalty')
                 # 2011 rules have no 0 second penalties for any robot,
                 # but check should be here if there is.
