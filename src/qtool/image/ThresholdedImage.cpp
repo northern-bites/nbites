@@ -14,19 +14,25 @@ bool ThresholdedImage::needToResizeBitmap() const {
 }
 
 void ThresholdedImage::buildBitmap() {
-    if (this->needToResizeBitmap()) {
-        bitmap = QImage(rawImage->width(),
-                        rawImage->height(),
-                        QImage::Format_RGB32);
-    }
+//    if (this->needToResizeBitmap()) {
+//        bitmap = QImage(rawImage->width(),
+//                        rawImage->height(),
+//                        QImage::Format_RGB32);
+//    }
+
+    QImage qimage = QImage(rawImage->width(),
+                           rawImage->height(),
+                           QImage::Format_RGB32);
 
     for (int j = 0; j < getHeight(); ++j) {
-        QRgb* bitmapLine = (QRgb*) bitmap.scanLine(j);
+        QRgb* bitmapLine = (QRgb*) qimage.scanLine(j);
         for (int i = 0; i < getWidth(); ++i) {
             int color = rawImage->image()[j*rawImage->width() + i];
             bitmapLine[i] = Color_RGB[color];
         }
     }
+
+    bitmap = QPixmap::fromImage(qimage);
 }
 }
 }

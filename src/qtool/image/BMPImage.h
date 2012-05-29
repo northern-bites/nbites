@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <QImage>
+#include <QPixmap>
 #include <QPainter>
 #include "ClassHelper.h"
 
@@ -22,8 +22,8 @@ public:
     BMPImage(QObject* parent = 0) : QObject(parent) {}
     virtual ~BMPImage() {}
 
-    const QImage* getBitmap() const { return &bitmap; }
-    QImage* getBitmap() { return &bitmap; }
+    const QPixmap* getBitmap() const { return &bitmap; }
+    QPixmap* getBitmap() { return &bitmap; }
 
     virtual unsigned getWidth() const = 0;
     virtual unsigned getHeight() const = 0;
@@ -41,7 +41,7 @@ protected:
     virtual void buildBitmap() = 0;
 
 protected:
-    QImage bitmap;
+    QPixmap bitmap;
 
 };
 
@@ -68,17 +68,17 @@ protected:
     virtual void buildBitmap() {
 
         baseImage->updateBitmap();
-        overlayedImage->updateBitmap();
 
         if (bitmap.height() < getHeight() || bitmap.width() < getWidth()) {
-            bitmap = QImage(getWidth(), getHeight(), QImage::Format_ARGB32_Premultiplied);
+            bitmap = QPixmap(getWidth(), getHeight());
         }
 
         QPainter painter(&bitmap);
 
-        painter.drawImage(0, 0, *(baseImage->getBitmap()));
+        painter.drawPixmap(0, 0, *(baseImage->getBitmap()));
         if (overlayedImage) {
-            painter.drawImage(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
+            overlayedImage->updateBitmap();
+            painter.drawPixmap(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
         }
     }
 

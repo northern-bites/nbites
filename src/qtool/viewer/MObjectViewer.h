@@ -32,6 +32,9 @@ public:
 public slots:
     void updateView();
 
+protected:
+    void showEvent(QShowEvent* event);
+
 private:
     void createNewTreeModel();
 
