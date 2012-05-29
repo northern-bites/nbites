@@ -60,6 +60,8 @@ public:
     int  distance(int x, int x1, int x2, int x3);
     void printBlob(Blob a);
     void setImageBox(int i, int j, int value);
+    void incImageBox(int i, int j) {imageBoxes[i][j] += 1;}
+    int getImageBox(int i, int j) {return imageBoxes[i][j];}
 
 #ifdef OFFLINE
     void setDebugRobots(bool debug) {debugRobots = debug;}

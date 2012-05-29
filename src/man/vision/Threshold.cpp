@@ -112,7 +112,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 void Threshold::visionLoop() {
     // threshold image and create runs
     thresholdAndRuns();
-    newFindRobots();
+    //newFindRobots();
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
@@ -808,6 +808,8 @@ bool Threshold::checkRobotAgainstBluePost(VisualRobot* robot,
 }
 
 void Threshold::newFindRobots() {
+  
+
     //this is the robot detection method.
     //we perform robot detection by performing another pass through the image
     //and looking for filled macro pixels of red or navy.
@@ -815,7 +817,7 @@ void Threshold::newFindRobots() {
     //we want macro pixels of this size
   int widthScale = Robots::widthScale;
   int heightScale = Robots::heightScale;
-    unsigned char pixel = GREEN;
+  unsigned char pixel = GREEN;
     float navyColorCount = 0;
     float redColorCount = 0;
     float totalCellCount = (float)(widthScale * heightScale);
@@ -826,27 +828,29 @@ void Threshold::newFindRobots() {
     //in that particular macro pixel
     for (int i = 0; i < IMAGE_WIDTH; i += widthScale){
         for (int j = 0; j < IMAGE_HEIGHT; j += heightScale) {
-            for (int x = 0; x < widthScale; x++) {
-                for (int y = 0; y < heightScale; y++) {
-                    pixel = getThresholded(j+y, i+x);
-                    if (Utility::isNavy(pixel))
-                        navyColorCount++;
-                    else if (Utility::isRed(pixel))
-                        redColorCount++;
-                }
-            }
-            if (navyColorCount/totalCellCount >= 0.6) {
-                navyblue->setImageBox(i/widthScale, j/heightScale, 1);
+	  pixel = getThresholded(j, i);                
+	  if (Utility::isNavy(pixel))
+	    navyblue->incImageBox(i/widthScale, j/heightScale);
+	  else if (Utility::isRed(pixel))
+	    red->incImageBox(i/widthScale, j/heightScale);
+	}
+    }
+    for (int i = 0; i < IMAGE_WIDTH/widthScale; i++) {
+      for (int j = 0; j < IMAGE_HEIGHT/heightScale; j++) {
+	navyColorCount = navyblue->getImageBox(i, j);
+	redColorCount = red->getImageBox(i, j);
+	if (navyColorCount/totalCellCount >= 0.6) {
+	  navyblue->setImageBox(i, j, 1);
                 //the following line allows us to see which pixel has been activated.
                 //vision->drawRect(i, j, widthScale, heightScale, MAROON);
-            }
-            if (redColorCount/totalCellCount >= 0.4) {
-                red->setImageBox(i/widthScale, j/heightScale, 1);
-                //vision->drawRect(i, j, widthScale, heightScale, WHITE);
-            }
-            navyColorCount = 0;
-            redColorCount = 0;
-        }
+	}
+	if (redColorCount/totalCellCount >= 0.4) {
+	  red->setImageBox(i, j, 1);
+	  //vision->drawRect(i, j, widthScale, heightScale, WHITE);
+	}
+	navyColorCount = 0;
+	redColorCount = 0;
+      }
     }
 }
 
@@ -859,8 +863,8 @@ void Threshold::objectRecognition() {
     // now get the posts and goals
         // we need to make the white blobs before checking on robots
     cross->createObject();
-    red->findRobots(cross);
-    navyblue->findRobots(cross);
+    //red->findRobots(cross);
+    //navyblue->findRobots(cross);
     unid->findRobots(cross);
     yellow->createObject();
     blue->createObject();
@@ -1638,11 +1642,16 @@ void Threshold::initDebugImage(){
  * to the real image.
  */
 void Threshold::transposeDebugImage(){
-#if defined OFFLINE && defined DEBUG_IMAGE
-    for(int x = 0 ; x < IMAGE_WIDTH;x++)
-        for(int y = 0; y < IMAGE_HEIGHT;y++)
-            if(debugImage[y][x]!=GREY){
-                thresholded[y][x] = debugImage[y][x];}
+#if defined OFFLINE
+    for(int x = 0 ; x < IMAGE_WIDTH; x++) {
+      for(int y = 0; y < IMAGE_HEIGHT; y++) {
+	if(debugImage[y][x] != GREY){
+	  setThresholded(y, x, debugImage[y][x]);
+	}
+      }
+    }
+  
+    initDebugImage();
 #endif
 }
 

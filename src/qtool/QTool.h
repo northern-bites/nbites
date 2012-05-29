@@ -15,6 +15,7 @@
 #include "data/DataManager.h"
 #include "colorcreator/ColorCalibrate.h"
 #include "viewer/MemoryViewer.h"
+#include "viewer/VisionViewer.h"
 #include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
 #include "viewer/FieldViewer.h"
@@ -45,12 +46,11 @@ private slots:
 private:
     QTabWidget* toolTabs;
 
-    QScrollArea *colorScrollArea;
-
     data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
     colorcreator::ColorCalibrate* colorCalibrate;
     viewer::MemoryViewer* memoryViewer;
+    viewer::VisionViewer* visionViewer;
     offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
