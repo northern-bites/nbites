@@ -43,9 +43,9 @@ def spinScanBall(tracker):
     if tracker.target == ball and \
             tracker.target.vis.framesOn >= constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.activeLocOn = False
-        return tracker.goNow('ballSpinTracking')
+        return tracker.goNow('tracking')
 
-    if nav.walkTheta > 0:
+    if nav.isSpinningLeft():
         tracker.headMove = HeadMoves.LEFT_EDGE_SCAN_BALL
     else:
         tracker.headMove = HeadMoves.RIGHT_EDGE_SCAN_BALL
@@ -169,14 +169,12 @@ def returnHeadsPan(tracker):
     Return the head angles to pre-active pan position.
     """
     if tracker.firstFrame():
-        tracker.brain.motion.stopHeadMoves()
-        tracker.helper.panTo(tracker.preActivePanHeads)
+        tracker.helper.panTo(tracker.preKickPanHeads)
         return tracker.stay()
 
     if not tracker.brain.motion.isHeadActive() or \
             tracker.target.vis.on:
         tracker.helper.trackObject()
-        return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()
 
@@ -193,6 +191,23 @@ def look(tracker):
     if tracker.brain.ball.vis.on:
         return tracker.goNow('ballTracking')
 
+    return tracker.stay()
+
+#us open 12 hack
+def kickScan(tracker):
+    """
+    Pan up quickly, back to original angles, then stop.
+    """
+    if tracker.firstFrame():
+        motionAngles = tracker.brain.sensors.motionAngles
+        tracker.preKickPanHeads = (motionAngles[MotionConstants.HeadYaw],
+                                     motionAngles[MotionConstants.HeadPitch])
+        tracker.helper.executeHeadMove(HeadMoves.KICK_SCAN)
+        return tracker.stay()
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goNow('returnHeadsPan')
+    
     return tracker.stay()
 
 def scanQuickUp(tracker):

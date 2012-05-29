@@ -20,7 +20,7 @@ void BMPYUVImage::buildBitmap() {
     if (this->needToResizeBitmap()) {
         bitmap = QImage(yuvImage.getWidth(),
                         yuvImage.getHeight(),
-                        QImage::Format_RGB32);
+                        QImage::Format_ARGB32);
     }
 
     Color c;

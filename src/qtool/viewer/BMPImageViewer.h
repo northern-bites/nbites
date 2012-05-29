@@ -29,7 +29,7 @@ public:
         return QSize(image->getWidth(), image->getHeight());
     }
 
-protected slots:
+public slots:
     void updateView();
 
 protected:

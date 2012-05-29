@@ -22,14 +22,14 @@ def read_hostname():
 #board, however, reading this is not currently setup. -js
 
 marvin = BirthCertificate.BirthCertificate(
-			name='marvin',
-			long_name='Marvin the Paranoid Android',
-			tts_name='marvin',
+			name='zoe',
+			long_name='Zoe Washburne',
+			tts_name='zoe',
 			doc='''\
-I am Marvin the Paranoid Android. Forced to suffer millenia in abjecet boredom,
-Marvin was eventually kidnapped by the Krikkit robots who wished to use his
-vast intelligence for evil. However, Marvin's depression infects his captors
-and is thus responsible for saving the Universe.''',
+I am Zoe Washburne. I served with Mal during the Unification War and stuck
+with him when he bought Serenity. As second-in-command, I back Mal up during
+our jobs and can stay completely cool when we're in hot water. Although I may
+seem more tough than lovable, I'm married to Wash.''',
 			gait = gaits.MARVIN_GAIT,
 			dribble_gait = gaits.MARVIN_DRIBBLE_GAIT,
 			backwards_gait = gaits.MARVIN_BACKWARDS_GAIT,
@@ -39,14 +39,14 @@ and is thus responsible for saving the Universe.''',
 			)
 
 slarti = BirthCertificate.BirthCertificate(
-			name="slarti",
-			long_name="Slartibartfast",
-			tts_name="slartibartfast",
+			name="wash",
+			long_name="Hoban Washburne",
+			tts_name="wash",
 			doc='''\
-I am Slartibartfast of Magrathea.  I am best known for my award-winning
-fjords on the coastline of Norway.	Join me in CamTim, the Campaign for
-Real Time, and stop the robots of Krikkit from bringing together the
-pieces of the Wikkit Gate!''',
+I am Hoban Washburne, better known as Wash. I am the pilot of Serenity and
+am married to Zoe. My collection of toy dinosaurs keep me company as I
+expertly maneuver the ship from planet to planet. I am a leaf on the wind;
+watch how I soar...''',
 			gait = gaits.SLARTI_GAIT,
 			dribble_gait = gaits.SLARTI_DRIBBLE_GAIT,
 			backwards_gait = gaits.SLARTI_BACKWARDS_GAIT,
@@ -56,12 +56,14 @@ pieces of the Wikkit Gate!''',
 			)
 
 trillian = BirthCertificate.BirthCertificate(
-			name='trillian',
-			long_name='Tricia MacMillan',
-			tts_name='trillian',
+			name='mal',
+			long_name='Malcolm Reynolds',
+			tts_name='mal',
 			doc='''\
-I am Tricia MacMillian. After saving the Universe from the Krikkit
-rebellion, I became a highly successful Sub Etha radio reporter.''',
+I am Malcolm Reynolds, captain of the Firefy-class spaceship Serenity. I fought
+against the Alliance in the Unification war, and now I stick to the outskirts
+of civilization and take whatever work comes my way, legal or no. As long as
+Serenity can keep on flying, it's enough for me.''',
 			gait = gaits.TRILLIAN_GAIT,
 			dribble_gait = gaits.TRILLIAN_DRIBBLE_GAIT,
 			backwards_gait = gaits.TRILLIAN_BACKWARDS_GAIT,
@@ -71,14 +73,14 @@ rebellion, I became a highly successful Sub Etha radio reporter.''',
 			)
 
 zaphod = BirthCertificate.BirthCertificate(
-			name='zaphod',
-			long_name='Zaphod Beeblebrox',
-			tts_name='zafoed beebel brocks',
+			name='river',
+			long_name='River Tam',
+			tts_name='river',
 			doc='''\
-I am Zaphod Bebblebrox. I invented the legendary Pan-Galatic
-Garble Blaster, the strongest drink known to man. As President of the Galaxy, I
-stole the Heart of Gold Spaceship, and helped rescue the Universe from the
-Krikkit robots.''',
+I am River Tam. My brother Simon and I are on the run from the Alliance because
+he saved me from a cruel experimental program where they removed part of my brain.
+Although sometimes mentally unstable, I also have incredible abilities. No
+power in the 'verse can stop me.''',
 			gait = gaits.ZAPHOD_GAIT,
 			dribble_gait = gaits.ZAPHOD_DRIBBLE_GAIT,
 			backwards_gait = gaits.ZAPHOD_BACKWARDS_GAIT,
@@ -88,14 +90,14 @@ Krikkit robots.''',
 			)
 
 spock = BirthCertificate.BirthCertificate(
-		   name='spock',
-		   long_name='Spock',
-		   tts_name='spock',
+		   name='jayne',
+		   long_name='Jayne Cobb',
+		   tts_name='jayne',
 		   doc='''\
-I am Spock. My first name is unpronounceable by you humans. I am the son of a
-Vulcan ambassador, Sarek, and a human, Amanda Grayson. I declined studying at the
-Vulcan Science Academy and joined Starfleet instead. My actions really pissed off
-my father. I provide an emotionally detached, logical perspective to the crew.''',
+I am Jayne Cobb. I'm a total mercenary, so I turned on my old employer and joined
+the crew of Serenity when Mal offered me my own bunk on the ship. Despite my
+selfish personality, I somehow became a hero, statue and all, to a poor town
+where I was forced to drop some money I stole from their rich magistrate.''',
 		   gait = gaits.SPOCK_GAIT,
 		   dribble_gait = gaits.SPOCK_DRIBBLE_GAIT,
 		   backwards_gait = gaits.SPOCK_BACKWARDS_GAIT,

@@ -325,9 +325,10 @@ void ColorTable::write(QString filename, ColorSpace* colorSpaces) {
         {
             for (int y = 0; y < Y_MAX; y++)
             {
-                byte temp = GREY_BIT;
+                byte temp = 0;
                 Color color;
-                color.setYuv((byte) y, (byte) x, (byte) z);
+                assert(2*y >=y && 2*x >= x && 2*z >= z); //overflow
+                color.setYuv((byte) (2*y), (byte) (2*x), (byte) (2*z));
                 for (int c = 0; c < image::NUM_COLORS; c++)
                 {
                     if (colorSpaces[c].contains(color)) {

@@ -87,7 +87,7 @@ public:
     void performHealthCheck();
 
     /**
-     * Saves a report on network health to ~/naoqi/log/network.xls on the robot,
+     * Saves a report on network health to ~/nbites/log/network.xls on the robot,
      * including a histogram of the latency and of dropped packets.
      */
     void logOutput();

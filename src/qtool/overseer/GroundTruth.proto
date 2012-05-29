@@ -1,0 +1,13 @@
+package qtool.overseer.proto;
+
+message GroundTruth {
+
+    optional int64 timestamp = 1;
+    optional Point ball = 2;
+    repeated Point robots = 3;
+    
+    message Point {
+        optional float x = 1;
+        optional float y = 2;
+    }
+}

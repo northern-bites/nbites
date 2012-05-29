@@ -13,7 +13,7 @@
 #include <map>
 
 #include "io/InProvider.h"
-#include "MObjectParser.h"
+#include "MessageParser.h"
 #include "memory/MObject.h"
 #include "memory/Memory.h"
 #include "memory/MemoryCommon.h"
@@ -25,8 +25,8 @@ namespace parse {
 class ParsingBoard {
 
 	typedef common::io::InProvider InProvider;
-	typedef std::pair< MObject_ID, MObjectParser::ptr > ObjectIOPair;
-	typedef std::map< MObject_ID, MObjectParser::ptr > ObjectIOMap;
+	typedef std::pair< MObject_ID, MessageParser::ptr > ObjectIOPair;
+	typedef std::map< MObject_ID, MessageParser::ptr > ObjectIOMap;
 
 public:
     ParsingBoard(Memory::ptr memory);

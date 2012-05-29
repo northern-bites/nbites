@@ -15,6 +15,8 @@ SET( BUILDING_FOR_A_REMOTE_NAO OFF )
 #  SET( CMAKE_C_COMPILER ${CCACHE})
 #endif()
 
+SET( ROBOT_TYPE "NAO_NEXTGEN" )
+
 ######## PyVersion
 ### Note: the robots currently use 2.6, so this is to make sure cmake
 ### looks for the right thing

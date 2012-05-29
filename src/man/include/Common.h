@@ -9,52 +9,34 @@
 #include "NBMath.h"
 //TODO: (Octavian) THIS IS A REALLY SHITTY WAY TO ENSURE THAT THE CONFIG DEFINES
 // ARE DEFINED EVERYWHERE. BEWARE!
+#ifndef NO_MANCONFIG
 #include "manconfig.h"
 #include "nameconfig.h"
 #include "visionconfig.h"
+#endif //NO_MANCONFIG
 #include <time.h>
 #include <assert.h>
 #include <stdint.h>
 
 // ROBOT TYPES
-#define NAO_RL    3
-#define NAO_SIM   4
-#define NAO       5
-#define NAO_RL_33 6  // longer arms, new heads
+#define NAO_RL      3
+#define NAO_SIM     4
+#define NAO         5
+#define NAO_RL_33   6  // longer arms, new heads
+#define NAO_NEXTGEN 7
 
 namespace angle {
     typedef float radians;
     typedef float degrees;
 }
 
-// we set ROBOT_TYPE here for now, not in cmake anymore
-// Nathan 4/18/11
-// @TODO Make this less stupid
-#undef ROBOT_TYPE
-#ifdef ROBOT_NAME_slarti
-  #define ROBOT_TYPE NAO_RL
-#else
-#ifdef ROBOT_NAME_trillian
-  #define ROBOT_TYPE NAO_RL
-#else
-#ifdef ROBOT_NAME_marvin
-  #define ROBOT_TYPE NAO_RL
-#else
-#ifdef ROBOT_NAME_zaphod
-  #define ROBOT_TYPE NAO_RL
-#else
-  #define ROBOT_TYPE NAO_RL_33
-#endif
-#endif
-#endif
-#endif
-
 #define ROBOT(t) ( \
     (t == NAO_RL_33 && ROBOT_TYPE == NAO_RL_33) || \
+    (t == NAO_NEXTGEN && ROBOT_TYPE == NAO_NEXTGEN) || \
     (t == NAO_SIM   && ROBOT_TYPE == NAO_SIM) || \
-    (t == NAO_RL && (ROBOT_TYPE == NAO_RL_33 || ROBOT_TYPE == NAO_RL) ) || \
+    (t == NAO_RL && (ROBOT_TYPE == NAO_RL_33 || ROBOT_TYPE == NAO_RL || ROBOT_TYPE == NAO_NEXTGEN) ) || \
     (t == NAO  && \
-      (ROBOT_TYPE == NAO_RL || ROBOT_TYPE == NAO_RL_33 || ROBOT_TYPE == NAO_SIM) ))
+      (ROBOT_TYPE == NAO_RL || ROBOT_TYPE == NAO_RL_33 || ROBOT_TYPE == NAO_NEXTGEN || ROBOT_TYPE == NAO_SIM) ))
 
 static const int NUM_PLAYERS_PER_TEAM = 4;
 
@@ -78,6 +60,14 @@ typedef unsigned int uint;
 #ifndef byte
 typedef unsigned char byte;
 #endif
+
+#define CHECK_SUCCESS(x) {\
+        int result; \
+        if( (result = (x)) < 0) { \
+            printf("Problem with " #x ", returned %i\n", result); \
+            perror("Error message"); \
+        } \
+}
 
 #include <time.h>
 #include <sys/time.h>

@@ -24,12 +24,11 @@ using Kinematics::jointsMaxVelNoLoad;
 void staticPostSensors(NaoEnactor * n) {
     if (n != NULL) {
         n->postSensors();
-        n->sendCommands();
     }
 }
 void staticSendCommands(NaoEnactor * n) {
     if (n != NULL) {
-        // n->sendCommands();
+         n->sendCommands();
     }
 }
 
@@ -46,7 +45,6 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
         cout << "Failed to initialize proxy to DCM" << endl;
     }
 
-
     initDCMAliases();
     initDCMCommands();
 
@@ -57,9 +55,9 @@ NaoEnactor::NaoEnactor(boost::shared_ptr<Sensors> s,
         dcmPostConnection =
             broker->getProxy("DCM")->getModule()->
             atPostProcess(boost::bind(&staticPostSensors,this));
-        // dcmPreConnection =
-        //     broker->getProxy("DCM")->getModule()->
-        //     atPreProcess(boost::bind(&staticSendCommands,this));
+         dcmPreConnection =
+             broker->getProxy("DCM")->getModule()->
+             atPreProcess(boost::bind(&staticSendCommands,this));
     } catch (AL::ALError& e){
         cout << "Failed to set pre/postprocess DCM commands" << endl;
     }
@@ -95,7 +93,7 @@ void NaoEnactor::sendJoints()
 
 #ifndef NO_ACTUAL_MOTION
     try {
-        joint_command[4][0] = dcmProxy->getTime(10);
+        joint_command[4][0] = dcmProxy->getTime(0);
         dcmProxy->setAlias(joint_command); // Takes a long time for some reason
     }
     catch(AL::ALError& a)
@@ -130,7 +128,7 @@ void NaoEnactor::sendHardness()
 
 #ifndef NO_ACTUAL_MOTION
     try {
-        hardness_command[4][0] = dcmProxy->getTime(10);
+        hardness_command[4][0] = dcmProxy->getTime(0);
         dcmProxy->setAlias(hardness_command);
     } catch(AL::ALError& a) {
         std::cout << "DCM Hardness set error" << a.toString() << "    "

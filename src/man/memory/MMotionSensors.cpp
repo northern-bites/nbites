@@ -11,9 +11,9 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MMotionSensors::MMotionSensors(shared_ptr<Sensors> sensors)
-    : MObject(id), sensors(sensors), data(new PMotionSensors) {
-    MObject::protoMessage = data;
+MMotionSensors::MMotionSensors(shared_ptr<Sensors> sensors, PMotionSensors_ptr data)
+    : MObject(id, data), sensors(sensors), data(data) {
+
 }
 
 MMotionSensors::~MMotionSensors() {
