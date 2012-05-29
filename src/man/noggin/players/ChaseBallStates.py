@@ -15,7 +15,7 @@ def chase(player):
     """
     Super State to determine what to do from various situations
     """
-    
+
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
 
@@ -29,11 +29,11 @@ def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.brain.nav.chaseBall()
-        
+
     # most of the time going to chase will kick back to here, lets us reset
     if transitions.shouldFindBall(player):
         return player.goLater('chase')
-        
+
     if transitions.shouldPrepareForKick(player) or player.brain.nav.isAtPosition():
         if player.shouldKickOff:
             player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -50,18 +50,18 @@ def prepareForKick(player):
         player.brain.tracker.kickScan()
         player.brain.nav.stand()
         return player.stay()
-    
+
     prepareForKick.hackKick.collectData()
-    
+
     if player.brain.tracker.currentState is 'returnHeadsPan':
         prepareForKick.hackKick.calculateDataAverages()
         print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
         print str(player.kick)
         return player.goNow('positionForKick')
-     
+
     return player.stay()
-     
+
 
 def positionForKick(player):
     """
@@ -84,14 +84,14 @@ def positionForKick(player):
         player.inKickingState = False
 
     #only enque the new goTo destination once
-    if player.firstFrame():    
-        player.brain.nav.goTo(positionForKick.kickPose, 
+    if player.firstFrame():
+        player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.CLOSE_ENOUGH,
                               Navigator.CAREFUL_SPEED,
                               Navigator.ADAPTIVE)
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
-        
+
 
     # most of the time going to chase will kick back to here, lets us reset
     if transitions.shouldFindBallKick(player) and player.counter > 15:
