@@ -35,26 +35,37 @@ class Kick(object):
 #From extensve testing in pKicker and with printlines of the balls
 #relX and relY, this appears accurate TODO TODO TODO
 
+#new-NEED TO GET NEW SWEET SPOTS!
 LEFT_SIDE_KICK =  Kick("L_Side", x = 12.5, y =  5,
-                       move=SweetMoves.GOOGZ_MID_LEFT_SIDE_KICK)
+                       move=SweetMoves.LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick("R_Side", x = 12.5, y = -5,
-                       move=SweetMoves.GOOGZ_MID_RIGHT_SIDE_KICK)
-
-SHORT_LEFT_SIDE_KICK = Kick("L_Short_Side", x = 12.5, y = 5,
-                            move=SweetMoves.GOOGZ_SHORT_LEFT_SIDE_KICK)
-SHORT_RIGHT_SIDE_KICK = Kick("R_Short_Side", x = 12.5, y = -15,
-                             move=SweetMoves.GOOGZ_SHORT_RIGHT_SIDE_KICK)
-
+                       move=SweetMoves.RIGHT_SIDE_KICK)
+#new-NEED TO GET NEW SWEET SPOTS!
+LEFT_SHORT_SIDE_KICK = Kick("L_Short_Side", x = 12.5, y = 5,
+                            move=SweetMoves.LEFT_SHORT_SIDE_KICK)
+RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 12.5, y = -15,
+                             move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
+#new-NEED TO GET NEW SWEET SPOTS!
+LEFT_STRAIGHT_KICK = Kick("L_D_Straight", x = 11, y = 3,
+                             move=SweetMoves.LEFT_STRAIGHT_KICK)
+RIGHT_STRAIGHT_KICK =Kick("R_D_Straight", x = 11, y = -3,
+                             move=SweetMoves.RIGHT_STRAIGHT_KICK)
+#new-NEED TO GET NEW SWEET SPOTS!
+LEFT_QUICK_STRAIGHT_KICK =  Kick("L_D_Straight", x = 11, y =  3,
+                                   move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
+RIGHT_QUICK_STRAIGHT_KICK = Kick("R_D_Straight", x = 11, y = -3,
+                                   move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
 #usopen12 hack
-LEFT_DYNAMIC_STRAIGHT_KICK =  Kick("L_D_Straight", x = 11, y =  3,
+LEFT_BIG_KICK =  Kick("L_D_Straight", x = 11, y =  3,
                                    move=SweetMoves.LEFT_BIG_KICK)
-RIGHT_DYNAMIC_STRAIGHT_KICK = Kick("R_D_Straight", x = 11, y = -3,
+RIGHT_BIG_KICK = Kick("R_D_Straight", x = 11, y = -3,
                                    move=SweetMoves.RIGHT_BIG_KICK)
 
+#new-NEED TO GET NEW SWEET SPOTS!
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_D_Straight", x = 11, y =  3,
-                                   move=SweetMoves.SHORT_QUICK_LEFT_KICK)
+                                   move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_D_Straight", x = 11, y = -3,
-                                   move=SweetMoves.SHORT_QUICK_RIGHT_KICK)
+                                   move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 
 # used when we haven't decided what kick to do yet
@@ -70,7 +81,5 @@ LEFT_SHORT_BACK_KICK =  Kick("L_ShortBack", x = 12, y =  6.5,
 RIGHT_SHORT_BACK_KICK = Kick("R_ShortBack", x = 12, y = -6.5,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
-SHORT_QUICK_LEFT_KICK =  Kick("L_ShortStraight", x = DEFAULT_KICK_X_OFFSET -5, y=5,
-                              move = SweetMoves.SHORT_QUICK_LEFT_KICK)
-SHORT_QUICK_RIGHT_KICK =  Kick("R_ShortStraight", x = DEFAULT_KICK_X_OFFSET -5, y=-5,
-                               move = SweetMoves.SHORT_QUICK_RIGHT_KICK)
+
+
