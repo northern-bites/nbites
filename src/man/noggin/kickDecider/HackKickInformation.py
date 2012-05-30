@@ -192,8 +192,8 @@ class KickInformation:
     def chooseDynamicKick(self):
         ball = self.brain.ball
         if ball.loc.relY > 0:
-            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
-        return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
+            return kicks.LEFT_QUICK_STRAIGHT_KICK
+        return kicks.RIGHT_QUICK_STRAIGHT_KICK
 
     def kickLoc(self):
         """

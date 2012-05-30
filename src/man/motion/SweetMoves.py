@@ -1128,16 +1128,16 @@ LEFT_QUICK_STRAIGHT_KICK = (
     #lean right/lift leg
     ((80.,40.,-50.,-70.),
      (0.,17.,-30,70,-45,-25.),
-     (0.,12.,-22.3,45,-22.5,-17),
+     (0.,13.,-22.3,45,-22.5,-17),
      (80.,-40.,50.,70),
      .4,0, stiff.NORMAL_STIFFNESSES),
     
     #kick?
     ((80.,40.,-50.,-70.),
-     (0.,17.,-50,60,-10,-20.),
-     (0.,10.,-22.3,45,-22.5,-17),
+     (0.,17.,-65,60,-5,-20.),
+     (0.,13.,-22.3,45,-22.5,-17),
      (80.,-40.,50.,70),
-     .12,0, stiff.NORMAL_STIFFNESSES),
+     .14,0, stiff.NORMAL_STIFFNESSES),
     
     #recover
     ((80.,40.,-50.,-70.),
@@ -1157,6 +1157,39 @@ LEFT_QUICK_STRAIGHT_KICK = (
 RIGHT_QUICK_STRAIGHT_KICK = mirrorMove(LEFT_QUICK_STRAIGHT_KICK)
 
 LEFT_SHORT_STRAIGHT_KICK = (
+    #lean right/lift leg
+    ((80.,40.,-50.,-70.),
+     (0.,17.,-30,70,-45,-25.),
+     (0.,13.,-22.3,45,-22.5,-17),
+     (80.,-40.,50.,70),
+     .4,0, stiff.NORMAL_STIFFNESSES),
+    
+    #kick?
+    ((80.,40.,-50.,-70.),
+     (0.,17.,-65,60,-5,-20.),
+     (0.,13.,-22.3,45,-22.5,-17),
+     (80.,-40.,50.,70),
+     .25,0, stiff.NORMAL_STIFFNESSES),
+    
+    #recover
+    ((80.,40.,-50.,-70.),
+     (0.,25.,-25,50,-10,-25.),
+     (0.,10.,-22.3,45,-22.5,-17),
+     (80.,-40.,50.,70),
+     .4,0, stiff.NORMAL_STIFFNESSES),
+
+    #back to normal
+    ((90.,10.,-90.,-10.),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (0.0,0.0,-22.3,43.5,-21.2, 0.0),
+     (90.,-10.,82.,13.2),
+     .5,0,stiff.NORMAL_STIFFNESSES),
+
+)
+
+RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
+
+LEFT_SHORTER_STRAIGHT_KICK = (
     #lean right/lift leg
     ((80.,40.,-50.,-70.),
      (0.,17.,-35,70,-45,-25.),
@@ -1186,7 +1219,7 @@ LEFT_SHORT_STRAIGHT_KICK = (
      .5,0,stiff.NORMAL_STIFFNESSES),
     )
 
-RIGHT_SHORT_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
+RIGHT_SHORTER_STRAIGHT_KICK = mirrorMove(LEFT_SHORT_STRAIGHT_KICK)
 
 OLD_SHORT_LEFT_SIDE_KICK = (
     ((80.,90.,-50.,-70.),
