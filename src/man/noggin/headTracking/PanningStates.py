@@ -211,6 +211,8 @@ def kickScan(tracker):
 
     return tracker.stay()
 
+# Not called anywhere in code.
+# Consider removing.
 def scanQuickUp(tracker):
     """
     Pan up quickly, back to original angles, then stop.

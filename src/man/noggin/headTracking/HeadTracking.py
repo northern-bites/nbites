@@ -68,11 +68,6 @@ class HeadTracking(FSA.FSA):
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
-    # a hack for US open 2012.
-    # Marked for deprecation.
-    def kickScan(self):
-        self.switchTo('kickScan')
-
     # Consider tweaking.
     def trackBall(self):
         """
@@ -103,7 +98,8 @@ class HeadTracking(FSA.FSA):
             and (not self.currentState == 'spinScanBall') ):
             self.switchTo('ballSpinTracking')
 
-    # Do we still need/want to do this?
+    # Do we still want to do this?
+    # Consider changing.
     def locPans(self):
         """Repeatedly performs quick pan."""
         self.activeLocOn = False
@@ -136,16 +132,6 @@ class HeadTracking(FSA.FSA):
         self.goalieActiveLoc = True
         if (not self.activeLocOn):
             self.switchTo('activeTracking')
-
-    # Not called anywhere in code.
-    # Marked for deprecation.
-    def preKickScan(self):
-        """
-        Pan up once (quickly), then stop.
-        """
-        if not self.isPreKickScanning:
-            self.isPreKickScanning = True
-            self.switchTo('scanQuickUp')
 
     # Probably needs fixing.
     def kickDecideScan(self):
@@ -211,6 +197,7 @@ class HeadTracking(FSA.FSA):
         self.switchTo('lookToPoint')
 
     # Currently bypasses states.
+    # Not called anywhere in code.
     # Either move into a state or remove.
     def lookToPoint(self, goalX=0, goalY=0, goalZ=0):
         """
@@ -220,33 +207,3 @@ class HeadTracking(FSA.FSA):
         self.target.y = goalY
         self.target.height = goalZ
         self.helper.lookToPoint(self.target)
-
-    # Called only in a test behavior.
-    # Consider removing from this class.
-    def lookToAngles(self,pitch,yaw):
-        """Looks to the given head angles. """
-        self.helper.lookToAngles(yaw,pitch)
-
-    # Not called anywhere in code:
-    # Marked for deprecation.
-    def bounceHead(self):
-        """Continually bounce head up and down."""
-        self.switchTo('bounceUp')
-
-    # Called only in a test behavior.
-    # Marked for deprecation.
-    def orbitPan(self):
-        """
-        Continually bounces head up to see goalposts, then
-        back down to see the ball.
-        """
-        self.switchTo('panOrbit')
-
-    # Not called anywhere in code:
-    # Marked for deprecation.
-    def locFirstTracking(self, ball):
-        """Uses loc values to track target, or vision if on"""
-        if ball.vis.on:
-            self.switchTo('tracking')
-        else:
-            helper.lookToPoint(ball)
