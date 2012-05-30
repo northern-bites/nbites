@@ -25,9 +25,14 @@ def gameReady(player):
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
+    #HACK! TODO: this delay is to make sure the sensors get calibrated before
+    #we start walking; find a way to query motion to see whether the sensors are
+    #calibrated or not before starting
     if player.initialDelayCounter < 230:
         player.initialDelayCounter += 1
         return player.stay()
+
+    # If the goalie were to move during ready, it should happen here.
 
     return player.stay()
 
@@ -39,7 +44,12 @@ def gameSet(player):
         player.brain.loc.resetBall()
         player.brain.tracker.trackBall()
 
-        player.brain.resetGoalieLocalization()
+    # For the goalie, reset loc every frame.
+    # This way, garaunteed to have correctly set loc and be standing in that
+    #  location for a frame before gamePlaying begins.
+    player.brain.loc.resetLocTo(player.brain.FIELD_WHITE_LEFT_SIDELINE_X,
+                                    player.brain.MIDFIELD_Y,
+                                    0)
 
     return player.stay()
 
@@ -48,6 +58,10 @@ def gamePlaying(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
+
+    #if player.lastDiffState == 'gamePenalized':
+        # Need to at least *try* to get back into goal.
+
     return player.goLater('position')
 
 def gamePenalized(player):
@@ -81,7 +95,7 @@ def gameFinished(player):
     return player.stay()
 
 def position(player):
-    # step forward - NOPE, hacked out
+    # step forward - NOPE, hacked out US open 2012
     if player.firstFrame():
         """player.brain.nav.walkTo(RelRobotLocation(15,0,0),
                                 #player.brain.nav.CLOSE_ENOUGH,
@@ -105,11 +119,6 @@ def watch(player):
     #if player.brain.ball.dist < 100:
     #    player.executeMove(SweetMoves.GOALIE_SQUAT)
     #    return player.goLater('saveIt')
-
-    # If ball comes close enough, kick it away.
-    if player.brain.ball.vis.framesOn > 5 and \
-            player.brain.ball.vis.dist < 17:
-        return player.goLater('kickBall')
 
     return player.stay()
 
@@ -140,6 +149,7 @@ def saveIt(player):
         return player.stay()
     if player.isSaving:
         stopTime = time.time()
+        # This is to stand up before a penalty is called.
         if (stopTime - player.squatTime > 4):
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')

@@ -26,6 +26,7 @@ class HeadTracking(FSA.FSA):
 
         # Set state variables
         self.currentState = 'stopped'
+        # Note: This variable is never used.
         self.decisionState = 'stopped'
 
         # Set sweetmove and scan variables and enums
@@ -33,9 +34,11 @@ class HeadTracking(FSA.FSA):
         self.headMove = None
         self.lookDirection = None
         self.kickName = ""
+        # Note: Used only by scanQuickUp
         self.preActivePanHeads = None
 
         # Set object variables
+        # Note: This variables is never used.
         self.locObjectList = []
         self.locObjectList.extend(self.brain.myFieldObjects)
         self.target = self.brain.ball #default
@@ -43,10 +46,12 @@ class HeadTracking(FSA.FSA):
 
         # Set flag variables
         self.goalieActiveLoc = False
+        # Note: Following 2 variables are never used.
         self.activePanDir = False
-        self.activeLocOn = False
         self.activePanOut = False
+        self.activeLocOn = False
         self.activePanUp = False
+        # Note: Used only by scanQuickUpx
         self.isPreKickScanning = False
 
     def stopHeadMoves(self):
