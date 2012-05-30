@@ -150,6 +150,7 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     update(visual_detection, visualFieldObject);
     update(visual_landmark, visualFieldObject);
     visual_field_object->set_width(visualFieldObject->getWidth());
+    visual_field_object->set_height(visualFieldObject->getHeight());
     visual_field_object->set_left_top_x(visualFieldObject->getLeftTopX());
     visual_field_object->set_left_top_y(visualFieldObject->getLeftTopY());
     visual_field_object->set_left_bottom_x(visualFieldObject->getLeftBottomX());
