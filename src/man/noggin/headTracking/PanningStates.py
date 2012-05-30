@@ -69,6 +69,7 @@ def scanning(tracker):
 
     return tracker.stay()
 
+# Consider updating to 2-image system (summer 2012)
 def locPans(tracker):
     """
     Repeatedly execute the headMove QUICK_PANS.
@@ -97,6 +98,7 @@ def afterKickScan(tracker):
 
     return tracker.stay()
 
+# Not called anywhere in code.
 def panLeftOnce(tracker):
     """
     Pan to the left, then return to last diff state.
@@ -111,6 +113,7 @@ def panLeftOnce(tracker):
 
     return tracker.stay()
 
+# Not called anywhere in code.
 def panRightOnce(tracker):
     """
     Pan to the right, then return to last diff state.
@@ -125,6 +128,7 @@ def panRightOnce(tracker):
 
     return tracker.stay()
 
+# Only called from scanQuickUp
 def panUpOnce(tracker):
     """
     Pan to up, then return to last diff state.
@@ -139,6 +143,7 @@ def panUpOnce(tracker):
 
     return tracker.stay()
 
+# Not called anywhere in code.
 def postScan(tracker):
     """
     Repeatedly execute the headMove POST_SCAN.
@@ -150,6 +155,7 @@ def postScan(tracker):
 
     return tracker.stay()
 
+# Only called from activeTracking.
 def activeLocScan(tracker):
     """
     Execute naive mid-height scans.
@@ -164,6 +170,8 @@ def activeLocScan(tracker):
 
     return tracker.stay()
 
+# Only called from methods which may soon be removed.
+# Also called in a hack from ChaseBallStates.
 def returnHeadsPan(tracker):
     """
     Return the head angles to pre-active pan position.
@@ -178,6 +186,7 @@ def returnHeadsPan(tracker):
 
     return tracker.stay()
 
+# Not called anywhere in code.
 def look(tracker):
     """
     Look continuously in stored direction.
@@ -301,6 +310,7 @@ def trianglePanReturn(tracker):
 
     return tracker.stay()
 
+# Only called from bounceDown.
 def bounceUp(tracker):
     """
     Repeatedly pan head up, then down.
@@ -312,6 +322,7 @@ def bounceUp(tracker):
 
     return tracker.stay()
 
+# Only called from bounceUp.
 def bounceDown(tracker):
     """
     Repeatedly pan head down, then up.
@@ -323,6 +334,7 @@ def bounceDown(tracker):
 
     return tracker.stay()
 
+# Only called from orbitPanDown.
 def orbitPanUp(tracker):
     """
     Pan head up, then back down to the ball.
@@ -334,6 +346,7 @@ def orbitPanUp(tracker):
 
     return tracker.stay()
 
+# Only called from OrbitPanUp.
 def orbitPanDown(tracker):
     """
     Pan head down until ball is seen for several frames.

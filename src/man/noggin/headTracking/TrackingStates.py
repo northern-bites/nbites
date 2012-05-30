@@ -97,6 +97,7 @@ def activeTracking(tracker):
 
     return tracker.stay()
 
+# Only called from activeTracking.
 def panToFieldObject(tracker):
     """
     Calculate which goalpost is easiest to look at and look to it.

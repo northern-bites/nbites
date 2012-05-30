@@ -78,6 +78,7 @@ class HeadTrackingHelper(object):
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
+    # Not called anywhere in the code.
     def lookToTargetAngles(self, target):
         """
         Uses setHeadCommands to bring given target to center of frame.
@@ -134,11 +135,13 @@ class HeadTrackingHelper(object):
         self.tracker.brain.motion.coordHead(headMove)
         return headMove
 
+    # Not called anywhere in code.
     def lookToAngles(self, yaw=0, pitch=0):
         headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
                                          MyMath.degrees(pitch))
         self.tracker.brain.motion.setHead(headMove)
 
+    # Consider updating this for new loc and vision systems (summer 2012)
     def calculateClosestLandmark(self):
         brain = self.tracker.brain
         posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]
