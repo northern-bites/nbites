@@ -20,7 +20,11 @@ def standup(player):
     if player.firstFrame():
         player.stand()
         return player.stay()
-    return player.goLater('lookState0')
+    #return player.goLater('lookState0')
+
+    # Hijacked for vision testing.
+    player.printf()
+    return player.stay()
 
 # alternate testing path
 

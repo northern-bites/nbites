@@ -33,6 +33,10 @@ def gameReady(player):
         return player.stay()
 
     # If the goalie were to move during ready, it should happen here.
+    # If the goalie walks forward at start of game, need to check if a goal
+    #  was just scored. If so, walk forward enough to require manual positioning.
+    #  Otherwise, every goal accumulates forward walk, and goalie ends up out
+    #  of position.
 
     return player.stay()
 

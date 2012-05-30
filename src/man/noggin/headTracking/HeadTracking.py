@@ -34,11 +34,9 @@ class HeadTracking(FSA.FSA):
         self.headMove = None
         self.lookDirection = None
         self.kickName = ""
-        # Note: Used only by scanQuickUp
-        self.preActivePanHeads = None
 
         # Set object variables
-        # Note: This variables is never used.
+        # Note: This variable is never used.
         self.locObjectList = []
         self.locObjectList.extend(self.brain.myFieldObjects)
         self.target = self.brain.ball #default
@@ -46,13 +44,8 @@ class HeadTracking(FSA.FSA):
 
         # Set flag variables
         self.goalieActiveLoc = False
-        # Note: Following 2 variables are never used.
-        self.activePanDir = False
-        self.activePanOut = False
         self.activeLocOn = False
         self.activePanUp = False
-        # Note: Used only by scanQuickUpx
-        self.isPreKickScanning = False
 
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
@@ -164,16 +157,6 @@ class HeadTracking(FSA.FSA):
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
             self.switchTo('scanning')
-
-    def lookToDir(self,  direction):
-        """
-        Performs scripted look: down, up, right, or left.
-        If ball becomes visible, go to state 'ballTracking'.
-        """
-        if self.currentState is not 'look' or \
-                self.lookDirection != direction:
-            self.lookDirection = direction
-            self.switchTo('look')
 
     # Clarify and simplify.
     def trackTarget(self, target):
