@@ -7,7 +7,6 @@
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
-#include "MultiLocEKF.h"
 #include "NaoPaths.h"
 
 #include "PySensors.h"
