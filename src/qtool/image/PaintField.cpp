@@ -101,8 +101,8 @@ void PaintField::buildBitmap()
             (LINE_CROSS_LENGTH/2));
 
     // Painting the Blue Goal
-    painter.setBrush(Qt::blue);
-    painter.setPen(Qt::blue);
+    painter.setBrush(Qt::yellow);
+    painter.setPen(Qt::yellow);
     painter.drawEllipse(topBluePost,
             (int)GOAL_POST_RADIUS,
             (int)GOAL_POST_RADIUS);

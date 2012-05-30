@@ -20,6 +20,7 @@ set( viewer_srcs MemoryViewer.cpp
 		 BallEKFViewer.cpp
 		 FieldViewer.cpp
 		 EKFDataViewer.cpp
+		 BotLocs.cpp
 		 )
 
 set( viewer_headers MemoryViewer.h
@@ -29,6 +30,7 @@ set( viewer_headers MemoryViewer.h
 		    BallEKFViewer.h
 		    FieldViewer.h
 		    EKFDataViewer.h
+		    BotLocs.h
 		    )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -50,5 +52,6 @@ target_link_libraries(
   image
   memory
   ${QT_LIBRARIES}
+  ${QT_QTNETWORK_LIBRARY}
 
   )

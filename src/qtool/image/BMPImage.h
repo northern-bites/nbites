@@ -45,7 +45,7 @@ protected:
 
 };
 
-//yo dawg I head you liked BMPImage so we merged two BMPImages in a class that
+//yo dawg I heard you liked BMPImage so we merged two BMPImages in a class that
 //inherits from BMPImage
 
 class OverlayedImage : public BMPImage {

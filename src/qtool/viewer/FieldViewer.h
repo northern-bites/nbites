@@ -8,17 +8,25 @@
  *
  * @author Dani McAvoy
  * @date October 2011
+ *
+ *
+ * @modified Brian Jacobel
+ * @date April 2012
  */
 
 #pragma once
 
 #include <QWidget>
+#include <QPushButton>
 #include <QtGui>
+#include <QPainter>
 #include <vector>
 
 #include "data/DataManager.h"
 #include "image/PaintField.h"
 #include "BMPImageViewer.h"
+#include "image/PaintBots.h"
+
 
 namespace qtool {
 namespace viewer {
@@ -28,14 +36,31 @@ class FieldViewer : public QMainWindow{
 
 public:
     FieldViewer(data::DataManager::ptr dataManager);
+    
+
+public slots:
+    void stopDrawing();
+    void drawBots();
+    void drawButtons();
+    
 
 private:
-    std::vector<QDockWidget*> dockWidget;
     data::DataManager::ptr dataManager;
-    image::PaintField* paintField;
-    BMPImageViewer* fieldView;
+    viewer::BMPImageViewer* fieldView;
+    image::OverlayedImage* overlayView;
+    image::PaintBots* bot_locs;
+    image::PaintField* fieldImage; 
+    bool keepDrawing;
+     
 
+protected:
+    QPushButton* startButton;
+    QPushButton* stopButton;
+    QWidget* buttonWidget;
+    QVBoxLayout* buttonLayout;
+    QDockWidget* dockWidget;
 };
+
 
 }
 }
