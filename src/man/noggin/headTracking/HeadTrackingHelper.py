@@ -161,7 +161,7 @@ class HeadTrackingHelper(object):
 
     # Debug method to print current head pitch and yaw.
     def printHeadAngles(self):
-        self.printf("Head pitch is: ")
-        self.printf(self.tracker.brain.sensors.motionAngles[MotionConstants.HeadPitch])
-        self.printf("Head yaw is: ")
-        self.printf(self.tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw])
+        self.tracker.printf("Head pitch is: ")
+        self.tracker.printf(self.tracker.brain.sensors.motionAngles[MotionConstants.HeadPitch])
+        self.tracker.printf("Head yaw is: ")
+        self.tracker.printf(self.tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw])

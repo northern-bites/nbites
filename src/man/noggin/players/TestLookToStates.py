@@ -16,8 +16,8 @@ def gamePenalized(player):
     return player.goLater('standup')
 
 def standup(player):
-    player.gainsOn()
     if player.firstFrame():
+        player.gainsOn()
         player.stand()
         return player.stay()
     #return player.goLater('lookState0')
