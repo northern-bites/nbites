@@ -87,9 +87,6 @@ void TeamConnect::setUpSocket()
 end:
 	socket->setTarget(ipTarget.c_str(), TEAM_PORT);
 
-// HACK!!!  
-	socket->setTarget("139.140.213.74", TEAM_PORT);
-
 	//join team's multicast...
 	for (int i = 0; i < NUM_ROBOTS; ++i)
 	{

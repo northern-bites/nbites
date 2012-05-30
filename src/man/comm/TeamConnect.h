@@ -102,7 +102,7 @@ public:
 
 private:
 	/**
-	 * Sets up the socket to be used
+	 * Sets up the socket to be used.
 	 */
 	void setUpSocket();
 
