@@ -64,14 +64,15 @@ message PVision {
     
 	required PVisualDetection visual_detection = 1;
 	required PVisualLandmark visual_landmark = 2;
-	optional sint32 left_top_x = 3;
-	optional sint32 left_top_y = 4;
-	optional sint32 right_top_x = 5;
-	optional sint32 right_top_y = 6; 
-	optional sint32 left_bottom_x = 7;
-	optional sint32 left_bottom_y = 8;
-	optional sint32 right_bottom_x = 9;
-	optional sint32 right_bottom_y = 10;
+	optional sint32 width = 3;
+	optional sint32 left_top_x = 4;
+	optional sint32 left_top_y = 5;
+	optional sint32 right_top_x = 6;
+	optional sint32 right_top_y = 7; 
+	optional sint32 left_bottom_x = 8;
+	optional sint32 left_bottom_y = 9;
+	optional sint32 right_bottom_x = 10;
+	optional sint32 right_bottom_y = 11;
     }
 
     message PVisualRobot {
