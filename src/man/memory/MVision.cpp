@@ -124,6 +124,8 @@ void MVision::updateData() {
 void MVision::update(PVision::PVisualDetection* visual_detection,
         VisualDetection* visualDetection) {
     visual_detection->set_distance(visualDetection->getDistance());
+    visual_detection->set_width(visualDetection->getWidth());
+    visual_detection->set_height(visualDetection->getHeight());
     visual_detection->set_center_x(visualDetection->getCenterX());
     visual_detection->set_center_y(visualDetection->getCenterY());
     visual_detection->set_x(visualDetection->getX());
@@ -149,8 +151,6 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     PVision::PVisualLandmark* visual_landmark = visual_field_object->mutable_visual_landmark();
     update(visual_detection, visualFieldObject);
     update(visual_landmark, visualFieldObject);
-    visual_field_object->set_width(visualFieldObject->getWidth());
-    visual_field_object->set_height(visualFieldObject->getHeight());
     visual_field_object->set_left_top_x(visualFieldObject->getLeftTopX());
     visual_field_object->set_left_top_y(visualFieldObject->getLeftTopY());
     visual_field_object->set_left_bottom_x(visualFieldObject->getLeftBottomX());
