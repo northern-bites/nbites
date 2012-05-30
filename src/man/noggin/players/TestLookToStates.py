@@ -23,7 +23,7 @@ def standup(player):
     #return player.goLater('lookState0')
 
     # Hijacked for vision testing.
-    player.printf()
+    player.brain.tracker.helper.printHeadAngles()
     return player.stay()
 
 # alternate testing path
