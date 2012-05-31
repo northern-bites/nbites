@@ -22,6 +22,7 @@ namespace qtool {
   
       fieldImage = new PaintField(this);
       bot_locs = new PaintBots(this);
+      overlayView = new OverlayedImage(fieldImage, bot_locs, this);
       fieldView = new BMPImageViewer(fieldImage, this);
       this->setCentralWidget(fieldView);
  
@@ -32,8 +33,13 @@ namespace qtool {
       bot_locs->locs->startListening();
       keepDrawing = true;
       while(keepDrawing){
-	overlayView = new OverlayedImage(fieldImage, bot_locs, this);
+	
+	//overlayView = new OverlayedImage(fieldImage, bot_locs, this);
+	//overlayView->updateBitmap();
+	delete fieldView;
 	fieldView = new BMPImageViewer(overlayView, this);
+       	//fieldView->updateView();
+	
 	this->setCentralWidget(fieldView);
 	qApp->processEvents();
       }

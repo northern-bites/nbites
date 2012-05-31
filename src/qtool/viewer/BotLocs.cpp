@@ -9,11 +9,13 @@
 namespace qtool {
   namespace viewer {
 
-
+    int bsCounter;
+    
     BotLocs::BotLocs(){    
       Bot b;
       b.address = "0.0.0.0";
       botPositions.push_back(b);
+      bsCounter = 0;
     }
     
     void BotLocs::startListening(){
@@ -33,24 +35,25 @@ namespace qtool {
         char* data = new char[datagram_size];
         udpSocket.readDatagram(data, datagram_size, &datagram_source, &datagram_port);
 	if(datagram_size==108){
+	  //qDebug()<<"mmm, delicious packets";
 	  data+=sizeof(CommPacketHeader); //cut off the header bytes
 	  
 	  Bot newBot;
 	  newBot.address = datagram_source;	  
 	  newBot.xPos = ((float*)data)[0];
 	  newBot.yPos = ((float*)data)[1];
-	  //data[3] is the heading, idgaf
+	  //data[2] is the heading, idgaf
 	  newBot.xUncert = ((float*)data)[3];
 	  newBot.yUncert = ((float*)data)[4];
 	  
 	  for(int i = 0; i < botPositions.size(); i++){
-	    if(botPositions[i].address == newBot.address)
+	    if(botPositions[i].address == newBot.address){
 	      botPositions.erase(botPositions.begin()+i);
+	    }
 	  }
 
 	  botPositions.push_back(newBot);
-	} else {
-	}
+	  }
       }
     }
 
