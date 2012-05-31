@@ -22,19 +22,19 @@ def gameInitial(player):
         if player.brain.my.playerNumber == 1:
             player.brain.loc.resetLocTo(player.brain.BLUE_GOALBOX_RIGHT_X,
                                         player.brain.FIELD_WHITE_BOTTOM_SIDLELINE_Y,
-                                        90)
+                                        player.brain.HEADING_UP)
         elif player.brain.my.playerNumber == 2:
             player.brain.loc.resetLocTo(player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
                                         player.brain.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        90)
+                                        player.brain.HEADING_UP)
         elif player.brain.my.playerNumber == 3:
             player.brain.loc.resetLocTo(player.brain.LANDMARKBLUE_GOAL_CROSS_X,
                                         player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        -90)
+                                        player.brain.HEADING_DOWN)
         elif player.brain.my.playerNumber == 4:
             player.brain.loc.resetLocTo(player.brain.BLUE_GOALBOX_RIGHT_X,
                                         player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        -90)
+                                        player.brain.HEADING_DOWN)
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
