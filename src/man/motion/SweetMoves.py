@@ -174,8 +174,8 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                      INITIAL_POS[0][3],
                      0.7,1, stiff.STANDUP_STIFFNESSES))
 
-# new robots
-STAND_UP_BACK_NEW = (((100,0,0,0),
+# old robots
+STAND_UP_BACK_OLD = (((100,0,0,0),
                   (0,0,0,0,0,0),
                    (0,0,0,0,0,0),
                   (100,0,0,0),
@@ -267,8 +267,8 @@ STAND_UP_BACK_NEW = (((100,0,0,0),
                  )
 
 
-#old robots
-STAND_UP_BACK = (((100,0,0,0),
+#new robots
+STAND_UP_BACK_NEW = (((100,0,0,0),
                   (0,0,0,0,0,0),
                   (0,0,0,0,0,0),
                   (100,0,0,0),
