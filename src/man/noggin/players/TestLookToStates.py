@@ -1,6 +1,8 @@
 
 def gameInitial(player):
-    player.gainsOn()
+    if player.firstFrame():
+        player.gainsOn()
+
     return player.stay()
 
 def gameReady(player):
@@ -20,7 +22,7 @@ def standup(player):
         player.gainsOn()
         player.stand()
 
-        player.brain.tracker.helper.lookToAngles(0,20)
+        player.brain.tracker.setNeutralHead()
 
         return player.stay()
 

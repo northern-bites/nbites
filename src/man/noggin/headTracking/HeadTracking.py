@@ -65,7 +65,6 @@ class HeadTracking(FSA.FSA):
 
     def kickScan(self):
         self.switchTo('kickScan')
-        
 
     def trackBall(self):
         """

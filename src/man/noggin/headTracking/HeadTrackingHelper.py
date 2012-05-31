@@ -134,6 +134,7 @@ class HeadTrackingHelper(object):
         self.tracker.brain.motion.coordHead(headMove)
         return headMove
 
+    # Broken?
     def lookToAngles(self, yaw=0, pitch=0):
         headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
                                          MyMath.degrees(pitch))
