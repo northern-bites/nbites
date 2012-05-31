@@ -20,25 +20,27 @@ namespace image {
 void VisualInfoImage::buildBitmap() {
 
      bitmap.fill(Qt::transparent);
-     
+
      const PVision::PVisualBall ballData = visionData->get()->visual_ball();
      drawBall(ballData);
 
      const PVision::PVisualFieldObject bglpData = visionData->get()->bglp();
      drawGoalPost(bglpData);
-     
+
      const PVision::PVisualFieldObject bgrpData = visionData->get()->bgrp();
      drawGoalPost(bgrpData);
-     
+
      const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
-     drawGoalPost(yglpData);
+     if (yglpData.visual_detection().distance())
+         drawGoalPost(yglpData);
 
      const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
-     drawGoalPost(ygrpData);
-     
+     if (ygrpData.visual_detection().distance())
+         drawGoalPost(ygrpData);
+
      const PVision::PVisualRobot red1Data = visionData->get()->red1();
      drawRedRobot(red1Data);
-     
+
      const PVision::PVisualRobot red2Data = visionData->get()->red2();
      drawRedRobot(red2Data);
 

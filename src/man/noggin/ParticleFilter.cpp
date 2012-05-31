@@ -43,8 +43,8 @@ namespace PF
 	boost::mt19937 rng;
 	rng.seed(std::time(0));
 
-        boost::uniform_real<float> xBounds(0.0f, parameters.fieldWidth);
-	boost::uniform_real<float> yBounds(0.0f, parameters.fieldHeight);
+        boost::uniform_real<float> xBounds(0.0f, (float) parameters.fieldWidth);
+	boost::uniform_real<float> yBounds(0.0f, (float) parameters.fieldHeight);
 	boost::uniform_real<float> angleBounds(0, 2.0f*boost::math::constants::pi<float>());
 
 	boost::variate_generator<boost::mt19937&, 
@@ -55,7 +55,7 @@ namespace PF
 				 boost::uniform_real<float> > angleGen(rng, angleBounds);
 
 	// Assign uniform weight.
-	float weight = 1.0f/(parameters.numParticles*1.0f);
+	float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
 
 #ifdef DEBUG_LOCALIZATION
 	std::cout << "Weight = " << weight << "." << std::endl;
@@ -104,11 +104,31 @@ namespace PF
 	}
 
 	// Update estimates.
-	Location estimate = this->getBestParticle().getLocation();
 
-	xEstimate = estimate.x;
-	yEstimate = estimate.y;
-	hEstimate = estimate.heading;
+	// Use the robust mean...
+
+	float sumX = 0;
+	float sumY = 0;
+	float sumH = 0;
+
+	ParticleIt iter;
+	for(iter = particles.begin(); iter != particles.end(); ++iter)
+	 {
+	     Location l = (*iter).getLocation();
+	     sumX += l.x;
+	     sumY += l.y;
+	     sumH += l.heading;
+	 }
+
+	xEstimate = sumX/parameters.numParticles;
+	yEstimate = sumY/parameters.numParticles;
+	hEstimate = sumH/parameters.numParticles;
+
+	// // Location estimate = this->getBestParticle().getLocation();
+
+	// xEstimate = estimate.x;
+	// yEstimate = estimate.y;
+	// hEstimate = estimate.heading;
     }
 
     /**
@@ -147,7 +167,7 @@ namespace PF
 	    return;
 	}
 
-	averageWeight = sum/(parameters.numParticles*1.0f);
+	averageWeight = sum/(((float)parameters.numParticles)*1.0f);
 
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	{
@@ -160,6 +180,12 @@ namespace PF
 	 wFast = wFast + parameters.alpha_fast*(averageWeight - wFast);
 
 	 float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
+
+	 float confidence = 1.0f - wFast/wSlow;
+	 std::cout << "The confidence of the particles swarm is: " << confidence << std::endl;
+
+	 
+
 	 //if(injectionProb > 0)
 	 //    std::cout << injectionProb << std::endl;
 
@@ -182,7 +208,7 @@ namespace PF
 	rng.seed(static_cast<unsigned>(std::time(0)));
 	boost::uniform_01<boost::mt19937> gen(rng);
 
-	// For random particle injection. 
+	// For random particle injection.
 	// boost::uniform_real<float> xBounds(0.0f, width);
 	// boost::uniform_real<float> yBounds(0.0f, height);
 	// boost::uniform_real<float> angleBounds(0, 2.0f*boost::math::constants::pi<float>());
@@ -249,8 +275,8 @@ namespace PF
 	boost::mt19937 rng;
 	rng.seed(std::time(0));
 
-        boost::uniform_real<float> xBounds(0.0f, parameters.fieldWidth);
-	boost::uniform_real<float> yBounds(0.0f, parameters.fieldHeight);
+        boost::uniform_real<float> xBounds(0.0f, (float) parameters.fieldWidth);
+	boost::uniform_real<float> yBounds(0.0f, (float) parameters.fieldHeight);
 	boost::uniform_real<float> angleBounds(0, 2.0f*boost::math::constants::pi<float>());
 
 	boost::variate_generator<boost::mt19937&, 
@@ -261,7 +287,7 @@ namespace PF
 				 boost::uniform_real<float> > angleGen(rng, angleBounds);
 
 	// Assign uniform weight.
-	float weight = 1.0f/(parameters.numParticles*1.0f);
+	float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
 
 	for(int i = 0; i < parameters.numParticles; ++i)
 	{
@@ -269,6 +295,11 @@ namespace PF
 
 	    particles.push_back(p);
 	}
+    }
+
+    template <class T>
+    T square(T x) {
+        return x*x;
     }
 
     /**
@@ -285,19 +316,21 @@ namespace PF
 	const float SIGMA_RESET_H = 0.2f;
 
 	const float TOTAL_UNITS = 2*boost::math::constants::pi<float>() +
-	                            parameters.fieldWidth + parameters.fieldHeight;
+	  (float)(parameters.fieldWidth + parameters.fieldHeight);
 
 	// We want to weight x,y,& h equally in our maginitude vector for scoring
-	const float COEFF_RESET_X = TOTAL_UNITS / parameters.fieldWidth;
-	const float COEFF_RESET_Y = TOTAL_UNITS / parameters.fieldHeight;
+	const float COEFF_RESET_X = TOTAL_UNITS / (float) parameters.fieldWidth;
+	const float COEFF_RESET_Y = TOTAL_UNITS / (float) parameters.fieldHeight;
 	const float COEFF_RESET_H = TOTAL_UNITS / 2*boost::math::constants::pi<float>();
 
 	// Determine the worst particle that could be chosen with the gaussian
 	// Multiply by 3 standard deviations to assume particles are within 99%
 	// of the distribution
-	const float WORST_MAGNITUDE = sqrt( pow (3 * COEFF_RESET_X * SIGMA_RESET_X, 2)
-					    + pow (3 * COEFF_RESET_Y * SIGMA_RESET_Y, 2)
-					    + pow (3 * COEFF_RESET_H * SIGMA_RESET_H, 2));
+	const float test = sqrt(4.0f);
+
+	const float WORST_MAGNITUDE = sqrt( square(3.0f * COEFF_RESET_X * SIGMA_RESET_X)
+					    + square(3.0f * COEFF_RESET_Y * SIGMA_RESET_Y)
+					    + square(3.0f * COEFF_RESET_H * SIGMA_RESET_H));
 
 	float scoreSum = 0;
 
@@ -316,9 +349,9 @@ namespace PF
 	    float pH = sampleNormal(h, SIGMA_RESET_H);
 
 	    //Determine the particles score
-	    float score = WORST_MAGNITUDE - sqrt( pow (COEFF_RESET_X * (x+pX), 2)
-						  + pow (COEFF_RESET_Y * (y+pY), 2)
-						  + pow (COEFF_RESET_H * (h+pH), 2));
+	    float score = WORST_MAGNITUDE - sqrt( square (COEFF_RESET_X * (x+pX))
+						  + square (COEFF_RESET_Y * (y+pY))
+						  + square (COEFF_RESET_H * (h+pH)));
 
 	    LocalizationParticle p(Location(pX,pY,pH), score);
 
@@ -354,19 +387,19 @@ namespace PF
 	const float SIGMA_RESET_H = 0.2f;
 
 	const float TOTAL_UNITS = 2*boost::math::constants::pi<float>() +
-	                            parameters.fieldWidth + parameters.fieldHeight;
+	                      (float) (parameters.fieldWidth + parameters.fieldHeight);
 
 	// We want to weight x,y,& h equally in our maginitude vector for scoring
-	const float COEFF_RESET_X = TOTAL_UNITS / parameters.fieldWidth;
-	const float COEFF_RESET_Y = TOTAL_UNITS / parameters.fieldHeight;
+	const float COEFF_RESET_X = TOTAL_UNITS / (float) parameters.fieldWidth;
+	const float COEFF_RESET_Y = TOTAL_UNITS / (float) parameters.fieldHeight;
 	const float COEFF_RESET_H = TOTAL_UNITS / 2*boost::math::constants::pi<float>();
 
 	// Determine the worst particle that could be chosen with the gaussian
 	// Multiply by 3 standard deviations to assume particles are within 99%
 	// of the distribution
-	const float WORST_MAGNITUDE = sqrt( pow (3 * COEFF_RESET_X * SIGMA_RESET_X, 2)
-					    + pow (3 * COEFF_RESET_Y * SIGMA_RESET_Y, 2)
-					    + pow (3 * COEFF_RESET_H * SIGMA_RESET_H, 2));
+	const float WORST_MAGNITUDE = sqrt( square (3 * COEFF_RESET_X * SIGMA_RESET_X)
+					    + square (3 * COEFF_RESET_Y * SIGMA_RESET_Y)
+					    + square (3 * COEFF_RESET_H * SIGMA_RESET_H));
 
 	float scoreSum = 0;
 
@@ -385,9 +418,9 @@ namespace PF
 	    float pH = sampleNormal(h, SIGMA_RESET_H);
 
 	    //Determine the particles score
-	    float score = WORST_MAGNITUDE - sqrt( pow (COEFF_RESET_X * (x+pX), 2)
-						  + pow (COEFF_RESET_Y * (y+pY), 2)
-						  + pow (COEFF_RESET_H * (h+pH), 2));
+	    float score = WORST_MAGNITUDE - sqrt( square (COEFF_RESET_X * (x+pX))
+						  + square (COEFF_RESET_Y * (y+pY))
+						  + square (COEFF_RESET_H * (h+pH)));
 
 	    LocalizationParticle p(Location(pX,pY,pH), score);
 
@@ -403,9 +436,9 @@ namespace PF
 	    float pH = sampleNormal(h_, SIGMA_RESET_H);
 
 	    //Determine the particles score
-	    float score = WORST_MAGNITUDE - sqrt( pow (COEFF_RESET_X * (x_+pX), 2)
-						  + pow (COEFF_RESET_Y * (y_+pY), 2)
-						  + pow (COEFF_RESET_H * (h_+pH), 2));
+	    float score = WORST_MAGNITUDE - sqrt( square (COEFF_RESET_X * (x_+pX))
+						  + square (COEFF_RESET_Y * (y_+pY))
+						  + square (COEFF_RESET_H * (h_+pH)));
 
 	    LocalizationParticle p(Location(pX,pY,pH), score);
 
