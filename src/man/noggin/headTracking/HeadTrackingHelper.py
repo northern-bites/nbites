@@ -156,3 +156,10 @@ class HeadTrackingHelper(object):
                 minDiff = diff
         return bestPost
 
+    def printAngles(self):
+        motionAngles = self.tracker.brain.sensors.motionAngles
+
+        printf("Head pitch is: ")
+        printf(motionAngles[MotionConstants.HeadPitch])
+        printf("Head yaw is: ")
+        printf(motionAngles[MotionConstants.HeadYaw])

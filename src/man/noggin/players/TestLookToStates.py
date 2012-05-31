@@ -16,19 +16,22 @@ def gamePenalized(player):
     return player.goLater('standup')
 
 def standup(player):
-    player.gainsOn()
     if player.firstFrame():
+        player.gainsOn()
         player.stand()
+
+        player.brain.tracker.helper.lookToAngles(0,20)
+
         return player.stay()
+
     return player.goLater('lookState0')
 
 # alternate testing path
 
 def lookState0(player):
     brain = player.brain
-    my = brain.my
 
-    brain.tracker.printAngles()
+    brain.tracker.helper.printAngles()
 
     return player.stay()
 
