@@ -31,10 +31,14 @@ void VisualInfoImage::buildBitmap() {
      drawGoalPost(bgrpData);
      
      const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
-     drawGoalPost(yglpData);
+     if(yglpData.visual_detection().distance() && yglpData.visual_detection().x() && 
+	yglpData.visual_detection().y())
+       drawGoalPost(yglpData);
 
      const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
-     drawGoalPost(ygrpData);
+     if(ygrpData.visual_detection().distance() && ygrpData.visual_detection().x() && 
+	ygrpData.visual_detection().y())
+       drawGoalPost(ygrpData);
      
      const PVision::PVisualRobot red1Data = visionData->get()->red1();
      drawRedRobot(red1Data);
