@@ -15,22 +15,26 @@ bool BMPYUVImage::needToResizeBitmap() const {
     return bitmap.width() < yuvImage.getWidth() || bitmap.height() < yuvImage.getHeight();
 }
 
+// this whole thing is slow as balls! - Octavian
 void BMPYUVImage::buildBitmap() {
     yuvImage.updateFromRawImage();
-    if (this->needToResizeBitmap()) {
-        bitmap = QImage(yuvImage.getWidth(),
-                        yuvImage.getHeight(),
-                        QImage::Format_RGB32);
-    }
+//    if (this->needToResizeBitmap()) {
+//        bitmap = QPixmap(yuvImage.getWidth(),
+//                        yuvImage.getHeight());
+//    }
+
+    QImage qimage = QImage(yuvImage.getWidth(),
+                           yuvImage.getHeight(),
+                           QImage::Format_RGB32);
 
     Color c;
 
-    byte** yImg = yuvImage.getYImage();
-    byte** uImg = yuvImage.getUImage();
-    byte** vImg = yuvImage.getVImage();
+    const byte** yImg = yuvImage.getYImage();
+    const byte** uImg = yuvImage.getUImage();
+    const byte** vImg = yuvImage.getVImage();
 
 	for (int j = 0; j < getHeight(); ++j) {
-	    QRgb* qImageLine = (QRgb*) (bitmap.scanLine((int)(j)));
+	    QRgb* qImageLine = (QRgb*) (qimage.scanLine((int)(j)));
 		for (int i = 0; i < getWidth(); ++i) {
 		    byte y = yImg[i][j], u = uImg[i][j], v = vImg[i][j];
 		    byte color_byte;
@@ -86,6 +90,7 @@ void BMPYUVImage::buildBitmap() {
 			}
 		}
 	}
+	bitmap = QPixmap::fromImage(qimage);
 }
 }
 }

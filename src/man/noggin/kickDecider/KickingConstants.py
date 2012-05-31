@@ -1,7 +1,14 @@
 import noggin_constants as NogginConstants
 from objects import Location
 
+APPROACH_BALL_HACK = 2
+
 DEFAULT_KICK_X_OFFSET = 13
+
+#HACK HACK HACK for HackKickInformation
+KICK_STRAIGHT_POST_BEARING = 17
+KICK_STRAIGHT_BEARING_THRESH = 70
+KICK_SIDE_DIST_THRESH = .75*NogginConstants.GOAL_WIDTH
 
 # TODO make these accurate. TODO make ranges specific to kicks
 SHORT_RANGE_KICK_DIST = 120

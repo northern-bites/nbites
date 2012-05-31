@@ -12,9 +12,12 @@
 #include <QWidget>
 #include <QtGui>
 #include <vector>
+#include <QCheckBox>
 
 #include "man/memory/Memory.h"
 #include "image/BMPYUVImage.h"
+
+#include "image/VisualInfoImage.h"
 #include "data/RobotMemoryManager.h"
 #include "BMPImageViewer.h"
 #include "ChannelImageViewer.h"
@@ -29,10 +32,12 @@ class MemoryViewer : public QMainWindow{
 public:
     MemoryViewer(data::RobotMemoryManager::const_ptr memoryManager);
 
+private slots:
+    void toggleOverlay() {};
+ 
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
-    viewer::RoboImageViewer roboImageViewer;
 
 };
 

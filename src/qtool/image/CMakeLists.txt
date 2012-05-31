@@ -20,6 +20,7 @@ set( Image_srcs
     BMPYUVImage
     Color
     ThresholdedImage
+    VisualInfoImage
     FastYUVToBMPImage
     PaintField
     PaintBots

@@ -45,8 +45,8 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${ALCOMMON_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_PATH}
                      ${CORPUS_INCLUDE_DIR}
-		     ${CFG_DIR}
-		     )
+		             ${CFG_DIR}
+		             )
 
 
 ############################ PROJECT SOURCES FILES
@@ -161,12 +161,14 @@ TARGET_LINK_LIBRARIES(
   ${PYTHON_LIBRARY}
   ${SENSORS_TARGET}
   ${Boost_PYTHON_LIBRARY}
+  bhwalk
   )
 
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories (some may not actually be subdirectories) to
 # include in this package
+add_subdirectory( bhwalk )
 #SUBDIRS(
 #  ${CORPUS_CMAKE_DIR}
 #  )

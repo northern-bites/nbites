@@ -112,8 +112,3 @@ void MotionInterface::setBalanceMode(int pBalanceMode) const {
 int MotionInterface::getBalanceMode() const {
     return DUMMY_I;
 }
-
-void MotionInterface::walkPose() const
-{
-    switchboard->walkPose();
-}
