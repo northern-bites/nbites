@@ -29,8 +29,8 @@ using namespace CoordFrame4D;
 using angle::radians;
 
 // From camera docs:
-const float NaoPose::IMAGE_WIDTH_MM = 2.36f;
-const float NaoPose::IMAGE_HEIGHT_MM = 1.76f;
+const float NaoPose::IMAGE_WIDTH_MM = 2.45f;
+const float NaoPose::IMAGE_HEIGHT_MM = 1.84f;
 
 // Calculated from numbers in camera docs:
 const float NaoPose::FOCAL_LENGTH_MM = (float) ((IMAGE_WIDTH_MM / 2)
@@ -596,7 +596,7 @@ const ublas::matrix<float> NaoPose::calculateForwardTransform(const ChainID id,
     // Do the end transforms
     const int numEndTransforms = NUM_END_TRANSFORMS[id];
     for (int i = 0; i < numEndTransforms; i++) {
-        fullTransform = prod(fullTransform, END_TRANSFORMS[id][i]);
+        fullTransform = prod(fullTransform, END_TRANSFORMS_BOTTOM[id][i]);
     }
 
     return fullTransform;

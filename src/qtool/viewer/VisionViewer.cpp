@@ -23,7 +23,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     offlineMVision = shared_ptr<MVision> (new MVision(vision));
     
     imageTranscribe = OfflineImageTranscriber::ptr (new OfflineImageTranscriber(sensors,
-							 memoryManager->getMemory()->getMImage()));
+										memoryManager->getMemory()->getMImage(Camera::BOTTOM)));
 
     rawImage->set_width(AVERAGED_IMAGE_WIDTH);
     rawImage->set_height(AVERAGED_IMAGE_HEIGHT);
@@ -64,7 +64,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     visionImage = new ThresholdedImage(rawImage, this);
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
-    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(), this);
+    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(Camera::BOTTOM), this);
     OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
     
     BMPImageViewer *imageViewer = new BMPImageViewer(combo, this);
@@ -114,7 +114,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 void VisionViewer::update(){
   imageTranscribe->acquireNewImage();
   sensors->updateVisionAngles();
-  vision->notifyImage(sensors->getImage());
+  vision->notifyImage(sensors->getImage(Camera::BOTTOM));
   offlineMVision->updateData();
   rawImage->mutable_image()->assign(reinterpret_cast<const char *>
 				    (vision->thresh->thresholded),

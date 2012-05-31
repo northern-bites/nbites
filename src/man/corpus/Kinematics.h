@@ -138,10 +138,15 @@ namespace Kinematics {
     static const float HIP_OFFSET_Z = 85.0f;
     static const float FOOT_HEIGHT = 45.19f;
 
-    // Camera
-    static const float CAMERA_OFF_X = 48.80f; // in millimeters
-    static const float CAMERA_OFF_Z = 23.81f;  // in millimeters
-    static const float CAMERA_PITCH_ANGLE = 40.0f * TO_RAD; // 40 degrees
+    // Camera::BOTTOM
+    static const float CAMERA_BOTTOM_OFF_X = 50.71f; // in millimeters
+    static const float CAMERA_BOTTOM_OFF_Z = 17.74f;  // in millimeters
+    static const float CAMERA_BOTTOM_PITCH_ANGLE = 39.7f * TO_RAD; // 39.7 degrees
+
+    //Camera::TOP
+    static const float CAMERA_TOP_OFF_X = 58.71f;
+    static const float CAMERA_TOP_OFF_Z = 63.64f;
+    static const float CAMERA_TOP_PITCH_ANGLE = 1.2f * TO_RAD; // 1.2 degrees
 
     /**********       Joint Bounds       ***********/
     static const float HEAD_BOUNDS[2][2] = {{-2.09f,2.09f},{-.785f,.785f}};
@@ -333,10 +338,15 @@ namespace Kinematics {
       &RIGHT_LEG_BASE_TRANSFORMS[0],
       &RIGHT_ARM_BASE_TRANSFORMS[0] };
 
-    static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS[3]
+    static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS_BOTTOM[3]
     = { CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, M_PI_FLOAT/2),
-        CoordFrame4D::translation4D(CAMERA_OFF_X, 0, CAMERA_OFF_Z),
-        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, CAMERA_PITCH_ANGLE) };
+        CoordFrame4D::translation4D(CAMERA_BOTTOM_OFF_X, 0, CAMERA_BOTTOM_OFF_Z),
+        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, CAMERA_BOTTOM_PITCH_ANGLE) };
+
+    static const boost::numeric::ublas::matrix <float> HEAD_END_TRANSFORMS_TOP[3]
+    = { CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS, M_PI_FLOAT/2),
+        CoordFrame4D::translation4D(CAMERA_TOP_OFF_X, 0, CAMERA_TOP_OFF_Z),
+        CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS, CAMERA_TOP_PITCH_ANGLE) };
 
 
     static const boost::numeric::ublas::matrix <float> LEFT_ARM_END_TRANSFORMS[2]
@@ -362,8 +372,8 @@ namespace Kinematics {
       CoordFrame4D::translation4D(UPPER_ARM_LENGTH + LOWER_ARM_LENGTH,0.0f,0.0f) };
 
 
-    static const boost::numeric::ublas::matrix <float> * END_TRANSFORMS[NUM_CHAINS] =
-    { &HEAD_END_TRANSFORMS[0],
+    static const boost::numeric::ublas::matrix <float> * END_TRANSFORMS_BOTTOM[NUM_CHAINS] =
+    { &HEAD_END_TRANSFORMS_BOTTOM[0],
       &LEFT_ARM_END_TRANSFORMS[0],
       &LEFT_LEG_END_TRANSFORMS[0],
       &RIGHT_LEG_END_TRANSFORMS[0],

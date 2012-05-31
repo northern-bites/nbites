@@ -71,7 +71,7 @@ void OfflineImageTranscriber::acquireNewImage() {
         ImageAcquisition::acquire_image_fast(table, params,
                 reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
                 image);
-	sensors->setImage(image);
+	sensors->setImage(image, Camera::BOTTOM);
     }
 }
 
