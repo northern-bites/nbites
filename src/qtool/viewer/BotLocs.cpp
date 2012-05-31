@@ -9,13 +9,12 @@
 namespace qtool {
   namespace viewer {
 
-    int bsCounter;
+    int numBots = 1;
     
     BotLocs::BotLocs(){    
       Bot b;
       b.address = "0.0.0.0";
-      botPositions.push_back(b);
-      bsCounter = 0;
+      botPositions.push_back(b); //make a fake robot to prevent segfaults
     }
     
     void BotLocs::startListening(){
@@ -35,7 +34,6 @@ namespace qtool {
         char* data = new char[datagram_size];
         udpSocket.readDatagram(data, datagram_size, &datagram_source, &datagram_port);
 	if(datagram_size==108){
-	  //qDebug()<<"mmm, delicious packets";
 	  data+=sizeof(CommPacketHeader); //cut off the header bytes
 	  
 	  Bot newBot;
@@ -54,7 +52,13 @@ namespace qtool {
 
 	  botPositions.push_back(newBot);
 	  }
+	if (botPositions.size()>numBots)
+	  qDebug()<<"New robot found,"<<botPositions.back().address.toString()<<"just connected.";
+	else if (botPositions.size()<numBots)
+	  qDebug()<<"Robot connection lost,"<<botPositions.size()-1<<" are now connected.";
+	numBots=botPositions.size();
       }
+     
     }
 
     int BotLocs::getX(int i){
