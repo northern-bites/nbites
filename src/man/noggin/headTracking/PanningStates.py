@@ -84,6 +84,48 @@ def locPans(tracker):
 
     return tracker.stay()
 
+# Fixed Pitch
+def fullPanFixedPitch(tracker):
+    """
+    Repeatedly executes the headMove FIXED_PITCH_PAN.
+    """
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
+
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
+
+    return tracker.stay()
+
+# Fixed Pitch
+def lookLeftFixedPitch(tracker):
+    """
+    Looks to the left as far as possible without being blocked by the shoulder pad.
+    """
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.switchTo('stop')
+
+    return tracker.stay()
+
+# Fixed Pitch
+def lookRightFixedPitch(tracker):
+    """
+    Looks to the right as far as possible without being blocked by the shoulder pad.
+    """
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.switchTo('stop')
+
+    return tracker.stay()
+
 def afterKickScan(tracker):
     """
     Looks in the direction the ball was kicked in.

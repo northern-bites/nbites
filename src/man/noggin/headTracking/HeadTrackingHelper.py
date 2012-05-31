@@ -19,7 +19,7 @@ class HeadTrackingHelper(object):
                                                position[2], # interpolation type
                                                )
             else:
-                self.printf("What kind of sweet ass-Move is this?")
+                self.tracker.printf("What kind of sweet ass-Move is this?")
 
             self.tracker.brain.motion.enqueue(move)
 
@@ -75,6 +75,51 @@ class HeadTrackingHelper(object):
 
         maxSpeed = 2.0
         headMove = motion.SetHeadCommand(newYaw, newPitch,
+                                         maxSpeed, maxSpeed)
+        self.tracker.brain.motion.setHead(headMove)
+
+    # Fixed Pitch
+    def trackObjectFixedPitch(self):
+        """
+        Analogous to trackObject, but with a fixed value for pitch.
+        """
+        target = self.tracker.target
+        changeX, changeY = 0.0, 0.0
+
+        # If we cannot see the target, abort.
+        if not target or \
+                (target.loc.relX == 0.0 and target.loc.relY == 0.0) or \
+                (target.vis.framesOff > 0 and target.vis.framesOff < 3):
+            return
+
+        # If we haven't seen the target, look towards loc model.
+        if target.vis.framesOff > 3:
+            self.lookToPoint(target)
+            return
+
+        # Assert: target is visible.
+
+        # Find the target's angular distance from yaw center.
+        changeX = target.vis.angleX
+        # ignore changeY: pitch is fixed
+
+        motionAngles = self.tracker.brain.sensors.motionAngles
+        curPitch = motionAngles[MotionConstants.HeadPitch]
+        curYaw = motionAngles[MotionConstants.HeadYaw]
+
+        maxChange = 13.0
+
+        # Warning- no gain is applied currently!
+        safeChangeX = MyMath.clip(changeX, -maxChange, maxChange)
+        # ignore safeChangeY: pitch is fixed
+
+        newYaw = curYaw + safeChangeX
+        # ignore newPitch: pitch is fixed
+
+        newYaw = MyMath.clip(newYaw, -80.0, 80.0) # CHECK THESE VALUES
+
+        maxSpeed = 2.0
+        headMove = motion.SetHeadCommand(newYaw, curPitch,
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
