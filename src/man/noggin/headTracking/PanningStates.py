@@ -108,7 +108,7 @@ def lookLeftFixedPitch(tracker):
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
 
     if not tracker.brain.motion.isHeadActive():
-        return tracker.switchTo('stop')
+        return tracker.goLater('stop')
 
     return tracker.stay()
 
@@ -122,7 +122,7 @@ def lookRightFixedPitch(tracker):
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
     if not tracker.brain.motion.isHeadActive():
-        return tracker.switchTo('stop')
+        return tracker.goLater('stop')
 
     return tracker.stay()
 

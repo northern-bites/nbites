@@ -50,6 +50,23 @@ def tracking(tracker):
 
     return tracker.stay()
 
+# Fixed Pitch
+def trackingFixedPitch(tracker):
+    """
+    While the target is visible, track it via vision values.
+    If the target is lost, execute wide pans.
+    """
+    # If the target is not in vision, trackObjectFixedPitch can handle it.
+    tracker.helper.trackObjectFixedPitch()
+
+    if not tracker.target.vis.on and tracker.counter > 15:
+        if DEBUG : tracker.printf("Missing object this frame",'cyan')
+        if tracker.target.vis.framesOff > \
+                constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+            return tracker.goLater('fullPanFixedPitch')
+
+    return tracker.stay()
+
 def ballSpinTracking(tracker):
 #    '''Super state which handles following/refinding the ball'''
 #    if tracker.target.vis.framesOff <= \
