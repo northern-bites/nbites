@@ -123,7 +123,7 @@ void PaintField::buildBitmap()
     // Nets in Goals
     QBrush goalsBrush = QBrush(Qt::white, Qt::CrossPattern);
     painter.setBrush(goalsBrush);
-    painter.setPen(Qt::blue);
+    painter.setPen(Qt::yellow);
     painter.drawRect(blueGoal);
     painter.setPen(Qt::yellow);
     painter.drawRect(yellowGoal);

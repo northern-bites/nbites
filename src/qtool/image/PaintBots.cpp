@@ -13,14 +13,13 @@ namespace qtool {
     PaintBots::PaintBots(QObject *parent):
       BMPImage(parent)
     {
-      bitmap = QImage(FIELD_WIDTH, FIELD_HEIGHT, QImage::Format_ARGB32_Premultiplied);
+      bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
       locs = new BotLocs();
-      
     }
     // Paints the robots onto the field
     void PaintBots::buildBitmap()
     {          
-      bitmap.fill(0x00000000); //yay transparent ARGB32 bitmap
+      bitmap.fill(Qt::transparent);
       QPainter painter(&bitmap);
 
       QColor orange = QColor::fromRgb(Color_RGB[Orange]);
