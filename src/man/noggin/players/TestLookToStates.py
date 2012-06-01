@@ -13,7 +13,7 @@ def gamePlaying(player):
     return player.goLater('standup')
 
 def gamePenalized(player):
-    return player.goLater('standup')
+    return player.stay()
 
 def standup(player):
     if player.firstFrame():
@@ -24,6 +24,8 @@ def standup(player):
 
     # Hijacked for vision testing.
     player.brain.tracker.helper.printHeadAngles()
+    player.brain.tracker.trackBallFixedPitch()
+
     return player.stay()
 
 # alternate testing path

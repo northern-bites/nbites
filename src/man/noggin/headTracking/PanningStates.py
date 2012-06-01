@@ -96,6 +96,10 @@ def fullPanFixedPitch(tracker):
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
+    # Might want to generalize this out.
+    if tracker.brain.ball.vis.framesOn > 5:
+        return tracker.goLater('trackingFixedPitch')
+
     return tracker.stay()
 
 # Fixed Pitch

@@ -82,6 +82,19 @@ class HeadTracking(FSA.FSA):
              and self.currentState is not 'trianglePan'):
             self.switchTo('tracking')
 
+    # Fixed Pitch
+    def trackBallFixedPitch(self):
+        """
+        Enters a state cycle:
+        When ball is in view, tracks via vision values.
+        Once ball is gone for some time, switch to wide pans.
+        """
+        self.target = self.brain.ball
+        self.gain = 1.0
+        if ( self.currentState is not 'trackingFixedPitch'
+             and self.currentState is not 'fullPanFixedPitch'):
+            self.switchTo('trackingFixedPitch')
+
     # Consider tweaking.
     def trackBallSpin(self):
         """

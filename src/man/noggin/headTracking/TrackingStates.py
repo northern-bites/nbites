@@ -56,7 +56,7 @@ def trackingFixedPitch(tracker):
     While the target is visible, track it via vision values.
     If the target is lost, execute wide pans.
     """
-    # If the target is not in vision, trackObjectFixedPitch can handle it.
+    # If the target is not in vision, trackObjectFixedPitch will track via loc.
     tracker.helper.trackObjectFixedPitch()
 
     if not tracker.target.vis.on and tracker.counter > 15:
