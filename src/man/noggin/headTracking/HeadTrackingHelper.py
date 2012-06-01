@@ -94,7 +94,7 @@ class HeadTrackingHelper(object):
 
         # If we haven't seen the target, look towards loc model.
         if target.vis.framesOff > 3:
-            self.lookToPoint(target)
+            self.lookToPointFixedPitch(target)
             return
 
         # Assert: target is visible.
@@ -179,6 +179,24 @@ class HeadTrackingHelper(object):
 
         self.tracker.brain.motion.coordHead(headMove)
         return headMove
+
+    # Fixed Pitch
+    def lookToPointFixedPitch(self, target):
+        """
+        If the relative y is positive, look left. Otherwise, look right.
+        """
+        if hasattr(target, "height"):
+            height = target.height
+        else:
+            height = 0
+
+        if hasattr(target, "loc"):
+            target = target.loc
+
+        if target.relY > 0:
+            self.executeHeadMove(motion.HeadMoves.FIXED_PITCH_LOOK_LEFT)
+        else:
+            self.executeHeadMove(motion.HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
     # broken?
     # Not called anywhere in code.
