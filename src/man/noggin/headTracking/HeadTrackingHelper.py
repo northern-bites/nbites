@@ -180,11 +180,8 @@ class HeadTrackingHelper(object):
         self.tracker.brain.motion.coordHead(headMove)
         return headMove
 
-<<<<<<< HEAD
-    # Broken?
-=======
+    # broken?
     # Not called anywhere in code.
->>>>>>> tracking
     def lookToAngles(self, yaw=0, pitch=0):
         headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
                                          MyMath.degrees(pitch))
@@ -208,19 +205,15 @@ class HeadTrackingHelper(object):
                 minDiff = diff
         return bestPost
 
-<<<<<<< HEAD
-    def printAngles(self):
-        motionAngles = self.tracker.brain.sensors.motionAngles
-
-        printf("Head pitch is: ")
-        printf(motionAngles[MotionConstants.HeadPitch])
-        printf("Head yaw is: ")
-        printf(motionAngles[MotionConstants.HeadYaw])
-=======
     # Debug method to print current head pitch and yaw.
     def printHeadAngles(self):
-        self.tracker.printf("Head pitch is: ")
-        self.tracker.printf(self.tracker.brain.sensors.motionAngles[MotionConstants.HeadPitch])
-        self.tracker.printf("Head yaw is: ")
-        self.tracker.printf(self.tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw])
->>>>>>> tracking
+
+        # hijacked for vision testing
+        curPitch = self.tracker.brain.sensors.motionAngles[MotionConstants.HeadPitch]
+        curYaw = self.tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw]
+
+        if curPitch > 25 or curPitch < 15:
+            self.tracker.printf("Head pitch changed!")
+            self.tracker.printf(curPitch)
+        #self.tracker.printf("Head yaw is: ")
+        #self.tracker.printf(

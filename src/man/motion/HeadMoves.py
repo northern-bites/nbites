@@ -369,8 +369,8 @@ DATA_PAN = (
 
 ################### FIXED PITCH PANS #################
 FIXED_PITCH_PAN = (
-    ((70.0,20.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-70.0,20.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((70.0,20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-70.0,20.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 FIXED_PITCH_LOOK_LEFT = ( ((70.0,20.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
 

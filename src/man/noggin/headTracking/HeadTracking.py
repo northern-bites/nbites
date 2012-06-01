@@ -66,13 +66,7 @@ class HeadTracking(FSA.FSA):
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
-<<<<<<< HEAD
-    def kickScan(self):
-        self.switchTo('kickScan')
-
-=======
     # Consider tweaking.
->>>>>>> tracking
     def trackBall(self):
         """
         Enters a state cycle:
@@ -214,28 +208,3 @@ class HeadTracking(FSA.FSA):
         self.target.y = goalY
         self.target.height = goalZ
         self.helper.lookToPoint(self.target)
-<<<<<<< HEAD
-
-    def lookToAngles(self,pitch,yaw):
-        """Looks to the given head angles. """
-        self.helper.lookToAngles(yaw,pitch)
-
-    def bounceHead(self):
-        """Continually bounce head up and down."""
-        self.switchTo('bounceUp')
-
-    def orbitPan(self):
-        """
-        Continually bounces head up to see goalposts, then
-        back down to see the ball.
-        """
-        self.switchTo('panOrbit')
-
-    def locFirstTracking(self, ball):
-        """Uses loc values to track target, or vision if on"""
-        if ball.vis.on:
-            self.switchTo('tracking')
-        else:
-            helper.lookToPoint(ball)
-=======
->>>>>>> tracking

@@ -28,18 +28,14 @@ def standup(player):
         player.brain.tracker.setNeutralHead()
 
         return player.stay()
-<<<<<<< HEAD
-
-    return player.goLater('lookState0')
-=======
     #return player.goLater('lookState0')
 
     # Hijacked for vision testing.
-    player.brain.tracker.helper.printHeadAngles()
     player.brain.tracker.trackBallFixedPitch()
 
+    player.brain.tracker.helper.printHeadAngles()
+
     return player.stay()
->>>>>>> tracking
 
 # alternate testing path
 
