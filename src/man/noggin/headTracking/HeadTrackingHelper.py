@@ -119,7 +119,7 @@ class HeadTrackingHelper(object):
         newYaw = MyMath.clip(newYaw, -80.0, 80.0) # CHECK THESE VALUES
 
         maxSpeed = 2.0
-        headMove = motion.SetHeadCommand(newYaw, curPitch,
+        headMove = motion.SetHeadCommand(newYaw, 20.0, # MAKE A CONSTANT FOR THIS
                                          maxSpeed, maxSpeed)
         self.tracker.brain.motion.setHead(headMove)
 
