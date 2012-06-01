@@ -241,17 +241,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         }
         if (obj != NULL) {
             id = (int) obj->getID();
-            if (obj->getPossibilities()->size() > 1) {
-                if (id == BLUE_GOAL_LEFT_POST ||
-                        id == BLUE_GOAL_RIGHT_POST ||
-                        id == BLUE_GOAL_POST) {
-                    id = BLUE_GOAL_POST;
-
-                } else {
-                    id = YELLOW_GOAL_POST;
-                }
-            }
-
+			id = YELLOW_GOAL_POST;
             env->CallVoidMethod(jobj, setFieldObjectInfo,
                     id,
                     obj->getWidth(), obj->getHeight(),
