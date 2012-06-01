@@ -4,15 +4,18 @@ def gameInitial(player):
     return player.stay()
 
 def gameReady(player):
-    return player.goLater('standup')
+    return player.stay()
 
 def gameSet(player):
-    return player.goLater('standup')
+    return player.stay()
 
 def gamePlaying(player):
     return player.goLater('standup')
 
 def gamePenalized(player):
+    if player.firstFrame():
+        player.brain.tracker.stopHeadMoves()
+
     return player.stay()
 
 def standup(player):
