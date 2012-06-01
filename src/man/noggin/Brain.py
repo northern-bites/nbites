@@ -340,6 +340,7 @@ class Brain(object):
                                     loc.ballVelY))
             self.out.logSComm(packet)
 
+    #TODO: is this method completely depricated?
     def resetLocalization(self):
         """
         Reset our localization

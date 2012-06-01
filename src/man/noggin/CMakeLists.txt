@@ -81,11 +81,14 @@ SET( NOGGIN_SRCS Noggin
                  BallEKF
                  PyLoc
                  # LocEKF
-		 MultiMeasurementEKF
-		 MultiLocEKF
+		 # MultiMeasurementEKF
+		 # MultiLocEKF
 		 PyConstants
 		 PyObjects
 		 CombinationObjects
+		 ParticleFilter
+		 VisionSystem
+		 MotionSystem
                  )
 
 

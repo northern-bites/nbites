@@ -13,6 +13,7 @@ using viewer::BallEKFViewer;
 using viewer::FieldViewer;
 using offline::OfflineViewer;
 using overseer::OverseerClient;
+  //using viewer::GraphViewer;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
@@ -23,7 +24,9 @@ QTool::QTool() : QMainWindow(),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
         fieldViewer(new FieldViewer(dataManager)),
-        overseerClient(new OverseerClient(dataManager, this)) {
+        overseerClient(new OverseerClient(dataManager, this))
+		 //	 graphViewer(new GraphViewer(dataManager, this))			
+{
 
     this->setWindowTitle(tr("HackTool"));
 
@@ -51,6 +54,7 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
+    //toolTabs->addTab(graphViewer, tr("Graph Viewer"));
 }
 
 QTool::~QTool() {

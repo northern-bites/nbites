@@ -29,7 +29,7 @@ def neutralHead(tracker):
     return tracker.stay()
 
 def doHeadMove(tracker):
-    '''Executes the currently set headMove.'''
+    '''Executes the currently set headMove, then stops.'''
     if tracker.firstFrame():
         tracker.activeLocOn = False
         tracker.brain.motion.stopHeadMoves()

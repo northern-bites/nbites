@@ -6,16 +6,19 @@ def gameInitial(player):
     return player.stay()
 
 def gameReady(player):
-    return player.goLater('standup')
+    return player.stay()
 
 def gameSet(player):
-    return player.goLater('standup')
+    return player.stay()
 
 def gamePlaying(player):
     return player.goLater('standup')
 
 def gamePenalized(player):
-    return player.goLater('standup')
+    if player.firstFrame():
+        player.brain.tracker.stopHeadMoves()
+
+    return player.stay()
 
 def standup(player):
     if player.firstFrame():
@@ -25,8 +28,18 @@ def standup(player):
         player.brain.tracker.setNeutralHead()
 
         return player.stay()
+<<<<<<< HEAD
 
     return player.goLater('lookState0')
+=======
+    #return player.goLater('lookState0')
+
+    # Hijacked for vision testing.
+    player.brain.tracker.helper.printHeadAngles()
+    player.brain.tracker.trackBallFixedPitch()
+
+    return player.stay()
+>>>>>>> tracking
 
 # alternate testing path
 
