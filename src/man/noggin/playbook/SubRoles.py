@@ -64,7 +64,9 @@ def pGoalieChaser(team, workingPlay):
 
 def pChaser(team, workingPlay):
     """ never called. now handled entirely in player behavior """
-    pass
+    workingPlay.setSubRole(PBConstants.CHASE_NORMAL)
+    pos = (team.brain.my.x,team.brain.my.y, team.brain.ball.loc.heading)
+    workingPlay.setPosition(pos)
 
 
 #### Defender sub roles ####
