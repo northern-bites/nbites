@@ -36,17 +36,17 @@ class WalkCommand : public MotionCommand
 public:
     typedef boost::shared_ptr<WalkCommand> ptr;
 
-    WalkCommand(float _x_mms, float _y_mms, float _theta_rads)
+    WalkCommand(float x_percent, float y_percent, float theta_percent)
         : MotionCommand(MotionConstants::WALK),
-          x_mms(_x_mms),y_mms(_y_mms),theta_rads(_theta_rads)
+          x_percent(x_percent),y_percent(y_percent),theta_percent(theta_percent)
         { setChainList(); }
 
     virtual ~WalkCommand() {}
 public:
 //    WalkParameters params;
-    const float x_mms;    //mm/second
-    const float y_mms;    //mm/second
-    const float theta_rads; //rad/second
+    const float x_percent;    //0 - 1 magnitude
+    const float y_percent;    //0 - 1 magnitude
+    const float theta_percent; //0 - 1 magnitude
 protected:
 	virtual void setChainList() {
         chainList.assign(MotionConstants::WALK_CHAINS,
@@ -58,7 +58,7 @@ public:
     friend std::ostream& operator<< (std::ostream &o, const WalkCommand &w)
         {
             return o << "WalkCommand("
-                     << w.x_mms << "," << w.y_mms << "," << w.theta_rads
+                     << w.x_percent << "," << w.y_percent << "," << w.theta_percent
                      << ") ";
         }
 

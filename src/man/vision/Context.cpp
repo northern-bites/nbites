@@ -66,14 +66,10 @@ Context::Context(Vision *vis, Threshold* thr, Field* fie)
 /* Initialize all of the ivars.
  */
 void Context::init() {
-    rightYellowPost = false;
-    leftYellowPost = false;
-    unknownYellowPost = false;
-    yellowPost = false;
-    rightBluePost = false;
-    leftBluePost = false;
-    unknownBluePost = false;
-    bluePost = false;
+    rightPost = false;
+    leftPost = false;
+    unknownPost = false;
+    seePost = false;
     tCorner = 0;
     lCorner = 0;
     iCorner = 0;
@@ -81,8 +77,6 @@ void Context::init() {
     cCorner = 0;
     cross = false;
     unknownCross = false;
-    yellowCross = false;
-    blueCross = false;
     ball = false;
     seeGoalBoxLines = false;
     seeCenterCircle = false;
@@ -96,7 +90,7 @@ void Context::init() {
  * Given a list of VisualCorners, attempts to assign ConcreteCorners (ideally
  * one, but sometimes multiple) that correspond with where the corner could
  * possibly be on the field.  For instance, if we have a T corner and it is
- * right next to the blue goal left post, then it is the blue goal right T.
+ * right next to a goal left post, then it is the goal right T.
  * Modifies the corners passed in by calling the setPossibleCorners method;
  * in certain cases the shape of a corner might be switched too (if an L
  * corner is determined to be a T instead, its shape is changed accordingly).
@@ -318,64 +312,32 @@ void Context::classifyT(VisualCorner & first) {
 	if (sideT || (l1 > 3 * GOALBOX_DEPTH && objectDistance > 250) ||
 		(face == FACING_UNKNOWN &&
 		 l1 > 2 * GOALBOX_DEPTH)) {
-        if (face == FACING_BLUE_GOAL) {
-            if (first.doesItPointRight()) {
-                first.setSecondaryShape(CENTER_T_BOTTOM);
-            } else {
-                first.setSecondaryShape(CENTER_T_TOP);
-            }
-        } else if (face == FACING_YELLOW_GOAL) {
-            if (first.doesItPointRight()) {
-                first.setSecondaryShape(CENTER_T_TOP);
-            } else {
-                first.setSecondaryShape(CENTER_T_BOTTOM);
-            }
-        } else {
-            first.setSecondaryShape(SIDE_T);
+        first.setSecondaryShape(SIDE_T);
+        if (face == FACING_UNKNOWN) {
             face = FACING_SIDELINE;
         }
     } else {
-        if (face == FACING_BLUE_GOAL) {
+        if (face == FACING_GOAL) {
             // This could be made more robust
             if (first.doesItPointUp()) {
                 // check if the T is above or below the post
                 if (first.getY() > objectRightY) {
                     if (first.doesItPointLeft()) {
-                        first.setSecondaryShape(LEFT_GOAL_BLUE_T);
+                        first.setSecondaryShape(LEFT_GOAL_T);
                     } else {
-                        first.setSecondaryShape(RIGHT_GOAL_BLUE_T);
+                        first.setSecondaryShape(RIGHT_GOAL_T);
                     }
                 } else {
                     if (first.doesItPointLeft()) {
-                        first.setSecondaryShape(RIGHT_GOAL_BLUE_T);
+                        first.setSecondaryShape(RIGHT_GOAL_T);
                     } else {
-                        first.setSecondaryShape(LEFT_GOAL_BLUE_T);
+                        first.setSecondaryShape(LEFT_GOAL_T);
                     }
                 }
             } else if (first.getX() > objectRightX) {
-                first.setSecondaryShape(LEFT_GOAL_BLUE_T);
+                first.setSecondaryShape(LEFT_GOAL_T);
             } else {
-                first.setSecondaryShape(RIGHT_GOAL_BLUE_T);
-            }
-        } else if (face == FACING_YELLOW_GOAL) {
-            if (first.doesItPointUp()) {
-                if (first.getY() > objectRightY) {
-                    if (first.doesItPointLeft()) {
-                        first.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-                    } else {
-                        first.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
-                    }
-                } else {
-                    if (first.doesItPointLeft()) {
-                        first.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
-                    } else {
-                        first.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-                    }
-                }
-            } else if (first.getX() > objectRightX) {
-                first.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-            } else {
-                first.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
+                first.setSecondaryShape(RIGHT_GOAL_T);
             }
         } else if (l2 * 2 > FIELD_HEIGHT) {
             first.setSecondaryShape(SIDE_T);
@@ -442,17 +404,11 @@ void Context::checkLowOuterL(VisualCorner & corner, bool line1IsLonger) {
             left = true;
         }
     }
-    if (face == FACING_BLUE_GOAL) {
+    if (face == FACING_GOAL) {
         if (left) {
-            corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+            corner.setSecondaryShape(LEFT_GOAL_L);
         } else {
-            corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-        }
-    } else if (face == FACING_YELLOW_GOAL) {
-        if (left) {
-            corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-        } else {
-            corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
+            corner.setSecondaryShape(RIGHT_GOAL_L);
         }
     }
 }
@@ -474,40 +430,16 @@ void Context::classifyOuterLMidAngle(VisualCorner & corner,
 	if (top1.y > top2.y) {
 		// we're at the side of the goal - just check direction
 		if (corner.doesItPointRight()) {
-			if (face == FACING_YELLOW_GOAL) {
-				corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-			} else if (face == FACING_BLUE_GOAL) {
-				corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
-			} else {
-				corner.setSecondaryShape(LEFT_GOAL_L);
-			}
+            corner.setSecondaryShape(LEFT_GOAL_L);
 		} else {
-			if (face == FACING_YELLOW_GOAL) {
-				corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-			} else if (face == FACING_BLUE_GOAL) {
-				corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-			} else {
-				corner.setSecondaryShape(RIGHT_GOAL_L);
-			}
+            corner.setSecondaryShape(RIGHT_GOAL_L);
 		}
 	} else {
 		// we're staring towards the goal, again check direction
 		if (corner.doesItPointRight()) {
-			if (face == FACING_YELLOW_GOAL) {
-				corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-			} else if (face == FACING_BLUE_GOAL) {
-				corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-			} else {
-				corner.setSecondaryShape(RIGHT_GOAL_L);
-			}
+            corner.setSecondaryShape(RIGHT_GOAL_L);
 		} else {
-			if (face == FACING_YELLOW_GOAL) {
-				corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-			} else if (face == FACING_BLUE_GOAL) {
-				corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
-			} else {
-				corner.setSecondaryShape(LEFT_GOAL_L);
-			}
+            corner.setSecondaryShape(LEFT_GOAL_L);
 		}
 	}
 }
@@ -547,25 +479,19 @@ void Context::classifyOuterL(VisualCorner & corner) {
 				if (corner.getLine1()->getRightEndpoint().x >
 					corner.getLine2()->getRightEndpoint().x) {
 					corner.changeToT(corner.getLine1());
+                    corner.setSecondaryShape(SIDE_T);
 				} else {
 					corner.changeToT(corner.getLine2());
-				}
-				if (face == FACING_BLUE_GOAL) {
-					corner.setSecondaryShape(CENTER_T_BOTTOM);
-				} else {
-					corner.setSecondaryShape(CENTER_T_TOP);
+                    corner.setSecondaryShape(SIDE_T);
 				}
 			} else {
 				if (corner.getLine1()->getLeftEndpoint().x >
 					corner.getLine2()->getLeftEndpoint().x) {
 					corner.changeToT(corner.getLine2());
+                    corner.setSecondaryShape(SIDE_T);
 				} else {
 					corner.changeToT(corner.getLine1());
-				}
-				if (face == FACING_BLUE_GOAL) {
-					corner.setSecondaryShape(CENTER_T_TOP);
-				} else {
-					corner.setSecondaryShape(CENTER_T_BOTTOM);
+                    corner.setSecondaryShape(SIDE_T);
 				}
 			}
 			return;
@@ -576,23 +502,14 @@ void Context::classifyOuterL(VisualCorner & corner) {
 
 	// check if it is an obvious field corner
 	if (corner.getY() < objectRightY - 20) {
-		if (face == FACING_BLUE_GOAL) {
+		if (face == FACING_GOAL) {
 			// 223-11/slarti/lookingin-bg/NBFRM.0
 			if (corner.getX() < objectRightX && corner.doesItPointLeft()) {
-				corner.setSecondaryShape(BLUE_GOAL_BOTTOM);
+				corner.setSecondaryShape(RIGHT_GOAL_CORNER);
 				return;
 			} else if (corner.getX() > objectRightX &&
 					   corner.doesItPointRight()) {
-				corner.setSecondaryShape(BLUE_GOAL_TOP);
-				return;
-			}
-		} else if (face == FACING_YELLOW_GOAL) {
-			if (corner.getX() < objectRightX && corner.doesItPointLeft()) {
-				corner.setSecondaryShape(YELLOW_GOAL_TOP);
-				return;
-			} else if (corner.getX() > objectRightX &&
-					   corner.doesItPointRight()) {
-				corner.setSecondaryShape(YELLOW_GOAL_BOTTOM);
+				corner.setSecondaryShape(LEFT_GOAL_CORNER);
 				return;
 			}
 		}
@@ -614,16 +531,12 @@ void Context::classifyOuterL(VisualCorner & corner) {
 			// it is l1 so fine its high endpoint
 			if (objectRightX > -1) {
 				if (top.x > top2.x) {
-					if (face == FACING_YELLOW_GOAL) {
-						corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-					} else {
-						corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+					if (face == FACING_GOAL) {
+						corner.setSecondaryShape(LEFT_GOAL_L);
 					}
 				} else {
-					if (face == FACING_YELLOW_GOAL) {
-						corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-					} else {
-						corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+					if (face == FACING_GOAL) {
+						corner.setSecondaryShape(RIGHT_GOAL_L);
 					}
 				}
 			}
@@ -638,16 +551,12 @@ void Context::classifyOuterL(VisualCorner & corner) {
 			// basically on the side of the goal this idea doesn't work
 			if (objectRightX > -1) {
 				if (top2.x > top.x) {
-					if (face == FACING_YELLOW_GOAL) {
-						corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-					} else {
-						corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
+					if (face == FACING_GOAL) {
+						corner.setSecondaryShape(LEFT_GOAL_L);
 					}
 				} else {
-					if (face == FACING_YELLOW_GOAL) {
-						corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-					} else {
-						corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
+					if (face == FACING_GOAL) {
+						corner.setSecondaryShape(RIGHT_GOAL_L);
 					}
 				}
 			}
@@ -660,25 +569,6 @@ void Context::classifyOuterL(VisualCorner & corner) {
     // but let's get the low-hanging fruit first
     if (l1 < GOALBOX_FUDGE * GOALBOX_DEPTH &&
         l2 < GOALBOX_FUDGE * GOALBOX_DEPTH) {
-		/*if (objectRightX < corner.getX()) {
-			// 223-11/6-7-11/zaphod/right_side_yellow_goal/frames/101.FRM
-			// corner to right, it is probably the left corner
-			if (corner.doesItPointLeft()) {
-				if (face == FACING_BLUE_GOAL) {
-					corner.setSecondaryShape(LEFT_GOAL_BLUE_L);
-				} else if (face == FACING_YELLOW_GOAL) {
-					corner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-				}
-			}
-		} else {
-			if (corner.doesItPointRight()) {
-				if (face == FACING_BLUE_GOAL) {
-					corner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-				} else if (face == FACING_YELLOW_GOAL) {
-					corner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-				}
-			}
-			}*/
         return;
     } else if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
                l2 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
@@ -703,21 +593,12 @@ void Context::setFieldCorner(VisualCorner & corner) {
     }
     corner.setSecondaryShape(CORNER_L);
     switch (face) {
-    case FACING_BLUE_GOAL:
+    case FACING_GOAL:
         if (objectRightX > -1 && objectRightX < IMAGE_WIDTH) {
             if (corner.getX() < objectRightX) {
-                corner.setSecondaryShape(BLUE_GOAL_BOTTOM);
+                corner.setSecondaryShape(RIGHT_GOAL_CORNER);
             } else {
-                corner.setSecondaryShape(BLUE_GOAL_TOP);
-            }
-        }
-        break;
-    case FACING_YELLOW_GOAL:
-        if (objectRightX > -1 && objectRightX < IMAGE_WIDTH) {
-            if (corner.getX() < objectRightX) {
-                corner.setSecondaryShape(YELLOW_GOAL_TOP);
-            } else {
-                corner.setSecondaryShape(YELLOW_GOAL_BOTTOM);
+                corner.setSecondaryShape(LEFT_GOAL_CORNER);
             }
         }
         break;
@@ -762,17 +643,8 @@ void Context::setFieldCorner(VisualCorner & corner) {
 void Context::checkGoalCornerWithPost(VisualCorner & corner,
                                       int l1y, int l2y,
                                       bool l1IsLeft, float dist) {
-    shape leftColor = LEFT_GOAL_YELLOW_L;
-    shape rightColor = RIGHT_GOAL_YELLOW_L;
-	shape leftCorner = YELLOW_GOAL_BOTTOM;
-	shape rightCorner = YELLOW_GOAL_TOP;
-    if ((face == FACING_BLUE_GOAL && sameHalf) ||
-        (face == FACING_YELLOW_GOAL && !sameHalf)) {
-        leftColor = LEFT_GOAL_BLUE_L;
-        rightColor = RIGHT_GOAL_BLUE_L;
-		leftCorner = BLUE_GOAL_TOP;
-		rightCorner = BLUE_GOAL_BOTTOM;
-    }
+	shape leftCorner = LEFT_GOAL_CORNER;
+	shape rightCorner = RIGHT_GOAL_CORNER;
 	if (debugIdentifyCorners) {
 		cout << "In checkGoalCornerWithPost " << dist << endl;
 	}
@@ -820,9 +692,9 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
     // best done by using the post
 	if (isInner) {
 		if (cornerIsRight) {
-			corner.setSecondaryShape(leftColor);
+			corner.setSecondaryShape(LEFT_GOAL_L);
 		} else {
-			corner.setSecondaryShape(rightColor);
+			corner.setSecondaryShape(RIGHT_GOAL_L);
 		}
 	} else {
 		if (cornerIsRight) {
@@ -831,41 +703,6 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
 			corner.setSecondaryShape(rightCorner);
 		}
 	}
-	/*cout << "Test " << objectRightX << " " << corner.getX() << endl;
-    if (objectRightX > -1 && objectRightX < IMAGE_WIDTH / 2) {
-        // post is on the left, normally this indicates a left goal inner L
-        // the line should basically disappear into the middle of the post
-        if (l1IsLeft) {
-			// can be problem see 223-11/annika/in_yg/NBFRM.5
-            if (isInner && corner.doesItPointLeft()) {
-                corner.setSecondaryShape(leftColor);
-            } else {
-                // we must have missed the other L corner for some reason
-                corner.setSecondaryShape(leftCorner);
-            }
-        } else {
-            if (isInner && corner.doesItPointLeft()) {
-                corner.setSecondaryShape(leftColor);
-            } else {
-                corner.setSecondaryShape(leftCorner);
-            }
-        }
-    } else {
-        // the post is on the right - normally a right corner
-        if (l1IsLeft) {
-            if (isInner && corner.doesItPointRight()) {
-                corner.setSecondaryShape(rightColor);
-            } else {
-                corner.setSecondaryShape(rightCorner);
-            }
-        } else {
-            if (isInner && corner.doesItPointRight()) {
-                corner.setSecondaryShape(rightColor);
-            } else {
-                corner.setSecondaryShape(rightCorner);
-            }
-        }
-		}*/
 }
 
 /** We have an innerl and no field objects.  On the bright side
@@ -1176,27 +1013,11 @@ void Context::unconnectedInnerLs(VisualCorner & inner, VisualCorner & outer) {
     // inner is a field corner, outer a goal corner
     // determine which ones
     if (inner.getX() < outer.getX()) {
-        if (face == FACING_BLUE_GOAL) {
-            inner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-            outer.setSecondaryShape(BLUE_GOAL_BOTTOM);
-        } else if (face == FACING_YELLOW_GOAL) {
-            inner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-            outer.setSecondaryShape(YELLOW_GOAL_TOP);
-        } else {
-            inner.setSecondaryShape(RIGHT_GOAL_L);
-            outer.setSecondaryShape(RIGHT_GOAL_CORNER);
-        }
+        inner.setSecondaryShape(RIGHT_GOAL_L);
+        outer.setSecondaryShape(RIGHT_GOAL_CORNER);
     } else {
-        if (face == FACING_BLUE_GOAL) {
-            inner.setSecondaryShape(LEFT_GOAL_BLUE_L);
-            outer.setSecondaryShape(BLUE_GOAL_TOP);
-        } else if (face == FACING_YELLOW_GOAL) {
-            inner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-            outer.setSecondaryShape(YELLOW_GOAL_BOTTOM);
-        } else {
-            inner.setSecondaryShape(LEFT_GOAL_L);
-            outer.setSecondaryShape(LEFT_GOAL_CORNER);
-        }
+        inner.setSecondaryShape(LEFT_GOAL_L);
+        outer.setSecondaryShape(LEFT_GOAL_CORNER);
     }
 }
 
@@ -1255,27 +1076,11 @@ void Context::findUnconnectedCornerRelationship(VisualCorner & first,
     // check the orientation of the outer-l
     if (outer->doesItPointRight()) {
         inner->setSecondaryShape(RIGHT_GOAL_CORNER);
-        if (face == FACING_BLUE_GOAL) {
-            outer->setSecondaryShape(RIGHT_GOAL_BLUE_L);
-			inner->setSecondaryShape(BLUE_GOAL_BOTTOM);
-        } else if (face == FACING_YELLOW_GOAL) {
-            outer->setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-			inner->setSecondaryShape(YELLOW_GOAL_TOP);
-        } else {
-            outer->setSecondaryShape(RIGHT_GOAL_L);
-        }
+        outer->setSecondaryShape(RIGHT_GOAL_L);
         return;
     } else {
         inner->setSecondaryShape(LEFT_GOAL_CORNER);
-        if (face == FACING_BLUE_GOAL) {
-            outer->setSecondaryShape(LEFT_GOAL_BLUE_L);
-			inner->setSecondaryShape(BLUE_GOAL_TOP);
-        } else if (face == FACING_YELLOW_GOAL) {
-            outer->setSecondaryShape(LEFT_GOAL_YELLOW_L);
-			inner->setSecondaryShape(YELLOW_GOAL_BOTTOM);
-        } else {
-            outer->setSecondaryShape(LEFT_GOAL_L);
-        }
+        outer->setSecondaryShape(LEFT_GOAL_L);
         return;
     }
 }
@@ -1334,21 +1139,11 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
 		// check if we're right on the side
 		if (objectDistance > t.getDistance() + GOALBOX_OVERAGE / 2) {
 			if (t.doesItPointRight()) {
-				if (face == FACING_YELLOW_GOAL) {
-					t.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
-					l1.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-				} else {
-					t.setSecondaryShape(RIGHT_GOAL_BLUE_T);
-					l1.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-				}
+                t.setSecondaryShape(RIGHT_GOAL_T);
+                l1.setSecondaryShape(RIGHT_GOAL_L);
 			} else {
-				if (face == FACING_YELLOW_GOAL) {
-					t.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-					l1.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-				} else {
-					t.setSecondaryShape(LEFT_GOAL_BLUE_T);
-					l1.setSecondaryShape(LEFT_GOAL_BLUE_L);
-				}
+                t.setSecondaryShape(LEFT_GOAL_T);
+                l1.setSecondaryShape(LEFT_GOAL_L);
 			}
 			return;
 		}
@@ -1369,54 +1164,20 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
         int close2 = abs(right.x - tpoint.x) + abs(right.y - tpoint.y);
         if (close > close2) {
             // Line goes to right of T
-            if (face == FACING_BLUE_GOAL) {
-                l1.setSecondaryShape(LEFT_GOAL_BLUE_L);
-                t.setSecondaryShape(LEFT_GOAL_BLUE_T);
-            } else if (face == FACING_YELLOW_GOAL) {
-                l1.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-                t.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-            } else {
-                l1.setSecondaryShape(LEFT_GOAL_L);
-                t.setSecondaryShape(LEFT_GOAL_T);
-            }
+            l1.setSecondaryShape(LEFT_GOAL_L);
+            t.setSecondaryShape(LEFT_GOAL_T);
         } else {
-            if (face == FACING_BLUE_GOAL) {
-                l1.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-                t.setSecondaryShape(RIGHT_GOAL_BLUE_T);
-            } else if (face == FACING_YELLOW_GOAL) {
-                l1.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-                t.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
-            } else {
-                l1.setSecondaryShape(RIGHT_GOAL_L);
-                t.setSecondaryShape(RIGHT_GOAL_T);
-            }
+            l1.setSecondaryShape(RIGHT_GOAL_L);
+            t.setSecondaryShape(RIGHT_GOAL_T);
         }
     } else if (l1.getShape() == INNER_L) {
-		if (face == FACING_BLUE_GOAL) {
-			if (l1.doesItPointLeft()) {
-				l1.setSecondaryShape(LEFT_GOAL_BLUE_L);
-				t.setSecondaryShape(LEFT_GOAL_BLUE_T);
-			} else {
-				l1.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-				t.setSecondaryShape(RIGHT_GOAL_BLUE_T);
-			}
-		} else if (face == FACING_YELLOW_GOAL) {
-			if (l1.doesItPointLeft()) {
-				l1.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-				t.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-			} else {
-				l1.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-				t.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
-			}
-		} else {
-			if (l1.doesItPointLeft()) {
-				l1.setSecondaryShape(LEFT_GOAL_L);
-				t.setSecondaryShape(LEFT_GOAL_T);
-			} else {
-				l1.setSecondaryShape(RIGHT_GOAL_L);
-				t.setSecondaryShape(RIGHT_GOAL_T);
-			}
-		}
+        if (l1.doesItPointLeft()) {
+            l1.setSecondaryShape(LEFT_GOAL_L);
+            t.setSecondaryShape(LEFT_GOAL_T);
+        } else {
+            l1.setSecondaryShape(RIGHT_GOAL_L);
+            t.setSecondaryShape(RIGHT_GOAL_T);
+        }
 	}
 }
 
@@ -1430,7 +1191,7 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
  */
 void Context::checkInnerToOuter(VisualCorner & inner, VisualCorner & outer) {
     // if it is the T, then we should be able to see the nearby goal post
-    if (face == FACING_BLUE_GOAL || face == FACING_YELLOW_GOAL) {
+    if (face == FACING_GOAL) {
 		boost::shared_ptr<VisualLine> common;
 		if (inner.getLine1() == outer.getLine1()) {
 			common = inner.getLine1();
@@ -1470,21 +1231,11 @@ void Context::checkInnerToOuter(VisualCorner & inner, VisualCorner & outer) {
 			// probably the two ends of the goal box - should be an easy case
 			if (inner.getY() < outer.getY()) {
 				if (inner.doesItPointRight()) {
-					if (face == FACING_YELLOW_GOAL) {
-						inner.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-						outer.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-					} else if (face == FACING_BLUE_GOAL) {
-						inner.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-						outer.setSecondaryShape(LEFT_GOAL_BLUE_L);
-					}
+                    inner.setSecondaryShape(RIGHT_GOAL_L);
+                    outer.setSecondaryShape(LEFT_GOAL_L);
 				} else {
-					if (face == FACING_YELLOW_GOAL) {
-						inner.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-						outer.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-					} else if (face == FACING_BLUE_GOAL) {
-						inner.setSecondaryShape(LEFT_GOAL_BLUE_L);
-						outer.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-					}
+                    inner.setSecondaryShape(LEFT_GOAL_L);
+                    outer.setSecondaryShape(RIGHT_GOAL_L);
 				}
 			}
 		}
@@ -1539,39 +1290,19 @@ void Context::checkOuterToOuter(VisualCorner & first, VisualCorner & second) {
 		}
 		if (first.getY() < second.getY()) {
 			if (first.doesItPointRight()) {
-				if (face == FACING_YELLOW_GOAL) {
-					first.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-					second.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-				} else if (face == FACING_BLUE_GOAL) {
-					first.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-					second.setSecondaryShape(LEFT_GOAL_BLUE_L);
-				}
+                first.setSecondaryShape(RIGHT_GOAL_L);
+                second.setSecondaryShape(LEFT_GOAL_L);
 			} else {
-				if (face == FACING_YELLOW_GOAL) {
-					first.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-					second.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-				} else if (face == FACING_BLUE_GOAL) {
-					first.setSecondaryShape(LEFT_GOAL_BLUE_L);
-					second.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-				}
+                first.setSecondaryShape(LEFT_GOAL_L);
+                second.setSecondaryShape(RIGHT_GOAL_L);
 			}
 		} else {
 			if (second.doesItPointRight()) {
-				if (face == FACING_YELLOW_GOAL) {
-					first.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-					second.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-				} else if (face == FACING_BLUE_GOAL) {
-					first.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-					second.setSecondaryShape(LEFT_GOAL_BLUE_L);
-				}
+                first.setSecondaryShape(RIGHT_GOAL_L);
+                second.setSecondaryShape(LEFT_GOAL_L);
 			} else {
-				if (face == FACING_YELLOW_GOAL) {
-					first.setSecondaryShape(LEFT_GOAL_YELLOW_L);
-					second.setSecondaryShape(RIGHT_GOAL_YELLOW_L);
-				} else if (face == FACING_BLUE_GOAL) {
-					first.setSecondaryShape(LEFT_GOAL_BLUE_L);
-					second.setSecondaryShape(RIGHT_GOAL_BLUE_L);
-				}
+                first.setSecondaryShape(LEFT_GOAL_L);
+                second.setSecondaryShape(RIGHT_GOAL_L);
 			}
 		}
 	}
@@ -1618,27 +1349,11 @@ void Context::checkTToFieldCorner(VisualCorner & t, VisualCorner & l1) {
         // we should be able to narrow the choices down to 2
         // compare the location of the L corner to the T corner
         if (l1.getX() < t.getX()) {
-            if (face == FACING_BLUE_GOAL) {
-                t.setSecondaryShape(RIGHT_GOAL_BLUE_T);
-                l1.setSecondaryShape(BLUE_GOAL_BOTTOM);
-            } else if (face == FACING_YELLOW_GOAL) {
-                t.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
-                l1.setSecondaryShape(YELLOW_GOAL_TOP);
-            } else {
-                t.setSecondaryShape(RIGHT_GOAL_T);
-                l1.setSecondaryShape(RIGHT_GOAL_CORNER);
-            }
+            t.setSecondaryShape(RIGHT_GOAL_T);
+            l1.setSecondaryShape(RIGHT_GOAL_CORNER);
         } else {
-            if (face == FACING_BLUE_GOAL) {
-                t.setSecondaryShape(LEFT_GOAL_BLUE_T);
-                l1.setSecondaryShape(BLUE_GOAL_TOP);
-            } else if (face == FACING_YELLOW_GOAL) {
-                t.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-                l1.setSecondaryShape(YELLOW_GOAL_BOTTOM);
-            } else {
-                l1.setSecondaryShape(LEFT_GOAL_CORNER);
-                t.setSecondaryShape(LEFT_GOAL_T);
-            }
+            l1.setSecondaryShape(LEFT_GOAL_CORNER);
+            t.setSecondaryShape(LEFT_GOAL_T);
         }
     } else {
         // check length  -- it its REALLY long to corner then we know
@@ -1652,27 +1367,11 @@ void Context::checkTToFieldCorner(VisualCorner & t, VisualCorner & l1) {
         if (dist * 2 < FIELD_WHITE_WIDTH) {
             // seems to be a goalline - evaluate further
             if (left) {
-                if (face == FACING_BLUE_GOAL) {
-                    t.setSecondaryShape(LEFT_GOAL_BLUE_T);
-                    l1.setSecondaryShape(BLUE_GOAL_TOP);
-                } else if (face == FACING_YELLOW_GOAL) {
-                    t.setSecondaryShape(LEFT_GOAL_YELLOW_T);
-                    l1.setSecondaryShape(YELLOW_GOAL_BOTTOM);
-                } else {
-                    t.setSecondaryShape(LEFT_GOAL_T);
-                    l1.setSecondaryShape(LEFT_GOAL_CORNER);
-                }
+                t.setSecondaryShape(LEFT_GOAL_T);
+                l1.setSecondaryShape(LEFT_GOAL_CORNER);
             } else {
-                if (face == FACING_BLUE_GOAL) {
-                    t.setSecondaryShape(RIGHT_GOAL_BLUE_T);
-                    l1.setSecondaryShape(BLUE_GOAL_BOTTOM);
-                } else if (face == FACING_YELLOW_GOAL) {
-                    t.setSecondaryShape(RIGHT_GOAL_YELLOW_T);
-                    l1.setSecondaryShape(YELLOW_GOAL_TOP);
-                } else {
-                    t.setSecondaryShape(RIGHT_GOAL_T);
-                    l1.setSecondaryShape(RIGHT_GOAL_CORNER);
-                }
+                t.setSecondaryShape(RIGHT_GOAL_T);
+                l1.setSecondaryShape(RIGHT_GOAL_CORNER);
             }
         } else {
             face = FACING_SIDELINE;
@@ -1790,67 +1489,13 @@ const list<const ConcreteCorner*> Context::classifyCornerWithObjects(
              << endl;
     }
 
-    // sometimes we have already classified the corner, so just return it
-    if (possibleCorners.size() == 1) {
-        list<const ConcreteCorner*> classification;
-        vector<const ConcreteCorner*>::const_iterator j =
-            possibleCorners.begin();
+    list<const ConcreteCorner*> classification;
+    vector<const ConcreteCorner*>::const_iterator j =
+        possibleCorners.begin();
+    for (; j != possibleCorners.end(); ++j) {
         classification.push_back(*j);
-        return classification;
     }
-
-	// Get all the possible corners given the shape of the corner
-	list<const ConcreteCorner*> possibleClassifications;
-    switch(corner.getShape()) {
-    case T:
-        possibleClassifications =
-            compareObjsT(corner, possibleCorners, visibleObjects);
-        break;
-    case OUTER_L:
-        possibleClassifications =
-            compareObjsOuterL(corner, possibleCorners, visibleObjects);
-        break;
-    case INNER_L:
-        possibleClassifications =
-            compareObjsInnerL(corner, possibleCorners, visibleObjects);
-        break;
-    default:
-		// before we waste our time let's make sure it isn't a misclassified
-		// T or L corner
-		if (face != FACING_UNKNOWN && objectDistance < 200) {
-			// 223-11/slarti/bg-sideview-lp/8..FRM
-			boost::shared_ptr<VisualLine> l1 = corner.getLine1();
-			boost::shared_ptr<VisualLine> l2 = corner.getLine2();
-			VisualCorner temp = corner;
-			if (l1->getLength() > l2->getLength()) {
-				temp.changeToT(l2);
-			} else {
-				temp.changeToT(l1);
-			}
-            compareObjsT(corner, possibleCorners, visibleObjects);
-		} else {
-			possibleClassifications =
-				compareObjsCenterCorners(corner, possibleCorners, visibleObjects);
-		}
-        break;
-    }
-
-    // note: we might actually look for why there is no match
-	if (possibleClassifications.empty()){
-        // reset to the best we've got
-        possibleCorners =
-            ConcreteCorner::getPossibleCorners(corner.getShape(),
-                                               corner.getSecondaryShape());
-        list<const ConcreteCorner*> classification;
-        vector<const ConcreteCorner*>::const_iterator j =
-            possibleCorners.begin();
-        for (; j != possibleCorners.end(); ++j) {
-            classification.push_back(*j);
-        }
-        return classification;
-	}
-
-    return possibleClassifications;
+    return classification;
 }
 
 /* Given a list of concrete corners that the Outer_L could possibly be,
@@ -1882,20 +1527,6 @@ list <const ConcreteCorner*> Context::compareObjsOuterL(
                  visibleObjects.begin();
              k != visibleObjects.end() && isOk; ++k) {
 
-            // don't bother with corners on the opposite side of the field
-            if (face == FACING_BLUE_GOAL) {
-                if ((*j)->getID() == YELLOW_GOAL_LEFT_L ||
-                    (*j)->getID() == YELLOW_GOAL_RIGHT_L) {
-                    isOk = false;
-                    continue;
-                }
-            } else if (face == FACING_YELLOW_GOAL) {
-                if ((*j)->getID() == BLUE_GOAL_LEFT_L ||
-                    (*j)->getID() == BLUE_GOAL_RIGHT_L) {
-                    isOk = false;
-                    continue;
-                }
-            }
             const float estimatedDistance =
                 realDistance(corner.getX(), corner.getY(),
                              (*k)->getX(),  (*k)->getY());
@@ -1963,68 +1594,30 @@ list <const ConcreteCorner*> Context::compareObjsT(
                                                          corner.getY(),
                                                          (*k)->getX(),
                                                          (*k)->getY());
-            /* if we have a T corner and a goal post, then we can determine
-               which one it is definitely - look at whether the Stem is going up
-               or down if it is down (normal case) just look at whether T is
-               left or right if it is up, then reverse the results because you
-               are over the endline. */
-            if ((*j)->getID() == CENTER_TOP_T ||
-                (*j)->getID() == CENTER_BOTTOM_T) {
-                // needs to be related to some field constant
-                if (estimatedDistance > 250.0) {
-                    // we can tell which one by looking at the direction
-                    if (corner.getOrientation() > 0.0) {
-                        if (face == FACING_BLUE_GOAL) {
-                            if ((*j)->getID() != CENTER_BOTTOM_T) {
-                                isOk = false;
-                            }
-                        } else {
-                            if ((*j)->getID() != CENTER_TOP_T) {
-                                isOk = false;
-                            }
-                        }
-                    } else {
-                        if (face == FACING_BLUE_GOAL) {
-                            if ((*j)->getID() != CENTER_TOP_T) {
-                                isOk = false;
-                            }
-                        } else {
-                            if ((*j)->getID() != CENTER_BOTTOM_T) {
-                                isOk = false;
-                            }
-                        }
-                    }
-                }
-                continue;
-            }
             // At this point we have an object relatively close
             // weed out the corners that are obviously wrong
             bool down = abs(corner.getOrientation()) > 90.0;
             bool right = corner.getX() > (*k)->getX();
             if (down) {
                 if (right) {
-                    if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
-                        (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+                    if ((*j)->getID() == RIGHT_GOAL_T) {
                         isOk = false;
                         continue;
                     }
                 } else {
-                    if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
-                        (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+                    if ((*j)->getID() == LEFT_GOAL_T) {
                         isOk = false;
                         continue;
                     }
                 }
             } else {
                 if (!right) {
-                    if ((*j)->getID() == BLUE_GOAL_RIGHT_T ||
-                        (*j)->getID() == YELLOW_GOAL_RIGHT_T) {
+                    if ((*j)->getID() == RIGHT_GOAL_T) {
                         isOk = false;
                         continue;
                     }
                 } else {
-                    if ((*j)->getID() == BLUE_GOAL_LEFT_T ||
-                        (*j)->getID() == YELLOW_GOAL_LEFT_T) {
+                    if ((*j)->getID() == LEFT_GOAL_T) {
                         isOk = false;
                         continue;
                     }
@@ -2598,17 +2191,6 @@ float Context::realLineDistance(boost::shared_ptr<VisualLine> line) {
     return realDistance(end1.x, end1.y, end2.x, end2.y);
 }
 
-/*
- */
-/*bool Context::onGoalSide() {
-	if (face == FACING_BLUE_GOAL && fieldHalf == HALF_BLUE) {
-		return true;
-	}
-	if (face == FACING_YELLOW_GOAL && fieldHalf == HALF_YELLOW) {
-		return true;
-	}
-	}*/
-
 
 /* Set facing information.  Initially this is based on whether we see a goal
    post or not.  If we do then we are facing one.  Eventually we may realize
@@ -2617,10 +2199,8 @@ float Context::realLineDistance(boost::shared_ptr<VisualLine> line) {
    particular field corner).
  */
 void Context::setFacing() {
-    if (bluePost) {
-        face = FACING_BLUE_GOAL;
-    } else if (yellowPost) {
-        face = FACING_YELLOW_GOAL;
+    if (seePost) {
+        face = FACING_GOAL;
     } else {
         face = FACING_UNKNOWN;
     }
@@ -2634,12 +2214,6 @@ void Context::setFieldHalf() {
         fieldHalf = HALF_UNKNOWN;
         return;
     }
-    if ((face == FACING_BLUE_GOAL && sameHalf) ||
-        (face == FACING_YELLOW_GOAL && !sameHalf)) {
-        fieldHalf = HALF_BLUE;
-    } else {
-        fieldHalf = HALF_YELLOW;
-    }
 }
 
 /**
@@ -2649,28 +2223,16 @@ void Context::printContext() {
     cout << "Begining identify Corners." << endl;
     cout << "   Facing: ";
     switch (face) {
-    case FACING_BLUE_GOAL:
-        cout << "Blue goals " << endl;
-        if (rightBluePost) {
-            cout << "     We see a right blue post" << endl;
+    case FACING_GOAL:
+        cout << "Goals " << endl;
+        if (rightPost) {
+            cout << "     We see a right post" << endl;
         }
-        if (leftBluePost) {
-            cout << "     We see a left blue post" << endl;
+        if (leftPost) {
+            cout << "     We see a left post" << endl;
         }
-        if (unknownBluePost) {
-            cout << "     We see an unidentified blue post" << endl;
-        }
-        break;
-    case FACING_YELLOW_GOAL:
-        cout << "Yellow goals " << endl;
-        if (rightYellowPost) {
-            cout << "     We see a right yellow post" << endl;
-        }
-        if (leftYellowPost) {
-            cout << "     We see a left yellow post" << endl;
-        }
-        if (unknownYellowPost) {
-            cout << "     We see an unidentified yellow post" << endl;
+        if (unknownPost) {
+            cout << "     We see an unidentified post" << endl;
         }
         break;
     case FACING_SIDELINE:
@@ -2678,20 +2240,6 @@ void Context::printContext() {
         break;
     case FACING_UNKNOWN:
         cout << "Unknown " << endl;
-        break;
-    }
-    cout << "   Field half is: ";
-    switch (fieldHalf) {
-    case HALF_UNKNOWN:
-        cout << "unknown" << endl;
-        break;
-    case HALF_BLUE:
-        cout << "blue side" << endl;
-        break;
-    case HALF_YELLOW:
-        cout << "yellow side" << endl;
-        break;
-    default:
         break;
     }
     cout << "   We can see:" << endl;

@@ -30,7 +30,7 @@ public:
                      QObject* parent) :
         BMPImage(parent), groundTruth(groundTruth) {
 
-        bitmap = QImage(getWidth(), getHeight(), QImage::Format_ARGB32_Premultiplied);
+        bitmap = QPixmap(getWidth(), getHeight());
     }
 
     virtual unsigned getWidth() const { return FIELD_WIDTH; }
@@ -39,7 +39,7 @@ public:
 protected:
     virtual void buildBitmap() {
 
-        bitmap.fill(0x00000000);
+        bitmap.fill(Qt::transparent);
 
         QPainter painter(&bitmap);
 

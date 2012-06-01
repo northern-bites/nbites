@@ -169,22 +169,22 @@ namespace Kinematics {
 
     // Order of arm joints: ShoulderPitch, SRoll, ElbowYaw, ERoll
     static const float LEFT_ARM_BOUNDS[][2] = {{-2.09f,2.09f},
-                                               {0.0f,1.65f},
+                                               {-0.31f,1.32f},
                                                {-2.09f,2.09f},
                                                {-1.57f,0.0f}};
     static const float RIGHT_ARM_BOUNDS[][2] = {{-2.09f,2.09f},
-                                                {-1.65f,0.0f},
+                                                {-1.32f,0.31f},
                                                 {-2.09f,2.09f},
                                                 {0.0f,1.57f}};
 
     // Order of leg joints: HYPitch HipRoll HipPitch  KneePitch APitch ARoll
-    static const float LEFT_LEG_BOUNDS[][2] = {{-1.57f,0.0f},
+    static const float LEFT_LEG_BOUNDS[][2] = {{-1.14f,0.74f},
                                                {-.349f,.785f},
                                                {-1.57f,.436f},
                                                {0.0f,2.269f},
                                                {-1.309f,.524f},
                                                {-.785f,.349f}};
-    static const float RIGHT_LEG_BOUNDS[][2] = {{-1.57f,0.0f},
+    static const float RIGHT_LEG_BOUNDS[][2] = {{-1.14f,0.74f},
                                                 {-.785f,.349f},
                                                 {-1.57f,.436f},
                                                 {0.0f,2.269f},

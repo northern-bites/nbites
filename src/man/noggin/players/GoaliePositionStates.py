@@ -43,15 +43,14 @@ def kickOffPosition(player):
     Meant for kickoff situations (For penalty kicks
     track ball)
     """
-    ball = player.brain.ball
 
     if player.firstFrame():
         player.brain.resetGoalieLocalization()
         player.brain.tracker.trackBall()
-        player.brain.nav.setDest(goalCon.MOVE_IN_KICKOFF, 0, 0)
+        player.brain.nav.walkTo(goalCon.MOVE_IN_KICKOFF, 0, 0)
         if player.penaltyKicking:
             player.gainsOn()
-            player.walkPose()
+            player.stand()
 
     return player.stay()
 

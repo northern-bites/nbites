@@ -21,7 +21,7 @@ def gamePlaying(player):
 def standup(player):
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
-        player.walkPose()
+        player.stand()
 
     elif not player.brain.motion.isBodyActive():
         return player.goLater('saveFrames')
