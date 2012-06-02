@@ -1,7 +1,7 @@
 /**
  * Implements an interface between localization and the vision
- * system to apply visual landmark measurements to the 
- * particles. 
+ * system to apply visual landmark measurements to the
+ * particles.
  *
  * @author Ellis Ratner <eratner@bowdoin.edu>
  */
@@ -47,7 +47,7 @@ struct Landmark
 
 /**
  * Helper function to construct a list of Landmark possibilities from
- * a VisualFieldObject. 
+ * a VisualFieldObject.
  * @param fieldObjects
  * @return a vector of landmarks.
  */

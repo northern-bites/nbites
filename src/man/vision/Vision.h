@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -89,7 +88,7 @@ public:
     void drawLine(int x, int y, int x1, int y1, int c);
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     void drawLine(const point<int> start, const point<int> end,
-		  const int c);
+                  const int c);
     void drawDot(int x, int y, int c);
     void drawFieldLines();
     void drawX(int x, int y, int c);
@@ -136,9 +135,9 @@ public:
     VisualCrossbar *ygCrossbar, *bgCrossbar;
     VisualRobot *red1, *red2, *red3;
     VisualRobot *navy1, *navy2, *navy3;
-	VisualCross *cross;
+    VisualCross *cross;
     VisualBall *ball;
-	VisualFieldEdge *fieldEdge;
+    VisualFieldEdge *fieldEdge;
     Threshold *thresh;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<FieldLines> fieldLines;

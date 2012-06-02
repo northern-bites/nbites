@@ -302,8 +302,8 @@ void Noggin::updateLocalization()
     const ::MotionModel odometry = motion_interface->getOdometryUpdate();
 
     const PF::OdometryMeasurement odo(odometry.x,
-				      odometry.y,
-				      odometry.theta);
+                                      odometry.y,
+                                      odometry.theta);
 
     locMotionSystem->setCurrentOdometry(odo);
 
@@ -313,71 +313,74 @@ void Noggin::updateLocalization()
 
     // Observe FieldObjects.
     VisualFieldObject fo;
+
+    /* We Dont need to check for blue goal posts anymore
     fo = *vision->bgrp;
 
     // @todo this seems like a lot of code duplication--make more concise?
 
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
     {
         // Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
+    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
+    dist = fo.getDistance();
+    theta = fo.getBearing();
+    observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     fo = *vision->bglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
     {
-	// Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
+        // Create a new Observation from the observed VisualFieldObject.
+    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
+    dist = fo.getDistance();
+    theta = fo.getBearing();
+    observations.push_back(PF::Observation(landmarks, dist, theta));
     }
+    */
 
     fo = *vision->ygrp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
     {
-	// Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
+        // Create a new Observation from the observed VisualFieldObject.
+    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
+    dist = fo.getDistance();
+    theta = fo.getBearing();
+    observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     fo = *vision->yglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
     {
-	// Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
+    // Create a new Observation from the observed VisualFieldObject.
+    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
+    dist = fo.getDistance();
+    theta = fo.getBearing();
+    observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     // Observe Field Cross.
     if (vision->cross->getDistance() > 0 &&
-        vision->cross->getDistance() < MAX_CROSS_DISTANCE) 
+        vision->cross->getDistance() < MAX_CROSS_DISTANCE)
     {
 
-	landmarks = constructLandmarks<VisualCross, ConcreteCross>(*vision->cross);
-	dist = (*vision->cross).getDistance();
-	theta = (*vision->cross).getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
+    landmarks = constructLandmarks<VisualCross, ConcreteCross>(*vision->cross);
+    dist = (*vision->cross).getDistance();
+    theta = (*vision->cross).getBearing();
+    observations.push_back(PF::Observation(landmarks, dist, theta));
     }
 
     // Observe Corners.
     const list<VisualCorner> * corners = vision->fieldLines->getCorners();
     list <VisualCorner>::const_iterator ci;
-    for(ci = corners->begin(); ci != corners->end(); ++ci) 
+    for(ci = corners->begin(); ci != corners->end(); ++ci)
     {
-        if (ci->getDistance() < MAX_CORNER_DISTANCE) 
-	{
-	    landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
-	    dist = ci->getDistance();
-	    theta = ci->getBearing();
-	    observations.push_back(PF::Observation(landmarks, dist, theta));
+        if (ci->getDistance() < MAX_CORNER_DISTANCE)
+    {
+        landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
+        dist = ci->getDistance();
+        theta = ci->getBearing();
+        observations.push_back(PF::Observation(landmarks, dist, theta));
         }
     }
 
