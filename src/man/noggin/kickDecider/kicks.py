@@ -35,27 +35,23 @@ class Kick(object):
 #From extensve testing in pKicker and with printlines of the balls
 #relX and relY, this appears accurate TODO TODO TODO
 
-#new-NEED TO GET NEW SWEET SPOTS!
+#new
 LEFT_SIDE_KICK =  Kick("L_Side", x = 13.5, y =  0,
                        move=SweetMoves.LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick("R_Side", x = 13.5, y = 0,
                        move=SweetMoves.RIGHT_SIDE_KICK)
-#new-NEED TO GET NEW SWEET SPOTS!
+#new
 LEFT_SHORT_SIDE_KICK = Kick("L_Short_Side", x = 13, y = 0,
                             move=SweetMoves.LEFT_SHORT_SIDE_KICK)
 RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 13, y = 0,
                              move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
 #new
 LEFT_STRAIGHT_KICK = Kick("L_D_Straight", x = 16.5, y = 6,
-                             move=SweetMoves.LEFT_STRAIGHT_KICK)
+                             move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
 RIGHT_STRAIGHT_KICK =Kick("R_D_Straight", x = 16.5, y = -6,
-                             move=SweetMoves.RIGHT_STRAIGHT_KICK)
-#new-NEED TO GET NEW SWEET SPOTS!
-LEFT_QUICK_STRAIGHT_KICK =  Kick("L_D_Straight", x = 18, y =  5.5,
-                                   move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
-RIGHT_QUICK_STRAIGHT_KICK = Kick("R_D_Straight", x = 18, y = -5.5,
-                                   move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
-#new-NEED TO GET NEW SWEET SPOTS!
+                             move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
+
+#new
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_D_Straight", x = 17, y =  5.5,
                                    move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_D_Straight", x = 17, y = -5.5,

@@ -206,9 +206,9 @@ class KickDecider(object):
         ball = self.brain.ball
         if ball.loc.relY >= 0:
             print "LEFT_DYNAMIC_STRAIGHT"
-            return kicks.LEFT_QUICK_STRAIGHT_KICK
+            return kicks.LEFT_STRAIGHT_KICK
         print "RIGHT_DYNAMIC_STRAIGHT"
-        return kicks.RIGHT_QUICK_STRAIGHT_KICK
+        return kicks.RIGHT_STRAIGHT_KICK
 
     def chooseLongBackKick(self):
         ball = self.brain.ball

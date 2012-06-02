@@ -205,9 +205,9 @@ class KickInformation:
         Picks the straight kick based on our heading to the ball.
         """
         if self.shouldFrontKickLeft():
-            return kicks.LEFT_QUICK_STRAIGHT_KICK
+            return kicks.LEFT_STRAIGHT_KICK
         else:
-            return kicks.RIGHT_QUICK_STRAIGHT_KICK
+            return kicks.RIGHT_STRAIGHT_KICK
 
     def chooseShortQuickKick(self):
         """
