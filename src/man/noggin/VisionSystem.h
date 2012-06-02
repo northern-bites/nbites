@@ -29,19 +29,19 @@ struct Landmark
     Landmark(const ConcreteLandmark& fieldLandmark)
     {
         x    = fieldLandmark.getFieldX();
-	y    = fieldLandmark.getFieldY();
+        y    = fieldLandmark.getFieldY();
         what = fieldLandmark.toString();
     }
-    
+
     float x;
     float y;
     std::string what;
 
     friend std::ostream& operator<<(std::ostream& out, Landmark l)
     {
-	out << "Landmark \"" << l.what << "\" at (" << l.x << ", "
-	    << l.y << ") \n";
-	return out;
+        out << "Landmark \"" << l.what << "\" at (" << l.x << ", "
+            << l.y << ") \n";
+        return out;
     }
 };
 
@@ -59,13 +59,13 @@ static std::vector<Landmark> constructLandmarks(const VisualT & fieldObject)
     const std::list<const ConcreteT * > * possibilities = fieldObject.getPossibilities();
 
     typename std::list<const ConcreteT * >::const_iterator i;
-    for(i = possibilities->begin(); i != possibilities->end(); ++i) 
+    for(i = possibilities->begin(); i != possibilities->end(); ++i)
     {
         // Construct landmarks from possibilities.
         Landmark l((**i).getFieldX(),
-		   (**i).getFieldY(),
-		   (**i).toString());
-	landmarks.push_back(l);
+                   (**i).getFieldY(),
+                   (**i).toString());
+        landmarks.push_back(l);
     }
 
     return landmarks;
@@ -78,30 +78,30 @@ namespace PF
 {
     struct Observation
     {
-         Observation(std::vector<Landmark> p, float dist = 0.0f, float theta = 0.0f)
-	 : possibilities(p), distance(dist), angle(theta)
-	{ }
-	
-	bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
+    Observation(std::vector<Landmark> p, float dist = 0.0f, float theta = 0.0f)
+        : possibilities(p), distance(dist), angle(theta)
+    { }
 
-	friend std::ostream& operator<<(std::ostream& out, Observation o)
+    bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
+
+    friend std::ostream& operator<<(std::ostream& out, Observation o)
+    {
+        out << "Observed landmark at distance " << o.distance
+            << " and angle " << o.angle << "\n"
+            << "Possibilities: \n";
+        std::vector<Landmark>::iterator lIter;
+        for(lIter = o.possibilities.begin(); lIter != o.possibilities.end();
+            lIter++)
         {
-	    out << "Observed landmark at distance " << o.distance 
-	        << " and angle " << o.angle << "\n"
-	        << "Possibilities: \n";
-	    std::vector<Landmark>::iterator lIter;
-	    for(lIter = o.possibilities.begin(); lIter != o.possibilities.end();
-		lIter++)
-	    {
-	        out << *lIter;
-	    }
-	    
-	    return out;
-	}
+            out << *lIter;
+        }
 
-	std::vector<Landmark> possibilities;
-	float distance;
-	float angle;
+        return out;
+    }
+
+        std::vector<Landmark> possibilities;
+        float distance;
+        float angle;
     };
 }
 
@@ -111,7 +111,7 @@ struct LocalizationVisionParams
     float sigma_h;       // Variance for calculating heading weights.
 };
 
-static const LocalizationVisionParams DEFAULT_LOCVIS_PARAMS = 
+static const LocalizationVisionParams DEFAULT_LOCVIS_PARAMS =
 {
     15.00f,
     1.25f
