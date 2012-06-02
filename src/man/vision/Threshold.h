@@ -170,8 +170,6 @@ public:
     int getRobotTop(int x, int c);
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
-    bool overlap(VisualRobot* robot, VisualFieldObject* post);
-    bool checkRobotAgainstBluePost(VisualRobot* robot, VisualFieldObject* post);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uint16_t* newyuv);
     const uint16_t* getYUV();
