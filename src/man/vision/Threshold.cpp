@@ -274,16 +274,17 @@ void Threshold::runs() {
  */
 
 void Threshold::findGoals(int column, int topEdge) {
-    const int BADSIZE = 10;
-	const int GAP = 15;
+    const int BADSIZE = 15;
+	const int GAP = BADSIZE * 2;
     // scan up for goals
-    int bad = 0, yellows = 0, pinks = 0;
-    int firstYellow = topEdge,
+    int bad = 0, yellows = 0, pinks = 0, navy = 0;
+    int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
         lastYellow = topEdge, firstPink = topEdge, lastPink = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
 	bool faceDown2 = pose->getHorizonY(0) < -100;
-    for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
+	int j;
+    for (j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
         if (Utility::isYellow(pixel)) {
@@ -297,10 +298,16 @@ void Threshold::findGoals(int column, int topEdge) {
         if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
         }
+		if (Utility::isNavy(pixel)) {
+			lastNavy = j;
+			navy++;
+			if (firstNavy == topEdge) {
+				firstNavy = j;
+			}
+		}
 		if (Utility::isRed(pixel)) {
 			lastPink = j;
 			pinks++;
-			bad++;
 			if (firstPink == topEdge) {
 				firstPink = j;
 			}
@@ -315,7 +322,7 @@ void Threshold::findGoals(int column, int topEdge) {
     // now do the same going down from the horizon
     bad = 0;
 	int greens = 0;
-    for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
+    for (j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
@@ -327,6 +334,13 @@ void Threshold::findGoals(int column, int topEdge) {
         if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
             found = true;
+			if (Utility::isNavy(pixel)) {
+				navy++;
+				firstNavy = j;
+			} else {
+				pinks++;
+				firstPink = j;
+			}
         }
         if (Utility::isGreen(pixel)) {
             bad++;
@@ -341,6 +355,9 @@ void Threshold::findGoals(int column, int topEdge) {
     }
 	if (pinks > 5) {
 		red->newRun(column, lastPink, firstPink - lastPink);
+	}
+	if (navy > 5) {
+		navyblue->newRun(column, lastNavy, firstNavy - lastNavy);
 	}
     if (shoot[column] && robots > 5) {
         shoot[column] = false;
