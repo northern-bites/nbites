@@ -53,6 +53,7 @@ def prepareForKick(player):
 
     prepareForKick.hackKick.collectData()
 
+    # Should not directly check the tracker's state!
     if player.brain.tracker.currentState is 'returnHeadsPan':
         prepareForKick.hackKick.calculateDataAverages()
         print str(prepareForKick.hackKick)

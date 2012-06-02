@@ -92,10 +92,10 @@ class Navigator(FSA.FSA):
         indefinitely
         @param speedGain: controls how fast the robot does the goTo; use provided
         constants for some good ballparks
-        @param precision: a tuple of deltaX, deltaY, deltaH for how close you want to get
-        to the location
-        @param adaptive: if true, then the speed is adapted to how close the target is
-        and the speed paramater is interpreted as the maximum speed
+        @param precision: a tuple of deltaX, deltaY, deltaH for how close
+        you want to get to the location
+        @param adaptive: if true, then the speed is adapted to how close the target
+        is and the speed paramater is interpreted as the maximum speed
         """
 
         self.updateDest(dest, speed)
@@ -117,8 +117,8 @@ class Navigator(FSA.FSA):
         Checks for the destination using odometry
         Great for close destinations (since odometry gets bad over time) in
         case loc is bad
-        Doesn't avoid obstacles! (that would make odometry very bad, especially if we're
-        being pushed)
+        Doesn't avoid obstacles! (that would make odometry very bad, especially
+        if we're being pushed)
         Switches to standing at the end
         @todo: Calling this again before the other walk is done does some weird stuff
         """
