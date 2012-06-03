@@ -80,7 +80,7 @@ using boost::shared_ptr;
 V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
                                            Camera::Type which) :
     ImageTranscriber(s),
-    settings(Camera::getDefaultSettings()),
+    settings(Camera::getSettings(which)),
     cameraType(which),
     currentBuf(0),
     timeStamp(0),
@@ -350,17 +350,10 @@ void V4L2ImageTranscriber::enumerate_menu ()
 
 void V4L2ImageTranscriber::initSettings()
 {
-    // The following should be 1 if we're using the top camera (?)
-    if(cameraType == Camera::TOP)
-    {
-        setControlSetting(V4L2_CID_HFLIP, 1);
-        setControlSetting(V4L2_CID_VFLIP, 1);
-    }
-    else
-    {
-        setControlSetting(V4L2_CID_HFLIP, 0);
-        setControlSetting(V4L2_CID_VFLIP, 0);
-    }
+    // DO NOT SCREW UP THE ORDER BELOW
+
+    setControlSetting(V4L2_CID_HFLIP, settings.hflip);
+    setControlSetting(V4L2_CID_VFLIP, settings.vflip);
 
     // Auto exposure on (buggy driver, blah)
     setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
@@ -370,58 +363,28 @@ void V4L2ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
     setControlSetting(V4L2_CID_SATURATION, settings.saturation);
     setControlSetting(V4L2_CID_HUE, settings.hue);
-    setControlSetting(V4L2_CID_SHARPNESS, 3);
+    setControlSetting(V4L2_CID_SHARPNESS, settings.sharpness);
 
     // Auto white balance and backlight comp off!
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
-    setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION, 0x00);
+    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE,
+                      settings.auto_whitebalance);
+    setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION,
+                      settings.backlight_compensation);
 
     // Auto exposure back off
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 0);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, settings.auto_exposure);
 
     setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
     setControlSetting(V4L2_CID_GAIN, settings.gain);
 
     // This is actually just the white balance setting!
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, -60);
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, settings.white_balance);
 }
 
 void V4L2ImageTranscriber::startCapturing() {
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     VERIFY((ioctl(fd, VIDIOC_STREAMON, &type)),
            "Start capture failed.");
-}
-
-void V4L2ImageTranscriber::setNewSettings(const Camera::Settings& newset) {
-    if (newset.exposure != settings.exposure)
-    {
-        setControlSetting(V4L2_CID_EXPOSURE,
-                (settings.exposure = newset.exposure));
-    }
-    if (newset.brightness != settings.brightness)
-    {
-        setControlSetting(V4L2_CID_BRIGHTNESS,
-                (settings.brightness = newset.brightness));
-    }
-    if (newset.contrast != settings.contrast)
-    {
-        setControlSetting(V4L2_CID_CONTRAST,
-                (settings.contrast = newset.contrast));
-    }
-    if (newset.gain != settings.gain)
-    {
-        setControlSetting(V4L2_CID_GAIN, (settings.gain = newset.gain));
-    }
-    if (newset.blue_chroma != settings.blue_chroma)
-    {
-        setControlSetting(V4L2_CID_BLUE_BALANCE,
-                          (settings.blue_chroma = newset.blue_chroma));
-    }
-    if (newset.red_chroma != settings.red_chroma)
-    {
-        setControlSetting(V4L2_CID_RED_BALANCE,
-                          (settings.red_chroma = newset.red_chroma));
-    }
 }
 
 bool V4L2ImageTranscriber::waitForImage() {
@@ -535,47 +498,75 @@ void V4L2ImageTranscriber::assertCameraSettings() {
     }
 
     // check camera settings against what the driver has
-    int exposure = getControlSetting(V4L2_CID_EXPOSURE);
+    int hflip = getControlSetting(V4L2_CID_HFLIP);
+    int vflip = getControlSetting(V4L2_CID_VFLIP);
     int brightness = getControlSetting(V4L2_CID_BRIGHTNESS);
     int contrast = getControlSetting(V4L2_CID_CONTRAST);
-    int red = getControlSetting(V4L2_CID_RED_BALANCE);
-    int blue = getControlSetting(V4L2_CID_BLUE_BALANCE);
+    int saturation = getControlSetting(V4L2_CID_SATURATION);
+    int hue = getControlSetting(V4L2_CID_HUE);
+    int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
+    int exposure = getControlSetting(V4L2_CID_EXPOSURE);
+    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
 
-    if (settings.exposure != Camera:: KEEP_DEFAULT &&
-        exposure != settings.exposure) {
-        printf("CAMERA::WARNING::Exposure setting is wrong:");
-        printf(" is %d, not %d.\n", exposure, settings.exposure);
+    if (hflip != settings.hflip)
+    {
+        printf("CAMERA::WARNING::Horizontal flip setting is wrong:");
+        printf(" is %d, not %d.\n", hflip, settings.hflip);
         allFine = false;
     }
-    if (settings.brightness != Camera:: KEEP_DEFAULT &&
-        brightness != settings.brightness) {
+    if (vflip != settings.vflip)
+    {
+        printf("CAMERA::WARNING::Vertical flip setting is wrong:");
+        printf(" is %d, not %d.\n", vflip, settings.vflip);
+        allFine = false;
+    }
+    if (brightness != settings.brightness)
+    {
         printf("CAMERA::WARNING::Brightness setting is wrong:");
         printf(" is %d, not %d.\n", brightness, settings.brightness);
         allFine = false;
     }
-    if (settings.contrast != Camera:: KEEP_DEFAULT &&
-        contrast != settings.contrast) {
+    if (contrast != settings.contrast)
+    {
         printf("CAMERA::WARNING::Contrast setting is wrong:");
         printf(" is %d, not %d.\n", contrast, settings.contrast);
         allFine = false;
     }
-    if (settings.red_chroma != Camera:: KEEP_DEFAULT &&
-        red != settings.red_chroma) {
-        printf("CAMERA::WARNING::Red chroma setting is wrong:");
-        printf(" is %d, not %d.\n", red, settings.red_chroma);
+    if (saturation != settings.saturation)
+    {
+        printf("CAMERA::WARNING::Saturation setting is wrong:");
+        printf(" is %d, not %d.\n", saturation, settings.saturation);
         allFine = false;
     }
-    if (settings.blue_chroma != Camera:: KEEP_DEFAULT &&
-        blue != settings.blue_chroma) {
-        printf("CAMERA::WARNING::Blue chroma setting is wrong:");
-        printf(" is %d, not %d.\n", blue, settings.blue_chroma);
+    if (hue != settings.hue)
+    {
+        printf("CAMERA::WARNING::Hue setting is wrong:");
+        printf(" is %d, not %d.\n", hue, settings.hue);
         allFine = false;
     }
-    if (settings.gain != Camera:: KEEP_DEFAULT &&
-        gain != settings.gain) {
+   if (sharpness != settings.sharpness)
+    {
+        printf("CAMERA::WARNING::Sharpness setting is wrong:");
+        printf(" is %d, not %d.\n", sharpness, settings.sharpness);
+        allFine = false;
+    }
+   if (gain != settings.gain)
+    {
         printf("CAMERA::WARNING::Gain setting is wrong:");
         printf(" is %d, not %d.\n", gain, settings.gain);
+        allFine = false;
+    }
+   if (exposure != settings.exposure)
+    {
+        printf("CAMERA::WARNING::Exposure setting is wrong:");
+        printf(" is %d, not %d.\n", exposure, settings.exposure);
+        allFine = false;
+    }
+   if (whitebalance != settings.white_balance)
+    {
+        printf("CAMERA::WARNING::Whitebalance setting is wrong:");
+        printf(" is %d, not %d.\n", whitebalance, settings.white_balance);
         allFine = false;
     }
 
@@ -585,15 +576,6 @@ void V4L2ImageTranscriber::assertCameraSettings() {
             printf("Bottom camera settings were set correctly.\n");
         else printf("Top camera settings were set correctly.\n");
     }
-}
-
-void V4L2ImageTranscriber::writeCameraSettings() {
-    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
-    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
-    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
-    setControlSetting(V4L2_CID_GAIN, settings.gain);
-    setControlSetting(V4L2_CID_BLUE_BALANCE, settings.blue_chroma);
-    setControlSetting(V4L2_CID_RED_BALANCE, settings.red_chroma);
 }
 
 } /* namespace corpus */
