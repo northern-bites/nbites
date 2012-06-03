@@ -85,7 +85,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
 
 #if defined USE_MEMORY && !defined OFFLINE
-    OutputProviderFactory::AllSocketOutput(loggingBoard.get());
+    OutputProviderFactory::AllSocketOutput(memory.get(), loggingBoard.get());
 #endif
 }
 

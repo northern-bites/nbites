@@ -29,6 +29,7 @@ public:
 public:
     MImage(boost::shared_ptr<Sensors> sensors,
            corpus::Camera::Type type,
+           MObject_ID objectID = id,
            PImage_ptr data = PImage_ptr(new proto::PImage));
     virtual ~MImage();
     /**
@@ -48,5 +49,16 @@ private:
     PImage_ptr thresholded_data;
     corpus::Camera::Type cameraType;
 };
+
+class MTopImage: public MImage {
+public:
+    MTopImage(boost::shared_ptr<Sensors> sensors);
+};
+
+class MBottomImage: public MImage {
+public:
+    MBottomImage(boost::shared_ptr<Sensors> sensors);
+};
+
 }
 }
