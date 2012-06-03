@@ -63,9 +63,9 @@ class TeamMember(RobotLocation):
 
         # stores packet information locally
         self.playerNumber = packet.playerNumber
-        #self.x = packet.playerX
-        #self.y = packet.playerY
-        #self.h = packet.playerH
+        self.x = packet.playerX
+        self.y = packet.playerY
+        self.h = packet.playerH
         self.ballDist = packet.ballDist
         self.ballBearing = packet.ballBearing
         self.ballOn = packet.ballOn
@@ -105,9 +105,9 @@ class TeamMember(RobotLocation):
         my = self.brain.my
         ball = self.brain.ball
 
-        #self.x = my.x
-        #self.y = my.y
-        #self.h = my.h
+        self.x = my.x
+        self.y = my.y
+        self.h = my.h
         self.ballDist = ball.vis.dist
         self.ballBearing = ball.vis.bearing
         self.ballOn = ball.vis.on

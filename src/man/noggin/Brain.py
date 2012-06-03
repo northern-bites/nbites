@@ -296,11 +296,11 @@ class Brain(object):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
         loc = self.loc
-        self.comm.setData(#loc.x,
-                          #loc.y,
-                          #loc.h,
-                          #loc.xUncert,
-                          #loc.yUncert,
+        self.comm.setData(loc.x,
+                          loc.y,
+                          loc.h,
+                          loc.xUncert,
+                          loc.yUncert,
                           #loc.hUncert,
                           #loc.ballX,
                           #loc.ballY,

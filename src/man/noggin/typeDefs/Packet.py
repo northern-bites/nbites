@@ -28,11 +28,11 @@ class Packet:
         (self.teamNumber,
          self.playerNumber,
          self.color,
-         #self.playerX,
-         #self.playerY,
-         #self.playerH,
-         #self.uncertX,
-         #self.uncertY,
+         self.playerX,
+         self.playerY,
+         self.playerH,
+         self.uncertX,
+         self.uncertY,
          #self.uncertH,
          #self.ballX,
          #self.ballY,
@@ -51,11 +51,11 @@ class Packet:
         self.teamNumber = int(self.teamNumber)
         self.playerNumber = int(self.playerNumber)
         self.color = int(self.color)
-        #self.playerX = float(self.playerX)
-        #self.playerY = float(self.playerY)
-        #self.playerH = float(self.playerH)
-        #self.uncertX = float(self.uncertX)
-        #self.uncertY = float(self.uncertY)
+        self.playerX = float(self.playerX)
+        self.playerY = float(self.playerY)
+        self.playerH = float(self.playerH)
+        self.uncertX = float(self.uncertX)
+        self.uncertY = float(self.uncertY)
         #self.uncertH = float(self.uncertH)
         #self.ballX = float(self.ballX)
         #self.ballY = float(self.ballY)
@@ -84,11 +84,11 @@ class Packet:
         (self.teamNumber,
          self.playerNumber,
          self.color,
-         #self.playerX,
-         #self.playerY,
-         #self.playerH,
-         #self.uncertX,
-         #self.uncertY,
+         self.playerX,
+         self.playerY,
+         self.playerH,
+         self.uncertX,
+         self.uncertY,
          #self.uncertH,
          #self.ballX,
          #self.ballY,
@@ -119,8 +119,12 @@ class Packet:
         #        self.ballDist, self.ballBearing, self.ballVelX, self.ballVelY))
         return (("teamNumber: {0} playerNumber: {1} color: {2}\n" +
                  "chaseTime: {3}\n" +
-                 "dist: {4} bearing: {5} on: ({6}, {7})").format(
+                 "playerX: {4} playerY: {5} playerH: {6}" +
+                 "uncertX: {7} uncertY: {8}" +
+                 "dist: {9} bearing: {10} on: ({11}, {12})").format(
                 self.teamNumber, self.playerNumber, self.color,
                 self.chaseTime,
+                self.playerX, self.playerY, self.playerH,
+                self.uncertX, self.uncertY,
                 self.ballDist, self.ballBearing, self.ballOn,
                 self.ballFramesOn))
