@@ -29,7 +29,6 @@ namespace qtool {
 		void BotLocs::readSocket(){
 			while(udpSocket.hasPendingDatagrams()){
 				qint64 datagram_size = udpSocket.pendingDatagramSize();
-				qDebug()<<datagram_size;
 				QHostAddress datagram_source;
 				quint16 datagram_port;
 				char* data = new char[datagram_size];
@@ -40,10 +39,11 @@ namespace qtool {
 					newBot.address = datagram_source;
 					newBot.xPos = ((float*)data)[0];
 					newBot.yPos = ((float*)data)[1];
-					//data[2] is the heading, idgaf
+                    //data[2] is the heading, idgaf
 					newBot.xUncert = ((float*)data)[3];
 					newBot.yUncert = ((float*)data)[4];
 
+					//kill the previous instance of this robot in the array
 					for(int i = 0; i < botPositions.size(); i++){
 						if(botPositions[i].address == newBot.address){
 							botPositions.erase(botPositions.begin()+i);
