@@ -100,11 +100,13 @@ IF(BUILDING_FOR_A_REMOTE_NAO)
     alconnect/ALEnactor
     alconnect/NaoEnactor
     alconnect/ALTranscriber
-    alconnect/ALImageTranscriber
+    # switched to V4L2
+    # alconnect/ALImageTranscriber
     alconnect/NaoLights
     alconnect/NaoRGBLight
     alconnect/ALSpeech
     V4L2ImageTranscriber
+    NaoImageTranscriber
     )
 ENDIF()
 

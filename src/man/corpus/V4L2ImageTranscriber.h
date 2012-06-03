@@ -74,24 +74,21 @@
 namespace man {
 namespace corpus {
 
-class V4L2ImageTranscriber: public ThreadedImageTranscriber {
+class V4L2ImageTranscriber: public ImageTranscriber {
 
 public:
 
-    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s);
+    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s, Camera::Type which);
     virtual ~V4L2ImageTranscriber();
 
-    void setNewSettings(const Camera::Settings& settings);
     const Camera::Settings* getSettings() const {
         return &settings;
     }
 
-    int start();
-    void run();
-    void stop();
     bool waitForImage();
     bool releaseBuffer();
     void releaseImage(){}
+
     /**
      * Note: this method blocks until it gets a new image
      */
@@ -100,15 +97,11 @@ public:
 
     void assertCameraSettings();
 
-    /**
-     * Unconditional write of the camera settings
-     */
-    void writeCameraSettings();
-
     void initTable(const std::string& path);
 
 private:
     Camera::Settings settings;
+    Camera::Type cameraType;
 
     int cameraAdapterFd;
 
