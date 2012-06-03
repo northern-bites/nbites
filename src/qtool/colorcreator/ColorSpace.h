@@ -69,10 +69,10 @@ public:
         float y = color.getY();
         // add 0.5f to normalize to a 0 to 1 range
         float v = color.getV() + 0.5f;
-        if (y < params[yMin] || y > params[yMax]) {
+        if (y < params[yMin] || y >= params[yMax]) {
             return false;
         }
-        if (v < params[vMin] || v > params[vMax]) {
+        if (v < params[vMin] || v >= params[vMax]) {
             return false;
         }
         return true;
