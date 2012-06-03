@@ -48,7 +48,7 @@ static void bindSocket(int socket_fd, unsigned short port) throw (socket_excepti
 }
 
 static void listenOnSocket(int socket_fd) throw (socket_exception) {
-    if (listen(socket_fd, 2) < 0) {
+    if (listen(socket_fd, 1024) < 0) {
         throw socket_exception(socket_exception::LISTEN_ERR, errno);
     }
 }
