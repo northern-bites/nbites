@@ -25,7 +25,7 @@ def playbookPosition(player):
             brain.tracker.locPans()
         else:
             brain.tracker.activeLoc()
-    
+
     #TODO: I think the transition is broken right now!
     #if PosTran.leavingTheField(player):
     #    return player.goLater('spinToField')

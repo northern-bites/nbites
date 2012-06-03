@@ -230,8 +230,7 @@ class HeadTrackingHelper(object):
         curPitch = self.tracker.brain.sensors.motionAngles[MotionConstants.HeadPitch]
         curYaw = self.tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw]
 
-        if curPitch > 25 or curPitch < 15:
-            self.tracker.printf("Head pitch changed!")
-            self.tracker.printf(curPitch)
-        #self.tracker.printf("Head yaw is: ")
-        #self.tracker.printf(
+        self.tracker.printf("Head pitch is:")
+        self.tracker.printf(curPitch)
+        self.tracker.printf("Head yaw is:")
+        self.tracker.printf(curYaw)

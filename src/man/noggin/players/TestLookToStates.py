@@ -3,6 +3,8 @@ def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
 
+    player.brain.tracker.helper.printHeadAngles()
+
     return player.stay()
 
 def gameReady(player):
