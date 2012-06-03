@@ -18,7 +18,7 @@ START_FUNCTION_EXPORT
 
 //This is what Aldebaran will call when it loads this module
 //Note: this is the point of entry for our code
-int _createModule(AL::ALPtr<AL::ALBroker> pBroker);
+int _createModule(boost::shared_ptr<AL::ALBroker> pBroker);
 
 //Aldebaran apparently never calls this - Octavian
 int _closeModule();
@@ -30,7 +30,8 @@ class NaoManPreloader: public AL::ALModule,
 
 public:
 
-    NaoManPreloader(AL::ALPtr<AL::ALBroker> pBroker, const std::string& pName);
+    NaoManPreloader(boost::shared_ptr<AL::ALBroker> pBroker,
+                    const std::string& pName);
     virtual ~NaoManPreloader();
 
     void reloadMan();
@@ -42,6 +43,6 @@ protected:
     void launchMan();
 
 private:
-    AL::ALPtr<AL::ALBroker> broker;
+    boost::shared_ptr<AL::ALBroker> broker;
 
 };

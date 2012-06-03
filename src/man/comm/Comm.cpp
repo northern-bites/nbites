@@ -530,7 +530,7 @@ void Comm::discover_broadcast()
 {
     // run ifconfig command to discover broadcast address
     FILE *f = popen(
-		"ifconfig | grep 'Bcast' | sed -e 's/.* Bcast:\\([^ ]*\\) .*/\\1/'",
+		"/sbin/ifconfig | grep 'Bcast' | sed -e 's/.* Bcast:\\([^ ]*\\) .*/\\1/'",
         "r");
     if (f == NULL)
         return error(SOCKET_ERROR(errno));

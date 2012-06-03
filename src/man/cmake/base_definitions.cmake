@@ -16,10 +16,6 @@ CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
 
 ############################### COMPILER STUFF
 
-############################ DEFAULT BUILD TYPE
-# Set which build type will be used by default, if none is set
-SET( CMAKE_BUILD_TYPE CACHE FORCE "Release")
-
 ########SETTING UP THE COMPILER FLAGS ##########
 # Notes: -JS, GS Feb. 2009
 # Note: gcc 4.2 doesnt have a geode processor type.
@@ -42,7 +38,7 @@ endif()
 
 # Default (no release specific) build flags
 SET( CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings -fno-strict-aliasing")
+  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings -fno-strict-aliasing -fPIC")
 SET( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 # Release build flags
@@ -102,24 +98,12 @@ ENDIF( NOT EXISTS ${NBITES_DIR} )
 ############################ MAN INSTALL PREFIX
 # Ensure the MAN_INSTALL_PREFIX variable is set
 
-IF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
-  IF( OE_CROSS_BUILD )
-    GET_FILENAME_COMPONENT(
-      MAN_INSTALL_PREFIX ${BUILD_DIR}/cross_install ABSOLUTE
-       )
-    SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
-  ENDIF( OE_CROSS_BUILD )
-  IF( WEBOTS_BACKEND )
-    GET_FILENAME_COMPONENT(
-      MAN_INSTALL_PREFIX ${BUILD_DIR}/webots_install ABSOLUTE
-       )
-    SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
-  ENDIF( WEBOTS_BACKEND )
+IF( "x{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
+  GET_FILENAME_COMPONENT( MAN_INSTALL_PREFIX ${BUILD_DIR}/cross_install ABSOLUTE )
+  SET( ENV{MAN_INSTALL_PREFIX} ${MAN_INSTALL_PREFIX} )
   MESSAGE( STATUS
-    "Environment variable MAN_INSTALL_PREFIX was not set, resetting to default ${MAN_INSTALL_PREFIX}!" )
-ELSE( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
-  SET( MAN_INSTALL_PREFIX $ENV{MAN_INSTALL_PREFIX} )
-ENDIF( "x$ENV{MAN_INSTALL_PREFIX}x" STREQUAL "xx")
+    "MAN_INSTALL_PREFIX was not set, resetting to default ${MAN_INSTALL_PREFIX}!" )
+ENDIF()
 
 
 ############################ CMAKE POLICY
@@ -143,7 +127,8 @@ IF( NOT DEFINED ROBOT_TYPE )
   SET( ROBOT_TYPE NAO_RL_33 )
 ENDIF( NOT DEFINED ROBOT_TYPE )
 SET( ROBOT_TYPE ${ROBOT_TYPE} CACHE STRING "Robot type" )
-SET( ROBOT_PREFIX nao )
+
+ADD_DEFINITIONS( -DROBOT_TYPE=${ROBOT_TYPE} )
 
 ############################ OUTPUT LOCATION
 # Define output directories.  Binaries, documentation, and libraries are
@@ -157,7 +142,6 @@ SET(
 SET( OUTPUT_ROOT_DIR_BIN "${CMAKE_INSTALL_PREFIX}/bin" )
 SET( OUTPUT_ROOT_DIR_DOC "${CMAKE_INSTALL_PREFIX}/doc" )
 SET( OUTPUT_ROOT_DIR_LIB "${CMAKE_INSTALL_PREFIX}/lib" )
-SET( OUTPUT_ROOT_DIR_NAOQI_LIB "${CMAKE_INSTALL_PREFIX}/lib/naoqi" )
 SET( OUTPUT_ROOT_DIR_PREF "${CMAKE_INSTALL_PREFIX}/preferences" )
 
 ########################### NB Common definitions

@@ -9,9 +9,11 @@ using data::DataLoader;
 using colorcreator::ColorCalibrate;
 using colorcreator::ColorTableCreator;
 using viewer::MemoryViewer;
+using viewer::VisionViewer;
 using viewer::BallEKFViewer;
 using viewer::FieldViewer;
 using offline::OfflineViewer;
+using overseer::OverseerClient;
 
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
@@ -20,11 +22,13 @@ QTool::QTool() : QMainWindow(),
         colorCalibrate(new ColorCalibrate(dataManager)),
         colorTableCreator(new ColorTableCreator(dataManager)),
         memoryViewer(new MemoryViewer(dataManager)),
+       	visionViewer(new VisionViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
-        fieldViewer(new FieldViewer(dataManager)) {
+        fieldViewer(new FieldViewer(dataManager)),
+        overseerClient(new OverseerClient(dataManager, this)) {
 
-    this->setWindowTitle(tr("HackTool"));
+    this->setWindowTitle(tr("The New Tool of Awesome"));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
@@ -47,9 +51,11 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(colorTableCreator, tr("Color Table Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
+    toolTabs->addTab(visionViewer, tr("Vision Viewer"));
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
+    toolTabs->addTab(overseerClient, tr("Overseer"));
 }
 
 QTool::~QTool() {

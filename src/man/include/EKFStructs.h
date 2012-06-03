@@ -3,22 +3,31 @@
 #include <ostream>
 #include "VisualBall.h"
 
+class MotionModel;
+typedef MotionModel DeltaMotionModel; //to be used to represent a delta CHANGE between MotionModels
+
 // Structs
-// Odometery change
+// Odometery model
+// Should be used as the current TOTAL xy-translation and theta-rotation
+// as measured by motion
 class MotionModel
 {
 public:
-    MotionModel(float f = 0.0f, float l = 0.0f, float r = 0.0f)
-        : deltaF(f), deltaL(l), deltaR(r) { }
-    MotionModel(const MotionModel& other)
-        : deltaF(other.deltaF), deltaL(other.deltaL), deltaR(other.deltaR) { }
-    float deltaF;
-    float deltaL;
-    float deltaR;
+    MotionModel(float x = 0.0f, float y = 0.0f, float theta = 0.0f)
+        : x(x), y(y), theta(theta) { }
+
+    DeltaMotionModel operator- (const MotionModel& other) const {
+        return MotionModel(x - other.x, y - other.y, theta - other.theta);
+    }
+
+    bool isValid() const { return x != 0.0f && y != 0.0f && theta != 0.0f; }
+
+    float x;
+    float y;
+    float theta;
 
     friend std::ostream& operator<< (std::ostream &o, const MotionModel &u) {
-        return o << "(" << u.deltaF << ", " << u.deltaL << ", " << u.deltaR
-                 << ")";
+        return o << "(" << u.x << ", " << u.y << ", " << u.theta << ")";
     }
 
 };

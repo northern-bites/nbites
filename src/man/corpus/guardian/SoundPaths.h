@@ -10,8 +10,8 @@ namespace sound_paths {
 
 static const std::string quiet = " -q ";
 static const std::string sout = "aplay"+quiet;
-static const std::string sdir = "/opt/naoqi/share/naoqi/wav/";
-static const std::string nbsdir = "/home/nao/naoqi/etc/audio/";
+static const std::string sdir = "/usr/share/naoqi/wav/";
+static const std::string nbsdir = "/home/nao/nbites/audio/";
 static const std::string wav = ".wav";
 static const std::string shutdown_wav = sdir + "shutdown" + wav;
 static const std::string heat_wav = sdir + "heat" + wav;

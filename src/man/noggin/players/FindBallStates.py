@@ -74,6 +74,8 @@ def walkFindBall(player):
     """
     if player.firstFrame():
         player.stopWalking()
+        # Do a slow pan
+        player.brain.tracker.locPans()
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
@@ -82,8 +84,6 @@ def walkFindBall(player):
 
     if player.brain.nav.isStopped():
         player.brain.nav.chaseBall()
-
-    player.brain.tracker.trackBall()
 
     if transitions.shouldSpinFindBallAgain(player):
         return player.goLater('spinFindBall')

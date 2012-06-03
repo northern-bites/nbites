@@ -104,6 +104,7 @@ IF(BUILDING_FOR_A_REMOTE_NAO)
     alconnect/NaoLights
     alconnect/NaoRGBLight
     alconnect/ALSpeech
+    V4L2ImageTranscriber
     )
 ENDIF()
 
@@ -198,6 +199,7 @@ TARGET_LINK_LIBRARIES( ${SENSORS_TARGET}
   ${PYTHON_LIBRARY}
   ${Boost_PYTHON_LIBRARY}
   ${NBINCLUDE_TARGET}
+  ${VISION_TARGET}
   )
 
 TARGET_LINK_LIBRARIES( ${ROBOT_INTERFACE_TARGET}

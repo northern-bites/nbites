@@ -35,9 +35,7 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     buttonLayout->addWidget(loadTableButton);
-
     mainLayout->setAlignment(Qt::AlignTop);
-
     this->setLayout(mainLayout);
 }
 
@@ -48,12 +46,12 @@ void OfflineViewer::update() {
 }
 
 void OfflineViewer::loadColorTable() {
-    if (loaded) {
+  //  if (loaded) {
         QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
                 "../../data/tables",
                 tr("Table Files (*.mtb)"));
         offlineControl->loadTable(colorTablePath.toStdString());
-    }
+	//  }
 }
 
 void OfflineViewer::reloadMan() {

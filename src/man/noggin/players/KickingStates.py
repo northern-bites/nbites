@@ -11,20 +11,21 @@ def kickBallExecute(player):
     Kick the ball
     """
     if player.firstFrame():
+        player.brain.speech.say("Kick it")
         player.brain.tracker.trackBall()
 
-        kick = player.brain.kickDecider.getSweetMove()
+        kick = player.kick.sweetMove
 
-        if transitions.ballInPosition(player) and kick is not None:
-            player.executeMove(kick)
-        else:
+#        if transitions.ballInPosition(player) and kick is not None:
+        player.executeMove(kick)
+        return player.stay()
+#        else:
             #Either it's close and we can't kick it now or it's far
             #away and we should search.
-            return player.goLater('chase')
 
     if player.counter > 10 and player.brain.nav.isStopped():
-        player.brain.nav.justKicked = True
-        return player.goLater('afterKick')
+        return player.goLater('chase')
+#        return player.goLater('afterKick')
 
     return player.stay()
 
@@ -34,7 +35,7 @@ def afterKick(player):
     Currently exits after one frame.
     """
     if player.firstFrame():
-        player.walkPose()        # stand up right, ready to walk
+        player.stand()        # stand up right, ready to walk
         player.brain.tracker.trackBall()
 
         kick = player.brain.kickDecider.getKick()
@@ -48,14 +49,12 @@ def afterKick(player):
         return player.stay()
 
     if transitions.shouldKickAgain(player):
-        player.brain.nav.justKicked = False
         return player.goNow('positionForKick')
 
     if ((player.counter > 1 and player.brain.nav.isStopped()) or
         transitions.shouldChaseBall(player) or
         transitions.shouldFindBallKick(player)):
         player.inKickingState = False
-        player.brain.nav.justKicked = False
         return player.goNow('chase')
 
     return player.stay()

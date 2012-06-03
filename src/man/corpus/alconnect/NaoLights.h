@@ -25,7 +25,7 @@
 
 class NaoLights : public Lights{
 public:
-    NaoLights(AL::ALPtr<AL::ALBroker> broker);
+    NaoLights(boost::shared_ptr<AL::ALBroker> broker);
     virtual ~NaoLights();
 
 public:
@@ -37,7 +37,7 @@ private:
     void generateLeds();
     void sendLightCommand(AL::ALValue &command);
 private:
-    AL::ALPtr<AL::DCMProxy> dcmProxy;
+    boost::shared_ptr<AL::DCMProxy> dcmProxy;
     AL::ALValue leftFaceLedCommand;
     std::vector<NaoRGBLight*> ledList;
     std::vector<int> hexList;

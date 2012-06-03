@@ -52,7 +52,7 @@ public:
 
     double X(double);
     void Reset();
-    void LogOutput(); // prints histograms to /home/nao/naoqi/log/{sensorName}.sensor
+    void LogOutput(); // prints histograms to /home/nao/nbites/log/{sensorName}.sensor
 
     // values outside will cause a print statement
     void setVarianceBounds(float low, float high);

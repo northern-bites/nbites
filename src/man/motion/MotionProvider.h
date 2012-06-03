@@ -101,6 +101,9 @@ public:
         }
         return nextStiffnesses[id];
     }
+
+    virtual std::vector<float> getInitialStance() { return std::vector<float>(); }
+
     const std::string getName() const {return provider_name;}
     const ProviderType getType() const {return provider_type;}
 

@@ -133,7 +133,6 @@ void Vision::notifyImage() {
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
-
     // linesDetector.detect(yImg);
 }
 

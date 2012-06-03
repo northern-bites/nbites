@@ -13,7 +13,15 @@ def shouldChaseBall(player):
     ball = player.brain.ball
     return (ball.vis.framesOn > constants.BALL_ON_THRESH)
 
-def ballInPosition(player):
+def shouldPrepareForKick(player):
+    """
+    We're close enough to prepare for a kick
+    """
+    ball = player.brain.ball
+    return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
+    
+
+def ballInPosition(player, kickPose):
     """
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
@@ -21,24 +29,12 @@ def ballInPosition(player):
     if player.brain.ball.vis.framesOn < 4:
         return False
 
-    ball = player.brain.ball
-    kick = player.brain.kickDecider.getKick()
     #Get the current kick sweet spot information
-    if kick is None:
-        (x_offset, y_offset, heading) = (0,0,0)
-    else:
-        (x_offset, y_offset, heading) = kick.getPosition()
+    
 
-    #Get the difference
-    # not absolute value for x, if ball is closer (not behind) kick anyway
-    diff_x = ball.loc.relX - x_offset
-    diff_y = fabs(ball.loc.relY - y_offset)
-
-    diff_y = fabs(ball.loc.relY - y_offset)
-    #Compare the sweet spot with the actual values and make sure they
-    #are within the threshold
-    return (0 < diff_x < constants.BALL_X_OFFSET and
-            diff_y < constants.BALL_Y_OFFSET)
+    return (0 < kickPose.relX < constants.BALL_X_OFFSET and
+                fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
+                fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
 def ballNearPosition(player):
     """
@@ -60,16 +56,6 @@ def shouldKickAgain(player):
     Ball hasn't changed enough to warrant new kick decision.
     """
     return (shouldKick(player) and ballNearPosition(player))
-
-def ballTooFar(player):
-    """
-    Navigator is almost at its destination, but we're still far away
-    from the ball
-    """
-    if player.brain.nav.nearDestination and player.brain.ball.dist > 30:
-        print "ballTooFar"
-        return True
-    return False
 
 def shouldOrbit(player):
     """

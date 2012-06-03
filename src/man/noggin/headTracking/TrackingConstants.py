@@ -3,7 +3,7 @@ from man.motion import HeadMoves
 MAX_PAN_SPEED = 125.0              # deg/sec
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 1
-TRACKER_FRAMES_OFF_REFIND_THRESH = 5
+TRACKER_FRAMES_OFF_REFIND_THRESH = 10
 
 ####
 #### Active tracking constants

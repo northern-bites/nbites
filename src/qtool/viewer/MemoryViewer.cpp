@@ -1,6 +1,7 @@
 
 #include "MemoryViewer.h"
 #include <vector>
+#include "image/FastYUVToBMPImage.h"
 
 namespace qtool {
 namespace viewer {
@@ -10,12 +11,23 @@ using namespace man::memory;
 using namespace qtool::image;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
-                 memoryManager(memoryManager),
-                 roboImageViewer(memoryManager->getMemory()->getMImage(), this) {
+                 memoryManager(memoryManager) {
+    MImage::const_ptr rawMImage = memoryManager->getMemory()->getMImage();
+    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(rawMImage, this);
 
-    this->setCentralWidget(&roboImageViewer);
-    memoryManager->connectSlotToMObject(&roboImageViewer,
+
+    BMPImageViewer* imageViewer;
+
+      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
+      OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
+    
+      imageViewer = new BMPImageViewer(combo, this);
+
+  
+    this->setCentralWidget(imageViewer);
+    memoryManager->connectSlotToMObject(imageViewer,
                         SLOT(updateView()), MIMAGE_ID);
+
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -35,7 +47,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
             memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
         }
     }
-
+   
 }
 }
 }
