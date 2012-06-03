@@ -97,6 +97,7 @@ public:
     static const int TOP_GAIN = 40;
     static const int TOP_WHITE_BALANCE = -60;
 
+    // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;

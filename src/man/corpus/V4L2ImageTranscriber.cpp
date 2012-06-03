@@ -22,44 +22,12 @@
 #undef __STRICT_ANSI__
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
-//#include <linux/i2c.h>
 #define __STRICT_ANSI__
 
 #include <cerrno>
 
 #include "ImageAcquisition.h"
 #include "Profiler.h"
-
-#ifndef V4L2_CID_AUTOEXPOSURE
-#  define V4L2_CID_AUTOEXPOSURE     (V4L2_CID_BASE+32)
-#endif
-
-#ifndef V4L2_CID_CAM_INIT
-#  define V4L2_CID_CAM_INIT         (V4L2_CID_BASE+33)
-#endif
-
-#ifndef V4L2_CID_POWER_LINE_FREQUENCY
-#  define V4L2_CID_POWER_LINE_FREQUENCY  (V4L2_CID_BASE+24)
-
-#define V4L2_CID_HUE_AUTO      (V4L2_CID_BASE+25)
-#define V4L2_CID_WHITE_BALANCE_TEMPERATURE  (V4L2_CID_BASE+26)
-//#define V4L2_CID_SHARPNESS      (V4L2_CID_BASE+27)
-//#define V4L2_CID_BACKLIGHT_COMPENSATION   (V4L2_CID_BASE+28)
-
-#define V4L2_CID_CAMERA_CLASS_BASE     (V4L2_CTRL_CLASS_CAMERA | 0x900)
-
-#define V4L2_CID_EXPOSURE_AUTO      (V4L2_CID_CAMERA_CLASS_BASE+1)
-enum v4l2_exposure_auto_type {
-    V4L2_EXPOSURE_MANUAL = 0,
-    V4L2_EXPOSURE_AUTO = 1,
-    V4L2_EXPOSURE_SHUTTER_PRIORITY = 2,
-    V4L2_EXPOSURE_APERTURE_PRIORITY = 3
-};
-
-//#define V4L2_CID_EXPOSURE_ABSOLUTE    (V4L2_CID_CAMERA_CLASS_BASE+2)
-//#define V4L2_CID_EXPOSURE_AUTO_PRIORITY    (V4L2_CID_CAMERA_CLASS_BASE+3)
-
-#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26) */
 
 // For checking the ioctls; prints error if one occurs
 #define VERIFY(x, str) {                               \
