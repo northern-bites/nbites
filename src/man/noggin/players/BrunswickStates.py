@@ -75,7 +75,8 @@ def gameReady(player):
                                     player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
                                     player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
                                     -90)
-        return player.goLater('afterPenalty')
+        # Do we still want to do this? Seems to be just a hack for loc. Summer 2012
+        #return player.goLater('afterPenalty')
 
     #See above about rules(2011) - we should still reposition after goals
     if (player.lastDiffState == 'gameInitial'
@@ -133,7 +134,10 @@ def gamePlaying(player):
                                             player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
                                             player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
                                             -90)
-                return player.goLater('afterPenalty')
+                # Do we still want to do this? Seems to be just a hack for loc.
+                #   Summer 2012
+                #return player.goLater('afterPenalty')
+
                 # 2011 rules have no 0 second penalties for any robot,
                 # but check should be here if there is.
             #else human error

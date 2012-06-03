@@ -7,6 +7,8 @@ from objects import RelRobotLocation
 OBJ_SEEN_THRESH = 5
 LOOK_DIR_THRESH = 10
 
+# @Summer 2012: This entire state appears to be a hack for localization.
+# Consider removing entirely.
 def afterPenalty(player):
 
     gcState = player.brain.gameController.currentState
@@ -59,7 +61,7 @@ def afterPenalty(player):
     if player.brain.nav.isStopped() or player.counter > 250:
         player.brain.nav.stop()
         return player.goLater('spinFindBall')
-    
+
 
     return player.stay()
 
