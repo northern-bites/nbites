@@ -66,6 +66,7 @@ namespace qtool {
   
     void FieldViewer::stopDrawing(){
       keepDrawing = false;
+	  qDebug()<<"Stopping WorldView...";
       bot_locs->locs->stopListening();
     }
 
