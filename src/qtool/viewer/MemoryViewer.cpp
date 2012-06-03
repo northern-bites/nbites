@@ -46,10 +46,17 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
       //    else
       // imageViewer = new BMPImageViewer(rawBMP, this);
 
+      QWidget* central = new QWidget(this);
 
-      //this->setCentralWidget(bottomImageViewer);
-      //QDockWidget* imageWidget = new QDockWidget(QString("Top Image"), this);
-      //this->addDockWidget(Qt::BottomDockWidgetArea, imageWidget);
+      QVBoxLayout* layout = new QVBoxLayout(central);
+
+      layout->addWidget(topImageViewer);
+      layout->addWidget(bottomImageViewer);
+
+      central->setLayout(layout);
+
+      this->setCentralWidget(central);
+
     memoryManager->connectSlotToMObject(bottomImageViewer,
                         SLOT(updateView()), MBOTTOMIMAGE_ID);
 

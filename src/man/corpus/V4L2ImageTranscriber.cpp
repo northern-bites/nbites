@@ -367,6 +367,7 @@ bool V4L2ImageTranscriber::waitForImage() {
        if (sensors->getWriteableNaoImage(cameraType) != NULL) {
            _copy_image(current_image,
                        sensors->getWriteableNaoImage(cameraType));
+
            sensors->notifyNewNaoImage();
            ImageAcquisition::acquire_image_fast(table, params,
                                                sensors->getNaoImage(cameraType),

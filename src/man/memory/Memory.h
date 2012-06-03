@@ -84,10 +84,10 @@ private:
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
+        // FAKE
+    boost::shared_ptr<MImage> mImage;
     boost::shared_ptr<MBottomImage> bottomMImage;
     boost::shared_ptr<MTopImage> topMImage;
-    // FAKE
-    boost::shared_ptr<MImage> mImage;
     boost::shared_ptr<MLocalization> mLocalization;
 };
 }

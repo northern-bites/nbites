@@ -39,7 +39,7 @@ using proto::PImage;
 
     string* image_string = this->data->mutable_image();
     // allocate the memory necessary for the image;
-    image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
+    image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), '0');
     char* image_string_data = const_cast<char *>(image_string->data());
     if (sensors.get()) {
         sensors->setNaoImagePointer(image_string_data, cameraType);
@@ -50,7 +50,6 @@ MImage::~MImage() {
 }
 
 void MImage::updateData() {
-
     this->data->set_timestamp(time_stamp());
     //Note: we don't need to update the image since it's set to already copy
     //into our image_string
