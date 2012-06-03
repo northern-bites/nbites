@@ -77,16 +77,16 @@ namespace corpus {
 
 using boost::shared_ptr;
 
-    V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
-                                               Camera::Type which) :
-        ImageTranscriber(s),
-        settings(Camera::getDefaultSettings()),
-        cameraType(which),
-        currentBuf(0),
-        timeStamp(0),
-        image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
-        table(new unsigned char[yLimit * uLimit * vLimit]),
-        params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit){
+V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
+                                           Camera::Type which) :
+    ImageTranscriber(s),
+    settings(Camera::getDefaultSettings()),
+    cameraType(which),
+    currentBuf(0),
+    timeStamp(0),
+    image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
+    table(new unsigned char[yLimit * uLimit * vLimit]),
+    params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit){
 
     initTable("/home/nao/nbites/lib/table/table.mtb");
 
@@ -98,6 +98,9 @@ using boost::shared_ptr;
     initSetFrameRate();
     initRequestAndMapBuffers();
     initQueueAllBuffers();
+
+    // Uncomment if you want info about control settings printed!
+    //enumerate_controls();
 
     initSettings();
 
@@ -182,16 +185,6 @@ void V4L2ImageTranscriber::initOpenVideoDevice() {
 }
 
 void V4L2ImageTranscriber::initSetCameraDefaults() {
-    // set default parameters
-#if ROBOT_TYPE == NAO_RL_33
-    struct v4l2_control control;
-    memset(&control, 0, sizeof(control));
-    control.id = V4L2_CID_CAM_INIT;
-    control.value = 0;
-    VERIFY((ioctl(fd, VIDIOC_S_CTRL, &control)),
-           "Setting default parameters failed.");
-#endif
-
     v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
     VERIFY((ioctl(fd, VIDIOC_S_STD, &esid0)),
            "Setting default parameters failed.");
@@ -357,33 +350,6 @@ void V4L2ImageTranscriber::enumerate_menu ()
 
 void V4L2ImageTranscriber::initSettings()
 {
-#if ROBOT_TYPE == NAO_NEXTGEN
-    // ORDER BELOW IS SUPER IMPORTANT
-    setControlSetting(V4L2_CID_HFLIP, 0);
-    setControlSetting(V4L2_CID_VFLIP, 0);
-
-    // Auto WB, exposure on (buggy driver, blah)
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 1);
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
-
-    // Set brightness when above are off
-    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
-
-    // Auto white balance off
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
-
-    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
-    setControlSetting(V4L2_CID_SATURATION, settings.saturation);
-    setControlSetting(V4L2_CID_HUE, settings.hue);
-    setControlSetting(V4L2_CID_SHARPNESS, 3);
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, -60);
-
-    // Auto exposure back off
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 0);
-
-    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
-    setControlSetting(V4L2_CID_GAIN, settings.gain);
-
     // The following should be 1 if we're using the top camera (?)
     if(cameraType == Camera::TOP)
     {
@@ -396,20 +362,28 @@ void V4L2ImageTranscriber::initSettings()
         setControlSetting(V4L2_CID_VFLIP, 0);
     }
 
-#else
-    // make sure all auto stuff is OFF!
-    setControlSetting(V4L2_CID_AUTOEXPOSURE , 0);
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
-    setControlSetting(V4L2_CID_AUTOGAIN, 0);
+    // Auto exposure on (buggy driver, blah)
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
 
-    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
+    // Set most settings with auto exposure off
     setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
     setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
-    setControlSetting(V4L2_CID_GAIN, settings.gain);
-    setControlSetting(V4L2_CID_BLUE_BALANCE, settings.blue_chroma);
-    setControlSetting(V4L2_CID_RED_BALANCE, settings.red_chroma);
-#endif
+    setControlSetting(V4L2_CID_SATURATION, settings.saturation);
+    setControlSetting(V4L2_CID_HUE, settings.hue);
+    setControlSetting(V4L2_CID_SHARPNESS, 3);
 
+    // Auto white balance and backlight comp off!
+    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
+    setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION, 0x00);
+
+    // Auto exposure back off
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 0);
+
+    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
+    setControlSetting(V4L2_CID_GAIN, settings.gain);
+
+    // This is actually just the white balance setting!
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, -60);
 }
 
 void V4L2ImageTranscriber::startCapturing() {
@@ -529,6 +503,7 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     struct v4l2_control control_s;
     control_s.id = id;
     control_s.value = value;
+
     // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
     {
