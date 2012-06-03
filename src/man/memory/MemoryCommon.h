@@ -24,6 +24,8 @@ enum MObject_ID {
     MMOTION_SENSORS_ID,
     MVISION_SENSORS_ID,
     MIMAGE_ID,
+    MTOPIMAGE_ID,
+    MBOTTOMIMAGE_ID,
     MLOCALIZATION_ID,
     LAST_OBJECT_ID //dummy object
 };
@@ -46,6 +48,8 @@ static const std::string MObject_names[] = {
             "MotionSensors",
             "VisionSensors",
             "Image",
+            "TopImage",
+            "BottomImage",
             "Localization"
 };
 

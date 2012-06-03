@@ -19,8 +19,9 @@ using proto::PImage;
 
     MImage::MImage(shared_ptr<Sensors> sensors,
                    corpus::Camera::Type type,
+                   MObject_ID objectID,
                    PImage_ptr data) :
-        MObject(id, data),
+        MObject(objectID, data),
         sensors(sensors),
         data(data),
         thresholded_data(new PImage()),
@@ -64,6 +65,16 @@ void MImage::updateData() {
     this->thresholded_data->set_width(AVERAGED_IMAGE_WIDTH);
     this->thresholded_data->set_height(AVERAGED_IMAGE_HEIGHT);
     #endif
+}
+
+MTopImage::MTopImage(boost::shared_ptr<Sensors> sensors) :
+    MImage(sensors, corpus::Camera::TOP, MTOPIMAGE_ID)
+{
+}
+
+MBottomImage::MBottomImage(boost::shared_ptr<Sensors> sensors) :
+    MImage(sensors, corpus::Camera::BOTTOM, MBOTTOMIMAGE_ID)
+{
 }
 
 }

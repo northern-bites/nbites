@@ -370,7 +370,7 @@ void V4L2ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
 
     // Auto white balance off
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
+    //setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
 
     setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
     setControlSetting(V4L2_CID_SATURATION, settings.saturation);
