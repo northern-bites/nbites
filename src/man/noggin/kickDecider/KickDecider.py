@@ -31,6 +31,7 @@ class KickDecider(object):
         """
         sets a particular kick
         """
+        print "set kick"
         self.info.kick = k
         
     def getIdealKickPosition(self):

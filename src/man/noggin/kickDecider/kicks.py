@@ -25,8 +25,9 @@ class Kick(object):
                 self is RIGHT_SHORT_BACK_KICK)
 
     def __str__(self):
-        return ("%s: \n x_offset: %g y_offset: %g heading: %g ==> dest: %s" %
-                (self.name, self.x_offset, self.y_offset, self.heading, self.dest))
+        #return ("%s: \n x_offset: %g y_offset: %g heading: %g ==> dest: %s" %
+         #       (self.name, self.x_offset, self.y_offset, self.heading, self.dest))
+        return self.name
 
 # Some standard kicks. x,y and move should not be modified unless you change
 # the sweetMove.  Heading will be modified when the kick is constructed.
@@ -52,9 +53,9 @@ RIGHT_STRAIGHT_KICK =Kick("R_D_Straight", x = 16.5, y = -6,
                              move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
 
 #new
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_D_Straight", x = 17, y =  5.5,
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 17, y =  5.5,
                                    move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_D_Straight", x = 17, y = -5.5,
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 17, y = -5.5,
                                    move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 #usopen12 hack
@@ -62,7 +63,6 @@ LEFT_BIG_KICK =  Kick("L_D_Straight", x = 11, y =  3,
                                    move=SweetMoves.LEFT_BIG_KICK)
 RIGHT_BIG_KICK = Kick("R_D_Straight", x = 11, y = -3,
                                    move=SweetMoves.RIGHT_BIG_KICK)
-
 
 # used when we haven't decided what kick to do yet
 ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)

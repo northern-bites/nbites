@@ -1128,7 +1128,7 @@ LEFT_QUICK_STRAIGHT_KICK = (
      (0.,25.,-35,65,-30,-25.),
      (0.,10.,-22.3,45,-22.5,-17),
      (90.,-30.,0.,0),
-     .4,0, stiff.NORMAL_STFFNESSES),
+     .4,0, stiff.NORMAL_STIFFNESSES),
 
     #back to normal
     ((90.,10.,-90.,-10.),
