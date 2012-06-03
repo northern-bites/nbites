@@ -17,7 +17,6 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
         mVision(new MVision(vision_ptr)),
         mVisionSensors(new MVisionSensors(sensors_ptr)),
         mMotionSensors(new MMotionSensors(sensors_ptr)),
-        mImage(new MImage(sensors_ptr, corpus::Camera::TOP)),
         bottomMImage(new MBottomImage(sensors_ptr)),
         topMImage(new MTopImage(sensors_ptr)),
         mLocalization(new MLocalization(loc_ptr))
@@ -36,7 +35,6 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
     mobject_IDMap.insert(MObject_IDPair(mVisionSensors->getID(), mVisionSensors));
     mobject_IDMap.insert(MObject_IDPair(mMotionSensors->getID(), mMotionSensors));
     mobject_IDMap.insert(MObject_IDPair(bottomMImage->getID(), bottomMImage));
-    mobject_IDMap.insert(MObject_IDPair(mImage->getID(), mImage));
     mobject_IDMap.insert(MObject_IDPair(topMImage->getID(), topMImage));
     mobject_IDMap.insert(MObject_IDPair(mLocalization->getID(), mLocalization));
 }

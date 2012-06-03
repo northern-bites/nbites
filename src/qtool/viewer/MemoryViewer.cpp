@@ -71,8 +71,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     std::vector<QTreeView> messageViewers;
     for (MObject_ID id = FIRST_OBJECT_ID;
             id != LAST_OBJECT_ID; id++) {
-        if (id != MIMAGE_ID && id != MTOPIMAGE_ID
-            && id != MBOTTOMIMAGE_ID) {
+        if (id != MTOPIMAGE_ID && id != MBOTTOMIMAGE_ID) {
             QDockWidget* dockWidget =
                     new QDockWidget(QString(MObject_names[id].c_str()), this);
             MObjectViewer* view = new MObjectViewer(

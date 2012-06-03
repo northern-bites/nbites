@@ -22,14 +22,12 @@ class MImage: public MObject {
 ADD_SHARED_PTR(MImage);
 
 public:
-    static const MObject_ID id = MIMAGE_ID;
-
     typedef boost::shared_ptr<proto::PImage> PImage_ptr;
 
 public:
     MImage(boost::shared_ptr<Sensors> sensors,
            corpus::Camera::Type type,
-           MObject_ID objectID = id,
+           MObject_ID objectID = MTOPIMAGE_ID,
            PImage_ptr data = PImage_ptr(new proto::PImage));
     virtual ~MImage();
     /**
