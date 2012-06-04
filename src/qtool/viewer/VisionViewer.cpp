@@ -89,12 +89,20 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     BMPImageViewer *bottomImageViewer = new BMPImageViewer(combo, this);
     BMPImageViewer *topImageViewer = new BMPImageViewer(rawTopBMP, this);
 
+    CollapsibleImageViewer* bottomCIV = new
+        CollapsibleImageViewer(bottomImageViewer,
+                               "Bottom",
+                               this);
+    CollapsibleImageViewer* topCIV = new CollapsibleImageViewer(topImageViewer,
+                                                                "Top",
+                                                                this);
+
     QWidget* rawImages = new QWidget(this);
 
     QVBoxLayout* layout = new QVBoxLayout(rawImages);
 
-    layout->addWidget(topImageViewer);
-    layout->addWidget(bottomImageViewer);
+    layout->addWidget(topCIV);
+    layout->addWidget(bottomCIV);
 
     rawImages->setLayout(layout);
 
@@ -103,12 +111,20 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     BMPImageViewer *topVisViewer = new BMPImageViewer(topVisionImage,
                                                       this);
 
+    CollapsibleImageViewer* bottomVisCIV = new
+        CollapsibleImageViewer(bottomVisViewer,
+                               "Bottom",
+                               this);
+    CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisViewer,
+                                                                   "Top",
+                                                                   this);
+
     QWidget* visionImages = new QWidget(this);
 
     QVBoxLayout* visLayout = new QVBoxLayout(visionImages);
 
-    visLayout->addWidget(topVisViewer);
-    visLayout->addWidget(bottomVisViewer);
+    visLayout->addWidget(topVisCIV);
+    visLayout->addWidget(bottomVisCIV);
 
     visionImages->setLayout(visLayout);
 
@@ -160,6 +176,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
         }
     }
 
+    // Make sure one of the images is toggled off for small screens
+    bottomCIV->toggle();
 }
 
 void VisionViewer::update(){

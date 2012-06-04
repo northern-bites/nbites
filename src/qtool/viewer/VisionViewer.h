@@ -25,6 +25,7 @@
 #include "BMPImageViewer.h"
 #include "ChannelImageViewer.h"
 #include "MObjectViewer.h"
+#include "CollapsibleImageViewer.h"
 
 namespace qtool {
 namespace viewer {

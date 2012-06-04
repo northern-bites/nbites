@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include <vector>
 #include "image/FastYUVToBMPImage.h"
+#include "CollapsibleImageViewer.h"
 
 namespace qtool {
 namespace viewer {
@@ -33,8 +34,17 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                                                  shapes, this);
 
       bottomImageViewer = new BMPImageViewer(combo, this);
+      CollapsibleImageViewer * bottomCIV = new
+          CollapsibleImageViewer(bottomImageViewer,
+                                 QString("Bottom"),
+                                 this);
 
       topImageViewer = new BMPImageViewer(rawTopBMP, this);
+      CollapsibleImageViewer * topCIV = new
+          CollapsibleImageViewer(topImageViewer,
+                                 QString("Top"),
+                                 this);
+
       //}
 
       //    else
@@ -44,8 +54,11 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
       QVBoxLayout* layout = new QVBoxLayout(central);
 
-      layout->addWidget(topImageViewer);
-      layout->addWidget(bottomImageViewer);
+      layout->addWidget(topCIV);
+      layout->addWidget(bottomCIV);
+
+      // Make sure one of the images is toggled off for small screens
+      bottomCIV->toggle();
 
       central->setLayout(layout);
 
