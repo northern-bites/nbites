@@ -103,10 +103,6 @@ class GoTeam:
               currentGCState =='gameSet'):
             Strategies.sReady(self, play)
 
-        # HACK for US OPEN 2012
-        # We are always chasers, so just skip to that
-        elif True:
-            Strategies.sTestChaser(self, play)
         # Now we look at game strategies
         elif self.numActiveFieldPlayers == 0:
             Strategies.sNoFieldPlayers(self, play)

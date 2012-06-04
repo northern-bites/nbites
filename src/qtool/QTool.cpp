@@ -27,7 +27,7 @@ QTool::QTool() : QMainWindow(),
         fieldViewer(new FieldViewer(dataManager)),
         overseerClient(new OverseerClient(dataManager, this)) {
 
-    this->setWindowTitle(tr("The New Tool of Awesome"));
+    this->setWindowTitle(tr("QTOOL"));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
