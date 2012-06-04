@@ -15,7 +15,7 @@ using namespace man::corpus;
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
         image(new BMPYUVImage(dataManager->getMemory()->
-                              getMImage(Camera::TOP),
+                              getMImage(Camera::BOTTOM),
                               BMPYUVImage::RGB, this)),
         channelImage(image, this),
         currentColorSpace(&colorSpace[STARTING_COLOR]),

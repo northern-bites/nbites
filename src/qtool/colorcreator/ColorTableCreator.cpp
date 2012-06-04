@@ -24,9 +24,11 @@ using namespace man::corpus;
 ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
         QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
-        image(new BMPYUVImage(dataManager->getMemory()->getMImage(), BMPYUVImage::RGB, this)),
+        image(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM), BMPYUVImage::RGB, this)),
         sensors(new Sensors(shared_ptr<Speech>(new Speech()))),
-        imageTranscribe(new OfflineImageTranscriber(sensors, dataManager->getMemory()->getMImage())),
+        imageTranscribe(new OfflineImageTranscriber(sensors,
+                dataManager->getMemory()->getMImage(Camera::TOP),
+                dataManager->getMemory()->getMImage(Camera::BOTTOM))),
         rawThresholdedImageData(new PImage())
 {
     rawThresholdedImageData->set_width(AVERAGED_IMAGE_WIDTH);
@@ -42,8 +44,8 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     QHBoxLayout* leftLayout = new QHBoxLayout;
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
-    dataManager->connectSlotToMObject(imageViewer, SLOT(updateView()), MIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MIMAGE_ID);
+    dataManager->connectSlotToMObject(imageViewer, SLOT(updateView()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
 
     QObject::connect(imageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(canvassClicked(int, int, int, bool)));
@@ -106,7 +108,7 @@ void ColorTableCreator::updateThresholdedImage(){
     imageTranscribe->initTable(colorTable.getTable());
     imageTranscribe->acquireNewImage();
     rawThresholdedImageData->mutable_image()->assign(
-            (const char*) sensors->getColorImage(),
+            (const char*) sensors->getColorImage(Camera::BOTTOM),
             AVERAGED_IMAGE_SIZE);
     thresholdedImageViewer->updateView();
     this->updateColorStats();
@@ -160,11 +162,11 @@ void ColorTableCreator::paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brush
                 int scaled_brush_y = brush_y/2;
 
                 // y image stores the sum of 4 neighboring pixels, so average it
-                int y1 = sensors->getYImage()[scaled_brush_y*AVERAGED_IMAGE_WIDTH + scaled_brush_x]/2;
+                int y1 = sensors->getYImage(Camera::BOTTOM)[scaled_brush_y*AVERAGED_IMAGE_WIDTH + scaled_brush_x]/2;
                 // u,v image stores the sum of 2 neighboring pixels so average it
                 // also since they're stored together we need to compute special offsets for each
-                int u1 = sensors->getUVImage()[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2];
-                int v1 = sensors->getUVImage()[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2 + 1];
+                int u1 = sensors->getUVImage(Camera::BOTTOM)[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2];
+                int v1 = sensors->getUVImage(Camera::BOTTOM)[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2 + 1];
 
                 std::cout << (int) y << " " << (int) u << " " << (int) v << std::endl;
                 std::cout << (int) y1 << " " << (int) u1 << " " << (int) v1 << std::endl;
