@@ -28,15 +28,15 @@ void ThresholdedImage::buildBitmap() {
         QRgb* bitmapLine = (QRgb*) qimage.scanLine(j);
         for (int i = 0; i < getWidth(); ++i) {
             int rawColor = rawImage->image()[j*rawImage->width() + i];
-	    int threshColor = 0, mix = 1;
-	    for (int c = 0; c < NUM_COLORS; c++) {
-	      if ((rawColor & Color_bits[c]) > 0) {
-		threshColor += Color_RGB[c];
-		threshColor /= mix;
-		mix++;
-	      }
-	    }
-	    if (threshColor == 0) threshColor = Color_RGB[0];
+            int threshColor = 0, mix = 1;
+            for (int c = 0; c < NUM_COLORS; c++) {
+                if ((rawColor & Color_bits[c]) > 0) {
+                    threshColor += Color_RGB[c];
+                    threshColor /= mix;
+                    mix++;
+                }
+            }
+            if (threshColor == 0) threshColor = Color_RGB[0];
             bitmapLine[i] = threshColor;
         }
     }

@@ -70,12 +70,13 @@ public:
     void paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brushStroke);
 
 protected slots:
-    void loadColorTableBtnPushed();
-    void saveColorTableBtnPushed();
+    void loadColorTable();
+    void saveColorTable();
     void updateThresholdedImage();
     void canvassClicked(int x, int y, int brushSize, bool leftClick);
     void undo();
     void updateColorSelection(int color);
+    void updateColorStats();
 
 private:
     data::DataManager::ptr dataManager;
@@ -89,7 +90,8 @@ private:
     image::ThresholdedImage* threshImage;
     viewer::BMPImageViewer* thresholdedImageViewer;
 
-    QPushButton saveColorTableBtn;
+    QLabel* colorStats;
+
     ColorTable colorTable;
 
     QComboBox colorSelect;

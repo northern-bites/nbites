@@ -23,8 +23,8 @@ void BMPImageViewerListener::mouseReleaseEvent ( QMouseEvent * event )
         left = false;
     }
 
-    int mouseX = event->pos().x();
-    int mouseY = event->pos().y();
+    int mouseX = event->x();
+    int mouseY = event->y();
 
     emit mouseClicked(mouseX, mouseY, brushSize, left);
 }

@@ -37,16 +37,17 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     thresholdedImageViewer = new viewer::BMPImageViewer(threshImage, this);
 
     QHBoxLayout* mainLayout = new QHBoxLayout;
-    QHBoxLayout* leftLayout = new QHBoxLayout;
 
+    QHBoxLayout* leftLayout = new QHBoxLayout;
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
-    dataManager->connectSlotToMObject(imageViewer,
-            SLOT(updateView()),
-            MIMAGE_ID);
+    dataManager->connectSlotToMObject(imageViewer, SLOT(updateView()), MIMAGE_ID);
+    dataManager->connectSlotToMObject(thresholdedImageViewer, SLOT(updateView()), MIMAGE_ID);
 
     QObject::connect(imageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(canvassClicked(int, int, int, bool)));
+
+    colorStats = new QLabel(this);
 
     //set up the color selection combo box
     for (int i = 0; i < image::NUM_COLORS; i++) {
@@ -61,52 +62,59 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     connect(undoBtn, SIGNAL(clicked()), this, SLOT(undo()));
     rightLayout->addWidget(undoBtn);
 
-    saveColorTableBtn.setText("Save Color Table");
-    rightLayout->addWidget(&saveColorTableBtn);
-    connect(&saveColorTableBtn, SIGNAL(clicked()),
-            this, SLOT(saveColorTableBtnPushed()));
+    QPushButton* loadBtn = new QPushButton("Load", this);
+    connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
+    rightLayout->addWidget(loadBtn);
+
+    QPushButton* saveBtn = new QPushButton("Save", this);
+    rightLayout->addWidget(saveBtn);
+    connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveColorTable()));
 
     leftLayout->addWidget(imageViewer);
     rightLayout->addWidget(thresholdedImageViewer);
 
+    rightLayout->addWidget(colorStats);
+
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
-
-
     this->setLayout(mainLayout);
-    // connect(image, SIGNAL(bitmapBuilt()),
-            //         this, SLOT(updateThresholdedImage()));
-    // leftLayout->addWidget(&imageViewer);
-
 }
 
-void ColorTableCreator::loadColorTableBtnPushed(){
+void ColorTableCreator::loadColorTable(){
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
     QString filename = QFileDialog::getOpenFileName(this,
                     tr("Load Color Table from File"),
                     base_directory,
                     tr("Color Table files (*.mtb)"));
-    // Use the filename
+    colorTable.read(filename.toStdString());
+    updateThresholdedImage();
 }
 
-void ColorTableCreator::saveColorTableBtnPushed(){
+void ColorTableCreator::saveColorTable(){
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
     QString filename = QFileDialog::getSaveFileName(this,
                     tr("Save Color Table to File"),
-                    base_directory + "/new_sliders.mtb",
+                    base_directory + "/new_table.mtb",
                     tr("Color Table files (*.mtb)"));
+    colorTable.write(filename.toStdString());
 }
 
 void ColorTableCreator::updateThresholdedImage(){
 
     imageTranscribe->initTable(colorTable.getTable());
     imageTranscribe->acquireNewImage();
-    //TODO: get better formatted image acquisition data
     rawThresholdedImageData->mutable_image()->assign(
             (const char*) sensors->getColorImage(),
             AVERAGED_IMAGE_SIZE);
     thresholdedImageViewer->updateView();
+    this->updateColorStats();
+}
+
+void ColorTableCreator::updateColorStats() {
+
+    int colorCount = colorTable.countColor(Color_bits[currentColor]);
+    colorStats->setText("Color count: " + QVariant(colorCount).toString());
 }
 
 
@@ -155,20 +163,11 @@ void ColorTableCreator::paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brush
     updateThresholdedImage();
 }
 
-void ColorTableCreator::updateColorSelection(int color)
-{
+void ColorTableCreator::updateColorSelection(int color) {
     currentColor = color;
     imageViewer->setBrushColor(QColor(image::Color_RGB[color]));
-}
-}
+    this->updateColorStats();
 }
 
-// void ColorTableCreator::saveColorTableBtnPushed() {
-//     QString base_directory = QString(NBITES_DIR) + "/data/tables";
-//     QString filename =
-//             QFileDialog::getSaveFileName(this,
-//                     tr("Save Color Table to File"),
-//                     base_directory + "/new_table.mtb",
-//                     tr("Color Tables(*.mtb)"));
-//     ColorTableCreator::writeFromSliders(filename, colorSpace);
-// }
+}
+}
