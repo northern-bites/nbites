@@ -1076,6 +1076,18 @@ bool Ball::badSurround(Blob b) {
 	return false;
 }
 
+/* We use a power function regression on data to estimate
+   the ball distance from the radius in the image
+ */
+float Ball::ballDistanceEstFromRadius(float radius) {
+  
+        float distEst;
+	float radToPow = std::pow(radius, -1.38);
+	distEst = 2350*radToPow;
+
+	return distEst;
+}
+
 /* Once we have determined a ball is a blob we want to set it up for
    the rest of the world (localization, behavior, etc.).
    @param w         ball width
@@ -1113,11 +1125,10 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	}
 	thisBall->setConfidence(SURE);
 	thisBall->findAngles();
-	focalDist = vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
-												thisBall->getCenterY(),
-												ORANGE_BALL_RADIUS,
-												thisBall->getRadius(),
-												ORANGE_BALL_RADIUS);
+	float ballRadDistEst = ballDistanceEstFromRadius(thisBall->getRadius());
+	focalDist = vision->pose->bodyEstimate(thisBall->getCenterX(), thisBall->getCenterY(),
+					       ballRadDistEst);
+
 	if (occlusion == NOOCCLUSION || e.dist > 600) {
 		thisBall->setFocalDistanceFromRadius();
 		//trust pixest to within 300 cm

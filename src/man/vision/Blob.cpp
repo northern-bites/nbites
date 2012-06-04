@@ -92,6 +92,16 @@ bool Blob::isAligned(Blob other) {
     return false;
 }
 
+/* Test if one blob contains another. Useful to observe complete overlap
+*/
+bool Blob::contains(Blob other) {
+    if (getLeft() >= other.getLeft() && getRight() <= other.getRight() &&
+        getTop() >= other.getTop() && getBottom() <= other.getBottom()){
+        return true;
+    }
+    return false;
+}
+
 /* Shift the blob in the directions indicated by the deltas.
    Note: not a pure shift - the bottom and top shift in opposite
    directions.
