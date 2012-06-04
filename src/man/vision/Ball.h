@@ -83,6 +83,7 @@ public:
     std::pair<int, int> scanMidlinesForRoundnessInformation(Blob b);
     std::pair<int, int> scanDiagonalsForRoundnessInformation(Blob b);
     bool badSurround(Blob b);
+    float ballDistanceEstFromRadius(float radius);
     void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
     void checkForReflections(int h, int w, VisualBall * thisBall,
                              estimate e);

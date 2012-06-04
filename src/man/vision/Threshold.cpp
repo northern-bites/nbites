@@ -78,6 +78,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
                                                              YELLOW_BIT));
     navyblue = new Robots(vision, this, field, context, NAVY_BIT);
     red = new Robots(vision, this, field, context, RED_BIT);
+    unid = new Robots(vision, this, field, context, 0x00);
     orange = new Ball(vision, this, field, context, ORANGE_BIT);
     cross = new Cross(vision, this, field, context);
     for (int i = 0; i < IMAGE_WIDTH; i++) {
@@ -90,6 +91,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 void Threshold::visionLoop() {
     // threshold image and create runs
     thresholdAndRuns();
+    //newFindRobots();
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
@@ -321,9 +323,6 @@ void Threshold::findGoals(int column, int topEdge) {
     if (yellows > 10) {
         yellow->newRun(column, lastYellow, firstYellow - lastYellow);
     }
-	if (pinks > 5) {
-		red->newRun(column, lastPink, firstPink - lastPink);
-	}
     if (shoot[column] && robots > 5) {
         shoot[column] = false;
     }
@@ -348,13 +347,13 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     int robots = 0, greens = 0, greys = 0;
     int lastGood = IMAGE_HEIGHT - 1;
     int maxWhite = 0;
-	bool faceDown = pose->getHorizonY(0) < 0;
-	bool faceDown2 = pose->getHorizonY(0) < -100;
+    bool faceDown = pose->getHorizonY(0) < 0;
+    bool faceDown2 = pose->getHorizonY(0) < -100;
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
         while (bound < IMAGE_HEIGHT &&
-			   Utility::isOrange(getColor(column, bound))) {
+               Utility::isOrange(getColor(column, bound))) {
             bound++;
         }
     }
@@ -372,12 +371,12 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         // otherwise, do stuff according to color
         if (lastPixel != pixel || j == topEdge) { // end of column
             // Note: pixel can contain multiple colors, so we check all of them
-			if (Utility::isOrange(lastPixel)) {
+            if (Utility::isOrange(lastPixel)) {
                 // add to Ball data structure
                 //drawPoint(column, j, MAROON);
                 if (j == topEdge) {
                     while (j > 0 && Utility::isOrange(getThresholded(j,column)))
-					{
+                    {
                         currentRun++;
                         j--;
                     }
@@ -386,8 +385,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     orange->newRun(column, j, currentRun);
                 }
                 greens += currentRun;
-			}
-			if (Utility::isWhite(lastPixel)) {
+            }
+            if (Utility::isWhite(lastPixel)) {
                 // add to the cross data structure
                 if (currentRun > 2) {
                     cross->newRun(column, j, currentRun);
@@ -395,8 +394,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         maxWhite = currentRun;
                     }
                 }
-			}
-			if (Utility::isUndefined(lastPixel)) {
+            }
+            if (Utility::isUndefined(lastPixel)) {
                 if (currentRun > 15) {
                     greys+= currentRun;
                 }
@@ -410,22 +409,18 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         vision->drawPoint(column, j + currentRun, MAROON);
                     }
                 }
-			}
-			if (Utility::isGreen(lastPixel)) {
+            }
+            if (Utility::isGreen(lastPixel)) {
                 greens+= currentRun;
                 lastGood = j;
-				// we often see navy in shadowed places
-				if (currentRun > 3) {
-					robots = 0;
-				}
-			}
-			if (Utility::isNavy(lastPixel)) {
-                robots+= currentRun;
-                if (currentRun > 5) {
-                    navyblue->newRun(column, j, currentRun);
+                // we often see navy in shadowed places
+                if (currentRun > 3) {
+                    robots = 0;
                 }
+            }
+            if (Utility::isNavy(lastPixel)) {
                 if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
-					&& shoot[column] && !faceDown) {
+                    && shoot[column] && !faceDown) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
                         block[column / divider] = lastGood;//j + currentRun;
@@ -436,11 +431,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
             }
-			if (Utility::isRed(lastPixel)) {
+            if (Utility::isRed(lastPixel)) {
                 robots+= currentRun;
-                if (currentRun > 3) {
-                    red->newRun(column, j, currentRun);
-                }
                 if (robots > 10 && shoot[column]) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
@@ -451,7 +443,7 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         vision->drawPoint(column, j + currentRun, MAROON);
                     }
                 }
-			}
+            }
             // since this loop runs when a run ends, restart # pixels in run counter
             currentRun = 1;
         }
@@ -723,17 +715,65 @@ int Threshold::getRobotBottom(int x, int c) {
     return navyBottoms[x];
 }
 
+
+void Threshold::newFindRobots() {
+
+    //this is the robot detection method.
+    //we perform robot detection by performing another pass through the image
+    //and looking for filled macro pixels of red or navy.
+
+    //we want macro pixels of this size
+    int widthScale = Robots::widthScale;
+    int heightScale = Robots::heightScale;
+    unsigned char pixel = GREEN;
+    float navyColorCount = 0;
+    float redColorCount = 0;
+    float totalCellCount = (float) (widthScale * heightScale);
+
+    //in this loop, we go first through the macro pixels,
+    //then, in each macro pixel, we count how much red or navy
+    //there is in it. Then we determine if there is enough to be interested
+    //in that particular macro pixel
+    for (int i = 0; i < IMAGE_WIDTH; i += widthScale) {
+        for (int j = 0; j < IMAGE_HEIGHT; j += heightScale) {
+            pixel = getThresholded(j, i);
+            if (Utility::isNavy(pixel))
+                navyblue->incImageBox(i / widthScale, j / heightScale);
+            else if (Utility::isRed(pixel))
+                red->incImageBox(i / widthScale, j / heightScale);
+        }
+    }
+    for (int i = 0; i < IMAGE_WIDTH / widthScale; i++) {
+        for (int j = 0; j < IMAGE_HEIGHT / heightScale; j++) {
+            navyColorCount = navyblue->getImageBox(i, j);
+            redColorCount = red->getImageBox(i, j);
+            if (navyColorCount / totalCellCount >= 0.6) {
+                navyblue->setImageBox(i, j, 1);
+                //the following line allows us to see which pixel has been activated.
+                //vision->drawRect(i, j, widthScale, heightScale, MAROON);
+            }
+            if (redColorCount / totalCellCount >= 0.4) {
+                red->setImageBox(i, j, 1);
+                //vision->drawRect(i, j, widthScale, heightScale, WHITE);
+            }
+            navyColorCount = 0;
+            redColorCount = 0;
+        }
+    }
+}
+
+
 /*  Makes the calls to the vision system to recognize objects.  Then performs
  * some extra sanity checks to make sure we don't have weird cases.
  */
-
 void Threshold::objectRecognition() {
     initObjects();
     // now get the posts and goals
-	// we need to make the white blobs before checking on robots
+        // we need to make the white blobs before checking on robots
     cross->createObject();
-    red->robot(cross);
-    navyblue->robot(cross);
+    //red->findRobots(cross);
+    //navyblue->findRobots(cross);
+    unid->findRobots(cross);
     yellow->createObject();
     cross->checkForCrosses();
 
@@ -1363,11 +1403,16 @@ void Threshold::initDebugImage(){
  * to the real image.
  */
 void Threshold::transposeDebugImage(){
-#if defined OFFLINE && defined DEBUG_IMAGE
-    for(int x = 0 ; x < IMAGE_WIDTH;x++)
-        for(int y = 0; y < IMAGE_HEIGHT;y++)
-            if(debugImage[y][x]!=GREY){
-                thresholded[y][x] = debugImage[y][x];}
+#if defined OFFLINE
+    for(int x = 0 ; x < IMAGE_WIDTH; x++) {
+      for(int y = 0; y < IMAGE_HEIGHT; y++) {
+	if(debugImage[y][x] != GREY){
+	  setThresholded(y, x, debugImage[y][x]);
+	}
+      }
+    }
+  
+    initDebugImage();
 #endif
 }
 
