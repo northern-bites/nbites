@@ -12,7 +12,7 @@ OfflineImageTranscriber::OfflineImageTranscriber(
 		boost::shared_ptr<Sensors> s,
 		memory::MImage::const_ptr mImage)
 		: ThreadedImageTranscriber(s, "OfflineImageTranscriber"),
-		  mImage(mImage),
+		  mImage(mImage), 
 		  table(new unsigned char[yLimit * uLimit * vLimit]),
 		  params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
 		  image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])){
@@ -70,6 +70,7 @@ void OfflineImageTranscriber::acquireNewImage() {
         ImageAcquisition::acquire_image_fast(table, params,
                 reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
                 image);
+	sensors->setImage(image);
     }
 }
 

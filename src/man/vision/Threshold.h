@@ -144,6 +144,7 @@ public:
     void detectSelf();
     void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
     void objectRecognition();
+    void newFindRobots(); //ben's function
     // helper methods
     void initObjects(void);
     void initColors();
@@ -180,7 +181,7 @@ public:
     int getPixelBoundaryLeft();
     int getPixelBoundaryRight();
     int getPixelBoundaryUp();
-	float getPixDistance(int y) {return pixDistance[y];}
+    float getPixDistance(int y) {return pixDistance[y];}
 
 #ifdef OFFLINE
     void setConstant(int c);
@@ -221,7 +222,7 @@ public:
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
 
-    Robots *red, *navyblue;
+    Robots *red, *navyblue, *unid;
     Ball* orange;
     Cross* cross;
     // main array

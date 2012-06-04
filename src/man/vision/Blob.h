@@ -67,7 +67,8 @@ public:
     void init();
     void merge(Blob other);
     void printBlob() const;
-    bool isAligned(Blob b);
+    bool isAligned(Blob other);
+    bool contains(Blob other);
 
 private:
     // bounding coordinates of the blob
