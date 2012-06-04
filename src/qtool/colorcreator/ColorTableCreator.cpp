@@ -24,31 +24,50 @@ using namespace man::corpus;
 ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
         QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
-        image(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM), BMPYUVImage::RGB, this)),
+        currentCamera(Camera::TOP),
+        topImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::TOP), BMPYUVImage::RGB, this)),
+        bottomImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM), BMPYUVImage::RGB, this)),
         sensors(new Sensors(shared_ptr<Speech>(new Speech()))),
         imageTranscribe(new OfflineImageTranscriber(sensors,
                 dataManager->getMemory()->getMImage(Camera::TOP),
                 dataManager->getMemory()->getMImage(Camera::BOTTOM))),
         rawThresholdedImageData(new PImage())
 {
-    rawThresholdedImageData->set_width(AVERAGED_IMAGE_WIDTH);
-    rawThresholdedImageData->set_height(AVERAGED_IMAGE_HEIGHT);
 
-    threshImage = new ThresholdedImage(rawThresholdedImageData, this);
-
-    imageViewer = new viewer::BMPImageViewerListener(image, this);
-    thresholdedImageViewer = new viewer::FilteredThresholdedViewer(threshImage, this);
 
     QHBoxLayout* mainLayout = new QHBoxLayout;
 
     QHBoxLayout* leftLayout = new QHBoxLayout;
-    QVBoxLayout* rightLayout = new QVBoxLayout;
+    mainLayout->addLayout(leftLayout);
 
-    dataManager->connectSlotToMObject(imageViewer, SLOT(updateView()), MBOTTOMIMAGE_ID);
+    imageTabs = new QTabWidget(this);
+    leftLayout->addWidget(imageTabs);
+
+    topImageViewer = new viewer::BMPImageViewerListener(topImage, this);
+    QObject::connect(topImageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
+                     this, SLOT(canvassClicked(int, int, int, bool)));
+    dataManager->connectSlotToMObject(topImageViewer, SLOT(updateView()), MTOPIMAGE_ID);
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
+
+    imageTabs->addTab(topImageViewer, "Top Image");
+
+    bottomImageViewer = new viewer::BMPImageViewerListener(bottomImage, this);
+    QObject::connect(bottomImageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
+                     this, SLOT(canvassClicked(int, int, int, bool)));
+    dataManager->connectSlotToMObject(bottomImageViewer, SLOT(updateView()), MBOTTOMIMAGE_ID);
     dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
 
-    QObject::connect(imageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
-            this, SLOT(canvassClicked(int, int, int, bool)));
+    imageTabs->addTab(bottomImageViewer, "Bottom Image");
+
+    connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
+
+    rawThresholdedImageData->set_width(AVERAGED_IMAGE_WIDTH);
+    rawThresholdedImageData->set_height(AVERAGED_IMAGE_HEIGHT);
+
+    threshImage = new ThresholdedImage(rawThresholdedImageData, this);
+    thresholdedImageViewer = new viewer::FilteredThresholdedViewer(threshImage, this);
+
+    QVBoxLayout* rightLayout = new QVBoxLayout;
 
     colorStats = new QLabel(this);
 
@@ -73,12 +92,9 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     rightLayout->addWidget(saveBtn);
     connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveColorTable()));
 
-    leftLayout->addWidget(imageViewer);
     rightLayout->addWidget(thresholdedImageViewer);
-
     rightLayout->addWidget(colorStats);
 
-    mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
     this->setLayout(mainLayout);
@@ -108,7 +124,7 @@ void ColorTableCreator::updateThresholdedImage(){
     imageTranscribe->initTable(colorTable.getTable());
     imageTranscribe->acquireNewImage();
     rawThresholdedImageData->mutable_image()->assign(
-            (const char*) sensors->getColorImage(Camera::BOTTOM),
+            (const char*) sensors->getColorImage(currentCamera),
             AVERAGED_IMAGE_SIZE);
     thresholdedImageViewer->updateView();
     this->updateColorStats();
@@ -146,6 +162,14 @@ void ColorTableCreator::paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brush
 
             int brush_x = i + brushStroke.x;
             int brush_y = j + brushStroke.y;
+
+            BMPYUVImage* image;
+
+            if (currentCamera == Camera::TOP) {
+                image = topImage;
+            } else {
+                image = bottomImage;
+            }
 
             // Get the color from the image and emit it
             if(0 < brush_x && brush_x < image->getWidth() &&  0 < brush_y && brush_y < image->getHeight()) {
@@ -185,9 +209,21 @@ void ColorTableCreator::paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brush
     updateThresholdedImage();
 }
 
+void ColorTableCreator::imageTabSwitched(int) {
+
+    if (imageTabs->currentWidget() == topImageViewer) {
+        currentCamera = Camera::TOP;
+    } else {
+        currentCamera = Camera::BOTTOM;
+    }
+
+    this->updateThresholdedImage();
+}
+
 void ColorTableCreator::updateColorSelection(int color) {
     currentColor = color;
-    imageViewer->setBrushColor(QColor(image::Color_RGB[color]));
+    topImageViewer->setBrushColor(QColor(image::Color_RGB[color]));
+    bottomImageViewer->setBrushColor(QColor(image::Color_RGB[color]));
     this->updateColorStats();
 }
 

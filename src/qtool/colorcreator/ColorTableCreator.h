@@ -77,12 +77,20 @@ protected slots:
     void undo();
     void updateColorSelection(int color);
     void updateColorStats();
+    void imageTabSwitched(int);
 
 private:
     data::DataManager::ptr dataManager;
 
-    image::BMPYUVImage* image;
-    viewer::BMPImageViewerListener* imageViewer;
+    QTabWidget* imageTabs;
+
+    man::corpus::Camera::Type currentCamera;
+
+    image::BMPYUVImage* topImage;
+    viewer::BMPImageViewerListener* topImageViewer;
+
+    image::BMPYUVImage* bottomImage;
+    viewer::BMPImageViewerListener* bottomImageViewer;
 
     boost::shared_ptr<Sensors> sensors;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
