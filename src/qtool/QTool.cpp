@@ -9,6 +9,7 @@ using data::DataManager;
 using data::DataLoader;
 using colorcreator::ColorCalibrate;
 using viewer::MemoryViewer;
+using viewer::VisionViewer;
 using viewer::BallEKFViewer;
 using viewer::FieldViewer;
 using offline::OfflineViewer;
@@ -20,7 +21,8 @@ QTool::QTool() : QMainWindow(),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCalibrate(new ColorCalibrate(dataManager)),
-        memoryViewer(new MemoryViewer(dataManager)),
+	memoryViewer(new MemoryViewer(dataManager)),
+       	visionViewer(new VisionViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
         fieldViewer(new FieldViewer(dataManager)),
@@ -28,7 +30,7 @@ QTool::QTool() : QMainWindow(),
 		 //	 graphViewer(new GraphViewer(dataManager, this))			
 {
 
-    this->setWindowTitle(tr("HackTool"));
+    this->setWindowTitle(tr("QTOOL"));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
@@ -47,9 +49,10 @@ QTool::QTool() : QMainWindow(),
 
     this->setCentralWidget(toolTabs);
 
-    toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
+    toolTabs->addTab(colorCalibrate, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
+    toolTabs->addTab(visionViewer, tr("Vision Viewer"));
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));

@@ -2,6 +2,8 @@
 
 #include "TMan.h"
 
+#include "manconfig.h"
+
 #include "Profiler.h"
 #include "corpus/Sensors.h"
 #include "corpus/RoboGuardian.h"
@@ -22,11 +24,15 @@ START_FUNCTION_EXPORT
 
 void loadMan(boost::shared_ptr<AL::ALBroker> broker) {
 
+#ifdef USE_ALSPEECH
     shared_ptr<Speech> speech(new ALSpeech(broker));
+#else
+    shared_ptr<Speech> speech(new Speech());
+#endif
     shared_ptr<Sensors> sensors(new Sensors(speech));
     shared_ptr<Transcriber> transcriber(new ALTranscriber(broker, sensors));
     shared_ptr<ThreadedImageTranscriber>
-        imageTranscriber(new NaoImageTranscriber(sensors, "image"));
+        imageTranscriber(new NaoImageTranscriber(sensors, "ImageTranscriber"));
     shared_ptr<MotionEnactor>
         enactor(new NaoEnactor(sensors, transcriber, broker));
     shared_ptr<Lights> lights(new NaoLights(broker));

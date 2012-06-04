@@ -81,7 +81,6 @@ public:
     V4L2ImageTranscriber(boost::shared_ptr<Sensors> s, Camera::Type which);
     virtual ~V4L2ImageTranscriber();
 
-    void setNewSettings(const Camera::Settings& settings);
     const Camera::Settings* getSettings() const {
         return &settings;
     }
@@ -97,11 +96,6 @@ public:
     unsigned long long getTimeStamp() const;
 
     void assertCameraSettings();
-
-    /**
-     * Unconditional write of the camera settings
-     */
-    void writeCameraSettings();
 
     void initTable(const std::string& path);
 

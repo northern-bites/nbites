@@ -15,7 +15,7 @@ using namespace man::corpus;
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
         image(new BMPYUVImage(dataManager->getMemory()->
-                              getMImage(Camera::BOTTOM),
+                              getMImage(Camera::TOP),
                               BMPYUVImage::RGB, this)),
         channelImage(image, this),
         currentColorSpace(&colorSpace[STARTING_COLOR]),
@@ -40,7 +40,7 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     leftLayout->addWidget(&channelImage);
 
     dataManager->connectSlotToMObject(&channelImage,
-                 SLOT(updateView()), MIMAGE_ID);
+                 SLOT(updateView()), MTOPIMAGE_ID);
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 

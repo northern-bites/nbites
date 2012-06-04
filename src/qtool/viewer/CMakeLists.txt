@@ -23,8 +23,13 @@ set( viewer_srcs MemoryViewer.cpp
 		 BallEKFViewer.cpp
 		 FieldViewer.cpp
 		 EKFDataViewer.cpp
+<<<<<<< HEAD
 		 #GraphViewer.cpp
 		 #R/RTool.cpp
+=======
+		 VisionViewer.cpp
+		 CollapsibleImageViewer.cpp
+>>>>>>> master
 		 )
 
 set( viewer_headers MemoryViewer.h
@@ -34,8 +39,13 @@ set( viewer_headers MemoryViewer.h
 		    BallEKFViewer.h
 		    FieldViewer.h
 		    EKFDataViewer.h
+<<<<<<< HEAD
 		    #GraphViewer.h
 		    #R/RTool.h
+=======
+		    VisionViewer.h
+		    CollapsibleImageViewer.h
+>>>>>>> master
 		    )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -56,6 +66,9 @@ target_link_libraries(
   treemodel
   image
   memory
+  vision
+  _sensors
+  _robot_connect
   ${QT_LIBRARIES}
   #${R_LIBRARY} 
   #${QWT_LIBRARY}

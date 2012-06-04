@@ -19,8 +19,9 @@ using proto::PImage;
 
     MImage::MImage(shared_ptr<Sensors> sensors,
                    corpus::Camera::Type type,
+                   MObject_ID objectID,
                    PImage_ptr data) :
-        MObject(id, data),
+        MObject(objectID, data),
         sensors(sensors),
         data(data),
         thresholded_data(new PImage()),
@@ -38,7 +39,7 @@ using proto::PImage;
 
     string* image_string = this->data->mutable_image();
     // allocate the memory necessary for the image;
-    image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
+    image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), '0');
     char* image_string_data = const_cast<char *>(image_string->data());
     if (sensors.get()) {
         sensors->setNaoImagePointer(image_string_data, cameraType);
@@ -49,7 +50,6 @@ MImage::~MImage() {
 }
 
 void MImage::updateData() {
-
     this->data->set_timestamp(time_stamp());
     //Note: we don't need to update the image since it's set to already copy
     //into our image_string
@@ -64,6 +64,16 @@ void MImage::updateData() {
     this->thresholded_data->set_width(AVERAGED_IMAGE_WIDTH);
     this->thresholded_data->set_height(AVERAGED_IMAGE_HEIGHT);
     #endif
+}
+
+MTopImage::MTopImage(boost::shared_ptr<Sensors> sensors) :
+    MImage(sensors, corpus::Camera::TOP, MTOPIMAGE_ID)
+{
+}
+
+MBottomImage::MBottomImage(boost::shared_ptr<Sensors> sensors) :
+    MImage(sensors, corpus::Camera::BOTTOM, MBOTTOMIMAGE_ID)
+{
 }
 
 }

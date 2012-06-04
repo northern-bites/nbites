@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include <vector>
 #include "image/FastYUVToBMPImage.h"
+#include "CollapsibleImageViewer.h"
 
 namespace qtool {
 namespace viewer {
@@ -14,32 +15,60 @@ using namespace man::corpus;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager) {
-    MImage::const_ptr rawMImage = memoryManager->getMemory()->
+    MImage::const_ptr rawMTopImage = memoryManager->getMemory()->
         getMImage(Camera::TOP);
-    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(rawMImage, this);
+    MImage::const_ptr rawMBottomImage = memoryManager->getMemory()->
+        getMImage(Camera::BOTTOM);
 
-    /*QCheckBox* overlayCheckBox = new QCheckBox ("Show Shapes Overlay", this);
-    QDockWidget* checkBoxDockWidget = new QDockWidget(this);
-    checkBoxDockWidget->setWidget(overlayCheckBox);
-    this->addDockWidget(Qt::TopDockWidgetArea, checkBoxDockWidget);
-    overlayCheckBox->setChecked(true);
-    QObject::connect(overlayCheckBox, SIGNAL(stateChanged()), this,  SLOT(toggleOverlay()));*/
-    BMPImageViewer* imageViewer;
+    FastYUVToBMPImage* rawTopBMP = new
+        FastYUVToBMPImage(rawMTopImage, this);
+    FastYUVToBMPImage* rawBottomBMP = new
+        FastYUVToBMPImage(rawMBottomImage, this);
 
-    //if(overlayCheckBox->isChecked()){
+    BMPImageViewer* topImageViewer;
+    BMPImageViewer* bottomImageViewer;
+
       VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
-      OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
-    
-      imageViewer = new BMPImageViewer(combo, this);
+
+      OverlayedImage* combo = new OverlayedImage(rawBottomBMP,
+                                                 shapes, this);
+
+      bottomImageViewer = new BMPImageViewer(combo, this);
+      CollapsibleImageViewer * bottomCIV = new
+          CollapsibleImageViewer(bottomImageViewer,
+                                 QString("Bottom"),
+                                 this);
+
+      topImageViewer = new BMPImageViewer(rawTopBMP, this);
+      CollapsibleImageViewer * topCIV = new
+          CollapsibleImageViewer(topImageViewer,
+                                 QString("Top"),
+                                 this);
+
       //}
 
       //    else
       // imageViewer = new BMPImageViewer(rawBMP, this);
-  
-    this->setCentralWidget(imageViewer);
-    memoryManager->connectSlotToMObject(imageViewer,
-                        SLOT(updateView()), MIMAGE_ID);
 
+      QWidget* central = new QWidget(this);
+
+      QVBoxLayout* layout = new QVBoxLayout(central);
+
+      layout->addWidget(topCIV);
+      layout->addWidget(bottomCIV);
+
+      // Make sure one of the images is toggled off for small screens
+      bottomCIV->toggle();
+
+      central->setLayout(layout);
+
+      this->setCentralWidget(central);
+
+    memoryManager->connectSlotToMObject(bottomImageViewer,
+                        SLOT(updateView()), MBOTTOMIMAGE_ID);
+
+    memoryManager->connectSlotToMObject(topImageViewer,
+                        SLOT(updateView()), MTOPIMAGE_ID);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -48,7 +77,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     std::vector<QTreeView> messageViewers;
     for (MObject_ID id = FIRST_OBJECT_ID;
             id != LAST_OBJECT_ID; id++) {
-        if (id != MIMAGE_ID) {
+        if (id != MTOPIMAGE_ID && id != MBOTTOMIMAGE_ID) {
             QDockWidget* dockWidget =
                     new QDockWidget(QString(MObject_names[id].c_str()), this);
             MObjectViewer* view = new MObjectViewer(
@@ -59,7 +88,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
             memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
         }
     }
-   
+
 }
 }
 }
