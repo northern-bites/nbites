@@ -43,7 +43,7 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
     dataManager->connectSlotToMObject(imageViewer, SLOT(updateView()), MIMAGE_ID);
-    dataManager->connectSlotToMObject(thresholdedImageViewer, SLOT(updateView()), MIMAGE_ID);
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MIMAGE_ID);
 
     QObject::connect(imageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(canvassClicked(int, int, int, bool)));
@@ -152,10 +152,29 @@ void ColorTableCreator::paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brush
                 byte u = image->getYUVImage()->getU(brush_x, brush_y);
                 byte v = image->getYUVImage()->getV(brush_x, brush_y);
 
+                //TODO: hack? there must be a better way to do this - Octavian
+
+                // these values reflect the downscaled Y, U, V values from the image acquisition
+
+                int scaled_brush_x = brush_x/2;
+                int scaled_brush_y = brush_y/2;
+
+                // y image stores the sum of 4 neighboring pixels, so average it
+                int y1 = sensors->getYImage()[scaled_brush_y*AVERAGED_IMAGE_WIDTH + scaled_brush_x]/2;
+                // u,v image stores the sum of 2 neighboring pixels so average it
+                // also since they're stored together we need to compute special offsets for each
+                int u1 = sensors->getUVImage()[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2];
+                int v1 = sensors->getUVImage()[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2 + 1];
+
+                std::cout << (int) y << " " << (int) u << " " << (int) v << std::endl;
+                std::cout << (int) y1 << " " << (int) u1 << " " << (int) v1 << std::endl;
+
                 if (brushStroke.define) {
                     colorTable.setColor(y, u, v, image::Color_bits[brushStroke.color]);
+                    colorTable.setColor(y1, u1, v1, image::Color_bits[brushStroke.color]);
                 } else {
                     colorTable.unSetColor(y, u, v, image::Color_bits[brushStroke.color]);
+                    colorTable.unSetColor(y1, u1, v1, image::Color_bits[brushStroke.color]);
                 }
             }
         }
