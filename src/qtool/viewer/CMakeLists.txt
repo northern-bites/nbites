@@ -21,6 +21,7 @@ set( viewer_srcs MemoryViewer.cpp
 		 FieldViewer.cpp
 		 EKFDataViewer.cpp
 		 VisionViewer.cpp
+		 CollapsibleImageViewer.cpp
 		 )
 
 set( viewer_headers MemoryViewer.h
@@ -31,6 +32,7 @@ set( viewer_headers MemoryViewer.h
 		    FieldViewer.h
 		    EKFDataViewer.h
 		    VisionViewer.h
+		    CollapsibleImageViewer.h
 		    )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

@@ -38,6 +38,7 @@ using namespace boost::lambda;
 #include "NBMath.h"
 #include "Kinematics.h"
 using namespace Kinematics;
+using namespace man::corpus;
 
 // static base image array, so we don't crash on image access if the setImage()
 // method is never called
@@ -70,9 +71,12 @@ Sensors::Sensors(boost::shared_ptr<Speech> s) :
         motionBodyAngles(Kinematics::NUM_JOINTS, 0.0f),
         bodyAnglesError(Kinematics::NUM_JOINTS, 0.0f),
         bodyTemperatures(Kinematics::NUM_JOINTS, 0.0f),
-        yImage(&global_image[0]), uvImage(&global_image[0]),
-        colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
-        naoImage(NULL),
+        yBottomImage(&global_image[0]), uvBottomImage(&global_image[0]),
+        yTopImage(&global_image[0]), uvTopImage(&global_image[0]),
+        colorBottomImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+        colorTopImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+        bottomImage(NULL),
+        topImage(NULL),
         roboImage(),
         varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
         fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
@@ -638,35 +642,49 @@ void Sensors::updateVisionAngles() {
 
 //get a pointer to the full size Nao image
 //this image has been copied to some local buffer
-const uint8_t* Sensors::getNaoImage() const {
-    return naoImage;
+const uint8_t* Sensors::getNaoImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return bottomImage;
+    else return topImage;
 }
 
 //get a pointer to the full size Nao image
 //this image has been copied to some local buffer
-uint8_t* Sensors::getWriteableNaoImage() {
-    return naoImage;
+uint8_t* Sensors::getWriteableNaoImage(Camera::Type which) {
+    if(which == Camera::BOTTOM) return bottomImage;
+    else return topImage;
 }
 
-const uint16_t* Sensors::getYImage() const {
-    return yImage;
+const uint16_t* Sensors::getYImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return yBottomImage;
+    else return yTopImage;
 }
 
-const uint16_t* Sensors::getImage() const {
-    return yImage;
+const uint16_t* Sensors::getImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return yBottomImage;
+    else return yTopImage;
 }
 
-const uint16_t* Sensors::getUVImage() const {
-    return uvImage;
+const uint16_t* Sensors::getUVImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return uvBottomImage;
+    else return uvTopImage;
 }
 
-const uint8_t* Sensors::getColorImage() const {
-    return colorImage;
+const uint8_t* Sensors::getColorImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return colorBottomImage;
+    else return colorTopImage;
 }
 
-void Sensors::setNaoImagePointer(char* _naoImage) {
-    naoImage = reinterpret_cast<uint8_t*>(_naoImage);
-    roboImage.updateImagePointer(naoImage);
+void Sensors::setNaoImagePointer(char* _naoImage, Camera::Type which) {
+    if(which == Camera::BOTTOM)
+    {
+        bottomImage = reinterpret_cast<uint8_t*>(_naoImage);
+        // roboImage.updateImagePointer(bottomImage);
+    }
+    else
+    {
+        topImage = reinterpret_cast<uint8_t*>(_naoImage);
+        //  roboImage.updateImagePointer(topImage);
+    }
 }
 
 void Sensors::notifyNewNaoImage() {
@@ -677,11 +695,22 @@ const man::memory::RoboImage* Sensors::getRoboImage() const {
     return &roboImage;
 }
 
-void Sensors::setImage(const uint16_t *img) {
-    yImage = img;
-    uvImage = img + AVERAGED_IMAGE_SIZE;
-    colorImage = reinterpret_cast<const uint8_t*>(img
-            + AVERAGED_IMAGE_SIZE * 3);}
+void Sensors::setImage(const uint16_t *img, Camera::Type which) {
+    if(which == Camera::BOTTOM)
+    {
+        yBottomImage = img;
+        uvBottomImage = img + AVERAGED_IMAGE_SIZE;
+        colorBottomImage = reinterpret_cast<const uint8_t*>(img
+                                      + AVERAGED_IMAGE_SIZE * 3);
+    }
+    else
+    {
+        yTopImage = img;
+        uvTopImage = img + AVERAGED_IMAGE_SIZE;
+        colorTopImage = reinterpret_cast<const uint8_t*>(img
+                                   + AVERAGED_IMAGE_SIZE * 3);
+    }
+}
 
 void Sensors::resetSaveFrame() {
     saved_frames = 0;
@@ -814,6 +843,7 @@ float Sensors::percentBrokenSonar() {
 }
 
 // @TODO move this to Transcriber to write out from full size image...
+// BROKEN--Lizzie
 void Sensors::saveFrame() {
     int MAX_FRAMES = 5000;
     if (saved_frames > MAX_FRAMES)
@@ -833,7 +863,7 @@ void Sensors::saveFrame() {
     lockImage();
 
     // @TODO Write out entire 640x480 image
-    fout.write(reinterpret_cast<const char*>(getNaoImage()), NAO_IMAGE_BYTE_SIZE);
+    //fout.write(reinterpret_cast<const char*>(getNaoImage()), NAO_IMAGE_BYTE_SIZE);
     // write the version of the frame format at the end before joints/sensors
     fout << VERSION << " ";
 
@@ -886,6 +916,7 @@ void Sensors::saveFrame() {
 /**
  * Load a frame from a file and set the sensors and image data as
  * appropriate. Useful for running offline.
+ * BROKEN--Lizzie
  */
 void Sensors::loadFrame(string path) {
     fstream fin(path.c_str(), fstream::in);
@@ -898,7 +929,7 @@ void Sensors::loadFrame(string path) {
     // Load the image from the file, puts it straight into Sensors'
     // image buffer so it doesn't have to allocate its own buffer and
     // worry about deleting it
-    uint16_t * img = const_cast<uint16_t*>(getImage());
+    //uint16_t * img = const_cast<uint16_t*>(getImage());
     uint8_t  * byte_img = new uint8_t[320 * 240 * 2];
     fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
     releaseImage();
@@ -907,10 +938,10 @@ void Sensors::loadFrame(string path) {
 
     // Translate the loaded image into the proper format.
     // @TODO: Convert images to new format.
-    for (int i = 0; i < 320 * 240; ++i) {
-        img[i] = 0;
-        img[i] = static_cast<uint16_t>(byte_img[i << 1]);
-    }
+    //for (int i = 0; i < 320 * 240; ++i) {
+    //img[i] = 0;
+    //   img[i] = static_cast<uint16_t>(byte_img[i << 1]);
+    //}
     delete byte_img;
 
     releaseImage();

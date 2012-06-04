@@ -5,7 +5,7 @@ try:
     haveNumpy = True
 except:
     haveNumpy = False
-    print "could not load numpy, please install it for advanced statistics"
+    print "  Could not load numpy. Please install it for advanced statistics."
 
 # unstable walks that do not fall have accelerometer variance
 # on the order of 1.5-3, stable walks are < 1

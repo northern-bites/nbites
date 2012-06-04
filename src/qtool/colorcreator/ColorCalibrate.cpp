@@ -1,4 +1,5 @@
 #include "ColorCalibrate.h"
+#include "Camera.h"
 
 #include <QtDebug>
 
@@ -9,10 +10,13 @@ namespace colorcreator {
 
 using namespace qtool::data;
 using namespace qtool::image;
+using namespace man::corpus;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
-        image(new BMPYUVImage(dataManager->getMemory()->getMImage(), BMPYUVImage::RGB, this)),
+        image(new BMPYUVImage(dataManager->getMemory()->
+                              getMImage(Camera::TOP),
+                              BMPYUVImage::RGB, this)),
         channelImage(image, this),
         currentColorSpace(&colorSpace[STARTING_COLOR]),
         colorSpaceWidget(currentColorSpace, this),
@@ -36,7 +40,7 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     leftLayout->addWidget(&channelImage);
 
     dataManager->connectSlotToMObject(&channelImage,
-                 SLOT(updateView()), MIMAGE_ID);
+                 SLOT(updateView()), MTOPIMAGE_ID);
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
