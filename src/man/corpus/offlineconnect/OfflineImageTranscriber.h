@@ -35,7 +35,7 @@ public:
 
     void initTable(const std::string& filename);
 
-protected:
+
     void acquireNewImage();
 
 public:

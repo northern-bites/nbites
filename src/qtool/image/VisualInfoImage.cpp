@@ -19,7 +19,7 @@ namespace image {
 
 void VisualInfoImage::buildBitmap() {
 
-     bitmap.fill(Qt::transparent);
+  bitmap.fill(Qt::transparent);
      
      const PVision::PVisualBall ballData = visionData->get()->visual_ball();
      if(ballData.visual_detection().distance() || ballData.visual_detection().x() ||
@@ -88,8 +88,6 @@ void VisualInfoImage::buildBitmap() {
        const PVision::PVisualLine lineData=linesData.Get(i);
        drawLine(lineData);
      }
-
-  
 }
 
 void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
