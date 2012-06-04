@@ -1,5 +1,6 @@
 
 #include "VisionViewer.h"
+#include "Camera.h"
 #include <vector>
 
 namespace qtool {
@@ -15,18 +16,22 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager),
 		 speech(new Speech()),
 		 sensors(new Sensors(speech)),
-		 rawImage(new proto::PImage()){
+		 bottomRawImage(new proto::PImage()){
 
     memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
     vision = shared_ptr<Vision> (new Vision(pose));
     offlineMVision = shared_ptr<MVision> (new MVision(vision));
-    
-    imageTranscribe = OfflineImageTranscriber::ptr (new OfflineImageTranscriber(sensors,
-							 memoryManager->getMemory()->getMImage()));
 
-    rawImage->set_width(AVERAGED_IMAGE_WIDTH);
-    rawImage->set_height(AVERAGED_IMAGE_HEIGHT);
+    imageTranscribe = OfflineImageTranscriber::ptr
+        (new OfflineImageTranscriber(sensors,
+                                     memoryManager->getMemory()->
+                                     getMImage(Camera::TOP),
+                                     memoryManager->getMemory()->
+                                     getMImage(Camera::BOTTOM)));
+
+    bottomRawImage->set_width(AVERAGED_IMAGE_WIDTH);
+    bottomRawImage->set_height(AVERAGED_IMAGE_HEIGHT);
 
     QToolBar* toolBar = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
@@ -61,26 +66,31 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     robotsD = false;
 
 
-    visionImage = new ThresholdedImage(rawImage, this);
+    bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
-    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(), this);
+    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->
+                                                      getMemory()->
+                                                  getMImage(Camera::BOTTOM),
+                                                      this);
     OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
-    
+
     BMPImageViewer *imageViewer = new BMPImageViewer(combo, this);
-    BMPImageViewer *visionViewer = new BMPImageViewer(visionImage, this);
+    BMPImageViewer *visionViewer = new BMPImageViewer(bottomVisionImage,
+                                                      this);
 
     QTabWidget* imageTabs = new QTabWidget();
     imageTabs->addTab(imageViewer, tr("Raw Image"));
     imageTabs->addTab(visionViewer, tr("Vision Image"));
-    
-    memoryManager->connectSlotToMObject(this, SLOT(update()), MIMAGE_ID);
+
+    memoryManager->connectSlotToMObject(this, SLOT(update()),
+                                        MBOTTOMIMAGE_ID);
 
     this->setCentralWidget(imageTabs);
     memoryManager->connectSlotToMObject(visionViewer,
-					SLOT(updateView()), MIMAGE_ID);
+					SLOT(updateView()), MBOTTOMIMAGE_ID);
     memoryManager->connectSlotToMObject(imageViewer,
-					SLOT(updateView()), MIMAGE_ID);
+					SLOT(updateView()), MBOTTOMIMAGE_ID);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -97,7 +107,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
             memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
 	}
-        if (id != MIMAGE_ID && id != MVISION_ID) {
+        if (id != MTOPIMAGE_ID && id != MBOTTOMIMAGE_ID &&
+            id != MVISION_ID) {
             QDockWidget* dockWidget =
                     new QDockWidget(QString(MObject_names[id].c_str()), this);
             MObjectViewer* view = new MObjectViewer(
@@ -114,9 +125,9 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 void VisionViewer::update(){
   imageTranscribe->acquireNewImage();
   sensors->updateVisionAngles();
-  vision->notifyImage(sensors->getImage());
+  vision->notifyImage(sensors->getImage(Camera::BOTTOM));
   offlineMVision->updateData();
-  rawImage->mutable_image()->assign(reinterpret_cast<const char *>
+  bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>
 				    (vision->thresh->thresholded),
 				    AVERAGED_IMAGE_SIZE);
 
