@@ -1,8 +1,6 @@
 /*  ColorTable class.  There are several things we need to do in this class.
-    1. Read the old color tables and convert them to the newest format.
-    Currently that means going from a number for each color to a bit for each
-    primary color.  That allows bit operations on the tables.
-    2. Write new color tables based upon the parameters set in the UI.
+    1. Read tables
+    2. Write tables
 
     Our color table is currently a 128x128x128 table accessed by a pixel's
     yuv value (in the order
@@ -10,69 +8,51 @@
 
 #include "ColorTable.h"
 
+#include <iostream>
+
 namespace qtool {
 namespace colorcreator {
 
 using namespace image;
+using namespace std;
 
-ColorTable::ColorTable()
-{
-    table = new byte**[128];
-    for (byte i = 0; i < 128; i++)
-    {
-        table[i] = new byte*[128];
-    }
-    for (byte i = 0; i < 128; i++)
-    {
-        for (byte j = 0; j < 128; j++)
-        {
-            table[i][j] = new byte[128];
-        }
-    }
+ColorTable::ColorTable() {
+    //initialize to all zeroes
+    table = (byte*) calloc(sizeof(byte), TABLE_SIZE);
+}
+
+ColorTable::~ColorTable() {
+    free(table);
 }
 
 // Read table from a file and determine the format
-void ColorTable::read(QString filename)
+void ColorTable::read(string filename)
 {
-    QFile file(filename);
-    QTextStream out(stdout);
-    QByteArray temp;
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        out << "The file would not open properly" << "\n";
+
+    FILE *tableFile = fopen(filename.c_str(), "r");   //open table for reading
+
+    if (tableFile == NULL) {
+        cerr << "Could not open color table " << filename;
         return;
     }
-    for (byte y = 0; y < 128; ++y)
-    {
-        for (byte x = 0; x < 128; x ++)
-        {
-            for (byte z = 0; z < 128; z++)
-            {
-                temp = file.read(1);
-                table[y][x][z] = temp[0];
-            }
+
+    // Color table is in VUY ordering
+    int rval;
+    for(int v=0; v < V_SIZE; ++v) {
+        for(int u=0; u < U_SIZE; ++u) {
+            fread(&table[v * U_SIZE * Y_SIZE + u * Y_SIZE],
+                    sizeof(unsigned char), Y_SIZE, tableFile);
         }
     }
-    file.close();
-    /*Stats** stats = colorStats();
-    for (byte i = 0; i < mainColors; i++)
-    {
-        for (byte j = 0; j < 3; j++)
-        {
-            stats[j][i].prbyte(i, j);
-        }
-    }*/
-    filename.chop(4);
-    QString newName = filename + "uvy.mtb";
-    out << "Filename is :" << newName << "\n";
-    write(newName);
+
+    fclose(tableFile);
 }
 
 /* WHen we read in a table of the old format we automatically convert
   it to the new format.  Here we just write out the table directly.
   */
-void ColorTable::write(QString filename)
-{
+void ColorTable::write(QString filename) {
+
     QFile file(filename);
     QTextStream out(stdout);
     QByteArray temp;
@@ -87,55 +67,12 @@ void ColorTable::write(QString filename)
         {
             for (byte z = 0; z < 128; z++)
             {
-                temp[0] = table[y][x][z];
+                temp[0] = table[offset(y, x, z)];
                 file.write(temp);
             }
         }
     }
     file.close();
-}
-
-byte ColorTable::getColor(byte y, byte u, byte v)
-{
-    return table[v / 2][u / 2][y / 2];
-}
-
-void ColorTable::setColor(byte y, byte u, byte v, byte col)
-{
-    QTextStream out(stdout);
-    out << y/2 << " " << u/2 << " " << v/2;
-    table[v / 2][u / 2][y / 2] |= col;
-
-}
-
-void ColorTable::unSetColor(byte y, byte u, byte v, byte col)
-{
-    byte allCol = 0xFF;
-    col = col ^ allCol;
-    table[v / 2][u / 2][y / 2] = table[v / 2][u / 2][y / 2] & col;
-}
-
-uint8_t* ColorTable::getLinearTable()
-{
-    QTextStream out(stdout);
-    uint8_t* linearTable = new uint8_t[128*128*128];
-    byte V_MAX = 128, U_MAX = 128, Y_MAX = 128;
-    int index = 0;
-    out << "Start write loop";
-    // loop through all possible table values - our tables are v-u-y
-    for (byte z = 0; z < V_MAX; z++)
-    {
-        for (byte x = 0; x < U_MAX; x++)
-        {
-            for (byte y = 0; y < Y_MAX; y++)
-            {
-                linearTable[index] = table[z][x][y];
-                index++;
-            }
-        }
-    }
-    return linearTable;
-
 }
 
 /* Write out a color table using bitwise definitions

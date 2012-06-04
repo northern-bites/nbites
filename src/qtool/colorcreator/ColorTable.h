@@ -21,13 +21,28 @@ namespace colorcreator {
 class ColorTable
 {
 public:
+    static const int Y_MAX = 256, U_MAX = 256, V_MAX = 256;
+    static const int SCALE = 2;
+    static const int Y_SIZE = Y_MAX/SCALE, U_SIZE = U_MAX/SCALE, V_SIZE = V_MAX/SCALE;
+    static const int TABLE_SIZE = Y_SIZE * U_SIZE * V_SIZE;
+
+public:
     ColorTable();
-    byte*** getTable() {return table; }
-    uint8_t* getLinearTable();
-    void read(QString filename);
-    byte getColor(byte y, byte u, byte v);
-    void setColor(byte y, byte u, byte v, byte col);
-    void unSetColor(byte y, byte u, byte v, byte col);
+    ~ColorTable();
+
+    byte* getTable() { return table; }
+    //computes the offset of the color in the table for a y, u, v value
+    int offset(byte y, byte u, byte v) { return (v/2)*Y_SIZE*U_SIZE + (u/2)*Y_SIZE + (y/2); }
+
+    void read(std::string filename);
+
+    byte getColor(byte y, byte u, byte v) { return table[offset(y, u, v)]; }
+    void setColor(byte y, byte u, byte v, byte col) { table[offset(y, u, v)] |= col; }
+    void unSetColor(byte y, byte u, byte v, byte col) {
+        byte allCol = 0xFF;
+        col = col ^ allCol;
+        table[offset(y, u, v)] &= col;
+    }
 
     //color table output methods
     void write(QString filename);
@@ -36,7 +51,7 @@ public:
     static void writeFromSliders(QString filename, ColorSpace* colorSpaces);
 
 private:
-    byte*** table;
+    byte* table;
 };
 
 }
