@@ -6,6 +6,7 @@
 #include "synchro/synchro.h"
 #include "VisionDef.h"
 #include "Common.h"
+#include "Camera.h"
 #include "PyRoboGuardian.h"
 #include "PySensors.h"
 #include "PyLights.h"
@@ -16,6 +17,7 @@
 
 using namespace std;
 using boost::shared_ptr;
+using namespace man::corpus;
 using namespace man::memory;
 using namespace man::memory::log;
 
@@ -83,7 +85,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
 
 #if defined USE_MEMORY && !defined OFFLINE
-    OutputProviderFactory::AllSocketOutput(loggingBoard.get());
+    OutputProviderFactory::AllSocketOutput(memory.get(), loggingBoard.get());
 #endif
 }
 
@@ -143,7 +145,7 @@ Man::processFrame ()
     // vision processing to ensure consistency.
     sensors->lockImage();
     PROF_ENTER(P_VISION);
-    vision->notifyImage(sensors->getImage());
+    vision->notifyImage(sensors->getImage(Camera::BOTTOM));
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
 //    cout<<vision->ball->getDistance() << endl;

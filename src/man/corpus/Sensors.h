@@ -30,6 +30,7 @@
 #include "SensorDef.h"
 #include "SensorConfigs.h"
 #include "VisionDef.h"
+#include "Camera.h"
 #include "Notifier.h"
 #include "Speech.h"
 #include "BulkMonitor.h"
@@ -191,16 +192,19 @@ public:
     //   its own, and there is no way, even with locking, to guarantee that the
     //   underlying data at the image pointer location is not modified while
     //   the image is locked in Sensors.
-    const uint8_t* getNaoImage() const;
-    uint8_t* getWriteableNaoImage();
-    const uint16_t* getYImage() const;
-    const uint16_t* getImage() const;
-    const uint16_t* getUVImage() const;
-    const uint8_t* getColorImage() const;
-    void setNaoImagePointer(char* img);
+
+    man::corpus::Camera::Type which;
+
+    const uint8_t* getNaoImage(man::corpus::Camera::Type type) const;
+    uint8_t* getWriteableNaoImage(man::corpus::Camera::Type type);
+    const uint16_t* getYImage(man::corpus::Camera::Type type) const;
+    const uint16_t* getImage(man::corpus::Camera::Type type) const;
+    const uint16_t* getUVImage(man::corpus::Camera::Type type) const;
+    const uint8_t* getColorImage(man::corpus::Camera::Type type) const;
+    void setNaoImagePointer(char* img, man::corpus::Camera::Type type);
     void notifyNewNaoImage();
     const man::memory::RoboImage* getRoboImage() const;
-    void setImage(const uint16_t* img);
+    void setImage(const uint16_t* img, man::corpus::Camera::Type type);
     void lockImage() const;
     void releaseImage() const;
 
@@ -277,9 +281,12 @@ private:
     float ultraSoundDistanceLeft;
     float ultraSoundDistanceRight;
 
-    const uint16_t *yImage, *uvImage;
-    const uint8_t *colorImage;
-    uint8_t *naoImage;
+    const uint16_t *yBottomImage, *uvBottomImage;
+    const uint16_t *yTopImage, *uvTopImage;
+    const uint8_t *colorBottomImage, *colorTopImage;
+    uint8_t *bottomImage, *topImage;
+
+    // Not used...
     man::memory::RoboImage roboImage;
 
     // Pose needs to know which foot is on the ground during a vision frame

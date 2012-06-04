@@ -81,6 +81,6 @@ class BirthCertificate:
     def __str__(self):
         s = "CoA: " + self.long_name
         if self.__doc__:
-            s += '\nCoA:   ' + self.__doc__
+            s += '\nCoA: ' + self.__doc__
         return s
 
