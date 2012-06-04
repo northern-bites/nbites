@@ -1,4 +1,3 @@
-
 #include "QTool.h"
 #include <iostream>
 #include <QFileDialog>
@@ -20,7 +19,7 @@ QTool::QTool() : QMainWindow(),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCalibrate(new ColorCalibrate(dataManager)),
-	memoryViewer(new MemoryViewer(dataManager)),
+		memoryViewer(new MemoryViewer(dataManager)),
        	visionViewer(new VisionViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
@@ -30,6 +29,7 @@ QTool::QTool() : QMainWindow(),
     this->setWindowTitle(tr("QTOOL"));
 
     toolbar = new QToolBar();
+	scrollArea = new QScrollArea();
     nextButton = new QPushButton(tr(">"));
     prevButton = new QPushButton(tr("<"));
     recordButton = new QPushButton(tr("Rec"));
@@ -44,8 +44,6 @@ QTool::QTool() : QMainWindow(),
 
     this->addToolBar(toolbar);
 
-    this->setCentralWidget(toolTabs);
-
     toolTabs->addTab(colorCalibrate, tr("Color Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
@@ -54,6 +52,13 @@ QTool::QTool() : QMainWindow(),
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
+
+	scrollArea->setWidget(toolTabs);
+	scrollArea->resize(toolTabs->size());
+	this->setCentralWidget(scrollArea);
+	barMargins = new QSize((toolTabs->size().width()+35),
+						   (toolTabs->size().height()+35));
+	this->resize(*barMargins);
 }
 
 QTool::~QTool() {

@@ -60,6 +60,8 @@ private:
     QPushButton* nextButton;
     QPushButton* recordButton;
     QToolBar* toolbar;
+	QScrollArea* scrollArea;
+	QSize* barMargins;
 
 
 };
