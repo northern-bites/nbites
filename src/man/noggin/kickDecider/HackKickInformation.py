@@ -124,7 +124,7 @@ class KickInformation:
             if mate.playerNumber in [1, 4] and mate.active:
                 if mate.ballOn and mate.ballDist < 100:
                     return True
-                
+
         return False
 
 
@@ -144,7 +144,7 @@ class KickInformation:
             # if we are facing between the posts
             if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
                     rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0):
-                
+
                 if not self.sawGoal:
                     return self.chooseBackKick()
                 elif self.oppAvgPostDist == 0 or self.dangerousBall():
@@ -152,8 +152,8 @@ class KickInformation:
                 else:
                     self.brain.speech.say("Take it to the house!")
                     return self.chooseDynamicKick()
-                
-                
+
+
             # if the goal is to our right, use our left foot
             elif leftPostBearing < 0:
                 return kicks.LEFT_SIDE_KICK
