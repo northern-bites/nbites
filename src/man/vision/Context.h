@@ -143,26 +143,6 @@ public:
         const VisualCorner &corner,
         const std::vector <const VisualFieldObject*> &visibleObjects) const;
 
-    std::list<const ConcreteCorner*>
-    compareObjsCenterCorners(const VisualCorner& corner,
-                       const std::vector<const ConcreteCorner*>& possibleCorners,
-                       const std::vector<const VisualFieldObject*>& visibleObjects)
-        const;
-    std::list<const ConcreteCorner*>
-    compareObjsT(const VisualCorner& corner,
-                       const std::vector<const ConcreteCorner*>& possibleCorners,
-                       const std::vector<const VisualFieldObject*>& visibleObjects)
-        const;
-    std::list<const ConcreteCorner*>
-    compareObjsOuterL(const VisualCorner& corner,
-                       const std::vector<const ConcreteCorner*>& possibleCorners,
-                       const std::vector<const VisualFieldObject*>& visibleObjects)
-        const;
-    std::list<const ConcreteCorner*>
-    compareObjsInnerL(const VisualCorner& corner,
-                       const std::vector<const ConcreteCorner*>& possibleCorners,
-                       const std::vector<const VisualFieldObject*>& visibleObjects)
-        const;
 
 	void checkForKickDanger(VisualRobot *robot);
 	void checkForKickDangerNoRobots();
