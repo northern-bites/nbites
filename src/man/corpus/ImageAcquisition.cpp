@@ -40,7 +40,7 @@ int ImageAcquisition::acquire_image_fast(uint8_t *table,
 
             // *2 is to remove lowest bit, so it is bit compatible with
             //     ASM version.
-            int offset = 128*128*(vAvg>>2)*2 + 128*(uAvg>>2)*2 + (yAvg>>2);
+            int offset = 128*128*(vAvg>>2)*2 + 128*(uAvg>>2)*2 + (yAvg>>2)*2;
             *color = *(table + offset);
         }
     }
