@@ -151,7 +151,6 @@ void WalkingEngine::init()
     InConfigMap massesStream(common::paths::NAO_CONFIG_DIR + "/masses.cfg");
     if (massesStream.exists()) {
         massesStream >> theMassCalibration;
-        cout << theMassCalibration.masses[2].mass << endl;
     } else {
         cout << "Could not find masses.cfg!" << endl;
     }
