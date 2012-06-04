@@ -98,6 +98,8 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     mainLayout->addLayout(rightLayout);
 
     this->setLayout(mainLayout);
+
+    this->updateThresholdedImage();
 }
 
 void ColorTableCreator::loadColorTable(){
