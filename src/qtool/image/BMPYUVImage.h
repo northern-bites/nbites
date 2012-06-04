@@ -63,7 +63,6 @@ public:
     unsigned getWidth() const { return bitmap.width(); }
     unsigned getHeight() const { return bitmap.height(); }
 
-    const YUVImage* getYUVImage() const { return &yuvImage; }
 
 protected:
     bool needToResizeBitmap() const;
