@@ -1080,8 +1080,8 @@ bool Ball::badSurround(Blob b) {
    the ball distance from the radius in the image
  */
 float Ball::ballDistanceEstFromRadius(float radius) {
-  
-        float distEst;
+
+	float distEst;
 	float radToPow = std::pow(radius, -1.38);
 	distEst = 2350*radToPow;
 

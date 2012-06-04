@@ -457,6 +457,10 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                 }
             }
             if (Utility::isNavy(lastPixel)) {
+				robots+= currentRun;
+                if (currentRun > 5) {
+                    navyblue->newRun(column, j, currentRun);
+                }
                 if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
                     && shoot[column] && !faceDown) {
                     evidence[column / divider]++;
@@ -471,6 +475,9 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
             }
             if (Utility::isRed(lastPixel)) {
                 robots+= currentRun;
+                if (currentRun > 5) {
+                    red->newRun(column, j, currentRun);
+                }
                 if (robots > 10 && shoot[column]) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
@@ -807,11 +814,13 @@ void Threshold::newFindRobots() {
 void Threshold::objectRecognition() {
     initObjects();
     // now get the posts and goals
-        // we need to make the white blobs before checking on robots
+	// we need to make the white blobs before checking on robots
     cross->createObject();
+	red->robot(cross);
+	navyblue->robot(cross);
     //red->findRobots(cross);
     //navyblue->findRobots(cross);
-    unid->findRobots(cross);
+    //unid->findRobots(cross);
     yellow->createObject();
     cross->checkForCrosses();
 
