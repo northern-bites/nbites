@@ -128,7 +128,7 @@ void Noggin::initializePython()
 void Noggin::initializeLocalization()
 {
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
-    printf("Initializing localization modules\n");
+    printf("  Initializing localization modules\n");
 #   endif
 
     // Initialize the localization module

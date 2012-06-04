@@ -12,6 +12,7 @@
 #include "MObject.h"
 #include "Sensors.h"
 #include "ClassHelper.h"
+#include "Camera.h"
 
 namespace man {
 namespace memory {
@@ -21,12 +22,12 @@ class MImage: public MObject {
 ADD_SHARED_PTR(MImage);
 
 public:
-    static const MObject_ID id = MIMAGE_ID;
-
     typedef boost::shared_ptr<proto::PImage> PImage_ptr;
 
 public:
     MImage(boost::shared_ptr<Sensors> sensors,
+           corpus::Camera::Type type,
+           MObject_ID objectID = MTOPIMAGE_ID,
            PImage_ptr data = PImage_ptr(new proto::PImage));
     virtual ~MImage();
     /**
@@ -44,6 +45,18 @@ private:
     boost::shared_ptr<Sensors> sensors;
     PImage_ptr data;
     PImage_ptr thresholded_data;
+    corpus::Camera::Type cameraType;
 };
+
+class MTopImage: public MImage {
+public:
+    MTopImage(boost::shared_ptr<Sensors> sensors);
+};
+
+class MBottomImage: public MImage {
+public:
+    MBottomImage(boost::shared_ptr<Sensors> sensors);
+};
+
 }
 }
