@@ -11,7 +11,7 @@ int ImageAcquisition::acquire_image_fast(uint8_t *table,
 {
 #ifdef __linux__
     _acquire_image_fast(table, const_cast<ColorParams*>(&params), yuv, out);
-#else
+#else //TODO: I don't think this accurately reflects the ASM image acquisition
 
     uint16_t *yOut = out;
     uint16_t *uvOut = out + AVERAGED_IMAGE_SIZE;
@@ -40,7 +40,7 @@ int ImageAcquisition::acquire_image_fast(uint8_t *table,
 
             // *2 is to remove lowest bit, so it is bit compatible with
             //     ASM version.
-            int offset = 128*128*(vAvg>>2)*2 + 128*(uAvg>>2)*2 + (yAvg>>2)*2;
+            int offset = 128*128*(vAvg>>2)*2 + 128*(uAvg>>2)*2 + (yAvg>>2);
             *color = *(table + offset);
         }
     }
