@@ -25,54 +25,45 @@ ColorTable::~ColorTable() {
     free(table);
 }
 
-// Read table from a file and determine the format
-void ColorTable::read(string filename)
-{
+void ColorTable::read(string filename) {
 
     FILE *tableFile = fopen(filename.c_str(), "r");   //open table for reading
 
-    if (tableFile == NULL) {
+    if (!tableFile) {
         cerr << "Could not open color table " << filename;
         return;
     }
 
-    // Color table is in VUY ordering
-    int rval;
-    for(int v=0; v < V_SIZE; ++v) {
-        for(int u=0; u < U_SIZE; ++u) {
-            fread(&table[v * U_SIZE * Y_SIZE + u * Y_SIZE],
-                    sizeof(unsigned char), Y_SIZE, tableFile);
-        }
-    }
+    fread(table, sizeof(byte), TABLE_SIZE, tableFile);
 
     fclose(tableFile);
 }
 
-/* WHen we read in a table of the old format we automatically convert
-  it to the new format.  Here we just write out the table directly.
-  */
-void ColorTable::write(QString filename) {
+void ColorTable::write(string filename) {
 
-    QFile file(filename);
-    QTextStream out(stdout);
-    QByteArray temp;
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        out << "The file would not open properly" << "\n";
+    FILE *tableFile = fopen(filename.c_str(), "w");
+
+    if (!tableFile) {
+        cerr << "Could open file for saving a color table " << filename;
         return;
     }
-    for (byte y = 0; y < 128; ++y)
-    {
-        for (byte x = 0; x < 128; x ++)
-        {
-            for (byte z = 0; z < 128; z++)
-            {
-                temp[0] = table[offset(y, x, z)];
-                file.write(temp);
-            }
+
+    fwrite(table, sizeof(byte), TABLE_SIZE, tableFile);
+
+    fclose(tableFile);
+}
+
+int ColorTable::countColor(byte color) {
+
+    int count = 0;
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        if ((table[i] & color) > 0) {
+            count++;
         }
     }
-    file.close();
+
+    return count;
 }
 
 /* Write out a color table using bitwise definitions
@@ -119,51 +110,6 @@ void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
     out << "Orange count was " << count << "\n" << endl;
     file.close();
 }
-
-/*Stats** ColorTable::colorStats()
-{
-    Stats** colorStats;
-    colorStats = new Stats*[3];
-    for (byte i = 0; i < 3; i++)
-    {
-        colorStats[i] = new Stats[mainColors];
-    }
-
-    // initialize stats
-    for (byte h = 0; h < 3; ++h)
-        for (byte c = 0; c < mainColors; ++c)
-            colorStats[h][c] = Stats();
-
-    // loop through the whole table collecting stats
-    for (byte y = 0; y < 256; y += 2)
-        for (byte v = 0; v < 256; v += 2)
-            for (byte u = 0; u < 256; u += 2)
-            {
-                byte c = index(y, u, v);
-                while (c < 0) {
-                    c = 256 + c;
-                }
-                if (c > 256)
-                {
-                    c = c % 256;
-                }
-                // assumes old style table - convert values
-                // e.g. ORANGERED hits both ORANGE and RED
-                if (c < 12)
-                    for (byte q = 0; q < 2; ++q)
-                    {
-                        byte ci = colormap[q][c];
-                        if (ci < mainColors)
-                        {
-                            colorStats[0][ci].add(y);
-                            colorStats[1][ci].add(u);
-                            colorStats[2][ci].add(v);
-                        }
-                    }
-            }
-
-    return colorStats;
-}*/
 
 }
 }
