@@ -24,17 +24,11 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     FastYUVToBMPImage* rawBottomBMP = new
         FastYUVToBMPImage(rawMBottomImage, this);
 
-    /*QCheckBox* overlayCheckBox = new QCheckBox ("Show Shapes Overlay", this);
-    QDockWidget* checkBoxDockWidget = new QDockWidget(this);
-    checkBoxDockWidget->setWidget(overlayCheckBox);
-    this->addDockWidget(Qt::TopDockWidgetArea, checkBoxDockWidget);
-    overlayCheckBox->setChecked(true);
-    QObject::connect(overlayCheckBox, SIGNAL(stateChanged()), this,  SLOT(toggleOverlay()));*/
     BMPImageViewer* topImageViewer;
     BMPImageViewer* bottomImageViewer;
 
-    //if(overlayCheckBox->isChecked()){
       VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
+
       OverlayedImage* combo = new OverlayedImage(rawBottomBMP,
                                                  shapes, this);
 
@@ -62,7 +56,6 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     memoryManager->connectSlotToMObject(topImageViewer,
                         SLOT(updateView()), MTOPIMAGE_ID);
-
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
