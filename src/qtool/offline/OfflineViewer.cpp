@@ -46,12 +46,12 @@ void OfflineViewer::update() {
 }
 
 void OfflineViewer::loadColorTable() {
-    if (loaded) {
+  //  if (loaded) {
         QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
                 "../../data/tables",
                 tr("Table Files (*.mtb)"));
         offlineControl->loadTable(colorTablePath.toStdString());
-    }
+	//  }
 }
 
 void OfflineViewer::reloadMan() {
