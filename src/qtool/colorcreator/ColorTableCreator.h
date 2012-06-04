@@ -4,6 +4,7 @@
  * Tool to define/calibrate a color table
  *
  * @author EJ Googins
+ * @withsomehelpfrom Octavian Neamtu
  */
 
 #pragma once
@@ -28,44 +29,74 @@
 #include "ColorWheel.h"
 #include "image/ThresholdedImage.h"
 
+#include "man/corpus/offlineconnect/OfflineImageTranscriber.h"
+
 namespace qtool {
-    namespace colorcreator {
-        class ColorTableCreator : public QWidget
-        {
-            Q_OBJECT
+namespace colorcreator {
 
-        public:
-            ColorTableCreator(qtool::data::DataManager::ptr dataManager,
-                              QWidget *parent = 0);
-            ~ColorTableCreator() {}
+/**
+ * @class BrushStroke
+ *
+ * Saves a color paint action (like defining or undefining a color on a region in the image)
+ *
+ */
+class BrushStroke {
 
-        public:
-            static const image::ColorID STARTING_COLOR = image::Orange;
+public:
+    BrushStroke(int x, int y, image::ColorID color, int brushSize, bool define)
+        : x(x), y(y), color(color), brushSize(brushSize), define(define) { }
 
-        protected slots:
-            void loadColorTableBtnPushed();
-            void saveColorTableBtnPushed();
-            void updateThresholdedImage();
-            void updateColorTable(byte y, byte u, byte v);
-            void updateColorSelection(int color);
+    BrushStroke invert() const { return BrushStroke(x, y, color, brushSize, !define); }
 
-        private:
-            data::DataManager::ptr dataManager;
-            image::BMPYUVImage* image;
-            image::ThresholdedImage* threshImage;
-            viewer::BMPImageViewerListener* imageViewer;
-            viewer::BMPImageViewer* thresholdedImageViewer;
-            QPushButton saveColorTableBtn;
-            ColorTable* colorTable;
-            QComboBox colorSelect;
-            int currentColor;
-            ColorParams params;
-            uint8_t* rawThresh;
+    int x, y;
+    image::ColorID color;
+    int brushSize;
+    bool define;
 
-            boost::shared_ptr<man::memory::proto::PImage> rawThreshImage;
-            // Octavians idea for name
+};
 
+class ColorTableCreator: public QWidget {
 
-        };
-    }
+    Q_OBJECT
+
+public:
+    static const image::ColorID STARTING_COLOR = image::Orange;
+
+public:
+    ColorTableCreator(qtool::data::DataManager::ptr dataManager,
+            QWidget *parent = 0);
+    ~ColorTableCreator() {    }
+
+    void paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brushStroke);
+
+protected slots:
+    void loadColorTableBtnPushed();
+    void saveColorTableBtnPushed();
+    void updateThresholdedImage();
+    void canvassClicked(int x, int y, int brushSize, bool leftClick);
+    void undo();
+    void updateColorSelection(int color);
+
+private:
+    data::DataManager::ptr dataManager;
+
+    image::BMPYUVImage* image;
+    viewer::BMPImageViewerListener* imageViewer;
+
+    boost::shared_ptr<Sensors> sensors;
+    man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
+    boost::shared_ptr<man::memory::proto::PImage> rawThresholdedImageData; // Octavians idea for name
+    image::ThresholdedImage* threshImage;
+    viewer::BMPImageViewer* thresholdedImageViewer;
+
+    QPushButton saveColorTableBtn;
+    ColorTable colorTable;
+
+    QComboBox colorSelect;
+    int currentColor;
+
+    std::vector<BrushStroke> brushStrokes;
+
+};
+}
 }

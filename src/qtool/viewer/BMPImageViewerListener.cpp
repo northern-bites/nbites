@@ -9,39 +9,46 @@ namespace viewer {
 
 BMPImageViewerListener::BMPImageViewerListener(image::BMPYUVImage* image,
         QWidget *parent)
-: BMPImageViewer(image,parent){
-    setupUI();
-    QWidget::setAttribute(Qt::WA_NoMousePropagation,true );
-    givenImage = image;
+    : BMPImageViewer(image,parent), brushSize(DEFAULT_BRUSH_SIZE) {
+
+    QWidget::setAttribute(Qt::WA_NoMousePropagation, true );
 }
 
 void BMPImageViewerListener::mouseReleaseEvent ( QMouseEvent * event )
 {
-    qDebug() << "emit a mouse event";
-
-
-    if(event->button() == Qt::LeftButton)
-    {
-        int mouse_x = event->pos().x();
-        int mouse_y = event->pos().y();
-        // Check the click was on the image
-        for (int i = -10; i <= 10; i++) {
-            for (int j = -10; j <= 10; j++) {
-
-                int x = i + mouse_x;
-                int y = j + mouse_y;
-
-                // Get the color from the image and emit it
-                if(0 < x && x < image->getWidth() &&  0 < y && y < image->getHeight()) {
-
-                    byte y = givenImage->getYUVImage()->getY(x, y);
-                    byte u = givenImage->getYUVImage()->getU(x, y);
-                    byte v = givenImage->getYUVImage()->getV(x, y);
-                    emit fetchColorToDefine(y,u,v);
-                }
-            }
-        }
+    bool left;
+    if(event->button() == Qt::LeftButton) {
+        left = true;
+    } else {
+        left = false;
     }
+
+    int mouseX = event->pos().x();
+    int mouseY = event->pos().y();
+
+    emit mouseClicked(mouseX, mouseY, brushSize, left);
 }
+
+void BMPImageViewerListener::wheelEvent(QWheelEvent* event) {
+    if (event->delta() > 0) {
+        brushSize++;
+    } else {
+        brushSize--;
+    }
+
+    if (brushSize == 0) {
+        brushSize = 1;
+    }
+
+    updateBrushCursor();
+}
+
+void BMPImageViewerListener::updateBrushCursor() {
+    QPixmap cursor(brushSize, brushSize);
+
+    cursor.fill(brushColor);
+    this->setCursor(QCursor(cursor, brushSize, 0)); // not exactly sure why this works
+}
+
 }
 }
