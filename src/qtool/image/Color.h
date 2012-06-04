@@ -28,6 +28,8 @@ static const int MixedColor_RGB[] = {
         0x20b2aa, 0xff4500, 0x191970, 0x9400d3
 };
 
+static const byte ALL_COLORS = 0xFF;
+
 class Color
 {
     // holds an rgb value in the form #XXRRGGBB

@@ -7,10 +7,11 @@
  */
 
 #include "ColorTableCreator.h"
-#include "corpus/alconnect/ALConstants.h"
 #include <QMouseEvent>
-
 #include <QFileDialog>
+
+#include "viewer/FilteredThresholdedViewer.h"
+
 
 namespace qtool {
 namespace colorcreator {
@@ -34,7 +35,7 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     threshImage = new ThresholdedImage(rawThresholdedImageData, this);
 
     imageViewer = new viewer::BMPImageViewerListener(image, this);
-    thresholdedImageViewer = new viewer::BMPImageViewer(threshImage, this);
+    thresholdedImageViewer = new viewer::FilteredThresholdedViewer(threshImage, this);
 
     QHBoxLayout* mainLayout = new QHBoxLayout;
 
