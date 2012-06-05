@@ -22,7 +22,7 @@ def playbookPosition(player):
         nav.positionPlaybook()
 
         if gcState == 'gameReady':
-            brain.tracker.repeatHeadMove(brain.tracker.FIXED_PITCH_PAN_WIDE)
+            brain.tracker.repeatWidePanFixedPitch()
         else:
             # TODO: fix active loc @summer 2012
             brain.tracker.activeLoc()
@@ -67,7 +67,7 @@ def relocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_WIDE_PAN)
+        player.brain.tracker.repeatWidePanFixedPitch()
 
 #    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
 #        direction = MyMath.sign(player.getWalk()[2])

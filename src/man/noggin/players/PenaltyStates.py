@@ -15,7 +15,7 @@ def afterPenalty(player):
 
     if player.firstFrame():
         initPenaltyReloc(player)
-        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
+        player.brain.tracker.repeatWidePanFixedPitch()
         # walk towards the center of the field
         player.brain.nav.walkTo(RelRobotLocation(2000,0,0))
 
@@ -141,6 +141,6 @@ def penaltyRelocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
+        player.brain.tracker.repeatWidePanFixedPitch()
 
     return player.stay()

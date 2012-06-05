@@ -76,7 +76,7 @@ def walkFindBall(player):
     if player.firstFrame():
         player.stopWalking()
         # Do a slow pan
-        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
+        player.brain.tracker.repeatWidePanFixedPitch()
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()

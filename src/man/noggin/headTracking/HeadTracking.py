@@ -75,6 +75,21 @@ class HeadTracking(FSA.FSA):
             self.headMove = headMove
             self.switchTo('repeatHeadMove')
 
+    # Fixed Pitch
+    def repeatBasicPanFixedPitch(self):
+        '''Repeat the basic fixed pitch pan.'''
+        self.repeatHeadMove(self, HeadMoves.FIXED_PITCH_PAN)
+
+    # Fixed Pitch
+    def repeatWidePanFixedPitch(self):
+        '''Repeat the wide fixed pitch pan.'''
+        self.repeatHeadMove(self, HeadMoves.FIXED_PITCH_PAN_WIDE)
+
+    # Fixed Pitch
+    def repeatNarrowPanFixedPitch(self):
+        '''Repeat the narrow fixed pitch pan.'''
+        self.repeatHeadMove(self, HeadMoves.FIXED_PITCH_PAN_NARROW)
+
     # Consider tweaking.
     def trackBall(self):
         """

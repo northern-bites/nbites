@@ -47,7 +47,7 @@ def approachBall(player):
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
-        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_NARROW)
+        player.brain.tracker.repeatNarrowPanFixedPitch()
         player.brain.nav.stand()
         return player.stay()
 
@@ -116,7 +116,7 @@ def lookAround(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.stopHeadMoves() # HACK so that tracker goes back to stopped.
-        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN)
+        player.brain.tracker.repeatBasicPanFixedPitch()
 
     # Make sure we leave this state...
     if player.brain.ball.vis.framesOff > 200:

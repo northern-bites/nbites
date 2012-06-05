@@ -32,7 +32,7 @@ def standup(player):
         return player.stay()
 
     # repeatedly perform basic fixed pitch pan:
-    player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN)
+    player.brain.tracker.repeatBasicPanFixedPitch()
 
     # if ball in sight, track it. otherwise, pan:
     #player.brain.tracker.trackBallFixedPitch()

@@ -51,7 +51,7 @@ def gameReady(player):
         player.inKickingState = False
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
+        player.brain.tracker.repeatWidePanFixedPitch()
         player.brain.sensors.startSavingFrames()
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
