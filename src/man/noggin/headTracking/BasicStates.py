@@ -39,3 +39,10 @@ def doHeadMove(tracker):
         return tracker.goLater('stopped')
 
     return tracker.stay()
+
+def loopState(tracker):
+    '''Repeats lastDiffState.'''
+    if tracker.lastDiffState != 'loopState':
+        return tracker.goLater(tracker.lastDiffState)
+
+    return tracker.stay()

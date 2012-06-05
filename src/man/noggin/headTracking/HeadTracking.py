@@ -88,12 +88,24 @@ class HeadTracking(FSA.FSA):
         Enters a state cycle:
         When ball is in view, tracks via vision values.
         Once ball is gone for some time, switch to wide pans.
+        Note: can be safely called every frame.
         """
         self.target = self.brain.ball
         self.gain = 1.0
-        if ( self.currentState is not 'trackingFixedPitch'
-             and self.currentState is not 'fullPanFixedPitch'):
+        if (self.currentState is 'fullPanFixedPitch'):
+            self.lastDiffState = 'trackingFixedPitch'
+        else:
             self.switchTo('trackingFixedPitch')
+
+    # Fixed Pitch
+    def testPanFixedPitch(self):
+        """
+        Continuously perform the standard fixed pitch pan.
+        Note: can be safely called every frame.
+        """
+        if self.currentState is not 'fullPanFixedPitch':
+            self.switchTo('fullPanFixedPitch')
+        self.lastDiffState = 'loopState'
 
     # Consider tweaking.
     def trackBallSpin(self):

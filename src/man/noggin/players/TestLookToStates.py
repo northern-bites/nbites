@@ -33,9 +33,9 @@ def standup(player):
     #return player.goLater('lookState0')
 
     # Hijacked for vision testing.
-    player.brain.tracker.trackBallFixedPitch()
-
-    player.brain.tracker.helper.printHeadAngles()
+    player.brain.tracker.testPanFixedPitch()
+    #player.brain.tracker.trackBallFixedPitch()
+    #player.brain.tracker.helper.printHeadAngles()
 
     return player.stay()
 

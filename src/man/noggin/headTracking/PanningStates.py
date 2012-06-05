@@ -88,6 +88,7 @@ def locPans(tracker):
 def fullPanFixedPitch(tracker):
     """
     Repeatedly executes the headMove FIXED_PITCH_PAN.
+    Once the ball is located, switches to lastDiffState.
     """
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
@@ -96,9 +97,10 @@ def fullPanFixedPitch(tracker):
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    # Might want to generalize this out.
+    # If you want this pan to continue forever, be careful
+    #  to set lastDiffState to loopState.
     if tracker.brain.ball.vis.framesOn > 5:
-        return tracker.goLater('trackingFixedPitch')
+        return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()
 
