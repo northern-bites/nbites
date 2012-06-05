@@ -10,9 +10,11 @@ using namespace boost::assign;
 #include "CommDef.h"
 #include "Kinematics.h"
 #include "SensorDef.h"
+#include "Camera.h"
 
 using std::vector;
 using namespace boost;
+using namespace man::corpus;
 
 //
 // Debugging ifdef switches
@@ -195,7 +197,7 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     if (r.image) {
         sensors->lockImage();
         serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getNaoImage()),
+            reinterpret_cast<const uint8_t*>(sensors->getNaoImage(Camera::BOTTOM)),
             NAO_IMAGE_BYTE_SIZE);
         sensors->releaseImage();
     }
@@ -203,7 +205,7 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     if (r.thresh)
         // send thresholded image
         serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getColorImage()),
+            reinterpret_cast<const uint8_t*>(sensors->getColorImage(Camera::BOTTOM)),
             COLOR_IMAGE_BYTE_SIZE);
 
     if (r.objects) {

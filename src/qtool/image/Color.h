@@ -28,12 +28,23 @@ static const int MixedColor_RGB[] = {
         0x20b2aa, 0xff4500, 0x191970, 0x9400d3
 };
 
+static const byte ALL_COLORS = 0xFF;
+
 class Color
 {
     // holds an rgb value in the form #XXRRGGBB
     typedef unsigned int RGB;
 
 public:
+    static ColorID getColorIDFromBitColor(int bits) {
+        for (int i = 0; i < NUM_COLORS; i++) {
+            if (bits == Color_bits[i]) {
+                return (ColorID) i;
+            }
+        }
+        return Grey;
+    }
+
     static MixedColorID getMixedColorIDFromBitColor(int bits) {
         switch(bits) {
         case GREEN_BIT | BLUE_BIT :

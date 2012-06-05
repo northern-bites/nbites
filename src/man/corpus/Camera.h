@@ -2,6 +2,7 @@
  * class that keeps camera information
  *
  * @author Octavian Neamtu <oneamtu89@gmail.com>
+ * @author Lizzie Mamantov (2012)
  */
 
 #pragma once
@@ -17,67 +18,99 @@ public:
         BOTTOM = 0x02
     };
 
-    static const int KEEP_DEFAULT = -1;
-
     struct Settings {
-
-        int auto_gain;
-        int gain;
-        int auto_whitebalance;
-        int blue_chroma;
-        int red_chroma;
+        bool hflip;
+        bool vflip;
+        bool auto_exposure;
         int brightness;
         int contrast;
         int saturation;
         int hue;
-        // Exposure length
-        int auto_exposition;
+        int sharpness;
+        bool auto_whitebalance;
+        int backlight_compensation;
         int exposure;
+        int gain;
+        int white_balance;
     };
 
-    static const int DEFAULT_FRAMERATE = 30;
+    static const Settings& getSettings(Type type)
+        {
+            if(type == TOP) return getTopSettings();
+            else return getBottomSettings();
+        }
 
-    static const int DEFAULT_AUTO_WHITEBALANCE = false; // AUTO WB OFF
-    static const int DEFAULT_AUTO_EXPOSITION = false; // AUTO EXPOSURE OFF
-
-#if ROBOT_TYPE == NAO_NEXTGEN
-    static const int DEFAULT_AUTO_GAIN = KEEP_DEFAULT;
-    static const int DEFAULT_GAIN = 40;
-    static const int DEFAULT_BLUECHROMA = KEEP_DEFAULT;
-    static const int DEFAULT_REDCHROMA = KEEP_DEFAULT;
-    static const int DEFAULT_BRIGHTNESS = 80;
-    static const int DEFAULT_CONTRAST = 60;
-    static const int DEFAULT_SATURATION = 130;
-    static const int DEFAULT_HUE = 0;
-    static const int DEFAULT_EXPOSURE = 60;
-#else
-    static const int DEFAULT_AUTO_GAIN = false; // AUTO GAIN OFF
-    static const int DEFAULT_GAIN = 27;
-    static const int DEFAULT_BLUECHROMA = 120;
-    static const int DEFAULT_REDCHROMA = 85;
-    static const int DEFAULT_BRIGHTNESS = 150;
-    static const int DEFAULT_CONTRAST = 88;
-    static const int DEFAULT_SATURATION = 150;
-    static const int DEFAULT_HUE = 0;
-    static const int DEFAULT_EXPOSURE = 129;
-#endif
-
-    static const Settings& getDefaultSettings() {
-        static const Settings defaultSettings = {
-                DEFAULT_AUTO_GAIN,
-                DEFAULT_GAIN,
-                DEFAULT_AUTO_WHITEBALANCE,
-                DEFAULT_BLUECHROMA,
-                DEFAULT_REDCHROMA,
-                DEFAULT_BRIGHTNESS,
-                DEFAULT_CONTRAST,
-                DEFAULT_SATURATION,
-                DEFAULT_HUE,
-                DEFAULT_AUTO_EXPOSITION,
-                DEFAULT_EXPOSURE
+    static const Settings& getTopSettings() {
+        static const Settings topSettings = {
+            TOP_H_FLIP,
+            TOP_V_FLIP,
+            TOP_AUTO_EXPOSURE,
+            TOP_BRIGHTNESS,
+            TOP_CONTRAST,
+            TOP_SATURATION,
+            TOP_HUE,
+            TOP_SHARPNESS,
+            TOP_AUTO_WHITEBALANCE,
+            TOP_BACKLIGHT_COMPENSATION,
+            TOP_EXPOSURE,
+            TOP_GAIN,
+            TOP_WHITE_BALANCE
         };
-        return defaultSettings;
+        return topSettings;
     }
+
+    static const Settings& getBottomSettings() {
+        static const Settings bottomSettings = {
+            BOTTOM_H_FLIP,
+            BOTTOM_V_FLIP,
+            BOTTOM_AUTO_EXPOSURE,
+            BOTTOM_BRIGHTNESS,
+            BOTTOM_CONTRAST,
+            BOTTOM_SATURATION,
+            BOTTOM_HUE,
+            BOTTOM_SHARPNESS,
+            BOTTOM_AUTO_WHITEBALANCE,
+            BOTTOM_BACKLIGHT_COMPENSATION,
+            BOTTOM_EXPOSURE,
+            BOTTOM_GAIN,
+            BOTTOM_WHITE_BALANCE
+        };
+        return bottomSettings;
+    }
+
+    /*
+     * Camera Parameters Go Here
+     */
+
+    // TOP SETTINGS
+    static const bool TOP_H_FLIP = 1;
+    static const bool TOP_V_FLIP = 1;
+    static const bool TOP_AUTO_EXPOSURE = 0;
+    static const int TOP_BRIGHTNESS = 80;
+    static const int TOP_CONTRAST = 60;
+    static const int TOP_SATURATION = 130;
+    static const int TOP_HUE = 0;
+    static const int TOP_SHARPNESS = 3;
+    static const bool TOP_AUTO_WHITEBALANCE = 0;
+    static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
+    static const int TOP_EXPOSURE = 60;
+    static const int TOP_GAIN = 40;
+    static const int TOP_WHITE_BALANCE = -60;
+
+    // BOTTOM SETTINGS
+    static const bool BOTTOM_H_FLIP = 0;
+    static const bool BOTTOM_V_FLIP = 0;
+    static const bool BOTTOM_AUTO_EXPOSURE = 0;
+    static const int BOTTOM_BRIGHTNESS = 80;
+    static const int BOTTOM_CONTRAST = 60;
+    static const int BOTTOM_SATURATION = 130;
+    static const int BOTTOM_HUE = 0;
+    static const int BOTTOM_SHARPNESS = 3;
+    static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
+    static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
+    static const int BOTTOM_EXPOSURE = 60;
+    static const int BOTTOM_GAIN = 40;
+    static const int BOTTOM_WHITE_BALANCE = -60;
 
     static const Type getOtherCameraType(Type type) {
         if (type == TOP) {
