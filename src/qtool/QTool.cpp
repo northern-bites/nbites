@@ -14,6 +14,8 @@ using viewer::FieldViewer;
 using offline::OfflineViewer;
 using overseer::OverseerClient;
 
+QFile file(QString("./.geometry"));
+
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
         dataManager(new DataManager()),
@@ -56,12 +58,24 @@ QTool::QTool() : QMainWindow(),
 	scrollArea->setWidget(toolTabs);
 	scrollArea->resize(toolTabs->size());
 	this->setCentralWidget(scrollArea);
-	barMargins = new QSize((toolTabs->size().width()+35),
-						   (toolTabs->size().height()+35));
-	this->resize(*barMargins);
+
+	if (file.open(QIODevice::ReadWrite)){
+		QTextStream in(&file);
+		geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
+						 in.readLine().toInt(), in.readLine().toInt());
+	}
+	this->setGeometry(*geom);
+	file.close();
 }
 
 QTool::~QTool() {
+	if (file.open(QIODevice::ReadWrite)){
+		QTextStream out(&file);
+		out << this->pos().x() << endl
+			<< this->pos().y() << endl
+			<< this->width() << endl
+			<< this->height() << endl;
+	}
 }
 
 void QTool::next() {

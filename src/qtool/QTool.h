@@ -61,7 +61,8 @@ private:
     QPushButton* recordButton;
     QToolBar* toolbar;
 	QScrollArea* scrollArea;
-	QSize* barMargins;
+	QSize* toolSize;
+	QRect* geom;
 
 
 };
