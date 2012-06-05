@@ -81,7 +81,6 @@ def spinAfterBackKick(player):
         else:
             player.setWalk(0, 0, -1*constants.FIND_BALL_SPIN_SPEED)
 
-        # TODO: fix track ball spin for fixed pitch @summer 2012
-        player.brain.tracker.trackBallSpin()
+        player.brain.tracker.spinPanFixedPitch()
 
     return player.stay()

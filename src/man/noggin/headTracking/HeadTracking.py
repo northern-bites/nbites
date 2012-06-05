@@ -90,22 +90,6 @@ class HeadTracking(FSA.FSA):
         '''Repeat the narrow fixed pitch pan.'''
         self.repeatHeadMove(self, HeadMoves.FIXED_PITCH_PAN_NARROW)
 
-    # Consider tweaking.
-    def trackBall(self):
-        """
-        Enters a state cycle:
-        When ball is in view, tracks via vision values.
-        When ball is not in view, executes naive pans.
-        """
-        self.target = self.brain.ball
-        self.gain = 1.0
-        if ( self.currentState is not 'tracking'
-             and self.currentState is not 'scanBall'
-             and self.currentState is not 'ballTracking'
-             and self.currentState is not 'activeTracking'
-             and self.currentState is not 'trianglePan'):
-            self.switchTo('tracking')
-
     # Fixed Pitch
     def trackBallFixedPitch(self):
         """
@@ -132,27 +116,6 @@ class HeadTracking(FSA.FSA):
             self.switchTo('lookLeftFixedPitch')
         else:
             self.switchTo('lookRightFixedPitch')
-
-    # Consider tweaking.
-    def trackBallSpin(self):
-        """
-        Enters a state cycle:
-        When ball is in view, tracks via vision values.
-        When ball is not in view, continuously executes short pans
-        based on direction robot is spinning.
-        """
-        self.target = self.brain.ball
-        self.gain = 1.0
-        if ( (not self.currentState == 'tracking')
-            and (not self.currentState == 'spinScanBall') ):
-            self.switchTo('ballSpinTracking')
-
-    # Do we still want to do this?
-    # Consider changing.
-    def locPans(self):
-        """Repeatedly performs quick pan."""
-        self.activeLocOn = False
-        self.switchTo('locPans')
 
     # Marked for deprecation
     def activeLoc(self):

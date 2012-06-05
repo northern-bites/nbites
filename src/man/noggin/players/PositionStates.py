@@ -24,8 +24,7 @@ def playbookPosition(player):
         if gcState == 'gameReady':
             brain.tracker.repeatWidePanFixedPitch()
         else:
-            # TODO: fix active loc @summer 2012
-            brain.tracker.activeLoc()
+            brain.tracker.trackBallFixedPitch()
 
     #TODO: I think the transition is broken right now!
     #if PosTran.leavingTheField(player):
@@ -40,12 +39,10 @@ def spinToField(player):
     if player.firstFrame():
         if fieldEdge.shape == vision.basicShape.RISING_LEFT:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_LEFT)
-            # fix this @summer 2012
-            player.brain.tracker.activeLoc()
+            player.brain.tracker.spinPanFixedPitch()
         else:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_RIGHT)
-            # fix this @summer 2012
-            player.brain.tracker.activeLoc()
+            player.brain.tracker.spinPanFixedPitch()
 
     elif player.brain.nav.isAtPosition():
         return player.goLater('playbookPosition')

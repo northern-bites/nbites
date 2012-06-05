@@ -60,8 +60,7 @@ def spinFindBall(player):
         spinDir = my.spinDirToPoint(ball.loc)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
-        # TODO: fix track ball spin for fixed pitch @summer 2012
-        player.brain.tracker.trackBallSpin()
+        player.brain.tracker.spinPanFixedPitch()
 
     if not player.brain.play.isRole(GOALIE):
         if transitions.shouldWalkFindBall(player):
