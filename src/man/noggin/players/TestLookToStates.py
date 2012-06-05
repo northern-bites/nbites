@@ -30,11 +30,14 @@ def standup(player):
         player.brain.tracker.setNeutralHead()
 
         return player.stay()
-    #return player.goLater('lookState0')
 
-    # Hijacked for vision testing.
-    player.brain.tracker.testPanFixedPitch()
+    # repeatedly perform basic fixed pitch pan:
+    player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN)
+
+    # if ball in sight, track it. otherwise, pan:
     #player.brain.tracker.trackBallFixedPitch()
+
+    # for debugging, will print pitch and yaw every frame
     #player.brain.tracker.helper.printHeadAngles()
 
     return player.stay()

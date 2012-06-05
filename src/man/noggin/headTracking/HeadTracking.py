@@ -3,6 +3,7 @@ from . import PanningStates
 from . import ActiveLookStates
 from . import BasicStates
 from . import HeadTrackingHelper as helper
+import man.motion.HeadMoves as HeadMoves
 from ..util import FSA
 
 class HeadTracking(FSA.FSA):
@@ -66,6 +67,14 @@ class HeadTracking(FSA.FSA):
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
+    # Note: safe to call every frame.
+    def repeatHeadMove(self, headMove):
+        '''Execute the given headMove, then repeats it forever.'''
+        if (self.headMove != headMove or \
+                self.currentState != 'repeatHeadMove'):
+            self.headMove = headMove
+            self.switchTo('repeatHeadMove')
+
     # Consider tweaking.
     def trackBall(self):
         """
@@ -92,20 +101,11 @@ class HeadTracking(FSA.FSA):
         """
         self.target = self.brain.ball
         self.gain = 1.0
-        if (self.currentState is 'fullPanFixedPitch'):
-            self.lastDiffState = 'trackingFixedPitch'
+        if (self.currentState is 'fullPanFixedPitch' or \
+                self.currentState is 'trackingFixedPitch'):
+            self.lastDiffState = 'trackBallFixedPitch'
         else:
-            self.switchTo('trackingFixedPitch')
-
-    # Fixed Pitch
-    def testPanFixedPitch(self):
-        """
-        Continuously perform the standard fixed pitch pan.
-        Note: can be safely called every frame.
-        """
-        if self.currentState is not 'fullPanFixedPitch':
-            self.switchTo('fullPanFixedPitch')
-        self.lastDiffState = 'loopState'
+            self.switchTo('trackBallFixedPitch')
 
     # Consider tweaking.
     def trackBallSpin(self):

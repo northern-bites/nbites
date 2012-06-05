@@ -40,9 +40,13 @@ def doHeadMove(tracker):
 
     return tracker.stay()
 
-def loopState(tracker):
-    '''Repeats lastDiffState.'''
-    if tracker.lastDiffState != 'loopState':
-        return tracker.goLater(tracker.lastDiffState)
+def repeatHeadMove(tracker):
+    '''Executes the currently set headMove, then repeats it.'''
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(tracker.headMove)
+
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(tracker.headMove)
 
     return tracker.stay()

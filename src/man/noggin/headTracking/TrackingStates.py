@@ -54,7 +54,7 @@ def tracking(tracker):
 def trackingFixedPitch(tracker):
     """
     While the target is visible, track it via vision values.
-    If the target is lost, execute wide pans.
+    If the target is lost, return to lastDiffState.
     """
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
     tracker.helper.trackObjectFixedPitch()
@@ -63,7 +63,7 @@ def trackingFixedPitch(tracker):
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if tracker.target.vis.framesOff > \
                 constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-            return tracker.goLater('fullPanFixedPitch')
+            return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()
 
