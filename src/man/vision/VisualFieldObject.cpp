@@ -42,7 +42,6 @@ void VisualFieldObject::init(){
     centerY = 0;
     angleX = 0;
     angleY = 0;
-    focDist = 0;
     setDistance(0);
     setBearing(0);
     elevation = 0;

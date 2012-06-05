@@ -311,55 +311,10 @@ ublas::vector<float> NaoPose::intersectLineWithXYPlane(const std::vector<
  * Method to determine where the physical point represented by a pixel is relative
  * to the world frame.
  */
-const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
-                                    const float objectHeight) {
+estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
+                                    const float objectHeight) const {
 
-    /*if (pixelX >= IMAGE_WIDTH || pixelX < 0 || pixelY >= IMAGE_HEIGHT || pixelY
-            < 0) {
-        return NULL_ESTIMATE;
-    }
-    */
-    /*
-    // declare x,y,z coordinate of pixel in relation to focal point
-    ublas::vector<float> pixelInCameraFrame =
-            vector4D(FOCAL_LENGTH_MM, ((float) IMAGE_CENTER_X - (float) pixelX)
-                    * (float) PIX_X_TO_MM, ((float) IMAGE_CENTER_Y
-                    - (float) pixelY) * (float) PIX_Y_TO_MM);
-
-    // declare x,y,z coordinate of pixel in relation to body center
-    ublas::vector<float> pixelInWorldFrame(4);
-
-    // transform camera coordinates to body frame coordinates for a test pixel
-    pixelInWorldFrame = prod(cameraToWorldFrame, pixelInCameraFrame);
-
-    // Draw the line between the focal point and the pixel while in the world
-    // frame. Our goal is to find the point of intersection of that line and
-    // the plane, parallel to the ground, passing through the object height.
-    // In most cases, this plane is the ground plane, which is comHeight below the
-    // origin of the world frame. If we call this method with objectHeight != 0,
-    // then the plane is at a different height.
-    float object_z_in_world_frame = -comHeight + objectHeight * CM_TO_MM;
-
-    // We are going to parameterize the line with one variable t. We find the t
-    // for which the line goes through the plane, then evaluate the line at t for
-    // the x,y,z coordinate
-    float t = 0;
-
-    // calculate t knowing object_z_in_body_frame
-    if ((focalPointInWorldFrame.z - pixelInWorldFrame(Z)) != 0) {
-        t = (object_z_in_world_frame - pixelInWorldFrame(Z))
-                / (focalPointInWorldFrame.z - pixelInWorldFrame(Z));
-    }
-
-    const float x = pixelInWorldFrame(X) + (focalPointInWorldFrame.x
-            - pixelInWorldFrame(X)) * t;
-    const float y = pixelInWorldFrame(Y) + (focalPointInWorldFrame.y
-            - pixelInWorldFrame(Y)) * t;
-    const float z = pixelInWorldFrame(Z) + (focalPointInWorldFrame.z
-            - pixelInWorldFrame(Z)) * t;
-    ublas::vector<float> objectInWorldFrame = vector4D(x, y, z);
-*/
-    float FOCAL_LENGTH = 385.54f;
+    float FOCAL_LENGTH = 290.f;
     ufvector4 pixelInCameraFrame =
             vector4D( FOCAL_LENGTH,
                       ((float)IMAGE_CENTER_X - (float)pixelX),
@@ -382,8 +337,6 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
                             (focalPointInWorldFrame.z + comHeight - objectHeight));
 
     estimate est;
-//    est.bearing = beta;
-    //est.dist = distance2D * MM_TO_CM;
 
     float distX = distance2D * cos(beta) + focalPointInWorldFrame.x;
     float distY = distance2D * sin(beta) + focalPointInWorldFrame.y;
@@ -426,9 +379,6 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
         return NULL_ESTIMATE;
     }
 
-    //estimate est = getEstimate(objectInWorldFrame);
-    //est.dist = correctDistance(static_cast<float> (est.dist));
-
     est.distance_variance = getDistanceVariance(est.dist);
     est.bearing_variance = getBearingVariance(est.dist);
 
@@ -443,13 +393,36 @@ float NaoPose::getBearingVariance(float distance) {
 	return max<float>(-0.00002f * distance + 0.0115f, 0);
 }
 
+estimate NaoPose::estimateWithKnownGroundDistance(pixels x, pixels y, cms dist) const {
+
+    if (dist <= 0.0) {
+        return NULL_ESTIMATE;
+    }
+
+    estimate initialEstimate = this->pixEstimate(x, y, 0.0f);
+
+    estimate newEstimate(initialEstimate);
+
+    newEstimate.dist = dist;
+    newEstimate.x = dist * cos(initialEstimate.bearing);
+    newEstimate.y = dist * sin(initialEstimate.bearing);
+
+    //TODO: we could probably determine a better elevation for the object as well from
+    //knowing the distance
+
+    newEstimate.distance_variance = getDistanceVariance(dist);
+    newEstimate.bearing_variance = getDistanceVariance(dist);
+
+    return newEstimate;
+}
+
 /**
  * Body estimate takes a pixel on the screen, and a vision calculated
  * distance to that pixel, and calculates where that pixel is relative
  * to the world frame.  It then returns an estimate to that position,
  * with units in cm.
  */
-const estimate NaoPose::bodyEstimate(const int x, const int y, const float dist) {
+estimate NaoPose::bodyEstimate(const int x, const int y, const float dist) {
     if (dist <= 0.0)
         return NULL_ESTIMATE;
 
@@ -739,7 +712,7 @@ std::vector<radians> NaoPose::headAnglesToRobotPoint(ublas::vector <float> point
     return headAngles;
 }
 
-const estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHeight, float pixelSize, float realSize) {
+estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHeight, float pixelSize, float realSize) {
 
     float PIXEL_FOCAL_LENGTH = 385.54f;
     if (pixelSize <= 0 || realSize <= 0)

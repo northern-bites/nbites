@@ -180,11 +180,18 @@ class NaoPose {
      * an estimate of the distance to the point (and the bearing)
      * all estimates are in CM
      */
-    const estimate pixEstimate(const int pixelX, const int pixelY,
-                               const float objectHeight);
-    const estimate sizeBasedEstimate(const int pixelX, const int pixelY, const float objectHeight,
+    estimate pixEstimate(const int pixelX, const int pixelY,
+                               const float objectHeight) const;
+    estimate sizeBasedEstimate(const int pixelX, const int pixelY, const float objectHeight,
                                      const float pixelSize, const float realSize);
-    const estimate bodyEstimate(const int x, const int y, const float dist);
+    estimate bodyEstimate(const int x, const int y, const float dist);
+
+
+    /**
+     * Returns an estimate to a pixel on the screen to which we know the ground distance
+     * (a.k.a the distance from the robot's CoM projection on the ground to that pixel)
+     */
+    estimate estimateWithKnownGroundDistance(pixels x, pixels y, cms dist) const;
 
     /********** Getters **********/
     const int getHorizonY(const int x) const;

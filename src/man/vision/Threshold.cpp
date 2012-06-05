@@ -848,8 +848,6 @@ void Threshold::storeFieldObjects() {
     setVisualCrossInfo(vision->cross);
     setFramesOnAndOff(vision->cross);
 
-    vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
-    vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
 
@@ -980,8 +978,6 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 			//cout << "What the heck!" << endl;
             return;
         }
-        // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
         // convert dist + angle estimates to body center
         estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
                                               objPtr->getCenterY(),
@@ -991,8 +987,6 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
         objPtr->setElevation(obj_est.elevation);
     }
     else {
-        objPtr->setFocDist(0.0);
-
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1080,7 +1074,6 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 			   MAX_ELEVATION_RAD );
 
         // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
 		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
 											  objPtr->getCenterY(),
 											  265.0f);
@@ -1096,7 +1089,6 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 			context->checkForKickDanger(objPtr);
 		}
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1129,7 +1121,6 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
         estimate obj_est = pose->pixEstimate(crossX, crossY, 0.0);
         obj_est = pose->bodyEstimate(crossX, crossY, obj_est.dist);
         if (obj_est.dist > 1500.0f) { // pose problem which happens rarely
-            objPtr->setFocDist(0.0);
             objPtr->setDistanceWithSD(0.0);
             objPtr->setBearingWithSD(0.0);
             objPtr->setElevation(0.0);
@@ -1151,7 +1142,6 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 			objPtr->setID(ABSTRACT_CROSS);
         }
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
