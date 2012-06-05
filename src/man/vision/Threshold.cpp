@@ -89,6 +89,7 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 /* Main vision loop, called by Vision.cc
  */
 void Threshold::visionLoop() {
+    usingTopCamera = true;
     // threshold image and create runs
     thresholdAndRuns();
     //newFindRobots();
@@ -123,6 +124,22 @@ void Threshold::visionLoop() {
     }
     transposeDebugImage();
 #endif
+
+    if (vision->ball->getRadius() != 0) return; //we see the ball, we are done
+    
+    usingTopCamera = false;
+   
+    orange->init(pose->getHorizonSlope());
+    lowerRuns();
+
+    vision->ball->init();
+
+    if (horizon < IMAGE_HEIGHT) {
+        orange->createBall(horizon);
+    } else {
+        orange->createBall(pose->getHorizonY(0));
+    }
+  
 }
 
 /*
@@ -255,7 +272,7 @@ void Threshold::runs() {
 void Threshold::lowerRuns() {
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
         int topEdge = max(0, field->horizonAt(i));
-		findBallLowerCamera(i, topEdge);
+	findBallLowerCamera(i, 0);
     }
 }
 
@@ -521,38 +538,38 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
 
 void Threshold::findBallLowerCamera(int column, int topEdge) {
     // scan down finding balls and crosses
-	static const int SCANSIZE = 8;
+    static const int SCANSIZE = 8;
     int currentRun = 0;
-    int bound = lowerBound[column];
+    int bound = IMAGE_HEIGHT - 1;//lowerBound[column];
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
-        while (bound < IMAGE_HEIGHT &&
-			   Utility::isOrange(getColor(column, bound))) {
-            bound++;
-        }
+      while (bound < IMAGE_HEIGHT &&
+	     Utility::isOrange(getColor(column, bound))) {
+	bound++;
+      }
     }
     // scan down the column looking for ORANGE
     for (int j = bound; j >= topEdge; j-= SCANSIZE) {
-        // get the next pixel
-		currentRun = 0;
-        unsigned char pixel = getThresholded(j,column);
-		if (Utility::isOrange(pixel)) {
-			//drawPoint(column, j, MAROON);
-			int scanner = j+1;
-			while (scanner < j + SCANSIZE &&
-				   Utility::isOrange(getThresholded(scanner, column))) {
-				currentRun++;
-				scanner++;
-			}
-			while (j > 0 && Utility::isOrange(getThresholded(j,column)))
-			{
-				currentRun++;
-				j--;
-			}
-			if (currentRun > 1) {
-				orange->newRun(column, j, currentRun);
-			}
-        }
+      // get the next pixel
+      currentRun = 0;
+      unsigned char pixel = getThresholded(j,column);
+      if (Utility::isOrange(pixel)) {
+	//drawPoint(column, j, MAROON);
+	int scanner = j+1;
+	while (scanner < j + SCANSIZE &&
+	       Utility::isOrange(getThresholded(scanner, column))) {
+	  currentRun++;
+	  scanner++;
+	}
+	while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+	  {
+	    currentRun++;
+	    j--;
+	  }
+	if (currentRun > 1) {
+	  orange->newRun(column, j, currentRun);
+	}
+      }
     }
 }
 
@@ -1401,6 +1418,13 @@ void Threshold::setYUV(const uint16_t* newyuv) {
         reinterpret_cast<const uint8_t*>(yuv) +
         Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
     yplane = yuv;
+}
+void Threshold::setYUV_bot(const uint16_t* newyuv) {
+    yuv_bot = newyuv;
+    thresholdedBottom = const_cast<uint8_t*>(
+        reinterpret_cast<const uint8_t*>(yuv_bot) +
+        Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
+    yplane_bot = yuv_bot;
 }
 
 /* Calculate the distance between two objects (x distance only).

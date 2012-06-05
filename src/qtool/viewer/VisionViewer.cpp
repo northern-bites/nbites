@@ -75,13 +75,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
-<<<<<<< HEAD
-    FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(Camera::BOTTOM), this);
-    OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
-    
-    BMPImageViewer *imageViewer = new BMPImageViewer(combo, this);
-    BMPImageViewer *visionViewer = new BMPImageViewer(visionImage, this);
-=======
     FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(memoryManager->
                                                       getMemory()->
                                                   getMImage(Camera::BOTTOM),
@@ -91,10 +84,10 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                                                      getMImage(Camera::TOP),
                                                          this);
 
-    OverlayedImage* combo = new OverlayedImage(rawBottomBMP, shapes, this);
+    OverlayedImage* combo = new OverlayedImage(rawTopBMP, shapes, this);
 
-    BMPImageViewer *bottomImageViewer = new BMPImageViewer(combo, this);
-    BMPImageViewer *topImageViewer = new BMPImageViewer(rawTopBMP, this);
+    BMPImageViewer *bottomImageViewer = new BMPImageViewer(rawBottomBMP, this);
+    BMPImageViewer *topImageViewer = new BMPImageViewer(combo, this);
 
     CollapsibleImageViewer* bottomCIV = new
         CollapsibleImageViewer(bottomImageViewer,
@@ -134,7 +127,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     visLayout->addWidget(bottomVisCIV);
 
     visionImages->setLayout(visLayout);
->>>>>>> nbites
 
     QTabWidget* imageTabs = new QTabWidget();
     imageTabs->addTab(rawImages, tr("Raw Images"));
@@ -191,12 +183,12 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 void VisionViewer::update(){
   imageTranscribe->acquireNewImage();
   sensors->updateVisionAngles();
-  vision->notifyImage(sensors->getImage(Camera::BOTTOM));
+  vision->notifyImage(sensors->getImage(Camera::TOP), sensors->getImage(Camera::BOTTOM));
   offlineMVision->updateData();
   // Will need to get these to be diffent thresholded images but vision
   // appears to only threhold one at the moment!
   bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>
-                                          (vision->thresh->thresholded),
+                                          (vision->thresh->thresholdedBottom),
                                           AVERAGED_IMAGE_SIZE);
   topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
                                        (vision->thresh->thresholded),

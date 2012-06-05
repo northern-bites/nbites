@@ -118,6 +118,7 @@ void Ball::createBall(int h) {
 			blobs->blobIt(nextX, nextY, nextH, true);
 		}
 	}
+
 	balls(h, vision->ball);
     setFramesOnAndOff(vision->ball);
 }
@@ -177,7 +178,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
             blobs->init(i);
         } else if (ar > 0) {
             if (blobs->get(i).getBottom() + diam <
-                horizonAt(blobs->get(i).getLeft())) {
+                horizonAt(blobs->get(i).getLeft()) && thresh->usingTopCamera) {//temp hack
                 blobs->init(i);
                 if (BALLDEBUG) {
                     cout << "Screened one for horizon problems " << endl;
@@ -290,55 +291,55 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	occlusion = NOOCCLUSION;
 	int w, h;	// width and height of potential ball
 	estimate e; // pix estimate of ball's distance
-
-    preScreenBlobsBasedOnSizeAndColor();
-    // loop through the blobs from biggest to smallest until we find a ball
+	
+	preScreenBlobsBasedOnSizeAndColor();
+	// loop through the blobs from biggest to smallest until we find a ball
 	do {
-		topBlob = blobs->getTopAndMerge(horizon);
-        // the conditions when we know we don't have a ball
-		if (topBlob == NULL || !blobOk(*topBlob) || topBlob->getArea() == 0) {
+	  topBlob = blobs->getTopAndMerge(horizon);
+	  // the conditions when we know we don't have a ball
+	  if (topBlob == NULL || !blobOk(*topBlob) || topBlob->getArea() == 0) {
             return 0;
-        }
-        if (BALLDEBUG) {
+	  }
+	  if (BALLDEBUG) {
             cout << endl << "Examining next top blob " << endl;
-        }
-        w = topBlob->width();
-        h = topBlob->height();
-        //if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
-		if (!nearEdge(*topBlob)) {
+	  }
+	  w = topBlob->width();
+	  h = topBlob->height();
+	  //if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
+	  if (!nearEdge(*topBlob)) {
             adjustBallDimensions();
             w = topBlob->width();
             h = topBlob->height();
-        }
-		const float BALL_REAL_HEIGHT = 6.5f;
-		e = vision->pose->pixEstimate(topBlob->getLeftTopX() + (w / 2),
-									  topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
-									  ORANGE_BALL_RADIUS);
-        // SORT OUT BALL INFORMATION
-        setOcclusionInformation();
-        setBallInfo(w, h, thisBall, e);
-        if (thisBall->getHeight() > 0) thisBall->setOn(true);
-    } while (!sanityChecks(w, h, e, thisBall));
-
-    // last second adjustment for non-square balls
-    if (ballIsClose(thisBall) && ballIsNotSquare(h, w)) {
-        checkForReflections(h, w, thisBall, e);
-    }
-    if (BALLDEBUG) {
-        cout << "Vision found ball " << endl;
-        cout << topBlob->getLeftTopX() << " " << topBlob->getLeftTopY()
-             << " " <<
+	  }
+	  const float BALL_REAL_HEIGHT = 6.5f;
+	  e = vision->pose->pixEstimate(topBlob->getLeftTopX() + (w / 2),
+					topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
+					ORANGE_BALL_RADIUS);
+	  // SORT OUT BALL INFORMATION
+	  setOcclusionInformation();
+	  setBallInfo(w, h, thisBall, e);
+	  if (thisBall->getHeight() > 0) thisBall->setOn(true);
+	} while (!sanityChecks(w, h, e, thisBall));
+	
+	// last second adjustment for non-square balls
+	if (ballIsClose(thisBall) && ballIsNotSquare(h, w)) {
+	  checkForReflections(h, w, thisBall, e);
+	}
+	if (BALLDEBUG) {
+	  cout << "Vision found ball " << endl;
+	  cout << topBlob->getLeftTopX() << " " << topBlob->getLeftTopY()
+	       << " " <<
             w << " " << h << " " << e.dist << endl;
-    }
+	}
 	if (BALLDISTDEBUG) {
-		estimate es;
-		es = vision->pose->pixEstimate(topBlob->getLeftTopX() + topBlob->width() /
-									   2, topBlob->getLeftTopY() + 2
-									   * topBlob->height() / PIX_EST_DIV,
-									   ORANGE_BALL_RADIUS);
-		cout << "Distance is " << thisBall->getDistance() << " " <<
-				thisBall->getFocDist() << " " << es.dist << endl;
-		cout<< "Radius"<<thisBall->getRadius()<<endl;
+	  estimate es;
+	  es = vision->pose->pixEstimate(topBlob->getLeftTopX() + topBlob->width() /
+					 2, topBlob->getLeftTopY() + 2
+					 * topBlob->height() / PIX_EST_DIV,
+					 ORANGE_BALL_RADIUS);
+	  cout << "Distance is " << thisBall->getDistance() << " " <<
+	    thisBall->getFocDist() << " " << es.dist << endl;
+	  cout<< "Radius"<<thisBall->getRadius()<<endl;
 	}
 	return 0;
 }

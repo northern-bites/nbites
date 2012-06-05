@@ -145,7 +145,7 @@ Man::processFrame ()
     // vision processing to ensure consistency.
     sensors->lockImage();
     PROF_ENTER(P_VISION);
-    vision->notifyImage(sensors->getImage(Camera::BOTTOM));
+    vision->notifyImage(sensors->getImage(Camera::TOP), sensors->getImage(Camera::BOTTOM));
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
 //    cout<<vision->ball->getDistance() << endl;
