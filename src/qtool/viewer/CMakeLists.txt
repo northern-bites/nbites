@@ -16,22 +16,28 @@ add_definitions(${QT_DEFINITIONS})
 set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
                  BMPImageViewer.cpp
+                 BMPImageViewerListener.cpp
                  ChannelImageViewer.cpp
-		 BallEKFViewer.cpp
-		 FieldViewer.cpp
-		 EKFDataViewer.cpp
-		 VisionViewer.cpp
-		 )
+                 BallEKFViewer.cpp
+                 FieldViewer.cpp
+                 EKFDataViewer.cpp
+                 VisionViewer.cpp
+                 FilteredThresholdedViewer.cpp
+                 CollapsibleImageViewer.cpp
+                 )
 
 set( viewer_headers MemoryViewer.h
                     MObjectViewer.h
                     BMPImageViewer.h
+                    BMPImageViewerListener.h
                     ChannelImageViewer.h
-		    BallEKFViewer.h
-		    FieldViewer.h
-		    EKFDataViewer.h
-		    VisionViewer.h
-		    )
+                    BallEKFViewer.h
+                    FieldViewer.h
+                    EKFDataViewer.h
+                    VisionViewer.h
+                    FilteredThresholdedViewer.h
+                    CollapsibleImageViewer.h
+                    )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

@@ -19,7 +19,7 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
         manPreloader(offlineControl),
         loaded(false) {
 
-    memory->subscribe(this, MIMAGE_ID);
+    memory->subscribe(this, MTOPIMAGE_ID);
 
     mainLayout = new QVBoxLayout;
     QHBoxLayout* buttonLayout = new QHBoxLayout;
@@ -68,10 +68,10 @@ void OfflineViewer::loadMan() {
     mainLayout->addWidget(manMemoryViewer);
     //add the thresholded image to the memory viewer
     ThresholdedImage* threshImage = new ThresholdedImage(
-        offlineControl->getManMemory()->getMImage(Camera::BOTTOM)->
+        offlineControl->getManMemory()->getMImage(Camera::TOP)->
         getThresholded(), this);
     manMemoryManager->connectSlotToMObject(threshImage,
-            SLOT(updateBitmap()), MIMAGE_ID);
+            SLOT(updateBitmap()), MTOPIMAGE_ID);
 
     QDockWidget* dockWidget =
             new QDockWidget(tr("Thresholded"), manMemoryViewer);

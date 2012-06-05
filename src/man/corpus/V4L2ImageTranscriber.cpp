@@ -22,44 +22,12 @@
 #undef __STRICT_ANSI__
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
-//#include <linux/i2c.h>
 #define __STRICT_ANSI__
 
 #include <cerrno>
 
 #include "ImageAcquisition.h"
 #include "Profiler.h"
-
-#ifndef V4L2_CID_AUTOEXPOSURE
-#  define V4L2_CID_AUTOEXPOSURE     (V4L2_CID_BASE+32)
-#endif
-
-#ifndef V4L2_CID_CAM_INIT
-#  define V4L2_CID_CAM_INIT         (V4L2_CID_BASE+33)
-#endif
-
-#ifndef V4L2_CID_POWER_LINE_FREQUENCY
-#  define V4L2_CID_POWER_LINE_FREQUENCY  (V4L2_CID_BASE+24)
-
-#define V4L2_CID_HUE_AUTO      (V4L2_CID_BASE+25)
-#define V4L2_CID_WHITE_BALANCE_TEMPERATURE  (V4L2_CID_BASE+26)
-//#define V4L2_CID_SHARPNESS      (V4L2_CID_BASE+27)
-//#define V4L2_CID_BACKLIGHT_COMPENSATION   (V4L2_CID_BASE+28)
-
-#define V4L2_CID_CAMERA_CLASS_BASE     (V4L2_CTRL_CLASS_CAMERA | 0x900)
-
-#define V4L2_CID_EXPOSURE_AUTO      (V4L2_CID_CAMERA_CLASS_BASE+1)
-enum v4l2_exposure_auto_type {
-    V4L2_EXPOSURE_MANUAL = 0,
-    V4L2_EXPOSURE_AUTO = 1,
-    V4L2_EXPOSURE_SHUTTER_PRIORITY = 2,
-    V4L2_EXPOSURE_APERTURE_PRIORITY = 3
-};
-
-//#define V4L2_CID_EXPOSURE_ABSOLUTE    (V4L2_CID_CAMERA_CLASS_BASE+2)
-//#define V4L2_CID_EXPOSURE_AUTO_PRIORITY    (V4L2_CID_CAMERA_CLASS_BASE+3)
-
-#endif /* LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26) */
 
 // For checking the ioctls; prints error if one occurs
 #define VERIFY(x, str) {                               \
@@ -77,16 +45,16 @@ namespace corpus {
 
 using boost::shared_ptr;
 
-    V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
-                                               Camera::Type which) :
-        ImageTranscriber(s),
-        settings(Camera::getDefaultSettings()),
-        cameraType(which),
-        currentBuf(0),
-        timeStamp(0),
-        image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
-        table(new unsigned char[yLimit * uLimit * vLimit]),
-        params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit){
+V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
+                                           Camera::Type which) :
+    ImageTranscriber(s),
+    settings(Camera::getSettings(which)),
+    cameraType(which),
+    currentBuf(0),
+    timeStamp(0),
+    image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
+    table(new unsigned char[yLimit * uLimit * vLimit]),
+    params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit){
 
     initTable("/home/nao/nbites/lib/table/table.mtb");
 
@@ -98,6 +66,9 @@ using boost::shared_ptr;
     initSetFrameRate();
     initRequestAndMapBuffers();
     initQueueAllBuffers();
+
+    // Uncomment if you want info about control settings printed!
+    //enumerate_controls();
 
     initSettings();
 
@@ -182,16 +153,6 @@ void V4L2ImageTranscriber::initOpenVideoDevice() {
 }
 
 void V4L2ImageTranscriber::initSetCameraDefaults() {
-    // set default parameters
-#if ROBOT_TYPE == NAO_RL_33
-    struct v4l2_control control;
-    memset(&control, 0, sizeof(control));
-    control.id = V4L2_CID_CAM_INIT;
-    control.value = 0;
-    VERIFY((ioctl(fd, VIDIOC_S_CTRL, &control)),
-           "Setting default parameters failed.");
-#endif
-
     v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
     VERIFY((ioctl(fd, VIDIOC_S_STD, &esid0)),
            "Setting default parameters failed.");
@@ -357,97 +318,41 @@ void V4L2ImageTranscriber::enumerate_menu ()
 
 void V4L2ImageTranscriber::initSettings()
 {
-#if ROBOT_TYPE == NAO_NEXTGEN
-    // ORDER BELOW IS SUPER IMPORTANT
-    setControlSetting(V4L2_CID_HFLIP, 0);
-    setControlSetting(V4L2_CID_VFLIP, 0);
+    // DO NOT SCREW UP THE ORDER BELOW
 
-    // Auto WB, exposure on (buggy driver, blah)
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 1);
+    setControlSetting(V4L2_CID_HFLIP, settings.hflip);
+    setControlSetting(V4L2_CID_VFLIP, settings.vflip);
+
+    // Auto exposure on (buggy driver, blah)
     setControlSetting(V4L2_CID_EXPOSURE_AUTO, 1);
 
-    // Set brightness when above are off
+    // Set most settings with auto exposure off
     setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
-
-    // Auto white balance off
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
-
     setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
     setControlSetting(V4L2_CID_SATURATION, settings.saturation);
     setControlSetting(V4L2_CID_HUE, settings.hue);
-    setControlSetting(V4L2_CID_SHARPNESS, 3);
-    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, -60);
+    setControlSetting(V4L2_CID_SHARPNESS, settings.sharpness);
+
+    // Auto white balance and backlight comp off!
+    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE,
+                      settings.auto_whitebalance);
+    setControlSetting(V4L2_CID_BACKLIGHT_COMPENSATION,
+                      settings.backlight_compensation);
 
     // Auto exposure back off
-    setControlSetting(V4L2_CID_EXPOSURE_AUTO, 0);
+    setControlSetting(V4L2_CID_EXPOSURE_AUTO, settings.auto_exposure);
 
     setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
     setControlSetting(V4L2_CID_GAIN, settings.gain);
 
-    // The following should be 1 if we're using the top camera (?)
-    if(cameraType == Camera::TOP)
-    {
-        setControlSetting(V4L2_CID_HFLIP, 1);
-        setControlSetting(V4L2_CID_VFLIP, 1);
-    }
-    else
-    {
-        setControlSetting(V4L2_CID_HFLIP, 0);
-        setControlSetting(V4L2_CID_VFLIP, 0);
-    }
-
-#else
-    // make sure all auto stuff is OFF!
-    setControlSetting(V4L2_CID_AUTOEXPOSURE , 0);
-    setControlSetting(V4L2_CID_AUTO_WHITE_BALANCE, 0);
-    setControlSetting(V4L2_CID_AUTOGAIN, 0);
-
-    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
-    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
-    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
-    setControlSetting(V4L2_CID_GAIN, settings.gain);
-    setControlSetting(V4L2_CID_BLUE_BALANCE, settings.blue_chroma);
-    setControlSetting(V4L2_CID_RED_BALANCE, settings.red_chroma);
-#endif
-
+    // This is actually just the white balance setting!
+    setControlSetting(V4L2_CID_DO_WHITE_BALANCE, settings.white_balance);
 }
 
 void V4L2ImageTranscriber::startCapturing() {
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     VERIFY((ioctl(fd, VIDIOC_STREAMON, &type)),
            "Start capture failed.");
-}
-
-void V4L2ImageTranscriber::setNewSettings(const Camera::Settings& newset) {
-    if (newset.exposure != settings.exposure)
-    {
-        setControlSetting(V4L2_CID_EXPOSURE,
-                (settings.exposure = newset.exposure));
-    }
-    if (newset.brightness != settings.brightness)
-    {
-        setControlSetting(V4L2_CID_BRIGHTNESS,
-                (settings.brightness = newset.brightness));
-    }
-    if (newset.contrast != settings.contrast)
-    {
-        setControlSetting(V4L2_CID_CONTRAST,
-                (settings.contrast = newset.contrast));
-    }
-    if (newset.gain != settings.gain)
-    {
-        setControlSetting(V4L2_CID_GAIN, (settings.gain = newset.gain));
-    }
-    if (newset.blue_chroma != settings.blue_chroma)
-    {
-        setControlSetting(V4L2_CID_BLUE_BALANCE,
-                          (settings.blue_chroma = newset.blue_chroma));
-    }
-    if (newset.red_chroma != settings.red_chroma)
-    {
-        setControlSetting(V4L2_CID_RED_BALANCE,
-                          (settings.red_chroma = newset.red_chroma));
-    }
 }
 
 bool V4L2ImageTranscriber::waitForImage() {
@@ -462,6 +367,7 @@ bool V4L2ImageTranscriber::waitForImage() {
        if (sensors->getWriteableNaoImage(cameraType) != NULL) {
            _copy_image(current_image,
                        sensors->getWriteableNaoImage(cameraType));
+
            sensors->notifyNewNaoImage();
            ImageAcquisition::acquire_image_fast(table, params,
                                                sensors->getNaoImage(cameraType),
@@ -529,6 +435,7 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     struct v4l2_control control_s;
     control_s.id = id;
     control_s.value = value;
+
     // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
     {
@@ -560,47 +467,75 @@ void V4L2ImageTranscriber::assertCameraSettings() {
     }
 
     // check camera settings against what the driver has
-    int exposure = getControlSetting(V4L2_CID_EXPOSURE);
+    int hflip = getControlSetting(V4L2_CID_HFLIP);
+    int vflip = getControlSetting(V4L2_CID_VFLIP);
     int brightness = getControlSetting(V4L2_CID_BRIGHTNESS);
     int contrast = getControlSetting(V4L2_CID_CONTRAST);
-    int red = getControlSetting(V4L2_CID_RED_BALANCE);
-    int blue = getControlSetting(V4L2_CID_BLUE_BALANCE);
+    int saturation = getControlSetting(V4L2_CID_SATURATION);
+    int hue = getControlSetting(V4L2_CID_HUE);
+    int sharpness = getControlSetting(V4L2_CID_SHARPNESS);
     int gain = getControlSetting(V4L2_CID_GAIN);
+    int exposure = getControlSetting(V4L2_CID_EXPOSURE);
+    int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
 
-    if (settings.exposure != Camera:: KEEP_DEFAULT &&
-        exposure != settings.exposure) {
-        printf("CAMERA::WARNING::Exposure setting is wrong:");
-        printf(" is %d, not %d.\n", exposure, settings.exposure);
+    if (hflip != settings.hflip)
+    {
+        printf("CAMERA::WARNING::Horizontal flip setting is wrong:");
+        printf(" is %d, not %d.\n", hflip, settings.hflip);
         allFine = false;
     }
-    if (settings.brightness != Camera:: KEEP_DEFAULT &&
-        brightness != settings.brightness) {
+    if (vflip != settings.vflip)
+    {
+        printf("CAMERA::WARNING::Vertical flip setting is wrong:");
+        printf(" is %d, not %d.\n", vflip, settings.vflip);
+        allFine = false;
+    }
+    if (brightness != settings.brightness)
+    {
         printf("CAMERA::WARNING::Brightness setting is wrong:");
         printf(" is %d, not %d.\n", brightness, settings.brightness);
         allFine = false;
     }
-    if (settings.contrast != Camera:: KEEP_DEFAULT &&
-        contrast != settings.contrast) {
+    if (contrast != settings.contrast)
+    {
         printf("CAMERA::WARNING::Contrast setting is wrong:");
         printf(" is %d, not %d.\n", contrast, settings.contrast);
         allFine = false;
     }
-    if (settings.red_chroma != Camera:: KEEP_DEFAULT &&
-        red != settings.red_chroma) {
-        printf("CAMERA::WARNING::Red chroma setting is wrong:");
-        printf(" is %d, not %d.\n", red, settings.red_chroma);
+    if (saturation != settings.saturation)
+    {
+        printf("CAMERA::WARNING::Saturation setting is wrong:");
+        printf(" is %d, not %d.\n", saturation, settings.saturation);
         allFine = false;
     }
-    if (settings.blue_chroma != Camera:: KEEP_DEFAULT &&
-        blue != settings.blue_chroma) {
-        printf("CAMERA::WARNING::Blue chroma setting is wrong:");
-        printf(" is %d, not %d.\n", blue, settings.blue_chroma);
+    if (hue != settings.hue)
+    {
+        printf("CAMERA::WARNING::Hue setting is wrong:");
+        printf(" is %d, not %d.\n", hue, settings.hue);
         allFine = false;
     }
-    if (settings.gain != Camera:: KEEP_DEFAULT &&
-        gain != settings.gain) {
+   if (sharpness != settings.sharpness)
+    {
+        printf("CAMERA::WARNING::Sharpness setting is wrong:");
+        printf(" is %d, not %d.\n", sharpness, settings.sharpness);
+        allFine = false;
+    }
+   if (gain != settings.gain)
+    {
         printf("CAMERA::WARNING::Gain setting is wrong:");
         printf(" is %d, not %d.\n", gain, settings.gain);
+        allFine = false;
+    }
+   if (exposure != settings.exposure)
+    {
+        printf("CAMERA::WARNING::Exposure setting is wrong:");
+        printf(" is %d, not %d.\n", exposure, settings.exposure);
+        allFine = false;
+    }
+   if (whitebalance != settings.white_balance)
+    {
+        printf("CAMERA::WARNING::Whitebalance setting is wrong:");
+        printf(" is %d, not %d.\n", whitebalance, settings.white_balance);
         allFine = false;
     }
 
@@ -610,15 +545,6 @@ void V4L2ImageTranscriber::assertCameraSettings() {
             printf("Bottom camera settings were set correctly.\n");
         else printf("Top camera settings were set correctly.\n");
     }
-}
-
-void V4L2ImageTranscriber::writeCameraSettings() {
-    setControlSetting(V4L2_CID_EXPOSURE, settings.exposure);
-    setControlSetting(V4L2_CID_BRIGHTNESS, settings.brightness);
-    setControlSetting(V4L2_CID_CONTRAST, settings.contrast);
-    setControlSetting(V4L2_CID_GAIN, settings.gain);
-    setControlSetting(V4L2_CID_BLUE_BALANCE, settings.blue_chroma);
-    setControlSetting(V4L2_CID_RED_BALANCE, settings.red_chroma);
 }
 
 } /* namespace corpus */

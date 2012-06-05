@@ -1,5 +1,6 @@
 
 #include "VisionViewer.h"
+#include "Camera.h"
 #include <vector>
 
 namespace qtool {
@@ -13,20 +14,28 @@ using namespace qtool::image;
 
 VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager),
-		 speech(new Speech()),
-		 sensors(new Sensors(speech)),
-		 rawImage(new proto::PImage()){
+                 speech(new Speech()),
+                 sensors(new Sensors(speech)),
+                 bottomRawImage(new proto::PImage()),
+                 topRawImage(new proto::PImage())
+{
 
     memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
     vision = shared_ptr<Vision> (new Vision(pose));
     offlineMVision = shared_ptr<MVision> (new MVision(vision));
-    
-    imageTranscribe = OfflineImageTranscriber::ptr (new OfflineImageTranscriber(sensors,
-										memoryManager->getMemory()->getMImage(Camera::BOTTOM)));
 
-    rawImage->set_width(AVERAGED_IMAGE_WIDTH);
-    rawImage->set_height(AVERAGED_IMAGE_HEIGHT);
+    imageTranscribe = OfflineImageTranscriber::ptr
+        (new OfflineImageTranscriber(sensors,
+                                     memoryManager->getMemory()->
+                                     getMImage(Camera::TOP),
+                                     memoryManager->getMemory()->
+                                     getMImage(Camera::BOTTOM)));
+
+    bottomRawImage->set_width(AVERAGED_IMAGE_WIDTH);
+    bottomRawImage->set_height(AVERAGED_IMAGE_HEIGHT);
+    topRawImage->set_width(AVERAGED_IMAGE_WIDTH);
+    topRawImage->set_height(AVERAGED_IMAGE_HEIGHT);
 
     QToolBar* toolBar = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
@@ -61,26 +70,91 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     robotsD = false;
 
 
-    visionImage = new ThresholdedImage(rawImage, this);
+    bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
+    topVisionImage = new ThresholdedImage(topRawImage, this);
+
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
+<<<<<<< HEAD
     FastYUVToBMPImage* rawBMP = new FastYUVToBMPImage(memoryManager->getMemory()->getMImage(Camera::BOTTOM), this);
     OverlayedImage* combo = new OverlayedImage(rawBMP, shapes, this);
     
     BMPImageViewer *imageViewer = new BMPImageViewer(combo, this);
     BMPImageViewer *visionViewer = new BMPImageViewer(visionImage, this);
+=======
+    FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(memoryManager->
+                                                      getMemory()->
+                                                  getMImage(Camera::BOTTOM),
+                                                      this);
+    FastYUVToBMPImage* rawTopBMP = new FastYUVToBMPImage(memoryManager->
+                                                         getMemory()->
+                                                     getMImage(Camera::TOP),
+                                                         this);
+
+    OverlayedImage* combo = new OverlayedImage(rawBottomBMP, shapes, this);
+
+    BMPImageViewer *bottomImageViewer = new BMPImageViewer(combo, this);
+    BMPImageViewer *topImageViewer = new BMPImageViewer(rawTopBMP, this);
+
+    CollapsibleImageViewer* bottomCIV = new
+        CollapsibleImageViewer(bottomImageViewer,
+                               "Bottom",
+                               this);
+    CollapsibleImageViewer* topCIV = new CollapsibleImageViewer(topImageViewer,
+                                                                "Top",
+                                                                this);
+
+    QWidget* rawImages = new QWidget(this);
+
+    QVBoxLayout* layout = new QVBoxLayout(rawImages);
+
+    layout->addWidget(topCIV);
+    layout->addWidget(bottomCIV);
+
+    rawImages->setLayout(layout);
+
+    BMPImageViewer *bottomVisViewer = new BMPImageViewer(bottomVisionImage,
+                                                       this);
+    BMPImageViewer *topVisViewer = new BMPImageViewer(topVisionImage,
+                                                      this);
+
+    CollapsibleImageViewer* bottomVisCIV = new
+        CollapsibleImageViewer(bottomVisViewer,
+                               "Bottom",
+                               this);
+    CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisViewer,
+                                                                   "Top",
+                                                                   this);
+
+    QWidget* visionImages = new QWidget(this);
+
+    QVBoxLayout* visLayout = new QVBoxLayout(visionImages);
+
+    visLayout->addWidget(topVisCIV);
+    visLayout->addWidget(bottomVisCIV);
+
+    visionImages->setLayout(visLayout);
+>>>>>>> nbites
 
     QTabWidget* imageTabs = new QTabWidget();
-    imageTabs->addTab(imageViewer, tr("Raw Image"));
-    imageTabs->addTab(visionViewer, tr("Vision Image"));
-    
-    memoryManager->connectSlotToMObject(this, SLOT(update()), MIMAGE_ID);
+    imageTabs->addTab(rawImages, tr("Raw Images"));
+    imageTabs->addTab(visionImages, tr("Vision Images"));
+
+    memoryManager->connectSlotToMObject(this, SLOT(update()),
+                                        MBOTTOMIMAGE_ID);
+    memoryManager->connectSlotToMObject(this, SLOT(update()),
+                                        MTOPIMAGE_ID);
 
     this->setCentralWidget(imageTabs);
-    memoryManager->connectSlotToMObject(visionViewer,
-					SLOT(updateView()), MIMAGE_ID);
-    memoryManager->connectSlotToMObject(imageViewer,
-					SLOT(updateView()), MIMAGE_ID);
+    memoryManager->connectSlotToMObject(bottomVisViewer,
+					SLOT(updateView()), MBOTTOMIMAGE_ID);
+    memoryManager->connectSlotToMObject(topVisViewer,
+					SLOT(updateView()), MTOPIMAGE_ID);
+
+    memoryManager->connectSlotToMObject(bottomImageViewer,
+					SLOT(updateView()), MBOTTOMIMAGE_ID);
+    memoryManager->connectSlotToMObject(topImageViewer,
+					SLOT(updateView()), MTOPIMAGE_ID);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -97,7 +171,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
             memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
 	}
-        if (id != MIMAGE_ID && id != MVISION_ID) {
+        if (id != MTOPIMAGE_ID && id != MBOTTOMIMAGE_ID &&
+            id != MVISION_ID) {
             QDockWidget* dockWidget =
                     new QDockWidget(QString(MObject_names[id].c_str()), this);
             MObjectViewer* view = new MObjectViewer(
@@ -109,6 +184,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
         }
     }
 
+    // Make sure one of the images is toggled off for small screens
+    bottomCIV->toggle();
 }
 
 void VisionViewer::update(){
@@ -116,10 +193,14 @@ void VisionViewer::update(){
   sensors->updateVisionAngles();
   vision->notifyImage(sensors->getImage(Camera::BOTTOM));
   offlineMVision->updateData();
-  rawImage->mutable_image()->assign(reinterpret_cast<const char *>
-				    (vision->thresh->thresholded),
-				    AVERAGED_IMAGE_SIZE);
-
+  // Will need to get these to be diffent thresholded images but vision
+  // appears to only threhold one at the moment!
+  bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>
+                                          (vision->thresh->thresholded),
+                                          AVERAGED_IMAGE_SIZE);
+  topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
+                                       (vision->thresh->thresholded),
+                                       AVERAGED_IMAGE_SIZE);
 }
 
 void VisionViewer::loadColorTable(){

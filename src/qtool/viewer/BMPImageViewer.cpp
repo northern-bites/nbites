@@ -18,15 +18,17 @@ BMPImageViewer::~BMPImageViewer() {
 void BMPImageViewer::setupUI() {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(&imagePlaceholder);
+    layout->setAlignment(Qt::AlignTop);
+    layout->setSpacing(0);
     this->setLayout(layout);
 }
 
 void BMPImageViewer::updateView() {
     if (this->isVisible()) {
         image->updateBitmap();
-        QImage* qimage = image->getBitmap();
+        QPixmap* qimage = image->getBitmap();
         if (qimage) {
-            imagePlaceholder.setPixmap(QPixmap::fromImage(*(qimage)));
+            imagePlaceholder.setPixmap(*qimage);
         } else {
             imagePlaceholder.setText("Underlying Null image pointer!");
         }

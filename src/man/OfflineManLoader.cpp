@@ -26,7 +26,10 @@ void loadMan(OfflineManController::ptr offlineController) {
     		offlineController->getFakeMemory()->getMMotionSensors()));
     shared_ptr<ThreadedImageTranscriber>
         imageTranscriber(new OfflineImageTranscriber(sensors,
-                                                     offlineController->getFakeMemory()->getMImage(Camera::BOTTOM)));
+                                       offlineController->getFakeMemory()->
+                                                     getMImage(Camera::TOP),
+                                       offlineController->getFakeMemory()->
+                                                getMImage(Camera::BOTTOM)));
     shared_ptr<MotionEnactor>
         enactor(new OfflineEnactor());
     shared_ptr<Lights> lights(new Lights());
