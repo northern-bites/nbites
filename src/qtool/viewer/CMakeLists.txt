@@ -16,22 +16,44 @@ add_definitions(${QT_DEFINITIONS})
 set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
                  BMPImageViewer.cpp
+                 BMPImageViewerListener.cpp
                  ChannelImageViewer.cpp
+<<<<<<< .merge_file_8RpVUu
 		 BallEKFViewer.cpp
 		 FieldViewer.cpp
 		 EKFDataViewer.cpp
 		 BotLocs.cpp
 		 )
+=======
+                 BallEKFViewer.cpp
+                 FieldViewer.cpp
+                 EKFDataViewer.cpp
+                 VisionViewer.cpp
+                 FilteredThresholdedViewer.cpp
+                 CollapsibleImageViewer.cpp
+                 )
+>>>>>>> .merge_file_ISip0r
 
 set( viewer_headers MemoryViewer.h
                     MObjectViewer.h
                     BMPImageViewer.h
+                    BMPImageViewerListener.h
                     ChannelImageViewer.h
+<<<<<<< .merge_file_8RpVUu
 		    BallEKFViewer.h
 		    FieldViewer.h
 		    EKFDataViewer.h
 		    BotLocs.h
 		    )
+=======
+                    BallEKFViewer.h
+                    FieldViewer.h
+                    EKFDataViewer.h
+                    VisionViewer.h
+                    FilteredThresholdedViewer.h
+                    CollapsibleImageViewer.h
+                    )
+>>>>>>> .merge_file_ISip0r
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -51,6 +73,9 @@ target_link_libraries(
   treemodel
   image
   memory
+  vision
+  _sensors
+  _robot_connect
   ${QT_LIBRARIES}
   ${QT_QTNETWORK_LIBRARY}
 

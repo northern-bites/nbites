@@ -128,7 +128,8 @@ void Ball::createBall(int h) {
    @return      whether it meets the minimum criteria
  */
 bool Ball::blobIsBigEnoughToBeABall(int w, int h) {
-    return !(w < 3 || h < 3);
+	const int MIN_SIZE = 3;
+    return !(w < MIN_SIZE || h < MIN_SIZE);
 }
 
 /*  Before we just take the biggest blob, we do some initial screening
@@ -551,7 +552,8 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
  */
 
 bool Ball::ballIsClose(VisualBall * thisBall) {
-    return thisBall->getDistance() < 75.0f;
+	const float CLOSE = 75.0f;
+    return thisBall->getDistance() < CLOSE;
 }
 
 /* Returns true when the height and width are not a good match.
@@ -560,7 +562,8 @@ bool Ball::ballIsClose(VisualBall * thisBall) {
    @return       whether the ball is square or not
  */
 bool Ball::ballIsNotSquare(int h, int w) {
-    return abs(h - w) > 3;
+	const int MISMATCH = 3;
+    return abs(h - w) > MISMATCH;
 }
 
 /* Set the primary color.  Depending on the color, we have different space needs
@@ -1073,6 +1076,18 @@ bool Ball::badSurround(Blob b) {
 	return false;
 }
 
+/* We use a power function regression on data to estimate
+   the ball distance from the radius in the image
+ */
+float Ball::ballDistanceEstFromRadius(float radius) {
+
+	float distEst;
+	float radToPow = std::pow(radius, -1.38);
+	distEst = 2350*radToPow;
+
+	return distEst;
+}
+
 /* Once we have determined a ball is a blob we want to set it up for
    the rest of the world (localization, behavior, etc.).
    @param w         ball width
@@ -1110,11 +1125,10 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	}
 	thisBall->setConfidence(SURE);
 	thisBall->findAngles();
-	focalDist = vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
-												thisBall->getCenterY(),
-												ORANGE_BALL_RADIUS,
-												thisBall->getRadius(),
-												ORANGE_BALL_RADIUS);
+	float ballRadDistEst = ballDistanceEstFromRadius(thisBall->getRadius());
+	focalDist = vision->pose->bodyEstimate(thisBall->getCenterX(), thisBall->getCenterY(),
+					       ballRadDistEst);
+
 	if (occlusion == NOOCCLUSION || e.dist > 600) {
 		thisBall->setFocalDistanceFromRadius();
 		//trust pixest to within 300 cm

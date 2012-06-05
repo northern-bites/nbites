@@ -82,6 +82,8 @@ bool Cross::checkForRobotBlobs(Blob blob) {
     return false;
 }
 
+
+
 /* See if any of our candidate blobs are actually worthy crosses.
  */
 
@@ -324,6 +326,11 @@ void Cross::checkForX(Blob b) {
     } else {
         vision->cross->updateCross(&b);
     }
+}
+
+//returns the blobs data structure containing white blob info
+Blobs* Cross::getBlobs(){
+    return blobs;
 }
 
 /* Adds a new run to the basic data structure.
