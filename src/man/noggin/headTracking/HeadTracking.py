@@ -107,6 +107,17 @@ class HeadTracking(FSA.FSA):
         else:
             self.switchTo('trackBallFixedPitch')
 
+    # Fixed Pitch
+    def spinPanFixedPitch(self):
+        """
+        Determines which direction the robot is spinning.
+        Then, continually looks in that direction.
+        """
+        if self.brain.nav.isSpinningLeft():
+            self.switchTo('lookLeftFixedPitch')
+        else:
+            self.switchTo('lookRightFixedPitch')
+
     # Consider tweaking.
     def trackBallSpin(self):
         """
