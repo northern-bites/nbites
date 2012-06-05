@@ -137,8 +137,10 @@ public:
     unsigned char getExpandedColor(int x, int y, unsigned char col);
     int getHorizontalEdge(int x1, int y1, int dir);
     void thresholdAndRuns();
-    void findGoals(int column, int topEdge);
-    void findBallsCrosses(int column, int topEdge);
+	void lowerRuns();
+    void findGoals(int column, int top);
+    void findBallsCrosses(int column, int top);
+	void findBallLowerCamera(int column, int topEdge);
     void detectSelf();
     void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
     void objectRecognition();

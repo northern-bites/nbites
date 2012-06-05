@@ -238,14 +238,24 @@ void Threshold::runs() {
     // split up the loops
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
         int topEdge = max(0, field->horizonAt(i));
-        findBallsCrosses(i, topEdge);
-        findGoals(i, topEdge);
+		findBallsCrosses(i, topEdge);
+		findGoals(i, topEdge);
     }
-    setOpenFieldInformation();
-    for (int i = 0; i < NUMBLOCKS; i++) {
-        if (evidence[i] < 5) {
-            block[i] = 0;
-        }
+	setOpenFieldInformation();
+	for (int i = 0; i < NUMBLOCKS; i++) {
+		if (evidence[i] < 5) {
+			block[i] = 0;
+		}
+	}
+}
+
+/** Does the same thing as the previous function (runs) except for
+ * the lower camera.  Just looks for the ball.
+ */
+void Threshold::lowerRuns() {
+    for (int i = 0; i < IMAGE_WIDTH; i += 1) {
+        int topEdge = max(0, field->horizonAt(i));
+		findBallLowerCamera(i, topEdge);
     }
 }
 
@@ -500,6 +510,48 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         shoot[column] = false;
         if (debugShot) {
             vision->drawPoint(column, IMAGE_HEIGHT - 4, RED);
+        }
+    }
+}
+
+/* For starters with the bottom camera we'll only look for the ball.
+ * @param column     the current vertical scanline
+ * @param topEdge    the top of the field in that scanline
+ */
+
+void Threshold::findBallLowerCamera(int column, int topEdge) {
+    // scan down finding balls and crosses
+	static const int SCANSIZE = 8;
+    int currentRun = 0;
+    int bound = lowerBound[column];
+    // if a ball is in the middle of the boundary, then look a little lower
+    if (bound < IMAGE_HEIGHT - 1) {
+        while (bound < IMAGE_HEIGHT &&
+			   Utility::isOrange(getColor(column, bound))) {
+            bound++;
+        }
+    }
+    // scan down the column looking for ORANGE
+    for (int j = bound; j >= topEdge; j-= SCANSIZE) {
+        // get the next pixel
+		currentRun = 0;
+        unsigned char pixel = getThresholded(j,column);
+		if (Utility::isOrange(pixel)) {
+			//drawPoint(column, j, MAROON);
+			int scanner = j+1;
+			while (scanner < j + SCANSIZE &&
+				   Utility::isOrange(getThresholded(scanner, column))) {
+				currentRun++;
+				scanner++;
+			}
+			while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+			{
+				currentRun++;
+				j--;
+			}
+			if (currentRun > 1) {
+				orange->newRun(column, j, currentRun);
+			}
         }
     }
 }
