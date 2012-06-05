@@ -81,8 +81,8 @@ void YUVImage::read(const byte* data) {
             uImg[x+1][y] = uImg[x][y];
 
             yImg[x + 1][y] = data[i++];
-            vImg[x][y] = data[i++];
 
+            vImg[x][y] = data[i++];
             vImg[x+1][y] = vImg[x][y];
         }
     }

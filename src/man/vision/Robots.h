@@ -43,6 +43,9 @@ public:
     void init();
     void findRobots(Cross* cross);
     void findUniforms();
+	void preprocess();
+	void robot(Cross* cross);
+	void newRun(int x, int y, int h);
     void findRobotParts();
     Blob correctBlob(Blob area);
     bool checkWhiteAllignment(Blob candidate);
@@ -53,6 +56,7 @@ public:
     void checkMerge(int i, int j);
     bool closeEnough(int i, int j);
     bool sanityChecks(int index);
+	bool sanityChecks(Blob b, Cross* cross);
     bool notGreen(Blob a);
     bool whiteBelow(Blob a);
     bool whiteAbove(Blob b);

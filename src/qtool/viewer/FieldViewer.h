@@ -2,8 +2,8 @@
  * @class Viewer
  *
  * This class is going to be the WorldController from
- * the previous Tool.  It will show the field with 
- * robots and balls in their positions which are 
+ * the previous Tool.  It will show the field with
+ * robots and balls in their positions which are
  * passed in.
  *
  * @author Dani McAvoy

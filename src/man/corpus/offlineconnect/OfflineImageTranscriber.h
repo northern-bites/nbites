@@ -35,6 +35,7 @@ public:
     void run();
 
     void initTable(const std::string& filename);
+    void initTable(byte* other_table) { table = other_table; }
 
 
     void acquireNewImage();
