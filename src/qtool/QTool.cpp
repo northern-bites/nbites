@@ -7,6 +7,7 @@ namespace qtool {
 using data::DataManager;
 using data::DataLoader;
 using colorcreator::ColorCalibrate;
+using colorcreator::ColorTableCreator;
 using viewer::MemoryViewer;
 using viewer::VisionViewer;
 using viewer::BallEKFViewer;
@@ -21,7 +22,8 @@ QTool::QTool() : QMainWindow(),
         dataManager(new DataManager()),
         dataLoader(new DataLoader(dataManager)),
         colorCalibrate(new ColorCalibrate(dataManager)),
-		memoryViewer(new MemoryViewer(dataManager)),
+        colorTableCreator(new ColorTableCreator(dataManager)),
+        memoryViewer(new MemoryViewer(dataManager)),
        	visionViewer(new VisionViewer(dataManager)),
         offlineViewer(new OfflineViewer(dataManager->getMemory())),
         ballEKFViewer(new BallEKFViewer(dataManager)),
@@ -45,8 +47,10 @@ QTool::QTool() : QMainWindow(),
     toolbar->addWidget(recordButton);
 
     this->addToolBar(toolbar);
+    this->setCentralWidget(toolTabs);
 
-    toolTabs->addTab(colorCalibrate, tr("Color Creator"));
+    toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
+    toolTabs->addTab(colorTableCreator, tr("Color Table Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
     toolTabs->addTab(visionViewer, tr("Vision Viewer"));
