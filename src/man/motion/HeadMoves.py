@@ -1,5 +1,7 @@
 # Constants file to store all head moves, including pans and simple moves
 
+# TODO: update all pans to speeds that avoid motion blur. @summer 2012
+
 import StiffnessModes as stiff
 
 HEAD_MOVE_LENGTH = 4
@@ -369,19 +371,19 @@ DATA_PAN = (
 
 ################### FIXED PITCH PANS #################
 FIXED_PITCH_PAN = (
-    ((65.0,18.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-65.0,18.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((65.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-65.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Maximum search angle for top camera.
 FIXED_PITCH_PAN_WIDE = (
-    ((115.0,18.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,18.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((115.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Bottom camera is never significantly blocked by shoulders or arms.
 FIXED_PITCH_PAN_NARROW = (
-    ((55.0,18.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-55.0,18.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((55.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-55.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
-FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
+FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
-FIXED_PITCH_LOOK_RIGHT = ( ((-70.0,18.0), 0.8, 1, stiff.LOW_HEAD_STIFFNESSES), )
+FIXED_PITCH_LOOK_RIGHT = ( ((-70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
