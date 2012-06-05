@@ -65,8 +65,6 @@ private:
 	QScrollArea* scrollArea;
 	QSize* toolSize;
 	QRect* geom;
-
-
 };
 
 }
