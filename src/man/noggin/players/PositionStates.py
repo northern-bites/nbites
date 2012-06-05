@@ -22,8 +22,9 @@ def playbookPosition(player):
         nav.positionPlaybook()
 
         if gcState == 'gameReady':
-            brain.tracker.locPans()
+            brain.tracker.repeatHeadMove(brain.tracker.FIXED_PITCH_PAN_WIDE)
         else:
+            # TODO: fix active loc @summer 2012
             brain.tracker.activeLoc()
 
     #TODO: I think the transition is broken right now!
@@ -39,9 +40,11 @@ def spinToField(player):
     if player.firstFrame():
         if fieldEdge.shape == vision.basicShape.RISING_LEFT:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_LEFT)
+            # fix this @summer 2012
             player.brain.tracker.activeLoc()
         else:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_RIGHT)
+            # fix this @summer 2012
             player.brain.tracker.activeLoc()
 
     elif player.brain.nav.isAtPosition():
@@ -64,7 +67,7 @@ def relocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_WIDE_PAN)
 
 #    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
 #        direction = MyMath.sign(player.getWalk()[2])

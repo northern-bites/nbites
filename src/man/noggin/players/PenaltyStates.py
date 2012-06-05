@@ -15,13 +15,13 @@ def afterPenalty(player):
 
     if player.firstFrame():
         initPenaltyReloc(player)
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
         # walk towards the center of the field
         player.brain.nav.walkTo(RelRobotLocation(2000,0,0))
 
     if player.brain.ball.vis.framesOn > OBJ_SEEN_THRESH:
         #deal with ball and don't worry about loc
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         return player.goLater(gcState)
 
     # Would be great if loc worked. Hacked out for US OPEN 2012
@@ -127,7 +127,7 @@ def penaltyRelocalize(player):
         player.setWalk(1, 0, 0)
 
     if player.brain.ball.vis.framesOn >= OBJ_SEEN_THRESH:
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         return player.goLater(gcState)
 
     if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
@@ -141,6 +141,6 @@ def penaltyRelocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
 
     return player.stay()

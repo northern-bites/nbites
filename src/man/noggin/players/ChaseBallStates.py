@@ -27,7 +27,7 @@ def chase(player):
 
 def approachBall(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         player.brain.nav.chaseBall()
 
     # most of the time going to chase will kick back to here, lets us reset
@@ -47,14 +47,14 @@ def approachBall(player):
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
-        player.brain.tracker.kickScan()
+        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_NARROW)
         player.brain.nav.stand()
         return player.stay()
 
     prepareForKick.hackKick.collectData()
 
-    # Should not directly check the tracker's state!
-    if player.brain.tracker.currentState is 'returnHeadsPan':
+    # HACK HACK
+    if player.brain.tracker.counter > 80:
         prepareForKick.hackKick.calculateDataAverages()
         print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
@@ -81,7 +81,7 @@ def positionForKick(player):
                                                 0)
 
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         player.inKickingState = False
 
     #only enque the new goTo destination once
@@ -116,14 +116,14 @@ def lookAround(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.stopHeadMoves() # HACK so that tracker goes back to stopped.
-        player.brain.tracker.kickDecideScan()
+        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN)
 
     # Make sure we leave this state...
     if player.brain.ball.vis.framesOff > 200:
         return player.goLater('chase')
 
     if player.brain.tracker.isStopped() and player.counter > 2:
-            player.brain.tracker.trackBall()
+            player.brain.tracker.trackBallFixedPitch()
             player.brain.kickDecider.decideKick()
             if transitions.shouldOrbit(player) and not player.penaltyKicking:
                 print "Don't have a kick, orbitting"
@@ -138,7 +138,7 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         player.brain.nav.orbitAngle(10, 90) # TODO HACK HACK
 
     if transitions.shouldFindBall(player) or player.brain.nav.isStopped():

@@ -28,7 +28,7 @@ def scanFindBall(player):
     State to move the head to find the ball. If we find the ball, we
     mppove to align on it. If we don't find it, we spin to keep looking
     """
-    player.brain.tracker.trackBall()
+    player.brain.tracker.trackBallFixedPitch()
 
     if transitions.shouldChaseBall(player):
         return player.goNow('findBall')
@@ -48,7 +48,7 @@ def spinFindBall(player):
     """
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         return player.goNow('findBall')
 
     if player.firstFrame():
@@ -60,6 +60,7 @@ def spinFindBall(player):
         spinDir = my.spinDirToPoint(ball.loc)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
+        # TODO: fix track ball spin for fixed pitch @summer 2012
         player.brain.tracker.trackBallSpin()
 
     if not player.brain.play.isRole(GOALIE):
@@ -75,11 +76,11 @@ def walkFindBall(player):
     if player.firstFrame():
         player.stopWalking()
         # Do a slow pan
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         return player.goNow('findBall')
 
     if player.brain.nav.isStopped():

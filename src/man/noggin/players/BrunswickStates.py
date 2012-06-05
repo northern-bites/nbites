@@ -51,7 +51,7 @@ def gameReady(player):
         player.inKickingState = False
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatHeadMove(player.brain.tracker.FIXED_PITCH_PAN_WIDE)
         player.brain.sensors.startSavingFrames()
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
@@ -95,7 +95,7 @@ def gameSet(player):
         player.brain.nav.stand()
         player.gainsOn()
         player.brain.loc.resetBall()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
 
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
@@ -122,7 +122,7 @@ def gamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 25:
@@ -200,9 +200,10 @@ def penaltyShotsGameSet(player):
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
         if player.brain.play.isRole(GOALIE):
-            player.brain.tracker.trackBall()
+            player.brain.tracker.trackBallFixedPitch()
         else:
-            player.brain.tracker.activeLoc()
+            #player.brain.tracker.activeLoc()
+            player.brain.tracker.trackBallFixedPitch()
     if player.brain.play.isRole(GOALIE):
         player.brain.resetGoalieLocalization()
 
