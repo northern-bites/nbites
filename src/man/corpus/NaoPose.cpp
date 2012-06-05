@@ -314,6 +314,8 @@ ublas::vector<float> NaoPose::intersectLineWithXYPlane(const std::vector<
 estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
                                     const float objectHeight) const {
 
+    // Computed this constant and also checked it experimentally
+    // For objects in 320x240-size images ONLY!
     float FOCAL_LENGTH = 290.f;
     ufvector4 pixelInCameraFrame =
             vector4D( FOCAL_LENGTH,

@@ -10,16 +10,16 @@ namespace man {
 namespace corpus {
 
 OfflineImageTranscriber::OfflineImageTranscriber(
-		boost::shared_ptr<Sensors> s,
-		memory::MTopImage::const_ptr topImage,
-		memory::MBottomImage::const_ptr bottomImage)
-		: ThreadedImageTranscriber(s, "OfflineImageTranscriber"),
-		  mTopImage(topImage),
-		  mBottomImage(bottomImage),
-		  table(new unsigned char[yLimit * uLimit * vLimit]),
-		  params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
-		  topImage(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
-		  bottomImage(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE]))
+        boost::shared_ptr<Sensors> s,
+        memory::MTopImage::const_ptr topImage,
+        memory::MBottomImage::const_ptr bottomImage)
+    : ThreadedImageTranscriber(s, "OfflineImageTranscriber"),
+      mTopImage(topImage),
+      mBottomImage(bottomImage),
+      table(new unsigned char[yLimit * uLimit * vLimit]),
+      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
+      topImage(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
+      bottomImage(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE]))
 {
 }
 
