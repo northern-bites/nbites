@@ -7,6 +7,8 @@
 #include "alproxies/alvideodeviceproxy.h"
 #include "alerror/alerror.h"
 
+#include "ALConstants.h"
+
 #include "ThreadedImageTranscriber.h"
 #include "synchro/synchro.h"
 #include "ColorParams.h"
@@ -59,17 +61,17 @@ private:
     static const int DEFAULT_FRAMERATE;
 
     enum {
-        y0 = 0,
-        u0 = 0,
-        v0 = 0,
+        y0 = Y0,
+        u0 = U0,
+        v0 = V0,
 
-        y1 = 256,
-        u1 = 256,
-        v1 = 256,
+        y1 = Y1,
+        u1 = U1,
+        v1 = V1,
 
-        yLimit = 128,
-        uLimit = 128,
-        vLimit = 128,
+        yLimit = YLIMIT,
+        uLimit = ULIMIT,
+        vLimit = VLIMIT,
 
         tableByteSize = yLimit * uLimit * vLimit
     };

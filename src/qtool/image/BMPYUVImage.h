@@ -63,6 +63,7 @@ public:
     unsigned getWidth() const { return bitmap.width(); }
     unsigned getHeight() const { return bitmap.height(); }
 
+
 protected:
     bool needToResizeBitmap() const;
 

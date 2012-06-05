@@ -41,6 +41,7 @@ public:
     void init();
     void createObject();
     void checkForCrosses();
+	bool checkForRobotBlobs(Blob b);
     bool checkSizeAgainstPixEstimate(Blob b);
     bool scanAroundPerimeter(Blob b);
     bool checkForLineIntersection(Blob b);
