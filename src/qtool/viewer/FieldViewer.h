@@ -31,16 +31,15 @@
 namespace qtool {
 	namespace viewer {
 
-		class FieldViewer : public QMainWindow{
+		class FieldViewer : public QWidget{ //: public QMainWindow{
 			Q_OBJECT
 
 			public:
-			FieldViewer(data::DataManager::ptr dataManager);
+			FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
 
 		public slots:
 			void stopDrawing();
 			void drawBots();
-			void drawButtons();
 
 		private:
 			data::DataManager::ptr dataManager;
@@ -53,8 +52,9 @@ namespace qtool {
 		protected:
 			QPushButton* startButton;
 			QPushButton* stopButton;
-			QWidget* buttonWidget;
+			QHBoxLayout* mainLayout;
 			QVBoxLayout* buttonLayout;
+			QVBoxLayout* field;
 			QDockWidget* dockWidget;
 		};
 

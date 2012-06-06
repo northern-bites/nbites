@@ -19,7 +19,7 @@ BMPImageViewer::~BMPImageViewer() {
 void BMPImageViewer::setupUI() {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(&imagePlaceholder);
-    //layout->setAlignment(Qt::AlignTop);
+    layout->setAlignment(Qt::AlignTop);
     layout->setSpacing(0);
     this->setLayout(layout);
 }

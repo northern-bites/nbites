@@ -14,21 +14,37 @@ namespace qtool {
 		using namespace image;
 		using namespace overseer;
 
-		FieldViewer::FieldViewer(DataManager::ptr dataManager):
-			QMainWindow(),
+		FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
+			QWidget(parent),
 			dataManager(dataManager),
 			startButton(new QPushButton("Locate Robots", this)),
 			stopButton(new QPushButton("Stop Location", this)) {
 
+			mainLayout = new QHBoxLayout(this);
+
+			//field image painted via overlay of robots, field
 			fieldImage = new PaintField(this);
 			bot_locs = new PaintBots(this);
 			overlayView = new OverlayedImage(fieldImage, bot_locs, this);
 			fieldView = new BMPImageViewer(fieldImage, this);
 
-			drawButtons();
+			field = new QVBoxLayout();
+			field->addWidget(fieldView);
 
-			fieldView->setMinimumHeight(FIELD_HEIGHT);
-			this->setCentralWidget(fieldView);
+			buttonLayout = new QVBoxLayout();
+			buttonLayout->setSpacing(10);
+			buttonLayout->addWidget(startButton);
+			connect(startButton, SIGNAL(clicked()), this, SLOT(drawBots()));
+			buttonLayout->addWidget(stopButton);
+			connect(stopButton, SIGNAL(clicked()), this, SLOT(stopDrawing()));
+			QSpacerItem* spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
+												   QSizePolicy::Expanding);
+			buttonLayout->addItem(spacer);
+
+			//paint the field
+			mainLayout->addLayout(field);
+			mainLayout->addLayout(buttonLayout);
+			this->setLayout(mainLayout);
 		}
 
 		void FieldViewer::drawBots(){
@@ -36,41 +52,28 @@ namespace qtool {
 				bot_locs->locs->startListening();
 				keepDrawing = true;
 				while(keepDrawing){
-					delete fieldView;
-					fieldView = new BMPImageViewer(overlayView, this);
-					fieldView->setMinimumHeight(FIELD_HEIGHT);
-					this->setCentralWidget(fieldView);
+					delete field;
+					//delete fieldView;
+					//fieldView = new BMPImageViewer(overlayView, this);
+					fieldView->update();
+					field = new QVBoxLayout();
+					field->addWidget(fieldView);
+					mainLayout->insertLayout(0, field);
 					qApp->processEvents();
 				}
 			} else {
-				qDebug()<<"WorldViewer is already running.";
+				qDebug()<<"WorldView is already running.";
 			}
 		}
 
-		void FieldViewer::drawButtons(){
-			dockWidget = new QDockWidget(tr(""), this);
-			dockWidget->setAllowedAreas(Qt::RightDockWidgetArea);
-			dockWidget->setFixedSize(250,100);
-
-			buttonWidget = new QWidget();
-			buttonLayout = new QVBoxLayout(buttonWidget);
-
-			buttonLayout->addWidget(startButton);
-			connect(startButton, SIGNAL(clicked()), this, SLOT(drawBots()));
-
-			buttonLayout->addWidget(stopButton);
-			connect(stopButton, SIGNAL(clicked()), this, SLOT(stopDrawing()));
-
-			dockWidget->setWidget(buttonWidget);
-			addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-
-			this->setCentralWidget(fieldView);
-		}
-
 		void FieldViewer::stopDrawing(){
-			keepDrawing = false;
-			qDebug()<<"WorldView stopped.";
-			bot_locs->locs->stopListening();
+			if(keepDrawing){
+				keepDrawing = false;
+				qDebug()<<"WorldView stopped.";
+				bot_locs->locs->stopListening();
+			} else {
+				qDebug()<<"WorldView isn't running.";
+			}
 		}
 	}
 }

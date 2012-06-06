@@ -29,6 +29,10 @@ public:
         return QSize(image->getWidth(), image->getHeight());
     }
 
+	virtual unsigned getWidth() { return image->getWidth();}
+	virtual unsigned getHeight() { return image->getHeight();}
+
+
 public slots:
     void updateView();
 
