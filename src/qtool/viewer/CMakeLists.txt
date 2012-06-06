@@ -19,24 +19,32 @@ add_definitions(${QT_DEFINITIONS}) #-DR_HOME=/usr/lib/R)
 set( viewer_srcs MemoryViewer.cpp
                  MObjectViewer.cpp
                  BMPImageViewer.cpp
+                 BMPImageViewerListener.cpp
                  ChannelImageViewer.cpp
-		 BallEKFViewer.cpp
-		 FieldViewer.cpp
-		 EKFDataViewer.cpp
-		 #GraphViewer.cpp
-		 #R/RTool.cpp
-		 )
+
+                 BallEKFViewer.cpp
+                 FieldViewer.cpp
+                 EKFDataViewer.cpp
+                 VisionViewer.cpp
+                 FilteredThresholdedViewer.cpp
+                 CollapsibleImageViewer.cpp
+                 )
+
 
 set( viewer_headers MemoryViewer.h
                     MObjectViewer.h
                     BMPImageViewer.h
+                    BMPImageViewerListener.h
                     ChannelImageViewer.h
-		    BallEKFViewer.h
-		    FieldViewer.h
-		    EKFDataViewer.h
-		    #GraphViewer.h
-		    #R/RTool.h
-		    )
+
+                    BallEKFViewer.h
+                    FieldViewer.h
+                    EKFDataViewer.h
+                    VisionViewer.h
+                    FilteredThresholdedViewer.h
+                    CollapsibleImageViewer.h
+                    )
+
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -56,6 +64,9 @@ target_link_libraries(
   treemodel
   image
   memory
+  vision
+  _sensors
+  _robot_connect
   ${QT_LIBRARIES}
   #${R_LIBRARY} 
   #${QWT_LIBRARY}

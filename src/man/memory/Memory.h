@@ -29,6 +29,7 @@ class Memory; //forward declaration
 #include "MVisionSensors.h"
 #include "MMotionSensors.h"
 #include "MImage.h"
+#include "Camera.h"
 #include "MLocalization.h"
 #include "Sensors.h"
 #include "Profiler.h"
@@ -46,6 +47,7 @@ public:
             boost::shared_ptr<MObject> > MObject_IDPair;
     typedef std::map<MObject_ID,
             boost::shared_ptr<MObject> > MObject_IDMap;
+    typedef MObject_IDMap::const_iterator const_iterator;
 
 public:
     Memory(boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
@@ -64,10 +66,14 @@ public:
     MVision::const_ptr getMVision() const {return mVision;}
     MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
     MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
-    MImage::const_ptr getMImage() const {return mImage;}
     MLocalization::const_ptr getMLocalization() const { return mLocalization; }
+    MImage::const_ptr getMImage(corpus::Camera::Type which) const;
+
     MObject::const_ptr getMObject(MObject_ID id) const;
     MObject::ptr getMutableMObject(MObject_ID id);
+
+    const_iterator begin() const { return mobject_IDMap.begin(); }
+    const_iterator end() const { return mobject_IDMap.end(); }
 
     void subscribe(Subscriber* subscriber,
                        MObject_ID objectToSubscribeTo) const;
@@ -79,7 +85,8 @@ private:
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
-    boost::shared_ptr<MImage> mImage;
+    boost::shared_ptr<MBottomImage> bottomMImage;
+    boost::shared_ptr<MTopImage> topMImage;
     boost::shared_ptr<MLocalization> mLocalization;
 };
 }

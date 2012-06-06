@@ -6,12 +6,16 @@ import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
 from ..navigator import Navigator
 from ..playbook.PBConstants import GOALIE
+import man.motion.HeadMoves as HeadMoves
+import man.noggin.kickDecider.HackKickInformation as hackKick
+import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation
 
 def chase(player):
     """
     Super State to determine what to do from various situations
     """
+    
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
 
@@ -30,10 +34,34 @@ def approachBall(player):
     if transitions.shouldFindBall(player):
         return player.goLater('chase')
         
-    if transitions.shouldPrepareForKick(player):
-        return player.goNow('positionForKick')
+    if transitions.shouldPrepareForKick(player) or player.brain.nav.isAtPosition():
+        if player.shouldKickOff:
+            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
+            player.shouldKickOff = False
+            return player.goNow('positionForKick')
+        else:
+            return player.goNow('prepareForKick')
     else:
         return player.stay()
+
+def prepareForKick(player):
+    if player.firstFrame():
+        prepareForKick.hackKick = hackKick.KickInformation(player.brain)
+        player.brain.tracker.kickScan()
+        player.brain.nav.stand()
+        return player.stay()
+    
+    prepareForKick.hackKick.collectData()
+    
+    if player.brain.tracker.currentState is 'returnHeadsPan':
+        prepareForKick.hackKick.calculateDataAverages()
+        print str(prepareForKick.hackKick)
+        player.kick = prepareForKick.hackKick.shoot()
+        print str(player.kick)
+        return player.goNow('positionForKick')
+     
+    return player.stay()
+     
 
 def positionForKick(player):
     """
@@ -45,36 +73,38 @@ def positionForKick(player):
     if player.penaltyKicking and player.brain.ball.loc.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
 
+    ballLoc = player.brain.ball.loc
+    kick_pos = player.kick.getPosition()
+    positionForKick.kickPose = RelRobotLocation(ballLoc.relX - kick_pos[0] - 3,
+                                                ballLoc.relY - kick_pos[1],
+                                                0)
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.inKickingState = False
 
-    kickDecider = player.brain.kickDecider
-
-    if player.counter % 10 is 0:
-        kickDecider.decideKick()
-
     #only enque the new goTo destination once
-    if player.firstFrame():          
-        player.brain.nav.goTo(kickDecider.getIdealKickPosition(), 
+    if player.firstFrame():    
+        player.brain.nav.goTo(positionForKick.kickPose, 
                               Navigator.CLOSE_ENOUGH,
-                              Navigator.FULL_SPEED,
+                              Navigator.CAREFUL_SPEED,
                               Navigator.ADAPTIVE)
     else:
-        player.brain.nav.updateDest(kickDecider.getIdealKickPosition())
+        player.brain.nav.updateDest(positionForKick.kickPose)
         
 
     # most of the time going to chase will kick back to here, lets us reset
-    if transitions.shouldFindBallKick(player):
+    if transitions.shouldFindBallKick(player) and player.counter > 15:
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goNow('findBall')
 
     #if transitions.shouldKick(player):
-    if transitions.ballInPosition(player) or player.brain.nav.isAtPosition():
-        if transitions.shouldOrbit(player):
-            return player.goNow('lookAround')
-        else:
-            return player.goNow('kickBallExecute')
+    if transitions.ballInPosition(player, positionForKick.kickPose) or player.brain.nav.isAtPosition():
+#        if transitions.shouldOrbit(player):
+#            return player.goNow('lookAround')
+#        else:
+        player.brain.nav.stand()
+        return player.goLater('kickBallExecute')
 
     return player.stay()
 

@@ -14,7 +14,7 @@
 class LocSystem
 {
 public:
-    LocSystem() : active(false), probability(0.0) {};
+ LocSystem() : active(false), probability(0.0), onOpposingSide(false) {};
     virtual ~LocSystem() {};
     // Core Functions
     virtual void updateLocalization(const MotionModel& u_t,
@@ -49,6 +49,8 @@ public:
     virtual bool isActive() const { return active;}
     double getProbability() const { return probability; }
 
+    bool isOnOpposingSide() const { return onOpposingSide; }
+
     // Setters
     virtual void setXEst(float xEst) = 0;
     virtual void setYEst(float yEst) = 0;
@@ -59,6 +61,8 @@ public:
     virtual void activate() { active = true; }
     virtual void deactivate() { active = false; }
     void setProbability(double p) { probability = p; }
+    
+    void setOnOpposingSide(bool opp) { onOpposingSide = opp; }
 
 
     friend std::ostream& operator<< (std::ostream &o,
@@ -74,6 +78,11 @@ public:
 
 private:
     bool active;
+
+    // Indicates which side of the field the robot is on.
+    // True only if the robot is on the opposing side of the 
+    // field.
+    bool onOpposingSide;
 
 protected:
     double probability;

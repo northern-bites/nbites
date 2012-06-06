@@ -32,11 +32,11 @@ def goToPosition(nav):
     relDest = helper.getRelativeDestination(nav.brain.my, goToPosition.dest)
     goToPosition.deltaDest = relDest # cache it for later use
         
-    if nav.counter % 10 is 0:
-        print "going to " + str(relDest)
-        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX, 
-                                                 nav.brain.ball.loc.relY, 
-                                                 nav.brain.ball.loc.bearing)
+#    if nav.counter % 10 is 0:
+#        print "going to " + str(relDest)
+#        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX, 
+#                                                 nav.brain.ball.loc.relY, 
+#                                                 nav.brain.ball.loc.bearing)
 
     if goToPosition.adaptive:
         speed = helper.adaptSpeed(relDest.dist, constants.ADAPT_DISTANCE, goToPosition.speed)
@@ -48,8 +48,8 @@ def goToPosition(nav):
     #reduce the speed if we're close to the target
     helper.setDestination(nav, relDest, speed)
 
-    if navTrans.shouldAvoidObstacle(nav):
-        return nav.goLater('avoidObstacle')
+#    if navTrans.shouldAvoidObstacle(nav):
+#        return nav.goLater('avoidObstacle')
 
     return Transition.getNextState(nav, goToPosition)
 

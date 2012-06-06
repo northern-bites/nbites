@@ -11,8 +11,8 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-//    MainWindow w;
-//    w.show();
+    //MainWindow w;
+    //w.show();
 
     memory::proto::PMotionSensors* ms =
             new memory::proto::PMotionSensors();

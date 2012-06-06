@@ -46,6 +46,11 @@ public:
         loc->resetLocTo(x, y, h * TO_RAD, x_, y_, h_ * TO_RAD);
     }
 
+    void setOnOpposingSide(bool opp)
+    {
+        loc->setOnOpposingSide(opp);
+    }
+
     /* Getters */
     // We use degreees in python, and radians in C++
     // Self localization
@@ -58,6 +63,8 @@ public:
     const float getYUncert() const { return loc->getYUncert(); }
     const float getHUncert() const { return loc->getHUncertDeg(); }
     const float getRadHUncert() const { return loc->getHUncert(); }
+
+    const bool isOnOpposingSide() const { return loc->isOnOpposingSide(); }
 
     // Ball localization
     // Global Coordinates

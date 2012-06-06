@@ -127,7 +127,7 @@ void Noggin::initializePython()
 void Noggin::initializeLocalization()
 {
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
-    printf("Initializing localization modules\n");
+    printf("  Initializing localization modules\n");
 #   endif
 
     locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
@@ -311,33 +311,11 @@ void Noggin::updateLocalization()
     std::vector<Landmark> landmarks;
     float dist, theta;
 
+    // Get team of the robot for localization.
+    uint8 teamColor = (*gc->getMyTeam()).teamColor;
+
     // Observe FieldObjects.
     VisualFieldObject fo;
-
-    /* We Dont need to check for blue goal posts anymore
-    fo = *vision->bgrp;
-
-    // @todo this seems like a lot of code duplication--make more concise?
-
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
-    {
-        // Create a new Observation from the observed VisualFieldObject.
-    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-    dist = fo.getDistance();
-    theta = fo.getBearing();
-    observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
-    fo = *vision->bglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
-    {
-        // Create a new Observation from the observed VisualFieldObject.
-    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-    dist = fo.getDistance();
-    theta = fo.getBearing();
-    observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-    */
 
     fo = *vision->ygrp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
@@ -352,7 +330,7 @@ void Noggin::updateLocalization()
     fo = *vision->yglp;
     if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
     {
-    // Create a new Observation from the observed VisualFieldObject.
+        // Create a new Observation from the observed VisualFieldObject.
     landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
     dist = fo.getDistance();
     theta = fo.getBearing();

@@ -19,7 +19,7 @@ namespace image {
 
 void VisualInfoImage::buildBitmap() {
 
-     bitmap.fill(Qt::transparent);
+  bitmap.fill(Qt::transparent);
 
      const PVision::PVisualBall ballData = visionData->get()->visual_ball();
      drawBall(ballData);
@@ -31,38 +31,55 @@ void VisualInfoImage::buildBitmap() {
      drawGoalPost(bgrpData);
 
      const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
-     if (yglpData.visual_detection().distance())
+
+     if(yglpData.visual_detection().distance() || yglpData.visual_detection().x() || 
+        yglpData.visual_detection().y())
          drawGoalPost(yglpData);
 
      const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
-     if (ygrpData.visual_detection().distance())
+     if(ygrpData.visual_detection().distance() || ygrpData.visual_detection().x() || 
+        ygrpData.visual_detection().y())
          drawGoalPost(ygrpData);
 
      const PVision::PVisualRobot red1Data = visionData->get()->red1();
-     drawRedRobot(red1Data);
+     if(red1Data.visual_detection().distance() || red1Data.visual_detection().x() ||
+        red1Data.visual_detection().y())
+         drawRedRobot(red1Data);
 
      const PVision::PVisualRobot red2Data = visionData->get()->red2();
-     drawRedRobot(red2Data);
+     if(red2Data.visual_detection().distance() || red2Data.visual_detection().x() ||
+        red2Data.visual_detection().y())
+         drawRedRobot(red2Data);
 
      const PVision::PVisualRobot red3Data = visionData->get()->red3();
-     drawRedRobot(red3Data);
+     if(red3Data.visual_detection().distance() || red3Data.visual_detection().x() ||
+        red3Data.visual_detection().y())
+         drawRedRobot(red3Data);
 
      const PVision::PVisualRobot navy1Data = visionData->get()->navy1();
-     drawNavyRobot(navy1Data);
-     
+     if(navy1Data.visual_detection().distance() || navy1Data.visual_detection().x() ||
+        navy1Data.visual_detection().y())
+         drawNavyRobot(navy1Data);
+
      const PVision::PVisualRobot navy2Data = visionData->get()->navy2();
-     drawNavyRobot(navy2Data);
-     
+     if(navy2Data.visual_detection().distance() || navy2Data.visual_detection().x() ||
+        navy2Data.visual_detection().y())
+         drawNavyRobot(navy2Data);
+
      const PVision::PVisualRobot navy3Data = visionData->get()->navy3();
-     drawNavyRobot(navy3Data);
+     if(navy3Data.visual_detection().distance() || navy3Data.visual_detection().x() ||
+        navy3Data.visual_detection().y())
+         drawNavyRobot(navy3Data);
 
      const PVision::PVisualCross crossData = visionData->get()->visual_cross();
-     drawCross(crossData);
-     
+     if(crossData.visual_detection().distance() || crossData.visual_detection().x() || 
+        crossData.visual_detection().y())
+         drawCross(crossData);
+
      const RepeatedPtrField<PVision::PVisualCorner> cornersData = visionData->get()->visual_corner();
      for(int i=0; i<cornersData.size(); i++) {
-       const PVision::PVisualCorner cornerData=cornersData.Get(i);
-       drawCorner(cornerData);
+         const PVision::PVisualCorner cornerData=cornersData.Get(i);
+         drawCorner(cornerData);
      }
 
      const RepeatedPtrField<PVision::PVisualLine> linesData = visionData->get()->visual_line();
@@ -70,8 +87,6 @@ void VisualInfoImage::buildBitmap() {
        const PVision::PVisualLine lineData=linesData.Get(i);
        drawLine(lineData);
      }
-
-  
 }
 
 void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
@@ -82,7 +97,7 @@ void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
     int ball_x = 2*ballData.visual_detection().x();
     int ball_y = 2*ballData.visual_detection().y();
     int ball_radius = 2*ballData.radius();
-     
+
     painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
     painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
     painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
@@ -101,9 +116,9 @@ void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(2*corner_x-10, 2*corner_y-10, 2*corner_x+10, 2*corner_y+10);
     painter.drawLine(2*corner_x+10, 2*corner_y-10, 2*corner_x-10, 2*corner_y+10);
-    
+
   }
-  
+
 void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     QPainter painter(&bitmap);
 //    painter.setBackgroundMode(Qt::TransparentMode);
@@ -124,7 +139,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_bottom_x, right_bottom_y),
       QPoint (right_top_x, right_top_y)
     };
-    
+
     painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
     painter.setBrush(QBrush(QColor(255,255,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
@@ -150,7 +165,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_bottom_x, right_bottom_y),
       QPoint (right_top_x, right_top_y)
     };
-    
+
     painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
     painter.setBrush(QBrush(QColor(0,0,200,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
@@ -175,7 +190,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_bottom_x, right_bottom_y),
       QPoint (right_top_x, right_top_y)
     };
-    
+
     painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
     painter.setBrush(QBrush(QColor(200,0,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
@@ -190,7 +205,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int start_y = 2*lineData.start_y();
     int end_x = 2*lineData.end_x();
     int end_y = 2*lineData.end_y();
-    
+
     painter.setPen(QPen(Qt::blue, 6, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(start_x, start_y, end_x, end_y);
   }
@@ -209,10 +224,10 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int right_bottom_x = 2*crossData.right_bottom_x();
     int right_bottom_y = 2*crossData.right_bottom_y();
 
-    painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setPen(QPen(Qt::cyan, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(left_top_x, left_top_y, right_bottom_x, right_bottom_y);
     painter.drawLine(right_top_x, right_top_y, left_bottom_x, left_bottom_y);
-    
+
 
   }
 }

@@ -63,6 +63,10 @@ class HeadTracking(FSA.FSA):
         self.headMove = headMove
         self.switchTo('doHeadMove')
 
+    def kickScan(self):
+        self.switchTo('kickScan')
+        
+
     def trackBall(self):
         """
         Enters a state cycle:
@@ -76,7 +80,7 @@ class HeadTracking(FSA.FSA):
              and self.currentState is not 'ballTracking'
              and self.currentState is not 'activeTracking'
              and self.currentState is not 'trianglePan'):
-            self.switchTo('ballTracking')
+            self.switchTo('tracking')
 
     def trackBallSpin(self):
         """
@@ -213,3 +217,10 @@ class HeadTracking(FSA.FSA):
         back down to see the ball.
         """
         self.switchTo('panOrbit')
+
+    def locFirstTracking(self, ball):
+        """Uses loc values to track target, or vision if on"""
+        if ball.vis.on:
+            self.switchTo('tracking')
+        else:
+            helper.lookToPoint(ball)
