@@ -23,11 +23,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 ########### Sources
 
 set( qtool_srcs main.cpp
+  EmptyQTool.cpp
   QTool.cpp
   )
 
 set(qtool_headers
-    QTool.h
+  EmptyQTool.h
+  QTool.h
 )
 
 #set(qtool_forms qtool.ui)

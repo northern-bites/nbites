@@ -50,7 +50,6 @@ private:
     data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
     colorcreator::ColorCalibrate* colorCalibrate;
-    //colorcreator::ColorCalibrate* colorTableCreator;
     colorcreator::ColorTableCreator* colorTableCreator;
     viewer::MemoryViewer* memoryViewer;
     viewer::VisionViewer* visionViewer;
