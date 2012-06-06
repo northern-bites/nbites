@@ -25,19 +25,25 @@ namespace qtool {
 			overlayView = new OverlayedImage(fieldImage, bot_locs, this);
 			fieldView = new BMPImageViewer(fieldImage, this);
 
-			this->setCentralWidget(fieldView);
-
 			drawButtons();
+
+			fieldView->setMinimumHeight(FIELD_HEIGHT);
+			this->setCentralWidget(fieldView);
 		}
 
 		void FieldViewer::drawBots(){
-			bot_locs->locs->startListening();
-			keepDrawing = true;
-			while(keepDrawing){
-				delete fieldView;
-				fieldView = new BMPImageViewer(overlayView, this);
-				this->setCentralWidget(fieldView);
-				qApp->processEvents();
+			if(!keepDrawing){
+				bot_locs->locs->startListening();
+				keepDrawing = true;
+				while(keepDrawing){
+					delete fieldView;
+					fieldView = new BMPImageViewer(overlayView, this);
+					fieldView->setMinimumHeight(FIELD_HEIGHT);
+					this->setCentralWidget(fieldView);
+					qApp->processEvents();
+				}
+			} else {
+				qDebug()<<"WorldViewer is already running.";
 			}
 		}
 
@@ -57,11 +63,13 @@ namespace qtool {
 
 			dockWidget->setWidget(buttonWidget);
 			addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+
+			this->setCentralWidget(fieldView);
 		}
 
 		void FieldViewer::stopDrawing(){
 			keepDrawing = false;
-			qDebug()<<"Stopping WorldView...";
+			qDebug()<<"WorldView stopped.";
 			bot_locs->locs->stopListening();
 		}
 	}
