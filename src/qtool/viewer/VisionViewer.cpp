@@ -106,8 +106,10 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     rawImages->setLayout(layout);
 
-    BMPImageViewer *bottomVisViewer = new BMPImageViewer(bottomVisionImage,
+    BMPImageViewer *bottomVisViewer = new BMPImageViewerListener(bottomVisionImage,
                                                        this);
+    connect(bottomVisViewer, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
     BMPImageViewer *topVisViewer = new BMPImageViewer(topVisionImage,
                                                       this);
 
@@ -181,18 +183,29 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 }
 
 void VisionViewer::update(){
-  imageTranscribe->acquireNewImage();
-  sensors->updateVisionAngles();
-  vision->notifyImage(sensors->getImage(Camera::BOTTOM));
-  offlineMVision->updateData();
-  // Will need to get these to be diffent thresholded images but vision
-  // appears to only threhold one at the moment!
-  bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>
-                                          (vision->thresh->thresholded),
-                                          AVERAGED_IMAGE_SIZE);
-  topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
-                                       (vision->thresh->thresholded),
-                                       AVERAGED_IMAGE_SIZE);
+    //no useless computation
+    if (!this->isVisible())
+        return;
+
+    imageTranscribe->acquireNewImage();
+    memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
+    vision->notifyImage(sensors->getImage(Camera::BOTTOM));
+    offlineMVision->updateData();
+    // Will need to get these to be diffent thresholded images but vision
+    // appears to only threhold one at the moment!
+    bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>
+                                            (vision->thresh->thresholded),
+                                            AVERAGED_IMAGE_SIZE);
+    topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
+                                         (vision->thresh->thresholded),
+                                         AVERAGED_IMAGE_SIZE);
+}
+
+void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {
+
+    estimate pixEst = vision->pose->pixEstimate(x, y, 0.0f);
+    std::cout << "x: " << x << "   y: " << y << std::endl;
+    std::cout << pixEst << std::endl;
 }
 
 void VisionViewer::loadColorTable(){
