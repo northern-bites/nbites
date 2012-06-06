@@ -20,21 +20,21 @@ def gameInitial(player):
         # Reset localization to proper starting position by player number.
         # Locations are defined in the wiki.
         if player.brain.my.playerNumber == 1:
-            player.brain.loc.resetLocTo(player.brain.BLUE_GOALBOX_RIGHT_X,
-                                        player.brain.FIELD_WHITE_BOTTOM_SIDLELINE_Y,
-                                        player.brain.HEADING_UP)
+            player.brain.loc.resetLocTo(player.brain.Constants.BLUE_GOALBOX_RIGHT_X,
+                                        player.brain.Constants.FIELD_WHITE_BOTTOM_SIDLELINE_Y,
+                                        player.brain.Constants.HEADING_UP)
         elif player.brain.my.playerNumber == 2:
-            player.brain.loc.resetLocTo(player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        player.brain.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        player.brain.HEADING_UP)
+            player.brain.loc.resetLocTo(player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        player.brain.Constants.HEADING_UP)
         elif player.brain.my.playerNumber == 3:
             player.brain.loc.resetLocTo(player.brain.LANDMARKBLUE_GOAL_CROSS_X,
-                                        player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        player.brain.HEADING_DOWN)
+                                        player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        player.brain.Constants.HEADING_DOWN)
         elif player.brain.my.playerNumber == 4:
-            player.brain.loc.resetLocTo(player.brain.BLUE_GOALBOX_RIGHT_X,
-                                        player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        player.brain.HEADING_DOWN)
+            player.brain.loc.resetLocTo(player.brain.Constants.BLUE_GOALBOX_RIGHT_X,
+                                        player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        player.brain.Constants.HEADING_DOWN)
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
