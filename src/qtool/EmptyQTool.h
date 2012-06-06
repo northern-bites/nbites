@@ -30,12 +30,12 @@ public:
     EmptyQTool(const char* title = "qTool");
     ~EmptyQTool();
 
-private slots:
+protected slots:
     void next();
     void prev();
     void record();
 
-private:
+protected:
     QTabWidget* toolTabs;
 
     data::DataManager::ptr dataManager;
