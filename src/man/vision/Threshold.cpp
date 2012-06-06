@@ -90,6 +90,11 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
  */
 void Threshold::visionLoop() {
     usingTopCamera = true;
+
+    PROF_ENTER(P_TRANSFORM);
+    pose->transform(usingTopCamera);
+    PROF_EXIT(P_TRANSFORM);
+
     // threshold image and create runs
     thresholdAndRuns();
     //newFindRobots();
@@ -128,11 +133,14 @@ void Threshold::visionLoop() {
     if (vision->ball->getRadius() != 0) return; //we see the ball, we are done
     
     usingTopCamera = false;
+    
+    pose->transform(usingTopCamera);
    
     orange->init(pose->getHorizonSlope());
     lowerRuns();
 
     vision->ball->init();
+    vision->ball->setTopCam(usingTopCamera);
 
     if (horizon < IMAGE_HEIGHT) {
         orange->createBall(horizon);
@@ -1274,7 +1282,7 @@ void Threshold::initObjects(void) {
 	vision->navy3->init();
     // balls
     vision->ball->init();
-
+    vision->ball->setTopCam(usingTopCamera);
     // crosses
     vision->cross->init();
 } // initObjects

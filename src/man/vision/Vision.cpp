@@ -139,9 +139,11 @@ void Vision::notifyImage() {
     if (frameNumber > 1000000) frameNumber = 0;
 
     // Transform joints into pose estimations and horizon line
-    PROF_ENTER(P_TRANSFORM);
-    pose->transform();
-    PROF_EXIT(P_TRANSFORM);
+    // PROF_ENTER(P_TRANSFORM);
+    // pose->transform();
+    // PROF_EXIT(P_TRANSFORM);
+    
+    //the above is commented to try cool shit
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();

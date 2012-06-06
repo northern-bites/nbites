@@ -162,7 +162,7 @@ class NaoPose {
     ~NaoPose() { }
 
     /********** Core Methods **********/
-    void transform ();
+    void transform (bool _isTopCam);
 
     /**
      * Takes a pixel and the height orthogonal from the ground
@@ -214,7 +214,7 @@ class NaoPose {
     const float getFocalPointInWorldFrameY() const { return focalPointInWorldFrame.y;}
 
  protected: // helper methods
-    static const boost::numeric::ublas::matrix <float>
+    const boost::numeric::ublas::matrix <float>
         calculateForwardTransform(const Kinematics::ChainID id,
                                   const std::vector <float> &angles);
     static const boost::numeric::ublas::vector <float>
@@ -268,6 +268,8 @@ class NaoPose {
     boost::numeric::ublas::matrix <float> cameraToWorldFrame;
     // Current hack for better beraing est
     boost::numeric::ublas::matrix <float> cameraToBodyTransform;
+
+    bool isTopCam; //true = using the top camera
 };
 
 #endif

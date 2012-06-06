@@ -81,7 +81,9 @@ NaoPose::NaoPose(shared_ptr<Sensors> s) :
  * Then we calculate horizon and camera height which is necessary for the
  * calculation of pix estimates.
  */
-void NaoPose::transform() {
+void NaoPose::transform(bool _isTopCam) {
+
+    isTopCam = _isTopCam;
 
     // Make up bogus values
     std::vector<float> headAngles(2, 0.0f);
@@ -599,7 +601,8 @@ const ublas::matrix<float> NaoPose::calculateForwardTransform(const ChainID id,
     // Do the end transforms
     const int numEndTransforms = NUM_END_TRANSFORMS[id];
     for (int i = 0; i < numEndTransforms; i++) {
-        fullTransform = prod(fullTransform, END_TRANSFORMS_BOTTOM[id][i]);
+      if (isTopCam) fullTransform = prod(fullTransform, END_TRANSFORMS_TOP[id][i]);
+      else fullTransform = prod(fullTransform, END_TRANSFORMS_BOTTOM[id][i]);
     }
 
     return fullTransform;

@@ -378,6 +378,13 @@ namespace Kinematics {
       &LEFT_LEG_END_TRANSFORMS[0],
       &RIGHT_LEG_END_TRANSFORMS[0],
       &RIGHT_ARM_END_TRANSFORMS[0] };
+
+    static const boost::numeric::ublas::matrix <float> * END_TRANSFORMS_TOP[NUM_CHAINS] =
+    { &HEAD_END_TRANSFORMS_TOP[0],
+      &LEFT_ARM_END_TRANSFORMS[0],
+      &LEFT_LEG_END_TRANSFORMS[0],
+      &RIGHT_LEG_END_TRANSFORMS[0],
+      &RIGHT_ARM_END_TRANSFORMS[0] };
     static const int NUM_BASE_TRANSFORMS[NUM_CHAINS] = {1,1,1,1,1};
     static const int NUM_END_TRANSFORMS[NUM_CHAINS] = {3,2,3,3,2};
     static const int NUM_JOINTS_CHAIN[NUM_CHAINS] = {2,4,6,6,4};

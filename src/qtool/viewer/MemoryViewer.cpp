@@ -28,47 +28,48 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     BMPImageViewer* topImageViewer;
     BMPImageViewer* bottomImageViewer;
 
-      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
+    VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision(), 
+						  Camera::BOTTOM);
 
-      OverlayedImage* combo = new OverlayedImage(rawBottomBMP,
-                                                 shapes, this);
-
-      bottomImageViewer = new BMPImageViewer(combo, this);
-      CollapsibleImageViewer * bottomCIV = new
-          CollapsibleImageViewer(bottomImageViewer,
-                                 QString("Bottom"),
-                                 this);
-
-      topImageViewer = new BMPImageViewer(rawTopBMP, this);
-      CollapsibleImageViewer * topCIV = new
-          CollapsibleImageViewer(topImageViewer,
-                                 QString("Top"),
-                                 this);
-
-      //}
-
-      //    else
-      // imageViewer = new BMPImageViewer(rawBMP, this);
-
-      QWidget* central = new QWidget(this);
-
-      QVBoxLayout* layout = new QVBoxLayout(central);
-
-      layout->addWidget(topCIV);
-      layout->addWidget(bottomCIV);
-
-      // Make sure one of the images is toggled off for small screens
-      bottomCIV->toggle();
-
-      central->setLayout(layout);
-
-      this->setCentralWidget(central);
-
+    OverlayedImage* combo = new OverlayedImage(rawBottomBMP,
+					       shapes, this);
+    
+    bottomImageViewer = new BMPImageViewer(combo, this);
+    CollapsibleImageViewer * bottomCIV = new
+      CollapsibleImageViewer(bottomImageViewer,
+			     QString("Bottom"),
+			     this);
+    
+    topImageViewer = new BMPImageViewer(rawTopBMP, this);
+    CollapsibleImageViewer * topCIV = new
+      CollapsibleImageViewer(topImageViewer,
+			     QString("Top"),
+			     this);
+    
+    //}
+    
+    //    else
+    // imageViewer = new BMPImageViewer(rawBMP, this);
+    
+    QWidget* central = new QWidget(this);
+    
+    QVBoxLayout* layout = new QVBoxLayout(central);
+    
+    layout->addWidget(topCIV);
+    layout->addWidget(bottomCIV);
+    
+    // Make sure one of the images is toggled off for small screens
+    bottomCIV->toggle();
+    
+    central->setLayout(layout);
+    
+    this->setCentralWidget(central);
+    
     memoryManager->connectSlotToMObject(bottomImageViewer,
-                        SLOT(updateView()), MBOTTOMIMAGE_ID);
-
+					SLOT(updateView()), MBOTTOMIMAGE_ID);
+    
     memoryManager->connectSlotToMObject(topImageViewer,
-                        SLOT(updateView()), MTOPIMAGE_ID);
+					SLOT(updateView()), MTOPIMAGE_ID);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);

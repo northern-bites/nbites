@@ -73,7 +73,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
 
-    VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
+    VisualInfoImage* shapesBottom = new VisualInfoImage(offlineMVision, Camera::BOTTOM);
+    VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);    
 
     FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(memoryManager->
                                                       getMemory()->
@@ -84,10 +85,11 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                                                      getMImage(Camera::TOP),
                                                          this);
 
-    OverlayedImage* combo = new OverlayedImage(rawTopBMP, shapes, this);
+    OverlayedImage* comboBottom = new OverlayedImage(rawBottomBMP, shapesBottom, this);
+    OverlayedImage* comboTop = new OverlayedImage(rawTopBMP, shapesTop, this);
 
-    BMPImageViewer *bottomImageViewer = new BMPImageViewer(rawBottomBMP, this);
-    BMPImageViewer *topImageViewer = new BMPImageViewer(combo, this);
+    BMPImageViewer *bottomImageViewer = new BMPImageViewer(comboBottom, this);
+    BMPImageViewer *topImageViewer = new BMPImageViewer(comboTop, this);
 
     CollapsibleImageViewer* bottomCIV = new
         CollapsibleImageViewer(bottomImageViewer,
