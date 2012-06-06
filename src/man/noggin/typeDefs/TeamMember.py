@@ -43,8 +43,8 @@ class TeamMember(RobotLocation):
         self.ballFramesOn = 0
         #self.ballX = 0
         #self.ballY = 0
-        #self.role = None
-        #self.subRole = None
+        self.role = None
+        self.subRole = None
         self.chaseTime = 0
         self.lastPacketTime = time.time()
 
@@ -72,8 +72,8 @@ class TeamMember(RobotLocation):
         self.ballFramesOn = packet.ballFramesOn
         #self.ballX = packet.ballX
         #self.ballY = packet.ballY
-        #self.role = packet.role
-        #self.subRole = packet.subRole
+        self.role = packet.role
+        self.subRole = packet.subRole
         self.chaseTime = packet.chaseTime
 
         # calculates ball localization distance, bearing
@@ -113,8 +113,8 @@ class TeamMember(RobotLocation):
         self.ballOn = ball.vis.on
         #self.ballX = ball.loc.x
         #self.ballY = ball.loc.y
-        #self.role = self.brain.play.role
-        #self.subRole = self.brain.play.subRole
+        self.role = self.brain.play.role
+        self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
 
         self.active = (not self.brain.gameController.currentState ==
