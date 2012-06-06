@@ -1,5 +1,6 @@
 from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_KICKOFF)
 import man.motion.SweetMoves as SweetMoves
+from ../ import noggin_constants as Constants
 
 ###
 # Reimplementation of Game Controller States for pBrunswick
@@ -20,21 +21,21 @@ def gameInitial(player):
         # Reset localization to proper starting position by player number.
         # Locations are defined in the wiki.
         if player.brain.my.playerNumber == 1:
-            player.brain.loc.resetLocTo(player.brain.BLUE_GOALBOX_RIGHT_X,
-                                        player.brain.FIELD_WHITE_BOTTOM_SIDLELINE_Y,
-                                        player.brain.HEADING_UP)
+            player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
+                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDLELINE_Y,
+                                        nogginConstants.HEADING_UP)
         elif player.brain.my.playerNumber == 2:
-            player.brain.loc.resetLocTo(player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        player.brain.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        player.brain.HEADING_UP)
+            player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        nogginConstants.HEADING_UP)
         elif player.brain.my.playerNumber == 3:
-            player.brain.loc.resetLocTo(player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        player.brain.Constants.HEADING_DOWN)
+            player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        nogginConstants.HEADING_DOWN)
         elif player.brain.my.playerNumber == 4:
-            player.brain.loc.resetLocTo(player.brain.Constants.BLUE_GOALBOX_RIGHT_X,
-                                        player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        player.brain.Constants.HEADING_DOWN)
+            player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
+                                        nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        nogginConstants.HEADING_DOWN)
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -69,11 +70,11 @@ def gameReady(player):
         return player.goLater('relocalize')
 
     elif player.lastDiffState == 'gamePenalized':
-        player.brain.loc.resetLocTo(player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                    nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     90,
-                                    player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                    nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                    nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
                                     -90)
         # Do we still want to do this? Seems to be just a hack for loc. Summer 2012
         #return player.goLater('afterPenalty')
@@ -112,8 +113,8 @@ def gameSet(player):
     # This way, garaunteed to have correctly set loc and be standing in that
     #  location for a frame before gamePlaying begins.
     if player.brain.play.isRole(GOALIE):
-        player.brain.loc.resetLocTo(player.brain.Constants.FIELD_WHITE_LEFT_SIDELINE_X,
-                                    player.brain.Constants.MIDFIELD_Y,
+        player.brain.loc.resetLocTo(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
+                                    nogginConstants.MIDFIELD_Y,
                                     0)
 
     return player.stay()
@@ -128,11 +129,11 @@ def gamePlaying(player):
             if player.lastStateTime > 25:
                 # 25 is arbitrary. This check is meant to catch human error and
                 # possible 0 sec. penalties for the goalie
-                player.brain.loc.resetLocTo(player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                             90,
-                                            player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                            nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
                                             -90)
                 # Do we still want to do this? Seems to be just a hack for loc.
                 #   Summer 2012
