@@ -69,11 +69,11 @@ def gameReady(player):
         return player.goLater('relocalize')
 
     elif player.lastDiffState == 'gamePenalized':
-        player.brain.loc.resetLocTo(player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    player.brain.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+        player.brain.loc.resetLocTo(player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                    player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     90,
-                                    player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
+                                    player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                    player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                                     -90)
         # Do we still want to do this? Seems to be just a hack for loc. Summer 2012
         #return player.goLater('afterPenalty')
@@ -112,8 +112,8 @@ def gameSet(player):
     # This way, garaunteed to have correctly set loc and be standing in that
     #  location for a frame before gamePlaying begins.
     if player.brain.play.isRole(GOALIE):
-        player.brain.loc.resetLocTo(player.brain.FIELD_WHITE_LEFT_SIDELINE_X,
-                                    player.brain.MIDFIELD_Y,
+        player.brain.loc.resetLocTo(player.brain.Constants.FIELD_WHITE_LEFT_SIDELINE_X,
+                                    player.brain.Constants.MIDFIELD_Y,
                                     0)
 
     return player.stay()
@@ -128,11 +128,11 @@ def gamePlaying(player):
             if player.lastStateTime > 25:
                 # 25 is arbitrary. This check is meant to catch human error and
                 # possible 0 sec. penalties for the goalie
-                player.brain.loc.resetLocTo(player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            player.brain.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                player.brain.loc.resetLocTo(player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            player.brain.Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                             90,
-                                            player.brain.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            player.brain.FIELD_WHITE_TOP_SIDELINE_Y,
+                                            player.brain.Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            player.brain.Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                                             -90)
                 # Do we still want to do this? Seems to be just a hack for loc.
                 #   Summer 2012
