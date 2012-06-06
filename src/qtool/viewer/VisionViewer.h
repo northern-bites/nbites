@@ -22,7 +22,7 @@
 #include "image/BMPYUVImage.h"
 #include "image/VisualInfoImage.h"
 #include "data/RobotMemoryManager.h"
-#include "BMPImageViewer.h"
+#include "BMPImageViewerListener.h"
 #include "ChannelImageViewer.h"
 #include "MObjectViewer.h"
 #include "CollapsibleImageViewer.h"
@@ -45,6 +45,7 @@ public slots:
     void setEdgeDetectDebug();
     void setHoughDebug();
     void setRobotsDebug();
+    void pixelClicked(int x, int y, int brushSize, bool leftClick);
 
 private:
     std::vector<QDockWidget*> dockWidget;
