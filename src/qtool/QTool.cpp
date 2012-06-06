@@ -1,6 +1,4 @@
 #include "QTool.h"
-#include <iostream>
-#include <QFileDialog>
 
 namespace qtool {
 
