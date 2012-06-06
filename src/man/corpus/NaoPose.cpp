@@ -359,7 +359,10 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
             - pixelInWorldFrame(Z)) * t;
     ublas::vector<float> objectInWorldFrame = vector4D(x, y, z);
 */
-    float FOCAL_LENGTH = 385.54f;
+
+    // Computed this constant and also checked it experimentally
+    // For objects in 320x240-size images ONLY!
+    float FOCAL_LENGTH = 290.f;
     ufvector4 pixelInCameraFrame =
             vector4D( FOCAL_LENGTH,
                       ((float)IMAGE_CENTER_X - (float)pixelX),
