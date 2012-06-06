@@ -41,7 +41,7 @@ def afterKick(player):
         kick = player.brain.kickDecider.getKick()
 
         # TODO: fix after kick scans @summer 2012
-        player.brain.tracker.afterKickScan(kick.name)
+        #player.brain.tracker.afterKickScan(kick.name)
 
         if kick.isBackKick():
             player.inKickingState = False

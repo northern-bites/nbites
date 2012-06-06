@@ -149,6 +149,7 @@ class KickInformation:
             if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
                     rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0):
 
+                # will this ever happen?
                 if not self.sawGoal:
                     return self.chooseBackKick()
                 elif self.oppAvgPostDist == 0 or self.dangerousBall():

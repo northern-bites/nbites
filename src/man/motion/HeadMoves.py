@@ -371,13 +371,13 @@ DATA_PAN = (
 
 ################### FIXED PITCH PANS #################
 FIXED_PITCH_PAN = (
-    ((65.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-65.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((60.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-60.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Maximum search angle for top camera.
 FIXED_PITCH_PAN_WIDE = (
-    ((115.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((115.0,15.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,15.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Bottom camera is never significantly blocked by shoulders or arms.
 FIXED_PITCH_PAN_NARROW = (
