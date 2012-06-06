@@ -202,12 +202,10 @@ class TeamMember(RobotLocation):
         return self.grabbing
 
     def isTeammateRole(self, roleToTest):
-        return 1
-        #return (self.role == roleToTest)
+        return (self.role == roleToTest)
 
     def isTeammateSubRole(self, subRoleToTest):
-        return 1
-        #return (self.subRole == subRoleToTest)
+        return (self.subRole == subRoleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
