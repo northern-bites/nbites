@@ -59,6 +59,13 @@ namespace PF
 
         float magnitude;
         float direction;
+
+        friend std::ostream& operator<<(std::ostream& out, Vector2D v)
+        {
+            out << "magnitude: " << v.magnitude << ", "
+                << "direciton: " << v.direction << "\n";
+            return out;
+        }
     };
 
     struct ParticleFilterParams
@@ -74,7 +81,7 @@ namespace PF
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
-        175,
+        1,
         0.2f,
         0.05f
     };

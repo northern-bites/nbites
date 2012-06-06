@@ -371,6 +371,10 @@ void Noggin::updateLocalization()
     std::vector<CornerObservation> c_z;
     loc->updateLocalization(u_t, pt_z, c_z);
 
+    // HACK HACK HACK for testing particles
+    loc->resetLocTo(497,383,-.78);
+
+
     // END LOCALIZATION UPDATE //
 
     // Ball Tracking

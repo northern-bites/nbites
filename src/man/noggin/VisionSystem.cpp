@@ -48,21 +48,35 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
             PF::Observation o = (*obsIter);
             if(!o.isAmbiguous())
             {
-                // Since the observation is unambiguous, there is only one possibility.
+                // Since the observation is unambiguous,
+                // there is only one possibility.
                 Landmark l = o.possibilities[0];
-                PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
+                std::cout << "Landmark: " << l << "\n";
+                PF::Vector2D hypothesisVector = PF::getPosition(
+                                           (*partIter).getLocation(), l.x, l.y);
+                std::cout << "Landmark Rel Location: " << o.distance
+                          << " , " << o.angle << "\n \n";
+                std::cout << "Hypothesis vector: " << hypothesisVector << "\n";
                 float distanceDiff = o.distance - hypothesisVector.magnitude;
+                std::cout << "distanceDiff: " << distanceDiff << "\n";
                 float angleDiff = NBMath::subPIAngle(o.angle) -
                                  NBMath::subPIAngle(hypothesisVector.direction);
+                std::cout << "angleDiff: " << angleDiff << "\n";
 
-                boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
+                boost::math::normal_distribution<float> pDist(0.0f,
+                                                       parameters.sigma_d);
 
-                float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
+                float distanceProb = boost::math::pdf<float>(pDist,
+                                                             distanceDiff);
 
-                boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
+                boost::math::normal_distribution<float> pAngle(0.0f,
+                                                        parameters.sigma_h);
 
                 float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
+
+                // Better way to determine probability?
                 float probability = distanceProb * angleProb;
+                std::cout << "Probability: " << probability << "\n";
 
                 if(totalWeight == 0.0f)
                     totalWeight = probability;
@@ -91,7 +105,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                     float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
                     float probability = distanceProb * angleProb;
                     if(probability > maxWeight)
+                    {
                         maxWeight = probability;
+                        std::cout << "Potential landmark: " << l << "\n";
+                    }
                 }
 
                 // Assign the total weight to be the product of the current total
