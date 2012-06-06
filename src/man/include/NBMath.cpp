@@ -86,8 +86,8 @@ const float NBMath::safe_acos(const float input){
 }
 
 // takes in two sides of a triangle, returns hypotenuse
-float getHypotenuse(float x, float y) {
-    return std::sqrt(x*x + y*y);
+float NBMath::getHypotenuse(float x, float y) {
+    return sqrtf(x*x + y*y);
 }
 
 const float  NBMath::cycloidx(const float theta){

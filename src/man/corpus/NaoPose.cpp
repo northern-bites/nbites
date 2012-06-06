@@ -665,7 +665,7 @@ estimate NaoPose::estimateFromObjectSize(pixels pixelX, pixels pixelY, mms objec
     cameraToWorldRotation(1, 3) = 0;
     cameraToWorldRotation(2, 3) = 0;
 
-    cout << "y-rotation " << NBMath::safe_asin(-cameraToWorldRotation(2, 0)) * 180 / M_PI << std::endl;
+//    cout << "y-rotation " << NBMath::safe_asin(-cameraToWorldRotation(2, 0)) * 180 / M_PI << std::endl;
 
     //TODO: clean this up and comment
     ufvector4 pixelInWorldFrame = prod(cameraToWorldRotation, pixelInCameraFrame);

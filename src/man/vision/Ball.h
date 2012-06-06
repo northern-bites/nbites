@@ -155,6 +155,7 @@ private:
     static const bool BALLDISTDEBUG = false;
     static const bool BALLDEBUG = false;
 #endif
+
 };
 
 #endif // Ball_h_DEFINED

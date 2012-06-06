@@ -1074,8 +1074,8 @@ bool Ball::badSurround(Blob b) {
 float Ball::ballDistanceEstFromRadius(float radius) {
 
 	float distEst;
-	float radToPow = std::pow(radius, -1.38);
-	distEst = 2350*radToPow;
+	float radToPow = std::pow(radius, -1.28);
+	distEst = 2166*radToPow;
 
 	return distEst;
 }
@@ -1123,19 +1123,26 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall) {
 	                                               ORANGE_BALL_RADIUS);
 
 	float radiusBasedDistance = ballDistanceEstFromRadius(thisBall->getRadius());
-	radiusBasedEst = vision->pose->estimateWithKnownGroundDistance(
-	        thisBall->getCenterX(), thisBall->getCenterY(), radiusBasedDistance);
+	radiusBasedEst = vision->pose->estimateWithKnownDistance(
+	        thisBall->getCenterX(), thisBall->getCenterY(), 0.0f, radiusBasedDistance);
 
-	std::cout << "radius-based " << radiusBasedEst << std::endl;
-	std::cout << "kinematics-based " << kinematicsBasedEst << std::endl;
+	estimate sizeBased = vision->pose->estimateFromObjectSize(thisBall->getCenterX(), thisBall->getCenterY(),
+	                                                          ORANGE_BALL_RADIUS,
+	                                                          thisBall->getRadius(), ORANGE_BALL_RADIUS);
+
+//	std::cout << "radius-based " << radiusBasedEst << std::endl;
+//	std::cout << "kinematics-based " << kinematicsBasedEst << std::endl;
+//	std::cout << "size-based " << sizeBased << std::endl;
 
 	//trust radius-based estimates for non-occluded balls that are relatively big enough
 	//to get enough radius information
-	if (occlusion == NOOCCLUSION && thisBall->getRadius() > 6) {
-	    thisBall->setDistanceEst(radiusBasedEst);
-	} else {
+
+	//TODO: right now the radius-based function is broken (for small distances at least)
+//	if (occlusion == NOOCCLUSION && thisBall->getRadius() > 6) {
+//	    thisBall->setDistanceEst(radiusBasedEst);
+//	} else {
 	    thisBall->setDistanceEst(kinematicsBasedEst);
-	}
+//	}
 }
 
 /*
