@@ -86,6 +86,7 @@ target_link_libraries(
   image
   data
   viewer
+  vision_viewer
   offline
   remote
   overseer_client
