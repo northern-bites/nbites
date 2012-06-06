@@ -4,12 +4,12 @@ using boost::shared_ptr;
 using namespace std;
 
 
-TTMan::TTMan(shared_ptr<Sensors> _sensors,
-             shared_ptr<Transcriber> _transcriber,
-             shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
-             shared_ptr<ThreadedMotionEnactor> _enactor,
-             shared_ptr<Lights> _lights,
-             shared_ptr<Speech> _speech)
+TTMan::TTMan(boost::shared_ptr<Sensors> _sensors,
+             boost::shared_ptr<Transcriber> _transcriber,
+             boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
+             boost::shared_ptr<ThreadedMotionEnactor> _enactor,
+             boost::shared_ptr<Lights> _lights,
+             boost::shared_ptr<Speech> _speech)
     :Man(_sensors, _transcriber, _imageTranscriber,
          _enactor, _lights, _speech),
      threadedImageTranscriber(_imageTranscriber),

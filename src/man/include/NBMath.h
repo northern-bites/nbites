@@ -98,7 +98,7 @@ namespace NBMath {
 
     const float  cycloidy(const float theta);
 
-
+    float getHypotenuse(float x, float y);
 
 }
 #endif //NBMath_h

@@ -37,6 +37,7 @@ protected slots:
 protected:
     QListWidget robotList;
     RobotFinder robotFinder;
+    QListWidgetItem* currentSelection;
 
 };
 

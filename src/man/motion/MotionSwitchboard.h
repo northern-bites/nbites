@@ -122,8 +122,8 @@ private:
     void swapHeadProvider();
     int realityCheckJoints();
 
-    static vector<float> getBodyJointsFromProvider(MotionProvider* provider);
-    vector<BodyJointCommand::ptr> generateNextBodyProviderTransitions();
+    static std::vector<float> getBodyJointsFromProvider(MotionProvider* provider);
+    std::vector<BodyJointCommand::ptr> generateNextBodyProviderTransitions();
 
 #ifdef DEBUG_JOINTS_OUTPUT
     void initDebugLogs();
