@@ -24,6 +24,7 @@ namespace qtool {
 			bot_locs = new PaintBots(this);
 			overlayView = new OverlayedImage(fieldImage, bot_locs, this);
 			fieldView = new BMPImageViewer(fieldImage, this);
+			
 			this->setCentralWidget(fieldView);
 
 			drawButtons();

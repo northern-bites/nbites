@@ -1,4 +1,5 @@
 #include "BMPImageViewer.h"
+#include <QDebug>
 
 using namespace qtool::image;
 using namespace man::memory;
@@ -18,7 +19,7 @@ BMPImageViewer::~BMPImageViewer() {
 void BMPImageViewer::setupUI() {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(&imagePlaceholder);
-    layout->setAlignment(Qt::AlignTop);
+    //layout->setAlignment(Qt::AlignTop); //THIS LINE BREAKS MY FIELDVIEWER
     layout->setSpacing(0);
     this->setLayout(layout);
 }
