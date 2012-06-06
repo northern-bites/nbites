@@ -28,9 +28,9 @@ using namespace std;
 
 //#include "NaoEnactor.h"
 
-Motion::Motion (shared_ptr<MotionEnactor> _enactor,
-                shared_ptr<Sensors> s,
-                shared_ptr<NaoPose> _pose)
+Motion::Motion (boost::shared_ptr<MotionEnactor> _enactor,
+                boost::shared_ptr<Sensors> s,
+                boost::shared_ptr<NaoPose> _pose)
   : Thread("Motion"),
     switchboard(s, _pose),
     interface(&switchboard),

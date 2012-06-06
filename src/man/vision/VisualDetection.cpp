@@ -10,7 +10,7 @@ VisualDetection::VisualDetection(int _x, int _y, float _distance,
 VisualDetection::VisualDetection(const VisualDetection& other)
     : x(other.x), y(other.y), width(other.width), height(other.height),
       centerX(other.centerX), centerY(other.centerY), angleX(other.angleX),
-      angleY(other.angleY), focDist(other.focDist), distance(other.distance),
+      angleY(other.angleY), distance(other.distance),
       bearing(other.bearing), elevation(other.elevation),
       distanceSD(other.distanceSD), bearingSD(other.bearingSD) {}
 
