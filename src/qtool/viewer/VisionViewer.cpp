@@ -195,11 +195,11 @@ void VisionViewer::update(){
     // Will need to get these to be diffent thresholded images but vision
     // appears to only threhold one at the moment!
     bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>
-    (vision->thresh->thresholded),
-    AVERAGED_IMAGE_SIZE);
+                                            (vision->thresh->thresholded),
+                                            AVERAGED_IMAGE_SIZE);
     topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
-    (vision->thresh->thresholded),
-    AVERAGED_IMAGE_SIZE);
+                                         (vision->thresh->thresholded),
+                                         AVERAGED_IMAGE_SIZE);
 }
 
 void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {
