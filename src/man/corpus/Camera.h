@@ -95,7 +95,7 @@ public:
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
     static const int TOP_EXPOSURE = 40;
     static const int TOP_GAIN = 60;
-    static const int TOP_WHITE_BALANCE = -80;
+    static const int TOP_WHITE_BALANCE = -100;
 
     // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
@@ -110,7 +110,7 @@ public:
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
     static const int BOTTOM_EXPOSURE = 48;
     static const int BOTTOM_GAIN = 65;
-    static const int BOTTOM_WHITE_BALANCE = -60;
+    static const int BOTTOM_WHITE_BALANCE = -80;
 
     static const Type getOtherCameraType(Type type) {
         if (type == TOP) {
