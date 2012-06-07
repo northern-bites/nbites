@@ -33,20 +33,19 @@ class Packet:
          self.playerH,
          self.uncertX,
          self.uncertY,
-         #self.uncertH,
-         #self.ballX,
-         #self.ballY,
-         #self.ballUncertX,
-         #self.ballUncertY,
+         self.uncertH,
+         self.ballX,
+         self.ballY,
+         self.ballUncertX,
+         self.ballUncertY,
          self.ballDist,
          self.ballBearing,
          self.ballOn,
-         self.ballFramesOn,
-         #self.role,
-         #self.subRole,
-         self.chaseTime) = new_packet
-         #self.ballVelX,
-         #self.ballVelY) = new_packet
+         self.role,
+         self.subRole,
+         self.chaseTime,
+         self.ballVelX,
+         self.ballVelY) = new_packet
 
         self.teamNumber = int(self.teamNumber)
         self.playerNumber = int(self.playerNumber)
@@ -56,20 +55,19 @@ class Packet:
         self.playerH = float(self.playerH)
         self.uncertX = float(self.uncertX)
         self.uncertY = float(self.uncertY)
-        #self.uncertH = float(self.uncertH)
-        #self.ballX = float(self.ballX)
-        #self.ballY = float(self.ballY)
-        #self.ballUncertX = float(self.ballUncertX)
-        #self.ballUncertY = float(self.ballUncertY)
+        self.uncertH = float(self.uncertH)
+        self.ballX = float(self.ballX)
+        self.ballY = float(self.ballY)
+        self.ballUncertX = float(self.ballUncertX)
+        self.ballUncertY = float(self.ballUncertY)
         self.ballDist = float(self.ballDist)
         self.ballBearing = float(self.ballBearing)
-        self.ballOn = self.ballOn
-        self.ballFramesOn = self.ballFramesOn
-        #self.role = float(self.role)
-        #self.subRole = float(self.subRole)
+        self.ballOn = float(self.ballOn)
+        self.role = float(self.role)
+        self.subRole = float(self.subRole)
         self.chaseTime = float(self.chaseTime)
-        #self.ballVelX = float(self.ballVelX)
-        #self.ballVelY = float(self.ballVelY)
+        self.ballVelX = float(self.ballVelX)
+        self.ballVelY = float(self.ballVelY)
 
     def update(self,update_packet=[0]*NUM_PACKET_ELEMENTS):
         """
@@ -89,42 +87,32 @@ class Packet:
          self.playerH,
          self.uncertX,
          self.uncertY,
-         #self.uncertH,
-         #self.ballX,
-         #self.ballY,
-         #self.ballUncertX,
-         #self.ballUncertY,
+         self.uncertH,
+         self.ballX,
+         self.ballY,
+         self.ballUncertX,
+         self.ballUncertY,
          self.ballDist,
          self.ballBearing,
          self.ballOn,
-         self.ballFramesOn,
-         #self.role,
-         #self.subRole,
-         self.chaseTime) = update_packet
-         #self.ballVelX,
-         #self.ballVelY) = update_packet
+         self.role,
+         self.subRole,
+         self.chaseTime,
+         self.ballVelX,
+         self.ballVelY) = update_packet
 
     def __str__(self):
         """returns string with all important values"""
-        #return (("teamNumber: {0} playerNumber: {1} color: {2}\n" +
-        #         "role: {3} subRole: {4} chaseTime: {5}\n" +
-        #         "loc: ({6}, {7}, {8}) uncert: ({9}, {10}, {11})\n" +
-        #         "ball-loc: ({12}, {13}) uncert: ({14}, {15})\n" +
-        #         "dist: {16} bearing: {17} velocity: ({18}, {19})").format(
-        #        self.teamNumber, self.playerNumber, self.color,
-        #        self.role, self.subRole, self.chaseTime,
-        #        self.playerX, self.playerY, self.playerH,
-        #        self.uncertX, self.uncertY, self.uncertH,
-        #        self.ballX, self.ballY, self.ballUncertX, self.ballUncertY,
-        #        self.ballDist, self.ballBearing, self.ballVelX, self.ballVelY))
         return (("teamNumber: {0} playerNumber: {1} color: {2}\n" +
-                 "chaseTime: {3}\n" +
-                 "playerX: {4} playerY: {5} playerH: {6}" +
-                 "uncertX: {7} uncertY: {8}" +
-                 "dist: {9} bearing: {10} on: ({11}, {12})").format(
+                 "role: {3} subRole: {4} chaseTime: {5}\n" +
+                 "loc: ({6}, {7}, {8}) uncert: ({9}, {10}, {11})\n" +
+                 "ball-loc: ({12}, {13}) uncert: ({14}, {15})\n" +
+                 "dist: {16} bearing: {17} velocity: ({18}, {19})\n" +
+                 "ball is on: {20}").format(
                 self.teamNumber, self.playerNumber, self.color,
-                self.chaseTime,
+                self.role, self.subRole, self.chaseTime,
                 self.playerX, self.playerY, self.playerH,
-                self.uncertX, self.uncertY,
-                self.ballDist, self.ballBearing, self.ballOn,
-                self.ballFramesOn))
+                self.uncertX, self.uncertY, self.uncertH,
+                self.ballX, self.ballY, self.ballUncertX, self.ballUncertY,
+                self.ballDist, self.ballBearing, self.ballVelX,
+                self.ballVelY, self.ballOn))
