@@ -183,12 +183,20 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 }
 
 void VisionViewer::update(){
+
     //no useless computation
     if (!this->isVisible())
         return;
 
     imageTranscribe->acquireNewImage();
-    memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
+
+    // update the vision body angles
+    MImage::const_ptr mImage = memoryManager->getMemory()->getMImage(Camera::BOTTOM);
+    std::vector<float> body_angles(mImage->get()->vision_body_angles().begin(),
+                                   mImage->get()->vision_body_angles().end());
+
+    sensors->setVisionBodyAngles(body_angles);
+
     vision->notifyImage(sensors->getImage(Camera::BOTTOM));
     offlineMVision->updateData();
     // Will need to get these to be diffent thresholded images but vision

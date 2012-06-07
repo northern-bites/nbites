@@ -45,7 +45,7 @@ namespace corpus {
 
 using boost::shared_ptr;
 
-V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
+V4L2ImageTranscriber::V4L2ImageTranscriber(boost::shared_ptr<Sensors> s,
                                            Camera::Type which) :
     ImageTranscriber(s),
     settings(Camera::getSettings(which)),
@@ -137,7 +137,7 @@ void V4L2ImageTranscriber::initOpenI2CAdapter() {
 }
 
 void V4L2ImageTranscriber::initSelectCamera() {
-    unsigned char cmd[2] = { cameraType, 0 };
+    unsigned char cmd[2] = { (unsigned char) cameraType, 0 };
     i2c_smbus_write_block_data(cameraAdapterFd, 220, 1, cmd);
 }
 
