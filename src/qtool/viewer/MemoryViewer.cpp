@@ -65,27 +65,28 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
       this->setCentralWidget(central);
 
     memoryManager->connectSlotToMObject(bottomImageViewer,
-                        SLOT(updateView()), MBOTTOMIMAGE_ID);
+                        SLOT(updateView()), "MBottomImage");
 
     memoryManager->connectSlotToMObject(topImageViewer,
-                        SLOT(updateView()), MTOPIMAGE_ID);
+                        SLOT(updateView()), "MTopImage");
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
+    Memory::const_ptr memory = memoryManager->getMemory();
+
     std::vector<QTreeView> messageViewers;
-    for (MObject_ID id = FIRST_OBJECT_ID;
-            id != LAST_OBJECT_ID; id++) {
-        if (id != MTOPIMAGE_ID && id != MBOTTOMIMAGE_ID) {
-            QDockWidget* dockWidget =
-                    new QDockWidget(QString(MObject_names[id].c_str()), this);
-            MObjectViewer* view = new MObjectViewer(
-                    memoryManager->getMemory()->
-                    getMObject(id)->getProtoMessage());
+    for (Memory::const_iterator iterator = memory->begin(); iterator != memory->end(); iterator++) {
+
+        if (iterator->second != memory->get<MTopImage>() &&
+            iterator->second != memory->get<MBottomImage>()) {
+
+            QDockWidget* dockWidget = new QDockWidget(QString(iterator->first.c_str()), this);
+            MObjectViewer* view = new MObjectViewer(iterator->second->getProtoMessage());
             dockWidget->setWidget(view);
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-            memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
+            memoryManager->connectSlotToMObject(view, SLOT(updateView()), iterator->first);
         }
     }
 

@@ -50,13 +50,19 @@ public slots:
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
+
     image::ThresholdedImage* topVisionImage;
     image::ThresholdedImage* bottomVisionImage;
+    BMPImageViewer* topVisionView;
+    BMPImageViewer* bottomVisionView;
+
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;
     man::memory::MVision::ptr offlineMVision;
+    MObjectViewer* offlineVisionView;
+
     boost::shared_ptr<man::memory::proto::PImage> topRawImage;
     boost::shared_ptr<man::memory::proto::PImage> bottomRawImage;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;

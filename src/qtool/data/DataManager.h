@@ -56,8 +56,7 @@ public slots:
         }
     }
 
-    void newInputProvider(common::io::InProvider::ptr newInput,
-                          MObject_ID id);
+    void newInputProvider(common::io::InProvider::ptr newInput, std::string name);
     void newGroundTruthProvider(common::io::InProvider::ptr input);
     void reset();
 

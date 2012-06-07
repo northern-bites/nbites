@@ -107,7 +107,7 @@ public:
     //templated getters - generally pretty awesome
     template<class T>
     boost::shared_ptr<const T> get() const throw(NonExistentMemoryObjectError) {
-        return boost::dynamic_pointer_cast<T>(this->getByName(class_name<T>()));
+        return boost::dynamic_pointer_cast<const T>(this->getByName(class_name<T>()));
     }
 
     template<class T>

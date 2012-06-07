@@ -31,9 +31,8 @@ DataManager::~DataManager() {
     this->reset();
 }
 
-void DataManager::newInputProvider(InProvider::ptr newInput,
-                                   MObject_ID id) {
-    parsingBoard.newInputProvider(newInput, id);
+void DataManager::newInputProvider(InProvider::ptr newInput, std::string name) {
+    parsingBoard.newInputProvider(newInput, name);
 }
 
 void DataManager::newGroundTruthProvider(InProvider::ptr input) {
@@ -60,7 +59,7 @@ void DataManager::reset() {
 
 void DataManager::startRecordingToPath(string path) {
     is_recording = true;
-    log::OutputProviderFactory::AllFileOutput(&loggingBoard, path);
+    log::OutputProviderFactory::AllFileOutput(memory.get(), &loggingBoard, path);
 
     FileOutProvider::ptr file_out(new FileOutProvider(path + "/GroundTruth.log"));
     groundTruthLogger = new MessageLogger(file_out, groundTruth);

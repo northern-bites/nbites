@@ -106,20 +106,15 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     rawImages->setLayout(layout);
 
-    BMPImageViewer *bottomVisViewer = new BMPImageViewerListener(bottomVisionImage,
+    bottomVisionView = new BMPImageViewerListener(bottomVisionImage,
                                                        this);
-    connect(bottomVisViewer, SIGNAL(mouseClicked(int, int, int, bool)),
+    connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
-    BMPImageViewer *topVisViewer = new BMPImageViewer(topVisionImage,
+    topVisionView = new BMPImageViewer(topVisionImage,
                                                       this);
 
-    CollapsibleImageViewer* bottomVisCIV = new
-        CollapsibleImageViewer(bottomVisViewer,
-                               "Bottom",
-                               this);
-    CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisViewer,
-                                                                   "Top",
-                                                                   this);
+    CollapsibleImageViewer* bottomVisCIV = new CollapsibleImageViewer(bottomVisionView, "Bottom", this);
+    CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisionView, "Top", this);
 
     QWidget* visionImages = new QWidget(this);
 
@@ -134,49 +129,26 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     imageTabs->addTab(rawImages, tr("Raw Images"));
     imageTabs->addTab(visionImages, tr("Vision Images"));
 
-    memoryManager->connectSlotToMObject(this, SLOT(update()),
-                                        MBOTTOMIMAGE_ID);
-    memoryManager->connectSlotToMObject(this, SLOT(update()),
-                                        MTOPIMAGE_ID);
+    memoryManager->connectSlotToMObject(this, SLOT(update()), "MBottomImage");
+    memoryManager->connectSlotToMObject(this, SLOT(update()), "MTopImage");
 
     this->setCentralWidget(imageTabs);
-    memoryManager->connectSlotToMObject(bottomVisViewer,
-					SLOT(updateView()), MBOTTOMIMAGE_ID);
-    memoryManager->connectSlotToMObject(topVisViewer,
-					SLOT(updateView()), MTOPIMAGE_ID);
 
-    memoryManager->connectSlotToMObject(bottomImageViewer,
-					SLOT(updateView()), MBOTTOMIMAGE_ID);
-    memoryManager->connectSlotToMObject(topImageViewer,
-					SLOT(updateView()), MTOPIMAGE_ID);
+    memoryManager->connectSlotToMObject(bottomImageViewer, SLOT(updateView()), "MBottomImage");
+    memoryManager->connectSlotToMObject(topImageViewer, SLOT(updateView()), "MTopImage");
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-    std::vector<QTreeView> messageViewers; 
-    for (MObject_ID id = FIRST_OBJECT_ID;
-            id != LAST_OBJECT_ID; id++) {
-        if (id == MVISION_ID) {
-            QDockWidget* dockWidget = 
-                   new QDockWidget("Offline Vision", this);
-            MObjectViewer* view = new MObjectViewer(offlineMVision->getProtoMessage());
-	    dockWidget->setWidget(view);
-            this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-            memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
-	}
-        if (id != MTOPIMAGE_ID && id != MBOTTOMIMAGE_ID &&
-            id != MVISION_ID) {
-            QDockWidget* dockWidget =
-                    new QDockWidget(QString(MObject_names[id].c_str()), this);
-            MObjectViewer* view = new MObjectViewer(
-                    memoryManager->getMemory()->
-                    getMObject(id)->getProtoMessage());
-            dockWidget->setWidget(view);
-            this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-            memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
-        }
-    }
+    Memory::const_ptr memory = memoryManager->getMemory();
+
+    std::vector<QTreeView> messageViewers;
+
+    QDockWidget* dockWidget = new QDockWidget("Offline Vision", this);
+    offlineVisionView = new MObjectViewer(offlineMVision->getProtoMessage());
+	dockWidget->setWidget(offlineVisionView);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
     // Make sure one of the images is toggled off for small screens
     bottomCIV->toggle();
@@ -207,6 +179,10 @@ void VisionViewer::update(){
     topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
                                          (vision->thresh->thresholded),
                                          AVERAGED_IMAGE_SIZE);
+
+    offlineVisionView->updateView();
+    topVisionView->updateView();
+    bottomVisionView->updateView();
 }
 
 void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {

@@ -29,9 +29,10 @@ void OutputProviderFactory::AllFileOutput(const Memory* memory, LoggingBoard* lo
 void OutputProviderFactory::AllSocketOutput(const Memory* memory,
         LoggingBoard* loggingBoard) {
 
-    for (Memory::const_iterator it = memory->begin(), unsigned short i = 0; it != memory->end(); it++, i++) {
+    unsigned short i = 0;
+    for (Memory::const_iterator it = memory->begin(); it != memory->end(); it++, i++) {
         loggingBoard->newOutputProvider(OutProvider::ptr(new SocketOutProvider(
-                static_cast<unsigned short>(i + STREAMING_PORT_BASE)), it->first);
+                static_cast<unsigned short>(i + STREAMING_PORT_BASE))), it->first);
     }
 
 }
