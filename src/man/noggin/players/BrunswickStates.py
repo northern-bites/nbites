@@ -22,7 +22,7 @@ def gameInitial(player):
         # Locations are defined in the wiki.
         if player.brain.my.playerNumber == 1:
             player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
-                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDLELINE_Y,
+                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                         nogginConstants.HEADING_UP)
         elif player.brain.my.playerNumber == 2:
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,

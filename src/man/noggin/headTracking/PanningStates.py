@@ -97,7 +97,7 @@ def fullPanFixedPitch(tracker):
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    if tracker.brain.ball.vis.framesOn > TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.brain.ball.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()
