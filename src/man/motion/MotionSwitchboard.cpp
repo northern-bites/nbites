@@ -425,18 +425,26 @@ void MotionSwitchboard::clipHeadJoints(vector<float>& joints)
 
     else if (yaw < 1.57f)
     {
-        if (pitch > -0.2f)
-        {
-            pitch = -0.2f;
-        }
+        //if (pitch > -0.2f)
+        //{
+        //    pitch = -0.2f;
+        //}
+		if (pitch > 0.2f)
+		{
+			pitch = 0.2f;
+		}
     }
 
     else if (yaw >= 1.57f)
     {
-        if (pitch > -0.3f)
-        {
-            pitch = -0.3f;
-        }
+        //if (pitch > -0.3f)
+        //{
+        //    pitch = -0.3f;
+        //}
+		if (pitch > 0.2f)
+		{
+			pitch = 0.2f;
+		}
     }
 
     joints[HEAD_PITCH] = pitch;
