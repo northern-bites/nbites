@@ -116,8 +116,6 @@ class HeadTrackingHelper(object):
         newYaw = curYaw + safeChangeX
         # ignore newPitch: pitch is fixed
 
-        newYaw = MyMath.clip(newYaw, -80.0, 80.0) # CHECK THESE VALUES
-
         maxSpeed = 2.0
         headMove = motion.SetHeadCommand(newYaw, 20.0, # MAKE A CONSTANT FOR THIS
                                          maxSpeed, maxSpeed)
