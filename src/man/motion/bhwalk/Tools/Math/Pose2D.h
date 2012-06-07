@@ -82,12 +82,12 @@ public:
   /** get the cos of the angle
   * @return the cos of the angle
   */
-  inline float getCos() const {return cos(rotation);}
+  inline float getCos() const {return (float) cos(rotation);}
 
   /** get the sin of the angle
    * @return the sin of the angle
    */
-  inline float getSin() const {return sin(rotation);}
+  inline float getSin() const {return (float) sin(rotation);}
 
   /** Assignment operator
   *\param other The other Pose2D that is assigned to this one
@@ -112,8 +112,8 @@ public:
 
   Vector2<> operator*(const Vector2<>& point) const
   {
-    float s = sin(rotation);
-    float c = cos(rotation);
+    float s = (float) sin(rotation);
+    float c = (float) cos(rotation);
     return (Vector2<>(point.x * c - point.y * s , point.x * s + point.y * c) + translation);
   }
 
@@ -159,8 +159,8 @@ public:
   Pose2D minusDiff(const Pose2D& diff) const
   {
     float rot = rotation - diff.rotation;
-    float s = sin(rot);
-    float c = cos(rot);
+    float s = (float) sin(rot);
+    float c = (float) cos(rot);
     return Pose2D(
              rot,
              translation.x - c * diff.translation.x + s * diff.translation.y,

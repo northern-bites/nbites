@@ -27,12 +27,12 @@ using namespace man::memory::log;
 //                                     //
 /////////////////////////////////////////
 
-Man::Man (shared_ptr<Sensors> _sensors,
-          shared_ptr<Transcriber> _transcriber,
-          shared_ptr<ImageTranscriber> _imageTranscriber,
-          shared_ptr<MotionEnactor> _enactor,
-          shared_ptr<Lights> _lights,
-          shared_ptr<Speech> _speech)
+Man::Man (boost::shared_ptr<Sensors> _sensors,
+          boost::shared_ptr<Transcriber> _transcriber,
+          boost::shared_ptr<ImageTranscriber> _imageTranscriber,
+          boost::shared_ptr<MotionEnactor> _enactor,
+          boost::shared_ptr<Lights> _lights,
+          boost::shared_ptr<Speech> _speech)
     :     sensors(_sensors),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
@@ -50,13 +50,13 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
     imageTranscriber->setSubscriber(this);
 
-    guardian = shared_ptr<RoboGuardian>(new RoboGuardian(sensors));
+    guardian = boost::shared_ptr<RoboGuardian>(new RoboGuardian(sensors));
 
-    pose = shared_ptr<NaoPose> (new NaoPose(sensors));
+    pose = boost::shared_ptr<NaoPose> (new NaoPose(sensors));
 
     // initialize core processing modules
 #ifdef USE_MOTION
-    motion = shared_ptr<Motion> (new Motion(enactor, sensors, pose));
+    motion = boost::shared_ptr<Motion> (new Motion(enactor, sensors, pose));
     guardian->setMotionInterface(motion->getInterface());
 #endif
     // initialize python roboguardian module.
@@ -65,22 +65,22 @@ Man::Man (shared_ptr<Sensors> _sensors,
     set_lights_pointer(_lights);
     set_speech_pointer(_speech);
 
-    vision = shared_ptr<Vision> (new Vision(pose));
+    vision = boost::shared_ptr<Vision> (new Vision(pose));
 
     set_vision_pointer(vision);
 
-    comm = shared_ptr<Comm> (new Comm(sensors, vision));
+    comm = boost::shared_ptr<Comm> (new Comm(sensors, vision));
 
-    loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
+    loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);
 
 #ifdef USE_NOGGIN
-    noggin = shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
+    noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
                                             motion->getInterface()));
 #endif// USE_NOGGIN
 
-    memory = shared_ptr<Memory> (new Memory(vision, sensors, noggin->loc));
+    memory = boost::shared_ptr<Memory> (new Memory(vision, sensors, noggin->loc));
     loggingBoard->setMemory(memory);
 
 
