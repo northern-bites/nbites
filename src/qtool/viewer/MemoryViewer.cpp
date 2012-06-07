@@ -28,19 +28,23 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     BMPImageViewer* topImageViewer;
     BMPImageViewer* bottomImageViewer;
 
-    VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision(), 
+    VisualInfoImage* shapesBottom = new VisualInfoImage(memoryManager->getMemory()->getMVision(), 
 						  Camera::BOTTOM);
+    VisualInfoImage* shapesTop = new VisualInfoImage(memoryManager->getMemory()->getMVision(), 
+						  Camera::TOP);
 
-    OverlayedImage* combo = new OverlayedImage(rawBottomBMP,
-					       shapes, this);
+    OverlayedImage* comboBottom = new OverlayedImage(rawBottomBMP,
+					       shapesBottom, this);
+    OverlayedImage* comboTop = new OverlayedImage(rawTopBMP,
+					       shapesTop, this);
     
-    bottomImageViewer = new BMPImageViewer(combo, this);
+    bottomImageViewer = new BMPImageViewer(comboBottom, this);
     CollapsibleImageViewer * bottomCIV = new
       CollapsibleImageViewer(bottomImageViewer,
 			     QString("Bottom"),
 			     this);
     
-    topImageViewer = new BMPImageViewer(rawTopBMP, this);
+    topImageViewer = new BMPImageViewer(comboTop, this);
     CollapsibleImageViewer * topCIV = new
       CollapsibleImageViewer(topImageViewer,
 			     QString("Top"),

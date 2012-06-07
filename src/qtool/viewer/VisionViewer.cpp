@@ -202,12 +202,10 @@ void VisionViewer::update(){
     else
       sensors->setVisionBodyAngles(body_angles);
 
-    vision->notifyImage(sensors->getImage(Camera::BOTTOM));
+    vision->notifyImage(sensors->getImage(Camera::TOP), sensors->getImage(Camera::BOTTOM));
     offlineMVision->updateData();
-    // Will need to get these to be diffent thresholded images but vision
-    // appears to only threhold one at the moment!
     bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>
-                                            (vision->thresh->thresholded),
+                                            (vision->thresh->thresholdedBottom),
                                             AVERAGED_IMAGE_SIZE);
     topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
                                          (vision->thresh->thresholded),
