@@ -31,7 +31,7 @@
 namespace qtool {
 	namespace viewer {
 
-		class FieldViewer : public QWidget{ //: public QMainWindow{
+		class FieldViewer : public QWidget{
 			Q_OBJECT
 
 			public:
@@ -56,6 +56,8 @@ namespace qtool {
 			QVBoxLayout* buttonLayout;
 			QVBoxLayout* field;
 			QDockWidget* dockWidget;
+			QSpacerItem* fieldSpacer;
+			QSpacerItem* buttonSpacer;
 		};
 
 

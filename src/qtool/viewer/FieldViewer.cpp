@@ -28,8 +28,15 @@ namespace qtool {
 			overlayView = new OverlayedImage(fieldImage, bot_locs, this);
 			fieldView = new BMPImageViewer(fieldImage, this);
 
+			//spacers are for customized layout
+			fieldSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
+										  QSizePolicy::Expanding);
+			buttonSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
+										   QSizePolicy::Expanding);
+
 			field = new QVBoxLayout();
 			field->addWidget(fieldView);
+			field->addItem(fieldSpacer);
 
 			buttonLayout = new QVBoxLayout();
 			buttonLayout->setSpacing(10);
@@ -37,9 +44,7 @@ namespace qtool {
 			connect(startButton, SIGNAL(clicked()), this, SLOT(drawBots()));
 			buttonLayout->addWidget(stopButton);
 			connect(stopButton, SIGNAL(clicked()), this, SLOT(stopDrawing()));
-			QSpacerItem* spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
-												   QSizePolicy::Expanding);
-			buttonLayout->addItem(spacer);
+			buttonLayout->addItem(buttonSpacer);
 
 			//paint the field
 			mainLayout->addLayout(field);
@@ -53,11 +58,14 @@ namespace qtool {
 				keepDrawing = true;
 				while(keepDrawing){
 					delete field;
-					//delete fieldView;
-					//fieldView = new BMPImageViewer(overlayView, this);
-					fieldView->update();
+					delete fieldView;
+					fieldView = new BMPImageViewer(overlayView, this);
+					fieldView->getLayout()->setAlignment(Qt::Alignment());
 					field = new QVBoxLayout();
 					field->addWidget(fieldView);
+					fieldSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
+												  QSizePolicy::Expanding);
+					field->addItem(fieldSpacer);
 					mainLayout->insertLayout(0, field);
 					qApp->processEvents();
 				}

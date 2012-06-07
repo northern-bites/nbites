@@ -32,7 +32,8 @@ namespace qtool {
 
 				//to draw uncertainty, draw with pen, not brush
 				painter.setBrush(Qt::NoBrush);
-				painter.drawEllipse(QPoint(locs->getX(i), locs->getY(i)), locs->getXUncert(i), locs->getYUncert(i));
+				painter.drawEllipse(QPoint(locs->getX(i), locs->getY(i)),
+									locs->getXUncert(i), locs->getYUncert(i));
 			}
 		}
 
