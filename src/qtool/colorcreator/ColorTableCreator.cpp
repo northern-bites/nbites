@@ -46,16 +46,16 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     topImageViewer = new viewer::BMPImageViewerListener(topImage, this);
     QObject::connect(topImageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
                      this, SLOT(canvassClicked(int, int, int, bool)));
-    dataManager->connectSlotToMObject(topImageViewer, SLOT(updateView()), MTOPIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
+    dataManager->connectSlotToMObject(topImageViewer, SLOT(updateView()), "MTopImage");
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), "MTopImage");
 
     imageTabs->addTab(topImageViewer, "Top Image");
 
     bottomImageViewer = new viewer::BMPImageViewerListener(bottomImage, this);
     QObject::connect(bottomImageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
                      this, SLOT(canvassClicked(int, int, int, bool)));
-    dataManager->connectSlotToMObject(bottomImageViewer, SLOT(updateView()), MBOTTOMIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlotToMObject(bottomImageViewer, SLOT(updateView()), "MBottomImage");
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), "MBottomImage");
 
     imageTabs->addTab(bottomImageViewer, "Bottom Image");
 

@@ -44,7 +44,8 @@ protected:
      */
     MObject(MObject_ID id, data_ptr protoMessage) :
         NotifyingProtobufMessage(protoMessage, MObject_names[id], (int32_t) id),
-        my_id(id) {   }
+        my_id(id),
+        data(protoMessage) {   }
 
 public:
     virtual ~MObject(){}

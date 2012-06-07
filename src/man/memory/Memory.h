@@ -135,6 +135,8 @@ public:
         }
     }
 
+    int numObjects() const { return mobject_IDMap.size(); }
+
 private:
     MObject_IDMap mobject_IDMap;
     boost::shared_ptr<MVision> mVision;

@@ -157,7 +157,7 @@ Man::processFrame ()
     noggin->runStep();
 #endif
 
-    memory->getMutableMObject(MLOCALIZATION_ID)->update();
+    memory->get<MLocalization>()->update();
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();
     PROF_EXIT(P_LIGHTS);

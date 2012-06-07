@@ -12,9 +12,10 @@ namespace remote {
 
 using namespace common::io;
 using namespace man::memory;
+using namespace data;
 
-RemoteDataFinder::RemoteDataFinder(QWidget* parent) :
-    DataFinder(parent) {
+RemoteDataFinder::RemoteDataFinder(DataManager::ptr dataManager, QWidget* parent) :
+    DataFinder(parent), dataManager(dataManager) {
 
     QLayout* layout = new QHBoxLayout;
 
@@ -30,11 +31,19 @@ void RemoteDataFinder::robotSelected(const RemoteRobot* remoteRobot) {
 
     emit signalNewDataSet();
 
-    for (MObject_ID id = FIRST_OBJECT_ID; id != LAST_OBJECT_ID; id++) {
+    //TODO: this is a somewhat terrible way of negociating which and how many
+    //sockets to use, as the order of the object in the memory map can change
+    //an alternative is to actually use a protocol to negociate which object
+    //should go on which port
+
+    Memory::const_ptr memory = dataManager->getMemory();
+    unsigned short port_offset = 0;
+
+    for (Memory::const_iterator it = memory->begin(); it != memory->end(); it++, port_offset++) {
         InProvider::ptr socket_in = InProvider::ptr(new SocketInProvider(
                 remoteRobot->getAddress().toIPv4Address(),
-                STREAMING_PORT_BASE + static_cast<short>(id)));
-        emit signalNewInputProvider(socket_in, id);
+                STREAMING_PORT_BASE + port_offset));
+        emit signalNewInputProvider(socket_in, it->first);
     }
 }
 

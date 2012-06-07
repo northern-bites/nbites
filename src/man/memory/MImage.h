@@ -42,7 +42,6 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    PImage_ptr data;
     PImage_ptr thresholded_data;
     corpus::Camera::Type cameraType;
 };

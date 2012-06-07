@@ -27,20 +27,18 @@ OfflineDataFinder::OfflineDataFinder(QWidget* parent) :
 }
 
 OfflineDataFinder::~OfflineDataFinder() {
-    delete fsBrowser;
-    delete fsModel;
 }
 
 void OfflineDataFinder::setupFSModel() {
 
-    fsModel = new QFileSystemModel();
+    fsModel = new QFileSystemModel(this);
     fsModel->setRootPath(QDir::homePath());
     fsModel->setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 }
 
 void OfflineDataFinder::setupFSBrowser() {
 
-    fsBrowser = new QTreeView();
+    fsBrowser = new QTreeView(this);
     fsBrowser->setModel(fsModel);
     fsBrowser->setRootIndex(fsModel->index(QString(NBITES_DIR) + "/data/logs"));
     fsBrowser->expand(fsModel->index(QDir::currentPath()));
@@ -73,12 +71,9 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
         QFileInfo fileInfo = list.at(i);
         if (fileInfo.size() != 0) {
             std::string path = fileInfo.absoluteFilePath().toStdString();
-            for (int id = FIRST_OBJECT_ID; id < LAST_OBJECT_ID; id++) {
-                if (fileInfo.baseName() == QString(MObject_names[id].c_str())) {
-                    InProvider::ptr file_in(new FileInProvider(path));
-                    emit signalNewInputProvider(file_in, (MObject_ID)(id));
-                }
-            }
+            InProvider::ptr file_in(new FileInProvider(path));
+            emit signalNewInputProvider(file_in, fileInfo.baseName().toStdString());
+
             if (fileInfo.baseName() == "GroundTruth") {
                 InProvider::ptr file_in(new FileInProvider(path));
                 emit signalGroundTruth(file_in);
