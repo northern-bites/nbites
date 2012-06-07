@@ -237,9 +237,6 @@ class Brain(object):
         # Update objects
         self.updateObjects()
 
-        #Set LEDS
-        self.leds.processLeds()
-
         # Behavior stuff
         self.gameController.run()
         self.fallController.run()
@@ -247,6 +244,9 @@ class Brain(object):
         self.player.run()
         self.tracker.run()
         self.nav.run()
+
+        #Set LEDS
+        self.leds.processLeds()
 
         # Broadcast Report for Teammates
         self.setPacketData()

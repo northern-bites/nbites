@@ -1,7 +1,10 @@
 import _lights
 from playbook import PBConstants
+import noggin_constants as NogginConstants
 
 # LED Related #
+GC_LEDS = True
+FOOT_LEDS = True
 BALL_LEDS = True
 GOAL_LEDS = False
 PLAYBOOK_LEDS = False
@@ -95,17 +98,10 @@ class Leds():
     def __init__(self, brainPtr):
         self.lights = _lights.lights
         self.brain = brainPtr
-        self.flashing = False
-        self.flashOn = False
-        self.counter = 0
+        self.kickoffChange = True
+        self.teamChange = True
 
     def processLeds(self):
-        self.counter += 1
-
-        if self.flashing and self.counter % 5 == 0:
-            self.flashLeds()
-            return
-
         if BALL_LEDS:
             if self.brain.ball.vis.framesOn == 1:
                 self.executeLeds(BALL_ON_LEDS)
@@ -147,6 +143,41 @@ class Leds():
         if COMM_LEDS:
             pass
 
+        if GC_LEDS:
+            if self.brain.gameController.firstFrame():
+                gcState = self.brain.gameController.currentState
+                if (gcState == 'gameInitial' or
+                    gcState == 'penaltyShotsGameInitial'):
+                    self.executeLeds(STATE_INITIAL_LEDS)
+                elif (gcState == 'gameReady' or
+                      gcState == 'penaltyShotsGameReady'):
+                    self.executeLeds(STATE_READY_LEDS)
+                elif (gcState == 'gameSet' or
+                      gcState == 'penaltyShotsGameSet'):
+                    self.executeLeds(STATE_SET_LEDS)
+                elif (gcState == 'gamePlaying' or
+                      gcState == 'penaltyShotsGamePlaying'):
+                    self.executeLeds(STATE_PLAYING_LEDS)
+                elif (gcState == 'gamePenalized' or
+                      gcState == 'penaltyShotsGamePenalized'):
+                    self.executeLeds(STATE_PENALIZED_LEDS)
+                elif (gcState == 'gameFinished' or
+                      gcState == 'penaltyShotsGameFinished'):
+                    self.executeLeds(STATE_FINISHED_LEDS)
+
+
+        if FOOT_LEDS:
+            if self.kickoffChange:
+                if self.brain.gameController.ownKickOff:
+                    self.executeLeds(HAVE_KICKOFF_LEDS)
+                else:
+                    self.executeLeds(NO_KICKOFF_LEDS)
+            if self.teamChange:
+                if self.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                    self.executeLeds(TEAM_BLUE_LEDS)
+                else:
+                    self.executeLeds(TEAM_RED_LEDS)
+
     def executeLeds(self,listOfLeds):
 
         for ledTuple in listOfLeds:
@@ -158,20 +189,3 @@ class Leds():
             if ledTuple[2] != NOW:
                 print "Invalid timing command in Leds.py"
             self.lights.setRGB(ledName,ledHexValue)
-
-    def startFlashing(self):
-        self.flashing = True
-        self.flashOn = False
-        self.flashLeds()
-
-    def stopFlashing(self):
-        self.flashing = False
-        self.flashOn = False
-
-    def flashLeds(self):
-        if self.flashOn:
-            self.executeLeds(FLASH_OFF_LEDS)
-        else:
-            self.executeLeds(FLASH_ON_LEDS)
-
-        self.flashOn = not self.flashOn
