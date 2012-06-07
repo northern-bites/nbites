@@ -31,19 +31,19 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
     }
 #endif
 
-    mobject_IDMap.insert(MObject_IDPair(mVision->getID(), mVision));
-    mobject_IDMap.insert(MObject_IDPair(mVisionSensors->getID(), mVisionSensors));
-    mobject_IDMap.insert(MObject_IDPair(mMotionSensors->getID(), mMotionSensors));
-    mobject_IDMap.insert(MObject_IDPair(bottomMImage->getID(), bottomMImage));
-    mobject_IDMap.insert(MObject_IDPair(topMImage->getID(), topMImage));
-    mobject_IDMap.insert(MObject_IDPair(mLocalization->getID(), mLocalization));
+    mobject_IDMap.insert(MObject_IDPair(class_name<MVision>(), mVision));
+    mobject_IDMap.insert(MObject_IDPair(class_name<MVisionSensors>(), mVisionSensors));
+    mobject_IDMap.insert(MObject_IDPair(class_name<MMotionSensors>(), mMotionSensors));
+    mobject_IDMap.insert(MObject_IDPair(class_name<MTopImage>(), topMImage));
+    mobject_IDMap.insert(MObject_IDPair(class_name<MBottomImage>(), bottomMImage));
+    mobject_IDMap.insert(MObject_IDPair(class_name<MLocalization>(), mLocalization));
 }
 
 Memory::~Memory() {
     cout << "Memory destructor" << endl;
 }
 
-void Memory::update(boost::shared_ptr<MObject> obj) {
+void Memory::update(boost::shared_ptr<Object> obj) {
     obj->update();
 }
 
@@ -56,41 +56,6 @@ MImage::const_ptr Memory::getMImage(corpus::Camera::Type which) const
     if(which == corpus::Camera::BOTTOM)
         return bottomMImage;
     else return topMImage;
-}
-
-MObject::const_ptr Memory::getMObject(MObject_ID id) const {
-    MObject_IDMap::const_iterator it = mobject_IDMap.find(id);
-
-    if (it != mobject_IDMap.end()) {
-        return it->second;
-    } else {
-        return MObject::const_ptr();
-    }
-}
-
-MObject::ptr Memory::getMutableMObject(MObject_ID id) {
-    MObject_IDMap::iterator it = mobject_IDMap.find(id);
-
-    if (it != mobject_IDMap.end()) {
-        return it->second;
-    } else {
-        return MObject::ptr();
-    }
-}
-
-void Memory::subscribe(Subscriber* subscriber,
-                           MObject_ID objectToSubscribeTo) const {
-    MObject::const_ptr mobject = getMObject(objectToSubscribeTo);
-    if (mobject.get()) {
-        mobject->addSubscriber(subscriber);
-    } else {
-        cout << "Warning: trying to subscribe to non-existent memory object" << endl;
-    }
-}
-
-void Memory::unsubscribe(Subscriber* subscriber,
-                         MObject_ID objectToUnsuscribeFrom) const {
-    getMObject(objectToUnsuscribeFrom)->unsubscribe(subscriber);
 }
 
 }

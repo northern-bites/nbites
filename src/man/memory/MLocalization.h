@@ -16,16 +16,15 @@
 namespace man {
 namespace memory {
 
-class MLocalization: public MObject {
+class MLocalization: public MObject<proto::PLoc> {
 
 public:
     static const MObject_ID id = MLOCALIZATION_ID;
 
-    typedef boost::shared_ptr<proto::PLoc> PLoc_ptr;
 
 public:
     MLocalization(boost::shared_ptr<LocSystem> locSystem,
-                  PLoc_ptr = PLoc_ptr(new proto::PLoc));
+                  data_ptr = data_ptr(new proto::PLoc));
     virtual ~MLocalization();
 
     /**
@@ -36,7 +35,7 @@ public:
 
 private:
     boost::shared_ptr<LocSystem> locSystem;
-    PLoc_ptr data;
+
 };
 }
 }

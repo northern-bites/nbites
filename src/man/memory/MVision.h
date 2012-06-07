@@ -16,18 +16,16 @@
 
 namespace man {
 namespace memory {
-class MVision: public MObject {
+class MVision: public MObject<proto::PVision> {
 
     ADD_SHARED_PTR(MVision);
-
-    typedef boost::shared_ptr<proto::PVision> PVision_ptr;
 
 public:
     static const MObject_ID id = MVISION_ID;
 
 public:
     MVision(boost::shared_ptr<Vision> vision,
-            PVision_ptr data = PVision_ptr(new proto::PVision()));
+            data_ptr data = data_ptr(new proto::PVision()));
     virtual ~MVision();
 
     /**
@@ -35,8 +33,6 @@ public:
      * from the Vision object
      */
     void updateData();
-
-    boost::shared_ptr<const proto::PVision> get() const {return data; }
 
 private:
     //update helper methods
@@ -54,7 +50,6 @@ private:
 	    VisualCross* visualCross);
 private:
     boost::shared_ptr<Vision> vision;
-    PVision_ptr data;
 
 };
 }

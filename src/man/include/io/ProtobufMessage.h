@@ -24,7 +24,7 @@
 namespace common {
 namespace io {
 
-class ProtobufMessage: public common::io::MessageInterface {
+class ProtobufMessage: public MessageInterface {
 
 ADD_SHARED_PTR(ProtobufMessage)
 
@@ -110,12 +110,17 @@ protected:
 
 };
 
-class NotifyingProtobufMessage : public ProtobufMessage, public Notifier {
+/**
+ * Protobuf message with subscribing and notifying
+ */
+class NotifyingProtobufMessage : public ProtobufMessage, public Notifier, public Subscriber {
+
+    ADD_SHARED_PTR(NotifyingProtobufMessage)
 
 public:
-    NotifyingProtobufMessage(ProtoMessage_ptr protoMessage,
-            std::string name) :
-                ProtobufMessage(protoMessage, name) {
+    NotifyingProtobufMessage(ProtoMessage_ptr protoMessage, std::string name,
+                             int32_t id_tag = ProtobufMessage::DEFAULT_ID_TAG) :
+                ProtobufMessage(protoMessage, name, id_tag) {
     }
 
     virtual ~NotifyingProtobufMessage() {

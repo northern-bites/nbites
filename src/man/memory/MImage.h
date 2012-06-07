@@ -17,7 +17,7 @@
 namespace man {
 namespace memory {
 
-class MImage: public MObject {
+class MImage: public MObject<proto::PImage> {
 
 ADD_SHARED_PTR(MImage);
 
@@ -27,7 +27,7 @@ public:
 public:
     MImage(boost::shared_ptr<Sensors> sensors,
            corpus::Camera::Type type,
-           MObject_ID objectID = MTOPIMAGE_ID,
+           MObject_ID id,
            PImage_ptr data = PImage_ptr(new proto::PImage));
     virtual ~MImage();
     /**
@@ -36,7 +36,6 @@ public:
      */
     void updateData();
 
-    boost::shared_ptr<const proto::PImage> get() const { return data; }
     boost::shared_ptr<const proto::PImage> getThresholded() const {
         return thresholded_data;
     }

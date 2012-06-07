@@ -9,10 +9,9 @@ using std::list;
 using std::vector;
 using proto::PVision;
 
-MVision::MVision(shared_ptr<Vision> vision, PVision_ptr data) :
+MVision::MVision(shared_ptr<Vision> vision, data_ptr data) :
         MObject(id, data),
-        vision(vision),
-        data(data) {
+        vision(vision) {
 }
 
 MVision::~MVision() {

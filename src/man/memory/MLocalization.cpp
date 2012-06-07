@@ -16,8 +16,8 @@ using namespace proto;
 using namespace std;
 
 MLocalization::MLocalization(shared_ptr<LocSystem> locSystem,
-                             PLoc_ptr data) :
-        MObject(id, data), locSystem(locSystem), data(data) {
+                             data_ptr data) :
+        MObject(id, data), locSystem(locSystem) {
 }
 
 //Destructor

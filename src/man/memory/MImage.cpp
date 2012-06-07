@@ -17,16 +17,14 @@ using boost::shared_ptr;
 using namespace std;
 using proto::PImage;
 
-    MImage::MImage(shared_ptr<Sensors> sensors,
-                   corpus::Camera::Type type,
-                   MObject_ID objectID,
-                   PImage_ptr data) :
-        MObject(objectID, data),
+MImage::MImage(shared_ptr<Sensors> sensors,
+               corpus::Camera::Type type,
+               MObject_ID id,
+               data_ptr data) :
+        MObject(id, data),
         sensors(sensors),
-        data(data),
         thresholded_data(new PImage()),
-        cameraType(type)
-    {
+        cameraType(type) {
 
     //Note (Octavian): This is a pretty dumb way to get the image data
     // (ideally you would want to just copy the image - that saves any

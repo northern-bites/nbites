@@ -18,6 +18,16 @@
 namespace common {
 namespace io {
 
+/**
+ * A header that uniquely identifies the message
+ */
+struct MessageHeader {
+    char name[56];
+    int64_t birth_time;
+    char padding[64];
+    char more_padding[128]; //in case we need it for other stuff in the future
+};
+
 class MessageInterface {
 
     ADD_SHARED_PTR(MessageInterface)
@@ -35,6 +45,8 @@ public:
     virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size) = 0;
     virtual unsigned byteSize() const = 0;
 
+protected:
+    MessageHeader header;
 };
 
 }

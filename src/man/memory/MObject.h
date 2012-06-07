@@ -27,10 +27,13 @@
 namespace man {
 namespace memory {
 
-class MObject : public SpecializedNotifier<MObject_ID>, public Subscriber,
-                public common::io::ProtobufMessage {
+template <class ProtoType>
+class MObject : public common::io::NotifyingProtobufMessage {
 
-    ADD_SHARED_PTR(MObject)
+    ADD_SHARED_PTR(MObject);
+
+    typedef boost::shared_ptr<ProtoType> data_ptr;
+    typedef boost::shared_ptr<const ProtoType> data_const_ptr;
 
 protected:
     /*
@@ -39,8 +42,9 @@ protected:
      * MObject_ID associated with it)
      * protoMessage : the protocol message associated with this MObject
      */
-    MObject(MObject_ID id = UNKNOWN_OBJECT,
-            ProtoMessage_ptr protoMessage = ProtoMessage_ptr());
+    MObject(MObject_ID id, data_ptr protoMessage) :
+        NotifyingProtobufMessage(protoMessage, MObject_names[id], (int32_t) id),
+        my_id(id) {   }
 
 public:
     virtual ~MObject(){}
@@ -50,17 +54,15 @@ public:
      * the proto message fields with relevant values
      */
     virtual void updateData() = 0;
-    /**
-     * this gets called when the provider for this MObject is notifying us for
-     * new data
-     */
-    virtual void update();
-    virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size);
 
-    virtual MObject_ID getID() const {return my_id;}
+    data_const_ptr get() const { return data; }
+    data_ptr get() { return data; }
+
+    virtual MObject_ID getID() const { return my_id; }
 
 protected:
     MObject_ID my_id;
+    data_ptr data;
 
 };
 

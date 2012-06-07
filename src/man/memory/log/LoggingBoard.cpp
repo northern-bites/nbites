@@ -2,30 +2,38 @@
 #include "NaoPaths.h"
 
 #include <cstdio>
+#include <iostream>
 
 namespace man {
 namespace memory {
 namespace log {
 
 using boost::shared_ptr;
+using namespace common::io;
+using namespace std;
 
 LoggingBoard::LoggingBoard(Memory::const_ptr memory) :
     memory(memory), logging(true) {
 }
 
-void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider,
-									 MObject_ID id) {
+void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider, std::string name) {
 
-    MessageLogger::ptr logger(
-    			new MessageLogger(outProvider,  memory->getMObject(id)));
-    objectIOMap[id] = logger;
-    memory->subscribe(logger.get(), id);
-    //start the logging thread
-    logger->start();
+    try {
+        ProtobufMessage::const_ptr object = memory->getByName(name);
+        MessageLogger::ptr logger(new MessageLogger(outProvider, object));
+        objectIOMap[name] = logger;
+        memory->subscribe(logger.get(), name);
+        //start the logging thread
+        logger->start();
+
+    } catch (std::exception& e) {
+        cerr << e.what() << endl;
+        return ;
+    }
 }
 
-MessageLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
-    ObjectIOMap::const_iterator it = objectIOMap.find(id);
+MessageLogger::const_ptr LoggingBoard::getLogger(std::string name) const {
+    ObjectIOMap::const_iterator it = objectIOMap.find(name);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
@@ -35,8 +43,8 @@ MessageLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
     }
 }
 
-MessageLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
-    ObjectIOMap::iterator it = objectIOMap.find(id);
+MessageLogger::ptr LoggingBoard::getMutableLogger(std::string name) {
+    ObjectIOMap::iterator it = objectIOMap.find(name);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {

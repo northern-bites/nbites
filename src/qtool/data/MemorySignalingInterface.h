@@ -50,10 +50,8 @@ signals:
 class MemorySignalingInterface {
 
 protected:
-    typedef man::memory::MObject_ID MObject_ID;
-
-    typedef std::pair<MObject_ID, SubscriberEmiterConvertor*> ms_pair;
-    typedef std::map<MObject_ID, SubscriberEmiterConvertor*> ms_map;
+    typedef std::pair<std::string, SubscriberEmiterConvertor*> ms_pair;
+    typedef std::map<std::string, SubscriberEmiterConvertor*> ms_map;
 
 public:
     MemorySignalingInterface(man::memory::Memory::const_ptr memory) :
@@ -61,11 +59,10 @@ public:
 
         using namespace man::memory;
 
-        for (MObject_ID id = FIRST_OBJECT_ID;
-                        id != LAST_OBJECT_ID; id++) {
+        for (auto it = memory->begin(); it != memory->end(); it++) {
             SubscriberEmiterConvertor* convertor = new SubscriberEmiterConvertor;
-            memory->subscribe(convertor, id);
-            convertors.insert(ms_pair(id, convertor));
+            it->second->addSubscriber(convertor);
+            convertors.insert(ms_pair(it->first, convertor));
         }
     }
 
@@ -78,8 +75,8 @@ public:
     }
 
     void subscribeSlotToMObject(const QObject* subscriber,
-                   const char* slot, MObject_ID mobject_id ) const {
-        ms_map::const_iterator it = convertors.find(mobject_id);
+                   const char* slot, std::string name ) const {
+        ms_map::const_iterator it = convertors.find(name);
 
         if (it != convertors.end()) {
             QObject::connect(it->second, SIGNAL(subscriberUpdate()),

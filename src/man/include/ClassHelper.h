@@ -43,3 +43,21 @@ public:\
     static bool isTheNullInstance(class_name* instance) {\
         return instance == NullInstance();\
     }
+
+#include <typeinfo>
+#include <cxxabi.h>
+#include <string>
+
+//Class name - with name demangling
+//TODO: this might not be compatible with other compilers (or OSs)
+
+template<class T>
+std::string class_name() {
+    char name[512];
+    size_t size = sizeof(name);
+    int status;
+    abi::__cxa_demangle(typeid(T).name(), name, &size, &status);
+    assert(!status);
+    std::string sname(name);
+    return sname.substr(sname.find_last_of(':')+1);
+}

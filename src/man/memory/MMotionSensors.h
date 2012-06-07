@@ -16,19 +16,18 @@
 
 namespace man {
 namespace memory {
-class MMotionSensors: public MObject {
+class MMotionSensors: public MObject<proto::PMotionSensors> {
 
     ADD_SHARED_PTR(MMotionSensors);
-
-    typedef boost::shared_ptr<proto::PMotionSensors> PMotionSensors_ptr;
 
 public:
     static const MObject_ID id = MMOTION_SENSORS_ID;
 
 public:
     MMotionSensors(boost::shared_ptr<Sensors> sensors,
-                   PMotionSensors_ptr data = PMotionSensors_ptr(new proto::PMotionSensors));
+                   data_ptr data = data_ptr(new proto::PMotionSensors));
     virtual ~MMotionSensors();
+
     /**
      * Updates all the fields of the underlying proto::PSensors with values
      * from the Sensors object
@@ -37,7 +36,6 @@ public:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    PMotionSensors_ptr data;
 
 };
 }

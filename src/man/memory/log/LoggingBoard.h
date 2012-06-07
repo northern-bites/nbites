@@ -31,15 +31,15 @@ class LoggingBoard {
 
 protected:
 	typedef common::io::OutProvider OutProvider;
-	typedef std::pair<MObject_ID, MessageLogger::ptr > ObjectIOPair;
-	typedef std::map<MObject_ID, MessageLogger::ptr > ObjectIOMap;
+	typedef std::pair<std::string, MessageLogger::ptr > ObjectIOPair;
+	typedef std::map<std::string, MessageLogger::ptr > ObjectIOMap;
 
 public:
 	LoggingBoard(Memory::const_ptr memory = Memory::NullInstanceSharedPtr());
 	virtual ~LoggingBoard() {
 	}
 
-	void newOutputProvider(OutProvider::ptr outProvider, MObject_ID id);
+	void newOutputProvider(OutProvider::ptr outProvider, std::string name);
 
 	void startLogging();
 	void stopLogging();
@@ -53,9 +53,9 @@ public:
 
 protected:
 	//returns a NULL pointer if such a logger doesn't exist
-	MessageLogger::const_ptr getLogger(MObject_ID id) const;
+	MessageLogger::const_ptr getLogger(std::string name) const;
 	//returns a NULL pointer if such a logger doesn't exist
-	MessageLogger::ptr getMutableLogger(MObject_ID id);
+	MessageLogger::ptr getMutableLogger(std::string name);
 
 private:
 	Memory::const_ptr memory;
