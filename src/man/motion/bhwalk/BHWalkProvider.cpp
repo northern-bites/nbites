@@ -60,7 +60,7 @@ static const JointData::Joint nb_joint_order[] = {
         JointData::RElbowRoll
 };
 
-BHWalkProvider::BHWalkProvider(shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
+BHWalkProvider::BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
         MotionProvider(WALK_PROVIDER), requestedToStop(false),
         sensors(s) {
 }
