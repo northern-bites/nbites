@@ -10,7 +10,6 @@ extern "C" void _sobel_operator(const uint8_t thresh,
                                 uint16_t *out);
 extern "C" void _find_edge_peaks(const uint16_t *gradients,
                                  uint16_t *angles);
-using boost::shared_ptr;
 using namespace std;
 
 EdgeDetector::EdgeDetector(uint8_t thresh):
@@ -25,7 +24,7 @@ EdgeDetector::EdgeDetector(uint8_t thresh):
  * @param channel      The entire channel (one of Y, U, or V)
  */
 void EdgeDetector::detectEdges(const uint16_t* channel,
-                               shared_ptr<Gradient> gradient)
+                               boost::shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(P_EDGES);
     sobelOperator(channel, gradient);
@@ -45,7 +44,7 @@ void EdgeDetector::detectEdges(const uint16_t* channel,
  * @param gradient    Gradient struct to be populated.
  */
 void EdgeDetector::sobelOperator(const uint16_t* channel,
-                                 shared_ptr<Gradient> gradient)
+                                 boost::shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(P_SOBEL);
 #ifdef USE_MMX
@@ -119,7 +118,7 @@ void EdgeDetector::sobelOperator(const uint16_t* channel,
  *
  * @param gradient Gradient to check for points.
  */
-void EdgeDetector::findPeaks(shared_ptr<Gradient> gradient)
+void EdgeDetector::findPeaks(boost::shared_ptr<Gradient> gradient)
 {
     PROF_ENTER(P_EDGE_PEAKS);
 #ifdef USE_MMX

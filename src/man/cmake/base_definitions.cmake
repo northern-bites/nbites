@@ -38,7 +38,7 @@ endif()
 
 # Default (no release specific) build flags
 SET( CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings -fno-strict-aliasing -fPIC")
+  "${CMAKE_CXX_FLAGS} -m32 -Wall -Wconversion -Wno-unused -Wno-write-strings -fno-strict-aliasing -fPIC -std=c++0x")
 SET( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 # Release build flags

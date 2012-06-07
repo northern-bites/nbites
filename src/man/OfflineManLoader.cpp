@@ -13,28 +13,28 @@ using namespace std;
 using boost::shared_ptr;
 using namespace man::corpus;
 
-static shared_ptr<TMan> man_pointer;
+static boost::shared_ptr<TMan> man_pointer;
 
 START_FUNCTION_EXPORT
 
 void loadMan(OfflineManController::ptr offlineController) {
 
-    shared_ptr<Speech> speech(new Speech());
-    shared_ptr<Sensors> sensors(new Sensors(speech));
-    shared_ptr<Transcriber> transcriber(new OfflineTranscriber(sensors,
+    boost::shared_ptr<Speech> speech(new Speech());
+    boost::shared_ptr<Sensors> sensors(new Sensors(speech));
+    boost::shared_ptr<Transcriber> transcriber(new OfflineTranscriber(sensors,
     		offlineController->getFakeMemory()->getMVisionSensors(),
     		offlineController->getFakeMemory()->getMMotionSensors()));
-    shared_ptr<ThreadedImageTranscriber>
+    boost::shared_ptr<ThreadedImageTranscriber>
         imageTranscriber(new OfflineImageTranscriber(sensors,
                                        offlineController->getFakeMemory()->
                                                      getMImage(Camera::TOP),
                                        offlineController->getFakeMemory()->
                                                 getMImage(Camera::BOTTOM)));
-    shared_ptr<MotionEnactor>
+    boost::shared_ptr<MotionEnactor>
         enactor(new OfflineEnactor());
-    shared_ptr<Lights> lights(new Lights());
+    boost::shared_ptr<Lights> lights(new Lights());
 
-    man_pointer = shared_ptr<TMan>(new TMan(sensors, transcriber,
+    man_pointer = boost::shared_ptr<TMan>(new TMan(sensors, transcriber,
                                             imageTranscriber,
                                             enactor, lights, speech));
     offlineController->setImageTranscriber(imageTranscriber);

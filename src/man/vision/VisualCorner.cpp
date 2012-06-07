@@ -18,9 +18,9 @@ const float VisualCorner::MIN_EXTEND_DIST = 12.0f;
 VisualCorner::VisualCorner(const int _x, const int _y,
                            const float _distance,
                            const float _bearing,
-                           shared_ptr<VisualLine> l1, shared_ptr<VisualLine> l2,
+                           boost::shared_ptr<VisualLine> l1, boost::shared_ptr<VisualLine> l2,
                            const float _t1, const float _t2,
-                           shared_ptr<NaoPose> _pose)
+                           boost::shared_ptr<NaoPose> _pose)
     : VisualObject(CORNER_NO_IDEA_ID,_x, _y, _distance, _bearing),
       pose(_pose),
       possibleCorners(ConcreteCorner::concreteCorners().begin(),
@@ -414,7 +414,7 @@ void VisualCorner::identifyFromLines()
  *
  * @param line A line with only one possible ID
  */
-void VisualCorner::IDFromLine(const shared_ptr<VisualLine> line)
+void VisualCorner::IDFromLine(const boost::shared_ptr<VisualLine> line)
 {
     // We don't want to use an ambiguous line, or
     // change the ID an a corner that has already been identified

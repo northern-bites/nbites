@@ -243,9 +243,9 @@ void RoboGuardian::checkFalling(){
 
     /***** Determine if the robot is in the process of FALLING ****/
     //Using just the magnitude:
-    const float angleMag = std::sqrt(std::pow(inertial.angleX,2) +
+    const float angleMag = sqrtf(std::pow(inertial.angleX,2) +
                                      std::pow(inertial.angleY,2));
-    const float lastAngleMag = std::sqrt(std::pow(lastInertial.angleX,2) +
+    const float lastAngleMag = sqrtf(std::pow(lastInertial.angleX,2) +
                                          std::pow(lastInertial.angleY,2));
 
     const float angleSpeed = angleMag - lastAngleMag;
