@@ -263,10 +263,10 @@ private:
     void computeContants()
     {
       const float g = 9806.65f;;
-      walkK.x = sqrt(g / walkHeight.x);
-      walkK.y = sqrt(g / walkHeight.y);
-      kickK.x = sqrt(g / kickHeight.x);
-      kickK.y = sqrt(g / kickHeight.y);
+      walkK.x = sqrtf(g / walkHeight.x);
+      walkK.y = sqrtf(g / walkHeight.y);
+      kickK.x = sqrtf(g / kickHeight.x);
+      kickK.y = sqrtf(g / kickHeight.y);
       te = walkStepDuration * (0.001f * 0.25f);
       teAtFullSpeedX = walkStepDurationAtFullSpeedX * (0.001f * 0.25f);
       teAtFullSpeedY = walkStepDurationAtFullSpeedY * (0.001f * 0.25f);

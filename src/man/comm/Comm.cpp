@@ -411,7 +411,7 @@ PyMODINIT_FUNC init_comm (void)
 /**************************/
 
 // Constructor
-Comm::Comm (shared_ptr<Sensors> s, shared_ptr<Vision> v)
+Comm::Comm (boost::shared_ptr<Sensors> s, boost::shared_ptr<Vision> v)
     : Thread("Comm"), data(NUM_PACKET_DATA_ELEMENTS,0),
       lastPacketNumber(0),  latest(), sensors(s),
       timer(&monotonic_micro_time), gc(new GameController()),
@@ -1057,8 +1057,8 @@ std::string Comm::getRobotName()
     return name;
 }
 
-void Comm::setLocalizationAccess(shared_ptr<LocSystem> _loc,
-                                 shared_ptr<BallEKF> _ballEKF)
+void Comm::setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
+                                 boost::shared_ptr<BallEKF> _ballEKF)
 {
     tool.setLocalizationAccess(_loc, _ballEKF);
 }

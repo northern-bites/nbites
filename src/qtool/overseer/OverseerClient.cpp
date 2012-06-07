@@ -63,6 +63,18 @@ void OverseerClient::newGroundTruth() {
     if (delta_t != 0) {
         fps = 1 / delta_t;
     }
+
+//    float ball_x = groundTruth->get()->ball().x();
+//    float ball_y = groundTruth->get()->ball().y();
+//
+//    if (groundTruth->get()->robots_size() > 0) {
+//        auto robot_x = groundTruth->get()->robots(0).x();
+//        auto robot_y = groundTruth->get()->robots(0).y();
+//
+//        cout << "ball distance: "
+//             << NBMath::getHypotenuse(ball_x - robot_x, ball_y - robot_y) << endl;
+//    }
+
     fpsLabel->setNum(fps);
     last_timestamp = new_timestamp;
 }
