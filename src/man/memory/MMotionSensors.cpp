@@ -12,7 +12,7 @@ using namespace proto;
 using namespace std;
 
 MMotionSensors::MMotionSensors(shared_ptr<Sensors> sensors, data_ptr data)
-    : MObject(id, data), sensors(sensors) {
+    : MObject<PMotionSensors>(id, data), sensors(sensors) {
 
 }
 

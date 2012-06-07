@@ -21,7 +21,7 @@ MImage::MImage(shared_ptr<Sensors> sensors,
                corpus::Camera::Type type,
                MObject_ID id,
                data_ptr data) :
-        MObject(id, data),
+        MObject<PImage>(id, data),
         sensors(sensors),
         thresholded_data(new PImage()),
         cameraType(type) {

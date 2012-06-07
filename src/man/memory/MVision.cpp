@@ -10,7 +10,7 @@ using std::vector;
 using proto::PVision;
 
 MVision::MVision(shared_ptr<Vision> vision, data_ptr data) :
-        MObject(id, data),
+        MObject<PVision>(id, data),
         vision(vision) {
 }
 
