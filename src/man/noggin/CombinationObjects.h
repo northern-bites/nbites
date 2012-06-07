@@ -68,7 +68,7 @@ namespace noggin {
         virtual bool operator != (const Location& other) const;
         virtual RelLocation operator - (const Location& other) const;
 
-        static const float INFINITE_DISTANCE = 10000000.0f;
+        static constexpr float INFINITE_DISTANCE = 10000000.0f;
 
         //Getters
         virtual const float getX(){ return x; }
