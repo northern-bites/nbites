@@ -36,6 +36,11 @@ void RobotSelect::updateList() {
 }
 
 void RobotSelect::robotClicked(QListWidgetItem* item) {
+    if (item == currentSelection)
+        return ;
+
+    currentSelection = item;
+
     RobotListItem* clickedItem = dynamic_cast<RobotListItem*>(item);
     emit(robotSelected(clickedItem->getRemoteRobot()));
 }

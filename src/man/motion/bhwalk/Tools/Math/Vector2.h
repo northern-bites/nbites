@@ -242,8 +242,8 @@ public:
   Vector2<V>& rotate(float alpha)
   {
     float buffer = (float) x;
-    float a = cos(alpha);
-    float b = sin(alpha);
+    float a = (float) cos(alpha);
+    float b = (float) sin(alpha);
     x = (V)(a * (float)x - b * (float)y);
     y = (V)(b * buffer + a * (float)y);
     return *this;

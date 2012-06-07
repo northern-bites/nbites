@@ -44,8 +44,8 @@ using namespace NBMath;
 //#define DEBUG_COM_TRANSFORMS
 //#define DEBUG_DESTINATION
 
-StepGenerator::StepGenerator(shared_ptr<Sensors> s,
-                             shared_ptr<NaoPose> p,
+StepGenerator::StepGenerator(boost::shared_ptr<Sensors> s,
+                             boost::shared_ptr<NaoPose> p,
                              const MetaGait * _gait)
     : x(0.0f), y(0.0f), theta(0.0f),
       done(true),

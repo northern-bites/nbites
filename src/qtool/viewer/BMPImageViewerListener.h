@@ -18,7 +18,7 @@ class BMPImageViewerListener: public BMPImageViewer {
 
 public:
 
-    BMPImageViewerListener(image::BMPYUVImage* image,
+    BMPImageViewerListener(image::BMPImage* image,
             QWidget *parent = NULL);
     void mouseReleaseEvent ( QMouseEvent *event);
     // Scroll up or down to increase or decrease brush size

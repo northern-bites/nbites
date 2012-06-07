@@ -63,17 +63,16 @@
 #include "ColorParams.h"
 
 using namespace std;
-using boost::shared_ptr;
 #define PRINT_VISION_INFO
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
-Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
+Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr)
 {
     // Set up object recognition object pointers
     field = new Field(vision, this);
     context = new Context(vision, this, field);
-    yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+    yellow = boost::shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                              field, context,
                                                              YELLOW_BIT));
     navyblue = new Robots(vision, this, field, context, NAVY_BIT);
@@ -848,8 +847,6 @@ void Threshold::storeFieldObjects() {
     setVisualCrossInfo(vision->cross);
     setFramesOnAndOff(vision->cross);
 
-    vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
-    vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
 
@@ -940,17 +937,17 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             const int intBottomOfObjectX = static_cast<int>(bottomOfObjectX);
             const int intBottomOfObjectY = static_cast<int>(bottomOfObjectY);
 
-            float distwnew = pose->sizeBasedEstimate(intBottomOfObjectX,
+            float distwnew = pose->estimateFromObjectSize(intBottomOfObjectX,
                                                      intBottomOfObjectY,
                                                      0.0f,
                                                      width,
-                                                     GOAL_POST_CM_WIDTH*10).dist;
+                                                     GOAL_POST_CM_WIDTH * CM_TO_MM).dist;
 
-            float disthnew = pose->sizeBasedEstimate(intBottomOfObjectX,
+            float disthnew = pose->estimateFromObjectSize(intBottomOfObjectX,
                                                      intBottomOfObjectY,
                                                      0.0f,
                                                      height,
-                                                     GOAL_POST_CM_HEIGHT*10).dist;
+                                                     GOAL_POST_CM_HEIGHT * CM_TO_MM).dist;
 
 
             const float poseDist = pose->pixEstimate(
@@ -980,19 +977,16 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 			//cout << "What the heck!" << endl;
             return;
         }
-        // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
         // convert dist + angle estimates to body center
-        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
+        estimate obj_est = pose->estimateWithKnownDistance(objPtr->getCenterX(),
                                               objPtr->getCenterY(),
+                                              0.0f,
                                               objPtr->getDistance());
         objPtr->setDistanceWithSD(obj_est.dist);
         objPtr->setBearingWithSD(obj_est.bearing);
         objPtr->setElevation(obj_est.elevation);
     }
     else {
-        objPtr->setFocDist(0.0);
-
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1080,23 +1074,18 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 			   MAX_ELEVATION_RAD );
 
         // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
 		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
 											  objPtr->getCenterY(),
 											  265.0f);
-		// convert dist + angle estimates to body center
-		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-											  objPtr->getCenterY(),
-											  pose_est.dist);
-		objPtr->setDistanceWithSD(obj_est.dist);
-		objPtr->setBearingWithSD(obj_est.bearing);
-		objPtr->setElevation(obj_est.elevation);
+
+		objPtr->setDistanceWithSD(pose_est.dist);
+		objPtr->setBearingWithSD(pose_est.bearing);
+		objPtr->setElevation(pose_est.elevation);
 		// now that we have the robot information check if it might kick
 		if (vision->ball->getWidth() > 0) {
 			context->checkForKickDanger(objPtr);
 		}
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1127,9 +1116,7 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
         int crossY = objPtr->getCenterY();
         // convert dist + angle estimates to body center
         estimate obj_est = pose->pixEstimate(crossX, crossY, 0.0);
-        obj_est = pose->bodyEstimate(crossX, crossY, obj_est.dist);
         if (obj_est.dist > 1500.0f) { // pose problem which happens rarely
-            objPtr->setFocDist(0.0);
             objPtr->setDistanceWithSD(0.0);
             objPtr->setBearingWithSD(0.0);
             objPtr->setElevation(0.0);
@@ -1151,7 +1138,6 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 			objPtr->setID(ABSTRACT_CROSS);
         }
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);

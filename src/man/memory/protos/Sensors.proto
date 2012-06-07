@@ -76,4 +76,6 @@ message PImage {
 	optional bytes image = 2;
 	optional uint32 width = 3;
 	optional uint32 height = 4;
+	
+	repeated float vision_body_angles = 5;
 }

@@ -56,6 +56,14 @@ void MImage::updateData() {
     this->data->set_width(sensors->getRoboImage()->getWidth());
     this->data->set_height(sensors->getRoboImage()->getHeight());
 
+    //TODO: this is a hack so we get the vision body angles for pose
+    this->data->clear_vision_body_angles();
+    vector<float> bodyAngles = sensors->getVisionBodyAngles();
+    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end();
+            i++) {
+        this->data->add_vision_body_angles(*i);
+    }
+
     //debugging purposes
     #ifdef OFFLINE
     this->thresholded_data->mutable_image()->assign(
