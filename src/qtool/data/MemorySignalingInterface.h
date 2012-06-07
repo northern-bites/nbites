@@ -59,7 +59,7 @@ public:
 
         using namespace man::memory;
 
-        for (auto it = memory->begin(); it != memory->end(); it++) {
+        for (Memory::const_iterator it = memory->begin(); it != memory->end(); it++) {
             SubscriberEmiterConvertor* convertor = new SubscriberEmiterConvertor;
             it->second->addSubscriber(convertor);
             convertors.insert(ms_pair(it->first, convertor));

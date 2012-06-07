@@ -37,8 +37,8 @@ public:
     }
 
     void connectSlotToMObject(const QObject* subscriber,
-                const char* slot, man::memory::MObject_ID mobject_id ) const {
-        memorySignalingInterface.subscribeSlotToMObject(subscriber, slot, mobject_id);
+                const char* slot, std::string name) const {
+        memorySignalingInterface.subscribeSlotToMObject(subscriber, slot, name);
     }
 
 
