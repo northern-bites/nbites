@@ -282,25 +282,32 @@ STAND_UP_BACK = (((100,0,0,0),
                   0.4,1, stiff.STANDUP_STIFFNESSES),
                  #hips arch and arms underneath
 
-                 ((90,5,58,-86),
+                 ((75,5,58,-86),
                   (-9.49,24.70,-40.25,115.22,22.41,7.74),
                   (-9.49,-24.12,-40.19,115.22,22.47,-7.74),
-                  (90,-5,-58,86),
+                  (75,-5,-58,86),
                   .4,1, stiff.STANDUP_STIFFNESSES),
                  # hips sit and upper body comes up with hands under
+
+                 ((80, 5, 58, -86),
+                  (-9.49,24.70,-40.25,15.22,22.41,7.74),
+                  (-9.49,-24.12,-40.19,15.22,22.47,-7.74),
+                  (80,-5,-58,86),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
+                 #twists hands
 
                  ((90,5, 58, -86),
                   (-9.49,24.70,-40.25,115.22,22.41,7.74),
                   (-9.49,-24.12,-40.19,115.22,22.47,-7.74),
                   (90,-5,-58,86),
-                  0.2,1, stiff.STANDUP_STIFFNESSES),
+                  .2,1, stiff.STANDUP_STIFFNESSES),
                  # legs go down and upper body comes up
 
                  ((119,-11.08,94.13,-1.93),
                   (-62.93,9.06,-84.64,116.72,21.88,23.73),
                   (-62.93,-29.44,-82.62,103.71,30.85,-10.11),
                   (115.93,17.58,-90.62,3.34),
-                  10000000,1, stiff.STANDUP_STIFFNESSES),
+                  1000000,1, stiff.STANDUP_STIFFNESSES),
                  #sitting legs spread hands behind facing forward
 
                  ((40,60,4,-28),
