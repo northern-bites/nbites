@@ -34,7 +34,7 @@ namespace noggin {
 
         ///// COM HEADER /////
         static const char* PY_PACKET_HEADER = "ilikeyoulots";
-        static const int NUM_PACKET_ELEMENTS = 8;
+        static const int NUM_PACKET_ELEMENTS = 20;
 
         ///// WALK TIME CONSTANTS /////
         static const float TIME_STEP = 40.0;
