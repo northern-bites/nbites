@@ -11,8 +11,8 @@ using namespace Kinematics;
 using namespace NBMath;
 //#define DEBUG_SWITCHBOARD
 
-MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
-                                     shared_ptr<NaoPose> pose)
+MotionSwitchboard::MotionSwitchboard(boost::shared_ptr<Sensors> s,
+                                     boost::shared_ptr<NaoPose> pose)
     : sensors(s),
       walkProvider(sensors, pose),
       scriptedProvider(sensors),

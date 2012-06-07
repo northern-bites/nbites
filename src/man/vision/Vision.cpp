@@ -42,7 +42,7 @@ static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
 // Vision Class Constructor
-Vision::Vision(shared_ptr<NaoPose> _pose)
+Vision::Vision(boost::shared_ptr<NaoPose> _pose)
     : pose(_pose),
       yImg(&global_16_image[0]), linesDetector(),
       frameNumber(0), colorTable("table.mtb")
@@ -67,7 +67,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose)
 	fieldEdge = new VisualFieldEdge();
 
     thresh = new Threshold(this, pose);
-    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose));
+    fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
     thresh->setYUV(&global_16_image[0]);
 }
 
@@ -103,6 +103,18 @@ void Vision::notifyImage(const uint16_t* y) {
     notifyImage();
 }
 
+void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
+    yImg = y_top;
+    uvImg = y_top + AVERAGED_IMAGE_SIZE;
+    yImg_bot = y_bot;
+    uvImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
+
+    // Set the current image pointer in Threshold
+    thresh->setYUV(y_top);
+    thresh->setYUV_bot(y_bot);
+    notifyImage();
+}
+
 /* notifyImage() -- The Image Loop
  *
  * This is the most important loop, ever, really.  This is what the operating
@@ -127,9 +139,11 @@ void Vision::notifyImage() {
     if (frameNumber > 1000000) frameNumber = 0;
 
     // Transform joints into pose estimations and horizon line
-    PROF_ENTER(P_TRANSFORM);
-    pose->transform();
-    PROF_EXIT(P_TRANSFORM);
+    // PROF_ENTER(P_TRANSFORM);
+    // pose->transform();
+    // PROF_EXIT(P_TRANSFORM);
+    
+    //the above is commented to try cool shit
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
@@ -444,9 +458,9 @@ void Vision::drawDot(int x, int y, int c)
 void Vision::drawFieldLines()
 {
 #ifdef OFFLINE
-    const vector< shared_ptr<VisualLine> >* lines = fieldLines->getLines();
+    const vector< boost::shared_ptr<VisualLine> >* lines = fieldLines->getLines();
 
-    for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
+    for (vector< boost::shared_ptr<VisualLine> >::const_iterator i = lines->begin();
          i != lines->end(); i++) {
         drawLine(*i, BLUE);
 

@@ -38,8 +38,6 @@
 #include "MotionSwitchboard.h"
 #include "Transcriber.h"
 
-using namespace std;
-
 class ALEnactor : public ThreadedMotionEnactor {
 public:
     ALEnactor(boost::shared_ptr<Sensors> s,

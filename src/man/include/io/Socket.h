@@ -20,7 +20,6 @@
 #include <netdb.h>
 
 #include <iostream>
-using namespace std;
 
 namespace common {
 namespace io {

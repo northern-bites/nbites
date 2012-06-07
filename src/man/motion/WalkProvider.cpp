@@ -31,8 +31,8 @@ using namespace Kinematics;
 //#define DEBUG_WALKPROVIDER
 //#define DEBUG_ODOMETRY
 
-WalkProvider::WalkProvider(shared_ptr<Sensors> s,
-                           shared_ptr<NaoPose> _pose)
+WalkProvider::WalkProvider(boost::shared_ptr<Sensors> s,
+                           boost::shared_ptr<NaoPose> _pose)
     : MotionProvider(WALK_PROVIDER),
       sensors(s),
       pose(_pose),

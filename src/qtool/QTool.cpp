@@ -1,6 +1,4 @@
 #include "QTool.h"
-#include <iostream>
-#include <QFileDialog>
 
 namespace qtool {
 
@@ -16,6 +14,7 @@ using offline::OfflineViewer;
 using overseer::OverseerClient;
   //using viewer::GraphViewer;
 
+<<<<<<< HEAD
 QTool::QTool() : QMainWindow(),
         toolTabs(new QTabWidget()),
         dataManager(new DataManager()),
@@ -50,6 +49,19 @@ QTool::QTool() : QMainWindow(),
 
     this->setCentralWidget(toolTabs);
 
+=======
+QTool::QTool() : EmptyQTool("QTOOL"),
+                 dataLoader(new DataLoader(dataManager)),
+                 colorCalibrate(new ColorCalibrate(dataManager)),
+                 colorTableCreator(new ColorTableCreator(dataManager)),
+                 memoryViewer(new MemoryViewer(dataManager)),
+                 visionViewer(new VisionViewer(dataManager)),
+                 offlineViewer(new OfflineViewer(dataManager->getMemory())),
+                 ballEKFViewer(new BallEKFViewer(dataManager)),
+                 fieldViewer(new FieldViewer(dataManager)),
+                 overseerClient(new OverseerClient(dataManager, this))
+{
+>>>>>>> bmende/twoPics
     toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
     toolTabs->addTab(colorTableCreator, tr("Color Table Creator"));
     toolTabs->addTab(dataLoader, tr("Data Loader"));
@@ -63,28 +75,6 @@ QTool::QTool() : QMainWindow(),
 }
 
 QTool::~QTool() {
-}
-
-void QTool::next() {
-    dataManager->getNext();
-}
-
-void QTool::prev() {
-    dataManager->getPrev();
-}
-
-void QTool::record() {
-    if (dataManager->isRecording()) {
-        dataManager->stopRecording();
-        recordButton->setText("Rec");
-    } else {
-        QString path = QFileDialog::getExistingDirectory(this, "Choose folder",
-                QString(NBITES_DIR) + "/data/logs");
-        if (!path.isEmpty()) {
-            dataManager->startRecordingToPath(path.toStdString());
-            recordButton->setText("Stop");
-        }
-    }
 }
 
 }

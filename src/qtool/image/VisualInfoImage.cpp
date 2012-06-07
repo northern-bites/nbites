@@ -7,14 +7,16 @@ namespace image {
     using namespace man::memory::proto;
     using namespace man::memory;
     using namespace google::protobuf;
+  using namespace man::corpus;
 
-    VisualInfoImage::VisualInfoImage(MVision::const_ptr visionData) :
+  VisualInfoImage::VisualInfoImage(MVision::const_ptr visionData, Camera::Type _camera) :
 	visionData(visionData)
 
 {
         int image_width = 640;
         int image_height = 480;
         bitmap= QPixmap(image_width, image_height);
+	camera = _camera;
 }
 
 void VisualInfoImage::buildBitmap() {
@@ -93,14 +95,26 @@ void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
 //    painter.setBackgroundMode(Qt::TransparentMode);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    int ball_x = 2*ballData.visual_detection().x();
-    int ball_y = 2*ballData.visual_detection().y();
-    int ball_radius = 2*ballData.radius();
+    if (ballData.visual_detection().intopcam() && camera == Camera::TOP) {
 
-    painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
-    painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
-    painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
-  }
+      int ball_x = 2*ballData.visual_detection().x();
+      int ball_y = 2*ballData.visual_detection().y();
+      int ball_radius = 2*ballData.radius();
+
+      painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+      painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
+      painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
+    }
+    else if (!ballData.visual_detection().intopcam() && camera == Camera::BOTTOM) {
+      int ball_x = 2*ballData.visual_detection().x();
+      int ball_y = 2*ballData.visual_detection().y();
+      int ball_radius = 2*ballData.radius();
+
+      painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+      painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
+      painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
+    }
+}
 
 void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     QPainter painter(&bitmap);

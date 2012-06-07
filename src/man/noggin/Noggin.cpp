@@ -40,9 +40,9 @@ fstream outputFile;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
-Noggin::Noggin (shared_ptr<Vision> v,
-                shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
-                shared_ptr<Sensors> _sensors, shared_ptr<LoggingBoard> loggingBoard,
+Noggin::Noggin (boost::shared_ptr<Vision> v,
+                boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
+                boost::shared_ptr<Sensors> _sensors, boost::shared_ptr<LoggingBoard> loggingBoard,
                 MotionInterface * _minterface
                 )
     : vision(v),
@@ -136,7 +136,7 @@ void Noggin::initializeLocalization()
 
     loc = shared_ptr<LocSystem>(new PF::ParticleFilter(locMotionSystem, locVisionSystem));
 
-    ballEKF = shared_ptr<BallEKF>(new BallEKF());
+    ballEKF = boost::shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers
     set_loc_reference(loc);
