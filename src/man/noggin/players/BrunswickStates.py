@@ -1,6 +1,6 @@
 from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_KICKOFF)
 import man.motion.SweetMoves as SweetMoves
-from ../ import noggin_constants as Constants
+import noggin_constants as nogginConstants
 
 ###
 # Reimplementation of Game Controller States for pBrunswick
@@ -72,10 +72,10 @@ def gameReady(player):
     elif player.lastDiffState == 'gamePenalized':
         player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    90,
+                                    nogginConstants.HEADING_UP,
                                     nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    -90)
+                                    nogginConstants.HEADING_DOWN)
         # Do we still want to do this? Seems to be just a hack for loc. Summer 2012
         #return player.goLater('afterPenalty')
 
@@ -115,7 +115,7 @@ def gameSet(player):
     if player.brain.play.isRole(GOALIE):
         player.brain.loc.resetLocTo(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
                                     nogginConstants.MIDFIELD_Y,
-                                    0)
+                                    nogginConstants.HEADING_RIGHT)
 
     return player.stay()
 
@@ -131,10 +131,10 @@ def gamePlaying(player):
                 # possible 0 sec. penalties for the goalie
                 player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                             nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                            90,
+                                            nogginConstants.HEADING_UP,
                                             nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                             nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                            -90)
+                                            nogginConstants.HEADING_DOWN)
                 # Do we still want to do this? Seems to be just a hack for loc.
                 #   Summer 2012
                 #return player.goLater('afterPenalty')

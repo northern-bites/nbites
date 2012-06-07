@@ -310,8 +310,8 @@ class Brain(object):
                           self.ball.vis.bearing,
                           self.ball.vis.on,
                           self.ball.vis.framesOn,
-                          #self.play.role,
-                          #self.play.subRole,
+                          self.play.role,
+                          self.play.subRole,
                           self.teamMembers[self.my.playerNumber-1].chaseTime)
                           #loc.ballVelX,
                           #loc.ballVelY)
