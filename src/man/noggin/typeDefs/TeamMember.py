@@ -41,6 +41,7 @@ class TeamMember(RobotLocation):
         self.ballBearing = 0
         self.ballX = 0
         self.ballY = 0
+        self.ballOn = False
         self.role = None
         self.subRole = None
         self.chaseTime = 0
@@ -68,6 +69,7 @@ class TeamMember(RobotLocation):
         self.ballBearing = packet.ballBearing
         self.ballX = packet.ballX
         self.ballY = packet.ballY
+        self.ballOn = packet.ballOn
         self.role = packet.role
         self.subRole = packet.subRole
         self.chaseTime = packet.chaseTime
@@ -105,6 +107,7 @@ class TeamMember(RobotLocation):
         self.ballBearing = ball.vis.bearing
         self.ballX = ball.loc.x
         self.ballY = ball.loc.y
+        self.ballOn = ball.vis.on
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
