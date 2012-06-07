@@ -84,7 +84,7 @@ private:
     std::vector<float> getCurrentHeads();
     void setNextHeadCommand();
 
-    static const float SPEED_CLIP_FACTOR = 0.1f;
+    static constexpr float SPEED_CLIP_FACTOR = 0.1f;
 };
 
 #endif

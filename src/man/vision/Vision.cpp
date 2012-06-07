@@ -42,7 +42,7 @@ static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
 // Vision Class Constructor
-Vision::Vision(shared_ptr<NaoPose> _pose)
+Vision::Vision(boost::shared_ptr<NaoPose> _pose)
     : pose(_pose),
       yImg(&global_16_image[0]), linesDetector(),
       frameNumber(0), colorTable("table.mtb")
@@ -67,7 +67,7 @@ Vision::Vision(shared_ptr<NaoPose> _pose)
 	fieldEdge = new VisualFieldEdge();
 
     thresh = new Threshold(this, pose);
-    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose));
+    fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
     thresh->setYUV(&global_16_image[0]);
 }
 
@@ -458,9 +458,9 @@ void Vision::drawDot(int x, int y, int c)
 void Vision::drawFieldLines()
 {
 #ifdef OFFLINE
-    const vector< shared_ptr<VisualLine> >* lines = fieldLines->getLines();
+    const vector< boost::shared_ptr<VisualLine> >* lines = fieldLines->getLines();
 
-    for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
+    for (vector< boost::shared_ptr<VisualLine> >::const_iterator i = lines->begin();
          i != lines->end(); i++) {
         drawLine(*i, BLUE);
 

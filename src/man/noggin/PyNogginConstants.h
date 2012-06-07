@@ -138,23 +138,23 @@ namespace noggin {
         };
 
         static const int LANDMARK_MY_GOAL_LEFT_POST[3] =
-        {LANDMARK_MY_GOAL_LEFT_POST_X,
-         LANDMARK_MY_GOAL_LEFT_POST_Y,
+        {(int) LANDMARK_MY_GOAL_LEFT_POST_X,
+         (int) LANDMARK_MY_GOAL_LEFT_POST_Y,
          LANDMARK_MY_GOAL_LEFT_POST_ID};
 
         static const int LANDMARK_MY_GOAL_RIGHT_POST[3] =
-        {LANDMARK_MY_GOAL_RIGHT_POST_X,
-         LANDMARK_MY_GOAL_RIGHT_POST_Y,
+        {(int) LANDMARK_MY_GOAL_RIGHT_POST_X,
+         (int) LANDMARK_MY_GOAL_RIGHT_POST_Y,
          LANDMARK_MY_GOAL_RIGHT_POST_ID};
 
         static const int LANDMARK_OPP_GOAL_LEFT_POST[3] =
-        {LANDMARK_OPP_GOAL_LEFT_POST_X,
-         LANDMARK_OPP_GOAL_LEFT_POST_Y,
+        {(int) LANDMARK_OPP_GOAL_LEFT_POST_X,
+         (int) LANDMARK_OPP_GOAL_LEFT_POST_Y,
          LANDMARK_OPP_GOAL_LEFT_POST_ID};
 
         static const int LANDMARK_OPP_GOAL_RIGHT_POST[3] =
-        {LANDMARK_OPP_GOAL_RIGHT_POST_X,
-         LANDMARK_OPP_GOAL_RIGHT_POST_Y,
+        {(int) LANDMARK_OPP_GOAL_RIGHT_POST_X,
+         (int) LANDMARK_OPP_GOAL_RIGHT_POST_Y,
          LANDMARK_OPP_GOAL_RIGHT_POST_ID};
 
         static const int NUM_VIS_LANDMARKS = 6;
@@ -171,12 +171,12 @@ namespace noggin {
 
 
         static const int LANDMARK_OPP_FIELD_CROSS[2] =
-        {FIELD_WHITE_LEFT_SIDELINE_X + LINE_CROSS_OFFSET,
-         MIDFIELD_Y};
+        {(int) (FIELD_WHITE_LEFT_SIDELINE_X + LINE_CROSS_OFFSET),
+         (int) MIDFIELD_Y};
 
         static const int LANDMARK_MY_FIELD_CROSS[2] =
-        {FIELD_WHITE_RIGHT_SIDELINE_X - LINE_CROSS_OFFSET,
-         MIDFIELD_Y};
+        {(int) (FIELD_WHITE_RIGHT_SIDELINE_X - LINE_CROSS_OFFSET),
+         (int) MIDFIELD_Y};
 
         static const int NUM_LOC_SCORES = 3;
 

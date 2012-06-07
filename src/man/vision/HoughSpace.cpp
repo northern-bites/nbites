@@ -17,7 +17,7 @@ HoughSpace::HoughSpace() :
  * The main public interface for the HoughSpace class.
  * Finds all the lines in the image using the Hough Transform.
  */
-list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
+list<HoughLine> HoughSpace::findLines(boost::shared_ptr<Gradient> g)
 {
     PROF_ENTER(P_HOUGH);
     reset();
@@ -38,7 +38,7 @@ list<HoughLine> HoughSpace::findLines(shared_ptr<Gradient> g)
  * Pass through the given Gradient and mark all potential edges
  * in the accumulator.
  */
-void HoughSpace::markEdges(shared_ptr<Gradient> g)
+void HoughSpace::markEdges(boost::shared_ptr<Gradient> g)
 {
     PROF_ENTER(P_MARK_EDGES);
     const int height = Gradient::rows;

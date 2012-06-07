@@ -25,7 +25,7 @@ using namespace std;
 using namespace boost;
 using namespace Kinematics;
 
-ChopShop::ChopShop (shared_ptr<Sensors> s)
+ChopShop::ChopShop (boost::shared_ptr<Sensors> s)
     : sensors(s)
 {
 
