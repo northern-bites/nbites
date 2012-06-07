@@ -195,7 +195,10 @@ void VisionViewer::update(){
     std::vector<float> body_angles(mImage->get()->vision_body_angles().begin(),
                                    mImage->get()->vision_body_angles().end());
 
-    sensors->setVisionBodyAngles(body_angles);
+    if (body_angles.empty())
+      sensors->updateVisionAngles();
+    else
+      sensors->setVisionBodyAngles(body_angles);
 
     vision->notifyImage(sensors->getImage(Camera::BOTTOM));
     offlineMVision->updateData();
