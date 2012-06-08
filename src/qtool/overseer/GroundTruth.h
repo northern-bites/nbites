@@ -11,31 +11,28 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "io/ProtobufMessage.h"
 #include "Structs.h"
-#include "data/QProtobufMessage.h"
 #include "GroundTruth.pb.h"
 #include "ClassHelper.h"
 
 namespace qtool {
 namespace overseer {
 
-class GroundTruth : public data::QProtobufMessage {
+class GroundTruth : public common::io::TemplatedProtobufMessage<proto::GroundTruth> {
 
     ADD_SHARED_PTR(GroundTruth)
 
 public:
-    typedef boost::shared_ptr<const proto::GroundTruth> ProtoGroundTruth_const_ptr;
-    typedef boost::shared_ptr<proto::GroundTruth> ProtoGroundTruth_ptr;
     typedef std::vector<point<float> > fpoint_vector;
 
 public:
-    GroundTruth(ProtoGroundTruth_ptr data = ProtoGroundTruth_ptr(new proto::GroundTruth))
-        : QProtobufMessage(data, "GroundTruth"), data(data) {}
+    GroundTruth()
+        : TemplatedProtobufMessage<proto::GroundTruth>(class_name<GroundTruth>()) {}
 
     GroundTruth(point<float>* ballPosition,
-                fpoint_vector* robotPositions,
-                ProtoGroundTruth_ptr data = ProtoGroundTruth_ptr(new proto::GroundTruth))
-        : QProtobufMessage(data, "GroundTruth"), data(data),
+                fpoint_vector* robotPositions)
+        : TemplatedProtobufMessage<proto::GroundTruth>(class_name<GroundTruth>()),
           ballPosition(ballPosition), robotPositions(robotPositions) {}
 
     virtual ~GroundTruth() {}
@@ -56,12 +53,7 @@ public:
         }
     }
 
-    virtual ProtoGroundTruth_const_ptr get() const {
-        return data;
-    }
-
 protected:
-    ProtoGroundTruth_ptr data;
     point<float>* ballPosition;
     fpoint_vector* robotPositions;
 

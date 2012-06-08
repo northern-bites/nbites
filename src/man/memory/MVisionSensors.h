@@ -7,23 +7,19 @@
 #pragma once
 
 #include "protos/Sensors.pb.h"
-#include "MObject.h"
+#include "MemoryCommon.h"
 #include "Sensors.h"
 #include "ClassHelper.h"
 
 namespace man {
 namespace memory {
 
-class MVisionSensors: public MObject<proto::PVisionSensors> {
+class MVisionSensors: public TemplatedProtobufMessage<proto::PVisionSensors> {
 
 ADD_SHARED_PTR(MVisionSensors);
 
 public:
-    static const MObject_ID id = MVISION_SENSORS_ID;
-
-public:
-    MVisionSensors(boost::shared_ptr<Sensors> sensors,
-                   data_ptr data = data_ptr(new proto::PVisionSensors));
+    MVisionSensors(std::string name, boost::shared_ptr<Sensors> sensors);
     virtual ~MVisionSensors();
 
     /**

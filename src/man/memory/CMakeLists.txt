@@ -46,7 +46,6 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 # Add here source files needed to compile this project
 
 set( MEMORY_SRCS Memory
-                 MObject
                  MVision
                  MVisionSensors
                  MMotionSensors

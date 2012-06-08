@@ -1,6 +1,7 @@
 
 #include "VisionViewer.h"
 #include "Camera.h"
+#include "ClassHelper.h"
 #include <vector>
 
 namespace qtool {
@@ -23,7 +24,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
     vision = shared_ptr<Vision> (new Vision(pose));
-    offlineMVision = shared_ptr<MVision> (new MVision(vision));
+    offlineMVision = shared_ptr<MVision> (new MVision(class_name<MVision>(), vision));
 
     imageTranscribe = OfflineImageTranscriber::ptr
         (new OfflineImageTranscriber(sensors,
@@ -129,13 +130,13 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     imageTabs->addTab(rawImages, tr("Raw Images"));
     imageTabs->addTab(visionImages, tr("Vision Images"));
 
-    memoryManager->connectSlotToMObject(this, SLOT(update()), "MBottomImage");
-    memoryManager->connectSlotToMObject(this, SLOT(update()), "MTopImage");
+    memoryManager->connectSlot(this, SLOT(update()), "MBottomImage");
+    memoryManager->connectSlot(this, SLOT(update()), "MTopImage");
 
     this->setCentralWidget(imageTabs);
 
-    memoryManager->connectSlotToMObject(bottomImageViewer, SLOT(updateView()), "MBottomImage");
-    memoryManager->connectSlotToMObject(topImageViewer, SLOT(updateView()), "MTopImage");
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MBottomImage");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MTopImage");
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);

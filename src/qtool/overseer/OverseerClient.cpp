@@ -23,8 +23,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
         groundTruth(dataManager->getGroundTruth()),
         connectButton(new QPushButton("Connect", this)){
 
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-                this, SLOT(newGroundTruth()));
+    dataManager->connectSlot(this, SLOT(newGroundTruth()), "GroundTruth");
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
 
@@ -33,7 +32,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     PaintGroundTruth* groundImage = new PaintGroundTruth(groundTruth, this);
     OverlayedImage* combinedImage = new OverlayedImage(fieldImage, groundImage, this);
     viewer::BMPImageViewer* fieldView = new BMPImageViewer(combinedImage, this);
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
+    connect(dataManager.get(), SIGNAL(dataUpdated()),
             fieldView, SLOT(updateView()));
     mainLayout->addWidget(fieldView);
 
@@ -43,8 +42,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
 
     MObjectViewer* groundTruthView = new MObjectViewer(groundTruth->getProtoMessage(), this);
     rightLayout->addWidget(groundTruthView);
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-            groundTruthView, SLOT(updateView()));
+    dataManager->connect(groundTruthView, SLOT(updateView()), "GroundTruth");
 
     QLabel* fpsTagLabel = new QLabel("FPS:", this);
     fpsLabel = new QLabel(this);

@@ -10,22 +10,19 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Vision.pb.h"
-#include "MObject.h"
 #include "vision/Vision.h"
+#include "MemoryCommon.h"
 #include "ClassHelper.h"
 
 namespace man {
 namespace memory {
-class MVision: public MObject<proto::PVision> {
+
+class MVision: public TemplatedProtobufMessage<proto::PVision> {
 
     ADD_SHARED_PTR(MVision);
 
 public:
-    static const MObject_ID id = MVISION_ID;
-
-public:
-    MVision(boost::shared_ptr<Vision> vision,
-            data_ptr data = data_ptr(new proto::PVision()));
+    MVision(std::string name, boost::shared_ptr<Vision> vision);
     virtual ~MVision();
 
     /**

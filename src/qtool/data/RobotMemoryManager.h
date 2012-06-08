@@ -3,7 +3,8 @@
  * @class RobotMemoryManager
  *
  * Combines a Memory object and a MemorySignalingInterface to
- * connect QObjects slots to Memory Object notifications
+ * connect QObjects slots to Memory Object (or other objects, such as Ground Truth)
+ * notifications
  *
  * @author Octavian Neamtu
  *
@@ -36,8 +37,7 @@ public:
         return memory;
     }
 
-    void connectSlotToMObject(const QObject* subscriber,
-                const char* slot, std::string name) const {
+    void connectSlot(const QObject* subscriber, const char* slot, std::string name) const {
         memorySignalingInterface.subscribeSlotToMObject(subscriber, slot, name);
     }
 

@@ -24,7 +24,6 @@ class Memory; //forward declaration
 }
 }
 
-#include "MObject.h"
 #include "MVision.h"
 #include "Vision.h"
 #include "MVisionSensors.h"
@@ -62,7 +61,7 @@ private:
 
 class Memory {
 
-    typedef common::io::NotifyingProtobufMessage Object;
+    typedef common::io::ProtobufMessage Object;
 
 public:
     ADD_NULL_INSTANCE(Memory)
@@ -142,8 +141,8 @@ private:
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
-    boost::shared_ptr<MBottomImage> bottomMImage;
-    boost::shared_ptr<MTopImage> topMImage;
+    boost::shared_ptr<MBottomImage> mBottomImage;
+    boost::shared_ptr<MTopImage> mTopImage;
     boost::shared_ptr<MLocalization> mLocalization;
 };
 }

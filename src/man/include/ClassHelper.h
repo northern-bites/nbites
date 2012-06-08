@@ -44,6 +44,10 @@ public:\
         return instance == NullInstance();\
     }
 
+#define ADD_CLASS_NAME(class_ee) \
+public: \
+    virtual std::string getName() const { return class_name<class_ee>(); }
+
 #include <typeinfo>
 #include <cxxabi.h>
 #include <string>

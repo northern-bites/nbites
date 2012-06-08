@@ -10,22 +10,18 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Sensors.pb.h"
-#include "MObject.h"
+#include "MemoryCommon.h"
 #include "Sensors.h"
 #include "ClassHelper.h"
 
 namespace man {
 namespace memory {
-class MMotionSensors: public MObject<proto::PMotionSensors> {
+class MMotionSensors: public TemplatedProtobufMessage<proto::PMotionSensors> {
 
     ADD_SHARED_PTR(MMotionSensors);
 
 public:
-    static const MObject_ID id = MMOTION_SENSORS_ID;
-
-public:
-    MMotionSensors(boost::shared_ptr<Sensors> sensors,
-                   data_ptr data = data_ptr(new proto::PMotionSensors));
+    MMotionSensors(std::string name, boost::shared_ptr<Sensors> sensors);
     virtual ~MMotionSensors();
 
     /**

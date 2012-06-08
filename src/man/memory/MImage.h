@@ -8,8 +8,7 @@
 #pragma once
 
 #include <protos/Sensors.pb.h>
-#include "RoboImage.h"
-#include "MObject.h"
+#include "MemoryCommon.h"
 #include "Sensors.h"
 #include "ClassHelper.h"
 #include "Camera.h"
@@ -17,7 +16,7 @@
 namespace man {
 namespace memory {
 
-class MImage: public MObject<proto::PImage> {
+class MImage: public TemplatedProtobufMessage<proto::PImage> {
 
 ADD_SHARED_PTR(MImage);
 
@@ -25,10 +24,9 @@ public:
     typedef boost::shared_ptr<proto::PImage> PImage_ptr;
 
 public:
-    MImage(boost::shared_ptr<Sensors> sensors,
-           corpus::Camera::Type type,
-           MObject_ID id,
-           PImage_ptr data = PImage_ptr(new proto::PImage));
+    MImage(std::string name,
+           boost::shared_ptr<Sensors> sensors,
+           corpus::Camera::Type type);
     virtual ~MImage();
     /**
      * Updates all the fields of the underlying proto::PSensors with values
@@ -48,12 +46,12 @@ private:
 
 class MTopImage: public MImage {
 public:
-    MTopImage(boost::shared_ptr<Sensors> sensors);
+    MTopImage(std::string name, boost::shared_ptr<Sensors> sensors);
 };
 
 class MBottomImage: public MImage {
 public:
-    MBottomImage(boost::shared_ptr<Sensors> sensors);
+    MBottomImage(std::string name, boost::shared_ptr<Sensors> sensors);
 };
 
 }

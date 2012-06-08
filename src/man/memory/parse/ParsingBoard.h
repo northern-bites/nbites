@@ -14,7 +14,7 @@
 
 #include "io/InProvider.h"
 #include "MessageParser.h"
-#include "memory/MObject.h"
+
 #include "memory/Memory.h"
 #include "memory/MemoryCommon.h"
 

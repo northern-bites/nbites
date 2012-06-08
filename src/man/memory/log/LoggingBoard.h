@@ -18,7 +18,6 @@
 #include "ClassHelper.h"
 
 #include "MessageLogger.h"
-#include "memory/MObject.h"
 #include "memory/Memory.h"
 
 namespace man {

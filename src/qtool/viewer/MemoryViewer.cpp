@@ -64,10 +64,10 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
       this->setCentralWidget(central);
 
-    memoryManager->connectSlotToMObject(bottomImageViewer,
+    memoryManager->connectSlot(bottomImageViewer,
                         SLOT(updateView()), "MBottomImage");
 
-    memoryManager->connectSlotToMObject(topImageViewer,
+    memoryManager->connectSlot(topImageViewer,
                         SLOT(updateView()), "MTopImage");
 
     //corner ownership
@@ -86,7 +86,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
             MObjectViewer* view = new MObjectViewer(iterator->second->getProtoMessage());
             dockWidget->setWidget(view);
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-            memoryManager->connectSlotToMObject(view, SLOT(updateView()), iterator->first);
+            memoryManager->connectSlot(view, SLOT(updateView()), iterator->first);
         }
     }
 

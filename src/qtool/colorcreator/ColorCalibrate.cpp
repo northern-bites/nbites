@@ -39,14 +39,14 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     leftLayout->addWidget(imageTabs);
 
     //update the threshold when the underlying image changes
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), "MTopImage");
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), "MBottomImage");
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MTopImage");
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MBottomImage");
 
     imageTabs->addTab(&topChannelImage, "Top Image");
-    dataManager->connectSlotToMObject(&topChannelImage, SLOT(updateView()), "MTopImage");
+    dataManager->connectSlot(&topChannelImage, SLOT(updateView()), "MTopImage");
 
     imageTabs->addTab(&bottomChannelImage, "Bottom Image");
-    dataManager->connectSlotToMObject(&bottomChannelImage, SLOT(updateView()), "MBottomImage");
+    dataManager->connectSlot(&bottomChannelImage, SLOT(updateView()), "MBottomImage");
 
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 

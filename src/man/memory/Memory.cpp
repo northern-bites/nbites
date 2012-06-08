@@ -14,29 +14,29 @@ using namespace std;
 Memory::Memory(shared_ptr<Vision> vision_ptr,
                shared_ptr<Sensors> sensors_ptr,
                shared_ptr<LocSystem> loc_ptr) :
-        mVision(new MVision(vision_ptr)),
-        mVisionSensors(new MVisionSensors(sensors_ptr)),
-        mMotionSensors(new MMotionSensors(sensors_ptr)),
-        bottomMImage(new MBottomImage(sensors_ptr)),
-        topMImage(new MTopImage(sensors_ptr)),
-        mLocalization(new MLocalization(loc_ptr))
+        mVision(new MVision(class_name<MVision>(), vision_ptr)),
+        mVisionSensors(new MVisionSensors(class_name<MVisionSensors>(), sensors_ptr)),
+        mMotionSensors(new MMotionSensors(class_name<MMotionSensors>(),sensors_ptr)),
+        mBottomImage(new MBottomImage(class_name<MBottomImage>(),sensors_ptr)),
+        mTopImage(new MTopImage(class_name<MTopImage>(), sensors_ptr)),
+        mLocalization(new MLocalization(class_name<MLocalization>(), loc_ptr))
 {
 
 #if defined USE_MEMORY || defined OFFLINE
     if(sensors_ptr.get()) {
         sensors_ptr->addSubscriber(mVisionSensors.get(), NEW_VISION_SENSORS);
         sensors_ptr->addSubscriber(mMotionSensors.get(), NEW_MOTION_SENSORS);
-        sensors_ptr->addSubscriber(bottomMImage.get(), NEW_IMAGE);
-        sensors_ptr->addSubscriber(topMImage.get(), NEW_IMAGE);
+        sensors_ptr->addSubscriber(mBottomImage.get(), NEW_IMAGE);
+        sensors_ptr->addSubscriber(mTopImage.get(), NEW_IMAGE);
     }
 #endif
 
-    mobject_IDMap.insert(MObject_IDPair(class_name<MVision>(), mVision));
-    mobject_IDMap.insert(MObject_IDPair(class_name<MVisionSensors>(), mVisionSensors));
-    mobject_IDMap.insert(MObject_IDPair(class_name<MMotionSensors>(), mMotionSensors));
-    mobject_IDMap.insert(MObject_IDPair(class_name<MTopImage>(), topMImage));
-    mobject_IDMap.insert(MObject_IDPair(class_name<MBottomImage>(), bottomMImage));
-    mobject_IDMap.insert(MObject_IDPair(class_name<MLocalization>(), mLocalization));
+    mobject_IDMap.insert(MObject_IDPair(mVision->getName(), mVision));
+    mobject_IDMap.insert(MObject_IDPair(mVisionSensors->getName(), mVisionSensors));
+    mobject_IDMap.insert(MObject_IDPair(mMotionSensors->getName(), mMotionSensors));
+    mobject_IDMap.insert(MObject_IDPair(mTopImage->getName(), mTopImage));
+    mobject_IDMap.insert(MObject_IDPair(mBottomImage->getName(), mBottomImage));
+    mobject_IDMap.insert(MObject_IDPair(mLocalization->getName(), mLocalization));
 }
 
 Memory::~Memory() {
@@ -53,9 +53,7 @@ void Memory::updateVision() {
 
 MImage::const_ptr Memory::getMImage(corpus::Camera::Type which) const
 {
-    if(which == corpus::Camera::BOTTOM)
-        return bottomMImage;
-    else return topMImage;
+    return (which == corpus::Camera::BOTTOM) ? mBottomImage : mTopImage;
 }
 
 }

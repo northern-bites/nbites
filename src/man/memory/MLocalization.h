@@ -10,21 +10,16 @@
 #include <boost/shared_ptr.hpp>
 
 #include "protos/Loc.pb.h"
-#include "MObject.h"
+#include "MemoryCommon.h"
 #include "LocSystem.h"
 
 namespace man {
 namespace memory {
 
-class MLocalization: public MObject<proto::PLoc> {
+class MLocalization: public TemplatedProtobufMessage<proto::PLoc> {
 
 public:
-    static const MObject_ID id = MLOCALIZATION_ID;
-
-
-public:
-    MLocalization(boost::shared_ptr<LocSystem> locSystem,
-                  data_ptr = data_ptr(new proto::PLoc));
+    MLocalization(std::string name, boost::shared_ptr<LocSystem> locSystem);
     virtual ~MLocalization();
 
     /**

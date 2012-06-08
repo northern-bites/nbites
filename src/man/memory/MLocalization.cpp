@@ -15,9 +15,8 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-MLocalization::MLocalization(shared_ptr<LocSystem> locSystem,
-                             data_ptr data) :
-        MObject<PLoc>(id, data), locSystem(locSystem) {
+MLocalization::MLocalization(std::string name, shared_ptr<LocSystem> locSystem) :
+        TemplatedProtobufMessage<PLoc>(name), locSystem(locSystem) {
 }
 
 //Destructor

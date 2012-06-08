@@ -17,11 +17,9 @@ using boost::shared_ptr;
 using namespace std;
 using proto::PImage;
 
-MImage::MImage(shared_ptr<Sensors> sensors,
-               corpus::Camera::Type type,
-               MObject_ID id,
-               data_ptr data) :
-        MObject<PImage>(id, data),
+MImage::MImage(std::string name, shared_ptr<Sensors> sensors,
+               corpus::Camera::Type type) :
+        TemplatedProtobufMessage<PImage>(name),
         sensors(sensors),
         thresholded_data(new PImage()),
         cameraType(type) {
@@ -72,13 +70,13 @@ void MImage::updateData() {
     #endif
 }
 
-MTopImage::MTopImage(boost::shared_ptr<Sensors> sensors) :
-    MImage(sensors, corpus::Camera::TOP, MTOPIMAGE_ID)
+MTopImage::MTopImage(std::string name, boost::shared_ptr<Sensors> sensors) :
+    MImage(name, sensors, corpus::Camera::TOP)
 {
 }
 
-MBottomImage::MBottomImage(boost::shared_ptr<Sensors> sensors) :
-    MImage(sensors, corpus::Camera::BOTTOM, MBOTTOMIMAGE_ID)
+MBottomImage::MBottomImage(std::string name, boost::shared_ptr<Sensors> sensors) :
+    MImage(name, sensors, corpus::Camera::BOTTOM)
 {
 }
 
