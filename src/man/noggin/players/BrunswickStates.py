@@ -182,7 +182,7 @@ def gameFinished(player):
 
     if player.brain.nav.isStopped():
         player.gainsOff()
-        
+
     return player.stay()
 
 ########### PENALTY SHOTS STATES ############
@@ -200,7 +200,6 @@ def penaltyShotsGameSet(player):
         if player.brain.play.isRole(GOALIE):
             player.brain.tracker.trackBallFixedPitch()
         else:
-            #player.brain.tracker.activeLoc()
             player.brain.tracker.trackBallFixedPitch()
     if player.brain.play.isRole(GOALIE):
         player.brain.resetGoalieLocalization()

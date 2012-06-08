@@ -21,7 +21,7 @@ def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatWidePanFixedPitch()
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -46,7 +46,7 @@ def gameSet(player):
         player.brain.nav.stand()
         player.gainsOn()
         player.brain.loc.resetBall()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
 
     # For the goalie, reset loc every frame.
     # This way, garaunteed to have correctly set loc and be standing in that
@@ -61,7 +61,7 @@ def gamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
 
     #if player.lastDiffState == 'gamePenalized':
         # Need to at least *try* to get back into goal.
@@ -116,7 +116,7 @@ def position(player):
 
 def watch(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         if player.lastDiffState == 'kickBall':
             player.brain.nav.stand()
 
@@ -131,7 +131,7 @@ def kickBall(player):
     Kick the ball
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         if player.brain.ball.loc.relY < 0:
             kick = SweetMoves.RIGHT_BIG_KICK
         else:
@@ -182,7 +182,7 @@ def penaltyShotsGameSet(player):
         player.stand()
         player.brain.loc.resetBall()
 
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         player.initialDelayCounter = 0
 
     if player.initialDelayCounter < 230:

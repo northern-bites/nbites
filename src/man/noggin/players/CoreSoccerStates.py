@@ -41,7 +41,7 @@ def gameReady(player):
     if player.firstFrame():
         player.stopWalking()
         player.stand()
-        player.brain.tracker.switchTo('locPans')
+        player.brain.tracker.repeatWidePanFixedPitch()
     return player.stay()
 
 def gameSet(player):

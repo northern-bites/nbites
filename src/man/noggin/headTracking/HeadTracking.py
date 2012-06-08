@@ -72,7 +72,10 @@ class HeadTracking(FSA.FSA):
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
     def repeatWidePanFixedPitch(self):
-        '''Repeat the wide fixed pitch pan.'''
+        """
+        Repeat the wide fixed pitch pan.
+        Good for localizing.
+        """
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
     def repeatNarrowPanFixedPitch(self):
