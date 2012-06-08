@@ -1,5 +1,6 @@
 #ifndef _ActiveArray_h_DEFINED
 #define _ActiveArray_h_DEFINED
+#include <assert.h>
 
 template <class T>
 struct ActiveArray

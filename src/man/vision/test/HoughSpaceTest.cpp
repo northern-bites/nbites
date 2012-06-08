@@ -1,8 +1,17 @@
-
-#include "HoughSpaceTest.h"
+#include <gtest/gtest.h>
 #include <list>
 #include <string.h>
 #include "ActiveArray.h"
+
+#define private public
+#define protected public
+#include "../HoughSpace.h"
+#undef private
+#undef protected
+
+#include "Tests.h"
+#include "Gradient.h"
+#include "VisionDef.h"
 
 #include "Profiler.h"
 
@@ -10,15 +19,51 @@ using namespace std;
 using boost::shared_ptr;
 
  // 1 bin in the hough space error allowed (plus a floating point error)
-const float HoughSpaceTest::ACCEPT_ANGLE = 1 * M_PI_FLOAT/128.0f + 0.0001;
 
-HoughSpaceTest::HoughSpaceTest() :
-    hs()
+
+class HoughSpaceTest : public ::testing::Test
 {
+public:
+    HoughSpace hs;
 
+    // arbitrary acceptance thresholds
+    const static float ACCEPT_ANGLE;
+    const static int ACCEPT_RADIUS = 0;
+};
+
+const float HoughSpaceTest::ACCEPT_ANGLE = 1 * M_PI_FLOAT/128.0f + 0.0001;
+enum { max_parallel_tdiff = 5 };
+
+bool isParallel(HoughLine& l, HoughLine& l2)
+{
+    int tDiff = abs(l.getTIndex() - l2.getTIndex()) - HoughSpace::t_span/2;
+    return (abs(tDiff) < max_parallel_tdiff);
 }
 
-void HoughSpaceTest::test_hs()
+bool isDesiredLine(float goalR, float goalT, const HoughLine& line)
+{
+    float lineR = line.getRadius();
+    float lineT = line.getAngle();
+
+    LTE(lineT, 2*M_PI_FLOAT);
+    GTE(lineT, 0);
+
+    float goalLowerT = goalT - HoughSpaceTest::ACCEPT_ANGLE;
+    float goalUpperT = goalT + HoughSpaceTest::ACCEPT_ANGLE;
+
+    float tDiff = lineT - goalT;
+    float rDiff = fabs(lineR - goalR);
+
+    return (
+        // Correct radius
+        (rDiff <= HoughSpaceTest::ACCEPT_RADIUS) &&
+
+        // Correct angle
+        // Greater than lower bound
+        NBMath::subPIAngle(tDiff) <= HoughSpaceTest::ACCEPT_ANGLE);
+}
+
+TEST_F(HoughSpaceTest, HoughSpace)
 {
     Gradient g;
 
@@ -70,20 +115,7 @@ void HoughSpaceTest::test_hs()
     PASSED(SMOOTH_CORRECT);
 }
 
-/**
- * Test for known lines in an image
- */
-void HoughSpaceTest::test_lines()
-{
-    for(int t=0; t < 255; t += 5){
-        for (float r=5; r < 120; r += 10){
-            test_for_line(static_cast<uint8_t>(t), r);
-        }
-    }
-    PASSED(FOUND_GOOD_LINES);
-}
-
-void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
+void test_for_line(uint8_t angle, float radius)
 {
     float radAngle = static_cast<float>(angle) * M_PI_FLOAT / 128.f;
 
@@ -93,6 +125,7 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
     g.clear();
     g.createLineAtPoint(angle, radius);
 
+    HoughSpace hs;
     hs.reset();
     hs.findHoughLines(g);
 
@@ -106,7 +139,7 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
     FALSE(lines.empty());
 
     float maxRadius = sqrtf(IMAGE_WIDTH * IMAGE_WIDTH +
-                           IMAGE_HEIGHT * IMAGE_HEIGHT);
+                            IMAGE_HEIGHT * IMAGE_HEIGHT);
 
     bool foundFixedLine = false;
     list<HoughLine>::iterator l = lines.begin();
@@ -128,7 +161,20 @@ void HoughSpaceTest::test_for_line(uint8_t angle, float radius)
     TRUE(foundFixedLine);
 }
 
-void HoughSpaceTest::test_suppress()
+/**
+ * Test for known lines in an image
+ */
+TEST_F(HoughSpaceTest, lines)
+{
+    for(int t=0; t < 255; t += 5){
+        for (float r=5; r < 120; r += 10){
+            test_for_line(static_cast<uint8_t>(t), r);
+        }
+    }
+    PASSED(FOUND_GOOD_LINES);
+}
+
+TEST_F(HoughSpaceTest, Suppress)
 {
     ActiveArray<HoughLine> lines(200);
 
@@ -222,7 +268,7 @@ void HoughSpaceTest::test_suppress()
 
 }
 
-void HoughSpaceTest::test_pairing()
+TEST_F(HoughSpaceTest, Pairing)
 {
     // Insert random lines into list
     hs.activeLines.clear();
@@ -268,52 +314,4 @@ void HoughSpaceTest::test_pairing()
             NE(l->second, l2->second);
         }
     }
-}
-
-bool HoughSpaceTest::isParallel(HoughLine& l, HoughLine& l2)
-{
-    int tDiff = abs(l.getTIndex() - l2.getTIndex()) - HoughSpace::t_span/2;
-    return (abs(tDiff) < max_parallel_tdiff);
-}
-
-bool HoughSpaceTest::isDesiredLine(float goalR, float goalT,
-                                   const HoughLine& line)
-{
-    float lineR = line.getRadius();
-    float lineT = line.getAngle();
-
-    LTE(lineT, 2*M_PI_FLOAT);
-    GTE(lineT, 0);
-
-    float goalLowerT = goalT - ACCEPT_ANGLE;
-    float goalUpperT = goalT + ACCEPT_ANGLE;
-
-    float tDiff = lineT - goalT;
-    float rDiff = fabs(lineR - goalR);
-
-    return (
-        // Correct radius
-        (rDiff <= ACCEPT_RADIUS) &&
-
-        // Correct angle
-        // Greater than lower bound
-        NBMath::subPIAngle(tDiff) <= ACCEPT_ANGLE);
-
-
-}
-
-int HoughSpaceTest::runTests()
-{
-    test_hs();
-    test_lines();
-    test_suppress();
-    test_pairing();
-    return 0;
-}
-
-
-int main(int argc, char * argv[])
-{
-    HoughSpaceTest * tests = new HoughSpaceTest();
-    return tests->runTests();
 }

@@ -193,13 +193,26 @@ ENDIF( VISIONLINK )
 
 ########################### VISION TEST EXECUTABLES
 
+find_package(GTest)
+
+macro( nbites_add_test testname )
+  if( GTEST_FOUND )
+    add_executable( ${testname} ${ARGN} )
+    target_link_libraries(
+      ${testname}
+      ${GTEST_BOTH_LIBRARIES}
+      )
+    GTEST_ADD_TESTS( ${testname} "" ${ARGN})
+  endif(GTEST_FOUND)
+endmacro()
+
 set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test )
 
-add_executable( EdgeDetectorTest
-  ${VISION_INCLUDE_DIR}/EdgeDetector
-  ${VISION_TEST_DIR}/EdgeDetectorTest
+nbites_add_test( EdgeDetectorTest
+  ${VISION_INCLUDE_DIR}/EdgeDetector.cpp
+  ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
   ${VISION_INCLUDE_DIR}/EdgeDetection.s
-  ${VISION_INCLUDE_DIR}/Gradient
+  ${VISION_INCLUDE_DIR}/Gradient.cpp
   )
 
 target_link_libraries( EdgeDetectorTest
@@ -207,12 +220,12 @@ target_link_libraries( EdgeDetectorTest
   ${VISION_TARGET}
   )
 
-add_executable( HoughSpaceTest
-  ${VISION_INCLUDE_DIR}/HoughSpace
-  ${VISION_TEST_DIR}/HoughSpaceTest
-  ${VISION_INCLUDE_DIR}/geom/HoughLine
+nbites_add_test( HoughSpaceTest
+  ${VISION_INCLUDE_DIR}/HoughSpace.cpp
+  ${VISION_TEST_DIR}/HoughSpaceTest.cpp
+  ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
   ${VISION_INCLUDE_DIR}/EdgeDetection.s
-  ${VISION_INCLUDE_DIR}/Gradient
+  ${VISION_INCLUDE_DIR}/Gradient.cpp
   )
 
 target_link_libraries( HoughSpaceTest
@@ -220,29 +233,11 @@ target_link_libraries( HoughSpaceTest
   ${VISION_TARGET}
   )
 
-
-add_executable( OfflineVision
-  ${VISION_INCLUDE_DIR}/offline/OfflineVision
-  )
-
-target_link_libraries( OfflineVision
-                       ${VISION_TARGET}
-		       ${SENSORS_TARGET}
-		       ${ROBOT_CONNECT_TARGET}
-		       ${NBINCLUDE_TARGET}
-		       )
-
-add_executable( FLDTest
-  ${VISION_TEST_DIR}/FieldLinesDetectorTest
+nbites_add_test( FLDTest
+  ${VISION_TEST_DIR}/FieldLinesDetectorTest.cpp
   )
 
 target_link_libraries( FLDTest
   ${VISION_TARGET}
   ${NBINCLUDE_TARGET}
   )
-
-add_test( NAME EdgeTest COMMAND EdgeDetectorTest )
-add_test( NAME HoughTest COMMAND HoughSpaceTest )
-add_test( NAME FieldLinesTest COMMAND FLDTest )
-
-add_executable( ConvertFrame ${VISION_INCLUDE_DIR}/offline/ConvertFrames.cpp )

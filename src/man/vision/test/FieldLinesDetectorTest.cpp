@@ -1,20 +1,18 @@
-#include "FieldLinesDetectorTest.h"
-
+#include <gtest/gtest.h>
 #include <list>
 
-using namespace std;
-using boost::shared_ptr;
+#include "Gradient.h"
 
-FieldLinesDetectorTest::FieldLinesDetectorTest() :
-    fld(shared_ptr<Profiler>(new Profiler(&thread_micro_time)))
-{
-
-}
+#define private public
+#define protected public
+#include "../FieldLinesDetector.h"
+#undef private
+#undef protected
 
 /**
  * Test the attributes of the VisualLines found
  */
-void FieldLinesDetectorTest::test_lines()
+TEST(FieldLinesDetector, Lines)
 {
     Gradient g;
     g.reset();
@@ -27,6 +25,8 @@ void FieldLinesDetectorTest::test_lines()
         g.createLineAtPoint(angle, radius);
     }
 
+    FieldLinesDetector fld;
+
     // Run it through field lines
     fld.gradient = g;
     fld.houghLines = fld.hough.findLines(g);
@@ -34,18 +34,5 @@ void FieldLinesDetectorTest::test_lines()
     fld.findFieldLines();
 
     // Make sure there exists one line for every pair of lines
-    EQ_INT(fld.houghLines.size(), fld.lines.size());
-}
-
-void FieldLinesDetectorTest::runTests()
-{
-    test_lines();
-}
-
-int main(int argc, char * argv[])
-{
-    FieldLinesDetectorTest fld;
-
-    fld.runTests();
-    return 0;
+    EXPECT_EQ(fld.houghLines.size(), fld.lines.size());
 }
