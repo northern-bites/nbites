@@ -101,8 +101,8 @@ void PaintField::buildBitmap()
             (LINE_CROSS_LENGTH/2));
 
     // Painting the Blue Goal
-    painter.setBrush(Qt::blue);
-    painter.setPen(Qt::blue);
+    painter.setBrush(Qt::yellow);
+    painter.setPen(Qt::yellow);
     painter.drawEllipse(topBluePost,
             (int)GOAL_POST_RADIUS,
             (int)GOAL_POST_RADIUS);
@@ -123,7 +123,7 @@ void PaintField::buildBitmap()
     // Nets in Goals
     QBrush goalsBrush = QBrush(Qt::white, Qt::CrossPattern);
     painter.setBrush(goalsBrush);
-    painter.setPen(Qt::blue);
+    painter.setPen(Qt::yellow);
     painter.drawRect(blueGoal);
     painter.setPen(Qt::yellow);
     painter.drawRect(yellowGoal);

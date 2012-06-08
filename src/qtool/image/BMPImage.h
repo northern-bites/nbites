@@ -45,7 +45,7 @@ protected:
 
 };
 
-//yo dawg I head you liked BMPImage so we merged two BMPImages in a class that
+//yo dawg I heard you liked BMPImage so we merged two BMPImages in a class that
 //inherits from BMPImage
 
 class OverlayedImage : public BMPImage {
@@ -61,8 +61,16 @@ public:
 
        }
 
-    virtual unsigned getWidth() const { return baseImage->getWidth(); }
-    virtual unsigned getHeight() const { return baseImage->getHeight(); }
+    virtual unsigned getWidth() const {
+		if(baseImage->getWidth()>overlayedImage->getWidth())
+			return baseImage->getWidth();
+		else return overlayedImage->getWidth();
+	}
+    virtual unsigned getHeight() const {
+		if(baseImage->getHeight()>overlayedImage->getHeight())
+			return baseImage->getHeight();
+		else return overlayedImage->getHeight();
+	}
 
 protected:
     virtual void buildBitmap() {

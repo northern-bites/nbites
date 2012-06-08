@@ -22,6 +22,7 @@ set( viewer_srcs MemoryViewer.cpp
                  FieldViewer.cpp
                  EKFDataViewer.cpp
                  CollapsibleImageViewer.cpp
+		 BotLocs.cpp
                  )
 
 set( viewer_headers MemoryViewer.h
@@ -33,6 +34,7 @@ set( viewer_headers MemoryViewer.h
                     FieldViewer.h
                     EKFDataViewer.h
                     CollapsibleImageViewer.h
+		    BotLocs.h
                     )
 
 ########### Separate VisionViewer Sources
