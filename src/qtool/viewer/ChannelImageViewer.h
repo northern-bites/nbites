@@ -18,6 +18,7 @@
 namespace qtool {
 namespace viewer {
 
+// inherit from BMPImageViewerListener so we can get mouse clicks
 class ChannelImageViewer: public BMPImageViewerListener {
     Q_OBJECT;
 public:
