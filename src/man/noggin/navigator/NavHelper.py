@@ -41,7 +41,7 @@ def adaptSpeed(distance, cutoffDistance, maxSpeed):
 def getStrafelessDest(dest):
     if (dest.relX > 150 and dest.relY < 50) or (dest.relX <= 150 and dest.relX > 50 and dest.relY < 20) \
             or (dest.relX <= 50 and dest.relX > 20 and dest.relY < 10):
-        print "old dest: " + str(dest)
+        #print "old dest: " + str(dest)
         return RelRobotLocation(dest.relX, 0, dest.relH)
     else:
         return dest
