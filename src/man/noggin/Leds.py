@@ -6,8 +6,8 @@ import noggin_constants as NogginConstants
 GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
-GOAL_LEDS = False
-PLAYBOOK_LEDS = False
+GOAL_LEDS = True
+PLAYBOOK_LEDS = True
 LOC_LEDS = False
 COMM_LEDS = False
 
@@ -29,7 +29,9 @@ RIGHT_GOAL_LED,
 GOAL_ID_LED,
 CHEST_LED,
 LEFT_FOOT_LED,
-RIGHT_FOOT_LED) = range(_lights.NUM_LED_GROUPS)
+RIGHT_FOOT_LED,
+LEFT_UNUSED_LED,
+RIGHT_UNUSED_LED) = range(_lights.NUM_LED_GROUPS)
 
 ###COLORS
 RED   = 0xFF0000
@@ -51,15 +53,22 @@ CHASER_ON_LEDS =   ((ROLE_LED, RED, NOW),)
 OFFENDER_ON_LEDS = ((ROLE_LED, YELLOW, NOW),)
 MIDDIE_ON_LEDS =   ((ROLE_LED, GREEN, NOW),)
 DEFENDER_ON_LEDS = ((ROLE_LED, BLUE, NOW),)
+DUB_DEFEND_ON_LEDS=((ROLE_LED, CYAN, NOW),)
 GOALIE_ON_LEDS =   ((ROLE_LED, PURPLE, NOW),)
-OTHER_ROLE_LEDS =    ((ROLE_LED, WHITE, NOW),)
+ROLE_OFF_LEDS =    ((ROLE_LED, OFF, NOW),)
 
 ##### SubRoles #####
 AGGRESSIVE_LEDS = ((SUBROLE_LED, RED, NOW),)
 BOLD_LEDS =       ((SUBROLE_LED, YELLOW, NOW),)
 CAUTIOUS_LEDS =   ((SUBROLE_LED, GREEN, NOW),)
 GUARDED_LEDS =    ((SUBROLE_LED, BLUE, NOW),)
-OTHER_SUBROLE_LEDS= ((SUBROLE_LED, WHITE, NOW),)
+
+GOALIE_CHASE_LEDS =  ((SUBROLE_LED, PURPLE, NOW),)
+GOALIE_CENTER_LEDS = ((SUBROLE_LED, BLUE, NOW),)
+GOALIE_LEFT_LEDS =   ((SUBROLE_LED, RED, NOW),)
+GOALIE_RIGHT_LEDS =  ((SUBROLE_LED, GREEN, NOW),)
+
+OTHER_SUBROLE_LEDS= ((SUBROLE_LED, OFF, NOW),)
 
 ##### GOAL ######
 LEFT_POST_ON_LEDS =   ((LEFT_GOAL_LED, YELLOW, NOW),)
@@ -126,17 +135,59 @@ class Leds():
                 self.executeLeds(RIGHT_POST_OFF_LEDS)
 
         if PLAYBOOK_LEDS:
-            if self.playbook.roleChanged:
+            if self.brain.playbook.roleChanged():
                 if self.brain.play.isRole(PBConstants.CHASER):
-                        self.executeLeds(CHASER_ON_LEDS)
-                elif self.brain.play.isRole(PBConstants.DEFENDER):
-                        self.executeLeds(DEFENDER_ON_LEDS)
+                    self.executeLeds(CHASER_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.OFFENDER):
-                        self.executeLeds(OFFENDER_ON_LEDS)
+                    self.executeLeds(OFFENDER_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.MIDDIE):
-                        self.executeLeds(MIDDIE_ON_LEDS)
-                elif self.brain.play.roleChanged():
-                        self.executeLeds(OTHER_ROLE_LEDS)
+                    self.executeLeds(MIDDIE_ON_LEDS)
+                elif self.brain.play.isRole(PBConstants.DEFENDER):
+                    self.executeLeds(DEFENDER_ON_LEDS)
+                elif self.brain.play.isRole(PBConstants.DEFENDER_DUB_D):
+                    print "IN DUB D"
+                    self.executeLeds(DUB_DEFEND_ON_LEDS)
+                elif self.brain.play.isRole(PBConstants.GOALIE):
+                    self.executeLeds(GOALIE_ON_LEDS)
+                else:
+                    self.executeLeds(ROLE_OFF_LEDS)
+
+            if not self.brain.playbook.subRoleUnchanged():
+                play = self.brain.play
+                if play.isRole(PBConstants.GOALIE):
+                    if (play.isSubRole(PBConstants.GOALIE_CENTER)):
+                        self.executeLeds(GOALIE_CENTER_LEDS)
+                    #elif (play.isSubRole(PBConstants.GOALIE_LEFT)):
+                    #    self.executeLeds(GOALIE_LEFT_LEDS)
+                    #elif (play.isSubRole(PBConstants.GOALIE_RIGHT)):
+                    #    self.executeLeds(GOALIE_RIGHT_LEDS)
+                    elif (play.isSubRole(PBConstants.GOALIE_CHASER)):
+                        self.executeLeds(GOALIE_CHASE_LEDS)
+                    else:
+                        self.executeLeds(OTHER_SUBROLE_LEDS)
+                else:
+                    if (play.isSubRole(PBConstants.CHASE_NORMAL) or
+                        play.isSubRole(PBConstants.PICKER) or
+                        play.isSubRole(PBConstants.DEFENSIVE_MIDDIE) or
+                        play.isSubRole(PBConstants.STOPPER)):
+                        self.executeLeds(AGGRESSIVE_LEDS)
+                    elif (play.isSubRole(PBConstants.LEFT_WING) or
+                          play.isSubRole(PBConstants.RIGHT_WING) or
+                          play.isSubRole(PBConstants.KICKOFF_STRIKER) or
+                          play.isSubRole(PBConstants.CENTER_BACK)):
+                        self.executeLeds(BOLD_LEDS)
+                    elif (play.isSubRole(PBConstants.STRIKER) or
+                          play.isSubRole(PBConstants.OFFENSIVE_MIDDIE) or
+                          play.isSubRole(PBConstants.SWEEPER)):
+                        self.executeLeds(CAUTIOUS_LEDS)
+                    elif (play.isSubRole(PBConstants.FORWARD) or
+                          play.isSubRole(PBConstants.DUB_D_MIDDIE) or
+                          play.isSubRole(PBConstants.KICKOFF_SWEEPER) or
+                          play.isSubRole(PBConstants.LEFT_DEEP_BACK) or
+                          play.isSubRole(PBConstants.RIGHT_DEEP_BACK)):
+                        self.executeLeds(GUARDED_LEDS)
+                    else:
+                        self.executeLeds(OTHER_SUBROLE_LEDS)
         if LOC_LEDS:
             pass
 
@@ -144,7 +195,7 @@ class Leds():
             pass
 
         if GC_LEDS:
-            if self.brain.gameController.firstFrame():
+            if self.brain.gameController.counter == 1:
                 gcState = self.brain.gameController.currentState
                 if (gcState == 'gameInitial' or
                     gcState == 'penaltyShotsGameInitial'):
@@ -172,11 +223,13 @@ class Leds():
                     self.executeLeds(HAVE_KICKOFF_LEDS)
                 else:
                     self.executeLeds(NO_KICKOFF_LEDS)
+                self.kickoffChange = False
             if self.teamChange:
-                if self.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                     self.executeLeds(TEAM_BLUE_LEDS)
                 else:
                     self.executeLeds(TEAM_RED_LEDS)
+                self.teamChange = False
 
     def executeLeds(self,listOfLeds):
 

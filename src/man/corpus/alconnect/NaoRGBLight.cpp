@@ -45,7 +45,7 @@ bool NaoRGBLight::updateCommand(const int newRgbHex){
     unsigned int ledIndex = 0;
     for(unsigned int c = startColor; c < endColor; c++){
         for(unsigned int led = 0; led < numRGBSubLeds; led++){
-            const float color =
+			const float color =
                 getColor(static_cast<ALNames::LedColor>(c),rgbHex);
             command[5][ledIndex][0] = color;
             ledIndex++;

@@ -48,12 +48,13 @@ namespace ALNames {
 	static const unsigned int NUM_GOAL_ID_LEDS = (NUM_FACE_LEDS >> 1) -1;
 	static const unsigned int NUM_ROLE_LEDS = NUM_GOAL_LEDS;
 	static const unsigned int NUM_BALL_LEDS = NUM_GOAL_ID_LEDS;
+	static const unsigned int NUM_UNUSED_EYE_LEDS = 3;
 
     static const unsigned int NUM_LED_COLORS = 3;
     static const unsigned int NUM_LED_ORIENTATIONS = 2;
     static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
-    static const unsigned int NUM_UNIQUE_LEDS = 13;
+    static const unsigned int NUM_UNIQUE_LEDS = 15;
     static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
         NUM_LOC_LEDS,
 		NUM_COMM_LEDS,
@@ -67,13 +68,16 @@ namespace ALNames {
 		NUM_GOAL_ID_LEDS,
         NUM_CHEST_LEDS,
         NUM_FOOT_LEDS,
-        NUM_FOOT_LEDS};
+        NUM_FOOT_LEDS,
+	    NUM_UNUSED_EYE_LEDS,
+		NUM_UNUSED_EYE_LEDS};
     static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
 		BLUE_LED,BLUE_LED,
 		BLUE_LED,BLUE_LED,
 		RED_LED,RED_LED,RED_LED,
 		RED_LED,RED_LED,RED_LED,
 		RED_LED,
+		RED_LED,RED_LED,
 		RED_LED,RED_LED};
     static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
 		NUM_LED_COLORS,NUM_LED_COLORS,
@@ -81,6 +85,7 @@ namespace ALNames {
 		NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
 		NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
 		NUM_LED_COLORS,
+		NUM_LED_COLORS,NUM_LED_COLORS,
 		NUM_LED_COLORS,NUM_LED_COLORS};
 
     static const std::string faceL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS][NUM_FACE_LEDS] ={
@@ -223,6 +228,35 @@ namespace ALNames {
 		{faceL[LEFT_LED][BLUE_LED][7]}
 	};
 
+/* UNUSED LEDS HACK... stupid aldebaran...*/
+	static const std::string leftUnL[NUM_LED_COLORS][3] ={
+		{faceL[LEFT_LED][RED_LED][0],
+		 faceL[LEFT_LED][RED_LED][2],
+		 faceL[LEFT_LED][RED_LED][6]},
+
+		{faceL[LEFT_LED][GREEN_LED][0],
+		 faceL[LEFT_LED][GREEN_LED][2],
+		 faceL[LEFT_LED][GREEN_LED][6]},
+
+		{faceL[LEFT_LED][BLUE_LED][0],
+		 faceL[LEFT_LED][BLUE_LED][2],
+		 faceL[LEFT_LED][BLUE_LED][6]}
+	};
+
+	static const std::string rightUnL[NUM_LED_COLORS][3] ={
+		{faceL[RIGHT_LED][RED_LED][0],
+		 faceL[RIGHT_LED][RED_LED][2],
+		 faceL[RIGHT_LED][RED_LED][6]},
+
+		{faceL[RIGHT_LED][GREEN_LED][0],
+		 faceL[RIGHT_LED][GREEN_LED][2],
+		 faceL[RIGHT_LED][GREEN_LED][6]},
+
+		{faceL[RIGHT_LED][BLUE_LED][0],
+		 faceL[RIGHT_LED][BLUE_LED][2],
+		 faceL[RIGHT_LED][BLUE_LED][6]}
+	};
+
 	static const std::string leftGoalL[NUM_LED_COLORS][NUM_GOAL_LEDS] ={
 /* Red*/
 		{faceL[RIGHT_LED][RED_LED][1]},
@@ -259,9 +293,9 @@ namespace ALNames {
     static const std::string strPtr = footL[RIGHT_LED][0];
     static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
         &earL[LEFT_LED][0],             // Left Loc
-		&earL[LEFT_LED][NUM_LOC_LEDS]   // Left Comm
+		&earL[LEFT_LED][NUM_LOC_LEDS],  // Left Comm
         &earL[RIGHT_LED][0],            // Right Loc
-		&earL[RIGHT_LED][NUM_LOC_LEDS]  // Right Comm
+		&earL[RIGHT_LED][NUM_LOC_LEDS], // Right Comm
         &subRoleL[0][0],                // Subrole
 		&roleL[0][0],                   // Role
 		&ballL[0][0],                   // Ball
@@ -271,6 +305,8 @@ namespace ALNames {
         &chestL[0],
         &footL[LEFT_LED][0],
         &footL[RIGHT_LED][0],
+		&leftUnL[0][0],
+		&rightUnL[0][0]
     };
 };
 
