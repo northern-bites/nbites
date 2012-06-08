@@ -45,7 +45,32 @@ public slots:
     void setEdgeDetectDebug();
     void setHoughDebug();
     void setRobotsDebug();
+
     void pixelClicked(int x, int y, int brushSize, bool leftClick);
+
+    void setBallDebug();
+    void setBallDistDebug();
+    void setCrossDebug();
+    void setIdentCornersDebug();
+    void setFieldEdgeDebug();
+
+    void setPostPrintDebug();
+    void setPostDebug();
+    void setPostLogicDebug();
+    void setPostCorrectDebug();
+    void setPostSanityDebug();
+
+    /*    void setVertEdgeDetectDebug();
+    void setHorEdgeDetectDebug();
+    void setSecondVertDebug();
+    void setCreateLinesDebug();
+    void setFitUnusedPointsDebug();
+    void setJoinLinesDebug();
+    void setExtendLinesDebug();
+    void setIntersectLinesDebug();
+    void setCcScanDebug();
+    void setRiskyCornersDebug();
+    void setCornObjDistDebug();*/
 
 private:
     std::vector<QDockWidget*> dockWidget;
@@ -62,6 +87,10 @@ private:
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
 
     bool horizonD, shootD, openFieldD, edgeDetectD, houghD, robotsD;
+    bool ballD, ballDistD, identCornersD, dangerousBallD, fieldEdgeD;
+    bool crossD, postPrintD, postD, postLogicD, postCorrectD, postSanityD;
+    bool vertEdgeD, horEdgeD, secVertD, createLD, fitPointD, joinLD;
+    bool intersectLD, CcScanD, riskyCornerD, cornObjDistD;
 
 };
 

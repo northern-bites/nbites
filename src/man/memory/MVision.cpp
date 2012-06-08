@@ -124,6 +124,8 @@ void MVision::updateData() {
 void MVision::update(PVision::PVisualDetection* visual_detection,
         VisualDetection* visualDetection) {
     visual_detection->set_distance(visualDetection->getDistance());
+    visual_detection->set_width(visualDetection->getWidth());
+    visual_detection->set_height(visualDetection->getHeight());
     visual_detection->set_center_x(visualDetection->getCenterX());
     visual_detection->set_center_y(visualDetection->getCenterY());
     visual_detection->set_x(visualDetection->getX());
