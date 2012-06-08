@@ -21,7 +21,7 @@ namespace qtool {
 			stopButton(new QPushButton("Stop Location", this)) {
 
 			mainLayout = new QVBoxLayout(this);
-			scaleFactor = (float)1.25;
+			scaleFactor = (float)1.35;
 
 			//field image painted via overlay of robots, field
 			fieldImage = new PaintField(this, scaleFactor);
