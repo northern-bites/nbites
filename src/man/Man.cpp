@@ -69,9 +69,6 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
 
     try {
         vision = boost::shared_ptr<Vision> (new Vision(pose, memory->get<MVision>()));
-    } catch(std::exception &e) {
-        std::cerr << e.what() << std::endl;
-    }
 
     set_vision_pointer(vision);
 
@@ -83,7 +80,12 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
 #ifdef USE_NOGGIN
     noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
-                                            motion->getInterface()));
+                                            motion->getInterface(), memory));
+
+    } catch(std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+
 #endif// USE_NOGGIN
 
     loggingBoard->setMemory(memory);

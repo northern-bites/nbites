@@ -11,14 +11,13 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-RobotMemory::RobotMemory(shared_ptr<Sensors> sensors_ptr,
-                         shared_ptr<LocSystem> loc_ptr) :
+RobotMemory::RobotMemory(shared_ptr<Sensors> sensors_ptr) :
         mVision(new MVision(class_name<MVision>())),
         mVisionSensors(new MVisionSensors(class_name<MVisionSensors>(), sensors_ptr)),
         mMotionSensors(new MMotionSensors(class_name<MMotionSensors>(),sensors_ptr)),
         mBottomImage(new MBottomImage(class_name<MBottomImage>(),sensors_ptr)),
         mTopImage(new MTopImage(class_name<MTopImage>(), sensors_ptr)),
-        mLocalization(new MLocalization(class_name<MLocalization>(), loc_ptr))
+        mLocalization(new MLocalization(class_name<MLocalization>()))
 {
 
 #if defined USE_MEMORY || defined OFFLINE
@@ -40,12 +39,6 @@ RobotMemory::RobotMemory(shared_ptr<Sensors> sensors_ptr,
 
 RobotMemory::~RobotMemory() {
     cout << "Robot Memory destructor" << endl;
-}
-
-MImage::const_ptr RobotMemory::getMImage(corpus::Camera::Type which) const
-{
-    if (which == corpus::Camera::BOTTOM) return mBottomImage;
-    return mTopImage;
 }
 
 }

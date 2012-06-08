@@ -51,7 +51,7 @@ class Vision;   // forward reference
 #include "FieldLines.h"
 #include "VisualCorner.h"
 //memory
-#include "memory/MVision.h"
+#include "memory/MObjects.h"
 #include "memory/MemoryProvider.h"
 
 class Vision

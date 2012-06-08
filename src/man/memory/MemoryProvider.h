@@ -44,8 +44,8 @@ public:
 
 protected:
     updateMethod update;
-    MemoryObjectPtr memoryObject;
     const RobotObject* robotObject;
+    MemoryObjectPtr memoryObject;
 
 };
 

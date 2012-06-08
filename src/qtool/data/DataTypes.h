@@ -2,7 +2,7 @@
 #pragma once
 
 #include "man/memory/MemoryCommon.h"
-#include "man/memory/MVision.h"
+#include "man/memory/MObjects.h"
 #include "man/memory/MImage.h"
 
 namespace qtool {

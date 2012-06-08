@@ -163,15 +163,17 @@ const float MultiLocEKF::STANDARD_ERROR_THRESH = 6.0f;
  * @param initYUncert Initial y uncertainty
  * @param initHUncert Initial heading uncertainty
  */
-MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
-               float initXUncert,float initYUncert, float initHUncert)
+MultiLocEKF::MultiLocEKF(man::memory::MLocalization::ptr mLocalization,
+               float initX, float initY, float initH,
+               float initXUncert,float initYUncert, float initHUncert
+               )
     : TwoMeasurementEKF<PointObservation, dist_bearing_meas_dim,
                         CornerObservation, corner_measurement_dim,
                         MotionModel,
                         loc_ekf_dimension>(BETA_LOC,GAMMA_LOC), LocSystem(),
       lastOdometry(0,0,0), lastPointObservations(), lastCornerObservations(),
       useAmbiguous(true), errorLog(error_log_width),
-      resetFlag(false)
+      resetFlag(false), memoryProvider(&updateMLocalization, this, mLocalization)
 {
     // These jacobian values are unchanging and independent of the
     // motion updates, so we initialize them here.
@@ -199,6 +201,18 @@ MultiLocEKF::MultiLocEKF(float initX, float initY, float initH,
 #ifdef DEBUG_LOC_EKF_INPUTS
     cout << "Initializing MultiLocEKF with: " << *this << endl;
 #endif
+}
+
+
+// Memory update
+void MultiLocEKF::updateMLocalization(const MultiLocEKF* locSystem, man::memory::MLocalization::ptr mLoc) {
+
+    mLoc->get()->set_x_est(locSystem->getXEst());
+    mLoc->get()->set_y_est(locSystem->getYEst());
+    mLoc->get()->set_h_est(locSystem->getHEst());
+    mLoc->get()->set_x_uncert(locSystem->getXUncert());
+    mLoc->get()->set_y_uncert(locSystem->getYUncert());
+    mLoc->get()->set_h_uncert(locSystem->getHUncert());
 }
 
 /**
@@ -270,6 +284,8 @@ void MultiLocEKF::updateLocalization(const MotionModel& u,
     odometryUpdate(u);
     applyObservations(pt_z, c_z);
     endFrame();
+
+    memoryProvider.updateMemory();
 
 #ifdef DEBUG_LOC_EKF_INPUTS
     printAfterUpdateInfo();

@@ -19,18 +19,19 @@ using namespace qtool::data;
 using namespace qtool::image;
 using namespace boost;
 using namespace man::memory::proto;
+using namespace man::memory;
 using namespace man::corpus;
 
 ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
         QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
         currentCamera(Camera::TOP),
-        topImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::TOP), BMPYUVImage::RGB, this)),
-        bottomImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM), BMPYUVImage::RGB, this)),
+        topImage(new BMPYUVImage(dataManager->getMemory()->get<MTopImage>(), BMPYUVImage::RGB, this)),
+        bottomImage(new BMPYUVImage(dataManager->getMemory()->get<MBottomImage>(), BMPYUVImage::RGB, this)),
         sensors(new Sensors(shared_ptr<Speech>(new Speech()))),
         imageTranscribe(new OfflineImageTranscriber(sensors,
-                dataManager->getMemory()->getMImage(Camera::TOP),
-                dataManager->getMemory()->getMImage(Camera::BOTTOM))),
+                dataManager->getMemory()->get<MTopImage>(),
+                dataManager->getMemory()->get<MBottomImage>())),
         rawThresholdedImageData(new PImage())
 {
 

@@ -38,8 +38,7 @@ class RobotMemory : public Memory {
     ADD_SHARED_PTR(RobotMemory)
 
 public:
-    RobotMemory(boost::shared_ptr<Sensors> sensors_ptr = Sensors::ptr(),
-                boost::shared_ptr<LocSystem> loc_ptr = LocSystem::ptr());
+    RobotMemory(boost::shared_ptr<Sensors> sensors_ptr = Sensors::ptr());
     virtual ~RobotMemory();
 
 public:
@@ -47,7 +46,6 @@ public:
     MVision::const_ptr getMVision() const {return mVision;}
     MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
     MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
-    MImage::const_ptr getMImage(corpus::Camera::Type which) const;
 
 protected:
     boost::shared_ptr<MVision> mVision;
