@@ -33,6 +33,8 @@ namespace qtool {
 			overlayView = new OverlayedImage(fieldImage, bot_locs, this);
 			fieldView = new BMPImageViewer(fieldImage, this);
 
+			spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
 			field = new QHBoxLayout();
 			field->addWidget(fieldView);
 
@@ -46,6 +48,7 @@ namespace qtool {
 			//paint the field
 			mainLayout->addLayout(buttonLayout);
 			mainLayout->addLayout(field);
+			mainLayout->addItem(spacer);
 			this->setLayout(mainLayout);
 		}
 
@@ -60,7 +63,7 @@ namespace qtool {
 					fieldView->getLayout()->setAlignment(Qt::Alignment());
 					field = new QHBoxLayout();
 					field->addWidget(fieldView);
-					mainLayout->insertLayout(0, field);
+					mainLayout->insertLayout(1, field);
 					qApp->processEvents();
 				}
 			} else {

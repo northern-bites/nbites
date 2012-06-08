@@ -75,7 +75,7 @@ namespace qtool {
 				painter.drawLine(robotPt, hUncertL2);
 
                 //don't draw ball if robot thinks its distance is 0)
-				if(!robotPt==ballPt){
+				if(robotPt!=ballPt){
 					//ball
 					painter.setPen(ball);
 					painter.setBrush(ball);

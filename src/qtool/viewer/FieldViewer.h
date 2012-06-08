@@ -55,7 +55,7 @@ namespace qtool {
 			QVBoxLayout* mainLayout;
 			QHBoxLayout* buttonLayout;
 			QHBoxLayout* field;
-			QDockWidget* dockWidget;
+			QSpacerItem* spacer;
 		};
 
 
