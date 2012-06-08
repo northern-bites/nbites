@@ -27,8 +27,6 @@ class HeadTracking(FSA.FSA):
 
         # Set state variables
         self.currentState = 'stopped'
-        # Note: This variable is never used.
-        self.decisionState = 'stopped'
 
         # Set sweetmove and scan variables and enums
         self.currentHeadScan = None
@@ -37,16 +35,8 @@ class HeadTracking(FSA.FSA):
         self.kickName = ""
 
         # Set object variables
-        # Note: This variable is never used.
-        self.locObjectList = []
-        self.locObjectList.extend(self.brain.myFieldObjects)
         self.target = self.brain.ball #default
         # target should either be ball or instance of FieldObject
-
-        # Set flag variables
-        self.goalieActiveLoc = False
-        self.activeLocOn = False
-        self.activePanUp = False
 
     def stopHeadMoves(self):
         """stop all head moves. In TrackingStates.py"""
@@ -75,22 +65,20 @@ class HeadTracking(FSA.FSA):
             self.headMove = headMove
             self.switchTo('repeatHeadMove')
 
-    # Fixed Pitch
+    ##################### Fixed Pitch #######################
+
     def repeatBasicPanFixedPitch(self):
         '''Repeat the basic fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    # Fixed Pitch
     def repeatWidePanFixedPitch(self):
         '''Repeat the wide fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
-    # Fixed Pitch
     def repeatNarrowPanFixedPitch(self):
         '''Repeat the narrow fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW)
 
-    # Fixed Pitch
     def trackBallFixedPitch(self):
         """
         Enters a state cycle:
@@ -106,7 +94,6 @@ class HeadTracking(FSA.FSA):
         else:
             self.switchTo('trackBallFixedPitch')
 
-    # Fixed Pitch
     def spinPanFixedPitch(self):
         """
         Determines which direction the robot is spinning.
@@ -117,33 +104,7 @@ class HeadTracking(FSA.FSA):
         else:
             self.switchTo('lookRightFixedPitch')
 
-    # Marked for deprecation
-    def activeLoc(self):
-        """
-        If ball is visible and close, track it via vision values.
-        If ball is not visible, execute naive pans.
-        If state counter is low enough, track ball via vision values.
-        If state counter is high enough, perform triangle pans
-        and return to last head angles.
-        """
-        self.target = self.brain.ball
-        self.gain = 1.0
-        self.goalieActiveLoc = False
-        if (not self.activeLocOn):
-            self.switchTo('activeTracking')
-
-    # only need to set goalieActiveLoc in this
-    # and activeLoc because they are the only states
-    # that directly initially call activeTracking
-
-    # Marked for deprecation
-    def activeLocGoaliePos(self):
-        """looks at the ball for shorter amount of time than activeLoc"""
-        self.target = self.brain.ball
-        self.gain = 1.0
-        self.goalieActiveLoc = True
-        if (not self.activeLocOn):
-            self.switchTo('activeTracking')
+    ################### End Fixed Pitch #####################
 
     # Probably needs fixing.
     def kickDecideScan(self):
@@ -171,27 +132,6 @@ class HeadTracking(FSA.FSA):
         if newScan != self.currentHeadScan:
             self.currentHeadScan = newScan
             self.switchTo('scanning')
-
-    # Clarify and simplify.
-    def trackTarget(self, target):
-        """
-        TODO: Pick a comment!!!!
-
-        Someone else: Track given target via vision information while possible.
-        Once target is no longer visible, perform naive pans.
-        If target becomes visible again, either return to state
-        'targetTracking' or go to state 'activeTracking'.
-
-        Lizzie: automatically tracks landmark, scans for landmark if not in view
-        only works if target has attribute loc.dist, framesOn, framesOff,x,y
-        """
-        self.target = target
-        self.target.height = 0
-        self.gain = 1.0
-        if (not self.currentState == 'targetTracking' and
-            not self.currentState == 'lookToTarget' and
-            not self.currentState == 'scanForTarget' ):
-            self.switchTo('targetTracking')
 
     def lookToTarget(self, target):
         """Look towards given target, using localization values."""
