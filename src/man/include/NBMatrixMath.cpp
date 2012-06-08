@@ -76,5 +76,5 @@ const ufvector3 NBMath::solve(ufmatrix3 &A,
 
 const float NBMath::length(ufvector4 &v) {
 
-    return sqrt(v(0) * v(0) + v(1) * v(1) + v(2) * v(2));
+    return sqrtf(v(0) * v(0) + v(1) * v(1) + v(2) * v(2));
 }

@@ -16,21 +16,27 @@ if [ "$1" = "" ]; then
     exit 1
 fi
 
-ROBOCUP_DIR=/mnt/research/robocup
+# modified for Istanbul
+# commented out lines should be re-enabled at Bowdoin
+
+#ROBOCUP_DIR=/mnt/research/robocup
+ROBOCUP_DIR=/home/nbites/
 PSO_DIR=gait-pso/swarms
 PICKLE="PSO_pGaitLearner.pickle"
 
 # fetch the gait file from the robot
 FETCH_GAIT="scp nao@$ROBOT_IP:/home/nao/gaits/$PICKLE /tmp/"
 
-echo "Type username for RoboCup server, followed by [ENTER]"
-read username
+#echo "Type username for RoboCup server, followed by [ENTER]"
+#read username
+username=nbites
 
 echo "Fetching gait..."
 echo $FETCH_GAIT
 eval $FETCH_GAIT || exit 1
 
-SERVER="$username@robocup.bowdoin.edu"
+#SERVER=$username@robocup.bowdoin.edu
+SERVER=$username@eisbaer.local
 
 # back up the old gait file
 NOW=`date "+%m_%d_%H_%M"`  # month_day_hour_minute

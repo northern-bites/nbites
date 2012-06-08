@@ -95,6 +95,8 @@
 #include "NBMatrixMath.h"
 #include "ZmpEKF.h"
 #include "ZmpAccExp.h"
+#include "OdometryFilter.h"
+#include "dsp.h"
 
 //Debugging flags:
 #ifdef WALK_DEBUG
@@ -129,7 +131,8 @@ public:
     bool isDone() const { return done; }
 
     void setSpeed(const float _x, const float _y, const float _theta);
-	void setDestination(const float rel_x, const float rel_y, const float rel_theta);
+    int setDestination(const float rel_x, const float rel_y, const float rel_theta,
+		       float gain = 1.0f);
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
 
@@ -137,7 +140,7 @@ public:
 
     void resetHard();
 
-    static std::vector<float>*
+    static std::vector<float>
     getDefaultStance(const Gait & wp);
 
     const SupportFoot getSupportFoot() const {
@@ -148,22 +151,28 @@ private: // Helper methods
     zmp_xy_tuple generate_zmp_ref();
 
     void findSensorZMP();
-    float scaleSensors(const float sensorZMP, const float perfectZMP) const;
+
+    // checks reliability of Sensor measurements, scales sensorZMP
+    float scaleSensors(const float sensorZMP, const float perfectZMP);
 
     void swapSupportLegs();
 
     void generateStep(float _x,float _y,
                       float _theta);
-    void fillZMP(const boost::shared_ptr<Step> newStep );
-    void fillZMPRegular(const boost::shared_ptr<Step> newStep );
-    void fillZMPEnd(const boost::shared_ptr<Step> newStep);
+    void fillZMP(const Step::ptr newStep );
+    void fillZMPRegular(const Step::ptr newStep );
+    void fillZMPEnd(const Step::ptr newStep);
 
     void resetSteps(const bool startLeft);
+    // updates our relative position to a destination based on the Step distances
+    static void countStepTowardsDestination(Step::ptr step, float& dest_x,
+					    float& dest_y, float& dest_theta,
+					    int& framesToDestination);
 
-    static const NBMath::ufmatrix3 get_f_fprime(const boost::shared_ptr<Step> step);
-    static const NBMath::ufmatrix3 get_fprime_f(const boost::shared_ptr<Step> step);
-    static const NBMath::ufmatrix3 get_sprime_s(const boost::shared_ptr<Step> step);
-    static const NBMath::ufmatrix3 get_s_sprime(const boost::shared_ptr<Step> step);
+    static const NBMath::ufmatrix3 get_f_fprime(const Step::ptr step);
+    static const NBMath::ufmatrix3 get_fprime_f(const Step::ptr step);
+    static const NBMath::ufmatrix3 get_sprime_s(const Step::ptr step);
+    static const NBMath::ufmatrix3 get_s_sprime(const Step::ptr step);
 
     const bool decideStartLeft(const float lateralVelocity,
                                const float radialVelocity);
@@ -171,7 +180,7 @@ private: // Helper methods
 
     void resetQueues();
     void resetOdometry(const float initX, const float initY);
-    void updateOdometry(const std::vector<float> &deltaOdo);
+    void updateOdometry();
     void debugLogging();
     void update_FtoI_transform();
 private:
@@ -186,18 +195,21 @@ private:
 
     bool done;
 
+    bool hasDestination;
+    bool brokenSensorWarning;
+
     SensorAngles sensorAngles;
 
     NBMath::ufvector3 com_i,joints_com_i,last_com_c,com_f,est_zmp_i;
     //boost::numeric::ublas::vector<float> com_f;
     // need to store future zmp_ref values (points in xy)
     std::list<float> zmp_ref_x, zmp_ref_y;
-    std::list<boost::shared_ptr<Step> > futureSteps; //stores steps not yet zmpd
+    std::list<Step::ptr > futureSteps; //stores steps not yet zmpd
     //Stores currently relevant steps that are zmpd but not yet completed.
     //A step is consider completed (obsolete/irrelevant) as soon as the foot
     //enters into double support (perisistant)
-    std::list<boost::shared_ptr<Step> > currentZMPDSteps;
-    boost::shared_ptr<Step> lastQueuedStep;
+    std::list<Step::ptr > currentZMPDSteps;
+    Step::ptr lastQueuedStep;
 
     //Reference Frames for ZMPing steps
     //These are updated when we ZMP a step - they are the 'future', if you will
@@ -205,24 +217,27 @@ private:
     NBMath::ufvector3 last_zmp_end_s;
 
     //Steps for the Walking Leg
-    boost::shared_ptr<Step> lastStep_s;
-    boost::shared_ptr<Step> supportStep_s;
-    boost::shared_ptr<Step> swingingStep_s;
-    boost::shared_ptr<Step> supportStep_f;
-    boost::shared_ptr<Step> swingingStep_f;
-    boost::shared_ptr<Step> swingingStepSource_f;
+    Step::ptr lastStep_s;
+    Step::ptr supportStep_s;
+    Step::ptr swingingStep_s;
+    Step::ptr supportStep_f;
+    Step::ptr swingingStep_f;
+    Step::ptr swingingStepSource_f;
 
     //Reference frames for the Walking Leg
     //These are updated in real time, as we are processing steps
     //that are being sent to the WalkingLegs
     //Translation matrix to transfer points in the non-changing 'i'
     //coord. frame into points in the 'f' coord frame
-	//We also maintain their inverses
+    //We also maintain their inverses
     NBMath::ufmatrix3 if_Transform;
-	NBMath::ufmatrix3 fi_Transform;
+    NBMath::ufmatrix3 fi_Transform;
     NBMath::ufmatrix3 fc_Transform;
-	NBMath::ufmatrix3 cf_Transform;
-    NBMath::ufmatrix3 cc_Transform; //odometry
+    NBMath::ufmatrix3 cf_Transform;
+
+    NBMath::ufmatrix3 cc_Transform;
+    float lastRotation, avgStepRotation, dThetaPerMotionFrame;
+    Boxcar xOdoFilter;
 
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<NaoPose> pose;
@@ -237,7 +252,7 @@ private:
     WalkController *controller_x, *controller_y;
 
     ZmpEKF zmp_filter;
-	ZmpAccExp acc_filter;
+    ZmpAccExp acc_filter;
 
     NBMath::ufvector4 accInWorldFrame;
 
@@ -248,7 +263,7 @@ private:
     FILE* zmp_log;
 #endif
 #ifdef DEBUG_ZMP_REF
-	FILE* zmp_ref_log;
+    FILE* zmp_ref_log;
 #endif
 
 };

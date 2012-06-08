@@ -82,15 +82,13 @@ class YOrder {
 #include "Structs.h"
 #include "Utility.h"
 
-class VisualLine : public VisualLandmark<lineID> {
+class VisualLine : public VisualLandmark {
     // Private constants
     enum {
         edge_pts_for_line = 6,
         edge_pt_buffer = 4,
         angle_epsilon = 5
     };
-
-
  public: // Constants
 
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;
@@ -264,7 +262,7 @@ class VisualLine : public VisualLandmark<lineID> {
     inline const bool isParallel() const;
 
     inline const std::string getColorString() const;
-    inline const std::list <const ConcreteLine *> getPossibleLines() const;
+    inline const std::list <const ConcreteLine *> getPossibilities() const;
     const std::vector<lineID> getIDs();
     inline const std::vector<linePoint> getPoints() const;
 
@@ -448,7 +446,7 @@ inline const std::string VisualLine::getColorString() const
 }
 
 inline
-const std::list <const ConcreteLine *> VisualLine::getPossibleLines() const
+const std::list <const ConcreteLine *> VisualLine::getPossibilities() const
 {
     return possibleLines;
 }

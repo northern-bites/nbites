@@ -1,126 +1,154 @@
-from math import fabs
 from ..util import FSA
 from . import NavStates
-from . import PlaybookPositionStates
-from . import ChaseStates
-from . import PFKStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from man.noggin.typeDefs.Location import RobotLocation
+from objects import RobotLocation, RelRobotLocation
+from ..kickDecider import kicks
+from ..util import Transition 
+
+#speed gains
+FULL_SPEED = 1.0
+FAST_SPEED = 0.8
+MEDIUM_SPEED = 0.6
+CAREFUL_SPEED = 0.4
+SLOW_SPEED = 0.2
+KEEP_SAME_SPEED = -1
+#walk speed adapt
+ADAPTIVE = True
+#goTo precision
+GENERAL_AREA = (5.0, 5.0, 20)
+CLOSE_ENOUGH = (3.5, 3.5, 10)
+PRECISELY = (1.0, 1.0, 5)
+#directions - left is positive (in terms of rotation or y) and right is negative
+LEFT = 1
+RIGHT = -LEFT
+
+
+DEBUG_DESTINATION = False
 
 class Navigator(FSA.FSA):
-    def __init__(self,brain):
-        """it gets you where you want to go"""
+    """it gets you where you want to go"""
 
-        FSA.FSA.__init__(self,brain)
+    def __init__(self, brain):
+        FSA.FSA.__init__(self, brain)
         self.brain = brain
         self.addStates(NavStates)
-        self.addStates(PlaybookPositionStates)
-        self.addStates(ChaseStates)
-        self.addStates(PFKStates)
         self.currentState = 'stopped'
-        self.doingSweetMove = False
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
-        self.justKicked = False
-
-        # Goto controls
-        self.dest = RobotLocation(0, 0, 0)
-
-        # Walk controls
-        self.walkX = 0
-        self.walkY = 0
-        self.walkTheta = 0
-        self.orbitDir = 0
-        self.angleToOrbit = 0
-        self.curSpinDir = 0
 
         self.shouldAvoidObstacleLeftCounter = 0
         self.shouldAvoidObstacleRightCounter = 0
+        
+        #transitions
+        #@todo: move this to the actual transitions file?
+        self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination)
+        self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition, 
+                                                                  Transition.SOME_OF_THE_TIME,
+                                                                  Transition.LOW_PRECISION)
+        self.walkingToTransition = Transition.CountTransition(navTrans.walkedEnough,
+                                                              Transition.ALL_OF_THE_TIME,
+                                                              Transition.INSTANT)
+        
+        NavStates.goToPosition.transitions = { NavStates.atPosition: self.atLocPositionTransition }
+        NavStates.atPosition.transitions = { NavStates.goToPosition: self.locRepositionTransition }
+        NavStates.walkingTo.transitions = { NavStates.standing: self.walkingToTransition }
+
+    def run(self):
+        FSA.FSA.run(self)
 
     def performSweetMove(self, move):
         """
         Navigator function to do the sweet move
         """
-        self.sweetMove = move
-        self.brain.player.stopWalking()
-        helper.executeMove(self.brain.motion, self.sweetMove)
-        self.switchTo('doingSweetMove')
-
-    def dribble(self):
-        self.switchTo('dribble')
-
-    def chaseBall(self):
-        """
-        robot will walk to the ball with it centered at his feet.
-        if no ball is visible, localization will be usedn
-        """
-        self.switchTo('walkSpinToBall')
-
-    def kickPosition(self, kick):
-        """
-        state to align on the ball once we are near it
-        """
-        self.kick = kick
-        self.switchTo('pfk_all')
+        NavStates.scriptedMove.sweetMove = move
+        self.switchTo('scriptedMove')
 
     def positionPlaybook(self):
-        """robot will walk to the x,y,h from playbook using a mix of omni,
-        straight walks and spins"""
+        self.goTo(self.brain.play.getPosition())
+        
+    def chaseBall(self):
+        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, FULL_SPEED)
 
-        self.switchTo('playbookWalk')
+    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, adaptive = False):
+        """
+        General go to method
+        Ideal for going to a field position, or for going to a 
+        relative location that we can track/see
+        
+        @param dest: must be a Location, RobotLocation, RelLocation 
+        or RelRobotLocation.
+        If you want to update the destination, you can just modify the instance
+        you passed to goTo (so for example if you passed ball.loc as a destination,
+        then you wouldn't have to do anything since the ball's position updates
+        automatically).
+        Alternatively, you can use updateDest to change the destination.
+        This is especially important if dest is a relative location, 
+        since there's no way for the robot to keep track of how close it is to the 
+        location, so if you don't update it it will keep walking to that destination
+        indefinitely
+        @param speedGain: controls how fast the robot does the goTo; use provided 
+        constants for some good ballparks
+        @param precision: a tuple of deltaX, deltaY, deltaH for how close you want to get 
+        to the location
+        @param adaptive: if true, then the speed is adapted to how close the target is
+        and the speed paramater is interpreted as the maximum speed
+        """
+        
+        self.updateDest(dest, speed)
+        NavStates.goToPosition.precision = precision
+        NavStates.goToPosition.adaptive = adaptive
+        
+        if self.currentState is not 'goToPosition':
+            self.switchTo('goToPosition')
 
-    def goTo(self,dest):
-        self.dest = dest
+    def updateDest(self, dest, speed = KEEP_SAME_SPEED):
+        """  Update the destination we're headed to   """
+        NavStates.goToPosition.dest = dest
+        if speed is not KEEP_SAME_SPEED:
+            NavStates.goToPosition.speed = speed
 
-        if not self.currentState == 'spinToWalkHeading' and \
-               not self.currentState == 'walkStraightToPoint' and \
-               not self.currentState == 'spinToFinalHeading':
-            if not navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
-                self.switchTo('spinToWalkHeading')
-            elif navTrans.atHeadingGoTo(self.brain.my, self.dest.h):
-                self.switchTo('walkStraightToPoint')
+    def walkTo(self, walkToDest, precision = CLOSE_ENOUGH, speed = FULL_SPEED):
+        """
+        Walks to a RelRobotLocation
+        Checks for the destination using odometry
+        Great for close destinations (since odometry gets bad over time) in 
+        case loc is bad
+        Doesn't avoid obstacles! (that would make odometry very bad, especially if we're 
+        being pushed)
+        Switches to standing at the end
+        @todo: Calling this again before the other walk is done does some weird stuff
+        """
+        if not isinstance(walkToDest, RelRobotLocation):
+            raise TypeError, "walkToDest must be a RelRobotLocation"
+        
+        NavStates.walkingTo.dest = walkToDest
+        NavStates.walkingTo.speed = speed
+        NavStates.walkingTo.precision = precision
+        
+        #reset the counter to make sure walkingTo.firstFrame() is true on entrance
+        #in case we were in walkingTo before as well
+        self.counter = 0
+        self.switchTo('walkingTo')
 
     def stop(self):
-        if ((self.currentState =='stop' or self.currentState == 'stopped')
-            and not self.justKicked):
-            pass
-        else:
+        if self.currentState not in ['stop', 'stopped']:
             self.switchTo('stop')
 
-    def isStopped(self):
-        return self.currentState == 'stopped'
+    def orbitAngle(self, radius, angle):
+        """ 
+        Orbits a point at a certain radius for a certain angle using walkTo
+        WARNING: as of now angles that are greater than 90 degrees
+        are iffy since the robot will try to cut a straight-ish path to that
+        destination; a solution would be to enque several smaller
+        walkTo's or something
+        """
+        self.walkTo(helper.getOrbitLocation(radius, angle), CLOSE_ENOUGH, SLOW_SPEED)
 
-    def orbit(self, orbitDir):
-
-        # If the orbit direction is the same ignore the command
-        if (self.orbitDir == orbitDir):
-            self.updatedTrajectory = False
-            return
-
-        self.orbitDir = orbitDir
-        self.walkX = 0
-        self.walkY = self.orbitDir*constants.ORBIT_STRAFE_SPEED
-        self.walkTheta = self.orbitDir*constants.ORBIT_SPIN_SPEED
-        self.updatedTrajectory = True
-
-        self.switchTo('orbitPoint')
-
-    def orbitAngle(self, angleToOrbit):
-
-        if (self.angleToOrbit == angleToOrbit and \
-                self.currentState == 'orbitPointThruAngle'):
-            self.updatedTrajectory = False
-            return
-
-        self.angleToOrbit = angleToOrbit
-
-        self.updatedTrajectory = True
-
-        self.switchTo('orbitPointThruAngle')
+        
 
     def walk(self, x, y, theta):
         """
@@ -128,31 +156,55 @@ class Navigator(FSA.FSA):
         Does nothing if it is the same as the current walk
         Switches to it otherwise
         """
-        # Make sure we stop
-        if (x == 0 and y == 0 and theta == 0):
-            self.printf("!!!!!! USE player.stopWalking() NOT walk(0,0,0)!!!!!")
-            return
-        # If the walk changes are really small, then ignore them
-        if (fabs(self.walkX - x) < constants.FORWARD_EPSILON and
-            fabs(self.walkY - y) < constants.STRAFE_EPSILON and
-            fabs(self.walkTheta - theta) < constants.SPIN_EPSILON):
-            self.updatedTrajectory = False
-            return
-
-        self.walkX = x
-        self.walkY = y
-        self.walkTheta = theta
-
-        self.updatedTrajectory = True
+        NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
-    def takeSteps(self, x, y, theta, numSteps):
+    def stand(self):
         """
-        Set the step commands
+        Make the robot stand; Standing should be the default action when we're not 
+        walking/executing a sweet move
         """
-        self.walkX, self.walkY, self.walkTheta = 0, 0, 0
-        self.stepX = x
-        self.stepY = y
-        self.stepTheta = theta
-        self.numSteps = numSteps
-        self.switchTo('stepping')
+        self.switchTo('standing')
+
+    # informative methods
+    def isAtPosition(self):
+        return self.currentState is 'atPosition'
+    
+    def isStopped(self):
+        return self.currentState in ['stopped', 'standing'] 
+
+    def spinDirection(self):
+        """ Returns LEFT or RIGHT depending on navigation direction """
+        
+        #@todo: put in a threshold since a relative destination
+        # will never  have heading 0; I don't know how important that is
+        if self.currentState is 'goToPosition':
+            if NavStates.goToPosition.deltaDest.relH > 0:
+                return LEFT
+            elif NavStates.goToPosition.deltaDest.relH < 0:
+                return RIGHT
+            else:
+                return 0
+            
+        if self.currentState is 'walkingTo':
+            if NavStates.walkingTo.deltaDest.relH > 0:
+                return LEFT
+            elif NavStates.walkingTo.deltaDest.relH < 0:
+                return RIGHT
+            else:
+                return 0
+            
+        if self.currentState is 'walking':
+            if NavStates.walking.speeds[2] > 0:
+                return LEFT
+            elif NavStates.walking.speeds[2] < 0:
+                return RIGHT
+            else:
+                return 0
+        
+    def isSpinningLeft(self):
+        return self.spinDirection() == LEFT
+    
+    def isSpinningRight(self):
+        return self.spinDirection() == RIGHT
+        

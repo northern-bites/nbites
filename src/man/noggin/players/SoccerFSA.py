@@ -5,7 +5,6 @@
 from man.motion import HeadMoves
 import man.motion as motion
 from ..util import FSA
-from ..navigator import NavHelper as helper
 from . import CoreSoccerStates
 
 class SoccerFSA(FSA.FSA):
@@ -25,8 +24,19 @@ class SoccerFSA(FSA.FSA):
         # for writing variance data only once per appropriate state
         self.wroteVarianceData = False
 
+        # stuff so players don't crash.
+        self.inKickingState = False
+        self.saveBallPosition()
+
+        # Penalty kick player variables
+        self.penaltyKicking = False
+
+        # Kickoff kick
+        self.hasKickedOff = True
+
     def run(self):
-        # gamePenalized is a good time for a lot of i/o, since we won't be moving
+        # gamePenalized is a good time for a lot of i/o, since we
+        # won't be moving
         if self.currentState == 'gamePenalized' or \
                self.currentState == 'gameFinished':
             if not self.wroteVarianceData:
@@ -45,59 +55,41 @@ class SoccerFSA(FSA.FSA):
         """
         self.brain.nav.performSweetMove(sweetMove)
 
-    def setWalk(self,x,y,theta):
+    def setWalk(self, x, y, theta):
         """
         Wrapper method to easily change the walk vector of the robot
         """
         if x == 0 and y == 0 and theta == 0:
-            self.stopWalking()
+            self.stand()
         else:
             self.brain.nav.walk(x,y,theta)
-            # else:
-            #     self.printf("WARNING NEW WALK of %g,%g,%g" % (x,y,theta) +
-            #                 " is ignored")
 
-    def getWalk(self):
-        """
-        returns a tuple of current walk parameters
-        """
-        nav = self.brain.nav
-        return (nav.walkX, nav.walkY, nav.walkTheta)
-
-    def setSteps(self, x, y, theta, numSteps=1):
-        """
-        Have the robot walk a specified number of steps
-        """
-        if self.brain.motion.isWalkActive():
-            return False
-        else:
-            self.brain.nav.takeSteps(x, y, theta, numSteps)
-            return True
-
-    def standup(self):
-        self.brain.nav.stop()
-
-    def walkPose(self):
-        """
-        we return to std walk pose when we stop walking
-        """
-        self.brain.nav.stop()
+    def stand(self):
+        """ Set the navigator/motion engine to stand"""
+        self.brain.nav.stand()
 
     def stopWalking(self):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
-        nav = self.brain.nav
-        if not nav.isStopped():
-            self.brain.nav.stop()
+        self.brain.nav.stop()
 
-    def atDestinationCloser(self):
-        nav = self.brain.nav
-        return helper.atDestinationCloser(self.brain.my, nav.dest)
+    def ballMoved(self):
+        """
+        Returns true if the ball has moved in the absolute frame since the last time
+        saveBallPosition() was called, or if the uncertainty is too high
+        """
+        if abs(self.brain.ball.loc.x - self.lastBall_x) > 20 or \
+               abs(self.brain.ball.loc.y - self.lastBall_y) > 20:
+            print "Ball has moved globally since we last saved"
+            self.brain.speech.say("Ball moved")
+            return True
 
-    def atHeading(self):
-        nav = self.brain.nav
-        return helper.atHeading(self.brain.my, nav.dest.h)
+        return False
+
+    def saveBallPosition(self):
+        self.lastBall_x = self.brain.ball.loc.x
+        self.lastBall_y = self.brain.ball.loc.y
 
 ##### Direct Motion Calls
     def gainsOff(self):

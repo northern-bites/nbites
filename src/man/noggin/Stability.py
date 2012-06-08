@@ -1,13 +1,11 @@
-from . import NogginConstants as Constants
 from math import fabs
-from .typeDefs import Location
 
 try:
     from numpy import corrcoef
     haveNumpy = True
 except:
     haveNumpy = False
-    print "could not load numpy, please install it for advanced statistics"
+    print "  Could not load numpy. Please install it for advanced statistics."
 
 # unstable walks that do not fall have accelerometer variance
 # on the order of 1.5-3, stable walks are < 1
@@ -63,7 +61,6 @@ class Stability:
         xStabilityHeuristic = X_STABILITY_WEIGHT * xVariance
         yStabilityHeuristic = Y_STABILITY_WEIGHT * yVariance
 
-        # new style python print formatting - READ ABOUT IT (it's awesome)
         print 'X/Y accelerometer variance: {0:.3f}/{1:.3f}'.format(xVariance, yVariance)
 
         return xStabilityHeuristic**2 + yStabilityHeuristic**2

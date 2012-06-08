@@ -1,19 +1,23 @@
 #include "VisualCross.h"
 VisualCross::VisualCross() :
-    VisualDetection(), VisualLandmark<crossID>(ABSTRACT_CROSS)
+    VisualObject(ABSTRACT_CROSS)
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 VisualCross::VisualCross(const crossID _id) :
-    VisualDetection(), VisualLandmark<crossID>(_id)
+    VisualObject(_id)
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 
 VisualCross::VisualCross(const VisualCross& o) :
-    VisualDetection(o), VisualLandmark<crossID>(o.id){}
+    VisualObject(o){}
 
 // Initialization, happens every frame.
 void VisualCross::init()
@@ -26,10 +30,10 @@ void VisualCross::init()
     centerY = 0;
     angleX = 0;
     angleY = 0;
-    focDist = 0;
     setDistance(0);
     setBearing(0);
     elevation = 0;
+    on = false;
 
 	switch (id) {
 	case YELLOW_GOAL_CROSS:

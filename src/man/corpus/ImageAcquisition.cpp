@@ -7,11 +7,11 @@
  */
 int ImageAcquisition::acquire_image_fast(uint8_t *table,
                                          const ColorParams &params,
-                                         uint8_t *yuv, uint16_t *out )
+                                         const uint8_t *yuv, uint16_t *out )
 {
 #ifdef __linux__
     _acquire_image_fast(table, const_cast<ColorParams*>(&params), yuv, out);
-#else
+#else //TODO: I don't think this accurately reflects the ASM image acquisition
 
     uint16_t *yOut = out;
     uint16_t *uvOut = out + AVERAGED_IMAGE_SIZE;

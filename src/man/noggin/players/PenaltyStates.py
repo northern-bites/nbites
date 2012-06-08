@@ -1,7 +1,8 @@
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
+from objects import RelRobotLocation
 
 OBJ_SEEN_THRESH = 5
 LOOK_DIR_THRESH = 10
@@ -12,16 +13,20 @@ def afterPenalty(player):
 
     if player.firstFrame():
         initPenaltyReloc(player)
-        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_LEFT)
+        player.brain.tracker.locPans()
+        # walk towards the center of the field
+        player.brain.nav.walkTo(RelRobotLocation(2000,0,0))
 
-    if player.brain.ball.framesOn > OBJ_SEEN_THRESH:
+    if player.brain.ball.vis.framesOn > OBJ_SEEN_THRESH:
         #deal with ball and don't worry about loc
         player.brain.tracker.trackBall()
         return player.goLater(gcState)
 
+    # Would be great if loc worked. Hacked out for US OPEN 2012
+    """
     if not player.brain.motion.isHeadActive():
         ##looking to the side
-        if player.brain.yglp.on or player.brain.ygrp.on:
+        if player.brain.yglp.vis.on or player.brain.ygrp.vis.on:
             #see the goal posts in multiple frames for safety
             seeYellow(player)
             if player.yellowCount >= OBJ_SEEN_THRESH:
@@ -29,7 +34,7 @@ def afterPenalty(player):
                 #now you know where you are!
                 return player.goLater(gcState)
 
-        if player.brain.bglp.on or player.brain.bgrp.on:
+        if player.brain.bglp.vis.on or player.brain.bgrp.vis.on:
             #see the goal posts in multiple frames for safety
             seeBlue(player)
             if player.blueCount >= OBJ_SEEN_THRESH:
@@ -37,7 +42,10 @@ def afterPenalty(player):
                 #now you know where you are!
                 return player.goLater(gcState)
         player.headCount += 1
+    """
 
+    # Hacked out for US OPEN 2012
+    """
     #if we are looking left too long
     if player.headCount == LOOK_DIR_THRESH:
         player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
@@ -45,6 +53,13 @@ def afterPenalty(player):
     #if we are looking right too long
     if player.headCount == 2*LOOK_DIR_THRESH:
         return player.goLater('penaltyRelocalize')
+        """
+
+    # If done walking forward, start relocalizing normally
+    if player.brain.nav.isStopped() or player.counter > 250:
+        player.brain.nav.stop()
+        return player.goLater('spinFindBall')
+    
 
     return player.stay()
 
@@ -103,18 +118,17 @@ def penaltyRelocalize(player):
     Note: This is the old code that I'm using as a back-up in case we can't
     see any goal posts. It may be possible to make this smarter. -Wils
     """
-
+    #@todo: Go back to game playing rather than the gameControllerState?
     gcState = player.brain.gameController.currentState
 
     if player.firstFrame():
         player.setWalk(1, 0, 0)
 
-    if player.brain.ball.framesOn >= OBJ_SEEN_THRESH:
+    if player.brain.ball.vis.framesOn >= OBJ_SEEN_THRESH:
         player.brain.tracker.trackBall()
         return player.goLater(gcState)
 
-    if player.brain.my.locScore == NogginConstants.GOOD_LOC or \
-            player.brain.my.locScore == NogginConstants.OK_LOC:
+    if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
         player.shouldRelocalizeCounter += 1
 
         if player.shouldRelocalizeCounter > 30:
@@ -126,12 +140,5 @@ def penaltyRelocalize(player):
 
     if not player.brain.motion.isHeadActive():
         player.brain.tracker.locPans()
-
-    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
-        direction = MyMath.sign(player.getWalk()[2])
-        if direction == 0:
-            direction = 1
-
-        player.setWalk(0 , 0, constants.RELOC_SPIN_SPEED * direction)
 
     return player.stay()

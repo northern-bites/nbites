@@ -1,76 +1,69 @@
 #include "LoggingBoard.h"
 #include "NaoPaths.h"
 
-namespace memory {
+#include <cstdio>
 
+namespace man {
+namespace memory {
 namespace log {
 
-const char* LoggingBoard::MVISION_PATH = NAO_LOG_DIR "/Vision.log";
-const char* LoggingBoard::MMOTION_SENSORS_PATH = NAO_LOG_DIR "/MotionSensors.log";
-const char* LoggingBoard::MVISION_SENSORS_PATH = NAO_LOG_DIR "/VisionSensors.log";
-const char* LoggingBoard::MIMAGE_PATH = NAO_LOG_DIR "/Image.log";
+using boost::shared_ptr;
 
-LoggingBoard::LoggingBoard(const Memory* _memory) :
-    memory(_memory) {
-    initLoggingObjects();
+LoggingBoard::LoggingBoard(Memory::const_ptr memory) :
+    memory(memory), logging(true) {
 }
 
-void LoggingBoard::initLoggingObjects() {
+void LoggingBoard::newOutputProvider(OutProvider::ptr outProvider,
+									 MObject_ID id) {
 
-    const MVision* mvision = memory->getMVision();
-    FDProvider* mvisionFDprovider = new FileFDProvider(MVISION_PATH);
-    objectFDProviderMap[mvision] = mvisionFDprovider;
-    objectFDLoggerMap[mvision] = new CodedFileLogger(mvisionFDprovider,
-            MVISION_ID, mvision);
-
-    const MMotionSensors* mmotionSensors = memory->getMMotionSensors();
-    FDProvider* mmotionSensorsFDprovider = new FileFDProvider(
-            MMOTION_SENSORS_PATH);
-    objectFDProviderMap[mmotionSensors] = mmotionSensorsFDprovider;
-    objectFDLoggerMap[mmotionSensors] = new CodedFileLogger(
-            mmotionSensorsFDprovider, MMOTION_SENSORS_ID, mmotionSensors);
-
-    const MVisionSensors* mvisionSensors = memory->getMVisionSensors();
-    FDProvider* mvisionSensorsFDprovider = new FileFDProvider(
-            MVISION_SENSORS_PATH);
-    objectFDProviderMap[mvisionSensors] = mvisionSensorsFDprovider;
-    objectFDLoggerMap[mvisionSensors] = new CodedFileLogger(
-            mvisionSensorsFDprovider, MVISION_SENSORS_ID, mvisionSensors);
-
-    const MImage* mimage = memory->getMImage();
-    FDProvider* mimageFDprovider = new FileFDProvider(MIMAGE_PATH);
-    objectFDProviderMap[mimage] = mimageFDprovider;
-    objectFDLoggerMap[mimage] = new ImageFDLogger(mimageFDprovider,
-            MIMAGE_ID, mimage);
+    MessageLogger::ptr logger(
+    			new MessageLogger(outProvider,  memory->getMObject(id)));
+    objectIOMap[id] = logger;
+    memory->subscribe(logger.get(), id);
+    //start the logging thread
+    logger->start();
 }
 
-void LoggingBoard::log(const MObject* mobject) {
-
-    ObjectFDLoggerMap::iterator it = objectFDLoggerMap.find(mobject);
+MessageLogger::const_ptr LoggingBoard::getLogger(MObject_ID id) const {
+    ObjectIOMap::const_iterator it = objectIOMap.find(id);
     // if this is true, then we found a legitimate logger
     // corresponding to our mobject in the map
-    if (it != objectFDLoggerMap.end()) {
-        //it->second is the logger associated with the specified mobject
-        it->second->write();
-    }
-}
-
-const ImageFDLogger* LoggingBoard::getImageLogger(const MImage* mimage) const {
-    return dynamic_cast<const ImageFDLogger*>(this->getLogger(mimage));
-}
-
-const FDLogger* LoggingBoard::getLogger(const MObject* mobject) const {
-    ObjectFDLoggerMap::const_iterator it = objectFDLoggerMap.find(mobject);
-    // if this is true, then we found a legitimate logger
-    // corresponding to our mobject in the map
-    if (it != objectFDLoggerMap.end()) {
+    if (it != objectIOMap.end()) {
         return it->second;
     } else {
-        return NULL;
+        return MessageLogger::const_ptr();
     }
 }
 
-
+MessageLogger::ptr LoggingBoard::getMutableLogger(MObject_ID id) {
+    ObjectIOMap::iterator it = objectIOMap.find(id);
+    // if this is true, then we found a legitimate logger
+    // corresponding to our mobject in the map
+    if (it != objectIOMap.end()) {
+        return it->second;
+    } else {
+        return MessageLogger::ptr();
+    }
 }
 
+void LoggingBoard::reset() {
+    ObjectIOMap::iterator it;
+    for (it = objectIOMap.begin(); it != objectIOMap.end(); it++) {
+        memory->unsubscribe(it->second.get(), it->first);
+    }
+    objectIOMap.clear();
+}
+
+void LoggingBoard::startLogging() {
+    printf("Starting logging!\n");
+    logging = true;
+}
+
+void LoggingBoard::stopLogging() {
+    printf("Stopped logging!\n");
+    logging = false;
+}
+
+}
+}
 }

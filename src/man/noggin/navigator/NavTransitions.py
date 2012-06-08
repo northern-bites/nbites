@@ -1,94 +1,83 @@
-from math import fabs, sqrt, pow
+from math import fabs, hypot
 from . import NavConstants as constants
+import NavStates as states
 from man.noggin.util import MyMath
-from man.noggin import NogginConstants
+import noggin_constants as NogginConstants
+from ..players import ChaseBallTransitions
+from . import NavHelper as helper
 
-def atDestinationCloser(my, dest):
+DEBUG = True
+
+def atDestination(nav):
     """
-    Returns true if we are at an (x, y) close enough to the one we want
-
+    Returns true if we're close enough to nav's current destination;
+    Takes into account loc uncertainty to check if we're at least close to
+    the destination according to our belief
     """
-    #diffX = fabs(dest.x - my.x)
-    #diffY = fabs(dest.y - my.y)
-
-    #return diffX < my.uncertX and diffY < my.uncertY
-
-    return my.distTo(dest) < (constants.CLOSER_XY +
-                              sqrt(pow(my.uncertX, 2) + 
-                                   pow(my.uncertY, 2)))
-
-def atDestinationCloserAndFacing(my, dest, bearing):
-    return (atDestinationCloser(my, dest) and \
-            fabs(bearing) < constants.CLOSE_ENOUGH_H)
-
-def atHeadingGoTo(my, targetHeading):
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
-    return hDiff < constants.AT_HEADING_GOTO_DEG
-
-def atHeading(my, targetHeading):
-    """
-    Returns true if we are at a heading close enough to what we want
-    """
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
-    return hDiff < constants.CLOSE_ENOUGH_H and \
-           my.uncertH < constants.LOC_IS_ACTIVE_H
-
-#not used
-def notAtHeading(my, targetHeading):
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
-
-    return hDiff > constants.ALMOST_CLOSE_ENOUGH_H and \
-           my.uncertH < constants.LOC_IS_ACTIVE_H
-
-def useFinalHeading(brain, position):
-    if brain.gameController.currentState == 'gameReady':
-        useFinalHeadingDist = constants.FINAL_HEADING_READY_DIST
+    relDest = helper.getRelativeDestination(nav.brain.my, states.goToPosition.dest)
+    my = nav.brain.my
+    (x, y, h) = states.goToPosition.precision
+    
+    if (not helper.isDestinationRelative(states.goToPosition.dest)):
+        return relDest.within((x + my.uncertX, y + my.uncertY, h + my.uncertH))
     else:
-        useFinalHeadingDist = constants.FINAL_HEADING_DIST
+        return relDest.within((x, y, h))
+            
+    
+def notAtLocPosition(nav):
+    return not atDestination(nav)
 
-    distToPoint = brain.my.distTo(position)
-
-    return (distToPoint <= useFinalHeadingDist)
+def walkedEnough(nav):
+    deltaDest = states.walkingTo.deltaDest
+    dest = states.walkingTo.dest
+    precision = states.walkingTo.precision
+    
+    #check if we've "passed" the point we were supposed to go to
+    #with odometry
+    if (dest.relX * deltaDest.relX < 0 and 
+        dest.relY * deltaDest.relY < 0 and 
+        dest.relH * deltaDest.relH < 0):
+        return True
+     
+    return deltaDest.within(precision)
 
 ######### BALL IN BOX ###############
+
+#keeping this code around for posterity; do we actually need it?
 
 def shouldChaseAroundBox(my, ball):
 
     # 3 common, simple cases where we don't need to worry about the box.
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
-        if ball.x > NogginConstants.MY_GOALBOX_RIGHT_X:
+        if ball.loc.x > NogginConstants.MY_GOALBOX_RIGHT_X:
             return False
 
     if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-        if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+        if ball.loc.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
             return False
 
     if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
-        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
+        if ball.loc.y > NogginConstants.MY_GOALBOX_TOP_Y:
             return False
 
     # handle more complex cases where correct behavior isn't obvious
     intersect = MyMath.linesIntersect
 
-    return ( intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
+    return ( intersect( my.x, my.y, ball.loc.x, ball.loc.y, # BOTTOM_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_LEFT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-             intersect( my.x, my.y, ball.x, ball.y, # LEFT_GOALBOX_LINE
+             intersect( my.x, my.y, ball.loc.x, ball.loc.y, # LEFT_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-             intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
+             intersect( my.x, my.y, ball.loc.x, ball.loc.y, # BOTTOM_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_LEFT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y) )
-
-def shouldNotGoInBox(ball):
-    return (False and ball.inMyGoalBox() and
-            ball.dist < constants.IGNORE_BALL_IN_BOX_DIST)
 
 ####### AVOIDANCE STUFF ##############
 
@@ -130,20 +119,11 @@ def shouldAvoidObstacle(nav):
     Should avoid an obstacle
     """
     # don't dodge an object in front when we're not going forward
-    if nav.walkX <= 0:
+    # @todo: this is terrible since we're not always in walk mode (we're 
+    # mostly in goTo modes)
+    if states.walking.speeds[0] < 0:
         return False
 
     return ((shouldAvoidObstacleLeft(nav) or
              shouldAvoidObstacleRight(nav)) and
             not nav.brain.player.penaltyKicking)
-
-def shouldAvoidObstacleDuringApproachBall(nav):
-    return (nav.brain.ball.dist >
-            constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST and \
-            shouldAvoidObstacle(nav))
-
-KICK_STRAIGHT_BEARING_THRESH = 20.
-########## CHASE STUFF ##############
-def shouldChaseOrbit(myH, destH):
-    hDiff = MyMath.sub180Angle(myH - destH)
-    return( fabs(hDiff) > KICK_STRAIGHT_BEARING_THRESH)

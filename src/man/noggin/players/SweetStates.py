@@ -7,7 +7,7 @@ import man.motion.SweetMoves as SweetMoves
 def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
-        player.standup()
+        player.stand()
     return player.stay()
 
 def gameReady(player):

@@ -50,13 +50,13 @@ static const float ORANGE_BALL_RADIUS = 32.5; //mm
 class Ball {
 public:
     Ball(Vision* vis, Threshold* thr, Field* fie, Context* con,
-		 unsigned char _color);
+         unsigned char _color);
     virtual ~Ball() {}
 
     // SETTERS
     void setColor(unsigned char c);
     void allocateColorRuns();
-	void newRun(int x, int y, int h);
+    void newRun(int x, int y, int h);
 
     // Making object
     void init(float s);
@@ -67,24 +67,25 @@ public:
     void createBall(int c);
 
     // ball stuff
-	bool isOrange(unsigned char pix);
-	bool isRed(unsigned char pix);
-	bool isYellow(unsigned char pix);
-	bool isGreen(unsigned char pix);
-	bool isUndefined(unsigned char pix);
+    bool isOrange(unsigned char pix);
+    bool isRed(unsigned char pix);
+    bool isYellow(unsigned char pix);
+    bool isGreen(unsigned char pix);
+    bool isUndefined(unsigned char pix);
     float rightHalfColor(Blob obj);
     void setOcclusionInformation();
     bool ballIsReasonablySquare(int x, int y, int w, int h);
+	bool robotOccludesIt(int x, int y, int w, int h);
     bool nearImageEdgeX(int x, int margin);
     bool nearImageEdgeY(int y, int margin);
     bool nearEdge(Blob b);
     int roundness(Blob b);
-    pair<int, int> scanMidlinesForRoundnessInformation(Blob b);
-    pair<int, int> scanDiagonalsForRoundnessInformation(Blob b);
+    std::pair<int, int> scanMidlinesForRoundnessInformation(Blob b);
+    std::pair<int, int> scanDiagonalsForRoundnessInformation(Blob b);
     bool badSurround(Blob b);
-	void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
-    void checkForReflections(int h, int w, VisualBall * thisBall,
-                             estimate e);
+    float ballDistanceEstFromRadius(float radius);
+    void setBallInfo(int w, int h, VisualBall *thisBall);
+    void checkForReflections(int h, int w, VisualBall * thisBall);
     bool ballIsClose(VisualBall * thisBall);
     bool ballIsNotSquare(int h, int w);
 
@@ -94,9 +95,11 @@ public:
     int findBallEdgeY(int x, int y, int dir);
     int findBallEdgeX(int x, int y, int dir);
 
+    void setFramesOnAndOff(VisualBall *objPtr);
+
     // sanity checks
     void preScreenBlobsBasedOnSizeAndColor();
-    bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
+    bool sanityChecks(int w, int h, VisualBall * thisBall);
     bool blobOk(Blob b);
     bool blobIsBigEnoughToBeABall(int w, int h);
 
@@ -110,15 +113,15 @@ public:
     void paintRun(int x,int y, int h, int c);
     void drawRun(const run& run, int c);
 #ifdef OFFLINE
-	void setDebugBall(bool debugBall) {BALLDEBUG = debugBall;}
-	void setDebugBallDistance(bool debug) {BALLDISTDEBUG = debug;}
+    void setDebugBall(bool debugBall) {BALLDEBUG = debugBall;}
+    void setDebugBallDistance(bool debug) {BALLDISTDEBUG = debug;}
 #endif
 
 private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
-	Field* field;
+    Field* field;
     Context* context;
 
     int topSpot; //keeps track of best blob -> global var for debugging purposes
@@ -134,7 +137,11 @@ private:
     Blob *topBlob, zeroBlob;
     //Blob checker, obj, pole, leftBox, rightBox;
     Blobs *blobs;
-	estimate focalDist;
+
+    //estimates for current blob
+    estimate radiusBasedEst;
+    estimate kinematicsBasedEst;
+
     int inferredConfidence;
     float slope;
     int occlusion;
@@ -142,12 +149,13 @@ private:
     int numPoints;
     float points[MAX_BALL_POINTS*2];
 #ifdef OFFLINE
-	bool BALLDISTDEBUG;
-	bool BALLDEBUG;
+    bool BALLDISTDEBUG;
+    bool BALLDEBUG;
 #else
-	static const bool BALLDISTDEBUG = false;
-	static const bool BALLDEBUG = false;
+    static const bool BALLDISTDEBUG = false;
+    static const bool BALLDEBUG = false;
 #endif
+
 };
 
 #endif // Ball_h_DEFINED

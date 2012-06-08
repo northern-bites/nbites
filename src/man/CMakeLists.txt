@@ -92,7 +92,7 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 # Define this to remotely install the binary or library on the robot.
 # Cannot be selected unless OE_CROSS_BUILD is set to ON.
 SET( @ROBOT_NAME@
-  "spock"
+  "river"
   CACHE STRING
   "The NAME of the robot"
   )
@@ -102,7 +102,7 @@ SET( ROBOT_NAME ${@ROBOT_NAME@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( COLOR_TABLE
-  "../../data/tables/223-11.mtb"
+  "../../data/tables/lab120/lab120-11.mtb"
   CACHE STRING
   "Path relative to man directory for the desired color table"
   )
@@ -120,19 +120,11 @@ CONFIGURE_FILE(
   ESCAPE_QUOTES
   )
 
-IF ( NOT USE_TTS )
-  SET( USE_TTS_POUND "#" )
+IF ( NOT USE_ALSPEECH )
+  SET( USE_ALSPEECH_POUND "#" )
 ELSE()
-  SET( USE_TTS_POUND "" )
+  SET( USE_ALSPEECH_POUND "" )
 ENDIF()
-
-SET( AUTOLOAD_INI ${CFG_DIR}/autoload.ini )
-
-CONFIGURE_FILE(
-  ${MAN_CMAKE_DIR}/autoload.ini.in
-  ${CFG_DIR}/autoload.ini
-  ESCAPE_QUOTES
-  )
 
 ############################ DEFINITIONS
 # Add here definition needed.
@@ -154,48 +146,77 @@ INCLUDE_DIRECTORIES(
   ${COMM_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
   ${MOTION_INCLUDE_DIR}
+  ${BHWALK_INCLUDE_DIR}
   ${NOGGIN_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${WEBOTS_INCLUDE_DIR}
   ${MEMORY_INCLUDE_DIR}
+  ${PROJECT_BINARY_DIR}
   ${CFG_DIR}
   )
 
-############################ PROJECT SOURCES FILES
-# Add here source files needed to compile this project
+############################ Platform settings
+
+IF(BUILDING_FOR_A_REMOTE_NAO)
+  SET( MAN_LOADER_SRC NaoManLoader )
+  LIST(APPEND MAN_PRELOADER_SRCS NaoManPreloader )
+ENDIF()
+IF(OFFLINE)
+  SET( MAN_LOADER_SRC OfflineManLoader )
+  LIST(APPEND MAN_PRELOADER_SRCS OfflineManPreloader )
+ENDIF()
+
+############################ Setting up Man
 SET( MAN_SRCS Man
               TMan
               TTMan
-  )
+              ${MAN_LOADER_SRC} )
 
 IF(WEBOTS_BACKEND)
+#NOTE: this doesn't work anymore because we changed the way we
+# load man - Octavian
   LIST(APPEND MAN_SRCS nao_soccer_player
     )
-ELSE(WEBOTS_BACKEND)
-  LIST(APPEND MAN_SRCS manmodule
-    )
-ENDIF(WEBOTS_BACKEND)
+ENDIF()
 
 SET( MAN_PYTHON_SRCS __init__.py )
 
-############################ CHECK LIBRARY / EXECUTABLE OPTION
-# Configure the output execuatable or shared library, and the install
-# commands
+ADD_LIBRARY(
+  ${MAN_TARGET}
+  SHARED
+  ${MAN_SRCS}
+  )
 
-GET_TARGET_PROPERTY( MAN_LOCATION ${MAN_TARGET} LOCATION )
+TARGET_LINK_LIBRARIES(
+  ${MAN_TARGET}
+  ${COMM_TARGET}
+  ${SENSORS_TARGET}
+  ${ROBOT_INTERFACE_TARGET}
+  ${ROBOT_CONNECT_TARGET}
+  ${NBINCLUDE_TARGET}
+  ${VISION_TARGET}
+  ${MOTION_TARGET}
+  ${NOGGIN_TARGET}
+  ${MEMORY_TARGET}
+  ${WEBOTS_LIBRARIES}
+  )
 
-IF( MAN_IS_REMOTE )
-  ADD_EXECUTABLE(
-    ${MAN_TARGET}
-    ${MAN_SRCS}
-    )
-ELSE( MAN_IS_REMOTE )
-  ADD_LIBRARY(
-    ${MAN_TARGET}
-    SHARED
-    ${MAN_SRCS}
-    )
-ENDIF( MAN_IS_REMOTE )
+############################## Setting up Man Preloader
+
+ADD_LIBRARY(
+  ${MAN_PRELOADER_TARGET}
+  SHARED
+  ${MAN_PRELOADER_SRCS}
+  )
+
+############################# INSTALL PATHS
+
+INSTALL(
+  TARGETS ${MAN_PRELOADER_TARGET}
+  RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}
+  LIBRARY DESTINATION ${OUTPUT_ROOT_DIR_LIB}
+  CONFIGURATIONS "" Debug Release
+  )
 INSTALL(
   TARGETS ${MAN_TARGET}
   RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}
@@ -207,27 +228,6 @@ INSTALL(
   DESTINATION ${MAN_PYTHON_TARGET_DIR}
   CONFIGURATIONS "" Debug Release
   )
-INSTALL(
-  FILES ${AUTOLOAD_INI}
-  DESTINATION ${OUTPUT_ROOT_DIR_PREF}
-  CONFIGURATIONS "" Debug Release
-  )
-
-############################ SET LIBRARIES TO LINK WITH
-TARGET_LINK_LIBRARIES(
-  ${MAN_TARGET}
-  ${ALCOMMON_LIBRARIES}
-  ${COMM_TARGET}
-  ${SENSORS_TARGET}
-  ${SYNCHRO_TARGET}
-  ${ROBOT_CONNECT_TARGET}
-  ${NBINCLUDE_TARGET}
-  ${VISION_TARGET}
-  ${MOTION_TARGET}
-  ${NOGGIN_TARGET}
-  ${MEMORY_TARGET}
-  ${WEBOTS_LIBRARIES}
-  )
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories to
@@ -238,3 +238,4 @@ add_subdirectory( corpus )
 add_subdirectory( vision )
 add_subdirectory( motion )
 add_subdirectory( noggin )
+add_subdirectory( include )

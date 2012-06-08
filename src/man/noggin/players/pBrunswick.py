@@ -1,3 +1,5 @@
+import time
+
 from . import SoccerFSA
 from . import ChaseBallStates
 from . import PositionStates
@@ -8,14 +10,13 @@ from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
 from . import BrunswickStates
-from . import GoalieChanges
-from . import GoalieTransitions
 
-from .. import NogginConstants
+import noggin_constants as NogginConstants
 from ..playbook import PBConstants
-from . import ChaseBallConstants as ChaseConstants
 
-from man.noggin.typeDefs.Location import Location
+from objects import Location
+
+COUNT_FPS = False
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -40,6 +41,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.counterLeftSave = 0
         self.counterCenterSave = 0
 
+        self.isSaving = False
+        self.shouldSaveCounter = 0
+
         #END GOALIE COUNTERS AND BOOLEANS
 
         self.frameCounter = 0
@@ -48,25 +52,45 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         # Penalty kick player variables
         self.penaltyKicking = False
-        self.penaltyMadeFirstKick = True
-        self.penaltyMadeSecondKick = False
 
         # Kickoff kick
-        self.hasKickedOff = True
+        self.shouldKickOff = False
 
         # Orbiting
-        self.angleToOrbit = 0.0
+        self.shouldOrbit = False
 
     def run(self):
         self.play = self.brain.play
         gcState = self.brain.gameController.currentState
-        if not self.firstFrame() and (gcState == 'gamePlaying' or\
-               (gcState == 'penaltyShotsGamePlaying'
-                and self.play.isRole(PBConstants.GOALIE))):
+
+        if (gcState == 'gamePlaying'):
+            if (self.brain.gameController.counter != 1):
+                # Make sure gamePlaying gets run
+                roleState = self.getNextState()
+
+                if roleState != self.currentState:
+                    self.switchTo(roleState)
+
+        #Goalie Penalty Kicking
+        if (gcState == 'penaltyShotsGamePlaying'
+                 and self.play.isRole(PBConstants.GOALIE)):
+            self.penaltyKicking = True
             roleState = self.getNextState()
 
             if roleState != self.currentState:
                 self.switchTo(roleState)
+
+        # takes our average fps over 1000 frames (without profiling)
+        if COUNT_FPS:
+            if self.counter == 0:
+                self.startTime = time.time()
+                print "time at start: {0}".format(self.startTime)
+            if self.counter == 1000:
+                self.stopTime = time.time()
+                print "time at end: {0}".format(self.stopTime)
+                print "{0} s for 1000 frames = {1} fps" \
+                      .format(self.stopTime - self.startTime,
+                              1000/(self.stopTime - self.startTime))
 
         SoccerFSA.SoccerFSA.run(self)
 
@@ -91,20 +115,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'playbookPosition'
 
     def getRoleStateGoalie(self):
-        if self.play.isSubRole(PBConstants.GOALIE_PENALTY_SAVER):
-            return 'penaltyGoalie'
-        if self.play.isSubRole(PBConstants.GOALIE_CHASER):
-            return 'goalieChase'
+        if self.play.isSubRole(PBConstants.GOALIE_KICKOFF):
+            return 'kickOffPosition'
+        elif self.play.isSubRole(PBConstants.GOALIE_CHASER):
+            return 'chase'
         elif self.play.isSubRole(PBConstants.GOALIE_SAVE):
             return 'goalieSave'
         else:
             return 'goaliePosition'
 
-    ###### HELPER METHODS ######
-    def getPenaltyKickingBallDest(self):
-        if not self.penaltyMadeFirstKick:
-            return Location(NogginConstants.FIELD_WIDTH * 3./4.,
-                            NogginConstants.FIELD_HEIGHT /4.)
-
-        return Location(NogginConstants.OPP_GOAL_MIDPOINT[0],
-                        NogginConstants.OPP_GOAL_MIDPOINT[1] )

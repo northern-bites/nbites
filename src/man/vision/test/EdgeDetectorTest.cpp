@@ -18,7 +18,7 @@ using namespace std;
 using boost::shared_ptr;
 
 EdgeDetectorTest::EdgeDetectorTest() :
-    edges(shared_ptr<Profiler>(new Profiler(&thread_micro_time)))
+    edges()
 {
 
 }

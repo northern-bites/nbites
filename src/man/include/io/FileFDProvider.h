@@ -10,33 +10,53 @@
 
 #include <iostream>
 #include <fcntl.h>
-#include "FDProvider.h"
+#include <string>
+#include "IOProvider.h"
 
-class FileFDProvider : public FDProvider {
+namespace common {
+namespace io {
+
+enum OpenType {
+    //O_APPEND is crucial if you want to use aio_write on the file descriptor
+    //you open
+    NEW = O_WRONLY | O_CREAT | O_TRUNC | O_APPEND,
+    EXISTING = O_RDONLY
+};
+
+class FileFDProvider : public IOProvider {
 
 public:
-    FileFDProvider(const char* fileName,
-            int	flags = O_WRONLY | O_CREAT | O_TRUNC,
-            int permissions = S_IRWXU | S_IRWXG | S_IRWXO) :
-                FDProvider(),
-                fileName(fileName),
-                flags(flags), permissions(permissions){
-        openFileDescriptor();
+    FileFDProvider(std::string file_name,
+            int flags = EXISTING ) :
+                IOProvider(),
+                file_name(file_name),
+                flags(flags) {
     }
 
-    void openFileDescriptor() {
+    virtual ~FileFDProvider() {
+        close(file_descriptor);
+    }
 
-        file_descriptor = open(fileName,
-                flags, permissions);
+    virtual std::string debugInfo() const {
+        return "file name: " + file_name;
+    }
+
+    void openCommunicationChannel() {
+
+        file_descriptor = open(file_name.c_str(),
+                flags, S_IRWXU | S_IRWXG | S_IRWXO);
 
         if (file_descriptor < 0) {
-            std::cout << "Could not open file: " << fileName << std::endl;
-            file_descriptor = 0;
+            std::cout << "Could not open file: " << debugInfo() << std::endl;
+            file_descriptor = -1;
         }
     }
 
 private:
-    const char* fileName;
-    int flags, permissions;
+    std::string file_name;
+    int flags;
 
 };
+
+}
+}

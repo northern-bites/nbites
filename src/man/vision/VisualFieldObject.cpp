@@ -4,27 +4,31 @@ using namespace std;
 const float VisualFieldObject::BOTH_UNSURE_DISTANCE_SD = 2500;
 
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
-    : VisualLandmark<fieldObjectID>(_id), VisualDetection()
+    : VisualObject(_id)
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 
 VisualFieldObject::VisualFieldObject()
-    : VisualLandmark<fieldObjectID>(UNKNOWN_FIELD_OBJECT), VisualDetection()
+    : VisualObject(UNKNOWN_FIELD_OBJECT)
  {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,
                                      const float _distance,
                                      const float _bearing)
-    : VisualLandmark<fieldObjectID>(UNKNOWN_FIELD_OBJECT),
-      VisualDetection(_x, _y, _distance, _bearing)
+    : VisualObject(UNKNOWN_FIELD_OBJECT,
+                                  _x, _y, _distance, _bearing)
 {
 }
 VisualFieldObject::VisualFieldObject(const VisualFieldObject& other) :
-    VisualLandmark<fieldObjectID>(other), VisualDetection(other)
+    VisualObject(other)
 {
 }
 
@@ -38,11 +42,11 @@ void VisualFieldObject::init(){
     centerY = 0;
     angleX = 0;
     angleY = 0;
-    focDist = 0;
     setDistance(0);
     setBearing(0);
     elevation = 0;
     idCertainty = NOT_SURE;
+    on = false;
 
     switch (id) {
     case BLUE_GOAL_LEFT_POST:

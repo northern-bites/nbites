@@ -1,0 +1,35 @@
+/**
+ * @class DataFinder
+ *
+ * Abstract class that has the duty to find a data set somewhere and
+ * return a data source
+ *
+ * @author Octavian Neamtu <oneamtu89@gmail.com>
+ *
+ */
+
+#pragma once
+
+#include <QWidget>
+
+#include "io/InProvider.h"
+#include "DataTypes.h"
+
+namespace qtool {
+namespace data {
+
+class DataFinder : public QWidget {
+    Q_OBJECT
+
+public:
+    DataFinder(QWidget *parent = 0) : QWidget(parent) {}
+
+signals:
+    void signalNewDataSet();
+    void signalNewInputProvider(common::io::InProvider::ptr newInput,
+                                MObject_ID id);
+
+};
+
+}
+}

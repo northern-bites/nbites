@@ -32,9 +32,11 @@
 #ifndef SENSOR_MONITOR_H
 #define SENSOR_MONITOR_H
 
-#include "dsp.h"
-
 #include <string>
+#include <boost/shared_ptr.hpp>
+
+#include "Speech.h"
+#include "dsp.h"
 
 #define NOT_STEADY -1
 
@@ -45,15 +47,18 @@ class SensorMonitor : public Filter
 public:
     SensorMonitor();
     SensorMonitor(std::string sensorName);
+    SensorMonitor(int _bins, float _lowBin, float _highBin, bool isLog);
     ~SensorMonitor();
 
-	double X(double);
-	void Reset();
-	void LogOutput(); // prints histograms to /home/nao/naoqi/log/{sensorName}.sensor
+    double X(double);
+    void Reset();
+    void LogOutput(); // prints histograms to /home/nao/nbites/log/{sensorName}.sensor
 
     // values outside will cause a print statement
     void setVarianceBounds(float low, float high);
     void disableErrors() { reportErrors = false; }
+
+    bool isTrustworthy() { return sensorTrustworthy; }
 
     static const int DONT_CHECK = -1;
 
@@ -64,14 +69,18 @@ public:
     const std::string SensorName() const { return sensorName; }
     void SensorName(std::string name) { sensorName = name; }
 
+    void SpeechPointer(boost::shared_ptr<Speech> s) { speech = s; }
+
 private:
     void reportSensorError();
 
+    boost::shared_ptr<Speech> speech;
     std::string sensorName;
     NoiseMeter<Butterworth> noise;
     SignalMonitor monitor;
     int steadyAtFrame;
     bool reportErrors; // warn if sensor variances exceed thresholds
+    bool sensorTrustworthy;
     float lowVariance, highVariance;
     int seenErrors;
 };

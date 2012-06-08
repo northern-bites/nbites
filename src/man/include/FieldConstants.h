@@ -2,9 +2,10 @@
 #define FieldConstantsDefined__h
 
 #include <cmath>
+#ifndef NO_MANCONFIG
 #include "Common.h"
 #include "manconfig.h"
-
+#endif
 // Nao field constants
 
 #ifdef USING_LAB_FIELD
@@ -13,11 +14,13 @@ static const float FIELD_WHITE_HEIGHT = 330.f;
 static const float GREEN_PAD_X = 20.f;
 static const float GREEN_PAD_Y = 15.f;
 #else
-static const float FIELD_WHITE_WIDTH = 605.f;
-static const float FIELD_WHITE_HEIGHT = 405.f;
-static const float GREEN_PAD_X = 67.5f;
-static const float GREEN_PAD_Y = 67.5f;
+static const float FIELD_WHITE_WIDTH = 600.f;
+static const float FIELD_WHITE_HEIGHT = 400.f;
+static const float GREEN_PAD_X = 71.0f;
+static const float GREEN_PAD_Y = 71.0f;
 #endif // USING_LAB_FIELD
+
+static const float LINE_WIDTH = 5.0f;
 
 static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_Y;
 static const float FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + 2.0f * GREEN_PAD_X;
@@ -47,6 +50,7 @@ static const float GOAL_POST_CM_HEIGHT = 80.0f;
 static const float GOAL_POST_CM_WIDTH = 10.0f;
 static const float CROSSBAR_CM_WIDTH = 140.f;
 static const float CROSSBAR_CM_HEIGHT = 5.0f;
+static const float GOAL_DEPTH = 40.0f;
 static const float GOAL_POST_RADIUS = GOAL_POST_CM_WIDTH / 2.0f;
 
 // GOAL CONSTANTS
@@ -68,20 +72,16 @@ static const float LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y =
 static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
     CENTER_FIELD_Y + CROSSBAR_CM_WIDTH / 2.0f;
 
-static const float CENTER_CIRCLE_RADIUS = 62.5f; // Not scaled
+static const float CENTER_CIRCLE_RADIUS = 60.0f; // Not scaled
 
 #ifdef USING_LAB_FIELD
 static const float GOALBOX_DEPTH = 60.f;
 static const float GOALBOX_WIDTH = 200.f;
 #else
-#ifdef SINGAPORE_FIELD_B
-static const float GOALBOX_DEPTH = 56.f;
-static const float GOALBOX_WIDTH = 216.f;
-#else
-static const float GOALBOX_DEPTH = 65.f;
-static const float GOALBOX_WIDTH = 230.f;
+static const float GOALBOX_DEPTH = 60.f;
+static const float GOALBOX_WIDTH = 220.f;
 #endif // USING_LAB_FIELD
-#endif
+
 
 // These are used by the vision system
 // The distance the goalie box extends out past each goal post

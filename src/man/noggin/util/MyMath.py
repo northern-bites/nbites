@@ -1,27 +1,36 @@
-
 """
 myMath.py - a number of methods for simple often used math
 """
-
-from math import (atan2,
-                  cos,
+from math import (cos,
                   fabs,
                   radians,
                   sin,
                   sqrt)
 
+def mapRange(x, x_start, x_end, y_start, y_end):
+    """
+    Maps x in from the range x_start, x_end to the corresponding value
+    in the range y_start, y_end
+    """
+    if x <= x_start:
+        return y_start
+    elif x >= x_end:
+        return y_end
+    else:
+        ratio = (x - x_start)/(x_end - x_start)
+        return (ratio * (y_end - y_start)) + y_start
 
 def sub180Angle(angle):
     """
     Returns the angle identitical to the input angle that is between -180 and
     180 degrees.
     """
-    if angle > 180.:
-        angle -= 360.
-    if angle < -180.:
-        angle += 360.
+    while angle > 180 or angle < -180:
+        if angle > 180.:
+            angle -= 360.
+        if angle < -180.:
+            angle += 360.
     return angle
-
 
 def sub180Diff(angle, from_angle):
     """

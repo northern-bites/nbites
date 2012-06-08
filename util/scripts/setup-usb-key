@@ -18,18 +18,14 @@ HOSTNAME=$2
 
 CONFIG_DIR=../config
 
-# Add custom naoqi init script
-mv $ROOT_PART/etc/init.d/naoqi $ROOT_PART/etc/init.d/naoqi.dist
-cp $CONFIG_DIR/naoqi.nbites $ROOT_PART/etc/init.d/naoqi
-
 LIB_DIR=../../lib
 # Add libboost_python-mt.so
 cp $LIB_DIR/nao/libboost_python-mt.so $ROOT_PART/usr/lib/
 cp $LIB_DIR/nao/libprotobuf.so $ROOT_PART/usr/lib/
+cp $LIB_DIR/nao/lxv4l2.ko $ROOT_PART/lib/modules/2.6.29.6-rt24-aldebaran-rt/kernel/drivers/media/video/lxv4l2/
 
 # Change hostname
 echo $HOSTNAME > $ROOT_PART/etc/hostname
 
-# Add aliases to /etc/profile
-cp  $ROOT_PART/etc/profile $ROOT_PART/etc/profile.dist
-cat $CONFIG_DIR/profile >> $ROOT_PART/etc/profile
+# Set up init
+cp  -r $CONFIG_DIR/etc $ROOT_PART/

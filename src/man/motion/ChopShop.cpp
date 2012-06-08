@@ -22,58 +22,54 @@
 #include "Kinematics.h"
 
 using namespace std;
-
 using namespace boost;
-
 using namespace Kinematics;
 
-ChopShop::ChopShop (shared_ptr<Sensors> s)
-	: sensors(s)
+ChopShop::ChopShop (boost::shared_ptr<Sensors> s)
+    : sensors(s)
 {
 
 }
 
 // Breaks command into FRAME_LENGTH_S size pieces,
 // adds it to the queue
-/*************************************************************************/
-/*******  THIS WILL DELETE THE JOINT COMMAND PASSED TO IT!   *************/
-/*************************************************************************/
-shared_ptr<ChoppedCommand>
-ChopShop::chopCommand(const JointCommand *command) {
-	shared_ptr<ChoppedCommand> chopped;
-	int numChops = 1;
-	if (command->getDuration() > MOTION_FRAME_LENGTH_S) {
-		numChops = static_cast<int>(command->getDuration() / MOTION_FRAME_LENGTH_S);
-	}
+ChoppedCommand::ptr ChopShop::chopCommand(const JointCommand::ptr command,
+					  bool comPreview) {
+    ChoppedCommand::ptr chopped;
+    int numChops = 1;
+    if (command->getDuration() > MOTION_FRAME_LENGTH_S) {
+	numChops = static_cast<int>(command->getDuration() / MOTION_FRAME_LENGTH_S);
+    }
 
-	vector<float> currentJoints = getCurrentJoints();
+    vector<float> currentJoints = getCurrentJoints();
 
-	if (command->getInterpolation() == INTERPOLATION_LINEAR) {
-		chopped = chopLinear(command, currentJoints, numChops);
-	}
+    if (command->getInterpolation() == INTERPOLATION_LINEAR) {
+	chopped = chopLinear(command, currentJoints, numChops);
+    }
 
- 	else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
- 		chopped =  chopSmooth(command, currentJoints, numChops);
- 	}
+    else if (command->getInterpolation() == INTERPOLATION_SMOOTH) {
+	chopped =  chopSmooth(command, currentJoints, numChops);
+    }
 
-	else {
-		cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING SMOOTHLY" << endl;
-		chopped = chopSmooth(command, currentJoints, numChops) ;
-	}
+    else {
+	cout << "ILLEGAL INTERPOLATION VALUE. CHOPPING SMOOTHLY" << endl;
+	chopped = chopSmooth(command, currentJoints, numChops) ;
+    }
 
-	// Deleting command!
-	delete command;
-	return chopped;
+    // for CoM preview estimates and dynamic balancing
+    if (comPreview) {
+	//return ChoppedCommand::ptr ( new BalancingChoppedCommand(chopped) );
+    }
+    return chopped;
 }
 
 //Smooth interpolation motion
-shared_ptr<ChoppedCommand>
-ChopShop::chopSmooth(const JointCommand *command,
+ChoppedCommand::ptr ChopShop::chopSmooth(const JointCommand::ptr command,
 					 vector<float> currentJoints, int numChops) {
-	return shared_ptr<ChoppedCommand> ( new SmoothChoppedCommand(
-											command,
-											currentJoints,
-											numChops ) );
+    return ChoppedCommand::ptr  ( new SmoothChoppedCommand(
+				      command,
+				      currentJoints,
+				      numChops ) );
 }
 
 /*
@@ -81,15 +77,13 @@ ChopShop::chopSmooth(const JointCommand *command,
  * Retrieves current joint angels and acquiries the differences
  * between the current and the intended final. Send them to
  */
-shared_ptr<ChoppedCommand>
-ChopShop::chopLinear(const JointCommand *command,
+ChoppedCommand::ptr ChopShop::chopLinear(const JointCommand::ptr command,
 					 vector<float> currentJoints,
 					 int numChops) {
-
-	return shared_ptr<ChoppedCommand> ( new LinearChoppedCommand(
-											command,
-											currentJoints,
-											numChops ) );
+    return ChoppedCommand::ptr ( new LinearChoppedCommand(
+				     command,
+				     currentJoints,
+				     numChops ) );
 }
 
 vector<float> ChopShop::getCurrentJoints() {

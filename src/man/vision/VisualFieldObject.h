@@ -6,7 +6,7 @@
 
 class VisualFieldObject;
 
-#include "VisualLandmark.h"
+#include "VisualObject.h"
 #include "VisualDetection.h"
 #include "ConcreteFieldObject.h"
 #include "Utility.h"
@@ -16,10 +16,12 @@ class VisualFieldObject;
 #include "Blob.h"
 #include "stdio.h"
 
-class VisualFieldObject : public VisualLandmark<fieldObjectID> ,
-                          public VisualDetection {
+class VisualFieldObject : public VisualObject {
 
 public:
+    // ConcreteType provided by this VisualObject
+    typedef ConcreteFieldObject ConcreteType;
+
     // Construcotrs
     VisualFieldObject(const int _x, const int _y, const float _distance,
                       const float _bearing);
@@ -64,6 +66,7 @@ public:
     void setBearingWithSD(float _bearing);
     virtual void setIDCertainty(certainty c);
 
+
     // GETTERS
     const int getLeftTopX() const{ return leftTop.x; }
     const int getLeftTopY() const{ return leftTop.y; }
@@ -78,10 +81,11 @@ public:
     const point<float> getFieldLocation() const { return fieldLocation; }
     const float getFieldX() const { return fieldLocation.x; }
     const float getFieldY() const { return fieldLocation.y; }
-	const float getFieldX2() const { return fieldLocation2.x; }
-	const float getFieldY2() const { return fieldLocation2.y; }
-    const std::list <const ConcreteFieldObject *> * getPossibleFieldObjects()
-		const { return possibleFieldObjects; }
+    const float getFieldX2() const { return fieldLocation2.x; }
+    const float getFieldY2() const { return fieldLocation2.y; }
+    const std::list<const ConcreteFieldObject*> * getPossibilities() const {
+        return possibleFieldObjects;
+    }
 
 	virtual const bool hasPositiveID();
 
@@ -99,10 +103,10 @@ private: // Class Variables
     // Helper Methods
     inline static float postDistanceToSD(float _distance) {
         //return 0.0496f * exp(0.0271f * _distance);
-        return sqrt(2.0f*(10 + (_distance * _distance)*0.00125f));
+        return sqrtf(2.0f*(10 + (_distance * _distance)*0.00125f));
     }
     inline static float postBearingToSD(float _bearing) {
-        return sqrt(static_cast<float>(M_PI) / 8.0f);
+        return sqrtf(static_cast<float>(M_PI) / 8.0f);
     }
     const static float BOTH_UNSURE_DISTANCE_SD;
 };

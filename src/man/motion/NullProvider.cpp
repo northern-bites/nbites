@@ -3,9 +3,8 @@
 using namespace std;
 
 NullProvider::NullProvider(boost::shared_ptr<Sensors> s,
-						   boost::shared_ptr<Profiler> p,
                            const bool chain_mask[Kinematics::NUM_CHAINS])
-    :MotionProvider(NULL_PROVIDER, p),
+    :MotionProvider(NULL_PROVIDER),
      sensors(s),
      nextStiffness(Kinematics::NUM_JOINTS,0.0f),
      lastStiffness(Kinematics::NUM_JOINTS,0.0f),

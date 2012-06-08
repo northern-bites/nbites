@@ -30,14 +30,12 @@ public:
     void findTopEdges(int M);
     int getInitialHorizonEstimate(int pH);
     int getImprovedEstimate(int pH);
-    int horizonAt(int x);
-    int ccw(point<int> p1, point<int> p2, point<int> p3);
-
+	int horizonAt(int x);
+	float distanceToHorizon(int x, int y);
+	int ccw(point<int> p1, point<int> p2, point<int> p3);
     int * getTopEdge(){
         return topEdge;
     }
-
-
 
     // scan operations
     int yProject(int startx, int starty, int newy);
@@ -64,6 +62,7 @@ private:
 
 	// the field horizon
 	int horizon;
+	int poseHorizon;
 	float slope;
 
     bool shoot[IMAGE_WIDTH];

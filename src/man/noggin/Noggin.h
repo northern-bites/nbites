@@ -1,3 +1,4 @@
+
 #ifndef _Noggin_h_DEFINED
 #define _Noggin_h_DEFINED
 
@@ -7,12 +8,14 @@
 #include "MotionInterface.h"
 #include "Profiler.h"
 #include "PyVision.h"
-#include "MCL.h"
 #include "BallEKF.h"
 #include "Comm.h"
 #include "GameController.h"
 #include "RoboGuardian.h"
 #include "Sensors.h"
+#include "PyConstants.h"
+#include "memory/log/LoggingBoard.h"
+#include "memory/log/PyLoggingBoard.h"
 
 //#define LOG_LOCALIZATION
 
@@ -25,10 +28,12 @@
 class Noggin
 {
 public:
-    Noggin(boost::shared_ptr<Profiler> p, boost::shared_ptr<Vision> v,
+    Noggin(boost::shared_ptr<Vision> v,
            boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
            boost::shared_ptr<Sensors> _sensors,
-           MotionInterface * _minterface);
+           boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard,
+           MotionInterface * _minterface
+           );
     virtual ~Noggin();
 
     // reinitialize and reload the Python interpreter
@@ -60,11 +65,11 @@ private:
     void processGCButtonClicks();
 
 private:
-    boost::shared_ptr<Profiler> profiler;
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
     boost::shared_ptr<GameController> gc;
     boost::shared_ptr<Sensors> sensors;
+    boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
 
     boost::shared_ptr<ClickableButton> chestButton;
     boost::shared_ptr<ClickableButton> leftFootButton;

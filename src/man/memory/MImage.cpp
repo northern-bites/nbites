@@ -6,42 +6,83 @@
 
 #include <string>
 
-#include "Common.h" //for micro_time
-#include "MemoryMacros.h"
 #include "MImage.h"
 
+#include <cstdio>
+
+namespace man {
 namespace memory {
 
 using boost::shared_ptr;
-using namespace proto;
 using namespace std;
+using proto::PImage;
 
-MImage::MImage(shared_ptr<Sensors> s) : RoboImage(), sensors(s) {
-    //string* image_string = this->mutable_image();
-    //image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), 'a');
-    //cout << " string capacity " << NAO_IMAGE_BYTE_SIZE << " "<<  image_string->capacity() << endl;
-    //char* image_string_data = const_cast<char *>(image_string->data());
-    //sensors->setNaoImagePointer(image_string_data);
+    MImage::MImage(shared_ptr<Sensors> sensors,
+                   corpus::Camera::Type type,
+                   MObject_ID objectID,
+                   PImage_ptr data) :
+        MObject(objectID, data),
+        sensors(sensors),
+        data(data),
+        thresholded_data(new PImage()),
+        cameraType(type)
+    {
 
+    //Note (Octavian): This is a pretty dumb way to get the image data
+    // (ideally you would want to just copy the image - that saves any
+    // potential multi-threading safety issues and is how we update
+    // ALL of the other memory objects)
+
+    // Alas, copying the image means a 3 ms delay each frame, or roughly 10%
+    // of regular running time; if we have too much free processing time on our
+    // hands it would be prettier if we could avoid this
+
+    string* image_string = this->data->mutable_image();
+    // allocate the memory necessary for the image;
+    image_string->assign(NAO_IMAGE_BYTE_SIZE * sizeof(char), '0');
+    char* image_string_data = const_cast<char *>(image_string->data());
+    if (sensors.get()) {
+        sensors->setNaoImagePointer(image_string_data, cameraType);
+    }
 }
 
 MImage::~MImage() {
 }
 
-void MImage::update() {
+void MImage::updateData() {
+    this->data->set_timestamp(time_stamp());
+    //Note: we don't need to update the image since it's set to already copy
+    //into our image_string
+    this->data->set_width(sensors->getRoboImage()->getWidth());
+    this->data->set_height(sensors->getRoboImage()->getHeight());
 
-    //ADD_PROTO_TIMESTAMP;
-//    cout << "MImage_updata timestamp is " << process_micro_time() << endl;
-    this->updateImage(sensors->getRawNaoImage());
+    //TODO: this is a hack so we get the vision body angles for pose
+    this->data->clear_vision_body_angles();
+    vector<float> bodyAngles = sensors->getVisionBodyAngles();
+    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end();
+            i++) {
+        this->data->add_vision_body_angles(*i);
+    }
 
-//    string* image_string =  this->mutable_image();
-//    image_string->assign((char *) (sensors->getNaoImage()), 640*480*sizeof(char)*2);
-    //string* image_string = this->mutable_image();
-    //TODO: const stripping is unsafe
+    //debugging purposes
+    #ifdef OFFLINE
+    this->thresholded_data->mutable_image()->assign(
+            reinterpret_cast<const char *>(sensors->getColorImage(cameraType)),
+            AVERAGED_IMAGE_SIZE);
+    this->thresholded_data->set_width(AVERAGED_IMAGE_WIDTH);
+    this->thresholded_data->set_height(AVERAGED_IMAGE_HEIGHT);
+    #endif
+}
 
-//    memcpy(unsafe_data, sensors->getNaoImage(), sizeof(void*));
-//    printf("%p %p %p %p \n", &c[0], data, unsafe_data, s->data());
-    //cout << unsafe_data << " " << sensors->getNaoImage() << endl;
+MTopImage::MTopImage(boost::shared_ptr<Sensors> sensors) :
+    MImage(sensors, corpus::Camera::TOP, MTOPIMAGE_ID)
+{
+}
+
+MBottomImage::MBottomImage(boost::shared_ptr<Sensors> sensors) :
+    MImage(sensors, corpus::Camera::BOTTOM, MBOTTOMIMAGE_ID)
+{
+}
 
 }
 }

@@ -31,7 +31,6 @@ public:
     void setCenterY(int cy) { centerY = cy; }
     void setAngleX(float aX) { angleX = aX; }
     void setAngleY(float aY) { angleY = aY; }
-    void setFocDist(float fd) { focDist = fd; }
     void setDistance(float d) { distance = d; }
     void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
@@ -41,6 +40,10 @@ public:
     void setBearingSD(float _bearingSD) { bearingSD = _bearingSD;}
     virtual void setDistanceWithSD(float _distance) = 0;
     virtual void setBearingWithSD(float _bearing) = 0;
+
+    void setOn(bool _on){ on = _on; }
+    void setFramesOn(int numOn){ framesOn = numOn; }
+    void setFramesOff(int numOff){ framesOff = numOff; }
 
     /* GETTERS */
     const int getX() const {return x;}
@@ -54,7 +57,6 @@ public:
     const float getAngleY() const { return angleY; }
     const float getAngleXDeg() const { return angleX*TO_DEG; }
     const float getAngleYDeg() const { return angleY*TO_DEG; }
-    const float getFocDist() const { return focDist; }
     const float getDistance() const { return distance; }
     const float getBearing() const { return bearing; }
     const float getBearingDeg() const { return bearing*TO_DEG; }
@@ -62,6 +64,10 @@ public:
     const float getElevationDeg() const { return elevation*TO_DEG; }
     const float getDistanceSD() const { return distanceSD; }
     const float getBearingSD() const { return bearingSD; }
+
+    const bool isOn() const{ return on; }
+    int getFramesOn() { return framesOn; }
+    int getFramesOff(){ return framesOff; }
 
 protected:
     /* Best guessed Ball Variables */
@@ -72,13 +78,14 @@ protected:
     int centerY;
     float angleX;
     float angleY;
-    float focDist;
     float distance;
     float bearing;
     float elevation;
     // Standard deviation of measurements
     float distanceSD;
     float bearingSD;
+    bool on;
+    int framesOn, framesOff;
 
 };
 

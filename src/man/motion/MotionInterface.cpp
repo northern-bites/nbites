@@ -19,40 +19,43 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "MotionInterface.h"
+#include <iostream>
 
-void MotionInterface::setNextWalkCommand(const WalkCommand *command){
+void MotionInterface::setNextWalkCommand(const WalkCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
-void
-MotionInterface::sendStepCommand(const boost::shared_ptr<StepCommand> command){
+void MotionInterface::sendStepCommand(const StepCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
-void MotionInterface::enqueue(const BodyJointCommand *command){
+void MotionInterface::sendDestCommand(const DestinationCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
-
-void MotionInterface::enqueue(const HeadJointCommand *command){
-    switchboard->sendMotionCommand(command);
-}
-
-void MotionInterface::setHead(const SetHeadCommand *command){
+void MotionInterface::enqueue(const BodyJointCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::coordHead(const CoordHeadCommand *command){
+void MotionInterface::enqueue(const HeadJointCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
-void MotionInterface::sendFreezeCommand(const boost::shared_ptr<FreezeCommand> command){
+void MotionInterface::setHead(const SetHeadCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
-void MotionInterface::sendFreezeCommand(const boost::shared_ptr<UnfreezeCommand> command){
+
+void MotionInterface::coordHead(const CoordHeadCommand::ptr command){
+    switchboard->sendMotionCommand(command);
+}
+
+void MotionInterface::sendFreezeCommand(const FreezeCommand::ptr command){
+    switchboard->sendMotionCommand(command);
+}
+void MotionInterface::sendFreezeCommand(const UnfreezeCommand::ptr command){
     switchboard->sendMotionCommand(command);
 }
 
 
 void MotionInterface::stopBodyMoves() {
-	switchboard->stopBodyMoves();
+    switchboard->stopBodyMoves();
 }
 
 void MotionInterface::stopHeadMoves() {
@@ -71,24 +74,27 @@ float MotionInterface::getHeadSpeed() const {
     return DUMMY_F;
 }
 
-void MotionInterface::setWalkConfig ( float pMaxStepLength, float pMaxStepHeight,
-				      float pMaxStepSide, float pMaxStepTurn,
-				      float pZmpOffsetX, float pZmpOffsetY) const {
+void MotionInterface::setWalkConfig ( float pMaxStepLength,
+                                      float pMaxStepHeight,
+                                      float pMaxStepSide,
+                                      float pMaxStepTurn,
+                                      float pZmpOffsetX,
+                                      float pZmpOffsetY) const {
 }
 
 void MotionInterface::setWalkArmsConfig ( float pShoulderMedian,
-					  float pShoulderApmlitude,
-					  float pElbowMedian,
-					  float pElbowAmplitude) const {
+                      float pShoulderApmlitude,
+                      float pElbowMedian,
+                      float pElbowAmplitude) const {
 }
 
 void MotionInterface::setWalkExtraConfig( float pLHipRollBacklashCompensator,
-					  float pRHipRollBacklashCompensator,
-					  float pHipHeight,
-					  float pTorsoYOrientation) const {
+                      float pRHipRollBacklashCompensator,
+                      float pHipHeight,
+                      float pTorsoYOrientation) const {
 }
 
-void MotionInterface::setGait(const boost::shared_ptr<Gait> command){
+void MotionInterface::setGait(const Gait::ptr command){
     switchboard->sendMotionCommand(command);
 }
 

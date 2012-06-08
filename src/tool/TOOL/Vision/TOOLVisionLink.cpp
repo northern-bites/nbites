@@ -30,6 +30,7 @@
 #include "Common.h"
 #include "ImageAcquisition.h"
 #include "ColorParams.h"
+#include "Speech.h"
 
 using namespace std;
 using namespace boost;
@@ -63,10 +64,10 @@ extern "C" {
 #endif
 
 //Instantiate the vision stuff
-static shared_ptr<Sensors> sensors(new Sensors());
+static shared_ptr<Sensors> sensors(new Sensors(
+                                       shared_ptr<Speech>(new Speech())));
 static shared_ptr<NaoPose> pose(new NaoPose(sensors));
-static shared_ptr<Profiler> profiler(new Profiler(thread_micro_time));
-static Vision vision(pose, profiler);
+static Vision vision(pose);
 
 JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 (JNIEnv * env, jobject jobj, jbyteArray jimg, jfloatArray jjoints,
@@ -133,7 +134,18 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     for (unsigned int i = 0; i < NUM_SENSORS - numSensorsInFrame; ++i)
     sensors_vector.push_back(0.0f);
 
-    sensors->setAllSensors(sensors_vector);
+    sensors->setLeftFootFSR(sensors_vector[0], sensors_vector[1],
+            sensors_vector[2], sensors_vector[3]);
+    sensors->setRightFootFSR(sensors_vector[4], sensors_vector[5],
+                sensors_vector[6], sensors_vector[7]);
+    sensors->setLeftFootBumper(sensors_vector[8], sensors_vector[9]);
+    sensors->setLeftFootBumper(sensors_vector[10], sensors_vector[11]);
+    sensors->setInertial(sensors_vector[12], sensors_vector[13], sensors_vector[14],
+            sensors_vector[15], sensors_vector[16], sensors_vector[17],
+            sensors_vector[18]);
+    sensors->setUltraSound(sensors_vector[19], sensors_vector[20]);
+    sensors->setSupportFoot(static_cast<SupportFoot>(sensors_vector[21]));
+
 
     // Clear the debug image on which the vision algorithm can draw
     vision.thresh->initDebugImage();
@@ -146,7 +158,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     ColorParams cp(0,0,0,256,256,256,128,128,128);
 
     //timing the vision process
-    long startTime = thread_micro_time();
+    long long startTime = thread_micro_time();
 
     // Shrink (by averaging) the image, and do color segmentation
     ImageAcquisition::acquire_image_fast(table, cp, img, newImg);
@@ -154,7 +166,9 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     //PROCESS VISION!!
     vision.notifyImage(newImg);
 
-    long processTime = thread_micro_time() - startTime;
+    long long processTime = thread_micro_time() - startTime;
+
+    vision.drawBoxes();
     env->ReleaseByteArrayElements( jimg, buf_img, 0);
 
     //copy results from vision thresholded to the array passed in from java
@@ -228,17 +242,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         }
         if (obj != NULL) {
             id = (int) obj->getID();
-            if (obj->getPossibleFieldObjects()->size() > 1) {
-                if (id == BLUE_GOAL_LEFT_POST ||
-                        id == BLUE_GOAL_RIGHT_POST ||
-                        id == BLUE_GOAL_POST) {
-                    id = BLUE_GOAL_POST;
-
-                } else {
-                    id = YELLOW_GOAL_POST;
-                }
-            }
-
+			id = YELLOW_GOAL_POST;
             env->CallVoidMethod(jobj, setFieldObjectInfo,
                     id,
                     obj->getWidth(), obj->getHeight(),

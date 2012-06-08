@@ -31,7 +31,8 @@
 
 BulkMonitor::BulkMonitor(int _numberMonitors, std:: string _bulkName,
                          const std::string sensorNames[])
-    : numberMonitors(_numberMonitors),
+    : speech(),
+      numberMonitors(_numberMonitors),
       bulkName(_bulkName)
 {
     monitors = new SensorMonitor[numberMonitors];
@@ -65,15 +66,16 @@ void BulkMonitor::LogOutput() {
     using namespace std;
     const int width = 12;
 
-	stringstream filename;
-	ofstream outFile;
-	filename << "/home/nao/naoqi/log/" << bulkName << ".monitor.xls";
-	outFile.open(filename.str().c_str(), ifstream::out);
+    stringstream filename;
+    ofstream outFile;
+    filename << "/home/nao/nbites/log/" << bulkName << ".monitor.cvs";
+    outFile.open(filename.str().c_str(), ifstream::out);
 
     // header line with sensor names
     outFile << setw(width) << "bin";
-    for (int i = 0; i < numberMonitors; ++i)
+    for (int i = 0; i < numberMonitors; ++i) {
         outFile << setw(width) << monitors[i].SensorName();
+    }
     outFile << endl;
 
     // histogram loop (data, line by line)
@@ -81,9 +83,17 @@ void BulkMonitor::LogOutput() {
     for (int bin = 0; bin < numBins; ++bin) {
         outFile << setw(width) << setprecision(4) << monitors[0].binMidPoint(bin);
 
-        for (int i = 0; i < numberMonitors; ++i)
+        for (int i = 0; i < numberMonitors; ++i) {
             outFile << setw(width) << monitors[i].binCountAt(bin);
+	}
         outFile << endl;
     }
     outFile.close();
+}
+
+void BulkMonitor::SpeechPointer(boost::shared_ptr<Speech> s) {
+    speech = s;
+
+    for (int i = 0; i < numberMonitors; ++i)
+	monitors[i].SpeechPointer(speech);
 }

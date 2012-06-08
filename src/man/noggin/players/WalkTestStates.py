@@ -13,23 +13,46 @@ from ..WebotsConfig import WEBOTS_ACTIVE
 import man.motion.SweetMoves as SweetMoves
 
 #Types
-STEP = 1 #currently broken in Nav.
+DEST = 1
 WALK = 0
 
 # all walk vector values must be in the range [-1,1]
-UNIT_TEST1 = ((WALK, (1, 0, 0), 100),
-              (WALK, (0, .5, 0), 100),
-              (WALK, (.5, -.5, .75), 75),
-              (WALK, (-.4, .5, .5), 50),
-              (WALK, (.2, .2, .2), 50),
+UNIT_TEST1 = ((WALK, (1, 0, 0), 250),
+              (WALK, (0, 1, 0), 250),
+              (WALK, (.5, -.5, .75), 250),
+              (WALK, (-.4, .5, .5), 250),
+              (WALK, (.2, .2, .2), 250),
               )
 
 STRAIGHT_ONLY = ((WALK, (1.0, 0, 0), 150),
                  (WALK, (0, 1.0, 0), 150),
                  )
 
-STAND_STILL = ((WALK, (0, 0, 0), 300),
-               )
+CARDINAL_DEST_TEST = ((DEST, (15, 0, 0), 150),
+                      (DEST, (-15, 0, 0), 150),
+                      (DEST, (0, 10, 0), 150),
+                      (DEST, (0, -10, 0), 150),
+                      (DEST, (0, 0, 90), 150),
+                      (DEST, (0, 0, -90), 150),
+                      )
+
+MIXED_DEST_TEST = ((DEST, (15, 15, 0), 200),
+                   (DEST, (15, -15, 0), 200),
+                   (DEST, (0, -15, -90), 200),
+                   (DEST, (50, 15, -90), 300),
+                   (DEST, (-30, -15, -90), 300),
+                   )
+
+START_STOP_DEST = ((DEST, (100, 0, 0), 500),
+                   (DEST, (50, 50, 30), 500),
+                   (DEST, (150, 150, 0), 300),
+                   )
+
+def gameSet(player):
+    if player.firstFrame():
+        player.brain.nav.stand()
+        
+    return player.stay()
 
 def gamePlaying(player):
     """
@@ -40,11 +63,8 @@ def gamePlaying(player):
         player.brain.tracker.stopHeadMoves()
 
         player.testCounter = 0
-        player.unitTest = STRAIGHT_ONLY
-
-        player.brain.stability.resetData()
+        player.unitTest = UNIT_TEST1
     return player.goLater('walkTest')
-
 
 def walkTest(player):
     """
@@ -66,11 +86,11 @@ def walkTest(player):
             player.setWalk(currentVector[0],
                            currentVector[1],
                            currentVector[2],)
-        elif currentCommand[0] == STEP:
-            player.setSteps(currentVector[0],
-                            currentVector[1],
-                            currentVector[2],
-                            currentVector[3],)
+        elif currentCommand[0] == DEST:
+            player.setDestination(currentVector[0],
+                                  currentVector[1],
+                                  currentVector[2],
+                                  0.75)
         else:
             player.printf("WARNING! Unrecognized command"
                           " type in WalkUnitTest")
@@ -80,7 +100,8 @@ def walkTest(player):
     return player.stay()
 
 def switchDirections(player):
-    return player.goNow('walkTest')
+    return player.goLater('walkTest')
+
 def sitdown(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.SIT_POS)

@@ -88,7 +88,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	for (int i = 0; i < HULLS; i++) {
 		good = 0;
 		ok = 0;
-		int poseProject = thresh->blue->yProject(0, pH, i * SCANSIZE);
+		int poseProject = thresh->yellow->yProject(0, pH, i * SCANSIZE);
 		if (poseProject <= 0) {
 			poseProject = 0;
 		} else if (pH == 0) {
@@ -140,14 +140,16 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		}
 	}
 	// look for odd spikes and quell them
-	for (good = 1; good < HULLS - 1; good++) {
-		if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
-			convex[good].y > 15) {
-			if (debugFieldEdge) {
-				cout << "Spike at " << convex[good].x << " " << convex[good].y <<
-					endl;
+	if (poseHorizon > -100) {
+		for (good = 1; good < HULLS - 1; good++) {
+			if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
+				convex[good].y > 15) {
+				if (debugFieldEdge) {
+					cout << "Spike at " << convex[good].x << " " << convex[good].y <<
+						endl;
+				}
+				convex[good].y = convex[good-1].y;
 			}
-			convex[good].y = convex[good-1].y;
 		}
 	}
 	for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
@@ -159,6 +161,14 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		for (int i = good + 1; i < HULLS; i++) {
 			convex[i].y = convex[i-1].y;
 		}
+	}
+	if (convex[0].y - convex[2].y > 10) {
+		convex[0].y = convex[2].y;
+		convex[1].y = convex[2].y;
+	}
+	if (convex[HULLS - 1].y - convex[HULLS - 3].y > 10) {
+		convex[HULLS - 1].y = convex[HULLS - 3].y;
+		convex[HULLS - 2].y = convex[HULLS - 3].y;
 	}
 }
 
@@ -321,7 +331,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 			//pixel = thresh->thresholded[scanY][i];
 			pixel = thresh->getColor(i, scanY);
 			// project the line to get the next y value
-			scanY = thresh->blue->yProject(0, j, i);
+			scanY = thresh->yellow->yProject(0, j, i);
 			if (Utility::isGreen(pixel)) {
 				greenPixels++;
                 // since green pixels are likely to be next to other ones
@@ -389,7 +399,7 @@ int Field::getImprovedEstimate(int horizon) {
 				run = 0;
 			}
 			// next Y value in this scan
-			scanY = thresh->blue->yProject(0, k, l);
+			scanY = thresh->yellow->yProject(0, k, l);
 		}
 		// now check how we did in this scanline - remember now we are
 		// looking for the first line where we DON'T have lots of green
@@ -414,7 +424,7 @@ int Field::getImprovedEstimate(int horizon) {
 					greenPixels++;
 					firstpix = j;
 				}
-				scanY = thresh->blue->yProject(0, k, j);
+				scanY = thresh->yellow->yProject(0, k, j);
 			}
 			// if we still meet the criteria then we are done
 			if (run < MIN_GREEN_SIZE && greenPixels < MIN_PIXELS_PRECISE) {
@@ -451,6 +461,8 @@ int Field::findGreenHorizon(int pH, float sl) {
         topEdge[i] = 0;
         shoot[i] = true;
 	}
+	// store field pose
+	poseHorizon = pH;
 	/*if (pH < -100) {
         horizon = 0;
         return 0;
@@ -522,8 +534,17 @@ void Field::bestShot(VisualFieldObject* left,
  */
 
 int Field::horizonAt(int x) {
+	if (x < 0 || x >= IMAGE_WIDTH) {
+		if (debugHorizon) {
+			cout << "Problem in horizon " << x << endl;
+		}
+		if (x < 0) {
+			return topEdge[0];
+		} else {
+			return topEdge[IMAGE_WIDTH - 1];
+		}
+	}
 	return topEdge[x];
-	//return yProject(0, horizon, x);
 }
 
 /* Project a line given a start coord and a new y value - note that this is

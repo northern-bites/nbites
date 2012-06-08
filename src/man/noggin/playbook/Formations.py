@@ -2,7 +2,6 @@ from . import Roles
 from . import SubRoles
 from . import PBConstants
 
-
 #### No Field Players ####
 
 def fNoFieldPlayers(team, workingPlay):
@@ -60,10 +59,7 @@ def fNeutralTwoField(team, workingPlay):
 def fTwoDubD(team, workingPlay):
     '''goalie(probably chaser), two defenders'''
     workingPlay.setFormation(PBConstants.TWO_DUB_D)
-    chaser_mate = team.determineChaser(workingPlay)
-    if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        Roles.rChaser(team, workingPlay)
-    elif team.me.isDefaultGoalie():
+    if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
     else:
         Roles.rDefenderDubD(team, workingPlay)
@@ -149,10 +145,7 @@ def fNeutralDThreeField(team, workingPlay):
 def fThreeDubD(team, workingPlay):
     '''goalie(probably chaser), two defenders, middie'''
     workingPlay.setFormation(PBConstants.THREE_DUB_D)
-    chaser_mate = team.determineChaser(workingPlay)
-    if chaser_mate.playerNumber == team.brain.my.playerNumber:
-        Roles.rChaser(team, workingPlay)
-    elif team.me.isDefaultGoalie():
+    if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
     else:
         forward = team.getForward(team.activeFieldPlayers)
@@ -241,14 +234,14 @@ def fReady(team, workingPlay):
 
 def fTestDefender(team, workingPlay):
     workingPlay.setFormation(PBConstants.TEST_DEFEND)
-    if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+    if team.brain.ball.loc.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Roles.rMiddie(team, workingPlay)
     else:
         Roles.rDefender(team, workingPlay)
 
 def fTestOffender(team, workingPlay):
     workingPlay.setFormation(PBConstants.TEST_OFFEND)
-    if team.brain.ball.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
+    if team.brain.ball.loc.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
         Roles.rMiddie(team, workingPlay)
     else:
         Roles.rOffender(team, workingPlay)

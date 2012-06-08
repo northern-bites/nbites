@@ -15,8 +15,7 @@ extern "C" void _smooth_hough(uint16_t *hs, uint32_t threshold);
 extern "C" void _houghMain(uint16_t* hs,
                            AnglePeak* edges, int numEdges);
 
-HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
-    profiler(p),
+HoughSpace::HoughSpace() :
     acceptThreshold(default_accept_thresh),
     angleSpread(default_angle_spread),
     numPeaks(0), activeLines(active_line_buffer)
@@ -28,14 +27,15 @@ HoughSpace::HoughSpace(shared_ptr<Profiler> p) :
  * The main public interface for the HoughSpace class.
  * Finds all the lines in the image using the Hough Transform.
  */
-list<pair<HoughLine, HoughLine> > HoughSpace::findLines(Gradient& g)
+list<pair<HoughLine, HoughLine> >
+HoughSpace::findLines(Gradient& g)
 {
-    PROF_ENTER(profiler, P_HOUGH);
+    PROF_ENTER(P_HOUGH);
     reset();
     findHoughLines(g);
     list<pair<HoughLine, HoughLine> > lines = narrowHoughLines();
 
-    PROF_EXIT(profiler, P_HOUGH);
+    PROF_EXIT(P_HOUGH);
     return lines;
 }
 
@@ -68,6 +68,7 @@ list<pair<HoughLine, HoughLine> > HoughSpace::narrowHoughLines()
         lines.push_back(pair<HoughLine, HoughLine>(activeLines[(*i).first],
                                                    activeLines[(*i).second]));
     }
+    PROF_EXIT(P_HOUGH);
     return lines;
 }
 
@@ -77,7 +78,7 @@ list<pair<HoughLine, HoughLine> > HoughSpace::narrowHoughLines()
  */
 void HoughSpace::markEdges(Gradient& g)
 {
-    PROF_ENTER(profiler, P_MARK_EDGES);
+    PROF_ENTER(P_MARK_EDGES);
 #ifdef USE_MMX
     if (g.numPeaks > 0){
         // _mark_edges(g.numPeaks, angleSpread, g.angles, &hs[0][0]);
@@ -94,7 +95,7 @@ void HoughSpace::markEdges(Gradient& g)
              g.getAngle(i) + angleSpread);
     }
 #endif /* USE_MMX */
-    PROF_EXIT(profiler, P_MARK_EDGES);
+    PROF_EXIT(P_MARK_EDGES);
 }
 
 /**
@@ -141,12 +142,11 @@ int HoughSpace::getR(int x, int y, int t)
  */
 void HoughSpace::smooth()
 {
-    PROF_ENTER(profiler, P_SMOOTH);
+    PROF_ENTER(P_SMOOTH);
 
 #ifdef USE_MMX
     _smooth_hough(&hs[0][0], acceptThreshold);
 #else
-
     // In-place 2x2 boxcar smoothing
     for (int t=first_smoothing_row; t < t_span+first_smoothing_row; ++t) {
         for (int r=0; r < r_span-1; ++r) {
@@ -160,7 +160,7 @@ void HoughSpace::smooth()
     }
 #endif
 
-    PROF_EXIT(profiler, P_SMOOTH);
+    PROF_EXIT(P_SMOOTH);
 }
 
 /**
@@ -168,8 +168,7 @@ void HoughSpace::smooth()
  */
 void HoughSpace::peaks()
 {
-    PROF_ENTER(profiler, P_HOUGH_PEAKS);
-
+    PROF_ENTER(P_HOUGH_PEAKS);
     for (uint16_t t=first_peak_row; t < t_span+first_peak_row; ++t) {
 
         // First and last columns are not accurate, so they shouldn't
@@ -197,8 +196,7 @@ void HoughSpace::peaks()
             continue;
         }
     }
-
-    PROF_EXIT(profiler, P_HOUGH_PEAKS);
+    PROF_EXIT(P_HOUGH_PEAKS);
 }
 
 /**
@@ -222,7 +220,7 @@ void HoughSpace::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
  */
 void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
 {
-    PROF_ENTER(profiler, P_SUPPRESS);
+    PROF_ENTER(P_SUPPRESS);
     const int size = lines.size();
     bool toDelete[size];
 
@@ -277,7 +275,7 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
             lines.deactivate(i);
         }
     }
-    PROF_EXIT(profiler, P_SUPPRESS);
+    PROF_EXIT(P_SUPPRESS);
 }
 
 /**
@@ -295,7 +293,7 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
  */
 list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 {
-    PROF_ENTER(profiler, P_PAIR_LINES);
+    PROF_ENTER(P_PAIR_LINES);
     list<pair<int, int> > pairs;
     const int size = lines.size();
 
@@ -366,7 +364,7 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 
         pairs.push_back(pair<int,int>(i, pair_array[i]));
     }
-    PROF_EXIT(profiler, P_PAIR_LINES);
+    PROF_EXIT(P_PAIR_LINES);
     return pairs;
 }
 

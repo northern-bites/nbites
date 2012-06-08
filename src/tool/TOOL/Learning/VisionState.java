@@ -728,20 +728,26 @@ public class VisionState {
         thresholdedImage.getVisionLink().
             setFieldLinesDebugCornerAndObjectDistances(false);
 
-        thresholdedImage.getVisionLink().setDebugBall(false);
-        thresholdedImage.getVisionLink().setDebugBallDistance(false);
-        thresholdedImage.getVisionLink().setDebugCross(false);
-        thresholdedImage.getVisionLink().setDebugPostPrint(false);
-        thresholdedImage.getVisionLink().setDebugPost(false);
-        thresholdedImage.getVisionLink().setDebugPostLogic(false);
-        thresholdedImage.getVisionLink().setDebugPostSanity(false);
-        thresholdedImage.getVisionLink().setDebugPostCorrect(false);
-        thresholdedImage.getVisionLink().setDebugFieldHorizon(false);
-        thresholdedImage.getVisionLink().setDebugFieldEdge(false);
-        thresholdedImage.getVisionLink().setDebugEdgeDetection(false);
-        thresholdedImage.getVisionLink().setDebugHoughTransform(false);
-        thresholdedImage.getVisionLink().setDebugRobot(false);
-        thresholdedImage.getVisionLink().setDebugDangerousBall(false);
-        thresholdedImage.getVisionLink().setDebugVisualLines(false);
-    }
+		thresholdedImage.getVisionLink().setDebugBall(false);
+		thresholdedImage.getVisionLink().setDebugBallDistance(false);
+		thresholdedImage.getVisionLink().setDebugCross(false);
+		//thresholdedImage.getVisionLink().setDebugPostPrint(false);
+		//thresholdedImage.getVisionLink().setDebugPost(false);
+		/*System.out.println("more3");
+		thresholdedImage.getVisionLink().setDebugPostLogic(false);
+		thresholdedImage.getVisionLink().setDebugPostSanity(false);
+		System.out.println("more4");
+		thresholdedImage.getVisionLink().setDebugPostCorrect(false);
+		thresholdedImage.getVisionLink().setDebugFieldHorizon(false);
+		System.out.println("more5");
+		thresholdedImage.getVisionLink().setDebugFieldEdge(false);
+		thresholdedImage.getVisionLink().setDebugEdgeDetection(false);
+		System.out.println("more6");
+		thresholdedImage.getVisionLink().setDebugHoughTransform(false);
+		thresholdedImage.getVisionLink().setDebugRobot(false);
+		System.out.println("more7");
+		thresholdedImage.getVisionLink().setDebugDangerousBall(false);
+		*/
+		System.out.println("going out");
+	}
 }

@@ -2,12 +2,8 @@
 This file contains an implementation of a finite state automaton.
 """
 import time
-from . import NaoOutput
 
 DEBUG = False
-
-#HELPER method syntax for external state changes requiring helpers
-HELPER = "Helper"
 
 # Should I stay? Or should I go?
 THIS_FRAME = True
@@ -203,7 +199,6 @@ class FSA:
         else:
             self.counter +=1
             self.stateTime = self.getTime() - self.startTime
-
 
     #Debug methods
     def setPrintStateChanges(self, bool):

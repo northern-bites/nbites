@@ -4,36 +4,36 @@ NBITES_DIR = $(CUR_DIR)/../..
 BUILD_DIR = $(NBITES_DIR)/build/man
 MAN_DIR = $(CUR_DIR)
 
-STRAIGHT_DIR = $(BUILD_DIR)/straight
-CROSS_DIR = $(BUILD_DIR)/cross
+ATOM_DIR = $(BUILD_DIR)/atom
+GEODE_DIR = $(BUILD_DIR)/geode
 WEBOTS_DIR = $(BUILD_DIR)/webots
-CROSS_INSTALL_DIR = $(BUILD_DIR)/cross_install
+GEODE_INSTALL_DIR = $(BUILD_DIR)/geode_install
 WEBOTS_INSTALL_DIR = $(BUILD_DIR)/webots_install
+ATOM_INSTALL_DIR = $(BUILD_DIR)/atom_install
 CMAKE_DIR = 
-CMAKE_STRAIGHT_DEPEND = $(STRAIGHT_DIR)/Makefile
+CMAKE_ATOM_DEPEND = $(ATOM_DIR)/Makefile
 CMAKE_WEBOTS_DEPEND = $(WEBOTS_DIR)/Makefile
-CMAKE_CROSS_DEPEND = $(CROSS_DIR)/Makefile
+CMAKE_GEDOE_DEPEND = $(GEODE_DIR)/Makefile
 
 #File setup
 CONFIG_FILE = manconfig.h
 INSTALL_SCRIPT = upload.sh
-CROSS_FILE = $(BUILD_DIR)/cross_file
-STRAIGHT_FILE = $(BUILD_DIR)/straight_file
+GEODE_FILE = $(BUILD_DIR)/geode_file
+ATOM_FILE = $(BUILD_DIR)/atom_file
 WEBOTS_FILE = $(BUILD_DIR)/webots_file
 
 PYC_FILES = $(shell find . -name "*.pyc")
 
 #general definitions
-#TODO: in cmake make everything relative to NBITES_ROOT
-CMAKE_DEFS = -DNBITES_ROOT=$(NBITES_DIR)
+#TODO: in cmake make everything relative to NBITES_DIR
+CMAKE_DEFS = -DNBITES_DIR=$(NBITES_DIR)
 #toolchains
-CROSS_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
-STRAIGHT_TOOLCHAIN = $(abspath $(CURDIR)/cmake/generic.cmake)
+GEODE_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
+ATOM_TOOLCHAIN = $(abspath $(CURDIR)/cmake/atom.cmake)
 #specialized defs
-CMAKE_STRAIGHT_DEFS = $(CMAKE_DEFS) -DCMAKE_TOOLCHAIN_FILE=$(STRAIGHT_TOOLCHAIN)
-CMAKE_CROSS_DEFS = $(CMAKE_DEFS) -DCMAKE_TOOLCHAIN_FILE=$(CROSS_TOOLCHAIN)
-CMAKE_WEBOTS_DEFS = $(CMAKE_DEFS) -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=../../tables/uvy/webots/webots_6_2.mtb
-CCMAKE_CROSS_OPT = -DCMAKE_SHARED_LINKER_FLAGS:STRING="" -DCMAKE_MODULE_LINKER_FLAGS:STRING=""
+CMAKE_ATOM_DEFS = $(CMAKE_DEFS) -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) -DMAN_INSTALL_PREFIX=$(ATOM_INSTALL_DIR)
+CMAKE_GEODE_DEFS = $(CMAKE_DEFS) -DCMAKE_TOOLCHAIN_FILE=$(GEODE_TOOLCHAIN) -DMAN_INSTALL_PREFIX=$(GEODE_INSTALL_DIR)
+CMAKE_WEBOTS_DEFS = $(CMAKE_DEFS) -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=../../tables/uvy/webots/webots_6_2.mtb -DMAN_INSTALL_PREFIX=$(WEBOTS_INSTALL_DIR)
 #Commands setup
 CD=cd
 RM=rm
@@ -43,19 +43,19 @@ CCMAKE_GUI=cmake-gui
 MKDIR=mkdir
 TOUCH=touch
 MAKE_OPTIONS=--no-print-directory
-MAN_TARGET=man
+MAN_TARGET=man manpreloader
 
-.PHONY: default_target all straight cross cclean clean install noconfig
+.PHONY: default_target all atom geode cclean clean install noconfig
 .PHONY: clean_install
 
 
 default_target: all
 
-all: $(CMAKE_STRAIGHT_DEPEND) $(CMAKE_WEBOTS_DEPEND) $(CMAKE_CROSS_DEPEND)
-	@if [ -e $(CROSS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) ${MAN_TARGET}; \
-	elif [ -e $(STRAIGHT_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR) ${MAN_TARGET}; \
+all: $(CMAKE_ATOM_DEPEND) $(CMAKE_WEBOTS_DEPEND) $(CMAKE_GEODE_DEPEND)
+	@if [ -e $(GEODE_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(GEODE_DIR) ${MAN_TARGET}; \
+	elif [ -e $(ATOM_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(ATOM_DIR) ${MAN_TARGET}; \
 	elif [ -e $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) ${MAN_TARGET}; \
 	fi
@@ -65,70 +65,70 @@ $(CMAKE_WEBOTS_DEPEND):
 		$(MAKE) $(MAKE_OPTIONS) webots; \
 	fi
 
-$(CMAKE_STRAIGHT_DEPEND):
-	@if [ -f $(STRAIGHT_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) straight; \
+$(CMAKE_ATOM_DEPEND):
+	@if [ -f $(ATOM_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) atom; \
 	fi
 
-$(CMAKE_CROSS_DEPEND):
-	@if [ -f $(CROSS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) cross; \
+$(CMAKE_GEODE_DEPEND):
+	@if [ -f $(GEODE_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) geode; \
 	fi
 
-build_straight:
-	$(MAKE) $(MAKE_OPTIONS) -C $(STRAIGHT_DIR) ${MAN_TARGET}; \
+build_atom:
+	$(MAKE) $(MAKE_OPTIONS) -C $(ATOM_DIR) ${MAN_TARGET}; \
 
-straight: $(STRAIGHT_FILE)
+atom: $(ATOM_FILE)
 	@set -e;
-		$(CD) $(STRAIGHT_DIR); \
+		$(CD) $(ATOM_DIR); \
 		$(CCMAKE) .
 
-straight_gui: $(STRAIGHT_FILE)
+atom_gui: $(ATOM_FILE)
 	@set -e;
-		$(CD) $(STRAIGHT_DIR); \
+		$(CD) $(ATOM_DIR); \
 		$(CCMAKE_GUI) .
 
-$(STRAIGHT_FILE):
-	@if [ -e $(CROSS_FILE) ]; then \
-		$(RM) $(CROSS_FILE); \
+$(ATOM_FILE):
+	@if [ -e $(GEODE_FILE) ]; then \
+		$(RM) $(GEODE_FILE); \
 	fi
 	@if [ -e $(WEBOTS_FILE) ]; then \
 		$(RM) $(WEBOTS_FILE); \
 	fi
 	@set -e; \
 		$(MKDIR) -p $(BUILD_DIR); \
-		$(TOUCH) $(STRAIGHT_FILE); \
-		$(MKDIR) -p $(STRAIGHT_DIR); \
-		$(CD) $(STRAIGHT_DIR); \
-		$(CMAKE) $(CMAKE_STRAIGHT_DEFS) $(CURDIR)/$(CMAKE_DIR)
+		$(TOUCH) $(ATOM_FILE); \
+		$(MKDIR) -p $(ATOM_DIR); \
+		$(CD) $(ATOM_DIR); \
+		$(CMAKE) $(CMAKE_ATOM_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
-build_cross:
-	$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) ${MAN_TARGET}; \
+build_geode:
+	$(MAKE) $(MAKE_OPTIONS) -C $(GEODE_DIR) ${MAN_TARGET}; \
 
 
-cross: $(CROSS_FILE)
+geode: $(GEODE_FILE)
 	@set -e ; \
-		$(CD) $(CROSS_DIR); \
+		$(CD) $(GEODE_DIR); \
 		$(CCMAKE) $(CCMAKE_CROSS_OPT) .
 
-cross_gui: $(CROSS_FILE)
+geode_gui: $(GEODE_FILE)
 	@set -e ; \
-		$(CD) $(CROSS_DIR); \
+		$(CD) $(GEODE_DIR); \
 		$(CCMAKE_GUI) $(CCMAKE_CROSS_OPT) .
 
-$(CROSS_FILE):
-	@if [ -e $(STRAIGHT_FILE) ]; then \
-		$(RM) $(STRAIGHT_FILE); \
+$(GEODE_FILE):
+	@if [ -e $(ATOM_FILE) ]; then \
+		$(RM) $(ATOM_FILE); \
 	fi
 	@if [ -e $(WEBOTS_FILE) ]; then \
 		$(RM) $(WEBOTS_FILE); \
 	fi
 	@set -e; \
 		$(MKDIR) -p $(BUILD_DIR); \
-		$(TOUCH) $(CROSS_FILE); \
-		$(MKDIR) -p $(CROSS_DIR); \
-		$(CD) $(CROSS_DIR); \
-		$(CMAKE) $(CMAKE_CROSS_DEFS) $(CURDIR)/$(CMAKE_DIR)
+		$(TOUCH) $(GEODE_FILE); \
+		$(MKDIR) -p $(GEODE_DIR); \
+		$(CD) $(GEODE_DIR); \
+		$(CMAKE) $(CMAKE_GEODE_DEFS) $(CURDIR)/$(CMAKE_DIR)
 
 build_webots:
 	$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) ${MAN_TARGET}; \
@@ -144,11 +144,11 @@ webots_gui: $(WEBOTS_FILE)
 		$(CCMAKE_GUI) .
 
 $(WEBOTS_FILE):
-	@if [ -e $(STRAIGHT_FILE) ]; then \
-		$(RM) $(STRAIGHT_FILE); \
+	@if [ -e $(ATOM_FILE) ]; then \
+		$(RM) $(ATOM_FILE); \
 	fi
-	@if [ -e $(CROSS_FILE) ]; then \
-		$(RM) $(CROSS_FILE); \
+	@if [ -e $(GEODE_FILE) ]; then \
+		$(RM) $(GEODE_FILE); \
 	fi
 	@set -e; \
 		$(MKDIR) -p $(BUILD_DIR); \
@@ -159,19 +159,23 @@ $(WEBOTS_FILE):
 
 
 install: $(CMAKE_DEPEND)
-	@if [ -e $(CROSS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(CROSS_DIR) install; \
-		$(CROSS_DIR)/$(INSTALL_SCRIPT); \
+	@if [ -e $(GEODE_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(GEODE_DIR) install; \
+		$(GEODE_DIR)/$(INSTALL_SCRIPT); \
 	elif [ -e $(WEBOTS_FILE) ]; then \
 		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) install; \
 		$(WEBOTS_DIR)/$(INSTALL_SCRIPT); \
+	elif [ -e $(ATOM_FILE) ]; then \
+		$(MAKE) $(MAKE_OPTIONS) -C $(ATOM_DIR) install; \
+		$(ATOM_DIR)/$(INSTALL_SCRIPT); \
 	else \
-		echo "Must have CROSS or WEBOTS build configured to 'make install'"; \
+		echo "Must have ATOM/GEODE or WEBOTS build configured to 'make install'"; \
 	fi
 
 
 clean_install:
-	$(RM) -r $(CROSS_INSTALL_DIR)/*
+	$(RM) -r $(GEODE_INSTALL_DIR)/*
+	$(RM) -r $(ATOM_INSTALL_DIR)/*
 	$(RM) -r $(WEBOTS_INSTALL_DIR)/*
 
 cclean: $(CMAKE_DEPEND)
@@ -181,10 +185,10 @@ clean:
 	$(RM) -r $(BUILD_DIR)
 
 check:
-	@if [ -e $(CROSS_FILE) ]; then \
-		echo "Making for CROSS"; \
-	elif [ -e $(STRAIGHT_FILE) ]; then \
-		echo "Making for STRAIGHT"; \
+	@if [ -e $(GEODE_FILE) ]; then \
+		echo "Making for GEODE"; \
+	elif [ -e $(ATOM_FILE) ]; then \
+		echo "Making for ATOM"; \
 	elif [ -e $(WEBOTS_FILE) ]; then \
 		echo "Making for WEBOTS"; \
 	fi

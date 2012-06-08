@@ -1,98 +1,167 @@
 
 #include <iostream>
-#include <fcntl.h>
 
 #include "MessageParser.h"
 
+namespace man {
 namespace memory {
-
 namespace parse {
 
 using namespace std;
-using namespace google::protobuf::io;
 using boost::shared_ptr;
+using namespace common::io;
 
-//TODO: use file descriptor providers
-MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
-                       int _file_descriptor) :
-        Parser<proto::Message>(message),
-        file_descriptor(_file_descriptor)
+MessageParser::MessageParser(InProvider::ptr in_provider,
+                             MessageInterface::ptr objectToParseTo) :
+        ThreadedParser(in_provider, objectToParseTo->getName() + "_parser"),
+        objectToParseTo(objectToParseTo),
+        current_message_size(0),
+        current_buffer(NULL), current_buffer_size(0)
 {
 
-    initStreams();
-    readHeader();
-
-}
-
-MessageParser::MessageParser(boost::shared_ptr<proto::Message> message,
-                       const char* _file_name) :
-       Parser<proto::Message>(message) {
-
-    file_descriptor = open(_file_name, O_RDONLY);
-
-    initStreams();
-    readHeader();
 }
 
 MessageParser::~MessageParser() {
+    if (current_buffer) {
+        free(current_buffer);
+    }
+    in_provider->closeChannel();
+    this->stop();
+    this->waitForThreadToFinish();
+}
 
-    delete coded_input;
-    delete raw_input;
-    close(file_descriptor);
+void MessageParser::run() {
+
+    while (running) {
+        if (!in_provider->opened()) {
+            //blocking for socket fds, (almost) instant for other ones
+            try {
+                in_provider->openCommunicationChannel();
+            } catch (io_exception& io_exception) {
+                cout << io_exception.what() << endl;
+                return;
+            }
+            this->readHeader();
+        }
+        //the order here matters; if getNext is put after waitForSignal
+        //then when the thread tries to stop it will call getNext
+        //and that will throw a pure virtual call error
+        this->readNextMessage();
+        //in streaming we get messages continuously,
+        //so there's no need to wait
+        if (!in_provider->isOfTypeStreaming()) {
+            this->waitForSignal();
+        }
+    }
+}
+
+void MessageParser::waitForReadToFinish() {
+    while(in_provider->readInProgress() && running) {
+        pthread_yield();
+    }
 }
 
 void MessageParser::readHeader() {
 
-
+    log_header.log_id = this->readValue<int32_t>();
     cout << "Log ID: " << log_header.log_id << endl;
 
-    coded_input->ReadLittleEndian64(&(log_header.birth_time));
+    log_header.birth_time = this->readValue<int64_t>();
     cout << "Birth time: " << log_header.birth_time << endl;
 }
 
-const LogHeader MessageParser::getHeader() {
-    return log_header;
+void MessageParser::increaseBufferSizeTo(uint32_t new_size) {
+    void* new_buffer = realloc(current_buffer, new_size);
+
+    assert(new_buffer != NULL);
+    current_buffer = reinterpret_cast<char*>(new_buffer);
+    current_buffer_size = new_size;
 }
 
-shared_ptr<const proto::Message> MessageParser::getNext() {
+bool MessageParser::readNextMessage() {
 
-    proto::uint32 size;
-    uint64_t byte_count = raw_input->ByteCount();
-    coded_input->ReadVarint32(&size);
+    if (in_provider->reachedEnd()) {
+        return false;
+    }
 
-    //current_size = size;
+    current_message_size = this->readValue<uint32_t>();
+    message_sizes.push_back(current_message_size);
 
-    CodedInputStream::Limit l = coded_input->PushLimit(size);
-    finished = container->ParseFromCodedStream(coded_input);
-    coded_input->PopLimit(l);
+    if (current_message_size > TOO_BIG_THRESHOLD) {
+        cout << "Message size is too big! Cannot read in "
+             << current_message_size << " bytes" << endl;
+        return false;
+    }
 
-    //current_size = raw_input->ByteCount() - byte_count;
+    if (current_message_size > current_buffer_size) {
+        increaseBufferSizeTo(current_message_size);
+    }
 
-    return container;
+    bool result = readIntoBuffer(current_buffer, current_message_size);
+
+    if (result == true) {
+        objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
+        return true;
+    }
+    return false;
 }
 
-shared_ptr<const proto::Message> MessageParser::getPrev() {
-
-
-    raw_input->BackUp(current_size);
-
-    proto::uint32 size;
-    coded_input->ReadVarint32(&size);
-
-    CodedInputStream::Limit l = coded_input->PushLimit(size);
-    finished = container->ParseFromCodedStream(coded_input);
-    coded_input->PopLimit(l);
+bool MessageParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
+    uint32_t bytes_read = 0;
+    while (bytes_read < num_bytes) {
+        try {
+            in_provider->readCharBuffer(
+                    buffer + bytes_read, num_bytes - bytes_read);
+            waitForReadToFinish();
+            bytes_read += in_provider->bytesRead();
+        }
+        catch (read_exception& read_exception) {
+            cout << read_exception.what() << " " << in_provider->debugInfo() << endl;
+            return false;
+        }
+    }
+    return true;
 }
 
-
-void MessageParser::initStreams() {
-
-    raw_input = new FileInputStream(file_descriptor);
-    coded_input = new CodedInputStream(raw_input);
-    coded_input->SetTotalBytesLimit(2000000000, 2000000000);
-
-
+uint32_t MessageParser::sizeOfLastNumMessages(uint32_t n) const {
+    uint32_t total_size = 0;
+    for (uint i = message_sizes.size() - n; i < message_sizes.size(); i++) {
+        total_size += message_sizes[i];
+    }
+    //also add the size taken up by the message size informa-ion themselves
+    total_size += n*sizeof(uint32_t);
+    return total_size;
 }
 
+uint32_t MessageParser::truncateNumberOfFramesToRewind(uint32_t n) const {
+    if (n >= message_sizes.size()) {
+        return message_sizes.size() - 1;
+    } else {
+        return n;
+    }
+}
+
+bool MessageParser::getPrev(uint32_t n) {
+    n = truncateNumberOfFramesToRewind(n);
+    //we can't read backwards; that's why we rewind n+1 messages
+    //then go forward one
+    bool success = in_provider->rewind(sizeOfLastNumMessages(n+1));
+    //rewind the message_sizes read
+    for (uint i = 0; i < n+1; i++) {
+        message_sizes.pop_back();
+    }
+    // A step back is sometimes a step forward too - the Tao of Octavian
+    if (success) {
+        this->signalToParseNext();
+        return true;
+    }
+    return false;
+}
+
+bool MessageParser::getPrev() {
+    return getPrev(1);
+}
+
+}
 }
 }

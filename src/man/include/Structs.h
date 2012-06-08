@@ -4,6 +4,8 @@
 #ifndef Structs_h_DEFINED
 #define Structs_h_DEFINED
 
+#include "Common.h"
+
 #include <iostream>
 
 //////////// VISION STRUCTURES ////////////
@@ -129,15 +131,21 @@ struct segmentBlob {
 
 struct estimate {
     // Distance in cm from point to robot's center
-    float dist;
-    float elevation;
-    float bearing;
+    cms dist;
+    angle::radians elevation;
+    angle::radians bearing;
     // Field coordinate X, relative to robot's body
-    float x;
+    cms x;
     // Field coordinate Y, relative to robot's body
-    float y;
+    cms y;
+    // Distance variance
+    float distance_variance;
+    // Bearing variance
+    float bearing_variance;
+
     estimate() :
-        dist(0.0f), elevation(0.0f), bearing(0.0f), x(0.0f), y(0.0f)
+        dist(0.0f), elevation(0.0f), bearing(0.0f), x(0.0f), y(0.0f),
+        distance_variance(0.0f), bearing_variance(0.0f)
         {}
 
     friend std::ostream& operator<< (std::ostream &o, const estimate &e)

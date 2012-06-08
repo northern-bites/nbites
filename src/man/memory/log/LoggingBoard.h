@@ -2,71 +2,66 @@
  *
  * @LoggingBoard - a class that will handle all of the logging objects for each
  * of the memory object
- * e.g. MVision can have a ZeroCopyFileLogger, whereas
- * MSensors can have a CodedFileLogger
+ * Each item could potentially have a different logger (a threaded one, a gzip one, etc.)
  *
- * Also each logger depends on a FDProvider (that is a file descriptor
- * provider) to provide the file descriptor necessary. Some stuff
- * might go to a file, some might go to wifi, etc.
+ * Also each logger depends on a OutProvider (which provides a means to write to some output)
  *
+ * @author Octavian Neamtu
  */
 
 #pragma once
 
 #include <map>
+#include <string>
 
-#include "include/io/FileFDProvider.h"
+#include "include/io/OutProvider.h"
+#include "ClassHelper.h"
 
-#include "CodedFileLogger.h"
-#include "ImageFDLogger.h"
+#include "MessageLogger.h"
 #include "memory/MObject.h"
-
-//forward declaration
-namespace memory {
-namespace log {
-class LoggingBoard;
-}
-}
-
 #include "memory/Memory.h"
 
+namespace man {
 namespace memory {
-
 namespace log {
-
-typedef pair< const MObject*, FDLogger*> ObjectFDLoggerPair;
-typedef pair< const MObject*, FDProvider*> ObjectFDProviderPair;
-
-typedef map< const MObject*, FDLogger*> ObjectFDLoggerMap;
-typedef map< const MObject*, FDProvider*> ObjectFDProviderMap;
 
 class LoggingBoard {
 
-public:
-    LoggingBoard(const Memory* _memory);
-    //TODO: make sure to delete all of the logger objects
-    //~LoggingBoard();
+	ADD_SHARED_PTR(LoggingBoard)
 
-    void log(const MObject* mobject);
-
-    const ImageFDLogger* getImageLogger(const MImage* mimage) const;
-    const FDLogger* getLogger(const MObject* mobject) const;
-
-private:
-    void initLoggingObjects();
+protected:
+	typedef common::io::OutProvider OutProvider;
+	typedef std::pair<MObject_ID, MessageLogger::ptr > ObjectIOPair;
+	typedef std::map<MObject_ID, MessageLogger::ptr > ObjectIOMap;
 
 public:
-    static const char* MVISION_PATH;
-    static const char* MVISION_SENSORS_PATH;
-    static const char* MMOTION_SENSORS_PATH;
-    static const char* MIMAGE_PATH;
+	LoggingBoard(Memory::const_ptr memory = Memory::NullInstanceSharedPtr());
+	virtual ~LoggingBoard() {
+	}
+
+	void newOutputProvider(OutProvider::ptr outProvider, MObject_ID id);
+
+	void startLogging();
+	void stopLogging();
+	bool isLogging() {
+		return logging;
+	}
+
+	void reset();
+
+	void setMemory(Memory::const_ptr mem) { memory = mem; }
+
+protected:
+	//returns a NULL pointer if such a logger doesn't exist
+	MessageLogger::const_ptr getLogger(MObject_ID id) const;
+	//returns a NULL pointer if such a logger doesn't exist
+	MessageLogger::ptr getMutableLogger(MObject_ID id);
 
 private:
-    const Memory* memory;
-    ObjectFDLoggerMap objectFDLoggerMap;
-    ObjectFDProviderMap objectFDProviderMap;
-
-
+	Memory::const_ptr memory;
+	bool logging;
+	ObjectIOMap objectIOMap;
 };
+}
 }
 }

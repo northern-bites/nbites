@@ -21,18 +21,22 @@
 #ifndef _SetHeadCommand_h_DEFINED
 #define _SetHeadCommand_h_DEFINED
 
-#include "Kinematics.h"
 #include <iostream>
+#include <boost/shared_ptr.hpp>
+
+#include "Kinematics.h"
 
 class SetHeadCommand : public MotionCommand
 {
 public:
+    typedef boost::shared_ptr<SetHeadCommand> ptr;
+
     SetHeadCommand(const float _yaw,
 		   const float _pitch,
 		   const float _maxSpeedYaw =
-		   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
+				   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_YAW],
 		   const float _maxSpeedPitch =
-		   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
+				   Kinematics::jointsMaxVelNominal[Kinematics::HEAD_PITCH]
 		   )
         : MotionCommand(MotionConstants::SET_HEAD),
            yaw(_yaw),

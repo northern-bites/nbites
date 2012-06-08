@@ -6,6 +6,7 @@
 class Speech
 {
 public:
+    Speech() : isEnabled(true){ };
     virtual ~Speech() { };
 
 public:
@@ -18,7 +19,6 @@ public:
     virtual void disable() { isEnabled = false;  }
 
 protected:
-    Speech() : isEnabled(true){ };
     bool isEnabled;
 };
 

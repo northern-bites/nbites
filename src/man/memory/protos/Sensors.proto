@@ -1,4 +1,4 @@
-package memory.proto;
+package man.memory.proto;
 
 message PSensors {
 
@@ -74,4 +74,8 @@ message PImage {
 	optional int64 timestamp = 1;
 
 	optional bytes image = 2;
+	optional uint32 width = 3;
+	optional uint32 height = 4;
+	
+	repeated float vision_body_angles = 5;
 }

@@ -6,14 +6,13 @@
 class TOOLConnect; // forward reference
 
 #  include <boost/shared_ptr.hpp>
-#  include "synchro.h"
+#  include "synchro/synchro.h"
 #  include "Sensors.h"
 #  include "Vision.h"
 
 #include "CommDef.h"
 #include "DataSerializer.h"
 #include "LocSystem.h"
-#include "MMLocEKF.h"
 #include "BallEKF.h"
 #include "GameController.h"
 
@@ -61,11 +60,10 @@ class TOOLConnect
     : public Thread
 {
 public:
-    TOOLConnect(boost::shared_ptr<Synchro> _synchro,
-                boost::shared_ptr<Sensors> s,
+    TOOLConnect(boost::shared_ptr<Sensors> s,
                 boost::shared_ptr<Vision> v,
-				boost::shared_ptr<GameController> gc);
-    ~TOOLConnect();
+                boost::shared_ptr<GameController> gc);
+    virtual ~TOOLConnect();
 
     void run();
 
@@ -90,12 +88,7 @@ private:
     boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
     boost::shared_ptr<Vision> vision; // access to vision processing
     boost::shared_ptr<GameController> gameController; // access to GameController
-#ifdef USE_MM_LOC_EKF
-    boost::shared_ptr<MMLocEKF> loc; // access to localization, use MMLocEKF for
-									 // transfering model information
-#else
     boost::shared_ptr<LocSystem> loc; // access to localization data
-#endif
     boost::shared_ptr<BallEKF> ballEKF; // access to localization data
 };
 

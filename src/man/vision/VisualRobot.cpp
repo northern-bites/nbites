@@ -2,9 +2,12 @@
 VisualRobot::VisualRobot() : VisualDetection()
 {
     init();
+    framesOn = 0;
+    framesOff = 0;
 }
 
-VisualRobot::VisualRobot(const VisualRobot& o) : VisualDetection(o) {}
+VisualRobot::VisualRobot(const VisualRobot& o) : VisualDetection(o)
+{}
 
 // Initialization, happens every frame.
 void VisualRobot::init()
@@ -17,10 +20,10 @@ void VisualRobot::init()
     centerY = 0;
     angleX = 0;
     angleY = 0;
-    focDist = 0;
     setDistance(0);
     setBearing(0);
     elevation = 0;
+    on = false;
 }
 
 /**
@@ -47,7 +50,6 @@ void VisualRobot::updateRobot(Blob b)
     setCenterX(getLeftTopX() + ROUND2(getWidth() / 2));
     setCenterY(getRightTopY() + ROUND2(getHeight() / 2));
     setDistance(1);
-
 }
 
 /**

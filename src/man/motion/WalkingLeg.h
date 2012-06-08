@@ -60,7 +60,8 @@
 #include "CoordFrame.h"
 #include "Kinematics.h"
 #include "NBMatrixMath.h"
-#include  "Sensors.h"
+#include "Sensors.h"
+#include "OdometryFilter.h"
 
 //DEBUG Switches:
 #ifdef WALK_DEBUG
@@ -144,7 +145,7 @@ private:
     bool firstFrame() const {return frameCounter == 0;}
     void assignStateTimes(boost::shared_ptr<Step> step);
     const boost::tuple<const float, const float> getSensorFeedback();
-    void debugProcessing();
+    void debugProcessing(NBMath::ufmatrix3 fc_Transform);
 //hack
 public:
     const float getFootRotation();
@@ -179,10 +180,10 @@ private:
     Kinematics::ChainID chainID; //keep track of which leg this is
     const MetaGait *gait;
     float lastJoints[Kinematics::LEG_JOINTS];
-    NBMath::ufvector3 goal;
-    NBMath::ufvector3 last_goal;
+    NBMath::ufvector3 goal, last_goal;
+    OdoFilter::ptr odometry;
+    std::vector<float> odoDiff;
     float lastRotation;
-    std::vector<float> odoUpdate;
     int leg_sign; //-1 for right leg, 1 for left leg
     std::string leg_name;
 

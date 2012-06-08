@@ -1,7 +1,6 @@
 from . import PBConstants
 from . import Formations
 
-
 #### No Field Players ####
 
 def sNoFieldPlayers(team, workingPlay):
@@ -14,7 +13,10 @@ def sNoFieldPlayers(team, workingPlay):
 def sOneField(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_ONE_FIELD_PLAYER)
     # No Kickoff play because it would be identical
-    Formations.fOneField(team, workingPlay)
+    if (team.shouldUseDubD()):
+        Formations.fOneFieldD(team, workingPlay)
+    else:
+        Formations.fOneField(team, workingPlay)
 
 #### Two Field Players ####
 
@@ -30,7 +32,7 @@ def sTwoField(team, workingPlay):
     elif team.shouldUseDubD():
         Formations.fTwoDubD(team, workingPlay)
     # Agressive middie support for ball deep in opponents' territory.
-    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+    elif team.brain.ball.loc.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Formations.fNeutralTwoField(team, workingPlay)
     # Standard formation
     else:
@@ -47,7 +49,7 @@ def sTwoZone(team, workingPlay):
         Formations.fKickoff(team, workingPlay)
     # Ball on offensive side of the field, keep defender
     # @TODO: this can cause chaser to ossilate back and forth. need tie-breaking
-    elif team.brain.ball.x > PBConstants.S_TWO_ZONE_DEFENDER_THRESH:
+    elif team.brain.ball.loc.x > PBConstants.S_TWO_ZONE_DEFENDER_THRESH:
         Formations.fTwoZoneD(team, workingPlay)
     # Ball on defensive side of the field, keep offender
     else:
@@ -68,10 +70,10 @@ def sWin(team, workingPlay):
     elif team.shouldUseDubD():
         Formations.fThreeDubD(team, workingPlay)
     # Make the defender a middie if the ball is close enough to opp goal
-    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+    elif team.brain.ball.loc.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Formations.fNeutralOThreeField(team, workingPlay)
     # Make the offender a middie if the ball is close enough to our goal
-    elif team.brain.ball.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
+    elif team.brain.ball.loc.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
         Formations.fNeutralDThreeField(team, workingPlay)
     # Standard Formation
     else:
@@ -116,11 +118,5 @@ def sTestMiddie(team, workingPlay):
     Formations.fTestMiddie(team, workingPlay)
 def sTestChaser(team, workingPlay):
     workingPlay.setStrategy(PBConstants.S_TEST_CHASER)
-    # Game Ready Setup
-    if team.brain.gameController.currentState == 'gameReady' or\
-        team.brain.gameController.currentState =='gameSet':
-        # team is kicking off
-        Formations.fReady(team, workingPlay)
-    else:
-        Formations.fTestChaser(team, workingPlay)
+    Formations.fTestChaser(team, workingPlay)
 

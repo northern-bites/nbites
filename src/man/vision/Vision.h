@@ -33,9 +33,6 @@
 #include "Common.h"
 #include "VisionDef.h"
 #include "Profiler.h"
-#if defined(OFFLINE) || !ROBOT(NAO_RL)
-#  include "MotionDef.h"
-#endif
 #include "FieldLinesDetector.h"
 
 class Vision;   // forward reference
@@ -58,7 +55,7 @@ class Vision
     friend class Threshold;
 
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose, boost::shared_ptr<Profiler> _prof);
+    Vision(boost::shared_ptr<NaoPose> _pose);
     ~Vision();
 
 private:
@@ -98,7 +95,7 @@ public:
     void drawLine(int x, int y, int x1, int y1, int c);
     void drawPoint(int x, int y, int c);
     void drawRect(int left, int top, int width, int height, int c);
-    void drawVisualLines(const vector<VisualLine>& lines);
+    void drawVisualLines(const std::vector<VisualLine>& lines);
     void drawX(int x, int y, int c);
 
     //
@@ -151,11 +148,7 @@ public:
     fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3
 
-    // Profiling
-    boost::shared_ptr<Profiler> profiler;
-
     const uint16_t * yImg, *uImg, *vImg;
-
     FieldLinesDetector linesDetector;
 protected:
     //

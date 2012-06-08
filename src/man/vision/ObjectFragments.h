@@ -97,6 +97,8 @@ public:
     // post recognition routines
     int classifyByCrossbar(Blob b);
     int classifyByOtherRuns(int left, int right, int height);
+	int classifyByOuterL(Blob post, VisualCorner & corner);
+	int classifyByInnerL(Blob post, VisualCorner  & corner);
     int classifyByTCorner(Blob b);
     int classifyByCheckingCorners(Blob b);
     int cornerClassifier(float diff, float dist, int x, int y,int class1,
@@ -109,10 +111,10 @@ public:
                                    int class1, int class2);
     int classifyByGoalline(const point<int> linel, const point<int> liner,
                            point<int> left, point<int> right);
-    int classifyByGoalBoxFrontline(pair<int, int> foo,
+    int classifyByGoalBoxFrontline(std::pair<int, int> foo,
                                    point<int> left, point<int> right);
     int getFrontlineClassification(point<int> post,
-                                   pair<int, int> foo,
+                                   std::pair<int, int> foo,
                                    int classification);
 
 	int classifyByCheckingLines(Blob post);
@@ -125,8 +127,8 @@ public:
     void lookForFirstPost(VisualFieldObject *left, VisualFieldObject *right,
                   VisualCrossbar *mid, unsigned char c);
     void lookForSecondPost(Blob pole, int post,
-						   VisualFieldObject* left,
-						   VisualFieldObject* right,
+                           VisualFieldObject* left,
+                           VisualFieldObject* right,
                            VisualCrossbar* mid, unsigned char c);
 
     void updateRunsAfterFirstPost(Blob pole, int post);
@@ -149,6 +151,10 @@ public:
 	bool badDistance(Blob b);
     bool locationOk(Blob b);
     bool relativeSizesOk(Blob a, Blob b);
+	bool goodValueX(int x) {return x >= 0 && x < IMAGE_WIDTH;}
+	bool goodValueY(int y) {return y >= 0 && y < IMAGE_HEIGHT;}
+	bool goodValuePoint(point<int> p) {return goodValueX(p.x) &&
+			goodValueY(p.y);}
 
     // misc.
     bool withinMargin(float n, float n1, float n2);

@@ -10,10 +10,11 @@ using namespace boost::assign;
 #include "CommDef.h"
 #include "Kinematics.h"
 #include "SensorDef.h"
-#include "MMLocEKF.h"
+#include "Camera.h"
 
 using std::vector;
 using namespace boost;
+using namespace man::corpus;
 
 //
 // Debugging ifdef switches
@@ -27,9 +28,9 @@ using namespace boost;
 // Begin class code
 //
 
-TOOLConnect::TOOLConnect (shared_ptr<Synchro> _synchro, shared_ptr<Sensors> s,
-                          shared_ptr<Vision> v, shared_ptr<GameController> gc)
-    : Thread(_synchro, "TOOLConnect"),
+TOOLConnect::TOOLConnect (shared_ptr<Sensors> s, shared_ptr<Vision> v,
+                          shared_ptr<GameController> gc)
+    : Thread("TOOLConnect"),
       state(TOOL_REQUESTING),
       sensors(s), vision(v), gameController(gc),
       loc(), ballEKF()
@@ -54,13 +55,11 @@ void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
 void
 TOOLConnect::run ()
 {
-    running = true;
-    trigger->on();
-
     try {
         serial.bind();
 
         while (running) {
+            PROF_ENTER(P_TOOLCONNECT);
             serial.accept();
 #ifdef DEBUG_TOOL_CONNECTS
             printf("Connection received from the TOOL\n");
@@ -76,6 +75,7 @@ TOOLConnect::run ()
                     fprintf(stderr, "%s\n", e.what());
                 }
             }
+            PROF_EXIT(P_TOOLCONNECT);
         }
     }catch (socket_error &e) {
         if (running) {
@@ -86,8 +86,6 @@ TOOLConnect::run ()
 
     serial.closeAll();
 
-    running = false;
-    trigger->off();
 }
 
 void
@@ -152,11 +150,6 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Robot information request
     if (r.info) {
         serial.write_byte(ROBOT_TYPE);
-        //TODO: this is dumb, remove it
-        std::string name = "";
-        serial.write_bytes((const byte*)name.c_str(), name.size());
-        // TODO - get calibration file name access
-        serial.write_bytes((byte*)"table.mtb", strlen("table.mtb"));
     }
 
     std::vector<float> v;
@@ -169,15 +162,42 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 
     // Sensor data request
     if (r.sensors) {
-        v = sensors->getAllSensors();
-        serial.write_floats(v);
+        std::vector<float> sensor_data(NUM_SENSORS);
+        FSR lfsr = sensors->getLeftFootFSR();
+        sensor_data[0] = lfsr.frontLeft;
+        sensor_data[1] = lfsr.frontRight;
+        sensor_data[2] = lfsr.rearLeft;
+        sensor_data[3] = lfsr.rearRight;
+        FSR rfsr = sensors->getRightFootFSR();
+        sensor_data[4] = rfsr.frontLeft;
+        sensor_data[5] = rfsr.frontRight;
+        sensor_data[6] = rfsr.rearLeft;
+        sensor_data[7] = rfsr.rearRight;
+        FootBumper lfb = sensors->getLeftFootBumper();
+        sensor_data[8] = lfb.left;
+        sensor_data[9] = lfb.right;
+        FootBumper rfb = sensors->getRightFootBumper();
+        sensor_data[10] = rfb.left;
+        sensor_data[11] = rfb.right;
+        Inertial inertial = sensors->getInertial();
+        sensor_data[12] = inertial.accX;
+        sensor_data[13] = inertial.accY;
+        sensor_data[14] = inertial.accZ;
+        sensor_data[15] = inertial.gyrX;
+        sensor_data[16] = inertial.gyrY;
+        sensor_data[17] = inertial.angleX;
+        sensor_data[18] = inertial.angleY;
+        sensor_data[19] = sensors->getUltraSoundLeft();
+        sensor_data[20] = sensors->getUltraSoundRight();
+        sensor_data[21] = sensors->getSupportFoot();
+        serial.write_floats(sensor_data);
     }
 
     // Image data request
     if (r.image) {
         sensors->lockImage();
         serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getNaoImage()),
+            reinterpret_cast<const uint8_t*>(sensors->getNaoImage(Camera::BOTTOM)),
             NAO_IMAGE_BYTE_SIZE);
         sensors->releaseImage();
     }
@@ -185,39 +205,58 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     if (r.thresh)
         // send thresholded image
         serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getColorImage()),
+            reinterpret_cast<const uint8_t*>(sensors->getColorImage(Camera::BOTTOM)),
             COLOR_IMAGE_BYTE_SIZE);
 
-	if (r.objects) {
-		if (loc.get()) {
-			vector<Observation> obs = loc->getLastObservations();
-			vector<float> obs_values;
+    if (r.objects) {
+        if (loc.get()) {
+            vector<float> obs_values;
 
-			for (unsigned int i=0; i < obs.size() ; ++i){
-				obs_values.push_back(static_cast<float>(obs[i].getID()));
-				obs_values.push_back(obs[i].getVisDistance());
-				obs_values.push_back(obs[i].getVisBearing());
-			}
-			serial.write_floats(obs_values);
-		}
-	}
+            // Add point values to observed values
+            vector<PointObservation> obs =
+                loc->getLastPointObservations();
+            for (vector<PointObservation>::iterator i = obs.begin();
+                 i != obs.end() ; ++i){
+                obs_values.push_back(static_cast<float>(i->getID()));
+                obs_values.push_back(i->getVisDistance());
+                obs_values.push_back(i->getVisBearing());
+            }
+
+            // Add corners to observed values
+            vector<CornerObservation> corners =
+                loc->getLastCornerObservations();
+            for (vector<CornerObservation>::iterator i = corners.begin();
+                 i != corners.end() ; ++i){
+                obs_values.push_back(static_cast<float>(i->getID()));
+                obs_values.push_back(i->getVisDistance());
+                obs_values.push_back(i->getVisBearing());
+            }
+
+            serial.write_floats(obs_values);
+        }
+    }
 
     if (r.local) {
         // send localization data
         vector<float> loc_values;
 
         if (loc.get()) {
-			loc_values += loc->getXEst(), loc->getYEst(),
-				loc->getHEst(), loc->getXUncert(),
-				loc->getYUncert(),
-				loc->getHUncert();
-			loc_values += ballEKF->getXEst(), ballEKF->getYEst(),
-				ballEKF->getXUncert(), ballEKF->getYUncert(),
-				ballEKF->getXVelocityEst(), ballEKF->getYVelocityEst(),
-				ballEKF->getXVelocityUncert(),
-				ballEKF->getYVelocityUncert();
-          loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
-                        loc->getLastOdo().deltaR;
+            loc_values += loc->getXEst(), loc->getYEst(),
+                loc->getHEst(), loc->getXUncert(),
+                loc->getYUncert(),
+                loc->getHUncert();
+
+            loc_values += ballEKF->getGlobalX(),
+                ballEKF->getGlobalY(),
+                ballEKF->getGlobalXUncert(),
+                ballEKF->getGlobalYUncert(),
+                ballEKF->getGlobalXVelocity(),
+                ballEKF->getGlobalYVelocity(),
+                ballEKF->getGlobalXVelocityUncert(),
+                ballEKF->getGlobalYVelocityUncert();
+
+          loc_values += loc->getLastOdo().x, loc->getLastOdo().y,
+                        loc->getLastOdo().theta;
         } else
           for (int i = 0; i < 19; i++)
             loc_values += 0;

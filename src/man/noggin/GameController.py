@@ -1,7 +1,5 @@
-
 from man import comm
-
-from . import NogginConstants as Constants
+import noggin_constants as Constants
 from . import GameStates
 from .util import FSA
 from . import Leds
@@ -14,15 +12,15 @@ STATE_FINISHED = comm.STATE_FINISHED
 PENALTY_NONE = comm.PENALTY_NONE
 STATE2_PENALTYSHOOT = comm.STATE2_PENALTYSHOOT
 STATE2_NORMAL = comm.STATE2_NORMAL
-TEAM_BLUE = 0
-TEAM_RED = 1
+#TODO: unify these constants!
+TEAM_BLUE = Constants.teamColor.TEAM_BLUE
+TEAM_RED = Constants.teamColor.TEAM_RED
 
 class GameController(FSA.FSA):
     def __init__(self, brain):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
         self.gc = brain.comm.gc
-        #jf- self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(GameStates)
         self.currentState = 'gameInitial'
         self.setName('GameController')
@@ -38,13 +36,14 @@ class GameController(FSA.FSA):
         else:
             self.brain.leds.executeLeds(Leds.TEAM_RED_LEDS)
 
-        print  "kickoff:%g teamColor:%g" % (self.gc.kickOff, self.gc.color)
         if self.kickOff == self.gc.color:
             self.ownKickOff = True
             self.brain.leds.executeLeds(Leds.HAVE_KICKOFF_LEDS)
         else:
             self.ownKickOff = False
             self.brain.leds.executeLeds(Leds.NO_KICKOFF_LEDS)
+
+        print  "kickoff:%g teamColor:%g" % (self.gc.kickOff, self.gc.color)
 
 
     def run(self):
@@ -87,15 +86,15 @@ class GameController(FSA.FSA):
 
         #Set team color
         if self.gc.color != self.brain.my.teamColor:
-            self.brain.my.teamColor = self.gc.color
-            self.brain.makeFieldObjectsRelative()
-            self.printf("Switching team color to " +
-                        Constants.teamColorDict[self.brain.my.teamColor])
-
-            if self.brain.my.teamColor == TEAM_BLUE:
+            if self.gc.color == TEAM_BLUE:
+                self.brain.my.teamColor = TEAM_BLUE
                 self.brain.leds.executeLeds(Leds.TEAM_BLUE_LEDS)
             else:
+                self.brain.my.teamColor = TEAM_RED
                 self.brain.leds.executeLeds(Leds.TEAM_RED_LEDS)
+            self.brain.makeFieldObjectsRelative()
+            self.printf("Switching team color to: " +
+                        str(self.brain.my.teamColor))
 
             # need to update kickoff when we swap team color
             if self.kickOff == self.brain.my.teamColor:

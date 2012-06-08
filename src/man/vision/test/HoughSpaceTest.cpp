@@ -13,7 +13,7 @@ using boost::shared_ptr;
 const float HoughSpaceTest::ACCEPT_ANGLE = 1 * M_PI_FLOAT/128.0f + 0.0001;
 
 HoughSpaceTest::HoughSpaceTest() :
-    hs(shared_ptr<Profiler>(new Profiler(&thread_micro_time)))
+    hs()
 {
 
 }

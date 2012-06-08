@@ -1,6 +1,6 @@
-from .Location import (RobotLocation, Location)
-from .. import NogginConstants
+from objects import (RobotLocation, Location)
 from math import fabs
+import noggin_constants as NogginConstants
 import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
@@ -15,28 +15,33 @@ DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
 DEBUG_DETERMINE_CHASE_TIME = False
-BALL_ON_BONUS = 1000.
-CHASE_SPEED = 15.00 #cm/sec
-BALL_GOAL_LINE_BONUS = CHASE_SPEED*10 #takes a little less than 10 secs to orbit 180
 SEC_TO_MILLIS = 1000.0
-# penalty is: (ball_dist*heading)/scale
-PLAYER_HEADING_PENALTY_SCALE = 300.0 # max 60% of distance
-# penalty is: (ball_dist*ball_bearing)/scale
-BALL_BEARING_PENALTY_SCALE = 200.0 # max 90% of distance
+CHASE_SPEED = 15.00 #cm/sec
+CHASE_TIME_SCALE = 0.45              # How much new measurement is used.
+BALL_OFF_PENALTY = 1000.             # Big penalty for not seeing the ball.
+BALL_GOAL_LINE_PENALTY = 10.
 
+# Behavior constants
+BALL_TEAMMATE_DIST_GRABBING = 35
+BALL_TEAMMATE_BEARING_GRABBING = 85.
+BALL_TEAMMATE_DIST_DRIBBLING = 20
+
+# Ball on?
+BALL_FRAMES = 20
 
 class TeamMember(RobotLocation):
     """class for keeping track of teammates' info """
 
     def __init__(self, tbrain=None):
         '''variables include lots from the Packet class'''
-        RobotLocation.__init__(self)
+        RobotLocation.__init__(self, 0.0, 0.0, 0.0)
         # things in the Packet()
         self.playerNumber = 0
         self.ballDist = 0
         self.ballBearing = 0
         self.ballX = 0
         self.ballY = 0
+        self.ballOn = False
         self.role = None
         self.subRole = None
         self.chaseTime = 0
@@ -64,6 +69,7 @@ class TeamMember(RobotLocation):
         self.ballBearing = packet.ballBearing
         self.ballX = packet.ballX
         self.ballY = packet.ballY
+        self.ballOn = packet.ballOn
         self.role = packet.role
         self.subRole = packet.subRole
         self.chaseTime = packet.chaseTime
@@ -73,14 +79,14 @@ class TeamMember(RobotLocation):
         # if we are recieving packets, teammate is active
         self.active = True
         self.grabbing = (self.ballDist <=
-                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING) and \
+                         BALL_TEAMMATE_DIST_GRABBING) and \
                          (fabs(self.ballBearing) <
-                          NogginConstants.BALL_TEAMMATE_BEARING_GRABBING)
+                          BALL_TEAMMATE_BEARING_GRABBING)
 
         #potential problem when goalie is grabbing?
         #only going to be dribbling or grabbing if you see the ball
         self.dribbling = self.ballDist <= \
-                          NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
+                          BALL_TEAMMATE_DIST_DRIBBLING
 
         self.lastPacketTime = time.time()
 
@@ -93,15 +99,15 @@ class TeamMember(RobotLocation):
 
         my = self.brain.my
         ball = self.brain.ball
-        pb = self.brain.playbook
 
         self.x = my.x
         self.y = my.y
         self.h = my.h
-        self.ballDist = ball.dist
-        self.ballBearing = ball.bearing
-        self.ballX = ball.x
-        self.ballY = ball.y
+        self.ballDist = ball.vis.dist
+        self.ballBearing = ball.vis.bearing
+        self.ballX = ball.loc.x
+        self.ballY = ball.loc.y
+        self.ballOn = ball.vis.on
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
@@ -110,14 +116,14 @@ class TeamMember(RobotLocation):
                        'gamePenalized')
 
         self.dribbling = self.ballDist <= \
-                         NogginConstants.BALL_TEAMMATE_DIST_DRIBBLING
+                         BALL_TEAMMATE_DIST_DRIBBLING
 
         self.grabbing = (self.ballDist <=
-                         NogginConstants.BALL_TEAMMATE_DIST_GRABBING) and \
+                         BALL_TEAMMATE_DIST_GRABBING) and \
                          (fabs(self.ballBearing) <
-                          NogginConstants.BALL_TEAMMATE_BEARING_GRABBING)
+                          BALL_TEAMMATE_BEARING_GRABBING)
 
-        self.lastPacketTime = self.brain.time
+        self.lastPacketTime = time.time()
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -138,50 +144,63 @@ class TeamMember(RobotLocation):
 
     def determineChaseTime(self):
         """
-        Metric for deciding chaser.
-        Attempt to define a time to get to the ball.
-        Can give bonuses or penalties in certain situations.
+        Attempt to define a time in seconds to get to the ball.
+        Can give penalties in certain situations.
+        @ return: returns a time in milliseconds with penalties.
+        Note: Don't give bonuses. It can result in negative chase times
+              which can screw up the math later on. --Wils (06/25/11)
         """
-        time = 0.0
-
-        ## if DEBUG_DETERMINE_CHASE_TIME:
-        ##     self.printf("DETERMINE CHASE TIME DEBUG")
-
-        time += (self.ballDist / CHASE_SPEED)*SEC_TO_MILLIS
+        t = (self.ballDist / CHASE_SPEED)
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time base is " + str(time))
+            self.brain.out.printf("\tChase time base is " + str(t))
 
-        # Give a bonus for seeing the ball
-        if self.brain.ball.on:
-            time -= BALL_ON_BONUS
+        # Give a penalty for not seeing the ball if we aren't in a kickingState
+        if not self.brain.ball.vis.on and not self.brain.play.isChaser():
+            t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball on bonus " + str(time))
+            self.brain.out.printf("\tChase time after ball on bonus " + str(t))
 
-        # Give a bonus for lining up along the ball-goal line
+        # Give penalties for not lining up along the ball-goal line
         lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
         rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
-        if (lpb < self.ballBearing < rpb):
-            time -= BALL_GOAL_LINE_BONUS
+        # TODO: scale these by how far off we are??
+        # ball is not lined up
+        if (self.ballBearing > lpb or rpb > self.ballBearing):
+            t += BALL_GOAL_LINE_PENALTY
+        # we are not lined up
+        if (lpb < 0 or rpb > 0):
+            t += BALL_GOAL_LINE_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball-goal-line bonus " +str(time))
+            self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
 
         # Add a penalty for being fallen over
-        time += (self.brain.fallController.getTimeRemainingEst()*SEC_TO_MILLIS)
+        t += self.brain.fallController.getTimeRemainingEst()
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after fallen over penalty " + str(time))
+            self.brain.out.printf("\tChase time after fallen over penalty " + str(t))
+
+        tm = t*SEC_TO_MILLIS
+
+        # Filter by IIR to reduce noise
+        tm = tm * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            self.brain.out.printf("\tChase time after filter " +str(tm))
             self.brain.out.printf("")
 
-        return time
+        return tm
 
     def hasBall(self):
         return self.grabbing
 
     def isTeammateRole(self, roleToTest):
         return (self.role == roleToTest)
+
+    def isTeammateSubRole(self, subRoleToTest):
+        return (self.subRole == subRoleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
@@ -211,10 +230,18 @@ class TeamMember(RobotLocation):
     def isDead(self):
         """
         returns True if teammates last timestamp is sufficiently behind ours.
-        however, the dog could still be on but sending really laggy packets.
+        however, the bot could still be on but sending really laggy packets.
         """
-        return (PACKET_DEAD_PERIOD <
-                (self.brain.time - self.lastPacketTime))
+        if ((self.brain.time + PACKET_DEAD_PERIOD) < self.lastPacketTime):
+            print "\nTIME GOT RESET! AH!!!!!!!!!!!!!!!!!!!\n"
+        return (PACKET_DEAD_PERIOD < (self.brain.time - self.lastPacketTime))
 
     def __str__(self):
         return "I am player number " + self.playerNumber
+
+    def __eq__(self, other):
+        return self.playerNumber == other.playerNumber
+
+    def __ne__(self, other):
+        return self.playerNumber != other.playerNumber
+

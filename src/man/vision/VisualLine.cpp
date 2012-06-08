@@ -20,7 +20,7 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
 VisualLine::VisualLine(const HoughLine& a,
                        const HoughLine& b,
                        const Gradient& g) :
-    VisualLandmark<lineID>(UNKNOWN_LINE), hLine1(a), hLine2(b)
+    VisualLandmark(UNKNOWN_LINE), hLine1(a), hLine2(b)
 {
     findEndpoints(a,b,g);
     // findDimensions();
@@ -217,7 +217,7 @@ bool VisualLine::isLineEdge(const HoughLine& line,
 }
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
-    : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+    : VisualLandmark(UNKNOWN_LINE), ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
                     ConcreteLine::concreteLines().end())
 {
@@ -229,7 +229,7 @@ VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     init();
 }
 
-VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+VisualLine::VisualLine() : VisualLandmark(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
                     ConcreteLine::concreteLines().end())
 {
@@ -237,7 +237,7 @@ VisualLine::VisualLine() : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
 }
 
 VisualLine::VisualLine(float _dist, float _bearing) :
-    VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+    VisualLandmark(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
                     ConcreteLine::concreteLines().end())
 {
@@ -250,7 +250,7 @@ VisualLine::VisualLine(float _dist, float _bearing) :
 
 
 VisualLine::VisualLine(list<linePoint> &linePoints)
-    : VisualLandmark<lineID>(UNKNOWN_LINE),ccLine(false),
+    : VisualLandmark(UNKNOWN_LINE),ccLine(false),
       possibleLines(ConcreteLine::concreteLines().begin(),
                     ConcreteLine::concreteLines().end())
 {
@@ -264,7 +264,7 @@ VisualLine::VisualLine(list<linePoint> &linePoints)
 
 
 VisualLine::VisualLine(const VisualLine& other)
-    : VisualLandmark<lineID>(other),
+    : VisualLandmark(other),
       start(other.start), end(other.end), leftBound(other.leftBound),
       rightBound(other.rightBound),
       bottomBound(other.bottomBound),
@@ -282,7 +282,7 @@ VisualLine::VisualLine(const VisualLine& other)
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
-      possibleLines(other.getPossibleLines()),
+      possibleLines(other.getPossibilities()),
       tr(other.tr), tl(other.tl), br(other.br), bl(other.bl)
 {
 }
@@ -667,7 +667,7 @@ const bool VisualLine::hasPositiveID()
 const std::vector<lineID> VisualLine::getIDs() {
   std::vector<lineID> poss;
 
-  for (list<const ConcreteLine*>::const_iterator 
+  for (list<const ConcreteLine*>::const_iterator
 	 currLine = possibleLines.begin();
        currLine != possibleLines.end(); currLine++) {
     poss.push_back((**currLine).getID());
@@ -675,4 +675,3 @@ const std::vector<lineID> VisualLine::getIDs() {
 
   return poss;
 }
-

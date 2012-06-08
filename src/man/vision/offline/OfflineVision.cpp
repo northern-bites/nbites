@@ -59,16 +59,11 @@ int OfflineVision::runOnDirectory(std::string path)
             framePath << path << "/" << i << ".frm";
 
             sensors->loadFrame(framePath.str());
-
-            _acquire_image_fast(table, &params,
-                                const_cast<uint8_t*>(sensors->getNaoImage()),
-                                image);
-
-            vision->notifyImage(image);
-            PROF_NFRAME(profiler);
+            vision->notifyImage(sensors->getImage());
+            PROF_NFRAME();
         }
     }
-    PROF_NFRAME(profiler);
+    PROF_NFRAME();
     cout << endl;
 
     delete[] image;

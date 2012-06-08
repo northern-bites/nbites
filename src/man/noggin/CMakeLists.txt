@@ -80,9 +80,12 @@ SET( NOGGIN_SRCS Noggin
                  # MCL
                  BallEKF
                  PyLoc
-                 LocEKF
-                 MMLocEKF
-                 NogginStructs.h
+                 # LocEKF
+		 MultiMeasurementEKF
+		 MultiLocEKF
+		 PyConstants
+		 PyObjects
+		 CombinationObjects
                  )
 
 
@@ -93,7 +96,6 @@ SET( NOGGIN_PYTHON_SRCS __init__.py
                         FallController.py
 			Stability.py
                         FallStates.py
-                        NogginConstants.py
                         Leds.py
                         ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
                         ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py
@@ -155,9 +157,11 @@ SET_TARGET_PROPERTIES(
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
   ${NOGGIN_TARGET}
+  ${LOG_TARGET}
   ${PYTHON_LIBRARY}
   ${VISION_TARGET}
   ${SENSORS_TARGET}
+  log
   ${Boost_PYTHON_LIBRARY}
   )
 

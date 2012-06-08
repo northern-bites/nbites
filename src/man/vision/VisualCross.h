@@ -4,8 +4,7 @@
 #include <iomanip>
 #include <cstdlib>
 
-#include "VisualLandmark.h"
-#include "VisualDetection.h"
+#include "VisualObject.h"
 #include "ConcreteFieldObject.h"
 #include "Utility.h"
 #include "Structs.h"
@@ -16,9 +15,12 @@
 
 // Values for the Standard Deviation calculations
 
-class VisualCross : public VisualDetection, public VisualLandmark<crossID> {
+class VisualCross : public VisualObject {
 
 public:
+    // ConcreteType provided by this VisualObject
+    typedef ConcreteCross ConcreteType;
+
     // Construcotrs
     VisualCross();
 	VisualCross(const crossID id);
@@ -68,7 +70,7 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
-    const std::list <const ConcreteCross *> * getPossibleCrosses() const {
+    const std::list <const ConcreteCross *> * getPossibilities() const {
         return possibleCrosses;
     }
 	virtual const bool hasPositiveID();
@@ -84,10 +86,10 @@ private: // Class Variables
 
     // Member functions
     inline static float robotDistanceToSD(float _distance) {
-        return sqrt(0.00000004f * std::pow(_distance,4.079f));
+        return sqrtf(0.00000004f * std::pow(_distance,4.079f));
     }
     inline static float robotBearingToSD(float _bearing) {
-        return sqrt(static_cast<float>(M_PI_FLOAT) / 8.0f);
+        return sqrtf(M_PI_FLOAT / 8.0f);
     }
 
 };

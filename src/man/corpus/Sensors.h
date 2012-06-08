@@ -25,20 +25,27 @@
 #include <list>
 #include <pthread.h>
 #include <stdint.h>
+#include <boost/shared_ptr.hpp>
 
 #include "SensorDef.h"
 #include "SensorConfigs.h"
-#include "NaoDef.h"
 #include "VisionDef.h"
-#include "Provider.h"
+#include "Camera.h"
+#include "Notifier.h"
+#include "Speech.h"
 #include "BulkMonitor.h"
+#include "include/synchro/mutex.h"
+#include "Kinematics.h"
+#include "memory/RoboImage.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
     RIGHT_SUPPORT
 };
 
-enum SENSORS_EVENT {
+class Sensors;
+
+enum SensorsEvent {
     NEW_MOTION_SENSORS = 1,
     NEW_VISION_SENSORS,
     NEW_IMAGE
@@ -59,6 +66,7 @@ struct FSR {
 };
 
 struct FootBumper {
+    FootBumper() : left(0.0f), right(0.0f) {}
     // Since the foot bumpers only have pressed/unpressed states, but are stored
     // as floats with values 0.0f and 1.0f, we just test whether the value is
     // bigger than a half or not and assign a boolean based on that.
@@ -92,25 +100,25 @@ struct Inertial {
 };
 
 
-class Sensors : public Provider{
+class Sensors : public EventNotifier<SensorsEvent>{
     //friend class Man;
 public:
-    Sensors();
-    ~Sensors();
+    Sensors(boost::shared_ptr<Speech> s);
+    virtual ~Sensors();
 
     // Locking data retrieval methods
     //   Each of these methods first locks the associated mutex, copies the
     //   requested values, then unlocks the mutex before returning
     const std::vector<float> getBodyAngles() const;
-    const std::vector<float> getHeadAngles() const;
     const std::vector<float> getBodyAngles_degs() const;
     const std::vector<float> getVisionBodyAngles() const;
+    float getVisionAngle(Kinematics::JointName joint) const;
     const std::vector<float> getMotionBodyAngles() const;
     const std::vector<float> getMotionBodyAngles_degs() const;
     const std::vector<float> getBodyTemperatures() const;
-    const float getBodyAngle(const int index) const;
+    float getBodyAngle(Kinematics::JointName joint) const;
     const std::vector<float> getBodyAngleErrors() const ;
-    const float getBodyAngleError(int index) const;
+    float getBodyAngleError(Kinematics::JointName joint) const;
     const FSR getLeftFootFSR() const;
     const FSR getRightFootFSR() const;
     const FootBumper getLeftFootBumper() const;
@@ -126,16 +134,15 @@ public:
     const float getChestButton() const;
     const float getBatteryCharge() const;
     const float getBatteryCurrent() const;
-    const std::vector<float> getAllSensors() const;
 
     // Locking data storage methods
     //   Each of these methods first locks the associated mutex, stores
     //   the specified values, then unlocks the mutex before returning
-    void setBodyAngles(const std::vector<float>& v);
+    void setBodyAngles(float* jointTPointers[]);
     void setVisionBodyAngles(const std::vector<float>& v);
     void setMotionBodyAngles(const std::vector<float>& v);
     void setBodyAngleErrors(const std::vector<float>& v);
-    void setBodyTemperatures(const std::vector<float>& v);
+    void setBodyTemperatures(float* jointTPointers[]);
     void setLeftFootFSR(const float frontLeft, const float frontRight,
                         const float rearLeft, const float rearRight);
     void setRightFootFSR(const float frontLeft, const float frontRight,
@@ -169,9 +176,8 @@ public:
                           const float batteryCharge,
                           const float batteryCurrent);
 
-    // this method is very useful for serialization and parsing sensors
-    void setAllSensors(const std::vector<float> sensorValues);
-
+    void setBatteryCharge(float charge);
+    void setBatteryCurrent(float charge);
 
     // special methods
     //   the image retrieval and locking methods are a little different, as we
@@ -186,16 +192,19 @@ public:
     //   its own, and there is no way, even with locking, to guarantee that the
     //   underlying data at the image pointer location is not modified while
     //   the image is locked in Sensors.
-    uint8_t* getRawNaoImage();
-    const uint8_t* getNaoImage() const;
-    const uint16_t* getYImage() const;
-    const uint16_t* getImage() const;
-    const uint16_t* getUVImage() const;
-    const uint8_t* getColorImage() const;
-    void setNaoImagePointer(char* img);
-    void setNaoImage(const uint8_t* img);
-    void setRawNaoImage(uint8_t *img);
-    void setImage(const uint16_t* img);
+
+    man::corpus::Camera::Type which;
+
+    const uint8_t* getNaoImage(man::corpus::Camera::Type type) const;
+    uint8_t* getWriteableNaoImage(man::corpus::Camera::Type type);
+    const uint16_t* getYImage(man::corpus::Camera::Type type) const;
+    const uint16_t* getImage(man::corpus::Camera::Type type) const;
+    const uint16_t* getUVImage(man::corpus::Camera::Type type) const;
+    const uint8_t* getColorImage(man::corpus::Camera::Type type) const;
+    void setNaoImagePointer(char* img, man::corpus::Camera::Type type);
+    void notifyNewNaoImage();
+    const man::memory::RoboImage* getRoboImage() const;
+    void setImage(const uint16_t* img, man::corpus::Camera::Type type);
     void lockImage() const;
     void releaseImage() const;
 
@@ -204,8 +213,6 @@ public:
     // current image. At the same time, the bodyAngles vector will still have the
     // most recent angles if some other module needs them.
     void updateVisionAngles();
-    void lockVisionAngles();
-    void releaseVisionAngles();
 
     // Save a vision frame with associated sensor data
     void saveFrame();
@@ -215,8 +222,13 @@ public:
     void stopSavingFrames();
     bool isSavingFrames() const;
 
-    // writes data collected the variance monitor to /tmp/
+    // writes data collected the variance monitor to ~/nbites/log/
     void writeVarianceData();
+    // checks whether the sensors we're monitoring are "healthy" or not
+    float percentBrokenFSR();
+    float percentBrokenMotionSensors();
+    bool angleXYBroken();
+    float percentBrokenSonar();
 
 private:
     void add_to_module();
@@ -225,21 +237,27 @@ private:
     void updateMotionDataVariance();
     void updateVisionDataVariance();
 
+    // Pointer to speech, for Sensor warnings
+    boost::shared_ptr<Speech> speech;
+
     // Locking mutexes
-    mutable pthread_mutex_t angles_mutex;
-    mutable pthread_mutex_t vision_angles_mutex;
-    mutable pthread_mutex_t motion_angles_mutex;
-    mutable pthread_mutex_t errors_mutex;
-    mutable pthread_mutex_t temperatures_mutex;
-    mutable pthread_mutex_t fsr_mutex;
-    mutable pthread_mutex_t button_mutex;
-    mutable pthread_mutex_t inertial_mutex;
-    mutable pthread_mutex_t unfiltered_inertial_mutex;
-    mutable pthread_mutex_t ultra_sound_mutex;
-    mutable pthread_mutex_t support_foot_mutex;
-    mutable pthread_mutex_t battery_mutex;
-    mutable pthread_mutex_t image_mutex;
-    mutable pthread_mutex_t variance_mutex;
+    mutex angles_mutex;
+    mutex vision_angles_mutex;
+    mutex motion_angles_mutex;
+    mutex errors_mutex;
+    mutex temperatures_mutex;
+    mutex fsr_mutex;
+    mutex button_mutex;
+    mutex bumper_mutex;
+    mutex inertial_mutex;
+    mutex unfiltered_inertial_mutex;
+    mutex ultra_sound_mutex;
+    mutex support_foot_mutex;
+    mutex battery_mutex;
+    mutex image_mutex;
+    mutex variance_mutex;
+    multi_mutex vision_sensors_mutex;
+    multi_mutex motion_sensors_mutex;
 
     // Joint angles and sensors
     // Make the following distinction: bodyAngles is a vector of the most current
@@ -249,7 +267,6 @@ private:
     std::vector<float> visionBodyAngles;
     std::vector<float> motionBodyAngles;
     std::vector<float> bodyAnglesError;
-
     std::vector<float> bodyTemperatures;
 
     // FSR sensors
@@ -264,10 +281,13 @@ private:
     float ultraSoundDistanceLeft;
     float ultraSoundDistanceRight;
 
-    const uint16_t *yImage, *uvImage;
-    const uint8_t *colorImage;
-    const uint8_t *naoImage;
-    uint8_t *rawNaoImage;
+    const uint16_t *yBottomImage, *uvBottomImage;
+    const uint16_t *yTopImage, *uvTopImage;
+    const uint8_t *colorBottomImage, *colorTopImage;
+    uint8_t *bottomImage, *topImage;
+
+    // Not used...
+    man::memory::RoboImage roboImage;
 
     // Pose needs to know which foot is on the ground during a vision frame
     // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume

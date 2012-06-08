@@ -34,7 +34,7 @@ CONFIGURE_FILE(
 
 ############################ DEFINITIONS
 # Add here definition needed.
-ADD_DEFINITIONS( 
+ADD_DEFINITIONS(
                ${CMAKE_THREAD_LIBS_INIT}
                )
 
@@ -45,11 +45,11 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
                      ${ALCOMMON_INCLUDE_DIR}
                      ${PYTHON_INCLUDE_PATH}
                      ${CORPUS_INCLUDE_DIR}
-		     ${CFG_DIR}
-		     )
+		             ${CFG_DIR}
+		             )
 
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 SET( MOTION_SRCS
   #CallbackAction
@@ -58,19 +58,21 @@ SET( MOTION_SRCS
 		     JointCommand
 		     MotionCommand
                      MotionConstants
-                     Motion.cpp
+                     Motion
                      MotionInterface
 		     MotionSwitchboard
 		     ScriptedProvider
 		     ChoppedCommand
 		     LinearChoppedCommand
 		     SmoothChoppedCommand
+		     PreviewChoppedCommand
+		     COMPreview
+		     BalancingChoppedCommand
 		     BaseFreezeCommand
 		     HeadProvider
 		     ChopShop
 		     NullProvider
 		     WalkProvider
-		     CoordHeadProvider
 		     Step
 		     Gait
 		     AbstractGait
@@ -78,7 +80,9 @@ SET( MOTION_SRCS
 		     SensorAngles
 		     SpringSensor
 		     WalkingLeg
+		     OdometryFilter
 		     WalkingArm
+		     BalancingArm
 		     PreviewController
 		     Observer
 		     ZmpExp
@@ -151,30 +155,20 @@ INSTALL(
   PATTERN "*.py"
   )
 
-############################ LINKER LANGUAGE
-# For Mac's, set the target link language to use
-
-#IF( APPLE )
-  SET_TARGET_PROPERTIES(
-    ${MOTION_TARGET} 
-    PROPERTIES LINKER_LANGUAGE CXX
-    )
-#ENDIF( APPLE )
-
-
 ############################ SET LIBRARIES TO LINK WITH
 TARGET_LINK_LIBRARIES(
   ${MOTION_TARGET}
-  ${ALCOMMON_LIBRARIES}
   ${PYTHON_LIBRARY}
   ${SENSORS_TARGET}
   ${Boost_PYTHON_LIBRARY}
+  bhwalk
   )
 
 
 ############################ (SUB)DIRECTORY COMPILATION
 # Set the sudirectories (some may not actually be subdirectories) to
 # include in this package
+add_subdirectory( bhwalk )
 #SUBDIRS(
 #  ${CORPUS_CMAKE_DIR}
 #  )

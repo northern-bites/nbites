@@ -50,10 +50,15 @@ public:
     void Reset();
     void LogOutput();
 
+    int NumberMonitors() const { return numberMonitors; }
+
+    void SpeechPointer(boost::shared_ptr<Speech> s);
+
 private:
+    boost::shared_ptr<Speech> speech;
     SensorMonitor* monitors;
     int numberMonitors;
-    string bulkName; // output file we log to in /home/nao/naoqi/log/
+    string bulkName; // output file we log to in /home/nao/nbites/log/
 };
 
 #endif

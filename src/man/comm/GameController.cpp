@@ -56,6 +56,10 @@ void GameController::handle_packet(const char *msg, int len)
     if (!validatePacket(msg, len, packet))
         return;
 
+    // Possibly log packet data?
+    //printGCData(packet);
+    //cout << "GameController::handle_packet() -- packet recieved." << endl;
+
     if (packet.teams[TEAM_BLUE].teamColor != TEAM_BLUE){
         rawSwapTeams(packet);
 	}
@@ -87,9 +91,9 @@ bool GameController::validatePacket(const char *msg, int len,
     // ensure correct packet size
     if (len != sizeof(packet)) {
 #ifdef DEBUG_INVALID_PACKETS
-        cerr << "GameController::validatePacket() -- invalid packet length";
-        cerr << endl;
-        cerr << "  packet length == " << len << endl;
+        cout << "GameController::validatePacket() -- invalid packet length";
+        cout << endl;
+        cout << "  packet length == " << len << endl;
 #endif
         return false;
     }
@@ -101,12 +105,12 @@ bool GameController::validatePacket(const char *msg, int len,
     if (memcmp(packet.header, GAMECONTROLLER_STRUCT_HEADER,
                sizeof(packet.header)) != 0) {
 #ifdef DEBUG_INVALID_PACKETS
-        cerr << "GameController::validatePacket() -- invalid packet header";
-        cerr << endl;
-        cerr << "  packet header == " << packet.header << endl;
-        cerr << "  header == " << GAMECONTROLLER_STRUCT_HEADER << endl;
-		cerr << "sizeof(packet header): "<< sizeof(packet.header) <<endl;
-		cerr << "sizeof(STRUCT_HEADER): "<< sizeof(GAMECONTROLLER_STRUCT_HEADER) <<endl;
+        cout << "GameController::validatePacket() -- invalid packet header";
+        cout << endl;
+        cout << "  packet header == " << packet.header << endl;
+        cout << "  header == " << GAMECONTROLLER_STRUCT_HEADER << endl;
+		cout << "sizeof(packet header): "<< sizeof(packet.header) <<endl;
+		cout << "sizeof(STRUCT_HEADER): "<< sizeof(GAMECONTROLLER_STRUCT_HEADER) <<endl;
 #endif
         return false;
     }
@@ -114,9 +118,9 @@ bool GameController::validatePacket(const char *msg, int len,
     // check version number
     if (packet.version != GAMECONTROLLER_STRUCT_VERSION) {
 #ifdef DEBUG_INVALID_PACKETS
-        cerr << "GameController::validatePacket() -- invalid version number";
-        cerr << endl;
-        cerr << "  version == " << packet.version << endl;
+        cout << "GameController::validatePacket() -- invalid version number";
+        cout << endl;
+        cout << "  version == " << packet.version << endl;
 #endif
         return false;
     }
@@ -127,12 +131,12 @@ bool GameController::validatePacket(const char *msg, int len,
     if (packet.teams[TEAM_BLUE].teamNumber != myTeam->teamNumber &&
         packet.teams[TEAM_RED].teamNumber  != myTeam->teamNumber) {
 #ifdef DEBUG_INVALID_PACKETS
-        cerr << "GameController::validatePacket() -- invalid team number" << endl;
-        cerr << "  team blue == " << (int)packet.teams[TEAM_BLUE].teamNumber;
-        cerr << endl;
-        cerr << "  team red  == " << (int)packet.teams[TEAM_RED].teamNumber;
-        cerr << endl;
-        cerr << "  our team  == " << (int)myTeam->teamNumber << endl;
+        cout << "GameController::validatePacket() -- invalid team number" << endl;
+        cout << "  team blue == " << (int)packet.teams[TEAM_BLUE].teamNumber;
+        cout << endl;
+        cout << "  team red  == " << (int)packet.teams[TEAM_RED].teamNumber;
+        cout << endl;
+        cout << "  our team  == " << (int)myTeam->teamNumber << endl;
 #endif
         pthread_mutex_unlock(&mutex);
         return false;
@@ -370,6 +374,12 @@ void GameController::sentManualPenalty()
 const bool GameController::isManuallyPenalized(void) const
 {
     return manuallyPenalized;
+}
+
+const bool GameController::isPenalized(void)
+{
+	const uint16 currentPenalty = penalty();
+	return currentPenalty != PENALTY_NONE;
 }
 
 //

@@ -12,13 +12,20 @@
 #pragma once
 
 #include <stdint.h>
-
+#include <boost/shared_ptr.hpp>
 #include "include/VisionDef.h"
 
-//TODO: add to namespace memory
+// TODO: move this to sensors; this should be the standard
+// way of passing the image around
 
-class RoboImage
-{
+namespace man {
+namespace memory {
+
+class RoboImage {
+
+public:
+	typedef boost::shared_ptr<RoboImage> ptr;
+	typedef boost::shared_ptr<const RoboImage> const_ptr;
 
 public:
     RoboImage(unsigned int wd = NAO_IMAGE_WIDTH,
@@ -27,7 +34,9 @@ public:
     		int32_t byte_size = NAO_IMAGE_BYTE_SIZE) :
     width(wd), height(ht), image(im), byte_size(byte_size), timestamp(0) {}
 
-    virtual void updateImage(const byte* _image) {
+    virtual ~RoboImage(){}
+
+    virtual void updateImagePointer(const byte* _image) {
     	image = _image;
     }
 
@@ -47,8 +56,10 @@ public:
 protected:
     unsigned int width;
     unsigned int height;
-    //TODO: make byte into uint8_t
     const uint8_t* image;
     int32_t byte_size;
     int64_t timestamp;
 };
+
+}
+}

@@ -76,6 +76,7 @@ void Blob::merge(Blob other) {
     value = max(leftBottom.y, other.leftBottom.y);
     leftBottom.y = value;
     rightBottom.y = value;
+	pixels += other.pixels;
 }
 
 /* Test if two blobs are vertically aligned.  Potentially useful for
@@ -86,6 +87,16 @@ bool Blob::isAligned(Blob other) {
         return true;
     }
     if (other.getLeft() >= getLeft() && other.getLeft() <= getRight()) {
+        return true;
+    }
+    return false;
+}
+
+/* Test if one blob contains another. Useful to observe complete overlap
+*/
+bool Blob::contains(Blob other) {
+    if (getLeft() >= other.getLeft() && getRight() <= other.getRight() &&
+        getTop() >= other.getTop() && getBottom() <= other.getBottom()){
         return true;
     }
     return false;

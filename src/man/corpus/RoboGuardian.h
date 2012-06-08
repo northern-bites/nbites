@@ -26,11 +26,14 @@
 #include <string.h>
 #include <boost/shared_ptr.hpp>
 
-#include "synchro.h"
 #include "Sensors.h"
 #include "MotionInterface.h"
 #include "ClickableButton.h"
 
+#include "synchro/synchro.h"
+#include "guardian/WifiAngel.h"
+
+//TODO: move this to the guardian folder
 
 enum  ButtonID {
     CHEST_BUTTON = 0,
@@ -40,8 +43,7 @@ enum  ButtonID {
 
 class RoboGuardian : public Thread {
 public:
-    RoboGuardian(boost::shared_ptr<Synchro>,
-                 boost::shared_ptr<Sensors>);
+    RoboGuardian(boost::shared_ptr<Sensors>);
     virtual ~RoboGuardian();
 
     void run();
@@ -57,7 +59,10 @@ public:
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
-    void setMotionInterface(MotionInterface * minterface)
+    //this should be mutex locked - if you set the pointer to NULL it might
+    //after the guardian thread checked to see if the pointer was NULL
+    //(and it wasn't) it might result in a segfault - Octavian
+    void setMotionInterface(MotionInterface* minterface)
         { motion_interface = minterface; }
 
     void enableFallProtection(bool _useFallProtection) const
@@ -75,9 +80,7 @@ private:
 	void checkFeetOnGround();
     void checkBatteryLevels();
     void checkTemperatures();
-    void checkConnection();
-    bool checkWired();
-    bool checkWireless();
+    bool checkConnection();
     void countButtonPushes();
     void processFallingProtection();
     void processChestButtonPushes();
@@ -85,21 +88,31 @@ private:
     void executeFallProtection();
     void shutoffGains();
     void enableGains();
-    void reconnectWifiConnection();
     void ifUpDown();
     //helpers
     std::string getHostName()const;
     void playFile(std::string filePath)const; //non-blocking
+    void reloadMan();
+
+public:
+    static const int GUARDIAN_FRAME_RATE;
+    static const int CONNECTION_CHECK_RATE;
+    static const int GUARDIAN_FRAME_LENGTH_uS;
+    static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
+        MICROS_PER_SECOND * 60;
+
 private:
 
     boost::shared_ptr<Sensors> sensors;
-    MotionInterface * motion_interface;
+    MotionInterface* motion_interface;
     std::vector<float> lastTemps;
     float lastBatteryCharge;
 
     boost::shared_ptr<ClickableButton> chestButton,
         leftFootButton,
         rightFootButton;
+
+    unsigned int frameCount;
 
     Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;
@@ -111,14 +124,11 @@ private:
     bool falling, fallen, feetOnGround;
     mutable bool useFallProtection;
 
-    mutable pthread_mutex_t click_mutex;
-    static const int GUARDIAN_FRAME_RATE;
-    static const int GUARDIAN_FRAME_LENGTH_uS;
-
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
-    static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
-        MICROS_PER_SECOND * 60;
 
+    man::corpus::guardian::WifiAngel wifiAngel;
+
+    mutable pthread_mutex_t click_mutex;
 };
 
 #endif

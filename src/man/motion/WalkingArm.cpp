@@ -25,7 +25,7 @@ WalkingArm::~WalkingArm(){}
  * @param pointer to the current step
  * @return arm joint stiffnesses and angles for current frame
  */
-ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
+ArmJointStiffTuple WalkingArm::tick(boost::shared_ptr<Step> supportStep){
     singleSupportFrames = supportStep->singleSupportFrames;
     doubleSupportFrames = supportStep->doubleSupportFrames;
 
@@ -56,7 +56,7 @@ ArmJointStiffTuple WalkingArm::tick(shared_ptr<Step> supportStep){
  *
  * @param pointer to the current step, for determining arm swing direction
  */
-const float WalkingArm::getShoulderPitchAddition(shared_ptr<Step> supportStep){
+const float WalkingArm::getShoulderPitchAddition(boost::shared_ptr<Step> supportStep){
     float direction = 1.0f; //forward = negative
     float percentComplete = 0.0f;
 

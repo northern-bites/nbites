@@ -1,4 +1,4 @@
-from ..NogginConstants import NUM_PACKET_ELEMENTS
+from noggin_constants import NUM_PACKET_ELEMENTS
 
 class Packet:
     """
@@ -40,6 +40,7 @@ class Packet:
          self.ballUncertY,
          self.ballDist,
          self.ballBearing,
+         self.ballOn,
          self.role,
          self.subRole,
          self.chaseTime,
@@ -61,6 +62,7 @@ class Packet:
         self.ballUncertY = float(self.ballUncertY)
         self.ballDist = float(self.ballDist)
         self.ballBearing = float(self.ballBearing)
+        self.ballOn = float(self.ballOn)
         self.role = float(self.role)
         self.subRole = float(self.subRole)
         self.chaseTime = float(self.chaseTime)
@@ -92,19 +94,25 @@ class Packet:
          self.ballUncertY,
          self.ballDist,
          self.ballBearing,
+         self.ballOn,
          self.role,
-         self.calledSubRole,
+         self.subRole,
          self.chaseTime,
          self.ballVelX,
          self.ballVelY) = update_packet
 
     def __str__(self):
         """returns string with all important values"""
-        return ("#%d role: %d subRole: %d chaseTime: %g; loc: (%g,%g,%g) uncert: (%g,%g,%g) ball - loc: (%g,%g) uncert: (%g,%g) dist: (%g)" %
-            (self.playerNumber,
-             self.role, self.calledSubRole, self.chaseTime,
-             self.playerX, self.playerY, self.playerH,
-             self.uncertX, self.uncertY, self.uncertH,
-             self.ballX, self.ballY, self.ballUncertX,
-             self.ballUncertY, self.ballDist, self.ballVelX,
-             self.ballVelY))
+        return (("teamNumber: {0} playerNumber: {1} color: {2}\n" +
+                 "role: {3} subRole: {4} chaseTime: {5}\n" +
+                 "loc: ({6}, {7}, {8}) uncert: ({9}, {10}, {11})\n" +
+                 "ball-loc: ({12}, {13}) uncert: ({14}, {15})\n" +
+                 "dist: {16} bearing: {17} velocity: ({18}, {19})\n" +
+                 "ball is on: {20}").format(
+                self.teamNumber, self.playerNumber, self.color,
+                self.role, self.subRole, self.chaseTime,
+                self.playerX, self.playerY, self.playerH,
+                self.uncertX, self.uncertY, self.uncertH,
+                self.ballX, self.ballY, self.ballUncertX, self.ballUncertY,
+                self.ballDist, self.ballBearing, self.ballVelX,
+                self.ballVelY, self.ballOn))

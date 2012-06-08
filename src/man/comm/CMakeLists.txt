@@ -27,7 +27,7 @@ INCLUDE( ${COMM_CMAKE_DIR}/buildconfig.cmake )
 #<ADD_TEST> don't remove this comment
 ### test example ADD_TEST(My_test python ${TEST_RUN} -p ${NAOQI} -s ${CMAKE_CURRENT_SOURCE_DIR}/test/myRubyTest.rb)
 
-#</ADD_TEST> don't remove this comment 
+#</ADD_TEST> don't remove this comment
 
 
 ############################ CONFIG.H GENERATION
@@ -56,7 +56,7 @@ INCLUDE_DIRECTORIES(
   )
 
 
-############################ PROJECT SOURCES FILES 
+############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 SET( COMM_SRCS Comm
                CommTimer
@@ -64,6 +64,7 @@ SET( COMM_SRCS Comm
                GameController
                RoboCupGameControlData
                TOOLConnect
+	       NetworkMonitor
                )
 
 IF( PYTHON_SHARED_COMM )
@@ -114,7 +115,6 @@ TARGET_LINK_LIBRARIES(
   ${COMM_TARGET}
   ${PYTHON_LIBRARY}
   ${VISION_TARGET}
-  ${SYNCHRO_TARGET}
   )
 
 

@@ -23,7 +23,7 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
-        player.stopWalking()
+        player.brain.nav.stop()
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
@@ -39,7 +39,8 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.firstFrame():
-        player.standup()
+        player.stopWalking()
+        player.stand()
         player.brain.tracker.switchTo('locPans')
     return player.stay()
 
@@ -94,10 +95,10 @@ def gameFinished(player):
 
 ########## PENALTY SHOT STATES #################
 def penaltyShotsGameInitial(player):
-    return player.goNow('gameInitial')
+    return player.goLater('penaltyShotsGameSet')
 
 def penaltyShotsGameReady(player):
-    return player.stay()
+    return player.goLater('penaltyShotsGameSet')
 
 def penaltyShotsGameSet(player):
     return player.stay()

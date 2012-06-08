@@ -27,11 +27,11 @@ class FallController(FSA.FSA):
         if not self.enabled:
             return
 
-        # Only try to stand up when playing or localizing in ready
+        # Only try to stand up when playing or localizing in ready because
+        # it's really annoying otherwise.
         if (self.brain.gameController.currentState == 'gamePlaying' or
             self.brain.gameController.currentState == 'gameReady' ):
-            # Check to see if fallen over
-            inertial = self.brain.sensors.inertial
+
             #self.printf("run angleY is "+str(inertial.angleY))
 
             if (not self.standingUp and self.brain.roboguardian.isRobotFallen() ):
@@ -41,11 +41,13 @@ class FallController(FSA.FSA):
                 #         elif self.brain.guardian.falling:
                 #             self.switchTo('falling')
 
-            # if not falling, check if our feet are on the ground
+            # disabled due to flakey FSRs (7/8/11)
+            """
             elif (not self.standingUp and
                   not self.brain.nav.doingSweetMove and
                   not self.brain.roboguardian.isFeetOnGround()):
                 self.switchTo('feetOffGround')
+            """
 
         FSA.FSA.run(self)
 

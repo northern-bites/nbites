@@ -6,7 +6,7 @@
 #include "ConvertFrames.h"
 #include "VisionDef.h"
 #include "SensorDef.h"
-#include "MotionDef.h"
+#include "Kinematics.h"
 
 using namespace std;
 
@@ -65,7 +65,7 @@ void loadFrame(string path, Frame& frame)
     float v;
 
     // Read in the body angles
-    for (unsigned int i = 0; i < NUM_ACTUATORS; ++i) {
+    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i) {
         fin >> v;
         vba.push_back( v );
     }

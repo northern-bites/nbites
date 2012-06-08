@@ -18,15 +18,15 @@ Vision Constants that span multiple classes and systems.
 #  define NAO_IMAGE_SIZE VGA
 #endif
 
-#define YUV422INTER_CS  9 // equivalent to kYUV422InterlaceColorSpace
+#define YUV422          9 // equivalent to kYUV422InterlaceColorSpace
 #define YUV_CS         10 // equivalent to kYUVColorSpace
 #define RGB_CS         11 // equivalent to kYUVColorSpace
 #ifndef NAO_COLOR_SPACE
-#  define NAO_COLOR_SPACE YUV422INTER_CS
+#  define NAO_COLOR_SPACE YUV422
 #endif
 
-#define NAO_FOV_X_DEG          46.4f
-#define NAO_FOV_Y_DEG          34.8f
+#define NAO_FOV_X_DEG          60.9f
+#define NAO_FOV_Y_DEG          47.6f
 #define NAO_SIM_IMAGE_WIDTH    160
 #define NAO_SIM_IMAGE_HEIGHT   120
 #define NAO_SIM_IMAGE_BYTE_SIZE (NAO_SIM_IMAGE_WIDTH * NAO_SIM_IMAGE_HEIGHT * 3)

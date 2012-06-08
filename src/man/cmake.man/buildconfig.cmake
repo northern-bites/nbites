@@ -37,17 +37,29 @@ ELSE( WEBOTS_BACKEND )
     )
 ENDIF( WEBOTS_BACKEND )
 
-IF( OE_CROSS_BUILD )
+IF( BUILDING_FOR_A_REMOTE_NAO )
   OPTION( OFFLINE
-    "turn offline vision debugging on for compatability with tool"
+    "turn offline vision debugging on for compatibility with tool"
     OFF
     )
-ELSE( OE_CROSS_BUILD )
+ELSE()
   OPTION( OFFLINE
-    "turn offline vision debugging on for compatability with tool"
+    "turn offline vision debugging on for compatibility with tool"
     ON
     )
-ENDIF( OE_CROSS_BUILD )
+ENDIF()
+
+IF( BUILDING_FOR_A_REMOTE_NAO )
+  OPTION( USE_ALSPEECH
+    "turn Aldebaran speech on for debugging"
+    ON
+    )
+ELSE()
+  OPTION( USE_ALSPEECH
+    "turn Aldebaran speech on for debugging"
+    OFF
+    )
+ENDIF()
 
 OPTION(
     MAN_IS_REMOTE_
@@ -107,7 +119,7 @@ OPTION(
   ON
   )
 OPTION(
-  USE_TTS
-  "Use the Text-To-Speech system"
-  ON
+  USE_MEMORY
+  "Use memory and logging"
+  OFF
   )

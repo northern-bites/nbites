@@ -7,7 +7,7 @@ from ..playbook.PBConstants import (INIT_STRATEGY,
                                     ROLES,
                                     SUB_ROLES,
                                     CHASER)
-from Location import RobotLocation
+from objects import RobotLocation
 
 class Play:
     def __init__(self,
