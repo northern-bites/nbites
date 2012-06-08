@@ -31,7 +31,6 @@ public:
     void setCenterY(int cy) { centerY = cy; }
     void setAngleX(float aX) { angleX = aX; }
     void setAngleY(float aY) { angleY = aY; }
-    void setFocDist(float fd) { focDist = fd; }
     void setDistance(float d) { distance = d; }
     void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
@@ -43,6 +42,7 @@ public:
     virtual void setBearingWithSD(float _bearing) = 0;
 
     void setOn(bool _on){ on = _on; }
+    void setTopCam(bool _inTopCam){ inTopCam = _inTopCam; }
     void setFramesOn(int numOn){ framesOn = numOn; }
     void setFramesOff(int numOff){ framesOff = numOff; }
 
@@ -58,7 +58,6 @@ public:
     const float getAngleY() const { return angleY; }
     const float getAngleXDeg() const { return angleX*TO_DEG; }
     const float getAngleYDeg() const { return angleY*TO_DEG; }
-    const float getFocDist() const { return focDist; }
     const float getDistance() const { return distance; }
     const float getBearing() const { return bearing; }
     const float getBearingDeg() const { return bearing*TO_DEG; }
@@ -68,6 +67,7 @@ public:
     const float getBearingSD() const { return bearingSD; }
 
     const bool isOn() const{ return on; }
+    const bool isTopCam() const{ return inTopCam;}
     int getFramesOn() { return framesOn; }
     int getFramesOff(){ return framesOff; }
 
@@ -80,7 +80,6 @@ protected:
     int centerY;
     float angleX;
     float angleY;
-    float focDist;
     float distance;
     float bearing;
     float elevation;
@@ -88,6 +87,7 @@ protected:
     float distanceSD;
     float bearingSD;
     bool on;
+    bool inTopCam;
     int framesOn, framesOff;
 
 };

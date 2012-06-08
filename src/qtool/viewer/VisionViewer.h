@@ -22,9 +22,10 @@
 #include "image/BMPYUVImage.h"
 #include "image/VisualInfoImage.h"
 #include "data/RobotMemoryManager.h"
-#include "BMPImageViewer.h"
+#include "BMPImageViewerListener.h"
 #include "ChannelImageViewer.h"
 #include "MObjectViewer.h"
+#include "CollapsibleImageViewer.h"
 
 namespace qtool {
 namespace viewer {
@@ -44,17 +45,20 @@ public slots:
     void setEdgeDetectDebug();
     void setHoughDebug();
     void setRobotsDebug();
+    void pixelClicked(int x, int y, int brushSize, bool leftClick);
 
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
-    image::ThresholdedImage* visionImage;
+    image::ThresholdedImage* topVisionImage;
+    image::ThresholdedImage* bottomVisionImage;
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;
     man::memory::MVision::ptr offlineMVision;
-    boost::shared_ptr<man::memory::proto::PImage> rawImage;
+    boost::shared_ptr<man::memory::proto::PImage> topRawImage;
+    boost::shared_ptr<man::memory::proto::PImage> bottomRawImage;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
 
     bool horizonD, shootD, openFieldD, edgeDetectD, houghD, robotsD;

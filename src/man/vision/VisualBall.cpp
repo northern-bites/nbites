@@ -25,11 +25,10 @@ void VisualBall::init() {
     centerY = 0;
     angleX = 0;
     angleY = 0;
-    focDist = 0;
     distance = 0;
     bearing = 0;
     elevation = 0;
-	heat = 0.0f;
+    heat = 0.0f;
     on = false;
 }
 

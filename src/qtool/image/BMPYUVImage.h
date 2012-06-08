@@ -58,8 +58,11 @@ public:
     ChannelType getCurrentBitmapType() const { return bitmapType; }
     void setBitmapType(ChannelType type) { bitmapType = type; updateBitmap();}
 
+    const YUVImage* getYUVImage() const { return &yuvImage; }
+
     unsigned getWidth() const { return bitmap.width(); }
     unsigned getHeight() const { return bitmap.height(); }
+
 
 protected:
     bool needToResizeBitmap() const;

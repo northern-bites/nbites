@@ -104,12 +104,14 @@ public class DataManager implements ItemListener,
     public DataSet activeSet() {
         if (dataSetIndex < 0)
             return null;
+		dataSets.get(dataSetIndex);
         return dataSets.get(dataSetIndex);
     }
 
     public Frame activeFrame() {
         if (dataSetIndex < 0)
             return null;
+		activeSet().get(frameIndex);
         return activeSet().get(frameIndex);
     }
 
@@ -203,7 +205,6 @@ public class DataManager implements ItemListener,
             DataSet d = dataSets.get(i);
             dataSetIndex = i;
             frameIndex = 0;
-
             if (safeLoad(d, frameIndex, mainCache))
                 notifyDependants(true);
             else {
@@ -445,10 +446,12 @@ public class DataManager implements ItemListener,
     }
 
     private void notifyDependant(DataListener d, boolean newSet) {
-        if (newSet)
+        if (newSet) {
             d.notifyDataSet(activeSet(), activeFrame());
-        else
+		}
+        else {
             d.notifyFrame(activeFrame());
+		}
     }
 
     //

@@ -35,26 +35,28 @@ public:
 
     unsigned int getWidth() const { return width;}
     unsigned int getHeight() const { return height;}
-    byte** getYImage() { return yImg;}
-    byte** getUImage() { return uImg;}
-    byte** getVImage() { return vImg;}
+    const byte** getYImage() const { return (const byte**) yImg;}
+    const byte** getUImage() const { return (const byte**) uImg;}
+    const byte** getVImage() const { return (const byte**) vImg;}
 
     bool areWithinImage(int x, int y) const {
         return 0 <= x && x < getWidth() && 0 <= y && y < getHeight();
     }
 
-    //look up ternary operators - they're elegant in some cases
     //Warning - do not use these in any mass assignment or mass
     //access - you're much better off getting the image pointers
     //and using those - Octavian
     byte getY(int x, int y) const {
-        return areWithinImage(x, y) ? yImg[x][y] : 0;
+        assert(areWithinImage(x, y));
+        return yImg[x][y];
     }
     byte getU(int x, int y) const {
-        return areWithinImage(x, y) ? uImg[x][y] : 0;
+        assert(areWithinImage(x, y));
+        return uImg[x][y];
     }
     byte getV(int x, int y) const {
-        return areWithinImage(x, y) ? vImg[x][y] : 0;
+        assert(areWithinImage(x, y));
+        return vImg[x][y];
     }
 
     bool rawImageDimensionsEnlarged();

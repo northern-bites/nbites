@@ -7,7 +7,7 @@ namespace image {
 PaintField::PaintField(QObject *parent):
         BMPImage(parent)
 {
-    bitmap = QImage(FIELD_WIDTH, FIELD_HEIGHT, QImage::Format_RGB32);
+    bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
 }
 
 // Paints the field

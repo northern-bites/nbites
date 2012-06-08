@@ -2,35 +2,42 @@
 
 #include "TMan.h"
 
+#include "manconfig.h"
+
 #include "Profiler.h"
 #include "corpus/Sensors.h"
 #include "corpus/RoboGuardian.h"
 #include "corpus/alconnect/NaoEnactor.h"
 #include "corpus/alconnect/ALTranscriber.h"
-#include "corpus/V4L2ImageTranscriber.h"
+#include "corpus/NaoImageTranscriber.h"
 #include "corpus/alconnect/ALSpeech.h"
 #include "corpus/alconnect/NaoLights.h"
+#include "corpus/Camera.h"
 
 using namespace std;
 using boost::shared_ptr;
 using namespace man::corpus;
 
-static shared_ptr<TMan> man_pointer;
+static boost::shared_ptr<TMan> man_pointer;
 
 START_FUNCTION_EXPORT
 
 void loadMan(boost::shared_ptr<AL::ALBroker> broker) {
 
-    shared_ptr<Speech> speech(new ALSpeech(broker));
-    shared_ptr<Sensors> sensors(new Sensors(speech));
-    shared_ptr<Transcriber> transcriber(new ALTranscriber(broker, sensors));
-    shared_ptr<ThreadedImageTranscriber>
-        imageTranscriber(new V4L2ImageTranscriber(sensors));
-    shared_ptr<MotionEnactor>
+#ifdef USE_ALSPEECH
+    boost::shared_ptr<Speech> speech(new ALSpeech(broker));
+#else
+    boost::shared_ptr<Speech> speech(new Speech());
+#endif
+    boost::shared_ptr<Sensors> sensors(new Sensors(speech));
+    boost::shared_ptr<Transcriber> transcriber(new ALTranscriber(broker, sensors));
+    boost::shared_ptr<ThreadedImageTranscriber>
+        imageTranscriber(new NaoImageTranscriber(sensors, "ImageTranscriber"));
+    boost::shared_ptr<MotionEnactor>
         enactor(new NaoEnactor(sensors, transcriber, broker));
-    shared_ptr<Lights> lights(new NaoLights(broker));
+    boost::shared_ptr<Lights> lights(new NaoLights(broker));
 
-    man_pointer = shared_ptr<TMan>(new TMan(sensors, transcriber,
+    man_pointer = boost::shared_ptr<TMan>(new TMan(sensors, transcriber,
                                             imageTranscriber,
                                             enactor, lights, speech));
     man_pointer->startSubThreads();
