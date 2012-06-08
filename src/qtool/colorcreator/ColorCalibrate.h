@@ -47,6 +47,7 @@ protected slots:
     void saveSlidersBtnPushed();
     void saveColorTableBtnPushed();
     void imageTabSwitched(int);
+	void setFullColors(bool state);
 
 protected:
     void loadColorSpaces(QString filename);
@@ -73,6 +74,7 @@ private:
     QImage thresholdedImage;
     QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
 
+	bool displayAllColors;
 
 };
 
