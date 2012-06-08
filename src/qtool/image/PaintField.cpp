@@ -4,25 +4,18 @@
 namespace qtool {
 	namespace image {
 
-		PaintField::PaintField(QObject *parent):
+		PaintField::PaintField(QObject *parent, float sF):
 			BMPImage(parent)
 		{
-			sX = 1; sY = 1;
-			bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
+			scaleFactor = sF;
+			bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
 		}
-
-		/*PaintField::PaintField(QObject *parent, float scaleX, float scaleY):
-			BMPImage(parent)
-		{
-			sX = scaleX; sY = scaleY;
-			bitmap = QPixmap((int)(FIELD_WIDTH*sX), (int)(FIELD_HEIGHT*sY));
-			}*/
 
 		void PaintField::buildBitmap()
 		{
 
 			QPainter painter(&bitmap);
-			painter.scale(sX, sY);
+			painter.scale(scaleFactor, scaleFactor);
 
 			// Field Areas
 			QRect field(FIELD_GREEN_LEFT_SIDELINE_X,

@@ -54,7 +54,7 @@ class OverlayedImage : public BMPImage {
 public:
     OverlayedImage(BMPImage* baseImage,
                    BMPImage* overlayedImage,
-                   QObject* parent = 0) :
+                   QObject* parent = 0):
        BMPImage(parent),
        baseImage(baseImage),
        overlayedImage(overlayedImage) {
