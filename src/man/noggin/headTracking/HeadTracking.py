@@ -96,13 +96,14 @@ class HeadTracking(FSA.FSA):
 
     def spinPanFixedPitch(self):
         """
-        Determines which direction the robot is spinning.
-        Then, continually looks in that direction.
+        Regardless of which direction we are spinning, look directly ahead.
+        This should result in the robot facing the ball when it sees it.
         """
-        if self.brain.nav.isSpinningLeft():
-            self.switchTo('lookLeftFixedPitch')
-        else:
-            self.switchTo('lookRightFixedPitch')
+        self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+        #if self.brain.nav.isSpinningLeft():
+        #    self.switchTo('lookLeftFixedPitch')
+        #else:
+        #    self.switchTo('lookRightFixedPitch')
 
     ################### End Fixed Pitch #####################
 
