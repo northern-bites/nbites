@@ -28,20 +28,32 @@ namespace qtool {
 
 		void BotLocs::readSocket(){
 			while(udpSocket.hasPendingDatagrams()){
+
 				qint64 datagram_size = udpSocket.pendingDatagramSize();
 				QHostAddress datagram_source;
 				quint16 datagram_port;
 				char* data = new char[datagram_size];
+
 				udpSocket.readDatagram(data, datagram_size, &datagram_source, &datagram_port);
-				if(datagram_size==112){ //this needs to be here to ignore the discovery messages
+
+				if(datagram_size==112){ //this needs to be here to ignore
+					                    //the 60-byte discovery messages
+
 					data+=sizeof(CommPacketHeader); //cut off the header bytes
+					float* floatdata = (float*) data;
 					Bot newBot;
+
 					newBot.address = datagram_source;
-					newBot.xPos = ((float*)data)[0];
-					newBot.yPos = ((float*)data)[1];
-                    //data[2] is the heading, idgaf
-					newBot.xUncert = ((float*)data)[3];
-					newBot.yUncert = ((float*)data)[4];
+					newBot.xPos = floatdata[0];
+					newBot.yPos = floatdata[1];
+                    newBot.heading = floatdata[2];
+					newBot.xUncert = floatdata[3];
+					newBot.yUncert = floatdata[4];
+					newBot.headingUncert = floatdata[5];
+					newBot.xBall = floatdata[6];
+					newBot.yBall = floatdata[7];
+					newBot.xBallUncert = floatdata[8];
+					newBot.yBallUncert = floatdata[9];
 
 					//kill the previous instance of this robot in the array
 					for(int i = 0; i < botPositions.size(); i++){
@@ -69,11 +81,32 @@ namespace qtool {
 		int BotLocs::getY(int i){
 			return botPositions[i].yPos;
 		}
+		int BotLocs::getHeading(int i){
+			return botPositions[i].heading;
+		}
 		int BotLocs::getXUncert(int i){
 			return botPositions[i].xUncert;
 		}
 		int BotLocs::getYUncert(int i){
 			return botPositions[i].yUncert;
+		}
+		int BotLocs::getheadUncert(int i){
+			return botPositions[i].headingUncert;
+		}
+		int BotLocs::getBallX(int i){
+			return botPositions[i].xBall;
+		}
+		int BotLocs::getBallY(int i){
+			return botPositions[i].yBall;
+		}
+		int BotLocs::getBallXUncert(int i){
+			return botPositions[i].xBallUncert;
+		}
+		int BotLocs::getBallYUncert(int i){
+			return botPositions[i].yBallUncert;
+		}
+		int BotLocs::getTeam(int i){//0=blue, 1=red
+			return botPositions[i].teamColor;
 		}
 		int BotLocs::getSize(){
 			return botPositions.size();

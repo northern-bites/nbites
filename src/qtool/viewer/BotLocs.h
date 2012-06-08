@@ -26,8 +26,15 @@ namespace qtool {
 			~BotLocs(){}
 			int getX(int);
 			int getY(int);
+			int getHeading(int);
 			int getXUncert(int);
 			int getYUncert(int);
+			int getheadUncert(int);
+			int getBallX(int);
+			int getBallY(int);
+			int getBallXUncert(int);
+			int getBallYUncert(int);
+			int getTeam(int);
 			int getSize();
 			void startListening();
 			void stopListening();
@@ -37,8 +44,15 @@ namespace qtool {
 				QHostAddress address;
 				float xPos;
 				float yPos;
+				float heading;
 				float xUncert;
 				float yUncert;
+				float headingUncert;
+				float xBall;
+				float yBall;
+				float xBallUncert;
+				float yBallUncert;
+				int teamColor; //0=blue,  1=red
 			};
 			std::vector<Bot> botPositions;
 			std::vector<QHostAddress> onField;
