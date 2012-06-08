@@ -49,12 +49,12 @@ namespace qtool {
 				float hBotUncert = heading - locs->getheadUncert(i)*(float)(PI/180)/2;
 				QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
 				QPoint ballPt = QPoint(locs->getBallX(i), locs->getBallY(i));
-				QPoint headingLine = QPoint(locs->getX(i)+45*cos(heading),
-											locs->getY(i)+45*sin(heading));
-				QPoint hUncertL1 = QPoint(locs->getX(i)+35*cos(hTopUncert),
-										  locs->getY(i)+35*sin(hTopUncert));
-				QPoint hUncertL2 = QPoint(locs->getX(i)+35*cos(hBotUncert),
-										  locs->getY(i)+35*sin(hBotUncert));
+				QPoint headingLine = QPoint(locs->getX(i)+40*cos(heading),
+											locs->getY(i)+40*sin(heading));
+				QPoint hUncertL1 = QPoint(locs->getX(i)+30*cos(hTopUncert),
+										  locs->getY(i)+30*sin(hTopUncert));
+				QPoint hUncertL2 = QPoint(locs->getX(i)+30*cos(hBotUncert),
+										  locs->getY(i)+30*sin(hBotUncert));
 
                 //robot
 				painter.drawEllipse(robotPt, 10, 10);
