@@ -23,10 +23,6 @@ HoughSpace::HoughSpace() :
 
 }
 
-/**
- * The main public interface for the HoughSpace class.
- * Finds all the lines in the image using the Hough Transform.
- */
 list<pair<HoughLine, HoughLine> >
 HoughSpace::findLines(Gradient& g)
 {
@@ -39,9 +35,6 @@ HoughSpace::findLines(Gradient& g)
     return lines;
 }
 
-/**
- * Locate the lines in the image using a Hough Transform
- */
 void HoughSpace::findHoughLines(Gradient& g)
 {
     markEdges(g);
@@ -50,10 +43,6 @@ void HoughSpace::findHoughLines(Gradient& g)
     createLinesFromPeaks(activeLines);
 }
 
-/**
- * Process hough lines to eliminate duplicate lines
- * and pair up the lines.
- */
 list<pair<HoughLine, HoughLine> > HoughSpace::narrowHoughLines()
 {
     int x0 = static_cast<int>(Gradient::cols/2);
@@ -72,10 +61,6 @@ list<pair<HoughLine, HoughLine> > HoughSpace::narrowHoughLines()
     return lines;
 }
 
-/**
- * Pass through the given Gradient and mark all potential edges
- * in the accumulator.
- */
 void HoughSpace::markEdges(Gradient& g)
 {
     PROF_ENTER(P_MARK_EDGES);
@@ -98,10 +83,6 @@ void HoughSpace::markEdges(Gradient& g)
     PROF_EXIT(P_MARK_EDGES);
 }
 
-/**
- * Marks an edge point in the source gradient as an edge in the Hough
- * accumulator
- */
 void HoughSpace::edge(int x, int y, int t0, int t1)
 {
 #ifndef USE_MMX
@@ -121,10 +102,6 @@ void HoughSpace::edge(int x, int y, int t0, int t1)
 #endif
 }
 
-/**
- * Returns the radius of a line at the given location with the given
- * angle.
- */
 int HoughSpace::getR(int x, int y, int t)
 {
     float a = static_cast<float>(t & 0xff) * M_PI_FLOAT / 128.0f;
@@ -132,14 +109,6 @@ int HoughSpace::getR(int x, int y, int t)
                                   static_cast<float>(y) * sin(a)));
 }
 
-/**
- * Smooth out irregularities in the Hough accumulator to reduce noisy
- * peaks by using a 2x2 boxcar kernel.
- *
- * Boxcar kernel: (each element becomes the sum of four surrounding pixels)
- *       |1 1|
- *       |1 1|
- */
 void HoughSpace::smooth()
 {
     PROF_ENTER(P_SMOOTH);
@@ -163,9 +132,6 @@ void HoughSpace::smooth()
     PROF_EXIT(P_SMOOTH);
 }
 
-/**
- * Find the peaks of the accumulator and create the list of lines in the space.
- */
 void HoughSpace::peaks()
 {
     PROF_ENTER(P_HOUGH_PEAKS);
@@ -199,25 +165,17 @@ void HoughSpace::peaks()
     PROF_EXIT(P_HOUGH_PEAKS);
 }
 
-/**
- * Using the list of peaks found in the Hough Transform, create line objects
- *
- * @param lines List to be filled with lines
- */
 void HoughSpace::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
 {
     for (int i=0; i < numPeaks; ++i){
-        HoughLine line(getPeakR(i),
-                       getPeakT(i),
-                       getPeakZ(i) );
+        HoughLine line(getPeakRadius(i),
+                       getPeakAngle(i),
+                       getPeakCount(i) );
 
         lines.add(line);
     }
 }
 
-/**
- * Combine/remove duplicate lines and lines which are not right.
- */
 void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
 {
     PROF_ENTER(P_SUPPRESS);
@@ -278,19 +236,6 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
     PROF_EXIT(P_SUPPRESS);
 }
 
-/**
- * Put the Hough lines into pairs of lines with opposite
- * angles. Opposite angles mean that the gradients on the lines are
- * headed into each other, as in the two edges of a field line.
- *
- * Each line should be paired with only one other line, that line
- * being the closest other parallel line to it. That way two parallel field
- * lines will not produce very strange results. If a line has no
- * parallel counterpart, it is discarded.
- *
- * @TODO Make sure lines are headed into or out of the line only. This
- *       would prevent inner parts of two lines from being paired.
- */
 list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
 {
     PROF_ENTER(P_PAIR_LINES);
@@ -368,9 +313,6 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
     return pairs;
 }
 
-/**
- * Reset the accumulator and peak arrays to their initial values.
- */
 void HoughSpace::reset()
 {
     numPeaks = 0;
