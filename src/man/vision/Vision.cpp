@@ -103,6 +103,18 @@ void Vision::notifyImage(const uint16_t* y) {
     notifyImage();
 }
 
+void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
+    yImg = y_top;
+    uvImg = y_top + AVERAGED_IMAGE_SIZE;
+    yImg_bot = y_bot;
+    uvImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
+
+    // Set the current image pointer in Threshold
+    thresh->setYUV(y_top);
+    thresh->setYUV_bot(y_bot);
+    notifyImage();
+}
+
 /* notifyImage() -- The Image Loop
  *
  * This is the most important loop, ever, really.  This is what the operating
@@ -127,9 +139,11 @@ void Vision::notifyImage() {
     if (frameNumber > 1000000) frameNumber = 0;
 
     // Transform joints into pose estimations and horizon line
-    PROF_ENTER(P_TRANSFORM);
-    pose->transform();
-    PROF_EXIT(P_TRANSFORM);
+    // PROF_ENTER(P_TRANSFORM);
+    // pose->transform();
+    // PROF_EXIT(P_TRANSFORM);
+    
+    //the above is commented to try cool shit
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();

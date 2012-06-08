@@ -268,11 +268,6 @@ class Brain(object):
         for mate in self.teamMembers:
             if (mate.active and mate.isDead()):
                 mate.active = False
-                if self.my.playerNumber == 1:
-                    return
-                if mate.playerNumber == 1:
-                    print "WARNING: THE GOALIE IS DEAD."
-                    return
 
     def updateObjects(self):
         """
@@ -296,25 +291,23 @@ class Brain(object):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
         loc = self.loc
-        self.comm.setData(#loc.x,
-                          #loc.y,
-                          #loc.h,
-                          #loc.xUncert,
-                          #loc.yUncert,
-                          #loc.hUncert,
-                          #loc.ballX,
-                          #loc.ballY,
-                          #loc.ballXUncert,
-                          #loc.ballYUncert,
+        self.comm.setData(loc.x,
+                          loc.y,
+                          loc.h,
+                          loc.xUncert,
+                          loc.yUncert,
+                          loc.hUncert,
+                          loc.ballX,
+                          loc.ballY,
+                          loc.ballXUncert,
+                          loc.ballYUncert,
                           self.ball.vis.dist,
                           self.ball.vis.bearing,
-                          self.ball.vis.on,
-                          self.ball.vis.framesOn,
-                          #self.play.role,
-                          #self.play.subRole,
-                          self.teamMembers[self.my.playerNumber-1].chaseTime)
-                          #loc.ballVelX,
-                          #loc.ballVelY)
+                          self.play.role,
+                          self.play.subRole,
+                          self.playbook.pb.me.chaseTime,
+                          loc.ballVelX,
+                          loc.ballVelY)
 
         # TODO: remove this and log through C++ and the Logger instead.
         if Constants.LOG_COMM:
@@ -340,6 +333,7 @@ class Brain(object):
                                     loc.ballVelY))
             self.out.logSComm(packet)
 
+    #TODO: is this method completely depricated?
     def resetLocalization(self):
         """
         Reset our localization

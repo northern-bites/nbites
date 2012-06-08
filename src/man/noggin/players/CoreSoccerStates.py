@@ -50,7 +50,7 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.activeLoc()
+        player.brain.tracker.trackBallFixedPitch()
     return player.stay()
 
 def gamePlaying(player):

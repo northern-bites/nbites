@@ -97,12 +97,14 @@ class KickInformation:
             self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
                                         len(self.oppGoalRightPostBearings))
         # average post bearings
-        if self.oppLeftPostBearing is not None and self.oppRightPostBearing is not None:
-            self.oppAvgPostBearing = (self.oppLeftPostBearing + self.oppRightPostBearing)*.5
+        if self.oppLeftPostBearing is not None and \
+                self.oppRightPostBearing is not None:
+            self.oppAvgPostBearing = (self.oppLeftPostBearing +
+                                      self.oppRightPostBearing)*.5
         elif self.oppLeftPostBearing is not None:
-            self.oppAvgPostBearing = self.oppLeftPostBearing + 5. #somewhere in middle
+            self.oppAvgPostBearing = self.oppLeftPostBearing + 5.#somewhere in middle
         elif self.oppRightPostBearing is not None:
-            self.oppAvgPostBearing = self.oppRightPostBearing - 5. #somewhere in middle
+            self.oppAvgPostBearing = self.oppRightPostBearing - 5.#somewhere in middle
 
         # distance averages
         if len(self.oppGoalLeftPostDists) > 0:
@@ -112,19 +114,21 @@ class KickInformation:
             self.oppRightPostDist = (sum(self.oppGoalRightPostDists) /
                                      len(self.oppGoalRightPostDists))
         # average post distances
-        if self.oppLeftPostBearing is not None and self.oppRightPostBearing is not None:
+        if self.oppLeftPostBearing is not None and \
+                self.oppRightPostBearing is not None:
             self.oppAvgPostDist = (self.oppLeftPostDist + self.oppRightPostDist)*.5
         elif self.oppLeftPostBearing is not None:
             self.oppAvgPostDist = self.oppLeftPostDist
         elif self.oppRightPostBearing is not None:
             self.oppAvgPostDist = self.oppRightPostDist
 
+    # Hack from US open 2012?
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
             if mate.playerNumber in [1, 4] and mate.active:
                 if mate.ballOn and mate.ballDist < 100:
                     return True
-                
+
         return False
 
 
@@ -144,7 +148,8 @@ class KickInformation:
             # if we are facing between the posts
             if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
                     rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0):
-                
+
+                # will this ever happen?
                 if not self.sawGoal:
                     return self.chooseBackKick()
                 elif self.oppAvgPostDist == 0 or self.dangerousBall():
@@ -152,33 +157,35 @@ class KickInformation:
                 else:
                     self.brain.speech.say("Take it to the house!")
                     return self.chooseDynamicKick()
-                
-                
+
+
             # if the goal is to our right, use our left foot
-            elif leftPostBearing < 0:
+            elif rightPostBearing < 0:
                 return kicks.LEFT_SIDE_KICK
             # if the goal is to our left, use our right foot
-            elif rightPostBearing > 0:
+            elif leftPostBearing > 0:
                 return kicks.RIGHT_SIDE_KICK
         # if only one was seen
-        elif (rightPostBearing is not None):
-            # if the right post is roughly to our right (but not too far), kick straight
-            if (rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0 and \
-                    rightPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
+        # @summer 2012: How does this handle ambiguous posts?
+        elif (leftPostBearing is not None):
+            # if the right post is roughly to our right (but not too far),
+            # kick straight
+            if (leftPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0 and \
+                    leftPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
                 return self.chooseDynamicKick()
             # if the right post is roughly to our left, kick right
-            elif (rightPostBearing > 0):
+            elif (leftPostBearing > 0):
                 return kicks.RIGHT_SIDE_KICK
             # if the right post is way to our right, kick with the left foot
-            elif (rightPostBearing < -1*constants.KICK_STRAIGHT_BEARING_THRESH):
+            elif (leftPostBearing < -1*constants.KICK_STRAIGHT_BEARING_THRESH):
                 return kicks.LEFT_SIDE_KICK
-        elif (leftPostBearing is not None):
-            if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
-                    leftPostBearing <= constants.KICK_STRAIGHT_BEARING_THRESH):
+        elif (rightPostBearing is not None):
+            if (rightPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
+                    rightPostBearing <= constants.KICK_STRAIGHT_BEARING_THRESH):
                 return self.chooseDynamicKick()
-            elif (leftPostBearing < 0):
+            elif (rightPostBearing < 0):
                 return kicks.LEFT_SIDE_KICK
-            elif (leftPostBearing > constants.KICK_STRAIGHT_BEARING_THRESH):
+            elif (rightPostBearing > constants.KICK_STRAIGHT_BEARING_THRESH):
                 return kicks.RIGHT_SIDE_KICK
         # if none were seen
         return self.kickLoc()

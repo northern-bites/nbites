@@ -39,12 +39,10 @@ class TeamMember(RobotLocation):
         self.playerNumber = 0
         self.ballDist = 0
         self.ballBearing = 0
-        self.ballOn = False
-        self.ballFramesOn = 0
-        #self.ballX = 0
-        #self.ballY = 0
-        #self.role = None
-        #self.subRole = None
+        self.ballX = 0
+        self.ballY = 0
+        self.role = None
+        self.subRole = None
         self.chaseTime = 0
         self.lastPacketTime = time.time()
 
@@ -63,25 +61,20 @@ class TeamMember(RobotLocation):
 
         # stores packet information locally
         self.playerNumber = packet.playerNumber
-        #self.x = packet.playerX
-        #self.y = packet.playerY
-        #self.h = packet.playerH
+        self.x = packet.playerX
+        self.y = packet.playerY
+        self.h = packet.playerH
         self.ballDist = packet.ballDist
         self.ballBearing = packet.ballBearing
-        self.ballOn = packet.ballOn
-        self.ballFramesOn = packet.ballFramesOn
-        #self.ballX = packet.ballX
-        #self.ballY = packet.ballY
-        #self.role = packet.role
-        #self.subRole = packet.subRole
+        self.ballX = packet.ballX
+        self.ballY = packet.ballY
+        self.role = packet.role
+        self.subRole = packet.subRole
         self.chaseTime = packet.chaseTime
 
         # calculates ball localization distance, bearing
-        #self.bearingToGoal = self.getBearingToGoal()
+        self.bearingToGoal = self.getBearingToGoal()
         # if we are recieving packets, teammate is active
-        if self.playerNumber == 1 and self.active == False:
-            print "OK: The goalie is back online."
-
         self.active = True
         self.grabbing = (self.ballDist <=
                          BALL_TEAMMATE_DIST_GRABBING) and \
@@ -105,16 +98,15 @@ class TeamMember(RobotLocation):
         my = self.brain.my
         ball = self.brain.ball
 
-        #self.x = my.x
-        #self.y = my.y
-        #self.h = my.h
+        self.x = my.x
+        self.y = my.y
+        self.h = my.h
         self.ballDist = ball.vis.dist
         self.ballBearing = ball.vis.bearing
-        self.ballOn = ball.vis.on
-        #self.ballX = ball.loc.x
-        #self.ballY = ball.loc.y
-        #self.role = self.brain.play.role
-        #self.subRole = self.brain.play.subRole
+        self.ballX = ball.loc.x
+        self.ballY = ball.loc.y
+        self.role = self.brain.play.role
+        self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
 
         self.active = (not self.brain.gameController.currentState ==
@@ -161,22 +153,22 @@ class TeamMember(RobotLocation):
             self.brain.out.printf("\tChase time base is " + str(t))
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if not self.brain.ball.vis.on: #and not self.brain.play.isChaser():
+        if not self.brain.ball.vis.on and not self.brain.play.isChaser():
             t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball on bonus " + str(t))
 
         # Give penalties for not lining up along the ball-goal line
-        #lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
-        #rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
+        lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
+        rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
         # TODO: scale these by how far off we are??
         # ball is not lined up
-        #if (self.ballBearing > lpb or rpb > self.ballBearing):
-        #    t += BALL_GOAL_LINE_PENALTY
+        if (self.ballBearing > lpb or rpb > self.ballBearing):
+            t += BALL_GOAL_LINE_PENALTY
         # we are not lined up
-        #if (lpb < 0 or rpb > 0):
-        #    t += BALL_GOAL_LINE_PENALTY
+        if (lpb < 0 or rpb > 0):
+            t += BALL_GOAL_LINE_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
@@ -202,12 +194,10 @@ class TeamMember(RobotLocation):
         return self.grabbing
 
     def isTeammateRole(self, roleToTest):
-        return 1
-        #return (self.role == roleToTest)
+        return (self.role == roleToTest)
 
     def isTeammateSubRole(self, subRoleToTest):
-        return 1
-        #return (self.subRole == subRoleToTest)
+        return (self.subRole == subRoleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)

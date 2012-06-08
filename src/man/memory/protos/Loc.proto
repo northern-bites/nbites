@@ -9,4 +9,13 @@ message PLoc {
 	optional float x_uncert = 5;
 	optional float y_uncert = 6;
 	optional float h_uncert = 7;
+
+	message Particle {
+		optional float x = 1;
+		optional float y = 2;
+		optional float h = 3;
+		optional float w = 4;
+	}
+
+	repeated Particle particles = 8;
 }
