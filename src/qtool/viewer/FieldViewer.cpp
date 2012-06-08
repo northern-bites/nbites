@@ -20,7 +20,12 @@ namespace qtool {
 			startButton(new QPushButton("Locate Robots", this)),
 			stopButton(new QPushButton("Stop Location", this)) {
 
-			mainLayout = new QHBoxLayout(this);
+			mainLayout = new QVBoxLayout(this);
+
+			//scaling factors for big view
+			float scaleX = this->width()/(float)FIELD_WIDTH;
+			float scaleY = this->height()/(float)FIELD_HEIGHT;
+			qDebug()<<scaleX<<scaleY;
 
 			//field image painted via overlay of robots, field
 			fieldImage = new PaintField(this);
@@ -28,27 +33,19 @@ namespace qtool {
 			overlayView = new OverlayedImage(fieldImage, bot_locs, this);
 			fieldView = new BMPImageViewer(fieldImage, this);
 
-			//spacers are for customized layout
-			fieldSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
-										  QSizePolicy::Expanding);
-			buttonSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
-										   QSizePolicy::Expanding);
-
-			field = new QVBoxLayout();
+			field = new QHBoxLayout();
 			field->addWidget(fieldView);
-			field->addItem(fieldSpacer);
 
-			buttonLayout = new QVBoxLayout();
+			buttonLayout = new QHBoxLayout();
 			buttonLayout->setSpacing(10);
 			buttonLayout->addWidget(startButton);
 			connect(startButton, SIGNAL(clicked()), this, SLOT(drawBots()));
 			buttonLayout->addWidget(stopButton);
 			connect(stopButton, SIGNAL(clicked()), this, SLOT(stopDrawing()));
-			buttonLayout->addItem(buttonSpacer);
 
 			//paint the field
-			mainLayout->addLayout(field);
 			mainLayout->addLayout(buttonLayout);
+			mainLayout->addLayout(field);
 			this->setLayout(mainLayout);
 		}
 
@@ -61,11 +58,8 @@ namespace qtool {
 					delete fieldView;
 					fieldView = new BMPImageViewer(overlayView, this);
 					fieldView->getLayout()->setAlignment(Qt::Alignment());
-					field = new QVBoxLayout();
+					field = new QHBoxLayout();
 					field->addWidget(fieldView);
-					fieldSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum,
-												  QSizePolicy::Expanding);
-					field->addItem(fieldSpacer);
 					mainLayout->insertLayout(0, field);
 					qApp->processEvents();
 				}
