@@ -44,7 +44,7 @@ slarti = BirthCertificate.BirthCertificate(
 			tts_name="wash",
 			doc='''\
 I am Hoban Washburne, better known as Wash. I am the pilot of Serenity and
-am married to Zoe. My collection of toy dinosaurs keep me company as I
+am married to Zoe. My collection of toy dinosaurs keeps me company as I
 expertly maneuver the ship from planet to planet. I am a leaf on the wind;
 watch how I soar...''',
 			gait = gaits.SLARTI_GAIT,

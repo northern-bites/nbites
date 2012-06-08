@@ -73,6 +73,17 @@ void Cross::createObject() {
     }
 }
 
+bool Cross::checkForRobotBlobs(Blob blob) {
+    for (int i = 0; i < blobs->number(); i++) {
+        if (blobs->get(i).isAligned(blob)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
 /* See if any of our candidate blobs are actually worthy crosses.
  */
 

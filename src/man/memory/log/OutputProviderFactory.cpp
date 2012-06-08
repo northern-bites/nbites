@@ -27,14 +27,14 @@ void OutputProviderFactory::AllFileOutput(LoggingBoard* loggingBoard,
 	}
 }
 
-void OutputProviderFactory::AllSocketOutput(LoggingBoard* loggingBoard) {
-    for (MObject_ID id = FIRST_OBJECT_ID; id != LAST_OBJECT_ID; id++) {
-        loggingBoard->newOutputProvider(
-                OutProvider::ptr(new SocketOutProvider(STREAMING_PORT_BASE +
-                        static_cast<unsigned short>(id))), id);
+void OutputProviderFactory::AllSocketOutput(const Memory* memory,
+                                            LoggingBoard* loggingBoard) {
+        for (Memory::const_iterator it = memory->begin(); it != memory->end(); it++) {
+            loggingBoard->newOutputProvider(
+                OutProvider::ptr(new SocketOutProvider(
+                                     static_cast<unsigned short>(it->second->getID()) + STREAMING_PORT_BASE)), it->second->getID());
+        }
     }
-}
-
 }
 }
 }

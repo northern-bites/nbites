@@ -1,4 +1,5 @@
 #include "ColorCalibrate.h"
+#include "Camera.h"
 
 #include <QtDebug>
 
@@ -9,11 +10,16 @@ namespace colorcreator {
 
 using namespace qtool::data;
 using namespace qtool::image;
+using namespace man::corpus;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
-        QWidget(parent), dataManager(dataManager),
-        image(new BMPYUVImage(dataManager->getMemory()->getMImage(), BMPYUVImage::RGB, this)),
-        channelImage(image, this),
+        QWidget(parent), dataManager(dataManager), imageTabs(new QTabWidget(this)),
+        topImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::TOP),
+                                 BMPYUVImage::RGB, this)),
+        bottomImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM),
+                                    BMPYUVImage::RGB, this)),
+        topChannelImage(topImage, this),
+        bottomChannelImage(bottomImage, this),
         currentColorSpace(&colorSpace[STARTING_COLOR]),
         colorSpaceWidget(currentColorSpace, this),
         colorWheel(currentColorSpace, this) {
@@ -21,7 +27,6 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     QHBoxLayout* mainLayout = new QHBoxLayout;
 
     QHBoxLayout* leftLayout = new QHBoxLayout;
-
     leftLayout->addWidget(&thresholdedImagePlaceholder);
 
     //connect all the color spaces to update the thresholded
@@ -30,13 +35,20 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         connect(&colorSpace[i], SIGNAL(parametersChanged()),
                 this, SLOT(updateThresholdedImage()));
     }
-    //also when the underlying image changes
-    connect(image, SIGNAL(bitmapBuilt()),
-            this, SLOT(updateThresholdedImage()));
-    leftLayout->addWidget(&channelImage);
 
-    dataManager->connectSlotToMObject(&channelImage,
-                 SLOT(updateView()), MIMAGE_ID);
+    leftLayout->addWidget(imageTabs);
+
+    //update the threshold when the underlying image changes
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
+
+    imageTabs->addTab(&topChannelImage, "Top Image");
+    dataManager->connectSlotToMObject(&topChannelImage, SLOT(updateView()), MTOPIMAGE_ID);
+
+    imageTabs->addTab(&bottomChannelImage, "Bottom Image");
+    dataManager->connectSlotToMObject(&bottomChannelImage, SLOT(updateView()), MBOTTOMIMAGE_ID);
+
+    connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
@@ -83,6 +95,14 @@ void ColorCalibrate::selectColorSpace(int index) {
 // or unify this with our regular thresholding process (maybe
 // by converting the color space parameters to a table continuously?
 void ColorCalibrate::updateThresholdedImage() {
+
+    BMPYUVImage* image;
+
+    if (currentImage == Camera::TOP) {
+        image = topImage;
+    } else {
+        image = bottomImage;
+    }
 
     //check for size changes and make sure
     //the thresholded image is the same size as the image
@@ -188,6 +208,15 @@ void ColorCalibrate::writeColorSpaces(QString filename) {
     }
 }
 
+void ColorCalibrate::imageTabSwitched(int) {
+    if (imageTabs->currentWidget() == &topChannelImage) {
+        currentImage = Camera::TOP;
+    } else {
+        currentImage = Camera::BOTTOM;
+    }
+    this->updateThresholdedImage();
+}
+
 void ColorCalibrate::loadSlidersBtnPushed() {
     QString base_directory = QString(NBITES_DIR) + "/data/sliders";
     QString filename =
@@ -215,7 +244,7 @@ void ColorCalibrate::saveColorTableBtnPushed() {
                     tr("Save Color Table to File"),
                     base_directory + "/new_table.mtb",
                     tr("Color Tables(*.mtb)"));
-    ColorTable::write(filename, colorSpace);
+    ColorTable::writeFromSliders(filename, colorSpace);
 }
 
 }
