@@ -128,13 +128,15 @@ void Threshold::visionLoop() {
     }
     transposeDebugImage();
 #endif
-
+    
     if (vision->ball->getRadius() != 0) return; //we see the ball, we are done
     
     usingTopCamera = false;
-    
+
+    PROF_ENTER(P_TRANSFORM)
     pose->transform(usingTopCamera);
-   
+    PROF_EXIT(P_TRANSFORM)
+
     orange->init(pose->getHorizonSlope());
     lowerRuns();
 
@@ -146,7 +148,7 @@ void Threshold::visionLoop() {
     } else {
         orange->createBall(pose->getHorizonY(0));
     }
-  
+   
 }
 
 /*
