@@ -65,6 +65,7 @@ private:
 	QScrollArea* scrollArea;
 	QSize* toolSize;
 	QRect* geom;
+	QSize* barBuffer;
 
 protected:
 	void resizeEvent(QResizeEvent*);

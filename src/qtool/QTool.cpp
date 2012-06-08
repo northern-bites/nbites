@@ -38,6 +38,8 @@ namespace qtool {
 		prevButton = new QPushButton(tr("<"));
 		recordButton = new QPushButton(tr("Rec"));
 
+		barBuffer = new QSize(15, 40);
+
 		connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
 		connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
 		connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
@@ -106,9 +108,9 @@ namespace qtool {
 
 	void QTool::resizeEvent(QResizeEvent* ev){
 		QSize widgetSize = ev->size();
-		toolTabs->resize(widgetSize);
-		qDebug()<<widgetSize<<toolTabs->size();
-		this->setCentralWidget(scrollArea);
+		if((widgetSize.width() > geom->size().width())
+		   || (widgetSize.height() > geom->size().height()))
+			toolTabs->resize(widgetSize-*barBuffer);
 		QWidget::resizeEvent(ev);
 	}
 }
