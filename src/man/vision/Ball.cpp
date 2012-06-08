@@ -128,7 +128,8 @@ void Ball::createBall(int h) {
    @return      whether it meets the minimum criteria
  */
 bool Ball::blobIsBigEnoughToBeABall(int w, int h) {
-    return !(w < 3 || h < 3);
+	const int MIN_SIZE = 3;
+    return !(w < MIN_SIZE || h < MIN_SIZE);
 }
 
 /*  Before we just take the biggest blob, we do some initial screening
@@ -215,12 +216,12 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
 /* Do more sanity checks on the ball returning false if any fail.
    @return          whether the ball passes the sanity checks
  */
-bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
+bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
     const float DISTANCE_MISMATCH = 50.0f;
 	const float PIXACC = 300;
 	const int HORIZON_THRESHOLD = 30;
 
-    float distanceDifference = fabs(e.dist - focalDist.dist);
+    float distanceDifference = fabs(kinematicsBasedEst.dist - radiusBasedEst.dist);
     int horb = horizonAt(topBlob->getLeftBottomX());
 
     if (!ballIsReasonablySquare(topBlob->getLeftTopX(), topBlob->getLeftTopY(),
@@ -249,12 +250,12 @@ bool Ball::sanityChecks(int w, int h, estimate e, VisualBall * thisBall) {
         thisBall->init();
         return false;
     } else if (distanceDifference > DISTANCE_MISMATCH &&
-               (e.dist *2 <  focalDist.dist ||
-                focalDist.dist * 2 < e.dist)
-               && e.dist < PIXACC && e.dist > 0 && w < 12) {
+               (kinematicsBasedEst.dist *2 <  radiusBasedEst.dist ||
+                radiusBasedEst.dist * 2 < kinematicsBasedEst.dist)
+               && kinematicsBasedEst.dist < PIXACC && kinematicsBasedEst.dist > 0 && w < 12) {
         if (BALLDEBUG) {
-            cout << "Screening due to distance mismatch " << e.dist <<
-                " " << focalDist.dist << endl;
+            cout << "Screening due to distance mismatch " << kinematicsBasedEst.dist <<
+                " " << radiusBasedEst.dist << endl;
 			drawBlob(*topBlob, BLACK);
         }
         thisBall->init();
@@ -310,18 +311,17 @@ int Ball::balls(int horizon, VisualBall *thisBall)
             h = topBlob->height();
         }
 		const float BALL_REAL_HEIGHT = 6.5f;
-		e = vision->pose->pixEstimate(topBlob->getLeftTopX() + (w / 2),
-									  topBlob->getLeftTopY() + 2 * h / PIX_EST_DIV,
-									  ORANGE_BALL_RADIUS);
+
         // SORT OUT BALL INFORMATION
         setOcclusionInformation();
-        setBallInfo(w, h, thisBall, e);
+        setBallInfo(w, h, thisBall);
+
         if (thisBall->getHeight() > 0) thisBall->setOn(true);
-    } while (!sanityChecks(w, h, e, thisBall));
+    } while (!sanityChecks(w, h, thisBall));
 
     // last second adjustment for non-square balls
     if (ballIsClose(thisBall) && ballIsNotSquare(h, w)) {
-        checkForReflections(h, w, thisBall, e);
+        checkForReflections(h, w, thisBall);
     }
     if (BALLDEBUG) {
         cout << "Vision found ball " << endl;
@@ -330,13 +330,8 @@ int Ball::balls(int horizon, VisualBall *thisBall)
             w << " " << h << " " << e.dist << endl;
     }
 	if (BALLDISTDEBUG) {
-		estimate es;
-		es = vision->pose->pixEstimate(topBlob->getLeftTopX() + topBlob->width() /
-									   2, topBlob->getLeftTopY() + 2
-									   * topBlob->height() / PIX_EST_DIV,
-									   ORANGE_BALL_RADIUS);
-		cout << "Distance is " << thisBall->getDistance() << " " <<
-				thisBall->getFocDist() << " " << es.dist << endl;
+		cout << "Distance is " << thisBall->getDistance() << " "
+				<< kinematicsBasedEst.dist << endl;
 		cout<< "Radius"<<thisBall->getRadius()<<endl;
 	}
 	return 0;
@@ -496,8 +491,7 @@ void Ball::adjustBallDimensions() {
    @param thisBall the ball
    @param e        pixEstimated distance to ball
  */
-void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
-                               estimate e) {
+void Ball::checkForReflections(int h, int w, VisualBall * thisBall) {
     // we probably have misidentified the distance see if we can fix it.
     if (BALLDISTDEBUG) {
         cout << "Detected bad ball distance - trying to fix " << w <<
@@ -539,10 +533,9 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
                 cout << "Resetting ball dimensions.	 Count was " << count
                      << endl;
             }
-            setBallInfo(w, w, thisBall, e);
+            setBallInfo(w, w, thisBall);
         }
     }
-    thisBall->setDistanceEst(e);
 }
 
 /* Returns true when the ball is close (3/4 of a meter).
@@ -551,7 +544,8 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall,
  */
 
 bool Ball::ballIsClose(VisualBall * thisBall) {
-    return thisBall->getDistance() < 75.0f;
+	const float CLOSE = 75.0f;
+    return thisBall->getDistance() < CLOSE;
 }
 
 /* Returns true when the height and width are not a good match.
@@ -560,7 +554,8 @@ bool Ball::ballIsClose(VisualBall * thisBall) {
    @return       whether the ball is square or not
  */
 bool Ball::ballIsNotSquare(int h, int w) {
-    return abs(h - w) > 3;
+	const int MISMATCH = 3;
+    return abs(h - w) > MISMATCH;
 }
 
 /* Set the primary color.  Depending on the color, we have different space needs
@@ -1073,6 +1068,18 @@ bool Ball::badSurround(Blob b) {
 	return false;
 }
 
+/* We use a power function regression on data to estimate
+   the ball distance from the radius in the image
+ */
+float Ball::ballDistanceEstFromRadius(float radius) {
+
+	float distEst;
+	float radToPow = std::pow(radius, -1.28);
+	distEst = 2166*radToPow;
+
+	return distEst;
+}
+
 /* Once we have determined a ball is a blob we want to set it up for
    the rest of the world (localization, behavior, etc.).
    @param w         ball width
@@ -1081,7 +1088,7 @@ bool Ball::badSurround(Blob b) {
    @param e         pixEstimate to ball
  */
 
-void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
+void Ball::setBallInfo(int w, int h, VisualBall *thisBall) {
 
 	const float radDiv = 2.0f;
 	// x, y, width, and height. Not up for debate.
@@ -1110,33 +1117,32 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall, estimate e) {
 	}
 	thisBall->setConfidence(SURE);
 	thisBall->findAngles();
-	focalDist = vision->pose->sizeBasedEstimate(thisBall->getCenterX(),
-												thisBall->getCenterY(),
-												ORANGE_BALL_RADIUS,
-												thisBall->getRadius(),
-												ORANGE_BALL_RADIUS);
-	if (occlusion == NOOCCLUSION || e.dist > 600) {
-		thisBall->setFocalDistanceFromRadius();
-		//trust pixest to within 300 cm
-		if (e.dist <= 300) {
-			thisBall->setDistanceEst(e);
-		}
-		else {
-			thisBall->setDistanceEst(focalDist);
-		}
-	} else {
-		// use our super swell updated pix estimate to do the distance
-		thisBall->setDistanceEst(e);
-		if (BALLDISTDEBUG) {
-			thisBall->setFocalDistanceFromRadius();
-		}
-	}
-	/*cout<<"pixest "<<e.dist<<"size "<<vision->pose->sizeBasedEstimate(
-	  thisBall->getCenterX(),
-	  thisBall->getCenterY(),
-	  ORANGE_BALL_RADIUS,
-	  thisBall->getRadius(),
-	  ORANGE_BALL_RADIUS).dist<<endl;*/
+
+	kinematicsBasedEst = vision->pose->pixEstimate(thisBall->getCenterX(),
+	                                               thisBall->getCenterY(),
+	                                               ORANGE_BALL_RADIUS);
+
+	float radiusBasedDistance = ballDistanceEstFromRadius(thisBall->getRadius());
+	radiusBasedEst = vision->pose->estimateWithKnownDistance(
+	        thisBall->getCenterX(), thisBall->getCenterY(), 0.0f, radiusBasedDistance);
+
+	estimate sizeBased = vision->pose->estimateFromObjectSize(thisBall->getCenterX(), thisBall->getCenterY(),
+	                                                          ORANGE_BALL_RADIUS,
+	                                                          thisBall->getRadius(), ORANGE_BALL_RADIUS);
+
+//	std::cout << "radius-based " << radiusBasedEst << std::endl;
+//	std::cout << "kinematics-based " << kinematicsBasedEst << std::endl;
+//	std::cout << "size-based " << sizeBased << std::endl;
+
+	//trust radius-based estimates for non-occluded balls that are relatively big enough
+	//to get enough radius information
+
+	//TODO: right now the radius-based function is broken (for small distances at least)
+//	if (occlusion == NOOCCLUSION && thisBall->getRadius() > 6) {
+//	    thisBall->setDistanceEst(radiusBasedEst);
+//	} else {
+	    thisBall->setDistanceEst(kinematicsBasedEst);
+//	}
 }
 
 /*

@@ -46,6 +46,7 @@ protected slots:
     void loadSlidersBtnPushed();
     void saveSlidersBtnPushed();
     void saveColorTableBtnPushed();
+    void imageTabSwitched(int);
 
 protected:
     void loadColorSpaces(QString filename);
@@ -53,8 +54,16 @@ protected:
 
 private:
     data::DataManager::ptr dataManager;
-    image::BMPYUVImage* image;
-    viewer::ChannelImageViewer channelImage;
+
+    QTabWidget* imageTabs;
+    man::corpus::Camera::Type currentImage;
+
+    image::BMPYUVImage* topImage;
+    viewer::ChannelImageViewer topChannelImage;
+
+    image::BMPYUVImage* bottomImage;
+    viewer::ChannelImageViewer bottomChannelImage;
+
     ColorSpace colorSpace[image::NUM_COLORS];
     ColorSpace* currentColorSpace;
     QComboBox colorSelect;

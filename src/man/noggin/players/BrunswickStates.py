@@ -132,19 +132,13 @@ def gameFinished(player):
         player.inKickingState = False
         player.stopWalking()
         player.zeroHeads()
-        player.GAME_FINISHED_satDown = False
+        player.executeMove(SweetMoves.SIT_POS)
         player.brain.sensors.stopSavingFrames()
         return player.stay()
 
-    # Sit down once we've finished walking
-    if (player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown
-        and not player.motion.isBodyActive()):
-        player.GAME_FINISHED_satDown = True
-        player.executeMove(SweetMoves.SIT_POS)
-        return player.stay()
-
-    if not player.motion.isBodyActive() and  player.GAME_FINISHED_satDown:
+    if player.brain.nav.isStopped():
         player.gainsOff()
+        
     return player.stay()
 
 ########### PENALTY SHOTS STATES ############

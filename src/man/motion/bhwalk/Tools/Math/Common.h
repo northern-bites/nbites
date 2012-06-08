@@ -12,8 +12,6 @@
 #include <cmath>
 #include <cstdlib> // std::abs(int)
 
-using namespace std;
-
 /**
 * Returns the sign of a value.
 * \param a The value.
@@ -91,7 +89,7 @@ template <class V> inline V fromDegrees(const V& degrees) {return degrees * V(pi
 template <class V> inline V normalize(const V& data)
 {
   if(data < V(pi) && data >= -V(pi)) return data;
-  V ndata = data - ((int)(data / V(pi2))) * V(pi2);
+  V ndata = data - V((int)(data / V(pi2))) * V(pi2);
   if(ndata >= V(pi))
   {
     ndata -= V(pi2);

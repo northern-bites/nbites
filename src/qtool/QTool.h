@@ -1,35 +1,39 @@
 /**
  * @class QTool
- * main QTool class
- * inherits from qmainwindow
+ * Main QTool Class
+ * Adds the following modules to the empty qtool (ALL OF THEM):
+ *
+ * DataLoader
+ * ColorCalibrate
+ * ColorTableCreator
+ * MemoryViewer
+ * VisionViewer
+ * OfflineViewer
+ * BallEKFViewer
+ * FieldViewer
+ * OverseerClient
  *
  * @author Octavian Neamtu
  */
 
 #pragma once
 
-#include <qmainwindow.h>
-#include <qtabwidget.h>
+#include "EmptyQTool.h"
 
 #include "data/DataLoader.h"
-#include "data/DataManager.h"
 #include "colorcreator/ColorCalibrate.h"
+#include "colorcreator/ColorTableCreator.h"
 #include "viewer/MemoryViewer.h"
+#include "viewer/VisionViewer.h"
 #include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
 #include "viewer/FieldViewer.h"
 #include "remote/RobotSelect.h"
 #include "overseer/OverseerClient.h"
 
-#ifndef NBITES_DIR
-#define NBITES_DIR "~/nbites"
-#warning "Could not find NBITES_DIR define! Reverting to " NBITES_DIR
-#endif
-
-
 namespace qtool {
 
-class QTool : public QMainWindow {
+class QTool : public EmptyQTool {
 
     Q_OBJECT
 
@@ -37,29 +41,16 @@ public:
     QTool();
     ~QTool();
 
-private slots:
-    void next();
-    void prev();
-    void record();
-
 private:
-    QTabWidget* toolTabs;
-
-    data::DataManager::ptr dataManager;
     data::DataLoader* dataLoader;
     colorcreator::ColorCalibrate* colorCalibrate;
+    colorcreator::ColorTableCreator* colorTableCreator;
     viewer::MemoryViewer* memoryViewer;
+    viewer::VisionViewer* visionViewer;
     offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
     overseer::OverseerClient* overseerClient;
-
-    QPushButton* prevButton;
-    QPushButton* nextButton;
-    QPushButton* recordButton;
-    QToolBar* toolbar;
-
-
 };
 
 }

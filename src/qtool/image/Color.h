@@ -16,7 +16,8 @@ static const std::string Color_label[] = {
         "Grey", "White", "Green", "Blue", "Yellow", "Orange", "Red", "Navy" };
 
 static const int Color_RGB[] = {
-        0xc0c0c0, 0xffffff, 0x66cc66, 0x3366ff, 0xffff00, 0xffcc33, 0xff0000, 0x3300cc
+        0xc0c0c0, 0xffffff, 0x66cc66, 0x3366ff, 0xffff00, 0xed9121,
+        0xff0000, 0x3300cc
 };
 
 static const int Color_bits[] = {
@@ -28,12 +29,23 @@ static const int MixedColor_RGB[] = {
         0x20b2aa, 0xff4500, 0x191970, 0x9400d3
 };
 
+static const byte ALL_COLORS = 0xFF;
+
 class Color
 {
     // holds an rgb value in the form #XXRRGGBB
     typedef unsigned int RGB;
 
 public:
+    static ColorID getColorIDFromBitColor(int bits) {
+        for (int i = 0; i < NUM_COLORS; i++) {
+            if (bits == Color_bits[i]) {
+                return (ColorID) i;
+            }
+        }
+        return Grey;
+    }
+
     static MixedColorID getMixedColorIDFromBitColor(int bits) {
         switch(bits) {
         case GREEN_BIT | BLUE_BIT :

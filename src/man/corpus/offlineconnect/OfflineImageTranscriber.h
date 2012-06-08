@@ -26,7 +26,8 @@ ADD_SHARED_PTR(OfflineImageTranscriber)
 
 public:
     OfflineImageTranscriber(boost::shared_ptr<Sensors> s,
-            memory::MImage::const_ptr mImage);
+                            memory::MTopImage::const_ptr topImage,
+                            memory::MBottomImage::const_ptr bottomImage);
     virtual ~OfflineImageTranscriber();
 
     void releaseImage() {
@@ -34,8 +35,9 @@ public:
     void run();
 
     void initTable(const std::string& filename);
+    void initTable(byte* other_table) { table = other_table; }
 
-protected:
+
     void acquireNewImage();
 
 public:
@@ -47,10 +49,11 @@ public:
     };
 
 private:
-    memory::MImage::const_ptr mImage;
+    memory::MTopImage::const_ptr mTopImage;
+    memory::MBottomImage::const_ptr mBottomImage;
     unsigned char* table;
     ColorParams params;
-    uint16_t *image;
+    uint16_t *topImage, *bottomImage;
 };
 
 }
