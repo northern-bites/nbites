@@ -2,7 +2,6 @@
 #include "Profiler.h"
 #include "visionconfig.h"
 
-#include <assert.h>
 #include <cmath>
 #include <iostream>
 #include <stdio.h>
@@ -154,8 +153,7 @@ TEST_F(EdgeDetectorTest, Sobel)
     // Make sure that if all points are zero, then all points in the
     // gradient are zero
     uint16_t * c;
-    c =
-        new uint16_t[IMAGE_WIDTH * IMAGE_HEIGHT];
+    c = new uint16_t[IMAGE_WIDTH * IMAGE_HEIGHT];
 
     for (int i=0; i < IMAGE_HEIGHT; ++i)
         for (int j=0; j < IMAGE_WIDTH; ++j)
@@ -176,12 +174,14 @@ TEST_F(EdgeDetectorTest, Sobel)
      * operator spits out the correct gradients.
      */
     srand(time(NULL));
-    for (int i=0; i < IMAGE_HEIGHT; ++i)
-        for (int j=0; j < IMAGE_WIDTH; ++j)
+    for (int i=0; i < IMAGE_HEIGHT; ++i) {
+        for (int j=0; j < IMAGE_WIDTH; ++j) {
             c[(i) * IMAGE_WIDTH + j] = static_cast<uint8_t>(rand()%255);
+        }
+    }
 
     edges.sobelOperator(0, c, g);
-    for (int i=1; i < IMAGE_HEIGHT-1; ++i)
+    for (int i=1; i < IMAGE_HEIGHT-1; ++i) {
         for (int j=1; j < IMAGE_WIDTH-1; ++j){
             int gx = ((c[(i-1) * IMAGE_WIDTH + j+1] +
                        c[(i) * IMAGE_WIDTH + j+1] * 2 +
@@ -230,6 +230,7 @@ TEST_F(EdgeDetectorTest, Sobel)
             // but kept around for austerity
             EXPECT_GE(g.getMagnitude(i,j) , 0);
         }
+    }
     delete[] c;
 }
 
@@ -261,7 +262,8 @@ TEST_F(EdgeDetectorTest, Peaks)
         int y = g.getAnglesYCoord(i) + IMAGE_HEIGHT/2;
 
         EXPECT_NE(g.getMagnitude(y,x) , 0);
-        assert(g.getX(y,x) != 0 || g.getY(y,x) != 0);
+        EXPECT_TRUE(g.getX(y,x) != 0 ||
+                    g.getY(y,x) != 0);
     }
 
     for (int n = 0; n < g.numPeaks; ++n) {
@@ -372,7 +374,7 @@ TEST_F(EdgeDetectorTest, Angles)
             int y = g.getAnglesYCoord(i) + IMAGE_HEIGHT/2;
 
             EXPECT_NE(g.getMagnitude(y,x) , 0);
-            assert(g.getX(y,x) != 0 || g.getY(y,x) != 0);
+            EXPECT_TRUE(g.getX(y,x) != 0 || g.getY(y,x) != 0);
 
        // If we find an x coordinate of zero, there are no more angles
        // to be found

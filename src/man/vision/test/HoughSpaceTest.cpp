@@ -9,7 +9,6 @@
 #undef private
 #undef protected
 
-#include "Tests.h"
 #include "Gradient.h"
 #include "VisionDef.h"
 
@@ -45,8 +44,8 @@ bool isDesiredLine(float goalR, float goalT, const HoughLine& line)
     float lineR = line.getRadius();
     float lineT = line.getAngle();
 
-    LTE(lineT, 2*M_PI_FLOAT);
-    GTE(lineT, 0);
+    EXPECT_LE(lineT, 2*M_PI_FLOAT);
+    EXPECT_GE(lineT, 0);
 
     float goalLowerT = goalT - HoughSpaceTest::ACCEPT_ANGLE;
     float goalUpperT = goalT + HoughSpaceTest::ACCEPT_ANGLE;
@@ -75,15 +74,13 @@ TEST_F(HoughSpaceTest, HoughSpace)
 
     for (int t=0; t < HoughSpace::t_span; ++t){
         for (int r=0; r < HoughSpace::r_span; ++r){
-            GTE(hs.getHoughBin(r,t) , 0);
+            EXPECT_GE(hs.getHoughBin(r,t) , 0);
         }
     }
-    PASSED(MORE_THAN_ZERO);
 
     // Check to make sure there is a point at r = 80 = img_width/4 , theta = 0
     // which is where the above gradient has a line, roughly.
-    GT(hs.getHoughBin(IMAGE_WIDTH * 1/4 + HoughSpace::r_span/2,0) , 0);
-    PASSED(EDGE_AT_BOUND);
+    EXPECT_GT(hs.getHoughBin(IMAGE_WIDTH * 1/4 + HoughSpace::r_span/2,0) , 0);
 
     // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
@@ -109,10 +106,9 @@ TEST_F(HoughSpaceTest, HoughSpace)
             preSum = max(preSum, 0); // Bound it at zero
 
             int smoothed = hs.getHoughBin(r,t);
-            EQ_INT( smoothed, preSum);
+            EXPECT_EQ( smoothed, preSum);
         }
     }
-    PASSED(SMOOTH_CORRECT);
 }
 
 void test_for_line(uint8_t angle, float radius)
@@ -136,7 +132,7 @@ void test_for_line(uint8_t angle, float radius)
         }
     }
 
-    FALSE(lines.empty());
+    EXPECT_FALSE(lines.empty());
 
     float maxRadius = sqrtf(IMAGE_WIDTH * IMAGE_WIDTH +
                             IMAGE_HEIGHT * IMAGE_HEIGHT);
@@ -145,11 +141,12 @@ void test_for_line(uint8_t angle, float radius)
     list<HoughLine>::iterator l = lines.begin();
 
     while (l != lines.end()){
-        LTE(l->getRadius() , maxRadius); // Line must be in image
-        GTE(l->getRadius(), -maxRadius); // in either direction
-        GTE(l->getAngle() , 0);          // 0 <= Angle <= 2 * pi
-        LTE(l->getAngle() , 2 * M_PI_FLOAT + ACCEPT_ANGLE);
-        GTE(l->getScore() , 0);
+        EXPECT_LE(l->getRadius() , maxRadius); // Line must be in image
+        EXPECT_GE(l->getRadius(), -maxRadius); // in either direction
+        EXPECT_GE(l->getAngle() , 0);          // 0 <= Angle <= 2 * pi
+        EXPECT_LE(l->getAngle() ,
+                  2 * M_PI_FLOAT + HoughSpaceTest::ACCEPT_ANGLE);
+        EXPECT_GE(l->getScore() , 0);
 
         // Make sure the system found the one line in the gradient
         if (isDesiredLine(radius, radAngle, *l)){
@@ -158,7 +155,7 @@ void test_for_line(uint8_t angle, float radius)
         l++;
     }
     // We better have found that line
-    TRUE(foundFixedLine);
+    EXPECT_TRUE(foundFixedLine);
 }
 
 /**
@@ -171,7 +168,6 @@ TEST_F(HoughSpaceTest, lines)
             test_for_line(static_cast<uint8_t>(t), r);
         }
     }
-    PASSED(FOUND_GOOD_LINES);
 }
 
 TEST_F(HoughSpaceTest, Suppress)
@@ -193,8 +189,8 @@ TEST_F(HoughSpaceTest, Suppress)
     hs.suppress(x0, y0, lines);
 
     // Ensure that only one duplicate line remains
-    EQ_INT(lines.numActive(), 1);
-    TRUE(lines[0] == a1);
+    EXPECT_EQ(lines.numActive(), 1);
+    EXPECT_TRUE(lines[0] == a1);
 
     lines.clear();
 
@@ -229,12 +225,10 @@ TEST_F(HoughSpaceTest, Suppress)
 
             int tDiff = abs(abs(lines[i].getTIndex() -
                                 lines[j].getTIndex()) & 255);
-            FALSE (rDiff <= HoughSpace::suppress_r_bound &&
-                   tDiff <= hs.angleSpread);
+            EXPECT_FALSE(rDiff <= HoughSpace::suppress_r_bound &&
+                         tDiff <= hs.angleSpread);
         }
     }
-
-    PASSED(NO_DUPE_LINES);
 
     // Make sure that suppress doesn't delete lines needlessly
     //
@@ -251,7 +245,7 @@ TEST_F(HoughSpaceTest, Suppress)
     lines.add(c2);
 
     hs.suppress(x0, y0, lines);
-    EQ_INT( lines.numActive() , 3 );
+    EXPECT_EQ( lines.numActive() , 3 );
     bool at = false, bt = false, ct = false;
 
     for (int i=0; i < lines.size(); ++i){
@@ -263,9 +257,7 @@ TEST_F(HoughSpaceTest, Suppress)
             ct = true;
     }
 
-    TRUE(at && bt && ct);
-    PASSED(DONT_DELETE_GOOD_LINES);
-
+    EXPECT_TRUE(at && bt && ct);
 }
 
 TEST_F(HoughSpaceTest, Pairing)
@@ -298,20 +290,19 @@ TEST_F(HoughSpaceTest, Pairing)
     list<pair<HoughLine, HoughLine> >::iterator l, l2;
 
     for(l = lines.begin(); l != lines.end(); ++l){
-        TRUE(l->first != l->second &&
-              isParallel(l->first, l->second));
+        EXPECT_NE(l->first, l->second);
+        EXPECT_TRUE(isParallel(l->first, l->second));
     }
-    PASSED(CORRECT_PAIRING);
 
     // Ensure that every line is only in a pair once
     for(l = lines.begin(); l != lines.end(); ++l){
         for(l2 = l; ++l2 != lines.end(); ){
 
             // Check all combos of lines between the pairs
-            NE(l->first, l2->first);
-            NE(l->first, l2->second);
-            NE(l->second, l2->first);
-            NE(l->second, l2->second);
+            EXPECT_NE(l->first, l2->first);
+            EXPECT_NE(l->first, l2->second);
+            EXPECT_NE(l->second, l2->first);
+            EXPECT_NE(l->second, l2->second);
         }
     }
 }
