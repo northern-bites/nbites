@@ -8,41 +8,58 @@
  *
  * @author Dani McAvoy
  * @date October 2011
+ *
+ *
+ * @modified Brian Jacobel
+ * @date April 2012
  */
 
 #pragma once
 
 #include <QWidget>
+#include <QPushButton>
 #include <QtGui>
+#include <QPainter>
 #include <vector>
 
 #include "data/DataManager.h"
 #include "image/PaintField.h"
 #include "image/PaintLocalization.h"
 #include "BMPImageViewer.h"
+#include "image/PaintBots.h"
+
 
 namespace qtool {
-namespace viewer {
+	namespace viewer {
 
-class FieldViewer : public QMainWindow{
-    Q_OBJECT
+		class FieldViewer : public QWidget{
+			Q_OBJECT
 
-public:
-    FieldViewer(data::DataManager::ptr dataManager);
+			public:
+			FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
 
-private slots:
-    void updateLocalization();
+		public slots:
+			void stopDrawing();
+			void drawBots();
 
-private:
-    std::vector<QDockWidget*> dockWidget;
-    data::DataManager::ptr dataManager;
-    image::PaintField* paintField;
-    image::PaintLocalization* paintLocalization;
-    BMPImageViewer* fieldView;
-    image::OverlayedImage *particlesOnField;
-    man::memory::MLocalization::const_ptr localizationStream;
-    
-};
+		private:
+			data::DataManager::ptr dataManager;
+			viewer::BMPImageViewer* fieldView;
+			image::OverlayedImage* overlayView;
+			image::PaintBots* bot_locs;
+			image::PaintField* fieldImage;
+			bool keepDrawing;
 
-}
+		protected:
+			QPushButton* startButton;
+			QPushButton* stopButton;
+			QVBoxLayout* mainLayout;
+			QHBoxLayout* buttonLayout;
+			QHBoxLayout* field;
+			QSpacerItem* spacer;
+			float scaleFactor;
+		};
+
+
+	}
 }
