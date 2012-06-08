@@ -21,6 +21,8 @@ namespace qtool {
 		{
 			bitmap.fill(Qt::transparent);
 			QPainter painter(&bitmap);
+			painter.translate(0, FIELD_HEIGHT);
+			painter.scale(1, -1);
 
 			QColor orange = QColor::fromRgb(Color_RGB[Orange]);
 			painter.setPen(orange); //pen can always be orange

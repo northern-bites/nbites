@@ -33,7 +33,7 @@ namespace qtool {
 				quint16 datagram_port;
 				char* data = new char[datagram_size];
 				udpSocket.readDatagram(data, datagram_size, &datagram_source, &datagram_port);
-				if(datagram_size==80){
+				if(datagram_size==112){ //this needs to be here to ignore the discovery messages
 					data+=sizeof(CommPacketHeader); //cut off the header bytes
 					Bot newBot;
 					newBot.address = datagram_source;
