@@ -6,6 +6,8 @@ from . import HeadTrackingHelper as helper
 import man.motion.HeadMoves as HeadMoves
 from ..util import FSA
 
+import man.motion.StiffnessModes as stiff
+
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""
 
@@ -130,6 +132,19 @@ class HeadTracking(FSA.FSA):
         """Look towards given target, using localization values."""
         self.target.height = 0
         self.switchTo('lookToPoint')
+
+    def lookToAngle(self, angle):
+        """
+        Look toward a specific angle relative to forward (ie set yaw).
+        """
+        self.target = 0
+        if angle < 57.0 and angle > -57.0:
+            self.headMove = (((angle, 17.0), 2.0, 1,
+                             stiff.LOW_HEAD_STIFFNESSES), )
+        else:
+            self.headMove = (((angle, 11.0), 2.0, 1,
+                             stiff.LOW_HEAD_STIFFNESSES), )
+        self.switchTo('doHeadMove')
 
     # Currently bypasses states.
     # Not called anywhere in code.

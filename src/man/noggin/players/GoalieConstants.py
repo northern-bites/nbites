@@ -3,14 +3,24 @@
 # are kept here.
 #
 
-import noggin_constants as NogCon
+import noggin_constants as constants
+from math import atan2, degrees
+
+# Lizzie's:
+INITIAL_X = constants.MY_GOALBOX_RIGHT_X
+INITIAL_Y = constants.FIELD_WHITE_BOTTOM_SIDELINE_Y
+INITIAL_ANGLE = degrees(atan2(
+        INITIAL_X-constants.LANDMARK_MY_GOAL_RIGHT_POST_X,
+        constants.LANDMARK_MY_GOAL_RIGHT_POST_Y-INITIAL_Y))
+
+# Dani's stuff below:
 
 # *****************
 #     Position    *
 # *****************
 
 # Distance from the ball at which we use active localization
-ACTIVE_LOC_THRESH = (NogCon.FIELD_WIDTH/ 4)
+ACTIVE_LOC_THRESH = (constants.FIELD_WIDTH/ 4)
 
 # Move up so that in center of box
 MOVE_IN_KICKOFF = 18
@@ -69,7 +79,7 @@ OUT_OF_SAVE = 30
 
 # The chasing box
 CHASE_BUFFER = 10
-CHASE_RIGHT_X_LIMIT = NogCon.MY_GOALBOX_RIGHT_X + 80
+CHASE_RIGHT_X_LIMIT = constants.MY_GOALBOX_RIGHT_X + 80
 
 # Sanity checks for chasing
 CHASE_RELX_BUFFER = CHASE_RIGHT_X_LIMIT

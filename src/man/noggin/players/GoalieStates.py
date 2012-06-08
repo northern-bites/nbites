@@ -1,5 +1,6 @@
 import time
 from objects import RelRobotLocation
+from GoalieConstants import INITIAL_ANGLE
 
 import man.motion.SweetMoves as SweetMoves
 
@@ -21,7 +22,7 @@ def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.lookToAngle(INITIAL_ANGLE)
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -37,6 +38,7 @@ def gameReady(player):
     #  was just scored. If so, walk forward enough to require manual positioning.
     #  Otherwise, every goal accumulates forward walk, and goalie ends up out
     #  of position.
+
 
     return player.stay()
 
