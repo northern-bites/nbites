@@ -39,7 +39,7 @@ noggin/util/fakeData/*
 /noggin/offline/faker
 /noggin/offline/fakerData/*
 /util/GameController/GameController.log
-/src/qtool/.geometry
+*.geometry
 *~
 docs/*
 *.wav
