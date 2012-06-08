@@ -30,48 +30,6 @@ namespace qtool {
 			fieldView = new BMPImageViewer(fieldImage, this);
 
 			spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-<<<<<<< HEAD
-  void FieldViewer::updateLocalization()
-  {
-      float xEst = localizationStream->get()->x_est();
-      float yEst = localizationStream->get()->y_est();
-      float hEst = localizationStream->get()->h_est();
-
-      PF::ParticleSet updateParticles;
-      proto::PLoc::Particle p;
-      for(int i = 0; i < localizationStream->get()->particles_size(); ++i)
-      {
-	assert(i < localizationStream->get()->particles_size());
-	p = localizationStream->get()->particles(i);
-	//std::cout << i << " " << localizationStream->get()->particles_size() << "\n";
-      	//std::cout << p.DebugString() << std::endl;
-      	float x = p.x();
-      	float y = p.y();
-      	float h = p.h();
-      	float w = p.w();
-      	updateParticles.push_back(PF::LocalizationParticle(PF::Location(x, y, h), w));
-      }
-
-      std::cout << "Updating " << localizationStream->get()->particles_size() << " particles." << std::endl;
-
-      paintLocalization->updateEstimates(xEst, yEst, hEst);
-
-      paintLocalization->updateWithParticles(updateParticles);
-
-      fieldView->updateView();
-
-      // std::cout << "Updating localization... (" 
-      // 		<< xEst << ", " 
-      // 		<< yEst << ", "
-      // 		<< hEst << ") "
-      // 		<< std::endl;
-
-      //std::cout << "Counted " << localizationStream->get()->particles_size()
-      //<< "." << std::endl;
-  }
-
-=======
 			field = new QHBoxLayout();
 			field->addWidget(fieldView);
 
@@ -118,7 +76,6 @@ namespace qtool {
 			}
 		}
 	}
->>>>>>> nbites/master
 }
 
 
