@@ -17,10 +17,11 @@ namespace qtool {
 		QColor grey = QColor::fromRgb(Color_RGB[Grey]);
 		QColor playerColor; QPen pen;
 
-		PaintBots::PaintBots(QObject *parent):
+		PaintBots::PaintBots(QObject *parent, float sF):
 			BMPImage(parent)
 		{
-			bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
+			scaleFactor = 1.25;
+			bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
 			locs = new BotLocs();
 		}
 
@@ -30,7 +31,7 @@ namespace qtool {
 			bitmap.fill(Qt::transparent);
 			QPainter painter(&bitmap);
 			painter.translate(0, FIELD_HEIGHT);
-			painter.scale(1, -1);
+			painter.scale(1*scaleFactor, -1*scaleFactor);
 
 			for(int i=1; i < locs->getSize(); i++) { //the first bot is a placeholder
 				//set pen/brush for correct team

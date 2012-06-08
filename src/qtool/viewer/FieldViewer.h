@@ -56,6 +56,7 @@ namespace qtool {
 			QHBoxLayout* buttonLayout;
 			QHBoxLayout* field;
 			QSpacerItem* spacer;
+			float scaleFactor;
 		};
 
 

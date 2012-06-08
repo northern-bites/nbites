@@ -27,14 +27,15 @@ namespace qtool {
 			Q_OBJECT
 
 			public:
-			PaintBots(QObject *parent = 0);
+			PaintBots(QObject *parent = 0, float sF = (float)1.0);
 			~PaintBots(){}
-			unsigned getWidth() const { return FIELD_WIDTH; }
-			unsigned getHeight() const { return FIELD_HEIGHT; }
+			unsigned getWidth() const { return FIELD_WIDTH*scaleFactor; }
+			unsigned getHeight() const { return FIELD_HEIGHT*scaleFactor; }
 			viewer::BotLocs* locs;
 
 		protected:
 			virtual void buildBitmap();
+			float scaleFactor;
 
 		};
 

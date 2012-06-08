@@ -21,15 +21,11 @@ namespace qtool {
 			stopButton(new QPushButton("Stop Location", this)) {
 
 			mainLayout = new QVBoxLayout(this);
-
-			//scaling factors for big view
-			float scaleX = this->width()/(float)FIELD_WIDTH;
-			float scaleY = this->height()/(float)FIELD_HEIGHT;
-			qDebug()<<scaleX<<scaleY;
+			scaleFactor = (float)1.35;
 
 			//field image painted via overlay of robots, field
-			fieldImage = new PaintField(this);
-			bot_locs = new PaintBots(this);
+			fieldImage = new PaintField(this, scaleFactor);
+			bot_locs = new PaintBots(this, scaleFactor);
 			overlayView = new OverlayedImage(fieldImage, bot_locs, this);
 			fieldView = new BMPImageViewer(fieldImage, this);
 
