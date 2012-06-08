@@ -85,11 +85,13 @@ public:
     }
 
     virtual unsigned byteSize() const {
+        unsigned byteSize = 0;
         if (protoMessage.get()) {
-            return protoMessage->ByteSize();
-        } else {
-            return 0;
+            objectMutex.lock();
+            byteSize = protoMessage->ByteSize();
+            objectMutex.unlock();
         }
+        return byteSize;
     }
 
     ProtoMessage_const_ptr getProtoMessage() const { return protoMessage; }

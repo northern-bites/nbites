@@ -18,6 +18,8 @@
 
 #include "NaoPaths.h"
 
+using namespace std;
+
 inline float saveAsinh(float xf)
 {
   double x = xf; // yes, we need double here
@@ -370,9 +372,9 @@ void WalkingEngine::updateMotionRequest()
       if (!warned) {
           bhwalk_out << "The walking engine is switching to "
                   << getName(requestedMotionType)
-                  << "!" << endl;
+                  << "!" << std::endl;
           if (instable) {
-              std::cout << "Warning - the walk engine is set to stand because of stability issues" << endl;
+              std::cout << "Warning - the walk engine is set to stand because of stability issues" << std::endl;
           }
       }
       warned = true;

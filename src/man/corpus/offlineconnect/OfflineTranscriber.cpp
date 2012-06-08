@@ -7,7 +7,7 @@ using namespace man::memory;
 namespace man {
 namespace corpus {
 
-OfflineTranscriber::OfflineTranscriber(shared_ptr<Sensors> s,
+OfflineTranscriber::OfflineTranscriber(boost::shared_ptr<Sensors> s,
 			MVisionSensors::const_ptr mvisionSensors,
 			MMotionSensors::const_ptr mmotionSensors)
     : Transcriber(s),
