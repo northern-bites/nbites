@@ -10,13 +10,15 @@
 #pragma once
 
 #include <QComboBox>
+#include <QMouseEvent>
 #include "BMPImageViewer.h"
+#include "BMPImageViewerListener.h"
 #include "image/BMPYUVImage.h"
 
 namespace qtool {
 namespace viewer {
 
-class ChannelImageViewer: public BMPImageViewer {
+class ChannelImageViewer: public BMPImageViewerListener {
     Q_OBJECT;
 public:
 
@@ -30,6 +32,7 @@ public:
         return BMPImageViewer::minimumSizeHint() +
                    QSize(0, channelSelect.height());
     }
+
 
 public slots:
     void selectionChanged(int i);
