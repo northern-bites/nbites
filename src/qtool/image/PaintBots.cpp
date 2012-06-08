@@ -74,18 +74,21 @@ namespace qtool {
 				painter.drawLine(robotPt, hUncertL1);
 				painter.drawLine(robotPt, hUncertL2);
 
-                //ball
-				painter.setPen(ball);
-				painter.setBrush(ball);
-				painter.drawEllipse(ballPt, 5, 5);
+                //don't draw ball if robot thinks its distance is 0)
+				if(robotPt!=ballPt){
+					//ball
+					painter.setPen(ball);
+					painter.setBrush(ball);
+					painter.drawEllipse(ballPt, 5, 5);
 
-				//ball uncertainty
-				painter.setBrush(Qt::NoBrush);
-				painter.drawEllipse(ballPt, locs->getBallXUncert(i), locs->getBallYUncert(i));
+					//ball uncertainty
+					painter.setBrush(Qt::NoBrush);
+					painter.drawEllipse(ballPt, locs->getBallXUncert(i), locs->getBallYUncert(i));
 
-				//robot-ball line
-				painter.setPen(Qt::DashLine);
-				painter.drawLine(ballPt, robotPt);
+					//robot-ball line
+					painter.setPen(Qt::DashLine);
+					painter.drawLine(ballPt, robotPt);
+				}
 
 			}
 		}

@@ -33,13 +33,16 @@ class PaintField : public image::BMPImage {
     Q_OBJECT
 
 public:
-    PaintField(QObject *parent = 0);
+	PaintField(QObject *parent = 0);
+	//PaintField(QObject *parent = 0, float scaleX = 1.0, float scaleY = 1.0);
 
     unsigned getWidth() const { return FIELD_WIDTH; }
     unsigned getHeight() const { return FIELD_HEIGHT; }
 
 protected:
     virtual void buildBitmap();
+	float sX;
+	float sY;
 
 };
 

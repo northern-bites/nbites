@@ -52,12 +52,10 @@ namespace qtool {
 		protected:
 			QPushButton* startButton;
 			QPushButton* stopButton;
-			QHBoxLayout* mainLayout;
-			QVBoxLayout* buttonLayout;
-			QVBoxLayout* field;
-			QDockWidget* dockWidget;
-			QSpacerItem* fieldSpacer;
-			QSpacerItem* buttonSpacer;
+			QVBoxLayout* mainLayout;
+			QHBoxLayout* buttonLayout;
+			QHBoxLayout* field;
+			QSpacerItem* spacer;
 		};
 
 
