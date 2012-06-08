@@ -110,18 +110,7 @@ class HeadTracking(FSA.FSA):
 
     ################### End Fixed Pitch #####################
 
-    # Probably needs fixing.
-    def kickDecideScan(self):
-        """Execute a triangle pan."""
-        self.lastDiffState = 'stop' # ensure we go back to stop after return
-        self.goalieActiveLoc = False
-        if (self.currentState != 'trianglePan' or
-            self.currentState != 'trianglePanLeft' or
-            self.currentState != 'trianglePanRight' or
-            self.currentState != 'trianglePanReturn'):
-            self.switchTo('trianglePan')
-
-    # Might need adjustments for current kicks.
+    # Needs adjustments for current kicks.
     def afterKickScan(self, name):
         """
         After a kick, looks in the appropriate direction
