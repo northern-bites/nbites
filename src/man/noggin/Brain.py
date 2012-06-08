@@ -128,6 +128,7 @@ class Brain(object):
         """
         # Build instances of the vision based field objects
         # Left post is on that goalie's left
+        # Note: As of 6/8/12, ygrp holds info about ambiguous posts
         # Yellow goal left and right posts
         self.yglp = FieldObject(self.vision.yglp,
                                 Constants.vis_landmark.VISION_YGLP,
@@ -339,6 +340,15 @@ class Brain(object):
                                     loc.ballVelX,
                                     loc.ballVelY))
             self.out.logSComm(packet)
+
+    # TODO: Take this out once new comm is in...
+    def activeTeamMates(self):
+        activeMates = 0
+        for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
+            mate = self.teamMembers[i]
+            if mate.active:
+                activeMates += 1
+        return activeMates
 
     def resetLocalization(self):
         """

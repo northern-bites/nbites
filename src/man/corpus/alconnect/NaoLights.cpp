@@ -55,7 +55,7 @@ void NaoLights::generateLeds(){
 
 void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
     pthread_mutex_lock(&lights_mutex);
-    //Slow, but there are only 13 leds, so it shouldn't be too bad...
+    //Slow, but there are only 31 leds, so it shouldn't be too bad...
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         if(LED_NAMES[i].compare(led_id) == 0){
             hexList[i] = newRgbHex;
@@ -64,17 +64,9 @@ void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
     }
     pthread_mutex_unlock(&lights_mutex);
 }
-   
-#include <iomanip>
-   
+
 void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
     pthread_mutex_lock(&lights_mutex);
-	
-	std::cout << "Sent LED command to " << led_id << " with color ";
-	std::cout << std::setfill('0') << std::setw(6);
-	std::cout << std::hex << newRgbHex << std::endl;
-	std::cout << std::dec;
-	
     hexList[led_id] = newRgbHex;
     pthread_mutex_unlock(&lights_mutex);
 }

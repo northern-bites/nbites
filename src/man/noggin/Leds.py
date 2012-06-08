@@ -1,4 +1,5 @@
 import _lights
+import vision
 from playbook import PBConstants
 import noggin_constants as NogginConstants
 
@@ -9,7 +10,7 @@ BALL_LEDS = True
 GOAL_LEDS = True
 PLAYBOOK_LEDS = True
 LOC_LEDS = False
-COMM_LEDS = False
+COMM_LEDS = True
 
 ####### LED DEFINITIONS #############
 LED_OFF = 0
@@ -17,14 +18,30 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
-(LEFT_LOC_LED,
-LEFT_COMM_LED,
-RIGHT_LOC_LED,
-RIGHT_COMM_LED,
+(LEFT_LOC_ONE_LED,
+LEFT_LOC_TWO_LED,
+LEFT_LOC_THREE_LED,
+LEFT_LOC_FOUR_LED,
+LEFT_LOC_FIVE_LED,
+RIGHT_LOC_ONE_LED,
+RIGHT_LOC_TWO_LED,
+RIGHT_LOC_THREE_LED,
+RIGHT_LOC_FOUR_LED,
+RIGHT_LOC_FIVE_LED,
+LEFT_COMM_ONE_LED,
+LEFT_COMM_TWO_LED,
+LEFT_COMM_THREE_LED,
+LEFT_COMM_FOUR_LED,
+LEFT_COMM_FIVE_LED,
+RIGHT_COMM_ONE_LED,
+RIGHT_COMM_TWO_LED,
+RIGHT_COMM_THREE_LED,
+RIGHT_COMM_FOUR_LED,
+RIGHT_COMM_FIVE_LED,
 SUBROLE_LED,
 ROLE_LED,
 BALL_LED,
-LEFT_GOAL_LED,
+LEFT_GOAL_LED, # 7
 RIGHT_GOAL_LED,
 GOAL_ID_LED,
 CHEST_LED,
@@ -42,6 +59,9 @@ PURPLE= 0xFF00FF
 CYAN  = 0x00FFFF
 WHITE = 0xFFFFFF
 OFF   = 0x000000
+PINK  = 0xFF1493
+EYE_YELLOW= 0xFF4400
+
 NOW = 0.0
 
 ##### Ball  #####
@@ -50,7 +70,7 @@ BALL_OFF_LEDS = ((BALL_LED, BLUE, NOW),)
 
 ##### Roles #####
 CHASER_ON_LEDS =   ((ROLE_LED, RED, NOW),)
-OFFENDER_ON_LEDS = ((ROLE_LED, YELLOW, NOW),)
+OFFENDER_ON_LEDS = ((ROLE_LED, EYE_YELLOW, NOW),)
 MIDDIE_ON_LEDS =   ((ROLE_LED, GREEN, NOW),)
 DEFENDER_ON_LEDS = ((ROLE_LED, BLUE, NOW),)
 DUB_DEFEND_ON_LEDS=((ROLE_LED, CYAN, NOW),)
@@ -59,7 +79,7 @@ ROLE_OFF_LEDS =    ((ROLE_LED, OFF, NOW),)
 
 ##### SubRoles #####
 AGGRESSIVE_LEDS = ((SUBROLE_LED, RED, NOW),)
-BOLD_LEDS =       ((SUBROLE_LED, YELLOW, NOW),)
+BOLD_LEDS =       ((SUBROLE_LED, EYE_YELLOW, NOW),)
 CAUTIOUS_LEDS =   ((SUBROLE_LED, GREEN, NOW),)
 GUARDED_LEDS =    ((SUBROLE_LED, BLUE, NOW),)
 
@@ -71,20 +91,60 @@ GOALIE_RIGHT_LEDS =  ((SUBROLE_LED, GREEN, NOW),)
 OTHER_SUBROLE_LEDS= ((SUBROLE_LED, OFF, NOW),)
 
 ##### GOAL ######
-LEFT_POST_ON_LEDS =   ((LEFT_GOAL_LED, YELLOW, NOW),)
-LEFT_POST_AMBIGUOUS_LEDS = ((LEFT_GOAL_LED, GREEN, NOW),)
-LEFT_POST_OFF_LEDS = ((LEFT_GOAL_LED, BLUE, NOW),)
-RIGHT_POST_ON_LEDS =  ((RIGHT_GOAL_LED, YELLOW, NOW),)
-RIGHT_POST_AMBIGUOUS_LEDS = ((RIGHT_GOAL_LED, GREEN, NOW),)
-RIGHT_POST_OFF_LEDS = ((RIGHT_GOAL_LED, BLUE, NOW),)
+LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, EYE_YELLOW, NOW),)
+LEFT_POST_AMBIGUOUS_LEDS = ((RIGHT_GOAL_LED, GREEN, NOW),)
+LEFT_POST_OFF_LEDS = ((RIGHT_GOAL_LED, BLUE, NOW),)
+RIGHT_POST_ON_LEDS =  ((LEFT_GOAL_LED, EYE_YELLOW, NOW),)
+RIGHT_POST_AMBIGUOUS_LEDS = ((LEFT_GOAL_LED, GREEN, NOW),)
+RIGHT_POST_OFF_LEDS = ((LEFT_GOAL_LED, BLUE, NOW),)
+
+BLUE_GOAL_LEDS = ((GOAL_ID_LED, BLUE, NOW),)
+PINK_GOAL_LEDS = ((GOAL_ID_LED, PINK, NOW),)
+NO_GOAL_LEDS =   ((GOAL_ID_LED, OFF, NOW),)
 
 ##### LOC #####
-LEFT_LOC_LEDS = ((LEFT_LOC_LED, BLUE, NOW),)
-RIGHT_LOC_LEDS = ((RIGHT_LOC_LED, BLUE, NOW),)
+LEFT_LOC_ONE_LEDS   = ((LEFT_LOC_ONE_LED, BLUE, NOW),)
+LEFT_LOC_TWO_LEDS   = ((LEFT_LOC_TWO_LED, BLUE, NOW),)
+LEFT_LOC_THREE_LEDS = ((LEFT_LOC_THREE_LED, BLUE, NOW),)
+LEFT_LOC_FOUR_LEDS  = ((LEFT_LOC_FOUR_LED, BLUE, NOW),)
+LEFT_LOC_FIVE_LEDS  = ((LEFT_LOC_FIVE_LED, BLUE, NOW),)
+RIGHT_LOC_ONE_LEDS  = ((RIGHT_LOC_ONE_LED, BLUE, NOW),)
+RIGHT_LOC_TWO_LEDS  = ((RIGHT_LOC_TWO_LED, BLUE, NOW),)
+RIGHT_LOC_THREE_LEDS= ((RIGHT_LOC_THREE_LED, BLUE, NOW),)
+RIGHT_LOC_FOUR_LEDS = ((RIGHT_LOC_FOUR_LED, BLUE, NOW),)
+RIGHT_LOC_FIVE_LEDS = ((RIGHT_LOC_FIVE_LED, BLUE, NOW),)
+LEFT_LOC_ONE_OFF_LEDS   = ((LEFT_LOC_ONE_LED, OFF, NOW),)
+LEFT_LOC_TWO_OFF_LEDS   = ((LEFT_LOC_TWO_LED, OFF, NOW),)
+LEFT_LOC_THREE_OFF_LEDS = ((LEFT_LOC_THREE_LED, OFF, NOW),)
+LEFT_LOC_FOUR_OFF_LEDS  = ((LEFT_LOC_FOUR_LED, OFF, NOW),)
+LEFT_LOC_FIVE_OFF_LEDS  = ((LEFT_LOC_FIVE_LED, OFF, NOW),)
+RIGHT_LOC_ONE_OFF_LEDS  = ((RIGHT_LOC_ONE_LED, OFF, NOW),)
+RIGHT_LOC_TWO_OFF_LEDS  = ((RIGHT_LOC_TWO_LED, OFF, NOW),)
+RIGHT_LOC_THREE_OFF_LEDS= ((RIGHT_LOC_THREE_LED, OFF, NOW),)
+RIGHT_LOC_FOUR_OFF_LEDS = ((RIGHT_LOC_FOUR_LED, OFF, NOW),)
+RIGHT_LOC_FIVE_OFF_LEDS = ((RIGHT_LOC_FIVE_LED, OFF, NOW),)
 
 ##### COMM #####
-LEFT_COMM_LEDS = ((LEFT_COMM_LED, BLUE, NOW),)
-RIGHT_COMM_LEDS = ((RIGHT_COMM_LED, BLUE, NOW),)
+LEFT_COMM_ONE_LEDS   = ((LEFT_COMM_ONE_LED, BLUE, NOW),)
+LEFT_COMM_TWO_LEDS   = ((LEFT_COMM_TWO_LED, BLUE, NOW),)
+LEFT_COMM_THREE_LEDS = ((LEFT_COMM_THREE_LED, BLUE, NOW),)
+LEFT_COMM_FOUR_LEDS  = ((LEFT_COMM_FOUR_LED, BLUE, NOW),)
+LEFT_COMM_FIVE_LEDS  = ((LEFT_COMM_FIVE_LED, BLUE, NOW),)
+RIGHT_COMM_ONE_LEDS  = ((RIGHT_COMM_ONE_LED, BLUE, NOW),)
+RIGHT_COMM_TWO_LEDS  = ((RIGHT_COMM_TWO_LED, BLUE, NOW),)
+RIGHT_COMM_THREE_LEDS= ((RIGHT_COMM_THREE_LED, BLUE, NOW),)
+RIGHT_COMM_FOUR_LEDS = ((RIGHT_COMM_FOUR_LED, BLUE, NOW),)
+RIGHT_COMM_FIVE_LEDS = ((RIGHT_COMM_FIVE_LED, BLUE, NOW),)
+LEFT_COMM_ONE_OFF_LEDS   = ((LEFT_COMM_ONE_LED, OFF, NOW),)
+LEFT_COMM_TWO_OFF_LEDS   = ((LEFT_COMM_TWO_LED, OFF, NOW),)
+LEFT_COMM_THREE_OFF_LEDS = ((LEFT_COMM_THREE_LED, OFF, NOW),)
+LEFT_COMM_FOUR_OFF_LEDS  = ((LEFT_COMM_FOUR_LED, OFF, NOW),)
+LEFT_COMM_FIVE_OFF_LEDS  = ((LEFT_COMM_FIVE_LED, OFF, NOW),)
+RIGHT_COMM_ONE_OFF_LEDS  = ((RIGHT_COMM_ONE_LED, OFF, NOW),)
+RIGHT_COMM_TWO_OFF_LEDS  = ((RIGHT_COMM_TWO_LED, OFF, NOW),)
+RIGHT_COMM_THREE_OFF_LEDS= ((RIGHT_COMM_THREE_LED, OFF, NOW),)
+RIGHT_COMM_FOUR_OFF_LEDS = ((RIGHT_COMM_FOUR_LED, OFF, NOW),)
+RIGHT_COMM_FIVE_OFF_LEDS = ((RIGHT_COMM_FIVE_LED, OFF, NOW),)
 
 ##### KICKOFF #####
 HAVE_KICKOFF_LEDS  = ((RIGHT_FOOT_LED, WHITE, NOW),)
@@ -109,6 +169,9 @@ class Leds():
         self.brain = brainPtr
         self.kickoffChange = True
         self.teamChange = True
+        self.goalCertainty = 0
+        self.facingOpp = -1
+        self.numActiveMates = 0
 
     def processLeds(self):
         if BALL_LEDS:
@@ -118,21 +181,56 @@ class Leds():
                 self.executeLeds(BALL_OFF_LEDS)
 
         if GOAL_LEDS:
-            if (self.brain.myGoalLeftPost.vis.framesOn == 1 or
-                self.brain.oppGoalLeftPost.vis.framesOn == 1 or
-                self.brain.myGoalRightPost.vis.framesOn == 1 or
-                self.brain.oppGoalRightPost.vis.framesOn == 1):
+            newCertainty = self.brain.ygrp.vis.certainty
 
-                self.executeLeds(LEFT_POST_ON_LEDS)
+            if (newCertainty == vision.certainty.NOT_SURE):
+                if (self.brain.ygrp.vis.on and
+                    (self.brain.ygrp.vis.framesOn == 1 or
+                     self.goalCertainty != newCertainty)):
+                    #we see an ambiguous post for the first time!
+                    self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
+                    self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
+            if(newCertainty == vision.certainty._SURE and
+               self.brain.ygrp.vis.on and
+               (self.brain.ygrp.vis.framesOn == 1 or
+                self.goalCertainty != newCertainty)):
+                #we see the right post for the first time!
                 self.executeLeds(RIGHT_POST_ON_LEDS)
-
-            elif (self.brain.myGoalLeftPost.vis.framesOff == 1 or
-                self.brain.oppGoalLeftPost.vis.framesOff == 1 or
-                self.brain.myGoalRightPost.vis.framesOff == 1 or
-                self.brain.oppGoalRightPost.vis.framesOff == 1):
-
-                self.executeLeds(LEFT_POST_OFF_LEDS)
+            if(self.brain.yglp.vis.on and
+               (self.brain.yglp.vis.framesOn == 1 or
+                self.goalCertainty != newCertainty)):
+                #we see the left post for the first time!
+                self.executeLeds(LEFT_POST_ON_LEDS)
+            if(self.brain.ygrp.vis.framesOff == 1):
+                #we don't see the right post for the first time
                 self.executeLeds(RIGHT_POST_OFF_LEDS)
+            if((self.brain.ygrp.vis.framesOff >= 1 or
+                newCertainty != vision.certainty.NOT_SURE) and
+               (self.brain.yglp.vis.framesOff == 1 or
+                self.goalCertainty != newCertainty)):
+                #we don't see the left post for the first time
+                self.executeLeds(LEFT_POST_OFF_LEDS)
+
+            self.goalCertainty = newCertainty
+
+
+            # TODO make this part actually tell us if we are looking at our goal or not
+            # via flag in loc (???)
+            newFacingOpp = (-90 < self.brain.my.h < 90)
+            if (newFacingOpp != self.facingOpp or
+                self.facingOpp == -1):
+                self.facingOpp = newFacingOpp
+                if -90 < self.brain.my.h < 90:
+                    if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                        self.executeLeds(PINK_GOAL_LEDS)
+                    else:
+                        self.executeLeds(BLUE_GOAL_LEDS)
+                else:
+                    if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                        self.executeLeds(BLUE_GOAL_LEDS)
+                    else:
+                        self.executeLeds(PINK_GOAL_LEDS)
+#                self.executeLeds(NO_GOAL_LEDS)
 
         if PLAYBOOK_LEDS:
             if self.brain.playbook.roleChanged():
@@ -192,7 +290,39 @@ class Leds():
             pass
 
         if COMM_LEDS:
-            pass
+            newActiveMates = self.brain.activeTeamMates()
+            if (newActiveMates != self.numActiveMates):
+                self.numActiveMates = newActiveMates
+                if(self.numActiveMates > 0):
+                    self.executeLeds(LEFT_COMM_ONE_LEDS)
+                    self.executeLeds(RIGHT_COMM_ONE_LEDS)
+                else:
+                    self.executeLeds(LEFT_COMM_ONE_OFF_LEDS)
+                    self.executeLeds(RIGHT_COMM_ONE_OFF_LEDS)
+                if(self.numActiveMates > 1):
+                    self.executeLeds(LEFT_COMM_TWO_LEDS)
+                    self.executeLeds(RIGHT_COMM_TWO_LEDS)
+                else:
+                    self.executeLeds(LEFT_COMM_TWO_OFF_LEDS)
+                    self.executeLeds(RIGHT_COMM_TWO_OFF_LEDS)
+                if(self.numActiveMates > 2):
+                    self.executeLeds(LEFT_COMM_THREE_LEDS)
+                    self.executeLeds(RIGHT_COMM_THREE_LEDS)
+                else:
+                    self.executeLeds(LEFT_COMM_THREE_OFF_LEDS)
+                    self.executeLeds(RIGHT_COMM_THREE_OFF_LEDS)
+                if(self.numActiveMates > 3):
+                    self.executeLeds(LEFT_COMM_FOUR_LEDS)
+                    self.executeLeds(RIGHT_COMM_FOUR_LEDS)
+                else:
+                    self.executeLeds(LEFT_COMM_FOUR_OFF_LEDS)
+                    self.executeLeds(RIGHT_COMM_FOUR_OFF_LEDS)
+                if(self.numActiveMates > 4):
+                    self.executeLeds(LEFT_COMM_FIVE_LEDS)
+                    self.executeLeds(RIGHT_COMM_FIVE_LEDS)
+                else:
+                    self.executeLeds(LEFT_COMM_FIVE_OFF_LEDS)
+                    self.executeLeds(RIGHT_COMM_FIVE_OFF_LEDS)
 
         if GC_LEDS:
             if self.brain.gameController.counter == 1:

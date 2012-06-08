@@ -23,7 +23,7 @@ public:
     virtual void setRGB(const unsigned int led_id, const int newRgbHex){};
     virtual void sendLights(){};
 
-    static const unsigned int NUM_LED_NAMES = 15;
+    static const unsigned int NUM_LED_NAMES = 31;
     static const std::string LED_NAMES[NUM_LED_NAMES];
 
 };

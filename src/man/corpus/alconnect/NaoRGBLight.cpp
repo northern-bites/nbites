@@ -122,5 +122,4 @@ void NaoRGBLight::makeCommand(){
         command[5][i].arraySetSize(1);
         command[5][i][0] = LED_OFF;
     }
-
 }
