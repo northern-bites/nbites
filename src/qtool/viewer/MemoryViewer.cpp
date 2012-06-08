@@ -15,10 +15,8 @@ using namespace man::corpus;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager) {
-    MImage::const_ptr rawMTopImage = memoryManager->getMemory()->
-        getMImage(Camera::TOP);
-    MImage::const_ptr rawMBottomImage = memoryManager->getMemory()->
-        getMImage(Camera::BOTTOM);
+    MImage::const_ptr rawMTopImage = memoryManager->getMemory()->get<MTopImage>();
+    MImage::const_ptr rawMBottomImage = memoryManager->getMemory()->get<MBottomImage>();
 
     FastYUVToBMPImage* rawTopBMP = new
         FastYUVToBMPImage(rawMTopImage, this);
@@ -28,7 +26,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     BMPImageViewer* topImageViewer;
     BMPImageViewer* bottomImageViewer;
 
-      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
+      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->get<MVision>());
 
       OverlayedImage* combo = new OverlayedImage(rawBottomBMP,
                                                  shapes, this);

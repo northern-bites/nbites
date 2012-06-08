@@ -9,9 +9,12 @@
 #include "corpus/offlineconnect/OfflineTranscriber.h"
 #include "corpus/offlineconnect/OfflineEnactor.h"
 
+#include "memory/RobotMemory.h"
+
 using namespace std;
 using boost::shared_ptr;
 using namespace man::corpus;
+using namespace man::memory;
 
 static boost::shared_ptr<TMan> man_pointer;
 
@@ -22,14 +25,14 @@ void loadMan(OfflineManController::ptr offlineController) {
     boost::shared_ptr<Speech> speech(new Speech());
     boost::shared_ptr<Sensors> sensors(new Sensors(speech));
     boost::shared_ptr<Transcriber> transcriber(new OfflineTranscriber(sensors,
-    		offlineController->getFakeMemory()->getMVisionSensors(),
-    		offlineController->getFakeMemory()->getMMotionSensors()));
+    		offlineController->getFakeMemory()->get<MVisionSensors>(),
+    		offlineController->getFakeMemory()->get<MMotionSensors>()));
     boost::shared_ptr<ThreadedImageTranscriber>
         imageTranscriber(new OfflineImageTranscriber(sensors,
                                        offlineController->getFakeMemory()->
-                                                     getMImage(Camera::TOP),
+                                                     get<MTopImage>(),
                                        offlineController->getFakeMemory()->
-                                                getMImage(Camera::BOTTOM)));
+                                                get<MBottomImage>()));
     boost::shared_ptr<MotionEnactor>
         enactor(new OfflineEnactor());
     boost::shared_ptr<Lights> lights(new Lights());

@@ -45,12 +45,12 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 
-set( MEMORY_SRCS Memory
+set( MEMORY_SRCS RobotMemory
                  MVision
                  MVisionSensors
                  MMotionSensors
                  MImage
-		 MLocalization
+				 MLocalization
                  )
 
 set( PARSE_SRCS parse/MessageParser
@@ -107,11 +107,9 @@ target_link_libraries(
     ${PROTOBUF_LIBRARY}
     ${Boost_PYTHON_LIBRARY}
     ${NBINCLUDE_TARGET}
-    ${MEMORY_TARGET}
     )
 
 target_link_libraries(
     ${PARSE_TARGET}
     ${PROTOBUF_LIBRARY}
-    ${MEMORY_TARGET}
     )

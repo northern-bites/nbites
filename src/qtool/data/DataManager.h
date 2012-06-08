@@ -14,7 +14,7 @@
 #include <QObject>
 
 #include "io/InProvider.h"
-#include "man/memory/Memory.h"
+
 #include "man/memory/parse/ParsingBoard.h"
 #include "man/memory/log/LoggingBoard.h"
 #include "DataTypes.h"

@@ -65,7 +65,13 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
     set_lights_pointer(_lights);
     set_speech_pointer(_speech);
 
-    vision = boost::shared_ptr<Vision> (new Vision(pose));
+    memory = RobotMemory::ptr(new RobotMemory(sensors));
+
+    try {
+        vision = boost::shared_ptr<Vision> (new Vision(pose, memory->get<MVision>()));
+    } catch(std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
 
     set_vision_pointer(vision);
 
@@ -80,7 +86,6 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
                                             motion->getInterface()));
 #endif// USE_NOGGIN
 
-    memory = boost::shared_ptr<Memory> (new Memory(vision, sensors, noggin->loc));
     loggingBoard->setMemory(memory);
 
 
@@ -150,9 +155,7 @@ Man::processFrame ()
     sensors->releaseImage();
 //    cout<<vision->ball->getDistance() << endl;
 #endif
-#if defined USE_MEMORY || defined OFFLINE
-    memory->updateVision();
-#endif
+
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif

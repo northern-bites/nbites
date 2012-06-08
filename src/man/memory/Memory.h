@@ -3,9 +3,12 @@
  *
  * This class keeps instances of all the different memory objects and provides
  * an interface through which they get updated (each memory object copies data
- * from its corresponding man object
+ * from its corresponding man object)
  *
- * Each MObject is associated with a MObject_ID that identifies it
+ * Each MObject is associated with a string that identifies it; this string
+ * is usually the class name
+ *
+ * Memory is more or less a glorified ProtobufMessage map
  *
  * Future work: we will be able to keep multiple instances of selected objects
  *
@@ -24,15 +27,6 @@ class Memory; //forward declaration
 }
 }
 
-#include "MVision.h"
-#include "Vision.h"
-#include "MVisionSensors.h"
-#include "MMotionSensors.h"
-#include "MImage.h"
-#include "Camera.h"
-#include "MLocalization.h"
-#include "Sensors.h"
-#include "Profiler.h"
 #include "ClassHelper.h"
 #include "io/ProtobufMessage.h"
 
@@ -64,34 +58,19 @@ class Memory {
     typedef common::io::ProtobufMessage Object;
 
 public:
-    ADD_NULL_INSTANCE(Memory)
     ADD_SHARED_PTR(Memory)
 
-    typedef std::pair<string, boost::shared_ptr<Object> > MObject_IDPair;
-    typedef std::map<string, boost::shared_ptr<Object> > MObject_IDMap;
+    typedef std::pair<std::string, boost::shared_ptr<Object> > MObject_IDPair;
+    typedef std::map<std::string, boost::shared_ptr<Object> > MObject_IDMap;
 
     typedef MObject_IDMap::iterator iterator;
     typedef MObject_IDMap::const_iterator const_iterator;
 
 public:
-    Memory(boost::shared_ptr<Vision> vision_ptr = boost::shared_ptr<Vision>(),
-           boost::shared_ptr<Sensors> sensors_ptr = boost::shared_ptr<Sensors>(),
-           boost::shared_ptr<LocSystem> loc_ptr = boost::shared_ptr<LocSystem>());
-    virtual ~Memory();
-    /**
-     * calls the update function on @obj
-     * this will usually make the MObject pull data
-     * from its corresponding man object
-     */
-    void update(boost::shared_ptr<Object> obj);
-    void updateVision();
+    Memory() {}
+    virtual ~Memory() {}
 
 public:
-    MVision::const_ptr getMVision() const {return mVision;}
-    MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
-    MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
-    MImage::const_ptr getMImage(corpus::Camera::Type which) const;
-
     const_iterator begin() const { return mobject_IDMap.begin(); }
     const_iterator end() const { return mobject_IDMap.end(); }
 
@@ -136,14 +115,10 @@ public:
 
     int numObjects() const { return mobject_IDMap.size(); }
 
-private:
+protected:
     MObject_IDMap mobject_IDMap;
-    boost::shared_ptr<MVision> mVision;
-    boost::shared_ptr<MVisionSensors> mVisionSensors;
-    boost::shared_ptr<MMotionSensors> mMotionSensors;
-    boost::shared_ptr<MBottomImage> mBottomImage;
-    boost::shared_ptr<MTopImage> mTopImage;
-    boost::shared_ptr<MLocalization> mLocalization;
 };
+
+
 }
 }

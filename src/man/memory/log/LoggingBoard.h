@@ -34,7 +34,7 @@ protected:
 	typedef std::map<std::string, MessageLogger::ptr > ObjectIOMap;
 
 public:
-	LoggingBoard(Memory::const_ptr memory = Memory::NullInstanceSharedPtr());
+	LoggingBoard(Memory::const_ptr memory);
 	virtual ~LoggingBoard() {
 	}
 

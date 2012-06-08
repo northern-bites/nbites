@@ -17,7 +17,7 @@ using namespace common::io;
 using boost::shared_ptr;
 
 DataManager::DataManager() :
-        RobotMemoryManager(Memory::ptr(new Memory())),
+        RobotMemoryManager(RobotMemory::ptr(new RobotMemory())),
         groundTruth(new overseer::GroundTruth()),
         groundTruthParser(NULL),
         groundTruthLogger(NULL),

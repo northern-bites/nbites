@@ -23,7 +23,7 @@
 #include "Comm.h"
 #include "Motion.h"
 #include "NaoPose.h"
-#include "memory/Memory.h"
+#include "memory/RobotMemory.h"
 #include "memory/log/LoggingBoard.h"
 #include "synchro/synchro.h"
 #include "RoboGuardian.h"
@@ -83,7 +83,7 @@ public:
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
-    boost::shared_ptr<man::memory::Memory> memory;
+    boost::shared_ptr<man::memory::RobotMemory> memory;
     boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
 
 #ifdef USE_NOGGIN

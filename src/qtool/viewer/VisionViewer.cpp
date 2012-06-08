@@ -21,17 +21,16 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                  topRawImage(new proto::PImage())
 {
 
-    memoryManager->getMemory()->getMVisionSensors()->copyTo(sensors);
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
     vision = shared_ptr<Vision> (new Vision(pose));
-    offlineMVision = shared_ptr<MVision> (new MVision(class_name<MVision>(), vision));
+    offlineMVision = shared_ptr<MVision> (new MVision(class_name<MVision>()));
 
     imageTranscribe = OfflineImageTranscriber::ptr
         (new OfflineImageTranscriber(sensors,
                                      memoryManager->getMemory()->
-                                     getMImage(Camera::TOP),
+                                     get<MTopImage>(),
                                      memoryManager->getMemory()->
-                                     getMImage(Camera::BOTTOM)));
+                                     get<MBottomImage>()));
 
     bottomRawImage->set_width(AVERAGED_IMAGE_WIDTH);
     bottomRawImage->set_height(AVERAGED_IMAGE_HEIGHT);
@@ -77,13 +76,9 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
     FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(memoryManager->
-                                                      getMemory()->
-                                                  getMImage(Camera::BOTTOM),
-                                                      this);
+            getMemory()->get<MBottomImage>(), this);
     FastYUVToBMPImage* rawTopBMP = new FastYUVToBMPImage(memoryManager->
-                                                         getMemory()->
-                                                     getMImage(Camera::TOP),
-                                                         this);
+            getMemory()->get<MTopImage>(), this);
 
     OverlayedImage* combo = new OverlayedImage(rawBottomBMP, shapes, this);
 
@@ -164,7 +159,7 @@ void VisionViewer::update(){
     imageTranscribe->acquireNewImage();
 
     // update the vision body angles
-    MImage::const_ptr mImage = memoryManager->getMemory()->getMImage(Camera::BOTTOM);
+    MImage::const_ptr mImage = memoryManager->getMemory()->get<MBottomImage>();
     std::vector<float> body_angles(mImage->get()->vision_body_angles().begin(),
                                    mImage->get()->vision_body_angles().end());
 

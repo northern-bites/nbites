@@ -27,6 +27,8 @@
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
 
+#include "ClassHelper.h"
+
 #include "SensorDef.h"
 #include "SensorConfigs.h"
 #include "VisionDef.h"
@@ -102,6 +104,9 @@ struct Inertial {
 
 class Sensors : public EventNotifier<SensorsEvent>{
     //friend class Man;
+
+    ADD_SHARED_PTR(Sensors)
+
 public:
     Sensors(boost::shared_ptr<Speech> s);
     virtual ~Sensors();

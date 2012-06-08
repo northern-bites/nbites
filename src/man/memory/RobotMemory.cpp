@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "Common.h"
-#include "Memory.h"
+#include "RobotMemory.h"
 
 namespace man {
 namespace memory {
@@ -11,10 +11,9 @@ using boost::shared_ptr;
 using namespace proto;
 using namespace std;
 
-Memory::Memory(shared_ptr<Vision> vision_ptr,
-               shared_ptr<Sensors> sensors_ptr,
-               shared_ptr<LocSystem> loc_ptr) :
-        mVision(new MVision(class_name<MVision>(), vision_ptr)),
+RobotMemory::RobotMemory(shared_ptr<Sensors> sensors_ptr,
+                         shared_ptr<LocSystem> loc_ptr) :
+        mVision(new MVision(class_name<MVision>())),
         mVisionSensors(new MVisionSensors(class_name<MVisionSensors>(), sensors_ptr)),
         mMotionSensors(new MMotionSensors(class_name<MMotionSensors>(),sensors_ptr)),
         mBottomImage(new MBottomImage(class_name<MBottomImage>(),sensors_ptr)),
@@ -39,21 +38,14 @@ Memory::Memory(shared_ptr<Vision> vision_ptr,
     mobject_IDMap.insert(MObject_IDPair(mLocalization->getName(), mLocalization));
 }
 
-Memory::~Memory() {
-    cout << "Memory destructor" << endl;
+RobotMemory::~RobotMemory() {
+    cout << "Robot Memory destructor" << endl;
 }
 
-void Memory::update(boost::shared_ptr<Object> obj) {
-    obj->update();
-}
-
-void Memory::updateVision() {
-    update(mVision);
-}
-
-MImage::const_ptr Memory::getMImage(corpus::Camera::Type which) const
+MImage::const_ptr RobotMemory::getMImage(corpus::Camera::Type which) const
 {
-    return (which == corpus::Camera::BOTTOM) ? mBottomImage : mTopImage;
+    if (which == corpus::Camera::BOTTOM) return mBottomImage;
+    return mTopImage;
 }
 
 }

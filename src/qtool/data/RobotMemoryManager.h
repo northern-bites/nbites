@@ -15,7 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 
-#include "man/memory/Memory.h"
+#include "man/memory/RobotMemory.h"
 #include "MemorySignalingInterface.h"
 
 namespace qtool {
@@ -27,13 +27,13 @@ class RobotMemoryManager: public QObject {
     ADD_SHARED_PTR(RobotMemoryManager);
 
 public:
-    RobotMemoryManager(man::memory::Memory::ptr memory) :
+    RobotMemoryManager(man::memory::RobotMemory::ptr memory) :
         memory(memory), memorySignalingInterface(memory) {
     }
 
     virtual ~RobotMemoryManager() {}
 
-    man::memory::Memory::const_ptr getMemory() const {
+    man::memory::RobotMemory::const_ptr getMemory() const {
         return memory;
     }
 
@@ -43,7 +43,7 @@ public:
 
 
 protected:
-    man::memory::Memory::ptr memory;
+    man::memory::RobotMemory::ptr memory;
     MemorySignalingInterface memorySignalingInterface;
 
 };

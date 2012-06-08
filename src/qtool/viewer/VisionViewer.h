@@ -17,6 +17,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "man/memory/Memory.h"
+#include "man/vision/Vision.h"
+
 #include "man/corpus/offlineconnect/OfflineImageTranscriber.h"
 #include "image/ThresholdedImage.h"
 #include "image/BMPYUVImage.h"
@@ -30,7 +32,7 @@
 namespace qtool {
 namespace viewer {
 
-class VisionViewer : public QMainWindow{
+class VisionViewer : public QMainWindow {
     Q_OBJECT
 
 public:

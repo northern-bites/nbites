@@ -52,7 +52,21 @@ public:
 
     // this method should update the fields in the protocol buffer
     // in some meaningful way
-    virtual void updateData() = 0;
+    virtual void updateData() {};
+
+    // thread-safety locks; while the lock is on, the object won't serialize
+    // or parse back in
+    // use them with care!
+
+    // TODO: we might need a read lock; what if we're accessing values from the memory object
+    // and it just gets updated?
+    void lock() {
+        objectMutex.lock();
+    }
+
+    void release() {
+        objectMutex.unlock();
+    }
 
     // wraps the updateData with mutex locks and notifications
     virtual void update() {
@@ -113,7 +127,7 @@ class TemplatedProtobufMessage : public ProtobufMessage {
     typedef boost::shared_ptr<ProtoType> data_ptr;
     typedef boost::shared_ptr<const ProtoType> data_const_ptr;
 
-protected:
+public:
     TemplatedProtobufMessage(std::string name, data_ptr protoMessage = data_ptr(new ProtoType)) :
             ProtobufMessage(name, protoMessage), data(protoMessage) {   }
 

@@ -11,12 +11,13 @@ namespace colorcreator {
 using namespace qtool::data;
 using namespace qtool::image;
 using namespace man::corpus;
+using namespace man::memory;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager), imageTabs(new QTabWidget(this)),
-        topImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::TOP),
+        topImage(new BMPYUVImage(dataManager->getMemory()->get<MTopImage>(),
                                  BMPYUVImage::RGB, this)),
-        bottomImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM),
+        bottomImage(new BMPYUVImage(dataManager->getMemory()->get<MBottomImage>(),
                                     BMPYUVImage::RGB, this)),
         topChannelImage(topImage, this),
         bottomChannelImage(bottomImage, this),
