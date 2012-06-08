@@ -38,7 +38,7 @@ namespace qtool {
 
 				if(datagram_size==112){ //this needs to be here to ignore
 					                    //the 60-byte discovery messages
-
+					CommPacketHeader* head = (CommPacketHeader*)data;
 					data+=sizeof(CommPacketHeader); //cut off the header bytes
 					float* floatdata = (float*) data;
 					Bot newBot;
@@ -54,6 +54,7 @@ namespace qtool {
 					newBot.yBall = floatdata[7];
 					newBot.xBallUncert = floatdata[8];
 					newBot.yBallUncert = floatdata[9];
+					newBot.teamColor = head->color;
 
 					//kill the previous instance of this robot in the array
 					for(int i = 0; i < botPositions.size(); i++){
