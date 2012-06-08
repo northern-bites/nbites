@@ -203,6 +203,17 @@ class HeadTrackingHelper(object):
                                          MyMath.degrees(pitch))
         self.tracker.brain.motion.setHead(headMove)
 
+    # Fixed Pitch
+    def lookToAngleFixedPitch(self, yaw):
+        """
+        Looks to the given yaw at the fixed pitch value of 17 degrees.
+        """
+        if yaw > 55 or yaw < -55:
+            headMove = yaw, 11.0
+        else:
+            headMove = yaw, 17.0
+        self.panTo(headMove)
+
     # Consider updating this for new loc and vision systems (summer 2012)
     def calculateClosestLandmark(self):
         brain = self.tracker.brain

@@ -108,6 +108,13 @@ class HeadTracking(FSA.FSA):
         #else:
         #    self.switchTo('lookRightFixedPitch')
 
+    def lookToAngleFixedPitch(self, yaw):
+        """
+        Look to the given yaw at an appropriate fixed pitch.
+        """
+        self.switchTo('stop')
+        self.helper.lookToAngleFixedPitch(yaw)
+
     ################### End Fixed Pitch #####################
 
     # Needs adjustments for current kicks.
