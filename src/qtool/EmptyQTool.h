@@ -36,6 +36,8 @@ protected slots:
     void record();
 
 protected:
+    virtual void keyPressEvent(QKeyEvent * event);
+
     QTabWidget* toolTabs;
 
     data::DataManager::ptr dataManager;
