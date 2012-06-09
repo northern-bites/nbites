@@ -29,7 +29,7 @@ TEST(FieldLinesDetector, Lines)
 
     // Run it through field lines
     fld.gradient = g;
-    fld.houghLines = fld.hough.findLines(g);
+    fld.houghLines = fld.hough->findLines(g);
 
     fld.findFieldLines();
 

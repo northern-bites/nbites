@@ -6,6 +6,7 @@
 #define private public
 #define protected public
 #include "../HoughSpace.h"
+#include "../HoughSpaceImpl.h"
 #undef private
 #undef protected
 
@@ -17,19 +18,17 @@
 using namespace std;
 using boost::shared_ptr;
 
- // 1 bin in the hough space error allowed (plus a floating point error)
-
-
 class HoughSpaceTest : public ::testing::Test
 {
 public:
-    HoughSpace hs;
+    HoughSpaceImpl hs;
 
     // arbitrary acceptance thresholds
     const static float ACCEPT_ANGLE;
     const static int ACCEPT_RADIUS = 0;
 };
 
+// 1 bin in the hough space error allowed (plus a floating point error)
 const float HoughSpaceTest::ACCEPT_ANGLE = 1 * M_PI_FLOAT/128.0f + 0.0001;
 enum { max_parallel_tdiff = 5 };
 
@@ -121,7 +120,7 @@ void test_for_line(uint8_t angle, float radius)
     g.clear();
     g.createLineAtPoint(angle, radius);
 
-    HoughSpace hs;
+    HoughSpaceImpl hs;
     hs.reset();
     hs.findHoughLines(g);
 

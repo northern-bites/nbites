@@ -46,11 +46,12 @@ private:
 
 private:
     EdgeDetector edges;
-    HoughSpace hough;
     Gradient gradient;
+
     std::list<std::pair<HoughLine, HoughLine> > houghLines;
     std::vector<VisualLine> lines;
     std::list<VisualCorner> corners;
+    boost::shared_ptr<HoughSpace> hough;
 };
 
 #endif /* _FieldLinesDetector_h_DEFINED */

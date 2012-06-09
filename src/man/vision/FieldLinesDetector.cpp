@@ -1,13 +1,15 @@
 #include "FieldLinesDetector.h"
 #include <stdio.h>
+#include <boost/make_shared.hpp>
 
 using namespace std;
 using boost::shared_ptr;
 
 FieldLinesDetector::FieldLinesDetector() :
-    VisualDetector(), edges(), hough(), gradient(),
+    VisualDetector(), edges(), gradient(),
     houghLines()
 {
+    hough = HoughSpace::create();
 }
 
 /**
@@ -42,7 +44,7 @@ void FieldLinesDetector::findHoughLines(int upperBound,
 {
     gradient.reset();
     edges.detectEdges(upperBound, field_edge, img, gradient);
-    houghLines = hough.findLines(gradient);
+    houghLines = hough->findLines(gradient);
 }
 
 /**
@@ -67,7 +69,7 @@ void FieldLinesDetector::setEdgeThreshold(int thresh)
 
 void FieldLinesDetector::setHoughAcceptThreshold(int thresh)
 {
-    hough.setAcceptThreshold(thresh);
+    hough->setAcceptThreshold(thresh);
 }
 
 list<HoughLine> FieldLinesDetector::getHoughLines() const

@@ -88,6 +88,7 @@ SET( VISION_SRCS Ball
                  EdgeDetector
                  Gradient
                  HoughSpace
+                 HoughSpaceImpl
                  geom/HoughLine
                  VisualDetector
                  FieldLinesDetector
