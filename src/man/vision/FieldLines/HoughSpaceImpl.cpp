@@ -88,8 +88,8 @@ void HoughSpaceImpl::edge(int x, int y, int t0, int t1)
         int r1 = getR(x, y, t8 + 1);
 
         for (int r = min(r0, r1); r <= max(r0, r1); ++r){
-            int ri = r + r_span / 2;
-            if (0 <=ri && ri <r_span){
+            int ri = r + HC::r_span / 2;
+            if (0 <=ri && ri < HC::r_span){
                 ++hs[t8][ri];
             }
         }
@@ -113,8 +113,9 @@ void HoughSpaceImpl::smooth()
     _smooth_hough(&hs[0][0], getAcceptThreshold());
 #else
     // In-place 2x2 boxcar smoothing
-    for (int t=first_smoothing_row; t < t_span+first_smoothing_row; ++t) {
-        for (int r=0; r < r_span-1; ++r) {
+    for (int t = HC::first_smoothing_row;
+         t < HC::t_span + HC::first_smoothing_row; ++t) {
+        for (int r=0; r < HC::r_span-1; ++r) {
 
             hs[t][r] = static_cast<int16_t>(
                 max((hs[t][r] + hs[t][r+1] + hs[t+1][r] + hs[t+1][r+1] -
@@ -234,6 +235,46 @@ void HoughSpaceImpl::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
     PROF_EXIT(P_SUPPRESS);
 }
 
+/** Compute a ray to line intersection to check if the gradient from
+ * one line is headed towards or away from the other. If it is headed
+ * towards, we are not looking at a line.
+ *
+ *               Line                      Non-line
+ *               |  |                     |        |
+ *           <---|  |--->                 |-->  <--|
+ *               |  |                     |        |
+ *
+ * Reference implementation found here: http://pastebin.com/f22ec3cf1
+ *
+ * @returns whether the gradient from one line points towards or away
+ *          from the other line
+ */
+bool gradientsPointIn(HoughLine i, HoughLine j)
+{
+    typedef pair<double, double> Vec;
+
+    // Find intersection point of i (start of ray, x0)
+    point<double> u_0(AVERAGED_IMAGE_WIDTH/2. + i.getCosT() * i.getRadius(),
+                      AVERAGED_IMAGE_HEIGHT/2. + i.getSinT() * i.getRadius());
+    Vec u(i.getCosT(), i.getSinT());
+
+    // Find intersection point of j (p0)
+    point<double> v_0(AVERAGED_IMAGE_WIDTH/2. + j.getCosT() * j.getRadius(),
+                      AVERAGED_IMAGE_HEIGHT/2. + j.getSinT() * j.getRadius());
+    Vec v(j.getSinT(), -j.getCosT());
+
+    // Compute d = x dot p
+    double d = u.first * v.second - u.second * v.first;
+
+    // Compute w= x - p
+    Vec w(u_0.x - v_0.x, u_0.y - v_0.y);
+
+    // Dot product perp(p) . a
+    double td = (w.first * v.second - w.second * v.first)/d;
+    if (td > 0) return false;
+    return true;
+}
+
 list<pair<int, int> > HoughSpaceImpl::pairLines(ActiveArray<HoughLine>& lines)
 {
     PROF_ENTER(P_PAIR_LINES);
@@ -254,27 +295,21 @@ list<pair<int, int> > HoughSpaceImpl::pairLines(ActiveArray<HoughLine>& lines)
         min_pair_r[i] = std::numeric_limits<int>::max();
     }
 
+    // For each active pair of lines
     for(int i=0; i < size; ++i){
-        if(!lines.active(i)){
-            continue;
-        }
+        if(!lines.active(i)) continue;
 
-        // This inner loop look awkward, yes. I'm avoiding
-        // computation of tDiff and rSum by exiting early.
         for(int j=i+1; j < size; ++j){
+            if (!lines.active(j)) continue;
 
-            if (!lines.active(j)){
-                continue;
-            }
-
+            // Look for two linesg whose
             const int tDiff = abs(abs(lines[i].getTIndex() -
                                       lines[j].getTIndex()) - HC::t_span/2);
 
             // The lines are in order by T, so they won't be any
             // closer after this
-            if (tDiff >= HC::opp_line_thresh){
-                continue;
-            }
+            if (tDiff >= HC::opp_line_thresh) continue;
+            if (gradientsPointIn(lines[i], lines[j])) continue;
 
             const int rSum = abs(lines[i].getRIndex() +
                                  lines[j].getRIndex() - HC::r_span);
@@ -319,8 +354,8 @@ void HoughSpaceImpl::reset()
 #ifdef USE_MMX
     // Array resetting done in edge marking
 #else
-    for (int t=0; t < t_span; ++t) {
-        for (int r=0; r < r_span; ++r) {
+    for (int t=0; t < HC::t_span; ++t) {
+        for (int r=0; r < HC::r_span; ++r) {
             hs[t][r] = 0;
         }
     }

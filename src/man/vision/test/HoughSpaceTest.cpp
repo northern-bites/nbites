@@ -2,6 +2,7 @@
 #include <list>
 #include <string.h>
 #include "ActiveArray.h"
+#include "../FieldLines/HoughConstants.h"
 
 #define private public
 #define protected public
@@ -17,6 +18,7 @@
 
 using namespace std;
 using boost::shared_ptr;
+namespace HC = HoughConstants;
 
 class HoughSpaceTest : public ::testing::Test
 {
@@ -304,4 +306,22 @@ TEST_F(HoughSpaceTest, Pairing)
             EXPECT_NE(l->second, l2->second);
         }
     }
+}
+
+TEST_F(HoughSpaceTest, GoodPair)
+{
+    hs.activeLines.add(HoughLine(HC::r_span/2 + 20, 0, 100));
+    hs.activeLines.add(HoughLine(HC::r_span/2 + 20, 128, 100));
+
+    list<pair<HoughLine, HoughLine> > lines = hs.narrowHoughLines();
+    EXPECT_EQ(1, lines.size());
+}
+
+TEST_F(HoughSpaceTest, BadPair)
+{
+    hs.activeLines.add(HoughLine(HC::r_span/2 - 20, 0, 100));
+    hs.activeLines.add(HoughLine(HC::r_span/2 - 20, 128, 100));
+
+    list<pair<HoughLine, HoughLine> > lines = hs.narrowHoughLines();
+    EXPECT_TRUE(lines.empty());
 }
