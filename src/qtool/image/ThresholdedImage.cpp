@@ -3,8 +3,10 @@
 namespace qtool {
 namespace image {
 
+using namespace data;
+
 ThresholdedImage::ThresholdedImage(
-        boost::shared_ptr<const man::memory::proto::PImage> rawImage,
+        ImagePtr rawImage,
         QObject* parent, byte filter) :
     BMPImage(parent), rawImage(rawImage), filter(filter)
 { }

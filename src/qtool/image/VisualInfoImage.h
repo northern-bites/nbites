@@ -9,8 +9,7 @@
 
 #include "BMPImage.h"
 #include <QImage>
-#include "man/memory/MVision.h"
-#include "man/corpus/Camera.h"
+#include "man/memory/MObjects.h"
 
 namespace qtool {
 namespace image {

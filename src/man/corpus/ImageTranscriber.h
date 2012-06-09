@@ -7,8 +7,6 @@
 #include "Sensors.h"
 #include "ImageSubscriber.h"
 
-//TODO: @oneamtu make this a subclass of Provider and ImageSubscriber a
-// subclass of Subscriber
 class ImageTranscriber {
  public:
  ImageTranscriber(boost::shared_ptr<Sensors> s)
@@ -20,8 +18,10 @@ class ImageTranscriber {
     }
 
     virtual void releaseImage() = 0;
-
     virtual void initTable(const std::string& path) = 0;
+
+    //a bit hackish, but we need this to update the vision body angles
+    Sensors::ptr getSensors() const { return sensors; }
 
  protected:
     boost::shared_ptr<Sensors> sensors;

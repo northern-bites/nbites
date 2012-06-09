@@ -39,6 +39,7 @@ using namespace boost::lambda;
 #include "Kinematics.h"
 using namespace Kinematics;
 using namespace man::corpus;
+using namespace man::memory;
 
 // static base image array, so we don't crash on image access if the setImage()
 // method is never called
@@ -49,7 +50,9 @@ static uint16_t global_image[NAO_IMAGE_BYTE_SIZE];
 //
 int Sensors::saved_frames = 0;
 
-Sensors::Sensors(boost::shared_ptr<Speech> s) :
+Sensors::Sensors(boost::shared_ptr<Speech> s,
+                 MVisionSensors::ptr mVisionSensors,
+                 MMotionSensors::ptr mMotionSensors) :
         speech(s),
         angles_mutex("angles"),
         vision_angles_mutex("vision_angles"),
@@ -75,9 +78,8 @@ Sensors::Sensors(boost::shared_ptr<Speech> s) :
         yTopImage(&global_image[0]), uvTopImage(&global_image[0]),
         colorBottomImage(reinterpret_cast<uint8_t*>(&global_image[0])),
         colorTopImage(reinterpret_cast<uint8_t*>(&global_image[0])),
-        bottomImage(NULL),
-        topImage(NULL),
-        roboImage(),
+        visionSensorsProvider(&Sensors::updateVisionSensorsInMemory, this, mVisionSensors),
+        motionSensorsProvider(&Sensors::updateMotionSensorsInMemory, this, mMotionSensors),
         varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
         fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
         unfilteredInertial(), chestButton(0.0f), batteryCharge(0.0f),
@@ -574,7 +576,7 @@ void Sensors::setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
 
     motion_sensors_mutex.unlock();
 
-    this->notifySubscribers(NEW_MOTION_SENSORS);
+    motionSensorsProvider.updateMemory();
 }
 
 /**
@@ -596,7 +598,7 @@ void Sensors::setVisionSensors(const FootBumper &_leftBumper,
     updateVisionDataVariance();
 
     vision_sensors_mutex.unlock();
-    this->notifySubscribers(NEW_VISION_SENSORS);
+    visionSensorsProvider.updateMemory();
 }
 
 void Sensors::setBatteryCharge(float charge) {
@@ -640,20 +642,6 @@ void Sensors::updateVisionAngles() {
     angles_mutex.unlock();
 }
 
-//get a pointer to the full size Nao image
-//this image has been copied to some local buffer
-const uint8_t* Sensors::getNaoImage(Camera::Type which) const {
-    if(which == Camera::BOTTOM) return bottomImage;
-    else return topImage;
-}
-
-//get a pointer to the full size Nao image
-//this image has been copied to some local buffer
-uint8_t* Sensors::getWriteableNaoImage(Camera::Type which) {
-    if(which == Camera::BOTTOM) return bottomImage;
-    else return topImage;
-}
-
 const uint16_t* Sensors::getYImage(Camera::Type which) const {
     if(which == Camera::BOTTOM) return yBottomImage;
     else return yTopImage;
@@ -674,27 +662,6 @@ const uint8_t* Sensors::getColorImage(Camera::Type which) const {
     else return colorTopImage;
 }
 
-void Sensors::setNaoImagePointer(char* _naoImage, Camera::Type which) {
-    if(which == Camera::BOTTOM)
-    {
-        bottomImage = reinterpret_cast<uint8_t*>(_naoImage);
-        // roboImage.updateImagePointer(bottomImage);
-    }
-    else
-    {
-        topImage = reinterpret_cast<uint8_t*>(_naoImage);
-        //  roboImage.updateImagePointer(topImage);
-    }
-}
-
-void Sensors::notifyNewNaoImage() {
-    this->notifySubscribers(NEW_IMAGE);
-}
-
-const man::memory::RoboImage* Sensors::getRoboImage() const {
-    return &roboImage;
-}
-
 void Sensors::setImage(const uint16_t *img, Camera::Type which) {
     if(which == Camera::BOTTOM)
     {
@@ -710,6 +677,75 @@ void Sensors::setImage(const uint16_t *img, Camera::Type which) {
         colorTopImage = reinterpret_cast<const uint8_t*>(img
                                    + AVERAGED_IMAGE_SIZE * 3);
     }
+}
+
+void Sensors::updateVisionSensorsInMemory(man::memory::MVisionSensors::ptr vs) const {
+
+    using namespace man::memory::proto;
+
+    vs->get()->clear_vision_body_angles();
+    vector<float> bodyAngles = this->getVisionBodyAngles();
+    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end();
+            i++) {
+        vs->get()->add_vision_body_angles(*i);
+    }
+
+    FootBumper leftFootBumper = this->getLeftFootBumper();
+    PSensors::PFootBumper* lfb = vs->get()->mutable_left_foot_bumper();
+    lfb->set_left(leftFootBumper.left);
+    lfb->set_right(leftFootBumper.right);
+    FootBumper rightFootBumper = this->getRightFootBumper();
+    PSensors::PFootBumper* rfb = vs->get()->mutable_right_foot_bumper();
+    rfb->set_left(rightFootBumper.left);
+    rfb->set_right(rightFootBumper.right);
+
+    vs->get()->set_ultra_sound_distance_left(this->getUltraSoundLeft());
+    vs->get()->set_ultra_sound_distance_right(this->getUltraSoundRight());
+
+    vs->get()->set_battery_charge(this->getBatteryCharge());
+    vs->get()->set_battery_current(this->getBatteryCurrent());
+}
+
+void Sensors::updateMotionSensorsInMemory(man::memory::MMotionSensors::ptr ms) const {
+
+    using namespace man::memory::proto;
+
+    ms->get()->clear_body_angles();
+    vector<float> bodyAngles = this->getBodyAngles();
+    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
+        ms->get()->add_body_angles(*i);
+    }
+
+    ms->get()->clear_body_temperatures();
+    vector<float> bodyTemperatures = this->getBodyTemperatures();
+    for (vector<float>::iterator i = bodyTemperatures.begin(); i != bodyTemperatures.end(); i++) {
+        ms->get()->add_body_temperatures(*i);
+    }
+
+    const Inertial _inertial = this->getInertial();
+    PSensors::PInertial* inertial = ms->get()->mutable_inertial();
+    inertial->set_acc_x(_inertial.accX);
+    inertial->set_acc_y(_inertial.accY);
+    inertial->set_acc_z(_inertial.accZ);
+    inertial->set_gyr_x(_inertial.accX);
+    inertial->set_gyr_y(_inertial.accY);
+    inertial->set_angle_x(_inertial.angleX);
+    inertial->set_angle_y(_inertial.angleY);
+
+    const FSR _lfsr = this->getLeftFootFSR();
+    PSensors::PFSR* lfsr = ms->get()->mutable_left_foot_fsr();
+    lfsr->set_front_left(_lfsr.frontLeft);
+    lfsr->set_front_right(_lfsr.frontRight);
+    lfsr->set_rear_left(_lfsr.rearLeft);
+    lfsr->set_rear_right(_lfsr.rearRight);
+    const FSR _rfsr = this->getRightFootFSR();
+    PSensors::PFSR* rfsr = ms->get()->mutable_right_foot_fsr();
+    rfsr->set_front_left(_rfsr.frontLeft);
+    rfsr->set_front_right(_rfsr.frontRight);
+    rfsr->set_rear_left(_rfsr.rearLeft);
+    rfsr->set_rear_right(_rfsr.rearRight);
+
+    ms->get()->set_support_foot(this->getSupportFoot());
 }
 
 void Sensors::resetSaveFrame() {

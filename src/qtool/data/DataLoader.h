@@ -26,7 +26,7 @@ class DataLoader : public QWidget
     Q_OBJECT
 
 public:
-    DataLoader(DataManager::ptr dataManager ,QWidget *parent = 0);
+    DataLoader(DataManager::ptr dataManager, QWidget *parent = 0);
     ~DataLoader();
 
 private:
