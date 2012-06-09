@@ -72,7 +72,8 @@ public:
     }
 
     static inline uint8_t dir(int y, int x) {
-        return static_cast<int32_t>(atan2(y, x) / M_PI * 128.0) % 256;
+        return static_cast<uint8_t>(
+            static_cast<int32_t>(atan2(y, x) / M_PI * 128.0) % 256);
     }
 
     /**
