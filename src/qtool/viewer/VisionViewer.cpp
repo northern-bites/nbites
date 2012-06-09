@@ -37,6 +37,9 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     topRawImage->set_width(AVERAGED_IMAGE_WIDTH);
     topRawImage->set_height(AVERAGED_IMAGE_HEIGHT);
 
+    bottomRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
+    topRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
+
     QToolBar* toolBar = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
@@ -69,7 +72,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     houghD = false;
     robotsD = false;
 
-
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
 
@@ -100,6 +102,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     QWidget* rawImages = new QWidget(this);
 
     QVBoxLayout* layout = new QVBoxLayout(rawImages);
+    layout->setAlignment(Qt::AlignTop);
 
     layout->addWidget(topCIV);
     layout->addWidget(bottomCIV);
@@ -124,6 +127,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     QWidget* visionImages = new QWidget(this);
 
     QVBoxLayout* visLayout = new QVBoxLayout(visionImages);
+    visLayout->setAlignment(Qt::AlignTop);
 
     visLayout->addWidget(topVisCIV);
     visLayout->addWidget(bottomVisCIV);
@@ -154,11 +158,11 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-    std::vector<QTreeView> messageViewers; 
+    std::vector<QTreeView> messageViewers;
     for (MObject_ID id = FIRST_OBJECT_ID;
             id != LAST_OBJECT_ID; id++) {
         if (id == MVISION_ID) {
-            QDockWidget* dockWidget = 
+            QDockWidget* dockWidget =
                    new QDockWidget("Offline Vision", this);
             MObjectViewer* view = new MObjectViewer(offlineMVision->getProtoMessage());
 	    dockWidget->setWidget(view);
@@ -177,9 +181,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
             memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
         }
     }
-
-    // Make sure one of the images is toggled off for small screens
-    bottomCIV->toggle();
 }
 
 void VisionViewer::update(){
