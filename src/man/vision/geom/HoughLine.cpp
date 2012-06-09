@@ -11,26 +11,30 @@ using namespace VisionDef;
 
 HoughLine::HoughLine() :
     rIndex(0), tIndex(0), r(0), t(0), score(0),
+    centerX(0), centerY(0),
     sinT(0), cosT(0), didSin(false), didCos(false)
 {
 
 }
-HoughLine::HoughLine(int _r_Indexbit, int _t_Indexbit, int _score) :
+
+HoughLine::HoughLine(int _r_Indexbit, int _t_Indexbit, int _score,
+                     int _centerX, int _centerY) :
     rIndex(_r_Indexbit), tIndex(_t_Indexbit),
     r(static_cast<float>(rIndex) - HoughConstants::r_span/2.0f + 1.0f),
     t(static_cast<float>(tIndex + 1) * M_PI_FLOAT /128.0f),
-    score(_score), sinT(0), cosT(0), didSin(false), didCos(false)
+    score(_score), centerX(_centerX), centerY(_centerY),
+    sinT(0), cosT(0), didSin(false), didCos(false)
 {
 
 }
 
-bool HoughLine::intersect(int x0, int y0,
-                          const HoughLine& a, const HoughLine& b)
+/** @params x0, y0 are the center of the image  */
+bool HoughLine::intersect(const HoughLine& other)
 {
-    const float sn1 = a.getSinT();
-    const float cs1 = a.getCosT();
-    const float sn2 = b.getSinT();
-    const float cs2 = b.getCosT();
+    const float sn1 = getSinT();
+    const float cs1 = getCosT();
+    const float sn2 = other.getSinT();
+    const float cs2 = other.getCosT();
 
     float g = cs1 * sn2 - sn1 * cs2;
 
@@ -38,9 +42,11 @@ bool HoughLine::intersect(int x0, int y0,
         return false;
     }
 
-    const float intX = (sn2  * a.getRadius() - sn1 * b.getRadius()) / g;
-    const float intY = (-cs2 * a.getRadius()  + cs1 * b.getRadius()) / g;
-    return (abs(intX) <= x0 && abs(intY) <= y0);
+    const float intX = (sn2  * getRadius() -
+                        sn1 * other.getRadius()) / g;
+    const float intY = (-cs2 * getRadius()  +
+                        cs1 * other.getRadius()) / g;
+    return (abs(intX) <= centerX && abs(intY) <= centerY);
 }
 
 bool HoughLine::operator==(const HoughLine &other) const

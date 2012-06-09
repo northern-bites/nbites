@@ -31,7 +31,7 @@ public:
 };
 
 // 1 bin in the hough space error allowed (plus a floating point error)
-const float HoughSpaceTest::ACCEPT_ANGLE = 1 * M_PI_FLOAT/128.0f + 0.0001;
+const float HoughSpaceTest::ACCEPT_ANGLE = 1 * M_PI_FLOAT/128.0f + 0.0001f;
 enum { max_parallel_tdiff = 5 };
 
 bool isParallel(HoughLine& l, HoughLine& l2)
@@ -185,9 +185,7 @@ TEST_F(HoughSpaceTest, Suppress)
     lines.add(a2);
     lines.add(a3);
 
-    int x0 = IMAGE_HEIGHT /2;
-    int y0 = IMAGE_WIDTH /2;
-    hs.suppress(x0, y0, lines);
+    hs.suppress(lines);
 
     // Ensure that only one duplicate line remains
     EXPECT_EQ(lines.numActive(), 1);
@@ -211,7 +209,7 @@ TEST_F(HoughSpaceTest, Suppress)
         lines.add(l);
     }
 
-    hs.suppress(x0, y0, lines);
+    hs.suppress(lines);
     for (int i=0; i < lines.size(); ++i){
         if (!lines.active(i)){
             continue;
@@ -245,7 +243,7 @@ TEST_F(HoughSpaceTest, Suppress)
     lines.add(c);
     lines.add(c2);
 
-    hs.suppress(x0, y0, lines);
+    hs.suppress(lines);
     EXPECT_EQ( lines.numActive() , 3 );
     bool at = false, bt = false, ct = false;
 

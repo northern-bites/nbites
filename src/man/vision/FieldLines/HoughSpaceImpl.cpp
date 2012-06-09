@@ -41,10 +41,7 @@ void HoughSpaceImpl::findHoughLines(Gradient& g)
 
 list<pair<HoughLine, HoughLine> > HoughSpaceImpl::narrowHoughLines()
 {
-    int x0 = static_cast<int>(Gradient::cols/2);
-    int y0 = static_cast<int>(Gradient::rows/2);
-
-    suppress(x0, y0, activeLines);
+    suppress(activeLines);
     list<pair<int, int> > pairs = pairLines(activeLines);
 
     list<pair<HoughLine, HoughLine> > lines;
@@ -169,13 +166,13 @@ void HoughSpaceImpl::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
     for (int i=0; i < numPeaks; ++i){
         HoughLine line(getPeakRadius(i),
                        getPeakAngle(i),
-                       getPeakCount(i) );
+                       getPeakCount(i));
 
         lines.add(line);
     }
 }
 
-void HoughSpaceImpl::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
+void HoughSpaceImpl::suppress(ActiveArray<HoughLine>& lines)
 {
     PROF_ENTER(P_SUPPRESS);
     const int size = lines.size();
@@ -216,7 +213,7 @@ void HoughSpaceImpl::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
                                   lines[j].getRIndex());
 
             if ( (rDiff <= HC::suppress_r_bound ||
-                  HoughLine::intersect(x0, y0, lines[i], lines[j]))) {
+                  lines[i].intersect(lines[j]))) {
 
                 if (lines[i].getScore() < lines[j].getScore()){
                     toDelete[i] = true;

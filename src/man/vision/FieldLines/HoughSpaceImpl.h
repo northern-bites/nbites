@@ -66,7 +66,7 @@ protected:
     /**
      * Combine/remove duplicate lines and lines which are not right.
      */
-    void suppress(int x0, int y0, ActiveArray<HoughLine>& lines);
+    void suppress(ActiveArray<HoughLine>& lines);
 
     /**
      * Put the Hough lines into pairs of lines with opposite

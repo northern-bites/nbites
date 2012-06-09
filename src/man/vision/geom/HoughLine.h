@@ -12,7 +12,9 @@
 class HoughLine
 {
 public:
-    HoughLine(int _rIndex, int _tIndex, int _score);
+    HoughLine(int _rIndex, int _tIndex, int _score,
+              int _centerX = static_cast<int>(Gradient::cols/2),
+              int _centerY = static_cast<int>(Gradient::rows/2));
 
     HoughLine();
     virtual ~HoughLine() { };
@@ -64,8 +66,7 @@ public:
         return false;
     }
 
-    static bool intersect(int x0, int y0,
-                          const HoughLine& a, const HoughLine& b);
+    bool intersect(const HoughLine& other);
     friend std::ostream& operator<< (std::ostream &o,
                                      const HoughLine &l) {
         return o << "Line: rIndex: " << l.rIndex << " tIndex: " << l.tIndex <<
@@ -82,6 +83,7 @@ private:
     int rIndex, tIndex;    // Radius, angle indices in HoughSpace table
     float r, t;            // Radius and angle of line in polar coords
     int score;             // Hough accumulator count
+    int centerX, centerY;
 
     mutable float sinT, cosT;   // These get computed on the fly, if needed
     mutable bool didSin, didCos;
