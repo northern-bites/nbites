@@ -35,7 +35,7 @@ enum { max_parallel_tdiff = 5 };
 
 bool isParallel(HoughLine& l, HoughLine& l2)
 {
-    int tDiff = abs(l.getTIndex() - l2.getTIndex()) - HoughSpace::t_span/2;
+    int tDiff = abs(l.getTIndex() - l2.getTIndex()) - HoughConstants::t_span/2;
     return (abs(tDiff) < max_parallel_tdiff);
 }
 
@@ -72,22 +72,22 @@ TEST_F(HoughSpaceTest, HoughSpace)
     // Run the gradient through the Hough Space
     hs.markEdges(g);
 
-    for (int t=0; t < HoughSpace::t_span; ++t){
-        for (int r=0; r < HoughSpace::r_span; ++r){
+    for (int t=0; t < HoughConstants::t_span; ++t){
+        for (int r=0; r < HoughConstants::r_span; ++r){
             EXPECT_GE(hs.getHoughBin(r,t) , 0);
         }
     }
 
     // Check to make sure there is a point at r = 80 = img_width/4 , theta = 0
     // which is where the above gradient has a line, roughly.
-    EXPECT_GT(hs.getHoughBin(IMAGE_WIDTH * 1/4 + HoughSpace::r_span/2,0) , 0);
+    EXPECT_GT(hs.getHoughBin(IMAGE_WIDTH * 1/4 + HoughConstants::r_span/2,0) , 0);
 
     // Notice that it is t_span +1. This is the same as in the
     // Hough Space.
-    uint16_t pre[HoughSpace::t_span+10][HoughSpace::r_span];
+    uint16_t pre[HoughConstants::t_span+10][HoughConstants::r_span];
 
-    for (int t=0; t < HoughSpace::t_span+10; ++t){
-        for(int r=0; r < HoughSpace::r_span; ++r){
+    for (int t=0; t < HoughConstants::t_span+10; ++t){
+        for(int r=0; r < HoughConstants::r_span; ++r){
             pre[t][r] = hs.hs[t][r];
         }
     }
@@ -95,9 +95,9 @@ TEST_F(HoughSpaceTest, HoughSpace)
     hs.smooth();
 
     // Test if smoothing worked
-    for (int t=HoughSpace::first_smoothing_row;
-         t < HoughSpace::t_span + HoughSpace::first_smoothing_row; ++t){
-        for (int r=0; r < HoughSpace::r_span-1; ++r){
+    for (int t=HoughConstants::first_smoothing_row;
+         t < HoughConstants::t_span + HoughConstants::first_smoothing_row; ++t){
+        for (int r=0; r < HoughConstants::r_span-1; ++r){
 
             int preSum = (pre[t][r]   + pre[t+1][r] +
                           pre[t][r+1] + pre[t+1][r+1]) -
@@ -225,7 +225,7 @@ TEST_F(HoughSpaceTest, Suppress)
 
             int tDiff = abs(abs(lines[i].getTIndex() -
                                 lines[j].getTIndex()) & 255);
-            EXPECT_FALSE(rDiff <= HoughSpace::suppress_r_bound &&
+            EXPECT_FALSE(rDiff <= HoughConstants::suppress_r_bound &&
                          tDiff <= hs.angleSpread);
         }
     }

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 
+#include "HoughConstants.h"
 #include "HoughSpace.h"
 
 using namespace std;
@@ -16,7 +17,7 @@ HoughLine::HoughLine() :
 }
 HoughLine::HoughLine(int _r_Indexbit, int _t_Indexbit, int _score) :
     rIndex(_r_Indexbit), tIndex(_t_Indexbit),
-    r(static_cast<float>(rIndex) - HoughSpace::r_span/2.0f + 1.0f),
+    r(static_cast<float>(rIndex) - HoughConstants::r_span/2.0f + 1.0f),
     t(static_cast<float>(tIndex + 1) * M_PI_FLOAT /128.0f),
     score(_score), sinT(0), cosT(0), didSin(false), didCos(false)
 {

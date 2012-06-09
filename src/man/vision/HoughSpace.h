@@ -9,6 +9,7 @@
 #include "Profiler.h"
 #include "visionconfig.h"
 #include "ActiveArray.h"
+#include "HoughConstants.h"
 
 /**
  * The accumulator space and associated functions for performing
@@ -125,30 +126,6 @@ protected:
 private:       // Member variables
     friend class HoughLine;     // Hough Line needs the HoughSpace private vars
 
-    enum {
-        // Hough Space size parameters
-        // 256 for full 8 bit angle, radius is for 320x240 image
-        r_span = 320,
-        t_span = 256,
-
-        // 5 rows on either side of the hough space to account for
-        // angle wrap around in edge marking.
-        hs_t_dim = t_span+10,
-#ifdef USE_MMX
-        first_smoothing_row = 3,
-#else
-        first_smoothing_row = 0,
-#endif
-        first_peak_row = first_smoothing_row + 1,
-
-        default_accept_thresh = 43,
-        default_angle_spread  = 5,
-        peak_points = 4,
-        hough_max_peaks = r_span * t_span / 4,
-        active_line_buffer = 200,
-        opp_line_thresh = 5,
-        suppress_r_bound = 4};
-
     /** Holds the two indices of a point in the HoughSpace and the
      * count at that location */
     struct HoughPeak {
@@ -161,14 +138,14 @@ private:       // Member variables
     ActiveArray<HoughLine> activeLines;
 
 #ifdef USE_MMX
-    uint16_t hs[hs_t_dim][r_span];
+    uint16_t hs[HoughConstants::hs_t_dim][HoughConstants::r_span];
 #else
-    uint16_t hs[t_span+1][r_span];
+    uint16_t hs[HoughConstants::t_span+1][HoughConstants::r_span];
 #endif
-    HoughPeak peak[hough_max_peaks];
+    HoughPeak peak[HoughConstants::hough_max_peaks];
 
-    const static int drTab[peak_points];
-    const static int dtTab[peak_points];
+    const static int drTab[HoughConstants::peak_points];
+    const static int dtTab[HoughConstants::peak_points];
 };
 
 #endif /* HoughSpace_h_DEFINED */

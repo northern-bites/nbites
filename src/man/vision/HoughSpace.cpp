@@ -5,8 +5,10 @@
 using namespace std;
 using boost::shared_ptr;
 
-const int HoughSpace::drTab[peak_points] = {  1,  1,  0, -1 };
-const int HoughSpace::dtTab[peak_points] = {  0,  1,  1,  1 };
+namespace HC = HoughConstants;
+
+const int HoughSpace::drTab[HC::peak_points] = {  1,  1,  0, -1 };
+const int HoughSpace::dtTab[HC::peak_points] = {  0,  1,  1,  1 };
 
 extern "C" void _mark_edges(int numPeaks, int angleSpread,
                             AnglePeak *peaks, uint16_t *houghSpace);
@@ -16,9 +18,9 @@ extern "C" void _houghMain(uint16_t* hs,
                            AnglePeak* edges, int numEdges);
 
 HoughSpace::HoughSpace() :
-    acceptThreshold(default_accept_thresh),
-    angleSpread(default_angle_spread),
-    numPeaks(0), activeLines(active_line_buffer)
+    acceptThreshold(HC::default_accept_thresh),
+    angleSpread(HC::default_angle_spread),
+    numPeaks(0), activeLines(HC::active_line_buffer)
 {
 
 }
@@ -135,15 +137,17 @@ void HoughSpace::smooth()
 void HoughSpace::peaks()
 {
     PROF_ENTER(P_HOUGH_PEAKS);
-    for (uint16_t t=first_peak_row; t < t_span+first_peak_row; ++t) {
+    for (uint16_t t = HC::first_peak_row;
+         t < HC::t_span + HC::first_peak_row;
+         ++t) {
 
         // First and last columns are not accurate, so they shouldn't
         // be queried, so we skip to third row as first possible peak
-        for (uint16_t r=2; r < r_span-2; ++r) {
+        for (uint16_t r=2; r < HC::r_span-2; ++r) {
 
             const uint16_t z = getHoughBin(r,t);
             if (z){
-                for (int i=0; i < peak_points; ++i) {
+                for (int i=0; i < HC::peak_points; ++i) {
 
                     if ( ! ( z >  getHoughBin(r + drTab[i],
                                               (t + dtTab[i])) &&
@@ -153,7 +157,7 @@ void HoughSpace::peaks()
                     }
                 }
 #ifdef USE_MMX
-                addPeak(r, static_cast<uint16_t>(t - first_peak_row), z);
+                addPeak(r, static_cast<uint16_t>(t - HC::first_peak_row), z);
 #else
                 addPeak(r, t, z);
 #endif
@@ -216,7 +220,7 @@ void HoughSpace::suppress(int x0, int y0, ActiveArray<HoughLine>& lines)
             const int rDiff = abs(lines[i].getRIndex() -
                                   lines[j].getRIndex());
 
-            if ( (rDiff <= suppress_r_bound ||
+            if ( (rDiff <= HC::suppress_r_bound ||
                   HoughLine::intersect(x0, y0, lines[i], lines[j]))) {
 
                 if (lines[i].getScore() < lines[j].getScore()){
@@ -270,16 +274,16 @@ list<pair<int, int> > HoughSpace::pairLines(ActiveArray<HoughLine>& lines)
             }
 
             const int tDiff = abs(abs(lines[i].getTIndex() -
-                                      lines[j].getTIndex())-t_span/2);
+                                      lines[j].getTIndex()) - HC::t_span/2);
 
             // The lines are in order by T, so they won't be any
             // closer after this
-            if (tDiff >= opp_line_thresh){
+            if (tDiff >= HC::opp_line_thresh){
                 continue;
             }
 
             const int rSum = abs(lines[i].getRIndex() +
-                                 lines[j].getRIndex() - r_span);
+                                 lines[j].getRIndex() - HC::r_span);
             if (rSum < min_pair_r[i] &&
                 rSum < min_pair_r[j]){
 
