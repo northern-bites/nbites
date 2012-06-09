@@ -138,6 +138,8 @@ public:
     data_ptr get() { return data; }
 
 protected:
+    //TODO: get rid of boost::shared_ptr crap; this could be a regular object (or pointer)
+    //passed by reference
     data_ptr data;
 };
 

@@ -51,8 +51,7 @@ protected:
     boost::shared_ptr<MVision> mVision;
     boost::shared_ptr<MVisionSensors> mVisionSensors;
     boost::shared_ptr<MMotionSensors> mMotionSensors;
-    boost::shared_ptr<MBottomImage> mBottomImage;
-    boost::shared_ptr<MTopImage> mTopImage;
+    boost::shared_ptr<MRawImages> mRawImages;
     boost::shared_ptr<MLocalization> mLocalization;
 };
 

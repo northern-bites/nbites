@@ -17,20 +17,19 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager),
                  speech(new Speech()),
                  sensors(new Sensors(speech)),
-                 bottomRawImage(new proto::PImage()),
-                 topRawImage(new proto::PImage())
+                 bottomRawImage(new proto::PRawImage()),
+                 topRawImage(new proto::PRawImage())
 {
+
+    offlineMVision = shared_ptr<MVision> (new MVision(class_name<MVision>()));
 
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
     vision = shared_ptr<Vision> (new Vision(pose));
-    offlineMVision = shared_ptr<MVision> (new MVision(class_name<MVision>()));
 
     imageTranscribe = OfflineImageTranscriber::ptr
         (new OfflineImageTranscriber(sensors,
                                      memoryManager->getMemory()->
-                                     get<MTopImage>(),
-                                     memoryManager->getMemory()->
-                                     get<MBottomImage>()));
+                                     get<MRawImages>()));
 
     bottomRawImage->set_width(AVERAGED_IMAGE_WIDTH);
     bottomRawImage->set_height(AVERAGED_IMAGE_HEIGHT);
@@ -75,10 +74,11 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     VisualInfoImage* shapes = new VisualInfoImage(offlineMVision);
 
-    FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(memoryManager->
-            getMemory()->get<MBottomImage>(), this);
-    FastYUVToBMPImage* rawTopBMP = new FastYUVToBMPImage(memoryManager->
-            getMemory()->get<MTopImage>(), this);
+    MRawImages::const_ptr rawImages = memoryManager->getMemory()->get<MRawImages>();
+
+    FastYUVToBMPImage* rawTopBMP = new FastYUVToBMPImage(rawImages, Camera::TOP, this);
+    FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(rawImages, Camera::BOTTOM, this);
+
 
     OverlayedImage* combo = new OverlayedImage(rawBottomBMP, shapes, this);
 
@@ -93,14 +93,14 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                                                                 "Top",
                                                                 this);
 
-    QWidget* rawImages = new QWidget(this);
+    QWidget* combinedRawImageView = new QWidget(this);
 
-    QVBoxLayout* layout = new QVBoxLayout(rawImages);
+    QVBoxLayout* layout = new QVBoxLayout(combinedRawImageView);
 
     layout->addWidget(topCIV);
     layout->addWidget(bottomCIV);
 
-    rawImages->setLayout(layout);
+    combinedRawImageView->setLayout(layout);
 
     bottomVisionView = new BMPImageViewerListener(bottomVisionImage,
                                                        this);
@@ -122,16 +122,15 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     visionImages->setLayout(visLayout);
 
     QTabWidget* imageTabs = new QTabWidget();
-    imageTabs->addTab(rawImages, tr("Raw Images"));
+    imageTabs->addTab(combinedRawImageView, tr("Raw Images"));
     imageTabs->addTab(visionImages, tr("Vision Images"));
 
-    memoryManager->connectSlot(this, SLOT(update()), "MBottomImage");
-    memoryManager->connectSlot(this, SLOT(update()), "MTopImage");
+    memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
 
     this->setCentralWidget(imageTabs);
 
-    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MBottomImage");
-    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MTopImage");
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -157,15 +156,8 @@ void VisionViewer::update(){
         return;
 
     imageTranscribe->acquireNewImage();
-
-    // update the vision body angles
-    MImage::const_ptr mImage = memoryManager->getMemory()->get<MBottomImage>();
-    std::vector<float> body_angles(mImage->get()->vision_body_angles().begin(),
-                                   mImage->get()->vision_body_angles().end());
-
-    sensors->setVisionBodyAngles(body_angles);
-
     vision->notifyImage(sensors->getImage(Camera::BOTTOM));
+
     offlineMVision->updateData();
     // Will need to get these to be diffent thresholded images but vision
     // appears to only threhold one at the moment!

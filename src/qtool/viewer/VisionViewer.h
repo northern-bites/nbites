@@ -65,8 +65,8 @@ private:
     man::memory::MVision::ptr offlineMVision;
     MObjectViewer* offlineVisionView;
 
-    boost::shared_ptr<man::memory::proto::PImage> topRawImage;
-    boost::shared_ptr<man::memory::proto::PImage> bottomRawImage;
+    boost::shared_ptr<man::memory::proto::PRawImage> topRawImage;
+    boost::shared_ptr<man::memory::proto::PRawImage> bottomRawImage;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
 
     bool horizonD, shootD, openFieldD, edgeDetectD, houghD, robotsD;

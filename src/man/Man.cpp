@@ -27,13 +27,15 @@ using namespace man::memory::log;
 //                                     //
 /////////////////////////////////////////
 
-Man::Man (boost::shared_ptr<Sensors> _sensors,
+Man::Man (RobotMemory::ptr memory,
+          boost::shared_ptr<Sensors> _sensors,
           boost::shared_ptr<Transcriber> _transcriber,
           boost::shared_ptr<ImageTranscriber> _imageTranscriber,
           boost::shared_ptr<MotionEnactor> _enactor,
           boost::shared_ptr<Lights> _lights,
           boost::shared_ptr<Speech> _speech)
-    :     sensors(_sensors),
+    :     memory(memory),
+          sensors(_sensors),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
           enactor(_enactor),
@@ -64,8 +66,6 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
     set_guardian_pointer(guardian);
     set_lights_pointer(_lights);
     set_speech_pointer(_speech);
-
-    memory = RobotMemory::ptr(new RobotMemory(sensors));
 
     try {
         vision = boost::shared_ptr<Vision> (new Vision(pose, memory->get<MVision>()));
@@ -128,6 +128,8 @@ void Man::stopSubThreads() {
 #ifdef DEBUG_MAN_THREADING
     cout << "Man stopping: " << endl;
 #endif
+
+    loggingBoard->reset();
 
     guardian->stop();
     guardian->waitForThreadToFinish();

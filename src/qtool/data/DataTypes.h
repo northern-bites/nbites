@@ -8,7 +8,7 @@
 namespace qtool {
 namespace data {
 
-typedef man::memory::MImage RoboImage;
+typedef man::memory::MRawImages RoboImages;
 typedef man::memory::MVision RoboVision;
 
 }
