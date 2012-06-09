@@ -41,9 +41,12 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 			QTextStream in(&file);
 			geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
 							 in.readLine().toInt(), in.readLine().toInt());
+			file.close();
+	} 
+	if((geom->width() == 0) && (geom->height() == 0)){
+		geom = new QRect(75, 75, 1132, 958);
 	}
 	this->setGeometry(*geom);
-	file.close();
 }
 
 EmptyQTool::~EmptyQTool() {
