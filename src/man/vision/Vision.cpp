@@ -34,7 +34,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
-#include "memory/MVision.h"
 
 using namespace std;
 using boost::shared_ptr;

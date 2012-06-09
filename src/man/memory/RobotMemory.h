@@ -1,13 +1,7 @@
 /**
- * @class Memory
+ * @class RobotMemory
  *
- * This class keeps instances of all the different memory objects and provides
- * an interface through which they get updated (each memory object copies data
- * from its corresponding man object
- *
- * Each MObject is associated with a MObject_ID that identifies it
- *
- * Future work: we will be able to keep multiple instances of selected objects
+ * This instantiates the most common used MemoryObjects
  *
  * @author Octavian Neamtu
  */
@@ -15,14 +9,7 @@
 #pragma once
 
 #include "Memory.h"
-#include "MVision.h"
-#include "Vision.h"
-#include "MVisionSensors.h"
-#include "MMotionSensors.h"
-#include "MImage.h"
-#include "Camera.h"
-#include "MLocalization.h"
-#include "Sensors.h"
+#include "MObjects.h"
 #include "Profiler.h"
 
 namespace man {

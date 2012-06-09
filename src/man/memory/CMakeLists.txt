@@ -19,7 +19,8 @@ INCLUDE( ../cmake/base_definitions.cmake )
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
-FIND_PACKAGE( Boost    REQUIRED )
+FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
+FIND_PACKAGE( PythonLibs REQUIRED )
 FIND_PACKAGE( Protobuf REQUIRED )
 
 
@@ -45,13 +46,7 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
 
-set( MEMORY_SRCS RobotMemory
-                 MVision
-                 MVisionSensors
-                 MMotionSensors
-                 MImage
-				 MLocalization
-                 )
+set( MEMORY_SRCS RobotMemory )
 
 set( PARSE_SRCS parse/MessageParser
                 parse/ParsingBoard )
@@ -98,14 +93,13 @@ target_link_libraries(
   ${MEMORY_TARGET}
   ${PROTOBUF_LIBRARY}
   ${PROTOS_TARGET}
-  ${VISION_TARGET}
-  ${SENSORS_TARGET}
   )
 
 target_link_libraries(
     ${LOG_TARGET}
     ${PROTOBUF_LIBRARY}
     ${Boost_PYTHON_LIBRARY}
+    ${PYTHON_LIBRARY}
     ${NBINCLUDE_TARGET}
     )
 
