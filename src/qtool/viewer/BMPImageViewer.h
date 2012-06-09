@@ -29,6 +29,12 @@ public:
         return QSize(image->getWidth(), image->getHeight());
     }
 
+	virtual unsigned getWidth() { return image->getWidth();}
+	virtual unsigned getHeight() { return image->getHeight();}
+
+	QVBoxLayout* getLayout();
+
+
 public slots:
     void updateView();
 
@@ -39,6 +45,7 @@ protected:
 protected:
     image::BMPImage* image;
     QLabel imagePlaceholder;
+	QVBoxLayout* BMPlayout;
 
 };
 

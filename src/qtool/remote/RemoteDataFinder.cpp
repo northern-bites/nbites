@@ -25,8 +25,6 @@ RemoteDataFinder::RemoteDataFinder(DataManager::ptr dataManager, QWidget* parent
 
     for (int i = 0; i < numStreamableObjects; i++) {
 
-        std:: cout << i << std::endl;
-
         QCheckBox* checkBox = new QCheckBox(QString(streamableObjects[i].c_str()), this);
         checkBox->setChecked(true);
 

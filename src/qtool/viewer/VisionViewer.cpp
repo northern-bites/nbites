@@ -36,6 +36,9 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     topRawImage->set_width(AVERAGED_IMAGE_WIDTH);
     topRawImage->set_height(AVERAGED_IMAGE_HEIGHT);
 
+    bottomRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
+    topRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
+
     QToolBar* toolBar = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
@@ -68,7 +71,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     houghD = false;
     robotsD = false;
 
-
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
 
@@ -96,6 +98,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     QWidget* combinedRawImageView = new QWidget(this);
 
     QVBoxLayout* layout = new QVBoxLayout(combinedRawImageView);
+    layout->setAlignment(Qt::AlignTop);
 
     layout->addWidget(topCIV);
     layout->addWidget(bottomCIV);
@@ -115,6 +118,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     QWidget* visionImages = new QWidget(this);
 
     QVBoxLayout* visLayout = new QVBoxLayout(visionImages);
+    visLayout->setAlignment(Qt::AlignTop);
 
     visLayout->addWidget(topVisCIV);
     visLayout->addWidget(bottomVisCIV);
@@ -141,8 +145,15 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     std::vector<QTreeView> messageViewers;
 
     QDockWidget* dockWidget = new QDockWidget("Offline Vision", this);
-    offlineVisionView = new MObjectViewer(offlineMVision->getProtoMessage());
+    offlineVisionView = new MObjectViewer(offlineMVision->getProtoMessage(), this);
 	dockWidget->setWidget(offlineVisionView);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+
+    dockWidget = new QDockWidget("Image data", this);
+    MObjectViewer* imageDataView = new MObjectViewer(
+            memoryManager->getMemory()->get<MRawImages>()->getProtoMessage(), this);
+    dockWidget->setWidget(imageDataView);
+    memoryManager->connectSlot(imageDataView, SLOT(updateView()), "MRawImages");
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
     // Make sure one of the images is toggled off for small screens
