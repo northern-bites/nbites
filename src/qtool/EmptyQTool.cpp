@@ -5,21 +5,27 @@
 #include "EmptyQTool.h"
 #include <iostream>
 #include <QFileDialog>
+#include <QDebug>
 
 namespace qtool {
 
 using data::DataManager;
+QFile file(QString("./.geometry"));
 
 EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
                                             toolTabs(new QTabWidget()),
                                             dataManager(new DataManager())
 {
-    this->setWindowTitle(tr(title));
+	this->setWindowTitle(tr(title));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
     prevButton = new QPushButton(tr("<"));
     recordButton = new QPushButton(tr("Rec"));
+	scrollArea = new QScrollArea();
+
+	scrollBarSize = new QSize(5, 35);
+	tabStartSize = new QSize(toolTabs->size());
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
@@ -31,10 +37,26 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 
     this->addToolBar(toolbar);
 
-    this->setCentralWidget(toolTabs);
+	if (file.open(QIODevice::ReadWrite)){
+			QTextStream in(&file);
+			geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
+							 in.readLine().toInt(), in.readLine().toInt());
+			file.close();
+	} 
+	if((geom->width() == 0) && (geom->height() == 0)){
+		geom = new QRect(75, 75, 1132, 958);
+	}
+	this->setGeometry(*geom);
 }
 
 EmptyQTool::~EmptyQTool() {
+	if (file.open(QIODevice::ReadWrite)){
+		QTextStream out(&file);
+		out << this->pos().x() << "\n"
+			<< this->pos().y() << "\n"
+			<< this->width() << "\n"
+			<< this->height() << "\n";
+	}
 }
 
 void EmptyQTool::next() {
@@ -57,6 +79,18 @@ void EmptyQTool::record() {
             recordButton->setText("Stop");
         }
     }
+}
+
+void EmptyQTool::resizeEvent(QResizeEvent* ev){
+	QSize widgetSize = ev->size();
+	if((widgetSize.width() > tabStartSize->width()) &&
+	   (widgetSize.height() > tabStartSize->height())) {
+		toolTabs->resize(widgetSize-*scrollBarSize);
+	}
+	else {
+		//do nothing - scroll bars will kick in by themselves
+	}
+	QWidget::resizeEvent(ev);
 }
 
 }
