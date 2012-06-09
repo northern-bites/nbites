@@ -142,6 +142,9 @@ void Vision::notifyImage() {
     drawEdges(*linesDetector.getEdges());
     drawHoughLines(linesDetector.getHoughLines());
     drawVisualLines(*linesDetector.getLines());
+
+    thresh->transposeDebugImage();
+
     PROF_EXIT(P_VISION);
 }
 

@@ -121,7 +121,6 @@ void Threshold::visionLoop() {
     if (visualHorizonDebug) {
         drawVisualHorizon();
     }
-    transposeDebugImage();
 #endif
 }
 
@@ -1418,13 +1417,13 @@ void Threshold::initDebugImage(){
  * to the real image.
  */
 void Threshold::transposeDebugImage(){
-#if defined OFFLINE
+#ifdef OFFLINE
     for(int x = 0 ; x < IMAGE_WIDTH; x++) {
-      for(int y = 0; y < IMAGE_HEIGHT; y++) {
-	if(debugImage[y][x] != GREY){
-	  setThresholded(y, x, debugImage[y][x]);
-	}
-      }
+        for(int y = 0; y < IMAGE_HEIGHT; y++) {
+            if(debugImage[y][x] != GREY){
+                setThresholded(y, x, debugImage[y][x]);
+            }
+        }
     }
 
     initDebugImage();
