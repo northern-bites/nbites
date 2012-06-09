@@ -29,11 +29,17 @@ namespace motion {
 class BHWalkProvider : public MotionProvider {
 
 public:
-    //TODO: naopose is for nothing, I just kept it here because the WalkProvider is the same
-    //but it should be eliminated from both places (e.g. it is not used here, it is not used
+    //TODO: naopose is for nothing, I just kept it here because the
+	//WalkProvider is the same but it should be eliminated from both
+	//places (e.g. it is not used here, it is not used
     //in walkprovider)
     BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p);
     virtual ~BHWalkProvider() {}
+
+	// Provide calibration boolean to the rest of the system.
+	bool calibrated() {
+		return walkingEngine.theInertiaSensorCalibrator.calibrated;
+	}
 
     void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses();
@@ -47,7 +53,7 @@ public:
 
     std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
         return std::vector<BodyJointCommand::ptr>();
-    }
+	}
 
     MotionModel getOdometryUpdate();
     virtual const SupportFoot getSupportFoot() const;

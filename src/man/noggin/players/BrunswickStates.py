@@ -63,9 +63,13 @@ def gameReady(player):
     #HACK! TODO: this delay is to make sure the sensors get calibrated before
     #we start walking; find a way to query motion to see whether the sensors are
     #calibrated or not before starting
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+    """
     player.initialDelayCounter += 1
     if player.initialDelayCounter < 230:
         return player.stay()
+        """
 
     # Works with rules (2011) to get goalie manually positioned
     if (player.lastDiffState == 'gameInitial'

@@ -101,6 +101,9 @@ public:
 
     int getFrameCount() const { return switchboard->getFrameCount(); }
 
+	// Provide calibration boolean for boost
+	bool calibrated() { return switchBoard->calibrated(); }
+
 private:
     MotionSwitchboard *switchboard;
 };
