@@ -240,7 +240,6 @@ class Leds():
 
         if PLAYBOOK_LEDS:
             if self.brain.playbook.roleChanged():
-                print "\n\nROLE CHANGED!!\n"
                 if self.brain.play.isRole(PBConstants.CHASER):
                     self.executeLeds(CHASER_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.OFFENDER):
@@ -258,7 +257,6 @@ class Leds():
                     self.executeLeds(ROLE_OFF_LEDS)
 
             if not self.brain.playbook.subRoleUnchanged():
-                print "\n\nSUBROLE CHANGED!!\n"
                 play = self.brain.play
                 if play.isRole(PBConstants.GOALIE):
                     if (play.isSubRole(PBConstants.GOALIE_CENTER)):
