@@ -131,10 +131,8 @@ void Noggin::initializeLocalization()
     printf("  Initializing localization modules\n");
 #   endif
 
-    locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
-    locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem());
-
-    loc = shared_ptr<LocSystem>(new PF::ParticleFilter(locMotionSystem, locVisionSystem));
+    // Initialize the localization module
+    loc = boost::shared_ptr<LocSystem>(new MultiLocEKF());
 
     ballEKF = boost::shared_ptr<BallEKF>(new BallEKF());
 
@@ -300,98 +298,169 @@ void Noggin::runStep ()
 
 void Noggin::updateLocalization()
 {
-    const ::MotionModel odometry = motion_interface->getOdometryUpdate();
+    // Self Localization
+    MotionModel odometery = motion_interface->getOdometryUpdate();
 
-    const PF::OdometryMeasurement odo(odometry.x,
-				      odometry.y,
-				      odometry.theta);
+    // Build the observations from vision data
+    vector<PointObservation> pt_observations;
+    vector<CornerObservation> corner_observations;
 
-    locMotionSystem->setCurrentOdometry(odo);
+    // Get team of the robot for localization.
+    uint8 teamColor = (*gc->getMyTeam()).teamColor;
 
-    std::vector<PF::Observation> observations;
-    std::vector<Landmark> landmarks;
-    float dist, theta;
+    // FieldObjects
 
-    // Observe FieldObjects.
     VisualFieldObject fo;
-    fo = *vision->bgrp;
-
-    // @todo this seems like a lot of code duplication--make more concise?
-
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
-    {
-        // Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
-    fo = *vision->bglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
-    {
-	// Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
+    // If the robot is on the opposing side, the CLOSER goal posts
+    // are the opposing goal posts. Otherwise, the closer
+    // posts are their own posts.
+    // If teamColor == TEAM_RED, then the opposing goal posts are 
+    // yellow; otherwise, the opposing goal posts are "blue". 
+    bool bluePost = false;
     fo = *vision->ygrp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) 
+    // There is a 120 cm "no posts" zone to avoid mislabeling a goal. 
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE
+       && (fo.getDistance() > (FIELD_WHITE_WIDTH * 0.5f + CENTER_CIRCLE_RADIUS)
+	   || fo.getDistance() < (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)) ) 
     {
-	// Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
+      if(loc->isOnOpposingSide())
+      {
+	if(fo.getDistance() < (FIELD_WHITE_WIDTH * 0.5f))
+	{
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    (teamColor == TEAM_RED) ?
+	    &ConcreteFieldObject::blueGoalRightPostList
+	    : &ConcreteFieldObject::yellowGoalRightPostList;
+
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  //std::cout << "See opposing yellow right post (" << fo.toString() << ") at distance "
+	  //	    << fo.getDistance() << " (offender.)" << std::endl;
+	  bluePost = true;
+	}
+	else
+	{
+	  //std::cout << "See own yellow right post (" << fo.getID() << ") at distance "
+	  //	    << fo.getDistance() << " (offender.)" << std::endl;
+	}
+      }
+      else
+      {
+	if(fo.getDistance() > (FIELD_WHITE_WIDTH * 0.5f))
+	{
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    (teamColor == TEAM_RED) ?
+	    &ConcreteFieldObject::blueGoalRightPostList
+	    : &ConcreteFieldObject::yellowGoalRightPostList;
+
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  //std::cout << "See opposing yellow right post (" << fo.getID() << ") at distance "
+	  //	    << fo.getDistance() << " (defender.)" << std::endl;
+	  bluePost = true;
+      	}
+	else
+	{
+	  //std::cout << "See own yellow right post (" << fo.getID() << ") at distance "
+	  //	    << fo.getDistance() << " (defender.)" << std::endl;
+	}
+      }
+      PointObservation seen(fo);
+      pt_observations.push_back(seen);
     }
 
     fo = *vision->yglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
+    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE
+       && (fo.getDistance() > (FIELD_WHITE_WIDTH * 0.5f + CENTER_CIRCLE_RADIUS)
+	   || fo.getDistance() < (FIELD_WHITE_WIDTH * 0.5f - CENTER_CIRCLE_RADIUS)) )
     {
-	// Create a new Observation from the observed VisualFieldObject.
-	landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-	dist = fo.getDistance();
-	theta = fo.getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
-    // Observe Field Cross.
-    if (vision->cross->getDistance() > 0 &&
-        vision->cross->getDistance() < MAX_CROSS_DISTANCE) 
-    {
-
-	landmarks = constructLandmarks<VisualCross, ConcreteCross>(*vision->cross);
-	dist = (*vision->cross).getDistance();
-	theta = (*vision->cross).getBearing();
-	observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
-    // Observe Corners.
-    const list<VisualCorner> * corners = vision->fieldLines->getCorners();
-    list <VisualCorner>::const_iterator ci;
-    for(ci = corners->begin(); ci != corners->end(); ++ci) 
-    {
-        if (ci->getDistance() < MAX_CORNER_DISTANCE) 
+      if(loc->isOnOpposingSide())
+      {
+	if(fo.getDistance() < (0.5f * FIELD_WHITE_WIDTH))
 	{
-	    landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
-	    dist = ci->getDistance();
-	    theta = ci->getBearing();
-	    observations.push_back(PF::Observation(landmarks, dist, theta));
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    &ConcreteFieldObject::blueGoalLeftPostList;
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  //std::cout << "See opposing yellow left post (" << fo.getID() << ") at distance "
+	  //	    << fo.getDistance() << " (offender.)" << std::endl;
+	  bluePost = true;
+	}
+	else
+	{
+	  //std::cout << "See own yellow left post (" << fo.getID() << ") at distance "
+	  //	    << fo.getDistance() << " (offender.)" << std::endl;
+	}
+      }
+      else
+      {
+	if(fo.getDistance() > (0.5f * FIELD_WHITE_WIDTH))
+	{
+	  const std::list<const ConcreteFieldObject *> * possibleFieldObjects = 
+	    &ConcreteFieldObject::blueGoalLeftPostList;
+	  fo.setPossibleFieldObjects(possibleFieldObjects);
+	  //std::cout << "See opposing yellow left post (" << fo.getID() << ") at distance "
+	  //	    << fo.getDistance() << " (defender.)" << std::endl;	
+	  bluePost = true;
+	}
+	else
+	{
+	  //std::cout << "See own yellow left post (" << fo.getID() << ") at distance "
+	  //	    << fo.getDistance() << " (defender.)" << std::endl;
+	}
+      }
+        PointObservation seen(fo);
+        pt_observations.push_back(seen);
+    }
+
+    //if(pt_observations.size() > 0)
+    //{
+      //std::cout << "Looking at " << (bluePost ? "BLUE " : "YELLOW ") << " posts." << std::endl;
+    //}
+
+    // vector<PointObservation>::iterator obsIter;
+    // for(obsIter = pt_observations.begin(); obsIter != pt_observations.end(); ++obsIter)
+    // {
+    //   std::cout << "Spotted post: " << *obsIter << std::endl;
+    //   std::cout << "Possibilities: " << std::endl;
+    //   std::vector<PointLandmark> p = (*obsIter).getPossibilities();
+    //   std::vector<PointLandmark>::iterator goalIter = p.begin();
+    //   for(; goalIter != p.end(); ++goalIter)
+    // 	std::cout << *goalIter << std::endl;
+    // }
+
+    // Field Cross
+    if (vision->cross->getDistance() > 0 &&
+        vision->cross->getDistance() < MAX_CROSS_DISTANCE) {
+
+        PointObservation seen(*vision->cross);
+        pt_observations.push_back(seen);
+#       ifdef DEBUG_CROSS_OBSERVATIONS
+        cout << "Saw cross " << pt_observations.back() << endl;
+#       endif
+    }
+
+    // Corners
+#   ifdef USE_LOC_CORNERS
+    const list<VisualCorner> * corners = vision->fieldLines->getCorners();
+    list <VisualCorner>::const_iterator i;
+    for ( i = corners->begin(); i != corners->end(); ++i) {
+        if (i->getDistance() < MAX_CORNER_DISTANCE) {
+            CornerObservation seen(*i);
+            corner_observations.push_back(seen);
+
+#           ifdef DEBUG_CORNER_OBSERVATIONS
+            cout << "Saw corner "
+                 << ConcreteCorner::cornerIDToString(i->getID())
+                 << " at distance "
+                 << seen.getVisDistance() << " and bearing "
+                 << seen.getVisBearing() << endl;
+#           endif
         }
     }
+#   endif
 
-    // Update the localiztion vision interface with Observations.
-    locVisionSystem->feedObservations(observations);
-
-    // Now, run the particle filter.
-    MotionModel u_t;
-    std::vector<PointObservation> pt_z;
-    std::vector<CornerObservation> c_z;
-    loc->updateLocalization(u_t, pt_z, c_z);
-
-    // END LOCALIZATION UPDATE //
+    // Process the information
+    PROF_ENTER(P_MCL);
+    loc->updateLocalization(odometery, pt_observations, corner_observations);
+    PROF_EXIT(P_MCL);
 
     // Ball Tracking
     if (vision->ball->getDistance() > 0.0) {
@@ -441,13 +510,13 @@ void Noggin::updateLocalization()
 #       endif
     }
 
-    ballEKF->updateModel(odometry, m, loc->getCurrentEstimate());
+    ballEKF->updateModel(odometery, m, loc->getCurrentEstimate());
 
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {
         // Print out odometry and ball readings
-        outputFile << odometry.deltaF << " " << odometry.deltaL << " "
-                   << odometry.deltaR << " " << m.distance
+        outputFile << odometery.deltaF << " " << odometery.deltaL << " "
+                   << odometery.deltaR << " " << m.distance
                    << " " << m.bearing;
         // Print out observation information
         for (unsigned int x = 0; x < observations.size(); ++x) {
