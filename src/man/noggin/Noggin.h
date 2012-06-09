@@ -17,11 +17,6 @@
 #include "memory/log/LoggingBoard.h"
 #include "memory/log/PyLoggingBoard.h"
 
-#include "ParticleFilter.h"
-#include "MotionSystem.h"
-#include "VisionSystem.h"
-#include "FieldConstants.h"
-
 //#define LOG_LOCALIZATION
 
 /**
@@ -79,9 +74,6 @@ private:
     boost::shared_ptr<ClickableButton> chestButton;
     boost::shared_ptr<ClickableButton> leftFootButton;
     boost::shared_ptr<ClickableButton> rightFootButton;
-
-    boost::shared_ptr<MotionSystem> locMotionSystem;
-    boost::shared_ptr<VisionSystem> locVisionSystem;
 
     bool error_state;
     PyObject *module_helper;
