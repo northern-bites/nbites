@@ -53,9 +53,7 @@ void MessageLogger::run() {
         this->waitForSignal();
         this->writeToLog();
 
-        while (out_provider->writingInProgress()) {
-            this->yield();
-        }
+        out_provider->waitForWriteToFinish();
     }
 }
 

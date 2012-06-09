@@ -73,6 +73,14 @@ typedef unsigned char byte;
         } \
 }
 
+#include <stdexcept>
+#include <cstring>
+#include <string>
+
+static void throw_errno(int err_no) throw (std::runtime_error) {
+    throw std::runtime_error(std::string(strerror(err_no)));
+}
+
 #include <time.h>
 #include <sys/time.h>
 

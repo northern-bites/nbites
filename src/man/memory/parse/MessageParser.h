@@ -64,7 +64,6 @@ public:
 private:
     void increaseBufferSizeTo(uint32_t new_size);
     uint32_t truncateNumberOfFramesToRewind(uint32_t n) const;
-    void waitForReadToFinish();
 
     template <typename T>
     T readValue() {

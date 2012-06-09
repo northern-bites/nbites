@@ -200,10 +200,6 @@ void Thread::waitForThreadToFinish() {
     this->trigger->await_off();
 }
 
-void Thread::yield() {
-    pthread_yield();
-}
-
 Trigger::Trigger (string name, bool _v)
   : mutex(boost::shared_ptr<pthread_mutex_t>(new pthread_mutex_t(), MutexDeleter())),
     on_event(name + TRIGGER_ON_SUFFIX, mutex),

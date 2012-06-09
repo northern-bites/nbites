@@ -86,6 +86,9 @@ public:
         this->rewind(size);
     }
 
+    //it's instant because it's synchronous
+    virtual void waitForReadToFinish() const { return; }
+
     virtual uint32_t bytesRead() const throw (read_exception) { return bytes_read; }
 
     void openCommunicationChannel() throw (file_exception) {

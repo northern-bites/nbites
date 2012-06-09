@@ -55,12 +55,6 @@ void MessageParser::run() {
     }
 }
 
-void MessageParser::waitForReadToFinish() {
-    while(in_provider->readInProgress() && running) {
-        pthread_yield();
-    }
-}
-
 void MessageParser::readHeader() {
 
     MessageHeader header = this->readValue<MessageHeader>();
@@ -106,15 +100,17 @@ bool MessageParser::readNextMessage() {
 }
 
 bool MessageParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
+
     uint32_t bytes_read = 0;
+
     while (bytes_read < num_bytes) {
+
         try {
             in_provider->readCharBuffer(
                     buffer + bytes_read, num_bytes - bytes_read);
-            waitForReadToFinish();
+            in_provider->waitForReadToFinish();
             bytes_read += in_provider->bytesRead();
-        }
-        catch (read_exception& read_exception) {
+        } catch (read_exception& read_exception) {
             cout << read_exception.what() << " " << in_provider->debugInfo() << endl;
             return false;
         }
