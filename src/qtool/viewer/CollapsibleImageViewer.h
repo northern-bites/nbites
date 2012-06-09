@@ -25,6 +25,8 @@ public:
 
 public slots:
     void toggle();
+    void show();
+    void hide();
 
 private:
     viewer::BMPImageViewer* image;
