@@ -112,7 +112,9 @@ class HeadTracking(FSA.FSA):
         """
         Look to the given yaw at an appropriate fixed pitch.
         """
-        self.switchTo('stop')
+        # HACK
+        self.switchTo('stopped')
+        self.brain.motion.stopHeadMoves()
         self.helper.lookToAngleFixedPitch(yaw)
 
     ################### End Fixed Pitch #####################
