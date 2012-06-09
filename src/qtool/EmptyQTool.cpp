@@ -23,7 +23,8 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
     recordButton = new QPushButton(tr("Rec"));
 	scrollArea = new QScrollArea();
 
-	barBuffer = new QSize(15, 40);
+	barBuffer = new QSize(10, 10);
+	tabStartSize = new QSize(toolTabs->size());
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
@@ -35,10 +36,6 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 
     this->addToolBar(toolbar);
 
-	scrollArea->setWidget(toolTabs);
-	scrollArea->resize(toolTabs->size());
-	this->setCentralWidget(scrollArea);
-
 	if (file.open(QIODevice::ReadWrite)){
 			QTextStream in(&file);
 			geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
@@ -49,13 +46,13 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 }
 
 EmptyQTool::~EmptyQTool() {
-	if (file.open(QIODevice::ReadWrite)){
+	/*if (file.open(QIODevice::ReadWrite)){
 		QTextStream out(&file);
 		out << this->pos().x() << "\n"
 			<< this->pos().y() << "\n"
 			<< this->width() << "\n"
 			<< this->height() << "\n";
-  	}
+			}*/
 }
 
 void EmptyQTool::next() {
@@ -84,7 +81,7 @@ void EmptyQTool::resizeEvent(QResizeEvent* ev){
 	if((widgetSize.width() > geom->size().width())
 	   || (widgetSize.height() > geom->size().height()))
 		toolTabs->resize(widgetSize-*barBuffer);
-	QWidget::resizeEvent(ev);
+		QWidget::resizeEvent(ev);
 }
 
 }

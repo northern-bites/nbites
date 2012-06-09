@@ -48,9 +48,10 @@ protected:
     QPushButton* recordButton;
     QToolBar* toolbar;
 	QScrollArea* scrollArea;
-	QSize* toolSize;
+	QSize* tabStartSize;
 	QRect* geom;
 	QSize* barBuffer;
+
 
 	void resizeEvent(QResizeEvent*);
 };
