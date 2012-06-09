@@ -36,6 +36,9 @@ class VisionViewer : public QMainWindow{
 public:
     VisionViewer(data::RobotMemoryManager::const_ptr memoryManager);
 
+signals:
+    void imagesUpdated();
+
 public slots:
     void update();
     void loadColorTable();

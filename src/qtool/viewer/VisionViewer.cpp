@@ -113,8 +113,13 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                                                        this);
     connect(bottomVisViewer, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
+    connect(this, SIGNAL(imagesUpdated()),
+            bottomVisViewer, SLOT(updateView()));
+
     BMPImageViewer *topVisViewer = new BMPImageViewer(topVisionImage,
                                                       this);
+    connect(this, SIGNAL(imagesUpdated()),
+            topVisViewer, SLOT(updateView()));
 
     CollapsibleImageViewer* bottomVisCIV = new
         CollapsibleImageViewer(bottomVisViewer,
@@ -208,6 +213,7 @@ void VisionViewer::update(){
     topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
                                          (vision->thresh->thresholded),
                                          AVERAGED_IMAGE_SIZE);
+    emit imagesUpdated();
 }
 
 void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {
@@ -222,12 +228,13 @@ void VisionViewer::loadColorTable(){
 							"../../data/tables",
 							tr("Table Files (*.mtb)"));
   imageTranscribe->initTable(colorTablePath.toStdString());
-
+  update();
 }
 
 #define SET_DEBUG(funcName, buttonName)                             \
     void VisionViewer::set##funcName##Debug(int state) {            \
         vision->thresh->setDebug##funcName(state == Qt::Checked);   \
+        update();                                                   \
     }
 
 SET_DEBUG(Horizon, horizon);
