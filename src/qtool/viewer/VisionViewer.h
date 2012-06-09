@@ -48,6 +48,7 @@ public slots:
     void setEdgeDetectionDebug(int state);
     void setHoughTransformDebug(int state);
     void setRobotsDebug(int state);
+    void setVisualLinesDebug(int state);
     void pixelClicked(int x, int y, int brushSize, bool leftClick);
 
 private:

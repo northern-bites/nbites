@@ -46,31 +46,20 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     toolBar->addWidget(loadTableButton);
     this->addToolBar(toolBar);
 
-    QCheckBox* horizonDebug = new QCheckBox(tr("Horizon Debug"));
-    connect(horizonDebug, SIGNAL(stateChanged(int)), this, SLOT(setHorizonDebug(int)));
-    toolBar->addWidget(horizonDebug);
+#define ADD_DEBUG_CHECKBOX(text, func) {            \
+        QCheckBox* debug = new QCheckBox(tr(text)); \
+        connect(debug, SIGNAL(stateChanged(int)),   \
+                this, SLOT(func(int)));             \
+        toolBar->addWidget(debug);                  \
+    }
 
-    QCheckBox* shootingDebug = new QCheckBox(tr("Shooting Debug"));
-    connect(shootingDebug, SIGNAL(stateChanged(int)), this, SLOT(setShootingDebug(int)));
-    toolBar->addWidget(shootingDebug);
-
-    QCheckBox* openFieldDebug = new QCheckBox(tr("Open Field Debug"));
-    connect(openFieldDebug, SIGNAL(stateChanged(int)), this, SLOT(setOpenFieldDebug(int)));
-    toolBar->addWidget(openFieldDebug);
-
-    QCheckBox* edgeDetectionDebug = new QCheckBox(tr("Edge Detection Debug"));
-    connect(edgeDetectionDebug, SIGNAL(stateChanged(int)),
-            this, SLOT(setEdgeDetectionDebug(int)));
-    toolBar->addWidget(edgeDetectionDebug);
-
-    QCheckBox* houghDebug = new QCheckBox(tr("Hough Debug"));
-    connect(houghDebug, SIGNAL(stateChanged(int)),
-            this, SLOT(setHoughTransformDebug(int)));
-    toolBar->addWidget(houghDebug);
-
-    QCheckBox* robotsDebug = new QCheckBox(tr("Robots Debug"));
-    connect(robotsDebug, SIGNAL(stateChanged(int)), this, SLOT(setRobotsDebug(int)));
-    toolBar->addWidget(robotsDebug);
+    ADD_DEBUG_CHECKBOX("Horizon Debug", setHorizonDebug);
+    ADD_DEBUG_CHECKBOX("Shooting Debug", setShootingDebug);
+    ADD_DEBUG_CHECKBOX("Open Field Debug", setOpenFieldDebug);
+    ADD_DEBUG_CHECKBOX("Edge Detection Debug", setEdgeDetectionDebug);
+    ADD_DEBUG_CHECKBOX("Hough Debug", setHoughTransformDebug);
+    ADD_DEBUG_CHECKBOX("Robot Detection Debug", setRobotsDebug);
+    ADD_DEBUG_CHECKBOX("Visual Line Debug", setVisualLinesDebug);
 
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
@@ -188,8 +177,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     }
 }
 
-void VisionViewer::update(){
-
+void VisionViewer::update()
+{
     //no useless computation
     if (!this->isVisible())
         return;
@@ -243,5 +232,7 @@ SET_DEBUG(Shooting, shoot);
 SET_DEBUG(EdgeDetection, edgeDetect);
 SET_DEBUG(OpenField, openField);
 SET_DEBUG(Robots, robots);
+SET_DEBUG(VisualLines, visualLines);
+
 }
 }
