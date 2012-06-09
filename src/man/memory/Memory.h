@@ -68,6 +68,7 @@ public:
     MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
     MImage::const_ptr getMImage(corpus::Camera::Type which) const;
 
+    MLocalization::const_ptr getMLocalization() const { return mLocalization; }
     MObject::const_ptr getMObject(MObject_ID id) const;
     MObject::ptr getMutableMObject(MObject_ID id);
 
