@@ -51,6 +51,7 @@ private:
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::FieldViewer* fieldViewer;
     overseer::OverseerClient* overseerClient;
+
 };
 
 }
