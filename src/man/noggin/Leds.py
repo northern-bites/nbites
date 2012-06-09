@@ -91,11 +91,11 @@ GOALIE_RIGHT_LEDS =  ((SUBROLE_LED, GREEN, NOW),)
 OTHER_SUBROLE_LEDS= ((SUBROLE_LED, OFF, NOW),)
 
 ##### GOAL ######
-LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, EYE_YELLOW, NOW),)
-LEFT_POST_AMBIGUOUS_LEDS = ((RIGHT_GOAL_LED, GREEN, NOW),)
+LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, GREEN, NOW),)
+LEFT_POST_AMBIGUOUS_LEDS = ((RIGHT_GOAL_LED, EYE_YELLOW, NOW),)
 LEFT_POST_OFF_LEDS = ((RIGHT_GOAL_LED, BLUE, NOW),)
-RIGHT_POST_ON_LEDS =  ((LEFT_GOAL_LED, EYE_YELLOW, NOW),)
-RIGHT_POST_AMBIGUOUS_LEDS = ((LEFT_GOAL_LED, GREEN, NOW),)
+RIGHT_POST_ON_LEDS =  ((LEFT_GOAL_LED, GREEN, NOW),)
+RIGHT_POST_AMBIGUOUS_LEDS = ((LEFT_GOAL_LED, EYE_YELLOW, NOW),)
 RIGHT_POST_OFF_LEDS = ((LEFT_GOAL_LED, BLUE, NOW),)
 
 BLUE_GOAL_LEDS = ((GOAL_ID_LED, BLUE, NOW),)
@@ -183,6 +183,9 @@ class Leds():
         if GOAL_LEDS:
             newCertainty = self.brain.ygrp.vis.certainty
 
+#            print 'YGRP:\n\tON: {0}\n\tFramesON: {1}\n\tFramesOFF: {2}\nYGLP:\n\tON: {3}\n\tFramesON: {4}\n\tFramesOFF: {5}'.format(self.brain.ygrp.vis.on,self.brain.ygrp.vis.framesOn,self.brain.ygrp.vis.framesOff,self.brain.yglp.vis.on,self.brain.yglp.vis.framesOn,self.brain.yglp.vis.framesOff)
+#            print 'Certainty: {0}'.format(newCertainty)
+
             if (newCertainty == vision.certainty.NOT_SURE):
                 if (self.brain.ygrp.vis.on and
                     (self.brain.ygrp.vis.framesOn == 1 or
@@ -204,10 +207,13 @@ class Leds():
             if(self.brain.ygrp.vis.framesOff == 1):
                 #we don't see the right post for the first time
                 self.executeLeds(RIGHT_POST_OFF_LEDS)
-            if((self.brain.ygrp.vis.framesOff >= 1 or
-                newCertainty != vision.certainty.NOT_SURE) and
-               (self.brain.yglp.vis.framesOff == 1 or
-                self.goalCertainty != newCertainty)):
+            if((self.brain.yglp.vis.framesOff == 1 and
+                (newCertainty != vision.certainty.NOT_SURE and
+                 self.brain.ygrp.vis.framesOff >= 1)) or
+               (self.brain.yglp.vis.framesOff >=1 and
+                ((newCertainty != vision.certainty.NOT_SURE and
+                  newCertainty != self.goalCertainty) or
+                 self.brain.ygrp.vis.framesOff == 1))):
                 #we don't see the left post for the first time
                 self.executeLeds(LEFT_POST_OFF_LEDS)
 
@@ -234,6 +240,7 @@ class Leds():
 
         if PLAYBOOK_LEDS:
             if self.brain.playbook.roleChanged():
+                print "\n\nROLE CHANGED!!\n"
                 if self.brain.play.isRole(PBConstants.CHASER):
                     self.executeLeds(CHASER_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.OFFENDER):
@@ -251,6 +258,7 @@ class Leds():
                     self.executeLeds(ROLE_OFF_LEDS)
 
             if not self.brain.playbook.subRoleUnchanged():
+                print "\n\nSUBROLE CHANGED!!\n"
                 play = self.brain.play
                 if play.isRole(PBConstants.GOALIE):
                     if (play.isSubRole(PBConstants.GOALIE_CENTER)):

@@ -322,21 +322,21 @@ namespace ALNames {
 		&earL[LEFT_LED][2],             // 3
 		&earL[LEFT_LED][3],             // 4
 		&earL[LEFT_LED][4],             // 5
-		&earL[RIGHT_LED][0],            // Right Loc 1
-		&earL[RIGHT_LED][1],            // 2
-		&earL[RIGHT_LED][2],            // 3
-		&earL[RIGHT_LED][3],            // 4
-		&earL[RIGHT_LED][4],            // 5
+		&earL[RIGHT_LED][1],            // Right Loc 1
+		&earL[RIGHT_LED][2],            // 2
+		&earL[RIGHT_LED][3],            // 3
+		&earL[RIGHT_LED][4],            // 4
+		&earL[RIGHT_LED][5],            // 5
         &earL[LEFT_LED][5],             // Left Comm 1
 		&earL[LEFT_LED][6],             // 2
 		&earL[LEFT_LED][7],             // 3
 		&earL[LEFT_LED][8],             // 4
 		&earL[LEFT_LED][9],             // 5
-		&earL[RIGHT_LED][5],            // Right Comm 1
-		&earL[RIGHT_LED][6],            // 2
-		&earL[RIGHT_LED][7],            // 3
-		&earL[RIGHT_LED][8],            // 4
-		&earL[RIGHT_LED][9],            // 5
+		&earL[RIGHT_LED][6],            // Right Comm 1
+		&earL[RIGHT_LED][7],            // 2
+		&earL[RIGHT_LED][8],            // 3
+		&earL[RIGHT_LED][9],            // 4
+		&earL[RIGHT_LED][0],            // 5
         &subRoleL[0][0],                // Subrole
 		&roleL[0][0],                   // Role
 		&ballL[0][0],                   // Ball
