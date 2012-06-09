@@ -1,15 +1,19 @@
 #include "FieldLinesDetector.h"
 #include <stdio.h>
 #include <boost/make_shared.hpp>
+#include "HoughSpace.h"
+#include "EdgeDetector.h"
+#include "Gradient.h"
 
 using namespace std;
 using boost::shared_ptr;
 
 FieldLinesDetector::FieldLinesDetector() :
-    VisualDetector(), edges(), gradient(),
-    houghLines()
+    mEdges(new EdgeDetector),
+    mGradient(new Gradient),
+    mHoughLines()
 {
-    hough = HoughSpace::create();
+    mHough = HoughSpace::create();
 }
 
 /**
@@ -42,9 +46,9 @@ void FieldLinesDetector::findHoughLines(int upperBound,
                                         int* field_edge,
                                         const uint16_t *img)
 {
-    gradient.reset();
-    edges.detectEdges(upperBound, field_edge, img, gradient);
-    houghLines = hough->findLines(gradient);
+    mGradient->reset();
+    mEdges->detectEdges(upperBound, field_edge, img, *mGradient);
+    mHoughLines = mHough->findLines(*mGradient);
 }
 
 /**
@@ -53,30 +57,28 @@ void FieldLinesDetector::findHoughLines(int upperBound,
  */
 void FieldLinesDetector::findFieldLines()
 {
-    lines.clear();
+    mLines.clear();
     list<pair<HoughLine, HoughLine> >::const_iterator hl;
-    for(hl = houghLines.begin(); hl != houghLines.end(); ++hl){
-        lines.push_back(VisualLine(hl->first,
-                                   hl->second,
-                                   gradient));
+    for(hl = mHoughLines.begin(); hl != mHoughLines.end(); ++hl){
+        mLines.push_back(VisualLine(hl->first, hl->second, *mGradient));
     }
 }
 
 void FieldLinesDetector::setEdgeThreshold(int thresh)
 {
-    edges.setThreshold(static_cast<uint8_t>(thresh));
+    mEdges->setThreshold(static_cast<uint8_t>(thresh));
 }
 
 void FieldLinesDetector::setHoughAcceptThreshold(int thresh)
 {
-    hough->setAcceptThreshold(thresh);
+    mHough->setAcceptThreshold(thresh);
 }
 
 list<HoughLine> FieldLinesDetector::getHoughLines() const
 {
     list<HoughLine> lines;
     list<pair<HoughLine, HoughLine> >::const_iterator i;
-    for(i = houghLines.begin(); i != houghLines.end(); ++i){
+    for(i = mHoughLines.begin(); i != mHoughLines.end(); ++i){
         lines.push_back(i->first);
         lines.push_back(i->second);
     }
