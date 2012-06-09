@@ -31,7 +31,6 @@ public:
     void setCenterY(int cy) { centerY = cy; }
     void setAngleX(float aX) { angleX = aX; }
     void setAngleY(float aY) { angleY = aY; }
-    void setFocDist(float fd) { focDist = fd; }
     void setDistance(float d) { distance = d; }
     void setBearing(float b) { bearing = b; }
     void setElevation(float e) { elevation = e; }
@@ -58,7 +57,6 @@ public:
     const float getAngleY() const { return angleY; }
     const float getAngleXDeg() const { return angleX*TO_DEG; }
     const float getAngleYDeg() const { return angleY*TO_DEG; }
-    const float getFocDist() const { return focDist; }
     const float getDistance() const { return distance; }
     const float getBearing() const { return bearing; }
     const float getBearingDeg() const { return bearing*TO_DEG; }
@@ -80,7 +78,6 @@ protected:
     int centerY;
     float angleX;
     float angleY;
-    float focDist;
     float distance;
     float bearing;
     float elevation;

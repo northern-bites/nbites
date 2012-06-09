@@ -30,6 +30,10 @@ namespace angle {
     typedef float degrees;
 }
 
+typedef int pixels;
+typedef float cms;
+typedef float mms;
+
 #define ROBOT(t) ( \
     (t == NAO_RL_33 && ROBOT_TYPE == NAO_RL_33) || \
     (t == NAO_NEXTGEN && ROBOT_TYPE == NAO_NEXTGEN) || \
