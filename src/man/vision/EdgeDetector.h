@@ -16,35 +16,58 @@
 class EdgeDetector
 {
 public:
-    EdgeDetector(uint8_t thresh = default_edge_value);
+    EdgeDetector();
     virtual ~EdgeDetector(){ };
 
-/**
- * Public interface
- */
-public:
+    /**
+     * Find the edges in a channel of an image.
+     *
+     * @param channel      The entire channel (one of Y, U, or V)
+     */
     void detectEdges(int upperBound,
                      int* field_edge,
                      const uint16_t* channel,
                      Gradient& gradient);
 
     void    setThreshold(uint8_t thresh) { threshold = thresh; }
-    uint8_t getThreshold() { return threshold; }
+    uint8_t getThreshold()               { return threshold;   }
 
-private:
+protected:
+
+    /**
+     * Apply the Sobel Operator to the given channel and fill a given struct
+     * with the gradient information (x, y, absolute magnitude)
+     *
+     * / -1 0 +1 \   / -1 -2 -1 \
+     * | -2 0 +2 |   |  0  0  0 |
+     * \ -1 0 +1 /   \ +1 +2 +1 /
+     *      Gx           Gy
+     * @param channel     The channel with edges to be detected.
+     * @param gradient    Gradient struct to be populated.
+     */
     void sobelOperator(int upperBound,
                        const uint16_t* channel,
                        Gradient& gradient);
 
+    /**
+     * Run an asymmetric peak test over the given gradient array. Based on
+     * the direction of the magnitude at a pixel, ensure that its gradient
+     * is greater (>) than the magnitude of the point opposite its
+     * gradient and greater than or equal to (>=) the magnitude of the
+     * point in the direction of its gradient.
+     *
+     * Example:
+     *     Magnitude Direction: to the right
+     *     Test:
+     *     - - -
+     *     > - >=
+     *     - - -
+     *
+     * @param gradient Gradient to check for points.
+     */
     void findPeaks(int upperBound,
                    int* field_edge,
                    Gradient& gradient);
-
-private:
-    enum {
-        default_edge_value = 75
-    };
-
 private:
     uint8_t threshold;
 };

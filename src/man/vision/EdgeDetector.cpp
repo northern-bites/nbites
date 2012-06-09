@@ -5,6 +5,10 @@
 #include <iostream>
 #include <stdio.h>
 
+enum {
+    default_edge_value = 75
+};
+
 extern "C" void _sobel_operator(int bound,
                                 const uint8_t thresh,
                                 const uint16_t *input,
@@ -16,17 +20,12 @@ extern "C" int _find_edge_peaks(int bound,
 using boost::shared_ptr;
 using namespace std;
 
-EdgeDetector::EdgeDetector(uint8_t thresh):
-    threshold(thresh)
+EdgeDetector::EdgeDetector():
+    threshold(default_edge_value)
 {
 
 }
 
-/**
- * Find the edges in a channel of an image.
- *
- * @param channel      The entire channel (one of Y, U, or V)
- */
 void EdgeDetector::detectEdges(int upperBound,
                                int* field_edge,
                                const uint16_t* channel,
@@ -38,17 +37,6 @@ void EdgeDetector::detectEdges(int upperBound,
     PROF_EXIT(P_EDGES);
 }
 
-/**
- * Apply the Sobel Operator to the given channel and fill a given struct
- * with the gradient information (x, y, absolute magnitude)
- *
- * / -1 0 +1 \   / -1 -2 -1 \
- * | -2 0 +2 |   |  0  0  0 |
- * \ -1 0 +1 /   \ +1 +2 +1 /
- *      Gx           Gy
- * @param channel     The channel with edges to be detected.
- * @param gradient    Gradient struct to be populated.
- */
 void EdgeDetector::sobelOperator(int upperBound,
                                  const uint16_t* channel,
                                  Gradient& gradient)
@@ -108,23 +96,6 @@ void EdgeDetector::sobelOperator(int upperBound,
     PROF_EXIT(P_SOBEL);
 }
 
-
-/**
- * Run an asymmetric peak test over the given gradient array. Based on
- * the direction of the magnitude at a pixel, ensure that its gradient
- * is greater (>) than the magnitude of the point opposite its
- * gradient and greater than or equal to (>=) the magnitude of the
- * point in the direction of its gradient.
- *
- * Example:
- *     Magnitude Direction: to the right
- *     Test:
- *     - - -
- *     > - >=
- *     - - -
- *
- * @param gradient Gradient to check for points.
- */
 void EdgeDetector::findPeaks(int upperBound,
                              int * field_edge,
                              Gradient& gradient)
