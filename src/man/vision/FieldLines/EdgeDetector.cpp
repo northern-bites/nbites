@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 enum {
-    default_edge_value = 75
+    default_edge_value = 50
 };
 
 extern "C" void _sobel_operator(int bound,
