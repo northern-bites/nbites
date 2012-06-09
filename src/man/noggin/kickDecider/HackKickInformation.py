@@ -124,7 +124,7 @@ class KickInformation:
             if mate.playerNumber in [1, 4] and mate.active:
                 if mate.ballOn and mate.ballDist < 100:
                     return True
-                
+
         return False
 
 

@@ -4,6 +4,7 @@
 #include <QtDebug>
 
 #include <QFileDialog>
+#include <QCheckBox>
 
 namespace qtool {
 namespace colorcreator {
@@ -35,7 +36,6 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         connect(&colorSpace[i], SIGNAL(parametersChanged()),
                 this, SLOT(updateThresholdedImage()));
     }
-
     leftLayout->addWidget(imageTabs);
 
     //update the threshold when the underlying image changes
@@ -79,16 +79,30 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     connect(&saveColorTableBtn, SIGNAL(clicked()),
             this, SLOT(saveColorTableBtnPushed()));
 
+    QCheckBox* fullColors = new QCheckBox(tr("All colors"));
+    rightLayout->addWidget(fullColors);
+    connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
+	displayAllColors = false;
+
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
     this->setLayout(mainLayout);
 }
 
+// flip between one and all colors
+	void ColorCalibrate::setFullColors(bool state) {
+		displayAllColors = !displayAllColors;
+		updateThresholdedImage();
+	}
+
 void ColorCalibrate::selectColorSpace(int index) {
     currentColorSpace = &colorSpace[index];
     colorWheel.setColorSpace(currentColorSpace);
     colorSpaceWidget.setColorSpace(currentColorSpace);
+	if (!displayAllColors) {
+		updateThresholdedImage();
+	}
 }
 
 // TODO: Ideally we'd want to have this in a separate class
@@ -132,7 +146,8 @@ void ColorCalibrate::updateThresholdedImage() {
             int count = 0;
             long long tempColor = 0;
             for (int c = 0; c < image::NUM_COLORS; c++) {
-                if (colorSpace[c].contains(color)) {
+                if (colorSpace[c].contains(color) &&
+					(displayAllColors || currentColorSpace == &colorSpace[c])) {
                     //blend colors in by averaging them
                     tempColor *= count;
                     tempColor += image::Color_RGB[c];
