@@ -9,6 +9,9 @@
 
 #pragma once
 
+#include <QVector>
+#include <QCheckBox>
+
 #include "data/DataFinder.h"
 #include "data/DataManager.h"
 #include "RobotSelect.h"
@@ -33,6 +36,7 @@ private slots:
 private:
     data::DataManager::ptr dataManager;
     RobotSelect robotSelect;
+    QVector<QCheckBox*> objectSelectVector;
 };
 
 }

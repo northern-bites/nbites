@@ -20,7 +20,7 @@ using namespace image;
 OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
         QWidget(parent),
         dataManager(dataManager),
-        groundTruth(dataManager->getGroundTruth()),
+        groundTruth(dataManager->getMemory()->get<GroundTruth>()),
         connectButton(new QPushButton("Connect", this)){
 
     dataManager->connectSlot(this, SLOT(newGroundTruth()), "GroundTruth");
@@ -32,8 +32,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     PaintGroundTruth* groundImage = new PaintGroundTruth(groundTruth, this);
     OverlayedImage* combinedImage = new OverlayedImage(fieldImage, groundImage, this);
     viewer::BMPImageViewer* fieldView = new BMPImageViewer(combinedImage, this);
-    connect(dataManager.get(), SIGNAL(dataUpdated()),
-            fieldView, SLOT(updateView()));
+    dataManager->connect(fieldView, SLOT(updateView()), "GroundTruth");
     mainLayout->addWidget(fieldView);
 
     QVBoxLayout* rightLayout = new QVBoxLayout();
@@ -89,7 +88,7 @@ void OverseerClient::connectToOverseer() {
 
     SocketInProvider::ptr socket_in(new SocketInProvider(
             host_info.addresses().first().toIPv4Address(), OVERSEER_PORT));
-    dataManager->newGroundTruthProvider(socket_in);
+    dataManager->newInputProvider(socket_in, "GroundTruth");
 }
 
 }

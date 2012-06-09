@@ -25,12 +25,6 @@ void VisualInfoImage::buildBitmap() {
     const PVision::PVisualBall ballData = visionData->get()->visual_ball();
     drawBall(ballData);
 
-    const PVision::PVisualFieldObject bglpData = visionData->get()->bglp();
-    drawGoalPost(bglpData);
-
-    const PVision::PVisualFieldObject bgrpData = visionData->get()->bgrp();
-    drawGoalPost(bgrpData);
-
     const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
     if(yglpData.visual_detection().distance() || yglpData.visual_detection().x() ||
             yglpData.visual_detection().y())

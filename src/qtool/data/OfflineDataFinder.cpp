@@ -73,11 +73,6 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
             std::string path = fileInfo.absoluteFilePath().toStdString();
             InProvider::ptr file_in(new FileInProvider(path));
             emit signalNewInputProvider(file_in, fileInfo.baseName().toStdString());
-
-            if (fileInfo.baseName() == "GroundTruth") {
-                InProvider::ptr file_in(new FileInProvider(path));
-                emit signalGroundTruth(file_in);
-            }
         }
     }
 }

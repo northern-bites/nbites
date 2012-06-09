@@ -17,15 +17,25 @@ using namespace data;
 RemoteDataFinder::RemoteDataFinder(DataManager::ptr dataManager, QWidget* parent) :
     DataFinder(parent), dataManager(dataManager) {
 
-    QLayout* layout = new QHBoxLayout;
+    QLayout* layout = new QVBoxLayout;
 
     layout->addWidget(&robotSelect);
     connect(&robotSelect, SIGNAL(robotSelected(const RemoteRobot*)),
             this, SLOT(robotSelected(const RemoteRobot*)));
 
+    for (int i = 0; i < numStreamableObjects; i++) {
+
+        std:: cout << i << std::endl;
+
+        QCheckBox* checkBox = new QCheckBox(QString(streamableObjects[i].c_str()), this);
+        checkBox->setChecked(true);
+
+        layout->addWidget(checkBox);
+        objectSelectVector.push_back(checkBox);
+    }
+
     this->setLayout(layout);
 }
-
 
 void RemoteDataFinder::robotSelected(const RemoteRobot* remoteRobot) {
 
@@ -39,11 +49,15 @@ void RemoteDataFinder::robotSelected(const RemoteRobot* remoteRobot) {
     Memory::const_ptr memory = dataManager->getMemory();
     unsigned short port_offset = 0;
 
-    for (Memory::const_iterator it = memory->begin(); it != memory->end(); it++, port_offset++) {
-        InProvider::ptr socket_in = InProvider::ptr(new SocketInProvider(
-                remoteRobot->getAddress().toIPv4Address(),
-                STREAMING_PORT_BASE + port_offset));
-        emit signalNewInputProvider(socket_in, it->first);
+    for (QVector<QCheckBox*>::Iterator it = objectSelectVector.begin();
+                                       it != objectSelectVector.end();
+                                       it++, port_offset++) {
+        if ((*it)->isChecked()) {
+            InProvider::ptr socket_in = InProvider::ptr(new SocketInProvider(
+                    remoteRobot->getAddress().toIPv4Address(),
+                    STREAMING_PORT_BASE + port_offset));
+            emit signalNewInputProvider(socket_in, (*it)->text().toStdString());
+        }
     }
 }
 

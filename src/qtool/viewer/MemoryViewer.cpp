@@ -74,7 +74,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     std::vector<QTreeView> messageViewers;
     for (Memory::const_iterator iterator = memory->begin(); iterator != memory->end(); iterator++) {
 
-        if (iterator->second != memory->get<MRawImages>()) {
+        if (iterator->first != "MRawImages" && iterator->first != "GroundTruth") {
 
             QDockWidget* dockWidget = new QDockWidget(QString(iterator->first.c_str()), this);
             MObjectViewer* view = new MObjectViewer(iterator->second->getProtoMessage());

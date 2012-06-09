@@ -15,6 +15,20 @@
 namespace man {
 namespace memory {
 
+//TODO: better way of doing this
+
+//this determines the ports the streams will use in streaming
+//modify this with care
+//add new objects if you want them streamed
+static const std::string streamableObjects[] = {
+        "MVision",
+        "MRawImages",
+        "MVisionSensors",
+        "MMotionSensors",
+        "MLocalization"
+};
+
+static const int numStreamableObjects = 5;
 
 class RobotMemory : public Memory {
 

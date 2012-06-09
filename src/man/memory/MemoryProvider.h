@@ -14,6 +14,8 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 
+#include "Profiler.h"
+
 namespace man {
 namespace memory {
 
@@ -39,11 +41,15 @@ public:
     #if defined USE_MEMORY
         if (memoryObject.get()) {
 
+            PROF_ENTER(P_MEMORY_UPDATE)
+
             memoryObject->lock();
             memoryObject->get()->set_timestamp(memoryObject->time_stamp());
             (robotObject->*update)(memoryObject);
             memoryObject->release();
             memoryObject->notifySubscribers();
+
+            PROF_EXIT(P_MEMORY_UPDATE)
         }
     #endif
     }

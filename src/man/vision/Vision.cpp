@@ -276,15 +276,6 @@ void Vision::updateMVision(man::memory::MVision::ptr mVision) const {
     visual_ball->set_radius(this->ball->getRadius());
     visual_ball->set_confidence(this->ball->getConfidence());
 
-    //VisualFieldObject
-    PVision::PVisualFieldObject* bglp;
-    bglp= mVision->get()->mutable_bglp();
-    update(bglp, this->bglp);
-
-    PVision::PVisualFieldObject* bgrp;
-    bgrp= mVision->get()->mutable_bgrp();
-    update(bgrp, this->bgrp);
-
     PVision::PVisualFieldObject* yglp;
     yglp= mVision->get()->mutable_yglp();
     update(yglp, this->yglp);

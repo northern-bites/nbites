@@ -37,6 +37,8 @@ public:
 
     virtual ~GroundTruth() {}
 
+    //TODO: move the updating to the server (much like robot objects update their own memory object
+
     virtual void updateData() {
 
         data->set_timestamp(time_stamp());

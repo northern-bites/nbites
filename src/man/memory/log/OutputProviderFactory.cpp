@@ -6,7 +6,7 @@
 #include "OutputProviderFactory.h"
 #include "io/FileOutProvider.h"
 #include "io/SocketOutProvider.h"
-#include "memory/MemoryCommon.h"
+#include "memory/RobotMemory.h"
 #include "CommDef.h"
 
 using namespace std;
@@ -29,10 +29,9 @@ void OutputProviderFactory::AllFileOutput(const Memory* memory, LoggingBoard* lo
 void OutputProviderFactory::AllSocketOutput(const Memory* memory,
         LoggingBoard* loggingBoard) {
 
-    unsigned short i = 0;
-    for (Memory::const_iterator it = memory->begin(); it != memory->end(); it++, i++) {
+    for (int i = 0; i < numStreamableObjects; i++) {
         loggingBoard->newOutputProvider(OutProvider::ptr(new SocketOutProvider(
-                static_cast<unsigned short>(i + STREAMING_PORT_BASE))), it->first);
+                static_cast<unsigned short>(i + STREAMING_PORT_BASE))), streamableObjects[i]);
     }
 
 }

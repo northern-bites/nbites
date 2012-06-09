@@ -18,13 +18,12 @@ using boost::shared_ptr;
 
 DataManager::DataManager() :
         RobotMemoryManager(RobotMemory::ptr(new RobotMemory())),
-        groundTruth(new overseer::GroundTruth()),
-        groundTruthParser(NULL),
-        groundTruthLogger(NULL),
         parsingBoard(memory),
         loggingBoard(memory),
         is_recording(false) {
 
+    // not really a memory object, but hey it works
+    memory->addObject<overseer::GroundTruth>();
 }
 
 DataManager::~DataManager() {
@@ -35,46 +34,19 @@ void DataManager::newInputProvider(InProvider::ptr newInput, std::string name) {
     parsingBoard.newInputProvider(newInput, name);
 }
 
-void DataManager::newGroundTruthProvider(InProvider::ptr input) {
-    if (groundTruthParser) {
-        delete groundTruthParser;
-        groundTruthParser = NULL;
-    }
-    groundTruthParser = new MessageParser(input, groundTruth);
-    groundTruthParser->start();
-}
-
 void DataManager::reset() {
     parsingBoard.reset();
     loggingBoard.reset();
-    if (groundTruthParser) {
-        delete groundTruthParser;
-        groundTruthParser = NULL;
-    }
-    if (groundTruthLogger) {
-        delete groundTruthLogger;
-        groundTruthLogger = NULL;
-    }
 }
 
 void DataManager::startRecordingToPath(string path) {
     is_recording = true;
     log::OutputProviderFactory::AllFileOutput(memory.get(), &loggingBoard, path);
-
-    FileOutProvider::ptr file_out(new FileOutProvider(path + "/GroundTruth.log"));
-    groundTruthLogger = new MessageLogger(file_out, groundTruth);
-    groundTruth->addSubscriber(groundTruthLogger);
-    groundTruthLogger->start();
 }
 
 void DataManager::stopRecording() {
     is_recording = false;
     loggingBoard.reset();
-    if (groundTruthLogger) {
-        groundTruth->unsubscribe(groundTruthLogger);
-        delete groundTruthLogger;
-        groundTruthLogger = NULL;
-    }
 }
 
 }
