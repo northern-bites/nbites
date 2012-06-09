@@ -12,6 +12,9 @@
 #include <qtabwidget.h>
 #include <QPushButton>
 #include <QToolBar>
+#include <QScrollArea>
+#include <QResizeEvent>
+#include <QTextStream>
 
 #include "data/DataManager.h"
 

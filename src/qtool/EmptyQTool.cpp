@@ -9,6 +9,7 @@
 namespace qtool {
 
 using data::DataManager;
+QFile file(QString("./.geometry"));
 
 EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
                                             toolTabs(new QTabWidget()),
@@ -22,7 +23,6 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
     recordButton = new QPushButton(tr("Rec"));
 	scrollArea = new QScrollArea();
 
-	QFile file(QString("./.geometry"));
 	barBuffer = new QSize(15, 40);
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
@@ -34,7 +34,6 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
     toolbar->addWidget(recordButton);
 
     this->addToolBar(toolbar);
-    this->setCentralWidget(toolTabs);
 
 	scrollArea->setWidget(toolTabs);
 	scrollArea->resize(toolTabs->size());
@@ -44,18 +43,18 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 			QTextStream in(&file);
 			geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
 							 in.readLine().toInt(), in.readLine().toInt());
-		}
-		this->setGeometry(*geom);
-		file.close();
+	}
+	this->setGeometry(*geom);
+	file.close();
 }
 
 EmptyQTool::~EmptyQTool() {
 	if (file.open(QIODevice::ReadWrite)){
 		QTextStream out(&file);
-		out << this->pos().x() << endl
-			<< this->pos().y() << endl
-			<< this->width() << endl
-			<< this->height() << endl;
+		out << this->pos().x() << "\n"
+			<< this->pos().y() << "\n"
+			<< this->width() << "\n"
+			<< this->height() << "\n";
   	}
 }
 
@@ -80,7 +79,7 @@ void EmptyQTool::record() {
         }
     }
 }
-void QTool::resizeEvent(QResizeEvent* ev){
+void EmptyQTool::resizeEvent(QResizeEvent* ev){
 	QSize widgetSize = ev->size();
 	if((widgetSize.width() > geom->size().width())
 	   || (widgetSize.height() > geom->size().height()))
