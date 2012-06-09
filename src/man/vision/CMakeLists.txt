@@ -59,10 +59,13 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 # Add here source files needed to compile this project
 SET( FIELD_LINES_SRCS
   FieldLines/FieldLinesDetector
+  FieldLines/CornerDetector
   FieldLines/HoughSpace
   FieldLines/HoughSpaceImpl
   FieldLines/EdgeDetector
   FieldLines/Gradient
+  FieldLines/HoughVisualLine
+  FieldLines/HoughVisualCorner
   geom/HoughLine
   )
 
@@ -240,6 +243,15 @@ nbites_add_test( FieldLinesDetectorTest
   )
 
 target_link_libraries( FieldLinesDetectorTest
+  ${VISION_TARGET}
+  ${NBINCLUDE_TARGET}
+  )
+
+nbites_add_test( CornerDetectorTest
+  ${VISION_TEST_DIR}/CornerDetectorTest.cpp
+  )
+
+target_link_libraries( CornerDetectorTest
   ${VISION_TARGET}
   ${NBINCLUDE_TARGET}
   )

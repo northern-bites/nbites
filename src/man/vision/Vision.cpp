@@ -34,6 +34,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
+#include "FieldLines/CornerDetector.h"
 #include "FieldLines/FieldLinesDetector.h"
 
 using namespace std;
@@ -47,6 +48,7 @@ Vision::Vision(boost::shared_ptr<NaoPose> _pose)
     : pose(_pose),
       yImg(&global_16_image[0]),
       linesDetector(new FieldLinesDetector()),
+      cornerDetector(new CornerDetector()),
       frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
@@ -138,12 +140,17 @@ void Vision::notifyImage() {
                          thresh->field->getTopEdge(),
                          yImg);
 
+    cornerDetector->detect(thresh->getVisionHorizon(),
+                           thresh->field->getTopEdge(),
+                           linesDetector->getLines());
+
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
 
     drawEdges(*linesDetector->getEdges());
     drawHoughLines(linesDetector->getHoughLines());
     drawVisualLines(linesDetector->getLines());
+    drawVisualCorners(cornerDetector->getCorners());
 
     thresh->transposeDebugImage();
 
@@ -566,7 +573,7 @@ void Vision::drawEdges(Gradient& g)
 #endif
 }
 
-    void Vision::drawHoughLines(const list<HoughLine>& lines)
+void Vision::drawHoughLines(const list<HoughLine>& lines)
     {
 #ifdef OFFLINE
         if (thresh->debugHoughTransform){
@@ -603,10 +610,25 @@ void Vision::drawVisualLines(const vector<HoughVisualLine>& lines)
 #ifdef OFFLINE
     if (thresh->debugVisualLines){
         vector<HoughVisualLine>::const_iterator line;
+        int color = 5;
         for (line = lines.begin(); line != lines.end(); line++){
             pair<HoughLine, HoughLine> lp = line->getHoughLines();
-            drawHoughLine(lp.first, PALE_GREEN);
-            drawHoughLine(lp.second, PALE_GREEN);
+            drawHoughLine(lp.first, color);
+            drawHoughLine(lp.second, color);
+            color++;
+        }
+    }
+#endif
+}
+
+void Vision::drawVisualCorners(const vector<HoughVisualCorner>& corners)
+{
+#ifdef OFFLINE
+    if (thresh->debugVisualCorners) {
+        for (vector<HoughVisualCorner>::const_iterator i = corners.begin();
+             i != corners.end(); ++i) {
+            point<int> pt = i->getImageLocation();
+            drawX(pt.x, pt.y, SEA_GREEN);
         }
     }
 #endif

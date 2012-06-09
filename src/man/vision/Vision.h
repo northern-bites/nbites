@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -36,6 +35,9 @@
 
 class Vision;   // forward reference
 class FieldLinesDetector;
+class CornerDetector;
+class HoughVisualLine;
+class HoughVisualCorner;
 
 // including Class header files
 #include "VisualCrossbar.h"
@@ -90,6 +92,7 @@ public:
     void drawFieldObject(VisualFieldObject* obj, int color);
     void drawHoughLines(const std::list<HoughLine>& lines);
     void drawHoughLine(const HoughLine& line, int color);
+    void drawVisualCorners(const std::vector<HoughVisualCorner>& corners);
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     void drawLine(const point<int> start, const point<int> end,
                   const int c);
@@ -151,6 +154,7 @@ public:
 
     const uint16_t * yImg, *uImg, *vImg;
     boost::shared_ptr<FieldLinesDetector> linesDetector;
+    boost::shared_ptr<CornerDetector> cornerDetector;
 protected:
     //
     // Protected Variable

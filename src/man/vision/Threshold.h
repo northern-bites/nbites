@@ -191,6 +191,7 @@ public:
     void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
     void setDebugRobots(bool _bool);
     void setDebugVisualLines(bool _bool) {debugVisualLines = _bool;}
+    void setDebugVisualCorners(bool _bool) {debugVisualCorners = _bool;}
 #endif
 
     void initDebugImage();
@@ -292,6 +293,7 @@ private:
     bool debugHoughTransform;
     bool debugRobots;
     bool debugVisualLines;
+    bool debugVisualCorners;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;

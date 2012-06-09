@@ -13,6 +13,7 @@ public:
     virtual ~HoughVisualLine() {}
 
     std::pair<HoughLine, HoughLine> getHoughLines() const { return mLines; }
+    bool intersects(const HoughVisualLine& other, point<int>& out) const;
 
 private:
     std::pair<HoughLine, HoughLine> mLines;

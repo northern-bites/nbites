@@ -213,7 +213,9 @@ void HoughSpaceImpl::suppress(ActiveArray<HoughLine>& lines)
                                   lines[j].getRIndex());
 
             if ( (rDiff <= HC::suppress_r_bound ||
-                  lines[i].intersect(lines[j]))) {
+                  lines[i].intersectOnScreen(lines[j],
+                                             Gradient::cols,
+                                             Gradient::rows))) {
 
                 if (lines[i].getScore() < lines[j].getScore()){
                     toDelete[i] = true;

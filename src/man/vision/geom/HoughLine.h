@@ -12,12 +12,10 @@
 class HoughLine
 {
 public:
-    HoughLine(int _rIndex, int _tIndex, int _score,
-              int _centerX = static_cast<int>(Gradient::cols/2),
-              int _centerY = static_cast<int>(Gradient::rows/2));
+    HoughLine(int _rIndex, int _tIndex, int _score);
 
     HoughLine();
-    virtual ~HoughLine() { };
+    ~HoughLine() {};
 
     inline float getRadius() const { return r;      }
     inline float getAngle()  const { return t;      }
@@ -66,7 +64,29 @@ public:
         return false;
     }
 
-    bool intersect(const HoughLine& other);
+    /**
+     * Check if this line intersects another.
+     *
+     * @param out Gets filled with the intersection point, if it
+     *            exists. The coordinates are relative to the center
+     *            of the image around which the HoughLine coordinates
+     *            rotate.
+     *
+     * @returns whether the lines intersect or not
+     */
+    bool intersects(const HoughLine& other, point<int>& out) const;
+
+    /**
+     * Test whether the intersection point is on screen for a given
+     * image size.
+     *
+     * @params x0, y0 are the center of the image
+     * @returns Whether the intersection point is on screen
+     */
+    bool intersectOnScreen(const HoughLine& other,
+                           int screenWidth,
+                           int screenHeight) const;
+
     friend std::ostream& operator<< (std::ostream &o,
                                      const HoughLine &l) {
         return o << "Line: rIndex: " << l.rIndex << " tIndex: " << l.tIndex <<
@@ -83,7 +103,6 @@ private:
     int rIndex, tIndex;    // Radius, angle indices in HoughSpace table
     float r, t;            // Radius and angle of line in polar coords
     int score;             // Hough accumulator count
-    int centerX, centerY;
 
     mutable float sinT, cosT;   // These get computed on the fly, if needed
     mutable bool didSin, didCos;

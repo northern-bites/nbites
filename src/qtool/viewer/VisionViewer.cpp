@@ -60,6 +60,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     ADD_DEBUG_CHECKBOX("Hough Debug", setHoughTransformDebug);
     ADD_DEBUG_CHECKBOX("Robot Detection Debug", setRobotsDebug);
     ADD_DEBUG_CHECKBOX("Visual Line Debug", setVisualLinesDebug);
+    ADD_DEBUG_CHECKBOX("Visual Corner Debug", setVisualCornersDebug);
 
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
@@ -233,6 +234,7 @@ SET_DEBUG(EdgeDetection, edgeDetect);
 SET_DEBUG(OpenField, openField);
 SET_DEBUG(Robots, robots);
 SET_DEBUG(VisualLines, visualLines);
+SET_DEBUG(VisualCorners, visualCorners);
 
 }
 }
