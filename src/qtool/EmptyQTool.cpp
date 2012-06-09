@@ -85,7 +85,7 @@ void EmptyQTool::resizeEvent(QResizeEvent* ev){
 		toolTabs->resize(widgetSize-*scrollBarSize);
 	}
 	else {
-		qDebug()<<"QTool x or y dimension at minimum size, redrawing with scroll bars";
+		//do nothing - scroll bars will kick in by themselves
 	}
 	QWidget::resizeEvent(ev);
 }
