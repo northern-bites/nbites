@@ -6,6 +6,7 @@ from collections import deque
 from vision import certainty
 from man.motion.HeadMoves import FIXED_PITCH_LEFT_SIDE_PAN
 from ..navigator import Navigator as nav
+from ..util import Transition
 
 import man.motion.SweetMoves as SweetMoves
 
@@ -21,6 +22,7 @@ def gameInitial(player):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
 
+    #fix this hack-lizzie
     player.rightPostBearings = deque([])
     player.rightPostBearings.append(30)
     player.rightPostDistances = deque([])
@@ -49,13 +51,6 @@ def gameReady(player):
     if player.initialDelayCounter < 230:
         player.initialDelayCounter += 1
         return player.stay()
-
-    # If the goalie were to move during ready, it should happen here.
-    # If the goalie walks forward at start of game, need to check if a goal
-    #  was just scored. If so, walk forward enough to require manual positioning.
-    #  Otherwise, every goal accumulates forward walk, and goalie ends up out
-    #  of position.
-
 
     return player.goLater('walkToGoal')
 
@@ -117,7 +112,7 @@ def gameFinished(player):
 ##### Non-main game methods
 
 def updatePostObservations(player):
-    if player.brain.vision.ygrp.on:
+    if player.brain.vision.ygrp.on and player.brain.vision.ygrp.certainty != certainty.NOT_SURE:
         print "RIGHT: Saw right post."
         player.rightPostBearings.append(player.brain.vision.ygrp.bearing)
         if len(player.rightPostBearings) > 50:
@@ -129,10 +124,10 @@ def updatePostObservations(player):
     if player.brain.vision.yglp.on:
         print "LEFT: Saw left post."
         player.leftPostBearings.append(player.brain.vision.yglp.bearing)
-        if len(player.leftPostBearings) > 100:
+        if len(player.leftPostBearings) > 50:
             player.leftPostBearings.popleft()
         player.leftPostDistances.append(player.brain.vision.yglp.dist)
-        if len(player.leftPostDistances) > 100:
+        if len(player.leftPostDistances) > 50:
             player.leftPostDistances.popleft()
 
     leftBearingsSum = 0
@@ -151,44 +146,54 @@ def updatePostObservations(player):
     for value in player.rightPostDistances:
         rightDistancesSum += value
 
-    curLeftBearing = leftBearingsSum/len(player.leftPostBearings)
+    player.curLeftBearing = leftBearingsSum/len(player.leftPostBearings)
     curRightBearing = rightBearingsSum/len(player.rightPostBearings)
     curLeftDistance = leftDistancesSum/len(player.leftPostDistances)
     curRightDistance = rightDistancesSum/len(player.rightPostDistances)
 
-    player.centerGoalBearing = (curLeftBearing + curRightBearing)/2.0
-    player.centerGoalDistance = (curLeftDistance + curRightDistance)/2.0
+    player.leftx = curLeftDistance * cos(radians(player.curLeftBearing))
+    player.lefty = curLeftDistance * sin(radians(player.curLeftBearing))
 
-    print "Bearing: " + str(player.centerGoalBearing)
-    print "  Left: " + str(curLeftBearing)
-    print "  Right: " + str(curRightBearing)
-    print "Distance: " + str(player.centerGoalDistance)
-    print "  Left: " + str(curLeftDistance)
-    print "  Right: " + str(curRightDistance)
+    player.rightx = curRightDistance * cos(radians(curRightBearing))
+    player.righty = curRightDistance * sin(radians(curRightBearing))
 
     print "To get to: "
-    print "  Left: " + str(curLeftDistance * cos(radians(curLeftBearing))) + " " + str(curLeftDistance * sin(radians(curLeftBearing)))
-    print "  Right: " + str(curRightDistance * cos(radians(curRightBearing))) + " " + str(curRightDistance * sin(radians(curRightBearing)))
+    print "  Left: " + str(player.leftx) + " " + str(player.lefty)
+    print "  Right: " + str(player.rightx) + " " + str(player.righty)
+
+    player.centerGoalBearing = (player.curLeftBearing + curRightBearing)/2.0
+    player.centerGoalDistance = (curLeftDistance + curRightDistance)/2.0
+
+    print "Averaged Bearing: " + str(player.centerGoalBearing)
+    print "  Left: " + str(player.curLeftBearing)
+    print "  Right: " + str(curRightBearing)
+    print "Averaged Distance: " + str(player.centerGoalDistance)
+    print "  Left: " + str(curLeftDistance)
+    print "  Right: " + str(curRightDistance)
 
 def walkToGoal(player):
     print "========================================"
 
     updatePostObservations(player)
+    player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
 
     if player.firstFrame():
         player.brain.nav.goTo(player.home, nav.CLOSE_ENOUGH, nav.FAST_SPEED)
-        player.brain.tracker.lookToAngleFixedPitch(player.centerGoalBearing)
 
-    player.home.relY = (player.centerGoalDistance *
-                        sin(radians(player.centerGoalBearing)))
-    player.home.relX = (player.centerGoalDistance *
-                        cos(radians(player.centerGoalBearing)))
+    player.home.relY = (player.lefty + player.righty) / 2.0
+    player.home.relX = ((player.leftx - 70) + (player.rightx + 70)) / 2.0
+
+    if player.home.relY < 120:
+        player.home.relY = player.lefty
+        player.home.relX = player.leftx - 70
+        player.brain.tracker.lookToAngle(player.curLeftBearing)
+
     print "Going to " + str(player.home.relX) + " " + str(player.home.relY)
 
-    if player.centerGoalDistance < 400.0:
-        player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
-
     return player.stay()
+    #return Transition.getNextState(player, walkToGoal)
+
+#walkToGoal.transitions = { turnForward: Transition.CountTransition(atGoal) }
 
 def fallen(player):
     return player.stay()
