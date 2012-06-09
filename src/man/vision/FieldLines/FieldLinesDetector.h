@@ -11,7 +11,7 @@ class Gradient;
 #include "geom/HoughLine.h"
 #include "Profiler.h"
 #include "VisualCorner.h"
-#include "VisualLine.h"
+#include "HoughVisualLine.h"
 
 class FieldLinesDetector
 {
@@ -32,7 +32,7 @@ public:
     std::list<HoughLine> getHoughLines() const;
 
     // FieldLines interface
-    std::vector<VisualLine> getLines() {
+    std::vector<HoughVisualLine> getLines() {
         return mLines;
     };
     std::list<VisualCorner> getCorners() {
@@ -49,7 +49,7 @@ private:
     boost::shared_ptr<Gradient> mGradient;
 
     std::list<std::pair<HoughLine, HoughLine> > mHoughLines;
-    std::vector<VisualLine> mLines;
+    std::vector<HoughVisualLine> mLines;
     std::list<VisualCorner> mCorners;
     boost::shared_ptr<HoughSpace> mHough;
 };

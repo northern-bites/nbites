@@ -60,7 +60,7 @@ void FieldLinesDetector::findFieldLines()
     mLines.clear();
     list<pair<HoughLine, HoughLine> >::const_iterator hl;
     for(hl = mHoughLines.begin(); hl != mHoughLines.end(); ++hl){
-        mLines.push_back(VisualLine(hl->first, hl->second, *mGradient));
+        mLines.push_back(HoughVisualLine(hl->first, hl->second));
     }
 }
 
