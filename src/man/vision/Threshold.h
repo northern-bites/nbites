@@ -183,8 +183,8 @@ public:
 
 #ifdef OFFLINE
     void setConstant(int c);
-    void setHorizonDebug(bool _bool) { visualHorizonDebug = _bool; }
-    bool getHorizonDebug() { return visualHorizonDebug; }
+    void setDebugHorizon(bool _bool) { visualHorizonDebug = _bool; }
+    bool getDebugHorizon() { return visualHorizonDebug; }
     void setDebugShooting(bool _bool) {debugShot = _bool;}
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
