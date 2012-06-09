@@ -1,6 +1,11 @@
 import time
-from objects import RelRobotLocation
+from objects import RelRobotLocation, RelLocation
 from GoalieConstants import INITIAL_ANGLE
+from math import sin, cos, radians
+from collections import deque
+from vision import certainty
+from man.motion.HeadMoves import FIXED_PITCH_LEFT_SIDE_PAN
+from ..navigator import Navigator as nav
 
 import man.motion.SweetMoves as SweetMoves
 
@@ -16,6 +21,17 @@ def gameInitial(player):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
 
+    player.rightPostBearings = deque([])
+    player.rightPostBearings.append(30)
+    player.rightPostDistances = deque([])
+    player.rightPostDistances.append(300)
+    player.leftPostBearings = deque([])
+    player.leftPostBearings.append(30)
+    player.leftPostDistances = deque([])
+    player.leftPostDistances.append(300)
+
+    player.home = RelLocation(0, 0)
+
     return player.stay()
 
 def gameReady(player):
@@ -23,6 +39,7 @@ def gameReady(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.lookToAngle(INITIAL_ANGLE)
+        print "Looking to: " + str(INITIAL_ANGLE)
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -40,7 +57,7 @@ def gameReady(player):
     #  of position.
 
 
-    return player.stay()
+    return player.goLater('walkToGoal')
 
 def gameSet(player):
     if player.firstFrame():
@@ -53,9 +70,9 @@ def gameSet(player):
     # For the goalie, reset loc every frame.
     # This way, garaunteed to have correctly set loc and be standing in that
     #  location for a frame before gamePlaying begins.
-    player.brain.loc.resetLocTo(player.brain.FIELD_WHITE_LEFT_SIDELINE_X,
-                                    player.brain.MIDFIELD_Y,
-                                    0)
+    #player.brain.loc.resetLocTo(player.brain.FIELD_WHITE_LEFT_SIDELINE_X,
+    #                               player.brain.MIDFIELD_Y,
+    #                                  0)
 
     return player.stay()
 
@@ -80,9 +97,6 @@ def gamePenalized(player):
 
     return player.stay()
 
-def fallen(player):
-    return player.stay()
-
 def gameFinished(player):
     if player.firstFrame():
         player.stopWalking()
@@ -98,6 +112,85 @@ def gameFinished(player):
 
     if not player.motion.isBodyActive() and player.GAME_FINISHED_satDown:
         player.gainsOff()
+    return player.stay()
+
+##### Non-main game methods
+
+def updatePostObservations(player):
+    if player.brain.vision.ygrp.on:
+        print "RIGHT: Saw right post."
+        player.rightPostBearings.append(player.brain.vision.ygrp.bearing)
+        if len(player.rightPostBearings) > 50:
+            player.rightPostBearings.popleft()
+        player.rightPostDistances.append(player.brain.vision.ygrp.dist)
+        if len(player.rightPostDistances) > 50:
+            player.rightPostDistances.popleft()
+
+    if player.brain.vision.yglp.on:
+        print "LEFT: Saw left post."
+        player.leftPostBearings.append(player.brain.vision.yglp.bearing)
+        if len(player.leftPostBearings) > 100:
+            player.leftPostBearings.popleft()
+        player.leftPostDistances.append(player.brain.vision.yglp.dist)
+        if len(player.leftPostDistances) > 100:
+            player.leftPostDistances.popleft()
+
+    leftBearingsSum = 0
+    for value in player.leftPostBearings:
+        leftBearingsSum += value
+
+    rightBearingsSum = 0
+    for value in player.rightPostBearings:
+        rightBearingsSum += value
+
+    leftDistancesSum = 0
+    for value in player.leftPostDistances:
+        leftDistancesSum += value
+
+    rightDistancesSum = 0
+    for value in player.rightPostDistances:
+        rightDistancesSum += value
+
+    curLeftBearing = leftBearingsSum/len(player.leftPostBearings)
+    curRightBearing = rightBearingsSum/len(player.rightPostBearings)
+    curLeftDistance = leftDistancesSum/len(player.leftPostDistances)
+    curRightDistance = rightDistancesSum/len(player.rightPostDistances)
+
+    player.centerGoalBearing = (curLeftBearing + curRightBearing)/2.0
+    player.centerGoalDistance = (curLeftDistance + curRightDistance)/2.0
+
+    print "Bearing: " + str(player.centerGoalBearing)
+    print "  Left: " + str(curLeftBearing)
+    print "  Right: " + str(curRightBearing)
+    print "Distance: " + str(player.centerGoalDistance)
+    print "  Left: " + str(curLeftDistance)
+    print "  Right: " + str(curRightDistance)
+
+    print "To get to: "
+    print "  Left: " + str(curLeftDistance * cos(radians(curLeftBearing))) + " " + str(curLeftDistance * sin(radians(curLeftBearing)))
+    print "  Right: " + str(curRightDistance * cos(radians(curRightBearing))) + " " + str(curRightDistance * sin(radians(curRightBearing)))
+
+def walkToGoal(player):
+    print "========================================"
+
+    updatePostObservations(player)
+
+    if player.firstFrame():
+        player.brain.nav.goTo(player.home, nav.CLOSE_ENOUGH, nav.FAST_SPEED)
+        player.brain.tracker.lookToAngleFixedPitch(player.centerGoalBearing)
+
+    player.home.relY = (player.centerGoalDistance *
+                        sin(radians(player.centerGoalBearing)))
+    player.home.relX = (player.centerGoalDistance *
+                        cos(radians(player.centerGoalBearing)))
+    print "Going to " + str(player.home.relX) + " " + str(player.home.relY)
+
+    if player.centerGoalDistance < 400.0:
+        player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
+
+    return player.stay()
+
+def fallen(player):
     return player.stay()
 
 def position(player):

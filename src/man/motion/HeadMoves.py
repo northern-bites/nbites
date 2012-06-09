@@ -374,6 +374,10 @@ FIXED_PITCH_PAN = (
     ((57.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-57.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
+FIXED_PITCH_LEFT_SIDE_PAN = (
+    ((57.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+
 # Maximum search angle for top camera.
 FIXED_PITCH_PAN_WIDE = (
     ((115.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
