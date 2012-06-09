@@ -34,6 +34,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
+#include "FieldLines/FieldLinesDetector.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -44,7 +45,8 @@ static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 // Vision Class Constructor
 Vision::Vision(boost::shared_ptr<NaoPose> _pose)
     : pose(_pose),
-      yImg(&global_16_image[0]), linesDetector(),
+      yImg(&global_16_image[0]),
+      linesDetector(new FieldLinesDetector()),
       frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
@@ -132,16 +134,16 @@ void Vision::notifyImage() {
     pose->transform();
     PROF_EXIT(P_TRANSFORM);
 
-    // Perform image correction, thresholding, and object recognition
-    thresh->visionLoop();
-
-    linesDetector.detect(thresh->getVisionHorizon(),
+    linesDetector->detect(thresh->getVisionHorizon(),
                          thresh->field->getTopEdge(),
                          yImg);
 
-    drawEdges(*linesDetector.getEdges());
-    drawHoughLines(linesDetector.getHoughLines());
-    drawVisualLines(*linesDetector.getLines());
+    // Perform image correction, thresholding, and object recognition
+    thresh->visionLoop();
+
+    drawEdges(*linesDetector->getEdges());
+    drawHoughLines(linesDetector->getHoughLines());
+    drawVisualLines(linesDetector->getLines());
 
     thresh->transposeDebugImage();
 

@@ -33,9 +33,9 @@
 #include "Common.h"
 #include "VisionDef.h"
 #include "Profiler.h"
-#include "FieldLines/FieldLinesDetector.h"
 
 class Vision;   // forward reference
+class FieldLinesDetector;
 
 // including Class header files
 #include "VisualCrossbar.h"
@@ -149,7 +149,7 @@ public:
 #define NUM_OPEN_FIELD_SEGMENTS 3
 
     const uint16_t * yImg, *uImg, *vImg;
-    FieldLinesDetector linesDetector;
+    boost::shared_ptr<FieldLinesDetector> linesDetector;
 protected:
     //
     // Protected Variable
