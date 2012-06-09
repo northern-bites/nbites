@@ -1,5 +1,6 @@
 import time
 from objects import RelRobotLocation
+import noggin_constants as nogginConstants
 
 import man.motion.SweetMoves as SweetMoves
 
@@ -51,9 +52,9 @@ def gameSet(player):
     # For the goalie, reset loc every frame.
     # This way, garaunteed to have correctly set loc and be standing in that
     #  location for a frame before gamePlaying begins.
-    player.brain.loc.resetLocTo(player.brain.FIELD_WHITE_LEFT_SIDELINE_X,
-                                    player.brain.MIDFIELD_Y,
-                                    0)
+    player.brain.loc.resetLocTo(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
+                                    nogginConstants.MIDFIELD_Y,
+                                    nogginConstants.HEADING_RIGHT)
 
     return player.stay()
 
