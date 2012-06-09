@@ -32,7 +32,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     PaintGroundTruth* groundImage = new PaintGroundTruth(groundTruth, this);
     OverlayedImage* combinedImage = new OverlayedImage(fieldImage, groundImage, this);
     viewer::BMPImageViewer* fieldView = new BMPImageViewer(combinedImage, this);
-    dataManager->connect(fieldView, SLOT(updateView()), "GroundTruth");
+    dataManager->connectSlot(fieldView, SLOT(updateView()), "GroundTruth");
     mainLayout->addWidget(fieldView);
 
     QVBoxLayout* rightLayout = new QVBoxLayout();
@@ -41,7 +41,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
 
     MObjectViewer* groundTruthView = new MObjectViewer(groundTruth->getProtoMessage(), this);
     rightLayout->addWidget(groundTruthView);
-    dataManager->connect(groundTruthView, SLOT(updateView()), "GroundTruth");
+    dataManager->connectSlot(groundTruthView, SLOT(updateView()), "GroundTruth");
 
     QLabel* fpsTagLabel = new QLabel("FPS:", this);
     fpsLabel = new QLabel(this);
