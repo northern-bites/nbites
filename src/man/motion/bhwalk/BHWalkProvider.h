@@ -38,7 +38,7 @@ public:
 
 	// Provide calibration boolean to the rest of the system.
 	bool calibrated() {
-		return walkingEngine.theInertiaSensorCalibrator.calibrated;
+		return walkingEngine.inertiaSensorCalibrator.calibrated;
 	}
 
     void requestStopFirstInstance();
