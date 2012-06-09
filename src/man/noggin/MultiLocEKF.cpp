@@ -173,7 +173,7 @@ MultiLocEKF::MultiLocEKF(man::memory::MLocalization::ptr mLocalization,
                         loc_ekf_dimension>(BETA_LOC,GAMMA_LOC), LocSystem(),
       lastOdometry(0,0,0), lastPointObservations(), lastCornerObservations(),
       useAmbiguous(true), errorLog(error_log_width),
-      resetFlag(false), memoryProvider(&updateMLocalization, this, mLocalization)
+      resetFlag(false), memoryProvider(&MultiLocEKF::updateMLocalization, this, mLocalization)
 {
     // These jacobian values are unchanging and independent of the
     // motion updates, so we initialize them here.
@@ -205,14 +205,14 @@ MultiLocEKF::MultiLocEKF(man::memory::MLocalization::ptr mLocalization,
 
 
 // Memory update
-void MultiLocEKF::updateMLocalization(const MultiLocEKF* locSystem, man::memory::MLocalization::ptr mLoc) {
+void MultiLocEKF::updateMLocalization(man::memory::MLocalization::ptr mLoc) const {
 
-    mLoc->get()->set_x_est(locSystem->getXEst());
-    mLoc->get()->set_y_est(locSystem->getYEst());
-    mLoc->get()->set_h_est(locSystem->getHEst());
-    mLoc->get()->set_x_uncert(locSystem->getXUncert());
-    mLoc->get()->set_y_uncert(locSystem->getYUncert());
-    mLoc->get()->set_h_uncert(locSystem->getHUncert());
+    mLoc->get()->set_x_est(this->getXEst());
+    mLoc->get()->set_y_est(this->getYEst());
+    mLoc->get()->set_h_est(this->getHEst());
+    mLoc->get()->set_x_uncert(this->getXUncert());
+    mLoc->get()->set_y_uncert(this->getYUncert());
+    mLoc->get()->set_h_uncert(this->getHUncert());
 }
 
 /**

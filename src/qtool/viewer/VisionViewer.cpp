@@ -158,7 +158,6 @@ void VisionViewer::update(){
     imageTranscribe->acquireNewImage();
     vision->notifyImage(sensors->getImage(Camera::BOTTOM));
 
-    offlineMVision->updateData();
     // Will need to get these to be diffent thresholded images but vision
     // appears to only threhold one at the moment!
     bottomRawImage->mutable_image()->assign(reinterpret_cast<const char *>

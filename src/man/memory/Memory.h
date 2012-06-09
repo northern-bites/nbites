@@ -113,6 +113,12 @@ public:
         }
     }
 
+    template<class T>
+    void addObject() {
+        boost::shared_ptr<T> object(new T);
+        mobject_IDMap.insert(MObject_IDPair(object->getName(), object));
+    }
+
     int numObjects() const { return mobject_IDMap.size(); }
 
 protected:

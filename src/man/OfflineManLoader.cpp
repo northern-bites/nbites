@@ -22,9 +22,12 @@ START_FUNCTION_EXPORT
 
 void loadMan(OfflineManController::ptr offlineController) {
 
-    boost::shared_ptr<Speech> speech(new Speech());
     RobotMemory::ptr memory(new RobotMemory());
-    boost::shared_ptr<Sensors> sensors(new Sensors(speech));
+
+    boost::shared_ptr<Speech> speech(new Speech());
+    boost::shared_ptr<Sensors> sensors(new Sensors(speech,
+                                                   memory->get<MVisionSensors>(),
+                                                   memory->get<MMotionSensors>()));
     boost::shared_ptr<Transcriber> transcriber(new OfflineTranscriber(sensors,
     		offlineController->getFakeMemory()->get<MVisionSensors>(),
     		offlineController->getFakeMemory()->get<MMotionSensors>()));

@@ -103,7 +103,7 @@ public:
     void drawPoint(int x, int y, int c);
 
     // Memory update
-    static void updateMVision(const Vision*, man::memory::MVision::ptr);
+    void updateMVision(man::memory::MVision::ptr) const;
 
     //
     // SETTERS

@@ -27,7 +27,7 @@
 namespace common {
 namespace io {
 
-class ProtobufMessage: public MessageInterface, public Notifier, public Subscriber {
+class ProtobufMessage: public MessageInterface, public Notifier {
 
 ADD_SHARED_PTR(ProtobufMessage)
 
@@ -50,10 +50,6 @@ public:
     virtual ~ProtobufMessage() {
     }
 
-    // this method should update the fields in the protocol buffer
-    // in some meaningful way
-    virtual void updateData() {};
-
     // thread-safety locks; while the lock is on, the object won't serialize
     // or parse back in
     // use them with care!
@@ -66,14 +62,6 @@ public:
 
     void release() {
         objectMutex.unlock();
-    }
-
-    // wraps the updateData with mutex locks and notifications
-    virtual void update() {
-        objectMutex.lock();
-        this->updateData();
-        objectMutex.unlock();
-        this->notifySubscribers();
     }
 
     virtual void serializeToString(std::string* write_buffer) const {

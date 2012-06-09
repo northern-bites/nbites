@@ -392,8 +392,6 @@ bool V4L2ImageTranscriber::waitForImage() {
             rawImage->set_width(WIDTH);
             rawImage->set_height(HEIGHT);
 
-            std::cout << rawImage->width() << std::endl;
-
             // acquire the image directly from the buffer we just copied over; faster
             // than from the original source
             ImageAcquisition::acquire_image_fast(table, params,

@@ -49,7 +49,7 @@ Vision::Vision(boost::shared_ptr<NaoPose> _pose,
     : pose(_pose),
       yImg(&global_16_image[0]), linesDetector(),
       frameNumber(0), colorTable("table.mtb"),
-      memoryProvider(&updateMVision, this, mVision)
+      memoryProvider(&Vision::updateMVision, this, mVision)
 {
     // variable initialization
 
@@ -262,7 +262,7 @@ void update(proto::PVision::PVisualCross* visual_cross,
 }
 
 //main update method
-void Vision::updateMVision(const Vision* vision, man::memory::MVision::ptr mVision) {
+void Vision::updateMVision(man::memory::MVision::ptr mVision) const {
 
     //VisualBall
     PVision::PVisualBall* visual_ball;
@@ -271,61 +271,61 @@ void Vision::updateMVision(const Vision* vision, man::memory::MVision::ptr mVisi
     //VisualBall::VisualDetection
     PVision::PVisualDetection* visual_detection;
     visual_detection = visual_ball->mutable_visual_detection();
-    update(visual_detection, vision->ball);
+    update(visual_detection, this->ball);
 
     //VisualBall::stuff
-    visual_ball->set_radius(vision->ball->getRadius());
-    visual_ball->set_confidence(vision->ball->getConfidence());
+    visual_ball->set_radius(this->ball->getRadius());
+    visual_ball->set_confidence(this->ball->getConfidence());
 
     //VisualFieldObject
     PVision::PVisualFieldObject* bglp;
     bglp= mVision->get()->mutable_bglp();
-    update(bglp, vision->bglp);
+    update(bglp, this->bglp);
 
     PVision::PVisualFieldObject* bgrp;
     bgrp= mVision->get()->mutable_bgrp();
-    update(bgrp, vision->bgrp);
+    update(bgrp, this->bgrp);
 
     PVision::PVisualFieldObject* yglp;
     yglp= mVision->get()->mutable_yglp();
-    update(yglp, vision->yglp);
+    update(yglp, this->yglp);
 
     PVision::PVisualFieldObject* ygrp;
     ygrp= mVision->get()->mutable_ygrp();
-    update(ygrp, vision->ygrp);
+    update(ygrp, this->ygrp);
 
     //VisualRobot
     PVision::PVisualRobot* red1;
     red1=mVision->get()->mutable_red1();
-    update(red1, vision->red1);
+    update(red1, this->red1);
 
     PVision::PVisualRobot* red2;
     red2=mVision->get()->mutable_red2();
-    update(red2, vision->red2);
+    update(red2, this->red2);
 
     PVision::PVisualRobot* red3;
     red3=mVision->get()->mutable_red3();
-    update(red3, vision->red3);
+    update(red3, this->red3);
 
     PVision::PVisualRobot* navy1;
     navy1=mVision->get()->mutable_navy1();
-    update(navy1, vision->navy1);
+    update(navy1, this->navy1);
 
     PVision::PVisualRobot* navy2;
     navy2=mVision->get()->mutable_navy2();
-    update(navy2, vision->navy2);
+    update(navy2, this->navy2);
 
     PVision::PVisualRobot* navy3;
     navy3=mVision->get()->mutable_navy3();
-    update(navy3, vision->navy3);
+    update(navy3, this->navy3);
 
     PVision::PVisualCross* visual_cross;
     visual_cross=mVision->get()->mutable_visual_cross();
-    update(visual_cross, vision->cross);
+    update(visual_cross, this->cross);
 
     //VisualLines
     mVision->get()->clear_visual_line();
-    const vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
+    const vector<boost::shared_ptr<VisualLine> >* visualLines = this->fieldLines->getLines();
     for(vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
             i != visualLines->end(); i++){
 
@@ -336,7 +336,7 @@ void Vision::updateMVision(const Vision* vision, man::memory::MVision::ptr mVisi
 
     //VisualCorners
     mVision->get()->clear_visual_corner();
-    list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
+    list<VisualCorner>* visualCorners = this->fieldLines->getCorners();
     for (list<VisualCorner>::iterator i = visualCorners->begin(); i
     != visualCorners->end(); i++) {
         //VisualCorner

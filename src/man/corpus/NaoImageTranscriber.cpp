@@ -13,7 +13,7 @@ NaoImageTranscriber::NaoImageTranscriber(boost::shared_ptr<Sensors> sensors,
 		: ThreadedImageTranscriber(sensors, name),
           topImageTranscriber(sensors, Camera::TOP, rawImages),
           bottomImageTranscriber(sensors, Camera::BOTTOM, rawImages),
-          memoryProvider(&updateMRawImages, this, rawImages),
+          memoryProvider(&NaoImageTranscriber::updateMRawImages, this, rawImages),
           rawImages(rawImages)
 {
 }
@@ -84,13 +84,12 @@ void NaoImageTranscriber::run()
     Thread::trigger->off();
 }
 
-void NaoImageTranscriber::updateMRawImages(const NaoImageTranscriber* transcriber,
-                                           memory::MRawImages::ptr rawImages) {
+void NaoImageTranscriber::updateMRawImages(memory::MRawImages::ptr rawImages) const {
     //we don't need to copy image information - we do that in each of the transcribers
 
     //TODO: this is a hack so we get the vision body angles for pose in image processing
     rawImages->get()->clear_vision_body_angles();
-    std::vector<float> bodyAngles = transcriber->getSensors()->getVisionBodyAngles();
+    std::vector<float> bodyAngles = this->sensors->getVisionBodyAngles();
     for (std::vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
         rawImages->get()->add_vision_body_angles(*i);
     }

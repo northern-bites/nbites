@@ -6,6 +6,9 @@
  *
  * @author Octavian Neamtu
  */
+
+//TODO: comment this and make sure people understand how it works
+
 #pragma once
 
 #include <boost/shared_ptr.hpp>
@@ -19,7 +22,7 @@ class MemoryProvider {
 
 public:
     typedef boost::shared_ptr<MemoryObject> MemoryObjectPtr;
-    typedef void (*updateMethod)(const RobotObject*, MemoryObjectPtr);
+    typedef void (RobotObject::*updateMethod)(MemoryObjectPtr) const;
 
 public:
     MemoryProvider(updateMethod update,
@@ -33,13 +36,16 @@ public:
      */
     void updateMemory() {
 
+    #if defined USE_MEMORY
         if (memoryObject.get()) {
+
             memoryObject->lock();
             memoryObject->get()->set_timestamp(memoryObject->time_stamp());
-            (*update)(robotObject, memoryObject);
+            (robotObject->*update)(memoryObject);
             memoryObject->release();
             memoryObject->notifySubscribers();
         }
+    #endif
     }
 
 protected:

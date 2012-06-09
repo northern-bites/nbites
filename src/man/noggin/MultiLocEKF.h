@@ -66,7 +66,7 @@ public:
     virtual ~MultiLocEKF() {}
 
     // Memory update
-    static void updateMLocalization(const MultiLocEKF* loc, man::memory::MLocalization::ptr);
+    void updateMLocalization(man::memory::MLocalization::ptr) const;
 
     // Update functions
     virtual void updateLocalization(const MotionModel& u,

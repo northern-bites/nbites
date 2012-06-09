@@ -164,7 +164,6 @@ Man::processFrame ()
     noggin->runStep();
 #endif
 
-    memory->get<MLocalization>()->update();
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();
     PROF_EXIT(P_LIGHTS);

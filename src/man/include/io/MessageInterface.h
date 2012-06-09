@@ -54,7 +54,6 @@ public:
 
     virtual std::string getName() const { return std::string(header.name); }
 
-    virtual void update() = 0;
     virtual void serializeToString(std::string* write_buffer) const = 0;
     virtual void parseFromString(const char* read_buffer, uint32_t buffer_size) = 0;
     virtual unsigned byteSize() const = 0;

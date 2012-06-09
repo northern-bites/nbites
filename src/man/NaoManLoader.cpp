@@ -32,8 +32,10 @@ void loadMan(boost::shared_ptr<AL::ALBroker> broker) {
 #else
     boost::shared_ptr<Speech> speech(new Speech());
 #endif
-    boost::shared_ptr<Sensors> sensors(new Sensors(speech));
-    RobotMemory::ptr memory(new RobotMemory(sensors));
+    RobotMemory::ptr memory(new RobotMemory());
+    boost::shared_ptr<Sensors> sensors(new Sensors(speech,
+                                                  memory->get<MVisionSensors>(),
+                                                  memory->get<MMotionSensors>()));
     boost::shared_ptr<Transcriber> transcriber(new ALTranscriber(broker, sensors));
     boost::shared_ptr<ThreadedImageTranscriber>
         imageTranscriber(new NaoImageTranscriber(sensors, "ImageTranscriber", memory->get<MRawImages>()));

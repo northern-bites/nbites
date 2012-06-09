@@ -34,6 +34,8 @@ public: \
 ADD_MEMORY_OBJECT(MVision, PVision)
 ADD_MEMORY_OBJECT(MLocalization, PLoc)
 ADD_MEMORY_OBJECT(MRawNaoImages, PRawNaoImages)
+ADD_MEMORY_OBJECT(MVisionSensors, PVisionSensors)
+ADD_MEMORY_OBJECT(MMotionSensors, PMotionSensors)
 
 //adds quick camera methods to MRawNaoImages
 class MRawImages : public MRawNaoImages {

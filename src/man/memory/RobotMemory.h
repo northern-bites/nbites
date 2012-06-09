@@ -14,10 +14,6 @@
 
 #pragma once
 
-#include <boost/shared_ptr.hpp>
-#include <map>
-#include <exception>
-
 #include "Memory.h"
 #include "MVision.h"
 #include "Vision.h"
@@ -38,21 +34,8 @@ class RobotMemory : public Memory {
     ADD_SHARED_PTR(RobotMemory)
 
 public:
-    RobotMemory(boost::shared_ptr<Sensors> sensors_ptr = Sensors::ptr());
+    RobotMemory();
     virtual ~RobotMemory();
-
-public:
-    //TODO: these calls should be deprecated with get<X>() calls
-    MVision::const_ptr getMVision() const {return mVision;}
-    MVisionSensors::const_ptr getMVisionSensors() const {return mVisionSensors;}
-    MMotionSensors::const_ptr getMMotionSensors() const {return mMotionSensors;}
-
-protected:
-    boost::shared_ptr<MVision> mVision;
-    boost::shared_ptr<MVisionSensors> mVisionSensors;
-    boost::shared_ptr<MMotionSensors> mMotionSensors;
-    boost::shared_ptr<MRawImages> mRawImages;
-    boost::shared_ptr<MLocalization> mLocalization;
 };
 
 

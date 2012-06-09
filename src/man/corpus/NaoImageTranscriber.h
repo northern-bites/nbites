@@ -25,7 +25,7 @@ public:
     void initTable(const std::string&){}
 
     //memory update
-    static void updateMRawImages(const NaoImageTranscriber*, memory::MRawImages::ptr);
+    void updateMRawImages(memory::MRawImages::ptr) const;
 
 private:
     V4L2ImageTranscriber topImageTranscriber;
