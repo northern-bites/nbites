@@ -57,6 +57,15 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
+SET( FIELD_LINES_SRCS
+  FieldLines/FieldLinesDetector
+  FieldLines/HoughSpace
+  FieldLines/HoughSpaceImpl
+  FieldLines/EdgeDetector
+  FieldLines/Gradient
+  geom/HoughLine
+  )
+
 SET( VISION_SRCS Ball
                  Blob
                  Blobs
@@ -68,7 +77,7 @@ SET( VISION_SRCS Ball
                  Context
                  Cross
                  Field
-                 FieldLines
+                 FieldLines.cpp
                  ObjectFragments
                  PyVision
                  Robots
@@ -85,29 +94,19 @@ SET( VISION_SRCS Ball
                  VisualRobot
                  VisualCross
                  VisualLine
-                 EdgeDetector
-                 Gradient
-                 HoughSpace
-                 HoughSpaceImpl
-                 geom/HoughLine
                  VisualDetector
-                 FieldLinesDetector
+		 ${FIELD_LINES_SRCS}
                  )
 
 # Add the assembly files if we're not on Mac OSX
 IF (UNIX AND NOT APPLE)
-  LIST( APPEND VISION_SRCS
-    EdgeDetection.s
-    Hough.s
-    HoughAlt.s
+  SET( ASM_SRCS
+    FieldLines/EdgeDetection.s
+    FieldLines/Hough.s
+    FieldLines/HoughAlt.s
     )
-
-  SET_PROPERTY(SOURCE
-    EdgeDetection.s
-    Hough.s
-    HoughAlt.s
-    PROPERTY LANGUAGE C
-    )
+  LIST( APPEND VISION_SRCS ${ASM_SRCS})
+  SET_PROPERTY(SOURCE ${ASM_SRCS} PROPERTY LANGUAGE C)
 ENDIF()
 
 SET( VISION_PYTHON_SRCS
@@ -209,11 +208,13 @@ endmacro()
 
 set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test )
 
+set( FIELD_LINES_DIR ${VISION_INCLUDE_DIR}/FieldLines )
+
 nbites_add_test( EdgeDetectorTest
-  ${VISION_INCLUDE_DIR}/EdgeDetector.cpp
+  ${FIELD_LINES_DIR}/EdgeDetector.cpp
   ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
-  ${VISION_INCLUDE_DIR}/EdgeDetection.s
-  ${VISION_INCLUDE_DIR}/Gradient.cpp
+  ${FIELD_LINES_DIR}/EdgeDetection.s
+  ${FIELD_LINES_DIR}/Gradient.cpp
   )
 
 target_link_libraries( EdgeDetectorTest
@@ -222,11 +223,11 @@ target_link_libraries( EdgeDetectorTest
   )
 
 nbites_add_test( HoughSpaceTest
-  ${VISION_INCLUDE_DIR}/HoughSpace.cpp
+  ${FIELD_LINES_DIR}/HoughSpace.cpp
   ${VISION_TEST_DIR}/HoughSpaceTest.cpp
   ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
-  ${VISION_INCLUDE_DIR}/EdgeDetection.s
-  ${VISION_INCLUDE_DIR}/Gradient.cpp
+  ${FIELD_LINES_DIR}/EdgeDetection.s
+  ${FIELD_LINES_DIR}/Gradient.cpp
   )
 
 target_link_libraries( HoughSpaceTest
@@ -234,11 +235,11 @@ target_link_libraries( HoughSpaceTest
   ${VISION_TARGET}
   )
 
-nbites_add_test( FLDTest
+nbites_add_test( FieldLinesDetectorTest
   ${VISION_TEST_DIR}/FieldLinesDetectorTest.cpp
   )
 
-target_link_libraries( FLDTest
+target_link_libraries( FieldLinesDetectorTest
   ${VISION_TARGET}
   ${NBINCLUDE_TARGET}
   )

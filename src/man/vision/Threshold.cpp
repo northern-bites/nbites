@@ -61,6 +61,7 @@
 #include "debug.h"
 
 #include "ColorParams.h"
+#include "FieldLines/Gradient.h"
 
 using namespace std;
 #define PRINT_VISION_INFO

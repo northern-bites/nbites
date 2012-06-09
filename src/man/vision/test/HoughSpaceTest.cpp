@@ -5,12 +5,12 @@
 
 #define private public
 #define protected public
-#include "../HoughSpace.h"
-#include "../HoughSpaceImpl.h"
+#include "../FieldLines/HoughSpace.h"
+#include "../FieldLines/HoughSpaceImpl.h"
 #undef private
 #undef protected
 
-#include "Gradient.h"
+#include "FieldLines/Gradient.h"
 #include "VisionDef.h"
 
 #include "Profiler.h"

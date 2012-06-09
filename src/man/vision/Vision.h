@@ -33,7 +33,7 @@
 #include "Common.h"
 #include "VisionDef.h"
 #include "Profiler.h"
-#include "FieldLinesDetector.h"
+#include "FieldLines/FieldLinesDetector.h"
 
 class Vision;   // forward reference
 

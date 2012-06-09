@@ -10,7 +10,7 @@
 
 #include "ConcreteLine.h"
 #include "geom/HoughLine.h"
-#include "Gradient.h"
+#include "FieldLines/Gradient.h"
 #include "VisualLandmark.h"
 
 class VisualLine;

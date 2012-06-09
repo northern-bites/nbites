@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 #include <list>
 
-#include "Gradient.h"
+#include "FieldLines/Gradient.h"
 
 #define private public
 #define protected public
-#include "../FieldLinesDetector.h"
+#include "../FieldLines/FieldLinesDetector.h"
 #undef private
 #undef protected
 

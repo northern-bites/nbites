@@ -6,6 +6,7 @@
 typedef unsigned char uchar;
 
 class Threshold;  // forward reference
+class Gradient;
 
 #include "Vision.h"
 
@@ -18,7 +19,6 @@ class Threshold;  // forward reference
 #include "Context.h"
 #include "Profiler.h"
 #include "NaoPose.h"
-#include "Gradient.h"
 
 //#define SOFTCOLORS
 

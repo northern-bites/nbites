@@ -10,7 +10,7 @@
 
 #define private public
 #define protected public
-#include "../EdgeDetector.h"
+#include "../FieldLines/EdgeDetector.h"
 #undef private
 #undef protected
 
