@@ -61,10 +61,7 @@ void MessageLogger::run() {
 
 void MessageLogger::writeHead() {
     // log ID
-    out_provider->writeValue<int32_t>(messageToLog->getIDTag());
-    // the absolute time stamp of the log
-    //(all other time stamps are relative to this)
-    out_provider->writeValue<int64_t>(messageToLog->getBirthTime());
+    out_provider->writeValue<MessageHeader>(messageToLog->getHeader());
 }
 
 void MessageLogger::writeToLog() {

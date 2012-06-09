@@ -12,7 +12,8 @@
 class TMan : public Man {
 public:
 
-    TMan(boost::shared_ptr<Sensors> _sensors,
+    TMan(man::memory::RobotMemory::ptr memory,
+         boost::shared_ptr<Sensors> _sensors,
          boost::shared_ptr<Transcriber> _transcriber,
          boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
          boost::shared_ptr<MotionEnactor> _enactor,

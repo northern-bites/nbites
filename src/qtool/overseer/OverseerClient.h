@@ -41,7 +41,7 @@ public slots:
 
 protected:
     data::DataManager::ptr dataManager;
-    GroundTruth::ptr groundTruth;
+    GroundTruth::const_ptr groundTruth;
     MessageParser::ptr messageParser;
     QPushButton* connectButton;
     QLabel* fpsLabel;

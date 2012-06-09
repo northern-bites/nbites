@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <string>
 #include <cerrno>
+#include <cstdio>
+
 #include "InProvider.h"
 #include "FileDefs.h"
 
