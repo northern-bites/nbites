@@ -11,6 +11,7 @@
 
 #include <string>
 #include <QObject>
+#include <QTextStream>
 #include "image/Color.h"
 #include "ClassHelper.h"
 
@@ -81,6 +82,111 @@ public:
             return false;
         }
         return true;
+    }
+
+    bool verboseContains(image::Color color) const {
+		QTextStream cout(stdout);
+
+        // the circle can wrap around
+        float h = color.getH();
+        float s = color.getS();
+        float z = color.getZ();
+
+		// we sometimes get bad values of Z
+		if (z > 1.0f) {
+			z = 1.0f;
+		}
+        if (params[hMin] > params[hMax]) {
+            if (params[hMax] < h && h < params[hMin]) {
+				cout << "Failed on H " << h << " " << params[hMin] <<
+					" " << params[hMax] << endl;
+                return false;
+            }
+        } else if (params[hMax] < h || h < params[hMin]) {
+				cout << "Failed on H " << h << " " << params[hMin] <<
+					" " << params[hMax] << endl;
+            return false;
+        }
+        if (s < params[sMin] || s > params[sMax]) {
+				cout << "Failed on S " << s << " " << params[sMin] <<
+					" " << params[sMax] << endl;
+            return false;
+        }
+        if (z < params[zMin] || z > params[zMax]) {
+				cout << "Failed on Z " << z << " " << params[zMin] <<
+					" " << params[zMax] << endl;
+            return false;
+        }
+
+        float y = color.getY();
+        // add 0.5f to normalize to a 0 to 1 range
+        float v = color.getV() + 0.5f;
+        if (y < params[yMin] || y >= params[yMax]) {
+			cout << "Failed on Y " << y << " " << params[yMin] <<
+				" " << params[yMax] << endl;
+            return false;
+        }
+        if (v < params[vMin] || v >= params[vMax]) {
+			cout << "Failed on V " << v << " " << params[vMin] <<
+				" " << params[vMax] << endl;
+            return false;
+        }
+        return true;
+    }
+
+    void expandToFit(image::Color color) {
+		QTextStream cout(stdout);
+
+        // the circle can wrap around
+        float h = color.getH();
+        float s = color.getS();
+        float z = color.getZ();
+
+		// we sometimes get bad values of Z
+		if (z > 1.0f) {
+			z = 1.0f;
+		}
+
+		// skip H for now as it is a bit dangerous with the wrap
+
+        if (s < params[sMin]) {
+			setParameter(sMin, s);
+			cout << "Setting sMin to " << s << endl;
+		}
+		if (s > params[sMax]) {
+			setParameter(sMax, s);
+			cout << "Setting sMax to " << s << endl;
+        }
+
+        if (z < params[zMin]) {
+			setParameter(zMin, z);
+			cout << "Setting zMin to " << z << endl;
+		}
+		if (z > params[zMax]) {
+			setParameter(zMax, z);
+			cout << "Setting zMax to " << z << endl;
+        }
+
+        float y = color.getY();
+        // add 0.5f to normalize to a 0 to 1 range
+        float v = color.getV() + 0.5f;
+        if (y < params[yMin]) {
+			setParameter(yMin, y);
+			cout << "Setting yMin to " << y << endl;
+		}
+		if (y > params[yMax]) {
+			setParameter(yMax, y);
+			cout << "Setting yMax to " << y << endl;
+        }
+
+        if (v < params[vMin]) {
+			setParameter(vMin, v);
+			cout << "Setting vMin to " << v << endl;
+		}
+		if (v > params[vMax]) {
+			setParameter(vMax, v);
+			cout << "Setting vMax to " << v << endl;
+        }
     }
 
     void setParameters(float* values) {

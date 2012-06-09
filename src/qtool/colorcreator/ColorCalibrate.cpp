@@ -5,6 +5,7 @@
 
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QMouseEvent>
 
 namespace qtool {
 namespace colorcreator {
@@ -38,9 +39,12 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     }
     leftLayout->addWidget(imageTabs);
 
-    //update the threshold when the underlying image changes
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
+    QObject::connect(&topChannelImage, SIGNAL(mouseClicked(int, int, int, bool)),
+                     this, SLOT(canvassClicked(int, int, int, bool)));
+    QObject::connect(&bottomChannelImage, SIGNAL(mouseClicked(int, int, int, bool)),
+                     this, SLOT(canvassClicked(int, int, int, bool)));
+
+
 
     imageTabs->addTab(&topChannelImage, "Top Image");
     dataManager->connectSlotToMObject(&topChannelImage, SLOT(updateView()), MTOPIMAGE_ID);
@@ -49,6 +53,9 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     dataManager->connectSlotToMObject(&bottomChannelImage, SLOT(updateView()), MBOTTOMIMAGE_ID);
 
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
+    //update the threshold when the underlying image changes
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
+    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
@@ -95,6 +102,37 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
 		displayAllColors = !displayAllColors;
 		updateThresholdedImage();
 	}
+
+void ColorCalibrate::canvassClicked(int x, int y, int brushSize, bool leftClick) {
+	std::cout << "Clicked " << x << " " << y << " " << std::endl;
+    BMPYUVImage* image;
+
+    if (currentImage == Camera::TOP) {
+        image = topImage;
+    } else {
+        image = bottomImage;
+    }
+
+	byte yi = image->getYUVImage()->getY(x, y);
+	byte u = image->getYUVImage()->getU(x, y);
+	byte v = image->getYUVImage()->getV(x, y);
+
+	std::cout << "YUV " << (int)yi << " " << (int)u << " " <<
+		(int)v << std::endl;
+
+	Color color;
+	color.setYuv(yi, u, v);
+	std::cout << "HSZ " << color.getH() << " " << color.getS() <<
+		" " << color.getZ() << std::endl;
+
+	currentColorSpace->verboseContains(color);
+	if (!leftClick) {
+		std::cout << "Right click " << std::endl;
+		currentColorSpace->expandToFit(color);
+		updateThresholdedImage();
+	}
+	std::cout << std::endl;
+}
 
 void ColorCalibrate::selectColorSpace(int index) {
     currentColorSpace = &colorSpace[index];
