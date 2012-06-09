@@ -46,12 +46,12 @@ protected:
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;
+	QPushButton* scrollButton;
     QToolBar* toolbar;
 	QScrollArea* scrollArea;
 	QSize* tabStartSize;
 	QRect* geom;
-	QSize* barBuffer;
-
+	QSize* scrollBarSize;
 
 	void resizeEvent(QResizeEvent*);
 };

@@ -5,6 +5,7 @@
 #include "EmptyQTool.h"
 #include <iostream>
 #include <QFileDialog>
+#include <QDebug>
 
 namespace qtool {
 
@@ -15,7 +16,7 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
                                             toolTabs(new QTabWidget()),
                                             dataManager(new DataManager())
 {
-    this->setWindowTitle(tr(title));
+	this->setWindowTitle(tr(title));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
@@ -23,7 +24,7 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
     recordButton = new QPushButton(tr("Rec"));
 	scrollArea = new QScrollArea();
 
-	barBuffer = new QSize(10, 10);
+	scrollBarSize = new QSize(5, 35);
 	tabStartSize = new QSize(toolTabs->size());
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
@@ -46,13 +47,13 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 }
 
 EmptyQTool::~EmptyQTool() {
-	/*if (file.open(QIODevice::ReadWrite)){
+	if (file.open(QIODevice::ReadWrite)){
 		QTextStream out(&file);
 		out << this->pos().x() << "\n"
 			<< this->pos().y() << "\n"
 			<< this->width() << "\n"
 			<< this->height() << "\n";
-			}*/
+	}
 }
 
 void EmptyQTool::next() {
@@ -76,12 +77,17 @@ void EmptyQTool::record() {
         }
     }
 }
+
 void EmptyQTool::resizeEvent(QResizeEvent* ev){
 	QSize widgetSize = ev->size();
-	if((widgetSize.width() > geom->size().width())
-	   || (widgetSize.height() > geom->size().height()))
-		toolTabs->resize(widgetSize-*barBuffer);
-		QWidget::resizeEvent(ev);
+	if((widgetSize.width() > tabStartSize->width()) &&
+	   (widgetSize.height() > tabStartSize->height())) {
+		toolTabs->resize(widgetSize-*scrollBarSize);
+	}
+	else {
+		qDebug()<<"QTool x or y dimension at minimum size, redrawing with scroll bars";
+	}
+	QWidget::resizeEvent(ev);
 }
 
 }

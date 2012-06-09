@@ -22,6 +22,8 @@ ConnectTool::ConnectTool() : EmptyQTool("Robot Connection Tool"),
 	scrollArea->setWidget(toolTabs);
 	scrollArea->resize(toolTabs->size());
 	this->setCentralWidget(scrollArea);
+	
+	tabStartSize = new QSize(toolTabs->size());
 }
 
 ConnectTool::~ConnectTool() {
