@@ -42,6 +42,7 @@ public:
     virtual void setBearingWithSD(float _bearing) = 0;
 
     void setOn(bool _on){ on = _on; }
+    void setTopCam(bool _inTopCam){ inTopCam = _inTopCam; }
     void setFramesOn(int numOn){ framesOn = numOn; }
     void setFramesOff(int numOff){ framesOff = numOff; }
 
@@ -66,6 +67,7 @@ public:
     const float getBearingSD() const { return bearingSD; }
 
     const bool isOn() const{ return on; }
+    const bool isTopCam() const{ return inTopCam;}
     int getFramesOn() { return framesOn; }
     int getFramesOff(){ return framesOff; }
 
@@ -85,6 +87,7 @@ protected:
     float distanceSD;
     float bearingSD;
     bool on;
+    bool inTopCam;
     int framesOn, framesOff;
 
 };

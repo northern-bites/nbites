@@ -74,6 +74,8 @@ public:
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
     void notifyImage(const uint16_t *image);
+    // for when we have two cameras
+    void notifyImage(const uint16_t *top, const uint16_t *bot);
     // utilize the current image pointer for vision processing
     void notifyImage();
     // set the current image pointer to the given pointer
@@ -147,6 +149,7 @@ public:
 #define NUM_OPEN_FIELD_SEGMENTS 3
 
     const uint16_t * yImg, *uvImg;
+    const uint16_t * yImg_bot, *uvImg_bot;
 
     FieldLinesDetector linesDetector;
 protected:
