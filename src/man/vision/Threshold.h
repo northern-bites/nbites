@@ -137,8 +137,10 @@ public:
     unsigned char getExpandedColor(int x, int y, unsigned char col);
     int getHorizontalEdge(int x1, int y1, int dir);
     void thresholdAndRuns();
-    void findGoals(int column, int topEdge);
-    void findBallsCrosses(int column, int topEdge);
+	void lowerRuns();
+    void findGoals(int column, int top);
+    void findBallsCrosses(int column, int top);
+	void findBallLowerCamera(int column, int topEdge);
     void detectSelf();
     void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
     void objectRecognition();
@@ -173,6 +175,7 @@ public:
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uint16_t* newyuv);
+    void setYUV_bot(const uint16_t* newyuv);
     const uint16_t* getYUV();
     static const char * getShortColor(int _id);
 
@@ -227,8 +230,13 @@ public:
     Cross* cross;
     // main array
     uint8_t* thresholded;
+    uint8_t* thresholdedBottom;
     inline uint8_t getThresholded(int i, int j){
+      if (usingTopCamera)
         return thresholded[i * IMAGE_WIDTH + j];
+      else {
+	return thresholdedBottom[i * IMAGE_WIDTH + j];
+      }
     }
     inline void setThresholded(int i, int j, uint8_t value){
         thresholded[i * IMAGE_WIDTH + j] = value;
@@ -242,6 +250,8 @@ public:
     uint8_t debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
 
+    bool usingTopCamera;
+
 private:
 
     // class pointers
@@ -249,6 +259,9 @@ private:
     boost::shared_ptr<NaoPose> pose;
 
     const uint16_t* yuv;
+    const uint16_t* yplane;
+    const uint16_t* yuv_bot;
+    const uint16_t* yplane_bot;
 
     unsigned char bigTable[UMAX][VMAX][YMAX];
 
@@ -258,6 +271,7 @@ private:
     int closePoint1;
     int closePoint2;
     bool stillOpen;
+
 
     bool greenBlue[IMAGE_WIDTH];
     bool greenYellow[IMAGE_WIDTH];

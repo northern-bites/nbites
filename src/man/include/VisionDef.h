@@ -27,6 +27,7 @@ Vision Constants that span multiple classes and systems.
 
 #define NAO_FOV_X_DEG          60.9f
 #define NAO_FOV_Y_DEG          47.6f
+
 #define NAO_SIM_IMAGE_WIDTH    160
 #define NAO_SIM_IMAGE_HEIGHT   120
 #define NAO_SIM_IMAGE_BYTE_SIZE (NAO_SIM_IMAGE_WIDTH * NAO_SIM_IMAGE_HEIGHT * 3)

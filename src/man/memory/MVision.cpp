@@ -134,6 +134,7 @@ void MVision::update(PVision::PVisualDetection* visual_detection,
     visual_detection->set_elevation(visualDetection->getElevation());
     visual_detection->set_distance_sd(visualDetection->getDistanceSD());
     visual_detection->set_bearing_sd(visualDetection->getBearingSD());
+    visual_detection->set_intopcam(visualDetection->isTopCam());
 }
 
   void MVision::update(PVision::PVisualLandmark* visual_landmark, 

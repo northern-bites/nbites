@@ -12,6 +12,9 @@
 #include <qtabwidget.h>
 #include <QPushButton>
 #include <QToolBar>
+#include <QScrollArea>
+#include <QResizeEvent>
+#include <QTextStream>
 
 #include "data/DataManager.h"
 
@@ -45,7 +48,14 @@ protected:
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;
+	QPushButton* scrollButton;
     QToolBar* toolbar;
+	QScrollArea* scrollArea;
+	QSize* tabStartSize;
+	QRect* geom;
+	QSize* scrollBarSize;
+
+	void resizeEvent(QResizeEvent*);
 };
 
 }

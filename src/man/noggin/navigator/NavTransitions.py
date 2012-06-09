@@ -17,13 +17,13 @@ def atDestination(nav):
     relDest = helper.getRelativeDestination(nav.brain.my, states.goToPosition.dest)
     my = nav.brain.my
     (x, y, h) = states.goToPosition.precision
-    
+
     if (not helper.isDestinationRelative(states.goToPosition.dest)):
         return relDest.within((x + my.uncertX, y + my.uncertY, h + my.uncertH))
     else:
         return relDest.within((x, y, h))
-            
-    
+
+
 def notAtLocPosition(nav):
     return not atDestination(nav)
 
@@ -31,14 +31,14 @@ def walkedEnough(nav):
     deltaDest = states.walkingTo.deltaDest
     dest = states.walkingTo.dest
     precision = states.walkingTo.precision
-    
+
     #check if we've "passed" the point we were supposed to go to
     #with odometry
-    if (dest.relX * deltaDest.relX < 0 and 
-        dest.relY * deltaDest.relY < 0 and 
+    if (dest.relX * deltaDest.relX < 0 and
+        dest.relY * deltaDest.relY < 0 and
         dest.relH * deltaDest.relH < 0):
         return True
-     
+
     return deltaDest.within(precision)
 
 ######### BALL IN BOX ###############
@@ -119,7 +119,7 @@ def shouldAvoidObstacle(nav):
     Should avoid an obstacle
     """
     # don't dodge an object in front when we're not going forward
-    # @todo: this is terrible since we're not always in walk mode (we're 
+    # @todo: this is terrible since we're not always in walk mode (we're
     # mostly in goTo modes)
     if states.walking.speeds[0] < 0:
         return False

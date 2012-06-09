@@ -30,7 +30,6 @@ namespace qtool {
 			fieldView = new BMPImageViewer(fieldImage, this);
 
 			spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
 			field = new QHBoxLayout();
 			field->addWidget(fieldView);
 
