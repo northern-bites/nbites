@@ -566,44 +566,47 @@ void Vision::drawEdges(Gradient& g)
 #endif
 }
 
-void Vision::drawHoughLines(const list<HoughLine>& lines)
-{
+    void Vision::drawHoughLines(const list<HoughLine>& lines)
+    {
 #ifdef OFFLINE
-    if (thresh->debugHoughTransform){
-
-        list<HoughLine>::const_iterator line;
-        for (line = lines.begin() ; line != lines.end(); line++){
-            const double sn = line->getSinT();
-            const double cs = line->getCosT();
-
-            double uStart = 0, uEnd = 0;
-            HoughLine::findLineImageIntersects(*line, uStart, uEnd);
-
-            const double x0 = line->getRadius() * cs + IMAGE_WIDTH/2;
-            const double y0 = line->getRadius() * sn + IMAGE_HEIGHT/2;
-
-            for (double u = uStart; u <= uEnd; u+=1.){
-                int x = (int)round(x0 + u * sn);
-                int y = (int)round(y0 - u * cs); // cs goes opposite direction
-                drawDot(x,y, MAROON);
+        if (thresh->debugHoughTransform){
+            list<HoughLine>::const_iterator line;
+            for (line = lines.begin() ; line != lines.end(); line++){
+                drawHoughLine(*line, MAROON);
             }
         }
+#endif
+    }
+
+void Vision::drawHoughLine(const HoughLine& line, int color)
+{
+#ifdef OFFLINE
+    const double sn = line.getSinT();
+    const double cs = line.getCosT();
+
+    double uStart = 0, uEnd = 0;
+    HoughLine::findLineImageIntersects(line, uStart, uEnd);
+
+    const double x0 = line.getRadius() * cs + IMAGE_WIDTH/2;
+    const double y0 = line.getRadius() * sn + IMAGE_HEIGHT/2;
+
+    for (double u = uStart; u <= uEnd; u+=1.){
+        int x = (int)round(x0 + u * sn);
+        int y = (int)round(y0 - u * cs); // cs goes opposite direction
+        drawDot(x,y, color);
     }
 #endif
 }
 
-void Vision::drawVisualLines(const vector<VisualLine>& lines)
+void Vision::drawVisualLines(const vector<HoughVisualLine>& lines)
 {
 #ifdef OFFLINE
     if (thresh->debugVisualLines){
-        vector<VisualLine>::const_iterator line;
+        vector<HoughVisualLine>::const_iterator line;
         for (line = lines.begin(); line != lines.end(); line++){
-            drawLine(line->getTopRightEndpoint(),
-                     line->getTopLeftEndpoint(),
-                     POWDER_BLUE);
-            drawLine(line->getBottomRightEndpoint(),
-                     line->getBottomLeftEndpoint(),
-                     POWDER_BLUE);
+            pair<HoughLine, HoughLine> lp = line->getHoughLines();
+            drawHoughLine(lp.first, PALE_GREEN);
+            drawHoughLine(lp.second, PALE_GREEN);
         }
     }
 #endif

@@ -89,13 +89,14 @@ public:
     void drawFieldLines();
     void drawFieldObject(VisualFieldObject* obj, int color);
     void drawHoughLines(const std::list<HoughLine>& lines);
+    void drawHoughLine(const HoughLine& line, int color);
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     void drawLine(const point<int> start, const point<int> end,
                   const int c);
     void drawLine(int x, int y, int x1, int y1, int c);
     void drawPoint(int x, int y, int c);
     void drawRect(int left, int top, int width, int height, int c);
-    void drawVisualLines(const std::vector<VisualLine>& lines);
+    void drawVisualLines(const std::vector<HoughVisualLine>& lines);
     void drawX(int x, int y, int c);
 
     //
