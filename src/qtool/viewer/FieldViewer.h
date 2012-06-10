@@ -29,37 +29,37 @@
 
 
 namespace qtool {
-	namespace viewer {
+namespace viewer {
 
-		class FieldViewer : public QWidget{
-			Q_OBJECT
+class FieldViewer : public QWidget{
+	Q_OBJECT
 
-			public:
-			FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
-			~FieldViewer();
+	public:
+	FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
+	~FieldViewer();
 
-		public slots:
-			void stopDrawing();
-			void drawBots();
+public slots:
+	void stopDrawing();
+	void drawBots();
 
-		private:
-			data::DataManager::ptr dataManager;
-			viewer::BMPImageViewer* fieldView;
-			image::OverlayedImage* overlayView;
-			image::PaintBots* bot_locs;
-			image::PaintField* fieldImage;
-			bool keepDrawing;
+private:
+	data::DataManager::ptr dataManager;
+	viewer::BMPImageViewer* fieldView;
+	image::OverlayedImage* overlayView;
+	image::PaintBots* bot_locs;
+	image::PaintField* fieldImage;
+	bool keepDrawing;
 
-		protected:
-			QPushButton* startButton;
-			QPushButton* stopButton;
-			QVBoxLayout* mainLayout;
-			QHBoxLayout* buttonLayout;
-			QHBoxLayout* field;
-			QSpacerItem* spacer;
-			float scaleFactor;
-		};
+protected:
+	QPushButton* startButton;
+	QPushButton* stopButton;
+	QVBoxLayout* mainLayout;
+	QHBoxLayout* buttonLayout;
+	QHBoxLayout* field;
+	QSpacerItem* spacer;
+	float scaleFactor;
+};
 
 
-	}
+}
 }

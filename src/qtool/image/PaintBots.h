@@ -20,24 +20,24 @@
 #include "viewer/BotLocs.h"
 
 namespace qtool {
-	namespace image {
+namespace image {
 
-		class PaintBots : public image::BMPImage {
+class PaintBots : public image::BMPImage {
 
-			Q_OBJECT
+	Q_OBJECT
 
-			public:
-			PaintBots(QObject *parent = 0, float sF = (float)1.0);
-			~PaintBots(){}
-			unsigned getWidth() const { return FIELD_WIDTH*scaleFactor; }
-			unsigned getHeight() const { return FIELD_HEIGHT*scaleFactor; }
-			viewer::BotLocs* locs;
+	public:
+	PaintBots(QObject *parent = 0, float sF = (float)1.0);
+	~PaintBots(){}
+	unsigned getWidth() const { return FIELD_WIDTH*scaleFactor; }
+	unsigned getHeight() const { return FIELD_HEIGHT*scaleFactor; }
+	viewer::BotLocs* locs;
 
-		protected:
-			virtual void buildBitmap();
-			float scaleFactor;
+protected:
+	virtual void buildBitmap();
+	float scaleFactor;
 
-		};
+};
 
-	}
+}
 }
