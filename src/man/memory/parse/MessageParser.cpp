@@ -110,7 +110,7 @@ bool MessageParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
                     buffer + bytes_read, num_bytes - bytes_read);
             in_provider->waitForReadToFinish();
             bytes_read += in_provider->bytesRead();
-        } catch (read_exception& read_exception) {
+        } catch (std::exception& read_exception) {
             cout << read_exception.what() << " " << in_provider->debugInfo() << endl;
             return false;
         }
