@@ -2,6 +2,7 @@ import KickingConstants as constants
 import vision
 import kicks
 from objects import Location
+import noggin_constants as nogginConstants
 
 class KickInformation:
     """
@@ -140,7 +141,7 @@ class KickInformation:
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # TODO: make sure this uses orbits
-        if False:
+        if self.brain.my.getLocScore() == nogginConstants.GOOD_LOC:
             relLocationBallToGoal = ball.loc.relativeLocationOf(Location(670,270))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
@@ -151,16 +152,16 @@ class KickInformation:
 
             if bearingDifference < 45 and bearingDifference > -45:
                 #choose straight kick!
-                pass
+                return self.chooseDynamicKick()
             elif bearingDifference > 45 and bearingDifference < 135:
                 #choose a right side kick! (using right foot)
-                pass
+                return kicks.RIGHT_SIDE_KICK
             elif bearingDifference < -45 and bearingDifference > -135:
                 #choose a left side kick! (using left foot)
-                pass
+                return kicks.LEFT_SIDE_KICK
             else:
                 #choose a back kick!
-                pass
+                return self.chooseBackKick()
 
         rightPostBearing = self.oppRightPostBearing
         leftPostBearing = self.oppLeftPostBearing
