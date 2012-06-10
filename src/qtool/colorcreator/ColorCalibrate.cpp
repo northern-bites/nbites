@@ -46,20 +46,17 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
                      this, SLOT(canvassClicked(int, int, int, bool)));
 
 
-    //update the threshold when the underlying image changes
-    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
-    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
-
     imageTabs->addTab(&topChannelImage, "Top Image");
     dataManager->connectSlot(&topChannelImage, SLOT(updateView()), "MRawImages");
 
     imageTabs->addTab(&bottomChannelImage, "Bottom Image");
     dataManager->connectSlot(&bottomChannelImage, SLOT(updateView()), "MRawImages");
 
-    connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
     //update the threshold when the underlying image changes
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
+
+    connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
