@@ -21,10 +21,10 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                  topRawImage(new proto::PRawImage())
 {
 
-    offlineMVision = shared_ptr<MVision> (new MVision(class_name<MVision>()));
+    offlineMVision = MVision::ptr(new MVision());
 
     pose = shared_ptr<NaoPose> (new NaoPose(sensors));
-    vision = shared_ptr<Vision> (new Vision(pose));
+    vision = shared_ptr<Vision> (new Vision(pose, offlineMVision));
 
     imageTranscribe = OfflineImageTranscriber::ptr
         (new OfflineImageTranscriber(sensors,
@@ -72,20 +72,22 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     FastYUVToBMPImage* rawTopBMP = new FastYUVToBMPImage(rawImages, Camera::TOP, this);
     FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(rawImages, Camera::BOTTOM, this);
 
-
     OverlayedImage* comboBottom = new OverlayedImage(rawBottomBMP, shapesBottom, this);
     OverlayedImage* comboTop = new OverlayedImage(rawTopBMP, shapesTop, this);
 
     BMPImageViewer *bottomImageViewer = new BMPImageViewer(comboBottom, this);
     BMPImageViewer *topImageViewer = new BMPImageViewer(comboTop, this);
 
+    connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
+    connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
+
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
+
     CollapsibleImageViewer* bottomCIV = new
-        CollapsibleImageViewer(bottomImageViewer,
-                               "Bottom",
-                               this);
-    CollapsibleImageViewer* topCIV = new CollapsibleImageViewer(topImageViewer,
-                                                                "Top",
-                                                                this);
+            CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
+    CollapsibleImageViewer* topCIV = new
+            CollapsibleImageViewer(topImageViewer, "Top", this);
 
     QWidget* combinedRawImageView = new QWidget(this);
 
@@ -100,7 +102,13 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     bottomVisionView = new BMPImageViewerListener(bottomVisionImage, this);
     connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
+
+    connect(this, SIGNAL(imagesUpdated()),
+            bottomVisionView, SLOT(updateView()));
+
     topVisionView = new BMPImageViewer(topVisionImage, this);
+    connect(this, SIGNAL(imagesUpdated()),
+            topVisionView, SLOT(updateView()));
 
     CollapsibleImageViewer* bottomVisCIV = new CollapsibleImageViewer(bottomVisionView, "Bottom", this);
     CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisionView, "Top", this);
@@ -123,9 +131,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     this->setCentralWidget(imageTabs);
 
-    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
-    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
-
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
@@ -137,6 +142,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     QDockWidget* dockWidget = new QDockWidget("Offline Vision", this);
     offlineVisionView = new MObjectViewer(offlineMVision->getProtoMessage(), this);
 	dockWidget->setWidget(offlineVisionView);
+	connect(this, SIGNAL(imagesUpdated()), offlineVisionView, SLOT(updateView()));
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Image data", this);
@@ -167,12 +173,7 @@ void VisionViewer::update()
     topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
                                          (vision->thresh->thresholded),
                                          AVERAGED_IMAGE_SIZE);
-
     emit imagesUpdated();
-
-    offlineVisionView->updateView();
-    topVisionView->updateView();
-    bottomVisionView->updateView();
 }
 
 void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {
