@@ -38,6 +38,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     PF::ParticleIt partIter;
     for(partIter = particles.begin(); partIter != particles.end(); ++partIter)
     {
+//        std::cout << "\n \n \n \n NEW PARTICLE IS BEING UPDATES BY VISION"
+//                  << std::endl;
+//        std::cout << "This particle is at: " << (*partIter).getLocation()
+//                  << " \n";
         // For each particle, compare the estimated distance from
         // the robot to the object (and angle) to the actual
         // distance as calculated by the vision system.
@@ -51,17 +55,17 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                 // Since the observation is unambiguous,
                 // there is only one possibility.
                 Landmark l = o.possibilities[0];
-                std::cout << "Landmark: " << l << "\n";
+//                std::cout << "We see the unambiguos Landmark: " << l << "\n";
                 PF::Vector2D hypothesisVector = PF::getPosition(
                                            (*partIter).getLocation(), l.x, l.y);
-                std::cout << "Landmark Rel Location: " << o.distance
-                          << " , " << o.angle << "\n \n";
-                std::cout << "Hypothesis vector: " << hypothesisVector << "\n";
+//                std::cout << "Landmark Rel Location: " << o.distance
+//                          << " , " << o.angle << "\n \n";
+//                std::cout << "Hypothesis vector: " << hypothesisVector << "\n";
                 float distanceDiff = o.distance - hypothesisVector.magnitude;
-                std::cout << "distanceDiff: " << distanceDiff << "\n";
+//                std::cout << "distanceDiff: " << distanceDiff << "\n";
                 float angleDiff = NBMath::subPIAngle(o.angle) -
                                  NBMath::subPIAngle(hypothesisVector.direction);
-                std::cout << "angleDiff: " << angleDiff << "\n";
+//                std::cout << "angleDiff: " << angleDiff << "\n";
 
                 boost::math::normal_distribution<float> pDist(0.0f,
                                                        parameters.sigma_d);
@@ -76,7 +80,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 
                 // Better way to determine probability?
                 float probability = distanceProb * angleProb;
-                std::cout << "Probability: " << probability << "\n";
+//                std::cout << "Probability: " << probability << "\n";
 
                 if(totalWeight == 0.0f)
                     totalWeight = probability;
@@ -91,23 +95,31 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                 std::vector<Landmark>::iterator landmarkIter;
                 float maxWeight = 0.0f;
                 // Loop through all possibilities.
+//                std::cout << "We see an ambigous landmark. Lets go through all possibilities and find the best one" << std::endl;
                 for(landmarkIter = o.possibilities.begin();
                     landmarkIter != o.possibilities.end();
                     ++landmarkIter)
                 {
                     Landmark l = *landmarkIter;
+//                    std::cout << "\n Potential landmark: " << l << "\n";
+//                    std::cout << "Landmark Rel Location: " << o.distance
+//                              << " , " << o.angle << "\n \n";
                     PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
+//                    std::cout << "Hypothesis vector: " << hypothesisVector << "\n";
                     float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
+//                    std::cout << "Distance Diff: " << distanceDiff << std::endl;
                     float angleDiff = std::abs(o.angle - hypothesisVector.direction);
+//                    std::cout << "Angle Diff " << angleDiff << std::endl;
                     boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
                     float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
                     boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
                     float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
                     float probability = distanceProb * angleProb;
+//                    std::cout << "Probability: " << probability << "\n \n";
                     if(probability > maxWeight)
                     {
                         maxWeight = probability;
-                        std::cout << "Potential landmark: " << l << "\n";
+//                        std::cout << "Best Guess so far! \n";
                     }
                 }
 

@@ -24,8 +24,8 @@
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
-static const float MAX_CORNER_DISTANCE = 150.0f;
-static const float MAX_CROSS_DISTANCE = 150.0f;
+static const float MAX_CORNER_DISTANCE = 400.0f;
+static const float MAX_CROSS_DISTANCE = 200.0f;
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 using namespace std;
 using namespace boost;
@@ -360,6 +360,12 @@ void Noggin::updateLocalization()
         theta = ci->getBearing();
         observations.push_back(PF::Observation(landmarks, dist, theta));
         }
+        else{
+            std::cout << "We saw a corner REALLY far away: "
+                      << ci->getDistance()<< " centimeters away" <<std::endl
+                      << "They can't be more than" << MAX_CORNER_DISTANCE
+                      << " centimeters away." << std::endl;
+        }
     }
 
     // Update the localiztion vision interface with Observations.
@@ -372,7 +378,7 @@ void Noggin::updateLocalization()
     loc->updateLocalization(u_t, pt_z, c_z);
 
     // HACK HACK HACK for testing particles
-    loc->resetLocTo(497,383,-.78);
+//    loc->resetLocTo(500,321,-.349);
 
 
     // END LOCALIZATION UPDATE //

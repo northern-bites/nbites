@@ -37,24 +37,24 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
 
 
       // UNCOMMENT to attempt drawing of particle swarm
-      // PF::ParticleSet updateParticles;
-      // proto::PLoc::Particle p;
-      // for(int i = 0; i < localizationStream->get()->particles_size(); ++i)
-      // {
-      //     assert(i < localizationStream->get()->particles_size());
-      //     p = localizationStream->get()->particles(i);
-      //     //std::cout << i << " " << localizationStream->get()->particles_size() << "\n";
-      //     //std::cout << p.DebugString() << std::endl;
-      //     float x = p.x();
-      //     float y = p.y();
-      //     float h = p.h();
-      //     float w = p.w();
-      //     updateParticles.push_back(PF::LocalizationParticle(PF::Location(x, y, h), w));
-      // }
+      PF::ParticleSet updateParticles;
+      proto::PLoc::Particle p;
+      for(int i = 0; i < localizationStream->get()->particles_size(); ++i)
+      {
+          assert(i < localizationStream->get()->particles_size());
+          p = localizationStream->get()->particles(i);
+          //std::cout << i << " " << localizationStream->get()->particles_size() << "\n";
+          //std::cout << p.DebugString() << std::endl;
+          float x = p.x();
+          float y = p.y();
+          float h = p.h();
+          float w = p.w();
+          updateParticles.push_back(PF::LocalizationParticle(PF::Location(x, y, h), w));
+      }
 
-      // std::cout << "Updating " << localizationStream->get()->particles_size() << " particles." << std::endl;
+      std::cout << "Updating " << localizationStream->get()->particles_size() << " particles." << std::endl;
 
-      // paintLocalization->updateWithParticles(updateParticles);
+      paintLocalization->updateWithParticles(updateParticles);
 
 
       paintLocalization->updateEstimates(xEst, yEst, hEst);
