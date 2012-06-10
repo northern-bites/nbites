@@ -24,7 +24,9 @@ void VisualInfoImage::buildBitmap() {
   bitmap.fill(Qt::transparent);
 
      const PVision::PVisualBall ballData = visionData->get()->visual_ball();
-     drawBall(ballData);
+     if(ballData.visual_detection().distance() || ballData.visual_detection().x() ||
+	ballData.visual_detection().y())
+       drawBall(ballData);
 
      const PVision::PVisualFieldObject bglpData = visionData->get()->bglp();
      drawGoalPost(bglpData);
