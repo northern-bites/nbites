@@ -16,6 +16,9 @@ def gameInitial(player):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
 
+    elif (not player.motion.isBodyActive()):
+        player.gainsOff()
+
     return player.stay()
 
 def gameReady(player):
