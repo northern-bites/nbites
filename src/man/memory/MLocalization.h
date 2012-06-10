@@ -12,7 +12,6 @@
 #include "protos/Loc.pb.h"
 #include "MObject.h"
 #include "LocSystem.h"
-#include "ParticleFilter.h"
 
 namespace man {
 namespace memory {
@@ -20,8 +19,6 @@ namespace memory {
 class MLocalization: public MObject {
 
 public:
-    ADD_SHARED_PTR(MLocalization);
-
     static const MObject_ID id = MLOCALIZATION_ID;
 
     typedef boost::shared_ptr<proto::PLoc> PLoc_ptr;
@@ -36,8 +33,6 @@ public:
      * with values from the LocSystem pointer
      */
     void updateData();
-
-    boost::shared_ptr<proto::PLoc> get() const { return data; }
 
 private:
     boost::shared_ptr<LocSystem> locSystem;

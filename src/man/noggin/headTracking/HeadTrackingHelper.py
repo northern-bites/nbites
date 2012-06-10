@@ -206,13 +206,16 @@ class HeadTrackingHelper(object):
     # Fixed Pitch
     def lookToAngleFixedPitch(self, yaw):
         """
-        Looks to the given yaw at the fixed pitch value of 17 degrees.
+        Looks to the given yaw at the appropriate fixed pitch.
+        NOTE: should call brain.motion.stopHeadMoves() first!
         """
         if yaw > 55 or yaw < -55:
-            headMove = yaw, 11.0
+            pitch = 11.0
         else:
-            headMove = yaw, 17.0
-        self.panTo(headMove)
+            pitch = 17.0
+
+        self.executeHeadMove((((yaw, pitch), 2.0, 1,
+                               StiffnessModes.LOW_HEAD_STIFFNESSES),))
 
     # Consider updating this for new loc and vision systems (summer 2012)
     def calculateClosestLandmark(self):

@@ -34,6 +34,7 @@ QTool::QTool() : EmptyQTool("QTOOL"),
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
+    //toolTabs->addTab(graphViewer, tr("Graph Viewer"));
 
 	scrollArea->setWidget(toolTabs);
 	scrollArea->resize(toolTabs->size());

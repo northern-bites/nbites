@@ -75,10 +75,11 @@ def gameReady(player):
     elif player.lastDiffState == 'gamePenalized':
         player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    nogginConstants.HEADING_UP,
-                                    nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    nogginConstants.HEADING_DOWN)
+                                    nogginConstants.HEADING_UP)
+    # Removed until particle filter is functioning.
+                                    #nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                    #nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                    #nogginConstants.HEADING_DOWN)
         # Do we still want to do this? Seems to be just a hack for loc. Summer 2012
         #return player.goLater('afterPenalty')
 
@@ -134,10 +135,11 @@ def gamePlaying(player):
                 # possible 0 sec. penalties for the goalie
                 player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                             nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                            nogginConstants.HEADING_UP,
-                                            nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                            nogginConstants.HEADING_DOWN)
+                                            nogginConstants.HEADING_UP)
+                # Removed until particle filter is functioning.
+                                            #nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            #nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                            #nogginConstants.HEADING_DOWN)
                 # Do we still want to do this? Seems to be just a hack for loc.
                 #   Summer 2012
                 #return player.goLater('afterPenalty')

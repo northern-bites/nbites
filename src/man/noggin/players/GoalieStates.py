@@ -7,6 +7,7 @@ from vision import certainty
 from man.motion.HeadMoves import FIXED_PITCH_LEFT_SIDE_PAN
 from ..navigator import Navigator as nav
 from ..util import Transition
+import noggin_constants as nogginConstants
 
 import man.motion.SweetMoves as SweetMoves
 
@@ -61,13 +62,6 @@ def gameSet(player):
         player.gainsOn()
         player.brain.loc.resetBall()
         player.brain.tracker.trackBallFixedPitch()
-
-    # For the goalie, reset loc every frame.
-    # This way, garaunteed to have correctly set loc and be standing in that
-    #  location for a frame before gamePlaying begins.
-    #player.brain.loc.resetLocTo(player.brain.FIELD_WHITE_LEFT_SIDELINE_X,
-    #                               player.brain.MIDFIELD_Y,
-    #                                  0)
 
     return player.stay()
 
