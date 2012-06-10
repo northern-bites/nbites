@@ -1,24 +1,32 @@
 from man.motion.HeadMoves import FIXED_PITCH_LEFT_SIDE_PAN
 from vision import certainty
 from ..navigator import Navigator as nav
+from GoalieTransitions import atGoalArea
+
+DEBUG_OBSERVATIONS = True
+DEBUG_APPROACH = False
 
 def updatePostObservations(player):
     """
     Updates the underlying C++ data structures.
     """
     if player.brain.vision.ygrp.on and player.brain.vision.ygrp.certainty != certainty.NOT_SURE:
-        print "RIGHT: Saw right post."
         player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
                                                player.brain.vision.ygrp.bearing)
-        print "  Pushed " + str(player.brain.vision.ygrp.bearing) + " " + str(player.brain.vision.ygrp.dist)
+        if DEBUG_OBSERVATIONS:
+            print "RIGHT: Saw right post."
+            print "  Pushed " + str(player.brain.vision.ygrp.bearing) + " " + str(player.brain.vision.ygrp.dist)
     if player.brain.vision.yglp.on:
-        print "LEFT: Saw left post."
         player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
                                               player.brain.vision.yglp.bearing)
-        print "  Pushed " + str(player.brain.vision.yglp.bearing) + " " + str(player.brain.vision.yglp.dist)
+        if DEBUG_OBSERVATIONS:
+            print "LEFT: Saw left post."
+            print "  Pushed " + str(player.brain.vision.yglp.bearing) + " " + str(player.brain.vision.yglp.dist)
 
 def walkToGoal(player):
-    print "========================================"
+    """
+    Has the goalie walk in the general direction of the goal.
+    """
     if player.firstFrame():
         player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
         player.brain.nav.goTo(player.system.home,
@@ -35,21 +43,23 @@ def walkToGoal(player):
     #     player.system.home.relX = player.system.leftPostRelX() - 70.0
     #     player.brain.tracker.lookToAngle(player.system.leftPostBearing())
 
-    print "BEARINGS " + str(player.system.centerGoalBearing())
-    print "  LEFT " + str(player.system.leftPostBearing())
-    print "  RIGHT " + str(player.system.rightPostBearing())
+    if DEBUG_APPROACH:
+        print "========================================"
 
-    print "DISTANCES " + str(player.system.centerGoalDistance())
-    print "  LEFT " + str(player.system.leftPostDistance())
-    print "  RIGHT " + str(player.system.rightPostDistance())
+        print "BEARINGS " + str(player.system.centerGoalBearing())
+        print "  LEFT " + str(player.system.leftPostBearing())
+        print "  RIGHT " + str(player.system.rightPostBearing())
 
-    print "TO GET TO"
-    print "  LEFT " + str(player.system.leftPostRelX()) + " " + str(player.system.leftPostRelY())
-    print "  RIGHT " + str(player.system.rightPostRelX()) + " " + str(player.system.rightPostRelY())
+        print "DISTANCES " + str(player.system.centerGoalDistance())
+        print "  LEFT " + str(player.system.leftPostDistance())
+        print "  RIGHT " + str(player.system.rightPostDistance())
 
-    print "Going to " + str(player.system.home.relX) + " " + str(player.system.home.relY)
+        print "TO GET TO"
+        print "  LEFT " + str(player.system.leftPostRelX()) + " " + str(player.system.leftPostRelY())
+        print "  RIGHT " + str(player.system.rightPostRelX()) + " " + str(player.system.rightPostRelY())
 
-    return player.stay()
-    #return Transition.getNextState(player, walkToGoal)
+        print "Going to " + str(player.system.home.relX) + " " + str(player.system.home.relY)
 
-#walkToGoal.transitions = { turnForward: Transition.CountTransition(atGoal) }
+    return Transition.getNextState(player, walkToGoal)
+
+def positionAtGoal(player):
