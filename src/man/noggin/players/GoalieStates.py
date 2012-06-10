@@ -8,6 +8,7 @@ from man.motion.HeadMoves import FIXED_PITCH_LEFT_SIDE_PAN
 from ..navigator import Navigator as nav
 from ..util import Transition
 import noggin_constants as nogginConstants
+import goalie
 
 import man.motion.SweetMoves as SweetMoves
 

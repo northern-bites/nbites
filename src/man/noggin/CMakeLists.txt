@@ -90,6 +90,7 @@ SET( NOGGIN_SRCS Noggin
 		 VisionSystem
 		 MotionSystem
 		 GoalieSystem
+		 PyGoalie
                  )
 
 

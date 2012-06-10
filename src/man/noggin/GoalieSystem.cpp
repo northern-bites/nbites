@@ -19,12 +19,16 @@ void GoalieSystem::pushRightPostObservation(float distance, float bearing)
 {
     rightPostDistances.push_back(distance);
     rightPostBearings.push_back(bearing);
+    if(rightPostDistances.size() > DEQUE_LENGTH)
+        popRightPostObservation();
 }
 
 void GoalieSystem::pushLeftPostObservation(float distance, float bearing)
 {
     leftPostDistances.push_back(distance);
     leftPostBearings.push_back(bearing);
+    if(leftPostDistances.size() > DEQUE_LENGTH)
+        popLeftPostObservation();
 }
 
 void GoalieSystem::popRightPostObservation()
