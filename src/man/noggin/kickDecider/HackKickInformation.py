@@ -1,6 +1,7 @@
 import KickingConstants as constants
 import vision
 import kicks
+from objects import Location
 
 class KickInformation:
     """
@@ -136,6 +137,31 @@ class KickInformation:
         """
         returns the kick we should do in a shooting situation
         """
+
+        # Is loc GOOD_ENOUGH for a kick decision?
+        # TODO: make sure this uses orbits
+        if False:
+            relLocationBallToGoal = ball.loc.relativeLocationOf(Location(670,270))
+            bearingBallToGoal = relLocationBallToGoal.bearing
+            # Assume our bearing at the ball will equal our current bearing
+            relLocationMeToBall = self.brain.my.relativeLocationOf(ball.loc)
+            bearingMeToBall = relLocationMeToBall.bearing
+
+            bearingDifference = bearingBallToGoal - bearingMeToBall
+
+            if bearingDifference < 45 and bearingDifference > -45:
+                #choose straight kick!
+                pass
+            elif bearingDifference > 45 and bearingDifference < 135:
+                #choose a right side kick! (using right foot)
+                pass
+            elif bearingDifference < -45 and bearingDifference > -135:
+                #choose a left side kick! (using left foot)
+                pass
+            else:
+                #choose a back kick!
+                pass
+
         rightPostBearing = self.oppRightPostBearing
         leftPostBearing = self.oppLeftPostBearing
 
@@ -166,12 +192,11 @@ class KickInformation:
             elif leftPostBearing > 0:
                 return kicks.RIGHT_SIDE_KICK
         # if only one was seen
-        # @summer 2012: How does this handle ambiguous posts?
         elif (leftPostBearing is not None):
             # if the right post is roughly to our right (but not too far),
             # kick straight
-            if (leftPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0 and \
-                    leftPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
+            if (leftPostBearing <= 0 and
+                leftPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
                 return self.chooseDynamicKick()
             # if the right post is roughly to our left, kick right
             elif (leftPostBearing > 0):
@@ -180,8 +205,8 @@ class KickInformation:
             elif (leftPostBearing < -1*constants.KICK_STRAIGHT_BEARING_THRESH):
                 return kicks.LEFT_SIDE_KICK
         elif (rightPostBearing is not None):
-            if (rightPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
-                    rightPostBearing <= constants.KICK_STRAIGHT_BEARING_THRESH):
+            if (rightPostBearing and
+                rightPostBearing <= constants.KICK_STRAIGHT_BEARING_THRESH):
                 return self.chooseDynamicKick()
             elif (rightPostBearing < 0):
                 return kicks.LEFT_SIDE_KICK
