@@ -211,13 +211,9 @@ private:
 
     // information
     std::string colorTable;
-<<<<<<< HEAD
-=======
-
     man::memory::MemoryProvider<man::memory::MVision, Vision> memoryProvider;
 
 
->>>>>>> nbites/master
 };
 
 #endif // _Vision_h_DEFINED

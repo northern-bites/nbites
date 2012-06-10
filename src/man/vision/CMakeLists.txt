@@ -220,10 +220,12 @@ nbites_add_test( EdgeDetectorTest
   ${FIELD_LINES_DIR}/Gradient.cpp
   )
 
+if (TARGET EdgeDetectorTest) 
 target_link_libraries( EdgeDetectorTest
   ${NBCOMMON_LIBRARIES}
   ${VISION_TARGET}
   )
+endif()
 
 nbites_add_test( HoughSpaceTest
   ${FIELD_LINES_DIR}/HoughSpace.cpp
@@ -233,25 +235,31 @@ nbites_add_test( HoughSpaceTest
   ${FIELD_LINES_DIR}/Gradient.cpp
   )
 
+if (TARGET HoughSpaceTest)
 target_link_libraries( HoughSpaceTest
   ${NBCOMMON_LIBRARIES}
   ${VISION_TARGET}
   )
+endif()
 
 nbites_add_test( FieldLinesDetectorTest
   ${VISION_TEST_DIR}/FieldLinesDetectorTest.cpp
   )
 
+if (TARGET FieldLinesDetectorTest)
 target_link_libraries( FieldLinesDetectorTest
   ${VISION_TARGET}
   ${NBINCLUDE_TARGET}
   )
+endif()
 
 nbites_add_test( CornerDetectorTest
   ${VISION_TEST_DIR}/CornerDetectorTest.cpp
   )
 
+if (TARGET CornerDetectorTest)
 target_link_libraries( CornerDetectorTest
   ${VISION_TARGET}
   ${NBINCLUDE_TARGET}
   )
+endif()
