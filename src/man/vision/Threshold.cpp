@@ -96,7 +96,9 @@ void Threshold::visionLoop() {
 
     // threshold image and create runs
     thresholdAndRuns();
-    //newFindRobots();
+    PROF_ENTER(P_ROBOTS);
+    newFindRobots();
+    PROF_EXIT(P_ROBOTS);
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
@@ -351,17 +353,19 @@ void Threshold::findGoals(int column, int topEdge) {
             yellows++;
             found = true;
         }
-        if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
-            robots++;
-            found = true;
-			if (Utility::isNavy(pixel)) {
-				navy++;
-				firstNavy = j;
-			} else {
-				pinks++;
-				firstPink = j;
-			}
-        }
+	// PROF_ENTER(P_ROBOTS);
+        // if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
+        //     robots++;
+        //     found = true;
+	// 		if (Utility::isNavy(pixel)) {
+	// 			navy++;
+	// 			firstNavy = j;
+	// 		} else {
+	// 			pinks++;
+	// 			firstPink = j;
+	// 		}
+        // }
+	// PROF_EXIT(P_ROBOTS);
         if (Utility::isGreen(pixel)) {
             bad++;
 			greens++;
@@ -373,12 +377,14 @@ void Threshold::findGoals(int column, int topEdge) {
     if (yellows > 10) {
         yellow->newRun(column, lastYellow, firstYellow - lastYellow);
     }
-	if (pinks > 5) {
-		red->newRun(column, lastPink, firstPink - lastPink);
-	}
-	if (navy > 5) {
-		navyblue->newRun(column, lastNavy, firstNavy - lastNavy);
-	}
+        // PROF_ENTER(P_ROBOTS);
+	// if (pinks > 5) {
+	// 	red->newRun(column, lastPink, firstPink - lastPink);
+	// }
+	// if (navy > 5) {
+	// 	navyblue->newRun(column, lastNavy, firstNavy - lastNavy);
+	// }
+	// PROF_EXIT(P_ROBOTS);
     if (shoot[column] && robots > 5) {
         shoot[column] = false;
     }
@@ -474,41 +480,41 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     robots = 0;
                 }
             }
-	    PROF_ENTER(P_ROBOTS)
-            if (Utility::isNavy(lastPixel)) {
-				robots+= currentRun;
-                if (currentRun > 5) {
-                    navyblue->newRun(column, j, currentRun);
-                }
-                if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
-                    && shoot[column] && !faceDown) {
-                    evidence[column / divider]++;
-                    if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = lastGood;//j + currentRun;
-                    }
-                    shoot[column] = false;
-                    if (debugShot) {
-                        vision->drawPoint(column, j + currentRun, MAROON);
-                    }
-                }
-            }
-            if (Utility::isRed(lastPixel)) {
-                robots+= currentRun;
-                if (currentRun > 5) {
-                    red->newRun(column, j, currentRun);
-                }
-                if (robots > 10 && shoot[column]) {
-                    evidence[column / divider]++;
-                    if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = lastGood;//j + currentRun;
-                    }
-                    shoot[column] = false;
-                    if (debugShot) {
-                        vision->drawPoint(column, j + currentRun, MAROON);
-                    }
-                }
-            }
-	    PROF_EXIT(P_ROBOTS)
+	    // PROF_ENTER(P_ROBOTS);
+            // if (Utility::isNavy(lastPixel)) {
+	    // 			robots+= currentRun;
+            //     if (currentRun > 5) {
+            //         navyblue->newRun(column, j, currentRun);
+            //     }
+            //     if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
+            //         && shoot[column] && !faceDown) {
+            //         evidence[column / divider]++;
+            //         if (block[column / divider] < j + currentRun) {
+            //             block[column / divider] = lastGood;//j + currentRun;
+            //         }
+            //         shoot[column] = false;
+            //         if (debugShot) {
+            //             vision->drawPoint(column, j + currentRun, MAROON);
+            //         }
+            //     }
+            // }
+            // if (Utility::isRed(lastPixel)) {
+            //     robots+= currentRun;
+            //     if (currentRun > 5) {
+            //         red->newRun(column, j, currentRun);
+            //     }
+            //     if (robots > 10 && shoot[column]) {
+            //         evidence[column / divider]++;
+            //         if (block[column / divider] < j + currentRun) {
+            //             block[column / divider] = lastGood;//j + currentRun;
+            //         }
+            //         shoot[column] = false;
+            //         if (debugShot) {
+            //             vision->drawPoint(column, j + currentRun, MAROON);
+            //         }
+            //     }
+            // }
+	    // PROF_EXIT(P_ROBOTS);
             // since this loop runs when a run ends, restart # pixels in run counter
             currentRun = 1;
         }
@@ -877,14 +883,14 @@ void Threshold::objectRecognition() {
     initObjects();
     // now get the posts and goals
 	// we need to make the white blobs before checking on robots
-    PROF_ENTER(P_ROBOTS)
+    PROF_ENTER(P_ROBOTS);
     cross->createObject();
-	red->robot(cross);
-	navyblue->robot(cross);
-    //red->findRobots(cross);
-    //navyblue->findRobots(cross);
-    //unid->findRobots(cross);
-    PROF_EXIT(P_ROBOTS)
+        //red->robot(cross);
+	//navyblue->robot(cross);
+	red->findRobots(cross);
+	navyblue->findRobots(cross);
+	unid->findRobots(cross);
+    PROF_EXIT(P_ROBOTS);
     yellow->createObject();
     cross->checkForCrosses();
 
@@ -945,6 +951,7 @@ void Threshold::storeFieldObjects() {
 
     setVisualRobotInfo(vision->navy1);
     setFramesOnAndOff(vision->navy1);
+    if (vision->navy1->isOn()) cout << "I see a navy robot!\n";
 
     setVisualRobotInfo(vision->navy2);
     setFramesOnAndOff(vision->navy2);
