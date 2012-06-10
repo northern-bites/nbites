@@ -46,31 +46,21 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     toolBar->addWidget(loadTableButton);
     this->addToolBar(toolBar);
 
-    QCheckBox* horizonDebug = new QCheckBox(tr("Horizon Debug"));
-    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setHorizonDebug()));
-    toolBar->addWidget(horizonDebug);
-    QCheckBox* shootingDebug = new QCheckBox(tr("Shooting Debug"));
-    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setShootingDebug()));
-    toolBar->addWidget(shootingDebug);
-    QCheckBox* openFieldDebug = new QCheckBox(tr("Open Field Debug"));
-    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setOpenFieldDebug()));
-    toolBar->addWidget(openFieldDebug);
-    QCheckBox* EdgeDetectionDebug = new QCheckBox(tr("Edge Detection Debug"));
-    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setEdgeDetectDebug()));
-    toolBar->addWidget(EdgeDetectionDebug);
-    QCheckBox* houghDebug = new QCheckBox(tr("Hough Debug"));
-    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setHoughDebug()));
-    toolBar->addWidget(houghDebug);
-    QCheckBox* robotsDebug = new QCheckBox(tr("Robots Debug"));
-    connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setRobotsDebug()));
-    toolBar->addWidget(robotsDebug);
+#define ADD_DEBUG_CHECKBOX(text, func) {            \
+        QCheckBox* debug = new QCheckBox(tr(text)); \
+        connect(debug, SIGNAL(stateChanged(int)),   \
+                this, SLOT(func(int)));             \
+        toolBar->addWidget(debug);                  \
+    }
 
-    horizonD = false;
-    shootD = false;
-    openFieldD = false;
-    edgeDetectD = false;
-    houghD = false;
-    robotsD = false;
+    ADD_DEBUG_CHECKBOX("Horizon Debug", setHorizonDebug);
+    ADD_DEBUG_CHECKBOX("Shooting Debug", setShootingDebug);
+    ADD_DEBUG_CHECKBOX("Open Field Debug", setOpenFieldDebug);
+    ADD_DEBUG_CHECKBOX("Edge Detection Debug", setEdgeDetectionDebug);
+    ADD_DEBUG_CHECKBOX("Hough Debug", setHoughTransformDebug);
+    ADD_DEBUG_CHECKBOX("Robot Detection Debug", setRobotsDebug);
+    ADD_DEBUG_CHECKBOX("Visual Line Debug", setVisualLinesDebug);
+    ADD_DEBUG_CHECKBOX("Visual Corner Debug", setVisualCornersDebug);
 
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
@@ -115,8 +105,13 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                                                        this);
     connect(bottomVisViewer, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
+    connect(this, SIGNAL(imagesUpdated()),
+            bottomVisViewer, SLOT(updateView()));
+
     BMPImageViewer *topVisViewer = new BMPImageViewer(topVisionImage,
                                                       this);
+    connect(this, SIGNAL(imagesUpdated()),
+            topVisViewer, SLOT(updateView()));
 
     CollapsibleImageViewer* bottomVisCIV = new
         CollapsibleImageViewer(bottomVisViewer,
@@ -185,8 +180,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     }
 }
 
-void VisionViewer::update(){
-
+void VisionViewer::update()
+{
     //no useless computation
     if (!this->isVisible())
         return;
@@ -211,6 +206,7 @@ void VisionViewer::update(){
     topRawImage->mutable_image()->assign(reinterpret_cast<const char *>
                                          (vision->thresh->thresholded),
                                          AVERAGED_IMAGE_SIZE);
+    emit imagesUpdated();
 }
 
 void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {
@@ -225,40 +221,23 @@ void VisionViewer::loadColorTable(){
 							"../../data/tables",
 							tr("Table Files (*.mtb)"));
   imageTranscribe->initTable(colorTablePath.toStdString());
-
+  update();
 }
 
-void VisionViewer::setHorizonDebug(){
-  if (horizonD == false) horizonD = true;
-  else horizonD = false;
-  vision->thresh->setHorizonDebug(horizonD);
-}
-void VisionViewer::setShootingDebug(){
-  if (shootD == false) shootD = true;
-  else shootD = false;
-  vision->thresh->setDebugShooting(shootD);
-}
-void VisionViewer::setOpenFieldDebug(){
-  if (openFieldD == false) openFieldD = true;
-  else openFieldD = false;
-  vision->thresh->setDebugOpenField(openFieldD);
-}
-void VisionViewer::setEdgeDetectDebug(){
-  if (edgeDetectD == false) edgeDetectD = true;
-  else edgeDetectD = false;
-  vision->thresh->setDebugEdgeDetection(edgeDetectD);
-}
-void VisionViewer::setHoughDebug(){
-  if (houghD == false) houghD = true;
-  else houghD = false;
-  vision->thresh->setDebugHoughTransform(houghD);
-}
-void VisionViewer::setRobotsDebug(){
-  if (robotsD == false) robotsD = true;
-  else robotsD = false;
-  vision->thresh->setDebugRobots(robotsD);
-}
+#define SET_DEBUG(funcName, buttonName)                             \
+    void VisionViewer::set##funcName##Debug(int state) {            \
+        vision->thresh->setDebug##funcName(state == Qt::Checked);   \
+        update();                                                   \
+    }
 
+SET_DEBUG(Horizon, horizon);
+SET_DEBUG(HoughTransform, hough);
+SET_DEBUG(Shooting, shoot);
+SET_DEBUG(EdgeDetection, edgeDetect);
+SET_DEBUG(OpenField, openField);
+SET_DEBUG(Robots, robots);
+SET_DEBUG(VisualLines, visualLines);
+SET_DEBUG(VisualCorners, visualCorners);
 
 }
 }

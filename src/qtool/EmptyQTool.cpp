@@ -5,6 +5,7 @@
 #include "EmptyQTool.h"
 #include <iostream>
 #include <QFileDialog>
+#include <QKeyEvent>
 #include <QDebug>
 
 namespace qtool {
@@ -16,16 +17,16 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
                                             toolTabs(new QTabWidget()),
                                             dataManager(new DataManager())
 {
-	this->setWindowTitle(tr(title));
+    this->setWindowTitle(tr(title));
 
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
     prevButton = new QPushButton(tr("<"));
     recordButton = new QPushButton(tr("Rec"));
-	scrollArea = new QScrollArea();
+    scrollArea = new QScrollArea();
 
-	scrollBarSize = new QSize(5, 35);
-	tabStartSize = new QSize(toolTabs->size());
+    scrollBarSize = new QSize(5, 35);
+    tabStartSize = new QSize(toolTabs->size());
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
@@ -37,26 +38,26 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 
     this->addToolBar(toolbar);
 
-	if (file.open(QIODevice::ReadWrite)){
-			QTextStream in(&file);
-			geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
-							 in.readLine().toInt(), in.readLine().toInt());
-			file.close();
-	} 
-	if((geom->width() == 0) && (geom->height() == 0)){
-		geom = new QRect(75, 75, 1132, 958);
-	}
-	this->setGeometry(*geom);
+    if (file.open(QIODevice::ReadWrite)){
+            QTextStream in(&file);
+            geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
+                             in.readLine().toInt(), in.readLine().toInt());
+            file.close();
+    }
+    if((geom->width() == 0) && (geom->height() == 0)){
+        geom = new QRect(75, 75, 1132, 958);
+    }
+    this->setGeometry(*geom);
 }
 
 EmptyQTool::~EmptyQTool() {
-	if (file.open(QIODevice::ReadWrite)){
-		QTextStream out(&file);
-		out << this->pos().x() << "\n"
-			<< this->pos().y() << "\n"
-			<< this->width() << "\n"
-			<< this->height() << "\n";
-	}
+    if (file.open(QIODevice::ReadWrite)){
+        QTextStream out(&file);
+        out << this->pos().x() << "\n"
+            << this->pos().y() << "\n"
+            << this->width() << "\n"
+            << this->height() << "\n";
+    }
 }
 
 void EmptyQTool::next() {
@@ -81,16 +82,35 @@ void EmptyQTool::record() {
     }
 }
 
-void EmptyQTool::resizeEvent(QResizeEvent* ev){
-	QSize widgetSize = ev->size();
-	if((widgetSize.width() > tabStartSize->width()) &&
-	   (widgetSize.height() > tabStartSize->height())) {
-		toolTabs->resize(widgetSize-*scrollBarSize);
-	}
-	else {
-		//do nothing - scroll bars will kick in by themselves
-	}
-	QWidget::resizeEvent(ev);
+void EmptyQTool::keyPressEvent(QKeyEvent * event)
+{
+    switch (event->key()) {
+    case Qt::Key_J:
+    case Qt::Key_D:
+    case Qt::Key_N:
+        next();
+        break;
+    case Qt::Key_K:
+    case Qt::Key_S:
+    case Qt::Key_P:
+        prev();
+        break;
+    default:
+        QWidget::keyPressEvent(event);
+    }
+}
+
+void EmptyQTool::resizeEvent(QResizeEvent* ev)
+{
+    QSize widgetSize = ev->size();
+    if((widgetSize.width() > tabStartSize->width()) &&
+       (widgetSize.height() > tabStartSize->height())) {
+        toolTabs->resize(widgetSize-*scrollBarSize);
+    }
+    else {
+//do nothing - scroll bars will kick in by themselves
+    }
+    QWidget::resizeEvent(ev);
 }
 
 }

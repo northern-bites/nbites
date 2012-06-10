@@ -79,7 +79,6 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
                                             loggingBoard,
                                             motion->getInterface()));
 #endif// USE_NOGGIN
-
     memory = boost::shared_ptr<Memory> (new Memory(vision, sensors, noggin->loc));
     loggingBoard->setMemory(memory);
 
@@ -87,6 +86,7 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
 #if defined USE_MEMORY && !defined OFFLINE
     OutputProviderFactory::AllSocketOutput(memory.get(), loggingBoard.get());
 #endif
+    PROF_ENTER(P_GETIMAGE);
 }
 
 Man::~Man ()

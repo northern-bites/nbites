@@ -36,15 +36,20 @@ class VisionViewer : public QMainWindow{
 public:
     VisionViewer(data::RobotMemoryManager::const_ptr memoryManager);
 
+signals:
+    void imagesUpdated();
+
 public slots:
     void update();
     void loadColorTable();
-    void setHorizonDebug();
-    void setShootingDebug();
-    void setOpenFieldDebug();
-    void setEdgeDetectDebug();
-    void setHoughDebug();
-    void setRobotsDebug();
+    void setHorizonDebug(int state);
+    void setShootingDebug(int state);
+    void setOpenFieldDebug(int state);
+    void setEdgeDetectionDebug(int state);
+    void setHoughTransformDebug(int state);
+    void setRobotsDebug(int state);
+    void setVisualLinesDebug(int state);
+    void setVisualCornersDebug(int state);
     void pixelClicked(int x, int y, int brushSize, bool leftClick);
 
 private:
@@ -60,9 +65,6 @@ private:
     boost::shared_ptr<man::memory::proto::PImage> topRawImage;
     boost::shared_ptr<man::memory::proto::PImage> bottomRawImage;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
-
-    bool horizonD, shootD, openFieldD, edgeDetectD, houghD, robotsD;
-
 };
 
 }

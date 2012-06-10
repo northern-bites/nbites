@@ -34,6 +34,8 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
+#include "FieldLines/CornerDetector.h"
+#include "FieldLines/FieldLinesDetector.h"
 
 using namespace std;
 using boost::shared_ptr;
@@ -44,7 +46,9 @@ static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 // Vision Class Constructor
 Vision::Vision(boost::shared_ptr<NaoPose> _pose)
     : pose(_pose),
-      yImg(&global_16_image[0]), linesDetector(),
+      yImg(&global_16_image[0]),
+      linesDetector(new FieldLinesDetector()),
+      cornerDetector(new CornerDetector()),
       frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
@@ -96,7 +100,8 @@ void Vision::copyImage(const byte* image) {
 
 void Vision::notifyImage(const uint16_t* y) {
     yImg = y;
-    uvImg = y + AVERAGED_IMAGE_SIZE;
+    uImg = y + AVERAGED_IMAGE_SIZE;
+    vImg = uImg + AVERAGED_IMAGE_SIZE;
 
     // Set the current image pointer in Threshold
     thresh->setYUV(y);
@@ -105,9 +110,12 @@ void Vision::notifyImage(const uint16_t* y) {
 
 void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
     yImg = y_top;
-    uvImg = y_top + AVERAGED_IMAGE_SIZE;
+    uImg = y_top + AVERAGED_IMAGE_SIZE;
+    vImg = uImg + AVERAGED_IMAGE_SIZE;
+
     yImg_bot = y_bot;
-    uvImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
+    uImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
+    vImg_bot = uImg + AVERAGED_IMAGE_SIZE;
 
     // Set the current image pointer in Threshold
     thresh->setYUV(y_top);
@@ -142,12 +150,28 @@ void Vision::notifyImage() {
     // PROF_ENTER(P_TRANSFORM);
     // pose->transform();
     // PROF_EXIT(P_TRANSFORM);
-    
+
     //the above is commented to try cool shit
+
+    linesDetector->detect(thresh->getVisionHorizon(),
+                         thresh->field->getTopEdge(),
+                         yImg);
+
+    cornerDetector->detect(thresh->getVisionHorizon(),
+                           thresh->field->getTopEdge(),
+                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
-    // linesDetector.detect(yImg);
+
+    drawEdges(*linesDetector->getEdges());
+    drawHoughLines(linesDetector->getHoughLines());
+    drawVisualLines(linesDetector->getLines());
+    drawVisualCorners(cornerDetector->getCorners());
+
+    thresh->transposeDebugImage();
+
+    PROF_EXIT(P_VISION);
 }
 
 void Vision::setImage(const uint16_t *image) {
@@ -549,6 +573,80 @@ void Vision::drawPoint(int x, int y, int c)
         thresh->debugImage[y][x-1] = static_cast<unsigned char>(c);
     }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
         thresh->debugImage[y][x-2] = static_cast<unsigned char>(c);
+    }
+#endif
+}
+
+void Vision::drawEdges(Gradient& g)
+{
+#ifdef OFFLINE
+    if (thresh->debugEdgeDetection){
+        for (int i=0; g.isPeak(i); ++i) {
+            drawDot(g.getAnglesXCoord(i) + IMAGE_WIDTH/2,
+                    g.getAnglesYCoord(i) + IMAGE_HEIGHT/2,
+                    PINK);
+        }
+    }
+#endif
+}
+
+void Vision::drawHoughLines(const list<HoughLine>& lines)
+    {
+#ifdef OFFLINE
+        if (thresh->debugHoughTransform){
+            list<HoughLine>::const_iterator line;
+            for (line = lines.begin() ; line != lines.end(); line++){
+                drawHoughLine(*line, MAROON);
+            }
+        }
+#endif
+    }
+
+void Vision::drawHoughLine(const HoughLine& line, int color)
+{
+#ifdef OFFLINE
+    const double sn = line.getSinT();
+    const double cs = line.getCosT();
+
+    double uStart = 0, uEnd = 0;
+    HoughLine::findLineImageIntersects(line, uStart, uEnd);
+
+    const double x0 = line.getRadius() * cs + IMAGE_WIDTH/2;
+    const double y0 = line.getRadius() * sn + IMAGE_HEIGHT/2;
+
+    for (double u = uStart; u <= uEnd; u+=1.){
+        int x = (int)round(x0 + u * sn);
+        int y = (int)round(y0 - u * cs); // cs goes opposite direction
+        drawDot(x,y, color);
+    }
+#endif
+}
+
+void Vision::drawVisualLines(const vector<HoughVisualLine>& lines)
+{
+#ifdef OFFLINE
+    if (thresh->debugVisualLines){
+        vector<HoughVisualLine>::const_iterator line;
+        int color = 5;
+        for (line = lines.begin(); line != lines.end(); line++){
+            pair<HoughLine, HoughLine> lp = line->getHoughLines();
+            drawHoughLine(lp.first, color);
+            drawHoughLine(lp.second, color);
+            color++;
+        }
+    }
+#endif
+}
+
+void Vision::drawVisualCorners(const vector<HoughVisualCorner>& corners)
+{
+#ifdef OFFLINE
+    if (thresh->debugVisualCorners) {
+        for (vector<HoughVisualCorner>::const_iterator i = corners.begin();
+             i != corners.end(); ++i) {
+            point<int> pt = i->getImageLocation();
+            drawX(pt.x, pt.y, SEA_GREEN);
+        }
     }
 #endif
 }
