@@ -49,15 +49,5 @@ protected:
 
 };
 
-class RoboImageViewer: public BMPImageViewer {
-    Q_OBJECT
-
-public:
-    RoboImageViewer(data::RoboImage::const_ptr rawImage, QWidget* parent = 0) :
-        BMPImageViewer(new image::FastYUVToBMPImage(rawImage, parent), parent) {
-
-        }
-};
-
 }
 }

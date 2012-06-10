@@ -35,7 +35,6 @@
 
 #include <iostream>
 #include "Ball.h"
-#include "debug.h"
 #include <vector>
 
 using namespace std;
@@ -634,7 +633,7 @@ void Ball::newRun(int x, int y, int h)
 		numberOfRuns++;
 	}else{
 		if(color == ORANGE) {
-			print("WARNING!!!: INSUFFICIENT MEMORY ALLOCATED ORANGE RUNS");
+			printf("WARNING!!!: INSUFFICIENT MEMORY ALLOCATED ORANGE RUNS");
 		}
 		//cout << "Too many runs " << color << endl;
 	}

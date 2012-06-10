@@ -30,6 +30,7 @@
 #include  "visionconfig.h"
 // including info header files
 #include "Common.h"
+#include "ClassHelper.h"
 #include "VisionDef.h"
 #include "Profiler.h"
 
@@ -51,13 +52,19 @@ class HoughVisualCorner;
 #include "NaoPose.h"
 #include "FieldLines.h"
 #include "VisualCorner.h"
+//memory
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
 
 class Vision
 {
     friend class Threshold;
 
+    ADD_SHARED_PTR(Vision)
+
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose);
+    Vision(boost::shared_ptr<NaoPose> _pose,
+           man::memory::MVision::ptr mVision = man::memory::MVision::ptr());
     ~Vision();
 
 private:
@@ -103,6 +110,9 @@ public:
     void drawRect(int left, int top, int width, int height, int c);
     void drawVisualLines(const std::vector<HoughVisualLine>& lines);
     void drawX(int x, int y, int c);
+
+    // Memory update
+    void updateMVision(man::memory::MVision::ptr) const;
 
     //
     // SETTERS
@@ -201,6 +211,13 @@ private:
 
     // information
     std::string colorTable;
+<<<<<<< HEAD
+=======
+
+    man::memory::MemoryProvider<man::memory::MVision, Vision> memoryProvider;
+
+
+>>>>>>> nbites/master
 };
 
 #endif // _Vision_h_DEFINED

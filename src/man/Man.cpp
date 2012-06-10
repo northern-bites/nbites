@@ -27,13 +27,15 @@ using namespace man::memory::log;
 //                                     //
 /////////////////////////////////////////
 
-Man::Man (boost::shared_ptr<Sensors> _sensors,
+Man::Man (RobotMemory::ptr memory,
+          boost::shared_ptr<Sensors> _sensors,
           boost::shared_ptr<Transcriber> _transcriber,
           boost::shared_ptr<ImageTranscriber> _imageTranscriber,
           boost::shared_ptr<MotionEnactor> _enactor,
           boost::shared_ptr<Lights> _lights,
           boost::shared_ptr<Speech> _speech)
-    :     sensors(_sensors),
+    :     memory(memory),
+          sensors(_sensors),
           transcriber(_transcriber),
           imageTranscriber(_imageTranscriber),
           enactor(_enactor),
@@ -65,7 +67,8 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
     set_lights_pointer(_lights);
     set_speech_pointer(_speech);
 
-    vision = boost::shared_ptr<Vision> (new Vision(pose));
+    try {
+        vision = boost::shared_ptr<Vision> (new Vision(pose, memory->get<MVision>()));
 
     set_vision_pointer(vision);
 
@@ -77,9 +80,13 @@ Man::Man (boost::shared_ptr<Sensors> _sensors,
 #ifdef USE_NOGGIN
     noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
-                                            motion->getInterface()));
+                                            motion->getInterface(), memory));
+
+    } catch(std::exception &e) {
+        std::cerr << e.what() << std::endl;
+    }
+
 #endif// USE_NOGGIN
-    memory = boost::shared_ptr<Memory> (new Memory(vision, sensors, noggin->loc));
     loggingBoard->setMemory(memory);
 
 
@@ -122,6 +129,8 @@ void Man::stopSubThreads() {
     cout << "Man stopping: " << endl;
 #endif
 
+    loggingBoard->reset();
+
     guardian->stop();
     guardian->waitForThreadToFinish();
 
@@ -150,14 +159,11 @@ Man::processFrame ()
     sensors->releaseImage();
 //    cout<<vision->ball->getDistance() << endl;
 #endif
-#if defined USE_MEMORY || defined OFFLINE
-    memory->updateVision();
-#endif
+
 #ifdef USE_NOGGIN
     noggin->runStep();
 #endif
 
-    memory->getMutableMObject(MLOCALIZATION_ID)->update();
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();
     PROF_EXIT(P_LIGHTS);

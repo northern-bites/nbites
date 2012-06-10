@@ -24,6 +24,8 @@
 #include "IOProvider.h"
 #include "IOExceptions.h"
 
+#include "Common.h"
+
 namespace common {
 namespace io {
 
@@ -46,6 +48,16 @@ public:
 
     virtual bool writingInProgress() const {
         return aio_error(&control_block) == EINPROGRESS;
+    }
+
+    virtual void waitForWriteToFinish() const throw (std::runtime_error) {
+
+        const struct aiocb* cblist[] = { &control_block };
+        int result = aio_suspend(cblist, 1, NULL);
+
+        if (result != 0) {
+            throw_errno(errno);
+        }
     }
 
     //yields before the other write is done!

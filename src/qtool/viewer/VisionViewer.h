@@ -17,6 +17,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "man/memory/Memory.h"
+#include "man/vision/Vision.h"
+
 #include "man/corpus/offlineconnect/OfflineImageTranscriber.h"
 #include "image/ThresholdedImage.h"
 #include "image/BMPYUVImage.h"
@@ -30,7 +32,7 @@
 namespace qtool {
 namespace viewer {
 
-class VisionViewer : public QMainWindow{
+class VisionViewer : public QMainWindow {
     Q_OBJECT
 
 public:
@@ -55,15 +57,21 @@ public slots:
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
+
     image::ThresholdedImage* topVisionImage;
     image::ThresholdedImage* bottomVisionImage;
+    BMPImageViewer* topVisionView;
+    BMPImageViewer* bottomVisionView;
+
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;
     man::memory::MVision::ptr offlineMVision;
-    boost::shared_ptr<man::memory::proto::PImage> topRawImage;
-    boost::shared_ptr<man::memory::proto::PImage> bottomRawImage;
+    MObjectViewer* offlineVisionView;
+
+    boost::shared_ptr<man::memory::proto::PRawImage> topRawImage;
+    boost::shared_ptr<man::memory::proto::PRawImage> bottomRawImage;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
 };
 

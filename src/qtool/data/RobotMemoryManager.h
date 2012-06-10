@@ -3,7 +3,8 @@
  * @class RobotMemoryManager
  *
  * Combines a Memory object and a MemorySignalingInterface to
- * connect QObjects slots to Memory Object notifications
+ * connect QObjects slots to Memory Object (or other objects, such as Ground Truth)
+ * notifications
  *
  * @author Octavian Neamtu
  *
@@ -14,7 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 
-#include "man/memory/Memory.h"
+#include "man/memory/RobotMemory.h"
 #include "MemorySignalingInterface.h"
 
 namespace qtool {
@@ -26,24 +27,23 @@ class RobotMemoryManager: public QObject {
     ADD_SHARED_PTR(RobotMemoryManager);
 
 public:
-    RobotMemoryManager(man::memory::Memory::ptr memory) :
+    RobotMemoryManager(man::memory::RobotMemory::ptr memory) :
         memory(memory), memorySignalingInterface(memory) {
     }
 
     virtual ~RobotMemoryManager() {}
 
-    man::memory::Memory::const_ptr getMemory() const {
+    man::memory::RobotMemory::const_ptr getMemory() const {
         return memory;
     }
 
-    void connectSlotToMObject(const QObject* subscriber,
-                const char* slot, man::memory::MObject_ID mobject_id ) const {
-        memorySignalingInterface.subscribeSlotToMObject(subscriber, slot, mobject_id);
+    void connectSlot(const QObject* subscriber, const char* slot, std::string name) const {
+        memorySignalingInterface.subscribeSlotToMObject(subscriber, slot, name);
     }
 
 
 protected:
-    man::memory::Memory::ptr memory;
+    man::memory::RobotMemory::ptr memory;
     MemorySignalingInterface memorySignalingInterface;
 
 };

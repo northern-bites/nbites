@@ -12,12 +12,13 @@ namespace colorcreator {
 using namespace qtool::data;
 using namespace qtool::image;
 using namespace man::corpus;
+using namespace man::memory;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager), imageTabs(new QTabWidget(this)),
-        topImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::TOP),
+        topImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::TOP,
                                  BMPYUVImage::RGB, this)),
-        bottomImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM),
+        bottomImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::BOTTOM,
                                     BMPYUVImage::RGB, this)),
         topChannelImage(topImage, this),
         bottomChannelImage(bottomImage, this),
@@ -39,14 +40,14 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     leftLayout->addWidget(imageTabs);
 
     //update the threshold when the underlying image changes
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
 
     imageTabs->addTab(&topChannelImage, "Top Image");
-    dataManager->connectSlotToMObject(&topChannelImage, SLOT(updateView()), MTOPIMAGE_ID);
+    dataManager->connectSlot(&topChannelImage, SLOT(updateView()), "MRawImages");
 
     imageTabs->addTab(&bottomChannelImage, "Bottom Image");
-    dataManager->connectSlotToMObject(&bottomChannelImage, SLOT(updateView()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlot(&bottomChannelImage, SLOT(updateView()), "MRawImages");
 
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 

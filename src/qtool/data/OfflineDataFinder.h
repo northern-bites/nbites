@@ -25,9 +25,6 @@ public:
     OfflineDataFinder(QWidget *parent = 0);
     ~OfflineDataFinder();
 
-signals:
-    void signalGroundTruth(common::io::InProvider::ptr input);
-
 private:
     void setupFSModel();
     void setupFSBrowser();

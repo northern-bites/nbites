@@ -19,19 +19,21 @@ using namespace qtool::data;
 using namespace qtool::image;
 using namespace boost;
 using namespace man::memory::proto;
+using namespace man::memory;
 using namespace man::corpus;
 
 ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
         QWidget *parent) :
         QWidget(parent), dataManager(dataManager),
         currentCamera(Camera::TOP),
-        topImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::TOP), BMPYUVImage::RGB, this)),
-        bottomImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM), BMPYUVImage::RGB, this)),
+        topImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::TOP,
+                BMPYUVImage::RGB, this)),
+        bottomImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::BOTTOM,
+                BMPYUVImage::RGB, this)),
         sensors(new Sensors(shared_ptr<Speech>(new Speech()))),
         imageTranscribe(new OfflineImageTranscriber(sensors,
-                dataManager->getMemory()->getMImage(Camera::TOP),
-                dataManager->getMemory()->getMImage(Camera::BOTTOM))),
-        rawThresholdedImageData(new PImage())
+                dataManager->getMemory()->get<MRawImages>())),
+        rawThresholdedImageData(new PRawImage())
 {
 
 
@@ -46,16 +48,16 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     topImageViewer = new viewer::BMPImageViewerListener(topImage, this);
     QObject::connect(topImageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
                      this, SLOT(canvassClicked(int, int, int, bool)));
-    dataManager->connectSlotToMObject(topImageViewer, SLOT(updateView()), MTOPIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
+    dataManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 
     imageTabs->addTab(topImageViewer, "Top Image");
 
     bottomImageViewer = new viewer::BMPImageViewerListener(bottomImage, this);
     QObject::connect(bottomImageViewer, SIGNAL(mouseClicked(int, int, int, bool)),
                      this, SLOT(canvassClicked(int, int, int, bool)));
-    dataManager->connectSlotToMObject(bottomImageViewer, SLOT(updateView()), MBOTTOMIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
 
     imageTabs->addTab(bottomImageViewer, "Bottom Image");
 
