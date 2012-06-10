@@ -163,6 +163,71 @@ class KickInformation:
                 #choose a back kick!
                 return self.chooseBackKick()
 
+
+        # Loc is bad- use only visual information to choose a kick.
+        #TODO: add orbits to this
+
+        rightPostBearing = self.oppRightPostBearing
+        leftPostBearing = self.oppLeftPostBearing
+
+        if rightPostBearing is None and leftPostBearing is None:
+            # Can't see any posts: orbit.
+            pass
+        elif rightPostBearing is not None and leftPostBearing is not None:
+            # Can see both posts: shoot between them.
+            leftScorePoint = rightPostBearing - 20
+            rightScorePoint = leftPostBearing + 20
+
+            if leftScorePoint < rightScorePoint:
+                # less than 40 degrees of goal available to shoot in.
+                leftScorePoint = ((rightPostBearing + leftPostBearing) / 2) + 5
+                rightScorePoint = leftScorePoint - 10
+
+            # If any kick is currently valid, choose that kick.
+            if leftScorePoint > 0 and rightScorePoint < 0:
+                return self.chooseDynamicKick()
+            elif leftScorePoint > 90 and rightScorePoint < 90:
+                return kicks.RIGHT_SIDE_KICK
+            elif leftScorePoint > -90 and rightScorePoint < -90:
+                return kicks.LEFT_SIDE_KICK
+            elif leftScorePoint > -180 and rightScorePoint < 180:
+                return self.chooseBackKick()
+
+            # Choose whichever kick is closest to being between the score points.
+            # Note: no kick bearing is between the posts, so they are all
+            #   to the right of the rightScorePoint or left of leftScorePoint.
+            if rightScorePoint > 90:
+                # Quadrent 2
+                if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:
+                    #Closer to the leftScorePoint
+                    return self.chooseBackKick()
+                else:
+                    return kicks.RIGHT_SIDE_KICK
+            elif rightScorePoint > 0:
+                # Quadrent 1
+                if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
+                    return kicks.RIGHT_SIDE_KICK
+                else:
+                    return self.chooseDynamicKick()
+            elif rightScorePoint > -90:
+                # Quadrent 4
+                if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
+                    return self.chooseDynamicKick()
+                else:
+                    return kicks.LEFT_SIDE_KICK
+            else:
+                # Quadrent 3
+                if (-90 - leftScorePoint) - (rightScorePoint + 180) < 0:
+                    return kicks.LEFT_SIDE_KICK
+                else:
+                    return self.chooseBackKick()
+
+
+
+
+
+
+
         rightPostBearing = self.oppRightPostBearing
         leftPostBearing = self.oppLeftPostBearing
 
