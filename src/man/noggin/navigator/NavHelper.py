@@ -51,7 +51,7 @@ def setDestination(nav, dest, gain = 1.0):
     Calls setDestination within the motion engine
     """
     nav.currentCommand = \
-        motion.DestinationCommand(x=dest.relX, y=0, theta=dest.relH, gain=gain)
+        motion.DestinationCommand(x=dest.relX, y=dest.relY, theta=dest.relH, gain=gain)
     nav.brain.motion.sendDestCommand(nav.currentCommand)
 
 def getDeltaOdometry(loc, startingOdo):
