@@ -49,6 +49,15 @@ public:
     static const bool between(const VisualLine& line,
                               const linePoint& p);
 
+    // @return True when a is between b and c (in the bounding box
+    // formed by them)
+    static bool between(const point<int>& a,
+                        const point<int>& b,
+                        const point<int>& c){
+        return (a.x < std::max(b.x, c.x) && a.x > std::min(b.x, c.x) &&
+                a.y < std::max(b.y, c.y) && a.y > std::min(b.y, c.y));
+    }
+
     // Returns true if the line segments (a,b) and (c,d) intersect "at a point
     // interior to both"
     // p.30.
@@ -263,8 +272,48 @@ public:
 
     static point<int> getClosestPointOnLine(const VisualLine& line,
                                             const point<int>& pt);
+
+    // Get closest point to point a which is on line from b->c
+    static inline point<int> getClosestPointOnLine(const point<int>& a,
+                                                   const point<int>& b,
+                                                   const point<int>& c){
+
+        /*
+         *        *a
+         *       /|
+         *      / |
+         *     /  |
+         *    b*--*-------------*c
+         *        ^find this point
+         *
+         * Finds the ^ point by computing the (b,a) dot (b,c)
+         *       and extending that result in the direction from
+         *       b to c.
+         */
+
+        float a_to_b_x = static_cast<float>(a.x - b.x);
+        float a_to_b_y = static_cast<float>(a.y - b.y);
+
+        float lx = static_cast<float>(c.x - b.x);
+        float ly = static_cast<float>(c.y - b.y);
+
+        // Unit vector
+        float len = hypotf(lx,
+                           ly);
+        float lx_unit = lx/len;
+        float ly_unit = ly/len;
+
+        float dot = (a_to_b_x * lx_unit) + (a_to_b_y * ly_unit);
+
+        int perp_x = b.x + static_cast<int>(lx_unit*dot);
+        int perp_y = b.y + static_cast<int>(ly_unit*dot);
+
+        return point<int>(perp_x, perp_y);
+    }
+
     static point<int> getClosestLinePoint(const VisualLine& line,
                                           const point<int>& pt);
+
 
     // Helper method that just returns whether the thresholded color is a
     // green color
