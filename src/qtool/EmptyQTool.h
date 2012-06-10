@@ -22,6 +22,7 @@
 
 namespace qtool {
 
+
 class EmptyQTool : public QMainWindow {
 
     Q_OBJECT
@@ -36,14 +37,13 @@ protected slots:
     void record();
 
 protected:
-    QTabWidget* toolTabs;
-
     data::DataManager::ptr dataManager;
 
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;
     QToolBar* toolbar;
+	QTabWidget* toolTabs;
 };
 
 }

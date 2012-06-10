@@ -25,6 +25,7 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
     connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
 
+
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);
@@ -58,5 +59,4 @@ void EmptyQTool::record() {
         }
     }
 }
-
 }

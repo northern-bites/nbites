@@ -36,6 +36,7 @@ namespace qtool {
 
 			public:
 			FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
+			~FieldViewer();
 
 		public slots:
 			void stopDrawing();

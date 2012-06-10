@@ -2,7 +2,7 @@
 #include "man/memory/Memory.h"
 #include "image/BMPImage.h"
 
-#include <QVBoxLayout>
+#include <QDebug>
 #include <vector>
 
 
@@ -41,11 +41,15 @@ namespace qtool {
 			buttonLayout->addWidget(stopButton);
 			connect(stopButton, SIGNAL(clicked()), this, SLOT(stopDrawing()));
 
-			//paint the field
+            //paint the field
 			mainLayout->addLayout(buttonLayout);
 			mainLayout->addLayout(field);
 			mainLayout->addItem(spacer);
 			this->setLayout(mainLayout);
+		}
+
+		FieldViewer::~FieldViewer(){
+			bot_locs->locs->stopListening();
 		}
 
 		void FieldViewer::drawBots(){
@@ -72,8 +76,6 @@ namespace qtool {
 				keepDrawing = false;
 				qDebug()<<"WorldView stopped.";
 				bot_locs->locs->stopListening();
-			} else {
-				qDebug()<<"WorldView isn't running.";
 			}
 		}
 	}

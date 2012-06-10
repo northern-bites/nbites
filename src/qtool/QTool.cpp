@@ -21,7 +21,7 @@ QTool::QTool() : EmptyQTool("QTOOL"),
                  visionViewer(new VisionViewer(dataManager)),
                  offlineViewer(new OfflineViewer(dataManager->getMemory())),
                  ballEKFViewer(new BallEKFViewer(dataManager)),
-                 fieldViewer(new FieldViewer(dataManager)),
+                 fieldViewer(new FieldViewer(dataManager, this)),
                  overseerClient(new OverseerClient(dataManager, this))
 {
     toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
@@ -37,5 +37,4 @@ QTool::QTool() : EmptyQTool("QTOOL"),
 
 QTool::~QTool() {
 }
-
 }
