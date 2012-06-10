@@ -18,23 +18,12 @@ def gameInitial(player):
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
+        player.system = goalie.GoalieSystem()
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
-
-    #fix this hack-lizzie
-    player.rightPostBearings = deque([])
-    player.rightPostBearings.append(30)
-    player.rightPostDistances = deque([])
-    player.rightPostDistances.append(300)
-    player.leftPostBearings = deque([])
-    player.leftPostBearings.append(30)
-    player.leftPostDistances = deque([])
-    player.leftPostDistances.append(300)
-
-    player.home = RelLocation(0, 0)
 
     return player.stay()
 
@@ -42,8 +31,8 @@ def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.lookToAngle(INITIAL_ANGLE)
-        print "Looking to: " + str(INITIAL_ANGLE)
+        player.brain.tracker.lookToAngle(goalie.INITIAL_ANGLE)
+        print "Looking to: " + str(goalie.INITIAL_ANGLE)
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -107,83 +96,50 @@ def gameFinished(player):
 ##### Non-main game methods
 
 def updatePostObservations(player):
+    """
+    Updates the underlying C++ data structures.
+    """
     if player.brain.vision.ygrp.on and player.brain.vision.ygrp.certainty != certainty.NOT_SURE:
         print "RIGHT: Saw right post."
-        player.rightPostBearings.append(player.brain.vision.ygrp.bearing)
-        if len(player.rightPostBearings) > 50:
-            player.rightPostBearings.popleft()
-        player.rightPostDistances.append(player.brain.vision.ygrp.dist)
-        if len(player.rightPostDistances) > 50:
-            player.rightPostDistances.popleft()
-
+        player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
+                                               player.brain.vision.ygrp.bearing)
+        print "  Pushed " + str(player.brain.vision.ygrp.bearing) + " " + str(player.brain.vision.ygrp.dist)
     if player.brain.vision.yglp.on:
         print "LEFT: Saw left post."
-        player.leftPostBearings.append(player.brain.vision.yglp.bearing)
-        if len(player.leftPostBearings) > 50:
-            player.leftPostBearings.popleft()
-        player.leftPostDistances.append(player.brain.vision.yglp.dist)
-        if len(player.leftPostDistances) > 50:
-            player.leftPostDistances.popleft()
-
-    leftBearingsSum = 0
-    for value in player.leftPostBearings:
-        leftBearingsSum += value
-
-    rightBearingsSum = 0
-    for value in player.rightPostBearings:
-        rightBearingsSum += value
-
-    leftDistancesSum = 0
-    for value in player.leftPostDistances:
-        leftDistancesSum += value
-
-    rightDistancesSum = 0
-    for value in player.rightPostDistances:
-        rightDistancesSum += value
-
-    player.curLeftBearing = leftBearingsSum/len(player.leftPostBearings)
-    curRightBearing = rightBearingsSum/len(player.rightPostBearings)
-    curLeftDistance = leftDistancesSum/len(player.leftPostDistances)
-    curRightDistance = rightDistancesSum/len(player.rightPostDistances)
-
-    player.leftx = curLeftDistance * cos(radians(player.curLeftBearing))
-    player.lefty = curLeftDistance * sin(radians(player.curLeftBearing))
-
-    player.rightx = curRightDistance * cos(radians(curRightBearing))
-    player.righty = curRightDistance * sin(radians(curRightBearing))
-
-    print "To get to: "
-    print "  Left: " + str(player.leftx) + " " + str(player.lefty)
-    print "  Right: " + str(player.rightx) + " " + str(player.righty)
-
-    player.centerGoalBearing = (player.curLeftBearing + curRightBearing)/2.0
-    player.centerGoalDistance = (curLeftDistance + curRightDistance)/2.0
-
-    print "Averaged Bearing: " + str(player.centerGoalBearing)
-    print "  Left: " + str(player.curLeftBearing)
-    print "  Right: " + str(curRightBearing)
-    print "Averaged Distance: " + str(player.centerGoalDistance)
-    print "  Left: " + str(curLeftDistance)
-    print "  Right: " + str(curRightDistance)
+        player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
+                                              player.brain.vision.yglp.bearing)
+        print "  Pushed " + str(player.brain.vision.yglp.bearing) + " " + str(player.brain.vision.yglp.dist)
 
 def walkToGoal(player):
     print "========================================"
+    if player.firstFrame():
+        player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
+        player.brain.nav.goTo(player.system.home,
+                              nav.CLOSE_ENOUGH, nav.FAST_SPEED)
 
     updatePostObservations(player)
-    player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
 
-    if player.firstFrame():
-        player.brain.nav.goTo(player.home, nav.CLOSE_ENOUGH, nav.FAST_SPEED)
+    player.system.home.relY = player.system.centerGoalRelY()
+    player.system.home.relX = player.system.centerGoalRelX()
 
-    player.home.relY = (player.lefty + player.righty) / 2.0
-    player.home.relX = ((player.leftx - 70) + (player.rightx + 70)) / 2.0
+    # if player.system.home.relY < 120:
+    #     player.system.home.relY = player.system.leftPostRelY()
+    #     player.system.home.relX = player.system.leftPostRelX() - 70.0
+    #     player.brain.tracker.lookToAngle(player.system.leftPostBearing())
 
-    if player.home.relY < 120:
-        player.home.relY = player.lefty
-        player.home.relX = player.leftx - 70
-        player.brain.tracker.lookToAngle(player.curLeftBearing)
+    print "BEARINGS " + str(player.system.centerGoalBearing())
+    print "  LEFT " + str(player.system.leftPostBearing())
+    print "  RIGHT " + str(player.system.rightPostBearing())
 
-    print "Going to " + str(player.home.relX) + " " + str(player.home.relY)
+    print "DISTANCES " + str(player.system.centerGoalDistance())
+    print "  LEFT " + str(player.system.leftPostDistance())
+    print "  RIGHT " + str(player.system.rightPostDistance())
+
+    print "TO GET TO"
+    print "  LEFT " + str(player.system.leftPostRelX()) + " " + str(player.system.leftPostRelY())
+    print "  RIGHT " + str(player.system.rightPostRelX()) + " " + str(player.system.rightPostRelY())
+
+    print "Going to " + str(player.system.home.relX) + " " + str(player.system.home.relY)
 
     return player.stay()
     #return Transition.getNextState(player, walkToGoal)

@@ -59,6 +59,8 @@ public:
     float centerGoalRelX();
     float centerGoalRelY();
 
+    RelLocation home;
+
 private:
     std::deque<float> rightPostBearings;
     std::deque<float> rightPostDistances;
@@ -66,7 +68,5 @@ private:
     std::deque<float> leftPostDistances;
 
     float computeAverage(std::deque<float>);
-
-    RelLocation home;
 };
 }

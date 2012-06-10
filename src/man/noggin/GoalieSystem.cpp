@@ -13,6 +13,9 @@ GoalieSystem::GoalieSystem() : rightPostBearings(),
                                home(CENTER_FIELD_Y - INITIAL_Y,
                                     LINE_CROSS_OFFSET)
 {
+    // need to fix these values
+    pushRightPostObservation(300.f, 30.f);
+    pushLeftPostObservation(300.f, 30.f);
 }
 
 void GoalieSystem::pushRightPostObservation(float distance, float bearing)

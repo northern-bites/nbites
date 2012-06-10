@@ -28,7 +28,10 @@ BOOST_PYTHON_MODULE(goalie)
         .def("centerGoalBearing", &GoalieSystem::centerGoalBearingAvg)
         .def("centerGoalRelX", &GoalieSystem::centerGoalRelX)
         .def("centerGoalRelY", &GoalieSystem::centerGoalRelY)
+        .add_property("home", &GoalieSystem::home)
         ;
+
+    scope().attr("INITIAL_ANGLE") = INITIAL_ANGLE;
 }
 
 void c_init_goalie() {
