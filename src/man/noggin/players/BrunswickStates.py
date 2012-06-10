@@ -13,6 +13,11 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
+
+        # testing
+        if player.lastDiffState == '':
+            print "Last diff state is empty"
+
         player.inKickingState = False
         player.brain.nav.stop()
         player.gainsOn()
@@ -60,16 +65,9 @@ def gameReady(player):
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
-    #HACK! TODO: this delay is to make sure the sensors get calibrated before
-    #we start walking; find a way to query motion to see whether the sensors are
-    #calibrated or not before starting
+    # Wait until the sensors are calibrated before moving.
     while (not player.brain.motion.calibrated()):
         return player.stay()
-    """
-    player.initialDelayCounter += 1
-    if player.initialDelayCounter < 230:
-        return player.stay()
-        """
 
     # Works with rules (2011) to get goalie manually positioned
     if (player.lastDiffState == 'gameInitial'
