@@ -10,6 +10,7 @@
 
 #include <QPixmap>
 #include <QPainter>
+#include <QtDebug>
 #include "ClassHelper.h"
 
 namespace qtool {
@@ -29,6 +30,8 @@ public:
     virtual unsigned getHeight() const = 0;
 
 public slots:
+    //TODO: deprecate this, use buildBitmap instead (this wrapping is kind of dumb,
+    //and I think bitmapBuilt is unnecessary)
     void updateBitmap() {
         this->buildBitmap();
         emit bitmapBuilt();
@@ -82,8 +85,8 @@ protected:
         }
 
         QPainter painter(&bitmap);
-
         painter.drawPixmap(0, 0, *(baseImage->getBitmap()));
+
         if (overlayedImage) {
             overlayedImage->updateBitmap();
             painter.drawPixmap(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
