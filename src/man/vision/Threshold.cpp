@@ -58,7 +58,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Threshold.h"
-#include "debug.h"
 
 #include "ColorParams.h"
 
@@ -1300,7 +1299,7 @@ void Threshold::initTable(std::string filename) {
     //cout << filename << endl;
     fp = fopen(filename.c_str(), "r");   //open table for reading
     if (fp == NULL) {
-        print("initTable() FAILED to open filename: %s", filename.c_str());
+        printf("initTable() FAILED to open filename: %s", filename.c_str());
 #ifdef OFFLINE
         exit(0);
 #else
@@ -1316,7 +1315,7 @@ void Threshold::initTable(std::string filename) {
         }
 
 #ifndef OFFLINE
-    print("Loaded colortable %s\n",filename.c_str());
+    printf("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);

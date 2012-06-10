@@ -5,8 +5,6 @@ message PVision {
     optional int64 timestamp = 1;
     optional PVisualBall visual_ball = 2;
     repeated PVisualCorner visual_corner = 3;
-    optional PVisualFieldObject bglp = 4;
-    optional PVisualFieldObject bgrp = 5;
     optional PVisualFieldObject yglp = 6; 
     optional PVisualFieldObject ygrp = 7;
     optional PVisualRobot red1=8;

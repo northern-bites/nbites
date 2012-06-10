@@ -27,7 +27,7 @@ public:
 signals:
     void signalNewDataSet();
     void signalNewInputProvider(common::io::InProvider::ptr newInput,
-                                MObject_ID id);
+                                std::string name);
 
 };
 

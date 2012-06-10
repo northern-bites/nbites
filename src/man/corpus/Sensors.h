@@ -27,6 +27,8 @@
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
 
+#include "ClassHelper.h"
+
 #include "SensorDef.h"
 #include "SensorConfigs.h"
 #include "VisionDef.h"
@@ -36,7 +38,9 @@
 #include "BulkMonitor.h"
 #include "include/synchro/mutex.h"
 #include "Kinematics.h"
-#include "memory/RoboImage.h"
+
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
 
 enum SupportFoot {
     LEFT_SUPPORT = 0,
@@ -44,12 +48,6 @@ enum SupportFoot {
 };
 
 class Sensors;
-
-enum SensorsEvent {
-    NEW_MOTION_SENSORS = 1,
-    NEW_VISION_SENSORS,
-    NEW_IMAGE
-};
 
 struct FSR {
     FSR()
@@ -100,10 +98,16 @@ struct Inertial {
 };
 
 
-class Sensors : public EventNotifier<SensorsEvent>{
+class Sensors {
     //friend class Man;
+    typedef man::memory::MemoryProvider<man::memory::MVisionSensors, Sensors> VisionSensorsProvider;
+    typedef man::memory::MemoryProvider<man::memory::MMotionSensors, Sensors> MotionSensorsProvider;
+    ADD_SHARED_PTR(Sensors)
+
 public:
-    Sensors(boost::shared_ptr<Speech> s);
+    Sensors(boost::shared_ptr<Speech> s,
+            man::memory::MVisionSensors::ptr mVisionSensors = man::memory::MVisionSensors::ptr(),
+            man::memory::MMotionSensors::ptr mMotionSensors = man::memory::MMotionSensors::ptr());
     virtual ~Sensors();
 
     // Locking data retrieval methods
@@ -195,15 +199,11 @@ public:
 
     man::corpus::Camera::Type which;
 
-    const uint8_t* getNaoImage(man::corpus::Camera::Type type) const;
-    uint8_t* getWriteableNaoImage(man::corpus::Camera::Type type);
     const uint16_t* getYImage(man::corpus::Camera::Type type) const;
     const uint16_t* getImage(man::corpus::Camera::Type type) const;
     const uint16_t* getUVImage(man::corpus::Camera::Type type) const;
     const uint8_t* getColorImage(man::corpus::Camera::Type type) const;
-    void setNaoImagePointer(char* img, man::corpus::Camera::Type type);
-    void notifyNewNaoImage();
-    const man::memory::RoboImage* getRoboImage() const;
+
     void setImage(const uint16_t* img, man::corpus::Camera::Type type);
     void lockImage() const;
     void releaseImage() const;
@@ -284,15 +284,17 @@ private:
     const uint16_t *yBottomImage, *uvBottomImage;
     const uint16_t *yTopImage, *uvTopImage;
     const uint8_t *colorBottomImage, *colorTopImage;
-    uint8_t *bottomImage, *topImage;
-
-    // Not used...
-    man::memory::RoboImage roboImage;
 
     // Pose needs to know which foot is on the ground during a vision frame
     // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume
     // left foot is on the ground.
     SupportFoot supportFoot;
+
+    // Memory updating
+    VisionSensorsProvider visionSensorsProvider;
+    void updateVisionSensorsInMemory(man::memory::MVisionSensors::ptr) const;
+    MotionSensorsProvider motionSensorsProvider;
+    void updateMotionSensorsInMemory(man::memory::MMotionSensors::ptr) const;
 
     /**
      * Stuff below is not logged to vision frames or sent over the network to

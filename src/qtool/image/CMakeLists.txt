@@ -52,7 +52,6 @@ target_link_libraries(
   image
   viewer
   overseer_client
-  noggin
   ${QT_LIBRARIES}
   ${SWSCALE_LIBRARY}
   ${AVUTIL_LIBRARY}

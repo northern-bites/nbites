@@ -14,6 +14,7 @@ def kickBallExecute(player):
         player.brain.speech.say("Kick it")
         player.brain.tracker.trackBallFixedPitch()
 
+        print "performing " + str(player.kick)
         kick = player.kick.sweetMove
 
 #        if transitions.ballInPosition(player) and kick is not None:

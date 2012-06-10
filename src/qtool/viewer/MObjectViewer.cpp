@@ -6,7 +6,6 @@
 namespace qtool {
 namespace viewer {
 
-using data::MObject_ID;
 using namespace data::treemodel;
 using boost::shared_ptr;
 using namespace man::memory;
