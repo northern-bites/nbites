@@ -58,11 +58,12 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     this->setCentralWidget(central);
 
-    memoryManager->connectSlot(bottomImageViewer,
-            SLOT(updateView()), "MRawImages");
+    //TODO: we call updateView twice per vision frame
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 
-    memoryManager->connectSlot(topImageViewer,
-                        SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MVision");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MVision");
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);

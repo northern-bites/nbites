@@ -65,12 +65,12 @@ public:
        }
 
     virtual unsigned getWidth() const {
-		if(baseImage->getWidth()>overlayedImage->getWidth())
+		if(baseImage->getWidth() > overlayedImage->getWidth())
 			return baseImage->getWidth();
 		else return overlayedImage->getWidth();
 	}
     virtual unsigned getHeight() const {
-		if(baseImage->getHeight()>overlayedImage->getHeight())
+		if(baseImage->getHeight() > overlayedImage->getHeight())
 			return baseImage->getHeight();
 		else return overlayedImage->getHeight();
 	}
@@ -89,7 +89,12 @@ protected:
 
         if (overlayedImage) {
             overlayedImage->updateBitmap();
-            painter.drawPixmap(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
+            if (!baseImage->getBitmap()->rect().isEmpty()) {
+                painter.drawPixmap(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
+            } else {
+                painter.fillRect(overlayedImage->getBitmap()->rect(), Qt::gray);
+                painter.drawPixmap(0, 0, *(overlayedImage->getBitmap()));
+            }
         }
     }
 
