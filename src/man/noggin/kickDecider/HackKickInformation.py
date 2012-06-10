@@ -222,62 +222,6 @@ class KickInformation:
                 else:
                     return self.chooseBackKick()
 
-
-
-
-
-
-
-        rightPostBearing = self.oppRightPostBearing
-        leftPostBearing = self.oppLeftPostBearing
-
-        if self.dangerousBall() and self.oppAvgPostDist < 200:
-            self.brain.speech.say("Dangerous ball!")
-            return self.chooseBackKick()
-
-        # first determine if both opp goal posts were seen
-        if (rightPostBearing is not None and leftPostBearing is not None):
-            # if we are facing between the posts
-            if (leftPostBearing + constants.KICK_STRAIGHT_POST_BEARING >= 0 and \
-                    rightPostBearing - constants.KICK_STRAIGHT_POST_BEARING <= 0):
-
-                # will this ever happen?
-                if not self.sawGoal:
-                    return self.chooseBackKick()
-                elif self.oppAvgPostDist == 0 or self.dangerousBall():
-                    return self.chooseShortKick()
-                else:
-                    self.brain.speech.say("Take it to the house!")
-                    return self.chooseDynamicKick()
-
-
-            # if the goal is to our right, use our left foot
-            elif rightPostBearing < 0:
-                return kicks.LEFT_SIDE_KICK
-            # if the goal is to our left, use our right foot
-            elif leftPostBearing > 0:
-                return kicks.RIGHT_SIDE_KICK
-        # if only one was seen
-        elif (leftPostBearing is not None):
-            # if the right post is roughly to our right (but not too far),
-            # kick straight
-            if (leftPostBearing <= 0 and
-                leftPostBearing >= -1*constants.KICK_STRAIGHT_BEARING_THRESH):
-                return self.chooseDynamicKick()
-            # if the right post is roughly to our left, kick right
-            elif (leftPostBearing > 0):
-                return kicks.RIGHT_SIDE_KICK
-            # if the right post is way to our right, kick with the left foot
-            elif (leftPostBearing < -1*constants.KICK_STRAIGHT_BEARING_THRESH):
-                return kicks.LEFT_SIDE_KICK
-        elif (rightPostBearing is not None):
-            if (rightPostBearing and
-                rightPostBearing <= constants.KICK_STRAIGHT_BEARING_THRESH):
-                return self.chooseDynamicKick()
-            elif (rightPostBearing < 0):
-                return kicks.LEFT_SIDE_KICK
-            elif (rightPostBearing > constants.KICK_STRAIGHT_BEARING_THRESH):
-                return kicks.RIGHT_SIDE_KICK
         # if none were seen
         return self.kickLoc()
 
