@@ -27,7 +27,7 @@ set( Image_srcs
     PaintLocalization
     )
 
-set( Image_headers 
+set( Image_headers
   BMPImage.h
   FastYUVToBMPImage.h
   PaintField.h

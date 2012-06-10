@@ -309,9 +309,7 @@ void Noggin::updateLocalization()
                                       odometry.y,
                                       odometry.theta);
 
-    // Build the observations from vision data
-    vector<PointObservation> pt_observations;
-    vector<CornerObservation> corner_observations;
+    locMotionSystem->setCurrentOdometry(odo);
 
     std::vector<PF::Observation> observations;
     std::vector<Landmark> landmarks;

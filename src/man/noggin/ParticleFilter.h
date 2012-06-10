@@ -100,8 +100,9 @@ namespace PF
     class LocalizationParticle
     {
     public:
-        LocalizationParticle(Location l, float w);
-        LocalizationParticle();
+        LocalizationParticle(Location l, float w)
+            : weight(w), location(l) { }
+        LocalizationParticle() : weight(0.0f), location() {}
 
         ~LocalizationParticle() { }
 

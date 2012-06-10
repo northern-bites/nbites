@@ -3,17 +3,6 @@
 namespace PF
 {
     /**
-     * Constructor
-     */
-    LocalizationParticle::LocalizationParticle(Location l, float w)
-        : weight(w), location(l)
-    { }
-
-    LocalizationParticle::LocalizationParticle()
-        : weight(0.0f), location()
-    { }
-
-    /**
      * Used to compare two particles by weight, primarily for
      * use with the sorting algorithm.
      *
@@ -135,6 +124,7 @@ namespace PF
         // xEstimate = estimate.x;
         // yEstimate = estimate.y;
         // hEstimate = estimate.heading;
+
         memoryProvider.updateMemory();
     }
 
@@ -161,7 +151,6 @@ namespace PF
      */
     void ParticleFilter::resample()
     {
-
         // Normalize the particle weights, and find the average weight.
         float sum = 0.0f;
         ParticleIt iter;
@@ -190,8 +179,8 @@ namespace PF
         float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
 
         float confidence = 1.0f - wFast/wSlow;
-//        std::cout << "The confidence of the particles swarm is: "
-//                  << confidence << std::endl;
+        std::cout << "The confidence of the particles swarm is: "
+                  << confidence << std::endl;
 
 
 
@@ -480,7 +469,6 @@ namespace PF
 
     void ParticleFilter::updateMemory(MLocalization::ptr mLoc) const
     {
-
         using namespace man::memory::proto;
 
         mLoc->get()->set_x_est(this->getXEst());
@@ -506,6 +494,4 @@ namespace PF
 
 
     }
-
-
 }

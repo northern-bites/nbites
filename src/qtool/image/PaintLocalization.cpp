@@ -45,6 +45,7 @@ namespace qtool
 
     void PaintLocalization::buildBitmap()
     {
+
       bitmap.fill(Qt::transparent);
 
       PF::ParticleIt i = lastParticles.begin();
