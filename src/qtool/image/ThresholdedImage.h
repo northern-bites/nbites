@@ -10,7 +10,8 @@
 
 #include <boost/shared_ptr.hpp>
 #include "BMPImage.h"
-#include "memory/MImage.h"
+#include "data/DataTypes.h"
+#include "memory/MObjects.h"
 #include "Color.h"
 
 namespace qtool {
@@ -18,10 +19,11 @@ namespace image {
 
 class ThresholdedImage : public BMPImage
 {
+    typedef boost::shared_ptr<const man::memory::proto::PRawImage> ImagePtr;
 
 public:
     ThresholdedImage(
-            boost::shared_ptr<const man::memory::proto::PImage> rawImage,
+            ImagePtr rawImage,
             QObject* parent = 0, byte filter = 0xFF);
     virtual ~ThresholdedImage() {};
 
@@ -38,7 +40,7 @@ protected:
     bool needToResizeBitmap() const;
 
 protected:
-    boost::shared_ptr<const man::memory::proto::PImage> rawImage;
+    ImagePtr rawImage;
     byte filter;
 
 };

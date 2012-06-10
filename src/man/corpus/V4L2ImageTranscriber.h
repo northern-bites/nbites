@@ -71,6 +71,8 @@
 #include "Camera.h"
 #include "ColorParams.h"
 
+#include "memory/MObjects.h"
+
 namespace man {
 namespace corpus {
 
@@ -78,7 +80,8 @@ class V4L2ImageTranscriber: public ImageTranscriber {
 
 public:
 
-    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s, Camera::Type which);
+    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s, Camera::Type which,
+                         memory::MRawImages::ptr rawImages);
     virtual ~V4L2ImageTranscriber();
 
     const Camera::Settings* getSettings() const {
@@ -105,10 +108,11 @@ private:
 
     int cameraAdapterFd;
 
-    enum {
-        frameBufferCount = 4, /**< Amount of available frame buffers. */
-        WIDTH = 640, HEIGHT = 480, SIZE = WIDTH * HEIGHT * 2
-    };
+    static const int frameBufferCount = 4; /**< Amount of available frame buffers. */
+    static const int WIDTH = 640;
+    static const int HEIGHT = 480;
+    static const int SIZE = WIDTH * HEIGHT * 2;
+
     int fd;
     void* mem[frameBufferCount]; /**< Frame buffer addresses. */
     int memLength[frameBufferCount]; /* The length of each frame buffer. */
@@ -121,6 +125,9 @@ private:
     uint16_t* image;
     unsigned char *table;
     ColorParams params;
+
+    // to update memory images (for logging)
+    memory::MRawImages::ptr rawImages;
 
     int getControlSetting(unsigned int id);
     bool setControlSetting(unsigned int id, int value);

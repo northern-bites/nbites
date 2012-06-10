@@ -36,6 +36,7 @@ static const char *PCOMPONENT_NAMES[] = {
   "Smooth Hough Space",
   "Hough Peaks",
   "Suppress Hough Lines",
+  "Pair Hough Lines",
 
   "Lines",
   "Vert Lines",
@@ -109,6 +110,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_SMOOTH,                --> */ P_HOUGH,
     /*P_HOUGH_PEAKS,           --> */ P_HOUGH,
     /*P_SUPPRESS,              --> */ P_HOUGH,
+    /*P_PAIR_LINES,             --> */ P_HOUGH,
 
     /*P_LINES                  --> */ P_VISION,
     /*P_VERT_LINES,            --> */ P_LINES,
@@ -346,7 +348,7 @@ Profiler::printIndentedSummary()
     comp = PCOMPONENT_SUB_ORDER[i];
     parent_sum = (float)sumTime[comp];
 
-    if (shouldNotPrintLine(i) &&
+    if (shouldNotPrintLine(i) ||
         (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
         continue;
 

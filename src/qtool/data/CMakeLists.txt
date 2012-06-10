@@ -23,7 +23,6 @@ set( data_headers DataLoader.h
                   OfflineDataFinder.h 
                   DataManager.h
                   MemorySignalingInterface.h
-                  QProtobufMessage.h
                   RobotMemoryManager.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

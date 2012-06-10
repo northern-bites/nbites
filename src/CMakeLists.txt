@@ -1,6 +1,7 @@
 ############
 
 cmake_minimum_required(VERSION 2.8.0)
+enable_testing()
 
 # set up sub projects and includes
 

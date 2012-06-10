@@ -60,7 +60,6 @@
 
 #include "Field.h"
 #include "VisualFieldEdge.h"
-#include "debug.h"
 #include "Utility.h"
 
 using namespace std;
