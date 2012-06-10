@@ -32,6 +32,9 @@ public:
     GoalieSystem();
     ~GoalieSystem() {};
 
+    void reset(float rightDistance, float rightBearing,
+               float leftDistance, float rightDistance);
+
     // Methods for controlling "memory"
     void pushRightPostObservation(float distance, float bearing);
     void pushLeftPostObservation(float distance, float bearing);

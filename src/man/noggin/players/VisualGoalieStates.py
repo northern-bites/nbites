@@ -6,6 +6,9 @@ from GoalieTransitions import atGoalArea
 DEBUG_OBSERVATIONS = True
 DEBUG_APPROACH = False
 
+walkToGoal.transitions = { positionAtGoal :
+                           Transition.CountTransition(atGoalArea)}
+
 def updatePostObservations(player):
     """
     Updates the underlying C++ data structures.
@@ -37,12 +40,6 @@ def walkToGoal(player):
     player.system.home.relY = player.system.centerGoalRelY()
     player.system.home.relX = player.system.centerGoalRelX()
 
-    # switch to 1 post when close?
-    # if player.system.home.relY < 120:
-    #     player.system.home.relY = player.system.leftPostRelY()
-    #     player.system.home.relX = player.system.leftPostRelX() - 70.0
-    #     player.brain.tracker.lookToAngle(player.system.leftPostBearing())
-
     if DEBUG_APPROACH:
         print "========================================"
 
@@ -63,3 +60,14 @@ def walkToGoal(player):
     return Transition.getNextState(player, walkToGoal)
 
 def positionAtGoal(player):
+    if player.firstFrame():
+        player.system.reset(70.0, 90.0, -70.0, -90.0)
+        player.brain.nav.goTo(player.system.home,
+                              nav.PRECISELY, nav.CAREFUL_SPEED)
+
+    player.brain.tracker.lookToAngle(player.system.leftPostBearing())
+
+    player.system.home.relX = player.system.leftPostRelX() - 70.f
+    player.system.home.relY = player.system.leftPostRelY()
+
+    return player.stay()

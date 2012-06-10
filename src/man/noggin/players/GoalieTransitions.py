@@ -8,10 +8,14 @@ import noggin_constants as NogCon
 import GoalieConstants as goalCon
 import PositionTransitions as PosTran
 
+# Visual Goalie
+
+def atGoalArea(player):
+    return player.system.centerGoalDistance() < 50
+
 # ******************
 # SAVING TRANSITIONS
 # ******************
-
 
 def shouldSave(player):
     """

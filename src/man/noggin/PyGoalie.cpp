@@ -16,6 +16,7 @@ BOOST_PYTHON_MODULE(goalie)
              &GoalieSystem::pushRightPostObservation)
         .def("pushLeftPostObservation",
              &GoalieSystem::pushLeftPostObservation)
+        .def("reset", &GoalieSystem::reset)
         .def("leftPostBearing", &GoalieSystem::leftPostBearing)
         .def("rightPostBearing", &GoalieSystem::rightPostBearing)
         .def("leftPostDistance", &GoalieSystem::leftPostDistance)

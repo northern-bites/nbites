@@ -18,6 +18,17 @@ GoalieSystem::GoalieSystem() : rightPostBearings(),
     pushLeftPostObservation(300.f, 30.f);
 }
 
+void GoalieSystem::reset(float rightDistance, float rightBearing,
+                         float leftDistance, float leftBearing)
+{
+    rightPostBearings.clear();
+    rightPostDistances.clear();
+    leftPostBearings.clear();
+    leftPostDistances.clear();
+    pushRightPostObservation(rightDistance, rightBearing);
+    pushLeftPostObservation(leftDistance, leftBearing);
+}
+
 void GoalieSystem::pushRightPostObservation(float distance, float bearing)
 {
     rightPostDistances.push_back(distance);
