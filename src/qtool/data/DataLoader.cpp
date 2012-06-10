@@ -10,7 +10,7 @@ DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
     QWidget(parent),
     dataManager(dataManager),
     offlineDataFinder(new OfflineDataFinder(this)),
-    remoteDataFinder(new RemoteDataFinder(this))
+    remoteDataFinder(new RemoteDataFinder(dataManager, this))
 {
     QHBoxLayout *layout = new QHBoxLayout;
 
@@ -18,9 +18,9 @@ DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
     layout->addWidget(remoteDataFinder);
 
     connect(remoteDataFinder,
-            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr, MObject_ID)),
+            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr, std::string)),
             dataManager.get(),
-            SLOT(newInputProvider(common::io::InProvider::ptr, MObject_ID)));
+            SLOT(newInputProvider(common::io::InProvider::ptr, std::string)));
 
     connect(remoteDataFinder,
             SIGNAL(signalNewDataSet()),
@@ -28,19 +28,14 @@ DataLoader::DataLoader(DataManager::ptr dataManager, QWidget *parent) :
             SLOT(reset()));
 
     connect(offlineDataFinder,
-            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr, MObject_ID)),
+            SIGNAL(signalNewInputProvider(common::io::InProvider::ptr, std::string)),
             dataManager.get(),
-            SLOT(newInputProvider(common::io::InProvider::ptr, MObject_ID)));
+            SLOT(newInputProvider(common::io::InProvider::ptr, std::string)));
 
     connect(offlineDataFinder,
             SIGNAL(signalNewDataSet()),
             dataManager.get(),
             SLOT(reset()));
-
-    connect(offlineDataFinder,
-            SIGNAL(signalGroundTruth(common::io::InProvider::ptr)),
-            dataManager.get(),
-            SLOT(newGroundTruthProvider(common::io::InProvider::ptr)));
 
     this->setLayout(layout);
 }

@@ -7,19 +7,21 @@ from objects import RelRobotLocation
 OBJ_SEEN_THRESH = 5
 LOOK_DIR_THRESH = 10
 
+# @Summer 2012: This entire state appears to be a hack for localization.
+# Consider removing entirely.
 def afterPenalty(player):
 
     gcState = player.brain.gameController.currentState
 
     if player.firstFrame():
         initPenaltyReloc(player)
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatWidePanFixedPitch()
         # walk towards the center of the field
         player.brain.nav.walkTo(RelRobotLocation(2000,0,0))
 
     if player.brain.ball.vis.framesOn > OBJ_SEEN_THRESH:
         #deal with ball and don't worry about loc
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         return player.goLater(gcState)
 
     # Would be great if loc worked. Hacked out for US OPEN 2012
@@ -59,7 +61,7 @@ def afterPenalty(player):
     if player.brain.nav.isStopped() or player.counter > 250:
         player.brain.nav.stop()
         return player.goLater('spinFindBall')
-    
+
 
     return player.stay()
 
@@ -125,7 +127,7 @@ def penaltyRelocalize(player):
         player.setWalk(1, 0, 0)
 
     if player.brain.ball.vis.framesOn >= OBJ_SEEN_THRESH:
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         return player.goLater(gcState)
 
     if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
@@ -139,6 +141,6 @@ def penaltyRelocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatWidePanFixedPitch()
 
     return player.stay()

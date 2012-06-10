@@ -19,9 +19,11 @@ namespace image {
 
 using namespace data;
 using namespace std;
+using namespace man::corpus;
 
-FastYUVToBMPImage::FastYUVToBMPImage(RoboImage::const_ptr roboImage, QObject* parent) :
-        BMPImage(parent), roboImage(roboImage), rgb_image(NULL) {
+FastYUVToBMPImage::FastYUVToBMPImage(RoboImages::const_ptr rawImages,
+                                     Camera::Type which, QObject* parent) :
+        BMPImage(parent), rawImages(rawImages), which(which), rgb_image(NULL) {
 }
 
 FastYUVToBMPImage::~FastYUVToBMPImage() {
@@ -30,9 +32,11 @@ FastYUVToBMPImage::~FastYUVToBMPImage() {
 
 void FastYUVToBMPImage::buildBitmap() {
 
-    const byte* yuyv_image_data = (byte*) roboImage->get()->image().data();
-    int image_width = roboImage->get()->width();
-    int image_height = roboImage->get()->height();
+    const byte* yuyv_image_data = (byte*) rawImages->getPImage(which)->image().data();
+
+    int image_width = rawImages->getPImage(which)->width();
+    int image_height = rawImages->getPImage(which)->height();
+
     int yuyv_image_line_size = 2*image_width;
     int rgb_line_size = 4*image_width;
 

@@ -22,34 +22,34 @@ public:
     void setDistanceWithSD(float _dist);
     void setBearingWithSD(float b);
     void findAngles() {
-        setAngleX( static_cast<float>((IMAGE_WIDTH/2 - centerX)) /
-                   static_cast<float>(IMAGE_WIDTH/2) *
-                   MAX_BEARING_RAD);
-
-        setAngleY( static_cast<float>(IMAGE_HEIGHT/2 - centerY) /
-                   static_cast<float>(IMAGE_HEIGHT/2) *
-                   MAX_ELEVATION_RAD);
+      setAngleX( static_cast<float>((IMAGE_WIDTH/2 - centerX)) /
+		 static_cast<float>(IMAGE_WIDTH/2) *
+		 MAX_BEARING_RAD);
+      
+      setAngleY( static_cast<float>(IMAGE_HEIGHT/2 - centerY) /
+		 static_cast<float>(IMAGE_HEIGHT/2) *
+		 MAX_ELEVATION_RAD);
     }
 	void setHeat(float value) {heat = value;}
 
     // Getters
     const float getRadius() const { return radius; }
     const int getConfidence() const { return confidence;}
-	const float getHeat() const { return heat;}
-
+    const float getHeat() const { return heat;}
+    
     // Member functions
     const float ballDistanceToSD(float _distance) const {
-        return static_cast<float>(sqrt(10.f + _distance * 0.2f));
+      return static_cast<float>(sqrt(10.f + _distance * 0.2f));
     }
     const float ballBearingToSD(float _bearing) const {
-        return static_cast<float>(sqrt(static_cast<float>(M_PI) / 4.0f));
+      return static_cast<float>(sqrt(static_cast<float>(M_PI) / 4.0f));
     }
-
-private:
+    
+ private:
     float radius;
     int confidence;
-	float heat;
-
+    float heat;
+    
 };
 
 

@@ -86,9 +86,7 @@ def rChaser(team, workingPlay):
         team.subRoleSwitchTime = 0
     workingPlay.setRole(PBConstants.CHASER)
     # Note: Don't use shouldSwitchSubRole here. Go for the ball immediately.
-    workingPlay.setSubRole(PBConstants.CHASE_NORMAL)
-    pos = (team.brain.my.x,team.brain.my.y, team.brain.ball.loc.heading)
-    workingPlay.setPosition(pos)
+    SubRoles.pChaser(team, workingPlay)
 
 def rDefender(team, workingPlay):
     '''gets positioning for defender'''

@@ -27,6 +27,7 @@ Vision Constants that span multiple classes and systems.
 
 #define NAO_FOV_X_DEG          60.9f
 #define NAO_FOV_Y_DEG          47.6f
+
 #define NAO_SIM_IMAGE_WIDTH    160
 #define NAO_SIM_IMAGE_HEIGHT   120
 #define NAO_SIM_IMAGE_BYTE_SIZE (NAO_SIM_IMAGE_WIDTH * NAO_SIM_IMAGE_HEIGHT * 3)
@@ -83,12 +84,14 @@ Vision Constants that span multiple classes and systems.
 #  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
 #  define FOV_X_DEG NAO_FOV_X_DEG
 #  define FOV_Y_DEG NAO_FOV_Y_DEG
-#  define Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 2 // uint16 values
-#  define UV_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE * 2
+#  define Y_IMAGE_BYTE_SIZE (AVERAGED_IMAGE_SIZE * 2) // uint16 values
+#  define U_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE
+#  define V_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE
 #  define COLOR_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE // Byte values
-#  define IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE \
-    + COLOR_IMAGE_BYTE_SIZE
-
+#  define IMAGE_BYTE_SIZE (Y_IMAGE_BYTE_SIZE                        \
+                           + U_IMAGE_BYTE_SIZE                      \
+                           + V_IMAGE_BYTE_SIZE                      \
+                           + COLOR_IMAGE_BYTE_SIZE)
 #  define IMAGE_ROW_OFFSET NAO_IMAGE_ROW_OFFSET
 #  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
 
@@ -220,6 +223,16 @@ inline static double MICRO2DEG(const long x) {
   return RAD2DEG(MICRO2RAD(x));
 }
 
+namespace VisionDef {
+
+    enum {
+        top_edge = 0,
+        bottom_edge,
+        left_edge,
+        right_edge,
+        num_edges
+    };
+};
 
 #endif // VisionDef_h_DEFINED
 

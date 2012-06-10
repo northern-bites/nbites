@@ -1,5 +1,4 @@
-#include "memory/MVisionSensors.h"
-#include "memory/MMotionSensors.h"
+#include "memory/MObjects.h"
 #include "corpus/Transcriber.h"
 
 #pragma once
