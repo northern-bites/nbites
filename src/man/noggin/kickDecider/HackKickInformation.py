@@ -124,7 +124,7 @@ class KickInformation:
         elif self.oppRightPostBearing is not None:
             self.oppAvgPostDist = self.oppRightPostDist
 
-    # Hack from US open 2012?
+    # Hack from US open 2012
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
             if mate.playerNumber in [1, 4] and mate.active:
