@@ -10,7 +10,7 @@ using overseer::OverseerClient;
 ConnectTool::ConnectTool() : EmptyQTool("Robot Connection Tool"),
                              dataLoader(new DataLoader(dataManager)),
                              memoryViewer(new MemoryViewer(dataManager)),
-                             fieldViewer(new FieldViewer(dataManager)),
+                             fieldViewer(new FieldViewer(dataManager, this)),
                              overseerClient(new OverseerClient(dataManager,
                                                                this))
 {

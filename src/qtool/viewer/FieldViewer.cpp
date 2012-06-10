@@ -21,7 +21,14 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 	stopButton(new QPushButton("Stop Location", this)) {
 
 	mainLayout = new QVBoxLayout(this);
-	scaleFactor = (float)1.35;
+
+	float scaleX = parent->size().width()/(float)FIELD_WIDTH;
+	float scaleY = parent->size().height()/(float)FIELD_HEIGHT;
+	qDebug()<<parent->size();
+	if(scaleX<scaleY)
+		scaleFactor = scaleX;
+	else
+		scaleFactor = scaleY;
 
 	//field image painted via overlay of robots, field
 	fieldImage = new PaintField(this, scaleFactor);
