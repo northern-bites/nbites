@@ -1,5 +1,7 @@
 # Constants file to store all head moves, including pans and simple moves
 
+# TODO: update all pans to speeds that avoid motion blur. @summer 2012
+
 import StiffnessModes as stiff
 
 HEAD_MOVE_LENGTH = 4
@@ -367,3 +369,24 @@ DATA_PAN = (
     ((0.0,-45), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES),
     ((0.0, 15), 2.0, 0, stiff.LOW_HEAD_STIFFNESSES))
 
+################### FIXED PITCH PANS #################
+FIXED_PITCH_PAN = (
+    ((57.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-57.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+# Maximum search angle for top camera.
+FIXED_PITCH_PAN_WIDE = (
+    ((115.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+# Bottom camera is never significantly blocked by shoulders or arms.
+FIXED_PITCH_PAN_NARROW = (
+    ((55.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-55.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+# Needs some alteration re: pitch for the given yaw
+FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+# Needs some alteration re: pitch for the given yaw
+FIXED_PITCH_LOOK_RIGHT = ( ((-70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+
+FIXED_PITCH_LOOK_STRAIGHT = ( ((0.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )

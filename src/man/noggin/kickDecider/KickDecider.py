@@ -32,7 +32,7 @@ class KickDecider(object):
         sets a particular kick
         """
         self.info.kick = k
-        
+
     def getIdealKickPosition(self):
         """
         gets an ideal position for the robot to be in
@@ -41,9 +41,9 @@ class KickDecider(object):
         (kick_x, kick_y, kick_heading) = self.info.kick.getPosition()
         ballLoc = self.brain.ball.loc
         myLoc = self.brain.my
-        
-        return RelRobotLocation(ballLoc.relX - kick_x - constants.APPROACH_BALL_HACK, 
-                                ballLoc.relY - kick_y, 
+
+        return RelRobotLocation(ballLoc.relX - kick_x - constants.APPROACH_BALL_HACK,
+                                ballLoc.relY - kick_y,
                                 kick_heading - myLoc.h)
 
     def getSweetMove(self):

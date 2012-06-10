@@ -4,34 +4,34 @@ from ..util import MyMath
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
 
-def stand(nav):    
+def stand(nav):
     createAndSendWalkVector(nav, 0, 0, 0)
 
 
 def getRelativeDestination(my, dest):
-      
+
     field_dest = dest
-    
+
     if isinstance(field_dest, RelRobotLocation):
         return field_dest
-    
+
     elif isinstance(field_dest, RelLocation):
         return RelRobotLocation(field_dest.relX,
                                 field_dest.relY,
                                 field_dest.bearing)
-          
+
     elif isinstance(field_dest, RobotLocation):
         return my.relativeRobotLocationOf(field_dest)
-    
+
     elif isinstance(field_dest, Location):
         relLocation = my.relativeLocationOf(field_dest)
         return RelRobotLocation(relLocation.relX,
                                 relLocation.relY,
-                                relLocation.bearing)  
-    
+                                relLocation.bearing)
+
     else:
-        raise TypeError, "dest is not a Location type!" + str(dest) 
-    
+        raise TypeError, "dest is not a Location type!" + str(dest)
+
 def isDestinationRelative(dest):
     return isinstance(dest, RelLocation)
 
@@ -57,7 +57,7 @@ def getDeltaOdometry(loc, startingOdo):
                                      loc.lastOdoTheta)
     deltaOdometry.rotate(-h1)
     return deltaOdometry
-   
+
 def getOrbitLocation(radius, angle):
     """
     Returns the RelRobotLocation destination of an orbit
@@ -67,7 +67,7 @@ def getOrbitLocation(radius, angle):
         return RelRobotLocation(0.1, radius, -angle)
     else:
         return RelRobotLocation(0.1, -radius, -angle)
-    
+
 
 def setSpeed(nav, speeds):
     """
@@ -78,7 +78,7 @@ def setSpeed(nav, speeds):
         return
 
     createAndSendWalkVector(nav, *speeds)
-    
+
 def createAndSendWalkVector(nav, x, y, theta):
     walk = motion.WalkCommand(x=x,y=y,theta=theta)
     nav.brain.motion.setNextWalkCommand(walk)

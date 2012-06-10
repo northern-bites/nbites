@@ -118,6 +118,7 @@ void Ball::createBall(int h) {
 			blobs->blobIt(nextX, nextY, nextH, true);
 		}
 	}
+
 	balls(h, vision->ball);
     setFramesOnAndOff(vision->ball);
 }
@@ -177,7 +178,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
             blobs->init(i);
         } else if (ar > 0) {
             if (blobs->get(i).getBottom() + diam <
-                horizonAt(blobs->get(i).getLeft())) {
+                horizonAt(blobs->get(i).getLeft()) && thresh->usingTopCamera) {//temp hack
                 blobs->init(i);
                 if (BALLDEBUG) {
                     cout << "Screened one for horizon problems " << endl;
@@ -290,22 +291,22 @@ int Ball::balls(int horizon, VisualBall *thisBall)
 	occlusion = NOOCCLUSION;
 	int w, h;	// width and height of potential ball
 	estimate e; // pix estimate of ball's distance
-
-    preScreenBlobsBasedOnSizeAndColor();
-    // loop through the blobs from biggest to smallest until we find a ball
+	
+	preScreenBlobsBasedOnSizeAndColor();
+	// loop through the blobs from biggest to smallest until we find a ball
 	do {
-		topBlob = blobs->getTopAndMerge(horizon);
-        // the conditions when we know we don't have a ball
-		if (topBlob == NULL || !blobOk(*topBlob) || topBlob->getArea() == 0) {
+	  topBlob = blobs->getTopAndMerge(horizon);
+	  // the conditions when we know we don't have a ball
+	  if (topBlob == NULL || !blobOk(*topBlob) || topBlob->getArea() == 0) {
             return 0;
-        }
-        if (BALLDEBUG) {
+	  }
+	  if (BALLDEBUG) {
             cout << endl << "Examining next top blob " << endl;
-        }
-        w = topBlob->width();
-        h = topBlob->height();
-        //if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
-		if (!nearEdge(*topBlob)) {
+	  }
+	  w = topBlob->width();
+	  h = topBlob->height();
+	  //if (abs(w - h) > DIAMETERMISMATCH && !nearEdge(*topBlob)) {
+	  if (!nearEdge(*topBlob)) {
             adjustBallDimensions();
             w = topBlob->width();
             h = topBlob->height();
@@ -328,7 +329,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
         cout << topBlob->getLeftTopX() << " " << topBlob->getLeftTopY()
              << " " <<
             w << " " << h << " " << e.dist << endl;
-    }
+	}
 	if (BALLDISTDEBUG) {
 		cout << "Distance is " << thisBall->getDistance() << " "
 				<< kinematicsBasedEst.dist << endl;
@@ -1154,8 +1155,10 @@ void Ball::setFramesOnAndOff(VisualBall *objPtr) {
         objPtr->setFramesOff(0);
     }
     else {
+      if (!thresh->usingTopCamera){
         objPtr->setFramesOff(objPtr->getFramesOff()+1);
         objPtr->setFramesOn(0);
+      }
     }
  }
 
