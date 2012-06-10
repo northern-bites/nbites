@@ -30,6 +30,7 @@ static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 using namespace std;
 using namespace boost;
 
+using namespace man::memory;
 using namespace man::memory::log;
 
 #ifdef LOG_LOCALIZATION
@@ -39,16 +40,17 @@ fstream outputFile;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
-Noggin::Noggin (shared_ptr<Vision> v,
-                shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
-                shared_ptr<Sensors> _sensors, shared_ptr<LoggingBoard> loggingBoard,
-                MotionInterface * _minterface
+Noggin::Noggin (boost::shared_ptr<Vision> v,
+                boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
+                boost::shared_ptr<Sensors> _sensors, boost::shared_ptr<LoggingBoard> loggingBoard,
+                MotionInterface * _minterface, man::memory::Memory::ptr memory
                 )
     : vision(v),
       comm(c),
       gc(c->getGC()),
       sensors(_sensors),
       loggingBoard(loggingBoard),
+      memory(memory),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -133,9 +135,11 @@ void Noggin::initializeLocalization()
     locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
     locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem());
 
-    loc = shared_ptr<LocSystem>(new PF::ParticleFilter(locMotionSystem, locVisionSystem));
+    loc = shared_ptr<LocSystem>(new PF::ParticleFilter(locMotionSystem,
+                                                       locVisionSystem,
+                                                       memory->get<MLocalization>()));
 
-    ballEKF = shared_ptr<BallEKF>(new BallEKF());
+    ballEKF = boost::shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers
     set_loc_reference(loc);
@@ -305,7 +309,9 @@ void Noggin::updateLocalization()
                                       odometry.y,
                                       odometry.theta);
 
-    locMotionSystem->setCurrentOdometry(odo);
+    // Build the observations from vision data
+    vector<PointObservation> pt_observations;
+    vector<CornerObservation> corner_observations;
 
     std::vector<PF::Observation> observations;
     std::vector<Landmark> landmarks;
@@ -436,8 +442,8 @@ void Noggin::updateLocalization()
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {
         // Print out odometry and ball readings
-        outputFile << odometry.deltaF << " " << odometry.deltaL << " "
-                   << odometry.deltaR << " " << m.distance
+        outputFile << odometery.deltaF << " " << odometery.deltaL << " "
+                   << odometery.deltaR << " " << m.distance
                    << " " << m.bearing;
         // Print out observation information
         for (unsigned int x = 0; x < observations.size(); ++x) {

@@ -19,7 +19,7 @@ def shouldPrepareForKick(player):
     """
     ball = player.brain.ball
     return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
-    
+
 
 def ballInPosition(player, kickPose):
     """
@@ -30,7 +30,7 @@ def ballInPosition(player, kickPose):
         return False
 
     #Get the current kick sweet spot information
-    
+
 
     return (0 < kickPose.relX < constants.BALL_X_OFFSET and
                 fabs(kickPose.relY) < constants.BALL_Y_OFFSET and

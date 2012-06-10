@@ -44,9 +44,10 @@ namespace man {
 namespace corpus {
 
 using boost::shared_ptr;
+using namespace memory;
 
-V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
-                                           Camera::Type which) :
+V4L2ImageTranscriber::V4L2ImageTranscriber(boost::shared_ptr<Sensors> s,
+                                           Camera::Type which, MRawImages::ptr rawImages) :
     ImageTranscriber(s),
     settings(Camera::getSettings(which)),
     cameraType(which),
@@ -54,7 +55,8 @@ V4L2ImageTranscriber::V4L2ImageTranscriber(shared_ptr<Sensors> s,
     timeStamp(0),
     image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
     table(new unsigned char[yLimit * uLimit * vLimit]),
-    params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit){
+    params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
+    rawImages(rawImages) {
 
     initTable("/home/nao/nbites/lib/table/table.mtb");
 
@@ -137,7 +139,7 @@ void V4L2ImageTranscriber::initOpenI2CAdapter() {
 }
 
 void V4L2ImageTranscriber::initSelectCamera() {
-    unsigned char cmd[2] = { cameraType, 0 };
+    unsigned char cmd[2] = { (unsigned char) cameraType, 0 };
     i2c_smbus_write_block_data(cameraAdapterFd, 220, 1, cmd);
 }
 
@@ -361,26 +363,49 @@ bool V4L2ImageTranscriber::waitForImage() {
     PROF_EXIT(P_DQBUF);
     uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
     if (current_image) {
-        sensors->updateVisionAngles();
+
         PROF_ENTER(P_ACQUIRE_IMAGE);
 #ifdef CAN_SAVE_FRAMES
-       if (sensors->getWriteableNaoImage(cameraType) != NULL) {
-           _copy_image(current_image,
-                       sensors->getWriteableNaoImage(cameraType));
+        //copy the image first into MRawImages so we can stream it
+        if (rawImages.get()) {
 
-           sensors->notifyNewNaoImage();
-           ImageAcquisition::acquire_image_fast(table, params,
-                                               sensors->getNaoImage(cameraType),
-                                               image);
-       } else {
-           ImageAcquisition::acquire_image_fast(table, params,
-                                                current_image, image);
-       }
-#else
+            proto::PRawImage* rawImage;
+            if (cameraType == Camera::TOP) {
+                rawImage = rawImages->get()->mutable_topimage();
+            } else {
+                rawImage = rawImages->get()->mutable_bottomimage();
+            }
+
+            if (rawImage->image().size() < (int) SIZE) {
+                //allocate the size needed if it's not big enough
+                //Note: if we assign too much it might mess up stuff later on
+                rawImage->mutable_image()->assign(SIZE * sizeof(byte), 'A');
+            }
+
+            //terrible, but necessary to get the image to copy
+            //if we don't copy it right into the string, initializing
+            //the string from the image byte array will copy it over again,
+            //which would slow us down unnecessarily
+            //TODO: look more into rawImage.set_image(const char*) and see if it slows us down
+            _copy_image(current_image, (uint8_t *)(rawImage->mutable_image()->data()));
+
+            rawImage->set_width(WIDTH);
+            rawImage->set_height(HEIGHT);
+
+            // acquire the image directly from the buffer we just copied over; faster
+            // than from the original source
+            ImageAcquisition::acquire_image_fast(table, params,
+                                                 reinterpret_cast<const uint8_t *>(rawImage->image().data()),
+                                                 image);
+        } else
+#else   //syntax magic for the hanging else one line up, don't know if bad or awesome - Octavian
+        {
         ImageAcquisition::acquire_image_fast(table, params,
                 current_image, image);
+        }
 #endif
         PROF_EXIT(P_ACQUIRE_IMAGE);
+
         PROF_ENTER(P_QBUF);
         this->releaseBuffer();
         PROF_EXIT(P_QBUF);

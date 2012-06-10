@@ -89,12 +89,12 @@ void c_init_localization() {
     }
 }
 
-void set_loc_reference(shared_ptr<LocSystem> _loc)
+void set_loc_reference(boost::shared_ptr<LocSystem> _loc)
 {
     loc_reference = _loc;
 }
 
-void set_ballEKF_reference(shared_ptr<BallEKF> _ballEKF)
+void set_ballEKF_reference(boost::shared_ptr<BallEKF> _ballEKF)
 {
     ballEKF_reference = _ballEKF;
 }

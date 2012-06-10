@@ -59,21 +59,28 @@ message PVisionSensors {
 	optional PSensors.PFootBumper left_foot_bumper = 4;
 	optional PSensors.PFootBumper right_foot_bumper = 5;
 
-
 	optional float ultra_sound_distance_left = 6;
 	optional float ultra_sound_distance_right = 7;
-
 
 	optional float battery_charge = 8;
 	optional float battery_current = 9;
 
 }
 
-message PImage {
+message PRawNaoImages {
 
 	optional int64 timestamp = 1;
+	
+	optional PRawImage topImage = 2;
+	optional PRawImage bottomImage = 3;
+	
+	repeated float vision_body_angles = 5;
+}
+
+message PRawImage {
 
 	optional bytes image = 2;
 	optional uint32 width = 3;
 	optional uint32 height = 4;
+	
 }

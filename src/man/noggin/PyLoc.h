@@ -8,8 +8,8 @@
 
 using boost::shared_ptr;
 
-static shared_ptr<LocSystem> loc_reference;
-static shared_ptr<BallEKF> ballEKF_reference;
+static boost::shared_ptr<LocSystem> loc_reference;
+static boost::shared_ptr<BallEKF> ballEKF_reference;
 
 /**
  * Class to hold the localization data needed in Python
@@ -17,13 +17,13 @@ static shared_ptr<BallEKF> ballEKF_reference;
  */
 class PyLoc {
 private:
-    shared_ptr<BallEKF> ballEKF;
+    boost::shared_ptr<BallEKF> ballEKF;
 public:
     PyLoc() {
         loc = loc_reference;
         ballEKF = ballEKF_reference;
     }
-    shared_ptr<LocSystem> loc;
+    boost::shared_ptr<LocSystem> loc;
 
     void reset() {
         loc->reset();

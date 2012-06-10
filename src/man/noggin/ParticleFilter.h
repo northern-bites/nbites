@@ -21,6 +21,9 @@
 
 #include "LocSystem.h"
 
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
+
 namespace PF
 {
     /**
@@ -49,7 +52,7 @@ namespace PF
 
     /**
      * Contains a two-dimensional spatial vector defined
-     * by a magnitude and direction (position vector).
+     * by a magnitude and directionn (position vector).
      */
     struct Vector2D
     {
@@ -139,9 +142,15 @@ namespace PF
      */
     class ParticleFilter : public LocSystem
     {
+
+    public:
+        typedef man::memory::MLocalization MLocalization;
+        typedef man::memory::MemoryProvider<man::memory::MLocalization, ParticleFilter> MemoryProvider;
+
     public:
    ParticleFilter(boost::shared_ptr<MotionModel> motion,
                   boost::shared_ptr<SensorModel> sensor,
+                  MLocalization::ptr mLocalization = MLocalization::ptr(),
                   ParticleFilterParams params = DEFAULT_PARAMS);
    ~ParticleFilter();
 
@@ -190,6 +199,8 @@ namespace PF
 
     bool isActive() const { return true; }
 
+    void updateMemory(MLocalization::ptr mLocalization) const;
+
     void setXEst(float xEst) { xEstimate = xEst; }
     void setYEst(float yEst) { yEstimate = yEst; }
     void setHEst(float hEst) { hEstimate = hEst; }
@@ -211,6 +222,8 @@ namespace PF
     float averageWeight;
     float wFast;
     float wSlow;
+
+    MemoryProvider memoryProvider;
 
     ParticleSet particles;
     boost::shared_ptr<MotionModel> motionModel;

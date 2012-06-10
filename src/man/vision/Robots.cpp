@@ -24,7 +24,6 @@
 
 #include <iostream>
 #include "Robots.h"
-#include "debug.h"
 #include <vector>
 
 using namespace std;

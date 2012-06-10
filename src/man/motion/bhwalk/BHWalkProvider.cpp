@@ -25,7 +25,7 @@ const float BHWalkProvider::INITIAL_BODY_POSE_ANGLES[] =
         1.57f, 0.18f, -1.56f, -0.18f,
         0.0f, 0.0f, -0.39f, 0.76f, -0.37f, 0.0f,
         0.0f, 0.0f, -0.39f, 0.76f, -0.37f, 0.0f,
-        1.57f, -0.18f, -1.43f, 0.23f
+        1.57f, -0.18f, 1.43f, 0.23f
 };
 
 /**
@@ -60,7 +60,7 @@ static const JointData::Joint nb_joint_order[] = {
         JointData::RElbowRoll
 };
 
-BHWalkProvider::BHWalkProvider(shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
+BHWalkProvider::BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
         MotionProvider(WALK_PROVIDER), requestedToStop(false),
         sensors(s) {
 }

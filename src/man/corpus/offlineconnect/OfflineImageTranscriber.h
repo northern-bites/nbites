@@ -13,7 +13,7 @@
 
 #include "corpus/ThreadedImageTranscriber.h"
 #include "ClassHelper.h"
-#include "memory/MImage.h"
+#include "memory/MObjects.h"
 #include "ColorParams.h"
 
 namespace man {
@@ -26,8 +26,7 @@ ADD_SHARED_PTR(OfflineImageTranscriber)
 
 public:
     OfflineImageTranscriber(boost::shared_ptr<Sensors> s,
-                            memory::MTopImage::const_ptr topImage,
-                            memory::MBottomImage::const_ptr bottomImage);
+                            memory::MRawImages::const_ptr rawImages);
     virtual ~OfflineImageTranscriber();
 
     void releaseImage() {
@@ -49,8 +48,7 @@ public:
     };
 
 private:
-    memory::MTopImage::const_ptr mTopImage;
-    memory::MBottomImage::const_ptr mBottomImage;
+    memory::MRawImages::const_ptr rawImages;
     unsigned char* table;
     ColorParams params;
     uint16_t *topImage, *bottomImage;

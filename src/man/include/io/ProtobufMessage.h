@@ -4,6 +4,9 @@
  * Basic wrapper to the MessageInterface of a google protocol buffer message
  * To make it thread-safe a mutex-locked update function is introduced
  *
+ * By default it uses the underlying ProtobufMessage wrapper object to implement the serialization/
+ * de-serialization of the data
+ *
  * @author Octavian Neamtu
  */
 
@@ -24,7 +27,7 @@
 namespace common {
 namespace io {
 
-class ProtobufMessage: public common::io::MessageInterface {
+class ProtobufMessage: public MessageInterface, public Notifier {
 
 ADD_SHARED_PTR(ProtobufMessage)
 
@@ -34,31 +37,30 @@ public:
     typedef boost::shared_ptr<const ProtoMessage> ProtoMessage_const_ptr;
 
 public:
-    static const int32_t DEFAULT_ID_TAG = 42;
-
-public:
     static long long int time_stamp() {
         return realtime_micro_time();
     }
 
-    ProtobufMessage(ProtoMessage_ptr protoMessage,
-                    std::string name,
-                    int32_t id_tag = DEFAULT_ID_TAG) :
-        protoMessage(protoMessage), objectMutex(name + "mutex"),
-        birth_time(time_stamp()), name(name), id_tag(id_tag) {
+    ProtobufMessage(std::string name, ProtoMessage_ptr protoMessage) :
+        MessageInterface(name, time_stamp()),
+        protoMessage(protoMessage), objectMutex(getName() + "mutex") {
     }
 
 public:
     virtual ~ProtobufMessage() {
     }
 
-    // this method should update the fields in the protocol buffer
-    // in some meaningful way
-    virtual void updateData() = 0;
+    // thread-safety locks; while the lock is on, the object won't serialize
+    // or parse back in
+    // use them with care!
 
-    virtual void update() {
+    // TODO: we might need a read lock; what if we're accessing values from the memory object
+    // and it just gets updated?
+    void lock() {
         objectMutex.lock();
-        this->updateData();
+    }
+
+    void release() {
         objectMutex.unlock();
     }
 
@@ -73,62 +75,60 @@ public:
         }
     }
 
-    virtual void parseFromBuffer(const char* read_buffer, uint32_t buffer_size) {
+    virtual void parseFromString(const char* read_buffer, uint32_t buffer_size) {
         if (protoMessage.get()) {
             objectMutex.lock();
             protoMessage->ParseFromArray(read_buffer, buffer_size);
             objectMutex.unlock();
+            this->notifySubscribers();
         } else {
             std::cout << "Warning - trying to parse into NULL protoMessage"
                       << __FILE__ << " : " << __LINE__ << std::endl;
         }
     }
 
+    //TODO: the byte size might change between calling this method and calling
+    // serializeToString; maybe we should just use the byte size of the serializeToString
+    // buffer that gets returned instead of using this!
     virtual unsigned byteSize() const {
+        unsigned byteSize = 0;
         if (protoMessage.get()) {
-            return protoMessage->ByteSize();
-        } else {
-            return 0;
+            objectMutex.lock();
+            byteSize = protoMessage->ByteSize();
+            objectMutex.unlock();
         }
+        return byteSize;
     }
 
     ProtoMessage_const_ptr getProtoMessage() const { return protoMessage; }
     ProtoMessage_ptr getMutableProtoMessage() { return protoMessage; }
 
-    virtual std::string getName() const { return name; }
-    virtual int32_t getIDTag() const { return id_tag; }
-    virtual long long getBirthTime() const { return birth_time; }
-
 protected:
     ProtoMessage_ptr protoMessage;
     mutex objectMutex;
-    long long int birth_time;
-    std::string name;
-    int32_t id_tag;
-
 };
 
-class NotifyingProtobufMessage : public ProtobufMessage, public Notifier {
+// the template must always be a Protobuf Message class
+template <class ProtoType>
+class TemplatedProtobufMessage : public ProtobufMessage {
+
+    typedef boost::shared_ptr<ProtoType> data_ptr;
+    typedef boost::shared_ptr<const ProtoType> data_const_ptr;
 
 public:
-    NotifyingProtobufMessage(ProtoMessage_ptr protoMessage,
-            std::string name) :
-                ProtobufMessage(protoMessage, name) {
-    }
+    TemplatedProtobufMessage(std::string name, data_ptr protoMessage = data_ptr(new ProtoType)) :
+            ProtobufMessage(name, protoMessage), data(protoMessage) {   }
 
-    virtual ~NotifyingProtobufMessage() {
-    }
+public:
+    virtual ~TemplatedProtobufMessage(){}
 
-    void update() {
-        ProtobufMessage::update();
-        this->notifySubscribers();
-    }
+    data_const_ptr get() const { return data; }
+    data_ptr get() { return data; }
 
-    void parseFromBuffer(const char* read_buffer, uint32_t buffer_size) {
-        ProtobufMessage::parseFromBuffer(read_buffer, buffer_size);
-        this->notifySubscribers();
-    }
-
+protected:
+    //TODO: get rid of boost::shared_ptr crap; this could be a regular object (or pointer)
+    //passed by reference
+    data_ptr data;
 };
 
 }

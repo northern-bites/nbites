@@ -6,7 +6,6 @@
  */
 
 #include <boost/shared_ptr.hpp>
-using boost::shared_ptr;
 
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
@@ -15,7 +14,7 @@ using namespace std;
 
 #include "PyVision.h"
 
-shared_ptr<Vision> vision_pointer;
+boost::shared_ptr<Vision> vision_pointer;
 
 BOOST_PYTHON_MODULE(vision)
 {
@@ -35,7 +34,7 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("framesOff", &VisualBall::getFramesOff)
         ;
 
-    class_<VisualFieldObject, shared_ptr<VisualFieldObject> >
+    class_<VisualFieldObject, boost::shared_ptr<VisualFieldObject> >
         ("FieldObject", no_init)
         // From VisualDetection
         .def_readonly("dist", &VisualFieldObject::getDistance)
@@ -118,9 +117,9 @@ BOOST_PYTHON_MODULE(vision)
     //FieldLines helper classes:/
 
     // FieldLines holds a list of shared_ptrs to VisualLines (linesList)
-    class_<std::vector<shared_ptr<VisualLine> > >("LineVec")
-        // True is for NoProxy, since shared_ptrs don't need one
-        .def(vector_indexing_suite<std::vector<shared_ptr<VisualLine> >, true>())
+    class_<std::vector<boost::shared_ptr<VisualLine> > >("LineVec")
+        // True is for NoProxy, since boost::shared_ptrs don't need one
+        .def(vector_indexing_suite<std::vector<boost::shared_ptr<VisualLine> >, true>())
         ;
 
     class_<VisualLine, boost::shared_ptr<VisualLine> >("VisualLine", no_init)
@@ -233,7 +232,7 @@ BOOST_PYTHON_MODULE(vision)
 
     ///////MAIN VISION CLASS/////////
     //noncopyable is required because vision has no public copy constructor
-    class_<Vision, shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
+    class_<Vision, boost::shared_ptr<Vision>, boost::noncopyable >("Vision", no_init)
         //make_getter provides a getter for objects not pointers
         .add_property("ball", make_getter(&Vision::ball, return_value_policy
                                           <reference_existing_object>()))
@@ -285,7 +284,7 @@ void c_init_vision() {
     }
 }
 
-void set_vision_pointer (shared_ptr<Vision> visionptr) {
+void set_vision_pointer (boost::shared_ptr<Vision> visionptr) {
     vision_pointer = visionptr;
 }
 

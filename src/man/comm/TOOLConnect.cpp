@@ -196,17 +196,17 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Image data request
     if (r.image) {
         sensors->lockImage();
-        serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getNaoImage(Camera::BOTTOM)),
-            NAO_IMAGE_BYTE_SIZE);
+//        serial.write_bytes(
+//            reinterpret_cast<const uint8_t*>(sensors->getNaoImage(Camera::BOTTOM)),
+//            NAO_IMAGE_BYTE_SIZE);
         sensors->releaseImage();
     }
 
     if (r.thresh)
         // send thresholded image
-        serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getColorImage(Camera::BOTTOM)),
-            COLOR_IMAGE_BYTE_SIZE);
+//        serial.write_bytes(
+//            reinterpret_cast<const uint8_t*>(sensors->getColorImage(Camera::BOTTOM)),
+//            COLOR_IMAGE_BYTE_SIZE);
 
     if (r.objects) {
         if (loc.get()) {

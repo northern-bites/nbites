@@ -12,11 +12,11 @@ using namespace image;
 FieldViewer::FieldViewer(DataManager::ptr dataManager) :
         QMainWindow(), dataManager(dataManager) {
 
-  dataManager->connectSlotToMObject(this,
+  dataManager->connectSlot(this,
                     SLOT( updateLocalization() ),
-                    man::memory::MLOCALIZATION_ID);
+                    "MLocalization");
 
-  localizationStream = dataManager->getMemory()->getMLocalization();
+  localizationStream = dataManager->getMemory()->get<MLocalization>();
 
     paintField = new PaintField(this);
     paintLocalization = new PaintLocalization(this);

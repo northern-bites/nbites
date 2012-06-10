@@ -41,7 +41,6 @@ private:
     BMPImageViewer* fieldView;
     image::OverlayedImage *particlesOnField;
     man::memory::MLocalization::const_ptr localizationStream;
-    
 };
 
 }

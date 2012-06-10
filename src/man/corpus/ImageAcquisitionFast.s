@@ -58,14 +58,14 @@
 .equiv INIT_LOOP_COUNT, -320
 .equiv OUT_IMG_WIDTH, 320
 .equiv OUT_IMG_HEIGHT, 240
-.equiv Y_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2
-.equiv UV_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 4
+.equiv CHANNEL_IMG_BYTE_SIZE, OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2
 
 
         ## Output image layout
         .struct 0
 yImg:   .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2 # 16 bit Y values
-uvImg:  .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 4 # 16 bit U and V values
+uImg:  .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2 # 16 bit U values
+vImg:  .skip OUT_IMG_WIDTH * OUT_IMG_HEIGHT * 2 # 16 bit V values
 colorImg:
 
 ## STACK STRUCTURE, esp offsets
@@ -73,12 +73,22 @@ colorImg:
 row_count:      .skip 4
 rdtsc_output:   .skip 4
 y_out_img:      .skip 4
-uv_out_img:     .skip 4
 color_out_img:  .skip 1280
                 .skip 4         # make color_out_row qword aligned
 color_stack_row_end:
 
 .equiv end_of_stack, color_stack_row_end
+
+        ## ColorParam structure
+        .struct 0
+yZero:   .skip 8
+ySlope:  .skip 8
+yLimit:  .skip 8
+
+uvZero:  .skip 8
+uvSlope: .skip 8
+uvLimit: .skip 8
+uvDim:   .skip 8
 
 .section .text
 
@@ -101,8 +111,15 @@ color_stack_row_end:
 .macro LOOP phase
         ## Prefetch the next 32 bytes of image (only useful when image is cacheable)
         ## Each "phase" loads 8 bytes, so we only need to prefetch once every 4 phases
+
         .ifeq (\phase)
-        prefetch [esi+ecx*4+64]
+        ## NOT USEFUL WHEN USING UNCACHEABLE CAMERA BUFFER
+        ## prefetch [esi+ecx*4+64]
+
+        ## Prefetch writes to the output images
+        prefetchw [edi+ ecx*2 + 8 *((\phase-1)/2)]
+        prefetchw [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg]
+        prefetchw [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg]
         .endif
 
         # Fetch next 8 pixels from upper (0) source row, split into y and uv words
@@ -111,14 +128,17 @@ color_stack_row_end:
         movq    mm0, [esi+ecx*4 + (\phase * 8)]
         movq    mm1, mm0
 
+        ## Zero out upper half of each word (the UV values)
         pand    mm0, mm7
+
+        ## Same here, but replace the bottom half with the UV component
         psrlw   mm1, 8
 
-        ##
-        ##
-        ## Y AVERAGING SECTION
-        ##
-        ##
+   #######
+ #########
+########## YUV SPLITTING SECTION
+ #########
+   #######
 
         # Sum 2 y values (words, 9 bits used)
         # mm0: | xxx | y20 + y30 | xxx | y00 + y10 |
@@ -128,75 +148,76 @@ color_stack_row_end:
         ## mm0: | 0000 | sum1 | 0000 | sum0 |
         pand    mm0, mm6
 
-        .ifeq (\phase)
-        ## Prefetch the UV segment
-        prefetchw [edi+ecx*4]
+########################## FIRST PHASES (0,2)
+        .if (\phase == 0 || \phase == 2)
+        ## Copy the Y values for later packing
+        movq    mm3, mm0
 
-        ## Copy the y values for later packing
-        movq    mm4, mm0
+        ## Put U values in lower doubleword
+        ## Vs in upper
+        ## | V1 | V0 | U1 | U0 |
+        pshufw  mm4, mm1, 0b11011000
+        .endif
+
+########################## SECOND PHASES (1,3)
+        .if (\phase == 1 || \phase == 3)
+
+        ## Pack values from first two phases together as 4 words in mm3
+        ## mm3 after pack: | y3 | y2 | y1 | y0 |
+        packssdw mm3, mm0
+
+        ## Shuffle U values around
+        ## | V3 | V2 | U3 | U2 |
+        pshufw  mm2, mm1, 0b11011000
+
+        ## First write out goes at the pointer, next goes 8 bytes later
+        movntq [edi+ ecx*2 + 8 *((\phase-1)/2) + yImg], mm3
+
+        ## Copy old UV values to mm5
+        movq    mm5, mm4
+
+        ## Unpack U values
+        ## mm4: | U3 | U2 | U1 | U0 |
+	punpckldq mm4, mm2
+
+        ## mm5: | V3 | V2 | V1 | V0 |
+	punpckhdq mm5, mm2
+
+        ## Write out both U and V values
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + uImg], mm4
+        movntq  [edi+ ecx*2 + 8 *((\phase-1)/2) + vImg], mm5
+
         .endif
 
 
-        .ifeq (\phase - 1)
-        mov     edi, [esp + y_out_img] # Replace y image ptr
-
-        ## Prefetch the next Y out segment
-        prefetchw [edi+ecx*2 + 32]
-
-        movq    mm2, mm0
-
-        ## Pack values from first two phases together as 4 words in mm4
-        ## mm4 after pack: | y3 | y2 | y1 | y0 |
-        packssdw mm4, mm2
-        movntq [edi+ecx*2], mm4
-
-        ## Load uv img ptr back
-        mov     edi, [esp + uv_out_img]
-        .endif
-
-        .ifeq (\phase - 2)
-        movq    mm5, mm0
-        .endif
-
-        ## Last phase, pack phase 2 & 3 into an array, then pack all 8
-        ## bytes together and write them out
-        .ifeq (\phase - 3)
-        mov     edi, [esp + y_out_img] # Replace y image ptr
-        movq     mm2, mm0
-
-        ## mm2 before: | 0 | y7 | 0 | y6|
-        ## mm5 after:  | y7 | y6 | y5 | y4 | all 16 bit words
-        packssdw mm5, mm2
-        movntq [edi+ecx*2+8], mm5
-
-        ## Load uv img ptr
-        mov     edi, [esp + uv_out_img]
-        .endif
+   #######
+ #########
+########## COLOR SECTION
+ #########
+   #######
 
         ##
-        ##
-        ## UV-COLOR SECTION
-        ##
+        ## Instructions here are interspersed to reduce dependencies
         ##
 
-        # Write out uv values, 8 bytes each phase
-        movntq [edi+ecx*4 + \phase * 8], mm1
+        # Convert two y sums (in mm0) in words 0 and 2 to two table indicies
+        psubusw mm0, [edx + yZero]      # zero point
 
-        # Convert two y sums in words 0 and 2 to two table indicies
-        psubusw mm0, [edx]                      # zero point
-        pmulhw mm0, [edx+8]                    # slope
-        pminsw  mm0, [edx+16]                   # limit to maximum value
+        # Convert four u,v sums (in mm1) to four table indicies
+        psubusw mm1, [edx + uvZero]                 # zero point
 
-        # Convert four u,v sums to four table indicies
-        psubusw mm1, [edx+24]                   # zero point
-        pmulhw mm1, [edx+32]                   # slope
+        pmulhw mm0, [edx + ySlope]                  # slope
+
+        pmulhw mm1, [edx + uvSlope]                 # slope
+        pminsw  mm0, [edx + yLimit]                 # limit to maximum value
+
         psllw   mm1, 1
-        pminsw  mm1, [edx+40]                   # limit to maximum value
+        pminsw  mm1, [edx + uvLimit]                # limit to maximum value
 
         # Calculate two table offsets from y, u, and v table indicies (dwords)
         # mm0: | table offset 1 | table offset 0 |
-        pmaddwd mm1, [edx+48]                   # combine u and v indicies
-        paddd   mm0, mm1                        # add y index
+        pmaddwd mm1, [edx + uvDim]                  # combine u and v indicies
+        paddd   mm0, mm1                            # add y index
 
         ## Write color address for 2 pixels to the stack, we'll look
         ## it up in the table later
@@ -238,13 +259,9 @@ _acquire_image_fast:
         ## Put end of row pointers on stack
         mov     [esp + y_out_img], edi
 
-        ## Put uv image pointer on stack
-        add     edi, Y_IMG_BYTE_SIZE + OUT_IMG_WIDTH * 2
-        mov     [esp + uv_out_img], edi
-
         ## Set color image pointer forward entire y image, and uv image, then back half a y-image row
         mov     edi, [esp + y_out_img]
-        add     edi, Y_IMG_BYTE_SIZE + UV_IMG_BYTE_SIZE - 320
+        add     edi, colorImg - OUT_IMG_WIDTH
         mov     [esp + color_out_img], edi
 
         # set mm7 to 0x00FF00FF00FF00FF for y pixel mask
@@ -258,7 +275,7 @@ _acquire_image_fast:
 # Start of outer (y) loop
 yLoop:
         mov     ecx, INIT_LOOP_COUNT                       # x loop count
-        mov     edi, [esp + uv_out_img]
+        mov     edi, [esp + y_out_img]
 
 # Start of inner (x) loop
 #
@@ -306,7 +323,6 @@ colorLoop:
 
         ## Move pointers to end of next output image rows
         add     dword ptr[esp + y_out_img], OUT_IMG_WIDTH * 2
-        add     dword ptr[esp + uv_out_img], OUT_IMG_WIDTH * 2 * 2
         add     dword ptr[esp + color_out_img], OUT_IMG_WIDTH
 
         dec     dword ptr[esp + row_count]

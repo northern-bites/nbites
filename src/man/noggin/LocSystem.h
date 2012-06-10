@@ -8,11 +8,16 @@
 #ifndef LocSystem_h_DEFINED
 #define LocSystem_h_DEFINED
 #include <vector>
+
+#include "ClassHelper.h"
+
 #include "NogginStructs.h"
 #include "Observation.h"
 
 class LocSystem
 {
+    ADD_SHARED_PTR(LocSystem)
+
 public:
  LocSystem() : active(false), probability(0.0), onOpposingSide(false) {};
     virtual ~LocSystem() {};

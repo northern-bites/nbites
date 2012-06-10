@@ -32,10 +32,12 @@ namespace PF
 
     ParticleFilter::ParticleFilter(boost::shared_ptr<MotionModel> motion,
                                    boost::shared_ptr<SensorModel> sensor,
+                                   MLocalization::ptr mLocalization,
                                    ParticleFilterParams params)
         : parameters(params), xEstimate(0.0f), yEstimate(0.0f),
           hEstimate(0.0f), averageWeight(0.0f), wFast(0.0f),
-          wSlow(0.0f)
+          wSlow(0.0f),
+          memoryProvider(&ParticleFilter::updateMemory, this, mLocalization)
     {
         motionModel = motion;
         sensorModel = sensor;
@@ -133,6 +135,7 @@ namespace PF
         // xEstimate = estimate.x;
         // yEstimate = estimate.y;
         // hEstimate = estimate.heading;
+        memoryProvider.updateMemory();
     }
 
     /**
@@ -158,6 +161,7 @@ namespace PF
      */
     void ParticleFilter::resample()
     {
+
         // Normalize the particle weights, and find the average weight.
         float sum = 0.0f;
         ParticleIt iter;
@@ -471,6 +475,35 @@ namespace PF
            LocalizationParticle p = *partIter;
            p.setWeight(p.getWeight()/scoreSum);
        }
+
+    }
+
+    void ParticleFilter::updateMemory(MLocalization::ptr mLoc) const
+    {
+
+        using namespace man::memory::proto;
+
+        mLoc->get()->set_x_est(this->getXEst());
+        mLoc->get()->set_y_est(this->getYEst());
+        mLoc->get()->set_h_est(this->getHEst());
+
+        mLoc->get()->clear_particles();
+
+        // Get the particles, and update the protobuf accordingly.
+        PF::ParticleSet particles = this->getParticles();
+
+        //std::cout << "Updating " << particles.size() << " particles." << std::endl;
+
+        PLoc::Particle *particle;
+        for(PF::ParticleIt iter = particles.begin(); iter != particles.end(); ++iter)
+        {
+            particle = mLoc->get()->add_particles();
+            particle->set_x((*iter).getLocation().x);
+            particle->set_y((*iter).getLocation().y);
+            particle->set_h((*iter).getLocation().heading);
+            particle->set_w((*iter).getWeight());
+        }
+
 
     }
 
