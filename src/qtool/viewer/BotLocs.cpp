@@ -54,6 +54,7 @@ void BotLocs::readSocket(){
 			newBot.yBall = floatdata[7];
 			newBot.xBallUncert = floatdata[8];
 			newBot.yBallUncert = floatdata[9];
+			newBot.teamNum = head->team;
 			newBot.teamColor = head->color;
 			newBot.playerNum = head->player;
 
@@ -67,11 +68,12 @@ void BotLocs::readSocket(){
 			botPositions.push_back(newBot);
 		}
 		if (botPositions.size()>numBots)
-			qDebug()<<"New robot found,"<<
-				botPositions.back().address.toString()<<"just connected.";
+			qDebug()<<"Player"
+				<<botPositions.back().playerNum<<"on team"
+				<<botPositions.back().teamNum<<"connected.";
 		else if (botPositions.size()<numBots)
 			qDebug()<<"Robot connection lost,"
-					<<botPositions.size()-1<<" are now connected.";
+					<<botPositions.size()-1<<" robots still connected.";
 		numBots=botPositions.size();
 	}
 
@@ -107,7 +109,10 @@ int BotLocs::getBallXUncert(int i){
 int BotLocs::getBallYUncert(int i){
 	return botPositions[i].yBallUncert;
 }
-int BotLocs::getTeam(int i){//0=blue, 1=red
+int BotLocs::getTeamNum(int i){
+	return botPositions[i].teamNum;
+}
+int BotLocs::getTeamColor(int i){//0=blue, 1=red
 	return botPositions[i].teamColor;
 }
 int BotLocs::getPlayerNum(int i){

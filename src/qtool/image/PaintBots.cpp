@@ -14,7 +14,7 @@ using namespace viewer;
 QColor ball = QColor::fromRgb(Color_RGB[Orange]);
 QColor bluePlayer = QColor::fromRgb(Color_RGB[Navy]);
 QColor redPlayer = QColor::fromRgb(Color_RGB[Red]);
-QColor grey = QColor::fromRgb(Color_RGB[Grey]);
+QColor white = QColor::fromRgb(Color_RGB[White]);
 QColor playerColor; QPen pen;
 
 PaintBots::PaintBots(QObject *parent, float sF):
@@ -30,12 +30,13 @@ void PaintBots::buildBitmap()
 {
 	bitmap.fill(Qt::transparent);
 	QPainter painter(&bitmap);
-	painter.translate(0, FIELD_HEIGHT);
-	painter.scale(1*scaleFactor, -1*scaleFactor);
+	//painter.translate(0, FIELD_HEIGHT);
+	//painter.scale(1*scaleFactor, -1*scaleFactor);
+	painter.scale(scaleFactor, scaleFactor);
 
 	for(int i=1; i < locs->getSize(); i++) { //the first bot is a placeholder
 		//set pen/brush for correct team
-		if(locs->getTeam(i)==0){
+		if(locs->getTeamColor(i)==0){
 			playerColor = bluePlayer;
 		} else {
 			playerColor = redPlayer;
@@ -48,14 +49,15 @@ void PaintBots::buildBitmap()
 		float heading = locs->getHeading(i)*(float)(PI/180);
 		float hTopUncert = heading + locs->getheadUncert(i)*(float)(PI/180)/2;
 		float hBotUncert = heading - locs->getheadUncert(i)*(float)(PI/180)/2;
-		QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
-		QPoint ballPt = QPoint(locs->getBallX(i), locs->getBallY(i));
+		QString robotLabel = QString::number(locs->getPlayerNum(i));
+		QPoint robotPt = QPoint(locs->getX(i), bitmap.height()-locs->getY(i));
+		QPoint ballPt = QPoint(locs->getBallX(i), bitmap.height()-locs->getBallY(i));
 		QPoint headingLine = QPoint(locs->getX(i)+40*cos(heading),
-									locs->getY(i)+40*sin(heading));
+									bitmap.height()-(locs->getY(i)+40*sin(heading)));
 		QPoint hUncertL1 = QPoint(locs->getX(i)+30*cos(hTopUncert),
-								  locs->getY(i)+30*sin(hTopUncert));
+								  bitmap.height()-(locs->getY(i)+30*sin(hTopUncert)));
 		QPoint hUncertL2 = QPoint(locs->getX(i)+30*cos(hBotUncert),
-								  locs->getY(i)+30*sin(hBotUncert));
+								  bitmap.height()-(locs->getY(i)+30*sin(hBotUncert)));
 
 		//robot
 		painter.drawEllipse(robotPt, 10, 10);
@@ -90,6 +92,10 @@ void PaintBots::buildBitmap()
 			painter.setPen(Qt::DashLine);
 			painter.drawLine(ballPt, robotPt);
 		}
+
+		//robot number
+		painter.setPen(white);
+		painter.drawText(robotPt.x()-5, robotPt.y()+5, robotLabel);
 
 	}
 }
