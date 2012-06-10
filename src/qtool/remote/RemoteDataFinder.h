@@ -32,9 +32,11 @@ private:
 
 private slots:
     void robotSelected(const RemoteRobot* remoteRobot);
+	void manualConnect();
 
 private:
     data::DataManager::ptr dataManager;
+	QLineEdit* textBox;
     RobotSelect robotSelect;
     QVector<QCheckBox*> objectSelectVector;
 };
