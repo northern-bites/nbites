@@ -8,6 +8,7 @@
 #include "CombinationObjects.h"
 #include "NBMath.h"
 #include "PyNogginConstants.h"
+#include "FieldConstants.h"
 
 #include <deque>
 
@@ -21,8 +22,9 @@ static const float INITIAL_X = FIELD_WHITE_LEFT_SIDELINE_X +
                                LINE_CROSS_OFFSET;
 static const float INITIAL_Y = FIELD_WHITE_BOTTOM_SIDELINE_Y;
 static const float INITIAL_ANGLE =
-    NBMath::safe_atan2(INITIAL_X - LANDMARK_MY_GOAL_LEFT_POST_X,
-                       LANDMARK_MY_GOAL_LEFT_POST_Y - INITIAL_Y) * TO_DEG;
+    NBMath::safe_atan2(INITIAL_X - py_constants::LANDMARK_MY_GOAL_LEFT_POST_X,
+                       py_constants::LANDMARK_MY_GOAL_LEFT_POST_Y -
+                       INITIAL_Y) * TO_DEG;
 
 class GoalieSystem
 {
@@ -66,5 +68,5 @@ private:
     float computeAverage(std::deque<float>);
 
     RelLocation home;
-}
+};
 }

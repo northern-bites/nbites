@@ -29,14 +29,14 @@ void GoalieSystem::pushLeftPostObservation(float distance, float bearing)
 
 void GoalieSystem::popRightPostObservation()
 {
-    rightPostDistances.pop_front(distance);
-    rightPostBearings.pop_front(bearing);
+    rightPostDistances.pop_front();
+    rightPostBearings.pop_front();
 }
 
 void GoalieSystem::popLeftPostObservation()
 {
-    leftPostDistances.pop_front(distance);
-    leftPostBearings.pop_front(bearing);
+    leftPostDistances.pop_front();
+    leftPostBearings.pop_front();
 }
 
 float GoalieSystem::leftPostBearing()
@@ -61,27 +61,22 @@ float GoalieSystem::rightPostDistance()
 
 float GoalieSystem::leftPostRelX()
 {
-    return leftPostDistance() * cos(leftPostBearing() * TO_RAD);
+    return leftPostDistance() * std::cos(leftPostBearing() * TO_RAD);
 }
 
 float GoalieSystem::leftPostRelY()
 {
-    return leftPostDistance() * cos(leftPostBearing() * TO_RAD);
-}
-
-float GoalieSystem::leftPostRelX()
-{
-    return leftPostDistance() * sin(leftPostBearing() * TO_RAD);
-}
-
-float GoalieSystem::rightPostRelY()
-{
-    return rightPostDistance() * cos(rightPostBearing() * TO_RAD);
+    return leftPostDistance() * std::sin(leftPostBearing() * TO_RAD);
 }
 
 float GoalieSystem::rightPostRelX()
 {
-    return rightPostDistance() * sin(rightPostBearing() * TO_RAD);
+    return rightPostDistance() * std::cos(rightPostBearing() * TO_RAD);
+}
+
+float GoalieSystem::rightPostRelY()
+{
+    return rightPostDistance() * std::sin(rightPostBearing() * TO_RAD);
 }
 
 float GoalieSystem::centerGoalBearingAvg()
@@ -91,7 +86,7 @@ float GoalieSystem::centerGoalBearingAvg()
 
 float GoalieSystem::centerGoalDistanceAvg()
 {
-    return (leftPostDistance() + rightPostDistancd()) / 2.f;
+    return (leftPostDistance() + rightPostDistance()) / 2.f;
 }
 
 float GoalieSystem::centerGoalRelX()
@@ -107,7 +102,7 @@ float GoalieSystem::centerGoalRelY()
 float GoalieSystem::computeAverage(std::deque<float> q)
 {
     float sum = 0;
-    for(deque<float>::iterator i = q.begin(); i != q.end(); i++)
+    for(std::deque<float>::iterator i = q.begin(); i != q.end(); i++)
     {
         sum += *i;
     }
