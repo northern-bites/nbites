@@ -2,134 +2,141 @@
 #include <vector>
 
 namespace qtool {
-	namespace image {
+namespace image {
 
-		PaintField::PaintField(QObject *parent, float sF):
-			BMPImage(parent)
-		{
-			scaleFactor = sF;
-			bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
-		}
+PaintField::PaintField(QObject *parent, float sF):
+			        BMPImage(parent)
+{
+    scaleFactor = sF;
+    bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
+    drawField();
+}
 
-		void PaintField::buildBitmap()
-		{
+void PaintField::drawField() {
 
-			QPainter painter(&bitmap);
-			painter.scale(scaleFactor, scaleFactor);
+    QPainter painter(&bitmap);
+    painter.scale(scaleFactor, scaleFactor);
 
-			// Field Areas
-			QRect field(FIELD_GREEN_LEFT_SIDELINE_X,
-						FIELD_GREEN_BOTTOM_SIDELINE_Y,
-						FIELD_GREEN_WIDTH, FIELD_GREEN_HEIGHT);
-			QRect playArea(FIELD_WHITE_LEFT_SIDELINE_X,
-						   FIELD_WHITE_BOTTOM_SIDELINE_Y,
-						   FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT);
+    // Field Areas
+    QRect field(FIELD_GREEN_LEFT_SIDELINE_X,
+            FIELD_GREEN_BOTTOM_SIDELINE_Y,
+            FIELD_GREEN_WIDTH, FIELD_GREEN_HEIGHT);
+    QRect playArea(FIELD_WHITE_LEFT_SIDELINE_X,
+            FIELD_WHITE_BOTTOM_SIDELINE_Y,
+            FIELD_WHITE_WIDTH, FIELD_WHITE_HEIGHT);
 
-			// Goal Boxes
-			QRect blueGoalBox(FIELD_WHITE_LEFT_SIDELINE_X,
-							  MIDFIELD_Y -(GOALBOX_WIDTH/2),
-							  GOALBOX_DEPTH, GOALBOX_WIDTH);
-			QRect yellowGoalBox(FIELD_WHITE_RIGHT_SIDELINE_X -
-								(GOALBOX_DEPTH),
-								MIDFIELD_Y - (GOALBOX_WIDTH/2),
-								GOALBOX_DEPTH, GOALBOX_WIDTH);
-			// Goals
-			QRect blueGoal(LANDMARK_BLUE_GOAL_BOTTOM_POST_X -
-						   GOAL_DEPTH,
-						   LANDMARK_BLUE_GOAL_BOTTOM_POST_Y,
-						   GOAL_DEPTH,
-						   CROSSBAR_CM_WIDTH);
-			QRect yellowGoal(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X,
-							 LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y,
-							 GOAL_DEPTH, CROSSBAR_CM_WIDTH);
+    // Goal Boxes
+    QRect blueGoalBox(FIELD_WHITE_LEFT_SIDELINE_X,
+            MIDFIELD_Y -(GOALBOX_WIDTH/2),
+            GOALBOX_DEPTH, GOALBOX_WIDTH);
+    QRect yellowGoalBox(FIELD_WHITE_RIGHT_SIDELINE_X -
+            (GOALBOX_DEPTH),
+            MIDFIELD_Y - (GOALBOX_WIDTH/2),
+            GOALBOX_DEPTH, GOALBOX_WIDTH);
+    // Goals
+    QRect blueGoal(LANDMARK_BLUE_GOAL_BOTTOM_POST_X -
+            GOAL_DEPTH,
+            LANDMARK_BLUE_GOAL_BOTTOM_POST_Y,
+            GOAL_DEPTH,
+            CROSSBAR_CM_WIDTH);
+    QRect yellowGoal(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X,
+            LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y,
+            GOAL_DEPTH, CROSSBAR_CM_WIDTH);
 
-			QPoint centerField = QPoint(CENTER_FIELD_X, CENTER_FIELD_Y);
+    QPoint centerField = QPoint(CENTER_FIELD_X, CENTER_FIELD_Y);
 
-			//Posts
-			QPoint topBluePost = QPoint(LANDMARK_BLUE_GOAL_TOP_POST_X,
-										LANDMARK_BLUE_GOAL_TOP_POST_Y);
-			QPoint bottomBluePost = QPoint(LANDMARK_BLUE_GOAL_BOTTOM_POST_X,
-										   LANDMARK_BLUE_GOAL_BOTTOM_POST_Y);
-			QPoint topYellowPost = QPoint(LANDMARK_YELLOW_GOAL_TOP_POST_X,
-										  LANDMARK_YELLOW_GOAL_TOP_POST_Y);
-			QPoint bottomYellowPost = QPoint(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X,
-											 LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y);
+    //Posts
+    QPoint topBluePost = QPoint(LANDMARK_BLUE_GOAL_TOP_POST_X,
+            LANDMARK_BLUE_GOAL_TOP_POST_Y);
+    QPoint bottomBluePost = QPoint(LANDMARK_BLUE_GOAL_BOTTOM_POST_X,
+            LANDMARK_BLUE_GOAL_BOTTOM_POST_Y);
+    QPoint topYellowPost = QPoint(LANDMARK_YELLOW_GOAL_TOP_POST_X,
+            LANDMARK_YELLOW_GOAL_TOP_POST_Y);
+    QPoint bottomYellowPost = QPoint(LANDMARK_YELLOW_GOAL_BOTTOM_POST_X,
+            LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y);
 
-			// Paint Field
-			painter.fillRect(field, Qt::darkGreen);
+    // Paint Field
+    painter.fillRect(field, Qt::darkGreen);
 
-			// Paint Lines
-			QPen pen(Qt::white, LINE_WIDTH, Qt::SolidLine,
-					 Qt::SquareCap, Qt::MiterJoin);
-			painter.setPen(pen);
-			painter.drawRect(blueGoalBox);
-			painter.drawRect(yellowGoalBox);
-			painter.drawRect(playArea);
+    // Paint Lines
+    QPen pen(Qt::white, LINE_WIDTH, Qt::SolidLine,
+            Qt::SquareCap, Qt::MiterJoin);
+    painter.setPen(pen);
+    painter.drawRect(blueGoalBox);
+    painter.drawRect(yellowGoalBox);
+    painter.drawRect(playArea);
 
-			// Mid-Field Line
-			painter.drawLine(((playArea.topLeft()+
-							   playArea.topRight())/2),
-							 ((playArea.bottomLeft()+
-							   playArea.bottomRight())/2));
-			// Center Cirlce
-			painter.drawEllipse (centerField,
-								 (int)CENTER_CIRCLE_RADIUS,
-								 (int)CENTER_CIRCLE_RADIUS);
-			// Field Crosses
-			painter.drawLine(LANDMARK_BLUE_GOAL_CROSS_X -
-							 (LINE_CROSS_LENGTH/2),
-							 LANDMARK_BLUE_GOAL_CROSS_Y,
-							 LANDMARK_BLUE_GOAL_CROSS_X +
-							 (LINE_CROSS_LENGTH/2),
-							 LANDMARK_BLUE_GOAL_CROSS_Y);
-			painter.drawLine(LANDMARK_YELLOW_GOAL_CROSS_X -
-							 (LINE_CROSS_LENGTH/2),
-							 LANDMARK_YELLOW_GOAL_CROSS_Y,
-							 LANDMARK_YELLOW_GOAL_CROSS_X +
-							 (LINE_CROSS_LENGTH/2),
-							 LANDMARK_YELLOW_GOAL_CROSS_Y);
-			painter.drawLine(LANDMARK_BLUE_GOAL_CROSS_X,
-							 LANDMARK_BLUE_GOAL_CROSS_Y -
-							 (LINE_CROSS_LENGTH/2),
-							 LANDMARK_BLUE_GOAL_CROSS_X ,
-							 LANDMARK_BLUE_GOAL_CROSS_Y +
-							 (LINE_CROSS_LENGTH/2));
-			painter.drawLine(LANDMARK_YELLOW_GOAL_CROSS_X,
-							 LANDMARK_YELLOW_GOAL_CROSS_Y-
-							 (LINE_CROSS_LENGTH/2),
-							 LANDMARK_YELLOW_GOAL_CROSS_X,
-							 LANDMARK_YELLOW_GOAL_CROSS_Y +
-							 (LINE_CROSS_LENGTH/2));
+    // Mid-Field Line
+    painter.drawLine(((playArea.topLeft()+
+            playArea.topRight())/2),
+            ((playArea.bottomLeft()+
+                    playArea.bottomRight())/2));
+    // Center Cirlce
+    painter.drawEllipse (centerField,
+            (int)CENTER_CIRCLE_RADIUS,
+            (int)CENTER_CIRCLE_RADIUS);
+    // Field Crosses
+    painter.drawLine(LANDMARK_BLUE_GOAL_CROSS_X -
+            (LINE_CROSS_LENGTH/2),
+            LANDMARK_BLUE_GOAL_CROSS_Y,
+            LANDMARK_BLUE_GOAL_CROSS_X +
+            (LINE_CROSS_LENGTH/2),
+            LANDMARK_BLUE_GOAL_CROSS_Y);
+    painter.drawLine(LANDMARK_YELLOW_GOAL_CROSS_X -
+            (LINE_CROSS_LENGTH/2),
+            LANDMARK_YELLOW_GOAL_CROSS_Y,
+            LANDMARK_YELLOW_GOAL_CROSS_X +
+            (LINE_CROSS_LENGTH/2),
+            LANDMARK_YELLOW_GOAL_CROSS_Y);
+    painter.drawLine(LANDMARK_BLUE_GOAL_CROSS_X,
+            LANDMARK_BLUE_GOAL_CROSS_Y -
+            (LINE_CROSS_LENGTH/2),
+            LANDMARK_BLUE_GOAL_CROSS_X ,
+            LANDMARK_BLUE_GOAL_CROSS_Y +
+            (LINE_CROSS_LENGTH/2));
+    painter.drawLine(LANDMARK_YELLOW_GOAL_CROSS_X,
+            LANDMARK_YELLOW_GOAL_CROSS_Y-
+            (LINE_CROSS_LENGTH/2),
+            LANDMARK_YELLOW_GOAL_CROSS_X,
+            LANDMARK_YELLOW_GOAL_CROSS_Y +
+            (LINE_CROSS_LENGTH/2));
 
-			// Painting the Blue Goal
-			painter.setBrush(Qt::yellow);
-			painter.setPen(Qt::yellow);
-			painter.drawEllipse(topBluePost,
-								(int)GOAL_POST_RADIUS,
-								(int)GOAL_POST_RADIUS);
-			painter.drawEllipse(bottomBluePost,
-								(int)GOAL_POST_RADIUS,
-								(int)GOAL_POST_RADIUS);
+    // Painting the Blue Goal
+    painter.setBrush(Qt::yellow);
+    painter.setPen(Qt::yellow);
+    painter.drawEllipse(topBluePost,
+            (int)GOAL_POST_RADIUS,
+            (int)GOAL_POST_RADIUS);
+    painter.drawEllipse(bottomBluePost,
+            (int)GOAL_POST_RADIUS,
+            (int)GOAL_POST_RADIUS);
 
-			// Painting Yellow Goal
-			painter.setBrush(Qt::yellow);
-			painter.setPen(Qt::yellow);
-			painter.drawEllipse(topYellowPost,
-								(int)GOAL_POST_RADIUS,
-								(int)GOAL_POST_RADIUS);
-			painter.drawEllipse(bottomYellowPost,
-								(int)GOAL_POST_RADIUS,
-								(int)GOAL_POST_RADIUS);
+    // Painting Yellow Goal
+    painter.setBrush(Qt::yellow);
+    painter.setPen(Qt::yellow);
+    painter.drawEllipse(topYellowPost,
+            (int)GOAL_POST_RADIUS,
+            (int)GOAL_POST_RADIUS);
+    painter.drawEllipse(bottomYellowPost,
+            (int)GOAL_POST_RADIUS,
+            (int)GOAL_POST_RADIUS);
 
-			// Nets in Goals
-			QBrush goalsBrush = QBrush(Qt::white, Qt::CrossPattern);
-			painter.setBrush(goalsBrush);
-			painter.setPen(Qt::yellow);
-			painter.drawRect(blueGoal);
-			painter.setPen(Qt::yellow);
-			painter.drawRect(yellowGoal);
-		}
+    // Nets in Goals
+    QBrush goalsBrush = QBrush(Qt::white, Qt::CrossPattern);
+    painter.setBrush(goalsBrush);
+    painter.setPen(Qt::yellow);
+    painter.drawRect(blueGoal);
+    painter.setPen(Qt::yellow);
+    painter.drawRect(yellowGoal);
+}
 
-	}
+void PaintField::buildBitmap()
+{
+
+    // no need to update bitmap, since the field is static and only needs
+    // to be drawn once
+}
+
+}
 }
 

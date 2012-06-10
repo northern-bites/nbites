@@ -25,6 +25,7 @@ namespace qtool {
 		}
 
 		void BMPImageViewer::updateView() {
+
 			if (this->isVisible()) {
 				image->updateBitmap();
 				QPixmap* qimage = image->getBitmap();

@@ -156,21 +156,21 @@ void Vision::notifyImage() {
 
     //the above is commented to try cool shit
 
-    linesDetector->detect(thresh->getVisionHorizon(),
-                         thresh->field->getTopEdge(),
-                         yImg);
-
-    cornerDetector->detect(thresh->getVisionHorizon(),
-                           thresh->field->getTopEdge(),
-                           linesDetector->getLines());
+//    linesDetector->detect(thresh->getVisionHorizon(),
+//                         thresh->field->getTopEdge(),
+//                         yImg);
+//
+//    cornerDetector->detect(thresh->getVisionHorizon(),
+//                           thresh->field->getTopEdge(),
+//                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
 
-    drawEdges(*linesDetector->getEdges());
-    drawHoughLines(linesDetector->getHoughLines());
-    drawVisualLines(linesDetector->getLines());
-    drawVisualCorners(cornerDetector->getCorners());
+//    drawEdges(*linesDetector->getEdges());
+//    drawHoughLines(linesDetector->getHoughLines());
+//    drawVisualLines(linesDetector->getLines());
+//    drawVisualCorners(cornerDetector->getCorners());
 
     thresh->transposeDebugImage();
 
