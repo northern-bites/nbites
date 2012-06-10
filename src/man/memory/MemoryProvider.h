@@ -38,7 +38,7 @@ public:
      */
     void updateMemory() {
 
-    #if defined USE_MEMORY
+    #if defined USE_MEMORY || defined OFFLINE
         if (memoryObject.get()) {
 
             memoryObject->lock();

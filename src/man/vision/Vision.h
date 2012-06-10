@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -34,9 +33,12 @@
 #include "ClassHelper.h"
 #include "VisionDef.h"
 #include "Profiler.h"
-#include "FieldLinesDetector.h"
 
 class Vision;   // forward reference
+class FieldLinesDetector;
+class CornerDetector;
+class HoughVisualLine;
+class HoughVisualCorner;
 
 // including Class header files
 #include "VisualCrossbar.h"
@@ -89,20 +91,25 @@ public:
     void setImage(const uint16_t* image);
 
     // visualization methods
-    void drawBoxes(void);
-    void drawFieldObject(VisualFieldObject* obj, int color);
-    void drawCrossbar(VisualCrossbar* obj, int color);
     void drawBox(int left, int right, int bottom, int top, int c);
+    void drawBoxes(void);
     void drawCenters(void);
-    void drawRect(int left, int top, int width, int height, int c);
-    void drawLine(int x, int y, int x1, int y1, int c);
+    void drawCrossbar(VisualCrossbar* obj, int color);
+    void drawDot(int x, int y, int c);
+    void drawEdges(Gradient& g);
+    void drawFieldLines();
+    void drawFieldObject(VisualFieldObject* obj, int color);
+    void drawHoughLines(const std::list<HoughLine>& lines);
+    void drawHoughLine(const HoughLine& line, int color);
+    void drawVisualCorners(const std::vector<HoughVisualCorner>& corners);
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     void drawLine(const point<int> start, const point<int> end,
-		  const int c);
-    void drawDot(int x, int y, int c);
-    void drawFieldLines();
-    void drawX(int x, int y, int c);
+                  const int c);
+    void drawLine(int x, int y, int x1, int y1, int c);
     void drawPoint(int x, int y, int c);
+    void drawRect(int left, int top, int width, int height, int c);
+    void drawVisualLines(const std::vector<HoughVisualLine>& lines);
+    void drawX(int x, int y, int c);
 
     // Memory update
     void updateMVision(man::memory::MVision::ptr) const;
@@ -157,10 +164,11 @@ public:
     fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3
 
-    const uint16_t * yImg, *uvImg;
-    const uint16_t * yImg_bot, *uvImg_bot;
+    const uint16_t * yImg, *uImg, *vImg;
+    const uint16_t * yImg_bot, *uImg_bot, *vImg_bot;
+    boost::shared_ptr<FieldLinesDetector> linesDetector;
+    boost::shared_ptr<CornerDetector> cornerDetector;
 
-    FieldLinesDetector linesDetector;
 protected:
     //
     // Protected Variable
@@ -203,7 +211,6 @@ private:
 
     // information
     std::string colorTable;
-
     man::memory::MemoryProvider<man::memory::MVision, Vision> memoryProvider;
 
 

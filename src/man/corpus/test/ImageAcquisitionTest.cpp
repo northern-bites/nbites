@@ -88,8 +88,11 @@ void ImageAcquisitionTest::allocate()
 
     // Allocate the output image.
     if (out == NULL){
-        // 6 bytes per YUV triple, and 1 per color value
-        out = reinterpret_cast<uint16_t*>(new uint8_t[320*240*7]);
+        // YUV are each 2 byte values and there is a separate image
+        // for each and 1 per color value
+        out = reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_WIDTH *
+                                                      IMAGE_HEIGHT *
+                                                      7]);
     }
 }
 
@@ -296,25 +299,33 @@ void ImageAcquisitionTest::run_average_test(){
         for (int j=0; j < IMAGE_WIDTH; ++j){
 
             uint16_t output = y_out[i*IMAGE_WIDTH + j];
+
             EQ_INT ( (yAvgValue(i, j)), output);
         }
     }
     PASSED(Y_AVERAGES);
 
-    uint16_t* uv_out = y_out + IMAGE_WIDTH * IMAGE_HEIGHT;
+    uint16_t* u_out = y_out + IMAGE_WIDTH * IMAGE_HEIGHT;
 
     for (int i = 0; i < IMAGE_HEIGHT; i++) {
         for (int j=0; j < IMAGE_WIDTH; j++){
-
-            uint16_t u_output = uv_out[i*IMAGE_WIDTH*2 + j*2];
-            uint16_t v_output = uv_out[i*IMAGE_WIDTH*2 + j*2 + 1];
-            EQ_INT ( (vAvgValue(i, j)), v_output);
+            uint16_t u_output = u_out[i*IMAGE_WIDTH + j];
             EQ_INT ( (uAvgValue(i, j)), u_output);
             LT(u_output, 256);
+        }
+    }
+    PASSED(U_AVERAGES);
+
+    uint16_t* v_out = u_out + IMAGE_WIDTH * IMAGE_HEIGHT;
+
+    for (int i = 0; i < IMAGE_HEIGHT; i++) {
+        for (int j=0; j < IMAGE_WIDTH; j++){
+            uint16_t v_output = v_out[i*IMAGE_WIDTH + j];
+            EQ_INT ( (vAvgValue(i, j)), v_output);
             LT(v_output, 256);
         }
     }
-    PASSED(UV_AVERAGES);
+    PASSED(V_AVERAGES);
 }
 
 int ImageAcquisitionTest::runTests()

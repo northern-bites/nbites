@@ -87,13 +87,13 @@ Man::Man (RobotMemory::ptr memory,
     }
 
 #endif// USE_NOGGIN
-
     loggingBoard->setMemory(memory);
 
 
 #if defined USE_MEMORY && !defined OFFLINE
     OutputProviderFactory::AllSocketOutput(memory.get(), loggingBoard.get());
 #endif
+    PROF_ENTER(P_GETIMAGE);
 }
 
 Man::~Man ()
