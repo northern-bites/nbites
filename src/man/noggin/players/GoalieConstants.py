@@ -6,15 +6,6 @@
 import noggin_constants as constants
 from math import atan2, degrees
 
-# Lizzie's:
-INITIAL_X = constants.CENTER_FIELD_X - 100.0
-INITIAL_Y = constants.FIELD_WHITE_BOTTOM_SIDELINE_Y
-INITIAL_ANGLE = degrees(atan2(
-        INITIAL_X-constants.LANDMARK_MY_GOAL_RIGHT_POST_X,
-        constants.LANDMARK_MY_GOAL_RIGHT_POST_Y-INITIAL_Y))
-
-# Dani's stuff below:
-
 # *****************
 #     Position    *
 # *****************

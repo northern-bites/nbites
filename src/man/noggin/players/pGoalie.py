@@ -1,5 +1,6 @@
 from . import SoccerFSA
 from . import GoalieStates
+from . import VisualGoalieStates
 
 import noggin_constants as NogginConstants
 
@@ -9,6 +10,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(GoalieStates)
+        self.addStates(VisualGoalieStates)
         self.setName('pGoalie')
         self.squatTime = 0
         self.frameCounter = 0
