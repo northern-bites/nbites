@@ -18,7 +18,7 @@
   <property name="visionlink.def" value="-DVISIONLINK:BOOL=ON" />
   <property name="visionlink.header.def" value="-DVISIONLINK_HEADER_DIR:PATH=${visionlink.header.dir}"/>
   <property name="visionlink.file.def" value="-DVISIONLINK_FILE:FILEPATH=${visionlink.file}" />
-  <property name="use.mmx" value="-DUSE_MMX:BOOL=OFF"/>
+  <property name="use.mmx" value="-DUSE_MMX:BOOL=ON"/>
   <!-- program definitions -->
   <property name="cmake" value="cmake"/>
 
