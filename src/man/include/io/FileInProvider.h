@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <string>
 #include <cerrno>
+#include <cstdio>
+
 #include "InProvider.h"
 #include "FileDefs.h"
 
@@ -83,6 +85,9 @@ public:
         this->readCharBuffer(buffer, size);
         this->rewind(size);
     }
+
+    //it's instant because it's synchronous
+    virtual void waitForReadToFinish() const { return; }
 
     virtual uint32_t bytesRead() const throw (read_exception) { return bytes_read; }
 

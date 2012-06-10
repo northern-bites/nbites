@@ -55,19 +55,12 @@ void MessageParser::run() {
     }
 }
 
-void MessageParser::waitForReadToFinish() {
-    while(in_provider->readInProgress() && running) {
-        pthread_yield();
-    }
-}
-
 void MessageParser::readHeader() {
 
-    log_header.log_id = this->readValue<int32_t>();
-    cout << "Log ID: " << log_header.log_id << endl;
+    MessageHeader header = this->readValue<MessageHeader>();
 
-    log_header.birth_time = this->readValue<int64_t>();
-    cout << "Birth time: " << log_header.birth_time << endl;
+    cout << header << endl;
+    objectToParseTo->setHeader(header);
 }
 
 void MessageParser::increaseBufferSizeTo(uint32_t new_size) {
@@ -100,22 +93,24 @@ bool MessageParser::readNextMessage() {
     bool result = readIntoBuffer(current_buffer, current_message_size);
 
     if (result == true) {
-        objectToParseTo->parseFromBuffer(current_buffer, current_message_size);
+        objectToParseTo->parseFromString(current_buffer, current_message_size);
         return true;
     }
     return false;
 }
 
 bool MessageParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
+
     uint32_t bytes_read = 0;
+
     while (bytes_read < num_bytes) {
+
         try {
             in_provider->readCharBuffer(
                     buffer + bytes_read, num_bytes - bytes_read);
-            waitForReadToFinish();
+            in_provider->waitForReadToFinish();
             bytes_read += in_provider->bytesRead();
-        }
-        catch (read_exception& read_exception) {
+        } catch (read_exception& read_exception) {
             cout << read_exception.what() << " " << in_provider->debugInfo() << endl;
             return false;
         }

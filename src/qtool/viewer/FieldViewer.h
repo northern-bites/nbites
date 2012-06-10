@@ -24,6 +24,7 @@
 
 #include "data/DataManager.h"
 #include "image/PaintField.h"
+#include "image/PaintLocalization.h"
 #include "BMPImageViewer.h"
 #include "image/PaintBots.h"
 

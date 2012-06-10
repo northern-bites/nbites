@@ -26,16 +26,16 @@ def goToPosition(nav):
     towards a location on the field stored in dest.
     The location can be a RobotLocation, Location, RelRobotLocation, RelLocation
     Absolute locations get transformed to relative locations based on current loc
-    For relative locations we use our bearing to that point as the heading 
+    For relative locations we use our bearing to that point as the heading
     """
-        
+
     relDest = helper.getRelativeDestination(nav.brain.my, goToPosition.dest)
     goToPosition.deltaDest = relDest # cache it for later use
-        
+
 #    if nav.counter % 10 is 0:
 #        print "going to " + str(relDest)
-#        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX, 
-#                                                 nav.brain.ball.loc.relY, 
+#        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
+#                                                 nav.brain.ball.loc.relY,
 #                                                 nav.brain.ball.loc.bearing)
 
     if goToPosition.adaptive:
@@ -46,7 +46,10 @@ def goToPosition(nav):
 #    print "distance {0} and speed {1}".format(relDest.dist, speed)
 
     #reduce the speed if we're close to the target
-    helper.setDestination(nav, relDest, speed)
+
+    #if y-distance is small, ignore it to avoid strafing
+    strafelessDest = helper.getStrafelessDest(relDest)
+    helper.setDestination(nav, strafelessDest, speed)
 
 #    if navTrans.shouldAvoidObstacle(nav):
 #        return nav.goLater('avoidObstacle')
@@ -65,11 +68,11 @@ def walkingTo(nav):
     """
     loc = nav.brain.loc
     dest = walkingTo.dest
-        
+
     if nav.firstFrame():
         #@todo: make a method that returns odometry as a tuple in PyLoc?
         walkingTo.startingOdometry = (loc.lastOdoX, loc.lastOdoY, loc.lastOdoTheta)
-    
+
     deltaOdo = helper.getDeltaOdometry(loc, walkingTo.startingOdometry)
     walkingTo.deltaDest = dest - (deltaOdo.relX, deltaOdo.relY, deltaOdo.relH)
 #    print "Delta dest {0}".format(walkingTo.deltaDest)
@@ -77,10 +80,10 @@ def walkingTo(nav):
 #    print str(deltaOdo)
     #walk the rest of the way
     helper.setDestination(nav, walkingTo.deltaDest, walkingTo.speed)
-    
+
     return Transition.getNextState(nav, walkingTo)
-    
-walkingTo.dest = RelRobotLocation(0, 0, 0) 
+
+walkingTo.dest = RelRobotLocation(0, 0, 0)
 walkingTo.deltaDest = RelRobotLocation(0, 0, 0) # how much do we have left to walk
 walkingTo.speed = 0
 walkingTo.precision = (0, 0, 0)
@@ -184,7 +187,7 @@ def avoidLeftObstacle(nav):
 
 def avoidRightObstacle(nav):
     """
-    dodges left if we only detect something to the left of us
+    dodges left if we only detect something to the right of us
     """
     if nav.firstFrame():
         nav.doneAvoidingCounter = 0
@@ -219,11 +222,11 @@ def walking(nav):
     """
     State to be used when setSpeed is called
     """
-    
+
     if (walking.speeds != walking.lastSpeeds) or not nav.brain.motion.isWalkActive():
         helper.setSpeed(nav, walking.speeds)
     walking.lastSpeeds = walking.speeds
-    
+
     return Transition.getNextState(nav, walking)
 
 walking.speeds = constants.ZERO_SPEEDS     # current walking speeds
@@ -238,7 +241,7 @@ def stop(nav):
     if nav.firstFrame():
         # stop walk vectors
         helper.stand(nav)
-        
+
     if not nav.brain.motion.isWalkActive():
         return nav.goNow('stopped')
 
@@ -251,11 +254,10 @@ def atPosition(nav):
     if nav.firstFrame():
         nav.brain.speech.say("At Position")
         helper.stand(nav)
-    
+
     return Transition.getNextState(nav, atPosition)
 
 def standing(nav):
     if nav.firstFrame():
         helper.stand(nav)
-        
     return nav.stay()

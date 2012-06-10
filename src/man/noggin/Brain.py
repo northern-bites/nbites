@@ -345,6 +345,7 @@ class Brain(object):
                 activeMates += 1
         return activeMates
 
+    #TODO: is this method completely depricated?
     def resetLocalization(self):
         """
         Reset our localization

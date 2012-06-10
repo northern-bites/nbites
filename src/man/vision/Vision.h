@@ -31,6 +31,7 @@
 #include  "visionconfig.h"
 // including info header files
 #include "Common.h"
+#include "ClassHelper.h"
 #include "VisionDef.h"
 #include "Profiler.h"
 #include "FieldLinesDetector.h"
@@ -49,13 +50,19 @@ class Vision;   // forward reference
 #include "NaoPose.h"
 #include "FieldLines.h"
 #include "VisualCorner.h"
+//memory
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
 
 class Vision
 {
     friend class Threshold;
 
+    ADD_SHARED_PTR(Vision)
+
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose);
+    Vision(boost::shared_ptr<NaoPose> _pose,
+           man::memory::MVision::ptr mVision = man::memory::MVision::ptr());
     ~Vision();
 
 private:
@@ -74,6 +81,8 @@ public:
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
     void notifyImage(const uint16_t *image);
+    // for when we have two cameras
+    void notifyImage(const uint16_t *top, const uint16_t *bot);
     // utilize the current image pointer for vision processing
     void notifyImage();
     // set the current image pointer to the given pointer
@@ -95,6 +104,8 @@ public:
     void drawX(int x, int y, int c);
     void drawPoint(int x, int y, int c);
 
+    // Memory update
+    void updateMVision(man::memory::MVision::ptr) const;
 
     //
     // SETTERS
@@ -147,6 +158,7 @@ public:
 #define NUM_OPEN_FIELD_SEGMENTS 3
 
     const uint16_t * yImg, *uvImg;
+    const uint16_t * yImg_bot, *uvImg_bot;
 
     FieldLinesDetector linesDetector;
 protected:
@@ -191,6 +203,8 @@ private:
 
     // information
     std::string colorTable;
+
+    man::memory::MemoryProvider<man::memory::MVision, Vision> memoryProvider;
 
 
 };

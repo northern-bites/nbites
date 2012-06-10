@@ -25,7 +25,6 @@
 
 #include <iostream>
 #include "Cross.h"
-#include "debug.h"
 
 using namespace std;
 

@@ -36,7 +36,7 @@ CONFIGURE_FILE(
 # Add here definition needed.
 ADD_DEFINITIONS(
                ${CMAKE_THREAD_LIBS_INIT}
-               )
+                )
 
 
 ############################ INCLUDE DIRECTORY
