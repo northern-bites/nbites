@@ -4,10 +4,14 @@
 namespace qtool {
 namespace image {
 
-BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+using namespace data;
+using namespace man::corpus;
+
+BMPYUVImage::BMPYUVImage(data::RoboImages::const_ptr rawImages,
+        Camera::Type which,
         ChannelType type, QObject* parent) :
         BMPImage(parent),
-        yuvImage(rawImage),
+        yuvImage(rawImages, which),
         bitmapType(type)
 { }
 

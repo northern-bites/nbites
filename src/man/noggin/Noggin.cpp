@@ -31,6 +31,7 @@ static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 using namespace std;
 using namespace boost;
 
+using namespace man::memory;
 using namespace man::memory::log;
 
 #ifdef LOG_LOCALIZATION
@@ -43,13 +44,14 @@ const int TEAMMATE_FRAMES_OFF_THRESH = 5;
 Noggin::Noggin (boost::shared_ptr<Vision> v,
                 boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
                 boost::shared_ptr<Sensors> _sensors, boost::shared_ptr<LoggingBoard> loggingBoard,
-                MotionInterface * _minterface
+                MotionInterface * _minterface, man::memory::Memory::ptr memory
                 )
     : vision(v),
       comm(c),
       gc(c->getGC()),
       sensors(_sensors),
       loggingBoard(loggingBoard),
+      memory(memory),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -132,7 +134,7 @@ void Noggin::initializeLocalization()
 #   endif
 
     // Initialize the localization module
-    loc = boost::shared_ptr<LocSystem>(new MultiLocEKF());
+    loc = boost::shared_ptr<LocSystem>(new MultiLocEKF(memory->get<MLocalization>()));
 
     ballEKF = boost::shared_ptr<BallEKF>(new BallEKF());
 

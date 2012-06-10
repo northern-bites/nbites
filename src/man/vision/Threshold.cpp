@@ -58,9 +58,9 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Threshold.h"
-#include "debug.h"
 
 #include "ColorParams.h"
+#include "FieldLines/Gradient.h"
 
 using namespace std;
 #define PRINT_VISION_INFO
@@ -126,11 +126,10 @@ void Threshold::visionLoop() {
     if (visualHorizonDebug) {
         drawVisualHorizon();
     }
-    transposeDebugImage();
 #endif
-    
+
     if (vision->ball->getRadius() != 0) return; //we see the ball, we are done
-    
+
     usingTopCamera = false;
 
     PROF_ENTER(P_TRANSFORM)
@@ -148,7 +147,7 @@ void Threshold::visionLoop() {
     } else {
         orange->createBall(pose->getHorizonY(0));
     }
-   
+
 }
 
 /*
@@ -1300,7 +1299,7 @@ void Threshold::initTable(std::string filename) {
     //cout << filename << endl;
     fp = fopen(filename.c_str(), "r");   //open table for reading
     if (fp == NULL) {
-        print("initTable() FAILED to open filename: %s", filename.c_str());
+        printf("initTable() FAILED to open filename: %s", filename.c_str());
 #ifdef OFFLINE
         exit(0);
 #else
@@ -1316,7 +1315,7 @@ void Threshold::initTable(std::string filename) {
         }
 
 #ifndef OFFLINE
-    print("Loaded colortable %s\n",filename.c_str());
+    printf("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);
@@ -1398,7 +1397,7 @@ void Threshold::initCompressedTable(std::string filename){
     free(fileData);
 
     fclose(fp);
-#endif 
+#endif
 }*/
 
 const uint16_t* Threshold::getYUV() {
@@ -1412,14 +1411,13 @@ void Threshold::setYUV(const uint16_t* newyuv) {
     yuv = newyuv;
     thresholded = const_cast<uint8_t*>(
         reinterpret_cast<const uint8_t*>(yuv) +
-        Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
-    yplane = yuv;
+        Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
 }
 void Threshold::setYUV_bot(const uint16_t* newyuv) {
     yuv_bot = newyuv;
     thresholdedBottom = const_cast<uint8_t*>(
         reinterpret_cast<const uint8_t*>(yuv_bot) +
-        Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
+        Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
     yplane_bot = yuv_bot;
 }
 
@@ -1504,15 +1502,15 @@ void Threshold::initDebugImage(){
  * to the real image.
  */
 void Threshold::transposeDebugImage(){
-#if defined OFFLINE
+#ifdef OFFLINE
     for(int x = 0 ; x < IMAGE_WIDTH; x++) {
-      for(int y = 0; y < IMAGE_HEIGHT; y++) {
-	if(debugImage[y][x] != GREY){
-	  setThresholded(y, x, debugImage[y][x]);
-	}
-      }
+        for(int y = 0; y < IMAGE_HEIGHT; y++) {
+            if(debugImage[y][x] != GREY){
+                setThresholded(y, x, debugImage[y][x]);
+            }
+        }
     }
-  
+
     initDebugImage();
 #endif
 }
@@ -1550,21 +1548,23 @@ int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
 }
 
-/**
- * Get the V channel information for a given point in the image.
- * This is used to help identify the Ball which shows up well
- * in the V channel.
- */
-int Threshold::getV(int x, int y) const {
-    return static_cast<int>(vision->uvImg[y*IMAGE_WIDTH*2 + x*2 + 1]);
-}
+
 
 /**
  * Get the U channel information for a given point.  This has the
  * potential to help id post edges. We don't currently use it though.
  */
 int Threshold::getU(int j, int i) const {
-    return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
+    return static_cast<int>(vision->uImg[i*IMAGE_WIDTH + j]);
+}
+
+/**
+ * Get the V channel information for a given point in the image.
+ * This is used to help identify the Ball which shows up well
+ * in the V channel.
+ */
+int Threshold::getV(int j, int i) const {
+    return static_cast<int>(vision->vImg[i*IMAGE_WIDTH + j]);
 }
 
 #ifdef OFFLINE

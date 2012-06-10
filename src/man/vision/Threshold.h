@@ -6,6 +6,7 @@
 typedef unsigned char uchar;
 
 class Threshold;  // forward reference
+class Gradient;
 
 #include "Vision.h"
 
@@ -18,7 +19,6 @@ class Threshold;  // forward reference
 #include "Context.h"
 #include "Profiler.h"
 #include "NaoPose.h"
-#include "Gradient.h"
 
 //#define SOFTCOLORS
 
@@ -186,13 +186,15 @@ public:
 
 #ifdef OFFLINE
     void setConstant(int c);
-    void setHorizonDebug(bool _bool) { visualHorizonDebug = _bool; }
-    bool getHorizonDebug() { return visualHorizonDebug; }
+    void setDebugHorizon(bool _bool) { visualHorizonDebug = _bool; }
+    bool getDebugHorizon() { return visualHorizonDebug; }
     void setDebugShooting(bool _bool) {debugShot = _bool;}
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
     void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
     void setDebugRobots(bool _bool);
+    void setDebugVisualLines(bool _bool) {debugVisualLines = _bool;}
+    void setDebugVisualCorners(bool _bool) {debugVisualCorners = _bool;}
 #endif
 
     void initDebugImage();
@@ -304,6 +306,8 @@ private:
     bool debugEdgeDetection;
     bool debugHoughTransform;
     bool debugRobots;
+    bool debugVisualLines;
+    bool debugVisualCorners;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
@@ -311,6 +315,7 @@ private:
     static const bool debugEdgeDetection = false;
     static const bool debugHoughTransform = false;
     static const bool debugRobots = false;
+    static const bool debugVisualLines = false;
 #endif
 };
 

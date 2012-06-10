@@ -51,8 +51,6 @@ public:
 
     virtual void run();
 
-    virtual LogHeader getHeader() const {return log_header;}
-
     uint32_t sizeOfLastNumMessages(uint32_t n) const;
 
     void setObjectToParseTo(Message::ptr newObject) {
@@ -66,7 +64,6 @@ public:
 private:
     void increaseBufferSizeTo(uint32_t new_size);
     uint32_t truncateNumberOfFramesToRewind(uint32_t n) const;
-    void waitForReadToFinish();
 
     template <typename T>
     T readValue() {
@@ -79,8 +76,6 @@ private:
 
 private:
     Message::ptr objectToParseTo;
-
-    LogHeader log_header;
 
     uint32_t current_message_size;
     //history of message sizes read, useful for rewinding
