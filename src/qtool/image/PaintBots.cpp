@@ -29,7 +29,7 @@ void PaintBots::buildBitmap()
 {
     bitmap.fill(Qt::transparent);
     QPainter painter(&bitmap);
-    painter.translate(0, FIELD_HEIGHT);
+    painter.translate(0, FIELD_HEIGHT*scaleFactor);
     painter.scale(1*scaleFactor, -1*scaleFactor);
 
 
