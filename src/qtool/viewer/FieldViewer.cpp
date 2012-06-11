@@ -35,8 +35,8 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
     fieldImage = new PaintField(this, scaleFactor);
     bot_locs = new PaintBots(this, scaleFactor);
 
-    overlayImage = new OverlayedImage(fieldImage, bot_locs, this);
-    fieldView = new BMPImageViewer(overlayImage, this);
+    overlayView = new OverlayedImage(fieldImage, bot_locs, this);
+    fieldView = new BMPImageViewer(overlayView, this);
 
     connect(bot_locs->locs, SIGNAL(newRobotLocation()), fieldView, SLOT(updateView()));
 
@@ -56,6 +56,10 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
     mainLayout->addLayout(field);
     mainLayout->addItem(spacer);
     this->setLayout(mainLayout);
+}
+
+FieldViewer::~FieldViewer(){
+	bot_locs->locs->stopListening();
 }
 
 void FieldViewer::drawBots(){

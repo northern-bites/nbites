@@ -114,5 +114,4 @@ void EmptyQTool::resizeEvent(QResizeEvent* ev)
     QWidget::resizeEvent(ev);
 }
 
->>>>>>> .merge_file_XXzVBw
 }

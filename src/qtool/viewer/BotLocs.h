@@ -19,6 +19,7 @@ namespace qtool {
 namespace viewer {
 
 class BotLocs: public QObject {
+	Q_OBJECT
 
 public:
     BotLocs(QObject* parent = 0);
@@ -62,7 +63,7 @@ private:
         float yBallUncert;
 		int teamNum;
         int teamColor; //0=blue,  1=red
-		int playerNumber;
+		int playerNum;
     };
     std::vector<Bot> botPositions;
     QUdpSocket udpSocket;
