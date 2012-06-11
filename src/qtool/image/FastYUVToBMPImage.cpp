@@ -6,11 +6,11 @@
 namespace qtool {
 namespace image {
 
-using namespace data;
+using namespace memory;
 using namespace std;
 using namespace man::corpus;
 
-FastYUVToBMPImage::FastYUVToBMPImage(RoboImages::const_ptr rawImages,
+FastYUVToBMPImage::FastYUVToBMPImage(MRawImages::const_ptr rawImages,
                                      Camera::Type which, QObject* parent) :
         BMPImage(parent), rawImages(rawImages), which(which),
         rgb_image(NULL), image_convert_context(NULL) {
@@ -52,8 +52,7 @@ void FastYUVToBMPImage::rescaleBuffers() {
         rgb_image = (byte*) realloc(rgb_image, image_size);
     }
 
-    qimage = QImage(rgb_image, image_width, image_height, QImage::Format_ARGB32_Premultiplied);
-
+    bitmap = QImage(rgb_image, image_width, image_height, QImage::Format_ARGB32_Premultiplied);
 }
 
 void FastYUVToBMPImage::buildBitmap() {
@@ -66,8 +65,8 @@ void FastYUVToBMPImage::buildBitmap() {
     if (!image_width || !image_height)
         return;
 
-    if (image_width > qimage.width() ||
-        image_height > qimage.height()) {
+    if (image_width > bitmap.width() ||
+        image_height > bitmap.height()) {
         this->rescaleBuffers();
     }
 
@@ -83,8 +82,6 @@ void FastYUVToBMPImage::buildBitmap() {
             &rgb_image,
             &rgb_line_size
             );
-
-    bitmap.convertFromImage(qimage);
 }
 
 }
