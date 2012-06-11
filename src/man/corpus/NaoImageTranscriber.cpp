@@ -32,7 +32,7 @@ void NaoImageTranscriber::run()
         //start timer
         const long long startTime = monotonic_micro_time();
 
-        sensors->updateVisionAngles();
+        sensors->updateVisionAngles(7);
 
         //usually the locking and releasing of mobjects is automatic, but in this
         //case we actually update them directly in waitForImage (to avoid copying of the
