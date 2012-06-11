@@ -93,28 +93,34 @@ void Threshold::obstacleLoop() {
   pose->transform(usingTopCamera);
 
   unsigned char pixel = GREEN;
-  float totalCount = (float) (IMAGE_HEIGHT * IMAGE_WIDTH);
+  float upperCount = (float) (IMAGE_HEIGHT * IMAGE_WIDTH);
   float greenCount = 0;
+  float lowerCount = 0;
+  
+  detectSelf();
 
-  for (int i = 0; i < IMAGE_HEIGHT; i += 1) {
-    for (int j = 0; j < IMAGE_WIDTH; j += 1) {
-      pixel = getThresholded(j, i);
+  for (int i = 0; i < IMAGE_WIDTH; i += 1) {
+    lowerCount += lowerBound[i];
+    for (int j = lowerBound[i]; j >= 0; j -= 1) {
+      pixel = getThresholded(i, j);
       if (Utility::isGreen(pixel)) greenCount++;
     }
   }
-  cout << "In the bottom image, green amount = " << greenCount/totalCount << std::endl;
+  cout << "In the bottom image, green amount = " << greenCount/lowerCount << std::endl;
 
-  usingTopCamera = true;
-  pose->transform(usingTopCamera);
-  greenCount = 0;
-  for (int i = 0; i < IMAGE_HEIGHT; i += 1) {
-    for (int j = 0; j < IMAGE_WIDTH; j += 1) {
-      pixel = getThresholded(j, i);
-      if (Utility::isGreen(pixel)) greenCount++;
+  if (greenCount/lowerCount < 0.5) {
+    usingTopCamera = true;
+    pose->transform(usingTopCamera);
+    greenCount = 0;
+    for (int i = 0; i < IMAGE_HEIGHT; i += 1) {
+      for (int j = 0; j < IMAGE_WIDTH; j += 1) {
+	pixel = getThresholded(j, i);
+	if (Utility::isGreen(pixel)) greenCount++;
+      }
     }
+    cout << "In the top image, green amount = " << greenCount/upperCount << std::endl;
+    if (greenCount/upperCount < 0.5) cout << "we have an obstacle\n";
   }
-  //cout << "In the top image, green amount = " << greenCount/totalCount << std::endl;
-
 
 }
 
