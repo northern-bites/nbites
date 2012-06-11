@@ -227,10 +227,13 @@ void ColorCalibrate::writeColorSpaces(QString filename) {
 void ColorCalibrate::imageTabSwitched(int) {
     if (imageTabs->currentWidget() == &topChannelImage) {
         currentImage = Camera::TOP;
-    } else {
-        currentImage = Camera::BOTTOM;
+        this->updateThresholdedImage();
     }
-    this->updateThresholdedImage();
+    if (imageTabs->currentWidget() == &bottomChannelImage) {
+        currentImage = Camera::BOTTOM;
+        this->updateThresholdedImage();
+    }
+
 }
 
 void ColorCalibrate::loadSlidersBtnPushed() {

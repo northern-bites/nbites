@@ -33,15 +33,13 @@ ADD_SHARED_PTR(ProtobufMessage)
 
 public:
     typedef google::protobuf::Message ProtoMessage;
-    typedef boost::shared_ptr<ProtoMessage> ProtoMessage_ptr;
-    typedef boost::shared_ptr<const ProtoMessage> ProtoMessage_const_ptr;
 
 public:
     static long long int time_stamp() {
         return realtime_micro_time();
     }
 
-    ProtobufMessage(std::string name, ProtoMessage_ptr protoMessage) :
+    ProtobufMessage(std::string name, ProtoMessage* protoMessage) :
         MessageInterface(name, time_stamp()),
         protoMessage(protoMessage), objectMutex(getName() + "mutex") {
     }
@@ -65,7 +63,7 @@ public:
     }
 
     virtual void serializeToString(std::string* write_buffer) const {
-        if (protoMessage.get()) {
+        if (protoMessage) {
             objectMutex.lock();
             protoMessage->SerializeToString(write_buffer);
             objectMutex.unlock();
@@ -76,7 +74,7 @@ public:
     }
 
     virtual void parseFromString(const char* read_buffer, uint32_t buffer_size) {
-        if (protoMessage.get()) {
+        if (protoMessage) {
             objectMutex.lock();
             protoMessage->ParseFromArray(read_buffer, buffer_size);
             objectMutex.unlock();
@@ -92,7 +90,7 @@ public:
     // buffer that gets returned instead of using this!
     virtual unsigned byteSize() const {
         unsigned byteSize = 0;
-        if (protoMessage.get()) {
+        if (protoMessage) {
             objectMutex.lock();
             byteSize = protoMessage->ByteSize();
             objectMutex.unlock();
@@ -100,11 +98,11 @@ public:
         return byteSize;
     }
 
-    ProtoMessage_const_ptr getProtoMessage() const { return protoMessage; }
-    ProtoMessage_ptr getMutableProtoMessage() { return protoMessage; }
+    const ProtoMessage* getProtoMessage() const { return protoMessage; }
+    ProtoMessage* getMutableProtoMessage() { return protoMessage; }
 
 protected:
-    ProtoMessage_ptr protoMessage;
+    ProtoMessage* protoMessage;
     mutex objectMutex;
 };
 
@@ -112,23 +110,23 @@ protected:
 template <class ProtoType>
 class TemplatedProtobufMessage : public ProtobufMessage {
 
-    typedef boost::shared_ptr<ProtoType> data_ptr;
-    typedef boost::shared_ptr<const ProtoType> data_const_ptr;
-
 public:
-    TemplatedProtobufMessage(std::string name, data_ptr protoMessage = data_ptr(new ProtoType)) :
+    TemplatedProtobufMessage(std::string name, ProtoType* protoMessage = new ProtoType) :
+                                                 //HACK: make the protoMessage in
+                                                 //ProtobufMessage also a regular
+                                                 //pointer
             ProtobufMessage(name, protoMessage), data(protoMessage) {   }
 
 public:
-    virtual ~TemplatedProtobufMessage(){}
+    virtual ~TemplatedProtobufMessage(){ delete protoMessage; }
 
-    data_const_ptr get() const { return data; }
-    data_ptr get() { return data; }
+    const ProtoType* get() const { return data; }
+    ProtoType* get() { return data; }
 
 protected:
     //TODO: get rid of boost::shared_ptr crap; this could be a regular object (or pointer)
     //passed by reference
-    data_ptr data;
+    ProtoType* data;
 };
 
 }

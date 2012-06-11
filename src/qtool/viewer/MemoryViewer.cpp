@@ -77,7 +77,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
         if (iterator->first != "MRawImages" && iterator->first != "GroundTruth") {
 
             QDockWidget* dockWidget = new QDockWidget(QString(iterator->first.c_str()), this);
-            MObjectViewer* view = new MObjectViewer(iterator->second->getProtoMessage());
+            MObjectViewer* view = new MObjectViewer(iterator->second, dockWidget);
             dockWidget->setWidget(view);
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
             memoryManager->connectSlot(view, SLOT(updateView()), iterator->first);
