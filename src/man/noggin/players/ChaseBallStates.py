@@ -47,14 +47,13 @@ def approachBall(player):
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
-        player.brain.tracker.repeatNarrowPanFixedPitch()
+        player.brain.tracker.performWidePanFixedPitch()
         player.brain.nav.stand()
         return player.stay()
 
     prepareForKick.hackKick.collectData()
 
-    # HACK HACK
-    if player.brain.tracker.counter > 80:
+    if player.brain.tracker.isStopped():
         prepareForKick.hackKick.calculateDataAverages()
         print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
@@ -80,12 +79,10 @@ def positionForKick(player):
                                                 ballLoc.relY - kick_pos[1],
                                                 0)
 
+    #only enque the new goTo destination once
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
         player.inKickingState = False
-
-    #only enque the new goTo destination once
-    if player.firstFrame():
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.CLOSE_ENOUGH,
                               Navigator.CAREFUL_SPEED,
@@ -166,4 +163,3 @@ def approachDangerousBall(player):
         return player.goLater('chase')
 
     return player.stay()
-
