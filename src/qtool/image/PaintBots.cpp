@@ -43,7 +43,7 @@ void PaintBots::buildBitmap()
     for(int i = 0; i < locs->getSize(); i++) {
         //set pen/brush for correct team
         QColor playerColor;
-        if(locs->getTeam(i) == 0){
+        if(locs->getTeamColor(i) == 0){
             playerColor = bluePlayer;
         } else {
             playerColor = redPlayer;
