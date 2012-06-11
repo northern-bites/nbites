@@ -17,7 +17,7 @@ PaintRobotWorldState::PaintRobotWorldState(memory::MVision::const_ptr mVision,
 
 void PaintRobotWorldState::draw(QPainter& painter,
                             const PVision::PVisualDetection& visualDetection,
-                            const Pose& startPose,
+                            const RobotLocation& startPose,
                             QColor color) {
 
     float distance = visualDetection.distance();
@@ -32,19 +32,19 @@ void PaintRobotWorldState::draw(QPainter& painter,
     this->paintDot(painter, color, point, 5);
 }
 
-void PaintRobotWorldState::draw(QPainter& painter, const Pose& pose,
-                                const PoseArea& poseArea, QColor color) {
+void PaintRobotWorldState::draw(QPainter& painter, const RobotLocation& location,
+                                const RobotArea& area, QColor color) {
 
-    QPoint poseLoc = QPoint(pose.x(), pose.y());
+    QPoint poseLoc = QPoint(location.x(), location.y());
     this->paintDot(painter, color, poseLoc);
-    this->paintPolarLine(painter, color, 3, poseLoc, 20, pose.h() * TO_DEG);
+    this->paintPolarLine(painter, color, 3, poseLoc, 20, location.h() * TO_DEG);
 
-    //pose area
-    this->paintEllipseArea(painter, color, poseLoc, poseArea.x_size(), poseArea.y_size());
+    //location area
+    this->paintEllipseArea(painter, color, poseLoc, area.x_size(), area.y_size());
     this->paintPolarLine(painter, color, 2, poseLoc, 15,
-                         (pose.h() + poseArea.h_size()/2) * TO_DEG);
+                         (location.h() + area.h_size()/2) * TO_DEG);
     this->paintPolarLine(painter, color, 2, poseLoc, 15,
-                         (pose.h() - poseArea.h_size()/2) * TO_DEG);
+                         (location.h() - area.h_size()/2) * TO_DEG);
 
 }
 
@@ -55,17 +55,17 @@ void PaintRobotWorldState::buildBitmap()
 
     this->transformPainterToFieldCoordinates(painter);
 
-    this->draw(painter, mLoc->get()->pose(), mLoc->get()->uncertainty(), QColor("Blue"));
+    this->draw(painter, mLoc->get()->location(), mLoc->get()->uncertainty(), QColor("Blue"));
 
     this->draw(painter, mVision->get()->visual_ball().visual_detection(),
-               mLoc->get()->pose(), QColor("Orange"));
+               mLoc->get()->location(), QColor("Orange"));
     this->draw(painter, mVision->get()->yglp().visual_detection(),
-               mLoc->get()->pose(), QColor("Yellow"));
+               mLoc->get()->location(), QColor("Yellow"));
     this->draw(painter, mVision->get()->ygrp().visual_detection(),
-               mLoc->get()->pose(), QColor("Yellow"));
+               mLoc->get()->location(), QColor("Yellow"));
 
     this->draw(painter, mVision->get()->visual_cross().visual_detection(),
-               mLoc->get()->pose(), QColor("White"));
+               mLoc->get()->location(), QColor("White"));
 }
 
 }

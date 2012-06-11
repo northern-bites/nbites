@@ -1,13 +1,13 @@
 package man.memory.proto;
 
-message Pose {
+message RobotLocation {
 	
 	optional float x = 1;
 	optional float y = 2;
 	optional float h = 3;
 }
 
-message PoseArea {
+message RobotArea {
 	
 	optional float x_size = 1;
 	optional float y_size = 2;
@@ -18,8 +18,8 @@ message PLoc {
 
 	optional int64 timestamp = 1;
 	
-	optional Pose  pose = 2; 
-	optional PoseArea uncertainty = 3;
+	optional RobotLocation location = 2; 
+	optional RobotArea uncertainty = 3;
 
 	message Particle {
 		optional float x = 1;

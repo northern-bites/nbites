@@ -209,12 +209,12 @@ void MultiLocEKF::updateMLocalization(man::memory::MLocalization::ptr mLoc) cons
 
     using namespace man::memory::proto;
 
-    Pose* pose = mLoc->get()->mutable_pose();
-    pose->set_x(this->getXEst());
-    pose->set_y(this->getYEst());
-    pose->set_h(this->getHEst());
+    RobotLocation* location = mLoc->get()->mutable_location();
+    location->set_x(this->getXEst());
+    location->set_y(this->getYEst());
+    location->set_h(this->getHEst());
 
-    PoseArea* uncertainty = mLoc->get()->mutable_uncertainty();
+    RobotArea* uncertainty = mLoc->get()->mutable_uncertainty();
     uncertainty->set_x_size(this->getXUncert());
     uncertainty->set_y_size(this->getYUncert());
     uncertainty->set_h_size(this->getHUncert());
