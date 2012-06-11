@@ -1,10 +1,13 @@
 #include "ConnectTool.h"
 
+#include "viewer/RobotField.h"
+
 namespace qtool {
 
 using data::DataLoader;
 using viewer::MemoryViewer;
 using viewer::FieldViewer;
+using viewer::RobotField;
 using overseer::OverseerClient;
 
 ConnectTool::ConnectTool() : EmptyQTool("Robot Connection Tool"),
@@ -16,6 +19,7 @@ ConnectTool::ConnectTool() : EmptyQTool("Robot Connection Tool"),
 {
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
+    toolTabs->addTab(new RobotField(dataManager, this), tr("Robot Field"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
 
