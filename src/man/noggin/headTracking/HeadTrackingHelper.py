@@ -27,6 +27,22 @@ class HeadTrackingHelper(object):
         # when a move is done
         return move
 
+    def startingPan(self, headMove):
+        """Calculates the first part of a fixed pitch pan to maintain normal speed."""
+        headMoveYaw = headMove[1][0][0]
+        headMovePitch = headMove[1][0][1]
+
+        motionAngles = self.tracker.brain.sensors.motionAngles
+        curYaw = motionAngles[MotionConstants.HeadYaw]
+        degreesPerSecond = MyMath.fabs(headMoveYaw/headMove[0][1])
+        yawDiff = MyMath.fabs(curYaw - headMoveYaw)
+        totalTime = yawDiff/degreesPerSecond
+
+        newHeadMove = ( ((headMoveYaw,headMovePitch), totalTime, 1,
+                         stiff.LOW_HEAD_STIFFNESSES) )
+
+        self.executeHeadMove(newHeadMove)
+
     def trackObject(self):
         """
         Method to actually perform the tracking.
