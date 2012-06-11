@@ -139,6 +139,9 @@ class KickInformation:
         returns the kick we should do in a shooting situation
         """
 
+        # DEBUG printing
+        print "In method shoot."
+
         # Is loc GOOD_ENOUGH for a kick decision?
         # TODO: make sure this uses orbits
         if False: #self.brain.my.getLocScore() == nogginConstants.GOOD_LOC:
@@ -170,6 +173,10 @@ class KickInformation:
         rightPostBearing = self.oppRightPostBearing
         leftPostBearing = self.oppLeftPostBearing
 
+        # DEBUG printing
+        print "rightPostBearing: ",rightPostBearing
+        print "leftPostBearing:  ",leftPostBearing
+
         if rightPostBearing is None and leftPostBearing is None:
             # Can't see any posts: orbit.
             pass
@@ -190,6 +197,10 @@ class KickInformation:
             # Can only see the left post.
             rightScorePoint = leftPostBearing + 15
             leftScorePoint = rightScorePoint +10
+
+        # DEBUG printing
+        print "rightScorePoint: ",rightScorePoint
+        print "leftScorePoint:  ",leftScorePoint
 
         # If any kick is currently valid, choose that kick.
         if leftScorePoint > 0 and rightScorePoint < 0:
