@@ -3,7 +3,7 @@ from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition
 
-DEBUG_OBSERVATIONS = False
+DEBUG_OBSERVATIONS = True
 DEBUG_APPROACH = False
 DEBUG_POSITION = False
 
@@ -57,6 +57,8 @@ def walkToGoal(player):
         print "  RIGHT " + str(player.system.rightPostRelX()) + " " + str(player.system.rightPostRelY())
 
         print "Going to " + str(player.system.home.relX) + " " + str(player.system.home.relY)
+
+        print "FIELDEDGE DISTANCE " + str(player.brain.vision.fieldEdge.centerDist)
 
     return Transition.getNextState(player, walkToGoal)
 

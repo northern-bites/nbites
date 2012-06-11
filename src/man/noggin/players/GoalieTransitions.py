@@ -14,6 +14,12 @@ from math import fabs
 def atGoalArea(player):
     return player.brain.vision.fieldEdge.centerDist < 100.0
 
+def veryCloseToPost(player):
+    return ((player.brain.vision.ygrp.on and
+             player.brain.vision.ygrp.dist < 70.0) or
+            (player.brain.vision.yglp.on and
+             player.brain.vision.yglp.dist < 70.0))
+
 def facingForward(player):
     return fabs(player.brain.vision.cross.bearing) < 10.0 and player.brain.vision.cross.on
 
