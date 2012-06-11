@@ -13,8 +13,6 @@
 #include "YUVImage.h"
 #include "ClassHelper.h"
 
-#include "data/DataTypes.h"
-
 #include "man/corpus/Camera.h"
 
 namespace qtool {
@@ -54,7 +52,7 @@ public:
     ADD_SHARED_PTR(BMPYUVImage);
 
 public:
-    BMPYUVImage(data::RoboImages::const_ptr roboImages,
+    BMPYUVImage(memory::MRawImages::const_ptr roboImages,
                 man::corpus::Camera::Type which,
                 ChannelType type = RGB, QObject* parent = 0);
     virtual ~BMPYUVImage() {};

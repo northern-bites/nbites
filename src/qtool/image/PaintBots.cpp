@@ -15,12 +15,18 @@ QColor ball = QColor::fromRgb(Color_RGB[Orange]);
 QColor bluePlayer = QColor::fromRgb(Color_RGB[Navy]);
 QColor redPlayer = QColor::fromRgb(Color_RGB[Red]);
 QColor grey = QColor::fromRgb(Color_RGB[Grey]);
-QColor playerColor; QPen pen;
 
-PaintBots::PaintBots(QObject *parent, float scaleFactor):
-			        BMPImage(parent), scaleFactor(scaleFactor)
+int robotDrawSize = 7;
+
+int headingLineWidth = 3;
+int headingLineLength = 20;
+int headingUncertLineWidth = 1;
+
+int ballDrawSize = 5;
+
+PaintBots::PaintBots(float scale, QObject *parent)
+    : PaintFieldOverlay(scale, parent)
 {
-    bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
     locs = new BotLocs(this);
 }
 
@@ -29,62 +35,46 @@ void PaintBots::buildBitmap()
 {
     bitmap.fill(Qt::transparent);
     QPainter painter(&bitmap);
-    painter.translate(0, FIELD_HEIGHT*scaleFactor);
-    painter.scale(1*scaleFactor, -1*scaleFactor);
 
+    this->transformPainterToFieldCoordinates(painter);
 
-    for(int i = 0; i < locs->getSize(); i++) { //the first bot is a placeholder
+    for(int i = 0; i < locs->getSize(); i++) {
         //set pen/brush for correct team
-        if(locs->getTeam(i)==0){
+        QColor playerColor;
+        if(locs->getTeam(i) == 0){
             playerColor = bluePlayer;
         } else {
             playerColor = redPlayer;
         }
 
-        painter.setBrush(playerColor);
-        painter.setPen(playerColor);
-        pen = QPen(playerColor);
-
-        float heading = locs->getHeading(i)*(float)(PI/180);
-        float hTopUncert = heading + locs->getheadUncert(i)*(float)(PI/180)/2;
-        float hBotUncert = heading - locs->getheadUncert(i)*(float)(PI/180)/2;
         QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
         QPoint ballPt = QPoint(locs->getBallX(i), locs->getBallY(i));
-        QPoint headingLine = QPoint(locs->getX(i)+40*cos(heading),
-                locs->getY(i)+40*sin(heading));
-        QPoint hUncertL1 = QPoint(locs->getX(i)+30*cos(hTopUncert),
-                locs->getY(i)+30*sin(hTopUncert));
-        QPoint hUncertL2 = QPoint(locs->getX(i)+30*cos(hBotUncert),
-                locs->getY(i)+30*sin(hBotUncert));
 
         //robot
-        painter.drawEllipse(robotPt, 10, 10);
+        this->paintDot(painter, playerColor, robotPt);
 
         //robot uncertainty
-        painter.setBrush(Qt::NoBrush);
-        painter.drawEllipse(robotPt, locs->getXUncert(i), locs->getYUncert(i));
+        this->paintEllipseArea(painter, playerColor, robotPt,
+                               locs->getXUncert(i), locs->getYUncert(i));
 
         //heading
-        pen.setWidth(5);
-        painter.setPen(pen);
-        painter.drawLine(robotPt, headingLine);
+        this->paintPolarLine(painter, playerColor, headingLineWidth,
+                             robotPt, headingLineLength, locs->getHeading(i));
 
         //heading uncertainty
-        pen.setWidth(2);
-        painter.setPen(pen);
-        painter.drawLine(robotPt, hUncertL1);
-        painter.drawLine(robotPt, hUncertL2);
+        this->paintPolarLine(painter, playerColor, headingUncertLineWidth,
+                             robotPt, headingLineLength, locs->getHeading(i) + locs->getheadUncert(i)/2);
+        this->paintPolarLine(painter, playerColor, headingUncertLineWidth,
+                             robotPt, headingLineLength, locs->getHeading(i) - locs->getheadUncert(i)/2);
 
         //don't draw ball if robot thinks its distance is 0)
-        if(robotPt!=ballPt){
+        if(robotPt != ballPt){
             //ball
-            painter.setPen(ball);
-            painter.setBrush(ball);
-            painter.drawEllipse(ballPt, 5, 5);
+            this->paintDot(painter, ball, ballPt, ballDrawSize);
 
             //ball uncertainty
-            painter.setBrush(Qt::NoBrush);
-            painter.drawEllipse(ballPt, locs->getBallXUncert(i), locs->getBallYUncert(i));
+            this->paintEllipseArea(painter, ball, ballPt,
+                                   locs->getBallXUncert(i), locs->getBallYUncert(i));
 
             //robot-ball line
             painter.setPen(Qt::DashLine);

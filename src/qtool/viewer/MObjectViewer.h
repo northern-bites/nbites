@@ -14,8 +14,11 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QTreeView>
-#include "data/DataTypes.h"
+
+#include "data/Typedefs.h"
+
 #include "man/memory/Memory.h"
+#include "man/memory/MemoryCommon.h"
 #include "data/treemodel/TreeModel.h"
 
 namespace qtool {
@@ -34,6 +37,7 @@ public slots:
 
 protected:
     void showEvent(QShowEvent* event);
+    void paintEvent(QPaintEvent*);
 
 private:
     void createNewTreeModel();
@@ -41,6 +45,7 @@ private:
 private:
     boost::shared_ptr<const man::memory::ProtoMessage> messageViewed;
     data::treemodel::TreeModel* treeModel;
+    bool shouldRedraw;
 
 };
 

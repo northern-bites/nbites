@@ -30,7 +30,7 @@ public:
                      QObject* parent) :
         BMPImage(parent), groundTruth(groundTruth) {
 
-        bitmap = QPixmap(getWidth(), getHeight());
+        bitmap = QImage(getWidth(), getHeight(), QImage::Format_ARGB32_Premultiplied);
     }
 
     virtual unsigned getWidth() const { return FIELD_WIDTH; }

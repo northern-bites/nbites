@@ -1,4 +1,6 @@
 
+#include <QtDebug>
+
 #include "MObjectViewer.h"
 
 #include "data/treemodel/ProtoNode.h"
@@ -27,20 +29,27 @@ void MObjectViewer::createNewTreeModel() {
 }
 
 void MObjectViewer::updateView() {
-    if (this->isVisible()) {
+    if (this->isVisible() && shouldRedraw) {
         treeModel->revalidateModel();
         QModelIndex top = treeModel->index(0, 0, QModelIndex());
         QModelIndex bottom = treeModel->index(treeModel->rowCount(QModelIndex())-1,
                 treeModel->columnCount(QModelIndex())-1, QModelIndex());
+        shouldRedraw = false;
         emit dataChanged(top, bottom);
     }
+    this->QTreeView::update();
 }
 
 void MObjectViewer::showEvent(QShowEvent * e) {
-    QWidget::showEvent(e);
+    QTreeView::showEvent(e);
     //explicitely update the bitmap when the widget becomes visible again
     //since it might have changed!
     this->updateView();
+}
+
+void MObjectViewer::paintEvent(QPaintEvent* e) {
+    QTreeView::paintEvent(e);
+    shouldRedraw = true;
 }
 
 }
