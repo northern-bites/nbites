@@ -10,7 +10,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QLayout>
-#include "data/DataTypes.h"
+
+#include "data/Typedefs.h"
 #include "image/FastYUVToBMPImage.h"
 
 namespace qtool {
@@ -34,18 +35,23 @@ public:
 
 	QVBoxLayout* getLayout();
 
-
 public slots:
     void updateView();
 
 protected:
     void showEvent(QShowEvent* event);
+    void paintEvent(QPaintEvent* event);
     void setupUI();
+    void addPixmap();
 
 protected:
     image::BMPImage* image;
     QLabel imagePlaceholder;
 	QVBoxLayout* BMPlayout;
+	QSize imageSize;
+
+private:
+	bool shouldRedraw;
 
 };
 

@@ -16,7 +16,7 @@ VisualInfoImage::VisualInfoImage(MVision::const_ptr visionData, Camera::Type _ca
 {
     int image_width = 640;
     int image_height = 480;
-    bitmap= QPixmap(image_width, image_height);
+    bitmap= QImage(image_width, image_height, QImage::Format_ARGB32);
     camera = _camera;
 }
 

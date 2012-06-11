@@ -8,7 +8,7 @@ PaintField::PaintField(QObject *parent, float sF):
 			        BMPImage(parent)
 {
     scaleFactor = sF;
-    bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
+    bitmap = QImage(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor, QImage::Format_ARGB32);
     drawField();
 }
 

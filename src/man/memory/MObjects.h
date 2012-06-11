@@ -26,9 +26,8 @@ class classType: public TemplatedProtobufMessage<proto::protoType> { \
     ADD_SHARED_PTR(classType); \
     \
 public: \
-    classType(std::string name = class_name<classType>(), \
-              boost::shared_ptr<proto::protoType> data = boost::shared_ptr<proto::protoType>(new proto::protoType())) \
-        : TemplatedProtobufMessage<proto::protoType>(name, data) {} \
+    classType(std::string name = class_name<classType>()) \
+        : TemplatedProtobufMessage<proto::protoType>(name) {} \
 };
 
 ADD_MEMORY_OBJECT(MVision, PVision)
