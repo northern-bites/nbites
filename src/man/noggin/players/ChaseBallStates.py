@@ -84,12 +84,11 @@ def positionForKick(player):
         player.brain.tracker.trackBallFixedPitch()
         player.inKickingState = False
         player.brain.nav.goTo(positionForKick.kickPose,
-                              Navigator.CLOSE_ENOUGH,
+                              Navigator.PRECISELY,
                               Navigator.CAREFUL_SPEED,
                               Navigator.ADAPTIVE)
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
-
 
     # most of the time going to chase will kick back to here, lets us reset
     if transitions.shouldFindBallKick(player) and player.counter > 15:
@@ -97,7 +96,7 @@ def positionForKick(player):
         return player.goNow('findBall')
 
     #if transitions.shouldKick(player):
-    if transitions.ballInPosition(player, positionForKick.kickPose) or player.brain.nav.isAtPosition():
+    if (transitions.ballInPosition(player, positionForKick.kickPose) or player.brain.nav.isAtPosition()):
 #        if transitions.shouldOrbit(player):
 #            return player.goNow('lookAround')
 #        else:
