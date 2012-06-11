@@ -134,13 +134,14 @@ public:
         return true;
     }
 
-    void expandToFit(image::Color color) {
+    bool expandToFit(image::Color color) {
 		QTextStream cout(stdout);
 
         // the circle can wrap around
         float h = color.getH();
         float s = color.getS();
         float z = color.getZ();
+		bool changed = false;
 
 		// we sometimes get bad values of Z
 		if (z > 1.0f) {
@@ -150,20 +151,24 @@ public:
 		// skip H for now as it is a bit dangerous with the wrap
 
         if (s < params[sMin]) {
-			setParameter(sMin, s);
+			setParameterSilently(sMin, s);
+			changed = true;
 			cout << "Setting sMin to " << s << endl;
 		}
 		if (s > params[sMax]) {
-			setParameter(sMax, s);
+			setParameterSilently(sMax, s);
+			changed = true;
 			cout << "Setting sMax to " << s << endl;
         }
 
         if (z < params[zMin]) {
-			setParameter(zMin, z);
+			setParameterSilently(zMin, z);
+			changed = true;
 			cout << "Setting zMin to " << z << endl;
 		}
 		if (z > params[zMax]) {
-			setParameter(zMax, z);
+			setParameterSilently(zMax, z);
+			changed = true;
 			cout << "Setting zMax to " << z << endl;
         }
 
@@ -171,22 +176,31 @@ public:
         // add 0.5f to normalize to a 0 to 1 range
         float v = color.getV() + 0.5f;
         if (y < params[yMin]) {
-			setParameter(yMin, y);
+			setParameterSilently(yMin, y);
+			changed = true;
 			cout << "Setting yMin to " << y << endl;
 		}
 		if (y > params[yMax]) {
-			setParameter(yMax, y);
+			setParameterSilently(yMax, y);
+			changed = true;
 			cout << "Setting yMax to " << y << endl;
         }
 
         if (v < params[vMin]) {
-			setParameter(vMin, v);
+			setParameterSilently(vMin, v);
+			changed = true;
 			cout << "Setting vMin to " << v << endl;
 		}
 		if (v > params[vMax]) {
-			setParameter(vMax, v);
+			setParameterSilently(vMax, v);
+			changed = true;
 			cout << "Setting vMax to " << v << endl;
         }
+		if (changed) {
+			emit parametersChanged();
+			return true;
+		}
+		return false;
     }
 
     void setParameters(float* values) {
@@ -201,6 +215,10 @@ public:
     void setParameter(Channel channel, float value) {
         params[channel] = value;
         emit parametersChanged();
+    }
+
+    void setParameterSilently(Channel channel, float value) {
+        params[channel] = value;
     }
 
     float getParameter(Channel channel) {

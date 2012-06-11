@@ -80,6 +80,7 @@ private:
     QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
 
 	bool displayAllColors;
+	int lastClickedX, lastClickedY;
 
 };
 
