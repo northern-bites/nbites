@@ -149,13 +149,6 @@ void Vision::notifyImage() {
     // counts the frameNumber
     if (frameNumber > 1000000) frameNumber = 0;
 
-    // Transform joints into pose estimations and horizon line
-    // PROF_ENTER(P_TRANSFORM);
-    // pose->transform();
-    // PROF_EXIT(P_TRANSFORM);
-
-    //the above is commented to try cool shit
-
 //    linesDetector->detect(thresh->getVisionHorizon(),
 //                         thresh->field->getTopEdge(),
 //                         yImg);
@@ -165,7 +158,13 @@ void Vision::notifyImage() {
 //                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
-    thresh->visionLoop();
+    
+    // - from Bende - I am going to try doing some obstacle avoidance stuff.
+    // - so there will be no visionLoop. Hopefully nothing breaks.
+
+    thresh->obstacleLoop();
+    
+    //    thresh->visionLoop();
 
 //    drawEdges(*linesDetector->getEdges());
 //    drawHoughLines(linesDetector->getHoughLines());

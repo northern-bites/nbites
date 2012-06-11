@@ -85,6 +85,39 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     }
 }
 
+//this loop will perform obstabcle detection, and for now it is seperate from
+//other detection, though in the future, we should change this.
+void Threshold::obstacleLoop() {
+
+  usingTopCamera = false;
+  pose->transform(usingTopCamera);
+
+  unsigned char pixel = GREEN;
+  float totalCount = (float) (IMAGE_HEIGHT * IMAGE_WIDTH);
+  float greenCount = 0;
+
+  for (int i = 0; i < IMAGE_HEIGHT; i += 1) {
+    for (int j = 0; j < IMAGE_WIDTH; j += 1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isGreen(pixel)) greenCount++;
+    }
+  }
+  cout << "In the bottom image, green amount = " << greenCount/totalCount << std::endl;
+
+  usingTopCamera = true;
+  pose->transform(usingTopCamera);
+  greenCount = 0;
+  for (int i = 0; i < IMAGE_HEIGHT; i += 1) {
+    for (int j = 0; j < IMAGE_WIDTH; j += 1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isGreen(pixel)) greenCount++;
+    }
+  }
+  //cout << "In the top image, green amount = " << greenCount/totalCount << std::endl;
+
+
+}
+
 /* Main vision loop, called by Vision.cc
  */
 void Threshold::visionLoop() {
@@ -950,7 +983,7 @@ void Threshold::storeFieldObjects() {
 
     setVisualRobotInfo(vision->navy1);
     setFramesOnAndOff(vision->navy1);
-    if (vision->navy1->isOn()) cout << "I see a navy robot!\n";
+
 
     setVisualRobotInfo(vision->navy2);
     setFramesOnAndOff(vision->navy2);

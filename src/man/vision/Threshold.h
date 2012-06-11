@@ -130,6 +130,7 @@ public:
 
     // main methods
     void visionLoop();
+    void obstacleLoop();
     // inline void threshold();
     void thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg);
     inline void runs();
