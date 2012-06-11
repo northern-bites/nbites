@@ -76,6 +76,8 @@ void PaintBots::buildBitmap()
             this->paintDot(painter, ball, ballPt, ballDrawSize);
 
             //ball uncertainty
+			//don't draw uncertainty if more than half the field
+			if (!(locs->getBallXUncert(i)*4>FIELD_WIDTH || locs->getBallYUncert(i)*4 > FIELD_HEIGHT))
             this->paintEllipseArea(painter, ball, ballPt,
                                    locs->getBallXUncert(i), locs->getBallYUncert(i));
 
