@@ -179,7 +179,7 @@ class KickInformation:
 
         if rightPostBearing is None and leftPostBearing is None:
             # Can't see any posts: orbit.
-            pass
+            return self.kickLoc()
         elif rightPostBearing is not None and leftPostBearing is not None:
             # Can see both posts: shoot between them.
             leftScorePoint = rightPostBearing - 20
@@ -260,6 +260,10 @@ class KickInformation:
         """
         returns kick using localization
         """
+
+        # DEBUG printing
+        print "In method kickLoc."
+
         my = self.brain.my
         if (my.h <= 45. and my.h >= -45.):
             return self.chooseDynamicKick()
