@@ -33,7 +33,8 @@ def getNextState(fsa, state):
             if DEBUG:
                 fsa.printf(fsa.name + " switching to " + targetState.__name__ +
                            " from " + state.__name__ + " after " + str(transition))
-
+            targetState.incomingTransition = transition
+            targetState.incomingState = state
             return fsa.goNow(targetState.__name__) #FSA use states by their names
 
     return fsa.stay()

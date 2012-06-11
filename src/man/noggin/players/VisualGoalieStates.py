@@ -4,10 +4,11 @@ from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition
 import goalie
-from GoalieConstants import RIGHT, LEFT
+from GoalieConstants import RIGHT, LEFT, UNKNOWN
+from GoalieTransitions import onLeftSideline, onRightSideline
 
 DEBUG_OBSERVATIONS = False
-DEBUG_APPROACH = True
+DEBUG_APPROACH = False
 DEBUG_POSITION = False
 
 def updatePostObservations(player):
@@ -34,13 +35,16 @@ def walkToGoal(player):
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        if player.side == RIGHT:
+        if (walkToGoal.incomingTransition.condition == onRightSideline or
+            player.lastState == 'gameReady'):
+            player.side = RIGHT
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
             player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
                                      goalie.RIGHT_SIDE_RP_ANGLE,
                                      goalie.RIGHT_SIDE_LP_DISTANCE,
                                      goalie.RIGHT_SIDE_LP_ANGLE)
         else:
+            player.side = LEFT
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
             player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
                                      goalie.LEFT_SIDE_RP_ANGLE,
@@ -100,8 +104,11 @@ def spinAtGoal(player):
     return Transition.getNextState(player, spinAtGoal)
 
 def decideSide(player):
-    player.side = LEFT
-    return player.goNow('walkToGoal')
+    if player.firstFrame():
+        player.side = UNKNOWN
+        player.brain.tracker.lookToAngle(90)
+
+    return Transition.getNextState(player, decideSide)
 
 def standStill(player):
     if player.firstFrame():

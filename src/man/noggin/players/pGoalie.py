@@ -37,6 +37,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.standStill
             }
 
+        VisualGoalieStates.decideSide.transitions = {
+            Transition.CountTransition(GoalieTransitions.onLeftSideline,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.walkToGoal,
+
+            Transition.CountTransition(GoalieTransitions.onRightSideline,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.walkToGoal
+            }
+
     def run(self):
         gcState = self.brain.gameController.currentState
 

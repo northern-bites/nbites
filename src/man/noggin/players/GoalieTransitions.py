@@ -8,6 +8,7 @@ import noggin_constants as NogCon
 import GoalieConstants as goalCon
 import PositionTransitions as PosTran
 from math import fabs
+from vision import cornerID as IDs
 
 # Visual Goalie
 
@@ -21,7 +22,18 @@ def veryCloseToPost(player):
              player.brain.vision.yglp.dist < 70.0))
 
 def facingForward(player):
-    return fabs(player.brain.vision.cross.bearing) < 10.0 and player.brain.vision.cross.on
+    return (fabs(player.brain.vision.cross.bearing) < 10.0 and
+            player.brain.vision.cross.on)
+
+def onLeftSideline(player):
+    for corner in player.brain.vision.fieldLines.corners:
+        if ( (IDs.CENTER_TOP_T in corner.possibilities) or
+             (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
+            return True
+    return False
+
+def onRightSideline(player):
+    return not onLeftSideline(player)
 
 # ******************
 # SAVING TRANSITIONS
