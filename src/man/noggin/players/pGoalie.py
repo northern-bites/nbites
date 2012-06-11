@@ -18,7 +18,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.frameCounter = 0
         self.penaltyKicking = False
 
-        VisualGoalieStates.walkToGoal.transitions = {VisualGoalieStates.positionAtGoal : Transition.CountTransition(GoalieTransitions.atGoalArea, Transition.SOME_OF_THE_TIME, Transition.LOW_PRECISION) }
+        VisualGoalieStates.walkToGoal.transitions = {VisualGoalieStates.spinAtGoal : Transition.CountTransition(GoalieTransitions.atGoalArea, Transition.SOME_OF_THE_TIME, Transition.LOW_PRECISION) }
+
+        VisualGoalieStates.spinAtGoal.transitions = {VisualGoalieStates.standStill : Transition.CountTransition(GoalieTransitions.facingForward, Transition.SOME_OF_THE_TIME, Transition.LOW_PRECISION) }
 
     def run(self):
         gcState = self.brain.gameController.currentState

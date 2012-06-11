@@ -3,7 +3,7 @@ from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition
 
-DEBUG_OBSERVATIONS = True
+DEBUG_OBSERVATIONS = False
 DEBUG_APPROACH = False
 DEBUG_POSITION = False
 
@@ -32,13 +32,12 @@ def walkToGoal(player):
         player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
         player.brain.nav.goTo(player.system.home,
                               nav.CLOSE_ENOUGH, nav.FAST_SPEED)
+        player.system.home.relH = 0
 
     if DEBUG_APPROACH:
         print "========================================"
 
     if player.system.centerGoalDistance() > 200.0:
-        if DEBUG_OBSERVATIONS:
-            print "Updating my posts."
         updatePostObservations(player)
 
     player.system.home.relY = player.system.centerGoalRelY()
@@ -61,7 +60,23 @@ def walkToGoal(player):
 
     return Transition.getNextState(player, walkToGoal)
 
-def positionAtGoal(player):
-    player.brain.nav.stop()
+def spinAtGoal(player):
+    if player.firstFrame():
+        player.system.home.relX = 0
+        player.system.home.relY = 0
+        player.system.home.relH = -90
+        player.brain.nav.goTo(player.system.home,
+                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
+
+    #if player.brain.vision.cross.on:
+        #player.system.pushCrossObservation(player.brain.vision.cross.bearing)
+
+    player.brain.tracker.lookToAngle(0.0)
+
+    return Transition.getNextState(player, spinAtGoal)
+
+def standStill(player):
+    if player.firstFrame():
+        player.brain.nav.stop()
 
     return player.stay()

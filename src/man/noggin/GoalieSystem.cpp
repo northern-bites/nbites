@@ -16,10 +16,11 @@ GoalieSystem::GoalieSystem() : rightPostBearings(),
     // need to fix these values
     pushRightPostObservation(300.f, 30.f);
     pushLeftPostObservation(300.f, 30.f);
+    pushCrossObservation(-30.f);
 }
 
-void GoalieSystem::reset(float rightDistance, float rightBearing,
-                         float leftDistance, float leftBearing)
+void GoalieSystem::resetPosts(float rightDistance, float rightBearing,
+                              float leftDistance, float leftBearing)
 {
     rightPostBearings.clear();
     rightPostDistances.clear();
@@ -33,7 +34,7 @@ void GoalieSystem::pushRightPostObservation(float distance, float bearing)
 {
     rightPostDistances.push_back(distance);
     rightPostBearings.push_back(bearing);
-    if(rightPostDistances.size() > DEQUE_LENGTH)
+    if(rightPostDistances.size() > POST_Q_LENGTH)
         popRightPostObservation();
 }
 
@@ -41,8 +42,15 @@ void GoalieSystem::pushLeftPostObservation(float distance, float bearing)
 {
     leftPostDistances.push_back(distance);
     leftPostBearings.push_back(bearing);
-    if(leftPostDistances.size() > DEQUE_LENGTH)
+    if(leftPostDistances.size() > POST_Q_LENGTH)
         popLeftPostObservation();
+}
+
+void GoalieSystem::pushCrossObservation(float bearing)
+{
+    crossBearings.push_back(bearing);
+    if(crossBearings.size() > CROSS_Q_LENGTH)
+        popCrossObservation();
 }
 
 void GoalieSystem::popRightPostObservation()
@@ -55,6 +63,11 @@ void GoalieSystem::popLeftPostObservation()
 {
     leftPostDistances.pop_front();
     leftPostBearings.pop_front();
+}
+
+void GoalieSystem::popCrossObservation()
+{
+    crossBearings.pop_front();
 }
 
 float GoalieSystem::leftPostBearing()
@@ -75,6 +88,11 @@ float GoalieSystem::rightPostBearing()
 float GoalieSystem::rightPostDistance()
 {
     return computeAverage(rightPostDistances);
+}
+
+float GoalieSystem::crossBearing()
+{
+    return computeAverage(crossBearings);
 }
 
 float GoalieSystem::leftPostRelX()
