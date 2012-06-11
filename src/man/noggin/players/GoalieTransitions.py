@@ -30,7 +30,10 @@ def onLeftSideline(player):
         if ( (IDs.CENTER_TOP_T in corner.possibilities) or
              (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
             return True
-    return False
+    return ((player.brain.vision.ygrp.on and
+             player.brain.vision.ygrp.dist > 400.0) or
+            (player.brain.vision.yglp.on and
+             player.brain.vision.yglp.dist > 400.0))
 
 def onRightSideline(player):
     return not onLeftSideline(player)

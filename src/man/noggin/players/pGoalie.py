@@ -40,12 +40,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         VisualGoalieStates.decideSide.transitions = {
             Transition.CountTransition(GoalieTransitions.onLeftSideline,
                                        Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
+                                       50)
             : VisualGoalieStates.walkToGoal,
 
             Transition.CountTransition(GoalieTransitions.onRightSideline,
                                        Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
+                                       50)
             : VisualGoalieStates.walkToGoal
             }
 

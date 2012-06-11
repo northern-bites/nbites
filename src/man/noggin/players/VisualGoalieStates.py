@@ -16,14 +16,18 @@ def updatePostObservations(player):
     Updates the underlying C++ data structures.
     """
     if (player.brain.vision.ygrp.on and
-        player.brain.vision.ygrp.certainty != certainty.NOT_SURE):
+        player.brain.vision.ygrp.certainty != certainty.NOT_SURE and
+        player.brain.vision.ygrp.dist != 0.0 and
+        player.brain.vision.ygrp.dist < 400.0):
         player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
                                                player.brain.vision.ygrp.bearing)
         if DEBUG_OBSERVATIONS:
             print "RIGHT: Saw right post."
             print "  Pushed " + str(player.brain.vision.ygrp.bearing) + " " + str(player.brain.vision.ygrp.dist)
 
-    if player.brain.vision.yglp.on:
+    if (player.brain.vision.yglp.on and
+        player.brain.vision.yglp.dist != 0.0 and
+        player.brain.vision.yglp.dist < 400.0):
         player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
                                               player.brain.vision.yglp.bearing)
         if DEBUG_OBSERVATIONS:
