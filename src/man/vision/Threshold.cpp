@@ -93,7 +93,7 @@ void Threshold::obstacleLoop() {
   pose->transform(usingTopCamera);
 
   unsigned char pixel = GREEN;
-  float upperCount = (float) (IMAGE_HEIGHT * IMAGE_WIDTH);
+  float upperCount = 0;
   float greenCount = 0;
   float lowerCount = 0;
   
@@ -112,10 +112,11 @@ void Threshold::obstacleLoop() {
     usingTopCamera = true;
     pose->transform(usingTopCamera);
     greenCount = 0;
-    for (int i = 0; i < IMAGE_HEIGHT; i += 1) {
-      for (int j = 0; j < IMAGE_WIDTH; j += 1) {
+    for (int i = 0; i < IMAGE_WIDTH; i += 1) {
+      for (int j = field->horizonAt(i); j < IMAGE_HEIGHT; j += 1) {
 	pixel = getThresholded(j, i);
 	if (Utility::isGreen(pixel)) greenCount++;
+	upperCount++;
       }
     }
     cout << "In the top image, green amount = " << greenCount/upperCount << std::endl;

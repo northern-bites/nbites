@@ -161,10 +161,9 @@ void Vision::notifyImage() {
     
     // - from Bende - I am going to try doing some obstacle avoidance stuff.
     // - so there will be no visionLoop. Hopefully nothing breaks.
-
-    thresh->obstacleLoop();
     
-    //    thresh->visionLoop();
+    thresh->visionLoop();
+    thresh->obstacleLoop();
 
 //    drawEdges(*linesDetector->getEdges());
 //    drawHoughLines(linesDetector->getHoughLines());
