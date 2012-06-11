@@ -31,6 +31,10 @@ public:
                    QSize(0, channelSelect.height());
     }
 
+	virtual QSize sizeHint(){
+		return QSize(640,480);
+	}
+
 public slots:
     void selectionChanged(int i);
 

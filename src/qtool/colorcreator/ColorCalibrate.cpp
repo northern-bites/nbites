@@ -26,10 +26,8 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         colorSpaceWidget(currentColorSpace, this),
         colorWheel(currentColorSpace, this) {
 
-    QHBoxLayout* mainLayout = new QHBoxLayout;
-
-    QHBoxLayout* leftLayout = new QHBoxLayout;
-    leftLayout->addWidget(&thresholdedImagePlaceholder);
+    QVBoxLayout* mainLayout = new QVBoxLayout;
+    QHBoxLayout* topLayout = new QHBoxLayout;
 
     //connect all the color spaces to update the thresholded
     //image when their parameters change
@@ -37,7 +35,10 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         connect(&colorSpace[i], SIGNAL(parametersChanged()),
                 this, SLOT(updateThresholdedImage()));
     }
-    leftLayout->addWidget(imageTabs);
+	imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    topLayout->addWidget(imageTabs);
+	thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
+	topLayout->addWidget(&thresholdedImagePlaceholder);
 
     //update the threshold when the underlying image changes
     dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
@@ -51,7 +52,10 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
 
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
-    QVBoxLayout* rightLayout = new QVBoxLayout;
+
+    QHBoxLayout* bottomLayout = new QHBoxLayout;
+	QVBoxLayout* colorButtons = new QVBoxLayout;
+	QVBoxLayout* leftJunk = new QVBoxLayout;
 
     //set up the color selection combo box
     for (int i = 0; i < image::NUM_COLORS; i++) {
@@ -60,33 +64,37 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     colorSelect.setCurrentIndex(STARTING_COLOR);
     connect(&colorSelect, SIGNAL(currentIndexChanged(int)),
             this, SLOT(selectColorSpace(int)));
-    rightLayout->addWidget(&colorSelect);
+	leftJunk->addWidget(&colorSelect);
+    leftJunk->addWidget(&colorWheel);
 
-    rightLayout->addWidget(&colorWheel);
-    rightLayout->addWidget(&colorSpaceWidget);
+	bottomLayout->addLayout(leftJunk);
+	bottomLayout->addWidget(&colorSpaceWidget);
 
     loadSlidersBtn.setText("Load Sliders");
-    rightLayout->addWidget(&loadSlidersBtn);
+    colorButtons->addWidget(&loadSlidersBtn);
     connect(&loadSlidersBtn, SIGNAL(clicked()),
             this, SLOT(loadSlidersBtnPushed()));
 
     saveSlidersBtn.setText("Save Sliders");
-    rightLayout->addWidget(&saveSlidersBtn);
+    colorButtons->addWidget(&saveSlidersBtn);
     connect(&saveSlidersBtn, SIGNAL(clicked()),
             this, SLOT(saveSlidersBtnPushed()));
 
     saveColorTableBtn.setText("Save Color Table");
-    rightLayout->addWidget(&saveColorTableBtn);
+    colorButtons->addWidget(&saveColorTableBtn);
     connect(&saveColorTableBtn, SIGNAL(clicked()),
             this, SLOT(saveColorTableBtnPushed()));
 
+	bottomLayout->addLayout(colorButtons);
+
     QCheckBox* fullColors = new QCheckBox(tr("All colors"));
-    rightLayout->addWidget(fullColors);
+    colorButtons->addWidget(fullColors);
     connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
 	displayAllColors = false;
 
-    mainLayout->addLayout(leftLayout);
-    mainLayout->addLayout(rightLayout);
+    mainLayout->addLayout(topLayout);
+	bottomLayout->setAlignment(Qt::AlignBottom);
+    mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
 }

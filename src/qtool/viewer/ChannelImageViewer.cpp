@@ -20,6 +20,7 @@ void ChannelImageViewer::selectionChanged(int i) {
 }
 
 void ChannelImageViewer::setupUI() {
+	this->updateView();
     for (int i = 0; i < image::BMPYUVImage::NUM_CHANNELS; i++) {
         channelSelect.addItem(image::ChannelType_label[i].c_str(), QVariant(i));
     }
