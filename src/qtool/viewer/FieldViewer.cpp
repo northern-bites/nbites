@@ -22,13 +22,14 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 
 	mainLayout = new QVBoxLayout(this);
 
-	float scaleX = parent->size().width()/(float)FIELD_WIDTH;
+	/*float scaleX = parent->size().width()/(float)FIELD_WIDTH;
 	float scaleY = parent->size().height()/(float)FIELD_HEIGHT;
 	qDebug()<<parent->size();
 	if(scaleX<scaleY)
 		scaleFactor = scaleX;
 	else
-		scaleFactor = scaleY;
+		scaleFactor = scaleY;*/
+	scaleFactor = 1.35f;
 
 	//field image painted via overlay of robots, field
 	fieldImage = new PaintField(this, scaleFactor);
