@@ -34,6 +34,14 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("framesOff", &VisualBall::getFramesOff)
         ;
 
+    class_<VisualCross, boost::shared_ptr<VisualCross> >("Cross", no_init)
+        .def_readonly("dist", &VisualCross::getDistance)
+        .def_readonly("bearing", &VisualCross::getBearingDeg)
+        .def_readonly("on", &VisualCross::isOn)
+        .def_readonly("framesOn", &VisualCross::getFramesOn)
+        .def_readonly("framesOff", &VisualCross::getFramesOff)
+        ;
+
     class_<VisualFieldObject, boost::shared_ptr<VisualFieldObject> >
         ("FieldObject", no_init)
         // From VisualDetection
@@ -262,6 +270,8 @@ BOOST_PYTHON_MODULE(vision)
                                           <reference_existing_object>()))
         .add_property("navy3", make_getter(&Vision::navy3, return_value_policy
                                           <reference_existing_object>()))
+        .add_property("cross", make_getter(&Vision::cross, return_value_policy
+                                           <reference_existing_object>()))
 
         /* Crossbars: not used right now
            .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar,
