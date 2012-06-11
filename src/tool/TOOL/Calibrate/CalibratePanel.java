@@ -91,7 +91,7 @@ public class CalibratePanel extends JPanel implements DataListener, KeyListener,
         feedback.setParagraphAttributes(set,true);
 
         feedback.setEditable(false);
-        feedback.setText("Welcome to TOOL .10");
+        feedback.setText("Welcome to TOOL .20");
         // Make the background match in color
         feedback.setBackground(this.getBackground());
 

@@ -207,12 +207,17 @@ MultiLocEKF::MultiLocEKF(man::memory::MLocalization::ptr mLocalization,
 // Memory update
 void MultiLocEKF::updateMLocalization(man::memory::MLocalization::ptr mLoc) const {
 
-    mLoc->get()->set_x_est(this->getXEst());
-    mLoc->get()->set_y_est(this->getYEst());
-    mLoc->get()->set_h_est(this->getHEst());
-    mLoc->get()->set_x_uncert(this->getXUncert());
-    mLoc->get()->set_y_uncert(this->getYUncert());
-    mLoc->get()->set_h_uncert(this->getHUncert());
+    using namespace man::memory::proto;
+
+    RobotLocation* location = mLoc->get()->mutable_location();
+    location->set_x(this->getXEst());
+    location->set_y(this->getYEst());
+    location->set_h(this->getHEst());
+
+    RobotArea* uncertainty = mLoc->get()->mutable_uncertainty();
+    uncertainty->set_x_size(this->getXUncert());
+    uncertainty->set_y_size(this->getYUncert());
+    uncertainty->set_h_size(this->getHUncert());
 }
 
 /**

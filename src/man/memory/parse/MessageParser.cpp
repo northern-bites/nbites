@@ -46,7 +46,10 @@ void MessageParser::run() {
         //the order here matters; if getNext is put after waitForSignal
         //then when the thread tries to stop it will call getNext
         //and that will throw a pure virtual call error
-        this->readNextMessage();
+        //TODO: replace this with exceptions
+        if (this->readNextMessage() == false) {
+            return ;
+        }
         //in streaming we get messages continuously,
         //so there's no need to wait
         if (!in_provider->isOfTypeStreaming()) {
@@ -110,6 +113,11 @@ bool MessageParser::readIntoBuffer(char* buffer, uint32_t num_bytes) {
                     buffer + bytes_read, num_bytes - bytes_read);
             in_provider->waitForReadToFinish();
             bytes_read += in_provider->bytesRead();
+
+            if (bytes_read == 0) {
+                return false;
+            }
+
         } catch (std::exception& read_exception) {
             cout << read_exception.what() << " " << in_provider->debugInfo() << endl;
             return false;
