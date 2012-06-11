@@ -9,9 +9,12 @@
 #include "corpus/offlineconnect/OfflineTranscriber.h"
 #include "corpus/offlineconnect/OfflineEnactor.h"
 
+#include "memory/RobotMemory.h"
+
 using namespace std;
 using boost::shared_ptr;
 using namespace man::corpus;
+using namespace man::memory;
 
 static boost::shared_ptr<TMan> man_pointer;
 
@@ -19,22 +22,23 @@ START_FUNCTION_EXPORT
 
 void loadMan(OfflineManController::ptr offlineController) {
 
+    RobotMemory::ptr memory(new RobotMemory());
+
     boost::shared_ptr<Speech> speech(new Speech());
-    boost::shared_ptr<Sensors> sensors(new Sensors(speech));
+    boost::shared_ptr<Sensors> sensors(new Sensors(speech,
+                                                   memory->get<MVisionSensors>(),
+                                                   memory->get<MMotionSensors>()));
     boost::shared_ptr<Transcriber> transcriber(new OfflineTranscriber(sensors,
-    		offlineController->getFakeMemory()->getMVisionSensors(),
-    		offlineController->getFakeMemory()->getMMotionSensors()));
+    		offlineController->getFakeMemory()->get<MVisionSensors>(),
+    		offlineController->getFakeMemory()->get<MMotionSensors>()));
     boost::shared_ptr<ThreadedImageTranscriber>
         imageTranscriber(new OfflineImageTranscriber(sensors,
-                                       offlineController->getFakeMemory()->
-                                                     getMImage(Camera::TOP),
-                                       offlineController->getFakeMemory()->
-                                                getMImage(Camera::BOTTOM)));
+                offlineController->getFakeMemory()->get<MRawImages>()));
     boost::shared_ptr<MotionEnactor>
         enactor(new OfflineEnactor());
     boost::shared_ptr<Lights> lights(new Lights());
 
-    man_pointer = boost::shared_ptr<TMan>(new TMan(sensors, transcriber,
+    man_pointer = boost::shared_ptr<TMan>(new TMan(memory, sensors, transcriber,
                                             imageTranscriber,
                                             enactor, lights, speech));
     offlineController->setImageTranscriber(imageTranscriber);

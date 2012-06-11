@@ -4,17 +4,18 @@
 namespace qtool {
 namespace image {
 
-PaintField::PaintField(QObject *parent):
-        BMPImage(parent)
+PaintField::PaintField(QObject *parent, float sF):
+			        BMPImage(parent)
 {
-    bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
+    scaleFactor = sF;
+    bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
+    drawField();
 }
 
-// Paints the field
-void PaintField::buildBitmap()
-{
+void PaintField::drawField() {
 
     QPainter painter(&bitmap);
+    painter.scale(scaleFactor, scaleFactor);
 
     // Field Areas
     QRect field(FIELD_GREEN_LEFT_SIDELINE_X,
@@ -101,8 +102,8 @@ void PaintField::buildBitmap()
             (LINE_CROSS_LENGTH/2));
 
     // Painting the Blue Goal
-    painter.setBrush(Qt::blue);
-    painter.setPen(Qt::blue);
+    painter.setBrush(Qt::yellow);
+    painter.setPen(Qt::yellow);
     painter.drawEllipse(topBluePost,
             (int)GOAL_POST_RADIUS,
             (int)GOAL_POST_RADIUS);
@@ -123,10 +124,17 @@ void PaintField::buildBitmap()
     // Nets in Goals
     QBrush goalsBrush = QBrush(Qt::white, Qt::CrossPattern);
     painter.setBrush(goalsBrush);
-    painter.setPen(Qt::blue);
+    painter.setPen(Qt::yellow);
     painter.drawRect(blueGoal);
     painter.setPen(Qt::yellow);
     painter.drawRect(yellowGoal);
+}
+
+void PaintField::buildBitmap()
+{
+
+    // no need to update bitmap, since the field is static and only needs
+    // to be drawn once
 }
 
 }

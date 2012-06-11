@@ -94,7 +94,7 @@ private:
 
     boost::shared_ptr<Sensors> sensors;
     man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
-    boost::shared_ptr<man::memory::proto::PImage> rawThresholdedImageData; // Octavians idea for name
+    boost::shared_ptr<man::memory::proto::PRawImage> rawThresholdedImageData; // Octavians idea for name
     image::ThresholdedImage* threshImage;
     viewer::BMPImageViewer* thresholdedImageViewer;
 

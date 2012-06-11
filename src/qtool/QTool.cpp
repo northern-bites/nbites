@@ -12,6 +12,7 @@ using viewer::BallEKFViewer;
 using viewer::FieldViewer;
 using offline::OfflineViewer;
 using overseer::OverseerClient;
+  //using viewer::GraphViewer;
 
 QTool::QTool() : EmptyQTool("QTOOL"),
                  dataLoader(new DataLoader(dataManager)),
@@ -33,9 +34,18 @@ QTool::QTool() : EmptyQTool("QTOOL"),
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
+    //toolTabs->addTab(graphViewer, tr("Graph Viewer"));
+
+	scrollArea->setWidget(toolTabs);
+	scrollArea->resize(toolTabs->size());
+	this->setCentralWidget(scrollArea);
+
+	tabStartSize = new QSize(toolTabs->size());
 }
+
 
 QTool::~QTool() {
 }
 
 }
+
