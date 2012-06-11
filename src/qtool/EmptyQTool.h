@@ -12,6 +12,9 @@
 #include <qtabwidget.h>
 #include <QPushButton>
 #include <QToolBar>
+#include <QScrollArea>
+#include <QResizeEvent>
+#include <QTextStream>
 
 #include "data/DataManager.h"
 
@@ -37,13 +40,22 @@ protected slots:
     void record();
 
 protected:
+    virtual void keyPressEvent(QKeyEvent * event);
+
+    QTabWidget* toolTabs;
+
     data::DataManager::ptr dataManager;
 
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;
+	QPushButton* scrollButton;
     QToolBar* toolbar;
-	QTabWidget* toolTabs;
-};
+	QScrollArea* scrollArea;
+	QSize* tabStartSize;
+	QRect* geom;
+	QSize* scrollBarSize;
 
+	void resizeEvent(QResizeEvent*);
+};
 }

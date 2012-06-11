@@ -20,75 +20,55 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 	startButton(new QPushButton("Locate Robots", this)),
 	stopButton(new QPushButton("Stop Location", this)) {
 
-	mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout(this);
 
 	/*float scaleX = parent->size().width()/(float)FIELD_WIDTH;
-	float scaleY = parent->size().height()/(float)FIELD_HEIGHT;
-	qDebug()<<parent->size();
-	if(scaleX<scaleY)
-		scaleFactor = scaleX;
-	else
-		scaleFactor = scaleY;*/
-	scaleFactor = 1.35f;
+	  float scaleY = parent->size().height()/(float)FIELD_HEIGHT;
+	  qDebug()<<parent->size();
+	  if(scaleX<scaleY)
+	  scaleFactor = scaleX;
+	  else
+	  scaleFactor = scaleY;*/
+    scaleFactor = 1.35f;
 
-	//field image painted via overlay of robots, field
-	fieldImage = new PaintField(this, scaleFactor);
-	bot_locs = new PaintBots(this, scaleFactor);
-	overlayView = new OverlayedImage(fieldImage, bot_locs, this);
-	fieldView = new BMPImageViewer(fieldImage, this);
+    //field image painted via overlay of robots, field
+    fieldImage = new PaintField(this, scaleFactor);
+    bot_locs = new PaintBots(this, scaleFactor);
 
-	spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    overlayImage = new OverlayedImage(fieldImage, bot_locs, this);
+    fieldView = new BMPImageViewer(overlayImage, this);
 
-	field = new QHBoxLayout();
-	field->addWidget(fieldView);
+    connect(bot_locs->locs, SIGNAL(newRobotLocation()), fieldView, SLOT(updateView()));
 
-	buttonLayout = new QHBoxLayout();
-	buttonLayout->setSpacing(10);
-	buttonLayout->addWidget(startButton);
-	connect(startButton, SIGNAL(clicked()), this, SLOT(drawBots()));
-	buttonLayout->addWidget(stopButton);
-	connect(stopButton, SIGNAL(clicked()), this, SLOT(stopDrawing()));
+    spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    field = new QHBoxLayout();
+    field->addWidget(fieldView);
 
-	//paint the field
-	mainLayout->addLayout(buttonLayout);
-	mainLayout->addLayout(field);
-	mainLayout->addItem(spacer);
-	this->setLayout(mainLayout);
-}
+    buttonLayout = new QHBoxLayout();
+    buttonLayout->setSpacing(10);
+    buttonLayout->addWidget(startButton);
+    connect(startButton, SIGNAL(clicked()), this, SLOT(drawBots()));
+    buttonLayout->addWidget(stopButton);
+    connect(stopButton, SIGNAL(clicked()), this, SLOT(stopDrawing()));
 
-FieldViewer::~FieldViewer(){
-	keepDrawing = false;
-	bot_locs->locs->stopListening();
+    //paint the field
+    mainLayout->addLayout(buttonLayout);
+    mainLayout->addLayout(field);
+    mainLayout->addItem(spacer);
+    this->setLayout(mainLayout);
 }
 
 void FieldViewer::drawBots(){
-	if(!keepDrawing){
-		bot_locs->locs->startListening();
-		keepDrawing = true;
-		while(keepDrawing){
-			delete field;
-			delete fieldView;
-			fieldView = new BMPImageViewer(overlayView, this);
-			fieldView->getLayout()->setAlignment(Qt::Alignment());
-			field = new QHBoxLayout();
-			field->addWidget(fieldView);
-			mainLayout->insertLayout(1, field);
-			qApp->processEvents();
-		}
-	} else {
-		qDebug()<<"WorldView is already running.";
-	}
+    bot_locs->locs->startListening();
 }
 
 void FieldViewer::stopDrawing(){
-	if(keepDrawing){
-		keepDrawing = false;
-		qDebug()<<"WorldView stopped.";
-		bot_locs->locs->stopListening();
-	}
+    bot_locs->locs->stopListening();
+}
+
 }
 }
-}
+
 
 
 

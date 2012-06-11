@@ -24,13 +24,14 @@
 
 #include "data/DataManager.h"
 #include "image/PaintField.h"
+#include "image/PaintLocalization.h"
 #include "BMPImageViewer.h"
 #include "image/PaintBots.h"
-
 
 namespace qtool {
 namespace viewer {
 
+<<<<<<< .merge_file_VCPReW
 class FieldViewer : public QWidget{
 	Q_OBJECT
 
@@ -61,5 +62,35 @@ protected:
 };
 
 
+=======
+class FieldViewer: public QWidget {
+Q_OBJECT
+
+public:
+    FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
+
+public slots:
+    void stopDrawing();
+    void drawBots();
+
+private:
+    data::DataManager::ptr dataManager;
+    viewer::BMPImageViewer* fieldView;
+    image::OverlayedImage* overlayImage;
+    image::PaintBots* bot_locs;
+    image::PaintField* fieldImage;
+    bool keepDrawing;
+
+protected:
+    QPushButton* startButton;
+    QPushButton* stopButton;
+    QVBoxLayout* mainLayout;
+    QHBoxLayout* buttonLayout;
+    QHBoxLayout* field;
+    QSpacerItem* spacer;
+    float scaleFactor;
+};
+
+>>>>>>> .merge_file_5ApTbT
 }
 }

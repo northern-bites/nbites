@@ -32,7 +32,8 @@ public:
            boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
            boost::shared_ptr<Sensors> _sensors,
            boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard,
-           MotionInterface * _minterface
+           MotionInterface * _minterface,
+           man::memory::Memory::ptr Memory
            );
     virtual ~Noggin();
 
@@ -69,7 +70,8 @@ private:
     boost::shared_ptr<Comm> comm;
     boost::shared_ptr<GameController> gc;
     boost::shared_ptr<Sensors> sensors;
-    boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
+    man::memory::log::LoggingBoard::ptr loggingBoard;
+    man::memory::Memory::ptr memory;
 
     boost::shared_ptr<ClickableButton> chestButton;
     boost::shared_ptr<ClickableButton> leftFootButton;

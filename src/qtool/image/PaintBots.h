@@ -23,19 +23,20 @@ namespace qtool {
 namespace image {
 
 class PaintBots : public image::BMPImage {
+    Q_OBJECT
 
-	Q_OBJECT
+public:
+    PaintBots(QObject *parent = 0, float scaleFactor = 1.0f);
+    ~PaintBots(){}
+    unsigned getWidth() const { return FIELD_WIDTH*scaleFactor; }
+    unsigned getHeight() const { return FIELD_HEIGHT*scaleFactor; }
 
-	public:
-	PaintBots(QObject *parent = 0, float sF = (float)1.0);
-	~PaintBots(){}
-	unsigned getWidth() const { return FIELD_WIDTH*scaleFactor; }
-	unsigned getHeight() const { return FIELD_HEIGHT*scaleFactor; }
-	viewer::BotLocs* locs;
+    //this should be moved somewhere else and not be public
+    viewer::BotLocs* locs;
 
 protected:
-	virtual void buildBitmap();
-	float scaleFactor;
+    virtual void buildBitmap();
+    float scaleFactor;
 
 };
 

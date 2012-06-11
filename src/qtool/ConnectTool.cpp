@@ -18,6 +18,12 @@ ConnectTool::ConnectTool() : EmptyQTool("Robot Connection Tool"),
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
     toolTabs->addTab(fieldViewer, tr("Field Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
+
+	scrollArea->setWidget(toolTabs);
+	scrollArea->resize(toolTabs->size());
+	this->setCentralWidget(scrollArea);
+	
+	tabStartSize = new QSize(toolTabs->size());
 }
 
 ConnectTool::~ConnectTool() {

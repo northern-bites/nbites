@@ -21,13 +21,18 @@
 
 #include <QGraphicsItem>
 #include <QColor>
-#include "man/memory/MImage.h"
+#include "man/memory/MObjects.h"
+
+#include "man/corpus/Camera.h"
+
+#include "data/DataTypes.h"
 
 class YUVImage
 {
 
 public:
-    YUVImage(man::memory::MImage::const_ptr rawImage);
+    YUVImage(qtool::data::RoboImages::const_ptr rawImages,
+             man::corpus::Camera::Type which);
     virtual ~YUVImage();
     virtual void updateFromRawImage();
     void read(QString filename);
@@ -69,7 +74,8 @@ private:
 
 
 protected:
-    man::memory::MImage::const_ptr rawImage;
+    qtool::data::RoboImages::const_ptr rawImages;
+    man::corpus::Camera::Type which;
 
     unsigned int width;
     unsigned int height;

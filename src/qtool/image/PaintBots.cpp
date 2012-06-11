@@ -15,14 +15,14 @@ QColor ball = QColor::fromRgb(Color_RGB[Orange]);
 QColor bluePlayer = QColor::fromRgb(Color_RGB[Navy]);
 QColor redPlayer = QColor::fromRgb(Color_RGB[Red]);
 QColor white = QColor::fromRgb(Color_RGB[White]);
+
 QColor playerColor; QPen pen;
 
-PaintBots::PaintBots(QObject *parent, float sF):
-	BMPImage(parent)
+PaintBots::PaintBots(QObject *parent, float scaleFactor):
+			        BMPImage(parent), scaleFactor(scaleFactor)
 {
-	scaleFactor = 1.25;
-	bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
-	locs = new BotLocs();
+    bitmap = QPixmap(FIELD_WIDTH*scaleFactor, FIELD_HEIGHT*scaleFactor);
+    locs = new BotLocs(this);
 }
 
 
@@ -34,7 +34,7 @@ void PaintBots::buildBitmap()
 	//painter.scale(1*scaleFactor, -1*scaleFactor);
 	painter.scale(scaleFactor, scaleFactor);
 
-	for(int i=1; i < locs->getSize(); i++) { //the first bot is a placeholder
+	for(int i=0; i < locs->getSize(); i++) {
 		//set pen/brush for correct team
 		if(locs->getTeamColor(i)==0){
 			playerColor = bluePlayer;

@@ -19,7 +19,7 @@ OfflineViewer::OfflineViewer(Memory::const_ptr memory, QWidget* parent) :
         manPreloader(offlineControl),
         loaded(false) {
 
-    memory->subscribe(this, MTOPIMAGE_ID);
+    memory->subscribe(this, "MRawImages");
 
     mainLayout = new QVBoxLayout;
     QHBoxLayout* buttonLayout = new QHBoxLayout;
@@ -61,25 +61,28 @@ void OfflineViewer::reloadMan() {
 
 void OfflineViewer::loadMan() {
 
-    manPreloader.createMan();
-    manMemoryManager = RobotMemoryManager::ptr(
-            new RobotMemoryManager(offlineControl->getManMemory()));
-    manMemoryViewer = new viewer::MemoryViewer(manMemoryManager);
-    mainLayout->addWidget(manMemoryViewer);
-    //add the thresholded image to the memory viewer
-    ThresholdedImage* threshImage = new ThresholdedImage(
-        offlineControl->getManMemory()->getMImage(Camera::TOP)->
-        getThresholded(), this);
-    manMemoryManager->connectSlotToMObject(threshImage,
-            SLOT(updateBitmap()), MTOPIMAGE_ID);
 
-    QDockWidget* dockWidget =
-            new QDockWidget(tr("Thresholded"), manMemoryViewer);
-    BMPImageViewer* threshView = new BMPImageViewer(threshImage, dockWidget);
-    dockWidget->setWidget(threshView);
+    //TODO: to be revised and fixed
 
-    dockWidget->setMinimumSize(350, 300);
-    manMemoryViewer->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
+//    manPreloader.createMan();
+//    manMemoryManager = RobotMemoryManager::ptr(
+//            new RobotMemoryManager(offlineControl->getManMemory()));
+//    manMemoryViewer = new viewer::MemoryViewer(manMemoryManager);
+//    mainLayout->addWidget(manMemoryViewer);
+//    //add the thresholded image to the memory viewer
+//    ThresholdedImage* threshImage = new ThresholdedImage(
+//        offlineControl->getManMemory()->getMImage(Camera::TOP)->
+//        getThresholded(), this);
+//    manMemoryManager->connectSlotToMObject(threshImage,
+//            SLOT(updateBitmap()), MTOPIMAGE_ID);
+
+//    QDockWidget* dockWidget =
+//            new QDockWidget(tr("Thresholded"), manMemoryViewer);
+//    BMPImageViewer* threshView = new BMPImageViewer(threshImage, dockWidget);
+//    dockWidget->setWidget(threshView);
+
+//    dockWidget->setMinimumSize(350, 300);
+//    manMemoryViewer->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     loaded = true;
 }

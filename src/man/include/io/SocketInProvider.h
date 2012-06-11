@@ -51,6 +51,16 @@ public:
         return "SocketIn client connecting to " + std::string(inet_ntoa(addr));
     }
 
+    void waitForReadToFinish() const {
+
+        const struct aiocb* cblist[] = { &control_block };
+        int result = aio_suspend(cblist, 1, NULL);
+
+        if (result != 0) {
+            throw_errno(errno);
+        }
+    }
+
     virtual bool isOfTypeStreaming() const { return true; }
     virtual bool reachedEnd() const { return false; }
     bool rewind(long int) const { return false; }
