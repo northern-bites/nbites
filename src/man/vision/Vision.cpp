@@ -388,6 +388,7 @@ void Vision::updateMVision(man::memory::MVision::ptr mVision) const {
         visual_corner->set_secondary_shape(i->getSecondaryShape());
         visual_corner->set_angle_between_lines(i->getAngleBetweenLines());
         visual_corner->set_orientation(i->getOrientation());
+        visual_corner->set_physical_orientation(i->getPhysicalOrientation());
     }
 }
 

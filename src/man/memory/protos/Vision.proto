@@ -57,16 +57,17 @@ message PVision {
     	optional uint32 secondary_shape = 4;
     	optional float angle_between_lines = 5;
     	optional float orientation = 6;
+	optional float physical_orientation = 7;
     }
 
     message PVisualFieldObject {
-    
+
 	required PVisualDetection visual_detection = 1;
 	required PVisualLandmark visual_landmark = 2;
 	optional sint32 left_top_x = 3;
 	optional sint32 left_top_y = 4;
 	optional sint32 right_top_x = 5;
-	optional sint32 right_top_y = 6; 
+	optional sint32 right_top_y = 6;
 	optional sint32 left_bottom_x = 7;
 	optional sint32 left_bottom_y = 8;
 	optional sint32 right_bottom_x = 9;
@@ -74,20 +75,20 @@ message PVision {
     }
 
     message PVisualRobot {
-        required PVisualDetection visual_detection = 1; 
+        required PVisualDetection visual_detection = 1;
 
 	optional sint32 left_top_x = 3;
 	optional sint32 left_top_y = 4;
 	optional sint32 right_top_x = 5;
-	optional sint32 right_top_y = 6; 
+	optional sint32 right_top_y = 6;
 	optional sint32 left_bottom_x = 7;
 	optional sint32 left_bottom_y = 8;
 	optional sint32 right_bottom_x = 9;
 	optional sint32 right_bottom_y = 10;
     }
-    
+
     message PVisualLine {
-    	
+
         required PVisualLandmark visual_landmark = 1;
 	optional sint32 start_x = 2;
 	optional sint32 start_y = 3;
@@ -97,17 +98,17 @@ message PVision {
     }
 
     message PVisualCross {
-        required PVisualDetection visual_detection = 1; 
+        required PVisualDetection visual_detection = 1;
 	required PVisualLandmark visual_landmark =2;
 	optional sint32 left_top_x = 3;
 	optional sint32 left_top_y = 4;
 	optional sint32 right_top_x = 5;
-	optional sint32 right_top_y = 6; 
+	optional sint32 right_top_y = 6;
 	optional sint32 left_bottom_x = 7;
 	optional sint32 left_bottom_y = 8;
 	optional sint32 right_bottom_x = 9;
 	optional sint32 right_bottom_y = 10;
     }
 
-    
+
 }
