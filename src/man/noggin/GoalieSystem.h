@@ -15,7 +15,7 @@
 namespace noggin {
 
 // How far memory should go back
-static const float DEQUE_LENGTH = 50;
+static const float DEQUE_LENGTH = 20;
 
 // Field constants
 static const float INITIAL_X = FIELD_WHITE_LEFT_SIDELINE_X +
@@ -33,7 +33,7 @@ public:
     ~GoalieSystem() {};
 
     void reset(float rightDistance, float rightBearing,
-               float leftDistance, float rightDistance);
+               float leftDistance, float leftBearing);
 
     // Methods for controlling "memory"
     void pushRightPostObservation(float distance, float bearing);
@@ -53,12 +53,9 @@ public:
     float rightPostRelX();
     float rightPostRelY();
 
-    // Averages left and right post bearings
+    // Averages left and right post values
     float centerGoalDistanceAvg();
     float centerGoalBearingAvg();
-
-    // Computes expected location of center of goal based on both posts
-    // then averages them
     float centerGoalRelX();
     float centerGoalRelY();
 

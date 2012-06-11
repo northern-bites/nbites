@@ -1,13 +1,11 @@
 from man.motion.HeadMoves import FIXED_PITCH_LEFT_SIDE_PAN
 from vision import certainty
 from ..navigator import Navigator as nav
-from GoalieTransitions import atGoalArea
+from ..util import Transition
 
 DEBUG_OBSERVATIONS = True
 DEBUG_APPROACH = False
-
-walkToGoal.transitions = { positionAtGoal :
-                           Transition.CountTransition(atGoalArea)}
+DEBUG_POSITION = False
 
 def updatePostObservations(player):
     """
@@ -35,14 +33,18 @@ def walkToGoal(player):
         player.brain.nav.goTo(player.system.home,
                               nav.CLOSE_ENOUGH, nav.FAST_SPEED)
 
-    updatePostObservations(player)
+    if DEBUG_APPROACH:
+        print "========================================"
+
+    if player.system.centerGoalDistance() > 200.0:
+        if DEBUG_OBSERVATIONS:
+            print "Updating my posts."
+        updatePostObservations(player)
 
     player.system.home.relY = player.system.centerGoalRelY()
     player.system.home.relX = player.system.centerGoalRelX()
 
     if DEBUG_APPROACH:
-        print "========================================"
-
         print "BEARINGS " + str(player.system.centerGoalBearing())
         print "  LEFT " + str(player.system.leftPostBearing())
         print "  RIGHT " + str(player.system.rightPostBearing())
@@ -60,14 +62,6 @@ def walkToGoal(player):
     return Transition.getNextState(player, walkToGoal)
 
 def positionAtGoal(player):
-    if player.firstFrame():
-        player.system.reset(70.0, 90.0, -70.0, -90.0)
-        player.brain.nav.goTo(player.system.home,
-                              nav.PRECISELY, nav.CAREFUL_SPEED)
-
-    player.brain.tracker.lookToAngle(player.system.leftPostBearing())
-
-    player.system.home.relX = player.system.leftPostRelX() - 70.f
-    player.system.home.relY = player.system.leftPostRelY()
+    player.brain.nav.stop()
 
     return player.stay()

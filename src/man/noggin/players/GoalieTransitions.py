@@ -11,7 +11,7 @@ import PositionTransitions as PosTran
 # Visual Goalie
 
 def atGoalArea(player):
-    return player.system.centerGoalDistance() < 50
+    return player.brain.vision.fieldEdge.centerDist < 100.0
 
 # ******************
 # SAVING TRANSITIONS

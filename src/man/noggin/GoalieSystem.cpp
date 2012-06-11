@@ -109,7 +109,7 @@ float GoalieSystem::centerGoalDistanceAvg()
 
 float GoalieSystem::centerGoalRelX()
 {
-    return ((leftPostRelX() - 70.f) + (rightPostRelX() + 70.f)) / 2.f;
+    return (leftPostRelX() + rightPostRelX()) / 2.f;
 }
 
 float GoalieSystem::centerGoalRelY()
