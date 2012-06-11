@@ -15,6 +15,8 @@ using namespace qtool::image;
 using namespace man::corpus;
 using namespace man::memory;
 
+#define BOX 5
+
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager), imageTabs(new QTabWidget(this)),
         topImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::TOP,
@@ -52,11 +54,11 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     imageTabs->addTab(&bottomChannelImage, "Bottom Image");
     dataManager->connectSlot(&bottomChannelImage, SLOT(updateView()), "MRawImages");
 
-    connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
     //update the threshold when the underlying image changes
     dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
     dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
 
+    connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
@@ -96,6 +98,9 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     mainLayout->addLayout(rightLayout);
 
     this->setLayout(mainLayout);
+
+	lastClickedX = -BOX;
+	lastClickedY = -BOX;
 }
 
 // flip between one and all colors
@@ -129,9 +134,14 @@ void ColorCalibrate::canvassClicked(int x, int y, int brushSize, bool leftClick)
 	currentColorSpace->verboseContains(color);
 	if (!leftClick) {
 		std::cout << "Right click " << std::endl;
-		currentColorSpace->expandToFit(color);
-		updateThresholdedImage();
+		bool changed = currentColorSpace->expandToFit(color);
+		if (changed) {
+			colorSpaceWidget.setColorSpace(currentColorSpace);
+		}
 	}
+	lastClickedX = x;
+	lastClickedY = y;
+	updateThresholdedImage();
 	std::cout << std::endl;
 }
 
@@ -147,7 +157,7 @@ void ColorCalibrate::selectColorSpace(int index) {
 // TODO: Ideally we'd want to have this in a separate class
 // or unify this with our regular thresholding process (maybe
 // by converting the color space parameters to a table continuously?
-void ColorCalibrate::updateThresholdedImage() {
+	void ColorCalibrate::updateThresholdedImage() {
 
     BMPYUVImage* image;
 
@@ -194,6 +204,11 @@ void ColorCalibrate::updateThresholdedImage() {
                     tempColor /= count;
                 }
             }
+			// lame hack to show a "cursor" on the thresholded image
+			// TODO do a true cursor mirroring on the thresholded image
+			if ((abs(j - lastClickedY) < BOX) && (abs(i - lastClickedX) < BOX)) {
+				tempColor = image::Color_RGB[3];
+			}
             if (tempColor) {
                 thresholdedImageLine[i] = (QRgb) tempColor;
             }
@@ -202,6 +217,7 @@ void ColorCalibrate::updateThresholdedImage() {
     //set it
     thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
 }
+
 
 void ColorCalibrate::loadColorSpaces(QString filename) {
 
