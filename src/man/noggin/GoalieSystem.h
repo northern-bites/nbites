@@ -22,13 +22,40 @@ static const float POST_Q_LENGTH = 20;
 static const float CROSS_Q_LENGTH = 5;
 
 // Field constants
-static const float INITIAL_X = FIELD_WHITE_LEFT_SIDELINE_X +
+static const float RIGHT_X = FIELD_WHITE_LEFT_SIDELINE_X +
                                LINE_CROSS_OFFSET;
-static const float INITIAL_Y = FIELD_WHITE_BOTTOM_SIDELINE_Y;
-static const float INITIAL_ANGLE =
-    NBMath::safe_atan2(INITIAL_X - py_constants::LANDMARK_MY_GOAL_LEFT_POST_X,
+static const float RIGHT_Y = FIELD_WHITE_BOTTOM_SIDELINE_Y;
+
+static const float RIGHT_SIDE_LP_ANGLE =
+    NBMath::safe_atan2(RIGHT_X - py_constants::LANDMARK_MY_GOAL_LEFT_POST_X,
                        py_constants::LANDMARK_MY_GOAL_LEFT_POST_Y -
-                       INITIAL_Y) * TO_DEG;
+                       RIGHT_Y) * TO_DEG;
+static const float RIGHT_SIDE_LP_DISTANCE = NBMath::getHypotenuse(RIGHT_X -
+                       py_constants::LANDMARK_MY_GOAL_LEFT_POST_X,
+                       py_constants::LANDMARK_MY_GOAL_LEFT_POST_Y -
+                                                          RIGHT_Y);
+
+static const float RIGHT_SIDE_RP_ANGLE =
+    NBMath::safe_atan2(RIGHT_X - py_constants::LANDMARK_MY_GOAL_RIGHT_POST_X,
+                       py_constants::LANDMARK_MY_GOAL_RIGHT_POST_Y -
+                       RIGHT_Y) * TO_DEG;
+
+static const float RIGHT_SIDE_RP_DISTANCE = NBMath::getHypotenuse(RIGHT_X -
+                       py_constants::LANDMARK_MY_GOAL_RIGHT_POST_X,
+                       py_constants::LANDMARK_MY_GOAL_RIGHT_POST_Y -
+                                                               RIGHT_Y);
+
+static const float RIGHT_SIDE_ANGLE = (RIGHT_SIDE_LP_ANGLE +
+                                       RIGHT_SIDE_RP_ANGLE) / 2.f;
+
+static const float LEFT_X = RIGHT_X;
+static const float LEFT_Y = FIELD_WHITE_TOP_SIDELINE_Y;
+static const float LEFT_SIDE_LP_ANGLE = - RIGHT_SIDE_RP_ANGLE;
+static const float LEFT_SIDE_RP_ANGLE = - RIGHT_SIDE_LP_ANGLE;
+static const float LEFT_SIDE_LP_DISTANCE = RIGHT_SIDE_RP_DISTANCE;
+static const float LEFT_SIDE_RP_DISTANCE = RIGHT_SIDE_LP_DISTANCE;
+
+static const float LEFT_SIDE_ANGLE = - RIGHT_SIDE_ANGLE;
 
 class GoalieSystem
 {

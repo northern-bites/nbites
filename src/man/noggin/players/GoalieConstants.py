@@ -6,6 +6,9 @@
 import noggin_constants as constants
 from math import atan2, degrees
 
+RIGHT = 0
+LEFT = 1
+
 # *****************
 #     Position    *
 # *****************

@@ -2,9 +2,10 @@ import time
 from objects import RelRobotLocation
 from ..navigator import Navigator as nav
 from ..util import Transition
-from goalie import GoalieSystem, INITIAL_ANGLE
+from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 import VisualGoalieStates as VisualStates
 import man.motion.SweetMoves as SweetMoves
+from GoalieConstants import RIGHT, LEFT
 
 def gameInitial(player):
     if player.firstFrame():
@@ -13,6 +14,7 @@ def gameInitial(player):
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
         player.system = GoalieSystem()
+        player.side = LEFT
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -25,8 +27,7 @@ def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.lookToAngle(INITIAL_ANGLE)
-        print "Looking to: " + str(INITIAL_ANGLE)
+        player.brain.tracker.lookToAngle(LEFT_SIDE_ANGLE)
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -53,12 +54,11 @@ def gamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.trackBallFixedPitch()
 
     #if player.lastDiffState == 'gamePenalized':
         # Need to at least *try* to get back into goal.
 
-    return player.goLater('position')
+    return player.goLater('decideSide')
 
 def gamePenalized(player):
     if player.firstFrame():

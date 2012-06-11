@@ -10,13 +10,12 @@ GoalieSystem::GoalieSystem() : rightPostBearings(),
                                rightPostDistances(),
                                leftPostBearings(),
                                leftPostDistances(),
-                               home(CENTER_FIELD_Y - INITIAL_Y,
-                                    LINE_CROSS_OFFSET)
+                               home()
 {
-    // need to fix these values
-    pushRightPostObservation(300.f, 30.f);
-    pushLeftPostObservation(300.f, 30.f);
-    pushCrossObservation(-30.f);
+    // to avoid a crash....
+    pushRightPostObservation(0.f, 0.f);
+    pushLeftPostObservation(0.f, 0.f);
+    pushCrossObservation(0.f);
 }
 
 void GoalieSystem::resetPosts(float rightDistance, float rightBearing,

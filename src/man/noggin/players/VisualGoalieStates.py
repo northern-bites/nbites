@@ -1,22 +1,27 @@
-from man.motion.HeadMoves import FIXED_PITCH_LEFT_SIDE_PAN
+from man.motion.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
+                                  FIXED_PITCH_RIGHT_SIDE_PAN)
 from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition
+import goalie
+from GoalieConstants import RIGHT, LEFT
 
-DEBUG_OBSERVATIONS = True
-DEBUG_APPROACH = False
+DEBUG_OBSERVATIONS = False
+DEBUG_APPROACH = True
 DEBUG_POSITION = False
 
 def updatePostObservations(player):
     """
     Updates the underlying C++ data structures.
     """
-    if player.brain.vision.ygrp.on and player.brain.vision.ygrp.certainty != certainty.NOT_SURE:
+    if (player.brain.vision.ygrp.on and
+        player.brain.vision.ygrp.certainty != certainty.NOT_SURE):
         player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
                                                player.brain.vision.ygrp.bearing)
         if DEBUG_OBSERVATIONS:
             print "RIGHT: Saw right post."
             print "  Pushed " + str(player.brain.vision.ygrp.bearing) + " " + str(player.brain.vision.ygrp.dist)
+
     if player.brain.vision.yglp.on:
         player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
                                               player.brain.vision.yglp.bearing)
@@ -29,10 +34,23 @@ def walkToGoal(player):
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
+        if player.side == RIGHT:
+            player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
+            player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
+                                     goalie.RIGHT_SIDE_RP_ANGLE,
+                                     goalie.RIGHT_SIDE_LP_DISTANCE,
+                                     goalie.RIGHT_SIDE_LP_ANGLE)
+        else:
+            player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
+            player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
+                                     goalie.LEFT_SIDE_RP_ANGLE,
+                                     goalie.LEFT_SIDE_LP_DISTANCE,
+                                     goalie.LEFT_SIDE_LP_ANGLE)
+
+        player.system.home.relH = 0
+
         player.brain.nav.goTo(player.system.home,
                               nav.CLOSE_ENOUGH, nav.FAST_SPEED)
-        player.system.home.relH = 0
 
     if DEBUG_APPROACH:
         print "========================================"
@@ -66,7 +84,11 @@ def spinAtGoal(player):
     if player.firstFrame():
         player.system.home.relX = 0
         player.system.home.relY = 0
-        player.system.home.relH = -90
+        # Decide which way to rotate based on the way we came from
+        if player.side == RIGHT:
+            player.system.home.relH = -90
+        else:
+            player.system.home.relH = 90
         player.brain.nav.goTo(player.system.home,
                               nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
 
@@ -76,6 +98,10 @@ def spinAtGoal(player):
     player.brain.tracker.lookToAngle(0.0)
 
     return Transition.getNextState(player, spinAtGoal)
+
+def decideSide(player):
+    player.side = LEFT
+    return player.goNow('walkToGoal')
 
 def standStill(player):
     if player.firstFrame():

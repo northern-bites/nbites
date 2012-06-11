@@ -34,7 +34,17 @@ BOOST_PYTHON_MODULE(goalie)
         .add_property("home", &GoalieSystem::home)
         ;
 
-    scope().attr("INITIAL_ANGLE") = INITIAL_ANGLE;
+    scope().attr("RIGHT_SIDE_ANGLE") = RIGHT_SIDE_ANGLE;
+    scope().attr("LEFT_SIDE_ANGLE") = LEFT_SIDE_ANGLE;
+    scope().attr("RIGHT_SIDE_RP_ANGLE") = RIGHT_SIDE_RP_ANGLE;
+    scope().attr("RIGHT_SIDE_LP_ANGLE") = RIGHT_SIDE_LP_ANGLE;
+    scope().attr("LEFT_SIDE_LP_ANGLE") = LEFT_SIDE_LP_ANGLE;
+    scope().attr("LEFT_SIDE_RP_ANGLE") = LEFT_SIDE_RP_ANGLE;
+    scope().attr("RIGHT_SIDE_RP_DISTANCE") = RIGHT_SIDE_RP_DISTANCE;
+    scope().attr("RIGHT_SIDE_LP_DISTANCE") = RIGHT_SIDE_LP_DISTANCE;
+    scope().attr("LEFT_SIDE_LP_DISTANCE") = LEFT_SIDE_LP_DISTANCE;
+    scope().attr("LEFT_SIDE_RP_DISTANCE") = LEFT_SIDE_RP_DISTANCE;
+
 }
 
 void c_init_goalie() {
