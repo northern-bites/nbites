@@ -75,7 +75,7 @@ def positionForKick(player):
 
     ballLoc = player.brain.ball.loc
     kick_pos = player.kick.getPosition()
-    positionForKick.kickPose = RelRobotLocation(ballLoc.relX - kick_pos[0] - 3,
+    positionForKick.kickPose = RelRobotLocation(ballLoc.relX - kick_pos[0],
                                                 ballLoc.relY - kick_pos[1],
                                                 0)
 
