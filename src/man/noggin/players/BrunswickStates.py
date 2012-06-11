@@ -57,8 +57,6 @@ def gameReady(player):
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePanFixedPitch()
         player.brain.sensors.startSavingFrames()
-        if player.lastDiffState == 'gameInitial':
-            player.initialDelayCounter = 0
 
     # Wait until the sensors are calibrated before moving.
     while (not player.brain.motion.calibrated()):
