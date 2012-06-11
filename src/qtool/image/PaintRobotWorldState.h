@@ -32,7 +32,12 @@ public:
 protected:
     void draw(QPainter& painter,
               const proto::PVision::PVisualDetection& visualDetection,
+              const proto::Pose& fromPose,
               QColor color);
+    void draw(QPainter& painter,
+            const proto::Pose& pose,
+            const proto::PoseArea& poseArea,
+            QColor color);
     virtual void buildBitmap();
 
 protected:

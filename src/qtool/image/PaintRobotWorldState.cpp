@@ -6,6 +6,7 @@ namespace image {
 
 using namespace data;
 using namespace memory;
+using namespace proto;
 
 PaintRobotWorldState::PaintRobotWorldState(memory::MVision::const_ptr mVision,
                                            memory::MLocalization::const_ptr mLoc,
@@ -15,7 +16,8 @@ PaintRobotWorldState::PaintRobotWorldState(memory::MVision::const_ptr mVision,
 }
 
 void PaintRobotWorldState::draw(QPainter& painter,
-                            const proto::PVision::PVisualDetection& visualDetection,
+                            const PVision::PVisualDetection& visualDetection,
+                            const Pose& startPose,
                             QColor color) {
 
     float distance = visualDetection.distance();
@@ -23,11 +25,27 @@ void PaintRobotWorldState::draw(QPainter& painter,
 
     if (distance == 0.0f) return ;
 
-    float relX = distance * cos(bearing + mLoc->get()->h_est());
-    float relY = distance * sin(bearing + mLoc->get()->h_est());
+    float relX = distance * cos(bearing + startPose.h());
+    float relY = distance * sin(bearing + startPose.h());
 
-    QPoint point(relX + mLoc->get()->x_est(), relY + mLoc->get()->y_est());
+    QPoint point(relX + startPose.x(), relY + startPose.y());
     this->paintDot(painter, color, point, 5);
+}
+
+void PaintRobotWorldState::draw(QPainter& painter, const Pose& pose,
+                                const PoseArea& poseArea, QColor color) {
+
+    QPoint poseLoc = QPoint(pose.x(), pose.y());
+    this->paintDot(painter, color, poseLoc);
+    this->paintPolarLine(painter, color, 3, poseLoc, 20, pose.h() * TO_DEG);
+
+    //pose area
+    this->paintEllipseArea(painter, color, poseLoc, poseArea.x_size(), poseArea.y_size());
+    this->paintPolarLine(painter, color, 2, poseLoc, 15,
+                         (pose.h() + poseArea.h_size()/2) * TO_DEG);
+    this->paintPolarLine(painter, color, 2, poseLoc, 15,
+                         (pose.h() - poseArea.h_size()/2) * TO_DEG);
+
 }
 
 void PaintRobotWorldState::buildBitmap()
@@ -37,16 +55,17 @@ void PaintRobotWorldState::buildBitmap()
 
     this->transformPainterToFieldCoordinates(painter);
 
-    QPoint robotLoc = QPoint(mLoc->get()->x_est(), mLoc->get()->y_est());
+    this->draw(painter, mLoc->get()->pose(), mLoc->get()->uncertainty(), QColor("Blue"));
 
-    this->paintDot(painter, QColor("Blue"), robotLoc);
-    this->paintPolarLine(painter, QColor("blue"), 3, robotLoc, 20, mLoc->get()->h_est() * TO_DEG);
+    this->draw(painter, mVision->get()->visual_ball().visual_detection(),
+               mLoc->get()->pose(), QColor("Orange"));
+    this->draw(painter, mVision->get()->yglp().visual_detection(),
+               mLoc->get()->pose(), QColor("Yellow"));
+    this->draw(painter, mVision->get()->ygrp().visual_detection(),
+               mLoc->get()->pose(), QColor("Yellow"));
 
-    this->draw(painter, mVision->get()->visual_ball().visual_detection(), QColor("Orange"));
-    this->draw(painter, mVision->get()->yglp().visual_detection(), QColor("Yellow"));
-    this->draw(painter, mVision->get()->ygrp().visual_detection(), QColor("Yellow"));
-
-    this->draw(painter, mVision->get()->visual_cross().visual_detection(), QColor("White"));
+    this->draw(painter, mVision->get()->visual_cross().visual_detection(),
+               mLoc->get()->pose(), QColor("White"));
 }
 
 }

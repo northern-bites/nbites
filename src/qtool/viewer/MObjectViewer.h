@@ -28,8 +28,8 @@ class MObjectViewer : public QTreeView {
 
     Q_OBJECT
 public:
-    MObjectViewer(boost::shared_ptr<const man::memory::ProtoMessage> messageViewed,
-                QWidget* parent = 0);
+    MObjectViewer(common::io::ProtobufMessage::const_ptr protoMessage,
+                  QWidget* parent = 0);
     virtual ~MObjectViewer();
 
 public slots:
@@ -43,7 +43,7 @@ private:
     void createNewTreeModel();
 
 private:
-    boost::shared_ptr<const man::memory::ProtoMessage> messageViewed;
+    common::io::ProtobufMessage::const_ptr messageViewed;
     data::treemodel::TreeModel* treeModel;
     bool shouldRedraw;
 

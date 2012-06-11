@@ -9,10 +9,10 @@ namespace qtool {
 namespace viewer {
 
 using namespace data::treemodel;
-using boost::shared_ptr;
 using namespace man::memory;
+using namespace common::io;
 
-MObjectViewer::MObjectViewer(shared_ptr<const ProtoMessage> messageViewed, QWidget* parent) :
+MObjectViewer::MObjectViewer(ProtobufMessage::const_ptr messageViewed, QWidget* parent) :
         QTreeView(parent), messageViewed(messageViewed) {
     this->createNewTreeModel();
 }
@@ -23,7 +23,7 @@ MObjectViewer::~MObjectViewer() {
 
 void MObjectViewer::createNewTreeModel() {
     ProtoNode* root = new ProtoNode(NULL, NULL,
-                                    messageViewed.get());
+                                    messageViewed->getProtoMessage());
     treeModel = new TreeModel(root);
     this->setModel(treeModel);
 }
