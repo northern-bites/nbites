@@ -10,10 +10,8 @@ PaintFieldOverlay::PaintFieldOverlay(float scale, QObject* parent)
 }
 
 void PaintFieldOverlay::transformPainterToFieldCoordinates(QPainter& painter) {
-    // invert the field so the left top corner (image origin) is not the bottom left
-    // corner (field origin)
-    painter.translate(0, FIELD_HEIGHT*scale);
-    painter.scale(scale, -scale);
+    // inversion is now done by subtracting all y-coords from the bitmap height
+    painter.scale(scale, scale);
 }
 
 void PaintFieldOverlay::paintDot(QPainter& painter, QColor color, QPoint point, int size) {
@@ -35,7 +33,8 @@ void PaintFieldOverlay::paintPolarLine(QPainter& painter, QColor color, int widt
                                        QPoint start, int distance, angle::degrees theta) {
 
     angle::radians theta_rad = theta * TO_RAD;
-    QPoint cartesian_vector = QPoint(distance * cos(theta_rad), distance * sin(theta_rad));
+    QPoint cartesian_vector = QPoint(distance * cos(theta_rad), distance * -sin(theta_rad));
+	//the - sin is to get the switched y-coords right
 
     QPen pen;
     pen.setWidth(width);
