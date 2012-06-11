@@ -25,7 +25,6 @@ NaoLights::NaoLights(boost::shared_ptr<AL::ALBroker> broker)
     pthread_mutex_init(&lights_mutex,NULL);
 }
 
-
 NaoLights::~NaoLights(){
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         delete ledList[i];
@@ -33,9 +32,30 @@ NaoLights::~NaoLights(){
     pthread_mutex_destroy(&lights_mutex);
 }
 
+/**
+ * This method generates all the NaoRGBLed objects for each LED group
+ */
+void NaoLights::generateLeds(){
+    for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
+        ledList.push_back(new NaoRGBLight(LED_NAMES[i],
+                                          i,
+                                          ALNames::NUM_RGB_LEDS[i],
+                                          ALNames::LED_START_COLOR[i],
+                                          ALNames::LED_END_COLOR[i]));
+
+        try {
+            AL::ALValue newAlias = *ledList[i]->getAlias();
+            dcmProxy->createAlias(newAlias);
+        } catch (AL::ALError &e){
+            std::cout << "dcm error in generateLeds"
+                      << e.toString() << std::endl;
+        }
+    }
+}
+
 void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
     pthread_mutex_lock(&lights_mutex);
-    //Slow, but there are only 7 leds, so it shouldn't be too bad...
+    //Slow, but there are only 31 leds, so it shouldn't be too bad...
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         if(LED_NAMES[i].compare(led_id) == 0){
             hexList[i] = newRgbHex;
@@ -69,27 +89,6 @@ void NaoLights::sendLights(){
 #ifdef DEBUG_NAOLIGHTS_INIT
     // std::cout << "  NaoLights::sendLights() end" << std::endl;
 #endif
-}
-
-/**
- * This method generates all the NaoRGBLed objects for each LED group
- */
-void NaoLights::generateLeds(){
-    for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
-        ledList.push_back(new NaoRGBLight(LED_NAMES[i],
-                                          i,
-                                          ALNames::NUM_RGB_LEDS[i],
-                                          ALNames::LED_START_COLOR[i],
-                                          ALNames::LED_END_COLOR[i]));
-
-        try {
-            AL::ALValue newAlias = *ledList[i]->getAlias();
-            dcmProxy->createAlias(newAlias);
-        } catch (AL::ALError &e){
-            std::cout << "dcm error in generateLeds"
-                      << e.toString() << std::endl;
-        }
-    }
 }
 
 void NaoLights::sendLightCommand(AL::ALValue & command){

@@ -58,11 +58,12 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     this->setCentralWidget(central);
 
-    memoryManager->connectSlot(bottomImageViewer,
-            SLOT(updateView()), "MRawImages");
+    //TODO: we call updateView twice per vision frame
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 
-    memoryManager->connectSlot(topImageViewer,
-                        SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MVision");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MVision");
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -76,7 +77,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
         if (iterator->first != "MRawImages" && iterator->first != "GroundTruth") {
 
             QDockWidget* dockWidget = new QDockWidget(QString(iterator->first.c_str()), this);
-            MObjectViewer* view = new MObjectViewer(iterator->second->getProtoMessage());
+            MObjectViewer* view = new MObjectViewer(iterator->second, dockWidget);
             dockWidget->setWidget(view);
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
             memoryManager->connectSlot(view, SLOT(updateView()), iterator->first);

@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <QHBoxLayout>
+#include <QtNetwork/QAbstractSocket>
+#include <QLineEdit>
 
 #include "memory/MemoryCommon.h"
 #include "CommDef.h"
@@ -17,7 +19,18 @@ using namespace data;
 RemoteDataFinder::RemoteDataFinder(DataManager::ptr dataManager, QWidget* parent) :
     DataFinder(parent), dataManager(dataManager) {
 
-    QLayout* layout = new QVBoxLayout;
+    QVBoxLayout* layout = new QVBoxLayout(this);
+	QLayout* textBoxLayout = new QHBoxLayout();
+
+	textBox = new QLineEdit(this);
+	textBox->setText("Enter dotted IPv4 address");
+	textBoxLayout -> addWidget(textBox);
+
+	QPushButton* button = new QPushButton("Connect", this);
+	textBoxLayout->addWidget(button);
+	connect(button, SIGNAL(clicked()), this, SLOT(manualConnect()));
+
+	layout->addLayout(textBoxLayout);
 
     layout->addWidget(&robotSelect);
     connect(&robotSelect, SIGNAL(robotSelected(const RemoteRobot*)),
@@ -57,6 +70,20 @@ void RemoteDataFinder::robotSelected(const RemoteRobot* remoteRobot) {
             emit signalNewInputProvider(socket_in, (*it)->text().toStdString());
         }
     }
+}
+
+void RemoteDataFinder::manualConnect() {
+	QString addrStr = textBox->text();
+	QHostAddress addr(addrStr);
+
+	if (QAbstractSocket::IPv4Protocol != addr.protocol())
+	{
+		textBox->setText("Invalid IP");
+		return;
+	}
+
+	RemoteRobot robot(addr, addrStr.toStdString());
+	robotSelected(&robot);
 }
 
 }
