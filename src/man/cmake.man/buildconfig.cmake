@@ -52,7 +52,7 @@ ENDIF()
 IF( BUILDING_FOR_A_REMOTE_NAO )
   OPTION( USE_ALSPEECH
     "turn Aldebaran speech on for debugging"
-    ON
+    OFF
     )
 ELSE()
   OPTION( USE_ALSPEECH
