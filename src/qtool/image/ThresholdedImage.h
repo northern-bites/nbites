@@ -10,7 +10,6 @@
 
 #include <boost/shared_ptr.hpp>
 #include "BMPImage.h"
-#include "data/DataTypes.h"
 #include "memory/MObjects.h"
 #include "Color.h"
 

@@ -25,7 +25,7 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 
     //field image painted via overlay of robots, field
     fieldImage = new PaintField(this, scaleFactor);
-    bot_locs = new PaintBots(this, scaleFactor);
+    bot_locs = new PaintBots(scaleFactor, this);
 
     overlayImage = new OverlayedImage(fieldImage, bot_locs, this);
     fieldView = new BMPImageViewer(overlayImage, this);

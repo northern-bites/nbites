@@ -54,7 +54,12 @@ public:
     void waitForReadToFinish() const {
 
         const struct aiocb* cblist[] = { &control_block };
-        int result = aio_suspend(cblist, 1, NULL);
+
+        struct timespec timeout;
+        timeout.tv_nsec = 0;
+        timeout.tv_sec = 5;
+
+        int result = aio_suspend(cblist, 1, &timeout);
 
         if (result != 0) {
             throw_errno(errno);
