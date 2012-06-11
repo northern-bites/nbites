@@ -20,8 +20,8 @@ def gamePlaying(player):
     while (not player.brain.motion.calibrated()):
         return player.stay()
 
-    # chase ball states, kicking states?
-    return player.stay()
+    # enter chaseBallStates
+    return player.goLater('chase')
 
 def gamePenalized(player):
     if player.firstFrame():

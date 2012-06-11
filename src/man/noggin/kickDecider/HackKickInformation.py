@@ -141,7 +141,7 @@ class KickInformation:
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # TODO: make sure this uses orbits
-        if self.brain.my.getLocScore() == nogginConstants.GOOD_LOC:
+        if False: #self.brain.my.getLocScore() == nogginConstants.GOOD_LOC:
             relLocationBallToGoal = ball.loc.relativeLocationOf(Location(670,270))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
