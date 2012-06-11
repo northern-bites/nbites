@@ -20,11 +20,10 @@ using namespace image;
 OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
         QWidget(parent),
         dataManager(dataManager),
-        groundTruth(dataManager->getGroundTruth()),
+        groundTruth(dataManager->getMemory()->get<GroundTruth>()),
         connectButton(new QPushButton("Connect", this)){
 
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-                this, SLOT(newGroundTruth()));
+    dataManager->connectSlot(this, SLOT(newGroundTruth()), "GroundTruth");
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
 
@@ -33,18 +32,16 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     PaintGroundTruth* groundImage = new PaintGroundTruth(groundTruth, this);
     OverlayedImage* combinedImage = new OverlayedImage(fieldImage, groundImage, this);
     viewer::BMPImageViewer* fieldView = new BMPImageViewer(combinedImage, this);
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-            fieldView, SLOT(updateView()));
+    dataManager->connectSlot(fieldView, SLOT(updateView()), "GroundTruth");
     mainLayout->addWidget(fieldView);
 
     QVBoxLayout* rightLayout = new QVBoxLayout();
     rightLayout->addWidget(connectButton);
     connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToOverseer()));
 
-    MObjectViewer* groundTruthView = new MObjectViewer(groundTruth->getProtoMessage(), this);
+    MObjectViewer* groundTruthView = new MObjectViewer(groundTruth, this);
     rightLayout->addWidget(groundTruthView);
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-            groundTruthView, SLOT(updateView()));
+    dataManager->connectSlot(groundTruthView, SLOT(updateView()), "GroundTruth");
 
     QLabel* fpsTagLabel = new QLabel("FPS:", this);
     fpsLabel = new QLabel(this);
@@ -91,7 +88,7 @@ void OverseerClient::connectToOverseer() {
 
     SocketInProvider::ptr socket_in(new SocketInProvider(
             host_info.addresses().first().toIPv4Address(), OVERSEER_PORT));
-    dataManager->newGroundTruthProvider(socket_in);
+    dataManager->newInputProvider(socket_in, "GroundTruth");
 }
 
 }

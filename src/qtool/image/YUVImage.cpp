@@ -1,11 +1,11 @@
 #include "YUVImage.h"
 
 using namespace std;
+using namespace man::memory;
+using namespace man::corpus;
 
-using man::memory::MImage;
-
-YUVImage::YUVImage(MImage::const_ptr rawImage) :
-		rawImage(rawImage), width(0), height(0),
+YUVImage::YUVImage(MRawImages::const_ptr rawImages, Camera::Type which) :
+		rawImages(rawImages), which(which), width(0), height(0),
 		yImg(NULL), uImg(NULL), vImg(NULL) {
 
 	updateFromRawImage();
@@ -16,8 +16,8 @@ YUVImage::~YUVImage() {
 }
 
 bool YUVImage::rawImageDimensionsEnlarged() {
-    return this->height < rawImage->get()->height() ||
-           this->width < rawImage->get()->width();
+    return this->height < rawImages->getPImage(which)->height() ||
+           this->width < rawImages->getPImage(which)->width();
 }
 
 void YUVImage::allocateYUVArrays(unsigned width, unsigned height) {
@@ -45,8 +45,8 @@ void YUVImage::deallocateYUVArrays() {
 }
 
 void YUVImage::resizeYUVArraysToFitRawImage() {
-    resizeYUVArrays(rawImage->get()->width(),
-                    rawImage->get()->height());
+    resizeYUVArrays(rawImages->getPImage(which)->width(),
+                    rawImages->getPImage(which)->height());
 }
 
 void YUVImage::resizeYUVArrays(unsigned width, unsigned height) {
@@ -58,7 +58,7 @@ void YUVImage::resizeYUVArrays(unsigned width, unsigned height) {
 
 void YUVImage::updateFromRawImage() {
 	const byte* data =
-	        reinterpret_cast<const byte*>(rawImage->get()->image().data());
+	        reinterpret_cast<const byte*>(rawImages->getPImage(which)->image().data());
 
 	if (rawImageDimensionsEnlarged()) {
 	    resizeYUVArraysToFitRawImage();

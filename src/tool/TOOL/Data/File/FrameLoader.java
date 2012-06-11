@@ -31,7 +31,6 @@ public class FrameLoader implements FileFilter {
             FileInputStream fis = new FileInputStream(path);
             DataInputStream input = new DataInputStream(fis);
             byte[] header;
-            byte[] image;
             byte[] footer;
 
             // This is the latest frame format.

@@ -24,6 +24,8 @@ set( Image_srcs
     FastYUVToBMPImage
     PaintField
     PaintBots
+    PaintFieldObjects
+    PaintRobotWorldState
     )
 
 set( Image_headers 
@@ -31,7 +33,9 @@ set( Image_headers
   FastYUVToBMPImage.h
   PaintField.h
   PaintBots.h
-  PaintGroundTruth.h)
+  PaintGroundTruth.h
+  PaintFieldObjects.h
+  PaintRobotWorldState.h)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -52,7 +56,6 @@ target_link_libraries(
   image
   viewer
   overseer_client
-  noggin
   ${QT_LIBRARIES}
   ${SWSCALE_LIBRARY}
   ${AVUTIL_LIBRARY}
