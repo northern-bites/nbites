@@ -14,12 +14,14 @@
 #include <QObject>
 
 #include "io/InProvider.h"
+#include "ClassHelper.h"
+
+#include "RobotMemoryManager.h"
+
+#include "Typedefs.h"
 
 #include "man/memory/parse/ParsingBoard.h"
 #include "man/memory/log/LoggingBoard.h"
-#include "DataTypes.h"
-#include "ClassHelper.h"
-#include "RobotMemoryManager.h"
 #include "overseer/GroundTruth.h"
 
 namespace qtool {

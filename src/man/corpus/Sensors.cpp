@@ -403,6 +403,13 @@ void Sensors::setBodyAngles(float* jointVPointers[]) {
      }
      cout << endl;
      */
+
+    bodyAngleHistory.push_back(bodyAngles);
+
+    if (bodyAngleHistory.size() > 10) {
+        bodyAngleHistory.pop_front();
+    }
+
     angles_mutex.unlock();
 }
 
@@ -632,11 +639,19 @@ void Sensors::releaseImage() const {
  * think anyone else requires both mutexes locked at the same time. Beware
  * nonetheless.
  */
-void Sensors::updateVisionAngles() {
+void Sensors::updateVisionAngles(int historyIndex) {
     angles_mutex.lock();
     vision_angles_mutex.lock();
 
-    visionBodyAngles = bodyAngles;
+    int i = 0;
+
+    AngleHistory::reverse_iterator it =  bodyAngleHistory.rbegin();
+
+    //look back in history historyIndex number of joint sets
+    while (it != bodyAngleHistory.rend() && i != historyIndex) {
+        it++; i++;
+    }
+    visionBodyAngles = *it;
 
     vision_angles_mutex.unlock();
     angles_mutex.unlock();

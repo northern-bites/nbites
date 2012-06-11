@@ -1,0 +1,17 @@
+import "Common.proto";
+
+package man.memory.proto;
+
+message Ball { 
+
+	optional int64 timestamp = 1;
+	
+	optional Vector2D location = 2; 
+	optional Vector2D loc_uncertainty = 3;
+
+	optional Vector2D velocity  = 4; 
+	optional Vector2D vel_uncertainty = 5;
+	
+	optional Vector2D acceleration = 6;
+	optional Vector2D acc_uncertainty = 7;
+}
