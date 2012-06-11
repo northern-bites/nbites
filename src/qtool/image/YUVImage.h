@@ -25,13 +25,13 @@
 
 #include "man/corpus/Camera.h"
 
-#include "data/DataTypes.h"
+#include "data/Typedefs.h"
 
 class YUVImage
 {
 
 public:
-    YUVImage(qtool::data::RoboImages::const_ptr rawImages,
+    YUVImage(qtool::memory::MRawImages::const_ptr rawImages,
              man::corpus::Camera::Type which);
     virtual ~YUVImage();
     virtual void updateFromRawImage();
@@ -74,7 +74,7 @@ private:
 
 
 protected:
-    qtool::data::RoboImages::const_ptr rawImages;
+    qtool::memory::MRawImages::const_ptr rawImages;
     man::corpus::Camera::Type which;
 
     unsigned int width;

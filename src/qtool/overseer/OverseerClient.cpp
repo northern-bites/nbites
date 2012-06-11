@@ -39,7 +39,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     rightLayout->addWidget(connectButton);
     connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToOverseer()));
 
-    MObjectViewer* groundTruthView = new MObjectViewer(groundTruth->getProtoMessage(), this);
+    MObjectViewer* groundTruthView = new MObjectViewer(groundTruth, this);
     rightLayout->addWidget(groundTruthView);
     dataManager->connectSlot(groundTruthView, SLOT(updateView()), "GroundTruth");
 

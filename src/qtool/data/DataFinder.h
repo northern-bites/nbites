@@ -13,7 +13,6 @@
 #include <QWidget>
 
 #include "io/InProvider.h"
-#include "DataTypes.h"
 
 namespace qtool {
 namespace data {

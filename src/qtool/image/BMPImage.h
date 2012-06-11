@@ -23,8 +23,8 @@ public:
     BMPImage(QObject* parent = 0) : QObject(parent) {}
     virtual ~BMPImage() {}
 
-    const QPixmap* getBitmap() const { return &bitmap; }
-    QPixmap* getBitmap() { return &bitmap; }
+    const QImage* getBitmap() const { return &bitmap; }
+    QImage* getBitmap() { return &bitmap; }
 
     virtual unsigned getWidth() const = 0;
     virtual unsigned getHeight() const = 0;
@@ -44,7 +44,7 @@ protected:
     virtual void buildBitmap() = 0;
 
 protected:
-    QPixmap bitmap;
+    QImage bitmap;
 
 };
 
@@ -81,19 +81,19 @@ protected:
         baseImage->updateBitmap();
 
         if (bitmap.height() < getHeight() || bitmap.width() < getWidth()) {
-            bitmap = QPixmap(getWidth(), getHeight());
+            bitmap = QImage(getWidth(), getHeight(), QImage::Format_ARGB32_Premultiplied);
         }
 
         QPainter painter(&bitmap);
-        painter.drawPixmap(0, 0, *(baseImage->getBitmap()));
+        painter.drawImage(0, 0, *(baseImage->getBitmap()));
 
         if (overlayedImage) {
             overlayedImage->updateBitmap();
             if (!baseImage->getBitmap()->rect().isEmpty()) {
-                painter.drawPixmap(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
+                painter.drawImage(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
             } else {
                 painter.fillRect(overlayedImage->getBitmap()->rect(), Qt::gray);
-                painter.drawPixmap(0, 0, *(overlayedImage->getBitmap()));
+                painter.drawImage(0, 0, *(overlayedImage->getBitmap()));
             }
         }
     }
