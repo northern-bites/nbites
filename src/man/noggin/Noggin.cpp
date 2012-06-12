@@ -353,6 +353,7 @@ void Noggin::updateLocalization()
     }
 
     // Observe Corners.
+    float phi;
     const list<VisualCorner> * corners = vision->fieldLines->getCorners();
     list <VisualCorner>::const_iterator ci;
     for(ci = corners->begin(); ci != corners->end(); ++ci)
@@ -362,7 +363,9 @@ void Noggin::updateLocalization()
         landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
         dist = ci->getDistance();
         theta = ci->getBearing();
-        observations.push_back(PF::Observation(landmarks, dist, theta));
+        phi = ci->getPhysicalOrientation();
+        observations.push_back(PF::CornerObservation(landmarks, dist,
+                                                     theta, phi));
         }
         else{
             std::cout << "We saw a corner REALLY far away: "

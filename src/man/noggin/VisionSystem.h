@@ -76,13 +76,12 @@ static std::vector<Landmark> constructLandmarks(const VisualT & fieldObject)
  */
 namespace PF
 {
-    struct Observation
-    {
-    Observation(std::vector<Landmark> p, float dist = 0.0f, float theta = 0.0f)
-        : possibilities(p), distance(dist), angle(theta)
-    { }
+template <class VisualObservationT, class ConcretePossibilityT>
+class Observation
+{
 
-    bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
+    Observation(const VisualObservationT& visualObservation)
+        : visualObservation(visualObservation) { }
 
     friend std::ostream& operator<<(std::ostream& out, Observation o)
     {
@@ -99,9 +98,43 @@ namespace PF
         return out;
     }
 
+protected:
+    VisualObservationT& visualObservation;
+    };
+
+    struct CornerObservation : Observation
+    {
+         CornerObservation(std::vector<Landmark> p, float dist = 0.0f,
+                           float theta = 0.0f, float phi = 0.0f)
+             : Observation(p,dist,theta)
+    {
+        orientation = phi;
+    }
+
+    bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
+
+    bool isCorner() const { return true; }
+
+    friend std::ostream& operator<<(std::ostream& out, CornerObservation o)
+    {
+        out << "Observed corner landmark at distance " << o.distance
+            << " and angle " << o.angle << "\n"
+            << " with physical orientation " << o.orientation << "\n"
+            << "Possibilities: \n";
+        std::vector<Landmark>::iterator lIter;
+        for(lIter = o.possibilities.begin(); lIter != o.possibilities.end();
+            lIter++)
+        {
+            out << *lIter;
+        }
+
+        return out;
+    }
+
         std::vector<Landmark> possibilities;
         float distance;
         float angle;
+        float orientation;
     };
 }
 

@@ -54,19 +54,14 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
             {
                 // Since the observation is unambiguous,
                 // there is only one possibility.
+                if(!o.isCorner())
+                {
                 Landmark l = o.possibilities[0];
-//                std::cout << "We see the unambiguos Landmark: " << l << "\n";
                 PF::Vector2D hypothesisVector = PF::getPosition(
                                            (*partIter).getLocation(), l.x, l.y);
-//                std::cout << "Landmark Rel Location: " << o.distance
-//                          << " , " << o.angle << "\n \n";
-//                std::cout << "Hypothesis vector: " << hypothesisVector << "\n";
                 float distanceDiff = o.distance - hypothesisVector.magnitude;
-//                std::cout << "distanceDiff: " << distanceDiff << "\n";
                 float angleDiff = NBMath::subPIAngle(o.angle) -
                                  NBMath::subPIAngle(hypothesisVector.direction);
-//                std::cout << "angleDiff: " << angleDiff << "\n";
-
                 boost::math::normal_distribution<float> pDist(0.0f,
                                                        parameters.sigma_d);
 
@@ -88,6 +83,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                     totalWeight *= probability;
 
                 count++;
+                }
             }
             else
             {
