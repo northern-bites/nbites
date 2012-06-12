@@ -39,7 +39,6 @@ void BMPImageViewerListener::wheelEvent(QWheelEvent* event) {
     if (brushSize == 0) {
         brushSize = 1;
     }
-
     updateBrushCursor();
 }
 
