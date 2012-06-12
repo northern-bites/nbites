@@ -109,6 +109,14 @@ void EmptyQTool::keyPressEvent(QKeyEvent * event)
     case Qt::Key_P:
         prev();
         break;
+    case Qt::Key_H:
+    case Qt::Key_F:
+        skipAhead();
+        break;
+    case Qt::Key_L:
+    case Qt::Key_A:
+        skipAhead();
+        break;
     default:
         QWidget::keyPressEvent(event);
     }
