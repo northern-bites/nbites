@@ -140,14 +140,14 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     std::vector<QTreeView> messageViewers;
 
     QDockWidget* dockWidget = new QDockWidget("Offline Vision", this);
-    offlineVisionView = new MObjectViewer(offlineMVision->getProtoMessage(), this);
+    offlineVisionView = new MObjectViewer(offlineMVision, this);
 	dockWidget->setWidget(offlineVisionView);
 	connect(this, SIGNAL(imagesUpdated()), offlineVisionView, SLOT(updateView()));
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Image data", this);
     MObjectViewer* imageDataView = new MObjectViewer(
-            memoryManager->getMemory()->get<MRawImages>()->getProtoMessage(), this);
+            memoryManager->getMemory()->get<MRawImages>(), this);
     dockWidget->setWidget(imageDataView);
     memoryManager->connectSlot(imageDataView, SLOT(updateView()), "MRawImages");
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);

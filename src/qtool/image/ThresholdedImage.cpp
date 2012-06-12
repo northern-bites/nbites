@@ -3,8 +3,6 @@
 namespace qtool {
 namespace image {
 
-using namespace data;
-
 ThresholdedImage::ThresholdedImage(
         ImagePtr rawImage,
         QObject* parent, byte filter) :
@@ -17,18 +15,15 @@ bool ThresholdedImage::needToResizeBitmap() const {
 }
 
 void ThresholdedImage::buildBitmap() {
-//    if (this->needToResizeBitmap()) {
-//        bitmap = QImage(rawImage->width(),
-//                        rawImage->height(),
-//                        QImage::Format_RGB32);
-//    }
 
-    QImage qimage = QImage(rawImage->width(),
-                           rawImage->height(),
-                           QImage::Format_RGB32);
+    if (this->needToResizeBitmap()) {
+        bitmap = QImage(rawImage->width(),
+                        rawImage->height(),
+                        QImage::Format_RGB32);
+    }
 
     for (int j = 0; j < getHeight(); ++j) {
-        QRgb* bitmapLine = (QRgb*) qimage.scanLine(j);
+        QRgb* bitmapLine = (QRgb*) bitmap.scanLine(j);
         for (int i = 0; i < getWidth(); ++i) {
             int rawColor = rawImage->image()[j*rawImage->width() + i];
             int threshColor = 0, mix = 1;
@@ -43,8 +38,6 @@ void ThresholdedImage::buildBitmap() {
             bitmapLine[i] = threshColor;
         }
     }
-
-    bitmap = QPixmap::fromImage(qimage);
 }
 
 void ThresholdedImage::scaleBitmap_640_480() {

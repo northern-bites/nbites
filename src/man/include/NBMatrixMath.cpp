@@ -27,11 +27,12 @@ using namespace NBMath;
     const boost::numeric::ublas::vector<float>
     NBMath::solve(boost::numeric::ublas::matrix<float> A,
           const boost::numeric::ublas::vector<float> &b) {
+
         boost::numeric::ublas::permutation_matrix<float> P(A.size1());
         int singularRow = lu_factorize(A, P);
         if (singularRow != 0) {
             // TODO: This case needs to be dealt with
-            throw "the system had no solution";
+            std::cout << "the system had no solution!" << std::endl;
         }
         boost::numeric::ublas::vector<float> result(A.size2());
         result.assign(b);
@@ -46,7 +47,7 @@ using namespace NBMath;
         int singularRow = lu_factorize(A, P);
         if (singularRow != 0) {
             // TODO: This case needs to be dealt with
-            throw "the system had no solution";
+            std::cout << "the system had no solution!" << std::endl;
         }
         boost::numeric::ublas::matrix<float> result(A.size2(), B.size1());
         result.assign(B);

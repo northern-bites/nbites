@@ -22,6 +22,9 @@ def gameInitial(player):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
 
+    elif (not player.motion.isBodyActive()):
+        player.gainsOff()
+
     return player.stay()
 
 def gameReady(player):
@@ -32,11 +35,8 @@ def gameReady(player):
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
-    #HACK! TODO: this delay is to make sure the sensors get calibrated before
-    #we start walking; find a way to query motion to see whether the sensors are
-    #calibrated or not before starting
-    if player.initialDelayCounter < 230:
-        player.initialDelayCounter += 1
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
         return player.stay()
 
     return player.goLater('walkToGoal')
@@ -49,12 +49,20 @@ def gameSet(player):
         player.brain.loc.resetBall()
         player.brain.tracker.trackBallFixedPitch()
 
+    # Wait until the sensors are calibrated before moving.
+    if (not player.brain.motion.calibrated()):
+        return player.stay()
+
     return player.stay()
 
 def gamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
+
+    # Wait until the sensors are calibrated before moving.
+    if (not player.brain.motion.calibrated()):
+        return player.stay()
 
     if player.lastDiffState == 'gamePenalized':
         return player.goLater('decideSide')
@@ -66,6 +74,15 @@ def gamePlaying(player):
     return player.goLater('watch')
 
 def gamePenalized(player):
+    if player.lastDiffState == '':
+        # Just started up! Need to calibrate sensors
+        player.gainsOn()
+        player.brain.nav.stand()
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
     if player.firstFrame():
         player.brain.logger.stopLogging()
         player.inKickingState = False
@@ -79,17 +96,12 @@ def gameFinished(player):
     if player.firstFrame():
         player.stopWalking()
         player.zeroHeads()
-        player.GAME_FINISHED_satDown = False
-        return player.stay()
-
-    if (player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown
-        and not player.motion.isBodyActive()):
-        player.GAME_FINISHED_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
 
-    if not player.motion.isBodyActive() and player.GAME_FINISHED_satDown:
+    if player.brain.nav.isStopped():
         player.gainsOff()
+
     return player.stay()
 
 ##### EXTRA METHODS
