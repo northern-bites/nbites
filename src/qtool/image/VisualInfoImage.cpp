@@ -123,8 +123,19 @@ void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     int corner_y=cornerData.visual_detection().y();
     int corner_width=2*(cornerData.visual_detection().center_x()-corner_x);
     int corner_height= 2*(cornerData.visual_detection().center_y()-corner_y);
+	int corner_shape = cornerData.corner_type();
 
     painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
+	switch (corner_shape) {
+	case 1: painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	case 2: painter.setPen(QPen(Qt::blue, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	case 3: painter.setPen(QPen(Qt::green, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	case 4: painter.setPen(QPen(Qt::black, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	}
     painter.drawLine(2*corner_x-10, 2*corner_y-10, 2*corner_x+10, 2*corner_y+10);
     painter.drawLine(2*corner_x+10, 2*corner_y-10, 2*corner_x-10, 2*corner_y+10);
 
