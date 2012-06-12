@@ -154,6 +154,8 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int right_top_y = 2*postData.right_top_y();
     int right_bottom_x = 2*postData.right_bottom_x();
     int right_bottom_y = 2*postData.right_bottom_y();
+	int id = postData.visual_landmark().id();
+	int cert = postData.visual_landmark().id_certainty();
 
     QPoint points [4]= {
       QPoint (left_top_x, left_top_y),
@@ -162,7 +164,13 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_top_x, right_top_y)
     };
 
-    painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+	std::cout << "Id is " << id << " " << cert << std::endl;
+	painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+	if (id == 42) {
+		painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
+	} else if (cert == 2) {
+		painter.setPen(QPen(QColor(255,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+	}
     painter.setBrush(QBrush(QColor(255,255,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
 }
