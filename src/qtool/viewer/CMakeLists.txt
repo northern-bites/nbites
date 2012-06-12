@@ -9,7 +9,10 @@ cmake_minimum_required(VERSION 2.6.0)
 find_package(Qt4 REQUIRED)
 
 include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
+add_definitions(${QT_DEFINITIONS}) #-DR_HOME=/usr/lib/R)
+
+#find_library(R_LIBRARY R PATHS)
+#find_library(QWT_LIBRARY qwt PATHS)
 
 ########### Sources
 
@@ -22,6 +25,8 @@ set( viewer_srcs MemoryViewer.cpp
                  FieldViewer.cpp
                  EKFDataViewer.cpp
                  CollapsibleImageViewer.cpp
+		 		 BotLocs.cpp
+		 		 RobotField.cpp
                  )
 
 set( viewer_headers MemoryViewer.h
@@ -33,6 +38,8 @@ set( viewer_headers MemoryViewer.h
                     FieldViewer.h
                     EKFDataViewer.h
                     CollapsibleImageViewer.h
+		    		BotLocs.h
+		    		RobotField.h
                     )
 
 ########### Separate VisionViewer Sources
@@ -83,4 +90,7 @@ target_link_libraries(
   _sensors
   _robot_connect
   ${QT_LIBRARIES}
+  #${R_LIBRARY}
+  #${QWT_LIBRARY}
+
   )

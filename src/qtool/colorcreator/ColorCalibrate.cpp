@@ -4,6 +4,7 @@
 #include <QtDebug>
 
 #include <QFileDialog>
+#include <QCheckBox>
 
 namespace qtool {
 namespace colorcreator {
@@ -11,12 +12,13 @@ namespace colorcreator {
 using namespace qtool::data;
 using namespace qtool::image;
 using namespace man::corpus;
+using namespace man::memory;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager), imageTabs(new QTabWidget(this)),
-        topImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::TOP),
+        topImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::TOP,
                                  BMPYUVImage::RGB, this)),
-        bottomImage(new BMPYUVImage(dataManager->getMemory()->getMImage(Camera::BOTTOM),
+        bottomImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::BOTTOM,
                                     BMPYUVImage::RGB, this)),
         topChannelImage(topImage, this),
         bottomChannelImage(bottomImage, this),
@@ -35,18 +37,17 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         connect(&colorSpace[i], SIGNAL(parametersChanged()),
                 this, SLOT(updateThresholdedImage()));
     }
-
     leftLayout->addWidget(imageTabs);
 
     //update the threshold when the underlying image changes
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MTOPIMAGE_ID);
-    dataManager->connectSlotToMObject(this, SLOT(updateThresholdedImage()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
 
     imageTabs->addTab(&topChannelImage, "Top Image");
-    dataManager->connectSlotToMObject(&topChannelImage, SLOT(updateView()), MTOPIMAGE_ID);
+    dataManager->connectSlot(&topChannelImage, SLOT(updateView()), "MRawImages");
 
     imageTabs->addTab(&bottomChannelImage, "Bottom Image");
-    dataManager->connectSlotToMObject(&bottomChannelImage, SLOT(updateView()), MBOTTOMIMAGE_ID);
+    dataManager->connectSlot(&bottomChannelImage, SLOT(updateView()), "MRawImages");
 
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
@@ -79,16 +80,30 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     connect(&saveColorTableBtn, SIGNAL(clicked()),
             this, SLOT(saveColorTableBtnPushed()));
 
+    QCheckBox* fullColors = new QCheckBox(tr("All colors"));
+    rightLayout->addWidget(fullColors);
+    connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
+	displayAllColors = false;
+
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
     this->setLayout(mainLayout);
 }
 
+// flip between one and all colors
+	void ColorCalibrate::setFullColors(bool state) {
+		displayAllColors = !displayAllColors;
+		updateThresholdedImage();
+	}
+
 void ColorCalibrate::selectColorSpace(int index) {
     currentColorSpace = &colorSpace[index];
     colorWheel.setColorSpace(currentColorSpace);
     colorSpaceWidget.setColorSpace(currentColorSpace);
+	if (!displayAllColors) {
+		updateThresholdedImage();
+	}
 }
 
 // TODO: Ideally we'd want to have this in a separate class
@@ -132,7 +147,8 @@ void ColorCalibrate::updateThresholdedImage() {
             int count = 0;
             long long tempColor = 0;
             for (int c = 0; c < image::NUM_COLORS; c++) {
-                if (colorSpace[c].contains(color)) {
+                if (colorSpace[c].contains(color) &&
+					(displayAllColors || currentColorSpace == &colorSpace[c])) {
                     //blend colors in by averaging them
                     tempColor *= count;
                     tempColor += image::Color_RGB[c];
@@ -211,10 +227,13 @@ void ColorCalibrate::writeColorSpaces(QString filename) {
 void ColorCalibrate::imageTabSwitched(int) {
     if (imageTabs->currentWidget() == &topChannelImage) {
         currentImage = Camera::TOP;
-    } else {
-        currentImage = Camera::BOTTOM;
+        this->updateThresholdedImage();
     }
-    this->updateThresholdedImage();
+    if (imageTabs->currentWidget() == &bottomChannelImage) {
+        currentImage = Camera::BOTTOM;
+        this->updateThresholdedImage();
+    }
+
 }
 
 void ColorCalibrate::loadSlidersBtnPushed() {

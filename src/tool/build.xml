@@ -77,7 +77,7 @@
   </target>
 
   <!-- Clean up everything -->
-  <target name="clean.all">
+  <target name="clean">
     <delete dir="${build.dir}"/>
   </target>
 
@@ -95,7 +95,7 @@
   </target>
 
   <!-- Clean class files -->
-  <target name="clean"
+  <target name="clean.java"
       description="clean .class files" >
     <delete dir="${build.dir}/TOOL"/>
   </target>

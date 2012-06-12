@@ -52,6 +52,11 @@ public:
         float h = color.getH();
         float s = color.getS();
         float z = color.getZ();
+
+		// we sometimes get bad values of Z
+		if (z > 1.0f) {
+			z = 1.0f;
+		}
         if (params[hMin] > params[hMax]) {
             if (params[hMax] < h && h < params[hMin]) {
                 return false;

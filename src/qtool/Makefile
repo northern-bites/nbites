@@ -73,7 +73,7 @@ clean_soft:
 $(EXECUTABLE): build
 
 run: $(EXECUTABLE)
-	$(EXECUTABLE)
+	$(EXECUTABLE) # add R_HOME=/usr/lib/R to the beginning for R to work.
 
 connect: build_connect
 	    $(CONNECT_EXECUTABLE)

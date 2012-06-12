@@ -10,6 +10,7 @@
 
 #include <QPixmap>
 #include <QPainter>
+#include <QtDebug>
 #include "ClassHelper.h"
 
 namespace qtool {
@@ -22,13 +23,15 @@ public:
     BMPImage(QObject* parent = 0) : QObject(parent) {}
     virtual ~BMPImage() {}
 
-    const QPixmap* getBitmap() const { return &bitmap; }
-    QPixmap* getBitmap() { return &bitmap; }
+    const QImage* getBitmap() const { return &bitmap; }
+    QImage* getBitmap() { return &bitmap; }
 
     virtual unsigned getWidth() const = 0;
     virtual unsigned getHeight() const = 0;
 
 public slots:
+    //TODO: deprecate this, use buildBitmap instead (this wrapping is kind of dumb,
+    //and I think bitmapBuilt is unnecessary)
     void updateBitmap() {
         this->buildBitmap();
         emit bitmapBuilt();
@@ -41,11 +44,11 @@ protected:
     virtual void buildBitmap() = 0;
 
 protected:
-    QPixmap bitmap;
+    QImage bitmap;
 
 };
 
-//yo dawg I head you liked BMPImage so we merged two BMPImages in a class that
+//yo dawg I heard you liked BMPImage so we merged two BMPImages in a class that
 //inherits from BMPImage
 
 class OverlayedImage : public BMPImage {
@@ -54,15 +57,23 @@ class OverlayedImage : public BMPImage {
 public:
     OverlayedImage(BMPImage* baseImage,
                    BMPImage* overlayedImage,
-                   QObject* parent = 0) :
+                   QObject* parent = 0):
        BMPImage(parent),
        baseImage(baseImage),
        overlayedImage(overlayedImage) {
 
        }
 
-    virtual unsigned getWidth() const { return baseImage->getWidth(); }
-    virtual unsigned getHeight() const { return baseImage->getHeight(); }
+    virtual unsigned getWidth() const {
+		if(baseImage->getWidth() > overlayedImage->getWidth())
+			return baseImage->getWidth();
+		else return overlayedImage->getWidth();
+	}
+    virtual unsigned getHeight() const {
+		if(baseImage->getHeight() > overlayedImage->getHeight())
+			return baseImage->getHeight();
+		else return overlayedImage->getHeight();
+	}
 
 protected:
     virtual void buildBitmap() {
@@ -70,15 +81,20 @@ protected:
         baseImage->updateBitmap();
 
         if (bitmap.height() < getHeight() || bitmap.width() < getWidth()) {
-            bitmap = QPixmap(getWidth(), getHeight());
+            bitmap = QImage(getWidth(), getHeight(), QImage::Format_ARGB32_Premultiplied);
         }
 
         QPainter painter(&bitmap);
+        painter.drawImage(0, 0, *(baseImage->getBitmap()));
 
-        painter.drawPixmap(0, 0, *(baseImage->getBitmap()));
         if (overlayedImage) {
             overlayedImage->updateBitmap();
-            painter.drawPixmap(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
+            if (!baseImage->getBitmap()->rect().isEmpty()) {
+                painter.drawImage(baseImage->getBitmap()->rect(), *(overlayedImage->getBitmap()));
+            } else {
+                painter.fillRect(overlayedImage->getBitmap()->rect(), Qt::gray);
+                painter.drawImage(0, 0, *(overlayedImage->getBitmap()));
+            }
         }
     }
 

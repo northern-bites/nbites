@@ -50,9 +50,6 @@ public class VisionState {
     public final static byte POINT_HORIZONTAL_COLOR = Vision.YELLOW;
     public final static byte POINT_VERTICAL_COLOR = Vision.RED;
 
-    public final static byte UNUSED_POINT_HORIZONTAL_COLOR = Vision.NAVY;
-    public final static byte UNUSED_POINT_VERTICAL_COLOR = Vision.PINK;
-
     public final static byte CORNER_POINT_COLOR = Vision.ORANGE;
 
     public final static byte POSE_HORIZON_THICKNESS = 2;
@@ -75,7 +72,6 @@ public class VisionState {
     private Vector<VisualFieldObject> visualFieldObjects;
     private Vector<VisualLine> visualLines;
     private Vector<VisualLine> expectedVisualLines;
-    private Vector<LinePoint> unusedPoints;
     private Vector<VisualCorner> visualCorners;
     private Horizon poseHorizon;
     private int visionHorizon;
@@ -124,7 +120,6 @@ public class VisionState {
             visualLines = thresholdedImage.getVisionLink().getVisualLines();
             expectedVisualLines =
                 thresholdedImage.getVisionLink().getExpectedVisualLines();
-            unusedPoints = thresholdedImage.getVisionLink().getUnusedPoints();
             visualCorners = thresholdedImage.getVisionLink().getVisualCorners();
             poseHorizon = thresholdedImage.getVisionLink().getPoseHorizon();
             visionHorizon = thresholdedImage.getVisionLink().getVisionHorizon();
@@ -241,20 +236,6 @@ public class VisionState {
             }
         }
 
-        //set unused points
-        LinePoint unusedPoint;
-        byte color;
-        for (int i = 0; i < unusedPoints.size(); i++){
-            unusedPoint = unusedPoints.elementAt(i);
-            switch(unusedPoint.foundWithScan()) {
-            case LinePoint.HORIZONTAL : color = UNUSED_POINT_HORIZONTAL_COLOR; break;
-            case LinePoint.VERTICAL : color = UNUSED_POINT_VERTICAL_COLOR; break;
-            default : color = Vision.BLACK; //this should never happen
-            }
-            thresholdedOverlay.drawCross(unusedPoint.getX(), unusedPoint.getY(),
-                                         POINT_CROSS_SIZE, POINT_CROSS_THICKNESS,
-                                         color);
-        }
         //set corners
         VisualCorner corner;
         for (int i = 0; i < visualCorners.size(); i++) {
