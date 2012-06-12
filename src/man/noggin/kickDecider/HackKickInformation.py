@@ -40,7 +40,7 @@ class KickInformation:
 
         self.haveData = False
 
-        self.aimingAtNearGoal = False
+        self.aimAtOtherGoal = False
         self.kickObjective = None
         self.kick = None
         self.kickDest = None
@@ -170,7 +170,7 @@ class KickInformation:
 
             if bearingDifference < 45 and bearingDifference > -45:
                 #choose straight kick!
-                return self.chooseDynamicKick()
+                return self.chooseQuickFrontKick()
             elif bearingDifference > 45 and bearingDifference < 135:
                 #choose a right side kick! (using right foot)
                 return kicks.RIGHT_SIDE_KICK
@@ -190,19 +190,24 @@ class KickInformation:
             if self.dangerousBall():
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
-                self.aimingAtNearGoal = False
             else:
                 rightPostBearing = self.nearRightPostBearing
                 leftPostBearing = self.nearLeftPostBearing
-                self.aimingAtNearGoal = True
         elif self.farAvgPostDist != 0:
             rightPostBearing = self.farRightPostBearing
             leftPostBearing = self.farLeftPostBearing
-            self.aimingAtNearGoal = False
         elif self.nearAvgPostDist != 0:
-            rightPostBearing = self.nearRightPostBearing
-            leftPostBearing = self.nearLeftPostBearing
-            self.aimingAtNearGoal = True
+            if self.dangerousBall():
+                # Can only see our own goal: Orbit to block.
+                avgPostBearing = self.nearRightPostBearing + self.nearLeftPostBearing
+                if avgPostBearing > 0:
+                    # Orbit until blocking, not just 45 degrees. Then re-decide kick.
+                    return kickLoc() #orbit left
+                else:
+                    return kickLoc() #orbit right
+            else:
+                rightPostBearing = self.nearRightPostBearing
+                leftPostBearing = self.nearLeftPostBearing
         else:
             # Can't see any posts: orbit
             return self.kickLoc()
@@ -238,7 +243,7 @@ class KickInformation:
 
         # If any kick is currently valid, choose that kick.
         if leftScorePoint > 0 and rightScorePoint < 0:
-            return self.chooseDynamicKick()
+            return self.chooseQuickFrontKick()
         elif leftScorePoint > 90 and rightScorePoint < 90:
             return kicks.RIGHT_SIDE_KICK
         elif leftScorePoint > -90 and rightScorePoint < -90:
@@ -261,11 +266,11 @@ class KickInformation:
             if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
                 return kicks.RIGHT_SIDE_KICK
             else:
-                return self.chooseDynamicKick()
+                return self.chooseQuickFrontKick()
         elif rightScorePoint > -90:
             # Quadrent 4
             if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
-                return self.chooseDynamicKick()
+                return self.chooseQuickFrontKick()
             else:
                 return kicks.LEFT_SIDE_KICK
         else:
@@ -278,17 +283,15 @@ class KickInformation:
         # if none were seen
         return self.kickLoc()
 
-    def chooseShortKick(self):
-        ball = self.brain.ball
-        if ball.loc.relY > 0:
+    def chooseShortFrontKick(self):
+        if self.kickWithLeftFoot()
             return kicks.LEFT_SHORT_STRAIGHT_KICK
         return kicks.RIGHT_SHORT_STRAIGHT_KICK
 
-    def chooseDynamicKick(self):
-        ball = self.brain.ball
-        if ball.loc.relY > 0:
-            return kicks.LEFT_STRAIGHT_KICK
-        return kicks.RIGHT_STRAIGHT_KICK
+    def chooseQuickFrontKick(self):
+        if self.kickWithLeftFoot()
+            return kicks.LEFT_QUICK_STRAIGHT_KICK
+        return kicks.RIGHT_QUICK_STRAIGHT_KICK
 
     def kickLoc(self):
         """
@@ -300,7 +303,7 @@ class KickInformation:
 
         my = self.brain.my
         if (my.h <= 45. and my.h >= -45.):
-            return self.chooseDynamicKick()
+            return self.chooseQuickFrontKick()
         elif (my.h <= 135. and my.h > 45.):
             return kicks.LEFT_SIDE_KICK
         elif (my.h >= -135. and my.h < -45.):
@@ -320,12 +323,12 @@ class KickInformation:
         else:
             return kicks.RIGHT_SHORT_BACK_KICK
         """
-        if self.shouldFrontKickLeft():
+        if self.kickWithLeftFoot():
             return kicks.LEFT_SHORT_BACK_KICK
         else:
             return kicks.RIGHT_SHORT_BACK_KICK
 
-    def shouldFrontKickLeft(self):
+    def kickWithLeftFoot(self):
         """
         How we choose which kick to do when we're facing the ball. For now,
         simply pick the foot that's closer to the ball.
