@@ -1085,42 +1085,7 @@ estimate Threshold::chooseBestGoalEstimate(distanceCertainty cert, const estimat
     case BOTH_UNSURE:
         if (bottomReliableForPixEst) {
             return estFromPose;
-        } else {
-            //choose the one that is closest to the others
-            float dwh = fabs(estFromWidth.dist - estFromHeight.dist);
-            float dwp = fabs(estFromWidth.dist - estFromPose.dist);
-            float dph = fabs(estFromPose.dist - estFromHeight.dist);
-
-            float dwmin = min(dwh, min(dwp, dph));
-
-            if (dwmin == dph) {
-                if (estFromHeight.dist > 0.0f) {
-                    return estFromHeight;
-                }
-                if (estFromPose.dist > 0.0f) {
-                    return estFromPose;
-                }
-            }
-
-            if (dwmin == dwh) {
-                if (estFromHeight.dist > 0.0f) {
-                    return estFromHeight;
-                }
-                if (estFromWidth.dist > 0.0f) {
-                    return estFromWidth;
-                }
-            }
-
-            if (dwmin == dwp) {
-                if (estFromPose.dist > 0.0f) {
-                    return estFromPose;
-                }
-                if (estFromWidth.dist > 0.0f) {
-                    return estFromWidth;
-                }
-            }
         }
-        break ;
     }
     return NULL_ESTIMATE;
 }
