@@ -51,9 +51,8 @@ public slots:
         parsingBoard.rewindAll();
     }
 
-	void getSkipAhead(){
-		for(int i = 0; i < 10; i++)
-			parsingBoard.parseNextAll();
+	void getSkipAhead(){//skip ahead 10 frames
+		parsingBoard.parseNextAll(10);
 	}
 
 	void getSkipBack(){ //skip back 10 frames
