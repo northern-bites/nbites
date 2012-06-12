@@ -109,13 +109,35 @@ def spinAtGoal(player):
 
 def clearIt(player):
     if player.firstFrame():
-        player.brain.nav.goTo(RelRobotLocation(player.brain.ball.loc.relX,
-                                               player.brain.ball.loc.relY,
-                                               0.0))
-        player.system.home.relX = -player.brain.ball.loc.relX
-        player.system.home.relY = -player.brain.ball.loc.relY
+        clearIt.ballDest = RelRobotLocation(player.brain.ball.loc.relX-15.0,
+                                            player.brain.ball.loc.relY,
+                                            0.0)
+        player.brain.nav.goTo(clearIt.ballDest,
+                              nav.CLOSE_ENOUGH,
+                              nav.CAREFUL_SPEED)
 
+    clearIt.ballDest.relX = player.brain.ball.loc.relX - 15.0
+    clearIt.ballDest.relY = player.brain.ball.loc.relY
+
+    return Transition.getNextState(player, clearIt)
+
+def standStill(player):
+    if player.firstFrame():
+        player.brain.nav.stop()
     return player.stay()
+
+def spinToFaceBall(player):
+    if player.firstFrame():
+        facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+        # Decide which way to rotate based on the way we came from
+        if player.brain.ball.loc.bearing < 0.0:
+            facingDest.relH = -90
+        else:
+            facingDest.relH = 90
+        player.brain.nav.goTo(facingDest,
+                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
+
+    return Transition.getNextState(player, spinToFaceBall)
 
 def decideSide(player):
     if player.firstFrame():

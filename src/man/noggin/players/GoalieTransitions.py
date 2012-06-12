@@ -28,6 +28,11 @@ def facingForward(player):
     return (fabs(player.brain.vision.cross.bearing) < 10.0 and
             player.brain.vision.cross.on)
 
+def facingBall(player):
+    #magic numbers
+    return (fabs(player.brain.ball.vis.bearing) < 10.0 and
+            player.brain.ball.vis.on)
+
 def onLeftSideline(player):
     for corner in player.brain.vision.fieldLines.corners:
         if ( (IDs.CENTER_TOP_T in corner.possibilities) or
@@ -44,9 +49,8 @@ def onRightSideline(player):
 
 def shouldPerformSave(player):
     # Same as Dani's
-    return False
-    # return (player.brain.ball.vis.heat <= goalCon.HEAT_LOW and
-    #         player.brain.ball.loc.relVelX < goalCon.VEL_HIGH)
+    return (player.brain.ball.vis.heat <= goalCon.HEAT_LOW and
+            player.brain.ball.loc.relVelX < goalCon.VEL_HIGH)
 
 def shouldClearBall(player):
     # ball must be visible
@@ -63,6 +67,9 @@ def shouldClearBall(player):
         return True
 
     return False
+
+def reachedTheBall(player):
+    return player.brain.nav.isAtPosition()
 
 # ******************
 # SAVING TRANSITIONS

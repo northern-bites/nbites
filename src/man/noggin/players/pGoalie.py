@@ -63,6 +63,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.clearIt
             }
 
+        VisualGoalieStates.spinToFaceBall.transitions = {
+            Transition.CountTransition(GoalieTransitions.facingBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.clearIt
+            }
+
+        VisualGoalieStates.clearIt.transitions = {
+            Transition.CountTransition(GoalieTransitions.reachedTheBall,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : GoalieStates.kickBall
+            }
+
     def run(self):
         gcState = self.brain.gameController.currentState
 
