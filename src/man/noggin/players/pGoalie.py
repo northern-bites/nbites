@@ -20,13 +20,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         VisualGoalieStates.walkToGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.atGoalArea,
-                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal,
-
-            Transition.CountTransition(GoalieTransitions.veryCloseToPost,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
             : VisualGoalieStates.spinAtGoal
             }
 
@@ -100,7 +95,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.watch
+            : VisualGoalieStates.spinAtGoal
             }
 
     def run(self):

@@ -17,17 +17,7 @@ def atGoalArea(player):
     Checks if robot is close enough to the field edge to be at the goal.
     """
     #magic number
-    return player.brain.vision.fieldEdge.centerDist < 100.0
-
-def veryCloseToPost(player):
-    """
-    Checks if a robot is so close to a post that it must be at the goal.
-    """
-    #magic numbers
-    return ((player.brain.vision.ygrp.on and
-             player.brain.vision.ygrp.dist < 70.0) or
-            (player.brain.vision.yglp.on and
-             player.brain.vision.yglp.dist < 70.0))
+    return player.brain.vision.fieldEdge.centerDist < 110.0
 
 def facingForward(player):
     """

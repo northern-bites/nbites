@@ -36,7 +36,7 @@ def gameReady(player):
             player.initialDelayCounter = 0
 
     # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
+    if(not player.brain.motion.calibrated()):
         return player.stay()
 
     return player.goLater('walkToGoal')
@@ -64,6 +64,8 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated()):
         return player.stay()
 
+    # check for legit penalty - don't forget!
+    # and player.lastStateTime > 25.0
     if player.lastDiffState == 'gamePenalized':
         return player.goLater('decideSide')
 
@@ -86,8 +88,7 @@ def gamePenalized(player):
     if player.firstFrame():
         player.brain.logger.stopLogging()
         player.inKickingState = False
-        player.stopWalking
-        player.executeMove(SweetMoves.SIT_POS)
+        player.stopWalking()
         player.penalizeHeads()
 
     return player.stay()
