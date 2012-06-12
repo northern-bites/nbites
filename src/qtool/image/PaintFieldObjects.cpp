@@ -10,10 +10,15 @@ PaintFieldOverlay::PaintFieldOverlay(float scale, QObject* parent)
 }
 
 void PaintFieldOverlay::transformPainterToFieldCoordinates(QPainter& painter) {
-    // inversion is now done by subtracting all y-coords from the bitmap height
-    painter.scale(scale, scale);
+    // translate and flip the coords to make the Qt and robot coord systems match up
+    painter.translate(0, FIELD_HEIGHT*scale);
+    painter.scale(scale, -1*scale);
 }
-
+void PaintFieldOverlay::unTransform(QPainter& painter){
+	//put the painter back the deafult Qt way
+	painter.scale(1/scale, -1/scale);
+	painter.translate(0, -FIELD_HEIGHT*scale);
+}
 void PaintFieldOverlay::paintDot(QPainter& painter, QColor color, QPoint point, int size) {
 
     painter.setPen(QColor("black"));
@@ -33,8 +38,7 @@ void PaintFieldOverlay::paintPolarLine(QPainter& painter, QColor color, int widt
                                        QPoint start, int distance, angle::degrees theta) {
 
     angle::radians theta_rad = theta * TO_RAD;
-    QPoint cartesian_vector = QPoint(distance * cos(theta_rad), distance * -sin(theta_rad));
-	//the - sin is to get the switched y-coords right
+    QPoint cartesian_vector = QPoint(distance * cos(theta_rad), distance * sin(theta_rad));
 
     QPen pen;
     pen.setWidth(width);

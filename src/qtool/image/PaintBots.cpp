@@ -38,7 +38,7 @@ void PaintBots::buildBitmap()
     bitmap.fill(Qt::transparent);
     QPainter painter(&bitmap);
 
-    this->transformPainterToFieldCoordinates(painter); //scales the field up, doesn't transform
+    this->transformPainterToFieldCoordinates(painter);
 
     for(int i = 0; i < locs->getSize(); i++) {
         //set pen/brush for correct team
@@ -49,8 +49,8 @@ void PaintBots::buildBitmap()
             playerColor = redPlayer;
         }
 
-        QPoint robotPt = QPoint(locs->getX(i), bitmap.height()-locs->getY(i));
-        QPoint ballPt = QPoint(locs->getBallX(i), bitmap.height()-locs->getBallY(i));
+        QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
+        QPoint ballPt = QPoint(locs->getBallX(i), locs->getBallY(i));
 		QString robotLabel = QString::number(locs->getPlayerNum(i));
 
         //robot
@@ -88,7 +88,9 @@ void PaintBots::buildBitmap()
 
         //robot number
 		painter.setPen(white);
-		painter.drawText(robotPt.x()-3, robotPt.y()+5, robotLabel);
+		this->unTransform(painter);
+		painter.drawText(this->scale*robotPt.x()-3, (FIELD_HEIGHT-robotPt.y())*this->scale+5, robotLabel);
+		this->transformPainterToFieldCoordinates(painter);
 
     }
 }
