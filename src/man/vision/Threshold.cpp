@@ -1030,7 +1030,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 obj_est = NULL_ESTIMATE;
             }
 
-//            bool debugEstimates = true;
+            bool debugEstimates = false;
             if (debugEstimates) {
                 cout << "width " << estFromWidth << endl;
                 cout << "height " << estFromHeight << endl;
