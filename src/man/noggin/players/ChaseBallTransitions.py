@@ -20,6 +20,12 @@ def shouldPrepareForKick(player):
     ball = player.brain.ball
     return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
 
+def shouldApproachBallAgain(player):
+    """
+    We've been in position for kick too long
+    """
+    return player.counter > 200
+
 def ballInPosition(player, kickPose):
     """
     Make sure ball is somewhere we will kick it. Also makes sure we're looking

@@ -36,7 +36,10 @@ def approachBall(player):
 
     if transitions.shouldPrepareForKick(player) or player.brain.nav.isAtPosition():
         if player.shouldKickOff:
-            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
+            if player.brain.ball.loc.relY > 0:
+                player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
+            else:
+                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             player.shouldKickOff = False
             return player.goNow('positionForKick')
         else:
