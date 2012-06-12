@@ -9,7 +9,7 @@ using namespace man::memory;
 
 ChannelImageViewer::ChannelImageViewer(BMPYUVImage* image,
                                        QWidget *parent)
-    : BMPImageViewer(image, parent), bmpyuvimage(image) {
+    : BMPImageViewerListener(image, parent), bmpyuvimage(image) {
 
     setupUI();
 }
