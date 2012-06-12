@@ -29,6 +29,11 @@ class HeadTrackingHelper(object):
 
     def startingPan(self, headMove):
         """Calculates the first part of a fixed pitch pan to get there quickly."""
+        if len(headMove) < 2:
+            # Not a normal pan: there's only 1 headMove.
+            # Don't do a starting move.
+            return
+
         headMoveYaw = headMove[1][0][0]
         headMovePitch = headMove[1][0][1]
 
