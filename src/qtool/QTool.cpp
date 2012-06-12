@@ -16,7 +16,7 @@ using overseer::OverseerClient;
 
 QTool::QTool() : EmptyQTool("QTOOL"),
                  dataLoader(new DataLoader(dataManager)),
-                 colorCalibrate(new ColorCalibrate(dataManager)),
+                 colorCalibrate(new ColorCalibrate(dataManager, this)),
                  colorTableCreator(new ColorTableCreator(dataManager)),
                  memoryViewer(new MemoryViewer(dataManager)),
                  visionViewer(new VisionViewer(dataManager)),
