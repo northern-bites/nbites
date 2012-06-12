@@ -13,15 +13,18 @@ from vision import cornerID as IDs
 # Visual Goalie
 
 def atGoalArea(player):
+    #magic number
     return player.brain.vision.fieldEdge.centerDist < 100.0
 
 def veryCloseToPost(player):
+    #magic numbers
     return ((player.brain.vision.ygrp.on and
              player.brain.vision.ygrp.dist < 70.0) or
             (player.brain.vision.yglp.on and
              player.brain.vision.yglp.dist < 70.0))
 
 def facingForward(player):
+    #magic numbers
     return (fabs(player.brain.vision.cross.bearing) < 10.0 and
             player.brain.vision.cross.on)
 
@@ -31,12 +34,18 @@ def onLeftSideline(player):
              (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
             return True
     return ((player.brain.vision.ygrp.on and
+             #magic numbers
              player.brain.vision.ygrp.dist > 400.0) or
             (player.brain.vision.yglp.on and
              player.brain.vision.yglp.dist > 400.0))
 
 def onRightSideline(player):
     return not onLeftSideline(player)
+
+def shouldPerformSave(player):
+    # Same as Dani's
+    return (player.brain.ball.vis.heat <= goalCon.HEAT_LOW and
+            player.brain.ball.loc.relVelX < goalCon.VEL_HIGH)
 
 # ******************
 # SAVING TRANSITIONS

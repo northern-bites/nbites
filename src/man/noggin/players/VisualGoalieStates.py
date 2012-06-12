@@ -18,6 +18,7 @@ def updatePostObservations(player):
     if (player.brain.vision.ygrp.on and
         player.brain.vision.ygrp.certainty != certainty.NOT_SURE and
         player.brain.vision.ygrp.dist != 0.0 and
+        #magic number
         player.brain.vision.ygrp.dist < 400.0):
         player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
                                                player.brain.vision.ygrp.bearing)
@@ -27,6 +28,7 @@ def updatePostObservations(player):
 
     if (player.brain.vision.yglp.on and
         player.brain.vision.yglp.dist != 0.0 and
+        #magic number
         player.brain.vision.yglp.dist < 400.0):
         player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
                                               player.brain.vision.yglp.bearing)
@@ -39,7 +41,8 @@ def walkToGoal(player):
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        if (walkToGoal.incomingTransition.condition == onRightSideline or
+        if ((hasattr(walkToGoal, 'incomingTransition') and
+             walkToGoal.incomingTransition.condition == onRightSideline) or
             player.lastState == 'gameReady'):
             player.side = RIGHT
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
@@ -63,8 +66,7 @@ def walkToGoal(player):
     if DEBUG_APPROACH:
         print "========================================"
 
-    if player.system.centerGoalDistance() > 200.0:
-        updatePostObservations(player)
+    updatePostObservations(player)
 
     player.system.home.relY = player.system.centerGoalRelY()
     player.system.home.relX = player.system.centerGoalRelX()

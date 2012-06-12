@@ -34,7 +34,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.facingForward,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.standStill
+            : GoalieStates.watch
             }
 
         VisualGoalieStates.decideSide.transitions = {
@@ -45,9 +45,17 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.onRightSideline,
                                        Transition.MOST_OF_THE_TIME,
+                                       # magic number
                                        50)
             : VisualGoalieStates.walkToGoal
             }
+
+        GoalieStates.watch.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.saveIt
+}
 
     def run(self):
         gcState = self.brain.gameController.currentState
@@ -55,6 +63,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if (gcState == 'gamePlaying'):
             # Make sure gamePlaying gets run
             if (self.brain.gameController.counter == 2):
-                self.switchTo('position')
+                self.switchTo('watch')
 
         SoccerFSA.SoccerFSA.run(self)

@@ -27,7 +27,7 @@ def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.lookToAngle(90)
+        player.brain.tracker.lookToAngle(RIGHT_SIDE_ANGLE)
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -38,7 +38,7 @@ def gameReady(player):
         player.initialDelayCounter += 1
         return player.stay()
 
-    return player.goLater('decideSide')
+    return player.goLater('walkToGoal')
 
 def gameSet(player):
     if player.firstFrame():
@@ -55,10 +55,13 @@ def gamePlaying(player):
         player.gainsOn()
         player.brain.nav.stand()
 
-    #if player.lastDiffState == 'gamePenalized':
-        # Need to at least *try* to get back into goal.
+    if player.lastDiffState == 'gamePenalized':
+        return player.goLater('decideSide')
 
-    return player.goLater('decideSide')
+    if player.lastDiffState == 'fallen':
+        return player.goLater('spinAtGoal')
+
+    return player.goLater('watch')
 
 def gamePenalized(player):
     if player.firstFrame():
@@ -92,33 +95,14 @@ def gameFinished(player):
 def fallen(player):
     return player.stay()
 
-def position(player):
-    # step forward - NOPE, hacked out US open 2012
-    if player.firstFrame():
-        """player.brain.nav.walkTo(RelRobotLocation(15,0,0),
-                                #player.brain.nav.CLOSE_ENOUGH,
-                                (3,3,10),
-                                #player.brain.nav.SLOW_SPEED)
-                                0.2)
-
-    # Just in case walkTo fails, eventually stop anyway
-    if player.brain.nav.isStopped() or player.counter > 300:
-        player.brain.nav.stop()
-        return player.goNow('watch')"""
-
-    return player.goLater('watch')
-
 def watch(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        if player.lastDiffState == 'kickBall':
+        if (player.lastDiffState == 'kickBall' or
+            player.lastDiffState == 'spinAtGoal'):
             player.brain.nav.stand()
 
-    #if player.brain.ball.dist < 100:
-    #    player.executeMove(SweetMoves.GOALIE_SQUAT)
-    #    return player.goLater('saveIt')
-
-    return player.stay()
+    return Transition.getNextState(player, watch)
 
 def kickBall(player):
     """
@@ -140,6 +124,7 @@ def kickBall(player):
 
 def saveIt(player):
     if player.firstFrame():
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
         player.isSaving = False
     if (not player.motion.isBodyActive() and not player.isSaving):
         player.squatTime = time.time()
@@ -163,8 +148,24 @@ def upUpUP(player):
         player.upDelay += 1
         return player.stay()
     else:
-        return player.goLater('watch')
+        return player.goLater('spinAtGoal')
     return player.stay()
+
+def position(player):
+    # step forward - NOPE, hacked out US open 2012
+    if player.firstFrame():
+        """player.brain.nav.walkTo(RelRobotLocation(15,0,0),
+                                #player.brain.nav.CLOSE_ENOUGH,
+                                (3,3,10),
+                                #player.brain.nav.SLOW_SPEED)
+                                0.2)
+
+    # Just in case walkTo fails, eventually stop anyway
+    if player.brain.nav.isStopped() or player.counter > 300:
+        player.brain.nav.stop()
+        return player.goNow('watch')"""
+
+    return player.goLater('watch')
 
 ############# PENALTY SHOOTOUT #############
 
