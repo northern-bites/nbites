@@ -397,6 +397,10 @@ public:
         motionInterface->stopHeadMoves();
     }
 
+	bool calibrated(){
+		return motionInterface->calibrated();
+	}
+
 private:
     MotionInterface *motionInterface;
 };
