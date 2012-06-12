@@ -169,8 +169,8 @@ public:
     estimate chooseBestGoalEstimate(distanceCertainty cert, const estimate& estFromHeight,
             const estimate& estFromWidth, const estimate& estFromPose, int bottom);
     //deprecate these - out of date
-    float getGoalPostDistFromHeight(float height);
-    float getGoalPostDistFromWidth(float width);
+    estimate getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height);
+    estimate getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width);
 
     float getBeaconDistFromHeight(float height);
     int distance(int x1, int x2, int x3, int x4);
