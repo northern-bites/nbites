@@ -68,6 +68,7 @@ void EmptyQTool::prev() {
     dataManager->getPrev();
 }
 
+
 void EmptyQTool::record() {
     if (dataManager->isRecording()) {
         dataManager->stopRecording();

@@ -14,7 +14,7 @@ using namespace qtool::image;
 using namespace man::corpus;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
-                 memoryManager(memoryManager) {
+	memoryManager(memoryManager) {
 
     MRawImages::const_ptr rawImages = memoryManager->getMemory()->get<MRawImages>();
 
@@ -25,38 +25,28 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     BMPImageViewer* bottomImageViewer;
 
     VisualInfoImage* shapesBottom = new VisualInfoImage(memoryManager->getMemory()->get<MVision>(),
-            Camera::BOTTOM);
+														Camera::BOTTOM);
     VisualInfoImage* shapesTop = new VisualInfoImage(memoryManager->getMemory()->get<MVision>(),
-            Camera::TOP);
+													 Camera::TOP);
 
     OverlayedImage* comboBottom = new OverlayedImage(rawBottomBMP, shapesBottom, this);
     OverlayedImage* comboTop = new OverlayedImage(rawTopBMP, shapesTop, this);
 
     bottomImageViewer = new BMPImageViewer(comboBottom, this);
-    CollapsibleImageViewer * bottomCIV = new
-            CollapsibleImageViewer(bottomImageViewer,
-                    QString("Bottom"),
-                    this);
-
     topImageViewer = new BMPImageViewer(comboTop, this);
-    CollapsibleImageViewer * topCIV = new
-            CollapsibleImageViewer(topImageViewer,
-                    QString("Top"),
-                    this);
 
-    QWidget* central = new QWidget(this);
+	QHBoxLayout* mainLayout = new QHBoxLayout;
+	QWidget* mainWidget = new QWidget;
+    QTabWidget* imageTabs = new QTabWidget();
 
-    QVBoxLayout* layout = new QVBoxLayout(central);
+    imageTabs->addTab(topImageViewer, QString("Top Image"));
+    imageTabs->addTab(bottomImageViewer, QString("Bottom Image"));
 
-    layout->addWidget(topCIV);
-    layout->addWidget(bottomCIV);
+	imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    // Make sure one of the images is toggled off for small screens
-    bottomCIV->toggle();
-
-    central->setLayout(layout);
-
-    this->setCentralWidget(central);
+	mainLayout->addWidget(imageTabs);
+	mainWidget->setLayout(mainLayout);
+    this->setCentralWidget(mainWidget);
 
     //TODO: we call updateView twice per vision frame
     memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
