@@ -15,6 +15,7 @@ def gameInitial(player):
         player.GAME_INITIAL_satDown = False
         player.system = GoalieSystem()
         player.side = LEFT
+        player.isSaving = False
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):

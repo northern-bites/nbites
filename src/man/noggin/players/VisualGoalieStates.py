@@ -6,6 +6,7 @@ from ..util import Transition
 import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
 from GoalieTransitions import onLeftSideline, onRightSideline
+from objects import RelRobotLocation
 
 DEBUG_OBSERVATIONS = False
 DEBUG_APPROACH = False
@@ -102,12 +103,19 @@ def spinAtGoal(player):
         player.brain.nav.goTo(player.system.home,
                               nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
 
-    #if player.brain.vision.cross.on:
-        #player.system.pushCrossObservation(player.brain.vision.cross.bearing)
-
     player.brain.tracker.lookToAngle(0.0)
 
     return Transition.getNextState(player, spinAtGoal)
+
+def clearIt(player):
+    if player.firstFrame():
+        player.brain.nav.goTo(RelRobotLocation(player.brain.ball.loc.relX,
+                                               player.brain.ball.loc.relY,
+                                               0.0))
+        player.system.home.relX = -player.brain.ball.loc.relX
+        player.system.home.relY = -player.brain.ball.loc.relY
+
+    return player.stay()
 
 def decideSide(player):
     if player.firstFrame():
@@ -115,9 +123,3 @@ def decideSide(player):
         player.brain.tracker.lookToAngle(90)
 
     return Transition.getNextState(player, decideSide)
-
-def standStill(player):
-    if player.firstFrame():
-        player.brain.nav.stop()
-
-    return player.stay()

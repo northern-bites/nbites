@@ -44,8 +44,25 @@ def onRightSideline(player):
 
 def shouldPerformSave(player):
     # Same as Dani's
-    return (player.brain.ball.vis.heat <= goalCon.HEAT_LOW and
-            player.brain.ball.loc.relVelX < goalCon.VEL_HIGH)
+    return False
+    # return (player.brain.ball.vis.heat <= goalCon.HEAT_LOW and
+    #         player.brain.ball.loc.relVelX < goalCon.VEL_HIGH)
+
+def shouldClearBall(player):
+    # ball must be visible
+    if not player.brain.ball.vis.on:
+        return False
+
+    # if definitely within goal box
+    if (player.brain.ball.vis.dist < 70.0):
+        return True
+
+    # if to sides of box
+    if (player.brain.ball.vis.dist < 120.0 and
+        fabs(player.brain.ball.vis.bearing) > 45.0):
+        return True
+
+    return False
 
 # ******************
 # SAVING TRANSITIONS

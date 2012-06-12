@@ -54,8 +54,14 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.shouldPerformSave,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.saveIt
-}
+            : GoalieStates.saveIt,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.MOST_OF_THE_TIME,
+                                       # magic number
+                                       50)
+            : VisualGoalieStates.clearIt
+            }
 
     def run(self):
         gcState = self.brain.gameController.currentState
