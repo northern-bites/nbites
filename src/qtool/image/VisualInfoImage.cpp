@@ -164,8 +164,9 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_top_x, right_top_y)
     };
 
-	std::cout << "Id is " << id << " " << cert << std::endl;
+	// default color for uncertain goal
 	painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+	// if the goal is the Right goal we know it is certain
 	if (id == 42) {
 		painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
 	} else if (cert == 2) {
