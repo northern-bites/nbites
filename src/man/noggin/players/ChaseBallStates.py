@@ -68,13 +68,14 @@ def prepareForKick(player):
 
 def positionForKick(player):
     """
-    Get to the ball.
-    Uses chaseBall to walk to the ball when its far away, and positionForKick
-    once we get close. This allows Player to monitor Navigator's progress as it
-    positions.
+    Get the ball in the sweet spot
     """
     if player.penaltyKicking and player.brain.ball.loc.inOppGoalBox():
         return player.goNow('penaltyBallInOppGoalbox')
+
+    if (transitions.shouldApproachBallAgain(player) or
+        transitions.shouldRedecideKick(player)):
+        return player.goLater('chase')
 
     ballLoc = player.brain.ball.loc
     kick_pos = player.kick.getPosition()

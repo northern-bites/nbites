@@ -22,6 +22,13 @@ def shouldPrepareForKick(player):
 
 def shouldApproachBallAgain(player):
     """
+    The ball got really far away somehow
+    """
+    ball = player.brain.ball
+    return ball.vis.on and ball.dist > constants.APPROACH_BALL_AGAIN_DIST
+
+def shouldRedecideKick(player):
+    """
     We've been in position for kick too long
     """
     return player.counter > 200
