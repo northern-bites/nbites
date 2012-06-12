@@ -57,14 +57,9 @@ def gameReady(player):
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePanFixedPitch()
         player.brain.sensors.startSavingFrames()
-        if player.lastDiffState == 'gameInitial':
-            player.initialDelayCounter = 0
 
-    #HACK! TODO: this delay is to make sure the sensors get calibrated before
-    #we start walking; find a way to query motion to see whether the sensors are
-    #calibrated or not before starting
-    player.initialDelayCounter += 1
-    if player.initialDelayCounter < 230:
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
         return player.stay()
 
     # Works with rules (2011) to get goalie manually positioned
@@ -113,6 +108,10 @@ def gameSet(player):
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
 
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
     # For the goalie, reset loc every frame.
     # This way, garaunteed to have correctly set loc and be standing in that
     #  location for a frame before gamePlaying begins.
@@ -147,11 +146,25 @@ def gamePlaying(player):
                 # 2011 rules have no 0 second penalties for any robot,
                 # but check should be here if there is.
             #else human error
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
     roleState = player.getRoleState()
     return player.goNow(roleState)
 
 
 def gamePenalized(player):
+    if player.lastDiffState == '':
+        # Just started up! Need to calibrate sensors
+        player.gainsOn()
+        player.brain.nav.stand()
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
     if player.firstFrame():
         player.brain.logger.stopLogging()
         player.inKickingState = False
