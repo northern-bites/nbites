@@ -20,6 +20,24 @@ def shouldPrepareForKick(player):
     ball = player.brain.ball
     return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
 
+def shouldSpinToBall(player):
+    """
+    We're not facing the ball well enough yet
+    """
+    ball = player.brain.ball
+    return (ball.vis.on and
+            (fabs(ball.loc.relY) > constants.SHOULD_SPIN_TO_BALL_Y or
+             fabs(ball.loc.bearing > constants.SHOULD_SPIN_TO_BALL_B)))
+
+def shouldStopSpinningToBall(player):
+    """
+    We're done spinning
+    """
+    ball = player.brain.ball
+    return (ball.vis.on and
+            (fabs(ball.loc.relY) < constants.STOP_SPINNING_TO_BALL_Y or
+             fabs(ball.loc.bearing) < constants.STOP_SPINNING_TO_BALL_B))
+
 def shouldApproachBallAgain(player):
     """
     The ball got really far away somehow
