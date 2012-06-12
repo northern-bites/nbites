@@ -117,12 +117,7 @@ class VisionSystem : public PF::SensorModel
         boost::math::normal_distribution<float> pDistance(0.0f, observation.getDistanceSD());
         float prob_d = boost::math::pdf<float>(pDistance, pose_diff_d);
 
-        float pose_diff_b = NBMath::safe_atan2(pose_y - particle.getLocation().y,
-                                               pose_x - particle.getLocation().x);
-        boost::math::normal_distribution<float> pBearing(0.0f, globalOrientationSD);
-        float prob_b = boost::math::pdf<float>(pBearing, pose_diff_b);
-
-        return prob_h * prob_d * prob_b;
+        return prob_h * prob_d;
     }
 
  private:
