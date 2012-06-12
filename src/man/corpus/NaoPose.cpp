@@ -357,7 +357,7 @@ estimate NaoPose::estimateWithKnownDistance(pixels x, pixels y, cms objectHeight
     //Do a kinematics estimate to get the bearing
     estimate initialEstimate = this->pixEstimate(x, y, objectHeight);
 
-    estimate newEstimate(initialEstimate);
+    estimate newEstimate = initialEstimate;
 
     newEstimate.dist = groundDist;
     newEstimate.x = groundDist * cos(initialEstimate.bearing);
