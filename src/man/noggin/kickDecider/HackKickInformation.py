@@ -209,7 +209,7 @@ class KickInformation:
             return kicks.RIGHT_SIDE_KICK
         elif leftScorePoint > -90 and rightScorePoint < -90:
             return kicks.LEFT_SIDE_KICK
-        elif leftScorePoint > -180 and rightScorePoint < 180:
+        elif leftScorePoint < -90 and rightScorePoint > 90:
             return self.chooseBackKick()
 
         # Choose whichever kick is closest to being between the score points.
