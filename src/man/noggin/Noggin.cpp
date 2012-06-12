@@ -312,7 +312,7 @@ void Noggin::updateLocalization()
     locMotionSystem->setCurrentOdometry(odo);
 
 //    std::vector<PF::Observation> observations;
-    std::vector<Landmark> landmarks;
+//    std::vector<Landmark> landmarks;
     float dist, theta;
 
     // Get team of the robot for localization.

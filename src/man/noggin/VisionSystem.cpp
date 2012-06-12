@@ -6,8 +6,8 @@ static const float MAX_CORNER_DISTANCE = 400.0f;
 /**
  * Constructor
  */
-VisionSystem::VisionSystem(Vision::const_ptr vision) //, LocalizationVisionParams params)
-    : PF::SensorModel(), vision(vision) //, parameters(params)
+VisionSystem::VisionSystem(Vision::const_ptr vision, LocalizationVisionParams params)
+    : PF::SensorModel(), vision(vision), parameters(params)
 { }
 
 /**
@@ -51,6 +51,35 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
         incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
                                 *(partIter), totalWeight, count);
 
+        std::cout << count << " " << totalWeight << std::endl;
+
+//        std::list<VisualCorner> * corners = vision->fieldLines->getCorners();
+//        std::list<VisualCorner>::const_iterator vc;
+//        for(vc = corners->begin(); vc != corners->end(); ++vc)
+//        {
+//            if (vc->getDistance() < MAX_CORNER_DISTANCE)
+//            {
+//                float bestProbability;
+//                typedef const std::list<const ConcreteCorner*> ConcreteCorners;
+//
+//                ConcreteCorners* concreteCorners = vc->getPossibilities();
+//                ConcreteCorners::const_iterator cc;
+//
+//                for (cc = concreteCorners->begin(); cc != concreteCorners->end(); cc++) {
+//                    float probability = scoreFromCorner(*vc, **cc, *partIter);
+//                    if (probability > bestProbability)
+//                        bestProbability = probability;
+//                }
+//
+//                totalWeight = updateTotalWeight(totalWeight, bestProbability);
+//                count++;
+//            } else{
+//                std::cout << "We saw a corner REALLY far away: "
+//                        << vc->getDistance()<< " centimeters away" <<std::endl
+//                        << "They can't be more than" << MAX_CORNER_DISTANCE
+//                        << " centimeters away." << std::endl;
+//            }
+//        }
 
         // Make sure that we have made an observation before updating weights.
         if(count > 0)

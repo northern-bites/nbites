@@ -41,8 +41,11 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
       proto::PLoc::Particle p;
       for(int i = 0; i < localizationStream->get()->particles_size(); ++i)
       {
-          assert(i < localizationStream->get()->particles_size());
-          p = localizationStream->get()->particles(i);
+          try {
+              p = localizationStream->get()->particles(i);
+          } catch (google::protobuf::FatalException& e) {
+              std::cout << "you suck" << std::endl;
+          }
           //std::cout << i << " " << localizationStream->get()->particles_size() << "\n";
           //std::cout << p.DebugString() << std::endl;
           float x = p.x();
@@ -52,7 +55,7 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
           updateParticles.push_back(PF::LocalizationParticle(PF::Location(x, y, h), w));
       }
 
-      std::cout << "Updating " << localizationStream->get()->particles_size() << " particles." << std::endl;
+//      std::cout << "Updating " << localizationStream->get()->particles_size() << " particles." << std::endl;
 
       paintLocalization->updateWithParticles(updateParticles);
 

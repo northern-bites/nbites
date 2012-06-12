@@ -179,8 +179,8 @@ namespace PF
         float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
 
         float confidence = 1.0f - wFast/wSlow;
-        std::cout << "The confidence of the particles swarm is: "
-                  << confidence << std::endl;
+//        std::cout << "The confidence of the particles swarm is: "
+//                  << confidence << std::endl;
 
 
 
