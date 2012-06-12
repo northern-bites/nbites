@@ -2456,10 +2456,8 @@ bool ObjectFragments::badDistance(Blob b) {
         int bottom = b.getBottom();
         estimate e = vision->pose->pixEstimate(x, y, 0.0);
         distanceCertainty dc = checkDist(b);
-        float disth = thresh->getGoalPostDistFromHeight(static_cast<float>
-                                                        (b.height()));
-        float distw = thresh->getGoalPostDistFromWidth(static_cast<float>
-                                                       (b.width()));
+        float disth = thresh->getGoalPostEstimateFromHeight(x, y, (float) b.height()).dist;
+        float distw = thresh->getGoalPostEstimateFromWidth(x, y, (float) (b.width())).dist;
         float choose = 0.0f;
         if (b.getTop() < 5 || y > IMAGE_HEIGHT - 5) {
             if (x < 5 || b.getRight() > IMAGE_WIDTH - 5) {
