@@ -78,10 +78,10 @@ class VisionSystem : public PF::SensorModel
         float distanceDiff = observation.getDistance() - hypothesisVector.magnitude;
         float angleDiff = NBMath::subPIAngle(observation.getBearing() - hypothesisVector.direction);
 
-        boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
+        boost::math::normal_distribution<float> pDist(0.0f, observation.getDistanceSD());
         float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 
-        boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
+        boost::math::normal_distribution<float> pAngle(0.0f, observation.getBearingSD());
         float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 
         // Better way to determine probability?
