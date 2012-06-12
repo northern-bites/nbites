@@ -40,32 +40,42 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     topRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
 
     QToolBar* toolBar = new QToolBar(this);
+	QToolBar* toolBar2 = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     toolBar->addWidget(loadTableButton);
     this->addToolBar(toolBar);
+	this->addToolBarBreak();
+	this->addToolBar(toolBar2);
 
-#define ADD_DEBUG_CHECKBOX(text, func) {            \
+#define ADD_DEBUG_CHECKBOX1(text, func) {           \
         QCheckBox* debug = new QCheckBox(tr(text)); \
         connect(debug, SIGNAL(stateChanged(int)),   \
                 this, SLOT(func(int)));             \
         toolBar->addWidget(debug);                  \
     }
 
-    ADD_DEBUG_CHECKBOX("Horizon Debug", setHorizonDebug);
-    ADD_DEBUG_CHECKBOX("Shooting Debug", setShootingDebug);
-    ADD_DEBUG_CHECKBOX("Open Field Debug", setOpenFieldDebug);
-    ADD_DEBUG_CHECKBOX("Edge Detection Debug", setEdgeDetectionDebug);
-    ADD_DEBUG_CHECKBOX("Hough Debug", setHoughTransformDebug);
-    ADD_DEBUG_CHECKBOX("Robot Detection Debug", setRobotsDebug);
-    ADD_DEBUG_CHECKBOX("Visual Line Debug", setVisualLinesDebug);
-    ADD_DEBUG_CHECKBOX("Visual Corner Debug", setVisualCornersDebug);
+#define ADD_DEBUG_CHECKBOX2(text, func) {           \
+        QCheckBox* debug = new QCheckBox(tr(text)); \
+        connect(debug, SIGNAL(stateChanged(int)),   \
+                this, SLOT(func(int)));             \
+        toolBar2->addWidget(debug);                 \
+    }
+
+    ADD_DEBUG_CHECKBOX1("Horizon Debug", setHorizonDebug);
+    ADD_DEBUG_CHECKBOX1("Shooting Debug", setShootingDebug);
+    ADD_DEBUG_CHECKBOX1("Open Field Debug", setOpenFieldDebug);
+    ADD_DEBUG_CHECKBOX1("Edge Detection Debug", setEdgeDetectionDebug);
+    ADD_DEBUG_CHECKBOX2("Hough Debug", setHoughTransformDebug);
+    ADD_DEBUG_CHECKBOX2("Robot Detection Debug", setRobotsDebug);
+    ADD_DEBUG_CHECKBOX2("Visual Line Debug", setVisualLinesDebug);
+    ADD_DEBUG_CHECKBOX2("Visual Corner Debug", setVisualCornersDebug);
 
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
 
     VisualInfoImage* shapesBottom = new VisualInfoImage(offlineMVision, Camera::BOTTOM);
-    VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);    
+    VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);
 
     MRawImages::const_ptr rawImages = memoryManager->getMemory()->get<MRawImages>();
 
