@@ -36,6 +36,8 @@ public:
 protected slots:
     void next();
     void prev();
+	void skipAhead();
+	void skipBack();
     void record();
 
 protected:
@@ -47,6 +49,8 @@ protected:
 
     QPushButton* prevButton;
     QPushButton* nextButton;
+	QPushButton* FFWButton;
+	QPushButton* RWButton;
     QPushButton* recordButton;
 	QPushButton* scrollButton;
     QToolBar* toolbar;

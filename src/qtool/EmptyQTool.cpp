@@ -22,6 +22,8 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
     toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
     prevButton = new QPushButton(tr("<"));
+	RWButton = new QPushButton(tr("<<<"));
+    FFWButton = new QPushButton(tr(">>>"));
     recordButton = new QPushButton(tr("Rec"));
     scrollArea = new QScrollArea();
 
@@ -30,10 +32,14 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
+	connect(FFWButton, SIGNAL(clicked()), this, SLOT(skipAhead()));
+    connect(RWButton, SIGNAL(clicked()), this, SLOT(skipBack()));
     connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
 
-    toolbar->addWidget(prevButton);
+    toolbar->addWidget(RWButton);
+	toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
+	toolbar->addWidget(FFWButton);
     toolbar->addWidget(recordButton);
 
     this->addToolBar(toolbar);
@@ -66,6 +72,14 @@ void EmptyQTool::next() {
 
 void EmptyQTool::prev() {
     dataManager->getPrev();
+}
+
+void EmptyQTool::skipAhead() {
+    dataManager->getSkipAhead();
+}
+
+void EmptyQTool::skipBack() {
+    dataManager->getSkipBack();
 }
 
 void EmptyQTool::record() {

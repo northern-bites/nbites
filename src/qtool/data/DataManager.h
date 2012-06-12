@@ -51,6 +51,15 @@ public slots:
         parsingBoard.rewindAll();
     }
 
+	void getSkipAhead(){
+		for(int i = 0; i < 10; i++)
+			parsingBoard.parseNextAll();
+	}
+
+	void getSkipBack(){ //skip back 10 frames
+		parsingBoard.rewindAll(10);
+	}
+
     void newInputProvider(common::io::InProvider::ptr newInput, std::string name);
     void reset();
 
