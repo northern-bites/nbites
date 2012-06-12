@@ -93,37 +93,58 @@ void Threshold::obstacleLoop() {
   pose->transform(usingTopCamera);
 
   unsigned char pixel = GREEN;
-  float upperCount = 0;
-  float greenCount = 0;
-  float lowerCount = 0;
+  float upperTotalL = 0, upperTotalR = 0;
+  float greenCountL = 0, greenCountR = 0;
+  float lowerTotalL = 0, lowerTotalR = 0;
+  float botL = 1.0, botR = 1.0;
+  float topL = 1.0, topR = 1.0;
+  bool isObstacle = false, isObLeft = false, isObRight = false;
   
   detectSelf();
-
+  
   for (int i = 0; i < IMAGE_WIDTH; i += 1) {
-    lowerCount += lowerBound[i];
-    for (int j = lowerBound[i]; j >= 0; j -= 1) {
+    lowerTotalL += lowerBound[i];
+    lowerTotalR += lowerBound[i];
+    for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
       pixel = getThresholded(i, j);
-      if (Utility::isGreen(pixel)) greenCount++;
+      if (Utility::isGreen(pixel) && i < IMAGE_WIDTH/2) greenCountL++;
+      else if (Utility::isGreen(pixel) && i >= IMAGE_WIDTH/2) greenCountR++;
     }
   }
-  cout << "In the bottom image, green amount = " << greenCount/lowerCount << std::endl;
-
-  if (greenCount/lowerCount < 0.5) {
-    usingTopCamera = true;
-    pose->transform(usingTopCamera);
-    greenCount = 0;
-    for (int i = 0; i < IMAGE_WIDTH; i += 1) {
-      for (int j = field->horizonAt(i); j < IMAGE_HEIGHT; j += 1) {
-	pixel = getThresholded(j, i);
-	if (Utility::isGreen(pixel)) greenCount++;
-	upperCount++;
+  botL = greenCountL/lowerTotalL;
+  botR = greenCountR/lowerTotalR;
+  
+  usingTopCamera = true;
+  pose->transform(usingTopCamera);
+  
+  greenCountL = 0;
+  greenCountR = 0;
+  for (int i = 0; i < IMAGE_WIDTH; i += 1) {
+    for (int j = pose->getHorizonY(i); j >= 0; j -= 1) {
+      pixel = getThresholded(i, j);
+      if (i < IMAGE_WIDTH/2) {
+	if (Utility::isGreen(pixel)) greenCountL++;
+	upperTotalL++;
+      } else if (i >= IMAGE_WIDTH/2) {
+	if (Utility::isGreen(pixel)) greenCountR++;
+	upperTotalR++;
       }
     }
-    cout << "In the top image, green amount = " << greenCount/upperCount << std::endl;
-    if (greenCount/upperCount < 0.5) cout << "we have an obstacle\n";
   }
+  topL = greenCountL/upperTotalL;
+  topR = greenCountR/upperTotalR;
 
+  if (botL < 0.5 && topL < 0.4) isObLeft = true;
+  if (botR < 0.5 && topR < 0.4) isObRight = true;
+  if (isObLeft || isObRight) isObstacle = true;
+  if (isObLeft) cout << "Obstacle Left";
+  if (isObRight) cout << " Obstacle Right";
+  if (isObstacle) cout << endl;
+
+  
 }
+
+
 
 /* Main vision loop, called by Vision.cc
  */
