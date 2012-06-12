@@ -1010,20 +1010,14 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             const int intBottomOfObjectX = static_cast<int>(bottomOfObjectX);
             const int intBottomOfObjectY = static_cast<int>(bottomOfObjectY);
 
-            estimate estFromWidth = pose->estimateFromObjectSize(intBottomOfObjectX,
-                                                     intBottomOfObjectY,
-                                                     0.0f,
-                                                     width,
-                                                     GOAL_POST_CM_WIDTH * CM_TO_MM);
+            estimate estFromWidth = this->getGoalPostEstimateFromWidth(intBottomOfObjectX,
+                    intBottomOfObjectY, width);
 
-            estimate estFromHeight = pose->estimateFromObjectSize(intBottomOfObjectX,
-                                                     intBottomOfObjectY,
-                                                     0.0f,
-                                                     height,
-                                                     GOAL_POST_CM_HEIGHT * CM_TO_MM);
+            estimate estFromHeight = this->getGoalPostEstimateFromHeight(intBottomOfObjectX,
+                    intBottomOfObjectY,  height);
 
-            estimate estFromPose = pose->pixEstimate(static_cast<int>(bottomOfObjectX),
-                                                     static_cast<int>(bottomOfObjectY),
+            estimate estFromPose = pose->pixEstimate(intBottomOfObjectX,
+                                                     intBottomOfObjectY,
                                                      0.0f);
 
             distanceCertainty cert = objPtr->getDistanceCertainty();
@@ -1036,7 +1030,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 obj_est = NULL_ESTIMATE;
             }
 
-            bool debugEstimates = true;
+//            bool debugEstimates = true;
             if (debugEstimates) {
                 cout << "width " << estFromWidth << endl;
                 cout << "height " << estFromHeight << endl;
@@ -1188,28 +1182,16 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
  * @param height     the height of the post in pixels
  * @return           the distance to the post in centimeters
  */
-float Threshold::getGoalPostDistFromHeight(float height) {
-#if ROBOT(NAO_SIM)
-    return 17826*pow((double) height,-1.0254);
-#else
-    // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
-    return 32880.0f/height - 11.8597f;
-#endif
+estimate Threshold::getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, height, GOAL_POST_CM_HEIGHT * CM_TO_MM);
 }
 
 /* Looks up goal post width in pixels to focal distance function.
  * @param width     the width of the post
  * @return          the distance to the post
  */
-float Threshold::getGoalPostDistFromWidth(float width) {
-#if ROBOT(NAO_SIM)
-    //floor distance, seems to be best for the width
-    //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
-    return 2360.1*pow((double) width,-1.0516);
-#else
-    // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
-    return 3116.59f/width + 21.75f;
-#endif
+estimate Threshold::getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, width, GOAL_POST_CM_WIDTH * CM_TO_MM);
 }
 
 /*
