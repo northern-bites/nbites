@@ -98,6 +98,7 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("cornerX", &VisualRobot::getX)
         .def_readonly("cornerY", &VisualRobot::getY)
         .def_readonly("elevation", &VisualRobot::getElevationDeg)
+        .def_readonly("on", &VisualRobot::isOn)
         ;
 
     // Currently unused, but fully avaliable to python if uncommented

@@ -48,12 +48,10 @@ def onRightSideline(player):
     return not onLeftSideline(player)
 
 def shouldPerformSave(player):
-    # Same as Dani's
-    return False
-    # return (player.brain.ball.vis.heat <= goalCon.HEAT_LOW and
-    #         player.brain.ball.loc.relVelX < goalCon.VEL_HIGH)
+    return player.brain.ball.loc.relVelX < -50.0
 
 def shouldClearBall(player):
+    return False
     # ball must be visible
     if not player.brain.ball.vis.on:
         return False
