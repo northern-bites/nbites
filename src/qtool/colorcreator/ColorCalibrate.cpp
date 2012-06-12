@@ -15,7 +15,7 @@ using namespace qtool::image;
 using namespace man::corpus;
 using namespace man::memory;
 
-#define BOX 5
+static const int BOX = 5;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager), imageTabs(new QTabWidget(this)),
