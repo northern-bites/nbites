@@ -35,8 +35,9 @@ def facingForward(player):
     if it is in the goal.
     """
     #magic numbers
-    return (fabs(player.brain.vision.cross.bearing) < 10.0 and
-            player.brain.vision.cross.on)
+    return (player.brain.vision.fieldEdge.centerDist > 800.0 or
+            (fabs(player.brain.vision.cross.bearing) < 10.0 and
+             player.brain.vision.cross.on))
 
 def facingBall(player):
     """
