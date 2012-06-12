@@ -39,7 +39,7 @@ def gameReady(player):
         player.initialDelayCounter += 1
         return player.stay()
 
-    return player.goLater('walkToGoal')
+    return player.goLater('watch')
 
 def gameSet(player):
     if player.firstFrame():
@@ -119,7 +119,7 @@ def kickBall(player):
         player.executeMove(kick)
 
     if player.counter > 10 and player.brain.nav.isStopped():
-        return player.goLater('watch')
+        return player.goLater('returnToGoal')
 
     return player.stay()
 

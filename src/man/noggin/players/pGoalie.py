@@ -77,6 +77,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : GoalieStates.kickBall
             }
 
+        VisualGoalieStates.returnToGoal.transitions = {
+            Transition.CountTransition(GoalieTransitions.facingForward,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watch
+            }
+
     def run(self):
         gcState = self.brain.gameController.currentState
 

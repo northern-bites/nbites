@@ -1,12 +1,14 @@
 from man.motion.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
-                                  FIXED_PITCH_RIGHT_SIDE_PAN)
+                                  FIXED_PITCH_RIGHT_SIDE_PAN,
+                                  FIXED_PITCH_PAN)
 from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition
 import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
 from GoalieTransitions import onLeftSideline, onRightSideline
-from objects import RelRobotLocation
+from objects import RelRobotLocation, RelLocation
+from noggin_constants import LINE_CROSS_OFFSET
 
 DEBUG_OBSERVATIONS = False
 DEBUG_APPROACH = False
@@ -36,6 +38,13 @@ def updatePostObservations(player):
         if DEBUG_OBSERVATIONS:
             print "LEFT: Saw left post."
             print "  Pushed " + str(player.brain.vision.yglp.bearing) + " " + str(player.brain.vision.yglp.dist)
+
+
+def updateCrossObservations(player):
+    if(player.brain.vision.cross.on and
+       player.brain.vision.cross.dist != 0.0):
+        player.system.pushCrossObservation(player.brain.vision.cross.dist,
+                                           player.brain.vision.cross.bearing)
 
 def walkToGoal(player):
     """
@@ -109,14 +118,21 @@ def spinAtGoal(player):
 
 def clearIt(player):
     if player.firstFrame():
-        clearIt.ballDest = RelRobotLocation(player.brain.ball.loc.relX-15.0,
-                                            player.brain.ball.loc.relY,
+        clearIt.storedX = -(player.brain.ball.loc.relX - 20.0)
+        clearIt.storedY = -(player.brain.ball.loc.relY)
+        if clearIt.storedY < 0.0:
+            player.side = RIGHT
+        else:
+            player.side = LEFT
+        clearIt.ballDest = RelRobotLocation(clearIt.storedX,
+                                            clearIt.storedY,
                                             0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.CAREFUL_SPEED)
 
-    clearIt.ballDest.relX = player.brain.ball.loc.relX - 15.0
+    # magic number
+    clearIt.ballDest.relX = player.brain.ball.loc.relX - 20.0
     clearIt.ballDest.relY = player.brain.ball.loc.relY
 
     return Transition.getNextState(player, clearIt)
@@ -145,3 +161,13 @@ def decideSide(player):
         player.brain.tracker.lookToAngle(90)
 
     return Transition.getNextState(player, decideSide)
+
+def returnToGoal(player):
+    if player.firstFrame():
+        player.system.home.relX = clearIt.storedX - 10.0
+        player.system.home.relY = clearIt.storedY
+        player.system.home.relH = 0.0
+        player.brain.nav.walkTo(player.system.home)
+        player.brain.tracker.lookToAngle(0.0)
+
+    return player.stay()
