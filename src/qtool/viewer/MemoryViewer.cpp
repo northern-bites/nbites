@@ -35,18 +35,23 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     bottomImageViewer = new BMPImageViewer(comboBottom, this);
     topImageViewer = new BMPImageViewer(comboTop, this);
 
+	QHBoxLayout* bothImagesLayout = new QHBoxLayout;
+	QWidget* bothImages = new QWidget;
+	bothImagesLayout->addWidget(bottomImageViewer);
+	bothImagesLayout->addWidget(topImageViewer);
+	bothImages->setLayout(bothImagesLayout);
+
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;
     QTabWidget* imageTabs = new QTabWidget();
 
     imageTabs->addTab(topImageViewer, QString("Top Image"));
     imageTabs->addTab(bottomImageViewer, QString("Bottom Image"));
-
-	imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	imageTabs->addTab(bothImages, QString("Both Images"));
 
 	mainLayout->addWidget(imageTabs);
 	mainWidget->setLayout(mainLayout);
-    this->setCentralWidget(mainWidget);
+    this->setCentralWidget(bothImages);
 
     //TODO: we call updateView twice per vision frame
     memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
