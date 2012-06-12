@@ -103,10 +103,10 @@ void Threshold::obstacleLoop() {
   detectSelf();
   
   for (int i = 0; i < IMAGE_WIDTH; i += 1) {
-    lowerTotalL += lowerBound[i];
-    lowerTotalR += lowerBound[i];
+    lowerTotalL += IMAGE_HEIGHT;//lowerBound[i];
+    lowerTotalR += IMAGE_HEIGHT;//lowerBound[i];
     for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
-      pixel = getThresholded(i, j);
+      pixel = getThresholded(j, i);
       if (Utility::isGreen(pixel) && i < IMAGE_WIDTH/2) greenCountL++;
       else if (Utility::isGreen(pixel) && i >= IMAGE_WIDTH/2) greenCountR++;
     }
@@ -116,12 +116,13 @@ void Threshold::obstacleLoop() {
   
   usingTopCamera = true;
   pose->transform(usingTopCamera);
+  field->findGreenHorizon(pose->getHorizonY(0), pose->getHorizonSlope());
   
   greenCountL = 0;
   greenCountR = 0;
   for (int i = 0; i < IMAGE_WIDTH; i += 1) {
-    for (int j = pose->getHorizonY(i); j >= 0; j -= 1) {
-      pixel = getThresholded(i, j);
+    for (int j = max(0, field->horizonAt(i)); j < IMAGE_HEIGHT; j += 1) {
+      pixel = getThresholded(j, i);
       if (i < IMAGE_WIDTH/2) {
 	if (Utility::isGreen(pixel)) greenCountL++;
 	upperTotalL++;
@@ -131,15 +132,21 @@ void Threshold::obstacleLoop() {
       }
     }
   }
-  topL = greenCountL/upperTotalL;
-  topR = greenCountR/upperTotalR;
+  if (upperTotalL > 0)
+    topL = greenCountL/upperTotalL;
+  else topL = 1.0;
+  if (upperTotalR > 0)
+    topR = greenCountR/upperTotalR;
+  else 
+    topR = 1.0;
 
   if (botL < 0.5 && topL < 0.4) isObLeft = true;
   if (botR < 0.5 && topR < 0.4) isObRight = true;
   if (isObLeft || isObRight) isObstacle = true;
-  if (isObLeft) cout << "Obstacle Left";
-  if (isObRight) cout << " Obstacle Right";
-  if (isObstacle) cout << endl;
+  if (isObLeft) cout << "BotL = " << botL << " TopL = " << topL << endl;
+  if (isObRight) cout << "BotR = " << botR << " TopR = " << topR << endl;
+
+  vision->drawLine(IMAGE_WIDTH/2, 0, IMAGE_WIDTH/2, IMAGE_HEIGHT, VISUAL_HORIZON_COLOR);
 
   
 }
@@ -1589,7 +1596,8 @@ void Threshold::transposeDebugImage(){
 
 // Draws the visual horizon on the image
 void Threshold::drawVisualHorizon() {
-    vision->drawLine(0, horizon, IMAGE_WIDTH, horizon, VISUAL_HORIZON_COLOR);
+  vision->drawLine(0, field->horizonAt(0), 
+		   IMAGE_WIDTH - 1, field->horizonAt(IMAGE_WIDTH - 1), VISUAL_HORIZON_COLOR);
 }
 
 const char* Threshold::getShortColor(int _id) {
