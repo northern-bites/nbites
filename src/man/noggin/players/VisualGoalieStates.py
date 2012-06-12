@@ -118,21 +118,23 @@ def spinAtGoal(player):
 
 def clearIt(player):
     if player.firstFrame():
-        clearIt.storedX = -(player.brain.ball.loc.relX - 20.0)
-        clearIt.storedY = -(player.brain.ball.loc.relY)
-        if clearIt.storedY < 0.0:
+        clearIt.storedHome = RelRobotLocation(-(player.brain.ball.loc.relX -
+                                                18.0),
+                                               -(player.brain.ball.loc.relY),
+                                               0.0)
+        if clearIt.storedHome.relY < 0.0:
             player.side = RIGHT
         else:
             player.side = LEFT
-        clearIt.ballDest = RelRobotLocation(clearIt.storedX,
-                                            clearIt.storedY,
+        clearIt.ballDest = RelRobotLocation(clearIt.storedHome.relX,
+                                            clearIt.storedHome.relY,
                                             0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.CAREFUL_SPEED)
 
     # magic number
-    clearIt.ballDest.relX = player.brain.ball.loc.relX - 20.0
+    clearIt.ballDest.relX = player.brain.ball.loc.relX - 18.0
     clearIt.ballDest.relY = player.brain.ball.loc.relY
 
     return Transition.getNextState(player, clearIt)
@@ -164,10 +166,6 @@ def decideSide(player):
 
 def returnToGoal(player):
     if player.firstFrame():
-        player.system.home.relX = clearIt.storedX - 10.0
-        player.system.home.relY = clearIt.storedY
-        player.system.home.relH = 0.0
-        player.brain.nav.walkTo(player.system.home)
-        player.brain.tracker.lookToAngle(0.0)
+        player.brain.nav.walkTo(clearIt.storedHome)
 
-    return player.stay()
+    return Transition.getNextState(player, returnToGoal)

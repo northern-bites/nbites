@@ -13,10 +13,16 @@ from vision import cornerID as IDs
 # Visual Goalie
 
 def atGoalArea(player):
+    """
+    Checks if robot is close enough to the field edge to be at the goal.
+    """
     #magic number
     return player.brain.vision.fieldEdge.centerDist < 100.0
 
 def veryCloseToPost(player):
+    """
+    Checks if a robot is so close to a post that it must be at the goal.
+    """
     #magic numbers
     return ((player.brain.vision.ygrp.on and
              player.brain.vision.ygrp.dist < 70.0) or
@@ -24,16 +30,27 @@ def veryCloseToPost(player):
              player.brain.vision.yglp.dist < 70.0))
 
 def facingForward(player):
+    """
+    Checks if a robot is facing the cross, which is more or less forward
+    if it is in the goal.
+    """
     #magic numbers
     return (fabs(player.brain.vision.cross.bearing) < 10.0 and
             player.brain.vision.cross.on)
 
 def facingBall(player):
+    """
+    Checks if the ball is right in front of it.
+    """
     #magic numbers
     return (fabs(player.brain.ball.vis.bearing) < 10.0 and
             player.brain.ball.vis.on)
 
 def onLeftSideline(player):
+    """
+    Looks for a T corner or far goals to determine which sideline it's
+    standing on.
+    """
     for corner in player.brain.vision.fieldLines.corners:
         if ( (IDs.CENTER_TOP_T in corner.possibilities) or
              (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
@@ -45,13 +62,23 @@ def onLeftSideline(player):
              player.brain.vision.yglp.dist > 400.0))
 
 def onRightSideline(player):
+    """
+    Checks that it is definitely not on the left sideline.
+    """
     return not onLeftSideline(player)
 
 def shouldPerformSave(player):
-    return player.brain.ball.loc.relVelX < -50.0
+    """
+    Checks that the ball is moving toward it and close enough to save.
+    """
+    return (player.brain.ball.loc.relVelX < -50.0 and
+            player.brain.ball.vis.on and
+            player.brain.ball.loc.dist < 150.0)
 
 def shouldClearBall(player):
-    return False
+    """
+    Checks that the ball is more or less in the goal box.
+    """
     # ball must be visible
     if not player.brain.ball.vis.on:
         return False
@@ -67,8 +94,41 @@ def shouldClearBall(player):
 
     return False
 
+def ballLostStopChasing(player):
+    """
+    If the robot does not see the ball while chasing, it is lost.
+    """
+    if not player.brain.ball.vis.on:
+        return False
+
+def ballMovedStopChasing(player):
+    """
+    If the robot has been chasing for a while and it is far away, it should
+    stop chasing.
+    """
+    return (player.brain.ball.vis.dist > 100.0 and
+            player.counter > 200.0)
+
 def reachedTheBall(player):
+    """
+    The robot has reached the ball after walking to it.
+    """
     return player.brain.nav.isAtPosition()
+
+def doneWalking(player):
+    """
+    HACK for walkTo from nav, which does not always switch to done.
+    """
+    return player.brain.nav.currentState == 'standing'
+
+def ballIsAtMyFeet(player):
+    """
+    If the ball is just sitting at the goalie's feet, it should kick fast.
+    """
+    return (player.brain.ball.loc.dist < 18.0 and
+            fabs(player.brain.ball.loc.relX) < 18.0 and
+            player.brain.ball.loc.relY < 1.0 and
+            player.brain.ball.vis.on)
 
 # ******************
 # SAVING TRANSITIONS
