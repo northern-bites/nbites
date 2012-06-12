@@ -39,7 +39,7 @@ class HeadTrackingHelper(object):
         totalTime = yawDiff/degreesPerSecond
 
         newHeadMove = ( ((headMoveYaw,headMovePitch), totalTime, 1,
-                         stiff.LOW_HEAD_STIFFNESSES) )
+                         StiffnessModes.LOW_HEAD_STIFFNESSES) )
 
         self.executeHeadMove(newHeadMove)
 
