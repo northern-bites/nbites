@@ -39,7 +39,7 @@ def gameReady(player):
         player.initialDelayCounter += 1
         return player.stay()
 
-    return player.goLater('watch')
+    return player.goLater('walkToGoal')
 
 def gameSet(player):
     if player.firstFrame():
@@ -59,6 +59,7 @@ def gamePlaying(player):
     if player.lastDiffState == 'gamePenalized':
         return player.goLater('decideSide')
 
+    # something with falls is NOT working!
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
 
@@ -119,13 +120,16 @@ def kickBall(player):
         player.executeMove(kick)
 
     if player.counter > 10 and player.brain.nav.isStopped():
-        return player.goLater('returnToGoal')
+        if player.lastDiffState == 'clearIt':
+            return player.goLater('returnToGoal')
+        else:
+            return player.goLater('watch')
 
     return player.stay()
 
 def saveIt(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.GOALIE_SQUAT)
+        player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         player.isSaving = False
     if (not player.motion.isBodyActive() and not player.isSaving):
         player.squatTime = time.time()
@@ -135,7 +139,7 @@ def saveIt(player):
         stopTime = time.time()
         # This is to stand up before a penalty is called.
         if (stopTime - player.squatTime > 4):
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            #player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
     return player.stay()
 
