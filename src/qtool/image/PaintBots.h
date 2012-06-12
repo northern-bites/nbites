@@ -15,29 +15,28 @@
 #include <vector>
 
 #include "data/DataManager.h"
-#include "image/BMPImage.h"
+#include "image/PaintFieldObjects.h"
 #include "man/include/FieldConstants.h"
 #include "viewer/BotLocs.h"
 
 namespace qtool {
-	namespace image {
+namespace image {
 
-		class PaintBots : public image::BMPImage {
+class PaintBots : public PaintFieldOverlay {
 
-			Q_OBJECT
+    Q_OBJECT
 
-			public:
-			PaintBots(QObject *parent = 0, float sF = (float)1.0);
-			~PaintBots(){}
-			unsigned getWidth() const { return FIELD_WIDTH*scaleFactor; }
-			unsigned getHeight() const { return FIELD_HEIGHT*scaleFactor; }
-			viewer::BotLocs* locs;
+public:
+    PaintBots(float scale = 1.0f, QObject *parent = 0);
+    ~PaintBots(){}
 
-		protected:
-			virtual void buildBitmap();
-			float scaleFactor;
+    //this should be moved somewhere else and not be public
+    viewer::BotLocs* locs;
 
-		};
+protected:
+    virtual void buildBitmap();
 
-	}
+};
+
+}
 }

@@ -31,9 +31,9 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
 
   void FieldViewer::updateLocalization()
   {
-      float xEst = localizationStream->get()->x_est();
-      float yEst = localizationStream->get()->y_est();
-      float hEst = localizationStream->get()->h_est();
+      float xEst = localizationStream->get()->location().x();
+      float yEst = localizationStream->get()->location().y();
+      float hEst = localizationStream->get()->location().h();
 
 
       // UNCOMMENT to attempt drawing of particle swarm

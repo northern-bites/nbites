@@ -16,21 +16,20 @@ message PVision {
     repeated PVisualLine visual_line=14;
     optional PVisualCross visual_cross=15;
 
-    	message PVisualDetection {
+    message PVisualDetection {
 
-	optional float distance = 1;
-        optional sint32 x = 2;
-        optional sint32 y = 3;
-        optional sint32 center_x = 4;
-        optional sint32 center_y = 5;
-        optional float angle_x = 6;
+		optional float distance = 1;
+    	optional sint32 x = 2;
+    	optional sint32 y = 3;
+    	optional sint32 center_x = 4;
+    	optional sint32 center_y = 5;
+    	optional float angle_x = 6;
         optional float angle_y = 7;
         optional float bearing = 8;
         optional float elevation = 9;
         optional float distance_sd = 10;
         optional float bearing_sd = 11;
-	optional bool inTopCam = 12;
-
+		optional bool inTopCam = 12;
 	}
 
     message PVisualBall {

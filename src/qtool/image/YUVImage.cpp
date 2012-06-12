@@ -3,9 +3,8 @@
 using namespace std;
 using namespace man::memory;
 using namespace man::corpus;
-using namespace qtool::data;
 
-YUVImage::YUVImage(RoboImages::const_ptr rawImages, Camera::Type which) :
+YUVImage::YUVImage(MRawImages::const_ptr rawImages, Camera::Type which) :
 		rawImages(rawImages), which(which), width(0), height(0),
 		yImg(NULL), uImg(NULL), vImg(NULL) {
 

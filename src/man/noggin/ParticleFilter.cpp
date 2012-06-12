@@ -471,9 +471,9 @@ namespace PF
     {
         using namespace man::memory::proto;
 
-        mLoc->get()->set_x_est(this->getXEst());
-        mLoc->get()->set_y_est(this->getYEst());
-        mLoc->get()->set_h_est(this->getHEst());
+        mLoc->get()->mutable_location()->set_x(this->getXEst());
+        mLoc->get()->mutable_location()->set_y(this->getYEst());
+        mLoc->get()->mutable_location()->set_h(this->getHEst());
 
         mLoc->get()->clear_particles();
 

@@ -212,7 +212,7 @@ public:
     // angles. This way we can save joints that are synchronized to the most
     // current image. At the same time, the bodyAngles vector will still have the
     // most recent angles if some other module needs them.
-    void updateVisionAngles();
+    void updateVisionAngles(int historyIndex);
 
     // Save a vision frame with associated sensor data
     void saveFrame();
@@ -231,8 +231,6 @@ public:
     float percentBrokenSonar();
 
 private:
-    void add_to_module();
-
     // put the sensor data values into the variance tracker, at the correct hz
     void updateMotionDataVariance();
     void updateVisionDataVariance();
@@ -264,6 +262,9 @@ private:
     // angles. visionBodyAngles is a snapshot of what the most current angles
     // were when the last vision frame started.
     std::vector<float> bodyAngles;
+
+    typedef std::list< std::vector<float> > AngleHistory;
+    AngleHistory bodyAngleHistory;
     std::vector<float> visionBodyAngles;
     std::vector<float> motionBodyAngles;
     std::vector<float> bodyAnglesError;

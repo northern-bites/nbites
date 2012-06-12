@@ -25,6 +25,8 @@ set( Image_srcs
     PaintField
     PaintBots
     PaintLocalization
+    PaintFieldObjects
+    PaintRobotWorldState
     )
 
 set( Image_headers
@@ -33,7 +35,9 @@ set( Image_headers
   PaintField.h
   PaintBots.h
   PaintLocalization.h
-  PaintGroundTruth.h)
+  PaintGroundTruth.h
+  PaintFieldObjects.h
+  PaintRobotWorldState.h)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 

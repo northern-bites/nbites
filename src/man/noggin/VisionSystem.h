@@ -54,7 +54,10 @@ class VisionSystem : public PF::SensorModel
             float probability = scoreFromLandmark<VisualObservationT, ConcretePossibilityT>(observation,
                     *(observation.getPossibilities()->front()), particle);
 
-            totalWeight = updateTotalWeight(totalWeight, probability);
+            if(totalWeight == 0.0f)
+                totalWeight = probability;
+            else
+                totalWeight*= probability;
             observationCount++;
         }
     }
@@ -70,19 +73,19 @@ class VisionSystem : public PF::SensorModel
                             const Particle& particle) {
 
         PF::Vector2D hypothesisVector = PF::getPosition(particle.getLocation(),
-                observation.getDistance(), observation.getBearing());
+                landmark.getFieldX(), landmark.getFieldY());
+
         float distanceDiff = observation.getDistance() - hypothesisVector.magnitude;
-        float angleDiff = NBMath::subPIAngle(observation.getBearing())
-            - NBMath::subPIAngle(hypothesisVector.direction);
+        float angleDiff = NBMath::subPIAngle(observation.getBearing() - hypothesisVector.direction);
 
         boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
         float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 
-//        boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
-//        float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
+        boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
+        float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 
         // Better way to determine probability?
-        return distanceProb;// * angleProb;
+        return distanceProb * angleProb;
     }
 
     static float scoreFromCorner(const VisualCorner& observation,

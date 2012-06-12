@@ -25,7 +25,8 @@ set( viewer_srcs MemoryViewer.cpp
                  FieldViewer.cpp
                  EKFDataViewer.cpp
                  CollapsibleImageViewer.cpp
-		 BotLocs.cpp
+		 		 BotLocs.cpp
+		 		 RobotField.cpp
                  )
 
 set( viewer_headers MemoryViewer.h
@@ -37,7 +38,8 @@ set( viewer_headers MemoryViewer.h
                     FieldViewer.h
                     EKFDataViewer.h
                     CollapsibleImageViewer.h
-		    BotLocs.h
+		    		BotLocs.h
+		    		RobotField.h
                     )
 
 

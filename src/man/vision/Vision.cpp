@@ -156,21 +156,21 @@ void Vision::notifyImage() {
 
     //the above is commented to try cool shit
 
-    linesDetector->detect(thresh->getVisionHorizon(),
-                         thresh->field->getTopEdge(),
-                         yImg);
-
-    cornerDetector->detect(thresh->getVisionHorizon(),
-                           thresh->field->getTopEdge(),
-                           linesDetector->getLines());
+//    linesDetector->detect(thresh->getVisionHorizon(),
+//                         thresh->field->getTopEdge(),
+//                         yImg);
+//
+//    cornerDetector->detect(thresh->getVisionHorizon(),
+//                           thresh->field->getTopEdge(),
+//                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
     thresh->visionLoop();
 
-    drawEdges(*linesDetector->getEdges());
-    drawHoughLines(linesDetector->getHoughLines());
-    drawVisualLines(linesDetector->getLines());
-    drawVisualCorners(cornerDetector->getCorners());
+//    drawEdges(*linesDetector->getEdges());
+//    drawHoughLines(linesDetector->getHoughLines());
+//    drawVisualLines(linesDetector->getLines());
+//    drawVisualCorners(cornerDetector->getCorners());
 
     thresh->transposeDebugImage();
 
@@ -317,11 +317,11 @@ void Vision::updateMVision(man::memory::MVision::ptr mVision) const {
     visual_ball->set_confidence(this->ball->getConfidence());
 
     PVision::PVisualFieldObject* yglp;
-    yglp= mVision->get()->mutable_yglp();
+    yglp = mVision->get()->mutable_yglp();
     update(yglp, this->yglp);
 
     PVision::PVisualFieldObject* ygrp;
-    ygrp= mVision->get()->mutable_ygrp();
+    ygrp = mVision->get()->mutable_ygrp();
     update(ygrp, this->ygrp);
 
     //VisualRobot

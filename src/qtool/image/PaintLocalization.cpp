@@ -9,7 +9,7 @@ namespace qtool
       BMPImage(parent), lastParticles(), lastXEst(FIELD_HEIGHT*0.5f), 
       lastYEst(FIELD_WIDTH*0.5f), lastHEst(0.0f)
     {
-      bitmap = QPixmap(FIELD_WIDTH, FIELD_HEIGHT);
+      bitmap = QImage(FIELD_WIDTH, FIELD_HEIGHT, QImage::Format_ARGB32_Premultiplied);
     }
     
     void PaintLocalization::updateWithParticles(PF::ParticleSet particles)
@@ -26,7 +26,7 @@ namespace qtool
       lastHEst = h;
     }
 
-    void PaintLocalization::drawParticle(PF::LocalizationParticle particle, QPixmap& bitmap)
+    void PaintLocalization::drawParticle(PF::LocalizationParticle particle, QImage& bitmap)
     {
       QPainter painter(&bitmap);
 
@@ -57,7 +57,7 @@ namespace qtool
       drawEstimate(bitmap);
     }
 
-    void PaintLocalization::drawEstimate(QPixmap& bitmap)
+    void PaintLocalization::drawEstimate(QImage& bitmap)
     {
       QPainter painter(&bitmap);
 
