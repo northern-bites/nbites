@@ -127,7 +127,7 @@ class KickInformation:
     # Hack from US open 2012
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
-            if mate.playerNumber in [1, 4] and mate.active:
+            if mate.playerNumber in [1] and mate.active:
                 if mate.ballOn and mate.ballDist < 100:
                     return True
 
