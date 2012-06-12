@@ -12,36 +12,35 @@ class KickInformation:
 #        self.decider = decider
         self.brain = brain
 
-        self.oppGoalLeftPostBearings = []
-        self.oppGoalRightPostBearings = []
-        self.myGoalLeftPostBearings = []
-        self.myGoalRightPostBearings = []
+        self.farGoalLeftPostBearings = []
+        self.farGoalRightPostBearings = []
+        self.nearGoalLeftPostBearings = []
+        self.nearGoalRightPostBearings = []
 
-        self.oppGoalLeftPostDists = []
-        self.oppGoalRightPostDists = []
-        self.myGoalLeftPostDists = []
-        self.myGoalRightPostDists = []
+        self.farGoalLeftPostDists = []
+        self.farGoalRightPostDists = []
+        self.nearGoalLeftPostDists = []
+        self.nearGoalRightPostDists = []
 
-        self.oppLeftPostBearing = None
-        self.oppRightPostBearing = None
-        self.oppAvgPostBearing = None
-        self.myLeftPostBearing = None
-        self.myRightPostBearing = None
-        self.myAvgPostBearing = None
+        self.farLeftPostBearing = 0.0
+        self.farRightPostBearing = 0.0
+        self.nearLeftPostBearing = 0.0
+        self.nearRightPostBearing = 0.0
 
-        self.oppLeftPostDist = 0.0
-        self.oppRightPostDist = 0.0
-        self.oppAvgPostDist = 0.0
-        self.myLeftPostDist = 0.0
-        self.myRightPostDist = 0.0
-        self.myAvgPostDist = 0.0
+        self.farLeftPostDist = 0.0
+        self.farRightPostDist = 0.0
+        self.farAvgPostDist = 0.0
+        self.nearLeftPostDist = 0.0
+        self.nearRightPostDist = 0.0
+        self.nearAvgPostDist = 0.0
 
         self.sawGoal = False
-        self.sawOwnGoal = False
-        self.sawOppGoal = False
+        self.sawNearGoal = False
+        self.sawFarGoal = False
 
         self.haveData = False
 
+        self.aimingAtNearGoal = False
         self.kickObjective = None
         self.kick = None
         self.kickDest = None
@@ -74,16 +73,22 @@ class KickInformation:
         if self.brain.yglp.vis.on:
             self.sawGoal = True
             if self.brain.yglp.vis.certainty == vision.certainty._SURE:
-                self.sawOppGoal = True
-                self.oppGoalLeftPostBearings.append(self.brain.oppGoalLeftPost.vis.bearing)
-                self.oppGoalLeftPostDists.append(self.brain.oppGoalLeftPost.vis.dist)
+                if brain.yglp.vis.dist > 300:
+                    self.farGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
+                    self.farGoalLeftPostDists.append(self.brain.yglp.vis.dist)
+                if brain.yglp.vis.dist < 300:
+                    self.nearGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
+                    self.nearGoalLeftPostDists.append(self.brain.yglp.vis.dist)
 
         if self.brain.ygrp.vis.on:
             self.sawGoal = True
             if self.brain.ygrp.vis.certainty == vision.certainty._SURE:
-                self.sawOppGoal = True
-                self.oppGoalRightPostBearings.append(self.brain.oppGoalRightPost.vis.bearing)
-                self.oppGoalRightPostDists.append(self.brain.oppGoalRightPost.vis.dist)
+                if brain.ygrp.vis.dist > 300:
+                    self.farGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
+                    self.farGoalRightPostDists.append(self.brain.ygrp.vis.dist)
+                if brain.ygrp.vis.dist < 300:
+                    self.nearGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
+                    self.nearGoalRightPostDists.append(self.brain.ygrp.vis.dist)
 
     def calculateDataAverages(self):
         """
@@ -92,37 +97,47 @@ class KickInformation:
         if not self.haveData:
             return
 
-        if len(self.oppGoalLeftPostBearings) > 0:
-            self.oppLeftPostBearing = (sum(self.oppGoalLeftPostBearings) /
-                                       len(self.oppGoalLeftPostBearings))
-        if len(self.oppGoalRightPostBearings) > 0:
-            self.oppRightPostBearing = (sum(self.oppGoalRightPostBearings) /
-                                        len(self.oppGoalRightPostBearings))
-        # average post bearings
-        if self.oppLeftPostBearing is not None and \
-                self.oppRightPostBearing is not None:
-            self.oppAvgPostBearing = (self.oppLeftPostBearing +
-                                      self.oppRightPostBearing)*.5
-        elif self.oppLeftPostBearing is not None:
-            self.oppAvgPostBearing = self.oppLeftPostBearing + 5.#somewhere in middle
-        elif self.oppRightPostBearing is not None:
-            self.oppAvgPostBearing = self.oppRightPostBearing - 5.#somewhere in middle
-
+        # bearing averages
+        if len(self.farGoalLeftPostBearings) > 0:
+            self.farLeftPostBearing = (sum(self.farGoalLeftPostBearings) /
+                                       len(self.farGoalLeftPostBearings))
+        if len(self.farGoalRightPostBearings) > 0:
+            self.farRightPostBearing = (sum(self.farGoalRightPostBearings) /
+                                        len(self.farGoalRightPostBearings))
+        if len(self.nearGoalLeftPostBearings) > 0:
+            self.nearLeftPostBearing = (sum(self.nearGoalLeftPostBearings) /
+                                        len(self.nearGoalLeftPostBearings))
+        if len(self.nearGoalRightPostBearings) > 0:
+            self.nearRightPostBearing = (sum(self.nearGoalRightPostBearings) /
+                                         len(self.nearGoalRightPostBearings))
         # distance averages
-        if len(self.oppGoalLeftPostDists) > 0:
-            self.oppLeftPostDist = (sum(self.oppGoalLeftPostDists) /
-                                    len(self.oppGoalLeftPostDists))
-        if len(self.oppGoalRightPostDists) > 0:
-            self.oppRightPostDist = (sum(self.oppGoalRightPostDists) /
-                                     len(self.oppGoalRightPostDists))
+        if len(self.farGoalLeftPostDists) > 0:
+            self.farLeftPostDist = (sum(self.farGoalLeftPostDists) /
+                                    len(self.farGoalLeftPostDists))
+        if len(self.farGoalRightPostDists) > 0:
+            self.farRightPostDist = (sum(self.farGoalRightPostDists) /
+                                     len(self.farGoalRightPostDists))
+        if len(self.nearGoalLeftPostDists) > 0:
+            self.nearLeftPostDist = (sum(self.nearGoalLeftPostDists) /
+                                     len(self.nearGoalLeftPostDists))
+        if len(self.nearGoalRightPostDists) > 0:
+            self.nearRightPostDist = (sum(self.nearGoalRightPostDists) /
+                                      len(self.nearGoalRightPostDists))
         # average post distances
-        if self.oppLeftPostBearing is not None and \
-                self.oppRightPostBearing is not None:
-            self.oppAvgPostDist = (self.oppLeftPostDist + self.oppRightPostDist)*.5
-        elif self.oppLeftPostBearing is not None:
-            self.oppAvgPostDist = self.oppLeftPostDist
-        elif self.oppRightPostBearing is not None:
-            self.oppAvgPostDist = self.oppRightPostDist
+        if self.farLeftPostBearing is not None and \
+                self.farRightPostBearing is not None:
+            self.farAvgPostDist = (self.farLeftPostDist + self.farRightPostDist)*.5
+        elif self.farLeftPostBearing is not None:
+            self.farAvgPostDist = self.farLeftPostDist
+        elif self.farRightPostBearing is not None:
+            self.farAvgPostDist = self.farRightPostDist
+        if self.nearLeftPostBearing is not None and \
+                self.nearRightPostBearing is not None:
+            self.nearAvgPostDist = (self.nearLeftPostDist + self.nearRightPostDist)*.5
+        elif self.nearLeftPostBearing is not None:
+            self.nearAvgPostDist = self.nearLeftPostDist
+        elif self.nearRightPostBearing is not None:
+            self.nearAvgPostDist = self.nearRightPostDist
 
     # Hack from US open 2012
     def dangerousBall(self):
@@ -170,17 +185,36 @@ class KickInformation:
         # Loc is bad- use only visual information to choose a kick.
         #TODO: add orbits to this
 
-        rightPostBearing = self.oppRightPostBearing
-        leftPostBearing = self.oppLeftPostBearing
+        # Determine which goal to aim at
+        if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
+            if self.dangerousBall():
+                rightPostBearing = self.farRightPostBearing
+                leftPostBearing = self.farLeftPostBearing
+                self.aimingAtNearGoal = False
+            else:
+                rightPostBearing = self.nearRightPostBearing
+                leftPostBearing = self.nearLeftPostBearing
+                self.aimingAtNearGoal = True
+        elif self.farAvgPostDist != 0:
+            rightPostBearing = self.farRightPostBearing
+            leftPostBearing = self.farLeftPostBearing
+            self.aimingAtNearGoal = False
+        elif self.nearAvgPostDist != 0:
+            rightPostBearing = self.nearRightPostBearing
+            leftPostBearing = self.nearLeftPostBearing
+            self.aimingAtNearGoal = True
+        else:
+            # Can't see any posts: orbit
+            return self.kickLoc()
 
         # DEBUG printing
         print "rightPostBearing: ",rightPostBearing
         print "leftPostBearing:  ",leftPostBearing
 
-        if rightPostBearing is None and leftPostBearing is None:
+        if rightPostBearing != 0 and leftPostBearing != 0:
             # Can't see any posts: orbit.
             return self.kickLoc()
-        elif rightPostBearing is not None and leftPostBearing is not None:
+        elif rightPostBearing != 0 and leftPostBearing != 0:
             # Can see both posts: shoot between them.
             leftScorePoint = rightPostBearing - 20
             rightScorePoint = leftPostBearing + 20
@@ -189,7 +223,7 @@ class KickInformation:
                 # less than 40 degrees of goal available to shoot in.
                 leftScorePoint = ((rightPostBearing + leftPostBearing) / 2) + 5
                 rightScorePoint = leftScorePoint - 10
-        elif rightPostBearing is not None:
+        elif rightPostBearing != 0:
             # Can only see the right post.
             leftScorePoint = rightPostBearing - 15
             rightScorePoint = leftScorePoint - 10
