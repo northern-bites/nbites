@@ -6,16 +6,16 @@
 
 namespace noggin {
 
-GoalieSystem::GoalieSystem() : rightPostBearings(),
+GoalieSystem::GoalieSystem() : home(),
+                               rightPostBearings(),
                                rightPostDistances(),
                                leftPostBearings(),
-                               leftPostDistances(),
-                               home()
+                               leftPostDistances()
 {
     // to avoid a crash....
     pushRightPostObservation(0.f, 0.f);
     pushLeftPostObservation(0.f, 0.f);
-    pushCrossObservation(0.f);
+    pushCrossObservation(0.f, 0.f);
 }
 
 void GoalieSystem::resetPosts(float rightDistance, float rightBearing,
@@ -27,6 +27,13 @@ void GoalieSystem::resetPosts(float rightDistance, float rightBearing,
     leftPostDistances.clear();
     pushRightPostObservation(rightDistance, rightBearing);
     pushLeftPostObservation(leftDistance, leftBearing);
+}
+
+void GoalieSystem::resetCross(float distance, float bearing)
+{
+    crossBearings.clear();
+    crossDistances.clear();
+    pushCrossObservation(distance, bearing);
 }
 
 void GoalieSystem::pushRightPostObservation(float distance, float bearing)
@@ -45,9 +52,10 @@ void GoalieSystem::pushLeftPostObservation(float distance, float bearing)
         popLeftPostObservation();
 }
 
-void GoalieSystem::pushCrossObservation(float bearing)
+void GoalieSystem::pushCrossObservation(float distance, float bearing)
 {
     crossBearings.push_back(bearing);
+    crossBearings.push_back(distance);
     if(crossBearings.size() > CROSS_Q_LENGTH)
         popCrossObservation();
 }
@@ -67,6 +75,7 @@ void GoalieSystem::popLeftPostObservation()
 void GoalieSystem::popCrossObservation()
 {
     crossBearings.pop_front();
+    crossDistances.pop_front();
 }
 
 float GoalieSystem::leftPostBearing()
@@ -94,6 +103,11 @@ float GoalieSystem::crossBearing()
     return computeAverage(crossBearings);
 }
 
+float GoalieSystem::crossDistance()
+{
+    return computeAverage(crossDistances);
+}
+
 float GoalieSystem::leftPostRelX()
 {
     return leftPostDistance() * std::cos(leftPostBearing() * TO_RAD);
@@ -112,6 +126,16 @@ float GoalieSystem::rightPostRelX()
 float GoalieSystem::rightPostRelY()
 {
     return rightPostDistance() * std::sin(rightPostBearing() * TO_RAD);
+}
+
+float GoalieSystem::crossRelX()
+{
+    return crossDistance() * std::cos(crossBearing() * TO_RAD);
+}
+
+float GoalieSystem::crossRelY()
+{
+    return crossDistance() * std::sin(crossBearing() * TO_RAD);
 }
 
 float GoalieSystem::centerGoalBearingAvg()

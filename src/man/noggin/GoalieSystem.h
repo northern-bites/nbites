@@ -65,11 +65,12 @@ public:
 
     void resetPosts(float rightDistance, float rightBearing,
                     float leftDistance, float leftBearing);
+    void resetCross(float distance, float bearing);
 
     // Methods for controlling "memory"
     void pushRightPostObservation(float distance, float bearing);
     void pushLeftPostObservation(float distance, float bearing);
-    void pushCrossObservation(float bearing);
+    void pushCrossObservation(float distance, float bearing);
 
     void popRightPostObservation();
     void popLeftPostObservation();
@@ -81,11 +82,14 @@ public:
     float leftPostDistance();
     float rightPostDistance();
     float crossBearing();
+    float crossDistance();
 
     float leftPostRelX();
     float leftPostRelY();
     float rightPostRelX();
     float rightPostRelY();
+    float crossRelX();
+    float crossRelY();
 
     // Averages left and right post values
     float centerGoalDistanceAvg();
@@ -101,6 +105,7 @@ private:
     std::deque<float> leftPostBearings;
     std::deque<float> leftPostDistances;
     std::deque<float> crossBearings;
+    std::deque<float> crossDistances;
 
     float computeAverage(std::deque<float>);
 };
