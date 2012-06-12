@@ -133,7 +133,7 @@ void Noggin::initializeLocalization()
 #   endif
 
     locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
-    locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem());
+    locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem(vision));
 
     loc = shared_ptr<LocSystem>(new PF::ParticleFilter(locMotionSystem,
                                                        locVisionSystem,
@@ -311,72 +311,38 @@ void Noggin::updateLocalization()
 
     locMotionSystem->setCurrentOdometry(odo);
 
-    std::vector<PF::Observation> observations;
+//    std::vector<PF::Observation> observations;
     std::vector<Landmark> landmarks;
     float dist, theta;
 
     // Get team of the robot for localization.
     uint8 teamColor = (*gc->getMyTeam()).teamColor;
 
-    // Observe FieldObjects.
-    VisualFieldObject fo;
-
-    fo = *vision->ygrp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
-    {
-        // Create a new Observation from the observed VisualFieldObject.
-    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-    dist = fo.getDistance();
-    theta = fo.getBearing();
-    observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
-    fo = *vision->yglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE)
-    {
-        // Create a new Observation from the observed VisualFieldObject.
-    landmarks = constructLandmarks<VisualFieldObject, ConcreteFieldObject>(fo);
-    dist = fo.getDistance();
-    theta = fo.getBearing();
-    observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
-    // Observe Field Cross.
-    if (vision->cross->getDistance() > 0 &&
-        vision->cross->getDistance() < MAX_CROSS_DISTANCE)
-    {
-
-    landmarks = constructLandmarks<VisualCross, ConcreteCross>(*vision->cross);
-    dist = (*vision->cross).getDistance();
-    theta = (*vision->cross).getBearing();
-    observations.push_back(PF::Observation(landmarks, dist, theta));
-    }
-
     // Observe Corners.
-    float phi;
-    const list<VisualCorner> * corners = vision->fieldLines->getCorners();
-    list <VisualCorner>::const_iterator ci;
-    for(ci = corners->begin(); ci != corners->end(); ++ci)
-    {
-        if (ci->getDistance() < MAX_CORNER_DISTANCE)
-    {
-        landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
-        dist = ci->getDistance();
-        theta = ci->getBearing();
-        phi = ci->getPhysicalOrientation();
-        observations.push_back(PF::CornerObservation(landmarks, dist,
-                                                     theta, phi));
-        }
-        else{
-            std::cout << "We saw a corner REALLY far away: "
-                      << ci->getDistance()<< " centimeters away" <<std::endl
-                      << "They can't be more than" << MAX_CORNER_DISTANCE
-                      << " centimeters away." << std::endl;
-        }
-    }
+//    float phi;
+//    const list<VisualCorner> * corners = vision->fieldLines->getCorners();
+//    list <VisualCorner>::const_iterator ci;
+//    for(ci = corners->begin(); ci != corners->end(); ++ci)
+//    {
+//        if (ci->getDistance() < MAX_CORNER_DISTANCE)
+//    {
+//        landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
+//        dist = ci->getDistance();
+//        theta = ci->getBearing();
+//        phi = ci->getPhysicalOrientation();
+//        observations.push_back(PF::CornerObservation(landmarks, dist,
+//                                                     theta, phi));
+//        }
+//        else{
+//            std::cout << "We saw a corner REALLY far away: "
+//                      << ci->getDistance()<< " centimeters away" <<std::endl
+//                      << "They can't be more than" << MAX_CORNER_DISTANCE
+//                      << " centimeters away." << std::endl;
+//        }
+//    }
 
     // Update the localiztion vision interface with Observations.
-    locVisionSystem->feedObservations(observations);
+//    locVisionSystem->feedObservations(observations);
 
     // Now, run the particle filter.
     MotionModel u_t;

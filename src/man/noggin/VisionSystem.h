@@ -12,160 +12,97 @@
 #include "ParticleFilter.h"
 #include "ConcreteFieldObject.h"
 #include "NBMath.h"
+#include "Vision.h"
 #include <boost/math/distributions.hpp>
 
-/**
- * Holds a known landmark.
- */
-struct Landmark
-{
-    Landmark(float X = 0.0f, float Y = 0.0f, std::string w = "UNKNOWN")
-    : x(X), y(Y), what(w)
-    { }
 
-    /**
-     * Constructs a Landmark from a ConcreteFieldObject.
-     */
-    Landmark(const ConcreteLandmark& fieldLandmark)
-    {
-        x    = fieldLandmark.getFieldX();
-        y    = fieldLandmark.getFieldY();
-        what = fieldLandmark.toString();
-    }
-
-    float x;
-    float y;
-    std::string what;
-
-    friend std::ostream& operator<<(std::ostream& out, Landmark l)
-    {
-        out << "Landmark \"" << l.what << "\" at (" << l.x << ", "
-            << l.y << ") \n";
-        return out;
-    }
-};
-
-/**
- * Helper function to construct a list of Landmark possibilities from
- * a VisualFieldObject.
- * @param fieldObjects
- * @return a vector of landmarks.
- */
-template <typename VisualT, typename ConcreteT>
-static std::vector<Landmark> constructLandmarks(const VisualT & fieldObject)
-{
-    std::vector<Landmark> landmarks;
-
-    const std::list<const ConcreteT * > * possibilities = fieldObject.getPossibilities();
-
-    typename std::list<const ConcreteT * >::const_iterator i;
-    for(i = possibilities->begin(); i != possibilities->end(); ++i)
-    {
-        // Construct landmarks from possibilities.
-        Landmark l((**i).getFieldX(),
-                   (**i).getFieldY(),
-                   (**i).toString());
-        landmarks.push_back(l);
-    }
-
-    return landmarks;
-}
-
-/**
- * Holds a single observation.
- */
-namespace PF
-{
-template <class VisualObservationT, class ConcretePossibilityT>
-class Observation
-{
-
-    Observation(const VisualObservationT& visualObservation)
-        : visualObservation(visualObservation) { }
-
-    friend std::ostream& operator<<(std::ostream& out, Observation o)
-    {
-        out << "Observed landmark at distance " << o.distance
-            << " and angle " << o.angle << "\n"
-            << "Possibilities: \n";
-        std::vector<Landmark>::iterator lIter;
-        for(lIter = o.possibilities.begin(); lIter != o.possibilities.end();
-            lIter++)
-        {
-            out << *lIter;
-        }
-
-        return out;
-    }
-
-protected:
-    VisualObservationT& visualObservation;
-    };
-
-    struct CornerObservation : Observation
-    {
-         CornerObservation(std::vector<Landmark> p, float dist = 0.0f,
-                           float theta = 0.0f, float phi = 0.0f)
-             : Observation(p,dist,theta)
-    {
-        orientation = phi;
-    }
-
-    bool isAmbiguous() const { return possibilities.size() > 1 ? true : false; }
-
-    bool isCorner() const { return true; }
-
-    friend std::ostream& operator<<(std::ostream& out, CornerObservation o)
-    {
-        out << "Observed corner landmark at distance " << o.distance
-            << " and angle " << o.angle << "\n"
-            << " with physical orientation " << o.orientation << "\n"
-            << "Possibilities: \n";
-        std::vector<Landmark>::iterator lIter;
-        for(lIter = o.possibilities.begin(); lIter != o.possibilities.end();
-            lIter++)
-        {
-            out << *lIter;
-        }
-
-        return out;
-    }
-
-        std::vector<Landmark> possibilities;
-        float distance;
-        float angle;
-        float orientation;
-    };
-}
-
-struct LocalizationVisionParams
-{
-    float sigma_d;       // Variance for calculating distance weights.
-    float sigma_h;       // Variance for calculating heading weights.
-};
-
-static const LocalizationVisionParams DEFAULT_LOCVIS_PARAMS =
-{
-    15.00f,
-    1.25f
-};
+//struct LocalizationVisionParams
+//{
+//    float sigma_d;       // Variance for calculating distance weights.
+//    float sigma_h;       // Variance for calculating heading weights.
+//};
+//
+//static const LocalizationVisionParams DEFAULT_LOCVIS_PARAMS =
+//{
+//    15.00f,
+//    1.25f
+//};
 
 /**
  * @class VisionSystem
  */
 class VisionSystem : public PF::SensorModel
 {
+
+    typedef PF::LocalizationParticle Particle;
+
  public:
-    VisionSystem(LocalizationVisionParams params = DEFAULT_LOCVIS_PARAMS);
+    VisionSystem(Vision::const_ptr vision);//, LocalizationVisionParams params = DEFAULT_LOCVIS_PARAMS);
 
     PF::ParticleSet update(PF::ParticleSet particles);
 
-    void feedObservations(std::vector<PF::Observation> newObs);
+//    void feedObservations(std::vector<PF::Observation> newObs);
+
+    template <class VisualObservationT, class ConcretePossibilityT>
+    static float incorporateLandmarkObservation(VisualObservationT& observation,
+                                                 const Particle& particle,
+                                                 float& totalWeight,
+                                                 int& observationCount) {
+
+        if (isSaneLandmarkObservation<VisualObservationT>(observation)) {
+
+            float probability = scoreFromLandmark<VisualObservationT, ConcretePossibilityT>(observation,
+                    observation->getPossibilities()->front(), particle);
+
+            totalWeight = updateTotalWeight(totalWeight, probability);
+            observationCount++;
+        }
+    }
+
+    template <class VisualObservationT>
+    static bool isSaneLandmarkObservation(VisualObservationT& observation) {
+        return observation.hasPositiveID() && observation.hasValidDistance();
+    }
+
+    template <class VisualObservationT, class ConcretePossibilityT>
+    static float scoreFromLandmark(const VisualObservationT& observation,
+                            const ConcretePossibilityT& landmark,
+                            const Particle& particle) {
+
+        PF::Vector2D hypothesisVector = PF::getPosition(particle.getLocation(),
+                observation.getDistance(), observation.getBearing());
+        float distanceDiff = observation.getDistance() - hypothesisVector.magnitude;
+        float angleDiff = NBMath::subPIAngle(observation.getBearing()) -
+                NBMath::subPIAngle(hypothesisVector.direction);
+
+        boost::math::normal_distribution<float> pDist(0.0f, observation.getDistanceSD());
+        float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
+
+        boost::math::normal_distribution<float> pAngle(0.0f, observation.getBearingSD());
+        float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
+
+        // Better way to determine probability?
+        return distanceProb * angleProb;
+    }
+
+    template <class VisualCornerT, class Co
 
  private:
-    LocalizationVisionParams parameters;
+    static float updateTotalWeight(float currentTotalWeight, float currentWeight) {
 
-    std::vector<PF::Observation> currentObservations;
+        if(currentTotalWeight == 0.0f)
+            currentTotalWeight = currentWeight;
+        else
+            currentTotalWeight = currentTotalWeight*currentWeight;
+
+        return currentTotalWeight;
+    }
+
+ private:
+    Vision::const_ptr vision;
+//    LocalizationVisionParams parameters;
+
+//    std::vector<PF::Observation> currentObservations;
 
     // Normal distributions for calculating weights of particles
     // based on visual observations.

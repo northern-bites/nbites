@@ -88,6 +88,7 @@ public:
     }
 
 	virtual const bool hasPositiveID();
+	virtual bool hasValidDistance() const { return getDistance() > 0.0f; }
 
 private: // Class Variables
 

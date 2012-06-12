@@ -1,10 +1,13 @@
 #include "VisionSystem.h"
 
+//TODO: move this to a sensible header
+static const float MAX_CORNER_DISTANCE = 400.0f;
+
 /**
  * Constructor
  */
-VisionSystem::VisionSystem(LocalizationVisionParams params)
-    : PF::SensorModel(), parameters(params)
+VisionSystem::VisionSystem(Vision::const_ptr vision) //, LocalizationVisionParams params)
+    : PF::SensorModel(), vision(vision) //, parameters(params)
 { }
 
 /**
@@ -15,21 +18,6 @@ VisionSystem::VisionSystem(LocalizationVisionParams params)
  */
 PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 {
-    std::vector<PF::Observation> obs = currentObservations;
-    if(obs.size() == 0)
-    {
-        //std::cout << "Nothing seen, do not update weights." << std::endl;
-
-        setUpdated(false);
-
-        return particles;
-    }
-    // else
-    //      std::cout << "#obs = " << obs.size() << std::endl;
-
-    setUpdated(true);
-
-    std::vector<PF::Observation>::iterator obsIter;
 
 #ifdef DEBUG_LOCALIZATION
     std::cout << "Using current location " << currentLocation << std::endl;
@@ -42,93 +30,28 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 //                  << std::endl;
 //        std::cout << "This particle is at: " << (*partIter).getLocation()
 //                  << " \n";
+
         // For each particle, compare the estimated distance from
         // the robot to the object (and angle) to the actual
         // distance as calculated by the vision system.
+
         float totalWeight = 0.0f;
         int count = 0;
-        for(obsIter = obs.begin(); obsIter != obs.end(); ++obsIter)
-        {
-            PF::Observation o = (*obsIter);
-            if(!o.isAmbiguous())
-            {
-                // Since the observation is unambiguous,
-                // there is only one possibility.
-                if(!o.isCorner())
-                {
-                Landmark l = o.possibilities[0];
-                PF::Vector2D hypothesisVector = PF::getPosition(
-                                           (*partIter).getLocation(), l.x, l.y);
-                float distanceDiff = o.distance - hypothesisVector.magnitude;
-                float angleDiff = NBMath::subPIAngle(o.angle) -
-                                 NBMath::subPIAngle(hypothesisVector.direction);
-                boost::math::normal_distribution<float> pDist(0.0f,
-                                                       parameters.sigma_d);
 
-                float distanceProb = boost::math::pdf<float>(pDist,
-                                                             distanceDiff);
+        // Visual objects
 
-                boost::math::normal_distribution<float> pAngle(0.0f,
-                                                        parameters.sigma_h);
+        // TODO: a bit nicer if we had a visual field object iterator of sorts in vision ...
+        incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->yglp),
+                *(partIter), totalWeight, count);
+        incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->ygrp),
+                        *(partIter), totalWeight, count);
 
-                float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
+        // Visual cross
 
-                // Better way to determine probability?
-                float probability = distanceProb * angleProb;
-//                std::cout << "Probability: " << probability << "\n";
+        incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
+                                *(partIter), totalWeight, count);
 
-                if(totalWeight == 0.0f)
-                    totalWeight = probability;
-                else
-                    totalWeight *= probability;
 
-                count++;
-                }
-            }
-            else
-            {
-                // Take the most likely landmark.
-                std::vector<Landmark>::iterator landmarkIter;
-                float maxWeight = 0.0f;
-                // Loop through all possibilities.
-//                std::cout << "We see an ambigous landmark. Lets go through all possibilities and find the best one" << std::endl;
-                for(landmarkIter = o.possibilities.begin();
-                    landmarkIter != o.possibilities.end();
-                    ++landmarkIter)
-                {
-                    Landmark l = *landmarkIter;
-//                    std::cout << "\n Potential landmark: " << l << "\n";
-//                    std::cout << "Landmark Rel Location: " << o.distance
-//                              << " , " << o.angle << "\n \n";
-                    PF::Vector2D hypothesisVector = PF::getPosition((*partIter).getLocation(), l.x, l.y);
-//                    std::cout << "Hypothesis vector: " << hypothesisVector << "\n";
-                    float distanceDiff = std::abs(o.distance - hypothesisVector.magnitude);
-//                    std::cout << "Distance Diff: " << distanceDiff << std::endl;
-                    float angleDiff = std::abs(o.angle - hypothesisVector.direction);
-//                    std::cout << "Angle Diff " << angleDiff << std::endl;
-                    boost::math::normal_distribution<float> pDist(0.0f, parameters.sigma_d);
-                    float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
-                    boost::math::normal_distribution<float> pAngle(0.0f, parameters.sigma_h);
-                    float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
-                    float probability = distanceProb * angleProb;
-//                    std::cout << "Probability: " << probability << "\n \n";
-                    if(probability > maxWeight)
-                    {
-                        maxWeight = probability;
-//                        std::cout << "Best Guess so far! \n";
-                    }
-                }
-
-                // Assign the total weight to be the product of the current total
-                // and the newly calculated weight based on current observation.
-                if(totalWeight == 0.0f)
-                    totalWeight = maxWeight;
-                else
-                    totalWeight *= maxWeight;
-
-                count++;
-            }
-        }
         // Make sure that we have made an observation before updating weights.
         if(count > 0)
         {
@@ -150,10 +73,14 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 #ifdef DEBUG_LOCALIZATION
             std::cout << " with new weight " << (*partIter).getWeight() << std::endl;
 #endif
+        } else {
+            //no observations, no use trying to re-weigh the other particles
+            setUpdated(false);
+            return particles;
         }
     }
     //std::cout << "---------------------------------------------" << std::endl;
-
+    setUpdated(true);
     return particles;
 }
 
@@ -162,7 +89,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
  *
  * @param newObs the new vector of observations.
  */
-void VisionSystem::feedObservations(std::vector<PF::Observation> newObs)
-{
-    currentObservations = newObs;
-}
+//void VisionSystem::feedObservations(std::vector<PF::Observation> newObs)
+//{
+//    currentObservations = newObs;
+//}

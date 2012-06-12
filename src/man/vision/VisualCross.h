@@ -18,6 +18,10 @@
 class VisualCross : public VisualObject {
 
 public:
+    //determined by common sense
+    static const float MAX_DISTANCE = 200.0f;
+
+public:
     // ConcreteType provided by this VisualObject
     typedef ConcreteCross ConcreteType;
 
@@ -74,6 +78,10 @@ public:
         return possibleCrosses;
     }
 	virtual const bool hasPositiveID();
+
+	virtual bool hasValidDistance() const {
+	    return getDistance() > 0.0f && getDistance() < MAX_DISTANCE;
+	}
 
 private: // Class Variables
 
