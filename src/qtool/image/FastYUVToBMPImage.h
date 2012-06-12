@@ -19,7 +19,7 @@
 #include <QImage>
 #include <QLayout>
 
-#include "data/DataTypes.h"
+#include "data/Typedefs.h"
 #include "image/BMPImage.h"
 
 #include "man/corpus/Camera.h"
@@ -43,7 +43,7 @@ class FastYUVToBMPImage : public image::BMPImage {
     Q_OBJECT;
 
 public:
-    FastYUVToBMPImage(data::RoboImages::const_ptr rawImages,
+    FastYUVToBMPImage(memory::MRawImages::const_ptr rawImages,
                       man::corpus::Camera::Type which,
                       QObject *parent = 0);
     virtual ~FastYUVToBMPImage();
@@ -63,9 +63,8 @@ protected:
     virtual void buildBitmap();
 
 private:
-    data::RoboImages::const_ptr rawImages;
+    memory::MRawImages::const_ptr rawImages;
     man::corpus::Camera::Type which;
-    QImage qimage;
     byte* rgb_image;
     SwsContext* image_convert_context;
 };

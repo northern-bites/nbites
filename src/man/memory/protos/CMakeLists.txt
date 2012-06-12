@@ -19,9 +19,11 @@ include_directories( ${PROTOBUF_INCLUDE_DIR}/
 ########################### PROTOBUF GENERATION
 
 #protobuf input - finds all .proto files in the current dir
-file(GLOB PROTO_INPUT
-  RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-  "*.proto")
+set(PROTO_INPUT Sensors.proto
+                 Vision.proto
+                 Loc.proto
+                 Common.proto
+                 Ball.proto)
 
 #protobuf compiler
 set(PROTOC_C_OUT_FLAG --cpp_out)
