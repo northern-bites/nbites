@@ -86,12 +86,24 @@ def shouldAvoidObstacleLeft(nav):
     Need to avoid an obstacle on our left side
     """
     sonar = nav.brain.sonar
-    if (sonar.leftDist != sonar.UNKNOWN_VALUE and
-        sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST):
+    obstacles = nav.brain.vision.obstacles
+    leftFoot = nav.brain.sensors.leftFootBumper
+    rightFoot = nav.brain.sensors.rightFootBumper
+    if ((leftFoot.left or leftFoot.right) and nav.shouldAvoidObstacleLeftCounter >= 10):
+        nav.shouldAvoidObstacleLeftCounter += 3
+    elif (obstacles.onLeft and nav.shouldAvoidObstacleLeftCounter >= 10):
         nav.shouldAvoidObstacleLeftCounter += 1
-    else :
-        nav.shouldAvoidObstacleLeftCounter = 0
-
+    elif (obstacles.offField and
+          sonar.leftDist != sonar.UNKNOWN_VALUE and
+          sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST and
+          nav.shouldAvoidObstacleLeftCounter >= 10):
+        nav.shouldAvoidObstacleLeftCounter += 1
+    else:
+        if (nav.shouldAvoidObstacleLeftCounter > 0):
+            nav.shouldAvoidObstacleLeftCounter -= 2
+        else:
+            nav.shouldAvoidObstacleLeftCounter = 0
+        
     if nav.shouldAvoidObstacleLeftCounter > \
             constants.AVOID_OBSTACLE_FRAMES_THRESH:
         return True
@@ -102,11 +114,23 @@ def shouldAvoidObstacleRight(nav):
     Need to avoid an obstacle on our right side
     """
     sonar = nav.brain.sonar
-    if (sonar.rightDist != sonar.UNKNOWN_VALUE and
-        sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST):
+    obstacles = nav.brain.vision.obstacles
+    leftFoot = nav.brain.sensors.leftFootBumper
+    rightFoot = nav.brain.sensors.rightFootBumper
+    if ((rightFoot.left or rightFoot.right) and nav.shouldAvoidObstacleRightCounter >= 10):
+        nav.shouldAvoidObstacleRightCounter += 3
+    elif (obstacles.onRight and nav.shouldAvoidObstacleRightCounter >= 10):
+        nav.shouldAvoidObstacleRightCounter += 1
+    elif (obstacles.offField and
+          sonar.rightDist != sonar.UNKNOWN_VALUE and
+          sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST and
+          nav.shouldAvoidObstacleRightCounter >= 10):
          nav.shouldAvoidObstacleRightCounter += 1
-    else :
-        nav.shouldAvoidObstacleRightCounter = 0
+    else:
+        if (nav.shouldAvoidObstacleRightCounter > 0):
+            nav.shouldAvoidObstacleRightCounter -= 2
+        else:
+            nav.shouldAvoidObstacleRightCounter = 0
 
     if nav.shouldAvoidObstacleRightCounter > \
             constants.AVOID_OBSTACLE_FRAMES_THRESH:

@@ -66,12 +66,13 @@ Vision::Vision(boost::shared_ptr<NaoPose> _pose,
     ball = new VisualBall();
     red1 = new VisualRobot();
     red2 = new VisualRobot();
-	red3 = new VisualRobot();
+    red3 = new VisualRobot();
     navy1 = new VisualRobot();
     navy2 = new VisualRobot();
-	navy3 = new VisualRobot();
-	cross = new VisualCross();
-	fieldEdge = new VisualFieldEdge();
+    navy3 = new VisualRobot();
+    cross = new VisualCross();
+    fieldEdge = new VisualFieldEdge();
+    obstacles = new VisualObstacle();
 
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));

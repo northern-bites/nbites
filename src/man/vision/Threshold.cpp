@@ -95,10 +95,11 @@ void Threshold::obstacleLoop() {
   unsigned char pixel = GREEN;
   float upperTotalL = 0, upperTotalR = 0;
   float greenCountL = 0, greenCountR = 0;
+  float yellowCountD = 0, yellowCountU = 0;
   float lowerTotalL = 0, lowerTotalR = 0;
   float botL = 1.0, botR = 1.0;
   float topL = 1.0, topR = 1.0;
-  bool isObstacle = false, isObLeft = false, isObRight = false;
+  vision->obstacles->init();
   
   detectSelf();
   
@@ -109,10 +110,14 @@ void Threshold::obstacleLoop() {
       pixel = getThresholded(j, i);
       if (Utility::isGreen(pixel) && i < IMAGE_WIDTH/2) greenCountL++;
       else if (Utility::isGreen(pixel) && i >= IMAGE_WIDTH/2) greenCountR++;
+
+      if (Utility::isYellow(pixel)) yellowCountD++;
     }
   }
   botL = greenCountL/lowerTotalL;
   botR = greenCountR/lowerTotalR;
+
+  // cout << "In the bottom I see this much post: " << yellowCountD << endl;
   
   usingTopCamera = true;
   pose->transform(usingTopCamera);
@@ -131,25 +136,26 @@ void Threshold::obstacleLoop() {
 	upperTotalR++;
       }
     }
+    for (int j = 0; j < IMAGE_HEIGHT && yellowCountD > 10000; j+=1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isYellow(pixel)) yellowCountU++;
+    }
   }
   if (upperTotalL > 0)
     topL = greenCountL/upperTotalL;
-  else topL = 1.0;
+  else topL = 2.0; // so that looking over the field edge is not an obstacle.
   if (upperTotalR > 0)
     topR = greenCountR/upperTotalR;
   else 
-    topR = 1.0;
+    topR = 2.0;
 
-  if (botL < 0.5 && topL < 0.4) isObLeft = true;
-  if (botR < 0.5 && topR < 0.4) isObRight = true;
-  if (isObLeft || isObRight) isObstacle = true;
-  if (isObLeft) cout << "BotL = " << botL << " TopL = " << topL << endl;
-  if (isObRight) cout << "BotR = " << botR << " TopR = " << topR << endl;
-
-  vision->drawLine(IMAGE_WIDTH/2, 0, IMAGE_WIDTH/2, IMAGE_HEIGHT, VISUAL_HORIZON_COLOR);
-
-  
-}
+  if (botL < 0.5 && topL < 0.4) vision->obstacles->setLeft(true);
+  if (botR < 0.5 && topR < 0.4) vision->obstacles->setRight(true);
+  if (topL >= 1.0 || topR >= 1.0) vision->obstacles->setOffField(true);
+  if (vision->obstacles->offField()) cout << "I am looking off the field\n";
+  if (vision->obstacles->onLeft()) cout << "BotL = " << botL << " TopL = " << topL << endl;
+  if (vision->obstacles->onRight()) cout << "BotR = " << botR << " TopR = " << topR << endl;
+  //  cout << "the amount of goalPost is: " << yellowCountU << endl;}
 
 
 

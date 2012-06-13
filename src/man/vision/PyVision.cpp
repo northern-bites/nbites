@@ -106,6 +106,12 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("rightOpening", &VisualCrossbar::getRightOpening)
         ;
 
+    class_<VisualObstacle>("Obstacle", no_init)
+      .def_readonly("onLeft", &VisualObstacle::onLeft)
+      .def_readonly("onRight", &VisualObstacle::onRight)
+      .def_readonly("offField", &VisualObstacle::offField)
+      ;
+
     //FieldLines: holds corner and line information
     class_<FieldLines, boost::shared_ptr<FieldLines> >("FieldLines", no_init)
         .def_readonly("numCorners", &FieldLines::getNumCorners)
@@ -262,6 +268,8 @@ BOOST_PYTHON_MODULE(vision)
                                           <reference_existing_object>()))
         .add_property("navy3", make_getter(&Vision::navy3, return_value_policy
                                           <reference_existing_object>()))
+        .add_property("obstacles", make_getter(&Vision::obstacles, return_value_policy
+					     <reference_existing_object>()))
 
         /* Crossbars: not used right now
            .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar,
