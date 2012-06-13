@@ -73,20 +73,20 @@ class KickInformation:
         if self.brain.yglp.vis.on:
             self.sawGoal = True
             if self.brain.yglp.vis.certainty == vision.certainty._SURE:
-                if brain.yglp.vis.dist > 300:
+                if self.brain.yglp.vis.dist > 300:
                     self.farGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
                     self.farGoalLeftPostDists.append(self.brain.yglp.vis.dist)
-                if brain.yglp.vis.dist < 300:
+                if self.brain.yglp.vis.dist < 300:
                     self.nearGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
                     self.nearGoalLeftPostDists.append(self.brain.yglp.vis.dist)
 
         if self.brain.ygrp.vis.on:
             self.sawGoal = True
             if self.brain.ygrp.vis.certainty == vision.certainty._SURE:
-                if brain.ygrp.vis.dist > 300:
+                if self.brain.ygrp.vis.dist > 300:
                     self.farGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
                     self.farGoalRightPostDists.append(self.brain.ygrp.vis.dist)
-                if brain.ygrp.vis.dist < 300:
+                if self.brain.ygrp.vis.dist < 300:
                     self.nearGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
                     self.nearGoalRightPostDists.append(self.brain.ygrp.vis.dist)
 
@@ -96,6 +96,10 @@ class KickInformation:
         """
         if not self.haveData:
             return
+
+        #DEBUG printing
+        print "Total far goal sightings (sum both posts): ",len(self.farGoalLeftPostBearings)+len(self.farGoalRightPostBearings)
+        print "Total near goal sightings (sum both posts): ",len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
 
         # bearing averages
         if len(self.farGoalLeftPostBearings) > 0:
@@ -183,6 +187,9 @@ class KickInformation:
 
 
         # Loc is bad- use only visual information to choose a kick.
+        #DEBUG printing
+        print "Using vision for kick decision."
+        print "Dangerous ball? ",self.dangerousBall()
 
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
@@ -202,6 +209,7 @@ class KickInformation:
                 orbitAngle = -180 + avgPostBearing
                 if orbitAngle < -180:
                     orbitAngle += 180
+                orbitAngle = int(orbitAngle)
 
                 # Orbit until blocking, not just 45 degrees. Then re-decide kick.
                 kick = kicks.ORBIT_KICK_POSITION
@@ -213,27 +221,31 @@ class KickInformation:
         else:
             # Can't see any posts: orbit
             kick = kicks.ORBIT_KICK_POSITION
-            kick.h = 45.0
+            kick.h = 45
             return kick
 
         # DEBUG printing
+        print "farRightPostBearing: ",self.farRightPostBearing
+        print "farLeftPostBearing: ",self.farLeftPostBearing
+        print "nearRightPostBearing: ",self.nearRightPostBearing
+        print "nearLeftPostBearing: ",self.nearLeftPostBearing
         print "rightPostBearing: ",rightPostBearing
         print "leftPostBearing:  ",leftPostBearing
 
-        if rightPostBearing != 0 and leftPostBearing != 0:
+        if rightPostBearing == 0 and leftPostBearing == 0:
             # Can't see any posts: orbit.
             # Note: this case should already be covered above,
             #  but is repeated for safety.
             kick = kicks.ORBIT_KICK_POSITION
-            kick.h = 45.0
+            kick.h = 45
             return kick
         elif rightPostBearing != 0 and leftPostBearing != 0:
             # Can see both posts: shoot between them.
-            leftScorePoint = rightPostBearing - 20
-            rightScorePoint = leftPostBearing + 20
+            leftScorePoint = rightPostBearing - 10
+            rightScorePoint = leftPostBearing + 10
 
             if leftScorePoint < rightScorePoint:
-                # less than 40 degrees of goal available to shoot in.
+                # less than 20 degrees of goal available to shoot in.
                 leftScorePoint = ((rightPostBearing + leftPostBearing) / 2) + 5
                 rightScorePoint = leftScorePoint - 10
         elif rightPostBearing != 0:
@@ -262,7 +274,7 @@ class KickInformation:
         # Choose whichever kick is closest to being between the score points.
         # Note: no kick bearing is between the posts, so they are all
         #   to the right of the rightScorePoint or left of leftScorePoint.
-        avgScorePoint = rightScorePoint + leftScorePoint / 2
+        avgScorePoint = int((rightScorePoint + leftScorePoint) * .5)
         kick = None
 
         if rightScorePoint > 90:
@@ -292,25 +304,28 @@ class KickInformation:
                 kick = self.chooseBackKick()
 
         if kick is not None:
-            kick.h = avgScorePoint
+            kick.h = -1*avgScorePoint
             return kick
+
+        #DEBUG printing
+        print "Somehow got to end without a kick..."
 
         # If all else fails, orbit and re-decide.
         # Note: this case should already be covered above,
         #  but is repeated for safety.
         kick = kicks.ORBIT_KICK_POSITION
-        kick.h = 45.0
+        kick.h = 45
         return kick
 
     def chooseShortFrontKick(self):
-        if self.kickWithLeftFoot()
+        if self.kickWithLeftFoot():
             return kicks.LEFT_SHORT_STRAIGHT_KICK
         return kicks.RIGHT_SHORT_STRAIGHT_KICK
 
     def chooseQuickFrontKick(self):
-        if self.kickWithLeftFoot()
-            return kicks.LEFT_QUICK_STRAIGHT_KICK
-        return kicks.RIGHT_QUICK_STRAIGHT_KICK
+        if self.kickWithLeftFoot():
+            return kicks.LEFT_STRAIGHT_KICK
+        return kicks.RIGHT_STRAIGHT_KICK
 
     def chooseBackKick(self):
         """
@@ -347,6 +362,12 @@ class KickInformation:
         if self.oppRightPostBearing is not None:
             s += ("Opp right post bearing is: " + str(self.oppRightPostBearing)
                   + " dist is: " + str(self.oppRightPostDist) +  "\n")
+        if self.nearLeftPostBearing is not None:
+            s += ("Near left post bearing is: " + str(self.nearLeftPostBearing) +
+                  " dist is: " + str(self.nearLeftPostDist) + "\n")
+        if self.nearRightPostBearing is not None:
+            s += ("Near right post bearing is: " + str(self.nearRightPostBearing)
+                  + " dist is: " + str(self.nearRightPostDist) +  "\n")
         if s == "":
             s = "No goal posts observed"
 #        if self.kickObjective == constants.OBJECTIVE_SHOOT:
