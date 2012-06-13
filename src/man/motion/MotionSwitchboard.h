@@ -102,8 +102,8 @@ public:
 	curProvider->requestStop();
     }
 
-    bool isWalkActive(){
-        return walkProvider.isWalkActive();}
+    bool isWalkActive(){return walkProvider.isActive();}
+    bool isStanding()  {return walkProvider.isStanding();}
     bool isHeadActive(){return headProvider.isActive();}
     bool isBodyActive(){return curProvider->isActive();}
 
