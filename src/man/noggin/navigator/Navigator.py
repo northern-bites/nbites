@@ -138,9 +138,10 @@ class Navigator(FSA.FSA):
         """
         Orbits a point at a certain radius for a certain angle using walkTo
         Splits the command into multiple smaller commands
-        Don't rely on it too much since it depends on the odometry of strafes and turns
-        which slip a lot
-        It will orbit in steps, each orbit taking ~30 degrees (more like 45 when I test it out)
+        Don't rely on it too much since it depends on the odometry of strafes
+        and turns which slip a lot
+        It will orbit in steps, each orbit taking ~30 degrees (more like 45
+        when I test it out)
         """
         NavStates.walkingTo.destQueue.clear()
 

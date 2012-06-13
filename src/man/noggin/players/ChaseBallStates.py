@@ -81,7 +81,7 @@ def prepareForKick(player):
         print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
         print str(player.kick)
-        return player.goNow('positionForKick')
+        return player.goNow('orbitBall')
 
     return player.stay()
 
@@ -159,13 +159,19 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
+        if player.kick.h == 0:
+            return player.goLater('prepareForKick')
         player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.orbitAngle(10, 90) # TODO HACK HACK
+        player.brain.nav.orbitAngle(player.brain.ball.loc.dist, player.kick.h)
 
-    if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
+    if player.brain.nav.isStopped():
         player.inKickingState = False
         player.shouldOrbit = False
-        return player.goLater('lookAround')
+        player.kick.h = 0
+        if player.kick == kicks.ORBIT_KICK_POSITION:
+            return player.goLater('prepareForKick')
+        else:
+            return player.goLater('positionForKick')
 
     return player.stay()
 

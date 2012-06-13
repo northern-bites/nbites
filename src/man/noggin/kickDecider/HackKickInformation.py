@@ -160,10 +160,10 @@ class KickInformation:
         # Is loc GOOD_ENOUGH for a kick decision?
         # TODO: make sure this uses orbits
         if False: #self.brain.my.getLocScore() == nogginConstants.GOOD_LOC:
-            relLocationBallToGoal = ball.loc.relativeLocationOf(Location(670,270))
+            relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Location(670,270))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
-            relLocationMeToBall = self.brain.my.relativeLocationOf(ball.loc)
+            relLocationMeToBall = self.brain.my.relativeLocationOf(self.brain.ball.loc)
             bearingMeToBall = relLocationMeToBall.bearing
 
             bearingDifference = bearingBallToGoal - bearingMeToBall
@@ -183,7 +183,6 @@ class KickInformation:
 
 
         # Loc is bad- use only visual information to choose a kick.
-        #TODO: add orbits to this
 
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
@@ -199,18 +198,23 @@ class KickInformation:
         elif self.nearAvgPostDist != 0:
             if self.dangerousBall():
                 # Can only see our own goal: Orbit to block.
-                avgPostBearing = self.nearRightPostBearing + self.nearLeftPostBearing
-                if avgPostBearing > 0:
-                    # Orbit until blocking, not just 45 degrees. Then re-decide kick.
-                    return kickLoc() #orbit left
-                else:
-                    return kickLoc() #orbit right
+                avgPostBearing = self.nearRightPostBearing + self.nearLeftPostBearing / 2
+                orbitAngle = -180 + avgPostBearing
+                if orbitAngle < -180:
+                    orbitAngle += 180
+
+                # Orbit until blocking, not just 45 degrees. Then re-decide kick.
+                kick = kicks.ORBIT_KICK_POSITION
+                kick.h = orbitAngle
+                return kick
             else:
                 rightPostBearing = self.nearRightPostBearing
                 leftPostBearing = self.nearLeftPostBearing
         else:
             # Can't see any posts: orbit
-            return self.kickLoc()
+            kick = kicks.ORBIT_KICK_POSITION
+            kick.h = 45.0
+            return kick
 
         # DEBUG printing
         print "rightPostBearing: ",rightPostBearing
@@ -218,7 +222,11 @@ class KickInformation:
 
         if rightPostBearing != 0 and leftPostBearing != 0:
             # Can't see any posts: orbit.
-            return self.kickLoc()
+            # Note: this case should already be covered above,
+            #  but is repeated for safety.
+            kick = kicks.ORBIT_KICK_POSITION
+            kick.h = 45.0
+            return kick
         elif rightPostBearing != 0 and leftPostBearing != 0:
             # Can see both posts: shoot between them.
             leftScorePoint = rightPostBearing - 20
@@ -235,7 +243,7 @@ class KickInformation:
         else:
             # Can only see the left post.
             rightScorePoint = leftPostBearing + 15
-            leftScorePoint = rightScorePoint +10
+            leftScorePoint = rightScorePoint + 10
 
         # DEBUG printing
         print "rightScorePoint: ",rightScorePoint
@@ -254,34 +262,45 @@ class KickInformation:
         # Choose whichever kick is closest to being between the score points.
         # Note: no kick bearing is between the posts, so they are all
         #   to the right of the rightScorePoint or left of leftScorePoint.
+        avgScorePoint = rightScorePoint + leftScorePoint / 2
+        kick = None
+
         if rightScorePoint > 90:
                 # Quadrent 2
             if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:
                     #Closer to the leftScorePoint
-                return self.chooseBackKick()
+                kick = self.chooseBackKick()
             else:
-                return kicks.RIGHT_SIDE_KICK
+                kick = kicks.RIGHT_SIDE_KICK
         elif rightScorePoint > 0:
             # Quadrent 1
             if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
-                return kicks.RIGHT_SIDE_KICK
+                kick = kicks.RIGHT_SIDE_KICK
             else:
-                return self.chooseQuickFrontKick()
+                kick = self.chooseQuickFrontKick()
         elif rightScorePoint > -90:
             # Quadrent 4
             if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
-                return self.chooseQuickFrontKick()
+                kick = self.chooseQuickFrontKick()
             else:
-                return kicks.LEFT_SIDE_KICK
+                kick = kicks.LEFT_SIDE_KICK
         else:
             # Quadrent 3
             if (-90 - leftScorePoint) - (rightScorePoint + 180) < 0:
-                return kicks.LEFT_SIDE_KICK
+                kick = kicks.LEFT_SIDE_KICK
             else:
-                return self.chooseBackKick()
+                kick = self.chooseBackKick()
 
-        # if none were seen
-        return self.kickLoc()
+        if kick is not None:
+            kick.h = avgScorePoint
+            return kick
+
+        # If all else fails, orbit and re-decide.
+        # Note: this case should already be covered above,
+        #  but is repeated for safety.
+        kick = kicks.ORBIT_KICK_POSITION
+        kick.h = 45.0
+        return kick
 
     def chooseShortFrontKick(self):
         if self.kickWithLeftFoot()
@@ -292,24 +311,6 @@ class KickInformation:
         if self.kickWithLeftFoot()
             return kicks.LEFT_QUICK_STRAIGHT_KICK
         return kicks.RIGHT_QUICK_STRAIGHT_KICK
-
-    def kickLoc(self):
-        """
-        returns kick using localization
-        """
-
-        # DEBUG printing
-        print "In method kickLoc."
-
-        my = self.brain.my
-        if (my.h <= 45. and my.h >= -45.):
-            return self.chooseQuickFrontKick()
-        elif (my.h <= 135. and my.h > 45.):
-            return kicks.LEFT_SIDE_KICK
-        elif (my.h >= -135. and my.h < -45.):
-            return kicks.RIGHT_SIDE_KICK
-        else:
-            return self.chooseBackKick()
 
     def chooseBackKick(self):
         """
