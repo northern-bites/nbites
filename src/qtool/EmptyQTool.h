@@ -25,6 +25,7 @@
 
 namespace qtool {
 
+
 class EmptyQTool : public QMainWindow {
 
     Q_OBJECT
@@ -61,5 +62,4 @@ protected:
 
 	void resizeEvent(QResizeEvent*);
 };
-
 }

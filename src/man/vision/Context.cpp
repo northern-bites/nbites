@@ -1329,6 +1329,13 @@ void Context::checkForBadTID(VisualCorner & first, VisualCorner & second,
 				checkTToFieldCorner(first, second);
 			}
 		}
+	} else {
+		// we have a CC and something else, let's make sure we don't use it
+		if (first.getShape() == CIRCLE) {
+			second.setShape(CIRCLE);
+		} else {
+			first.setShape(CIRCLE);
+		}
 	}
 }
 
@@ -1457,6 +1464,10 @@ void Context::findCornerRelationship(VisualCorner & first,
 			} else {
 				checkForBadTID(second, first, common);
 			}
+		}
+		if (commonDist > 100.0f) {
+			first.setShape(CIRCLE);
+			second.setShape(CIRCLE);
 		}
     }
 }

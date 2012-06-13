@@ -24,7 +24,7 @@ class GameController(FSA.FSA):
         self.currentState = 'gameInitial'
         self.setName('GameController')
         self.setPrintStateChanges(True)
-        self.stateChangeColor = 'cyan'
+        self.stateChangeColor = 'green'
         self.setPrintFunction(self.brain.out.printf)
         self.timeLeft = self.gc.timeRemaining()
         self.kickOff = self.gc.kickOff

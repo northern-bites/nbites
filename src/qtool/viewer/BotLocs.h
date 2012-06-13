@@ -19,7 +19,7 @@ namespace qtool {
 namespace viewer {
 
 class BotLocs: public QObject {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
     BotLocs(QObject* parent = 0);
@@ -34,7 +34,9 @@ public:
     int getBallY(int);
     int getBallXUncert(int);
     int getBallYUncert(int);
-    int getTeam(int);
+    int getTeamNum(int);
+	int getTeamColor(int);
+	int getPlayerNum(int);
     int getSize();
 
     void startListening();
@@ -59,10 +61,11 @@ private:
         float yBall;
         float xBallUncert;
         float yBallUncert;
+		int teamNum;
         int teamColor; //0=blue,  1=red
+		int playerNum;
     };
     std::vector<Bot> botPositions;
-    std::vector<QHostAddress> onField;
     QUdpSocket udpSocket;
 
 };

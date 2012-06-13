@@ -281,6 +281,8 @@ void Threshold::lowerRuns() {
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
         int topEdge = max(0, field->horizonAt(i));
 	findBallLowerCamera(i, 0);
+	//debugSelf = true;
+    //detectSelf();
     }
 }
 
@@ -551,33 +553,33 @@ void Threshold::findBallLowerCamera(int column, int topEdge) {
     int bound = IMAGE_HEIGHT - 1;//lowerBound[column];
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
-      while (bound < IMAGE_HEIGHT &&
-	     Utility::isOrange(getColor(column, bound))) {
-	bound++;
-      }
+		while (bound < IMAGE_HEIGHT &&
+			   Utility::isOrange(getColor(column, bound))) {
+			bound++;
+		}
     }
     // scan down the column looking for ORANGE
     for (int j = bound; j >= topEdge; j-= SCANSIZE) {
-      // get the next pixel
-      currentRun = 0;
-      unsigned char pixel = getThresholded(j,column);
-      if (Utility::isOrange(pixel)) {
-	//drawPoint(column, j, MAROON);
-	int scanner = j+1;
-	while (scanner < j + SCANSIZE &&
-	       Utility::isOrange(getThresholded(scanner, column))) {
-	  currentRun++;
-	  scanner++;
-	}
-	while (j > 0 && Utility::isOrange(getThresholded(j,column)))
-	  {
-	    currentRun++;
-	    j--;
-	  }
-	if (currentRun > 1) {
-	  orange->newRun(column, j, currentRun);
-	}
-      }
+		// get the next pixel
+		currentRun = 0;
+		unsigned char pixel = getThresholded(j,column);
+		if (Utility::isOrange(pixel)) {
+			//drawPoint(column, j, MAROON);
+			int scanner = j+1;
+			while (scanner < j + SCANSIZE &&
+				   Utility::isOrange(getThresholded(scanner, column))) {
+				currentRun++;
+				scanner++;
+			}
+			while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+			{
+				currentRun++;
+				j--;
+			}
+			if (currentRun > 1) {
+				orange->newRun(column, j, currentRun);
+			}
+		}
     }
 }
 
@@ -751,6 +753,12 @@ void Threshold::detectSelf() {
     const int TOPRIGHT = 250;
     const int HIGHBOUND = -50;
     const int COMPENSATION = 20;
+#ifdef OFFLINE
+            if (debugSelf) {
+				cout << "Boundaries " << pixInImageLeft << " " <<
+					pixInImageRight << endl;
+            }
+#endif
 
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
@@ -866,6 +874,144 @@ void Threshold::newFindRobots() {
     }
 }
 
+void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
+	int leftX, rightX, topY, bottomY;
+	if (leftPost && rightPost) {
+		leftX = vision->ygrp->getRightBottomX();
+		rightX = vision->yglp->getLeftBottomX();
+		topY = min(vision->ygrp->getRightTopY(), vision->yglp->getLeftTopY());
+		bottomY = max(vision->ygrp->getRightBottomY(), vision->yglp->getLeftBottomY());
+	} else if (leftPost) {
+		leftX = max(0, vision->yglp->getRightBottomX() - (int)vision->yglp->getHeight());
+		rightX = vision->yglp->getLeftBottomX();
+		topY = vision->yglp->getRightTopY();
+		bottomY = vision->yglp->getRightBottomY();
+	} else if (rightPost) {
+		leftX = vision->ygrp->getRightBottomX();
+		rightX = min(IMAGE_WIDTH, vision->ygrp->getLeftBottomX() + (int)vision->ygrp->getHeight());
+		topY = vision->ygrp->getRightTopY();
+		bottomY = vision->ygrp->getRightBottomY();
+	} else {
+		return;
+	}
+	bool redRobot = false, navyRobot = false;
+	// first just check if we already identified any robots
+	if (vision->red1->getHeight() > 0) {
+		int redX = vision->red1->getCenterX();
+		if (redX > leftX && redX < rightX) {
+			redRobot = true;
+		}
+	}
+	if (vision->navy1->getHeight() > 0) {
+		int navyX = vision->navy1->getCenterX();
+		if (navyX > leftX && navyX < rightX) {
+			navyRobot = true;
+		}
+	}
+	// scan the box
+	int height = bottomY - topY;
+	int redTotal = 0, navyTotal = 0, redRun = 0, navyRun = 0, currentRun = 0;
+	int columnRed = 0, columnNavy = 0;
+	int whiteBefore = 0;
+	int navyCols = 0, redCols = 0;
+	for (int i = leftX; i < rightX; i++) {
+		whiteBefore = 0;
+		columnRed = 0;
+		columnNavy = 0;
+		for (int j = bottomY; j > topY; j--) {
+			if (Utility::isWhite(getColor(i, j))) {
+				whiteBefore++;
+			}
+			if (Utility::isRed(getColor(i, j))) {
+				j--;
+				redTotal++;
+				currentRun = 1;
+				if (whiteBefore > 20) {
+					while (Utility::isRed(getColor(i, j))) {
+						j--;
+						currentRun++;
+						redTotal++;
+					}
+					if (currentRun > 3) {
+						redRun += currentRun;
+						columnRed += currentRun;
+					}
+				}
+			}
+			if (Utility::isNavy(getColor(i, j))) {
+				j--;
+				navyTotal++;
+				currentRun = 1;
+				if (whiteBefore > 20) {
+					while (Utility::isNavy(getColor(i, j))) {
+						j--;
+						currentRun++;
+						navyTotal++;
+					}
+					if (currentRun > 3) {
+						navyRun += currentRun;
+						columnNavy += currentRun;
+					}
+				}
+			}
+		}
+		if (whiteBefore > height / 3) {
+			if (columnRed > 1) {
+				redCols++;
+			}
+			if (columnNavy > 1) {
+				navyCols++;
+			}
+		}
+	}
+	/*cout << "Goalie box " << leftX << " " << rightX << " " << bottomY << " " <<
+		topY << endl;
+	cout << "Red " << redTotal << " blue " << navyTotal << endl;
+	cout << "Runs red " << redRun << " navy " << navyRun << endl;
+	cout << "Red cols " << redCols << " navy cols " << navyCols << endl; */
+	if (redRobot || (redCols > 2 * navyCols && redCols > 5) && !navyRobot) {
+		if (debugShot) {
+			cout << "Red goalie " << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setRedGoalieCertain();
+		}
+		if (rightPost) {
+			vision->ygrp->setRedGoalieCertain();
+		}
+	} else if (navyRobot || (navyCols > 2 * redCols && navyCols > 5) && !redRobot) {
+		if (debugShot) {
+			cout << "Navy goalie " << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setNavyGoalieCertain();
+		}
+		if (rightPost) {
+			vision->ygrp->setNavyGoalieCertain();
+		}
+	} else if (redCols > 1 && navyCols == 0 && redTotal > 30 && !navyRobot) {
+		if (debugShot) {
+			cout << "Probably a red goalie" << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setRedGoalieProbable();
+		}
+		if (rightPost) {
+			vision->ygrp->setRedGoalieProbable();
+		}
+	} else if (navyCols > 1 && redCols == 0 && navyTotal > 30 && !redRobot) {
+		if (debugShot) {
+			cout << "Probably a navy goalie" << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setNavyGoalieProbable();
+		}
+		if (rightPost) {
+			vision->ygrp->setNavyGoalieProbable();
+		}
+	}
+}
+
 
 /*  Makes the calls to the vision system to recognize objects.  Then performs
  * some extra sanity checks to make sure we don't have weird cases.
@@ -893,6 +1039,7 @@ void Threshold::objectRecognition() {
     }
     if (ylp || yrp) {
         field->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar, YELLOW);
+		identifyGoalie(ylp, yrp);
     }
     storeFieldObjects();
 	if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
@@ -916,11 +1063,11 @@ void Threshold::storeFieldObjects() {
     setFieldObjectInfo(vision->ygrp);
     setFramesOnAndOff(vision->ygrp);
 
-    setFieldObjectInfo(vision->bglp);
-    setFramesOnAndOff(vision->bglp);
-
-    setFieldObjectInfo(vision->bgrp);
-    setFramesOnAndOff(vision->bgrp);
+//    setFieldObjectInfo(vision->bglp);
+//    setFramesOnAndOff(vision->bglp);
+//
+//    setFieldObjectInfo(vision->bgrp);
+//    setFramesOnAndOff(vision->bgrp);
 
     setVisualCrossInfo(vision->cross);
     setFramesOnAndOff(vision->cross);
@@ -994,13 +1141,8 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 objPtr == vision->bglp ||
                 objPtr == vision->bgrp) {
             //print("we've got a post!");
-            float dist = 0.0;
             float width = objPtr->getWidth();
             float height = objPtr->getHeight();
-
-            distanceCertainty cert = objPtr->getDistanceCertainty();
-            float distw = getGoalPostDistFromWidth(width);
-            float disth = getGoalPostDistFromHeight(height);
 
             const int bottomLeftX = objPtr->getLeftBottomX();
             const int bottomRightX = objPtr->getRightBottomX();
@@ -1015,39 +1157,40 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             const int intBottomOfObjectX = static_cast<int>(bottomOfObjectX);
             const int intBottomOfObjectY = static_cast<int>(bottomOfObjectY);
 
-            float distwnew = pose->estimateFromObjectSize(intBottomOfObjectX,
+            estimate estFromWidth = this->getGoalPostEstimateFromWidth(intBottomOfObjectX,
+                    intBottomOfObjectY, width);
+
+            estimate estFromHeight = this->getGoalPostEstimateFromHeight(intBottomOfObjectX,
+                    intBottomOfObjectY,  height);
+
+            estimate estFromPose = pose->pixEstimate(intBottomOfObjectX,
                                                      intBottomOfObjectY,
-                                                     0.0f,
-                                                     width,
-                                                     GOAL_POST_CM_WIDTH * CM_TO_MM).dist;
+                                                     0.0f);
 
-            float disthnew = pose->estimateFromObjectSize(intBottomOfObjectX,
-                                                     intBottomOfObjectY,
-                                                     0.0f,
-                                                     height,
-                                                     GOAL_POST_CM_HEIGHT * CM_TO_MM).dist;
-
-
-            const float poseDist = pose->pixEstimate(
-                    static_cast<int>(bottomOfObjectX),
-                    static_cast<int>(bottomOfObjectY), 0.0f).dist;
-
-            //TODO: remove the old code, make new code better on distances
-            dist = chooseGoalDistance(cert, disth, distw, poseDist,
-                                      static_cast<int>(bottomOfObjectY));
-            //TODO: hack
-            float distnew = chooseGoalDistance(cert, disthnew, distw, poseDist,
-											   static_cast<int>(bottomOfObjectY));
-            dist = distnew;
+            distanceCertainty cert = objPtr->getDistanceCertainty();
+            estimate obj_est = chooseBestGoalEstimate(cert, estFromHeight, estFromWidth,
+                    estFromPose, static_cast<int>(bottomOfObjectY));
 
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
-            if (dist < POST_MIN_FOC_DIST ||
-				dist > POST_MAX_FOC_DIST) {
-                dist = 0.0;
+            if (obj_est.dist < POST_MIN_FOC_DIST || obj_est.dist > POST_MAX_FOC_DIST) {
+                obj_est = NULL_ESTIMATE;
             }
-            objPtr->setDistance(dist);
-			if (dist < MIDFIELD_X + 150) {
+
+            bool debugEstimates = false;
+            if (debugEstimates) {
+                cout << "width " << estFromWidth << endl;
+                cout << "height " << estFromHeight << endl;
+                cout << "pose " << estFromPose << endl;
+                cout << "chosen " << obj_est << endl;
+            }
+
+            objPtr->setDistance(obj_est.dist);
+            objPtr->setDistanceWithSD(obj_est.dist);
+            objPtr->setBearingWithSD(obj_est.bearing);
+            objPtr->setElevation(obj_est.elevation);
+
+			if (obj_est.dist < MIDFIELD_X + 150) {
 				context->setSameHalf();
 			}
 		} else { // don't know what object it is
@@ -1055,14 +1198,6 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 			//cout << "What the heck!" << endl;
             return;
         }
-        // convert dist + angle estimates to body center
-        estimate obj_est = pose->estimateWithKnownDistance(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              0.0f,
-                                              objPtr->getDistance());
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
     }
     else {
         objPtr->setDistanceWithSD(0.0);
@@ -1074,58 +1209,26 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
  * the sizes of width and height.
  */
 
-float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
-                                    float distw, float poseDist, int bottom) {
-    float dist = 0.0f;
-	if (poseDist < 200.0f && poseDist > 0 && bottom <= IMAGE_HEIGHT - 5) {
-		//cout << "Returning pose dist " << poseDist << endl;
-		return poseDist;
-	}
+estimate Threshold::chooseBestGoalEstimate(distanceCertainty cert, const estimate& estFromHeight,
+        const estimate& estFromWidth, const estimate& estFromPose, int bottom) {
+
+    bool bottomReliableForPixEst = bottom <= IMAGE_HEIGHT - 5;
+
     switch (cert) {
-    case HEIGHT_UNSURE:
-        dist = distw;
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            dist = poseDist;
-        }
-        break;
-    case WIDTH_UNSURE:
-        dist = disth;
-		if (disth > distw) {
-			dist = distw;
-			if (bottom <= IMAGE_HEIGHT - 5) {
-				dist = poseDist;
-			}
-		}
-        break;
-    case BOTH_UNSURE:
-        // We choose the min distance here, since that means more pixels
-		dist = min( poseDist, min(disth, distw));
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            //dist = min( poseDist, min(disth, distw));
-        } else if (dist > 100) {
-            dist = 0.0f;
-		}
-        break;
     case BOTH_SURE:
-		// pick the one right in the middle
-		if (poseDist < disth) {
-			if (poseDist < distw) {
-				dist = min(disth, distw);
-			} else {
-				dist = poseDist;
-			}
-		} else {
-			if (poseDist < distw) {
-				dist = poseDist;
-			} else {
-				dist = max(disth, distw);
-			}
-		}
-        break;
+    case WIDTH_UNSURE:
+        return estFromHeight;
+    case HEIGHT_UNSURE:
+        if (bottomReliableForPixEst)
+            return estFromPose;
+        else
+            return estFromWidth;
+    case BOTH_UNSURE:
+        if (bottomReliableForPixEst) {
+            return estFromPose;
+        }
     }
-	/*cout << "Distances disth " << disth << " distw " << distw <<
-	  " posedist " << poseDist << " returning " << dist << endl;*/
-    return dist;
+    return NULL_ESTIMATE;
 }
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
@@ -1226,28 +1329,16 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
  * @param height     the height of the post in pixels
  * @return           the distance to the post in centimeters
  */
-float Threshold::getGoalPostDistFromHeight(float height) {
-#if ROBOT(NAO_SIM)
-    return 17826*pow((double) height,-1.0254);
-#else
-    // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
-    return 32880.0f/height - 11.8597f;
-#endif
+estimate Threshold::getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, height, GOAL_POST_CM_HEIGHT * CM_TO_MM);
 }
 
 /* Looks up goal post width in pixels to focal distance function.
  * @param width     the width of the post
  * @return          the distance to the post
  */
-float Threshold::getGoalPostDistFromWidth(float width) {
-#if ROBOT(NAO_SIM)
-    //floor distance, seems to be best for the width
-    //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
-    return 2360.1*pow((double) width,-1.0516);
-#else
-    // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
-    return 3116.59f/width + 21.75f;
-#endif
+estimate Threshold::getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, width, GOAL_POST_CM_WIDTH * CM_TO_MM);
 }
 
 /*
