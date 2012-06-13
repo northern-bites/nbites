@@ -9,7 +9,7 @@ using namespace boost;
 #include "NBMatrixMath.h"
 using namespace Kinematics;
 using namespace NBMath;
-#define DEBUG_SWITCHBOARD
+//#define DEBUG_SWITCHBOARD
 
 MotionSwitchboard::MotionSwitchboard(boost::shared_ptr<Sensors> s,
                                      boost::shared_ptr<NaoPose> pose,
