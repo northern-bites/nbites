@@ -7,9 +7,9 @@ class StepCommand : public MotionCommand {
 public:
     typedef boost::shared_ptr<StepCommand> ptr;
 
-    StepCommand(float _x_mms, float _y_mms, float _theta_rads, int nSteps = 1)
-  : MotionCommand(MotionConstants::WALK),
-    x_mms(_x_mms),y_mms(_y_mms),theta_rads(_theta_rads), numSteps(nSteps)
+    StepCommand(float _x_mms, float _y_mms, float _theta_rads, float gain = 1.0f)
+  : MotionCommand(MotionConstants::STEP),
+    x_mms(_x_mms),y_mms(_y_mms),theta_rads(_theta_rads), gain(gain)
         { setChainList(); }
     ~StepCommand(){}
 public:
@@ -17,7 +17,7 @@ public:
     const float x_mms;    //mm/second
     const float y_mms;    //mm/second
     const float theta_rads; //rad/second
-    const int numSteps;
+    const float gain;
 
 protected:
 	virtual void setChainList() {
@@ -31,7 +31,7 @@ public:
         {
             return o << "StepCommand("
                      << w.x_mms << "," << w.y_mms << ","
-                     << w.theta_rads << ",nSteps=" <<w.numSteps
+                     << w.theta_rads << ", gain=" <<w.gain
                      << ") ";
         }
 };

@@ -23,8 +23,12 @@
 //BH
 #include "WalkingEngine.h"
 
+#include "memory/MObjects.h"
+
 namespace man {
 namespace motion {
+
+using namespace memory;
 
 class BHWalkProvider : public MotionProvider {
 
@@ -48,14 +52,16 @@ public:
 
     void setCommand(const WalkCommand::ptr command);
     void setCommand(const Gait::ptr command) {}
-    void setCommand(const StepCommand::ptr command);
     void setCommand(const DestinationCommand::ptr command);
+    //TODO: I'm taking over StepCommand (currently not used) and making
+    //it an odometry destination walk
+    void setCommand(const StepCommand::ptr command);
 
     std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
         return std::vector<BodyJointCommand::ptr>();
 	}
 
-    MotionModel getOdometryUpdate();
+    MotionModel getOdometryUpdate() const;
     virtual const SupportFoot getSupportFoot() const;
 
     static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
@@ -67,10 +73,9 @@ public:
                                   INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
     }
 
-    const bool isWalkActive() const {
-        return walkingEngine.theMotionRequest.motion == MotionRequest::stand &&
-               walkingEngine.walkingEngineOutput.isLeavingPossible;
-    }
+    const bool isStanding() const;
+
+    void update(proto::WalkProvider* walkProvider) const;
 
 protected:
     void stand();
@@ -80,6 +85,8 @@ private:
     bool requestedToStop;
     boost::shared_ptr<Sensors> sensors;
     WalkingEngine walkingEngine;
+    MotionCommand::ptr currentCommand;
+    Pose2D startOdometry;
 };
 
 }

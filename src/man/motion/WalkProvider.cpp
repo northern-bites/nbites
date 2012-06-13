@@ -99,10 +99,10 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     nextCommand = WalkCommand::ptr();
 
     if(pendingStepCommands){
-        stepGenerator.takeSteps(nextStepCommand->x_mms,
-                                nextStepCommand->y_mms,
-                                nextStepCommand->theta_rads,
-                                nextStepCommand->numSteps);
+//        stepGenerator.takeSteps(nextStepCommand->x_mms,
+//                                nextStepCommand->y_mms,
+//                                nextStepCommand->theta_rads,
+//                                nextStepCommand->numSteps);
         nextDestCommand->finishedExecuting();
     }
     pendingStepCommands=false;

@@ -1,6 +1,7 @@
 import NavConstants as constants
 import NavHelper as helper
 import NavTransitions as navTrans
+from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
@@ -66,27 +67,22 @@ def walkingTo(nav):
     """
     Walks to a relative location based on odometry
     """
-    loc = nav.brain.loc
-    dest = walkingTo.dest
-
     if nav.firstFrame():
-        #@todo: make a method that returns odometry as a tuple in PyLoc?
-        walkingTo.startingOdometry = (loc.lastOdoX, loc.lastOdoY, loc.lastOdoTheta)
+        return nav.stay()
 
-    deltaOdo = helper.getDeltaOdometry(loc, walkingTo.startingOdometry)
-    walkingTo.deltaDest = dest - (deltaOdo.relX, deltaOdo.relY, deltaOdo.relH)
-#    print "Delta dest {0}".format(walkingTo.deltaDest)
-#    print str(dest)
-#    print str(deltaOdo)
-    #walk the rest of the way
-    helper.setDestination(nav, walkingTo.deltaDest, walkingTo.speed)
+    if nav.brain.motion.isStanding():
+        if len(walkingTo.destQueue) > 0:
+            dest = walkingTo.destQueue.popleft()
+            helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            return nav.stay()
+        else:
+            return nav.goNow('standing')
 
-    return Transition.getNextState(nav, walkingTo)
+    return nav.stay()
 
-walkingTo.dest = RelRobotLocation(0, 0, 0)
-walkingTo.deltaDest = RelRobotLocation(0, 0, 0) # how much do we have left to walk
+walkingTo.destQueue = deque()
 walkingTo.speed = 0
-walkingTo.precision = (0, 0, 0)
+
 
 # WARNING: avoidObstacle could possibly go into our own box
 def avoidObstacle(nav):
@@ -223,7 +219,7 @@ def walking(nav):
     State to be used when setSpeed is called
     """
 
-    if (walking.speeds != walking.lastSpeeds) or not nav.brain.motion.isWalkActive():
+    if (walking.speeds != walking.lastSpeeds) or not nav.brain.motion.isStanding():
         helper.setSpeed(nav, walking.speeds)
     walking.lastSpeeds = walking.speeds
 

@@ -121,8 +121,8 @@ BOOST_PYTHON_MODULE(_motion)
         ;
 
     class_<PyStepCommand, bases<PyMotionCommand> >("StepCommand",
-                           init<float, float, float, int>(args("x","y","theta",
-                                               "numSteps"),
+                           init<float, float, float, float>(args("x","y","theta",
+                                               "gain"),
                                           "A container for a step command. ""Holds an x, y and theta which represents a"
                                           " walk vector, in addition to the number of desired steps."))
         ;
@@ -152,6 +152,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("isHeadActive", &PyMotionInterface::isHeadActive)
         .def("isBodyActive", &PyMotionInterface::isBodyActive)
+        .def("isStanding", &PyMotionInterface::isStanding)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
 		.def("calibrated", &PyMotionInterface::calibrated)
