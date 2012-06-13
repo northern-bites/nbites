@@ -78,7 +78,7 @@ bool hasLargerMagnitude(float x, float y) {
     return true; // considers values of 0.0f as always smaller in magnitude than anything
 }
 
-static const float ALLOWED_ROTATION_ERROR = M_PI/36.0f;
+static const float ALLOWED_ROTATION_ERROR = M_PI_FLOAT/36.0f;
 static const float ALLOWED_TRANSLATION_ERROR = 5.0f;
 
 //Pose2D errorOffset(ALLOWED_ROTATION_ERROR, ALLOWED_TRANSLATION_ERROR, ALLOWED_TRANSLATION_ERROR);
@@ -106,16 +106,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
 
-    if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP
-                             && !requestedToStop) {
+    if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+
         StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
-
-        WalkRequest* walkRequest = &(walkingEngine.theMotionRequest.walkRequest);
-        walkRequest->mode = WalkRequest::targetMode;
-
-        walkRequest->speed.rotation = command->gain;
-        walkRequest->speed.translation.x = command->gain;
-        walkRequest->speed.translation.y = command->gain;
 
         Pose2D deltaOdometry = walkingEngine.theOdometryData - startOdometry;
         Pose2D absoluteTarget(command->theta_rads, command->x_mms, command->y_mms);
@@ -129,9 +122,20 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 //                      relativeTarget.rotation << std::endl;
 
         if (!hasPassed(deltaOdometry + walkingEngine.upcomingOdometryOffset, absoluteTarget)) {
-            walkRequest->target = relativeTarget;
-            walkingEngine.theMotionRequest.walkRequest.pedantic = true;
-            walkingEngine.theMotionRequest.motion = MotionRequest::walk;
+
+            MotionRequest motionRequest;
+            motionRequest.motion = MotionRequest::walk;
+
+            motionRequest.walkRequest.mode = WalkRequest::targetMode;
+
+            motionRequest.walkRequest.speed.rotation = command->gain;
+            motionRequest.walkRequest.speed.translation.x = command->gain;
+            motionRequest.walkRequest.speed.translation.y = command->gain;
+
+            motionRequest.walkRequest.pedantic = true;
+            motionRequest.walkRequest.target = relativeTarget;
+
+            walkingEngine.theMotionRequest = motionRequest;
         } else {
             this->stand();
         }
@@ -212,9 +216,12 @@ const bool BHWalkProvider::isWalkActive() const {
 
 void BHWalkProvider::stand() {
     bhwalk_out << "BHWalk stand requested" << endl;
-    walkingEngine.theMotionRequest.motion = MotionRequest::stand;
-    walkingEngine.theMotionRequest.walkRequest = WalkRequest();
+    MotionRequest motionRequest;
+    motionRequest.motion = MotionRequest::stand;
+
+    walkingEngine.theMotionRequest = motionRequest;
     currentCommand = MotionCommand::ptr();
+
     active();
 }
 
@@ -232,19 +239,22 @@ void BHWalkProvider::hardReset() {
 }
 
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
-    WalkRequest* walkRequest = &(walkingEngine.theMotionRequest.walkRequest);
-    walkRequest->mode = WalkRequest::percentageSpeedMode;
 
     if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {
         this->stand();
         return;
     }
 
-    walkingEngine.theMotionRequest.motion = MotionRequest::walk;
+    MotionRequest motionRequest;
+    motionRequest.motion = MotionRequest::walk;
 
-    walkRequest->speed.rotation = command->theta_percent;
-    walkRequest->speed.translation.x = command->x_percent;
-    walkRequest->speed.translation.y = command->y_percent;
+    motionRequest.walkRequest.mode = WalkRequest::percentageSpeedMode;
+
+    motionRequest.walkRequest.speed.rotation = command->theta_percent;
+    motionRequest.walkRequest.speed.translation.x = command->x_percent;
+    motionRequest.walkRequest.speed.translation.y = command->y_percent;
+
+    currentCommand = command;
 
     bhwalk_out << "BHWalk speed walk requested with command ";
     bhwalk_out << *(command.get());
@@ -264,18 +274,23 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
 }
 
 void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
-    WalkRequest* walkRequest = &(walkingEngine.theMotionRequest.walkRequest);
-    walkRequest->mode = WalkRequest::targetMode;
 
-    walkRequest->speed.rotation = command->gain;
-    walkRequest->speed.translation.x = command->gain;
-    walkRequest->speed.translation.y = command->gain;
+    MotionRequest motionRequest;
+    motionRequest.motion = MotionRequest::walk;
 
-    walkRequest->target.rotation = command->theta_rads;
-    walkRequest->target.translation.x = command->x_mm;
-    walkRequest->target.translation.y = command->y_mm;
+    motionRequest.walkRequest.mode = WalkRequest::targetMode;
 
-    walkingEngine.theMotionRequest.motion = MotionRequest::walk;
+    motionRequest.walkRequest.speed.rotation = command->gain;
+    motionRequest.walkRequest.speed.translation.x = command->gain;
+    motionRequest.walkRequest.speed.translation.y = command->gain;
+
+    motionRequest.walkRequest.target.rotation = command->theta_rads;
+    motionRequest.walkRequest.target.translation.x = command->x_mm;
+    motionRequest.walkRequest.target.translation.y = command->y_mm;
+
+    walkingEngine.theMotionRequest = motionRequest;
+
+    currentCommand == command;
 
     bhwalk_out << "BHWalk destination walk requested with command ";
     bhwalk_out << *(command.get()) << endl;
