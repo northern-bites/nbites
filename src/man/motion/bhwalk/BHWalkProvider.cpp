@@ -13,7 +13,7 @@ namespace motion {
 using namespace boost;
 using namespace std;
 
-//#define DEBUG_BHWALK
+#define DEBUG_BHWALK
 #ifdef DEBUG_BHWALK
 #define bhwalk_out std::cout
 #else
@@ -66,8 +66,32 @@ BHWalkProvider::BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<N
 }
 
 void BHWalkProvider::requestStopFirstInstance() {
-    this->stand();
     requestedToStop = true;
+    this->stand();
+}
+
+bool hasLargerMagnitude(float x, float y) {
+    if (y > 0.0f)
+        return x > y;
+    if (y < 0.0f)
+        return x < y;
+    return true; // considers values of 0.0f as always smaller in magnitude than anything
+}
+
+static const float ALLOWED_ROTATION_ERROR = M_PI/36.0f;
+static const float ALLOWED_TRANSLATION_ERROR = 5.0f;
+
+//Pose2D errorOffset(ALLOWED_ROTATION_ERROR, ALLOWED_TRANSLATION_ERROR, ALLOWED_TRANSLATION_ERROR);
+
+// return true if p1 has "passed" p2 (has components values that either have a magnitude
+// larger than the corresponding magnitude p2 within the same sign)
+bool hasPassed(const Pose2D& p1, const Pose2D& p2) {
+
+//    Pose2D p1WithError = p1 + errorOffset;
+
+    return (hasLargerMagnitude(p1.rotation, p2.rotation) &&
+            hasLargerMagnitude(p1.translation.x, p2.translation.x) &&
+            hasLargerMagnitude(p1.translation.y, p2.translation.y));
 }
 
 /**
@@ -81,6 +105,36 @@ void BHWalkProvider::requestStopFirstInstance() {
 void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
+
+    if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP
+                             && !requestedToStop) {
+        StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
+
+        WalkRequest* walkRequest = &(walkingEngine.theMotionRequest.walkRequest);
+        walkRequest->mode = WalkRequest::targetMode;
+
+        walkRequest->speed.rotation = command->gain;
+        walkRequest->speed.translation.x = command->gain;
+        walkRequest->speed.translation.y = command->gain;
+
+        Pose2D deltaOdometry = walkingEngine.theOdometryData - startOdometry;
+        Pose2D absoluteTarget(command->theta_rads, command->x_mms, command->y_mms);
+
+        Pose2D relativeTarget = absoluteTarget - deltaOdometry;
+
+//        bhwalk_out << deltaOdometry.rotation << " " << absoluteTarget.rotation << std::endl;
+
+//        bhwalk_out << relativeTarget.translation.x << " " <<
+//                      relativeTarget.translation.y << " " <<
+//                      relativeTarget.rotation << std::endl;
+
+        if (!hasPassed(deltaOdometry, absoluteTarget)) {
+            walkRequest->target = relativeTarget;
+            walkingEngine.theMotionRequest.motion = MotionRequest::walk;
+        } else {
+            this->stand();
+        }
+    }
 
     //We only copy joint position, and not temperatures or currents
     //Note: temperatures are unused, and currents are used by the GroundContactDetector
@@ -151,6 +205,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     }
 }
 
+const bool BHWalkProvider::isWalkActive() const {
+        return !(walkingEngine.theMotionRequest.motion == MotionRequest::stand);
+    }
+
 void BHWalkProvider::stand() {
     bhwalk_out << "BHWalk stand requested" << endl;
     walkingEngine.theMotionRequest.motion = MotionRequest::stand;
@@ -194,6 +252,13 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 
 void BHWalkProvider::setCommand(const StepCommand::ptr command) {
 
+    startOdometry = walkingEngine.theOdometryData;
+    currentCommand = command;
+
+    bhwalk_out << "BHWalk destination walk requested with command ";
+    bhwalk_out << *(command.get()) << endl;
+
+    active();
 }
 
 void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
