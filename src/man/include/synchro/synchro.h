@@ -172,8 +172,6 @@ public:
     void signalToResume();
     void waitForThreadToFinish();
 
-    void yield();
-
     // Overload this method to run your thread code
     virtual void run() = 0;
 

@@ -38,7 +38,7 @@ def tracking(tracker):
 
     if tracker.target.vis.on:
         tracker.helper.trackObject()
-#    else: 
+#    else:
 #        tracker.helper.lookToPoint(tracker.target)
 
     if not tracker.target.vis.on and tracker.counter > 15:
@@ -47,6 +47,23 @@ def tracking(tracker):
                 constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
             return tracker.goLater('ballTracking')
         return tracker.stay()
+
+    return tracker.stay()
+
+# Fixed Pitch
+def trackingFixedPitch(tracker):
+    """
+    While the target is visible, track it via vision values.
+    If the target is lost, return to lastDiffState.
+    """
+    # If the target is not in vision, trackObjectFixedPitch will track via loc.
+    tracker.helper.trackObjectFixedPitch()
+
+    if not tracker.target.vis.on and tracker.counter > 15:
+        if DEBUG : tracker.printf("Missing object this frame",'cyan')
+        if tracker.target.vis.framesOff > \
+                constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+            return tracker.goLater(tracker.lastDiffState)
 
     return tracker.stay()
 
@@ -97,6 +114,7 @@ def activeTracking(tracker):
 
     return tracker.stay()
 
+# Only called from activeTracking.
 def panToFieldObject(tracker):
     """
     Calculate which goalpost is easiest to look at and look to it.

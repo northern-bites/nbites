@@ -128,6 +128,7 @@ class Brain(object):
         """
         # Build instances of the vision based field objects
         # Left post is on that goalie's left
+        # Note: As of 6/8/12, ygrp holds info about ambiguous posts
         # Yellow goal left and right posts
         self.yglp = FieldObject(self.vision.yglp,
                                 Constants.vis_landmark.VISION_YGLP,
@@ -237,9 +238,6 @@ class Brain(object):
         # Update objects
         self.updateObjects()
 
-        #Set LEDS
-        self.leds.processLeds()
-
         # Behavior stuff
         self.gameController.run()
         self.fallController.run()
@@ -247,6 +245,9 @@ class Brain(object):
         self.player.run()
         self.tracker.run()
         self.nav.run()
+
+        #Set LEDS
+        self.leds.processLeds()
 
         # Broadcast Report for Teammates
         self.setPacketData()
@@ -268,11 +269,6 @@ class Brain(object):
         for mate in self.teamMembers:
             if (mate.active and mate.isDead()):
                 mate.active = False
-                if self.my.playerNumber == 1:
-                    return
-                if mate.playerNumber == 1:
-                    print "WARNING: THE GOALIE IS DEAD."
-                    return
 
     def updateObjects(self):
         """
@@ -296,25 +292,24 @@ class Brain(object):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
         loc = self.loc
-        self.comm.setData(#loc.x,
-                          #loc.y,
-                          #loc.h,
-                          #loc.xUncert,
-                          #loc.yUncert,
-                          #loc.hUncert,
-                          #loc.ballX,
-                          #loc.ballY,
-                          #loc.ballXUncert,
-                          #loc.ballYUncert,
+        self.comm.setData(loc.x,
+                          loc.y,
+                          loc.h,
+                          loc.xUncert,
+                          loc.yUncert,
+                          loc.hUncert,
+                          loc.ballX,
+                          loc.ballY,
+                          loc.ballXUncert,
+                          loc.ballYUncert,
                           self.ball.vis.dist,
                           self.ball.vis.bearing,
                           self.ball.vis.on,
-                          self.ball.vis.framesOn,
-                          #self.play.role,
-                          #self.play.subRole,
-                          self.teamMembers[self.my.playerNumber-1].chaseTime)
-                          #loc.ballVelX,
-                          #loc.ballVelY)
+                          self.play.role,
+                          self.play.subRole,
+                          self.playbook.pb.me.chaseTime,
+                          loc.ballVelX,
+                          loc.ballVelY)
 
         # TODO: remove this and log through C++ and the Logger instead.
         if Constants.LOG_COMM:
@@ -333,6 +328,7 @@ class Brain(object):
                                     loc.ballYUncert,
                                     self.ball.dist,
                                     self.ball.bearing,
+                                    self.ball.vis.on,
                                     self.play.role,
                                     self.play.subRole,
                                     self.playbook.pb.me.chaseTime,
@@ -340,6 +336,16 @@ class Brain(object):
                                     loc.ballVelY))
             self.out.logSComm(packet)
 
+    # TODO: Take this out once new comm is in...
+    def activeTeamMates(self):
+        activeMates = 0
+        for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
+            mate = self.teamMembers[i]
+            if mate.active:
+                activeMates += 1
+        return activeMates
+
+    #TODO: is this method completely depricated?
     def resetLocalization(self):
         """
         Reset our localization

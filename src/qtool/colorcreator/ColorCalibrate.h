@@ -18,6 +18,7 @@
 #include "viewer/ChannelImageViewer.h"
 #include "data/DataManager.h"
 #include "image/BMPYUVImage.h"
+#include "viewer/BMPImageViewerListener.h"
 //colorcreator
 #include "ColorEdit.h"
 #include "ColorTable.h"
@@ -47,6 +48,9 @@ protected slots:
     void saveSlidersBtnPushed();
     void saveColorTableBtnPushed();
     void imageTabSwitched(int);
+	void setFullColors(bool state);
+    void canvassClicked(int x, int y, int brushSize, bool leftClick);
+
 
 protected:
     void loadColorSpaces(QString filename);
@@ -60,9 +64,11 @@ private:
 
     image::BMPYUVImage* topImage;
     viewer::ChannelImageViewer topChannelImage;
+    viewer::BMPImageViewerListener* topImageViewer;
 
     image::BMPYUVImage* bottomImage;
     viewer::ChannelImageViewer bottomChannelImage;
+    viewer::BMPImageViewerListener* bottomImageViewer;
 
     ColorSpace colorSpace[image::NUM_COLORS];
     ColorSpace* currentColorSpace;
@@ -73,6 +79,8 @@ private:
     QImage thresholdedImage;
     QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
 
+	bool displayAllColors;
+	int lastClickedX, lastClickedY;
 
 };
 

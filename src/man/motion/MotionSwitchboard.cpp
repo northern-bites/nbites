@@ -11,8 +11,8 @@ using namespace Kinematics;
 using namespace NBMath;
 //#define DEBUG_SWITCHBOARD
 
-MotionSwitchboard::MotionSwitchboard(shared_ptr<Sensors> s,
-                                     shared_ptr<NaoPose> pose)
+MotionSwitchboard::MotionSwitchboard(boost::shared_ptr<Sensors> s,
+                                     boost::shared_ptr<NaoPose> pose)
     : sensors(s),
       walkProvider(sensors, pose),
       scriptedProvider(sensors),
@@ -425,18 +425,26 @@ void MotionSwitchboard::clipHeadJoints(vector<float>& joints)
 
     else if (yaw < 1.57f)
     {
-        if (pitch > -0.2f)
-        {
-            pitch = -0.2f;
-        }
+        //if (pitch > -0.2f)
+        //{
+        //    pitch = -0.2f;
+        //}
+		if (pitch > 0.2f)
+		{
+			pitch = 0.2f;
+		}
     }
 
     else if (yaw >= 1.57f)
     {
-        if (pitch > -0.3f)
-        {
-            pitch = -0.3f;
-        }
+        //if (pitch > -0.3f)
+        //{
+        //    pitch = -0.3f;
+        //}
+		if (pitch > 0.2f)
+		{
+			pitch = 0.2f;
+		}
     }
 
     joints[HEAD_PITCH] = pitch;

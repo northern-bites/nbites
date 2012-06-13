@@ -23,12 +23,19 @@ set( Image_srcs
     VisualInfoImage
     FastYUVToBMPImage
     PaintField
+    PaintBots
+    PaintFieldObjects
+    PaintRobotWorldState
     )
 
-set( Image_headers BMPImage.h
-				   FastYUVToBMPImage.h
-				   PaintField.h
-				   PaintGroundTruth.h)
+set( Image_headers 
+  BMPImage.h
+  FastYUVToBMPImage.h
+  PaintField.h
+  PaintBots.h
+  PaintGroundTruth.h
+  PaintFieldObjects.h
+  PaintRobotWorldState.h)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -47,6 +54,7 @@ add_library(image
 
 target_link_libraries(
   image
+  viewer
   overseer_client
   ${QT_LIBRARIES}
   ${SWSCALE_LIBRARY}

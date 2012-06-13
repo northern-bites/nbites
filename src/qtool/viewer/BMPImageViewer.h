@@ -10,7 +10,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QLayout>
-#include "data/DataTypes.h"
+
+#include "data/Typedefs.h"
 #include "image/FastYUVToBMPImage.h"
 
 namespace qtool {
@@ -29,27 +30,29 @@ public:
         return QSize(image->getWidth(), image->getHeight());
     }
 
+	virtual unsigned getWidth() { return image->getWidth();}
+	virtual unsigned getHeight() { return image->getHeight();}
+
+	QVBoxLayout* getLayout();
+
 public slots:
     void updateView();
 
 protected:
     void showEvent(QShowEvent* event);
+    void paintEvent(QPaintEvent* event);
     void setupUI();
+    void addPixmap();
 
 protected:
     image::BMPImage* image;
     QLabel imagePlaceholder;
+	QVBoxLayout* BMPlayout;
+	QSize imageSize;
 
-};
+private:
+	bool shouldRedraw;
 
-class RoboImageViewer: public BMPImageViewer {
-    Q_OBJECT
-
-public:
-    RoboImageViewer(data::RoboImage::const_ptr rawImage, QWidget* parent = 0) :
-        BMPImageViewer(new image::FastYUVToBMPImage(rawImage, parent), parent) {
-
-        }
 };
 
 }

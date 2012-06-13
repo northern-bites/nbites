@@ -13,6 +13,8 @@
 #include "YUVImage.h"
 #include "ClassHelper.h"
 
+#include "man/corpus/Camera.h"
+
 namespace qtool {
 namespace image {
 
@@ -31,6 +33,7 @@ static const std::string ChannelType_label[] = {
 
 class BMPYUVImage : public BMPImage
 {
+
 public:
     enum ChannelType {
         RGB,
@@ -49,7 +52,8 @@ public:
     ADD_SHARED_PTR(BMPYUVImage);
 
 public:
-    BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+    BMPYUVImage(memory::MRawImages::const_ptr roboImages,
+                man::corpus::Camera::Type which,
                 ChannelType type = RGB, QObject* parent = 0);
     virtual ~BMPYUVImage() {};
 

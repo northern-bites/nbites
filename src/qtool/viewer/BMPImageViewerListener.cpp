@@ -7,7 +7,7 @@ using namespace man::memory;
 namespace qtool {
 namespace viewer {
 
-BMPImageViewerListener::BMPImageViewerListener(image::BMPYUVImage* image,
+BMPImageViewerListener::BMPImageViewerListener(image::BMPImage* image,
         QWidget *parent)
     : BMPImageViewer(image,parent), brushSize(DEFAULT_BRUSH_SIZE) {
 
@@ -39,7 +39,6 @@ void BMPImageViewerListener::wheelEvent(QWheelEvent* event) {
     if (brushSize == 0) {
         brushSize = 1;
     }
-
     updateBrushCursor();
 }
 

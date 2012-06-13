@@ -58,22 +58,21 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Threshold.h"
-#include "debug.h"
 
 #include "ColorParams.h"
+#include "FieldLines/Gradient.h"
 
 using namespace std;
-using boost::shared_ptr;
 #define PRINT_VISION_INFO
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
-Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
+Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr)
 {
     // Set up object recognition object pointers
     field = new Field(vision, this);
     context = new Context(vision, this, field);
-    yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+    yellow = boost::shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
                                                              field, context,
                                                              YELLOW_BIT));
     navyblue = new Robots(vision, this, field, context, NAVY_BIT);
@@ -89,6 +88,12 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
 /* Main vision loop, called by Vision.cc
  */
 void Threshold::visionLoop() {
+    usingTopCamera = true;
+
+    PROF_ENTER(P_TRANSFORM);
+    pose->transform(usingTopCamera);
+    PROF_EXIT(P_TRANSFORM);
+
     // threshold image and create runs
     thresholdAndRuns();
     //newFindRobots();
@@ -121,8 +126,28 @@ void Threshold::visionLoop() {
     if (visualHorizonDebug) {
         drawVisualHorizon();
     }
-    transposeDebugImage();
 #endif
+
+    if (vision->ball->getRadius() != 0) return; //we see the ball, we are done
+
+    usingTopCamera = false;
+
+    PROF_ENTER(P_TRANSFORM)
+    pose->transform(usingTopCamera);
+    PROF_EXIT(P_TRANSFORM)
+
+    orange->init(pose->getHorizonSlope());
+    lowerRuns();
+
+    vision->ball->init();
+    vision->ball->setTopCam(usingTopCamera);
+
+    if (horizon < IMAGE_HEIGHT) {
+        orange->createBall(horizon);
+    } else {
+        orange->createBall(pose->getHorizonY(0));
+    }
+
 }
 
 /*
@@ -238,14 +263,24 @@ void Threshold::runs() {
     // split up the loops
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
         int topEdge = max(0, field->horizonAt(i));
-        findBallsCrosses(i, topEdge);
-        findGoals(i, topEdge);
+		findBallsCrosses(i, topEdge);
+		findGoals(i, topEdge);
     }
-    setOpenFieldInformation();
-    for (int i = 0; i < NUMBLOCKS; i++) {
-        if (evidence[i] < 5) {
-            block[i] = 0;
-        }
+	setOpenFieldInformation();
+	for (int i = 0; i < NUMBLOCKS; i++) {
+		if (evidence[i] < 5) {
+			block[i] = 0;
+		}
+	}
+}
+
+/** Does the same thing as the previous function (runs) except for
+ * the lower camera.  Just looks for the ball.
+ */
+void Threshold::lowerRuns() {
+    for (int i = 0; i < IMAGE_WIDTH; i += 1) {
+        int topEdge = max(0, field->horizonAt(i));
+	findBallLowerCamera(i, 0);
     }
 }
 
@@ -501,6 +536,48 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         if (debugShot) {
             vision->drawPoint(column, IMAGE_HEIGHT - 4, RED);
         }
+    }
+}
+
+/* For starters with the bottom camera we'll only look for the ball.
+ * @param column     the current vertical scanline
+ * @param topEdge    the top of the field in that scanline
+ */
+
+void Threshold::findBallLowerCamera(int column, int topEdge) {
+    // scan down finding balls and crosses
+    static const int SCANSIZE = 8;
+    int currentRun = 0;
+    int bound = IMAGE_HEIGHT - 1;//lowerBound[column];
+    // if a ball is in the middle of the boundary, then look a little lower
+    if (bound < IMAGE_HEIGHT - 1) {
+      while (bound < IMAGE_HEIGHT &&
+	     Utility::isOrange(getColor(column, bound))) {
+	bound++;
+      }
+    }
+    // scan down the column looking for ORANGE
+    for (int j = bound; j >= topEdge; j-= SCANSIZE) {
+      // get the next pixel
+      currentRun = 0;
+      unsigned char pixel = getThresholded(j,column);
+      if (Utility::isOrange(pixel)) {
+	//drawPoint(column, j, MAROON);
+	int scanner = j+1;
+	while (scanner < j + SCANSIZE &&
+	       Utility::isOrange(getThresholded(scanner, column))) {
+	  currentRun++;
+	  scanner++;
+	}
+	while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+	  {
+	    currentRun++;
+	    j--;
+	  }
+	if (currentRun > 1) {
+	  orange->newRun(column, j, currentRun);
+	}
+      }
     }
 }
 
@@ -839,17 +916,15 @@ void Threshold::storeFieldObjects() {
     setFieldObjectInfo(vision->ygrp);
     setFramesOnAndOff(vision->ygrp);
 
-    setFieldObjectInfo(vision->bglp);
-    setFramesOnAndOff(vision->bglp);
-
-    setFieldObjectInfo(vision->bgrp);
-    setFramesOnAndOff(vision->bgrp);
+//    setFieldObjectInfo(vision->bglp);
+//    setFramesOnAndOff(vision->bglp);
+//
+//    setFieldObjectInfo(vision->bgrp);
+//    setFramesOnAndOff(vision->bgrp);
 
     setVisualCrossInfo(vision->cross);
     setFramesOnAndOff(vision->cross);
 
-    vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
-    vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
 
@@ -919,13 +994,8 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 objPtr == vision->bglp ||
                 objPtr == vision->bgrp) {
             //print("we've got a post!");
-            float dist = 0.0;
             float width = objPtr->getWidth();
             float height = objPtr->getHeight();
-
-            distanceCertainty cert = objPtr->getDistanceCertainty();
-            float distw = getGoalPostDistFromWidth(width);
-            float disth = getGoalPostDistFromHeight(height);
 
             const int bottomLeftX = objPtr->getLeftBottomX();
             const int bottomRightX = objPtr->getRightBottomX();
@@ -940,39 +1010,40 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             const int intBottomOfObjectX = static_cast<int>(bottomOfObjectX);
             const int intBottomOfObjectY = static_cast<int>(bottomOfObjectY);
 
-            float distwnew = pose->sizeBasedEstimate(intBottomOfObjectX,
+            estimate estFromWidth = this->getGoalPostEstimateFromWidth(intBottomOfObjectX,
+                    intBottomOfObjectY, width);
+
+            estimate estFromHeight = this->getGoalPostEstimateFromHeight(intBottomOfObjectX,
+                    intBottomOfObjectY,  height);
+
+            estimate estFromPose = pose->pixEstimate(intBottomOfObjectX,
                                                      intBottomOfObjectY,
-                                                     0.0f,
-                                                     width,
-                                                     GOAL_POST_CM_WIDTH*10).dist;
+                                                     0.0f);
 
-            float disthnew = pose->sizeBasedEstimate(intBottomOfObjectX,
-                                                     intBottomOfObjectY,
-                                                     0.0f,
-                                                     height,
-                                                     GOAL_POST_CM_HEIGHT*10).dist;
-
-
-            const float poseDist = pose->pixEstimate(
-                    static_cast<int>(bottomOfObjectX),
-                    static_cast<int>(bottomOfObjectY), 0.0f).dist;
-
-            //TODO: remove the old code, make new code better on distances
-            dist = chooseGoalDistance(cert, disth, distw, poseDist,
-                                      static_cast<int>(bottomOfObjectY));
-            //TODO: hack
-            float distnew = chooseGoalDistance(cert, disthnew, distw, poseDist,
-											   static_cast<int>(bottomOfObjectY));
-            dist = distnew;
+            distanceCertainty cert = objPtr->getDistanceCertainty();
+            estimate obj_est = chooseBestGoalEstimate(cert, estFromHeight, estFromWidth,
+                    estFromPose, static_cast<int>(bottomOfObjectY));
 
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
-            if (dist < POST_MIN_FOC_DIST ||
-				dist > POST_MAX_FOC_DIST) {
-                dist = 0.0;
+            if (obj_est.dist < POST_MIN_FOC_DIST || obj_est.dist > POST_MAX_FOC_DIST) {
+                obj_est = NULL_ESTIMATE;
             }
-            objPtr->setDistance(dist);
-			if (dist < MIDFIELD_X + 150) {
+
+            bool debugEstimates = false;
+            if (debugEstimates) {
+                cout << "width " << estFromWidth << endl;
+                cout << "height " << estFromHeight << endl;
+                cout << "pose " << estFromPose << endl;
+                cout << "chosen " << obj_est << endl;
+            }
+
+            objPtr->setDistance(obj_est.dist);
+            objPtr->setDistanceWithSD(obj_est.dist);
+            objPtr->setBearingWithSD(obj_est.bearing);
+            objPtr->setElevation(obj_est.elevation);
+
+			if (obj_est.dist < MIDFIELD_X + 150) {
 				context->setSameHalf();
 			}
 		} else { // don't know what object it is
@@ -980,19 +1051,8 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 			//cout << "What the heck!" << endl;
             return;
         }
-        // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
-        // convert dist + angle estimates to body center
-        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              objPtr->getDistance());
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
     }
     else {
-        objPtr->setFocDist(0.0);
-
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1002,58 +1062,26 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
  * the sizes of width and height.
  */
 
-float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
-                                    float distw, float poseDist, int bottom) {
-    float dist = 0.0f;
-	if (poseDist < 200.0f && poseDist > 0 && bottom <= IMAGE_HEIGHT - 5) {
-		//cout << "Returning pose dist " << poseDist << endl;
-		return poseDist;
-	}
+estimate Threshold::chooseBestGoalEstimate(distanceCertainty cert, const estimate& estFromHeight,
+        const estimate& estFromWidth, const estimate& estFromPose, int bottom) {
+
+    bool bottomReliableForPixEst = bottom <= IMAGE_HEIGHT - 5;
+
     switch (cert) {
-    case HEIGHT_UNSURE:
-        dist = distw;
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            dist = poseDist;
-        }
-        break;
-    case WIDTH_UNSURE:
-        dist = disth;
-		if (disth > distw) {
-			dist = distw;
-			if (bottom <= IMAGE_HEIGHT - 5) {
-				dist = poseDist;
-			}
-		}
-        break;
-    case BOTH_UNSURE:
-        // We choose the min distance here, since that means more pixels
-		dist = min( poseDist, min(disth, distw));
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            //dist = min( poseDist, min(disth, distw));
-        } else if (dist > 100) {
-            dist = 0.0f;
-		}
-        break;
     case BOTH_SURE:
-		// pick the one right in the middle
-		if (poseDist < disth) {
-			if (poseDist < distw) {
-				dist = min(disth, distw);
-			} else {
-				dist = poseDist;
-			}
-		} else {
-			if (poseDist < distw) {
-				dist = poseDist;
-			} else {
-				dist = max(disth, distw);
-			}
-		}
-        break;
+    case WIDTH_UNSURE:
+        return estFromHeight;
+    case HEIGHT_UNSURE:
+        if (bottomReliableForPixEst)
+            return estFromPose;
+        else
+            return estFromWidth;
+    case BOTH_UNSURE:
+        if (bottomReliableForPixEst) {
+            return estFromPose;
+        }
     }
-	/*cout << "Distances disth " << disth << " distw " << distw <<
-	  " posedist " << poseDist << " returning " << dist << endl;*/
-    return dist;
+    return NULL_ESTIMATE;
 }
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
@@ -1080,23 +1108,18 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 			   MAX_ELEVATION_RAD );
 
         // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
 		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
 											  objPtr->getCenterY(),
 											  265.0f);
-		// convert dist + angle estimates to body center
-		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-											  objPtr->getCenterY(),
-											  pose_est.dist);
-		objPtr->setDistanceWithSD(obj_est.dist);
-		objPtr->setBearingWithSD(obj_est.bearing);
-		objPtr->setElevation(obj_est.elevation);
+
+		objPtr->setDistanceWithSD(pose_est.dist);
+		objPtr->setBearingWithSD(pose_est.bearing);
+		objPtr->setElevation(pose_est.elevation);
 		// now that we have the robot information check if it might kick
 		if (vision->ball->getWidth() > 0) {
 			context->checkForKickDanger(objPtr);
 		}
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1127,9 +1150,7 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
         int crossY = objPtr->getCenterY();
         // convert dist + angle estimates to body center
         estimate obj_est = pose->pixEstimate(crossX, crossY, 0.0);
-        obj_est = pose->bodyEstimate(crossX, crossY, obj_est.dist);
         if (obj_est.dist > 1500.0f) { // pose problem which happens rarely
-            objPtr->setFocDist(0.0);
             objPtr->setDistanceWithSD(0.0);
             objPtr->setBearingWithSD(0.0);
             objPtr->setElevation(0.0);
@@ -1151,7 +1172,6 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 			objPtr->setID(ABSTRACT_CROSS);
         }
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1162,28 +1182,16 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
  * @param height     the height of the post in pixels
  * @return           the distance to the post in centimeters
  */
-float Threshold::getGoalPostDistFromHeight(float height) {
-#if ROBOT(NAO_SIM)
-    return 17826*pow((double) height,-1.0254);
-#else
-    // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
-    return 32880.0f/height - 11.8597f;
-#endif
+estimate Threshold::getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, height, GOAL_POST_CM_HEIGHT * CM_TO_MM);
 }
 
 /* Looks up goal post width in pixels to focal distance function.
  * @param width     the width of the post
  * @return          the distance to the post
  */
-float Threshold::getGoalPostDistFromWidth(float width) {
-#if ROBOT(NAO_SIM)
-    //floor distance, seems to be best for the width
-    //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
-    return 2360.1*pow((double) width,-1.0516);
-#else
-    // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
-    return 3116.59f/width + 21.75f;
-#endif
+estimate Threshold::getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, width, GOAL_POST_CM_WIDTH * CM_TO_MM);
 }
 
 /*
@@ -1205,7 +1213,7 @@ void Threshold::initObjects(void) {
 	vision->navy3->init();
     // balls
     vision->ball->init();
-
+    vision->ball->setTopCam(usingTopCamera);
     // crosses
     vision->cross->init();
 } // initObjects
@@ -1235,7 +1243,7 @@ void Threshold::initTable(std::string filename) {
     //cout << filename << endl;
     fp = fopen(filename.c_str(), "r");   //open table for reading
     if (fp == NULL) {
-        print("initTable() FAILED to open filename: %s", filename.c_str());
+        printf("initTable() FAILED to open filename: %s", filename.c_str());
 #ifdef OFFLINE
         exit(0);
 #else
@@ -1251,7 +1259,7 @@ void Threshold::initTable(std::string filename) {
         }
 
 #ifndef OFFLINE
-    print("Loaded colortable %s\n",filename.c_str());
+    printf("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);
@@ -1333,7 +1341,7 @@ void Threshold::initCompressedTable(std::string filename){
     free(fileData);
 
     fclose(fp);
-#endif 
+#endif
 }*/
 
 const uint16_t* Threshold::getYUV() {
@@ -1347,8 +1355,14 @@ void Threshold::setYUV(const uint16_t* newyuv) {
     yuv = newyuv;
     thresholded = const_cast<uint8_t*>(
         reinterpret_cast<const uint8_t*>(yuv) +
-        Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
-    yplane = yuv;
+        Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
+}
+void Threshold::setYUV_bot(const uint16_t* newyuv) {
+    yuv_bot = newyuv;
+    thresholdedBottom = const_cast<uint8_t*>(
+        reinterpret_cast<const uint8_t*>(yuv_bot) +
+        Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
+    yplane_bot = yuv_bot;
 }
 
 /* Calculate the distance between two objects (x distance only).
@@ -1432,15 +1446,15 @@ void Threshold::initDebugImage(){
  * to the real image.
  */
 void Threshold::transposeDebugImage(){
-#if defined OFFLINE
+#ifdef OFFLINE
     for(int x = 0 ; x < IMAGE_WIDTH; x++) {
-      for(int y = 0; y < IMAGE_HEIGHT; y++) {
-	if(debugImage[y][x] != GREY){
-	  setThresholded(y, x, debugImage[y][x]);
-	}
-      }
+        for(int y = 0; y < IMAGE_HEIGHT; y++) {
+            if(debugImage[y][x] != GREY){
+                setThresholded(y, x, debugImage[y][x]);
+            }
+        }
     }
-  
+
     initDebugImage();
 #endif
 }
@@ -1478,21 +1492,23 @@ int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
 }
 
-/**
- * Get the V channel information for a given point in the image.
- * This is used to help identify the Ball which shows up well
- * in the V channel.
- */
-int Threshold::getV(int x, int y) const {
-    return static_cast<int>(vision->uvImg[y*IMAGE_WIDTH*2 + x*2 + 1]);
-}
+
 
 /**
  * Get the U channel information for a given point.  This has the
  * potential to help id post edges. We don't currently use it though.
  */
 int Threshold::getU(int j, int i) const {
-    return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
+    return static_cast<int>(vision->uImg[i*IMAGE_WIDTH + j]);
+}
+
+/**
+ * Get the V channel information for a given point in the image.
+ * This is used to help identify the Ball which shows up well
+ * in the V channel.
+ */
+int Threshold::getV(int j, int i) const {
+    return static_cast<int>(vision->vImg[i*IMAGE_WIDTH + j]);
 }
 
 #ifdef OFFLINE

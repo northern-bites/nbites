@@ -30,6 +30,10 @@ namespace angle {
     typedef float degrees;
 }
 
+typedef int pixels;
+typedef float cms;
+typedef float mms;
+
 #define ROBOT(t) ( \
     (t == NAO_RL_33 && ROBOT_TYPE == NAO_RL_33) || \
     (t == NAO_NEXTGEN && ROBOT_TYPE == NAO_NEXTGEN) || \
@@ -67,6 +71,14 @@ typedef unsigned char byte;
             printf("Problem with " #x ", returned %i\n", result); \
             perror("Error message"); \
         } \
+}
+
+#include <stdexcept>
+#include <cstring>
+#include <string>
+
+static void throw_errno(int err_no) throw (std::runtime_error) {
+    throw std::runtime_error(std::string(strerror(err_no)));
 }
 
 #include <time.h>

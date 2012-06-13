@@ -15,77 +15,72 @@ using namespace man::corpus;
 
 MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
                  memoryManager(memoryManager) {
-    MImage::const_ptr rawMTopImage = memoryManager->getMemory()->
-        getMImage(Camera::TOP);
-    MImage::const_ptr rawMBottomImage = memoryManager->getMemory()->
-        getMImage(Camera::BOTTOM);
 
-    FastYUVToBMPImage* rawTopBMP = new
-        FastYUVToBMPImage(rawMTopImage, this);
-    FastYUVToBMPImage* rawBottomBMP = new
-        FastYUVToBMPImage(rawMBottomImage, this);
+    MRawImages::const_ptr rawImages = memoryManager->getMemory()->get<MRawImages>();
+
+    FastYUVToBMPImage* rawTopBMP = new FastYUVToBMPImage(rawImages, Camera::TOP, this);
+    FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(rawImages, Camera::BOTTOM, this);
 
     BMPImageViewer* topImageViewer;
     BMPImageViewer* bottomImageViewer;
 
-      VisualInfoImage* shapes = new VisualInfoImage(memoryManager->getMemory()->getMVision());
+    VisualInfoImage* shapesBottom = new VisualInfoImage(memoryManager->getMemory()->get<MVision>(),
+            Camera::BOTTOM);
+    VisualInfoImage* shapesTop = new VisualInfoImage(memoryManager->getMemory()->get<MVision>(),
+            Camera::TOP);
 
-      OverlayedImage* combo = new OverlayedImage(rawBottomBMP,
-                                                 shapes, this);
+    OverlayedImage* comboBottom = new OverlayedImage(rawBottomBMP, shapesBottom, this);
+    OverlayedImage* comboTop = new OverlayedImage(rawTopBMP, shapesTop, this);
 
-      bottomImageViewer = new BMPImageViewer(combo, this);
-      CollapsibleImageViewer * bottomCIV = new
-          CollapsibleImageViewer(bottomImageViewer,
-                                 QString("Bottom"),
-                                 this);
+    bottomImageViewer = new BMPImageViewer(comboBottom, this);
+    CollapsibleImageViewer * bottomCIV = new
+            CollapsibleImageViewer(bottomImageViewer,
+                    QString("Bottom"),
+                    this);
 
-      topImageViewer = new BMPImageViewer(rawTopBMP, this);
-      CollapsibleImageViewer * topCIV = new
-          CollapsibleImageViewer(topImageViewer,
-                                 QString("Top"),
-                                 this);
+    topImageViewer = new BMPImageViewer(comboTop, this);
+    CollapsibleImageViewer * topCIV = new
+            CollapsibleImageViewer(topImageViewer,
+                    QString("Top"),
+                    this);
 
-      //}
+    QWidget* central = new QWidget(this);
 
-      //    else
-      // imageViewer = new BMPImageViewer(rawBMP, this);
+    QVBoxLayout* layout = new QVBoxLayout(central);
 
-      QWidget* central = new QWidget(this);
+    layout->addWidget(topCIV);
+    layout->addWidget(bottomCIV);
 
-      QVBoxLayout* layout = new QVBoxLayout(central);
+    // Make sure one of the images is toggled off for small screens
+    bottomCIV->toggle();
 
-      layout->addWidget(topCIV);
-      layout->addWidget(bottomCIV);
+    central->setLayout(layout);
 
-      // Make sure one of the images is toggled off for small screens
-      bottomCIV->toggle();
+    this->setCentralWidget(central);
 
-      central->setLayout(layout);
+    //TODO: we call updateView twice per vision frame
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 
-      this->setCentralWidget(central);
-
-    memoryManager->connectSlotToMObject(bottomImageViewer,
-                        SLOT(updateView()), MBOTTOMIMAGE_ID);
-
-    memoryManager->connectSlotToMObject(topImageViewer,
-                        SLOT(updateView()), MTOPIMAGE_ID);
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MVision");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MVision");
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
+    Memory::const_ptr memory = memoryManager->getMemory();
+
     std::vector<QTreeView> messageViewers;
-    for (MObject_ID id = FIRST_OBJECT_ID;
-            id != LAST_OBJECT_ID; id++) {
-        if (id != MTOPIMAGE_ID && id != MBOTTOMIMAGE_ID) {
-            QDockWidget* dockWidget =
-                    new QDockWidget(QString(MObject_names[id].c_str()), this);
-            MObjectViewer* view = new MObjectViewer(
-                    memoryManager->getMemory()->
-                    getMObject(id)->getProtoMessage());
+    for (Memory::const_iterator iterator = memory->begin(); iterator != memory->end(); iterator++) {
+
+        if (iterator->first != "MRawImages" && iterator->first != "GroundTruth") {
+
+            QDockWidget* dockWidget = new QDockWidget(QString(iterator->first.c_str()), this);
+            MObjectViewer* view = new MObjectViewer(iterator->second, dockWidget);
             dockWidget->setWidget(view);
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-            memoryManager->connectSlotToMObject(view, SLOT(updateView()), id);
+            memoryManager->connectSlot(view, SLOT(updateView()), iterator->first);
         }
     }
 

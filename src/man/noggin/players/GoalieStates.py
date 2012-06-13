@@ -1,5 +1,6 @@
 import time
 from objects import RelRobotLocation
+import noggin_constants as nogginConstants
 
 import man.motion.SweetMoves as SweetMoves
 
@@ -15,19 +16,28 @@ def gameInitial(player):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
 
+    elif (not player.motion.isBodyActive()):
+        player.gainsOff()
+
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatWidePanFixedPitch()
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
-    if player.initialDelayCounter < 230:
-        player.initialDelayCounter += 1
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
         return player.stay()
+
+    # If the goalie were to move during ready, it should happen here.
+    # If the goalie walks forward at start of game, need to check if a goal
+    #  was just scored. If so, walk forward enough to require manual positioning.
+    #  Otherwise, every goal accumulates forward walk, and goalie ends up out
+    #  of position.
 
     return player.stay()
 
@@ -37,9 +47,18 @@ def gameSet(player):
         player.brain.nav.stand()
         player.gainsOn()
         player.brain.loc.resetBall()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
 
-        player.brain.resetGoalieLocalization()
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
+    # For the goalie, reset loc every frame.
+    # This way, garaunteed to have correctly set loc and be standing in that
+    #  location for a frame before gamePlaying begins.
+    player.brain.loc.resetLocTo(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
+                                    nogginConstants.MIDFIELD_Y,
+                                    nogginConstants.HEADING_RIGHT)
 
     return player.stay()
 
@@ -47,10 +66,27 @@ def gamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
+    #if player.lastDiffState == 'gamePenalized':
+        # Need to at least *try* to get back into goal.
+
     return player.goLater('position')
 
 def gamePenalized(player):
+    if player.lastDiffState == '':
+        # Just started up! Need to calibrate sensors
+        player.gainsOn()
+        player.brain.nav.stand()
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
     if player.firstFrame():
         player.brain.logger.stopLogging()
         player.inKickingState = False
@@ -67,21 +103,16 @@ def gameFinished(player):
     if player.firstFrame():
         player.stopWalking()
         player.zeroHeads()
-        player.GAME_FINISHED_satDown = False
-        return player.stay()
-
-    if (player.brain.nav.isStopped() and not player.GAME_FINISHED_satDown
-        and not player.motion.isBodyActive()):
-        player.GAME_FINISHED_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
 
-    if not player.motion.isBodyActive() and player.GAME_FINISHED_satDown:
+    if player.brain.nav.isStopped():
         player.gainsOff()
+
     return player.stay()
 
 def position(player):
-    # step forward - NOPE, hacked out
+    # step forward - NOPE, hacked out US open 2012
     if player.firstFrame():
         """player.brain.nav.walkTo(RelRobotLocation(15,0,0),
                                 #player.brain.nav.CLOSE_ENOUGH,
@@ -98,18 +129,13 @@ def position(player):
 
 def watch(player):
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         if player.lastDiffState == 'kickBall':
             player.brain.nav.stand()
 
     #if player.brain.ball.dist < 100:
     #    player.executeMove(SweetMoves.GOALIE_SQUAT)
     #    return player.goLater('saveIt')
-
-    # If ball comes close enough, kick it away.
-    if player.brain.ball.vis.framesOn > 5 and \
-            player.brain.ball.vis.dist < 17:
-        return player.goLater('kickBall')
 
     return player.stay()
 
@@ -118,7 +144,7 @@ def kickBall(player):
     Kick the ball
     """
     if player.firstFrame():
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         if player.brain.ball.loc.relY < 0:
             kick = SweetMoves.RIGHT_BIG_KICK
         else:
@@ -140,6 +166,7 @@ def saveIt(player):
         return player.stay()
     if player.isSaving:
         stopTime = time.time()
+        # This is to stand up before a penalty is called.
         if (stopTime - player.squatTime > 4):
             player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
@@ -168,7 +195,7 @@ def penaltyShotsGameSet(player):
         player.stand()
         player.brain.loc.resetBall()
 
-        player.brain.tracker.trackBall()
+        player.brain.tracker.trackBallFixedPitch()
         player.initialDelayCounter = 0
 
     if player.initialDelayCounter < 230:

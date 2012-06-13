@@ -29,7 +29,7 @@ def neutralHead(tracker):
     return tracker.stay()
 
 def doHeadMove(tracker):
-    '''Executes the currently set headMove.'''
+    '''Executes the currently set headMove, then stops.'''
     if tracker.firstFrame():
         tracker.activeLocOn = False
         tracker.brain.motion.stopHeadMoves()
@@ -37,5 +37,16 @@ def doHeadMove(tracker):
 
     if not tracker.brain.motion.isHeadActive():
         return tracker.goLater('stopped')
+
+    return tracker.stay()
+
+def repeatHeadMove(tracker):
+    '''Executes the currently set headMove, then repeats it.'''
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.startingPan(tracker.headMove)
+
+    if not tracker.brain.motion.isHeadActive():
+        tracker.helper.executeHeadMove(tracker.headMove)
 
     return tracker.stay()

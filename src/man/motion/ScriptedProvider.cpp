@@ -25,7 +25,7 @@ using namespace std;
 using namespace Kinematics;
 using boost::shared_ptr;
 
-ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s)
+ScriptedProvider::ScriptedProvider(boost::shared_ptr<Sensors> s)
     : MotionProvider(SCRIPTED_PROVIDER),
       sensors(s),
       chopper(sensors),
@@ -104,7 +104,7 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
 
     // Go through the chains and enqueue the next
     // joints from the ChoppedCommand.
-    shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
+    boost::shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
 
     currCommand->nextFrame(); // so Python can keep track of progress
 
@@ -169,8 +169,8 @@ void ScriptedProvider::setNextBodyCommand() {
 // Get the chain's current positions. Gives a shared pointer to
 // a vector containing a vector for each chain. Makes accessing
 // each chain very simple.
-shared_ptr<vector<vector<float> > > ScriptedProvider::getCurrentChains() {
-    shared_ptr<vector<vector<float> > >currentChains(
+boost::shared_ptr<vector<vector<float> > > ScriptedProvider::getCurrentChains() {
+    boost::shared_ptr<vector<vector<float> > >currentChains(
 	new vector<vector<float> >(Kinematics::NUM_CHAINS) );
 
     vector<float> currentJoints = sensors->getBodyAngles();

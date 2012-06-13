@@ -1,12 +1,20 @@
+import "Common.proto";
+
 package man.memory.proto;
 
-message PLoc {
+message PLoc { 
 
 	optional int64 timestamp = 1;
-	optional float x_est = 2;
-	optional float y_est = 3;
-	optional float h_est = 4;
-	optional float x_uncert = 5;
-	optional float y_uncert = 6;
-	optional float h_uncert = 7;
+	
+	optional RobotLocation location = 2; 
+	optional RobotArea uncertainty = 3;
+
+	message Particle {
+		optional float x = 1;
+		optional float y = 2;
+		optional float h = 3;
+		optional float w = 4;
+	}
+
+	repeated Particle particles = 8;
 }

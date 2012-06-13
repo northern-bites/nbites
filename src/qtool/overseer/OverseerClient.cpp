@@ -20,11 +20,10 @@ using namespace image;
 OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
         QWidget(parent),
         dataManager(dataManager),
-        groundTruth(dataManager->getGroundTruth()),
+        groundTruth(dataManager->getMemory()->get<GroundTruth>()),
         connectButton(new QPushButton("Connect", this)){
 
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-                this, SLOT(newGroundTruth()));
+    dataManager->connectSlot(this, SLOT(newGroundTruth()), "GroundTruth");
 
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
 
@@ -33,18 +32,16 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     PaintGroundTruth* groundImage = new PaintGroundTruth(groundTruth, this);
     OverlayedImage* combinedImage = new OverlayedImage(fieldImage, groundImage, this);
     viewer::BMPImageViewer* fieldView = new BMPImageViewer(combinedImage, this);
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-            fieldView, SLOT(updateView()));
+    dataManager->connectSlot(fieldView, SLOT(updateView()), "GroundTruth");
     mainLayout->addWidget(fieldView);
 
     QVBoxLayout* rightLayout = new QVBoxLayout();
     rightLayout->addWidget(connectButton);
     connect(connectButton, SIGNAL(clicked()), this, SLOT(connectToOverseer()));
 
-    MObjectViewer* groundTruthView = new MObjectViewer(groundTruth->getProtoMessage(), this);
+    MObjectViewer* groundTruthView = new MObjectViewer(groundTruth, this);
     rightLayout->addWidget(groundTruthView);
-    connect(groundTruth.get(), SIGNAL(dataUpdated()),
-            groundTruthView, SLOT(updateView()));
+    dataManager->connectSlot(groundTruthView, SLOT(updateView()), "GroundTruth");
 
     QLabel* fpsTagLabel = new QLabel("FPS:", this);
     fpsLabel = new QLabel(this);
@@ -63,6 +60,18 @@ void OverseerClient::newGroundTruth() {
     if (delta_t != 0) {
         fps = 1 / delta_t;
     }
+
+//    float ball_x = groundTruth->get()->ball().x();
+//    float ball_y = groundTruth->get()->ball().y();
+//
+//    if (groundTruth->get()->robots_size() > 0) {
+//        auto robot_x = groundTruth->get()->robots(0).x();
+//        auto robot_y = groundTruth->get()->robots(0).y();
+//
+//        cout << "ball distance: "
+//             << NBMath::getHypotenuse(ball_x - robot_x, ball_y - robot_y) << endl;
+//    }
+
     fpsLabel->setNum(fps);
     last_timestamp = new_timestamp;
 }
@@ -79,7 +88,7 @@ void OverseerClient::connectToOverseer() {
 
     SocketInProvider::ptr socket_in(new SocketInProvider(
             host_info.addresses().first().toIPv4Address(), OVERSEER_PORT));
-    dataManager->newGroundTruthProvider(socket_in);
+    dataManager->newInputProvider(socket_in, "GroundTruth");
 }
 
 }

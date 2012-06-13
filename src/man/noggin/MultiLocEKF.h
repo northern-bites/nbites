@@ -16,6 +16,9 @@
 #include "LocSystem.h"
 #include "dsp.h"
 
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
+
 // #define DEBUG_LOC_EKF_INPUTS
 // #define DEBUG_STANDARD_ERROR
 // #define DEBUG_DIVERGENCE_CALCULATIONS
@@ -52,7 +55,8 @@ class MultiLocEKF : public ekf::TwoMeasurementEKF<PointObservation,
 public:
 
     // Constructors & Destructors
-    explicit MultiLocEKF(float initX = INIT_LOC_X,
+    explicit MultiLocEKF(man::memory::MLocalization::ptr mLocalization = man::memory::MLocalization::ptr(),
+                         float initX = INIT_LOC_X,
                          float initY = INIT_LOC_Y,
                          float initH = INIT_LOC_H,
                          float initXUncert = INIT_X_UNCERT,
@@ -60,6 +64,9 @@ public:
                          float initHUncert = INIT_H_UNCERT);
 
     virtual ~MultiLocEKF() {}
+
+    // Memory update
+    void updateMLocalization(man::memory::MLocalization::ptr) const;
 
     // Update functions
     virtual void updateLocalization(const MotionModel& u,
@@ -340,6 +347,8 @@ private:
      */
     Boxcar errorLog;
     bool resetFlag;
+
+    man::memory::MemoryProvider<man::memory::MLocalization, MultiLocEKF> memoryProvider;
 
     // Fraction of frames with an erroneous observation
     const static float ERROR_RESET_THRESH;

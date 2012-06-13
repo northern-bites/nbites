@@ -34,7 +34,9 @@
 #include <boost/python/module.hpp>
 #include <boost/python/args.hpp>
 #include <boost/shared_ptr.hpp>
+
 using namespace std;
+using namespace boost;
 using namespace boost::python;
 
 #include "PyMotionCommand.h"
@@ -66,13 +68,13 @@ BOOST_PYTHON_MODULE(_motion)
     ;
 
     class_<PyHeadJointCommand, bases<PyMotionCommand> >("HeadJointCommand",
-                            init<float, tuple, tuple, int>(
+                            init<float, python::tuple, python::tuple, int>(
                                 "A container for a head joint command passed to the motion engine"))
         ;
     class_<PyGaitCommand, bases<PyMotionCommand> >("GaitCommand",
                            init<
-                           tuple, tuple, tuple, tuple,
-                           tuple, tuple, tuple, tuple>
+                           python::tuple, python::tuple, python::tuple, python::tuple,
+                           python::tuple, python::tuple, python::tuple, python::tuple>
                            (args("stance,step,zmp,joint_hack,sensor,"
                              "stiffness,odo,arms"),
                             "Parameterization of the"
@@ -81,10 +83,10 @@ BOOST_PYTHON_MODULE(_motion)
     ;
 
     class_<PyBodyJointCommand, bases<PyMotionCommand> >("BodyJointCommand",
-                            init<float, tuple, tuple, tuple,
-                            tuple, tuple, int>(
+                            init<float, python::tuple, python::tuple, python::tuple,
+                            python::tuple, python::tuple, int>(
                                 "A container for a body joint command passed to the motion engine"))
-    .def(init<float, int, tuple, tuple, int>( // Single chain command
+    .def(init<float, int, python::tuple, python::tuple, int>( // Single chain command
          args("time","chainID", "joints","body_stiffness","interpolation"),
          "A container for a body joint command passed to the motion engine"))
     ;
@@ -152,6 +154,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("isBodyActive", &PyMotionInterface::isBodyActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
+		.def("calibrated", &PyMotionInterface::calibrated)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)
         .def("resetScripted", &PyMotionInterface::resetScriptedProvider)
         ;

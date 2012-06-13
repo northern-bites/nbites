@@ -249,7 +249,6 @@ public class TOOLVisionLink {
     public Vector<VisualFieldObject> getVisualFieldObjects() { return visualFieldObjects;}
     public Vector<VisualLine> getVisualLines() { return visualLines;}
     public Vector<VisualLine> getExpectedVisualLines() { return expectedVisualLines;}
-    public Vector<LinePoint> getUnusedPoints() { return unusedPoints;}
     public Vector<VisualCorner> getVisualCorners() { return visualCorners;}
     public Horizon getPoseHorizon(){ return poseHorizon;}
     public int getVisionHorizon(){ return visionHorizon;}
@@ -294,7 +293,7 @@ public class TOOLVisionLink {
     native private void cppSetHoughTransformDebug(boolean _bool);
     native private void cppSetRobotDebug(boolean _bool);
     native private void cppSetDebugDangerousBall(boolean _bool);
-
+    native private void cppSetVisualLinesDebug(boolean _bool);
 
     // Set edge detection threshold
     native private void cppSetEdgeThreshold(int _t);
@@ -761,7 +760,6 @@ public class TOOLVisionLink {
             System.out.println("Vision Link Inactive. Flag not set.");
         }
     }
-
     public void setDebugHoughTransform(boolean _bool){
         if (visionLinkSuccessful) {
             try {
@@ -788,6 +786,18 @@ public class TOOLVisionLink {
         if (visionLinkSuccessful) {
             try {
                 cppSetDebugDangerousBall(_bool);
+
+            } catch(Throwable e){
+                System.err.println("Error in cpp sub system. \n");
+            }
+        } else {
+            System.out.println("Vision Link Inactive. Flag not set.");
+        }
+    }
+    public void setDebugVisualLines(boolean _bool){
+        if (visionLinkSuccessful) {
+            try {
+                cppSetVisualLinesDebug(_bool);
             } catch(Throwable e){
                 System.err.println("Error in cpp sub system. \n");
             }

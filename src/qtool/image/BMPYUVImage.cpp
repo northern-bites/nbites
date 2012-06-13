@@ -4,10 +4,13 @@
 namespace qtool {
 namespace image {
 
-BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+using namespace man::corpus;
+
+BMPYUVImage::BMPYUVImage(memory::MRawImages::const_ptr rawImages,
+        Camera::Type which,
         ChannelType type, QObject* parent) :
         BMPImage(parent),
-        yuvImage(rawImage),
+        yuvImage(rawImages, which),
         bitmapType(type)
 { }
 
@@ -23,9 +26,9 @@ void BMPYUVImage::buildBitmap() {
 //                        yuvImage.getHeight());
 //    }
 
-    QImage qimage = QImage(yuvImage.getWidth(),
-                           yuvImage.getHeight(),
-                           QImage::Format_RGB32);
+    bitmap = QImage(yuvImage.getWidth(),
+                    yuvImage.getHeight(),
+                    QImage::Format_RGB32);
 
     Color c;
 
@@ -34,7 +37,7 @@ void BMPYUVImage::buildBitmap() {
     const byte** vImg = yuvImage.getVImage();
 
 	for (int j = 0; j < getHeight(); ++j) {
-	    QRgb* qImageLine = (QRgb*) (qimage.scanLine((int)(j)));
+	    QRgb* qImageLine = (QRgb*) (bitmap.scanLine((int)(j)));
 		for (int i = 0; i < getWidth(); ++i) {
 		    byte y = yImg[i][j], u = uImg[i][j], v = vImg[i][j];
 		    byte color_byte;
@@ -90,7 +93,6 @@ void BMPYUVImage::buildBitmap() {
 			}
 		}
 	}
-	bitmap = QPixmap::fromImage(qimage);
 }
 }
 }
