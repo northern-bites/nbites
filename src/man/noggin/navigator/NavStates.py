@@ -38,19 +38,19 @@ def goToPosition(nav):
 #        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
 #                                                 nav.brain.ball.loc.relY,
 #                                                 nav.brain.ball.loc.bearing)
-
-    if goToPosition.adaptive:
-        speed = helper.adaptSpeed(relDest.dist, constants.ADAPT_DISTANCE, goToPosition.speed)
+    if goToPosition.adaptive and relDest.relX >= 0:
+        #reduce the speed if we're close to the target
+        speed = helper.adaptSpeed(relDest.dist,
+                                 constants.ADAPT_DISTANCE,
+                                 goToPosition.speed)
     else:
         speed = goToPosition.speed
 
 #    print "distance {0} and speed {1}".format(relDest.dist, speed)
 
-    #reduce the speed if we're close to the target
-
     #if y-distance is small, ignore it to avoid strafing
-    strafelessDest = helper.getStrafelessDest(relDest)
-    helper.setDestination(nav, strafelessDest, speed)
+    #strafelessDest = helper.getStrafelessDest(relDest)
+    helper.setDestination(nav, relDest, speed)
 
 #    if navTrans.shouldAvoidObstacle(nav):
 #        return nav.goLater('avoidObstacle')
