@@ -213,7 +213,7 @@ void WalkingEngine::update()
 {
 
     //set the motion selection
-    theMotionRequest.walkRequest.pedantic = false;
+//    theMotionRequest.walkRequest.pedantic = false;
 
     //get new joint, sensor and frame info data
     theFrameInfo.cycleTime = 0.01f;

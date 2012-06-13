@@ -128,8 +128,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 //                      relativeTarget.translation.y << " " <<
 //                      relativeTarget.rotation << std::endl;
 
-        if (!hasPassed(deltaOdometry, absoluteTarget)) {
+        if (!hasPassed(deltaOdometry + walkingEngine.upcomingOdometryOffset, absoluteTarget)) {
             walkRequest->target = relativeTarget;
+            walkingEngine.theMotionRequest.walkRequest.pedantic = true;
             walkingEngine.theMotionRequest.motion = MotionRequest::walk;
         } else {
             this->stand();
@@ -213,6 +214,7 @@ void BHWalkProvider::stand() {
     bhwalk_out << "BHWalk stand requested" << endl;
     walkingEngine.theMotionRequest.motion = MotionRequest::stand;
     walkingEngine.theMotionRequest.walkRequest = WalkRequest();
+    currentCommand = MotionCommand::ptr();
     active();
 }
 
