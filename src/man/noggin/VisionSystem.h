@@ -41,8 +41,6 @@ class VisionSystem : public PF::SensorModel
 
     PF::ParticleSet update(PF::ParticleSet particles);
 
-//    void feedObservations(std::vector<PF::Observation> newObs);
-
     template <class VisualObservationT, class ConcretePossibilityT>
     void incorporateLandmarkObservation(VisualObservationT& observation,
                                                  const Particle& particle,
@@ -131,15 +129,10 @@ class VisionSystem : public PF::SensorModel
 
         float pose_diff_h = NBMath::subPIAngle(pose_h - particle.getLocation().heading);
 
-        float distVar = observation.getEstimate().distance_variance;
-        float bearVar = observation.getEstimate().bearing_variance;
-
-        std::cout <<distVar << " " <<bearVar << "\n";
         float globalOrientationSD =
                 NBMath::getHypotenuse(observation.getBearingSD(),
                                       observation.getPhysicalOrientationSD());
 
-        std::cout << "Attempt normal distribution? \n";
         boost::math::normal_distribution<float> pHeading(0.0f, globalOrientationSD);
         float prob_h = boost::math::pdf<float>(pHeading, pose_diff_h);
 
@@ -155,8 +148,6 @@ class VisionSystem : public PF::SensorModel
                                                   reconstructedLocation,
                                                   observation.getDistanceSD(),
                                                   globalOrientationSD);
-                                                  // observation.getEstimate().distance_variance,
-                                                  // observation.getEstimate().bearing_variance);
 
         std::cout << "Previous calculation would be: " << prevProb << "\n";
         std::cout << "New Calculation would be: " << newProb << "\n";

@@ -71,9 +71,6 @@ public:
     int getFramesOn() { return framesOn; }
     int getFramesOff(){ return framesOff; }
 
-    estimate getEstimate() const{ return est; }
-    void setEstimate(const estimate& _est) { est = _est; }
-
 protected:
     /* Best guessed Ball Variables */
     int x, y;
