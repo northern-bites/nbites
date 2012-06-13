@@ -277,6 +277,9 @@ class KickInformation:
         avgScorePoint = int((rightScorePoint + leftScorePoint) * .5)
         kick = None
 
+        #DEBUG printing
+        print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
+
         if rightScorePoint > 90:
                 # Quadrent 2
             if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:

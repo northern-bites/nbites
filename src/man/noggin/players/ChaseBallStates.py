@@ -160,7 +160,7 @@ def orbitBall(player):
     """
     if player.firstFrame():
         if player.kick.h == 0:
-            return player.goLater('prepareForKick')
+            return player.goLater('positionForKick')
         player.brain.tracker.trackBallFixedPitch()
         player.brain.nav.orbitAngle(player.brain.ball.loc.dist, player.kick.h)
 
