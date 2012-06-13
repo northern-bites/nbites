@@ -10,9 +10,9 @@ from ..util import Transition
 #speed gains
 FULL_SPEED = 1.0
 FAST_SPEED = 0.8
-MEDIUM_SPEED = 0.6
-CAREFUL_SPEED = 0.4
-SLOW_SPEED = 0.2
+MEDIUM_SPEED = 0.65
+CAREFUL_SPEED = 0.5
+SLOW_SPEED = 0.3
 KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
@@ -49,9 +49,6 @@ class Navigator(FSA.FSA):
         self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition,
                                                                   Transition.SOME_OF_THE_TIME,
                                                                   Transition.LOW_PRECISION)
-        self.walkingToTransition = Transition.CountTransition(navTrans.walkedEnough,
-                                                              Transition.ALL_OF_THE_TIME,
-                                                              Transition.INSTANT)
 
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition
@@ -59,10 +56,6 @@ class Navigator(FSA.FSA):
 
         NavStates.atPosition.transitions = {
             self.locRepositionTransition : NavStates.goToPosition
-            }
-
-        NavStates.walkingTo.transitions = {
-            self.walkingToTransition : NavStates.standing
             }
 
     def run(self):
@@ -119,14 +112,14 @@ class Navigator(FSA.FSA):
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
 
-    def walkTo(self, walkToDest, precision = CLOSE_ENOUGH, speed = FULL_SPEED):
+    def walkTo(self, walkToDest, speed = FULL_SPEED):
         """
         Walks to a RelRobotLocation
-        Checks for the destination using odometry
+        Checks if reached the destination using odometry
         Great for close destinations (since odometry gets bad over time) in
         case loc is bad
-        Doesn't avoid obstacles! (that would make odometry very bad, especially
-        if we're being pushed)
+        Doesn't avoid obstacles! (that would make it very confused and odometry
+        very bad, especially if we're being pushed)
         Switches to standing at the end
         @todo: Calling this again before the other walk is done does some weird stuff
         """
@@ -135,7 +128,6 @@ class Navigator(FSA.FSA):
 
         NavStates.walkingTo.dest = walkToDest
         NavStates.walkingTo.speed = speed
-        NavStates.walkingTo.precision = precision
 
         #reset the counter to make sure walkingTo.firstFrame() is true on entrance
         #in case we were in walkingTo before as well
@@ -154,7 +146,7 @@ class Navigator(FSA.FSA):
         destination; a solution would be to enque several smaller
         walkTo's or something
         """
-        self.walkTo(helper.getOrbitLocation(radius, angle), CLOSE_ENOUGH, SLOW_SPEED)
+        self.walkTo(helper.getOrbitLocation(radius, angle), 0.7)
 
 
 
