@@ -10,6 +10,7 @@ import man.motion.HeadMoves as HeadMoves
 import man.noggin.kickDecider.HackKickInformation as hackKick
 import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation
+from math import fabs
 
 def chase(player):
     """
@@ -36,7 +37,11 @@ def spinToBall(player):
         return player.goNow('approachBall')
     else:
         spinDir = player.brain.my.spinDirToPoint(player.brain.ball.loc)
-        player.setWalk(0,0,spinDir*constants.FIND_BALL_SPIN_SPEED)
+        if fabs(player.brain.ball.loc.bearing) > constants.CHANGE_SPEED_THRESH:
+            speed = Navigator.CAREFUL_SPEED
+        else:
+            speed = Navigator.SLOW_SPEED
+        player.setWalk(0,0,spinDir*speed)
         return player.stay()
 
 def approachBall(player):

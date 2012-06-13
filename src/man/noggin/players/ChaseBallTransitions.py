@@ -26,8 +26,7 @@ def shouldSpinToBall(player):
     """
     ball = player.brain.ball
     return (ball.vis.on and
-            (fabs(ball.loc.relY) > constants.SHOULD_SPIN_TO_BALL_Y or
-             fabs(ball.loc.bearing > constants.SHOULD_SPIN_TO_BALL_B)))
+            fabs(ball.loc.relY) > constants.SHOULD_SPIN_TO_BALL_Y)
 
 def shouldStopSpinningToBall(player):
     """
@@ -35,8 +34,7 @@ def shouldStopSpinningToBall(player):
     """
     ball = player.brain.ball
     return (ball.vis.on and
-            (fabs(ball.loc.relY) < constants.STOP_SPINNING_TO_BALL_Y or
-             fabs(ball.loc.bearing) < constants.STOP_SPINNING_TO_BALL_B))
+            fabs(ball.loc.relY) < constants.STOP_SPINNING_TO_BALL_Y)
 
 def shouldApproachBallAgain(player):
     """
