@@ -367,7 +367,7 @@ estimate NaoPose::estimateWithKnownDistance(pixels x, pixels y, cms objectHeight
     //knowing the distance
 
     newEstimate.distance_variance = getDistanceVariance(groundDist);
-    newEstimate.bearing_variance = getDistanceVariance(groundDist);
+    newEstimate.bearing_variance = getBearingVariance(groundDist);
 
     return newEstimate;
 }

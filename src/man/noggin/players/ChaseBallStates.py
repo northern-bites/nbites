@@ -10,12 +10,12 @@ import man.motion.HeadMoves as HeadMoves
 import man.noggin.kickDecider.HackKickInformation as hackKick
 import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation
+from math import fabs
 
 def chase(player):
     """
     Super State to determine what to do from various situations
     """
-
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
 
@@ -23,18 +23,38 @@ def chase(player):
         return player.goNow('approachDangerousBall')
 
     else:
+        return player.goNow('spinToBall')
+
+def spinToBall(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBallFixedPitch()
+        player.brain.nav.stand()
+
+    if transitions.shouldFindBall(player):
+        return player.goLater('chase')
+
+    if transitions.shouldStopSpinningToBall(player):
         return player.goNow('approachBall')
+    else:
+        spinDir = player.brain.my.spinDirToPoint(player.brain.ball.loc)
+        if fabs(player.brain.ball.loc.bearing) > constants.CHANGE_SPEED_THRESH:
+            speed = Navigator.CAREFUL_SPEED
+        else:
+            speed = Navigator.SLOW_SPEED
+        player.setWalk(0,0,spinDir*speed)
+        return player.stay()
 
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
         player.brain.nav.chaseBall()
 
-    # most of the time going to chase will kick back to here, lets us reset
-    if transitions.shouldFindBall(player):
+    if (transitions.shouldFindBall(player) or
+        transitions.shouldSpinToBall(player)):
         return player.goLater('chase')
 
-    if transitions.shouldPrepareForKick(player) or player.brain.nav.isAtPosition():
+    if (transitions.shouldPrepareForKick(player) or
+        player.brain.nav.isAtPosition()):
         if player.shouldKickOff:
             if player.brain.ball.loc.relY > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -100,7 +120,8 @@ def positionForKick(player):
         return player.goNow('findBall')
 
     #if transitions.shouldKick(player):
-    if (transitions.ballInPosition(player, positionForKick.kickPose) or player.brain.nav.isAtPosition()):
+    if (transitions.ballInPosition(player, positionForKick.kickPose) or
+        player.brain.nav.isAtPosition()):
 #        if transitions.shouldOrbit(player):
 #            return player.goNow('lookAround')
 #        else:
