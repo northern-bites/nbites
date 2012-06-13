@@ -85,7 +85,7 @@ const float FieldLines::MIN_CROSS_EXTEND = 10.0f;
 // When estimating the angle between two lines on the field, anything less
 // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
 // and disallowed; ideally our estimates would always be 1.57 radians
-const float FieldLines::MIN_ANGLE_ON_FIELD = .96f;
+const float FieldLines::MIN_ANGLE_ON_FIELD = 1.03f;
 const float FieldLines::MAX_ANGLE_ON_FIELD = 2.00f;
 
 const float FieldLines::WHITE_PERCENT_CLEARANCE = 200.0f/9.0f;// 2/9 must be white
@@ -128,7 +128,6 @@ FieldLines::FieldLines(Vision *visPtr, boost::shared_ptr<NaoPose> posePtr )
     debugFitUnusedPoints = false;
     standardView = false;
 #endif
-
     // Makes setprecision dictate number of decimal places
     cout.setf(ios::fixed);
 }
@@ -779,7 +778,8 @@ void FieldLines::createLines(list <linePoint> &linePoints)
 								   static_cast<float>(lineEndpointY),
 								   static_cast<float>(pointX),
 								   static_cast<float>(pointY) )
-                < MIN_SEPARATION_TO_NOT_CHECK) {
+                < MIN_SEPARATION_TO_NOT_CHECK && pointY < IMAGE_HEIGHT / 3 &&
+				lineEndpointY < IMAGE_HEIGHT / 4) {
                 percentGreen = 0;
             } else {
                 percentGreen = percentColorBetween(lineEndpointX, lineEndpointY,

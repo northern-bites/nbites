@@ -125,7 +125,7 @@ void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     int corner_height= 2*(cornerData.visual_detection().center_y()-corner_y);
 	int corner_shape = cornerData.corner_type();
 
-    painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setPen(QPen(Qt::yellow, 3, Qt::SolidLine, Qt::FlatCap));
 	switch (corner_shape) {
 	case 1: painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
 		break;
@@ -237,7 +237,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int end_x = 2*lineData.end_x();
     int end_y = 2*lineData.end_y();
     
-    painter.setPen(QPen(Qt::blue, 6, Qt::SolidLine, Qt::FlatCap));
+    painter.setPen(QPen(Qt::blue, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(start_x, start_y, end_x, end_y);
   }
 
