@@ -1,0 +1,38 @@
+package man.memory.proto;
+
+import "Common.proto";
+
+message WalkProvider {
+
+	optional bool active = 1;
+	optional bool stopping = 3;
+	optional bool requested_to_stop = 4;
+
+	optional BHDebug bhdebug = 5;
+
+	message BHDebug {
+	
+		optional uint32 motion_type = 1;
+	
+	}
+}
+
+message ScriptedProvider {
+
+	optional bool active = 1;
+	optional bool stopping = 2;
+}
+
+message Motion {
+
+	optional int64 timestamp = 1;
+	
+	optional string current_body_provider = 2;
+	optional string next_body_provider = 3;
+	
+	optional RobotLocation odometry = 4;
+	
+	optional WalkProvider walk_provider = 5; 
+	optional ScriptedProvider scripted_provider = 6;
+	
+}
