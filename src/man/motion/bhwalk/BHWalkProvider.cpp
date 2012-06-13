@@ -225,7 +225,7 @@ void BHWalkProvider::stand() {
     active();
 }
 
-MotionModel BHWalkProvider::getOdometryUpdate() {
+MotionModel BHWalkProvider::getOdometryUpdate() const {
     return MotionModel(walkingEngine.theOdometryData.translation.x * MM_TO_CM,
                        walkingEngine.theOdometryData.translation.y * MM_TO_CM,
                        walkingEngine.theOdometryData.rotation);
@@ -304,6 +304,15 @@ const SupportFoot BHWalkProvider::getSupportFoot() const {
     } else {
         return RIGHT_SUPPORT;
     }
+}
+
+void BHWalkProvider::update(proto::WalkProvider* walkProvider) const {
+
+    walkProvider->set_active(isActive());
+    walkProvider->set_stopping(isStopping());
+    walkProvider->set_requested_to_stop(requestedToStop);
+
+    walkProvider->mutable_bhdebug()->set_motion_type(walkingEngine.theMotionRequest.motion);
 }
 
 }

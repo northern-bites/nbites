@@ -23,8 +23,12 @@
 //BH
 #include "WalkingEngine.h"
 
+#include "memory/MObjects.h"
+
 namespace man {
 namespace motion {
+
+using namespace memory;
 
 class BHWalkProvider : public MotionProvider {
 
@@ -57,7 +61,7 @@ public:
         return std::vector<BodyJointCommand::ptr>();
 	}
 
-    MotionModel getOdometryUpdate();
+    MotionModel getOdometryUpdate() const;
     virtual const SupportFoot getSupportFoot() const;
 
     static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
@@ -70,6 +74,8 @@ public:
     }
 
     const bool isWalkActive() const;
+
+    void update(proto::WalkProvider* walkProvider) const;
 
 protected:
     void stand();

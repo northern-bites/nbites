@@ -47,12 +47,15 @@
 #include "NaoPose.h"
 #include "synchro/synchro.h"
 
+#include "memory/MObjects.h"
+
 class Motion : public Thread
 {
 public:
     Motion(boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Sensors> s,
-           boost::shared_ptr<NaoPose> _pose);
+           boost::shared_ptr<NaoPose> _pose,
+           man::memory::MMotion::ptr mMotion = man::memory::MMotion::ptr());
     virtual ~Motion();
 
     int start();
