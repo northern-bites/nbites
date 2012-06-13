@@ -59,13 +59,19 @@ def setOdometryDestination(nav, dest, gain = 1.0):
         motion.StepCommand(x = dest.relX, y = dest.relY, theta = dest.relH, gain = gain)
     nav.brain.motion.sendStepCommand(nav.currentCommand)
 
+#not used!
 def getOrbitLocation(radius, angle):
     """
     Returns the RelRobotLocation destination of an orbit
     """
+    if angle > 0:
+        return RelRobotLocation(0.0, radius / 2, -angle)
+    else:
+        return RelRobotLocation(0.0, -radius / 2, -angle)
+
     dest = RelRobotLocation(radius, 0, 0)
     dest.rotate(-angle)
-    return RelRobotLocation(radius - dest.relX, -dest.relY, -angle)
+    return RelRobotLocation(0.0, -dest.relY, -angle)
 
 def setSpeed(nav, speeds):
     """

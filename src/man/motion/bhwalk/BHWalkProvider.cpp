@@ -13,7 +13,7 @@ namespace motion {
 using namespace boost;
 using namespace std;
 
-#define DEBUG_BHWALK
+//#define DEBUG_BHWALK
 #ifdef DEBUG_BHWALK
 #define bhwalk_out std::cout
 #else
@@ -78,16 +78,9 @@ bool hasLargerMagnitude(float x, float y) {
     return true; // considers values of 0.0f as always smaller in magnitude than anything
 }
 
-static const float ALLOWED_ROTATION_ERROR = M_PI_FLOAT/36.0f;
-static const float ALLOWED_TRANSLATION_ERROR = 5.0f;
-
-//Pose2D errorOffset(ALLOWED_ROTATION_ERROR, ALLOWED_TRANSLATION_ERROR, ALLOWED_TRANSLATION_ERROR);
-
 // return true if p1 has "passed" p2 (has components values that either have a magnitude
 // larger than the corresponding magnitude p2 within the same sign)
 bool hasPassed(const Pose2D& p1, const Pose2D& p2) {
-
-//    Pose2D p1WithError = p1 + errorOffset;
 
     return (hasLargerMagnitude(p1.rotation, p2.rotation) &&
             hasLargerMagnitude(p1.translation.x, p2.translation.x) &&
@@ -113,13 +106,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
         Pose2D deltaOdometry = walkingEngine.theOdometryData - startOdometry;
         Pose2D absoluteTarget(command->theta_rads, command->x_mms, command->y_mms);
 
-        Pose2D relativeTarget = absoluteTarget - deltaOdometry;
+        Pose2D relativeTarget = absoluteTarget - (deltaOdometry + walkingEngine.upcomingOdometryOffset);
 
 //        bhwalk_out << deltaOdometry.rotation << " " << absoluteTarget.rotation << std::endl;
 
-//        bhwalk_out << relativeTarget.translation.x << " " <<
-//                      relativeTarget.translation.y << " " <<
-//                      relativeTarget.rotation << std::endl;
+        bhwalk_out << relativeTarget.translation.x << " " <<
+                      relativeTarget.translation.y << " " <<
+                      relativeTarget.rotation << std::endl;
 
         if (!hasPassed(deltaOdometry + walkingEngine.upcomingOdometryOffset, absoluteTarget)) {
 

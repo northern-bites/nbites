@@ -1,6 +1,7 @@
 import NavConstants as constants
 import NavHelper as helper
 import NavTransitions as navTrans
+from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
@@ -67,15 +68,19 @@ def walkingTo(nav):
     Walks to a relative location based on odometry
     """
     if nav.firstFrame():
-        helper.setOdometryDestination(nav, walkingTo.dest, walkingTo.speed)
         return nav.stay()
 
     if nav.brain.motion.isStanding():
-        return nav.goNow('standing')
+        if len(walkingTo.destQueue) > 0:
+            dest = walkingTo.destQueue.popleft()
+            helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            return nav.stay()
+        else:
+            return nav.goNow('standing')
 
     return nav.stay()
 
-walkingTo.dest = RelRobotLocation(0, 0, 0)
+walkingTo.destQueue = deque()
 walkingTo.speed = 0
 
 

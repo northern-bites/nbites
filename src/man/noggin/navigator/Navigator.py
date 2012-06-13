@@ -121,12 +121,13 @@ class Navigator(FSA.FSA):
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
 
-        NavStates.walkingTo.dest = walkToDest
+        NavStates.walkingTo.destQueue.clear()
+
+        NavStates.walkingTo.destQueue.append(walkToDest)
         NavStates.walkingTo.speed = speed
 
         #reset the counter to make sure walkingTo.firstFrame() is true on entrance
         #in case we were in walkingTo before as well
-        self.counter = 0
         self.switchTo('walkingTo')
 
     def stop(self):
@@ -136,13 +137,27 @@ class Navigator(FSA.FSA):
     def orbitAngle(self, radius, angle):
         """
         Orbits a point at a certain radius for a certain angle using walkTo
-        WARNING: as of now angles that are greater than 90 degrees
-        are iffy since the robot will try to cut a straight-ish path to that
-        destination; a solution would be to enque several smaller
-        walkTo's or something
+        Splits the command into multiple smaller commands
+        Don't rely on it too much since it depends on the odometry of strafes and turns
+        which slip a lot
+        It will orbit in steps, each orbit taking ~30 degrees (more like 45 when I test it out)
         """
-        self.walkTo(helper.getOrbitLocation(radius, angle), 0.7)
+        NavStates.walkingTo.destQueue.clear()
 
+        #@todo: make this a bit nicer or figure out a better way to do it
+        # split it up in 33 degree moves; good enough approximation for small radii
+        for k in range(0, abs(angle) / 33):
+            if angle > 0:
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 2, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -30))
+            else:
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 2, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 30))
+
+        NavStates.walkingTo.speed = FAST_SPEED
+        self.switchTo('walkingTo')
+        #self.walkTo(helper.getOrbitLocation(radius, angle), speed)
+        #self.walk(0, .75, -.5)
 
 
     def walk(self, x, y, theta):
