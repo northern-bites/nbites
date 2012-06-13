@@ -25,6 +25,7 @@ def kickBallExecute(player):
             #away and we should search.
 
     if player.counter > 10 and player.brain.nav.isStopped():
+        player.inKickingState = False
         return player.goLater('chase')
 #        return player.goLater('afterKick')
 
@@ -65,6 +66,8 @@ def spinAfterBackKick(player):
     """
     State to spin to the ball after we kick it behind us.
     """
+    # TODO This is essentially spinFindBall... maybe we go straight to that.
+
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBallFixedPitch()

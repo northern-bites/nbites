@@ -81,6 +81,7 @@ def prepareForKick(player):
         print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
         print str(player.kick)
+        player.inKickingState = True
         return player.goNow('positionForKick')
 
     return player.stay()
@@ -95,6 +96,7 @@ def positionForKick(player):
 
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
+        player.inKickingState = False
         return player.goLater('chase')
 
     ballLoc = player.brain.ball.loc
@@ -106,7 +108,6 @@ def positionForKick(player):
     #only enque the new goTo destination once
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        player.inKickingState = False
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
                               Navigator.CAREFUL_SPEED,
@@ -114,7 +115,6 @@ def positionForKick(player):
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
 
-    # most of the time going to chase will kick back to here, lets us reset
     if transitions.shouldFindBallKick(player) and player.counter > 15:
         player.inKickingState = False
         return player.goNow('findBall')
