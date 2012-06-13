@@ -20,6 +20,34 @@ def shouldPrepareForKick(player):
     ball = player.brain.ball
     return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
 
+def shouldSpinToBall(player):
+    """
+    We're not facing the ball well enough yet
+    """
+    ball = player.brain.ball
+    return (ball.vis.on and
+            fabs(ball.loc.relY) > constants.SHOULD_SPIN_TO_BALL_Y)
+
+def shouldStopSpinningToBall(player):
+    """
+    We're done spinning
+    """
+    ball = player.brain.ball
+    return (ball.vis.on and
+            fabs(ball.loc.relY) < constants.STOP_SPINNING_TO_BALL_Y)
+
+def shouldApproachBallAgain(player):
+    """
+    The ball got really far away somehow
+    """
+    ball = player.brain.ball
+    return ball.vis.on and ball.dist > constants.APPROACH_BALL_AGAIN_DIST
+
+def shouldRedecideKick(player):
+    """
+    We've been in position for kick too long
+    """
+    return player.counter > 200
 
 def ballInPosition(player, kickPose):
     """
@@ -31,10 +59,9 @@ def ballInPosition(player, kickPose):
 
     #Get the current kick sweet spot information
 
-
-    return (0 < kickPose.relX < constants.BALL_X_OFFSET and
-                fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
-                fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
+    return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
+            fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
+            fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
 def ballNearPosition(player):
     """

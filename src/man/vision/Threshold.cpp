@@ -281,6 +281,8 @@ void Threshold::lowerRuns() {
     for (int i = 0; i < IMAGE_WIDTH; i += 1) {
         int topEdge = max(0, field->horizonAt(i));
 	findBallLowerCamera(i, 0);
+	//debugSelf = true;
+    //detectSelf();
     }
 }
 
@@ -551,33 +553,33 @@ void Threshold::findBallLowerCamera(int column, int topEdge) {
     int bound = IMAGE_HEIGHT - 1;//lowerBound[column];
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
-      while (bound < IMAGE_HEIGHT &&
-	     Utility::isOrange(getColor(column, bound))) {
-	bound++;
-      }
+		while (bound < IMAGE_HEIGHT &&
+			   Utility::isOrange(getColor(column, bound))) {
+			bound++;
+		}
     }
     // scan down the column looking for ORANGE
     for (int j = bound; j >= topEdge; j-= SCANSIZE) {
-      // get the next pixel
-      currentRun = 0;
-      unsigned char pixel = getThresholded(j,column);
-      if (Utility::isOrange(pixel)) {
-	//drawPoint(column, j, MAROON);
-	int scanner = j+1;
-	while (scanner < j + SCANSIZE &&
-	       Utility::isOrange(getThresholded(scanner, column))) {
-	  currentRun++;
-	  scanner++;
-	}
-	while (j > 0 && Utility::isOrange(getThresholded(j,column)))
-	  {
-	    currentRun++;
-	    j--;
-	  }
-	if (currentRun > 1) {
-	  orange->newRun(column, j, currentRun);
-	}
-      }
+		// get the next pixel
+		currentRun = 0;
+		unsigned char pixel = getThresholded(j,column);
+		if (Utility::isOrange(pixel)) {
+			//drawPoint(column, j, MAROON);
+			int scanner = j+1;
+			while (scanner < j + SCANSIZE &&
+				   Utility::isOrange(getThresholded(scanner, column))) {
+				currentRun++;
+				scanner++;
+			}
+			while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+			{
+				currentRun++;
+				j--;
+			}
+			if (currentRun > 1) {
+				orange->newRun(column, j, currentRun);
+			}
+		}
     }
 }
 
@@ -751,6 +753,12 @@ void Threshold::detectSelf() {
     const int TOPRIGHT = 250;
     const int HIGHBOUND = -50;
     const int COMPENSATION = 20;
+#ifdef OFFLINE
+            if (debugSelf) {
+				cout << "Boundaries " << pixInImageLeft << " " <<
+					pixInImageRight << endl;
+            }
+#endif
 
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
@@ -866,6 +874,144 @@ void Threshold::newFindRobots() {
     }
 }
 
+void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
+	int leftX, rightX, topY, bottomY;
+	if (leftPost && rightPost) {
+		leftX = vision->ygrp->getRightBottomX();
+		rightX = vision->yglp->getLeftBottomX();
+		topY = min(vision->ygrp->getRightTopY(), vision->yglp->getLeftTopY());
+		bottomY = max(vision->ygrp->getRightBottomY(), vision->yglp->getLeftBottomY());
+	} else if (leftPost) {
+		leftX = max(0, vision->yglp->getRightBottomX() - (int)vision->yglp->getHeight());
+		rightX = vision->yglp->getLeftBottomX();
+		topY = vision->yglp->getRightTopY();
+		bottomY = vision->yglp->getRightBottomY();
+	} else if (rightPost) {
+		leftX = vision->ygrp->getRightBottomX();
+		rightX = min(IMAGE_WIDTH, vision->ygrp->getLeftBottomX() + (int)vision->ygrp->getHeight());
+		topY = vision->ygrp->getRightTopY();
+		bottomY = vision->ygrp->getRightBottomY();
+	} else {
+		return;
+	}
+	bool redRobot = false, navyRobot = false;
+	// first just check if we already identified any robots
+	if (vision->red1->getHeight() > 0) {
+		int redX = vision->red1->getCenterX();
+		if (redX > leftX && redX < rightX) {
+			redRobot = true;
+		}
+	}
+	if (vision->navy1->getHeight() > 0) {
+		int navyX = vision->navy1->getCenterX();
+		if (navyX > leftX && navyX < rightX) {
+			navyRobot = true;
+		}
+	}
+	// scan the box
+	int height = bottomY - topY;
+	int redTotal = 0, navyTotal = 0, redRun = 0, navyRun = 0, currentRun = 0;
+	int columnRed = 0, columnNavy = 0;
+	int whiteBefore = 0;
+	int navyCols = 0, redCols = 0;
+	for (int i = leftX; i < rightX; i++) {
+		whiteBefore = 0;
+		columnRed = 0;
+		columnNavy = 0;
+		for (int j = bottomY; j > topY; j--) {
+			if (Utility::isWhite(getColor(i, j))) {
+				whiteBefore++;
+			}
+			if (Utility::isRed(getColor(i, j))) {
+				j--;
+				redTotal++;
+				currentRun = 1;
+				if (whiteBefore > 20) {
+					while (Utility::isRed(getColor(i, j))) {
+						j--;
+						currentRun++;
+						redTotal++;
+					}
+					if (currentRun > 3) {
+						redRun += currentRun;
+						columnRed += currentRun;
+					}
+				}
+			}
+			if (Utility::isNavy(getColor(i, j))) {
+				j--;
+				navyTotal++;
+				currentRun = 1;
+				if (whiteBefore > 20) {
+					while (Utility::isNavy(getColor(i, j))) {
+						j--;
+						currentRun++;
+						navyTotal++;
+					}
+					if (currentRun > 3) {
+						navyRun += currentRun;
+						columnNavy += currentRun;
+					}
+				}
+			}
+		}
+		if (whiteBefore > height / 3) {
+			if (columnRed > 1) {
+				redCols++;
+			}
+			if (columnNavy > 1) {
+				navyCols++;
+			}
+		}
+	}
+	/*cout << "Goalie box " << leftX << " " << rightX << " " << bottomY << " " <<
+		topY << endl;
+	cout << "Red " << redTotal << " blue " << navyTotal << endl;
+	cout << "Runs red " << redRun << " navy " << navyRun << endl;
+	cout << "Red cols " << redCols << " navy cols " << navyCols << endl; */
+	if (redRobot || (redCols > 2 * navyCols && redCols > 5) && !navyRobot) {
+		if (debugShot) {
+			cout << "Red goalie " << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setRedGoalieCertain();
+		}
+		if (rightPost) {
+			vision->ygrp->setRedGoalieCertain();
+		}
+	} else if (navyRobot || (navyCols > 2 * redCols && navyCols > 5) && !redRobot) {
+		if (debugShot) {
+			cout << "Navy goalie " << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setNavyGoalieCertain();
+		}
+		if (rightPost) {
+			vision->ygrp->setNavyGoalieCertain();
+		}
+	} else if (redCols > 1 && navyCols == 0 && redTotal > 30 && !navyRobot) {
+		if (debugShot) {
+			cout << "Probably a red goalie" << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setRedGoalieProbable();
+		}
+		if (rightPost) {
+			vision->ygrp->setRedGoalieProbable();
+		}
+	} else if (navyCols > 1 && redCols == 0 && navyTotal > 30 && !redRobot) {
+		if (debugShot) {
+			cout << "Probably a navy goalie" << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setNavyGoalieProbable();
+		}
+		if (rightPost) {
+			vision->ygrp->setNavyGoalieProbable();
+		}
+	}
+}
+
 
 /*  Makes the calls to the vision system to recognize objects.  Then performs
  * some extra sanity checks to make sure we don't have weird cases.
@@ -893,6 +1039,7 @@ void Threshold::objectRecognition() {
     }
     if (ylp || yrp) {
         field->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar, YELLOW);
+		identifyGoalie(ylp, yrp);
     }
     storeFieldObjects();
 	if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
