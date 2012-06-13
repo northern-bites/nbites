@@ -345,7 +345,7 @@ float NaoPose::getDistanceVariance(float distance) {
 }
 
 float NaoPose::getBearingVariance(float distance) {
-	return max<float>(-0.00002f * distance + 0.0115f, 0);
+	return min<float>(-0.00002f * distance + 0.0115f, 0);
 }
 
 estimate NaoPose::estimateWithKnownDistance(pixels x, pixels y, cms objectHeight, cms groundDist) const {

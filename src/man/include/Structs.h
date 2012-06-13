@@ -150,7 +150,7 @@ struct estimate {
 
     friend std::ostream& operator<< (std::ostream &o, const estimate &e)
         {
-            return o << "Distance: " << e.dist << ", Elevation: " << e.elevation 
+            return o << "Distance: " << e.dist << ", Elevation: " << e.elevation
                      << ", Bearing: " << e.bearing << "(" << e.x << ", " << e.y << ")";
         }
 };
