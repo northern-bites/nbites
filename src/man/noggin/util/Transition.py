@@ -25,19 +25,19 @@ def getNextState(fsa, state):
     """
     if fsa.firstFrame():
         resetTransitions(state)
-    
-    #@todo: make it so we can tell the transition whether to use goNow or goLater
+
+    #@TODO: make it so we can tell the transition whether to use goNow or goLater
     for targetState, transition in state.transitions.iteritems():
         if transition.checkCondition(fsa):
-            
+
             if DEBUG:
                 fsa.printf(fsa.name + " switching to " + targetState.__name__ +
-                           " from " + state.__name__ + " after " + str(transition))
-                
+                           " from " + state.__name__ + " after " + str(transition), fsa.stateChangeColor)
+
             return fsa.goNow(targetState.__name__) #FSA use states by their names
-        
+
     return fsa.stay()
-     
+
 
 class CountTransition:
     """
@@ -45,21 +45,21 @@ class CountTransition:
     on satisfying a given condition for a certain percent of the frames
     in a window of time
     The higher the value of frameWindow, the better the precision,
-    but the worse the delay before the transition occurs 
+    but the worse the delay before the transition occurs
     """
-    
+
     def __init__(self, condition, threshold = MOST_OF_THE_TIME, frameWindow = OK_PRECISION):
         """
         @param condition: the condition checked for the transition
-        @param threshold: (optional) number of frames threshold    
+        @param threshold: (optional) number of frames threshold
         """
         self.condition = condition
         self.threshold = threshold
         self.frameWindow = frameWindow
-        
+
         self.count = 0
         self.fifo = Queue.Queue()
-        
+
     def checkCondition(self, fsa):
         """
         If the transition's condition was true for a certain number of frames
@@ -70,19 +70,19 @@ class CountTransition:
             self.fifo.put(1)
         else:
             self.fifo.put(0)
-            
+
         if self.fifo.qsize() > self.frameWindow:
             self.count -= self.fifo.get()
-        
+
         if self.count >= self.threshold * self.frameWindow:
-            return True 
+            return True
         else:
             return False
-    
+
     def __str__(self):
-        return (self.condition.__name__ + " happened " + 
+        return (self.condition.__name__ + " happened " +
                 str(self.count) + " out of " + str(self.frameWindow) + " frames")
-    
+
     def reset(self):
         self.fifo = Queue.Queue()
         self.count = 0

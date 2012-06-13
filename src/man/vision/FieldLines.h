@@ -175,7 +175,7 @@ private:
 
     static const int CORNER_TEST_RADIUS = 1;
 
-    static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 15;
+    static const int MIN_ANGLE_BETWEEN_INTERSECTING_LINES = 20;
     static const int LINE_HEIGHT = 0; // this refers to height off the ground
     static const float MIN_CROSS_EXTEND;
     // When estimating the angle between two lines on the field, anything less
