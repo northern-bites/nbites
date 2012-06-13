@@ -14,7 +14,7 @@ def scriptedMove(nav):
         return nav.stay()
 
     if not nav.brain.motion.isBodyActive():
-        return nav.goNow('stopped')
+        return nav.goNow('standing')
 
     return nav.stay()
 
