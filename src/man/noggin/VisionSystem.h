@@ -25,7 +25,7 @@ struct LocalizationVisionParams
 static const LocalizationVisionParams DEFAULT_LOCVIS_PARAMS =
 {
     15.00f,
-    M_PI/20.0f
+    (float) M_PI/20.0f
 };
 
 /**
@@ -76,14 +76,10 @@ class VisionSystem : public PF::SensorModel
         float distanceDiff = observation.getDistance() - hypothesisVector.magnitude;
         float angleDiff = NBMath::subPIAngle(observation.getBearing() - hypothesisVector.direction);
 
-        // Grab the distSD from the observation
-        float distSD = sqrtf(observation.getEstimate().distance_variance);
-        boost::math::normal_distribution<float> pDist(0.0f, distSD);
+        boost::math::normal_distribution<float> pDist(0.0f, observation.getDistanceSD());
         float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 
-        // Grab the bearSD from the observation
-        float bearSD = sqrtf(observation.getEstimate().bearing_variance);
-        boost::math::normal_distribution<float> pAngle(0.0f, bearSD);
+        boost::math::normal_distribution<float> pAngle(0.0f, observation.getBearingSD());
         float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 
         // Better way to determine probability?
@@ -92,18 +88,18 @@ class VisionSystem : public PF::SensorModel
 
     static float scoreParticleAgainstPose(const Particle& particle,
                                           const PF::Location pose,
-                                          float distVar,
-                                          float headVar){
+                                          float distSD,
+                                          float headSD){
 
         float pose_diff_h = NBMath::subPIAngle(pose.heading -
                                                particle.getLocation().heading);
         // create a normal distribution with the std dev derived from the variance
-        boost::math::normal_distribution<float> pHeading(0.0f, sqrtf(headVar));
+        boost::math::normal_distribution<float> pHeading(0.0f, distSD);
         float prob_h = boost::math::pdf<float>(pHeading, pose_diff_h);
 
         float pose_diff_d = NBMath::getHypotenuse(pose.x - particle.getLocation().x,
                                                   pose.y - particle.getLocation().y);
-        boost::math::normal_distribution<float> pDistance(0.0f, sqrt(distVar));
+        boost::math::normal_distribution<float> pDistance(0.0f, distSD);
         float prob_d = boost::math::pdf<float> (pDistance, pose_diff_d);
 
         return prob_h * prob_d;
