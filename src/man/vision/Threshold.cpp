@@ -1017,11 +1017,11 @@ void Threshold::storeFieldObjects() {
     setFieldObjectInfo(vision->ygrp);
     setFramesOnAndOff(vision->ygrp);
 
-    setFieldObjectInfo(vision->bglp);
-    setFramesOnAndOff(vision->bglp);
-
-    setFieldObjectInfo(vision->bgrp);
-    setFramesOnAndOff(vision->bgrp);
+//    setFieldObjectInfo(vision->bglp);
+//    setFramesOnAndOff(vision->bglp);
+//
+//    setFieldObjectInfo(vision->bgrp);
+//    setFramesOnAndOff(vision->bgrp);
 
     setVisualCrossInfo(vision->cross);
     setFramesOnAndOff(vision->cross);
@@ -1095,13 +1095,8 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 objPtr == vision->bglp ||
                 objPtr == vision->bgrp) {
             //print("we've got a post!");
-            float dist = 0.0;
             float width = objPtr->getWidth();
             float height = objPtr->getHeight();
-
-            distanceCertainty cert = objPtr->getDistanceCertainty();
-            float distw = getGoalPostDistFromWidth(width);
-            float disth = getGoalPostDistFromHeight(height);
 
             const int bottomLeftX = objPtr->getLeftBottomX();
             const int bottomRightX = objPtr->getRightBottomX();
@@ -1116,39 +1111,40 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             const int intBottomOfObjectX = static_cast<int>(bottomOfObjectX);
             const int intBottomOfObjectY = static_cast<int>(bottomOfObjectY);
 
-            float distwnew = pose->estimateFromObjectSize(intBottomOfObjectX,
+            estimate estFromWidth = this->getGoalPostEstimateFromWidth(intBottomOfObjectX,
+                    intBottomOfObjectY, width);
+
+            estimate estFromHeight = this->getGoalPostEstimateFromHeight(intBottomOfObjectX,
+                    intBottomOfObjectY,  height);
+
+            estimate estFromPose = pose->pixEstimate(intBottomOfObjectX,
                                                      intBottomOfObjectY,
-                                                     0.0f,
-                                                     width,
-                                                     GOAL_POST_CM_WIDTH * CM_TO_MM).dist;
+                                                     0.0f);
 
-            float disthnew = pose->estimateFromObjectSize(intBottomOfObjectX,
-                                                     intBottomOfObjectY,
-                                                     0.0f,
-                                                     height,
-                                                     GOAL_POST_CM_HEIGHT * CM_TO_MM).dist;
-
-
-            const float poseDist = pose->pixEstimate(
-                    static_cast<int>(bottomOfObjectX),
-                    static_cast<int>(bottomOfObjectY), 0.0f).dist;
-
-            //TODO: remove the old code, make new code better on distances
-            dist = chooseGoalDistance(cert, disth, distw, poseDist,
-                                      static_cast<int>(bottomOfObjectY));
-            //TODO: hack
-            float distnew = chooseGoalDistance(cert, disthnew, distw, poseDist,
-											   static_cast<int>(bottomOfObjectY));
-            dist = distnew;
+            distanceCertainty cert = objPtr->getDistanceCertainty();
+            estimate obj_est = chooseBestGoalEstimate(cert, estFromHeight, estFromWidth,
+                    estFromPose, static_cast<int>(bottomOfObjectY));
 
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
-            if (dist < POST_MIN_FOC_DIST ||
-				dist > POST_MAX_FOC_DIST) {
-                dist = 0.0;
+            if (obj_est.dist < POST_MIN_FOC_DIST || obj_est.dist > POST_MAX_FOC_DIST) {
+                obj_est = NULL_ESTIMATE;
             }
-            objPtr->setDistance(dist);
-			if (dist < MIDFIELD_X + 150) {
+
+            bool debugEstimates = false;
+            if (debugEstimates) {
+                cout << "width " << estFromWidth << endl;
+                cout << "height " << estFromHeight << endl;
+                cout << "pose " << estFromPose << endl;
+                cout << "chosen " << obj_est << endl;
+            }
+
+            objPtr->setDistance(obj_est.dist);
+            objPtr->setDistanceWithSD(obj_est.dist);
+            objPtr->setBearingWithSD(obj_est.bearing);
+            objPtr->setElevation(obj_est.elevation);
+
+			if (obj_est.dist < MIDFIELD_X + 150) {
 				context->setSameHalf();
 			}
 		} else { // don't know what object it is
@@ -1156,14 +1152,6 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 			//cout << "What the heck!" << endl;
             return;
         }
-        // convert dist + angle estimates to body center
-        estimate obj_est = pose->estimateWithKnownDistance(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              0.0f,
-                                              objPtr->getDistance());
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
     }
     else {
         objPtr->setDistanceWithSD(0.0);
@@ -1175,58 +1163,26 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
  * the sizes of width and height.
  */
 
-float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
-                                    float distw, float poseDist, int bottom) {
-    float dist = 0.0f;
-	if (poseDist < 200.0f && poseDist > 0 && bottom <= IMAGE_HEIGHT - 5) {
-		//cout << "Returning pose dist " << poseDist << endl;
-		return poseDist;
-	}
+estimate Threshold::chooseBestGoalEstimate(distanceCertainty cert, const estimate& estFromHeight,
+        const estimate& estFromWidth, const estimate& estFromPose, int bottom) {
+
+    bool bottomReliableForPixEst = bottom <= IMAGE_HEIGHT - 5;
+
     switch (cert) {
-    case HEIGHT_UNSURE:
-        dist = distw;
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            dist = poseDist;
-        }
-        break;
-    case WIDTH_UNSURE:
-        dist = disth;
-		if (disth > distw) {
-			dist = distw;
-			if (bottom <= IMAGE_HEIGHT - 5) {
-				dist = poseDist;
-			}
-		}
-        break;
-    case BOTH_UNSURE:
-        // We choose the min distance here, since that means more pixels
-		dist = min( poseDist, min(disth, distw));
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            //dist = min( poseDist, min(disth, distw));
-        } else if (dist > 100) {
-            dist = 0.0f;
-		}
-        break;
     case BOTH_SURE:
-		// pick the one right in the middle
-		if (poseDist < disth) {
-			if (poseDist < distw) {
-				dist = min(disth, distw);
-			} else {
-				dist = poseDist;
-			}
-		} else {
-			if (poseDist < distw) {
-				dist = poseDist;
-			} else {
-				dist = max(disth, distw);
-			}
-		}
-        break;
+    case WIDTH_UNSURE:
+        return estFromHeight;
+    case HEIGHT_UNSURE:
+        if (bottomReliableForPixEst)
+            return estFromPose;
+        else
+            return estFromWidth;
+    case BOTH_UNSURE:
+        if (bottomReliableForPixEst) {
+            return estFromPose;
+        }
     }
-	/*cout << "Distances disth " << disth << " distw " << distw <<
-	  " posedist " << poseDist << " returning " << dist << endl;*/
-    return dist;
+    return NULL_ESTIMATE;
 }
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
@@ -1327,28 +1283,16 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
  * @param height     the height of the post in pixels
  * @return           the distance to the post in centimeters
  */
-float Threshold::getGoalPostDistFromHeight(float height) {
-#if ROBOT(NAO_SIM)
-    return 17826*pow((double) height,-1.0254);
-#else
-    // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
-    return 32880.0f/height - 11.8597f;
-#endif
+estimate Threshold::getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, height, GOAL_POST_CM_HEIGHT * CM_TO_MM);
 }
 
 /* Looks up goal post width in pixels to focal distance function.
  * @param width     the width of the post
  * @return          the distance to the post
  */
-float Threshold::getGoalPostDistFromWidth(float width) {
-#if ROBOT(NAO_SIM)
-    //floor distance, seems to be best for the width
-    //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
-    return 2360.1*pow((double) width,-1.0516);
-#else
-    // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
-    return 3116.59f/width + 21.75f;
-#endif
+estimate Threshold::getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, width, GOAL_POST_CM_WIDTH * CM_TO_MM);
 }
 
 /*

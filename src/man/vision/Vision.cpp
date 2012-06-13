@@ -317,11 +317,11 @@ void Vision::updateMVision(man::memory::MVision::ptr mVision) const {
     visual_ball->set_confidence(this->ball->getConfidence());
 
     PVision::PVisualFieldObject* yglp;
-    yglp= mVision->get()->mutable_yglp();
+    yglp = mVision->get()->mutable_yglp();
     update(yglp, this->yglp);
 
     PVision::PVisualFieldObject* ygrp;
-    ygrp= mVision->get()->mutable_ygrp();
+    ygrp = mVision->get()->mutable_ygrp();
     update(ygrp, this->ygrp);
 
     //VisualRobot
