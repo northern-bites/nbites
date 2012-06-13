@@ -52,7 +52,9 @@ void BotLocs::readSocket(){
             newBot.yBall = floatdata[7];
             newBot.xBallUncert = floatdata[8];
             newBot.yBallUncert = floatdata[9];
-            newBot.teamColor = head->color;
+			newBot.teamNum = head->team;
+			newBot.teamColor = head->color;
+			newBot.playerNum = head->player;
 
             //kill the previous instance of this robot in the array
             for(int i = 0; i < botPositions.size(); i++){
@@ -63,13 +65,14 @@ void BotLocs::readSocket(){
 
             botPositions.push_back(newBot);
         }
-        if (botPositions.size() > numBots)
-            qDebug()<<"New robot found,"<<
-            botPositions.back().address.toString()<<"just connected.";
-        else if (botPositions.size() < numBots)
-            qDebug()<<"Robot connection lost,"
-            <<botPositions.size()-1<<" are now connected.";
-        numBots = botPositions.size();
+		if (botPositions.size()>numBots)
+			qDebug()<<"Player"
+					<<botPositions.back().playerNum<<"on team"
+					<<botPositions.back().teamNum<<"connected.";
+		else if (botPositions.size()<numBots)
+			qDebug()<<"Robot connection lost,"
+					<<botPositions.size()-1<<" robots still connected.";
+		numBots=botPositions.size();
 
         emit newRobotLocation();
     }
@@ -105,11 +108,17 @@ int BotLocs::getBallXUncert(int i){
 int BotLocs::getBallYUncert(int i){
     return botPositions[i].yBallUncert;
 }
-int BotLocs::getTeam(int i){//0=blue, 1=red
-    return botPositions[i].teamColor;
+int BotLocs::getTeamNum(int i){
+	return botPositions[i].teamNum;
+}
+int BotLocs::getTeamColor(int i){//0=blue, 1=red
+	return botPositions[i].teamColor;
+}
+int BotLocs::getPlayerNum(int i){
+	return botPositions[i].playerNum;
 }
 int BotLocs::getSize(){
-    return botPositions.size();
+	return botPositions.size();
 }
 }
 }

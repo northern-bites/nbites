@@ -31,32 +31,33 @@
 namespace qtool {
 namespace viewer {
 
-class FieldViewer: public QWidget {
-Q_OBJECT
+class FieldViewer : public QWidget{
+	Q_OBJECT
 
-public:
-    FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
+	public:
+	FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
+	~FieldViewer();
 
 public slots:
-    void stopDrawing();
-    void drawBots();
+	void stopDrawing();
+	void drawBots();
 
 private:
-    data::DataManager::ptr dataManager;
-    viewer::BMPImageViewer* fieldView;
-    image::OverlayedImage* overlayImage;
-    image::PaintBots* bot_locs;
-    image::PaintField* fieldImage;
-    bool keepDrawing;
+	data::DataManager::ptr dataManager;
+	viewer::BMPImageViewer* fieldView;
+	image::OverlayedImage* overlayView;
+	image::PaintBots* bot_locs;
+	image::PaintField* fieldImage;
+	bool keepDrawing;
 
 protected:
-    QPushButton* startButton;
-    QPushButton* stopButton;
-    QVBoxLayout* mainLayout;
-    QHBoxLayout* buttonLayout;
-    QHBoxLayout* field;
-    QSpacerItem* spacer;
-    float scaleFactor;
+	QPushButton* startButton;
+	QPushButton* stopButton;
+	QVBoxLayout* mainLayout;
+	QHBoxLayout* buttonLayout;
+	QHBoxLayout* field;
+	QSpacerItem* spacer;
+	float scaleFactor;
 };
 
 }
