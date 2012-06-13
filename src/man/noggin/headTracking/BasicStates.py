@@ -44,7 +44,7 @@ def repeatHeadMove(tracker):
     '''Executes the currently set headMove, then repeats it.'''
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.helper.executeHeadMove(tracker.headMove)
+        tracker.helper.startingPan(tracker.headMove)
 
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(tracker.headMove)

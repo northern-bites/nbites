@@ -154,6 +154,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("isBodyActive", &PyMotionInterface::isBodyActive)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
+		.def("calibrated", &PyMotionInterface::calibrated)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)
         .def("resetScripted", &PyMotionInterface::resetScriptedProvider)
         ;

@@ -62,6 +62,10 @@ public:
                                  _possibleFieldObjects) {
         possibleFieldObjects = _possibleFieldObjects;
     }
+	void setRedGoalieCertain() {almostCertainlyRedGoalie = true;}
+	void setNavyGoalieCertain() {almostCertainlyNavyGoalie = true;}
+	void setRedGoalieProbable() {probablyRedGoalie = true;}
+	void setNavyGoalieProbable() {probablyNavyGoalie = true;}
     void setDistanceWithSD(float _distance);
     void setBearingWithSD(float _bearing);
     virtual void setIDCertainty(certainty c);
@@ -76,6 +80,10 @@ public:
     const int getLeftBottomY() const{ return leftBottom.y; }
     const int getRightBottomX() const{ return rightBottom.x; }
     const int getRightBottomY() const{ return rightBottom.y; }
+	const bool getRedGoalieCertain() const{ return almostCertainlyRedGoalie;}
+	const bool getNavyGoalieCertain() const{ return almostCertainlyNavyGoalie;}
+	const bool getRedGoalieProbable() const{ return probablyRedGoalie;}
+	const bool getNavyGoalieProbable() const{ return probablyNavyGoalie;}
     const std::string toString() const { return ConcreteFieldObject::
             getStringFromID(id); }
     const point<float> getFieldLocation() const { return fieldLocation; }
@@ -98,6 +106,11 @@ private: // Class Variables
     point <int> rightBottom;
     point <float> fieldLocation;
 	point <float> fieldLocation2; // for abstract field objects
+	bool probablyNavyGoalie;
+	bool probablyRedGoalie;
+	bool almostCertainlyNavyGoalie;
+	bool almostCertainlyRedGoalie;
+
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 

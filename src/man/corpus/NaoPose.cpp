@@ -367,7 +367,7 @@ estimate NaoPose::estimateWithKnownDistance(pixels x, pixels y, cms objectHeight
     //knowing the distance
 
     newEstimate.distance_variance = getDistanceVariance(groundDist);
-    newEstimate.bearing_variance = getDistanceVariance(groundDist);
+    newEstimate.bearing_variance = getBearingVariance(groundDist);
 
     return newEstimate;
 }
@@ -388,23 +388,7 @@ estimate NaoPose::makeEstimateFrom(ufvector4 pixelInCameraWorldFrame,
     float distX = groundDistance * cos(beta) + cameraInWorldFrame.x;
     float distY = groundDistance * sin(beta) + cameraInWorldFrame.y;
 
-    // Compute the bearing keeping in mind where the object is relative to the robot
-    float bearing = 0.0f;
-    const bool yPos = (distY >= 0);
-    const bool xPos = (distX >= 0);
-
-    if (distX >= 0) {
-        //object in front of robot
-        bearing = NBMath::safe_atan2(distY, distX);
-    } else if (distY >= 0) {
-        //object behind, left
-        bearing = NBMath::safe_atan2(distY, distX) + M_PI_FLOAT;
-    } else {
-        //objecet behind, right
-        bearing = NBMath::safe_atan2(distY, distX) - M_PI_FLOAT;
-    }
-
-    est.bearing = bearing;
+    est.bearing = NBMath::safe_atan2(distY, distX);
 
     est.x = distX*MM_TO_CM;
     est.y = distY*MM_TO_CM;

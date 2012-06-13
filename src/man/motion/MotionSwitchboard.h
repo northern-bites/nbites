@@ -107,6 +107,11 @@ public:
 
     int getFrameCount() const { return frameCount; }
 
+	// Provide calibration boolean towards boost
+	bool calibrated() {
+		return walkProvider.calibrated();
+	}
+
 private:
     void preProcess();
     void processJoints();

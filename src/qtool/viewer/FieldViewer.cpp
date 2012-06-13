@@ -1,4 +1,8 @@
 #include "FieldViewer.h"
+#include "man/memory/Memory.h"
+#include "image/BMPImage.h"
+
+#include <QDebug>
 #include <vector>
 #include "man/memory/Memory.h"
 
@@ -8,7 +12,6 @@ namespace viewer {
 using namespace data;
 using namespace man::memory;
 using namespace image;
-
 FieldViewer::FieldViewer(DataManager::ptr dataManager) :
         QMainWindow(), dataManager(dataManager) {
 

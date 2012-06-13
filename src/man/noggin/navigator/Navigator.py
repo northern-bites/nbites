@@ -207,4 +207,3 @@ class Navigator(FSA.FSA):
 
     def isSpinningRight(self):
         return self.spinDirection() == RIGHT
-

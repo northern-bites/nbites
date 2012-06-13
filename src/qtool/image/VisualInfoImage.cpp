@@ -124,8 +124,19 @@ void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     int corner_y=cornerData.visual_detection().y();
     int corner_width=2*(cornerData.visual_detection().center_x()-corner_x);
     int corner_height= 2*(cornerData.visual_detection().center_y()-corner_y);
+	int corner_shape = cornerData.corner_type();
 
-    painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
+    painter.setPen(QPen(Qt::yellow, 3, Qt::SolidLine, Qt::FlatCap));
+	switch (corner_shape) {
+	case 1: painter.setPen(QPen(Qt::red, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	case 2: painter.setPen(QPen(Qt::blue, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	case 3: painter.setPen(QPen(Qt::green, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	case 4: painter.setPen(QPen(Qt::black, 3, Qt::SolidLine, Qt::FlatCap));
+		break;
+	}
     painter.drawLine(2*corner_x-10, 2*corner_y-10, 2*corner_x+10, 2*corner_y+10);
     painter.drawLine(2*corner_x+10, 2*corner_y-10, 2*corner_x-10, 2*corner_y+10);
 
@@ -144,6 +155,8 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int right_top_y = 2*postData.right_top_y();
     int right_bottom_x = 2*postData.right_bottom_x();
     int right_bottom_y = 2*postData.right_bottom_y();
+	int id = postData.visual_landmark().id();
+	int cert = postData.visual_landmark().id_certainty();
 
     QPoint points [4]= {
       QPoint (left_top_x, left_top_y),
@@ -152,7 +165,14 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_top_x, right_top_y)
     };
 
-    painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+	// default color for uncertain goal
+	painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+	// if the goal is the Right goal we know it is certain
+	if (id == 42) {
+		painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
+	} else if (cert == 2) {
+		painter.setPen(QPen(QColor(255,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+	}
     painter.setBrush(QBrush(QColor(255,255,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
 }
@@ -218,7 +238,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int end_x = 2*lineData.end_x();
     int end_y = 2*lineData.end_y();
 
-    painter.setPen(QPen(Qt::blue, 6, Qt::SolidLine, Qt::FlatCap));
+    painter.setPen(QPen(Qt::blue, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(start_x, start_y, end_x, end_y);
   }
 
