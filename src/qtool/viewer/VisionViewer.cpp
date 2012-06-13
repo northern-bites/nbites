@@ -65,7 +65,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     topVisionImage = new ThresholdedImage(topRawImage, this);
 
     VisualInfoImage* shapesBottom = new VisualInfoImage(offlineMVision, Camera::BOTTOM);
-    VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);    
+    VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);
 
     MRawImages::const_ptr rawImages = memoryManager->getMemory()->get<MRawImages>();
 
@@ -80,9 +80,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
     connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
-
-    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
-    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 
     CollapsibleImageViewer* bottomCIV = new
             CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
