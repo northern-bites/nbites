@@ -9,10 +9,11 @@ using namespace boost;
 #include "NBMatrixMath.h"
 using namespace Kinematics;
 using namespace NBMath;
-//#define DEBUG_SWITCHBOARD
+#define DEBUG_SWITCHBOARD
 
 MotionSwitchboard::MotionSwitchboard(boost::shared_ptr<Sensors> s,
-                                     boost::shared_ptr<NaoPose> pose)
+                                     boost::shared_ptr<NaoPose> pose,
+                                     MemoryMotion::ptr mMotion)
     : sensors(s),
       walkProvider(sensors, pose),
       scriptedProvider(sensors),
@@ -31,7 +32,8 @@ MotionSwitchboard::MotionSwitchboard(boost::shared_ptr<Sensors> s,
       newJoints(false),
       newInputJoints(false),
       readyToSend(false),
-      noWalkTransitionCommand(true)
+      noWalkTransitionCommand(true),
+      memoryProvider(&MotionSwitchboard::updateMemory, this, mMotion)
 {
 
     //Allow safe access to the next joints
@@ -124,6 +126,7 @@ void MotionSwitchboard::run() {
         processStiffness();
         bool active  = postProcess();
 
+        memoryProvider.updateMemory();
 
         if(active)
         {
@@ -374,6 +377,9 @@ void MotionSwitchboard::preProcessBody()
     if (curProvider != &nullBodyProvider &&
         nextProvider == &nullBodyProvider)
     {
+            #ifdef DEBUG_SWITCHBOARD
+            cout << "Hard reset on "<< *curProvider <<endl;
+            #endif
         scriptedProvider.hardReset();
         walkProvider.hardReset();
     }
@@ -517,6 +523,9 @@ void MotionSwitchboard::swapBodyProvider(){
             }
         }
         curProvider = nextProvider;
+        #ifdef DEBUG_SWITCHBOARD
+            cout << "Switched to " << *curProvider << " from "<< old_provider << endl;
+        #endif
         break;
 
     case NULL_PROVIDER:
@@ -804,6 +813,27 @@ void MotionSwitchboard::sendMotionCommand(const DestinationCommand::ptr command)
     nextProvider = &walkProvider;
     walkProvider.setCommand(command);
     pthread_mutex_unlock(&next_provider_mutex);
+}
+
+void MotionSwitchboard::updateMemory(MemoryMotion::ptr mMotion) const {
+
+    proto::Motion* proto_motion = mMotion->get();
+
+    proto_motion->set_current_body_provider(curProvider->getName());
+    proto_motion->set_next_body_provider(nextProvider->getName());
+
+    proto::RobotLocation* odometry = proto_motion->mutable_odometry();
+
+    MotionModel motionOdometry = getOdometryUpdate();
+    odometry->set_h(motionOdometry.theta);
+    odometry->set_x(motionOdometry.x);
+    odometry->set_y(motionOdometry.y);
+
+    walkProvider.update(proto_motion->mutable_walk_provider());
+
+    proto::ScriptedProvider* scripted_provider = proto_motion->mutable_scripted_provider();
+    scripted_provider->set_active(scriptedProvider.isActive());
+    scripted_provider->set_stopping(scriptedProvider.isStopping());
 }
 
 //vector<float> MotionSwitchboard::getBodyJointsFromProvider(MotionProvider* provider) {

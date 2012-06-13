@@ -10,6 +10,7 @@
 #include "protos/Vision.pb.h"
 #include "protos/Loc.pb.h"
 #include "protos/Sensors.pb.h"
+#include "protos/Motion.pb.h"
 #include "MemoryCommon.h"
 #include "ClassHelper.h"
 
@@ -35,6 +36,7 @@ ADD_MEMORY_OBJECT(MLocalization, PLoc)
 ADD_MEMORY_OBJECT(MRawNaoImages, PRawNaoImages)
 ADD_MEMORY_OBJECT(MVisionSensors, PVisionSensors)
 ADD_MEMORY_OBJECT(MMotionSensors, PMotionSensors)
+ADD_MEMORY_OBJECT(MMotion, Motion)
 
 //adds quick camera methods to MRawNaoImages
 class MRawImages : public MRawNaoImages {
