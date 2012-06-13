@@ -27,7 +27,7 @@ def facingForward(player):
     if it is in the goal.
     """
     #magic numbers
-    return (player.brain.vision.fieldEdge.centerDist > 800.0 or
+    return (player.brain.vision.fieldEdge.centerDist > 900.0 or
             (fabs(player.brain.vision.cross.bearing) < 10.0 and
              player.brain.vision.cross.on))
 
@@ -56,9 +56,10 @@ def onLeftSideline(player):
 
 def onRightSideline(player):
     """
-    Checks that it is definitely not on the left sideline.
+    Checks that it is definitely not on the left sideline for at least
+    2 seconds-ish.
     """
-    return not onLeftSideline(player)
+    return not onLeftSideline(player) and player.counter > 60
 
 def shouldPerformSave(player):
     """
@@ -82,7 +83,7 @@ def shouldClearBall(player):
 
     # if to sides of box
     if (player.brain.ball.vis.dist < 120.0 and
-        fabs(player.brain.ball.vis.bearing) > 45.0):
+        fabs(player.brain.ball.vis.bearing) > 40.0):
         return True
 
     return False
@@ -106,7 +107,7 @@ def walkedTooFar(player):
     diff = (RelRobotLocation(player.brain.loc.lastOdoX,
                             player.brain.loc.lastOdoY,
                             player.brain.loc.lastOdoTheta) -
-            VisualGoalieStates.clearIt.storedOdo)
+            VisualGoalieStates.returnToGoal.storedOdo)
     return diff.relX > 80.0 or fabs(diff.relY) > 90.0
 
 def reachedTheBall(player):

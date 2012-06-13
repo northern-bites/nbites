@@ -119,19 +119,19 @@ def spinAtGoal(player):
 # clearIt->kickBall->didIKickIt->returnToGoal
 def clearIt(player):
     if player.firstFrame():
-        clearIt.storedHome = RelRobotLocation(-(player.brain.ball.loc.relX -
+        returnToGoal.storedHome = RelRobotLocation(-(player.brain.ball.loc.relX -
                                                 18.0),
                                                -(player.brain.ball.loc.relY),
                                                0.0)
-        clearIt.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
+        returnToGoal.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
                                              player.brain.loc.lastOdoY,
                                              player.brain.loc.lastOdoTheta)
-        if clearIt.storedHome.relY < 0.0:
+        if returnToGoal.storedHome.relY < 0.0:
             player.side = RIGHT
         else:
             player.side = LEFT
-        clearIt.ballDest = RelRobotLocation(clearIt.storedHome.relX,
-                                            clearIt.storedHome.relY,
+        clearIt.ballDest = RelRobotLocation(returnToGoal.storedHome.relX,
+                                            returnToGoal.storedHome.relY,
                                             0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
@@ -174,16 +174,17 @@ def decideSide(player):
 
 def returnToGoal(player):
     if player.firstFrame():
-        if returnToGoal.incomingTransition.condition == walkedTooFar:
-            # arbitrary correction for walking too far
-            correctedDest = (clearIt.storedOdo -
-                             RelRobotLocation(player.brain.loc.lastOdoX,
+        # didn't kick it, coming back for some other reason
+        if player.lastDiffState != 'didIKickIt':
+            correctedDest = (returnToGoal.storedOdo -
+                             # magic number
+                             RelRobotLocation(player.brain.loc.lastOdoX - 10.0,
                                               player.brain.loc.lastOdoY,
-                                              player.brain.loc.lastOdoTheta))
+                                              0.0))
             player.brain.nav.walkTo(correctedDest)
-            print "I have corrected my dest to " + str(correctedDest)
+        # did kick it
         else:
-            print "I did not correct my dest, so it is " + str(clearIt.storedHome)
-            player.brain.nav.walkTo(clearIt.storedHome)
+            player.brain.nav.walkTo(returnToGoal.storedOdo -
+                                    returnToGoal.kickPose)
 
     return Transition.getNextState(player, returnToGoal)

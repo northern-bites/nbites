@@ -124,6 +124,9 @@ def kickBall(player):
     Kick the ball
     """
     if player.firstFrame():
+        VisualStates.returnToGoal.kickPose = RelRobotLocation(player.brain.loc.lastOdoX,
+                            player.brain.loc.lastOdoY,
+                            player.brain.loc.lastOdoTheta)
         player.brain.tracker.trackBallFixedPitch()
         if player.brain.ball.loc.relY < 0:
             kick = SweetMoves.RIGHT_BIG_KICK
