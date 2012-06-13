@@ -33,6 +33,7 @@ public:
     unsigned getHeight() const { return FIELD_HEIGHT*scale; }
 
     void transformPainterToFieldCoordinates(QPainter& painter);
+	void unTransform(QPainter& painter);
     void paintDot(QPainter& painter, QColor color, QPoint point, int size = 7);
     void paintEllipseArea(QPainter& painter, QColor color,
                           QPoint center, int x_size, int y_size);
