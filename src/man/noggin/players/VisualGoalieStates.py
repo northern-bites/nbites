@@ -6,7 +6,7 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
-from GoalieTransitions import onLeftSideline, onRightSideline
+from GoalieTransitions import onLeftSideline, onRightSideline, walkedTooFar
 from objects import RelRobotLocation, RelLocation
 from noggin_constants import LINE_CROSS_OFFSET
 
@@ -123,6 +123,9 @@ def clearIt(player):
                                                 18.0),
                                                -(player.brain.ball.loc.relY),
                                                0.0)
+        clearIt.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
+                                             player.brain.loc.lastOdoY,
+                                             player.brain.loc.lastOdoTheta)
         if clearIt.storedHome.relY < 0.0:
             player.side = RIGHT
         else:
@@ -171,6 +174,16 @@ def decideSide(player):
 
 def returnToGoal(player):
     if player.firstFrame():
-        player.brain.nav.walkTo(clearIt.storedHome)
+        if returnToGoal.incomingTransition.condition == walkedTooFar:
+            # arbitrary correction for walking too far
+            correctedDest = (clearIt.storedOdo -
+                             RelRobotLocation(player.brain.loc.lastOdoX,
+                                              player.brain.loc.lastOdoY,
+                                              player.brain.loc.lastOdoTheta))
+            player.brain.nav.walkTo(correctedDest)
+            print "I have corrected my dest to " + str(correctedDest)
+        else:
+            print "I did not correct my dest, so it is " + str(clearIt.storedHome)
+            player.brain.nav.walkTo(clearIt.storedHome)
 
     return Transition.getNextState(player, returnToGoal)

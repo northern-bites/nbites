@@ -9,6 +9,8 @@ import GoalieConstants as goalCon
 import PositionTransitions as PosTran
 from math import fabs
 from vision import cornerID as IDs
+import VisualGoalieStates
+from objects import RelRobotLocation
 
 # Visual Goalie
 
@@ -99,6 +101,13 @@ def ballMovedStopChasing(player):
     """
     return (player.brain.ball.vis.dist > 100.0 and
             player.counter > 200.0)
+
+def walkedTooFar(player):
+    diff = (RelRobotLocation(player.brain.loc.lastOdoX,
+                            player.brain.loc.lastOdoY,
+                            player.brain.loc.lastOdoTheta) -
+            VisualGoalieStates.clearIt.storedOdo)
+    return diff.relX > 80.0 or fabs(diff.relY) > 90.0
 
 def reachedTheBall(player):
     """

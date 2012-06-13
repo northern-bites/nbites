@@ -78,6 +78,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
+            : VisualGoalieStates.returnToGoal,
+
+            Transition.CountTransition(GoalieTransitions.walkedTooFar,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
             : VisualGoalieStates.returnToGoal
 
             }
