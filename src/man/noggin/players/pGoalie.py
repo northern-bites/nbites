@@ -28,7 +28,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         VisualGoalieStates.spinAtGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.facingForward,
                                        Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : GoalieStates.watch
             }
 
@@ -46,7 +46,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         GoalieStates.watch.transitions = {
             Transition.CountTransition(GoalieTransitions.shouldPerformSave,
-                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveIt,
 
@@ -91,7 +91,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.spinAtGoal
+            : GoalieStates.watch
 
             }
 

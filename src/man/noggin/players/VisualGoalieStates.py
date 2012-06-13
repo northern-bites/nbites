@@ -174,17 +174,17 @@ def decideSide(player):
 
 def returnToGoal(player):
     if player.firstFrame():
-        # didn't kick it, coming back for some other reason
-        if player.lastDiffState != 'didIKickIt':
+        if player.lastDiffState == 'didIKickIt':
+            correctedDest = returnToGoal.storedOdo- returnToGoal.kickPose
+            correctedDest.relX = correctedDest.relX - 5.0
+
+        else:
             correctedDest = (returnToGoal.storedOdo -
                              # magic number
-                             RelRobotLocation(player.brain.loc.lastOdoX - 10.0,
+                             RelRobotLocation(player.brain.loc.lastOdoX + 10,
                                               player.brain.loc.lastOdoY,
                                               0.0))
-            player.brain.nav.walkTo(correctedDest)
-        # did kick it
-        else:
-            player.brain.nav.walkTo(returnToGoal.storedOdo -
-                                    returnToGoal.kickPose)
+
+        player.brain.nav.walkTo(correctedDest)
 
     return Transition.getNextState(player, returnToGoal)
