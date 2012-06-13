@@ -70,7 +70,7 @@ def walkingTo(nav):
         helper.setOdometryDestination(nav, walkingTo.dest, walkingTo.speed)
         return nav.stay()
 
-    if not nav.brain.motion.isWalkActive():
+    if nav.brain.motion.isStanding():
         return nav.goNow('standing')
 
     return nav.stay()

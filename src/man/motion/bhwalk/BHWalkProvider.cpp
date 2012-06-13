@@ -253,6 +253,7 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
     motionRequest.walkRequest.speed.rotation = command->theta_percent;
     motionRequest.walkRequest.speed.translation.x = command->x_percent;
     motionRequest.walkRequest.speed.translation.y = command->y_percent;
+    walkingEngine.theMotionRequest = motionRequest;
 
     currentCommand = command;
 
@@ -263,6 +264,9 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 }
 
 void BHWalkProvider::setCommand(const StepCommand::ptr command) {
+    MotionRequest motionRequest;
+    motionRequest.motion = MotionRequest::walk;
+    walkingEngine.theMotionRequest = motionRequest;
 
     startOdometry = walkingEngine.theOdometryData;
     currentCommand = command;
