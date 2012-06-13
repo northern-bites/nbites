@@ -65,6 +65,14 @@ void ParsingBoard::parseNextAll() {
 
 }
 
+void ParsingBoard::parseNextAll(int skips) {
+	for (ObjectIOMap::iterator it = objectIOMap.begin();
+		 it != objectIOMap.end(); it++ ) {
+		for (int i = 0; i < skips; i++)
+			it->second->readNextMessage();
+    }
+}
+
 void ParsingBoard::rewind(std::string name) {
 
     ObjectIOMap::iterator it = objectIOMap.find(name);
@@ -82,6 +90,13 @@ void ParsingBoard::rewindAll() {
         it->second->getPrev();
     }
 
+}
+
+void ParsingBoard::rewindAll(int skips) {
+	for (ObjectIOMap::iterator it = objectIOMap.begin();
+            it != objectIOMap.end(); it++ ) {
+        it->second->getPrev(skips);
+    }
 }
 
 }

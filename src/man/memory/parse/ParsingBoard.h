@@ -39,9 +39,11 @@ public:
 
     void parseNext(std::string name);
     void parseNextAll();
+	void parseNextAll(int skips);
 
     void rewind(std::string name);
     void rewindAll();
+	void rewindAll(int skips);
 
     void reset() { objectIOMap.clear(); }
 
