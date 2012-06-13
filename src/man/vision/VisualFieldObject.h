@@ -97,6 +97,11 @@ private: // Class Variables
     point <int> rightBottom;
     point <float> fieldLocation;
 	point <float> fieldLocation2; // for abstract field objects
+	bool probablyNavyGoalie;
+	bool probablyRedGoalie;
+	bool almostCertainlyNavyGoalie;
+	bool almostCertainlyRedGoalie;
+
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 

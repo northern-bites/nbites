@@ -983,7 +983,7 @@ void FieldLines::joinLines()
                 if (isCCLine) {
                     cout << "Joined as center circle line.";
                 }
-                cout << endl;
+                cout << endl << endl;
             }
             // Replace the information in i with the union of i and j and
             // recalculated the variables in the line struct
@@ -2205,6 +2205,20 @@ list< VisualCorner > FieldLines::intersectLines()
                         cout << (*i)->getAngle() << " " << (*j)->getAngle() << endl;
                 }
  			}
+			// if we have a lot of lines we're probably looking at the center circle
+			if (linesList.size() > 5) {
+				if (c.getShape() == OUTER_L) {
+					int newY = vision->thresh->field->horizonAt(intersection.x);
+					estimate r = vision->pose->pixEstimate(intersection.x, newY, 0.0);
+					if (r.dist > 300.0f) {
+						if (debugIntersectLines) {
+							cout << "Edge is too far away for outer_l" << endl;
+						}
+						continue;
+					}
+
+				}
+			}
             if (isCCIntersection) {
                 c.setShape(CIRCLE);
             } else if (c.getShape() == T) {
@@ -2238,9 +2252,9 @@ list< VisualCorner > FieldLines::intersectLines()
             if (c.getShape() == T) {
                 vision->thresh->context->setTCorner();
             } else if (c.getShape() == OUTER_L) {
-                vision->thresh->context->setILCorner();
-            } else if (c.getShape() == INNER_L) {
                 vision->thresh->context->setOLCorner();
+            } else if (c.getShape() == INNER_L) {
+                vision->thresh->context->setILCorner();
             } else {
                 vision->thresh->context->setCCCorner();
             }
