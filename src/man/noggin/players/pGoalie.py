@@ -35,13 +35,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         VisualGoalieStates.decideSide.transitions = {
             Transition.CountTransition(GoalieTransitions.onLeftSideline,
                                        Transition.MOST_OF_THE_TIME,
-                                       50)
+                                       Transition.HIGH_PRECISION)
             : VisualGoalieStates.walkToGoal,
 
             Transition.CountTransition(GoalieTransitions.onRightSideline,
                                        Transition.MOST_OF_THE_TIME,
-                                       # magic number
-                                       50)
+                                       Transition.HIGH_PRECISION)
             : VisualGoalieStates.walkToGoal
             }
 
@@ -53,15 +52,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.MOST_OF_THE_TIME,
-                                       # magic number
-                                       50)
-            : VisualGoalieStates.clearIt,
-
-            Transition.CountTransition(GoalieTransitions.ballIsAtMyFeet,
-                                       Transition.MOST_OF_THE_TIME,
-                                       # magic number
-                                       50)
-            : GoalieStates.kickBall
+                                       Transition.HIGH_PRECISION)
+            : VisualGoalieStates.clearIt
 
             }
 
@@ -80,8 +72,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
                                        Transition.MOST_OF_THE_TIME,
-                                       # magic number
-                                       50)
+                                       Transition.HIGH_PRECISION)
             : VisualGoalieStates.returnToGoal,
 
             Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
@@ -96,6 +87,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.spinAtGoal
+
+            }
+
+        VisualGoalieStates.didIKickIt.transitions = {
+            Transition.CountTransition(GoalieTransitions.whiffed,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.kickBall,
+
+            Transition.CountTransition(GoalieTransitions.successfulKick,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : VisualGoalieStates.returnToGoal
+
             }
 
     def run(self):

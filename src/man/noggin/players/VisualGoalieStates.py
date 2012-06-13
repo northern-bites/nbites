@@ -116,6 +116,7 @@ def spinAtGoal(player):
 
     return Transition.getNextState(player, spinAtGoal)
 
+# clearIt->kickBall->didIKickIt->returnToGoal
 def clearIt(player):
     if player.firstFrame():
         clearIt.storedHome = RelRobotLocation(-(player.brain.ball.loc.relX -
@@ -139,6 +140,11 @@ def clearIt(player):
 
     return Transition.getNextState(player, clearIt)
 
+def didIKickIt(player):
+    if player.firstFrame():
+        player.brain.nav.stop()
+    return Transition.getNextState(player, didIKickIt)
+
 def standStill(player):
     if player.firstFrame():
         player.brain.nav.stop()
@@ -147,7 +153,6 @@ def standStill(player):
 def spinToFaceBall(player):
     if player.firstFrame():
         facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        # Decide which way to rotate based on the way we came from
         if player.brain.ball.loc.bearing < 0.0:
             facingDest.relH = -90
         else:

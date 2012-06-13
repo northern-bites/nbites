@@ -133,10 +133,7 @@ def kickBall(player):
         player.executeMove(kick)
 
     if player.counter > 10 and player.brain.nav.isStopped():
-        if player.lastDiffState == 'clearIt':
-            return player.goLater('returnToGoal')
-        else:
-            return player.goLater('watch')
+            return player.goLater('didIKickIt')
 
     return player.stay()
 
