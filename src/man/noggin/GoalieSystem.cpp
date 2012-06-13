@@ -165,6 +165,6 @@ float GoalieSystem::computeAverage(std::deque<float> q)
     {
         sum += *i;
     }
-    return sum / q.size();
+    return sum / float(q.size());
 }
 }
