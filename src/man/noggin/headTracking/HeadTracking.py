@@ -84,6 +84,9 @@ class HeadTracking(FSA.FSA):
         '''Repeat the narrow fixed pitch pan.'''
         self.repeatHeadMove(HeadMoves.FIXED_PITCH_PAN_NARROW)
 
+    def performWidePanFixedPitch(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+
     def trackBallFixedPitch(self):
         """
         Enters a state cycle:
