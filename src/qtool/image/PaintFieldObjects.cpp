@@ -10,12 +10,15 @@ PaintFieldOverlay::PaintFieldOverlay(float scale, QObject* parent)
 }
 
 void PaintFieldOverlay::transformPainterToFieldCoordinates(QPainter& painter) {
-    // invert the field so the left top corner (image origin) is not the bottom left
-    // corner (field origin)
+    // translate and flip the coords to make the Qt and robot coord systems match up
     painter.translate(0, FIELD_HEIGHT*scale);
-    painter.scale(scale, -scale);
+    painter.scale(scale, -1*scale);
 }
-
+void PaintFieldOverlay::unTransform(QPainter& painter){
+	//put the painter back the deafult Qt way
+	painter.scale(1/scale, -1/scale);
+	painter.translate(0, -FIELD_HEIGHT*scale);
+}
 void PaintFieldOverlay::paintDot(QPainter& painter, QColor color, QPoint point, int size) {
 
     painter.setPen(QColor("black"));
