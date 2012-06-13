@@ -21,9 +21,6 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     FastYUVToBMPImage* rawTopBMP = new FastYUVToBMPImage(rawImages, Camera::TOP, this);
     FastYUVToBMPImage* rawBottomBMP = new FastYUVToBMPImage(rawImages, Camera::BOTTOM, this);
 
-    BMPImageViewer* topImageViewer;
-    BMPImageViewer* bottomImageViewer;
-
     VisualInfoImage* shapesBottom = new VisualInfoImage(memoryManager->getMemory()->get<MVision>(),
 														Camera::BOTTOM);
     VisualInfoImage* shapesTop = new VisualInfoImage(memoryManager->getMemory()->get<MVision>(),
@@ -32,13 +29,22 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     OverlayedImage* comboBottom = new OverlayedImage(rawBottomBMP, shapesBottom, this);
     OverlayedImage* comboTop = new OverlayedImage(rawTopBMP, shapesTop, this);
 
-    bottomImageViewer = new BMPImageViewer(comboBottom, this);
-    topImageViewer = new BMPImageViewer(comboTop, this);
+	BMPImageViewer* bottomImageViewer = new BMPImageViewer(comboBottom, this);
+    BMPImageViewer* topImageViewer = new BMPImageViewer(comboTop, this);
 
-	QHBoxLayout* bothImagesLayout = new QHBoxLayout;
+	BMPImageViewer* top = new BMPImageViewer(comboTop, this);
+    BMPImageViewer* bottom = new BMPImageViewer(comboBottom, this);
+
+	QVBoxLayout* bothImagesLayout = new QVBoxLayout;
 	QWidget* bothImages = new QWidget;
-	bothImagesLayout->addWidget(bottomImageViewer);
-	bothImagesLayout->addWidget(topImageViewer);
+
+	bothImagesLayout->addWidget(top);
+	bothImagesLayout->addWidget(bottom);
+	qDebug()<<bothImagesLayout->sizeHint().height();
+
+	bothImages->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	bothImages->setMaximumWidth(640);
+	bothImages->setMaximumHeight(480*2);
 	bothImages->setLayout(bothImagesLayout);
 
 	QHBoxLayout* mainLayout = new QHBoxLayout;
@@ -50,8 +56,9 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	imageTabs->addTab(bothImages, QString("Both Images"));
 
 	mainLayout->addWidget(imageTabs);
+	mainWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	mainWidget->setLayout(mainLayout);
-    this->setCentralWidget(bothImages);
+    this->setCentralWidget(mainWidget);
 
     //TODO: we call updateView twice per vision frame
     memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
