@@ -894,6 +894,20 @@ void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
 	} else {
 		return;
 	}
+	bool redRobot = false, navyRobot = false;
+	// first just check if we already identified any robots
+	if (vision->red1->getHeight() > 0) {
+		int redX = vision->red1->getCenterX();
+		if (redX > leftX && redX < rightX) {
+			redRobot = true;
+		}
+	}
+	if (vision->navy1->getHeight() > 0) {
+		int navyX = vision->navy1->getCenterX();
+		if (navyX > leftX && navyX < rightX) {
+			navyRobot = true;
+		}
+	}
 	// scan the box
 	int height = bottomY - topY;
 	int redTotal = 0, navyTotal = 0, redRun = 0, navyRun = 0, currentRun = 0;
@@ -955,14 +969,46 @@ void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
 	cout << "Red " << redTotal << " blue " << navyTotal << endl;
 	cout << "Runs red " << redRun << " navy " << navyRun << endl;
 	cout << "Red cols " << redCols << " navy cols " << navyCols << endl; */
-	if (redCols > 2 * navyCols && redCols > 5) {
-		cout << "Red goalie " << endl;
-	} else if (navyCols > 2 * redCols && navyCols > 5) {
-		cout << "Navy goalie " << endl;
-	} else if (redCols > 1 && navyCols == 0 && redTotal > 30) {
-		cout << "Probably a red goalie" << endl;
-	} else if (navyCols > 1 && redCols == 0 && navyTotal > 30) {
-		cout << "Probably a navy goalie" << endl;
+	if (redRobot || (redCols > 2 * navyCols && redCols > 5) && !navyRobot) {
+		if (debugShot) {
+			cout << "Red goalie " << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setRedGoalieCertain();
+		}
+		if (rightPost) {
+			vision->ygrp->setRedGoalieCertain();
+		}
+	} else if (navyRobot || (navyCols > 2 * redCols && navyCols > 5) && !redRobot) {
+		if (debugShot) {
+			cout << "Navy goalie " << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setNavyGoalieCertain();
+		}
+		if (rightPost) {
+			vision->ygrp->setNavyGoalieCertain();
+		}
+	} else if (redCols > 1 && navyCols == 0 && redTotal > 30 && !navyRobot) {
+		if (debugShot) {
+			cout << "Probably a red goalie" << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setRedGoalieProbable();
+		}
+		if (rightPost) {
+			vision->ygrp->setRedGoalieProbable();
+		}
+	} else if (navyCols > 1 && redCols == 0 && navyTotal > 30 && !redRobot) {
+		if (debugShot) {
+			cout << "Probably a navy goalie" << endl;
+		}
+		if (leftPost) {
+			vision->yglp->setNavyGoalieProbable();
+		}
+		if (rightPost) {
+			vision->ygrp->setNavyGoalieProbable();
+		}
 	}
 }
 
