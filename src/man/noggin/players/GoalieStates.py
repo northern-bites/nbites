@@ -64,12 +64,10 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated()):
         return player.stay()
 
-    # check for legit penalty - don't forget!
-    # and player.lastStateTime > 25.0
-    if player.lastDiffState == 'gamePenalized':
+    if (player.lastDiffState == 'gamePenalized' and
+        player.lastStateTime > 25):
         return player.goLater('decideSide')
 
-    # something with falls is NOT working!
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
 
@@ -113,9 +111,7 @@ def fallen(player):
 def watch(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        if (player.lastDiffState == 'kickBall' or
-            player.lastDiffState == 'spinAtGoal'):
-            player.brain.nav.stand()
+        player.brain.nav.stand()
 
     return Transition.getNextState(player, watch)
 
@@ -129,9 +125,9 @@ def kickBall(player):
                             player.brain.loc.lastOdoTheta)
         player.brain.tracker.trackBallFixedPitch()
         if player.brain.ball.loc.relY < 0:
-            kick = SweetMoves.RIGHT_BIG_KICK
+            kick = SweetMoves.RIGHT_SHORT_STRAIGHT_KICK
         else:
-            kick = SweetMoves.LEFT_BIG_KICK
+            kick = SweetMoves.LEFT_SHORT_STRAIGHT_KICK
 
         player.executeMove(kick)
 
