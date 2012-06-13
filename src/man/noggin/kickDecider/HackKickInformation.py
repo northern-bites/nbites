@@ -282,29 +282,36 @@ class KickInformation:
             if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:
                     #Closer to the leftScorePoint
                 kick = self.chooseBackKick()
+                kick.h = 1 #HACK
             else:
                 kick = kicks.RIGHT_SIDE_KICK
+                kick.h = 90 - avgScorePoint
         elif rightScorePoint > 0:
             # Quadrent 1
             if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
                 kick = kicks.RIGHT_SIDE_KICK
+                kick.h = 90 - avgScorePoint
             else:
                 kick = self.chooseQuickFrontKick()
+                kick.h = 0 - avgScorePoint
         elif rightScorePoint > -90:
             # Quadrent 4
             if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
                 kick = self.chooseQuickFrontKick()
+                kick.h = 0 - avgScorePoint
             else:
                 kick = kicks.LEFT_SIDE_KICK
+                kick.h = -90 - avgScorePoint
         else:
             # Quadrent 3
             if (-90 - leftScorePoint) - (rightScorePoint + 180) < 0:
                 kick = kicks.LEFT_SIDE_KICK
+                kick.h = -90 - avgScorePoint
             else:
                 kick = self.chooseBackKick()
+                kick.h = 1 #HACK
 
         if kick is not None:
-            kick.h = -1*avgScorePoint
             return kick
 
         #DEBUG printing
@@ -356,12 +363,12 @@ class KickInformation:
 
     def __str__(self):
         s = ""
-        if self.oppLeftPostBearing is not None:
-            s += ("Opp left post bearing is: " + str(self.oppLeftPostBearing) +
-                  " dist is: " + str(self.oppLeftPostDist) + "\n")
-        if self.oppRightPostBearing is not None:
-            s += ("Opp right post bearing is: " + str(self.oppRightPostBearing)
-                  + " dist is: " + str(self.oppRightPostDist) +  "\n")
+        if self.farLeftPostBearing is not None:
+            s += ("Far left post bearing is: " + str(self.farLeftPostBearing) +
+                  " dist is: " + str(self.farLeftPostDist) + "\n")
+        if self.farRightPostBearing is not None:
+            s += ("Far right post bearing is: " + str(self.farRightPostBearing)
+                  + " dist is: " + str(self.farRightPostDist) +  "\n")
         if self.nearLeftPostBearing is not None:
             s += ("Near left post bearing is: " + str(self.nearLeftPostBearing) +
                   " dist is: " + str(self.nearLeftPostDist) + "\n")
