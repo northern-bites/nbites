@@ -91,16 +91,19 @@ class VisionSystem : public PF::SensorModel
                                           float distSD,
                                           float headSD){
 
-        float pose_diff_h = NBMath::subPIAngle(pose.heading -
-                                               particle.getLocation().heading);
-        // create a normal distribution with the std dev derived from the variance
-        boost::math::normal_distribution<float> pHeading(0.0f, distSD);
-        float prob_h = boost::math::pdf<float>(pHeading, pose_diff_h);
-
         float pose_diff_d = NBMath::getHypotenuse(pose.x - particle.getLocation().x,
                                                   pose.y - particle.getLocation().y);
+        std::cout << "pose_diff_d: " << pose_diff_d << "\n";
         boost::math::normal_distribution<float> pDistance(0.0f, distSD);
         float prob_d = boost::math::pdf<float> (pDistance, pose_diff_d);
+
+        float pose_diff_h = NBMath::subPIAngle(pose.heading -
+                                               particle.getLocation().heading);
+
+        boost::math::normal_distribution<float> pHeading(0.0f, headSD);
+        float prob_h = boost::math::pdf<float>(pHeading, pose_diff_h);
+
+        std::cout << "NEW? prob_h: " << prob_h << " , prob_d: " << prob_d << "\n\n";
 
         return prob_h * prob_d;
 
@@ -123,35 +126,13 @@ class VisionSystem : public PF::SensorModel
         float pose_y = concrete.getFieldY() - observation.getDistance()*sin_global_orientation;
         float pose_h = globalPhysicalOrientation - observation.getBearing();
 
-        float pose_diff_h = NBMath::subPIAngle(pose_h - particle.getLocation().heading);
-
-        float globalOrientationSD =
-                NBMath::getHypotenuse(observation.getBearingSD(),
-                                      observation.getPhysicalOrientationSD());
-
-        boost::math::normal_distribution<float> pHeading(0.0f, globalOrientationSD);
-        float prob_h = boost::math::pdf<float>(pHeading, pose_diff_h);
-
-        float pose_diff_d = NBMath::getHypotenuse(pose_x - particle.getLocation().x,
-                pose_y - particle.getLocation().y);
-        boost::math::normal_distribution<float> pDistance(0.0f, observation.getDistanceSD());
-        float prob_d = boost::math::pdf<float>(pDistance, pose_diff_d);
-
         PF::Location reconstructedLocation(pose_x, pose_y, pose_h);
-
-        float prevProb = prob_h * prob_d;
-        float newProb =  scoreParticleAgainstPose(particle,
-                                                  reconstructedLocation,
-                                                  observation.getDistanceSD(),
-                                                  globalOrientationSD);
-
-        std::cout << "Previous calculation would be: " << prevProb << "\n";
-        std::cout << "New Calculation would be: " << newProb << "\n";
-        std::cout << "Equal?  " << prevProb << " == " << newProb << "\n\n";
-
-        return newProb;
-
-
+        float globalOrientationSD = NBMath::getHypotenuse(observation.getBearingSD(),
+                                                          observation.getPhysicalOrientationSD());
+        return  scoreParticleAgainstPose(particle,
+                                         reconstructedLocation,
+                                         observation.getDistanceSD(),
+                                         globalOrientationSD);
     }
 
  private:
