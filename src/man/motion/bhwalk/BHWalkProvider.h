@@ -73,7 +73,7 @@ public:
                                   INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
     }
 
-    const bool isWalkActive() const;
+    const bool isStanding() const;
 
     void update(proto::WalkProvider* walkProvider) const;
 

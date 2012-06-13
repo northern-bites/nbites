@@ -210,8 +210,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     }
 }
 
-const bool BHWalkProvider::isWalkActive() const {
-        return !(walkingEngine.theMotionRequest.motion == MotionRequest::stand);
+const bool BHWalkProvider::isStanding() const {
+        return walkingEngine.theMotionRequest.motion == MotionRequest::stand;
     }
 
 void BHWalkProvider::stand() {

@@ -214,7 +214,7 @@ def walking(nav):
     State to be used when setSpeed is called
     """
 
-    if (walking.speeds != walking.lastSpeeds) or not nav.brain.motion.isWalkActive():
+    if (walking.speeds != walking.lastSpeeds) or not nav.brain.motion.isStanding():
         helper.setSpeed(nav, walking.speeds)
     walking.lastSpeeds = walking.speeds
 

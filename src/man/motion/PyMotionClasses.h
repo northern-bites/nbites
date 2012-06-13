@@ -377,6 +377,10 @@ public:
 	return motionInterface->isBodyActive();
     }
 
+    bool isStanding() {
+        return motionInterface->isStanding();
+    }
+
     void resetWalkProvider(){
         motionInterface->resetWalkProvider();
     }
