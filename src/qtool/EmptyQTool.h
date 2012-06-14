@@ -12,6 +12,7 @@
 #include <qtabwidget.h>
 #include <QPushButton>
 #include <QToolBar>
+#include <QLabel>
 #include <QScrollArea>
 #include <QResizeEvent>
 #include <QTextStream>
@@ -34,12 +35,16 @@ public:
     EmptyQTool(const char* title = "qTool");
     ~EmptyQTool();
 
+signals:
+	void frameChanged();
+
 protected slots:
     void next();
     void prev();
 	void skipAhead();
 	void skipBack();
     void record();
+	void frameUpdate();
 
 protected:
     virtual void keyPressEvent(QKeyEvent * event);
@@ -53,12 +58,14 @@ protected:
 	QPushButton* FFWButton;
 	QPushButton* RWButton;
     QPushButton* recordButton;
-	QPushButton* scrollButton;
+	QString currFrame;
+	QLabel* frameCounter;
     QToolBar* toolbar;
 	QScrollArea* scrollArea;
 	QSize* tabStartSize;
 	QRect* geom;
 	QSize* scrollBarSize;
+	QAction* addframes;
 
 	void resizeEvent(QResizeEvent*);
 };

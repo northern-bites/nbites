@@ -21,7 +21,7 @@ DataManager::DataManager() :
         parsingBoard(memory),
         loggingBoard(memory),
         is_recording(false) {
-
+	currFrame = 0;
     // not really a memory object, but hey it works
     memory->addObject<overseer::GroundTruth>();
 }

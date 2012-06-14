@@ -43,21 +43,31 @@ public:
     void stopRecording();
     bool isRecording() const { return is_recording; }
 
+	int getCurrFrame(){return currFrame;}
+
 public slots:
     void getNext() {
-        qDebug()<<parsingBoard.parseNextAll();
+        parsingBoard.parseNextAll();
+		currFrame++;
     }
 
     void getPrev() {
-        qDebug()<<parsingBoard.rewindAll();
+        parsingBoard.rewindAll();
+		if(currFrame>0)
+			currFrame--;
+		else currFrame = 0;
     }
 
 	void getSkipAhead(){//skip ahead 10 frames
-		qDebug()<<parsingBoard.parseNextAll(10);
+		parsingBoard.parseNextAll(10);
+		currFrame+=10;
 	}
 
 	void getSkipBack(){ //skip back 10 frames
-		qDebug()<<parsingBoard.rewindAll(10);
+		parsingBoard.rewindAll(10);
+		if(currFrame>10)
+			currFrame-=10;
+		else currFrame = 0;
 	}
 
 
@@ -68,6 +78,7 @@ protected:
     man::memory::parse::ParsingBoard parsingBoard;
     man::memory::log::LoggingBoard loggingBoard;
     bool is_recording;
+	int currFrame;
 
 };
 
