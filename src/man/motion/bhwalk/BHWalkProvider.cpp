@@ -197,6 +197,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
             motionRequest.walkRequest.target.translation.x = command->x_mm;
             motionRequest.walkRequest.target.translation.y = command->y_mm;
 
+            //motionRequest.walkRequest.pedantic = true;
+
             walkingEngine.theMotionRequest = motionRequest;
         }
         //TODO: make special command for stand
@@ -284,8 +286,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 }
 
 bool BHWalkProvider::isStanding() const {
-    return (walkingEngine.theMotionRequest.motion == MotionRequest::stand) ||
-           (walkingEngine.theMotionRequest.motion == MotionRequest::specialAction);
+    return walkingEngine.theMotionRequest.motion == MotionRequest::stand;
 }
 
 bool BHWalkProvider::isWalkActive() const {

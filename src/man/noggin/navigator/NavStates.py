@@ -68,6 +68,7 @@ def walkingTo(nav):
     Walks to a relative location based on odometry
     """
     if nav.firstFrame():
+        helper.stand(nav)
         return nav.stay()
 
     if nav.brain.motion.isStanding():
