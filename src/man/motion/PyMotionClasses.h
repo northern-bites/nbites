@@ -189,14 +189,14 @@ public:
 
 class PyStepCommand : public PyMotionCommand {
 public:
-    PyStepCommand(float x_cms, float m_cms, float theta_degs, int numStep) {
+    PyStepCommand(float x_cms, float m_cms, float theta_degs, float gain=1.0f) {
         //All python units should be in CM and DEG per second
         //C++ is in mm and rads, so we need to convert
         command =
             StepCommand::ptr(new StepCommand(x_cms*CM_TO_MM,
 					     m_cms*CM_TO_MM,
 					     theta_degs*TO_RAD,
-					     numStep));
+					     gain));
     }
 
     StepCommand::ptr getCommand() const {
@@ -375,6 +375,10 @@ public:
 
     bool isBodyActive() {
 	return motionInterface->isBodyActive();
+    }
+
+    bool isStanding() {
+        return motionInterface->isStanding();
     }
 
     void resetWalkProvider(){
