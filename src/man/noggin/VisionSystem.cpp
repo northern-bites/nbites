@@ -22,21 +22,14 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 #ifdef DEBUG_LOCALIZATION
     std::cout << "Using current location " << currentLocation << std::endl;
 #endif
+    // FOR TESTING, should not be in this scope
+    int count = 0;
 
     PF::ParticleIt partIter;
     for(partIter = particles.begin(); partIter != particles.end(); ++partIter)
     {
-//        std::cout << "\n \n \n \n NEW PARTICLE IS BEING UPDATES BY VISION"
-//                  << std::endl;
-//        std::cout << "This particle is at: " << (*partIter).getLocation()
-//                  << " \n";
-
-        // For each particle, compare the estimated distance from
-        // the robot to the object (and angle) to the actual
-        // distance as calculated by the vision system.
-
         float totalWeight = 0.0f;
-        int count = 0;
+//        int count = 0;
 
         // Visual objects
 
@@ -47,11 +40,8 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                         *(partIter), totalWeight, count);
 
         // Visual cross
-
         incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
                                 *(partIter), totalWeight, count);
-
-//        std::cout << count << " " << totalWeight << std::endl;
 
         std::list<VisualCorner> * corners = vision->fieldLines->getCorners();
         std::list<VisualCorner>::const_iterator vc;
@@ -67,14 +57,14 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 
                 for (cc = concreteCorners->begin(); cc != concreteCorners->end(); cc++) {
                     float probability = scoreFromCorner(*vc, **cc, *partIter);
+
                     if (probability > bestProbability)
                         bestProbability = probability;
                 }
 
-                if (bestProbability != 0.0f) {
-                    totalWeight = updateTotalWeight(totalWeight, bestProbability);
-                    count++;
-                }
+                totalWeight = updateTotalWeight(totalWeight, bestProbability);
+                count++;
+
             } else{
                 std::cout << "We saw a corner REALLY far away: "
                         << vc->getDistance()<< " centimeters away" <<std::endl
@@ -83,26 +73,23 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
             }
         }
 
-//        totalWeight /= 2.0f;
-//        totalWeight += 0.5f;
-
         // Make sure that we have made an observation before updating weights.
         if(count > 0)
         {
 #ifdef DEBUG_LOCALIZATION
             std::cout << "Updating particle of previous weight " << (*partIter).getWeight();
 #endif
-        // @todo although this should never happen, it is possible that underflow 
-        // errors cause nan's, which would be problematic for resampling.
-        if(std::isnan(totalWeight) || std::abs(totalWeight) == HUGE_VAL)
-        {
-            std::cout << "Invalid weight calculated!" << std::endl;
-            totalWeight = 0.0f;
-        }
-        // std::cout << "(" << (*partIter).getLocation().x
-        //            << ", " << (*partIter).getLocation().y
-        //            << ", " << (*partIter).getLocation().heading
-        //            << ") : " << totalWeight << std::endl;
+            // @todo although this should never happen, it is possible that underflow
+            // errors cause nan's, which would be problematic for resampling.
+            if(std::isnan(totalWeight) || std::abs(totalWeight) == HUGE_VAL)
+            {
+                std::cout << "Invalid weight calculated!" << std::endl;
+                totalWeight = 0.0f;
+            }
+            // std::cout << "(" << (*partIter).getLocation().x
+            //            << ", " << (*partIter).getLocation().y
+            //            << ", " << (*partIter).getLocation().heading
+            //            << ") : " << totalWeight << std::endl;
             (*partIter).setWeight(totalWeight);
 #ifdef DEBUG_LOCALIZATION
             std::cout << " with new weight " << (*partIter).getWeight() << std::endl;
@@ -117,13 +104,3 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     setUpdated(true);
     return particles;
 }
-
-/**
- * Provides the vision module with a new set of observations.
- *
- * @param newObs the new vector of observations.
- */
-//void VisionSystem::feedObservations(std::vector<PF::Observation> newObs)
-//{
-//    currentObservations = newObs;
-//}

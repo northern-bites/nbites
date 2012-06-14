@@ -172,15 +172,15 @@ namespace PF
             (*iter).setWeight(weight/sum);
         }
 
-        // Update exponential filters for long-term and short-term weights.
-        wSlow = wSlow + parameters.alpha_slow*(averageWeight - wSlow);
-        wFast = wFast + parameters.alpha_fast*(averageWeight - wFast);
+//         // Update exponential filters for long-term and short-term weights.
+//         wSlow = wSlow + parameters.alpha_slow*(averageWeight - wSlow);
+//         wFast = wFast + parameters.alpha_fast*(averageWeight - wFast);
 
-        float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
+//         float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
 
-        float confidence = 1.0f - wFast/wSlow;
-//        std::cout << "The confidence of the particles swarm is: "
-//                  << confidence << std::endl;
+//         float confidence = 1.0f - wFast/wSlow;
+// //        std::cout << "The confidence of the particles swarm is: "
+// //                  << confidence << std::endl;
 
 
 
@@ -228,8 +228,8 @@ namespace PF
         {
             rand = (float)gen();
 
-            if(rand <= injectionProb)
-                numParticlesInjected++;
+//            if(rand <= injectionProb)
+//                numParticlesInjected++;
             //{
             //LocalizationParticle p(Location(xGen(), yGen(), angleGen()),
             //                       0.0f);

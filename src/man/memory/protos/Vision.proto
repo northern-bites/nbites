@@ -5,7 +5,7 @@ message PVision {
     optional int64 timestamp = 1;
     optional PVisualBall visual_ball = 2;
     repeated PVisualCorner visual_corner = 3;
-    optional PVisualFieldObject yglp = 6; 
+    optional PVisualFieldObject yglp = 6;
     optional PVisualFieldObject ygrp = 7;
     optional PVisualRobot red1=8;
     optional PVisualRobot red2=9;
@@ -18,7 +18,7 @@ message PVision {
 
     message PVisualDetection {
 
-		optional float distance = 1;
+	optional float distance = 1;
     	optional sint32 x = 2;
     	optional sint32 y = 3;
     	optional sint32 center_x = 4;
@@ -29,7 +29,7 @@ message PVision {
         optional float elevation = 9;
         optional float distance_sd = 10;
         optional float bearing_sd = 11;
-		optional bool inTopCam = 12;
+	optional bool inTopCam = 12;
 	}
 
     message PVisualBall {

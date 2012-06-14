@@ -139,6 +139,8 @@ void Noggin::initializeLocalization()
                                                        locVisionSystem,
                                                        memory->get<MLocalization>()));
 
+    loc.reset();
+
     ballEKF = boost::shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers

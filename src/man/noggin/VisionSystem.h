@@ -45,18 +45,14 @@ class VisionSystem : public PF::SensorModel
     void incorporateLandmarkObservation(VisualObservationT& observation,
                                                  const Particle& particle,
                                                  float& totalWeight,
-                                                 int& observationCount) {
-
+                                                 int& observationCount){
         if (isSaneLandmarkObservation<VisualObservationT>(observation)) {
-
-            float probability = scoreFromLandmark<VisualObservationT, ConcretePossibilityT>(observation,
-                    *(observation.getPossibilities()->front()), particle);
-
-            if(totalWeight == 0.0f)
-                totalWeight = probability;
-            else
-                totalWeight*= probability;
             observationCount++;
+            float probability = scoreFromLandmark<VisualObservationT, ConcretePossibilityT>
+                                                  (observation,
+                                                   *(observation.getPossibilities()->front()),
+                                                   particle);
+            totalWeight = updateTotalWeight(totalWeight, probability);
         }
     }
 
@@ -93,20 +89,15 @@ class VisionSystem : public PF::SensorModel
 
         float pose_diff_d = NBMath::getHypotenuse(pose.x - particle.getLocation().x,
                                                   pose.y - particle.getLocation().y);
-        std::cout << "pose_diff_d: " << pose_diff_d << "\n";
         boost::math::normal_distribution<float> pDistance(0.0f, distSD);
         float prob_d = boost::math::pdf<float> (pDistance, pose_diff_d);
 
         float pose_diff_h = NBMath::subPIAngle(pose.heading -
                                                particle.getLocation().heading);
-
         boost::math::normal_distribution<float> pHeading(0.0f, headSD);
         float prob_h = boost::math::pdf<float>(pHeading, pose_diff_h);
 
-        std::cout << "NEW? prob_h: " << prob_h << " , prob_d: " << prob_d << "\n\n";
-
         return prob_h * prob_d;
-
     }
 
     static float scoreFromCorner(const VisualCorner& observation,
@@ -127,6 +118,7 @@ class VisionSystem : public PF::SensorModel
         float pose_h = globalPhysicalOrientation - observation.getBearing();
 
         PF::Location reconstructedLocation(pose_x, pose_y, pose_h);
+
         float globalOrientationSD = NBMath::getHypotenuse(observation.getBearingSD(),
                                                           observation.getPhysicalOrientationSD());
         return  scoreParticleAgainstPose(particle,
@@ -137,11 +129,13 @@ class VisionSystem : public PF::SensorModel
 
  private:
     static float updateTotalWeight(float currentTotalWeight, float currentWeight) {
-
+        const float TINY_WEIGHT = .00001;
+        if (currentWeight <=  0)
+            currentWeight = TINY_WEIGHT;
         if(currentTotalWeight == 0.0f)
             currentTotalWeight = currentWeight;
         else
-            currentTotalWeight = currentTotalWeight*currentWeight;
+            currentTotalWeight *= currentWeight;
 
         return currentTotalWeight;
     }

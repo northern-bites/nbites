@@ -13,7 +13,7 @@ using overseer::OverseerClient;
 ConnectTool::ConnectTool() : EmptyQTool("Robot Connection Tool"),
                              dataLoader(new DataLoader(dataManager)),
                              memoryViewer(new MemoryViewer(dataManager)),
-                             fieldViewer(new FieldViewer(dataManager, this)),
+                             fieldViewer(new FieldViewer(dataManager)),
                              overseerClient(new OverseerClient(dataManager,
                                                                this))
 {
@@ -26,7 +26,6 @@ ConnectTool::ConnectTool() : EmptyQTool("Robot Connection Tool"),
 	scrollArea->setWidget(toolTabs);
 	scrollArea->resize(toolTabs->size());
 	this->setCentralWidget(scrollArea);
-	
 	tabStartSize = new QSize(toolTabs->size());
 }
 
