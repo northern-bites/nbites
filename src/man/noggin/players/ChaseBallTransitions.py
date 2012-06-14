@@ -25,7 +25,7 @@ def shouldSpinToBall(player):
     We're not facing the ball well enough yet
     """
     ball = player.brain.ball
-    return (ball.vis.on and
+    return (ball.vis.framesOn > 4 and
             fabs(ball.loc.relY) > constants.SHOULD_SPIN_TO_BALL_Y)
 
 def shouldStopSpinningToBall(player):
@@ -33,7 +33,7 @@ def shouldStopSpinningToBall(player):
     We're done spinning
     """
     ball = player.brain.ball
-    return (ball.vis.on and
+    return (ball.vis.framesOn > 4 and
             fabs(ball.loc.relY) < constants.STOP_SPINNING_TO_BALL_Y)
 
 def shouldApproachBallAgain(player):
