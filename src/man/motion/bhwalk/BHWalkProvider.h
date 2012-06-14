@@ -41,9 +41,7 @@ public:
     virtual ~BHWalkProvider() {}
 
 	// Provide calibration boolean to the rest of the system.
-	bool calibrated() {
-		return walkingEngine.theInertiaSensorData.calibrated;
-	}
+	bool calibrated() const;
 
     void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses();
@@ -79,6 +77,8 @@ public:
     // !isWalkActive() means we're at a complete standstill. everything else is walking.
     bool isWalkActive() const;
 
+    void setStandby(bool value) { standby = value; }
+
     void update(proto::WalkProvider* walkProvider) const;
 
 protected:
@@ -89,6 +89,7 @@ protected:
 
 private:
     bool requestedToStop;
+    bool standby;
     boost::shared_ptr<Sensors> sensors;
     WalkingEngine walkingEngine;
     MotionCommand::ptr currentCommand;

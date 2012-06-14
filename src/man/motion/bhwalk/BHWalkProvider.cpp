@@ -13,7 +13,7 @@ namespace motion {
 using namespace boost;
 using namespace std;
 
-#define DEBUG_BHWALK
+//#define DEBUG_BHWALK
 #ifdef DEBUG_BHWALK
 #define bhwalk_out std::cout
 #else
@@ -100,6 +100,20 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
 
+    if (standby) {
+        MotionRequest motionRequest;
+        motionRequest.motion = MotionRequest::specialAction;
+
+        //TODO: maybe check what kind of special move we're switching to and change this
+        //accordingly
+        motionRequest.specialActionRequest.specialAction = SpecialActionRequest::keeperJumpLeftSign;
+        walkingEngine.theMotionRequest = motionRequest;
+
+        //anything that's not in the walk is marked as unstable
+        walkingEngine.theMotionInfo = MotionInfo();
+        walkingEngine.theMotionInfo.isMotionStable = false;
+
+    } else {
     // Figure out the motion request
     // VERY UGLY! re-factor this please TODO TODO TODO
     if (requestedToStop || !isActive()) {
@@ -195,6 +209,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
         }
         }
     }
+    }
 
     //We only copy joint position, and not temperatures or currents
     //Note: temperatures are unused, and currents are used by the GroundContactDetector
@@ -257,7 +272,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     }
 
     //we only really leave when we do a sweet move, so request a special action
-    if (walkingEngine.theMotionSelection.targetMotion == MotionRequest::specialAction) {
+    if (walkingEngine.theMotionSelection.targetMotion == MotionRequest::specialAction
+            && requestedToStop) {
 
         inactive();
         requestedToStop = false;
@@ -357,6 +373,10 @@ const SupportFoot BHWalkProvider::getSupportFoot() const {
     }
 }
 
+bool BHWalkProvider::calibrated() const {
+    return walkingEngine.theInertiaSensorData.calibrated;
+}
+
 static void copyOver(const Pose2D& target, proto::RobotLocation* location) {
 
     location->set_h(target.rotation);
@@ -373,6 +393,7 @@ void BHWalkProvider::update(proto::WalkProvider* walkProvider) const {
     walkProvider->set_stopping(isStopping());
     walkProvider->set_requested_to_stop(requestedToStop);
     walkProvider->set_is_standing(isStanding());
+    walkProvider->set_calibrated(calibrated());
 
     if (currentCommand.get()) {
         walkProvider->set_command_type(currentCommand->getType());
@@ -394,12 +415,9 @@ void BHWalkProvider::update(proto::WalkProvider* walkProvider) const {
 
     RepeatedFloats* ratios = bhdebug->mutable_select_ratios();
 
-    if (ratios->size() < MotionRequest::numOfMotions) {
-        ratios->Reserve(MotionRequest::numOfMotions);
-    }
-
+    ratios->Clear();
     for (int i = 0; i < MotionRequest::numOfMotions; i++) {
-        ratios->Set(i, walkingEngine.theMotionSelection.ratios[i]);
+        ratios->Add(walkingEngine.theMotionSelection.ratios[i]);
     }
 }
 
