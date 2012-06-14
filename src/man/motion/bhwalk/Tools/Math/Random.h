@@ -20,7 +20,7 @@ static inline float randomFloat() {return float(rand()) * (1.f / static_cast<flo
 * @param n the number of possible return values (0 ... n-1)
 * @return The random number.
 */
-static inline int random(int n) {return (long long)rand() * n / ((unsigned int)RAND_MAX + 1);}
+static inline int random(int n) {return static_cast<int>((long long)rand() * n / ((unsigned int)RAND_MAX + 1));}
 
 /**
 * The function returns a random integer number in the range of [0..n-1].
@@ -32,6 +32,6 @@ static inline int random(short n)
 #if RAND_MAX < 0xffff
   return rand() * n / (RAND_MAX + 1);
 #else
-  return (long long)rand() * n / ((unsigned int)RAND_MAX + 1);
+  return  static_cast<int>((long long)rand() * n / ((unsigned int)RAND_MAX + 1));
 #endif
 }
