@@ -72,6 +72,7 @@ public:
   virtual ~ConfigValue() { }
   enum Type
   {
+    ERROR = -1,
     PLAIN,
     LIST,
     MAP
@@ -244,6 +245,7 @@ public:
   }
   PlainConfigValue& operator<<(const std::string &value);
 
+/*Commented out due to warnings...
   virtual operator PlainConfigValue&()
   {
     return *this;
@@ -252,6 +254,7 @@ public:
   {
     return *this;
   }
+*/
 
   friend class ConfigValue;
 };
@@ -296,6 +299,7 @@ public:
 
   template<typename T> ListConfigValue& operator<<(const std::vector<T> &value);
 
+/*Commented out due to warnings
   virtual operator ListConfigValue&()
   {
     return *this;
@@ -305,6 +309,7 @@ public:
   {
     return *this;
   }
+*/
 
   ConfigValueProxy operator[](size_t index);
   ConfigValueProxy operator[](const std::string &key);
@@ -350,6 +355,8 @@ public:
   size_t length() const;
   void write(const std::string *filename, bool withComment = true, std::string indentation = "") const;
   std::ostream& write(std::ostream &os, bool withComment = true, std::string indentation = "") const;
+
+/*Commented out due to warnings...
   virtual operator ConfigMap&()
   {
     return *this;
@@ -359,6 +366,7 @@ public:
   {
     return *this;
   }
+*/
 
   ConfigValueProxy operator[](const std::string &key);
   const ConfigValue& operator[](const std::string &key) const;
