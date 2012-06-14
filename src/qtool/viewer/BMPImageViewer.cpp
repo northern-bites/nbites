@@ -31,8 +31,18 @@ void BMPImageViewer::updateView() {
         image->updateBitmap();
 
         QImage* qimage = image->getBitmap();
+		QPixmap scaledPixmap = QPixmap::fromImage(*qimage);
+
+		int maxWidth = this->width();
+		int maxHeight = this->height();
+		qDebug()<<maxWidth<<maxHeight;
+
+		if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
+			scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);
+		else scaledPixmap = scaledPixmap.scaledToHeight(maxHeight);
+
         if (qimage) {
-            imagePlaceholder.setPixmap(QPixmap::fromImage(*qimage));
+            imagePlaceholder.setPixmap(scaledPixmap);
         } else {
             imagePlaceholder.setText("Underlying Null image pointer!");
         }
