@@ -49,16 +49,28 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : GoalieStates.watch
             }
 
-        VisualGoalieStates.decideSide.transitions = {
+        VisualGoalieStates.decideLeftSide.transitions = {
             Transition.CountTransition(GoalieTransitions.onLeftSideline,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
             : VisualGoalieStates.walkToGoal,
 
+            Transition.CountTransition(GoalieTransitions.unsure,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.decideRightSide
+            }
+
+        VisualGoalieStates.decideRightSide.transitions = {
             Transition.CountTransition(GoalieTransitions.onRightSideline,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
-            : VisualGoalieStates.walkToGoal
+            : VisualGoalieStates.walkToGoal,
+
+            Transition.CountTransition(GoalieTransitions.unsure,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.decideLeftSide
             }
 
         GoalieStates.watch.transitions = {

@@ -65,12 +65,22 @@ def onLeftSideline(player):
             (player.brain.vision.yglp.on and
              player.brain.vision.yglp.dist > 400.0))
 
+def unsure(player):
+    return (not onLeftSideline(player) and
+            not onRightSideline(player) and
+            player.counter > 60)
+
 def onRightSideline(player):
     """
-    Checks that it is definitely not on the left sideline for at least
-    2 seconds-ish.
+    Looks for the close posts.
     """
-    return not onLeftSideline(player) and player.counter > 60
+    if onLeftSideline(player):
+        return False
+    return ((player.brain.vision.ygrp.on and
+             #magic numbers
+             player.brain.vision.ygrp.dist < 400.0) or
+            (player.brain.vision.yglp.on and
+             player.brain.vision.yglp.dist < 400.0))
 
 def shouldPerformSave(player):
     """

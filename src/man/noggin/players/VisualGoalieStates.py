@@ -185,12 +185,19 @@ def spinToFaceBall(player):
 
     return Transition.getNextState(player, spinToFaceBall)
 
-def decideSide(player):
+def decideLeftSide(player):
     if player.firstFrame():
         player.side = UNKNOWN
         player.brain.tracker.lookToAngle(90)
 
-    return Transition.getNextState(player, decideSide)
+    return Transition.getNextState(player, decideLeftSide)
+
+def decideRightSide(player):
+    if player.firstFrame():
+        player.side = UNKNOWN
+        player.brain.tracker.lookToAngle(goalie.RIGHT_SIDE_ANGLE)
+
+    return Transition.getNextState(player, decideRightSide)
 
 def returnToGoal(player):
     if player.firstFrame():
