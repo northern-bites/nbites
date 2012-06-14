@@ -165,6 +165,10 @@ bool MessageParser::getPrev() {
     return getPrev(1);
 }
 
+int MessageParser::getFrameNum(){
+	return message_sizes.size();
+}
+
 }
 }
 }

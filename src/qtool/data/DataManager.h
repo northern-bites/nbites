@@ -12,6 +12,7 @@
 #pragma once
 
 #include <QObject>
+#include <QDebug>
 
 #include "io/InProvider.h"
 #include "ClassHelper.h"
@@ -44,20 +45,21 @@ public:
 
 public slots:
     void getNext() {
-        parsingBoard.parseNextAll();
+        qDebug()<<parsingBoard.parseNextAll();
     }
 
     void getPrev() {
-        parsingBoard.rewindAll();
+        qDebug()<<parsingBoard.rewindAll();
     }
 
 	void getSkipAhead(){//skip ahead 10 frames
-		parsingBoard.parseNextAll(10);
+		qDebug()<<parsingBoard.parseNextAll(10);
 	}
 
 	void getSkipBack(){ //skip back 10 frames
-		parsingBoard.rewindAll(10);
+		qDebug()<<parsingBoard.rewindAll(10);
 	}
+
 
     void newInputProvider(common::io::InProvider::ptr newInput, std::string name);
     void reset();
