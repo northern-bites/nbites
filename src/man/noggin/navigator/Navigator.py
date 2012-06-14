@@ -142,21 +142,26 @@ class Navigator(FSA.FSA):
         """
         Orbits a point at a certain radius for a certain angle using walkTo
         Splits the command into multiple smaller commands
-        Don't rely on it too much since it depends on the odometry of strafes and turns
-        which slip a lot
-        It will orbit in steps, each orbit taking ~30 degrees (more like 45 when I test it out)
+        Don't rely on it too much since it depends on the odometry of strafes
+        and turns which slip a lot
+        It will orbit in steps, each orbit taking ~30 degrees (more like 45
+        when I test it out)
         """
+        #DEBUG printing
+        print "In navigator, orbit angle is: ",angle
+        #Note: abs(angle) < 45 ALWAYS
+
         NavStates.walkingTo.destQueue.clear()
 
         #@todo: make this a bit nicer or figure out a better way to do it
-        # split it up in 33 degree moves; good enough approximation for small radii
-        for k in range(0, abs(angle) / 33):
+        # split it up in 15 degree moves; good enough approximation for small radii
+        for k in range(0, abs(angle) / 15):
             if angle > 0:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 2, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -30))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 4, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -15))
             else:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 2, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 30))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 4, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 15))
 
         NavStates.walkingTo.speed = FAST_SPEED
         self.switchTo('walkingTo')

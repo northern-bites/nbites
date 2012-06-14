@@ -11,6 +11,7 @@ import man.noggin.kickDecider.HackKickInformation as hackKick
 import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation
 from math import fabs
+import noggin_constants as nogginConstants
 
 def chase(player):
     """
@@ -55,6 +56,7 @@ def approachBall(player):
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+        player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.loc.relY > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -76,16 +78,18 @@ def prepareForKick(player):
 
     prepareForKick.hackKick.collectData()
 
+    # If loc is good, stop pan ASAP and do the kick
+    # Loc is currently never accurate enough @summer 2012
+    #if player.brain.my.locScore == nogginConstants.locScore.GOOD_LOC or \
+    #        player.brain.tracker.isStopped():
     if player.brain.tracker.isStopped():
         prepareForKick.hackKick.calculateDataAverages()
         print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
         print str(player.kick)
-        player.inKickingState = True
-        return player.goNow('positionForKick')
+        return player.goNow('orbitBall')
 
     return player.stay()
-
 
 def positionForKick(player):
     """
@@ -159,13 +163,20 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
+        if player.kick.h == 0:
+            return player.goLater('positionForKick')
         player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.orbitAngle(10, 90) # TODO HACK HACK
+        player.brain.nav.orbitAngle(player.brain.ball.loc.dist, player.kick.h)
 
-    if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
+    if player.brain.nav.isStopped():
         player.inKickingState = False
         player.shouldOrbit = False
-        return player.goLater('lookAround')
+        player.kick.h = 0
+        if player.kick == kicks.ORBIT_KICK_POSITION:
+            return player.goLater('prepareForKick')
+        else:
+            player.kick = prepareForKick.hackKick.checkKickingFoot(player.kick)
+            return player.goLater('positionForKick')
 
     return player.stay()
 

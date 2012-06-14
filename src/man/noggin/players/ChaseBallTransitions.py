@@ -18,7 +18,7 @@ def shouldPrepareForKick(player):
     We're close enough to prepare for a kick
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
+    return ball.vis.framesOn > 4 and ball.dist < constants.PREPARE_FOR_KICK_DIST
 
 def shouldSpinToBall(player):
     """
