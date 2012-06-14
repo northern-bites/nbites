@@ -70,7 +70,7 @@ def walkingTo(nav):
     if nav.firstFrame():
         return nav.stay()
 
-    if nav.brain.motion.isStanding():
+    if nav.brain.motion.isWalkActive():
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
