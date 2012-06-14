@@ -45,32 +45,21 @@ public slots:
     void update();
     void loadColorTable();
 
-    /* void setHorizonDebug(); */
-    /* void setShootingDebug(); */
-    /* void setOpenFieldDebug(); */
-    /* void setEdgeDetectDebug(); */
-    /* void setHoughDebug(); */
-    /* void setRobotsDebug(); */
-    /* void setBallDebug(); */
-    /* void setBallDistDebug(); */
-    /* void setCrossDebug(); */
-    /* void setIdentCornersDebug(); */
-    /* void setFieldEdgeDebug(); */
+    void setPrintObjs(int state);
+    void setPostDebug(int state);
+    void setPostLogic(int state);
+    void setCorrect(int state);
+    void setSanity(int state);
 
-    /* void setPostPrintDebug(); */
-    /* void setPostDebug(); */
-    /* void setPostLogicDebug(); */
-    /* void setPostCorrectDebug(); */
-    /* void setPostSanityDebug(); */
-
-    void setHorizonDebug(int state);
-    void setShootingDebug(int state);
-    void setOpenFieldDebug(int state);
-    void setEdgeDetectionDebug(int state);
-    void setHoughTransformDebug(int state);
-    void setRobotsDebug(int state);
-    void setVisualLinesDebug(int state);
-    void setVisualCornersDebug(int state);
+    void setDebugHorizon(int state);
+    void setDebugShooting(int state);
+    void setDebugOpenField(int state);
+    void setDebugEdgeDetection(int state);
+    void setDebugHoughTransform(int state);
+    void setDebugRobots(int state);
+    void setDebugVisualLines(int state);
+    void setDebugVisualCorners(int state);
+    
     void pixelClicked(int x, int y, int brushSize, bool leftClick);
 
 private:

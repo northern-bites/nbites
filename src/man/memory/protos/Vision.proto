@@ -31,6 +31,7 @@ message PVision {
         optional float elevation = 12;
         optional float distance_sd = 13;
         optional float bearing_sd = 14;
+	optional bool intopcam = 15;
 
 	}
 

@@ -113,14 +113,23 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
         toolBar->addWidget(debug);                  \
     }
 
-    ADD_DEBUG_CHECKBOX("Horizon Debug", setHorizonDebug);
-    ADD_DEBUG_CHECKBOX("Shooting Debug", setShootingDebug);
-    ADD_DEBUG_CHECKBOX("Open Field Debug", setOpenFieldDebug);
-    ADD_DEBUG_CHECKBOX("Edge Detection Debug", setEdgeDetectionDebug);
-    ADD_DEBUG_CHECKBOX("Hough Debug", setHoughTransformDebug);
-    ADD_DEBUG_CHECKBOX("Robot Detection Debug", setRobotsDebug);
-    ADD_DEBUG_CHECKBOX("Visual Line Debug", setVisualLinesDebug);
-    ADD_DEBUG_CHECKBOX("Visual Corner Debug", setVisualCornersDebug);
+    ADD_DEBUG_CHECKBOX("Horizon", setDebugHorizon);
+    ADD_DEBUG_CHECKBOX("Shooting", setDebugShooting);
+    ADD_DEBUG_CHECKBOX("Open Field", setDebugOpenField);
+    ADD_DEBUG_CHECKBOX("Edge Detection", setDebugEdgeDetection);
+    ADD_DEBUG_CHECKBOX("Hough", setDebugHoughTransfrom);
+    ADD_DEBUG_CHECKBOX("Robot Detection", setDebugRobots);
+    ADD_DEBUG_CHECKBOX("Visual Line", setDebugVisualLines);
+    ADD_DEBUG_CHECKBOX("Visual Corner", setDebugVisualCorners);
+    ADD_DEBUG_CHECKBOX("Ball", setDebugBall);
+    ADD_DEBUG_CHECKBOX("Ball Dist", setDebugBallDist);
+    ADD_DEBUG_CHECKBOX("Cross", setCrossDebug);
+    ADD_DEBUG_CHECKBOX("Identify Corners", setDebugIdentifyCorners);
+    ADD_DEBUG_CHECKBOX("Field Edge", setDebugFieldEdge);
+    ADD_DEBUG_CHECKBOX("Post Print", setPrintObjs);
+    ADD_DEBUG_CHECKBOX("Post", setPostDebug);
+    ADD_DEBUG_CHECKBOX("Post Correct", setCorrect);
+    ADD_DEBUG_CHECKBOX("Post Sanity", setSanity);
 
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
@@ -252,102 +261,30 @@ void VisionViewer::loadColorTable(){
   update();
 }
 
-
-// void VisionViewer::setHorizonDebug(){
-//   if (horizonD == false) horizonD = true;
-//   else horizonD = false;
-//   vision->thresh->setHorizonDebug(horizonD);
-// }
-// void VisionViewer::setShootingDebug(){
-//   if (shootD == false) shootD = true;
-//   else shootD = false;
-//   vision->thresh->setDebugShooting(shootD);
-// }
-// void VisionViewer::setOpenFieldDebug(){
-//   if (openFieldD == false) openFieldD = true;
-//   else openFieldD = false;
-//   vision->thresh->setDebugOpenField(openFieldD);
-// }
-// void VisionViewer::setEdgeDetectDebug(){
-//   if (edgeDetectD == false) edgeDetectD = true;
-//   else edgeDetectD = false;
-//   vision->thresh->setDebugEdgeDetection(edgeDetectD);
-// }
-// void VisionViewer::setHoughDebug(){
-//   if (houghD == false) houghD = true;
-//   else houghD = false;
-//   vision->thresh->setDebugHoughTransform(houghD);
-// }
-// void VisionViewer::setRobotsDebug(){
-//   if (robotsD == false) robotsD = true;
-//   else robotsD = false;
-//   vision->thresh->setDebugRobots(robotsD);
-// }
-// void VisionViewer::setBallDebug(){
-//   if (ballD == false) ballD = true;
-//   else ballD = false;
-//   vision->thresh->orange->setDebugBall(ballD);
-// }
-// void VisionViewer::setBallDistDebug(){
-//   if (ballDistD == false) ballDistD = true;
-//   else ballDistD = false;
-//   vision->thresh->orange->setDebugBallDistance(ballDistD);
-// }
-// void VisionViewer::setCrossDebug(){
-//   if (crossD == false) crossD = true;
-//   else crossD = false;
-//   vision->thresh->cross->setCrossDebug(crossD);
-// }
-// void VisionViewer::setIdentCornersDebug(){
-//   if (identCornersD == false) identCornersD = true;
-//   else identCornersD = false;
-//   vision->thresh->context->setDebugIdentifyCorners(identCornersD);
-// }
-// void VisionViewer::setFieldEdgeDebug(){
-//   if (fieldEdgeD == false) fieldEdgeD = true;
-//   else fieldEdgeD = false;
-//   vision->thresh->field->setDebugFieldEdge(robotsD);
-// }
-
-// void VisionViewer::setPostPrintDebug(){
-//   if (postPrintD == false) postPrintD = true;
-//   else postPrintD = false;
-//   vision->thresh->yellow->setPrintObjs(postPrintD);
-// }
-// void VisionViewer::setPostDebug(){
-//   if (postD == false) postD = true;
-//   else postD = false;
-//   vision->thresh->yellow->setPostDebug(postD);
-// }
-// void VisionViewer::setPostLogicDebug(){
-//   if (postLogicD == false) postLogicD = true;
-//   else postLogicD = false;
-//   vision->thresh->yellow->setPostLogic(postLogicD);
-// }
-// void VisionViewer::setPostCorrectDebug(){
-//   if (postCorrectD == false) postCorrectD = true;
-//   else postCorrectD = false;
-//   vision->thresh->yellow->setCorrect(postCorrectD);
-// }
-// void VisionViewer::setPostSanityDebug(){
-//   if (postSanityD == false) postSanityD = true;
-//   else postSanityD = false;
-//   vision->thresh->yellow->setSanity(postSanityD);
-// }
 #define SET_DEBUG(funcName, buttonName)                             \
-    void VisionViewer::set##funcName##Debug(int state) {            \
-        vision->thresh->setDebug##funcName(state == Qt::Checked);   \
+    void VisionViewer::set##funcName(int state) {            \
+        vision->thresh->set##funcName(state == Qt::Checked);   \
         update();                                                   \
     }
 
-SET_DEBUG(Horizon, horizon);
-SET_DEBUG(HoughTransform, hough);
-SET_DEBUG(Shooting, shoot);
-SET_DEBUG(EdgeDetection, edgeDetect);
-SET_DEBUG(OpenField, openField);
-SET_DEBUG(Robots, robots);
-SET_DEBUG(VisualLines, visualLines);
-SET_DEBUG(VisualCorners, visualCorners);
+  SET_DEBUG(DebugHorizon, horizon);
+  SET_DEBUG(DebugHoughTransform, hough);
+  SET_DEBUG(DebugShooting, shoot);
+  SET_DEBUG(DebugEdgeDetection, edgeDetect);
+  SET_DEBUG(DebugOpenField, openField);
+  SET_DEBUG(DebugRobots, robots);
+  SET_DEBUG(DebugVisualLines, visualLines);
+  SET_DEBUG(DebugVisualCorners, visualCorners);
+#define POST_DEBUG(funcName, buttonName)                           \
+  void VisionViewer::set##funcName(int state) {                    \
+      vision->thresh->yellow->set##funcName(state == Qt::Checked); \
+      update();                                                    \
+  }
+  POST_DEBUG(PrintObjs, postPrint);
+  POST_DEBUG(PostDebug, post);
+  POST_DEBUG(PostLogic, postLogic);
+  POST_DEBUG(Correct, postCorrect);
+  POST_DEBUG(Sanity, postSanity);
 
 }
 }
