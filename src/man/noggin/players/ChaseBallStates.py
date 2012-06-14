@@ -11,6 +11,7 @@ import man.noggin.kickDecider.HackKickInformation as hackKick
 import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation
 from math import fabs
+import noggin_constants as nogginConstants
 
 def chase(player):
     """
@@ -76,7 +77,9 @@ def prepareForKick(player):
 
     prepareForKick.hackKick.collectData()
 
-    if player.brain.tracker.isStopped():
+    # If loc is good, stop pan ASAP and do the kick
+    if player.brain.my.getLocScore() == nogginConstants.GOOD_LOC or \
+            player.brain.tracker.isStopped():
         prepareForKick.hackKick.calculateDataAverages()
         print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
