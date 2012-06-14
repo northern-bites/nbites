@@ -68,6 +68,7 @@ def walkingTo(nav):
     Walks to a relative location based on odometry
     """
     if nav.firstFrame():
+        helper.stand(nav)
         return nav.stay()
 
     if nav.brain.motion.isStanding():
@@ -230,19 +231,6 @@ walking.lastSpeeds = constants.ZERO_SPEEDS # useful for knowing if speeds change
 walking.transitions = {}
 
 ### Stopping States ###
-def stop(nav):
-    """
-    Wait until the walk is finished.
-    """
-    if nav.firstFrame():
-        # stop walk vectors
-        helper.stand(nav)
-
-    if not nav.brain.motion.isWalkActive():
-        return nav.goNow('stopped')
-
-    return nav.stay()
-
 def stopped(nav):
     return nav.stay()
 
@@ -253,7 +241,23 @@ def atPosition(nav):
 
     return Transition.getNextState(nav, atPosition)
 
-def standing(nav):
+def stand(nav):
+    """
+    Transitional state between walking and standing
+    Could still be walking, but we can give it new walk commands
+    so we shouldn't wait to go for it to go to standing before we
+    give it new commands
+    """
     if nav.firstFrame():
         helper.stand(nav)
+
+    if not nav.brain.motion.isWalkActive():
+        return nav.goNow('standing')
+
+    return nav.stay()
+
+def standing(nav):
+    """
+    Complete walk standstill
+    """
     return nav.stay()

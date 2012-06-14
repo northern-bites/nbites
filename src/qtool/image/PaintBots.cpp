@@ -14,7 +14,9 @@ using namespace viewer;
 QColor ball = QColor::fromRgb(Color_RGB[Orange]);
 QColor bluePlayer = QColor::fromRgb(Color_RGB[Navy]);
 QColor redPlayer = QColor::fromRgb(Color_RGB[Red]);
-QColor grey = QColor::fromRgb(Color_RGB[Grey]);
+QColor white = QColor::fromRgb(Color_RGB[White]);
+
+QColor playerColor; QPen pen;
 
 int robotDrawSize = 7;
 
@@ -41,7 +43,7 @@ void PaintBots::buildBitmap()
     for(int i = 0; i < locs->getSize(); i++) {
         //set pen/brush for correct team
         QColor playerColor;
-        if(locs->getTeam(i) == 0){
+        if(locs->getTeamColor(i) == 0){
             playerColor = bluePlayer;
         } else {
             playerColor = redPlayer;
@@ -49,6 +51,7 @@ void PaintBots::buildBitmap()
 
         QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
         QPoint ballPt = QPoint(locs->getBallX(i), locs->getBallY(i));
+		QString robotLabel = QString::number(locs->getPlayerNum(i));
 
         //robot
         this->paintDot(painter, playerColor, robotPt);
@@ -73,6 +76,8 @@ void PaintBots::buildBitmap()
             this->paintDot(painter, ball, ballPt, ballDrawSize);
 
             //ball uncertainty
+			//don't draw uncertainty if more than half the field
+			if (!(locs->getBallXUncert(i)*4>FIELD_WIDTH || locs->getBallYUncert(i)*4 > FIELD_HEIGHT))
             this->paintEllipseArea(painter, ball, ballPt,
                                    locs->getBallXUncert(i), locs->getBallYUncert(i));
 
@@ -80,6 +85,12 @@ void PaintBots::buildBitmap()
             painter.setPen(Qt::DashLine);
             painter.drawLine(ballPt, robotPt);
         }
+
+        //robot number
+		painter.setPen(white);
+		this->unTransform(painter);
+		painter.drawText(this->scale*robotPt.x()-3, (FIELD_HEIGHT-robotPt.y())*this->scale+5, robotLabel);
+		this->transformPainterToFieldCoordinates(painter);
 
     }
 }
