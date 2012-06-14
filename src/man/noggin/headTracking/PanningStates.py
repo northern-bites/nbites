@@ -92,7 +92,7 @@ def fullPanFixedPitch(tracker):
     """
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
+        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)

@@ -150,7 +150,7 @@ class Navigator(FSA.FSA):
         NavStates.walkingTo.destQueue.clear()
 
         #@todo: make this a bit nicer or figure out a better way to do it
-        # split it up in 33 degree moves; good enough approximation for small radii
+        # split it up in 15 degree moves; good enough approximation for small radii
         for k in range(0, abs(angle) / 15):
             if angle > 0:
                 NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 4, 0.0))
