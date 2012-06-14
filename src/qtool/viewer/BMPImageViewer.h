@@ -22,16 +22,17 @@ class BMPImageViewer: public QWidget {
 public:
 
     BMPImageViewer(image::BMPImage* image,
-            QWidget *parent = NULL);
+				   QWidget *parent = NULL,
+				   float scale = 1.0f);
 
     virtual ~BMPImageViewer();
 
     virtual QSize minimumSizeHint() const {
-        return QSize(image->getWidth(), image->getHeight());
+        return QSize(image->getWidth()*scale, image->getHeight()*scale);
     }
 
-	virtual unsigned getWidth() { return image->getWidth();}
-	virtual unsigned getHeight() { return image->getHeight();}
+	virtual unsigned getWidth() { return image->getWidth()*scale;}
+	virtual unsigned getHeight() { return image->getHeight()*scale;}
 
 	QVBoxLayout* getLayout();
 
@@ -49,6 +50,7 @@ protected:
     QLabel imagePlaceholder;
 	QVBoxLayout* BMPlayout;
 	QSize imageSize;
+	float scale;
 
 private:
 	bool shouldRedraw;

@@ -52,7 +52,6 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
 
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
-
     QHBoxLayout* bottomLayout = new QHBoxLayout;
 	QVBoxLayout* colorButtons = new QVBoxLayout;
 	QVBoxLayout* leftJunk = new QVBoxLayout;

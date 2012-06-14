@@ -8,7 +8,7 @@ namespace qtool {
 namespace viewer {
 
 BMPImageViewer::BMPImageViewer(image::BMPImage* image,
-        QWidget *parent)
+							   QWidget *parent, float scale)
     : QWidget(parent), image(image) {
     setupUI();
 }
