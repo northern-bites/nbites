@@ -58,7 +58,7 @@ Man::Man (RobotMemory::ptr memory,
 
     // initialize core processing modules
 #ifdef USE_MOTION
-    motion = boost::shared_ptr<Motion> (new Motion(enactor, sensors, pose));
+    motion = boost::shared_ptr<Motion> (new Motion(enactor, sensors, pose, memory->get<MMotion>()));
     guardian->setMotionInterface(motion->getInterface());
 #endif
     // initialize python roboguardian module.
@@ -128,6 +128,10 @@ void Man::stopSubThreads() {
 #ifdef DEBUG_MAN_THREADING
     cout << "Man stopping: " << endl;
 #endif
+
+    //remove stiffnesses
+    cout << "Killing stiffnesses " << endl;
+    motion->getInterface()->sendFreezeCommand(FreezeCommand::ptr(new FreezeCommand()));
 
     loggingBoard->reset();
 
