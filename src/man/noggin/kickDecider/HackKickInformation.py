@@ -370,6 +370,39 @@ class KickInformation:
         else:
             return False
 
+    def checkKickingFoot(self, kick):
+        """
+        Takes a kick and decides which foot to use.
+        """
+        if kick == kicks.RIGHT_SIDE_KICK or \
+                kick == kicks.LEFT_SIDE_KICK:
+            # Side kicks can't change which foot they use.
+            return kick
+        elif kick == kicks.LEFT_SHORT_STRAIGHT_KICK or \
+                kick == kicks.RIGHT_SHORT_STRAIGHT_KICK:
+            if kickWithLeftFoot():
+                kick = kicks.LEFT_SHORT_STRAIGHT_KICK
+            else:
+                kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
+            return kick
+        elif kick == kicks.LEFT_STRAIGHT_KICK or \
+                kick == kicks.RIGHT_STRAIGHT_KICK:
+            if kickWithLeftFoot():
+                kick = kicks.LEFT_STRAIGHT_KICK
+            else:
+                kick = kicks.RIGHT_STRAIGHT_KICK
+            return kick
+        elif kick == kicks.LEFT_SHORT_BACK_KICK or \
+                kick == kicks.RIGHT_SHORT_BACK_KICK:
+            if kickWithLeftFoot():
+                kick = kicks.LEFT_SHORT_BACK_KICK
+            else:
+                kick = kicks.RIGHT_SHORT_BACK_KICK
+            return kick
+        else:
+            # If the case was missed, just return the original kick.
+            return kick
+
     def __str__(self):
         s = ""
         if self.farLeftPostBearing is not None:

@@ -174,6 +174,7 @@ def orbitBall(player):
         if player.kick == kicks.ORBIT_KICK_POSITION:
             return player.goLater('prepareForKick')
         else:
+            player.kick = prepareForKick.hackKick.checkKickingFoot(player.kick)
             return player.goLater('positionForKick')
 
     return player.stay()
