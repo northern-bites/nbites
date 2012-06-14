@@ -7,7 +7,6 @@ from objects import RelLocation, RelRobotLocation, RobotLocation, Location
 def stand(nav):
     createAndSendWalkVector(nav, 0, 0, 0)
 
-
 def getRelativeDestination(my, dest):
 
     field_dest = dest
@@ -30,7 +29,7 @@ def getRelativeDestination(my, dest):
                                 relLocation.bearing)
 
     else:
-        raise TypeError, "dest is not a Location type!" + str(dest)
+        raise TypeError, "Navigator dest is not a Location type!" + str(dest)
 
 def isDestinationRelative(dest):
     return isinstance(dest, RelLocation)
@@ -39,19 +38,23 @@ def adaptSpeed(distance, cutoffDistance, maxSpeed):
     return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
 def getStrafelessDest(dest):
-    if (dest.relX > 150 and dest.relY < 50) or (dest.relX <= 150 and dest.relX > 50 and dest.relY < 20) \
-            or (dest.relX <= 50 and dest.relX > 20 and dest.relY < 10):
+    if ((dest.relX > 150 and dest.relY < 50) or
+        (dest.relX <= 150 and dest.relX > 50 and dest.relY < 20) or
+        (dest.relX <= 50 and dest.relX > 20 and dest.relY < 10)):
         #print "old dest: " + str(dest)
         return RelRobotLocation(dest.relX, 0, dest.relH)
     else:
         return dest
-    
+
 def setDestination(nav, dest, gain = 1.0):
     """
     Calls setDestination within the motion engine
     """
-    nav.currentCommand = \
-        motion.DestinationCommand(x=dest.relX, y=dest.relY, theta=dest.relH, gain=gain)
+    nav.currentCommand = motion.DestinationCommand(x=dest.relX,
+                                                   y=dest.relY,
+                                                   theta=dest.relH,
+                                                   gain=gain)
+
     nav.brain.motion.sendDestCommand(nav.currentCommand)
 
 def getDeltaOdometry(loc, startingOdo):

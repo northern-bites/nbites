@@ -16,13 +16,13 @@ using overseer::OverseerClient;
 
 QTool::QTool() : EmptyQTool("QTOOL"),
                  dataLoader(new DataLoader(dataManager)),
-                 colorCalibrate(new ColorCalibrate(dataManager)),
+                 colorCalibrate(new ColorCalibrate(dataManager, this)),
                  colorTableCreator(new ColorTableCreator(dataManager)),
                  memoryViewer(new MemoryViewer(dataManager)),
                  visionViewer(new VisionViewer(dataManager)),
                  offlineViewer(new OfflineViewer(dataManager->getMemory())),
                  ballEKFViewer(new BallEKFViewer(dataManager)),
-                 fieldViewer(new FieldViewer(dataManager)),
+                 fieldViewer(new FieldViewer(dataManager, this)),
                  overseerClient(new OverseerClient(dataManager, this))
 {
     toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
@@ -46,6 +46,5 @@ QTool::QTool() : EmptyQTool("QTOOL"),
 
 QTool::~QTool() {
 }
-
 }
 
