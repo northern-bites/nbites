@@ -60,6 +60,7 @@ public:
     void signalToParseNext() {
         this->signalToResume();
     }
+	int getFrameNum();
 
 private:
     void increaseBufferSizeTo(uint32_t new_size);

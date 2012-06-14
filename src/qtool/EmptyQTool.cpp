@@ -19,10 +19,14 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 {
     this->setWindowTitle(tr(title));
 
-    toolbar = new QToolBar();
+	toolbar = new QToolBar();
     nextButton = new QPushButton(tr(">"));
     prevButton = new QPushButton(tr("<"));
+	RWButton = new QPushButton(tr("<<<"));
+    FFWButton = new QPushButton(tr(">>>"));
     recordButton = new QPushButton(tr("Rec"));
+	currFrame = QString("   Current Frame: ");
+	frameCounter = new QLabel(currFrame);
     scrollArea = new QScrollArea();
 
     scrollBarSize = new QSize(5, 35);
@@ -30,12 +34,17 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
+	connect(FFWButton, SIGNAL(clicked()), this, SLOT(skipAhead()));
+    connect(RWButton, SIGNAL(clicked()), this, SLOT(skipBack()));
     connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
+	connect(this, SIGNAL(frameChanged()), this, SLOT(frameUpdate()));
 
-
-    toolbar->addWidget(prevButton);
+    toolbar->addWidget(RWButton);
+	toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
+	toolbar->addWidget(FFWButton);
     toolbar->addWidget(recordButton);
+	addframes = toolbar->addWidget(frameCounter);
 
     this->addToolBar(toolbar);
 
@@ -63,10 +72,22 @@ EmptyQTool::~EmptyQTool() {
 
 void EmptyQTool::next() {
     dataManager->getNext();
+    emit frameChanged();
 }
 
 void EmptyQTool::prev() {
     dataManager->getPrev();
+    emit frameChanged();
+}
+
+void EmptyQTool::skipAhead() {
+    dataManager->getSkipAhead();
+    emit frameChanged();
+}
+
+void EmptyQTool::skipBack() {
+    dataManager->getSkipBack();
+    emit frameChanged();
 }
 
 void EmptyQTool::record() {
@@ -83,6 +104,14 @@ void EmptyQTool::record() {
     }
 }
 
+void EmptyQTool::frameUpdate() {
+	toolbar->removeAction(addframes);
+	currFrame = QString("   Current Frame: ");
+	currFrame.append(QString::number(dataManager->getCurrFrame()));
+	frameCounter = new QLabel(currFrame);
+	addframes = toolbar->addWidget(frameCounter);
+}
+
 void EmptyQTool::keyPressEvent(QKeyEvent * event)
 {
     switch (event->key()) {
@@ -95,6 +124,14 @@ void EmptyQTool::keyPressEvent(QKeyEvent * event)
     case Qt::Key_S:
     case Qt::Key_P:
         prev();
+        break;
+    case Qt::Key_H:
+    case Qt::Key_F:
+        skipAhead();
+        break;
+    case Qt::Key_L:
+    case Qt::Key_A:
+        skipAhead();
         break;
     default:
         QWidget::keyPressEvent(event);

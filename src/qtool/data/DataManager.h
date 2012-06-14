@@ -12,6 +12,7 @@
 #pragma once
 
 #include <QObject>
+#include <QDebug>
 
 #include "io/InProvider.h"
 #include "ClassHelper.h"
@@ -42,14 +43,33 @@ public:
     void stopRecording();
     bool isRecording() const { return is_recording; }
 
+	int getCurrFrame(){return currFrame;}
+
 public slots:
     void getNext() {
         parsingBoard.parseNextAll();
+		currFrame++;
     }
 
     void getPrev() {
         parsingBoard.rewindAll();
+		if(currFrame>0)
+			currFrame--;
+		else currFrame = 0;
     }
+
+	void getSkipAhead(){//skip ahead 10 frames
+		parsingBoard.parseNextAll(10);
+		currFrame+=10;
+	}
+
+	void getSkipBack(){ //skip back 10 frames
+		parsingBoard.rewindAll(10);
+		if(currFrame>10)
+			currFrame-=10;
+		else currFrame = 0;
+	}
+
 
     void newInputProvider(common::io::InProvider::ptr newInput, std::string name);
     void reset();
@@ -58,6 +78,7 @@ protected:
     man::memory::parse::ParsingBoard parsingBoard;
     man::memory::log::LoggingBoard loggingBoard;
     bool is_recording;
+	int currFrame;
 
 };
 
