@@ -83,6 +83,7 @@ void Context::init() {
     face = FACING_UNKNOWN;
     objectRightX = -1;
 	objectDistance = 0.0f;
+	debugIdentifyCorners = true;
 }
 
 /**
@@ -890,6 +891,14 @@ void Context::classifyInnerL(VisualCorner & corner) {
 		return;
 	}
 
+	// again, another way of checking, corner far from object, closer to robot
+	if (face != FACING_UNKNOWN &&
+		realDistance(corner.getX(), corner.getY(), objectRightX, objectRightY) >
+		150.0f && objectDistance > cornerDist) {
+		corner.setShape(CIRCLE);
+		return;
+	}
+
     // punt (for now) when we can be sure about what we see
     if (!seeGoalBoxLines && face == FACING_UNKNOWN) {
         lookForFieldCorner(corner, l1, l2);
@@ -1133,6 +1142,12 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
         cout << "T connect to an L, should be goal box " <<
             realLineDistance(t.getTStem()) << " " << l1.getX() << endl;
     }
+	// make sure we aren't side to circle
+	if (realLineDistance(t.getTStem()) > 100.0f) {
+		t.setSecondaryShape(SIDE_T);
+		l1.setShape(CIRCLE);
+		return;
+	}
     // can we determine which side?
     if (l1.getShape() == OUTER_L) {
 		// check if we're right on the side
@@ -1332,9 +1347,25 @@ void Context::checkForBadTID(VisualCorner & first, VisualCorner & second,
 	} else {
 		// we have a CC and something else, let's make sure we don't use it
 		if (first.getShape() == CIRCLE) {
-			second.setShape(CIRCLE);
+			float line1 = realLineDistance(second.getLine1());
+			float line2 = realLineDistance(second.getLine2());
+			cout << "Dists " << line1 << " " << line2 << endl;
+			if (line1 > 100.0f && line2 && 100.0f) {
+				second.setShape(T);
+				second.setSecondaryShape(SIDE_T);
+			} else {
+				second.setShape(CIRCLE);
+			}
 		} else {
-			first.setShape(CIRCLE);
+			float line1 = realLineDistance(first.getLine1());
+			float line2 = realLineDistance(first.getLine2());
+			cout << "Dists " << line1 << " " << line2 << endl;
+			if (line1 > 100.0f && line2 && 100.0f) {
+				first.setShape(T);
+				first.setSecondaryShape(SIDE_T);
+			} else {
+				first.setShape(CIRCLE);
+			}
 		}
 	}
 }
@@ -1456,6 +1487,33 @@ void Context::findCornerRelationship(VisualCorner & first,
 		if (first.getShape() == OUTER_L && second.getShape() == OUTER_L) {
 			checkOuterToOuter(first, second);
 		}
+		if (first.getShape() == CIRCLE && second.getShape() == CIRCLE) {
+			return;
+		}
+		// false corner in the center
+		if (objectDistance > 350.0f) {
+			// TO DO:  instead of resetting, these should be removed
+			if (first.getShape() == CIRCLE) {
+				second.setShape(CIRCLE);
+				return;
+			} else {
+				first.setShape(CIRCLE);
+				return;
+			}
+			return;
+		}
+		// T + CC + ?  usually that ? is a false corner
+		if ((face == FACING_UNKNOWN  || face == FACING_SIDELINE) &&
+			getTCorner() > 0 && (first.getShape() == CIRCLE ||
+								 second.getShape() == CIRCLE)) {
+			// TO DO:  instead of resetting, these should be removed
+			if (first.getShape() == CIRCLE) {
+				second.setShape(CIRCLE);
+			} else {
+				first.setShape(CIRCLE);
+			}
+			return;
+		}
 		// sometimes we see a goal T as a CC
 		if (commonDist < BLUE_GOALBOX_BOTTOM_Y + 20 && (first.getShape() == CIRCLE ||
 														second.getShape() == CIRCLE)) {
@@ -1466,8 +1524,27 @@ void Context::findCornerRelationship(VisualCorner & first,
 			}
 		}
 		if (commonDist > 100.0f) {
-			first.setShape(CIRCLE);
-			second.setShape(CIRCLE);
+			if (first.getShape() == CIRCLE) {
+				float line1 = realLineDistance(second.getLine1());
+				float line2 = realLineDistance(second.getLine2());
+				cout << "Dists " << line1 << " " << line2 << endl;
+				if (line1 > 100.0f && line2 && 100.0f) {
+					second.setShape(T);
+					second.setSecondaryShape(SIDE_T);
+				} else {
+					second.setShape(CIRCLE);
+				}
+			} else {
+				float line1 = realLineDistance(first.getLine1());
+				float line2 = realLineDistance(first.getLine2());
+				cout << "Dists " << line1 << " " << line2 << endl;
+				if (line1 > 100.0f && line2 && 100.0f) {
+					first.setShape(T);
+					first.setSecondaryShape(SIDE_T);
+				} else {
+					first.setShape(CIRCLE);
+				}
+			}
 		}
     }
 }
