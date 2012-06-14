@@ -22,8 +22,24 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal
+            : VisualGoalieStates.spinAtGoal,
 
+            Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.dodgeBall
+            }
+
+        VisualGoalieStates.dodgeBall.transitions = {
+            Transition.CountTransition(GoalieTransitions.reachedTheBall,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : VisualGoalieStates.gatherPostInfo,
+
+            Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.gatherPostInfo
             }
 
         VisualGoalieStates.spinAtGoal.transitions = {
@@ -55,7 +71,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
             : VisualGoalieStates.clearIt
-
             }
 
         VisualGoalieStates.spinToFaceBall.transitions = {
@@ -72,8 +87,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : GoalieStates.kickBall,
 
             Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.HIGH_PRECISION)
+                                       Transition.ALL_OF_THE_TIME,
+                                       90)
             : VisualGoalieStates.returnToGoal,
 
             Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
@@ -85,7 +100,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.returnToGoal
-
             }
 
         VisualGoalieStates.returnToGoal.transitions = {
@@ -93,7 +107,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : GoalieStates.watch
-
             }
 
         VisualGoalieStates.didIKickIt.transitions = {
@@ -106,7 +119,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
             : VisualGoalieStates.returnToGoal
-
             }
 
     def run(self):

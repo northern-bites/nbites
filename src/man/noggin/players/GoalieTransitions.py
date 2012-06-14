@@ -21,6 +21,17 @@ def atGoalArea(player):
     #magic number
     return player.brain.vision.fieldEdge.centerDist < 110.0
 
+def ballIsInMyWay(player):
+    """
+    Checks if robot will run into ball while returning from penalty.
+    """
+    if not player.brain.ball.vis.on:
+        return False
+
+    return (fabs(player.brain.ball.loc.bearing -
+                 player.system.centerGoalBearing()) < 20.0 and
+            player.brain.ball.loc.dist < 100.0)
+
 def facingForward(player):
     """
     Checks if a robot is facing the cross, which is more or less forward
@@ -93,7 +104,7 @@ def ballLostStopChasing(player):
     If the robot does not see the ball while chasing, it is lost.
     """
     if not player.brain.ball.vis.on:
-        return False
+        return True
 
 def ballMovedStopChasing(player):
     """
