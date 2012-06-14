@@ -163,8 +163,8 @@ class KickInformation:
         print "In method shoot."
 
         # Is loc GOOD_ENOUGH for a kick decision?
-        # TODO: make sure this uses orbits
-        if self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
+        # Loc is currently never accurate enough @summer 2012
+        if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
             #DEBUG printing
             print "loc Score is good. Using it to decide kick."
