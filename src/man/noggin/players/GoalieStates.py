@@ -66,7 +66,7 @@ def gamePlaying(player):
 
     if (player.lastDiffState == 'gamePenalized' and
         player.lastStateTime > 25):
-        return player.goLater('decideSide')
+        return player.goLater('decideLeftSide')
 
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
@@ -125,9 +125,9 @@ def kickBall(player):
                                                               0.0)
         player.brain.tracker.trackBallFixedPitch()
         if player.brain.ball.loc.relY < 0:
-            kick = SweetMoves.RIGHT_SHORT_STRAIGHT_KICK
+            kick = SweetMoves.RIGHT_STRAIGHT_KICK
         else:
-            kick = SweetMoves.LEFT_SHORT_STRAIGHT_KICK
+            kick = SweetMoves.LEFT_STRAIGHT_KICK
 
         player.executeMove(kick)
 

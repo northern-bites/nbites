@@ -159,8 +159,6 @@ def clearIt(player):
     clearIt.ballDest.relX = player.brain.ball.loc.relX - 18.0
     clearIt.ballDest.relY = player.brain.ball.loc.relY
 
-    #print "I want to go to " + str(clearIt.ballDest)
-
     return Transition.getNextState(player, clearIt)
 
 def didIKickIt(player):
