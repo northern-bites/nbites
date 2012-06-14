@@ -25,11 +25,11 @@ void InertiaSensorInspector::update(InspectedInertiaSensorData& inertiaSensorDat
   newGyro = Vector2<>(theSensorData.data[SensorData::gyroX], theSensorData.data[SensorData::gyroY]);
   newAcc = Vector3<>(theSensorData.data[SensorData::accX], theSensorData.data[SensorData::accY], theSensorData.data[SensorData::accZ]);
   newAcc *= 9.80665f; // strange unit => metric unit :)
-  if(abs(newGyro.x - lastGyro.x) > p.maxGyroOffset.x ||
-     abs(newGyro.y - lastGyro.y) > p.maxGyroOffset.y ||
-     abs(newAcc.x - lastAcc.x) > p.maxAccOffset.x ||
-     abs(newAcc.y - lastAcc.y) > p.maxAccOffset.y ||
-     abs(newAcc.z - lastAcc.z) > p.maxAccOffset.z)
+  if(fabs(newGyro.x - lastGyro.x) > p.maxGyroOffset.x ||
+     fabs(newGyro.y - lastGyro.y) > p.maxGyroOffset.y ||
+     fabs(newAcc.x - lastAcc.x) > p.maxAccOffset.x ||
+     fabs(newAcc.y - lastAcc.y) > p.maxAccOffset.y ||
+     fabs(newAcc.z - lastAcc.z) > p.maxAccOffset.z)
   {
     if(++inertiaSensorDrops > 3)
     {
