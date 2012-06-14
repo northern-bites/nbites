@@ -38,10 +38,13 @@ void ThresholdedImage::buildBitmap() {
             bitmapLine[i] = threshColor;
         }
     }
+
+    //bitmap = QPixmap::fromImage(QImage);
+	//scaleBitmap_640_480();
 }
 
 void ThresholdedImage::scaleBitmap_640_480() {
-    bitmap.scaled(640, 480);
+    bitmap = bitmap.scaled(640, 480);
 }
 
 void ThresholdedImage::scaleBitmap_320_240() {

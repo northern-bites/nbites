@@ -81,8 +81,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
     connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
 
-    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
-    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
+    //memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+    //memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 
     CollapsibleImageViewer* bottomCIV = new
             CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
@@ -100,8 +100,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     combinedRawImageView->setLayout(layout);
 
     bottomVisionView = new BMPImageViewerListener(bottomVisionImage, this);
-    connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
-            this, SLOT(pixelClicked(int, int, int, bool)));
 
     connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));
@@ -109,6 +107,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     topVisionView = new BMPImageViewer(topVisionImage, this);
     connect(this, SIGNAL(imagesUpdated()),
             topVisionView, SLOT(updateView()));
+    connect(topVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
 
     CollapsibleImageViewer* bottomVisCIV = new CollapsibleImageViewer(bottomVisionView, "Bottom", this);
     CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisionView, "Top", this);

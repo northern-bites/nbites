@@ -23,17 +23,25 @@
 //BH
 #include "WalkingEngine.h"
 
+#include "memory/MObjects.h"
+
 namespace man {
 namespace motion {
+
+using namespace memory;
 
 class BHWalkProvider : public MotionProvider {
 
 public:
-    //TODO: naopose is for nothing, I just kept it here because the WalkProvider is the same
-    //but it should be eliminated from both places (e.g. it is not used here, it is not used
+    //TODO: naopose is for nothing, I just kept it here because the
+	//WalkProvider is the same but it should be eliminated from both
+	//places (e.g. it is not used here, it is not used
     //in walkprovider)
     BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p);
     virtual ~BHWalkProvider() {}
+
+	// Provide calibration boolean to the rest of the system.
+	bool calibrated() const;
 
     void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses();
@@ -42,14 +50,16 @@ public:
 
     void setCommand(const WalkCommand::ptr command);
     void setCommand(const Gait::ptr command) {}
-    void setCommand(const StepCommand::ptr command);
     void setCommand(const DestinationCommand::ptr command);
+    //TODO: I'm taking over StepCommand (currently not used) and making
+    //it an odometry destination walk
+    void setCommand(const StepCommand::ptr command);
 
     std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
         return std::vector<BodyJointCommand::ptr>();
-    }
+	}
 
-    MotionModel getOdometryUpdate();
+    MotionModel getOdometryUpdate() const;
     virtual const SupportFoot getSupportFoot() const;
 
     static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
@@ -61,19 +71,29 @@ public:
                                   INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
     }
 
-    const bool isWalkActive() const {
-        return walkingEngine.theMotionRequest.motion == MotionRequest::stand &&
-               walkingEngine.walkingEngineOutput.isLeavingPossible;
-    }
+    //TODO: rename this to isGoingToStand since it flags whether we are going to
+    //a stand rather than be at a complete standstill
+    bool isStanding() const;
+    // !isWalkActive() means we're at a complete standstill. everything else is walking.
+    bool isWalkActive() const;
+
+    void setStandby(bool value) { standby = value; }
+
+    void update(proto::WalkProvider* walkProvider) const;
 
 protected:
     void stand();
     void setActive() {}
 
+//    void playDead();
+
 private:
     bool requestedToStop;
+    bool standby;
     boost::shared_ptr<Sensors> sensors;
     WalkingEngine walkingEngine;
+    MotionCommand::ptr currentCommand;
+    Pose2D startOdometry;
 };
 
 }

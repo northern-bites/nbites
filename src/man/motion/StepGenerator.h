@@ -136,7 +136,7 @@ public:
     void takeSteps(const float _x, const float _y, const float _theta,
                    const int _numSteps);
 
-    std::vector <float> getOdometryUpdate();
+    std::vector <float> getOdometryUpdate() const;
 
     void resetHard();
 
