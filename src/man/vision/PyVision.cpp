@@ -116,11 +116,13 @@ BOOST_PYTHON_MODULE(vision)
 
     //FieldLines helper classes:/
 
+/*  Commented out to get rid of pesky warnings...
     // FieldLines holds a list of shared_ptrs to VisualLines (linesList)
     class_<std::vector<boost::shared_ptr<VisualLine> > >("LineVec")
         // True is for NoProxy, since boost::shared_ptrs don't need one
         .def(vector_indexing_suite<std::vector<boost::shared_ptr<VisualLine> >, true>())
         ;
+*/
 
     class_<VisualLine, boost::shared_ptr<VisualLine> >("VisualLine", no_init)
         .def_readonly("angle", &VisualLine::getAngle)
@@ -133,10 +135,12 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("possibilities", &VisualLine::getIDs)
         ;
 
+/*  Commented out to get rid of pesky warnings...
     //VisualLine can return a vector of IDs from ConcreteLine
     class_<std::vector<lineID> >("LineIDVec")
         .def(vector_indexing_suite<std::vector<lineID> >())
         ;
+*/
 
     // From ConcreteLine.h, gives the ID of a line
     enum_<lineID>("lineID")
@@ -165,10 +169,12 @@ BOOST_PYTHON_MODULE(vision)
         .value("YELLOW_GOALBOX_RIGHT_LINE", YELLOW_GOALBOX_RIGHT_LINE)
         ;
 
+/*  Commented out to get rid of pesky warnings...
     // FieldLines holds a list of VisualCorners (not pointers) (cornersList)
     class_<std::list<VisualCorner> >("CornerList")
         .def("__iter__", boost::python::iterator<std::list<VisualCorner> >())
         ;
+*/
 
     class_<VisualCorner>("VisualCorner", no_init)
         // From VisualDetection
@@ -181,10 +187,13 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("angleY", &VisualCorner::getAngleYDeg)
         ;
 
+/*  Commented out to get rid of pesky warnings...
     // VisualCorner can return a vector of IDs from ConcreteCorner
     class_<std::vector<cornerID> >("CornerIDVec")
         .def(vector_indexing_suite<std::vector<cornerID> >())
         ;
+
+*/
 
     // From ConcreteCorner.h, gives the ID of a corner
     enum_<cornerID>("cornerID")
@@ -287,9 +296,3 @@ void c_init_vision() {
 void set_vision_pointer (boost::shared_ptr<Vision> visionptr) {
     vision_pointer = visionptr;
 }
-
-
-
-
-
-
