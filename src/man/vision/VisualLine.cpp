@@ -80,15 +80,15 @@ VisualLine::findHoughLineEndpoints(const HoughLine& l,
     point<int> meanPt(static_cast<int>(uMean *  sn + x0) + IMAGE_WIDTH/2,
                       static_cast<int>(uMean * -cs + y0) + IMAGE_HEIGHT/2);
 
-    float xOff = sn * uSd * 1.5;
-    float yOff = -cs * uSd * 1.5;
+    float xOff = sn * uSd * 1.5f;
+    float yOff = -cs * uSd * 1.5f;
 
     // Package and return endpoints
-    point<int> endA(meanPt.x + xOff,
-                    meanPt.y + yOff);
+    point<int> endA(static_cast<int>((float)meanPt.x + xOff),
+                    static_cast<int>((float)meanPt.y + yOff));
 
-    point<int> endB(meanPt.x - xOff,
-                    meanPt.y - yOff);
+    point<int> endB(static_cast<int>((float)meanPt.x - xOff),
+                    static_cast<int>((float)meanPt.y - yOff));
 
     return PointsPair(endA, endB);
 }
