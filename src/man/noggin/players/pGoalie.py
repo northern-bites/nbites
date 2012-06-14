@@ -81,7 +81,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.MOST_OF_THE_TIME,
-                                       Transition.HIGH_PRECISION)
+                                       Transition.OK_PRECISION)
             : VisualGoalieStates.clearIt
             }
 

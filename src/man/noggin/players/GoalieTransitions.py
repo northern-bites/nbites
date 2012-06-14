@@ -99,11 +99,11 @@ def shouldClearBall(player):
         return False
 
     # if definitely within goal box
-    if (player.brain.ball.vis.dist < 70.0):
+    if (player.brain.ball.vis.dist < 80.0):
         return True
 
     # if to sides of box
-    if (player.brain.ball.vis.dist < 120.0 and
+    if (player.brain.ball.vis.dist < 130.0 and
         fabs(player.brain.ball.vis.bearing) > 40.0):
         return True
 
