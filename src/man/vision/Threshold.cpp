@@ -969,7 +969,7 @@ void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
 	cout << "Red " << redTotal << " blue " << navyTotal << endl;
 	cout << "Runs red " << redRun << " navy " << navyRun << endl;
 	cout << "Red cols " << redCols << " navy cols " << navyCols << endl; */
-	if (redRobot || (redCols > 2 * navyCols && redCols > 5) && !navyRobot) {
+	if ((redRobot || (redCols > 2 * navyCols && redCols > 5)) && !navyRobot) {
 		if (debugShot) {
 			cout << "Red goalie " << endl;
 		}
@@ -979,7 +979,7 @@ void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
 		if (rightPost) {
 			vision->ygrp->setRedGoalieCertain();
 		}
-	} else if (navyRobot || (navyCols > 2 * redCols && navyCols > 5) && !redRobot) {
+	} else if ((navyRobot || (navyCols > 2 * redCols && navyCols > 5)) && !redRobot) {
 		if (debugShot) {
 			cout << "Navy goalie " << endl;
 		}
