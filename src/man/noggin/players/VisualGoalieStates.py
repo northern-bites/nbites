@@ -141,7 +141,7 @@ def clearIt(player):
                                             0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
-                              nav.CAREFUL_SPEED)
+                              nav.FAST_SPEED)
 
     # magic number
     clearIt.ballDest.relX = player.brain.ball.loc.relX - 18.0
