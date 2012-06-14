@@ -47,16 +47,21 @@ LEFT_SHORT_SIDE_KICK = Kick("L_Short_Side", x = 13, y = 0,
 RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 13, y = 0,
                              move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
 #new
-LEFT_STRAIGHT_KICK = Kick("L_Quick_Straight", x = 16.5, y = 6,
-                             move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK =Kick("R_Quick_Straight", x = 16.5, y = -6,
-                             move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
+LEFT_STRAIGHT_KICK = Kick("L_Straight", x = 15, y = 6,
+                             move=SweetMoves.LEFT_STRAIGHT_KICK)
+RIGHT_STRAIGHT_KICK =Kick("R_Straight", x = 15, y = -6,
+                             move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
 #new
 LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 17, y =  5.5,
                                    move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 17, y = -5.5,
                                    move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
+#new
+LEFT_QUICK_STRAIGHT_KICK = Kick("L_Quick_Straight", x = 15, y = 5.5,
+                                   move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
+RIGHT_QUICK_STRAIGHT_KICK = Kick("R_Quick_Straight", x = 15, y = -5.5,
+                                   move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
 
 #usopen12 hack
 LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 11, y =  3,
