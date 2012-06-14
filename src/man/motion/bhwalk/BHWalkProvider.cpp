@@ -63,11 +63,12 @@ static const JointData::Joint nb_joint_order[] = {
 BHWalkProvider::BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
         MotionProvider(WALK_PROVIDER), requestedToStop(false),
         sensors(s) {
+    hardReset();
 }
 
 void BHWalkProvider::requestStopFirstInstance() {
     requestedToStop = true;
-    this->stand();
+    bhwalk_out << "stop requested!" << endl;
 }
 
 bool hasLargerMagnitude(float x, float y) {
@@ -78,16 +79,9 @@ bool hasLargerMagnitude(float x, float y) {
     return true; // considers values of 0.0f as always smaller in magnitude than anything
 }
 
-static const float ALLOWED_ROTATION_ERROR = M_PI_FLOAT/36.0f;
-static const float ALLOWED_TRANSLATION_ERROR = 5.0f;
-
-//Pose2D errorOffset(ALLOWED_ROTATION_ERROR, ALLOWED_TRANSLATION_ERROR, ALLOWED_TRANSLATION_ERROR);
-
 // return true if p1 has "passed" p2 (has components values that either have a magnitude
 // larger than the corresponding magnitude p2 within the same sign)
 bool hasPassed(const Pose2D& p1, const Pose2D& p2) {
-
-//    Pose2D p1WithError = p1 + errorOffset;
 
     return (hasLargerMagnitude(p1.rotation, p2.rotation) &&
             hasLargerMagnitude(p1.translation.x, p2.translation.x) &&
@@ -106,22 +100,89 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
 
-    if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+    if (standby) {
+        MotionRequest motionRequest;
+        motionRequest.motion = MotionRequest::specialAction;
 
-        StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
+        //TODO: maybe check what kind of special move we're switching to and change this
+        //accordingly
+        motionRequest.specialActionRequest.specialAction = SpecialActionRequest::keeperJumpLeftSign;
+        walkingEngine.theMotionRequest = motionRequest;
 
-        Pose2D deltaOdometry = walkingEngine.theOdometryData - startOdometry;
-        Pose2D absoluteTarget(command->theta_rads, command->x_mms, command->y_mms);
+        //anything that's not in the walk is marked as unstable
+        walkingEngine.theMotionInfo = MotionInfo();
+        walkingEngine.theMotionInfo.isMotionStable = false;
 
-        Pose2D relativeTarget = absoluteTarget - deltaOdometry;
+    } else {
+    // Figure out the motion request
+    // VERY UGLY! re-factor this please TODO TODO TODO
+    if (requestedToStop || !isActive()) {
+        MotionRequest motionRequest;
+        motionRequest.motion = MotionRequest::specialAction;
 
-//        bhwalk_out << deltaOdometry.rotation << " " << absoluteTarget.rotation << std::endl;
+        //TODO: maybe check what kind of special move we're switching to and change this
+        //accordingly
+        motionRequest.specialActionRequest.specialAction = SpecialActionRequest::keeperJumpLeftSign;
+        walkingEngine.theMotionRequest = motionRequest;
 
-//        bhwalk_out << relativeTarget.translation.x << " " <<
-//                      relativeTarget.translation.y << " " <<
-//                      relativeTarget.rotation << std::endl;
+        currentCommand = MotionCommand::ptr();
 
-        if (!hasPassed(deltaOdometry + walkingEngine.upcomingOdometryOffset, absoluteTarget)) {
+    } else {
+
+        if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+
+            StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
+
+            Pose2D deltaOdometry = walkingEngine.theOdometryData - startOdometry;
+            Pose2D absoluteTarget(command->theta_rads, command->x_mms, command->y_mms);
+
+            Pose2D relativeTarget = absoluteTarget - (deltaOdometry + walkingEngine.upcomingOdometryOffset);
+
+            //        bhwalk_out << deltaOdometry.rotation << " " << absoluteTarget.rotation << std::endl;
+
+            //        bhwalk_out << relativeTarget.translation.x << " " <<
+            //                      relativeTarget.translation.y << " " <<
+            //                      relativeTarget.rotation << std::endl;
+
+            if (!hasPassed(deltaOdometry + walkingEngine.upcomingOdometryOffset, absoluteTarget)) {
+
+                MotionRequest motionRequest;
+                motionRequest.motion = MotionRequest::walk;
+
+                motionRequest.walkRequest.mode = WalkRequest::targetMode;
+
+                motionRequest.walkRequest.speed.rotation = command->gain;
+                motionRequest.walkRequest.speed.translation.x = command->gain;
+                motionRequest.walkRequest.speed.translation.y = command->gain;
+
+                motionRequest.walkRequest.pedantic = true;
+                motionRequest.walkRequest.target = relativeTarget;
+
+                walkingEngine.theMotionRequest = motionRequest;
+
+            } else {
+                currentCommand = MotionCommand::ptr();
+            }
+
+        } else {
+        if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
+
+            WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
+
+            MotionRequest motionRequest;
+            motionRequest.motion = MotionRequest::walk;
+
+            motionRequest.walkRequest.mode = WalkRequest::percentageSpeedMode;
+
+            motionRequest.walkRequest.speed.rotation = command->theta_percent;
+            motionRequest.walkRequest.speed.translation.x = command->x_percent;
+            motionRequest.walkRequest.speed.translation.y = command->y_percent;
+
+            walkingEngine.theMotionRequest = motionRequest;
+        } else {
+        if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
+
+            DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
 
             MotionRequest motionRequest;
             motionRequest.motion = MotionRequest::walk;
@@ -132,13 +193,22 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
             motionRequest.walkRequest.speed.translation.x = command->gain;
             motionRequest.walkRequest.speed.translation.y = command->gain;
 
-            motionRequest.walkRequest.pedantic = true;
-            motionRequest.walkRequest.target = relativeTarget;
+            motionRequest.walkRequest.target.rotation = command->theta_rads;
+            motionRequest.walkRequest.target.translation.x = command->x_mm;
+            motionRequest.walkRequest.target.translation.y = command->y_mm;
 
             walkingEngine.theMotionRequest = motionRequest;
-        } else {
-            this->stand();
         }
+        //TODO: make special command for stand
+        if (!currentCommand.get()) {
+            MotionRequest motionRequest;
+            motionRequest.motion = MotionRequest::stand;
+
+            walkingEngine.theMotionRequest = motionRequest;
+        }
+        }
+        }
+    }
     }
 
     //We only copy joint position, and not temperatures or currents
@@ -201,7 +271,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);
     }
 
-    if (requestedToStop && walkingEngine.walkingEngineOutput.isLeavingPossible) {
+    //we only really leave when we do a sweet move, so request a special action
+    if (walkingEngine.theMotionSelection.targetMotion == MotionRequest::specialAction
+            && requestedToStop) {
+
         inactive();
         requestedToStop = false;
         //reset odometry - this allows the walk to not "freak out" when we come back
@@ -210,18 +283,19 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     }
 }
 
-const bool BHWalkProvider::isStanding() const {
-        return walkingEngine.theMotionRequest.motion == MotionRequest::stand;
-    }
+bool BHWalkProvider::isStanding() const {
+    return (walkingEngine.theMotionRequest.motion == MotionRequest::stand) ||
+           (walkingEngine.theMotionRequest.motion == MotionRequest::specialAction);
+}
+
+bool BHWalkProvider::isWalkActive() const {
+    return !(isStanding() && walkingEngine.walkingEngineOutput.isLeavingPossible) && isActive();
+}
 
 void BHWalkProvider::stand() {
     bhwalk_out << "BHWalk stand requested" << endl;
-    MotionRequest motionRequest;
-    motionRequest.motion = MotionRequest::stand;
 
-    walkingEngine.theMotionRequest = motionRequest;
     currentCommand = MotionCommand::ptr();
-
     active();
 }
 
@@ -232,11 +306,28 @@ MotionModel BHWalkProvider::getOdometryUpdate() const {
 }
 
 void BHWalkProvider::hardReset() {
-    stand();
+
     inactive();
     //reset odometry
     walkingEngine.theOdometryData = OdometryData();
+
+    MotionRequest motionRequest;
+    motionRequest.motion = MotionRequest::specialAction;
+
+    motionRequest.specialActionRequest.specialAction = SpecialActionRequest::standUpBackNao;
+    currentCommand = MotionCommand::ptr();
+
+    requestedToStop = false;
 }
+
+//void BHWalkProvider::playDead() {
+//    MotionRequest motionRequest;
+//    motionRequest.motion = MotionRequest::specialAction;
+//
+//    motionRequest.specialActionRequest.specialAction = SpecialActionRequest::playDead;
+//
+//    currentCommand = MotionCommand::ptr();
+//}
 
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 
@@ -244,16 +335,6 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
         this->stand();
         return;
     }
-
-    MotionRequest motionRequest;
-    motionRequest.motion = MotionRequest::walk;
-
-    motionRequest.walkRequest.mode = WalkRequest::percentageSpeedMode;
-
-    motionRequest.walkRequest.speed.rotation = command->theta_percent;
-    motionRequest.walkRequest.speed.translation.x = command->x_percent;
-    motionRequest.walkRequest.speed.translation.y = command->y_percent;
-    walkingEngine.theMotionRequest = motionRequest;
 
     currentCommand = command;
 
@@ -271,7 +352,7 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
     startOdometry = walkingEngine.theOdometryData;
     currentCommand = command;
 
-    bhwalk_out << "BHWalk destination walk requested with command ";
+    bhwalk_out << "BHWalk step walk requested with command ";
     bhwalk_out << *(command.get()) << endl;
 
     active();
@@ -279,22 +360,7 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
 
 void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 
-    MotionRequest motionRequest;
-    motionRequest.motion = MotionRequest::walk;
-
-    motionRequest.walkRequest.mode = WalkRequest::targetMode;
-
-    motionRequest.walkRequest.speed.rotation = command->gain;
-    motionRequest.walkRequest.speed.translation.x = command->gain;
-    motionRequest.walkRequest.speed.translation.y = command->gain;
-
-    motionRequest.walkRequest.target.rotation = command->theta_rads;
-    motionRequest.walkRequest.target.translation.x = command->x_mm;
-    motionRequest.walkRequest.target.translation.y = command->y_mm;
-
-    walkingEngine.theMotionRequest = motionRequest;
-
-    currentCommand == command;
+    currentCommand = command;
 
     bhwalk_out << "BHWalk destination walk requested with command ";
     bhwalk_out << *(command.get()) << endl;
@@ -310,13 +376,52 @@ const SupportFoot BHWalkProvider::getSupportFoot() const {
     }
 }
 
+bool BHWalkProvider::calibrated() const {
+    return walkingEngine.theInertiaSensorData.calibrated;
+}
+
+static void copyOver(const Pose2D& target, proto::RobotLocation* location) {
+
+    location->set_h(target.rotation);
+    location->set_x(target.translation.x);
+    location->set_y(target.translation.y);
+}
+
 void BHWalkProvider::update(proto::WalkProvider* walkProvider) const {
 
+    using namespace proto;
+
     walkProvider->set_active(isActive());
+    walkProvider->set_is_walking(isWalkActive());
     walkProvider->set_stopping(isStopping());
     walkProvider->set_requested_to_stop(requestedToStop);
+    walkProvider->set_is_standing(isStanding());
+    walkProvider->set_calibrated(calibrated());
 
-    walkProvider->mutable_bhdebug()->set_motion_type(walkingEngine.theMotionRequest.motion);
+    if (currentCommand.get()) {
+        walkProvider->set_command_type(currentCommand->getType());
+    } else {
+        walkProvider->set_command_type(-1);
+    }
+
+    WalkProvider::BHDebug* bhdebug = walkProvider->mutable_bhdebug();
+
+    bhdebug->set_motion_type(walkingEngine.theMotionRequest.motion);
+    bhdebug->set_motion_name(MotionRequest::getName(walkingEngine.theMotionRequest.motion));
+
+    bhdebug->set_selected_motion_type(walkingEngine.theMotionSelection.targetMotion);
+    bhdebug->set_selected_motion_name(MotionRequest::getName(walkingEngine.theMotionSelection.targetMotion));
+
+    copyOver(walkingEngine.theMotionRequest.walkRequest.target, bhdebug->mutable_target());
+    copyOver(walkingEngine.theMotionRequest.walkRequest.speed, bhdebug->mutable_speeds());
+
+
+    RepeatedFloats* ratios = bhdebug->mutable_select_ratios();
+
+    ratios->Clear();
+    for (int i = 0; i < MotionRequest::numOfMotions; i++) {
+        ratios->Add(walkingEngine.theMotionSelection.ratios[i]);
+    }
 }
 
 }

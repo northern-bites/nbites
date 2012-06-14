@@ -41,9 +41,7 @@ public:
     virtual ~BHWalkProvider() {}
 
 	// Provide calibration boolean to the rest of the system.
-	bool calibrated() {
-		return walkingEngine.theInertiaSensorData.calibrated;
-	}
+	bool calibrated() const;
 
     void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses();
@@ -73,7 +71,13 @@ public:
                                   INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
     }
 
-    const bool isStanding() const;
+    //TODO: rename this to isGoingToStand since it flags whether we are going to
+    //a stand rather than be at a complete standstill
+    bool isStanding() const;
+    // !isWalkActive() means we're at a complete standstill. everything else is walking.
+    bool isWalkActive() const;
+
+    void setStandby(bool value) { standby = value; }
 
     void update(proto::WalkProvider* walkProvider) const;
 
@@ -81,8 +85,11 @@ protected:
     void stand();
     void setActive() {}
 
+//    void playDead();
+
 private:
     bool requestedToStop;
+    bool standby;
     boost::shared_ptr<Sensors> sensors;
     WalkingEngine walkingEngine;
     MotionCommand::ptr currentCommand;

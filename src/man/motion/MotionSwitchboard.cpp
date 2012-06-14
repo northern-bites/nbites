@@ -300,8 +300,18 @@ void MotionSwitchboard::processBodyJoints()
 #endif
     if (curProvider->isActive())
     {
-        //Request new joints
-        curProvider->calculateNextJointsAndStiffnesses();
+        //TODO: move this
+        //let the walk engine know if it's in use or in standby
+        if (curProvider != &walkProvider) {
+            walkProvider.setStandby(true);
+            //"fake" calculate - this is just for the sensor computation
+            walkProvider.calculateNextJointsAndStiffnesses();
+            curProvider->calculateNextJointsAndStiffnesses();
+        } else {
+            walkProvider.setStandby(false);
+            walkProvider.calculateNextJointsAndStiffnesses();
+        }
+
         const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
         const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
         const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
@@ -355,6 +365,9 @@ void MotionSwitchboard::preProcessHead()
         nextHeadProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
+        swapHeadProvider();
+        // skip other checks if we're resetting hard
+        return ;
     }
 
     if (curHeadProvider != nextHeadProvider)
