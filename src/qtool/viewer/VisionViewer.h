@@ -77,11 +77,6 @@ private:
     boost::shared_ptr<Sensors> sensors;
     man::memory::MVision::ptr offlineMVision;
 
-    /* bool horizonD, shootD, openFieldD, edgeDetectD, houghD, robotsD; */
-    /* bool ballD, ballDistD, identCornersD, dangerousBallD, fieldEdgeD; */
-    /* bool crossD, postPrintD, postD, postLogicD, postCorrectD, postSanityD; */
-    /* bool vertEdgeD, horEdgeD, secVertD, createLD, fitPointD, joinLD; */
-    /* bool intersectLD, CcScanD, riskyCornerD, cornObjDistD; */
 
     MObjectViewer* offlineVisionView;
 

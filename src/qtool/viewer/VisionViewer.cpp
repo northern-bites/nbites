@@ -45,67 +45,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     toolBar->addWidget(loadTableButton);
     this->addToolBar(toolBar);
 
-
-    // QCheckBox* horizonDebug = new QCheckBox(tr("Horizon"));
-    // connect(horizonDebug, SIGNAL(clicked()), this, SLOT(setHorizonDebug()));
-    // toolBar->addWidget(horizonDebug);
-    // QCheckBox* shootingDebug = new QCheckBox(tr("Shooting"));
-    // connect(shootingDebug, SIGNAL(clicked()), this, SLOT(setShootingDebug()));
-    // toolBar->addWidget(shootingDebug);
-    // QCheckBox* openFieldDebug = new QCheckBox(tr("Open Field"));
-    // connect(openFieldDebug, SIGNAL(clicked()), this, SLOT(setOpenFieldDebug()));
-    // toolBar->addWidget(openFieldDebug);
-    // QCheckBox* EdgeDetectionDebug = new QCheckBox(tr("Edge Detection"));
-    // connect(EdgeDetectionDebug, SIGNAL(clicked()), this, SLOT(setEdgeDetectDebug()));
-    // toolBar->addWidget(EdgeDetectionDebug);
-    // QCheckBox* houghDebug = new QCheckBox(tr("Hough"));
-    // connect(houghDebug, SIGNAL(clicked()), this, SLOT(setHoughDebug()));
-    // toolBar->addWidget(houghDebug);
-    // QCheckBox* robotsDebug = new QCheckBox(tr("Robots"));
-    // connect(robotsDebug, SIGNAL(clicked()), this, SLOT(setRobotsDebug()));
-    // toolBar->addWidget(robotsDebug);
-    // QCheckBox* ballDebug = new QCheckBox(tr("Ball"));
-    // connect(ballDebug, SIGNAL(clicked()), this, SLOT(setBallDebug()));
-    // toolBar->addWidget(ballDebug);
-    // QCheckBox* ballDistanceDebug = new QCheckBox(tr("Ball Distance"));
-    // connect(ballDistanceDebug, SIGNAL(clicked()), this, SLOT(setBallDistDebug()));
-    // toolBar->addWidget(ballDistanceDebug);
-    // QCheckBox* crossDebug = new QCheckBox(tr("Cross"));
-    // connect(crossDebug, SIGNAL(clicked()), this, SLOT(setCrossDebug()));
-    // toolBar->addWidget(crossDebug);
-    // QCheckBox* identCornersDebug = new QCheckBox(tr("Identify Corners"));
-    // connect(identCornersDebug, SIGNAL(clicked()), this, SLOT(setIdentCornersDebug()));
-    // toolBar->addWidget(identCornersDebug);
-    // QCheckBox* dangerousBallDebug = new QCheckBox(tr("Dangerous Ball"));
-    // connect(dangerousBallDebug, SIGNAL(clicked()), this, SLOT(setDangerousBallDebug()));
-    // toolBar->addWidget(dangerousBallDebug);
-    // QCheckBox* fieldEdgeDebug = new QCheckBox(tr("Field Edge"));
-    // connect(fieldEdgeDebug, SIGNAL(clicked()), this, SLOT(setFieldEdgeDebug()));
-    // toolBar->addWidget(fieldEdgeDebug);
-
-    // QCheckBox* postPrintDebug = new QCheckBox(tr("Post Print"));
-    // connect(postPrintDebug, SIGNAL(clicked()), this, SLOT(setPostPrintDebug()));
-    // toolBar->addWidget(postPrintDebug);
-    // QCheckBox* postDebug = new QCheckBox(tr("Post"));
-    // connect(postDebug, SIGNAL(clicked()), this, SLOT(setPostDebug()));
-    // toolBar->addWidget(postDebug);
-    // QCheckBox* postLogicDebug = new QCheckBox(tr("Post Logic"));
-    // connect(postDebug, SIGNAL(clicked()), this, SLOT(setPostLogicDebug()));
-    // toolBar->addWidget(postLogicDebug);
-    // QCheckBox* postCorrectDebug = new QCheckBox(tr("Post Correct"));
-    // connect(postCorrectDebug, SIGNAL(clicked()), this, SLOT(setPostCorrectDebug()));
-    // toolBar->addWidget(postCorrectDebug);
-    // QCheckBox* postSanityDebug = new QCheckBox(tr("Post Sanity"));
-    // connect(postSanityDebug, SIGNAL(clicked()), this, SLOT(setPostSanityDebug()));
-    // toolBar->addWidget(postSanityDebug);
- 
-
-    // horizonD = shootD = openFieldD = edgeDetectD = houghD = robotsD = false;
-    // ballD = ballDistD = crossD = identCornersD = dangerousBallD = fieldEdgeD = false;
-    // postPrintD = postD = postLogicD = postCorrectD = postSanityD = false;
-    // vertEdgeD = horEdgeD = secVertD = createLD = fitPointD = joinLD = false;
-    // intersectLD = CcScanD = riskyCornerD = cornObjDistD = false;
-
 #define ADD_DEBUG_CHECKBOX(text, func) {            \
         QCheckBox* debug = new QCheckBox(tr(text)); \
         connect(debug, SIGNAL(stateChanged(int)),   \
@@ -170,6 +109,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     combinedRawImageView->setLayout(layout);
 
     bottomVisionView = new BMPImageViewerListener(bottomVisionImage, this);
+    connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
 
     connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));
@@ -177,8 +118,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     topVisionView = new BMPImageViewer(topVisionImage, this);
     connect(this, SIGNAL(imagesUpdated()),
             topVisionView, SLOT(updateView()));
-    connect(topVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
-            this, SLOT(pixelClicked(int, int, int, bool)));
 
     CollapsibleImageViewer* bottomVisCIV = new CollapsibleImageViewer(bottomVisionView, "Bottom", this);
     CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisionView, "Top", this);
