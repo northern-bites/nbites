@@ -78,7 +78,7 @@ def prepareForKick(player):
     prepareForKick.hackKick.collectData()
 
     # If loc is good, stop pan ASAP and do the kick
-    if player.brain.my.getLocScore() == nogginConstants.GOOD_LOC or \
+    if player.brain.my.locScore == nogginConstants.locScore.GOOD_LOC or \
             player.brain.tracker.isStopped():
         prepareForKick.hackKick.calculateDataAverages()
         print str(prepareForKick.hackKick)

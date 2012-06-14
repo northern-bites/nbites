@@ -157,13 +157,18 @@ class KickInformation:
         """
         returns the kick we should do in a shooting situation
         """
+        kick = None
 
         # DEBUG printing
         print "In method shoot."
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # TODO: make sure this uses orbits
-        if False: #self.brain.my.getLocScore() == nogginConstants.GOOD_LOC:
+        if self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
+
+            #DEBUG printing
+            print "loc Score is good. Using it to decide kick."
+
             relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Location(670,270))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
@@ -174,16 +179,24 @@ class KickInformation:
 
             if bearingDifference < 45 and bearingDifference > -45:
                 #choose straight kick!
-                return self.chooseQuickFrontKick()
+                kick = self.chooseQuickFrontKick()
+                kick.h = 0 - bearingDifference
+                return kick
             elif bearingDifference > 45 and bearingDifference < 135:
                 #choose a right side kick! (using right foot)
-                return kicks.RIGHT_SIDE_KICK
+                kick = kicks.RIGHT_SIDE_KICK
+                kick.h = 90 - bearingDifference
+                return kick
             elif bearingDifference < -45 and bearingDifference > -135:
                 #choose a left side kick! (using left foot)
-                return kicks.LEFT_SIDE_KICK
+                kick = kicks.LEFT_SIDE_KICK
+                kick.h = -90 - bearingDifference
+                return kick
             else:
                 #choose a back kick!
-                return self.chooseBackKick()
+                kick = self.chooseBackKick()
+                kick.h = 1 #HACK
+                return kick
 
 
         # Loc is bad- use only visual information to choose a kick.
@@ -260,8 +273,6 @@ class KickInformation:
         # DEBUG printing
         print "rightScorePoint: ",rightScorePoint
         print "leftScorePoint:  ",leftScorePoint
-
-        kick = None
 
         # If any kick is currently valid, choose that kick.
         if leftScorePoint > 0 and rightScorePoint < 0:
@@ -380,21 +391,21 @@ class KickInformation:
             return kick
         elif kick == kicks.LEFT_SHORT_STRAIGHT_KICK or \
                 kick == kicks.RIGHT_SHORT_STRAIGHT_KICK:
-            if kickWithLeftFoot():
+            if self.kickWithLeftFoot():
                 kick = kicks.LEFT_SHORT_STRAIGHT_KICK
             else:
                 kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             return kick
         elif kick == kicks.LEFT_STRAIGHT_KICK or \
                 kick == kicks.RIGHT_STRAIGHT_KICK:
-            if kickWithLeftFoot():
+            if self.kickWithLeftFoot():
                 kick = kicks.LEFT_STRAIGHT_KICK
             else:
                 kick = kicks.RIGHT_STRAIGHT_KICK
             return kick
         elif kick == kicks.LEFT_SHORT_BACK_KICK or \
                 kick == kicks.RIGHT_SHORT_BACK_KICK:
-            if kickWithLeftFoot():
+            if self.kickWithLeftFoot():
                 kick = kicks.LEFT_SHORT_BACK_KICK
             else:
                 kick = kicks.RIGHT_SHORT_BACK_KICK
