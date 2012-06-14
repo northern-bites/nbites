@@ -891,6 +891,14 @@ void Context::classifyInnerL(VisualCorner & corner) {
 		return;
 	}
 
+	// again, another way of checking, corner far from object, closer to robot
+	if (face != FACING_UNKNOWN &&
+		realDistance(corner.getX(), corner.getY(), objectRightX, objectRightY) >
+		150.0f && objectDistance > cornerDist) {
+		corner.setShape(CIRCLE);
+		return;
+	}
+
     // punt (for now) when we can be sure about what we see
     if (!seeGoalBoxLines && face == FACING_UNKNOWN) {
         lookForFieldCorner(corner, l1, l2);
@@ -1134,6 +1142,12 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
         cout << "T connect to an L, should be goal box " <<
             realLineDistance(t.getTStem()) << " " << l1.getX() << endl;
     }
+	// make sure we aren't side to circle
+	if (realLineDistance(t.getTStem()) > 100.0f) {
+		t.setSecondaryShape(SIDE_T);
+		l1.setShape(CIRCLE);
+		return;
+	}
     // can we determine which side?
     if (l1.getShape() == OUTER_L) {
 		// check if we're right on the side
