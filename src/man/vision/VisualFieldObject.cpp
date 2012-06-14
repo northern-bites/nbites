@@ -47,6 +47,10 @@ void VisualFieldObject::init(){
     elevation = 0;
     idCertainty = NOT_SURE;
     on = false;
+	almostCertainlyRedGoalie = false;
+	almostCertainlyNavyGoalie = false;
+	probablyRedGoalie = false;
+	probablyNavyGoalie = false;
 
     switch (id) {
     case BLUE_GOAL_LEFT_POST:

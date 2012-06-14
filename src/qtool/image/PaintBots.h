@@ -23,7 +23,6 @@ namespace qtool {
 namespace image {
 
 class PaintBots : public PaintFieldOverlay {
-
     Q_OBJECT
 
 public:
