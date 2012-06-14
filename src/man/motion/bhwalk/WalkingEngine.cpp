@@ -221,7 +221,7 @@ void WalkingEngine::update()
 
     //calibrate joints
     for(int i = 0; i < JointData::numOfJoints; ++i) {
-        theJointData.angles[i] = theJointData.angles[i] * theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
+        theJointData.angles[i] = theJointData.angles[i] * (float)theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
     }
     //calibrate sensors
     theSensorData.data[SensorData::gyroX] *= theSensorCalibration.gyroXGain / 1600;
