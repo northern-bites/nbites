@@ -20,6 +20,10 @@
 namespace man {
 namespace memory {
 
+namespace protobuf = google::protobuf;
+
+typedef protobuf::RepeatedField<float> RepeatedFloats;
+
 //being lazy ...
 
 #define ADD_MEMORY_OBJECT(classType, protoType) \

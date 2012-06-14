@@ -302,6 +302,8 @@ void MotionSwitchboard::processBodyJoints()
     {
         //Request new joints
         curProvider->calculateNextJointsAndStiffnesses();
+        //also let the walkProvider now about what we're doing
+        //useful in transitions between body providers
         const vector <float > llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
         const vector <float > rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
         const vector <float > rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
@@ -355,6 +357,9 @@ void MotionSwitchboard::preProcessHead()
         nextHeadProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
+        swapHeadProvider();
+        // skip other checks if we're resetting hard
+        return ;
     }
 
     if (curHeadProvider != nextHeadProvider)

@@ -131,8 +131,12 @@ class Navigator(FSA.FSA):
         self.switchTo('walkingTo')
 
     def stop(self):
-        if self.currentState not in ['stop', 'stopped']:
-            self.switchTo('stop')
+        """
+        This is the same as standing because to end a walk
+        we just make it stand
+        """
+        if self.currentState not in ['stopped', 'stand', 'standing']:
+            self.stand()
 
     def orbitAngle(self, radius, angle):
         """
@@ -174,11 +178,14 @@ class Navigator(FSA.FSA):
         Make the robot stand; Standing should be the default action when we're not
         walking/executing a sweet move
         """
-        self.switchTo('standing')
+        self.switchTo('stand')
 
     # informative methods
     def isAtPosition(self):
         return self.currentState is 'atPosition'
+
+    def isStanding(self):
+        return self.currentState in ['standing', 'stand']
 
     def isStopped(self):
         return self.currentState in ['stopped', 'standing']
