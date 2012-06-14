@@ -23,6 +23,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : VisualGoalieStates.spinAtGoal
+
             }
 
         VisualGoalieStates.spinAtGoal.transitions = {

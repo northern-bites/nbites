@@ -51,24 +51,29 @@ def walkToGoal(player):
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
+        # first decide which side you're coming in from
         if ((hasattr(walkToGoal, 'incomingTransition') and
              walkToGoal.incomingTransition.condition == onRightSideline) or
             player.lastState == 'gameReady'):
             player.side = RIGHT
+        else:
+            player.side = LEFT
+
+        # based on that side, set up post observations
+        if player.side == RIGHT:
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
             player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
                                      goalie.RIGHT_SIDE_RP_ANGLE,
                                      goalie.RIGHT_SIDE_LP_DISTANCE,
                                      goalie.RIGHT_SIDE_LP_ANGLE)
-        else:
-            player.side = LEFT
+        if player.side == LEFT:
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
             player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
                                      goalie.LEFT_SIDE_RP_ANGLE,
                                      goalie.LEFT_SIDE_LP_DISTANCE,
                                      goalie.LEFT_SIDE_LP_ANGLE)
 
-        player.system.home.relH = 0
+        player.system.home.relH = player.system.centerGoalBearing()
 
         player.brain.nav.goTo(player.system.home,
                               nav.CLOSE_ENOUGH, nav.FAST_SPEED)
@@ -80,6 +85,7 @@ def walkToGoal(player):
 
     player.system.home.relY = player.system.centerGoalRelY()
     player.system.home.relX = player.system.centerGoalRelX()
+    player.system.home.relH = player.system.centerGoalBearing()
 
     if DEBUG_APPROACH:
         print "BEARINGS " + str(player.system.centerGoalBearing())
@@ -130,8 +136,8 @@ def clearIt(player):
             player.side = RIGHT
         else:
             player.side = LEFT
-        clearIt.ballDest = RelRobotLocation(returnToGoal.storedHome.relX,
-                                            returnToGoal.storedHome.relY,
+        clearIt.ballDest = RelRobotLocation(player.brain.ball.loc.relX - 18.0,
+                                            player.brain.ball.loc.relY,
                                             0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
@@ -176,12 +182,12 @@ def returnToGoal(player):
     if player.firstFrame():
         if player.lastDiffState == 'didIKickIt':
             correctedDest = returnToGoal.storedOdo- returnToGoal.kickPose
-            correctedDest.relX = correctedDest.relX - 5.0
+            correctedDest.relX = correctedDest.relX - 10.0
 
         else:
             correctedDest = (returnToGoal.storedOdo -
                              # magic number
-                             RelRobotLocation(player.brain.loc.lastOdoX + 10,
+                             RelRobotLocation(player.brain.loc.lastOdoX + 15,
                                               player.brain.loc.lastOdoY,
                                               0.0))
 
