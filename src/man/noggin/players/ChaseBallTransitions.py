@@ -18,14 +18,14 @@ def shouldPrepareForKick(player):
     We're close enough to prepare for a kick
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
+    return ball.vis.framesOn > 4 and ball.dist < constants.PREPARE_FOR_KICK_DIST
 
 def shouldSpinToBall(player):
     """
     We're not facing the ball well enough yet
     """
     ball = player.brain.ball
-    return (ball.vis.framesOn > 4 and
+    return (ball.vis.on and
             fabs(ball.loc.relY) > constants.SHOULD_SPIN_TO_BALL_Y)
 
 def shouldStopSpinningToBall(player):
@@ -33,7 +33,7 @@ def shouldStopSpinningToBall(player):
     We're done spinning
     """
     ball = player.brain.ball
-    return (ball.vis.framesOn > 4 and
+    return (ball.vis.on and
             fabs(ball.loc.relY) < constants.STOP_SPINNING_TO_BALL_Y)
 
 def shouldApproachBallAgain(player):
