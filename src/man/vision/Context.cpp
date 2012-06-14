@@ -83,7 +83,7 @@ void Context::init() {
     face = FACING_UNKNOWN;
     objectRightX = -1;
 	objectDistance = 0.0f;
-	debugIdentifyCorners = true;
+	//debugIdentifyCorners = true;
 }
 
 /**

@@ -874,26 +874,12 @@ void Threshold::newFindRobots() {
     }
 }
 
-void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
+void Threshold::identifyGoalie() {
 	int leftX, rightX, topY, bottomY;
-	if (leftPost && rightPost) {
-		leftX = vision->ygrp->getRightBottomX();
-		rightX = vision->yglp->getLeftBottomX();
-		topY = min(vision->ygrp->getRightTopY(), vision->yglp->getLeftTopY());
-		bottomY = max(vision->ygrp->getRightBottomY(), vision->yglp->getLeftBottomY());
-	} else if (leftPost) {
-		leftX = max(0, vision->yglp->getRightBottomX() - (int)vision->yglp->getHeight());
-		rightX = vision->yglp->getLeftBottomX();
-		topY = vision->yglp->getRightTopY();
-		bottomY = vision->yglp->getRightBottomY();
-	} else if (rightPost) {
-		leftX = vision->ygrp->getRightBottomX();
-		rightX = min(IMAGE_WIDTH, vision->ygrp->getLeftBottomX() + (int)vision->ygrp->getHeight());
-		topY = vision->ygrp->getRightTopY();
-		bottomY = vision->ygrp->getRightBottomY();
-	} else {
-		return;
-	}
+	leftX = vision->ygrp->getRightBottomX();
+	rightX = vision->yglp->getLeftBottomX();
+	topY = min(vision->ygrp->getRightTopY(), vision->yglp->getLeftTopY());
+	bottomY = max(vision->ygrp->getRightBottomY(), vision->yglp->getLeftBottomY());
 	bool redRobot = false, navyRobot = false;
 	// first just check if we already identified any robots
 	if (vision->red1->getHeight() > 0) {
@@ -973,42 +959,26 @@ void Threshold::identifyGoalie(bool leftPost, bool rightPost) {
 		if (debugShot) {
 			cout << "Red goalie " << endl;
 		}
-		if (leftPost) {
-			vision->yglp->setRedGoalieCertain();
-		}
-		if (rightPost) {
-			vision->ygrp->setRedGoalieCertain();
-		}
+		vision->yglp->setRedGoalieCertain();
+		vision->ygrp->setRedGoalieCertain();
 	} else if ((navyRobot || (navyCols > 2 * redCols && navyCols > 5)) && !redRobot) {
 		if (debugShot) {
 			cout << "Navy goalie " << endl;
 		}
-		if (leftPost) {
-			vision->yglp->setNavyGoalieCertain();
-		}
-		if (rightPost) {
-			vision->ygrp->setNavyGoalieCertain();
-		}
+		vision->yglp->setNavyGoalieCertain();
+		vision->ygrp->setNavyGoalieCertain();
 	} else if (redCols > 1 && navyCols == 0 && redTotal > 30 && !navyRobot) {
 		if (debugShot) {
 			cout << "Probably a red goalie" << endl;
 		}
-		if (leftPost) {
-			vision->yglp->setRedGoalieProbable();
-		}
-		if (rightPost) {
-			vision->ygrp->setRedGoalieProbable();
-		}
+		vision->yglp->setRedGoalieProbable();
+		vision->ygrp->setRedGoalieProbable();
 	} else if (navyCols > 1 && redCols == 0 && navyTotal > 30 && !redRobot) {
 		if (debugShot) {
 			cout << "Probably a navy goalie" << endl;
 		}
-		if (leftPost) {
-			vision->yglp->setNavyGoalieProbable();
-		}
-		if (rightPost) {
-			vision->ygrp->setNavyGoalieProbable();
-		}
+		vision->yglp->setNavyGoalieProbable();
+		vision->ygrp->setNavyGoalieProbable();
 	}
 }
 
@@ -1037,9 +1007,9 @@ void Threshold::objectRecognition() {
     } else {
         orange->createBall(pose->getHorizonY(0));
     }
-    if (ylp || yrp) {
+    if (ylp && yrp) {
         field->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar, YELLOW);
-		identifyGoalie(ylp, yrp);
+		identifyGoalie();
     }
     storeFieldObjects();
 	if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
