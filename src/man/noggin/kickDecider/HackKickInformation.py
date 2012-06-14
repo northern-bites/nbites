@@ -147,7 +147,7 @@ class KickInformation:
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
             if mate.playerNumber in [1] and mate.active:
-                if mate.ballOn and mate.ballDist < 100:
+                if mate.ballOn and mate.ballDist < 250:
                     return True
 
         return False
