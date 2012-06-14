@@ -261,21 +261,27 @@ class KickInformation:
         print "rightScorePoint: ",rightScorePoint
         print "leftScorePoint:  ",leftScorePoint
 
+        kick = None
+
         # If any kick is currently valid, choose that kick.
         if leftScorePoint > 0 and rightScorePoint < 0:
-            return self.chooseQuickFrontKick()
+            kick = self.chooseQuickFrontKick()
         elif leftScorePoint > 90 and rightScorePoint < 90:
-            return kicks.RIGHT_SIDE_KICK
+            kick = kicks.RIGHT_SIDE_KICK
         elif leftScorePoint > -90 and rightScorePoint < -90:
-            return kicks.LEFT_SIDE_KICK
+            kick = kicks.LEFT_SIDE_KICK
         elif leftScorePoint < -90 and rightScorePoint > 90:
-            return self.chooseBackKick()
+            kick =self.chooseBackKick()
+
+        # Did we pick a kick yet?
+        if kick is not None:
+            kick.h = 0 # Straight is fine.
+            return kick
 
         # Choose whichever kick is closest to being between the score points.
         # Note: no kick bearing is between the posts, so they are all
         #   to the right of the rightScorePoint or left of leftScorePoint.
         avgScorePoint = int((rightScorePoint + leftScorePoint) * .5)
-        kick = None
 
         #DEBUG printing
         print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
