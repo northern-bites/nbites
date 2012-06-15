@@ -56,7 +56,7 @@ def foundACorner(player):
     return False
 
 def lostMyCorner(player):
-    return not foundACorner(player) and player.counter > 100
+    return not foundACorner(player) and player.counter > 60
 
 def facingForward(player):
     """

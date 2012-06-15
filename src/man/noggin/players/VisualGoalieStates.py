@@ -229,10 +229,6 @@ def centerAtGoalBasedOnCorners(player):
         player.brain.nav.goTo(centerAtGoalBasedOnCorners.home,
                               nav.GENERAL_AREA,
                               nav.FAST_SPEED)
-        if centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L:
-            print "I found the LEFT corner!"
-        if centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_RIGHT_L:
-            print "I found the RIGHT corner!"
 
     for corner in player.brain.vision.fieldLines.corners:
         # if it is possible that this is the desired corner
@@ -271,10 +267,8 @@ def centerAtGoalBasedOnCorners(player):
             if fabs(centerAtGoalBasedOnCorners.home.relY) < 10:
                 centerAtGoalBasedOnCorners.home.relY = 0
 
-    print "My current destination is: " + str(centerAtGoalBasedOnCorners.home)
+            lookTo = RelLocation(-relX, -relY)
 
-    lookTo = RelLocation(-relX, -relY)
+            player.brain.tracker.helper.lookToPointFixedPitch(lookTo)
 
-    player.brain.tracker.helper.lookToPointFixedPitch(lookTo)
-    print "I am attempting to look to: " + str(lookTo)
     return Transition.getNextState(player, centerAtGoalBasedOnCorners)

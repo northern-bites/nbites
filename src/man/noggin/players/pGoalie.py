@@ -48,7 +48,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.facingForward,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.watch
+            : VisualGoalieStates.findGoalboxCorner
             }
 
         VisualGoalieStates.decideLeftSide.transitions = {
@@ -120,7 +120,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.doneWalking,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : GoalieStates.watch
+            : VisualGoalieStates.findGoalboxCorner
             }
 
         VisualGoalieStates.didIKickIt.transitions = {
@@ -137,7 +137,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         VisualGoalieStates.findGoalboxCorner.transitions = {
             Transition.CountTransition(GoalieTransitions.foundACorner,
-                                       Transition.OCCASIONALLY,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : VisualGoalieStates.centerAtGoalBasedOnCorners
             }

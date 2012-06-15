@@ -39,7 +39,7 @@ def gameReady(player):
     if(not player.brain.motion.calibrated()):
         return player.stay()
 
-    return player.goLater('findGoalboxCorner')
+    return player.goLater('walkToGoal')
 
 def gameSet(player):
     if player.firstFrame():
@@ -68,6 +68,7 @@ def gamePlaying(player):
         player.lastStateTime > 25):
         return player.goLater('decideLeftSide')
 
+    # fixme
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
 
@@ -162,27 +163,10 @@ def upUpUP(player):
         player.upDelay += 1
         return player.stay()
     else:
-        return player.goLater('spinAtGoal')
+        return player.goLater('watch')
     return player.stay()
 
-def position(player):
-    # step forward - NOPE, hacked out US open 2012
-    if player.firstFrame():
-        """player.brain.nav.walkTo(RelRobotLocation(15,0,0),
-                                #player.brain.nav.CLOSE_ENOUGH,
-                                (3,3,10),
-                                #player.brain.nav.SLOW_SPEED)
-                                0.2)
-
-    # Just in case walkTo fails, eventually stop anyway
-    if player.brain.nav.isStopped() or player.counter > 300:
-        player.brain.nav.stop()
-        return player.goNow('watch')"""
-
-    return player.goLater('watch')
-
 ############# PENALTY SHOOTOUT #############
-
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
