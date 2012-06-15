@@ -52,14 +52,23 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
         toolBar->addWidget(debug);                  \
     }
 
-    ADD_DEBUG_CHECKBOX("Horizon Debug", setHorizonDebug);
-    ADD_DEBUG_CHECKBOX("Shooting Debug", setShootingDebug);
-    ADD_DEBUG_CHECKBOX("Open Field Debug", setOpenFieldDebug);
-    ADD_DEBUG_CHECKBOX("Edge Detection Debug", setEdgeDetectionDebug);
-    ADD_DEBUG_CHECKBOX("Hough Debug", setHoughTransformDebug);
-    ADD_DEBUG_CHECKBOX("Robot Detection Debug", setRobotsDebug);
-    ADD_DEBUG_CHECKBOX("Visual Line Debug", setVisualLinesDebug);
-    ADD_DEBUG_CHECKBOX("Visual Corner Debug", setVisualCornersDebug);
+    ADD_DEBUG_CHECKBOX("Horizon", setDebugHorizon);
+    ADD_DEBUG_CHECKBOX("Shooting", setDebugShooting);
+    ADD_DEBUG_CHECKBOX("Open Field", setDebugOpenField);
+    ADD_DEBUG_CHECKBOX("Edge Detection", setDebugEdgeDetection);
+    ADD_DEBUG_CHECKBOX("Hough", setDebugHoughTransfrom);
+    ADD_DEBUG_CHECKBOX("Robot Detection", setDebugRobots);
+    ADD_DEBUG_CHECKBOX("Visual Line", setDebugVisualLines);
+    ADD_DEBUG_CHECKBOX("Visual Corner", setDebugVisualCorners);
+    ADD_DEBUG_CHECKBOX("Ball", setDebugBall);
+    ADD_DEBUG_CHECKBOX("Ball Dist", setDebugBallDist);
+    ADD_DEBUG_CHECKBOX("Cross", setCrossDebug);
+    ADD_DEBUG_CHECKBOX("Identify Corners", setDebugIdentifyCorners);
+    ADD_DEBUG_CHECKBOX("Field Edge", setDebugFieldEdge);
+    ADD_DEBUG_CHECKBOX("Post Print", setPrintObjs);
+    ADD_DEBUG_CHECKBOX("Post", setPostDebug);
+    ADD_DEBUG_CHECKBOX("Post Correct", setCorrect);
+    ADD_DEBUG_CHECKBOX("Post Sanity", setSanity);
 
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
@@ -100,6 +109,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     combinedRawImageView->setLayout(layout);
 
     bottomVisionView = new BMPImageViewerListener(bottomVisionImage, this);
+    connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
 
     connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));
@@ -107,8 +118,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     topVisionView = new BMPImageViewer(topVisionImage, this);
     connect(this, SIGNAL(imagesUpdated()),
             topVisionView, SLOT(updateView()));
-    connect(topVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
-            this, SLOT(pixelClicked(int, int, int, bool)));
 
     CollapsibleImageViewer* bottomVisCIV = new CollapsibleImageViewer(bottomVisionView, "Bottom", this);
     CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisionView, "Top", this);
@@ -192,19 +201,29 @@ void VisionViewer::loadColorTable(){
 }
 
 #define SET_DEBUG(funcName, buttonName)                             \
-    void VisionViewer::set##funcName##Debug(int state) {            \
-        vision->thresh->setDebug##funcName(state == Qt::Checked);   \
+    void VisionViewer::set##funcName(int state) {            \
+        vision->thresh->set##funcName(state == Qt::Checked);   \
         update();                                                   \
     }
 
-SET_DEBUG(Horizon, horizon);
-SET_DEBUG(HoughTransform, hough);
-SET_DEBUG(Shooting, shoot);
-SET_DEBUG(EdgeDetection, edgeDetect);
-SET_DEBUG(OpenField, openField);
-SET_DEBUG(Robots, robots);
-SET_DEBUG(VisualLines, visualLines);
-SET_DEBUG(VisualCorners, visualCorners);
+  SET_DEBUG(DebugHorizon, horizon);
+  SET_DEBUG(DebugHoughTransform, hough);
+  SET_DEBUG(DebugShooting, shoot);
+  SET_DEBUG(DebugEdgeDetection, edgeDetect);
+  SET_DEBUG(DebugOpenField, openField);
+  SET_DEBUG(DebugRobots, robots);
+  SET_DEBUG(DebugVisualLines, visualLines);
+  SET_DEBUG(DebugVisualCorners, visualCorners);
+#define POST_DEBUG(funcName, buttonName)                           \
+  void VisionViewer::set##funcName(int state) {                    \
+      vision->thresh->yellow->set##funcName(state == Qt::Checked); \
+      update();                                                    \
+  }
+  POST_DEBUG(PrintObjs, postPrint);
+  POST_DEBUG(PostDebug, post);
+  POST_DEBUG(PostLogic, postLogic);
+  POST_DEBUG(Correct, postCorrect);
+  POST_DEBUG(Sanity, postSanity);
 
 }
 }
