@@ -39,7 +39,7 @@ def spinToBall(player):
     else:
         spinDir = player.brain.my.spinDirToPoint(player.brain.ball.loc)
         if fabs(player.brain.ball.loc.bearing) > constants.CHANGE_SPEED_THRESH:
-            speed = Navigator.CAREFUL_SPEED
+            speed = Navigator.GRADUAL_SPEED
         else:
             speed = Navigator.SLOW_SPEED
         player.setWalk(0,0,spinDir*speed)
@@ -114,7 +114,7 @@ def positionForKick(player):
         player.brain.tracker.trackBallFixedPitch()
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.CAREFUL_SPEED,
+                              Navigator.GRADUAL_SPEED,
                               Navigator.ADAPTIVE)
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
