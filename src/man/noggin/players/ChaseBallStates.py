@@ -101,8 +101,8 @@ def orbitBall(player):
     """
     if player.firstFrame():
 
-        #DEBUG printing
-        print "Orbiting at angle: ",player.kick.h
+        if hackKick.DEBUG_KICK_DECISION:
+            print "Orbiting at angle: ",player.kick.h
 
         if player.kick.h == 0:
             return player.goLater('positionForKick')

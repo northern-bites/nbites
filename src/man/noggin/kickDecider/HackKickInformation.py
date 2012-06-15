@@ -5,6 +5,8 @@ import objects as Objects
 import noggin_constants as nogginConstants
 import math
 
+DEBUG_KICK_DECISION = False
+
 class KickInformation:
     """
     Class to hold all the things we need to decide a kick
@@ -12,6 +14,10 @@ class KickInformation:
     def __init__(self, brain):
 #        self.decider = decider
         self.brain = brain
+
+        # If true, we will always aim for the center of the goal.
+        # If false, we will aim for the corners of the goal.
+        self.aimCenter = True
 
         self.farGoalLeftPostBearings = []
         self.farGoalRightPostBearings = []
@@ -98,9 +104,9 @@ class KickInformation:
         if not self.haveData:
             return
 
-        #DEBUG printing
-        print "Total far goal sightings (sum both posts): ",len(self.farGoalLeftPostBearings)+len(self.farGoalRightPostBearings)
-        print "Total near goal sightings (sum both posts): ",len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
+        if DEBUG_KICK_DECISION:
+            print "Total far goal sightings (sum both posts): ",len(self.farGoalLeftPostBearings)+len(self.farGoalRightPostBearings)
+            print "Total near goal sightings (sum both posts): ",len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
 
         # bearing averages
         # Need more than 4 frames of each post to consider it "real".
@@ -165,13 +171,14 @@ class KickInformation:
         print "In method shoot."
 
         # Is loc GOOD_ENOUGH for a kick decision?
+        # Need to use aimCenter in decision.
         # Loc is currently never accurate enough @summer 2012
         if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
-            #DEBUG printing
-            print "loc Score is good. Using it to decide kick."
+            if DEBUG_KICK_DECISION:
+                print "loc Score is good. Using it to decide kick."
 
-            relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(670,270))
+            relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,nogginConstants.CENTER_FIELD_Y))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
             relLocationMeToBall = self.brain.my.relativeLocationOf(self.brain.ball.loc)
@@ -202,9 +209,9 @@ class KickInformation:
 
 
         # Loc is bad- use only visual information to choose a kick.
-        #DEBUG printing
-        print "Using vision for kick decision."
-        print "Dangerous ball? ",self.dangerousBall()
+        if DEBUG_KICK_DECISION:
+            print "Using vision for kick decision."
+            print "Dangerous ball? ",self.dangerousBall()
 
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
@@ -221,7 +228,7 @@ class KickInformation:
             if self.dangerousBall():
                 # Can only see our own goal: Use goalie to make decision
 
-                #DEBUG printing
+                if DEBUG_KICK_DECISION
                 print "Doing a goalie based kick."
 
                 return self.goalieBasedKick()
@@ -272,6 +279,7 @@ class KickInformation:
         print "leftScorePoint:  ",leftScorePoint
 
         # If any kick is currently valid, choose that kick.
+        # Note: this ignores the aimCenter distinction.
         if leftScorePoint > 0 and rightScorePoint < 0:
             kick = self.chooseQuickFrontKick()
         elif leftScorePoint > 90 and rightScorePoint < 90:
@@ -289,50 +297,75 @@ class KickInformation:
         # Choose whichever kick is closest to being between the score points.
         # Note: no kick bearing is between the posts, so they are all
         #   to the right of the rightScorePoint or left of leftScorePoint.
+        # If not aimCenter, pick whichever kick is closest to either score point.
         avgScorePoint = int((rightScorePoint + leftScorePoint) * .5)
 
-        #DEBUG printing
-        print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
+        if DEBUG_KICK_DECISION:
+            print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
 
         if rightScorePoint > 90:
                 # Quadrent 2
             if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:
                     #Closer to the leftScorePoint
                 kick = self.chooseBackKick()
-                kick.h = 1 #HACK
+                if self.aimCenter:
+                    kick.h = 180 - avgScorePoint
+                else:
+                    kick.h = 180 - leftScorePoint
             else:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.h = 90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 90 - avgScorePoint
+                else:
+                    kick.h = 90 - rightScorePoint
         elif rightScorePoint > 0:
             # Quadrent 1
             if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.h = 90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 90 - avgScorePoint
+                else:
+                    kick.h = 90 - leftScorePoint
             else:
                 kick = self.chooseQuickFrontKick()
-                kick.h = 0 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 0 - avgScorePoint
+                else:
+                    kick.h = 0 - rightScorePoint
         elif rightScorePoint > -90:
             # Quadrent 4
             if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
                 kick = self.chooseQuickFrontKick()
-                kick.h = 0 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 0 - avgScorePoint
+                else:
+                    kick.h = 0 - leftScorePoint
             else:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.h = -90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = -90 - avgScorePoint
+                else:
+                    kick.h = -90 - rightScorePoint
         else:
             # Quadrent 3
             if (-90 - leftScorePoint) - (rightScorePoint + 180) < 0:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.h = -90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = -90 - avgScorePoint
+                else:
+                    kick.h = -90 - leftScorePoint
             else:
                 kick = self.chooseBackKick()
-                kick.h = 1 #HACK
+                if self.aimCenter:
+                    kick.h = -180 - avgScorePoint
+                else:
+                    kick.h = -180 - rightScorePoint
 
         if kick is not None:
             return kick
 
-        #DEBUG printing
-        print "Somehow got to end without a kick..."
+        if DEBUG_KICK_DECISION:
+            print "Somehow got to end without a kick..."
 
         # If all else fails, orbit and re-decide.
         # Note: this case should already be covered above,
@@ -362,8 +395,8 @@ class KickInformation:
             return kick
 
         # Calculate coordinates of ball, assuming goalie is perfectly centered.
-        goalieX = 70
-        goalieY = 270
+        goalieX = nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
+        goalieY = nogginConstants.CENTER_FIELD_Y
         diffX = math.cos(math.radians(goalieBearing)) * goalieDist
         diffY = math.sin(math.radians(goalieBearing)) * goalieDist
         ballX = goalieX + diffX
@@ -374,11 +407,11 @@ class KickInformation:
         if len(self.nearGoalRightPostBearings) > len(self.nearGoalLeftPostBearings):
             # Use the right post
             relPostBearing = self.nearRightPostBearing
-            ballToPost = ballLocation.relativeLocationOf(Objects.Location(70,200))
+            ballToPost = ballLocation.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,nogginConstants.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y))
         else:
             # Use the left post
             relPostBearing = self.nearLeftPostBearing
-            ballToPost = ballLocation.relativeLocationOf(Objects.Location(70,340))
+            ballToPost = ballLocation.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y))
 
         ballToPostBearing = ballToPost.bearing
         myGlobalHeading = ballToPostBearing - relPostBearing
@@ -389,39 +422,41 @@ class KickInformation:
 
         # Assert: I have my global heading and coordinates of the ball.
 
-        #DEBUG printing
-        print "myGlobalHeading: ",myGlobalHeading
-        print "ballY: ",ballY
+        if DEBUG_KICK_DECISION:
+            print "myGlobalHeading: ",myGlobalHeading
+            print "ballY: ",ballY
 
         # Determine which kick I should do.
         if myGlobalHeading < -135 or myGlobalHeading > 135:
             kick = self.chooseBackKick()
             #should I orbit?
-            if ballY < 270 and myGlobalHeading > 135:
+            if ballY < nogginConstants.MIDFIELD_Y and myGlobalHeading > 135:
                 kick.h = myGlobalHeading - 180 # to your right
-            elif ballY > 270 and myGlobalHeading < -135:
+            elif ballY > nogginConstants.MIDFIELD_Y and myGlobalHeading < -135:
                 kick.h = myGlobalHeading + 180 # to your left
             else:
                 kick.h = 0
         elif myGlobalHeading < -45:
             kick = kicks.RIGHT_SIDE_KICK
             #should I orbit?
-            if ballY < 200 or ballY > 340:
+            if ballY < nogginConstants.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y or \
+                    ballY > nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y:
                 kick.h = myGlobalHeading + 90
             else:
                 kick.h = 0
         elif myGlobalHeading > 45:
             kick = kicks.LEFT_SIDE_KICK
             #should I orbit?
-            if ballY < 200 or ballY > 340:
+            if ballY < nogginConstants.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y or \
+                    ballY > nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y:
                 kick.h = myGlobalHeading - 90
             else:
                 kick.h = 0
         else:
             kick = self.chooseQuickFrontKick()
             #should I orbit?
-            if (ballY < 270 and myGlobalHeading < 0) or \
-                    (ballY > 270 and myGlobalHeading > 0):
+            if (ballY < nogginConstants.MIDFIELD_Y and myGlobalHeading < 0) or \
+                    (ballY > nogginConstants.MIDFIELD_Y and myGlobalHeading > 0):
                 kick.h = myGlobalHeading
             else:
                 kick.h = 0
