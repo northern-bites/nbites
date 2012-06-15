@@ -16,7 +16,7 @@ class ForwardKinematic
 public:
   static void calculateArmChain(bool left, const JointData& joints, const RobotDimensions& robotDimensions, const MassCalibration& massCalibration, Pose3D limbs[MassCalibration::numOfLimbs])
   {
-    int sign = left ? -1 : 1;
+    const float sign = left ? -1.0f : 1.0f;
     MassCalibration::Limb shoulder = left ? MassCalibration::shoulderLeft : MassCalibration::shoulderRight;
     JointData::Joint arm0 = left ? JointData::LShoulderPitch : JointData::RShoulderPitch;
 
@@ -33,7 +33,7 @@ public:
 
   static void calculateLegChain(bool left, const JointData& joints, const RobotDimensions& robotDimensions, const MassCalibration& massCalibration, Pose3D limbs[MassCalibration::numOfLimbs])
   {
-    int sign = left ? -1 : 1;
+    const float sign = left ? -1.0f : 1.0f;
     MassCalibration::Limb pelvis = left ? MassCalibration::pelvisLeft : MassCalibration::pelvisRight;
     JointData::Joint leg0 = left ? JointData::LHipYawPitch : JointData::RHipYawPitch;
 

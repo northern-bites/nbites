@@ -6,6 +6,9 @@
 */
 
 #include "MotionSelector.h"
+
+#include <math.h>
+
 //#include "Tools/Debugging/DebugDrawings.h"
 
 //MAKE_MODULE(MotionSelector, Motion Control)
@@ -85,7 +88,7 @@ void MotionSelector::update(MotionSelection& motionSelection,
     // increase / decrease all ratios according to target motion
     const unsigned deltaTime(theFrameInfo.getTimeSince(lastExecution));
     const int interpolationTime = prevMotion == MotionRequest::specialAction && lastActiveSpecialAction == SpecialActionRequest::playDead ? playDeadDelay : interpolationTimes[motionSelection.targetMotion];
-    float delta((float)deltaTime / interpolationTime);
+    float delta((float)deltaTime / (float)interpolationTime);
 //    ASSERT(SystemCall::getMode() == SystemCall::logfileReplay || delta > 0.00001f);
     float sum(0);
     for(int i = 0; i < MotionRequest::numOfMotions; i++)
@@ -102,7 +105,7 @@ void MotionSelector::update(MotionSelection& motionSelection,
     for(int i = 0; i < MotionRequest::numOfMotions; i++)
     {
       motionSelection.ratios[i] /= sum;
-      if(abs(motionSelection.ratios[i] - 1.f) < 0.00001f)
+      if(fabs(motionSelection.ratios[i] - 1.f) < 0.00001f)
         motionSelection.ratios[i] = 1.f; // this should fix a "motionSelection.ratios[motionSelection.targetMotion] remains smaller than 1.f" bug
     }
 
