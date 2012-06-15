@@ -221,7 +221,7 @@ void WalkingEngine::update()
 
     //calibrate joints
     for(int i = 0; i < JointData::numOfJoints; ++i) {
-        theJointData.angles[i] = theJointData.angles[i] * theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
+        theJointData.angles[i] = theJointData.angles[i] * (float)theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
     }
     //calibrate sensors
     theSensorData.data[SensorData::gyroX] *= theSensorCalibration.gyroXGain / 1600;
@@ -360,6 +360,7 @@ void WalkingEngine::updateMotionRequest()
     {
       if(theMotionRequest.walkRequest.kickType != WalkRequest::none && kickPlayer.isKickStandKick(theMotionRequest.walkRequest.kickType))
       {
+          cout << "Cannot request a kick in the walking engine atm! " << endl;
         bool mirrored = kickPlayer.isKickMirrored(theMotionRequest.walkRequest.kickType);
         requestedMotionType = mirrored ? standLeft : standRight;
       }

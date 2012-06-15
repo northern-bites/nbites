@@ -6,6 +6,7 @@
 */
 
 #include "RotationMatrix.h"
+#include <math.h>
 
 RotationMatrix::RotationMatrix(const Vector3<>& a, float angle)
 {
@@ -13,7 +14,7 @@ RotationMatrix::RotationMatrix(const Vector3<>& a, float angle)
   axis.normalize();
   const float& x = axis.x, &y = axis.y, &z = axis.z;
   //compute sine and cosine of angle because it is needed quite often for complete matrix
-  const float si = sin(angle), co = cos(angle);
+  const float si = sinf(angle), co = cosf(angle);
   //compute all components needed more than once for complete matrix
   const float v = 1 - co;
   const float xyv = x * y * v;
@@ -42,7 +43,7 @@ RotationMatrix::RotationMatrix(const Vector3<>& a)
     axis /= angle; // normalize a, rotation is only possible with unit vectors
   const float& x = axis.x, &y = axis.y, &z = axis.z;
   //compute sine and cosine of angle because it is needed quite often for complete matrix
-  const float si = sin(angle), co = cos(angle);
+  const float si = sinf(angle), co = cosf(angle);
   //compute all components needed more than once for complete matrix
   const float v = 1 - co;
   const float xyv = x * y * v;
@@ -71,7 +72,7 @@ RotationMatrix& RotationMatrix::rotateX(const float angle)
   return *this;
   */
 
-  const float c = cos(angle), s = sin(angle);
+  const float c = cosf(angle), s = sinf(angle);
   const float c1X = c1.x, c1Y = c1.y, c1Z = c1.z;
   c1.x = c1X * c + c2.x * s;
   c1.y = c1Y * c + c2.y * s;
@@ -90,7 +91,7 @@ RotationMatrix& RotationMatrix::rotateY(const float angle)
   return *this;
   */
 
-  const float c = cos(angle), s = sin(angle);
+  const float c = cosf(angle), s = sinf(angle);
   const float c0X = c0.x, c0Y = c0.y, c0Z = c0.z;
   c0.x = c0X * c - c2.x * s;
   c0.y = c0Y * c - c2.y * s;
@@ -109,7 +110,7 @@ RotationMatrix& RotationMatrix::rotateZ(const float angle)
   return *this;
   */
 
-  const float c = cos(angle), s = sin(angle);
+  const float c = cosf(angle), s = sinf(angle);
   const float c0X = c0.x, c0Y = c0.y, c0Z = c0.z;
   c0.x = c0X * c + c1.x * s;
   c0.y = c0Y * c + c1.y * s;
@@ -122,20 +123,20 @@ RotationMatrix& RotationMatrix::rotateZ(const float angle)
 
 float RotationMatrix::getXAngle() const
 {
-  const float h = sqrt(c2.y * c2.y + c2.z * c2.z);
-  return h ? acos(c2.z / h) * (c2.y > 0 ? -1 : 1) : 0;
+  const float h = sqrtf(c2.y * c2.y + c2.z * c2.z);
+  return h ? acosf(c2.z / h) * (c2.y > 0 ? -1 : 1) : 0;
 }
 
 float RotationMatrix::getYAngle() const
 {
-  const float h = sqrt(c0.x * c0.x + c0.z * c0.z);
-  return h ? acos(c0.x / h) * (c0.z > 0 ? -1 : 1) : 0;
+  const float h = sqrtf(c0.x * c0.x + c0.z * c0.z);
+  return h ? acosf(c0.x / h) * (c0.z > 0 ? -1 : 1) : 0;
 }
 
 float RotationMatrix::getZAngle() const
 {
-  const float h = sqrt(c0.x * c0.x + c0.y * c0.y);
-  return h ? acos(c0.x / h) * (c0.y < 0 ? -1 : 1) : 0;
+  const float h = sqrtf(c0.x * c0.x + c0.y * c0.y);
+  return h ? acosf(c0.x / h) * (c0.y < 0 ? -1 : 1) : 0;
 }
 
 Vector3<> RotationMatrix::getAngleAxis() const
@@ -145,31 +146,31 @@ Vector3<> RotationMatrix::getAngleAxis() const
     co = 1.f;
   else if(co < -1.f)
     co = 1.f;
-  const float angle = acos(co);
+  const float angle = acosf(co);
   if(angle == 0.f)
     return Vector3<>();
   Vector3<> result(
     c1.z - c2.y,
     c2.x - c0.z,
     c0.y - c1.x);
-  result *= angle / (2.f * sin(angle));
+  result *= angle / (2.f * sinf(angle));
   return result;
 }
 
 RotationMatrix RotationMatrix::fromRotationX(const float angle)
 {
-  const float c = cos(angle), s = sin(angle);
+  const float c = cosf(angle), s = sinf(angle);
   return RotationMatrix(Vector3<>(1.f, 0.f, 0.f), Vector3<>(0.f, c, s), Vector3<>(0.f, -s, c));
 }
 
 RotationMatrix RotationMatrix::fromRotationY(const float angle)
 {
-  const float c = cos(angle), s = sin(angle);
+  const float c = cosf(angle), s = sinf(angle);
   return RotationMatrix(Vector3<>(c, 0.f, -s), Vector3<>(0.f, 1.f, 0.f), Vector3<>(s, 0.f, c));
 }
 
 RotationMatrix RotationMatrix::fromRotationZ(const float angle)
 {
-  const float c = cos(angle), s = sin(angle);
+  const float c = cosf(angle), s = sinf(angle);
   return RotationMatrix(Vector3<>(c, s, 0.f), Vector3<>(-s, c, 0.f), Vector3<>(0.f, 0.f, 1.f));
 }

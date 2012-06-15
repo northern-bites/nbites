@@ -318,6 +318,8 @@ void BHWalkProvider::hardReset() {
     motionRequest.specialActionRequest.specialAction = SpecialActionRequest::standUpBackNao;
     currentCommand = MotionCommand::ptr();
 
+    walkingEngine.inertiaSensorCalibrator.reset();
+
     requestedToStop = false;
 }
 
@@ -417,11 +419,14 @@ void BHWalkProvider::update(proto::WalkProvider* walkProvider) const {
     copyOver(walkingEngine.theMotionRequest.walkRequest.speed, bhdebug->mutable_speeds());
 
 
-    RepeatedFloats* ratios = bhdebug->mutable_select_ratios();
+    bhdebug->set_ground_contact_safe(walkingEngine.theGroundContactState.contactSafe);
+    bhdebug->set_instable(walkingEngine.instable);
 
-    ratios->Clear();
+//    RepeatedFloats* ratios = bhdebug->mutable_select_ratios();
+
+    bhdebug->clear_select_ratios();
     for (int i = 0; i < MotionRequest::numOfMotions; i++) {
-        ratios->Add(walkingEngine.theMotionSelection.ratios[i]);
+        bhdebug->add_select_ratios(walkingEngine.theMotionSelection.ratios[i]);
     }
 }
 
