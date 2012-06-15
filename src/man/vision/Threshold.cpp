@@ -85,6 +85,161 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     }
 }
 
+//this loop will perform obstabcle detection, and for now it is seperate from
+//other detection, though in the future, we should change this.
+void Threshold::obstacleLoop() {
+  vision->obstacles->init();
+
+  usingTopCamera = false;
+  pose->transform(usingTopCamera);
+
+  unsigned char pixel = GREEN;
+  
+  float tempTotalLeft = 0.0, tempTotalRight = 0.0;
+  float greenLeftB = 0.0, greenRightB = 0.0;
+  float yellowLeftB = 0.0, yellowRightB = 0.0;
+  float whiteLeftB = 0.0, whiteRightB = 0.0;
+  float undefLeftB = 0.0, undefRightB = 0.0;
+  bool postBottom = false, bottomLeftFree = false, bottomRightFree = false;
+  
+  for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+    for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isGreen(pixel))
+	greenLeftB++;
+      else if (Utility::isYellow(pixel))
+	yellowLeftB++;
+      else if (Utility::isWhite(pixel))
+	whiteLeftB++;
+      else if (Utility::isUndefined(pixel))
+	undefLeftB++;
+      tempTotalLeft++;
+    }
+    for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isGreen(pixel))
+	greenRightB++;
+      else if (Utility::isYellow(pixel))
+	yellowRightB++;
+      else if (Utility::isWhite(pixel))
+	whiteRightB++;
+      else if (Utility::isUndefined(pixel))
+	undefRightB++;
+      tempTotalRight++;
+    }
+  }
+  greenLeftB /= tempTotalLeft; greenRightB /= tempTotalRight;
+  yellowLeftB /= tempTotalLeft; yellowRightB /= tempTotalRight;
+  whiteLeftB /= tempTotalLeft; whiteRightB /= tempTotalRight;
+  undefLeftB /= tempTotalLeft; undefRightB /= tempTotalRight;
+
+  /**********************************************
+   *This is the first set of detections*
+   *********************************************/
+  //First, we throw things out.
+  if (greenLeftB > yellowLeftB && greenLeftB > whiteLeftB && greenLeftB > undefLeftB) {
+    bottomLeftFree = true;
+   }
+  if (greenRightB > yellowRightB && greenRightB > whiteRightB && greenRightB > undefRightB) {
+    bottomRightFree = true;
+  }
+  if (bottomLeftFree && bottomRightFree) {
+    return;
+  }
+
+  //Only Posts can be uniquely thrown out in the bottom
+  if ((yellowLeftB - greenLeftB > 0.1) || (yellowRightB - greenRightB > 0.1)) {
+    if (yellowLeftB - greenLeftB > 0.1) {
+      vision->obstacles->setPostLeft(true);
+    }
+    if (yellowRightB - greenRightB > 0.1) {
+      vision->obstacles->setPostRight(true);
+    }
+    postBottom = true;
+  }
+
+
+  
+  usingTopCamera = true;
+  pose->transform(usingTopCamera);
+  
+  tempTotalLeft = 0.0, tempTotalRight = 0.0;
+  float greenLeftT = 0.0, greenRightT = 0.0;
+  float yellowLeftT = 0.0, yellowRightT = 0.0;
+  float whiteLeftT = 0.0, whiteRightT = 0.0;
+  float undefLeftT = 0.0, undefRightT = 0.0;
+  bool topLeftFree = false, topRightFree = false;
+
+  for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+    for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isGreen(pixel))
+	greenLeftT++;
+      else if (Utility::isYellow(pixel))
+	yellowLeftT++;
+      else if (Utility::isWhite(pixel))
+	whiteLeftT++;
+      else if (Utility::isUndefined(pixel))
+	undefLeftT++;
+      tempTotalLeft++;
+    }
+    for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isGreen(pixel))
+	greenRightT++;
+      else if (Utility::isYellow(pixel))
+	yellowRightT++;
+      else if (Utility::isWhite(pixel))
+	whiteRightT++;
+      else if (Utility::isUndefined(pixel))
+	undefRightT++;
+      tempTotalRight++;
+    }
+  }
+  greenLeftT /= tempTotalLeft; greenRightT /= tempTotalRight;
+  yellowLeftT /= tempTotalLeft; yellowRightT /= tempTotalRight;
+  whiteLeftT /= tempTotalLeft; whiteRightT /= tempTotalRight;
+  undefLeftT /= tempTotalLeft; undefRightT /= tempTotalRight;
+
+
+  /***********************************************************
+   *This is the second set of detections*
+   **********************************************************/
+  if(!bottomLeftFree) { //if no obstacle in bottom, then not in top either
+    if (greenLeftT > yellowLeftT && greenLeftT > whiteLeftT && greenLeftT > undefLeftT && 
+	!vision->obstacles->onLeft()) {
+      topLeftFree = true;
+    }
+    if (!topLeftFree) { // same principle as !bottomLeftFree
+      if (undefLeftT - (greenLeftT + whiteLeftT + yellowLeftT) > 0.1) {
+	vision->obstacles->setOffField(true);
+      } 
+      else if (whiteLeftT > greenLeftT && (undefLeftT - (whiteLeftT + greenLeftT) < 0.1)) {
+	vision->obstacles->setLeft(true);
+      }
+    }
+  }
+
+
+
+  if (!bottomRightFree) { //if no obstacle in bottom, not in top either
+    if (greenRightT > yellowRightT && greenRightT > whiteRightT && greenRightT > undefRightT &&
+	!vision->obstacles->onRight()) {
+      topRightFree = true;
+    }
+    if (!topRightFree) { // same principle as !bottomRightFree
+      if (undefRightT - (greenRightT + whiteRightT + yellowRightT) > 0.1) {
+	vision->obstacles->setOffField(true);
+      } 
+      else if (whiteRightT > greenRightT && (undefRightT - (whiteRightT + greenRightT) < 0.1)) {
+	vision->obstacles->setRight(true);
+      }
+    }  
+    
+  }
+  
+}
+
 /* Main vision loop, called by Vision.cc
  */
 void Threshold::visionLoop() {
@@ -96,7 +251,9 @@ void Threshold::visionLoop() {
 
     // threshold image and create runs
     thresholdAndRuns();
-    //newFindRobots();
+    PROF_ENTER(P_ROBOTS);
+    newFindRobots();
+    PROF_EXIT(P_ROBOTS);
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
@@ -352,17 +509,19 @@ void Threshold::findGoals(int column, int topEdge) {
             yellows++;
             found = true;
         }
-        if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
-            robots++;
-            found = true;
-			if (Utility::isNavy(pixel)) {
-				navy++;
-				firstNavy = j;
-			} else {
-				pinks++;
-				firstPink = j;
-			}
-        }
+	// PROF_ENTER(P_ROBOTS);
+        // if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
+        //     robots++;
+        //     found = true;
+	// 		if (Utility::isNavy(pixel)) {
+	// 			navy++;
+	// 			firstNavy = j;
+	// 		} else {
+	// 			pinks++;
+	// 			firstPink = j;
+	// 		}
+        // }
+	// PROF_EXIT(P_ROBOTS);
         if (Utility::isGreen(pixel)) {
             bad++;
 			greens++;
@@ -374,12 +533,14 @@ void Threshold::findGoals(int column, int topEdge) {
     if (yellows > 10) {
         yellow->newRun(column, lastYellow, firstYellow - lastYellow);
     }
-	if (pinks > 5) {
-		red->newRun(column, lastPink, firstPink - lastPink);
-	}
-	if (navy > 5) {
-		navyblue->newRun(column, lastNavy, firstNavy - lastNavy);
-	}
+        // PROF_ENTER(P_ROBOTS);
+	// if (pinks > 5) {
+	// 	red->newRun(column, lastPink, firstPink - lastPink);
+	// }
+	// if (navy > 5) {
+	// 	navyblue->newRun(column, lastNavy, firstNavy - lastNavy);
+	// }
+	// PROF_EXIT(P_ROBOTS);
     if (shoot[column] && robots > 5) {
         shoot[column] = false;
     }
@@ -475,39 +636,41 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     robots = 0;
                 }
             }
-            if (Utility::isNavy(lastPixel)) {
-				robots+= currentRun;
-                if (currentRun > 5) {
-                    navyblue->newRun(column, j, currentRun);
-                }
-                if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
-                    && shoot[column] && !faceDown) {
-                    evidence[column / divider]++;
-                    if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = lastGood;//j + currentRun;
-                    }
-                    shoot[column] = false;
-                    if (debugShot) {
-                        vision->drawPoint(column, j + currentRun, MAROON);
-                    }
-                }
-            }
-            if (Utility::isRed(lastPixel)) {
-                robots+= currentRun;
-                if (currentRun > 5) {
-                    red->newRun(column, j, currentRun);
-                }
-                if (robots > 10 && shoot[column]) {
-                    evidence[column / divider]++;
-                    if (block[column / divider] < j + currentRun) {
-                        block[column / divider] = lastGood;//j + currentRun;
-                    }
-                    shoot[column] = false;
-                    if (debugShot) {
-                        vision->drawPoint(column, j + currentRun, MAROON);
-                    }
-                }
-            }
+	    // PROF_ENTER(P_ROBOTS);
+            // if (Utility::isNavy(lastPixel)) {
+	    // 			robots+= currentRun;
+            //     if (currentRun > 5) {
+            //         navyblue->newRun(column, j, currentRun);
+            //     }
+            //     if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
+            //         && shoot[column] && !faceDown) {
+            //         evidence[column / divider]++;
+            //         if (block[column / divider] < j + currentRun) {
+            //             block[column / divider] = lastGood;//j + currentRun;
+            //         }
+            //         shoot[column] = false;
+            //         if (debugShot) {
+            //             vision->drawPoint(column, j + currentRun, MAROON);
+            //         }
+            //     }
+            // }
+            // if (Utility::isRed(lastPixel)) {
+            //     robots+= currentRun;
+            //     if (currentRun > 5) {
+            //         red->newRun(column, j, currentRun);
+            //     }
+            //     if (robots > 10 && shoot[column]) {
+            //         evidence[column / divider]++;
+            //         if (block[column / divider] < j + currentRun) {
+            //             block[column / divider] = lastGood;//j + currentRun;
+            //         }
+            //         shoot[column] = false;
+            //         if (debugShot) {
+            //             vision->drawPoint(column, j + currentRun, MAROON);
+            //         }
+            //     }
+            // }
+	    // PROF_EXIT(P_ROBOTS);
             // since this loop runs when a run ends, restart # pixels in run counter
             currentRun = 1;
         }
@@ -990,12 +1153,14 @@ void Threshold::objectRecognition() {
     initObjects();
     // now get the posts and goals
 	// we need to make the white blobs before checking on robots
+    PROF_ENTER(P_ROBOTS);
     cross->createObject();
-	red->robot(cross);
-	navyblue->robot(cross);
-    //red->findRobots(cross);
-    //navyblue->findRobots(cross);
-    //unid->findRobots(cross);
+        //red->robot(cross);
+	//navyblue->robot(cross);
+	red->findRobots(cross);
+	navyblue->findRobots(cross);
+	unid->findRobots(cross);
+    PROF_EXIT(P_ROBOTS);
     yellow->createObject();
     cross->checkForCrosses();
 
@@ -1057,6 +1222,7 @@ void Threshold::storeFieldObjects() {
 
     setVisualRobotInfo(vision->navy1);
     setFramesOnAndOff(vision->navy1);
+
 
     setVisualRobotInfo(vision->navy2);
     setFramesOnAndOff(vision->navy2);
@@ -1578,7 +1744,8 @@ void Threshold::transposeDebugImage(){
 
 // Draws the visual horizon on the image
 void Threshold::drawVisualHorizon() {
-    vision->drawLine(0, horizon, IMAGE_WIDTH, horizon, VISUAL_HORIZON_COLOR);
+  vision->drawLine(0, field->horizonAt(0), 
+		   IMAGE_WIDTH - 1, field->horizonAt(IMAGE_WIDTH - 1), VISUAL_HORIZON_COLOR);
 }
 
 const char* Threshold::getShortColor(int _id) {
