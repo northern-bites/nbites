@@ -18,6 +18,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.frameCounter = 0
         self.penaltyKicking = False
 
+        # All transitions are defined here. Their conditions are in
+        # GoalieTransitions
         VisualGoalieStates.walkToGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
@@ -131,6 +133,25 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
             : VisualGoalieStates.returnToGoal
+            }
+
+        VisualGoalieStates.findGoalboxCorner.transitions = {
+            Transition.CountTransition(GoalieTransitions.foundACorner,
+                                       Transition.OCCASIONALLY,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.centerAtGoalBasedOnCorners
+            }
+
+        VisualGoalieStates.centerAtGoalBasedOnCorners.transitions = {
+            Transition.CountTransition(GoalieTransitions.lostMyCorner,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watch,
+
+            Transition.CountTransition(GoalieTransitions.reachedTheBall,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.watch
             }
 
     def run(self):

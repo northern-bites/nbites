@@ -32,6 +32,32 @@ def ballIsInMyWay(player):
                  player.system.centerGoalBearing()) < 20.0 and
             player.brain.ball.loc.dist < 100.0)
 
+def foundACorner(player):
+    """
+    Loops through corners to find a visible goalbox corner.
+    """
+    if player.brain.vision.fieldLines.numCorners == 0:
+        return False
+
+    for corner in player.brain.vision.fieldLines.corners:
+        if (IDs.YELLOW_GOAL_LEFT_L in corner.possibilities and
+            corner.visualOrientation < 0 and
+            corner.bearing > 0):
+            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_LEFT_L
+            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
+            return True
+        elif (IDs.YELLOW_GOAL_RIGHT_L in corner.possibilities and
+              corner.visualOrientation > 0 and
+              corner.bearing < 0):
+            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_RIGHT_L
+            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
+            return True
+
+    return False
+
+def lostMyCorner(player):
+    return not foundACorner(player) and player.counter > 100
+
 def facingForward(player):
     """
     Checks if a robot is facing the cross, which is more or less forward

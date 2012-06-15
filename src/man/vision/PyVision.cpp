@@ -188,6 +188,7 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("possibilities", &VisualCorner::getIDs)
         .def_readonly("angleX", &VisualCorner::getAngleXDeg)
         .def_readonly("angleY", &VisualCorner::getAngleYDeg)
+        .def_readonly("visualOrientation", &VisualCorner::getOrientation)
         .def("getRobotGlobalHeadingIfFieldAngleIs",
              &VisualCorner::getRobotGlobalHeadingIfFieldAngleIs)
         .def("getRobotRelXIfFieldAngleIs",

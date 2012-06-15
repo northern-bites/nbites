@@ -39,7 +39,7 @@ def gameReady(player):
     if(not player.brain.motion.calibrated()):
         return player.stay()
 
-    return player.goLater('walkToGoal')
+    return player.goLater('findGoalboxCorner')
 
 def gameSet(player):
     if player.firstFrame():

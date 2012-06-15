@@ -384,8 +384,12 @@ FIXED_PITCH_RIGHT_SIDE_PAN = (
 
 # Maximum search angle for top camera.
 FIXED_PITCH_PAN_WIDE = (
-    ((115.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((115.0,11.0), 4.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,11.0), 4.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+FIXED_PITCH_SLOW_GOALIE_PAN = (
+    ((115.0,11.0), 5.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,11.0), 5.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Bottom camera is never significantly blocked by shoulders or arms.
 FIXED_PITCH_PAN_NARROW = (

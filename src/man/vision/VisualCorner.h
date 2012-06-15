@@ -95,16 +95,17 @@ public:
 
     //TODO: prettify this
     //HACK Mexico 2012 from Octavian to Lizzie
-    float getRobotGlobalHeadingIfFieldAngleIs(angle::radians alpha) const {
-        return physicalOrientation + alpha - bearing;
+    // Takes degrees because this is for Python. Lovely.
+    float getRobotGlobalHeadingIfFieldAngleIs(angle::degrees alpha) const {
+        return (physicalOrientation + alpha*TO_RAD - bearing)*TO_DEG;
     }
 
-    float getRobotRelXIfFieldAngleIs(angle::radians alpha) const {
-        return - distance * std::cos(physicalOrientation + alpha);
+    float getRobotRelXIfFieldAngleIs(angle::degrees alpha) const {
+        return - distance * std::cos(physicalOrientation + alpha*TO_RAD);
     }
 
-    float getRobotRelYIfFieldAngleIs(angle::radians alpha) const {
-        return - distance * std::sin(physicalOrientation + alpha);
+    float getRobotRelYIfFieldAngleIs(angle::degrees alpha) const {
+        return - distance * std::sin(physicalOrientation + alpha*TO_RAD);
     }
 
     ////////////////////////////////////////////////////////////

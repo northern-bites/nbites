@@ -1,6 +1,7 @@
 from man.motion.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
                                   FIXED_PITCH_RIGHT_SIDE_PAN,
-                                  FIXED_PITCH_PAN)
+                                  FIXED_PITCH_PAN,
+                                  FIXED_PITCH_SLOW_GOALIE_PAN)
 from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition
@@ -8,7 +9,9 @@ import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
 from GoalieTransitions import onLeftSideline, onRightSideline, walkedTooFar
 from objects import RelRobotLocation, RelLocation
-from noggin_constants import LINE_CROSS_OFFSET
+from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
+from vision import cornerID as IDs
+from math import fabs
 
 DEBUG_OBSERVATIONS = False
 DEBUG_POSITION = False
@@ -213,3 +216,65 @@ def returnToGoal(player):
         player.brain.nav.walkTo(correctedDest)
 
     return Transition.getNextState(player, returnToGoal)
+
+def findGoalboxCorner(player):
+    if player.firstFrame():
+        player.brain.tracker.repeatHeadMove(FIXED_PITCH_SLOW_GOALIE_PAN)
+
+    return Transition.getNextState(player, findGoalboxCorner)
+
+def centerAtGoalBasedOnCorners(player):
+    if player.firstFrame():
+        centerAtGoalBasedOnCorners.home = RelRobotLocation(-10.0, 0.0, 0.0)
+        player.brain.nav.goTo(centerAtGoalBasedOnCorners.home,
+                              nav.GENERAL_AREA,
+                              nav.FAST_SPEED)
+        if centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L:
+            print "I found the LEFT corner!"
+        if centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_RIGHT_L:
+            print "I found the RIGHT corner!"
+
+    for corner in player.brain.vision.fieldLines.corners:
+        # if it is possible that this is the desired corner
+        if(centerAtGoalBasedOnCorners.cornerID in corner.possibilities):
+            if(centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L
+               and corner.visualOrientation < 0):
+                centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
+                heading = corner.getRobotGlobalHeadingIfFieldAngleIs(90)
+                relX = corner.getRobotRelXIfFieldAngleIs(90)
+                relY = corner.getRobotRelYIfFieldAngleIs(90)
+            elif(centerAtGoalBasedOnCorners.cornerID ==
+                 IDs.YELLOW_GOAL_RIGHT_L and corner.visualOrientation > 0):
+                centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
+                heading = corner.getRobotGlobalHeadingIfFieldAngleIs(0)
+                relX = corner.getRobotRelXIfFieldAngleIs(0)
+                relY = corner.getRobotRelYIfFieldAngleIs(0)
+            else:
+                continue
+
+            centerAtGoalBasedOnCorners.home.relH = -heading
+            centerAtGoalBasedOnCorners.home.relX = -(GOALBOX_DEPTH + relX)
+            if centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L:
+                centerAtGoalBasedOnCorners.home.relY = -(GOALBOX_WIDTH/2.0 +
+                                                         relY)
+            else:
+                centerAtGoalBasedOnCorners.home.relY = (GOALBOX_WIDTH/2.0 -
+                                                        relY)
+
+            # corrections to make nav STOP!
+            if fabs(centerAtGoalBasedOnCorners.home.relH) < 5:
+                centerAtGoalBasedOnCorners.home.relH = 0
+
+            if fabs(centerAtGoalBasedOnCorners.home.relX) < 10:
+                centerAtGoalBasedOnCorners.home.relX = 0
+
+            if fabs(centerAtGoalBasedOnCorners.home.relY) < 10:
+                centerAtGoalBasedOnCorners.home.relY = 0
+
+    print "My current destination is: " + str(centerAtGoalBasedOnCorners.home)
+
+    lookTo = RelLocation(-relX, -relY)
+
+    player.brain.tracker.helper.lookToPointFixedPitch(lookTo)
+    print "I am attempting to look to: " + str(lookTo)
+    return Transition.getNextState(player, centerAtGoalBasedOnCorners)
