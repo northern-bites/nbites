@@ -57,7 +57,7 @@ const float pi_4 = pi * 0.25f;
 /** constant for a 3/8 circle*/
 const float pi3_4 = pi * 0.75f;
 /** constant for an expression used by the gaussian function*/
-const float sqrt2pi = sqrt(2.0f * pi);
+const float sqrt2pi = sqrtf(2.0f * pi);
 /** constant for converting radians to degrees */
 const float _180_pi = 180.0f / pi;
 ///@}
@@ -118,5 +118,5 @@ inline int roundNumberToInt(float d)
 */
 inline float roundNumber(float d)
 {
-  return floor(d + 0.5f);
+  return floorf(d + 0.5f);
 }

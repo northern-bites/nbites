@@ -1,8 +1,9 @@
 import KickingConstants as constants
 import vision
 import kicks
-from objects import Location
+import objects as Objects
 import noggin_constants as nogginConstants
+import math
 
 class KickInformation:
     """
@@ -102,29 +103,30 @@ class KickInformation:
         print "Total near goal sightings (sum both posts): ",len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
 
         # bearing averages
-        if len(self.farGoalLeftPostBearings) > 0:
+        # Need more than 4 frames of each post to consider it "real".
+        if len(self.farGoalLeftPostBearings) > 7:
             self.farLeftPostBearing = (sum(self.farGoalLeftPostBearings) /
                                        len(self.farGoalLeftPostBearings))
-        if len(self.farGoalRightPostBearings) > 0:
+        if len(self.farGoalRightPostBearings) > 7:
             self.farRightPostBearing = (sum(self.farGoalRightPostBearings) /
                                         len(self.farGoalRightPostBearings))
-        if len(self.nearGoalLeftPostBearings) > 0:
+        if len(self.nearGoalLeftPostBearings) > 7:
             self.nearLeftPostBearing = (sum(self.nearGoalLeftPostBearings) /
                                         len(self.nearGoalLeftPostBearings))
-        if len(self.nearGoalRightPostBearings) > 0:
+        if len(self.nearGoalRightPostBearings) > 7:
             self.nearRightPostBearing = (sum(self.nearGoalRightPostBearings) /
                                          len(self.nearGoalRightPostBearings))
         # distance averages
-        if len(self.farGoalLeftPostDists) > 0:
+        if len(self.farGoalLeftPostDists) > 7:
             self.farLeftPostDist = (sum(self.farGoalLeftPostDists) /
                                     len(self.farGoalLeftPostDists))
-        if len(self.farGoalRightPostDists) > 0:
+        if len(self.farGoalRightPostDists) > 7:
             self.farRightPostDist = (sum(self.farGoalRightPostDists) /
                                      len(self.farGoalRightPostDists))
-        if len(self.nearGoalLeftPostDists) > 0:
+        if len(self.nearGoalLeftPostDists) > 7:
             self.nearLeftPostDist = (sum(self.nearGoalLeftPostDists) /
                                      len(self.nearGoalLeftPostDists))
-        if len(self.nearGoalRightPostDists) > 0:
+        if len(self.nearGoalRightPostDists) > 7:
             self.nearRightPostDist = (sum(self.nearGoalRightPostDists) /
                                       len(self.nearGoalRightPostDists))
         # average post distances
@@ -147,7 +149,7 @@ class KickInformation:
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
             if mate.playerNumber in [1] and mate.active:
-                if mate.ballOn and mate.ballDist < 100:
+                if mate.ballOn and mate.ballDist < 350:
                     return True
 
         return False
@@ -169,7 +171,7 @@ class KickInformation:
             #DEBUG printing
             print "loc Score is good. Using it to decide kick."
 
-            relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Location(670,270))
+            relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(670,270))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
             relLocationMeToBall = self.brain.my.relativeLocationOf(self.brain.ball.loc)
@@ -217,22 +219,17 @@ class KickInformation:
             leftPostBearing = self.farLeftPostBearing
         elif self.nearAvgPostDist != 0:
             if self.dangerousBall():
-                # Can only see our own goal: Orbit to block.
-                avgPostBearing = self.nearRightPostBearing + self.nearLeftPostBearing / 2
-                orbitAngle = -180 + avgPostBearing
-                if orbitAngle < -180:
-                    orbitAngle += 180
-                orbitAngle = int(orbitAngle)
+                # Can only see our own goal: Use goalie to make decision
 
-                # Orbit until blocking, not just 45 degrees. Then re-decide kick.
-                kick = kicks.ORBIT_KICK_POSITION
-                kick.h = orbitAngle
-                return kick
+                #DEBUG printing
+                print "Doing a goalie based kick."
+
+                return self.goalieBasedKick()
             else:
                 rightPostBearing = self.nearRightPostBearing
                 leftPostBearing = self.nearLeftPostBearing
         else:
-            # Can't see any posts: orbit
+            # No information at all? Orbit arbitrarily and try again.
             kick = kicks.ORBIT_KICK_POSITION
             kick.h = 45
             return kick
@@ -342,6 +339,95 @@ class KickInformation:
         #  but is repeated for safety.
         kick = kicks.ORBIT_KICK_POSITION
         kick.h = 45
+        return kick
+
+    def goalieBasedKick(self):
+        # Assert: Neither far post was seen.
+        #         At least one near post was seen.
+        #         Goalie can see the ball.
+        goalieBearing = 0
+        goalieDist = 0
+        kick = None
+
+        for mate in self.brain.teamMembers:
+            if mate.playerNumber == 1:
+                goalieBearing = mate.ballBearing
+                goalieDist = mate.ballDist
+
+        # Sanity check.
+        if goalieBearing == 0 or goalieDist == 0:
+            # Something went wrong. Abort and default to no info orbit.
+            kick = kicks.ORBIT_KICK_POSITION
+            kick.h = 45
+            return kick
+
+        # Calculate coordinates of ball, assuming goalie is perfectly centered.
+        goalieX = 70
+        goalieY = 270
+        diffX = math.cos(math.radians(goalieBearing)) * goalieDist
+        diffY = math.sin(math.radians(goalieBearing)) * goalieDist
+        ballX = goalieX + diffX
+        ballY = goalieY + diffY
+        ballLocation = Objects.Location(ballX, ballY)
+
+        # Calculate your bearing on the post with more sightings
+        if len(self.nearGoalRightPostBearings) > len(self.nearGoalLeftPostBearings):
+            # Use the right post
+            relPostBearing = self.nearRightPostBearing
+            ballToPost = ballLocation.relativeLocationOf(Objects.Location(70,200))
+        else:
+            # Use the left post
+            relPostBearing = self.nearLeftPostBearing
+            ballToPost = ballLocation.relativeLocationOf(Objects.Location(70,340))
+
+        ballToPostBearing = ballToPost.bearing
+        myGlobalHeading = ballToPostBearing - relPostBearing
+        if myGlobalHeading < -180:
+            myGlobalHeading += 360
+        elif myGlobalHeading > 180:
+            myGlobalHeading -= 360
+
+        # Assert: I have my global heading and coordinates of the ball.
+
+        #DEBUG printing
+        print "myGlobalHeading: ",myGlobalHeading
+        print "ballY: ",ballY
+
+        # Determine which kick I should do.
+        if myGlobalHeading < -135 or myGlobalHeading > 135:
+            kick = self.chooseBackKick()
+            #should I orbit?
+            if ballY < 270 and myGlobalHeading > 135:
+                kick.h = myGlobalHeading - 180 # to your right
+            elif ballY > 270 and myGlobalHeading < -135:
+                kick.h = myGlobalHeading + 180 # to your left
+            else:
+                kick.h = 0
+        elif myGlobalHeading < -45:
+            kick = kicks.RIGHT_SIDE_KICK
+            #should I orbit?
+            if ballY < 200 or ballY > 340:
+                kick.h = myGlobalHeading + 90
+            else:
+                kick.h = 0
+        elif myGlobalHeading > 45:
+            kick = kicks.LEFT_SIDE_KICK
+            #should I orbit?
+            if ballY < 200 or ballY > 340:
+                kick.h = myGlobalHeading - 90
+            else:
+                kick.h = 0
+        else:
+            kick = self.chooseQuickFrontKick()
+            #should I orbit?
+            if (ballY < 270 and myGlobalHeading < 0) or \
+                    (ballY > 270 and myGlobalHeading > 0):
+                kick.h = myGlobalHeading
+            else:
+                kick.h = 0
+
+        # Make sure the heading is an int before passing it to nav as an orbit angle.
+        kick.h = int(kick.h)
         return kick
 
     def chooseShortFrontKick(self):
