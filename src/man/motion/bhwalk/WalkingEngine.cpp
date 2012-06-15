@@ -360,6 +360,7 @@ void WalkingEngine::updateMotionRequest()
     {
       if(theMotionRequest.walkRequest.kickType != WalkRequest::none && kickPlayer.isKickStandKick(theMotionRequest.walkRequest.kickType))
       {
+          cout << "Cannot request a kick in the walking engine atm! " << endl;
         bool mirrored = kickPlayer.isKickMirrored(theMotionRequest.walkRequest.kickType);
         requestedMotionType = mirrored ? standLeft : standRight;
       }
