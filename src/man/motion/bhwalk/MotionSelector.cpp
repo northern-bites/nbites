@@ -102,7 +102,7 @@ void MotionSelector::update(MotionSelection& motionSelection,
     for(int i = 0; i < MotionRequest::numOfMotions; i++)
     {
       motionSelection.ratios[i] /= sum;
-      if(abs(motionSelection.ratios[i] - 1.f) < 0.00001f)
+      if(fabs(motionSelection.ratios[i] - 1.f) < 0.00001f)
         motionSelection.ratios[i] = 1.f; // this should fix a "motionSelection.ratios[motionSelection.targetMotion] remains smaller than 1.f" bug
     }
 
