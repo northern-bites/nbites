@@ -104,16 +104,16 @@ class KickInformation:
 
         # bearing averages
         # Need more than 4 frames of each post to consider it "real".
-        if len(self.farGoalLeftPostBearings) > 4:
+        if len(self.farGoalLeftPostBearings) > 7:
             self.farLeftPostBearing = (sum(self.farGoalLeftPostBearings) /
                                        len(self.farGoalLeftPostBearings))
-        if len(self.farGoalRightPostBearings) > 4:
+        if len(self.farGoalRightPostBearings) > 7:
             self.farRightPostBearing = (sum(self.farGoalRightPostBearings) /
                                         len(self.farGoalRightPostBearings))
-        if len(self.nearGoalLeftPostBearings) > 4:
+        if len(self.nearGoalLeftPostBearings) > 7:
             self.nearLeftPostBearing = (sum(self.nearGoalLeftPostBearings) /
                                         len(self.nearGoalLeftPostBearings))
-        if len(self.nearGoalRightPostBearings) > 4:
+        if len(self.nearGoalRightPostBearings) > 7:
             self.nearRightPostBearing = (sum(self.nearGoalRightPostBearings) /
                                          len(self.nearGoalRightPostBearings))
         # distance averages
@@ -401,22 +401,30 @@ class KickInformation:
                 kick.h = myGlobalHeading - 180 # to your right
             elif ballY > 270 and myGlobalHeading < -135:
                 kick.h = myGlobalHeading + 180 # to your left
+            else:
+                kick.h = 0
         elif myGlobalHeading < -45:
             kick = kicks.RIGHT_SIDE_KICK
             #should I orbit?
             if ballY < 200 or ballY > 340:
                 kick.h = myGlobalHeading + 90
+            else:
+                kick.h = 0
         elif myGlobalHeading > 45:
             kick = kicks.LEFT_SIDE_KICK
             #should I orbit?
             if ballY < 200 or ballY > 340:
                 kick.h = myGlobalHeading - 90
+            else:
+                kick.h = 0
         else:
             kick = self.chooseQuickFrontKick()
             #should I orbit?
             if (ballY < 270 and myGlobalHeading < 0) or \
                     (ballY > 270 and myGlobalHeading > 0):
                 kick.h = myGlobalHeading
+            else:
+                kick.h = 0
 
         return kick
 
