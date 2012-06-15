@@ -235,13 +235,15 @@ def centerAtGoalBasedOnCorners(player):
         # if it is possible that this is the desired corner
         if(centerAtGoalBasedOnCorners.cornerID in corner.possibilities):
             if(centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L
-               and corner.visualOrientation < 0):
+               and corner.visualOrientation < 0 and
+               player.brain.vision.fieldEdge.centerDist > 110.0):
                 centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
                 heading = corner.getRobotGlobalHeadingIfFieldAngleIs(90)
                 relX = corner.getRobotRelXIfFieldAngleIs(90)
                 relY = corner.getRobotRelYIfFieldAngleIs(90)
             elif(centerAtGoalBasedOnCorners.cornerID ==
-                 IDs.YELLOW_GOAL_RIGHT_L and corner.visualOrientation > 0):
+                 IDs.YELLOW_GOAL_RIGHT_L and corner.visualOrientation > 0 and
+                 player.brain.vision.fieldEdge.centerDist > 110.0):
                 centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
                 heading = corner.getRobotGlobalHeadingIfFieldAngleIs(0)
                 relX = corner.getRobotRelXIfFieldAngleIs(0)
@@ -258,19 +260,21 @@ def centerAtGoalBasedOnCorners(player):
                 centerAtGoalBasedOnCorners.home.relY = (GOALBOX_WIDTH/2.0 -
                                                         relY)
 
-            # corrections to make nav STOP!
-            if fabs(centerAtGoalBasedOnCorners.home.relH) < 5:
-                centerAtGoalBasedOnCorners.home.relH = 0
-
-            if fabs(centerAtGoalBasedOnCorners.home.relX) < 10:
-                centerAtGoalBasedOnCorners.home.relX = 0
-
-            if fabs(centerAtGoalBasedOnCorners.home.relY) < 10:
-                centerAtGoalBasedOnCorners.home.relY = 0
-
             lookTo = RelLocation(-relX, -relY)
 
             # does this work?
-            player.brain.tracker.helper.lookToPointFixedPitch(lookTo)
+            player.brain.tracker.lookToAngle(centerAtGoalBasedOnCorners.cornerDirection)
+
+            break
+
+    # corrections to make nav STOP!
+    if fabs(centerAtGoalBasedOnCorners.home.relH) < 5:
+        centerAtGoalBasedOnCorners.home.relH = 0
+
+    if fabs(centerAtGoalBasedOnCorners.home.relX) < 10:
+        centerAtGoalBasedOnCorners.home.relX = 0
+
+    if fabs(centerAtGoalBasedOnCorners.home.relY) < 10:
+        centerAtGoalBasedOnCorners.home.relY = 0
 
     return Transition.getNextState(player, centerAtGoalBasedOnCorners)

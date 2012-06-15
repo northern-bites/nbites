@@ -39,6 +39,10 @@ def foundACorner(player):
     if player.brain.vision.fieldLines.numCorners == 0:
         return False
 
+    # Throw away false positives from the net!
+    if player.brain.vision.fieldEdge.centerDist < 110.0:
+        return False
+
     for corner in player.brain.vision.fieldLines.corners:
         if (IDs.YELLOW_GOAL_LEFT_L in corner.possibilities and
             corner.visualOrientation < 0 and
