@@ -26,8 +26,8 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         colorSpaceWidget(currentColorSpace, this),
         colorWheel(currentColorSpace, this) {
 
-    QVBoxLayout* mainLayout = new QVBoxLayout;
-    QHBoxLayout* topLayout = new QHBoxLayout;
+    mainLayout = new QVBoxLayout;
+    topLayout = new QHBoxLayout;
 
     //connect all the color spaces to update the thresholded
     //image when their parameters change
@@ -35,6 +35,7 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         connect(&colorSpace[i], SIGNAL(parametersChanged()),
                 this, SLOT(updateThresholdedImage()));
     }
+
 	imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     topLayout->addWidget(imageTabs);
 	thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
@@ -52,9 +53,9 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
 
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
-    QHBoxLayout* bottomLayout = new QHBoxLayout;
-	QVBoxLayout* colorButtons = new QVBoxLayout;
-	QVBoxLayout* leftJunk = new QVBoxLayout;
+    bottomLayout = new QHBoxLayout;
+	colorButtons = new QVBoxLayout;
+	leftJunk = new QVBoxLayout;
 
     //set up the color selection combo box
     for (int i = 0; i < image::NUM_COLORS; i++) {
@@ -91,7 +92,7 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
 	displayAllColors = false;
 
-    mainLayout->addLayout(topLayout);
+	mainLayout->addLayout(topLayout);
 	bottomLayout->setAlignment(Qt::AlignBottom);
     mainLayout->addLayout(bottomLayout);
 
@@ -240,7 +241,6 @@ void ColorCalibrate::imageTabSwitched(int) {
         currentImage = Camera::BOTTOM;
         this->updateThresholdedImage();
     }
-
 }
 
 void ColorCalibrate::loadSlidersBtnPushed() {

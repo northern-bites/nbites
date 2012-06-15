@@ -35,15 +35,15 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	BMPImageViewer* top = new BMPImageViewer(comboTop, this);
     BMPImageViewer* bottom = new BMPImageViewer(comboBottom, this);
 
-	QVBoxLayout* bothImagesLayout = new QVBoxLayout;
+	QHBoxLayout* bothImagesLayout = new QHBoxLayout;
 	QWidget* bothImages = new QWidget;
 
+	bothImagesLayout->setSpacing(0);
 	bothImagesLayout->addWidget(top);
 	bothImagesLayout->addWidget(bottom);
 
-	bothImages->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	bothImages->setMaximumWidth(640);
-	bothImages->setMaximumHeight(480*2);
+	//bothImages->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	//bothImages->setMaximumHeight(480); //just enough room to stack two images
 	bothImages->setLayout(bothImagesLayout);
 
 	QHBoxLayout* mainLayout = new QHBoxLayout;
