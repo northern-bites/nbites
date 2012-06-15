@@ -165,6 +165,10 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
+
+        #DEBUG printing
+        print "Orbiting at angle: ",player.kick.h
+
         if player.kick.h == 0:
             return player.goLater('positionForKick')
         player.brain.tracker.trackBallFixedPitch()

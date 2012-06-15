@@ -117,16 +117,16 @@ class KickInformation:
             self.nearRightPostBearing = (sum(self.nearGoalRightPostBearings) /
                                          len(self.nearGoalRightPostBearings))
         # distance averages
-        if len(self.farGoalLeftPostDists) > 0:
+        if len(self.farGoalLeftPostDists) > 7:
             self.farLeftPostDist = (sum(self.farGoalLeftPostDists) /
                                     len(self.farGoalLeftPostDists))
-        if len(self.farGoalRightPostDists) > 0:
+        if len(self.farGoalRightPostDists) > 7:
             self.farRightPostDist = (sum(self.farGoalRightPostDists) /
                                      len(self.farGoalRightPostDists))
-        if len(self.nearGoalLeftPostDists) > 0:
+        if len(self.nearGoalLeftPostDists) > 7:
             self.nearLeftPostDist = (sum(self.nearGoalLeftPostDists) /
                                      len(self.nearGoalLeftPostDists))
-        if len(self.nearGoalRightPostDists) > 0:
+        if len(self.nearGoalRightPostDists) > 7:
             self.nearRightPostDist = (sum(self.nearGoalRightPostDists) /
                                       len(self.nearGoalRightPostDists))
         # average post distances
