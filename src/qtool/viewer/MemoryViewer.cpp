@@ -66,6 +66,13 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MVision");
     memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MVision");
 
+	//need another set of these to connect the BMPImageViewer copies (top, bottom)
+	memoryManager->connectSlot(bottom, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(top, SLOT(updateView()), "MRawImages");
+
+    memoryManager->connectSlot(bottom, SLOT(updateView()), "MVision");
+    memoryManager->connectSlot(top, SLOT(updateView()), "MVision");
+
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
