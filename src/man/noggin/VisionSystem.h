@@ -66,6 +66,8 @@ class VisionSystem : public PF::SensorModel
                             const ConcretePossibilityT& landmark,
                             const Particle& particle) {
 
+        //       std::cout << "score from a " << landmark << "\n";
+        //std::cout << "coordinates " << landmark.getFieldX() << " , " << landmark.getFieldY() << "\n";
         PF::Vector2D hypothesisVector = PF::getPosition(particle.getLocation(),
                 landmark.getFieldX(), landmark.getFieldY());
 
@@ -119,6 +121,13 @@ class VisionSystem : public PF::SensorModel
 
         PF::Location reconstructedLocation(pose_x, pose_y, pose_h);
 
+        //Throwout automatically any locations off field
+        if ((pose_x < 0) || (pose_x > FIELD_GREEN_HEIGHT) ||
+            (pose_y < 0) || (pose_y > FIELD_GREEN_HEIGHT))
+        {
+//            std::cout << "OFFFIELD POSSIBILITY \n";
+            return 0.0f;
+        }
         float globalOrientationSD = NBMath::getHypotenuse(observation.getBearingSD(),
                                                           observation.getPhysicalOrientationSD());
         return  scoreParticleAgainstPose(particle,
