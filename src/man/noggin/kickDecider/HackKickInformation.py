@@ -426,6 +426,8 @@ class KickInformation:
             else:
                 kick.h = 0
 
+        # Make sure the heading is an int before passing it to nav as an orbit angle.
+        kick.h = int(kick.h)
         return kick
 
     def chooseShortFrontKick(self):
