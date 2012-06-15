@@ -1,6 +1,7 @@
 import NavConstants as constants
 import NavHelper as helper
 import NavTransitions as navTrans
+from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
@@ -66,27 +67,23 @@ def walkingTo(nav):
     """
     Walks to a relative location based on odometry
     """
-    loc = nav.brain.loc
-    dest = walkingTo.dest
-
     if nav.firstFrame():
-        #@todo: make a method that returns odometry as a tuple in PyLoc?
-        walkingTo.startingOdometry = (loc.lastOdoX, loc.lastOdoY, loc.lastOdoTheta)
+        helper.stand(nav)
+        return nav.stay()
 
-    deltaOdo = helper.getDeltaOdometry(loc, walkingTo.startingOdometry)
-    walkingTo.deltaDest = dest - (deltaOdo.relX, deltaOdo.relY, deltaOdo.relH)
-#    print "Delta dest {0}".format(walkingTo.deltaDest)
-#    print str(dest)
-#    print str(deltaOdo)
-    #walk the rest of the way
-    helper.setDestination(nav, walkingTo.deltaDest, walkingTo.speed)
+    if nav.brain.motion.isStanding():
+        if len(walkingTo.destQueue) > 0:
+            dest = walkingTo.destQueue.popleft()
+            helper.setOdometryDestination(nav, dest, walkingTo.speed)
+            return nav.stay()
+        else:
+            return nav.goNow('standing')
 
-    return Transition.getNextState(nav, walkingTo)
+    return nav.stay()
 
-walkingTo.dest = RelRobotLocation(0, 0, 0)
-walkingTo.deltaDest = RelRobotLocation(0, 0, 0) # how much do we have left to walk
+walkingTo.destQueue = deque()
 walkingTo.speed = 0
-walkingTo.precision = (0, 0, 0)
+
 
 # WARNING: avoidObstacle could possibly go into our own box
 def avoidObstacle(nav):
@@ -234,19 +231,6 @@ walking.lastSpeeds = constants.ZERO_SPEEDS # useful for knowing if speeds change
 walking.transitions = {}
 
 ### Stopping States ###
-def stop(nav):
-    """
-    Wait until the walk is finished.
-    """
-    if nav.firstFrame():
-        # stop walk vectors
-        helper.stand(nav)
-
-    if not nav.brain.motion.isWalkActive():
-        return nav.goNow('stopped')
-
-    return nav.stay()
-
 def stopped(nav):
     return nav.stay()
 
@@ -257,7 +241,23 @@ def atPosition(nav):
 
     return Transition.getNextState(nav, atPosition)
 
-def standing(nav):
+def stand(nav):
+    """
+    Transitional state between walking and standing
+    Could still be walking, but we can give it new walk commands
+    so we shouldn't wait to go for it to go to standing before we
+    give it new commands
+    """
     if nav.firstFrame():
         helper.stand(nav)
+
+    if not nav.brain.motion.isWalkActive():
+        return nav.goNow('standing')
+
+    return nav.stay()
+
+def standing(nav):
+    """
+    Complete walk standstill
+    """
     return nav.stay()

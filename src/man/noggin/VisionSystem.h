@@ -15,7 +15,6 @@
 #include "Vision.h"
 #include <boost/math/distributions.hpp>
 
-
 struct LocalizationVisionParams
 {
     float sigma_d;       // Variance for calculating distance weights.
@@ -33,7 +32,6 @@ static const LocalizationVisionParams DEFAULT_LOCVIS_PARAMS =
  */
 class VisionSystem : public PF::SensorModel
 {
-
     typedef PF::LocalizationParticle Particle;
 
  public:

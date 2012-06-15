@@ -8,7 +8,7 @@ from ..util import FSA
 from . import CoreSoccerStates
 
 class SoccerFSA(FSA.FSA):
-    def __init__(self,brain):
+    def __init__(self, brain):
         FSA.FSA.__init__(self, brain)
         #self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(CoreSoccerStates)
@@ -47,7 +47,7 @@ class SoccerFSA(FSA.FSA):
 
         FSA.FSA.run(self)
 
-    def executeMove(self,sweetMove):
+    def executeMove(self, sweetMove):
         """
         Method to do a SweetMove from the behavior
         Can either take in a head move or a body command
@@ -62,7 +62,7 @@ class SoccerFSA(FSA.FSA):
         if x == 0 and y == 0 and theta == 0:
             self.stand()
         else:
-            self.brain.nav.walk(x,y,theta)
+            self.brain.nav.walk(x, y, theta)
 
     def stand(self):
         """ Set the navigator/motion engine to stand"""
@@ -72,7 +72,7 @@ class SoccerFSA(FSA.FSA):
         """
         Wrapper method to navigator to easily stop the robot from walking
         """
-        self.brain.nav.stop()
+        self.stand()
 
     def ballMoved(self):
         """

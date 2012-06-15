@@ -110,12 +110,12 @@ void InertiaSensorFilter::update(OrientationData& orientationData,
     safeRawAngle = Vector2<>(theSensorData.data[SensorData::angleX], theSensorData.data[SensorData::angleY]);
   if((theMotionInfo.motion == MotionRequest::walk || theMotionInfo.motion == MotionRequest::stand ||
       (theMotionInfo.motion == MotionRequest::specialAction && theMotionInfo.specialActionRequest.specialAction == SpecialActionRequest::sitDownKeeper)) &&
-     abs(safeRawAngle.x) < p.calculatedAccLimit.x && abs(safeRawAngle.y) < p.calculatedAccLimit.y)
+     fabs(safeRawAngle.x) < p.calculatedAccLimit.x && fabs(safeRawAngle.y) < p.calculatedAccLimit.y)
   {
     const RotationMatrix& usedRotation(useLeft ? leftFootInvert.rotation : rightFootInvert.rotation);
     RotationMatrix calculatedRotation(Vector3<>(
-                                        atan2(usedRotation.c1.z, usedRotation.c2.z),
-                                        atan2(-usedRotation.c0.z, usedRotation.c2.z), 0.f));
+                                        atan2f(usedRotation.c1.z, usedRotation.c2.z),
+                                        atan2f(-usedRotation.c0.z, usedRotation.c2.z), 0.f));
     Vector3<> accGravOnly(calculatedRotation.c0.z, calculatedRotation.c1.z, calculatedRotation.c2.z);
     accGravOnly *= -9.80665f;
     readingUpdate(accGravOnly);
@@ -128,8 +128,8 @@ void InertiaSensorFilter::update(OrientationData& orientationData,
 
   // fill the representation
   orientationData.orientation = Vector2<>(
-                                  atan2(x.rotation.c1.z, x.rotation.c2.z),
-                                  atan2(-x.rotation.c0.z, x.rotation.c2.z));
+                                  atan2f(x.rotation.c1.z, x.rotation.c2.z),
+                                  atan2f(-x.rotation.c0.z, x.rotation.c2.z));
   // this removes any kind of z-rotation from internal rotation
   if(orientationData.orientation.squareAbs() < 0.04f * 0.04f)
     x.rotation = RotationMatrix(Vector3<>(orientationData.orientation.x, orientationData.orientation.y, 0.f));
@@ -260,12 +260,12 @@ void InertiaSensorFilter::cholOfCov()
   float& l22(l.c[1].y);
 
   //ASSERT(a11 >= 0.f);
-  l11 = sqrt(std::max<>(a11, 0.f));
+  l11 = sqrtf(std::max<>(a11, 0.f));
   if(l11 == 0.f) l11 = 0.0000000001f;
   l21 = a21 / l11;
 
   //ASSERT(a22 - l21 * l21 >= 0.f);
-  l22 = sqrt(std::max<>(a22 - l21 * l21, 0.f));
+  l22 = sqrtf(std::max<>(a22 - l21 * l21, 0.f));
   if(l22 == 0.f) l22 = 0.0000000001f;
 }
 

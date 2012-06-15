@@ -67,6 +67,7 @@ private:
   // Variables
   //
 public:
+    boost::shared_ptr<man::memory::RobotMemory> memory;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<RoboGuardian> guardian;
     boost::shared_ptr<Transcriber> transcriber;
@@ -84,7 +85,6 @@ public:
 #endif
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
-    boost::shared_ptr<man::memory::RobotMemory> memory;
     boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
 
 #ifdef USE_NOGGIN

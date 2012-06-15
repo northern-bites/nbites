@@ -25,10 +25,11 @@ static const std::string streamableObjects[] = {
         "MRawImages",
         "MVisionSensors",
         "MMotionSensors",
-        "MLocalization"
+        "MLocalization",
+        "MMotion"
 };
 
-static const int numStreamableObjects = 5;
+static const int numStreamableObjects = 6;
 
 class RobotMemory : public Memory {
 

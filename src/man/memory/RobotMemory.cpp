@@ -18,6 +18,7 @@ RobotMemory::RobotMemory() {
     this->addObject<MMotionSensors>();
     this->addObject<MRawImages>();
     this->addObject<MLocalization>();
+    this->addObject<MMotion>();
 }
 
 RobotMemory::~RobotMemory() {

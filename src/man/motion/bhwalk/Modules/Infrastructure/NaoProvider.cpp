@@ -190,7 +190,7 @@ void NaoProvider::update(JointData& jointData, const JointCalibration &theJointC
     }
     else
     {
-      jointData.angles[i] = sensors[j++] * theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
+      jointData.angles[i] = sensors[j++] * (float)theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
       sensorData.currents[i] = short(1000 * sensors[j++]);
       sensorData.temperatures[i] = (unsigned char) sensors[j++];
     }
