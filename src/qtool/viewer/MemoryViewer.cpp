@@ -55,7 +55,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	imageTabs->addTab(bothImages, QString("Both Images"));
 
 	mainLayout->addWidget(imageTabs);
-	mainWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	mainWidget->setLayout(mainLayout);
     this->setCentralWidget(mainWidget);
 

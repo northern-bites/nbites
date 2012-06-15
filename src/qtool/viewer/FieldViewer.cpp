@@ -21,7 +21,7 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 			        stopButton(new QPushButton("Stop Location", this)) {
 
     mainLayout = new QVBoxLayout(this);
-    scaleFactor = 1.35f;
+	scaleFactor = 1.0f;
 
     //field image painted via overlay of robots, field
     fieldImage = new PaintField(this, scaleFactor);
@@ -32,7 +32,6 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 
     connect(bot_locs->locs, SIGNAL(newRobotLocation()), fieldView, SLOT(updateView()));
 
-    spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     field = new QHBoxLayout();
     field->addWidget(fieldView);
 
@@ -46,7 +45,6 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
     //paint the field
     mainLayout->addLayout(buttonLayout);
     mainLayout->addLayout(field);
-    mainLayout->addItem(spacer);
     this->setLayout(mainLayout);
 }
 
