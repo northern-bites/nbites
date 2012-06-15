@@ -117,7 +117,9 @@ def shouldPerformSave(player):
     """
     return (player.brain.ball.loc.relVelX < -50.0 and
             player.brain.ball.vis.on and
-            player.brain.ball.loc.dist < 150.0)
+            player.brain.ball.loc.dist > 120.0 and
+            player.brain.ball.loc.dist < 200.0 and
+            player.brain.ball.loc.relY < 100.0)
 
 def shouldClearBall(player):
     """
@@ -158,7 +160,7 @@ def walkedTooFar(player):
                             player.brain.loc.lastOdoY,
                             player.brain.loc.lastOdoTheta) -
             VisualGoalieStates.returnToGoal.storedOdo)
-    return diff.relX > 90.0 or fabs(diff.relY) > 130.0
+    return diff.relX > 90.0 or fabs(diff.relY) > 140.0
 
 def reachedTheBall(player):
     """
