@@ -13,6 +13,10 @@ class KickInformation:
 #        self.decider = decider
         self.brain = brain
 
+        # If true, we will always aim for the center of the goal.
+        # If false, we will aim for the corners of the goal.
+        self.aimCenter = True
+
         self.farGoalLeftPostBearings = []
         self.farGoalRightPostBearings = []
         self.nearGoalLeftPostBearings = []
@@ -165,6 +169,7 @@ class KickInformation:
         print "In method shoot."
 
         # Is loc GOOD_ENOUGH for a kick decision?
+        # Need to use aimCenter in decision.
         # Loc is currently never accurate enough @summer 2012
         if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
@@ -272,6 +277,7 @@ class KickInformation:
         print "leftScorePoint:  ",leftScorePoint
 
         # If any kick is currently valid, choose that kick.
+        # Note: this ignores the aimCenter distinction.
         if leftScorePoint > 0 and rightScorePoint < 0:
             kick = self.chooseQuickFrontKick()
         elif leftScorePoint > 90 and rightScorePoint < 90:
@@ -289,6 +295,7 @@ class KickInformation:
         # Choose whichever kick is closest to being between the score points.
         # Note: no kick bearing is between the posts, so they are all
         #   to the right of the rightScorePoint or left of leftScorePoint.
+        # If not aimCenter, pick whichever kick is closest to either score point.
         avgScorePoint = int((rightScorePoint + leftScorePoint) * .5)
 
         #DEBUG printing
@@ -299,34 +306,58 @@ class KickInformation:
             if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:
                     #Closer to the leftScorePoint
                 kick = self.chooseBackKick()
-                kick.h = 1 #HACK
+                if self.aimCenter:
+                    kick.h = 180 - avgScorePoint
+                else:
+                    kick.h = 180 - leftScorePoint
             else:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.h = 90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 90 - avgScorePoint
+                else:
+                    kick.h = 90 - rightScorePoint
         elif rightScorePoint > 0:
             # Quadrent 1
             if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.h = 90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 90 - avgScorePoint
+                else:
+                    kick.h = 90 - leftScorePoint
             else:
                 kick = self.chooseQuickFrontKick()
-                kick.h = 0 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 0 - avgScorePoint
+                else:
+                    kick.h = 0 - rightScorePoint
         elif rightScorePoint > -90:
             # Quadrent 4
             if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
                 kick = self.chooseQuickFrontKick()
-                kick.h = 0 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = 0 - avgScorePoint
+                else:
+                    kick.h = 0 - leftScorePoint
             else:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.h = -90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = -90 - avgScorePoint
+                else:
+                    kick.h = -90 - rightScorePoint
         else:
             # Quadrent 3
             if (-90 - leftScorePoint) - (rightScorePoint + 180) < 0:
                 kick = kicks.LEFT_SIDE_KICK
-                kick.h = -90 - avgScorePoint
+                if self.aimCenter:
+                    kick.h = -90 - avgScorePoint
+                else:
+                    kick.h = -90 - leftScorePoint
             else:
                 kick = self.chooseBackKick()
-                kick.h = 1 #HACK
+                if self.aimCenter:
+                    kick.h = -180 - avgScorePoint
+                else:
+                    kick.h = -180 - rightScorePoint
 
         if kick is not None:
             return kick
