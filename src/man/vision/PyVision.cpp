@@ -188,6 +188,12 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("possibilities", &VisualCorner::getIDs)
         .def_readonly("angleX", &VisualCorner::getAngleXDeg)
         .def_readonly("angleY", &VisualCorner::getAngleYDeg)
+        .def("getRobotGlobalHeadingIfFieldAngleIs",
+             &VisualCorner::getRobotGlobalHeadingIfFieldAngleIs)
+        .def("getRobotRelXIfFieldAngleIs",
+             &VisualCorner::getRobotRelXIfFieldAngleIs)
+        .def("getRobotRelYIfFieldAngleIs",
+             &VisualCorner::getRobotRelYIfFieldAngleIs)
         ;
 
     // VisualCorner can return a vector of IDs from ConcreteCorner
