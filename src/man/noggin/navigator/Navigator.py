@@ -154,6 +154,7 @@ class Navigator(FSA.FSA):
         """
         #DEBUG printing
         print "In navigator, orbit angle is: ",angle
+        print "In navigator, orbit radius is: ", radius
         #Note: abs(angle) < 45 ALWAYS
 
         NavStates.walkingTo.destQueue.clear()

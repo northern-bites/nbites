@@ -42,32 +42,32 @@ LEFT_SIDE_KICK =  Kick("L_Side", x = 17, y =  -.5,
 RIGHT_SIDE_KICK = Kick("R_Side", x = 17, y = .5,
                        move=SweetMoves.RIGHT_SIDE_KICK)
 #new- sweet spots sorta done
-LEFT_SHORT_SIDE_KICK = Kick("L_Short_Side", x = 17, y = -.5,
-                            move=SweetMoves.LEFT_SHORT_SIDE_KICK)
+LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 17, y = -.5,
+                             move=SweetMoves.LEFT_SHORT_SIDE_KICK)
 RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 17, y = .5,
                              move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
 #new- sweet spots done
-LEFT_STRAIGHT_KICK = Kick("L_Straight", x = 18, y = 4.5,
-                             move=SweetMoves.LEFT_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK =Kick("R_Straight", x = 18, y = -4.5,
-                             move=SweetMoves.RIGHT_STRAIGHT_KICK)
+LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 18, y = 4.5,
+                           move=SweetMoves.LEFT_STRAIGHT_KICK)
+RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 18, y = -4.5,
+                           move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
 #new- sweet spots done
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 19, y =  5.3,
-                                   move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 19, y = -5.3,
-                                   move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 17.5, y =  5.3,
+                                 move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 17.5, y = -5.3,
+                                 move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 #new
-LEFT_QUICK_STRAIGHT_KICK = Kick("L_Quick_Straight", x = 15, y = 5.5,
-                                   move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
+LEFT_QUICK_STRAIGHT_KICK =  Kick("L_Quick_Straight", x = 15, y = 5.5,
+                                 move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
 RIGHT_QUICK_STRAIGHT_KICK = Kick("R_Quick_Straight", x = 15, y = -5.5,
-                                   move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
+                                 move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
 
 #usopen12 hack
 LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 11, y =  3,
-                                   move=SweetMoves.LEFT_BIG_KICK)
+                      move=SweetMoves.LEFT_BIG_KICK)
 RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 11, y = -3,
-                                   move=SweetMoves.RIGHT_BIG_KICK)
+                      move=SweetMoves.RIGHT_BIG_KICK)
 
 # used when we haven't decided what kick to do yet
 ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
