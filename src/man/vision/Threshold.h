@@ -144,7 +144,7 @@ public:
 	void findBallLowerCamera(int column, int topEdge);
     void detectSelf();
     void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
-	void identifyGoalie(bool left, bool right);
+	void identifyGoalie();
     void objectRecognition();
     void newFindRobots(); //ben's function
     // helper methods

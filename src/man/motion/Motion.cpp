@@ -30,9 +30,10 @@ using namespace std;
 
 Motion::Motion (boost::shared_ptr<MotionEnactor> _enactor,
                 boost::shared_ptr<Sensors> s,
-                boost::shared_ptr<NaoPose> _pose)
+                boost::shared_ptr<NaoPose> _pose,
+                man::memory::MMotion::ptr mMotion)
   : Thread("Motion"),
-    switchboard(s, _pose),
+    switchboard(s, _pose, mMotion),
     interface(&switchboard),
     enactor(_enactor),
     pose(_pose)
