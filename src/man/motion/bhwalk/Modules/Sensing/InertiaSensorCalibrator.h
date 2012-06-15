@@ -134,12 +134,13 @@ private:
   JointCalibration lastJointCalibration; /**< Some parts of the joint calibration of the previous iteration. */
 #endif
 
+  public:
   /**
   * Resets all internal values (including determined calibration) of this module.
   */
   void reset();
 
-  public:
+
   /**
   * Updates the InertiaSensorData representation.
   * @param inertiaSensorData The inertia sensor data representation which is updated by this module.
