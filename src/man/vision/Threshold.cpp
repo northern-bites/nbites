@@ -88,76 +88,157 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
 //this loop will perform obstabcle detection, and for now it is seperate from
 //other detection, though in the future, we should change this.
 void Threshold::obstacleLoop() {
+  vision->obstacles->init();
 
   usingTopCamera = false;
   pose->transform(usingTopCamera);
 
   unsigned char pixel = GREEN;
-  float upperTotalL = 0, upperTotalR = 0;
-  float greenCountL = 0, greenCountR = 0;
-  float yellowCountD = 0, yellowCountU = 0;
-  float lowerTotalL = 0, lowerTotalR = 0;
-  float botL = 1.0, botR = 1.0;
-  float topL = 1.0, topR = 1.0;
-  vision->obstacles->init();
   
-  detectSelf();
+  float tempTotalLeft = 0.0, tempTotalRight = 0.0;
+  float greenLeftB = 0.0, greenRightB = 0.0;
+  float yellowLeftB = 0.0, yellowRightB = 0.0;
+  float whiteLeftB = 0.0, whiteRightB = 0.0;
+  float undefLeftB = 0.0, undefRightB = 0.0;
+  bool postBottom = false, bottomLeftFree = false, bottomRightFree = false;
   
-  for (int i = 0; i < IMAGE_WIDTH; i += 1) {
-    lowerTotalL += IMAGE_HEIGHT;//lowerBound[i];
-    lowerTotalR += IMAGE_HEIGHT;//lowerBound[i];
-    for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+  for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+    for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
       pixel = getThresholded(j, i);
-      if (Utility::isGreen(pixel) && i < IMAGE_WIDTH/2) greenCountL++;
-      else if (Utility::isGreen(pixel) && i >= IMAGE_WIDTH/2) greenCountR++;
-
-      if (Utility::isYellow(pixel)) yellowCountD++;
+      if (Utility::isGreen(pixel))
+	greenLeftB++;
+      else if (Utility::isYellow(pixel))
+	yellowLeftB++;
+      else if (Utility::isWhite(pixel))
+	whiteLeftB++;
+      else if (Utility::isUndefined(pixel))
+	undefLeftB++;
+      tempTotalLeft++;
+    }
+    for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
+      pixel = getThresholded(j, i);
+      if (Utility::isGreen(pixel))
+	greenRightB++;
+      else if (Utility::isYellow(pixel))
+	yellowRightB++;
+      else if (Utility::isWhite(pixel))
+	whiteRightB++;
+      else if (Utility::isUndefined(pixel))
+	undefRightB++;
+      tempTotalRight++;
     }
   }
-  botL = greenCountL/lowerTotalL;
-  botR = greenCountR/lowerTotalR;
+  greenLeftB /= tempTotalLeft; greenRightB /= tempTotalRight;
+  yellowLeftB /= tempTotalLeft; yellowRightB /= tempTotalRight;
+  whiteLeftB /= tempTotalLeft; whiteRightB /= tempTotalRight;
+  undefLeftB /= tempTotalLeft; undefRightB /= tempTotalRight;
 
-  // cout << "In the bottom I see this much post: " << yellowCountD << endl;
+  /**********************************************
+   *This is the first set of detections*
+   *********************************************/
+  //First, we throw things out.
+  if (greenLeftB > yellowLeftB && greenLeftB > whiteLeftB && greenLeftB > undefLeftB) {
+    bottomLeftFree = true;
+   }
+  if (greenRightB > yellowRightB && greenRightB > whiteRightB && greenRightB > undefRightB) {
+    bottomRightFree = true;
+  }
+  if (bottomLeftFree && bottomRightFree) {
+    return;
+  }
+
+  //Only Posts can be uniquely thrown out in the bottom
+  if ((yellowLeftB - greenLeftB > 0.1) || (yellowRightB - greenRightB > 0.1)) {
+    if (yellowLeftB - greenLeftB > 0.1) {
+      vision->obstacles->setPostLeft(true);
+    }
+    if (yellowRightB - greenRightB > 0.1) {
+      vision->obstacles->setPostRight(true);
+    }
+    postBottom = true;
+  }
+
+
   
   usingTopCamera = true;
   pose->transform(usingTopCamera);
-  field->findGreenHorizon(pose->getHorizonY(0), pose->getHorizonSlope());
   
-  greenCountL = 0;
-  greenCountR = 0;
-  for (int i = 0; i < IMAGE_WIDTH; i += 1) {
-    for (int j = max(0, field->horizonAt(i)); j < IMAGE_HEIGHT; j += 1) {
+  tempTotalLeft = 0.0, tempTotalRight = 0.0;
+  float greenLeftT = 0.0, greenRightT = 0.0;
+  float yellowLeftT = 0.0, yellowRightT = 0.0;
+  float whiteLeftT = 0.0, whiteRightT = 0.0;
+  float undefLeftT = 0.0, undefRightT = 0.0;
+  bool topLeftFree = false, topRightFree = false;
+
+  for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+    for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
       pixel = getThresholded(j, i);
-      if (i < IMAGE_WIDTH/2) {
-	if (Utility::isGreen(pixel)) greenCountL++;
-	upperTotalL++;
-      } else if (i >= IMAGE_WIDTH/2) {
-	if (Utility::isGreen(pixel)) greenCountR++;
-	upperTotalR++;
-      }
+      if (Utility::isGreen(pixel))
+	greenLeftT++;
+      else if (Utility::isYellow(pixel))
+	yellowLeftT++;
+      else if (Utility::isWhite(pixel))
+	whiteLeftT++;
+      else if (Utility::isUndefined(pixel))
+	undefLeftT++;
+      tempTotalLeft++;
     }
-    for (int j = 0; j < IMAGE_HEIGHT && yellowCountD > 10000; j+=1) {
+    for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
       pixel = getThresholded(j, i);
-      if (Utility::isYellow(pixel)) yellowCountU++;
+      if (Utility::isGreen(pixel))
+	greenRightT++;
+      else if (Utility::isYellow(pixel))
+	yellowRightT++;
+      else if (Utility::isWhite(pixel))
+	whiteRightT++;
+      else if (Utility::isUndefined(pixel))
+	undefRightT++;
+      tempTotalRight++;
     }
   }
-  if (upperTotalL > 0)
-    topL = greenCountL/upperTotalL;
-  else topL = 2.0; // so that looking over the field edge is not an obstacle.
-  if (upperTotalR > 0)
-    topR = greenCountR/upperTotalR;
-  else 
-    topR = 2.0;
-
-  if (botL < 0.5 && topL < 0.4) vision->obstacles->setLeft(true);
-  if (botR < 0.5 && topR < 0.4) vision->obstacles->setRight(true);
-  if (topL >= 1.0 || topR >= 1.0) vision->obstacles->setOffField(true);
-  if (vision->obstacles->offField()) cout << "I am looking off the field\n";
-  if (vision->obstacles->onLeft()) cout << "BotL = " << botL << " TopL = " << topL << endl;
-  if (vision->obstacles->onRight()) cout << "BotR = " << botR << " TopR = " << topR << endl;
-  //  cout << "the amount of goalPost is: " << yellowCountU << endl;}
+  greenLeftT /= tempTotalLeft; greenRightT /= tempTotalRight;
+  yellowLeftT /= tempTotalLeft; yellowRightT /= tempTotalRight;
+  whiteLeftT /= tempTotalLeft; whiteRightT /= tempTotalRight;
+  undefLeftT /= tempTotalLeft; undefRightT /= tempTotalRight;
 
 
+  /***********************************************************
+   *This is the second set of detections*
+   **********************************************************/
+  if(!bottomLeftFree) { //if no obstacle in bottom, then not in top either
+    if (greenLeftT > yellowLeftT && greenLeftT > whiteLeftT && greenLeftT > undefLeftT && 
+	!vision->obstacles->onLeft()) {
+      topLeftFree = true;
+    }
+    if (!topLeftFree) { // same principle as !bottomLeftFree
+      if (undefLeftT - (greenLeftT + whiteLeftT + yellowLeftT) > 0.1) {
+	vision->obstacles->setOffField(true);
+      } 
+      else if (whiteLeftT > greenLeftT && (undefLeftT - (whiteLeftT + greenLeftT) < 0.1)) {
+	vision->obstacles->setLeft(true);
+      }
+    }
+  }
+
+
+
+  if (!bottomRightFree) { //if no obstacle in bottom, not in top either
+    if (greenRightT > yellowRightT && greenRightT > whiteRightT && greenRightT > undefRightT &&
+	!vision->obstacles->onRight()) {
+      topRightFree = true;
+    }
+    if (!topRightFree) { // same principle as !bottomRightFree
+      if (undefRightT - (greenRightT + whiteRightT + yellowRightT) > 0.1) {
+	vision->obstacles->setOffField(true);
+      } 
+      else if (whiteRightT > greenRightT && (undefRightT - (whiteRightT + greenRightT) < 0.1)) {
+	vision->obstacles->setRight(true);
+      }
+    }  
+    
+  }
+  
+}
 
 /* Main vision loop, called by Vision.cc
  */
