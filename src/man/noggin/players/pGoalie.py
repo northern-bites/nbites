@@ -144,7 +144,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.noCorner,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
-            : GoalieStates.watch
+            : GoalieStates.watch,
+
+            Transition.CountTransition(GoalieTransitions.ballMoreImportant,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.clearIt
             }
 
         VisualGoalieStates.centerAtGoalBasedOnCorners.transitions = {

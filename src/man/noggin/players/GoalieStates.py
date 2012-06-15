@@ -75,20 +75,20 @@ def gamePlaying(player):
     return player.goLater('watch')
 
 def gamePenalized(player):
+    if player.firstFrame():
+        player.brain.logger.stopLogging()
+        player.inKickingState = False
+        player.stopWalking()
+        player.penalizeHeads()
+
     if player.lastDiffState == '':
         # Just started up! Need to calibrate sensors
         player.gainsOn()
         player.brain.nav.stand()
 
     # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
+    if (not player.brain.motion.calibrated()):
         return player.stay()
-
-    if player.firstFrame():
-        player.brain.logger.stopLogging()
-        player.inKickingState = False
-        player.stopWalking()
-        player.penalizeHeads()
 
     return player.stay()
 

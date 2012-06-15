@@ -60,10 +60,23 @@ def foundACorner(player):
     return False
 
 def lostCorner(player):
+    """
+    Goalie no longer sees the corner it was localizing based on.
+    """
     return not foundACorner(player) and player.counter > 60
 
 def noCorner(player):
+    """
+    Goalie cannot find a corner to localize on. Given more time because
+    the pan is very slow.
+    """
     return not foundACorner(player) and player.counter > 150
+
+def ballMoreImportant(player):
+    """
+    Goalie needs to chase, not localize itself.
+    """
+    return player.brain.ball.vis.on and player.brain.ball.vis.dist < 100.0
 
 def facingForward(player):
     """

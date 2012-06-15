@@ -144,16 +144,24 @@ def spinAtGoal(player):
 # clearIt->kickBall->didIKickIt->returnToGoal
 def clearIt(player):
     if player.firstFrame():
+        player.brain.tracker.trackBallFixedPitch()
         returnToGoal.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
                                                   player.brain.loc.lastOdoY,
                                                   0.0)
         if player.brain.ball.loc.relY < 0.0:
             player.side = RIGHT
+            clearIt.ballDest = RelRobotLocation((player.brain.ball.loc.relX -
+                                                 18.0),
+                                                (player.brain.ball.loc.relY +
+                                                 5.0),
+                                                0.0)
         else:
             player.side = LEFT
-        clearIt.ballDest = RelRobotLocation(player.brain.ball.loc.relX - 18.0,
-                                            player.brain.ball.loc.relY,
-                                            0.0)
+            clearIt.ballDest = RelRobotLocation((player.brain.ball.loc.relX -
+                                                 18.0),
+                                                (player.brain.ball.loc.relY -
+                                                 5.0),
+                                                0.0)
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.FAST_SPEED)
