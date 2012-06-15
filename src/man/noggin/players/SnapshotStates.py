@@ -23,8 +23,8 @@ def gameSet(player):
 
 def gamePlaying(player):
 
-    #if player.firstFrame():
-    #    player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
+    if player.firstFrame():
+        player.brain.nav.orbitAngle(20, 90)
 
     #if player.brain.ball.vis.on:
     # player.brain.sensors.saveFrame()
@@ -34,9 +34,9 @@ def gamePlaying(player):
     return player.stay()
 
 def gamePenalized(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.SIT_POS)
-        player.brain.tracker.stopHeadMoves()
+#    if player.firstFrame():
+#        player.executeMove(SweetMoves.SIT_POS)
+#        player.brain.tracker.stopHeadMoves()
     return player.stay()
 
 def doneState(player):
