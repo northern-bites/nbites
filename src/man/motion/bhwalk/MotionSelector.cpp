@@ -6,6 +6,9 @@
 */
 
 #include "MotionSelector.h"
+
+#include <math.h>
+
 //#include "Tools/Debugging/DebugDrawings.h"
 
 //MAKE_MODULE(MotionSelector, Motion Control)
@@ -85,7 +88,7 @@ void MotionSelector::update(MotionSelection& motionSelection,
     // increase / decrease all ratios according to target motion
     const unsigned deltaTime(theFrameInfo.getTimeSince(lastExecution));
     const int interpolationTime = prevMotion == MotionRequest::specialAction && lastActiveSpecialAction == SpecialActionRequest::playDead ? playDeadDelay : interpolationTimes[motionSelection.targetMotion];
-    float delta((float)deltaTime / interpolationTime);
+    float delta((float)deltaTime / (float)interpolationTime);
 //    ASSERT(SystemCall::getMode() == SystemCall::logfileReplay || delta > 0.00001f);
     float sum(0);
     for(int i = 0; i < MotionRequest::numOfMotions; i++)

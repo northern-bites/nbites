@@ -287,9 +287,3 @@ void c_init_vision() {
 void set_vision_pointer (boost::shared_ptr<Vision> visionptr) {
     vision_pointer = visionptr;
 }
-
-
-
-
-
-
