@@ -147,9 +147,6 @@ class Navigator(FSA.FSA):
         It will orbit in steps, each orbit taking ~30 degrees (more like 45
         when I test it out)
         """
-        #DEBUG printing
-        print "In navigator, orbit angle is: ",angle
-        #Note: abs(angle) < 45 ALWAYS
 
         NavStates.walkingTo.destQueue.clear()
 

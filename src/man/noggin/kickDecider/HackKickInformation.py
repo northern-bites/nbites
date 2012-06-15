@@ -5,6 +5,8 @@ import objects as Objects
 import noggin_constants as nogginConstants
 import math
 
+DEBUG_KICK_DECISION = False
+
 class KickInformation:
     """
     Class to hold all the things we need to decide a kick
@@ -102,9 +104,9 @@ class KickInformation:
         if not self.haveData:
             return
 
-        #DEBUG printing
-        print "Total far goal sightings (sum both posts): ",len(self.farGoalLeftPostBearings)+len(self.farGoalRightPostBearings)
-        print "Total near goal sightings (sum both posts): ",len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
+        if DEBUG_KICK_DECISION:
+            print "Total far goal sightings (sum both posts): ",len(self.farGoalLeftPostBearings)+len(self.farGoalRightPostBearings)
+            print "Total near goal sightings (sum both posts): ",len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
 
         # bearing averages
         # Need more than 4 frames of each post to consider it "real".
@@ -173,8 +175,8 @@ class KickInformation:
         # Loc is currently never accurate enough @summer 2012
         if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
-            #DEBUG printing
-            print "loc Score is good. Using it to decide kick."
+            if DEBUG_KICK_DECISION:
+                print "loc Score is good. Using it to decide kick."
 
             relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,nogginConstants.CENTER_FIELD_Y))
             bearingBallToGoal = relLocationBallToGoal.bearing
@@ -207,9 +209,9 @@ class KickInformation:
 
 
         # Loc is bad- use only visual information to choose a kick.
-        #DEBUG printing
-        print "Using vision for kick decision."
-        print "Dangerous ball? ",self.dangerousBall()
+        if DEBUG_KICK_DECISION:
+            print "Using vision for kick decision."
+            print "Dangerous ball? ",self.dangerousBall()
 
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
@@ -226,7 +228,7 @@ class KickInformation:
             if self.dangerousBall():
                 # Can only see our own goal: Use goalie to make decision
 
-                #DEBUG printing
+                if DEBUG_KICK_DECISION
                 print "Doing a goalie based kick."
 
                 return self.goalieBasedKick()
@@ -298,8 +300,8 @@ class KickInformation:
         # If not aimCenter, pick whichever kick is closest to either score point.
         avgScorePoint = int((rightScorePoint + leftScorePoint) * .5)
 
-        #DEBUG printing
-        print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
+        if DEBUG_KICK_DECISION:
+            print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
 
         if rightScorePoint > 90:
                 # Quadrent 2
@@ -362,8 +364,8 @@ class KickInformation:
         if kick is not None:
             return kick
 
-        #DEBUG printing
-        print "Somehow got to end without a kick..."
+        if DEBUG_KICK_DECISION:
+            print "Somehow got to end without a kick..."
 
         # If all else fails, orbit and re-decide.
         # Note: this case should already be covered above,
@@ -420,9 +422,9 @@ class KickInformation:
 
         # Assert: I have my global heading and coordinates of the ball.
 
-        #DEBUG printing
-        print "myGlobalHeading: ",myGlobalHeading
-        print "ballY: ",ballY
+        if DEBUG_KICK_DECISION:
+            print "myGlobalHeading: ",myGlobalHeading
+            print "ballY: ",ballY
 
         # Determine which kick I should do.
         if myGlobalHeading < -135 or myGlobalHeading > 135:
