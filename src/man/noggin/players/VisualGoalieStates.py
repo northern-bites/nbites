@@ -220,6 +220,7 @@ def returnToGoal(player):
 def findGoalboxCorner(player):
     if player.firstFrame():
         player.brain.tracker.repeatHeadMove(FIXED_PITCH_SLOW_GOALIE_PAN)
+        player.brain.nav.stop()
 
     return Transition.getNextState(player, findGoalboxCorner)
 
@@ -269,6 +270,7 @@ def centerAtGoalBasedOnCorners(player):
 
             lookTo = RelLocation(-relX, -relY)
 
+            # does this work?
             player.brain.tracker.helper.lookToPointFixedPitch(lookTo)
 
     return Transition.getNextState(player, centerAtGoalBasedOnCorners)

@@ -139,13 +139,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.foundACorner,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.centerAtGoalBasedOnCorners
+            : VisualGoalieStates.centerAtGoalBasedOnCorners,
+
+            Transition.CountTransition(GoalieTransitions.noCorner,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.HIGH_PRECISION)
+            : GoalieStates.watch
             }
 
         VisualGoalieStates.centerAtGoalBasedOnCorners.transitions = {
-            Transition.CountTransition(GoalieTransitions.lostMyCorner,
+            Transition.CountTransition(GoalieTransitions.lostCorner,
                                        Transition.ALL_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
+                                       Transition.OK_PRECISION)
             : GoalieStates.watch,
 
             Transition.CountTransition(GoalieTransitions.reachedTheBall,

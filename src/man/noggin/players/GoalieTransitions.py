@@ -55,8 +55,11 @@ def foundACorner(player):
 
     return False
 
-def lostMyCorner(player):
+def lostCorner(player):
     return not foundACorner(player) and player.counter > 60
+
+def noCorner(player):
+    return not foundACorner(player) and player.counter > 150
 
 def facingForward(player):
     """
@@ -125,11 +128,11 @@ def shouldClearBall(player):
         return False
 
     # if definitely within goal box
-    if (player.brain.ball.vis.dist < 80.0):
+    if (player.brain.ball.vis.dist < 70.0):
         return True
 
     # if to sides of box
-    if (player.brain.ball.vis.dist < 130.0 and
+    if (player.brain.ball.vis.dist < 120.0 and
         fabs(player.brain.ball.vis.bearing) > 40.0):
         return True
 
@@ -155,7 +158,7 @@ def walkedTooFar(player):
                             player.brain.loc.lastOdoY,
                             player.brain.loc.lastOdoTheta) -
             VisualGoalieStates.returnToGoal.storedOdo)
-    return diff.relX > 80.0 or fabs(diff.relY) > 90.0
+    return diff.relX > 90.0 or fabs(diff.relY) > 130.0
 
 def reachedTheBall(player):
     """
