@@ -35,7 +35,6 @@ void BMPImageViewer::updateView() {
 
 		int maxWidth = this->width();
 		int maxHeight = this->height();
-		qDebug()<<maxWidth<<maxHeight;
 
 		if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
 			scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);

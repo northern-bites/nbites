@@ -40,7 +40,6 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
 	bothImagesLayout->addWidget(top);
 	bothImagesLayout->addWidget(bottom);
-	qDebug()<<bothImagesLayout->sizeHint().height();
 
 	bothImages->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	bothImages->setMaximumWidth(640);
