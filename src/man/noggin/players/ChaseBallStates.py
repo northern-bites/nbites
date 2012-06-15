@@ -63,6 +63,9 @@ def approachBall(player):
             else:
                 player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             player.shouldKickOff = False
+
+            player.kick = kicks.LEFT_SIDE_KICK
+
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')
@@ -89,6 +92,32 @@ def prepareForKick(player):
         player.kick = prepareForKick.hackKick.shoot()
         print str(player.kick)
         return player.goNow('orbitBall')
+
+    return player.stay()
+
+def orbitBall(player):
+    """
+    State to orbit the ball
+    """
+    if player.firstFrame():
+
+        #DEBUG printing
+        print "Orbiting at angle: ",player.kick.h
+
+        if player.kick.h == 0:
+            return player.goLater('positionForKick')
+            player.brain.tracker.trackBallFixedPitch()
+            player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
+
+    if player.brain.nav.isStopped():
+        player.inKickingState = False
+        player.shouldOrbit = False
+        player.kick.h = 0
+        if player.kick == kicks.ORBIT_KICK_POSITION:
+            return player.goLater('prepareForKick')
+        else:
+            player.kick = kicks.chooseAlignedKickFromKick(player.kick)
+            return player.goLater('positionForKick')
 
     return player.stay()
 
@@ -156,32 +185,6 @@ def lookAround(player):
                 return player.goNow('orbitBall')
             else:
                 return player.goLater('chase')
-
-    return player.stay()
-
-def orbitBall(player):
-    """
-    State to orbit the ball
-    """
-    if player.firstFrame():
-
-        #DEBUG printing
-        print "Orbiting at angle: ",player.kick.h
-
-        if player.kick.h == 0:
-            return player.goLater('positionForKick')
-        player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
-
-    if player.brain.nav.isStopped():
-        player.inKickingState = False
-        player.shouldOrbit = False
-        player.kick.h = 0
-        if player.kick == kicks.ORBIT_KICK_POSITION:
-            return player.goLater('prepareForKick')
-        else:
-            player.kick = prepareForKick.hackKick.checkKickingFoot(player.kick)
-            return player.goLater('positionForKick')
 
     return player.stay()
 

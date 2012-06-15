@@ -29,6 +29,12 @@ class Kick(object):
          #       (self.name, self.x_offset, self.y_offset, self.heading, self.dest))
         return self.name
 
+    def __eq__(self, other):
+        return self.name == other.name
+
+    def __ne__(self, other):
+        return not self == other
+
 # Some standard kicks. x,y and move should not be modified unless you change
 # the sweetMove.  Heading will be modified when the kick is constructed.
 
@@ -81,3 +87,46 @@ LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 12, y =  6.5,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
 RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 12, y = -6.5,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
+
+def chooseAlignedKickFromKick(player, kick):
+    ballRelY = player.brain.ball.loc.relY
+    if (kick == LEFT_STRAIGHT_KICK or
+        kick == RIGHT_STRAIGHT_KICK):
+        if ballRelY > 0:
+            return LEFT_STRAIGHT_KICK
+        else:
+            return RIGHT_STRAIGHT_KICK
+    elif (kick == LEFT_SHORT_STRAIGHT_KICK or
+          kick == RIGHT_SHORT_STRAIGHT_KICK):
+        if ballRelY > 0:
+            return LEFT_SHORT_STRAIGHT_KICK
+        else:
+            return RIGHT_SHORT_STRAIGHT_KICK
+    elif (kick == LEFT_QUICK_STRAIGHT_KICK or
+          kick == RIGHT_QUICK_STRAIGHT_KICK):
+        if ballRelY > 0:
+            return LEFT_QUICK_STRAIGHT_KICK
+        else:
+            return RIGHT_QUICK_STRAIGHT_KICK
+    elif (kick == LEFT_BIG_KICK or
+          kick == RIGHT_BIG_KICK):
+        if ballRelY > 0:
+            return LEFT_BIG_KICK
+        else:
+            return RIGHT_BIG_KICK
+    elif (kick == LEFT_LONG_BACK_KICK or
+          kick == RIGHT_LONG_BACK_KICK):
+        if ballRelY > 0:
+            return LEFT_LONG_BACK_KICK
+        else:
+            return RIGHT_LONG_BACK_KICK
+    elif (kick == LEFT_SHORT_BACK_KICK or
+          kick == LEFT_SHORT_BACK_KICK):
+        if ballRelY > 0:
+            return LEFT_SHORT_BACK_KICK
+        else:
+            return RIGHT_SHORT_BACK_KICK
+    elif "Side" in kick.name:
+        return kick
+    else:
+        raise NameError('Invalid kick passed to chooseAlignedKickFromKick')

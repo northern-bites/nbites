@@ -14,7 +14,7 @@ def kickBallExecute(player):
         player.brain.speech.say("Kick it")
         player.brain.tracker.trackBallFixedPitch()
 
-        print "Performing " + str(player.kick)
+        print "uPerforming " + str(player.kick)
         kick = player.kick.sweetMove
 
         player.executeMove(kick)
@@ -42,6 +42,7 @@ def afterKick(player):
         return player.stay()
 
     if transitions.shouldKickAgain(player):
+        player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         return player.goNow('positionForKick')
 
     if (transitions.shouldChaseBall(player) or
