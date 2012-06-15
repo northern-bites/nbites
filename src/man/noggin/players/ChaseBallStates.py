@@ -71,6 +71,7 @@ def approachBall(player):
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
+        player.orbitDistance = player.brain.ball.loc.dist
         player.brain.tracker.performWidePanFixedPitch()
         player.brain.nav.stand()
         return player.stay()
@@ -167,7 +168,7 @@ def orbitBall(player):
         if player.kick.h == 0:
             return player.goLater('positionForKick')
         player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.orbitAngle(player.brain.ball.loc.dist, player.kick.h)
+        player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
 
     if player.brain.nav.isStopped():
         player.inKickingState = False
