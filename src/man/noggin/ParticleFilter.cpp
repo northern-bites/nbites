@@ -70,82 +70,13 @@ namespace PF
            #endif
         }
     }
-}
 
-ParticleFilter::~ParticleFilter()
-{
-
-}
-
-void ParticleFilter::run(bool motionUpdate, bool sensorUpdate)
-{
-    if(motionUpdate && motionModel)
+    ParticleFilter::~ParticleFilter()
     {
-        particles = motionModel->update(particles);
+
     }
 
-    if(sensorUpdate && sensorModel)
-    {
-        particles = sensorModel->update(particles);
-    }
-
-    // Only resample if the sensor model has updated particle weights.
-    if(sensorModel->hasUpdated())
-    {
-        resample();
-    }
-    else
-    {
-        //std::cout << "No sensor update." << std::endl;
-    }
-
-    // Update estimates.
-    Location estimate = this->getBestParticle().getLocation();
-
-    xEstimate = estimate.x;
-    yEstimate = estimate.y;
-    hEstimate = estimate.heading;
-}
-
-/**
- * Finds the "best" particle (the particle with the highest
- * weight) from the current set, and returns it.
- * @return a LocalizationParticle that has the greatest weight
- *         in the current set.
- */
-LocalizationParticle ParticleFilter::getBestParticle()
-{
-    // Sort the particles in ascending order.
-    std::sort(particles.begin(), particles.end());
-
-    // The last particle should have the greatest weight.
-    return particles[particles.size()-1];
-}
-
-/**
- * A resampling algorithm to construct the posterior belief distribution
- * from the prior belief. The "fittest" particles survive and are
- * the most prevalent in the resulting set of particles. Replaces the
- * existing particle set in the filter with a newly generated one.
- */
-void ParticleFilter::resample()
-{
-    // Normalize the particle weights, and find the average weight.
-    float sum = 0.0f;
-    ParticleIt iter;
-    for(iter = particles.begin(); iter != particles.end(); ++iter)
-        sum += (*iter).getWeight();
-
-    if(sum == 0)
-    {
-        //std::cout << "\n\n\nZERO SUM!\n\n\n" << std::endl;
-        reset();
-        return;
-    }
-
-    averageWeight = sum / ((float)parameters.numParticles * 1.0f);
-
-    for(iter = particles.begin(); iter != particles.end(); ++iter)
+    void ParticleFilter::run(bool motionUpdate, bool sensorUpdate)
     {
         if(motionUpdate && motionModel)
         {
@@ -154,13 +85,13 @@ void ParticleFilter::resample()
 
         if(sensorUpdate && sensorModel)
         {
-            particles = sensorModel->update(particles);
+//            particles = sensorModel->update(particles);
         }
 
         // Only resample if the sensor model has updated particle weights.
         if(sensorModel->hasUpdated())
         {
-            resample();
+//            resample();
         }
         else
         {
@@ -201,21 +132,16 @@ void ParticleFilter::resample()
         memoryProvider.updateMemory();
     }
 
-    // Update exponential filters for long-term and short-term weights.
-    wSlow = wSlow + parameters.alpha_slow*(averageWeight - wSlow);
-    wFast = wFast + parameters.alpha_fast*(averageWeight - wFast);
-
-    float injectionProb = std::max(0.0f, 1.0f - wFast/wSlow);
-    //if(injectionProb > 0)
-    //    std::cout << injectionProb << std::endl;
-
-    // Map each normalized weight to the corresponding particle.
-    std::map<float, LocalizationParticle> cdf;
-
-    float prev = 0.0f;
-    for(iter = particles.begin(); iter != particles.end(); ++iter)
+    /**
+     * Finds the "best" particle (the particle with the highest
+     * weight) from the current set, and returns it.
+     * @return a LocalizationParticle that has the greatest weight
+     *         in the current set.
+     */
+    LocalizationParticle ParticleFilter::getBestParticle()
     {
-        LocalizationParticle particle = (*iter);
+        // Sort the particles in ascending order.
+        std::sort(particles.begin(), particles.end());
 
         // The last particle should have the greatest weight.
         return particles[particles.size()-1];
@@ -340,10 +266,6 @@ void ParticleFilter::resample()
         }
 #endif
 
-        if(numParticlesInjected > 0)
-    {
-        //std::cout << "Injected " << numParticlesInjected << " random particles."
-        //        << std::endl;
     }
 
     /**
@@ -389,7 +311,15 @@ void ParticleFilter::resample()
     T square(T x) {
         return x*x;
     }
-    for(int i = 0; i < parameters.numParticles; ++i)
+
+    /**
+     * Resets localization to the given x, y, and heading.
+     *
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param h the heading (radians).
+     */
+    void ParticleFilter::resetLocTo(float x, float y, float h)
     {
         const float SIGMA_RESET_X = 15.0f;
         const float SIGMA_RESET_Y = 15.0f;
@@ -568,5 +498,4 @@ void ParticleFilter::resample()
 
 
     }
-}
 }

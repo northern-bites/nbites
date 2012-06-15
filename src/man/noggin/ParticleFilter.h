@@ -84,7 +84,7 @@ namespace PF
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
-        150,
+        1,
         0.2f,
         0.05f
     };
@@ -242,7 +242,7 @@ namespace PF
         MotionModel() { }
         virtual ~MotionModel() { }
 
-        virtual ParticleSet update(ParticleSet particles) = 0;
+        virtual ParticleSet update(ParticleSet particles) const = 0;
     };
 
     /**
