@@ -171,7 +171,7 @@ class KickInformation:
             #DEBUG printing
             print "loc Score is good. Using it to decide kick."
 
-            relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(670,270))
+            relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,nogginConstants.CENTER_FIELD_Y))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
             relLocationMeToBall = self.brain.my.relativeLocationOf(self.brain.ball.loc)
@@ -362,8 +362,8 @@ class KickInformation:
             return kick
 
         # Calculate coordinates of ball, assuming goalie is perfectly centered.
-        goalieX = 70
-        goalieY = 270
+        goalieX = nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X
+        goalieY = nogginConstants.CENTER_FIELD_Y
         diffX = math.cos(math.radians(goalieBearing)) * goalieDist
         diffY = math.sin(math.radians(goalieBearing)) * goalieDist
         ballX = goalieX + diffX
@@ -374,11 +374,11 @@ class KickInformation:
         if len(self.nearGoalRightPostBearings) > len(self.nearGoalLeftPostBearings):
             # Use the right post
             relPostBearing = self.nearRightPostBearing
-            ballToPost = ballLocation.relativeLocationOf(Objects.Location(70,200))
+            ballToPost = ballLocation.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,nogginConstants.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y))
         else:
             # Use the left post
             relPostBearing = self.nearLeftPostBearing
-            ballToPost = ballLocation.relativeLocationOf(Objects.Location(70,340))
+            ballToPost = ballLocation.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y))
 
         ballToPostBearing = ballToPost.bearing
         myGlobalHeading = ballToPostBearing - relPostBearing
@@ -397,31 +397,33 @@ class KickInformation:
         if myGlobalHeading < -135 or myGlobalHeading > 135:
             kick = self.chooseBackKick()
             #should I orbit?
-            if ballY < 270 and myGlobalHeading > 135:
+            if ballY < nogginConstants.MIDFIELD_Y and myGlobalHeading > 135:
                 kick.h = myGlobalHeading - 180 # to your right
-            elif ballY > 270 and myGlobalHeading < -135:
+            elif ballY > nogginConstants.MIDFIELD_Y and myGlobalHeading < -135:
                 kick.h = myGlobalHeading + 180 # to your left
             else:
                 kick.h = 0
         elif myGlobalHeading < -45:
             kick = kicks.RIGHT_SIDE_KICK
             #should I orbit?
-            if ballY < 200 or ballY > 340:
+            if ballY < nogginConstants.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y or \
+                    ballY > nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y:
                 kick.h = myGlobalHeading + 90
             else:
                 kick.h = 0
         elif myGlobalHeading > 45:
             kick = kicks.LEFT_SIDE_KICK
             #should I orbit?
-            if ballY < 200 or ballY > 340:
+            if ballY < nogginConstants.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y or \
+                    ballY > nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y:
                 kick.h = myGlobalHeading - 90
             else:
                 kick.h = 0
         else:
             kick = self.chooseQuickFrontKick()
             #should I orbit?
-            if (ballY < 270 and myGlobalHeading < 0) or \
-                    (ballY > 270 and myGlobalHeading > 0):
+            if (ballY < nogginConstants.MIDFIELD_Y and myGlobalHeading < 0) or \
+                    (ballY > nogginConstants.MIDFIELD_Y and myGlobalHeading > 0):
                 kick.h = myGlobalHeading
             else:
                 kick.h = 0
