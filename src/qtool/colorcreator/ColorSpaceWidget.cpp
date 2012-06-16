@@ -30,6 +30,7 @@ ColorSpaceWidget::ColorSpaceWidget(ColorSpace* colorSpace, QWidget* parent)
     }
 
     this->setColorSpace(colorSpace);
+	layout->setSpacing(1);
     this->setLayout(layout);
 }
 
