@@ -47,6 +47,7 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     fpsLabel = new QLabel(this);
     rightLayout->addWidget(fpsTagLabel);
     rightLayout->addWidget(fpsLabel);
+	rightLayout->addItem(new QSpacerItem(300,1,QSizePolicy::Fixed,QSizePolicy::Expanding));
 
     mainLayout->addLayout(rightLayout);
     this->setLayout(mainLayout);
