@@ -16,8 +16,6 @@ def kickBallExecute(player):
 
         print "Performing " + str(player.kick)
 
-        print player.brain.ball.loc.relX, player.brain.ball.loc.relY
-
         kick = player.kick.sweetMove
 
         player.executeMove(kick)
