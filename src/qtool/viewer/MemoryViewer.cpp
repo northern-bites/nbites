@@ -35,7 +35,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	BMPImageViewer* top = new BMPImageViewer(comboTop, this);
     BMPImageViewer* bottom = new BMPImageViewer(comboBottom, this);
 
-	QVBoxLayout* bothImagesLayout = new QVBoxLayout;
+/*	QVBoxLayout* bothImagesLayout = new QVBoxLayout;
 	bothImagesLayout->setAlignment(Qt::AlignTop);
 	bothImagesLayout->setSpacing(1);
 
@@ -44,7 +44,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
 	QWidget* bothImages = new QWidget;
 
-	bothImages->setLayout(bothImagesLayout);
+	bothImages->setLayout(bothImagesLayout);*/
 
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;
@@ -52,7 +52,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     imageTabs->addTab(topImageViewer, QString("Top Image"));
     imageTabs->addTab(bottomImageViewer, QString("Bottom Image"));
-	imageTabs->addTab(bothImages, QString("Both Images"));
+	//imageTabs->addTab(bothImages, QString("Both Images"));
 
 	mainLayout->addWidget(imageTabs);
 	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
