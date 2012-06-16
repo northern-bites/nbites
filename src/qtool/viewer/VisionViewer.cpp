@@ -39,7 +39,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     bottomRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
     topRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
 
-    QToolBar* toolBar = new QToolBar(this);
+    //*** TOOLBAR STUFF ***//
+	QToolBar* toolBar = new QToolBar(this);
 	QToolBar* toolBar2 = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
@@ -71,8 +72,13 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     ADD_DEBUG_CHECKBOX2("Visual Line Debug", setVisualLinesDebug);
     ADD_DEBUG_CHECKBOX2("Visual Corner Debug", setVisualCornersDebug);
 
+
+	//*** VISION IMAGE STUFF ***//
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
+
+	topVisionView = new BMPImageViewer(topVisionImage, this);
+	bottomVisionView = new BMPImageViewer(bottomVisionImage, this);
 
     VisualInfoImage* shapesBottom = new VisualInfoImage(offlineMVision, Camera::BOTTOM);
     VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);
@@ -93,53 +99,45 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
     memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
+	memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
 
-    CollapsibleImageViewer* bottomCIV = new
-            CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
-    CollapsibleImageViewer* topCIV = new
-            CollapsibleImageViewer(topImageViewer, "Top", this);
-
-    QWidget* combinedRawImageView = new QWidget(this);
-
-    QVBoxLayout* layout = new QVBoxLayout(combinedRawImageView);
-    layout->setAlignment(Qt::AlignTop);
-
-    layout->addWidget(topCIV);
-    layout->addWidget(bottomCIV);
-
-    combinedRawImageView->setLayout(layout);
-
-    bottomVisionView = new BMPImageViewerListener(bottomVisionImage, this);
-    connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
-            this, SLOT(pixelClicked(int, int, int, bool)));
-
-    connect(this, SIGNAL(imagesUpdated()),
+	connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));
 
-    topVisionView = new BMPImageViewer(topVisionImage, this);
     connect(this, SIGNAL(imagesUpdated()),
             topVisionView, SLOT(updateView()));
 
-    CollapsibleImageViewer* bottomVisCIV = new CollapsibleImageViewer(bottomVisionView, "Bottom", this);
-    CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisionView, "Top", this);
+	connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
 
-    QWidget* visionImages = new QWidget(this);
 
-    QVBoxLayout* visLayout = new QVBoxLayout(visionImages);
-    visLayout->setAlignment(Qt::AlignTop);
+	//*** WINDOW LAYOUT STUFF ***//
+	QWidget* rawPane = new QWidget(this);
+	QWidget* visionPane = new QWidget(this);
 
-    visLayout->addWidget(topVisCIV);
-    visLayout->addWidget(bottomVisCIV);
+    QTabWidget* rawTabs = new QTabWidget(rawPane);
+	QHBoxLayout* rawTabLayout = new QHBoxLayout(rawPane);
 
-    visionImages->setLayout(visLayout);
+    rawTabs->addTab(topImageViewer, tr("Top Image"));
+    rawTabs->addTab(bottomImageViewer, tr("Bottom Image"));
 
-    QTabWidget* imageTabs = new QTabWidget();
-    imageTabs->addTab(combinedRawImageView, tr("Raw Images"));
-    imageTabs->addTab(visionImages, tr("Vision Images"));
+	rawTabLayout->addWidget(rawTabs);
+	rawPane->setLayout(rawTabLayout);
 
-    memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
+	QTabWidget* visTabs = new QTabWidget(visionPane);
+    QHBoxLayout* visTabLayout = new QHBoxLayout(visionPane);
 
-    this->setCentralWidget(imageTabs);
+    visTabs->addTab(topVisionView, tr("Top Vision"));
+    visTabs->addTab(bottomVisionView, tr("Bottom Vision"));
+
+	visTabLayout->addWidget(visTabs);
+    visionPane->setLayout(visTabLayout);
+
+    QTabWidget* outsideTabs = new QTabWidget();
+    outsideTabs->addTab(rawPane, tr("Raw Images"));
+    outsideTabs->addTab(visionPane, tr("Vision Images"));
+
+    this->setCentralWidget(outsideTabs);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -162,8 +160,6 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     memoryManager->connectSlot(imageDataView, SLOT(updateView()), "MRawImages");
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
-    // Make sure one of the images is toggled off for small screens
-    bottomCIV->toggle();
 }
 
 void VisionViewer::update()
