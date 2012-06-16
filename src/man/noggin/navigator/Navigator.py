@@ -9,10 +9,15 @@ from ..util import Transition
 
 #speed gains
 FULL_SPEED = 1.0
+HASTY_SPEED = 0.9
 FAST_SPEED = 0.8
-MEDIUM_SPEED = 0.65
-CAREFUL_SPEED = 0.5
-SLOW_SPEED = 0.3
+QUICK_SPEED = 0.7
+BRISK_SPEED = 0.6
+MEDIUM_SPEED = 0.5
+GRADUAL_SPEED = 0.4
+CAREFUL_SPEED = 0.3
+SLOW_SPEED = 0.2
+SLUGGISH_SPEED = 0.1
 KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
@@ -154,10 +159,10 @@ class Navigator(FSA.FSA):
         # split it up in 15 degree moves; good enough approximation for small radii
         for k in range(0, abs(angle) / 15):
             if angle > 0:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 4, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 6, 0.0))
                 NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -15))
             else:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 4, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 6, 0.0))
                 NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 15))
 
         NavStates.walkingTo.speed = FAST_SPEED

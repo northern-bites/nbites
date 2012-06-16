@@ -127,6 +127,7 @@ def gamePlaying(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.trackBallFixedPitch()
+        player.inKickingState = False
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 25:
@@ -229,6 +230,7 @@ def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.stand()
+        player.inKickingState = False
         player.penaltyKicking = True
 
     if player.brain.play.isRole(GOALIE):
@@ -236,5 +238,3 @@ def penaltyShotsGamePlaying(player):
         roleState = player.getRoleState()
         return player.goNow(roleState)
     return player.goNow('chase')
-
-
