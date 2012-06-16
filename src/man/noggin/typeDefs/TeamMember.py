@@ -14,7 +14,7 @@ DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
-DEBUG_DETERMINE_CHASE_TIME = False
+DEBUG_DETERMINE_CHASE_TIME = True
 SEC_TO_MILLIS = 1000.0
 CHASE_SPEED = 15.00 #cm/sec
 CHASE_TIME_SCALE = 0.45              # How much new measurement is used.
@@ -162,19 +162,20 @@ class TeamMember(RobotLocation):
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after ball on bonus " + str(t))
 
-        # Give penalties for not lining up along the ball-goal line
-        lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
-        rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
-        # TODO: scale these by how far off we are??
-        # ball is not lined up
-        if (self.ballBearing > lpb or rpb > self.ballBearing):
-            t += BALL_GOAL_LINE_PENALTY
-        # we are not lined up
-        if (lpb < 0 or rpb > 0):
-            t += BALL_GOAL_LINE_PENALTY
+        # Commented out Summer 2012 due to unreliable Localization.
+        # # Give penalties for not lining up along the ball-goal line
+        # lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
+        # rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
+        # # TODO: scale these by how far off we are??
+        # # ball is not lined up
+        # if (self.ballBearing > lpb or rpb > self.ballBearing):
+        #     t += BALL_GOAL_LINE_PENALTY
+        # # we are not lined up
+        # if (lpb < 0 or rpb > 0):
+        #     t += BALL_GOAL_LINE_PENALTY
 
-        if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
+        # if DEBUG_DETERMINE_CHASE_TIME:
+        #     self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
 
         # Add a penalty for being fallen over
         t += self.brain.fallController.getTimeRemainingEst()
@@ -244,4 +245,3 @@ class TeamMember(RobotLocation):
 
     def __ne__(self, other):
         return self.playerNumber != other.playerNumber
-
