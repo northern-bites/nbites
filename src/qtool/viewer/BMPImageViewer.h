@@ -29,11 +29,15 @@ public:
 
 	virtual unsigned getWidth() { return scaledPixmap.width();}
 	virtual unsigned getHeight() { return scaledPixmap.height();}
+	virtual QSize size(){return QSize(scaledPixmap.width(), scaledPixmap.height());}
+	virtual void resize(QSize newSize){
+		scaledPixmap = scaledPixmap.scaled(newSize);
+	}
 
 	QVBoxLayout* getLayout();
 
 public slots:
-    void updateView();
+    void updateView(bool resize = 1);
 
 protected:
     void showEvent(QShowEvent* event);

@@ -40,7 +40,6 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     QHBoxLayout* mainLayout = new QHBoxLayout;
 
     QHBoxLayout* leftLayout = new QHBoxLayout;
-    mainLayout->addLayout(leftLayout);
 
     imageTabs = new QTabWidget(this);
     leftLayout->addWidget(imageTabs);
@@ -72,6 +71,7 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
     colorStats = new QLabel(this);
+	colorStats->setAlignment(Qt::AlignTop);
 
     //set up the color selection combo box
     for (int i = 0; i < image::NUM_COLORS; i++) {
@@ -97,9 +97,10 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     rightLayout->addWidget(thresholdedImageViewer);
     rightLayout->addWidget(colorStats);
 
-    mainLayout->addLayout(rightLayout);
+	mainLayout->addLayout(leftLayout);
+	mainLayout->addLayout(rightLayout);
 
-    this->setLayout(mainLayout);
+	this->setLayout(mainLayout);
 
     this->updateThresholdedImage();
 }
@@ -130,7 +131,7 @@ void ColorTableCreator::updateThresholdedImage(){
     rawThresholdedImageData->mutable_image()->assign(
             (const char*) sensors->getColorImage(currentCamera),
             AVERAGED_IMAGE_SIZE);
-    thresholdedImageViewer->updateView();
+	thresholdedImageViewer->updateView(0);
     this->updateColorStats();
 }
 

@@ -27,7 +27,7 @@ void BMPImageViewer::setupUI() {
 	initialH = image->getHeight();
 }
 
-void BMPImageViewer::updateView() {
+void BMPImageViewer::updateView(bool resize) {
     //shouldRedraw keeps it from redrawing faster
     //than we need paint it
     if (this->isVisible() && shouldRedraw) {
@@ -39,7 +39,7 @@ void BMPImageViewer::updateView() {
 		int maxWidth = this->width();
 		int maxHeight = this->height();
 
-		if(maxWidth > initialW && maxHeight > initialH) {
+		if(maxWidth > initialW && maxHeight > initialH && resize) {
 			if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
 				scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);
 			else scaledPixmap = scaledPixmap.scaledToHeight(maxHeight);
