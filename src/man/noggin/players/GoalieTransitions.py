@@ -84,7 +84,7 @@ def facingForward(player):
     if it is in the goal.
     """
     #magic numbers
-    return (player.brain.vision.fieldEdge.centerDist > 900.0 or
+    return (player.brain.vision.fieldEdge.centerDist > 800.0 or
             (fabs(player.brain.vision.cross.bearing) < 10.0 and
              player.brain.vision.cross.on))
 
@@ -137,6 +137,26 @@ def shouldPerformSave(player):
             player.brain.ball.loc.dist > 120.0 and
             player.brain.ball.loc.dist < 200.0 and
             player.brain.ball.loc.relY < 100.0)
+
+def facingSideways(player):
+    """
+    If the robot is facing a post directly, it's probably turned around.
+    """
+    if ((player.brain.vision.yglp.on and
+         fabs(player.brain.vision.yglp.bearing) < 30.0 and
+         player.brain.vision.yglp.bearing != 0.0 and
+         player.brain.vision.yglp.dist < 300.0) or
+        (player.brain.vision.ygrp.on and
+         fabs(player.brain.vision.ygrp.bearing) < 30.0 and
+         player.brain.vision.ygrp.bearing != 0.0 and
+         player.brain.vision.ygrp.dist < 300.0)):
+        if player.brain.vision.yglp.on:
+            print "Left post at " + str(player.brain.vision.yglp.bearing)
+        if player.brain.vision.yglp.on:
+            print "Right post at " + str(player.brain.vision.ygrp.bearing)
+        return True
+    else:
+        return False
 
 def shouldClearBall(player):
     """

@@ -137,7 +137,7 @@ def spinAtGoal(player):
         player.brain.nav.goTo(player.system.home,
                               nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
 
-    player.brain.tracker.lookToAngle(0.0)
+        player.brain.tracker.lookToAngle(0.0)
 
     return Transition.getNextState(player, spinAtGoal)
 
@@ -147,7 +147,7 @@ def clearIt(player):
         player.brain.tracker.trackBallFixedPitch()
         returnToGoal.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
                                                   player.brain.loc.lastOdoY,
-                                                  0.0)
+                                                  player.brain.loc.lastOdoTheta)
         if player.brain.ball.loc.relY < 0.0:
             player.side = RIGHT
             clearIt.ballDest = RelRobotLocation((player.brain.ball.loc.relX -
@@ -219,7 +219,7 @@ def returnToGoal(player):
                              # magic number
                              RelRobotLocation(player.brain.loc.lastOdoX + 15,
                                               player.brain.loc.lastOdoY,
-                                              0.0))
+                                              player.brain.loc.lastOdoTheta))
 
         player.brain.nav.walkTo(correctedDest)
 

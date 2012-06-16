@@ -47,8 +47,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         VisualGoalieStates.spinAtGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.facingForward,
                                        Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.findGoalboxCorner,
+
+            Transition.CountTransition(GoalieTransitions.ballMoreImportant,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.findGoalboxCorner
+            : VisualGoalieStates.clearIt
             }
 
         VisualGoalieStates.decideLeftSide.transitions = {
@@ -84,7 +89,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.clearIt
+            : VisualGoalieStates.clearIt,
+
+            Transition.CountTransition(GoalieTransitions.facingSideways,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.spinAtGoal
             }
 
         VisualGoalieStates.spinToFaceBall.transitions = {
@@ -95,7 +105,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         VisualGoalieStates.clearIt.transitions = {
-            Transition.CountTransition(GoalieTransitions.reachedTheBall,
+            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
             : GoalieStates.kickBall,
@@ -158,7 +168,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OK_PRECISION)
             : GoalieStates.watch,
 
-            Transition.CountTransition(GoalieTransitions.reachedTheBall,
+            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : GoalieStates.watch

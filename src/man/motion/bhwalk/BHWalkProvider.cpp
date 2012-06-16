@@ -332,6 +332,10 @@ void BHWalkProvider::hardReset() {
 //    currentCommand = MotionCommand::ptr();
 //}
 
+void BHWalkProvider::resetOdometry() {
+    walkingEngine.theOdometryData = OdometryData();
+}
+
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 
     if (command->theta_percent == 0 && command->x_percent == 0 && command->y_percent == 0) {

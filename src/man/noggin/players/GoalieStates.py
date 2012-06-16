@@ -47,7 +47,8 @@ def gameSet(player):
         player.brain.nav.stand()
         player.gainsOn()
         player.brain.loc.resetBall()
-        player.brain.tracker.trackBallFixedPitch()
+        # The ball will be right in front of us, for sure
+        player.brain.tracker.lookToAngle(0)
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated()):
@@ -123,9 +124,9 @@ def kickBall(player):
     if player.firstFrame():
         VisualStates.returnToGoal.kickPose = RelRobotLocation(player.brain.loc.lastOdoX,
                                                               player.brain.loc.lastOdoY,
-                                                              0.0)
+                                                              player.brain.loc.lastOdoTheta)
         player.brain.tracker.trackBallFixedPitch()
-        if player.brain.ball.loc.relY < 0:
+        if player.brain.ball.loc.relY < 0.0:
             kick = SweetMoves.RIGHT_STRAIGHT_KICK
         else:
             kick = SweetMoves.LEFT_STRAIGHT_KICK
