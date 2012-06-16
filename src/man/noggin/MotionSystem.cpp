@@ -81,20 +81,20 @@ DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
     //the odometry?
     //Filter out big jumps
     if (-5 < noisyDeltaOdometry.x && noisyDeltaOdometry.x < 5) {
-        noisyDeltaOdometry.x = deltaOdometry.x + PF::sampleNormal(0.0f, 0.5 + std::abs(deltaOdometry.x)/4);
+        noisyDeltaOdometry.x = deltaOdometry.x + PF::sampleNormal(0.0f, 0.05 + std::abs(deltaOdometry.x)/16);
     } else {
         //replace it with a usual measurement
         noisyDeltaOdometry.x = PF::sampleNormal(0.0f, ODO_MEASUREMENT_X_SD);
     }
 
     if (-3 < noisyDeltaOdometry.y && noisyDeltaOdometry.y < 3) {
-        noisyDeltaOdometry.y = deltaOdometry.y + PF::sampleNormal(0.0f, 0.5 + std::abs(deltaOdometry.y)/4);
+        noisyDeltaOdometry.y = deltaOdometry.y + PF::sampleNormal(0.0f, 0.05 + std::abs(deltaOdometry.y)/16);
     } else {
         //replace it with a usual measurement
         noisyDeltaOdometry.y = PF::sampleNormal(0.0f, ODO_MEASUREMENT_Y_SD);
     }
-    if (-.02 < noisyDeltaOdometry.theta && noisyDeltaOdometry.theta < .02) {
-        noisyDeltaOdometry.theta = deltaOdometry.theta + PF::sampleNormal(0.0f, M_PI_FLOAT/140.0f +  std::abs(deltaOdometry.theta)/4);
+    if (-.01 < noisyDeltaOdometry.theta && noisyDeltaOdometry.theta < .01) {
+        noisyDeltaOdometry.theta = deltaOdometry.theta + PF::sampleNormal(0.0f, M_PI_FLOAT/2880.0f +  std::abs(deltaOdometry.theta)/16);
     } else {
         //replace it with a usual measurement
         noisyDeltaOdometry.theta = PF::sampleNormal(0.0f, ODO_MEASUREMENT_THETA_SD);
