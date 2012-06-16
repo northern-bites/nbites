@@ -57,7 +57,7 @@ public:
     void setRightBottomX(int _x){ rightBottom.x = _x; }
     void setRightBottomY(int _y){ rightBottom.y = _y; }
     void setDistanceWithSD(float _distance);
-    void setBearingWithSD(float _bearing);
+    void setBearingWithSD(float _bearing, float _distance);
     void updateCross(Blob *b);
     void setPossibleCrosses(const std::list <const ConcreteCross *> *
                             _possibleCrosses) {
@@ -93,11 +93,12 @@ private: // Class Variables
     const std::list <const ConcreteCross *> * possibleCrosses;
 
     // Member functions
+    // Obtained by magic by Octavian and Lizzie summer 2012
     inline static float robotDistanceToSD(float _distance) {
-        return sqrtf(0.00000004f * std::pow(_distance,4.079f));
+        return 0.0000002f * _distance * _distance * _distance + 5.f;
     }
-    inline static float robotBearingToSD(float _bearing) {
-        return sqrtf(M_PI_FLOAT / 8.0f);
+    inline static float robotBearingToSD(float _bearing, float _distance) {
+        return .00035f*_distance + 5.f * TO_DEG;
     }
 
 };

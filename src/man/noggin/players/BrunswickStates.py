@@ -63,11 +63,11 @@ def gameReady(player):
         return player.stay()
 
     # Works with rules (2011) to get goalie manually positioned
-    if (player.lastDiffState == 'gameInitial'
-        and not player.brain.play.isRole(GOALIE)):
-        return player.goLater('relocalize')
+    #if (player.lastDiffState == 'gameInitial'
+    #    and not player.brain.play.isRole(GOALIE)):
+    #    return player.goLater('relocalize')
 
-    elif player.lastDiffState == 'gamePenalized':
+    if player.lastDiffState == 'gamePenalized':
         player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     nogginConstants.HEADING_UP)

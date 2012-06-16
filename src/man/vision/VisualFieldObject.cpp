@@ -115,7 +115,7 @@ void VisualFieldObject::setDistanceWithSD(float _distance)
  *
  * @param _bearing the distance estimate to be set
  */
-void VisualFieldObject::setBearingWithSD(float _bearing)
+void VisualFieldObject::setBearingWithSD(float _bearing, float _distance)
 {
     setBearing(_bearing);
     // Calculate the SD based on the object type
@@ -124,7 +124,7 @@ void VisualFieldObject::setBearingWithSD(float _bearing)
     case BLUE_GOAL_RIGHT_POST:
     case YELLOW_GOAL_LEFT_POST:
     case YELLOW_GOAL_RIGHT_POST:
-        setBearingSD(postBearingToSD(_bearing));
+        setBearingSD(postBearingToSD(_distance));
         break;
     }
 }

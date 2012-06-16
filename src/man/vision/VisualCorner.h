@@ -111,7 +111,7 @@ public:
     void setLine1(boost::shared_ptr<VisualLine> l1) { line1 = l1; }
     void setLine2(boost::shared_ptr<VisualLine> l2) { line2 = l2; }
     void setDistanceWithSD(float _distance);
-    void setBearingWithSD(float _bearing);
+    void setBearingWithSD(float _bearing, float _distance);
     void setID(cornerID _id) { id = _id; }
     void setTOrientation();
 
@@ -127,12 +127,12 @@ private: // private methods
     void determineCornerIDFromShape();
     void determineCornerShape(); // called on object instantiation
 
-
+    // Obtained by magic by Octavian and Lizzie summer 2012
     inline static float cornerDistanceToSD(float _distance) {
-        return std::sqrt(2.0f * std::max(10 + _distance*0.00125f, 250.0f));
+        return 0.0000002f * _distance * _distance * _distance + 5.f;
     }
-    inline static float cornerBearingToSD(float _bearing) {
-        return std::sqrt(static_cast<float>(M_PI) / 4.0f);
+    inline static float cornerBearingToSD(float _bearing, float _distance) {
+        return .00035f*_distance + 5.f * TO_DEG;
     }
 
 

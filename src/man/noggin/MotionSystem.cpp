@@ -94,7 +94,7 @@ DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
         noisyDeltaOdometry.y = PF::sampleNormal(0.0f, ODO_MEASUREMENT_Y_SD);
     }
     if (-.02 < noisyDeltaOdometry.theta && noisyDeltaOdometry.theta < .02) {
-        noisyDeltaOdometry.theta = deltaOdometry.theta + PF::sampleNormal(0.0f, M_PI/140.0f +  std::abs(deltaOdometry.theta)/4);
+        noisyDeltaOdometry.theta = deltaOdometry.theta + PF::sampleNormal(0.0f, M_PI_FLOAT/140.0f +  std::abs(deltaOdometry.theta)/4);
     } else {
         //replace it with a usual measurement
         noisyDeltaOdometry.theta = PF::sampleNormal(0.0f, ODO_MEASUREMENT_THETA_SD);

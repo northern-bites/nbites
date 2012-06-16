@@ -61,8 +61,6 @@ class VisionSystem : public PF::SensorModel
 
                 if (probability > bestProbability)
                     bestProbability = probability;
-
-                std::cout << probability << " of " << *possibilityIterator << std::endl;
             }
 
             totalWeight = updateTotalWeight(totalWeight, bestProbability);

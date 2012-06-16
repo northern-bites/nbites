@@ -67,7 +67,7 @@ public:
 	void setRedGoalieProbable() {probablyRedGoalie = true;}
 	void setNavyGoalieProbable() {probablyNavyGoalie = true;}
     void setDistanceWithSD(float _distance);
-    void setBearingWithSD(float _bearing);
+    void setBearingWithSD(float _bearing, float _distance);
     virtual void setIDCertainty(certainty c);
 
 
@@ -125,12 +125,12 @@ private: // Class Variables
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 
     // Helper Methods
+    // Obtained by magic by Octavian and Lizzie summer 2012
     inline static float postDistanceToSD(float _distance) {
-        //return 0.0496f * exp(0.0271f * _distance);
-        return sqrtf(2.0f*(10 + (_distance * _distance)*0.00125f));
+        return (_distance-100.f)*(_distance-100.f)/4500.f + 20.f;
     }
-    inline static float postBearingToSD(float _bearing) {
-        return sqrtf(static_cast<float>(M_PI) / 8.0f);
+    inline static float postBearingToSD(float _distance) {
+        return .00035f*_distance + 5.f * TO_DEG;
     }
     const static float BOTH_UNSURE_DISTANCE_SD;
 };

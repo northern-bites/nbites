@@ -112,10 +112,10 @@ void VisualCross::setDistanceWithSD(float _distance)
  *
  * @param _bearing the distance estimate to be set
  */
-void VisualCross::setBearingWithSD(float _bearing)
+void VisualCross::setBearingWithSD(float _bearing, float _distance)
 {
     setBearing(_bearing);
-    setBearingSD(robotBearingToSD(_bearing));
+    setBearingSD(robotBearingToSD(_bearing, _distance));
 }
 
 const bool VisualCross::hasPositiveID()

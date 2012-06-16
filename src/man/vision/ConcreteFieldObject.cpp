@@ -49,7 +49,7 @@ const ConcreteFieldObject* ConcreteFieldObject::RIGHT_GOAL_POSTS[
     NUM_RIGHT_GOAL_POSTS] = {&yellow_goal_right_post, &blue_goal_right_post};
 
 const ConcreteFieldObject* ConcreteFieldObject::LEFT_GOAL_POSTS[
-    NUM_RIGHT_GOAL_POSTS] = {&yellow_goal_left_post, &blue_goal_left_post};
+    NUM_LEFT_GOAL_POSTS] = {&yellow_goal_left_post, &blue_goal_left_post};
 
 
 const list <const ConcreteFieldObject*> ConcreteFieldObject::blueGoalPosts =
