@@ -32,13 +32,16 @@ def standup(player):
         return player.stay()
 
     # repeatedly perform basic fixed pitch pan:
-    player.brain.tracker.repeatBasicPanFixedPitch()
+    #player.brain.tracker.repeatBasicPanFixedPitch()
 
     # if ball in sight, track it. otherwise, pan:
-    #player.brain.tracker.trackBallFixedPitch()
+    player.brain.tracker.trackBallFixedPitch()
 
     # for debugging, will print pitch and yaw every frame
     #player.brain.tracker.helper.printHeadAngles()
+
+    # for debugging, will print ball's distance
+    print "Ball dist: ",player.brain.ball.loc.dist
 
     return player.stay()
 

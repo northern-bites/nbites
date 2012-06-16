@@ -383,9 +383,15 @@ FIXED_PITCH_RIGHT_SIDE_PAN = (
     ((-10,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Maximum search angle for top camera.
+# Time is set for localization while moving.
 FIXED_PITCH_PAN_WIDE = (
-    ((115.0,11.0), 4.2, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,11.0), 4.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((115.0,11.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,11.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+# Same as above, but timed for a stationary kick decision.
+FIXED_PITCH_KICK_PAN = (
+    ((115.0,11.0), 2.5, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,11.0), 2.5, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 FIXED_PITCH_SLOW_GOALIE_PAN = (
     ((115.0,11.0), 5.0, 1, stiff.LOW_HEAD_STIFFNESSES),
@@ -401,4 +407,4 @@ FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 # Needs some alteration re: pitch for the given yaw
 FIXED_PITCH_LOOK_RIGHT = ( ((-70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
-FIXED_PITCH_LOOK_STRAIGHT = ( ((0.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+FIXED_PITCH_LOOK_STRAIGHT = ( ((0.0,17.0), 1.0, 1, stiff.LOW_HEAD_STIFFNESSES), )

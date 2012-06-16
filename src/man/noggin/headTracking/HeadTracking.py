@@ -56,8 +56,12 @@ class HeadTracking(FSA.FSA):
 
     def performHeadMove(self, headMove):
         """Executes the given headMove, then stops."""
-        self.headMove = headMove
-        self.switchTo('doHeadMove')
+        if headMove != self.headMove or self.currentState != 'doHeadMove':
+            self.headMove = headMove
+            # If we were already in the state, reset our counter so that
+            #  firstFrame() will be true again.
+            self.switchTo('doHeadMove')
+            self.counter = 0
 
     # Note: safe to call every frame.
     def repeatHeadMove(self, headMove):
@@ -86,6 +90,9 @@ class HeadTracking(FSA.FSA):
 
     def performWidePanFixedPitch(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+
+    def performKickPanFixedPitch(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_KICK_PAN)
 
     def trackBallFixedPitch(self):
         """
@@ -121,6 +128,12 @@ class HeadTracking(FSA.FSA):
         self.switchTo('stopped')
         self.brain.motion.stopHeadMoves()
         self.helper.lookToAngleFixedPitch(yaw)
+
+    def lookStraightThenTrackFixedPitch(self):
+        """
+        Look straight. Once the ball is seen, begin tracking it.
+        """
+        self.switchTo('lookStraightThenTrackFixedPitch')
 
     ################### End Fixed Pitch #####################
 
