@@ -76,7 +76,7 @@ def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
         player.orbitDistance = player.brain.ball.loc.dist
-        player.brain.tracker.performWidePanFixedPitch()
+        player.brain.tracker.performKickPanFixedPitch()
         player.brain.nav.stand()
         return player.stay()
 

@@ -89,6 +89,9 @@ class HeadTracking(FSA.FSA):
     def performWidePanFixedPitch(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
+    def performKickPanFixedPitch(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_KICK_PAN)
+
     def trackBallFixedPitch(self):
         """
         Enters a state cycle:
