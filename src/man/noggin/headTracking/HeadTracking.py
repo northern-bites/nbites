@@ -124,6 +124,12 @@ class HeadTracking(FSA.FSA):
         self.brain.motion.stopHeadMoves()
         self.helper.lookToAngleFixedPitch(yaw)
 
+    def lookStraightThenTrackFixedPitch(self):
+        """
+        Look straight. Once the ball is seen, begin tracking it.
+        """
+        self.switchTo('lookStraightThenTrackFixedPitch')
+
     ################### End Fixed Pitch #####################
 
     # Needs adjustments for current kicks.

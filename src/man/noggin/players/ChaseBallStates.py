@@ -111,7 +111,8 @@ def positionForKick(player):
 
     #only enque the new goTo destination once
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
+        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
+        player.brain.tracker.lookStraightThenTrackFixedPitch()
         player.inKickingState = False
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
@@ -171,7 +172,8 @@ def orbitBall(player):
 
         if player.kick.h == 0:
             return player.goLater('positionForKick')
-        player.brain.tracker.trackBallFixedPitch()
+        # Reset from pre-kick pan to straight, then track the ball.
+        player.brain.tracker.lookStraightThenTrackFixedPitch()
         player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
 
     if player.brain.nav.isStopped():
