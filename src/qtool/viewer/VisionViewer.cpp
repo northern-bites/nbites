@@ -116,6 +116,10 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 		= new BMPImageViewerListener(comboBottom, this);
 	BMPImageViewerListener* topRawListener
 		= new BMPImageViewerListener(comboTop, this);
+    bottomVisionListener->hide();
+	topVisionListener->hide();
+	bottomRawListener->hide();
+	topRawListener->hide();
 	connect(topVisionListener, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
 	connect(bottomVisionListener, SIGNAL(mouseClicked(int, int, int, bool)),
@@ -123,7 +127,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 	connect(topRawListener, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
 	connect(bottomRawListener, SIGNAL(mouseClicked(int, int, int, bool)),
-            this, SLOT(pixelClicked(int, int, int, bool)));
+			this, SLOT(pixelClicked(int, int, int, bool)));
 
 
 	//*** WINDOW LAYOUT STUFF ***//
