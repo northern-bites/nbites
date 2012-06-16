@@ -104,6 +104,8 @@ def gameSet(player):
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
             player.shouldKickOff = True
+        else:
+            player.shouldKickOff = False
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()

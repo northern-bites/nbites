@@ -5,7 +5,7 @@ import objects as Objects
 import noggin_constants as nogginConstants
 import math
 
-DEBUG_KICK_DECISION = True
+DEBUG_KICK_DECISION = False
 
 class KickInformation:
     """

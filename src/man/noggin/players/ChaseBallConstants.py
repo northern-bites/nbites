@@ -18,6 +18,9 @@ SHOULD_SPIN_TO_BALL_Y = 30.0
 STOP_SPINNING_TO_BALL_Y = 15.0
 CHANGE_SPEED_THRESH = 25.0 #Degrees
 
+# Should Cancel Orbit
+SHOULD_CANCEL_ORBIT_BALL_DIST = APPROACH_BALL_AGAIN_DIST
+
 # Should kick again
 SHOULD_KICK_AGAIN_CLOSE_X = 9.5
 SHOULD_KICK_AGAIN_FAR_X = 20
@@ -26,8 +29,8 @@ SHOULD_KICK_AGAIN_Y = 9
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
 ##        navigator's PFK. Otherwise there can be bad looping.
-BALL_X_OFFSET = 2
-BALL_Y_OFFSET = 2
+BALL_X_OFFSET = 1.5
+BALL_Y_OFFSET = 1.5
 GOOD_ENOUGH_H = 6
 
 # Should dribble should and should stop dribbling

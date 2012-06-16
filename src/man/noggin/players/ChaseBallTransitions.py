@@ -90,6 +90,13 @@ def shouldOrbit(player):
     """
     return player.brain.kickDecider.getSweetMove() is None
 
+def shouldCancelOrbit(player):
+    """
+    Ball is far away. Don't want to finish slow orbit.
+    """
+    return (player.brain.ball.vis.framesOn > 4 and
+            player.brain.ball.loc.dist > SHOULD_CANCEL_ORBIT_BALL_DIST)
+
 ####### PENALTY KICK STUFF ###########
 
 def shouldStopPenaltyKickDribbling(player):

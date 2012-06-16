@@ -43,19 +43,19 @@ class Kick(object):
 #relX and relY, this appears accurate TODO TODO TODO
 
 #new- sweet spots done
-LEFT_SIDE_KICK =  Kick("L_Side", x = 17, y =  -.5,
+LEFT_SIDE_KICK =  Kick("L_Side", x = 15.5, y =  -.5,
                        move=SweetMoves.LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick("R_Side", x = 17, y = .5,
+RIGHT_SIDE_KICK = Kick("R_Side", x = 15.5, y = .5,
                        move=SweetMoves.RIGHT_SIDE_KICK)
 #new- sweet spots sorta done
-LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 17, y = -.5,
+LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
                              move=SweetMoves.LEFT_SHORT_SIDE_KICK)
-RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 17, y = .5,
+RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 15.5, y = .5,
                              move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
 #new- sweet spots done
-LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 18, y = 4.5,
+LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 15.8, y = 5.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 18, y = -4.5,
+RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 15.8, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
 #new- sweet spots done
