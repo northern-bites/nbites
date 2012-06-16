@@ -167,7 +167,7 @@ def shouldClearBall(player):
         return False
 
     # if definitely within goal box
-    if (player.brain.ball.vis.dist < 70.0):
+    if (player.brain.ball.vis.dist < 80.0):
         return True
 
     # if to sides of box
@@ -196,12 +196,8 @@ def walkedTooFar(player):
     # for the odometry reset delay
     if player.counter < 3:
         return False
-
-    diff = (RelRobotLocation(player.brain.loc.lastOdoX,
-                            player.brain.loc.lastOdoY,
-                            player.brain.loc.lastOdoTheta) -
-            VisualGoalieStates.returnToGoal.storedOdo)
-    return diff.relX > 90.0 or fabs(diff.relY) > 140.0
+    return (player.brain.loc.lastOdoX > 90.0 or
+            fabs(player.brain.loc.lastOdoY) > 140.0)
 
 def reachedMyDestination(player):
     """

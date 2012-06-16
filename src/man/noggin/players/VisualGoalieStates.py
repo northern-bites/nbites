@@ -161,15 +161,11 @@ def clearIt(player):
                                                 0.0)
         # reset odometry
         player.brain.motion.resetOdometry()
-        clearIt.shouldStoreOdo = True
+        clearIt.odoDelay = True
         return player.stay()
 
-    if clearIt.shouldStoreOdo:
-        clearIt.shouldStoreOdo = False
-        returnToGoal.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
-                                                  player.brain.loc.lastOdoY,
-                                                  0.0)
-
+    if clearIt.odoDelay:
+        clearIt.odoDelay = False
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.FAST_SPEED)
@@ -219,12 +215,12 @@ def decideRightSide(player):
 def returnToGoal(player):
     if player.firstFrame():
         if player.lastDiffState == 'didIKickIt':
-            correctedDest = returnToGoal.storedOdo- returnToGoal.kickPose
+            correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
+                             returnToGoal.kickPose)
             correctedDest.relX = correctedDest.relX
 
         else:
-            correctedDest = (returnToGoal.storedOdo -
-                             # magic number
+            correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
                              RelRobotLocation(player.brain.loc.lastOdoX,
                                               player.brain.loc.lastOdoY,
                                               0.0))
