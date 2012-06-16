@@ -193,13 +193,17 @@ def ballMovedStopChasing(player):
             player.counter > 200.0)
 
 def walkedTooFar(player):
+    # for the odometry reset delay
+    if player.counter < 3:
+        return False
+
     diff = (RelRobotLocation(player.brain.loc.lastOdoX,
                             player.brain.loc.lastOdoY,
                             player.brain.loc.lastOdoTheta) -
             VisualGoalieStates.returnToGoal.storedOdo)
     return diff.relX > 90.0 or fabs(diff.relY) > 140.0
 
-def reachedTheBall(player):
+def reachedMyDestination(player):
     """
     The robot has reached the ball after walking to it.
     """

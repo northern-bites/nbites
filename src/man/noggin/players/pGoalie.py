@@ -33,7 +33,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         VisualGoalieStates.dodgeBall.transitions = {
-            Transition.CountTransition(GoalieTransitions.reachedTheBall,
+            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
             : VisualGoalieStates.gatherPostInfo,

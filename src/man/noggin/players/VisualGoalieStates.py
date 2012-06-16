@@ -145,9 +145,6 @@ def spinAtGoal(player):
 def clearIt(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        returnToGoal.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
-                                                  player.brain.loc.lastOdoY,
-                                                  player.brain.loc.lastOdoTheta)
         if player.brain.ball.loc.relY < 0.0:
             player.side = RIGHT
             clearIt.ballDest = RelRobotLocation((player.brain.ball.loc.relX -
@@ -162,6 +159,17 @@ def clearIt(player):
                                                 (player.brain.ball.loc.relY -
                                                  5.0),
                                                 0.0)
+        # reset odometry
+        player.brain.motion.resetOdometry()
+        clearIt.shouldStoreOdo = True
+        return player.stay()
+
+    if clearIt.shouldStoreOdo:
+        clearIt.shouldStoreOdo = False
+        returnToGoal.storedOdo = RelRobotLocation(player.brain.loc.lastOdoX,
+                                                  player.brain.loc.lastOdoY,
+                                                  0.0)
+
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
                               nav.FAST_SPEED)
@@ -212,14 +220,14 @@ def returnToGoal(player):
     if player.firstFrame():
         if player.lastDiffState == 'didIKickIt':
             correctedDest = returnToGoal.storedOdo- returnToGoal.kickPose
-            correctedDest.relX = correctedDest.relX - 15.0
+            correctedDest.relX = correctedDest.relX
 
         else:
             correctedDest = (returnToGoal.storedOdo -
                              # magic number
-                             RelRobotLocation(player.brain.loc.lastOdoX + 15,
+                             RelRobotLocation(player.brain.loc.lastOdoX,
                                               player.brain.loc.lastOdoY,
-                                              player.brain.loc.lastOdoTheta))
+                                              0.0))
 
         player.brain.nav.walkTo(correctedDest)
 
