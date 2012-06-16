@@ -7,7 +7,7 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
-from GoalieTransitions import onLeftSideline, onRightSideline, walkedTooFar
+import GoalieTransitions
 from objects import RelRobotLocation, RelLocation
 from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 from vision import cornerID as IDs
@@ -59,7 +59,8 @@ def walkToGoal(player):
             # don't change side
             player.side = player.side
         elif ((hasattr(walkToGoal, 'incomingTransition') and
-             walkToGoal.incomingTransition.condition == onRightSideline) or
+             (walkToGoal.incomingTransition.condition ==
+              GoalieTransitions.onRightSideline)) or
             player.lastDiffState == 'gameReady'):
             player.side = RIGHT
         else:
