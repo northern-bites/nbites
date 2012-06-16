@@ -45,12 +45,28 @@ class VisionSystem : public PF::SensorModel
                                                  float& totalWeight,
                                                  int& observationCount){
         if (isSaneLandmarkObservation<VisualObservationT>(observation)) {
+
+            typedef const std::list<const ConcretePossibilityT*> ConcretePossibilities;
+
+            ConcretePossibilities* concretePossibilities = observation.getPossibilities();
+            typename ConcretePossibilities::const_iterator possibilityIterator;
+
+            float bestProbability = 0.0f;
+
+            for (possibilityIterator = concretePossibilities->begin();
+                 possibilityIterator != concretePossibilities->end(); possibilityIterator++) {
+
+                float probability = scoreFromLandmark<VisualObservationT, ConcretePossibilityT>
+                    (observation, (**possibilityIterator), particle);
+
+                if (probability > bestProbability)
+                    bestProbability = probability;
+
+                std::cout << probability << " of " << *possibilityIterator << std::endl;
+            }
+
+            totalWeight = updateTotalWeight(totalWeight, bestProbability);
             observationCount++;
-            float probability = scoreFromLandmark<VisualObservationT, ConcretePossibilityT>
-                                                  (observation,
-                                                   *(observation.getPossibilities()->front()),
-                                                   particle);
-            totalWeight = updateTotalWeight(totalWeight, probability);
         }
     }
 

@@ -40,11 +40,11 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
         incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->yglp),
                 *(partIter), totalWeight, count);
         incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->ygrp),
-                        *(partIter), totalWeight, count);
+                *(partIter), totalWeight, count);
 
         // Visual cross
-        incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
-                                *(partIter), totalWeight, count);
+//        incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
+//                                *(partIter), totalWeight, count);
 
         std::list<VisualCorner> * corners = vision->fieldLines->getCorners();
         std::list<VisualCorner>::const_iterator vc;
