@@ -352,6 +352,9 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
     motionRequest.motion = MotionRequest::walk;
     walkingEngine.theMotionRequest = motionRequest;
 
+    //reset odometry
+    walkingEngine.theOdometryData = OdometryData();
+
     startOdometry = walkingEngine.theOdometryData;
     currentCommand = command;
 
