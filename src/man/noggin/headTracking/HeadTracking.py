@@ -89,6 +89,9 @@ class HeadTracking(FSA.FSA):
     def performWidePanFixedPitch(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
+    def performKickPanFixedPitch(self):
+        self.performHeadMove(HeadMoves.FIXED_PITCH_KICK_PAN)
+
     def trackBallFixedPitch(self):
         """
         Enters a state cycle:
@@ -123,6 +126,12 @@ class HeadTracking(FSA.FSA):
         self.switchTo('stopped')
         self.brain.motion.stopHeadMoves()
         self.helper.lookToAngleFixedPitch(yaw)
+
+    def lookStraightThenTrackFixedPitch(self):
+        """
+        Look straight. Once the ball is seen, begin tracking it.
+        """
+        self.switchTo('lookStraightThenTrackFixedPitch')
 
     ################### End Fixed Pitch #####################
 

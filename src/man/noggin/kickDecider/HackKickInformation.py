@@ -5,7 +5,7 @@ import objects as Objects
 import noggin_constants as nogginConstants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 
 class KickInformation:
     """
@@ -129,8 +129,10 @@ class KickInformation:
             return
 
         if DEBUG_KICK_DECISION:
-            print "Total far goal sightings (sum both posts): ",len(self.farGoalLeftPostBearings)+len(self.farGoalRightPostBearings)
-            print "Total near goal sightings (sum both posts): ",len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
+            print "Total far goal sightings (sum both posts): ",\
+                len(self.farGoalLeftPostBearings)+len(self.farGoalRightPostBearings)
+            print "Total near goal sightings (sum both posts): ",\
+                len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
 
         # bearing averages
         # Need more than 4 frames of each post to consider it "real".
@@ -205,8 +207,8 @@ class KickInformation:
         """
         kick = None
 
-        # DEBUG printing
-        print "In method shoot."
+        if DEBUG_KICK_DECISION:
+            print "In method shoot."
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # Need to use aimCenter in decision.
@@ -267,8 +269,8 @@ class KickInformation:
             if self.dangerousBall() or self.nearGoalieOwn:
                 # Can only see our own goal: Use goalie to make decision
 
-                if DEBUG_KICK_DECISION
-                print "Doing a goalie based kick."
+                if DEBUG_KICK_DECISION:
+                    print "Doing a goalie based kick."
 
                 return self.goalieBasedKick()
             else:
@@ -280,13 +282,13 @@ class KickInformation:
             kick.h = 45
             return kick
 
-        # DEBUG printing
-        print "farRightPostBearing: ",self.farRightPostBearing
-        print "farLeftPostBearing: ",self.farLeftPostBearing
-        print "nearRightPostBearing: ",self.nearRightPostBearing
-        print "nearLeftPostBearing: ",self.nearLeftPostBearing
-        print "rightPostBearing: ",rightPostBearing
-        print "leftPostBearing:  ",leftPostBearing
+        if DEBUG_KICK_DECISION:
+            print "farRightPostBearing: ",self.farRightPostBearing
+            print "farLeftPostBearing: ",self.farLeftPostBearing
+            print "nearRightPostBearing: ",self.nearRightPostBearing
+            print "nearLeftPostBearing: ",self.nearLeftPostBearing
+            print "rightPostBearing: ",rightPostBearing
+            print "leftPostBearing:  ",leftPostBearing
 
         if rightPostBearing == 0 and leftPostBearing == 0:
             # Can't see any posts: orbit.
@@ -313,9 +315,9 @@ class KickInformation:
             rightScorePoint = leftPostBearing + 15
             leftScorePoint = rightScorePoint + 10
 
-        # DEBUG printing
-        print "rightScorePoint: ",rightScorePoint
-        print "leftScorePoint:  ",leftScorePoint
+        if DEBUG_KICK_DECISION:
+            print "rightScorePoint: ",rightScorePoint
+            print "leftScorePoint:  ",leftScorePoint
 
         # If any kick is currently valid, choose that kick.
         # Note: this ignores the aimCenter distinction.
