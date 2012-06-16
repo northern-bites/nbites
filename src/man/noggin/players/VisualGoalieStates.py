@@ -12,6 +12,7 @@ from objects import RelRobotLocation, RelLocation
 from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 from vision import cornerID as IDs
 from math import fabs
+import man.noggin.kickDecider.kicks as kicks
 
 DEBUG_OBSERVATIONS = False
 DEBUG_POSITION = False
@@ -147,18 +148,18 @@ def clearIt(player):
         player.brain.tracker.trackBallFixedPitch()
         if player.brain.ball.loc.relY < 0.0:
             player.side = RIGHT
-            clearIt.ballDest = RelRobotLocation((player.brain.ball.loc.relX -
-                                                 18.0),
-                                                (player.brain.ball.loc.relY +
-                                                 5.0),
-                                                0.0)
+            clearIt.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
             player.side = LEFT
-            clearIt.ballDest = RelRobotLocation((player.brain.ball.loc.relX -
-                                                 18.0),
-                                                (player.brain.ball.loc.relY -
-                                                 5.0),
-                                                0.0)
+            clearIt.kick = kicks.LEFT_STRAIGHT_KICK
+
+        kickPose = clearIt.kick.getPosition()
+        clearIt.ballDest = RelRobotLocation(player.brain.ball.loc.relX -
+                                            kickPose[0],
+                                            player.brain.ball.loc.relY -
+                                            kickPose[1],
+                                            0.0)
+
         # reset odometry
         player.brain.motion.resetOdometry()
         clearIt.odoDelay = True
@@ -171,8 +172,9 @@ def clearIt(player):
                               nav.FAST_SPEED)
 
     # magic number
-    clearIt.ballDest.relX = player.brain.ball.loc.relX - 18.0
-    clearIt.ballDest.relY = player.brain.ball.loc.relY
+    kickPose = clearIt.kick.getPosition()
+    clearIt.ballDest.relX = player.brain.ball.loc.relX - kickPose[0]
+    clearIt.ballDest.relY = player.brain.ball.loc.relY - kickPose[1]
 
     return Transition.getNextState(player, clearIt)
 

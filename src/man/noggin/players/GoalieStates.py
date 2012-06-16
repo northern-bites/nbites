@@ -127,12 +127,8 @@ def kickBall(player):
                                                               player.brain.loc.lastOdoTheta)
 
         player.brain.tracker.trackBallFixedPitch()
-        if player.brain.ball.loc.relY < 0.0:
-            kick = SweetMoves.RIGHT_STRAIGHT_KICK
-        else:
-            kick = SweetMoves.LEFT_STRAIGHT_KICK
 
-        player.executeMove(kick)
+        player.executeMove(VisualStates.clearIt.kick.sweetMove)
 
     if player.counter > 10 and player.brain.nav.isStopped():
             return player.goLater('didIKickIt')
