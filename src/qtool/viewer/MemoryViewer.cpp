@@ -35,24 +35,12 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	BMPImageViewer* top = new BMPImageViewer(comboTop, this);
     BMPImageViewer* bottom = new BMPImageViewer(comboBottom, this);
 
-/*	QVBoxLayout* bothImagesLayout = new QVBoxLayout;
-	bothImagesLayout->setAlignment(Qt::AlignTop);
-	bothImagesLayout->setSpacing(1);
-
-	bothImagesLayout->addWidget(top);
-	bothImagesLayout->addWidget(bottom);
-
-	QWidget* bothImages = new QWidget;
-
-	bothImages->setLayout(bothImagesLayout);*/
-
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;
     QTabWidget* imageTabs = new QTabWidget();
 
     imageTabs->addTab(topImageViewer, QString("Top Image"));
     imageTabs->addTab(bottomImageViewer, QString("Bottom Image"));
-	//imageTabs->addTab(bothImages, QString("Both Images"));
 
 	mainLayout->addWidget(imageTabs);
 	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
