@@ -14,11 +14,11 @@ using namespace man::corpus;
 using namespace qtool::image;
 
 VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
-                 memoryManager(memoryManager),
-                 speech(new Speech()),
-                 sensors(new Sensors(speech)),
-                 bottomRawImage(new proto::PRawImage()),
-                 topRawImage(new proto::PRawImage())
+	memoryManager(memoryManager),
+	speech(new Speech()),
+	sensors(new Sensors(speech)),
+	bottomRawImage(new proto::PRawImage()),
+	topRawImage(new proto::PRawImage())
 {
 
     offlineMVision = MVision::ptr(new MVision());
@@ -176,7 +176,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     dockWidget = new QDockWidget("Image data", this);
 	dockWidget->setMinimumWidth(300);
     MObjectViewer* imageDataView = new MObjectViewer(
-            memoryManager->getMemory()->get<MRawImages>(), this);
+		memoryManager->getMemory()->get<MRawImages>(), this);
     dockWidget->setWidget(imageDataView);
     memoryManager->connectSlot(imageDataView, SLOT(updateView()), "MRawImages");
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
@@ -211,11 +211,11 @@ void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {
 }
 
 void VisionViewer::loadColorTable(){
-  QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
-							"../../data/tables",
-							tr("Table Files (*.mtb)"));
-  imageTranscribe->initTable(colorTablePath.toStdString());
-  update();
+	QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
+														  "../../data/tables",
+														  tr("Table Files (*.mtb)"));
+	imageTranscribe->initTable(colorTablePath.toStdString());
+	update();
 }
 
 #define SET_DEBUG(funcName, buttonName)                             \

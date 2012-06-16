@@ -2,6 +2,7 @@
 #include "man/memory/Memory.h"
 #include "image/BMPImage.h"
 
+#include <QDebug>
 #include <QVBoxLayout>
 #include <vector>
 
@@ -15,10 +16,10 @@ using namespace image;
 using namespace overseer;
 
 FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
-			        QWidget(parent),
-			        dataManager(dataManager),
-			        startButton(new QPushButton("Locate Robots", this)),
-			        stopButton(new QPushButton("Stop Location", this)) {
+	QWidget(parent),
+	dataManager(dataManager),
+	startButton(new QPushButton("Locate Robots", this)),
+	stopButton(new QPushButton("Stop Location", this)) {
 
     mainLayout = new QVBoxLayout(this);
 	scaleFactor = 1.0f;
@@ -46,6 +47,10 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
     mainLayout->addLayout(buttonLayout);
     mainLayout->addLayout(field);
     this->setLayout(mainLayout);
+}
+
+FieldViewer::~FieldViewer(){
+	bot_locs->locs->stopListening();
 }
 
 void FieldViewer::drawBots(){

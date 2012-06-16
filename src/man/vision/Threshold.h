@@ -111,8 +111,8 @@ static const int NUMBLOCKS = 3;
 
 //
 // DISTANCE ESTIMATES CONSTANTS
-// based on Height and Width
-static const float POST_MIN_FOC_DIST = 10.0f; // goal posts
+// based on common sense
+static const float POST_MIN_FOC_DIST = 5.0f; // goal posts
 static const float POST_MAX_FOC_DIST = 800.0f;
 
 const float HORIZONTAL_SHOULDER_THRESH_LEFT = 1.05f;
@@ -143,6 +143,7 @@ public:
 	void findBallLowerCamera(int column, int topEdge);
     void detectSelf();
     void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
+	void identifyGoalie();
     void objectRecognition();
     void newFindRobots(); //ben's function
     // helper methods
@@ -159,10 +160,19 @@ public:
     void setVisualCrossInfo(VisualCross *objPtr);
     void setShot(VisualCrossbar * one);
     void setOpenFieldInformation();
-    float chooseGoalDistance(distanceCertainty cert, float height, float width,
-                             float poseDist, int bottom);
-    float getGoalPostDistFromHeight(float height);
-    float getGoalPostDistFromWidth(float width);
+
+    /**
+     * Chooses between different types of estimates for the best one
+     * relies mainly on whether the visual attributes are reliable
+     * and on what distance ranges we get, since bearing estimates
+     * are usually very similar (since they're computed in similar ways);
+     */
+    estimate chooseBestGoalEstimate(distanceCertainty cert, const estimate& estFromHeight,
+            const estimate& estFromWidth, const estimate& estFromPose, int bottom);
+    //deprecate these - out of date
+    estimate getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height);
+    estimate getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width);
+
     float getBeaconDistFromHeight(float height);
     int distance(int x1, int x2, int x3, int x4);
     float realDistance(int x, int y, int x1, int y1);

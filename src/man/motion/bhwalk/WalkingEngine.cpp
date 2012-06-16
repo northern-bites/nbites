@@ -213,7 +213,7 @@ void WalkingEngine::update()
 {
 
     //set the motion selection
-    theMotionRequest.walkRequest.pedantic = false;
+//    theMotionRequest.walkRequest.pedantic = false;
 
     //get new joint, sensor and frame info data
     theFrameInfo.cycleTime = 0.01f;
@@ -221,7 +221,7 @@ void WalkingEngine::update()
 
     //calibrate joints
     for(int i = 0; i < JointData::numOfJoints; ++i) {
-        theJointData.angles[i] = theJointData.angles[i] * theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
+        theJointData.angles[i] = theJointData.angles[i] * (float)theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
     }
     //calibrate sensors
     theSensorData.data[SensorData::gyroX] *= theSensorCalibration.gyroXGain / 1600;
@@ -261,6 +261,7 @@ void WalkingEngine::update()
 
     motionSelector.update(theMotionSelection, theMotionRequest, walkingEngineOutput,
             theGroundContactState, theDamageConfiguration, theFrameInfo);
+
     //motion selector surrogate
 //    theMotionSelection.walkRequest = theMotionRequest.walkRequest;
 //    theMotionSelection.targetMotion = theMotionRequest.motion;
@@ -272,9 +273,9 @@ void WalkingEngine::update()
 
     static bool calibrated = false;
     if (calibrated != theInertiaSensorData.calibrated) {
-        bhwalk_out << "Calibration status changed to " << theInertiaSensorData.calibrated << endl;
+        cout << "Calibration status changed to " << theInertiaSensorData.calibrated << endl;
+        calibrated = theInertiaSensorData.calibrated;
     }
-    calibrated = theInertiaSensorData.calibrated;
 
   if(theMotionSelection.ratios[MotionRequest::walk] > 0.f || theMotionSelection.ratios[MotionRequest::stand] > 0.f)
   {
@@ -359,6 +360,7 @@ void WalkingEngine::updateMotionRequest()
     {
       if(theMotionRequest.walkRequest.kickType != WalkRequest::none && kickPlayer.isKickStandKick(theMotionRequest.walkRequest.kickType))
       {
+          cout << "Cannot request a kick in the walking engine atm! " << endl;
         bool mirrored = kickPlayer.isKickMirrored(theMotionRequest.walkRequest.kickType);
         requestedMotionType = mirrored ? standLeft : standRight;
       }

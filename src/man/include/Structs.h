@@ -155,6 +155,8 @@ struct estimate {
         }
 };
 
+const estimate NULL_ESTIMATE;
+
 struct fieldOpening {
     int soft;
     int hard;

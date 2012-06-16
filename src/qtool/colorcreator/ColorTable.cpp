@@ -96,9 +96,6 @@ void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
                 for (int c = 0; c < image::NUM_COLORS; c++)
                 {
                     if (colorSpaces[c].contains(color)) {
-                        if (c == image::Orange) {
-                            count++;
-                        }
                         temp = temp | image::Color_bits[c];
                     }
                 }
@@ -107,7 +104,6 @@ void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
         }
     }
     file.write(table);
-    out << "Orange count was " << count << "\n" << endl;
     file.close();
 }
 

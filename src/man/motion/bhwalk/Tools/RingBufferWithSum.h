@@ -85,7 +85,7 @@ public:
     // Return 0 if buffer is empty
     if(0 == numberOfEntries) return C();
 
-    return (sum / numberOfEntries);
+    return (sum / (C)numberOfEntries);
   }
 
   /**
