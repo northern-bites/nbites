@@ -18,7 +18,7 @@ def shouldPrepareForKick(player):
     We're close enough to prepare for a kick
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.dist < constants.PREPARE_FOR_KICK_DIST
+    return ball.vis.framesOn > 4 and ball.dist < constants.PREPARE_FOR_KICK_DIST
 
 def shouldSpinToBall(player):
     """
@@ -82,13 +82,20 @@ def shouldKickAgain(player):
     """
     Ball hasn't changed enough to warrant new kick decision.
     """
-    return (shouldKick(player) and ballNearPosition(player))
+    return ballNearPosition(player)
 
 def shouldOrbit(player):
     """
     We are lost (no kick) but are chaser and are at the ball.
     """
     return player.brain.kickDecider.getSweetMove() is None
+
+def shouldCancelOrbit(player):
+    """
+    Ball is far away. Don't want to finish slow orbit.
+    """
+    return (player.brain.ball.vis.framesOn > 4 and
+            player.brain.ball.loc.dist > constants.SHOULD_CANCEL_ORBIT_BALL_DIST)
 
 ####### PENALTY KICK STUFF ###########
 

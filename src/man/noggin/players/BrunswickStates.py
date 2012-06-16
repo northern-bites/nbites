@@ -104,6 +104,8 @@ def gameSet(player):
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
             player.shouldKickOff = True
+        else:
+            player.shouldKickOff = False
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
@@ -127,6 +129,7 @@ def gamePlaying(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.trackBallFixedPitch()
+        player.inKickingState = False
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 25:
@@ -205,7 +208,6 @@ def gameFinished(player):
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.gainsOn()
-        player.stopWalking()
         player.stand()
         player.brain.loc.resetBall()
         player.inKickingState = False
@@ -229,6 +231,8 @@ def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.stand()
+        player.inKickingState = False
+        player.shouldKickOff = False
         player.penaltyKicking = True
 
     if player.brain.play.isRole(GOALIE):
@@ -236,5 +240,3 @@ def penaltyShotsGamePlaying(player):
         roleState = player.getRoleState()
         return player.goNow(roleState)
     return player.goNow('chase')
-
-
