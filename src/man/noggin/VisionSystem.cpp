@@ -43,8 +43,8 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                 *(partIter), totalWeight, count);
 
         // Visual cross
-//        incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
-//                                *(partIter), totalWeight, count);
+        incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
+                                *(partIter), totalWeight, count);
 
         std::list<VisualCorner> * corners = vision->fieldLines->getCorners();
         std::list<VisualCorner>::const_iterator vc;
@@ -72,10 +72,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                 count++;
 
             } else{
-                std::cout << "We saw a corner REALLY far away: "
-                        << vc->getDistance()<< " centimeters away" <<std::endl
-                        << "They can't be more than" << MAX_CORNER_DISTANCE
-                        << " centimeters away." << std::endl;
+//                std::cout << "We saw a corner REALLY far away: "
+//                        << vc->getDistance()<< " centimeters away" <<std::endl
+//                        << "They can't be more than" << MAX_CORNER_DISTANCE
+//                        << " centimeters away." << std::endl;
             }
         }
 
