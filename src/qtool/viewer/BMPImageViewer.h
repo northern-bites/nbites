@@ -50,6 +50,8 @@ protected:
     QLabel imagePlaceholder;
 	QVBoxLayout* BMPlayout;
 	QSize imageSize;
+	int initialW;
+	int initialH;
 	float scale;
 
 private:

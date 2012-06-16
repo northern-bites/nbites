@@ -22,6 +22,9 @@ void BMPImageViewer::setupUI() {
     BMPlayout->setAlignment(Qt::AlignTop);
     BMPlayout->setSpacing(0);
     this->setLayout(BMPlayout);
+	
+	initialW = image->getWidth();
+	initialH = image->getHeight();
 }
 
 void BMPImageViewer::updateView() {
@@ -36,9 +39,11 @@ void BMPImageViewer::updateView() {
 		int maxWidth = this->width();
 		int maxHeight = this->height();
 
-		if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
-			scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);
-		else scaledPixmap = scaledPixmap.scaledToHeight(maxHeight);
+		if(maxWidth > initialW && maxHeight > initialH) {
+			if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
+				scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);
+			else scaledPixmap = scaledPixmap.scaledToHeight(maxHeight);
+		}
 
         if (qimage) {
             imagePlaceholder.setPixmap(scaledPixmap);

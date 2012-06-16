@@ -48,6 +48,10 @@ OverseerClient::OverseerClient(DataManager::ptr dataManager, QWidget* parent) :
     rightLayout->addWidget(fpsTagLabel);
     rightLayout->addWidget(fpsLabel);
 
+rightLayout->setGeometry(QRect(parent->size().width()-300, 0, 300, parent->size().height()));
+
+qDebug()<<rightLayout->geometry();
+
     mainLayout->addLayout(rightLayout);
     this->setLayout(mainLayout);
 }
