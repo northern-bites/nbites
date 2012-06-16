@@ -104,9 +104,9 @@ void InertiaSensorCalibrator::update(InertiaSensorData& inertiaSensorData,
      (!theGroundContactState.contact && theDamageConfiguration.useGroundContactDetectionForSensorCalibration))
     unstable = true;
   else if(currentMotion == MotionRequest::walk &&
-          (abs(theWalkingEngineOutput.speed.translation.y) > 10.f ||
-           abs(theWalkingEngineOutput.speed.translation.x) > 20.f ||
-           abs(theWalkingEngineOutput.speed.rotation) > 0.15f))
+          (fabs(theWalkingEngineOutput.speed.translation.y) > 10.f ||
+           fabs(theWalkingEngineOutput.speed.translation.x) > 20.f ||
+           fabs(theWalkingEngineOutput.speed.rotation) > 0.15f))
     unstable = true;
   else if(inertiaSensorDrops >= 2)
     unstable = true;
@@ -186,12 +186,12 @@ void InertiaSensorCalibrator::update(InertiaSensorData& inertiaSensorData,
     const Pose3D& footRight(theRobotModel.limbs[MassCalibration::footRight]);
     const Pose3D footLeftInvert(footLeft.invert());
     const Pose3D footRightInvert(footRight.invert());
-    if(abs(footLeftInvert.translation.z - footRightInvert.translation.z) < 3.f/* magic number */)
+    if(fabs(footLeftInvert.translation.z - footRightInvert.translation.z) < 3.f/* magic number */)
     {
       // use average of the calculated rotation of each leg
       calculatedRotation = RotationMatrix(Vector3<>(
-                                            (atan2(footLeftInvert.rotation.c1.z, footLeftInvert.rotation.c2.z) + atan2(footRightInvert.rotation.c1.z, footRightInvert.rotation.c2.z)) * 0.5f,
-                                            (atan2(-footLeftInvert.rotation.c0.z, footLeftInvert.rotation.c2.z) + atan2(-footRightInvert.rotation.c0.z, footRightInvert.rotation.c2.z)) * 0.5f,
+                                            (atan2f(footLeftInvert.rotation.c1.z, footLeftInvert.rotation.c2.z) + atan2f(footRightInvert.rotation.c1.z, footRightInvert.rotation.c2.z)) * 0.5f,
+                                            (atan2f(-footLeftInvert.rotation.c0.z, footLeftInvert.rotation.c2.z) + atan2f(-footRightInvert.rotation.c0.z, footRightInvert.rotation.c2.z)) * 0.5f,
                                             0.f));
     }
     else if(footLeftInvert.translation.z > footRightInvert.translation.z)

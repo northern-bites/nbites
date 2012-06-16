@@ -28,6 +28,9 @@ message WalkProvider {
 		optional RobotLocation speeds = 6;
 		
 		repeated float select_ratios = 7;
+		
+		optional bool ground_contact_safe = 8;
+		optional bool instable = 9;
 	}
 }
 
@@ -48,5 +51,7 @@ message Motion {
 	
 	optional WalkProvider walk_provider = 5; 
 	optional ScriptedProvider scripted_provider = 6;
+	
+	optional bool support_foot = 7;
 	
 }
