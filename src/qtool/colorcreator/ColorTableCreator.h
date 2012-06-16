@@ -69,6 +69,7 @@ public:
 
     void paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brushStroke);
 
+
 protected slots:
     void loadColorTable();
     void saveColorTable();
@@ -108,5 +109,14 @@ private:
     std::vector<BrushStroke> brushStrokes;
 
 };
+
+class FixedLayout: public QVBoxLayout{
+	Q_OBJECT
+
+public:
+	QSize sizeHint() const {return QSize(350,500);}
+};
+
+
 }
 }

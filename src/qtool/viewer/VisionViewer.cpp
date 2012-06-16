@@ -14,11 +14,11 @@ using namespace man::corpus;
 using namespace qtool::image;
 
 VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
-                 memoryManager(memoryManager),
-                 speech(new Speech()),
-                 sensors(new Sensors(speech)),
-                 bottomRawImage(new proto::PRawImage()),
-                 topRawImage(new proto::PRawImage())
+	memoryManager(memoryManager),
+	speech(new Speech()),
+	sensors(new Sensors(speech)),
+	bottomRawImage(new proto::PRawImage()),
+	topRawImage(new proto::PRawImage())
 {
 
     offlineMVision = MVision::ptr(new MVision());
@@ -39,33 +39,49 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     bottomRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
     topRawImage->mutable_image()->assign(AVERAGED_IMAGE_SIZE, 0);
 
-    QToolBar* toolBar = new QToolBar(this);
+    //*** TOOLBAR STUFF ***//
+	QToolBar* toolBar = new QToolBar(this);
+	QToolBar* toolBar2 = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     toolBar->addWidget(loadTableButton);
     this->addToolBar(toolBar);
+	this->addToolBarBreak();
+	this->addToolBar(toolBar2);
 
-#define ADD_DEBUG_CHECKBOX(text, func) {            \
+#define ADD_DEBUG_CHECKBOX1(text, func) {           \
         QCheckBox* debug = new QCheckBox(tr(text)); \
         connect(debug, SIGNAL(stateChanged(int)),   \
                 this, SLOT(func(int)));             \
         toolBar->addWidget(debug);                  \
     }
 
-    ADD_DEBUG_CHECKBOX("Horizon Debug", setHorizonDebug);
-    ADD_DEBUG_CHECKBOX("Shooting Debug", setShootingDebug);
-    ADD_DEBUG_CHECKBOX("Open Field Debug", setOpenFieldDebug);
-    ADD_DEBUG_CHECKBOX("Edge Detection Debug", setEdgeDetectionDebug);
-    ADD_DEBUG_CHECKBOX("Hough Debug", setHoughTransformDebug);
-    ADD_DEBUG_CHECKBOX("Robot Detection Debug", setRobotsDebug);
-    ADD_DEBUG_CHECKBOX("Visual Line Debug", setVisualLinesDebug);
-    ADD_DEBUG_CHECKBOX("Visual Corner Debug", setVisualCornersDebug);
+#define ADD_DEBUG_CHECKBOX2(text, func) {           \
+        QCheckBox* debug = new QCheckBox(tr(text)); \
+        connect(debug, SIGNAL(stateChanged(int)),   \
+                this, SLOT(func(int)));             \
+        toolBar2->addWidget(debug);                 \
+    }
 
+    ADD_DEBUG_CHECKBOX1("Horizon Debug", setHorizonDebug);
+    ADD_DEBUG_CHECKBOX1("Shooting Debug", setShootingDebug);
+    ADD_DEBUG_CHECKBOX1("Open Field Debug", setOpenFieldDebug);
+    ADD_DEBUG_CHECKBOX1("Edge Detection Debug", setEdgeDetectionDebug);
+    ADD_DEBUG_CHECKBOX2("Hough Debug", setHoughTransformDebug);
+    ADD_DEBUG_CHECKBOX2("Robot Detection Debug", setRobotsDebug);
+    ADD_DEBUG_CHECKBOX2("Visual Line Debug", setVisualLinesDebug);
+    ADD_DEBUG_CHECKBOX2("Visual Corner Debug", setVisualCornersDebug);
+
+
+	//*** VISION IMAGE STUFF ***//
     bottomVisionImage = new ThresholdedImage(bottomRawImage, this);
     topVisionImage = new ThresholdedImage(topRawImage, this);
 
+	topVisionView = new BMPImageViewer(topVisionImage, this);
+	bottomVisionView = new BMPImageViewer(bottomVisionImage, this);
+
     VisualInfoImage* shapesBottom = new VisualInfoImage(offlineMVision, Camera::BOTTOM);
-    VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);    
+    VisualInfoImage* shapesTop = new VisualInfoImage(offlineMVision, Camera::TOP);
 
     MRawImages::const_ptr rawImages = memoryManager->getMemory()->get<MRawImages>();
 
@@ -81,55 +97,66 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
     connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
 
-    //memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
-    //memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
+	memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
 
-    CollapsibleImageViewer* bottomCIV = new
-            CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
-    CollapsibleImageViewer* topCIV = new
-            CollapsibleImageViewer(topImageViewer, "Top", this);
-
-    QWidget* combinedRawImageView = new QWidget(this);
-
-    QVBoxLayout* layout = new QVBoxLayout(combinedRawImageView);
-    layout->setAlignment(Qt::AlignTop);
-
-    layout->addWidget(topCIV);
-    layout->addWidget(bottomCIV);
-
-    combinedRawImageView->setLayout(layout);
-
-    bottomVisionView = new BMPImageViewerListener(bottomVisionImage, this);
-
-    connect(this, SIGNAL(imagesUpdated()),
+	connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));
 
-    topVisionView = new BMPImageViewer(topVisionImage, this);
     connect(this, SIGNAL(imagesUpdated()),
             topVisionView, SLOT(updateView()));
-    connect(topVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
+
+	//mouse listeners for all four images
+	BMPImageViewerListener* bottomVisionListener
+		= new BMPImageViewerListener(bottomVisionImage, this);
+	BMPImageViewerListener* topVisionListener
+		= new BMPImageViewerListener(topVisionImage, this);
+	BMPImageViewerListener* bottomRawListener
+		= new BMPImageViewerListener(comboBottom, this);
+	BMPImageViewerListener* topRawListener
+		= new BMPImageViewerListener(comboTop, this);
+    bottomVisionListener->hide();
+	topVisionListener->hide();
+	bottomRawListener->hide();
+	topRawListener->hide();
+	connect(topVisionListener, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
+	connect(bottomVisionListener, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
+	connect(topRawListener, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
+	connect(bottomRawListener, SIGNAL(mouseClicked(int, int, int, bool)),
+			this, SLOT(pixelClicked(int, int, int, bool)));
 
-    CollapsibleImageViewer* bottomVisCIV = new CollapsibleImageViewer(bottomVisionView, "Bottom", this);
-    CollapsibleImageViewer* topVisCIV = new CollapsibleImageViewer(topVisionView, "Top", this);
 
-    QWidget* visionImages = new QWidget(this);
+	//*** WINDOW LAYOUT STUFF ***//
+	QWidget* rawPane = new QWidget(this);
+	QWidget* visionPane = new QWidget(this);
 
-    QVBoxLayout* visLayout = new QVBoxLayout(visionImages);
-    visLayout->setAlignment(Qt::AlignTop);
+    QTabWidget* rawTabs = new QTabWidget(rawPane);
+	QHBoxLayout* rawTabLayout = new QHBoxLayout(rawPane);
 
-    visLayout->addWidget(topVisCIV);
-    visLayout->addWidget(bottomVisCIV);
+    rawTabs->addTab(topImageViewer, tr("Top Image"));
+    rawTabs->addTab(bottomImageViewer, tr("Bottom Image"));
 
-    visionImages->setLayout(visLayout);
+	rawTabLayout->addWidget(rawTabs);
+	rawPane->setLayout(rawTabLayout);
 
-    QTabWidget* imageTabs = new QTabWidget();
-    imageTabs->addTab(combinedRawImageView, tr("Raw Images"));
-    imageTabs->addTab(visionImages, tr("Vision Images"));
+	QTabWidget* visTabs = new QTabWidget(visionPane);
+    QHBoxLayout* visTabLayout = new QHBoxLayout(visionPane);
 
-    memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
+    visTabs->addTab(topVisionView, tr("Top Vision"));
+    visTabs->addTab(bottomVisionView, tr("Bottom Vision"));
 
-    this->setCentralWidget(imageTabs);
+	visTabLayout->addWidget(visTabs);
+    visionPane->setLayout(visTabLayout);
+
+    QTabWidget* outsideTabs = new QTabWidget();
+    outsideTabs->addTab(rawPane, tr("Raw Images"));
+    outsideTabs->addTab(visionPane, tr("Vision Images"));
+
+    this->setCentralWidget(outsideTabs);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -140,20 +167,22 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     std::vector<QTreeView> messageViewers;
 
     QDockWidget* dockWidget = new QDockWidget("Offline Vision", this);
+	dockWidget->setMinimumWidth(300);
+	dockWidget->setMaximumHeight(375);
     offlineVisionView = new MObjectViewer(offlineMVision, this);
 	dockWidget->setWidget(offlineVisionView);
 	connect(this, SIGNAL(imagesUpdated()), offlineVisionView, SLOT(updateView()));
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Image data", this);
+	dockWidget->setMinimumWidth(300);
+	dockWidget->setMaximumHeight(300);
     MObjectViewer* imageDataView = new MObjectViewer(
-            memoryManager->getMemory()->get<MRawImages>(), this);
+		memoryManager->getMemory()->get<MRawImages>(), this);
     dockWidget->setWidget(imageDataView);
     memoryManager->connectSlot(imageDataView, SLOT(updateView()), "MRawImages");
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
-    // Make sure one of the images is toggled off for small screens
-    bottomCIV->toggle();
 }
 
 void VisionViewer::update()
@@ -184,11 +213,11 @@ void VisionViewer::pixelClicked(int x, int y, int brushSize, bool leftClick) {
 }
 
 void VisionViewer::loadColorTable(){
-  QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
-							"../../data/tables",
-							tr("Table Files (*.mtb)"));
-  imageTranscribe->initTable(colorTablePath.toStdString());
-  update();
+	QString colorTablePath = QFileDialog::getOpenFileName(this, tr("Open Color Table"),
+														  "../../data/tables",
+														  tr("Table Files (*.mtb)"));
+	imageTranscribe->initTable(colorTablePath.toStdString());
+	update();
 }
 
 #define SET_DEBUG(funcName, buttonName)                             \
