@@ -219,9 +219,8 @@ def whiffed(player):
     If the ball is just sitting at the goalie's feet after kicking, it
     should try again.
     """
-    return (player.brain.ball.loc.dist < 18.0 and
-            fabs(player.brain.ball.loc.relX) < 18.0 and
-            player.brain.ball.loc.relY < 10.0 and
+    return (player.brain.ball.loc.relX < 40.0 and
+            fabs(player.brain.ball.loc.relY) < 25.0 and
             player.brain.ball.vis.on)
 
 # ******************

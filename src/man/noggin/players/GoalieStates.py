@@ -122,13 +122,24 @@ def kickBall(player):
     Kick the ball
     """
     if player.firstFrame():
-        VisualStates.returnToGoal.kickPose = RelRobotLocation(player.brain.loc.lastOdoX,
-                                                              player.brain.loc.lastOdoY,
-                                                              player.brain.loc.lastOdoTheta)
+        # save odometry if this was your first kick
+        if player.lastDiffState == 'clearIt':
+            VisualStates.returnToGoal.kickPose = \
+                RelRobotLocation(player.brain.loc.lastOdoX,
+                                 player.brain.loc.lastOdoY,
+                                 player.brain.loc.lastOdoTheta)
+        #otherwise add to previously saved odo
+        else:
+            VisualStates.returnToGoal.kickPose.relX += \
+                player.brain.loc.lastOdoX
+            VisualStates.returnToGoal.kickPose.relX += \
+                player.brain.loc.lastOdoY
+            VisualStates.returnToGoal.kickPose.relX += \
+                player.brain.loc.lastOdoTheta
 
         player.brain.tracker.trackBallFixedPitch()
 
-        player.executeMove(VisualStates.clearIt.kick.sweetMove)
+        player.executeMove(player.kick.sweetMove)
 
     if player.counter > 10 and player.brain.nav.isStopped():
             return player.goLater('didIKickIt')

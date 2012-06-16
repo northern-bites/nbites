@@ -55,12 +55,12 @@ def walkToGoal(player):
     """
     if player.firstFrame():
         # first decide which side you're coming in from
-        if player.lastState == 'gatherPostInfo':
+        if player.lastDiffState == 'gatherPostInfo':
             # don't change side
             player.side = player.side
         elif ((hasattr(walkToGoal, 'incomingTransition') and
              walkToGoal.incomingTransition.condition == onRightSideline) or
-            player.lastState == 'gameReady'):
+            player.lastDiffState == 'gameReady'):
             player.side = RIGHT
         else:
             player.side = LEFT
@@ -148,12 +148,12 @@ def clearIt(player):
         player.brain.tracker.trackBallFixedPitch()
         if player.brain.ball.loc.relY < 0.0:
             player.side = RIGHT
-            clearIt.kick = kicks.RIGHT_STRAIGHT_KICK
+            player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
             player.side = LEFT
-            clearIt.kick = kicks.LEFT_STRAIGHT_KICK
+            player.kick = kicks.LEFT_STRAIGHT_KICK
 
-        kickPose = clearIt.kick.getPosition()
+        kickPose = player.kick.getPosition()
         clearIt.ballDest = RelRobotLocation(player.brain.ball.loc.relX -
                                             kickPose[0],
                                             player.brain.ball.loc.relY -
@@ -171,8 +171,7 @@ def clearIt(player):
                               nav.CLOSE_ENOUGH,
                               nav.FAST_SPEED)
 
-    # magic number
-    kickPose = clearIt.kick.getPosition()
+    kickPose = player.kick.getPosition()
     clearIt.ballDest.relX = player.brain.ball.loc.relX - kickPose[0]
     clearIt.ballDest.relY = player.brain.ball.loc.relY - kickPose[1]
 
@@ -227,6 +226,13 @@ def returnToGoal(player):
                                               player.brain.loc.lastOdoY,
                                               0.0))
 
+        if fabs(correctedDest.relX) < 5:
+            correctedDest.relX = 0.0
+        if fabs(correctedDest.relY) < 5:
+            correctedDest.relY = 0.0
+        if fabs(correctedDest.relH) < 5:
+            correctedDest.relH = 0.0
+
         player.brain.nav.walkTo(correctedDest)
 
     return Transition.getNextState(player, returnToGoal)
@@ -276,7 +282,6 @@ def centerAtGoalBasedOnCorners(player):
 
             lookTo = RelLocation(-relX, -relY)
 
-            # does this work?
             player.brain.tracker.lookToAngle(centerAtGoalBasedOnCorners.cornerDirection)
 
             break
@@ -285,10 +290,44 @@ def centerAtGoalBasedOnCorners(player):
     if fabs(centerAtGoalBasedOnCorners.home.relH) < 5:
         centerAtGoalBasedOnCorners.home.relH = 0
 
-    if fabs(centerAtGoalBasedOnCorners.home.relX) < 10:
+    if fabs(centerAtGoalBasedOnCorners.home.relX) < 5:
         centerAtGoalBasedOnCorners.home.relX = 0
 
-    if fabs(centerAtGoalBasedOnCorners.home.relY) < 10:
+    if fabs(centerAtGoalBasedOnCorners.home.relY) < 5:
         centerAtGoalBasedOnCorners.home.relY = 0
 
     return Transition.getNextState(player, centerAtGoalBasedOnCorners)
+
+def repositionAfterWhiff(player):
+    if player.firstFrame():
+        player.brain.motion.resetOdometry()
+        if player.brain.ball.loc.relY < 0.0:
+            player.kick = kicks.RIGHT_STRAIGHT_KICK
+        else:
+            player.kick = kicks.LEFT_STRAIGHT_KICK
+
+        kickPose = player.kick.getPosition()
+        repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.loc.relX -
+                                                         kickPose[0],
+                                                         player.brain.ball.loc.relY -
+                                                         kickPose[1],
+                                                         0.0)
+        player.brain.nav.goTo(repositionAfterWhiff.ballDest,
+                              nav.CLOSE_ENOUGH,
+                              nav.FAST_SPEED)
+
+    # if it took more than 5 seconds, forget it
+    if player.counter > 150:
+        returnToGoal.kickPose.relX += player.brain.loc.lastOdoX
+        returnToGoal.kickPose.relX += player.brain.loc.lastOdoY
+        returnToGoal.kickPose.relX += player.brain.loc.lastOdoTheta
+
+        return player.goLater('returnToGoal')
+
+    kickPose = player.kick.getPosition()
+    repositionAfterWhiff.ballDest.relX = (player.brain.ball.loc.relX -
+                                          kickPose[0])
+    repositionAfterWhiff.ballDest.relY = (player.brain.ball.loc.relY -
+                                          kickPose[1])
+
+    return Transition.getNextState(player, repositionAfterWhiff)
