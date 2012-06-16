@@ -29,6 +29,7 @@ def gameInitial(player):
 
 def gameReady(player):
     if player.firstFrame():
+        player.penaltyKicking = False
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.lookToAngle(0)
@@ -44,6 +45,7 @@ def gameReady(player):
 def gameSet(player):
     if player.firstFrame():
         player.brain.logger.startLogging()
+        player.penaltyKicking = False
         player.brain.nav.stand()
         player.gainsOn()
         player.brain.loc.resetBall()
@@ -58,6 +60,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
+        player.penaltyKicking = False
         player.gainsOn()
         player.brain.nav.stand()
 
@@ -185,6 +188,7 @@ def penaltyShotsGameSet(player):
 
         player.brain.tracker.trackBallFixedPitch()
         player.initialDelayCounter = 0
+        player.penaltyKicking = True
 
     if player.initialDelayCounter < 230:
         player.initialDelayCounter += 1

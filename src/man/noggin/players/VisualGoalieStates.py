@@ -286,10 +286,10 @@ def centerAtGoalBasedOnCorners(player):
     if fabs(centerAtGoalBasedOnCorners.home.relH) < 5:
         centerAtGoalBasedOnCorners.home.relH = 0
 
-    if fabs(centerAtGoalBasedOnCorners.home.relX) < 5:
+    if fabs(centerAtGoalBasedOnCorners.home.relX) < 10:
         centerAtGoalBasedOnCorners.home.relX = 0
 
-    if fabs(centerAtGoalBasedOnCorners.home.relY) < 5:
+    if fabs(centerAtGoalBasedOnCorners.home.relY) < 10:
         centerAtGoalBasedOnCorners.home.relY = 0
 
     return Transition.getNextState(player, centerAtGoalBasedOnCorners)

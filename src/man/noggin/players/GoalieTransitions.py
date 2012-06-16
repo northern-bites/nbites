@@ -137,6 +137,9 @@ def shouldPerformSave(player):
     """
     Checks that the ball is moving toward it and close enough to save.
     """
+    if player.penaltyKicking:
+        return (player.brain.ball.vis.heat > 5.0 or
+                player.brain.ball.loc.relVelX < -50.0)
     return (player.brain.ball.loc.relVelX < -50.0 and
             player.brain.ball.vis.on and
             player.brain.ball.loc.dist > 120.0 and
@@ -167,6 +170,8 @@ def shouldClearBall(player):
     """
     Checks that the ball is more or less in the goal box.
     """
+    if player.penaltyKicking:
+        return False
     # less than 1.5 minutes left or winning/losing badly
     if player.brain.comm.gc.timeRemaining() < 90 and not player.aggressive:
         player.aggressive = True
@@ -207,9 +212,10 @@ def shouldClearBall(player):
 
 def ballLostStopChasing(player):
     """
-    If the robot does not see the ball while chasing, it is lost.
+    If the robot does not see the ball while chasing, it is lost. Delay
+    in case our shoulder pads are just hiding it.
     """
-    if not player.brain.ball.vis.on:
+    if not player.brain.ball.vis.on and player.counter > 150:
         return True
 
 def ballMovedStopChasing(player):
