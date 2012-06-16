@@ -42,6 +42,108 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
         incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->ygrp),
                 *(partIter), totalWeight, count);
 
+
+        // HACK HACK HACK
+        float bestProbability = 0.0f;
+
+        if (vision->yglp->hasPositiveID() && vision->ygrp->hasPositiveID())
+        {
+            for (int i=0; i<2; i++)
+            {
+                point<float> leftPost, rightPost;
+                if(i==0){
+                    leftPost = BLUE_GOAL_TOP_POST_LOC;
+                    rightPost = BLUE_GOAL_BOTTOM_POST_LOC;
+                }
+                else{
+                    leftPost = YELLOW_GOAL_BOTTOM_POST_LOC;
+                    rightPost = YELLOW_GOAL_TOP_POST_LOC;
+                }
+
+                float i = rightPost.x - leftPost.x;
+                float j = rightPost.y - leftPost.y;
+
+                float sideA = vision->yglp->getDistance();
+                float sideB = vision->ygrp->getDistance();
+                float sideC = hypotf(i,j);
+
+                /**
+                 * Using Law of Sines
+                 *      c         b         a
+                 *   ------- = ------- = -------
+                 *    sin(C)    sin(B)    sin(A)
+                 *
+                 *     self   b
+                 *        +---------+ pt2  ^
+                 *        |C      A/       |
+                 *        |       /        |
+                 *        |      /         |
+                 *      a |     / c        |
+                 *        |    /        i  |   (x goes up, like on the field.
+                 *        |   /            |            Heading of zero is up)
+                 *        |B /             |
+                 *        | /              |
+                 *        +/               _
+                 *      pt1
+                 *            j
+                 *       |----------->
+                 */
+
+                // Calculate angle between vector (pt1,pt2) and north (zero heading)
+                float ptVecHeading = copysignf(1.0f, j) * acosf(clip(i/sideC, -1.0f, 1.0f));
+                float angleC = fabs(subPIAngle(vision->yglp->getBearing() -
+                                              vision->ygrp->getBearing()));
+
+                // Clamp the input to asin to within (-1 , 1) due to measurement
+                // inaccuracies. This prevents a nan return from asin.
+                float angleB = asinf( clip( (sideB * sin(angleC)) /sideC, -1.0f, 1.0f));
+
+                // Swap sign of angle B to place us on the correct side of the
+                // line (pt1 -> pt2)
+                if (NBMath::subPIAngle(vision->yglp->getBearing() - vision->ygrp->getBearing()) > 0){
+                    angleB = -angleB;
+                }
+
+                // x_hat, y_hat are x and y in coord frame with x axis pointed
+                // from (pt1 -> pt2) and y perpendicular
+                float x_hat = sideA * cos(angleB);
+                float y_hat = sideA * sin(angleB);
+
+                // Transform to global x and y coordinates
+                float newX = x_hat * cos(ptVecHeading) - y_hat * sin(ptVecHeading) + leftPost.x;
+                float newY = x_hat * sin(ptVecHeading) + y_hat * cos(ptVecHeading) + leftPost.y;
+
+                // Heading of line (self -> pt2)
+                // Clamp the input to (-1,1) to prevent illegal trig call and a nan return
+                float headingPt2 = acosf(clip( (rightPost.x - newX)/sideB, -1.0f, 1.0f) );
+                // Sign based on y direction of vector (self -> pt2)
+                float signedHeadingPt2 = copysignf(1.0f, rightPost.y - newY) * headingPt2;
+
+                // New global heading
+                float newH = NBMath::subPIAngle(signedHeadingPt2 - vision->ygrp->getBearing());
+
+                //Determine distanceSD and bearingSD
+                float distanceSD = hypotf(vision->yglp->getDistanceSD(),
+                                          vision->ygrp->getDistanceSD());
+                float bearingSD = hypotf(vision->yglp->getBearingSD(),
+                                          vision->ygrp->getBearingSD());
+
+                // Reconstructed to newX, newY, newH
+                PF::Location pose(newX, newY, newH);
+                float probability = scoreParticleAgainstPose(*(partIter),
+                                                             pose,
+                                                             distanceSD,
+                                                             bearingSD);
+                if (probability > bestProbability)
+                    bestProbability = probability;
+            }
+
+            totalWeight = updateTotalWeight(totalWeight, bestProbability);
+
+        }
+
+
+
         // Visual cross
         incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
                                 *(partIter), totalWeight, count);
