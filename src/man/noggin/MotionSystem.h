@@ -37,6 +37,7 @@ class MotionSystem : public PF::MotionModel
 
  private:
     DeltaOdometryMeasurement makeNoisyDeltaOdometry() const;
+    void clipDeltaOdometry();
 
  private:
     mutable bool moved;

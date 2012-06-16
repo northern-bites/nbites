@@ -119,8 +119,8 @@ namespace PF
         yEstimate = sumY/parameters.numParticles;
         hEstimate = sumH/parameters.numParticles;
 
-        if ((xEstimate < 0) || (xEstimate > FIELD_GREEN_HEIGHT) ||
-            (yEstimate < 0) || (yEstimate > FIELD_GREEN_HEIGHT))
+        if ((xEstimate < 0) || (xEstimate > parameters.fieldWidth) ||
+            (yEstimate < 0) || (yEstimate > parameters.fieldHeight))
             reset();
 
         // Location estimate = this->getBestParticle().getLocation();

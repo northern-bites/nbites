@@ -2,6 +2,8 @@
 
 #include "NullStream.h"
 
+#include <fstream>
+
 #define DEBUG_LOC_ODOMETRY
 #ifdef DEBUG_LOC_ODOMETRY
 #define debug_loc_odometry std::cout
@@ -14,7 +16,6 @@
  */
 MotionSystem::MotionSystem()
     : moved(false) {
-    
 }
 
 void MotionSystem::motionUpdate(const OdometryModel& odometryModel) {
@@ -29,12 +30,38 @@ void MotionSystem::motionUpdate(const OdometryModel& odometryModel) {
         moved = true;
         deltaOdometry = currentOdometryModel - lastOdometryModel;
         deltaOdometry.theta = NBMath::subPIAngle(deltaOdometry.theta);
+
+        clipDeltaOdometry();
+
+//        static std::ofstream odometry_out("/home/nao/odometry.out");
+//        odometry_out << deltaOdometry << std::endl;
+
     } else {
         //TODO: determine what to do when it's invalid
     }
-
 }
 
+void MotionSystem::clipDeltaOdometry() {
+    if (std::abs(deltaOdometry.x) < 0.000001f) {
+        deltaOdometry.x = 0.000001f;
+  //      debug_loc_odometry << "Warning! Clipped delta odo X";
+    }
+    if (std::abs(deltaOdometry.y) < 0.000001f) {
+        deltaOdometry.y = 0.000001f;
+  //      debug_loc_odometry << "Warning! Clipped delta odo Y";
+    }
+    if (std::abs(deltaOdometry.theta) < 0.000001f) {
+        deltaOdometry.theta = 0.000001f;
+  //      debug_loc_odometry << "Warning! Clipped delta odo theta";
+    }
+}
+
+//Odometry offsets standard deviations (not to be confused with odometry MEASUREMENT standard deviation
+// -- these don't measure the accuracy of the measurment, just what it's value usually is)
+//Computed by Octavian summer 2012 using R and some sample data
+float ODO_MEASUREMENT_X_SD = 2.2f;
+float ODO_MEASUREMENT_Y_SD = 1.48f;
+float ODO_MEASUREMENT_THETA_SD = 0.038f;
 
 /**
  * Generates a noisy delta odometry measurement. We store absolute
@@ -47,33 +74,30 @@ void MotionSystem::motionUpdate(const OdometryModel& odometryModel) {
 DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
 {
 
-
-
-
-//  if (deltaOdometry.x < 0.000001f) {
-//      deltaOdometry.x = 0.000001f;
-//      debug_loc_odometry << "Warning! Clipped delta odo X";
-//  }
-//  if (deltaOdometry.y < 0.000001f) {
-//      deltaOdometry.y = 0.000001f;
-//      debug_loc_odometry << "Warning! Clipped delta odo Y";
-//  }
-//  if (deltaOdometry.theta < 0.000001f) {
-//      deltaOdometry.theta = 0.000001f;
-//      debug_loc_odometry << "Warning! Clipped delta odo theta";
-//  }
-
     DeltaOdometryMeasurement noisyDeltaOdometry;
 
-  //Add noise inverse proportionally to the step size (the bigger the step, the worst
-  //the odometry)
-//  noisyDeltaOdometry.x = deltaOdometry.x
-//          + 1/PF::sampleNormal(0.0f, std::sqrt(1/std::abs(deltaOdometry.x)));
-//  noisyDeltaOdometry.y = deltaOdometry.y
-//          + 1/PF::sampleNormal(0.0f, std::sqrt(1/std::abs(deltaOdometry.y)));
-//  noisyDeltaOdometry.theta = NBMath::subPIAngle(deltaOdometry.theta
-//          + 1/PF::sampleNormal(0.0f, std::sqrt(1/std::abs(deltaOdometry.theta))));
-    noisyDeltaOdometry = deltaOdometry;
+    //Add noise proportionally to the step size (the bigger the step, the worst
+    //the odometry?
+    //Filter out big jumps
+    if (-5 < noisyDeltaOdometry.x && noisyDeltaOdometry.x < 5) {
+        noisyDeltaOdometry.x = deltaOdometry.x + PF::sampleNormal(0.0f, std::abs(deltaOdometry.x)/4);
+    } else {
+        //replace it with a usual measurement
+        noisyDeltaOdometry.x = PF::sampleNormal(0.0f, ODO_MEASUREMENT_X_SD);
+    }
+
+    if (-3 < noisyDeltaOdometry.y && noisyDeltaOdometry.y < 3) {
+        noisyDeltaOdometry.y = deltaOdometry.y + PF::sampleNormal(0.0f, std::abs(deltaOdometry.y)/4);
+    } else {
+        //replace it with a usual measurement
+        noisyDeltaOdometry.y = PF::sampleNormal(0.0f, ODO_MEASUREMENT_Y_SD);
+    }
+    if (-.02 < noisyDeltaOdometry.theta && noisyDeltaOdometry.theta < .02) {
+        noisyDeltaOdometry.theta = deltaOdometry.theta + PF::sampleNormal(0.0f, std::abs(deltaOdometry.theta)/4);
+    } else {
+        //replace it with a usual measurement
+        noisyDeltaOdometry.theta = PF::sampleNormal(0.0f, ODO_MEASUREMENT_THETA_SD);
+    }
 
     return noisyDeltaOdometry;
 }
@@ -88,14 +112,16 @@ PF::ParticleSet MotionSystem::update(PF::ParticleSet particles) const
     if(moved)
     {
 	PF::ParticleIt iter;
-	float angle;
-	float angle2;
-	float angle3;
+
 	for(iter = particles.begin(); iter != particles.end(); ++iter)
 	{
 	    DeltaOdometryMeasurement noisyDeltaOdometry = makeNoisyDeltaOdometry();
 
 	    PF::LocalizationParticle* particle = &(*iter);
+
+	    //TODO: comment this really well and make sure people understand
+	    // what odometry represents and what it measures !!!!!
+	    // EJ & Octavian
 
 	    //Rotate from the robot frame to the world frame to add the translation
 	    float sinh, cosh;
@@ -103,10 +129,6 @@ PF::ParticleSet MotionSystem::update(PF::ParticleSet particles) const
 
 //	    debug_loc_odometry << particle->getLocation() << std::endl;
 
-	    angle = NBMath::subPIAngle(particle->getLocation().heading + noisyDeltaOdometry.theta);
-	    angle2 = noisyDeltaOdometry.theta;
-
-	    // Assume that
 	    particle->setX(particle->getLocation().x + cosh * noisyDeltaOdometry.x + sinh * noisyDeltaOdometry.y);
 	    particle->setY(particle->getLocation().y + cosh * noisyDeltaOdometry.y - sinh * noisyDeltaOdometry.x);
 	    //Rotation is just added

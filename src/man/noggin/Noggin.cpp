@@ -305,11 +305,7 @@ void Noggin::updateLocalization()
 {
     const ::MotionModel odometry = motion_interface->getOdometryUpdate();
 
-    const PF::OdometryMeasurement odo(odometry.x,
-                                      odometry.y,
-                                      odometry.theta);
-
-    locMotionSystem->setCurrentOdometry(odo);
+    locMotionSystem->motionUpdate(odometry);
 
 //    std::vector<PF::Observation> observations;
 //    std::vector<Landmark> landmarks;

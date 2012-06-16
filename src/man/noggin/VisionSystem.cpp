@@ -97,7 +97,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
         } else {
             //no observations, no use trying to re-weigh the other particles
             setUpdated(false);
-            std::cout << "We made no new observations \n";
+//            std::cout << "We made no new observations \n";
             return particles;
         }
     }
