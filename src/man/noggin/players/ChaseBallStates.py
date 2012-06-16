@@ -48,7 +48,10 @@ def spinToBall(player):
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.chaseBall()
+        if player.shouldKickOff:
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED)
+        else:
+            player.brain.nav.chaseBall()
 
     if (transitions.shouldFindBall(player) or
         transitions.shouldSpinToBall(player)):
@@ -62,7 +65,7 @@ def approachBall(player):
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
             else:
                 player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
-            player.shouldKickOff = False
+            #player.shouldKickOff = False
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')
