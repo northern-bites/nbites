@@ -29,11 +29,16 @@ public:
 
 	virtual unsigned getWidth() { return scaledPixmap.width();}
 	virtual unsigned getHeight() { return scaledPixmap.height();}
-	virtual QSize size(){return QSize(scaledPixmap.width(), scaledPixmap.height());}
-	virtual void resize(QSize newSize){
-		scaledPixmap = scaledPixmap.scaled(newSize);
+	QSize size(){return QSize(scaledPixmap.width(), scaledPixmap.height());}
+	void resize(QSize newSize){scaledPixmap = scaledPixmap.scaled(newSize);}
+	void resize(float sF){
+		scaledPixmap = scaledPixmap.scaled(QSize(sF*scaledPixmap.width(),
+												 sF*scaledPixmap.height()));
 	}
-	float scale;
+	void setupUI();
+	float getScale(){return scale;}
+	void setScale(int newScale){scale = newScale;}
+
 
 	QVBoxLayout* getLayout();
 
@@ -43,7 +48,7 @@ public slots:
 protected:
     void showEvent(QShowEvent* event);
     void paintEvent(QPaintEvent* event);
-    void setupUI();
+
     void addPixmap();
 
 protected:
@@ -54,11 +59,14 @@ protected:
 	QPixmap scaledPixmap;
 	int initialW;
 	int initialH;
+	float scale;
 
 private:
 	bool shouldRedraw;
 
 };
+
+
 
 }
 }

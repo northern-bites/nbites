@@ -35,14 +35,15 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	BMPImageViewer* top = new BMPImageViewer(comboTop, this);
     BMPImageViewer* bottom = new BMPImageViewer(comboBottom, this);
 
-	QHBoxLayout* bothImagesLayout = new QHBoxLayout;
-	QWidget* bothImages = new QWidget;
-
+	QVBoxLayout* bothImagesLayout = new QVBoxLayout;
+	bothImagesLayout->setAlignment(Qt::AlignTop);
 	bothImagesLayout->setSpacing(1);
+
 	bothImagesLayout->addWidget(top);
 	bothImagesLayout->addWidget(bottom);
 
-	bothImages->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	QWidget* bothImages = new QWidget;
+
 	bothImages->setLayout(bothImagesLayout);
 
 	QHBoxLayout* mainLayout = new QHBoxLayout;
@@ -59,16 +60,10 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
     this->setCentralWidget(mainWidget);
 
     //TODO: we call updateView twice per vision frame
-    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
-    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
-
     memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MVision");
     memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MVision");
 
 	//need another set of these to connect the BMPImageViewer copies (top, bottom)
-	memoryManager->connectSlot(bottom, SLOT(updateView()), "MRawImages");
-    memoryManager->connectSlot(top, SLOT(updateView()), "MRawImages");
-
     memoryManager->connectSlot(bottom, SLOT(updateView()), "MVision");
     memoryManager->connectSlot(top, SLOT(updateView()), "MVision");
 
