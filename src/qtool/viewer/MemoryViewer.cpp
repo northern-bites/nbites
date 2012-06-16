@@ -43,7 +43,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	bothImagesLayout->addWidget(bottom);
 
 	bothImages->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	//bothImages->setLayout(bothImagesLayout);
+	bothImages->setLayout(bothImagesLayout);
 
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;
@@ -51,7 +51,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     imageTabs->addTab(topImageViewer, QString("Top Image"));
     imageTabs->addTab(bottomImageViewer, QString("Bottom Image"));
-	//imageTabs->addTab(bothImages, QString("Both Images"));
+	imageTabs->addTab(bothImages, QString("Both Images"));
 
 	mainLayout->addWidget(imageTabs);
 	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

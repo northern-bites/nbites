@@ -43,7 +43,9 @@ void BMPImageViewer::updateView(bool resize) {
 			if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
 				scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);
 			else scaledPixmap = scaledPixmap.scaledToHeight(maxHeight);
-			}
+		}
+
+		scale = scaledPixmap.width()/(float)image->getWidth();
 
         if (qimage) {
             imagePlaceholder.setPixmap(scaledPixmap);

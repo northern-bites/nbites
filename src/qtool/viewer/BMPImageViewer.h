@@ -33,6 +33,7 @@ public:
 	virtual void resize(QSize newSize){
 		scaledPixmap = scaledPixmap.scaled(newSize);
 	}
+	float scale;
 
 	QVBoxLayout* getLayout();
 
