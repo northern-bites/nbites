@@ -156,7 +156,6 @@ def positionForKick(player):
     if player.firstFrame():
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrackFixedPitch()
-        player.inKickingState = False
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
                               Navigator.GRADUAL_SPEED,
