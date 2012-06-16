@@ -126,9 +126,6 @@ void VisualFieldObject::setBearingWithSD(float _bearing)
     case YELLOW_GOAL_RIGHT_POST:
         setBearingSD(postBearingToSD(_bearing));
         break;
-    default:
-        setDistanceSD(postBearingToSD(_bearing));
-        break;
     }
 }
 

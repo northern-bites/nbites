@@ -1147,6 +1147,12 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 obj_est = NULL_ESTIMATE;
             }
 
+            if (obj_est.dist > 0 || obj_est.dist == estFromWidth.dist) {
+                objPtr->setEstimateCertain(false);
+            } else {
+                objPtr->setEstimateCertain(true);
+            }
+
             bool debugEstimates = false;
             if (debugEstimates) {
                 cout << "width " << estFromWidth << endl;

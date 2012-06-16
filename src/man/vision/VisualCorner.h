@@ -93,6 +93,11 @@ public:
 
     const std::vector<cornerID> getIDs();
 
+    //reliable corner types
+    bool isReliable() const {
+        return cornerType == INNER_L || cornerType == OUTER_L || cornerType == T;
+    }
+
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////

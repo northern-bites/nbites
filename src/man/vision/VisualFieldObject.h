@@ -95,8 +95,16 @@ public:
         return possibleFieldObjects;
     }
 
+    bool isEstimateCertain() const { return estimateCertain; }
+    void setEstimateCertain(bool certainty) { estimateCertain = certainty; }
+
 	virtual const bool hasPositiveID();
-	virtual bool hasValidDistance() const { return getDistance() > 0.0f; }
+	virtual bool hasValidDistance() const {
+	    //TODO: we should
+	    //really have a unified way of telling
+	    //if a post estimate is valid or not
+	    return getDistance() > 0.0f && estimateCertain;
+	}
 
 private: // Class Variables
 
@@ -110,6 +118,8 @@ private: // Class Variables
 	bool probablyRedGoalie;
 	bool almostCertainlyNavyGoalie;
 	bool almostCertainlyRedGoalie;
+
+	bool estimateCertain;
 
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
