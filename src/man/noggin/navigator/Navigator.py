@@ -9,10 +9,15 @@ from ..util import Transition
 
 #speed gains
 FULL_SPEED = 1.0
+HASTY_SPEED = 0.9
 FAST_SPEED = 0.8
-MEDIUM_SPEED = 0.65
-CAREFUL_SPEED = 0.5
-SLOW_SPEED = 0.3
+QUICK_SPEED = 0.7
+BRISK_SPEED = 0.6
+MEDIUM_SPEED = 0.5
+GRADUAL_SPEED = 0.4
+CAREFUL_SPEED = 0.3
+SLOW_SPEED = 0.2
+SLUGGISH_SPEED = 0.1
 KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
@@ -66,8 +71,8 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         self.goTo(self.brain.play.getPosition())
 
-    def chaseBall(self):
-        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, FULL_SPEED)
+    def chaseBall(self, speed = FULL_SPEED):
+        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, adaptive = False):
         """
@@ -142,21 +147,23 @@ class Navigator(FSA.FSA):
         """
         Orbits a point at a certain radius for a certain angle using walkTo
         Splits the command into multiple smaller commands
-        Don't rely on it too much since it depends on the odometry of strafes and turns
-        which slip a lot
-        It will orbit in steps, each orbit taking ~30 degrees (more like 45 when I test it out)
+        Don't rely on it too much since it depends on the odometry of strafes
+        and turns which slip a lot
+        It will orbit in steps, each orbit taking ~30 degrees (more like 45
+        when I test it out)
         """
+
         NavStates.walkingTo.destQueue.clear()
 
         #@todo: make this a bit nicer or figure out a better way to do it
-        # split it up in 33 degree moves; good enough approximation for small radii
-        for k in range(0, abs(angle) / 33):
+        # split it up in 15 degree moves; good enough approximation for small radii
+        for k in range(0, abs(angle) / 15):
             if angle > 0:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 2, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -30))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 6, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -15))
             else:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 2, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 30))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 6, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 15))
 
         NavStates.walkingTo.speed = FAST_SPEED
         self.switchTo('walkingTo')
