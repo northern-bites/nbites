@@ -31,7 +31,7 @@ def gameReady(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.tracker.lookToAngle(RIGHT_SIDE_ANGLE)
+        player.brain.tracker.lookToAngle(0)
         if player.lastDiffState == 'gameInitial':
             player.initialDelayCounter = 0
 
@@ -39,7 +39,7 @@ def gameReady(player):
     if(not player.brain.motion.calibrated()):
         return player.stay()
 
-    return player.goLater('walkToGoal')
+    return player.stay()
 
 def gameSet(player):
     if player.firstFrame():
@@ -69,7 +69,6 @@ def gamePlaying(player):
         player.lastStateTime > 25):
         return player.goLater('decideLeftSide')
 
-    # fixme
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
 

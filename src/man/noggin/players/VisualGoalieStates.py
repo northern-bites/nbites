@@ -182,11 +182,6 @@ def didIKickIt(player):
         player.brain.nav.stop()
     return Transition.getNextState(player, didIKickIt)
 
-def standStill(player):
-    if player.firstFrame():
-        player.brain.nav.stop()
-    return player.stay()
-
 def spinToFaceBall(player):
     if player.firstFrame():
         facingDest = RelRobotLocation(0.0, 0.0, 0.0)
