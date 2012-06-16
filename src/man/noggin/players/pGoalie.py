@@ -17,6 +17,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.squatTime = 0
         self.frameCounter = 0
         self.penaltyKicking = False
+        self.aggressive = False
 
         # All transitions are defined here. Their conditions are in
         # GoalieTransitions

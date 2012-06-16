@@ -197,5 +197,4 @@ def penaltyShotsGamePlaying(player):
         player.gainsOn()
         player.stand()
 
-    return player.goLater('position')
-    #return player.goLater('watch')
+    return player.goLater('watch')

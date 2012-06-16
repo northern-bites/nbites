@@ -76,7 +76,12 @@ def ballMoreImportant(player):
     """
     Goalie needs to chase, not localize itself.
     """
-    return player.brain.ball.vis.on and player.brain.ball.vis.dist < 100.0
+    if player.brain.ball.vis.on and player.brain.ball.vis.dist < 100.0:
+        return True
+
+    if (player.brain.ball.vis.on and player.brain.ball.vis.dist < 150.0 and
+        player.aggressive):
+        return True
 
 def facingForward(player):
     """
@@ -162,6 +167,19 @@ def shouldClearBall(player):
     """
     Checks that the ball is more or less in the goal box.
     """
+    # less than 1.5 minutes left or winning/losing badly
+    if player.brain.comm.gc.timeRemaining() < 90 and not player.aggressive:
+        player.aggressive = True
+        print "Goalie is now AGGRESSIVE."
+    elif((abs(player.brain.comm.gc.teams(0)[1] -
+         player.brain.comm.gc.teams(1)[1]) > 3) and not player.aggressive):
+        player.aggressive = True
+        print "Goalie is now AGGRESSIVE."
+    elif (abs(player.brain.comm.gc.teams(0)[1] -
+         player.brain.comm.gc.teams(1)[1]) <= 3) and player.aggressive:
+        print "Goalie is no longer AGGRESSIVE."
+        player.aggressive = False
+
     # ball must be visible
     if not player.brain.ball.vis.on:
         return False
@@ -170,9 +188,19 @@ def shouldClearBall(player):
     if (player.brain.ball.vis.dist < 80.0):
         return True
 
+    # farther out but being aggressive
+    if (player.brain.ball.vis.dist < 120 and
+        player.aggressive):
+        return True
+
     # if to sides of box
     if (player.brain.ball.vis.dist < 120.0 and
         fabs(player.brain.ball.vis.bearing) > 40.0):
+        return True
+
+    # to goalie's sides, being aggressive
+    if (fabs(player.brain.ball.vis.bearing) > 50.0 and
+        player.aggressive):
         return True
 
     return False
@@ -196,6 +224,10 @@ def walkedTooFar(player):
     # for the odometry reset delay
     if player.counter < 3:
         return False
+
+    if player.aggressive:
+        return False
+
     return (player.brain.loc.lastOdoX > 90.0 or
             fabs(player.brain.loc.lastOdoY) > 140.0)
 
