@@ -93,7 +93,10 @@ def prepareForKick(player):
             print str(prepareForKick.hackKick)
         if hackKick.DEBUG_KICK_DECISION:
             print str(player.kick)
-        player.kick = kicks.RIGHT_STRAIGHT_KICK
+        if player.brain.ball.loc.relY > 0:
+            player.kick = kicks.LEFT_STRAIGHT_KICK
+        else:
+            player.kick = kicks.RIGHT_STRAIGHT_KICK
         player.kick.h = 0.0
         return player.goNow('orbitBall')
 
