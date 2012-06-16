@@ -34,7 +34,7 @@ void BMPImageViewer::updateView() {
         image->updateBitmap();
 
         QImage* qimage = image->getBitmap();
-		QPixmap scaledPixmap = QPixmap::fromImage(*qimage);
+		scaledPixmap = QPixmap::fromImage(*qimage);
 
 		int maxWidth = this->width();
 		int maxHeight = this->height();
@@ -43,7 +43,7 @@ void BMPImageViewer::updateView() {
 			if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
 				scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);
 			else scaledPixmap = scaledPixmap.scaledToHeight(maxHeight);
-		}
+			}
 
         if (qimage) {
             imagePlaceholder.setPixmap(scaledPixmap);

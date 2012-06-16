@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QLayout>
+#include <QResizeEvent>
 
 #include "data/Typedefs.h"
 #include "image/FastYUVToBMPImage.h"
@@ -26,8 +27,8 @@ public:
 
     virtual ~BMPImageViewer();
 
-	virtual unsigned getWidth() { return image->getWidth();}
-	virtual unsigned getHeight() { return image->getHeight();}
+	virtual unsigned getWidth() { return scaledPixmap.width();}
+	virtual unsigned getHeight() { return scaledPixmap.height();}
 
 	QVBoxLayout* getLayout();
 
@@ -45,6 +46,7 @@ protected:
     QLabel imagePlaceholder;
 	QVBoxLayout* BMPlayout;
 	QSize imageSize;
+	QPixmap scaledPixmap;
 	int initialW;
 	int initialH;
 
