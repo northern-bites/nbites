@@ -159,10 +159,10 @@ class Navigator(FSA.FSA):
         # split it up in 15 degree moves; good enough approximation for small radii
         for k in range(0, abs(angle) / 15):
             if angle > 0:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 4, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 6, 0.0))
                 NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -15))
             else:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 4, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 6, 0.0))
                 NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 15))
 
         NavStates.walkingTo.speed = FAST_SPEED
