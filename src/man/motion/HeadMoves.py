@@ -389,4 +389,4 @@ FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 # Needs some alteration re: pitch for the given yaw
 FIXED_PITCH_LOOK_RIGHT = ( ((-70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
-FIXED_PITCH_LOOK_STRAIGHT = ( ((0.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+FIXED_PITCH_LOOK_STRAIGHT = ( ((0.0,17.0), 1.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
