@@ -8,7 +8,7 @@ namespace qtool {
 namespace viewer {
 
 BMPImageViewer::BMPImageViewer(image::BMPImage* image,
-							   QWidget *parent, float scale)
+							   QWidget *parent)
     : QWidget(parent), image(image) {
     setupUI();
 }
@@ -22,7 +22,7 @@ void BMPImageViewer::setupUI() {
     BMPlayout->setAlignment(Qt::AlignTop);
     BMPlayout->setSpacing(0);
     this->setLayout(BMPlayout);
-	
+
 	initialW = image->getWidth();
 	initialH = image->getHeight();
 }
@@ -52,7 +52,7 @@ void BMPImageViewer::updateView() {
         }
         shouldRedraw = false;
     }
-    //enqueues a repaint - thread-safe
+//enqueues a repaint - thread-safe
     this->QWidget::update();
 }
 
