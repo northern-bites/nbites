@@ -315,6 +315,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-30, -29.44,-100, 80, 30.85, -10.11),
                   (115,-10,-58,5),
                   .8,1, stiff.STANDUP_STIFFNESSES),
+
                  #sitting legs spread hands behind facing forward
                  #THIS ONE CAUSES THE AWFUL NOISE
 
@@ -323,6 +324,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-28, -31, -87, 70, 45, 0),
                   (120,-33,-4,4),
                   .8,0, stiff.STANDUP_STIFFNESSES),
+
                  # turns to right a little and stands with one arm on ground
 
                  ((42,28,5,-47),

@@ -47,6 +47,7 @@ public:
     void calculateNextJointsAndStiffnesses();
 
     void hardReset();
+    void resetOdometry();
 
     void setCommand(const WalkCommand::ptr command);
     void setCommand(const Gait::ptr command) {}

@@ -16,6 +16,7 @@
 #include "PyLights.h"
 #include "PySpeech.h"
 #include "PyObjects.h"
+#include "PyGoalie.h"
 
 //#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_CORNER_OBSERVATIONS
@@ -116,15 +117,10 @@ void Noggin::initializePython()
     c_init_comm();
     c_init_logging();
     comm->add_to_module();
-
-    // Initialize PyVision module
     c_init_vision();
-
-    // Initlialize PyConstants module
     c_init_noggin_constants();
-
-    // Initialize PyLocation module
     c_init_objects();
+    c_init_goalie();
 }
 
 void Noggin::initializeLocalization()
