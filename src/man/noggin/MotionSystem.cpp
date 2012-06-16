@@ -26,34 +26,35 @@ void MotionSystem::motionUpdate(const OdometryModel& odometryModel) {
 //    debug_loc_odometry << "Current " << currentOdometryModel << std::endl
 //                       << "Last "<< lastOdometryModel << std::endl;
 
-    if (currentOdometryModel.isValid()) {
+    if (!currentOdometryModel.isValid() && lastOdometryModel.isValid()) {
+        //TODO: determine what to do when it's invalid
+
+    } else {
         moved = true;
         deltaOdometry = currentOdometryModel - lastOdometryModel;
         deltaOdometry.theta = NBMath::subPIAngle(deltaOdometry.theta);
 
         clipDeltaOdometry();
 
-//        static std::ofstream odometry_out("/home/nao/odometry.out");
-//        odometry_out << deltaOdometry << std::endl;
+        //        static std::ofstream odometry_out("/home/nao/odometry.out");
+        //        odometry_out << deltaOdometry << std::endl;
 
-    } else {
-        //TODO: determine what to do when it's invalid
     }
 }
 
 void MotionSystem::clipDeltaOdometry() {
-    if (std::abs(deltaOdometry.x) < 0.000001f) {
-        deltaOdometry.x = 0.000001f;
-  //      debug_loc_odometry << "Warning! Clipped delta odo X";
-    }
-    if (std::abs(deltaOdometry.y) < 0.000001f) {
-        deltaOdometry.y = 0.000001f;
-  //      debug_loc_odometry << "Warning! Clipped delta odo Y";
-    }
-    if (std::abs(deltaOdometry.theta) < 0.000001f) {
-        deltaOdometry.theta = 0.000001f;
-  //      debug_loc_odometry << "Warning! Clipped delta odo theta";
-    }
+//    if (std::abs(deltaOdometry.x) < 0.000001f) {
+//        deltaOdometry.x = 0.000001f;
+//  //      debug_loc_odometry << "Warning! Clipped delta odo X";
+//    }
+//    if (std::abs(deltaOdometry.y) < 0.000001f) {
+//        deltaOdometry.y = 0.000001f;
+//  //      debug_loc_odometry << "Warning! Clipped delta odo Y";
+//    }
+//    if (std::abs(deltaOdometry.theta) < 0.000001f) {
+//        deltaOdometry.theta = 0.000001f;
+//  //      debug_loc_odometry << "Warning! Clipped delta odo theta";
+//    }
 }
 
 //Odometry offsets standard deviations (not to be confused with odometry MEASUREMENT standard deviation
@@ -80,20 +81,20 @@ DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
     //the odometry?
     //Filter out big jumps
     if (-5 < noisyDeltaOdometry.x && noisyDeltaOdometry.x < 5) {
-        noisyDeltaOdometry.x = deltaOdometry.x + PF::sampleNormal(0.0f, std::abs(deltaOdometry.x)/4);
+        noisyDeltaOdometry.x = deltaOdometry.x + PF::sampleNormal(0.0f, 0.5 + std::abs(deltaOdometry.x)/4);
     } else {
         //replace it with a usual measurement
         noisyDeltaOdometry.x = PF::sampleNormal(0.0f, ODO_MEASUREMENT_X_SD);
     }
 
     if (-3 < noisyDeltaOdometry.y && noisyDeltaOdometry.y < 3) {
-        noisyDeltaOdometry.y = deltaOdometry.y + PF::sampleNormal(0.0f, std::abs(deltaOdometry.y)/4);
+        noisyDeltaOdometry.y = deltaOdometry.y + PF::sampleNormal(0.0f, 0.5 + std::abs(deltaOdometry.y)/4);
     } else {
         //replace it with a usual measurement
         noisyDeltaOdometry.y = PF::sampleNormal(0.0f, ODO_MEASUREMENT_Y_SD);
     }
     if (-.02 < noisyDeltaOdometry.theta && noisyDeltaOdometry.theta < .02) {
-        noisyDeltaOdometry.theta = deltaOdometry.theta + PF::sampleNormal(0.0f, std::abs(deltaOdometry.theta)/4);
+        noisyDeltaOdometry.theta = deltaOdometry.theta + PF::sampleNormal(0.0f, M_PI/140.0f +  std::abs(deltaOdometry.theta)/4);
     } else {
         //replace it with a usual measurement
         noisyDeltaOdometry.theta = PF::sampleNormal(0.0f, ODO_MEASUREMENT_THETA_SD);

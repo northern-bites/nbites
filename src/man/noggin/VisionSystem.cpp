@@ -25,6 +25,9 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
     // FOR TESTING, should not be in this scope
     int count = 0;
 
+    float bestCornerProbabilities = 0.0f;
+    int count_corner = 0;
+
     PF::ParticleIt partIter;
     for(partIter = particles.begin(); partIter != particles.end(); ++partIter)
     {
@@ -47,7 +50,7 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
         std::list<VisualCorner>::const_iterator vc;
         for(vc = corners->begin(); vc != corners->end(); ++vc)
         {
-            if (vc->getDistance() < MAX_CORNER_DISTANCE)
+            if (vc->getDistance() < MAX_CORNER_DISTANCE && vc->isReliable())
             {
                 float bestProbability = 0.0f;
                 typedef const std::list<const ConcreteCorner*> ConcreteCorners;
@@ -61,6 +64,9 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
                     if (probability > bestProbability)
                         bestProbability = probability;
                 }
+
+                bestCornerProbabilities+=bestProbability;
+                count_corner++;
 
                 totalWeight = updateTotalWeight(totalWeight, bestProbability);
                 count++;
@@ -101,6 +107,11 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
             return particles;
         }
     }
+
+//    if (bestCornerProbabilities == 0.0f && count_corner > 0 && particles.size() > 0) {
+//        throw(std::exception());
+//    }
+
     //std::cout << "---------------------------------------------" << std::endl;
     setUpdated(true);
     return particles;

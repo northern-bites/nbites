@@ -84,7 +84,7 @@ namespace PF
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
-        400,
+        200,
         0.2f,
         0.05f
     };

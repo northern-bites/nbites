@@ -85,13 +85,13 @@ namespace PF
 
         if(sensorUpdate && sensorModel)
         {
-//            particles = sensorModel->update(particles);
+            particles = sensorModel->update(particles);
         }
 
         // Only resample if the sensor model has updated particle weights.
         if(sensorModel->hasUpdated())
         {
-//            resample();
+            resample();
         }
         else
         {
@@ -119,9 +119,9 @@ namespace PF
         yEstimate = sumY/parameters.numParticles;
         hEstimate = sumH/parameters.numParticles;
 
-        if ((xEstimate < 0) || (xEstimate > parameters.fieldWidth) ||
-            (yEstimate < 0) || (yEstimate > parameters.fieldHeight))
-            reset();
+//        if ((xEstimate < 0) || (xEstimate > parameters.fieldWidth) ||
+//            (yEstimate < 0) || (yEstimate > parameters.fieldHeight))
+//            reset();
 
         // Location estimate = this->getBestParticle().getLocation();
 

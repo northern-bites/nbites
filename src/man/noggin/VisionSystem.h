@@ -124,7 +124,7 @@ class VisionSystem : public PF::SensorModel
             (pose_y < 0) || (pose_y > FIELD_GREEN_HEIGHT))
         {
 //            std::cout << "OFFFIELD POSSIBILITY \n";
-            return 0.0f;
+            return 0.0000001f;
         }
         float globalOrientationSD = NBMath::getHypotenuse(observation.getBearingSD(),
                                                           observation.getPhysicalOrientationSD());
