@@ -16,14 +16,15 @@ DEFAULT_OFFENDER_NUMBER = 3
 DEFAULT_CHASER_NUMBER = 4
 DEBUG_DETERMINE_CHASE_TIME = True
 SEC_TO_MILLIS = 1000.0
-CHASE_SPEED = 15.00 #cm/sec
+CHASE_SPEED = 20.00 #cm/sec
 CHASE_TIME_SCALE = 0.45              # How much new measurement is used.
 BALL_OFF_PENALTY = 1000.             # Big penalty for not seeing the ball.
+                                     # If you change this, modify determineChaser
 BALL_GOAL_LINE_PENALTY = 10.
 
 # Behavior constants
 BALL_TEAMMATE_DIST_GRABBING = 35
-BALL_TEAMMATE_BEARING_GRABBING = 85.
+BALL_TEAMMATE_BEARING_GRABBING = 45.
 BALL_TEAMMATE_DIST_DRIBBLING = 20
 
 # Ball on?
@@ -103,8 +104,8 @@ class TeamMember(RobotLocation):
         self.x = my.x
         self.y = my.y
         self.h = my.h
-        self.ballDist = ball.vis.dist
-        self.ballBearing = ball.vis.bearing
+        self.ballDist = ball.loc.dist
+        self.ballBearing = ball.loc.bearing
         self.ballX = ball.loc.x
         self.ballY = ball.loc.y
         self.ballOn = ball.vis.on
@@ -156,7 +157,8 @@ class TeamMember(RobotLocation):
             self.brain.out.printf("\tChase time base is " + str(t))
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if not self.brain.ball.vis.on and not self.brain.play.isChaser():
+        if (not self.brain.ball.vis.framesOn > 3 and
+            not self.brain.player.inKickingState):
             t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
@@ -183,16 +185,16 @@ class TeamMember(RobotLocation):
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after fallen over penalty " + str(t))
 
-        tm = t*SEC_TO_MILLIS
+        t *= CHASE_SPEED
 
         # Filter by IIR to reduce noise
-        tm = tm * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
+        t = t * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after filter " +str(tm))
+            self.brain.out.printf("\tChase time after filter " +str(t))
             self.brain.out.printf("")
 
-        return tm
+        return t
 
     def hasBall(self):
         return self.grabbing

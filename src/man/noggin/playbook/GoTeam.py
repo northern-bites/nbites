@@ -134,7 +134,7 @@ class GoTeam:
             self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
 
         # save processing time and skip the rest if we have the ball
-        if self.brain.player.inKickingState and play.isChaser():
+        if self.brain.player.inKickingState:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("I should Chase")
             return self.me
@@ -152,49 +152,81 @@ class GoTeam:
                                 % mate.playerNumber)
                 continue
 
-            elif mate.hasBall():
+            # 20000 is synced with the penalty for not seeing the ball
+            # Hacked in so we don't have to import. Summer 2012
+            elif mate.hasBall() and mate.chaseTime < 20000:
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
 
             else:
-                # Tie breaking. Method described in Robust Team Play, by
-                # Henry Work
-                ## NOTE: Took out chaseTimeScale (which was just the
-                ## minimum chase-time between two robots) because it
-                ## wansn't guaranteeing that the thresholds would be
-                ## appropriately tiered. A good idea, but bad
-                ## implementation. May work with some futsing around.
-                ##      -- Wils (06/24/11)
-                if self.shouldCallOff(chaser_mate, mate):
-                    if PBConstants.DEBUG_DET_CHASER:
-                        self.printf("\t #%d @ %g >= #%d @ %g, shouldCallOff" %
-                               (mate.playerNumber, mate.chaseTime,
-                                chaser_mate.playerNumber, chaser_mate.chaseTime))
-                    if self.shouldListen(chaser_mate, mate):
-                        if PBConstants.DEBUG_DET_CHASER:
-                            self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
-                                         (mate.playerNumber, mate.chaseTime,
-                                          chaser_mate.playerNumber,
-                                          chaser_mate.chaseTime)))
-                        continue
+                # For the following to work you need to communicate whether
+                # or not robots are calling each other off. The system below,
+                # as a result, introduces the problem of lag since each robot
+                # communicates its own calculation with some lag. The system
+                # we will hack in for summer 2012 allows for each robot to do
+                # calculations for all of it's mates, therefore reducing the
+                # amount of lag.
+                # # Tie breaking. Method described in Robust Team Play, by
+                # # Henry Work
+                # ## NOTE: Took out chaseTimeScale (which was just the
+                # ## minimum chase-time between two robots) because it
+                # ## wansn't guaranteeing that the thresholds would be
+                # ## appropriately tiered. A good idea, but bad
+                # ## implementation. May work with some futsing around.
+                # ##      -- Wils (06/24/11)
+                # if self.shouldCallOff(chaser_mate, mate):
+                #     if PBConstants.DEBUG_DET_CHASER:
+                #         self.printf("\t #%d @ %g >= #%d @ %g, shouldCallOff" %
+                #                (mate.playerNumber, mate.chaseTime,
+                #                 chaser_mate.playerNumber, chaser_mate.chaseTime))
+                #     if self.shouldListen(chaser_mate, mate):
+                #         if PBConstants.DEBUG_DET_CHASER:
+                #             self.printf(("\t #%d @ %g <= #%d @ %g, shouldListen" %
+                #                          (mate.playerNumber, mate.chaseTime,
+                #                           chaser_mate.playerNumber,
+                #                           chaser_mate.chaseTime)))
+                #         continue
 
+                #     chaser_mate = mate
+
+                # # else pick the lowest chaseTime
+                # else:
+                #     if mate.chaseTime < chaser_mate.chaseTime:
+                #         chaser_mate = mate
+                #     if PBConstants.DEBUG_DET_CHASER:
+                #         self.printf (("\t #%d @ %g >= #%d @ %g, normal comparison" %
+                #                       (mate.playerNumber, mate.chaseTime,
+                #                        chaser_mate.playerNumber,
+                #                        chaser_mate.chaseTime)))
+                if self.hackShouldCallOff(chaser_mate, mate):
+                    if PBConstants.DEBUG_DET_CHASER:
+                        self.printf("\t #%d @ %g < #%d @ %g, shouldCallOff" %
+                                    (mate.playerNumber, mate.chaseTime,
+                                     chaser_mate.playerNumber,
+                                     chaser_mate.chaseTime))
                     chaser_mate = mate
 
-                # else pick the lowest chaseTime
-                else:
-                    if mate.chaseTime < chaser_mate.chaseTime:
-                        chaser_mate = mate
-                    if PBConstants.DEBUG_DET_CHASER:
-                        self.printf (("\t #%d @ %g >= #%d @ %g, normal comparison" %
-                                      (mate.playerNumber, mate.chaseTime,
-                                       chaser_mate.playerNumber,
-                                       chaser_mate.chaseTime)))
+                elif PBConstants.DEBUG_DET_CHASER:
+                    self.printf (("\t #%d @ %g > #%d @ %g, didn't call off" %
+                                  (mate.playerNumber, mate.chaseTime,
+                                   chaser_mate.playerNumber,
+                                   chaser_mate.chaseTime)))
 
         if PBConstants.DEBUG_DET_CHASER:
             self.printf ("\t ---- MATE %g WINS" % (chaser_mate.playerNumber))
         # returns teammate instance (could be mine)
         return chaser_mate
+
+    def hackShouldCallOff(self, chaser_mate, mate):
+        """Decides if mate should call off chaser_mate"""
+        # mate = A, chaser_mate = B.
+        # A will become chaser_mate if:
+        # [ (chaseTime(A) - chaseTime(B) < e) or
+        #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
+        return((mate.chaseTime < chaser_mate.chaseTime * 1.1) or
+               ((mate.chaseTime < chaser_mate.chaseTime * 1.5) and
+                mate.isTeammateRole(PBConstants.CHASER)))
 
     def shouldCallOff(self, chaser_mate, mate):
         """Decides if mate shouldCallOff the chaser_mate"""
