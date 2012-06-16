@@ -107,7 +107,22 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     connect(this, SIGNAL(imagesUpdated()),
             topVisionView, SLOT(updateView()));
 
-	connect(bottomVisionView, SIGNAL(mouseClicked(int, int, int, bool)),
+	//mouse listeners for all four images
+	BMPImageViewerListener* bottomVisionListener
+		= new BMPImageViewerListener(bottomVisionImage, this);
+	BMPImageViewerListener* topVisionListener
+		= new BMPImageViewerListener(topVisionImage, this);
+	BMPImageViewerListener* bottomRawListener
+		= new BMPImageViewerListener(comboBottom, this);
+	BMPImageViewerListener* topRawListener
+		= new BMPImageViewerListener(comboTop, this);
+	connect(topVisionListener, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
+	connect(bottomVisionListener, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
+	connect(topRawListener, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(pixelClicked(int, int, int, bool)));
+	connect(bottomRawListener, SIGNAL(mouseClicked(int, int, int, bool)),
             this, SLOT(pixelClicked(int, int, int, bool)));
 
 
@@ -155,7 +170,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Image data", this);
-	dockWidget->setMinimumWidht(300);
+	dockWidget->setMinimumWidth(300);
     MObjectViewer* imageDataView = new MObjectViewer(
             memoryManager->getMemory()->get<MRawImages>(), this);
     dockWidget->setWidget(imageDataView);
