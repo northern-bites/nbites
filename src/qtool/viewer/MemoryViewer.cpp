@@ -35,7 +35,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 	BMPImageViewer* top = new BMPImageViewer(comboTop, this);
     BMPImageViewer* bottom = new BMPImageViewer(comboBottom, this);
 
-	QHBoxLayout* bothImagesLayout = new QHBoxLayout;
+	QVBoxLayout* bothImagesLayout = new QVBoxLayout;
 	QWidget* bothImages = new QWidget;
 
 	bothImagesLayout->setSpacing(0);
