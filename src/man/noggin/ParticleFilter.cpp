@@ -164,7 +164,6 @@ namespace PF
         if(sum == 0)
         {
             std::cout << "\n\n\nZERO SUM!\n\n\n" << std::endl;
-            reset();
             return;
         }
 
