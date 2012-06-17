@@ -93,6 +93,21 @@ public:
 
     const std::vector<cornerID> getIDs();
 
+    //TODO: prettify this
+    //HACK Mexico 2012 from Octavian to Lizzie
+    // Takes degrees because this is for Python. Lovely.
+    float getRobotGlobalHeadingIfFieldAngleIs(angle::degrees alpha) const {
+        return (physicalOrientation + alpha*TO_RAD - bearing)*TO_DEG;
+    }
+
+    float getRobotRelXIfFieldAngleIs(angle::degrees alpha) const {
+        return - distance * std::cos(physicalOrientation + alpha*TO_RAD);
+    }
+
+    float getRobotRelYIfFieldAngleIs(angle::degrees alpha) const {
+        return - distance * std::sin(physicalOrientation + alpha*TO_RAD);
+    }
+
     ////////////////////////////////////////////////////////////
     // SETTERS
     ////////////////////////////////////////////////////////////

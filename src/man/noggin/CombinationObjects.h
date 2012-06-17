@@ -184,6 +184,7 @@ namespace noggin {
         virtual ~RelRobotLocation() {};
         RelRobotLocation(const RelRobotLocation& other);
         virtual RelRobotLocation operator- (boost::python::tuple delta) const;
+        virtual RelRobotLocation operator- (const RelRobotLocation& other) const;
 
         virtual const degrees getRelH() const { return relH*TO_DEG; }
         virtual void setRelH(degrees _h){ relH = _h*TO_RAD; }

@@ -55,8 +55,13 @@ class Navigator(FSA.FSA):
                                                                   Transition.SOME_OF_THE_TIME,
                                                                   Transition.LOW_PRECISION)
 
-        NavStates.goToPosition.transitions = { NavStates.atPosition: self.atLocPositionTransition }
-        NavStates.atPosition.transitions = { NavStates.goToPosition: self.locRepositionTransition }
+        NavStates.goToPosition.transitions = {
+            self.atLocPositionTransition : NavStates.atPosition
+            }
+
+        NavStates.atPosition.transitions = {
+            self.locRepositionTransition : NavStates.goToPosition
+            }
 
     def run(self):
         FSA.FSA.run(self)
