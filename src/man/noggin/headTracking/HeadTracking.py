@@ -60,8 +60,8 @@ class HeadTracking(FSA.FSA):
             self.headMove = headMove
             # If we were already in the state, reset our counter so that
             #  firstFrame() will be true again.
+            self.switchTo('stop')
             self.switchTo('doHeadMove')
-            self.counter = 0
 
     # Note: safe to call every frame.
     def repeatHeadMove(self, headMove):

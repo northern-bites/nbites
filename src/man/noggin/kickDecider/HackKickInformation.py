@@ -174,6 +174,7 @@ class KickInformation:
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # Need to use aimCenter in decision.
+        # Adjust to use ~70 degrees for side kick path.
         # Loc is currently never accurate enough @summer 2012
         if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
@@ -284,9 +285,9 @@ class KickInformation:
         # Note: this ignores the aimCenter distinction.
         if leftScorePoint > 0 and rightScorePoint < 0:
             kick = self.chooseQuickFrontKick()
-        elif leftScorePoint > 90 and rightScorePoint < 90:
+        elif leftScorePoint > 70 and rightScorePoint < 70:
             kick = kicks.RIGHT_SIDE_KICK
-        elif leftScorePoint > -90 and rightScorePoint < -90:
+        elif leftScorePoint > -70 and rightScorePoint < -70:
             kick = kicks.LEFT_SIDE_KICK
         elif leftScorePoint < -90 and rightScorePoint > 90:
             kick =self.chooseBackKick()
@@ -305,9 +306,9 @@ class KickInformation:
         if DEBUG_KICK_DECISION:
             print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
 
-        if rightScorePoint > 90:
+        if rightScorePoint > 70:
                 # Quadrent 2
-            if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:
+            if (180 - leftScorePoint) - (rightScorePoint - 70) < 0:
                     #Closer to the leftScorePoint
                 kick = self.chooseBackKick()
                 if self.aimCenter:
@@ -317,26 +318,26 @@ class KickInformation:
             else:
                 kick = kicks.RIGHT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = 90 - avgScorePoint
+                    kick.h = 70 - avgScorePoint
                 else:
-                    kick.h = 90 - rightScorePoint
+                    kick.h = 70 - rightScorePoint
         elif rightScorePoint > 0:
             # Quadrent 1
-            if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
+            if (70 - leftScorePoint) - (rightScorePoint - 0) < 0:
                 kick = kicks.RIGHT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = 90 - avgScorePoint
+                    kick.h = 70 - avgScorePoint
                 else:
-                    kick.h = 90 - leftScorePoint
+                    kick.h = 70 - leftScorePoint
             else:
                 kick = self.chooseQuickFrontKick()
                 if self.aimCenter:
                     kick.h = 0 - avgScorePoint
                 else:
                     kick.h = 0 - rightScorePoint
-        elif rightScorePoint > -90:
+        elif rightScorePoint > -70:
             # Quadrent 4
-            if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
+            if (0 - leftScorePoint) - (rightScorePoint + 70) < 0:
                 kick = self.chooseQuickFrontKick()
                 if self.aimCenter:
                     kick.h = 0 - avgScorePoint
@@ -345,17 +346,17 @@ class KickInformation:
             else:
                 kick = kicks.LEFT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = -90 - avgScorePoint
+                    kick.h = -70 - avgScorePoint
                 else:
-                    kick.h = -90 - rightScorePoint
+                    kick.h = -70 - rightScorePoint
         else:
             # Quadrent 3
-            if (-90 - leftScorePoint) - (rightScorePoint + 180) < 0:
+            if (-70 - leftScorePoint) - (rightScorePoint + 180) < 0:
                 kick = kicks.LEFT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = -90 - avgScorePoint
+                    kick.h = -70 - avgScorePoint
                 else:
-                    kick.h = -90 - leftScorePoint
+                    kick.h = -70 - leftScorePoint
             else:
                 kick = self.chooseBackKick()
                 if self.aimCenter:
