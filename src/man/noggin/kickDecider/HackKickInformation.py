@@ -93,14 +93,14 @@ class KickInformation:
                     self.farGoalLeftPostDists.append(self.brain.yglp.vis.dist)
                     if self.brain.yglp.vis.redGoalieCertain:
                         self.farGoalieRed += 1
-                    elif self.brain.yplp.vis.navyGoalieCertain:
+                    elif self.brain.yglp.vis.navyGoalieCertain:
                         self.farGoalieNavy += 1
                 if self.brain.yglp.vis.dist < 300:
                     self.nearGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
                     self.nearGoalLeftPostDists.append(self.brain.yglp.vis.dist)
                     if self.brain.yglp.vis.redGoalieCertain:
                         self.nearGoalieRed += 1
-                    elif self.brain.yplp.vis.navyGoalieCertain:
+                    elif self.brain.yglp.vis.navyGoalieCertain:
                         self.nearGoalieNavy += 1
 
         if self.brain.ygrp.vis.on:
@@ -111,14 +111,14 @@ class KickInformation:
                     self.farGoalRightPostDists.append(self.brain.ygrp.vis.dist)
                     if self.brain.ygrp.vis.redGoalieCertain:
                         self.farGoalieRed += 1
-                    elif self.brain.yprp.vis.navyGoalieCertain:
+                    elif self.brain.ygrp.vis.navyGoalieCertain:
                         self.farGoalieNavy += 1
                 if self.brain.ygrp.vis.dist < 300:
                     self.nearGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
                     self.nearGoalRightPostDists.append(self.brain.ygrp.vis.dist)
                     if self.brain.ygrp.vis.redGoalieCertain:
                         self.nearGoalieRed += 1
-                    elif self.brain.yprp.vis.navyGoalieCertain:
+                    elif self.brain.ygrp.vis.navyGoalieCertain:
                         self.nearGoalieNavy += 1
 
     def calculateDataAverages(self):
@@ -177,6 +177,10 @@ class KickInformation:
         elif self.nearRightPostBearing is not None:
             self.nearAvgPostDist = self.nearRightPostDist
 
+        if DEBUG_KICK_DECISION:
+            print "near reds: ",self.nearGoalieRed
+            print "near navys: ",self.nearGoalieNavy
+
         # Determine visual dangerous goalie
         # Note that the values should be double the sightings:
         #  one for each post for each frame it is seen.
@@ -188,7 +192,7 @@ class KickInformation:
         if (self.nearGoalieRed > 20 and
             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
             (self.nearGoalieNavy > 20 and
-             self.brain.my.teamColor == nogginCosntants.teamColor.TEAM_BLUE):
+             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
             self.nearGoalieOwn = True
 
     # Hack from US open 2012
