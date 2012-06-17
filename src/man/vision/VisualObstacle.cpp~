@@ -1,0 +1,15 @@
+#include VisualObstacle.h
+using namespace std;
+
+
+VisualObstacle::VisualObstacle() 
+{
+  init();
+}
+
+VisualObstacle::init() {
+
+  isLeft = false;
+  isRight = false;
+
+}
