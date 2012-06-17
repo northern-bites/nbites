@@ -100,7 +100,7 @@ def gameSet(player):
         if player.brain.play.isRole(GOALIE):
             player.brain.resetGoalieLocalization()
 
-        if (player.brain.my.playerNumber == 2 and
+        if (player.brain.my.playerNumber == 4 and
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
             player.shouldKickOff = True
