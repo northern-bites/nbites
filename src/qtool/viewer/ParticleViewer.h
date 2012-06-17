@@ -24,11 +24,11 @@
 namespace qtool {
 namespace viewer {
 
-class FieldViewer : public QMainWindow{
+class ParticleViewer : public QMainWindow{
     Q_OBJECT
 
 public:
-    FieldViewer(data::DataManager::ptr dataManager);
+    ParticleViewer(data::DataManager::ptr dataManager);
 
 private slots:
     void updateLocalization();

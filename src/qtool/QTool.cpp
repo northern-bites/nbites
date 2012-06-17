@@ -9,7 +9,7 @@ using colorcreator::ColorTableCreator;
 using viewer::MemoryViewer;
 using viewer::VisionViewer;
 using viewer::BallEKFViewer;
-using viewer::FieldViewer;
+using viewer::ParticleViewer;
 using offline::OfflineViewer;
 using overseer::OverseerClient;
   //using viewer::GraphViewer;
@@ -22,7 +22,7 @@ QTool::QTool() : EmptyQTool("QTOOL"),
                  visionViewer(new VisionViewer(dataManager)),
                  offlineViewer(new OfflineViewer(dataManager->getMemory())),
                  ballEKFViewer(new BallEKFViewer(dataManager)),
-                 fieldViewer(new FieldViewer(dataManager)),
+                 fieldViewer(new ParticleViewer(dataManager)),
                  overseerClient(new OverseerClient(dataManager, this))
 {
     toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
@@ -32,7 +32,7 @@ QTool::QTool() : EmptyQTool("QTOOL"),
     toolTabs->addTab(visionViewer, tr("Vision Viewer"));
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
-    toolTabs->addTab(fieldViewer, tr("Field Viewer"));
+    toolTabs->addTab(fieldViewer, tr("Particle Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
     //toolTabs->addTab(graphViewer, tr("Graph Viewer"));
 

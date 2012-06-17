@@ -1,4 +1,4 @@
-#include "FieldViewer.h"
+#include "ParticleViewer.h"
 #include "man/memory/Memory.h"
 #include "image/BMPImage.h"
 
@@ -12,7 +12,7 @@ namespace viewer {
 using namespace data;
 using namespace man::memory;
 using namespace image;
-FieldViewer::FieldViewer(DataManager::ptr dataManager) :
+ParticleViewer::ParticleViewer(DataManager::ptr dataManager) :
         QMainWindow(), dataManager(dataManager) {
 
   dataManager->connectSlot(this,
@@ -32,7 +32,7 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager) :
     fieldView->updateView();
 }
 
-  void FieldViewer::updateLocalization()
+  void ParticleViewer::updateLocalization()
   {
       float xEst = localizationStream->get()->location().x();
       float yEst = localizationStream->get()->location().y();

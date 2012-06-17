@@ -16,7 +16,7 @@
 
 #include "data/DataLoader.h"
 #include "viewer/MemoryViewer.h"
-#include "viewer/FieldViewer.h"
+#include "viewer/ParticleViewer.h"
 #include "remote/RobotSelect.h"
 #include "overseer/OverseerClient.h"
 
@@ -33,7 +33,7 @@ public:
 private:
     data::DataLoader* dataLoader;
     viewer::MemoryViewer* memoryViewer;
-    viewer::FieldViewer* fieldViewer;
+    viewer::ParticleViewer* fieldViewer;
     overseer::OverseerClient* overseerClient;
 };
 
