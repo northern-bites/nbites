@@ -52,6 +52,7 @@ class VisionSystem : public PF::SensorModel
             typename ConcretePossibilities::const_iterator possibilityIterator;
 
             float bestProbability = 0.0f;
+            float secondBestProbability = 0.0f;
 
             for (possibilityIterator = concretePossibilities->begin();
                  possibilityIterator != concretePossibilities->end(); possibilityIterator++) {
@@ -59,8 +60,15 @@ class VisionSystem : public PF::SensorModel
                 float probability = scoreFromLandmark<VisualObservationT, ConcretePossibilityT>
                     (observation, (**possibilityIterator), particle);
 
-                if (probability > bestProbability)
+                if (probability > bestProbability) {
+                    secondBestProbability = bestProbability;
                     bestProbability = probability;
+                }
+            }
+
+            const float MIN_DIFF_PROBABILITY = 0.001f;
+            if (std::abs(bestProbability - secondBestProbability) < MIN_DIFF_PROBABILITY) {
+                //deal with confusing particles - they shouldn't be probable
             }
 
             totalWeight = updateTotalWeight(totalWeight, bestProbability);
@@ -114,9 +122,9 @@ class VisionSystem : public PF::SensorModel
         return prob_h * prob_d;
     }
 
-    static float scoreFromCorner(const VisualCorner& observation,
-                                 const ConcreteCorner& concrete,
-                                 const Particle& particle) {
+    float scoreFromCorner(const VisualCorner& observation,
+                          const ConcreteCorner& concrete,
+                          const Particle& particle) {
         //angle between the robot's visual heading line (or bearing to corner line)
         //and the line parallel to the x axis oriented towards the corner
         //(so x axis flipped)
@@ -142,6 +150,7 @@ class VisionSystem : public PF::SensorModel
         }
         float globalOrientationSD = NBMath::getHypotenuse(observation.getBearingSD(),
                                                           observation.getPhysicalOrientationSD());
+
         return  scoreParticleAgainstPose(particle,
                                          reconstructedLocation,
                                          observation.getDistanceSD(),
@@ -150,7 +159,7 @@ class VisionSystem : public PF::SensorModel
 
  private:
     static float updateTotalWeight(float currentTotalWeight, float currentWeight) {
-        const float TINY_WEIGHT = .00001f;
+        const float TINY_WEIGHT = .00001;
         if (currentWeight <=  0)
             currentWeight = TINY_WEIGHT;
         if(currentTotalWeight == 0.0f)
@@ -160,7 +169,6 @@ class VisionSystem : public PF::SensorModel
 
         return currentTotalWeight;
     }
-
 
  private:
     Vision::const_ptr vision;

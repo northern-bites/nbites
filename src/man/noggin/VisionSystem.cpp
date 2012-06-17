@@ -37,10 +37,10 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
         // Visual objects
 
         // TODO: a bit nicer if we had a visual field object iterator of sorts in vision ...
-//        incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->yglp),
-//                *(partIter), totalWeight, count);
-//        incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->ygrp),
-//                *(partIter), totalWeight, count);
+        incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->yglp),
+                *(partIter), totalWeight, count);
+        incorporateLandmarkObservation<VisualFieldObject, ConcreteFieldObject>(*(vision->ygrp),
+                *(partIter), totalWeight, count);
 //
 //
 //        // HACK HACK HACK
@@ -145,8 +145,8 @@ PF::ParticleSet VisionSystem::update(PF::ParticleSet particles)
 
 
         // Visual cross
-//        incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
-//                                *(partIter), totalWeight, count);
+        incorporateLandmarkObservation<VisualCross, ConcreteCross>(*(vision->cross),
+                                *(partIter), totalWeight, count);
 
         std::list<VisualCorner> * corners = vision->fieldLines->getCorners();
         std::list<VisualCorner>::const_iterator vc;
