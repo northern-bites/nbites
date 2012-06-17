@@ -104,6 +104,8 @@ def gameSet(player):
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
             player.shouldKickOff = True
+        else:
+            player.shouldKickOff = False
 
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalization()
@@ -206,7 +208,6 @@ def gameFinished(player):
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.gainsOn()
-        player.stopWalking()
         player.stand()
         player.brain.loc.resetBall()
         player.inKickingState = False
@@ -231,6 +232,7 @@ def penaltyShotsGamePlaying(player):
         player.gainsOn()
         player.stand()
         player.inKickingState = False
+        player.shouldKickOff = False
         player.penaltyKicking = True
 
     if player.brain.play.isRole(GOALIE):

@@ -48,7 +48,10 @@ def spinToBall(player):
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.chaseBall()
+        if player.shouldKickOff:
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED)
+        else:
+            player.brain.nav.chaseBall()
 
     if (transitions.shouldFindBall(player) or
         transitions.shouldSpinToBall(player)):
@@ -85,9 +88,11 @@ def prepareForKick(player):
     #        player.brain.tracker.isStopped():
     if player.brain.tracker.isStopped():
         prepareForKick.hackKick.calculateDataAverages()
-        print str(prepareForKick.hackKick)
+        if hackKick.DEBUG_KICK_DECISION:
+            print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
-        print str(player.kick)
+        if hackKick.DEBUG_KICK_DECISION:
+            print str(player.kick)
         return player.goNow('orbitBall')
 
     return player.stay()
@@ -102,21 +107,25 @@ def orbitBall(player):
             print "Orbiting at angle: ",player.kick.h
 
         if player.kick.h == 0:
-            return player.goLater('positionForKick')
+            return player.goNow('positionForKick')
 
         # Reset from pre-kick pan to straight, then track the ball.
         player.brain.tracker.lookStraightThenTrackFixedPitch()
         player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
 
     elif player.brain.nav.isStopped():
-        player.inKickingState = False
         player.shouldOrbit = False
         player.kick.h = 0
         if player.kick == kicks.ORBIT_KICK_POSITION:
-            return player.goLater('prepareForKick')
+            return player.goNow('prepareForKick')
         else:
             player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-            return player.goLater('positionForKick')
+            return player.goNow('positionForKick')
+
+    if (transitions.shouldFindBallKick(player) or
+        transitions.shouldCancelOrbit(player)):
+        player.inKickingState = False
+        return player.goLater('chase')
 
     return player.stay()
 
@@ -142,7 +151,6 @@ def positionForKick(player):
     if player.firstFrame():
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrackFixedPitch()
-        player.inKickingState = False
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
                               Navigator.GRADUAL_SPEED,
@@ -152,7 +160,7 @@ def positionForKick(player):
 
     if transitions.shouldFindBallKick(player) and player.counter > 15:
         player.inKickingState = False
-        return player.goNow('findBall')
+        return player.goLater('chase')
 
     #if transitions.shouldKick(player):
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
@@ -161,7 +169,7 @@ def positionForKick(player):
 #            return player.goNow('lookAround')
 #        else:
         player.brain.nav.stand()
-        return player.goLater('kickBallExecute')
+        return player.goNow('kickBallExecute')
 
     return player.stay()
 

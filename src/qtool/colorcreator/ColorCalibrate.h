@@ -79,6 +79,12 @@ private:
     QImage thresholdedImage;
     QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
 
+	QHBoxLayout* bottomLayout;
+	QVBoxLayout* colorButtons;
+	QVBoxLayout* leftJunk;
+	QVBoxLayout* mainLayout;
+    QHBoxLayout* topLayout;
+
 	bool displayAllColors;
 	int lastClickedX, lastClickedY;
 

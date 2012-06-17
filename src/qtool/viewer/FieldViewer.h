@@ -45,7 +45,7 @@ public slots:
 private:
 	data::DataManager::ptr dataManager;
 	viewer::BMPImageViewer* fieldView;
-	image::OverlayedImage* overlayView;
+	image::OverlayedImage* overlayImage;
 	image::PaintBots* bot_locs;
 	image::PaintField* fieldImage;
 	bool keepDrawing;

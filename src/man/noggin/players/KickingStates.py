@@ -15,6 +15,7 @@ def kickBallExecute(player):
         player.brain.tracker.trackBallFixedPitch()
 
         print "Performing " + str(player.kick)
+
         kick = player.kick.sweetMove
 
         player.executeMove(kick)
@@ -32,18 +33,17 @@ def afterKick(player):
     """
     if player.firstFrame():
         player.stand()        # stand up right, ready to walk
-        kick = player.kick
-        player.brain.tracker.afterKickScan(kick.name)
-
-        if kick.isBackKick():
-            player.inKickingState = False
-            return player.goNow('spinAfterBackKick')
-
+        player.brain.tracker.afterKickScan(player.kick.name)
         return player.stay()
 
     if transitions.shouldKickAgain(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         return player.goNow('positionForKick')
+
+    if player.kick.isBackKick() and player.counter > 10:
+        player.inKickingState = False
+        return player.goNow('spinAfterBackKick')
+
 
     if (transitions.shouldChaseBall(player) or
         transitions.shouldFindBallKick(player)):

@@ -8,7 +8,7 @@ namespace qtool {
 namespace viewer {
 
 BMPImageViewer::BMPImageViewer(image::BMPImage* image,
-        QWidget *parent)
+							   QWidget *parent)
     : QWidget(parent), image(image) {
     setupUI();
 }
@@ -22,23 +22,39 @@ void BMPImageViewer::setupUI() {
     BMPlayout->setAlignment(Qt::AlignTop);
     BMPlayout->setSpacing(0);
     this->setLayout(BMPlayout);
+
+	initialW = image->getWidth();
+	initialH = image->getHeight();
 }
 
-void BMPImageViewer::updateView() {
+void BMPImageViewer::updateView(bool resize) {
     //shouldRedraw keeps it from redrawing faster
     //than we need paint it
     if (this->isVisible() && shouldRedraw) {
         image->updateBitmap();
 
         QImage* qimage = image->getBitmap();
+		scaledPixmap = QPixmap::fromImage(*qimage);
+
+		int maxWidth = this->width();
+		int maxHeight = this->height();
+
+		if(maxWidth > initialW && maxHeight > initialH && resize) {
+			if((float)maxWidth/image->getWidth() < (float)maxHeight/image->getHeight())
+				scaledPixmap = scaledPixmap.scaledToWidth(maxWidth);
+			else scaledPixmap = scaledPixmap.scaledToHeight(maxHeight);
+		}
+
+		scale = scaledPixmap.width()/(float)image->getWidth();
+
         if (qimage) {
-            imagePlaceholder.setPixmap(QPixmap::fromImage(*qimage));
+            imagePlaceholder.setPixmap(scaledPixmap);
         } else {
             imagePlaceholder.setText("Underlying Null image pointer!");
         }
         shouldRedraw = false;
     }
-    //enqueues a repaint - thread-safe
+//enqueues a repaint - thread-safe
     this->QWidget::update();
 }
 

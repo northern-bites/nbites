@@ -71,8 +71,8 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         self.goTo(self.brain.play.getPosition())
 
-    def chaseBall(self):
-        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, FULL_SPEED)
+    def chaseBall(self, speed = FULL_SPEED):
+        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, adaptive = False):
         """

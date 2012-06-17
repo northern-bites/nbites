@@ -29,8 +29,8 @@ class FallController(FSA.FSA):
 
         # Only try to stand up when playing or localizing in ready because
         # it's really annoying otherwise.
-        if (self.brain.gameController.currentState == 'gamePlaying' or
-            self.brain.gameController.currentState == 'gameReady' ):
+        if ('Playing' in self.brain.gameController.currentState or
+            'Ready' in self.brain.gameController.currentState):
 
             #self.printf("run angleY is "+str(inertial.angleY))
 
@@ -62,4 +62,3 @@ class FallController(FSA.FSA):
         self.printf("Fall Protection is " + str(isTrue))
         self.enabled = isTrue
         self.brain.roboguardian.enableFallProtection(isTrue)
-
