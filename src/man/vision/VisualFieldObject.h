@@ -127,10 +127,10 @@ private: // Class Variables
     // Helper Methods
     // Obtained by magic by Octavian and Lizzie summer 2012
     inline static float postDistanceToSD(float _distance) {
-        return (_distance-100.f)*(_distance-100.f)/4500.f + 20.f;
+        return (_distance-100.f)*(_distance-100.f)/4500.f + 10.f;
     }
     inline static float postBearingToSD(float _distance) {
-        return .00035f*_distance + 5.f * TO_DEG;
+        return .0000002*(_distance*_distance) + 4 * TO_RAD;
     }
     const static float BOTH_UNSURE_DISTANCE_SD;
 };

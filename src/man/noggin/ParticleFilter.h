@@ -52,8 +52,9 @@ namespace PF
 
     /**
      * Contains a two-dimensional spatial vector defined
-     * by a magnitude and directionn (position vector).
+     * by a magnitude and direction (position vector).
      */
+    //TODO: this is unnecessary; also confusing - Octavian
     struct Vector2D
     {
         Vector2D(float mag = 0.0f, float dir = 0.0f)
@@ -84,7 +85,7 @@ namespace PF
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
-        200,
+        1000,
         0.2f,
         0.05f
     };
@@ -301,16 +302,22 @@ namespace PF
      */
     static Vector2D getPosition(Location origin, float x, float y)
     {
-    float x0 = origin.x;
-    float y0 = origin.y;
-    float rotate = NBMath::subPIAngle(origin.heading);
 
-    // Translate and rotate.
-    float x_prime = (x - x0) * std::cos(rotate) + (y - y0) * std::sin(rotate);
-    float y_prime = (y - y0) * std::cos(rotate) + (x - x0) * std::sin(rotate);
+        float dx = x - origin.x;
+        float dy = y - origin.y;
 
-    return Vector2D(std::sqrt(x_prime*x_prime + y_prime*y_prime),
-                    std::atan2(y_prime, x_prime));
+        float magnitude = std::sqrt(dx*dx + dy*dy);
+
+        float sinh, cosh;
+        sincosf(-origin.heading, &sinh, &cosh);
+
+        float x_prime = cosh * dx - sinh * dy;
+        float y_prime = sinh * dx + cosh * dy;
+
+        float bearing = NBMath::safe_atan2(y_prime, x_prime);
+
+
+        return Vector2D(magnitude, bearing);
     }
 }
 

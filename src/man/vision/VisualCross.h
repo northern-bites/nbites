@@ -98,7 +98,7 @@ private: // Class Variables
         return 0.0000002f * _distance * _distance * _distance + 5.f;
     }
     inline static float robotBearingToSD(float _bearing, float _distance) {
-        return .00035f*_distance + 5.f * TO_DEG;
+        return .0000002*(_distance*_distance) + 4 * TO_RAD;
     }
 
 };
