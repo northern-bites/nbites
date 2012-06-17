@@ -1,5 +1,8 @@
 #include "QTool.h"
 
+#include "viewer/RobotField.h"
+#include "viewer/FieldViewer.h"
+
 namespace qtool {
 
 using data::DataManager;
@@ -10,6 +13,8 @@ using viewer::MemoryViewer;
 using viewer::VisionViewer;
 using viewer::BallEKFViewer;
 using viewer::ParticleViewer;
+using viewer::FieldViewer;
+using viewer::RobotField;
 using offline::OfflineViewer;
 using overseer::OverseerClient;
   //using viewer::GraphViewer;
@@ -22,7 +27,7 @@ QTool::QTool() : EmptyQTool("QTOOL"),
                  visionViewer(new VisionViewer(dataManager)),
                  offlineViewer(new OfflineViewer(dataManager->getMemory())),
                  ballEKFViewer(new BallEKFViewer(dataManager)),
-                 fieldViewer(new ParticleViewer(dataManager)),
+                 particleViewer(new ParticleViewer(dataManager)),
                  overseerClient(new OverseerClient(dataManager, this))
 {
     toolTabs->addTab(colorCalibrate, tr("Color Calibrate"));
@@ -32,9 +37,20 @@ QTool::QTool() : EmptyQTool("QTOOL"),
     toolTabs->addTab(visionViewer, tr("Vision Viewer"));
     toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
-    toolTabs->addTab(fieldViewer, tr("Particle Viewer"));
+    toolTabs->addTab(particleViewer, tr("Particle Viewer"));
+    toolTabs->addTab(new RobotField(dataManager, this), tr("Robot Field"));
+    toolTabs->addTab(new FieldViewer(dataManager, this), tr("Field Viewer"));
     toolTabs->addTab(overseerClient, tr("Overseer"));
     //toolTabs->addTab(graphViewer, tr("Graph Viewer"));
+
+	qDebug()<<colorCalibrate->height()
+			<<colorTableCreator->height()
+			<<memoryViewer->height()
+			<<visionViewer->height()
+			<<offlineViewer->height()
+			<<ballEKFViewer->height()
+			<<particleViewer->height()
+			<<overseerClient->height();
 
 	scrollArea->setWidget(toolTabs);
 	scrollArea->resize(toolTabs->size());

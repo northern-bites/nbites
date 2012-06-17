@@ -50,7 +50,7 @@ private:
     viewer::VisionViewer* visionViewer;
     offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
-    viewer::ParticleViewer* fieldViewer;
+    viewer::ParticleViewer* particleViewer;
     overseer::OverseerClient* overseerClient;
     //viewer::GraphViewer* graphViewer;
 

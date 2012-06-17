@@ -34,7 +34,7 @@ public:
 
 private slots:
     void toggleOverlay() {};
- 
+
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;

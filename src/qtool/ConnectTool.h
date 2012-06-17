@@ -33,7 +33,7 @@ public:
 private:
     data::DataLoader* dataLoader;
     viewer::MemoryViewer* memoryViewer;
-    viewer::ParticleViewer* fieldViewer;
+    viewer::ParticleViewer* particleViewer;
     overseer::OverseerClient* overseerClient;
 };
 

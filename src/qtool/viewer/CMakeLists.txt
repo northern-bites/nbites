@@ -22,7 +22,7 @@ set( viewer_srcs MemoryViewer.cpp
                  BMPImageViewerListener.cpp
                  ChannelImageViewer.cpp
                  BallEKFViewer.cpp
-                 #FieldViewer.cpp
+                 FieldViewer.cpp
                  EKFDataViewer.cpp
                  CollapsibleImageViewer.cpp
 		 		 BotLocs.cpp
@@ -36,7 +36,7 @@ set( viewer_headers MemoryViewer.h
                     BMPImageViewerListener.h
                     ChannelImageViewer.h
                     BallEKFViewer.h
-                    #FieldViewer.h
+                    FieldViewer.h
                     EKFDataViewer.h
                     CollapsibleImageViewer.h
 		    		BotLocs.h
