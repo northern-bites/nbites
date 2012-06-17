@@ -172,17 +172,20 @@ def shouldClearBall(player):
     """
     if player.penaltyKicking:
         return False
+
     # less than 1.5 minutes left or winning/losing badly
-    if player.brain.comm.gc.timeRemaining() < 90 and not player.aggressive:
+    shouldBeAggressive = (player.brain.comm.gc.timeRemaining() < 90 or
+                          (abs(player.brain.comm.gc.teams(0)[1] -
+                               player.brain.comm.gc.teams(1)[1]) > 3))
+    #print "Should I be aggressive? " + str(shouldBeAggressive)
+    #print "Am I aggressive? " + str(player.aggressive)
+    #print ""
+
+    if shouldBeAggressive and not player.aggressive:
+        print "The goalie is now AGGRESSIVE"
         player.aggressive = True
-        print "Goalie is now AGGRESSIVE."
-    elif((abs(player.brain.comm.gc.teams(0)[1] -
-         player.brain.comm.gc.teams(1)[1]) > 3) and not player.aggressive):
-        player.aggressive = True
-        print "Goalie is now AGGRESSIVE."
-    elif (abs(player.brain.comm.gc.teams(0)[1] -
-         player.brain.comm.gc.teams(1)[1]) <= 3) and player.aggressive:
-        print "Goalie is no longer AGGRESSIVE."
+    elif not shouldBeAggressive and player.aggressive:
+        print "The goalie is no longer AGGRESSIVE"
         player.aggressive = False
 
     # ball must be visible
