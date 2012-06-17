@@ -28,9 +28,7 @@ def standup(player):
         player.gainsOn()
         player.stand()
 
-        #player.brain.tracker.setNeutralHead()
-        player.hackKick = hackKick.KickInformation(player.brain)
-        player.brain.tracker.performKickPanFixedPitch()
+        player.brain.tracker.setNeutralHead()
 
         return player.stay()
 
@@ -38,20 +36,13 @@ def standup(player):
     #player.brain.tracker.repeatBasicPanFixedPitch()
 
     # if ball in sight, track it. otherwise, pan:
-    #player.brain.tracker.trackBallFixedPitch()
+    player.brain.tracker.trackBallFixedPitch()
 
     # for debugging, will print pitch and yaw every frame
     #player.brain.tracker.helper.printHeadAngles()
 
     # for debugging, will print ball's distance
-    #print "Ball dist: ",player.brain.ball.loc.dist
-
-    player.hackKick.collectData()
-
-    if player.brain.tracker.isStopped():
-        player.hackKick.calculateDataAverages()
-        kick = player.hackKick.shoot()
-        return player.goLater('gamePenalized')
+    print "Ball dist: ",player.brain.ball.loc.dist
 
     return player.stay()
 
