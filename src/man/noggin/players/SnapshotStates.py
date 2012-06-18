@@ -23,8 +23,8 @@ def gameSet(player):
 
 def gamePlaying(player):
 
-    if player.firstFrame():
-        player.brain.nav.orbitAngle(20, 90)
+#    if player.firstFrame():
+#        player.brain.nav.orbitAngle(20, 90)
 
     #if player.brain.ball.vis.on:
     # player.brain.sensors.saveFrame()
