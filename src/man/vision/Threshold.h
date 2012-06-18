@@ -139,6 +139,7 @@ public:
     void thresholdAndRuns();
 	void lowerRuns();
     void findGoals(int column, int top);
+	void findPostsInLowerCamera(int column);
     void findBallsCrosses(int column, int top);
 	void findBallLowerCamera(int column, int topEdge);
     void detectSelf();
