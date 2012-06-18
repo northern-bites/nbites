@@ -173,7 +173,11 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
 		painter.setPen(QPen(QColor(255,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
 	}
     painter.setBrush(QBrush(QColor(255,255,0,80),Qt::SolidPattern));
-    painter.drawConvexPolygon(points, 4);
+    //if (postData.visual_detection().intopcam() && camera == Camera::TOP) {
+		painter.drawConvexPolygon(points, 4);
+		//} else if (!postData.visual_detection().intopcam() && camera == Camera::BOTTOM) {
+		//painter.drawConvexPolygon(points, 4);
+		//}
 }
 
   void VisualInfoImage::drawNavyRobot(const PVision::PVisualRobot robotData) {

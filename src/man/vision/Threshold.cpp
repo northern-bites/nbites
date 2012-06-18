@@ -150,7 +150,6 @@ void Threshold::visionLoop() {
 
 	if ((ylp && vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5) ||
 		(yrp && vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5)) {
-		cout << "Need to see bottom" << endl;
 		usingTopCamera = false;
 
 		pose->transform(usingTopCamera);
