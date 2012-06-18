@@ -56,6 +56,8 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("on", &VisualFieldObject::isOn)
         .def_readonly("framesOn", &VisualFieldObject::getFramesOn)
         .def_readonly("framesOff", &VisualFieldObject::getFramesOff)
+		.def_readonly("redGoalieCertain", &VisualFieldObject::getRedGoalieCertain)
+		.def_readonly("navyGoalieCertain", &VisualFieldObject::getNavyGoalieCertain)
         ;
 
     // From VisualLandmark.h, ID certainty possibilities

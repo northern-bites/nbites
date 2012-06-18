@@ -41,9 +41,19 @@ class KickInformation:
         self.nearRightPostDist = 0.0
         self.nearAvgPostDist = 0.0
 
+        self.farGoalieRed = 0
+        self.farGoalieNavy = 0
+        self.nearGoalieRed = 0
+        self.nearGoalieNavy = 0
+        # Currently, far goals are inaccurate for goalie detection.
+        self.farGoalieOwn = False
+        self.nearGoalieOwn = False
+
         self.sawGoal = False
         self.sawNearGoal = False
         self.sawFarGoal = False
+
+        self.dangerousBallCount = 0
 
         self.haveData = False
 
@@ -77,15 +87,26 @@ class KickInformation:
         """
         self.haveData = True
 
+        if self.dangerousBall():
+            self.dangerousBallCount += 1
+
         if self.brain.yglp.vis.on:
             self.sawGoal = True
             if self.brain.yglp.vis.certainty == vision.certainty._SURE:
                 if self.brain.yglp.vis.dist > 300:
                     self.farGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
                     self.farGoalLeftPostDists.append(self.brain.yglp.vis.dist)
+                    if self.brain.yglp.vis.redGoalieCertain:
+                        self.farGoalieRed += 1
+                    elif self.brain.yglp.vis.navyGoalieCertain:
+                        self.farGoalieNavy += 1
                 if self.brain.yglp.vis.dist < 300:
                     self.nearGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
                     self.nearGoalLeftPostDists.append(self.brain.yglp.vis.dist)
+                    if self.brain.yglp.vis.redGoalieCertain:
+                        self.nearGoalieRed += 1
+                    elif self.brain.yglp.vis.navyGoalieCertain:
+                        self.nearGoalieNavy += 1
 
         if self.brain.ygrp.vis.on:
             self.sawGoal = True
@@ -93,9 +114,17 @@ class KickInformation:
                 if self.brain.ygrp.vis.dist > 300:
                     self.farGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
                     self.farGoalRightPostDists.append(self.brain.ygrp.vis.dist)
+                    if self.brain.ygrp.vis.redGoalieCertain:
+                        self.farGoalieRed += 1
+                    elif self.brain.ygrp.vis.navyGoalieCertain:
+                        self.farGoalieNavy += 1
                 if self.brain.ygrp.vis.dist < 300:
                     self.nearGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
                     self.nearGoalRightPostDists.append(self.brain.ygrp.vis.dist)
+                    if self.brain.ygrp.vis.redGoalieCertain:
+                        self.nearGoalieRed += 1
+                    elif self.brain.ygrp.vis.navyGoalieCertain:
+                        self.nearGoalieNavy += 1
 
     def calculateDataAverages(self):
         """
@@ -152,6 +181,24 @@ class KickInformation:
             self.nearAvgPostDist = self.nearLeftPostDist
         elif self.nearRightPostBearing is not None:
             self.nearAvgPostDist = self.nearRightPostDist
+
+        if DEBUG_KICK_DECISION:
+            print "near reds: ",self.nearGoalieRed
+            print "near navys: ",self.nearGoalieNavy
+
+        # Determine visual dangerous goalie
+        # Note that the values should be double the sightings:
+        #  one for each post for each frame it is seen.
+        if (self.farGoalieRed > 20 and
+            self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
+            (self.farGoalieNavy > 20 and
+             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
+            self.farGoalieOwn = True
+        if (self.nearGoalieRed > 20 and
+            self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
+            (self.nearGoalieNavy > 20 and
+             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
+            self.nearGoalieOwn = True
 
     # Hack from US open 2012
     def dangerousBall(self):
@@ -214,11 +261,13 @@ class KickInformation:
         # Loc is bad- use only visual information to choose a kick.
         if DEBUG_KICK_DECISION:
             print "Using vision for kick decision."
-            print "Dangerous ball? ",self.dangerousBall()
+            print "Dangerous ball count: ",self.dangerousBallCount
+            print "Own goalie in near goal? ",self.nearGoalieOwn
 
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
-            if self.dangerousBall():
+            # Goalie detection too easily fooled.
+            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
             else:
@@ -228,7 +277,8 @@ class KickInformation:
             rightPostBearing = self.farRightPostBearing
             leftPostBearing = self.farLeftPostBearing
         elif self.nearAvgPostDist != 0:
-            if self.dangerousBall():
+            # Goalie detection too easily fooled.
+            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
                 # Can only see our own goal: Use goalie to make decision
 
                 if DEBUG_KICK_DECISION:

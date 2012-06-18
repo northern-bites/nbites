@@ -22,7 +22,6 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
-
     if player.firstFrame():
         player.brain.tracker.repeatBasicHeadPan()
 
@@ -47,4 +46,3 @@ def doneState(player):
 
 def gameInitial(player):
     return player.stay()
-
