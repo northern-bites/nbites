@@ -38,8 +38,10 @@ bool HoughLine::intersects(const HoughLine& other, point<int>& out) const
         return false;
     }
 
-    out.x = (sn2  * getRadius() - sn1 * other.getRadius()) / g;
-    out.y = (-cs2 * getRadius() + cs1 * other.getRadius()) / g;
+    out.x = static_cast<int>((sn2  * getRadius() -
+                              sn1 * other.getRadius()) / g);
+    out.y = static_cast<int>((-cs2 * getRadius() +
+                              cs1 * other.getRadius()) / g);
     return true;
 }
 

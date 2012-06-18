@@ -3,6 +3,7 @@
 #include "image/BMPImage.h"
 
 #include <QDebug>
+#include <QVBoxLayout>
 #include <vector>
 
 
@@ -21,26 +22,17 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 	stopButton(new QPushButton("Stop Location", this)) {
 
     mainLayout = new QVBoxLayout(this);
-
-	/*float scaleX = parent->size().width()/(float)FIELD_WIDTH;
-	  float scaleY = parent->size().height()/(float)FIELD_HEIGHT;
-	  qDebug()<<parent->size();
-	  if(scaleX<scaleY)
-	  scaleFactor = scaleX;
-	  else
-	  scaleFactor = scaleY;*/
-    scaleFactor = 1.35f;
+	scaleFactor = 1.0f;
 
     //field image painted via overlay of robots, field
     fieldImage = new PaintField(this, scaleFactor);
     bot_locs = new PaintBots(scaleFactor, this);
 
-    overlayView = new OverlayedImage(fieldImage, bot_locs, this);
-    fieldView = new BMPImageViewer(overlayView, this);
+    overlayImage = new OverlayedImage(fieldImage, bot_locs, this);
+    fieldView = new BMPImageViewer(overlayImage, this);
 
     connect(bot_locs->locs, SIGNAL(newRobotLocation()), fieldView, SLOT(updateView()));
 
-    spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     field = new QHBoxLayout();
     field->addWidget(fieldView);
 
@@ -54,7 +46,6 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
     //paint the field
     mainLayout->addLayout(buttonLayout);
     mainLayout->addLayout(field);
-    mainLayout->addItem(spacer);
     this->setLayout(mainLayout);
 }
 
@@ -72,7 +63,6 @@ void FieldViewer::stopDrawing(){
 
 }
 }
-
 
 
 

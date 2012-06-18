@@ -35,7 +35,7 @@
             printf("CAMERA ERROR::");                  \
             printf(str);                               \
             printf("\n");                              \
-            printf("System Error Message: %s\n",        \
+            printf("System Error Message: %s\n",       \
                    strerror(errno));                   \
         }                                              \
     }
@@ -172,7 +172,7 @@ void V4L2ImageTranscriber::initSetImageFormat() {
     VERIFY((ioctl(fd, VIDIOC_S_FMT, &fmt)),
            "Setting image format failed.");
 
-    if(fmt.fmt.pix.sizeimage != SIZE)
+    if(fmt.fmt.pix.sizeimage != (unsigned int)SIZE)
         printf("CAMERA ERROR::Size setting is WRONG.\n");
 }
 
@@ -199,13 +199,13 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
     VERIFY((ioctl(fd, VIDIOC_REQBUFS, &rb)),
            "Requesting buffers failed.");
 
-    if(rb.count != frameBufferCount)
+    if(rb.count != (unsigned int)frameBufferCount)
         printf("CAMERA ERROR::Buffer count is WRONG.\n");
 
     // map or prepare the buffers
     buf = static_cast<struct v4l2_buffer*>(calloc(1,
             sizeof(struct v4l2_buffer)));
-    for(    int i = 0; i < frameBufferCount; ++i)
+    for(int i = 0; i < frameBufferCount; ++i)
     {
         buf->index = i;
         buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -423,7 +423,7 @@ bool V4L2ImageTranscriber::captureNew() {
 
     VERIFY((ioctl(fd, VIDIOC_DQBUF, buf)),
            "Dequeueing the frame buffer failed.");
-    if(buf->bytesused != SIZE)
+    if(buf->bytesused != (unsigned int)SIZE)
         printf("CAMERA::ERROR::Wrong buffer size!.\n");
     currentBuf = buf;
 
@@ -461,6 +461,8 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     control_s.id = id;
     control_s.value = value;
 
+    int counter = 0;
+
     // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
     {
@@ -469,6 +471,12 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
             printf("CAMERA::Warning::Control setting failed.\n");
             return false;
         }
+	counter++;
+	if(counter > 10)
+	  {
+	    printf("CAMERA::Warning::Timeout while setting a parameter.\n");
+	    return false;
+	  }
     }
     return true;
 }

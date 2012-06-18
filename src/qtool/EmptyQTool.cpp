@@ -69,6 +69,7 @@ void EmptyQTool::prev() {
     dataManager->getPrev();
 }
 
+
 void EmptyQTool::record() {
     if (dataManager->isRecording()) {
         dataManager->stopRecording();
@@ -104,7 +105,7 @@ void EmptyQTool::keyPressEvent(QKeyEvent * event)
 void EmptyQTool::resizeEvent(QResizeEvent* ev)
 {
     QSize widgetSize = ev->size();
-    if((widgetSize.width() > tabStartSize->width()) &&
+    if((widgetSize.width() > tabStartSize->width()) ||
        (widgetSize.height() > tabStartSize->height())) {
         toolTabs->resize(widgetSize-*scrollBarSize);
     }

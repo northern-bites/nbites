@@ -19,9 +19,9 @@ fi
 echo "Type username for RoboCup server, followed by [ENTER]"
 read username
 
-SERVER=$username@robocup.bowdoin.edu
-ROBOCUP_DIR=/mnt/research/robocup
-TABLES_DIR=tables
+SERVER=$username@eisbaer.local
+ROBOCUP_DIR=
+TABLES_DIR=/home/d-mac/tables
 DEST=.
 EXCLUDE_SYNC=--exclude=sync*
 EXCLUDE_GIT="--exclude=tables.git* --exclude=.git*"
