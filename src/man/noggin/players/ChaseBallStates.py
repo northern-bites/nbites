@@ -133,9 +133,6 @@ def positionForKick(player):
     """
     Get the ball in the sweet spot
     """
-    if player.penaltyKicking and player.brain.ball.loc.inOppGoalBox():
-        return player.goNow('penaltyBallInOppGoalbox')
-
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
         player.inKickingState = False
@@ -162,12 +159,8 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    #if transitions.shouldKick(player):
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
-#        if transitions.shouldOrbit(player):
-#            return player.goNow('lookAround')
-#        else:
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 
