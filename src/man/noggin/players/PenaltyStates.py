@@ -60,7 +60,7 @@ def afterPenalty(player):
     # If done walking forward, start relocalizing normally
     if player.brain.nav.isStopped() or player.counter > 250:
         player.brain.nav.stop()
-        return player.goLater('spinFindBall')
+        return player.goLater('findBall')
 
 
     return player.stay()

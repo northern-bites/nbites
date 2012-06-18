@@ -158,6 +158,7 @@ BOOST_PYTHON_MODULE(_motion)
 		.def("calibrated", &PyMotionInterface::calibrated)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)
         .def("resetScripted", &PyMotionInterface::resetScriptedProvider)
+        .def("resetOdometry", &PyMotionInterface::resetWalkOdometry)
         ;
 }
 
