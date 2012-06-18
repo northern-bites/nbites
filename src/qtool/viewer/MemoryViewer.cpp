@@ -68,7 +68,7 @@ MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
 
             QDockWidget* dockWidget = new QDockWidget(QString(iterator->first.c_str()), this);
 			dockWidget->setMinimumWidth(300);
-			dockWidget->setMaximumHeight(150);
+			dockWidget->setMaximumHeight(125);
             MObjectViewer* view = new MObjectViewer(iterator->second, dockWidget);
             dockWidget->setWidget(view);
             this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
