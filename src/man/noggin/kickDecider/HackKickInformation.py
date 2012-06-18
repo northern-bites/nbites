@@ -53,6 +53,8 @@ class KickInformation:
         self.sawNearGoal = False
         self.sawFarGoal = False
 
+        self.dangerousBallCount = 0
+
         self.haveData = False
 
         self.aimAtOtherGoal = False
@@ -84,6 +86,9 @@ class KickInformation:
         Collect info on any observed goals
         """
         self.haveData = True
+
+        if self.dangerousBall():
+            self.dangerousBallCount += 1
 
         if self.brain.yglp.vis.on:
             self.sawGoal = True
@@ -256,13 +261,13 @@ class KickInformation:
         # Loc is bad- use only visual information to choose a kick.
         if DEBUG_KICK_DECISION:
             print "Using vision for kick decision."
-            print "Dangerous ball? ",self.dangerousBall()
+            print "Dangerous ball count: ",self.dangerousBallCount
             print "Own goalie in near goal? ",self.nearGoalieOwn
 
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
-            if self.dangerousBall(): #or self.nearGoalieOwn:
+            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
             else:
@@ -273,7 +278,7 @@ class KickInformation:
             leftPostBearing = self.farLeftPostBearing
         elif self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
-            if self.dangerousBall(): #or self.nearGoalieOwn:
+            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
                 # Can only see our own goal: Use goalie to make decision
 
                 if DEBUG_KICK_DECISION:
