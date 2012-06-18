@@ -133,11 +133,13 @@ def gamePlaying(player):
         if player.lastDiffState == 'gamePenalized':
             player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 25:
+                player.brain.loc.resetLocTo(nogginConstants.MIDFIELD_X, \
+                                            nogginConstants.GREEN_PAD_Y)
                 # 25 is arbitrary. This check is meant to catch human error and
                 # possible 0 sec. penalties for the goalie
-                player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                            nogginConstants.HEADING_UP)
+                # player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                #                             nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                #                             nogginConstants.HEADING_UP)
                 # Removed until particle filter is functioning.
                                             #nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                             #nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,

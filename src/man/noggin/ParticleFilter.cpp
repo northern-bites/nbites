@@ -314,38 +314,15 @@ namespace PF
     /**
      * Resets localization to the given x, y, and heading.
      *
-     * @param x the x-coordinate.
-     * @param y the y-coordinate.
-     * @param h the heading (radians).
+     * @param x      The x-coordinate.
+     * @param y      The y-coordinate.
+     * @param h      The heading (radians).
+     * @param params The parameters specifying how the particles will
+     *               be sampled about the mean (x, y, h).
      */
-    void ParticleFilter::resetLocTo(float x, float y, float h)
+    void ParticleFilter::resetLocTo(float x, float y, float h,
+				    LocNormalParams params)
     {
-        const float SIGMA_RESET_X = 15.0f;
-        const float SIGMA_RESET_Y = 15.0f;
-        const float SIGMA_RESET_H = 0.2f;
-
-        const float TOTAL_UNITS = 2*boost::math::constants::pi<float>() +
-            (float)(parameters.fieldWidth + parameters.fieldHeight);
-
-       // We want to weight x,y,& h equally in our maginitude vector for scoring
-        const float COEFF_RESET_X = TOTAL_UNITS / (float) parameters.fieldWidth;
-        const float COEFF_RESET_Y = TOTAL_UNITS /
-                                    (float) parameters.fieldHeight;
-        const float COEFF_RESET_H = TOTAL_UNITS /
-                                    2*boost::math::constants::pi<float>();
-
-        // Determine the worst particle that could be chosen with the gaussian
-        // Multiply by 3 standard deviations to assume particles are within 99%
-        // of the distribution
-        const float test = sqrt(4.0f);
-
-        const float WORST_MAGNITUDE =
-                      sqrt( square(3.0f *COEFF_RESET_X * SIGMA_RESET_X)
-                          + square(3.0f * COEFF_RESET_Y * SIGMA_RESET_Y)
-                          + square(3.0f * COEFF_RESET_H * SIGMA_RESET_H));
-
-        float scoreSum = 0;
-
         // Reset the estimates.
         xEstimate = x;
         yEstimate = y;
@@ -353,70 +330,40 @@ namespace PF
 
         particles.clear();
 
+	float weight = 1.0f/parameters.numParticles;
+
         for(int i = 0; i < parameters.numParticles; ++i)
         {
             // Get the new particles x,y, and h
-            float pX = sampleNormal(x, SIGMA_RESET_X);
-            float pY = sampleNormal(y, SIGMA_RESET_Y);
-            float pH = sampleNormal(h, SIGMA_RESET_H);
+            float pX = sampleNormal(x, params.sigma_x);
+            float pY = sampleNormal(y, params.sigma_x);
+            float pH = sampleNormal(h, params.sigma_h);
 
-            //Determine the particles score
-            float score = WORST_MAGNITUDE -
-                                   sqrt( square (COEFF_RESET_X * (x+pX))
-                                       + square (COEFF_RESET_Y * (y+pY))
-                                       + square (COEFF_RESET_H * (h+pH)));
+            LocalizationParticle p(Location(pX, pY, pH), weight);
 
-            LocalizationParticle p(Location(pX,pY,pH), score);
-
-            scoreSum += score;
             particles.push_back(p);
         }
-
-        // Normalize the particles weights
-        PF::ParticleIt partIter;
-      for(partIter = particles.begin(); partIter != particles.end(); partIter++)
-        {
-            LocalizationParticle p = *partIter;
-            p.setWeight(p.getWeight()/scoreSum);
-        }
-
     }
 
     /**
      * Overloaded resetLocTo, resets Loc to 2 possible Locations
      *
-     * @param x the first Locations x-coordinate.
-     * @param y the first Locations y-coordinate.
-     * @param h the first Locations heading (radians).
-     * @param x_ the second Locations x-coordinate.
-     * @param y_ the second Locations y-coordinate.
-     * @param h_ the second Locations heading (radians).
+     * @param x       The first Locations x-coordinate.
+     * @param y       The first Locations y-coordinate.
+     * @param h       The first Locations heading (radians).
+     * @param x_      The second Locations x-coordinate.
+     * @param y_      The second Locations y-coordinate.
+     * @param h_      The second Locations heading (radians).
+     * @param params1 The parameters specifying how the particles will
+     *                be normally sampled about the mean (x, y, h).
+     * @param params2 The parameters specifying how the particles will
+     *                be normally sampled about the mean (x_, y_, h_).
      */
     void ParticleFilter::resetLocTo(float x, float y, float h,
-                                    float x_, float y_, float h_)
+                                    float x_, float y_, float h_,
+				    LocNormalParams params1,
+				    LocNormalParams params2)
     {
-        const float SIGMA_RESET_X = 15.0f;
-        const float SIGMA_RESET_Y = 15.0f;
-        const float SIGMA_RESET_H = 0.2f;
-
-        const float TOTAL_UNITS = 2*boost::math::constants::pi<float>() +
-                       (float) (parameters.fieldWidth + parameters.fieldHeight);
-
-       // We want to weight x,y,& h equally in our maginitude vector for scoring
-       const float COEFF_RESET_X = TOTAL_UNITS / (float) parameters.fieldWidth;
-       const float COEFF_RESET_Y = TOTAL_UNITS / (float) parameters.fieldHeight;
-       const float COEFF_RESET_H = TOTAL_UNITS /
-                                   2*boost::math::constants::pi<float>();
-
-       // Determine the worst particle that could be chosen with the gaussian
-       // Multiply by 3 standard deviations to assume particles are within 99%
-       // of the distribution
-       const float WORST_MAGNITUDE = sqrt( square (3 * COEFF_RESET_X * SIGMA_RESET_X)
-                                           + square (3 * COEFF_RESET_Y * SIGMA_RESET_Y)
-                                           + square (3 * COEFF_RESET_H * SIGMA_RESET_H));
-
-       float scoreSum = 0;
-
        // Reset the estimates. Choose the first location for convention
        xEstimate = x;
        yEstimate = y;
@@ -424,50 +371,31 @@ namespace PF
 
        particles.clear();
 
+       float weight = 1.0f/parameters.numParticles;
+
        for(int i = 0; i < (parameters.numParticles / 2); ++i)
        {
            // Get the new particles x,y, and h
-           float pX = sampleNormal(x, SIGMA_RESET_X);
-           float pY = sampleNormal(y, SIGMA_RESET_Y);
-           float pH = sampleNormal(h, SIGMA_RESET_H);
+           float pX = sampleNormal(x, params1.sigma_x);
+           float pY = sampleNormal(y, params1.sigma_y);
+           float pH = sampleNormal(h, params1.sigma_h);
 
-           //Determine the particles score
-           float score = WORST_MAGNITUDE - sqrt( square (COEFF_RESET_X * (x+pX))
-                                                 + square (COEFF_RESET_Y * (y+pY))
-                                                 + square (COEFF_RESET_H * (h+pH)));
+           LocalizationParticle p(Location(pX, pY, pH), weight);
 
-           LocalizationParticle p(Location(pX,pY,pH), score);
-
-           scoreSum += score;
            particles.push_back(p);
        }
 
        for(int i = 0; i < ((parameters.numParticles + 1) / 2); ++i)
        {
            // Get the new particles x,y, and h
-           float pX = sampleNormal(x_, SIGMA_RESET_X);
-           float pY = sampleNormal(y_, SIGMA_RESET_Y);
-           float pH = sampleNormal(h_, SIGMA_RESET_H);
+           float pX = sampleNormal(x_, params2.sigma_x);
+           float pY = sampleNormal(y_, params2.sigma_y);
+           float pH = sampleNormal(h_, params2.sigma_h);
 
-           //Determine the particles score
-           float score = WORST_MAGNITUDE - sqrt( square (COEFF_RESET_X * (x_+pX))
-                                                 + square (COEFF_RESET_Y * (y_+pY))
-                                                 + square (COEFF_RESET_H * (h_+pH)));
+	   LocalizationParticle p(Location(pX, pY, pH), weight);
 
-           LocalizationParticle p(Location(pX,pY,pH), score);
-
-           scoreSum += score;
            particles.push_back(p);
        }
-
-       // Normalize the particles weights
-       PF::ParticleIt partIter;
-       for(partIter = particles.begin(); partIter != particles.end(); partIter++)
-       {
-           LocalizationParticle p = *partIter;
-           p.setWeight(p.getWeight()/scoreSum);
-       }
-
     }
 
     void ParticleFilter::updateMemory(MLocalization::ptr mLoc) const

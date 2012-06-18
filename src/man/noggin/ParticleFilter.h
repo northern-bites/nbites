@@ -179,8 +179,11 @@ namespace PF
 
     void blueGoalieReset() { }
     void redGoalieReset() { }
-    void resetLocTo(float x, float y, float h);
-    void resetLocTo(float x, float y, float h, float x_, float y_, float h_);
+    void resetLocTo(float x, float y, float h, LocNormalParams params);
+    void resetLocTo(float x, float y, float h, 
+		    float x_, float y_, float h_,
+	            LocNormalParams params1,
+	            LocNormalParams params2);
 
     PoseEst getCurrentEstimate() const { return PoseEst(); }
     PoseEst getCurrentUncertainty() const { return PoseEst(); }
