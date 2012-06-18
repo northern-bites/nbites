@@ -58,8 +58,6 @@ V4L2ImageTranscriber::V4L2ImageTranscriber(boost::shared_ptr<Sensors> s,
     params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
     rawImages(rawImages) {
 
-    initTable("/home/nao/nbites/lib/table/table.mtb");
-
     initOpenI2CAdapter();
     initSelectCamera();
     initOpenVideoDevice();
