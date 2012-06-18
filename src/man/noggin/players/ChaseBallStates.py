@@ -82,6 +82,8 @@ def prepareForKick(player):
 
     prepareForKick.hackKick.collectData()
 
+    #TODO: if we see the bal far away, stop and go get it.
+
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
     #if player.brain.my.locScore == nogginConstants.locScore.GOOD_LOC or \
