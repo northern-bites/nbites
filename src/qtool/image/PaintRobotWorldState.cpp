@@ -8,10 +8,9 @@ using namespace data;
 using namespace memory;
 using namespace proto;
 
-PaintRobotWorldState::PaintRobotWorldState(memory::MVision::const_ptr mVision,
-                                           memory::MLocalization::const_ptr mLoc,
+PaintRobotWorldState::PaintRobotWorldState(DataManager::ptr dataManager,
                                            QObject *parent)
-    : PaintFieldOverlay(1.0f, parent), mVision(mVision), mLoc(mLoc)
+    : PaintFieldOverlay(1.0f, parent), dataManager(dataManager)
 {
 }
 
@@ -48,24 +47,43 @@ void PaintRobotWorldState::draw(QPainter& painter, const RobotLocation& location
 
 }
 
+RobotLocation operator+(const RobotLocation& location1, const RobotLocation& location2) {
+    RobotLocation result;
+
+    result.set_h(location1.h() + location2.h());
+    result.set_x(location1.x() + 4*location2.x());
+    result.set_y(location1.y() + 4*location2.y());
+    return result;
+}
+
 void PaintRobotWorldState::buildBitmap()
 {
-    bitmap.fill(Qt::transparent);
+//    bitmap.fill(Qt::transparent);
     QPainter painter(&bitmap);
 
     this->transformPainterToFieldCoordinates(painter);
 
-    this->draw(painter, mLoc->get()->location(), mLoc->get()->uncertainty(), QColor("Blue"));
+    MLocalization::const_ptr mLoc = dataManager->getMemory()->get<MLocalization>();
+    MVision::const_ptr mVision = dataManager->getMemory()->get<MVision>();
+    MMotion::const_ptr mMotion = dataManager->getMemory()->get<MMotion>();
 
-    this->draw(painter, mVision->get()->visual_ball().visual_detection(),
-               mLoc->get()->location(), QColor("Orange"));
-    this->draw(painter, mVision->get()->yglp().visual_detection(),
-               mLoc->get()->location(), QColor("Yellow"));
-    this->draw(painter, mVision->get()->ygrp().visual_detection(),
-               mLoc->get()->location(), QColor("Yellow"));
+    RobotLocation robotLocation;
+    robotLocation.set_x(370);
+    robotLocation.set_y(270);
+    robotLocation.set_h(0);
+    robotLocation = robotLocation + mMotion->get()->odometry();
 
-    this->draw(painter, mVision->get()->visual_cross().visual_detection(),
-               mLoc->get()->location(), QColor("White"));
+    this->draw(painter, robotLocation, mLoc->get()->uncertainty(), QColor("Blue"));
+
+//    this->draw(painter, mVision->get()->visual_ball().visual_detection(),
+//               robotLocation, QColor("Orange"));
+//    this->draw(painter, mVision->get()->yglp().visual_detection(),
+//               robotLocation, QColor("Yellow"));
+//    this->draw(painter, mVision->get()->ygrp().visual_detection(),
+//               robotLocation, QColor("Yellow"));
+//
+//    this->draw(painter, mVision->get()->visual_cross().visual_detection(),
+//               robotLocation, QColor("White"));
 }
 
 }
