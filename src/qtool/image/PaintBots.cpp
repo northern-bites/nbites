@@ -50,7 +50,7 @@ void PaintBots::buildBitmap()
         }
 
         QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
-        QPoint ballPt = QPoint(locs->getBallX(i), locs->getBallY(i));
+        QPoint ballPt = QPoint(locs->getX(i)+locs->getBallX(i), locs->getY(i)+locs->getBallY(i));
 		QString robotLabel = QString::number(locs->getPlayerNum(i));
 
         //robot
