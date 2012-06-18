@@ -512,10 +512,10 @@ const int NaoPose::getHorizonX(const int y) const {
  * returns the expected visual lines from a known field position
  * x, y, robotAngle are considered from a bird's eye view perspective
  **/
-std::vector<VisualLine> NaoPose::getExpectedVisualLinesFromFieldPosition(
+std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromFieldPosition(
         float x, float y, float robotAngle) {
 
-    std::vector<VisualLine> visualLines;
+    std::vector<shared_ptr<VisualLine> > visualLines;
     //translation from the world origin to the robot origin
     ublas::matrix <float> worldOriginToRobotOriginTranslation =
             CoordFrame3D::translation3D(-x, -y);
@@ -554,8 +554,7 @@ std::vector<VisualLine> NaoPose::getExpectedVisualLinesFromFieldPosition(
         if (pixel2(X) != 0 && pixel2(Y) != 0)
             visualLinePoints.push_back(visualLinePoint2);
         if (visualLinePoints.size() > 0){
-            VisualLine visualLine = VisualLine(visualLinePoints);
-            visualLines.push_back(visualLine);}
+            visualLines.push_back(shared_ptr<VisualLine>(new VisualLine(visualLinePoints)));}
     }
 
     return visualLines;
@@ -585,7 +584,7 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     cameraToWorldRotation(2, 3) = 0;
     pointVectorInWorldFrame = prod(trans(cameraToWorldRotation), pointVectorInWorldFrame);
 
-    float FOCAL_LENGTH = 385.54f;
+    float FOCAL_LENGTH = 290.0f;
 
     //scale to image size
     float t = FOCAL_LENGTH / pointVectorInWorldFrame(X);
