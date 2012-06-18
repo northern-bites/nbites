@@ -205,7 +205,7 @@ def decideLeftSide(player):
 def decideRightSide(player):
     if player.firstFrame():
         player.side = UNKNOWN
-        player.brain.tracker.lookToAngle(goalie.RIGHT_SIDE_ANGLE)
+        player.brain.tracker.lookToAngle(-90)
 
     return Transition.getNextState(player, decideRightSide)
 

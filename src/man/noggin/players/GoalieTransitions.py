@@ -125,13 +125,15 @@ def onRightSideline(player):
     """
     Looks for the close posts.
     """
-    if onLeftSideline(player):
-        return False
+    for corner in player.brain.vision.fieldLines.corners:
+        if ( (IDs.CENTER_TOP_T in corner.possibilities) or
+             (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
+            return True
     return ((player.brain.vision.ygrp.on and
              #magic numbers
-             player.brain.vision.ygrp.dist < 400.0) or
+             player.brain.vision.ygrp.dist > 400.0) or
             (player.brain.vision.yglp.on and
-             player.brain.vision.yglp.dist < 400.0))
+             player.brain.vision.yglp.dist > 400.0))
 
 def shouldPerformSave(player):
     """
