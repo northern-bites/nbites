@@ -182,17 +182,17 @@ namespace PF
     void resetLocTo(float x, float y, float h);
     void resetLocTo(float x, float y, float h, float x_, float y_, float h_);
 
-    PoseEst getCurrentEstimate() const { return PoseEst(); }
+    PoseEst getCurrentEstimate() const { return PoseEst(xEstimate, yEstimate, hEstimate); }
     PoseEst getCurrentUncertainty() const { return PoseEst(); }
     float getXEst() const { return xEstimate; }
     float getYEst() const { return yEstimate; }
     float getHEst() const { return hEstimate; }
-    float getHEstDeg() const { return 0.0f; }
+    float getHEstDeg() const { return hEstimate*TO_DEG; }
     float getXUncert() const { return 0.0f; }
     float getYUncert() const { return 0.0f; }
     float getHUncert() const { return 0.0f; }
     float getHUncertDeg() const { return 0.0f; }
-    ::MotionModel getLastOdo() const { return ::MotionModel(); }
+    ::MotionModel getLastOdo() const;
 
     std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
 
@@ -244,6 +244,7 @@ namespace PF
         virtual ~MotionModel() { }
 
         virtual ParticleSet update(ParticleSet particles) const = 0;
+        virtual const ::MotionModel& getLastOdometry() const = 0;
     };
 
     /**
