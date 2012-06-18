@@ -52,6 +52,7 @@ class HoughVisualCorner;
 #include "NaoPose.h"
 #include "FieldLines.h"
 #include "VisualCorner.h"
+#include "VisualObstacle.h"
 //memory
 #include "memory/MObjects.h"
 #include "memory/MemoryProvider.h"
@@ -154,10 +155,11 @@ public:
     VisualCrossbar *ygCrossbar, *bgCrossbar;
     VisualRobot *red1, *red2, *red3;
     VisualRobot *navy1, *navy2, *navy3;
-	VisualCross *cross;
+    VisualCross *cross;
     VisualBall *ball;
-	VisualFieldEdge *fieldEdge;
+    VisualFieldEdge *fieldEdge;
     Threshold *thresh;
+    VisualObstacle* obstacles;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<FieldLines> fieldLines;
 
