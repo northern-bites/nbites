@@ -267,6 +267,8 @@ namespace PF
 
     }
 
+    ::MotionModel ParticleFilter::getLastOdo() const { return motionModel->getLastOdometry(); }
+
     /**
      * Clears the existing particle set and generates a new,
      * uniform distribution of particles bounded by the

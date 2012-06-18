@@ -34,6 +34,7 @@ class MotionSystem : public PF::MotionModel
      */
     void motionUpdate(const OdometryModel& odometryModel);
     PF::ParticleSet update(PF::ParticleSet particles) const;
+    const OdometryModel& getLastOdometry() const { return currentOdometryModel; }
 
  private:
     DeltaOdometryMeasurement makeNoisyDeltaOdometry() const;
