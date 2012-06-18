@@ -174,7 +174,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     QDockWidget* dockWidget = new QDockWidget("Offline Vision", this);
 	dockWidget->setMinimumWidth(300);
-	dockWidget->setMaximumHeight(375);
+	dockWidget->setMaximumHeight(150);
     offlineVisionView = new MObjectViewer(offlineMVision, this);
 	dockWidget->setWidget(offlineVisionView);
 	connect(this, SIGNAL(imagesUpdated()), offlineVisionView, SLOT(updateView()));
@@ -182,7 +182,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     dockWidget = new QDockWidget("Image data", this);
 	dockWidget->setMinimumWidth(300);
-	dockWidget->setMaximumHeight(300);
+	dockWidget->setMaximumHeight(150);
     MObjectViewer* imageDataView = new MObjectViewer(
 		memoryManager->getMemory()->get<MRawImages>(), this);
     dockWidget->setWidget(imageDataView);
