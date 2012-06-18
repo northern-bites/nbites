@@ -1311,6 +1311,12 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 obj_est = NULL_ESTIMATE;
             }
 
+            if (obj_est.dist == 0.0f || obj_est.dist == estFromWidth.dist) {
+                objPtr->setEstimateCertain(false);
+            } else {
+                objPtr->setEstimateCertain(true);
+            }
+
             bool debugEstimates = false;
             if (debugEstimates) {
                 cout << "width " << estFromWidth << endl;
@@ -1319,9 +1325,8 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 cout << "chosen " << obj_est << endl;
             }
 
-            objPtr->setDistance(obj_est.dist);
             objPtr->setDistanceWithSD(obj_est.dist);
-            objPtr->setBearingWithSD(obj_est.bearing);
+            objPtr->setBearingWithSD(obj_est.bearing, obj_est.dist);
             objPtr->setElevation(obj_est.elevation);
 
             if (obj_est.dist < MIDFIELD_X + 150) {
@@ -1335,7 +1340,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
     }
     else {
         objPtr->setDistanceWithSD(0.0);
-        objPtr->setBearingWithSD(0.0);
+        objPtr->setBearingWithSD(0.0, 0.0);
         objPtr->setElevation(0.0);
     }
 }
@@ -1433,11 +1438,11 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
         estimate obj_est = pose->pixEstimate(crossX, crossY, 0.0);
         if (obj_est.dist > 1500.0f) { // pose problem which happens rarely
             objPtr->setDistanceWithSD(0.0);
-            objPtr->setBearingWithSD(0.0);
+            objPtr->setBearingWithSD(0.0, 0.0);
             objPtr->setElevation(0.0);
         } else {
             objPtr->setDistanceWithSD(obj_est.dist);
-            objPtr->setBearingWithSD(obj_est.bearing);
+            objPtr->setBearingWithSD(obj_est.bearing, obj_est.dist);
             objPtr->setElevation(obj_est.elevation);
             // now let's see if we can id this guy
             // at this point we've sorted out all of the goal post info
@@ -1454,7 +1459,7 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
         }
     } else {
         objPtr->setDistanceWithSD(0.0);
-        objPtr->setBearingWithSD(0.0);
+        objPtr->setBearingWithSD(0.0, 0.0);
         objPtr->setElevation(0.0);
     }
 }

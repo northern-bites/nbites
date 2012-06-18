@@ -37,10 +37,10 @@ void VisualCross::init()
 
 	switch (id) {
 	case YELLOW_GOAL_CROSS:
-		setPossibleCrosses(&ConcreteCross::yellowGoalCrossList);
+		setPossibleCrosses(&ConcreteCross::abstractCrossList);
 		break;
 	case BLUE_GOAL_CROSS:
-		setPossibleCrosses(&ConcreteCross::blueGoalCrossList);
+		setPossibleCrosses(&ConcreteCross::abstractCrossList);
 		break;
 	case ABSTRACT_CROSS:
 		setPossibleCrosses(&ConcreteCross::abstractCrossList);
@@ -80,14 +80,15 @@ void VisualCross::updateCross(Blob *b)
 void VisualCross::setID(crossID _id) {
 	switch (_id) {
     case BLUE_GOAL_CROSS:
-		setPossibleCrosses(&ConcreteCross::blueGoalCrossList);
+		setPossibleCrosses(&ConcreteCross::abstractCrossList);
 		id = BLUE_GOAL_CROSS;
 		break;
     case YELLOW_GOAL_CROSS:
-		setPossibleCrosses(&ConcreteCross::yellowGoalCrossList);
+		setPossibleCrosses(&ConcreteCross::abstractCrossList);
 		id = YELLOW_GOAL_CROSS;
 		break;
 	default:
+	    setPossibleCrosses(&ConcreteCross::abstractCrossList);
 		id = ABSTRACT_CROSS;
     }
 
@@ -111,13 +112,13 @@ void VisualCross::setDistanceWithSD(float _distance)
  *
  * @param _bearing the distance estimate to be set
  */
-void VisualCross::setBearingWithSD(float _bearing)
+void VisualCross::setBearingWithSD(float _bearing, float _distance)
 {
     setBearing(_bearing);
-    setBearingSD(robotBearingToSD(_bearing));
+    setBearingSD(robotBearingToSD(_bearing, _distance));
 }
 
 const bool VisualCross::hasPositiveID()
 {
-	return possibleCrosses->size() == 1;
+	return possibleCrosses->size() == 1 || possibleCrosses->size() == 2;
 }

@@ -27,7 +27,7 @@
 #include "viewer/VisionViewer.h"
 #include "offline/OfflineViewer.h"
 #include "viewer/BallEKFViewer.h"
-#include "viewer/FieldViewer.h"
+#include "viewer/ParticleViewer.h"
 #include "remote/RobotSelect.h"
 #include "overseer/OverseerClient.h"
 //#include "viewer/GraphViewer.h"
@@ -50,7 +50,7 @@ private:
     viewer::VisionViewer* visionViewer;
     offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
-    viewer::FieldViewer* fieldViewer;
+    viewer::ParticleViewer* particleViewer;
     overseer::OverseerClient* overseerClient;
 };
 

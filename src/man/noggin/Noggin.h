@@ -1,4 +1,3 @@
-
 #ifndef _Noggin_h_DEFINED
 #define _Noggin_h_DEFINED
 
@@ -16,6 +15,11 @@
 #include "PyConstants.h"
 #include "memory/log/LoggingBoard.h"
 #include "memory/log/PyLoggingBoard.h"
+
+#include "ParticleFilter.h"
+#include "MotionSystem.h"
+#include "VisionSystem.h"
+#include "FieldConstants.h"
 
 //#define LOG_LOCALIZATION
 
@@ -73,9 +77,13 @@ private:
     man::memory::log::LoggingBoard::ptr loggingBoard;
     man::memory::Memory::ptr memory;
 
+
     boost::shared_ptr<ClickableButton> chestButton;
     boost::shared_ptr<ClickableButton> leftFootButton;
     boost::shared_ptr<ClickableButton> rightFootButton;
+
+    boost::shared_ptr<MotionSystem> locMotionSystem;
+    boost::shared_ptr<VisionSystem> locVisionSystem;
 
     bool error_state;
     PyObject *module_helper;

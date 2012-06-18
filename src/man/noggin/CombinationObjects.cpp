@@ -131,7 +131,7 @@ bool RobotLocation::operator != (const RobotLocation& other) const
 
 RelRobotLocation RobotLocation::operator - (const RobotLocation& other) const
 {
-    return RelRobotLocation(x - other.x, y - other.y, h - other.h);
+    return RelRobotLocation(x - other.x, y - other.y, (h - other.h)*TO_DEG);
 }
 
 RobotLocation RobotLocation::operator+ (const RelRobotLocation& other) const
@@ -139,9 +139,21 @@ RobotLocation RobotLocation::operator+ (const RelRobotLocation& other) const
     return RobotLocation(x + other.getRelX(), y + other.getRelY(), h + other.getRelH());
 }
 
-RelRobotLocation RobotLocation::getRelRobotLocationOf(const RobotLocation& other) const {
-    return other - *this;
-}
+    RelRobotLocation RobotLocation::getRelRobotLocationOf(const RobotLocation& other) const {
+        RelRobotLocation relRobotLocation;
+
+        float dx = other.x - x;
+        float dy = other.y - y;
+
+        float sinh, cosh;
+        sincosf(-h, &sinh, &cosh);
+
+        relRobotLocation.setRelX(cosh * dx - sinh * dy);
+        relRobotLocation.setRelY(sinh * dx + cosh * dy);
+        relRobotLocation.setRelH((other.h - h)*TO_DEG);
+
+        return relRobotLocation;
+    }
 
 const degrees RobotLocation::getRelativeBearing(Location& other)
 {

@@ -1,5 +1,4 @@
 #include "PaintBots.h"
-#include "viewer/FieldViewer.h"
 #include "BMPImage.h"
 #include <vector>
 #include "image/Color.h"

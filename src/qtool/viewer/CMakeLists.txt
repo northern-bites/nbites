@@ -27,6 +27,7 @@ set( viewer_srcs MemoryViewer.cpp
                  CollapsibleImageViewer.cpp
 		 		 BotLocs.cpp
 		 		 RobotField.cpp
+		 		 ParticleViewer.cpp
                  )
 
 set( viewer_headers MemoryViewer.h
@@ -40,7 +41,9 @@ set( viewer_headers MemoryViewer.h
                     CollapsibleImageViewer.h
 		    		BotLocs.h
 		    		RobotField.h
+		    		ParticleViewer.h
                     )
+
 
 ########### Separate VisionViewer Sources
 
