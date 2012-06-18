@@ -82,6 +82,8 @@ def prepareForKick(player):
 
     prepareForKick.hackKick.collectData()
 
+    #TODO: if we see the bal far away, stop and go get it.
+
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
     #if player.brain.my.locScore == nogginConstants.locScore.GOOD_LOC or \
@@ -133,9 +135,6 @@ def positionForKick(player):
     """
     Get the ball in the sweet spot
     """
-    if player.penaltyKicking and player.brain.ball.loc.inOppGoalBox():
-        return player.goNow('penaltyBallInOppGoalbox')
-
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
         player.inKickingState = False
@@ -162,12 +161,8 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    #if transitions.shouldKick(player):
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
-#        if transitions.shouldOrbit(player):
-#            return player.goNow('lookAround')
-#        else:
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 
