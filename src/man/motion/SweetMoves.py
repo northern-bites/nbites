@@ -157,14 +157,14 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-50,5,-90,123,-13,-5),
                     (-50,-5,-90,123,-13,5),
                     (35,2,14,41),
-                    .7, 1, stiff.STANDUP_STIFFNESSES), # was 1.0 interp time
+                    .4, 1, stiff.STANDUP_STIFFNESSES),
                    #Rock back to squatting upright
 
                    ((75,10,-53,-74),
                     (-40,6,-61,124,-35,-6),
                     (-40,-6,-61,124,-35,6),
                     (75,-10,53,74),
-                    .4, 1, stiff.STANDUP_STIFFNESSES),
+                    .3, 1, stiff.STANDUP_STIFFNESSES),
 
                    ((93,10,-90,-80),
                     (0,0,-60,120,-60,0),
