@@ -26,18 +26,16 @@ void VisualInfoImage::buildBitmap() {
 
     const PVision::PVisualBall ballData = visionData->get()->visual_ball();
     drawBall(ballData);
+	const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
+	if(yglpData.visual_detection().distance() || yglpData.visual_detection().x() ||
+	   yglpData.visual_detection().y())
+		drawGoalPost(yglpData);
+	const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
+	if(ygrpData.visual_detection().distance() || ygrpData.visual_detection().x() ||
+	   ygrpData.visual_detection().y())
+		drawGoalPost(ygrpData);
 
     if (camera == Camera::TOP) {
-
-        const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
-        if(yglpData.visual_detection().distance() || yglpData.visual_detection().x() ||
-                yglpData.visual_detection().y())
-            drawGoalPost(yglpData);
-
-        const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
-        if(ygrpData.visual_detection().distance() || ygrpData.visual_detection().x() ||
-                ygrpData.visual_detection().y())
-            drawGoalPost(ygrpData);
 
         const PVision::PVisualRobot red1Data = visionData->get()->red1();
         if(red1Data.visual_detection().distance() || red1Data.visual_detection().x() ||
@@ -173,11 +171,11 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
 		painter.setPen(QPen(QColor(255,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
 	}
     painter.setBrush(QBrush(QColor(255,255,0,80),Qt::SolidPattern));
-    //if (postData.visual_detection().intopcam() && camera == Camera::TOP) {
+    if (postData.visual_detection().intopcam() && camera == Camera::TOP) {
 		painter.drawConvexPolygon(points, 4);
-		//} else if (!postData.visual_detection().intopcam() && camera == Camera::BOTTOM) {
-		//painter.drawConvexPolygon(points, 4);
-		//}
+	} else if (!postData.visual_detection().intopcam() && camera == Camera::BOTTOM) {
+		painter.drawConvexPolygon(points, 4);
+	}
 }
 
   void VisualInfoImage::drawNavyRobot(const PVision::PVisualRobot robotData) {

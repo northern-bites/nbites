@@ -172,9 +172,11 @@ void Threshold::visionLoop() {
 		}
 		yellow->createObject();
 		if (ylp) {
+			vision->yglp->setTopCam(usingTopCamera);
 			setFieldObjectInfo(vision->yglp);
 		}
 		if (yrp) {
+			vision->ygrp->setTopCam(usingTopCamera);
 			setFieldObjectInfo(vision->ygrp);
 		}
 
