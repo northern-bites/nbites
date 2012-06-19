@@ -61,8 +61,9 @@ fi
 #fi
 
 mkdir -p $COLOR_TABLE_DIR #ensure the color table directory exists
-echo "echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt"
-echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt
+#echo "echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt"
+#echo $COLOR_TABLE_PATH > $COLOR_TABLE_DIR/whichtable.txt
+
 echo "cp $TOP_COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TOP_TABLE_STD_NAME"
 cp $TOP_COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TOP_TABLE_STD_NAME
 
