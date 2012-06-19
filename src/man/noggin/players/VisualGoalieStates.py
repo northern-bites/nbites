@@ -178,6 +178,12 @@ def clearIt(player):
 
     return Transition.getNextState(player, clearIt)
 
+def shouldISaveIt(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBallFixedPitch()
+        player.brain.nav.stop()
+    return Transition.getNextState(player, shouldISaveIt)
+
 def didIKickIt(player):
     if player.firstFrame():
         player.brain.nav.stop()
