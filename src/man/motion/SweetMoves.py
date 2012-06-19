@@ -144,21 +144,27 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-50,8,-90,58,5,-31),
                     (-50,0,-90,58,5,31),
                     (0,0,90,8),
-                    0.7,1, stiff.STANDUP_STIFFNESSES),
+                    1.0,1, stiff.STANDUP_STIFFNESSES),
                    #Push back onto feet
+
+                   ((35,2,-14,-41),
+                    (-50,5,-90,100,5,-5),
+                    (-50,-5,-90,100,5,5),
+                    (35,2,14,41),
+                    .7, 1, stiff.STANDUP_STIFFNESSES),
 
                    ((35,2,-14,-41),
                     (-50,5,-90,123,-13,-5),
                     (-50,-5,-90,123,-13,5),
                     (35,2,14,41),
-                    1.0, 1, stiff.STANDUP_STIFFNESSES),
+                    .7, 1, stiff.STANDUP_STIFFNESSES), # was 1.0 interp time
                    #Rock back to squatting upright
 
                    ((75,10,-53,-74),
                     (-40,6,-61,124,-35,-6),
                     (-40,-6,-61,124,-35,6),
                     (75,-10,53,74),
-                    0.4, 1, stiff.STANDUP_STIFFNESSES),
+                    .4, 1, stiff.STANDUP_STIFFNESSES),
 
                    ((93,10,-90,-80),
                     (0,0,-60,120,-60,0),
@@ -306,7 +312,7 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-28,8,-49,126,-25,-22),
                   (-28,-31,-87,80,52,0),
                   (120,-33,-4,4),
-                  .6,0, stiff.STANDUP_STIFFNESSES),
+                  .6,1, stiff.STANDUP_STIFFNESSES),
                  # turns to right a little and stands with one arm on ground
 
                  ((42,28,5,-47),
