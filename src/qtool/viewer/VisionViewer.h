@@ -44,6 +44,7 @@ signals:
 public slots:
     void update();
     void loadColorTable();
+
     void setHorizonDebug(int state);
     void setShootingDebug(int state);
     void setOpenFieldDebug(int state);
@@ -52,7 +53,32 @@ public slots:
     void setRobotsDebug(int state);
     void setVisualLinesDebug(int state);
     void setVisualCornersDebug(int state);
+
     void pixelClicked(int x, int y, int brushSize, bool leftClick);
+
+    /* void setBallDebug(); */
+    /* void setBallDistDebug(); */
+    /* void setCrossDebug(); */
+    /* void setIdentCornersDebug(); */
+    /* void setFieldEdgeDebug(); */
+
+    /* void setPostPrintDebug(); */
+    /* void setPostDebug(); */
+    /* void setPostLogicDebug(); */
+    /* void setPostCorrectDebug(); */
+    /* void setPostSanityDebug(); */
+
+    /*    void setVertEdgeDetectDebug();
+    void setHorEdgeDetectDebug();
+    void setSecondVertDebug();
+    void setCreateLinesDebug();
+    void setFitUnusedPointsDebug();
+    void setJoinLinesDebug();
+    void setExtendLinesDebug();
+    void setIntersectLinesDebug();
+    void setCcScanDebug();
+    void setRiskyCornersDebug();
+    void setCornObjDistDebug();*/
 
 private:
     std::vector<QDockWidget*> dockWidget;
@@ -68,6 +94,7 @@ private:
     boost::shared_ptr<Speech> speech;
     boost::shared_ptr<Sensors> sensors;
     man::memory::MVision::ptr offlineMVision;
+
     MObjectViewer* offlineVisionView;
 
     boost::shared_ptr<man::memory::proto::PRawImage> topRawImage;

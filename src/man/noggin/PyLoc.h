@@ -42,6 +42,10 @@ public:
         loc->resetLocTo(x, y, h * TO_RAD);
     }
 
+    void resetLocTo(float x, float y, float h, float x_, float y_, float h_){
+        loc->resetLocTo(x, y, h * TO_RAD, x_, y_, h_ * TO_RAD);
+    }
+
     void setOnOpposingSide(bool opp)
     {
         loc->setOnOpposingSide(opp);

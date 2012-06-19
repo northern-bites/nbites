@@ -474,10 +474,10 @@ void Ball::adjustBallDimensions() {
         if (abs(change - (h - w)) < DIAMETERMISMATCH) {
             if (BALLDEBUG) {
                 cout << "Adjusting width of blob " << change << endl;
+				printBlob(*topBlob);
             }
             topBlob->setLeft(newleft);
             topBlob->setRight(newright);
-            printBlob(*topBlob);
         }
     }
 }

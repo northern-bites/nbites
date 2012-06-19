@@ -465,7 +465,8 @@ void Comm::run()
 	{
         PROF_ENTER(P_COMM);
 	    if(timer.timeToSend())
-		send();
+			for (int burst = 0; burst < 3; ++burst)
+				send();
 
 	    monitor.performHealthCheck();
 
@@ -580,7 +581,7 @@ void Comm::bind() throw(socket_error)
     // set bind address parameters
     bind_addr.sin_family = AF_INET;
     bind_addr.sin_port = htons(UDP_PORT);
-    bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    bind_addr.sin_addr.s_addr = inet_addr("192.168.255.255");
 
     // set shared UDP socket (other processes may bind this port)
     ::setsockopt(sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));

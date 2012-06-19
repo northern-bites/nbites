@@ -48,15 +48,12 @@ def gameReady(player):
         return player.stay()
 
     # Works with rules (2011) to get goalie manually positioned
-    if (player.lastDiffState == 'gameInitial'
-        and not player.brain.play.isRole(GOALIE)):
-        return player.goLater('relocalize')
+    #if (player.lastDiffState == 'gameInitial'
+    #    and not player.brain.play.isRole(GOALIE)):
+    #    return player.goLater('relocalize')
 
-    elif player.lastDiffState == 'gamePenalized':
+    if player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalizationFromPenalty()
-
-        # Do we still want to do this? Seems to be just a hack for loc. Summer 2012
-        #return player.goLater('afterPenalty')
 
     #See above about rules(2011) - we should still reposition after goals
     if (player.lastDiffState == 'gameInitial'
