@@ -97,7 +97,7 @@ void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
       int ball_y = 2*ballData.visual_detection().y();
       int ball_radius = 2*ballData.radius();
 
-      painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+      painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
       painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
       painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
     }
@@ -106,7 +106,7 @@ void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
       int ball_y = 2*ballData.visual_detection().y();
       int ball_radius = 2*ballData.radius();
 
-      painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+      painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
       painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
       painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
     }
