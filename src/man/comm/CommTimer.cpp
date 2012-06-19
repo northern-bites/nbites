@@ -13,7 +13,7 @@ CommTimer::CommTimer(llong (*f)())
 {
     // Default is six packets/second, but should vary randomly.
     // Right now, there are no randomized packet send delays!
-    nextSendDelay = MICROS_PER_SECOND / 6;
+    nextSendDelay = MICROS_PER_SECOND / 30;
     srand(static_cast<int>(time()));
 }
 
