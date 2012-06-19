@@ -465,7 +465,8 @@ void Comm::run()
 	{
         PROF_ENTER(P_COMM);
 	    if(timer.timeToSend())
-		send();
+			for (int burst = 0; burst < 3; ++burst)
+				send();
 
 	    monitor.performHealthCheck();
 
