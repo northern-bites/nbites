@@ -1,6 +1,7 @@
 from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_KICKOFF)
 import man.motion.SweetMoves as SweetMoves
 import noggin_constants as nogginConstants
+import _localization
 
 ###
 # Reimplementation of Game Controller States for pBrunswick
@@ -24,22 +25,22 @@ def gameInitial(player):
             player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
                                         nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                         nogginConstants.HEADING_UP,
-                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
         elif player.brain.my.playerNumber == 2:
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                         nogginConstants.HEADING_UP,
-                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
         elif player.brain.my.playerNumber == 3:
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
                                         nogginConstants.HEADING_DOWN,
-                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
         elif player.brain.my.playerNumber == 4:
             player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
                                         nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
                                         nogginConstants.HEADING_DOWN,
-                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -75,13 +76,10 @@ def gameReady(player):
         player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     nogginConstants.HEADING_UP,
-                                    Loc.LocNormalParams(15.0, 15.0, 1.0))
-    # Removed until particle filter is functioning.
-                                    #nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    #nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    #nogginConstants.HEADING_DOWN)
-        # Do we still want to do this? Seems to be just a hack for loc. Summer 2012
-        #return player.goLater('afterPenalty')
+                                    nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                    nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                    nogginConstants.HEADING_DOWN,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
 
     #See above about rules(2011) - we should still reposition after goals
     if (player.lastDiffState == 'gameInitial'
@@ -126,7 +124,7 @@ def gameSet(player):
         player.brain.loc.resetLocTo(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
                                     nogginConstants.MIDFIELD_Y,
                                     nogginConstants.HEADING_RIGHT,
-                                    Loc.LocNormalParams(15.0, 15.0, 1.0))
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
 
     return player.stay()
 
@@ -137,27 +135,21 @@ def gamePlaying(player):
         player.brain.tracker.trackBallFixedPitch()
         player.inKickingState = False
         if player.lastDiffState == 'gamePenalized':
+            print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' frames in last state'
             player.brain.sensors.startSavingFrames()
-            if player.lastStateTime > 25:
-                player.brain.loc.resetLocTo(nogginConstants.MIDFIELD_X, \
-                                            nogginConstants.GREEN_PAD_Y, \
-                                            90, \
-                                            nogginConstants.MIDFIELD_X, \
-                                            nogginConstants.GREEN_PAD_Y \
-                                            + nogginConstants.FIELD_WHITE_HEIGHT, \
-                                                Loc.LocNormalParams(15.0, 15.0, 1.0))
-                # 25 is arbitrary. This check is meant to catch human error and
-                # possible 0 sec. penalties for the goalie
-                # player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                #                             nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                #                             nogginConstants.HEADING_UP)
-                # Removed until particle filter is functioning.
-                                            #nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            #nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                            #nogginConstants.HEADING_DOWN)
-                # Do we still want to do this? Seems to be just a hack for loc.
-                #   Summer 2012
-                #return player.goLater('afterPenalty')
+            # Note that the threshold is in seconds.
+            if player.lastStateTime > 5:
+                player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                            nogginConstants.HEADING_UP,
+                                            nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                            nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                            nogginConstants.HEADING_DOWN,
+                                            _localization.LocNormalParams(15.0, 15.0, 1.0),
+                                            _localization.LocNormalParams(15.0, 15.0, 1.0))
+
+                print 'Resetting localization to (' + str(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X) + ', ' + str(nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y) + ', ' + str(nogginConstants.HEADING_UP) + ' and (' + str(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X) + ', ' + str(nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y) + ', ' + str(nogginConstants.HEADING_DOWN) + ')'
+
 
                 # 2011 rules have no 0 second penalties for any robot,
                 # but check should be here if there is.

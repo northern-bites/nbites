@@ -320,7 +320,6 @@ namespace PF
 
         float bearing = NBMath::safe_atan2(y_prime, x_prime);
 
-
         return Vector2D(magnitude, bearing);
     }
 }
