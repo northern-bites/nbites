@@ -9,9 +9,9 @@ ROBOT=""
 
 HOST=$MAL
 ROBOT="mal"
-nmap -sP $HOST 2>&1 | grep "Host is up"
+nmap -sP -T1 $HOST 2>&1 | grep "Host is up"
 if [ "$?" -eq 0 ]; then
-    echo "$ROBOT is up is up at $HOST."
+    echo "$ROBOT is up at $HOST."
 else
     echo "ERROR: $HOST unreachable, $ROBOT is down!"
 fi
@@ -19,9 +19,9 @@ echo "\n"
 
 HOST=$JAYNE
 ROBOT="jayne"
-nmap -sP $HOST 2>&1 | grep "Host is up"
+nmap -sP -T1 $HOST 2>&1 | grep "Host is up"
 if [ "$?" -eq 0 ]; then
-    echo "$ROBOT is up is up at $HOST."
+    echo "$ROBOT is up at $HOST."
 else
     echo "ERROR: $HOST unreachable, $ROBOT is down!"
 fi
@@ -29,9 +29,9 @@ echo "\n"
 
 HOST=$RIVER
 ROBOT="river"
-nmap -sP $HOST 2>&1 | grep "Host is up"
+nmap -sP -T1 $HOST 2>&1 | grep "Host is up"
 if [ "$?" -eq 0 ]; then
-    echo "$ROBOT is up is up at $HOST."
+    echo "$ROBOT is up at $HOST."
 else
     echo "ERROR: $HOST unreachable, $ROBOT is down!"
 fi
@@ -39,9 +39,9 @@ echo "\n"
 
 HOST=$WASH
 ROBOT="wash"
-nmap -sP $HOST 2>&1 | grep "Host is up"
+nmap -sP -T1 $HOST 2>&1 | grep "Host is up"
 if [ "$?" -eq 0 ]; then
-    echo "$ROBOT is up is up at $HOST."
+    echo "$ROBOT is up at $HOST."
 else
     echo "ERROR: $HOST unreachable, $ROBOT is down!"
 fi
@@ -49,9 +49,9 @@ echo "\n"
 
 HOST=$ZOE
 ROBOT="zoe"
-nmap -sP $HOST 2>&1 | grep "Host is up"
+nmap -sP -T1 $HOST 2>&1 | grep "Host is up"
 if [ "$?" -eq 0 ]; then
-    echo "$ROBOT is up is up at $HOST."
+    echo "$ROBOT is up at $HOST."
 else
     echo "ERROR: $HOST unreachable, $ROBOT is down!"
 fi
