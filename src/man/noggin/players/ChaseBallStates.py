@@ -82,7 +82,10 @@ def prepareForKick(player):
 
     prepareForKick.hackKick.collectData()
 
-    #TODO: if we see the bal far away, stop and go get it.
+    if player.brain.ball.dist > 40:
+        # Ball has moved away. Go get it!
+        player.inKickingState = False
+        return player.goLater('chase')
 
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
