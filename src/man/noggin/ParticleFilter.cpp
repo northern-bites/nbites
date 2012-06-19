@@ -413,8 +413,6 @@ namespace PF
         // Get the particles, and update the protobuf accordingly.
         PF::ParticleSet particles = this->getParticles();
 
-        //std::cout << "Updating " << particles.size() << " particles." << std::endl;
-
         PLoc::Particle *particle;
         for(PF::ParticleIt iter = particles.begin(); iter != particles.end(); ++iter)
         {
@@ -424,7 +422,55 @@ namespace PF
             particle->set_h((*iter).getLocation().heading);
             particle->set_w((*iter).getWeight());
         }
+    }
 
+    /**
+     * Calculates the standard deviation of the particle cluster.
+     *
+     * @return sd A vector whose indices 0, 1, 2 correspond to the
+     *            standard deviations of the x, y, and heading
+     *            standard deviations respectively.
+     */
+    std::vector<float> ParticleFilter::findParticleSD() const
+    {
+	PF::ParticleSet particles = this->getParticles();
 
+	std::vector<float> sd(3, 0.0f);
+	float mean_x = 0.0f, mean_y = 0.0f, mean_h = 0.0f;
+	ParticleIt iter = particles.begin();
+	for(; iter != particles.end(); ++iter)
+	{
+	    mean_x += (*iter).getLocation().x;
+	    mean_y += (*iter).getLocation().y;
+	    mean_h += (*iter).getLocation().heading;
+	}
+
+	mean_x /= parameters.numParticles;
+	mean_y /= parameters.numParticles;
+	mean_h /= parameters.numParticles;
+
+	// Calculate the standard deviation:
+	// \sigma_x = \sqrt{\frac{1}{N}\sum_{i=0}^{N-1}(x_i - \bar{x})^2}
+	// where x_i stands for either the x, y, or heading of 
+	// the ith particle.
+	for(iter = particles.begin(); iter != particles.end(); ++iter)
+	{
+	    sd[0] += square((*iter).getLocation().x       - mean_x);
+	    sd[1] += square((*iter).getLocation().y       - mean_y);
+	    sd[2] += square((*iter).getLocation().heading - mean_h); 
+	}
+	sd[0] /= (1/parameters.numParticles);
+	sd[1] /= (1/parameters.numParticles);
+	sd[2] /= (1/parameters.numParticles);
+
+	// Convert variances into standard deviations.
+
+	sd[0] = std::sqrt(sd[0]);
+	sd[1] = std::sqrt(sd[1]);
+	sd[2] = std::sqrt(sd[2]);
+
+	return sd;
     }
 }
+
+

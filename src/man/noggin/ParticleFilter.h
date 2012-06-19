@@ -215,6 +215,8 @@ namespace PF
     void activate() { }
     void deactivate() { }
 
+    std::vector<float> findParticleSD() const;
+
     private:
     void resample();
 
