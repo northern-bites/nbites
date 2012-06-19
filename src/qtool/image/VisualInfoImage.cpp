@@ -26,18 +26,16 @@ void VisualInfoImage::buildBitmap() {
 
     const PVision::PVisualBall ballData = visionData->get()->visual_ball();
     drawBall(ballData);
+	const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
+	if(yglpData.visual_detection().distance() || yglpData.visual_detection().x() ||
+	   yglpData.visual_detection().y())
+		drawGoalPost(yglpData);
+	const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
+	if(ygrpData.visual_detection().distance() || ygrpData.visual_detection().x() ||
+	   ygrpData.visual_detection().y())
+		drawGoalPost(ygrpData);
 
     if (camera == Camera::TOP) {
-
-        const PVision::PVisualFieldObject yglpData = visionData->get()->yglp();
-        if(yglpData.visual_detection().distance() || yglpData.visual_detection().x() ||
-                yglpData.visual_detection().y())
-            drawGoalPost(yglpData);
-
-        const PVision::PVisualFieldObject ygrpData = visionData->get()->ygrp();
-        if(ygrpData.visual_detection().distance() || ygrpData.visual_detection().x() ||
-                ygrpData.visual_detection().y())
-            drawGoalPost(ygrpData);
 
         const PVision::PVisualRobot red1Data = visionData->get()->red1();
         if(red1Data.visual_detection().distance() || red1Data.visual_detection().x() ||
@@ -99,7 +97,7 @@ void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
       int ball_y = 2*ballData.visual_detection().y();
       int ball_radius = 2*ballData.radius();
 
-      painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+      painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
       painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
       painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
     }
@@ -108,11 +106,12 @@ void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
       int ball_y = 2*ballData.visual_detection().y();
       int ball_radius = 2*ballData.radius();
 
-      painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
+      painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
       painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
       painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
     }
 }
+
 
 void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     QPainter painter(&bitmap);
@@ -173,7 +172,11 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
 		painter.setPen(QPen(QColor(255,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
 	}
     painter.setBrush(QBrush(QColor(255,255,0,80),Qt::SolidPattern));
-    painter.drawConvexPolygon(points, 4);
+    if (postData.visual_detection().intopcam() && camera == Camera::TOP) {
+		painter.drawConvexPolygon(points, 4);
+	} else if (!postData.visual_detection().intopcam() && camera == Camera::BOTTOM) {
+		painter.drawConvexPolygon(points, 4);
+	}
 }
 
   void VisualInfoImage::drawNavyRobot(const PVision::PVisualRobot robotData) {
@@ -221,7 +224,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_bottom_x, right_bottom_y),
       QPoint (right_top_x, right_top_y)
     };
-    
+
     painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
     painter.setBrush(QBrush(QColor(200,0,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
@@ -236,7 +239,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int start_y = 2*lineData.start_y();
     int end_x = 2*lineData.end_x();
     int end_y = 2*lineData.end_y();
-    
+
     painter.setPen(QPen(Qt::blue, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(start_x, start_y, end_x, end_y);
   }
@@ -258,7 +261,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     painter.setPen(QPen(Qt::cyan, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(left_top_x, left_top_y, right_bottom_x, right_bottom_y);
     painter.drawLine(right_top_x, right_top_y, left_bottom_x, left_bottom_y);
-    
+
 
   }
 }

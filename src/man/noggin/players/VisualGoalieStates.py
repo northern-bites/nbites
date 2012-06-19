@@ -83,7 +83,7 @@ def walkToGoal(player):
         player.system.home.relH = player.system.centerGoalBearing()
 
         player.brain.nav.goTo(player.system.home,
-                              nav.CLOSE_ENOUGH, nav.FAST_SPEED)
+                              nav.CLOSE_ENOUGH, nav.FAST_SPEED, True)
 
     updatePostObservations(player)
 
@@ -178,6 +178,12 @@ def clearIt(player):
 
     return Transition.getNextState(player, clearIt)
 
+def shouldISaveIt(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBallFixedPitch()
+        player.brain.nav.stop()
+    return Transition.getNextState(player, shouldISaveIt)
+
 def didIKickIt(player):
     if player.firstFrame():
         player.brain.nav.stop()
@@ -205,7 +211,7 @@ def decideLeftSide(player):
 def decideRightSide(player):
     if player.firstFrame():
         player.side = UNKNOWN
-        player.brain.tracker.lookToAngle(goalie.RIGHT_SIDE_ANGLE)
+        player.brain.tracker.lookToAngle(-90)
 
     return Transition.getNextState(player, decideRightSide)
 

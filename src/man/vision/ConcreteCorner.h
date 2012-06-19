@@ -144,10 +144,10 @@ public:
             return o << c.toString();
         }
 
-	bool operator== (const ConcreteCorner& secondCorner) const
-		{
-			return id == secondCorner.getID();
-		}
+    bool operator== (const ConcreteCorner& secondCorner) const
+    {
+        return id == secondCorner.getID();
+    }
 
     ////////////////////////////////////////////////////////////
     // GETTERS
@@ -159,47 +159,47 @@ public:
     virtual const std::string toString() const;
 
     static const std::vector <const ConcreteCorner*>&
-	getPossibleCorners(shape corner_type, shape secondary_type);
+    getPossibleCorners(shape corner_type, shape secondary_type);
 
-	const std::vector<const ConcreteLine*> getLines() const {
-		return lines;
-	}
+    const std::vector<const ConcreteLine*> getLines() const {
+        return lines;
+    }
 
 //     // Private methods
 // private:
 public:
     static const shape inferCornerType(const cornerID id);
-	void assignTCornerLines();
-	bool isLineInCorner(const ConcreteLine* line) const;
+    void assignTCornerLines();
+    bool isLineInCorner(const ConcreteLine* line) const;
 
 public:
     static const ConcreteCorner& blue_corner_top_l();
-	static const ConcreteCorner& blue_corner_bottom_l();
-	static const ConcreteCorner& blue_goal_left_t();
-	static const ConcreteCorner& blue_goal_right_t();
-	static const ConcreteCorner& blue_goal_left_l();
-	static const ConcreteCorner& blue_goal_right_l();
-	static const ConcreteCorner& center_top_t();
-	static const ConcreteCorner& center_bottom_t();
-	static const ConcreteCorner& yellow_corner_bottom_l();
-	static const ConcreteCorner& yellow_corner_top_l();
-	static const ConcreteCorner& yellow_goal_left_t();
-	static const ConcreteCorner& yellow_goal_right_t();
-	static const ConcreteCorner& yellow_goal_left_l();
-	static const ConcreteCorner& yellow_goal_right_l();
-	static const ConcreteCorner& top_cc();
-	static const ConcreteCorner& bottom_cc();
-	static const ConcreteCorner& fake_cc();
+    static const ConcreteCorner& blue_corner_bottom_l();
+    static const ConcreteCorner& blue_goal_left_t();
+    static const ConcreteCorner& blue_goal_right_t();
+    static const ConcreteCorner& blue_goal_left_l();
+    static const ConcreteCorner& blue_goal_right_l();
+    static const ConcreteCorner& center_top_t();
+    static const ConcreteCorner& center_bottom_t();
+    static const ConcreteCorner& yellow_corner_bottom_l();
+    static const ConcreteCorner& yellow_corner_top_l();
+    static const ConcreteCorner& yellow_goal_left_t();
+    static const ConcreteCorner& yellow_goal_right_t();
+    static const ConcreteCorner& yellow_goal_left_l();
+    static const ConcreteCorner& yellow_goal_right_l();
+    static const ConcreteCorner& top_cc();
+    static const ConcreteCorner& bottom_cc();
+    static const ConcreteCorner& fake_cc();
 
     static const std::string getShapeString(shape s);
     static const std::string cornerIDToString(const cornerID _id);
     static const ConcreteCorner* concreteCornerList[NUM_CORNERS];
 
-	const ConcreteLine* getTBar() const { return tBar; }
-	const ConcreteLine* getTStem() const { return tStem; }
+    const ConcreteLine* getTBar() const { return tBar; }
+    const ConcreteLine* getTStem() const { return tStem; }
 
 public:
-	static const std::vector <const ConcreteCorner*>& concreteCorners();
+    static const std::vector <const ConcreteCorner*>& concreteCorners();
     static const std::vector <const ConcreteCorner*>& lCorners();
     static const std::vector <const ConcreteCorner*>& lGoalCorners();
     static const std::vector <const ConcreteCorner*>& rightGoalCorners();
@@ -247,10 +247,10 @@ private: // Instance variables recording location on field and identifier
 
     const ConcreteLine * line1;
     const ConcreteLine * line2;
-	std::vector<const ConcreteLine*> lines;
+    std::vector<const ConcreteLine*> lines;
 
-	const ConcreteLine * tBar;
-	const ConcreteLine * tStem;
+    const ConcreteLine * tBar;
+    const ConcreteLine * tStem;
 
 };
 

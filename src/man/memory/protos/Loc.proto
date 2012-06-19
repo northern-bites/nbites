@@ -2,11 +2,11 @@ import "Common.proto";
 
 package man.memory.proto;
 
-message PLoc { 
+message PLoc {
 
 	optional int64 timestamp = 1;
-	
-	optional RobotLocation location = 2; 
+
+	optional RobotLocation location = 2;
 	optional RobotArea uncertainty = 3;
 
 	message Particle {
