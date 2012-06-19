@@ -277,8 +277,9 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 CENTER_FIELD = Location(NogginConstants.CENTER_FIELD_X,
                         NogginConstants.CENTER_FIELD_Y)
 """DEFENDER"""
-READY_KICKOFF_DEFENDER_X = (NogginConstants.CENTER_FIELD_X -
-                            NogginConstants.GREEN_PAD_X) * 0.3 + 15
+READY_KICKOFF_DEFENDER_X = ((NogginConstants.CENTER_FIELD_X -
+                            NogginConstants.GREEN_PAD_X) * 0.3 + 15 +
+                            NogginConstants.GREEN_PAD_X)
 READY_KICKOFF_DEFENDER_0_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y
 READY_KICKOFF_DEFENDER_1_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y
 """OFFENDER"""
