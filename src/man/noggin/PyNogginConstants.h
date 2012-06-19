@@ -170,11 +170,11 @@ namespace noggin {
         };
 
 
-        static const int LANDMARK_OPP_FIELD_CROSS[2] =
+        static const int LANDMARK_MY_FIELD_CROSS[2] =
         {(int) (FIELD_WHITE_LEFT_SIDELINE_X + LINE_CROSS_OFFSET),
          (int) MIDFIELD_Y};
 
-        static const int LANDMARK_MY_FIELD_CROSS[2] =
+        static const int LANDMARK_OPP_FIELD_CROSS[2] =
         {(int) (FIELD_WHITE_RIGHT_SIDELINE_X - LINE_CROSS_OFFSET),
          (int) MIDFIELD_Y};
 
