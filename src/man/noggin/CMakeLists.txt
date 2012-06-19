@@ -89,6 +89,8 @@ SET( NOGGIN_SRCS Noggin
 		 ParticleFilter
 		 VisionSystem
 		 MotionSystem
+		 GoalieSystem
+		 PyGoalie
                  )
 
 

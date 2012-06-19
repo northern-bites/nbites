@@ -14,7 +14,7 @@ def findBall(player):
             return player.goLater('chase')
 
     if player.firstFrame():
-        player.stopWalking()
+        player.stand()
         player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped():
