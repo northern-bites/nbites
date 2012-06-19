@@ -134,15 +134,15 @@ class KickInformation:
               in calculateDataAverages method.
         """
         # If we've seen a pair of near posts with very good certainty, we can kick.
-        seenPostPair = ((len(nearGoalLeftPostBearings) > 10 and
-                        len(nearGoalRightPostBearings) > 10))
+        seenPostPair = ((len(self.nearGoalLeftPostBearings) > 10 and
+                        len(self.nearGoalRightPostBearings) > 10))
 
         # If we've seen a single post, and heard that it's a dangerous ball.
         nearPostAndDangerous = (self.dangerousBallCount > 5 and
-                                (len(nearGoalLeftPostBearings) > 10 or
-                                 len(nearGoalRightPostBearings) > 10 or
-                                 len(farGoalLeftPostBearings) > 10 or
-                                 len(farGoalRightPostBearings) > 10))
+                                (len(self.nearGoalLeftPostBearings) > 10 or
+                                 len(self.nearGoalRightPostBearings) > 10 or
+                                 len(self.farGoalLeftPostBearings) > 10 or
+                                 len(self.farGoalRightPostBearings) > 10))
 
         if DEBUG_KICK_DECISION:
             if seenPostPair:

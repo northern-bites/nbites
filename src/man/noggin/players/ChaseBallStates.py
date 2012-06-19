@@ -82,7 +82,7 @@ def prepareForKick(player):
 
     prepareForKick.hackKick.collectData()
 
-    if player.brain.ball.dist > 40:
+    if player.brain.ball.loc.dist > 40:
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
