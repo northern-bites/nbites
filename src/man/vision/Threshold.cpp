@@ -113,10 +113,7 @@ void Threshold::visionLoop() {
 
     vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
-    if (vision->bgCrossbar->getWidth() > 0) {
-        setShot(vision->bgCrossbar);
-    }
-    if (vision->ygCrossbar->getWidth() > 0) {
+	if (vision->ygCrossbar->getWidth() > 0) {
         setShot(vision->ygCrossbar);
     }
     // for now we also don't use open field information
@@ -128,26 +125,62 @@ void Threshold::visionLoop() {
     }
 #endif
 
-    if (vision->ball->getRadius() != 0) return; //we see the ball, we are done
+    if (vision->ball->getRadius() == 0) {
 
-    usingTopCamera = false;
+		usingTopCamera = false;
 
-    PROF_ENTER(P_TRANSFORM)
-    pose->transform(usingTopCamera);
-    PROF_EXIT(P_TRANSFORM)
+		PROF_ENTER(P_TRANSFORM)
+			pose->transform(usingTopCamera);
+		PROF_EXIT(P_TRANSFORM)
 
-    orange->init(pose->getHorizonSlope());
-    lowerRuns();
+			orange->init(pose->getHorizonSlope());
+		lowerRuns();
 
-    vision->ball->init();
-    vision->ball->setTopCam(usingTopCamera);
+		vision->ball->init();
+		vision->ball->setTopCam(usingTopCamera);
 
-    if (horizon < IMAGE_HEIGHT) {
-        orange->createBall(horizon);
-    } else {
-        orange->createBall(pose->getHorizonY(0));
-    }
+		if (horizon < IMAGE_HEIGHT) {
+			orange->createBall(horizon);
+		} else {
+			orange->createBall(pose->getHorizonY(0));
+		}
+	}
+	bool left = vision->yglp->getWidth() > 0;
+	bool right = vision->ygrp->getWidth() > 0;
+    bool ylp = left &&
+		(vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+		 vision->yglp->getRightBottomY() > IMAGE_HEIGHT - 5);
+    bool yrp = right &&
+		(vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+		 vision->ygrp->getRightBottomY() > IMAGE_HEIGHT - 5);
 
+	if ((ylp || yrp) && !(left && right)) {
+		usingTopCamera = false;
+
+		pose->transform(usingTopCamera);
+		yellow->init(pose->getHorizonSlope());
+		if (ylp) {
+			vision->yglp->init();
+			vision->yglp->setTopCam(usingTopCamera);
+		}
+		if (yrp) {
+			vision->ygrp->init();
+			vision->ygrp->setTopCam(usingTopCamera);
+		}
+		for (int i = 0; i < IMAGE_WIDTH; i++) {
+			findPostsInLowerCamera(i);
+		}
+		yellow->createObject();
+		if (ylp) {
+			vision->yglp->setTopCam(usingTopCamera);
+			setFieldObjectInfo(vision->yglp);
+		}
+		if (yrp) {
+			vision->ygrp->setTopCam(usingTopCamera);
+			setFieldObjectInfo(vision->ygrp);
+		}
+
+	}
 }
 
 /*
@@ -382,6 +415,36 @@ void Threshold::findGoals(int column, int topEdge) {
     }
     if (shoot[column] && robots > 5) {
         shoot[column] = false;
+    }
+}
+
+void Threshold::findPostsInLowerCamera(int column) {
+    const int BADSIZE = 5;
+    const int GAP = BADSIZE;
+    // scan up for goals
+    int bad = 0, yellows = 0;
+    int firstYellow = 0;
+    int j;
+    bad = 0;
+    int greens = 0;
+    for (j = 0; bad < BADSIZE && j < lowerBound[column]; j++) {
+        unsigned char pixel = getThresholded(j,column);
+        bool found = false;
+        if (Utility::isYellow(pixel)) {
+            firstYellow = j;
+            yellows++;
+            found = true;
+        }
+        if (Utility::isGreen(pixel)) {
+            bad++;
+            greens++;
+        }
+        if (!found) {
+            bad++;
+        }
+    }
+    if (yellows > 10) {
+        yellow->newRun(column, 0, firstYellow);
     }
 }
 
@@ -1152,7 +1215,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 cout << "width " << estFromWidth << endl;
                 cout << "height " << estFromHeight << endl;
                 cout << "pose " << estFromPose << endl;
-                cout << "chosen " << obj_est << endl;
+                cout << "chosen " << obj_est << endl << endl;
             }
 
             objPtr->setDistance(obj_est.dist);
@@ -1319,6 +1382,8 @@ void Threshold::initObjects(void) {
     // yellow goal objs
     vision->ygrp->init();
     vision->yglp->init();
+	vision->ygrp->setTopCam(usingTopCamera);
+	vision->yglp->setTopCam(usingTopCamera);
     vision->ygCrossbar->init();
 
     // robots
