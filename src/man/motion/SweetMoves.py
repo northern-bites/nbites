@@ -266,75 +266,57 @@ STAND_UP_BACK_OLD = (((100,0,0,0),
                   0.6,0, stiff.STANDUP_STIFFNESSES)
                  )
 
-
-#new robots (i.e. Firefly generation)
+# new robots
 STAND_UP_BACK = (((100,0,0,0),
                   (0,0,0,0,0,0),
-                  (0,0,0,0,0,0),
+                   (0,0,0,0,0,0),
                   (100,0,0,0),
                   0.6,0, stiff.STANDUP_STIFFNESSES),
                  #arms at sides
 
-                 ((90,5,58,-86),
+                 ((119,18,6,-88),
                   (0,0,27,105,-15,0),
                   (0,0,27,105,-15,0),
-                  (90,-5,-58,86),
+                  (119,-18,-6,88),
                   0.4,1, stiff.STANDUP_STIFFNESSES),
                  #hips arch and arms underneath
 
-                 ((75,5,58,-86),
+                 ((119,15,6,-85),
                   (-9.49,24.70,-40.25,115.22,22.41,7.74),
                   (-9.49,-24.12,-40.19,115.22,22.47,-7.74),
-                  (75,-5,-58,86),
-                  .4,1, stiff.STANDUP_STIFFNESSES),
+                  (119,-15,-6,85),
+                  0.4,1, stiff.STANDUP_STIFFNESSES),
                  # hips sit and upper body comes up with hands under
 
-                 ((80, 5, 58, -86),
-                  (-9.49,24.70,-40.25,15.22,22.41,7.74),
-                  (-9.49,-24.12,-40.19,15.22,22.47,-7.74),
-                  (80,-5,-58,86),
+                 ((73.48,-16.17,81.55,-88.88),
+                  (-9.49,24.70,-40.25,100,22.41,7.74),
+                  (-9.49,-24.12,-40.19,100,22.47,-7.74),
+                  (72.78,16.70,-81.74,88.51),
+                  .4,1, stiff.STANDUP_STIFFNESSES),
+                 #twists hands
+
+                 ((119,-11.08,94.13,-1.93),
+                  (-62.93,9.06,-84.64,116.72,21.88,23.73),
+                  (-62.93,-29.44,-82.62,103.71,30.85,-10.11),
+                  (115.93,17.58,-90.62,3.34),
                   0.6,1, stiff.STANDUP_STIFFNESSES),
-                 #twists hands and lifts legs
-
-                 ((90,5, 58, -86),
-                  (-9.49,24.70,-40.25,115.22,22.41,7.74),
-                  (-9.49,-24.12,-40.19,115.22,22.47,-7.74),
-                  (90,-5,-58,86),
-                  .2,1, stiff.STANDUP_STIFFNESSES),
-                 # legs go down and upper body comes up
-
-                 ((90,0, 58, -25),
-                  (-9, 5,-75, 15, 22.41, 7.74),
-                  (-9,-5,-75, 15, 27, -7.74),
-                  (90,-10,-58, 25),
-                  .6,1, stiff.STANDUP_STIFFNESSES),
-                 #sitting legs straight out
-
-                 ((119,-11.08,58,-1),
-                  (-30, 9.06,-100, 80, 21.88, 23.73),
-                  (-30, -29.44,-100, 80, 30.85, -10.11),
-                  (115,-10,-58,5),
-                  .8,1, stiff.STANDUP_STIFFNESSES),
-
                  #sitting legs spread hands behind facing forward
-                 #THIS ONE CAUSES THE AWFUL NOISE
 
                  ((40,60,4,-28),
-                  (-28, 8, -49, 126, -32, -22),
-                  (-28, -31, -87, 70, 45, 0),
+                  (-28,8,-49,126,-25,-22),
+                  (-28,-31,-87,80,52,0),
                   (120,-33,-4,4),
-                  .8,0, stiff.STANDUP_STIFFNESSES),
-
+                  .6,0, stiff.STANDUP_STIFFNESSES),
                  # turns to right a little and stands with one arm on ground
 
                  ((42,28,5,-47),
                   (-49,-16,22,101,-70,-5),
                   (-49,-32,-89,61,39,-7),
                   (101,-15,-4,3),
-                  .8,1, stiff.STANDUP_STIFFNESSES),
+                  0.6,1, stiff.STANDUP_STIFFNESSES),
                  #gets hips up and over knees
 
-                 ((20.76,29.35,4.39,-45.79),
+                 ((59.76,29.35,4.39,-45.79),
                   (-30.23,-10.19,-35.86,122.78,-67.68,8.44),
                   (-30.23,-26.72,-70.78,54.41,34.99,19.69),
                   (54.85,-45.62,-0.27,24.35),
@@ -345,8 +327,8 @@ STAND_UP_BACK = (((100,0,0,0),
                   (-50,5,-90,123,-13,-5),
                   (-50,-5,-90,123,-13,5),
                   (35,2,14,41),
-                  .6, 1, stiff.STANDUP_STIFFNESSES),
-                 #squatting upright
+                  0.6, 1, stiff.STANDUP_STIFFNESSES),
+                  #squatting upright
 
                  ((75,10,-53,-74),
                   (-40,6,-61,124,-35,-6),
