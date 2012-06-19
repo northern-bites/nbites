@@ -23,19 +23,23 @@ def gameInitial(player):
         if player.brain.my.playerNumber == 1:
             player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
                                         nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        nogginConstants.HEADING_UP)
+                                        nogginConstants.HEADING_UP,
+                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
         elif player.brain.my.playerNumber == 2:
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        nogginConstants.HEADING_UP)
+                                        nogginConstants.HEADING_UP,
+                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
         elif player.brain.my.playerNumber == 3:
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        nogginConstants.HEADING_DOWN)
+                                        nogginConstants.HEADING_DOWN,
+                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
         elif player.brain.my.playerNumber == 4:
             player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
                                         nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        nogginConstants.HEADING_DOWN)
+                                        nogginConstants.HEADING_DOWN,
+                                        Loc.LocNormalParams(15.0, 15.0, 1.0))
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -70,7 +74,8 @@ def gameReady(player):
     if player.lastDiffState == 'gamePenalized':
         player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    nogginConstants.HEADING_UP)
+                                    nogginConstants.HEADING_UP,
+                                    Loc.LocNormalParams(15.0, 15.0, 1.0))
     # Removed until particle filter is functioning.
                                     #nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     #nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
@@ -120,7 +125,8 @@ def gameSet(player):
     if player.brain.play.isRole(GOALIE):
         player.brain.loc.resetLocTo(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,
                                     nogginConstants.MIDFIELD_Y,
-                                    nogginConstants.HEADING_RIGHT)
+                                    nogginConstants.HEADING_RIGHT,
+                                    Loc.LocNormalParams(15.0, 15.0, 1.0))
 
     return player.stay()
 
@@ -134,7 +140,12 @@ def gamePlaying(player):
             player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 25:
                 player.brain.loc.resetLocTo(nogginConstants.MIDFIELD_X, \
-                                            nogginConstants.GREEN_PAD_Y)
+                                            nogginConstants.GREEN_PAD_Y, \
+                                            90, \
+                                            nogginConstants.MIDFIELD_X, \
+                                            nogginConstants.GREEN_PAD_Y \
+                                            + nogginConstants.FIELD_WHITE_HEIGHT, \
+                                                Loc.LocNormalParams(15.0, 15.0, 1.0))
                 # 25 is arbitrary. This check is meant to catch human error and
                 # possible 0 sec. penalties for the goalie
                 # player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,

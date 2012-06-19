@@ -39,15 +39,15 @@ public:
     }
 
     void resetLocTo(float x, float y, float h,
-		    LocNormalParams params = DEFAULT_NORMAL_PARAMS)
+		    LocNormalParams params = LocNormalParams())
     {
         loc->resetLocTo(x, y, h * TO_RAD, params);
     }
 
     void resetLocTo(float x, float y, float h, 
 		    float x_, float y_, float h_,
-		    LocNormalParams params1 = DEFAULT_NORMAL_PARAMS,
-		    LocNormalParams params2 = DEFAULT_NORMAL_PARAMS)
+		    LocNormalParams params1 = LocNormalParams(),
+		    LocNormalParams params2 = LocNormalParams())
     {		    
         loc->resetLocTo(x, y, h * TO_RAD, 
 			x_, y_, h_ * TO_RAD,

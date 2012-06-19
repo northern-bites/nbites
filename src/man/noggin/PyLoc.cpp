@@ -12,6 +12,10 @@ using namespace boost;
 
 BOOST_PYTHON_MODULE(_localization)
 {
+    class_<LocNormalParams>("LocNormalParams",
+			    init<float, float, float>
+			    (args("sigma_x,sigma_y,sigma_h"),
+			     "Parameterizes a localization normal."));
     class_<PyLoc>("Loc")
         .add_property("x", &PyLoc::getXEst)
         .add_property("y", &PyLoc::getYEst)
