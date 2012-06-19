@@ -144,7 +144,7 @@ STAND_UP_FRONT = ( ((90,50,0,0),
                     (-50,8,-90,58,5,-31),
                     (-50,0,-90,58,5,31),
                     (0,0,90,8),
-                    100000.7,1, stiff.STANDUP_STIFFNESSES),
+                    0.7,1, stiff.STANDUP_STIFFNESSES),
                    #Push back onto feet
 
                    ((35,2,-14,-41),
