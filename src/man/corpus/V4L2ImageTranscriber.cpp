@@ -459,6 +459,8 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     control_s.id = id;
     control_s.value = value;
 
+    int counter = 0;
+
     // Have to make sure the setting "sticks"
     while(getControlSetting(id) != value)
     {
@@ -467,6 +469,12 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
             printf("CAMERA::Warning::Control setting failed.\n");
             return false;
         }
+	counter++;
+	if(counter > 10)
+	  {
+	    printf("CAMERA::Warning::Timeout while setting a parameter.\n");
+	    return false;
+	  }
     }
     return true;
 }
