@@ -62,6 +62,7 @@ public:
     void stopBodyMoves();
     void stopHeadMoves();
     void resetWalkProvider();
+    void resetWalkOdometry();
     void resetScriptedProvider();
     void sendFreezeCommand(const FreezeCommand::ptr command);
     void sendFreezeCommand(const UnfreezeCommand::ptr command);
