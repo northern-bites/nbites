@@ -126,6 +126,31 @@ class KickInformation:
                     elif self.brain.ygrp.vis.navyGoalieCertain:
                         self.nearGoalieNavy += 1
 
+    def hasEnoughInformation(self):
+        """
+        Can we stop panning and kick sooner?
+        Note: minimum sightings here must be greater than minimums
+              in calculateDataAverages method.
+        """
+        # If we've seen a pair of near posts with very good certainty, we can kick.
+        seenPostPair = ((len(nearGoalLeftPostBearings) > 10 and
+                        len(nearGoalRightPostBearings) > 10))
+
+        # If we've seen a single post, and heard that it's a dangerous ball.
+        nearPostAndDangerous = (self.dangerousBallCount > 5 and
+                                (len(nearGoalLeftPostBearings) > 10 or
+                                 len(nearGoalRightPostBearings) > 10 or
+                                 len(farGoalLeftPostBearings) > 10 or
+                                 len(farGoalRightPostBearings) > 10))
+
+        if DEBUG_KICK_DECISION:
+            if seenPostPair:
+                print "Already seen a pair of near posts: abort pan."
+            if nearPostAndDangerous:
+                print "Already seen a post, and heard dangerous ball: abort pan."
+
+        return (seenPostPair or nearPostAndDangerous)
+
     def calculateDataAverages(self):
         """
         calculates averages based on data collected
@@ -239,17 +264,14 @@ class KickInformation:
                 #choose straight kick!
                 kick = self.chooseQuickFrontKick()
                 kick.h = 0 - bearingDifference
-                return kick
             elif bearingDifference > 35 and bearingDifference < 125:
                 #choose a right side kick! (using right foot)
                 kick = kicks.RIGHT_SIDE_KICK
                 kick.h = 70 - bearingDifference
-                return kick
             elif bearingDifference < -35 and bearingDifference > -125:
                 #choose a left side kick! (using left foot)
                 kick = kicks.LEFT_SIDE_KICK
                 kick.h = -70 - bearingDifference
-                return kick
             else:
                 #choose a back kick!
                 kick = self.chooseBackKick()
@@ -257,7 +279,8 @@ class KickInformation:
                     kick.h = -180 - bearingDifference
                 else:
                     kick.h = 180 - bearingDifference
-                return kick
+
+            return kick
 
 
         # Loc is bad- use only visual information to choose a kick.

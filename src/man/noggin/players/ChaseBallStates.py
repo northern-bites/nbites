@@ -84,9 +84,11 @@ def prepareForKick(player):
 
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
-    #if player.brain.my.locScore == nogginConstants.locScore.GOOD_LOC or \
-    #        player.brain.tracker.isStopped():
-    if player.brain.tracker.isStopped():
+    #  Might have to do it anyway if comm is always down.
+
+    # If hackKickInfo has enough information already, prematurely end pan and kick.
+    if player.brain.tracker.isStopped() or \
+            prepareForKick.hackKick.hasEnoughInformation():
         prepareForKick.hackKick.calculateDataAverages()
         if hackKick.DEBUG_KICK_DECISION:
             print str(prepareForKick.hackKick)
