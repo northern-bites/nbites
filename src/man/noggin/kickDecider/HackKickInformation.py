@@ -6,6 +6,7 @@ import noggin_constants as nogginConstants
 import math
 
 DEBUG_KICK_DECISION = False
+USE_LOC = False
 
 class KickInformation:
     """
@@ -246,11 +247,11 @@ class KickInformation:
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # Need to use aimCenter in decision.
-        # Loc is currently never accurate enough @summer 2012
-        if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
+        if USE_LOC: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
             if DEBUG_KICK_DECISION:
-                print "loc Score is good. Using it to decide kick."
+                #print "loc Score is good. Using it to decide kick."
+                print "Flag is set: using loc for decision."
 
             relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,nogginConstants.CENTER_FIELD_Y))
             bearingBallToGoal = relLocationBallToGoal.bearing
@@ -280,6 +281,8 @@ class KickInformation:
                 else:
                     kick.h = 180 - bearingDifference
 
+            # Make sure heading is an int before passing it to the orbit.
+            kick.h = int(kick.h)
             return kick
 
 
