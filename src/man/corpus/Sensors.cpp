@@ -353,7 +353,7 @@ const float Sensors::getUltraSoundRight_cm() const {
 const SupportFoot Sensors::getSupportFoot() const {
     support_foot_mutex.lock();
 
-    SupportFoot foot = supportFoot;
+    SupportFoot foot = supportFootHistory.back();
 
     support_foot_mutex.unlock();
 
@@ -560,7 +560,11 @@ void Sensors::setUltraSound(const float distLeft, const float distRight) {
 void Sensors::setSupportFoot(const SupportFoot _supportFoot) {
     support_foot_mutex.lock();
 
-    supportFoot = _supportFoot;
+    supportFootHistory.push_back(_supportFoot);
+
+    if (supportFootHistory.size() > 10) {
+        supportFootHistory.pop_front();
+    }
 
     support_foot_mutex.unlock();
 }
@@ -639,6 +643,9 @@ void Sensors::releaseImage() const {
  * think anyone else requires both mutexes locked at the same time. Beware
  * nonetheless.
  */
+//TODO: (octavian) rename this and clean up the history part
+// We keep a history of the past 10 angles to get the joints to sync
+// up to vision properly
 void Sensors::updateVisionAngles(int historyIndex) {
     angles_mutex.lock();
     vision_angles_mutex.lock();
@@ -646,12 +653,14 @@ void Sensors::updateVisionAngles(int historyIndex) {
     int i = 0;
 
     AngleHistory::reverse_iterator it =  bodyAngleHistory.rbegin();
+    SupportFootHistory::reverse_iterator foot_it = supportFootHistory.rbegin();
 
     //look back in history historyIndex number of joint sets
     while (it != bodyAngleHistory.rend() && i != historyIndex) {
-        it++; i++;
+        it++; i++; foot_it++;
     }
     visionBodyAngles = *it;
+    visionSupportFoot = *foot_it;
 
     vision_angles_mutex.unlock();
     angles_mutex.unlock();

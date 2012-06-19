@@ -4,11 +4,12 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include "CoordFrame.h" //for rotation4D, etc
 #include "NBMatrixMath.h" // for ufmatrix4
-#include "nameconfig.h" //for robot name
 
 using namespace NBMath;
 
-class CameraCalibrate{
+namespace Kinematics {
+
+class CameraCalibrate {
 
 public:
     enum Angle {
@@ -24,6 +25,7 @@ public:
     static void UpdateWithParams(float params[]);
 
     };
+}
 
 
 #endif

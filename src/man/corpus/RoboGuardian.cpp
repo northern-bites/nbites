@@ -480,8 +480,7 @@ void RoboGuardian::executeShutdownAction()const {
 //TODO: cache this - it's unlikely to change while we're running the code
 string RoboGuardian::getHostName()const {
     char name[40];
-    name[0] ='\0';
-    gethostname(name,39);
+    gethostname(name, 40);
     return string(name);
 }
 

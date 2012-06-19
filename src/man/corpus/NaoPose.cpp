@@ -116,7 +116,7 @@ void NaoPose::transform(bool _isTopCam) {
     //   * ask the walk engine for the support leg. (doesnt work in cortex)
     //   * ask the gyros/accelerometers for which way is down (doesnt work yet)
     //if (lLegDistance > rLegDistance) {
-    if (sensors->getSupportFoot() == LEFT_SUPPORT) {
+    if (sensors->getVisionSupportFoot() == LEFT_SUPPORT) {
         supportLegToBodyTransform = calculateForwardTransform(LLEG_CHAIN,
                                                               lLegAngles);
     } else {
