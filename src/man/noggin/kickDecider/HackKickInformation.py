@@ -221,7 +221,6 @@ class KickInformation:
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # Need to use aimCenter in decision.
-        # Adjust to use ~70 degrees for side kick path.
         # Loc is currently never accurate enough @summer 2012
         if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
@@ -236,25 +235,28 @@ class KickInformation:
 
             bearingDifference = bearingBallToGoal - bearingMeToBall
 
-            if bearingDifference < 45 and bearingDifference > -45:
+            if bearingDifference < 35 and bearingDifference > -35:
                 #choose straight kick!
                 kick = self.chooseQuickFrontKick()
                 kick.h = 0 - bearingDifference
                 return kick
-            elif bearingDifference > 45 and bearingDifference < 135:
+            elif bearingDifference > 35 and bearingDifference < 125:
                 #choose a right side kick! (using right foot)
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.h = 90 - bearingDifference
+                kick.h = 70 - bearingDifference
                 return kick
-            elif bearingDifference < -45 and bearingDifference > -135:
+            elif bearingDifference < -35 and bearingDifference > -125:
                 #choose a left side kick! (using left foot)
                 kick = kicks.LEFT_SIDE_KICK
-                kick.h = -90 - bearingDifference
+                kick.h = -70 - bearingDifference
                 return kick
             else:
                 #choose a back kick!
                 kick = self.chooseBackKick()
-                kick.h = 1 #HACK
+                if bearingDifference < -125:
+                    kick.h = -180 - bearingDifference
+                else:
+                    kick.h = 180 - bearingDifference
                 return kick
 
 
