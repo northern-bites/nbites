@@ -55,9 +55,9 @@ def penalizeHeads(tracker):
     '''Penalizes the heads.'''
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.helper.exectueHeadMove(HeadMoves.PENALIZED_HEADS)
+        tracker.helper.executeHeadMove(HeadMoves.PENALIZED_HEADS)
 
-    if not tracker.brain.motion.isHeadAcitve():
+    if not tracker.brain.motion.isHeadActive():
         return tracker.goLater('stopped')
 
     return tracker.stay()
