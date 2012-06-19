@@ -145,25 +145,38 @@ void Threshold::visionLoop() {
 			orange->createBall(pose->getHorizonY(0));
 		}
 	}
-    bool ylp = vision->yglp->getWidth() > 0;
-    bool yrp = vision->ygrp->getWidth() > 0;
+	bool left = vision->yglp->getWidth() > 0;
+	bool right = vision->ygrp->getWidth() > 0;
+    bool ylp = left &&
+		(vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+		 vision->yglp->getRightBottomY() > IMAGE_HEIGHT - 5);
+    bool yrp = right &&
+		(vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+		 vision->ygrp->getRightBottomY() > IMAGE_HEIGHT - 5);
 
-	if ((ylp && vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5) ||
-		(yrp && vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5)) {
+	if ((ylp || yrp) && !(left && right)) {
 		usingTopCamera = false;
 
 		pose->transform(usingTopCamera);
 		yellow->init(pose->getHorizonSlope());
-		vision->yglp->init();
-		vision->ygrp->init();
-		vision->yglp->setTopCam(usingTopCamera);
-		vision->ygrp->setTopCam(usingTopCamera);
+		if (ylp) {
+			vision->yglp->init();
+			vision->yglp->setTopCam(usingTopCamera);
+		}
+		if (yrp) {
+			vision->ygrp->init();
+			vision->ygrp->setTopCam(usingTopCamera);
+		}
 		for (int i = 0; i < IMAGE_WIDTH; i++) {
 			findPostsInLowerCamera(i);
 		}
 		yellow->createObject();
-		setFieldObjectInfo(vision->yglp);
-		setFieldObjectInfo(vision->ygrp);
+		if (ylp) {
+			setFieldObjectInfo(vision->yglp);
+		}
+		if (yrp) {
+			setFieldObjectInfo(vision->ygrp);
+		}
 
 	}
 }
@@ -1367,6 +1380,8 @@ void Threshold::initObjects(void) {
     // yellow goal objs
     vision->ygrp->init();
     vision->yglp->init();
+	vision->ygrp->setTopCam(usingTopCamera);
+	vision->yglp->setTopCam(usingTopCamera);
     vision->ygCrossbar->init();
 
     // robots
