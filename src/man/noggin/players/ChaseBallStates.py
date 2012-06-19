@@ -11,6 +11,7 @@ import man.noggin.kickDecider.HackKickInformation as hackKick
 import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation
 from math import fabs
+import noggin_constants as nogginConstants
 
 def chase(player):
     """
@@ -38,7 +39,7 @@ def spinToBall(player):
     else:
         spinDir = player.brain.my.spinDirToPoint(player.brain.ball.loc)
         if fabs(player.brain.ball.loc.bearing) > constants.CHANGE_SPEED_THRESH:
-            speed = Navigator.CAREFUL_SPEED
+            speed = Navigator.GRADUAL_SPEED
         else:
             speed = Navigator.SLOW_SPEED
         player.setWalk(0,0,spinDir*speed)
@@ -47,7 +48,10 @@ def spinToBall(player):
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.chaseBall()
+        if player.shouldKickOff:
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED)
+        else:
+            player.brain.nav.chaseBall()
 
     if (transitions.shouldFindBall(player) or
         transitions.shouldSpinToBall(player)):
@@ -55,6 +59,7 @@ def approachBall(player):
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+        player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.loc.relY > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -70,31 +75,69 @@ def approachBall(player):
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
-        player.brain.tracker.performWidePanFixedPitch()
+        player.orbitDistance = player.brain.ball.loc.dist
+        player.brain.tracker.performKickPanFixedPitch()
         player.brain.nav.stand()
         return player.stay()
 
     prepareForKick.hackKick.collectData()
 
+    #TODO: if we see the bal far away, stop and go get it.
+
+    # If loc is good, stop pan ASAP and do the kick
+    # Loc is currently never accurate enough @summer 2012
+    #if player.brain.my.locScore == nogginConstants.locScore.GOOD_LOC or \
+    #        player.brain.tracker.isStopped():
     if player.brain.tracker.isStopped():
         prepareForKick.hackKick.calculateDataAverages()
-        print str(prepareForKick.hackKick)
+        if hackKick.DEBUG_KICK_DECISION:
+            print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
-        print str(player.kick)
-        return player.goNow('positionForKick')
+        if hackKick.DEBUG_KICK_DECISION:
+            print str(player.kick)
+        return player.goNow('orbitBall')
 
     return player.stay()
 
+def orbitBall(player):
+    """
+    State to orbit the ball
+    """
+    if player.firstFrame():
+
+        if hackKick.DEBUG_KICK_DECISION:
+            print "Orbiting at angle: ",player.kick.h
+
+        if player.kick.h == 0:
+            return player.goNow('positionForKick')
+
+        # Reset from pre-kick pan to straight, then track the ball.
+        player.brain.tracker.lookStraightThenTrackFixedPitch()
+        player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
+
+    elif player.brain.nav.isStopped():
+        player.shouldOrbit = False
+        player.kick.h = 0
+        if player.kick == kicks.ORBIT_KICK_POSITION:
+            return player.goNow('prepareForKick')
+        else:
+            player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+            return player.goNow('positionForKick')
+
+    if (transitions.shouldFindBallKick(player) or
+        transitions.shouldCancelOrbit(player)):
+        player.inKickingState = False
+        return player.goLater('chase')
+
+    return player.stay()
 
 def positionForKick(player):
     """
     Get the ball in the sweet spot
     """
-    if player.penaltyKicking and player.brain.ball.loc.inOppGoalBox():
-        return player.goNow('penaltyBallInOppGoalbox')
-
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
+        player.inKickingState = False
         return player.goLater('chase')
 
     ballLoc = player.brain.ball.loc
@@ -105,28 +148,23 @@ def positionForKick(player):
 
     #only enque the new goTo destination once
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
-        player.inKickingState = False
+        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
+        player.brain.tracker.lookStraightThenTrackFixedPitch()
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.CAREFUL_SPEED,
+                              Navigator.GRADUAL_SPEED,
                               Navigator.ADAPTIVE)
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
 
-    # most of the time going to chase will kick back to here, lets us reset
     if transitions.shouldFindBallKick(player) and player.counter > 15:
         player.inKickingState = False
-        return player.goNow('findBall')
+        return player.goLater('chase')
 
-    #if transitions.shouldKick(player):
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
-#        if transitions.shouldOrbit(player):
-#            return player.goNow('lookAround')
-#        else:
         player.brain.nav.stand()
-        return player.goLater('kickBallExecute')
+        return player.goNow('kickBallExecute')
 
     return player.stay()
 
@@ -151,21 +189,6 @@ def lookAround(player):
                 return player.goNow('orbitBall')
             else:
                 return player.goLater('chase')
-
-    return player.stay()
-
-def orbitBall(player):
-    """
-    State to orbit the ball
-    """
-    if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
-        player.brain.nav.orbitAngle(10, 90) # TODO HACK HACK
-
-    if transitions.shouldFindBall(player) or player.brain.nav.isStopped():
-        player.inKickingState = False
-        player.shouldOrbit = False
-        return player.goLater('lookAround')
 
     return player.stay()
 

@@ -148,6 +148,11 @@ void MotionSwitchboard::run() {
     cout << "Switchboard run has exited" <<endl;
 }
 
+void MotionSwitchboard::resetOdometry()
+{
+    walkProvider.resetOdometry();
+}
+
 void MotionSwitchboard::preProcess()
 {
     pthread_mutex_lock(&next_provider_mutex);

@@ -58,8 +58,11 @@ def setDestination(nav, dest, gain = 1.0):
     nav.brain.motion.sendDestCommand(nav.currentCommand)
 
 def setOdometryDestination(nav, dest, gain = 1.0):
-    nav.currentCommand = \
-        motion.StepCommand(x = dest.relX, y = dest.relY, theta = dest.relH, gain = gain)
+    nav.currentCommand = motion.StepCommand(x = dest.relX,
+                                            y = dest.relY,
+                                            theta = dest.relH,
+                                            gain = gain)
+
     nav.brain.motion.sendStepCommand(nav.currentCommand)
 
 #not used!

@@ -345,6 +345,10 @@ public:
         motionInterface->enqueue(command->getCommand());
     }
 
+    void resetWalkOdometry() {
+        motionInterface->resetWalkOdometry();
+    }
+
     void setNextWalkCommand(const PyWalkCommand *command) {
         motionInterface->setNextWalkCommand(command->getCommand());
     }
