@@ -267,7 +267,7 @@ STAND_UP_BACK_OLD = (((100,0,0,0),
                  )
 
 
-#new robots (i.e. Firefly generation)
+#new robots (i.e. Firefly class)
 STAND_UP_BACK = (((100,0,0,0),
                   (0,0,0,0,0,0),
                   (0,0,0,0,0,0),
