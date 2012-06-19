@@ -30,6 +30,8 @@ public:
     virtual void blueGoalieReset() = 0;
     virtual void redGoalieReset() = 0;
     virtual void resetLocTo(float x, float y, float h) = 0;
+    virtual void resetLocTo(float x, float y, float h, float x_, float y_, float h_) = 0;
+
 
     // Getters
     virtual PoseEst getCurrentEstimate() const    = 0;

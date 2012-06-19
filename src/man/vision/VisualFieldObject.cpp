@@ -56,22 +56,22 @@ void VisualFieldObject::init(){
     case BLUE_GOAL_LEFT_POST:
         fieldLocation = BLUE_GOAL_TOP_POST_LOC;
         fieldLocation2 = BLUE_GOAL_BOTTOM_POST_LOC;
-        setPossibleFieldObjects(&ConcreteFieldObject::blueGoalPosts);
+        setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
         break;
     case BLUE_GOAL_RIGHT_POST:
         fieldLocation = BLUE_GOAL_BOTTOM_POST_LOC;
         fieldLocation2 = BLUE_GOAL_TOP_POST_LOC;
-        setPossibleFieldObjects(&ConcreteFieldObject::blueGoalPosts);
+        setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
         break;
     case YELLOW_GOAL_LEFT_POST:
         fieldLocation = YELLOW_GOAL_BOTTOM_POST_LOC;
         fieldLocation2 = YELLOW_GOAL_TOP_POST_LOC;
-        setPossibleFieldObjects(&ConcreteFieldObject::yellowGoalPosts);
+        setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
         break;
     case YELLOW_GOAL_RIGHT_POST:
         fieldLocation = YELLOW_GOAL_TOP_POST_LOC;
         fieldLocation2 = YELLOW_GOAL_BOTTOM_POST_LOC;
-        setPossibleFieldObjects(&ConcreteFieldObject::yellowGoalPosts);
+        setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
         break;
     case UNKNOWN_FIELD_OBJECT:
         fieldLocation = UNKNOWN_LOC;
@@ -115,7 +115,7 @@ void VisualFieldObject::setDistanceWithSD(float _distance)
  *
  * @param _bearing the distance estimate to be set
  */
-void VisualFieldObject::setBearingWithSD(float _bearing)
+void VisualFieldObject::setBearingWithSD(float _bearing, float _distance)
 {
     setBearing(_bearing);
     // Calculate the SD based on the object type
@@ -124,10 +124,7 @@ void VisualFieldObject::setBearingWithSD(float _bearing)
     case BLUE_GOAL_RIGHT_POST:
     case YELLOW_GOAL_LEFT_POST:
     case YELLOW_GOAL_RIGHT_POST:
-        setBearingSD(postBearingToSD(_bearing));
-        break;
-    default:
-        setDistanceSD(postBearingToSD(_bearing));
+        setBearingSD(postBearingToSD(_distance));
         break;
     }
 }
@@ -148,12 +145,12 @@ void VisualFieldObject::setIDCertainty(certainty _cert)
         case BLUE_GOAL_LEFT_POST:
         case BLUE_GOAL_RIGHT_POST:
         case BLUE_GOAL_POST:
-            setPossibleFieldObjects(&ConcreteFieldObject::blueGoalPosts);
+            setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
             break;
         case YELLOW_GOAL_LEFT_POST:
         case YELLOW_GOAL_RIGHT_POST:
         case YELLOW_GOAL_POST:
-            setPossibleFieldObjects(&ConcreteFieldObject::yellowGoalPosts);
+            setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
             break;
         default:
             // We don't actually care about the possible field objects
@@ -162,24 +159,22 @@ void VisualFieldObject::setIDCertainty(certainty _cert)
     } else { // We know what the field object is
         switch(getID()) {
         case BLUE_GOAL_LEFT_POST:
-            setPossibleFieldObjects(&ConcreteFieldObject::blueGoalLeftPostList);
+            setPossibleFieldObjects(&ConcreteFieldObject::leftPosts);
             break;
         case BLUE_GOAL_RIGHT_POST:
-            setPossibleFieldObjects(&ConcreteFieldObject::blueGoalRightPostList);
+            setPossibleFieldObjects(&ConcreteFieldObject::rightPosts);
             break;
         case BLUE_GOAL_POST: // This should probably never be reached
-            setPossibleFieldObjects(&ConcreteFieldObject::blueGoalPosts);
+            setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
             break;
         case YELLOW_GOAL_LEFT_POST:
-            setPossibleFieldObjects(
-                &ConcreteFieldObject::yellowGoalLeftPostList);
+            setPossibleFieldObjects(&ConcreteFieldObject::leftPosts);
             break;
         case YELLOW_GOAL_RIGHT_POST:
-            setPossibleFieldObjects(
-                &ConcreteFieldObject::yellowGoalRightPostList);
+            setPossibleFieldObjects(&ConcreteFieldObject::rightPosts);
             break;
         case YELLOW_GOAL_POST: // This should probably never be reached
-            setPossibleFieldObjects(&ConcreteFieldObject::yellowGoalPosts);
+            setPossibleFieldObjects(&ConcreteFieldObject::allPosts);
             break;
         default:
             // We don't actually care about the possible field objects
@@ -215,5 +210,5 @@ void VisualFieldObject::updateObject(Blob * b, certainty _certainty,
 
 const bool VisualFieldObject::hasPositiveID()
 {
-	return possibleFieldObjects->size() == 1;
+	return possibleFieldObjects->size() == 2 || possibleFieldObjects->size() == 1;
 }

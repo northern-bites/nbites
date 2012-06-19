@@ -77,7 +77,7 @@ public:
     // setting the distance; should be used whenever a legitimate distance
     // measurement is set
 
-	virtual const bool hasPositiveID() = 0;
+    virtual const bool hasPositiveID() = 0;
 };
 
 

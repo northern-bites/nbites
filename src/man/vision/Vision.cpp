@@ -66,12 +66,13 @@ Vision::Vision(boost::shared_ptr<NaoPose> _pose,
     ball = new VisualBall();
     red1 = new VisualRobot();
     red2 = new VisualRobot();
-	red3 = new VisualRobot();
+    red3 = new VisualRobot();
     navy1 = new VisualRobot();
     navy2 = new VisualRobot();
-	navy3 = new VisualRobot();
-	cross = new VisualCross();
-	fieldEdge = new VisualFieldEdge();
+    navy3 = new VisualRobot();
+    cross = new VisualCross();
+    fieldEdge = new VisualFieldEdge();
+    obstacles = new VisualObstacle();
 
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
@@ -149,13 +150,6 @@ void Vision::notifyImage() {
     // counts the frameNumber
     if (frameNumber > 1000000) frameNumber = 0;
 
-    // Transform joints into pose estimations and horizon line
-    // PROF_ENTER(P_TRANSFORM);
-    // pose->transform();
-    // PROF_EXIT(P_TRANSFORM);
-
-    //the above is commented to try cool shit
-
 //    linesDetector->detect(thresh->getVisionHorizon(),
 //                         thresh->field->getTopEdge(),
 //                         yImg);
@@ -165,7 +159,12 @@ void Vision::notifyImage() {
 //                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
+    
+    // - from Bende - I am going to try doing some obstacle avoidance stuff.
+    // - so there will be no visionLoop. Hopefully nothing breaks.
+    
     thresh->visionLoop();
+    thresh->obstacleLoop();
 
 //    drawEdges(*linesDetector->getEdges());
 //    drawHoughLines(linesDetector->getHoughLines());
@@ -388,6 +387,7 @@ void Vision::updateMVision(man::memory::MVision::ptr mVision) const {
         visual_corner->set_secondary_shape(i->getSecondaryShape());
         visual_corner->set_angle_between_lines(i->getAngleBetweenLines());
         visual_corner->set_orientation(i->getOrientation());
+        visual_corner->set_physical_orientation(i->getPhysicalOrientation());
     }
 }
 

@@ -161,7 +161,7 @@ private:
       ASSERT(out);
       for(int i = 0; i < JointData::numOfJoints; ++i)
         angles[i] = jointData->angles[i] == JointData::off ? JointData::off
-                    : floor(toDegrees(jointData->angles[i]) * 10.0f + 0.5f) / 10.0f;
+                    : floorf(toDegrees(jointData->angles[i]) * 10.0f + 0.5f) / 10.0f;
       timeStamp = jointData->timeStamp;
 
       STREAM(angles);

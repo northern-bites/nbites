@@ -36,6 +36,10 @@ RemoteDataFinder::RemoteDataFinder(DataManager::ptr dataManager, QWidget* parent
     connect(&robotSelect, SIGNAL(robotSelected(const RemoteRobot*)),
             this, SLOT(robotSelected(const RemoteRobot*)));
 
+    QPushButton* disconnect = new QPushButton("Disconnect", this);
+    layout->addWidget(disconnect);
+    connect(disconnect, SIGNAL(clicked()), this, SLOT(disconnect()));
+
     for (int i = 0; i < numStreamableObjects; i++) {
 
         QCheckBox* checkBox = new QCheckBox(QString(streamableObjects[i].c_str()), this);
@@ -46,6 +50,11 @@ RemoteDataFinder::RemoteDataFinder(DataManager::ptr dataManager, QWidget* parent
     }
 
     this->setLayout(layout);
+}
+
+void RemoteDataFinder::disconnect() {
+
+    dataManager->reset();
 }
 
 void RemoteDataFinder::robotSelected(const RemoteRobot* remoteRobot) {

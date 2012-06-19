@@ -23,6 +23,56 @@ def atDestination(nav):
     else:
         return relDest.within((x, y, h))
 
+def shouldDodgeLeft(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
+
+    # check sonars
+    sonars = (nav.brain.sonar.rightDist != nav.brain.sonar.UNKNOWN_VALUE and
+              nav.brain.sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST)
+    #check vision
+    vision = nav.brain.vision.obstacles.onRight
+
+    #check feet
+    feet = (nav.brain.sensors.rightFootBumper.left or
+            nav.brain.sensors.rightFootBumper.right)
+
+    if (feet and vision):
+        return True
+    elif (vision and sonars):
+        return True
+    elif (sonars and feet):
+        return True
+
+    else:
+        return False
+
+def shouldDodgeRight(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
+
+    # check sonars
+    sonars = (nav.brain.sonar.leftDist != nav.brain.sonar.UNKNOWN_VALUE and
+              nav.brain.sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST)
+    #check vision
+    vision = nav.brain.vision.obstacles.onLeft
+
+    #check feet
+    feet = (nav.brain.sensors.leftFootBumper.left or
+            nav.brain.sensors.leftFootBumper.right)
+
+    if (feet and vision):
+        return True
+    elif (vision and sonars):
+        return True
+    elif (sonars and feet):
+        return True
+
+    else:
+        return False
+
+def doneDodging(nav):
+    return nav.brain.motion.isStanding()
 
 def notAtLocPosition(nav):
     return not atDestination(nav)
@@ -79,51 +129,3 @@ def shouldChaseAroundBox(my, ball):
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y) )
 
-####### AVOIDANCE STUFF ##############
-
-def shouldAvoidObstacleLeft(nav):
-    """
-    Need to avoid an obstacle on our left side
-    """
-    sonar = nav.brain.sonar
-    if (sonar.leftDist != sonar.UNKNOWN_VALUE and
-        sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST):
-        nav.shouldAvoidObstacleLeftCounter += 1
-    else :
-        nav.shouldAvoidObstacleLeftCounter = 0
-
-    if nav.shouldAvoidObstacleLeftCounter > \
-            constants.AVOID_OBSTACLE_FRAMES_THRESH:
-        return True
-    return False
-
-def shouldAvoidObstacleRight(nav):
-    """
-    Need to avoid an obstacle on our right side
-    """
-    sonar = nav.brain.sonar
-    if (sonar.rightDist != sonar.UNKNOWN_VALUE and
-        sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST):
-         nav.shouldAvoidObstacleRightCounter += 1
-    else :
-        nav.shouldAvoidObstacleRightCounter = 0
-
-    if nav.shouldAvoidObstacleRightCounter > \
-            constants.AVOID_OBSTACLE_FRAMES_THRESH:
-        return True
-
-    return False
-
-def shouldAvoidObstacle(nav):
-    """
-    Should avoid an obstacle
-    """
-    # don't dodge an object in front when we're not going forward
-    # @todo: this is terrible since we're not always in walk mode (we're
-    # mostly in goTo modes)
-    if states.walking.speeds[0] < 0:
-        return False
-
-    return ((shouldAvoidObstacleLeft(nav) or
-             shouldAvoidObstacleRight(nav)) and
-            not nav.brain.player.penaltyKicking)

@@ -34,6 +34,14 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("framesOff", &VisualBall::getFramesOff)
         ;
 
+    class_<VisualCross, boost::shared_ptr<VisualCross> >("Cross", no_init)
+        .def_readonly("dist", &VisualCross::getDistance)
+        .def_readonly("bearing", &VisualCross::getBearingDeg)
+        .def_readonly("on", &VisualCross::isOn)
+        .def_readonly("framesOn", &VisualCross::getFramesOn)
+        .def_readonly("framesOff", &VisualCross::getFramesOff)
+        ;
+
     class_<VisualFieldObject, boost::shared_ptr<VisualFieldObject> >
         ("FieldObject", no_init)
         // From VisualDetection
@@ -48,6 +56,8 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("on", &VisualFieldObject::isOn)
         .def_readonly("framesOn", &VisualFieldObject::getFramesOn)
         .def_readonly("framesOff", &VisualFieldObject::getFramesOff)
+		.def_readonly("redGoalieCertain", &VisualFieldObject::getRedGoalieCertain)
+		.def_readonly("navyGoalieCertain", &VisualFieldObject::getNavyGoalieCertain)
         ;
 
     // From VisualLandmark.h, ID certainty possibilities
@@ -90,6 +100,7 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("cornerX", &VisualRobot::getX)
         .def_readonly("cornerY", &VisualRobot::getY)
         .def_readonly("elevation", &VisualRobot::getElevationDeg)
+        .def_readonly("on", &VisualRobot::isOn)
         ;
 
     // Currently unused, but fully avaliable to python if uncommented
@@ -105,6 +116,12 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("leftOpening", &VisualCrossbar::getLeftOpening)
         .def_readonly("rightOpening", &VisualCrossbar::getRightOpening)
         ;
+
+    class_<VisualObstacle>("Obstacle", no_init)
+      .def_readonly("onLeft", &VisualObstacle::onLeft)
+      .def_readonly("onRight", &VisualObstacle::onRight)
+      .def_readonly("offField", &VisualObstacle::offField)
+      ;
 
     //FieldLines: holds corner and line information
     class_<FieldLines, boost::shared_ptr<FieldLines> >("FieldLines", no_init)
@@ -179,6 +196,13 @@ BOOST_PYTHON_MODULE(vision)
         .def_readonly("possibilities", &VisualCorner::getIDs)
         .def_readonly("angleX", &VisualCorner::getAngleXDeg)
         .def_readonly("angleY", &VisualCorner::getAngleYDeg)
+        .def_readonly("visualOrientation", &VisualCorner::getOrientation)
+        .def("getRobotGlobalHeadingIfFieldAngleIs",
+             &VisualCorner::getRobotGlobalHeadingIfFieldAngleIs)
+        .def("getRobotRelXIfFieldAngleIs",
+             &VisualCorner::getRobotRelXIfFieldAngleIs)
+        .def("getRobotRelYIfFieldAngleIs",
+             &VisualCorner::getRobotRelYIfFieldAngleIs)
         ;
 
     // VisualCorner can return a vector of IDs from ConcreteCorner
@@ -262,6 +286,10 @@ BOOST_PYTHON_MODULE(vision)
                                           <reference_existing_object>()))
         .add_property("navy3", make_getter(&Vision::navy3, return_value_policy
                                           <reference_existing_object>()))
+        .add_property("cross", make_getter(&Vision::cross, return_value_policy
+                                           <reference_existing_object>()))
+        .add_property("obstacles", make_getter(&Vision::obstacles, return_value_policy
+					     <reference_existing_object>()))
 
         /* Crossbars: not used right now
            .add_property("ygCrossbar", make_getter(&Vision::ygCrossbar,
@@ -287,9 +315,3 @@ void c_init_vision() {
 void set_vision_pointer (boost::shared_ptr<Vision> visionptr) {
     vision_pointer = visionptr;
 }
-
-
-
-
-
-

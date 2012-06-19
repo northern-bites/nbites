@@ -39,8 +39,8 @@ namespace qtool
       void updateEstimates(float x, float y, float h);
 
     protected:
-      void drawParticle(PF::LocalizationParticle particle, QPixmap& bitmap);
-      void drawEstimate(QPixmap& bitmap);
+      void drawParticle(PF::LocalizationParticle particle, QImage& bitmap);
+      void drawEstimate(QImage& bitmap);
 
       virtual void buildBitmap();
 

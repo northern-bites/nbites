@@ -114,6 +114,7 @@ void VisualInfoImage::drawBall(const PVision::PVisualBall ballData) {
     }
 }
 
+
 void VisualInfoImage::drawCorner(const PVision::PVisualCorner cornerData) {
     QPainter painter(&bitmap);
     //    painter.setBackgroundMode(Qt::TransparentMode);
@@ -221,7 +222,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
       QPoint (right_bottom_x, right_bottom_y),
       QPoint (right_top_x, right_top_y)
     };
-    
+
     painter.setPen(QPen(QColor(0,0,0,200), 3, Qt::SolidLine, Qt::FlatCap));
     painter.setBrush(QBrush(QColor(200,0,0,80),Qt::SolidPattern));
     painter.drawConvexPolygon(points, 4);
@@ -236,7 +237,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     int start_y = 2*lineData.start_y();
     int end_x = 2*lineData.end_x();
     int end_y = 2*lineData.end_y();
-    
+
     painter.setPen(QPen(Qt::blue, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(start_x, start_y, end_x, end_y);
   }
@@ -258,7 +259,7 @@ void VisualInfoImage::drawGoalPost(const PVision::PVisualFieldObject postData) {
     painter.setPen(QPen(Qt::cyan, 3, Qt::SolidLine, Qt::FlatCap));
     painter.drawLine(left_top_x, left_top_y, right_bottom_x, right_bottom_y);
     painter.drawLine(right_top_x, right_top_y, left_bottom_x, left_bottom_y);
-    
+
 
   }
 }

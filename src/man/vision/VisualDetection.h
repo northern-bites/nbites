@@ -39,7 +39,9 @@ public:
     void setDistanceSD(float _distSD) { distanceSD = _distSD;}
     void setBearingSD(float _bearingSD) { bearingSD = _bearingSD;}
     virtual void setDistanceWithSD(float _distance) = 0;
-    virtual void setBearingWithSD(float _bearing) = 0;
+    //TODO: I'm commenting this out because I modified the method arguments
+    //Mexico 2012 - Octavian
+//    virtual void setBearingWithSD(float _bearing) = 0;
 
     void setOn(bool _on){ on = _on; }
     void setTopCam(bool _inTopCam){ inTopCam = _inTopCam; }
