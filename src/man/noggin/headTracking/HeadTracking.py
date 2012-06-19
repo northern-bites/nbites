@@ -54,6 +54,10 @@ class HeadTracking(FSA.FSA):
         """Executes sweet move to move head to neutral position, then stops."""
         self.switchTo('neutralHead')
 
+    def penalizeHeads(self):
+        """Penalizes the heads."""
+        self.switchTo('penalizeHeads')
+
     def performHeadMove(self, headMove):
         """Executes the given headMove, then stops."""
         if headMove != self.headMove or self.currentState != 'doHeadMove':
