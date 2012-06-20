@@ -385,7 +385,7 @@ class KickInformation:
             print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
 
         if rightScorePoint > 70:
-                # Quadrent 2
+                # Quadrant 2
             if (180 - leftScorePoint) - (rightScorePoint - 70) < 0:
                     #Closer to the leftScorePoint
                 kick = self.chooseBackKick()
@@ -400,7 +400,7 @@ class KickInformation:
                 else:
                     kick.h = 70 - rightScorePoint
         elif rightScorePoint > 0:
-            # Quadrent 1
+            # Quadrant 1
             if (70 - leftScorePoint) - (rightScorePoint - 0) < 0:
                 kick = kicks.RIGHT_SIDE_KICK
                 if self.aimCenter:
@@ -414,7 +414,7 @@ class KickInformation:
                 else:
                     kick.h = 0 - rightScorePoint
         elif rightScorePoint > -70:
-            # Quadrent 4
+            # Quadrant 4
             if (0 - leftScorePoint) - (rightScorePoint + 70) < 0:
                 kick = self.chooseQuickFrontKick()
                 if self.aimCenter:
@@ -428,7 +428,7 @@ class KickInformation:
                 else:
                     kick.h = -70 - rightScorePoint
         else:
-            # Quadrent 3
+            # Quadrant 3
             if (-70 - leftScorePoint) - (rightScorePoint + 180) < 0:
                 kick = kicks.LEFT_SIDE_KICK
                 if self.aimCenter:
@@ -615,6 +615,26 @@ class KickInformation:
         else:
             # If the case was missed, just return the original kick.
             return kick
+
+    def shouldKickPanRight(self):
+        """
+        Decide whether to pan left or right first for kick decision.
+        """
+        heading = self.brain.loc.h
+        xPosition = self.brain.loc.x
+
+        if xPosition < 370:
+            # Blue half of field.
+            if heading > 0:
+                return False
+            else:
+                return True
+        else:
+            # Yellow half of field.
+            if heading > 0:
+                return True
+            else:
+                return False
 
     def __str__(self):
         s = ""

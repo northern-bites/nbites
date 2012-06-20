@@ -95,8 +95,8 @@ class HeadTracking(FSA.FSA):
     def performWidePanFixedPitch(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
 
-    def performKickPanFixedPitch(self):
-        self.performHeadMove(HeadMoves.FIXED_PITCH_KICK_PAN)
+    def performKickPanFixedPitch(self, invert = False):
+        self.performHeadMove(self.helper.convertKickPan(HeadMoves.FIXED_PITCH_KICK_PAN, invert))
 
     def trackBallFixedPitch(self):
         """
