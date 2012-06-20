@@ -136,7 +136,8 @@ def onRightSideline(player):
              player.brain.vision.yglp.dist > 400.0))
 
 def shouldGetReadyToSave(player):
-   return player.brain.ball.vis.heat > 5.0
+    print "I got a heat value of " + str(player.brain.ball.vis.heat)
+    return player.brain.ball.vis.heat > 10.0
 
 def noSave(player):
    return player.counter > 90
@@ -150,7 +151,7 @@ def shouldPerformSave(player):
                 player.brain.ball.loc.relVelX < -50.0)
 
     return (player.brain.ball.loc.relVelX < -50.0 and
-            player.brain.ball.vis.on)
+            player.brain.ball.vis.framesOn > 4)
 
 def facingSideways(player):
     """

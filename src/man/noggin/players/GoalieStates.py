@@ -172,11 +172,11 @@ def upUpUP(player):
 
     if player.motion.isBodyActive():
         return player.stay()
-    elif player.upDelay < 60:
+    elif player.upDelay < 10:
         player.upDelay += 1
         return player.stay()
     else:
-        return player.goLater('watch')
+        return player.goLater('spinAtGoal')
     return player.stay()
 
 ############# PENALTY SHOOTOUT #############
