@@ -2004,6 +2004,10 @@ list< VisualCorner > FieldLines::intersectLines()
         cout <<"Beginning intersectLines() with " << linesList.size() << " lines.."
              << endl;
     }
+	if (linesList.size() > 5) {
+		//cout << "Punting on corners" << endl;
+		//return corners;
+	}
 
     // Reset all of the context variables
     vision->thresh->context->init();

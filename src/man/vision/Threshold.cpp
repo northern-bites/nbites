@@ -167,17 +167,31 @@ void Threshold::visionLoop() {
 			vision->ygrp->init();
 			vision->ygrp->setTopCam(usingTopCamera);
 		}
+		int lowYellow = 0;
 		for (int i = 0; i < IMAGE_WIDTH; i++) {
-			findPostsInLowerCamera(i);
+			int result = findPostsInLowerCamera(i);
+			if (result > lowYellow) {
+				lowYellow = result;
+			}
 		}
+		//cout << "Low yellow is " << lowYellow << endl;
 		yellow->createObject();
 		if (ylp) {
+			vision->yglp->setLeftTopY(0);
+			vision->yglp->setRightTopY(0);
+			// make sure we use pix estimate
+			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
 			vision->yglp->setTopCam(usingTopCamera);
 			setFieldObjectInfo(vision->yglp);
+			//cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
 		}
 		if (yrp) {
+			vision->ygrp->setLeftTopY(0);
+			vision->ygrp->setRightTopY(0);
+			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
 			vision->ygrp->setTopCam(usingTopCamera);
 			setFieldObjectInfo(vision->ygrp);
+			//cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
 		}
 
 	}
@@ -418,9 +432,8 @@ void Threshold::findGoals(int column, int topEdge) {
     }
 }
 
-void Threshold::findPostsInLowerCamera(int column) {
-    const int BADSIZE = 5;
-    const int GAP = BADSIZE;
+int Threshold::findPostsInLowerCamera(int column) {
+    const int BADSIZE = 10;
     // scan up for goals
     int bad = 0, yellows = 0;
     int firstYellow = 0;
@@ -446,6 +459,7 @@ void Threshold::findPostsInLowerCamera(int column) {
     if (yellows > 10) {
         yellow->newRun(column, 0, firstYellow);
     }
+	return firstYellow;
 }
 
 /* Balls and field crosses can only be on the actual field.  So we scan
@@ -1210,7 +1224,7 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
                 obj_est = NULL_ESTIMATE;
             }
 
-            bool debugEstimates = false;
+            bool debugEstimates = true;
             if (debugEstimates) {
                 cout << "width " << estFromWidth << endl;
                 cout << "height " << estFromHeight << endl;
