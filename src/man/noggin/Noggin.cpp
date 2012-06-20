@@ -302,7 +302,7 @@ void Noggin::updateLocalization()
 {
     const ::MotionModel odometry = motion_interface->getOdometryUpdate();
 
-    updateRobotFallenState(guard->isRobotFallen());
+    //updateRobotFallenState(guard->isRobotFallen());
 
     locMotionSystem->motionUpdate(odometry);
 

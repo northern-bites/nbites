@@ -122,41 +122,41 @@ namespace PF
 	// Check if the mean has gone out of bounds. If so, 
 	// reset to the closest point in bounds with appropriate
 	// uncertainty.
-	bool resetInBounds = false;
+	// bool resetInBounds = false;
 
-	if(xEstimate < 0)
-	{
-	    resetInBounds = true;
-	    xEstimate = 0;
-	}
-	else if(xEstimate > parameters.fieldWidth)
-	{
-	    resetInBounds = true;
-	    xEstimate = parameters.fieldWidth;
-	}
+	// if(xEstimate < 0)
+	// {
+	//     resetInBounds = true;
+	//     xEstimate = 0;
+	// }
+	// else if(xEstimate > parameters.fieldWidth)
+	// {
+	//     resetInBounds = true;
+	//     xEstimate = parameters.fieldWidth;
+	// }
 
-	if(yEstimate < 0)
-	{
-	    resetInBounds = true;
-	    yEstimate = 0;
-	}
-	else if(yEstimate > parameters.fieldHeight)
-	{
-	    resetInBounds = true;
-	    yEstimate = parameters.fieldHeight;
-	}
+	// if(yEstimate < 0)
+	// {
+	//     resetInBounds = true;
+	//     yEstimate = 0;
+	// }
+	// else if(yEstimate > parameters.fieldHeight)
+	// {
+	//     resetInBounds = true;
+	//     yEstimate = parameters.fieldHeight;
+	// }
 
-	// Only reset if one of the location coordinates is
-	// out of bounds; avoids unnecessary resets.
-	if(resetInBounds)
-	{
-	    std::cout << "Resetting to (" << xEstimate
-		      << ", " << yEstimate << ", "
-		      << hEstimate << ")." << std::endl;
+	// // Only reset if one of the location coordinates is
+	// // out of bounds; avoids unnecessary resets.
+	// if(resetInBounds)
+	// {
+	//     std::cout << "Resetting to (" << xEstimate
+	// 	      << ", " << yEstimate << ", "
+	// 	      << hEstimate << ")." << std::endl;
 
-	    resetLocTo(xEstimate, yEstimate, hEstimate,
-		       LocNormalParams());
-	}
+	//     resetLocTo(xEstimate, yEstimate, hEstimate,
+	// 	       LocNormalParams());
+	// }
 
         memoryProvider.updateMemory();
     }

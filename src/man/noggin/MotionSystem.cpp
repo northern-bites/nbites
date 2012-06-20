@@ -99,15 +99,15 @@ DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
         noisyDeltaOdometry.theta = PF::sampleNormal(0.0f, ODO_MEASUREMENT_THETA_SD);
     }
 
-    // If the robot has fallen, increase noise in heading. 
-    if(robotFallen)
-    {
-	// Incorperate noise only once per fall.
-	robotFallen = false;
-	float noise = PF::sampleNormal(0.0f, M_PI_FLOAT);
-	noisyDeltaOdometry.theta += PF::sampleNormal(0.0f, noise);
-	std::cout << "Adding robot fall noise " << noise << std::endl;
-    }
+    // // If the robot has fallen, increase noise in heading. 
+    // if(robotFallen)
+    // {
+    // 	// Incorperate noise only once per fall.
+    // 	robotFallen = false;
+    // 	float noise = PF::sampleNormal(0.0f, M_PI_FLOAT);
+    // 	noisyDeltaOdometry.theta += PF::sampleNormal(0.0f, noise);
+    // 	std::cout << "Adding robot fall noise " << noise << std::endl;
+    // }
 
     return noisyDeltaOdometry;
 }

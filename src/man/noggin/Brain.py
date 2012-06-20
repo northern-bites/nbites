@@ -355,36 +355,44 @@ class Brain(object):
             if self.my.playerNumber == 1:
                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP)
+                                    Constants.HEADING_UP,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
             elif self.my.playerNumber == 2:
                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN)
+                                    Constants.HEADING_DOWN,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
             elif self.my.playerNumber == 3:
                 self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN)
+                                    Constants.HEADING_DOWN,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
             elif self.my.playerNumber == 4:
                 self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP)
+                                    Constants.HEADING_UP,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
         else:
             if self.my.playerNumber == 1:
                 self.loc.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN)
+                                    Constants.HEADING_DOWN,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
             elif self.my.playerNumber == 2:
                 self.loc.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP)
+                                    Constants.HEADING_UP,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
             elif self.my.playerNumber == 3:
                 self.loc.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP)
+                                    Constants.HEADING_UP,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
             elif self.my.playerNumber == 4:
                 self.loc.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN)
+                                    Constants.HEADING_DOWN,
+                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
 
     def resetLocalizationFromPenalty(self):
         """
@@ -416,11 +424,13 @@ class Brain(object):
         if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
                                 Constants.MIDFIELD_Y,
-                                Constants.HEADING_RIGHT)
+                                Constants.HEADING_RIGHT,
+                                _localization.LocNormalParams(15.0, 15.0, 1.0))
         else:
             self.loc.resetLocTo(Constants.FIELD_WHITE_RIGHT_SIDELINE_X,
                                 Constants.MIDFIELD_Y,
-                                Constants.HEADING_LEFT)
+                                Constants.HEADING_LEFT,
+                                _localization.LocNormalParams(15.0, 15.0, 1.0))
 
     #TODO: write this method!
     def resetPenaltyKickLocalization(self):
