@@ -6,7 +6,7 @@ import noggin_constants as nogginConstants
 import math
 
 DEBUG_KICK_DECISION = True
-USE_LOC = True
+USE_LOC = False
 
 class KickInformation:
     """
