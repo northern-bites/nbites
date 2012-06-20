@@ -16,15 +16,28 @@ def kickBallExecute(player):
 
         print "Performing " + str(player.kick)
 
-        kick = player.kick.sweetMove
+        #print "ball is at {0}, {1}".format(player.brain.ball.loc.relX,
+        #                                         player.brain.ball.loc.relY)
+    
 
-        player.executeMove(kick)
+        kickBallExecute.sweetMove = player.kick.sweetMove
+        
+        kickBallExecute.preKickDelay = 20
+        return player.stay()
+    
+    kickBallExecute.preKickDelay-=1
+    
+    if kickBallExecute.preKickDelay == 0:
+        player.executeMove(kickBallExecute.sweetMove)
         return player.stay()
 
-    if player.counter > 10 and player.brain.nav.isStopped():
+    if player.counter > 30 and player.brain.nav.isStopped():
         return player.goNow('afterKick')
 
     return player.stay()
+
+kickBallExecute.preKickDelay = 0
+kickBallExecute.sweetMove = None
 
 def afterKick(player):
     """
