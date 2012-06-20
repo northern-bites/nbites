@@ -69,7 +69,7 @@ def gamePlaying(player):
         return player.stay()
 
     if (player.lastDiffState == 'gamePenalized' and
-        player.lastStateTime > 25):
+        player.lastStateTime > 10):
         return player.goLater('decideLeftSide')
 
     if player.lastDiffState == 'fallen':
