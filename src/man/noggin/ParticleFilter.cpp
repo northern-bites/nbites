@@ -119,15 +119,44 @@ namespace PF
         yEstimate = sumY/parameters.numParticles;
         hEstimate = sumH/parameters.numParticles;
 
-//        if ((xEstimate < 0) || (xEstimate > parameters.fieldWidth) ||
-//            (yEstimate < 0) || (yEstimate > parameters.fieldHeight))
-//            reset();
+	// Check if the mean has gone out of bounds. If so, 
+	// reset to the closest point in bounds with appropriate
+	// uncertainty.
+	bool resetInBounds = false;
 
-        // Location estimate = this->getBestParticle().getLocation();
+	if(xEstimate < 0)
+	{
+	    resetInBounds = true;
+	    xEstimate = 0;
+	}
+	else if(xEstimate > parameters.fieldWidth)
+	{
+	    resetInBounds = true;
+	    xEstimate = parameters.fieldWidth;
+	}
 
-        // xEstimate = estimate.x;
-        // yEstimate = estimate.y;
-        // hEstimate = estimate.heading;
+	if(yEstimate < 0)
+	{
+	    resetInBounds = true;
+	    yEstimate = 0;
+	}
+	else if(yEstimate > parameters.fieldHeight)
+	{
+	    resetInBounds = true;
+	    yEstimate = parameters.fieldHeight;
+	}
+
+	// Only reset if one of the location coordinates is
+	// out of bounds; avoids unnecessary resets.
+	if(resetInBounds)
+	{
+	    std::cout << "Resetting to (" << xEstimate
+		      << ", " << yEstimate << ", "
+		      << hEstimate << ")." << std::endl;
+
+	    resetLocTo(xEstimate, yEstimate, hEstimate,
+		       LocNormalParams());
+	}
 
         memoryProvider.updateMemory();
     }

@@ -49,6 +49,7 @@ Noggin::Noggin (boost::shared_ptr<Vision> v,
       comm(c),
       gc(c->getGC()),
       sensors(_sensors),
+      guard(rbg),
       loggingBoard(loggingBoard),
       memory(memory),
       chestButton(rbg->getButton(CHEST_BUTTON)),
@@ -305,6 +306,8 @@ void Noggin::updateLocalization()
 {
     const ::MotionModel odometry = motion_interface->getOdometryUpdate();
 
+    updateRobotFallenState(guard->isRobotFallen());
+
     locMotionSystem->motionUpdate(odometry);
 
 //    std::vector<PF::Observation> observations;
@@ -348,7 +351,6 @@ void Noggin::updateLocalization()
 
     // HACK HACK HACK for testing particles
 //    loc->resetLocTo(500,321,-.349);
-
 
     // END LOCALIZATION UPDATE //
 
