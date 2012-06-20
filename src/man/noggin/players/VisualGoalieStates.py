@@ -71,35 +71,19 @@ def walkToGoal(player):
         # based on that side, set up post observations
         if player.side == RIGHT:
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
-            player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
-                                     goalie.RIGHT_SIDE_RP_ANGLE,
-                                     goalie.RIGHT_SIDE_LP_DISTANCE,
-                                     goalie.RIGHT_SIDE_LP_ANGLE)
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                         nogginConstants.HEADING_UP)
         if player.side == LEFT:
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
-            player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
-                                     goalie.LEFT_SIDE_RP_ANGLE,
-                                     goalie.LEFT_SIDE_LP_DISTANCE,
-                                     goalie.LEFT_SIDE_LP_ANGLE)
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
                                         nogginConstants.HEADING_DOWN)
-        player.system.home.relH = player.system.centerGoalBearing()
+
 
         player.brain.nav.positionPlaybook()
 
-    updatePostObservations(player)
-
-    player.system.home.relY = player.system.centerGoalRelY()
-    player.system.home.relX = player.system.centerGoalRelX()
-    player.system.home.relH = player.system.centerGoalBearing()
-
-    print "I am going to " + str(player.system.home)
-
-    return player.stay()# Transition.getNextState(player, walkToGoal)
+    return Transition.getNextState(player, walkToGoal)
 
 def dodgeBall(player):
     if player.firstFrame():

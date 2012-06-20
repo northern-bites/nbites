@@ -28,9 +28,8 @@ def ballIsInMyWay(player):
     if not player.brain.ball.vis.on:
         return False
 
-    return (fabs(player.brain.ball.loc.bearing -
-                 player.system.centerGoalBearing()) < 20.0 and
-            player.brain.ball.loc.dist < 100.0)
+    return (fabs(player.brain.ball.loc.relY) < 20.0 and
+            player.brain.ball.loc.relX < 30.0)
 
 def foundACorner(player):
     """
@@ -136,7 +135,6 @@ def onRightSideline(player):
              player.brain.vision.yglp.dist > 400.0))
 
 def shouldGetReadyToSave(player):
-    print "I got a heat value of " + str(player.brain.ball.vis.heat)
     return player.brain.ball.vis.heat > 10.0
 
 def noSave(player):
@@ -179,7 +177,7 @@ def shouldClearBall(player):
     # less than 1.5 minutes left or winning/losing badly
     shouldBeAggressive = (player.brain.comm.gc.timeRemaining() < 90 or
                           (abs(player.brain.comm.gc.teams(0)[1] -
-                               player.brain.comm.gc.teams(1)[1]) > 3))
+                               player.brain.comm.gc.teams(1)[1]) > 1))
 
     if shouldBeAggressive and not player.aggressive:
         print "The goalie is now AGGRESSIVE"

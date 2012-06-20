@@ -317,7 +317,7 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # NOTE: Constants are to set up triangle blocking the line of sight to the goalposts
 
 # Use the MAX_X to ensure we don't cross the line even with the tips of our feet.
-READY_NON_KICKOFF_MAX_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[1] - 25
+READY_NON_KICKOFF_MAX_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[1] - 45
 """DEFENDER"""
 READY_NON_KICKOFF_DEFENDER_X = NogginConstants.GREEN_PAD_X + 80.
 READY_NON_KICKOFF_DEFENDER_OFFSET = 51.3
