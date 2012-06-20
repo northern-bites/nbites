@@ -399,8 +399,8 @@ FIXED_PITCH_SLOW_GOALIE_PAN = (
 
 # Bottom camera is never significantly blocked by shoulders or arms.
 FIXED_PITCH_PAN_NARROW = (
-    ((55.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-55.0,17.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Needs some alteration re: pitch for the given yaw
 FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
