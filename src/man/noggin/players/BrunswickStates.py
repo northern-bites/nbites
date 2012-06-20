@@ -107,7 +107,7 @@ def gameSet(player):
             player.shouldKickOff = False
 
         if player.lastDiffState == 'gamePenalized':
-            player.brain.resetLocalizationFromPenalty()
+            player.brain.resetSetLocalization()
 
     # For the goalie, reset loc every frame.
     # This way, garaunteed to have correctly set loc and be standing in that
@@ -135,6 +135,8 @@ def gamePlaying(player):
             player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 5:
                 player.brain.resetLocalizationFromPenalty()
+        if player.lastDiffState == 'gameSet':
+            player.brain.resetSetLocalization()
 
     # Wait until the sensors are calibrated before moving.
     while (not player.brain.motion.calibrated()):
