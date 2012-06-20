@@ -422,6 +422,11 @@ Comm::Comm (boost::shared_ptr<Sensors> s, boost::shared_ptr<Vision> v)
     // initialize broadcast address structure
     broadcast_addr.sin_family = AF_INET;
     broadcast_addr.sin_port = htons(UDP_PORT);
+
+    struct in_addr addr;
+    inet_aton("192.168.255.255", &addr);
+    broadcast_addr.sin_addr = addr;
+
     broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
     // initialize gc broadcast address structure
     gc_broadcast_addr.sin_family = AF_INET;
@@ -581,7 +586,7 @@ void Comm::bind() throw(socket_error)
     // set bind address parameters
     bind_addr.sin_family = AF_INET;
     bind_addr.sin_port = htons(UDP_PORT);
-    bind_addr.sin_addr.s_addr = inet_addr("192.168.255.255");
+    bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     // set shared UDP socket (other processes may bind this port)
     ::setsockopt(sockn, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
