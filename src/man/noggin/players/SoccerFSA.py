@@ -111,7 +111,7 @@ class SoccerFSA(FSA.FSA):
         """
         Put head into penalized position, stop tracker
         """
-        self.brain.tracker.performHeadMove(HeadMoves.PENALIZED_HEADS)
+        self.brain.tracker.penalizeHeads()
 
     def zeroHeads(self):
         """
