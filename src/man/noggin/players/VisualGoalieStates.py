@@ -70,18 +70,17 @@ def walkToGoal(player):
 
         # based on that side, set up post observations
         if player.side == RIGHT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                         nogginConstants.HEADING_UP)
         if player.side == LEFT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
             player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
                                         nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
                                         nogginConstants.HEADING_DOWN)
 
 
         player.brain.nav.positionPlaybook()
+        player.brain.tracker.repeatBasicPanFixedPitch()
 
     return Transition.getNextState(player, walkToGoal)
 
