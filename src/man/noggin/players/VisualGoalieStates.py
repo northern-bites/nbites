@@ -83,7 +83,7 @@ def walkToGoal(player):
         player.system.home.relH = player.system.centerGoalBearing()
 
         player.brain.nav.goTo(player.system.home,
-                              nav.CLOSE_ENOUGH, nav.FAST_SPEED, True)
+                              nav.CLOSE_ENOUGH, nav.FAST_SPEED)
 
     updatePostObservations(player)
 
