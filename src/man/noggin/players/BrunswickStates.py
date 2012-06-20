@@ -134,10 +134,6 @@ def gamePenalized(player):
         player.gainsOn()
         player.brain.nav.stand()
 
-    # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
-        return player.stay()
-
     if player.firstFrame():
         player.brain.logger.stopLogging()
         player.inKickingState = False
