@@ -22,6 +22,10 @@ public:
     static float Params[NUM_PARAMS];
     static ufmatrix4 Transforms[2];
 
+    //TODO: not the best way to do this, but works
+    //hack to get the parameters in
+    //we should just update the params once
+    static void init(std::string name);
     static void UpdateWithParams(float params[]);
 
     };
