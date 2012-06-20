@@ -90,7 +90,7 @@ private:
     void enableGains();
     void ifUpDown();
     //helpers
-    std::string getHostName()const;
+    static std::string getHostName();
     void playFile(std::string filePath)const; //non-blocking
     void reloadMan();
 
