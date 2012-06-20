@@ -18,9 +18,6 @@ def gameInitial(player):
         player.gainsOn()
         player.zeroHeads()
         player.GAME_INITIAL_satDown = False
-        # Reset localization to proper starting position by player number.
-        # Locations are defined in the wiki.
-        player.brain.resetInitialLocalization()
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
           and not player.motion.isBodyActive()):
@@ -43,17 +40,17 @@ def gameReady(player):
         player.brain.tracker.repeatWidePanFixedPitch()
         player.brain.sensors.startSavingFrames()
 
-    # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
-        return player.stay()
-
-    # Works with rules (2011) to get goalie manually positioned
-    #if (player.lastDiffState == 'gameInitial'
-    #    and not player.brain.play.isRole(GOALIE)):
-    #    return player.goLater('relocalize')
+    # Reset localization to proper starting position by player number.
+    # Locations are defined in the wiki.
+    if player.lastDiffState == 'gameInitial':
+        player.brain.resetInitialLocalization()
 
     if player.lastDiffState == 'gamePenalized':
         player.brain.resetLocalizationFromPenalty()
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
 
     #See above about rules(2011) - we should still reposition after goals
     if (player.lastDiffState == 'gameInitial'
@@ -74,9 +71,6 @@ def gameSet(player):
         player.brain.loc.resetBall()
         player.brain.tracker.trackBallFixedPitch()
 
-        if player.brain.play.isRole(GOALIE):
-            player.brain.resetGoalieLocalization()
-
         if (player.brain.my.playerNumber == 4 and
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
@@ -87,15 +81,15 @@ def gameSet(player):
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetLocalizationFromPenalty()
 
-    # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
-        return player.stay()
-
     # For the goalie, reset loc every frame.
     # This way, garaunteed to have correctly set loc and be standing in that
     #  location for a frame before gamePlaying begins.
     if player.brain.play.isRole(GOALIE):
         player.brain.resetGoalieLocalization()
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
 
     return player.stay()
 
