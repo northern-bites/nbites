@@ -392,17 +392,17 @@ class Brain(object):
         if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                 Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                Constants.HEADING_UP)#,
-                                #Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                #Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                #Constants.HEADING_DOWN)
+                                Constants.HEADING_UP,
+                                Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                Constants.HEADING_DOWN)
         else:
             self.loc.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                 Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                Constants.HEADING_UP)#,
-                                #Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
-                                #Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                #Constants.HEADING_DOWN)
+                                Constants.HEADING_UP,
+                                Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
+                                Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                Constants.HEADING_DOWN)
 
     def resetGoalieLocalization(self):
         """
