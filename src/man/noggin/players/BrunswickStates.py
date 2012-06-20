@@ -63,6 +63,14 @@ def gameReady(player):
         player.brain.tracker.repeatWidePanFixedPitch()
         player.brain.sensors.startSavingFrames()
 
+    # Reset localization to proper starting position by player number.
+    # Locations are defined in the wiki.
+    if player.lastDiffState == 'gameInitial':
+        player.brain.resetInitialLocalization()
+
+    if player.lastDiffState == 'gamePenalized':
+        player.brain.resetLocalizationFromPenalty()
+
     # Wait until the sensors are calibrated before moving.
     while (not player.brain.motion.calibrated()):
         return player.stay()
@@ -100,10 +108,7 @@ def gameSet(player):
         player.brain.loc.resetBall()
         player.brain.tracker.trackBallFixedPitch()
 
-        if player.brain.play.isRole(GOALIE):
-            player.brain.resetGoalieLocalization()
-
-        if (player.brain.my.playerNumber == 2 and
+        if (player.brain.my.playerNumber == 4 and
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
             player.shouldKickOff = True
@@ -111,11 +116,7 @@ def gameSet(player):
             player.shouldKickOff = False
 
         if player.lastDiffState == 'gamePenalized':
-            player.brain.resetLocalization()
-
-    # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
-        return player.stay()
+            player.brain.resetLocalizationFromPenalty()
 
     # For the goalie, reset loc every frame.
     # This way, garaunteed to have correctly set loc and be standing in that
@@ -126,6 +127,10 @@ def gameSet(player):
                                     nogginConstants.HEADING_RIGHT,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
 
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
     return player.stay()
 
 def gamePlaying(player):
@@ -135,25 +140,10 @@ def gamePlaying(player):
         player.brain.tracker.trackBallFixedPitch()
         player.inKickingState = False
         if player.lastDiffState == 'gamePenalized':
-            print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' frames in last state'
+            print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
             player.brain.sensors.startSavingFrames()
-            # Note that the threshold is in seconds.
             if player.lastStateTime > 5:
-                player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                            nogginConstants.HEADING_UP,
-                                            nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                            nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                            nogginConstants.HEADING_DOWN,
-                                            _localization.LocNormalParams(15.0, 15.0, 1.0),
-                                            _localization.LocNormalParams(15.0, 15.0, 1.0))
-
-                print 'Resetting localization to (' + str(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X) + ', ' + str(nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y) + ', ' + str(nogginConstants.HEADING_UP) + ' and (' + str(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X) + ', ' + str(nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y) + ', ' + str(nogginConstants.HEADING_DOWN) + ')'
-
-
-                # 2011 rules have no 0 second penalties for any robot,
-                # but check should be here if there is.
-            #else human error
+                player.brain.resetLocalizationFromPenalty()
 
     # Wait until the sensors are calibrated before moving.
     while (not player.brain.motion.calibrated()):
@@ -168,10 +158,6 @@ def gamePenalized(player):
         # Just started up! Need to calibrate sensors
         player.gainsOn()
         player.brain.nav.stand()
-
-    # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
-        return player.stay()
 
     if player.firstFrame():
         player.brain.logger.stopLogging()
@@ -218,7 +204,7 @@ def penaltyShotsGameSet(player):
         player.inKickingState = False
 
         if player.lastDiffState == 'gamePenalized':
-            player.brain.resetLocalization()
+            player.brain.resetPenaltyKickLocalization()
         if player.brain.play.isRole(GOALIE):
             player.brain.tracker.trackBallFixedPitch()
         else:
@@ -231,7 +217,7 @@ def penaltyShotsGameSet(player):
 def penaltyShotsGamePlaying(player):
     if (player.lastDiffState == 'gamePenalized' and
             player.firstFrame()):
-        player.brain.resetLocalization()
+        player.brain.resetPenaltyKickLocalization()
 
     if player.firstFrame():
         player.gainsOn()

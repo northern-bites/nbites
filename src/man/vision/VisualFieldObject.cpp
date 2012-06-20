@@ -18,6 +18,7 @@ VisualFieldObject::VisualFieldObject()
     init();
     framesOn = 0;
     framesOff = 0;
+	on = false;
 }
 
 VisualFieldObject::VisualFieldObject(const int _x, const int _y,

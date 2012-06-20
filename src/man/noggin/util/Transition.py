@@ -1,5 +1,6 @@
 import Queue
 
+OCCASIONALLY = 0.3
 SOME_OF_THE_TIME = .5
 MOST_OF_THE_TIME = .75
 ALL_OF_THE_TIME = 1
@@ -7,6 +8,7 @@ ALL_OF_THE_TIME = 1
 INSTANT = 1
 LOW_PRECISION = 10
 OK_PRECISION = 20
+HIGH_PRECISION = 50
 
 DEBUG = True
 
@@ -14,7 +16,7 @@ def resetTransitions(state):
     """
     resets the transitions of a state
     """
-    for targetState, transition in state.transitions.iteritems():
+    for transition, targetState in state.transitions.iteritems():
         transition.reset()
 
 def getNextState(fsa, state):
@@ -26,14 +28,15 @@ def getNextState(fsa, state):
     if fsa.firstFrame():
         resetTransitions(state)
 
-    #@TODO: make it so we can tell the transition whether to use goNow or goLater
-    for targetState, transition in state.transitions.iteritems():
+    #@todo: make it so we can tell the transition whether to use goNow or goLater
+    for transition, targetState in state.transitions.iteritems():
         if transition.checkCondition(fsa):
 
             if DEBUG:
                 fsa.printf(fsa.name + " switching to " + targetState.__name__ +
-                           " from " + state.__name__ + " after " + str(transition), fsa.stateChangeColor)
-
+                           " from " + state.__name__ + " after " + str(transition))
+            targetState.incomingTransition = transition
+            targetState.incomingState = state
             return fsa.goNow(targetState.__name__) #FSA use states by their names
 
     return fsa.stay()

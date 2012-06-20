@@ -6,6 +6,7 @@ import noggin_constants as nogginConstants
 import math
 
 DEBUG_KICK_DECISION = False
+USE_LOC = False
 
 class KickInformation:
     """
@@ -41,9 +42,19 @@ class KickInformation:
         self.nearRightPostDist = 0.0
         self.nearAvgPostDist = 0.0
 
+        self.farGoalieRed = 0
+        self.farGoalieNavy = 0
+        self.nearGoalieRed = 0
+        self.nearGoalieNavy = 0
+        # Currently, far goals are inaccurate for goalie detection.
+        self.farGoalieOwn = False
+        self.nearGoalieOwn = False
+
         self.sawGoal = False
         self.sawNearGoal = False
         self.sawFarGoal = False
+
+        self.dangerousBallCount = 0
 
         self.haveData = False
 
@@ -77,15 +88,26 @@ class KickInformation:
         """
         self.haveData = True
 
+        if self.dangerousBall():
+            self.dangerousBallCount += 1
+
         if self.brain.yglp.vis.on:
             self.sawGoal = True
             if self.brain.yglp.vis.certainty == vision.certainty._SURE:
                 if self.brain.yglp.vis.dist > 300:
                     self.farGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
                     self.farGoalLeftPostDists.append(self.brain.yglp.vis.dist)
+                    if self.brain.yglp.vis.redGoalieCertain:
+                        self.farGoalieRed += 1
+                    elif self.brain.yglp.vis.navyGoalieCertain:
+                        self.farGoalieNavy += 1
                 if self.brain.yglp.vis.dist < 300:
                     self.nearGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
                     self.nearGoalLeftPostDists.append(self.brain.yglp.vis.dist)
+                    if self.brain.yglp.vis.redGoalieCertain:
+                        self.nearGoalieRed += 1
+                    elif self.brain.yglp.vis.navyGoalieCertain:
+                        self.nearGoalieNavy += 1
 
         if self.brain.ygrp.vis.on:
             self.sawGoal = True
@@ -93,9 +115,42 @@ class KickInformation:
                 if self.brain.ygrp.vis.dist > 300:
                     self.farGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
                     self.farGoalRightPostDists.append(self.brain.ygrp.vis.dist)
+                    if self.brain.ygrp.vis.redGoalieCertain:
+                        self.farGoalieRed += 1
+                    elif self.brain.ygrp.vis.navyGoalieCertain:
+                        self.farGoalieNavy += 1
                 if self.brain.ygrp.vis.dist < 300:
                     self.nearGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
                     self.nearGoalRightPostDists.append(self.brain.ygrp.vis.dist)
+                    if self.brain.ygrp.vis.redGoalieCertain:
+                        self.nearGoalieRed += 1
+                    elif self.brain.ygrp.vis.navyGoalieCertain:
+                        self.nearGoalieNavy += 1
+
+    def hasEnoughInformation(self):
+        """
+        Can we stop panning and kick sooner?
+        Note: minimum sightings here must be greater than minimums
+              in calculateDataAverages method.
+        """
+        # If we've seen a pair of near posts with very good certainty, we can kick.
+        seenPostPair = ((len(self.nearGoalLeftPostBearings) > 10 and
+                        len(self.nearGoalRightPostBearings) > 10))
+
+        # If we've seen a single post, and heard that it's a dangerous ball.
+        nearPostAndDangerous = (self.dangerousBallCount > 5 and
+                                (len(self.nearGoalLeftPostBearings) > 10 or
+                                 len(self.nearGoalRightPostBearings) > 10 or
+                                 len(self.farGoalLeftPostBearings) > 10 or
+                                 len(self.farGoalRightPostBearings) > 10))
+
+        if DEBUG_KICK_DECISION:
+            if seenPostPair:
+                print "Already seen a pair of near posts: abort pan."
+            if nearPostAndDangerous:
+                print "Already seen a post, and heard dangerous ball: abort pan."
+
+        return (seenPostPair or nearPostAndDangerous)
 
     def calculateDataAverages(self):
         """
@@ -153,6 +208,24 @@ class KickInformation:
         elif self.nearRightPostBearing is not None:
             self.nearAvgPostDist = self.nearRightPostDist
 
+        if DEBUG_KICK_DECISION:
+            print "near reds: ",self.nearGoalieRed
+            print "near navys: ",self.nearGoalieNavy
+
+        # Determine visual dangerous goalie
+        # Note that the values should be double the sightings:
+        #  one for each post for each frame it is seen.
+        if (self.farGoalieRed > 20 and
+            self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
+            (self.farGoalieNavy > 20 and
+             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
+            self.farGoalieOwn = True
+        if (self.nearGoalieRed > 20 and
+            self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
+            (self.nearGoalieNavy > 20 and
+             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
+            self.nearGoalieOwn = True
+
     # Hack from US open 2012
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
@@ -174,11 +247,11 @@ class KickInformation:
 
         # Is loc GOOD_ENOUGH for a kick decision?
         # Need to use aimCenter in decision.
-        # Loc is currently never accurate enough @summer 2012
-        if False: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
+        if USE_LOC: #self.brain.my.locScore == nogginConstants.locScore.GOOD_LOC:
 
             if DEBUG_KICK_DECISION:
-                print "loc Score is good. Using it to decide kick."
+                #print "loc Score is good. Using it to decide kick."
+                print "Flag is set: using loc for decision."
 
             relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,nogginConstants.CENTER_FIELD_Y))
             bearingBallToGoal = relLocationBallToGoal.bearing
@@ -188,36 +261,41 @@ class KickInformation:
 
             bearingDifference = bearingBallToGoal - bearingMeToBall
 
-            if bearingDifference < 45 and bearingDifference > -45:
+            if bearingDifference < 35 and bearingDifference > -35:
                 #choose straight kick!
                 kick = self.chooseQuickFrontKick()
                 kick.h = 0 - bearingDifference
-                return kick
-            elif bearingDifference > 45 and bearingDifference < 135:
+            elif bearingDifference > 35 and bearingDifference < 125:
                 #choose a right side kick! (using right foot)
                 kick = kicks.RIGHT_SIDE_KICK
-                kick.h = 90 - bearingDifference
-                return kick
-            elif bearingDifference < -45 and bearingDifference > -135:
+                kick.h = 70 - bearingDifference
+            elif bearingDifference < -35 and bearingDifference > -125:
                 #choose a left side kick! (using left foot)
                 kick = kicks.LEFT_SIDE_KICK
-                kick.h = -90 - bearingDifference
-                return kick
+                kick.h = -70 - bearingDifference
             else:
                 #choose a back kick!
                 kick = self.chooseBackKick()
-                kick.h = 1 #HACK
-                return kick
+                if bearingDifference < -125:
+                    kick.h = -180 - bearingDifference
+                else:
+                    kick.h = 180 - bearingDifference
+
+            # Make sure heading is an int before passing it to the orbit.
+            kick.h = int(kick.h)
+            return kick
 
 
         # Loc is bad- use only visual information to choose a kick.
         if DEBUG_KICK_DECISION:
             print "Using vision for kick decision."
-            print "Dangerous ball? ",self.dangerousBall()
+            print "Dangerous ball count: ",self.dangerousBallCount
+            print "Own goalie in near goal? ",self.nearGoalieOwn
 
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
-            if self.dangerousBall():
+            # Goalie detection too easily fooled.
+            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
             else:
@@ -227,7 +305,8 @@ class KickInformation:
             rightPostBearing = self.farRightPostBearing
             leftPostBearing = self.farLeftPostBearing
         elif self.nearAvgPostDist != 0:
-            if self.dangerousBall():
+            # Goalie detection too easily fooled.
+            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
                 # Can only see our own goal: Use goalie to make decision
 
                 if DEBUG_KICK_DECISION:
@@ -284,9 +363,9 @@ class KickInformation:
         # Note: this ignores the aimCenter distinction.
         if leftScorePoint > 0 and rightScorePoint < 0:
             kick = self.chooseQuickFrontKick()
-        elif leftScorePoint > 90 and rightScorePoint < 90:
+        elif leftScorePoint > 70 and rightScorePoint < 70:
             kick = kicks.RIGHT_SIDE_KICK
-        elif leftScorePoint > -90 and rightScorePoint < -90:
+        elif leftScorePoint > -70 and rightScorePoint < -70:
             kick = kicks.LEFT_SIDE_KICK
         elif leftScorePoint < -90 and rightScorePoint > 90:
             kick =self.chooseBackKick()
@@ -305,9 +384,9 @@ class KickInformation:
         if DEBUG_KICK_DECISION:
             print "Didn't choose a 0 heading kick.\navgScorePoint: ",avgScorePoint
 
-        if rightScorePoint > 90:
+        if rightScorePoint > 70:
                 # Quadrent 2
-            if (180 - leftScorePoint) - (rightScorePoint - 90) < 0:
+            if (180 - leftScorePoint) - (rightScorePoint - 70) < 0:
                     #Closer to the leftScorePoint
                 kick = self.chooseBackKick()
                 if self.aimCenter:
@@ -317,26 +396,26 @@ class KickInformation:
             else:
                 kick = kicks.RIGHT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = 90 - avgScorePoint
+                    kick.h = 70 - avgScorePoint
                 else:
-                    kick.h = 90 - rightScorePoint
+                    kick.h = 70 - rightScorePoint
         elif rightScorePoint > 0:
             # Quadrent 1
-            if (90 - leftScorePoint) - (rightScorePoint - 0) < 0:
+            if (70 - leftScorePoint) - (rightScorePoint - 0) < 0:
                 kick = kicks.RIGHT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = 90 - avgScorePoint
+                    kick.h = 70 - avgScorePoint
                 else:
-                    kick.h = 90 - leftScorePoint
+                    kick.h = 70 - leftScorePoint
             else:
                 kick = self.chooseQuickFrontKick()
                 if self.aimCenter:
                     kick.h = 0 - avgScorePoint
                 else:
                     kick.h = 0 - rightScorePoint
-        elif rightScorePoint > -90:
+        elif rightScorePoint > -70:
             # Quadrent 4
-            if (0 - leftScorePoint) - (rightScorePoint + 90) < 0:
+            if (0 - leftScorePoint) - (rightScorePoint + 70) < 0:
                 kick = self.chooseQuickFrontKick()
                 if self.aimCenter:
                     kick.h = 0 - avgScorePoint
@@ -345,17 +424,17 @@ class KickInformation:
             else:
                 kick = kicks.LEFT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = -90 - avgScorePoint
+                    kick.h = -70 - avgScorePoint
                 else:
-                    kick.h = -90 - rightScorePoint
+                    kick.h = -70 - rightScorePoint
         else:
             # Quadrent 3
-            if (-90 - leftScorePoint) - (rightScorePoint + 180) < 0:
+            if (-70 - leftScorePoint) - (rightScorePoint + 180) < 0:
                 kick = kicks.LEFT_SIDE_KICK
                 if self.aimCenter:
-                    kick.h = -90 - avgScorePoint
+                    kick.h = -70 - avgScorePoint
                 else:
-                    kick.h = -90 - leftScorePoint
+                    kick.h = -70 - leftScorePoint
             else:
                 kick = self.chooseBackKick()
                 if self.aimCenter:

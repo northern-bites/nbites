@@ -52,12 +52,6 @@ private:
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::ParticleViewer* particleViewer;
     overseer::OverseerClient* overseerClient;
-    //viewer::GraphViewer* graphViewer;
-
-    QPushButton* prevButton;
-    QPushButton* nextButton;
-    QPushButton* recordButton;
-    QToolBar* toolbar;
 };
 
 }

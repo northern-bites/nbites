@@ -81,6 +81,7 @@ public:
     void start();
     void stop();
     void run();
+    void resetOdometry();
 
     const std::vector <float> getNextJoints() const;
     const std::vector<float> getNextStiffness() const;

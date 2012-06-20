@@ -45,9 +45,6 @@ class Navigator(FSA.FSA):
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
 
-        self.shouldAvoidObstacleLeftCounter = 0
-        self.shouldAvoidObstacleRightCounter = 0
-
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination)
@@ -55,8 +52,37 @@ class Navigator(FSA.FSA):
                                                                   Transition.SOME_OF_THE_TIME,
                                                                   Transition.LOW_PRECISION)
 
-        NavStates.goToPosition.transitions = { NavStates.atPosition: self.atLocPositionTransition }
-        NavStates.atPosition.transitions = { NavStates.goToPosition: self.locRepositionTransition }
+        NavStates.goToPosition.transitions = {
+            self.atLocPositionTransition : NavStates.atPosition,
+
+            Transition.CountTransition(navTrans.shouldDodgeLeft,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidLeft,
+
+            Transition.CountTransition(navTrans.shouldDodgeRight,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidRight
+            }
+
+        NavStates.avoidLeft.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.avoidRight.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.atPosition.transitions = {
+            self.locRepositionTransition : NavStates.goToPosition
+            }
 
     def run(self):
         FSA.FSA.run(self)
@@ -74,7 +100,7 @@ class Navigator(FSA.FSA):
     def chaseBall(self, speed = FULL_SPEED):
         self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, adaptive = False):
+    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False):
         """
         General go to method
         Ideal for going to a field position, or for going to a
@@ -101,6 +127,7 @@ class Navigator(FSA.FSA):
 
         self.updateDest(dest, speed)
         NavStates.goToPosition.precision = precision
+        NavStates.goToPosition.avoidObstacles = avoidObstacles
         NavStates.goToPosition.adaptive = adaptive
 
         if self.currentState is not 'goToPosition':

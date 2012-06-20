@@ -66,6 +66,10 @@ void MotionInterface::resetWalkProvider(){
     switchboard->resetWalkProvider();
 }
 
+void MotionInterface::resetWalkOdometry(){
+    switchboard->resetOdometry();
+}
+
 void MotionInterface::resetScriptedProvider(){
     switchboard->resetScriptedProvider();
 }

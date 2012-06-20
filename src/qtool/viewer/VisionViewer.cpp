@@ -97,9 +97,15 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
     connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
 
-    memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
-    memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
-	memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
+    CollapsibleImageViewer* bottomCIV = new
+            CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
+    CollapsibleImageViewer* topCIV = new
+            CollapsibleImageViewer(topImageViewer, "Top", this);
+
+    QWidget* combinedRawImageView = new QWidget(this);
+
+    QVBoxLayout* layout = new QVBoxLayout(combinedRawImageView);
+    layout->setAlignment(Qt::AlignTop);
 
 	connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));
@@ -168,7 +174,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     QDockWidget* dockWidget = new QDockWidget("Offline Vision", this);
 	dockWidget->setMinimumWidth(300);
-	dockWidget->setMaximumHeight(375);
+	dockWidget->setMaximumHeight(150);
     offlineVisionView = new MObjectViewer(offlineMVision, this);
 	dockWidget->setWidget(offlineVisionView);
 	connect(this, SIGNAL(imagesUpdated()), offlineVisionView, SLOT(updateView()));
@@ -176,7 +182,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 
     dockWidget = new QDockWidget("Image data", this);
 	dockWidget->setMinimumWidth(300);
-	dockWidget->setMaximumHeight(300);
+	dockWidget->setMaximumHeight(150);
     MObjectViewer* imageDataView = new MObjectViewer(
 		memoryManager->getMemory()->get<MRawImages>(), this);
     dockWidget->setWidget(imageDataView);
@@ -219,6 +225,7 @@ void VisionViewer::loadColorTable(){
 	imageTranscribe->initTable(colorTablePath.toStdString());
 	update();
 }
+
 
 #define SET_DEBUG(funcName, buttonName)                             \
     void VisionViewer::set##funcName##Debug(int state) {            \

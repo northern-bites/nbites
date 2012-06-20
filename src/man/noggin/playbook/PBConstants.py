@@ -277,8 +277,9 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 CENTER_FIELD = Location(NogginConstants.CENTER_FIELD_X,
                         NogginConstants.CENTER_FIELD_Y)
 """DEFENDER"""
-READY_KICKOFF_DEFENDER_X = (NogginConstants.CENTER_FIELD_X -
-                            NogginConstants.GREEN_PAD_X) * 0.3 + 15
+READY_KICKOFF_DEFENDER_X = ((NogginConstants.CENTER_FIELD_X -
+                            NogginConstants.GREEN_PAD_X) * 0.3 + 15 +
+                            NogginConstants.GREEN_PAD_X)
 READY_KICKOFF_DEFENDER_0_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y
 READY_KICKOFF_DEFENDER_1_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y
 """OFFENDER"""
@@ -298,13 +299,13 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # READY_NON_KICKOFF
 # ____________________
 # |__                |
-# |  |               |
+# |  |     O         |
 # 0  |             __|
-# |  |      C     /  |
+# |  | D          /  |
 # |G |      +    |   +
-# |  | D          \__|
+# |  |      C     \__|
 # 0  |               |
-# |__|     O         |
+# |__|               |
 # |__________________|
 #
 # Above is our ready position_0 when not kicking-off. Can mirror for position_1
@@ -320,24 +321,24 @@ READY_NON_KICKOFF_MAX_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[1] - 25
 """DEFENDER"""
 READY_NON_KICKOFF_DEFENDER_X = NogginConstants.GREEN_PAD_X + 80.
 READY_NON_KICKOFF_DEFENDER_OFFSET = 51.3
-READY_NON_KICKOFF_DEFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y -
+READY_NON_KICKOFF_DEFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
                                   READY_NON_KICKOFF_DEFENDER_OFFSET)
-READY_NON_KICKOFF_DEFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y +
+READY_NON_KICKOFF_DEFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y +
                                   READY_NON_KICKOFF_DEFENDER_OFFSET)
 """OFFENDER"""
 READY_NON_KICKOFF_OFFENDER_X = (NogginConstants.CENTER_FIELD_X -
                                 NogginConstants.GREEN_PAD_X) * 0.5
 READY_NON_KICKOFF_OFFENDER_OFFSET = 150. # How wide offender should be to run upfield
-READY_NON_KICKOFF_OFFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y -
+READY_NON_KICKOFF_OFFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
                                   READY_NON_KICKOFF_OFFENDER_OFFSET)
-READY_NON_KICKOFF_OFFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y +
+READY_NON_KICKOFF_OFFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y +
                                   READY_NON_KICKOFF_OFFENDER_OFFSET)
 """CHASER"""
 READY_NON_KICKOFF_CHASER_X = READY_NON_KICKOFF_MAX_X
 READY_NON_KICKOFF_CHASER_OFFSET = 28.
-READY_NON_KICKOFF_CHASER_0_Y = (NogginConstants.CENTER_FIELD_Y +
+READY_NON_KICKOFF_CHASER_1_Y = (NogginConstants.CENTER_FIELD_Y +
                                 READY_NON_KICKOFF_CHASER_OFFSET)
-READY_NON_KICKOFF_CHASER_1_Y = (NogginConstants.CENTER_FIELD_Y -
+READY_NON_KICKOFF_CHASER_0_Y = (NogginConstants.CENTER_FIELD_Y -
                                 READY_NON_KICKOFF_CHASER_OFFSET)
 
 

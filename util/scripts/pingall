@@ -1,0 +1,16 @@
+#!/bin/sh
+
+ROBOT=""
+
+for HOST  in 192.168.16.100 192.168.16.101 192.168.16.102 192.168.16.103 192.168.16.104
+do
+    nmap -sP $HOST 2>&1 | grep "Host is up"
+    if [ "$?" -eq 0 ]; then
+	ROBOT=$(host $HOST | awk '/'"name pointer"'/ {print $5}') 
+	echo "$ROBOT ($HOST) is up."
+    else
+	echo "ERROR: robot at $HOST is down!"
+    fi
+
+    echo "\n"
+done

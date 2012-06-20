@@ -16,11 +16,11 @@ bool ThresholdedImage::needToResizeBitmap() const {
 
 void ThresholdedImage::buildBitmap() {
 
-    if (this->needToResizeBitmap()) {
+  // if (this->needToResizeBitmap()) {
         bitmap = QImage(rawImage->width(),
                         rawImage->height(),
                         QImage::Format_RGB32);
-    }
+	// }
 
     for (int j = 0; j < getHeight(); ++j) {
         QRgb* bitmapLine = (QRgb*) bitmap.scanLine(j);
@@ -39,8 +39,7 @@ void ThresholdedImage::buildBitmap() {
         }
     }
 
-    //bitmap = QPixmap::fromImage(QImage);
-	//scaleBitmap_640_480();
+    scaleBitmap_640_480();
 }
 
 void ThresholdedImage::scaleBitmap_640_480() {
