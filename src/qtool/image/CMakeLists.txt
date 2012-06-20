@@ -24,15 +24,17 @@ set( Image_srcs
     FastYUVToBMPImage
     PaintField
     PaintBots
+    PaintLocalization
     PaintFieldObjects
     PaintRobotWorldState
     )
 
-set( Image_headers 
+set( Image_headers
   BMPImage.h
   FastYUVToBMPImage.h
   PaintField.h
   PaintBots.h
+  PaintLocalization.h
   PaintGroundTruth.h
   PaintFieldObjects.h
   PaintRobotWorldState.h)

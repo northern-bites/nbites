@@ -82,10 +82,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         GoalieStates.watch.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+            Transition.CountTransition(GoalieTransitions.shouldGetReadyToSave,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.saveIt,
+            : VisualGoalieStates.shouldISaveIt,
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.MOST_OF_THE_TIME,
@@ -96,6 +96,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : VisualGoalieStates.spinAtGoal
+            }
+
+        VisualGoalieStates.shouldISaveIt.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.saveIt,
+
+            Transition.CountTransition(GoalieTransitions.noSave,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : GoalieStates.watch
             }
 
         VisualGoalieStates.spinToFaceBall.transitions = {

@@ -150,8 +150,9 @@ def kickBall(player):
 
 def saveIt(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
         player.isSaving = False
+        player.brain.fallController.enableFallProtection(False)
     if (not player.motion.isBodyActive() and not player.isSaving):
         player.squatTime = time.time()
         player.isSaving = True
@@ -159,13 +160,14 @@ def saveIt(player):
     if player.isSaving:
         stopTime = time.time()
         # This is to stand up before a penalty is called.
-        if (stopTime - player.squatTime > 4):
-            #player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+        if (stopTime - player.squatTime > 2):
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
     return player.stay()
 
 def upUpUP(player):
     if player.firstFrame():
+        player.brain.fallController.enableFallProtection(True)
         player.upDelay = 0
 
     if player.motion.isBodyActive():

@@ -23,7 +23,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.brain.tracker.repeatBasicHeadPan()
+        player.brain.tracker.repeatBasicPanFixedPitch()
 
     return player.stay()
 

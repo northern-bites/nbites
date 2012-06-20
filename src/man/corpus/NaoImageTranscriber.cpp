@@ -16,6 +16,8 @@ NaoImageTranscriber::NaoImageTranscriber(boost::shared_ptr<Sensors> sensors,
           memoryProvider(&NaoImageTranscriber::updateMRawImages, this, rawImages),
           rawImages(rawImages)
 {
+    topImageTranscriber.initTable("/home/nao/nbites/lib/table/top_table.mtb");
+    bottomImageTranscriber.initTable("/home/nao/nbites/lib/table/bottom_table.mtb");
 }
 
 void NaoImageTranscriber::run()

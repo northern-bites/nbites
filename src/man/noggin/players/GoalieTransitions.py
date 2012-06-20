@@ -125,13 +125,21 @@ def onRightSideline(player):
     """
     Looks for the close posts.
     """
-    if onLeftSideline(player):
-        return False
+    for corner in player.brain.vision.fieldLines.corners:
+        if ( (IDs.CENTER_TOP_T in corner.possibilities) or
+             (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
+            return True
     return ((player.brain.vision.ygrp.on and
              #magic numbers
-             player.brain.vision.ygrp.dist < 400.0) or
+             player.brain.vision.ygrp.dist > 400.0) or
             (player.brain.vision.yglp.on and
-             player.brain.vision.yglp.dist < 400.0))
+             player.brain.vision.yglp.dist > 400.0))
+
+def shouldGetReadyToSave(player):
+   return player.brain.ball.vis.heat > 5.0
+
+def noSave(player):
+   return player.counter > 90
 
 def shouldPerformSave(player):
     """
@@ -140,11 +148,9 @@ def shouldPerformSave(player):
     if player.penaltyKicking:
         return (player.brain.ball.vis.heat > 5.0 or
                 player.brain.ball.loc.relVelX < -50.0)
+
     return (player.brain.ball.loc.relVelX < -50.0 and
-            player.brain.ball.vis.on and
-            player.brain.ball.loc.dist > 120.0 and
-            player.brain.ball.loc.dist < 200.0 and
-            player.brain.ball.loc.relY < 100.0)
+            player.brain.ball.vis.on)
 
 def facingSideways(player):
     """
@@ -158,10 +164,6 @@ def facingSideways(player):
          fabs(player.brain.vision.ygrp.bearing) < 30.0 and
          player.brain.vision.ygrp.bearing != 0.0 and
          player.brain.vision.ygrp.dist < 300.0)):
-        if player.brain.vision.yglp.on:
-            print "Left post at " + str(player.brain.vision.yglp.bearing)
-        if player.brain.vision.yglp.on:
-            print "Right post at " + str(player.brain.vision.ygrp.bearing)
         return True
     else:
         return False
@@ -177,9 +179,6 @@ def shouldClearBall(player):
     shouldBeAggressive = (player.brain.comm.gc.timeRemaining() < 90 or
                           (abs(player.brain.comm.gc.teams(0)[1] -
                                player.brain.comm.gc.teams(1)[1]) > 3))
-    #print "Should I be aggressive? " + str(shouldBeAggressive)
-    #print "Am I aggressive? " + str(player.aggressive)
-    #print ""
 
     if shouldBeAggressive and not player.aggressive:
         print "The goalie is now AGGRESSIVE"
