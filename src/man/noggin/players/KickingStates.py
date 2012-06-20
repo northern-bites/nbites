@@ -22,7 +22,7 @@ def kickBallExecute(player):
 
         kickBallExecute.sweetMove = player.kick.sweetMove
         
-        kickBallExecute.preKickDelay = 20
+        kickBallExecute.preKickDelay = 30
         return player.stay()
     
     kickBallExecute.preKickDelay-=1
@@ -31,7 +31,7 @@ def kickBallExecute(player):
         player.executeMove(kickBallExecute.sweetMove)
         return player.stay()
 
-    if player.counter > 30 and player.brain.nav.isStopped():
+    if player.counter > 40 and player.brain.nav.isStopped():
         return player.goNow('afterKick')
 
     return player.stay()
