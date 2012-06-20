@@ -7,8 +7,8 @@ using namespace std;
 
 CommTimer::CommTimer(llong (*f)())
     : time(f), epoch(time()), lastPacketReceived(0), lastPacketSent(0),
-      offsetMicros(0), nextSendDelay(0), mark_time(epoch), 
-      teamPackets(NUM_PLAYERS_PER_TEAM), numPacketsChecked(0), 
+      offsetMicros(0), nextSendDelay(0), mark_time(epoch),
+      teamPackets(NUM_PLAYERS_PER_TEAM), numPacketsChecked(0),
       need_to_update(false)
 {
     // Default is six packets/second, but should vary randomly.
@@ -27,7 +27,7 @@ void CommTimer::reset()
     lastPacketReceived = 0;
 }
 
-void CommTimer::packetSent() 
+void CommTimer::packetSent()
 {
     lastPacketSent = timestamp();
     // Calculate the next time a packet needs to be sent by randomly
@@ -40,7 +40,7 @@ void CommTimer::packetSent()
 
 int CommTimer::packetsDropped(const CommPacketHeader& packet)
 {
-    // Note that the lastNumber in the CommTeammatePacketInfo struct 
+    // Note that the lastNumber in the CommTeammatePacketInfo struct
     // is initialized to 0, even though packet numbering begins at 1,
     // so if the lastNumber == 0, this means that the robot has been
     // restarted; not taking this into account leads to huge numbers
@@ -67,20 +67,22 @@ bool CommTimer::check_packet(const CommPacketHeader &p)
 #endif
 	return false;
     }
-    // TOO OLD CHECK
-    if (p.timestamp + PACKET_GRACE_PERIOD < ts)
+
+// HACKED OUT SUMMER 2012... fucking venue wireless...
+//     // TOO OLD CHECK
+//     if (p.timestamp + PACKET_GRACE_PERIOD < ts)
+//     {
+// #ifdef COMM_DEBUG
+// 	cout << "CommTimer::check_packet() : Packet is too old to check (pt: " << p.timestamp/1000 <<" ts: " << ts/1000
+// 	     << ")." << endl;
+// #endif
+// 	return false;
+//     }
+    // Check whether the packet number is greater than the last
+    // packet number received for that particular teammate.
+    if(p.number < teamPackets[p.player-1].lastNumber)
     {
 #ifdef COMM_DEBUG
-	cout << "CommTimer::check_packet() : Packet is too old to check (pt: " << p.timestamp/1000 <<" ts: " << ts/1000 
-	     << ")." << endl;
-#endif      
-	return false;
-    }
-    // Check whether the packet number is greater than the last 
-    // packet number received for that particular teammate.
-    if(p.number < teamPackets[p.player-1].lastNumber) 
-    {
-#ifdef COMM_DEBUG  
 	cout << "CommTimer::check_packet() : Packet received out of order!" << endl;
 #endif
 	return false;
@@ -95,26 +97,26 @@ bool CommTimer::check_packet(const CommPacketHeader &p)
 	need_to_update = true;
 	return false;
     }
-  
+
     // All tests passed, packet must be valid.
     return true;
 }
 
 // This should be called if the packet is found to be valid.
 void CommTimer::updateTeamPackets(const CommPacketHeader& packet)
-{  
+{
     // Packet is good!
     // Update timestamp and last number received.
     teamPackets[packet.player - 1].timestamp = packet.timestamp;
     teamPackets[packet.player - 1].lastNumber = packet.number;
     numPacketsChecked++;
 
-    // Also check if a teammate has not been heard from for more than 
+    // Also check if a teammate has not been heard from for more than
     // the TEAMMATE_DEAD_THRESHOLD time.
-    
 
-    if (need_to_update)
-	get_time_from_others(); 
+
+//    if (need_to_update)
+//	get_time_from_others();
 }
 
 void CommTimer::checkDeadTeammates()
