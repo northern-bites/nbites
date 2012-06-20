@@ -13,6 +13,8 @@ from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 from vision import cornerID as IDs
 from math import fabs
 import man.noggin.kickDecider.kicks as kicks
+import noggin_constants as nogginConstants
+
 
 DEBUG_OBSERVATIONS = False
 DEBUG_POSITION = False
@@ -73,17 +75,21 @@ def walkToGoal(player):
                                      goalie.RIGHT_SIDE_RP_ANGLE,
                                      goalie.RIGHT_SIDE_LP_DISTANCE,
                                      goalie.RIGHT_SIDE_LP_ANGLE)
+            player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        nogginConstants.HEADING_UP)
         if player.side == LEFT:
             player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
             player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
                                      goalie.LEFT_SIDE_RP_ANGLE,
                                      goalie.LEFT_SIDE_LP_DISTANCE,
                                      goalie.LEFT_SIDE_LP_ANGLE)
-
+            player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        nogginConstants.HEADING_DOWN)
         player.system.home.relH = player.system.centerGoalBearing()
 
-        player.brain.nav.goTo(player.system.home,
-                              nav.CLOSE_ENOUGH, nav.FAST_SPEED, True)
+        player.brain.nav.positionPlaybook()
 
     updatePostObservations(player)
 
@@ -91,7 +97,9 @@ def walkToGoal(player):
     player.system.home.relX = player.system.centerGoalRelX()
     player.system.home.relH = player.system.centerGoalBearing()
 
-    return Transition.getNextState(player, walkToGoal)
+    print "I am going to " + str(player.system.home)
+
+    return player.stay()# Transition.getNextState(player, walkToGoal)
 
 def dodgeBall(player):
     if player.firstFrame():
