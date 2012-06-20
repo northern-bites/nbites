@@ -38,12 +38,21 @@ public:
         loc->redGoalieReset();
     }
 
-    void resetLocTo(float x, float y, float h){
-        loc->resetLocTo(x, y, h * TO_RAD);
+    void resetLocTo(float x, float y, float h,
+		    LocNormalParams params = LocNormalParams())
+    {
+        loc->resetLocTo(x, y, h * TO_RAD, params);
     }
 
-    void resetLocTo(float x, float y, float h, float x_, float y_, float h_){
-        loc->resetLocTo(x, y, h * TO_RAD, x_, y_, h_ * TO_RAD);
+    void resetLocTo(float x, float y, float h, 
+		    float x_, float y_, float h_,
+		    LocNormalParams params1 = LocNormalParams(),
+		    LocNormalParams params2 = LocNormalParams())
+    {		    
+        loc->resetLocTo(x, y, h * TO_RAD, 
+			x_, y_, h_ * TO_RAD,
+	                params1,
+			params2);
     }
 
     void setOnOpposingSide(bool opp)

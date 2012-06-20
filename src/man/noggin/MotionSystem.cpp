@@ -15,7 +15,7 @@
  * Constructor. No shit :).
  */
 MotionSystem::MotionSystem()
-    : moved(false) {
+    : moved(false), robotFallen(false) {
 }
 
 void MotionSystem::motionUpdate(const OdometryModel& odometryModel) {
@@ -74,7 +74,6 @@ float ODO_MEASUREMENT_THETA_SD = 0.038f;
  */
 DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
 {
-
     DeltaOdometryMeasurement noisyDeltaOdometry;
 
     //Add noise proportionally to the step size (the bigger the step, the worst
@@ -99,6 +98,16 @@ DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
         //replace it with a usual measurement
         noisyDeltaOdometry.theta = PF::sampleNormal(0.0f, ODO_MEASUREMENT_THETA_SD);
     }
+
+    // // If the robot has fallen, increase noise in heading. 
+    // if(robotFallen)
+    // {
+    // 	// Incorperate noise only once per fall.
+    // 	robotFallen = false;
+    // 	float noise = PF::sampleNormal(0.0f, M_PI_FLOAT);
+    // 	noisyDeltaOdometry.theta += PF::sampleNormal(0.0f, noise);
+    // 	std::cout << "Adding robot fall noise " << noise << std::endl;
+    // }
 
     return noisyDeltaOdometry;
 }
@@ -143,4 +152,9 @@ PF::ParticleSet MotionSystem::update(PF::ParticleSet particles) const
     }
 
     return particles;
+}
+
+void MotionSystem::setFallen(bool fallen)
+{
+    robotFallen = fallen;
 }
