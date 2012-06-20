@@ -97,15 +97,14 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
     connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
 
-    CollapsibleImageViewer* bottomCIV = new
-            CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
-    CollapsibleImageViewer* topCIV = new
-            CollapsibleImageViewer(topImageViewer, "Top", this);
-
     QWidget* combinedRawImageView = new QWidget(this);
 
     QVBoxLayout* layout = new QVBoxLayout(combinedRawImageView);
     layout->setAlignment(Qt::AlignTop);
+
+	memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+	memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
+	memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
 
 	connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));
