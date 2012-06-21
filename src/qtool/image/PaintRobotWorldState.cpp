@@ -28,6 +28,7 @@ void PaintRobotWorldState::draw(QPainter& painter,
     float relY = distance * sin(bearing + startPose.h());
 
     QPoint point(relX + startPose.x(), relY + startPose.y());
+//    QPoint point(relX + 500, relY + 321);
     this->paintDot(painter, color, point, 5);
 }
 
@@ -41,9 +42,11 @@ void PaintRobotWorldState::draw(QPainter& painter, const RobotLocation& location
     //location area
     this->paintEllipseArea(painter, color, poseLoc, area.x_size(), area.y_size());
     this->paintPolarLine(painter, color, 2, poseLoc, 15,
-                         (location.h() + area.h_size()/2) * TO_DEG);
+                         //(.349 + area.h_size()/2) * TO_DEG);
+                           (location.h() + area.h_size()/2) * TO_DEG);
     this->paintPolarLine(painter, color, 2, poseLoc, 15,
-                         (location.h() - area.h_size()/2) * TO_DEG);
+                         //(.349 - area.h_size()/2) * TO_DEG);
+                          (location.h() - area.h_size()/2) * TO_DEG);
 
 }
 
@@ -58,7 +61,9 @@ RobotLocation operator+(const RobotLocation& location1, const RobotLocation& loc
 
 void PaintRobotWorldState::buildBitmap()
 {
-//    bitmap.fill(Qt::transparent);
+    using namespace google::protobuf;
+
+    bitmap.fill(Qt::transparent);
     QPainter painter(&bitmap);
 
     this->transformPainterToFieldCoordinates(painter);

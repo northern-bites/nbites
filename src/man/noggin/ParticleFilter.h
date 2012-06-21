@@ -21,62 +21,73 @@
 
 #include "LocSystem.h"
 
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
+
 namespace PF
 {
     /**
      * Contains a complete field location (x, y, angle).
      * Note that the angle is defined as increasing in the
      * counter-clockwise direction, and is 0 and 2*PI
-     * at 12 o'clock (parallel to the positive y axis.)
+     * at 3 o'clock (parallel to the positive x axis.)
      */
     struct Location
     {
-    Location(float X = 0.0f, float Y = 0.0f, float H = 0.0f)
-    : x(X), y(Y), heading(H)
-    { }
+        Location(float X = 0.0f, float Y = 0.0f, float H = 0.0f)
+            : x(X), y(Y), heading(H)
+            { }
 
-    float x;
-    float y;
-    float heading;
+        float x;
+        float y;
+        float heading;
 
-    friend std::ostream& operator<<(std::ostream& out, Location l)
-    {
-        out << "location (" << l.x << ", "
-        << l.y << ", " << l.heading << ")" << "\n";
-        return out;
-    }
+        friend std::ostream& operator<<(std::ostream& out, Location l)
+        {
+            out << "location (" << l.x << ", "
+                << l.y << ", " << l.heading << ")" << "\n";
+            return out;
+        }
     };
 
     /**
      * Contains a two-dimensional spatial vector defined
      * by a magnitude and direction (position vector).
      */
+    //TODO: this is unnecessary; also confusing - Octavian
     struct Vector2D
     {
-    Vector2D(float mag = 0.0f, float dir = 0.0f)
-    : magnitude(mag), direction(dir)
-    { }
+        Vector2D(float mag = 0.0f, float dir = 0.0f)
+            : magnitude(mag), direction(dir)
+            { }
 
-    float magnitude;
-    float direction;
+        float magnitude;
+        float direction;
+
+        friend std::ostream& operator<<(std::ostream& out, Vector2D v)
+        {
+            out << "magnitude: " << v.magnitude << ", "
+                << "direciton: " << v.direction << "\n";
+            return out;
+        }
     };
 
     struct ParticleFilterParams
     {
-    float fieldHeight;                // Field height.
-    float fieldWidth;                 // Field width.
-    int numParticles;               // Size of particle population.
-    float alpha_fast;               // Weight factor for fast exponential weight filter.
-    float alpha_slow;               // Weight factor for slow exponential weight filter.
+        int fieldHeight;    // Field height.
+        int fieldWidth;     // Field width.
+        int numParticles;   // Size of particle population.
+        float alpha_fast;   // Weight factor for fast exponential weight filter.
+        float alpha_slow;   // Weight factor for slow exponential weight filter.
     };
 
     static const ParticleFilterParams DEFAULT_PARAMS =
     {
-    FIELD_WHITE_HEIGHT,
-    FIELD_WHITE_WIDTH,
-    150,
-    0.2f,
-    0.05f
+        FIELD_GREEN_HEIGHT,
+        FIELD_GREEN_WIDTH,
+        200,
+        0.2f,
+        0.05f
     };
 
     class MotionModel;
@@ -90,34 +101,36 @@ namespace PF
     class LocalizationParticle
     {
     public:
-    LocalizationParticle(Location l, float w);
-    LocalizationParticle();
+        LocalizationParticle(Location l, float w)
+            : weight(w), location(l) { }
+        LocalizationParticle() : weight(0.0f), location() {}
 
-    ~LocalizationParticle() { }
+        ~LocalizationParticle() { }
 
-    Location getLocation() const { return location; }
-    void setLocation(Location nl) { location = nl; }
+        Location getLocation() const { return location; }
+        void setLocation(Location nl) { location = nl; }
 
-    float getWeight() const { return weight; }
-    void setWeight(float nw) { weight = nw; }
+        float getWeight() const { return weight; }
+        void setWeight(float nw) { weight = nw; }
 
-    void setX(float x) { location.x = x; }
-    void setY(float y) { location.y = y; }
-    void setH(float h) { location.heading = h; }
+        void setX(float x) { location.x = x; }
+        void setY(float y) { location.y = y; }
+        void setH(float h) { location.heading = h; }
 
-    friend bool operator <(const LocalizationParticle& first,
-                   const LocalizationParticle& second);
+        friend bool operator <(const LocalizationParticle& first,
+                               const LocalizationParticle& second);
 
-    friend std::ostream& operator<<(std::ostream& out, LocalizationParticle p)
-    {
-        out << "Particle with weight " << p.getWeight() << " with "
-        << p.getLocation() << std::endl;
-        return out;
-    }
+        friend std::ostream& operator<<(std::ostream& out,
+                                        LocalizationParticle p)
+        {
+            out << "Particle with weight " << p.getWeight() << " with "
+                << p.getLocation() << std::endl;
+            return out;
+        }
 
     private:
-    float weight;
-    Location location;
+        float weight;
+        Location location;
     };
 
     typedef std::vector<LocalizationParticle> ParticleSet;
@@ -131,11 +144,17 @@ namespace PF
      */
     class ParticleFilter : public LocSystem
     {
+
     public:
-        ParticleFilter(boost::shared_ptr<MotionModel> motion,
-               boost::shared_ptr<SensorModel> sensor,
-                   ParticleFilterParams params = DEFAULT_PARAMS);
-    ~ParticleFilter();
+        typedef man::memory::MLocalization MLocalization;
+        typedef man::memory::MemoryProvider<man::memory::MLocalization, ParticleFilter> MemoryProvider;
+
+    public:
+   ParticleFilter(boost::shared_ptr<MotionModel> motion,
+                  boost::shared_ptr<SensorModel> sensor,
+                  MLocalization::ptr mLocalization = MLocalization::ptr(),
+                  ParticleFilterParams params = DEFAULT_PARAMS);
+   ~ParticleFilter();
 
     void run(bool motionUpdate = true, bool sensorUpdate = true);
 
@@ -149,8 +168,8 @@ namespace PF
      * do anything, since LocSystem will change soon (maybe? @todo)
      */
     void updateLocalization(const ::MotionModel& u_t,
-                const std::vector<PointObservation>& pt_z,
-                const std::vector<CornerObservation>& c_z)
+                            const std::vector<PointObservation>& pt_z,
+                            const std::vector<CornerObservation>& c_z)
     {
         // Just run the next iteration of the particle filter.
         run();
@@ -160,19 +179,23 @@ namespace PF
 
     void blueGoalieReset() { }
     void redGoalieReset() { }
-    void resetLocTo(float x, float y, float h);
+    void resetLocTo(float x, float y, float h, LocNormalParams params = LocNormalParams());
+    void resetLocTo(float x, float y, float h, 
+		    float x_, float y_, float h_,
+	            LocNormalParams params1 = LocNormalParams(),
+	            LocNormalParams params2 = LocNormalParams());
 
-    PoseEst getCurrentEstimate() const { return PoseEst(); }
+    PoseEst getCurrentEstimate() const { return PoseEst(xEstimate, yEstimate, hEstimate); }
     PoseEst getCurrentUncertainty() const { return PoseEst(); }
     float getXEst() const { return xEstimate; }
     float getYEst() const { return yEstimate; }
     float getHEst() const { return hEstimate; }
-    float getHEstDeg() const { return 0.0f; }
+    float getHEstDeg() const { return hEstimate*TO_DEG; }
     float getXUncert() const { return 0.0f; }
     float getYUncert() const { return 0.0f; }
     float getHUncert() const { return 0.0f; }
     float getHUncertDeg() const { return 0.0f; }
-    ::MotionModel getLastOdo() const { return ::MotionModel(); }
+    ::MotionModel getLastOdo() const;
 
     std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
 
@@ -181,7 +204,9 @@ namespace PF
 
     bool isActive() const { return true; }
 
-        void setXEst(float xEst) { xEstimate = xEst; }
+    void updateMemory(MLocalization::ptr mLocalization) const;
+
+    void setXEst(float xEst) { xEstimate = xEst; }
     void setYEst(float yEst) { yEstimate = yEst; }
     void setHEst(float hEst) { hEstimate = hEst; }
     void setXUncert(float uncertX) { }
@@ -189,6 +214,8 @@ namespace PF
     void setHUncert(float uncertH) { }
     void activate() { }
     void deactivate() { }
+
+    std::vector<float> findParticleSD() const;
 
     private:
     void resample();
@@ -203,6 +230,8 @@ namespace PF
     float wFast;
     float wSlow;
 
+    MemoryProvider memoryProvider;
+
     ParticleSet particles;
     boost::shared_ptr<MotionModel> motionModel;
     boost::shared_ptr<SensorModel> sensorModel;
@@ -216,10 +245,11 @@ namespace PF
     class MotionModel
     {
     public:
-    MotionModel() { }
-    virtual ~MotionModel() { }
+        MotionModel() { }
+        virtual ~MotionModel() { }
 
-    virtual ParticleSet update(ParticleSet particles) = 0;
+        virtual ParticleSet update(ParticleSet particles) const = 0;
+        virtual const ::MotionModel& getLastOdometry() const = 0;
     };
 
     /**
@@ -229,21 +259,21 @@ namespace PF
     class SensorModel
     {
     public:
-    SensorModel() { }
-    virtual ~SensorModel() { }
+        SensorModel() { }
+        virtual ~SensorModel() { }
 
-    virtual ParticleSet update(ParticleSet particles) = 0;
+        virtual ParticleSet update(ParticleSet particles) = 0;
 
-    /**
-     * These methods allow the client to access information as
-     * to whether or not the SensorModel has performed an
-     * update on the latest iteration.
-     */
-    bool hasUpdated() const { return updated; }
-    void setUpdated(bool u) { updated = u; }
+        /**
+         * These methods allow the client to access information as
+         * to whether or not the SensorModel has performed an
+         * update on the latest iteration.
+         */
+        bool hasUpdated() const { return updated; }
+        void setUpdated(bool u) { updated = u; }
 
     private:
-    bool updated;
+        bool updated;
     };
 
     /**
@@ -256,15 +286,15 @@ namespace PF
      */
     static float sampleNormal(float mean, float sigma)
     {
-    // Seed the random number generator.
+        // Seed the random number generator.
         static boost::mt19937 rng(static_cast<unsigned>(std::time(0)));
 
-    boost::normal_distribution<float> dist(mean, sigma);
+        boost::normal_distribution<float> dist(mean, sigma);
 
-    boost::variate_generator<boost::mt19937&,
-        boost::normal_distribution<float> > sample(rng, dist);
+        boost::variate_generator<boost::mt19937&,
+                       boost::normal_distribution<float> > sample(rng, dist);
 
-    return sample();
+        return sample();
     }
 
     /**
@@ -278,16 +308,21 @@ namespace PF
      */
     static Vector2D getPosition(Location origin, float x, float y)
     {
-    float x0 = origin.x;
-    float y0 = origin.y;
-    float rotate = NBMath::subPIAngle(origin.heading);
 
-    // Translate and rotate.
-    float x_prime = (x - x0) * std::cos(rotate) + (y - y0) * std::sin(rotate);
-    float y_prime = (y - y0) * std::cos(rotate) + (x - x0) * std::sin(rotate);
+        float dx = x - origin.x;
+        float dy = y - origin.y;
 
-    return Vector2D(std::sqrt(x_prime*x_prime + y_prime*y_prime),
-            std::atan2(y_prime, x_prime));
+        float magnitude = std::sqrt(dx*dx + dy*dy);
+
+        float sinh, cosh;
+        sincosf(-origin.heading, &sinh, &cosh);
+
+        float x_prime = cosh * dx - sinh * dy;
+        float y_prime = sinh * dx + cosh * dy;
+
+        float bearing = NBMath::safe_atan2(y_prime, x_prime);
+
+        return Vector2D(magnitude, bearing);
     }
 }
 

@@ -39,7 +39,9 @@ private:
 
 public: // Constants
     static const int NUM_BLUE_GOAL_POSTS = 2;
+    static const int NUM_RIGHT_GOAL_POSTS = 2;
     static const int NUM_YELLOW_GOAL_POSTS = 2;
+    static const int NUM_LEFT_GOAL_POSTS = 2;
     static const int NUM_FIELD_OBJECTS = NUM_BLUE_GOAL_POSTS +
         NUM_YELLOW_GOAL_POSTS;
 
@@ -79,6 +81,8 @@ public:
 private:
     static const ConcreteFieldObject* BLUE_GOAL_POSTS[NUM_BLUE_GOAL_POSTS];
     static const ConcreteFieldObject* YELLOW_GOAL_POSTS[NUM_YELLOW_GOAL_POSTS];
+    static const ConcreteFieldObject* RIGHT_GOAL_POSTS[NUM_RIGHT_GOAL_POSTS];
+    static const ConcreteFieldObject* LEFT_GOAL_POSTS[NUM_LEFT_GOAL_POSTS];
 
 public:
     static const std::list <const ConcreteFieldObject*> blueGoalPosts;
@@ -87,6 +91,10 @@ public:
     static const std::list <const ConcreteFieldObject*> blueGoalRightPostList;
     static const std::list <const ConcreteFieldObject*> yellowGoalLeftPostList;
     static const std::list <const ConcreteFieldObject*> yellowGoalRightPostList;
+
+    static const std::list <const ConcreteFieldObject*> rightPosts;
+    static const std::list <const ConcreteFieldObject*> leftPosts;
+    static const std::list <const ConcreteFieldObject*> allPosts;
 
 private: // Instance variables recording location on field and identifier
     int id;

@@ -14,6 +14,23 @@
 #include "NogginStructs.h"
 #include "Observation.h"
 
+struct LocNormalParams
+{
+    LocNormalParams(float sx, float sy, float sh)
+    : sigma_x(sx), sigma_y(sy), sigma_h(sh)
+    {
+    }
+    
+    LocNormalParams()
+    : sigma_x(15.0), sigma_y(15.0), sigma_h(1.0)
+    {
+    }
+
+    float sigma_x;         
+    float sigma_y;
+    float sigma_h;
+};
+
 class LocSystem
 {
     ADD_SHARED_PTR(LocSystem)
@@ -29,7 +46,12 @@ public:
 
     virtual void blueGoalieReset() = 0;
     virtual void redGoalieReset() = 0;
-    virtual void resetLocTo(float x, float y, float h) = 0;
+    virtual void resetLocTo(float x, float y, float h,
+			    LocNormalParams params = LocNormalParams()) = 0;
+    virtual void resetLocTo(float x, float y, float h,
+			    float x_, float y_, float h_,
+			    LocNormalParams params1 = LocNormalParams(),
+			    LocNormalParams params2 = LocNormalParams()) = 0;
 
     // Getters
     virtual PoseEst getCurrentEstimate() const    = 0;

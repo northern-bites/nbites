@@ -92,7 +92,7 @@ def fullPanFixedPitch(tracker):
     """
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
+        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
@@ -136,12 +136,7 @@ def afterKickScan(tracker):
     If the ball is seen, go to state 'ballTracking'.
     """
     if tracker.counter < 2:
-        tracker.brain.motion.stopHeadMoves()
-        tracker.helper.executeHeadMove(constants.KICK_DICT[tracker.kickName])
-
-    if tracker.brain.ball.vis.framesOn > 2:
-        return tracker.goLater('ballTracking')
-
+        return tracker.goLater(constants.KICK_DICT[tracker.kickName])
     return tracker.stay()
 
 # Only called from activeTracking.

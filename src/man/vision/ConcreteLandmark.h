@@ -1,3 +1,5 @@
+// An abstract class that stores coordinates of a landmark
+
 #ifndef ConcreteLandmark_h_defined__
 #define ConcreteLandmark_h_defined__
 

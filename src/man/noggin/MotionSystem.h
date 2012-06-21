@@ -4,37 +4,17 @@
  * data.
  *
  * @author Ellis Ratner <eratner@bowdoin.edu>
+ * @fixed Octavian Neamtu #hotaldebarangirl #hahathisisfunny
  */
-#ifndef MOTION_SYSTEM_H
-#define MOTION_SYSTEM_H
 
-#include "VisionSystem.h"
+#pragma once
 
-class VisionSystem; 
+#include "EKFStructs.h"
+#include "ParticleFilter.h"
 
-/**
- * Holds information about an odometry measurement.
- */
-namespace PF
-{
-    struct OdometryMeasurement
-    {
-         OdometryMeasurement(float X = 0.0f, float Y = 0.0f, float H = 0.0f)
-	 : x(X), y(Y), h(H)
-	{ }
-	
-	float x;
-	float y;
-	float h;
-	
-	friend std::ostream& operator<<(std::ostream& out, OdometryMeasurement o)
-	{
-	    out << "Last odometry measurement, (" << o.x << ", "
-		<< o.y << ", " << o.h << ")" << "\n";
-	    return out;
-	}
-    };
-}
+//TODO: just make MotionModel the odometry model
+typedef MotionModel OdometryModel;
+typedef DeltaMotionModel DeltaOdometryMeasurement;
 
 /**
  * @class MotionSystem
@@ -48,17 +28,34 @@ class MotionSystem : public PF::MotionModel
     MotionSystem();
     ~MotionSystem() { }
 
-    void setCurrentOdometry(const PF::OdometryMeasurement &current);
-    void setLastOdometry(const PF::OdometryMeasurement &last);
-    PF::OdometryMeasurement noisyDeltaOdometry(const PF::OdometryMeasurement &newOdometry);
-    PF::ParticleSet update(PF::ParticleSet particles);
+    /**
+     * Incorporate motion odometry measurements
+     * The odometryModel can potentially be invalid
+     */
+    void motionUpdate(const OdometryModel& odometryModel);
+    PF::ParticleSet update(PF::ParticleSet particles) const;
+    const OdometryModel& getLastOdometry() const { return currentOdometryModel; }
 
-    PF::OdometryMeasurement getLastOdometry() const { return lastOdometry; }
+    /**
+     * When a robot falls, it tends to rotate, altering its
+     * heading in a manner not measureable by conventional
+     * odometry. Therefore, we will account for this by adding
+     * additional noise/uncertainty to the heading following
+     * a fall. 
+     *
+     * @param fallen Whether or not the robot is fallen. 
+     */
+    void setFallen(bool fallen);
 
  private:
-    bool moved;
-    PF::OdometryMeasurement currentOdometry;
-    PF::OdometryMeasurement lastOdometry;
-};
+    DeltaOdometryMeasurement makeNoisyDeltaOdometry() const;
+    void clipDeltaOdometry();
 
-#endif // MOTION_SYSTEM_H
+ private:
+    mutable bool moved;
+    mutable bool robotFallen;
+    OdometryModel currentOdometryModel;
+    OdometryModel lastOdometryModel;
+    DeltaOdometryMeasurement deltaOdometry;
+
+};

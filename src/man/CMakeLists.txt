@@ -90,11 +90,19 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
-SET( COLOR_TABLE
-  "../../data/tables/223-robots.mtb"
+SET( @TABLE_TOP@
+  "../../data/tables/mexico-c-top.mtb"
   CACHE STRING
-  "Path relative to man directory for the desired color table"
+  "Path relative to man directory for the desired top camera color table"
   )
+SET( TABLE_TOP ${@TABLE_TOP@})
+
+SET( @TABLE_BOTTOM@
+  "../../data/tables/mexico-c-bottom.mtb"
+  CACHE STRING
+  "Path relative to man directory for the desired bottom camera color table"
+  )
+SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
 
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(

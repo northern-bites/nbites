@@ -67,7 +67,7 @@ public:
 	void setRedGoalieProbable() {probablyRedGoalie = true;}
 	void setNavyGoalieProbable() {probablyNavyGoalie = true;}
     void setDistanceWithSD(float _distance);
-    void setBearingWithSD(float _bearing);
+    void setBearingWithSD(float _bearing, float _distance);
     virtual void setIDCertainty(certainty c);
 
 
@@ -95,7 +95,16 @@ public:
         return possibleFieldObjects;
     }
 
+    bool isEstimateCertain() const { return estimateCertain; }
+    void setEstimateCertain(bool certainty) { estimateCertain = certainty; }
+
 	virtual const bool hasPositiveID();
+	virtual bool hasValidDistance() const {
+	    //TODO: we should
+	    //really have a unified way of telling
+	    //if a post estimate is valid or not
+	    return getDistance() > 0.0f && estimateCertain;
+	}
 
 private: // Class Variables
 
@@ -110,16 +119,18 @@ private: // Class Variables
 	bool almostCertainlyNavyGoalie;
 	bool almostCertainlyRedGoalie;
 
+	bool estimateCertain;
+
     // This list will hold all the possibilities for this objects's specific ID
     const std::list <const ConcreteFieldObject *> * possibleFieldObjects;
 
     // Helper Methods
+    // Obtained by magic by Octavian and Lizzie summer 2012
     inline static float postDistanceToSD(float _distance) {
-        //return 0.0496f * exp(0.0271f * _distance);
-        return sqrtf(2.0f*(10 + (_distance * _distance)*0.00125f));
+        return (_distance-100.f)*(_distance-100.f)/4500.f + 10.f;
     }
-    inline static float postBearingToSD(float _bearing) {
-        return sqrtf(static_cast<float>(M_PI) / 8.0f);
+    inline static float postBearingToSD(float _distance) {
+        return .0000002*(_distance*_distance) + 4 * TO_RAD;
     }
     const static float BOTH_UNSURE_DISTANCE_SD;
 };

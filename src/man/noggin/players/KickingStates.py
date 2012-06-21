@@ -14,21 +14,30 @@ def kickBallExecute(player):
         player.brain.speech.say("Kick it")
         player.brain.tracker.trackBallFixedPitch()
 
-        print "performing " + str(player.kick)
-        kick = player.kick.sweetMove
+        print "Performing " + str(player.kick)
 
-#        if transitions.ballInPosition(player) and kick is not None:
-        player.executeMove(kick)
+        #print "ball is at {0}, {1}".format(player.brain.ball.loc.relX,
+        #                                         player.brain.ball.loc.relY)
+    
+
+        kickBallExecute.sweetMove = player.kick.sweetMove
+        
+        kickBallExecute.preKickDelay = 30
         return player.stay()
-#        else:
-            #Either it's close and we can't kick it now or it's far
-            #away and we should search.
+    
+    kickBallExecute.preKickDelay-=1
+    
+    if kickBallExecute.preKickDelay == 0:
+        player.executeMove(kickBallExecute.sweetMove)
+        return player.stay()
 
-    if player.counter > 10 and player.brain.nav.isStopped():
-        return player.goLater('chase')
-#        return player.goLater('afterKick')
+    if player.counter > 40 and player.brain.nav.isStopped():
+        return player.goNow('afterKick')
 
     return player.stay()
+
+kickBallExecute.preKickDelay = 0
+kickBallExecute.sweetMove = None
 
 def afterKick(player):
     """
@@ -37,27 +46,22 @@ def afterKick(player):
     """
     if player.firstFrame():
         player.stand()        # stand up right, ready to walk
-        player.brain.tracker.trackBallFixedPitch()
-
-        kick = player.brain.kickDecider.getKick()
-
-        # TODO: fix after kick scans @summer 2012
-        #player.brain.tracker.afterKickScan(kick.name)
-
-        if kick.isBackKick():
-            player.inKickingState = False
-            return player.goLater('spinAfterBackKick')
-
+        player.brain.tracker.afterKickScan(player.kick.name)
         return player.stay()
 
     if transitions.shouldKickAgain(player):
+        player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         return player.goNow('positionForKick')
 
-    if ((player.counter > 1 and player.brain.nav.isStopped()) or
-        transitions.shouldChaseBall(player) or
+    if player.kick.isBackKick() and player.counter > 10:
+        player.inKickingState = False
+        return player.goNow('spinAfterBackKick')
+
+
+    if (transitions.shouldChaseBall(player) or
         transitions.shouldFindBallKick(player)):
         player.inKickingState = False
-        return player.goNow('chase')
+        return player.goLater('chase')
 
     return player.stay()
 
@@ -65,10 +69,12 @@ def spinAfterBackKick(player):
     """
     State to spin to the ball after we kick it behind us.
     """
+    # TODO This is essentially spinFindBall... maybe we go straight to that.
+
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBallFixedPitch()
-        return player.goNow('chase')
+        return player.goLater('chase')
 
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()

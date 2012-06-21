@@ -33,12 +33,12 @@ def gameFinished(game):
 
 def penaltyShotsGameInitial(game):
     if game.firstFrame():
-        game.brain.player.switchTo('penaltyShotsGameInitial')
+        game.brain.player.switchTo('penaltyShotsGameSet')
     return game.stay()
 
 def penaltyShotsGameReady(game):
     if game.firstFrame():
-        game.brain.player.switchTo('penaltyShotsGameReady')
+        game.brain.player.switchTo('penaltyShotsGameSet')
     return game.stay()
 
 def penaltyShotsGameSet(game):

@@ -6,6 +6,8 @@ from . import HeadTrackingHelper as helper
 import man.motion.HeadMoves as HeadMoves
 from ..util import FSA
 
+import man.motion.StiffnessModes as stiff
+
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""
 
@@ -52,10 +54,18 @@ class HeadTracking(FSA.FSA):
         """Executes sweet move to move head to neutral position, then stops."""
         self.switchTo('neutralHead')
 
+    def penalizeHeads(self):
+        """Penalizes the heads."""
+        self.switchTo('penalizeHeads')
+
     def performHeadMove(self, headMove):
         """Executes the given headMove, then stops."""
-        self.headMove = headMove
-        self.switchTo('doHeadMove')
+        if headMove != self.headMove or self.currentState != 'doHeadMove':
+            self.headMove = headMove
+            # If we were already in the state, reset our counter so that
+            #  firstFrame() will be true again.
+            self.switchTo('stop')
+            self.switchTo('doHeadMove')
 
     # Note: safe to call every frame.
     def repeatHeadMove(self, headMove):
@@ -84,6 +94,9 @@ class HeadTracking(FSA.FSA):
 
     def performWidePanFixedPitch(self):
         self.performHeadMove(HeadMoves.FIXED_PITCH_PAN_WIDE)
+
+    def performKickPanFixedPitch(self, invert = False):
+        self.performHeadMove(self.helper.convertKickPan(HeadMoves.FIXED_PITCH_KICK_PAN, invert))
 
     def trackBallFixedPitch(self):
         """
@@ -120,6 +133,12 @@ class HeadTracking(FSA.FSA):
         self.brain.motion.stopHeadMoves()
         self.helper.lookToAngleFixedPitch(yaw)
 
+    def lookStraightThenTrackFixedPitch(self):
+        """
+        Look straight. Once the ball is seen, begin tracking it.
+        """
+        self.switchTo('lookStraightThenTrackFixedPitch')
+
     ################### End Fixed Pitch #####################
 
     # Needs adjustments for current kicks.
@@ -140,6 +159,7 @@ class HeadTracking(FSA.FSA):
 
     def lookToTarget(self, target):
         """Look towards given target, using localization values."""
+        self.target = target
         self.target.height = 0
         self.switchTo('lookToPoint')
 
@@ -154,3 +174,16 @@ class HeadTracking(FSA.FSA):
         self.target.y = goalY
         self.target.height = goalZ
         self.helper.lookToPoint(self.target)
+
+    def lookToAngle(self, angle):
+        """
+        Look toward a specific angle relative to forward (ie set yaw).
+        """
+        self.target = 0
+        if angle < 57.0 and angle > -57.0:
+            self.headMove = (((angle, 17.0), 2.0, 1,
+                              stiff.LOW_HEAD_STIFFNESSES), )
+        else:
+            self.headMove = (((angle, 11.0), 2.0, 1,
+                              stiff.LOW_HEAD_STIFFNESSES), )
+        self.switchTo('doHeadMove')

@@ -12,6 +12,8 @@ using namespace boost;
 
 BOOST_PYTHON_MODULE(_localization)
 {
+    class_<LocNormalParams>("LocNormalParams", init<float, float, float>());
+
     class_<PyLoc>("Loc")
         .add_property("x", &PyLoc::getXEst)
         .add_property("y", &PyLoc::getYEst)
@@ -70,8 +72,12 @@ BOOST_PYTHON_MODULE(_localization)
              "reset the localization system")
         .def("redGoalieReset", &PyLoc::redGoalieReset,
              "reset the localization system")
-		.def("resetLocTo", &PyLoc::resetLocTo,
-			 "reset the localiation system to a specific location")
+	.def("resetLocTo", static_cast< void(PyLoc::*)
+	     (float, float, float, LocNormalParams) >(&PyLoc::resetLocTo),
+	     "reset the localization system to a specific location")
+	.def("resetLocTo", static_cast< void(PyLoc::*)
+	     (float, float, float, float, float, float, LocNormalParams, LocNormalParams) >(&PyLoc::resetLocTo),
+	     "reset the localization system to two distinct locations")
         ;
 }
 
