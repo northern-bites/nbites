@@ -295,7 +295,8 @@ class KickInformation:
         # Determine which goal to aim at
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
-            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
+            #  Screw it. We need it anyway.
+            if self.dangerousBallCount > 5 or self.nearGoalieOwn:
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
             else:
@@ -306,7 +307,8 @@ class KickInformation:
             leftPostBearing = self.farLeftPostBearing
         elif self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
-            if self.dangerousBallCount > 5: #or self.nearGoalieOwn:
+            #  Screw it. We need it anyway.
+            if self.dangerousBallCount > 5 or self.nearGoalieOwn:
                 # Can only see our own goal: Use goalie to make decision
 
                 if DEBUG_KICK_DECISION:
