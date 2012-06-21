@@ -130,10 +130,11 @@ def unsure(player):
             player.counter > 60)
 
 def shouldGetReadyToSave(player):
-    return player.brain.ball.vis.heat > 10.0
+    return (player.brain.ball.vis.heat > 10.0 and
+            not shouldClearBall(player))
 
 def noSave(player):
-   return player.counter > 90
+   return player.counter > 60
 
 def shouldPerformSave(player):
     """

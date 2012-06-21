@@ -96,7 +96,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.shouldISaveIt,
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
-                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.clearIt,
 
@@ -111,6 +111,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveIt,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.clearIt,
 
             Transition.CountTransition(GoalieTransitions.noSave,
                                        Transition.ALL_OF_THE_TIME,
