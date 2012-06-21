@@ -7,6 +7,7 @@ import math
 
 DEBUG_KICK_DECISION = False
 USE_LOC = False
+USE_LOC_HALF_FIELD = False
 
 class KickInformation:
     """
@@ -65,6 +66,9 @@ class KickInformation:
         self.destDist = 500.
 
         self.orbitAngle = 0.0
+
+        if not USE_LOC_HALF_FIELD:
+            self.brain.onOwnFieldSide = False
 
     def getKickObjective(self):
         """
@@ -215,14 +219,14 @@ class KickInformation:
         # Determine visual dangerous goalie
         # Note that the values should be double the sightings:
         #  one for each post for each frame it is seen.
-        if (self.farGoalieRed > 20 and
+        if (self.farGoalieRed > 5 and
             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
-            (self.farGoalieNavy > 20 and
+            (self.farGoalieNavy > 5 and
              self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
             self.farGoalieOwn = True
-        if (self.nearGoalieRed > 20 and
+        if (self.nearGoalieRed > 5 and
             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
-            (self.nearGoalieNavy > 20 and
+            (self.nearGoalieNavy > 5 and
              self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
             self.nearGoalieOwn = True
 
@@ -296,7 +300,8 @@ class KickInformation:
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
             #  Screw it. We need it anyway.
-            if self.dangerousBallCount > 5 or self.nearGoalieOwn:
+            if self.dangerousBallCount > 5 or self.nearGoalieOwn or \
+                    self.brain.onOwnFieldSide:
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
             else:
@@ -308,13 +313,32 @@ class KickInformation:
         elif self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
             #  Screw it. We need it anyway.
-            if self.dangerousBallCount > 5 or self.nearGoalieOwn:
+            if self.dangerousBallCount > 5 or self.nearGoalieOwn or \
+                    self.brain.onOwnFieldSide:
+
                 # Can only see our own goal: Use goalie to make decision
+                if self.dangerousBallCount > 5:
+                    if DEBUG_KICK_DECISION:
+                        print "Doing a goalie based clearing kick."
+                    return self.goalieBasedKick()
 
-                if DEBUG_KICK_DECISION:
-                    print "Doing a goalie based kick."
+                # Saw two posts: use them to triangulate.
+                if self.nearRightPostBearing != 0 and self.nearLeftPostBearing != 0:
+                    if DEBUG_KICK_DECISION:
+                        print "Saw two own posts. Triangulating and clearing."
+                    return self.triangulateClearKick()
 
-                return self.goalieBasedKick()
+                # Saw one post: oh god, what now?
+                # Default to no-info orbit.
+                """
+                if self.nearRightPostBearing != 0:
+                    pass
+                else:
+                    pass
+                """
+                kick = kicks.ORBIT_KICK_POSITION
+                kick.h = 45
+                return kick
             else:
                 rightPostBearing = self.nearRightPostBearing
                 leftPostBearing = self.nearLeftPostBearing
@@ -460,7 +484,7 @@ class KickInformation:
     def goalieBasedKick(self):
         # Assert: Neither far post was seen.
         #         At least one near post was seen.
-        #         Goalie can see the ball.
+        #         Either Goalie can see the ball, or not.
         goalieBearing = 0
         goalieDist = 0
         kick = None
@@ -503,6 +527,10 @@ class KickInformation:
         elif myGlobalHeading > 180:
             myGlobalHeading -= 360
 
+        return self.chooseClearKick(myGlobalHeading, ballX, ballY)
+
+
+    def chooseClearKick(self, myGlobalHeading, ballX, ballY):
         # Assert: I have my global heading and coordinates of the ball.
 
         if DEBUG_KICK_DECISION:
@@ -547,6 +575,33 @@ class KickInformation:
         # Make sure the heading is an int before passing it to nav as an orbit angle.
         kick.h = int(kick.h)
         return kick
+
+    def triangulateClearKick(self):
+        # Assert: Neither far post was seen.
+        #         Both near posts were seen.
+        bearingDiff = self.nearLeftPostBearing - self.nearRightPostBearing
+        leftDist = self.nearRightPostDist
+        rightDist = self.nearLeftPostDist
+        leftPostY = nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y
+        rightPostY = nogginConstants.LANDMARK_BLUE_GOAL_BOTTOM_POST_Y
+        farSideLenth = nogginConstants.CROSSBAR_CM_WIDTH
+
+        # Should be generalized into a helper method somewhere.
+        y = (math.pow(leftPostY,2) + math.pow(leftDist,2) - math.pow(rightPostY,2) - math.pow(rightDist,2)) / (2 * (leftPostY - rightPostY))
+        x = math.sqrt(math.pow(leftDist,2) - math.pow((y-rightPostY),2))
+
+        # Use locations to get global heading.
+        post = Objects.Location(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y)
+        me = Objects.Location(x,y)
+        meToPost = me.relativeLocationOf(post)
+
+        myGlobalHeading = meToPost.bearing - self.nearLeftPostBearing
+        if myGlobalHeading < -180:
+            myGlobalHeading += 360
+        elif myGlobalHeading > 180:
+            myGlobalHeading -= 360
+
+        return self.chooseClearKick(myGlobalHeading, x, y)
 
     def chooseShortFrontKick(self):
         if self.kickWithLeftFoot():
