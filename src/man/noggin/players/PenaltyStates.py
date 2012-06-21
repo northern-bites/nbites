@@ -2,6 +2,7 @@ import noggin_constants as NogginConstants
 import man.motion.HeadMoves as HeadMoves
 import man.noggin.util.MyMath as MyMath
 import PositionConstants as constants
+import ChaseBallTransitions as transitions
 from objects import RelRobotLocation
 
 OBJ_SEEN_THRESH = 5
@@ -11,18 +12,19 @@ LOOK_DIR_THRESH = 10
 # Consider removing entirely.
 def afterPenalty(player):
 
-    gcState = player.brain.gameController.currentState
-
     if player.firstFrame():
-        initPenaltyReloc(player)
+        print "Pan for the ball now that we're out of penalty"
+        # pan for the ball
         player.brain.tracker.repeatWidePanFixedPitch()
-        # walk towards the center of the field
-        player.brain.nav.walkTo(RelRobotLocation(2000,0,0))
+        # walk towards your own field cross
+        print "Walk onto the field"
+        player.brain.nav.walkTo(RelRobotLocation(300,0,0))
 
-    if player.brain.ball.vis.framesOn > OBJ_SEEN_THRESH:
-        #deal with ball and don't worry about loc
-        player.brain.tracker.trackBallFixedPitch()
-        return player.goLater(gcState)
+    if transitions.shouldChaseBall(player):
+        if not player.brain.play.isChaser():
+            return player.goLater('playbookPosition')
+        else:
+            return player.goLater('chase')
 
     # Would be great if loc worked. Hacked out for US OPEN 2012
     """
@@ -46,22 +48,11 @@ def afterPenalty(player):
         player.headCount += 1
     """
 
-    # Hacked out for US OPEN 2012
-    """
-    #if we are looking left too long
-    if player.headCount == LOOK_DIR_THRESH:
-        player.brain.tracker.performHeadMove(HeadMoves.LOOK_UP_RIGHT)
-
-    #if we are looking right too long
-    if player.headCount == 2*LOOK_DIR_THRESH:
-        return player.goLater('penaltyRelocalize')
-        """
-
     # If done walking forward, start relocalizing normally
     if player.brain.nav.isStopped() or player.counter > 250:
         player.brain.nav.stop()
+        print "I'm at the center cross? Find Ball!!"
         return player.goLater('findBall')
-
 
     return player.stay()
 

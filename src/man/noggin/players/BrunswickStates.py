@@ -140,6 +140,11 @@ def gamePlaying(player):
     while (not player.brain.motion.calibrated()):
         return player.stay()
 
+    if player.lastDiffState == 'gamePenalized' and  player.brain.play.isChaser():
+        print "We just came out of penalty as a chaser!"
+        return player.goNow('afterPenalty')
+
+
     roleState = player.getRoleState()
     return player.goNow(roleState)
 
