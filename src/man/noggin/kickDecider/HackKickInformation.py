@@ -329,10 +329,16 @@ class KickInformation:
                     return self.triangulateClearKick()
 
                 # Saw one post: oh god, what now?
+                # Default to no-info orbit.
+                """
                 if self.nearRightPostBearing != 0:
-                    pass #HACKERDO
+                    pass
                 else:
                     pass
+                """
+                kick = kicks.ORBIT_KICK_POSITION
+                kick.h = 45
+                return kick
             else:
                 rightPostBearing = self.nearRightPostBearing
                 leftPostBearing = self.nearLeftPostBearing
