@@ -11,39 +11,66 @@ namespace Kinematics {
 // WARNING: matrix multiplication not commutative
 
 //default parameters/transforms
-float CameraCalibrate::Params[NUM_PARAMS] = {0.0f, 0.0f};
-ufmatrix4 CameraCalibrate::Transforms[2] =
+float CameraCalibrate::ParamsTop[NUM_PARAMS] = {0.0f, 0.0f};
+float CameraCalibrate::ParamsBottom[NUM_PARAMS] = {0.0f, 0.0f};
+ufmatrix4 CameraCalibrate::TransformsTop[2] =
 { CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,
-                           CameraCalibrate::Params[CameraCalibrate::PITCH]),
+                           CameraCalibrate::ParamsTop[CameraCalibrate::PITCH]),
   CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
-                           CameraCalibrate::Params[CameraCalibrate::ROLL])};
-
+                           CameraCalibrate::ParamsTop[CameraCalibrate::ROLL])};
+ufmatrix4 CameraCalibrate::TransformsBottom[2] =
+{ CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,
+                           CameraCalibrate::ParamsBottom[CameraCalibrate::PITCH]),
+  CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
+                           CameraCalibrate::ParamsBottom[CameraCalibrate::ROLL])};
 
 void CameraCalibrate::init(std::string name) {
 
-    float params[] = {0.0f, 0.0f};
+    float paramsTop[] = {0.0f, 0.0f};
+    float paramsBottom[] = {0.0f, 0.0f};
 
-    if (name == "river")
-        params[PITCH] = -.03f;
-    else if (name == "mal")
-        params[PITCH] = 0.04f;
+    if (name == "river") {
+        paramsTop[PITCH] = -.042f;
+    } else if (name == "mal") {
+        paramsTop[PITCH] = -.04f;
+        paramsBottom[PITCH] = -.12f;
+    } else if (name == "zoe") {
+        paramsTop[ROLL] = -0.02f;
+        paramsTop[PITCH] = 0.018f;
+        paramsBottom[PITCH] = 0.02f;
+    } else if (name == "jayne") {
+        paramsTop[PITCH] = 0.025f;
+        paramsBottom[PITCH] = 0.005f;
+    } else if (name == "wash") {
+        paramsTop[PITCH] = -.005f;
+    }
 
-    UpdateWithParams(params);
+    UpdateWithParams(paramsTop, paramsBottom);
 }
 
-void CameraCalibrate::UpdateWithParams(float _Params[]){
+void CameraCalibrate::UpdateWithParams(float _paramsTop[], float _paramsBottom[]){
     //update the parameter array
     for (int i = 0; i < NUM_PARAMS; i++) {
-        Params[i] = _Params[i];
+        ParamsTop[i] = _paramsTop[i];
+        ParamsBottom[i] = _paramsBottom[i];
     }
 
     //then update all of the transforms based on the new params
-    Transforms[0] =
+    TransformsTop[0] =
         CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,
-                                 Params[PITCH]);
-    Transforms[1] =
+                                 ParamsTop[PITCH]);
+    TransformsTop[1] =
         CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
-                                 Params[ROLL]);
+                                 ParamsTop[ROLL]);
+
+    TransformsBottom[0] =
+            CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,
+                    ParamsBottom[PITCH]);
+    TransformsBottom[1] =
+            CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
+                    ParamsBottom[ROLL]);
+
+
 }
 
 }

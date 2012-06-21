@@ -5,8 +5,11 @@
 #include "CoordFrame.h" //for rotation4D, etc
 #include "NBMatrixMath.h" // for ufmatrix4
 
+#include "Camera.h"
+
 using namespace NBMath;
 
+//TODO: move this to the right namespace
 namespace Kinematics {
 
 class CameraCalibrate {
@@ -19,14 +22,23 @@ public:
 
     static const int NUM_PARAMS = 2;
 
-    static float Params[NUM_PARAMS];
-    static ufmatrix4 Transforms[2];
+    static float ParamsTop[NUM_PARAMS];
+    static float ParamsBottom[NUM_PARAMS];
+    static ufmatrix4 TransformsTop[2];
+    static ufmatrix4 TransformsBottom[2];
 
     //TODO: not the best way to do this, but works
     //hack to get the parameters in
     //we should just update the params once
     static void init(std::string name);
-    static void UpdateWithParams(float params[]);
+    static void UpdateWithParams(float paramsTop[], float paramsBottom[]);
+    static ufmatrix4* getTransforms(man::corpus::Camera::Type which) {
+        if (which == man::corpus::Camera::TOP) {
+            return TransformsTop;
+        } else {
+            return TransformsBottom;
+        }
+    }
 
     };
 }

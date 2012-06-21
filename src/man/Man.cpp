@@ -46,6 +46,8 @@ Man::Man (RobotMemory::ptr memory,
     Profiler::getInstance()->profileFrames(1400);
 #endif
 
+    Kinematics::CameraCalibrate::init(RoboGuardian::getHostName());
+
     // give python a pointer to the sensors structure. Method defined in
     // Sensors.h
     set_sensors_pointer(sensors);

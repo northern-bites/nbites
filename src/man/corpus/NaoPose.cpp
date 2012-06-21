@@ -104,10 +104,18 @@ void NaoPose::transform(bool _isTopCam) {
     const ublas::vector<float> origin = vector4D(0.0f, 0.0f, 0.0f);
 
     cameraToBodyTransform = calculateForwardTransform(HEAD_CHAIN, headAngles);
+
+    ufmatrix4* camera_calibration;
     // factor in camera calibration
+    if (_isTopCam) {
+        camera_calibration = CameraCalibrate::getTransforms(man::corpus::Camera::TOP);
+    } else {
+        camera_calibration = CameraCalibrate::getTransforms(man::corpus::Camera::BOTTOM);
+    }
     for (int i = 0; i < CameraCalibrate::NUM_PARAMS; i++) {
+
         cameraToBodyTransform = prod(cameraToBodyTransform,
-                                     CameraCalibrate::Transforms[i]);
+                                     camera_calibration[i]);
     }
 
 
@@ -506,6 +514,35 @@ const int NaoPose::getHorizonX(const int y) const {
     return (int) (((float) y - (float) horizonLeft.y) / horizonSlope);
 }
 
+NBMath::ufvector3 intersection(ufvector3 a1, ufvector3 a2, ufvector3 b1, ufvector3 b2) {
+
+    int X = 0;
+    int Y = 1;
+
+    //Line1
+    float A1 = a2(Y) - a1(Y);
+    float B1 = a2(X) - a1(X);
+    float C1 = A1*a1(X) + B1*a1(Y);
+
+    //Line2
+    float A2 = b2(Y) - b1(Y);
+    float B2 = b2(X) - b1(X);
+    float C2 = A2 * b2(X) + B2 * b2(Y);
+
+    float det = A1*B2 - A2*B1;
+    if (det == 0)
+    {
+        //parallel
+        return CoordFrame3D::vector3D(-1, -1);
+    }
+    else
+    {
+        float x = (B2*C1 - B1*C2)/det;
+        float y = (A1 * C2 - A2 * C1) / det;
+        return CoordFrame3D::vector3D(x,y);
+    }
+}
+
 /**
  * getExpectedVisualLinesFromFieldPosition
  *
@@ -532,18 +569,32 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
         linePoint1 = prod(worldOriginToRobotOriginTranslation, linePoint1);
         linePoint1 = prod(worldToRobotRotation, linePoint1);
 
-        ublas::vector <float> pixel1 = worldPointToPixel(linePoint1);
-        linePoint visualLinePoint1;
-        visualLinePoint1.x = (int) pixel1(X);
-        visualLinePoint1.y = (int) pixel1(Y);
-
         ublas::vector <float> linePoint2 = CoordFrame3D::vector3D(
                 (**i).getFieldX2(), (**i).getFieldY2());
         //get the line point in the robot coordinate system
         linePoint2 = prod(worldOriginToRobotOriginTranslation, linePoint2);
         linePoint2 = prod(worldToRobotRotation, linePoint2);
 
+        ublas::vector <float> pixel1 = worldPointToPixel(linePoint1);
         ublas::vector <float> pixel2 = worldPointToPixel(linePoint2);
+
+        float FOCAL_LENGTH = 290.0;
+
+        // correct if one point is behind image plane
+        if (pixel1(Z) < 0 && pixel2(Z) > 0) {
+            pixel1 = ((FOCAL_LENGTH - pixel1(Z)) /
+                    (pixel2(Z) - pixel1(Z)))*
+                    (pixel1-pixel2) + pixel1;
+        } else if (pixel2(Z) < 0 && pixel1(Z) > 0) {
+            pixel2 = ((FOCAL_LENGTH - pixel2(Z)) /
+                    (pixel1(Z) - pixel2(Z))) *
+                    (pixel2-pixel1) + pixel2;
+        }
+
+        linePoint visualLinePoint1;
+        visualLinePoint1.x = (int) pixel1(X);
+        visualLinePoint1.y = (int) pixel1(Y);
+
         linePoint visualLinePoint2;
         visualLinePoint2.x = (int) pixel2(X);
         visualLinePoint2.y = (int) pixel2(Y);
@@ -592,7 +643,7 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     float y = -(t * pointVectorInWorldFrame(Z)) + IMAGE_CENTER_Y;
 
     //if t is negatve, then object is behind, cannnot put that in image
-    if (t < 0) {x = 0;  y = 0;}
+//    if (t < 0) {x = 0;  y = 0;}
 
     return CoordFrame3D::vector3D(x, y);
 }

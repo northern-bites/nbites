@@ -71,6 +71,9 @@ public:
 
     const std::string discoverIP() const;
 
+    //helpers
+    static std::string getHostName();
+
 public:
     static const int NO_CLICKS;
 
@@ -89,8 +92,6 @@ private:
     void shutoffGains();
     void enableGains();
     void ifUpDown();
-    //helpers
-    static std::string getHostName();
     void playFile(std::string filePath)const; //non-blocking
     void reloadMan();
 
