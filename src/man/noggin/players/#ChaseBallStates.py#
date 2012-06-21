@@ -1,5 +1,5 @@
 """
-Here we house all of the state methods used for chasing the ball
+ Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
