@@ -74,17 +74,21 @@ namespace PF
 
     struct ParticleFilterParams
     {
-        int fieldHeight;    // Field height.
-        int fieldWidth;     // Field width.
-        int numParticles;   // Size of particle population.
-        float alpha_fast;   // Weight factor for fast exponential weight filter.
-        float alpha_slow;   // Weight factor for slow exponential weight filter.
+        float fieldHeight;        // Field height.
+        float fieldWidth;         // Field width.
+	float fieldHeightOffset;  // Offset from the field height parameter 	                                   // the width of the possible reigon of occupancy.
+	float fieldWidthOffset;
+        float numParticles;       // Size of particle population.
+        float alpha_fast;         // Weight factor for fast exponential weight filter.
+        float alpha_slow;         // Weight factor for slow exponential weight filter.
     };
 
     static const ParticleFilterParams DEFAULT_PARAMS =
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
+	GREEN_PAD_Y,
+	GREEN_PAD_X,
         200,
         0.2f,
         0.05f
@@ -131,6 +135,7 @@ namespace PF
     private:
         float weight;
         Location location;
+
     };
 
     typedef std::vector<LocalizationParticle> ParticleSet;
@@ -191,10 +196,10 @@ namespace PF
     float getYEst() const { return yEstimate; }
     float getHEst() const { return hEstimate; }
     float getHEstDeg() const { return hEstimate*TO_DEG; }
-    float getXUncert() const { return 0.0f; }
-    float getYUncert() const { return 0.0f; }
-    float getHUncert() const { return 0.0f; }
-    float getHUncertDeg() const { return 0.0f; }
+    float getXUncert() const { return standardDeviations[0]; }
+    float getYUncert() const { return standardDeviations[1]; }
+    float getHUncert() const { return standardDeviations[2]; }
+    float getHUncertDeg() const { return standardDeviations[2]*TO_DEG; }
     ::MotionModel getLastOdo() const;
 
     std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
@@ -226,9 +231,13 @@ namespace PF
     float yEstimate;
     float hEstimate;
 
+    std::vector<float> standardDeviations;
+
     float averageWeight;
     float wFast;
     float wSlow;
+
+    long long int lastUpdateTime;
 
     MemoryProvider memoryProvider;
 
