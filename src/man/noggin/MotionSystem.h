@@ -35,6 +35,7 @@ class MotionSystem : public PF::MotionModel
     void motionUpdate(const OdometryModel& odometryModel);
     PF::ParticleSet update(PF::ParticleSet particles) const;
     const OdometryModel& getLastOdometry() const { return currentOdometryModel; }
+    const DeltaOdometryMeasurement& getDeltaOdometry() const { return deltaOdometry; }
 
     /**
      * When a robot falls, it tends to rotate, altering its

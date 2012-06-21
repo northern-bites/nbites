@@ -24,8 +24,8 @@ namespace PF
                                    MLocalization::ptr mLocalization,
                                    ParticleFilterParams params)
         : parameters(params), xEstimate(0.0f), yEstimate(0.0f),
-          hEstimate(0.0f), averageWeight(0.0f), wFast(0.0f),
-          wSlow(0.0f),
+          hEstimate(0.0f), standardDeviations(3, 0.0f), 
+	  averageWeight(0.0f), wFast(0.0f), wSlow(0.0f),
           memoryProvider(&ParticleFilter::updateMemory, this, mLocalization)
     {
         motionModel = motion;
@@ -115,48 +115,72 @@ namespace PF
             sumH += l.heading;
         }
 
+	float previousXEstimate = xEstimate;
+	float previousYEstimate = yEstimate;
+	float previousHEstimate = hEstimate;
+
         xEstimate = sumX/parameters.numParticles;
         yEstimate = sumY/parameters.numParticles;
         hEstimate = sumH/parameters.numParticles;
 
+	long long int currentTime = monotonic_micro_time();
+	float deltaTime = static_cast<float>(currentTime - lastUpdateTime)/
+	    1000000.0f;
+
+	standardDeviations = findParticleSD();
+	// std::cout << "Standard deviations: \n x: " << standardDeviations[0]
+	// 	  << "\n y: " << standardDeviations[1] 
+	// 	  << "\n h: " << standardDeviations[2]
+	// 	  << "\n Odometries: "
+	//           << "\n deltaX: " << xEstimate - previousXEstimate
+	// 	  << "\n deltaY: " << yEstimate - previousYEstimate
+	// 	  << "\n deltaH: " << hEstimate - previousHEstimate
+	// 	  << "\n deltaT: " << deltaTime << " seconds"
+	// 	  << std::endl;
+	
+	//TODO: calculate odometry based velocities and estimate based
+	//      velocities.
+
+	lastUpdateTime = currentTime;
+
 	// Check if the mean has gone out of bounds. If so, 
 	// reset to the closest point in bounds with appropriate
 	// uncertainty.
-	// bool resetInBounds = false;
+	bool resetInBounds = false;
 
-	// if(xEstimate < 0)
-	// {
-	//     resetInBounds = true;
-	//     xEstimate = 0;
-	// }
-	// else if(xEstimate > parameters.fieldWidth)
-	// {
-	//     resetInBounds = true;
-	//     xEstimate = parameters.fieldWidth;
-	// }
+	if(xEstimate < parameters.fieldWidthOffset)
+	{
+	    resetInBounds = true;
+	    xEstimate = parameters.fieldWidthOffset;
+	}
+	else if(xEstimate > parameters.fieldWidth - parameters.fieldWidthOffset)
+	{
+	    resetInBounds = true;
+	    xEstimate = parameters.fieldWidth - parameters.fieldWidthOffset;
+	}
 
-	// if(yEstimate < 0)
-	// {
-	//     resetInBounds = true;
-	//     yEstimate = 0;
-	// }
-	// else if(yEstimate > parameters.fieldHeight)
-	// {
-	//     resetInBounds = true;
-	//     yEstimate = parameters.fieldHeight;
-	// }
+	if(yEstimate < parameters.fieldHeightOffset)
+	{
+	    resetInBounds = true;
+	    yEstimate = parameters.fieldHeightOffset;
+	}
+	else if(yEstimate > parameters.fieldHeight - parameters.fieldHeightOffset)
+	{
+	    resetInBounds = true;
+	    yEstimate = parameters.fieldHeight - parameters.fieldHeightOffset;
+	}
 
-	// // Only reset if one of the location coordinates is
-	// // out of bounds; avoids unnecessary resets.
-	// if(resetInBounds)
-	// {
-	//     std::cout << "Resetting to (" << xEstimate
-	// 	      << ", " << yEstimate << ", "
-	// 	      << hEstimate << ")." << std::endl;
+	// Only reset if one of the location coordinates is
+	// out of bounds; avoids unnecessary resets.
+	if(resetInBounds)
+	{
+	    std::cout << "Resetting to (" << xEstimate
+		      << ", " << yEstimate << ", "
+		      << hEstimate << ")." << std::endl;
 
-	//     resetLocTo(xEstimate, yEstimate, hEstimate,
-	// 	       LocNormalParams());
-	// }
+	    resetLocTo(xEstimate, yEstimate, hEstimate,
+		       LocNormalParams());
+	}
 
         memoryProvider.updateMemory();
     }
@@ -474,6 +498,12 @@ namespace PF
 	    mean_h += (*iter).getLocation().heading;
 	}
 
+	if(parameters.numParticles == 0)
+	{
+	    std::cout << "Invalid number of particles!" << std::endl;
+	    return sd;
+	}
+       
 	mean_x /= parameters.numParticles;
 	mean_y /= parameters.numParticles;
 	mean_h /= parameters.numParticles;
@@ -488,12 +518,12 @@ namespace PF
 	    sd[1] += square((*iter).getLocation().y       - mean_y);
 	    sd[2] += square((*iter).getLocation().heading - mean_h); 
 	}
-	sd[0] /= (1/parameters.numParticles);
-	sd[1] /= (1/parameters.numParticles);
-	sd[2] /= (1/parameters.numParticles);
+
+	sd[0] /= parameters.numParticles;
+	sd[1] /= parameters.numParticles;
+	sd[2] /= parameters.numParticles;
 
 	// Convert variances into standard deviations.
-
 	sd[0] = std::sqrt(sd[0]);
 	sd[1] = std::sqrt(sd[1]);
 	sd[2] = std::sqrt(sd[2]);
