@@ -427,11 +427,10 @@ Comm::Comm (boost::shared_ptr<Sensors> s, boost::shared_ptr<Vision> v)
     inet_aton("192.168.255.255", &addr);
     broadcast_addr.sin_addr = addr;
 
-    broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
     // initialize gc broadcast address structure
     gc_broadcast_addr.sin_family = AF_INET;
     gc_broadcast_addr.sin_port = htons(GAMECONTROLLER_PORT);
-    gc_broadcast_addr.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+    gc_broadcast_addr.sin_addr = addr;
 }
 
 // Deconstructor
@@ -445,7 +444,7 @@ Comm::~Comm ()
 int Comm::start ()
 {
     // Run the TOOLConnect thread
-    startTOOL();
+//    startTOOL();
 
     // Run the Comm (UDP+GameController) thread
     return Thread::start();
@@ -489,8 +488,8 @@ void Comm::run()
 	    PROF_EXIT(P_COMM);
 	}
     } catch (socket_error &e) {
-        fprintf(stderr, "Error occurred in Comm, thread has paused.\n");
-        fprintf(stderr, "%s\n", e.what());
+        printf("ERROR IN COMM AAAAAAAAAAAAA.\n");
+        printf("%s\n", e.what());
     }
 
     // Close the UDP socket
@@ -500,7 +499,7 @@ void Comm::run()
 // Stops ToolConnect thread and Comm thread
 void Comm::stop()
 {
-    tool.stop();
+//    tool.stop();
     Thread::stop();
 }
 // Starts ToolConnect thread
