@@ -128,5 +128,7 @@ def chooseAlignedKickFromKick(player, kick):
             return RIGHT_SHORT_BACK_KICK
     elif "Side" in kick.name:
         return kick
+    elif (kick == ORBIT_KICK_POSITION):
+        return kick
     else:
         raise NameError('Invalid kick passed to chooseAlignedKickFromKick')
