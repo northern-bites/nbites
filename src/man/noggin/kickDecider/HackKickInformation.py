@@ -5,7 +5,7 @@ import objects as Objects
 import noggin_constants as nogginConstants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 USE_LOC = False
 USE_LOC_HALF_FIELD = False
 
@@ -219,14 +219,14 @@ class KickInformation:
         # Determine visual dangerous goalie
         # Note that the values should be double the sightings:
         #  one for each post for each frame it is seen.
-        if (self.farGoalieRed > 20 and
+        if (self.farGoalieRed > 5 and
             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
-            (self.farGoalieNavy > 20 and
+            (self.farGoalieNavy > 5 and
              self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
             self.farGoalieOwn = True
-        if (self.nearGoalieRed > 20 and
+        if (self.nearGoalieRed > 5 and
             self.brain.my.teamColor == nogginConstants.teamColor.TEAM_RED) or \
-            (self.nearGoalieNavy > 20 and
+            (self.nearGoalieNavy > 5 and
              self.brain.my.teamColor == nogginConstants.teamColor.TEAM_BLUE):
             self.nearGoalieOwn = True
 
@@ -591,7 +591,7 @@ class KickInformation:
         x = math.sqrt(math.pow(leftDist,2) - math.pow((y-rightPostY),2))
 
         # Use locations to get global heading.
-        post = Objects.Location(nogginConstants.FIELD_WHITE_SIDELINE_X,nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y)
+        post = Objects.Location(nogginConstants.FIELD_WHITE_LEFT_SIDELINE_X,nogginConstants.LANDMARK_BLUE_GOAL_TOP_POST_Y)
         me = Objects.Location(x,y)
         meToPost = me.relativeLocationOf(post)
 
