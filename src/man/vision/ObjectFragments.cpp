@@ -80,7 +80,7 @@ static const float GOODRAT = 0.75f;
 static const float SQUATRAT = 1.2f;
 // EXAMINED: lowered
 // goal posts of the same color have to be this far apart
-static const int MIN_POST_SEPARATION = 7;
+static const int MIN_POST_SEPARATION = 20;
 // how big a post is to be declared a big post
 // EXAMINED: change this
 static const int BIGPOST = 25;
@@ -2618,6 +2618,8 @@ bool ObjectFragments::secondPostFarEnough(Blob post1, Blob post2, int post) {
     point <int> right1 = post1.getRightBottom();
     point <int> left2 = post2.getLeftBottom();
     point <int> right2 = post2.getRightBottom();
+	int width1 = post1.width();
+	int width2 = post2.width();
     if (SANITY) {
         cout << "Separations " << (dist(left1.x, left1.y, right2.x, right2.y))
              << " " << (dist(left2.x, left2.y, right1.x, right1.y)) << endl;
@@ -2635,10 +2637,18 @@ bool ObjectFragments::secondPostFarEnough(Blob post1, Blob post2, int post) {
 		(right1.x >= left2.x - 2 && right1.x <= right2.x + 2)) {
 		return false;
 	}
-    if (dist(left1.x, left1.y, right2.x, right2.y) > MIN_POST_SEPARATION &&
-        dist(left2.x, left2.y, right1.x, right1.y) > MIN_POST_SEPARATION) {
-        if (dist(left1.x, left1.y, left2.x, left2.y) > MIN_POST_SEPARATION &&
-            dist(right2.x, right2.y, right1.x, right1.y) > MIN_POST_SEPARATION){
+	// posts should only be really close from the side
+	int separationNeeded = MIN_POST_SEPARATION;
+	if (max(width1, width2) < 50) {
+		separationNeeded = 40;
+	}
+	if (max(post1.height(), post2.height()) > 50) {
+		separationNeeded = 60;
+	}
+    if (dist(left1.x, left1.y, right2.x, right2.y) > separationNeeded &&
+        dist(left2.x, left2.y, right1.x, right1.y) > separationNeeded) {
+        if (dist(left1.x, left1.y, left2.x, left2.y) > separationNeeded &&
+            dist(right2.x, right2.y, right1.x, right1.y) > separationNeeded){
             return true;
         }
     }
