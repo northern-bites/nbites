@@ -246,6 +246,13 @@ class Brain(object):
         self.player.run()
         self.tracker.run()
         self.nav.run()
+        # Kinda of a hack...
+        # check and set loc boolean
+        if ((self.my.teamColor == Constants.teamColor.TEAM_BLUE and
+             self.loc.x > Constants.MIDFIELD_X - Constants.CENTER_CIRCLE_RADIUS) or
+            (self.my.teamColor == Constants.teamColor.TEAM_RED and
+             self.loc.x < Constants.MIDFIELD_X + Constants.CENTER_CIRCLE_RADIUS)):
+            self.onOwnFieldSide = False
 
         #Set LEDS
         self.leds.processLeds()
@@ -394,13 +401,16 @@ class Brain(object):
                                     Constants.HEADING_DOWN,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
 
+        # Loc knows the side of the field now. Reset accordingly.
+        self.onOwnFieldSide = True
+
     #@todo: HACK HACK HACK Mexico 2012 to make sure we still re-converge properly even if
     #we get manually positioned
     #should make this nicer (or at least the locations)
     def resetSetLocalization(self):
-        
+
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
-        
+
         if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
 #            if self.my.playerNumber == 1:
 #                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
@@ -428,7 +438,6 @@ class Brain(object):
                                     180,
                                     gameSetResetUncertainties)
 
-
     def resetLocalizationFromPenalty(self):
         """
         Resets localization to both possible locations, depending on team color.
@@ -452,6 +461,9 @@ class Brain(object):
                                 _localization.LocNormalParams(15.0, 15.0, 1.0),
                                 _localization.LocNormalParams(15.0, 15.0, 1.0))
 
+        # Loc knows the side of the field now. Reset accordingly.
+        self.onOwnFieldSide = True
+
     def resetGoalieLocalization(self):
         """
         Resets the goalie's localization to the manual position in the goalbox.
@@ -466,6 +478,9 @@ class Brain(object):
                                 Constants.MIDFIELD_Y,
                                 Constants.HEADING_LEFT,
                                 _localization.LocNormalParams(15.0, 15.0, 1.0))
+
+        # Loc knows the side of the field now. Reset accordingly.
+        self.onOwnFieldSide = True
 
     #TODO: write this method!
     def resetPenaltyKickLocalization(self):
