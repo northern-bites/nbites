@@ -28,30 +28,43 @@ const boost::numeric::ublas::vector<float>
 NBMath::solve(boost::numeric::ublas::matrix<float> A,
               const boost::numeric::ublas::vector<float> &b) {
 
+    boost::numeric::ublas::vector<float> result(A.size2());
+    try {
     boost::numeric::ublas::permutation_matrix<> P(A.size1());
     int singularRow = lu_factorize(A, P);
     if (singularRow != 0) {
         // TODO: This case needs to be dealt with
         std::cout << "the system had no solution!" << std::endl;
     }
-    boost::numeric::ublas::vector<float> result(A.size2());
     result.assign(b);
     lu_substitute(A, P, result);
+    } catch (std::exception &e) {
+        std::cout << "This is a shitty error and someone should track it down and fix it"
+                << "but right now we need not to segfault - Mexico 2012"
+                << e.what() << std::endl;
+    }
     return result;
 }
 
 const boost::numeric::ublas::matrix<float>
 NBMath::solve(boost::numeric::ublas::matrix<float> A,
               const boost::numeric::ublas::matrix<float> &B) {
+    boost::numeric::ublas::matrix<float> result(A.size2(), B.size1());
+    try {
     boost::numeric::ublas::permutation_matrix<> P(A.size1());
     int singularRow = lu_factorize(A, P);
     if (singularRow != 0) {
         // TODO: This case needs to be dealt with
         std::cout << "the system had no solution!" << std::endl;
     }
-    boost::numeric::ublas::matrix<float> result(A.size2(), B.size1());
+
     result.assign(B);
     lu_substitute(A, P, result);
+    } catch (std::exception &e) {
+        std::cout << "This is a shitty error and someone should track it down and fix it"
+                << "but right now we need not to segfault - Mexico 2012"
+                << e.what() << std::endl;
+    }
     return result;
 }
 
@@ -61,17 +74,24 @@ NBMath::solve(boost::numeric::ublas::matrix<float> A,
 
 const ufvector3 NBMath::solve(ufmatrix3 &A,
                               const ufvector3 &b) {
+
+    ufvector3 result(A.size2());
+    try {
     boost::numeric::ublas::permutation_matrix
         <unsigned int, boost::numeric::ublas::bounded_array<unsigned int, 9> >
         P(A.size1());
     int singularRow = lu_factorize(A, P);
     if (singularRow != 0) {
         // TODO: This case needs to be dealt with
-        throw "the system had no solution";
+        std::cout << "the system had no solution" << std::endl;
     }
-    ufvector3 result(A.size2());
     result.assign(b);
     lu_substitute(A, P, result);
+    } catch (std::exception &e) {
+        std::cout << "This is a shitty error and someone should track it down and fix it"
+                << "but right now we need not to segfault - Mexico 2012"
+                << e.what() << std::endl;
+    }
     return result;
 }
 
