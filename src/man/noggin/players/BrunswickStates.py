@@ -65,11 +65,11 @@ def gameReady(player):
 
     # Reset localization to proper starting position by player number.
     # Locations are defined in the wiki.
-    if player.lastDiffState == 'gameInitial':
-        player.brain.resetInitialLocalization()
+        if player.lastDiffState == 'gameInitial':
+            player.brain.resetInitialLocalization()
 
-    if player.lastDiffState == 'gamePenalized':
-        player.brain.resetLocalizationFromPenalty()
+        if player.lastDiffState == 'gamePenalized':
+            player.brain.resetLocalizationFromPenalty()
 
     # Wait until the sensors are calibrated before moving.
     while (not player.brain.motion.calibrated()):
@@ -79,15 +79,6 @@ def gameReady(player):
     #if (player.lastDiffState == 'gameInitial'
     #    and not player.brain.play.isRole(GOALIE)):
     #    return player.goLater('relocalize')
-
-    if player.lastDiffState == 'gamePenalized':
-        player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    nogginConstants.HEADING_UP,
-                                    nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    nogginConstants.HEADING_DOWN,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
 
     #See above about rules(2011) - we should still reposition after goals
     if (player.lastDiffState == 'gameInitial'
