@@ -88,17 +88,6 @@ SET( @REMOTE_ADDRESS@
   )
 SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 
-############################ REMOTE INSTALLATION
-# Define this to remotely install the binary or library on the robot.
-# Cannot be selected unless OE_CROSS_BUILD is set to ON.
-SET( @ROBOT_NAME@
-  "river"
-  CACHE STRING
-  "The NAME of the robot"
-  )
-SET( ROBOT_NAME ${@ROBOT_NAME@} )
-
-
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
@@ -119,12 +108,6 @@ SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/upload.sh.in
   ${CMAKE_CURRENT_BINARY_DIR}/upload.sh
-  ESCAPE_QUOTES
-  )
-
-CONFIGURE_FILE(
-  ${MAN_CMAKE_DIR}/nameconfig.in
-  ${CFG_DIR}/nameconfig.h
   ESCAPE_QUOTES
   )
 

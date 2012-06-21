@@ -204,6 +204,9 @@ public:
     const uint16_t* getUVImage(man::corpus::Camera::Type type) const;
     const uint8_t* getColorImage(man::corpus::Camera::Type type) const;
 
+    SupportFoot getVisionSupportFoot() const { return visionSupportFoot; }
+    void setVisionSupportFoot(SupportFoot supportFoot) { visionSupportFoot = supportFoot; }
+
     void setImage(const uint16_t* img, man::corpus::Camera::Type type);
     void lockImage() const;
     void releaseImage() const;
@@ -263,6 +266,7 @@ private:
     // were when the last vision frame started.
     std::vector<float> bodyAngles;
 
+    //we need to keep a history because of body angle/camera sync issues
     typedef std::list< std::vector<float> > AngleHistory;
     AngleHistory bodyAngleHistory;
     std::vector<float> visionBodyAngles;
@@ -289,7 +293,10 @@ private:
     // Pose needs to know which foot is on the ground during a vision frame
     // If both are on the ground (DOUBLE_SUPPORT_MODE/not walking), we assume
     // left foot is on the ground.
-    SupportFoot supportFoot;
+    typedef std::list<SupportFoot> SupportFootHistory;
+    SupportFootHistory supportFootHistory;
+
+    SupportFoot visionSupportFoot;
 
     // Memory updating
     VisionSensorsProvider visionSensorsProvider;

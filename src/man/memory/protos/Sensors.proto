@@ -75,6 +75,7 @@ message PRawNaoImages {
 	optional PRawImage bottomImage = 3;
 	
 	repeated float vision_body_angles = 5;
+	optional uint32 support_foot = 6;
 }
 
 message PRawImage {
