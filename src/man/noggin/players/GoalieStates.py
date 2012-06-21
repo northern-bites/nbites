@@ -170,7 +170,7 @@ def upUpUP(player):
         player.brain.fallController.enableFallProtection(True)
         player.upDelay = 0
 
-    if player.nav.isStanding():
+    if player.brain.nav.isStanding():
         return player.stay()
     elif player.upDelay < 10:
         player.upDelay += 1
