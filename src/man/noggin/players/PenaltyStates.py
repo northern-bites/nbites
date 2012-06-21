@@ -16,7 +16,7 @@ def afterPenalty(player):
         # pan for the ball
         player.brain.tracker.repeatWidePanFixedPitch()
         # walk towards your own field cross
-        player.brain.nav.walkTo(RelRobotLocation(300,0,0))
+        player.brain.nav.walkTo(RelRobotLocation(200,0,0))
 
     if transitions.shouldChaseBall(player):
         if not player.brain.play.isChaser():
