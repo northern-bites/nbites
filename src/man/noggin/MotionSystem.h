@@ -33,9 +33,10 @@ class MotionSystem : public PF::MotionModel
      * The odometryModel can potentially be invalid
      */
     void motionUpdate(const OdometryModel& odometryModel);
-    PF::ParticleSet update(PF::ParticleSet particles) const;
+    PF::ParticleSet update(PF::ParticleSet particles);
     const OdometryModel& getLastOdometry() const { return currentOdometryModel; }
     const DeltaOdometryMeasurement& getDeltaOdometry() const { return deltaOdometry; }
+    const std::vector<float> getVelocity() const { return velocity; }
 
     /**
      * When a robot falls, it tends to rotate, altering its
@@ -58,5 +59,7 @@ class MotionSystem : public PF::MotionModel
     OdometryModel currentOdometryModel;
     OdometryModel lastOdometryModel;
     DeltaOdometryMeasurement deltaOdometry;
+    long long int lastUpdateTime;
+    std::vector<float> velocity;
 
 };

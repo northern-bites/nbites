@@ -20,6 +20,8 @@
 #include <boost/math/constants/constants.hpp>
 
 #include "LocSystem.h"
+#include "NBMath.h"
+#include "Common.h"
 
 #include "memory/MObjects.h"
 #include "memory/MemoryProvider.h"
@@ -257,8 +259,9 @@ namespace PF
         MotionModel() { }
         virtual ~MotionModel() { }
 
-        virtual ParticleSet update(ParticleSet particles) const = 0;
+        virtual ParticleSet update(ParticleSet particles) = 0;
         virtual const ::MotionModel& getLastOdometry() const = 0;
+	virtual const std::vector<float> getVelocity() const { return std::vector<float>(3, 0.0f); }
     };
 
     /**

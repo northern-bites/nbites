@@ -1,5 +1,7 @@
 #include "ParticleFilter.h"
 
+#include <fstream>
+
 namespace PF
 {
     /**
@@ -48,7 +50,7 @@ namespace PF
         boost::variate_generator<boost::mt19937&,
                       boost::uniform_real<float> > angleGen(rng, angleBounds);
 
-    // Assign uniform weight.
+	// Assign uniform weight.
         float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
 
         #ifdef DEBUG_LOCALIZATION
@@ -100,8 +102,6 @@ namespace PF
 
         // Update estimates.
 
-        // Use the robust mean...
-
         float sumX = 0;
         float sumY = 0;
         float sumH = 0;
@@ -123,24 +123,42 @@ namespace PF
         yEstimate = sumY/parameters.numParticles;
         hEstimate = sumH/parameters.numParticles;
 
-	long long int currentTime = monotonic_micro_time();
-	float deltaTime = static_cast<float>(currentTime - lastUpdateTime)/
+	standardDeviations = findParticleSD();
+
+	const std::vector<float> odometryVelocity = motionModel->getVelocity();
+
+	std::vector<float> meanVelocity(3, 0.0f);
+
+	long long int currentTime = ::monotonic_micro_time();
+	float deltaT = static_cast<float>(currentTime - lastUpdateTime)/
 	    1000000.0f;
 
-	standardDeviations = findParticleSD();
-	// std::cout << "Standard deviations: \n x: " << standardDeviations[0]
-	// 	  << "\n y: " << standardDeviations[1] 
-	// 	  << "\n h: " << standardDeviations[2]
-	// 	  << "\n Odometries: "
-	//           << "\n deltaX: " << xEstimate - previousXEstimate
-	// 	  << "\n deltaY: " << yEstimate - previousYEstimate
-	// 	  << "\n deltaH: " << hEstimate - previousHEstimate
-	// 	  << "\n deltaT: " << deltaTime << " seconds"
-	// 	  << std::endl;
-	
-	//TODO: calculate odometry based velocities and estimate based
-	//      velocities.
+	meanVelocity[0] = (xEstimate - previousXEstimate)/deltaT;
+	meanVelocity[1] = (yEstimate - previousYEstimate)/deltaT;
+	meanVelocity[2] = (hEstimate - previousHEstimate)/deltaT;
 
+	lastUpdateTime = currentTime;
+
+	static std::ofstream uncertaintyLog("/home/nao/pfuncertainty.log");
+	uncertaintyLog << standardDeviations[0]
+		       << " " << standardDeviations[1]
+		       << " " << standardDeviations[2]
+		       << std::endl;
+
+	std::cout << "Standard deviations: \n x: " << standardDeviations[0]
+		  << "\n y: " << standardDeviations[1] 
+		  << "\n h: " << standardDeviations[2]
+		  // << "\n Odometries: "
+	          // << "\n deltaX: " << xEstimate - previousXEstimate
+		  // << "\n deltaY: " << yEstimate - previousYEstimate
+		  // << "\n deltaH: " << hEstimate - previousHEstimate
+		  << "\n Velocities: "
+		  << "\n Odometry linear velocity = "
+		  << NBMath::getHypotenuse(odometryVelocity[0], odometryVelocity[1])
+		  << " \n Mean linear velocity = "
+		  << NBMath::getHypotenuse(meanVelocity[0], odometryVelocity[1])
+		  << std::endl;
+	
 	lastUpdateTime = currentTime;
 
 	// Check if the mean has gone out of bounds. If so, 
