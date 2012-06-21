@@ -23,33 +23,55 @@ def updatePostObservations(player):
     Updates the underlying C++ data structures.
     """
     if (player.brain.vision.ygrp.on and
-        player.brain.vision.ygrp.certainty != certainty.NOT_SURE and
-        player.brain.vision.ygrp.dist != 0.0 and
+        player.brain.vision.yglp.on):
+
+        if(player.brain.vision.ygrp.dist != 0.0 and
         #magic number
         player.brain.vision.ygrp.dist < 400.0):
-        player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
-                                               player.brain.vision.ygrp.bearing)
-        if DEBUG_OBSERVATIONS:
-            print "RIGHT: Saw right post."
-            print "  Pushed " + str(player.brain.vision.ygrp.bearing) + " " + str(player.brain.vision.ygrp.dist)
+            player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
+                                                   player.brain.vision.ygrp.bearing)
+            if DEBUG_OBSERVATIONS:
+                print "RIGHT: Saw right post."
+                print "  Avg right x is now " + str(player.system.rightPostRelX())
+                print "  Avg right y is now " + str(player.system.rightPostRelY())
 
-    if (player.brain.vision.yglp.on and
-        player.brain.vision.yglp.dist != 0.0 and
-        player.brain.vision.yglp.certainty != certainty.NOT_SURE and
-        #magic number
-        player.brain.vision.yglp.dist < 400.0):
-        player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
-                                              player.brain.vision.yglp.bearing)
-        if DEBUG_OBSERVATIONS:
-            print "LEFT: Saw left post."
-            print "  Pushed " + str(player.brain.vision.yglp.bearing) + " " + str(player.brain.vision.yglp.dist)
-
+        if (player.brain.vision.yglp.dist != 0.0 and
+            #magic number
+            player.brain.vision.yglp.dist < 400.0):
+            player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
+                                                  player.brain.vision.yglp.bearing)
+            if DEBUG_OBSERVATIONS:
+                print "LEFT: Saw left post."
+                print "  Avg left x is now " + str(player.system.leftPostRelX())
+                print "  Avg left y is now " + str(player.system.leftPostRelY())
 
 def updateCrossObservations(player):
     if(player.brain.vision.cross.on and
        player.brain.vision.cross.dist != 0.0):
         player.system.pushCrossObservation(player.brain.vision.cross.dist,
                                            player.brain.vision.cross.bearing)
+
+def spinToFaceGoal(player):
+    if player.firstFrame():
+        if (player.lastDiffState == 'decideRightSide'):
+            player.side = RIGHT
+        else:
+            player.side = LEFT
+
+        spinToFaceGoal.facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+        if player.side == RIGHT:
+            spinToFaceGoal.facingDest.relH = 90
+        else:
+            spinToFaceGoal.facingDest.relH = -90
+
+    player.brain.tracker.lookToAngle(0)
+
+    if player.counter == 20:
+        player.brain.nav.goTo(spinToFaceGoal.facingDest,
+                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
+
+    return Transition.getNextState(player, spinToFaceGoal)
+
 
 def walkToGoal(player):
     """
@@ -60,34 +82,26 @@ def walkToGoal(player):
         if player.lastDiffState == 'gatherPostInfo':
             # don't change side
             player.side = player.side
-        elif ((hasattr(walkToGoal, 'incomingTransition') and
-             (walkToGoal.incomingTransition.condition ==
-              GoalieTransitions.onRightSideline)) or
-            player.lastDiffState == 'gameReady'):
-            player.side = RIGHT
-        else:
-            player.side = LEFT
 
         # based on that side, set up post observations
         if player.side == RIGHT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
             player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
                                      goalie.RIGHT_SIDE_RP_ANGLE,
                                      goalie.RIGHT_SIDE_LP_DISTANCE,
-                                     goalie.RIGHT_SIDE_LP_ANGLE)
+                                     0.0)
         if player.side == LEFT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
             player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
-                                     goalie.LEFT_SIDE_RP_ANGLE,
+                                     0.0,
                                      goalie.LEFT_SIDE_LP_DISTANCE,
                                      goalie.LEFT_SIDE_LP_ANGLE)
 
 
-        player.system.home.relH = player.system.centerGoalBearing()
+        player.system.home.relH = 0.0
         player.brain.nav.goTo(player.system.home, nav.CLOSE_ENOUGH,
-                              nav.FAST_SPEED)
+                              nav.MEDIUM_SPEED)
 
     updatePostObservations(player)
+    player.brain.tracker.lookToAngle(player.system.centerGoalBearing())
     player.system.home.relY = player.system.centerGoalRelY()
     player.system.home.relX = player.system.centerGoalRelX()
     player.system.home.relH = player.system.centerGoalBearing()

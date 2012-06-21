@@ -5,6 +5,7 @@ from ..util import Transition
 from . import GoalieTransitions
 
 import noggin_constants as NogginConstants
+from GoalieConstants import RIGHT, LEFT
 
 from objects import Location
 
@@ -21,6 +22,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         # All transitions are defined here. Their conditions are in
         # GoalieTransitions
+        VisualGoalieStates.spinToFaceGoal.transitions = {
+            Transition.CountTransition(GoalieTransitions.facingGoal,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.walkToGoal
+            }
+
         VisualGoalieStates.walkToGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
@@ -58,10 +66,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         VisualGoalieStates.decideLeftSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onLeftSideline,
+            Transition.CountTransition(GoalieTransitions.onThisSideline,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
-            : VisualGoalieStates.walkToGoal,
+            : VisualGoalieStates.spinToFaceGoal,
 
             Transition.CountTransition(GoalieTransitions.unsure,
                                        Transition.MOST_OF_THE_TIME,
@@ -70,10 +78,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         VisualGoalieStates.decideRightSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onRightSideline,
+            Transition.CountTransition(GoalieTransitions.onThisSideline,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.walkToGoal,
+            : VisualGoalieStates.spinToFaceGoal,
 
             Transition.CountTransition(GoalieTransitions.unsure,
                                        Transition.MOST_OF_THE_TIME,
