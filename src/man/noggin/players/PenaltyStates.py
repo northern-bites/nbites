@@ -13,11 +13,9 @@ LOOK_DIR_THRESH = 10
 def afterPenalty(player):
 
     if player.firstFrame():
-        print "Pan for the ball now that we're out of penalty"
         # pan for the ball
         player.brain.tracker.repeatWidePanFixedPitch()
         # walk towards your own field cross
-        print "Walk onto the field"
         player.brain.nav.walkTo(RelRobotLocation(300,0,0))
 
     if transitions.shouldChaseBall(player):
@@ -51,7 +49,6 @@ def afterPenalty(player):
     # If done walking forward, start relocalizing normally
     if player.brain.nav.isStopped() or player.counter > 250:
         player.brain.nav.stop()
-        print "I'm at the center cross? Find Ball!!"
         return player.goLater('findBall')
 
     return player.stay()

@@ -141,7 +141,6 @@ def gamePlaying(player):
         return player.stay()
 
     if player.lastDiffState == 'gamePenalized' and  player.brain.play.isChaser():
-        print "We just came out of penalty as a chaser!"
         return player.goNow('afterPenalty')
 
 
