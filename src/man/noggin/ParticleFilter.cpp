@@ -477,7 +477,8 @@ namespace PF
         particles.clear();
 
 	float xLowerBound = 0.0f, xUpperBound = 0.0f;
-	float yLowerBound = 0.0f, yUpperBound = (float) parameters.fieldHeight;
+	// HACK replace constants!
+	float yLowerBound = FIELD_WHITE_BOTTOM_SIDELINE_Y, yUpperBound = FIELD_WHITE_TOP_SIDELINE_Y;
 	float heading = 0.0f;
 
         boost::mt19937 rng;
@@ -485,13 +486,13 @@ namespace PF
 
 	if(blueSide)
 	{
-	    xLowerBound = 0.0f;
-	    xUpperBound = 0.5f*parameters.fieldWidth;
+	    xLowerBound = FIELD_WHITE_LEFT_SIDELINE_X;
+	    xUpperBound = MIDFIELD_X;
 	}
 	else
 	{
-	    xLowerBound = 1.5f*parameters.fieldWidth;
-	    xUpperBound = (float) parameters.fieldWidth;
+	    xLowerBound = MIDFIELD_X;
+	    xUpperBound = FIELD_WHITE_RIGHT_SIDELINE_X;
 	    heading = M_PI_FLOAT;
 	}
 
