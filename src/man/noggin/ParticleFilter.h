@@ -188,6 +188,8 @@ namespace PF
 	            LocNormalParams params1 = LocNormalParams(),
 	            LocNormalParams params2 = LocNormalParams());
 
+    void resetLocToSide(bool blueSide);
+
     PoseEst getCurrentEstimate() const { return PoseEst(xEstimate, yEstimate, hEstimate); }
     PoseEst getCurrentUncertainty() const { return PoseEst(); }
     float getXEst() const { return xEstimate; }
@@ -201,7 +203,6 @@ namespace PF
     ::MotionModel getLastOdo() const;
 
     std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
-
 
     std::vector<CornerObservation> getLastCornerObservations() const { return std::vector<CornerObservation>(); }
 

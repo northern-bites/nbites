@@ -471,6 +471,53 @@ namespace PF
        }
     }
 
+    void ParticleFilter::resetLocToSide(bool blueSide)
+    {
+        // Clear the existing particles.
+        particles.clear();
+
+	float xLowerBound = 0.0f, xUpperBound = 0.0f;
+	// HACK replace constants!
+	float yLowerBound = FIELD_WHITE_BOTTOM_SIDELINE_Y, yUpperBound = FIELD_WHITE_TOP_SIDELINE_Y;
+	float heading = 0.0f;
+
+        boost::mt19937 rng;
+        rng.seed(std::time(0));
+
+	if(blueSide)
+	{
+	    xLowerBound = FIELD_WHITE_LEFT_SIDELINE_X;
+	    xUpperBound = MIDFIELD_X;
+	}
+	else
+	{
+	    xLowerBound = MIDFIELD_X;
+	    xUpperBound = FIELD_WHITE_RIGHT_SIDELINE_X;
+	    heading = M_PI_FLOAT;
+	}
+
+        boost::uniform_real<float> xBounds(xLowerBound,
+	                                   xUpperBound);
+        boost::uniform_real<float> yBounds(yLowerBound,
+	                                   yUpperBound);
+
+        boost::variate_generator<boost::mt19937&,
+                                boost::uniform_real<float> > xGen(rng, xBounds);
+        boost::variate_generator<boost::mt19937&,
+                                boost::uniform_real<float> > yGen(rng, yBounds);
+
+        // Assign uniform weight.
+        float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
+
+        for(int i = 0; i < parameters.numParticles; ++i)
+        {
+            LocalizationParticle p(Location(xGen(), yGen(), heading),
+                                   weight);
+
+            particles.push_back(p);
+        }
+    }
+
     void ParticleFilter::updateMemory(MLocalization::ptr mLoc) const
     {
         using namespace man::memory::proto;
