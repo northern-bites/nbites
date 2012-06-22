@@ -611,7 +611,7 @@ class KickInformation:
     def chooseQuickFrontKick(self):
         # If our goalie is inactive, always use short front kicks.
         for mate in self.brain.teamMembers:
-            if ((mate.teamNumber == 1) and (mate.active is False)):
+            if ((mate.playerNumber == 1) and (mate.active is False)):
                 return self.chooseShortFrontKick()
 
         if self.kickWithLeftFoot():
