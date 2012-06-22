@@ -200,6 +200,10 @@ def penaltyShotsGameSet(player):
         player.brain.loc.resetBall()
         player.inKickingState = False
 
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
+
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetPenaltyKickLocalization()
         if player.brain.play.isRole(GOALIE):
@@ -222,6 +226,10 @@ def penaltyShotsGamePlaying(player):
         player.inKickingState = False
         player.shouldKickOff = False
         player.penaltyKicking = True
+
+    # Wait until the sensors are calibrated before moving.
+    while (not player.brain.motion.calibrated()):
+        return player.stay()
 
     if player.brain.play.isRole(GOALIE):
         player.brain.play.setSubRole(GOALIE_KICKOFF)
