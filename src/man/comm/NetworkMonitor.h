@@ -41,7 +41,7 @@ class NetworkMonitor : public Boxcar
 public:
     /**
      * Class constructor
-	 * @param time: The time at which the monitor is constructed.
+     * @param time: The time at which the monitor is constructed.
      */
     NetworkMonitor(long long time);
 
@@ -50,14 +50,14 @@ public:
      */
     ~NetworkMonitor();
 
-	/**
-	 * Resets the boxcar filter, latency, and droppedPackets information.
-	 */
+    /**
+     * Resets the boxcar filter, latency, and droppedPackets information.
+     */
     void Reset();
 
-	/**
-	 * Input for boxcar filter.
-	 */
+    /**
+     * Input for boxcar filter.
+     */
     double X(double);
 
     /**
@@ -76,21 +76,21 @@ public:
      */
     void packetsDropped(int numDropped);
 
-	/**
-	 * @return: The total number of packets recieved.
-	 */
+    /**
+     * @return: The total number of packets recieved.
+     */
     const int totalPacketsReceived() const;
 
-	/**
-	 * @return: The total number of packets delayed.
-	 */
+    /**
+     * @return: The total number of packets delayed.
+     */
     const int totalPacketsDropped() const;
 
-	/**
-	 * @return: The total number of packets that we know were sent.
-	 */
+    /**
+     * @return: The total number of packets that we know were sent.
+     */
     const int totalPackets() const { return (totalPacketsReceived() +
-											 totalPacketsDropped()); }
+                                             totalPacketsDropped()); }
 
     /**
      * Finds the bin in the latency histogram with the highest number of
@@ -104,15 +104,15 @@ public:
      * Determines whether network health has deteriorated by using shifts in
      * the latency peak and significant increases in packet loss as criteria.
      * Sends warning notifications.
-	 * @param time: Current time
-	 * @return:     1 on GOOD, 2 on OK, 3 on BAD
+     * @param time: Current time
+     * @return:     1 on GOOD, 2 on OK, 3 on BAD
      */
     int performHealthCheck(long long time);
 
     /**
      * Saves a report on network health to ~/nbites/log/network.xls on the robot,
      * including a histogram of the latency and of dropped packets.
-	 * @param time: The current time to make sure we don't output too often.
+     * @param time: The current time to make sure we don't output too often.
      */
     void logOutput(long long time);
 
@@ -127,10 +127,10 @@ private:
     SignalMonitor latency;
     SignalMonitor droppedPackets;
 
-	int       latencyPeak;
+    int       latencyPeak;
     bool      sentWarning;
-	long long warningTime;
-	long long lastOutput;
+    long long warningTime;
+    long long lastOutput;
 };
 
 #endif // NETWORK_MONITOR_H

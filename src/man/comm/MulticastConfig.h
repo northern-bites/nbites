@@ -9,8 +9,8 @@ static const int NUM_ROBOTS = 9;    // Total number of robots we have
 
 typedef struct robot_ip_pair_t
 {
-	std::string name;
-	std::string ip;
+    std::string name;
+    std::string ip;
 }robot_ip_pair;
 
 static const robot_ip_pair wash   = {"wash"  , "139.140.218.9" };
@@ -24,4 +24,4 @@ static const robot_ip_pair mal    = {"mal"   , "139.140.218.16"};
 static const robot_ip_pair zoe    = {"zoe"   , "139.140.218.17"};
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne, scotty,
-													dax, annika, data, mal, zoe};
+                                                    dax, annika, data, mal, zoe};

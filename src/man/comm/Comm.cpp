@@ -26,154 +26,159 @@
 
 #include <iostream>
 #include <time.h>
-#include <sys/time.h>  //?  
+#include <sys/time.h>  //TODO: Do we need?
 
-//#include "Profiler.h"  
+//TODO: Actually include the following
+//#include "Profiler.h"
 //#include "Common.h"
-static long long monotonic_micro_time(void)  
+static long long monotonic_micro_time(void)
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
     return tv.tv_sec * 1000000 + tv.tv_usec;
-}  
+}
 
+//TODO: Extend Thread
 Comm::Comm()
-//	: Thread("Comm")  
+//  : Thread("Comm")
 {
-	running = true;  
-	burstRate = 2;  
+//TODO: Clean these two up.
+    running = true;
+    burstRate = 2;
 
-	timer = new CommTimer(&monotonic_micro_time);
-	monitor = new NetworkMonitor(timer->timestamp());
+    timer = new CommTimer(&monotonic_micro_time);
+    monitor = new NetworkMonitor(timer->timestamp());
 
-	teamConnect = new TeamConnect(timer, monitor);
+    teamConnect = new TeamConnect(timer, monitor);
 
-	pthread_mutex_init(&comm_mutex, NULL);
+    pthread_mutex_init(&comm_mutex, NULL);
 
-	std::cout << "Comm Constructed" << std::endl;
+    std::cout << "Comm Constructed" << std::endl;
 }
 
 Comm::~Comm()
 {
-	std::cout << "Comm destructor" << std::endl;
-	delete monitor;
-	delete teamConnect;
-	delete timer;
-	pthread_mutex_destroy(&comm_mutex);
+    std::cout << "Comm destructor" << std::endl;
+    delete monitor;
+    delete teamConnect;
+    delete timer;
+    pthread_mutex_destroy(&comm_mutex);
 }
 
 int Comm::start()
 {
-//	return Thread::start();  
-	return 0;
+//TODO: implement this.
+//  return Thread::start();
+    return 0;
 }
 
 void Comm::stop()
 {
-//	Thread::stop();  
+//TODO: implement this.
+//  Thread::stop();
 }
 
 void Comm::run()
 {
-	llong lastMonitorOutput = timer->timestamp();
-	// end ??? section
+    llong lastMonitorOutput = timer->timestamp();
+    // end ??? section
 
-	while(running)
-	{
-		// Start the profiler.
-		//PROF_ENTER(P_COMM);  
+    while(running)
+    {
+        //TODO: Start the profiler.
+        //PROF_ENTER(P_COMM);
 
-		receive();
+        receive();
 
-		// Update teammates.
-		teamConnect->checkDeadTeammates(timer->timestamp(), myPlayerNumber());
+        // Update teammates.
+        teamConnect->checkDeadTeammates(timer->timestamp(), myPlayerNumber());
 
-		// Update the monitor.
-		int health = monitor->performHealthCheck(timer->timestamp());
+        // Update the monitor.
+        int health = monitor->performHealthCheck(timer->timestamp());
 
-		burstRate = health;
+        burstRate = health;
 
-		monitor->logOutput(timer->timestamp());
+        monitor->logOutput(timer->timestamp());
 
-		if (timer->timeToSend())
-			send();
+        if (timer->timeToSend())
+            send();
 
-		// Stop the profiler.
-		//PROF_EXIT(P_COMM);   
-	}
+        //TODO: Stop the profiler.
+        //PROF_EXIT(P_COMM);
+    }
 }
 
 void Comm::send()
 {
-	pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock (&comm_mutex);
 
-	teamConnect->send(myPlayerNumber(), burstRate);
-	timer->teamPacketSent();
+    teamConnect->send(myPlayerNumber(), burstRate);
+    timer->teamPacketSent();
 
-	pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock (&comm_mutex);
 }
 
 void Comm::receive()
 {
-	pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock (&comm_mutex);
 
     teamConnect->receive(0);
 
-	pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock (&comm_mutex);
 }
 
 void Comm::setLocData(int p,
-					  float x , float y , float h ,
-					  float xu, float yu, float hu)
+                      float x , float y , float h ,
+                      float xu, float yu, float hu)
 {
-	int player = checkPlayerNumber(p);
-	pthread_mutex_lock (&comm_mutex);
+    int player = checkPlayerNumber(p);
+    pthread_mutex_lock (&comm_mutex);
 
     teamConnect->setLocData(p, x, y, h, xu, yu, hu);
 
-	pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock (&comm_mutex);
 }
 
 void Comm::setBallData(int p,
-					   float d , float b ,
-					   float du, float bu)
+                       float d , float b ,
+                       float du, float bu)
 {
-	int player = checkPlayerNumber(p);
-	pthread_mutex_lock (&comm_mutex);
+    int player = checkPlayerNumber(p);
+    pthread_mutex_lock (&comm_mutex);
 
     teamConnect->setBallData(p, d, b, du, bu);
 
-	pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock (&comm_mutex);
 }
 
 void Comm::setBehaviorData(int p,
-						   float r, float sr, float ct)
+                           float r, float sr, float ct)
 {
-	int player = checkPlayerNumber(p);
-	pthread_mutex_lock (&comm_mutex);
+    int player = checkPlayerNumber(p);
+    pthread_mutex_lock (&comm_mutex);
 
     teamConnect->setBehaviorData(p, r, sr, ct);
 
-	pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock (&comm_mutex);
 }
 
 int Comm::checkPlayerNumber(int p)
 {
-	int player = p ? p : myPlayerNumber();
-	if (player <= 0)
-	{
-		std::cout << "Trying to set Comm data with bad player number!\n"
-				  << "Set Comm's player number through brain first!" << std::endl;
-	}
-	return player;
+    int player = p ? p : myPlayerNumber();
+    if (player <= 0)
+    {
+        std::cout << "Trying to set Comm data with bad player number!\n"
+                  << "Set Comm's player number through brain first!" << std::endl;
+    }
+    return player;
 }
 
 void Comm::setTeamNumber(int tn)
 {
-	teamConnect->setTeamNumber(tn);
+    teamConnect->setTeamNumber(tn);
 }
 
 int Comm::teamNumber()
 {
-	return teamConnect->teamNumber();
+    return teamConnect->teamNumber();
 }

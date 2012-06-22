@@ -6,46 +6,46 @@
 #include "TeamMember.h"
 
 TeamMember::TeamMember(int num)
-	: _playerNumber(num)
+    : _playerNumber(num)
 {
 }
 
 void TeamMember::update(float* packet)
 {
-	setActive(true);
+    setActive(true);
 
-	float* ptr = packet;
+    float* ptr = packet;
 
-	setMyX(*ptr);
-	setMyY(*++ptr);
-	setMyH(*++ptr);
-	setMyXUncert(*++ptr);
-	setMyYUncert(*++ptr);
-	setMyHUncert(*++ptr);
-	setBallDist(*++ptr);
-	setBallBearing(*++ptr);
-	setBallDistUncert(*++ptr);
-	setBallBearingUncert(*++ptr);
-	setChaseTime(*++ptr);
-	setRole(*++ptr);
-	setSubRole(*++ptr);
+    setMyX(*ptr);
+    setMyY(*++ptr);
+    setMyH(*++ptr);
+    setMyXUncert(*++ptr);
+    setMyYUncert(*++ptr);
+    setMyHUncert(*++ptr);
+    setBallDist(*++ptr);
+    setBallBearing(*++ptr);
+    setBallDistUncert(*++ptr);
+    setBallBearingUncert(*++ptr);
+    setChaseTime(*++ptr);
+    setRole(*++ptr);
+    setSubRole(*++ptr);
 }
 
 void TeamMember::generatePacket(float* packet)
 {
-	float* ptr = packet;
+    float* ptr = packet;
 
-	*  ptr = myX();
-	*++ptr = myY();
-	*++ptr = myH();
-	*++ptr = myXUncert();
-	*++ptr = myYUncert();
-	*++ptr = myHUncert();
-	*++ptr = ballDist();
-	*++ptr = ballBearing();
-	*++ptr = ballDistUncert();
-	*++ptr = ballBearingUncert();
-	*++ptr = chaseTime();
-	*++ptr = role();
-	*++ptr = subRole();
+    *  ptr = myX();
+    *++ptr = myY();
+    *++ptr = myH();
+    *++ptr = myXUncert();
+    *++ptr = myYUncert();
+    *++ptr = myHUncert();
+    *++ptr = ballDist();
+    *++ptr = ballBearing();
+    *++ptr = ballDistUncert();
+    *++ptr = ballBearingUncert();
+    *++ptr = chaseTime();
+    *++ptr = role();
+    *++ptr = subRole();
 }
