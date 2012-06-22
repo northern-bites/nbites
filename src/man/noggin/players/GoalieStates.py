@@ -33,8 +33,8 @@ def gameReady(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.lookToAngle(0)
-        if player.lastDiffState == 'gameInitial':
-            player.initialDelayCounter = 0
+        if player.lastDiffState != 'gameInitial':
+            player.brain.nav.walkTo(RelRobotLocation(120, 0, 0))
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated()):
