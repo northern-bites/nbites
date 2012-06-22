@@ -203,5 +203,20 @@ def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.stand()
+        player.brain.tracker.trackBallFixedPitch()
+        player.brain.nav.walkTo(RelRobotLocation(0.0, 30.0, 0.0))
 
-    return player.goLater('watch')
+    return Transition.getNextState(player, penaltyShotsGamePlaying)
+
+def waitForPenaltySave(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBallFixedPitch()
+        player.brain.nav.stop()
+    return Transition.getNextState(player, waitForPenaltySave)
+
+def diveForPenaltySave(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
+        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+
+    return player.stay()

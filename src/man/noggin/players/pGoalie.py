@@ -207,6 +207,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : GoalieStates.watch
             }
 
+        GoalieStates.penaltyShotsGamePlaying.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldGetReadyToSave,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.waitForPenaltySave
+            }
+
+        GoalieStates.waitForPenaltySave.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.diveForPenaltySave
+            }
+
     def run(self):
         gcState = self.brain.gameController.currentState
 

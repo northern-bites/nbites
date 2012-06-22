@@ -140,10 +140,6 @@ def shouldPerformSave(player):
     """
     Checks that the ball is moving toward it and close enough to save.
     """
-    if player.penaltyKicking:
-        return (player.brain.ball.vis.heat > 5.0 or
-                player.brain.ball.loc.relVelX < -50.0)
-
     return (player.brain.ball.loc.relVelX < -50.0 and
             player.brain.ball.vis.framesOn > 4)
 
@@ -167,9 +163,6 @@ def shouldClearBall(player):
     """
     Checks that the ball is more or less in the goal box.
     """
-    if player.penaltyKicking:
-        return False
-
     # less than 1.5 minutes left or winning/losing badly
     shouldBeAggressive = (player.brain.comm.gc.timeRemaining() < 90 or
                           (abs(player.brain.comm.gc.teams(0)[1] -
