@@ -125,67 +125,67 @@ namespace PF
 
 	standardDeviations = findParticleSD();
 
-	const std::vector<float> odometryVelocity = motionModel->getVelocity();
+	//const std::vector<float> odometryVelocity = motionModel->getVelocity();
 
-	std::vector<float> meanVelocity(3, 0.0f);
+	//std::vector<float> meanVelocity(3, 0.0f);
 
-	long long int currentTime = ::monotonic_micro_time();
-	float deltaT = static_cast<float>(currentTime - lastUpdateTime)/
-	    1000000.0f;
+	//long long int currentTime = ::monotonic_micro_time();
+	//float deltaT = static_cast<float>(currentTime - lastUpdateTime)/
+	//    1000000.0f;
 
-	meanVelocity[0] = (xEstimate - previousXEstimate)/deltaT;
-	meanVelocity[1] = (yEstimate - previousYEstimate)/deltaT;
-	meanVelocity[2] = (hEstimate - previousHEstimate)/deltaT;
+	// meanVelocity[0] = (xEstimate - previousXEstimate)/deltaT;
+	// meanVelocity[1] = (yEstimate - previousYEstimate)/deltaT;
+	// meanVelocity[2] = (hEstimate - previousHEstimate)/deltaT;
 
-	lastUpdateTime = currentTime;
+	// lastUpdateTime = currentTime;
 
-	static std::ofstream uncertaintyLog("/home/nao/pfuncertainty.log");
-	uncertaintyLog << standardDeviations[0]
-		       << " " << standardDeviations[1]
-		       << " " << standardDeviations[2]
-		       << std::endl;
+	// static std::ofstream uncertaintyLog("/home/nao/pfuncertainty.log");
+	// uncertaintyLog << standardDeviations[0]
+	// 	       << " " << standardDeviations[1]
+	// 	       << " " << standardDeviations[2]
+	// 	       << std::endl;
 
-	std::cout << "Standard deviations: \n x: " << standardDeviations[0]
-		  << "\n y: " << standardDeviations[1] 
-		  << "\n h: " << standardDeviations[2]
-		  // << "\n Odometries: "
-	          // << "\n deltaX: " << xEstimate - previousXEstimate
-		  // << "\n deltaY: " << yEstimate - previousYEstimate
-		  // << "\n deltaH: " << hEstimate - previousHEstimate
-		  << "\n Velocities: "
-		  << "\n Odometry linear velocity = "
-		  << NBMath::getHypotenuse(odometryVelocity[0], odometryVelocity[1])
-		  << " \n Mean linear velocity = "
-		  << NBMath::getHypotenuse(meanVelocity[0], odometryVelocity[1])
-		  << std::endl;
+	// std::cout << "Standard deviations: \n x: " << standardDeviations[0]
+	// 	  << "\n y: " << standardDeviations[1] 
+	// 	  << "\n h: " << standardDeviations[2]
+	// 	  // << "\n Odometries: "
+	//           // << "\n deltaX: " << xEstimate - previousXEstimate
+	// 	  // << "\n deltaY: " << yEstimate - previousYEstimate
+	// 	  // << "\n deltaH: " << hEstimate - previousHEstimate
+	// 	  << "\n Velocities: "
+	// 	  << "\n Odometry linear velocity = "
+	// 	  << NBMath::getHypotenuse(odometryVelocity[0], odometryVelocity[1])
+	// 	  << " \n Mean linear velocity = "
+	// 	  << NBMath::getHypotenuse(meanVelocity[0], odometryVelocity[1])
+	// 	  << std::endl;
 	
-	lastUpdateTime = currentTime;
+	// lastUpdateTime = currentTime;
 
 	// Check if the mean has gone out of bounds. If so, 
 	// reset to the closest point in bounds with appropriate
 	// uncertainty.
 	bool resetInBounds = false;
 
-	if(xEstimate < parameters.fieldWidthOffset)
+	if(xEstimate < 0)
 	{
 	    resetInBounds = true;
-	    xEstimate = parameters.fieldWidthOffset;
+	    xEstimate = 0;
 	}
-	else if(xEstimate > parameters.fieldWidth - parameters.fieldWidthOffset)
+	else if(xEstimate > parameters.fieldWidth)
 	{
 	    resetInBounds = true;
-	    xEstimate = parameters.fieldWidth - parameters.fieldWidthOffset;
+	    xEstimate = parameters.fieldWidth;
 	}
 
-	if(yEstimate < parameters.fieldHeightOffset)
+	if(yEstimate < 0)
 	{
 	    resetInBounds = true;
-	    yEstimate = parameters.fieldHeightOffset;
+	    yEstimate = 0;
 	}
-	else if(yEstimate > parameters.fieldHeight - parameters.fieldHeightOffset)
+	else if(yEstimate > parameters.fieldHeight)
 	{
 	    resetInBounds = true;
-	    yEstimate = parameters.fieldHeight - parameters.fieldHeightOffset;
+	    yEstimate = parameters.fieldHeight;
 	}
 
 	// Only reset if one of the location coordinates is
@@ -549,5 +549,3 @@ namespace PF
 	return sd;
     }
 }
-
-

@@ -78,8 +78,6 @@ namespace PF
     {
         float fieldHeight;        // Field height.
         float fieldWidth;         // Field width.
-	float fieldHeightOffset;  // Offset from the field height parameter 	                                   // the width of the possible reigon of occupancy.
-	float fieldWidthOffset;
         float numParticles;       // Size of particle population.
         float alpha_fast;         // Weight factor for fast exponential weight filter.
         float alpha_slow;         // Weight factor for slow exponential weight filter.
@@ -89,8 +87,6 @@ namespace PF
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
-	GREEN_PAD_Y,
-	GREEN_PAD_X,
         200,
         0.2f,
         0.05f

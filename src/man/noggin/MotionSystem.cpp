@@ -15,8 +15,8 @@
  * Constructor. No shit :).
  */
 MotionSystem::MotionSystem()
-    : moved(false), robotFallen(false), lastUpdateTime(0.0f), velocity(3, 0.0f) {
-}
+    : moved(false), robotFallen(false)//, lastUpdateTime(0.0f), velocity(3, 0.0f)
+{ }
 
 void MotionSystem::motionUpdate(const OdometryModel& odometryModel) {
 
@@ -120,20 +120,20 @@ DeltaOdometryMeasurement MotionSystem::makeNoisyDeltaOdometry() const
  */
 PF::ParticleSet MotionSystem::update(PF::ParticleSet particles)
 {
-    long long int currentTime = monotonic_micro_time();
-    // Find the change in time (in seconds) to calculate velocity. 
-    float deltaTime = static_cast<float>(currentTime - lastUpdateTime)/
-	1000000.0f;
+    // long long int currentTime = monotonic_micro_time();
+    // // Find the change in time (in seconds) to calculate velocity. 
+    // float deltaTime = static_cast<float>(currentTime - lastUpdateTime)/
+    // 	1000000.0f;
 
     if(moved)
     {
 	// Calculate the odometry-based velocity of the robot's
 	// position: x-velocity, y-velocity, and angular velocity.
-	velocity[0] = deltaOdometry.x/deltaTime;  // x-velocity.
-	velocity[1] = deltaOdometry.y/deltaTime;  // y-velocity.
-	velocity[2] = deltaOdometry.theta/deltaTime;  // angular (heading) velocity
+	// velocity[0] = deltaOdometry.x/deltaTime;  // x-velocity.
+	// velocity[1] = deltaOdometry.y/deltaTime;  // y-velocity.
+	// velocity[2] = deltaOdometry.theta/deltaTime;  // angular (heading) velocity
 
-	lastUpdateTime = currentTime;
+	// lastUpdateTime = currentTime;
 
 	PF::ParticleIt iter;
 
