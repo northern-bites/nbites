@@ -20,6 +20,8 @@
 #include <boost/math/constants/constants.hpp>
 
 #include "LocSystem.h"
+#include "NBMath.h"
+#include "Common.h"
 
 #include "memory/MObjects.h"
 #include "memory/MemoryProvider.h"
@@ -76,8 +78,6 @@ namespace PF
     {
         float fieldHeight;        // Field height.
         float fieldWidth;         // Field width.
-	float fieldHeightOffset;  // Offset from the field height parameter 	                                   // the width of the possible reigon of occupancy.
-	float fieldWidthOffset;
         float numParticles;       // Size of particle population.
         float alpha_fast;         // Weight factor for fast exponential weight filter.
         float alpha_slow;         // Weight factor for slow exponential weight filter.
@@ -87,8 +87,6 @@ namespace PF
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
-	GREEN_PAD_Y,
-	GREEN_PAD_X,
         200,
         0.2f,
         0.05f
@@ -257,8 +255,9 @@ namespace PF
         MotionModel() { }
         virtual ~MotionModel() { }
 
-        virtual ParticleSet update(ParticleSet particles) const = 0;
+        virtual ParticleSet update(ParticleSet particles) = 0;
         virtual const ::MotionModel& getLastOdometry() const = 0;
+	virtual const std::vector<float> getVelocity() const { return std::vector<float>(3, 0.0f); }
     };
 
     /**
