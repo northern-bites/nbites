@@ -150,6 +150,7 @@ def kickBall(player):
 
 def saveIt(player):
     if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
         player.executeMove(SweetMoves.GOALIE_SQUAT)
         player.isSaving = False
         player.brain.fallController.enableFallProtection(False)

@@ -30,6 +30,7 @@ def shouldDodgeLeft(nav):
     # check sonars
     sonars = (nav.brain.sonar.rightDist != nav.brain.sonar.UNKNOWN_VALUE and
               nav.brain.sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST)
+
     #check vision
     vision = nav.brain.vision.obstacles.onRight
 

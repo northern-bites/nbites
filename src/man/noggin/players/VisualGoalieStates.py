@@ -98,7 +98,7 @@ def walkToGoal(player):
 
         player.system.home.relH = 0.0
         player.brain.nav.goTo(player.system.home, nav.CLOSE_ENOUGH,
-                              nav.MEDIUM_SPEED)
+                              nav.MEDIUM_SPEED, True)
 
     updatePostObservations(player)
     player.brain.tracker.lookToAngle(player.system.centerGoalBearing())
