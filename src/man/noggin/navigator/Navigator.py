@@ -95,10 +95,10 @@ class Navigator(FSA.FSA):
         self.switchTo('scriptedMove')
 
     def positionPlaybook(self):
-        self.goTo(self.brain.play.getPosition())
+        self.goTo(self.brain.play.getPosition(), avoidObstacles = True)
 
     def chaseBall(self, speed = FULL_SPEED):
-        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed)
+        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed, True)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False):
         """
