@@ -12,6 +12,44 @@
 #include <string>
 #include <sstream>
 
+GameData::GameData(int teamNumber = 101)
+{
+    _myTeamNumber = teamNumber;
+    control = setUpControl();
+}
+
+void GameData::setUpControl()
+{
+    struct RoboCupGameControlData data;
+    data.header = GAMECONTROLLER_STRUCT_HEADER;
+    data.version = GAMECONTROLLER_STRUCT_VERSION;
+    data.playersPerTeam = MAX_NUM_PLAYERS;
+    data.state = STATE_INITIAL;
+    data.firstHalf = 1;
+    data.kickOffTeam = TEAM_BLUE; //TODO: check if this is correct
+    data.secondaryState = STATE2_NORMAL;
+    data.dropInTeam = TEAM_BLUE;
+    data.dropInTime = 0;
+    data.secsRemaining = 600;
+
+    data.teams[TEAM_BLUE].teamNumber = _myTeamNumber; //TODO: check if
+                                                      //this is the
+                                                      //correct
+                                                      //indexing
+    data.teams[TEAM_BLUE].teamColour = TEAM_BLUE;
+    data.teams[TEAM_BLUE].goalColour = GOAL_YELLOW;
+
+    data.teams[TEAM_RED].teamColour = TEAM_RED;
+    data.teams[TEAM_RED].goalColour = GOAL_YELLOW;
+
+    setControl(data);
+}
+
+void setControl(RoboCupGameControlData data)
+{
+    control = data;
+}
+
 bool GameData::ourKickoff()
 {
     //TODO: Make sure this is the correct comparison.
@@ -144,6 +182,20 @@ int GameData::theirTeamIndex()
 int GameData::checkPenaltyForPlayer(int team, int player)
 {
     return (int)control.teams[team].players.[player].penalty
+}
+
+void GameData::switchTeams()
+{
+    //TODO: find out if we need to switch the structs or just the color.
+    struct TeamInfo temp = control.teams[0];
+
+    control.teams[0] = control.teams[1];
+    control.teams[0].teamColour = (control.teams[0].teamColour == TEAM_BLUE ?
+                                   TEAM_RED : TEAM_BLUE);
+
+    control.teams[1] = temp;
+    control.teams[1].teamColour = (control.teams[1].teamColour == TEAM_BLUE ?
+                                   TEAM_RED : TEAM_BLUE);
 }
 
 char* GameData::toString()

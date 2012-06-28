@@ -15,6 +15,21 @@ class GameData
 {
 public:
     /**
+     * Constructor
+     */
+    GameData(int teamNumber);
+
+    /**
+     * @effect: Sets up the control data to a generic state
+     */
+    void setUpControl();
+
+    /**
+     * @effect: Sets the control data to another one
+     */
+    void setControl(RoboCupGameControlData data);
+
+    /**
      * The following methods return the important values stored in
      * the RoboCupGameControlData structure.
      * The values it returns are consistent with the constants in
@@ -75,6 +90,8 @@ public:
     int  myTeamNumber() {return _myTeamNumber;}
 
     int  myTeamColor();
+
+    void switchTeams();
 
     char* toString();
 
