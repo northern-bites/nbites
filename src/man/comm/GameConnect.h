@@ -1,7 +1,7 @@
 /**
  * This class provides functionality for communicating with the
  * GameController. Uses UDP for transmission and reception and
- * keeps track of the data with the  GameData class.
+ * keeps track of the data with the GameData class.
  * @author Wils Dawson 5/29/2012
  */
 
@@ -29,8 +29,10 @@ public:
     /**
      * Signal to receive any information from the socket
      * and send any appropriate response back to the GC.
+     * @param player: The player number to respond as.
+     *                0 to respond as all.
      */
-    void handle();
+    void handle(int player);
 
     /**
      * @return: The pointer to the GameData.
@@ -81,11 +83,11 @@ private:
 
     /**
      * Builds and sends a response to the Game Controller.
-     * @param msg:    The kind of response to send.
-     *                Specified in "RoboCupGameControlData.h"
      * @param player: The player to respond as.
+     * @param msg:    The message to respond with.
+     *                Defined in RoboCupGameControlData.h
      */
-    void respond(int msg, int player);
+    void respond(int player, unsigned int msg);
 
     /**
      * Verifies the packet we received from the socket.
@@ -93,12 +95,12 @@ private:
      */
     bool verify(char* packet);
 
-    CommTimer*      timer;
-    NetworkMonitor* monitor;
-    GameData*       data;
-    UDPSocket*      socket;
+    CommTimer*      _timer;
+    NetworkMonitor* _monitor;
+    GameData*       _data;
+    UDPSocket*      _socket;
     int             _myTeamNumber;
 
-    bool            haveRemoteGC;
+    bool            _haveRemoteGC;
 };
 #endif
