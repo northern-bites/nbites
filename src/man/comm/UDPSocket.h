@@ -34,6 +34,13 @@ public:
     bool setTarget(const char* ip, const int port);
 
     /**
+     * Set the target address.
+     * @param addr: The address to set as the target
+     * @retrun:     true for success, false for error.
+     */
+    bool setTarget(const struct sockaddr addr);
+
+    /**
      * Set broadcast mode.
      * @param enable: true to enable broadcast, false to disable.
      * @return:       true for success, false for error.
