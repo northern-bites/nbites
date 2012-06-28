@@ -24,4 +24,4 @@ static const robot_ip_pair mal    = {"mal"   , "139.140.218.16"};
 static const robot_ip_pair zoe    = {"zoe"   , "139.140.218.17"};
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne, scotty,
-                                                    dax, annika, data, mal, zoe};
+                                                   dax, annika, data, mal, zoe};

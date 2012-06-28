@@ -49,7 +49,7 @@ TeamConnect::~TeamConnect()
 void TeamConnect::setUpSocket()
 {
     socket->setBlocking(false);
-    socket->setBroadcast(false);
+    socket->setBroadcast(true);
     socket->bind("", TEAM_PORT); // listen for anything on our port.
 
     std::string ipTarget = "255.255.255.255";
@@ -61,7 +61,8 @@ void TeamConnect::setUpSocket()
 
         if (gethostname(buf, sizeof(buf)) < 0)
         {
-            std::cerr << "\nError getting hostname in TeamConnect::setUpSocket()"
+            std::cerr << "\nError getting hostname in "
+                      << "TeamConnect::setUpSocket()"
                       << std::endl;
             goto end;
         }
@@ -73,6 +74,7 @@ void TeamConnect::setUpSocket()
             if (robotIPs[i].name.compare(name) == 0)
             {
                 ipTarget = robotIPs[i].ip;
+                socket->setBroadcast(false);
                 break;
             }
             if (i == NUM_ROBOTS-1)
@@ -163,7 +165,7 @@ void TeamConnect::receive(int player)
         robot = team[playerNumber -1];
 
         robot->update(payload);
-        std::cout << "Received a packet!" << std::endl;
+        //std::cout << "Received a packet!" << std::endl;
     } while (result > 0);
 }
 
