@@ -1,11 +1,10 @@
 #!/bin/sh
 
-MAL=192.168.16.102
-JAYNE=192.168.16.103
-RIVER=192.168.16.104
-WASH=192.168.16.105
-ZOE=192.168.16.106
-COUNT=0
+MAL=mal.local
+JAYNE=jayne.local
+RIVER=river.local
+WASH=wash.local
+ZOE=zoe.local
 
 echo "|  mal  | jayne | river | wash  |  zoe  |"
 
