@@ -6,30 +6,35 @@ RIVER=river.local
 WASH=wash.local
 ZOE=zoe.local
 
-ROBOT="nao@"
 WPASUPCONF=../config/wpa_supplicant.conf
 TMPCONF=../config/tmpconf
+DOALL=0
 
 if [ $2 ]; then 
     echo $1 | grep -i "mal" >/dev/null 2>&1
     if [ "$?" -eq "0" ]; then
-	ROBOT="$ROBOT$MAL"
+	ROBOT="nao@$MAL"
     fi
     echo $1 | grep -i "jayne" >/dev/null 2>&1
     if [ "$?" -eq "0" ]; then
-	ROBOT="$ROBOT$JAYNE"
+	ROBOT="nao@$JAYNE"
     fi
     echo $1 | grep -i "river" >/dev/null 2>&1
     if [ "$?" -eq "0" ]; then
-	ROBOT="$ROBOT$RIVER"
+	ROBOT="nao@$RIVER"
     fi
     echo $1 | grep -i "wash" >/dev/null 2>&1
     if [ "$?" -eq "0" ]; then
-	ROBOT="$ROBOT$WASH"
+	ROBOT="nao@$WASH"
     fi
     echo $1 | grep -i "zoe" >/dev/null 2>&1
     if [ "$?" -eq "0" ]; then
-	ROBOT="$ROBOT$ZOE"
+	ROBOT="nao@$ZOE"
+    fi
+    echo $1 | grep -i "all" >/dev/null 2>&1
+    if [ "$?" -eq "0" ]; then
+	ROBOT="nao@"
+	DOALL=1
     fi
 
 else
@@ -52,4 +57,12 @@ else
     mv $TMPCONF $WPASUPCONF
 fi
 
-scp $WPASUPCONF $ROBOT:/etc/wpa_supplicant/wpa_supplicant.conf
+if [ $DOALL -eq 1 ]; then
+    scp $WPASUPCONF $ROBOT$MAL:/etc/wpa_supplicant/wpa_supplicant.conf
+    scp $WPASUPCONF $ROBOT$JAYNE:/etc/wpa_supplicant/wpa_supplicant.conf
+    scp $WPASUPCONF $ROBOT$RIVER:/etc/wpa_supplicant/wpa_supplicant.conf
+    scp $WPASUPCONF $ROBOT$WASH:/etc/wpa_supplicant/wpa_supplicant.conf
+    scp $WPASUPCONF $ROBOT$ZOE:/etc/wpa_supplicant/wpa_supplicant.conf
+else
+    scp $WPASUPCONF $ROBOT:/etc/wpa_supplicant/wpa_supplicant.conf
+fi
