@@ -1,10 +1,5 @@
 #!/bin/sh
 
-#MAL=192.168.16.102
-#JAYNE=192.168.16.103
-#RIVER=192.168.16.104
-#WASH=192.168.16.105
-#ZOE=192.168.16.106
 MAL=mal.local
 JAYNE=jayne.local
 RIVER=river.local
@@ -12,10 +7,10 @@ WASH=wash.local
 ZOE=zoe.local
 
 ROBOT="nao@"
-WPASUPCONF=../../wireless/wpa_supplicant.conf
+WPASUPCONF=../config/wpa_supplicant.conf
+TMPCONF=../config/tmpconf
 
-
-if [ $1 ]; then 
+if [ $2 ]; then 
     echo $1 | grep -i "mal" >/dev/null 2>&1
     if [ "$?" -eq "0" ]; then
 	ROBOT="$ROBOT$MAL"
@@ -37,9 +32,24 @@ if [ $1 ]; then
 	ROBOT="$ROBOT$ZOE"
     fi
 
-    scp $WPASUPCONF $ROBOT:/etc/wpa_supplicant/
 else
-    echo "Usage: ./change_ssid [robot_name]"
+    echo "Usage: ./change_ssid [robot_name] [network_ssid] [password_optional]"
+    echo "You may substitute \"all\" for the robot name to copy the file to all reachable robots"
     exit 2
 fi
 
+SSID_LINE=`awk '$0 ~ str{print NR}' str="ssid" $WPASUPCONF`
+PSK_LINE=`awk '$0 ~ str{print NR}' str="psk" $WPASUPCONF`
+
+sed "${SSID_LINE}s/.*/  ssid\=\"$2\"/" $WPASUPCONF > $TMPCONF
+mv $TMPCONF $WPASUPCONF
+
+if [ $3 ]; then
+    sed "${PSK_LINE}s/.*/  psk\=\"$3\"/" $WPASUPCONF > $TMPCONF
+    mv $TMPCONF $WPASUPCONF
+else
+    sed "${PSK_LINE}s/.*/  psk\=\"\"/" $WPASUPCONF > $TMPCONF
+    mv $TMPCONF $WPASUPCONF
+fi
+
+scp $WPASUPCONF $ROBOT:/etc/wpa_supplicant/wpa_supplicant.conf
