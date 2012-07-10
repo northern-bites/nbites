@@ -22,21 +22,15 @@ def gameSet(player):
     return player.stay()
 
 def gamePlaying(player):
+    if player.firstFrame():
+        player.brain.tracker.repeatBasicPanFixedPitch()
 
-    #if player.firstFrame():
-    #    player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-
-    #if player.brain.ball.vis.on:
-    # player.brain.sensors.saveFrame()
-    # player.numFramesSaved += 1
-    #player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-    player.brain.tracker.repeatBasicPanFixedPitch()
     return player.stay()
 
 def gamePenalized(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.SIT_POS)
-        player.brain.tracker.stopHeadMoves()
+#    if player.firstFrame():
+#        player.executeMove(SweetMoves.SIT_POS)
+#        player.brain.tracker.stopHeadMoves()
     return player.stay()
 
 def doneState(player):
@@ -52,4 +46,3 @@ def doneState(player):
 
 def gameInitial(player):
     return player.stay()
-

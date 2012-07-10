@@ -32,6 +32,7 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
     connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
 
+
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);
@@ -68,6 +69,7 @@ void EmptyQTool::prev() {
     dataManager->getPrev();
 }
 
+
 void EmptyQTool::record() {
     if (dataManager->isRecording()) {
         dataManager->stopRecording();
@@ -103,7 +105,7 @@ void EmptyQTool::keyPressEvent(QKeyEvent * event)
 void EmptyQTool::resizeEvent(QResizeEvent* ev)
 {
     QSize widgetSize = ev->size();
-    if((widgetSize.width() > tabStartSize->width()) &&
+    if((widgetSize.width() > tabStartSize->width()) ||
        (widgetSize.height() > tabStartSize->height())) {
         toolTabs->resize(widgetSize-*scrollBarSize);
     }

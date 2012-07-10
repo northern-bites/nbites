@@ -33,6 +33,7 @@ private:
 private slots:
     void robotSelected(const RemoteRobot* remoteRobot);
 	void manualConnect();
+	void disconnect();
 
 private:
     data::DataManager::ptr dataManager;

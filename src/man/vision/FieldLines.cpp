@@ -85,7 +85,7 @@ const float FieldLines::MIN_CROSS_EXTEND = 10.0f;
 // When estimating the angle between two lines on the field, anything less
 // than MIN_ANGLE_ON_FIELD or greater than MAX_ANGLE_ON_FIELD is suspect
 // and disallowed; ideally our estimates would always be 1.57 radians
-const float FieldLines::MIN_ANGLE_ON_FIELD = .96f;
+const float FieldLines::MIN_ANGLE_ON_FIELD = 1.03f;
 const float FieldLines::MAX_ANGLE_ON_FIELD = 2.00f;
 
 const float FieldLines::WHITE_PERCENT_CLEARANCE = 200.0f/9.0f;// 2/9 must be white
@@ -128,7 +128,6 @@ FieldLines::FieldLines(Vision *visPtr, boost::shared_ptr<NaoPose> posePtr )
     debugFitUnusedPoints = false;
     standardView = false;
 #endif
-
     // Makes setprecision dictate number of decimal places
     cout.setf(ios::fixed);
 }
@@ -779,7 +778,8 @@ void FieldLines::createLines(list <linePoint> &linePoints)
 								   static_cast<float>(lineEndpointY),
 								   static_cast<float>(pointX),
 								   static_cast<float>(pointY) )
-                < MIN_SEPARATION_TO_NOT_CHECK) {
+                < MIN_SEPARATION_TO_NOT_CHECK && pointY < IMAGE_HEIGHT / 3 &&
+				lineEndpointY < IMAGE_HEIGHT / 4) {
                 percentGreen = 0;
             } else {
                 percentGreen = percentColorBetween(lineEndpointX, lineEndpointY,
@@ -983,7 +983,7 @@ void FieldLines::joinLines()
                 if (isCCLine) {
                     cout << "Joined as center circle line.";
                 }
-                cout << endl;
+                cout << endl << endl;
             }
             // Replace the information in i with the union of i and j and
             // recalculated the variables in the line struct
@@ -2004,6 +2004,10 @@ list< VisualCorner > FieldLines::intersectLines()
         cout <<"Beginning intersectLines() with " << linesList.size() << " lines.."
              << endl;
     }
+	if (linesList.size() > 5) {
+		//cout << "Punting on corners" << endl;
+		//return corners;
+	}
 
     // Reset all of the context variables
     vision->thresh->context->init();
@@ -2205,6 +2209,20 @@ list< VisualCorner > FieldLines::intersectLines()
                         cout << (*i)->getAngle() << " " << (*j)->getAngle() << endl;
                 }
  			}
+			// if we have a lot of lines we're probably looking at the center circle
+			if (linesList.size() > 5) {
+				if (c.getShape() == OUTER_L) {
+					int newY = vision->thresh->field->horizonAt(intersection.x);
+					estimate r = vision->pose->pixEstimate(intersection.x, newY, 0.0);
+					if (r.dist > 300.0f) {
+						if (debugIntersectLines) {
+							cout << "Edge is too far away for outer_l" << endl;
+						}
+						continue;
+					}
+
+				}
+			}
             if (isCCIntersection) {
                 c.setShape(CIRCLE);
             } else if (c.getShape() == T) {
@@ -2238,9 +2256,9 @@ list< VisualCorner > FieldLines::intersectLines()
             if (c.getShape() == T) {
                 vision->thresh->context->setTCorner();
             } else if (c.getShape() == OUTER_L) {
-                vision->thresh->context->setILCorner();
-            } else if (c.getShape() == INNER_L) {
                 vision->thresh->context->setOLCorner();
+            } else if (c.getShape() == INNER_L) {
+                vision->thresh->context->setILCorner();
             } else {
                 vision->thresh->context->setCCCorner();
             }

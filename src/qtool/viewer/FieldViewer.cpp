@@ -2,6 +2,7 @@
 #include "man/memory/Memory.h"
 #include "image/BMPImage.h"
 
+#include <QDebug>
 #include <QVBoxLayout>
 #include <vector>
 
@@ -15,13 +16,13 @@ using namespace image;
 using namespace overseer;
 
 FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
-			        QWidget(parent),
-			        dataManager(dataManager),
-			        startButton(new QPushButton("Locate Robots", this)),
-			        stopButton(new QPushButton("Stop Location", this)) {
+	QWidget(parent),
+	dataManager(dataManager),
+	startButton(new QPushButton("Locate Robots", this)),
+	stopButton(new QPushButton("Stop Location", this)) {
 
     mainLayout = new QVBoxLayout(this);
-    scaleFactor = 1.35f;
+	scaleFactor = 1.0f;
 
     //field image painted via overlay of robots, field
     fieldImage = new PaintField(this, scaleFactor);
@@ -32,7 +33,6 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
 
     connect(bot_locs->locs, SIGNAL(newRobotLocation()), fieldView, SLOT(updateView()));
 
-    spacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     field = new QHBoxLayout();
     field->addWidget(fieldView);
 
@@ -46,8 +46,11 @@ FieldViewer::FieldViewer(DataManager::ptr dataManager, QWidget* parent):
     //paint the field
     mainLayout->addLayout(buttonLayout);
     mainLayout->addLayout(field);
-    mainLayout->addItem(spacer);
     this->setLayout(mainLayout);
+}
+
+FieldViewer::~FieldViewer(){
+	bot_locs->locs->stopListening();
 }
 
 void FieldViewer::drawBots(){

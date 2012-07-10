@@ -9,10 +9,15 @@ from ..util import Transition
 
 #speed gains
 FULL_SPEED = 1.0
+HASTY_SPEED = 0.9
 FAST_SPEED = 0.8
-MEDIUM_SPEED = 0.6
-CAREFUL_SPEED = 0.4
+QUICK_SPEED = 0.7
+BRISK_SPEED = 0.6
+MEDIUM_SPEED = 0.5
+GRADUAL_SPEED = 0.4
+CAREFUL_SPEED = 0.3
 SLOW_SPEED = 0.2
+SLUGGISH_SPEED = 0.1
 KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
@@ -40,22 +45,44 @@ class Navigator(FSA.FSA):
         self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
 
-        self.shouldAvoidObstacleLeftCounter = 0
-        self.shouldAvoidObstacleRightCounter = 0
-
         #transitions
         #@todo: move this to the actual transitions file?
         self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination)
         self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition,
                                                                   Transition.SOME_OF_THE_TIME,
                                                                   Transition.LOW_PRECISION)
-        self.walkingToTransition = Transition.CountTransition(navTrans.walkedEnough,
-                                                              Transition.ALL_OF_THE_TIME,
-                                                              Transition.INSTANT)
 
-        NavStates.goToPosition.transitions = { NavStates.atPosition: self.atLocPositionTransition }
-        NavStates.atPosition.transitions = { NavStates.goToPosition: self.locRepositionTransition }
-        NavStates.walkingTo.transitions = { NavStates.standing: self.walkingToTransition }
+        NavStates.goToPosition.transitions = {
+            self.atLocPositionTransition : NavStates.atPosition,
+
+            Transition.CountTransition(navTrans.shouldDodgeLeft,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidLeft,
+
+            Transition.CountTransition(navTrans.shouldDodgeRight,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidRight
+            }
+
+        NavStates.avoidLeft.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.avoidRight.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.atPosition.transitions = {
+            self.locRepositionTransition : NavStates.goToPosition
+            }
 
     def run(self):
         FSA.FSA.run(self)
@@ -70,10 +97,10 @@ class Navigator(FSA.FSA):
     def positionPlaybook(self):
         self.goTo(self.brain.play.getPosition())
 
-    def chaseBall(self):
-        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, FULL_SPEED)
+    def chaseBall(self, speed = FULL_SPEED):
+        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, adaptive = False):
+    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False):
         """
         General go to method
         Ideal for going to a field position, or for going to a
@@ -100,6 +127,7 @@ class Navigator(FSA.FSA):
 
         self.updateDest(dest, speed)
         NavStates.goToPosition.precision = precision
+        NavStates.goToPosition.avoidObstacles = avoidObstacles
         NavStates.goToPosition.adaptive = adaptive
 
         if self.currentState is not 'goToPosition':
@@ -111,43 +139,63 @@ class Navigator(FSA.FSA):
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
 
-    def walkTo(self, walkToDest, precision = CLOSE_ENOUGH, speed = FULL_SPEED):
+    def walkTo(self, walkToDest, speed = FULL_SPEED):
         """
         Walks to a RelRobotLocation
-        Checks for the destination using odometry
+        Checks if reached the destination using odometry
         Great for close destinations (since odometry gets bad over time) in
         case loc is bad
-        Doesn't avoid obstacles! (that would make odometry very bad, especially
-        if we're being pushed)
+        Doesn't avoid obstacles! (that would make it very confused and odometry
+        very bad, especially if we're being pushed)
         Switches to standing at the end
         @todo: Calling this again before the other walk is done does some weird stuff
         """
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
 
-        NavStates.walkingTo.dest = walkToDest
+        NavStates.walkingTo.destQueue.clear()
+
+        NavStates.walkingTo.destQueue.append(walkToDest)
         NavStates.walkingTo.speed = speed
-        NavStates.walkingTo.precision = precision
 
         #reset the counter to make sure walkingTo.firstFrame() is true on entrance
         #in case we were in walkingTo before as well
-        self.counter = 0
         self.switchTo('walkingTo')
 
     def stop(self):
-        if self.currentState not in ['stop', 'stopped']:
-            self.switchTo('stop')
+        """
+        This is the same as standing because to end a walk
+        we just make it stand
+        """
+        if self.currentState not in ['stopped', 'stand', 'standing']:
+            self.stand()
 
     def orbitAngle(self, radius, angle):
         """
         Orbits a point at a certain radius for a certain angle using walkTo
-        WARNING: as of now angles that are greater than 90 degrees
-        are iffy since the robot will try to cut a straight-ish path to that
-        destination; a solution would be to enque several smaller
-        walkTo's or something
+        Splits the command into multiple smaller commands
+        Don't rely on it too much since it depends on the odometry of strafes
+        and turns which slip a lot
+        It will orbit in steps, each orbit taking ~30 degrees (more like 45
+        when I test it out)
         """
-        self.walkTo(helper.getOrbitLocation(radius, angle), CLOSE_ENOUGH, SLOW_SPEED)
 
+        NavStates.walkingTo.destQueue.clear()
+
+        #@todo: make this a bit nicer or figure out a better way to do it
+        # split it up in 15 degree moves; good enough approximation for small radii
+        for k in range(0, abs(angle) / 15):
+            if angle > 0:
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 6, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -15))
+            else:
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 6, 0.0))
+                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 15))
+
+        NavStates.walkingTo.speed = FAST_SPEED
+        self.switchTo('walkingTo')
+        #self.walkTo(helper.getOrbitLocation(radius, angle), speed)
+        #self.walk(0, .75, -.5)
 
 
     def walk(self, x, y, theta):
@@ -164,11 +212,14 @@ class Navigator(FSA.FSA):
         Make the robot stand; Standing should be the default action when we're not
         walking/executing a sweet move
         """
-        self.switchTo('standing')
+        self.switchTo('stand')
 
     # informative methods
     def isAtPosition(self):
         return self.currentState is 'atPosition'
+
+    def isStanding(self):
+        return self.currentState in ['standing', 'stand']
 
     def isStopped(self):
         return self.currentState in ['stopped', 'standing']
@@ -207,4 +258,3 @@ class Navigator(FSA.FSA):
 
     def isSpinningRight(self):
         return self.spinDirection() == RIGHT
-

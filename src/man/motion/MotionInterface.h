@@ -53,6 +53,7 @@ public:
     void enqueue(const BodyJointCommand::ptr command);
     void enqueue(const HeadJointCommand::ptr command);
     inline bool isWalkActive() {return switchboard->isWalkActive();}
+    inline bool isStanding() {return switchboard->isStanding();}
     inline bool isHeadActive(){return switchboard->isHeadActive();}
     inline bool isBodyActive(){return switchboard->isBodyActive();}
     void setGait(const Gait::ptr command);
@@ -61,6 +62,7 @@ public:
     void stopBodyMoves();
     void stopHeadMoves();
     void resetWalkProvider();
+    void resetWalkOdometry();
     void resetScriptedProvider();
     void sendFreezeCommand(const FreezeCommand::ptr command);
     void sendFreezeCommand(const UnfreezeCommand::ptr command);
@@ -100,6 +102,9 @@ public:
     int getBalanceMode() const;
 
     int getFrameCount() const { return switchboard->getFrameCount(); }
+
+	// Provide calibration boolean for boost
+	bool calibrated() { return switchboard->calibrated(); }
 
 private:
     MotionSwitchboard *switchboard;

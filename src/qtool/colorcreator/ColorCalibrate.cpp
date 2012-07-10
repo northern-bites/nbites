@@ -5,6 +5,7 @@
 
 #include <QFileDialog>
 #include <QCheckBox>
+#include <QMouseEvent>
 
 namespace qtool {
 namespace colorcreator {
@@ -13,6 +14,8 @@ using namespace qtool::data;
 using namespace qtool::image;
 using namespace man::corpus;
 using namespace man::memory;
+
+static const int BOX = 5;
 
 ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         QWidget(parent), dataManager(dataManager), imageTabs(new QTabWidget(this)),
@@ -26,10 +29,8 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         colorSpaceWidget(currentColorSpace, this),
         colorWheel(currentColorSpace, this) {
 
-    QHBoxLayout* mainLayout = new QHBoxLayout;
-
-    QHBoxLayout* leftLayout = new QHBoxLayout;
-    leftLayout->addWidget(&thresholdedImagePlaceholder);
+    mainLayout = new QVBoxLayout;
+    topLayout = new QHBoxLayout;
 
     //connect all the color spaces to update the thresholded
     //image when their parameters change
@@ -37,11 +38,17 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
         connect(&colorSpace[i], SIGNAL(parametersChanged()),
                 this, SLOT(updateThresholdedImage()));
     }
-    leftLayout->addWidget(imageTabs);
 
-    //update the threshold when the underlying image changes
-    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
-    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
+	imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    topLayout->addWidget(imageTabs);
+	thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
+	topLayout->addWidget(&thresholdedImagePlaceholder);
+
+    QObject::connect(&topChannelImage, SIGNAL(mouseClicked(int, int, int, bool)),
+                     this, SLOT(canvassClicked(int, int, int, bool)));
+    QObject::connect(&bottomChannelImage, SIGNAL(mouseClicked(int, int, int, bool)),
+                     this, SLOT(canvassClicked(int, int, int, bool)));
+
 
     imageTabs->addTab(&topChannelImage, "Top Image");
     dataManager->connectSlot(&topChannelImage, SLOT(updateView()), "MRawImages");
@@ -49,9 +56,15 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     imageTabs->addTab(&bottomChannelImage, "Bottom Image");
     dataManager->connectSlot(&bottomChannelImage, SLOT(updateView()), "MRawImages");
 
+    //update the threshold when the underlying image changes
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
+    dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
+
     connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
 
-    QVBoxLayout* rightLayout = new QVBoxLayout;
+    bottomLayout = new QHBoxLayout;
+	colorButtons = new QVBoxLayout;
+	leftJunk = new QVBoxLayout;
 
     //set up the color selection combo box
     for (int i = 0; i < image::NUM_COLORS; i++) {
@@ -60,35 +73,42 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
     colorSelect.setCurrentIndex(STARTING_COLOR);
     connect(&colorSelect, SIGNAL(currentIndexChanged(int)),
             this, SLOT(selectColorSpace(int)));
-    rightLayout->addWidget(&colorSelect);
+	leftJunk->addWidget(&colorSelect);
+    leftJunk->addWidget(&colorWheel);
 
-    rightLayout->addWidget(&colorWheel);
-    rightLayout->addWidget(&colorSpaceWidget);
+	bottomLayout->addLayout(leftJunk);
+	bottomLayout->addWidget(&colorSpaceWidget);
 
     loadSlidersBtn.setText("Load Sliders");
-    rightLayout->addWidget(&loadSlidersBtn);
+    colorButtons->addWidget(&loadSlidersBtn);
     connect(&loadSlidersBtn, SIGNAL(clicked()),
             this, SLOT(loadSlidersBtnPushed()));
 
     saveSlidersBtn.setText("Save Sliders");
-    rightLayout->addWidget(&saveSlidersBtn);
+    colorButtons->addWidget(&saveSlidersBtn);
     connect(&saveSlidersBtn, SIGNAL(clicked()),
             this, SLOT(saveSlidersBtnPushed()));
 
     saveColorTableBtn.setText("Save Color Table");
-    rightLayout->addWidget(&saveColorTableBtn);
+    colorButtons->addWidget(&saveColorTableBtn);
     connect(&saveColorTableBtn, SIGNAL(clicked()),
             this, SLOT(saveColorTableBtnPushed()));
 
+	bottomLayout->addLayout(colorButtons);
+
     QCheckBox* fullColors = new QCheckBox(tr("All colors"));
-    rightLayout->addWidget(fullColors);
+    colorButtons->addWidget(fullColors);
     connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
 	displayAllColors = false;
 
-    mainLayout->addLayout(leftLayout);
-    mainLayout->addLayout(rightLayout);
+	mainLayout->addLayout(topLayout);
+	bottomLayout->setAlignment(Qt::AlignBottom);
+    mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
+
+	lastClickedX = -BOX;
+	lastClickedY = -BOX;
 }
 
 // flip between one and all colors
@@ -96,6 +116,42 @@ ColorCalibrate::ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
 		displayAllColors = !displayAllColors;
 		updateThresholdedImage();
 	}
+
+void ColorCalibrate::canvassClicked(int x, int y, int brushSize, bool leftClick) {
+	std::cout << "Clicked " << x << " " << y << " " << std::endl;
+    BMPYUVImage* image;
+
+    if (currentImage == Camera::TOP) {
+        image = topImage;
+    } else {
+        image = bottomImage;
+    }
+
+	byte yi = image->getYUVImage()->getY(x, y);
+	byte u = image->getYUVImage()->getU(x, y);
+	byte v = image->getYUVImage()->getV(x, y);
+
+	std::cout << "YUV " << (int)yi << " " << (int)u << " " <<
+		(int)v << std::endl;
+
+	Color color;
+	color.setYuv(yi, u, v);
+	std::cout << "HSZ " << color.getH() << " " << color.getS() <<
+		" " << color.getZ() << std::endl;
+
+	currentColorSpace->verboseContains(color);
+	if (!leftClick) {
+		std::cout << "Right click " << std::endl;
+		bool changed = currentColorSpace->expandToFit(color);
+		if (changed) {
+			colorSpaceWidget.setColorSpace(currentColorSpace);
+		}
+	}
+	lastClickedX = x;
+	lastClickedY = y;
+	updateThresholdedImage();
+	std::cout << std::endl;
+}
 
 void ColorCalibrate::selectColorSpace(int index) {
     currentColorSpace = &colorSpace[index];
@@ -109,7 +165,7 @@ void ColorCalibrate::selectColorSpace(int index) {
 // TODO: Ideally we'd want to have this in a separate class
 // or unify this with our regular thresholding process (maybe
 // by converting the color space parameters to a table continuously?
-void ColorCalibrate::updateThresholdedImage() {
+	void ColorCalibrate::updateThresholdedImage() {
 
     BMPYUVImage* image;
 
@@ -156,6 +212,11 @@ void ColorCalibrate::updateThresholdedImage() {
                     tempColor /= count;
                 }
             }
+			// lame hack to show a "cursor" on the thresholded image
+			// TODO do a true cursor mirroring on the thresholded image
+			if ((abs(j - lastClickedY) < BOX) && (abs(i - lastClickedX) < BOX)) {
+				tempColor = image::Color_RGB[3];
+			}
             if (tempColor) {
                 thresholdedImageLine[i] = (QRgb) tempColor;
             }
@@ -164,6 +225,7 @@ void ColorCalibrate::updateThresholdedImage() {
     //set it
     thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
 }
+
 
 void ColorCalibrate::loadColorSpaces(QString filename) {
 
@@ -233,7 +295,6 @@ void ColorCalibrate::imageTabSwitched(int) {
         currentImage = Camera::BOTTOM;
         this->updateThresholdedImage();
     }
-
 }
 
 void ColorCalibrate::loadSlidersBtnPushed() {

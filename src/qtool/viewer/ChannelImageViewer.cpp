@@ -9,7 +9,7 @@ using namespace man::memory;
 
 ChannelImageViewer::ChannelImageViewer(BMPYUVImage* image,
                                        QWidget *parent)
-    : BMPImageViewer(image, parent), bmpyuvimage(image) {
+    : BMPImageViewerListener(image, parent), bmpyuvimage(image) {
 
     setupUI();
 }
@@ -20,6 +20,7 @@ void ChannelImageViewer::selectionChanged(int i) {
 }
 
 void ChannelImageViewer::setupUI() {
+	this->updateView();
     for (int i = 0; i < image::BMPYUVImage::NUM_CHANNELS; i++) {
         channelSelect.addItem(image::ChannelType_label[i].c_str(), QVariant(i));
     }

@@ -94,6 +94,7 @@ SET( VISION_SRCS Ball
                  VisualFieldEdge
                  VisualLandmark
                  VisualFieldObject
+		 VisualObstacle
                  VisualRobot
                  VisualCross
                  VisualLine

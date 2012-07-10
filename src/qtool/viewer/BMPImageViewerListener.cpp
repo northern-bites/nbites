@@ -26,7 +26,8 @@ void BMPImageViewerListener::mouseReleaseEvent ( QMouseEvent * event )
     int mouseX = event->x();
     int mouseY = event->y();
 
-    emit mouseClicked(mouseX, mouseY, brushSize, left);
+    emit mouseClicked((int)((float)mouseX / scale),
+					  (int)((float)mouseY / scale), brushSize, left);
 }
 
 void BMPImageViewerListener::wheelEvent(QWheelEvent* event) {
@@ -39,7 +40,6 @@ void BMPImageViewerListener::wheelEvent(QWheelEvent* event) {
     if (brushSize == 0) {
         brushSize = 1;
     }
-
     updateBrushCursor();
 }
 

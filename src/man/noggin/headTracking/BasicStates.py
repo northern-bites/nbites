@@ -44,9 +44,20 @@ def repeatHeadMove(tracker):
     '''Executes the currently set headMove, then repeats it.'''
     if tracker.firstFrame():
         tracker.brain.motion.stopHeadMoves()
-        tracker.helper.executeHeadMove(tracker.headMove)
+        tracker.helper.startingPan(tracker.headMove)
 
     if not tracker.brain.motion.isHeadActive():
         tracker.helper.executeHeadMove(tracker.headMove)
+
+    return tracker.stay()
+
+def penalizeHeads(tracker):
+    '''Penalizes the heads.'''
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(HeadMoves.PENALIZED_HEADS)
+
+    if not tracker.brain.motion.isHeadActive():
+        return tracker.goLater('stopped')
 
     return tracker.stay()

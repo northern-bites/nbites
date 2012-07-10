@@ -75,7 +75,7 @@ public:
     void setCommand(const DestinationCommand::ptr command);
 
     std::vector<BodyJointCommand::ptr> getGaitTransitionCommand();
-    MotionModel getOdometryUpdate(){
+    MotionModel getOdometryUpdate() const {
         const std::vector<float> odo = stepGenerator.getOdometryUpdate();
         return MotionModel(odo[0]*MM_TO_CM,odo[1]*MM_TO_CM,odo[2]);
     }

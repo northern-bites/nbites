@@ -16,15 +16,14 @@ def playbookPosition(player):
     """
     brain = player.brain
     nav = brain.nav
-    gcState = brain.gameController.currentState
 
     if player.firstFrame():
         nav.positionPlaybook()
 
-        if gcState == 'gameReady':
-            brain.tracker.repeatWidePanFixedPitch()
-        else:
-            brain.tracker.trackBallFixedPitch()
+    if nav.isAtPosition():
+        brain.tracker.trackBallFixedPitch()
+    else:
+        brain.tracker.repeatWidePanFixedPitch()
 
     #TODO: I think the transition is broken right now!
     #if PosTran.leavingTheField(player):
@@ -75,4 +74,3 @@ def relocalize(player):
         player.setWalk(0, 0, constants.RELOC_SPIN_SPEED)
 
     return player.stay()
-

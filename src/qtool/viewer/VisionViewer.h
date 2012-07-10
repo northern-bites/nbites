@@ -57,7 +57,6 @@ public slots:
     void pixelClicked(int x, int y, int brushSize, bool leftClick);
 
 
-
 private:
     std::vector<QDockWidget*> dockWidget;
     data::RobotMemoryManager::const_ptr memoryManager;
@@ -74,7 +73,6 @@ private:
     man::memory::MVision::ptr offlineMVision;
 
     MObjectViewer* offlineVisionView;
-
 
     boost::shared_ptr<man::memory::proto::PRawImage> topRawImage;
     boost::shared_ptr<man::memory::proto::PRawImage> bottomRawImage;
