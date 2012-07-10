@@ -44,8 +44,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 	QToolBar* toolBar2 = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
-    toolBar->addWidget(loadTableButton);
-    this->addToolBar(toolBar);
+	toolBar->addWidget(loadTableButton);
+	this->addToolBar(toolBar);
 	this->addToolBarBreak();
 	this->addToolBar(toolBar2);
 
@@ -97,15 +97,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
     connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
 
-    CollapsibleImageViewer* bottomCIV = new
-            CollapsibleImageViewer(bottomImageViewer, "Bottom", this);
-    CollapsibleImageViewer* topCIV = new
-            CollapsibleImageViewer(topImageViewer, "Top", this);
-
-    QWidget* combinedRawImageView = new QWidget(this);
-
-    QVBoxLayout* layout = new QVBoxLayout(combinedRawImageView);
-    layout->setAlignment(Qt::AlignTop);
+	memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
 
 	connect(this, SIGNAL(imagesUpdated()),
             bottomVisionView, SLOT(updateView()));

@@ -179,8 +179,11 @@ namespace PF
 
     void blueGoalieReset() { }
     void redGoalieReset() { }
-    void resetLocTo(float x, float y, float h);
-    void resetLocTo(float x, float y, float h, float x_, float y_, float h_);
+    void resetLocTo(float x, float y, float h, LocNormalParams params = LocNormalParams());
+    void resetLocTo(float x, float y, float h, 
+		    float x_, float y_, float h_,
+	            LocNormalParams params1 = LocNormalParams(),
+	            LocNormalParams params2 = LocNormalParams());
 
     PoseEst getCurrentEstimate() const { return PoseEst(xEstimate, yEstimate, hEstimate); }
     PoseEst getCurrentUncertainty() const { return PoseEst(); }
@@ -211,6 +214,8 @@ namespace PF
     void setHUncert(float uncertH) { }
     void activate() { }
     void deactivate() { }
+
+    std::vector<float> findParticleSD() const;
 
     private:
     void resample();
@@ -316,7 +321,6 @@ namespace PF
         float y_prime = sinh * dx + cosh * dy;
 
         float bearing = NBMath::safe_atan2(y_prime, x_prime);
-
 
         return Vector2D(magnitude, bearing);
     }

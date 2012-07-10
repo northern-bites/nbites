@@ -22,15 +22,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # All transitions are defined here. Their conditions are in
         # GoalieTransitions
         VisualGoalieStates.walkToGoal.transitions = {
+            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : VisualGoalieStates.spinAtGoal,
+
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal,
+            : VisualGoalieStates.spinAtGoal
 
-            Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.dodgeBall
+            # Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
+            #                            Transition.MOST_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : VisualGoalieStates.dodgeBall
             }
 
         VisualGoalieStates.dodgeBall.transitions = {

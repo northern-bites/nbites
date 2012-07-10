@@ -36,12 +36,24 @@ class MotionSystem : public PF::MotionModel
     PF::ParticleSet update(PF::ParticleSet particles) const;
     const OdometryModel& getLastOdometry() const { return currentOdometryModel; }
 
+    /**
+     * When a robot falls, it tends to rotate, altering its
+     * heading in a manner not measureable by conventional
+     * odometry. Therefore, we will account for this by adding
+     * additional noise/uncertainty to the heading following
+     * a fall. 
+     *
+     * @param fallen Whether or not the robot is fallen. 
+     */
+    void setFallen(bool fallen);
+
  private:
     DeltaOdometryMeasurement makeNoisyDeltaOdometry() const;
     void clipDeltaOdometry();
 
  private:
     mutable bool moved;
+    mutable bool robotFallen;
     OdometryModel currentOdometryModel;
     OdometryModel lastOdometryModel;
     DeltaOdometryMeasurement deltaOdometry;
