@@ -11,8 +11,7 @@ start() {
   ifconfig wlan0 up
   wpa_supplicant -iwlan0 -Dwext -c/etc/wpa_supplicant/wpa_supplicant.conf -B
   sleep 1
-  ifconfig wlan0 192.168.16.105 netmask 255.255.0.0
-  route add -net default gw "192.168.0.1"
+  dhclient wlan0
 }
 
 stop() {
