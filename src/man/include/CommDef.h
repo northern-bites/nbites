@@ -20,10 +20,10 @@
 #  define COMM_SEND 1
 #endif
 
-#define UDP_PORT  21600
-#define TCP_PORT  21601
-#define TOOL_PORT 21602
-static const short STREAMING_PORT_BASE = 21603;
+#define UDP_PORT  4000
+#define TCP_PORT  4001
+#define TOOL_PORT 4002
+static const short STREAMING_PORT_BASE = 4003;
 
 #define UDP_BUF_SIZE 1024
 
