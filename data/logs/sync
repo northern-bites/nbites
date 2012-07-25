@@ -27,9 +27,9 @@ fi
 echo "Type username for RoboCup server, followed by [ENTER]"
 read username
 
-SERVER=$username@eisbaer.local
-ROBOCUP_DIR=
-FRAMES_DIR=/home/d-mac/logs
+SERVER=$username@robocup.bowdoin.edu
+ROBOCUP_DIR=/mnt/research/robocup
+FRAMES_DIR=logs
 
 SYNC_UP="$RSYNC $RSYNC_OPTS ./$REMOTE_FOLDER/ $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/"
 SYNC_DOWN="$RSYNC $RSYNC_OPTS $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/ ./$REMOTE_FOLDER/"

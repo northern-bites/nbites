@@ -77,6 +77,8 @@ void OfflineImageTranscriber::acquireNewImage() {
         sensors->setVisionBodyAngles(body_angles);
     }
 
+    sensors->setVisionSupportFoot((SupportFoot) (rawImages->get()->support_foot()));
+
 }
 
 }

@@ -230,7 +230,7 @@ class NaoPose {
         return sensors->getVisionAngle(Kinematics::HEAD_YAW);
     }
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
-    std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
+    std::vector<boost::shared_ptr<VisualLine> > getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
     const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
     std::vector<angle::radians> headAnglesToRobotPoint(boost::numeric::ublas::vector <float> point);
 

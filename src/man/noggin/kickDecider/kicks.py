@@ -78,14 +78,14 @@ RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 11, y = -3,
 # used when we haven't decided what kick to do yet
 ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
 
-LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 12, y =  6.5,
+LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 16.5, y =  4,
                             move=SweetMoves.LEFT_LONG_BACK_KICK)
-RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 12, y = -6.5,
+RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 16.5, y = -4,
                             move=SweetMoves.RIGHT_LONG_BACK_KICK)
 
-LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 12, y =  6.5,
+LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.5, y =  4,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
-RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 12, y = -6.5,
+RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.5, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
 def chooseAlignedKickFromKick(player, kick):

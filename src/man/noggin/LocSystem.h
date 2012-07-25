@@ -53,6 +53,8 @@ public:
 			    LocNormalParams params1 = LocNormalParams(),
 			    LocNormalParams params2 = LocNormalParams()) = 0;
 
+    virtual void resetLocToSide(bool blueSide) = 0;
+
     // Getters
     virtual PoseEst getCurrentEstimate() const    = 0;
     virtual PoseEst getCurrentUncertainty() const = 0;

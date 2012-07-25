@@ -5,6 +5,7 @@ from ..util import Transition
 from . import GoalieTransitions
 
 import noggin_constants as NogginConstants
+from GoalieConstants import RIGHT, LEFT
 
 from objects import Location
 
@@ -21,21 +22,23 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         # All transitions are defined here. Their conditions are in
         # GoalieTransitions
-        VisualGoalieStates.walkToGoal.transitions = {
-            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : VisualGoalieStates.spinAtGoal,
+        VisualGoalieStates.spinToFaceGoal.transitions = {
+            Transition.CountTransition(GoalieTransitions.facingGoal,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.walkToGoal
+            }
 
+        VisualGoalieStates.walkToGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal
+            : VisualGoalieStates.spinAtGoal,
 
-            # Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : VisualGoalieStates.dodgeBall
+            Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.dodgeBall
             }
 
         VisualGoalieStates.dodgeBall.transitions = {
@@ -63,10 +66,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         VisualGoalieStates.decideLeftSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onLeftSideline,
+            Transition.CountTransition(GoalieTransitions.onThisSideline,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
-            : VisualGoalieStates.walkToGoal,
+            : VisualGoalieStates.spinToFaceGoal,
 
             Transition.CountTransition(GoalieTransitions.unsure,
                                        Transition.MOST_OF_THE_TIME,
@@ -75,10 +78,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         VisualGoalieStates.decideRightSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onRightSideline,
+            Transition.CountTransition(GoalieTransitions.onThisSideline,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
-            : VisualGoalieStates.walkToGoal,
+            : VisualGoalieStates.spinToFaceGoal,
 
             Transition.CountTransition(GoalieTransitions.unsure,
                                        Transition.MOST_OF_THE_TIME,
@@ -93,7 +96,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.shouldISaveIt,
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
-                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.clearIt,
 
@@ -108,6 +111,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveIt,
+
+            Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.clearIt,
 
             Transition.CountTransition(GoalieTransitions.noSave,
                                        Transition.ALL_OF_THE_TIME,
@@ -197,6 +205,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : GoalieStates.watch
+            }
+
+        GoalieStates.penaltyShotsGamePlaying.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldGetReadyToSave,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.waitForPenaltySave
+            }
+
+        GoalieStates.waitForPenaltySave.transitions = {
+            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.diveForPenaltySave
             }
 
     def run(self):

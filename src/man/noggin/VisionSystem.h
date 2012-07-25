@@ -69,6 +69,7 @@ class VisionSystem : public PF::SensorModel
             const float MIN_DIFF_PROBABILITY = 0.001f;
             if (std::abs(bestProbability - secondBestProbability) < MIN_DIFF_PROBABILITY) {
                 //deal with confusing particles - they shouldn't be probable
+		return;
             }
 
             totalWeight = updateTotalWeight(totalWeight, bestProbability);

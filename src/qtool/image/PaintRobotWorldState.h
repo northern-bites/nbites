@@ -25,8 +25,7 @@ class PaintRobotWorldState : public PaintFieldOverlay {
     Q_OBJECT
 
 public:
-    PaintRobotWorldState(memory::MVision::const_ptr ,
-                         memory::MLocalization::const_ptr, QObject *parent = 0);
+    PaintRobotWorldState(data::DataManager::ptr, QObject *parent = 0);
     ~PaintRobotWorldState(){}
 
 protected:
@@ -41,8 +40,7 @@ protected:
     virtual void buildBitmap();
 
 protected:
-    memory::MLocalization::const_ptr mLoc;
-    memory::MVision::const_ptr mVision;
+    data::DataManager::ptr dataManager;
 
 };
 
