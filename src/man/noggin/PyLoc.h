@@ -55,6 +55,11 @@ public:
 			params2);
     }
 
+    void resetLocToSide(bool blueSide)
+    {
+	loc->resetLocToSide(blueSide);
+    }
+
     void setOnOpposingSide(bool opp)
     {
         loc->setOnOpposingSide(opp);

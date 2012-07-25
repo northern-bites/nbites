@@ -65,7 +65,7 @@ goToPosition.precision = "how precise we want to be in moving"
 
 def avoidLeft(nav):
     if nav.firstFrame():
-        avoidDest = RelRobotLocation(0, 20, 0)
+        avoidDest = RelRobotLocation(0, 25, 0)
         helper.setOdometryDestination(nav, avoidDest)
         return nav.stay()
 
@@ -73,7 +73,7 @@ def avoidLeft(nav):
 
 def avoidRight(nav):
     if nav.firstFrame():
-        avoidDest = RelRobotLocation(0, -20, 0)
+        avoidDest = RelRobotLocation(0, -25, 0)
         helper.setOdometryDestination(nav, avoidDest)
         return nav.stay()
 

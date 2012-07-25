@@ -158,6 +158,7 @@ def positionForKick(player):
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
                               Navigator.GRADUAL_SPEED,
+                              False,
                               Navigator.ADAPTIVE)
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)

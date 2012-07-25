@@ -39,17 +39,19 @@ def standup(player):
         player.gainsOn()
         player.brain.nav.stand()
 
-    if player.counter == 1:
+    if player.counter == 100:
         return player.goLater('kickStraight')
     return player.stay()
 
 def kickStraight(player):
     if player.firstFrame():
         print player.brain.ball.loc.relX, player.brain.ball.loc.relY
-        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
-    if player.brain.nav.isStopped() and player.counter > 1:
+        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+    if player.brain.nav.isStopped() and player.counter > 100:
         return player.goLater('done')
     return player.stay()
 
 def done(player):
+    if player.firstFrame():
+        player.executeMove(SweetMoves.STAND_UP_FRONT)
     return player.stay()

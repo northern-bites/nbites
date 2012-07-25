@@ -20,6 +20,8 @@
 #include <boost/math/constants/constants.hpp>
 
 #include "LocSystem.h"
+#include "NBMath.h"
+#include "Common.h"
 
 #include "memory/MObjects.h"
 #include "memory/MemoryProvider.h"
@@ -74,11 +76,11 @@ namespace PF
 
     struct ParticleFilterParams
     {
-        int fieldHeight;    // Field height.
-        int fieldWidth;     // Field width.
-        int numParticles;   // Size of particle population.
-        float alpha_fast;   // Weight factor for fast exponential weight filter.
-        float alpha_slow;   // Weight factor for slow exponential weight filter.
+        float fieldHeight;        // Field height.
+        float fieldWidth;         // Field width.
+        float numParticles;       // Size of particle population.
+        float alpha_fast;         // Weight factor for fast exponential weight filter.
+        float alpha_slow;         // Weight factor for slow exponential weight filter.
     };
 
     static const ParticleFilterParams DEFAULT_PARAMS =
@@ -131,6 +133,7 @@ namespace PF
     private:
         float weight;
         Location location;
+
     };
 
     typedef std::vector<LocalizationParticle> ParticleSet;
@@ -185,20 +188,21 @@ namespace PF
 	            LocNormalParams params1 = LocNormalParams(),
 	            LocNormalParams params2 = LocNormalParams());
 
+    void resetLocToSide(bool blueSide);
+
     PoseEst getCurrentEstimate() const { return PoseEst(xEstimate, yEstimate, hEstimate); }
     PoseEst getCurrentUncertainty() const { return PoseEst(); }
     float getXEst() const { return xEstimate; }
     float getYEst() const { return yEstimate; }
     float getHEst() const { return hEstimate; }
     float getHEstDeg() const { return hEstimate*TO_DEG; }
-    float getXUncert() const { return 0.0f; }
-    float getYUncert() const { return 0.0f; }
-    float getHUncert() const { return 0.0f; }
-    float getHUncertDeg() const { return 0.0f; }
+    float getXUncert() const { return standardDeviations[0]; }
+    float getYUncert() const { return standardDeviations[1]; }
+    float getHUncert() const { return standardDeviations[2]; }
+    float getHUncertDeg() const { return standardDeviations[2]*TO_DEG; }
     ::MotionModel getLastOdo() const;
 
     std::vector<PointObservation> getLastPointObservations() const { return std::vector<PointObservation>(); }
-
 
     std::vector<CornerObservation> getLastCornerObservations() const { return std::vector<CornerObservation>(); }
 
@@ -226,9 +230,13 @@ namespace PF
     float yEstimate;
     float hEstimate;
 
+    std::vector<float> standardDeviations;
+
     float averageWeight;
     float wFast;
     float wSlow;
+
+    long long int lastUpdateTime;
 
     MemoryProvider memoryProvider;
 
@@ -248,8 +256,9 @@ namespace PF
         MotionModel() { }
         virtual ~MotionModel() { }
 
-        virtual ParticleSet update(ParticleSet particles) const = 0;
+        virtual ParticleSet update(ParticleSet particles) = 0;
         virtual const ::MotionModel& getLastOdometry() const = 0;
+	virtual const std::vector<float> getVelocity() const { return std::vector<float>(3, 0.0f); }
     };
 
     /**

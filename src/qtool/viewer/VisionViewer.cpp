@@ -99,6 +99,8 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
     connect(this, SIGNAL(imagesUpdated()), bottomImageViewer, SLOT(updateView()));
     connect(this, SIGNAL(imagesUpdated()), topImageViewer, SLOT(updateView()));
 
+//	memoryManager->connectSlot(bottomImageViewer, SLOT(updateView()), "MRawImages");
+//	memoryManager->connectSlot(topImageViewer, SLOT(updateView()), "MRawImages");
 	memoryManager->connectSlot(this, SLOT(update()), "MRawImages");
 
 	connect(this, SIGNAL(imagesUpdated()),

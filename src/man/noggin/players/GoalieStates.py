@@ -33,8 +33,8 @@ def gameReady(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.lookToAngle(0)
-        if player.lastDiffState == 'gameInitial':
-            player.initialDelayCounter = 0
+        if player.lastDiffState != 'gameInitial':
+            player.brain.nav.walkTo(RelRobotLocation(120, 0, 0))
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated()):
@@ -150,6 +150,7 @@ def kickBall(player):
 
 def saveIt(player):
     if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
         player.executeMove(SweetMoves.GOALIE_SQUAT)
         player.isSaving = False
         player.brain.fallController.enableFallProtection(False)
@@ -170,7 +171,7 @@ def upUpUP(player):
         player.brain.fallController.enableFallProtection(True)
         player.upDelay = 0
 
-    if player.motion.isBodyActive():
+    if player.brain.nav.isStanding():
         return player.stay()
     elif player.upDelay < 10:
         player.upDelay += 1
@@ -202,5 +203,20 @@ def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.gainsOn()
         player.stand()
+        player.brain.tracker.trackBallFixedPitch()
+        player.brain.nav.walkTo(RelRobotLocation(0.0, 30.0, 0.0))
 
-    return player.goLater('watch')
+    return Transition.getNextState(player, penaltyShotsGamePlaying)
+
+def waitForPenaltySave(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBallFixedPitch()
+        player.brain.nav.stop()
+    return Transition.getNextState(player, waitForPenaltySave)
+
+def diveForPenaltySave(player):
+    if player.firstFrame():
+        player.brain.fallController.enableFallProtection(False)
+        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+
+    return player.stay()

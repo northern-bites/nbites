@@ -11,7 +11,6 @@
 // ARE DEFINED EVERYWHERE. BEWARE!
 #ifndef NO_MANCONFIG
 #include "manconfig.h"
-#include "nameconfig.h"
 #include "visionconfig.h"
 #endif //NO_MANCONFIG
 #include <time.h>

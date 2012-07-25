@@ -13,9 +13,7 @@ RobotField::RobotField(DataManager::ptr dataManager, QWidget* parent)
 
     PaintField* fieldImage = new PaintField(this);
     PaintRobotWorldState* worldStateOverlay = new PaintRobotWorldState(
-            dataManager->getMemory()->get<MVision>(),
-            dataManager->getMemory()->get<MLocalization>(),
-            this);
+            dataManager, this);
 
     OverlayedImage* combinedImage = new OverlayedImage(fieldImage, worldStateOverlay, this);
 
