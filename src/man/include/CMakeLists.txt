@@ -1,7 +1,7 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( NBINCLUDE )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
