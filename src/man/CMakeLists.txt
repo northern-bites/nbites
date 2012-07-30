@@ -20,7 +20,7 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( MAN )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 ENABLE_TESTING()
 

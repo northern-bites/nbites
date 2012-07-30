@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 1 ]; then
-	echo "usage: ./linux_setup.sh [ naoqi-version ]"
+	echo "usage: ./linux_setup.sh [naoqi-version]"
 	exit 1
 fi
 
@@ -9,41 +9,57 @@ PACKAGES="build-essential cmake git-core \
 python2.7-dev emacs cmake-curses-gui ccache curl aptitude \
 ant qt4-dev-tools"
 
-echo "Are you on 64-bit linux?(y/n)"
+echo "Are you on 64-bit linux? (y/n)"
 read IS64BIT
-echo "What version of Ubuntu are you on? (example: 11.04)"
-read VERSION
 
 if [ $IS64BIT == 'y' ]; then
-  PACKAGES="$PACKAGES g++-4.4-multilib"
+    echo "64 bit Linux is NOT SUPPORTED!"
+    echo "The Northern Bites code base depends on too many 32-bit libraries."
+    echo "Please switch to 32-bit, or set up your system manually."
+    echo "Exiting."
+    exit 1
 fi
 
-if [ $VERSION == '10.10' ]; then
-    echo "Downloading Java. Accept the license by pressing TAB!"
-    sudo add-apt-repository ppa:sun-java-community-team/sun-java6
-    sudo apt-get update
-    sudo apt-get install sun-java6-jdk
-    sudo update-java-alternatives -s java-6-sun
-elif [ $VERSION == '11.04' ]; then
-    echo "Downloading Java. Accept the license by pressing TAB!"
-    sudo add-apt-repository ppa:ferramroberto/java
-    sudo apt-get update
-    sudo apt-get install sun-java6-jdk
-elif [ $VERSION == '11.10' ]; then
-    echo "Downloading Java. Accept the license by pressing TAB!"
-    sudo add-apt-repository ppa:ferramroberto/java
-    sudo apt-get update
-    sudo apt-get install sun-java6-jdk
-else
-    echo "That version is not supported. Please use 10.10 or 11.04. However, \
-if you are very sure of what you're doing, you can \
-finish running the script and install Sun Java manually when it is done."
-    echo ""
-    echo "Continue? (y/n)"
-    read CONTINUE
-    if [ $CONTINUE == 'n' ]; then
+echo "What version of Ubuntu are you on? (example: 12.04)"
+read VERSION
+
+if [[ $VERSION != '10.10' && $VERSION != '11.04' && $VERSION != '11.10' && $VERSION != '12.04' ]]; then
+
+    echo "That version is not supported."
+    echo "If you are very sure of what you are doing, you may continue."
+    echo "Otherwise, please switch to Ubuntu 10.10 through 12.04."
+    echo "Abort? (y/n)"
+    read ABORT
+    if [ $ABORT == 'y' ]; then
 	echo "Exiting."
 	exit 1
+    fi
+fi
+
+echo "Do you want to run the deprecated Java tool on this computer? (y/n)"
+read WANTJAVA
+
+if [ $WANTJAVA == 'y' ]; then
+
+    if [ $VERSION == '10.10' ]; then
+	echo "Downloading Java. Accept the license by pressing TAB!"
+	sudo add-apt-repository ppa:sun-java-community-team/sun-java6
+	sudo apt-get update
+	sudo apt-get install sun-java6-jdk
+	sudo update-java-alternatives -s java-6-sun
+    elif [ $VERSION == '11.04' ]; then
+	echo "Downloading Java. Accept the license by pressing TAB!"
+	sudo add-apt-repository ppa:ferramroberto/java
+	sudo apt-get update
+	sudo apt-get install sun-java6-jdk
+    elif [ $VERSION == '11.10' ]; then
+	echo "Downloading Java. Accept the license by pressing TAB!"
+	sudo add-apt-repository ppa:ferramroberto/java
+	sudo apt-get update
+	sudo apt-get install sun-java6-jdk
+    else
+	echo "You will need to install Sun Java manually."
+	echo ""
     fi
 fi
 
@@ -69,11 +85,8 @@ naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
 geode_local=$lib_dir/geodetoolchain
 
-if [ $IS64BIT == 'y' ]; then
-    ext=ext-nbites-linux64.tar.gz
-else
-    ext=ext-nbites-linux32.tar.gz
-fi
+ext=ext-nbites-linux32.tar.gz
+
 ext_robocup=$robocup/software/$ext
 
 echo ""
@@ -103,22 +116,6 @@ mkdir $geode_local
 tar -xzf $geode -C $geode_local --strip-components 1
 popd
 
-if [ $IS64BIT == 'y' ]; then
-
-ctc=linux-x64-crosstoolchain.tar.gz
-ctc_robocup=$robocup/software/nao/cross_compiler_stuff/$ctc
-
-echo "Downloading the CTC"
-rsync -v $USER_NAME@$ctc_robocup $naoqi_local/
-
-echo "Unpacking the CTC"
-
-pushd $naoqi_local
-tar -xzf $ctc
-rm $ctc
-popd
-fi
-
 echo "Downloading external components"
 
 rsync -v $USER_NAME@$ext_robocup $nbites_dir/
@@ -129,7 +126,7 @@ tar -xzf $ext
 rm $ext
 popd
 
-echo "Setting up git stuff .."
+echo "Setting up git stuff ..."
 ./git_setup.sh
 
 echo "Setting up bash stuff ..."
