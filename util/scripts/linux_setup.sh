@@ -145,6 +145,7 @@ echo "Would you like this to be done automatically? (y/n)"
 read AUTO
 
 if [ $AUTO == 'y' ]; then
+    echo "" >> ~/.bashrc
     echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
     echo "source $nbites_bash" >> ~/.bashrc
     echo "You're good to go!"
