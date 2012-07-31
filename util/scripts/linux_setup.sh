@@ -13,21 +13,28 @@ echo "Are you on 64-bit linux? (y/n)"
 read IS64BIT
 
 if [ $IS64BIT == 'y' ]; then
+    echo ""
     echo "64 bit Linux is NOT SUPPORTED!"
     echo "The Northern Bites code base depends on too many 32-bit libraries."
-    echo "Please switch to 32-bit, or set up your system manually."
+    echo "Please switch to 32-bit or set up your system manually."
     echo "Exiting."
     exit 1
 fi
 
+echo ""
 echo "What version of Ubuntu are you on? (example: 12.04)"
 read VERSION
 
-if [[ $VERSION != '10.10' && $VERSION != '11.04' && $VERSION != '11.10' && $VERSION != '12.04' ]]; then
+if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
 
-    echo "That version is not supported."
-    echo "If you are very sure of what you are doing, you may continue."
-    echo "Otherwise, please switch to Ubuntu 10.10 through 12.04."
+    echo ""
+    echo "That version is NOT SUPPORTED."
+    echo "Some packages will not be the right version or may not exist."
+    echo "--------------------------------------------------------------"
+    echo "If you are very sure of what you are doing, you may continue and"
+    echo "configure broken packages manually."
+    echo "Otherwise, please switch to Ubuntu 11.10 or 12.04."
+    echo ""
     echo "Abort? (y/n)"
     read ABORT
     if [ $ABORT == 'y' ]; then
@@ -41,18 +48,7 @@ read WANTJAVA
 
 if [ $WANTJAVA == 'y' ]; then
 
-    if [ $VERSION == '10.10' ]; then
-	echo "Downloading Java. Accept the license by pressing TAB!"
-	sudo add-apt-repository ppa:sun-java-community-team/sun-java6
-	sudo apt-get update
-	sudo apt-get install sun-java6-jdk
-	sudo update-java-alternatives -s java-6-sun
-    elif [ $VERSION == '11.04' ]; then
-	echo "Downloading Java. Accept the license by pressing TAB!"
-	sudo add-apt-repository ppa:ferramroberto/java
-	sudo apt-get update
-	sudo apt-get install sun-java6-jdk
-    elif [ $VERSION == '11.10' ]; then
+    if [ $VERSION == '11.10' ]; then
 	echo "Downloading Java. Accept the license by pressing TAB!"
 	sudo add-apt-repository ppa:ferramroberto/java
 	sudo apt-get update
@@ -63,10 +59,10 @@ if [ $WANTJAVA == 'y' ]; then
     fi
 fi
 
-echo "Downloading awesome free stuff!"
+echo ""
+echo "Downloading and installing software!"
+echo "..."
 sudo apt-get install $PACKAGES
-
-echo "Downloading and unpacking NBites files"
 
 naoqi_version=$1
 robocup=robocup.bowdoin.edu:/mnt/research/robocup
@@ -92,6 +88,9 @@ ext_robocup=$robocup/software/$ext
 echo ""
 echo "What's your Bowdoin username?"
 read USER_NAME
+
+echo ""
+echo "Downloading and unpacking NBites files."
 
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
@@ -120,16 +119,18 @@ echo "Downloading external components"
 
 rsync -v $USER_NAME@$ext_robocup $nbites_dir/
 
-echo "Unpacking ext"
+echo "Unpacking external components"
 pushd $nbites_dir
 tar -xzf $ext
 rm $ext
 popd
 
-echo "Setting up git stuff ..."
+echo ""
+echo "Configuring git."
 ./git_setup.sh
 
-echo "Setting up bash stuff ..."
+echo ""
+echo "Configuring bash."
 
 nbites_bash=$nbites_dir/util/scripts/nbites.bash
 
@@ -137,6 +138,8 @@ echo "export NBITES_DIR=$nbites_dir" >> $nbites_bash
 echo "export AL_DIR=$naoqi_local" >> $nbites_bash
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> $nbites_bash
 echo "export PATH=$nbites_dir/ext/bin:$PATH" >> $nbites_bash
+
+echo ""
 echo "Done! The last step is just to add the following line:"
 echo "source $nbites_bash"
 echo "to your .bashrc (which is in your home directory)"
@@ -148,8 +151,10 @@ if [ $AUTO == 'y' ]; then
     echo "" >> ~/.bashrc
     echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
     echo "source $nbites_bash" >> ~/.bashrc
+    echo ""
     echo "You're good to go!"
 else
+    echo ""
     echo "Add the line manually, and you'll be all set up!"
 fi
 
