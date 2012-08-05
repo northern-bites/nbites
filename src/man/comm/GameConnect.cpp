@@ -5,7 +5,11 @@
  * @author Wils Dawson 5/29/2012
  */
 
+#include "GameConnect.h"
+
 #include <string>
+#include <iostream>
+#include <sys/socket.h>
 
 #include "RoboCupGameControlData.h"
 
@@ -14,10 +18,10 @@
 static const int NUM_PLAYERS_PER_TEAM = 4;
 #define DEBUG_COMM
 
-GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m) :
-    _timer(t), _monitor(m)
+GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m)
+    : _timer(t), _monitor(m)
 {
-    _data = new GameData()
+    _data = new GameData(_myTeamNumber); //TODO need this to be valid at construction
 }
 
 GameConnect::~GameConnect()
@@ -25,28 +29,29 @@ GameConnect::~GameConnect()
     delete _data;
 }
 
-GameConnect::setUpSocket()
+void GameConnect::setUpSocket()
 {
-    socket->setBlocking(false);
-    socket->setBroadcast(true);
+    _socket->setBlocking(false);
+    _socket->setBroadcast(true);
 
-    socket->bind("", GAMECONTROLLER_PORT); // Listen on the GC port.
+    _socket->bind("", GAMECONTROLLER_PORT); // Listen on the GC port.
 
-    socket->setTarget(ipTarget.c_str(), GAMECONTROLLER_PORT);
+    _socket->setTarget("255.255.255.255", GAMECONTROLLER_PORT);
 }
 
-GameConnect::handle(int player = 0)
+void GameConnect::handle(int player = 0)
 {
     //TODO: find out if this is the correct size.
     char packet[sizeof(struct RoboCupGameControlData)];
     int result;
     struct sockaddr from;
+    int addrlen = sizeof(from);
     do
     {
         memset(&packet[0], 0, sizeof(struct RoboCupGameControlData));
 
-        result = socket->receiveFrom(&packet[0], sizeof(packet),
-                                     &from, sizeof(from));
+        result = _socket->receiveFrom(&packet[0], sizeof(packet),
+                                      &from, &addrlen);
 
         if (result <= 0)
             break;
@@ -55,13 +60,13 @@ GameConnect::handle(int player = 0)
             continue;  // Bad Packet.
 
         //TODO: make sure casting like this works.
-        getGameData->setControl((struct RoboCupGameControlData)packet);
+        getGameData()->setControl(*(struct RoboCupGameControlData*)packet);
 
         //std::cout << "Received a packet!" << std::endl;
 
         //TODO: check this...
-        socket->setTarget(from);
-        socket->setBroadcast(false);
+        _socket->setTarget(from);
+        _socket->setBroadcast(false);
 
         if (player)
             respond(player);
@@ -72,20 +77,21 @@ GameConnect::handle(int player = 0)
     } while (result > 0);
 }
 
-GameConnect::verify(char* packet)
+bool GameConnect::verify(char* packet)
 {
-    struct RoboCupGameControlData data = (struct RoboCupGameControlData)packet;
+    struct RoboCupGameControlData* data = (struct RoboCupGameControlData*)packet;
+    int gc_version = GAMECONTROLLER_STRUCT_VERSION;
 
-    if (memcmp(data.header, GAMECONTROLLER_STRUCT_HEADER,
-               sizeof(data.header)))
+    if (memcmp(data->header, GAMECONTROLLER_STRUCT_HEADER,
+               sizeof(data->header)))
     {
 #ifdef DEBUG_COMM
         std::cout << "GameConnect::verify() found a bad header" << std::endl;
 #endif
         return false;
     }
-    if (memcmp(data.version, GAMECONTROLLER_STRUCT_VERSION,
-               sizeof(data.version)))
+    if (memcmp(&data->version, &gc_version,
+               sizeof(data->version)))
     {
 #ifdef DEBUG_COMM
         std::cout << "GameConnect::verify() found a bad version" << std::endl;
@@ -95,15 +101,16 @@ GameConnect::verify(char* packet)
     return true;
 }
 
-GameConnect::respond(int player, unsigned int msg = GAMECONTROLLER_RETURN_MSG_ALIVE)
+void GameConnect::respond(int player, unsigned int msg)
 {
     struct RoboCupGameControlReturnData response;
-    response.header = GAMECONTROLLER_RETURN_STRUCT_HEADER;
+    memcpy(&response.header, GAMECONTROLLER_RETURN_STRUCT_HEADER,
+           sizeof(response.header));
     response.version = GAMECONTROLLER_RETURN_STRUCT_VERSION;
     response.team = (uint16)_myTeamNumber;
     response.player = (uint16)player;
     response.message = msg;
 
     //TODO: see if this cast works.
-    socket->sendToTarget((char*)&response, sizeof(response));
+    _socket->sendToTarget((char*)&response, sizeof(response));
 }

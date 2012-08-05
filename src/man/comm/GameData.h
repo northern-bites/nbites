@@ -54,7 +54,7 @@ public:
 
     int  theirScore();
 
-    void goalDifferential() {return ourScore() - theirScore();}
+    int goalDifferential() {return ourScore() - theirScore();}
 
     /**
      * @return: number of penalized robots for the given team.
@@ -86,14 +86,14 @@ public:
 
     int checkPenaltyForPlayer(int team, int player);
 
-    void setMyTeamNumber(int tn){_myTeamNumber = tn}
+    void setMyTeamNumber(int tn){_myTeamNumber = tn;}
     int  myTeamNumber() {return _myTeamNumber;}
 
     int  myTeamColor();
 
     void switchTeams();
 
-    char* toString();
+    const char* toString();
 
 private:
     int  myTeamIndex();

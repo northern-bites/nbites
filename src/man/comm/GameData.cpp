@@ -8,20 +8,20 @@
 
 #include "GameData.h"
 
-//TODO: Remove these?
-#include <string>
-#include <sstream>
+#include <string.h>
+#include <sstream>   //TODO: Remove this?
+#include <iostream>  //TODO: Remove this?
 
 GameData::GameData(int teamNumber = 101)
 {
     _myTeamNumber = teamNumber;
-    control = setUpControl();
+    setUpControl();
 }
 
 void GameData::setUpControl()
 {
     struct RoboCupGameControlData data;
-    data.header = GAMECONTROLLER_STRUCT_HEADER;
+    memcpy(&data.header, GAMECONTROLLER_STRUCT_HEADER, sizeof(data.header));
     data.version = GAMECONTROLLER_STRUCT_VERSION;
     data.playersPerTeam = MAX_NUM_PLAYERS;
     data.state = STATE_INITIAL;
@@ -45,7 +45,7 @@ void GameData::setUpControl()
     setControl(data);
 }
 
-void setControl(RoboCupGameControlData data)
+void GameData::setControl(RoboCupGameControlData data)
 {
     control = data;
 }
@@ -53,7 +53,7 @@ void setControl(RoboCupGameControlData data)
 bool GameData::ourKickoff()
 {
     //TODO: Make sure this is the correct comparison.
-    return (control.teams[myTeamIndex()].teamColour == control.kickOffTeam)
+    return (control.teams[myTeamIndex()].teamColour == control.kickOffTeam);
 }
 
 int GameData::ourScore()
@@ -79,7 +79,7 @@ int GameData::numTheirPenalizedRobots()
 int GameData::numPenalizedRobots(int team)
 {
     int count = 0;
-    for (int i = 0; i < MAX_NUM_PLAYERS; ++i)
+    for (int player = 0; player < MAX_NUM_PLAYERS; ++player)
     {
         if(checkPenaltyForPlayer(team, player) != PENALTY_NONE)
             ++count;
@@ -122,7 +122,7 @@ int GameData::timeUntilNextUnpened(int team)
         {
             penalizedRobot = true;
             if (timeUntilPlayerUnpened(team, i) < minTime)
-                minTime = timeUntilNextUnpened(team, i);
+                minTime = timeUntilPlayerUnpened(team, i);
         }
     }
     if (!penalizedRobot)
@@ -146,8 +146,8 @@ int GameData::timeUntilFullStrength(int team)
     for (int i = 0; i < MAX_NUM_PLAYERS; ++i)
     {
         if (checkPenaltyForPlayer(team, i) != PENALTY_NONE &&
-            timeUntilNextUnpened(team, i) > maxTime)
-            maxTime = timeUntilNextUnpened(team, i)
+            timeUntilPlayerUnpened(team, i) > maxTime)
+            maxTime = timeUntilPlayerUnpened(team, i);
     }
     return maxTime;
 }
@@ -159,7 +159,7 @@ int GameData::myTeamColor()
 
 int GameData::myTeamIndex()
 {
-    for (int i = 0; i < control.teams.length; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         if (control.teams[i].teamNumber == _myTeamNumber)
             return i;
@@ -170,7 +170,7 @@ int GameData::myTeamIndex()
 
 int GameData::theirTeamIndex()
 {
-    for (int i = 0; i < control.teams.length; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         if (control.teams[i].teamNumber != _myTeamNumber)
             return i;
@@ -181,7 +181,7 @@ int GameData::theirTeamIndex()
 
 int GameData::checkPenaltyForPlayer(int team, int player)
 {
-    return (int)control.teams[team].players.[player].penalty
+    return (int)control.teams[team].players[player].penalty;
 }
 
 void GameData::switchTeams()
@@ -198,7 +198,7 @@ void GameData::switchTeams()
                                    TEAM_RED : TEAM_BLUE);
 }
 
-char* GameData::toString()
+const char* GameData::toString()
 {
     std::string d;
 

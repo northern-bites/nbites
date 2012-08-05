@@ -112,7 +112,7 @@ public:
                     struct sockaddr* from = NULL, int* addrlen = NULL);
 
     /**
-     * Recieve some datagram in the socket's buffer. Does not
+     * Receive some datagram in the socket's buffer. Does not
      * gather information about the sender. Uses receiveFrom.
      * @param data: Buffer to which the data will be moved.
      * @param len:  Number of bytes to read from the socket.

@@ -10,8 +10,9 @@
 
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
-#include "GameData.h"
 #include "UDPSocket.h"
+#include "GameData.h"
+#include "RoboCupGameControlData.h"
 
 class GameConnect
 {
@@ -37,7 +38,7 @@ public:
     /**
      * @return: The pointer to the GameData.
      */
-    GameData* getGameData() {return data;}
+    GameData* getGameData() {return _data;}
 
     /**
      * Checks if the specified player is penalized.
@@ -87,7 +88,7 @@ private:
      * @param msg:    The message to respond with.
      *                Defined in RoboCupGameControlData.h
      */
-    void respond(int player, unsigned int msg);
+    void respond(int player, unsigned int msg = GAMECONTROLLER_RETURN_MSG_ALIVE);
 
     /**
      * Verifies the packet we received from the socket.
