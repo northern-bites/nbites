@@ -14,6 +14,6 @@ More information
 --------------------------------------
 For information on setting up your computer to use our code or a more detailed explanation of our codebase, please visit the [Northern Bites Wiki](https://github.com/northern-bites/nbites/wiki).
 
-For more information on the team, visit [our blog](robocup.bowdoin.edu).
+For more information on the team, visit [our blog](http://robocup.bowdoin.edu).
 
-We also have a [github page](northern-bites.github.com/nbites).
+We also have a [github page](http://northern-bites.github.com/nbites).
