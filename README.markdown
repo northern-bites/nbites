@@ -12,5 +12,5 @@ Codebase Layout
 
 More information
 --------------------------------------
-For information on setting up your computer to use our code, Please visit the [Northern Bites Wiki](https://github.com/northern-bites/nbites/wiki).
+For information on setting up your computer to use our code or a more detailed explanation of our codebase, Please visit the [Northern Bites Wiki](https://github.com/northern-bites/nbites/wiki).
 
