@@ -5,8 +5,7 @@
  * @author Wils Dawson 5/29/2012
  */
 
-#ifndef GameConnect_H
-#define GameConnect_H
+#pragma once
 
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
@@ -73,7 +72,7 @@ public:
      */
     void manualPenalize();
 
-    void setMyTeamNumber(int tn) {_myTeamNumber = tn;}
+    void setMyTeamNumber(int tn);
     int  myTeamNumber() {return _myTeamNumber;}
 
 private:
@@ -104,4 +103,3 @@ private:
 
     bool            _haveRemoteGC;
 };
-#endif

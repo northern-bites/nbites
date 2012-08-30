@@ -21,7 +21,7 @@ static const int NUM_PLAYERS_PER_TEAM = 4;
 GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m)
     : _timer(t), _monitor(m)
 {
-    _data = new GameData(_myTeamNumber); //TODO need this to be valid at construction
+
 }
 
 GameConnect::~GameConnect()
@@ -113,4 +113,11 @@ void GameConnect::respond(int player, unsigned int msg)
 
     //TODO: see if this cast works.
     _socket->sendToTarget((char*)&response, sizeof(response));
+}
+
+void GameConnect::setMyTeamNumber(int tn)
+{
+    _myTeamNumber = tn;
+    delete _data;
+    _data = new GameData(_myTeamNumber);
 }

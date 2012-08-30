@@ -50,6 +50,7 @@ Comm::Comm()
     monitor = new NetworkMonitor(timer->timestamp());
 
     teamConnect = new TeamConnect(timer, monitor);
+    gameConnect = new GameConnect(timer, monitor);
 
     pthread_mutex_init(&comm_mutex, NULL);
 
@@ -60,8 +61,9 @@ Comm::~Comm()
 {
     std::cout << "Comm destructor" << std::endl;
     delete monitor;
-    delete teamConnect;
     delete timer;
+    delete teamConnect;
+    delete gameConnect;
     pthread_mutex_destroy(&comm_mutex);
 }
 
@@ -124,6 +126,8 @@ void Comm::receive()
 
     teamConnect->receive(0);
 
+    gameConnect->handle(myPlayerNumber());
+
     pthread_mutex_unlock (&comm_mutex);
 }
 
@@ -176,6 +180,7 @@ int Comm::checkPlayerNumber(int p)
 void Comm::setTeamNumber(int tn)
 {
     teamConnect->setTeamNumber(tn);
+    gameConnect->setMyTeamNumber(tn);
 }
 
 int Comm::teamNumber()

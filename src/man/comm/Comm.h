@@ -21,15 +21,14 @@
  * Top-Level class for the Northern-bites Comm Module.
  * @author Wils Dawson and Josh Zalinger 5/14/12
  */
-
-#ifndef Comm_H
-#define Comm_H
+#pragma once
 
 #include <pthread.h>
 //TODO: Actually use this...
 //#include <boost/shared_ptr.hpp>
 
 #include "TeamConnect.h"
+#include "GameConnect.h"
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
 
@@ -136,10 +135,9 @@ private:
     NetworkMonitor*  monitor;
     CommTimer*       timer;
     TeamConnect*     teamConnect; // For communicating with TeamMates.
+    GameConnect*     gameConnect; // For communicating with GameController.
 
     int burstRate;
 
     int _myPlayerNumber;
 };
-
-#endif // Comm_H
