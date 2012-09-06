@@ -86,31 +86,31 @@ public:
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
-    static const int TOP_BRIGHTNESS = 180;
-    static const int TOP_CONTRAST = 60;
-    static const int TOP_SATURATION = 130;
+    static const int TOP_BRIGHTNESS = 36;
+    static const int TOP_CONTRAST = 58;
+    static const int TOP_SATURATION = 106;
     static const int TOP_HUE = 0;
     static const int TOP_SHARPNESS = 3;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    static const int TOP_EXPOSURE = 60;
-    static const int TOP_GAIN = 120;
-    static const int TOP_WHITE_BALANCE = -82;
+    static const int TOP_EXPOSURE = 30;
+    static const int TOP_GAIN = 58;
+    static const int TOP_WHITE_BALANCE = -110;
 
     // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 140;
-    static const int BOTTOM_CONTRAST = 60;
-    static const int BOTTOM_SATURATION = 140;
+    static const int BOTTOM_BRIGHTNESS = 80;
+    static const int BOTTOM_CONTRAST = 64;
+    static const int BOTTOM_SATURATION = 90;
     static const int BOTTOM_HUE = 0;
     static const int BOTTOM_SHARPNESS = 3;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 63;
-    static const int BOTTOM_GAIN = 118;
-    static const int BOTTOM_WHITE_BALANCE = -82;
+    static const int BOTTOM_EXPOSURE = 35;
+    static const int BOTTOM_GAIN = 62;
+    static const int BOTTOM_WHITE_BALANCE = -100;
 
     static const Type getOtherCameraType(Type type) {
         if (type == TOP) {

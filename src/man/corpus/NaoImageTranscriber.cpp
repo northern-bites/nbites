@@ -92,10 +92,13 @@ void NaoImageTranscriber::updateMRawImages(memory::MRawImages::ptr rawImages) co
 
     //TODO: this is a hack so we get the vision body angles for pose in image processing
     rawImages->get()->clear_vision_body_angles();
+
     std::vector<float> bodyAngles = this->sensors->getVisionBodyAngles();
     for (std::vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
         rawImages->get()->add_vision_body_angles(*i);
     }
+
+    rawImages->get()->set_support_foot(sensors->getVisionSupportFoot());
 }
 
 }

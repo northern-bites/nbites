@@ -1,5 +1,7 @@
 #include "ParticleFilter.h"
 
+#include <fstream>
+
 namespace PF
 {
     /**
@@ -24,8 +26,8 @@ namespace PF
                                    MLocalization::ptr mLocalization,
                                    ParticleFilterParams params)
         : parameters(params), xEstimate(0.0f), yEstimate(0.0f),
-          hEstimate(0.0f), averageWeight(0.0f), wFast(0.0f),
-          wSlow(0.0f),
+          hEstimate(0.0f), standardDeviations(3, 0.0f), 
+	  averageWeight(0.0f), wFast(0.0f), wSlow(0.0f),
           memoryProvider(&ParticleFilter::updateMemory, this, mLocalization)
     {
         motionModel = motion;
@@ -48,7 +50,7 @@ namespace PF
         boost::variate_generator<boost::mt19937&,
                       boost::uniform_real<float> > angleGen(rng, angleBounds);
 
-    // Assign uniform weight.
+	// Assign uniform weight.
         float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
 
         #ifdef DEBUG_LOCALIZATION
@@ -100,8 +102,6 @@ namespace PF
 
         // Update estimates.
 
-        // Use the robust mean...
-
         float sumX = 0;
         float sumY = 0;
         float sumH = 0;
@@ -115,48 +115,90 @@ namespace PF
             sumH += l.heading;
         }
 
+	float previousXEstimate = xEstimate;
+	float previousYEstimate = yEstimate;
+	float previousHEstimate = hEstimate;
+
         xEstimate = sumX/parameters.numParticles;
         yEstimate = sumY/parameters.numParticles;
         hEstimate = sumH/parameters.numParticles;
 
+	standardDeviations = findParticleSD();
+
+	//const std::vector<float> odometryVelocity = motionModel->getVelocity();
+
+	//std::vector<float> meanVelocity(3, 0.0f);
+
+	//long long int currentTime = ::monotonic_micro_time();
+	//float deltaT = static_cast<float>(currentTime - lastUpdateTime)/
+	//    1000000.0f;
+
+	// meanVelocity[0] = (xEstimate - previousXEstimate)/deltaT;
+	// meanVelocity[1] = (yEstimate - previousYEstimate)/deltaT;
+	// meanVelocity[2] = (hEstimate - previousHEstimate)/deltaT;
+
+	// lastUpdateTime = currentTime;
+
+	// static std::ofstream uncertaintyLog("/home/nao/pfuncertainty.log");
+	// uncertaintyLog << standardDeviations[0]
+	// 	       << " " << standardDeviations[1]
+	// 	       << " " << standardDeviations[2]
+	// 	       << std::endl;
+
+	// std::cout << "Standard deviations: \n x: " << standardDeviations[0]
+	// 	  << "\n y: " << standardDeviations[1] 
+	// 	  << "\n h: " << standardDeviations[2]
+	// 	  // << "\n Odometries: "
+	//           // << "\n deltaX: " << xEstimate - previousXEstimate
+	// 	  // << "\n deltaY: " << yEstimate - previousYEstimate
+	// 	  // << "\n deltaH: " << hEstimate - previousHEstimate
+	// 	  << "\n Velocities: "
+	// 	  << "\n Odometry linear velocity = "
+	// 	  << NBMath::getHypotenuse(odometryVelocity[0], odometryVelocity[1])
+	// 	  << " \n Mean linear velocity = "
+	// 	  << NBMath::getHypotenuse(meanVelocity[0], odometryVelocity[1])
+	// 	  << std::endl;
+	
+	// lastUpdateTime = currentTime;
+
 	// Check if the mean has gone out of bounds. If so, 
 	// reset to the closest point in bounds with appropriate
 	// uncertainty.
-	// bool resetInBounds = false;
+	bool resetInBounds = false;
 
-	// if(xEstimate < 0)
-	// {
-	//     resetInBounds = true;
-	//     xEstimate = 0;
-	// }
-	// else if(xEstimate > parameters.fieldWidth)
-	// {
-	//     resetInBounds = true;
-	//     xEstimate = parameters.fieldWidth;
-	// }
+	if(xEstimate < 0)
+	{
+	    resetInBounds = true;
+	    xEstimate = 0;
+	}
+	else if(xEstimate > parameters.fieldWidth)
+	{
+	    resetInBounds = true;
+	    xEstimate = parameters.fieldWidth;
+	}
 
-	// if(yEstimate < 0)
-	// {
-	//     resetInBounds = true;
-	//     yEstimate = 0;
-	// }
-	// else if(yEstimate > parameters.fieldHeight)
-	// {
-	//     resetInBounds = true;
-	//     yEstimate = parameters.fieldHeight;
-	// }
+	if(yEstimate < 0)
+	{
+	    resetInBounds = true;
+	    yEstimate = 0;
+	}
+	else if(yEstimate > parameters.fieldHeight)
+	{
+	    resetInBounds = true;
+	    yEstimate = parameters.fieldHeight;
+	}
 
-	// // Only reset if one of the location coordinates is
-	// // out of bounds; avoids unnecessary resets.
-	// if(resetInBounds)
-	// {
-	//     std::cout << "Resetting to (" << xEstimate
-	// 	      << ", " << yEstimate << ", "
-	// 	      << hEstimate << ")." << std::endl;
+	// Only reset if one of the location coordinates is
+	// out of bounds; avoids unnecessary resets.
+	if(resetInBounds)
+	{
+	    std::cout << "Resetting to (" << xEstimate
+		      << ", " << yEstimate << ", "
+		      << hEstimate << ")." << std::endl;
 
-	//     resetLocTo(xEstimate, yEstimate, hEstimate,
-	// 	       LocNormalParams());
-	// }
+	    resetLocTo(xEstimate, yEstimate, hEstimate,
+		       LocNormalParams());
+	}
 
         memoryProvider.updateMemory();
     }
@@ -429,6 +471,53 @@ namespace PF
        }
     }
 
+    void ParticleFilter::resetLocToSide(bool blueSide)
+    {
+        // Clear the existing particles.
+        particles.clear();
+
+	float xLowerBound = 0.0f, xUpperBound = 0.0f;
+	// HACK replace constants!
+	float yLowerBound = FIELD_WHITE_BOTTOM_SIDELINE_Y, yUpperBound = FIELD_WHITE_TOP_SIDELINE_Y;
+	float heading = 0.0f;
+
+        boost::mt19937 rng;
+        rng.seed(std::time(0));
+
+	if(blueSide)
+	{
+	    xLowerBound = FIELD_WHITE_LEFT_SIDELINE_X;
+	    xUpperBound = MIDFIELD_X;
+	}
+	else
+	{
+	    xLowerBound = MIDFIELD_X;
+	    xUpperBound = FIELD_WHITE_RIGHT_SIDELINE_X;
+	    heading = M_PI_FLOAT;
+	}
+
+        boost::uniform_real<float> xBounds(xLowerBound,
+	                                   xUpperBound);
+        boost::uniform_real<float> yBounds(yLowerBound,
+	                                   yUpperBound);
+
+        boost::variate_generator<boost::mt19937&,
+                                boost::uniform_real<float> > xGen(rng, xBounds);
+        boost::variate_generator<boost::mt19937&,
+                                boost::uniform_real<float> > yGen(rng, yBounds);
+
+        // Assign uniform weight.
+        float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
+
+        for(int i = 0; i < parameters.numParticles; ++i)
+        {
+            LocalizationParticle p(Location(xGen(), yGen(), heading),
+                                   weight);
+
+            particles.push_back(p);
+        }
+    }
+
     void ParticleFilter::updateMemory(MLocalization::ptr mLoc) const
     {
         using namespace man::memory::proto;
@@ -474,6 +563,12 @@ namespace PF
 	    mean_h += (*iter).getLocation().heading;
 	}
 
+	if(parameters.numParticles == 0)
+	{
+	    std::cout << "Invalid number of particles!" << std::endl;
+	    return sd;
+	}
+       
 	mean_x /= parameters.numParticles;
 	mean_y /= parameters.numParticles;
 	mean_h /= parameters.numParticles;
@@ -488,12 +583,12 @@ namespace PF
 	    sd[1] += square((*iter).getLocation().y       - mean_y);
 	    sd[2] += square((*iter).getLocation().heading - mean_h); 
 	}
-	sd[0] /= (1/parameters.numParticles);
-	sd[1] /= (1/parameters.numParticles);
-	sd[2] /= (1/parameters.numParticles);
+
+	sd[0] /= parameters.numParticles;
+	sd[1] /= parameters.numParticles;
+	sd[2] /= parameters.numParticles;
 
 	// Convert variances into standard deviations.
-
 	sd[0] = std::sqrt(sd[0]);
 	sd[1] = std::sqrt(sd[1]);
 	sd[2] = std::sqrt(sd[2]);
@@ -501,5 +596,3 @@ namespace PF
 	return sd;
     }
 }
-
-

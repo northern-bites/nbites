@@ -78,6 +78,8 @@ BOOST_PYTHON_MODULE(_localization)
 	.def("resetLocTo", static_cast< void(PyLoc::*)
 	     (float, float, float, float, float, float, LocNormalParams, LocNormalParams) >(&PyLoc::resetLocTo),
 	     "reset the localization system to two distinct locations")
+	.def("resetLocToSide", &PyLoc::resetLocToSide,
+	     "reset the localization to be normally distributed on a particular side")
         ;
 }
 

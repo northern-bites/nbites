@@ -14,6 +14,16 @@ from objects import RelRobotLocation
 
 # Visual Goalie
 
+def facingGoal(player):
+    if player.side == goalCon.RIGHT:
+        return (player.brain.vision.yglp.on and
+                fabs(player.brain.vision.yglp.bearing) < 10.0
+                and player.brain.vision.yglp.dist < 400.0)
+    else:
+        return (player.brain.vision.ygrp.on and
+                fabs(player.brain.vision.ygrp.bearing) < 10.0
+                and player.brain.vision.ygrp.dist < 400.0)
+
 def atGoalArea(player):
     """
     Checks if robot is close enough to the field edge to be at the goal.
@@ -100,7 +110,7 @@ def facingBall(player):
     return (fabs(player.brain.ball.vis.bearing) < 10.0 and
             player.brain.ball.vis.on)
 
-def onLeftSideline(player):
+def onThisSideline(player):
     """
     Looks for a T corner or far goals to determine which sideline it's
     standing on.
@@ -116,38 +126,20 @@ def onLeftSideline(player):
              player.brain.vision.yglp.dist > 400.0))
 
 def unsure(player):
-    return (not onLeftSideline(player) and
-            not onRightSideline(player) and
+    return (not onThisSideline(player) and
             player.counter > 60)
 
-def onRightSideline(player):
-    """
-    Looks for the close posts.
-    """
-    for corner in player.brain.vision.fieldLines.corners:
-        if ( (IDs.CENTER_TOP_T in corner.possibilities) or
-             (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
-            return True
-    return ((player.brain.vision.ygrp.on and
-             #magic numbers
-             player.brain.vision.ygrp.dist > 400.0) or
-            (player.brain.vision.yglp.on and
-             player.brain.vision.yglp.dist > 400.0))
-
 def shouldGetReadyToSave(player):
-    return player.brain.ball.vis.heat > 10.0
+    return (player.brain.ball.vis.heat > 10.0 and
+            not shouldClearBall(player))
 
 def noSave(player):
-   return player.counter > 90
+   return player.counter > 60
 
 def shouldPerformSave(player):
     """
     Checks that the ball is moving toward it and close enough to save.
     """
-    if player.penaltyKicking:
-        return (player.brain.ball.vis.heat > 5.0 or
-                player.brain.ball.loc.relVelX < -50.0)
-
     return (player.brain.ball.loc.relVelX < -50.0 and
             player.brain.ball.vis.framesOn > 4)
 
@@ -171,9 +163,6 @@ def shouldClearBall(player):
     """
     Checks that the ball is more or less in the goal box.
     """
-    if player.penaltyKicking:
-        return False
-
     # less than 1.5 minutes left or winning/losing badly
     shouldBeAggressive = (player.brain.comm.gc.timeRemaining() < 90 or
                           (abs(player.brain.comm.gc.teams(0)[1] -

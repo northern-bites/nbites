@@ -412,31 +412,33 @@ class Brain(object):
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
         if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
-#            if self.my.playerNumber == 1:
-#                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
-#                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-#                                    Constants.HEADING_UP)
-            if self.gameController.ownKickOff:
-                self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    Constants.CENTER_FIELD_Y,
-                                    0,
-                                    gameSetResetUncertainties)
-            else:
-                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
-                                    Constants.CENTER_FIELD_Y,
-                                    0,
-                                    gameSetResetUncertainties)
+# #            if self.my.playerNumber == 1:
+# #                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+# #                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+# #                                    Constants.HEADING_UP)
+#             if self.gameController.ownKickOff:
+#                 self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+#                                     Constants.CENTER_FIELD_Y,
+#                                     0,
+#                                     gameSetResetUncertainties)
+#             else:
+#                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+#                                     Constants.CENTER_FIELD_Y,
+#                                     0,
+#                                     gameSetResetUncertainties)
+            self.loc.resetLocToSide(True)
         else:
-            if self.gameController.ownKickOff:
-                self.loc.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
-                                    Constants.CENTER_FIELD_Y,
-                                    180,
-                                    gameSetResetUncertainties)
-            else:
-                self.loc.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
-                                    Constants.CENTER_FIELD_Y,
-                                    180,
-                                    gameSetResetUncertainties)
+            # if self.gameController.ownKickOff:
+            #     self.loc.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
+            #                         Constants.CENTER_FIELD_Y,
+            #                         180,
+            #                         gameSetResetUncertainties)
+            # else:
+            #     self.loc.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
+            #                         Constants.CENTER_FIELD_Y,
+            #                         180,
+            #                         gameSetResetUncertainties)
+            self.loc.resetLocToSide(False)
 
     def resetLocalizationFromPenalty(self):
         """

@@ -25,6 +25,10 @@ def gamePlaying(player):
     if player.firstFrame():
         player.brain.tracker.repeatBasicPanFixedPitch()
 
+    #if player.brain.ball.vis.on:
+    # player.brain.sensors.saveFrame()
+    # player.numFramesSaved += 1
+    #player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
     return player.stay()
 
 def gamePenalized(player):
