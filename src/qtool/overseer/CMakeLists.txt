@@ -72,5 +72,6 @@ add_library(
     
 target_link_libraries(
     overseer_client
+    memory
     ${PROTOBUF_LIBRARY}
     parse )

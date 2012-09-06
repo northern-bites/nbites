@@ -1,0 +1,8 @@
+language: cpp
+compiler:
+  - gcc
+before_install: 
+  - ./util/scripts/linux-setup-dep.sh
+script:
+  - cd src/qtool
+  - make -j2
