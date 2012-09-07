@@ -28,7 +28,6 @@ ENABLE_TESTING()
 # Include  the basic definitions accross all projects
 INCLUDE( cmake/base_definitions.cmake )
 
-
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
@@ -40,6 +39,7 @@ FIND_PACKAGE( PythonLibs  REQUIRED )
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_LIBS OFF)
 FIND_PACKAGE( Boost REQUIRED )
+MARK_AS_ADVANCED( Boost_DIR )
 
 IF(WEBOTS_BACKEND)
   include ( cmake/FindWEBOTS.cmake )
