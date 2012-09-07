@@ -28,7 +28,6 @@ ENABLE_TESTING()
 # Include  the basic definitions accross all projects
 INCLUDE( cmake/base_definitions.cmake )
 
-
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
 # usefull to your project
@@ -40,6 +39,7 @@ FIND_PACKAGE( PythonLibs  REQUIRED )
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_LIBS OFF)
 FIND_PACKAGE( Boost REQUIRED )
+MARK_AS_ADVANCED( Boost_DIR )
 
 IF(WEBOTS_BACKEND)
   include ( cmake/FindWEBOTS.cmake )
@@ -82,7 +82,7 @@ ELSE(WEBOTS_BACKEND)
 ENDIF(WEBOTS_BACKEND)
 
 SET( @REMOTE_ADDRESS@
-  "192.168.0.5"
+  "mal.local"
   CACHE STRING
   "The remote address of the robot"
   )
@@ -91,14 +91,14 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
-  "../../data/tables/mexico-c-top.mtb"
+  "../../data/tables/120-top.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
   )
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/mexico-c-bottom.mtb"
+  "../../data/tables/120-bottom.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )
