@@ -82,7 +82,7 @@ ELSE(WEBOTS_BACKEND)
 ENDIF(WEBOTS_BACKEND)
 
 SET( @REMOTE_ADDRESS@
-  "192.168.0.5"
+  "mal.local"
   CACHE STRING
   "The remote address of the robot"
   )
@@ -91,14 +91,14 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
-  "../../data/tables/mexico-c-top.mtb"
+  "../../data/tables/120-top.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
   )
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/mexico-c-bottom.mtb"
+  "../../data/tables/120-bottom.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )
