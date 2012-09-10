@@ -26,7 +26,7 @@ TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
 {
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        team[i] = new TeamMember(i+1);
+        teamMates[i] = new TeamMember(i+1);
         std::cout << "TeamMember " << i << " Constructed" << std::endl;
     }
 
@@ -40,7 +40,7 @@ TeamConnect::~TeamConnect()
 {
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        delete team[i];
+        delete teamMates[i];
     }
 
     delete socket;
@@ -99,14 +99,13 @@ end:
     }
 }
 
-//TODO: Add a teamNumber parameter and get rid of the instance variable.
-void TeamConnect::send(int player, int burst = 1)
+void TeamConnect::send(int player, int team, int burst = 1)
 {
-    TeamMember* robot = team[player-1];
+    TeamMember* robot = teamMates[player-1];
 
     char packet[NUM_HEADER_BYTES + TeamMember::sizeOfData()];
 
-    float* payload = buildHeader(&packet[0], robot);
+    float* payload = buildHeader(&packet[0], robot, team);
 
     robot->generatePacket(payload);
 
@@ -117,14 +116,14 @@ void TeamConnect::send(int player, int burst = 1)
     std::cout << "Sent a packet" << std::endl;
 }
 
-float* TeamConnect::buildHeader(char* packet, TeamMember* robot)
+float* TeamConnect::buildHeader(char* packet, TeamMember* robot, int tn)
 {
     char* cptr = packet;  // Preserve packet pointer for caller.
 
     *cptr = *UNIQUE_ID;
     cptr += sizeof(UNIQUE_ID);  // Advance pointer.
 
-    *cptr   = (char)teamNumber();
+    *cptr   = (char)tn;
     *++cptr = (char)robot->playerNumber();
 
     int* iptr = (int*)++cptr;
@@ -140,8 +139,7 @@ float* TeamConnect::buildHeader(char* packet, TeamMember* robot)
     return fptr;
 }
 
-//TODO: Add a teamNumber parameter and get rid of the instance variable.
-void TeamConnect::receive(int player)
+void TeamConnect::receive(int player, int team)
 {
     char packet[NUM_HEADER_BYTES + TeamMember::sizeOfData()];
     int result, playerNumber;
@@ -157,24 +155,24 @@ void TeamConnect::receive(int player)
         if (result <= 0)
             break;
 
-        playerNumber = verify(&packet[0], player);
+        playerNumber = verify(&packet[0], player, team);
         if (playerNumber == 0)
             continue;  // Bad Packet.
 
         payload = (float*)(&packet[0] + NUM_HEADER_BYTES);
-        robot = team[playerNumber -1];
+        robot = teamMates[playerNumber -1];
 
         robot->update(payload);
         //std::cout << "Received a packet!" << std::endl;
     } while (result > 0);
 }
 
-int TeamConnect::verify(char* packet, int player)
+int TeamConnect::verify(char* packet, int player, int team)
 {
     // Save the current time for later.
     llong currtime = timer->timestamp();
 
-    if (!verifyHeader(packet))
+    if (!verifyHeader(packet, team))
         return 0;
 
     // get pointer after UNIQUE_ID and teamNumber
@@ -203,7 +201,7 @@ int TeamConnect::verify(char* packet, int player)
     int* iptr = (int*)++cptr;
     int seqNumber = *iptr;
 
-    TeamMember* robot = team[playerNum-1];
+    TeamMember* robot = teamMates[playerNum-1];
     if (seqNumber <= robot->lastSeqNum())
     {
 #ifdef DEBUG_COMM
@@ -242,7 +240,7 @@ int TeamConnect::verify(char* packet, int player)
     return playerNum;
 }
 
-bool TeamConnect::verifyHeader(char* header)
+bool TeamConnect::verifyHeader(char* header, int team)
 {
     char* ptr = header;
 
@@ -258,8 +256,9 @@ bool TeamConnect::verifyHeader(char* header)
     }
     ptr += sizeof(UNIQUE_ID);
 
+    char tn = (char)team;
     // Assumes teamNumber can fit in one byte.
-    if (memcmp(ptr, &_teamNumber, 1))
+    if (memcmp(ptr, &tn, 1))
     {
 #ifdef DEBUG_COMM
         std::cout << "Received packet with bad teamNumber"
@@ -275,7 +274,7 @@ void TeamConnect::checkDeadTeammates(llong time, int player)
     TeamMember* robot;
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        robot = team[i];
+        robot = teamMates[i];
         if (robot->playerNumber() == player)
             robot->setActive(true);
         else if (time - robot->lastPacketTime() > TEAMMATE_DEAD_THRESHOLD)
@@ -288,7 +287,7 @@ void TeamConnect::setLocData(int p,
                              float x , float y , float h ,
                              float xu, float yu, float hu)
 {
-    TeamMember* robot = team[p-1];
+    TeamMember* robot = teamMates[p-1];
 
     robot->setMyX(x);
     robot->setMyY(y);
@@ -302,7 +301,7 @@ void TeamConnect::setBallData(int p,
                               float d , float b ,
                               float du, float bu)
 {
-    TeamMember* robot = team[p-1];
+    TeamMember* robot = teamMates[p-1];
 
     robot->setBallDist(d);
     robot->setBallBearing(b);
@@ -313,7 +312,7 @@ void TeamConnect::setBallData(int p,
 void TeamConnect::setBehaviorData(int p,
                                   float r, float sr, float ct)
 {
-    TeamMember* robot = team[p-1];
+    TeamMember* robot = teamMates[p-1];
 
     robot->setRole(r);
     robot->setSubRole(sr);

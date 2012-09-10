@@ -26,7 +26,7 @@ void CommTimer::teamPacketSent()
     // This means that (if we run at 30 frames/sec) we will send data
     // once per frame on average, while providing significant randomization.
     // We could send duplicates or skip frames with this method, but we will
-    // send more than one duplicate or skip more than one frame in a row.
+    // not send more than one duplicate or skip more than one frame in a row.
     // NOTE: Since rand() generates a value between 0 and some undefined
     //       large maximum (at least 32767), to get a truly random distribution,
     //       we generate random numbers until we get one less than 33,333.
@@ -35,6 +35,6 @@ void CommTimer::teamPacketSent()
     do
     {
         random = rand();
-    } while (random > 33333); // TODO: clean this up.
+    } while (random > 33333); // Ensure nextSendTime doesn't exceed 50,000
     nextSendTime += random + 16667;
 }

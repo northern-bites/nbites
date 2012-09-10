@@ -24,8 +24,6 @@
 #pragma once
 
 #include <pthread.h>
-//TODO: Actually use this...
-//#include <boost/shared_ptr.hpp>
 
 #include "TeamConnect.h"
 #include "GameConnect.h"

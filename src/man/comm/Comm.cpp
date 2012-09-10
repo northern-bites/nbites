@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <time.h>
-#include <sys/time.h>  //TODO: Do we need?
+#include <sys/time.h>  //TODO: Do we need for Robots?
 
 //TODO: Actually include the following
 //#include "Profiler.h"
@@ -44,7 +44,6 @@ Comm::Comm()
 {
 //TODO: Clean these two up.
     running = true;
-    burstRate = 2;
 
     timer = new CommTimer(&monotonic_micro_time);
     monitor = new NetworkMonitor(timer->timestamp());
@@ -114,7 +113,7 @@ void Comm::send()
 {
     pthread_mutex_lock (&comm_mutex);
 
-    teamConnect->send(myPlayerNumber(), burstRate);
+    teamConnect->send(myPlayerNumber(), gameConnect->myTeamNumber(), burstRate);
     timer->teamPacketSent();
 
     pthread_mutex_unlock (&comm_mutex);
@@ -124,7 +123,7 @@ void Comm::receive()
 {
     pthread_mutex_lock (&comm_mutex);
 
-    teamConnect->receive(0);
+    teamConnect->receive(0, gameConnect->myTeamNumber());
 
     gameConnect->handle(myPlayerNumber());
 
@@ -179,11 +178,10 @@ int Comm::checkPlayerNumber(int p)
 
 void Comm::setTeamNumber(int tn)
 {
-    teamConnect->setTeamNumber(tn);
     gameConnect->setMyTeamNumber(tn);
 }
 
 int Comm::teamNumber()
 {
-    return teamConnect->teamNumber();
+    return gameConnect->myTeamNumber();
 }
