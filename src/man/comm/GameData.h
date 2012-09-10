@@ -96,6 +96,8 @@ public:
     const char* toString();
 
 private:
+    GameData(); // Disallow default constructor
+
     int  myTeamIndex();
     int  theirTeamIndex();
 

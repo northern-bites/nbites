@@ -12,10 +12,11 @@
 #include <sstream>   //TODO: Remove this?
 #include <iostream>  //TODO: Remove this?
 
-GameData::GameData(int teamNumber = 101)
+GameData::GameData(int teamNumber)
 {
     _myTeamNumber = teamNumber;
     setUpControl();
+    std::cout << "Constructed GameData" << std::endl;
 }
 
 void GameData::setUpControl()
@@ -42,7 +43,7 @@ void GameData::setUpControl()
     data.teams[TEAM_RED].teamColour = TEAM_RED;
     data.teams[TEAM_RED].goalColour = GOAL_YELLOW;
 
-    setControl(data);
+    control = data;
 }
 
 void GameData::setControl(RoboCupGameControlData data)

@@ -21,12 +21,17 @@ static const int NUM_PLAYERS_PER_TEAM = 4;
 GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m)
     : _timer(t), _monitor(m)
 {
+    _socket = new UDPSocket();
+    setUpSocket();
 
+    _data   = new GameData(101);
+    std::cout << "GameConnect Contstructed" << std::endl;
 }
 
 GameConnect::~GameConnect()
 {
     delete _data;
+    std::cout << "GameConnect destructor" << std::endl;
 }
 
 void GameConnect::setUpSocket()
