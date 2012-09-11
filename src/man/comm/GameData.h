@@ -25,9 +25,9 @@ public:
     void setUpControl();
 
     /**
-     * @effect: Sets the control data to another one
+     * @effect: Sets the control data to memory at pointer location
      */
-    void setControl(RoboCupGameControlData data);
+    void setControl(char* p);
 
     /**
      * The following methods return the important values stored in

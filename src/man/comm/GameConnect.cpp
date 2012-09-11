@@ -46,7 +46,6 @@ void GameConnect::setUpSocket()
 
 void GameConnect::handle(int player = 0)
 {
-    //TODO: find out if this is the correct size.
     char packet[sizeof(struct RoboCupGameControlData)];
     int result;
     struct sockaddr from;
@@ -117,7 +116,14 @@ void GameConnect::respond(int player, unsigned int msg)
     response.message = msg;
 
     //TODO: see if this cast works.
-    _socket->sendToTarget((char*)&response, sizeof(response));
+    int result = _socket->sendToTarget((char*)&response, sizeof(response));
+
+#ifdef DEBUG_COMM
+    if (result <= 0)
+    {
+        std::cout << "GameConnect::respond() Unable to send" << std::endl;
+    }
+#endif
 }
 
 void GameConnect::setMyTeamNumber(int tn)

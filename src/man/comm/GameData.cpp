@@ -27,33 +27,30 @@ void GameData::setUpControl()
     data.playersPerTeam = MAX_NUM_PLAYERS;
     data.state = STATE_INITIAL;
     data.firstHalf = 1;
-    data.kickOffTeam = TEAM_BLUE; //TODO: check if this is correct
+    data.kickOffTeam = TEAM_BLUE;
     data.secondaryState = STATE2_NORMAL;
     data.dropInTeam = TEAM_BLUE;
     data.dropInTime = 0;
     data.secsRemaining = 600;
 
-    data.teams[TEAM_BLUE].teamNumber = _myTeamNumber; //TODO: check if
-                                                      //this is the
-                                                      //correct
-                                                      //indexing
+    data.teams[TEAM_BLUE].teamNumber = _myTeamNumber;
     data.teams[TEAM_BLUE].teamColour = TEAM_BLUE;
-    data.teams[TEAM_BLUE].goalColour = GOAL_YELLOW;
+    data.teams[TEAM_BLUE].goalColour = GOAL_BLUE;
 
+    data.teams[TEAM_RED].teamNumber = 0;
     data.teams[TEAM_RED].teamColour = TEAM_RED;
     data.teams[TEAM_RED].goalColour = GOAL_YELLOW;
 
     control = data;
 }
 
-void GameData::setControl(RoboCupGameControlData data)
+void GameData::setControl(char* p)
 {
-    control = data;
+    memcpy(&control, p, sizeof(RoboCupGameControlData));
 }
 
 bool GameData::ourKickoff()
 {
-    //TODO: Make sure this is the correct comparison.
     return (control.teams[myTeamIndex()].teamColour == control.kickOffTeam);
 }
 
@@ -187,16 +184,15 @@ int GameData::checkPenaltyForPlayer(int team, int player)
 
 void GameData::switchTeams()
 {
-    //TODO: find out if we need to switch the structs or just the color.
     struct TeamInfo temp = control.teams[0];
 
     control.teams[0] = control.teams[1];
-    control.teams[0].teamColour = (control.teams[0].teamColour == TEAM_BLUE ?
-                                   TEAM_RED : TEAM_BLUE);
+    control.teams[0].teamColour = TEAM_BLUE;
+    control.teams[0].goalColour = GOAL_BLUE;
 
     control.teams[1] = temp;
-    control.teams[1].teamColour = (control.teams[1].teamColour == TEAM_BLUE ?
-                                   TEAM_RED : TEAM_BLUE);
+    control.teams[1].teamColour = TEAM_RED;
+    control.teams[1].goalColour = GOAL_YELLOW;
 }
 
 const char* GameData::toString()
@@ -207,7 +203,7 @@ const char* GameData::toString()
 
     data << "=====Game Data=====\n";
 
-    data << "Header:\t";
+    data << "Header: \t";
     data << control.header;
     data << "\n";
 
@@ -216,163 +212,163 @@ const char* GameData::toString()
     data << "\n";
 
     data << "Players Per Team:\t";
-    data << control.playersPerTeam;
+    data << (int)control.playersPerTeam;
     data << "\n";
 
     data << "State:\t";
-    data << control.state;
+    data << (int)control.state;
     data << "\n";
 
     data << "First Half:\t";
-    data << control.firstHalf;
+    data << (int)control.firstHalf;
     data << "\n";
 
     data << "Kickoff Team:\t";
-    data << control.kickOffTeam;
+    data << (int)control.kickOffTeam;
     data << "\n";
 
     data << "Second State:\t";
-    data << control.secondaryState;
+    data << (int)control.secondaryState;
     data << "\n";
 
     data << "Drop In Team:\t";
-    data << control.dropInTeam;
+    data << (int)control.dropInTeam;
     data << "\n";
 
     data << "Drop In Time:\t";
-    data << control.state;
+    data << (int)control.dropInTime;
     data << "\n";
 
     data << "Remaining:\t";
-    data << control.secsRemaining;
+    data << (int)control.secsRemaining;
     data << "\n";
 
     data << "Team 0:\n";
 
     data << "\tTeam Number:\t";
-    data << control.teams[0].teamNumber;
+    data << (int)control.teams[0].teamNumber;
     data << "\n";
 
     data << "\tTeam Color:\t";
-    data << control.teams[0].teamColour;
+    data << (int)control.teams[0].teamColour;
     data << "\n";
 
     data << "\tGoal Color:\t";
-    data << control.teams[0].goalColour;
+    data << (int)control.teams[0].goalColour;
     data << "\n";
 
     data << "\tScore:\t";
-    data << control.teams[0].score;
+    data << (int)control.teams[0].score;
     data << "\n";
 
     data << "\t\tRobot 1:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[0].penalty;
+    data << (int)control.teams[0].players[0].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[0].secsTillUnpenalised;
+    data << (int)control.teams[0].players[0].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 2:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[1].penalty;
+    data << (int)control.teams[0].players[1].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[1].secsTillUnpenalised;
+    data << (int)control.teams[0].players[1].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 3:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[2].penalty;
+    data << (int)control.teams[0].players[2].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[2].secsTillUnpenalised;
+    data << (int)control.teams[0].players[2].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 4:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[3].penalty;
+    data << (int)control.teams[0].players[3].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[3].secsTillUnpenalised;
+    data << (int)control.teams[0].players[3].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 5:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[4].penalty;
+    data << (int)control.teams[0].players[4].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[4].secsTillUnpenalised;
+    data << (int)control.teams[0].players[4].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 6:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[5].penalty;
+    data << (int)control.teams[0].players[5].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[5].secsTillUnpenalised;
+    data << (int)control.teams[0].players[5].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 7:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[6].penalty;
+    data << (int)control.teams[0].players[6].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[6].secsTillUnpenalised;
+    data << (int)control.teams[0].players[6].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 8:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[7].penalty;
+    data << (int)control.teams[0].players[7].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[7].secsTillUnpenalised;
+    data << (int)control.teams[0].players[7].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 9:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[8].penalty;
+    data << (int)control.teams[0].players[8].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[8].secsTillUnpenalised;
+    data << (int)control.teams[0].players[8].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 10:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[9].penalty;
+    data << (int)control.teams[0].players[9].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[9].secsTillUnpenalised;
+    data << (int)control.teams[0].players[9].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 11:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[0].players[10].penalty;
+    data << (int)control.teams[0].players[10].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[0].players[10].secsTillUnpenalised;
+    data << (int)control.teams[0].players[10].secsTillUnpenalised;
     data << "\n";
 
 
@@ -384,129 +380,129 @@ ilajgoiejgoeai gjewoigjfa sdpf jdsfgeig eadi fjdjife */
     data << "Team 1:\n";
 
     data << "\tTeam Number:\t";
-    data << control.teams[1].teamNumber;
+    data << (int)control.teams[1].teamNumber;
     data << "\n";
 
     data << "\tTeam Color:\t";
-    data << control.teams[1].teamColour;
+    data << (int)control.teams[1].teamColour;
     data << "\n";
 
     data << "\tGoal Color:\t";
-    data << control.teams[1].goalColour;
+    data << (int)control.teams[1].goalColour;
     data << "\n";
 
     data << "\tScore:\t";
-    data << control.teams[1].score;
+    data << (int)control.teams[1].score;
     data << "\n";
 
     data << "\t\tRobot 1:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[0].penalty;
+    data << (int)control.teams[1].players[0].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[0].secsTillUnpenalised;
+    data << (int)control.teams[1].players[0].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 2:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[1].penalty;
+    data << (int)control.teams[1].players[1].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[1].secsTillUnpenalised;
+    data << (int)control.teams[1].players[1].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 3:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[2].penalty;
+    data << (int)control.teams[1].players[2].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[2].secsTillUnpenalised;
+    data << (int)control.teams[1].players[2].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 4:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[3].penalty;
+    data << (int)control.teams[1].players[3].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[3].secsTillUnpenalised;
+    data << (int)control.teams[1].players[3].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 5:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[4].penalty;
+    data << (int)control.teams[1].players[4].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[4].secsTillUnpenalised;
+    data << (int)control.teams[1].players[4].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 6:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[5].penalty;
+    data << (int)control.teams[1].players[5].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[5].secsTillUnpenalised;
+    data << (int)control.teams[1].players[5].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 7:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[6].penalty;
+    data << (int)control.teams[1].players[6].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[6].secsTillUnpenalised;
+    data << (int)control.teams[1].players[6].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 8:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[7].penalty;
+    data << (int)control.teams[1].players[7].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[7].secsTillUnpenalised;
+    data << (int)control.teams[1].players[7].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 9:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[8].penalty;
+    data << (int)control.teams[1].players[8].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[8].secsTillUnpenalised;
+    data << (int)control.teams[1].players[8].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 10:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[9].penalty;
+    data << (int)control.teams[1].players[9].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[9].secsTillUnpenalised;
+    data << (int)control.teams[1].players[9].secsTillUnpenalised;
     data << "\n";
 
     data << "\t\tRobot 11:\n";
 
     data << "\t\tPenalty:\t";
-    data << control.teams[1].players[10].penalty;
+    data << (int)control.teams[1].players[10].penalty;
     data << "\n";
 
     data << "\t\tSeconds Left:\t";
-    data << control.teams[1].players[10].secsTillUnpenalised;
+    data << (int)control.teams[1].players[10].secsTillUnpenalised;
     data << "\n";
 
     d = data.str();
