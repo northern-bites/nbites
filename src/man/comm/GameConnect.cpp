@@ -101,6 +101,17 @@ bool GameConnect::verify(char* packet)
 #endif
         return false;
     }
+
+    int tn = myTeamNumber();
+    if (memcmp(&(data->teams[0].teamNumber), &tn, sizeof(char)) &&
+        memcmp(&(data->teams[1].teamNumber), &tn, sizeof(char)))
+    {
+#ifdef DEBUG_COMM
+        std::cout << "GameConnect::verify() incorrect teamNumber" << std::endl;
+#endif
+        return false;
+    }
+
     return true;
 }
 
