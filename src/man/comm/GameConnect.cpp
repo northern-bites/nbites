@@ -63,10 +63,9 @@ void GameConnect::handle(int player = 0)
         if (!verify(&packet[0]))
             continue;  // Bad Packet.
 
-        //TODO: make sure casting like this works.
-        getGameData()->setControl(*(struct RoboCupGameControlData*)packet);
+        getGameData()->setControl(packet);
 
-        //std::cout << "Received a packet!" << std::endl;
+        std::cout << "Received a packet!" << std::endl << getGameData()->toString();
 
         //TODO: check this...
         _socket->setTarget(from);
