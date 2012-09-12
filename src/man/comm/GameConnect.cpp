@@ -37,11 +37,11 @@ GameConnect::~GameConnect()
 void GameConnect::setUpSocket()
 {
     _socket->setBlocking(false);
-    _socket->setBroadcast(true);
+    _socket->setBroadcast(false);
 
     _socket->bind("", GAMECONTROLLER_PORT); // Listen on the GC port.
 
-    _socket->setTarget("255.255.255.255", GAMECONTROLLER_PORT);
+    _socket->setTarget("127.0.0.1", GAMECONTROLLER_PORT);
 }
 
 void GameConnect::handle(int player = 0)
@@ -65,9 +65,6 @@ void GameConnect::handle(int player = 0)
 
         getGameData()->setControl(packet);
 
-        std::cout << "Received a packet!" << std::endl << getGameData()->toString();
-
-        //TODO: check this...
         _socket->setTarget(from);
         _socket->setBroadcast(false);
 
@@ -77,7 +74,7 @@ void GameConnect::handle(int player = 0)
             for (int i = 1; i <= NUM_PLAYERS_PER_TEAM; ++i)
                 respond(i);
 
-    } while (result > 0);
+    } while (true);
 }
 
 bool GameConnect::verify(char* packet)
@@ -125,8 +122,10 @@ void GameConnect::respond(int player, unsigned int msg)
     response.player = (uint16)player;
     response.message = msg;
 
-    //TODO: see if this cast works.
-    int result = _socket->sendToTarget((char*)&response, sizeof(response));
+    char packet[sizeof(RoboCupGameControlReturnData)];
+    memcpy(&packet[0], &response, sizeof(RoboCupGameControlReturnData));
+
+    int result = _socket->sendToTarget(&packet[0], sizeof(response));
 
 #ifdef DEBUG_COMM
     if (result <= 0)
