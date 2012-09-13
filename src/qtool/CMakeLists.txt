@@ -54,6 +54,23 @@ include_directories(.
                     ${PROTOBUF_INCLUDE_DIRS}
                     )
 
+########## OfflineTool Sources
+
+set( offline_tool_srcs offline_main.cpp
+  EmptyQTool.cpp
+  OfflineTool.cpp
+  )
+
+set( offline_tool_headers
+  EmptyQTool.h
+  OfflineTool.h
+)
+
+include_directories(.
+                    ${CMAKE_CURRENT_BINARY_DIR}
+                    ${PROTOBUF_INCLUDE_DIRS}
+                    )
+
 ############ Qt4 goodness
 
 Qt4_wrap_cpp(qtool_headers_moc ${qtool_headers})
@@ -63,6 +80,7 @@ Qt4_wrap_ui(qtool_forms_headers ${qtool_forms})
 #Qr4_add_resources(qtool_resources_rcc ${qtool_resources})
 
 Qt4_wrap_cpp(connect_headers_moc ${connect_headers})
+Qt4_wrap_cpp(offline_tool_headers_moc ${offline_tool_headers})
 
 ######### Subdirectory compilation
 add_subdirectory( image )
@@ -106,5 +124,21 @@ target_link_libraries(
   viewer
   remote
   overseer_client
+  ${QT_LIBRARIES}
+  )
+
+########## OfflineTool executable
+
+add_executable( offline_tool
+  ${offline_tool_srcs}
+  ${offline_tool_headers_moc} )
+
+target_link_libraries(
+  offline_tool
+  image
+  data
+  offline
+  viewer
+  remote
   ${QT_LIBRARIES}
   )
