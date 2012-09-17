@@ -51,7 +51,24 @@ set( connect_headers
 include_directories(.
                     ${CMAKE_CURRENT_BINARY_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}/overseer #for the GroundTruth.pb.h
-                    ${PROTOBUF_INCLUDE_DIRS}
+                    ${PROTOBUF_INCLUDE_DIR}
+                    )
+
+########## OfflineTool Sources
+
+set( offline_tool_srcs offline_main.cpp
+  EmptyQTool.cpp
+  OfflineTool.cpp
+  )
+
+set( offline_tool_headers
+  EmptyQTool.h
+  OfflineTool.h
+)
+
+include_directories(.
+                    ${CMAKE_CURRENT_BINARY_DIR}
+                    ${PROTOBUF_INCLUDE_DIR}
                     )
 
 ########## OfflineTool Sources

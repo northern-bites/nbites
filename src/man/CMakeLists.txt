@@ -47,6 +47,9 @@ ELSE(WEBOTS_BACKEND)
   include ( cmake/FindALCOMMON.cmake )
 ENDIF(WEBOTS_BACKEND)
 
+include(../cmake/protobuf.cmake)
+include_directories(${PROTOBUF_INCLUDE_DIR})
+
 ############################ BUILDCONFIG
 # Include the config file for this build
 INCLUDE( ${MAN_CMAKE_DIR}/buildconfig.cmake )
