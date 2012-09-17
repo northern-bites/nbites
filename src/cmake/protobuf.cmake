@@ -1,4 +1,11 @@
 ########################### protobuf
+
+if(DEFINED included_protobuf_cmake)
+    return()
+else()
+    set(included_protobuf_cmake TRUE)
+endif()
+
 # Enable ExternalProject CMake module
 include(ExternalProject)
 
