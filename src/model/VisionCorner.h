@@ -17,6 +17,7 @@ public:
 
     int x() { return imageCoordinates[X_VALUE]; }
     int y() { return imageCoordinates[Y_VALUE]; }
+    bool green();
 
 private:
     FieldCorner concrete;

@@ -14,6 +14,11 @@ static const int X_VALUE = 0;
 static const int Y_VALUE = 1;
 static const int Z_VALUE = 2;
 
+// About corners
+static const int NUM_GREEN_CORNERS = 4;
+static const int NUM_FIELD_CORNERS = 14;
+static const int NUM_CORNERS = 18;
+
 // Green outer corners
 static const FieldCorner BOTTOM_LEFT_GREEN(GREEN_LEFT_EDGE_X,
                                            GREEN_BOTTOM_Y,
@@ -92,23 +97,44 @@ static const FieldCorner BOTTOM_CENTER_T(HALF_FIELD_X,
                                          0);
 
 // Arrays of all the corners
-static const FieldCorner GREEN_CORNERS[4] = { BOTTOM_LEFT_GREEN,
-                                             TOP_LEFT_GREEN,
-                                             BOTTOM_RIGHT_GREEN,
-                                             TOP_RIGHT_GREEN };
+static const FieldCorner GREEN_CORNERS[NUM_GREEN_CORNERS] =
+{ BOTTOM_LEFT_GREEN,
+  TOP_LEFT_GREEN,
+  BOTTOM_RIGHT_GREEN,
+  TOP_RIGHT_GREEN };
 
-static const FieldCorner FIELD_CORNERS[14] = { BOTTOM_LEFT_FIELD_L,
-                                              TOP_LEFT_FIELD_L,
-                                              BOTTOM_RIGHT_FIELD_L,
-                                              TOP_RIGHT_FIELD_L,
-                                              BOTTOM_LEFT_GOAL_T,
-                                              TOP_LEFT_GOAL_T,
-                                              BOTTOM_RIGHT_GOAL_T,
-                                              TOP_RIGHT_GOAL_T,
-                                              BOTTOM_LEFT_GOALBOX_L,
-                                              TOP_LEFT_GOALBOX_L,
-                                              BOTTOM_RIGHT_GOALBOX_L,
-                                              TOP_RIGHT_GOALBOX_L,
-                                              TOP_CENTER_T,
-                                               BOTTOM_CENTER_T};
+static const FieldCorner FIELD_CORNERS[NUM_FIELD_CORNERS] =
+{ BOTTOM_LEFT_FIELD_L,
+  TOP_LEFT_FIELD_L,
+  BOTTOM_RIGHT_FIELD_L,
+  TOP_RIGHT_FIELD_L,
+  BOTTOM_LEFT_GOAL_T,
+  TOP_LEFT_GOAL_T,
+  BOTTOM_RIGHT_GOAL_T,
+  TOP_RIGHT_GOAL_T,
+  BOTTOM_LEFT_GOALBOX_L,
+  TOP_LEFT_GOALBOX_L,
+  BOTTOM_RIGHT_GOALBOX_L,
+  TOP_RIGHT_GOALBOX_L,
+  TOP_CENTER_T,
+  BOTTOM_CENTER_T};
 
+static const FieldCorner ALL_CORNERS[NUM_CORNERS] =
+{ BOTTOM_LEFT_GREEN,
+  TOP_LEFT_GREEN,
+  BOTTOM_RIGHT_GREEN,
+  TOP_RIGHT_GREEN,
+  BOTTOM_LEFT_FIELD_L,
+  TOP_LEFT_FIELD_L,
+  BOTTOM_RIGHT_FIELD_L,
+  TOP_RIGHT_FIELD_L,
+  BOTTOM_LEFT_GOAL_T,
+  TOP_LEFT_GOAL_T,
+  BOTTOM_RIGHT_GOAL_T,
+  TOP_RIGHT_GOAL_T,
+  BOTTOM_LEFT_GOALBOX_L,
+  TOP_LEFT_GOALBOX_L,
+  BOTTOM_RIGHT_GOALBOX_L,
+  TOP_RIGHT_GOALBOX_L,
+  TOP_CENTER_T,
+  BOTTOM_CENTER_T};

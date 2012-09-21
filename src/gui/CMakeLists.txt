@@ -12,10 +12,12 @@ add_definitions(${QT_DEFINITIONS})
 
 ####### sources
 
-set( gui_srcs
+set( gui_srcs ImageView.cpp
+  MainView.cpp
 )
 
-set( gui_headers
+set( gui_headers ImageView.h
+  MainView.h
 )
 
 ####### qt4
