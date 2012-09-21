@@ -90,7 +90,9 @@ public:
     int timeUntilTheyFullStrength();
     int timeUntilFullStrength(int team);
 
-    int checkPenaltyForPlayer(int team, int player);
+    int  checkPenaltyForPlayer(int team, int player);
+    bool isOurPlayerPenalized(int player) {return checkPenaltyForPlayer(myTeamNumber(),
+                                                                        player);}
 
     void setMyTeamNumber(int tn){_myTeamNumber = tn;}
     int  myTeamNumber() {return _myTeamNumber;}

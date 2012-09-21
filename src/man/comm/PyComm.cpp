@@ -38,6 +38,7 @@ BOOST_PYTHON_MODULE(comm)
         .def_readonly("timeUntilTheyFullStrength", &GameData::timeUntilTheyFullStrength)
         .def("timeUntilOurPlayerUnpened", &GameData::timeUntilOurPlayerUnpened)
         .def("timeUntilTheirPlayerUnpened", &GameData::timeUntilTheirPlayerUnpened)
+        .def("isOurPlayerPenalized", &GameData::isOurPlayerPenalized)
         ;
 
     class_<TeamMember>("TeamMember", no_init)
