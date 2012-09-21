@@ -67,7 +67,7 @@ Man::Man (shared_ptr<Sensors> _sensors,
 
     set_vision_pointer(vision);
 
-    comm = shared_ptr<Comm> (new Comm(sensors, vision));
+    comm = shared_ptr<Comm> (new Comm());
 
     loggingBoard = shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);
