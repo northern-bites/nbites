@@ -29,9 +29,7 @@ class TeamMember(RobotLocation):
     """class for keeping track of teammates' info """
 
     def __init__(self, tbrain=None):
-        '''variables include lots from the Packet class'''
         RobotLocation.__init__(self, 0.0, 0.0, 0.0)
-        # things in the Packet()
         self.playerNumber = 0
         self.ballDist = 0
         self.ballBearing = 0
@@ -50,7 +48,7 @@ class TeamMember(RobotLocation):
         Updates information from latest Comm
         '''
 
-        # stores packet information locally
+        # stores comm information locally
         self.playerNumber = info.number
         self.x = info.x
         self.y = info.y

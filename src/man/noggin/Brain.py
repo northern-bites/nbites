@@ -26,8 +26,7 @@ from . import robots
 
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
-from .typeDefs import (Sonar, Packet,
-                       Play, TeamMember)
+from .typeDefs import (Sonar, Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
