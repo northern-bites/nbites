@@ -43,7 +43,7 @@ public:
      * Sets the offset for team clock syncronization.
      * @param off: The offset to increase our offset by.
      */
-    void setOffset(llong off) {teamClockOffset += off;}
+    void addToOffset(llong off) {teamClockOffset += off;}
 
     /**
      * Gets the offset for team clock syncronization.

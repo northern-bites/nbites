@@ -12,9 +12,10 @@
 #include <sstream>   //TODO: Remove this?
 #include <iostream>  //TODO: Remove this?
 
-GameData::GameData(int teamNumber)
+GameData::GameData(int teamNumber, int playerNumber)
 {
     _myTeamNumber = teamNumber;
+    _myPlayerNumber = playerNumber;
     setUpControl();
     std::cout << "Constructed GameData" << std::endl;
 }

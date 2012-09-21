@@ -21,7 +21,7 @@ GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m)
     _socket = new UDPSocket();
     setUpSocket();
 
-    _data   = new GameData(101);
+    _data   = new GameData(101, 2); // Will be set for real soon
     std::cout << "GameConnect Contstructed" << std::endl;
 }
 
@@ -64,6 +64,7 @@ void GameConnect::handle(int player = 0)
 
         _socket->setTarget(from);
         _socket->setBroadcast(false);
+        _haveRemoteGC = true;
 
         if (player)
             respond(player);
@@ -132,9 +133,9 @@ void GameConnect::respond(int player, unsigned int msg)
 #endif
 }
 
-void GameConnect::setMyTeamNumber(int tn)
+void GameConnect::setMyTeamNumber(int tn, int pn)
 {
     _myTeamNumber = tn;
     delete _data;
-    _data = new GameData(_myTeamNumber);
+    _data = new GameData(_myTeamNumber, pn);
 }

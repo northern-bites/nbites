@@ -17,7 +17,7 @@ public:
     /**
      * Constructor
      */
-    GameData(int teamNumber);
+    GameData(int teamNumber, int playerNumber);
 
     /**
      * @effect: Sets up the control data to a generic state
@@ -104,6 +104,7 @@ private:
     int  theirTeamIndex();
 
     int   _myTeamNumber;
+    int _myPlayerNumber;
 
     RoboCupGameControlData control;
 };

@@ -52,27 +52,12 @@ public:
      *************************************************/
 
     /**
-     * Signal for manually advancing the game state.
-     */
-    void advanceButtonClickState();
-
-    /**
-     * Signal for manually changing the team color.
-     */
-    void toggleTeamColor();
-
-    /**
-     * Signal for manually toggling our kickoff.
-     */
-    void toggleKickoff();
-
-    /**
      * Called when we have a remote GC and we advanced
      * the game state to penalized.
      */
     void manualPenalize();
 
-    void setMyTeamNumber(int tn);
+    void setMyTeamNumber(int tn, int pn);
     int  myTeamNumber() {return _myTeamNumber;}
 
 private:

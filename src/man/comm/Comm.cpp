@@ -114,6 +114,28 @@ void Comm::receive()
     pthread_mutex_unlock (&comm_mutex);
 }
 
+GameData Comm::getGameData()
+{
+    pthread_mutex_lock (&comm_mutex);
+
+    GameData d = *(gameConnect->getGameData());
+
+    pthread_mutex_unlock (&comm_mutex);
+
+    return d;
+}
+
+TeamMember Comm::getTeammate(int player)
+{
+    pthread_mutex_lock (&comm_mutex);
+
+    TeamMember m = *(teamConnect->getTeamMate(player));
+
+    pthread_mutex_unlock (&comm_mutex);
+
+    return m;
+}
+
 void Comm::setLocData(int p,
                       float x , float y , float h ,
                       float xu, float yu, float hu)
@@ -162,7 +184,7 @@ int Comm::checkPlayerNumber(int p)
 
 void Comm::setTeamNumber(int tn)
 {
-    gameConnect->setMyTeamNumber(tn);
+    gameConnect->setMyTeamNumber(tn, myPlayerNumber());
 }
 
 int Comm::teamNumber()

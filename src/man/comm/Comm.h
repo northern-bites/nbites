@@ -71,6 +71,16 @@ public:
      */
     void receive();
 
+    /**
+     * Returns a pointer to the GameData object for other systems.
+     */
+    GameData getGameData();
+
+    /**
+     * Returns a pointer to a specific teammate.
+     */
+    TeamMember getTeammate(int player);
+
 /*****************************************************
  * When updating the following functions, be sure to *
  * update them in TeamConnect as well!               *
