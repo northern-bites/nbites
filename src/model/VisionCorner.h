@@ -18,6 +18,7 @@ public:
     int x() { return imageCoordinates[X_VALUE]; }
     int y() { return imageCoordinates[Y_VALUE]; }
     bool green();
+    bool behind() { return (cameraCoordinates[Z_VALUE] < 0) ; }
 
 private:
     FieldCorner concrete;

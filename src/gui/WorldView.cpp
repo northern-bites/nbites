@@ -141,7 +141,7 @@ void WorldView::paintEvent(QPaintEvent *event)
     // coordinate system to center of the goalie and rotates before
     // drawing
     painter.translate(world.robotX(), world.robotY());
-    painter.rotate(world.robotH()+180);
+    painter.rotate(-world.robotH());
     painter.drawEllipse(-(0.5*ROBOT_X_SIZE), -(0.5*ROBOT_Y_SIZE),
                         ROBOT_X_SIZE, ROBOT_Y_SIZE);
 

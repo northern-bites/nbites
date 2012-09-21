@@ -28,14 +28,25 @@ void ImageView::paintEvent(QPaintEvent* event)
 
     QPen pen(Qt::white);
 
-    pen.setWidth(6);
-    painter.setPen(pen);
-
     // Draw locations of visible corners
     CornerVector visible = image.visibleCorners;
     for (CornerVector::iterator i = visible.begin();
          i != visible.end(); i++)
     {
-        painter.drawPoint(i->x(), i->y());
+        if (i->green())
+        {
+            pen.setColor(Qt::darkGreen);
+            pen.setWidth(6);
+            painter.setPen(pen);
+        }
+        else
+        {
+            pen.setColor(Qt::white);
+            pen.setWidth(6);
+            painter.setPen(pen);
+        }
+
+        if (!i->behind())
+            painter.drawPoint(i->x(), i->y());
     }
 }
