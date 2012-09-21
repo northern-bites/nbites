@@ -17,7 +17,6 @@ import noggin_constants as Constants
 import loggingBoard
 
 # Modules from this directory
-from . import GameController
 from . import FallController
 from . import Stability
 from . import Loc
@@ -60,9 +59,9 @@ class Brain(object):
         self.vision = vision.vision
         self.sensors = sensors.sensors
         self.logger = loggingBoard.loggingBoard
-        self.comm = comm.inst
-        self.comm.gc.team = TeamConfig.TEAM_NUMBER
-        self.comm.gc.player = TeamConfig.PLAYER_NUMBER
+        self.comm = comm.comm
+        self.comm.setTeam(TeamConfig.TEAM_NUMBER)
+        self.comm.setPlayer(TeamConfig.PLAYER_NUMBER)
 
         #initalize the leds
         #print leds
@@ -93,11 +92,8 @@ class Brain(object):
         self.my = MyInfo(self.loc)
 
         # Functional Variables
-        self.my.playerNumber = self.comm.gc.player
-        if self.comm.gc.color == GameController.TEAM_BLUE:
-            self.my.teamColor = Constants.teamColor.TEAM_BLUE
-        else:
-            self.my.teamColor = Constants.teamColor.TEAM_RED
+        self.my.playerNumber = TeamConfig.PLAYER_NUMBER
+        self.my.teamColor = Constants.teamColor.TEAM_BLUE
 
         # Information about the environment
         self.initFieldObjects()
@@ -106,8 +102,6 @@ class Brain(object):
 
         self.play = Play.Play()
         self.sonar = Sonar.Sonar()
-        if Constants.LOG_COMM:
-            self.out.startCommLog()
 
         # Stability data
         self.stability = Stability.Stability(self.sensors)
@@ -232,7 +226,7 @@ class Brain(object):
         self.sonar.updateSensors(self.sensors)
 
         # Communications update
-        self.updateComm()
+        self.getCommUpdate()
 
         # Update objects
         self.updateObjects()
@@ -249,25 +243,17 @@ class Brain(object):
         self.nav.run()
 
         # Broadcast Report for Teammates
-        self.setPacketData()
+        self.setCommData()
 
         # Update any logs we have
         self.out.updateLogs()
 
-    def updateComm(self):
-        temp = self.comm.latestComm()
-        for packet in temp:
-            if len(packet) == Constants.NUM_PACKET_ELEMENTS:
-                packet = Packet.Packet(packet)
-                if packet.playerNumber != self.my.playerNumber:
-                    self.teamMembers[packet.playerNumber-1].update(packet)
-                if Constants.LOG_COMM:
-                    self.out.logRComm(packet)
-        # update the activity of our teammates here
-        # active field is set to true upon recipt of a new packet.
-        for mate in self.teamMembers:
-            if (mate.active and mate.isDead()):
-                mate.active = False
+    def getCommUpdate(self):
+        for i in range(len(self.teamMembers))
+        mates = comm.teammate(i+1)
+
+        for mate in mates:
+            self.teamMembers[packet.playerNumber-1].update(mate)
 
     def updateObjects(self):
         """
@@ -287,51 +273,13 @@ class Brain(object):
         self.playbook.update(self.play)
 
     # move to comm
-    def setPacketData(self):
+    def setCommData(self):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
         loc = self.loc
-        self.comm.setData(loc.x,
-                          loc.y,
-                          loc.h,
-                          loc.xUncert,
-                          loc.yUncert,
-                          loc.hUncert,
-                          loc.ballX,
-                          loc.ballY,
-                          loc.ballXUncert,
-                          loc.ballYUncert,
-                          self.ball.dist,
-                          self.ball.bearing,
-                          self.play.role,
+        self.comm.setData(self.play.role,
                           self.play.subRole,
-                          self.playbook.pb.me.chaseTime,
-                          loc.ballVelX,
-                          loc.ballVelY)
-
-        # TODO: remove this and log through C++ and the Logger instead.
-        if Constants.LOG_COMM:
-            packet = Packet.Packet((TeamConfig.TEAM_NUMBER,
-                                    TeamConfig.PLAYER_NUMBER,
-                                    self.my.teamColor,
-                                    loc.x,
-                                    loc.y,
-                                    loc.h,
-                                    loc.xUncert,
-                                    loc.yUncert,
-                                    loc.hUncert,
-                                    loc.ballX,
-                                    loc.ballY,
-                                    loc.ballXUncert,
-                                    loc.ballYUncert,
-                                    self.ball.dist,
-                                    self.ball.bearing,
-                                    self.play.role,
-                                    self.play.subRole,
-                                    self.playbook.pb.me.chaseTime,
-                                    loc.ballVelX,
-                                    loc.ballVelY))
-            self.out.logSComm(packet)
+                          self.playbook.pb.me.chaseTime)
 
     def resetLocalization(self):
         """
