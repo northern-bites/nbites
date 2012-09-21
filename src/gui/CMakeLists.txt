@@ -14,10 +14,12 @@ add_definitions(${QT_DEFINITIONS})
 
 set( gui_srcs ImageView.cpp
   MainView.cpp
+  WorldView.cpp
 )
 
 set( gui_headers ImageView.h
   MainView.h
+  WorldView.h
 )
 
 ####### qt4

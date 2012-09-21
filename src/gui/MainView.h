@@ -6,6 +6,7 @@
 
 #include <QMainWindow>
 #include "ImageView.h"
+#include "WorldView.h"
 
 class MainWidget : public QWidget {
 Q_OBJECT
@@ -23,6 +24,7 @@ private:
     // View
     ImageView topImageView;
     ImageView bottomImageView;
+    WorldView worldView;
 };
 
 class MainView : public QMainWindow {

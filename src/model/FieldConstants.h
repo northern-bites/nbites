@@ -32,14 +32,14 @@ static const float FIELD_BOTTOM_Y        = EDGE_WIDTH;
 static const float FIELD_TOP_Y           = EDGE_WIDTH + FIELD_HEIGHT;
 
 static const float GOALBOX_BOTTOM_Y      = 0.5f *
-                                          (FIELD_HEIGHT - GOALBOX_HEIGHT);
+                                          (GREEN_HEIGHT - GOALBOX_HEIGHT);
 static const float GOALBOX_TOP_Y         = 0.5f *
-                                          (FIELD_HEIGHT + GOALBOX_HEIGHT);
+                                          (GREEN_HEIGHT + GOALBOX_HEIGHT);
 
-static const float BOTTOM_GOALPOST_Y     = 0.5f * (FIELD_HEIGHT - GOAL_WIDTH);
-static const float TOP_GOALPOST_Y        = 0.5f * (FIELD_HEIGHT + GOAL_WIDTH);
+static const float BOTTOM_GOALPOST_Y     = 0.5f * (GREEN_HEIGHT - GOAL_WIDTH);
+static const float TOP_GOALPOST_Y        = 0.5f * (GREEN_HEIGHT + GOAL_WIDTH);
 
-static const float CROSS_Y               = 0.5f * FIELD_HEIGHT;
+static const float CROSS_Y               = 0.5f * GREEN_HEIGHT;
 
 static const float GREEN_LEFT_EDGE_X     = 0;
 static const float GREEN_RIGHT_EDGE_X    = GREEN_WIDTH;
@@ -50,9 +50,12 @@ static const float FIELD_RIGHT_EDGE_X    = EDGE_WIDTH + FIELD_WIDTH;
 static const float LEFT_GOAL_X           = FIELD_LEFT_EDGE_X;
 static const float RIGHT_GOAL_X          = FIELD_RIGHT_EDGE_X;
 
+static const float LEFT_GOAL_BACK_X      = FIELD_LEFT_EDGE_X - GOAL_DEPTH;
+static const float RIGHT_GOAL_BACK_X     = FIELD_RIGHT_EDGE_X + GOAL_DEPTH;
+
 static const float LEFT_GOALBOX_FRONT_X  = FIELD_LEFT_EDGE_X + GOALBOX_WIDTH;
 static const float RIGHT_GOALBOX_FRONT_X = FIELD_RIGHT_EDGE_X - GOALBOX_WIDTH;
 
-static const float HALF_FIELD_X          = 0.5f * FIELD_WIDTH;
+static const float HALF_FIELD_X          = 0.5f * GREEN_WIDTH;
 
 
