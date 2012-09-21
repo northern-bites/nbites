@@ -26,6 +26,11 @@ Image::Image(World& state, Camera which) : world(state),
     }
 }
 
+void Image::update()
+{
+    updateCorners();
+}
+
 void Image::updateCorners()
 {
     visibleCorners.clear();

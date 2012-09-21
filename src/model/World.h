@@ -9,17 +9,14 @@
 
 typedef Eigen::Vector3f PhysicalBall;
 
-static const float BALL_DIAMETER = 6.5f;
-static const float BALL_RADIUS   = 0.5f * BALL_DIAMETER;
-
 class World{
 public:
     World() : ball(0, 0, BALL_RADIUS), robot() {};
     ~World() {};
 
-    float ballX() { return ball[0]; };
-    float ballY() { return ball[1]; };
-    float ballZ() { return ball[2]; };
+    float ballX() { return ball[X_VALUE]; };
+    float ballY() { return ball[Y_VALUE]; };
+    float ballZ() { return ball[Z_VALUE]; };
 
     float robotX() { return robot.getX(); }
     float robotY() { return robot.getY(); }
@@ -27,6 +24,15 @@ public:
 
     float headYaw() { return robot.getYaw(); }
     float headPitch() { return robot.getPitch(); }
+
+    void moveRobot(float dx, float dy, float dh);
+    void moveRobotTo(float xn, float yn, float hn);
+
+    void moveHead(float dy, float dp);
+    void moveHeadTo(float y, float p);
+
+    void moveBall(float dx, float dy);
+    void moveBallTo(float x, float y);
 
 private:
     PhysicalBall ball;

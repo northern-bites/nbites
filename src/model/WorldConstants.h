@@ -1,9 +1,26 @@
 /**
- * Constants specifying field size and location of objects.
+ * Constants specifying field size, object size, robot motion constraints.
  */
 
 #pragma once
 
+// Ball constants
+static const float BALL_DIAMETER = 6.5f;
+static const float BALL_RADIUS   = 0.5f * BALL_DIAMETER;
+
+// Robot head constants
+// From NAO documentation
+static const float MAX_HEAD_PITCH =   29.5f;
+static const float MIN_HEAD_PITCH =  -38.5f;
+static const float MAX_HEAD_YAW   =  119.5f;
+static const float MIN_HEAD_YAW   = -119.5f;
+
+// For using most vectors
+static const int X_VALUE = 0;
+static const int Y_VALUE = 1;
+static const int Z_VALUE = 2;
+
+// Field dimensions
 static const float FIELD_WIDTH           = 600.f;
 static const float FIELD_HEIGHT          = 400.f;
 static const float EDGE_WIDTH            = 70.f;

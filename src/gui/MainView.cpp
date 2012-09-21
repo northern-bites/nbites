@@ -8,9 +8,10 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent),
                                           bottomImage(world, BOTTOM),
                                           topImageView(topImage),
                                           bottomImageView(bottomImage),
-                                          worldView(world)
+                                          worldView(world),
+                                          controls(this)
 {
-    // For the image viewer and controls on the left
+    // For the two images
     QWidget* imagesView = new QWidget(this);
     QVBoxLayout* imagesLayout = new QVBoxLayout(imagesView);
 
@@ -32,11 +33,56 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent),
 
     imagesView->setLayout(imagesLayout);
 
+    // For the world view and controls
+    QWidget* worldControlView = new QWidget(this);
+    QVBoxLayout* worldControlLayout = new QVBoxLayout(worldControlView);
+
+    QLabel* worldLabel = new QLabel(tr("World State"));
+    worldControlLayout->addWidget(worldLabel);
+    worldControlLayout->addWidget(&worldView);
+    worldControlLayout->addWidget(&controls);
+
+    worldControlView->setLayout(worldControlLayout);
+
     // Combines them into the main layout
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
     mainLayout->addWidget(imagesView);
-    mainLayout->addWidget(&worldView);
+    mainLayout->addWidget(worldControlView);
     this->setLayout(mainLayout);
+
+    QObject::connect(&controls, SIGNAL(robotMoved(float, float, float)),
+                     this, SLOT(updateRobot(float, float, float)));
+    QObject::connect(&controls, SIGNAL(headMoved(float, float)),
+                     this, SLOT(updateHead(float, float)));
+    QObject::connect(&controls, SIGNAL(ballMoved(float, float)),
+                     this, SLOT(updateBall(float, float)));
+}
+
+void MainWidget::updateRobot(float x, float y, float h)
+{
+    world.moveRobotTo(x, y, h);
+    updateView();
+}
+
+void MainWidget::updateHead(float yaw, float pitch)
+{
+    world.moveHeadTo(yaw, pitch);
+    updateView();
+}
+
+void MainWidget::updateBall(float x, float y)
+{
+    world.moveBallTo(x, y);
+    updateView();
+}
+
+void MainWidget::updateView()
+{
+    topImage.update();
+    bottomImage.update();
+    topImageView.repaint();
+    bottomImageView.repaint();
+    worldView.repaint();
 }
 
 MainView::MainView() : QMainWindow()

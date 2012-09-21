@@ -8,7 +8,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include "../model/World.h"
-#include "../model/FieldConstants.h"
+#include "../model/WorldConstants.h"
 
 class WorldView : public QWidget
 {
@@ -16,7 +16,6 @@ class WorldView : public QWidget
 Q_OBJECT
 
 public:
-    WorldView();
     WorldView(World& state);
     ~WorldView() {};
 
@@ -27,5 +26,5 @@ protected:
     void paintEvent(QPaintEvent* event);
 
 private:
-    World world;
+    World& world;
 };

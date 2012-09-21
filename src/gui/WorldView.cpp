@@ -23,16 +23,12 @@ static const float CROSS_ARM = 0.5f*CROSS_WIDTH;
 
 static const int BALL_RAD = 5;
 
-static const int ROBOT_X_SIZE = 15;
-static const int ROBOT_Y_SIZE = 8;
+static const int ROBOT_X_SIZE = 20;
+static const int ROBOT_Y_SIZE = 10;
 
 static const int ARROW_START = -1;
 static const int ARROW_WIDTH = 2;
 static const int ARROW_DEPTH = 3;
-
-WorldView::WorldView() : world()
-{
-}
 
 WorldView::WorldView(World& state) : world(state)
 {
@@ -146,7 +142,8 @@ void WorldView::paintEvent(QPaintEvent *event)
     // drawing
     painter.translate(world.robotX(), world.robotY());
     painter.rotate(world.robotH()+180);
-    painter.drawEllipse(0, 0, ROBOT_X_SIZE, ROBOT_Y_SIZE);
+    painter.drawEllipse(-(0.5*ROBOT_X_SIZE), -(0.5*ROBOT_Y_SIZE),
+                        ROBOT_X_SIZE, ROBOT_Y_SIZE);
 
     // Arrow specifies direction the goalie is facing
     pen.setColor(Qt::darkBlue);

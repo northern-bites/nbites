@@ -4,15 +4,11 @@
 
 #pragma once
 
-// From NAO documentation
-static const float MAX_HEAD_PITCH =   29.5f;
-static const float MIN_HEAD_PITCH =  -38.5f;
-static const float MAX_HEAD_YAW   =  119.5f;
-static const float MIN_HEAD_YAW   = -119.5f;
+#include "WorldConstants.h"
 
 class RobotPosition {
 public:
-    RobotPosition();
+    RobotPosition() : x(0), y(0), h(0), headYaw(0), headPitch(0) {};
     ~RobotPosition() {};
 
     // Location control
@@ -24,17 +20,11 @@ public:
     float getY() { return y; }
     float getH() { return h; }
 
-    void moveRobot(float dx, float dy, float dh);
-    void moveRobotTo(float xn, float yn, float hn);
-
     // Head control
     void setYaw(float y) { headYaw  = y; }
     void setPitch(float p) { headPitch = p; }
     float getYaw() { return headYaw; }
     float getPitch() { return headPitch; }
-
-    void moveHead(float dy, float dp);
-    void moveHeadTo(float y, float p);
 
 private:
     float x;

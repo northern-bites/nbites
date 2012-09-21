@@ -5,14 +5,9 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include "FieldConstants.h"
+#include "WorldConstants.h"
 
 typedef Eigen::Vector3f FieldCorner;
-
-// What these vectors mean
-static const int X_VALUE = 0;
-static const int Y_VALUE = 1;
-static const int Z_VALUE = 2;
 
 // About corners
 static const int NUM_GREEN_CORNERS = 4;
