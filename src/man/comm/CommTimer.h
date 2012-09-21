@@ -8,10 +8,8 @@
 
 #include <vector>
 
-//TODO: include these
-//#include "CommDef.h"
-typedef long long llong;
-//#include "commconfig.h"
+#include "CommDef.h"
+#include "commconfig.h"
 
 class CommTimer
 {

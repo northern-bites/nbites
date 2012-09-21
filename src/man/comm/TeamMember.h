@@ -3,12 +3,9 @@
  * @author Wils Dawson 4/26/12
  */
 
-#ifndef TeamMember_H
-#define TeamMember_H
+#pragma once
 
-//TODO: Actually include this
-//#include "CommDef.h"
-typedef long long llong;
+#include "CommDef.h"
 
 static const int NUM_DATA_FIELDS = 13;
 
@@ -122,4 +119,3 @@ private:
     int   _lastSeqNum;        // The sequence number of the last packet used.
     bool  _active;            // Is the robot active.
 };
-#endif

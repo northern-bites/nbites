@@ -13,10 +13,7 @@
 
 #include "RoboCupGameControlData.h"
 
-//TODO: actually include Common.h
-//#include "Common.h"
-static const int NUM_PLAYERS_PER_TEAM = 4;
-#define DEBUG_COMM
+#include "Common.h"
 
 GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m)
     : _timer(t), _monitor(m)

@@ -21,10 +21,7 @@
 #include <ifaddrs.h>
 #include <cstdio>
 
-//Actually include this
-//#include "commconfig.h"
-#define DEBUG_COMM
-
+#include "commconfig.h"
 
 UDPSocket::UDPSocket()
 {

@@ -37,10 +37,16 @@ public:
      */
 
     int  currentState()  {return control.state;}
+    void advanceState();
+    void initial()       {control.state = STATE_INITIAL;}
 
     bool firstHalf()     {return control.firstHalf;}
 
+    int  myTeamColor();
+    void switchTeams();
+
     bool ourKickoff();
+    void toggleKickoff();
 
     int  secondState()   {return control.secondaryState;}
 
@@ -54,7 +60,7 @@ public:
 
     int  theirScore();
 
-    int goalDifferential() {return ourScore() - theirScore();}
+    int  goalDifferential() {return ourScore() - theirScore();}
 
     /**
      * @return: number of penalized robots for the given team.
@@ -88,10 +94,6 @@ public:
 
     void setMyTeamNumber(int tn){_myTeamNumber = tn;}
     int  myTeamNumber() {return _myTeamNumber;}
-
-    int  myTeamColor();
-
-    void switchTeams();
 
     const char* toString();
 

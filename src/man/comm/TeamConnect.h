@@ -11,9 +11,7 @@
 #include "TeamMember.h"
 #include "UDPSocket.h"
 
-//TODO: actually include Common.h
-//#include "Common.h"
-static const int NUM_PLAYERS_PER_TEAM = 4;
+#include "Common.h"
 
 class TeamConnect
 {

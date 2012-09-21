@@ -5,6 +5,8 @@
 
 #include "NetworkMonitor.h"
 
+#include "Common.h"
+
 // Constants for the latency monitor.
 static const int NUM_BINS_LATENCY = 30;
 static const double LOW_BIN_LATENCY = 1.0f;        // Low is 1 microsecond.
@@ -105,7 +107,7 @@ int NetworkMonitor::findPeakLatency()
 
 int NetworkMonitor::performHealthCheck(long long time)
 {
-    if (time - warningTime > 30 * 1000000)  //TODO: switch to MICROS_PER_SECOND
+    if (time - warningTime > 30 * MICROS_PER_SECOND)
     {
         setSentWarning(false);
     }
@@ -136,7 +138,7 @@ void NetworkMonitor::logOutput(long long time)
     using namespace std;
 
     // Don't log too often. ~30 sec.
-    if (time - lastOutput <= 30 * 1000000)  //TODO: switch to MICROS_PER_SECOND
+    if (time - lastOutput <= 30 * MICROS_PER_SECOND)
         return;
 
     // Update the output time.

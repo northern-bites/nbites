@@ -11,15 +11,8 @@
 
 #include "MulticastConfig.h"
 
-//TODO: clean this up and include the right files
-//#include "commconfig.h"
-#define DEBUG_COMM
-//#include "CommDef.h"
-static const int TEAM_PORT = 4000;
-#define UNIQUE_ID "B"  // Keep this as a define so that it stays 2 bytes, not 4.
-static const llong TEAMMATE_DEAD_THRESHOLD = 3000000;
-static const llong MIN_PACKET_DELAY = 0;
-static const int NUM_HEADER_BYTES = 16;
+#include "commconfig.h"
+#include "CommDef.h"
 
 TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
     : timer(t), monitor(m)
@@ -224,12 +217,12 @@ int TeamConnect::verify(char* packet, int player, int team)
     // two clocks will reach an equilibrium point (within a
     // reasonable margin of error) without the use of internet
     // based clock syncronizing (don't need outside world).
-    int newOffset = 0;
+    llong newOffset = 0;
 
     if (ts + MIN_PACKET_DELAY > currtime)
     {
         newOffset = ts + MIN_PACKET_DELAY - currtime;
-        timer->setOffset(newOffset);
+        timer->addToOffset(newOffset);
     }
     robot->setLastPacketTime(ts);
 

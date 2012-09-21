@@ -28,23 +28,12 @@
 #include <time.h>
 #include <sys/time.h>  //TODO: Do we need for Robots?
 
-//TODO: Actually include the following
-//#include "Profiler.h"
-//#include "Common.h"
-static long long monotonic_micro_time(void)
-{
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return tv.tv_sec * 1000000 + tv.tv_usec;
-}
+#include "Profiler.h"
+#include "Common.h"
 
-//TODO: Extend Thread
 Comm::Comm()
-//  : Thread("Comm")
+  : Thread("Comm")
 {
-//TODO: Clean these two up.
-    running = true;
-
     timer = new CommTimer(&monotonic_micro_time);
     monitor = new NetworkMonitor(timer->timestamp());
 
@@ -66,17 +55,14 @@ Comm::~Comm()
     pthread_mutex_destroy(&comm_mutex);
 }
 
-int Comm::start()
+int  Comm::start()
 {
-//TODO: implement this.
-//  return Thread::start();
-    return 0;
+    return Thread::start();
 }
 
 void Comm::stop()
 {
-//TODO: implement this.
-//  Thread::stop();
+    Thread::stop();
 }
 
 void Comm::run()
@@ -86,8 +72,7 @@ void Comm::run()
 
     while(running)
     {
-        //TODO: Start the profiler.
-        //PROF_ENTER(P_COMM);
+        PROF_ENTER(P_COMM);
 
         receive();
 
@@ -104,8 +89,7 @@ void Comm::run()
         if (timer->timeToSend())
             send();
 
-        //TODO: Stop the profiler.
-        //PROF_EXIT(P_COMM);
+        PROF_EXIT(P_COMM);
     }
 }
 

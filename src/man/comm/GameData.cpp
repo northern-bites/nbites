@@ -49,6 +49,40 @@ void GameData::setControl(char* p)
     memcpy(&control, p, sizeof(RoboCupGameControlData));
 }
 
+void GameData::advanceState()
+{
+    int currentState = control.state;
+    if (currentState == STATE_INITIAL)
+        control.state = STATE_READY;
+    else if (currentState == STATE_READY)
+        control.state = STATE_SET;
+    else if (currentState == STATE_SET)
+        control.state = STATE_PLAYING;
+    else if (currentState == STATE_PLAYING){
+        RobotInfo me = control.teams[myTeamIndex()].players[_myPlayerNumber-1];
+        if (me.penalty)
+        {
+            me.penalty = PENALTY_NONE;
+            me.secsTillUnpenalised = 0;
+        }
+        else
+        {
+            me.penalty = PENALTY_MANUAL;
+            me.secsTillUnpenalised = 30;
+            //TODO: Send something to a remote GC. We don't have a
+            // reference to GameConnect right now, so that's hard. But!
+            // with the new architecture we shouldn't be calling this
+            // function from outside Comm Module anyway =D
+        }
+    }
+}
+
+void GameData::toggleKickoff()
+{
+    control.kickOffTeam = ((control.kickOffTeam == TEAM_BLUE) ?
+                           TEAM_RED : TEAM_BLUE);
+}
+
 bool GameData::ourKickoff()
 {
     return (control.teams[myTeamIndex()].teamColour == control.kickOffTeam);

@@ -24,19 +24,18 @@
 #pragma once
 
 #include <pthread.h>
+#include "synchro/synchro.h"
 
 #include "TeamConnect.h"
+#include "TeamMember.h"
 #include "GameConnect.h"
+#include "GameData.h"
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
 
-//TODO: extend Thread
-class Comm// : public Thread
+class Comm : public Thread
 {
 public:
-    //TODO: This is in the Thread class
-    bool running;
-
     /**
      * Constructor.
      */
