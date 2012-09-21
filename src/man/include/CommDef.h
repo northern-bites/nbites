@@ -21,6 +21,7 @@
 #endif
 
 #define UDP_PORT  4000
+#define TEAM_PORT 4000
 #define TCP_PORT  4001
 #define TOOL_PORT 4002
 static const short STREAMING_PORT_BASE = 4096;
@@ -95,7 +96,8 @@ static const int TOOL_ACCEPT_NAME_OFFSET = TOOL_ACCEPT_LEN + 3;
 // Comm constants and MACRO definitions
 //
 
-#define PACKET_HEADER "ilikeyoulots"
+#define UNIQUE_ID "B" // keep this as define so it stays 2 bytes, not 4.
+static const int NUM_HEADER_BYTES = 16;
 
 static const long PACKETS_PER_SECOND = 6;
 static const long SLEEP_MILLIS = 5000;
@@ -117,25 +119,4 @@ static const long long MIN_PACKETS_PER_SECOND = 4;   // 4 packets pers second.
 static const long long TEAMMATE_DEAD_THRESHOLD = 3 * MICROS_PER_SECOND;
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;
-
-typedef struct CommPacketHeader_t
-{
-    char header[sizeof(PACKET_HEADER)];
-    llong timestamp;
-    int number;
-    int team;
-    int player;
-    int color;
-} CommPacketHeader;
-
-typedef struct CommTeammatePacketInfo_t 
-{
-    CommTeammatePacketInfo_t()
-    : timestamp(0), lastNumber(0)
-	{ }
-
-    llong timestamp;       // Timestamp of last received packet.
-    int lastNumber;        // (Unique) number of last packet received.
-} CommTeammatePacketInfo;
-
 #endif /* CommDef.h */
