@@ -57,7 +57,7 @@ class GameController(FSA.FSA):
             elif gcState == STATE_READY:
                 self.switchTo('penaltyShotsGameReady')
             elif gcState == STATE_PLAYING:
-                if not self.brain.playbook.pb.me.active:
+                if self.gd.isOurPlayerPenalized(self.brain.my.playerNumber):
                     self.switchTo('penaltyShotsGamePenalized')
                 else:
                     self.switchTo("penaltyShotsGamePlaying")
@@ -67,7 +67,7 @@ class GameController(FSA.FSA):
                 self.printf("ERROR: INVALID GAME CONTROLLER STATE")
         elif self.gd.secondaryState == STATE2_NORMAL:
             if gcState == STATE_PLAYING:
-                if not self.brain.playbook.pb.me.active:
+                if self.gd.isOurPlayerPenalized(self.brain.my.playerNumber):
                     self.switchTo("gamePenalized")
                 else:
                     self.switchTo("gamePlaying")

@@ -194,14 +194,9 @@ class TeamMember(RobotLocation):
     def isPenalized(self):
         """
         this checks GameController to see if a player is penalized.
-        this check is more redundant than anything, because our players stop
-        sending packets when they are penalized, so they will most likely
-        fall under the isTeammateDead() check anyways.
         """
-        #penalty state is the first item the player tuple [0]
-        #penalty state == 1 is penalized
         return (
-            self.brain.gameController.gc.players(self.playerNumber)[0]!=0
+            self.brain.comm.gd.isOurPlayerPenalized(self.playerNumber)
            )
 
     def __str__(self):

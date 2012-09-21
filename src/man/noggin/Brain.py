@@ -249,11 +249,9 @@ class Brain(object):
         self.out.updateLogs()
 
     def getCommUpdate(self):
-        for i in range(len(self.teamMembers))
-        mates = comm.teammate(i+1)
-
-        for mate in mates:
-            self.teamMembers[packet.playerNumber-1].update(mate)
+        for i in range(len(self.teamMembers)):
+            mate = comm.teammate(i+1)
+            self.teamMembers[i].update(mate)
 
     def updateObjects(self):
         """
