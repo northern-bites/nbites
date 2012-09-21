@@ -4,13 +4,13 @@
 
 #pragma once
 
-#include <QtGui>
+#include <QWidget>
+#include <QPainter>
+
 #include "../model/ImageConstants.h"
 #include "../model/Image.h"
 
-class ImageView : public QWidget
-{
-
+class ImageView : public QWidget {
 Q_OBJECT
 
 public:

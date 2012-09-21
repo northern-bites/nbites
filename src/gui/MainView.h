@@ -5,22 +5,9 @@
 #pragma once
 
 #include <QMainWindow>
-#include "../model/Model.h"
 #include "ImageView.h"
 
-class MainWidget;
-
-class MainView : public QMainWindow {
-
-Q_OBJECT
-
-public:
-    MainView();
-    ~MainView() {};
-};
-
 class MainWidget : public QWidget {
-
 Q_OBJECT
 
 public:
@@ -36,4 +23,12 @@ private:
     // View
     ImageView topImageView;
     ImageView bottomImageView;
+};
+
+class MainView : public QMainWindow {
+Q_OBJECT
+
+public:
+    MainView();
+    ~MainView() {};
 };

@@ -14,10 +14,11 @@ static const int ERROR = -9999;
 typedef std::vector<VisionCorner> CornerVector;
 
 class Image {
-    friend class ImageView;
 public:
     Image(World& state, Camera which);
     ~Image(){};
+
+    friend class ImageView;
 
     // Update all of the vision information
     void update();
