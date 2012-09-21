@@ -9,8 +9,8 @@
 #include "Profiler.h"
 #include "PyVision.h"
 #include "BallEKF.h"
-#include "Comm.h"
-#include "GameController.h"
+class Comm;
+#include "PyComm.h"
 #include "RoboGuardian.h"
 #include "Sensors.h"
 #include "PyConstants.h"
@@ -61,13 +61,14 @@ private:
     void initializeLocalization();
     // Run the localization update; performed at every run step
     void updateLocalization();
+    // Send relevant information to Comm
+    void updateComm();
     //Process button  clicks that pertain to GameController manipulation
-    void processGCButtonClicks();
+    void processButtonClicks();
 
 private:
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
-    boost::shared_ptr<GameController> gc;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
 
