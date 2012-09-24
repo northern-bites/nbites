@@ -621,13 +621,13 @@ public class VisionState {
 					thresholdedImage.getVisionLink().
 						setDebugShooting(shootingBox.isSelected());}
 			});
-		final JCheckBox edgeDetectionBox = new
+        final JCheckBox edgeDetectionBox = new
             JCheckBox(" Debug Edge Detection");
-		edgeDetectionBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-					thresholdedImage.getVisionLink().
-						setDebugEdgeDetection(edgeDetectionBox.isSelected());}
-			});
+        edgeDetectionBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                    thresholdedImage.getVisionLink().
+                        setDebugEdgeDetection(edgeDetectionBox.isSelected());}
+            });
 
         final JCheckBox houghTransformBox = new
             JCheckBox(" Debug Hough Transform");
@@ -651,38 +651,47 @@ public class VisionState {
                         setDebugDangerousBall(dangerBox.isSelected());}
             });
 
-		buttonPanel.add(new JLabel("\tField Line Flags"));
-		buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
-		buttonPanel.add(fieldLinesDebugHorEdgeDetectBox);
-		buttonPanel.add(fieldLinesDebugCornerAndObjectDistancesBox);
-		buttonPanel.add(fieldLinesDebugSecondVertEdgeDetectBox);
-		buttonPanel.add(fieldLinesDebugCreateLinesBox);
-		buttonPanel.add(fieldLinesDebugFitUnusedPointsBox);
-		buttonPanel.add(fieldLinesDebugJoinLinesBox);
-		buttonPanel.add(fieldLinesDebugExtendLinesBox);
-		buttonPanel.add(fieldLinesDebugIntersectLinesBox);
-		buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
-		buttonPanel.add(fieldLinesDebugCcScanBox);
-		buttonPanel.add(fieldLinesDebugRiskyCornersBox);
-		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-		ballPanel.add(new JLabel("\tVision Flags"));
-		ballPanel.add(ballDebugBallBox);
-		ballPanel.add(ballDebugBallDistanceBox);
-		ballPanel.add(crossDebugBox);
-		ballPanel.add(postPrintBox);
-		ballPanel.add(postDebugBox);
-		ballPanel.add(postLogicBox);
-		ballPanel.add(postSanityBox);
-		ballPanel.add(postCorrectBox);
-		ballPanel.add(fieldHorizonBox);
-		ballPanel.add(fieldEdgeBox);
+        final JCheckBox visualLinesBox = new
+            JCheckBox(" Debug Visual Lines");
+        visualLinesBox.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    thresholdedImage.getVisionLink().
+                        setDebugVisualLines(visualLinesBox.isSelected());}
+            });
+
+        buttonPanel.add(new JLabel("\tField Line Flags"));
+        buttonPanel.add(fieldLinesDebugVertEdgeDetectBox);
+        buttonPanel.add(fieldLinesDebugHorEdgeDetectBox);
+        buttonPanel.add(fieldLinesDebugCornerAndObjectDistancesBox);
+        buttonPanel.add(fieldLinesDebugSecondVertEdgeDetectBox);
+        buttonPanel.add(fieldLinesDebugCreateLinesBox);
+        buttonPanel.add(fieldLinesDebugFitUnusedPointsBox);
+        buttonPanel.add(fieldLinesDebugJoinLinesBox);
+        buttonPanel.add(fieldLinesDebugExtendLinesBox);
+        buttonPanel.add(fieldLinesDebugIntersectLinesBox);
+        buttonPanel.add(fieldLinesDebugIdentifyCornersBox);
+        buttonPanel.add(fieldLinesDebugCcScanBox);
+        buttonPanel.add(fieldLinesDebugRiskyCornersBox);
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        ballPanel.add(new JLabel("\tVision Flags"));
+        ballPanel.add(ballDebugBallBox);
+        ballPanel.add(ballDebugBallDistanceBox);
+        ballPanel.add(crossDebugBox);
+        ballPanel.add(postPrintBox);
+        ballPanel.add(postDebugBox);
+        ballPanel.add(postLogicBox);
+        ballPanel.add(postSanityBox);
+        ballPanel.add(postCorrectBox);
+        ballPanel.add(fieldHorizonBox);
+        ballPanel.add(fieldEdgeBox);
         ballPanel.add(openFieldBox);
         ballPanel.add(shootingBox);
         ballPanel.add(edgeDetectionBox);
         ballPanel.add(houghTransformBox);
         ballPanel.add(robotBox);
-		ballPanel.add(dangerBox);
-		ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
+        ballPanel.add(dangerBox);
+        ballPanel.add(visualLinesBox);
+        ballPanel.setLayout(new BoxLayout(ballPanel, BoxLayout.Y_AXIS));
 
 		JPanel debugPanel = new JPanel();
 		debugPanel.setLayout(new GridLayout(1,1));
@@ -722,16 +731,23 @@ public class VisionState {
 		thresholdedImage.getVisionLink().setDebugBall(false);
 		thresholdedImage.getVisionLink().setDebugBallDistance(false);
 		thresholdedImage.getVisionLink().setDebugCross(false);
-		thresholdedImage.getVisionLink().setDebugPostPrint(false);
-		thresholdedImage.getVisionLink().setDebugPost(false);
+		//thresholdedImage.getVisionLink().setDebugPostPrint(false);
+		//thresholdedImage.getVisionLink().setDebugPost(false);
+		/*System.out.println("more3");
 		thresholdedImage.getVisionLink().setDebugPostLogic(false);
 		thresholdedImage.getVisionLink().setDebugPostSanity(false);
+		System.out.println("more4");
 		thresholdedImage.getVisionLink().setDebugPostCorrect(false);
 		thresholdedImage.getVisionLink().setDebugFieldHorizon(false);
+		System.out.println("more5");
 		thresholdedImage.getVisionLink().setDebugFieldEdge(false);
 		thresholdedImage.getVisionLink().setDebugEdgeDetection(false);
+		System.out.println("more6");
 		thresholdedImage.getVisionLink().setDebugHoughTransform(false);
 		thresholdedImage.getVisionLink().setDebugRobot(false);
+		System.out.println("more7");
 		thresholdedImage.getVisionLink().setDebugDangerousBall(false);
+		*/
+		System.out.println("going out");
 	}
 }

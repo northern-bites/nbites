@@ -1,3 +1,4 @@
+
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -37,6 +38,8 @@ using namespace boost::lambda;
 #include "NBMath.h"
 #include "Kinematics.h"
 using namespace Kinematics;
+using namespace man::corpus;
+using namespace man::memory;
 
 // static base image array, so we don't crash on image access if the setImage()
 // method is never called
@@ -47,7 +50,9 @@ static uint16_t global_image[NAO_IMAGE_BYTE_SIZE];
 //
 int Sensors::saved_frames = 0;
 
-Sensors::Sensors(boost::shared_ptr<Speech> s) :
+Sensors::Sensors(boost::shared_ptr<Speech> s,
+                 MVisionSensors::ptr mVisionSensors,
+                 MMotionSensors::ptr mMotionSensors) :
         speech(s),
         angles_mutex("angles"),
         vision_angles_mutex("vision_angles"),
@@ -69,10 +74,12 @@ Sensors::Sensors(boost::shared_ptr<Speech> s) :
         motionBodyAngles(Kinematics::NUM_JOINTS, 0.0f),
         bodyAnglesError(Kinematics::NUM_JOINTS, 0.0f),
         bodyTemperatures(Kinematics::NUM_JOINTS, 0.0f),
-        yImage(&global_image[0]), uvImage(&global_image[0]),
-        colorImage(reinterpret_cast<uint8_t*>(&global_image[0])),
-        naoImage(NULL),
-        roboImage(),
+        yBottomImage(&global_image[0]), uvBottomImage(&global_image[0]),
+        yTopImage(&global_image[0]), uvTopImage(&global_image[0]),
+        colorBottomImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+        colorTopImage(reinterpret_cast<uint8_t*>(&global_image[0])),
+        visionSensorsProvider(&Sensors::updateVisionSensorsInMemory, this, mVisionSensors),
+        motionSensorsProvider(&Sensors::updateMotionSensorsInMemory, this, mMotionSensors),
         varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
         fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
         unfilteredInertial(), chestButton(0.0f), batteryCharge(0.0f),
@@ -346,7 +353,7 @@ const float Sensors::getUltraSoundRight_cm() const {
 const SupportFoot Sensors::getSupportFoot() const {
     support_foot_mutex.lock();
 
-    SupportFoot foot = supportFoot;
+    SupportFoot foot = supportFootHistory.back();
 
     support_foot_mutex.unlock();
 
@@ -396,6 +403,13 @@ void Sensors::setBodyAngles(float* jointVPointers[]) {
      }
      cout << endl;
      */
+
+    bodyAngleHistory.push_back(bodyAngles);
+
+    if (bodyAngleHistory.size() > 10) {
+        bodyAngleHistory.pop_front();
+    }
+
     angles_mutex.unlock();
 }
 
@@ -546,7 +560,11 @@ void Sensors::setUltraSound(const float distLeft, const float distRight) {
 void Sensors::setSupportFoot(const SupportFoot _supportFoot) {
     support_foot_mutex.lock();
 
-    supportFoot = _supportFoot;
+    supportFootHistory.push_back(_supportFoot);
+
+    if (supportFootHistory.size() > 10) {
+        supportFootHistory.pop_front();
+    }
 
     support_foot_mutex.unlock();
 }
@@ -569,7 +587,7 @@ void Sensors::setMotionSensors(const FSR &_leftFoot, const FSR &_rightFoot,
 
     motion_sensors_mutex.unlock();
 
-    this->notifySubscribers(NEW_MOTION_SENSORS);
+    motionSensorsProvider.updateMemory();
 }
 
 /**
@@ -591,7 +609,7 @@ void Sensors::setVisionSensors(const FootBumper &_leftBumper,
     updateVisionDataVariance();
 
     vision_sensors_mutex.unlock();
-    this->notifySubscribers(NEW_VISION_SENSORS);
+    visionSensorsProvider.updateMemory();
 }
 
 void Sensors::setBatteryCharge(float charge) {
@@ -625,62 +643,134 @@ void Sensors::releaseImage() const {
  * think anyone else requires both mutexes locked at the same time. Beware
  * nonetheless.
  */
-void Sensors::updateVisionAngles() {
+//TODO: (octavian) rename this and clean up the history part
+// We keep a history of the past 10 angles to get the joints to sync
+// up to vision properly
+void Sensors::updateVisionAngles(int historyIndex) {
     angles_mutex.lock();
     vision_angles_mutex.lock();
 
-    visionBodyAngles = bodyAngles;
+    int i = 0;
+
+    AngleHistory::reverse_iterator it =  bodyAngleHistory.rbegin();
+    SupportFootHistory::reverse_iterator foot_it = supportFootHistory.rbegin();
+
+    //look back in history historyIndex number of joint sets
+    while (it != bodyAngleHistory.rend() && i != historyIndex) {
+        it++; i++; foot_it++;
+    }
+    visionBodyAngles = *it;
+    visionSupportFoot = *foot_it;
 
     vision_angles_mutex.unlock();
     angles_mutex.unlock();
 }
 
-//get a pointer to the full size Nao image
-//this image has been copied to some local buffer
-const uint8_t* Sensors::getNaoImage() const {
-    return naoImage;
+const uint16_t* Sensors::getYImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return yBottomImage;
+    else return yTopImage;
 }
 
-//get a pointer to the full size Nao image
-//this image has been copied to some local buffer
-uint8_t* Sensors::getWriteableNaoImage() {
-    return naoImage;
+const uint16_t* Sensors::getImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return yBottomImage;
+    else return yTopImage;
 }
 
-const uint16_t* Sensors::getYImage() const {
-    return yImage;
+const uint16_t* Sensors::getUVImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return uvBottomImage;
+    else return uvTopImage;
 }
 
-const uint16_t* Sensors::getImage() const {
-    return yImage;
+const uint8_t* Sensors::getColorImage(Camera::Type which) const {
+    if(which == Camera::BOTTOM) return colorBottomImage;
+    else return colorTopImage;
 }
 
-const uint16_t* Sensors::getUVImage() const {
-    return uvImage;
+void Sensors::setImage(const uint16_t *img, Camera::Type which) {
+    if(which == Camera::BOTTOM)
+    {
+        yBottomImage = img;
+        uvBottomImage = img + AVERAGED_IMAGE_SIZE;
+        colorBottomImage = reinterpret_cast<const uint8_t*>(img
+                                      + AVERAGED_IMAGE_SIZE * 3);
+    }
+    else
+    {
+        yTopImage = img;
+        uvTopImage = img + AVERAGED_IMAGE_SIZE;
+        colorTopImage = reinterpret_cast<const uint8_t*>(img
+                                   + AVERAGED_IMAGE_SIZE * 3);
+    }
 }
 
-const uint8_t* Sensors::getColorImage() const {
-    return colorImage;
+void Sensors::updateVisionSensorsInMemory(man::memory::MVisionSensors::ptr vs) const {
+
+    using namespace man::memory::proto;
+
+    vs->get()->clear_vision_body_angles();
+    vector<float> bodyAngles = this->getVisionBodyAngles();
+    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end();
+            i++) {
+        vs->get()->add_vision_body_angles(*i);
+    }
+
+    FootBumper leftFootBumper = this->getLeftFootBumper();
+    PSensors::PFootBumper* lfb = vs->get()->mutable_left_foot_bumper();
+    lfb->set_left(leftFootBumper.left);
+    lfb->set_right(leftFootBumper.right);
+    FootBumper rightFootBumper = this->getRightFootBumper();
+    PSensors::PFootBumper* rfb = vs->get()->mutable_right_foot_bumper();
+    rfb->set_left(rightFootBumper.left);
+    rfb->set_right(rightFootBumper.right);
+
+    vs->get()->set_ultra_sound_distance_left(this->getUltraSoundLeft());
+    vs->get()->set_ultra_sound_distance_right(this->getUltraSoundRight());
+
+    vs->get()->set_battery_charge(this->getBatteryCharge());
+    vs->get()->set_battery_current(this->getBatteryCurrent());
 }
 
-void Sensors::setNaoImagePointer(char* _naoImage) {
-    naoImage = reinterpret_cast<uint8_t*>(_naoImage);
-    roboImage.updateImagePointer(naoImage);
-}
+void Sensors::updateMotionSensorsInMemory(man::memory::MMotionSensors::ptr ms) const {
 
-void Sensors::notifyNewNaoImage() {
-    this->notifySubscribers(NEW_IMAGE);
-}
+    using namespace man::memory::proto;
 
-const man::memory::RoboImage* Sensors::getRoboImage() const {
-    return &roboImage;
-}
+    ms->get()->clear_body_angles();
+    vector<float> bodyAngles = this->getBodyAngles();
+    for (vector<float>::iterator i = bodyAngles.begin(); i != bodyAngles.end(); i++) {
+        ms->get()->add_body_angles(*i);
+    }
 
-void Sensors::setImage(const uint16_t *img) {
-    yImage = img;
-    uvImage = img + AVERAGED_IMAGE_SIZE;
-    colorImage = reinterpret_cast<const uint8_t*>(img
-            + AVERAGED_IMAGE_SIZE * 3);}
+    ms->get()->clear_body_temperatures();
+    vector<float> bodyTemperatures = this->getBodyTemperatures();
+    for (vector<float>::iterator i = bodyTemperatures.begin(); i != bodyTemperatures.end(); i++) {
+        ms->get()->add_body_temperatures(*i);
+    }
+
+    const Inertial _inertial = this->getInertial();
+    PSensors::PInertial* inertial = ms->get()->mutable_inertial();
+    inertial->set_acc_x(_inertial.accX);
+    inertial->set_acc_y(_inertial.accY);
+    inertial->set_acc_z(_inertial.accZ);
+    inertial->set_gyr_x(_inertial.accX);
+    inertial->set_gyr_y(_inertial.accY);
+    inertial->set_angle_x(_inertial.angleX);
+    inertial->set_angle_y(_inertial.angleY);
+
+    const FSR _lfsr = this->getLeftFootFSR();
+    PSensors::PFSR* lfsr = ms->get()->mutable_left_foot_fsr();
+    lfsr->set_front_left(_lfsr.frontLeft);
+    lfsr->set_front_right(_lfsr.frontRight);
+    lfsr->set_rear_left(_lfsr.rearLeft);
+    lfsr->set_rear_right(_lfsr.rearRight);
+    const FSR _rfsr = this->getRightFootFSR();
+    PSensors::PFSR* rfsr = ms->get()->mutable_right_foot_fsr();
+    rfsr->set_front_left(_rfsr.frontLeft);
+    rfsr->set_front_right(_rfsr.frontRight);
+    rfsr->set_rear_left(_rfsr.rearLeft);
+    rfsr->set_rear_right(_rfsr.rearRight);
+
+    ms->get()->set_support_foot(this->getSupportFoot());
+}
 
 void Sensors::resetSaveFrame() {
     saved_frames = 0;
@@ -813,6 +903,7 @@ float Sensors::percentBrokenSonar() {
 }
 
 // @TODO move this to Transcriber to write out from full size image...
+// BROKEN--Lizzie
 void Sensors::saveFrame() {
     int MAX_FRAMES = 5000;
     if (saved_frames > MAX_FRAMES)
@@ -832,7 +923,7 @@ void Sensors::saveFrame() {
     lockImage();
 
     // @TODO Write out entire 640x480 image
-    fout.write(reinterpret_cast<const char*>(getNaoImage()), NAO_IMAGE_BYTE_SIZE);
+    //fout.write(reinterpret_cast<const char*>(getNaoImage()), NAO_IMAGE_BYTE_SIZE);
     // write the version of the frame format at the end before joints/sensors
     fout << VERSION << " ";
 
@@ -885,6 +976,7 @@ void Sensors::saveFrame() {
 /**
  * Load a frame from a file and set the sensors and image data as
  * appropriate. Useful for running offline.
+ * BROKEN--Lizzie
  */
 void Sensors::loadFrame(string path) {
     fstream fin(path.c_str(), fstream::in);
@@ -897,7 +989,7 @@ void Sensors::loadFrame(string path) {
     // Load the image from the file, puts it straight into Sensors'
     // image buffer so it doesn't have to allocate its own buffer and
     // worry about deleting it
-    uint16_t * img = const_cast<uint16_t*>(getImage());
+    //uint16_t * img = const_cast<uint16_t*>(getImage());
     uint8_t  * byte_img = new uint8_t[320 * 240 * 2];
     fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
     releaseImage();
@@ -906,10 +998,10 @@ void Sensors::loadFrame(string path) {
 
     // Translate the loaded image into the proper format.
     // @TODO: Convert images to new format.
-    for (int i = 0; i < 320 * 240; ++i) {
-        img[i] = 0;
-        img[i] = static_cast<uint16_t>(byte_img[i << 1]);
-    }
+    //for (int i = 0; i < 320 * 240; ++i) {
+    //img[i] = 0;
+    //   img[i] = static_cast<uint16_t>(byte_img[i << 1]);
+    //}
     delete byte_img;
 
     releaseImage();

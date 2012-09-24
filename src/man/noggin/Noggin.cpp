@@ -7,7 +7,7 @@
 #include "nogginconfig.h"
 
 #include "EKFStructs.h"
-#include "MultiLocEKF.h"
+#include <cstdlib>
 #include "NaoPaths.h"
 
 #include "Comm.h"
@@ -20,6 +20,7 @@
 #include "PyLights.h"
 #include "PySpeech.h"
 #include "PyObjects.h"
+#include "PyGoalie.h"
 
 //#define DEBUG_POST_OBSERVATIONS
 //#define DEBUG_CORNER_OBSERVATIONS
@@ -29,12 +30,13 @@
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
-static const float MAX_CORNER_DISTANCE = 150.0f;
-static const float MAX_CROSS_DISTANCE = 150.0f;
+static const float MAX_CORNER_DISTANCE = 400.0f;
+static const float MAX_CROSS_DISTANCE = 200.0f;
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 using namespace std;
 using namespace boost;
 
+using namespace man::memory;
 using namespace man::memory::log;
 
 #ifdef LOG_LOCALIZATION
@@ -44,15 +46,17 @@ fstream outputFile;
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
-Noggin::Noggin (shared_ptr<Vision> v,
-                shared_ptr<Comm> c, shared_ptr<RoboGuardian> rbg,
-                shared_ptr<Sensors> _sensors, shared_ptr<LoggingBoard> loggingBoard,
-                MotionInterface * _minterface
+Noggin::Noggin (boost::shared_ptr<Vision> v,
+                boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
+                boost::shared_ptr<Sensors> _sensors, boost::shared_ptr<LoggingBoard> loggingBoard,
+                MotionInterface * _minterface, man::memory::Memory::ptr memory
                 )
     : vision(v),
       comm(c),
       sensors(_sensors),
+      guard(rbg),
       loggingBoard(loggingBoard),
+      memory(memory),
       chestButton(rbg->getButton(CHEST_BUTTON)),
       leftFootButton(rbg->getButton(LEFT_FOOT_BUTTON)),
       rightFootButton(rbg->getButton(RIGHT_FOOT_BUTTON)),
@@ -117,26 +121,26 @@ void Noggin::initializePython()
     c_init_comm();
     c_init_logging();
 
-    // Initialize PyVision module
     c_init_vision();
-
-    // Initlialize PyConstants module
     c_init_noggin_constants();
-
-    // Initialize PyLocation module
     c_init_objects();
+    c_init_goalie();
 }
 
 void Noggin::initializeLocalization()
 {
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
-    printf("Initializing localization modules\n");
+    printf("  Initializing localization modules\n");
 #   endif
 
-    // Initialize the localization module
-    loc = shared_ptr<LocSystem>(new MultiLocEKF());
+    locMotionSystem = shared_ptr<MotionSystem>(new MotionSystem());
+    locVisionSystem = shared_ptr<VisionSystem>(new VisionSystem(vision));
 
-    ballEKF = shared_ptr<BallEKF>(new BallEKF());
+    loc = shared_ptr<LocSystem>(new PF::ParticleFilter(locMotionSystem,
+                                                       locVisionSystem,
+                                                       memory->get<MLocalization>()));
+
+    ballEKF = boost::shared_ptr<BallEKF>(new BallEKF());
 
     // Setup the python localization wrappers
     set_loc_reference(loc);
@@ -301,90 +305,62 @@ void Noggin::updateComm()
 {
     comm->setLocData(0, loc->getXEst(), loc->getYEst(), loc->getHEst(),
                      loc->getXUncert(), loc->getYUncert(), loc->getHUncert());
-    comm->setBallData(0, ballEKF->getDistance(), ballEKF->getBearingDeg(),
+    comm->setBallData(0, (float)vision->ball->isOn(),
+                      ballEKF->getDistance(), ballEKF->getBearingDeg(),
                       0, 0);
 }
 
 void Noggin::updateLocalization()
 {
-    // Self Localization
-    MotionModel odometery = motion_interface->getOdometryUpdate();
+    const ::MotionModel odometry = motion_interface->getOdometryUpdate();
 
-    // Build the observations from vision data
-    vector<PointObservation> pt_observations;
-    vector<CornerObservation> corner_observations;
+    updateRobotFallenState(guard->isRobotFallen());
 
-    // FieldObjects
+    locMotionSystem->motionUpdate(odometry);
 
-    VisualFieldObject fo;
-    fo = *vision->bgrp;
+//    std::vector<PF::Observation> observations;
+//    std::vector<Landmark> landmarks;
+    float dist, theta;
 
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
-    }
+    // Get team of the robot for localization.
+    uint8 teamColor = (*gc->getMyTeam()).teamColor;
 
-    fo = *vision->bglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
-    }
+    // Observe Corners.
+//    float phi;
+//    const list<VisualCorner> * corners = vision->fieldLines->getCorners();
+//    list <VisualCorner>::const_iterator ci;
+//    for(ci = corners->begin(); ci != corners->end(); ++ci)
+//    {
+//        if (ci->getDistance() < MAX_CORNER_DISTANCE)
+//    {
+//        landmarks = constructLandmarks<VisualCorner, ConcreteCorner>(*ci);
+//        dist = ci->getDistance();
+//        theta = ci->getBearing();
+//        phi = ci->getPhysicalOrientation();
+//        observations.push_back(PF::CornerObservation(landmarks, dist,
+//                                                     theta, phi));
+//        }
+//        else{
+//            std::cout << "We saw a corner REALLY far away: "
+//                      << ci->getDistance()<< " centimeters away" <<std::endl
+//                      << "They can't be more than" << MAX_CORNER_DISTANCE
+//                      << " centimeters away." << std::endl;
+//        }
+//    }
 
-    fo = *vision->ygrp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
-    }
+    // Update the localiztion vision interface with Observations.
+//    locVisionSystem->feedObservations(observations);
 
-    fo = *vision->yglp;
-    if(fo.getDistance() > 0 && fo.getDistanceCertainty() != BOTH_UNSURE) {
-        PointObservation seen(fo);
-        pt_observations.push_back(seen);
-    }
+    // Now, run the particle filter.
+    MotionModel u_t;
+    std::vector<PointObservation> pt_z;
+    std::vector<CornerObservation> c_z;
+    loc->updateLocalization(u_t, pt_z, c_z);
 
-#       ifdef DEBUG_POST_OBSERVATIONS
-    vector<PointObservation>::iterator i;
-    for(i = pt_observations.begin(); i != pt_observations.end(); ++i){
-        cout << "Spotted post: " << *i << endl;
-    }
-#       endif
+    // HACK HACK HACK for testing particles
+//    loc->resetLocTo(500,321,-.349);
 
-
-    // Field Cross
-    if (vision->cross->getDistance() > 0 &&
-        vision->cross->getDistance() < MAX_CROSS_DISTANCE) {
-
-        PointObservation seen(*vision->cross);
-        pt_observations.push_back(seen);
-#       ifdef DEBUG_CROSS_OBSERVATIONS
-        cout << "Saw cross " << pt_observations.back() << endl;
-#       endif
-    }
-
-    // Corners
-#   ifdef USE_LOC_CORNERS
-    const list<VisualCorner> * corners = vision->fieldLines->getCorners();
-    list <VisualCorner>::const_iterator i;
-    for ( i = corners->begin(); i != corners->end(); ++i) {
-        if (i->getDistance() < MAX_CORNER_DISTANCE) {
-            CornerObservation seen(*i);
-            corner_observations.push_back(seen);
-
-#           ifdef DEBUG_CORNER_OBSERVATIONS
-            cout << "Saw corner "
-                 << ConcreteCorner::cornerIDToString(i->getID())
-                 << " at distance "
-                 << seen.getVisDistance() << " and bearing "
-                 << seen.getVisBearing() << endl;
-#           endif
-        }
-    }
-#   endif
-
-    // Process the information
-    PROF_ENTER(P_MCL);
-    loc->updateLocalization(odometery, pt_observations, corner_observations);
-    PROF_EXIT(P_MCL);
+    // END LOCALIZATION UPDATE //
 
     // Ball Tracking
     if (vision->ball->getDistance() > 0.0) {
@@ -436,7 +412,7 @@ void Noggin::updateLocalization()
 // #       endif
     }
 
-    ballEKF->updateModel(odometery, m, loc->getCurrentEstimate());
+    ballEKF->updateModel(odometry, m, loc->getCurrentEstimate());
 
 #   ifdef LOG_LOCALIZATION
     if (loggingLoc) {

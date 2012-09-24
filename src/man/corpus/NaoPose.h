@@ -33,10 +33,11 @@
  *  * Wiki line-plane intersection:  en.wikipedia.org/wiki/Line-plane_intersection
  *
  * The following coordinate frames will be important:
- *  * The camera frame. origin at the focal point, alligned with the head.
- *  * The body frame. origin at the center of mass (com), alligned with the torso.
- *  * The world frame. orgin at the center of mass, alligned with the ground
- *  * The horizon frame. origin at the focal point, alligned with the ground
+ *  * The camera frame. origin at the focal point, aligned with the head.
+ *  * The camera world frame. origin at the focal point, aligned with the ground
+ *  * The body frame. origin at the center of mass (com), aligned with the torso
+ *  * The world frame. orgin at the center of mass, aligned with the ground
+ *  * The horizon frame. origin at the focal point, aligned with the ground
  *
  * The following methods are central to the functioning of NaoPose:
  *  * tranform()     - must be called each frame. setups transformation matrices
@@ -162,7 +163,7 @@ class NaoPose {
     ~NaoPose() { }
 
     /********** Core Methods **********/
-    void transform ();
+    void transform (bool _isTopCam);
 
     /**
      * Takes a pixel and the height orthogonal from the ground
@@ -180,11 +181,41 @@ class NaoPose {
      * an estimate of the distance to the point (and the bearing)
      * all estimates are in CM
      */
-    const estimate pixEstimate(const int pixelX, const int pixelY,
-                               const float objectHeight);
-    const estimate sizeBasedEstimate(const int pixelX, const int pixelY, const float objectHeight,
-                                     const float pixelSize, const float realSize);
-    const estimate bodyEstimate(const int x, const int y, const float dist);
+    estimate pixEstimate(pixels pixelX, pixels pixelY, mms objectHeight) const;
+
+
+    /**
+     * Returns an estimate to a pixel in the image which represents the bottom
+     * of an object of known real-world size
+     *
+     * Note: because of the noise in estimates, objectHeight can usually considered
+     * to be 0 if small enough
+     *
+     * Note: this assumes the image and the real object are in parallel planes
+     * (usually true of posts and the ball, which is what we should use this for)
+     */
+    estimate estimateFromObjectSize(pixels pixelX, pixels pixelY, mms objectHeight,
+                                    float pixelSize, mms realSize) const;
+
+
+    /**
+     * Returns an estimate to a pixel in the image to which we know the ground (2D world) distance
+     * (a.k.a the distance from the robot's CoM projection on the ground to that pixel)
+     * and the height of that pixel from the ground
+     */
+    estimate estimateWithKnownDistance(pixels x, pixels y, mms objectHeight, cms groundDist) const;
+
+    /**
+     * Takes a pixel in the camera world frame and the known ground (world frame) distance
+     * to that pixel and extracts the bearing and the distance components;
+     *
+     * Computes the variance for the distance and the bearing
+     *
+     * Used internally by NaoPose
+     */
+    estimate makeEstimateFrom(ufvector4 pixelInCameraWorldFrame,
+                              mms groundDistance,
+                              mms objectHeight) const;
 
     /********** Getters **********/
     const int getHorizonY(const int x) const;
@@ -195,13 +226,11 @@ class NaoPose {
     const int getRightHorizonY() const { return horizonRight.y; }
     const float getHorizonSlope() const { return horizonSlope; }
     const float getPerpenSlope() const { return perpenHorizonSlope; }
-    const float pixHeightToDistance(float pixHeight, float cmHeight) const;
-    const float pixWidthToDistance(float pixWidth, float cmWidth) const;
     const float getHeadYaw() {
         return sensors->getVisionAngle(Kinematics::HEAD_YAW);
     }
     const float getDistanceBetweenTwoObjects(estimate e1, estimate e2);
-    std::vector<VisualLine> getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
+    std::vector<boost::shared_ptr<VisualLine> > getExpectedVisualLinesFromFieldPosition(float x, float y, float robotAngle);
     const boost::numeric::ublas::vector <float> worldPointToPixel(boost::numeric::ublas::vector <float> point);
     std::vector<angle::radians> headAnglesToRobotPoint(boost::numeric::ublas::vector <float> point);
 
@@ -209,12 +238,12 @@ class NaoPose {
         return sensors->getVisionAngle(Kinematics::HEAD_PITCH);
     }
     const float getBodyCenterHeight() const { return comHeight; }
-    const float getFocalPointInWorldFrameZ() const { return focalPointInWorldFrame.z;}
-    const float getFocalPointInWorldFrameX() const { return focalPointInWorldFrame.x;}
-    const float getFocalPointInWorldFrameY() const { return focalPointInWorldFrame.y;}
+    const float getFocalPointInWorldFrameZ() const { return cameraInWorldFrame.z;}
+    const float getFocalPointInWorldFrameX() const { return cameraInWorldFrame.x;}
+    const float getFocalPointInWorldFrameY() const { return cameraInWorldFrame.y;}
 
  protected: // helper methods
-    static const boost::numeric::ublas::matrix <float>
+    const boost::numeric::ublas::matrix <float>
         calculateForwardTransform(const Kinematics::ChainID id,
                                   const std::vector <float> &angles);
     static const boost::numeric::ublas::vector <float>
@@ -235,14 +264,6 @@ class NaoPose {
         return std::sqrt(x*x + y*y);
     }
 
-    //returns an 'estimate' object for a homogeneous vector pointing to an
-    //object in the world frame
-    static estimate getEstimate(boost::numeric::ublas::vector <float> objInWorldFrame);
-    // Usually our pix estimate is an overestimate of the distance to the pixel,
-    // so we have a fitting function which tries to correct the noise. This is
-    // that function.
-    static const float correctDistance(const float uncorrectedDist);
-
     // Variance as a function of distance
     // computed by Yoni Ackerman (c) 2011
     // to update - see the one file that Yoni added
@@ -256,7 +277,7 @@ class NaoPose {
     boost::shared_ptr<Sensors> sensors;
     point <int> horizonLeft, horizonRight;
     float horizonSlope,perpenHorizonSlope;
-    point3 <float> focalPointInWorldFrame;
+    point3 <float> cameraInWorldFrame;
     boost::numeric::ublas::matrix<float> supportLegToBodyTransform;
     float comHeight; // center of mass height in mm
     // In this array we hold the matrix transformation which takes us from the
@@ -268,6 +289,8 @@ class NaoPose {
     boost::numeric::ublas::matrix <float> cameraToWorldFrame;
     // Current hack for better beraing est
     boost::numeric::ublas::matrix <float> cameraToBodyTransform;
+
+    bool isTopCam; //true = using the top camera
 };
 
 #endif

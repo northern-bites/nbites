@@ -290,12 +290,13 @@ void TeamConnect::setLocData(int p,
     robot->setMyHUncert(hu);
 }
 
-void TeamConnect::setBallData(int p,
+void TeamConnect::setBallData(int p, float on,
                               float d , float b ,
                               float du, float bu)
 {
     TeamMember* robot = teamMates[p-1];
 
+    robot->setBallOn(on);
     robot->setBallDist(d);
     robot->setBallBearing(b);
     robot->setBallDistUncert(bu);

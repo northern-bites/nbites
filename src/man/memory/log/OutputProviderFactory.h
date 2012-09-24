@@ -18,9 +18,9 @@ namespace log {
 class OutputProviderFactory {
 
 public:
-    static void AllFileOutput(LoggingBoard* loggingBoard,
+    static void AllFileOutput(const Memory* memory, LoggingBoard* loggingBoard,
             std::string log_folder_path = common::paths::NAO_LOG_DIR);
-    static void AllSocketOutput(LoggingBoard* loggingBoard);
+    static void AllSocketOutput(const Memory* memory, LoggingBoard* loggingBoard);
 
 };
 

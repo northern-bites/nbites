@@ -22,6 +22,7 @@ void TeamMember::update(float* packet)
     setMyXUncert(*++ptr);
     setMyYUncert(*++ptr);
     setMyHUncert(*++ptr);
+    setBallOn(*++ptr);
     setBallDist(*++ptr);
     setBallBearing(*++ptr);
     setBallDistUncert(*++ptr);
@@ -41,6 +42,7 @@ void TeamMember::generatePacket(float* packet)
     *++ptr = myXUncert();
     *++ptr = myYUncert();
     *++ptr = myHUncert();
+    *++ptr = ballOn();
     *++ptr = ballDist();
     *++ptr = ballBearing();
     *++ptr = ballDistUncert();

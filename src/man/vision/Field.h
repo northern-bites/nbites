@@ -25,7 +25,7 @@ public:
 
     // main methods
     int findGreenHorizon(int pH, float sl);
-	void findConvexHull(int pH);
+    void findConvexHull(int pH);
     void initialScanForTopGreenPoints(int pH);
     void findTopEdges(int M);
     int getInitialHorizonEstimate(int pH);
@@ -33,6 +33,9 @@ public:
 	int horizonAt(int x);
 	float distanceToHorizon(int x, int y);
 	int ccw(point<int> p1, point<int> p2, point<int> p3);
+    int * getTopEdge(){
+        return topEdge;
+    }
 
     // scan operations
     int yProject(int startx, int starty, int newy);

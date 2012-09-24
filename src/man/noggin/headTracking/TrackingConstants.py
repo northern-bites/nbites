@@ -2,8 +2,8 @@ from man.motion import HeadMoves
 
 MAX_PAN_SPEED = 125.0              # deg/sec
 
-TRACKER_FRAMES_ON_TRACK_THRESH = 1
-TRACKER_FRAMES_OFF_REFIND_THRESH = 5
+TRACKER_FRAMES_ON_TRACK_THRESH = 3
+TRACKER_FRAMES_OFF_REFIND_THRESH = 10
 
 ####
 #### Active tracking constants
@@ -16,15 +16,19 @@ LOOK_FIELD_OBJ_FRAMES = 10
 
 PAN_UP_PITCH_THRESH = 10
 
-KICK_DICT = {"L_Side"          : HeadMoves.SIDEKICK_PAN_RIGHT,
-             "R_Side"          : HeadMoves.SIDEKICK_PAN_LEFT,
-             "L_Short_Side"    : HeadMoves.SIDEKICK_PAN_RIGHT,
-             "R_Short_Side"    : HeadMoves.SIDEKICK_PAN_LEFT,
-             "L_D_Straight"    : HeadMoves.FRONTKICK_PAN_LEFT,
-             "R_D_Straight"    : HeadMoves.FRONTKICK_PAN_RIGHT,
-             "L_ShortStraight" : HeadMoves.FRONTKICK_PAN_LEFT,
-             "R_ShortStraight" : HeadMoves.FRONTKICK_PAN_RIGHT,
-             "L_LongBack"      : HeadMoves.LOOK_DOWN,
-             "R_LongBack"      : HeadMoves.LOOK_DOWN,
-             "L_ShortBack"     : HeadMoves.LOOK_DOWN,
-             "R_ShortBack"     : HeadMoves.LOOK_DOWN}
+KICK_DICT = {"L_Side"           : 'lookRightFixedPitch',
+             "R_Side"           : 'lookLeftFixedPitch',
+             "L_Short_Side"     : 'lookRightFixedPitch',
+             "R_Short_Side"     : 'lookLeftFixedPitch',
+             "L_Straight"       : 'afterKickScan',
+             "R_Straight"       : 'afterKickScan',
+             "L_Short_Straight" : 'afterKickScan',
+             "R_Short_Straight" : 'afterKickScan',
+             "L_Quick_Straight" : 'afterKickScan',
+             "R_Quick_Straight" : 'afterKickScan',
+             "L_Big_Straight"   : 'afterKickScan',
+             "R_Big_Straight"   : 'afterKickScan',
+             "L_Long_Back"      : 'afterKickScan',
+             "R_Long_Back"      : 'afterKickScan',
+             "L_Short_Back"     : 'afterKickScan',
+             "R_Short_Back"     : 'afterKickScan'}

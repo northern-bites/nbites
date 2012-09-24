@@ -2,6 +2,7 @@
 #include "OfflineImageTranscriber.h"
 #include "ImageAcquisition.h"
 #include "VisionDef.h" // IMAGE_BYTE_SIZE
+#include "Camera.h"
 
 using namespace std;
 
@@ -9,13 +10,15 @@ namespace man {
 namespace corpus {
 
 OfflineImageTranscriber::OfflineImageTranscriber(
-		boost::shared_ptr<Sensors> s,
-		memory::MImage::const_ptr mImage)
-		: ThreadedImageTranscriber(s, "OfflineImageTranscriber"),
-		  mImage(mImage),
-		  table(new unsigned char[yLimit * uLimit * vLimit]),
-		  params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
-		  image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])){
+        boost::shared_ptr<Sensors> s,
+        memory::MRawImages::const_ptr rawImages)
+    : ThreadedImageTranscriber(s, "OfflineImageTranscriber"),
+      rawImages(rawImages),
+      table(new unsigned char[yLimit * uLimit * vLimit]),
+      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
+      topImage(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
+      bottomImage(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE]))
+{
 }
 
 OfflineImageTranscriber::~OfflineImageTranscriber() {
@@ -53,24 +56,29 @@ void OfflineImageTranscriber::initTable(const string &filename) {
 }
 
 void OfflineImageTranscriber::acquireNewImage() {
-    if (sensors->getWriteableNaoImage() != NULL) {
-        // TODO:
-        // this is how we make the image that gets passed to man offline
-        // appear valid in the memory viewer; this is slow; investigate a
-        // better way to do this
-        memcpy(sensors->getWriteableNaoImage(),
-              reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
-               NAO_IMAGE_BYTE_SIZE);
+    if (rawImages->get()->has_bottomimage()) {
         ImageAcquisition::acquire_image_fast(table, params,
-                sensors->getNaoImage(),
-                image);
-        sensors->setImage(image);
-        sensors->notifyNewNaoImage();
-    } else {
-        ImageAcquisition::acquire_image_fast(table, params,
-                reinterpret_cast<const uint8_t*>(mImage->get()->image().data()),
-                image);
+                reinterpret_cast<const uint8_t*>(rawImages->get()->bottomimage().image().data()),
+                bottomImage);
+        sensors->setImage(bottomImage, Camera::BOTTOM);
     }
+
+    if (rawImages->get()->has_topimage()) {
+        ImageAcquisition::acquire_image_fast(table, params,
+                     reinterpret_cast<const uint8_t*>(rawImages->get()->topimage().image().data()),
+                     topImage);
+             sensors->setImage(topImage, Camera::TOP);
+    }
+
+    if (rawImages->get()->vision_body_angles_size() > 0) {
+        std::vector<float> body_angles(rawImages->get()->vision_body_angles().begin(),
+                                       rawImages->get()->vision_body_angles().end());
+
+        sensors->setVisionBodyAngles(body_angles);
+    }
+
+    sensors->setVisionSupportFoot((SupportFoot) (rawImages->get()->support_foot()));
+
 }
 
 }

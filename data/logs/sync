@@ -1,0 +1,57 @@
+#!/bin/sh
+
+# Script to sync frames between robocup and your local frames folder
+
+
+USAGE="./sync [up-down] <folder-name> \nExample: $> ./sync down watson"
+
+UP_OR_DOWN=$1
+REMOTE_FOLDER=${2%/} #Strip the trailing slash if any
+
+RSYNC=rsync
+RSYNC_OPTS="-rvuza --chmod=ug+rw"
+
+
+if [ "$1" = "" ]; then
+    echo "No push direction specified"
+    echo $USAGE
+    exit 1
+fi
+
+if [ "$REMOTE_FOLDER" = "" ]; then
+    echo "No remote folder specified"
+    echo $USAGE
+    exit 1
+fi
+
+echo "Type username for RoboCup server, followed by [ENTER]"
+read username
+
+SERVER=$username@robocup.bowdoin.edu
+ROBOCUP_DIR=/mnt/research/robocup
+FRAMES_DIR=logs
+
+SYNC_UP="$RSYNC $RSYNC_OPTS ./$REMOTE_FOLDER/ $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/"
+SYNC_DOWN="$RSYNC $RSYNC_OPTS $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/ ./$REMOTE_FOLDER/"
+DIFF="$RSYNC $RSYNC_OPTS -n $SERVER:$ROBOCUP_DIR/$FRAMES_DIR/$REMOTE_FOLDER/ ./$REMOTE_FOLDER/"
+
+if [ "$UP_OR_DOWN" = "up" ]; then
+
+    echo $SYNC_UP
+    $SYNC_UP
+
+elif [ "$UP_OR_DOWN" = "down" ]; then
+
+    echo $SYNC_DOWN
+    $SYNC_DOWN
+
+elif [ "$UP_OR_DOWN"="diff" ]; then
+    echo "Getting diff"
+    echo $DIFF
+    $DIFF
+else
+    echo "Invalid parameters"
+    echo $USAGE
+    exit 1
+fi
+exit 0

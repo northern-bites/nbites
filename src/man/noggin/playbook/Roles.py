@@ -31,54 +31,62 @@ def rGoalie(team, workingPlay):
         team.brain.gameController.currentState == 'penaltyShotsGameSet'):
         SubRoles.pReadyGoalie(team, workingPlay)
 
-    # Get out of ready -> Just after kick off
-    elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
-        SubRoles.pGoalieKickOff(team, workingPlay)
+    elif (team.brain.player.currentState == 'clearIt' or
+        team.brain.player.currentState == 'kickBall' or
+        team.brain.player.currentState == 'didIKickIt'):
+        SubRoles.pGoalieChaser(team, workingPlay)
 
-    # Make sure we position when we come out of Penalized
-    # ToDo: find a way to use the after penalty states
-    elif workingPlay.isSubRole(PBConstants.PENALTY_SUB_ROLE):
+    else:
         SubRoles.pGoalieCenter(team, workingPlay)
 
-    # Kick off just happened or Penalty Kicking
-    elif workingPlay.isSubRole(PBConstants.GOALIE_KICKOFF):
-        if RoleTran.shouldPositionForSave(team):
-            SubRoles.pGoalieSave(team, workingPlay)
-        elif RoleTran.shouldChase(team):
-            SubRoles.pGoalieChaser(team, workingPlay)
-        else:
-            SubRoles.pGoalieKickOff(team, workingPlay)
+    # # Get out of ready -> Just after kick off
+    # elif workingPlay.isSubRole(PBConstants.READY_GOALIE):
+    #     SubRoles.pGoalieKickOff(team, workingPlay)
 
-    # Saving
-    # When saving gets more consistent going to want a
-    # way to get out of saving if ball is not coming.
-    elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
-        # if RoleTran.shouldNotSave(team):
-        #     SubRoles.pGoalieCenter(team, workingPlay)
-        if (team.brain.player.isSaving):
-            SubRoles.pGoalieSave(team, workingPlay)
-        elif RoleTran.shouldChase(team):
-            SubRoles.pGoalieChaser(team, workingPlay)
-        else:
-            SubRoles.pGoalieCenter(team, workingPlay)
+    # # Make sure we position when we come out of Penalized
+    # # ToDo: find a way to use the after penalty states
+    # elif workingPlay.isSubRole(PBConstants.PENALTY_SUB_ROLE):
+    #     SubRoles.pGoalieCenter(team, workingPlay)
 
-    # Chase
-    elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
-        if team.brain.player.inKickingState:
-            SubRoles.pGoalieChaser(team, workingPlay)
-        elif RoleTran.shouldStopChase(team):
-            SubRoles.pGoalieCenter(team, workingPlay)
-        else:
-            SubRoles.pGoalieChaser(team, workingPlay)
+    # # Kick off just happened or Penalty Kicking
+    # elif workingPlay.isSubRole(PBConstants.GOALIE_KICKOFF):
+    #     if RoleTran.shouldPositionForSave(team):
+    #         SubRoles.pGoalieSave(team, workingPlay)
+    #     elif RoleTran.shouldChase(team):
+    #         SubRoles.pGoalieChaser(team, workingPlay)
+    #     else:
+    #         SubRoles.pGoalieKickOff(team, workingPlay)
 
-    # Position
-    elif workingPlay.isSubRole(PBConstants.GOALIE_CENTER):
-        if RoleTran.shouldPositionForSave(team):
-            SubRoles.pGoalieSave(team, workingPlay)
-        elif RoleTran.shouldChase(team):
-            SubRoles.pGoalieChaser(team, workingPlay)
-        else:
-            SubRoles.pGoalieCenter(team, workingPlay)
+    # # Saving
+    # # When saving gets more consistent going to want a
+    # # way to get out of saving if ball is not coming.
+    # elif workingPlay.isSubRole(PBConstants.GOALIE_SAVE):
+    #     # if RoleTran.shouldNotSave(team):
+    #     #     SubRoles.pGoalieCenter(team, workingPlay)
+    #     if (team.brain.player.isSaving):
+    #         SubRoles.pGoalieSave(team, workingPlay)
+    #     elif RoleTran.shouldChase(team):
+    #         SubRoles.pGoalieChaser(team, workingPlay)
+    #     else:
+    #         SubRoles.pGoalieCenter(team, workingPlay)
+
+    # # Chase
+    # elif workingPlay.isSubRole(PBConstants.GOALIE_CHASER):
+    #     if team.brain.player.inKickingState:
+    #         SubRoles.pGoalieChaser(team, workingPlay)
+    #     elif RoleTran.shouldStopChase(team):
+    #         SubRoles.pGoalieCenter(team, workingPlay)
+    #     else:
+    #         SubRoles.pGoalieChaser(team, workingPlay)
+
+    # # Position
+    # elif workingPlay.isSubRole(PBConstants.GOALIE_CENTER):
+    #     if RoleTran.shouldPositionForSave(team):
+    #         SubRoles.pGoalieSave(team, workingPlay)
+    #     elif RoleTran.shouldChase(team):
+    #         SubRoles.pGoalieChaser(team, workingPlay)
+    #     else:
+    #         SubRoles.pGoalieCenter(team, workingPlay)
 
 def rChaser(team, workingPlay):
     '''sets current position for chaser since positioning is done by player'''
@@ -86,9 +94,7 @@ def rChaser(team, workingPlay):
         team.subRoleSwitchTime = 0
     workingPlay.setRole(PBConstants.CHASER)
     # Note: Don't use shouldSwitchSubRole here. Go for the ball immediately.
-    workingPlay.setSubRole(PBConstants.CHASE_NORMAL)
-    pos = (team.brain.my.x,team.brain.my.y, team.brain.ball.loc.heading)
-    workingPlay.setPosition(pos)
+    SubRoles.pChaser(team, workingPlay)
 
 def rDefender(team, workingPlay):
     '''gets positioning for defender'''

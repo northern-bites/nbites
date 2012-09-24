@@ -10,9 +10,11 @@ using namespace boost::assign;
 #include "CommDef.h"
 #include "Kinematics.h"
 #include "SensorDef.h"
+#include "Camera.h"
 
 using std::vector;
 using namespace boost;
+using namespace man::corpus;
 
 //
 // Debugging ifdef switches
@@ -43,11 +45,11 @@ void TOOLConnect::setLocalizationAccess (shared_ptr<LocSystem> _loc,
                                          shared_ptr<BallEKF> _ballEKF)
 {
 #ifdef USE_MM_LOC_EKF
-	loc = dynamic_pointer_cast<MMLocEKF>(_loc);
+    loc = dynamic_pointer_cast<MMLocEKF>(_loc);
 #else
-  loc = _loc;
+    loc = _loc;
 #endif
-  ballEKF = _ballEKF;
+    ballEKF = _ballEKF;
 }
 
 void
@@ -194,45 +196,45 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
     // Image data request
     if (r.image) {
         sensors->lockImage();
-        serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getNaoImage()),
-            NAO_IMAGE_BYTE_SIZE);
+//        serial.write_bytes(
+//            reinterpret_cast<const uint8_t*>(sensors->getNaoImage(Camera::BOTTOM)),
+//            NAO_IMAGE_BYTE_SIZE);
         sensors->releaseImage();
     }
 
     if (r.thresh)
         // send thresholded image
-        serial.write_bytes(
-            reinterpret_cast<const uint8_t*>(sensors->getColorImage()),
-            COLOR_IMAGE_BYTE_SIZE);
+//        serial.write_bytes(
+//            reinterpret_cast<const uint8_t*>(sensors->getColorImage(Camera::BOTTOM)),
+//            COLOR_IMAGE_BYTE_SIZE);
 
-    if (r.objects) {
-        if (loc.get()) {
-            vector<float> obs_values;
+        if (r.objects) {
+            if (loc.get()) {
+                vector<float> obs_values;
 
-            // Add point values to observed values
-            vector<PointObservation> obs =
-                loc->getLastPointObservations();
-            for (vector<PointObservation>::iterator i = obs.begin();
-                 i != obs.end() ; ++i){
-                obs_values.push_back(static_cast<float>(i->getID()));
-                obs_values.push_back(i->getVisDistance());
-                obs_values.push_back(i->getVisBearing());
+                // Add point values to observed values
+                vector<PointObservation> obs =
+                    loc->getLastPointObservations();
+                for (vector<PointObservation>::iterator i = obs.begin();
+                     i != obs.end() ; ++i){
+                    obs_values.push_back(static_cast<float>(i->getID()));
+                    obs_values.push_back(i->getVisDistance());
+                    obs_values.push_back(i->getVisBearing());
+                }
+
+                // Add corners to observed values
+                vector<CornerObservation> corners =
+                    loc->getLastCornerObservations();
+                for (vector<CornerObservation>::iterator i = corners.begin();
+                     i != corners.end() ; ++i){
+                    obs_values.push_back(static_cast<float>(i->getID()));
+                    obs_values.push_back(i->getVisDistance());
+                    obs_values.push_back(i->getVisBearing());
+                }
+
+                serial.write_floats(obs_values);
             }
-
-            // Add corners to observed values
-            vector<CornerObservation> corners =
-                loc->getLastCornerObservations();
-            for (vector<CornerObservation>::iterator i = corners.begin();
-                 i != corners.end() ; ++i){
-                obs_values.push_back(static_cast<float>(i->getID()));
-                obs_values.push_back(i->getVisDistance());
-                obs_values.push_back(i->getVisBearing());
-            }
-
-            serial.write_floats(obs_values);
         }
-    }
 
     if (r.local) {
         // send localization data
@@ -253,42 +255,42 @@ TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
                 ballEKF->getGlobalXVelocityUncert(),
                 ballEKF->getGlobalYVelocityUncert();
 
-          loc_values += loc->getLastOdo().deltaF, loc->getLastOdo().deltaL,
-                        loc->getLastOdo().deltaR;
+            loc_values += loc->getLastOdo().x, loc->getLastOdo().y,
+                loc->getLastOdo().theta;
         } else
-          for (int i = 0; i < 19; i++)
-            loc_values += 0;
+            for (int i = 0; i < 19; i++)
+                loc_values += 0.0f;
 
         serial.write_floats(loc_values);
     }
 
-	if (r.comm) {
-		vector<int> gc_values;
-		gc_values += gameController->team(),
-			gameController->player(),
-			gameController->color();
-		serial.write_ints(gc_values);
-	}
+    if (r.comm) {
+        vector<int> gc_values;
+        gc_values += gameController->team(),
+            gameController->player(),
+            gameController->color();
+        serial.write_ints(gc_values);
+    }
 
-	if (r.mmekf){
+    if (r.mmekf){
 #ifdef USE_MM_LOC_EKF
-		const list<LocEKF*> models = loc->getModels();
-		list<LocEKF*>::const_iterator model;
-		vector<float> mm_values;
+        const list<LocEKF*> models = loc->getModels();
+        list<LocEKF*>::const_iterator model;
+        vector<float> mm_values;
 
-		for(model = models.begin(); model != models.end() ; ++model){
-			if (!(*model)->isActive())
-				continue;
-			mm_values += (*model)->getXEst(),
-				(*model)->getYEst(),
-				(*model)->getHEst(),
-				(*model)->getXUncert(),
-				(*model)->getYUncert(),
-				(*model)->getHUncert();
-		}
-		serial.write_floats(mm_values);
+        for(model = models.begin(); model != models.end() ; ++model){
+            if (!(*model)->isActive())
+                continue;
+            mm_values += (*model)->getXEst(),
+                (*model)->getYEst(),
+                (*model)->getHEst(),
+                (*model)->getXUncert(),
+                (*model)->getYUncert(),
+                (*model)->getHUncert();
+        }
+        serial.write_floats(mm_values);
 #endif
-	}
+    }
 }
 
 void

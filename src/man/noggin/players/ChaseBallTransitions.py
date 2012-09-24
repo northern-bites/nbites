@@ -13,7 +13,43 @@ def shouldChaseBall(player):
     ball = player.brain.ball
     return (ball.vis.framesOn > constants.BALL_ON_THRESH)
 
-def ballInPosition(player):
+def shouldPrepareForKick(player):
+    """
+    We're close enough to prepare for a kick
+    """
+    ball = player.brain.ball
+    return ball.vis.framesOn > 4 and ball.dist < constants.PREPARE_FOR_KICK_DIST
+
+def shouldSpinToBall(player):
+    """
+    We're not facing the ball well enough yet
+    """
+    ball = player.brain.ball
+    return (ball.vis.on and
+            fabs(ball.loc.relY) > constants.SHOULD_SPIN_TO_BALL_Y)
+
+def shouldStopSpinningToBall(player):
+    """
+    We're done spinning
+    """
+    ball = player.brain.ball
+    return (ball.vis.on and
+            fabs(ball.loc.relY) < constants.STOP_SPINNING_TO_BALL_Y)
+
+def shouldApproachBallAgain(player):
+    """
+    The ball got really far away somehow
+    """
+    ball = player.brain.ball
+    return ball.vis.on and ball.dist > constants.APPROACH_BALL_AGAIN_DIST
+
+def shouldRedecideKick(player):
+    """
+    We've been in position for kick too long
+    """
+    return player.counter > 200
+
+def ballInPosition(player, kickPose):
     """
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
@@ -21,24 +57,11 @@ def ballInPosition(player):
     if player.brain.ball.vis.framesOn < 4:
         return False
 
-    ball = player.brain.ball
-    kick = player.brain.kickDecider.getKick()
     #Get the current kick sweet spot information
-    if kick is None:
-        (x_offset, y_offset, heading) = (0,0,0)
-    else:
-        (x_offset, y_offset, heading) = kick.getPosition()
 
-    #Get the difference
-    # not absolute value for x, if ball is closer (not behind) kick anyway
-    diff_x = ball.loc.relX - x_offset
-    diff_y = fabs(ball.loc.relY - y_offset)
-
-    diff_y = fabs(ball.loc.relY - y_offset)
-    #Compare the sweet spot with the actual values and make sure they
-    #are within the threshold
-    return (0 < diff_x < constants.BALL_X_OFFSET and
-            diff_y < constants.BALL_Y_OFFSET)
+    return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
+            fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
+            fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
 def ballNearPosition(player):
     """
@@ -59,23 +82,20 @@ def shouldKickAgain(player):
     """
     Ball hasn't changed enough to warrant new kick decision.
     """
-    return (shouldKick(player) and ballNearPosition(player))
-
-def ballTooFar(player):
-    """
-    Navigator is almost at its destination, but we're still far away
-    from the ball
-    """
-    if player.brain.nav.nearDestination and player.brain.ball.dist > 30:
-        print "ballTooFar"
-        return True
-    return False
+    return ballNearPosition(player)
 
 def shouldOrbit(player):
     """
     We are lost (no kick) but are chaser and are at the ball.
     """
     return player.brain.kickDecider.getSweetMove() is None
+
+def shouldCancelOrbit(player):
+    """
+    Ball is far away. Don't want to finish slow orbit.
+    """
+    return (player.brain.ball.vis.framesOn > 4 and
+            player.brain.ball.loc.dist > constants.SHOULD_CANCEL_ORBIT_BALL_DIST)
 
 ####### PENALTY KICK STUFF ###########
 

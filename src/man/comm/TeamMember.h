@@ -62,6 +62,9 @@ public:
     void  setMyHUncert(float hU) {_myHUncert = hU;}
     float myHUncert() {return _myHUncert;}
 
+    void  setBallOn(float on) {_ballOn = on;}
+    float ballOn() {return _ballOn;}
+
     void  setBallDist(float bd) {_ballDist = bd;}
     float ballDist() {return _ballDist;}
 
@@ -107,6 +110,7 @@ private:
     float _myXUncert;         // Uncertainty in the x value.
     float _myYUncert;         // Uncertainty in the y value.
     float _myHUncert;         // Uncertainty in the h value.
+    float _ballOn;            // 0 if ball is off.
     float _ballDist;          // Relative distance to the ball.
     float _ballBearing;       // Relative bearing to the ball.
     float _ballDistUncert;    // Uncertainty in the dist value.

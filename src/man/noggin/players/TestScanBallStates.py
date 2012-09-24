@@ -20,7 +20,7 @@ def gamePenalized(player):
 
 def standup(player):
     player.gainsOn()
-    player.walkPose()
+    player.stand()
     return player.goLater('ballTracking')
 
 def ballTracking(player):

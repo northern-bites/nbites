@@ -1,34 +1,57 @@
+import man.noggin.kickDecider.HackKickInformation as hackKick
 
 def gameInitial(player):
-    player.gainsOn()
+    if player.firstFrame():
+        player.gainsOn()
+
+    player.brain.tracker.helper.printHeadAngles()
+
     return player.stay()
 
 def gameReady(player):
-    return player.goLater('standup')
+    return player.stay()
 
 def gameSet(player):
-    return player.goLater('standup')
+    return player.stay()
 
 def gamePlaying(player):
     return player.goLater('standup')
 
 def gamePenalized(player):
-    return player.goLater('standup')
+    if player.firstFrame():
+        player.brain.tracker.stopHeadMoves()
+
+    return player.stay()
 
 def standup(player):
-    player.gainsOn()
     if player.firstFrame():
-        player.walkPose()
+        player.gainsOn()
+        player.stand()
+
+        player.brain.tracker.setNeutralHead()
+
         return player.stay()
-    return player.goLater('lookState0')
+
+    # repeatedly perform basic fixed pitch pan:
+    #player.brain.tracker.repeatBasicPanFixedPitch()
+
+    # if ball in sight, track it. otherwise, pan:
+    player.brain.tracker.trackBallFixedPitch()
+
+    # for debugging, will print pitch and yaw every frame
+    #player.brain.tracker.helper.printHeadAngles()
+
+    # for debugging, will print ball's distance
+    print "Ball dist: ",player.brain.ball.loc.dist
+
+    return player.stay()
 
 # alternate testing path
 
 def lookState0(player):
     brain = player.brain
-    my = brain.my
 
-    brain.tracker.printAngles()
+    brain.tracker.helper.printAngles()
 
     return player.stay()
 
@@ -218,6 +241,6 @@ def lookLeftFar(player):
 def done(player):
     if player.firstFrame():
         player.brain.tracker.setNeutralHead()
-        player.walkPose()
+        player.stand()
         return player.stay()
     return player.stay()

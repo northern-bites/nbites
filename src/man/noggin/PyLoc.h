@@ -8,8 +8,8 @@
 
 using boost::shared_ptr;
 
-static shared_ptr<LocSystem> loc_reference;
-static shared_ptr<BallEKF> ballEKF_reference;
+static boost::shared_ptr<LocSystem> loc_reference;
+static boost::shared_ptr<BallEKF> ballEKF_reference;
 
 /**
  * Class to hold the localization data needed in Python
@@ -17,13 +17,13 @@ static shared_ptr<BallEKF> ballEKF_reference;
  */
 class PyLoc {
 private:
-    shared_ptr<BallEKF> ballEKF;
+    boost::shared_ptr<BallEKF> ballEKF;
 public:
     PyLoc() {
         loc = loc_reference;
         ballEKF = ballEKF_reference;
     }
-    shared_ptr<LocSystem> loc;
+    boost::shared_ptr<LocSystem> loc;
 
     void reset() {
         loc->reset();
@@ -38,9 +38,32 @@ public:
         loc->redGoalieReset();
     }
 
-	void resetLocTo(float x, float y, float h){
-		loc->resetLocTo(x, y, h * TO_RAD);
-	}
+    void resetLocTo(float x, float y, float h,
+		    LocNormalParams params = LocNormalParams())
+    {
+        loc->resetLocTo(x, y, h * TO_RAD, params);
+    }
+
+    void resetLocTo(float x, float y, float h, 
+		    float x_, float y_, float h_,
+		    LocNormalParams params1 = LocNormalParams(),
+		    LocNormalParams params2 = LocNormalParams())
+    {		    
+        loc->resetLocTo(x, y, h * TO_RAD, 
+			x_, y_, h_ * TO_RAD,
+	                params1,
+			params2);
+    }
+
+    void resetLocToSide(bool blueSide)
+    {
+	loc->resetLocToSide(blueSide);
+    }
+
+    void setOnOpposingSide(bool opp)
+    {
+        loc->setOnOpposingSide(opp);
+    }
 
     /* Getters */
     // We use degreees in python, and radians in C++
@@ -54,6 +77,8 @@ public:
     const float getYUncert() const { return loc->getYUncert(); }
     const float getHUncert() const { return loc->getHUncertDeg(); }
     const float getRadHUncert() const { return loc->getHUncert(); }
+
+    const bool isOnOpposingSide() const { return loc->isOnOpposingSide(); }
 
     // Ball localization
     // Global Coordinates
@@ -138,9 +163,9 @@ public:
     }
 
     // Odometry
-    const float getOdoF() const { return loc->getLastOdo().deltaF; }
-    const float getOdoL() const { return loc->getLastOdo().deltaL; }
-    const float getOdoR() const { return loc->getLastOdo().deltaR; }
+    const float getOdoX() const { return loc->getLastOdo().x; }
+    const float getOdoY() const { return loc->getLastOdo().y; }
+    const float getOdoThetaDeg() const { return loc->getLastOdo().theta * TO_DEG; }
 
 };
 

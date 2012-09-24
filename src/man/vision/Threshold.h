@@ -6,6 +6,7 @@
 typedef unsigned char uchar;
 
 class Threshold;  // forward reference
+class Gradient;
 
 #include "Vision.h"
 
@@ -18,7 +19,6 @@ class Threshold;  // forward reference
 #include "Context.h"
 #include "Profiler.h"
 #include "NaoPose.h"
-#include "Gradient.h"
 
 //#define SOFTCOLORS
 
@@ -111,8 +111,8 @@ static const int NUMBLOCKS = 3;
 
 //
 // DISTANCE ESTIMATES CONSTANTS
-// based on Height and Width
-static const float POST_MIN_FOC_DIST = 10.0f; // goal posts
+// based on common sense
+static const float POST_MIN_FOC_DIST = 5.0f; // goal posts
 static const float POST_MAX_FOC_DIST = 800.0f;
 
 const float HORIZONTAL_SHOULDER_THRESH_LEFT = 1.05f;
@@ -130,6 +130,7 @@ public:
 
     // main methods
     void visionLoop();
+    void obstacleLoop();
     // inline void threshold();
     void thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg);
     inline void runs();
@@ -137,11 +138,16 @@ public:
     unsigned char getExpandedColor(int x, int y, unsigned char col);
     int getHorizontalEdge(int x1, int y1, int dir);
     void thresholdAndRuns();
+	void lowerRuns();
     void findGoals(int column, int top);
+	int findPostsInLowerCamera(int column);
     void findBallsCrosses(int column, int top);
+	void findBallLowerCamera(int column, int topEdge);
     void detectSelf();
     void setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3);
+	void identifyGoalie();
     void objectRecognition();
+    void newFindRobots(); //ben's function
     // helper methods
     void initObjects(void);
     void initColors();
@@ -156,10 +162,19 @@ public:
     void setVisualCrossInfo(VisualCross *objPtr);
     void setShot(VisualCrossbar * one);
     void setOpenFieldInformation();
-    float chooseGoalDistance(distanceCertainty cert, float height, float width,
-                             float poseDist, int bottom);
-    float getGoalPostDistFromHeight(float height);
-    float getGoalPostDistFromWidth(float width);
+
+    /**
+     * Chooses between different types of estimates for the best one
+     * relies mainly on whether the visual attributes are reliable
+     * and on what distance ranges we get, since bearing estimates
+     * are usually very similar (since they're computed in similar ways);
+     */
+    estimate chooseBestGoalEstimate(distanceCertainty cert, const estimate& estFromHeight,
+            const estimate& estFromWidth, const estimate& estFromPose, int bottom);
+    //deprecate these - out of date
+    estimate getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height);
+    estimate getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width);
+
     float getBeaconDistFromHeight(float height);
     int distance(int x1, int x2, int x3, int x4);
     float realDistance(int x, int y, int x1, int y1);
@@ -170,27 +185,28 @@ public:
     int getRobotTop(int x, int c);
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
-    bool overlap(VisualRobot* robot, VisualFieldObject* post);
-    bool checkRobotAgainstBluePost(VisualRobot* robot, VisualFieldObject* post);
     point <int> backStopCheck(bool which, int left, int right);
     void setYUV(const uint16_t* newyuv);
+    void setYUV_bot(const uint16_t* newyuv);
     const uint16_t* getYUV();
     static const char * getShortColor(int _id);
 
     int getPixelBoundaryLeft();
     int getPixelBoundaryRight();
     int getPixelBoundaryUp();
-	float getPixDistance(int y) {return pixDistance[y];}
+    float getPixDistance(int y) {return pixDistance[y];}
 
 #ifdef OFFLINE
     void setConstant(int c);
-    void setHorizonDebug(bool _bool) { visualHorizonDebug = _bool; }
-    bool getHorizonDebug() { return visualHorizonDebug; }
+    void setDebugHorizon(bool _bool) { visualHorizonDebug = _bool; }
+    bool getDebugHorizon() { return visualHorizonDebug; }
     void setDebugShooting(bool _bool) {debugShot = _bool;}
     void setDebugOpenField(bool _bool) {debugOpenField = _bool;}
     void setDebugEdgeDetection(bool _bool) {debugEdgeDetection = _bool;}
     void setDebugHoughTransform(bool _bool) {debugHoughTransform = _bool;}
     void setDebugRobots(bool _bool);
+    void setDebugVisualLines(bool _bool) {debugVisualLines = _bool;}
+    void setDebugVisualCorners(bool _bool) {debugVisualCorners = _bool;}
 #endif
 
     void initDebugImage();
@@ -221,13 +237,18 @@ public:
     boost::shared_ptr<ObjectFragments> blue;
     boost::shared_ptr<ObjectFragments> yellow;
 
-    Robots *red, *navyblue;
+    Robots *red, *navyblue, *unid;
     Ball* orange;
     Cross* cross;
     // main array
     uint8_t* thresholded;
+    uint8_t* thresholdedBottom;
     inline uint8_t getThresholded(int i, int j){
+      if (usingTopCamera)
         return thresholded[i * IMAGE_WIDTH + j];
+      else {
+	return thresholdedBottom[i * IMAGE_WIDTH + j];
+      }
     }
     inline void setThresholded(int i, int j, uint8_t value){
         thresholded[i * IMAGE_WIDTH + j] = value;
@@ -241,6 +262,8 @@ public:
     uint8_t debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
 #endif
 
+    bool usingTopCamera;
+
 private:
 
     // class pointers
@@ -249,6 +272,8 @@ private:
 
     const uint16_t* yuv;
     const uint16_t* yplane;
+    const uint16_t* yuv_bot;
+    const uint16_t* yplane_bot;
 
     unsigned char bigTable[UMAX][VMAX][YMAX];
 
@@ -258,6 +283,7 @@ private:
     int closePoint1;
     int closePoint2;
     bool stillOpen;
+
 
     bool greenBlue[IMAGE_WIDTH];
     bool greenYellow[IMAGE_WIDTH];
@@ -292,6 +318,8 @@ private:
     bool debugEdgeDetection;
     bool debugHoughTransform;
     bool debugRobots;
+    bool debugVisualLines;
+    bool debugVisualCorners;
 #else
     static const bool debugSelf = false;
     static const bool debugShot = false;
@@ -299,6 +327,7 @@ private:
     static const bool debugEdgeDetection = false;
     static const bool debugHoughTransform = false;
     static const bool debugRobots = false;
+    static const bool debugVisualLines = false;
 #endif
 };
 

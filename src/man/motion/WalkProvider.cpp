@@ -31,8 +31,8 @@ using namespace Kinematics;
 //#define DEBUG_WALKPROVIDER
 //#define DEBUG_ODOMETRY
 
-WalkProvider::WalkProvider(shared_ptr<Sensors> s,
-                           shared_ptr<NaoPose> _pose)
+WalkProvider::WalkProvider(boost::shared_ptr<Sensors> s,
+                           boost::shared_ptr<NaoPose> _pose)
     : MotionProvider(WALK_PROVIDER),
       sensors(s),
       pose(_pose),
@@ -89,9 +89,9 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     metaGait.tick_gait();
 
     if(nextCommand){
-        stepGenerator.setSpeed(nextCommand->x_mms,
-                               nextCommand->y_mms,
-                               nextCommand->theta_rads);
+        stepGenerator.setSpeed(nextCommand->x_percent,
+                               nextCommand->y_percent,
+                               nextCommand->theta_percent);
         if (nextDestCommand )
         nextDestCommand->finishedExecuting();
     }
@@ -99,10 +99,10 @@ void WalkProvider::calculateNextJointsAndStiffnesses() {
     nextCommand = WalkCommand::ptr();
 
     if(pendingStepCommands){
-        stepGenerator.takeSteps(nextStepCommand->x_mms,
-                                nextStepCommand->y_mms,
-                                nextStepCommand->theta_rads,
-                                nextStepCommand->numSteps);
+//        stepGenerator.takeSteps(nextStepCommand->x_mms,
+//                                nextStepCommand->y_mms,
+//                                nextStepCommand->theta_rads,
+//                                nextStepCommand->numSteps);
         nextDestCommand->finishedExecuting();
     }
     pendingStepCommands=false;

@@ -17,33 +17,39 @@ ParsingBoard::ParsingBoard(Memory::ptr memory) :
 
 ParsingBoard::~ParsingBoard(){}
 
-void ParsingBoard::newInputProvider(InProvider::ptr inProvider, MObject_ID id) {
+void ParsingBoard::newInputProvider(InProvider::ptr inProvider, std::string name) {
 
-    if (id == UNKNOWN_OBJECT) {
+    if (name == "find_it_out") {
         //warning - if target is a socket, then this might block (potentially
         //forever)
         //TODO: find some way around that (the tricky part is that we use
         // the id we get from reading the log to identify what memory object
         // it's going to be parsed to, so we need to wait on the open is some
         // way)
-        inProvider->openCommunicationChannel();
-        id = inProvider->peekAndGet<MObject_ID>();
+        try {
+            inProvider->openCommunicationChannel();
+            MessageHeader header = inProvider->peekAndGet<MessageHeader>();
+            name = std::string(header.name);
+        } catch (std::exception& e) {
+            cerr << e.what() << endl;
+            return ;
+        }
     }
 
-    if (0 < id && id < LAST_OBJECT_ID) {
-        MessageParser::ptr mObjectParser(new MessageParser(inProvider,
-                                memory->getMutableMObject(id)));
-        objectIOMap[id] = mObjectParser;
+    try {
+        ProtobufMessage::ptr object = memory->getByName(name);
+        MessageParser::ptr mObjectParser(new MessageParser(inProvider, object));
+        objectIOMap[name] = mObjectParser;
         mObjectParser->start();
-    } else {
-        cout<<"Could not read valid log ID " << id << " from input: "
-            << inProvider->debugInfo() << endl;
+    } catch(std::exception& e) {
+        cerr << e.what() << endl;
+        return ;
     }
 }
 
-void ParsingBoard::parseNext(MObject_ID id) {
+void ParsingBoard::parseNext(std::string name) {
 
-    ObjectIOMap::iterator it = objectIOMap.find(id);
+    ObjectIOMap::iterator it = objectIOMap.find(name);
     // if this is true, then we found a legitimate parser
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {
@@ -59,9 +65,9 @@ void ParsingBoard::parseNextAll() {
 
 }
 
-void ParsingBoard::rewind(MObject_ID id) {
+void ParsingBoard::rewind(std::string name) {
 
-    ObjectIOMap::iterator it = objectIOMap.find(id);
+    ObjectIOMap::iterator it = objectIOMap.find(name);
     // if this is true, then we found a legitimate parser
     // corresponding to our mobject in the map
     if (it != objectIOMap.end()) {

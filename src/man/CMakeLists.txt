@@ -20,13 +20,13 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( MAN )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
+ENABLE_TESTING()
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
 INCLUDE( cmake/base_definitions.cmake )
-
 
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
@@ -39,6 +39,7 @@ FIND_PACKAGE( PythonLibs  REQUIRED )
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_LIBS OFF)
 FIND_PACKAGE( Boost REQUIRED )
+MARK_AS_ADVANCED( Boost_DIR )
 
 IF(WEBOTS_BACKEND)
   include ( cmake/FindWEBOTS.cmake )
@@ -81,41 +82,32 @@ ELSE(WEBOTS_BACKEND)
 ENDIF(WEBOTS_BACKEND)
 
 SET( @REMOTE_ADDRESS@
-  "192.168.0.5"
+  "mal.local"
   CACHE STRING
   "The remote address of the robot"
   )
 SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 
-############################ REMOTE INSTALLATION
-# Define this to remotely install the binary or library on the robot.
-# Cannot be selected unless OE_CROSS_BUILD is set to ON.
-SET( @ROBOT_NAME@
-  "spock"
-  CACHE STRING
-  "The NAME of the robot"
-  )
-SET( ROBOT_NAME ${@ROBOT_NAME@} )
-
-
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
-SET( COLOR_TABLE
-  "../../data/tables/lab120/lab120-11.mtb"
+SET( @TABLE_TOP@
+  "../../data/tables/120-top.mtb"
   CACHE STRING
-  "Path relative to man directory for the desired color table"
+  "Path relative to man directory for the desired top camera color table"
   )
+SET( TABLE_TOP ${@TABLE_TOP@})
+
+SET( @TABLE_BOTTOM@
+  "../../data/tables/120-bottom.mtb"
+  CACHE STRING
+  "Path relative to man directory for the desired bottom camera color table"
+  )
+SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
 
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/upload.sh.in
   ${CMAKE_CURRENT_BINARY_DIR}/upload.sh
-  ESCAPE_QUOTES
-  )
-
-CONFIGURE_FILE(
-  ${MAN_CMAKE_DIR}/nameconfig.in
-  ${CFG_DIR}/nameconfig.h
   ESCAPE_QUOTES
   )
 
@@ -145,6 +137,7 @@ INCLUDE_DIRECTORIES(
   ${COMM_INCLUDE_DIR}
   ${CORPUS_INCLUDE_DIR}
   ${MOTION_INCLUDE_DIR}
+  ${BHWALK_INCLUDE_DIR}
   ${NOGGIN_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
   ${WEBOTS_INCLUDE_DIR}

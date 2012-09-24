@@ -44,8 +44,8 @@ using namespace NBMath;
 //#define DEBUG_COM_TRANSFORMS
 //#define DEBUG_DESTINATION
 
-StepGenerator::StepGenerator(shared_ptr<Sensors> s,
-                             shared_ptr<NaoPose> p,
+StepGenerator::StepGenerator(boost::shared_ptr<Sensors> s,
+                             boost::shared_ptr<NaoPose> p,
                              const MetaGait * _gait)
     : x(0.0f), y(0.0f), theta(0.0f),
       done(true),
@@ -1243,12 +1243,15 @@ void StepGenerator::resetQueues(){
  * it is vital to call 'resetOdometry()' in order to make sure any movement
  * since the last call to getOdometryUpdate doesnt get lost
  */
-vector<float> StepGenerator::getOdometryUpdate(){
+vector<float> StepGenerator::getOdometryUpdate() const {
     const float rotation = -safe_asin(cc_Transform(1,0));
     const ufvector3 odo = prod(cc_Transform,CoordFrame3D::vector3D(0.0f,0.0f));
     const float odoArray[3] = {odo(0),odo(1),rotation};
     //printf("Odometry update is (%g,%g,%g)\n",odoArray[0],odoArray[1],odoArray[2]);
-    cc_Transform = CoordFrame3D::translation3D(0.0f,0.0f);
+
+    // NOTE: commented out because it breaks const correctness
+    // HACK HACK HACK
+//    cc_Transform = CoordFrame3D::translation3D(0.0f,0.0f);
     return vector<float>(odoArray,&odoArray[3]);
 }
 

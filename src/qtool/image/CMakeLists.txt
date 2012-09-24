@@ -2,7 +2,7 @@
 ############ QTool/Image
 
 project( image )
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.3)
 
 ########### Dependencies
 
@@ -20,14 +20,24 @@ set( Image_srcs
     BMPYUVImage
     Color
     ThresholdedImage
+    VisualInfoImage
     FastYUVToBMPImage
     PaintField
+    PaintBots
+    PaintLocalization
+    PaintFieldObjects
+    PaintRobotWorldState
     )
 
-set( Image_headers BMPImage.h
-				   FastYUVToBMPImage.h
-				   PaintField.h
-				   PaintGroundTruth.h)
+set( Image_headers
+  BMPImage.h
+  FastYUVToBMPImage.h
+  PaintField.h
+  PaintBots.h
+  PaintLocalization.h
+  PaintGroundTruth.h
+  PaintFieldObjects.h
+  PaintRobotWorldState.h)
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
@@ -46,6 +56,7 @@ add_library(image
 
 target_link_libraries(
   image
+  viewer
   overseer_client
   ${QT_LIBRARIES}
   ${SWSCALE_LIBRARY}

@@ -12,6 +12,8 @@ def ballTracking(tracker):
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
+        if tracker.brain.player.currentState == 'spinFindBall':
+            return tracker.goNow('ballSpinTracking')
         return tracker.goNow('scanBall')
 
 def tracking(tracker):
@@ -31,27 +33,47 @@ def tracking(tracker):
     # might be the problem on tracking
     # TODO: Check ball information problem
     #       tracker.printf(tracker.target.loc.dist);
-    if tracker.target.loc.dist > minActiveDist:
-        return tracker.goLater('activeTracking')
+    #if tracker.target.loc.dist > minActiveDist:
+    #    return tracker.goLater('activeTracking')
 
-    tracker.helper.trackObject()
+    if tracker.target.vis.on:
+        tracker.helper.trackObject()
+#    else:
+#        tracker.helper.lookToPoint(tracker.target)
 
-    if not tracker.target.vis.on:
+    if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
         if tracker.target.vis.framesOff > \
                 constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-            return tracker.goLater(tracker.lastDiffState)
+            return tracker.goLater('ballTracking')
         return tracker.stay()
 
     return tracker.stay()
 
+# Fixed Pitch
+def trackingFixedPitch(tracker):
+    """
+    While the target is visible, track it via vision values.
+    If the target is lost, return to lastDiffState.
+    """
+    # If the target is not in vision, trackObjectFixedPitch will track via loc.
+    tracker.helper.trackObjectFixedPitch()
+
+    if not tracker.target.vis.on and tracker.counter > 15:
+        if DEBUG : tracker.printf("Missing object this frame",'cyan')
+        if tracker.target.vis.framesOff > \
+                constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+            return tracker.goLater(tracker.lastDiffState)
+
+    return tracker.stay()
+
 def ballSpinTracking(tracker):
-    '''Super state which handles following/refinding the ball'''
-    if tracker.target.vis.framesOff <= \
-            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-        return tracker.goNow('tracking')
-    else:
-        return tracker.goNow('spinScanBall')
+#    '''Super state which handles following/refinding the ball'''
+#    if tracker.target.vis.framesOff <= \
+#            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+#        return tracker.goNow('tracking')
+#    else:
+    return tracker.goNow('spinScanBall')
 
 def activeTracking(tracker):
     """
@@ -92,6 +114,7 @@ def activeTracking(tracker):
 
     return tracker.stay()
 
+# Only called from activeTracking.
 def panToFieldObject(tracker):
     """
     Calculate which goalpost is easiest to look at and look to it.
@@ -111,7 +134,7 @@ def panToFieldObject(tracker):
         if hasattr(closest, "loc"):
             closest = closest.loc
 
-        target = RelLocation(tracker.brain.my, closest.x, closest.y, 0)
+        target = tracker.brain.my.relativeLocationOf(closest)
         target.height = 45      # stare at the center of the post
                                 # rather than the bottom
 

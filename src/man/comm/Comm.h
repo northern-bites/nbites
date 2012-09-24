@@ -105,12 +105,13 @@ public:
      * Sets all data about the ball that we want to communicate.
      * @param p:  The player number we want to update.
      *            If 0, uses default provided by noggin.
+     * @param on: If 0, ball is off.
      * @param d:  The distance from me to the ball.
      * @param b:  The bearing from me to the ball.
      * @param du: The uncertainty in the ball distance.
      * @param bu: The uncertainty in the ball bearing.
      */
-    void setBallData(int p,
+    void setBallData(int p, float on,
                      float d , float b ,
                      float du, float bu);
 

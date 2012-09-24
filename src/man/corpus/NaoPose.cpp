@@ -26,11 +26,11 @@ using namespace boost::numeric;
 using namespace Kinematics;
 using namespace NBMath;
 using namespace CoordFrame4D;
-using angle::radians;
+using namespace angle;
 
 // From camera docs:
-const float NaoPose::IMAGE_WIDTH_MM = 2.36f;
-const float NaoPose::IMAGE_HEIGHT_MM = 1.76f;
+const float NaoPose::IMAGE_WIDTH_MM = 2.45f;
+const float NaoPose::IMAGE_HEIGHT_MM = 1.84f;
 
 // Calculated from numbers in camera docs:
 const float NaoPose::FOCAL_LENGTH_MM = (float) ((IMAGE_WIDTH_MM / 2)
@@ -67,11 +67,11 @@ const ublas::vector<float> NaoPose::topRight = vector4D(FOCAL_LENGTH_MM,
 const ublas::vector<float> NaoPose::bottomRight =
         vector4D(FOCAL_LENGTH_MM, -IMAGE_WIDTH_MM / 2, -IMAGE_HEIGHT_MM / 2);
 
-NaoPose::NaoPose(shared_ptr<Sensors> s) :
+NaoPose::NaoPose(boost::shared_ptr<Sensors> s) :
     bodyInclinationX(0.0f), bodyInclinationY(0.0f), sensors(s), horizonLeft(0,
                                                                             0),
             horizonRight(0, 0), horizonSlope(0.0f), perpenHorizonSlope(0.0f),
-            focalPointInWorldFrame(0.0f, 0.0f, 0.0f), comHeight(0.0f) {
+            cameraInWorldFrame(0.0f, 0.0f, 0.0f), comHeight(0.0f) {
 }
 
 /**
@@ -81,7 +81,9 @@ NaoPose::NaoPose(shared_ptr<Sensors> s) :
  * Then we calculate horizon and camera height which is necessary for the
  * calculation of pix estimates.
  */
-void NaoPose::transform() {
+void NaoPose::transform(bool _isTopCam) {
+
+    isTopCam = _isTopCam;
 
     // Make up bogus values
     std::vector<float> headAngles(2, 0.0f);
@@ -102,10 +104,18 @@ void NaoPose::transform() {
     const ublas::vector<float> origin = vector4D(0.0f, 0.0f, 0.0f);
 
     cameraToBodyTransform = calculateForwardTransform(HEAD_CHAIN, headAngles);
+
+    ufmatrix4* camera_calibration;
     // factor in camera calibration
+    if (_isTopCam) {
+        camera_calibration = CameraCalibrate::getTransforms(man::corpus::Camera::TOP);
+    } else {
+        camera_calibration = CameraCalibrate::getTransforms(man::corpus::Camera::BOTTOM);
+    }
     for (int i = 0; i < CameraCalibrate::NUM_PARAMS; i++) {
+
         cameraToBodyTransform = prod(cameraToBodyTransform,
-                                     CameraCalibrate::Transforms[i]);
+                                     camera_calibration[i]);
     }
 
 
@@ -114,7 +124,7 @@ void NaoPose::transform() {
     //   * ask the walk engine for the support leg. (doesnt work in cortex)
     //   * ask the gyros/accelerometers for which way is down (doesnt work yet)
     //if (lLegDistance > rLegDistance) {
-    if (sensors->getSupportFoot() == LEFT_SUPPORT) {
+    if (sensors->getVisionSupportFoot() == LEFT_SUPPORT) {
         supportLegToBodyTransform = calculateForwardTransform(LLEG_CHAIN,
                                                               lLegAngles);
     } else {
@@ -166,9 +176,9 @@ void NaoPose::transform() {
     cameraToWorldFrame = prod(bodyToWorldTransform, cameraToBodyTransform);
 
     calcImageHorizonLine();
-    focalPointInWorldFrame.x = cameraToWorldFrame(X, 3);
-    focalPointInWorldFrame.y = cameraToWorldFrame(Y, 3);
-    focalPointInWorldFrame.z = cameraToWorldFrame(Z, 3);
+    cameraInWorldFrame.x = cameraToWorldFrame(X, 3);
+    cameraInWorldFrame.y = cameraToWorldFrame(Y, 3);
+    cameraInWorldFrame.z = cameraToWorldFrame(Z, 3);
 
     //cout<<"Joints: yaw:"<<headAngles[0]*TO_DEG<<" pitch: "<<headAngles[1]*TO_DEG<<endl;
     //cout<<"comHeight "<<comHeight<<endl;
@@ -311,55 +321,11 @@ ublas::vector<float> NaoPose::intersectLineWithXYPlane(const std::vector<
  * Method to determine where the physical point represented by a pixel is relative
  * to the world frame.
  */
-const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
-                                    const float objectHeight) {
+estimate NaoPose::pixEstimate(pixels pixelX, pixels pixelY, mms objectHeight) const {
 
-    /*if (pixelX >= IMAGE_WIDTH || pixelX < 0 || pixelY >= IMAGE_HEIGHT || pixelY
-            < 0) {
-        return NULL_ESTIMATE;
-    }
-    */
-    /*
-    // declare x,y,z coordinate of pixel in relation to focal point
-    ublas::vector<float> pixelInCameraFrame =
-            vector4D(FOCAL_LENGTH_MM, ((float) IMAGE_CENTER_X - (float) pixelX)
-                    * (float) PIX_X_TO_MM, ((float) IMAGE_CENTER_Y
-                    - (float) pixelY) * (float) PIX_Y_TO_MM);
-
-    // declare x,y,z coordinate of pixel in relation to body center
-    ublas::vector<float> pixelInWorldFrame(4);
-
-    // transform camera coordinates to body frame coordinates for a test pixel
-    pixelInWorldFrame = prod(cameraToWorldFrame, pixelInCameraFrame);
-
-    // Draw the line between the focal point and the pixel while in the world
-    // frame. Our goal is to find the point of intersection of that line and
-    // the plane, parallel to the ground, passing through the object height.
-    // In most cases, this plane is the ground plane, which is comHeight below the
-    // origin of the world frame. If we call this method with objectHeight != 0,
-    // then the plane is at a different height.
-    float object_z_in_world_frame = -comHeight + objectHeight * CM_TO_MM;
-
-    // We are going to parameterize the line with one variable t. We find the t
-    // for which the line goes through the plane, then evaluate the line at t for
-    // the x,y,z coordinate
-    float t = 0;
-
-    // calculate t knowing object_z_in_body_frame
-    if ((focalPointInWorldFrame.z - pixelInWorldFrame(Z)) != 0) {
-        t = (object_z_in_world_frame - pixelInWorldFrame(Z))
-                / (focalPointInWorldFrame.z - pixelInWorldFrame(Z));
-    }
-
-    const float x = pixelInWorldFrame(X) + (focalPointInWorldFrame.x
-            - pixelInWorldFrame(X)) * t;
-    const float y = pixelInWorldFrame(Y) + (focalPointInWorldFrame.y
-            - pixelInWorldFrame(Y)) * t;
-    const float z = pixelInWorldFrame(Z) + (focalPointInWorldFrame.z
-            - pixelInWorldFrame(Z)) * t;
-    ublas::vector<float> objectInWorldFrame = vector4D(x, y, z);
-*/
-    float FOCAL_LENGTH = 385.54f;
+    // Computed this constant and also checked it experimentally
+    // For objects in 320x240-size images ONLY!
+    float FOCAL_LENGTH = 290.f;
     ufvector4 pixelInCameraFrame =
             vector4D( FOCAL_LENGTH,
                       ((float)IMAGE_CENTER_X - (float)pixelX),
@@ -372,67 +338,14 @@ const estimate NaoPose::pixEstimate(const int pixelX, const int pixelY,
     //TODO:clean this up and comment
     ufvector4 pixelInWorldFrame = prod(cameraToWorldRotation, pixelInCameraFrame);
 
-    float beta = atan(pixelInWorldFrame(Y)/pixelInWorldFrame(X));
+    float alpha = length(pixelInWorldFrame) / pixelInWorldFrame(Z);
 
-    float alpha = sqrt((pixelInWorldFrame(X)*pixelInWorldFrame(X)) + (pixelInWorldFrame(Y)*pixelInWorldFrame(Y))
-                      + (pixelInWorldFrame(Z)*pixelInWorldFrame(Z))) / pixelInWorldFrame(Z);
+    float distance3D = alpha * (cameraInWorldFrame.z + comHeight - objectHeight);
+    float distance2D = sqrt(distance3D * distance3D - (cameraInWorldFrame.z + comHeight - objectHeight) *
+                            (cameraInWorldFrame.z + comHeight - objectHeight));
 
-    float distance3D = alpha * (focalPointInWorldFrame.z + comHeight - objectHeight);
-    float distance2D = sqrt(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight - objectHeight) *
-                            (focalPointInWorldFrame.z + comHeight - objectHeight));
 
-    estimate est;
-//    est.bearing = beta;
-    //est.dist = distance2D * MM_TO_CM;
-
-    float distX = distance2D * cos(beta) + focalPointInWorldFrame.x;
-    float distY = distance2D * sin(beta) + focalPointInWorldFrame.y;
-
-    float bearing = 0.0f;
-    const bool yPos = pixelInWorldFrame(Y) >= 0;
-    const bool xPos = pixelInWorldFrame(X) >= 0;
-    const float r = distY / distX;
-    if (!isnan(r)) {
-        //quadrants +x,+y and +x-y
-        if (xPos && (yPos || !yPos)) {
-            bearing = std::atan(r);
-        } else if (yPos) { //quadrant -x+y
-            bearing = std::atan(r) + M_PI_FLOAT;
-        } else {//quadrant -x+y
-            bearing = std::atan(r) - M_PI_FLOAT;
-        }
-    } else {
-        bearing = 0.0f;
-    }
-
-    est.bearing = bearing;
-
-    est.x = distX*MM_TO_CM;
-    est.y = distY*MM_TO_CM;
-    est.dist = sqrt(est.x * est.x + est.y * est.y);
-
-    //TODO: this is prolly not right
-    const float temp2 = -(focalPointInWorldFrame.z + comHeight - objectHeight) / distance3D;
-    if (temp2 <= 1.0)
-        est.elevation = NBMath::safe_asin(temp2);
-
-    // SANITY CHECKS
-    //If the plane where the target object is, is below the camera height,
-    //then we need to make sure that the pixel in world frame is lower than
-    //the focal point, or else, we will get odd results, since the point
-    //of intersection with that plane will be behind us.
-    if (objectHeight * CM_TO_MM < comHeight + focalPointInWorldFrame.z
-            && pixelInWorldFrame(Z) > focalPointInWorldFrame.z) {
-        return NULL_ESTIMATE;
-    }
-
-    //estimate est = getEstimate(objectInWorldFrame);
-    //est.dist = correctDistance(static_cast<float> (est.dist));
-
-    est.distance_variance = getDistanceVariance(est.dist);
-    est.bearing_variance = getBearingVariance(est.dist);
-
-    return est;
+    return makeEstimateFrom(pixelInWorldFrame, distance2D, objectHeight);
 }
 
 float NaoPose::getDistanceVariance(float distance) {
@@ -443,91 +356,70 @@ float NaoPose::getBearingVariance(float distance) {
 	return max<float>(-0.00002f * distance + 0.0115f, 0);
 }
 
-/**
- * Body estimate takes a pixel on the screen, and a vision calculated
- * distance to that pixel, and calculates where that pixel is relative
- * to the world frame.  It then returns an estimate to that position,
- * with units in cm.
- */
-const estimate NaoPose::bodyEstimate(const int x, const int y, const float dist) {
-    if (dist <= 0.0)
+estimate NaoPose::estimateWithKnownDistance(pixels x, pixels y, cms objectHeight, cms groundDist) const {
+
+    if (groundDist <= 0.0) {
         return NULL_ESTIMATE;
-
-    //all angle signs are according to right hand rule for the major axis
-    // get bearing angle in image plane,left pos, right negative
-    float object_bearing = (IMAGE_CENTER_X - (float) x) * PIX_TO_RAD_X;
-    // get elevation angle in image plane, up negative, down is postive
-    float object_elevation = ((float) y - IMAGE_CENTER_Y) * PIX_TO_RAD_Y;
-    // convert dist estimate to mm
-    float object_dist = dist * 10;
-
-    // object in the camera frame
-    ublas::vector<float> objectInCameraFrame = vector4D(object_dist
-            * cos(object_bearing) * cos(-object_elevation), object_dist
-            * sin(object_bearing), object_dist * cos(object_bearing)
-            * sin(-object_elevation));
-
-    // object in world frame
-    ublas::vector<float> objectInWorldFrame = prod(cameraToWorldFrame,
-                                                   objectInCameraFrame);
-
-    return getEstimate(objectInWorldFrame);
-}
-
-/* OBSOLETE (yay)
-const float NaoPose::correctDistance(const float uncorrectedDist) {
-    if (uncorrectedDist > 706.0f) {
-        return uncorrectedDist - 387.0f;
-    }
-    return -0.000591972f * uncorrectedDist * uncorrectedDist + 0.858283f
-            * uncorrectedDist + 2.18768F;
-}
-*/
-
-/**
- * Method to populate an estimate with an vector4D in homogenous coordinates.
- *
- * Input units are MM, output in estimate is in CM, radians
- *
- */
-estimate NaoPose::getEstimate(ublas::vector<float> objInWorldFrame) {
-    estimate pix_est;
-
-    //distance as projected onto XY plane - ie bird's eye view
-
-    pix_est.dist = getHypotenuse(objInWorldFrame(X), objInWorldFrame(Y))
-            * MM_TO_CM;
-
-    // calculate in radians the bearing to the object from the center of the body
-    // since trig functions can't handle 2 Pi, we need to differentiate
-    // by quadrant:
-
-    const bool yPos = objInWorldFrame(Y) >= 0;
-    const bool xPos = objInWorldFrame(X) >= 0;
-    const float temp = objInWorldFrame(Y) / objInWorldFrame(X);
-    if (!isnan(temp)) {
-        //quadrants +x,+y and +x-y
-        if (xPos && (yPos || !yPos)) {
-            pix_est.bearing = std::atan(temp);
-        } else if (yPos) { //quadrant -x+y
-            pix_est.bearing = std::atan(temp) + M_PI_FLOAT;
-        } else {//quadrant -x+y
-            pix_est.bearing = std::atan(temp) - M_PI_FLOAT;
-        }
-    } else {
-        pix_est.bearing = 0.0f;
     }
 
-    pix_est.x = objInWorldFrame(X) * MM_TO_CM;
-    pix_est.y = objInWorldFrame(Y) * MM_TO_CM;
+    //Do a kinematics estimate to get the bearing
+    estimate initialEstimate = this->pixEstimate(x, y, objectHeight);
 
-    //need dist in 3D for angular elevation, not birdseye
-    float dist3D = getHomLength(objInWorldFrame); //in MM
-    const float temp2 = objInWorldFrame(Z) / dist3D;
-    if (temp2 <= 1.0)
-        pix_est.elevation = NBMath::safe_asin(temp2);
+    estimate newEstimate = initialEstimate;
 
-    return pix_est;
+    newEstimate.dist = groundDist;
+    newEstimate.x = groundDist * cos(initialEstimate.bearing);
+    newEstimate.y = groundDist * sin(initialEstimate.bearing);
+
+    //TODO: we could probably determine a better elevation for the object as well from
+    //knowing the distance
+
+    newEstimate.distance_variance = getDistanceVariance(groundDist);
+    newEstimate.bearing_variance = getBearingVariance(groundDist);
+
+    return newEstimate;
+}
+
+estimate NaoPose::makeEstimateFrom(ufvector4 pixelInCameraWorldFrame,
+                                   mms groundDistance, mms objectHeight) const {
+
+    // The bird's eye view angle between the X axis that originates from the camera and the
+    // line that goes through the camera and the pixel
+    // You can think of this as the object's bearing, but measured from the camera rather
+    // than the CoM
+    float beta = NBMath::safe_atan2(pixelInCameraWorldFrame(Y), pixelInCameraWorldFrame(X));
+
+    estimate est;
+
+    // Compute the component distances from the camera, and then add the camera offsets
+    // to translate them to the CoM origin
+    float distX = groundDistance * cos(beta) + cameraInWorldFrame.x;
+    float distY = groundDistance * sin(beta) + cameraInWorldFrame.y;
+
+    est.bearing = NBMath::safe_atan2(distY, distX);
+
+    est.x = distX*MM_TO_CM;
+    est.y = distY*MM_TO_CM;
+    est.dist = sqrt(est.x * est.x + est.y * est.y);
+
+    //TODO: figure out elevation
+//    const float temp2 = -(focalPointInWorldFrame.z + comHeight - objectHeight) / distance3D;
+//    if (temp2 <= 1.0)
+//        est.elevation = NBMath::safe_asin(temp2);
+
+    // SANITY CHECKS
+    //If the target object plane is below the camera height,
+    //then we need to make sure that the pixel in world frame is lower than
+    //the focal point, or else, we will get odd results, since the point
+    //of intersection with that plane will be behind us.
+    if (objectHeight < comHeight + cameraInWorldFrame.z && pixelInCameraWorldFrame(Z) >= 0) {
+        return NULL_ESTIMATE;
+    }
+
+    est.distance_variance = getDistanceVariance(est.dist);
+    est.bearing_variance = getBearingVariance(est.dist);
+
+    return est;
 }
 
 //TODO: test this (untested as of now)
@@ -596,7 +488,8 @@ const ublas::matrix<float> NaoPose::calculateForwardTransform(const ChainID id,
     // Do the end transforms
     const int numEndTransforms = NUM_END_TRANSFORMS[id];
     for (int i = 0; i < numEndTransforms; i++) {
-        fullTransform = prod(fullTransform, END_TRANSFORMS[id][i]);
+      if (isTopCam) fullTransform = prod(fullTransform, END_TRANSFORMS_TOP[id][i]);
+      else fullTransform = prod(fullTransform, END_TRANSFORMS_BOTTOM[id][i]);
     }
 
     return fullTransform;
@@ -621,16 +514,33 @@ const int NaoPose::getHorizonX(const int y) const {
     return (int) (((float) y - (float) horizonLeft.y) / horizonSlope);
 }
 
-// Return the distance to the object based on the image magnification of its
-// height
-const float NaoPose::pixHeightToDistance(float pixHeight, float cmHeight) const {
-    return (FOCAL_LENGTH_MM / (pixHeight * PIX_Y_TO_MM)) * cmHeight;
-}
+NBMath::ufvector3 intersection(ufvector3 a1, ufvector3 a2, ufvector3 b1, ufvector3 b2) {
 
-// Return the distance to the object based on the image magnification of its
-// height
-const float NaoPose::pixWidthToDistance(float pixWidth, float cmWidth) const {
-    return (FOCAL_LENGTH_MM / (pixWidth * PIX_X_TO_MM)) * cmWidth;
+    int X = 0;
+    int Y = 1;
+
+    //Line1
+    float A1 = a2(Y) - a1(Y);
+    float B1 = a2(X) - a1(X);
+    float C1 = A1*a1(X) + B1*a1(Y);
+
+    //Line2
+    float A2 = b2(Y) - b1(Y);
+    float B2 = b2(X) - b1(X);
+    float C2 = A2 * b2(X) + B2 * b2(Y);
+
+    float det = A1*B2 - A2*B1;
+    if (det == 0)
+    {
+        //parallel
+        return CoordFrame3D::vector3D(-1, -1);
+    }
+    else
+    {
+        float x = (B2*C1 - B1*C2)/det;
+        float y = (A1 * C2 - A2 * C1) / det;
+        return CoordFrame3D::vector3D(x,y);
+    }
 }
 
 /**
@@ -639,10 +549,10 @@ const float NaoPose::pixWidthToDistance(float pixWidth, float cmWidth) const {
  * returns the expected visual lines from a known field position
  * x, y, robotAngle are considered from a bird's eye view perspective
  **/
-std::vector<VisualLine> NaoPose::getExpectedVisualLinesFromFieldPosition(
+std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromFieldPosition(
         float x, float y, float robotAngle) {
 
-    std::vector<VisualLine> visualLines;
+    std::vector<shared_ptr<VisualLine> > visualLines;
     //translation from the world origin to the robot origin
     ublas::matrix <float> worldOriginToRobotOriginTranslation =
             CoordFrame3D::translation3D(-x, -y);
@@ -659,18 +569,32 @@ std::vector<VisualLine> NaoPose::getExpectedVisualLinesFromFieldPosition(
         linePoint1 = prod(worldOriginToRobotOriginTranslation, linePoint1);
         linePoint1 = prod(worldToRobotRotation, linePoint1);
 
-        ublas::vector <float> pixel1 = worldPointToPixel(linePoint1);
-        linePoint visualLinePoint1;
-        visualLinePoint1.x = (int) pixel1(X);
-        visualLinePoint1.y = (int) pixel1(Y);
-
         ublas::vector <float> linePoint2 = CoordFrame3D::vector3D(
                 (**i).getFieldX2(), (**i).getFieldY2());
         //get the line point in the robot coordinate system
         linePoint2 = prod(worldOriginToRobotOriginTranslation, linePoint2);
         linePoint2 = prod(worldToRobotRotation, linePoint2);
 
+        ublas::vector <float> pixel1 = worldPointToPixel(linePoint1);
         ublas::vector <float> pixel2 = worldPointToPixel(linePoint2);
+
+        float FOCAL_LENGTH = 290.0;
+
+        // correct if one point is behind image plane
+        if (pixel1(Z) < 0 && pixel2(Z) > 0) {
+            pixel1 = ((FOCAL_LENGTH - pixel1(Z)) /
+                    (pixel2(Z) - pixel1(Z)))*
+                    (pixel1-pixel2) + pixel1;
+        } else if (pixel2(Z) < 0 && pixel1(Z) > 0) {
+            pixel2 = ((FOCAL_LENGTH - pixel2(Z)) /
+                    (pixel1(Z) - pixel2(Z))) *
+                    (pixel2-pixel1) + pixel2;
+        }
+
+        linePoint visualLinePoint1;
+        visualLinePoint1.x = (int) pixel1(X);
+        visualLinePoint1.y = (int) pixel1(Y);
+
         linePoint visualLinePoint2;
         visualLinePoint2.x = (int) pixel2(X);
         visualLinePoint2.y = (int) pixel2(Y);
@@ -681,8 +605,7 @@ std::vector<VisualLine> NaoPose::getExpectedVisualLinesFromFieldPosition(
         if (pixel2(X) != 0 && pixel2(Y) != 0)
             visualLinePoints.push_back(visualLinePoint2);
         if (visualLinePoints.size() > 0){
-            VisualLine visualLine = VisualLine(visualLinePoints);
-            visualLines.push_back(visualLine);}
+            visualLines.push_back(shared_ptr<VisualLine>(new VisualLine(visualLinePoints)));}
     }
 
     return visualLines;
@@ -701,9 +624,9 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     ublas::vector <float> pointVectorInWorldFrame =
             CoordFrame4D::vector4D(point(X) * CM_TO_MM, point(Y) * CM_TO_MM, -comHeight);
     //transform it from the world frame to the camera frame
-    pointVectorInWorldFrame(X) = pointVectorInWorldFrame(X) - focalPointInWorldFrame.x;
-    pointVectorInWorldFrame(Y) = pointVectorInWorldFrame(Y) - focalPointInWorldFrame.y;
-    pointVectorInWorldFrame(Z) = pointVectorInWorldFrame(Z) - focalPointInWorldFrame.z;
+    pointVectorInWorldFrame(X) = pointVectorInWorldFrame(X) - cameraInWorldFrame.x;
+    pointVectorInWorldFrame(Y) = pointVectorInWorldFrame(Y) - cameraInWorldFrame.y;
+    pointVectorInWorldFrame(Z) = pointVectorInWorldFrame(Z) - cameraInWorldFrame.z;
 
     //now transform the point from camera frame to image frame
     ufmatrix4 cameraToWorldRotation = cameraToWorldFrame;
@@ -712,7 +635,7 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     cameraToWorldRotation(2, 3) = 0;
     pointVectorInWorldFrame = prod(trans(cameraToWorldRotation), pointVectorInWorldFrame);
 
-    float FOCAL_LENGTH = 385.54f;
+    float FOCAL_LENGTH = 290.0f;
 
     //scale to image size
     float t = FOCAL_LENGTH / pointVectorInWorldFrame(X);
@@ -720,7 +643,7 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     float y = -(t * pointVectorInWorldFrame(Z)) + IMAGE_CENTER_Y;
 
     //if t is negatve, then object is behind, cannnot put that in image
-    if (t < 0) {x = 0;  y = 0;}
+//    if (t < 0) {x = 0;  y = 0;}
 
     return CoordFrame3D::vector3D(x, y);
 }
@@ -739,78 +662,51 @@ std::vector<radians> NaoPose::headAnglesToRobotPoint(ublas::vector <float> point
     return headAngles;
 }
 
-const estimate NaoPose::sizeBasedEstimate(int pixelX, int pixelY, float objectHeight, float pixelSize, float realSize) {
+estimate NaoPose::estimateFromObjectSize(pixels pixelX, pixels pixelY, mms objectHeight, float pixelSize, mms realSize) const {
 
-    float PIXEL_FOCAL_LENGTH = 385.54f;
+    pixels FOCAL_LENGTH = 290;
+
     if (pixelSize <= 0 || realSize <= 0)
         return NULL_ESTIMATE;
+
+    // ratio gives a mm/pixel estimate for the object
     float ratio = realSize / pixelSize;
-    //cout<<"ratio "<<ratio<<endl;
 
     ufvector4 pixelInCameraFrame =
-                vector4D( PIXEL_FOCAL_LENGTH,
-                          ((float)IMAGE_CENTER_X - (float)pixelX),
-                          ((float)IMAGE_CENTER_Y - (float)pixelY));
+                vector4D((float) FOCAL_LENGTH,
+                         ((float)IMAGE_CENTER_X - (float)pixelX),
+                         ((float)IMAGE_CENTER_Y - (float)pixelY));
 
     float pixelDistance = length(pixelInCameraFrame);
 
-    float distance3D = ratio * pixelDistance;
+    // distance from the focal point (camera) to the pixel in the image
+    // in camera coordinates
+    mms distance3D = ratio * pixelDistance;
 
-    float distance2D = 0.0f;
-    //safe to assume that if the focal distance is smaller than the height, then the ball is a few pixel to big
-    if (distance3D < focalPointInWorldFrame.z + comHeight - objectHeight) {
+    mms robotHeight = cameraInWorldFrame.z + comHeight;
+    mms deltaHeight = robotHeight - objectHeight;
+
+//    std::cout << "com height" << comHeight <<
+//            " distance3D " << distance3D << " robotHeight " << robotHeight << std::endl;
+
+    //safe to assume that if the focal distance is smaller than the height, then the pixel size is too big
+    //default back to full kinematics estimate
+    if (distance3D < deltaHeight) {
         return pixEstimate(pixelX, pixelY, objectHeight);
     }
 
-    distance2D = sqrt(abs(distance3D * distance3D - (focalPointInWorldFrame.z + comHeight - objectHeight) *
-                          (focalPointInWorldFrame.z + comHeight - objectHeight)));
-    //cout<<"shit "<<distance3D<<" "<<(focalPointInWorldFrame.z + comHeight - objectHeight)<<endl;
+    mms distance2D = sqrt(distance3D * distance3D - deltaHeight * deltaHeight);
 
     ufmatrix4 cameraToWorldRotation = cameraToWorldFrame;
     cameraToWorldRotation(0, 3) = 0;
     cameraToWorldRotation(1, 3) = 0;
     cameraToWorldRotation(2, 3) = 0;
+
+//    cout << "y-rotation " << NBMath::safe_asin(-cameraToWorldRotation(2, 0)) * 180 / M_PI << std::endl;
+
     //TODO: clean this up and comment
     ufvector4 pixelInWorldFrame = prod(cameraToWorldRotation, pixelInCameraFrame);
 
-    float beta = atan(pixelInWorldFrame(Y)/pixelInWorldFrame(X));
-
-    float distX = distance2D * cos(beta) + focalPointInWorldFrame.x;
-    float distY = distance2D * sin(beta) + focalPointInWorldFrame.y;
-
-    //    float bearing = atan(pixelInWorldFrame(Y) / pixelInWorldFrame(X));
-    estimate est;
-    //est.dist = distance2D * MM_TO_CM;
-
-    float bearing = 0.0f;
-    const bool yPos = distY >= 0;
-    const bool xPos = distX >= 0;
-    const float r = distY / distX;
-    if (!isnan(r)) {
-        //quadrants +x,+y and +x-y
-        if (xPos && (yPos || !yPos)) {
-            bearing = std::atan(r);
-        } else if (yPos) { //quadrant -x+y
-            bearing = std::atan(r) + M_PI_FLOAT;
-        } else {//quadrant -x+y
-            bearing = std::atan(r) - M_PI_FLOAT;
-        }
-    } else {
-        bearing = 0.0f;
-    }
-
-    est.bearing = bearing;
-
-
-    //TODO: this is prolly not important
-    const float temp2 = (focalPointInWorldFrame.z + comHeight - objectHeight) / distance3D;
-    if (temp2 <= 1.0) {
-        est.elevation = NBMath::safe_asin(temp2);
-    }
-    est.x = distX*MM_TO_CM;
-    est.y = distY*MM_TO_CM;
-    est.dist = sqrt(est.x * est.x + est.y * est.y);
-
-    return est;
+    return makeEstimateFrom(pixelInWorldFrame, distance2D, objectHeight);
 }
 

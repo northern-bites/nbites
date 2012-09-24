@@ -1,65 +1,100 @@
 from math import fabs, hypot
 from . import NavConstants as constants
+import NavStates as states
 from man.noggin.util import MyMath
 import noggin_constants as NogginConstants
 from ..players import ChaseBallTransitions
+from . import NavHelper as helper
 
-def atDestinationCloser(nav):
+DEBUG = True
+
+def atDestination(nav):
     """
-    Returns true if we are at an (x, y) close enough to the one we want
+    Returns true if we're close enough to nav's current destination;
+    Takes into account loc uncertainty to check if we're at least close to
+    the destination according to our belief
     """
+    relDest = helper.getRelativeDestination(nav.brain.my, states.goToPosition.dest)
     my = nav.brain.my
+    (x, y, h) = states.goToPosition.precision
 
-    if nav.destType is constants.BALL:
-        return ChaseBallTransitions.ballInPosition(nav.brain.player)
-
-    return my.distTo(nav.getDestination()) < (constants.CLOSER_XY +
-                                              hypot(my.uncertX,
-                                                    my.uncertY))
-
-def atHeadingGoTo(my, targetHeading):
-    hDiff = fabs(MyMath.sub180Angle(my.h - targetHeading))
-    return hDiff < constants.AT_HEADING_GOTO_DEG
-
-def atHeading(nav):
-    """
-    Returns true if we are at a heading close enough to what we want
-    """
-    my = nav.brain.my
-    dest = nav.getDestination()
-
-    if nav.destType is constants.BALL:
-        return abs(nav.brain.ball.bearing) < constants.CLOSE_ENOUGH_H
-
-    hDiff = fabs(MyMath.sub180Angle(my.h - dest.h))
-    return hDiff < constants.CLOSE_ENOUGH_H and \
-           my.uncertH < constants.LOC_IS_ACTIVE_H
-
-def useFinalHeading(brain, position):
-    if brain.gameController.currentState == 'gameReady':
-        useFinalHeadingDist = constants.FINAL_HEADING_READY_DIST
+    if (not helper.isDestinationRelative(states.goToPosition.dest)):
+        return relDest.within((x + my.uncertX, y + my.uncertY, h + my.uncertH))
     else:
-        useFinalHeadingDist = constants.FINAL_HEADING_DIST
+        return relDest.within((x, y, h))
 
-    distToPoint = brain.my.distTo(position)
+def shouldDodgeLeft(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
 
-    return (distToPoint <= useFinalHeadingDist)
+    # check sonars
+    sonars = (nav.brain.sonar.rightDist != nav.brain.sonar.UNKNOWN_VALUE and
+              nav.brain.sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST)
 
-def shouldSwitchPFKModes(nav):
-    """
-    True if we're near to the ball and using setSpeed, or far away and using setDest
-    """
-    ball = nav.brain.ball
+    #check vision
+    vision = nav.brain.vision.obstacles.onRight
 
-    # using setSpeed
-    if nav.currentState == 'goToPosition' or \
-           nav.currentState == 'omniGoTo' :
-        if ball.dist < 30:
-            return True
+    #check feet
+    feet = (nav.brain.sensors.rightFootBumper.left or
+            nav.brain.sensors.rightFootBumper.right)
 
-    return False
+    if (feet and vision):
+        return True
+    elif (vision and sonars):
+        return True
+    elif (sonars and feet):
+        return True
+
+    else:
+        return False
+
+def shouldDodgeRight(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
+
+    # check sonars
+    sonars = (nav.brain.sonar.leftDist != nav.brain.sonar.UNKNOWN_VALUE and
+              nav.brain.sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST)
+    #check vision
+    vision = nav.brain.vision.obstacles.onLeft
+
+    #check feet
+    feet = (nav.brain.sensors.leftFootBumper.left or
+            nav.brain.sensors.leftFootBumper.right)
+
+    if (feet and vision):
+        return True
+    elif (vision and sonars):
+        return True
+    elif (sonars and feet):
+        return True
+
+    else:
+        return False
+
+def doneDodging(nav):
+    return nav.brain.motion.isStanding()
+
+def notAtLocPosition(nav):
+    return not atDestination(nav)
+
+def walkedEnough(nav):
+    deltaDest = states.walkingTo.deltaDest
+    dest = states.walkingTo.dest
+    precision = states.walkingTo.precision
+
+    #check if we've "passed" the point we were supposed to go to
+    #with odometry
+    if (dest.relX * deltaDest.relX < 0 and
+        dest.relY * deltaDest.relY < 0 and
+        dest.relH * deltaDest.relH < 0):
+        return True
+
+    return deltaDest.within(precision)
 
 ######### BALL IN BOX ###############
+
+#keeping this code around for posterity; do we actually need it?
 
 def shouldChaseAroundBox(my, ball):
 
@@ -95,62 +130,3 @@ def shouldChaseAroundBox(my, ball):
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y) )
 
-####### AVOIDANCE STUFF ##############
-
-def shouldAvoidObstacleLeft(nav):
-    """
-    Need to avoid an obstacle on our left side
-    """
-    sonar = nav.brain.sonar
-    if (sonar.leftDist != sonar.UNKNOWN_VALUE and
-        sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST):
-        nav.shouldAvoidObstacleLeftCounter += 1
-    else :
-        nav.shouldAvoidObstacleLeftCounter = 0
-
-    if nav.shouldAvoidObstacleLeftCounter > \
-            constants.AVOID_OBSTACLE_FRAMES_THRESH:
-        return True
-    return False
-
-def shouldAvoidObstacleRight(nav):
-    """
-    Need to avoid an obstacle on our right side
-    """
-    sonar = nav.brain.sonar
-    if (sonar.rightDist != sonar.UNKNOWN_VALUE and
-        sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST):
-         nav.shouldAvoidObstacleRightCounter += 1
-    else :
-        nav.shouldAvoidObstacleRightCounter = 0
-
-    if nav.shouldAvoidObstacleRightCounter > \
-            constants.AVOID_OBSTACLE_FRAMES_THRESH:
-        return True
-
-    return False
-
-def shouldAvoidObstacle(nav):
-    """
-    Should avoid an obstacle
-    """
-    # don't dodge an object in front when we're not going forward
-    if nav.walkX <= 0:
-        return False
-
-    return ((shouldAvoidObstacleLeft(nav) or
-             shouldAvoidObstacleRight(nav)) and
-            not nav.brain.player.penaltyKicking)
-
-def shouldAvoidObstacleDuringApproachBall(nav):
-    return (nav.brain.ball.dist >
-            constants.SHOULD_AVOID_OBSTACLE_APPROACH_DIST and \
-            shouldAvoidObstacle(nav) and
-            (nav.brain.ball.dist > nav.brain.sonar.leftDist or
-            nav.brain.ball.dist > nav.brain.sonar.rightDist))
-
-KICK_STRAIGHT_BEARING_THRESH = 20.
-########## CHASE STUFF ##############
-def shouldChaseOrbit(myH, destH):
-    hDiff = MyMath.sub180Angle(myH - destH)
-    return( fabs(hDiff) > KICK_STRAIGHT_BEARING_THRESH)

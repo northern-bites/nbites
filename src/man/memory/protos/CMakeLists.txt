@@ -2,7 +2,7 @@
 
 ############################ Version
 # Check cMake version
-cmake_minimum_required( VERSION 2.6.0 )
+cmake_minimum_required( VERSION 2.8.3 )
 
 
 ############################ FIND PACKAGE
@@ -22,6 +22,12 @@ include_directories( ${PROTOBUF_INCLUDE_DIR}/
 file(GLOB PROTO_INPUT
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
   "*.proto")
+set(PROTO_INPUT Sensors.proto
+                 Vision.proto
+                 Loc.proto
+                 Common.proto
+                 Ball.proto
+                 Motion.proto)
 
 #protobuf compiler
 set(PROTOC_C_OUT_FLAG --cpp_out)

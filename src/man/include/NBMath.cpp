@@ -68,11 +68,11 @@ const float NBMath::signNoZero(const float f)
 const float NBMath::subPIAngle(float theta)
 {
     theta = std::fmod(theta, 2.0f*M_PI_FLOAT);
-    if( theta > M_PI) {
+    if( theta > M_PI_FLOAT) {
         theta -= 2.0f*M_PI_FLOAT;
     }
 
-    if( theta < -M_PI) {
+    if( theta < -M_PI_FLOAT) {
         theta += 2.0f*M_PI_FLOAT;
     }
     return theta;
@@ -85,6 +85,10 @@ const float NBMath::safe_acos(const float input){
     return std::acos(clip(input,1.0f));
 }
 
+// takes in two sides of a triangle, returns hypotenuse
+float NBMath::getHypotenuse(float x, float y) {
+    return std::sqrt(x*x + y*y);
+}
 
 const float  NBMath::cycloidx(const float theta){
     return theta - std::sin(theta);
@@ -103,5 +107,5 @@ const float NBMath::safe_atan2(const float y, const float x)
             return -M_PI_FLOAT / 2.0f;
         }
     }
-    return static_cast<float>(atan2(y,x));
+    return static_cast<float>(std::atan2(y,x));
 }

@@ -73,3 +73,34 @@ def targetTracking(tracker):
     tracker.helper.trackObject()
 
     return tracker.stay()
+
+# Fixed Pitch
+# Super State
+def trackBallFixedPitch(tracker):
+    """
+    Track the ball using vision values.
+    If ball is lost, execute pans until found.
+    """
+    tracker.target = tracker.brain.ball
+
+    if tracker.target.vis.framesOff <= \
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+        return tracker.goNow('trackingFixedPitch')
+    else:
+        return tracker.goNow('fullPanFixedPitch')
+
+# Fixed Pitch
+def lookStraightThenTrackFixedPitch(tracker):
+    """
+    Perform a 'look straight' head move.
+    Once ball is seen enough, track it.
+    """
+    if tracker.firstFrame():
+        tracker.brain.motion.stopHeadMoves()
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+        tracker.target = tracker.brain.ball
+
+    if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.trackBallFixedPitch()
+
+    return tracker.stay()

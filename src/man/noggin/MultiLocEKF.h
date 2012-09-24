@@ -16,6 +16,9 @@
 #include "LocSystem.h"
 #include "dsp.h"
 
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
+
 // #define DEBUG_LOC_EKF_INPUTS
 // #define DEBUG_STANDARD_ERROR
 // #define DEBUG_DIVERGENCE_CALCULATIONS
@@ -52,7 +55,8 @@ class MultiLocEKF : public ekf::TwoMeasurementEKF<PointObservation,
 public:
 
     // Constructors & Destructors
-    explicit MultiLocEKF(float initX = INIT_LOC_X,
+    explicit MultiLocEKF(man::memory::MLocalization::ptr mLocalization = man::memory::MLocalization::ptr(),
+                         float initX = INIT_LOC_X,
                          float initY = INIT_LOC_Y,
                          float initH = INIT_LOC_H,
                          float initXUncert = INIT_X_UNCERT,
@@ -60,6 +64,9 @@ public:
                          float initHUncert = INIT_H_UNCERT);
 
     virtual ~MultiLocEKF() {}
+
+    // Memory update
+    void updateMLocalization(man::memory::MLocalization::ptr) const;
 
     // Update functions
     virtual void updateLocalization(const MotionModel& u,
@@ -113,7 +120,7 @@ public:
 
     // Get last odomotery update
     virtual MotionModel getLastOdo() const {
-        return lastOdo;
+        return lastOdometry;
     }
 
     virtual std::vector<PointObservation> getLastPointObservations() const {
@@ -165,7 +172,7 @@ private:
     MultiLocEKF operator=(const MultiLocEKF& other);
 
     // Core Functions
-    virtual StateVector associateTimeUpdate(MotionModel u_k);
+    virtual StateVector associateTimeUpdate(const DeltaMotionModel& u_k);
 
     virtual void incorporateMeasurement(const PointObservation& z,
                                         StateMeasurementMatrix1 &H_k,
@@ -329,7 +336,7 @@ private:
     void clipRobotPose();
 
     // Last odometry update
-    MotionModel lastOdo;
+    MotionModel lastOdometry;
     std::vector<PointObservation> lastPointObservations;
     std::vector<CornerObservation> lastCornerObservations;
     bool useAmbiguous;
@@ -340,6 +347,8 @@ private:
      */
     Boxcar errorLog;
     bool resetFlag;
+
+    man::memory::MemoryProvider<man::memory::MLocalization, MultiLocEKF> memoryProvider;
 
     // Fraction of frames with an erroneous observation
     const static float ERROR_RESET_THRESH;

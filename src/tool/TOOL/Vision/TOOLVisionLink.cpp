@@ -85,7 +85,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         cout << "Error: the image had the wrong byte size" << endl;
         cout << "Image byte size should be " << IMAGE_BYTE_SIZE << endl;
         cout << "Detected byte size of " << env->GetArrayLength(jimg)
-        << endl;
+             << endl;
         return;
     }
     if (env->GetArrayLength(jjoints) != Kinematics::NUM_JOINTS) {
@@ -155,7 +155,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 
     uint16_t *newImg = reinterpret_cast<uint16_t*>(new uint8_t[320*240*7]);
 
-    ColorParams  cp(0,0,0,256,256,256,128,128,128);
+    ColorParams cp(0,0,0,256,256,256,128,128,128);
 
     //timing the vision process
     long long startTime = thread_micro_time();
@@ -192,7 +192,8 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         env->ReleaseByteArrayElements(row_target, row, 0);
     }
 
-    delete newImg;
+    delete[] newImg;
+    newImg = NULL;
     env->ReleaseByteArrayElements( jtable, buf_table, 0);
 
     //get the id for the java class, so we can get method IDs
@@ -241,17 +242,7 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
         }
         if (obj != NULL) {
             id = (int) obj->getID();
-            if (obj->getPossibilities()->size() > 1) {
-                if (id == BLUE_GOAL_LEFT_POST ||
-                        id == BLUE_GOAL_RIGHT_POST ||
-                        id == BLUE_GOAL_POST) {
-                    id = BLUE_GOAL_POST;
-
-                } else {
-                    id = YELLOW_GOAL_POST;
-                }
-            }
-
+			id = YELLOW_GOAL_POST;
             env->CallVoidMethod(jobj, setFieldObjectInfo,
                     id,
                     obj->getWidth(), obj->getHeight(),
@@ -341,15 +332,6 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
                         (*i)->getEndpoint().x, (*i)->getEndpoint().y);
             }
 
-            //push data from unusedPoints
-            const list <linePoint> *unusedPoints = vision.fieldLines->getUnusedPoints();
-            env->CallVoidMethod(jobj, prepPointBuffers, unusedPoints->size());
-            for (list <linePoint>::const_iterator i = unusedPoints->begin();
-                    i != unusedPoints->end(); i++)
-            env->CallVoidMethod(jobj, setPointInfo,
-                    i->x, i->y,
-                    i->lineWidth, i->foundWithScan);
-            env->CallVoidMethod(jobj, setUnusedPointsInfo);
             //push data from visualCorners
             const list <VisualCorner>* corners = vision.fieldLines->getCorners();
             for (list <VisualCorner>::const_iterator i = corners->begin();
@@ -569,13 +551,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
 	(JNIEnv * env, jobject jobj, jboolean debugField){
 		vision.thresh->setDebugOpenField(debugField);
 	}
-
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetEdgeDetectionDebug
     (JNIEnv * env, jobject jobj, jboolean debugEdgeDetection){
         vision.thresh->setDebugEdgeDetection(debugEdgeDetection);
     }
-
     JNIEXPORT void JNICALL
     Java_TOOL_Vision_TOOLVisionLink_cppSetHoughTransformDebug
     (JNIEnv * env, jobject jobj, jboolean debugHoughTransform){
@@ -585,6 +565,11 @@ JNIEXPORT void JNICALL Java_TOOL_Vision_TOOLVisionLink_cppProcessImage
     Java_TOOL_Vision_TOOLVisionLink_cppSetRobotDebug
     (JNIEnv * env, jobject jobj, jboolean debugRobot) {
         vision.thresh->setDebugRobots(debugRobot);
+    }
+    JNIEXPORT void JNICALL
+    Java_TOOL_Vision_TOOLVisionLink_cppSetVisualLinesDebug
+    (JNIEnv * env, jobject jobj, jboolean debugVisualLines){
+        vision.thresh->setDebugVisualLines(debugVisualLines);
     }
 
 #ifdef __cplusplus

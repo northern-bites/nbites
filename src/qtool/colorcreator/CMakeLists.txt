@@ -2,7 +2,7 @@
 ############ ColorCreator
 
 project( colorcreator )
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.3)
 
 ########### Dependencies
 
@@ -19,7 +19,8 @@ set( ColorCreator_srcs
   ColorTable.cpp
   ColorSpaceWidget.cpp
   ColorWheel.cpp
-  Stats.cpp )
+  Stats.cpp
+  ColorTableCreator.cpp)
 
 set(ColorCreator_headers
 	ColorCalibrate.h
@@ -27,6 +28,7 @@ set(ColorCreator_headers
     ColorSpaceWidget.h
     ColorSpace.h
     ColorWheel.h
+    ColorTableCreator.h
 )
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -47,4 +49,6 @@ target_link_libraries(
   colorcreator
   data
   ${QT_LIBRARIES}
+  man
+
   )

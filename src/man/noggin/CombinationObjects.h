@@ -30,6 +30,7 @@ namespace noggin {
     class Location;
     class RobotLocation;
     class RelLocation;
+    class RelRobotLocation;
     class LocObject;
     class FieldObject;
     class MyInfo;
@@ -65,6 +66,7 @@ namespace noggin {
         Location(const Location& other);
         virtual bool operator == (const Location& other) const;
         virtual bool operator != (const Location& other) const;
+        virtual RelLocation operator - (const Location& other) const;
 
         static const float INFINITE_DISTANCE = 10000000.0f;
 
@@ -85,6 +87,7 @@ namespace noggin {
         virtual const bool inCenterOfField();
         virtual const bool inTopOfField();
         virtual const bool inBottomOfField();
+        virtual RelLocation getRelLocationOf(const Location& other) const;
 
         // For Python
         bool hasattr(boost::python::object, const std::string&);
@@ -112,7 +115,9 @@ namespace noggin {
         RobotLocation(const RobotLocation& other);
         bool operator == (const RobotLocation& other) const;
         bool operator != (const RobotLocation& other) const;
-
+        RelRobotLocation operator- (const RobotLocation& other) const;
+        RobotLocation operator+ (const RelRobotLocation& other) const;
+        RelRobotLocation getRelRobotLocationOf(const RobotLocation& other) const;
         // Extra getter
         virtual const degrees getH(){ return h*TO_DEG; }
 
@@ -137,28 +142,64 @@ namespace noggin {
      * are also stored.
      */
 
-    class RelLocation : public RobotLocation
+    class RelLocation
     {
     public:
-        RelLocation(RobotLocation& my, float dx, float dy, degrees dh);
-        ~RelLocation() {};
+        RelLocation(float dx = 0, float dy = 0);
+        virtual ~RelLocation() {};
         RelLocation(const RelLocation& other);
 
         //Getters
-        float getRelX(){ return relX; }
-        float getRelY(){ return relY; }
-        degrees getRelH(){ return relH*TO_DEG; }
+        virtual const float getRelX() const { return relX; }
+        virtual const float getRelY() const { return relY; }
+        virtual const degrees getBearing() const {
+            return NBMath::safe_atan2(relY, relX) * TO_DEG;
+        }
+        virtual const float getDist() const {
+            return hypotf(relY, relX);
+        }
 
         //Setters
-        void setRelX(float _x){ relX = _x; }
-        void setRelY(float _y){ relY = _y; }
-        void setRelH(degrees _h){ relH = _h*TO_RAD; }
+        virtual void setRelX(float _x){ relX = _x; }
+        virtual void setRelY(float _y){ relY = _y; }
+
+        // For python
+        virtual boost::python::str toString();
+
+    protected:
+        float relX, relY;
+    };
+
+    /*
+     * REL LOCATION
+     * A robot location that is created by specifying differences in
+     * x, y, and h from a given existing location. The dx, dy, and dh
+     * are also stored.
+     */
+
+    class RelRobotLocation : public RelLocation
+    {
+    public:
+        RelRobotLocation(float dx = 0, float dy = 0, degrees dh = 0);
+        virtual ~RelRobotLocation() {};
+        RelRobotLocation(const RelRobotLocation& other);
+        virtual RelRobotLocation operator- (boost::python::tuple delta) const;
+        virtual RelRobotLocation operator- (const RelRobotLocation& other) const;
+
+        virtual const degrees getRelH() const { return relH*TO_DEG; }
+        virtual void setRelH(degrees _h){ relH = _h*TO_RAD; }
+
+        virtual void rotate(degrees theta);
+
+        //region is a (x, y, h) tuple
+        //check if this rel robot location is within the ellipse specified by
+        // x, y and the heading specified by h
+        bool within(boost::python::tuple region) const;
 
         // For python
         boost::python::str toString();
 
-    private:
-        float relX, relY;
+    protected:
         radians relH;
     };
 
@@ -199,7 +240,7 @@ namespace noggin {
      * relative to the correct team.
      */
 
-    class LocBall : public Location
+    class LocBall : public Location, public RelLocation
     {
     public:
         LocBall(PyLoc&, MyInfo&);
@@ -213,8 +254,8 @@ namespace noggin {
         const float getVelXUncert() { return loc->getXVelocityUncert(); }
         const float getVelYUncert() { return loc->getYVelocityUncert(); }
         const degrees getHeading();
-        const float getRelX() { return loc->getBallRelXEst(); }
-        const float getRelY() { return loc->getBallRelYEst(); }
+        const float getRelX() const { return loc->getBallRelXEst(); }
+        const float getRelY() const { return loc->getBallRelYEst(); }
         const float getRelVelX() { return loc->getRelXVelocityEst(); }
         const float getRelVelY() { return loc->getRelYVelocityEst(); }
         const float getAccX();
@@ -226,8 +267,8 @@ namespace noggin {
         const float dX() { return dx; }
         const float dY() { return dy; }
         const float getEndY() { return endY; }
-        const float getDist() { return loc->getBallDistance(); }
-        const degrees getBearing() { return loc->getBallBearingDeg(); }
+        const float getDist() const { return loc->getBallDistance(); }
+        const degrees getBearing() const { return loc->getBallBearingDeg(); }
 
         // Other
         void update();

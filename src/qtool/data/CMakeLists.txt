@@ -2,7 +2,7 @@
 ############ data
 
 project( data )
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.3)
 
 ########### Dependencies
 
@@ -23,7 +23,6 @@ set( data_headers DataLoader.h
                   OfflineDataFinder.h 
                   DataManager.h
                   MemorySignalingInterface.h
-                  QProtobufMessage.h
                   RobotMemoryManager.h)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})

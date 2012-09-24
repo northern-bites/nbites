@@ -28,13 +28,13 @@ inline static void sincosf(float _x, float * _sinx, float * _cosx) {
 }
 
 #define isnan(x)                                                        \
-    (	sizeof (x) == sizeof(float )	?	__inline_isnanf((float)(x))	\
-		:	sizeof (x) == sizeof(double)	?	__inline_isnand((double)(x)) \
-        :	__inline_isnan ((long double)(x)))
+    (   sizeof (x) == sizeof(float )    ?   __inline_isnanf((float)(x)) \
+        :   sizeof (x) == sizeof(double)    ?   __inline_isnand((double)(x)) \
+        :   __inline_isnan ((long double)(x)))
 #define isinf(x)                                                        \
-    (	sizeof (x) == sizeof(float )	?	__inline_isinff((float)(x))	\
-		:	sizeof (x) == sizeof(double)	?	__inline_isinfd((double)(x)) \
-        :	__inline_isinf ((long double)(x)))
+    (   sizeof (x) == sizeof(float )    ?   __inline_isinff((float)(x)) \
+        :   sizeof (x) == sizeof(double)    ?   __inline_isinfd((double)(x)) \
+        :   __inline_isinf ((long double)(x)))
 
 #endif
 
@@ -98,7 +98,7 @@ namespace NBMath {
 
     const float  cycloidy(const float theta);
 
-
+    float getHypotenuse(float x, float y);
 
 }
 #endif //NBMath_h

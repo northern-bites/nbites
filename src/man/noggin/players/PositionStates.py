@@ -16,18 +16,18 @@ def playbookPosition(player):
     """
     brain = player.brain
     nav = brain.nav
-    gcState = brain.gameController.currentState
 
     if player.firstFrame():
         nav.positionPlaybook()
 
-        if gcState == 'gameReady':
-            brain.tracker.locPans()
-        else:
-            brain.tracker.activeLoc()
+    if nav.isAtPosition():
+        brain.tracker.trackBallFixedPitch()
+    else:
+        brain.tracker.repeatWidePanFixedPitch()
 
-    if PosTran.leavingTheField(player):
-        return player.goLater('spinToField')
+    #TODO: I think the transition is broken right now!
+    #if PosTran.leavingTheField(player):
+    #    return player.goLater('spinToField')
 
     return player.stay()
 
@@ -37,11 +37,11 @@ def spinToField(player):
 
     if player.firstFrame():
         if fieldEdge.shape == vision.basicShape.RISING_LEFT:
-            player.brain.nav.setDest(0,0,constants.SPIN_AROUND_LEFT)
-            player.brain.tracker.activeLoc()
+            player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_LEFT)
+            player.brain.tracker.spinPanFixedPitch()
         else:
-            player.brain.nav.setDest(0,0,constants.SPIN_AROUND_RIGHT)
-            player.brain.tracker.activeLoc()
+            player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_RIGHT)
+            player.brain.tracker.spinPanFixedPitch()
 
     elif player.brain.nav.isAtPosition():
         return player.goLater('playbookPosition')
@@ -52,7 +52,7 @@ def relocalize(player):
     if player.firstFrame():
         player.setWalk(constants.RELOC_X_SPEED, 0, 0)
 
-    if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
+    if player.brain.my.locScore is not NogginConstants.locScore.BAD_LOC:
         player.shouldRelocalizeCounter += 1
 
         if player.shouldRelocalizeCounter > 30:
@@ -63,14 +63,14 @@ def relocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.locPans()
+        player.brain.tracker.repeatWidePanFixedPitch()
 
-    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
-        direction = MyMath.sign(player.getWalk()[2])
-        if direction == 0:
-            direction = 1
-
-        player.setWalk(0, 0, constants.RELOC_SPIN_SPEED * direction)
+#    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
+#        direction = MyMath.sign(player.getWalk()[2])
+#        if direction == 0:
+#            direction = 1
+#@todo: we just spin left to relocalize since getWalk was deprecated
+# maybe we can make this smarter?
+        player.setWalk(0, 0, constants.RELOC_SPIN_SPEED)
 
     return player.stay()
-

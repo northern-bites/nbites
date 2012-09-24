@@ -34,7 +34,9 @@ static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
 
 //Non blocking!!
 void RoboGuardian::playFile(string str)const{
-    system((sout+str+" &").c_str()); // system returns an int.
+    // system returns an int.
+    if(system((sout+str+" &").c_str()) != 0)
+        cout << "Roboguardian could not play file." << endl;
 }
 
 
@@ -241,9 +243,9 @@ void RoboGuardian::checkFalling(){
 
     /***** Determine if the robot is in the process of FALLING ****/
     //Using just the magnitude:
-    const float angleMag = std::sqrt(std::pow(inertial.angleX,2) +
+    const float angleMag = sqrtf(std::pow(inertial.angleX,2) +
                                      std::pow(inertial.angleY,2));
-    const float lastAngleMag = std::sqrt(std::pow(lastInertial.angleX,2) +
+    const float lastAngleMag = sqrtf(std::pow(lastInertial.angleX,2) +
                                          std::pow(lastInertial.angleY,2));
 
     const float angleSpeed = angleMag - lastAngleMag;
@@ -471,14 +473,14 @@ void RoboGuardian::executeStartupAction() const{
 void RoboGuardian::executeShutdownAction()const {
     cout << Thread::name<<" is shutting down the robot NOW!!!"<<endl;
     playFile(shutdown_wav);
-    system("shutdown -h now &");
+    if(system("shutdown -h now &") != 0)
+        cout << "Roboguardian could not shutdown system." << endl;
 }
 
 //TODO: cache this - it's unlikely to change while we're running the code
-string RoboGuardian::getHostName()const {
+string RoboGuardian::getHostName() {
     char name[40];
-    name[0] ='\0';
-    gethostname(name,39);
+    gethostname(name, 40);
     return string(name);
 }
 
@@ -508,7 +510,8 @@ void RoboGuardian::speakIPAddress()const {
          << " my internet address is "
          <<IP<<endl;
 
-    system(speech_command.c_str());
+    if(system(speech_command.c_str()) != 0)
+        cout << "Roboguardian could not speak IP address." << endl;
 }
 
 
@@ -535,6 +538,6 @@ void RoboGuardian::ifUpDown(){
     char ifup[] = "su -c 'ifup wlan0'&";
     cout << "RoboGuardian::ifUpDown() -- reconnecting interfaces\n";
     playFile(wifi_restart_wav);
-    system(ifdown);
-    system(ifup);
+    if(system(ifdown) != 0 || system(ifup) != 0)
+        cout << "Roboguardian ifUpDown checks failed." << endl;
 }

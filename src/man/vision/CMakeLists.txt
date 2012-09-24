@@ -3,7 +3,7 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( VISION )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
@@ -20,7 +20,7 @@ FIND_PACKAGE( Boost        REQUIRED )
 ############################ BUILDCONFIG
 # Include the config file for this build
 INCLUDE( ${VISION_CMAKE_DIR}/buildconfig.cmake )
-
+ADD_DEFINITIONS( -mmmx )
 
 ############################ TESTS
 # Define main test script location
@@ -57,6 +57,18 @@ INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
+SET( FIELD_LINES_SRCS
+  FieldLines/FieldLinesDetector
+  FieldLines/CornerDetector
+  FieldLines/HoughSpace
+  FieldLines/HoughSpaceImpl
+  FieldLines/EdgeDetector
+  FieldLines/Gradient
+  FieldLines/HoughVisualLine
+  FieldLines/HoughVisualCorner
+  geom/HoughLine
+  )
+
 SET( VISION_SRCS Ball
                  Blob
                  Blobs
@@ -68,7 +80,7 @@ SET( VISION_SRCS Ball
                  Context
                  Cross
                  Field
-                 FieldLines
+                 FieldLines.cpp
                  ObjectFragments
                  PyVision
                  Robots
@@ -82,26 +94,23 @@ SET( VISION_SRCS Ball
                  VisualFieldEdge
                  VisualLandmark
                  VisualFieldObject
+		 VisualObstacle
                  VisualRobot
                  VisualCross
                  VisualLine
-                 EdgeDetector
-                 Gradient
-                 HoughSpace
-                 geom/HoughLine
                  VisualDetector
-                 FieldLinesDetector
+		 ${FIELD_LINES_SRCS}
                  )
 
 # Add the assembly files if we're not on Mac OSX
 IF (UNIX AND NOT APPLE)
-  LIST( APPEND VISION_SRCS
-    EdgeDetection.s
+  SET( ASM_SRCS
+    FieldLines/EdgeDetection.s
+    FieldLines/Hough.s
+    FieldLines/HoughAlt.s
     )
-
-SET_PROPERTY(SOURCE
-  EdgeDetection.s
- PROPERTY LANGUAGE C)
+  LIST( APPEND VISION_SRCS ${ASM_SRCS})
+  SET_PROPERTY(SOURCE ${ASM_SRCS} PROPERTY LANGUAGE C)
 ENDIF()
 
 SET( VISION_PYTHON_SRCS
@@ -174,6 +183,7 @@ IF( VISIONLINK )
                         ${VISION_TARGET}
                         ${SENSORS_TARGET}
                         ${NBINCLUDE_TARGET}
+                        ${ROBOT_INTERFACE_TARGET}
                        )
 ENDIF( VISIONLINK )
 
@@ -187,35 +197,70 @@ ENDIF( VISIONLINK )
 
 ########################### VISION TEST EXECUTABLES
 
-# set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test)
-# add_executable( EdgeDetectorTest ${VISION_INCLUDE_DIR}/EdgeDetector.cpp
-#   ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
-#   ${VISION_INCLUDE_DIR}/EdgeDetection.s
-#   ${VISION_INCLUDE_DIR}/Gradient.cpp )
+find_package(GTest)
 
-# target_link_libraries( EdgeDetectorTest ${NBCOMMON_LIBRARIES} ${VISION_TARGET})
+macro( nbites_add_test testname )
+  if( GTEST_FOUND )
+    add_executable( ${testname} ${ARGN} )
+    target_link_libraries(
+      ${testname}
+      ${GTEST_BOTH_LIBRARIES}
+      )
+    GTEST_ADD_TESTS( ${testname} "" ${ARGN})
+  endif(GTEST_FOUND)
+endmacro()
 
+set( VISION_TEST_DIR ${VISION_INCLUDE_DIR}/test )
 
-# add_executable( HoughSpaceTest ${VISION_INCLUDE_DIR}/HoughSpace.cpp
-#   ${VISION_TEST_DIR}/HoughSpaceTest.cpp
-#   ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
-#   ${VISION_INCLUDE_DIR}/EdgeDetection.s
-#   ${VISION_INCLUDE_DIR}/Gradient.cpp )
+set( FIELD_LINES_DIR ${VISION_INCLUDE_DIR}/FieldLines )
 
-# target_link_libraries( HoughSpaceTest ${VISION_TARGET})
+nbites_add_test( EdgeDetectorTest
+  ${FIELD_LINES_DIR}/EdgeDetector.cpp
+  ${VISION_TEST_DIR}/EdgeDetectorTest.cpp
+  ${FIELD_LINES_DIR}/EdgeDetection.s
+  ${FIELD_LINES_DIR}/Gradient.cpp
+  )
 
+if (TARGET EdgeDetectorTest) 
+target_link_libraries( EdgeDetectorTest
+  ${NBCOMMON_LIBRARIES}
+  ${VISION_TARGET}
+  )
+endif()
 
+nbites_add_test( HoughSpaceTest
+  ${FIELD_LINES_DIR}/HoughSpace.cpp
+  ${VISION_TEST_DIR}/HoughSpaceTest.cpp
+  ${VISION_INCLUDE_DIR}/geom/HoughLine.cpp
+  ${FIELD_LINES_DIR}/EdgeDetection.s
+  ${FIELD_LINES_DIR}/Gradient.cpp
+  )
 
-# add_executable( OfflineVision ${VISION_INCLUDE_DIR}/offline/OfflineVision.cpp )
-# target_link_libraries( OfflineVision
-#   ${VISION_TARGET}
-#   ${SENSORS_TARGET}
-#   ${NBINCLUDE_TARGET}
-#   )
+if (TARGET HoughSpaceTest)
+target_link_libraries( HoughSpaceTest
+  ${NBCOMMON_LIBRARIES}
+  ${VISION_TARGET}
+  )
+endif()
 
-# enable_testing()
-# add_test( EdgeDetectorTest  EdgeDetectorTest )
-# add_test( HoughSpaceTest  HoughSpaceTest )
+nbites_add_test( FieldLinesDetectorTest
+  ${VISION_TEST_DIR}/FieldLinesDetectorTest.cpp
+  )
 
+if (TARGET FieldLinesDetectorTest)
+target_link_libraries( FieldLinesDetectorTest
+  ${VISION_TARGET}
+  ${NBINCLUDE_TARGET}
+  )
+endif()
 
-# add_executable( ConvertFrame ${VISION_INCLUDE_DIR}/offline/ConvertFrames.cpp )
+nbites_add_test( CornerDetectorTest
+  ${VISION_TEST_DIR}/CornerDetectorTest.cpp
+  )
+
+if (TARGET CornerDetectorTest)
+target_link_libraries( CornerDetectorTest
+  ${VISION_TARGET}
+  ${NBINCLUDE_TARGET}
+  )
+endif()

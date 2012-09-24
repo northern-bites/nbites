@@ -34,18 +34,25 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
+#include "FieldLines/CornerDetector.h"
+#include "FieldLines/FieldLinesDetector.h"
 
 using namespace std;
 using boost::shared_ptr;
+using namespace man::memory;
 
 static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
 // Vision Class Constructor
-Vision::Vision(shared_ptr<NaoPose> _pose)
+Vision::Vision(boost::shared_ptr<NaoPose> _pose,
+               MVision::ptr mVision)
     : pose(_pose),
-      yImg(&global_16_image[0]), linesDetector(),
-      frameNumber(0), colorTable("table.mtb")
+      yImg(&global_16_image[0]),
+      linesDetector(new FieldLinesDetector()),
+      cornerDetector(new CornerDetector()),
+      frameNumber(0), colorTable("table.mtb"),
+      memoryProvider(&Vision::updateMVision, this, mVision)
 {
     // variable initialization
 
@@ -59,15 +66,16 @@ Vision::Vision(shared_ptr<NaoPose> _pose)
     ball = new VisualBall();
     red1 = new VisualRobot();
     red2 = new VisualRobot();
-	red3 = new VisualRobot();
+    red3 = new VisualRobot();
     navy1 = new VisualRobot();
     navy2 = new VisualRobot();
-	navy3 = new VisualRobot();
-	cross = new VisualCross();
-	fieldEdge = new VisualFieldEdge();
+    navy3 = new VisualRobot();
+    cross = new VisualCross();
+    fieldEdge = new VisualFieldEdge();
+    obstacles = new VisualObstacle();
 
     thresh = new Threshold(this, pose);
-    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose));
+    fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
     thresh->setYUV(&global_16_image[0]);
 }
 
@@ -96,10 +104,26 @@ void Vision::copyImage(const byte* image) {
 
 void Vision::notifyImage(const uint16_t* y) {
     yImg = y;
-    uvImg = y + AVERAGED_IMAGE_SIZE;
+    uImg = y + AVERAGED_IMAGE_SIZE;
+    vImg = uImg + AVERAGED_IMAGE_SIZE;
 
     // Set the current image pointer in Threshold
     thresh->setYUV(y);
+    notifyImage();
+}
+
+void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
+    yImg = y_top;
+    uImg = y_top + AVERAGED_IMAGE_SIZE;
+    vImg = uImg + AVERAGED_IMAGE_SIZE;
+
+    yImg_bot = y_bot;
+    uImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
+    vImg_bot = uImg + AVERAGED_IMAGE_SIZE;
+
+    // Set the current image pointer in Threshold
+    thresh->setYUV(y_top);
+    thresh->setYUV_bot(y_bot);
     notifyImage();
 }
 
@@ -126,15 +150,32 @@ void Vision::notifyImage() {
     // counts the frameNumber
     if (frameNumber > 1000000) frameNumber = 0;
 
-    // Transform joints into pose estimations and horizon line
-    PROF_ENTER(P_TRANSFORM);
-    pose->transform();
-    PROF_EXIT(P_TRANSFORM);
+//    linesDetector->detect(thresh->getVisionHorizon(),
+//                         thresh->field->getTopEdge(),
+//                         yImg);
+//
+//    cornerDetector->detect(thresh->getVisionHorizon(),
+//                           thresh->field->getTopEdge(),
+//                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
+    
+    // - from Bende - I am going to try doing some obstacle avoidance stuff.
+    // - so there will be no visionLoop. Hopefully nothing breaks.
+    
     thresh->visionLoop();
+    thresh->obstacleLoop();
 
+//    drawEdges(*linesDetector->getEdges());
+//    drawHoughLines(linesDetector->getHoughLines());
+//    drawVisualLines(linesDetector->getLines());
+//    drawVisualCorners(cornerDetector->getCorners());
+
+    thresh->transposeDebugImage();
+
+    PROF_EXIT(P_VISION);
     // linesDetector.detect(yImg);
+    memoryProvider.updateMemory();
 }
 
 void Vision::setImage(const uint16_t *image) {
@@ -161,6 +202,194 @@ std::string Vision::getThreshColor(int _id) {
     }
 }
 
+
+/**
+ * Vision memory update
+ */
+
+using namespace proto;
+
+//helpers
+void update(PVision::PVisualDetection* visual_detection,
+            VisualDetection* visualDetection) {
+
+    visual_detection->set_intopcam(visualDetection->isTopCam());
+    visual_detection->set_distance(visualDetection->getDistance());
+    visual_detection->set_center_x(visualDetection->getCenterX());
+    visual_detection->set_center_y(visualDetection->getCenterY());
+    visual_detection->set_x(visualDetection->getX());
+    visual_detection->set_y(visualDetection->getY());
+    visual_detection->set_angle_x(visualDetection->getAngleX());
+    visual_detection->set_angle_y(visualDetection->getAngleY());
+    visual_detection->set_bearing(visualDetection->getBearing());
+    visual_detection->set_elevation(visualDetection->getElevation());
+    visual_detection->set_distance_sd(visualDetection->getDistanceSD());
+    visual_detection->set_bearing_sd(visualDetection->getBearingSD());
+}
+
+void update(PVision::PVisualLandmark* visual_landmark,
+            VisualLandmark* visualLandmark) {
+
+    visual_landmark->set_id(visualLandmark->getID());
+    visual_landmark->set_id_certainty(visualLandmark->getIDCertainty());
+    visual_landmark->set_distance_certainty(visualLandmark->getDistanceCertainty());
+}
+
+void update(PVision::PVisualFieldObject* visual_field_object,
+            VisualFieldObject* visualFieldObject) {
+
+    PVision::PVisualDetection* visual_detection = visual_field_object->mutable_visual_detection();
+    PVision::PVisualLandmark* visual_landmark = visual_field_object->mutable_visual_landmark();
+    update(visual_detection, visualFieldObject);
+    update(visual_landmark, visualFieldObject);
+    visual_field_object->set_left_top_x(visualFieldObject->getLeftTopX());
+    visual_field_object->set_left_top_y(visualFieldObject->getLeftTopY());
+    visual_field_object->set_left_bottom_x(visualFieldObject->getLeftBottomX());
+    visual_field_object->set_left_bottom_y(visualFieldObject->getLeftBottomY());
+    visual_field_object->set_right_top_x(visualFieldObject->getRightTopX());
+    visual_field_object->set_right_top_y(visualFieldObject->getRightTopY());
+    visual_field_object->set_right_bottom_x(visualFieldObject->getRightBottomX());
+    visual_field_object->set_right_bottom_y(visualFieldObject->getRightBottomY());
+}
+
+void update(PVision::PVisualRobot* visual_robot,
+            VisualRobot* visualRobot) {
+
+    PVision::PVisualDetection* visual_detection = visual_robot->mutable_visual_detection();
+    update(visual_detection, visualRobot);
+
+    visual_robot->set_left_top_x(visualRobot->getLeftTopX());
+    visual_robot->set_left_top_y(visualRobot->getLeftTopY());
+    visual_robot->set_left_bottom_x(visualRobot->getLeftBottomX());
+    visual_robot->set_left_bottom_y(visualRobot->getLeftBottomY());
+    visual_robot->set_right_top_x(visualRobot->getRightTopX());
+    visual_robot->set_right_top_y(visualRobot->getRightTopY());
+    visual_robot->set_right_bottom_x(visualRobot->getRightBottomX());
+    visual_robot->set_right_bottom_y(visualRobot->getRightBottomY());
+}
+
+void update(PVision::PVisualLine* visual_line,
+            boost::shared_ptr<VisualLine> visualLine) {
+
+    PVision::PVisualLandmark* visual_landmark = visual_line->mutable_visual_landmark();
+    update(visual_landmark, visualLine.get());
+
+    visual_line->set_start_x(visualLine->getStartpoint().x);
+    visual_line->set_start_y(visualLine->getStartpoint().y);
+    visual_line->set_end_x(visualLine->getEndpoint().x);
+    visual_line->set_end_y(visualLine->getEndpoint().y);
+}
+
+void update(proto::PVision::PVisualCross* visual_cross,
+        VisualCross* visualCross) {
+
+    PVision::PVisualDetection* visual_detection= visual_cross->mutable_visual_detection();
+    update(visual_detection, visualCross);
+
+    PVision::PVisualLandmark* visual_landmark= visual_cross->mutable_visual_landmark();
+    update(visual_landmark, visualCross);
+
+    visual_cross->set_left_top_x(visualCross->getLeftTopX());
+    visual_cross->set_left_top_y(visualCross->getLeftTopY());
+    visual_cross->set_left_bottom_x(visualCross->getLeftBottomX());
+    visual_cross->set_left_bottom_y(visualCross->getLeftBottomY());
+    visual_cross->set_right_top_x(visualCross->getRightTopX());
+    visual_cross->set_right_top_y(visualCross->getRightTopY());
+    visual_cross->set_right_bottom_x(visualCross->getRightBottomX());
+    visual_cross->set_right_bottom_y(visualCross->getRightBottomY());
+}
+
+//main update method
+void Vision::updateMVision(man::memory::MVision::ptr mVision) const {
+
+    //VisualBall
+    PVision::PVisualBall* visual_ball;
+    visual_ball = mVision->get()->mutable_visual_ball();
+
+    //VisualBall::VisualDetection
+    PVision::PVisualDetection* visual_detection;
+    visual_detection = visual_ball->mutable_visual_detection();
+    update(visual_detection, this->ball);
+
+    //VisualBall::stuff
+    visual_ball->set_radius(this->ball->getRadius());
+    visual_ball->set_confidence(this->ball->getConfidence());
+
+    PVision::PVisualFieldObject* yglp;
+    yglp = mVision->get()->mutable_yglp();
+    update(yglp, this->yglp);
+
+    PVision::PVisualFieldObject* ygrp;
+    ygrp = mVision->get()->mutable_ygrp();
+    update(ygrp, this->ygrp);
+
+    //VisualRobot
+    PVision::PVisualRobot* red1;
+    red1=mVision->get()->mutable_red1();
+    update(red1, this->red1);
+
+    PVision::PVisualRobot* red2;
+    red2=mVision->get()->mutable_red2();
+    update(red2, this->red2);
+
+    PVision::PVisualRobot* red3;
+    red3=mVision->get()->mutable_red3();
+    update(red3, this->red3);
+
+    PVision::PVisualRobot* navy1;
+    navy1=mVision->get()->mutable_navy1();
+    update(navy1, this->navy1);
+
+    PVision::PVisualRobot* navy2;
+    navy2=mVision->get()->mutable_navy2();
+    update(navy2, this->navy2);
+
+    PVision::PVisualRobot* navy3;
+    navy3=mVision->get()->mutable_navy3();
+    update(navy3, this->navy3);
+
+    PVision::PVisualCross* visual_cross;
+    visual_cross=mVision->get()->mutable_visual_cross();
+    update(visual_cross, this->cross);
+
+    //VisualLines
+    mVision->get()->clear_visual_line();
+    const vector<boost::shared_ptr<VisualLine> >* visualLines = this->fieldLines->getLines();
+    for(vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
+            i != visualLines->end(); i++){
+
+        PVision::PVisualLine* visual_line = mVision->get()->add_visual_line();
+        update(visual_line, (*i));
+    }
+
+
+    //VisualCorners
+    mVision->get()->clear_visual_corner();
+    list<VisualCorner>* visualCorners = this->fieldLines->getCorners();
+    for (list<VisualCorner>::iterator i = visualCorners->begin(); i
+    != visualCorners->end(); i++) {
+        //VisualCorner
+        PVision::PVisualCorner* visual_corner =
+                mVision->get()->add_visual_corner();
+
+        //VisualCorner::VisualDetection
+        visual_detection = visual_corner->mutable_visual_detection();
+        update(visual_detection, &(*i));
+
+        //VisualCorner::VisualLandmark
+        PVision::PVisualLandmark* visual_landmark =
+                visual_corner->mutable_visual_landmark();
+        update(visual_landmark, &(*i));
+
+
+        //VisualCorner::stuff
+        visual_corner->set_corner_type(i->getShape());
+        visual_corner->set_secondary_shape(i->getSecondaryShape());
+        visual_corner->set_angle_between_lines(i->getAngleBetweenLines());
+        visual_corner->set_orientation(i->getOrientation());
+        visual_corner->set_physical_orientation(i->getPhysicalOrientation());
+    }
+}
 
 /*******************************|
 | Vision visualization methods. |
@@ -445,9 +674,9 @@ void Vision::drawDot(int x, int y, int c)
 void Vision::drawFieldLines()
 {
 #ifdef OFFLINE
-    const vector< shared_ptr<VisualLine> >* lines = fieldLines->getLines();
+    const vector< boost::shared_ptr<VisualLine> >* lines = fieldLines->getLines();
 
-    for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
+    for (vector< boost::shared_ptr<VisualLine> >::const_iterator i = lines->begin();
          i != lines->end(); i++) {
         drawLine(*i, BLUE);
 
@@ -536,6 +765,80 @@ void Vision::drawPoint(int x, int y, int c)
         thresh->debugImage[y][x-1] = static_cast<unsigned char>(c);
     }if (y > 0 && x-2 > 0 && y < (IMAGE_HEIGHT) && x-2 < (IMAGE_WIDTH)) {
         thresh->debugImage[y][x-2] = static_cast<unsigned char>(c);
+    }
+#endif
+}
+
+void Vision::drawEdges(Gradient& g)
+{
+#ifdef OFFLINE
+    if (thresh->debugEdgeDetection){
+        for (int i=0; g.isPeak(i); ++i) {
+            drawDot(g.getAnglesXCoord(i) + IMAGE_WIDTH/2,
+                    g.getAnglesYCoord(i) + IMAGE_HEIGHT/2,
+                    PINK);
+        }
+    }
+#endif
+}
+
+void Vision::drawHoughLines(const list<HoughLine>& lines)
+    {
+#ifdef OFFLINE
+        if (thresh->debugHoughTransform){
+            list<HoughLine>::const_iterator line;
+            for (line = lines.begin() ; line != lines.end(); line++){
+                drawHoughLine(*line, MAROON);
+            }
+        }
+#endif
+    }
+
+void Vision::drawHoughLine(const HoughLine& line, int color)
+{
+#ifdef OFFLINE
+    const double sn = line.getSinT();
+    const double cs = line.getCosT();
+
+    double uStart = 0, uEnd = 0;
+    HoughLine::findLineImageIntersects(line, uStart, uEnd);
+
+    const double x0 = line.getRadius() * cs + IMAGE_WIDTH/2;
+    const double y0 = line.getRadius() * sn + IMAGE_HEIGHT/2;
+
+    for (double u = uStart; u <= uEnd; u+=1.){
+        int x = (int)round(x0 + u * sn);
+        int y = (int)round(y0 - u * cs); // cs goes opposite direction
+        drawDot(x,y, color);
+    }
+#endif
+}
+
+void Vision::drawVisualLines(const vector<HoughVisualLine>& lines)
+{
+#ifdef OFFLINE
+    if (thresh->debugVisualLines){
+        vector<HoughVisualLine>::const_iterator line;
+        int color = 5;
+        for (line = lines.begin(); line != lines.end(); line++){
+            pair<HoughLine, HoughLine> lp = line->getHoughLines();
+            drawHoughLine(lp.first, color);
+            drawHoughLine(lp.second, color);
+            color++;
+        }
+    }
+#endif
+}
+
+void Vision::drawVisualCorners(const vector<HoughVisualCorner>& corners)
+{
+#ifdef OFFLINE
+    if (thresh->debugVisualCorners) {
+        for (vector<HoughVisualCorner>::const_iterator i = corners.begin();
+             i != corners.end(); ++i) {
+            point<int> pt = i->getImageLocation();
+            drawX(pt.x, pt.y, SEA_GREEN);
+        }
     }
 #endif
 }

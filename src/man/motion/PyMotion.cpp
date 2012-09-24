@@ -34,7 +34,9 @@
 #include <boost/python/module.hpp>
 #include <boost/python/args.hpp>
 #include <boost/shared_ptr.hpp>
+
 using namespace std;
+using namespace boost;
 using namespace boost::python;
 
 #include "PyMotionCommand.h"
@@ -66,13 +68,13 @@ BOOST_PYTHON_MODULE(_motion)
     ;
 
     class_<PyHeadJointCommand, bases<PyMotionCommand> >("HeadJointCommand",
-                            init<float, tuple, tuple, int>(
+                            init<float, python::tuple, python::tuple, int>(
                                 "A container for a head joint command passed to the motion engine"))
         ;
     class_<PyGaitCommand, bases<PyMotionCommand> >("GaitCommand",
                            init<
-                           tuple, tuple, tuple, tuple,
-                           tuple, tuple, tuple, tuple>
+                           python::tuple, python::tuple, python::tuple, python::tuple,
+                           python::tuple, python::tuple, python::tuple, python::tuple>
                            (args("stance,step,zmp,joint_hack,sensor,"
                              "stiffness,odo,arms"),
                             "Parameterization of the"
@@ -81,10 +83,10 @@ BOOST_PYTHON_MODULE(_motion)
     ;
 
     class_<PyBodyJointCommand, bases<PyMotionCommand> >("BodyJointCommand",
-                            init<float, tuple, tuple, tuple,
-                            tuple, tuple, int>(
+                            init<float, python::tuple, python::tuple, python::tuple,
+                            python::tuple, python::tuple, int>(
                                 "A container for a body joint command passed to the motion engine"))
-    .def(init<float, int, tuple, tuple, int>( // Single chain command
+    .def(init<float, int, python::tuple, python::tuple, int>( // Single chain command
          args("time","chainID", "joints","body_stiffness","interpolation"),
          "A container for a body joint command passed to the motion engine"))
     ;
@@ -119,8 +121,8 @@ BOOST_PYTHON_MODULE(_motion)
         ;
 
     class_<PyStepCommand, bases<PyMotionCommand> >("StepCommand",
-                           init<float, float, float, int>(args("x","y","theta",
-                                               "numSteps"),
+                           init<float, float, float, float>(args("x","y","theta",
+                                               "gain"),
                                           "A container for a step command. ""Holds an x, y and theta which represents a"
                                           " walk vector, in addition to the number of desired steps."))
         ;
@@ -141,7 +143,7 @@ BOOST_PYTHON_MODULE(_motion)
         .def("enqueue", enq2)
         .def("setNextWalkCommand", &PyMotionInterface::setNextWalkCommand)
         .def("sendStepCommand", &PyMotionInterface::sendStepCommand)
-    .def("sendDestCommand", &PyMotionInterface::sendDestCommand)
+        .def("sendDestCommand", &PyMotionInterface::sendDestCommand)
         .def("setGait", &PyMotionInterface::setGait)
         .def("setHead", &PyMotionInterface::setHead)
         .def("coordHead", &PyMotionInterface::coordHead)
@@ -150,11 +152,13 @@ BOOST_PYTHON_MODULE(_motion)
         .def("isWalkActive", &PyMotionInterface::isWalkActive)
         .def("isHeadActive", &PyMotionInterface::isHeadActive)
         .def("isBodyActive", &PyMotionInterface::isBodyActive)
+        .def("isStanding", &PyMotionInterface::isStanding)
         .def("stopBodyMoves", &PyMotionInterface::stopBodyMoves)
         .def("stopHeadMoves", &PyMotionInterface::stopHeadMoves)
+		.def("calibrated", &PyMotionInterface::calibrated)
         .def("resetWalk", &PyMotionInterface::resetWalkProvider)
         .def("resetScripted", &PyMotionInterface::resetScriptedProvider)
-        .def("walkPose", &PyMotionInterface::walkPose)
+        .def("resetOdometry", &PyMotionInterface::resetWalkOdometry)
         ;
 }
 

@@ -40,7 +40,7 @@
 #include "MotionSwitchboardInterface.h"
 
 #include "Kinematics.h"
-#include "WalkProvider.h"
+#include "bhwalk/BHWalkProvider.h"
 #include "WalkingConstants.h"
 #include "ScriptedProvider.h"
 #include "HeadProvider.h"
@@ -58,19 +58,30 @@
 #include "SetHeadCommand.h"
 #include "CoordHeadCommand.h"
 
+#include "memory/MObjects.h"
+#include "memory/MemoryProvider.h"
+
 #ifdef DEBUG_MOTION
 #  define DEBUG_JOINTS_OUTPUT
 #endif
 
+using namespace man::motion;
+
 class MotionSwitchboard : public MotionSwitchboardInterface {
+
+    typedef man::memory::MMotion MemoryMotion;
+    typedef man::memory::MemoryProvider<MemoryMotion, MotionSwitchboard> MemoryProvider;
+
 public:
     MotionSwitchboard(boost::shared_ptr<Sensors> s,
-            boost::shared_ptr<NaoPose> pose);
+            boost::shared_ptr<NaoPose> pose,
+            MemoryMotion::ptr mMotion = MemoryMotion::ptr());
     ~MotionSwitchboard();
 
     void start();
     void stop();
     void run();
+    void resetOdometry();
 
     const std::vector <float> getNextJoints() const;
     const std::vector<float> getNextStiffness() const;
@@ -85,7 +96,6 @@ public:
     void sendMotionCommand(const UnfreezeCommand::ptr command);
     void sendMotionCommand(const StepCommand::ptr command);
     void sendMotionCommand(const DestinationCommand::ptr command);
-    void walkPose();
 
 public:
     void stopHeadMoves(){headProvider.requestStop();}
@@ -93,18 +103,24 @@ public:
 	curProvider->requestStop();
     }
 
-    bool isWalkActive(){return walkProvider.isActive();}
+    bool isWalkActive(){return walkProvider.isWalkActive();}
+    bool isStanding()  {return walkProvider.isStanding();}
     bool isHeadActive(){return headProvider.isActive();}
     bool isBodyActive(){return curProvider->isActive();}
 
     void resetWalkProvider(){ walkProvider.hardReset(); }
     void resetScriptedProvider(){ scriptedProvider.hardReset(); }
 
-    MotionModel getOdometryUpdate(){
+    MotionModel getOdometryUpdate() const {
         return walkProvider.getOdometryUpdate();
     }
 
     int getFrameCount() const { return frameCount; }
+
+	// Provide calibration boolean towards boost
+	bool calibrated() {
+		return walkProvider.calibrated();
+	}
 
 private:
     void preProcess();
@@ -121,6 +137,11 @@ private:
     void swapHeadProvider();
     int realityCheckJoints();
 
+    static std::vector<float> getBodyJointsFromProvider(MotionProvider* provider);
+    std::vector<BodyJointCommand::ptr> generateNextBodyProviderTransitions();
+
+    void updateMemory(MemoryMotion::ptr mMotion) const;
+
 #ifdef DEBUG_JOINTS_OUTPUT
     void initDebugLogs();
     void closeDebugLogs();
@@ -129,7 +150,7 @@ private:
 
 private:
     boost::shared_ptr<Sensors> sensors;
-    WalkProvider walkProvider;
+    BHWalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;
     NullHeadProvider nullHeadProvider;
@@ -148,7 +169,6 @@ private:
 
     int frameCount;
     bool running;
-    bool shouldWalkPose;
     mutable bool newJoints; //Way to track if we ever use the same joints twice
     mutable bool newInputJoints;
 
@@ -162,6 +182,9 @@ private:
     mutable pthread_mutex_t stiffness_mutex;
 
     bool noWalkTransitionCommand;
+
+    MemoryMotion::ptr mMotion;
+    MemoryProvider memoryProvider;
 
 #ifdef DEBUG_JOINTS_OUTPUT
     FILE* joints_log;

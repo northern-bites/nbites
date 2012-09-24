@@ -3,6 +3,7 @@ import KickInformation
 import KickingConstants as constants
 import noggin_constants as NogginConstants
 from ..playbook import PBConstants
+from objects import RelRobotLocation
 
 class KickDecider(object):
     """
@@ -30,7 +31,21 @@ class KickDecider(object):
         """
         sets a particular kick
         """
+        print "set kick"
         self.info.kick = k
+
+    def getIdealKickPosition(self):
+        """
+        gets an ideal position for the robot to be in
+        for the kick to work
+        """
+        (kick_x, kick_y, kick_heading) = self.info.kick.getPosition()
+        ballLoc = self.brain.ball.loc
+        myLoc = self.brain.my
+
+        return RelRobotLocation(ballLoc.relX - kick_x - constants.APPROACH_BALL_HACK,
+                                ballLoc.relY - kick_y,
+                                kick_heading - myLoc.h)
 
     def getSweetMove(self):
         """
@@ -58,10 +73,10 @@ class KickDecider(object):
             self.setKick(self.info.chooseShortQuickKick())
         # do a side kick pass depending on where the offender is.
         elif self.brain.playbook.pb.kickoffFormation == 0:
-            self.setKick(kicks.SHORT_RIGHT_SIDE_KICK)
+            self.setKick(kicks.RIGHT_SIDE_KICK)
             print "Kickoff RIGHT_SIDE_KICK"
         else:
-            self.setKick(kicks.SHORT_LEFT_SIDE_KICK)
+            self.setKick(kicks.LEFT_SIDE_KICK)
             print "Kickoff LEFT_SIDE_KICK"
 
     def decideKick(self):
@@ -192,9 +207,9 @@ class KickDecider(object):
         ball = self.brain.ball
         if ball.loc.relY >= 0:
             print "LEFT_DYNAMIC_STRAIGHT"
-            return kicks.LEFT_DYNAMIC_STRAIGHT_KICK
+            return kicks.LEFT_STRAIGHT_KICK
         print "RIGHT_DYNAMIC_STRAIGHT"
-        return kicks.RIGHT_DYNAMIC_STRAIGHT_KICK
+        return kicks.RIGHT_STRAIGHT_KICK
 
     def chooseLongBackKick(self):
         ball = self.brain.ball
@@ -216,6 +231,6 @@ class KickDecider(object):
         ball = self.brain.ball
         if ball.loc.relY > 0:
             print "SHORT_QUICK_LEFT"
-            return kicks.SHORT_QUICK_LEFT_KICK
+            return kicks.LEFT_SHORT_STRAIGHT_KICK
         print "SHORT_QUICK_RIGHT"
-        return kicks.SHORT_QUICK_RIGHT_KICK
+        return kicks.RIGHT_SHORT_STRAIGHT_KICK

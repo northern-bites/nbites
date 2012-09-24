@@ -148,14 +148,14 @@ void Comm::setLocData(int p,
     pthread_mutex_unlock (&comm_mutex);
 }
 
-void Comm::setBallData(int p,
+void Comm::setBallData(int p, float on,
                        float d , float b ,
                        float du, float bu)
 {
     int player = checkPlayerNumber(p);
     pthread_mutex_lock (&comm_mutex);
 
-    teamConnect->setBallData(p, d, b, du, bu);
+    teamConnect->setBallData(p, on, d, b, du, bu);
 
     pthread_mutex_unlock (&comm_mutex);
 }

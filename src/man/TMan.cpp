@@ -1,14 +1,16 @@
 #include "TMan.h"
 
 using namespace std;
+using namespace man::memory;
 
-TMan::TMan(boost::shared_ptr<Sensors> _sensors,
+TMan::TMan(RobotMemory::ptr memory,
+           boost::shared_ptr<Sensors> _sensors,
            boost::shared_ptr<Transcriber> _transcriber,
            boost::shared_ptr<ThreadedImageTranscriber> _imageTranscriber,
            boost::shared_ptr<MotionEnactor> _enactor,
            boost::shared_ptr<Lights> _lights,
            boost::shared_ptr<Speech> _speech)
-    :Man(_sensors, _transcriber, _imageTranscriber,
+    :Man(memory, _sensors, _transcriber, _imageTranscriber,
          _enactor, _lights, _speech),
      threadedImageTranscriber(_imageTranscriber)
 {

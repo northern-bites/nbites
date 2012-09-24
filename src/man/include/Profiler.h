@@ -21,6 +21,10 @@ class Profiler;
 enum ProfiledComponent {
     P_MAIN = 0,
     P_GETIMAGE,
+    P_DQBUF,
+    P_ACQUIRE_IMAGE,
+    P_QBUF,
+
     P_VISION,
     P_TRANSFORM,
     P_THRESHRUNS,
@@ -28,6 +32,7 @@ enum ProfiledComponent {
     P_FGHORIZON,
     P_RUNS,
     P_OBJECT,
+    P_ROBOTS,
 
     P_EDGES,
     P_SOBEL,

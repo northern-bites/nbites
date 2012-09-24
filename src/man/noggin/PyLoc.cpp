@@ -12,11 +12,17 @@ using namespace boost;
 
 BOOST_PYTHON_MODULE(_localization)
 {
+    class_<LocNormalParams>("LocNormalParams", init<float, float, float>());
+
     class_<PyLoc>("Loc")
         .add_property("x", &PyLoc::getXEst)
         .add_property("y", &PyLoc::getYEst)
         .add_property("h", &PyLoc::getHEst)
         .add_property("radH", &PyLoc::getRadHEst)
+
+        // If a player is an offender, then he is closer to the 
+        // opposing goal.
+        .add_property("onOpposingSide", &PyLoc::isOnOpposingSide)
 
         .add_property("ballDistance", &PyLoc::getBallDistance)
         .add_property("ballBearing", &PyLoc::getBallBearingDeg)
@@ -55,18 +61,25 @@ BOOST_PYTHON_MODULE(_localization)
         .add_property("hUncert", &PyLoc::getHUncert)
         .add_property("radHUncert", &PyLoc::getRadHUncert)
         // Odometry
-        .add_property("lastOdoF", &PyLoc::getOdoF)
-        .add_property("lastOdoL", &PyLoc::getOdoL)
-        .add_property("lastOdoR", &PyLoc::getOdoR)
+        .add_property("lastOdoX", &PyLoc::getOdoX)
+        .add_property("lastOdoY", &PyLoc::getOdoY)
+        .add_property("lastOdoTheta", &PyLoc::getOdoThetaDeg)
         // functional
+        .def("setOnOpposingSide", &PyLoc::setOnOpposingSide)
         .def("reset", &PyLoc::reset, "reset the localization system")
         .def("resetBall", &PyLoc::resetBall)
         .def("blueGoalieReset", &PyLoc::blueGoalieReset,
              "reset the localization system")
         .def("redGoalieReset", &PyLoc::redGoalieReset,
              "reset the localization system")
-		.def("resetLocTo", &PyLoc::resetLocTo,
-			 "reset the localiation system to a specific location")
+	.def("resetLocTo", static_cast< void(PyLoc::*)
+	     (float, float, float, LocNormalParams) >(&PyLoc::resetLocTo),
+	     "reset the localization system to a specific location")
+	.def("resetLocTo", static_cast< void(PyLoc::*)
+	     (float, float, float, float, float, float, LocNormalParams, LocNormalParams) >(&PyLoc::resetLocTo),
+	     "reset the localization system to two distinct locations")
+	.def("resetLocToSide", &PyLoc::resetLocToSide,
+	     "reset the localization to be normally distributed on a particular side")
         ;
 }
 
@@ -80,12 +93,12 @@ void c_init_localization() {
     }
 }
 
-void set_loc_reference(shared_ptr<LocSystem> _loc)
+void set_loc_reference(boost::shared_ptr<LocSystem> _loc)
 {
     loc_reference = _loc;
 }
 
-void set_ballEKF_reference(shared_ptr<BallEKF> _ballEKF)
+void set_ballEKF_reference(boost::shared_ptr<BallEKF> _ballEKF)
 {
     ballEKF_reference = _ballEKF;
 }

@@ -66,6 +66,10 @@ void MotionInterface::resetWalkProvider(){
     switchboard->resetWalkProvider();
 }
 
+void MotionInterface::resetWalkOdometry(){
+    switchboard->resetOdometry();
+}
+
 void MotionInterface::resetScriptedProvider(){
     switchboard->resetScriptedProvider();
 }
@@ -111,9 +115,4 @@ void MotionInterface::setBalanceMode(int pBalanceMode) const {
 
 int MotionInterface::getBalanceMode() const {
     return DUMMY_I;
-}
-
-void MotionInterface::walkPose() const
-{
-    switchboard->walkPose();
 }

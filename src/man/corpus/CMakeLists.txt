@@ -3,7 +3,7 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( CORPUS )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
@@ -100,10 +100,13 @@ IF(BUILDING_FOR_A_REMOTE_NAO)
     alconnect/ALEnactor
     alconnect/NaoEnactor
     alconnect/ALTranscriber
-    alconnect/ALImageTranscriber
+    # switched to V4L2
+    # alconnect/ALImageTranscriber
     alconnect/NaoLights
     alconnect/NaoRGBLight
     alconnect/ALSpeech
+    V4L2ImageTranscriber
+    NaoImageTranscriber
     )
 ENDIF()
 
@@ -198,6 +201,7 @@ TARGET_LINK_LIBRARIES( ${SENSORS_TARGET}
   ${PYTHON_LIBRARY}
   ${Boost_PYTHON_LIBRARY}
   ${NBINCLUDE_TARGET}
+  ${VISION_TARGET}
   )
 
 TARGET_LINK_LIBRARIES( ${ROBOT_INTERFACE_TARGET}
@@ -219,13 +223,16 @@ TARGET_LINK_LIBRARIES( ${ROBOT_CONNECT_TARGET}
 
 ############################ TESTS!
 
-# add_executable( ImageAcquisitionTest ${CORPUS_TEST_DIR}/ImageAcquisitionTest.cpp
+# Broken currently
+# add_executable( ImageAcquisitionTest
+#   ${CORPUS_TEST_DIR}/ImageAcquisitionTest
 #   ${CORPUS_INCLUDE_DIR}/ImageAcquisition.s
-#   ${CORPUS_INCLUDE_DIR}/ImageAcquisitionFast.s ${CORPUS_INCLUDE_DIR}/ColorParams.cpp
+#   ${CORPUS_INCLUDE_DIR}/ImageAcquisitionFast.s
+#   ${CORPUS_INCLUDE_DIR}/ColorParams
 #   )
 
 # target_link_libraries( ImageAcquisitionTest
-#   ${ROBOT_CONNECT_TARGET}
-#   rt
+#   ${NBCOMMON_LIBRARIES}
 #   )
 
+# add_test( NAME ImageAcquisitionTest COMMAND ImageAcquisitionTest )

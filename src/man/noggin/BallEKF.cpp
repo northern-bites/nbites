@@ -217,7 +217,7 @@ void BallEKF::resetModelTo(const RangeBearingMeasurement& ball)
  * @param odo  The robot's odometry from the last frame.
  * @param p    The robot's current estimate of its position on the field.
  */
-void BallEKF::updateModel(const MotionModel& odo,
+void BallEKF::updateModel(const MotionModel& curOdometry,
                           const RangeBearingMeasurement& ball,
                           const PoseEst& p)
 {
@@ -228,8 +228,10 @@ void BallEKF::updateModel(const MotionModel& odo,
         resetModelTo(ball);
     }
 
+    curDeltaOdometry = curOdometry - lastOdometry;
+
     // Update expected ball movement
-    timeUpdate(odo);
+    timeUpdate(curDeltaOdometry);
 
     // We've seen a ball
     if (ball.distance > 0.0) {
@@ -248,6 +250,8 @@ void BallEKF::updateModel(const MotionModel& odo,
         cout << "\tBallEKF reset to " << *this << endl;
         cout << "\tObservation was: " << ball << endl;
     }
+
+    lastOdometry = curOdometry;
 }
 
 /**
@@ -261,16 +265,16 @@ void BallEKF::updateModel(const MotionModel& odo,
 EKF<RangeBearingMeasurement,
     MotionModel, ball_ekf_dimension,
     dist_bearing_meas_dim>::StateVector
-BallEKF::associateTimeUpdate(MotionModel odo)
+BallEKF::associateTimeUpdate(MotionModel deltaOdometry)
 {
-    curOdo = odo;
+
     StateVector deltaBall(ball_ekf_dimension, 0.0f);
 
     // Calculate expected ball deltas
-    updatePosition              ( odo, deltaBall);
-    updateVelocity              ( odo, deltaBall);
-    updateAcceleration          ( odo, deltaBall);
-    calculateTimeUpdateJacobian ( odo, deltaBall);
+    updatePosition              ( deltaOdometry, deltaBall);
+    updateVelocity              ( deltaOdometry, deltaBall);
+    updateAcceleration          ( deltaOdometry, deltaBall);
+    calculateTimeUpdateJacobian ( deltaOdometry, deltaBall);
 
 #ifdef DEBUG_BALL_EKF
     cout << "deltaBall: " << deltaBall << endl
@@ -300,7 +304,7 @@ void BallEKF::updateFrameLength()
 /**
  * Update the x,y components based on the odometry and the previous state.
  */
-void BallEKF::updatePosition(const MotionModel& odo, StateVector& deltaBall)
+void BallEKF::updatePosition(const DeltaMotionModel& deltaOdometry, StateVector& deltaBall)
 {
     // Calculate change in position from velocity and acceleration
     // ds = vt + .5*a*t^2 + .5*(friction deceleration)*t^2
@@ -333,17 +337,17 @@ void BallEKF::updatePosition(const MotionModel& odo, StateVector& deltaBall)
     }
 
     // Rotate the position according to odometry
-    deltaBall(x_index) += -sin(odo.deltaR) * odo.deltaL -
-        cos(odo.deltaR) * odo.deltaF;
-    deltaBall(y_index) += sin(odo.deltaR) * odo.deltaF -
-        cos(odo.deltaR) * odo.deltaL;
+    deltaBall(x_index) += -sin(deltaOdometry.theta) * deltaOdometry.y -
+        cos(deltaOdometry.theta) * deltaOdometry.x;
+    deltaBall(y_index) += sin(deltaOdometry.theta) * deltaOdometry.x -
+        cos(deltaOdometry.theta) * deltaOdometry.y;
 }
 
 /**
  * Update the x,y velocity components based on the odometry and the
 v * previous state.
  */
-void BallEKF::updateVelocity(const MotionModel& odo, StateVector& deltaBall)
+void BallEKF::updateVelocity(const DeltaMotionModel& deltaOdometry, StateVector& deltaBall)
 {
     // Velocities
     float velX = xhat_k(vel_x_index) +
@@ -355,8 +359,8 @@ void BallEKF::updateVelocity(const MotionModel& odo, StateVector& deltaBall)
     velY = applyFriction(velY);
 
     // Rotate the velocity components into the new coordinate frame
-    float estVelX = cos(odo.deltaR) * velX + sin(odo.deltaR) * velY;
-    float estVelY = cos(odo.deltaR) * velY - sin(odo.deltaR) * velX;
+    float estVelX = cos(deltaOdometry.theta) * velX + sin(deltaOdometry.theta) * velY;
+    float estVelY = cos(deltaOdometry.theta) * velY - sin(deltaOdometry.theta) * velX;
 
     // Change in velocity
     deltaBall(vel_x_index) = estVelX - xhat_k(vel_x_index);
@@ -379,7 +383,7 @@ float BallEKF::applyFriction(float vel)
     }
 }
 
-void BallEKF::updateAcceleration(const MotionModel& odo, StateVector& deltaBall)
+void BallEKF::updateAcceleration(const DeltaMotionModel& odo, StateVector& deltaBall)
 {
     deltaBall(acc_x_index) = -xhat_k(acc_x_index);
     deltaBall(acc_y_index) = -xhat_k(acc_y_index);
@@ -389,7 +393,7 @@ void BallEKF::updateAcceleration(const MotionModel& odo, StateVector& deltaBall)
  * Update the Jacobian A_k for the time update step used in the EKF
  * class timeUpdate()
  */
-void BallEKF::calculateTimeUpdateJacobian(const MotionModel& odo,
+void BallEKF::calculateTimeUpdateJacobian(const DeltaMotionModel& deltaOdometry,
                                           StateVector& deltaBall)
 {
     const float dt2 = dt*dt;
@@ -409,16 +413,16 @@ void BallEKF::calculateTimeUpdateJacobian(const MotionModel& odo,
     A_k(y_index,acc_y_index)     = .5f * dt2;
 
     // derivatives of vel_x
-    A_k(vel_x_index,vel_x_index) = cos(odo.deltaR);
-    A_k(vel_x_index,vel_y_index) = sin(odo.deltaR);
-    A_k(vel_x_index,acc_x_index) = cos(odo.deltaR) * dt;
-    A_k(vel_x_index,acc_y_index) = sin(odo.deltaR) * dt;
+    A_k(vel_x_index,vel_x_index) = cos(deltaOdometry.theta);
+    A_k(vel_x_index,vel_y_index) = sin(deltaOdometry.theta);
+    A_k(vel_x_index,acc_x_index) = cos(deltaOdometry.theta) * dt;
+    A_k(vel_x_index,acc_y_index) = sin(deltaOdometry.theta) * dt;
 
     // derivatives of vel_y
-    A_k(vel_y_index,vel_x_index) = -sin(odo.deltaR);
-    A_k(vel_y_index,vel_y_index) =  cos(odo.deltaR);
-    A_k(vel_y_index,acc_x_index) = -sin(odo.deltaR) * dt;
-    A_k(vel_y_index,acc_y_index) =  cos(odo.deltaR) * dt;
+    A_k(vel_y_index,vel_x_index) = -sin(deltaOdometry.theta);
+    A_k(vel_y_index,vel_y_index) =  cos(deltaOdometry.theta);
+    A_k(vel_y_index,acc_x_index) = -sin(deltaOdometry.theta) * dt;
+    A_k(vel_y_index,acc_y_index) =  cos(deltaOdometry.theta) * dt;
 }
 
 /**
@@ -438,7 +442,7 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
 {
     // We need to translate/rotate the old values into our new
     // coordinate frame based on the odometry update
-    StateVector xhat_k_prev = transformStateWithOdometry(xhat_k, curOdo);
+    StateVector xhat_k_prev = transformStateWithOdometry(xhat_k, curDeltaOdometry);
 
     // Calculate new velocities and accelerations
     MeasurementVector z_x = calculateObservedState(z, xhat_k_prev);
@@ -497,25 +501,25 @@ void BallEKF::incorporateMeasurement(const RangeBearingMeasurement& z,
  * current coordinate frame.
  */
 BallEKF::StateVector BallEKF::transformStateWithOdometry(const StateVector& x,
-                                                         const MotionModel& odo)
+                                                         const DeltaMotionModel& deltaOdometry)
 {
     StateVector prev(ball_ekf_dimension);
     prev(x_index)     = (x(x_index) -
-                         cos(odo.deltaR) * odo.deltaF -
-                         sin(odo.deltaR) * odo.deltaL);
+                         cos(deltaOdometry.theta) * deltaOdometry.x -
+                         sin(deltaOdometry.theta) * deltaOdometry.y);
     prev(y_index)     = (x(y_index) +
-                         sin(odo.deltaR) * odo.deltaF -
-                         cos(odo.deltaR) * odo.deltaL);
+                         sin(deltaOdometry.theta) * deltaOdometry.x -
+                         cos(deltaOdometry.theta) * deltaOdometry.y);
 
-    prev(vel_x_index) = (cos(odo.deltaR) * x(vel_x_index) +
-                         sin(odo.deltaR) * x(vel_y_index));
-    prev(vel_y_index) = (cos(odo.deltaR) * x(vel_y_index) -
-                         sin(odo.deltaR) * x(vel_x_index));
+    prev(vel_x_index) = (cos(deltaOdometry.theta) * x(vel_x_index) +
+                         sin(deltaOdometry.theta) * x(vel_y_index));
+    prev(vel_y_index) = (cos(deltaOdometry.theta) * x(vel_y_index) -
+                         sin(deltaOdometry.theta) * x(vel_x_index));
 
-    prev(acc_x_index) = (cos(odo.deltaR) * x(acc_x_index) +
-                         sin(odo.deltaR) * x(acc_y_index));
-    prev(acc_y_index) = (cos(odo.deltaR) * x(acc_y_index) -
-                         sin(odo.deltaR) * x(acc_x_index));
+    prev(acc_x_index) = (cos(deltaOdometry.theta) * x(acc_x_index) +
+                         sin(deltaOdometry.theta) * x(acc_y_index));
+    prev(acc_y_index) = (cos(deltaOdometry.theta) * x(acc_y_index) -
+                         sin(deltaOdometry.theta) * x(acc_x_index));
     return prev;
 }
 

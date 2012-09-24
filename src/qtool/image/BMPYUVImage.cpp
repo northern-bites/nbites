@@ -4,10 +4,13 @@
 namespace qtool {
 namespace image {
 
-BMPYUVImage::BMPYUVImage(man::memory::MImage::const_ptr rawImage,
+using namespace man::corpus;
+
+BMPYUVImage::BMPYUVImage(memory::MRawImages::const_ptr rawImages,
+        Camera::Type which,
         ChannelType type, QObject* parent) :
         BMPImage(parent),
-        yuvImage(rawImage),
+        yuvImage(rawImages, which),
         bitmapType(type)
 { }
 
@@ -15,19 +18,23 @@ bool BMPYUVImage::needToResizeBitmap() const {
     return bitmap.width() < yuvImage.getWidth() || bitmap.height() < yuvImage.getHeight();
 }
 
+// this whole thing is slow as balls! - Octavian
 void BMPYUVImage::buildBitmap() {
     yuvImage.updateFromRawImage();
-    if (this->needToResizeBitmap()) {
-        bitmap = QImage(yuvImage.getWidth(),
-                        yuvImage.getHeight(),
-                        QImage::Format_RGB32);
-    }
+//    if (this->needToResizeBitmap()) {
+//        bitmap = QPixmap(yuvImage.getWidth(),
+//                        yuvImage.getHeight());
+//    }
+
+    bitmap = QImage(yuvImage.getWidth(),
+                    yuvImage.getHeight(),
+                    QImage::Format_RGB32);
 
     Color c;
 
-    byte** yImg = yuvImage.getYImage();
-    byte** uImg = yuvImage.getUImage();
-    byte** vImg = yuvImage.getVImage();
+    const byte** yImg = yuvImage.getYImage();
+    const byte** uImg = yuvImage.getUImage();
+    const byte** vImg = yuvImage.getVImage();
 
 	for (int j = 0; j < getHeight(); ++j) {
 	    QRgb* qImageLine = (QRgb*) (bitmap.scanLine((int)(j)));

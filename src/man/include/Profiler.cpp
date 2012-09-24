@@ -14,6 +14,10 @@ using namespace std;
 static const char *PCOMPONENT_NAMES[] = {
   "Main Loop",
   "GetImage",
+  "Dequeue buf",
+  "Acquire image",
+  "Queue buf",
+
   "Vision",
   "Transform",
   "ThreshRuns",
@@ -21,6 +25,7 @@ static const char *PCOMPONENT_NAMES[] = {
   "FGHorizon",
   "Runs",
   "Object",
+  "Robots",
 
   "Edges",
   "Sobel",
@@ -31,6 +36,7 @@ static const char *PCOMPONENT_NAMES[] = {
   "Smooth Hough Space",
   "Hough Peaks",
   "Suppress Hough Lines",
+  "Pair Hough Lines",
 
   "Lines",
   "Vert Lines",
@@ -81,6 +87,11 @@ static const char *PCOMPONENT_NAMES[] = {
 static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_MAIN                   --> */ P_TOTAL,
     /*P_GETIMAGE               --> */ P_MAIN,
+
+    /*P_DQBUF                  --> */ P_GETIMAGE,
+    /*P_ACQUIRE_IMAGE          --> */ P_GETIMAGE,
+    /*P_QBUF                   --> */ P_GETIMAGE,
+
     /*P_VISION                 --> */ P_MAIN,
     /*P_TRANSFORM              --> */ P_VISION,
     /*P_THRESHRUNS             --> */ P_VISION,
@@ -88,6 +99,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_FGHORIZON              --> */ P_THRESHRUNS,
     /*P_RUNS                   --> */ P_THRESHRUNS,
     /*P_OBJECT                 --> */ P_VISION,
+    /*P_ROBOTS                 --> */ P_OBJECT,
 
     /*P_EDGES,                 --> */ P_VISION,
     /*P_SOBEL,                 --> */ P_EDGES,
@@ -98,6 +110,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_SMOOTH,                --> */ P_HOUGH,
     /*P_HOUGH_PEAKS,           --> */ P_HOUGH,
     /*P_SUPPRESS,              --> */ P_HOUGH,
+    /*P_PAIR_LINES,             --> */ P_HOUGH,
 
     /*P_LINES                  --> */ P_VISION,
     /*P_VERT_LINES,            --> */ P_LINES,
@@ -335,7 +348,7 @@ Profiler::printIndentedSummary()
     comp = PCOMPONENT_SUB_ORDER[i];
     parent_sum = (float)sumTime[comp];
 
-    if (shouldNotPrintLine(i) &&
+    if (shouldNotPrintLine(i) ||
         (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
         continue;
 

@@ -3,11 +3,11 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( NOGGIN )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 ############################ CMAKE VERSION
 # Check cMake version
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 
 ############################ BASE DEFINITIONS
@@ -81,11 +81,16 @@ SET( NOGGIN_SRCS Noggin
                  BallEKF
                  PyLoc
                  # LocEKF
-		 MultiMeasurementEKF
-		 MultiLocEKF
+		 # MultiMeasurementEKF
+		 # MultiLocEKF
 		 PyConstants
 		 PyObjects
 		 CombinationObjects
+		 ParticleFilter
+		 VisionSystem
+		 MotionSystem
+		 GoalieSystem
+		 PyGoalie
                  )
 
 

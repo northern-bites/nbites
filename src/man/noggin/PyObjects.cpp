@@ -15,6 +15,8 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("y", &Location::getY, &Location::setY)
         .def(self == self)
         .def(self != self)
+        .def(self - self)
+        .def("relativeLocationOf", &Location::getRelLocationOf)
         .def("toTupleXY", &Location::toTupleXY)
         .def("distTo", &Location::distTo)
         .def("headingTo", &Location::headingToInDeg)
@@ -32,17 +34,29 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("h", &RobotLocation::getH, &RobotLocation::setH)
         .def(self == self)
         .def(self != self)
+        .def(self - self)
+        .def(self + other<RelRobotLocation>())
+        .def("relativeRobotLocationOf", &RobotLocation::getRelRobotLocationOf)
         .def("getRelativeBearing", &RobotLocation::getRelativeBearing)
         .def("__str__", &RobotLocation::toString)
         ;
 
-    class_<RelLocation, bases<RobotLocation> >("RelLocation",
-                                               init<RobotLocation&,
-                                               float, float, float>())
+    class_<RelLocation>("RelLocation", init<float, float>())
         .add_property("relX", &RelLocation::getRelX, &RelLocation::setRelX)
         .add_property("relY", &RelLocation::getRelY, &RelLocation::setRelY)
-        .add_property("relH", &RelLocation::getRelH, &RelLocation::setRelH)
+        .add_property("bearing", &RelLocation::getBearing)
+        .add_property("dist", &RelLocation::getDist)
         .def("__str__", &RelLocation::toString)
+        ;
+
+    class_<RelRobotLocation, bases<RelLocation> >("RelRobotLocation",
+                                                  init<float, float, float>())
+        .add_property("relH", &RelRobotLocation::getRelH, &RelRobotLocation::setRelH)
+        .def(self - other<boost::python::tuple>())
+        .def(self - self)
+        .def("rotate", &RelRobotLocation::rotate)
+        .def("within", &RelRobotLocation::within)
+        .def("__str__", &RelRobotLocation::toString)
         ;
 
     class_<LocObject, bases<Location> >("LocObject", init<PyLoc&>())
@@ -88,7 +102,7 @@ BOOST_PYTHON_MODULE(objects)
         .def("spinDirToPoint", &RobotLocation::spinDirToPoint)
         ;
 
-    class_<LocBall, bases<Location> >("LocBall", init<PyLoc&, MyInfo&>())
+    class_<LocBall, bases<Location, RelLocation> >("LocBall", init<PyLoc&, MyInfo&>())
         .add_property("uncertX", &LocBall::getXUncert)
         .add_property("uncertY", &LocBall::getYUncert)
         .add_property("sd", &LocBall::getSD)
@@ -97,8 +111,6 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("uncertVelX", &LocBall::getVelXUncert)
         .add_property("uncertVelY", &LocBall::getVelYUncert)
         .add_property("heading", &LocBall::getHeading)
-        .add_property("relX", &LocBall::getRelX)
-        .add_property("relY", &LocBall::getRelY)
         .add_property("relVelX", &LocBall::getRelVelX)
         .add_property("relVelY", &LocBall::getRelVelY)
         .add_property("accX", &LocBall::getAccX)
@@ -110,8 +122,6 @@ BOOST_PYTHON_MODULE(objects)
         .add_property("uncertAccY", &LocBall::getAccYUncert)
         .add_property("relAccX", &LocBall::getRelAccX)
         .add_property("relAccY", &LocBall::getRelAccY)
-        .add_property("dist", &LocBall::getDist)
-        .add_property("bearing", &LocBall::getBearing)
         ;
 
     class_<Ball, boost::noncopyable>("Ball", init<VisualBall&,

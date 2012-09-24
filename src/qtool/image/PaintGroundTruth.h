@@ -39,7 +39,7 @@ public:
 protected:
     virtual void buildBitmap() {
 
-        bitmap.fill(0x00000000);
+        bitmap.fill(Qt::transparent);
 
         QPainter painter(&bitmap);
 

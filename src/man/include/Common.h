@@ -11,7 +11,6 @@
 // ARE DEFINED EVERYWHERE. BEWARE!
 #ifndef NO_MANCONFIG
 #include "manconfig.h"
-#include "nameconfig.h"
 #include "visionconfig.h"
 #endif //NO_MANCONFIG
 #include <time.h>
@@ -29,6 +28,10 @@ namespace angle {
     typedef float radians;
     typedef float degrees;
 }
+
+typedef int pixels;
+typedef float cms;
+typedef float mms;
 
 #define ROBOT(t) ( \
     (t == NAO_RL_33 && ROBOT_TYPE == NAO_RL_33) || \
@@ -60,6 +63,22 @@ typedef unsigned int uint;
 #ifndef byte
 typedef unsigned char byte;
 #endif
+
+#define CHECK_SUCCESS(x) {\
+        int result; \
+        if( (result = (x)) < 0) { \
+            printf("Problem with " #x ", returned %i\n", result); \
+            perror("Error message"); \
+        } \
+}
+
+#include <stdexcept>
+#include <cstring>
+#include <string>
+
+static void throw_errno(int err_no) throw (std::runtime_error) {
+    throw std::runtime_error(std::string(strerror(err_no)));
+}
 
 #include <time.h>
 #include <sys/time.h>

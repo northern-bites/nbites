@@ -13,7 +13,6 @@
 #include <QWidget>
 
 #include "io/InProvider.h"
-#include "DataTypes.h"
 
 namespace qtool {
 namespace data {
@@ -27,7 +26,7 @@ public:
 signals:
     void signalNewDataSet();
     void signalNewInputProvider(common::io::InProvider::ptr newInput,
-                                MObject_ID id);
+                                std::string name);
 
 };
 

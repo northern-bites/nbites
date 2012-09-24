@@ -38,6 +38,7 @@
 
 #include <boost/shared_ptr.hpp>
 using boost::dynamic_pointer_cast;
+using namespace boost; //TODO: get rid of this. nicely.
 
 #include "PyMotionCommand.h" // base class
 
@@ -56,18 +57,18 @@ static MotionInterface* interface_reference = 0;
 
 class PyHeadJointCommand : public PyMotionCommand {
 public:
-    PyHeadJointCommand(float time, tuple joints,
-		       tuple stiffness, int interpolationType) {
+    PyHeadJointCommand(float time, python::tuple joints,
+		       python::tuple stiffness, int interpolationType) {
 
         vector<float> jointsVector;
         vector<float> head_stiffness;
         // Head joint commands are sent in as degree values and we deal with
         // radians in the motion engine. They get converted here.
         for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
-            jointsVector.push_back(extract<float>(joints[i]) * TO_RAD);
+            jointsVector.push_back(python::extract<float>(joints[i]) * TO_RAD);
 
 	for (unsigned int i=0; i < Kinematics::HEAD_JOINTS; i++)
-	    head_stiffness.push_back(extract<float>(stiffness[i]));
+	    head_stiffness.push_back(python::extract<float>(stiffness[i]));
 
         command =
 	    HeadJointCommand::ptr (
@@ -83,14 +84,14 @@ public:
 
 class PyGaitCommand : public PyMotionCommand {
 public:
-    PyGaitCommand(const tuple &_stance_config,
-                  const tuple &_step_config,
-                  const tuple &_zmp_config,
-                  const tuple &_joint_hack_config,
-                  const tuple &_sensor_config,
-                  const tuple &_stiffness_config,
-                  const tuple &_odo_config,
-                  const tuple &_arm_config) {
+    PyGaitCommand(const python::tuple &_stance_config,
+                  const python::tuple &_step_config,
+                  const python::tuple &_zmp_config,
+                  const python::tuple &_joint_hack_config,
+                  const python::tuple &_sensor_config,
+                  const python::tuple &_stiffness_config,
+                  const python::tuple &_odo_config,
+                  const python::tuple &_arm_config) {
 
         float stance[WP::LEN_STANCE_CONFIG];
         fillArray<float,WP::LEN_STANCE_CONFIG>
@@ -134,9 +135,9 @@ public:
     }
 
     template <class T, const unsigned int size> void
-    fillArray( T target[size], tuple t, const T convert_units[size]){
+    fillArray( T target[size], python::tuple t, const T convert_units[size]){
         for(unsigned int i = 0; i < size; i++){
-            target[i] = extract<T>(t[i])*convert_units[i];
+            target[i] = python::extract<T>(t[i])*convert_units[i];
         }
     }
 
@@ -157,14 +158,9 @@ private:
 
 class PyWalkCommand : public PyMotionCommand {
 public:
-    PyWalkCommand(float x_cms, float m_cms, float theta_degs) {
-        //All python units should be in CM and DEG per second
-        //C++ is in mm and rads, so we need to convert
-        command = WalkCommand::ptr(
-	    new WalkCommand(x_cms*CM_TO_MM,
-			    m_cms*CM_TO_MM,
-			    theta_degs*TO_RAD)
-	    );
+    PyWalkCommand(float x_percent, float y_percent, float theta_percent) {
+        // Since it's a scalar magnitude, conversion doesn't matter
+        command = WalkCommand::ptr(new WalkCommand(x_percent, y_percent, theta_percent));
     }
 
     WalkCommand::ptr getCommand() const {
@@ -193,14 +189,14 @@ public:
 
 class PyStepCommand : public PyMotionCommand {
 public:
-    PyStepCommand(float x_cms, float m_cms, float theta_degs, int numStep) {
+    PyStepCommand(float x_cms, float m_cms, float theta_degs, float gain=1.0f) {
         //All python units should be in CM and DEG per second
         //C++ is in mm and rads, so we need to convert
         command =
             StepCommand::ptr(new StepCommand(x_cms*CM_TO_MM,
 					     m_cms*CM_TO_MM,
 					     theta_degs*TO_RAD,
-					     numStep));
+					     gain));
     }
 
     StepCommand::ptr getCommand() const {
@@ -211,25 +207,25 @@ public:
 class PyBodyJointCommand : public PyMotionCommand {
 public:
     PyBodyJointCommand(float time,
-                       tuple larmJoints, tuple llegJoints,
-                       tuple rlegJoints, tuple rarmJoints,
-                       tuple stiffness,
+                       python::tuple larmJoints, python::tuple llegJoints,
+                       python::tuple rlegJoints, python::tuple rarmJoints,
+                       python::tuple stiffness,
                        int interpolationType) {
         vector<float> larm, lleg, rleg, rarm, body_stiffness;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < Kinematics::ARM_JOINTS; i++){
-            larm.push_back(extract<float>(larmJoints[i]) * TO_RAD);
-            rarm.push_back(extract<float>(rarmJoints[i]) * TO_RAD);
+            larm.push_back(python::extract<float>(larmJoints[i]) * TO_RAD);
+            rarm.push_back(python::extract<float>(rarmJoints[i]) * TO_RAD);
         }
 
         for (unsigned int i=0; i < Kinematics::LEG_JOINTS; i++){
-            lleg.push_back(extract<float>(llegJoints[i]) * TO_RAD);
-            rleg.push_back(extract<float>(rlegJoints[i]) * TO_RAD);
+            lleg.push_back(python::extract<float>(llegJoints[i]) * TO_RAD);
+            rleg.push_back(python::extract<float>(rlegJoints[i]) * TO_RAD);
         }
 
         for (unsigned int i=0; i < Kinematics::NUM_JOINTS; i++){
-            body_stiffness.push_back(extract<float>(stiffness[i]));
+            body_stiffness.push_back(python::extract<float>(stiffness[i]));
         }
 
         command = BodyJointCommand::ptr (
@@ -242,18 +238,18 @@ public:
 
     // Single chain command
     PyBodyJointCommand(float time,
-                       int chainID, tuple chainJoints,
-                       tuple stiffness,
+                       int chainID, python::tuple chainJoints,
+                       python::tuple stiffness,
                        int interpolationType) {
 
         vector<float> chain, body_stiffness;
 
         // The joints come in in degrees. Convert them to radians here
         for (unsigned int i=0; i < chain_lengths[chainID] ; i++)
-            chain.push_back(extract<float>(chainJoints[i]) * TO_RAD);
+            chain.push_back(python::extract<float>(chainJoints[i]) * TO_RAD);
 
         for (unsigned int i=0; i < Kinematics::NUM_BODY_JOINTS; i++)
-            body_stiffness.push_back(extract<float>(stiffness[i]));
+            body_stiffness.push_back(python::extract<float>(stiffness[i]));
 
         command = BodyJointCommand::ptr (
             new BodyJointCommand(time, static_cast<ChainID>(chainID),
@@ -349,6 +345,10 @@ public:
         motionInterface->enqueue(command->getCommand());
     }
 
+    void resetWalkOdometry() {
+        motionInterface->resetWalkOdometry();
+    }
+
     void setNextWalkCommand(const PyWalkCommand *command) {
         motionInterface->setNextWalkCommand(command->getCommand());
     }
@@ -381,6 +381,10 @@ public:
 	return motionInterface->isBodyActive();
     }
 
+    bool isStanding() {
+        return motionInterface->isStanding();
+    }
+
     void resetWalkProvider(){
         motionInterface->resetWalkProvider();
     }
@@ -401,9 +405,9 @@ public:
         motionInterface->stopHeadMoves();
     }
 
-    void walkPose() {
-        motionInterface->walkPose();
-    }
+	bool calibrated(){
+		return motionInterface->calibrated();
+	}
 
 private:
     MotionInterface *motionInterface;
