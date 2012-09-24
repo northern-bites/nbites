@@ -97,8 +97,6 @@ public:
     void setMyTeamNumber(int tn){_myTeamNumber = tn;}
     int  myTeamNumber() {return _myTeamNumber;}
 
-    const char* toString();
-
 private:
     GameData(); // Disallow default constructor
 

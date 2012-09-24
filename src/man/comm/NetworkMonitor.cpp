@@ -23,7 +23,7 @@ static const int PACKET_DROPPED = 1;
 
 // Constants for the Boxcar
 static const int BOXCAR_WIDTH = 150;
-// TODO: find actual constants...
+// TODO: empirically find actual constants...
 static const double NETWORK_BAD  = 10.0f;
 static const double NETWORK_GOOD = 2.0f;
 
