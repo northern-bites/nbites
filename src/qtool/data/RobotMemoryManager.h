@@ -27,8 +27,8 @@ class RobotMemoryManager: public QObject {
     ADD_SHARED_PTR(RobotMemoryManager);
 
 public:
-    RobotMemoryManager(man::memory::RobotMemory::ptr memory) :
-        memory(memory), memorySignalingInterface(memory) {
+    RobotMemoryManager(man::memory::RobotMemory::ptr memory, QObject* parent = 0) :
+        QObject(parent), memory(memory), memorySignalingInterface(memory) {
     }
 
     virtual ~RobotMemoryManager() {}

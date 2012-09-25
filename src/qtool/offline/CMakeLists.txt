@@ -33,7 +33,7 @@ add_library(offline
 target_link_libraries(
   offline
   viewer
-  manpreloader
+  man
   ${QT_LIBRARIES}
   )
 
