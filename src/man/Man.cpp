@@ -75,7 +75,6 @@ Man::Man (RobotMemory::ptr memory,
     set_vision_pointer(vision);
 
     comm = boost::shared_ptr<Comm> (new Comm());
-    comm = boost::shared_ptr<Comm> (new Comm(sensors, vision));
 
     loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);

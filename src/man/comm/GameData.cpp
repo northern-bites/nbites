@@ -33,7 +33,7 @@ void GameData::setUpControl()
     data.dropInTime = 0;
     data.secsRemaining = 600;
 
-    data.teams[TEAM_BLUE].teamNumber = _myTeamNumber;
+    data.teams[TEAM_BLUE].teamNumber = (uint8)_myTeamNumber;
     data.teams[TEAM_BLUE].teamColour = TEAM_BLUE;
     data.teams[TEAM_BLUE].goalColour = GOAL_BLUE;
 

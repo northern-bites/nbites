@@ -323,7 +323,8 @@ void Noggin::updateLocalization()
     float dist, theta;
 
     // Get team of the robot for localization.
-    uint8 teamColor = (*gc->getMyTeam()).teamColor;
+    GameData gd = comm->getGameData();
+    int teamColor = gd.myTeamColor();
 
     // Observe Corners.
 //    float phi;
