@@ -189,6 +189,7 @@ TARGET_LINK_LIBRARIES(
   ${MOTION_TARGET}
   ${NOGGIN_TARGET}
   ${MEMORY_TARGET}
+  portals
   ${WEBOTS_LIBRARIES}
   )
 
@@ -230,3 +231,4 @@ add_subdirectory( vision )
 add_subdirectory( motion )
 add_subdirectory( noggin )
 add_subdirectory( include )
+add_subdirectory( portals )
