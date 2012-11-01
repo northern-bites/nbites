@@ -30,7 +30,7 @@ class MemoryViewer : public QMainWindow{
     Q_OBJECT
 
 public:
-    MemoryViewer(data::RobotMemoryManager::const_ptr memoryManager);
+    MemoryViewer(data::RobotMemoryManager::const_ptr memoryManager, QWidget* parent = 0);
 
 private slots:
     void toggleOverlay() {};

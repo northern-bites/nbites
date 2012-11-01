@@ -21,8 +21,6 @@ INCLUDE( ../cmake/base_definitions.cmake )
 # usefull to your project
 FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
 FIND_PACKAGE( PythonLibs REQUIRED )
-FIND_PACKAGE( Protobuf REQUIRED )
-
 
 ############################ CONFIG.H GENERATION
 # Generate the config.h file, inserting values of CMake cache variable
@@ -37,7 +35,7 @@ CONFIGURE_FILE(
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-                     ${PROTOBUF_INCLUDE_DIRS}
+                     ${PROTOBUF_INCLUDE_DIR}
                      ${Boost_INCLUDE_DIR}
                      ${PROJECT_BINARY_DIR}
                      )

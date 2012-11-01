@@ -13,8 +13,8 @@ using namespace man::memory;
 using namespace qtool::image;
 using namespace man::corpus;
 
-MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager) :
-	memoryManager(memoryManager) {
+MemoryViewer::MemoryViewer(RobotMemoryManager::const_ptr memoryManager, QWidget* parent) :
+	QMainWindow(parent), memoryManager(memoryManager) {
 
     MRawImages::const_ptr rawImages = memoryManager->getMemory()->get<MRawImages>();
 

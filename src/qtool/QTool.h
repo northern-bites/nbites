@@ -48,7 +48,7 @@ private:
     colorcreator::ColorTableCreator* colorTableCreator;
     viewer::MemoryViewer* memoryViewer;
     viewer::VisionViewer* visionViewer;
-    offline::OfflineViewer* offlineViewer;
+    // offline::OfflineViewer* offlineViewer;
     viewer::BallEKFViewer* ballEKFViewer;
     viewer::ParticleViewer* particleViewer;
     overseer::OverseerClient* overseerClient;

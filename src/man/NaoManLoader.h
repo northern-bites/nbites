@@ -6,26 +6,37 @@
  *
 **/
 
-#ifndef MANMODULE_H
-#define MANMODULE_H
+#pragma once
 
 #include <boost/shared_ptr.hpp>
 #include <alcommon/albroker.h>
+#include <alcommon/almodule.h>
+
+#include "TMan.h"
 
 #include "include/ExportDefines.h"
 
-//This is the method loadMan's signature
-typedef void (*loadManMethod)(boost::shared_ptr<AL::ALBroker> pBroker);
-
-//This is the method unloadMan's signature
-typedef void (*unloadManMethod)();
-
 START_FUNCTION_EXPORT
 
-void loadMan(boost::shared_ptr<AL::ALBroker> pBroker);
+//This is what Aldebaran will call when it loads this module
+//Note: this is the point of entry for our code
+int _createModule(boost::shared_ptr<AL::ALBroker> pBroker);
 
-void unloadMan();
+//Aldebaran apparently never calls this - Octavian
+int _closeModule();
 
 END_FUNCTION_EXPORT
 
-#endif // MANMODULE_H
+class NaoManLoader : public AL::ALModule {
+
+public:
+	NaoManLoader(boost::shared_ptr<AL::ALBroker> pBroker,
+                const std::string& pName);
+	virtual ~NaoManLoader();
+
+public:
+	boost::shared_ptr<TMan> man;
+
+private:
+    boost::shared_ptr<AL::ALBroker> broker;
+};
