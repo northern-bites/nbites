@@ -16,13 +16,14 @@ set( vssp_tool_sources main.cpp
   )
 
 set( vssp_tool_headers
+  VSSPTool.h
   )
 
 include_directories(.
   ${CMAKE_CURRENT_BINARY_DIR}
   )
 
-#Qt_wrap_cpp(vssp_tool_headers_moc ${vssp_tool_headers})
+Qt4_wrap_cpp(vssp_tool_headers_moc ${vssp_tool_headers})
 
 add_executable( vssp_tool
   ${vssp_tool_sources}
