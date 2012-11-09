@@ -17,8 +17,8 @@ add_definitions(${QT_DEFINITIONS})
 
 ######### FLAGS
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -g")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -g")
 
 ########### QTool Sources
 
@@ -167,5 +167,8 @@ add_executable( vssp_tool
 target_link_libraries(
   vssp_tool
   parse
+  portals
+  protos
+  _nb_include
   ${QT_LIBRARIES}
 )
