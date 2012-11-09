@@ -17,8 +17,8 @@ public:
     VSSPTool() : QMainWindow()
     {
         this->setCentralWidget(new VSSPMain());
-        LogModule thing("/home/ecat/nbites/data/logs/failed_walktogoals/returnfrompenalty/MVision.log");
-        thing.run();
+        LogModule* thing = new LogModule("/home/ecat/nbites/data/logs/failed_walktogoals/returnfrompenalty/MVision.log");
+        thing->run();
     };
     ~VSSPTool() {};
 };

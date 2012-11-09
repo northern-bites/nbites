@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 #include <boost/shared_ptr.hpp>
 
@@ -24,16 +25,19 @@ public:
         incomingMessage(new TemplatedProtobufMessage<PVision>("input")),
         parser(shared_ptr<FileInProvider>(new FileInProvider(fileName)),
                incomingMessage)
-    { parser.run(); };
+    { parser.openFile(); };
 
     OutPortal<PVision> output;
 
 private:
     virtual void run_()
     {
-        parser.readNextMessage();
-        Message<PVision> outMessage;
-        *outMessage.get() = *(incomingMessage->get());
+        if(parser.readNextMessage() == false)
+        {
+            std::cout << "Couldn't read the message." << std::endl;
+            return;
+        }
+        Message<PVision> outMessage(incomingMessage->get());
         output.setMessage(outMessage);
         outMessage.get()->PrintDebugString();
     };
