@@ -43,7 +43,7 @@ CCMAKE_GUI=cmake-gui
 MKDIR=mkdir
 TOUCH=touch
 MAKE_OPTIONS=--no-print-directory
-MAN_TARGET=man manpreloader
+MAN_TARGET=man
 
 .PHONY: default_target all atom geode cclean clean install noconfig
 .PHONY: clean_install

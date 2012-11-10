@@ -15,7 +15,7 @@ QFile file(QString("./.geometry"));
 
 EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
                                             toolTabs(new QTabWidget()),
-                                            dataManager(new DataManager())
+                                            dataManager(new DataManager(this))
 {
     this->setWindowTitle(tr(title));
 

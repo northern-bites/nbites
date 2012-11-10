@@ -47,6 +47,9 @@ ELSE(WEBOTS_BACKEND)
   include ( cmake/FindALCOMMON.cmake )
 ENDIF(WEBOTS_BACKEND)
 
+include(../cmake/protobuf.cmake)
+include_directories(${PROTOBUF_INCLUDE_DIR})
+
 ############################ BUILDCONFIG
 # Include the config file for this build
 INCLUDE( ${MAN_CMAKE_DIR}/buildconfig.cmake )
@@ -150,11 +153,6 @@ INCLUDE_DIRECTORIES(
 
 IF(BUILDING_FOR_A_REMOTE_NAO)
   SET( MAN_LOADER_SRC NaoManLoader )
-  LIST(APPEND MAN_PRELOADER_SRCS NaoManPreloader )
-ENDIF()
-IF(OFFLINE)
-  SET( MAN_LOADER_SRC OfflineManLoader )
-  LIST(APPEND MAN_PRELOADER_SRCS OfflineManPreloader )
 ENDIF()
 
 ############################ Setting up Man
@@ -192,22 +190,8 @@ TARGET_LINK_LIBRARIES(
   ${WEBOTS_LIBRARIES}
   )
 
-############################## Setting up Man Preloader
-
-ADD_LIBRARY(
-  ${MAN_PRELOADER_TARGET}
-  SHARED
-  ${MAN_PRELOADER_SRCS}
-  )
-
 ############################# INSTALL PATHS
 
-INSTALL(
-  TARGETS ${MAN_PRELOADER_TARGET}
-  RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}
-  LIBRARY DESTINATION ${OUTPUT_ROOT_DIR_LIB}
-  CONFIGURATIONS "" Debug Release
-  )
 INSTALL(
   TARGETS ${MAN_TARGET}
   RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}

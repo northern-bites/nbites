@@ -41,7 +41,7 @@ OFFLINE_TARGET=offline_tool
 OVERSEER_SERVER_LIB=$(BIN_DIR)/qtool/overseer/liboverseer_server.so
 OVERSEER_DESTINATION_DIR=$(SRC_DIR)/overseer/austinvilla/ground_truth/lib/
 
-.phony: build clean cfg eclipse
+.PHONY: build clean cfg eclipse
 
 default: build
 
@@ -87,7 +87,7 @@ connect: build_connect
 
 offline: build_offline
 		$(OFFLINE_EXECUTABLE)
-debug: 
+debug:
 	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
 	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_DEBUG_CONFIG) .
