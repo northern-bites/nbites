@@ -3,7 +3,7 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( CORPUS )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
@@ -200,6 +200,7 @@ SET_TARGET_PROPERTIES( ${SENSORS_TARGET} PROPERTIES LINKER_LANGUAGE CXX )
 TARGET_LINK_LIBRARIES( ${SENSORS_TARGET}
   ${PYTHON_LIBRARY}
   ${Boost_PYTHON_LIBRARY}
+  memory
   ${NBINCLUDE_TARGET}
   ${VISION_TARGET}
   )

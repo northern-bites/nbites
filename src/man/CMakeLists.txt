@@ -20,14 +20,13 @@
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( MAN )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6.0 )
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
 ENABLE_TESTING()
 
 ############################ BASE DEFINITIONS
 # Include  the basic definitions accross all projects
 INCLUDE( cmake/base_definitions.cmake )
-
 
 ############################ FIND PACKAGE
 # Libraries specifics. Define here cmake packages
@@ -40,12 +39,16 @@ FIND_PACKAGE( PythonLibs  REQUIRED )
 SET(Boost_USE_MULTITHREADED ON)
 SET(Boost_USE_STATIC_LIBS OFF)
 FIND_PACKAGE( Boost REQUIRED )
+MARK_AS_ADVANCED( Boost_DIR )
 
 IF(WEBOTS_BACKEND)
   include ( cmake/FindWEBOTS.cmake )
 ELSE(WEBOTS_BACKEND)
   include ( cmake/FindALCOMMON.cmake )
 ENDIF(WEBOTS_BACKEND)
+
+include(../cmake/protobuf.cmake)
+include_directories(${PROTOBUF_INCLUDE_DIR})
 
 ############################ BUILDCONFIG
 # Include the config file for this build
@@ -82,7 +85,7 @@ ELSE(WEBOTS_BACKEND)
 ENDIF(WEBOTS_BACKEND)
 
 SET( @REMOTE_ADDRESS@
-  "192.168.0.5"
+  "mal.local"
   CACHE STRING
   "The remote address of the robot"
   )
@@ -91,14 +94,14 @@ SET( REMOTE_ADDRESS ${@REMOTE_ADDRESS@} )
 ############################ COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
-  "../../data/tables/mexico-c-top.mtb"
+  "../../data/tables/120-top.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
   )
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/mexico-c-bottom.mtb"
+  "../../data/tables/120-bottom.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )
@@ -150,11 +153,6 @@ INCLUDE_DIRECTORIES(
 
 IF(BUILDING_FOR_A_REMOTE_NAO)
   SET( MAN_LOADER_SRC NaoManLoader )
-  LIST(APPEND MAN_PRELOADER_SRCS NaoManPreloader )
-ENDIF()
-IF(OFFLINE)
-  SET( MAN_LOADER_SRC OfflineManLoader )
-  LIST(APPEND MAN_PRELOADER_SRCS OfflineManPreloader )
 ENDIF()
 
 ############################ Setting up Man
@@ -192,22 +190,8 @@ TARGET_LINK_LIBRARIES(
   ${WEBOTS_LIBRARIES}
   )
 
-############################## Setting up Man Preloader
-
-ADD_LIBRARY(
-  ${MAN_PRELOADER_TARGET}
-  SHARED
-  ${MAN_PRELOADER_SRCS}
-  )
-
 ############################# INSTALL PATHS
 
-INSTALL(
-  TARGETS ${MAN_PRELOADER_TARGET}
-  RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}
-  LIBRARY DESTINATION ${OUTPUT_ROOT_DIR_LIB}
-  CONFIGURATIONS "" Debug Release
-  )
 INSTALL(
   TARGETS ${MAN_TARGET}
   RUNTIME DESTINATION ${OUTPUT_ROOT_DIR_BIN}

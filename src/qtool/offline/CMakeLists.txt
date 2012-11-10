@@ -2,7 +2,7 @@
 ############ offline
 
 project( offline )
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.3)
 
 ########### Dependencies
 
@@ -33,7 +33,7 @@ add_library(offline
 target_link_libraries(
   offline
   viewer
-  manpreloader
+  man
   ${QT_LIBRARIES}
   )
 

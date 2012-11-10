@@ -16,6 +16,8 @@ BIN_DIR=$(PROJECT_DIR)/build/qtool
 SRC_DIR=$(PROJECT_DIR)/src
 GEN_MAKEFILE=$(BIN_DIR)/Makefile
 
+export NBITES_DIR=$(PROJECT_DIR)
+
 TOOLCHAIN_FILE=$(PROJECT_DIR)/src/man/cmake/generic.cmake
 TOOLCHAIN_FLAG=-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE)
 
@@ -24,6 +26,7 @@ ECLIPSE_FLAGS=-G "Eclipse CDT4 - Unix Makefiles"
 
 EXECUTABLE=$(BIN_DIR)/qtool/qtool
 CONNECT_EXECUTABLE=$(BIN_DIR)/qtool/connect_tool
+OFFLINE_EXECUTABLE=$(BIN_DIR)/qtool/offline_tool
 
 CMAKE_DEBUG_CONFIG=-DCMAKE_BUILD_TYPE=debug
 CMAKE_RELEASE_CONFIG=-DCMAKE_BUILD_TYPE=release
@@ -33,11 +36,12 @@ MAKE_FLAGS=--no-print-directory
 OVERSEER_SERVER_TARGET=overseer_server
 QTOOL_TARGET=qtool
 CONNECT_TARGET=connect_tool
+OFFLINE_TARGET=offline_tool
 
 OVERSEER_SERVER_LIB=$(BIN_DIR)/qtool/overseer/liboverseer_server.so
 OVERSEER_DESTINATION_DIR=$(SRC_DIR)/overseer/austinvilla/ground_truth/lib/
 
-.phony: build clean cfg eclipse
+.PHONY: build clean cfg eclipse
 
 default: build
 
@@ -46,6 +50,9 @@ build: $(GEN_MAKEFILE)
 
 build_connect: $(GEN_MAKEFILE)
 	       $(MAKE) $(MAKE_FLAGS) $(CONNECT_TARGET) -C $(BIN_DIR)
+
+build_offline: $(GEN_MAKEFILE)
+	       $(MAKE) $(MAKE_FLAGS) $(OFFLINE_TARGET) -C $(BIN_DIR)
 
 $(GEN_MAKEFILE):
 	$(MKDIR) -p $(BIN_DIR); \
@@ -78,7 +85,9 @@ run: $(EXECUTABLE)
 connect: build_connect
 	    $(CONNECT_EXECUTABLE)
 
-debug: 
+offline: build_offline
+		$(OFFLINE_EXECUTABLE)
+debug:
 	$(MKDIR) -p $(BIN_DIR); \
 	$(CD) $(BIN_DIR); \
 	$(CMAKE) $(TOOLCHAIN_FLAG) $(CMAKE_DEBUG_CONFIG) .

@@ -33,7 +33,7 @@ IF( WEBOTS_BACKEND )
 ELSE( WEBOTS_BACKEND )
   OPTION( USING_LAB_FIELD
     "Set field constants to use the lab field constants"
-    OFF
+    ON
     )
 ENDIF( WEBOTS_BACKEND )
 

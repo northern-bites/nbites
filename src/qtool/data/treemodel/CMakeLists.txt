@@ -2,12 +2,12 @@
 ############ treemodel
 
 project( treemodel )
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.3)
 
 ########### Dependencies
 
 find_package(Qt4 REQUIRED)
-find_package(Protobuf REQUIRED)
+#find_package(Protobuf REQUIRED)
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
