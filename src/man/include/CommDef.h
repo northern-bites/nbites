@@ -3,6 +3,7 @@
 #define CommDef_H
 
 #include <string.h>
+#include <string>
 
 #include "Common.h"
 
@@ -91,6 +92,31 @@ static const char *TOOL_ACCEPT_MSG = "TOOL:accept";
 static const int TOOL_ACCEPT_LEN = strlen(TOOL_ACCEPT_MSG);
 static const int TOOL_ACCEPT_NAME_OFFSET = TOOL_ACCEPT_LEN + 3;
 
+
+//
+// Multicast information
+//
+
+static const int NUM_ROBOTS = 5;    // Total number of robots we have
+
+typedef struct robot_ip_pair_t
+{
+    std::string name;
+    std::string ip;
+}robot_ip_pair;
+
+static const robot_ip_pair wash   = {"wash"  , "139.140.218.9" };
+static const robot_ip_pair river  = {"river" , "139.140.218.10"};
+static const robot_ip_pair jayne  = {"jayne" , "139.140.218.11"};
+//static const robot_ip_pair scotty = {"scotty", "139.140.218.12"};
+//static const robot_ip_pair dax    = {"dax"   , "139.140.218.13"};
+//static const robot_ip_pair annika = {"annika", "139.140.218.14"};
+//static const robot_ip_pair data   = {"data"  , "139.140.218.15"};
+static const robot_ip_pair mal    = {"mal"   , "139.140.218.16"};
+static const robot_ip_pair zoe    = {"zoe"   , "139.140.218.17"};
+
+static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
+                                                   mal, zoe};
 
 //
 // Comm constants and MACRO definitions
