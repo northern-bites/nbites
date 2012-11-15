@@ -122,6 +122,14 @@ static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
 // Comm constants and MACRO definitions
 //
 
+/*   Packet Header: ("0" is null char)
+
+Byte| 1  | 2  | 3  | 4
+ 1  |"B" |"0" |team|player
+ 2  |.. sequence number ..
+
+ */
+
 #define UNIQUE_ID "B" // keep this as define so it stays 2 bytes, not 4.
 static const int NUM_HEADER_BYTES = 16;
 

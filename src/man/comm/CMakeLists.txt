@@ -66,7 +66,6 @@ SET( COMM_SRCS Comm
                GameConnect
                GameData
                UDPSocket
-               MulticastConfig
                RoboCupGameControlData
                PyComm
                )

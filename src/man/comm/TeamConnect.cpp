@@ -9,8 +9,6 @@
 #include <iostream>
 #include <string>
 
-#include "MulticastConfig.h"
-
 #include "commconfig.h"
 #include "CommDef.h"
 
