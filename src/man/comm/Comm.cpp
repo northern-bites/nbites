@@ -86,7 +86,7 @@ void Comm::run()
 
         monitor->logOutput(timer->timestamp());
 
-        if (timer->timeToSend())
+        if (timer->timeToSend() && myPlayerNumber() > 0)
             send();
 
         PROF_EXIT(P_COMM);
