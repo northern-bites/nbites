@@ -12,9 +12,9 @@
 #include <QWidget>
 #include "Subscriber.h"
 #include "viewer/MemoryViewer.h"
+#include "data/DataManager.h"
 #include "man/corpus/offlineconnect/OfflineManController.h"
 #include "man/memory/Memory.h"
-#include "man/OfflineManPreloader.h"
 #include "data/RobotMemoryManager.h"
 
 namespace qtool {
@@ -24,24 +24,21 @@ class OfflineViewer : public QWidget, public Subscriber {
     Q_OBJECT
 
 public:
-    OfflineViewer(man::memory::Memory::const_ptr memory,
+    OfflineViewer(data::DataManager::const_ptr dataManager,
             QWidget* parent = 0);
     virtual ~OfflineViewer() {}
 
-    void update();
-
 private slots:
+    void update();
     void loadColorTable();
-    void reloadMan();
-    void loadMan();
+    void startMan();
+    void stopMan();
 
 private:
     QVBoxLayout *mainLayout;
-    man::corpus::OfflineManController::ptr offlineControl;
-    OfflineManPreloader manPreloader;
+    man::corpus::OfflineManController offlineControl;
     data::RobotMemoryManager::const_ptr manMemoryManager;
     viewer::MemoryViewer* manMemoryViewer;
-    bool loaded;
 
 };
 

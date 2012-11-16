@@ -15,56 +15,59 @@
 #include "ClassHelper.h"
 #include "man/memory/Memory.h"
 
+#include "TMan.h"
+
+#include "Profiler.h"
+#include "corpus/Sensors.h"
+#include "corpus/RoboGuardian.h"
+#include "corpus/offlineconnect/OfflineImageTranscriber.h"
+#include "corpus/offlineconnect/OfflineTranscriber.h"
+#include "corpus/offlineconnect/OfflineEnactor.h"
+
 namespace man {
 namespace corpus{
 
 class OfflineManController {
 
-ADD_SHARED_PTR(OfflineManController);
+    ADD_SHARED_PTR(OfflineManController);
 
 public:
-	OfflineManController(memory::Memory::const_ptr offline_memory)
-		: fake_memory(offline_memory) { }
+    
+    OfflineManController(memory::Memory::const_ptr fakeMemory) {
 
-	memory::Memory::const_ptr getFakeMemory() const { return fake_memory; }
+        RobotMemory::ptr memory(new RobotMemory());
 
-	void loadTable(const std::string &path) {
-	    if (imageTranscriber.get()) {
-	        imageTranscriber->initTable(path);
-	    }
-	}
+        boost::shared_ptr<Speech> speech(new Speech());
+        boost::shared_ptr<Sensors> sensors(new Sensors(speech,
+            memory->get<MVisionSensors>(),
+            memory->get<MMotionSensors>()));
+        boost::shared_ptr<Transcriber> transcriber(new OfflineTranscriber(sensors,
+            fakeMemory->get<MVisionSensors>(),
+            fakeMemory->get<MMotionSensors>()));
+        imageTranscriber = boost::shared_ptr<ThreadedImageTranscriber>(new OfflineImageTranscriber(sensors,
+            fakeMemory->get<MRawImages>()));
+        boost::shared_ptr<MotionEnactor> enactor(new OfflineEnactor());
+        boost::shared_ptr<Lights> lights(new Lights());
 
-	void setImageTranscriber(ThreadedImageTranscriber::ptr imTrans) {
-		imageTranscriber = imTrans;
-	}
+        man = boost::shared_ptr<TMan>(new TMan(memory, sensors, transcriber,
+          imageTranscriber,
+          enactor, lights, speech));
+    }
 
-	void resetImageTranscriber() {
-		imageTranscriber = ThreadedImageTranscriber::ptr();
-	}
+    void loadTable(const std::string &path) {
+        imageTranscriber->initTable(path);
+    }
 
-	memory::Memory::ptr getManMemory() const {
-	    return man_memory;
-	}
+    void signalNextImageFrame() {
+        imageTranscriber->signalNewImage();
+    }
 
-	void setManMemory(memory::Memory::ptr memory) {
-		man_memory = memory;
-	}
-
-	void resetManMemory() {
-		man_memory = memory::Memory::ptr();
-	}
-
-	void signalNextImageFrame() {
-		if (imageTranscriber.get()) {
-			imageTranscriber->signalNewImage();
-		}
-	}
+    boost::shared_ptr<Man> getMan() { return man; } 
 
 private:
-	ThreadedImageTranscriber::ptr imageTranscriber;
-	memory::Memory::const_ptr fake_memory;
-	memory::Memory::ptr man_memory;
-
+    boost::shared_ptr<TMan> man;
+    boost::shared_ptr<ThreadedImageTranscriber> imageTranscriber;
+    memory::Memory::const_ptr fakeMemory;
 };
 
 }
