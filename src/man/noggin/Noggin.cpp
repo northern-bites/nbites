@@ -13,6 +13,7 @@
 #include "Comm.h"
 #include "GameData.h"
 
+#include "PyComm.h"
 #include "PyLoc.h"
 #include "PySensors.h"
 #include "PyRoboGuardian.h"

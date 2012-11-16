@@ -1,4 +1,4 @@
-from man import comm
+import comm
 import noggin_constants as Constants
 from . import GameStates
 from .util import FSA
@@ -30,11 +30,6 @@ class GameController(FSA.FSA):
         self.kickOff = self.gd.ourKickoff
         self.penaltyShots = False
 
-        if self.gd.myTeamColor == TEAM_BLUE:
-            self.brain.leds.executeLeds(Leds.TEAM_BLUE_LEDS)
-        else:
-            self.brain.leds.executeLeds(Leds.TEAM_RED_LEDS)
-
         if self.kickOff:
             self.ownKickOff = True
         else:
@@ -43,6 +38,8 @@ class GameController(FSA.FSA):
         print  "kickoff:%g teamColor:%g" % (self.kickOff, self.gd.myTeamColor)
 
     def run(self):
+        self.gd = self.brain.comm.gd
+
         gcState = self.gd.currentState
 
         if self.gd.secondaryState == STATE2_PENALTYSHOOT:

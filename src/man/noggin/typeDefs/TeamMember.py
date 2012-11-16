@@ -1,5 +1,5 @@
 from objects import (RobotLocation, Location)
-from man import comm
+import comm
 from math import fabs
 import noggin_constants as NogginConstants
 

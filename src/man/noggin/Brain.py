@@ -8,9 +8,10 @@ sys.stderr = sys.stdout
 ## import pstats
 
 # Packages and modules from super-directories
-from man import comm
 from man import motion
 import vision
+import comm
+
 #from man.corpus import leds
 import sensors
 import noggin_constants as Constants
@@ -32,6 +33,7 @@ from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
+import GameController
 
 import _roboguardian
 import _speech
@@ -258,7 +260,7 @@ class Brain(object):
 
     def getCommUpdate(self):
         for i in range(len(self.teamMembers)):
-            mate = comm.teammate(i+1)
+            mate = self.comm.teammate(i+1)
             self.teamMembers[i].update(mate)
 
     def updateObjects(self):
@@ -283,8 +285,8 @@ class Brain(object):
         # Team color, team number, and player number are all appended to this
         # list by the underlying comm module implemented in C++
         loc = self.loc
-        self.comm.setData(self.play.role,
-                          self.play.subRole,
+        self.comm.setData(self.my.playerNumber,
+                          self.play.role, self.play.subRole,
                           self.playbook.pb.me.chaseTime)
 
     # TODO: Take this out once new comm is in...

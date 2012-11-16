@@ -8,8 +8,9 @@
 #include "Profiler.h"
 #include "PyVision.h"
 #include "BallEKF.h"
+
 class Comm;
-#include "PyComm.h"
+
 #include "RoboGuardian.h"
 #include "Sensors.h"
 #include "PyConstants.h"
@@ -72,13 +73,13 @@ private:
     void processButtonClicks();
 
     /**
-     * Takes a boolean indicating whether or not the robot is in a 
+     * Takes a boolean indicating whether or not the robot is in a
      * fallen state, and if it is the first frame in such a state,
      * it notifies the localization motion model, to adjust
-     * the belief accordingly. 
-     * 
-     * @param fallen Indicates whether or not the robot is in a 
-     *               fallen state. Provided by RoboGuardian 
+     * the belief accordingly.
+     *
+     * @param fallen Indicates whether or not the robot is in a
+     *               fallen state. Provided by RoboGuardian
      *               (or BH walk engine FallDownState.)
      */
     void updateRobotFallenState(bool fallen)
