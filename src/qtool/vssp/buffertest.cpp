@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
     for (i = 0; i < 7; i++)
     {
         std::cout << "Insert!" << std::endl;
-        sb.push_back(new Scene(1, 2));
+        sb.push_back(Scene(i, i));
         sb.printInfo();
         std::cout << std::endl;
     }
