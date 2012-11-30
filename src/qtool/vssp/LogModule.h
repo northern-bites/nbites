@@ -39,7 +39,7 @@ private:
         }
         Message<PVision> outMessage(incomingMessage->get());
         output.setMessage(outMessage);
-        outMessage.get()->PrintDebugString();
+        //outMessage.get()->PrintDebugString();
     };
 
     shared_ptr<TemplatedProtobufMessage<PVision> > incomingMessage;
