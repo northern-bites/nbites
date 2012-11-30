@@ -28,7 +28,7 @@ public:
         diagram.addModule(thing);
         diagram.addModule(memory);
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 10; i++)
         {
             diagram.run();
         }

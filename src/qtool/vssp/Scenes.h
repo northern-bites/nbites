@@ -7,6 +7,7 @@
 
 class Scene;
 
+// TemporalObject
 class TemporalObject
 {
 public:
@@ -48,6 +49,7 @@ private:
     TemporalObject* nextObject;
 };
 
+// Scene
 class Scene
 {
 public:
@@ -61,15 +63,25 @@ private:
 };
 
 typedef boost::circular_buffer<Scene>::iterator SceneIt;
+
+// SceneBuffer
 class SceneBuffer
 {
 public:
     explicit SceneBuffer(int capacity) : cb(capacity) {};
 
-    bool push_back(Scene current)
+    bool addScene(Scene current)
     {
         cb.push_back(current);
     }
+
+    bool addScene(man::memory::proto::PVision current, int frame)
+    {
+        cb.push_back(Scene(current, frame));
+    }
+
+    SceneIt begin() { return cb.begin(); }
+    SceneIt end() { return cb.end(); }
 
     void printInfo();
 
