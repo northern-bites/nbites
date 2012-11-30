@@ -14,6 +14,8 @@ Scene::Scene(PVision input, int frame) : framestamp(frame)
                            this,
                            NULL,
                            NULL);
+    objects.insert( std::pair<std::string, TemporalObject>(theBall.type(),
+                                                           theBall));
 }
 
 void SceneBuffer::printInfo()

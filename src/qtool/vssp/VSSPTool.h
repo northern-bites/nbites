@@ -3,6 +3,9 @@
 #include <QMainWindow>
 #include "LogModule.h"
 #include "MemoryModule.h"
+#include "memory/protos/Vision.pb.h"
+
+using man::memory::proto::PVision;
 
 class VSSPMain : public QWidget
 {
@@ -19,7 +22,7 @@ public:
     {
         this->setCentralWidget(new VSSPMain());
 
-        LogModule thing("/home/ecat/nbites/data/logs/failed_walktogoals/returnfrompenalty/MVision.log");
+        LogModule<PVision> thing("/home/ecat/nbites/data/logs/failed_walktogoals/returnfrompenalty/MVision.log");
         MemoryModule memory;
 
         memory.input.wireTo(&thing.output);

@@ -13,7 +13,7 @@ public:
     {
     }
 
-    InPortal<PVision> input;
+    InPortal<man::memory::proto::PVision> input;
 
 private:
     virtual void run_()
