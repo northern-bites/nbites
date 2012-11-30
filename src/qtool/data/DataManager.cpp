@@ -16,8 +16,8 @@ using namespace std;
 using namespace common::io;
 using boost::shared_ptr;
 
-DataManager::DataManager() :
-        RobotMemoryManager(RobotMemory::ptr(new RobotMemory())),
+DataManager::DataManager(QObject* parent) :
+        RobotMemoryManager(RobotMemory::ptr(new RobotMemory()), parent),
         parsingBoard(memory),
         loggingBoard(memory),
         is_recording(false) {

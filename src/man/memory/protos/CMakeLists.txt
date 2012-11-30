@@ -8,7 +8,7 @@ cmake_minimum_required( VERSION 2.8.3 )
 ############################ FIND PACKAGE
 # Libraries specifics.
 # cmake packages we use
-FIND_PACKAGE( Protobuf REQUIRED )
+#FIND_PACKAGE( Protobuf REQUIRED )
 
 
 ############################ INCLUDE DIRECTORY

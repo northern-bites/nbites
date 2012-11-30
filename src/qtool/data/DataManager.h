@@ -34,7 +34,7 @@ Q_OBJECT
 ADD_SHARED_PTR(DataManager)
 
 public:
-    DataManager();
+    DataManager(QObject* parent = 0);
 
     virtual ~DataManager();
 
