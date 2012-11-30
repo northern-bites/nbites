@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include "LogModule.h"
+#include "Scenes.h"
 
 class VSSPMain : public QWidget
 {

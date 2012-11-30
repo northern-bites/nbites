@@ -74,6 +74,7 @@ include_directories(.
 ############ VSSP
 
 set( vssp_tool_sources vssp/main.cpp
+  vssp/Scenes.cpp
   )
 
 set( vssp_tool_headers

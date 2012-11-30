@@ -1,37 +1,77 @@
 #pragma once
 
 #include <boost/circular_buffer.hpp>
-#include <iostream>
+#include <string>
+#include <map>
+#include "memory/protos/Vision.pb.h"
 
-struct Scene
+class Scene;
+
+class TemporalObject
 {
-    int i;
-    int j;
-    Scene(int k, int l) : i(k), j(l) {};
+public:
+    TemporalObject(std::string name,
+                   int x,
+                   int y,
+                   float dist,
+                   float bear,
+                   Scene* sc,
+                   TemporalObject* prev,
+                   TemporalObject* nex) : objectType(name),
+                                         visualX(x),
+                                         visualY(y),
+                                         visualDistance(dist),
+                                         visualBearing(bear),
+                                         scene(sc),
+                                         previousObject(prev),
+                                         nextObject(nex) {};
+
+    inline std::string type() { return objectType; }
+    inline int x() { return visualX; }
+    inline int y() { return visualY; }
+    inline float distance() { return visualDistance; }
+    inline float bearing() { return visualBearing; }
+
+    Scene* getScene() { return scene; }
+    TemporalObject* next() { return nextObject; }
+    TemporalObject* previous() { return previousObject; }
+
+private:
+    std::string objectType;
+    int visualX;
+    int visualY;
+    float visualDistance;
+    float visualBearing;
+
+    Scene* scene;
+    TemporalObject* previousObject;
+    TemporalObject* nextObject;
+};
+
+class Scene
+{
+public:
+    Scene(man::memory::proto::PVision input, int frame);
+
+    inline int stamp() { return framestamp; }
+
+private:
+    int framestamp;
+    std::multimap<std::string, TemporalObject> objects;
 };
 
 typedef boost::circular_buffer<Scene>::iterator SceneIt;
 class SceneBuffer
 {
 public:
-    SceneBuffer(int capacity) : cb(capacity) {};
+    explicit SceneBuffer(int capacity) : cb(capacity) {};
 
     bool push_back(Scene current)
     {
         cb.push_back(current);
     }
 
-    void printInfo()
-    {
-        std::cout << "The buffer has capacity " << cb.capacity() <<
-            "\nThe buffer has size " << cb.size() << std::endl;
-        SceneIt it = cb.begin();
-        while (it != cb.end())
-        {
-            std::cout << (*it).i << ", " <<(*it).j << std::endl;
-            it++;
-        }
-    }
+    void printInfo();
 
 private:
     boost::circular_buffer<Scene> cb;
