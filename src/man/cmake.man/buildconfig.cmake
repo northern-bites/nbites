@@ -65,16 +65,6 @@ OPTION(
 SET(
     MAN_IS_REMOTE ${MAN_IS_REMOTE_}
     )
-OPTION(
-  DEBUG_MAN_INITIALIZATION
-  "Turn on/off debug printing while initializing the Man class"
-  ON
-  )
-OPTION(
-  DEBUG_MAN_THREADING
-  "Turn on/off debug printing while starting threads in the Man class"
-  ON
-  )
 
 OPTION(
   USE_VISION

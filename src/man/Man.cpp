@@ -100,25 +100,22 @@ Man::Man (RobotMemory::ptr memory,
 
 Man::~Man ()
 {
-  cout << "Man destructor" << endl;
+  cout << "Man destructed." << endl;
 }
 
 void Man::startSubThreads() {
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "Man starting" << endl;
-#endif
+    cout << "Man starting!" << endl;
 
     if (guardian->start() != 0)
-        cout << "Guardian failer to start" << endl;
+        cout << "Guardian failed to start." << endl;
 
     if (comm->start() != 0)
-        cout << "Comm failed to start" << endl;
+        cout << "Comm failed to start." << endl;
 
 #ifdef USE_MOTION
     // Start Motion thread (it handles its own threading
     if (motion->start() != 0)
-        cout << "Motion failed to start" << endl;
+        cout << "Motion failed to start." << endl;
 #endif
 
     //  CALLGRIND_START_INSTRUMENTATION;
@@ -126,13 +123,10 @@ void Man::startSubThreads() {
 }
 
 void Man::stopSubThreads() {
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "Man stopping: " << endl;
-#endif
+    cout << "Man stopping!" << endl;
 
     //remove stiffnesses
-    cout << "Killing stiffnesses " << endl;
+    cout << "Killing stiffnesses." << endl;
     motion->getInterface()->sendFreezeCommand(FreezeCommand::ptr(new FreezeCommand()));
 
     loggingBoard->reset();

@@ -26,22 +26,6 @@
 #  undef  MAN_IS_REMOTE
 #endif
 
-// print about the initialization of the Man class
-#define DEBUG_MAN_INITIALIZATION_${DEBUG_MAN_INITIALIZATION}
-#ifdef  DEBUG_MAN_INITIALIZATION_ON
-#  define DEBUG_MAN_INITIALIZATION
-#else
-#  undef  DEBUG_MAN_INITIALIZATION
-#endif
-
-// print information before each pthreads thread, mutex, or condition call
-#define DEBUG_MAN_THREADING_${DEBUG_MAN_THREADING}
-#ifdef  DEBUG_MAN_THREADING_ON
-#  define DEBUG_MAN_THREADING
-#else
-#  undef  DEBUG_MAN_THREADING
-#endif
-
 // turn on/off vision processing
 #define USE_NOGGIN_${USE_NOGGIN}
 #ifdef  USE_NOGGIN_ON

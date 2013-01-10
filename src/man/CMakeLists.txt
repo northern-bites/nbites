@@ -132,7 +132,6 @@ ENDIF()
 ############################ Setting up Man
 SET( MAN_SRCS Man
               TMan
-              TTMan
               ${MAN_LOADER_SRC} )
 
 SET( MAN_PYTHON_SRCS __init__.py )
