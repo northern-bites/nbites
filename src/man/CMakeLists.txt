@@ -81,6 +81,7 @@ SET( @TABLE_BOTTOM@
 SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
 
 MARK_AS_ADVANCED(CCACHE)
+MARK_AS_ADVANCED(I_AM_A_ROBOT)
 
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(
