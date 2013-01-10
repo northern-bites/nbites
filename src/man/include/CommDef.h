@@ -26,12 +26,7 @@
 static const short STREAMING_PORT_BASE = 4003;
 
 #define UDP_BUF_SIZE 1024
-
-#if ROBOT(NAO)
-#  define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
-#else
-#  define TCP_BUF_SIZE 204800  // 200KB for the Aibo's, and simulator
-#endif
+#define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
 
 typedef long long llong;
 #ifndef byte

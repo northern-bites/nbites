@@ -4,19 +4,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/find_nbites_dir.cmake")
 SET( OFFLINE ON )
 SET( BUILDING_FOR_A_REMOTE_NAO OFF )
 
-######## CCache
-
-# CMake automatically uses ccache nowadays, so this is redundant
-
-#if (CCACHE)
-##  SET( CMAKE_CXX_COMPILER_ARG1 ${CMAKE_CXX_COMPILER})
-#  SET( CMAKE_CXX_COMPILER ${CCACHE})
-#  SET( CMAKE_C_COMPILER_ARG1 ${CMAKE_C_COMPILER})
-#  SET( CMAKE_C_COMPILER ${CCACHE})
-#endif()
-
-SET( ROBOT_TYPE "NAO_NEXTGEN" )
-
 ######## PyVersion
 ### Note: the robots currently use 2.6, so this is to make sure cmake
 ### looks for the right thing

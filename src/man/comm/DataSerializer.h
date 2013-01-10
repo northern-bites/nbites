@@ -16,12 +16,7 @@
 // Constant definitions
 //
 
-#if ROBOT(AIBO)
-#  define SOCKETNS AiboSocket
-#else
-#  define SOCKETNS
-#endif
-
+#define SOCKETNS
 
 //
 // socket_error exception class definition

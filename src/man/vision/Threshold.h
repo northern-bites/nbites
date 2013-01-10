@@ -217,15 +217,9 @@ public:
     int getEdgeThreshold();
     void setHoughAcceptThreshold(int _thresh);
 
-#if ROBOT(NAO_RL)
     int getY(int j, int i) const;
     int getU(int x, int y) const;
     int getV(int j, int i) const;
-#elif ROBOT(NAO_SIM)
-#  error NAO_SIM robot type not implemented
-#else
-#  error Undefined robot type
-#endif
 
     int getVisionHorizon() { return horizon; }
 

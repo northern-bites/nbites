@@ -1047,13 +1047,6 @@ std::string Comm::getRobotName()
 
     std::string name = name_str.nodename;
 
-#if ROBOT(NAO_SIM)
-    name.append("- ");
-    name.append(robot_get_name());
-#elif ROBOT(NAO)
-#else
-#  error "Undefined robot type"
-#endif
     return name;
 }
 
