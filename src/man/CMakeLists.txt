@@ -80,6 +80,8 @@ SET( @TABLE_BOTTOM@
   )
 SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
 
+MARK_AS_ADVANCED(CCACHE)
+
 #upload.sh needs to get generated after REMOTE and OFFLINE stuff is set
 CONFIGURE_FILE(
   ${MAN_CMAKE_DIR}/upload.sh.in
