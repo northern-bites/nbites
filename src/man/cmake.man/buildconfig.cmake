@@ -55,18 +55,6 @@ ELSE()
 ENDIF()
 
 OPTION(
-    MAN_IS_REMOTE_
-    "Compile as a remote binary, versus a dynamic library (ON/OFF)"
-    OFF
-    )
-# DO NOT add any cache settings or documentation to this variable
-#  It is included directly in source files and such things will come
-#  along with it
-SET(
-    MAN_IS_REMOTE ${MAN_IS_REMOTE_}
-    )
-
-OPTION(
   USE_VISION
   "Turn on/off all vision processing"
   ON

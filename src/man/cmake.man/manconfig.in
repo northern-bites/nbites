@@ -16,16 +16,6 @@
 //
 // Debugging flags
 //
-
-
-// Compile as a remote binary, versus a dynamic library (ON/OFF)
-#define MAN_IS_REMOTE_${MAN_IS_REMOTE}
-#ifdef  MAN_IS_REMOTE_ON
-#  define MAN_IS_REMOTE
-#else
-#  undef  MAN_IS_REMOTE
-#endif
-
 // turn on/off vision processing
 #define USE_NOGGIN_${USE_NOGGIN}
 #ifdef  USE_NOGGIN_ON
