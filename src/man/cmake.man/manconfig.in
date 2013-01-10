@@ -42,14 +42,6 @@
 #  undef  DEBUG_MAN_THREADING
 #endif
 
-// print when each image is requested from the robot
-#define DEBUG_IMAGE_REQUESTS_${DEBUG_IMAGE_REQUESTS}
-#ifdef  DEBUG_IMAGE_REQUESTS_ON
-#  define DEBUG_IMAGE_REQUESTS
-#else
-#  undef  DEBUG_IMAGE_REQUESTS
-#endif
-
 // turn on/off vision processing
 #define USE_NOGGIN_${USE_NOGGIN}
 #ifdef  USE_NOGGIN_ON

@@ -75,11 +75,6 @@ OPTION(
   "Turn on/off debug printing while starting threads in the Man class"
   ON
   )
-OPTION(
-  DEBUG_IMAGE_REQUESTS
-  "Turn on/off debug printing on requesting images"
-  OFF
-  )
 
 OPTION(
   USE_VISION
