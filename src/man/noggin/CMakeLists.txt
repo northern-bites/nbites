@@ -56,11 +56,6 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
   )
 
-CONFIGURE_FILE(
-  ${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in
-  ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py
-  )
-
 ############################ INCLUDE DIRECTORY
 # Define include directories
 INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
@@ -103,7 +98,6 @@ SET( NOGGIN_PYTHON_SRCS __init__.py
                         FallStates.py
                         Leds.py
                         ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
-                        ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py
                         )
 
 SET ( NOGGIN_SWITCH ${CMAKE_CURRENT_BINARY_DIR}/players/Switch.py)

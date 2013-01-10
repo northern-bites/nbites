@@ -25,17 +25,10 @@
 #
 
 # See documentation strings for descriptions
-IF( WEBOTS_BACKEND )
-  OPTION( USING_LAB_FIELD
-    "Set field constants to use the lab field constants"
-    OFF
-    )
-ELSE( WEBOTS_BACKEND )
-  OPTION( USING_LAB_FIELD
-    "Set field constants to use the lab field constants"
-    ON
-    )
-ENDIF( WEBOTS_BACKEND )
+OPTION( USING_LAB_FIELD
+  "Set field constants to use the lab field constants"
+  ON
+  )
 
 IF( BUILDING_FOR_A_REMOTE_NAO )
   OPTION( OFFLINE

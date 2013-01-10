@@ -494,20 +494,13 @@ void Noggin::modifySysPath ()
 {
     // Enter the current working directory into the python module path
     //
-#  ifdef WEBOTS_BACKEND
-     const string test = std::string(getenv("WEBOTS_HOME")) +
-         std::string("/projects/contests") +
-         std::string("/robotstadium/controllers/nao_team_1/lib");
-     const char *cwd = test.c_str();
-#  else //WEBOTS
-#    if defined OFFLINE || defined STRAIGHT
+#if defined OFFLINE || defined STRAIGHT
        string dir1 = NBITES_DIR"/build/qtool";
        string dir2 = NBITES_DIR"/build/qtool/man";
        const char* cwd = "";
-#    else
+#else
        const char *cwd = "/home/nao/nbites/lib";
-#    endif
-#  endif
+#endif
 
 #ifdef DEBUG_NOGGIN_INITIALIZATION
        printf("  Adding %s to sys.path\n", cwd);
@@ -548,11 +541,8 @@ void Noggin::startLocLog()
     locTime = localtime( &systime );
     strftime(buf, 80, "%Y-%m-%d-%H-%M-%S",locTime);
 
-#ifdef WEBOTS_BACKEND
-    string s  = "./lib/man/noggin/" + string(buf) + ".loc";
-#else
     string s  = "/home/nao/nbites/log/" + string(buf) + ".loc";
-#endif
+
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);
     outputFile << (int)gc->color() << " " << (int)gc->player() << endl;

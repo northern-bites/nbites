@@ -41,11 +41,7 @@ SET(Boost_USE_STATIC_LIBS OFF)
 FIND_PACKAGE( Boost REQUIRED )
 MARK_AS_ADVANCED( Boost_DIR )
 
-IF(WEBOTS_BACKEND)
-  include ( cmake/FindWEBOTS.cmake )
-ELSE(WEBOTS_BACKEND)
-  include ( cmake/FindALCOMMON.cmake )
-ENDIF(WEBOTS_BACKEND)
+include ( cmake/FindALCOMMON.cmake )
 
 include(../cmake/protobuf.cmake)
 include_directories(${PROTOBUF_INCLUDE_DIR})
@@ -60,29 +56,6 @@ CONFIGURE_FILE(
   ${CFG_DIR}/manconfig.h
   ESCAPE_QUOTES
   )
-
-
-############################ OFFLINE
-SET( OFFLINE_NAOQI_PATH
-  $ENV{AL_DIR}
-  CACHE STRING
-  "The local path of the naoqi distribution to use with Webots"
-  )
-
-############################ REMOTE INSTALLATION
-# Define this to remotely install the binary or library on the robot.
-# Cannot be selected unless OE_CROSS_BUILD is set to ON.
-IF(WEBOTS_BACKEND)
-  OPTION( REMOTE_INSTALL
-    "Remotely install the libary or binary on the robot."
-    OFF
-    )
-ELSE(WEBOTS_BACKEND)
-  OPTION( REMOTE_INSTALL
-    "Remotely install the libary or binary on the robot."
-    ON
-    )
-ENDIF(WEBOTS_BACKEND)
 
 SET( @REMOTE_ADDRESS@
   "mal.local"
@@ -124,7 +97,6 @@ ENDIF()
 # Add here definition needed.
 ADD_DEFINITIONS(
   ${CMAKE_THREAD_LIBS_INIT}
-  ${WEBOTS_DEFINITIONS}
   )
 
 
@@ -143,7 +115,6 @@ INCLUDE_DIRECTORIES(
   ${BHWALK_INCLUDE_DIR}
   ${NOGGIN_INCLUDE_DIR}
   ${VISION_INCLUDE_DIR}
-  ${WEBOTS_INCLUDE_DIR}
   ${MEMORY_INCLUDE_DIR}
   ${PROJECT_BINARY_DIR}
   ${CFG_DIR}
@@ -160,13 +131,6 @@ SET( MAN_SRCS Man
               TMan
               TTMan
               ${MAN_LOADER_SRC} )
-
-IF(WEBOTS_BACKEND)
-#NOTE: this doesn't work anymore because we changed the way we
-# load man - Octavian
-  LIST(APPEND MAN_SRCS nao_soccer_player
-    )
-ENDIF()
 
 SET( MAN_PYTHON_SRCS __init__.py )
 
@@ -188,7 +152,6 @@ TARGET_LINK_LIBRARIES(
   ${NOGGIN_TARGET}
   ${MEMORY_TARGET}
   portals
-  ${WEBOTS_LIBRARIES}
   )
 
 ############################# INSTALL PATHS

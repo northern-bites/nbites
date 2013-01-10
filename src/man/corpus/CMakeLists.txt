@@ -18,11 +18,7 @@ FIND_PACKAGE( PythonLibs   REQUIRED )
 FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
 
 
-IF(WEBOTS_BACKEND)
-  FIND_PACKAGE(WEBOTS REQUIRED)
-ELSE(WEBOTS_BACKEND)
-  include( ../cmake/FindALCOMMON.cmake )
-ENDIF(WEBOTS_BACKEND)
+include( ../cmake/FindALCOMMON.cmake )
 
 ############################ BUILDCONFIG
 # Include the config file for this build
@@ -45,15 +41,10 @@ INCLUDE_DIRECTORIES(
   ${BOOST_INCLUDE_DIR}
   )
 
-#Possibly, don't need to include any AL or WEBOTS stuff in this directory
+#Possibly, don't need to include any AL stuff in this directory
 # since we may inherit it from man
-IF(WEBOTS_BACKEND)
-  INCLUDE_DIRECTORIES(${WEBOTS_INCLUDE_DIR})
-  ADD_DEFINITIONS( ${WEBOTS_DEFINITIONS})
-ELSE(WEBOTS_BACKEND)
-  INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR})
-  ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS})
-ENDIF(WEBOTS_BACKEND)
+INCLUDE_DIRECTORIES(${ALCOMMON_INCLUDE_DIR})
+ADD_DEFINITIONS( ${ALCOMMON_DEFINITIONS})
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
@@ -83,15 +74,6 @@ IF(OFFLINE)
   SET( ROBOT_CONNECT_SRCS
     offlineconnect/OfflineTranscriber
     offlineconnect/OfflineImageTranscriber
-    )
-ENDIF()
-
-IF(WEBOTS_BACKEND)
-  SET( ROBOT_CONNECT_SRCS
-    wbconnect/WBEnactor
-    wbconnect/AngleEKF
-    wbconnect/WBTranscriber
-    wbconnect/WBImageTranscriber
     )
 ENDIF()
 
