@@ -18,16 +18,6 @@
 
 # See documentation strings for descriptions
 OPTION(
-  PYTHON_SHARED_VISION
-  "Compile VISION as a shared library for Python dynamic loading"
-  OFF
-  )
-OPTION(
-  USE_PYVISION_FAKE_BACKEND
-  "Insert a 'fake' Vision object into the Python module"
-  OFF
-  )
-OPTION(
   USE_TIME_PROFILING
   "Turn on/off profiling function calls"
   OFF

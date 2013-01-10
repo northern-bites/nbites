@@ -18,16 +18,6 @@
 
 # See documentation strings for descriptions
 OPTION(
-  PYTHON_SHARED_COMM
-  "Compile comm as a shared library for Python dynamic loading"
-  OFF
-  )
-OPTION(
-  USE_PYCOMM_FAKE_BACKEND
-  "Insert a 'fake' Comm object into the Python module"
-  OFF
-  )
-OPTION(
   USE_PYTHON_GC
   "Build with the Python GameController interface"
   ON

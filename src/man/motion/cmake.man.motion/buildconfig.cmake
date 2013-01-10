@@ -18,18 +18,6 @@
 
 # See documentation strings for descriptions
 OPTION(
-  PYTHON_SHARED_MOTION
-  "Compile man/motion as a shared library for Python dynamic loading"
-  OFF
-  )
-OPTION(
-  USE_PYMOTION_CXX_BACKEND
-  "Turn on/off the actual backend C++ calls to MotionInterface in the Python _motion module"
-  ON
-  )
-
-
-OPTION(
   DEBUG_MOTION
   "Turn on/off a variety of motion-specific debugging. (Like logging trajectories to files)"
   OFF

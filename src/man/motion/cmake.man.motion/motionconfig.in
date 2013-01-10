@@ -8,25 +8,6 @@
 
 
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
-
-
-// Compile man/motion as a shared library for Python dynamic loading
-#define PYTHON_SHARED_MOTION_${PYTHON_SHARED_MOTION}
-#ifdef  PYTHON_SHARED_MOTION_ON
-#  define PYTHON_SHARED_MOTION
-#else
-#  undef  PYTHON_SHARED_MOTION
-#endif
-
-// Turn on/off the actual backend C++ calls to MotionInterface
-// in the Python _motion module
-#define USE_PYMOTION_CXX_BACKEND_${USE_PYMOTION_CXX_BACKEND}
-#ifdef  USE_PYMOTION_CXX_BACKEND_ON
-#  define USE_PYMOTION_CXX_BACKEND
-#else
-#  undef  USE_PYMOTION_CXX_BACKEND
-#endif
-
 #define DEBUG_MOTION_${DEBUG_MOTION}
 #ifdef DEBUG_MOTION_ON
 #  define DEBUG_MOTION

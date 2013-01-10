@@ -10,15 +10,6 @@
 
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
 
-
-// Insert a 'fake' Comm object into the Python module
-#define USE_PYCOMM_FAKE_BACKEND_${USE_PYCOMM_FAKE_BACKEND}
-#ifdef  USE_PYCOMM_FAKE_BACKEND_ON
-#  define USE_PYCOMM_FAKE_BACKEND
-#else
-#  undef  USE_PYCOMM_FAKE_BACKEND
-#endif
-
 // Build with the Python GameController interface
 #define USE_PYTHON_GC_${USE_PYTHON_GC}
 #ifdef  USE_PYTHON_GC_ON

@@ -67,42 +67,17 @@ SET( COMM_SRCS Comm
 	       NetworkMonitor
                )
 
-IF( PYTHON_SHARED_COMM )
-  LIST( APPEND COMM_SRCS ${CORPUS_INCLUDE_DIR}/Sensors
-                         ${CORPUS_INCLUDE_DIR}/NaoPose
-                         )
-ENDIF( PYTHON_SHARED_COMM )
-
 SET( COMM_PYTHON_SRCS __init__.py )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install
 # commands
 
-IF( PYTHON_SHARED_COMM )
-  ADD_LIBRARY(
-    ${COMM_TARGET}
-    SHARED
-    ${COMM_SRCS}
-    )
-  # Install to _motionmodule.so, instead of lib_motion.so
-  GET_TARGET_PROPERTY(
-    COMM_TARGET_LOCATION ${COMM_TARGET} LOCATION
-    )
-  INSTALL(
-    FILES ${COMM_TARGET_LOCATION}
-    DESTINATION ${COMM_PYTHON_TARGET_DIR}
-    CONFIGURATIONS "" Debug Release
-    RENAME ${COMM_TARGET}module.so
-    )
-ELSE( PYTHON_SHARED_COMM )
-  ADD_LIBRARY(
-    ${COMM_TARGET}
-    STATIC
-    ${COMM_SRCS}
-    )
-  # No INSTALL target when static
-ENDIF( PYTHON_SHARED_COMM )
+ADD_LIBRARY(
+  ${COMM_TARGET}
+  STATIC
+  ${COMM_SRCS}
+  )
 
 INSTALL(
   FILES ${COMM_PYTHON_SRCS}
