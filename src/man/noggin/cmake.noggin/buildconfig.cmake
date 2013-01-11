@@ -25,8 +25,3 @@ SET(
 SET(
   PYTHON_PLAYER ${@PYTHON_PLAYER@}
   )
-OPTION(
-  DEBUG_NOGGIN_INITIALIZATION
-  "Print about the initialization of the Man class"
-  ON
-  )

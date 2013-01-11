@@ -3,7 +3,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Noggin.h"
-#include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
@@ -25,6 +24,8 @@
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
+#define DEBUG_NOGGIN_INITIALIZATION
+
 static const float MAX_CORNER_DISTANCE = 400.0f;
 static const float MAX_CROSS_DISTANCE = 200.0f;
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
