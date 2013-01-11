@@ -624,15 +624,11 @@ void Sensors::setBatteryCurrent(float current) {
 }
 
 void Sensors::lockImage() const {
-#ifdef USE_SENSORS_IMAGE_LOCKING
     image_mutex.lock();
-#endif
 }
 
 void Sensors::releaseImage() const {
-#ifdef USE_SENSORS_IMAGE_LOCKING
     image_mutex.unlock();
-#endif
 }
 
 /**

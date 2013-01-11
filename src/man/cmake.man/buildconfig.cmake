@@ -75,16 +75,6 @@ OPTION(
   ON
   )
 OPTION(
-  USE_SENSORS_IMAGE_LOCKING
-  "Customize image locking configuration.  Man uses locking."
-  ON
-  )
-OPTION(
-  REDIRECT_C_STDERR
-  "Redirect the standard error to standard out in C++"
-  ON
-  )
-OPTION(
   USE_MEMORY
   "Use memory and logging"
   OFF

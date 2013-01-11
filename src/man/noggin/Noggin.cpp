@@ -252,14 +252,12 @@ void Noggin::runStep ()
         reload_hard();
     }
 
-#   ifdef USE_NOGGIN_AUTO_HALT
     static unsigned int num_crashed = 0;
     if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
         this->reload_hard();
         error_state = false;
         num_crashed++;
     }
-#   endif
 
     //Check button pushes for game controller signals
     processGCButtonClicks();

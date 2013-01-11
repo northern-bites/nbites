@@ -22,21 +22,9 @@ OPTION(
   "Turn on/off profiling function calls"
   OFF
   )
-OPTION(
-  USE_PROFILER_AUTO_PRINT
-  "Turn on/off automatic profiling summary printing"
-  ON
-  )
-
 # Options pertaining to running the vision code OFFLINE
 OPTION( OFFLINE
   "Debug flag for vision when we are running offline"
-  OFF
-  )
-
-# Use the smaller calibration tables
-OPTION( SMALL_TABLES
-  "Turn on/off the use of small color tables."
   OFF
   )
 

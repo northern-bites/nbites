@@ -48,22 +48,6 @@
 #  define USE_DCM
 #endif
 
-// Customize image locking configuration.  Man uses locking.
-#define USE_SENSORS_IMAGE_LOCKING_${USE_SENSORS_IMAGE_LOCKING}
-#ifdef  USE_SENSORS_IMAGE_LOCKING_ON
-#  define USE_SENSORS_IMAGE_LOCKING
-#else
-#  undef  USE_SENSORS_IMAGE_LOCKING
-#endif
-
-// Redirect the standard error to standard out in C++
-#define REDIRECT_C_STDERR_${REDIRECT_C_STDERR}
-#ifdef  REDIRECT_C_STDERR_ON
-#  define REDIRECT_C_STDERR
-#else
-#  undef  REDIRECT_C_STDERR
-#endif
-
 // turn on/off motion actions
 #define USING_LAB_FIELD_${USING_LAB_FIELD}
 #ifdef  USING_LAB_FIELD_ON

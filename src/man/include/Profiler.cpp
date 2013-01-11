@@ -168,8 +168,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  * num_profile_frames is -1, this will continue forever.  Otherwise, once
  * num_profile_frames frames have been profiled (nextFrame() called that many
  * times, or current_frame == num_total_frames - 1 upon entry to nextFrame()),
- * profiling will be automatically turned off, and if USE_PROFILER_AUTO_PRINT
- * defined, will print the results.
+ * profiling will be automatically turned off, and it will print the results.
  *
  * Calling profileFrames(n) will cause profiling to be turned on AFTER THE NEXT
  * CALL TO nextFrame().  This is so Python can turn on profiling mid-frame, and
@@ -263,9 +262,7 @@ Profiler::nextFrame() {
     if (num_profile_frames >= 0 && current_frame >= num_profile_frames - 1) {
       // at finish, stop profiling
       profiling = false;
-#ifdef USE_PROFILER_AUTO_PRINT
       printSummary();
-#endif
       return false;
     }else {
       // add this frame's times to the sums
