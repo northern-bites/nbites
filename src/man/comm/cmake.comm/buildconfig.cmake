@@ -18,11 +18,6 @@
 
 # See documentation strings for descriptions
 OPTION(
-  USE_PYTHON_GC
-  "Build with the Python GameController interface"
-  ON
-  )
-OPTION(
   DEBUG_COMM
   "Toggle comm debug mode"
   OFF

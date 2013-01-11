@@ -16,22 +16,6 @@
 //
 // Debugging flags
 //
-// turn on/off vision processing
-#define USE_NOGGIN_${USE_NOGGIN}
-#ifdef  USE_NOGGIN_ON
-#  define USE_NOGGIN
-#else
-#  undef USE_NOGGIN
-#endif
-
-// turn on/off vision processing
-#define USE_VISION_${USE_VISION}
-#ifdef  USE_VISION_ON
-#  define USE_VISION
-#else
-#  undef  USE_VISION
-#endif
-
 // turn on/off motion actions
 #define USE_MOTION_${USE_MOTION}
 #ifdef  USE_MOTION_ON
@@ -40,15 +24,7 @@
 #  undef  USE_MOTION
 #endif
 
-//switch btwn AlEnactor and NaoEnactor
-#define USE_DCM_${USE_DCM}
-#ifdef USE_DCM_OFF
-#  undef USE_DCM
-#else
-#  define USE_DCM
-#endif
-
-// turn on/off motion actions
+// are we in the lab or a real game?
 #define USING_LAB_FIELD_${USING_LAB_FIELD}
 #ifdef  USING_LAB_FIELD_ON
 #  define USING_LAB_FIELD

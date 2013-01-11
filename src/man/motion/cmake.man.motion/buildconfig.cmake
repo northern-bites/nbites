@@ -22,9 +22,3 @@ OPTION(
   "Turn on/off a variety of motion-specific debugging. (Like logging trajectories to files)"
   OFF
 )
-
-OPTION(
-  USE_MOTION_ACTUATORS
-  "Turn on/off commands being sent from motion to the actuators"
-  ON
-)

@@ -53,25 +53,9 @@ ELSE()
     OFF
     )
 ENDIF()
-
-OPTION(
-  USE_VISION
-  "Turn on/off all vision processing"
-  ON
-  )
-OPTION(
-  USE_NOGGIN
-  "Turn on/off python behaviors"
-  ON
-  )
 OPTION(
   USE_MOTION
   "Turn on/off all motion actions"
-  ON
-  )
-OPTION(
-  USE_DCM
-  "Send commands directly to the DCM. Turn this off in REMOTE mode"
   ON
   )
 OPTION(

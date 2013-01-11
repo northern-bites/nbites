@@ -9,15 +9,6 @@
 
 
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
-
-// Build with the Python GameController interface
-#define USE_PYTHON_GC_${USE_PYTHON_GC}
-#ifdef  USE_PYTHON_GC_ON
-#  define USE_PYTHON_GC
-#else
-#  undef  USE_PYTHON_GC
-#endif
-
 // Set/unset a DEBUG_COMM flag.
 #define DEBUG_COMM_${DEBUG_COMM}
 #ifdef  DEBUG_COMM_ON

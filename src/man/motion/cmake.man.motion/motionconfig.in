@@ -15,13 +15,5 @@
 #  undef DEBUG_MOTION
 #endif
 
-#define USE_MOTION_ACTUATORS_${USE_MOTION_ACTUATORS}
-#ifdef  USE_MOTION_ACTUATORS_OFF
-#  define NO_ACTUAL_MOTION
-#else
-#  undef  NO_ACTUAL_MOTION
-#endif
-
-
 #endif // !_motionconfig_h
 

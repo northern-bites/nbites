@@ -79,7 +79,6 @@ Man::Man (RobotMemory::ptr memory,
     loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);
 
-#ifdef USE_NOGGIN
     noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
                                             motion->getInterface(), memory));
@@ -88,7 +87,6 @@ Man::Man (RobotMemory::ptr memory,
         std::cerr << e.what() << std::endl;
     }
 
-#endif// USE_NOGGIN
     loggingBoard->setMemory(memory);
 
 
@@ -149,7 +147,6 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-#ifdef USE_VISION
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
     sensors->lockImage();
@@ -158,11 +155,8 @@ Man::processFrame ()
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
 //    cout<<vision->ball->getDistance() << endl;
-#endif
 
-#ifdef USE_NOGGIN
     noggin->runStep();
-#endif
 
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();
