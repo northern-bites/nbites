@@ -22,12 +22,6 @@ OPTION(
     "Turn on/off debugging information for the Thread class."
     OFF
     )
-
-OPTION(
-    SAVE_ALL_FRAMES
-    "Turn on/off saving every frame in-game."
-    OFF
-    )
 OPTION(
   CAN_SAVE_FRAMES
   "Enable the ability to save or stream frames. Slower performance."

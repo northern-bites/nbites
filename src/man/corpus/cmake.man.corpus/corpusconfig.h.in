@@ -19,17 +19,5 @@
 #else
 #  undef  CAN_SAVE_FRAMES
 #endif
-
-//Turn on/off saving every frame in-game.
-#define SAVE_ALL_FRAMES_${SAVE_ALL_FRAMES}
-#ifdef  SAVE_ALL_FRAMES_ON
-#  define SAVE_ALL_FRAMES
-#  ifndef CAN_SAVE_FRAMES
-#    define CAN_SAVE_FRAMES
-#  endif
-#else
-#  undef  SAVE_ALL_FRAMES
-#endif
-
 #endif // !_corpusconfig_h
 

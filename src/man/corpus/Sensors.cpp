@@ -48,8 +48,6 @@ static uint16_t global_image[NAO_IMAGE_BYTE_SIZE];
 //
 // C++ Sensors class methods
 //
-int Sensors::saved_frames = 0;
-
 Sensors::Sensors(boost::shared_ptr<Speech> s,
                  MVisionSensors::ptr mVisionSensors,
                  MMotionSensors::ptr mMotionSensors) :
@@ -83,8 +81,7 @@ Sensors::Sensors(boost::shared_ptr<Speech> s,
         varianceMonitor(MONITOR_COUNT, "SensorVariance", sensorNames),
         fsrMonitor(BUMPER_LEFT_L, "FSR_Variance", fsrNames),
         unfilteredInertial(), chestButton(0.0f), batteryCharge(0.0f),
-        batteryCurrent(0.0f), FRM_FOLDER("/home/nao/nbites/frames"),
-        saving_frames_on(false) {
+        batteryCurrent(0.0f), FRM_FOLDER("/home/nao/nbites/frames") {
 
     mutex* vision_sensors_mutices[] = { &battery_mutex, &bumper_mutex,
             &ultra_sound_mutex };
@@ -768,36 +765,8 @@ void Sensors::updateMotionSensorsInMemory(man::memory::MMotionSensors::ptr ms) c
     ms->get()->set_support_foot(this->getSupportFoot());
 }
 
-void Sensors::resetSaveFrame() {
-    saved_frames = 0;
-}
-
 // The version for the frame format
 static const int VERSION = 0;
-
-void Sensors::startSavingFrames() {
-#ifdef SAVE_ALL_FRAMES
-    if (!isSavingFrames())
-    {
-        saving_frames_on = true;
-        cout << "****Started Saving Frames****" << endl;
-    }
-#endif
-}
-
-void Sensors::stopSavingFrames() {
-#ifdef SAVE_ALL_FRAMES
-    if (isSavingFrames())
-    {
-        saving_frames_on = false;
-        cout << "****Stopped Saving Frames****" << endl;
-    }
-#endif
-}
-
-bool Sensors::isSavingFrames() const {
-    return saving_frames_on;
-}
 
 void Sensors::updateMotionDataVariance() {
     variance_mutex.lock();
@@ -896,142 +865,4 @@ float Sensors::percentBrokenSonar() {
         ++brokenSonars;
 
     return static_cast<float>(brokenSonars) * 0.5f; // only two Sonar sensors
-}
-
-// @TODO move this to Transcriber to write out from full size image...
-// BROKEN--Lizzie
-void Sensors::saveFrame() {
-    int MAX_FRAMES = 5000;
-    if (saved_frames > MAX_FRAMES)
-        return;
-    string EXT(".frm");
-    string BASE("/");
-    int NUMBER = saved_frames;
-    stringstream FRAME_PATH;
-
-    FRAME_PATH << FRM_FOLDER << BASE << NUMBER << EXT;
-    fstream fout(FRAME_PATH.str().c_str(), fstream::out);
-
-    // Lock and write image possibility of deadlock if something has
-    // the image locked and is waiting for visionAngles to unlock -
-    // not happening in our code atm
-    vision_angles_mutex.lock();
-    lockImage();
-
-    // @TODO Write out entire 640x480 image
-    //fout.write(reinterpret_cast<const char*>(getNaoImage()), NAO_IMAGE_BYTE_SIZE);
-    // write the version of the frame format at the end before joints/sensors
-    fout << VERSION << " ";
-
-    // Write joints
-    for (vector<float>::const_iterator i = visionBodyAngles.begin();
-            i < visionBodyAngles.end(); ++i) {
-        fout << *i << " ";
-    }
-    releaseImage();
-    vision_angles_mutex.unlock();
-
-    // Write sensors
-    float sensor_data[NUM_SENSORS];
-    FSR lfsr = getLeftFootFSR();
-    sensor_data[0] = lfsr.frontLeft;
-    sensor_data[1] = lfsr.frontRight;
-    sensor_data[2] = lfsr.rearLeft;
-    sensor_data[3] = lfsr.rearRight;
-    FSR rfsr = getRightFootFSR();
-    sensor_data[4] = rfsr.frontLeft;
-    sensor_data[5] = rfsr.frontRight;
-    sensor_data[6] = rfsr.rearLeft;
-    sensor_data[7] = rfsr.rearRight;
-    FootBumper lfb = getLeftFootBumper();
-    sensor_data[8] = lfb.left;
-    sensor_data[9] = lfb.right;
-    FootBumper rfb = getRightFootBumper();
-    sensor_data[10] = rfb.left;
-    sensor_data[11] = rfb.right;
-    Inertial inertial = getInertial();
-    sensor_data[12] = inertial.accX;
-    sensor_data[13] = inertial.accY;
-    sensor_data[14] = inertial.accZ;
-    sensor_data[15] = inertial.gyrX;
-    sensor_data[16] = inertial.gyrY;
-    sensor_data[17] = inertial.angleX;
-    sensor_data[18] = inertial.angleY;
-    sensor_data[19] = getUltraSoundLeft();
-    sensor_data[20] = getUltraSoundRight();
-    sensor_data[21] = getSupportFoot();
-    printf("Writing sensors\n");
-    for (int i = 0; i < NUM_SENSORS; i++) {
-        fout << sensor_data[i] << " ";
-    }
-
-    fout.close();
-    cout << "Saved frame #" << saved_frames++ << endl;
-}
-
-/**
- * Load a frame from a file and set the sensors and image data as
- * appropriate. Useful for running offline.
- * BROKEN--Lizzie
- */
-void Sensors::loadFrame(string path) {
-    fstream fin(path.c_str(), fstream::in);
-    if (fin.fail()) {
-        cout << "Frame load failed: " << path << endl;
-        return;
-    }
-
-    lockImage();
-    // Load the image from the file, puts it straight into Sensors'
-    // image buffer so it doesn't have to allocate its own buffer and
-    // worry about deleting it
-    //uint16_t * img = const_cast<uint16_t*>(getImage());
-    uint8_t  * byte_img = new uint8_t[320 * 240 * 2];
-    fin.read(reinterpret_cast<char *>(byte_img), 320 * 240 * 2);
-    releaseImage();
-
-    lockImage();
-
-    // Translate the loaded image into the proper format.
-    // @TODO: Convert images to new format.
-    //for (int i = 0; i < 320 * 240; ++i) {
-    //img[i] = 0;
-    //   img[i] = static_cast<uint16_t>(byte_img[i << 1]);
-    //}
-    delete byte_img;
-
-    releaseImage();
-    float v;
-    int version;
-    string space;
-    fin >> version;
-
-    vector<float> vba;
-
-    // Read in the body angles
-    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i) {
-        fin >> v;
-        vba += v;
-    }
-    setVisionBodyAngles(vba);
-
-    // Read sensor values
-    vector<float> sensor_data;
-
-    for (int i = 0; i < NUM_SENSORS; ++i) {
-        fin >> v;
-        sensor_data += v;
-    }
-    setLeftFootFSR(sensor_data[0], sensor_data[1], sensor_data[2],
-            sensor_data[3]);
-    setRightFootFSR(sensor_data[4], sensor_data[5], sensor_data[6],
-            sensor_data[7]);
-    setLeftFootBumper(sensor_data[8], sensor_data[9]);
-    setLeftFootBumper(sensor_data[10], sensor_data[11]);
-    setInertial(sensor_data[12], sensor_data[13], sensor_data[14],
-            sensor_data[15], sensor_data[16], sensor_data[17], sensor_data[18]);
-    setUltraSound(sensor_data[19], sensor_data[20]);
-    setSupportFoot(static_cast<SupportFoot>(sensor_data[21]));
-
-    fin.close();
 }
