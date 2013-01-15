@@ -23,7 +23,7 @@ set( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 
 # where should we look for libraries we need
-set(CMAKE_FIND_ROOT_PATH ${OE_SYSROOT} ${NBITES_EXT})
+set(CMAKE_FIND_ROOT_PATH ${OE_SYSROOT})
 
 # search for programs in the build host directories
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
