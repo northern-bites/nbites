@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include <alcommon/albroker.h>
 #include <alcommon/albrokermanager.h>
+#include <alcommon/almodule.h>
 
 extern "C"
 {

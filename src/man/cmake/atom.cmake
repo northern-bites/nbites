@@ -1,37 +1,33 @@
 
-include("${CMAKE_CURRENT_LIST_DIR}/find_nbites_dir.cmake")
+# Set options that are constrained by building for atom
+set( OFFLINE OFF )
 
-############################ DEFINES && DEFINITIONS
-SET( ATOM_BUILD ON )
-SET( OFFLINE OFF )
-SET( BUILDING_FOR_A_REMOTE_NAO ON )
+# Find the NBITES_DIR
+include(${CMAKE_CURRENT_LIST_DIR}/FindNBITES_DIR.cmake)
 
 ############################# CROSS-COMPILATION VARIABLES
 # Set the variable for the cross-compilation directory, cmake variables
+set( TOOLCHAIN_DIR "${NBITES_DIR}/lib/atomtoolchain" )
+set( OE_SYSROOT "${TOOLCHAIN_DIR}/sysroot/" )
 
-SET( TOOLCHAIN_DIR "${NBITES_DIR}/lib/atomtoolchain" )
-SET( OE_SYSROOT "${TOOLCHAIN_DIR}/sysroot/" )
+set( CMAKE_CROSSCOMPILING   TRUE  )
+set( CMAKE_SYSTEM_NAME      Linux )
+set( CMAKE_SYSTEM_VERSION   1     )
+set( CMAKE_SYSTEM_PROCESSOR atom  )
 
-SET( CMAKE_CROSSCOMPILING   TRUE  )
-SET( CMAKE_SYSTEM_NAME      Linux )
-SET( CMAKE_SYSTEM_VERSION   1     )
-SET( CMAKE_SYSTEM_PROCESSOR atom  )
+include("${TOOLCHAIN_DIR}/toolchain-atom.cmake")
 
-INCLUDE("${TOOLCHAIN_DIR}/toolchain-atom.cmake")
-
-SET( CMAKE_CXX_FLAGS
+set( CMAKE_CXX_FLAGS
   "${CMAKE_CXX_FLAGS} -march=core2 -mtune=generic -mssse3 -mfpmath=sse -fomit-frame-pointer -pipe")
-SET( CMAKE_C_FLAGS
+set( CMAKE_C_FLAGS
   "${CMAKE_CXX_FLAGS}" )
 
-SET( CMAKE_BUILD_TYPE "release" CACHE STRING "Build type" FORCE)
-
 # where should we look for libraries we need
-SET(CMAKE_FIND_ROOT_PATH ${OE_SYSROOT} ${NBITES_EXT})
+set(CMAKE_FIND_ROOT_PATH ${OE_SYSROOT} ${NBITES_EXT})
 
 # search for programs in the build host directories
-SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
 # for libraries and headers in the target directories
-SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-SET(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
