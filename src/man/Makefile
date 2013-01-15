@@ -8,8 +8,7 @@ build: build/Makefile
 .PHONY: cross
 cross:
 	mkdir -p build
-	cd build; cmake -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) ..; \
-	ccmake .
+	cd build; cmake -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) ..; ccmake ..
 
 .phony: clean
 clean:
