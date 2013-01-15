@@ -217,14 +217,6 @@ public:
     // most recent angles if some other module needs them.
     void updateVisionAngles(int historyIndex);
 
-    // Save a vision frame with associated sensor data
-    void saveFrame();
-    void loadFrame(std::string path);
-    void resetSaveFrame();
-    void startSavingFrames();
-    void stopSavingFrames();
-    bool isSavingFrames() const;
-
     // writes data collected the variance monitor to ~/nbites/log/
     void writeVarianceData();
     // checks whether the sensors we're monitoring are "healthy" or not
@@ -319,9 +311,7 @@ private:
     float batteryCharge;
     float batteryCurrent;
 
-    static int saved_frames;
     std::string FRM_FOLDER;
-    bool saving_frames_on;
 };
 
 

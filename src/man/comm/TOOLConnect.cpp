@@ -146,12 +146,6 @@ TOOLConnect::receive () throw(socket_error&)
 void
 TOOLConnect::handle_request (DataRequest &r) throw(socket_error&)
 {
-
-    // Robot information request
-    if (r.info) {
-        serial.write_byte(ROBOT_TYPE);
-    }
-
     std::vector<float> v;
 
     // Joint data request

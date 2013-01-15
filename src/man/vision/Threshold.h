@@ -27,21 +27,12 @@ class Gradient;
 // remember to change both values when chaning the color tables
 
 //these must be changed everytime we load a new table
-#ifdef SMALL_TABLES
-#define YSHIFT  3
-#define USHIFT  2
-#define VSHIFT  2
-#define YMAX  32
-#define UMAX  64
-#define VMAX  64
-#else
 #define YSHIFT  1
 #define USHIFT  1
 #define VSHIFT  1
 #define YMAX  128
 #define UMAX  128
 #define VMAX  128
-#endif
 
 //#define SHOULDERS
 
@@ -217,15 +208,9 @@ public:
     int getEdgeThreshold();
     void setHoughAcceptThreshold(int _thresh);
 
-#if ROBOT(NAO_RL)
     int getY(int j, int i) const;
     int getU(int x, int y) const;
     int getV(int j, int i) const;
-#elif ROBOT(NAO_SIM)
-#  error NAO_SIM robot type not implemented
-#else
-#  error Undefined robot type
-#endif
 
     int getVisionHorizon() { return horizon; }
 

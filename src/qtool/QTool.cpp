@@ -25,7 +25,7 @@ QTool::QTool() : EmptyQTool("QTOOL"),
                  colorTableCreator(new ColorTableCreator(dataManager)),
                  memoryViewer(new MemoryViewer(dataManager)),
                  visionViewer(new VisionViewer(dataManager)),
-                 offlineViewer(new OfflineViewer(dataManager->getMemory())),
+                 // offlineViewer(new OfflineViewer(dataManager->getMemory())),
                  ballEKFViewer(new BallEKFViewer(dataManager)),
                  particleViewer(new ParticleViewer(dataManager)),
                  overseerClient(new OverseerClient(dataManager, this))
@@ -35,7 +35,7 @@ QTool::QTool() : EmptyQTool("QTOOL"),
     toolTabs->addTab(dataLoader, tr("Data Loader"));
     toolTabs->addTab(memoryViewer, tr("Log Viewer"));
     toolTabs->addTab(visionViewer, tr("Vision Viewer"));
-    toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
+    // toolTabs->addTab(offlineViewer, tr("Offline Viewer"));
     toolTabs->addTab(ballEKFViewer, tr("BallEKF Viewer"));
     toolTabs->addTab(particleViewer, tr("Particle Viewer"));
     toolTabs->addTab(new RobotField(dataManager, this), tr("Robot Field"));

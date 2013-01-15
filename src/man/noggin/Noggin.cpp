@@ -3,7 +3,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Noggin.h"
-#include "nogginconfig.h"
 #include "PyLoc.h"
 #include "EKFStructs.h"
 #include <cstdlib>
@@ -25,6 +24,8 @@
 #define USE_TEAMMATE_BALL_REPORTS
 #define RUN_LOCALIZATION
 #define USE_LOC_CORNERS
+#define DEBUG_NOGGIN_INITIALIZATION
+
 static const float MAX_CORNER_DISTANCE = 400.0f;
 static const float MAX_CROSS_DISTANCE = 200.0f;
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
@@ -252,14 +253,12 @@ void Noggin::runStep ()
         reload_hard();
     }
 
-#   ifdef USE_NOGGIN_AUTO_HALT
     static unsigned int num_crashed = 0;
     if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
         this->reload_hard();
         error_state = false;
         num_crashed++;
     }
-#   endif
 
     //Check button pushes for game controller signals
     processGCButtonClicks();
@@ -494,20 +493,13 @@ void Noggin::modifySysPath ()
 {
     // Enter the current working directory into the python module path
     //
-#  ifdef WEBOTS_BACKEND
-     const string test = std::string(getenv("WEBOTS_HOME")) +
-         std::string("/projects/contests") +
-         std::string("/robotstadium/controllers/nao_team_1/lib");
-     const char *cwd = test.c_str();
-#  else //WEBOTS
-#    if defined OFFLINE || defined STRAIGHT
+#if defined OFFLINE || defined STRAIGHT
        string dir1 = NBITES_DIR"/build/qtool";
        string dir2 = NBITES_DIR"/build/qtool/man";
        const char* cwd = "";
-#    else
+#else
        const char *cwd = "/home/nao/nbites/lib";
-#    endif
-#  endif
+#endif
 
 #ifdef DEBUG_NOGGIN_INITIALIZATION
        printf("  Adding %s to sys.path\n", cwd);
@@ -548,11 +540,8 @@ void Noggin::startLocLog()
     locTime = localtime( &systime );
     strftime(buf, 80, "%Y-%m-%d-%H-%M-%S",locTime);
 
-#ifdef WEBOTS_BACKEND
-    string s  = "./lib/man/noggin/" + string(buf) + ".loc";
-#else
     string s  = "/home/nao/nbites/log/" + string(buf) + ".loc";
-#endif
+
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);
     outputFile << (int)gc->color() << " " << (int)gc->player() << endl;

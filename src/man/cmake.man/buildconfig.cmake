@@ -25,17 +25,10 @@
 #
 
 # See documentation strings for descriptions
-IF( WEBOTS_BACKEND )
-  OPTION( USING_LAB_FIELD
-    "Set field constants to use the lab field constants"
-    OFF
-    )
-ELSE( WEBOTS_BACKEND )
-  OPTION( USING_LAB_FIELD
-    "Set field constants to use the lab field constants"
-    ON
-    )
-ENDIF( WEBOTS_BACKEND )
+OPTION( USING_LAB_FIELD
+  "Set field constants to use the lab field constants"
+  ON
+  )
 
 IF( BUILDING_FOR_A_REMOTE_NAO )
   OPTION( OFFLINE
@@ -60,62 +53,9 @@ ELSE()
     OFF
     )
 ENDIF()
-
-OPTION(
-    MAN_IS_REMOTE_
-    "Compile as a remote binary, versus a dynamic library (ON/OFF)"
-    OFF
-    )
-# DO NOT add any cache settings or documentation to this variable
-#  It is included directly in source files and such things will come
-#  along with it
-SET(
-    MAN_IS_REMOTE ${MAN_IS_REMOTE_}
-    )
-OPTION(
-  DEBUG_MAN_INITIALIZATION
-  "Turn on/off debug printing while initializing the Man class"
-  ON
-  )
-OPTION(
-  DEBUG_MAN_THREADING
-  "Turn on/off debug printing while starting threads in the Man class"
-  ON
-  )
-OPTION(
-  DEBUG_IMAGE_REQUESTS
-  "Turn on/off debug printing on requesting images"
-  OFF
-  )
-
-OPTION(
-  USE_VISION
-  "Turn on/off all vision processing"
-  ON
-  )
-OPTION(
-  USE_NOGGIN
-  "Turn on/off python behaviors"
-  ON
-  )
 OPTION(
   USE_MOTION
   "Turn on/off all motion actions"
-  ON
-  )
-OPTION(
-  USE_DCM
-  "Send commands directly to the DCM. Turn this off in REMOTE mode"
-  ON
-  )
-OPTION(
-  USE_SENSORS_IMAGE_LOCKING
-  "Customize image locking configuration.  Man uses locking."
-  ON
-  )
-OPTION(
-  REDIRECT_C_STDERR
-  "Redirect the standard error to standard out in C++"
   ON
   )
 OPTION(

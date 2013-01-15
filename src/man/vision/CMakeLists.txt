@@ -120,30 +120,12 @@ SET( VISION_PYTHON_SRCS
 # Configure the output execuatable or shared library, and the install
 # commands
 
-IF( PYTHON_SHARED_VISION )
-  # Add shared library target
-  ADD_LIBRARY(
-    ${VISION_TARGET}
-    SHARED
-    ${VISION_SRCS}
-    )
-
-  # Install to XXXvisionmodule.so, instead of libvision.so
-  GET_TARGET_PROPERTY( VISION_TARGET_LOCATION ${VISION_TARGET} LOCATION )
-  INSTALL(
-    FILES ${VISION_TARGET_LOCATION}
-    DESTINATION ${VISION_PYTHON_TARGET_DIR}
-    CONFIGURATIONS "" Debug Release
-    RENAME ${ROBOT_PREFIX}${VISION_TARGET}module.so
-    )
-ELSE( PYTHON_SHARED_VISION )
-  # Add static library target
-  ADD_LIBRARY(
-    ${VISION_TARGET}
-    STATIC
-    ${VISION_SRCS}
-    )
-ENDIF( PYTHON_SHARED_VISION )
+# Add static library target
+ADD_LIBRARY(
+  ${VISION_TARGET}
+  STATIC
+  ${VISION_SRCS}
+  )
 
 INSTALL(
   FILES ${VISION_PYTHON_SRCS}

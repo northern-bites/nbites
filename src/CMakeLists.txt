@@ -3,6 +3,9 @@
 cmake_minimum_required(VERSION 2.8.0)
 enable_testing()
 
+include(cmake/protobuf.cmake)
+include_directories(${PROTOBUF_INCLUDE_DIR})
+
 # set up sub projects and includes
 
 set( NBITES_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR} )

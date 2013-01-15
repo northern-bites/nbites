@@ -52,9 +52,6 @@
 
 #include <math.h>
 #include <assert.h>
-#if ROBOT(NAO_SIM)
-#  include <aldefinitions.h>
-#endif
 #include <boost/shared_ptr.hpp>
 
 #include "Threshold.h"
@@ -1285,7 +1282,6 @@ void Threshold::storeFieldObjects() {
     vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
 
-#if ROBOT(NAO)
     setVisualRobotInfo(vision->red1);
     setFramesOnAndOff(vision->red1);
 
@@ -1304,8 +1300,6 @@ void Threshold::storeFieldObjects() {
 
     setVisualRobotInfo(vision->navy3);
     setFramesOnAndOff(vision->navy3);
-#endif
-
 }
 
 /*

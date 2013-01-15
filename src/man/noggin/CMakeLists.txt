@@ -41,12 +41,6 @@ SET(@GC_PLAYER_NUMBER@
 SET( GC_PLAYER_NUMBER ${@GC_PLAYER_NUMBER@} )
 ############################ CONFIG.H GENERATION
 CONFIGURE_FILE(
-  ${NOGGIN_CMAKE_DIR}/nogginconfig.in
-  ${CFG_DIR}/nogginconfig.h
-  ESCAPE_QUOTES
-  )
-
-CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/Switch.py.in
   ${CMAKE_CURRENT_BINARY_DIR}/players/Switch.py
   )
@@ -54,11 +48,6 @@ CONFIGURE_FILE(
 CONFIGURE_FILE(
   ${NOGGIN_CMAKE_DIR}/TeamConfig.py.in
   ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
-  )
-
-CONFIGURE_FILE(
-  ${NOGGIN_CMAKE_DIR}/WebotsConfig.py.in
-  ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py
   )
 
 ############################ INCLUDE DIRECTORY
@@ -103,7 +92,6 @@ SET( NOGGIN_PYTHON_SRCS __init__.py
                         FallStates.py
                         Leds.py
                         ${CMAKE_CURRENT_BINARY_DIR}/TeamConfig.py
-                        ${CMAKE_CURRENT_BINARY_DIR}/WebotsConfig.py
                         )
 
 SET ( NOGGIN_SWITCH ${CMAKE_CURRENT_BINARY_DIR}/players/Switch.py)

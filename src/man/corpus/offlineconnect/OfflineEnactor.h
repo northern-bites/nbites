@@ -7,6 +7,8 @@
  *
  */
 
+#pragma once
+
 #include "corpus/MotionEnactor.h"
 
 namespace man {

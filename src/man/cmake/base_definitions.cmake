@@ -119,17 +119,6 @@ IF(COMMAND CMAKE_POLICY)
       CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-
-############################ ROBOT TYPE
-# Definitions for the type of robot (for compilation definitions), and
-# prefixes for library, executable, and path names
-IF( NOT DEFINED ROBOT_TYPE )
-  SET( ROBOT_TYPE NAO_RL_33 )
-ENDIF( NOT DEFINED ROBOT_TYPE )
-SET( ROBOT_TYPE ${ROBOT_TYPE} CACHE STRING "Robot type" )
-
-ADD_DEFINITIONS( -DROBOT_TYPE=${ROBOT_TYPE} )
-
 ############################ OUTPUT LOCATION
 # Define output directories.  Binaries, documentation, and libraries are
 # copied to final locations depending on robot type.

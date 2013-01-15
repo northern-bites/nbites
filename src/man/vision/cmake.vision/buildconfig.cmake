@@ -18,35 +18,13 @@
 
 # See documentation strings for descriptions
 OPTION(
-  PYTHON_SHARED_VISION
-  "Compile VISION as a shared library for Python dynamic loading"
-  OFF
-  )
-OPTION(
-  USE_PYVISION_FAKE_BACKEND
-  "Insert a 'fake' Vision object into the Python module"
-  OFF
-  )
-OPTION(
   USE_TIME_PROFILING
   "Turn on/off profiling function calls"
   OFF
   )
-OPTION(
-  USE_PROFILER_AUTO_PRINT
-  "Turn on/off automatic profiling summary printing"
-  ON
-  )
-
 # Options pertaining to running the vision code OFFLINE
 OPTION( OFFLINE
   "Debug flag for vision when we are running offline"
-  OFF
-  )
-
-# Use the smaller calibration tables
-OPTION( SMALL_TABLES
-  "Turn on/off the use of small color tables."
   OFF
   )
 

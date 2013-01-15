@@ -6,8 +6,8 @@
  * the robot, we can easily do this by creating a new Enactor/Transcriber pair.
  *
  * Note that this file was originally created only to send joint information
- * from the switchboard to ALMotion/Webots, so this transformation is not
- * complete yet. Also, there is still no enactor for Webots.
+ * from the switchboard to ALMotion, so this transformation is not
+ * complete yet.
  *
  * See also Transcriber, ThreadedEnactor, NaoEnactor (DCM)
  * and ALEnactor(ALMotion).

@@ -25,13 +25,6 @@ namespace noggin {
         static const bool LOG_LOC = false;
         static const bool LOG_COMM = false;
 
-        ///// MODULE SWITCHES /////
-#ifdef USE_VISION
-        static const bool PY_USE_VISION = true;
-#else
-        static const bool PY_USE_VISION = false;
-#endif
-
         ///// COM HEADER /////
         static const char* PY_PACKET_HEADER = "ilikeyoulots";
         static const int NUM_PACKET_ELEMENTS = 21;

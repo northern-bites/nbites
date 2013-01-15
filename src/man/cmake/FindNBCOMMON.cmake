@@ -4,9 +4,6 @@
 # Clear variables/caches
 ##
 
-ADD_DEFINITIONS(
-	-DROBOT_TYPE=${ROBOT_TYPE}
-	)
 SET( NBCOMMON_INCLUDE_DIR "NBCOMMON_INCLUDE_DIR-NOTFOUND" CACHE FILEPATH "Cleared." FORCE )
 
 ##
@@ -37,7 +34,6 @@ SET( MEMORY_CMAKE_DIR     ${MEMORY_INCLUDE_DIR}/ )
 SET( COMM_TARGET        _comm      )
 SET( LEDS_TARGET        _leds      )
 SET( MAN_TARGET         man        )
-SET( MAN_PRELOADER_TARGET manpreloader   )
 SET( MATRIX_TARGET      matrix     )
 SET( MOTION_TARGET      _motion    )
 SET( NOGGIN_TARGET      noggin     )

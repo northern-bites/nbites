@@ -87,9 +87,7 @@ public:
     boost::shared_ptr<Comm> comm;
     boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard;
 
-#ifdef USE_NOGGIN
     boost::shared_ptr<Noggin> noggin;
-#endif// USE_NOGGIN
     boost::shared_ptr<Lights> lights;
     boost::shared_ptr<Speech> speech;
 

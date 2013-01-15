@@ -1,43 +1,11 @@
 /* This is an auto generated file. Please do not edit it.*/
 
-
 #ifndef _corpusconfig_h
 #define _corpusconfig_h
 
-
-
 // :::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
-
-
-// Compile Python sensors and _leds module
-// as a shared library for dynamic loading
-#define PYTHON_SHARED_CORPUS_${PYTHON_SHARED_CORPUS}
-#ifdef  PYTHON_SHARED_CORPUS_ON
-#  define PYTHON_SHARED_SENSORS
-#  define PYTHON_SHARED_LEDS
-#else
-#  undef  PYTHON_SHARED_SENSORS
-#  undef  PYTHON_SHARED_LEDS
-#endif
-
-// Insert a 'fake' Sensors object into the Python module
-#define USE_PYSENSORS_FAKE_BACKEND_${USE_PYSENSORS_FAKE_BACKEND}
-#ifdef  USE_PYSENSORS_FAKE_BACKEND_ON
-#  define USE_PYSENSORS_FAKE_BACKEND
-#else
-#  undef  USE_PYSENSORS_FAKE_BACKEND
-#endif
-
-// Turn on/off the actual backend proxy calls to the ALLeds module
-#define USE_PYLEDS_CXX_BACKEND_${USE_PYLEDS_CXX_BACKEND}
-#ifdef  USE_PYLEDS_CXX_BACKEND_ON
-#  define USE_PYLEDS_CXX_BACKEND
-#else
-#  undef  USE_PYLEDS_CXX_BACKEND
-#endif
-
 //Turn on/off debugging information for the Thread class.
-#define DEBUG_THREAD_${USE_PYLEDS_CXX_BACKEND}
+#define DEBUG_THREAD_${DEBUG_THREAD}
 #ifdef  DEBUG_THREAD_ON
 #  define DEBUG_THREAD
 #else
@@ -51,17 +19,5 @@
 #else
 #  undef  CAN_SAVE_FRAMES
 #endif
-
-//Turn on/off saving every frame in-game.
-#define SAVE_ALL_FRAMES_${SAVE_ALL_FRAMES}
-#ifdef  SAVE_ALL_FRAMES_ON
-#  define SAVE_ALL_FRAMES
-#  ifndef CAN_SAVE_FRAMES
-#    define CAN_SAVE_FRAMES
-#  endif
-#else
-#  undef  SAVE_ALL_FRAMES
-#endif
-
 #endif // !_corpusconfig_h
 

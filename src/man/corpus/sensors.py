@@ -7,8 +7,7 @@ except ImportError:
     _sensors = None
 
 if _sensors and not hasattr(_sensors, "inst"):
-    raise ImportError("C++ _sensors backend is not initialized.  Did you mean "
-                      "to compile with USE_PYSENSORS_FAKE_BACKEND?")
+    raise ImportError("C++ _sensors backend is not initialized.")
 
 
 def Sensors():

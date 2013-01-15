@@ -25,19 +25,3 @@ SET(
 SET(
   PYTHON_PLAYER ${@PYTHON_PLAYER@}
   )
-OPTION(
-  DEBUG_NOGGIN_INITIALIZATION
-  "Print about the initialization of the Man class"
-  ON
-  )
-OPTION(
-  USE_NOGGIN_AUTO_HALT
-  "Make noggin halt brain run() calls until a reload after an error"
-  ON
-  )
-
-OPTION(
-  USE_MM_LOC_EKF
-  "Use the Multimodal EKF instead of a single LocEKF"
-  OFF
-  )
