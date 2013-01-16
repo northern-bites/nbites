@@ -71,4 +71,3 @@ check:
 	elif [ -e $(STRAIGHT_FILE) ]; then \
 		echo "Making straight."; \
 	fi
-

@@ -6,7 +6,7 @@ include( cmake/RobotConfig.cmake )
 # A list of options that should be advanced
 include( cmake/Advanced.cmake )
 # Compiler flags
-include ( cmake/Flags.cmake )
+include( cmake/Flags.cmake )
 
 # So that we can use find_package commands
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -14,6 +14,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 # For Aldebaran's headers
 find_package(ALCOMMON REQUIRED)
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
+
+if( BUILD_PROTOBUF )
+  include( cmake/BuildProtobuf.cmake )
+endif()
+option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
 
 # Configure the copy script based on our settings
 configure_file(
