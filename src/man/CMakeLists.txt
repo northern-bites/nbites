@@ -24,10 +24,17 @@ set( MAN_SRCS main.cpp
   NewMan.cpp
 )
 
+add_subdirectory( ../portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
+
 add_library(
   man
   SHARED
   ${MAN_SRCS}
+)
+
+target_link_libraries(
+  man
+  portals
 )
 
 install( TARGETS man

@@ -6,4 +6,5 @@ mark_as_advanced(
   CCACHE
   CMAKE_INSTALL_PREFIX
   CMAKE_TOOLCHAIN_FILE
+  I_AM_A_ROBOT
 )
