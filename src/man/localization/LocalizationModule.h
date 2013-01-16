@@ -22,7 +22,12 @@ namespace man
 	    LocalizationModule();
 	    virtual ~LocalizationModule();
 
-	    //InPortal<memory::proto::Motion> motionInput;
+	    /**
+	     * @brief Resets the localization.
+	     */
+	    virtual void resetLocalization() = 0;
+
+	    //InPortal<memory::proto::PMotion> motionInput;
 	    InPortal<memory::proto::PVision> visionInput;
 	    OutPortal<memory::proto::RobotLocation> output;
 
@@ -39,11 +44,6 @@ namespace man
 	     */
 	    virtual void updateLocalization(
 		/* @todo sort out observation classes */) = 0;
-
-	    /**
-	     * @brief Resets the localization.
-	     */
-	    virtual void resetLocalization() = 0;
 	};
     } // namespace localization
 } // namespace man
