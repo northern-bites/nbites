@@ -3,14 +3,20 @@ ATOM_TOOLCHAIN = cmake/atom.cmake
 
 .PHONY: build
 build: build/Makefile
-	cd build; make --no-print-directory
+	make -C build --no-print-directory
+
+.PHONY: install
+install: build/Makefile
+	make install -C build --no-print-directory; build/upload.sh
 
 .PHONY: cross
 cross:
 	mkdir -p build
-	cd build; cmake -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) ..; ccmake ..
+	cd build; \
+	cmake -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) -DCMAKE_INSTALL_PREFIX=install/ ..; \
+	ccmake ..
 
-.phony: clean
+.PHONY: clean
 clean:
 	rm -rf build/*
 

@@ -13,3 +13,11 @@ set( @REMOTE_ADDRESS@
   CACHE STRING
   "The address to which the code will be installed."
 )
+# So that upload.sh can be configured
+set( REMOTE_ADDRESS ${@REMOTE_ADDRESS@})
+
+set( INSTALL_LOCATION
+  "nbites/"
+  CACHE STRING
+  "The folder on the robot where the code will end up."
+)
