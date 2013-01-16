@@ -1,5 +1,5 @@
-# Marks all options that should be hidden when we "make cross" as advanced
-# so that the list is not overwhelming
+# Marks all options that should be hidden when we "make cross/straight" as
+#  advanced so that the list is not overwhelming
 cmake_minimum_required( VERSION 2.8.3 )
 
 mark_as_advanced(

@@ -5,6 +5,8 @@ cmake_minimum_required( VERSION 2.8.3 )
 include( cmake/Advanced.cmake )
 # A list of options that we do want
 include( cmake/RobotConfig.cmake )
+# Compiler flags
+include ( cmake/Flags.cmake )
 
 # So that we can use find_package commands
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
@@ -12,7 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 # For Aldebaran's headers
 find_package(ALCOMMON REQUIRED)
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
-
 
 # Configure the copy script based on our settings
 configure_file(
@@ -24,6 +25,7 @@ set( MAN_SRCS main.cpp
   NewMan.cpp
 )
 
+# compile portals, which is outside the source tree so we specify a destination
 add_subdirectory( ../portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
 
 add_library(
