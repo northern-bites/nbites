@@ -6,6 +6,14 @@ include( cmake/Advanced.cmake )
 # A list of options that we do want
 include( cmake/RobotConfig.cmake )
 
+# So that we can use find_package commands
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
+# For Aldebaran's headers
+find_package(ALCOMMON REQUIRED)
+include_directories( ${ALCOMMON_INCLUDE_DIR} )
+
+
 # Configure the copy script based on our settings
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"

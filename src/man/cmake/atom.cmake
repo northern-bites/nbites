@@ -5,7 +5,7 @@ set( OFFLINE OFF )
 # Find the NBITES_DIR
 include(${CMAKE_CURRENT_LIST_DIR}/FindNBITES_DIR.cmake)
 
-############################# CROSS-COMPILATION VARIABLES
+# Cross compilation!
 # Set the variable for the cross-compilation directory, cmake variables
 set( TOOLCHAIN_DIR "${NBITES_DIR}/lib/atomtoolchain" )
 set( OE_SYSROOT "${TOOLCHAIN_DIR}/sysroot/" )
