@@ -4,10 +4,7 @@
 
 #include "NewMan.h"
 
-#include <boost/shared_ptr.hpp>
-#include <alcommon/albroker.h>
 #include <alcommon/albrokermanager.h>
-#include <alcommon/almodule.h>
 
 extern "C"
 {
@@ -18,7 +15,7 @@ extern "C"
         AL::ALBrokerManager::setInstance(broker->fBrokerManager.lock());
         AL::ALBrokerManager::getInstance()->addBroker(broker);
         // create module instances
-        AL::ALModule::createModule<Man>(broker, "ManModule");
+        AL::ALModule::createModule<Man>(broker, "nbitesman");
         return 0;
     }
 
