@@ -1,70 +1,35 @@
+# Finding the protobuf stuff
 
-##
-# Includes
-##
+if( OFFLINE AND NOT EXISTS ${NBITES_DIR}/lib/protobuf_native/lib AND NOT BUILD_PROTOBUF)
+    message( FATAL_ERROR "Protobuf libs do not exist for straight compilation. Use BUILD_PROTOBUF to get them." )
+endif()
+if( NOT OFFLINE AND NOT EXISTS ${NBITES_DIR}/lib/protobuf_cross/lib AND NOT BUILD_PROTOBUF)
+    message( FATAL_ERROR "Protobuf libs do not exist for cross compilation. Use BUILD_PROTOBUF to get them." )
+endif()
 
-INCLUDE ( ${CMAKE_MODULE_PATH}/base_definitions.cmake )
+if( OFFLINE )
+  set( PROTOBUF_INCLUDE_DIR ${NBITES_DIR}/lib/protobuf_native/include/google )
+  set( PROTOBUF_LIBRARIES ${NBITES_DIR}/lib/protobuf_native/lib/libprotobuf.a )
+else( OFFLINE )
+  set( PROTOBUF_INCLUDE_DIR ${NBITES_DIR}/lib/protobuf_cross/include/google )
+  set( PROTOBUF_LIBRARIES ${NBITES_DIR}/lib/protobuf_cross/lib/libprotobuf.a )
+endif( OFFLINE )
 
-##
-# Clear variables/caches
-##
+if( PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARIES )
+  set( PROTOBUF_FOUND TRUE )
+endif( PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARIES )
 
-SET(PROTOBUF_INCLUDE_DIR "PROTOBUF_INCLUDE_DIR-NOTFOUND" CACHE FILEPATH "Cleared." FORCE)
-SET(PROTOBUF_LIBRARIES "PROTOBUF_LIBRARIES-NOTFOUND" CACHE FILEPATH "Cleared." FORCE)
+if( NOT PROTOBUF_FOUND AND PROTOBUF_FIND_REQUIRED )
+  if( NOT PROTOBUF_INCLUDE_DIR )
+        message( STATUS "Required include not found" )
+    message( FATAL_ERROR "Could not find PROTOBUF include!" )
+  endif( NOT PROTOBUF_INCLUDE_DIR )
+  if( NOT PROTOBUF_LIBRARIES )
+    message( STATUS "Required libraries not found" )
+    message( FATAL_ERROR "Could not find PROTOBUF libraries!" )
+  endif( NOT PROTOBUF_LIBRARIES )
+endif( NOT PROTOBUF_FOUND AND PROTOBUF_FIND_REQUIRED )
 
-##
-# Find package requirements
-##
-
-  IF ( OE_CROSS_BUILD )
-    SET( PROTOBUF_INCLUDE_DIR /usr/include/ )
-    SET( PROTOBUF_LIBRARIES /usr/lib/libprotobuf.so )
-  ELSE ( OE_CROSS_BUILD )
-    IF( WIN32 )
-#      SET( PROTOBUF_ROOT $ENV{PROTOBUF_ROOT})
-#      SET( PROTOBUF_INCLUDE_DIR ${PROTOBUF_ROOT}/include/ )
-#      SET( PROTOBUF_LIBRARIES ${PROTOBUF_ROOT}/lib/PROTOBUFGCE2.dll )
-#      SET( PROTOBUF_DEFINITIONS "" )
-    ELSE ( WIN32 )
-      SET( PROTOBUF_INCLUDE_DIR /usr/include/ )
-      IF ( APPLE )
-        SET( PROTOBUF_LIBRARIES /usr/lib/libPROTOBUF.dylib )
-      ELSE ( APPLE )
-        SET( PROTOBUF_LIBRARIES /usr/lib/libprotobuf.so )
-      ENDIF( APPLE )
-    ENDIF( WIN32 )
-  ENDIF ( OE_CROSS_BUILD )
-
-
-
-
-IF( PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARIES )
-  SET( PROTOBUF_FOUND TRUE )
-ENDIF( PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARIES )
-
-IF( NOT PROTOBUF_FOUND AND PROTOBUF_FIND_REQUIRED )
-  IF( NOT PROTOBUF_INCLUDE_DIR )
-        MESSAGE( STATUS "Required include not found" )
-    MESSAGE( FATAL_ERROR "Could not find PROTOBUF include!" )
-  ENDIF( NOT PROTOBUF_INCLUDE_DIR )
-  IF( NOT PROTOBUF_LIBRARIES )
-    MESSAGE( STATUS "Required libraries not found" )
-    MESSAGE( FATAL_ERROR "Could not find PROTOBUF libraries!" )
-  ENDIF( NOT PROTOBUF_LIBRARIES )
-ENDIF( NOT PROTOBUF_FOUND AND PROTOBUF_FIND_REQUIRED )
-
-
-# Finally, display informations if not in quiet mode
-IF( NOT PROTOBUF_FIND_QUIETLY )
-  MESSAGE( STATUS "PROTOBUF found " )
-  MESSAGE( STATUS "  includes   : ${PROTOBUF_INCLUDE_DIR}" )
-  MESSAGE( STATUS "  libraries  : ${PROTOBUF_LIBRARIES}" )
-ENDIF( NOT PROTOBUF_FIND_QUIETLY )
-
-
-
-MARK_AS_ADVANCED(
-  PROTOBUF_DEFINITIONS
-  PROTOBUF_INCLUDE_DIR
-  PROTOBUF_LIBRARIES
-)
+message( STATUS "PROTOBUF found " )
+message( STATUS "  includes   : ${PROTOBUF_INCLUDE_DIR}" )
+message( STATUS "  libraries  : ${PROTOBUF_LIBRARIES}" )
