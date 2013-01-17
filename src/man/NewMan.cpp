@@ -1,6 +1,8 @@
 #include "NewMan.h"
 #include <iostream>
 
+namespace man {
+
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name)
 {
@@ -11,4 +13,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 Man::~Man()
 {
     std::cout << "Man destructor." << std::endl;
+}
+
 }

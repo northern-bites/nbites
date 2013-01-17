@@ -36,13 +36,12 @@ set( MAN_SRCS main.cpp
 
 # Compile portals, which is outside the source tree so specify a destination
 add_subdirectory( ../portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
+# Make portals available to everything
+include_directories( ../portals )
 # Also messages
 add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
-
-# MAKE THIS NICER LIZZIE
-include_directories( ../portals )
 
 add_library(
   man

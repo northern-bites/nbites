@@ -11,6 +11,8 @@
 // *                    *
 // **********************
 
+namespace portals {
+
 std::string strprintf (const char* format, ...)
 {
   char buf[1024];
@@ -162,4 +164,6 @@ void RoboGram::run()
     modules_[i]->reset();
   for (unsigned int i = 0; i < modules_.size(); ++i)
     modules_[i]->run();
+}
+
 }

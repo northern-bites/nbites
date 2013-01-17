@@ -23,7 +23,7 @@ endif( PROTOBUF_INCLUDE_DIR AND PROTOBUF_LIBRARY )
 
 if( NOT PROTOBUF_FOUND AND PROTOBUF_FIND_REQUIRED )
   if( NOT PROTOBUF_INCLUDE_DIR )
-        message( STATUS "Required include not found" )
+    message( STATUS "Required include not found" )
     message( FATAL_ERROR "Could not find PROTOBUF include!" )
   endif( NOT PROTOBUF_INCLUDE_DIR )
   if( NOT PROTOBUF_LIBRARY )

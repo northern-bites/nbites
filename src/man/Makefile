@@ -43,7 +43,7 @@ cross:  $(CROSS_FILE)
 
 $(CROSS_FILE):
 	@if [ -e $(STRAIGHT_FILE) ]; then \
-		rm $(STRAIGHT_FILE); \
+		rm -r $(BUILD_DIR)/*; \
 	fi
 	@touch $(CROSS_FILE)
 
@@ -56,7 +56,7 @@ straight: $(STRAIGHT_FILE)
 
 $(STRAIGHT_FILE):
 	@if [ -e $(CROSS_FILE) ]; then \
-		rm $(CROSS_FILE); \
+		rm -r $(BUILD_DIR)/*; \
 	fi
 	@touch $(STRAIGHT_FILE)
 
