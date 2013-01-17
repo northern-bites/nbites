@@ -14,7 +14,13 @@ TestThread::TestThread() : Thread("test"),
 
 void TestThread::run()
 {
-    testDiagram.run();
+    synchro::Thread::running = true;
+    synchro::Thread::trigger->on();
+
+    while (Thread::running)
+    {
+        testDiagram.run();
+    }
 }
 
 }
