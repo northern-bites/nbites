@@ -1,4 +1,5 @@
 #include "NewMan.h"
+#include "sensors/SensorsModule.h"
 #include <iostream>
 
 namespace man {
@@ -8,6 +9,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 {
     setModuleDescription("The Northern Bites' soccer player.");
     std::cout << "Man constructor." << std::endl;
+
+    sensors::SensorsModule sm(broker);
+    sm.run();
 }
 
 Man::~Man()
