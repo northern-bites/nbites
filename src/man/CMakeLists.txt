@@ -10,6 +10,7 @@ include( cmake/Flags.cmake )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
+include( cmake/FindNBITES_DIR.cmake )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
   include( cmake/BuildProtobuf.cmake )
@@ -43,6 +44,9 @@ add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
+# Build the sensors module.
+add_subdirectory( sensors )
+
 add_library(
   man
   SHARED
@@ -58,6 +62,7 @@ target_link_libraries(
   man
   portals
   messages
+  sensors
 )
 
 install( TARGETS man
