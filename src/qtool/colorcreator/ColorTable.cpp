@@ -34,7 +34,10 @@ void ColorTable::read(string filename) {
         return;
     }
 
-    fread(table, sizeof(byte), TABLE_SIZE, tableFile);
+    size_t bytesRead = fread(table, sizeof(byte), TABLE_SIZE, tableFile);
+    if (bytesRead == 0) {
+        cerr << "Error reading color table " << filename;
+    }
 
     fclose(tableFile);
 }
