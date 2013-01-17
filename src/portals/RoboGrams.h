@@ -592,6 +592,8 @@ public:
   void run();
 };
 
+}
+
 #endif
 
-}
+
