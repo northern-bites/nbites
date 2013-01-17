@@ -16,13 +16,13 @@ if( BUILD_PROTOBUF )
 endif()
 
 # So that we can use find_package commands
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/" )
 
 # For Aldebaran's headers
-find_package(ALCOMMON REQUIRED)
+find_package( ALCOMMON REQUIRED )
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
-find_package(PROTOBUF REQUIRED)
+find_package( PROTOBUF REQUIRED )
 
 # Configure the copy script based on our settings
 configure_file(
@@ -43,6 +43,9 @@ add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
+# Actual subdirectories
+add_subdirectory( synchro )
+
 add_library(
   man
   SHARED
@@ -58,6 +61,7 @@ target_link_libraries(
   man
   portals
   messages
+  synchro
 )
 
 install( TARGETS man

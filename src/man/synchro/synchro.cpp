@@ -1,40 +1,19 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
 #include <map>
 #include <string>
 #include <pthread.h>
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include "synchro.h"
-#include "corpusconfig.h"
 
 using namespace std;
 
-#include "NullStream.h"
+//#include "NullStream.h"
 
-#ifdef DEBUG_THREAD
+//#ifdef DEBUG_THREAD
 #define debug_thread_out cout
-#else
-#define debug_thread_out (*NullStream::NullInstance())
-#endif
+//#else
+//#define debug_thread_out (*NullStream::NullInstance())
+//#endif
 
 Event::Event (string _name)
   : name(_name), signalled(false)
