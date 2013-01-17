@@ -15,6 +15,9 @@
 #  define MUTEX_INIT errchkmutex
 #endif
 
+namespace man {
+namespace synchro {
+
 struct MutexDeleter
 {
     void operator() (pthread_mutex_t *mutex) { pthread_mutex_destroy(mutex); }
@@ -171,3 +174,6 @@ protected:
     boost::shared_ptr<Trigger> trigger;
     Event signal;
 };
+
+}
+}

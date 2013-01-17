@@ -9,6 +9,8 @@ using namespace std;
 
 //#include "NullStream.h"
 
+namespace man {
+namespace synchro {
 //#ifdef DEBUG_THREAD
 #define debug_thread_out cout
 //#else
@@ -260,4 +262,7 @@ void Trigger::await_off ()
 void Trigger::await_flip ()
 {
     flip_event.await();
+}
+
+}
 }

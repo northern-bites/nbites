@@ -32,6 +32,8 @@ configure_file(
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
+  TestModules.cpp
+  Threads.cpp
 )
 
 # Compile portals, which is outside the source tree so specify a destination
