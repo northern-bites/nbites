@@ -34,7 +34,7 @@ set( MAN_SRCS main.cpp
   NewMan.cpp
 )
 
-# compile portals, which is outside the source tree so we specify a destination
+# Compile portals, which is outside the source tree so specify a destination
 add_subdirectory( ../portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
 
 add_library(
@@ -42,6 +42,11 @@ add_library(
   SHARED
   ${MAN_SRCS}
 )
+
+# If protobuf libs don't exist yet, make sure they build before man
+if( BUILD_PROTOBUF )
+add_dependencies(man protobuf_libs)
+endif()
 
 target_link_libraries(
   man
