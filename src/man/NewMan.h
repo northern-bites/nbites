@@ -4,6 +4,8 @@
 #include <alcommon/albroker.h>
 #include <boost/shared_ptr.hpp>
 
+#include "Test.pb.h"
+
 class Man : public AL::ALModule
 {
 public:

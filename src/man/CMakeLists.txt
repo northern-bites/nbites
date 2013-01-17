@@ -36,6 +36,10 @@ set( MAN_SRCS main.cpp
 
 # Compile portals, which is outside the source tree so specify a destination
 add_subdirectory( ../portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
+# Also messages
+add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+# And make sure generated pb.h files are visible
+include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
 add_library(
   man
@@ -45,12 +49,13 @@ add_library(
 
 # If protobuf libs don't exist yet, make sure they build before man
 if( BUILD_PROTOBUF )
-add_dependencies(man protobuf_libs)
+add_dependencies(messages protobuf_libs)
 endif()
 
 target_link_libraries(
   man
   portals
+  messages
 )
 
 install( TARGETS man
