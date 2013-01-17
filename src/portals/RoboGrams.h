@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+namespace portals {
+
 // Prohibit copy/assignment of some class
 #define NO_COPY(name) \
   name(const name&);  \
@@ -590,4 +592,8 @@ public:
   void run();
 };
 
+}
+
 #endif
+
+
