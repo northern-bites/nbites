@@ -32,7 +32,6 @@ configure_file(
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
-  TestModules.cpp
   Threads.cpp
 )
 
@@ -44,6 +43,7 @@ include_directories( ../portals )
 add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+include_directories( ../messages )
 
 # Actual subdirectories
 add_subdirectory( common )

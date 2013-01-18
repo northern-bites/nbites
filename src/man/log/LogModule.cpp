@@ -31,8 +31,9 @@ void LogModule::writeFrame()
     num << saved_frames;
     string filename = FILEPATH + num.str() + EXT;
 
+
     fstream fout(filename.c_str(), fstream::out);
-    fout.write(reinterpret_cast<const char*>(topImageIn.message()),
+    fout.write(reinterpret_cast<char*>(topImageIn.message().get_image()),
                NAO_IMAGE_BYTE_SIZE);
 
     fout.close();

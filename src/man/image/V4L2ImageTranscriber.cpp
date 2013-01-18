@@ -38,17 +38,21 @@
         }                                              \
     }
 
+using namespace portals;
+using namespace messages;
+
 namespace man {
 namespace image {
 
 using boost::shared_ptr;
 
-V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which) :
+V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which,
+                                           OutPortal<ThresholdedImage>* out) :
+    outPortal(out),
     settings(Camera::getSettings(which)),
     cameraType(which),
     currentBuf(0),
     timeStamp(0),
-    image(reinterpret_cast<uint16_t*>(new uint8_t[IMAGE_BYTE_SIZE])),
     table(new unsigned char[yLimit * uLimit * vLimit]),
     params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
 {
@@ -266,10 +270,14 @@ bool V4L2ImageTranscriber::waitForImage() {
     uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
     if (current_image) {
 
+        Message<ThresholdedImage> image(new ThresholdedImage());
+
         //PROF_ENTER(P_ACQUIRE_IMAGE);
-        ImageAcquisition::acquire_image_fast(table, params,
-                current_image, image);
+        ImageAcquisition::acquire_image_fast(table, params, current_image,
+                                             image.get()->get_mutable_image());
         //PROF_EXIT(P_ACQUIRE_IMAGE);
+
+        outPortal->setMessage(image);
 
         //PROF_ENTER(P_QBUF);
         this->releaseBuffer();

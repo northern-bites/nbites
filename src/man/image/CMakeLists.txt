@@ -24,4 +24,5 @@ add_library(
 target_link_libraries(
   image
   common
+  messages
 )

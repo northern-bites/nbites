@@ -1,16 +1,7 @@
 #include "ImageTranscriberModule.h"
 //#include "Profiler.h"
 
-#include <vector>
-
-namespace portals {
-// Specialize for image messages
-template<> void MessageHolder<uint16_t>::initialize() { message = 0; }
-template<> std::string MessageHolder<uint16_t>::describe() const
-{
-    return "This is an image";
-}
-}
+#include <iostream>
 
 using namespace portals;
 
@@ -21,8 +12,8 @@ ImageTranscriberModule::ImageTranscriberModule()
     : Module(),
       topImageOut(base()),
       bottomImageOut(base()),
-      topImageTranscriber(Camera::TOP),
-      bottomImageTranscriber(Camera::BOTTOM)
+      topImageTranscriber(Camera::TOP, &topImageOut),
+      bottomImageTranscriber(Camera::BOTTOM, &bottomImageOut)
 {
     topImageTranscriber.initTable("/home/nao/nbites/lib/table/top_table.mtb");
     bottomImageTranscriber.initTable("/home/nao/nbites/lib/table/bottom_table.mtb");
@@ -43,8 +34,6 @@ void ImageTranscriberModule::run_()
 
     //PROF_EXIT(P_GETIMAGE);
 
-    topImageOut.setMessage(Message<uint16_t>(topImageTranscriber.getImage()));
-    bottomImageOut.setMessage(Message<uint16_t>(bottomImageTranscriber.getImage()));
     //stop timer
     //const long long processTime = monotonic_micro_time() - startTime;
     //sleep until next frame

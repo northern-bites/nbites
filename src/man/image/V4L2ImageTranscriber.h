@@ -70,6 +70,8 @@
 #include "Camera.h"
 #include "ColorParams.h"
 #include "VisionDef.h"
+#include "ThresholdedImage.h"
+#include "RoboGrams.h"
 
 namespace man {
 namespace image {
@@ -77,7 +79,9 @@ namespace image {
 class V4L2ImageTranscriber {
 public:
 
-    V4L2ImageTranscriber(Camera::Type which);
+    V4L2ImageTranscriber(Camera::Type which,
+                         portals::OutPortal<messages::ThresholdedImage> *out);
+
     virtual ~V4L2ImageTranscriber();
 
     const Camera::Settings* getSettings() const {
@@ -96,9 +100,9 @@ public:
 
     void initTable(const std::string& path);
 
-    uint16_t* getImage() { return image; }
-
 private:
+    portals::OutPortal<messages::ThresholdedImage>* outPortal;
+
     Camera::Settings settings;
     Camera::Type cameraType;
 
@@ -122,7 +126,6 @@ private:
     struct v4l2_buffer* currentBuf;
     unsigned long long timeStamp;
 
-    uint16_t* image;
     unsigned char *table;
     ColorParams params;
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
+#include "ThresholdedImage.h"
 #include <stdint.h>
 #include <string>
 
@@ -16,7 +17,7 @@ public:
 	LogModule();
 	virtual ~LogModule() {}
 
-    portals::InPortal<uint16_t> topImageIn;
+    portals::InPortal<messages::ThresholdedImage> topImageIn;
 
 protected:
     virtual void run_();

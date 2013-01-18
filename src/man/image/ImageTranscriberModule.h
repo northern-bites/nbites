@@ -1,7 +1,6 @@
 #pragma once
 
 #include "V4L2ImageTranscriber.h"
-#include "RoboGrams.h"
 
 namespace man {
 namespace image {
@@ -12,8 +11,8 @@ public:
 	ImageTranscriberModule();
 	virtual ~ImageTranscriberModule() {}
 
-    portals::OutPortal<uint16_t> topImageOut;
-    portals::OutPortal<uint16_t> bottomImageOut;
+    portals::OutPortal<messages::ThresholdedImage> topImageOut;
+    portals::OutPortal<messages::ThresholdedImage> bottomImageOut;
 
 protected:
     virtual void run_();
