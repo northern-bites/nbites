@@ -147,7 +147,7 @@ private: // private methods
         return 0.0000002f * _distance * _distance * _distance + 5.f;
     }
     inline static float cornerBearingToSD(float _bearing, float _distance) {
-        return .0000002*(_distance*_distance) + 4 * TO_RAD;
+        return .0000002f*(_distance*_distance) + 4.f * TO_RAD;
     }
 
 
