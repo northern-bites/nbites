@@ -44,6 +44,14 @@ add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
+# Actual subdirectories
+add_subdirectory( common )
+include_directories( common )
+add_subdirectory( synchro )
+
+# Actual modules
+add_subdirectory( log )
+
 add_library(
   man
   SHARED
@@ -59,6 +67,8 @@ target_link_libraries(
   man
   portals
   messages
+  synchro
+  log
 )
 
 install( TARGETS man
