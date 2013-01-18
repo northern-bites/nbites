@@ -46,7 +46,12 @@ add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
 # Actual subdirectories
+add_subdirectory( common )
+include_directories( common )
 add_subdirectory( synchro )
+
+# Actual modules
+add_subdirectory( image )
 
 add_library(
   man
