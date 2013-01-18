@@ -95,43 +95,43 @@ void Comm::run()
 
 void Comm::send()
 {
-    pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock(&comm_mutex);
 
     teamConnect->send(myPlayerNumber(), gameConnect->myTeamNumber(), burstRate);
     timer->teamPacketSent();
 
-    pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock(&comm_mutex);
 }
 
 void Comm::receive()
 {
-    pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock(&comm_mutex);
 
     teamConnect->receive(0, gameConnect->myTeamNumber());
 
     gameConnect->handle(myPlayerNumber());
 
-    pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock(&comm_mutex);
 }
 
 GameData Comm::getGameData()
 {
-    pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock(&comm_mutex);
 
     GameData d = *(gameConnect->getGameData());
 
-    pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock(&comm_mutex);
 
     return d;
 }
 
 TeamMember Comm::getTeammate(int player)
 {
-    pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock(&comm_mutex);
 
     TeamMember m = *(teamConnect->getTeamMate(player));
 
-    pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock(&comm_mutex);
 
     return m;
 }
@@ -141,11 +141,11 @@ void Comm::setLocData(int p,
                       float xu, float yu, float hu)
 {
     int player = checkPlayerNumber(p);
-    pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock(&comm_mutex);
 
     teamConnect->setLocData(p, x, y, h, xu, yu, hu);
 
-    pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock(&comm_mutex);
 }
 
 void Comm::setBallData(int p, float on,
@@ -153,22 +153,22 @@ void Comm::setBallData(int p, float on,
                        float du, float bu)
 {
     int player = checkPlayerNumber(p);
-    pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock(&comm_mutex);
 
     teamConnect->setBallData(p, on, d, b, du, bu);
 
-    pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock(&comm_mutex);
 }
 
 void Comm::setBehaviorData(int p,
                            float r, float sr, float ct)
 {
     int player = checkPlayerNumber(p);
-    pthread_mutex_lock (&comm_mutex);
+    pthread_mutex_lock(&comm_mutex);
 
     teamConnect->setBehaviorData(p, r, sr, ct);
 
-    pthread_mutex_unlock (&comm_mutex);
+    pthread_mutex_unlock(&comm_mutex);
 }
 
 int Comm::checkPlayerNumber(int p)
