@@ -12,10 +12,10 @@ template<> std::string MessageHolder<uint16_t>::describe() const
 }
 }
 
+using namespace portals;
+
 namespace man {
 namespace image {
-
-using namespace portals;
 
 ImageTranscriberModule::ImageTranscriberModule()
     : Module(),
