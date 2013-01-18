@@ -79,6 +79,11 @@ void TeamConnect::setUpSocket()
     }
 
 end:
+
+#ifdef DEBUG_COMM
+    std::cout << "Target ip is set to: " << ipTarget.c_str() << std::endl;
+#endif
+
     socket->setTarget(ipTarget.c_str(), TEAM_PORT);
 
     //join team's multicast...
@@ -104,7 +109,6 @@ void TeamConnect::send(int player, int team, int burst = 1)
     {
         socket->sendToTarget(&packet[0], sizeof(packet));
     }
-    std::cout << "Sent a packet" << std::endl;
 }
 
 float* TeamConnect::buildHeader(char* packet, TeamMember* robot, int tn)

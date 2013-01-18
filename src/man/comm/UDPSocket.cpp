@@ -257,11 +257,15 @@ int UDPSocket::sendToTarget(const char* data, const int len)
 {
     ssize_t nwritten;
 
-    nwritten = ::sendto(sock, data, len, 0, target, sizeof(struct sockaddr_in));
+    nwritten = ::sendto(sock, data, len, 0, target, sizeof(*target));
     if (nwritten < 0)
     {
         std::cerr << "UDPSocket::sendToTarget() failed: "
                   << strerror(errno) << std::endl;
+    }
+    else
+    {
+        std::cout << "Sent a packet" << std::endl;
     }
 
     return nwritten;
