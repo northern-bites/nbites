@@ -9,6 +9,9 @@
 #include "ColorTableCreator.h"
 #include <QMouseEvent>
 #include <QFileDialog>
+#include <QFile>
+#include <QDataStream>
+#include <QIODevice>
 
 #include "viewer/FilteredThresholdedViewer.h"
 
@@ -97,10 +100,18 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     rightLayout->addWidget(thresholdedImageViewer);
     rightLayout->addWidget(colorStats);
 
-	mainLayout->addLayout(leftLayout);
-	mainLayout->addLayout(rightLayout);
+    mainLayout->addLayout(leftLayout);
+    mainLayout->addLayout(rightLayout);
 
-	this->setLayout(mainLayout);
+    this->setLayout(mainLayout);
+
+    // Load most recent color table
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    QString filename;
+    in >> filename;
+    colorTable.read(filename.toStdString());
 
     this->updateThresholdedImage();
 }
@@ -113,6 +124,12 @@ void ColorTableCreator::loadColorTable(){
                     tr("Color Table files (*.mtb)"));
     colorTable.read(filename.toStdString());
     updateThresholdedImage();
+
+    // Serialize filename, so we can load latest color table at startup
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+    out << filename;
 }
 
 void ColorTableCreator::saveColorTable(){
