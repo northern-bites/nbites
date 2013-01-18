@@ -17,7 +17,7 @@ namespace image {
 
 using namespace portals;
 
-NaoImageTranscriber::NaoImageTranscriber()
+ImageTranscriberModule::ImageTranscriberModule()
     : Module(),
       topImageOut(base()),
       bottomImageOut(base()),
@@ -28,7 +28,7 @@ NaoImageTranscriber::NaoImageTranscriber()
     bottomImageTranscriber.initTable("/home/nao/nbites/lib/table/bottom_table.mtb");
 }
 
-void NaoImageTranscriber::run_()
+void ImageTranscriberModule::run_()
 {
     //long long lastProcessTimeAvg = VISION_FRAME_LENGTH_uS;
 

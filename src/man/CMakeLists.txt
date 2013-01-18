@@ -69,6 +69,7 @@ target_link_libraries(
   portals
   messages
   synchro
+  image
 )
 
 install( TARGETS man

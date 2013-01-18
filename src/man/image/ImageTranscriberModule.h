@@ -6,11 +6,11 @@
 namespace man {
 namespace image {
 
-class NaoImageTranscriber : public portals::Module {
+class ImageTranscriberModule : public portals::Module {
 
 public:
-	NaoImageTranscriber();
-	virtual ~NaoImageTranscriber() {}
+	ImageTranscriberModule();
+	virtual ~ImageTranscriberModule() {}
 
     portals::OutPortal<uint16_t> topImageOut;
     portals::OutPortal<uint16_t> bottomImageOut;

@@ -2,20 +2,22 @@
 
 #include "synchro/synchro.h"
 #include "RoboGrams.h"
-#include "TestModules.h"
+#include "image/ImageTranscriberModule.h"
 
 namespace man {
 
-class TestThread : public synchro::Thread
+class CognitionThread : public synchro::Thread
 {
 public:
-    TestThread();
+    CognitionThread();
     virtual void run();
 
 private:
-    portals::RoboGram testDiagram;
-    FirstModule firstMod;
-    SecondModule secondMod;
+    // The diagram handles running all of the modules
+    portals::RoboGram cognitionDiagram;
+
+    // Modules:
+    image::ImageTranscriberModule imageTranscriber;
 };
 
 }

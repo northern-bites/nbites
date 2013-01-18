@@ -2,24 +2,21 @@
 
 namespace man {
 
-TestThread::TestThread() : Thread("test"),
-                           testDiagram(),
-                           firstMod(),
-                           secondMod()
+CognitionThread::CognitionThread() : Thread("cognition"),
+                                     cognitionDiagram(),
+                                     imageTranscriber()
 {
-    secondMod.in.wireTo(&firstMod.out);
-    testDiagram.addModule(firstMod);
-    testDiagram.addModule(secondMod);
+    cognitionDiagram.addModule(imageTranscriber);
 }
 
-void TestThread::run()
+void CognitionThread::run()
 {
     synchro::Thread::running = true;
     synchro::Thread::trigger->on();
 
     while (Thread::running)
     {
-        testDiagram.run();
+        cognitionDiagram.run();
     }
 }
 
