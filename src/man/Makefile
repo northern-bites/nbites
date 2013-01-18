@@ -5,8 +5,11 @@ ATOM_TOOLCHAIN = cmake/atom.cmake
 # Toolchain for building natively
 STRAIGHT_TOOLCHAIN = cmake/generic.cmake
 
-# Where the build output will be placed
-BUILD_DIR = build
+# Where the build output will be placed relative to here
+BUILD_DIR = ../../build/man
+# Here relative to the build dir
+SRC_DIR = ../../src/man
+
 # Where the files will be installed
 INSTALL_PREFIX = install/
 
@@ -36,12 +39,12 @@ install: $(BUILD_DIR)/Makefile
 
 .PHONY: cross
 cross:  $(CROSS_FILE)
-	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR); \
-	cmake  $(CMAKE_CROSS_FLAGS) ..; \
-	ccmake ..
+	cmake  $(CMAKE_CROSS_FLAGS) $(SRC_DIR); \
+	ccmake $(SRC_DIR)
 
 $(CROSS_FILE):
+	mkdir -p $(BUILD_DIR)
 	@if [ -e $(STRAIGHT_FILE) ]; then \
 		rm -r $(BUILD_DIR)/*; \
 	fi
@@ -49,12 +52,12 @@ $(CROSS_FILE):
 
 .PHONY: straight
 straight: $(STRAIGHT_FILE)
-	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR); \
-	cmake  $(CMAKE_STRAIGHT_FLAGS) ..; \
-	ccmake ..
+	cmake  $(CMAKE_STRAIGHT_FLAGS) $(SRC_DIR); \
+	ccmake $(SRC_DIR)
 
 $(STRAIGHT_FILE):
+	mkdir -p $(BUILD_DIR)
 	@if [ -e $(CROSS_FILE) ]; then \
 		rm -r $(BUILD_DIR)/*; \
 	fi

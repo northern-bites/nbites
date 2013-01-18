@@ -13,7 +13,7 @@ else( OFFLINE )
   set ( PROTOBUF_LOCATION ${NBITES_DIR}/lib/protobuf_cross )
 endif( OFFLINE )
 
-set( PROTOBUF_INCLUDE_DIR ${PROTOBUF_LOCATION}/include/google )
+set( PROTOBUF_INCLUDE_DIR ${PROTOBUF_LOCATION}/include/ )
 set( PROTOBUF_LIBRARY ${PROTOBUF_LOCATION}/lib/libprotobuf.a )
 set( PROTOBUF_PROTOC_EXECUTABLE ${PROTOBUF_LOCATION}/bin/protoc )
 
