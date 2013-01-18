@@ -3,6 +3,7 @@
 #define CommDef_H
 
 #include <string.h>
+#include <string>
 
 #include "Common.h"
 
@@ -21,6 +22,7 @@
 #endif
 
 #define UDP_PORT  4000
+#define TEAM_PORT 4000
 #define TCP_PORT  4001
 #define TOOL_PORT 4002
 static const short STREAMING_PORT_BASE = 4003;
@@ -87,10 +89,44 @@ static const int TOOL_ACCEPT_NAME_OFFSET = TOOL_ACCEPT_LEN + 3;
 
 
 //
+// Multicast information
+//
+
+static const int NUM_ROBOTS = 5;    // Total number of robots we have
+
+typedef struct robot_ip_pair_t
+{
+    std::string name;
+    std::string ip;
+}robot_ip_pair;
+
+static const robot_ip_pair wash   = {"wash"  , "139.140.218.9" };
+static const robot_ip_pair river  = {"river" , "139.140.218.10"};
+static const robot_ip_pair jayne  = {"jayne" , "139.140.218.11"};
+//static const robot_ip_pair scotty = {"scotty", "139.140.218.12"};
+//static const robot_ip_pair dax    = {"dax"   , "139.140.218.13"};
+//static const robot_ip_pair annika = {"annika", "139.140.218.14"};
+//static const robot_ip_pair data   = {"data"  , "139.140.218.15"};
+static const robot_ip_pair mal    = {"mal"   , "139.140.218.16"};
+static const robot_ip_pair zoe    = {"zoe"   , "139.140.218.17"};
+
+static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
+                                                   mal, zoe};
+
+//
 // Comm constants and MACRO definitions
 //
 
-#define PACKET_HEADER "ilikeyoulots"
+/*   Packet Header: ("0" is null char)
+
+Byte| 1  | 2  | 3  | 4
+ 1  |"B" |"0" |team|player
+ 2  |.. sequence number ..
+
+ */
+
+#define UNIQUE_ID "B" // keep this as define so it stays 2 bytes, not 4.
+static const int NUM_HEADER_BYTES = 16;
 
 static const long PACKETS_PER_SECOND = 6;
 static const long SLEEP_MILLIS = 5000;
@@ -112,25 +148,4 @@ static const long long MIN_PACKETS_PER_SECOND = 4;   // 4 packets pers second.
 static const long long TEAMMATE_DEAD_THRESHOLD = 3 * MICROS_PER_SECOND;
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;
-
-typedef struct CommPacketHeader_t
-{
-    char header[sizeof(PACKET_HEADER)];
-    llong timestamp;
-    int number;
-    int team;
-    int player;
-    int color;
-} CommPacketHeader;
-
-typedef struct CommTeammatePacketInfo_t 
-{
-    CommTeammatePacketInfo_t()
-    : timestamp(0), lastNumber(0)
-	{ }
-
-    llong timestamp;       // Timestamp of last received packet.
-    int lastNumber;        // (Unique) number of last packet received.
-} CommTeammatePacketInfo;
-
 #endif /* CommDef.h */

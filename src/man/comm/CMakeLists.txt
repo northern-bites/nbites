@@ -60,14 +60,17 @@ INCLUDE_DIRECTORIES(
 # Add here source files needed to compile this project
 SET( COMM_SRCS Comm
                CommTimer
-               DataSerializer
-               GameController
-               RoboCupGameControlData
-               TOOLConnect
 	       NetworkMonitor
+               TeamConnect
+               TeamMember
+               GameConnect
+               GameData
+               UDPSocket
+               RoboCupGameControlData
+               PyComm
                )
 
-SET( COMM_PYTHON_SRCS __init__.py )
+SET( COMM_PYTHON_SRCS )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install

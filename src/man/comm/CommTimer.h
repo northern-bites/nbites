@@ -1,6 +1,10 @@
+/**
+ * Class to hold time related information.
+ * @author Wils Dawson 5/13/12 adapted from old version.
+ */
 
-#ifndef _CommTimer_h_DEFINED
-#define _CommTimer_h_DEFINED
+#ifndef CommTimer_H
+#define CommTimer_H
 
 #include <vector>
 
@@ -10,51 +14,49 @@
 class CommTimer
 {
 public:
+    /**
+     * Constructor
+     * @param f: Pointer to the function we should use for time.
+     */
     CommTimer(llong (*f)());
-    virtual ~CommTimer() { }
 
-    llong timestamp() { return time() - epoch + offsetMicros; }
+    /**
+     * @return: The current time on this robot after starting.
+     *          Takes offset into account to try to syncronize
+     *          clocks accross robots.
+     */
+    llong timestamp() {return time() - epoch + teamClockOffset;}
 
-    bool timeToSend() { return timestamp() - lastPacketSentAt() > nextSendDelay; }
+    /**
+     * Computes a reasonable random amount of time to wait
+     * before sending the next packet. This aids in
+     * avoiding regular spectrum interference.
+     */
+    void teamPacketSent();
 
-    void packetSent();
+    /**
+     * @return: true on GO, false on WAIT
+     */
+    bool timeToSend() {return timestamp() - nextSendTime >= 0;}
 
-    void mark() { mark_time = timestamp(); }
+    /**
+     * Sets the offset for team clock syncronization.
+     * @param off: The offset to increase our offset by.
+     */
+    void addToOffset(llong off) {teamClockOffset += off;}
 
-    llong elapsed() { return timestamp() - mark_time; }
-
-    llong lastPacketSentAt() const { return lastPacketSent; }
-
-    void packetReceived() { lastPacketReceived = timestamp(); }
-
-    llong lastPacketReceivedAt() const { return lastPacketReceived; }
-
-    void setOffset(llong micros) { offsetMicros += micros; }
-
-    llong getOffset() const { return offsetMicros; }
-
-    int packetsDropped(const CommPacketHeader& packet);
-
-    bool check_packet(const CommPacketHeader& packet);
-    void updateTeamPackets(const CommPacketHeader& packet);
-    void checkDeadTeammates();
-    void get_time_from_others();
-    void reset();
+    /**
+     * Gets the offset for team clock syncronization.
+     */
+    llong getOffset() const {return teamClockOffset;}
 
 private:
-    llong (*time)();                 // Pointer to function that returns current
-                                     // time.
-    llong epoch;
-    llong lastPacketReceived;        // Time last packet was received.
-    llong lastPacketSent;            // Time last packet was sent.
-    llong offsetMicros;              // The number of microseconds by which the 
-                                     // timer must be offset to be synced with the 
-                                     // other robots' clocks.
-    llong nextSendDelay;             // The timestamp when the next packet must be sent.
-    llong mark_time;
-    std::vector<CommTeammatePacketInfo> teamPackets;
-    unsigned int numPacketsChecked;
-    bool need_to_update;
+    llong (*time)();            // Pointer to function that returns current time
+    llong epoch;                // Time at start of execution.
+    llong nextSendTime;         // The timestamp after which we can send again.
+    llong teamClockOffset;      // The amount to offset our clock to match the
+                                //     clocks of our teammates.
+    bool  shouldUpdate;         // Used to check if we should update our offset.
 };
 
-#endif // _CommTimer_h_DEFINED
+#endif // CommTimer_H

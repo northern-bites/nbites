@@ -1,132 +1,151 @@
-#ifndef Comm_H
-#define Comm_H
+// This file is part of Man, a robotic perception, locomotion, and
+// team strategy application created by the Northern Bites RoboCup
+// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
+// Nao robot.
+//
+// Man is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Man is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// and the GNU Lesser Public License along with Man.  If not, see
+// <http://www.gnu.org/licenses/>.
 
-#include <vector>
-#include <string>
+/**
+ * Top-Level class for the Northern-bites Comm Module.
+ * @author Wils Dawson and Josh Zalinger 5/14/12
+ */
+#pragma once
+
 #include <pthread.h>
-#include <arpa/inet.h>  // inet_aton(), htonl()
-#include <boost/shared_ptr.hpp>
-
-#include "Common.h"
 #include "synchro/synchro.h"
-#include "Sensors.h"
-#include "CommDef.h"
-#include "RoboCupGameControlData.h"
-#include "GameController.h"
-#include "TOOLConnect.h"
-#include "Vision.h"
+
+#include "TeamConnect.h"
+#include "TeamMember.h"
+#include "GameConnect.h"
+#include "GameData.h"
 #include "CommTimer.h"
-#include "NogginStructs.h"
-#include "Profiler.h"
-#include "commconfig.h"
 #include "NetworkMonitor.h"
 
 class Comm : public Thread
 {
 public:
-    Comm(boost::shared_ptr<Sensors> s,
-         boost::shared_ptr<Vision> v);
+    /**
+     * Constructor.
+     */
+    Comm();
+
+    /**
+     * Destructor.
+     */
     virtual ~Comm();
 
+    /**
+     * Starts the thread.
+     */
     int start();
+
+    /**
+     * Stops the thread.
+     */
     void stop();
+
+    /**
+     * Runs the thread. Main execution in here.
+     */
     void run();
 
-    int  startTOOL();
-    void stopTOOL();
+    /**
+     * Sends any data necessary.
+     */
+    void send();
 
-    void setLocalizationAccess(boost::shared_ptr<LocSystem> _loc,
-                               boost::shared_ptr<BallEKF> _ballEKF);
+    /**
+     * Receives any data that is waiting.
+     */
+    void receive();
 
-    void discover_broadcast();
-    void error(socket_error err) throw();
-    void send(const char *msg, int len, sockaddr_in &addr) throw(socket_error);
+    /**
+     * Returns a pointer to the GameData object for other systems.
+     */
+    GameData getGameData();
 
-    boost::shared_ptr<GameController> getGC() { return gc; }
+    /**
+     * Returns a pointer to a specific teammate.
+     */
+    TeamMember getTeammate(int player);
 
-    int getTOOLState();
-    std::string getRobotName();
-    std::list<std::vector<float> > latestComm();
-    TeammateBallMeasurement getTeammateBallReport();
-    void setData(std::vector<float> &data);
+/*****************************************************
+ * When updating the following functions, be sure to *
+ * update them in TeamConnect as well!               *
+ *****************************************************/
 
-    void add_to_module();
-    static const int NUM_PACKET_DATA_ELEMENTS = 17;
+    /**
+     * Sets all data from loc that we want to communicate.
+     * @param p:  The player number we want to update.
+     *            If 0, uses default provided by noggin.
+     * @param x:  My x location on the field.
+     * @param y:  My y location on the field.
+     * @param h:  My heading on the field.
+     * @param xu: My uncertainty in my x location.
+     * @param yu: My uncertainty in my y location.
+     * @param hu: My uncertainty in my heading.
+     */
+    void setLocData(int player,
+                    float x , float y , float h ,
+                    float xu, float yu, float hu);
+
+    /**
+     * Sets all data about the ball that we want to communicate.
+     * @param p:  The player number we want to update.
+     *            If 0, uses default provided by noggin.
+     * @param on: If 0, ball is off.
+     * @param d:  The distance from me to the ball.
+     * @param b:  The bearing from me to the ball.
+     * @param du: The uncertainty in the ball distance.
+     * @param bu: The uncertainty in the ball bearing.
+     */
+    void setBallData(int p, float on,
+                     float d , float b ,
+                     float du, float bu);
+
+    /**
+     * Sets all behavioral data that we want to communicate.
+     * @param p:  The player number we want to update.
+     *            If 0, uses default provided by noggin.
+     * @param r:  My playbook role.
+     * @param sr: My playbook subrole.
+     * @param ct: My chase time.
+     */
+    void setBehaviorData(int p,
+                         float r, float sr, float ct);
+
+    void setMyPlayerNumber(int p) {_myPlayerNumber = p;}
+    int  myPlayerNumber() {return _myPlayerNumber;}
+
+    void setTeamNumber(int tn);
+    int  teamNumber();
+
 private:
-    void bind() throw(socket_error);
-    void bind_gc() throw(socket_error);
-    void handle_comm(struct sockaddr_in &addr,
-                     const char *msg,
-                     int len
-        )          throw();
-    void handle_gc(struct sockaddr_in &addr,
-                   const char *msg,
-                   int len
-        )            throw();
-    void receive()              throw(socket_error);
-    void receive_gc()           throw(socket_error);
-    void send()                 throw(socket_error);
+    /**
+     * @param p: Returns if non-zero, otherwise returns 'myPlayerNumber'
+     *           If 'myPlayerNumber' is 0, print a message. Prepare for error.
+     */
+    int checkPlayerNumber(int p);
 
-    void parse_packet(const CommPacketHeader& packet, const char* data,
-                      int size)  throw();
-    bool validate_packet(const char* msg, int len, CommPacketHeader& packet)
-        throw();
+    pthread_mutex_t  comm_mutex;  // Mutex lock for threaded data access.
+    NetworkMonitor*  monitor;
+    CommTimer*       timer;
+    TeamConnect*     teamConnect; // For communicating with TeamMates.
+    GameConnect*     gameConnect; // For communicating with GameController.
 
-    // Comm monitoring methods.
+    int burstRate;
 
-    // Calculates the running average delay between received
-    // transmissions. Called each time a new packet is received.
-    // Note that it only calculates those packets received from
-    // other robots, not from the TOOL, GameController, or itself.
-    void updateAverageDelay();
-
-    // Calculates the running percentage of packets received that are
-    // "ours" by recording the total packets received and the percent
-    // that have our header (but not packets from the TOOL, GameController,
-    // or from itself.
-    void updatePercentReceived();
-
-    // Gives an estimate for the latency in communications (i.e., the
-    // difference between the timestamp of time sent contained in the
-    // packet data and the current time.)
-    llong estimatePacketLatency(const CommPacketHeader &latestPacket);
-
-private:
-    // mutex lock for threaded data access
-    pthread_mutex_t comm_mutex;
-    // Sending packet data
-    std::vector<float> data;
-    // Received data
-    int lastPacketNumber;                    // Stores the number of the last packet
-                                             // sent. Should be unique.
-    std::list<std::vector<float> > latest;
-
-    // References to global data structures
-    boost::shared_ptr<Sensors> sensors; // thread-safe access to sensors
-    CommTimer timer;
-    boost::shared_ptr<GameController> gc;
-
-    // TOOLConnect sub-thread controller
-    TOOLConnect tool;
-    int toolCommandState;
-
-    // Socket information
-    int sockn;                               // Socket file descriptor.
-    int gc_sockn;                            // GameController socket file descriptor.
-    struct sockaddr_in bind_addr;
-    struct sockaddr_in broadcast_addr;
-    struct sockaddr_in gc_broadcast_addr;
-    char buf[UDP_BUF_SIZE];
-
-    // Data monitoring information.
-    llong averagePacketDelay;                 // Stores the running average delay between
-                                              // received packets.
-    int totalPacketsReceived;                 // Running total packets received.
-    int ourPacketsReceived;                   // Running count of "our" packets received (excludes robot's own.)
-
-    NetworkMonitor monitor;
+    int _myPlayerNumber;
 };
-
-bool c_init_comm(void);
-
-#endif /* Comm_H */

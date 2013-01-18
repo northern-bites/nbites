@@ -11,6 +11,7 @@
 #include "PySensors.h"
 #include "PyLights.h"
 #include "PySpeech.h"
+#include "PyComm.h"
 #include "memory/log/OutputProviderFactory.h"
 
 //#include <valgrind/callgrind.h>
@@ -72,14 +73,16 @@ Man::Man (RobotMemory::ptr memory,
     try {
         vision = boost::shared_ptr<Vision> (new Vision(pose, memory->get<MVision>()));
 
-    set_vision_pointer(vision);
+        set_vision_pointer(vision);
 
-    comm = boost::shared_ptr<Comm> (new Comm(sensors, vision));
+        comm = boost::shared_ptr<Comm> (new Comm());
 
-    loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
-    set_logging_board_pointer(loggingBoard);
+        set_comm_pointer(comm);
 
-    noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
+        loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
+        set_logging_board_pointer(loggingBoard);
+
+        noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
                                             motion->getInterface(), memory));
 

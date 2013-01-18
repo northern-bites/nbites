@@ -8,8 +8,9 @@
 #include "Profiler.h"
 #include "PyVision.h"
 #include "BallEKF.h"
-#include "Comm.h"
-#include "GameController.h"
+
+class Comm;
+
 #include "RoboGuardian.h"
 #include "Sensors.h"
 #include "PyConstants.h"
@@ -66,17 +67,19 @@ private:
     void initializeLocalization();
     // Run the localization update; performed at every run step
     void updateLocalization();
+    // Send relevant information to Comm
+    void updateComm();
     //Process button  clicks that pertain to GameController manipulation
-    void processGCButtonClicks();
+    void processButtonClicks();
 
     /**
-     * Takes a boolean indicating whether or not the robot is in a 
+     * Takes a boolean indicating whether or not the robot is in a
      * fallen state, and if it is the first frame in such a state,
      * it notifies the localization motion model, to adjust
-     * the belief accordingly. 
-     * 
-     * @param fallen Indicates whether or not the robot is in a 
-     *               fallen state. Provided by RoboGuardian 
+     * the belief accordingly.
+     *
+     * @param fallen Indicates whether or not the robot is in a
+     *               fallen state. Provided by RoboGuardian
      *               (or BH walk engine FallDownState.)
      */
     void updateRobotFallenState(bool fallen)
@@ -97,7 +100,6 @@ private:
 private:
     boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
-    boost::shared_ptr<GameController> gc;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<RoboGuardian> guard;
     man::memory::log::LoggingBoard::ptr loggingBoard;

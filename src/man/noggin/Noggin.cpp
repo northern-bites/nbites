@@ -1,13 +1,20 @@
 #include <Python.h>
+#include <cstdlib>
 #include <exception>
 #include <boost/shared_ptr.hpp>
 
 #include "Noggin.h"
 #include "PyLoc.h"
+
 #include "EKFStructs.h"
 #include <cstdlib>
 #include "NaoPaths.h"
 
+#include "Comm.h"
+#include "GameData.h"
+
+#include "PyComm.h"
+#include "PyLoc.h"
 #include "PySensors.h"
 #include "PyRoboGuardian.h"
 #include "PyMotion.h"
@@ -49,7 +56,6 @@ Noggin::Noggin (boost::shared_ptr<Vision> v,
                 )
     : vision(v),
       comm(c),
-      gc(c->getGC()),
       sensors(_sensors),
       guard(rbg),
       loggingBoard(loggingBoard),
@@ -117,7 +123,7 @@ void Noggin::initializePython()
     c_init_motion();
     c_init_comm();
     c_init_logging();
-    comm->add_to_module();
+
     c_init_vision();
     c_init_noggin_constants();
     c_init_objects();
@@ -143,9 +149,6 @@ void Noggin::initializeLocalization()
     set_loc_reference(loc);
     set_ballEKF_reference(ballEKF);
     c_init_localization();
-
-    // Set the comm localization access pointers
-    comm->setLocalizationAccess(loc, ballEKF);
 
 #   ifdef LOG_LOCALIZATION
     startLocLog();
@@ -261,7 +264,7 @@ void Noggin::runStep ()
     }
 
     //Check button pushes for game controller signals
-    processGCButtonClicks();
+    processButtonClicks();
 
     PROF_ENTER(P_PYTHON);
 
@@ -294,7 +297,18 @@ void Noggin::runStep ()
     }
     PROF_EXIT(P_PYRUN);
 
+    updateComm();
+
     PROF_EXIT(P_PYTHON);
+}
+
+void Noggin::updateComm()
+{
+    comm->setLocData(0, loc->getXEst(), loc->getYEst(), loc->getHEst(),
+                     loc->getXUncert(), loc->getYUncert(), loc->getHUncert());
+    comm->setBallData(0, (float)vision->ball->isOn(),
+                      ballEKF->getDistance(), ballEKF->getBearingDeg(),
+                      0, 0);
 }
 
 void Noggin::updateLocalization()
@@ -310,7 +324,8 @@ void Noggin::updateLocalization()
     float dist, theta;
 
     // Get team of the robot for localization.
-    uint8 teamColor = (*gc->getMyTeam()).teamColor;
+    GameData gd = comm->getGameData();
+    int teamColor = gd.myTeamColor();
 
     // Observe Corners.
 //    float phi;
@@ -368,33 +383,35 @@ void Noggin::updateLocalization()
         m = k;
     } else {
 
-        // If it's off for more then the threshold, then try and use mate data
-        TeammateBallMeasurement n;
-#       ifdef USE_TEAMMATE_BALL_REPORTS
-        n = comm->getTeammateBallReport();
-        if (!(n.ballX == 0.0 && n.ballY == 0.0) &&
-            !(gc->gameState() == STATE_INITIAL ||
-              gc->gameState() == STATE_FINISHED)) {
+//   @TODO: 9/21/2012: This has to be reworked as Comm no longer
+//        provides a TeammateBallMeasurement object.
+//        // If it's off for more then the threshold, then try and use mate data
+//         TeammateBallMeasurement n;
+// #       ifdef USE_TEAMMATE_BALL_REPORTS
+//         n = comm->getTeammateBallReport();
+//         if (!(n.ballX == 0.0 && n.ballY == 0.0) &&
+//             !(comm->getGameData().currentState() == STATE_INITIAL ||
+//               comm->getGameData().currentState() == STATE_FINISHED)) {
 
-            m.distance = hypotf(loc->getXEst() - n.ballX,
-                               loc->getYEst() - n.ballY);
-            m.bearing = subPIAngle(atan2(n.ballY - loc->getYEst(),
-                                         n.ballX - loc->getXEst()) -
-                                   loc->getHEst());
+//             m.distance = hypotf(loc->getXEst() - n.ballX,
+//                                loc->getYEst() - n.ballY);
+//             m.bearing = subPIAngle(atan2(n.ballY - loc->getYEst(),
+//                                          n.ballX - loc->getXEst()) -
+//                                    loc->getHEst());
 
-            m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
-            m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
+//             m.distanceSD = vision->ball->ballDistanceToSD(m.distance);
+//             m.bearingSD =  vision->ball->ballBearingToSD(m.bearing);
 
-#           ifdef DEBUG_TEAMMATE_BALL_OBSERVATIONS
-            cout << setprecision(4)
-                 << "Using teammate ball report of (" << m.distance << ", "
-                 << m.bearing << ")" << "\tReported x,y : "
-                 << "(" << n.ballX << ", " << n.ballY << ")" << endl;
-            cout << *ballEKF << endl;
-#           endif
+// #           ifdef DEBUG_TEAMMATE_BALL_OBSERVATIONS
+//             cout << setprecision(4)
+//                  << "Using teammate ball report of (" << m.distance << ", "
+//                  << m.bearing << ")" << "\tReported x,y : "
+//                  << "(" << n.ballX << ", " << n.ballY << ")" << endl;
+//             cout << *ballEKF << endl;
+// #           endif
 
-        }
-#       endif
+//         }
+// #       endif
     }
 
     ballEKF->updateModel(odometry, m, loc->getCurrentEstimate());
@@ -436,29 +453,31 @@ void Noggin::updateLocalization()
 
 
 //#define DEBUG_NOGGIN_GC
-void Noggin::processGCButtonClicks(){
+void Noggin::processButtonClicks(){
     static const int ADVANCE_STATES_CLICKS  = 1;
     static const int SWITCH_TEAM_CLICKS  = 1;
     static const int SWITCH_KICKOFF_CLICKS  = 1;
     static const int REVERT_TO_INITIAL_CLICKS = 4;
     //cout << "In noggin chest clicks are " << chestButton->peekNumClicks() <<endl;
 
+    GameData gd = comm->getGameData();
+
     if(chestButton->peekNumClicks() ==  ADVANCE_STATES_CLICKS){
-        gc->advanceButtonClickState();
+        gd.advanceState();
         chestButton->getAndClearNumClicks();
 #       ifdef DEBUG_NOGGIN_GC
-        cout << "Button pushing advanced GC to state : " << gc->gameState() <<endl;
+        cout << "Button pushing advanced GC to state : " << gd.currentState() <<endl;
 #       endif
     }
 
     //Only toggle colors and kickoff when you are in initial
-    if(gc->gameState() == STATE_INITIAL){
+    if(gd.currentState() == STATE_INITIAL){
         if(leftFootButton->peekNumClicks() ==  SWITCH_TEAM_CLICKS){
-            gc->toggleTeamColor();
+            gd.switchTeams();
             leftFootButton->getAndClearNumClicks();
 #           ifdef DEBUG_NOGGIN_GC
             cout << "Button pushing switched GC to color : ";
-            if(gc->color() == TEAM_BLUE)
+            if(gd.myTeamColor() == TEAM_BLUE)
                 cout << "BLUE" <<endl;
             else
                 cout << "RED" <<endl;
@@ -467,11 +486,11 @@ void Noggin::processGCButtonClicks(){
         }
 
         if(rightFootButton->peekNumClicks() ==  SWITCH_KICKOFF_CLICKS){
-            gc->toggleKickoff();
+            gd.toggleKickoff();
             rightFootButton->getAndClearNumClicks();
 #ifdef DEBUG_NOGGIN_GC
             cout << " Button pushing switched GC to kickoff state : ";
-            if(gc->kickOffTeam() == gc->color())
+            if(gd.ourKickoff())
                 cout << "ON KICKOFF" <<endl;
             else
                 cout << "OFF KICKOFF" <<endl;
@@ -484,7 +503,7 @@ void Noggin::processGCButtonClicks(){
                 <<endl;
 #endif
            chestButton->getAndClearNumClicks();
-           gc->setGameState(STATE_INITIAL);
+           gd.initial();
     }
 
 }
@@ -544,7 +563,8 @@ void Noggin::startLocLog()
 
     cout << "Started localization log at " << s << endl;
     outputFile.open(s.c_str(), ios::out);
-    outputFile << (int)gc->color() << " " << (int)gc->player() << endl;
+    outputFile << (int)comm->getGameData().myTeamColor() << " "
+               << (int)comm->myPlayerNumber() << endl;
     outputFile << loc->getXEst() << " " << loc->getYEst() << " "
                << loc->getHEst() << " "
                << loc->getXUncert() << " " << loc->getYUncert() << " "
@@ -563,4 +583,3 @@ void Noggin::stopLocLog()
     loggingLoc = false;
 }
 #endif
-
