@@ -26,12 +26,12 @@ UPLOAD_SCRIPT = $(BUILD_DIR)/upload.sh
 
 .PHONY: build
 build: $(BUILD_DIR)/Makefile
-	make -C $(BUILD_DIR) --no-print-directory
+	$(MAKE) -C $(BUILD_DIR) --no-print-directory
 
 .PHONY: install
 install: $(BUILD_DIR)/Makefile
 	@if [ -e $(CROSS_FILE) ]; then \
-		make install -C $(BUILD_DIR) --no-print-directory; \
+		$(MAKE) INSTALL -C $(BUILD_DIR) --no-print-directory; \
 		$(UPLOAD_SCRIPT) \
 	else \
 		echo "You must build cross to install to a robot."; \
