@@ -23,8 +23,7 @@
  */
 #pragma once
 
-#include <pthread.h>
-#include "synchro/synchro.h"
+#include "RoboGrams.h"
 
 #include "TeamConnect.h"
 #include "TeamMember.h"
@@ -33,33 +32,27 @@
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
 
-class Comm : public Thread
+namespace man{
+
+namespace comm{
+
+class CommModule : public portals::Module
 {
 public:
     /**
      * Constructor.
      */
-    Comm();
+    CommModule();
 
     /**
      * Destructor.
      */
-    virtual ~Comm();
+    virtual ~CommModule();
 
     /**
-     * Starts the thread.
+     * Runs the module. Main execution in here.
      */
-    int start();
-
-    /**
-     * Stops the thread.
-     */
-    void stop();
-
-    /**
-     * Runs the thread. Main execution in here.
-     */
-    void run();
+    virtual void run_();
 
     /**
      * Sends any data necessary.
@@ -78,53 +71,9 @@ public:
 
     /**
      * Returns a pointer to a specific teammate.
+     * @param player: the player number of the teammate desired.
      */
     TeamMember getTeammate(int player);
-
-/*****************************************************
- * When updating the following functions, be sure to *
- * update them in TeamConnect as well!               *
- *****************************************************/
-
-    /**
-     * Sets all data from loc that we want to communicate.
-     * @param p:  The player number we want to update.
-     *            If 0, uses default provided by noggin.
-     * @param x:  My x location on the field.
-     * @param y:  My y location on the field.
-     * @param h:  My heading on the field.
-     * @param xu: My uncertainty in my x location.
-     * @param yu: My uncertainty in my y location.
-     * @param hu: My uncertainty in my heading.
-     */
-    void setLocData(int player,
-                    float x , float y , float h ,
-                    float xu, float yu, float hu);
-
-    /**
-     * Sets all data about the ball that we want to communicate.
-     * @param p:  The player number we want to update.
-     *            If 0, uses default provided by noggin.
-     * @param on: If 0, ball is off.
-     * @param d:  The distance from me to the ball.
-     * @param b:  The bearing from me to the ball.
-     * @param du: The uncertainty in the ball distance.
-     * @param bu: The uncertainty in the ball bearing.
-     */
-    void setBallData(int p, float on,
-                     float d , float b ,
-                     float du, float bu);
-
-    /**
-     * Sets all behavioral data that we want to communicate.
-     * @param p:  The player number we want to update.
-     *            If 0, uses default provided by noggin.
-     * @param r:  My playbook role.
-     * @param sr: My playbook subrole.
-     * @param ct: My chase time.
-     */
-    void setBehaviorData(int p,
-                         float r, float sr, float ct);
 
     void setMyPlayerNumber(int p) {_myPlayerNumber = p;}
     int  myPlayerNumber() {return _myPlayerNumber;}
@@ -139,7 +88,6 @@ private:
      */
     int checkPlayerNumber(int p);
 
-    pthread_mutex_t  comm_mutex;  // Mutex lock for threaded data access.
     NetworkMonitor*  monitor;
     CommTimer*       timer;
     TeamConnect*     teamConnect; // For communicating with TeamMates.
@@ -149,3 +97,7 @@ private:
 
     int _myPlayerNumber;
 };
+
+}
+
+}

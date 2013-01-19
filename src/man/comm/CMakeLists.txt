@@ -12,7 +12,7 @@ find_package( PythonLibs   REQUIRED )
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-set( COMM_SRCS Comm
+set( COMM_SRCS CommModule
                CommTimer
 	       NetworkMonitor
                TeamConnect
@@ -21,10 +21,7 @@ set( COMM_SRCS Comm
                GameData
                UDPSocket
                RoboCupGameControlData
-#               PyComm
                )
-
-# set( COMM_PYTHON_SRCS )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION
 # Configure the output execuatable or shared library, and the install

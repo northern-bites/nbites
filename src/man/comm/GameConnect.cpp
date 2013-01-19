@@ -15,6 +15,12 @@
 
 #include "Common.h"
 
+#include "DebugConfig.h"
+
+namespace man {
+
+namespace comm {
+
 GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m)
     : _timer(t), _monitor(m)
 {
@@ -138,4 +144,8 @@ void GameConnect::setMyTeamNumber(int tn, int pn)
     _myTeamNumber = tn;
     delete _data;
     _data = new GameData(_myTeamNumber, pn);
+}
+
+}
+
 }

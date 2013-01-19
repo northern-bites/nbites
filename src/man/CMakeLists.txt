@@ -15,6 +15,7 @@ configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/DebugConfig.in"
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
+include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )

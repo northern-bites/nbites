@@ -3,8 +3,7 @@
  * @author Wils Dawson and Josh Zalinger 4/30/12
  */
 
-#ifndef TeamConnect_H
-#define TeamConnect_H
+#pragma once
 
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
@@ -12,6 +11,10 @@
 #include "UDPSocket.h"
 
 #include "Common.h"
+
+namespace man {
+
+namespace comm {
 
 class TeamConnect
 {
@@ -59,46 +62,6 @@ public:
      */
     void checkDeadTeammates(llong time, int player);
 
-    /**
-     * Sets all data from loc that we want to communicate.
-     * @param p:  The player number we want to update.
-     *            If 0, uses default provided by noggin.
-     * @param x:  My x location on the field.
-     * @param y:  My y location on the field.
-     * @param h:  My heading on the field.
-     * @param xu: My uncertainty in my x location.
-     * @param yu: My uncertainty in my y location.
-     * @param hu: My uncertainty in my heading.
-     */
-    void setLocData(int player,
-                    float x , float y , float h ,
-                    float xu, float yu, float hu);
-
-    /**
-     * Sets all data about the ball that we want to communicate.
-     * @param p:  The player number we want to update.
-     *            If 0, uses default provided by noggin.
-     * @param on: If 0, ball is off.
-     * @param d:  The distance from me to the ball.
-     * @param b:  The bearing from me to the ball.
-     * @param du: The uncertainty in the ball distance.
-     * @param bu: The uncertainty in the ball bearing.
-     */
-    void setBallData(int p, float on,
-                     float d , float b ,
-                     float du, float bu);
-
-    /**
-     * Sets all behavioral data that we want to communicate.
-     * @param p:  The player number we want to update.
-     *            If 0, uses default provided by noggin.
-     * @param r:  My playbook role.
-     * @param sr: My playbook subrole.
-     * @param ct: My chase time.
-     */
-    void setBehaviorData(int p,
-                         float r, float sr, float ct);
-
 private:
     /**
      * Sets up the socket to be used.
@@ -141,4 +104,7 @@ private:
     TeamMember*     teamMates[NUM_PLAYERS_PER_TEAM];
     UDPSocket*      socket;
 };
-#endif
+
+}
+
+}

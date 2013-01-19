@@ -9,19 +9,21 @@
 #include <errno.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include <net/if.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <cstring>
 #include <ifaddrs.h>
 #include <cstdio>
 
-#include "commconfig.h"
+#include "DebugConfig.h"
+
+namespace man {
+
+namespace comm {
 
 UDPSocket::UDPSocket()
 {
@@ -37,7 +39,7 @@ UDPSocket::UDPSocket()
 UDPSocket::~UDPSocket()
 {
     close(sock);
-    delete (struct sockaddr_in*)target;
+    delete target;
 }
 
 bool UDPSocket::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
@@ -269,4 +271,8 @@ int UDPSocket::sendToTarget(const char* data, const int len)
     }
 
     return nwritten;
+}
+
+}
+
 }

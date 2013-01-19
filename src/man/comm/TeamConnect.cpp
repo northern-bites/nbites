@@ -9,8 +9,13 @@
 #include <iostream>
 #include <string>
 
-#include "commconfig.h"
 #include "CommDef.h"
+
+#include "DebugConfig.h"
+
+namespace man {
+
+namespace comm {
 
 TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
     : timer(t), monitor(m)
@@ -278,39 +283,43 @@ void TeamConnect::checkDeadTeammates(llong time, int player)
 }
 
 
-void TeamConnect::setLocData(int p,
-                             float x , float y , float h ,
-                             float xu, float yu, float hu)
-{
-    TeamMember* robot = teamMates[p-1];
+// void TeamConnect::setLocData(int p,
+//                              float x , float y , float h ,
+//                              float xu, float yu, float hu)
+// {
+//     TeamMember* robot = teamMates[p-1];
 
-    robot->setMyX(x);
-    robot->setMyY(y);
-    robot->setMyH(h);
-    robot->setMyXUncert(xu);
-    robot->setMyYUncert(yu);
-    robot->setMyHUncert(hu);
+//     robot->setMyX(x);
+//     robot->setMyY(y);
+//     robot->setMyH(h);
+//     robot->setMyXUncert(xu);
+//     robot->setMyYUncert(yu);
+//     robot->setMyHUncert(hu);
+// }
+
+// void TeamConnect::setBallData(int p, float on,
+//                               float d , float b ,
+//                               float du, float bu)
+// {
+//     TeamMember* robot = teamMates[p-1];
+
+//     robot->setBallOn(on);
+//     robot->setBallDist(d);
+//     robot->setBallBearing(b);
+//     robot->setBallDistUncert(bu);
+//     robot->setBallBearingUncert(bu);
+// }
+
+// void TeamConnect::setBehaviorData(int p,
+//                                   float r, float sr, float ct)
+// {
+//     TeamMember* robot = teamMates[p-1];
+
+//     robot->setRole(r);
+//     robot->setSubRole(sr);
+//     robot->setChaseTime(ct);
+// }
+
 }
 
-void TeamConnect::setBallData(int p, float on,
-                              float d , float b ,
-                              float du, float bu)
-{
-    TeamMember* robot = teamMates[p-1];
-
-    robot->setBallOn(on);
-    robot->setBallDist(d);
-    robot->setBallBearing(b);
-    robot->setBallDistUncert(bu);
-    robot->setBallBearingUncert(bu);
-}
-
-void TeamConnect::setBehaviorData(int p,
-                                  float r, float sr, float ct)
-{
-    TeamMember* robot = teamMates[p-1];
-
-    robot->setRole(r);
-    robot->setSubRole(sr);
-    robot->setChaseTime(ct);
 }

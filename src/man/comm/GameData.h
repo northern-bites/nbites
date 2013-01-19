@@ -6,10 +6,13 @@
  * @author Wils Dawson 5/29/2012
  */
 
-#ifndef GameData_H
-#define GameData_H
+#pragma once
 
 #include "RoboCupGameControlData.h"
+
+namespace man {
+
+namespace comm {
 
 class GameData
 {
@@ -109,4 +112,6 @@ private:
     RoboCupGameControlData control;
 };
 
-#endif
+}
+
+}

@@ -31,10 +31,13 @@
  * @author Wils Dawson 5/13/12
  */
 
-#ifndef NETWORK_MONITOR_H
-#define NETWORK_MONITOR_H
+#pragma once
 
 #include "dsp.h"
+
+namespace man {
+
+namespace comm {
 
 class NetworkMonitor : public Boxcar
 {
@@ -133,4 +136,6 @@ private:
     long long lastOutput;
 };
 
-#endif // NETWORK_MONITOR_H
+}
+
+}

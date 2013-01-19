@@ -2,7 +2,6 @@
 #ifndef _Profiler_h_DEFINED
 #define _Profiler_h_DEFINED
 
-#include "profileconfig.h"
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
 #include "Common.h"
@@ -157,4 +156,3 @@ public:
 };
 
 #endif
-

@@ -5,6 +5,10 @@
 
 #include "TeamMember.h"
 
+namespace man {
+
+namespace comm {
+
 TeamMember::TeamMember(int num)
     : _playerNumber(num)
 {
@@ -50,4 +54,8 @@ void TeamMember::generatePacket(float* packet)
     *++ptr = chaseTime();
     *++ptr = role();
     *++ptr = subRole();
+}
+
+}
+
 }

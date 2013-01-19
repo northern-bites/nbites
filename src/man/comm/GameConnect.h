@@ -13,6 +13,10 @@
 #include "GameData.h"
 #include "RoboCupGameControlData.h"
 
+namespace man {
+
+namespace comm {
+
 class GameConnect
 {
 public:
@@ -88,3 +92,7 @@ private:
 
     bool            _haveRemoteGC;
 };
+
+}
+
+}

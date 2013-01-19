@@ -22,7 +22,7 @@
  * @author Wils Dawson and Josh Zalinger 5/14/12
  */
 
-#include "Comm.h"
+#include "CommModule.h"
 
 #include <iostream>
 #include <time.h>
@@ -31,8 +31,11 @@
 #include "Profiler.h"
 #include "Common.h"
 
-Comm::Comm()
-  : Thread("Comm")
+namespace man {
+
+namespace comm {
+
+CommModule::CommModule()
 {
     timer = new CommTimer(&monotonic_micro_time);
     monitor = new NetworkMonitor(timer->timestamp());
@@ -40,138 +43,62 @@ Comm::Comm()
     teamConnect = new TeamConnect(timer, monitor);
     gameConnect = new GameConnect(timer, monitor);
 
-    pthread_mutex_init(&comm_mutex, NULL);
-
     std::cout << "Comm Constructed" << std::endl;
 }
 
-Comm::~Comm()
+CommModule::~CommModule()
 {
-    std::cout << "Comm destructor" << std::endl;
     delete monitor;
     delete timer;
     delete teamConnect;
     delete gameConnect;
-    pthread_mutex_destroy(&comm_mutex);
+    std::cout << "Comm Destructed" << std::endl;
 }
 
-int  Comm::start()
+void CommModule::run_()
 {
-    return Thread::start();
+    PROF_ENTER(P_COMM);
+
+    receive();
+
+    // Update teammates.
+    teamConnect->checkDeadTeammates(timer->timestamp(), myPlayerNumber());
+
+    // Update the monitor.
+    burstRate = monitor->performHealthCheck(timer->timestamp());
+
+    monitor->logOutput(timer->timestamp());
+
+    if (timer->timeToSend() && myPlayerNumber() > 0)
+        send();
+
+    PROF_EXIT(P_COMM);
 }
 
-void Comm::stop()
+void CommModule::send()
 {
-    Thread::stop();
-}
-
-void Comm::run()
-{
-    llong lastMonitorOutput = timer->timestamp();
-    // end ??? section
-
-    while(running)
-    {
-        PROF_ENTER(P_COMM);
-
-        receive();
-
-        // Update teammates.
-        teamConnect->checkDeadTeammates(timer->timestamp(), myPlayerNumber());
-
-        // Update the monitor.
-        int health = monitor->performHealthCheck(timer->timestamp());
-
-        burstRate = health;
-
-        monitor->logOutput(timer->timestamp());
-
-        if (timer->timeToSend() && myPlayerNumber() > 0)
-            send();
-
-        PROF_EXIT(P_COMM);
-    }
-}
-
-void Comm::send()
-{
-    pthread_mutex_lock(&comm_mutex);
-
     teamConnect->send(myPlayerNumber(), gameConnect->myTeamNumber(), burstRate);
     timer->teamPacketSent();
-
-    pthread_mutex_unlock(&comm_mutex);
 }
 
-void Comm::receive()
+void CommModule::receive()
 {
-    pthread_mutex_lock(&comm_mutex);
-
     teamConnect->receive(0, gameConnect->myTeamNumber());
 
     gameConnect->handle(myPlayerNumber());
-
-    pthread_mutex_unlock(&comm_mutex);
 }
 
-GameData Comm::getGameData()
+GameData CommModule::getGameData()
 {
-    pthread_mutex_lock(&comm_mutex);
-
-    GameData d = *(gameConnect->getGameData());
-
-    pthread_mutex_unlock(&comm_mutex);
-
-    return d;
+    return *(gameConnect->getGameData());
 }
 
-TeamMember Comm::getTeammate(int player)
+TeamMember CommModule::getTeammate(int player)
 {
-    pthread_mutex_lock(&comm_mutex);
-
-    TeamMember m = *(teamConnect->getTeamMate(player));
-
-    pthread_mutex_unlock(&comm_mutex);
-
-    return m;
+    return *(teamConnect->getTeamMate(player));
 }
 
-void Comm::setLocData(int p,
-                      float x , float y , float h ,
-                      float xu, float yu, float hu)
-{
-    int player = checkPlayerNumber(p);
-    pthread_mutex_lock(&comm_mutex);
-
-    teamConnect->setLocData(p, x, y, h, xu, yu, hu);
-
-    pthread_mutex_unlock(&comm_mutex);
-}
-
-void Comm::setBallData(int p, float on,
-                       float d , float b ,
-                       float du, float bu)
-{
-    int player = checkPlayerNumber(p);
-    pthread_mutex_lock(&comm_mutex);
-
-    teamConnect->setBallData(p, on, d, b, du, bu);
-
-    pthread_mutex_unlock(&comm_mutex);
-}
-
-void Comm::setBehaviorData(int p,
-                           float r, float sr, float ct)
-{
-    int player = checkPlayerNumber(p);
-    pthread_mutex_lock(&comm_mutex);
-
-    teamConnect->setBehaviorData(p, r, sr, ct);
-
-    pthread_mutex_unlock(&comm_mutex);
-}
-
-int Comm::checkPlayerNumber(int p)
+int CommModule::checkPlayerNumber(int p)
 {
     int player = p ? p : myPlayerNumber();
     if (player <= 0)
@@ -182,12 +109,16 @@ int Comm::checkPlayerNumber(int p)
     return player;
 }
 
-void Comm::setTeamNumber(int tn)
+void CommModule::setTeamNumber(int tn)
 {
     gameConnect->setMyTeamNumber(tn, myPlayerNumber());
 }
 
-int Comm::teamNumber()
+int CommModule::teamNumber()
 {
     return gameConnect->myTeamNumber();
+}
+
+}
+
 }

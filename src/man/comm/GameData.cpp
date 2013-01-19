@@ -11,6 +11,10 @@
 #include <string.h>
 #include <iostream>
 
+namespace man {
+
+namespace comm {
+
 GameData::GameData(int teamNumber, int playerNumber)
 {
     _myTeamNumber = teamNumber;
@@ -227,4 +231,8 @@ void GameData::switchTeams()
     control.teams[1] = temp;
     control.teams[1].teamColour = TEAM_RED;
     control.teams[1].goalColour = GOAL_YELLOW;
+}
+
+}
+
 }

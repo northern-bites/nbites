@@ -2,14 +2,13 @@
  * Class to hold time related information.
  * @author Wils Dawson 5/13/12 adapted from old version.
  */
-
-#ifndef CommTimer_H
-#define CommTimer_H
-
-#include <vector>
+#pragma once
 
 #include "CommDef.h"
-#include "commconfig.h"
+
+namespace man {
+
+namespace comm {
 
 class CommTimer
 {
@@ -59,4 +58,6 @@ private:
     bool  shouldUpdate;         // Used to check if we should update our offset.
 };
 
-#endif // CommTimer_H
+}
+
+}

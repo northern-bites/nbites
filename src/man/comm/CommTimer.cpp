@@ -7,6 +7,10 @@
 
 #include "CommTimer.h"
 
+namespace man {
+
+namespace comm {
+
 CommTimer::CommTimer(llong (*f)())
     : time(f), epoch(time())
 {
@@ -37,4 +41,8 @@ void CommTimer::teamPacketSent()
         random = rand();
     } while (random > 33333); // Ensure nextSendTime doesn't exceed 50,000
     nextSendTime += random + 16667;
+}
+
+}
+
 }

@@ -7,6 +7,10 @@
 
 #include "CommDef.h"
 
+namespace man {
+
+namespace comm {
+
 static const int NUM_DATA_FIELDS = 13;
 
 class TeamMember
@@ -123,3 +127,7 @@ private:
     int   _lastSeqNum;        // The sequence number of the last packet used.
     bool  _active;            // Is the robot active.
 };
+
+}
+
+}

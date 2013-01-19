@@ -3,14 +3,15 @@
  * @author Wils Dawson 4/19/2012
  */
 
-#ifndef UDPSocket_H
-#define UDPSocket_H
+#pragma once
 
 #include <cstring>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
-// Define structs so we can compile without including socket header.
-struct sockaddr;
-struct sockaddr_in;
+namespace man {
+
+namespace comm {
 
 class UDPSocket
 {
@@ -142,4 +143,6 @@ private:
     bool resolve(const char* addrStr, int port, struct sockaddr_in* addr);
 };
 
-#endif
+}
+
+}

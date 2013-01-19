@@ -7,6 +7,10 @@
 
 #include "Common.h"
 
+namespace man {
+
+namespace comm {
+
 // Constants for the latency monitor.
 static const int NUM_BINS_LATENCY = 30;
 static const double LOW_BIN_LATENCY = 1.0f;        // Low is 1 microsecond.
@@ -23,7 +27,7 @@ static const int PACKET_DROPPED = 1;
 
 // Constants for the Boxcar
 static const int BOXCAR_WIDTH = 150;
-// TODO: empirically find actual constants...
+//@TODO: empirically find actual constants...
 static const double NETWORK_BAD  = 10.0f;
 static const double NETWORK_GOOD = 2.0f;
 
@@ -69,7 +73,7 @@ void NetworkMonitor::packetReceived(long long timeSent, long long timeReceived)
     latency.X(double(timeReceived - timeSent));
 
     // Boxcar
-    X(timeReceived - timeSent);
+    X((double)(timeReceived - timeSent));
 }
 
 void NetworkMonitor::packetsDropped(int numDropped)
@@ -178,4 +182,8 @@ void NetworkMonitor::logOutput(long long time)
 void NetworkMonitor::setSentWarning(bool sent)
 {
     sentWarning = sent;
+}
+
+}
+
 }
