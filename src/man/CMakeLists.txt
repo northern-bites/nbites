@@ -24,10 +24,10 @@ if( BUILD_PROTOBUF )
 endif()
 
 # So that we can use find_package commands
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/" )
 
 # For Aldebaran's headers
-find_package(ALCOMMON REQUIRED)
+find_package( ALCOMMON REQUIRED )
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
 find_package( PROTOBUF REQUIRED )
@@ -41,6 +41,7 @@ configure_file(
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
+  Threads.cpp
 )
 
 # Compile portals, which is outside the source tree so specify a destination
@@ -51,6 +52,16 @@ include_directories( ../portals )
 add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+include_directories( ../messages )
+
+# Actual subdirectories
+add_subdirectory( common )
+include_directories( common )
+add_subdirectory( synchro )
+
+# Actual modules
+add_subdirectory( image )
+add_subdirectory( log )
 
 add_subdirectory( comm )
 
@@ -70,6 +81,9 @@ target_link_libraries(
   portals
   messages
   comm
+  synchro
+  image
+  log
 )
 
 install( TARGETS man
