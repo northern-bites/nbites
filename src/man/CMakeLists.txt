@@ -30,7 +30,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 find_package(ALCOMMON REQUIRED)
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
-find_package(PROTOBUF REQUIRED)
+find_package( PROTOBUF REQUIRED )
+include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
 # Configure the copy script based on our settings
 configure_file(
