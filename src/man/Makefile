@@ -31,7 +31,7 @@ build: $(BUILD_DIR)/Makefile
 .PHONY: install
 install: $(BUILD_DIR)/Makefile
 	@if [ -e $(CROSS_FILE) ]; then \
-		$(MAKE) INSTALL -C $(BUILD_DIR) --no-print-directory; \
+		$(MAKE) install -C $(BUILD_DIR) --no-print-directory; \
 		$(UPLOAD_SCRIPT) \
 	else \
 		echo "You must build cross to install to a robot."; \
