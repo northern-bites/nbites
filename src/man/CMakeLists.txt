@@ -3,10 +3,18 @@ cmake_minimum_required( VERSION 2.8.3 )
 
 # A list of options that we do want
 include( cmake/RobotConfig.cmake )
+# A list of options for debugging various modules
+include( cmake/DebugConfig.cmake)
 # A list of options that should be advanced
 include( cmake/Advanced.cmake )
 # Compiler flags
 include( cmake/Flags.cmake )
+
+# Configure the debug options
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/DebugConfig.in"
+  "${PROJECT_BINARY_DIR}/DebugConfig.h"
+)
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
@@ -43,6 +51,8 @@ add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
+add_subdirectory( comm )
+
 add_library(
   man
   SHARED
@@ -58,6 +68,7 @@ target_link_libraries(
   man
   portals
   messages
+  comm
 )
 
 install( TARGETS man
