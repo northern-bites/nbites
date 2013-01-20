@@ -388,14 +388,6 @@ bool c_init_comm (void)
     PyModule_AddObject(comm_module, "PENALTY_MANUAL",
                        PyInt_FromLong(PENALTY_MANUAL));
 
-#ifdef USE_PYCOMM_FAKE_BACKEND
-    shared_ptr<Synchro> synchro = shared_ptr<Synchro>(new Synchro());
-    shared_ptr<Sensors> sensors = shared_ptr<Sensors>(new Sensors());
-    shared_ptr<NaoPose> pose = shared_ptr<NaoPose>(new NaoPose(sensors));
-    shared_ptr<Vision> vision = shared_ptr<Vision>(new Vision(pose, prof));
-    PyObject *pcomm = PyComm_new(new Comm(synchro, sensors, vision));
-    PyModule_AddObject(comm_module, "inst", pcomm);
-#endif
     return true;
 }
 
@@ -1047,13 +1039,6 @@ std::string Comm::getRobotName()
 
     std::string name = name_str.nodename;
 
-#if ROBOT(NAO_SIM)
-    name.append("- ");
-    name.append(robot_get_name());
-#elif ROBOT(NAO)
-#else
-#  error "Undefined robot type"
-#endif
     return name;
 }
 

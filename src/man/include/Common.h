@@ -17,13 +17,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-// ROBOT TYPES
-#define NAO_RL      3
-#define NAO_SIM     4
-#define NAO         5
-#define NAO_RL_33   6  // longer arms, new heads
-#define NAO_NEXTGEN 7
-
 namespace angle {
     typedef float radians;
     typedef float degrees;
@@ -32,14 +25,6 @@ namespace angle {
 typedef int pixels;
 typedef float cms;
 typedef float mms;
-
-#define ROBOT(t) ( \
-    (t == NAO_RL_33 && ROBOT_TYPE == NAO_RL_33) || \
-    (t == NAO_NEXTGEN && ROBOT_TYPE == NAO_NEXTGEN) || \
-    (t == NAO_SIM   && ROBOT_TYPE == NAO_SIM) || \
-    (t == NAO_RL && (ROBOT_TYPE == NAO_RL_33 || ROBOT_TYPE == NAO_RL || ROBOT_TYPE == NAO_NEXTGEN) ) || \
-    (t == NAO  && \
-      (ROBOT_TYPE == NAO_RL || ROBOT_TYPE == NAO_RL_33 || ROBOT_TYPE == NAO_NEXTGEN || ROBOT_TYPE == NAO_SIM) ))
 
 static const int NUM_PLAYERS_PER_TEAM = 4;
 

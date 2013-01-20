@@ -10,7 +10,6 @@ from .gaits.LabGait import LAB_GAIT
 from .gaits.DuckGait import DUCK_GAIT
 from .gaits.SlowGait import SLOW_GAIT
 from .gaits.ZaphodSlowGait import ZAPHOD_SLOW_GAIT
-from .gaits.WebotsGait import WEBOTS_GAIT, WEBOTS_GAIT2
 from .gaits.BackwardsGait import BACKWARDS_GAIT
 from .gaits.ZmpGait import ZMP_GAIT
 from .gaits.ZmpSlow import ZMP_SLOW_GAIT

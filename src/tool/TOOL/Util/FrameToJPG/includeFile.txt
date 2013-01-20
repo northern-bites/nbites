@@ -1,5 +1,0 @@
-**/TOOL/Util/FrameToJPG/*.class
-**/TOOL/Data/*.class
-**/TOOL/Data/File/*.class
-**/TOOL/Image/*.class
-**/TOOL/TOOLException.class

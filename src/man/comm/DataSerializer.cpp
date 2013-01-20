@@ -20,9 +20,6 @@ using namespace std;
 DataSerializer::DataSerializer () throw(socket_error&)
   : bind_sockn(-1), sockn(-1), blocking(true)
 {
-#if ROBOT(AIBO)
-  SOCKETNS::init();
-#endif
 }
 
 DataSerializer::~DataSerializer()
@@ -33,37 +30,13 @@ DataSerializer::~DataSerializer()
 void
 DataSerializer::accept () throw(socket_error&)
 {
-#if ROBOT(AIBO)
-  sockn = SOCKETNS::accept(bind_sockn);
-#else
   sockn = SOCKETNS::accept(bind_sockn, NULL, NULL);
-#endif
   if (sockn == -1) {
     close();
     socket_error e(__FILE__, __LINE__, errno);
     throw e;
     //throw SOCKET_ERROR(errno);
   }
-
-  if (!blocking) {
-    // for Aibo's, we must use non-blocking operations, as TOOLConnect must run
-    // in-line in the same thread as Vision
-#if ROBOT(AIBO)
-    if (SOCKETNS::setblocking(sockn, false) == -1) {
-      close();
-      throw SOCKET_ERROR(errno);
-    }
-#endif
-  }
-
-  // set socket send and receive buffer sizes
-  /*
-  if (::setsockopt(sockn, SOL_SOCKET, SO_SNDBUF, (void*)BUF_SIZE,
-        sizeof(int)) == -1 ||
-      ::setsockopt(sockn, SOL_SOCKET, SO_RCVBUF, (void*)BUF_SIZE,
-        sizeof(int)) == -1)
-    error(errno);
-  */
 }
 
 void
@@ -77,37 +50,17 @@ DataSerializer::bind () throw(socket_error&)
     throw SOCKET_ERROR(errno);
   }
 
-  if (!blocking) {
-    // for Aibo's, we must use non-blocking operations, as TOOLConnect must run
-    // in-line in the same thread as Vision
-#if ROBOT(AIBO)
-    if (SOCKETNS::setblocking(bind_sockn, false) == -1) {
-      closeAll();
-      throw SOCKET_ERROR(errno);
-    }
-#endif
-  }
 
   // set bind address parameters
-#if ROBOT(AIBO)
-  IPAddress bind_addr = IP_ADDR_ANY;
-  Port bind_port = Port(TCP_PORT);
-#else
   struct sockaddr_in bind_addr;
   bind_addr.sin_family = AF_INET;
   bind_addr.sin_port = htons(TCP_PORT);
   bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-#endif
 
   // bind socket to address
-#if ROBOT(AIBO)
-  if (SOCKETNS::bind(bind_sockn, bind_addr, bind_port) ||
-      SOCKETNS::listen(bind_sockn, 10) == -1) {
-#else
   if (SOCKETNS::bind(bind_sockn, (const struct sockaddr*)&bind_addr,
         sizeof(bind_addr)) == -1 ||
       SOCKETNS::listen(bind_sockn, 10) == -1) {
-#endif
     closeAll();
     throw SOCKET_ERROR(errno);
   }
@@ -181,26 +134,15 @@ DataSerializer::closeAll () throw()
       fprintf(stderr, "Error closing socket: #%i - %s\n", errno,
           strerror(errno));
   bind_sockn = -1;
-
-#if ROBOT(AIBO)
-  SOCKETNS::closeAll();
-#endif
 }
 
 void
 DataSerializer::setblocking (bool toBlock) throw(socket_error&)
 {
   if (toBlock ^ blocking) {
-#if ROBOT(AIBO)
-    if (bound() && SOCKETNS::setblocking(bind_sockn, toBlock) == -1)
-      throw SOCKET_ERROR(errno);
-
-    if (connected() && SOCKETNS::setblocking(sockn, toBlock) == -1)
-      throw SOCKET_ERROR(errno);
-#else
+      // TODO: WTF is this?
     fprintf(stderr, "Non-blocking sockets currently not supported on non-Aibo "
         "platforms\n");
-#endif
   }
   blocking = toBlock;
 }

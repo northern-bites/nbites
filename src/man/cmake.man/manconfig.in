@@ -16,56 +16,6 @@
 //
 // Debugging flags
 //
-
-
-// Compile as a remote binary, versus a dynamic library (ON/OFF)
-#define MAN_IS_REMOTE_${MAN_IS_REMOTE}
-#ifdef  MAN_IS_REMOTE_ON
-#  define MAN_IS_REMOTE
-#else
-#  undef  MAN_IS_REMOTE
-#endif
-
-// print about the initialization of the Man class
-#define DEBUG_MAN_INITIALIZATION_${DEBUG_MAN_INITIALIZATION}
-#ifdef  DEBUG_MAN_INITIALIZATION_ON
-#  define DEBUG_MAN_INITIALIZATION
-#else
-#  undef  DEBUG_MAN_INITIALIZATION
-#endif
-
-// print information before each pthreads thread, mutex, or condition call
-#define DEBUG_MAN_THREADING_${DEBUG_MAN_THREADING}
-#ifdef  DEBUG_MAN_THREADING_ON
-#  define DEBUG_MAN_THREADING
-#else
-#  undef  DEBUG_MAN_THREADING
-#endif
-
-// print when each image is requested from the robot
-#define DEBUG_IMAGE_REQUESTS_${DEBUG_IMAGE_REQUESTS}
-#ifdef  DEBUG_IMAGE_REQUESTS_ON
-#  define DEBUG_IMAGE_REQUESTS
-#else
-#  undef  DEBUG_IMAGE_REQUESTS
-#endif
-
-// turn on/off vision processing
-#define USE_NOGGIN_${USE_NOGGIN}
-#ifdef  USE_NOGGIN_ON
-#  define USE_NOGGIN
-#else
-#  undef USE_NOGGIN
-#endif
-
-// turn on/off vision processing
-#define USE_VISION_${USE_VISION}
-#ifdef  USE_VISION_ON
-#  define USE_VISION
-#else
-#  undef  USE_VISION
-#endif
-
 // turn on/off motion actions
 #define USE_MOTION_${USE_MOTION}
 #ifdef  USE_MOTION_ON
@@ -74,31 +24,7 @@
 #  undef  USE_MOTION
 #endif
 
-//switch btwn AlEnactor and NaoEnactor
-#define USE_DCM_${USE_DCM}
-#ifdef USE_DCM_OFF
-#  undef USE_DCM
-#else
-#  define USE_DCM
-#endif
-
-// Customize image locking configuration.  Man uses locking.
-#define USE_SENSORS_IMAGE_LOCKING_${USE_SENSORS_IMAGE_LOCKING}
-#ifdef  USE_SENSORS_IMAGE_LOCKING_ON
-#  define USE_SENSORS_IMAGE_LOCKING
-#else
-#  undef  USE_SENSORS_IMAGE_LOCKING
-#endif
-
-// Redirect the standard error to standard out in C++
-#define REDIRECT_C_STDERR_${REDIRECT_C_STDERR}
-#ifdef  REDIRECT_C_STDERR_ON
-#  define REDIRECT_C_STDERR
-#else
-#  undef  REDIRECT_C_STDERR
-#endif
-
-// turn on/off motion actions
+// are we in the lab or a real game?
 #define USING_LAB_FIELD_${USING_LAB_FIELD}
 #ifdef  USING_LAB_FIELD_ON
 #  define USING_LAB_FIELD

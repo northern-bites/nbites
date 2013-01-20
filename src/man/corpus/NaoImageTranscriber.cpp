@@ -58,10 +58,8 @@ void NaoImageTranscriber::run()
 
         if (processTime > VISION_FRAME_LENGTH_uS) {
             if (processTime > VISION_FRAME_LENGTH_PRINT_THRESH_uS) {
-#ifdef DEBUG_ALIMAGE_LOOP
-                cout << "Time spent in ALImageTranscriber loop longer than"
-                          << " frame length: " << processTime <<endl;
-#endif
+                std::cout << "Time spent in ImageTranscriber loop longer than"
+                          << " frame length: " << processTime << std::endl;
             }
             //Don't sleep at all
         } else{

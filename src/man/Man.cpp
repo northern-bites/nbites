@@ -79,7 +79,6 @@ Man::Man (RobotMemory::ptr memory,
     loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
     set_logging_board_pointer(loggingBoard);
 
-#ifdef USE_NOGGIN
     noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
                                             loggingBoard,
                                             motion->getInterface(), memory));
@@ -88,7 +87,6 @@ Man::Man (RobotMemory::ptr memory,
         std::cerr << e.what() << std::endl;
     }
 
-#endif// USE_NOGGIN
     loggingBoard->setMemory(memory);
 
 
@@ -100,25 +98,22 @@ Man::Man (RobotMemory::ptr memory,
 
 Man::~Man ()
 {
-  cout << "Man destructor" << endl;
+  cout << "Man destructed." << endl;
 }
 
 void Man::startSubThreads() {
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "Man starting" << endl;
-#endif
+    cout << "Man starting!" << endl;
 
     if (guardian->start() != 0)
-        cout << "Guardian failer to start" << endl;
+        cout << "Guardian failed to start." << endl;
 
     if (comm->start() != 0)
-        cout << "Comm failed to start" << endl;
+        cout << "Comm failed to start." << endl;
 
 #ifdef USE_MOTION
     // Start Motion thread (it handles its own threading
     if (motion->start() != 0)
-        cout << "Motion failed to start" << endl;
+        cout << "Motion failed to start." << endl;
 #endif
 
     //  CALLGRIND_START_INSTRUMENTATION;
@@ -126,13 +121,10 @@ void Man::startSubThreads() {
 }
 
 void Man::stopSubThreads() {
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "Man stopping: " << endl;
-#endif
+    cout << "Man stopping!" << endl;
 
     //remove stiffnesses
-    cout << "Killing stiffnesses " << endl;
+    cout << "Killing stiffnesses." << endl;
     motion->getInterface()->sendFreezeCommand(FreezeCommand::ptr(new FreezeCommand()));
 
     loggingBoard->reset();
@@ -155,7 +147,6 @@ void Man::stopSubThreads() {
 void
 Man::processFrame ()
 {
-#ifdef USE_VISION
     // Need to lock image and vision angles for duration of
     // vision processing to ensure consistency.
     sensors->lockImage();
@@ -164,11 +155,8 @@ Man::processFrame ()
     PROF_EXIT(P_VISION);
     sensors->releaseImage();
 //    cout<<vision->ball->getDistance() << endl;
-#endif
 
-#ifdef USE_NOGGIN
     noggin->runStep();
-#endif
 
     PROF_ENTER(P_LIGHTS);
     lights->sendLights();

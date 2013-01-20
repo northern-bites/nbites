@@ -28,12 +28,6 @@ Vision Constants that span multiple classes and systems.
 #define NAO_FOV_X_DEG          60.9f
 #define NAO_FOV_Y_DEG          47.6f
 
-#define NAO_SIM_IMAGE_WIDTH    160
-#define NAO_SIM_IMAGE_HEIGHT   120
-#define NAO_SIM_IMAGE_BYTE_SIZE (NAO_SIM_IMAGE_WIDTH * NAO_SIM_IMAGE_HEIGHT * 3)
-#define NAO_SIM_FOV_X_DEG      36
-#define NAO_SIM_FOV_Y_DEG      27
-
 #if NAO_IMAGE_SIZE == VGA
 #  define NAO_IMAGE_WIDTH      640
 #  define NAO_IMAGE_HEIGHT     480
@@ -66,40 +60,20 @@ Vision Constants that span multiple classes and systems.
 #define VISION_FRAME_LENGTH_PRINT_THRESH_uS 66000
 #define VISION_FPS 30
 
-#if ROBOT(NAO_SIM)
-
-#  define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH
-#  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
-#  define FOV_X_DEG NAO_SIM_FOV_X_DEG
-#  define FOV_Y_DEG NAO_SIM_FOV_Y_DEG
-#  define Y_IMAGE_BYTE_SIZE AVERAGED_Y_IMAGE_BYTE_SIZE
-#  define COLOR_IMAGE_BYTE_SIZE AVERAGED_Y_IMAGE_BYTE_SIZE
-
-#  define IMAGE_ROW_OFFSET NAO_SIM_IMAGE_ROW_OFFSET
-#  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
-
-#elif ROBOT(NAO_RL)
-
-#  define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH
-#  define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
-#  define FOV_X_DEG NAO_FOV_X_DEG
-#  define FOV_Y_DEG NAO_FOV_Y_DEG
-#  define Y_IMAGE_BYTE_SIZE (AVERAGED_IMAGE_SIZE * 2) // uint16 values
-#  define U_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE
-#  define V_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE
-#  define COLOR_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE // Byte values
-#  define IMAGE_BYTE_SIZE (Y_IMAGE_BYTE_SIZE                        \
-                           + U_IMAGE_BYTE_SIZE                      \
-                           + V_IMAGE_BYTE_SIZE                      \
-                           + COLOR_IMAGE_BYTE_SIZE)
-#  define IMAGE_ROW_OFFSET NAO_IMAGE_ROW_OFFSET
-#  define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
-
-#else
-
-#  error "Undefined robot type"
-
-#endif
+#define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH
+#define IMAGE_HEIGHT AVERAGED_IMAGE_HEIGHT
+#define FOV_X_DEG NAO_FOV_X_DEG
+#define FOV_Y_DEG NAO_FOV_Y_DEG
+#define Y_IMAGE_BYTE_SIZE (AVERAGED_IMAGE_SIZE * 2) // uint16 values
+#define U_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE
+#define V_IMAGE_BYTE_SIZE Y_IMAGE_BYTE_SIZE
+#define COLOR_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE // Byte values
+#define IMAGE_BYTE_SIZE (Y_IMAGE_BYTE_SIZE                        \
+                         + U_IMAGE_BYTE_SIZE                      \
+                         + V_IMAGE_BYTE_SIZE                      \
+                         + COLOR_IMAGE_BYTE_SIZE)
+#define IMAGE_ROW_OFFSET NAO_IMAGE_ROW_OFFSET
+#define JPEG_ROW_SKIP IMAGE_ROW_OFFSET
 
 #define FOV_X RAD_OVER_DEG*FOV_X_DEG
 #define FOV_Y RAD_OVER_DEG*FOV_Y_DEG

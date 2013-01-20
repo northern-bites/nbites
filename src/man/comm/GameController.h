@@ -11,6 +11,7 @@
 
 class GameController;
 
+#define USE_PYTHON_GC
 #ifdef USE_PYTHON_GC
 #include <Python.h>
 

@@ -9,7 +9,6 @@ compare this file with the new one to see if they are different or not.
 (Maybe using another program (like R) to do this comparison?
 """
 
-from ..WebotsConfig import WEBOTS_ACTIVE
 import man.motion.SweetMoves as SweetMoves
 
 from objects import RelRobotLocation
@@ -100,10 +99,3 @@ def sitdown(player):
         player.brain.tracker.stopHeadMoves()
 
     return player.stay()
-
-
-if WEBOTS_ACTIVE:
-    gameInitial = gamePlaying
-    print "Webots is active!!!!"
-else:
-    print "Webots is in-active!!!!"
