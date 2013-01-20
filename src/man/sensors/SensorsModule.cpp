@@ -5,8 +5,16 @@ namespace man
     namespace sensors
     {
 	SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
-	    : portals::Module(), jointsOutput_(base()), chestboardButtonOutput_(base()), footbumperOutput_(base()), broker_(broker), fastMemoryAccess_(new AL::ALMemoryFastAccess()),
-	      sensorValues_(NUM_SENSOR_VALUES), sensorKeys_(NUM_SENSOR_VALUES)
+	    : portals::Module(), 
+	      jointsOutput_(base()), 
+	      chestboardButtonOutput_(base()), 
+	      footbumperOutput_(base()), 
+	      inertialsOutput_(base()),
+	      sonarsOutput_(base()), 
+	      broker_(broker), 
+	      fastMemoryAccess_(new AL::ALMemoryFastAccess()),
+	      sensorValues_(NUM_SENSOR_VALUES), 
+	      sensorKeys_(NUM_SENSOR_VALUES)
 	{
 	    std::cout << "SensorsModule : Constructor." << std::endl;
 
@@ -126,9 +134,31 @@ namespace man
 	void SensorsModule::updateJointsMessage()
 	{
 	    portals::Message<messages::JointAngles> jointsMessage;
-	    jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
 
-	    // @todo ... 
+	    jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
+	    jointsMessage.get()->set_headpitch(sensorValues_[HeadPitch]);
+	    jointsMessage.get()->set_lshoulderpitch(sensorValues_[LShoulderPitch]);
+	    jointsMessage.get()->set_lshoulderroll(sensorValues_[LShoulderRoll]);
+	    jointsMessage.get()->set_lelbowyaw(sensorValues_[LElbowYaw]);
+	    jointsMessage.get()->set_lwristyaw(sensorValues_[LWristYaw]);
+	    jointsMessage.get()->set_lhand(sensorValues_[LHand]);
+	    jointsMessage.get()->set_rshoulderpitch(sensorValues_[RShoulderPitch]);
+	    jointsMessage.get()->set_rshoulderroll(sensorValues_[RShoulderRoll]);
+	    jointsMessage.get()->set_relbowyaw(sensorValues_[RElbowYaw]);
+	    jointsMessage.get()->set_rwristyaw(sensorValues_[RWristYaw]);
+	    jointsMessage.get()->set_rhand(sensorValues_[RHand]);
+	    jointsMessage.get()->set_lhipyawpitch(sensorValues_[LHipYawPitch]);
+	    jointsMessage.get()->set_rhipyawpitch(sensorValues_[RHipYawPitch]);
+	    jointsMessage.get()->set_lhiproll(sensorValues_[LHipRoll]);
+	    jointsMessage.get()->set_lhippitch(sensorValues_[LHipPitch]);
+	    jointsMessage.get()->set_lkneepitch(sensorValues_[LKneePitch]);
+	    jointsMessage.get()->set_lanklepitch(sensorValues_[LAnklePitch]);
+	    jointsMessage.get()->set_lankleroll(sensorValues_[LAnkleRoll]);
+	    jointsMessage.get()->set_rhiproll(sensorValues_[RHipRoll]);
+	    jointsMessage.get()->set_rhippitch(sensorValues_[RHipPitch]);
+	    jointsMessage.get()->set_rkneepitch(sensorValues_[RKneePitch]);
+	    jointsMessage.get()->set_ranklepitch(sensorValues_[RAnklePitch]);
+	    jointsMessage.get()->set_rankleroll(sensorValues_[RAnkleRoll]);
 
 	    jointsOutput_.setMessage(jointsMessage);
 	}
@@ -151,6 +181,33 @@ namespace man
 		);
 	    
 	    footbumperOutput_.setMessage(footbumperMessage);
+	}
+
+	void SensorsModule::updateInertialsMessage()
+	{
+	    portals::Message<messages::InertialState> inertialsMessage;
+
+	    inertialsMessage.get()->set_accx(sensorValues_[AccX]);
+	    inertialsMessage.get()->set_accy(sensorValues_[AccY]);
+	    inertialsMessage.get()->set_accz(sensorValues_[AccZ]);
+
+	    inertialsMessage.get()->set_gyrx(sensorValues_[GyrX]);
+	    inertialsMessage.get()->set_gyry(sensorValues_[GyrY]);
+
+	    inertialsMessage.get()->set_anglex(sensorValues_[AngleX]);
+	    inertialsMessage.get()->set_angley(sensorValues_[AngleY]);
+
+	    inertialsOutput_.setMessage(inertialsMessage);
+	}
+
+	void SensorsModule::updateSonarsMessage()
+	{
+	    portals::Message<messages::SonarState> sonarsMessage;
+
+	    sonarsMessage.get()->set_usleft(sensorValues_[USLeft]);
+	    sonarsMessage.get()->set_usright(sensorValues_[USRight]);
+
+	    sonarsOutput_.setMessage(sonarsMessage);
 	}
 
 	void SensorsModule::run_()
