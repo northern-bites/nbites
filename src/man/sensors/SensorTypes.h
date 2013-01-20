@@ -93,8 +93,6 @@ namespace man
 	    ChestboardButton,
 
 	    NUM_SENSOR_VALUES
-
-	    // @todo UltraSonic (US)/Sonar sensors
 	};
 
 	static const std::string SensorNames[] =
