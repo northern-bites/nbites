@@ -1,0 +1,20 @@
+
+message TestMessage {
+
+  required string string_test = 1;
+  required bytes bytes_test = 2;
+  required int32 int32_test = 3;
+  required float float_test = 4;
+
+  enum TestEnum {
+    TEST_ENUM_0 = 0;
+    TEST_ENUM_1 = 1;
+    TEST_ENUM_2 = 2;
+  }
+
+  message NestedTestMessage {
+    optional TestEnum type = 1 [default = TEST_ENUM_0];
+  }
+
+  repeated NestedTestMessage nestedTestMessages = 5;
+}
