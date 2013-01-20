@@ -18,6 +18,8 @@
 #include "JointAngles.pb.h"
 #include "ButtonState.pb.h"
 #include "FootBumperState.pb.h"
+#include "InertialState.pb.h"
+#include "SonarState.pb.h"
 
 #include <alcommon/albroker.h>
 #include <alproxies/almemoryproxy.h>
@@ -36,6 +38,11 @@ namespace man
 	class SensorsModule : public portals::Module
 	{
 	public:
+	    /**
+	     * @brief Constructor must take a pointer to the broker
+	     *        passed to Man in order to communicate via 
+	     *        proxies to the DCM and ALMemory. 
+	     */
 	    SensorsModule(boost::shared_ptr<AL::ALBroker> broker);
 
 	    virtual ~SensorsModule();
@@ -53,6 +60,12 @@ namespace man
 	    // Foot bumpers. 
 	    portals::OutPortal<messages::FootBumperState> footbumperOutput_;
 	    
+	    // Inertial sensors.
+	    portals::OutPortal<messages::InertialState> inertialsOutput_;
+
+	    // Sonars.
+	    portals::OutPortal<messages::SonarState> sonarsOutput_;
+
 	private:
 	    /*
 	     * Methods used to communicate with the NAO hardware 
@@ -96,6 +109,16 @@ namespace man
 	     * @brief Updates the footbumper button message.
 	     */
 	    void updateFootbumperMessage();
+
+	    /**
+	     * @brief Updates the inertial sensors message.
+	     */
+	    void updateInertialsMessage();
+
+	    /**
+	     * @brief Updates the sonars message. 
+	     */
+	    void updateSonarsMessage();
 
 	    /**
 	     * @brief The main run routine, primarily updates sensor
