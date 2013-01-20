@@ -1,6 +1,7 @@
 /**
- * @brief Contains useful sensor structs, definitions, and types. 
- * @date  January 2013 (modified)
+ * @brief  Contains useful sensor structs, definitions, and types. 
+ * @author Ellis Ratner <eratner@bowdoin.edu>
+ * @date   January 2013 (modified)
  */
 #pragma once
 

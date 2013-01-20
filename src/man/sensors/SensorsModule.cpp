@@ -5,7 +5,7 @@ namespace man
     namespace sensors
     {
 	SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
-	    : portals::Module(), broker_(broker), fastMemoryAccess_(new AL::ALMemoryFastAccess()),
+	    : portals::Module(), jointsOutput_(base()), chestboardButtonOutput_(base()), footbumperOutput_(base()), broker_(broker), fastMemoryAccess_(new AL::ALMemoryFastAccess()),
 	      sensorValues_(NUM_SENSOR_VALUES), sensorKeys_(NUM_SENSOR_VALUES)
 	{
 	    std::cout << "SensorsModule : Constructor." << std::endl;
@@ -80,7 +80,8 @@ namespace man
 	    {
 		try
 		{
-		    // For DCM::set see http://www.aldebaran-robotics.com/documentation/naoqi/sensors/dcm-api.html#DCMProxy::set__AL::ALValueCR
+		    // For DCM::set() see:
+		    // http://www.aldebaran-robotics.com/documentation/naoqi/sensors/dcm-api.html#DCMProxy::set__AL::ALValueCR
 		    AL::ALValue dcmSonarCommand;
 		    
 		    dcmSonarCommand.arraySetSize(3);
@@ -105,16 +106,56 @@ namespace man
 	void SensorsModule::updateSensorValues()
 	{
 	    std::cout << "SensorsModule : Retrieving sensor values from NAOqi." << std::endl;
+	    // Update stored sensor values. 
 	    fastMemoryAccess_->GetValues(sensorValues_);
+
+	    // Update joints message. 
+	    updateJointsMessage();
+	    // Update chestboard button message.
+	    updateChestboardButtonMessage();
+	    // Update footbumper message.
+	    updateFootbumperMessage();
+
 	    std::cout << "SensorsModule : Sensor values " << std::endl;
 	    for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
 	    {
-		std::cout << SensorNames[i] << " = " << sensorValues_[i] << std::endl;
+	    	std::cout << SensorNames[i] << " = " << sensorValues_[i] << std::endl;
 	    }
+	}
+
+	void SensorsModule::updateJointsMessage()
+	{
+	    portals::Message<messages::JointAngles> jointsMessage;
+	    jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
+
+	    // @todo ... 
+
+	    jointsOutput_.setMessage(jointsMessage);
+	}
+
+	void SensorsModule::updateChestboardButtonMessage()
+	{
+	    portals::Message<messages::ButtonState> chestboardMessage;
+	    chestboardMessage.get()->set_pressed(
+		sensorValues_[ChestboardButton] > 0.5f ? true : false
+		);
+
+	    chestboardButtonOutput_.setMessage(chestboardMessage);
+	}
+
+	void SensorsModule::updateFootbumperMessage()
+	{
+	    portals::Message<messages::FootBumperState> footbumperMessage;
+	    footbumperMessage.get()->mutable_lfootbumperleft()->set_pressed(
+		sensorValues_[LFootBumperLeft] > 0.5f ? true : false
+		);
+	    
+	    footbumperOutput_.setMessage(footbumperMessage);
 	}
 
 	void SensorsModule::run_()
 	{
+	    // Simply update all sensor readings from ALMemory. 
 	    updateSensorValues();
 	}
     } // namespace sensors

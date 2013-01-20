@@ -15,6 +15,10 @@
 #include "RoboGrams.h"
 #include "SensorTypes.h"
 
+#include "JointAngles.pb.h"
+#include "ButtonState.pb.h"
+#include "FootBumperState.pb.h"
+
 #include <alcommon/albroker.h>
 #include <alproxies/almemoryproxy.h>
 #include <alproxies/dcmproxy.h>
@@ -36,7 +40,25 @@ namespace man
 
 	    virtual ~SensorsModule();
 
+	    /*
+	     * These portals enable other modules to get sensory 
+	     * information. 
+	     */
+
+	    // Joints.
+	    portals::OutPortal<messages::JointAngles> jointsOutput_;
+
+	    // Chestboard button. 
+	    portals::OutPortal<messages::ButtonState> chestboardButtonOutput_;
+	    // Foot bumpers. 
+	    portals::OutPortal<messages::FootBumperState> footbumperOutput_;
+	    
 	private:
+	    /*
+	     * Methods used to communicate with the NAO hardware 
+	     * through the NAOqi software interface.
+	     */
+
 	    /**
 	     * @brief Initialize sensor aliases for fast access.
 	     */
@@ -55,6 +77,26 @@ namespace man
 	     */
 	    void updateSensorValues();
 	    
+	    /*
+	     * Methods to update the messages provided by the 
+	     * out portals. 
+	     */
+
+	    /**
+	     * @brief Updates the joint angles message.
+	     */
+	    void updateJointsMessage();
+
+	    /**
+	     * @brief Updates the chestboard button message.
+	     */
+	    void updateChestboardButtonMessage();
+
+	    /**
+	     * @brief Updates the footbumper button message.
+	     */
+	    void updateFootbumperMessage();
+
 	    /**
 	     * @brief The main run routine, primarily updates sensor
 	     *        readings.
