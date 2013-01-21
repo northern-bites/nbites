@@ -4,6 +4,7 @@
 #include "RoboGrams.h"
 #include "image/ImageTranscriberModule.h"
 #include "log/LogModule.h"
+#include "newVis/VisionModule.h"
 
 namespace man {
 
@@ -20,6 +21,7 @@ private:
     // Modules:
     image::ImageTranscriberModule imageTranscriber;
     log::LogModule logger;
+    vision::VisionModule visMod;
 };
 
 }

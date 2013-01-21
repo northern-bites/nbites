@@ -54,6 +54,7 @@ add_subdirectory( synchro )
 # Actual modules
 add_subdirectory( image )
 add_subdirectory( log )
+add_subdirectory( newVis )
 
 add_library(
   man
@@ -73,6 +74,7 @@ target_link_libraries(
   synchro
   image
   log
+  newVis
 )
 
 install( TARGETS man

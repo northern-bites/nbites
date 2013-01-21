@@ -5,11 +5,14 @@ namespace man {
 CognitionThread::CognitionThread() : Thread("cognition"),
                                      cognitionDiagram(),
                                      imageTranscriber(),
-                                     logger()
+                                     logger(),
+				     visMod()
 {
     logger.topImageIn.wireTo(&imageTranscriber.topImageOut);
+    visMod.topImageIn.wireTo(&imageTranscriber.topImageOut);
     cognitionDiagram.addModule(imageTranscriber);
     cognitionDiagram.addModule(logger);
+    cognitionDiagram.addModule(visMod);
 }
 
 void CognitionThread::run()
