@@ -21,7 +21,7 @@ private:
     // Modules:
     image::ImageTranscriberModule imageTranscriber;
     log::LogModule logger;
-    vision::VisionModule visMod;
+    newVis::VisionModule visMod;
 };
 
 }
