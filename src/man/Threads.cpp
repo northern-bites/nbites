@@ -8,6 +8,7 @@ CognitionThread::CognitionThread() : Thread("cognition"),
                                      logger()
 {
     logger.topImageIn.wireTo(&imageTranscriber.topImageOut);
+    logger.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
     cognitionDiagram.addModule(imageTranscriber);
     cognitionDiagram.addModule(logger);
 }
