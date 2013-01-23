@@ -29,7 +29,6 @@ LogModule::~LogModule()
 
 void LogModule::run_()
 {
-    std::cout << "LogModule run!" << std::endl;
     topImageIn.latch();
     bottomImageIn.latch();
     writeCurrentFrames();
