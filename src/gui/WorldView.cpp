@@ -132,7 +132,7 @@ void WorldView::paintEvent(QPaintEvent *event)
                         2*BALL_RAD, 2*BALL_RAD);
 
 
-    // Goalie-Data from WorldState instance
+    // Robot-Data from world instance
     pen.setColor(Qt::darkGray);
     painter.setPen(pen);
     painter.setBrush(Qt::darkGray);
