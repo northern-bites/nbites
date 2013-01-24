@@ -18,8 +18,10 @@ set( tool_headers
   Tool.h
 )
 
-# Qt4 goodness
+# Compile portals into portals folder
+add_subdirectory(../portals ${CMAKE_CURRENT_BINARY_DIR}/portals)
 
+# Qt4 goodness
 Qt4_wrap_cpp(tool_headers_moc ${tool_headers})
 
 # The main executable
@@ -29,5 +31,6 @@ add_executable( ${TOOL_EXECUTABLE}
 
 target_link_libraries(
   ${TOOL_EXECUTABLE}
+  portals
   ${QT_LIBRARIES}
   )

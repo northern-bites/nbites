@@ -7,16 +7,16 @@ SRC_DIR = ../../src/tool
 
 EXECUTABLE = $(BUILD_DIR)/tool
 
-.PHONY: run
-run: build
-	$(EXECUTABLE)
-
 .PHONY: build
 build:
 	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR); \
 	cmake $(SRC_DIR) -DTOOL_EXECUTABLE=$(EXECUTABLE); \
 	$(MAKE) --no-print-directory
+
+.PHONY: run
+run: build
+	$(EXECUTABLE)
 
 .PHONY: config
 config:
