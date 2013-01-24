@@ -1,8 +1,4 @@
-/*
- * Empty QTool
- */
-
-#include "EmptyQTool.h"
+#include "Tool.h"
 #include <QTextStream>
 #include <QFileDialog>
 #include <QKeyEvent>
@@ -13,7 +9,7 @@ namespace tool {
 
 QFile file(QString("./.geometry"));
 
-EmptyQTool::EmptyQTool(const char* title) :
+Tool::Tool(const char* title) :
     QMainWindow(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
@@ -50,7 +46,7 @@ EmptyQTool::EmptyQTool(const char* title) :
     this->setGeometry(*geometry);
 }
 
-EmptyQTool::~EmptyQTool() {
+Tool::~Tool() {
     if (file.open(QIODevice::ReadWrite)){
         QTextStream out(&file);
         out << this->pos().x() << "\n"
@@ -60,20 +56,20 @@ EmptyQTool::~EmptyQTool() {
     }
 }
 
-void EmptyQTool::next() {
+void Tool::next() {
     std::cout << "NEXT!" << std::endl;
 }
 
-void EmptyQTool::prev() {
+void Tool::prev() {
     std::cout << "PREV!" << std::endl;
 }
 
 
-void EmptyQTool::record() {
+void Tool::record() {
     std::cout << "RECORD!" << std::endl;
 }
 
-void EmptyQTool::keyPressEvent(QKeyEvent * event)
+void Tool::keyPressEvent(QKeyEvent * event)
 {
     switch (event->key()) {
     case Qt::Key_J:
@@ -91,7 +87,7 @@ void EmptyQTool::keyPressEvent(QKeyEvent * event)
     }
 }
 
-void EmptyQTool::resizeEvent(QResizeEvent* ev)
+void Tool::resizeEvent(QResizeEvent* ev)
 {
     QSize widgetSize = ev->size();
     if((widgetSize.width() > tabStartSize->width()) ||

@@ -1,9 +1,5 @@
 /**
- * @class EmptyQTool
- * The main window of QTool without any of its modules.
- * Inherits from qmainwindow. Can be used to create versions of QTool
- * with any subset of modules.
- * Has a data manager and the data handling toolbar.
+ * Lizzie write new comments
  */
 
 #pragma once
@@ -17,12 +13,12 @@
 
 namespace tool {
 
-class EmptyQTool : public QMainWindow {
+class Tool : public QMainWindow {
     Q_OBJECT;
 
 public:
-    EmptyQTool(const char* title = "qTool");
-    ~EmptyQTool();
+    Tool(const char* title = "qTool");
+    ~Tool();
 
 protected slots:
     void next();

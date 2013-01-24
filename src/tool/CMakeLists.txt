@@ -16,12 +16,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 
 # Sources
 
-set( tool_srcs
-  EmptyQTool.cpp
+set( tool_srcs main.cpp
+  Tool.cpp
   )
 
 set( tool_headers
-  EmptyQTool.h
+  Tool.h
 )
 
 # Qt4 goodness
@@ -29,11 +29,11 @@ set( tool_headers
 Qt4_wrap_cpp(tool_headers_moc ${tool_headers})
 
 # The main executable
-add_executable( tool
+add_executable( ${TOOL_EXECUTABLE}
   ${tool_srcs}
   ${tool_headers_moc} )
 
 target_link_libraries(
-  tool
+  ${TOOL_EXECUTABLE}
   ${QT_LIBRARIES}
   )
