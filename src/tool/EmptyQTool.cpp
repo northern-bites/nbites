@@ -3,30 +3,29 @@
  */
 
 #include "EmptyQTool.h"
-#include <iostream>
+#include <QTextStream>
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QDebug>
+#include <iostream>
 
-namespace qtool {
+namespace tool {
 
-using data::DataManager;
 QFile file(QString("./.geometry"));
 
-EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
-                                            toolTabs(new QTabWidget()),
-                                            dataManager(new DataManager(this))
+EmptyQTool::EmptyQTool(const char* title) :
+    QMainWindow(),
+    toolTabs(new QTabWidget),
+    toolbar(new QToolBar),
+    nextButton(new QPushButton(tr(">"))),
+    prevButton(new QPushButton(tr("<"))),
+    recordButton(new QPushButton(tr("Rec"))),
+    scrollArea(new QScrollArea),
+    scrollBarSize(new QSize(5, 35)),
+    tabStartSize(new QSize(toolTabs->size()))
+
 {
     this->setWindowTitle(tr(title));
-
-    toolbar = new QToolBar();
-    nextButton = new QPushButton(tr(">"));
-    prevButton = new QPushButton(tr("<"));
-    recordButton = new QPushButton(tr("Rec"));
-    scrollArea = new QScrollArea();
-
-    scrollBarSize = new QSize(5, 35);
-    tabStartSize = new QSize(toolTabs->size());
 
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
@@ -41,14 +40,14 @@ EmptyQTool::EmptyQTool(const char* title) : QMainWindow(),
 
     if (file.open(QIODevice::ReadWrite)){
             QTextStream in(&file);
-            geom = new QRect(in.readLine().toInt(), in.readLine().toInt(),
-                             in.readLine().toInt(), in.readLine().toInt());
+            geometry = new QRect(in.readLine().toInt(), in.readLine().toInt(),
+                                 in.readLine().toInt(), in.readLine().toInt());
             file.close();
     }
-    if((geom->width() == 0) && (geom->height() == 0)){
-        geom = new QRect(75, 75, 1132, 958);
+    if((geometry->width() == 0) && (geometry->height() == 0)){
+        geometry = new QRect(75, 75, 1132, 958);
     }
-    this->setGeometry(*geom);
+    this->setGeometry(*geometry);
 }
 
 EmptyQTool::~EmptyQTool() {
@@ -62,26 +61,16 @@ EmptyQTool::~EmptyQTool() {
 }
 
 void EmptyQTool::next() {
-    dataManager->getNext();
+    std::cout << "NEXT!" << std::endl;
 }
 
 void EmptyQTool::prev() {
-    dataManager->getPrev();
+    std::cout << "PREV!" << std::endl;
 }
 
 
 void EmptyQTool::record() {
-    if (dataManager->isRecording()) {
-        dataManager->stopRecording();
-        recordButton->setText("Rec");
-    } else {
-        QString path = QFileDialog::getExistingDirectory(this, "Choose folder",
-                QString(NBITES_DIR) + "/data/logs");
-        if (!path.isEmpty()) {
-            dataManager->startRecordingToPath(path.toStdString());
-            recordButton->setText("Stop");
-        }
-    }
+    std::cout << "RECORD!" << std::endl;
 }
 
 void EmptyQTool::keyPressEvent(QKeyEvent * event)
@@ -108,9 +97,6 @@ void EmptyQTool::resizeEvent(QResizeEvent* ev)
     if((widgetSize.width() > tabStartSize->width()) ||
        (widgetSize.height() > tabStartSize->height())) {
         toolTabs->resize(widgetSize-*scrollBarSize);
-    }
-    else {
-//do nothing - scroll bars will kick in by themselves
     }
     QWidget::resizeEvent(ev);
 }

@@ -8,27 +8,17 @@
 
 #pragma once
 
-#include <qmainwindow.h>
-#include <qtabwidget.h>
+#include <QMainWindow>
+#include <QTabWidget>
 #include <QPushButton>
 #include <QToolBar>
 #include <QScrollArea>
 #include <QResizeEvent>
-#include <QTextStream>
 
-#include "data/DataManager.h"
-
-#ifndef NBITES_DIR
-#define NBITES_DIR "~/nbites"
-#warning "Could not find NBITES_DIR define! Reverting to " NBITES_DIR
-#endif
-
-namespace qtool {
-
+namespace tool {
 
 class EmptyQTool : public QMainWindow {
-
-    Q_OBJECT
+    Q_OBJECT;
 
 public:
     EmptyQTool(const char* title = "qTool");
@@ -41,21 +31,17 @@ protected slots:
 
 protected:
     virtual void keyPressEvent(QKeyEvent * event);
+	void resizeEvent(QResizeEvent*);
 
     QTabWidget* toolTabs;
-
-    data::DataManager::ptr dataManager;
-
+    QToolBar* toolbar;
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;
 	QPushButton* scrollButton;
-    QToolBar* toolbar;
 	QScrollArea* scrollArea;
-	QSize* tabStartSize;
-	QRect* geom;
 	QSize* scrollBarSize;
-
-	void resizeEvent(QResizeEvent*);
+	QSize* tabStartSize;
+	QRect* geometry;
 };
 }
