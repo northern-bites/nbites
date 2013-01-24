@@ -58,24 +58,6 @@ MainWidget::MainWidget(QWidget* parent) : QWidget(parent),
                      this, SLOT(updateBall(float, float)));
 }
 
-void MainWidget::updateRobot(float x, float y, float h)
-{
-    world.moveRobotTo(x, y, h);
-    updateView();
-}
-
-void MainWidget::updateHead(float yaw, float pitch)
-{
-    world.moveHeadTo(yaw, pitch);
-    updateView();
-}
-
-void MainWidget::updateBall(float x, float y)
-{
-    world.moveBallTo(x, y);
-    updateView();
-}
-
 void MainWidget::updateView()
 {
     topImage.update();

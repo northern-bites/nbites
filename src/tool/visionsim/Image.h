@@ -10,6 +10,9 @@
 #include <Eigen/Dense>
 #include <vector>
 
+namespace tool{
+namespace visionsim{
+
 static const int ERROR = -9999;
 typedef std::vector<VisionCorner> CornerVector;
 
@@ -45,3 +48,6 @@ private:
     float cameraOffset;
     float cameraHeight;
 };
+
+}
+}

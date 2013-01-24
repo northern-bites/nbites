@@ -4,6 +4,9 @@
 
 #pragma once
 
+namespace tool{
+namespace visionsim{
+
 static const float PI                   = 3.14159265;
 
 // Angles in the model are in degrees
@@ -25,3 +28,6 @@ enum Camera{
     TOP = 0,
     BOTTOM
 };
+
+}
+}

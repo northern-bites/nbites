@@ -6,6 +6,9 @@
 
 #include "FieldCorners.h"
 
+namespace tool{
+namespace visionsim{
+
 typedef Eigen::Vector3f CameraPoint;
 typedef Eigen::Vector2i ImagePoint;
 class VisionCorner {
@@ -25,3 +28,6 @@ private:
     CameraPoint cameraCoordinates;
     ImagePoint imageCoordinates;
 };
+
+}
+}

@@ -13,6 +13,7 @@
 
 #include "RoboGrams.h"
 #include "unlog/UnlogModule.h"
+#include "visionsim/VisionSimModule.h"
 
 namespace tool {
 
@@ -40,6 +41,7 @@ protected:
 
     // Modules
     unlog::UnlogModule unlogger;
+    visionsim::VisionSimModule visionSimulator;
 
     // GUI stuff
     QTabWidget* toolTabs;

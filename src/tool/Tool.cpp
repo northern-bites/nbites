@@ -14,6 +14,7 @@ Tool::Tool(const char* title) :
     QMainWindow(),
     mainDiagram(),
     unlogger(),
+    visionSimulator(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -26,6 +27,7 @@ Tool::Tool(const char* title) :
 {
     // Set up the diagram
     mainDiagram.addModule(unlogger);
+    mainDiagram.addModule(visionSimulator);
 
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));

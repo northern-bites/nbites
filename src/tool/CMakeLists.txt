@@ -32,6 +32,7 @@ include_directories( ../portals )
 add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
 
 add_subdirectory( unlog )
+add_subdirectory( visionsim )
 
 # Qt4 goodness
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
@@ -46,5 +47,6 @@ target_link_libraries(
   portals
   messages
   unlog
+  visionsim
   ${QT_LIBRARIES}
   )

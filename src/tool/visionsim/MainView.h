@@ -17,23 +17,14 @@ public:
     ~MainWidget() {};
 
 public slots:
-    void updateRobot(float x, float y, float h);
-    void updateHead(float yaw, float pitch);
-    void updateBall(float x, float y);
+    void updateView();
 
 private:
-    // Model
-    World world;
-    Image topImage;
-    Image bottomImage;
-
-    // View
     ImageView topImageView;
     ImageView bottomImageView;
     WorldView worldView;
     Controls controls;
 
-    void updateView();
 };
 
 class MainView : public QMainWindow {

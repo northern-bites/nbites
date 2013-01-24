@@ -1,5 +1,8 @@
 #include "World.h"
 
+namespace tool{
+namespace visionsim{
+
 void World::moveRobot(float dx, float dy, float dh)
 {
     robot.setX(robot.getX()+dx);
@@ -38,3 +41,5 @@ void World::moveBallTo(float x, float y)
     ball[Y_VALUE] = y;
 }
 
+}
+}

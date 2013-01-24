@@ -4,6 +4,9 @@
 
 using namespace Eigen;
 
+namespace tool{
+namespace visionsim{
+
 Image::Image(World& state, Camera which) : world(state),
                                            type(which)
 {
@@ -138,4 +141,7 @@ Vector2i Image::cameraToImageCoords(Vector3f ccPoint)
     return cameraToImageCoords(ccPoint[X_VALUE],
                                ccPoint[Y_VALUE],
                                ccPoint[Z_VALUE]);
+}
+
+}
 }

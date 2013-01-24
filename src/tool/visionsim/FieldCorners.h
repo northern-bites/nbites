@@ -7,6 +7,9 @@
 #include <Eigen/Dense>
 #include "WorldConstants.h"
 
+namespace tool{
+namespace visionsim{
+
 typedef Eigen::Vector3f FieldCorner;
 
 // About corners
@@ -133,3 +136,6 @@ static const FieldCorner ALL_CORNERS[NUM_CORNERS] =
   TOP_RIGHT_GOALBOX_L,
   TOP_CENTER_T,
   BOTTOM_CENTER_T};
+
+}
+}

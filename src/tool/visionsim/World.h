@@ -7,6 +7,9 @@
 #include <Eigen/Dense>
 #include "RobotPosition.h"
 
+namespace tool{
+namespace visionsim{
+
 typedef Eigen::Vector3f PhysicalBall;
 
 class World{
@@ -38,3 +41,6 @@ private:
     PhysicalBall ball;
     RobotPosition robot;
 };
+
+}
+}
