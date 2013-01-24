@@ -4,6 +4,9 @@
 
 #pragma once
 
+namespace tool{
+namespace visionsim{
+
 // Ball constants
 static const float BALL_DIAMETER = 6.5f;
 static const float BALL_RADIUS   = 0.5f * BALL_DIAMETER;
@@ -75,4 +78,5 @@ static const float RIGHT_GOALBOX_FRONT_X = FIELD_RIGHT_EDGE_X - GOALBOX_WIDTH;
 
 static const float HALF_FIELD_X          = 0.5f * GREEN_WIDTH;
 
-
+}
+}

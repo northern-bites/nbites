@@ -7,6 +7,9 @@
 
 #include <QSpinBox>
 
+namespace tool{
+namespace visionsim{
+
 class Controls : public QWidget {
 Q_OBJECT
 
@@ -34,3 +37,5 @@ private:
     QSpinBox ballY;
 };
 
+}
+}

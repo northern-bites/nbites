@@ -7,8 +7,11 @@
 #include <QWidget>
 #include <QPainter>
 #include <QPaintEvent>
-#include "../model/World.h"
-#include "../model/WorldConstants.h"
+#include "World.h"
+#include "WorldConstants.h"
+
+namespace tool{
+namespace visionsim{
 
 class WorldView : public QWidget
 {
@@ -28,3 +31,6 @@ protected:
 private:
     World& world;
 };
+
+}
+}

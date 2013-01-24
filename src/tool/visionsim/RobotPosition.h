@@ -6,6 +6,9 @@
 
 #include "WorldConstants.h"
 
+namespace tool{
+namespace visionsim{
+
 class RobotPosition {
 public:
     RobotPosition() : x(0), y(0), h(0), headYaw(0), headPitch(0) {};
@@ -33,3 +36,6 @@ private:
     float headYaw;
     float headPitch;
 };
+
+}
+}

@@ -1,5 +1,8 @@
 #include "ImageView.h"
 
+namespace tool{
+namespace visionsim{
+
 // For drawing the ball!
 static const QColor ORANGE(255, 127, 0);
 
@@ -49,4 +52,7 @@ void ImageView::paintEvent(QPaintEvent* event)
         if (!i->behind())
             painter.drawPoint(i->x(), i->y());
     }
+}
+
+}
 }

@@ -21,8 +21,7 @@ Tool::Tool(const char* title) :
     prevButton(new QPushButton(tr("<"))),
     recordButton(new QPushButton(tr("Rec"))),
     scrollArea(new QScrollArea),
-    scrollBarSize(new QSize(5, 35)),
-    tabStartSize(new QSize(toolTabs->size()))
+    scrollBarSize(new QSize(5, 35))
 
 {
     // Set up the diagram
@@ -42,6 +41,14 @@ Tool::Tool(const char* title) :
     toolbar->addWidget(recordButton);
 
     this->addToolBar(toolbar);
+
+    toolTabs->addTab(&visionSimulator.gui, tr("Vision Simulator"));
+
+    scrollArea->setWidget(toolTabs);
+	scrollArea->resize(toolTabs->size());
+	this->setCentralWidget(scrollArea);
+
+	tabStartSize = new QSize(toolTabs->size());
 
     // Figure out the appropriate dimensions for the window
     if (file.open(QIODevice::ReadWrite)){

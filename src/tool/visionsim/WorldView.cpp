@@ -5,6 +5,9 @@
 #include "WorldView.h"
 #include <iostream>
 
+namespace tool{
+namespace visionsim{
+
 ///// Constants for Drawing /////
 
 // pixel/cm conversion ratios
@@ -153,4 +156,7 @@ void WorldView::paintEvent(QPaintEvent *event)
                      ROBOT_Y_SIZE-ARROW_DEPTH);
     painter.drawLine(0, ROBOT_Y_SIZE, -ARROW_WIDTH,
                      ROBOT_Y_SIZE-ARROW_DEPTH);
+}
+
+}
 }

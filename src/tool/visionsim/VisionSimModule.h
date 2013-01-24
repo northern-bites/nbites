@@ -4,14 +4,20 @@
 #include "RoboGrams.h"
 #include "World.h"
 #include "Image.h"
+#include "VisionSimGUI.h"
 
 namespace tool{
+
+// Forward declaration for friending
+class Tool;
+
 namespace visionsim{
 
 class VisionSimModule :  public QObject,
                          public portals::Module
 {
     Q_OBJECT;
+    friend class ::tool::Tool;
 
 public:
     VisionSimModule();
@@ -28,6 +34,7 @@ protected:
     World world;
     Image topImage;
     Image bottomImage;
+    VisionSimGUI gui;
 };
 
 }

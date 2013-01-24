@@ -10,7 +10,8 @@ VisionSimModule::VisionSimModule() : QObject(),
                                      Module(),
                                      world(),
                                      topImage(world, TOP),
-                                     bottomImage(world, BOTTOM)
+                                     bottomImage(world, BOTTOM),
+                                     gui()
 {}
 
 void VisionSimModule::updateRobot(float x, float y, float h)

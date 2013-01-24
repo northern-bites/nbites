@@ -1,8 +1,11 @@
 #include "Controls.h"
 #include <QGridLayout>
 #include <QLabel>
-#include "../model/WorldConstants.h"
-#include "../model/ImageConstants.h"
+#include "WorldConstants.h"
+#include "ImageConstants.h"
+
+namespace tool{
+namespace visionsim{
 
 Controls::Controls(QWidget * parent) : QWidget(parent),
                                                robotX(this),
@@ -99,4 +102,7 @@ void Controls::sendHeadInfo()
 void Controls::sendBallInfo()
 {
     emit( ballMoved((float)ballX.value(), (float)ballY.value()));
+}
+
+}
 }

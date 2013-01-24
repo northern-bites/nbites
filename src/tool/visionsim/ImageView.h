@@ -7,11 +7,14 @@
 #include <QWidget>
 #include <QPainter>
 
-#include "../model/ImageConstants.h"
-#include "../model/Image.h"
+#include "ImageConstants.h"
+#include "Image.h"
+
+namespace tool{
+namespace visionsim{
 
 class ImageView : public QWidget {
-Q_OBJECT
+    Q_OBJECT;
 
 public:
     ImageView(Image& i, QWidget* parent = 0);
@@ -26,3 +29,6 @@ protected:
 private:
     Image& image;
 };
+
+}
+}

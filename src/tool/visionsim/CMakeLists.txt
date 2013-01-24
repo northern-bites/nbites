@@ -3,9 +3,18 @@ cmake_minimum_required( VERSION 2.8.3 )
 set( VISION_SIM_SRCS VisionSimModule.cpp
   World.cpp
   Image.cpp
-  VisionCorner.cpp )
+  VisionCorner.cpp
+  ImageView.cpp
+  WorldView.cpp
+  Controls.cpp
+  VisionSimGUI.cpp)
 
-set( VISION_SIM_HEADERS VisionSimModule.h )
+set( VISION_SIM_HEADERS VisionSimModule.h
+  VisionSimGUI.h
+  ImageView.h
+  WorldView.h
+  Controls.h
+  VisionSimGUI.h)
 
 Qt4_wrap_cpp( VISION_SIM_HEADERS_MOC ${VISION_SIM_HEADERS} )
 
