@@ -9,13 +9,7 @@ find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
-# Compiler flags--might not need these, Lizzie?
-
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
-
 # Sources
-
 set( tool_srcs main.cpp
   Tool.cpp
   )
