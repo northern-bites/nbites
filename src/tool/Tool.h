@@ -11,6 +11,8 @@
 #include <QScrollArea>
 #include <QResizeEvent>
 
+#include "RoboGrams.h"
+
 namespace tool {
 
 class Tool : public QMainWindow {
@@ -28,6 +30,8 @@ protected slots:
 protected:
     virtual void keyPressEvent(QKeyEvent * event);
 	void resizeEvent(QResizeEvent*);
+
+    portals::RoboGram mainDiagram;
 
     QTabWidget* toolTabs;
     QToolBar* toolbar;

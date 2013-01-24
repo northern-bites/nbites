@@ -1,13 +1,13 @@
 # Main CMake file for the Tool!
 project( tool )
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required( VERSION 2.8.3 )
 
 # Dependencies
 
-find_package(Qt4 REQUIRED)
+find_package( Qt4 REQUIRED )
 
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
+include( ${QT_USE_FILE} )
+add_definitions( ${QT_DEFINITIONS} )
 
 # Sources
 set( tool_srcs main.cpp
@@ -19,10 +19,11 @@ set( tool_headers
 )
 
 # Compile portals into portals folder
-add_subdirectory(../portals ${CMAKE_CURRENT_BINARY_DIR}/portals)
+add_subdirectory( ../portals ${CMAKE_CURRENT_BINARY_DIR}/portals )
+include_directories( ../portals )
 
 # Qt4 goodness
-Qt4_wrap_cpp(tool_headers_moc ${tool_headers})
+Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 
 # The main executable
 add_executable( ${TOOL_EXECUTABLE}
