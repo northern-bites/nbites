@@ -59,6 +59,12 @@ void ImageView::paintEvent(QPaintEvent* event)
     for (LineVector::iterator i = lines.begin();
          i != lines.end(); i++)
     {
+        // Ignore corners behind the image plane
+        if(i->bothPointsBehind())
+        {
+            continue;
+        }
+
         if (i->green())
         {
             pen.setColor(Qt::darkGreen);
@@ -72,29 +78,10 @@ void ImageView::paintEvent(QPaintEvent* event)
             painter.setPen(pen);
         }
 
-        if((i->getCorner1()->behind() && i->getCorner2()->behind()))
-        {
-            continue;
-        }
-        else if((i->getCorner1()->behind() && !i->getCorner2()->behind()))
-        {
-            painter.drawLine(QLine(i->getIntersection()[X_VALUE],
-                                   i->getIntersection()[Y_VALUE],
-                                   i->getCorner2()->x(),
-                                   i->getCorner2()->y()));
-        }
-        else if((!i->getCorner1()->behind() && i->getCorner2()->behind()))
-        {
-            painter.drawLine(QLine(i->getIntersection()[X_VALUE],
-                                   i->getIntersection()[Y_VALUE],
-                                   i->getCorner1()->x(),
-                                   i->getCorner1()->y()));
-        }
-        else
-        {
-        painter.drawLine(QLine(i->getCorner1()->x(), i->getCorner1()->y(),
-                               i->getCorner2()->x(), i->getCorner2()->y()));
-        }
+        painter.drawLine(QLine(i->point1()[X_VALUE],
+                               i->point1()[Y_VALUE],
+                               i->point2()[X_VALUE],
+                               i->point2()[Y_VALUE]));
     }
 
 }

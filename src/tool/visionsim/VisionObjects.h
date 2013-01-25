@@ -41,14 +41,15 @@ class VisionLine
 public:
     VisionLine(FieldLine which, VisionCorner* cor1, VisionCorner* cor2);
 
-    VisionCorner* getCorner1() { return corner1; }
-    VisionCorner* getCorner2() { return corner2; }
-    ImagePoint& getIntersection() { return intersection; }
     bool green() { return corner1->green(); }
+    bool bothPointsBehind() { return (corner1->behind() && corner2->behind()); }
+    ImagePoint& point1() { return visualPoint1; }
+    ImagePoint& point2() { return visualPoint2; }
 
 private:
     FieldLine concrete;
-    ImagePoint intersection;
+    ImagePoint visualPoint1;
+    ImagePoint visualPoint2;
     VisionCorner* corner1;
     VisionCorner* corner2;
 };

@@ -43,7 +43,7 @@ private:
     Eigen::Vector3f fieldToCameraCoords(Eigen::Vector3f worldPoint);
     Eigen::Vector2i cameraToImageCoords(float x, float y, float z);
     Eigen::Vector2i cameraToImageCoords(Eigen::Vector3f ccPoint);
-    void correctIntercept(VisionLine& line);
+    void fixVisualPoints(VisionLine& line);
 
     bool isInImage(Eigen::Vector2i point);
 
