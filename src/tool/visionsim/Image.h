@@ -35,6 +35,7 @@ private:
     LineVector allLines;
 
     ImagePoint ballCenter;
+    int ballVisualRadius;
 
     // How we determine what's in the image
     void updateCorners();

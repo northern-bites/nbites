@@ -1,6 +1,7 @@
 #include "Image.h"
 #include <vector>
 #include <iostream>
+#include <math.h>
 
 using namespace Eigen;
 
@@ -85,6 +86,14 @@ void Image::updateBall()
                                            world.ballY(),
                                            world.ballZ());
     ballCenter = cameraToImageCoords(ball);
+
+    float ballDistance = sqrt(pow(ball[X_VALUE], 2) +
+                              pow(ball[Y_VALUE], 2) +
+                              pow(ball[Z_VALUE], 2));
+
+    float visualRadius = (((FOCAL_LENGTH_CM/ballDistance)*BALL_RADIUS) *
+                          CM_TO_PIX);
+    ballVisualRadius = int(visualRadius);
 }
 
 bool Image::isInImage(ImagePoint point)

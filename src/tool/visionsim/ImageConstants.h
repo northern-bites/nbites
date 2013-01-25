@@ -23,6 +23,7 @@ static const int TOP_CAMERA_OFFSET      = 1.2f + 90.f;
 static const int BOTTOM_CAMERA_OFFSET   = 39.7f + 90.f;
 static const int FOCAL_LENGTH           = 590.f;
 static const float FOCAL_LENGTH_CM      = 0.02f;
+static const float CM_TO_PIX            = FOCAL_LENGTH/FOCAL_LENGTH_CM;
 
 enum Camera{
     TOP = 0,
