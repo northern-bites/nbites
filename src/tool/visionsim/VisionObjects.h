@@ -1,5 +1,5 @@
 /*
- * Defines a corner actually seen in vision.
+ * Defines objects in the image, ie not in the real world.
  */
 
 #pragma once
@@ -40,6 +40,7 @@ public:
 
     VisionCorner* getCorner1() { return corner1; }
     VisionCorner* getCorner2() { return corner2; }
+    bool green() { return corner1->green(); }
 
 private:
     FieldLine concrete;

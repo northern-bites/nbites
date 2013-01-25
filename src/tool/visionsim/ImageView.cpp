@@ -59,6 +59,19 @@ void ImageView::paintEvent(QPaintEvent* event)
     for (LineVector::iterator i = lines.begin();
          i != lines.end(); i++)
     {
+        if (i->green())
+        {
+            pen.setColor(Qt::darkGreen);
+            pen.setWidth(3);
+            painter.setPen(pen);
+        }
+        else
+        {
+            pen.setColor(Qt::white);
+            pen.setWidth(3);
+            painter.setPen(pen);
+        }
+
         painter.drawLine(QLine(i->getCorner1()->x(), i->getCorner1()->y(),
                                i->getCorner2()->x(), i->getCorner2()->y()));
     }
