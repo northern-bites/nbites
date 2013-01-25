@@ -23,7 +23,6 @@ TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         teamMates[i] = new TeamMember(i+1);
-        std::cout << "TeamMember " << i << " Constructed" << std::endl;
     }
 
     socket = new UDPSocket();
@@ -155,7 +154,7 @@ void TeamConnect::receive(int player, int team)
         playerNumber = verify(&packet[0], player, team);
         if (playerNumber == 0)
             continue;  // Bad Packet.
-
+        std::cout << "Recieved a packet from player: " << playerNumber << std::endl;
 #ifdef DEBUG_COMM
         std::cout << "Recieved a packet from player: " << playerNumber << std::endl;
 #endif

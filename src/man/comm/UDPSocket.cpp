@@ -193,6 +193,12 @@ bool UDPSocket::joinMulticast(const char* addrStr)
                       << " for all interfaces." << std::endl;
             return false;
         }
+        else
+        {
+#ifdef DEBUG_COMM
+            std::cout << "Joined Multicast Address: " << addrStr << std::endl;
+#endif
+        }
         return true;
     }
 
@@ -267,7 +273,9 @@ int UDPSocket::sendToTarget(const char* data, const int len)
     }
     else
     {
+#ifdef DEBUG_COMM
         std::cout << "Sent a packet" << std::endl;
+#endif
     }
 
     return nwritten;
