@@ -34,18 +34,20 @@ private:
 
     LineVector allLines;
 
+    ImagePoint ballCenter;
+
     // How we determine what's in the image
     void updateCorners();
     void updateLines();
+    void updateBall();
 
     // Helper methods
-    Eigen::Vector3f fieldToCameraCoords(int x, int y, int z);
-    Eigen::Vector3f fieldToCameraCoords(Eigen::Vector3f worldPoint);
-    Eigen::Vector2i cameraToImageCoords(float x, float y, float z);
-    Eigen::Vector2i cameraToImageCoords(Eigen::Vector3f ccPoint);
+    CameraPoint fieldToCameraCoords(int x, int y, int z);
+    CameraPoint fieldToCameraCoords(Eigen::Vector3f worldPoint);
+    ImagePoint cameraToImageCoords(float x, float y, float z);
+    ImagePoint cameraToImageCoords(CameraPoint ccPoint);
     void fixVisualPoints(VisionLine& line);
-
-    bool isInImage(Eigen::Vector2i point);
+    bool isInImage(ImagePoint point);
 
     VisionCorner* getCorner(FieldCorner type);
 

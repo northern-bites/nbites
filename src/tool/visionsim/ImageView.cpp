@@ -84,6 +84,10 @@ void ImageView::paintEvent(QPaintEvent* event)
                                i->point2()[Y_VALUE]));
     }
 
+    pen.setColor(ORANGE);
+    pen.setWidth(5);
+    painter.setPen(pen);
+    painter.drawPoint(image.ballCenter[X_VALUE], image.ballCenter[Y_VALUE]);
 }
 
 }

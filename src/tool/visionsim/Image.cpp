@@ -52,6 +52,7 @@ void Image::update()
 {
     updateCorners();
     updateLines();
+    updateBall();
 }
 
 void Image::updateCorners()
@@ -78,7 +79,15 @@ void Image::updateLines()
     }
 }
 
-bool Image::isInImage(Vector2i point)
+void Image::updateBall()
+{
+    CameraPoint ball = fieldToCameraCoords(world.ballX(),
+                                           world.ballY(),
+                                           world.ballZ());
+    ballCenter = cameraToImageCoords(ball);
+}
+
+bool Image::isInImage(ImagePoint point)
 {
     return (point[X_VALUE] <= IMAGE_WIDTH && point[X_VALUE] >= 0 &&
             point[Y_VALUE] <= IMAGE_HEIGHT && point[Y_VALUE] >= 0);
@@ -92,7 +101,7 @@ bool Image::isInImage(Vector2i point)
  * +Y = FORWARD
  * +Z = UP
  */
-Vector3f Image::fieldToCameraCoords(int x, int y, int z)
+CameraPoint Image::fieldToCameraCoords(int x, int y, int z)
 {
    // Establish viewpoint, yaw, pitch matrices based on data
     Matrix4f viewpoint;
@@ -127,11 +136,11 @@ Vector3f Image::fieldToCameraCoords(int x, int y, int z)
 
     Vector4f ccPoint = trans*hPoint;
 
-    return Vector3f(ccPoint[X_VALUE], ccPoint[Y_VALUE], ccPoint[Z_VALUE]);
+    return CameraPoint(ccPoint[X_VALUE], ccPoint[Y_VALUE], ccPoint[Z_VALUE]);
 }
 
 // Overload for flexibility
-Vector3f Image::fieldToCameraCoords(Vector3f worldPoint)
+CameraPoint Image::fieldToCameraCoords(Vector3f worldPoint)
 {
     return fieldToCameraCoords(worldPoint[X_VALUE],
                                worldPoint[Y_VALUE],
@@ -140,7 +149,7 @@ Vector3f Image::fieldToCameraCoords(Vector3f worldPoint)
 
 // Takes a point (x, y, z) from the camera coordinate system and projects
 // it onto the image plane
-Vector2i Image::cameraToImageCoords(float x, float y, float z)
+ImagePoint Image::cameraToImageCoords(float x, float y, float z)
 {
     int px = ERROR;
     int py = ERROR;
@@ -159,12 +168,12 @@ Vector2i Image::cameraToImageCoords(float x, float y, float z)
     px = px + (0.5f*IMAGE_WIDTH);
     py = py + (0.5f*IMAGE_HEIGHT);
 
-    return Vector2i(px, py);
+    return ImagePoint(px, py);
 }
 
 // Overloaded function that takes a Point3D instead of three floats and
 // projects the point onto the image plane
-Vector2i Image::cameraToImageCoords(Vector3f ccPoint)
+ImagePoint Image::cameraToImageCoords(CameraPoint ccPoint)
 {
     return cameraToImageCoords(ccPoint[X_VALUE],
                                ccPoint[Y_VALUE],
@@ -194,7 +203,7 @@ void Image::fixVisualPoints(VisionLine& line)
     CameraPoint la = line.corner1->cameraCoordinates;
     CameraPoint lb = line.corner2->cameraCoordinates;
 
-    Vector3f intersection3D;
+    CameraPoint intersection3D;
     intersection3D = (((FOCAL_LENGTH_CM - la[Z_VALUE]) /
                      (lb[Z_VALUE] - la[Z_VALUE]))*(lb-la)) + la;
 
