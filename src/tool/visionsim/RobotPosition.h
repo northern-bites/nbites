@@ -1,5 +1,10 @@
 /*
- * Describes the robot's location and head position.
+ * @class RobotPosition
+ *
+ * Describes the robot's location and head position; very simple storage
+ * class.
+ *
+ * @author Lizzie Mamantov
  */
 
 #pragma once
@@ -18,7 +23,6 @@ public:
     void setX(float xn) { x = xn; }
     void setY(float yn) { y = yn; }
     void setH(float hn) { h = hn; }
-
     float getX() { return x; }
     float getY() { return y; }
     float getH() { return h; }

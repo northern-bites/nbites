@@ -1,5 +1,11 @@
 /**
- * Widget for drawing the state of the world.
+ * @class WorldView
+ *
+ * Widget for drawing the state of the world. Draws an overhead view of the
+ * field based on the world model it contains. Can draw lines, posts, the
+ * ball (movable) and the robot (movable).
+ *
+ * @author Lizzie Mamantov
  */
 
 #pragma once
@@ -22,10 +28,12 @@ public:
     WorldView(World& state);
     ~WorldView() {};
 
+    // Keeps the widget the right size
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
 protected:
+    // Handles all of the drawing
     void paintEvent(QPaintEvent* event);
 
 private:

@@ -1,18 +1,24 @@
 #include "ImageView.h"
-#include <iostream>
 
 namespace tool{
 namespace visionsim{
 
-// For drawing the ball!
+// For drawing the ball! Qt's orange is pathetic.
 static const QColor ORANGE(255, 127, 0);
 
+/*
+ * @param i -- the image instance we will get all of the object info from
+ */
 ImageView::ImageView(Image& i, QWidget* parent) :
     QWidget(parent),
     image(i)
 {
 }
 
+/*
+ * Overrode the following two messages so that the images are always shown
+ * full-size.
+ */
 QSize ImageView::minimumSizeHint() const
 {
     return QSize(IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -23,20 +29,26 @@ QSize ImageView::sizeHint() const
     return QSize(IMAGE_WIDTH, IMAGE_HEIGHT);
 }
 
+/*
+ * Handles all of the redrawing of objects when a PaintEvent happens, ie
+ * when the view is told to update.
+ */
 void ImageView::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
 
+    // Gray background
     painter.fillRect(0, 0, IMAGE_WIDTH,
                      IMAGE_HEIGHT, Qt::darkGray);
 
     QPen pen(Qt::white);
 
-    // Draw locations of visible corners
+    // Draw locations of visible corners with dots
     CornerVector visible = image.visibleCorners;
     for (CornerVector::iterator i = visible.begin();
          i != visible.end(); i++)
     {
+        // Make sure we're drawing the corners the right color
         if (i->green())
         {
             pen.setColor(Qt::darkGreen);
@@ -65,6 +77,7 @@ void ImageView::paintEvent(QPaintEvent* event)
             continue;
         }
 
+        // Make sure we're drawing the corners the right color
         if (i->green())
         {
             pen.setColor(Qt::darkGreen);
@@ -84,6 +97,8 @@ void ImageView::paintEvent(QPaintEvent* event)
                                i->point2()[Y_VALUE]));
     }
 
+    // If the ball is not behind the image plane, ie not back-projecting,
+    // draw it as well
     if (!image.ball.behind())
     {
         pen.setColor(ORANGE);
@@ -96,6 +111,7 @@ void ImageView::paintEvent(QPaintEvent* event)
                             image.ball.getVisualRadius());
     }
 
+    // Finally, draw the posts as yellow rectangles
     pen.setColor(Qt::yellow);
     pen.setWidth(1);
     painter.setPen(pen);

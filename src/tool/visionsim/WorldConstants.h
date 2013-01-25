@@ -1,5 +1,7 @@
 /**
  * Constants specifying field size, object size, robot motion constraints.
+ *
+ * @author Lizzie Mamantov
  */
 
 #pragma once

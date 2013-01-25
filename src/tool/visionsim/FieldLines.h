@@ -1,5 +1,8 @@
 /*
- * Defines concrete field lines.
+ * Defines concrete field lines by specifying which concrete corners make
+ * up each line, which gives us where each line is located on the field.
+ *
+ * @author Lizzie Mamantov
  */
 
 #pragma once
@@ -9,13 +12,14 @@
 namespace tool{
 namespace visionsim{
 
+// A FieldLine just contains its two corners--nothing fancy
 struct FieldLine
 {
     FieldCorner corner1;
     FieldCorner corner2;
 };
 
-// About lines
+// About lines--how many of each type
 static const int NUM_GREEN_LINES = 4;
 static const int NUM_FIELD_LINES = 11;
 static const int NUM_LINES = 15;
@@ -67,26 +71,8 @@ static const FieldLine RIGHT_BOX_FRONT = {TOP_RIGHT_GOALBOX_L,
 static const FieldLine CENTER_LINE = {TOP_CENTER_T,
                                       BOTTOM_CENTER_T};
 
-// Helpful arrays
-static const FieldLine GREEN_LINES[NUM_GREEN_LINES] =
-{ BOTTOM_GREEN,
-  TOP_GREEN,
-  LEFT_GREEN,
-  RIGHT_GREEN };
-
-static const FieldLine FIELD_LINES[NUM_FIELD_LINES] =
-{ TOP_SIDELINE,
-  BOTTOM_SIDELINE,
-  LEFT_ENDLINE,
-  RIGHT_ENDLINE,
-  LEFT_BOX_TOP,
-  LEFT_BOX_BOTTOM,
-  LEFT_BOX_FRONT,
-  RIGHT_BOX_TOP,
-  RIGHT_BOX_BOTTOM,
-  RIGHT_BOX_FRONT,
-  CENTER_LINE };
-
+// Helpful array for constructing visual lines.
+// @see Image constructor
 static const FieldLine ALL_LINES[NUM_LINES] =
 { BOTTOM_GREEN,
   TOP_GREEN,

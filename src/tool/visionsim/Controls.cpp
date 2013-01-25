@@ -16,7 +16,15 @@ Controls::Controls(QWidget * parent) : QWidget(parent),
                                                ballX(this),
                                                ballY(this)
 {
+    // Grid Layout organizes the spin boxes nicely
     QGridLayout* layout = new QGridLayout(this);
+
+    /*
+     * The min/max values come from the constant files constraining
+     * the world.
+     * @see WorldConstants.h
+     * @see ImageConstants.h
+     */
 
     // Robot X
     QLabel* xLabel = new QLabel(tr("Robot X"));
@@ -87,6 +95,9 @@ Controls::Controls(QWidget * parent) : QWidget(parent),
 
     this->setLayout(layout);
 }
+
+// These slots send the current values of the spin boxes to the model
+// by emitting the appropriate signal
 
 void Controls::sendRobotInfo()
 {

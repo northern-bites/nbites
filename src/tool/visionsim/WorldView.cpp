@@ -10,7 +10,7 @@ namespace visionsim{
 
 ///// Constants for Drawing /////
 
-// pixel/cm conversion ratios
+// pixel/cm conversion ratios; can be used to draw the field smaller/bigger
 static const float WIDTH_RATIO = 1.0f;
 static const float HEIGHT_RATIO = WIDTH_RATIO;
 
@@ -37,6 +37,7 @@ WorldView::WorldView(World& state) : world(state)
 {
 }
 
+// The following two methods keep Qt from resizing this widget
 QSize WorldView::minimumSizeHint() const
 {
     return QSize(WIDTH, HEIGHT);
@@ -47,6 +48,7 @@ QSize WorldView::sizeHint() const
     return QSize(WIDTH, HEIGHT);
 }
 
+// Handles all of the drawing when an update is requested
 void WorldView::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -85,7 +87,7 @@ void WorldView::paintEvent(QPaintEvent *event)
                         CENTER_CIRCLE_DIAM,
                         CENTER_CIRCLE_DIAM);
 
-    // // Cross
+    // // Cross -- should put this back in!
     // painter.drawLine(convertCoords(CENTER_GOAL_X-CROSS_ARM, CROSS_Y),
     //                  convertCoords(CENTER_GOAL_X+CROSS_ARM, CROSS_Y));
     // painter.drawLine(convertCoords(CENTER_GOAL_X, CROSS_Y-CROSS_ARM),
@@ -140,15 +142,15 @@ void WorldView::paintEvent(QPaintEvent *event)
     painter.setPen(pen);
     painter.setBrush(Qt::darkGray);
 
-    // To get the right orientation for the goalie ellipse, translates
-    // coordinate system to center of the goalie and rotates before
+    // To get the right orientation for the robot ellipse, translates
+    // coordinate system to center of the robot and rotates before
     // drawing
     painter.translate(world.robotX(), world.robotY());
     painter.rotate(-world.robotH());
     painter.drawEllipse(-(0.5*ROBOT_X_SIZE), -(0.5*ROBOT_Y_SIZE),
                         ROBOT_X_SIZE, ROBOT_Y_SIZE);
 
-    // Arrow specifies direction the goalie is facing
+    // Arrow specifies direction the robot is facing
     pen.setColor(Qt::darkBlue);
     painter.setPen(pen);
     painter.drawLine(0, ARROW_START, 0, ROBOT_Y_SIZE);
