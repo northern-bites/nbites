@@ -51,6 +51,7 @@ VisionCorner* Image::getCorner(FieldCorner type)
 void Image::update()
 {
     updateCorners();
+    updateLines();
 }
 
 void Image::updateCorners()
@@ -66,6 +67,14 @@ void Image::updateCorners()
 
         if (isInImage(allCorners[i].imageCoordinates))
             visibleCorners.push_back(allCorners[i]);
+    }
+}
+
+void Image::updateLines()
+{
+    for(int i = 0; i < NUM_LINES; i++)
+    {
+        correctIntercept(allLines[i]);
     }
 }
 
@@ -160,6 +169,30 @@ Vector2i Image::cameraToImageCoords(Vector3f ccPoint)
     return cameraToImageCoords(ccPoint[X_VALUE],
                                ccPoint[Y_VALUE],
                                ccPoint[Z_VALUE]);
+}
+
+// Given a line, determines where it intercepts the plane of the image
+// so that it can be drawn correctly
+void Image::correctIntercept(VisionLine& line)
+{
+    // If the intersection value isn't needed this frame
+    line.intersection = ImagePoint(ERROR, ERROR);
+
+    // Neither/both corners behind, don't need to do anything
+    if ((line.corner1->behind() && line.corner2->behind()) ||
+        (!line.corner1->behind() && !line.corner2->behind()))
+    {
+        return;
+    }
+
+    CameraPoint la = line.corner1->cameraCoordinates;
+    CameraPoint lb = line.corner2->cameraCoordinates;
+
+    Vector3f intersection3D;
+    intersection3D = (((FOCAL_LENGTH_CM - la[Z_VALUE]) /
+                     (lb[Z_VALUE] - la[Z_VALUE]))*(lb-la)) + la;
+
+    line.intersection = cameraToImageCoords(intersection3D);
 }
 
 }

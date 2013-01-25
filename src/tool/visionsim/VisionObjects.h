@@ -10,6 +10,9 @@
 namespace tool{
 namespace visionsim{
 
+// Forward declaration for friending
+class Image;
+
 typedef Eigen::Vector3f CameraPoint;
 typedef Eigen::Vector2i ImagePoint;
 
@@ -40,10 +43,12 @@ public:
 
     VisionCorner* getCorner1() { return corner1; }
     VisionCorner* getCorner2() { return corner2; }
+    ImagePoint& getIntersection() { return intersection; }
     bool green() { return corner1->green(); }
 
 private:
     FieldLine concrete;
+    ImagePoint intersection;
     VisionCorner* corner1;
     VisionCorner* corner2;
 };

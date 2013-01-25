@@ -72,8 +72,29 @@ void ImageView::paintEvent(QPaintEvent* event)
             painter.setPen(pen);
         }
 
+        if((i->getCorner1()->behind() && i->getCorner2()->behind()))
+        {
+            continue;
+        }
+        else if((i->getCorner1()->behind() && !i->getCorner2()->behind()))
+        {
+            painter.drawLine(QLine(i->getIntersection()[X_VALUE],
+                                   i->getIntersection()[Y_VALUE],
+                                   i->getCorner2()->x(),
+                                   i->getCorner2()->y()));
+        }
+        else if((!i->getCorner1()->behind() && i->getCorner2()->behind()))
+        {
+            painter.drawLine(QLine(i->getIntersection()[X_VALUE],
+                                   i->getIntersection()[Y_VALUE],
+                                   i->getCorner1()->x(),
+                                   i->getCorner1()->y()));
+        }
+        else
+        {
         painter.drawLine(QLine(i->getCorner1()->x(), i->getCorner1()->y(),
                                i->getCorner2()->x(), i->getCorner2()->y()));
+        }
     }
 
 }
