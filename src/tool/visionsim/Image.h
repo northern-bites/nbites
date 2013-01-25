@@ -16,6 +16,7 @@ namespace visionsim{
 static const int ERROR = -9999;
 typedef std::vector<VisionCorner> CornerVector;
 typedef std::vector<VisionLine> LineVector;
+typedef std::vector<VisionPost> PostVector;
 
 class Image {
 public:
@@ -37,10 +38,13 @@ private:
     ImagePoint ballCenter;
     int ballVisualRadius;
 
+    PostVector allPosts;
+
     // How we determine what's in the image
     void updateCorners();
     void updateLines();
     void updateBall();
+    void updatePosts();
 
     // Helper methods
     CameraPoint fieldToCameraCoords(int x, int y, int z);

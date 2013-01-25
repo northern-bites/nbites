@@ -92,6 +92,23 @@ void ImageView::paintEvent(QPaintEvent* event)
                                image.ballCenter[Y_VALUE]),
                         image.ballVisualRadius,
                         image.ballVisualRadius);
+
+    pen.setColor(Qt::yellow);
+    pen.setWidth(1);
+    painter.setPen(pen);
+    painter.setBrush(Qt::yellow);
+
+    PostVector posts = image.allPosts;
+    for (PostVector::iterator i = posts.begin();
+         i != posts.end(); i++)
+    {
+        if (i->behind()) continue;
+        painter.drawRect(QRect(QPoint(i->x(),
+                                      i->y()),
+                               QSize(i->getVisualWidth(),
+                                     i->getVisualHeight())));
+    }
+
 }
 
 }

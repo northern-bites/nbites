@@ -42,6 +42,7 @@ static const float CENTER_CIRCLE_RAD     = CENTER_CIRCLE_DIAM * 0.5f;
 static const float CROSS_WIDTH           = 10.f;
 
 static const float GOALPOST_WIDTH        = 10.f;
+static const float GOALPOST_HEIGHT       = 80.f;
 static const float GOAL_DEPTH            = 40.0f;
 
 // useful x and y values

@@ -36,6 +36,12 @@ Image::Image(World& state, Camera which) : world(state),
                                       getCorner(ALL_LINES[i].corner1),
                                       getCorner(ALL_LINES[i].corner2)));
     }
+
+    // Set up a post vector
+    for(int i = 0; i < NUM_POSTS; i++)
+    {
+        allPosts.push_back(VisionPost(ALL_POSTS[i]));
+    }
 }
 
 VisionCorner* Image::getCorner(FieldCorner type)
@@ -54,6 +60,7 @@ void Image::update()
     updateCorners();
     updateLines();
     updateBall();
+    updatePosts();
 }
 
 void Image::updateCorners()
@@ -63,7 +70,7 @@ void Image::updateCorners()
     for(int i = 0; i < NUM_CORNERS; i++)
     {
         allCorners[i].cameraCoordinates =
-            fieldToCameraCoords(ALL_CORNERS[i]);
+            fieldToCameraCoords(allCorners[i].concrete);
         allCorners[i].imageCoordinates =
             cameraToImageCoords(allCorners[i].cameraCoordinates);
 
@@ -94,6 +101,31 @@ void Image::updateBall()
     float visualRadius = (((FOCAL_LENGTH_CM/ballDistance)*BALL_RADIUS) *
                           CM_TO_PIX);
     ballVisualRadius = int(visualRadius);
+}
+
+void Image::updatePosts()
+{
+    for(int i = 0; i < NUM_POSTS; i++)
+    {
+        CameraPoint bottomPt = fieldToCameraCoords(allPosts[i].concrete);
+        CameraPoint topPt(bottomPt[X_VALUE] - (0.5*GOALPOST_WIDTH),
+                          bottomPt[Y_VALUE] - GOALPOST_HEIGHT,
+                          bottomPt[Z_VALUE]);
+
+        allPosts[i].topLeftCorner = cameraToImageCoords(topPt);
+        allPosts[i].bottomPoint = cameraToImageCoords(bottomPt);
+        allPosts[i].cameraCoordinates = bottomPt;
+
+        float postDistance = sqrt(pow(bottomPt[X_VALUE], 2) +
+                                  pow(bottomPt[Y_VALUE], 2) +
+                                  pow(bottomPt[Z_VALUE], 2));
+
+        allPosts[i].visualWidth = (((FOCAL_LENGTH_CM/postDistance) *
+                                    GOALPOST_WIDTH) * CM_TO_PIX);
+
+        allPosts[i].visualHeight = (((FOCAL_LENGTH_CM/postDistance) *
+                               GOALPOST_HEIGHT) * CM_TO_PIX);
+    }
 }
 
 bool Image::isInImage(ImagePoint point)

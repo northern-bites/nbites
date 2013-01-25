@@ -6,6 +6,7 @@
 
 #include "FieldCorners.h"
 #include "FieldLines.h"
+#include "Posts.h"
 
 namespace tool{
 namespace visionsim{
@@ -52,6 +53,28 @@ private:
     ImagePoint visualPoint2;
     VisionCorner* corner1;
     VisionCorner* corner2;
+};
+
+class VisionPost
+{
+    friend class Image;
+
+public:
+    VisionPost(FieldPost which);
+
+    int x() { return topLeftCorner[X_VALUE]; }
+    int y() { return topLeftCorner[Y_VALUE]; }
+    int getVisualWidth() { return visualWidth; }
+    int getVisualHeight() { return visualHeight; }
+    bool behind() { return cameraCoordinates[Z_VALUE] < 0; }
+
+private:
+    FieldPost concrete;
+    ImagePoint topLeftCorner;
+    ImagePoint bottomPoint;
+    CameraPoint cameraCoordinates;
+    int visualWidth;
+    int visualHeight;
 };
 
 }

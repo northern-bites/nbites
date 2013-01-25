@@ -1,11 +1,11 @@
 #include "VisionObjects.h"
+#include <iostream>
 
 namespace tool{
 namespace visionsim{
 
 VisionCorner::VisionCorner(FieldCorner which) : concrete(which)
-{
-}
+{}
 
 bool VisionCorner::green()
 {
@@ -21,6 +21,10 @@ VisionLine::VisionLine(FieldLine which,
                                              corner1(cor1),
                                              corner2(cor2)
 {}
+
+VisionPost::VisionPost(FieldPost which) : concrete(which)
+{
+}
 
 }
 }

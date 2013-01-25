@@ -9,7 +9,8 @@
 namespace tool{
 namespace visionsim{
 
-struct FieldLine {
+struct FieldLine
+{
     FieldCorner corner1;
     FieldCorner corner2;
 };
