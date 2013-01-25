@@ -5,30 +5,35 @@
 namespace tool{
 namespace visionsim{
 
-VisionSimGUI::VisionSimGUI(QWidget* parent) : QWidget(parent),
-                                          controls(this)
+VisionSimGUI::VisionSimGUI(Image& top, Image& bottom, World& world,
+                           QWidget* parent) :
+    QWidget(parent),
+    topImageView(top),
+    bottomImageView(bottom),
+    worldView(world),
+    controls(this)
 {
-    // // For the two images
-    // QWidget* imagesView = new QWidget(this);
-    // QVBoxLayout* imagesLayout = new QVBoxLayout(imagesView);
+    // For the two images
+    QWidget* imagesView = new QWidget(this);
+    QVBoxLayout* imagesLayout = new QVBoxLayout(imagesView);
 
-    // QWidget* topContainer = new QWidget(this);
-    // topContainer->setMinimumSize(IMAGE_WIDTH, IMAGE_HEIGHT);
-    // topImageView.setParent(topContainer);
+    QWidget* topContainer = new QWidget(this);
+    topContainer->setMinimumSize(IMAGE_WIDTH, IMAGE_HEIGHT);
+    topImageView.setParent(topContainer);
 
-    // QWidget* bottomContainer = new QWidget(this);
-    // bottomContainer->setMinimumSize(IMAGE_WIDTH, IMAGE_HEIGHT);
-    // bottomImageView.setParent(bottomContainer);
+    QWidget* bottomContainer = new QWidget(this);
+    bottomContainer->setMinimumSize(IMAGE_WIDTH, IMAGE_HEIGHT);
+    bottomImageView.setParent(bottomContainer);
 
-    // QLabel* topLabel = new QLabel(tr("Top Image"));
-    // QLabel* bottomLabel = new QLabel(tr("Bottom Image"));
+    QLabel* topLabel = new QLabel(tr("Top Image"));
+    QLabel* bottomLabel = new QLabel(tr("Bottom Image"));
 
-    // imagesLayout->addWidget(topLabel);
-    // imagesLayout->addWidget(topContainer);
-    // imagesLayout->addWidget(bottomLabel);
-    // imagesLayout->addWidget(bottomContainer);
+    imagesLayout->addWidget(topLabel);
+    imagesLayout->addWidget(topContainer);
+    imagesLayout->addWidget(bottomLabel);
+    imagesLayout->addWidget(bottomContainer);
 
-    // imagesView->setLayout(imagesLayout);
+    imagesView->setLayout(imagesLayout);
 
     // For the world view and controls
     QWidget* worldControlView = new QWidget(this);
@@ -36,23 +41,23 @@ VisionSimGUI::VisionSimGUI(QWidget* parent) : QWidget(parent),
 
     QLabel* worldLabel = new QLabel(tr("World State"));
     worldControlLayout->addWidget(worldLabel);
-    //worldControlLayout->addWidget(&worldView);
+    worldControlLayout->addWidget(&worldView);
     worldControlLayout->addWidget(&controls);
 
     worldControlView->setLayout(worldControlLayout);
 
     // Combines them into the main layout
     QHBoxLayout* mainLayout = new QHBoxLayout(this);
-    //mainLayout->addWidget(imagesView);
+    mainLayout->addWidget(imagesView);
     mainLayout->addWidget(worldControlView);
     this->setLayout(mainLayout);
 }
 
 void VisionSimGUI::updateView()
 {
-    // topImageView.repaint();
-    // bottomImageView.repaint();
-    // worldView.repaint();
+    topImageView.repaint();
+    bottomImageView.repaint();
+    worldView.repaint();
 }
 
 }

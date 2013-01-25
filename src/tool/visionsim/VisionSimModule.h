@@ -28,7 +28,11 @@ public slots:
     void updateHead(float yaw, float pitch);
     void updateBall(float x, float y);
 
+signals:
+    void modelChanged();
+
 protected:
+    void updateImages();
     virtual void run_();
 
     World world;
