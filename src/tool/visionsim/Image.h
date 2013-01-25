@@ -35,8 +35,7 @@ private:
 
     LineVector allLines;
 
-    ImagePoint ballCenter;
-    int ballVisualRadius;
+    VisionBall ball;
 
     PostVector allPosts;
 

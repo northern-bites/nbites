@@ -89,18 +89,18 @@ void Image::updateLines()
 
 void Image::updateBall()
 {
-    CameraPoint ball = fieldToCameraCoords(world.ballX(),
-                                           world.ballY(),
-                                           world.ballZ());
-    ballCenter = cameraToImageCoords(ball);
+    ball.cameraCoordinates = fieldToCameraCoords(world.ballX(),
+                                                 world.ballY(),
+                                                 world.ballZ());
+    ball.center = cameraToImageCoords(ball.cameraCoordinates);
 
-    float ballDistance = sqrt(pow(ball[X_VALUE], 2) +
-                              pow(ball[Y_VALUE], 2) +
-                              pow(ball[Z_VALUE], 2));
+    float ballDistance = sqrt(pow(ball.cameraCoordinates[X_VALUE], 2) +
+                              pow(ball.cameraCoordinates[Y_VALUE], 2) +
+                              pow(ball.cameraCoordinates[Z_VALUE], 2));
 
     float visualRadius = (((FOCAL_LENGTH_CM/ballDistance)*BALL_RADIUS) *
                           CM_TO_PIX);
-    ballVisualRadius = int(visualRadius);
+    ball.visualRadius = int(visualRadius);
 }
 
 void Image::updatePosts()

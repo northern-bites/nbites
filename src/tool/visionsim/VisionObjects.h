@@ -77,5 +77,21 @@ private:
     int visualHeight;
 };
 
+class VisionBall
+{
+    friend class Image;
+
+public:
+    int x() { return center[X_VALUE]; }
+    int y() { return center[Y_VALUE]; }
+    int getVisualRadius() { return visualRadius; }
+    bool behind() { return cameraCoordinates[Z_VALUE] < 0; }
+
+private:
+    ImagePoint center;
+    CameraPoint cameraCoordinates;
+    int visualRadius;
+};
+
 }
 }

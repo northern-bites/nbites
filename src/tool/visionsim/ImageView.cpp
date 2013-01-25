@@ -84,14 +84,17 @@ void ImageView::paintEvent(QPaintEvent* event)
                                i->point2()[Y_VALUE]));
     }
 
-    pen.setColor(ORANGE);
-    pen.setWidth(1);
-    painter.setPen(pen);
-    painter.setBrush(ORANGE);
-    painter.drawEllipse(QPoint(image.ballCenter[X_VALUE],
-                               image.ballCenter[Y_VALUE]),
-                        image.ballVisualRadius,
-                        image.ballVisualRadius);
+    if (!image.ball.behind())
+    {
+        pen.setColor(ORANGE);
+        pen.setWidth(1);
+        painter.setPen(pen);
+        painter.setBrush(ORANGE);
+        painter.drawEllipse(QPoint(image.ball.x(),
+                                   image.ball.y()),
+                            image.ball.getVisualRadius(),
+                            image.ball.getVisualRadius());
+    }
 
     pen.setColor(Qt::yellow);
     pen.setWidth(1);
