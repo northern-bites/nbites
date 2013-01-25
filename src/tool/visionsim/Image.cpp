@@ -27,6 +27,25 @@ Image::Image(World& state, Camera which) : world(state),
     {
         allCorners.push_back(VisionCorner(ALL_CORNERS[i]));
     }
+
+    // Set up a line vector
+    for(int i = 0; i < NUM_LINES; i++)
+    {
+        allLines.push_back(VisionLine(ALL_LINES[i],
+                                      getCorner(ALL_LINES[i].corner1),
+                                      getCorner(ALL_LINES[i].corner2)));
+    }
+}
+
+VisionCorner* Image::getCorner(FieldCorner type)
+{
+    for(int i = 0; i < NUM_CORNERS; i++)
+    {
+        if (allCorners[i].concrete == type) return &allCorners[i];
+    }
+
+    std::cout << "WARNING: Invalid corner type requested." << std::endl;
+    return &allCorners[0];
 }
 
 void Image::update()

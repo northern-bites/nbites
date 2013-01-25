@@ -1,4 +1,4 @@
-#include "VisionCorner.h"
+#include "VisionObjects.h"
 
 namespace tool{
 namespace visionsim{
@@ -14,6 +14,13 @@ bool VisionCorner::green()
             concrete == BOTTOM_RIGHT_GREEN ||
             concrete == TOP_RIGHT_GREEN);
 }
+
+VisionLine::VisionLine(FieldLine which,
+                       VisionCorner* cor1,
+                       VisionCorner* cor2) : concrete(which),
+                                             corner1(cor1),
+                                             corner2(cor2)
+{}
 
 }
 }

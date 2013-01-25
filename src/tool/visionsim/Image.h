@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "VisionCorner.h"
+#include "VisionObjects.h"
 #include "World.h"
 #include "ImageConstants.h"
 #include <Eigen/Dense>
@@ -15,6 +15,7 @@ namespace visionsim{
 
 static const int ERROR = -9999;
 typedef std::vector<VisionCorner> CornerVector;
+typedef std::vector<VisionLine> LineVector;
 
 class Image {
 public:
@@ -31,6 +32,8 @@ private:
     CornerVector visibleCorners;
     CornerVector allCorners;
 
+    LineVector allLines;
+
     // How we determine what's in the image
     void updateCorners();
 
@@ -41,6 +44,8 @@ private:
     Eigen::Vector2i cameraToImageCoords(Eigen::Vector3f ccPoint);
 
     bool isInImage(Eigen::Vector2i point);
+
+    VisionCorner* getCorner(FieldCorner type);
 
     // Things we need to know for the transformations
     World& world;

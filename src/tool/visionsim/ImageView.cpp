@@ -1,4 +1,5 @@
 #include "ImageView.h"
+#include <iostream>
 
 namespace tool{
 namespace visionsim{
@@ -52,6 +53,16 @@ void ImageView::paintEvent(QPaintEvent* event)
         if (!i->behind())
             painter.drawPoint(i->x(), i->y());
     }
+
+    // Draw locations of lines
+    LineVector lines = image.allLines;
+    for (LineVector::iterator i = lines.begin();
+         i != lines.end(); i++)
+    {
+        painter.drawLine(QLine(i->getCorner1()->x(), i->getCorner1()->y(),
+                               i->getCorner2()->x(), i->getCorner2()->y()));
+    }
+
 }
 
 }

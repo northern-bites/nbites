@@ -3,7 +3,7 @@ cmake_minimum_required( VERSION 2.8.3 )
 set( VISION_SIM_SRCS VisionSimModule.cpp
   World.cpp
   Image.cpp
-  VisionCorner.cpp
+  VisionObjects.cpp
   ImageView.cpp
   WorldView.cpp
   Controls.cpp
