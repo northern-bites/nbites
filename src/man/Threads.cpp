@@ -1,4 +1,5 @@
 #include "Threads.h"
+#include "RobotConfig.h"
 
 namespace man {
 
@@ -16,9 +17,6 @@ CognitionThread::CognitionThread() : Thread("cognition"),
 
 void CognitionThread::run()
 {
-//    synchro::Thread::running = true;
-//    synchro::Thread::trigger->on();
-
     while (Thread::running)
     {
         cognitionDiagram.run();
@@ -29,16 +27,13 @@ void CognitionThread::run()
 
 CommThread::CommThread() : Thread("comm"),
                            commDiagram(),
-                           comm()
+                           comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
 {
     commDiagram.addModule(comm);
 }
 
 void CommThread::run()
 {
-//    synchro::Thread::running = true;
-//    synchro::Thread::trigger->on();
-
     while (Thread::running)
     {
         commDiagram.run();

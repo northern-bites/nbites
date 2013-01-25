@@ -21,14 +21,13 @@ namespace man {
 
 namespace comm {
 
-GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m)
-    : _timer(t), _monitor(m)
+GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m, int team, int player)
+    : _timer(t), _monitor(m), _myTeamNumber(team)
 {
     _socket = new UDPSocket();
     setUpSocket();
 
-    _data   = new GameData(101, 2); // Will be set for real soon
-    std::cout << "GameConnect Contstructed" << std::endl;
+    _data   = new GameData(team, player);
 }
 
 GameConnect::~GameConnect()

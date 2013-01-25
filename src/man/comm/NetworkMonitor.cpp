@@ -43,8 +43,6 @@ NetworkMonitor::NetworkMonitor(long long time)
        latencyPeak(0), sentWarning(false), lastOutput(time)
 {
     Reset();
-
-    std::cout << "Monitor Constructed" << std::endl;
 }
 
 NetworkMonitor::~NetworkMonitor()

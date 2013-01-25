@@ -35,15 +35,14 @@ namespace man {
 
 namespace comm {
 
-CommModule::CommModule()
+CommModule::CommModule(int team, int player) :
+    _myPlayerNumber(player)
 {
     timer = new CommTimer(&monotonic_micro_time);
     monitor = new NetworkMonitor(timer->timestamp());
 
     teamConnect = new TeamConnect(timer, monitor);
-    gameConnect = new GameConnect(timer, monitor);
-
-    std::cout << "Comm Constructed" << std::endl;
+    gameConnect = new GameConnect(timer, monitor, team, player);
 }
 
 CommModule::~CommModule()
@@ -70,7 +69,9 @@ void CommModule::run_()
     monitor->logOutput(timer->timestamp());
 
     if (timer->timeToSend() && myPlayerNumber() > 0)
+    {
         send();
+    }
 
     PROF_EXIT(P_COMM);
 }

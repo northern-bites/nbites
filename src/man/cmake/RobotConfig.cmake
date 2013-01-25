@@ -2,10 +2,16 @@
 
 cmake_minimum_required( VERSION 2.8.3 )
 
-set( @ROBOT_NAME@
-  "river"
+set( @PLAYER_NUMBER@ )
+  "2"
   CACHE STRING
-  "The name of the robot."
+  "The player number for the robot."
+)
+
+set( @TEAM_NUMBER@ )
+  "16"
+  CACHE STRING
+  "The team number for the robot."
 )
 
 set( @REMOTE_ADDRESS@
@@ -13,8 +19,10 @@ set( @REMOTE_ADDRESS@
   CACHE STRING
   "The address to which the code will be installed."
 )
-# So that upload.sh can be configured
+# So that files can be configured
 set( REMOTE_ADDRESS ${@REMOTE_ADDRESS@})
+set( PLAYER_NUMBER ${@PLAYER_NUMBER@})
+set( TEAM_NUMBER ${@TEAM_NUMBER@})
 
 set( INSTALL_LOCATION
   "nbites/"

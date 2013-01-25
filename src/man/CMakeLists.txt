@@ -10,11 +10,18 @@ include( cmake/Advanced.cmake )
 # Compiler flags
 include( cmake/Flags.cmake )
 
+# Configure the robot options
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/RobotConfig.in"
+  "${PROJECT_BINARY_DIR}/RobotConfig.h"
+)
+
 # Configure the debug options
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/DebugConfig.in"
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
+
 include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off

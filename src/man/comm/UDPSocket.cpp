@@ -28,12 +28,11 @@ namespace comm {
 UDPSocket::UDPSocket()
 {
     sock = socket(AF_INET, SOCK_DGRAM, 0);
-    target = (struct sockaddr*)(new struct sockaddr_in);
 
     if (sock == -1)
         std::cerr << "\nError Constructing UDPSocket!" << std::endl;
 
-    std::cout << "Socket Constructed" << std::endl;
+    target = (struct sockaddr*)(new struct sockaddr_in);
 }
 
 UDPSocket::~UDPSocket()
@@ -260,6 +259,7 @@ int UDPSocket::sendToTarget(const char* data, const int len)
     ssize_t nwritten;
 
     nwritten = ::sendto(sock, data, len, 0, target, sizeof(*target));
+
     if (nwritten < 0)
     {
         std::cerr << "UDPSocket::sendToTarget() failed: "

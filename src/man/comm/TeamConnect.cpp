@@ -28,8 +28,6 @@ TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
 
     socket = new UDPSocket();
     setUpSocket();
-
-    std::cout << "TeamConnect Constructed" << std::endl;
 }
 
 TeamConnect::~TeamConnect()
@@ -133,9 +131,8 @@ float* TeamConnect::buildHeader(char* packet, TeamMember* robot, int tn)
 
     llong* lptr = (llong*)++iptr;
     *lptr = timer->timestamp();
-    lptr += sizeof(llong);
-
     float* fptr = (float*)++lptr;
+
     return fptr;
 }
 
@@ -159,11 +156,14 @@ void TeamConnect::receive(int player, int team)
         if (playerNumber == 0)
             continue;  // Bad Packet.
 
+#ifdef DEBUG_COMM
+        std::cout << "Recieved a packet from player: " << playerNumber << std::endl;
+#endif
+
         payload = (float*)(&packet[0] + NUM_HEADER_BYTES);
         robot = teamMates[playerNumber -1];
 
         robot->update(payload);
-        //std::cout << "Received a packet!" << std::endl;
     } while (result > 0);
 }
 

@@ -23,7 +23,7 @@ public:
     /**
      * Constructor
      */
-    GameConnect(CommTimer* t, NetworkMonitor* m);
+    GameConnect(CommTimer* t, NetworkMonitor* m, int team, int player);
 
     /**
      * Destructor

@@ -20,7 +20,6 @@ GameData::GameData(int teamNumber, int playerNumber)
     _myTeamNumber = teamNumber;
     _myPlayerNumber = playerNumber;
     setUpControl();
-    std::cout << "Constructed GameData" << std::endl;
 }
 
 void GameData::setUpControl()

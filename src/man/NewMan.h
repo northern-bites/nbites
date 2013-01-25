@@ -16,6 +16,7 @@ public:
 
 private:
     CognitionThread cognitionThread;
+    CommThread commThread;
 };
 
 }

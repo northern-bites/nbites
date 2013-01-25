@@ -11,7 +11,7 @@ namespace man {
 
 namespace comm {
 
-static const int NUM_DATA_FIELDS = 13;
+static const int NUM_DATA_FIELDS = 14;
 
 class TeamMember
 {
@@ -105,6 +105,7 @@ private:
     int   _playerNumber;      // The player number
 
     /**************************************************************
+     *                       WARNING!!!!                          *
      * The following are data fields. If adding or removing data, *
      * you should update the NUM_DATA_FIELDS constant at the top  *
      **************************************************************/

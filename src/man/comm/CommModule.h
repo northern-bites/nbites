@@ -41,8 +41,10 @@ class CommModule : public portals::Module
 public:
     /**
      * Constructor.
+     * @param team:   The team number for the robot.
+     * @param player: The player number for the robot.
      */
-    CommModule();
+    CommModule(int team, int player);
 
     /**
      * Destructor.
