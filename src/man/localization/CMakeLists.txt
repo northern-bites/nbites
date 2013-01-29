@@ -6,21 +6,21 @@ project(localization)
 # Find necessary libraries.
 find_package(Boost REQUIRED)
 
-# Include directories. 
+# Include directories.
 #include_directories( ... )
 
-# Set source files here that need to be compiled. 
+# Set source files here that need to be compiled.
 set(LOCALIZATION_SRCS LocalizationModule
                       ParticleFilter)
 
-# Add project as a library. 
+# Add project as a library.
 add_library(
   localization
   STATIC
   ${LOCALIZATION_SRCS}
 )
 
-# Link project to appropriate libraries. 
-target_link_libraries(localization 
+# Link project to appropriate libraries.
+target_link_libraries(localization
   portals
   ${PROTOS_TARGET})

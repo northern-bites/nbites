@@ -4,22 +4,22 @@ namespace man
 {
     namespace localization
     {
-	LocalizationModule::LocalizationModule()
-	    : Module(), output(base())
-	{
+    LocalizationModule::LocalizationModule()
+        : Module(), output(base())
+    {
 
-	}
+    }
 
-	LocalizationModule::~LocalizationModule()
-	{
+    LocalizationModule::~LocalizationModule()
+    {
 
-	}
+    }
 
-	void LocalizationModule::run_()
-	{
-	    // @todo pull information from (1) MotionModule 
-	    //       and (2) VisionModule. 
-	    updateLocalization(/* @todo */);
-	}
+    void LocalizationModule::run_()
+    {
+        // @todo pull information from (1) MotionModule
+        //       and (2) VisionModule.
+        updateLocalization(/* @todo */);
+    }
     }
 }
