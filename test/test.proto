@@ -1,20 +1,46 @@
 
-message TestMessage {
+message TestMessage { //test comment
 
+  //test comment
   required string string_test = 1;
   required bytes bytes_test = 2;
-  required int32 int32_test = 3;
-  required float float_test = 4;
+  required int32 int32_test = 3 [default = 1];
+  required int64 int64_test = 4;
+  required uint32 uint32_test = 5;
+  required uint64 uint64_test = 6;
+  required sint32 sint32_test = 7;
+  required sint64 sint64_test = 8;
+  required fixed32 fixed32_test = 9;
+  required fixed64 fixed64_test = 10;
+  required sfixed32 sfixed32_test = 11;
+  required sfixed64 sfixed64_test = 12;
+  required float float_test = 13;
+  required double double_test = 14;
+  required bool bool_test = 15;
 
   enum TestEnum {
-    TEST_ENUM_0 = 0;
+    TEST_ENUM_0 = 0; // test comment
     TEST_ENUM_1 = 1;
     TEST_ENUM_2 = 2;
   }
 
+  required TestEnum enum_test = 16 ;//[default = TEST_ENUM_0];
+
   message NestedTestMessage {
-    optional TestEnum type = 1 [default = TEST_ENUM_0];
+    required string string_test = 1;
   }
 
-  repeated NestedTestMessage nestedTestMessages = 5;
+  message NestedTestMessage2 {
+    required string string_test = 1;
+  }
+
+  required NestedTestMessage nested_message_test = 17;
+  repeated NestedTestMessage repeated_nested_message_test = 18;
+
+  repeated int32 repeated_int32_test = 19;
+  repeated string repeated_string_test = 20;
+}
+
+message TestMessage2 {
+  required string string_test = 1;
 }
