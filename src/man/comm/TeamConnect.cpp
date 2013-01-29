@@ -154,7 +154,6 @@ void TeamConnect::receive(int player, int team)
         playerNumber = verify(&packet[0], player, team);
         if (playerNumber == 0)
             continue;  // Bad Packet.
-        std::cout << "Recieved a packet from player: " << playerNumber << std::endl;
 #ifdef DEBUG_COMM
         std::cout << "Recieved a packet from player: " << playerNumber << std::endl;
 #endif
@@ -178,6 +177,7 @@ int TeamConnect::verify(char* packet, int player, int team)
     char* cptr = packet + sizeof(UNIQUE_ID) + 1;
 
     int playerNum = (int)*cptr;
+
     if (playerNum < 0 || playerNum > NUM_PLAYERS_PER_TEAM)
     {
 #ifdef DEBUG_COMM

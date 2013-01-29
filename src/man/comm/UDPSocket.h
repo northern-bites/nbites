@@ -37,7 +37,7 @@ public:
     /**
      * Set the target address.
      * @param addr: The address to set as the target
-     * @retrun:     true for success, false for error.
+     * @return:     true for success, false for error.
      */
     bool setTarget(const struct sockaddr addr);
 
