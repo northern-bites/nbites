@@ -1,1 +1,4 @@
 *.so
+*.pyc
+*.pb.cc
+*.pb.h
