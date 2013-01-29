@@ -26,113 +26,113 @@ namespace man
 {
     namespace localization
     {
-	// @todo move this to a common file!
-	/**
-	 * @brief  Samples a Gaussian normal distribution of specified
-	 *         mean and standard deviation (sigma.)
-	 * @param  mean the mean of the data.
-	 * @param  sigma the standard deviation of the data.
-	 * @return A random sample of the specified normal
-	 *         distribution.
-	 */
-	static float sampleNormal(float mean, float sigma)
-	{
-	    // Seed the random number generator.
-	    static boost::mt19937 rng(static_cast<unsigned>(std::time(0)));
+    // @todo move this to a common file!
+    /**
+     * @brief  Samples a Gaussian normal distribution of specified
+     *         mean and standard deviation (sigma.)
+     * @param  mean the mean of the data.
+     * @param  sigma the standard deviation of the data.
+     * @return A random sample of the specified normal
+     *         distribution.
+     */
+    static float sampleNormal(float mean, float sigma)
+    {
+        // Seed the random number generator.
+        static boost::mt19937 rng(static_cast<unsigned>(std::time(0)));
 
-	    boost::normal_distribution<float> dist(mean, sigma);
+        boost::normal_distribution<float> dist(mean, sigma);
 
-	    boost::variate_generator<boost::mt19937&,
-		boost::normal_distribution<float> > sample(rng, dist);
+        boost::variate_generator<boost::mt19937&,
+             boost::normal_distribution<float> > sample(rng, dist);
 
-	    return sample();
-	}
+        return sample();
+    }
 
-	/**
-	 * @struct ParticleFilterParams
-	 * @brief Parameters used for the particle filter.
-	 */
-	struct ParticleFilterParams
-	{
-	    float fieldHeight_;        //! Field height.
-	    float fieldWidth_;         //! Field width.
-	    float numParticles_;       //! Size of particle population.
-	    float alpha_fast_;         //! Weight factor for fast exponential weight filter.
-	    float alpha_slow_;         //! Weight factor for slow exponential weight filter.
-	};
+    /**
+     * @struct ParticleFilterParams
+     * @brief Parameters used for the particle filter.
+     */
+    struct ParticleFilterParams
+    {
+        float fieldHeight_;        //! Field height.
+        float fieldWidth_;         //! Field width.
+        float numParticles_;       //! Size of particle population.
+        float alpha_fast_;         //! Weight factor for fast exponential weight filter.
+        float alpha_slow_;         //! Weight factor for slow exponential weight filter.
+    };
 
-	static const ParticleFilterParams DEFAULT_PARAMS =
-	{
-	    FIELD_GREEN_HEIGHT,
-	    FIELD_GREEN_WIDTH,
-	    200,
-	    0.2f,
-	    0.05f
-	};
-	
-	/**
-	 * @class ParticleFilter
-	 * @brief The main particle filter localization class. Handles
-	 *        functionality for constructing a posterior belief
-	 *        based on a prior belief function as well as latest
-	 *        sensor and control data.
-	 */
-	class ParticleFilter : public LocalizationModule
-	{
+    static const ParticleFilterParams DEFAULT_PARAMS =
+    {
+        FIELD_GREEN_HEIGHT,
+        FIELD_GREEN_WIDTH,
+        200,
+        0.2f,
+        0.05f
+    };
 
-	public:
-	    ParticleFilter(boost::shared_ptr<MotionModel> motionModel,
-			   boost::shared_ptr<SensorModel> sensorModel,
-			   ParticleFilterParams parameters = DEFAULT_PARAMS);
+    /**
+     * @class ParticleFilter
+     * @brief The main particle filter localization class. Handles
+     *        functionality for constructing a posterior belief
+     *        based on a prior belief function as well as latest
+     *        sensor and control data.
+     */
+    class ParticleFilter : public LocalizationModule
+    {
 
-	    ~ParticleFilter();
+    public:
+        ParticleFilter(boost::shared_ptr<MotionModel> motionModel,
+                       boost::shared_ptr<SensorModel> sensorModel,
+                       ParticleFilterParams parameters = DEFAULT_PARAMS);
 
-	    /**
-	     * @brief Runs a single iteration of the particle filter algorithm, 
-	     *        incorperating motion and sensor data according to the motionUpdate
-	     *        and sensorUpdate flags, respectively.
-	     */
-	    void filter(bool motionUpdate = true, bool sensorUpdate = true);
+        ~ParticleFilter();
 
-	    ParticleSet getParticles() const { return particles_; }
+        /**
+         * @brief Runs a single iteration of the particle filter algorithm,
+         *        incorperating motion and sensor data according to the motionUpdate
+         *        and sensorUpdate flags, respectively.
+         */
+        void filter(bool motionUpdate = true, bool sensorUpdate = true);
 
-	    /**
-	     * @brief Returns the particle with the highest weight in the set
-	     *        (i.e., the "best" particle.)
-	     */
-	    Particle getBestParticle();
+        ParticleSet getParticles() const { return particles_; }
 
-	    /**
-	     * @brief Find the standard deviation of the particle set. This is 
-	     *        a useful metric for determining the error in the current
-	     *        estimate, or the rate of change of error over time.
-	     */
-	    std::vector<float> findParticleSD() const;
+        /**
+         * @brief Returns the particle with the highest weight in the set
+         *        (i.e., the "best" particle.)
+         */
+        Particle getBestParticle();
 
-	    void resetLocalization();
+        /**
+         * @brief Find the standard deviation of the particle set. This is
+         *        a useful metric for determining the error in the current
+         *        estimate, or the rate of change of error over time.
+         */
+        std::vector<float> findParticleSD() const;
 
-	private:
-	    /**
-	     * @brief Resamples (with replacement) the particle population according
-	     *        to the normalized weights of the particles. 
-	     */
-	    void resample();
+        void resetLocalization();
 
-	    /**
-	     * @brief Update localization using the particle filter algorithm 
-	              to incorperate motion and sensor data. 
-	     */
-	    void updateLocalization(/* @todo */);
+    private:
+        /**
+         * @brief Resamples (with replacement) the particle population according
+         *        to the normalized weights of the particles.
+         */
+        void resample();
 
-	    ParticleFilterParams parameters_;
+        /**
+         * @brief Update localization using the particle filter algorithm
+         to incorperate motion and sensor data.
+        */
+        void updateLocalization(/* @todo */);
 
-	    man::memory::protos::RobotLocation poseEstimate_;
+        ParticleFilterParams parameters_;
 
-	    std::vector<float> standardDeviations_;
+        man::memory::protos::RobotLocation poseEstimate_;
 
-	    ParticleSet particles_;
-	    boost::shared_ptr<MotionModel> motionModel_;
-	    boost::shared_ptr<SensorModel> sensorModel_;
-	};
+        std::vector<float> standardDeviations_;
+
+        ParticleSet particles_;
+        boost::shared_ptr<MotionModel> motionModel_;
+        boost::shared_ptr<SensorModel> sensorModel_;
+    };
     } // namespace localization
 } // namespace man
