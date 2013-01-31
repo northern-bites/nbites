@@ -44,6 +44,9 @@ add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
+# Build the jointenactor module. 
+add_subdirectory(jointenactor)
+
 add_library(
   man
   SHARED
@@ -59,6 +62,7 @@ target_link_libraries(
   man
   portals
   messages
+  jointenactor
 )
 
 install( TARGETS man
