@@ -9,64 +9,64 @@ namespace man
 {
     namespace localization
     {
-	/**
-	 * @class Particle
-	 * @brief Defines a localization particle with a weight
-	 *        (not normalized), and a complete location, which
-	 *        represents a single localization hypothesis.
-	 */
-	class Particle
-	{
-	public:
-	    Particle(memory::proto::RobotLocation location, float weight)
-		: weight_(w), location_(l) { }
-	
-	    Particle() : weight_(0.0f), location_() {}
-	    
-	    ~Particle() { }
+    /**
+     * @class Particle
+     * @brief Defines a localization particle with a weight
+     *        (not normalized), and a complete location, which
+     *        represents a single localization hypothesis.
+     */
+    class Particle
+    {
+    public:
+        Particle(memory::proto::RobotLocation location, float weight)
+            : weight_(weight), location_(location) { }
 
-	    memory::proto::RobotLocation getLocation() const { return location_; }
-	    void setLocation(memory::proto::RobotLocation location) { location_ = location; }
+        Particle() : weight_(0.0f), location_() {}
 
-	    float getWeight() const { return weight_; }
-	    void setWeight(float weight) { weight_ = weight; }
+        ~Particle() { }
 
-	    void setX(float x) { location_.setX(x); }
-	    void setY(float y) { location_.setY(y); }
-	    void setH(float h) { location_.setH(h); }
+        memory::proto::RobotLocation getLocation() const { return location_; }
+        void setLocation(memory::proto::RobotLocation location) { location_ = location; }
 
-	    /**
-	     * @brief Used to compare two particles by weight, primarily for
-	     *        use with the sorting algorithm.
-	     *
-	     * @param first the first particle.
-	     * @param second the second particle.
-	     * @return weight of first < weight of second ? true : false
-	     */
-	    friend bool operator <(const Particle& first,
-				   const Particle& second)
-	    {
-		float w1 = first.getWeight();
-		float w2 = second.getWeight();
+        float getWeight() const { return weight_; }
+        void setWeight(float weight) { weight_ = weight; }
 
-		return (w1 < w2) ? true : false;
-	    }
+        void setX(float x) { location_.set_x(x); }
+        void setY(float y) { location_.set_y(y); }
+        void setH(float h) { location_.set_h(h); }
 
-	    friend std::ostream& operator<<(std::ostream& out,
-					    Particle p)
-	    {
-		out << "Particle with weight " << p.getWeight() << " with "
-		    << p.getLocation().DebugString() << std::endl;
-		return out;
-	    }
+        /**
+         * @brief Used to compare two particles by weight, primarily for
+         *        use with the sorting algorithm.
+         *
+         * @param first the first particle.
+         * @param second the second particle.
+         * @return weight of first < weight of second ? true : false
+         */
+        friend bool operator <(const Particle& first,
+                               const Particle& second)
+        {
+            float w1 = first.getWeight();
+            float w2 = second.getWeight();
 
-	private:
-	    float weight_;                           //! The particle weight.
-	    memory::proto::RobotLocation location_;  //! The particle location (x, y, heading).
+            return (w1 < w2) ? true : false;
+        }
 
-	};
+        friend std::ostream& operator<<(std::ostream& out,
+                                        Particle p)
+        {
+            out << "Particle with weight " << p.getWeight() << " with "
+                << p.getLocation().DebugString() << std::endl;
+            return out;
+        }
 
-	typedef std::vector<Particle> ParticleSet;
-	typedef ParticleSet::iterator ParticleIt;
+    private:
+        float weight_;                           //! The particle weight.
+        memory::proto::RobotLocation location_;  //! The particle location (x, y, heading).
+
+    };
+
+    typedef std::vector<Particle> ParticleSet;
+    typedef ParticleSet::iterator ParticleIt;
     } // namespace localization
 } // namespace man

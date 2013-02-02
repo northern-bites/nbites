@@ -154,6 +154,7 @@ TARGET_LINK_LIBRARIES(
   ${NOGGIN_TARGET}
   ${MEMORY_TARGET}
   portals
+  localization
   )
 
 ############################# INSTALL PATHS
@@ -181,3 +182,4 @@ add_subdirectory( motion )
 add_subdirectory( noggin )
 add_subdirectory( include )
 add_subdirectory( portals )
+add_subdirectory( localization )

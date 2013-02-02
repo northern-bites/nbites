@@ -11,7 +11,8 @@
 #include "SensorModel.h"
 #include "MotionModel.h"
 #include "Particle.h"
-#include "../man/memory/protos/Common.pb.h"
+#include "../memory/protos/Common.pb.h"
+#include "FieldConstants.h"
 
 #include <vector>
 #include <iostream>
@@ -54,11 +55,11 @@ namespace man
      */
     struct ParticleFilterParams
     {
-        float fieldHeight_;        //! Field height.
-        float fieldWidth_;         //! Field width.
-        float numParticles_;       //! Size of particle population.
-        float alpha_fast_;         //! Weight factor for fast exponential weight filter.
-        float alpha_slow_;         //! Weight factor for slow exponential weight filter.
+        float fieldHeight;        //! Field height.
+        float fieldWidth;         //! Field width.
+        float numParticles;       //! Size of particle population.
+        float alpha_fast;         //! Weight factor for fast exponential weight filter.
+        float alpha_slow;         //! Weight factor for slow exponential weight filter.
     };
 
     static const ParticleFilterParams DEFAULT_PARAMS =
@@ -94,7 +95,7 @@ namespace man
          */
         void filter(bool motionUpdate = true, bool sensorUpdate = true);
 
-        ParticleSet getParticles() const { return particles_; }
+        ParticleSet getParticles() const { return particles; }
 
         /**
          * @brief Returns the particle with the highest weight in the set
@@ -124,15 +125,15 @@ namespace man
         */
         void updateLocalization(/* @todo */);
 
-        ParticleFilterParams parameters_;
+        ParticleFilterParams parameters;
 
-        man::memory::protos::RobotLocation poseEstimate_;
+        memory::proto::RobotLocation poseEstimate;
 
-        std::vector<float> standardDeviations_;
+        std::vector<float> standardDeviations;
 
-        ParticleSet particles_;
-        boost::shared_ptr<MotionModel> motionModel_;
-        boost::shared_ptr<SensorModel> sensorModel_;
+        ParticleSet particles;
+        boost::shared_ptr<MotionModel> motionModel;
+        boost::shared_ptr<SensorModel> sensorModel;
     };
     } // namespace localization
 } // namespace man
