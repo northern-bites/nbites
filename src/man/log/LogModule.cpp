@@ -23,20 +23,10 @@ void LogModule::run_()
 
 void LogModule::writeFrame()
 {
-    int MAX_FRAMES = 5000;
-    if (saved_frames > MAX_FRAMES)
-        return;
-
-    stringstream num;
-    num << saved_frames;
-    string filename = FILEPATH + num.str() + EXT;
-
-    fstream fout(filename.c_str(), fstream::out);
-    fout.write(reinterpret_cast<const char*>(topImageIn.message()),
-               NAO_IMAGE_BYTE_SIZE);
-
-    fout.close();
-    cout << "Saved frame #" << saved_frames++ << endl;
+    for(vector<LoggerBase>::iterator i = logs.begin(); i != logs.end(); i++)
+    {
+        i->signalToResume();
+    }
 }
 
 }

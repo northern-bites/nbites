@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include <stdint.h>
+#include "Logger.h"
 #include <string>
 
 namespace man {
@@ -16,12 +16,14 @@ public:
 	LogModule();
 	virtual ~LogModule() {}
 
-    portals::InPortal<uint16_t> topImageIn;
+    template<class T>
+    void addLogger(portals::OutPortal<T>* port, std::string name)
+    {
+    }
 
 protected:
-    virtual void run_();
-    void writeFrame();
-    int saved_frames;
+    void run_();
+    std::vector<LoggerBase> logs;
 };
 
 }
