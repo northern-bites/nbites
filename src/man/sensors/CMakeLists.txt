@@ -22,6 +22,6 @@ add_library(
 # Link project to appropriate libraries. 
 target_link_libraries(sensors 
   portals
-  ${PROTOS_TARGET}
+  messages
   ${ALCOMMON_LIBRARIES}
 )

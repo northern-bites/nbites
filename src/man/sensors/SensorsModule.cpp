@@ -16,7 +16,7 @@ namespace man
 	      sensorValues_(NUM_SENSOR_VALUES), 
 	      sensorKeys_(NUM_SENSOR_VALUES)
 	{
-	    std::cout << "SensorsModule : Constructor." << std::endl;
+	    //std::cout << "SensorsModule : Constructor." << std::endl;
 
 	    // Initialize the Aldebaran fast access memory interface 
 	    // to quickly read sensor values from memory. 
@@ -25,7 +25,7 @@ namespace man
 
 	SensorsModule::~SensorsModule()
 	{
-	    std::cout << "SensorsModule : Destructor." << std::endl;
+	    //std::cout << "SensorsModule : Destructor." << std::endl;
 	}
 	
 	void SensorsModule::initializeSensorFastAccess()
@@ -72,12 +72,12 @@ namespace man
 	    fastMemoryAccess_->ConnectToVariables(broker_, sensorKeys_);
 
 	    std::cout << "SensorsModule : Sensor keys initialized." << std::endl;
-	    for(std::vector<std::string>::iterator iter = sensorKeys_.begin();
-		iter != sensorKeys_.end();
-		++iter)
-	    {
-		std::cout << *iter << std::endl;
-	    }
+	    // for(std::vector<std::string>::iterator iter = sensorKeys_.begin();
+	    // 	iter != sensorKeys_.end();
+	    // 	++iter)
+	    // {
+	    // 	std::cout << *iter << std::endl;
+	    // }
 	}
 
 	void SensorsModule::initializeSonarValues()
@@ -113,7 +113,7 @@ namespace man
 
 	void SensorsModule::updateSensorValues()
 	{
-	    std::cout << "SensorsModule : Retrieving sensor values from NAOqi." << std::endl;
+	    //std::cout << "SensorsModule : Retrieving sensor values from NAOqi." << std::endl;
 	    // Update stored sensor values. 
 	    fastMemoryAccess_->GetValues(sensorValues_);
 
@@ -124,16 +124,18 @@ namespace man
 	    // Update footbumper message.
 	    updateFootbumperMessage();
 
-	    std::cout << "SensorsModule : Sensor values " << std::endl;
-	    for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
-	    {
-	    	std::cout << SensorNames[i] << " = " << sensorValues_[i] << std::endl;
-	    }
+	    //std::cout << "SensorsModule : Sensor values " << std::endl;
+	    // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
+	    // {
+	    // 	std::cout << SensorNames[i] << " = " << sensorValues_[i] << std::endl;
+	    // }
 	}
 
 	void SensorsModule::updateJointsMessage()
 	{
-	    portals::Message<messages::JointAngles> jointsMessage;
+	    portals::Message<messages::JointAngles> jointsMessage(0);
+
+	    *jointsMessage.get() = messages::JointAngles();
 
 	    jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
 	    jointsMessage.get()->set_headpitch(sensorValues_[HeadPitch]);
@@ -165,7 +167,10 @@ namespace man
 
 	void SensorsModule::updateChestboardButtonMessage()
 	{
-	    portals::Message<messages::ButtonState> chestboardMessage;
+	    portals::Message<messages::ButtonState> chestboardMessage(0);
+	    
+	    *chestboardMessage.get() = messages::ButtonState();
+	    
 	    chestboardMessage.get()->set_pressed(
 		sensorValues_[ChestboardButton] > 0.5f ? true : false
 		);
@@ -175,7 +180,10 @@ namespace man
 
 	void SensorsModule::updateFootbumperMessage()
 	{
-	    portals::Message<messages::FootBumperState> footbumperMessage;
+	    portals::Message<messages::FootBumperState> footbumperMessage(0);
+	    
+	    *footbumperMessage.get() = messages::FootBumperState();
+
 	    footbumperMessage.get()->mutable_lfootbumperleft()->set_pressed(
 		sensorValues_[LFootBumperLeft] > 0.5f ? true : false
 		);
@@ -185,7 +193,9 @@ namespace man
 
 	void SensorsModule::updateInertialsMessage()
 	{
-	    portals::Message<messages::InertialState> inertialsMessage;
+	    portals::Message<messages::InertialState> inertialsMessage(0);
+
+	    *inertialsMessage.get() = messages::InertialState();
 
 	    inertialsMessage.get()->set_accx(sensorValues_[AccX]);
 	    inertialsMessage.get()->set_accy(sensorValues_[AccY]);
@@ -202,7 +212,9 @@ namespace man
 
 	void SensorsModule::updateSonarsMessage()
 	{
-	    portals::Message<messages::SonarState> sonarsMessage;
+	    portals::Message<messages::SonarState> sonarsMessage(0);
+
+	    *sonarsMessage.get() = messages::SonarState();
 
 	    sonarsMessage.get()->set_usleft(sensorValues_[USLeft]);
 	    sonarsMessage.get()->set_usright(sensorValues_[USRight]);
