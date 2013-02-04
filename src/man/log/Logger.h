@@ -60,7 +60,7 @@ class Logger : public LoggerBase {
 public:
     Logger(portals::OutPortal<T>* out, std::string name) : LoggerBase(name)
     {
-        input.wireTo(out);
+        input.wireTo(out, true);
     }
 
     void writeToLog()

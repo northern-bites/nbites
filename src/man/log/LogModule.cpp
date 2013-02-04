@@ -23,9 +23,9 @@ void LogModule::run_()
 
 void LogModule::writeFrame()
 {
-    for(vector<LoggerBase>::iterator i = logs.begin(); i != logs.end(); i++)
+    for(vector<LoggerBase*>::iterator i = logs.begin(); i != logs.end(); i++)
     {
-        i->signalToResume();
+        (*i)->signalToResume();
     }
 }
 
