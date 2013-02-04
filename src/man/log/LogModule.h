@@ -19,7 +19,9 @@ public:
     template<class T>
     void addLogger(portals::OutPortal<T>* port, std::string name)
     {
-        logs.push_back(new Logger<T>(port, name));
+        Logger<T>* log = new Logger<T>(port, name);
+        logs.push_back(log);
+        log->start();
     }
 
 protected:

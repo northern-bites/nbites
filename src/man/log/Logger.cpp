@@ -6,7 +6,8 @@ namespace man{
 namespace log{
 
 LoggerBase::LoggerBase(std::string name) : Thread(name),
-                                   file_name(PATH + name)
+                                           file_name(PATH + name),
+                                           is_open(false)
 {
     memset(&control_block, 0, sizeof(control_block));
 }

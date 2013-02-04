@@ -14,7 +14,7 @@
 namespace man {
 namespace log {
 
-static const std::string PATH = "/home/nao/nbites/frames";
+static const std::string PATH = "/home/nao/nbites/frames/";
 
 class LoggerBase : public synchro::Thread {
 
