@@ -15,6 +15,7 @@
 #include <alproxies/dcmproxy.h>
 #include <almemoryfastaccess/almemoryfastaccess.h>
 #include <alerror/alerror.h>
+#include <althread/alprocesssignals.h>
 
 #include <string>
 #include <iostream>
@@ -51,6 +52,16 @@ namespace man
 	     */
 	    void initialize();
 
+	    void connectToDCMLoop();
+
+	    /**
+	     * @brief Synchronously called before each iteration of the
+	     *        DCM loop. All operations must be fast, so as not
+	     *        to slow down the DCM (e.g., no system calls or 
+	     *        dynamic memory allocation.)
+	     */
+	    void DCMPreProcessCallback();
+
 	    /**
 	     * @brief Disconnects from the DCM loop. 
 	     */
@@ -61,7 +72,8 @@ namespace man
 	    boost::shared_ptr<AL::ALBroker> broker_;
 	    boost::shared_ptr<AL::DCMProxy> dcmProxy_;
 
-	    AL::ALValue lastCommand_;
+	    AL::ALValue jointCommand_;
+	    AL::ALProcessSignals::ProcessSignalConnection dcmPreProcessConnection_;
 
 	};
     } // namespace jointenactor

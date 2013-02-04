@@ -176,11 +176,29 @@ namespace man
 			  << e.toString()
 		          << std::endl;
 	    }
+
+	    // Initialize joint command.
+	}
+
+	void JointEnactorModule::connectToDCMLoop()
+	{
+	    try
+	    {
+		dcmPreProcessConnection_ = broker_->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&JointEnactorModule::DCMPreProcessCallback, this));
+	    }
+	}
+
+	void JointEnactorModule::DCMPreProcessCallback()
+	{
+	    // @todo
 	}
 
 	void JointEnactorModule::stop()
 	{
-	    // @todo
+	    // Kill the joint stiffnessess.
+	    setStiffness(0.0f);
+	    // Disconnect synchronized callback from DCM loop. 
+	    dcmPreProcessConnection_.disconnect();
 	}
 
 	void JointEnactorModule::run_()
