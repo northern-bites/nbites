@@ -1,0 +1,7 @@
+package messages;
+
+message LedCommand
+{
+	// comments! woooooo
+	required int name = 1;
+}
