@@ -10,6 +10,7 @@ include( cmake/Flags.cmake )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
+include( cmake/FindNBITES_DIR.cmake )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
   include( cmake/BuildProtobuf.cmake )
@@ -56,6 +57,9 @@ add_subdirectory( image )
 add_subdirectory( log )
 add_subdirectory( newVis )
 
+# Build the sensors module.
+add_subdirectory( sensors )
+
 add_library(
   man
   SHARED
@@ -75,6 +79,7 @@ target_link_libraries(
   image
   log
   newVis
+  sensors
 )
 
 install( TARGETS man
