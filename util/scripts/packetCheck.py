@@ -13,7 +13,7 @@ class Packet(object):
     values = ()
 
     def __str__(self):
-        return  ('<' + self.__class__.__module__ + "." + 
+        return  ('<' + self.__class__.__module__ + "." +
                 self.__class__.__name__ + ' object: \n' +
                 '  header = ' + str(self.header) + '\n' +
                 '  ts     = ' + str(self.ts    ) + '\n' +
@@ -26,7 +26,7 @@ class Packet(object):
 def recv_packet(s):
     '''Read a packet from the network.  Error is raised on invalid packets
     (i.e. those not properly formed.  Does not check e.g. header value).'''
-    # recieve a raw message 
+    # recieve a raw message
     msg, addr = s.recvfrom(MAX_LEN)
     # extract header data
     packet = Packet()
@@ -44,7 +44,7 @@ def recv_packet(s):
 
 
 def main(port=4000):
-    
+
     # create and bind socket
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.bind(('', port))
@@ -61,4 +61,3 @@ def main(port=4000):
 if __name__ == '__main__':
     import sys
     main(*map(int, sys.argv[1:]))
-
