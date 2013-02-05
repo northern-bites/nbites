@@ -2,6 +2,7 @@ package messages;
 
 message LedCommand
 {
-	// comments! woooooo
-	required int name = 1;
+	// LED ID and hex value.
+	required int led_id = 1;
+	required int rgbHex = 2;
 }
