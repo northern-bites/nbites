@@ -12,11 +12,11 @@ include( cmake/Flags.cmake )
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
-  include( cmake/BuildProtobuf.cmake )
+  include( ${NBITES_DIR}/src/cmake/BuildProtobuf.cmake )
 endif()
 
 # So that we can use find_package commands
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${NBITES_DIR}/src/cmake/" )
 
 # For Aldebaran's headers
 find_package(ALCOMMON REQUIRED)
