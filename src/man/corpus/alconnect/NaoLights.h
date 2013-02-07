@@ -3,9 +3,9 @@
 
 #include <pthread.h>
 
-#include "Lights.h"
+#include "../Lights.h"
 #include "alproxies/dcmproxy.h"
-#include "ALLedNames.h"
+#include "../../include/ALLedNames.h"
 #include "NaoRGBLight.h"
 /**
  *  This class implements LED capability on the Nao robot using the DCM in Naoqi

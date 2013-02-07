@@ -2,7 +2,7 @@
 #define _ALNames_DEFINED
 
 #include <string>
-#include "Kinematics.h"
+#include "../corpus/Kinematics.h"
 
 namespace ALNames {
 

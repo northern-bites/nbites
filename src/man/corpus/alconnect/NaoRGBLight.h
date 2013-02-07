@@ -3,7 +3,7 @@
 
 #include <string>
 #include "alvalue/alvalue.h"
-#include "ALLedNames.h"
+#include "../../include/ALLedNames.h"
 
 class NaoRGBLight{
  public:

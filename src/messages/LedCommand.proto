@@ -3,6 +3,6 @@ package messages;
 message LedCommand
 {
 	// LED ID and hex value.
-	required int led_id = 1;
-	required int rgbHex = 2;
+	required int32 led_id = 1;
+	required int32 rgbHex = 2;
 }
