@@ -8,6 +8,7 @@
 #pragma once
 
 #include <boost/shared_ptr.hpp>
+#include <boost/bind.hpp>
 
 #include <alcommon/albroker.h>
 #include <alcommon/alproxy.h>
@@ -38,6 +39,19 @@ namespace man
 	    virtual ~JointEnactorModule();
 
 	    void setStiffness(float stiffness = 0.0f);
+
+	    /**
+	     * @brief Enables motion (joint angle) commands to be sent
+	     *        to the DCM.
+	     */
+	    void enableMotion();
+
+	    /**
+	     * @brief Disables motion (joint angle) commands from being
+	     *        sent to the DCM. Note that motion is initially
+	     *        disabled. 
+	     */
+	    void disableMotion();
 
 	private:
 	    /**
@@ -71,6 +85,8 @@ namespace man
 
 	    boost::shared_ptr<AL::ALBroker> broker_;
 	    boost::shared_ptr<AL::DCMProxy> dcmProxy_;
+
+	    bool motionEnabled_;
 
 	    AL::ALValue jointCommand_;
 	    AL::ALProcessSignals::ProcessSignalConnection dcmPreProcessConnection_;

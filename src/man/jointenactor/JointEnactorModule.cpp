@@ -5,7 +5,7 @@ namespace man
     namespace jointenactor
     {
 	JointEnactorModule::JointEnactorModule(boost::shared_ptr<AL::ALBroker> broker)
-	    : portals::Module(), broker_(broker)
+	    : portals::Module(), broker_(broker), motionEnabled_(false)
 	{
 	    start();
 	}
@@ -48,6 +48,16 @@ namespace man
 	    {
 		throw ALERROR("JointEnactorModule", "setStiffness()", "Error when sending stiffness command to DCM: " + e.toString());
 	    }
+	}
+
+	void JointEnactorModule::enableMotion()
+	{
+	    motionEnabled_ = true;
+	}
+
+	void JointEnactorModule::disableMotion()
+	{
+	    motionEnabled_ = false;
 	}
 
 	void JointEnactorModule::start()
@@ -178,6 +188,19 @@ namespace man
 	    }
 
 	    // Initialize joint command.
+	    jointCommand_.arraySetSize(6);
+	    jointCommand_[0] = std::string("jointActuator");
+	    jointCommand_[1] = std::string("ClearAll");
+	    jointCommand_[2] = std::string("time-separate");
+	    jointCommand_[3] = 0; // Importance level.
+	    jointCommand_[4].arraySetSize(1);
+	    jointCommand_[5].arraySetSize(sensors::NUM_SENSOR_VALUES);
+	    // Set default joint angle values.
+	    for(int i = 0; i < sensors::NUM_SENSOR_VALUES; ++i)
+	    {
+		jointCommand_[5][i].arraySetSize(1);
+		jointCommand_[5][i][0] = 0.0f; // This will be the new joint angle. 
+	    }
 	}
 
 	void JointEnactorModule::connectToDCMLoop()
@@ -186,11 +209,34 @@ namespace man
 	    {
 		dcmPreProcessConnection_ = broker_->getProxy("DCM")->getModule()->atPreProcess(boost::bind(&JointEnactorModule::DCMPreProcessCallback, this));
 	    }
+	    catch(const AL::ALError& e)
+	    {
+		std::cout << "Error connecting synchronously to the DCM loop: " + e.toString() << std::endl;
+	    }
 	}
 
 	void JointEnactorModule::DCMPreProcessCallback()
 	{
+	    if(motionEnabled_)
+	    {
 	    // @todo
+	    // Send the next joint angles to the DCM for execution. 
+	    /*
+	      motionValues = switchboard->getNextJoints();
+
+	      for(int i = 0; i < NUM_JOINTS; ++i)
+	      {
+	      jointCommand[5][i][0] = motionValues[i];
+	      }
+
+	      try
+	      {
+	      jointCommand[4][0] = dcmProxy_->getTime(0);
+	      
+	      }
+
+	     */
+	    }
 	}
 
 	void JointEnactorModule::stop()
@@ -203,7 +249,8 @@ namespace man
 
 	void JointEnactorModule::run_()
 	{
-	    setStiffness(0.0f);
+	    // Enable stiffnesses. 
+	    setStiffness(0.2f);
 	}
 
     } // namespace jointenactor
