@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "RoboGrams.h"
+#include "Threads.h"
 
 namespace man {
 

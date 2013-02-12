@@ -29,7 +29,6 @@ private:
     portals::RoboGram sensorsDiagram;
 
     // Modules:
-    image::ImageTranscriberModule imageTranscriber;
     log::LogModule logger;
     sensors::SensorsModule sensors;
 };

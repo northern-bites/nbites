@@ -49,6 +49,7 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 add_subdirectory( common )
 include_directories( common )
 add_subdirectory( synchro )
+include_directories( synchro )
 
 # Actual modules
 add_subdirectory( log )
