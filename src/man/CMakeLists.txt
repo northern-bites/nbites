@@ -10,6 +10,7 @@ include( cmake/Flags.cmake )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
+include( cmake/FindNBITES_DIR.cmake )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
   include( cmake/BuildProtobuf.cmake )
@@ -51,6 +52,7 @@ add_subdirectory( synchro )
 
 # Actual modules
 add_subdirectory( log )
+add_subdirectory( sensors )
 
 add_library(
   man
@@ -69,6 +71,7 @@ target_link_libraries(
   messages
   synchro
   log
+  sensors
 )
 
 install( TARGETS man
