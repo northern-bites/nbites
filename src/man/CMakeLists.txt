@@ -53,7 +53,6 @@ add_subdirectory( synchro )
 
 # Actual modules
 add_subdirectory( image )
-add_subdirectory( log )
 
 add_library(
   man
@@ -72,7 +71,6 @@ target_link_libraries(
   messages
   synchro
   image
-  log
 )
 
 install( TARGETS man

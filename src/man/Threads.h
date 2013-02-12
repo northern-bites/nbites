@@ -3,7 +3,6 @@
 #include "synchro/synchro.h"
 #include "RoboGrams.h"
 #include "image/ImageTranscriberModule.h"
-#include "log/LogModule.h"
 
 namespace man {
 
@@ -19,7 +18,6 @@ private:
 
     // Modules:
     image::ImageTranscriberModule imageTranscriber;
-    log::LogModule logger;
 };
 
 }
