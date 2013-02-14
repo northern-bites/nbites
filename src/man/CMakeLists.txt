@@ -10,6 +10,7 @@ include( cmake/Flags.cmake )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
+include( cmake/FindNBITES_DIR.cmake )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
   include( cmake/BuildProtobuf.cmake )
@@ -33,7 +34,7 @@ configure_file(
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
-  Threads.cpp
+  DiagramThread.cpp
 )
 
 # Compile portals, which is outside the source tree so specify a destination
@@ -49,9 +50,14 @@ include_directories( ../messages )
 # Actual subdirectories
 add_subdirectory( common )
 include_directories( common )
-add_subdirectory( synchro )
+
+# Actual subdirectories
+add_subdirectory( common )
+include_directories( common )
 
 # Actual modules
+add_subdirectory( log )
+add_subdirectory( sensors )
 add_subdirectory( image )
 
 add_library(
@@ -69,8 +75,9 @@ target_link_libraries(
   man
   portals
   messages
-  synchro
   image
+  log
+  sensors
 )
 
 install( TARGETS man

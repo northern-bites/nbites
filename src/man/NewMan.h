@@ -4,7 +4,9 @@
 #include <alcommon/albroker.h>
 #include <boost/shared_ptr.hpp>
 
-#include "Threads.h"
+#include "RoboGrams.h"
+#include "DiagramThread.h"
+#include "sensors/SensorsModule.h"
 
 namespace man {
 
@@ -15,7 +17,8 @@ public:
     virtual ~Man();
 
 private:
-    CognitionThread cognitionThread;
+    DiagramThread sensorsThread;
+    sensors::SensorsModule sensors;
 };
 
 }
