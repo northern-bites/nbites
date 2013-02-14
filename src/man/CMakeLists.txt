@@ -34,7 +34,7 @@ configure_file(
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
-  Threads.cpp
+  DiagramThread.cpp
 )
 
 # Compile portals, which is outside the source tree so specify a destination
@@ -57,7 +57,12 @@ add_subdirectory( image )
 add_subdirectory( log )
 add_subdirectory( vision )
 
-# Build the sensors module.
+# Actual subdirectories
+add_subdirectory( common )
+include_directories( common )
+
+# Actual modules
+add_subdirectory( log )
 add_subdirectory( sensors )
 
 add_library(
@@ -75,7 +80,6 @@ target_link_libraries(
   man
   portals
   messages
-  synchro
   image
   log
   vision
