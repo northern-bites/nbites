@@ -595,5 +595,3 @@ public:
 }
 
 #endif
-
-

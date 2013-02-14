@@ -2,17 +2,21 @@
 #include <iostream>
 
 namespace man {
+using namespace sensors;
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
-    : AL::ALModule(broker, name)
+    : AL::ALModule(broker, name),
+      sensorsThread("sensors"),
+      sensors(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
-    std::cout << "Man constructor." << std::endl;
+    sensorsThread.addModule(sensors);
+    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
+    sensorsThread.start();
 }
 
 Man::~Man()
 {
-    std::cout << "Man destructor." << std::endl;
 }
 
 }
