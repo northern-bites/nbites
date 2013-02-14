@@ -4,7 +4,8 @@
 #include "RoboGrams.h"
 #include "image/ImageTranscriberModule.h"
 #include "log/LogModule.h"
-#include "newVis/VisionModule.h"
+#include "vision/VisionModule.h"
+#include "sensors/SensorsModule.h"
 
 namespace man {
 
@@ -21,7 +22,8 @@ private:
     // Modules:
     image::ImageTranscriberModule imageTranscriber;
     log::LogModule logger;
-    newVis::VisionModule visMod;
+    vision::VisionModule visMod;
+    //    sensors::SensorsModule sensMod;
 };
 
 }

@@ -59,7 +59,10 @@
 #include "ColorParams.h"
 #include "FieldLines/Gradient.h"
 
-using namespace std;
+using std::cout;
+using std::max;
+using std::min;
+using std::endl;
 #define PRINT_VISION_INFO
 
 // Constructor for Threshold class. passed an instance of Vision and Pose
@@ -84,11 +87,11 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
 
 //this loop will perform obstabcle detection, and for now it is seperate from
 //other detection, though in the future, we should change this.
-void Threshold::obstacleLoop() {
+void Threshold::obstacleLoop(const messages::JointAngles& ja, const messages::InertialState& inert) {
   vision->obstacles->init();
 
   usingTopCamera = false;
-  pose->transform(usingTopCamera);
+  /************************************/pose->transform(usingTopCamera, ja, inert);
 
   unsigned char pixel = GREEN;
   
@@ -158,7 +161,7 @@ void Threshold::obstacleLoop() {
 
   
   usingTopCamera = true;
-  pose->transform(usingTopCamera);
+  /****************************************************/pose->transform(usingTopCamera, ja, inert);
   
   tempTotalLeft = 0.0, tempTotalRight = 0.0;
   float greenLeftT = 0.0, greenRightT = 0.0;
@@ -239,31 +242,30 @@ void Threshold::obstacleLoop() {
 
 /* Main vision loop, called by Vision.cc
  */
-void Threshold::visionLoop() {
+void Threshold::visionLoop(const messages::JointAngles& ja, const messages::InertialState& inert) {
     usingTopCamera = true;
 
-    PROF_ENTER(P_TRANSFORM);
-    pose->transform(usingTopCamera);
-    PROF_EXIT(P_TRANSFORM);
+    /*********************************************/pose->transform(usingTopCamera, ja, inert);
+
 
     // threshold image and create runs
     thresholdAndRuns();
-    PROF_ENTER(P_ROBOTS);
+
     newFindRobots();
-    PROF_EXIT(P_ROBOTS);
+
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-    PROF_ENTER(P_LINES);
+
     vision->fieldLines->lineLoop();
-    PROF_EXIT(P_LINES);
+
 
     // do recognition
-    PROF_ENTER(P_OBJECT);
+
     objectRecognition();
-    PROF_EXIT(P_OBJECT);
+
 
     vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
@@ -280,75 +282,75 @@ void Threshold::visionLoop() {
 #endif
 
     if (vision->ball->getRadius() == 0) {
+      
+      usingTopCamera = false;
+      
+      
+      /*****************************************/pose->transform(usingTopCamera, ja, inert);
 
-		usingTopCamera = false;
-
-		PROF_ENTER(P_TRANSFORM)
-			pose->transform(usingTopCamera);
-		PROF_EXIT(P_TRANSFORM)
-
-			orange->init(pose->getHorizonSlope());
-		lowerRuns();
-
-		vision->ball->init();
-		vision->ball->setTopCam(usingTopCamera);
-
-		if (horizon < IMAGE_HEIGHT) {
-			orange->createBall(horizon);
-		} else {
-			orange->createBall(pose->getHorizonY(0));
-		}
-	}
-	bool left = vision->yglp->getWidth() > 0;
-	bool right = vision->ygrp->getWidth() > 0;
+      
+      orange->init(pose->getHorizonSlope());
+      lowerRuns();
+      
+      vision->ball->init();
+      vision->ball->setTopCam(usingTopCamera);
+      
+      if (horizon < IMAGE_HEIGHT) {
+	orange->createBall(horizon);
+      } else {
+	orange->createBall(pose->getHorizonY(0));
+      }
+    }
+    bool left = vision->yglp->getWidth() > 0;
+    bool right = vision->ygrp->getWidth() > 0;
     bool ylp = left &&
-		(vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
-		 vision->yglp->getRightBottomY() > IMAGE_HEIGHT - 5);
+      (vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+       vision->yglp->getRightBottomY() > IMAGE_HEIGHT - 5);
     bool yrp = right &&
-		(vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
-		 vision->ygrp->getRightBottomY() > IMAGE_HEIGHT - 5);
-
-	if ((ylp || yrp) && !(left && right)) {
-		usingTopCamera = false;
-
-		pose->transform(usingTopCamera);
-		yellow->init(pose->getHorizonSlope());
-		if (ylp) {
-			vision->yglp->init();
-			vision->yglp->setTopCam(usingTopCamera);
-		}
-		if (yrp) {
-			vision->ygrp->init();
-			vision->ygrp->setTopCam(usingTopCamera);
-		}
-		int lowYellow = 0;
-		for (int i = 0; i < IMAGE_WIDTH; i++) {
-			int result = findPostsInLowerCamera(i);
-			if (result > lowYellow) {
-				lowYellow = result;
-			}
-		}
-		//cout << "Low yellow is " << lowYellow << endl;
-		yellow->createObject();
-		if (ylp) {
-			vision->yglp->setLeftTopY(0);
-			vision->yglp->setRightTopY(0);
-			// make sure we use pix estimate
-			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
-			vision->yglp->setTopCam(usingTopCamera);
-			setFieldObjectInfo(vision->yglp);
-			//cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
-		}
-		if (yrp) {
-			vision->ygrp->setLeftTopY(0);
-			vision->ygrp->setRightTopY(0);
-			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
-			vision->ygrp->setTopCam(usingTopCamera);
-			setFieldObjectInfo(vision->ygrp);
-			//cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
-		}
-
+      (vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+       vision->ygrp->getRightBottomY() > IMAGE_HEIGHT - 5);
+    
+    if ((ylp || yrp) && !(left && right)) {
+      usingTopCamera = false;
+      
+      /************************************************/pose->transform(usingTopCamera, ja, inert);
+      yellow->init(pose->getHorizonSlope());
+      if (ylp) {
+	vision->yglp->init();
+	vision->yglp->setTopCam(usingTopCamera);
+      }
+      if (yrp) {
+	vision->ygrp->init();
+	vision->ygrp->setTopCam(usingTopCamera);
+      }
+      int lowYellow = 0;
+      for (int i = 0; i < IMAGE_WIDTH; i++) {
+	int result = findPostsInLowerCamera(i);
+	if (result > lowYellow) {
+	  lowYellow = result;
 	}
+      }
+      //cout << "Low yellow is " << lowYellow << endl;
+      yellow->createObject();
+      if (ylp) {
+	vision->yglp->setLeftTopY(0);
+	vision->yglp->setRightTopY(0);
+	// make sure we use pix estimate
+	vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+	vision->yglp->setTopCam(usingTopCamera);
+	setFieldObjectInfo(vision->yglp);
+	//cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
+      }
+      if (yrp) {
+	vision->ygrp->setLeftTopY(0);
+	vision->ygrp->setRightTopY(0);
+	vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+	vision->ygrp->setTopCam(usingTopCamera);
+	setFieldObjectInfo(vision->ygrp);
+	//cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
+      }
+      
+    }
 }
 
 /*
@@ -363,22 +365,22 @@ void Threshold::visionLoop() {
  * NOTE: The name is now a misnomer.  We no longer threshold here.
  */
 void Threshold::thresholdAndRuns() {
-    PROF_ENTER(P_THRESHRUNS); // profiling
+ 
 
     initColors();
 
     // Determine where the field horizon is
-    PROF_ENTER(P_FGHORIZON);
+ 
     horizon = field->findGreenHorizon(pose->getHorizonY(0),
                                       pose->getHorizonSlope());
-    PROF_EXIT(P_FGHORIZON);
+ 
 
     // 'Run' up the image to find color-grouped pixel sequences
-    PROF_ENTER(P_RUNS);
+ 
     runs();
-    PROF_EXIT(P_RUNS);
+ 
 
-    PROF_EXIT(P_THRESHRUNS);
+ 
 }
 
 /* Thresholding.  Since there's no real benefit (and in fact can it can be a

@@ -9,8 +9,8 @@ CognitionThread::CognitionThread() : Thread("cognition"),
 				     visMod()
 {
     logger.topImageIn.wireTo(&imageTranscriber.topImageOut);
-    visMod.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
     visMod.topImageIn.wireTo(&imageTranscriber.topImageOut);
+    visMod.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
     cognitionDiagram.addModule(imageTranscriber);
     cognitionDiagram.addModule(logger);
     cognitionDiagram.addModule(visMod);

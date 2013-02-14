@@ -9,7 +9,6 @@ class EdgeDetector;
 class Gradient;
 
 #include "geom/HoughLine.h"
-#include "Profiler.h"
 #include "VisualCorner.h"
 #include "HoughVisualLine.h"
 

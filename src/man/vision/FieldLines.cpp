@@ -137,13 +137,13 @@ void FieldLines::lineLoop()
 {
     vector<linePoint> vertLinePoints, horLinePoints;
 
-	PROF_ENTER(P_VERT_LINES);
-    findVerticalLinePoints(vertLinePoints);
-	PROF_EXIT(P_VERT_LINES);
 
-	PROF_ENTER(P_HOR_LINES);
+    findVerticalLinePoints(vertLinePoints);
+
+
+
     findHorizontalLinePoints(horLinePoints);
-	PROF_EXIT(P_HOR_LINES);
+
 
     sort(horLinePoints.begin(), horLinePoints.end());
 
@@ -153,29 +153,29 @@ void FieldLines::lineLoop()
           horLinePoints.begin(), horLinePoints.end(),
           linePoints.begin());
 
-	PROF_ENTER(P_CREATE_LINES);
-    createLines(linePoints);
-	PROF_EXIT(P_CREATE_LINES);
 
-	PROF_ENTER(P_JOIN_LINES);
+    createLines(linePoints);
+
+
+
 	joinLines();
-	PROF_EXIT(P_JOIN_LINES);
+
 
     extendLines(linesList);
 
     // Only those linePoints which were not used in any line remain within the
     // linePoints list
     // unusedPoints is used by vision to draw points on the screen
-	PROF_ENTER(P_FIT_UNUSED);
+
     unusedPointsList = linePoints;
 	fitUnusedPoints(linesList, unusedPointsList);
-	PROF_EXIT(P_FIT_UNUSED);
+
 
 	removeDuplicateLines();
 
-	PROF_ENTER(P_INTERSECT_LINES);
+
     cornersList = intersectLines();
-	PROF_EXIT(P_INTERSECT_LINES);
+
 
 }
 

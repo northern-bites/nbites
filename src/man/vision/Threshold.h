@@ -17,8 +17,8 @@ class Gradient;
 #include "Cross.h"
 #include "Robots.h"
 #include "Context.h"
-#include "Profiler.h"
 #include "NaoPose.h"
+
 
 //#define SOFTCOLORS
 
@@ -120,8 +120,8 @@ public:
 
 
     // main methods
-    void visionLoop();
-    void obstacleLoop();
+    void visionLoop(const messages::JointAngles& ja, const messages::InertialState& inert);
+    void obstacleLoop(const messages::JointAngles& ja, const messages::InertialState& inert);
     // inline void threshold();
     void thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg);
     inline void runs();

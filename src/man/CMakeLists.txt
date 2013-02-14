@@ -55,7 +55,7 @@ add_subdirectory( synchro )
 # Actual modules
 add_subdirectory( image )
 add_subdirectory( log )
-add_subdirectory( newVis )
+add_subdirectory( vision )
 
 # Build the sensors module.
 add_subdirectory( sensors )
@@ -78,7 +78,7 @@ target_link_libraries(
   synchro
   image
   log
-  newVis
+  vision
   sensors
 )
 
