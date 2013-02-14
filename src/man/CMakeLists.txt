@@ -49,8 +49,6 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # Actual subdirectories
 add_subdirectory( common )
 include_directories( common )
-add_subdirectory( synchro )
-include_directories( synchro )
 
 # Actual modules
 add_subdirectory( log )
@@ -71,7 +69,6 @@ target_link_libraries(
   man
   portals
   messages
-  synchro
   log
   sensors
 )
