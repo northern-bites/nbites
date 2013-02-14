@@ -13,6 +13,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     setModuleDescription("The Northern Bites' soccer player.");
     //cognitionThread.start();
     sensorsThread.addModule(sensors);
+    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
     sensorsThread.start();
 }
 

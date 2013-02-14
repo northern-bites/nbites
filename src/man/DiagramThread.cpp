@@ -36,7 +36,6 @@ int DiagramThread::start()
 
     // Create thread
     const int result = pthread_create(&thread, &attr, runDiagram, (void*)this);
-
     // Free space from attr
     pthread_attr_destroy(&attr);
     return result;
@@ -56,7 +55,7 @@ void* DiagramThread::runDiagram(void* _this)
 
     this_instance->running = true;
 
-    while (this_instance->running) this_instance->diagram.run();
+    while(this_instance->running) this_instance->diagram.run();
 
     cout << "Thread " << this_instance->name << " exiting." << endl;
     pthread_exit(NULL);
