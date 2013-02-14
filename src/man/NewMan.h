@@ -17,7 +17,6 @@ public:
     virtual ~Man();
 
 private:
-    //CognitionThread cognitionThread;
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
 };

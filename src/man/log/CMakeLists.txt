@@ -1,7 +1,6 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
-set(LOG_SRCS LogModule.cpp
-  Logger.cpp)
+set(LOG_SRCS LogModule.cpp)
 
 add_library(
   log

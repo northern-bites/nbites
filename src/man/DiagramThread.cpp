@@ -16,6 +16,7 @@ DiagramThread::~DiagramThread()
     stop();
 }
 
+// Just add the desired module to the underlying diagram
 void DiagramThread::addModule(Module& mod)
 {
     diagram.addModule(mod);
@@ -41,12 +42,19 @@ int DiagramThread::start()
     return result;
 }
 
+// If called from outside the thread, this should break the loop in
+// runDiagram and allow the thread to exit.
 void DiagramThread::stop()
 {
     running = false;
     cout << "Thread " << name << " stopping." << endl;
 }
 
+/*
+ * @brief pthreads needs a method with this signature to run in the thread.
+ *        Since it has to be static, we need to pass in a pointer to the
+ *        current instance in order to actually run the diagram.
+ */
 void* DiagramThread::runDiagram(void* _this)
 {
     DiagramThread* this_instance = reinterpret_cast<DiagramThread*>(_this);
@@ -55,6 +63,7 @@ void* DiagramThread::runDiagram(void* _this)
 
     this_instance->running = true;
 
+    // Run the diagram over and over again!
     while(this_instance->running) this_instance->diagram.run();
 
     cout << "Thread " << this_instance->name << " exiting." << endl;
