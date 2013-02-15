@@ -10,7 +10,7 @@ include( cmake/Flags.cmake )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
-include( cmake/FindNBITES_DIR.cmake )
+include( ../cmake/FindNBITES_DIR.cmake )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
   include( ${NBITES_DIR}/src/cmake/BuildProtobuf.cmake )
