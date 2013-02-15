@@ -5,6 +5,11 @@
  */
 #pragma once
 
+#include "LocStructs.h"
+
+#include <iostream>
+#include "../memory/protos/Common.pb.h"
+
 namespace man
 {
     namespace localization
@@ -18,22 +23,31 @@ namespace man
     class Particle
     {
     public:
-        Particle(memory::proto::RobotLocation location, float weight)
-            : weight_(weight), location_(location) { }
+        Particle(memory::proto::RobotLocation location_, float weight_)
+            : weight(weight_), location(location_) { }
 
-        Particle() : weight_(0.0f), location_() {}
+        Particle() : weight(0.0f), location() {}
 
         ~Particle() { }
 
-        memory::proto::RobotLocation getLocation() const { return location_; }
-        void setLocation(memory::proto::RobotLocation location) { location_ = location; }
+        memory::proto::RobotLocation getLocation() const { return location; }
+        void setLocation(memory::proto::RobotLocation location_) { location = location_; }
 
-        float getWeight() const { return weight_; }
-        void setWeight(float weight) { weight_ = weight; }
+        float getWeight() const { return weight; }
+        void setWeight(float weight_) { weight = weight_; }
 
-        void setX(float x) { location_.set_x(x); }
-        void setY(float y) { location_.set_y(y); }
-        void setH(float h) { location_.set_h(h); }
+        void setX(float x) { location.set_x(x); }
+        void setY(float y) { location.set_y(y); }
+        void setH(float h) { location.set_h(h); }
+
+        void shiftParticle(memory::proto::RobotLocation shiftAmount)
+        {
+            location.set_x(location.x() + shiftAmount.x());
+            location.set_y(location.y() + shiftAmount.y());
+            location.set_h(location.h() + shiftAmount.h());
+        }
+
+        void normalizeWeight(float totalWeight) {weight = weight/totalWeight;}
 
         /**
          * @brief Used to compare two particles by weight, primarily for
@@ -61,11 +75,14 @@ namespace man
         }
 
     private:
-        float weight_;                           //! The particle weight.
-        memory::proto::RobotLocation location_;  //! The particle location (x, y, heading).
+        float weight;                           //! The particle weight.
+        memory::proto::RobotLocation location;  //! The particle location (x, y, heading).
 
     };
 
+    /*
+     * @brief The total weights of a Particle Set should sum to 1 for resampling
+     */
     typedef std::vector<Particle> ParticleSet;
     typedef ParticleSet::iterator ParticleIt;
     } // namespace localization

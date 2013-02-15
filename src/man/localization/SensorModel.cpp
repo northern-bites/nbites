@@ -4,6 +4,6 @@ namespace man
 {
     namespace localization
     {
-	// @todo
+    // @todo
     } // namespace localization
 } // namespace man

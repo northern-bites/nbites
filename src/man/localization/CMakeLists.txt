@@ -11,7 +11,11 @@ find_package(Boost REQUIRED)
 
 # Set source files here that need to be compiled.
 set(LOCALIZATION_SRCS LocalizationModule
-                      ParticleFilter)
+                      # ParticleFilter
+		      # Particle
+		      # MotionModel
+		      # SensorModel
+)
 
 # Add project as a library.
 add_library(

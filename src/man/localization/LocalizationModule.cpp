@@ -4,22 +4,29 @@ namespace man
 {
     namespace localization
     {
-    LocalizationModule::LocalizationModule()
-        : Module(), output(base())
-    {
 
+
+    LocalizationModule::LocalizationModule()
+    {
+//        motionModel = new MotionSystem();
+//        visionModel = new VisionSystem();
+//        particleFilter = new ParticleFilter(motionModel, visionModel);
     }
 
     LocalizationModule::~LocalizationModule()
     {
-
     }
 
-    void LocalizationModule::run_()
+    void LocalizationModule::update()
     {
-        // @todo pull information from (1) MotionModule
-        //       and (2) VisionModule.
-        updateLocalization(/* @todo */);
+        // particleFilter.update(motionInput.message(), visionInput.message());
+        // output.setMessage(particleFilter.getEstimate());
     }
+
+    void LocalizationModule::run()
+    {
+        update();
     }
-}
+
+    } // namespace localization
+} // namespace localization

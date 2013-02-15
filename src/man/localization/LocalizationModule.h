@@ -1,15 +1,18 @@
 /*
- * @brief  The main localization module base class.
- * @author Ellis Ratner <eratner@bowdoin.edu>
- * @date   January 2013
- * @modified EJ Googins <egoogins@bowdoin.edu>
- * @date   January 2013
+ * @brief  The abstract localization module base class.
+ * @author EJ Googins <egoogins@bowdoin.edu>
+ * @date   February 2013
  */
 #pragma once
 
 #include "../portals/RoboGrams.h"
 #include "../memory/protos/Common.pb.h"
 #include "../memory/protos/Vision.pb.h"
+#include "../memory/protos/Motion.pb.h"
+
+#include "SensorModel.h"
+#include "MotionModel.h"
+#include "ParticleFilter.h"
 
 namespace man
 {
@@ -22,30 +25,32 @@ namespace man
     {
     public:
         LocalizationModule();
-        virtual ~LocalizationModule();
+        ~LocalizationModule();
 
-        /**
-         * @brief Resets the localization.
-         */
-        virtual void resetLocalization() = 0;
-
-        //InPortal<memory::proto::PMotion> motionInput;
-        InPortal<memory::proto::PVision> visionInput;
+        InPortal<memory::proto::Motion> motionInput;
+        InPortal<memory::proto::PVisionField> visionInput;
         OutPortal<memory::proto::RobotLocation> output;
+
+        float lastMotionTimestamp;
+        float lastVisionTimestamp;
 
     protected:
         /**
-         * @brief Simply calls updateLocalization.
+         * @brief Calls Update
          */
-        virtual void run_();
+        void run();
 
         /**
          * @brief Updates the current robot pose estimate given
          *        the most recent motion control inputs and
          *        measurements taken.
          */
-        virtual void updateLocalization(
-            /* @todo sort out observation classes */) = 0;
+        void update();
+
+        SensorModel visionModel;
+        MotionModel motionModel;
+
+        ParticleFilter particleFilter;
     };
     } // namespace localization
 } // namespace man

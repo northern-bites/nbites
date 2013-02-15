@@ -3,16 +3,19 @@
  * system for robot self-localization.
  *
  * @author Ellis Ratner <eratner@bowdoin.edu>
+ * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   May 2012 (updated January 2013)
  */
 #pragma once
 
-#include "LocalizationModule.h"
 #include "SensorModel.h"
 #include "MotionModel.h"
 #include "Particle.h"
+#include "LocSystem.h"
 #include "../memory/protos/Common.pb.h"
 #include "FieldConstants.h"
+#include "VisionSystem.h"
+#include "MotionSystem.h"
 
 #include <vector>
 #include <iostream>
@@ -27,40 +30,6 @@ namespace man
 {
     namespace localization
     {
-    // @todo move this to a common file!
-    /**
-     * @brief  Samples a Gaussian normal distribution of specified
-     *         mean and standard deviation (sigma.)
-     * @param  mean the mean of the data.
-     * @param  sigma the standard deviation of the data.
-     * @return A random sample of the specified normal
-     *         distribution.
-     */
-    static float sampleNormal(float mean, float sigma)
-    {
-        // Seed the random number generator.
-        static boost::mt19937 rng(static_cast<unsigned>(std::time(0)));
-
-        boost::normal_distribution<float> dist(mean, sigma);
-
-        boost::variate_generator<boost::mt19937&,
-             boost::normal_distribution<float> > sample(rng, dist);
-
-        return sample();
-    }
-
-    /**
-     * @struct ParticleFilterParams
-     * @brief Parameters used for the particle filter.
-     */
-    struct ParticleFilterParams
-    {
-        float fieldHeight;        //! Field height.
-        float fieldWidth;         //! Field width.
-        float numParticles;       //! Size of particle population.
-        float alpha_fast;         //! Weight factor for fast exponential weight filter.
-        float alpha_slow;         //! Weight factor for slow exponential weight filter.
-    };
 
     static const ParticleFilterParams DEFAULT_PARAMS =
     {
@@ -78,14 +47,13 @@ namespace man
      *        based on a prior belief function as well as latest
      *        sensor and control data.
      */
-    class ParticleFilter : public LocalizationModule
+    class ParticleFilter : public LocSystem
     {
 
     public:
-        ParticleFilter(boost::shared_ptr<MotionModel> motionModel,
-                       boost::shared_ptr<SensorModel> sensorModel,
+        ParticleFilter(MotionSystem motionSystem,
+                       VisionSystem visionSystem,
                        ParticleFilterParams parameters = DEFAULT_PARAMS);
-
         ~ParticleFilter();
 
         /**
@@ -112,6 +80,14 @@ namespace man
 
         void resetLocalization();
 
+        void updateMotionModel();
+
+        memory::proto::RobotLocation getCurrentEstimate(){return poseEstimate;}
+
+        float getXEst(){return poseEstimate.x();}
+        float getYEst(){return poseEstimate.y();}
+        float getHEst(){return poseEstimate.h();}
+
     private:
         /**
          * @brief Resamples (with replacement) the particle population according
@@ -119,11 +95,7 @@ namespace man
          */
         void resample();
 
-        /**
-         * @brief Update localization using the particle filter algorithm
-         to incorperate motion and sensor data.
-        */
-        void updateLocalization(/* @todo */);
+        void updateEstimate();
 
         ParticleFilterParams parameters;
 
@@ -132,8 +104,15 @@ namespace man
         std::vector<float> standardDeviations;
 
         ParticleSet particles;
-        boost::shared_ptr<MotionModel> motionModel;
-        boost::shared_ptr<SensorModel> sensorModel;
+
+        // EJ ----------------------------------------------
+        MotionSystem motionSystem;
+        VisionSystem visionSystem;
+
+        float lastMotionTimestamp;
+        float lastVisionTimestamp;
+
+        bool updatedVision;
     };
     } // namespace localization
 } // namespace man

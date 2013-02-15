@@ -4,9 +4,13 @@
  *         done by computing odometry measurements in the
  *         motion system.
  * @author Ellis Ratner <eratner@bowdoin.edu>
+ * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   January 2013
  */
 #pragma once
+
+#include "../memory/protos/Common.pb.h"
+#include "../memory/protos/Motion.pb.h"
 
 #include "Particle.h"
 
@@ -14,6 +18,7 @@ namespace man
 {
     namespace localization
     {
+
     /**
      * @class MotionModel
      * @brief The abstract interface for providing motion updates
@@ -30,40 +35,22 @@ namespace man
          * @brief Update the particles with a the control input
          *        according to the latest motion.
          */
-        virtual ParticleSet update(ParticleSet& particles) = 0;
+        virtual ParticleSet update(ParticleSet& particles,
+                                   memory::proto::RobotLocation lastOdometry);
 
-        /**
-         * @brief Get the last odometry measurement.
+        /*
+         * These methods allow the client to access information as
+         * to whether or not the SensorModel has performed an
+         * update on the latest iteration.
          */
-//        virtual const OdometryMeasurement& getLastOdometry() const = 0;
-    };
-
-    /**
-     * @class OdometryModel
-     * @brief Responsible for updating particles based on an odometry
-     *        measurement from the motion system.
-     */
-    class OdometryModel : public MotionModel
-    {
-    public:
-        OdometryModel();
-        ~OdometryModel();
-
-        ParticleSet update(ParticleSet& particles);
-
-        /**
-         * @brief When a robot falls, it tends to rotate, altering its
-         *        heading in a manner not measureable by conventional
-         *        odometry. Therefore, we will account for this by adding
-         *        additional noise/uncertainty to the heading following
-         *        a fall.
-         *
-         * @param fallen Whether or not the robot is fallen.
-         */
-        void setFallen(bool fallen);
+        bool hasUpdated() const { return updated; }
+        void setUpdated(bool updated_) { updated = updated_; }
 
     private:
-        bool robotFallen;
+        bool updated;    //! Flag indicates whether or not the particles have
+                         //! been updated with the latest sensor readings.
+
     };
+
     } // namespace localization
 } // namespace man

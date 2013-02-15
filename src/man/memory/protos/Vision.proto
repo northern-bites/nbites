@@ -1,115 +1,51 @@
 package man.memory.proto;
 
-message PVision {
 
-    optional int64 timestamp = 1;
-    optional PVisualBall visual_ball = 2;
-    repeated PVisualCorner visual_corner = 3;
-    optional PVisualFieldObject yglp = 6;
-    optional PVisualFieldObject ygrp = 7;
-    optional PVisualRobot red1=8;
-    optional PVisualRobot red2=9;
-    optional PVisualRobot red3=10;
-    optional PVisualRobot navy1=11;
-    optional PVisualRobot navy2=12;
-    optional PVisualRobot navy3=13;
-    repeated PVisualLine visual_line=14;
-    optional PVisualCross visual_cross=15;
+message PVisionField
+{
 
-    	message PVisualDetection {
-
-        optional float distance = 1;
-        optional sint32 width = 3;
-	optional sint32	height = 4;
-	optional sint32 x = 5;
-        optional sint32 y = 6;
-        optional sint32 center_x = 7;
-        optional sint32 center_y = 8;
-        optional float angle_x = 9;
-        optional float angle_y = 10;
-        optional float bearing = 11;
-        optional float elevation = 12;
-        optional float distance_sd = 13;
-        optional float bearing_sd = 14;
-	optional bool inTopCam = 15;
-	}
-
-    message PVisualBall {
-
-	required PVisualDetection visual_detection = 1;
-        optional float radius = 2;
-        optional sint32 confidence = 3;
-
-    }
-
-    message PVisualLandmark {
-
-    	optional uint32 id = 1;
-    	optional uint32 id_certainty = 2;
-    	optional uint32 distance_certainty = 3;
-
-    }
-
-    message PVisualCorner {
-
-    	required PVisualDetection visual_detection = 1;
-    	required PVisualLandmark visual_landmark = 2;
-    	optional uint32 corner_type = 3;
-    	optional uint32 secondary_shape = 4;
-    	optional float angle_between_lines = 5;
-    	optional float orientation = 6;
-	optional float physical_orientation = 7;
-    }
-
-    message PVisualFieldObject {
-
-	required PVisualDetection visual_detection = 1;
-	required PVisualLandmark visual_landmark = 2;
-	optional sint32 left_top_x = 3;
-	optional sint32 left_top_y = 4;
-	optional sint32 right_top_x = 5;
-	optional sint32 right_top_y = 6;
-	optional sint32 left_bottom_x = 7;
-	optional sint32 left_bottom_y = 8;
-	optional sint32 right_bottom_x = 9;
-	optional sint32 right_bottom_y = 10;
-    }
-
-    message PVisualRobot {
-        required PVisualDetection visual_detection = 1;
-
-	optional sint32 left_top_x = 3;
-	optional sint32 left_top_y = 4;
-	optional sint32 right_top_x = 5;
-	optional sint32 right_top_y = 6;
-	optional sint32 left_bottom_x = 7;
-	optional sint32 left_bottom_y = 8;
-	optional sint32 right_bottom_x = 9;
-	optional sint32 right_bottom_y = 10;
-    }
-
-    message PVisualLine {
-
-        required PVisualLandmark visual_landmark = 1;
-	optional sint32 start_x = 2;
-	optional sint32 start_y = 3;
-	optional sint32 end_x = 4;
-	optional sint32 end_y = 5;
-
-    }
-
-    message PVisualCross {
-        required PVisualDetection visual_detection = 1;
-	required PVisualLandmark visual_landmark =2;
-	optional sint32 left_top_x = 3;
-	optional sint32 left_top_y = 4;
-	optional sint32 right_top_x = 5;
-	optional sint32 right_top_y = 6;
-	optional sint32 left_bottom_x = 7;
-	optional sint32 left_bottom_y = 8;
-	optional sint32 right_bottom_x = 9;
-	optional sint32 right_bottom_y = 10;
-    }
-
-
+   optional int64 timestamp = 1;
+   optional PVisualGoalPost goal_post_l = 2;
+   optional PVisualGoalPost goal_post_r = 3;
+   repeated PVisualCorner visual_corner = 4;
+   repeated PVisualLine visual_line = 5;
+   optional PVisualDetection visual_cross = 6;
 }
+   message Point
+   {
+      optional float x = 1;
+      optional float y = 2;
+   }
+
+   message PVisualDetection
+   {
+      optional float distance = 1;
+      optional float bearing = 2;
+      optional float distance_SD = 3;
+      optional float bearing_SD = 4;
+      repeated Point concrete_coords = 5;
+   }
+
+   message PVisualGoalPost
+   {
+      optional PVisualDetection visual_detection = 1;
+      optional int32 height = 2;
+      optional int32 width = 3;
+   }
+
+   message PVisualCorner
+   {
+      optional PVisualDetection visual_detection = 1;
+      optional float orientation = 2;
+      optional int32 corner_type = 3;
+   }
+
+   message PVisualLine
+   {
+      optional PVisualDetection visual_detection = 1;
+      optional int32 line_id = 2
+      optional int32 start_x = 3;
+      optional int32 start_y = 4;
+      optional int32 end_x = 5;
+      optional int32 end_y = 6;
+   }

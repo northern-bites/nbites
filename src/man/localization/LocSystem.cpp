@@ -1,146 +1,28 @@
-#include "ParticleFilter.h"
+#include "LocSystem.h"
 
 namespace man
 {
     namespace localization
     {
-    ParticleFilter::ParticleFilter(boost::shared_ptr<MotionModel> motionModel_,
-                                   boost::shared_ptr<SensorModel> sensorModel_,
-                                   ParticleFilterParams params)
-        : parameters(params), standardDeviations(3, 0.0f)
+    LocSystem::LocSystem(MotionModel motionModel_,
+                         SensorModel sensorModel_) : onOpposingSide(false),
+                                                     motionModel(motionModel_),
+                                                     sensorModel(sensorModel_) {}
+    LocSystem::~LocSystem(){}
+
+    void LocSystem::updateLocalization(memory::proto::PMotion motionInput,
+                                       memory::proto::PVision visionInput)
     {
-        motionModel = motionModel_;
-        sensorModel = sensorModel_;
-
-        boost::mt19937 rng;
-        rng.seed(std::time(0));
-
-        boost::uniform_real<float> xBounds(0.0f,
-                                           (float) parameters.fieldWidth);
-        boost::uniform_real<float> yBounds(0.0f,
-                                           (float) parameters.fieldHeight);
-        boost::uniform_real<float> angleBounds(0,
-                                               2.0f*boost::math::constants::pi<float>());
-
-        boost::variate_generator<boost::mt19937&,
-                                 boost::uniform_real<float> > xGen(rng, xBounds);
-        boost::variate_generator<boost::mt19937&,
-                                 boost::uniform_real<float> > yGen(rng, yBounds);
-        boost::variate_generator<boost::mt19937&,
-                                 boost::uniform_real<float> > angleGen(rng, angleBounds);
-
-        // Assign uniform weight.
-        float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
-
-        for(int i = 0; i < parameters.numParticles; ++i)
-        {
-            memory::proto::RobotLocation randomLocation;
-            randomLocation.set_x(xGen());
-            randomLocation.set_y(yGen());
-            randomLocation.set_h(angleGen());
-            Particle p(randomLocation, weight);
-            particles.push_back(p);
-        }
+        
     }
 
-    ParticleFilter::~ParticleFilter()
-    {}
 
-    void ParticleFilter::update(memory::proto::Motion motionInput,
-                                memory::proto::PVisionField visionInput)
-    {
-        // Update the Motion Model
-        if (motionInput.timestamp() > lastMotionTimestamp)
-        {
-            lastMotionTimestamp = MotionInput.timestamp();
-            motionSystem.update(particles, motionInput.odometry());
-        }
 
-        // Update the Vision Model
-        if (visionInput.timestamp() > lastVisionTimestamp)
-        {
-            lastVisionTimestamp = visionInput.timestamp();
-            visionSystem.update(particles, visionInput);
-            updatedVision = true;
-        }
 
-        // Resample if vision update
-        if(updatedVision)
-        {
-            resample();
-        }
 
-        // Update filters estimate
-        updateEstimate();
 
-        // Check if the mean has gone out of bounds. If so,
-        // reset to the closest point in bounds with appropriate
-        // uncertainty.
-        bool resetInBounds = false;
 
-        if(poseEstimate.x() < 0)
-        {
-            resetInBounds = true;
-            poseEstimate.set_x(0);
-        }
 
-        else if(poseEstimate.x() > parameters.fieldWidth)
-        {
-            resetInBounds = true;
-            poseEstimate.set_x(parameters.fieldWidth);
-        }
-
-        if(poseEstimate.y() < 0)
-        {
-            resetInBounds = true;
-            poseEstimate.set_y(0);
-        }
-        else if(poseEstimate.y() > parameters.fieldHeight)
-        {
-            resetInBounds = true;
-            poseEstimate.set_y(parameters.fieldHeight);
-        }
-
-        // Only reset if one of the location coordinates is
-        // out of bounds; avoids unnecessary resets.
-        if(resetInBounds)
-        {
-            /*
-             * @TODO Actually reset to a location here
-             */
-
-            std::cout << "Resetting to (" << poseEstimate.x()
-                      << ", " << poseEstimate.y() << ", "
-                      << poseEstimate.h() << ")." << std::endl;
-        }
-    }
-
-    void ParticleFilter::updateEstimate()
-    {
-        // Update estimates.
-        float sumX = 0;
-        float sumY = 0;
-        float sumH = 0;
-
-        ParticleIt iter;
-        for(iter = particles.begin(); iter != particles.end(); ++iter)
-        {
-            memory::proto::RobotLocation l = (*iter).getLocation();
-            sumX += l.x();
-            sumY += l.y();
-            sumH += l.h();
-        }
-
-        float previousXEstimate = poseEstimate.x();
-        float previousYEstimate = poseEstimate.y();
-        float previousHEstimate = poseEstimate.h();
-
-        poseEstimate.set_x(sumX/parameters.numParticles);
-        poseEstimate.set_y(sumY/parameters.numParticles);
-        poseEstimate.set_h(sumH/parameters.numParticles);
-
-        standardDeviations = findParticleSD();
-    }
 
     Particle ParticleFilter::getBestParticle()
     {
@@ -290,5 +172,21 @@ namespace man
 
         particles = newParticles;
     }
+
+    void ParticleFilter::updateLocalization(/* @todo */)
+    {
+        // @todo
+    }
+
+    void ParticleFilter::updateMotionModel()
+    {
+        // @todo
+    }
+
+    void ParticleFilter::updateVisionModel()
+    {
+        // @todo
+    }
+
     } // namespace localization
 } // namespace man
