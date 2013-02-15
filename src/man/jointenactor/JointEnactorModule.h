@@ -24,6 +24,9 @@
 #include "SensorTypes.h"
 #include "RoboGrams.h"
 
+#include "JointStiffness.pb.h"
+#include "JointAngles.pb.h"
+
 namespace man
 {
     namespace jointenactor
@@ -52,6 +55,12 @@ namespace man
 	     *        disabled. 
 	     */
 	    void disableMotion();
+
+	    // Allows clients to set the stiffnesses of all joints.
+	    portals::InPortal<messages::JointStiffness> stiffnessInput_;
+
+	    // Accepts motion commands (i.e. joint angles.)
+	    portals::InPortal<messages::JointAngles> jointsInput_;
 
 	private:
 	    /**
@@ -91,6 +100,7 @@ namespace man
 	    AL::ALValue jointCommand_;
 	    AL::ALProcessSignals::ProcessSignalConnection dcmPreProcessConnection_;
 
+	    messages::JointAngles latestJointAngles_;
 	};
     } // namespace jointenactor
 } // namespace man

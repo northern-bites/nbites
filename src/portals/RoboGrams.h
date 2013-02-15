@@ -481,7 +481,7 @@ public:
     wiredTo_ = op;
     asynchronous_ = asynchronous;
   }
-  // effect   Wire this inout to the specified output. The wire can be synchronous
+  // effect   Wire this input to the specified output. The wire can be synchronous
   //          or asynchronous. If the output is null, this input will hold a fixed
   //          message.
 

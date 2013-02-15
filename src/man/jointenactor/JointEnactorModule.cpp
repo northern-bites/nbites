@@ -249,8 +249,15 @@ namespace man
 
 	void JointEnactorModule::run_()
 	{
-	    // Enable stiffnesses. 
-	    setStiffness(0.2f);
+	    // Update stiffnesses. 
+	    stiffnessInput_.latch();
+	    setStiffness(stiffnessInput_.message().stiffness());
+
+	    // Update joint angles. 
+	    jointsInput_.latch();
+	    latestJointAngles_ = jointsInput_.message();
+	    if(!motionEnabled_)
+		enableMotion();
 	}
 
     } // namespace jointenactor
