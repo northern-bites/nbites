@@ -2,7 +2,6 @@
 #include <iostream>
 
 namespace man {
-using namespace sensors;
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
