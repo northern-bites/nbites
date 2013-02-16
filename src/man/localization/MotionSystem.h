@@ -22,7 +22,7 @@ namespace man
         ~MotionSystem();
 
         ParticleSet update(ParticleSet& particles,
-                           memory::proto::RobotLocation deltaMotionInformation);
+                           messages::RobotLocation deltaMotionInformation);
 
         void setFallen(bool fallen);
 

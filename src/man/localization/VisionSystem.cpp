@@ -14,7 +14,7 @@ namespace man
          * @return the updated ParticleSet.
          */
         ParticleSet VisionSystem::update(ParticleSet& particles,
-                                         memory::proto::PVisionField observations)
+                                         messages::PVisionField observations)
         {
             const float TINY_WEIGHT = .00001f;
 
@@ -34,7 +34,7 @@ namespace man
                     {
                         float newWeight = scoreFromLandmark(particle, observations.visual_corner(i));
                         if (newWeight < TINY_WEIGHT)
-                            newWeight = TINY_WEIGHT;
+p                            newWeight = TINY_WEIGHT;
                         newParticleWeight *= newWeight;
 
                     }
@@ -75,7 +75,9 @@ namespace man
                     Particle* particle = &(*iter);
                     particle.normalizeWeight(totalWeight
                 }
-                //
+
+                // We've updated particles with vision, so tell PF to resample
+                setUpdated(true);
             }
         }
 
@@ -90,10 +92,10 @@ namespace man
             float bestScore = 0;
 
             // Only using info from Visual Detection if in this function, so call obsv for short
-            memory::proto::PVisualDetection& obsv = observation_.visual_detection();
+            messages::PVisualDetection& obsv = observation_.visual_detection();
             for (int i=0; i<obsv.concrete_coords_size(); i++)
             {
-                const memory::proto::Point& fieldPoint = obsv.concrete_coords(i);
+                const messages::Point& fieldPoint = obsv.concrete_coords(i);
 
                 RelVector relVector = getRelativeVector(particle,
                                                         fieldPoint.x(),

@@ -9,8 +9,8 @@
  */
 #pragma once
 
-#include "../memory/protos/Common.pb.h"
-#include "../memory/protos/Motion.pb.h"
+#include "Common.pb.h"
+#include "Motion.pb.h"
 
 #include "Particle.h"
 
@@ -36,7 +36,7 @@ namespace man
          *        according to the latest motion.
          */
         virtual ParticleSet update(ParticleSet& particles,
-                                   memory::proto::RobotLocation lastOdometry);
+                                   messages::RobotLocation lastOdometry);
 
         /*
          * These methods allow the client to access information as

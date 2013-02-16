@@ -14,7 +14,7 @@ namespace man
          * @return the updated ParticleSet.
          */
         ParticleSet MotionSystem::update(ParticleSet& particles,
-                                         memory::proto::RobotLocation deltaMotionInformation)
+                                         messages::RobotLocation deltaMotionInformation)
         {
 
             if (visionInput.timestamp() > lastVisionTimestamp)
@@ -50,7 +50,7 @@ namespace man
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);
 
             // Determine random noise
-            memory::proto::RobotLocation randomShiftAmount;
+            messages::RobotLocation randomShiftAmount;
             randomShiftAmount.set_x(coordNoise());
             randomShiftAmount.set_y(coordNoise());
             randomShiftAmount.set_h(headNoise());

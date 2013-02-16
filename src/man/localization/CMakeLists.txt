@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 2.8.3)
 # Project name.
 project(localization)
 
-# Find necessary libraries.
-find_package(Boost REQUIRED)
-
 # Include directories.
 #include_directories( ... )
 
@@ -27,4 +24,5 @@ add_library(
 # Link project to appropriate libraries.
 target_link_libraries(localization
   portals
+  messages
   ${PROTOS_TARGET})

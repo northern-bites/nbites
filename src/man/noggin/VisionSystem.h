@@ -160,8 +160,8 @@ class VisionSystem : public PF::SensorModel
 
  private:
     static float updateTotalWeight(float currentTotalWeight, float currentWeight) {
-        const float TINY_WEIGHT = .00001;
-        if (currentWeight <=  0)
+        const float TINY_WEIGHT = .00001f;
+        if (currentWeight <=  0.0f)
             currentWeight = TINY_WEIGHT;
         if(currentTotalWeight == 0.0f)
             currentTotalWeight = currentWeight;

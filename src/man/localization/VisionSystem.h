@@ -32,7 +32,7 @@ namespace man
         ~VisionSystem();
 
         ParticleSet update(ParticleSet& particles,
-                           memory::proto::PVision visionInput);
+                           messages::PVisionField visionInput);
 
         template <class VisualObservationT, class ConcreteLandmarkT>
         float scoreFromLandmark(VisualObservationT observation,

@@ -8,7 +8,7 @@
 #include "LocStructs.h"
 
 #include <iostream>
-#include "../memory/protos/Common.pb.h"
+#include "Common.pb.h"
 
 namespace man
 {
@@ -23,15 +23,15 @@ namespace man
     class Particle
     {
     public:
-        Particle(memory::proto::RobotLocation location_, float weight_)
+        Particle(messages::RobotLocation location_, float weight_)
             : weight(weight_), location(location_) { }
 
         Particle() : weight(0.0f), location() {}
 
         ~Particle() { }
 
-        memory::proto::RobotLocation getLocation() const { return location; }
-        void setLocation(memory::proto::RobotLocation location_) { location = location_; }
+        messages::RobotLocation getLocation() const { return location; }
+        void setLocation(messages::RobotLocation location_) { location = location_; }
 
         float getWeight() const { return weight; }
         void setWeight(float weight_) { weight = weight_; }
@@ -40,7 +40,7 @@ namespace man
         void setY(float y) { location.set_y(y); }
         void setH(float h) { location.set_h(h); }
 
-        void shiftParticle(memory::proto::RobotLocation shiftAmount)
+        void shiftParticle(messages::RobotLocation shiftAmount)
         {
             location.set_x(location.x() + shiftAmount.x());
             location.set_y(location.y() + shiftAmount.y());
@@ -76,7 +76,7 @@ namespace man
 
     private:
         float weight;                           //! The particle weight.
-        memory::proto::RobotLocation location;  //! The particle location (x, y, heading).
+        messages::RobotLocation location;  //! The particle location (x, y, heading).
 
     };
 

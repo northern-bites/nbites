@@ -34,7 +34,7 @@ namespace man
 
         for(int i = 0; i < parameters.numParticles; ++i)
         {
-            memory::proto::RobotLocation randomLocation;
+            messages::RobotLocation randomLocation;
             randomLocation.set_x(xGen());
             randomLocation.set_y(yGen());
             randomLocation.set_h(angleGen());
@@ -46,8 +46,8 @@ namespace man
     ParticleFilter::~ParticleFilter()
     {}
 
-    void ParticleFilter::update(memory::proto::Motion motionInput,
-                                memory::proto::PVisionField visionInput)
+    void ParticleFilter::update(messages::Motion motionInput,
+                                messages::PVisionField visionInput)
     {
         // Update the Motion Model
         if (motionInput.timestamp() > lastMotionTimestamp)
@@ -125,7 +125,7 @@ namespace man
         ParticleIt iter;
         for(iter = particles.begin(); iter != particles.end(); ++iter)
         {
-            memory::proto::RobotLocation l = (*iter).getLocation();
+            messages::RobotLocation l = (*iter).getLocation();
             sumX += l.x();
             sumY += l.y();
             sumH += l.h();
@@ -230,7 +230,7 @@ namespace man
 
         for(int i = 0; i < parameters.numParticles; ++i)
         {
-            memory::proto::RobotLocation randomLocation;
+            messages::RobotLocation randomLocation;
             randomLocation.set_x(xGen());
             randomLocation.set_y(yGen());
             randomLocation.set_h(angleGen());
@@ -238,6 +238,25 @@ namespace man
 
             particles.push_back(p);
         }
+    }
+
+    void ParticleFilter::resetLocTo(float x, float y, float h,
+                                    LocNormalParams params = LocNormalParams())
+    {
+        resetLocalization();
+    }
+
+    void ParticleFilter::resetLocTo(float x, float y, float h,
+                                    float x_, float y_, float h_,
+                                    LocNormalParams params1 = LocNormalParams(),
+                                    LocNormalParams params2 = LocNormalParams())
+    {
+        resetLocalization();
+    }
+
+    void LocSystem::resetLocToSide(bool blueSide)
+    {
+        resetLocalization();
     }
 
     void ParticleFilter::resample()

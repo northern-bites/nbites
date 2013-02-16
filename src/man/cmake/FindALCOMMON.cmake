@@ -1,47 +1,45 @@
+# Finds Aldebaran's libraries
 
-##
-# Includes
-##
+set( AL_DIR $ENV{AL_DIR} )
+message(STATUS "Set $ENV{AL_DIR}/ as the SDK.")
+message(STATUS "If this is not correct, edit your nbites.bash.")
 
-IF( BUILDING_FOR_A_REMOTE_NAO )
-  SET( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/ )
-ENDIF()
+if( NOT OFFLINE )
+  set( ALCOMMON_INCLUDE_DIR ${OE_SYSROOT}/usr/include/ )
+else()
+  set( ALCOMMON_INCLUDE_DIR ${AL_DIR}/include/ )
+endif()
 
-IF( BUILDING_FOR_A_REMOTE_NAO ) 
-  SET( ALCOMMON_LIBRARIES
+if( NOT OFFLINE )
+  set( ALCOMMON_LIBRARIES
     ${OE_SYSROOT}/usr/lib/libalcommon.so
     ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
-ENDIF()
+else()
+  set( ALCOMMON_LIBRARIES
+    ${AL_DIR}/lib/libalcommon.so
+    ${AL_DIR}/lib/libalmemoryfastaccess.so)
+endif()
 
-IF( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
-    SET( ALCOMMON_FOUND TRUE )
-ENDIF( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
+# if( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
+#     set( ALCOMMON_FOUND TRUE )
+# endif( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
 
-IF( NOT ALCOMMON_FOUND_TRUE AND ALCOMMON_FIND_REQUIRED )
-    IF( NOT ALCOMMON_INCLUDE_DIR )
-        MESSAGE( STATUS "Required include not found" )
-        MESSAGE( FATAL_ERROR "Could not find ALCOMMON include!")
-    ENDIF( NOT ALCOMMON_INCLUDE_DIR )
-    IF( NOT ALCOMMON_LIBRARIES )
-        MESSAGE( STATUS "Required libraries not found" )
-        MESSAGE( FATAL_ERROR "Could not find ALCOMMON libraries!")
-    ENDIF( NOT ALCOMMON_LIBRARIES )
-ENDIF( NOT ALCOMMON_FOUND_TRUE AND ALCOMMON_FIND_REQUIRED )
+if( NOT ALCOMMON_FOUND_TRUE AND ALCOMMON_FIND_REQUIRED )
+    if( NOT ALCOMMON_INCLUDE_DIR )
+        message( STATUS "Required include not found" )
+        message( FATAL_ERROR "Could not find ALCOMMON include!")
+    endif( NOT ALCOMMON_INCLUDE_DIR )
+    if( NOT ALCOMMON_LIBRARIES )
+        message( STATUS "Required libraries not found" )
+        message( FATAL_ERROR "Could not find ALCOMMON libraries!")
+    endif( NOT ALCOMMON_LIBRARIES )
+endif( NOT ALCOMMON_FOUND_TRUE AND ALCOMMON_FIND_REQUIRED )
 
-##
-# Finally, display informations if not in quiet mode
-##
+message( STATUS "ALCOMMON found " )
+message( STATUS "  includes   : ${ALCOMMON_INCLUDE_DIR}" )
+message( STATUS "  libraries  : ${ALCOMMON_LIBRARIES}" )
 
-IF( NOT ALCOMMON_FIND_QUIETLY )
-  MESSAGE( STATUS "ALCOMMON found " )
-  MESSAGE( STATUS "  includes   : ${ALCOMMON_INCLUDE_DIR}" )
-  MESSAGE( STATUS "  libraries  : ${ALCOMMON_LIBRARIES}" )
-  MESSAGE( STATUS "  definitions: ${ALCOMMON_DEFINITIONS}" )
-ENDIF( NOT ALCOMMON_FIND_QUIETLY )
-
-
-
-MARK_AS_ADVANCED(
+mark_as_advanced(
   ALCOMMON_DEFINITIONS
   ALCOMMON_INCLUDE_DIR
   ALCOMMON_LIBRARIES

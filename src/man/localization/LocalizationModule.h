@@ -5,10 +5,10 @@
  */
 #pragma once
 
-#include "../portals/RoboGrams.h"
-#include "../memory/protos/Common.pb.h"
-#include "../memory/protos/Vision.pb.h"
-#include "../memory/protos/Motion.pb.h"
+#include "RoboGrams.h"
+#include "Common.pb.h"
+#include "Vision.pb.h"
+#include "Motion.pb.h"
 
 #include "SensorModel.h"
 #include "MotionModel.h"
@@ -21,15 +21,15 @@ namespace man
     /**
      * @class LocalizationModule
      */
-    class LocalizationModule : public Module
+    class LocalizationModule : public portals::Module
     {
     public:
         LocalizationModule();
         ~LocalizationModule();
 
-        InPortal<memory::proto::Motion> motionInput;
-        InPortal<memory::proto::PVisionField> visionInput;
-        OutPortal<memory::proto::RobotLocation> output;
+        portals::InPortal<messages::Motion> motionInput;
+        portals::InPortal<messages::PVisionField> visionInput;
+        portals::OutPortal<messages::RobotLocation> output;
 
         float lastMotionTimestamp;
         float lastVisionTimestamp;
@@ -38,7 +38,7 @@ namespace man
         /**
          * @brief Calls Update
          */
-        void run();
+        void run_();
 
         /**
          * @brief Updates the current robot pose estimate given
@@ -47,10 +47,10 @@ namespace man
          */
         void update();
 
-        SensorModel visionModel;
-        MotionModel motionModel;
+        // VisionSystem visionModel;
+        // MotionSystem motionModel;
 
-        ParticleFilter particleFilter;
+        // ParticleFilter particleFilter;
     };
     } // namespace localization
 } // namespace man

@@ -7,8 +7,8 @@
  */
 #pragma once
 
-#include "../memory/protos/Common.pb.h"
-#include "../memory/protos/Vision.pb.h"
+#include "Common.pb.h"
+#include "Vision.pb.h"
 
 #include "Particle.h"
 
@@ -32,7 +32,7 @@ namespace man
          *        taken by the robot's sensors.
          */
         virtual ParticleSet update(ParticleSet& particles,
-                                   memory::proto::PVision visionInput) = 0;
+                                   messages::PVisionField visionInput) = 0;
 
         /*
          * These methods allow the client to access information as

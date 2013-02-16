@@ -12,7 +12,7 @@
 #include "MotionModel.h"
 #include "Particle.h"
 #include "LocSystem.h"
-#include "../memory/protos/Common.pb.h"
+#include "Common.pb.h"
 #include "FieldConstants.h"
 #include "VisionSystem.h"
 #include "MotionSystem.h"
@@ -51,8 +51,8 @@ namespace man
     {
 
     public:
-        ParticleFilter(MotionSystem motionSystem,
-                       VisionSystem visionSystem,
+        ParticleFilter(MotionSystem& motionSystem,
+                       VisionSystem& visionSystem,
                        ParticleFilterParams parameters = DEFAULT_PARAMS);
         ~ParticleFilter();
 
@@ -62,6 +62,8 @@ namespace man
          *        and sensorUpdate flags, respectively.
          */
         void filter(bool motionUpdate = true, bool sensorUpdate = true);
+        void update(messages::Motion motionInput,
+                    messages::PVisionField visionInput);
 
         ParticleSet getParticles() const { return particles; }
 
@@ -82,11 +84,19 @@ namespace man
 
         void updateMotionModel();
 
-        memory::proto::RobotLocation getCurrentEstimate(){return poseEstimate;}
+        messages::RobotLocation getCurrentEstimate(){return poseEstimate;}
 
         float getXEst(){return poseEstimate.x();}
         float getYEst(){return poseEstimate.y();}
         float getHEst(){return poseEstimate.h();}
+
+        void resetLocTo(float x, float y, float h,
+                        LocNormalParams params = LocNormalParams());
+        void resetLocTo(float x, float y, float h,
+                        float x_, float y_, float h_,
+                        LocNormalParams params1 = LocNormalParams(),
+                        LocNormalParams params2 = LocNormalParams());
+        void resetLocToSide(bool blueSide);
 
     private:
         /**
@@ -99,7 +109,7 @@ namespace man
 
         ParticleFilterParams parameters;
 
-        memory::proto::RobotLocation poseEstimate;
+        messages::RobotLocation poseEstimate;
 
         std::vector<float> standardDeviations;
 

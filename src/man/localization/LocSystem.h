@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include "../portals/RoboGrams.h"
-#include "../memory/protos/Common.pb.h"
-#include "../memory/protos/Vision.pb.h"
-#include "../memory/protos/Motion.pb.h"
+#include "RoboGrams.h"
+#include "Common.pb.h"
+#include "Vision.pb.h"
+#include "Motion.pb.h"
 
 #include <vector>
 
@@ -30,8 +30,8 @@ namespace man
         virtual ~LocSystem() {};
 
        // Core Functions
-        void updateLocalization(memory::proto::Motion motionInput,
-                                memory::proto::PVisionField visionInput);
+        void updateLocalization(messages::Motion motionInput,
+                                messages::PVisionField visionInput);
         virtual void resetLocTo(float x, float y, float h,
                                 LocNormalParams params = LocNormalParams()) = 0;
         virtual void resetLocTo(float x, float y, float h,
@@ -41,12 +41,12 @@ namespace man
         virtual void resetLocToSide(bool blueSide) = 0;
 
         // Getters
-        virtual memory::proto::RobotLocation getCurrentEstimate() const    = 0;
-        virtual memory::proto::RobotLocation getCurrentUncertainty() const = 0;
+//         messages::RobotLocation getCurrentEstimate() const { return poseEstimate; }
+// //        virtual messages::RobotLocation getCurrentUncertainty() const = 0;
 
-        virtual float getXEst() = 0;
-        virtual float getYEst() = 0;
-        virtual float getHEst() = 0;
+//         float getXEst(){ return poseEstimate.x(); }
+//         float getYEst(){ return poseEstimate.y(); }
+//         float getHEst(){ return poseEstimate.h(); }
 
         bool isOnOpposingSide() const { return onOpposingSide; }
 
@@ -59,6 +59,7 @@ namespace man
         // True only if the robot is on the opposing side of the
         // field.
         bool onOpposingSide;
+//        messages::RobotLocation poseEstimate;
     };
 
 

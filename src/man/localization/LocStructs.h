@@ -10,8 +10,8 @@
 #include <vector>
 #include <cmath>
 
-#include "../memory/protos/Common.pb.h"
-#include "../include/NBMath.h"
+#include "Common.pb.h"
+#include "NBMath.h"
 
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -88,7 +88,7 @@ namespace man
     //  * @param y y-coordinate.
     //  * @return the position vector from the origin to the point (x', y').
     //  */
-    // static RelVector getRelativeVector(memory::proto::RobotLocation origin,
+    // static RelVector getRelativeVector(messages::RobotLocation origin,
     //                                        float x, float y)
     // {
 
