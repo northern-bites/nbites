@@ -8,9 +8,11 @@ namespace man
         : portals::Module(),
           output(base())
     {
-        // motionModel = new MotionSystem();
-        // visionModel = new VisionSystem();
-        // particleFilter = new ParticleFilter(motionModel, visionModel);
+        motionModel = boost::shared_ptr<MotionSystem>(new MotionSystem());
+        visionModel = boost::shared_ptr<VisionSystem>(new VisionSystem());
+
+        particleFilter = boost::shared_ptr<ParticleFilter>(new ParticleFilter(motionModel,
+                                                                       visionModel));
     }
 
     LocalizationModule::~LocalizationModule()

@@ -9,8 +9,8 @@ namespace man
                                    ParticleFilterParams params)
         : parameters(params), standardDeviations(3, 0.0f)
     {
-        motionModel = motionModel_;
-        sensorModel = sensorModel_;
+        motionSystem = motionModel_;
+        visionSystem = sensorModel_;
 
         boost::mt19937 rng;
         rng.seed(std::time(0));
@@ -53,14 +53,14 @@ namespace man
         if (motionInput.timestamp() > lastMotionTimestamp)
         {
             lastMotionTimestamp = MotionInput.timestamp();
-            motionSystem.update(particles, motionInput.odometry());
+            motionSystem->update(particles, motionInput.odometry());
         }
 
         // Update the Vision Model
         if (visionInput.timestamp() > lastVisionTimestamp)
         {
             lastVisionTimestamp = visionInput.timestamp();
-            visionSystem.update(particles, visionInput);
+            visionSystem->update(particles, visionInput);
             updatedVision = true;
         }
 

@@ -14,6 +14,8 @@
 #include "MotionModel.h"
 #include "ParticleFilter.h"
 
+#include <boost/shared_ptr.hpp>
+
 namespace man
 {
     namespace localization
@@ -47,10 +49,10 @@ namespace man
          */
         void update();
 
-        // VisionSystem visionModel;
-        // MotionSystem motionModel;
+        boost::shared_ptr<VisionSystem> visionModel;
+        boost::shared_ptr<MotionSystem> motionModel;
 
-        // ParticleFilter particleFilter;
+        boost::shared_ptr<ParticleFilter> particleFilter;
     };
     } // namespace localization
 } // namespace man

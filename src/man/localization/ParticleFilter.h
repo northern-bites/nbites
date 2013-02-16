@@ -20,6 +20,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -51,8 +52,8 @@ namespace man
     {
 
     public:
-        ParticleFilter(MotionSystem& motionSystem,
-                       VisionSystem& visionSystem,
+        ParticleFilter(boost::shared_ptr<MotionModel> motionModel_,
+                       boost::shared_ptr<SensorModel> sensorModel_,
                        ParticleFilterParams parameters = DEFAULT_PARAMS);
         ~ParticleFilter();
 
@@ -116,8 +117,8 @@ namespace man
         ParticleSet particles;
 
         // EJ ----------------------------------------------
-        MotionSystem motionSystem;
-        VisionSystem visionSystem;
+        boost::shared_ptr<MotionSystem> motionSystem;
+        boost::shared_ptr<VisionSystem> visionSystem;
 
         float lastMotionTimestamp;
         float lastVisionTimestamp;
