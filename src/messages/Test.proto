@@ -1,4 +1,0 @@
-message TestyTest {
-	required string something = 1;
-	required int32 blaaah = 2;
-}
