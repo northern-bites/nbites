@@ -17,6 +17,8 @@
 #include "VisionSystem.h"
 #include "MotionSystem.h"
 
+#include "NBMath.h"
+
 #include <vector>
 #include <iostream>
 #include <map>
@@ -32,6 +34,7 @@ namespace man
     namespace localization
     {
 
+    // Define the default parameters for the Particle Filter
     static const ParticleFilterParams DEFAULT_PARAMS =
     {
         FIELD_GREEN_HEIGHT,
@@ -40,6 +43,7 @@ namespace man
         0.2f,
         0.05f
     };
+
 
     /**
      * @class ParticleFilter
@@ -52,17 +56,11 @@ namespace man
     {
 
     public:
-        ParticleFilter(boost::shared_ptr<MotionModel> motionModel_,
-                       boost::shared_ptr<SensorModel> sensorModel_,
+        ParticleFilter(boost::shared_ptr<MotionSystem> motionModel_,
+                       boost::shared_ptr<VisionSystem> sensorModel_,
                        ParticleFilterParams parameters = DEFAULT_PARAMS);
         ~ParticleFilter();
 
-        /**
-         * @brief Runs a single iteration of the particle filter algorithm,
-         *        incorperating motion and sensor data according to the motionUpdate
-         *        and sensorUpdate flags, respectively.
-         */
-        void filter(bool motionUpdate = true, bool sensorUpdate = true);
         void update(messages::Motion motionInput,
                     messages::PVisionField visionInput);
 
@@ -85,12 +83,14 @@ namespace man
 
         void updateMotionModel();
 
-        messages::RobotLocation getCurrentEstimate(){return poseEstimate;}
+        // Getters
+        messages::RobotLocation getCurrentEstimate() const {return poseEstimate;}
+        float getXEst() const {return poseEstimate.x();}
+        float getYEst() const {return poseEstimate.y();}
+        float getHEst() const {return poseEstimate.h();}
+        float getHEstDeg() const {return poseEstimate.h()*TO_DEG;}
 
-        float getXEst(){return poseEstimate.x();}
-        float getYEst(){return poseEstimate.y();}
-        float getHEst(){return poseEstimate.h();}
-
+        void resetLoc();
         void resetLocTo(float x, float y, float h,
                         LocNormalParams params = LocNormalParams());
         void resetLocTo(float x, float y, float h,

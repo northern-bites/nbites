@@ -32,6 +32,7 @@ namespace man
        // Core Functions
         void updateLocalization(messages::Motion motionInput,
                                 messages::PVisionField visionInput);
+        virtual void resetLoc() = 0;
         virtual void resetLocTo(float x, float y, float h,
                                 LocNormalParams params = LocNormalParams()) = 0;
         virtual void resetLocTo(float x, float y, float h,
@@ -41,17 +42,28 @@ namespace man
         virtual void resetLocToSide(bool blueSide) = 0;
 
         // Getters
-//         messages::RobotLocation getCurrentEstimate() const { return poseEstimate; }
-// //        virtual messages::RobotLocation getCurrentUncertainty() const = 0;
+        virtual messages::RobotLocation getCurrentEstimate() const = 0;
+        virtual float getXEst() const = 0;
+        virtual float getYEst() const = 0;
+        virtual float getHEst() const = 0;
+        virtual float getHEstDeg() const = 0;
 
-//         float getXEst(){ return poseEstimate.x(); }
-//         float getYEst(){ return poseEstimate.y(); }
-//         float getHEst(){ return poseEstimate.h(); }
+        // virtual messages::RobotLocation getCurrentUncertainty() const = 0;
+        // virtual float getXUncert() const = 0;
+        // virtual float getYUncert() const = 0;
+        // virtual float getHUncert() const = 0;
+        // virtual float getHUncertDeg() const = 0;
 
         bool isOnOpposingSide() const { return onOpposingSide; }
 
         // Setters
         void setOnOpposingSide(bool opp) { onOpposingSide = opp; }
+
+        friend std::ostream& operator<< (std::ostream &o,
+                                         const LocSystem &c) {
+            return o << "Est: (" << c.getXEst() << ", " << c.getYEst() << ", "
+                     << c.getHEst() << ")\n";
+        }
 
 
     private:
@@ -59,7 +71,6 @@ namespace man
         // True only if the robot is on the opposing side of the
         // field.
         bool onOpposingSide;
-//        messages::RobotLocation poseEstimate;
     };
 
 

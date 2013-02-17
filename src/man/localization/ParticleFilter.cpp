@@ -4,8 +4,8 @@ namespace man
 {
     namespace localization
     {
-    ParticleFilter::ParticleFilter(boost::shared_ptr<MotionModel> motionModel_,
-                                   boost::shared_ptr<SensorModel> sensorModel_,
+    ParticleFilter::ParticleFilter(boost::shared_ptr<MotionSystem> motionModel_,
+                                   boost::shared_ptr<VisionSystem> sensorModel_,
                                    ParticleFilterParams params)
         : parameters(params), standardDeviations(3, 0.0f)
     {
@@ -52,14 +52,14 @@ namespace man
         // Update the Motion Model
         if (motionInput.timestamp() > lastMotionTimestamp)
         {
-            lastMotionTimestamp = MotionInput.timestamp();
+            lastMotionTimestamp = (float) motionInput.timestamp();
             motionSystem->update(particles, motionInput.odometry());
         }
 
         // Update the Vision Model
         if (visionInput.timestamp() > lastVisionTimestamp)
         {
-            lastVisionTimestamp = visionInput.timestamp();
+            lastVisionTimestamp = (float) visionInput.timestamp();
             visionSystem->update(particles, visionInput);
             updatedVision = true;
         }
@@ -203,7 +203,10 @@ namespace man
         return sd;
     }
 
-    void ParticleFilter::resetLocalization()
+    /*
+     * @brief The following are all of the resetLoc functions
+     */
+    void ParticleFilter::resetLoc()
     {
         // Clear the existing particles.
         particles.clear();
@@ -241,23 +244,133 @@ namespace man
     }
 
     void ParticleFilter::resetLocTo(float x, float y, float h,
-                                    LocNormalParams params = LocNormalParams())
+                                    LocNormalParams params)
     {
-        resetLocalization();
+        // Reset the estimate
+        poseEstimate.set_x(x);
+        poseEstimate.set_y(y);
+        poseEstimate.set_h(h);
+
+        particles.clear();
+
+        float weight = 1.0f/parameters.numParticles;
+
+        for(int i = 0; i < parameters.numParticles; ++i)
+        {
+            // Get the new particles x,y, and h
+            float pX = sampleNormal(x, params.sigma_x);
+            float pY = sampleNormal(y, params.sigma_x);
+            float pH = sampleNormal(h, params.sigma_h);
+
+            Particle p(pX, pY, pH, weight);
+
+            particles.push_back(p);
+        }
+
     }
 
+    /**
+     * Overloaded resetLocTo, resets Loc to 2 possible Locations
+     *
+     * @param x The first Locations x-coordinate.
+     * @param y The first Locations y-coordinate.
+     * @param h The first Locations heading (radians).
+     * @param x_ The second Locations x-coordinate.
+     * @param y_ The second Locations y-coordinate.
+     * @param h_ The second Locations heading (radians).
+     * @param params1 The parameters specifying how the particles will
+     * be normally sampled about the mean (x, y, h).
+     * @param params2 The parameters specifying how the particles will
+     * be normally sampled about the mean (x_, y_, h_).
+     */
     void ParticleFilter::resetLocTo(float x, float y, float h,
                                     float x_, float y_, float h_,
-                                    LocNormalParams params1 = LocNormalParams(),
-                                    LocNormalParams params2 = LocNormalParams())
+                                    LocNormalParams params1,
+                                    LocNormalParams params2)
     {
-        resetLocalization();
+        // Reset the estimates.
+        poseEstimate.set_x(x);
+        poseEstimate.set_y(y);
+        poseEstimate.set_h(h);
+
+
+       particles.clear();
+
+       float weight = 1.0f/parameters.numParticles;
+
+       for(int i = 0; i < (parameters.numParticles / 2); ++i)
+       {
+           // Get the new particles x,y, and h
+           float pX = sampleNormal(x, params1.sigma_x);
+           float pY = sampleNormal(y, params1.sigma_y);
+           float pH = sampleNormal(h, params1.sigma_h);
+
+           Particle p(pX, pY, pH, weight);
+
+           particles.push_back(p);
+       }
+
+       for(int i = 0; i < ((parameters.numParticles + 1) / 2); ++i)
+       {
+           // Get the new particles x,y, and h
+           float pX = sampleNormal(x_, params2.sigma_x);
+           float pY = sampleNormal(y_, params2.sigma_y);
+           float pH = sampleNormal(h_, params2.sigma_h);
+
+           Particle p(pX, pY, pH, weight);
+
+           particles.push_back(p);
+       }
     }
 
-    void LocSystem::resetLocToSide(bool blueSide)
+
+    void ParticleFilter::resetLocToSide(bool blueSide)
     {
-        resetLocalization();
+        // Clear the existing particles.
+        particles.clear();
+
+        float xLowerBound = 0.0f, xUpperBound = 0.0f;
+        // HACK replace constants!
+        float yLowerBound = FIELD_WHITE_BOTTOM_SIDELINE_Y, yUpperBound = FIELD_WHITE_TOP_SIDELINE_Y;
+        float heading = 0.0f;
+
+        boost::mt19937 rng;
+        rng.seed(std::time(0));
+
+        if(blueSide)
+        {
+            xLowerBound = FIELD_WHITE_LEFT_SIDELINE_X;
+            xUpperBound = MIDFIELD_X;
+        }
+        else
+        {
+            xLowerBound = MIDFIELD_X;
+            xUpperBound = FIELD_WHITE_RIGHT_SIDELINE_X;
+            heading = M_PI_FLOAT;
+        }
+
+        boost::uniform_real<float> xBounds(xLowerBound,
+                                           xUpperBound);
+        boost::uniform_real<float> yBounds(yLowerBound,
+                                           yUpperBound);
+
+        boost::variate_generator<boost::mt19937&,
+                                boost::uniform_real<float> > xGen(rng, xBounds);
+        boost::variate_generator<boost::mt19937&,
+                                boost::uniform_real<float> > yGen(rng, yBounds);
+
+        // Assign uniform weight.
+        float weight = 1.0f/(((float)parameters.numParticles)*1.0f);
+
+        for(int i = 0; i < parameters.numParticles; ++i)
+        {
+            Particle p(xGen(), yGen(), heading, weight);
+
+            particles.push_back(p);
+        }
     }
+
+
 
     void ParticleFilter::resample()
     {

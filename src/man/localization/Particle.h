@@ -26,6 +26,14 @@ namespace man
         Particle(messages::RobotLocation location_, float weight_)
             : weight(weight_), location(location_) { }
 
+        Particle(float x_, float y_, float h_, float weight_)
+        {
+            location.set_x(x_);
+            location.set_y(y_);
+            location.set_h(h_);
+            weight = weight_;
+        }
+
         Particle() : weight(0.0f), location() {}
 
         ~Particle() { }
