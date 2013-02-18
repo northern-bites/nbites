@@ -1,0 +1,6 @@
+package messages;
+
+message ButtonState
+{
+    required bool pressed = 1;
+}
