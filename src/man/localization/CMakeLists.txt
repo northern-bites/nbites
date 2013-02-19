@@ -12,6 +12,7 @@ set(LOCALIZATION_SRCS LocalizationModule
 		      Particle
 		      MotionModel
 		      SensorModel
+		      FakeLocInputModule
 )
 
 # Add project as a library.
