@@ -13,7 +13,7 @@ QFile file(QString("./.geometry"));
 Tool::Tool(const char* title) :
     QMainWindow(),
     mainDiagram(),
-    unlogger(),
+    unlogger("/home/ecat/nbites/data/logs/inert"),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),

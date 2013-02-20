@@ -30,8 +30,10 @@ include_directories( ../portals )
 
 # Compile messages into messages folder
 add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
+include_directories(  ${CMAKE_CURRENT_BINARY_DIR}/messages )
 
 add_subdirectory( unlog )
+include_directories( ${NBITES_DIR}/src/man )
 
 # Qt4 goodness
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )

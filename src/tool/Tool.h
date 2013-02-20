@@ -13,6 +13,7 @@
 
 #include "RoboGrams.h"
 #include "unlog/UnlogModule.h"
+#include "InertialState.pb.h"
 
 namespace tool {
 
@@ -39,7 +40,7 @@ protected:
     portals::RoboGram mainDiagram;
 
     // Modules
-    unlog::UnlogModule unlogger;
+    unlog::UnlogModule<messages::InertialState> unlogger;
 
     // GUI stuff
     QTabWidget* toolTabs;

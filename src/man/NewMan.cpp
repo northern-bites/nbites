@@ -11,7 +11,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 {
     setModuleDescription("The Northern Bites' soccer player.");
     sensorsThread.addModule(sensors);
-    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
+    sensorsThread.log<messages::InertialState>(&sensors.inertialsOutput_, "inert");
     sensorsThread.start();
 }
 
