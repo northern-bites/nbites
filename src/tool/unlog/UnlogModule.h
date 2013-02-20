@@ -56,10 +56,12 @@ protected:
 
     void readHeader()
     {
-        char head[35];
-        uint32_t br = readCharBuffer(head, 35);
+        int len = HEADER.length();
+        std::cout << len << std::endl;
+
+        char head[len];
+        uint32_t br = readCharBuffer(head, len);
         std::cout << head << std::endl;
-        std::cout << br << std::endl;
     }
 
     bool readNextMessage() {
@@ -80,10 +82,10 @@ protected:
         messageSizes.push_back(currentMessageSize);
 
         uint32_t bytes;
-        char buffer[35];
+        char buffer[currentMessageSize];
 
         try {
-            bytes = readCharBuffer(buffer, 35);
+            bytes = readCharBuffer(buffer, currentMessageSize);
         } catch (std::exception& read_exception) {
             std::cout << read_exception.what() << std::endl;
             return false;
@@ -94,9 +96,9 @@ protected:
 
         if (bytes) {
             T msg;
+            msg.ParseFromString(std::string(buffer));
             std::cout << "Bytesize " << msg.ByteSize() << std::endl;
-            msg.ParseFromString(buffer);
-            std::cout << msg.DebugString() << std::endl;
+            std::cout << "Debug " << msg.DebugString() << std::endl;
 
             return true;
         }
@@ -110,5 +112,3 @@ protected:
 
 }
 }
-
-

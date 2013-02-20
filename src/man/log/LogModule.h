@@ -120,10 +120,9 @@ public:
 
         // Serialize directly into the Write's buffer to avoid a copy
         msg.SerializeToString(&(current->buffer));
-        std::cout << msg.DebugString() << std::endl;
         // Write ths size of the message that will be written
         writeValue<uint32_t>(current->buffer.length());
-        std::cout << current->buffer.length() << std::endl;
+        std::cout << current->buffer << std::endl;
 
         // Recommended by aio--zeroes the control block
         memset(&current->control, 0, sizeof(current->control));
