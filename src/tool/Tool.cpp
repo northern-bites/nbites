@@ -68,16 +68,13 @@ Tool::~Tool() {
 
 // Button press methods
 void Tool::next() {
-    std::cout << "NEXT!" << std::endl;
     mainDiagram.run();
 }
 
 void Tool::prev() {
-    std::cout << "PREV!" << std::endl;
 }
 
 void Tool::record() {
-    std::cout << "RECORD!" << std::endl;
 }
 
 // Keyboard control

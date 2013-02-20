@@ -14,6 +14,9 @@
  * for a good explanation of what this means. This is why you will see
  * all of the aio calls rather than simple writes.
  *
+ * Note that log files are written HEADER | SIZE | MSG | SIZE | MSG ...
+ * where each SIZE gives the number of bytes in the next MSG.
+ *
  * @author Lizzie Mamantov
  * @date February 2013
  * @author Octavian Neamtu
