@@ -92,11 +92,11 @@ protected:
         }
 
         std::cout << "read " << bytes << " bytes." << std::endl;
-        std::cout << "buffer is " << buffer << std::endl;
+        std::cout << "buffer is " << std::string(buffer, bytes) << std::endl;
 
         if (bytes) {
             T msg;
-            msg.ParseFromString(std::string(buffer));
+            msg.ParseFromString(std::string(buffer, bytes));
             std::cout << "Bytesize " << msg.ByteSize() << std::endl;
             std::cout << "Debug " << msg.DebugString() << std::endl;
 
