@@ -13,7 +13,9 @@ QFile file(QString("./.geometry"));
 Tool::Tool(const char* title) :
     QMainWindow(),
     mainDiagram(),
-    unlogger("/home/ecat/nbites/data/logs/inertial"),
+    // IF YOU WANT TO SEE LOGS FOR THE TIME BEING, YOU HAVE TO DO THIS
+    // WE WILL FIX THIS HACK ASAP
+    unlogger("/home/ecat/nbites/data/logs/joint"),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),

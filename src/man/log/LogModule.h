@@ -112,11 +112,6 @@ public:
      */
     void writeMessage(T msg)
     {
-        static int count = 0;
-        count ++;
-        if (count > 7 ) return;
-        std::cout << count << std::endl;
-
         // Add a new write to the list of current writes
         ongoing.push_back(Write());
         Write* current = &ongoing.back();
