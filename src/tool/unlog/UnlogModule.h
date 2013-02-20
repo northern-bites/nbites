@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "/home/ecat/nbites/src/man/log/IOExceptions.h"
+#include "LogDefinitions.h"
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>
@@ -9,10 +9,6 @@
 namespace tool {
 namespace unlog {
 
-// Log version--in case we need to upgrade and stay backwards compatible
-static const std::string VERSION = "2.0";
-// Header. This could be updated with more useful information.
-static const std::string HEADER = "NORTHERN BITES LOG FILE VERSION " + VERSION;
 class UnlogBase : public portals::Module
 {
 public:
@@ -22,10 +18,10 @@ public:
 protected:
     virtual void run_() = 0;
 
-    void openFile() throw (man::log::file_exception);
+    void openFile() throw (file_exception);
     void closeFile();
     uint32_t readCharBuffer(char* buffer, uint32_t size)
-        const throw (man::log::file_read_exception);
+        const throw (file_read_exception);
 
     template <typename T>
     T readValue() {

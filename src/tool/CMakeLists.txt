@@ -27,14 +27,8 @@ mark_as_advanced( QT_QMAKE_EXECUTABLE )
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
-# Sources
-set( tool_srcs main.cpp
-  Tool.cpp
-  )
-
-set( tool_headers
-  Tool.h
-)
+# Our core includes come from here
+include_directories( ${SHARE_DIR}/include )
 
 # Compile portals into portals folder
 add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals )
@@ -51,6 +45,15 @@ endif()
 
 # Actual subdirectories!
 add_subdirectory( unlog )
+
+# Sources
+set( tool_srcs main.cpp
+  Tool.cpp
+  )
+
+set( tool_headers
+  Tool.h
+)
 
 # Qt4 goodness
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )

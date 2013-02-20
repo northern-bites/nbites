@@ -4,8 +4,6 @@
 namespace tool {
 namespace unlog {
 
-using namespace man::log;
-
 UnlogBase::UnlogBase(std::string path) : Module(),
                                          fileName(path)
 {}

@@ -33,10 +33,8 @@ configure_file(
   "${PROJECT_BINARY_DIR}/upload.sh"
 )
 
-set( MAN_SRCS main.cpp
-  NewMan.cpp
-  DiagramThread.cpp
-)
+# Our core includes come from here
+include_directories( ${SHARE_DIR}/include )
 
 # Compile portals, which is outside the source tree so specify a destination
 add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
@@ -59,6 +57,11 @@ include_directories( common )
 # Actual modules
 add_subdirectory( log )
 add_subdirectory( sensors )
+
+set( MAN_SRCS main.cpp
+  NewMan.cpp
+  DiagramThread.cpp
+)
 
 add_library(
   man
