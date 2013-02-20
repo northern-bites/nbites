@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>
 #include <sys/utsname.h>
 #include <net/if.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <cstring>
@@ -141,6 +142,53 @@ bool UDPSocket::setRcvBufSize(unsigned int size)
     return false;
 }
 
+bool UDPSocket::setMulticastInterface()
+{
+    struct in_addr lcl_iface;
+    struct ifconf  ifc;
+    struct ifreq*  item;
+    char buf[1024];
+
+    ifc.ifc_len = sizeof(buf);
+    ifc.ifc_buf = buf;
+    if (ioctl(sock, SIOCGIFCONF, &ifc) < 0)
+    {
+        std::cerr << "Cannot get interface list" << std::endl;
+        return false;
+    }
+
+    for (unsigned int i = 0; i < ifc.ifc_len / sizeof(struct ifreq); ++i)
+    {
+        item = &ifc.ifc_req[i];
+        if (!strcmp(item->ifr_name, "wlan0"))
+        {
+            lcl_iface = ((struct sockaddr_in *)&item->ifr_addr)->sin_addr;
+            if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF,
+                           (char *)&lcl_iface,
+                           sizeof(lcl_iface)) < 0)
+            {
+                std::cerr << "Could not set outgoing multicast interface"
+                          << std::endl;
+                return false;
+            }
+            else
+            {
+#ifdef DEBUG_COMM
+                char outgoing_ip_address[INET_ADDRSTRLEN];
+                inet_ntop(AF_INET, &(lcl_iface.s_addr),
+                          outgoing_ip_address, INET_ADDRSTRLEN);
+                std::cout << "Set outgoing multicast interface to "
+                          << item->ifr_name << " with address "
+                          << outgoing_ip_address << std::endl;
+#endif
+                return true;
+            }
+        }
+    }
+    std::cerr << "Could not find any interfaces to send on" << std::endl;
+    return false;
+}
+
 bool UDPSocket::setMulticastLoopback(bool enable)
 {
     char val = enable ? 1 : 0;
@@ -179,24 +227,33 @@ bool UDPSocket::joinMulticast(const char* addrStr)
         for (unsigned int i = 0; i < ifc.ifc_len / sizeof(struct ifreq); ++i)
         {
             item = &ifc.ifc_req[i];
-            mreq.imr_interface = ((struct sockaddr_in *)&item->ifr_addr)->sin_addr;
-            if (0 == setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-                                (void*)&mreq, sizeof(mreq)))
+
+            if (!strcmp(item->ifr_name, "wlan0"))
             {
-                couldJoin = true;
+#ifdef DEBUG_COMM
+                std::cout << "Trying to join multicast group " << addrStr
+                          << " on interface " << item->ifr_name << std::endl;
+#endif
+                mreq.imr_interface = ((struct sockaddr_in *)&item->ifr_addr)->sin_addr;
+                if (0 == setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                                    (void*)&mreq, sizeof(mreq)))
+                {
+                    couldJoin = true;
+                }
             }
         }
 
         if (!couldJoin)
         {
-            std::cerr << "Failed to join multicast group " << addrStr
-                      << " for all interfaces." << std::endl;
+            std::cerr << "Failed to join multicast group "
+                      << addrStr << std::endl;
             return false;
         }
         else
         {
 #ifdef DEBUG_COMM
-            std::cout << "Joined Multicast Address: " << addrStr << std::endl;
+            std::cout << "Joined Multicast Address: "
+                      << addrStr << std::endl;
 #endif
         }
         return true;
@@ -236,7 +293,12 @@ bool UDPSocket::bind(const char* addrStr = "", int port = 0)
         std::cerr << "UDPSocket::bind() failed: " << strerror(errno) << std::endl;
         return false;
     }
-
+#ifdef DEBUG_COMM
+    char bound_ip_address[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(addr.sin_addr),
+              bound_ip_address, INET_ADDRSTRLEN);
+    std::cout << "Socket bound to " << bound_ip_address << std::endl;
+#endif
     return true;
 }
 

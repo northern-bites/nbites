@@ -79,6 +79,13 @@ public:
     bool setMulticastLoopback(bool enable);
 
     /**
+     * Set multicast interface for sending to.
+     * Assumes wlan0.
+     * @return: true for success, false for error.
+     */
+    bool setMulticastInterface();
+
+    /**
      * Subscribe to a multicast address. In our system each robot
      * sends its information to 239.<my.low.bits>, where
      * <my.low.bits> is the low-order three bytes of its IPv4

@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <time.h>
-#include <sys/time.h>  //TODO: Do we need for Robots?
+#include <sys/time.h>
 
 #include "Profiler.h"
 #include "Common.h"

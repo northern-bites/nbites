@@ -41,12 +41,26 @@ TeamConnect::~TeamConnect()
 
 void TeamConnect::setUpSocket()
 {
-    socket->setBlocking(false);
-    socket->setBroadcast(true);
-    socket->bind("", TEAM_PORT); // listen for anything on our port.
-
     std::string ipTarget = "255.255.255.255";
     static char buf[100] = {0};
+
+    bool BROADCAST = true;
+
+    socket->setBlocking(false);
+
+    if (BROADCAST)
+    {
+#ifdef DEBUG_COMM
+        std::cout << "Comm set to Broadcast" << std::endl;
+#endif
+        socket->setBroadcast(true);
+        goto end;
+    }
+
+    socket->setBroadcast(false);
+    socket->setMulticastLoopback(false);
+    socket->setMulticastInterface();
+    socket->setMulticastTTL((char)1); // should be 1 to keep on subnet
 
     if (!buf[0])
     {
@@ -87,6 +101,7 @@ end:
 #endif
 
     socket->setTarget(ipTarget.c_str(), TEAM_PORT);
+    socket->bind("", TEAM_PORT); // listen for anything on our port.
 
     //join team's multicast...
     for (int i = 0; i < NUM_ROBOTS; ++i)
