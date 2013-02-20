@@ -55,7 +55,7 @@ class aio_read_exception: public read_exception {
 
 public:
     enum code {
-        ENQUE = 4, READ, NOT_OPEN, IN_PROGRESS
+        ENQUEUE = 4, READ, NOT_OPEN, IN_PROGRESS
     };
 
     aio_read_exception(code errcode, int err_no = 0) :
@@ -68,8 +68,8 @@ public:
             message = strerror(err_no);
         }
         switch (errcode) {
-        case (ENQUE):
-            return (std::string("AIO enque error ") + message).c_str();
+        case (ENQUEUE):
+            return (std::string("AIO enqueue error ") + message).c_str();
             break;
         case (READ):
             return (std::string("AIO read error ") + message).c_str();

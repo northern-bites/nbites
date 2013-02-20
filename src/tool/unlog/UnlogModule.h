@@ -53,11 +53,10 @@ protected:
     void readHeader()
     {
         int len = HEADER.length();
-        std::cout << len << std::endl;
 
         char head[len];
         uint32_t br = readCharBuffer(head, len);
-        std::cout << head << std::endl;
+        std::cout << "Read header from " << fileName << std::endl;
     }
 
     bool readNextMessage() {
@@ -69,11 +68,11 @@ protected:
 
         // End of file
         if (feof(file)) {
+            std::cout << "End of log file " << fileName << std::endl;
             return false;
         }
 
         currentMessageSize = readValue<uint32_t>();
-        std::cout << "got size " << currentMessageSize << std::endl;
 
         messageSizes.push_back(currentMessageSize);
 
@@ -87,18 +86,16 @@ protected:
             return false;
         }
 
-        std::cout << "read " << bytes << " bytes." << std::endl;
-        std::cout << "buffer is " << std::string(buffer, bytes) << std::endl;
-
         if (bytes) {
             T msg;
             msg.ParseFromString(std::string(buffer, bytes));
-            std::cout << "Bytesize " << msg.ByteSize() << std::endl;
-            std::cout << "Debug " << msg.DebugString() << std::endl;
-
+            // This is for debugging until the tool is back again
+            std::cout << "\nCurrent Message:\n" << msg.DebugString();
             return true;
         }
 
+        // We read zero bytes at the end of a file w/o hitting feof
+        std::cout << "End of log file " << fileName << std::endl;
         return false;
     }
 
