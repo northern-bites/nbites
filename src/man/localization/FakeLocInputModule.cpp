@@ -57,6 +57,62 @@ namespace man
             noisyOdometry.set_h(hNoise());
         }
 
+        void FakeLocInputModule::addCornerObservation()
+        {
+            message::PVisualCorner cornerObservation;
+            // Each corner observation needs a visual detection
+            message::PVisualDetection cornerVisualDetection;
+
+            // Choose concrete_coords randomly for the observation
+            //Create a random number generator
+            boost::mt19937 rng;
+            boost::uniform_real<float> observationRange(MIN_OBS_DIST, MAX_OBS_DIST);
+            boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > randOffset(rng, observationRange);
+            // @TODO one line? Don't think so but try
+            message::Point concreteCoords;
+            concreteCoords.set_x(currentLocation.x() + randOffset());
+            concreteCoords.set_y(currentLocation.y() + randOffset());
+            cornerVisualDetection.add_concrete_coords()->CopyFrom(concreteCoords);
+
+            // Fill in the Visual Detections distance and bearing with noise
+            // Use a gaussian since that's the assumption for a particle filter
+
+            translatedX = concreteCoords.x() - currentLocation.x();
+            translatedY = concreteCoords.y() - currentLocation.y();
+
+            float calcDistance = std::sqrt(NBMath::square(translatedX) + NBMath::square(translatedY));
+            float calcBearing = NBMath::safe_atan2(translatedY, translatedX);
+
+            boost::normal_distribution<float> distanceGen(calcDistance, DIST_STD_DEV);
+            boost::normal_distribution<float> bearingGen(calcBearing, BEAR_STD_DEV);
+
+            cornerVisualDetection.add_distance(distanceGen());
+            cornerVisualDetection.add_bearing(bearingGen());
+
+            // add the visual detection to the visual corner
+            cornerObservation.mutable_visual_detection()->CopyFrom(cornerVisualDetection);
+
+            // add the visual corner to the noisyVision message
+            noisyVision.add_visual_corner()->CopyFrom(cornerObservation);
+
+            // // add the visual corner to the output message
+            // portals::Message<messages::PVisionField> visionMessage(0);
+            // *visionMessage.get() = messages::PVisionField();
+            // visionMessage.get()->add_visual_corner()->CopyFrom(cornerObservation);
+        }
+
+        void FakeLocInputModule::genNoisyVision()
+        {
+            // Clear the current noisy vision
+            noisyVision.Clear();
+
+            // Increment the timestamp
+            noisyVision.set_timestamp((google::protobuf::int64) timestamp);
+
+            // Add a corner observation
+            addCornerObservation();
+        }
+
         void FakeLocInputModule::run_()
         {
             noisyMotion.set_timestamp((google::protobuf::int64) timestamp);
@@ -72,6 +128,9 @@ namespace man
             currentLocation.set_x(currentLocation.x() + odometry.x());
             currentLocation.set_y(currentLocation.y() + odometry.y());
             currentLocation.set_h(currentLocation.h() + odometry.h());
+
+            // Generate observations for this new location
+
 
             // increment timestamp, set negative if gen'd all frames so we terminate
             timestamp++;

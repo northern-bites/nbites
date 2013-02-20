@@ -27,6 +27,11 @@ namespace man
 
         static const float NUM_FRAMES = 60;
 
+        static const float MIN_OBS_DIST = 50;
+        static const float MAX_OBS_DIST = 150;
+        static const float DIST_STD_DEV = 15;
+        static const float BEAR_STD_DEV = .349; //20 degrees
+
 
         class FakeLocInputModule : public portals::Module
         {
@@ -45,6 +50,9 @@ namespace man
             void calcDeltaMotion();
             void genNoisyOdometry();
 
+            void addCornerObservation();
+            void genNoisyVision();
+
             float timestamp;
             float frames;
 
@@ -54,6 +62,8 @@ namespace man
 
             messages::RobotLocation odometry;
             messages::RobotLocation noisyOdometry;
+
+            messages::PVisionField  noisyVision;
             messages::Motion        noisyMotion;
 
         };
