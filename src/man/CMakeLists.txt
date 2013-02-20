@@ -61,18 +61,6 @@ include_directories( ../portals )
 add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
-include_directories( ../messages )
-
-# Actual subdirectories
-add_subdirectory( common )
-include_directories( common )
-add_subdirectory( synchro )
-
-# Actual modules
-add_subdirectory( image )
-add_subdirectory( log )
-
-add_subdirectory( comm )
 
 # Actual subdirectories
 add_subdirectory( common )
@@ -81,6 +69,7 @@ include_directories( common )
 # Actual modules
 add_subdirectory( log )
 add_subdirectory( sensors )
+add_subdirectory( comm )
 
 add_library(
   man

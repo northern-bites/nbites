@@ -36,6 +36,7 @@ add_library(
 ############################ SET LIBRARIES TO LINK WITH
 target_link_libraries(
   comm
+  common
   portals
   messages
   )
