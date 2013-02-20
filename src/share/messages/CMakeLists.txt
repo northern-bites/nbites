@@ -1,9 +1,5 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
-find_package( Protobuf REQUIRED )
-
-include_directories( ${PROTOBUF_INCLUDE_DIR}/ )
-
 #protobuf input - finds all .proto files in the current dir
 file(GLOB PROTO_INPUT
   RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
