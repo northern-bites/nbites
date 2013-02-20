@@ -38,6 +38,9 @@ namespace man
 
         void FakeLocInputModule::genNoisyOdometry()
         {
+            // Set the new timestamp
+            noisyMotion.set_timestamp((google::protobuf::int64) timestamp);
+
             //Determine how much noise to add (10%)
             float xVariance = (float) std::abs(odometry.x() * .05);
             float yVariance = (float) std::abs(odometry.y() * .05);
@@ -52,15 +55,32 @@ namespace man
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > yNoise(rng, yVarRange);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > hNoise(rng, hVarRange);
 
+            // set the noisy values
             noisyOdometry.set_x(xNoise());
             noisyOdometry.set_y(yNoise());
             noisyOdometry.set_h(hNoise());
+
+            // copy the new noisy odometry to the noisyMotion member
+            noisyMotion.mutable_odometry()->CopyFrom(noisyOdometry);
+
         }
 
         void FakeLocInputModule::addGoalObservation(bool rightGoal)
         {
             messages::PVisualGoalPost goalObservation;
+
+            // Each observation needs to have a visual detection
             messages::PVisualDetection goalVisualDetection;
+            genVisualDetection(goalVisualDetection);
+
+            // add the visual detection to the visual goal post
+            goalObservation.mutable_visual_detection()->CopyFrom(goalVisualDetection);
+
+            // add the visual goal post to the noisyVision message
+            if(rightGoal)
+                noisyVision.mutable_goal_post_r()->CopyFrom(goalObservation);
+            else
+                noisyVision.mutable_goal_post_l()->CopyFrom(goalObservation);
         }
 
 
@@ -98,11 +118,22 @@ namespace man
             visualDetection.set_bearing(bearingGen());
         }
 
+        void FakeLocInputModule::addCrossObservation()
+        {
+            // NOTE: The visual cross observation is just a visual detection
+            messages::PVisualDetection crossVisualDetection;
+            genVisualDetection(crossVisualDetection);
+
+            // add the observation to the noisyVision message
+            noisyVision.mutable_visual_cross()->CopyFrom(crossVisualDetection);
+        }
+
         void FakeLocInputModule::addCornerObservation()
         {
             messages::PVisualCorner cornerObservation;
             // Each corner observation needs a visual detection
             messages::PVisualDetection cornerVisualDetection;
+            genVisualDetection(cornerVisualDetection);
 
             // add the visual detection to the visual corner
             cornerObservation.mutable_visual_detection()->CopyFrom(cornerVisualDetection);
@@ -119,19 +150,21 @@ namespace man
             // Increment the timestamp
             noisyVision.set_timestamp((google::protobuf::int64) timestamp);
 
-            // Add a corner observation
-            addCornerObservation();
+            // Add corner observations
+            for(int i=0; i<NUM_CORNER_OBS; i++)
+                addCornerObservation();
         }
 
         void FakeLocInputModule::run_()
         {
-            noisyMotion.set_timestamp((google::protobuf::int64) timestamp);
-            noisyMotion.mutable_odometry()->CopyFrom(noisyOdometry);
+            // Generate a new motion message
+            // NOTE: Directly modifies the noisyMotion member
+            genNoisyOdometry();
 
             // Create a Message for the motion portal, set it appropriatly
             portals::Message<messages::Motion> odometryMessage(0);
             *odometryMessage.get() = messages::Motion();
-            odometryMessage.get()->mutable_odometry()->CopyFrom(noisyMotion);
+            odometryMessage.get()->CopyFrom(noisyMotion);
             fMotionOutput.setMessage(odometryMessage);
 
             // Set the correct actual location now that we've 'traveled' there
@@ -140,7 +173,14 @@ namespace man
             currentLocation.set_h(currentLocation.h() + odometry.h());
 
             // Generate observations for this new location
+            // NOTE: Directly modifies the noisyVision memeber
+            genNoisyVision();
 
+            // // Create a Message for the vision portal, set it appropriatly
+            portals::Message<messages::PVisionField> visionMessage(0);
+            *visionMessage.get() = messages::PVisionField();
+            visionMessage.get()->CopyFrom(noisyVision);
+            fVisionOutput.setMessage(visionMessage);
 
             // increment timestamp, set negative if gen'd all frames so we terminate
             timestamp++;

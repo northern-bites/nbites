@@ -34,6 +34,8 @@ namespace man
         static const float DIST_STD_DEV = 15;
         static const float BEAR_STD_DEV = .349f; //20 degrees
 
+        static const float NUM_CORNER_OBS = 2;
+
 
         class FakeLocInputModule : public portals::Module
         {
@@ -48,14 +50,16 @@ namespace man
             void run_();
 
         private:
-
             void calcDeltaMotion();
             void genNoisyOdometry();
 
             void addCornerObservation();
             void addGoalObservation(bool rightGoal);
+            void addCrossObservation();
+
             void genNoisyVision();
             void genVisualDetection(messages::PVisualDetection &visualObservation);
+
             float timestamp;
             float frames;
 
