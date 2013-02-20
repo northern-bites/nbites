@@ -11,6 +11,8 @@
 #include "Vision.pb.h"
 #include "Common.pb.h"
 
+#include "NBMath.h"
+
 #include <boost/random.hpp>
 
 namespace man
@@ -30,7 +32,7 @@ namespace man
         static const float MIN_OBS_DIST = 50;
         static const float MAX_OBS_DIST = 150;
         static const float DIST_STD_DEV = 15;
-        static const float BEAR_STD_DEV = .349; //20 degrees
+        static const float BEAR_STD_DEV = .349f; //20 degrees
 
 
         class FakeLocInputModule : public portals::Module
@@ -51,8 +53,9 @@ namespace man
             void genNoisyOdometry();
 
             void addCornerObservation();
+            void addGoalObservation(bool rightGoal);
             void genNoisyVision();
-
+            void genVisualDetection(messages::PVisualDetection &visualObservation);
             float timestamp;
             float frames;
 
