@@ -10,6 +10,7 @@ include( cmake/Flags.cmake )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
+include( cmake/FindNBITES_DIR.cmake )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
   include( cmake/BuildProtobuf.cmake )
@@ -33,6 +34,7 @@ configure_file(
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
+  DiagramThread.cpp
 )
 
 # Compile portals, which is outside the source tree so specify a destination
@@ -44,8 +46,13 @@ add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 
-# Build the jointenactor module. 
-add_subdirectory(jointenactor)
+# Actual subdirectories
+add_subdirectory( common )
+include_directories( common )
+
+# Actual modules
+add_subdirectory( log )
+add_subdirectory( sensors )
 
 add_library(
   man
@@ -62,7 +69,8 @@ target_link_libraries(
   man
   portals
   messages
-  jointenactor
+  log
+  sensors
 )
 
 install( TARGETS man

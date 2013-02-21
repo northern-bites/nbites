@@ -3,8 +3,8 @@
 #include <cstring>
 #include <exception>
 
-namespace common {
-namespace io {
+namespace man {
+namespace log {
 
 class read_exception: public std::exception {
 

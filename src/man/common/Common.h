@@ -7,12 +7,6 @@
 
 #include <math.h> // for PI
 #include "NBMath.h"
-//TODO: (Octavian) THIS IS A REALLY SHITTY WAY TO ENSURE THAT THE CONFIG DEFINES
-// ARE DEFINED EVERYWHERE. BEWARE!
-#ifndef NO_MANCONFIG
-#include "manconfig.h"
-#include "visionconfig.h"
-#endif //NO_MANCONFIG
 #include <time.h>
 #include <assert.h>
 #include <stdint.h>
