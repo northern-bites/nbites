@@ -6,10 +6,12 @@ using boost::shared_ptr;
 namespace man {
 	namespace image {
 
-		LedEnactorModule::LedEnactorModule(boost::shared_ptr<ALBroker> broker)
+		LedEnactorModule::LedEnactorModule(boost::shared_ptr<ALBroker> broker, portals::OutPortal<messages::LedCommand> out)
 			: Module(),
 			  naoLights = new NaoLights(broker);
-		{}
+		{
+			ledCommandsIn.wireTo(out);
+		}
 
 		void LedEnactorModule::run_()
 		{

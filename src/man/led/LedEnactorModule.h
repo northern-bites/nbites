@@ -10,7 +10,7 @@ namespace man {
 		class LedEnactorModule : public portals::Module {
 
 		public:
-			LedEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
+			LedEnactorModule(boost::shared_ptr<AL::ALBroker> broker, portals::OutPortal<messages::LedCommand> out);
 			virtual ~LedEnactorModule() {}
 
 			portals::InPortal<messages::LedCommand> ledCommandsIn;

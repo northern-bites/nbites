@@ -9,6 +9,7 @@
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
 #include "led/LedEnactorModule.h"
+#include "testModule/TestModule.h"
 
 namespace man {
 
@@ -28,6 +29,7 @@ private:
 
     CognitionThread cognitionThread;
 	led::LedEnactorModule leds;
+	TestModule test;
 };
 
 }
