@@ -27,7 +27,7 @@ private:
     DiagramThread commThread;
     comm::CommModule comm;
 
-    CognitionThread cognitionThread;
+    DiagramThread cognitionThread;
 	led::LedEnactorModule leds;
 	TestModule test;
 };

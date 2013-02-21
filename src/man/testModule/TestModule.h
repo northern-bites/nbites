@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LedCommand.ph.h"
+#include "LedCommand.pb.h"
 
 namespace man {
 
