@@ -36,6 +36,7 @@ namespace man {
 namespace comm {
 
 CommModule::CommModule(int team, int player) :
+    portals::Module()
     _myPlayerNumber(player)
 {
     timer = new CommTimer(&monotonic_micro_time);
