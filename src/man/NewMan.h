@@ -28,8 +28,8 @@ private:
     comm::CommModule comm;
 
     DiagramThread cognitionThread;
-	led::LedEnactorModule leds;
 	TestModule test;
+	led::LedEnactorModule leds;
 };
 
 }
