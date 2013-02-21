@@ -8,6 +8,7 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "led/LedEnactorModule.h"
 
 namespace man {
 
@@ -24,6 +25,9 @@ private:
 
     DiagramThread commThread;
     comm::CommModule comm;
+
+    CognitionThread cognitionThread;
+	led::LedEnactorModule leds;
 };
 
 }

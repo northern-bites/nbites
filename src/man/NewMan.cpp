@@ -9,7 +9,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       sensorsThread("sensors"),
       sensors(broker),
       commThread("comm"),
-      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
+      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+	  cognitionThread("cognition"),
+	  leds(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -19,6 +21,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     commThread.addModule(comm);
     commThread.start();
+
+	cognitionThread.addModule(leds);
+	cognitionThread.start();
 }
 
 Man::~Man()
