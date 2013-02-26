@@ -9,9 +9,7 @@ namespace man {
 		LedEnactorModule::LedEnactorModule(boost::shared_ptr<ALBroker> broker, portals::OutPortal<messages::LedCommand> out)
 			: Module(),
 			  naoLights = new NaoLights(broker);
-		{
-			ledCommandsIn.wireTo(out);
-		}
+		{}
 
 		void LedEnactorModule::run_()
 		{

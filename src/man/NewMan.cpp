@@ -25,6 +25,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
 	cognitionThread.addModule(test);
 	cognitionThread.addModule(leds);
+	leds.ledCommandsIn.wireTo(&test.ledCommandsOut);
 	cognitionThread.start();
 }
 

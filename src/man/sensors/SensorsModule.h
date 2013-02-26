@@ -1,8 +1,8 @@
 /**
- * @brief  Module that serves as an interface between the low-level 
+ * @brief  Module that serves as an interface between the low-level
  *         NAOQi sensor data acquisition, and responsible for retrieving
- *         and maintaining information about the state of the sonar, 
- *         joints, inertia, FSRs, and buttons. 
+ *         and maintaining information about the state of the sonar,
+ *         joints, inertia, FSRs, and buttons.
  * @author Ellis Ratner <eratner@bowdoin.edu>
  * @date   January 2013
  */
@@ -40,26 +40,26 @@ namespace man
 	public:
 	    /**
 	     * @brief Constructor must take a pointer to the broker
-	     *        passed to Man in order to communicate via 
-	     *        proxies to the DCM and ALMemory. 
+	     *        passed to Man in order to communicate via
+	     *        proxies to the DCM and ALMemory.
 	     */
 	    SensorsModule(boost::shared_ptr<AL::ALBroker> broker);
 
 	    virtual ~SensorsModule();
 
 	    /*
-	     * These portals enable other modules to get sensory 
-	     * information. 
+	     * These portals enable other modules to get sensory
+	     * information.
 	     */
 
 	    // Joints.
 	    portals::OutPortal<messages::JointAngles> jointsOutput_;
 
-	    // Chestboard button. 
+	    // Chestboard button.
 	    portals::OutPortal<messages::ButtonState> chestboardButtonOutput_;
-	    // Foot bumpers. 
+	    // Foot bumpers.
 	    portals::OutPortal<messages::FootBumperState> footbumperOutput_;
-	    
+
 	    // Inertial sensors.
 	    portals::OutPortal<messages::InertialState> inertialsOutput_;
 
@@ -68,7 +68,7 @@ namespace man
 
 	private:
 	    /*
-	     * Methods used to communicate with the NAO hardware 
+	     * Methods used to communicate with the NAO hardware
 	     * through the NAOqi software interface.
 	     */
 
@@ -78,21 +78,21 @@ namespace man
 	    void initializeSensorFastAccess();
 
 	    /**
-	     * @brief By default, the DCM does not write ultrasonic 
+	     * @brief By default, the DCM does not write ultrasonic
 	     *        sensor values to ALMemory, so we must notify
 	     *        it to do so if we need sonar readings.
 	     */
 	    void initializeSonarValues();
 
 	    /**
-	     * @brief Updates the sensor readings. All readings are 
+	     * @brief Updates the sensor readings. All readings are
 	     *        stored and indexed appropriately in a vector.
 	     */
 	    void updateSensorValues();
-	    
+
 	    /*
-	     * Methods to update the messages provided by the 
-	     * out portals. 
+	     * Methods to update the messages provided by the
+	     * out portals.
 	     */
 
 	    /**
@@ -116,7 +116,7 @@ namespace man
 	    void updateInertialsMessage();
 
 	    /**
-	     * @brief Updates the sonars message. 
+	     * @brief Updates the sonars message.
 	     */
 	    void updateSonarsMessage();
 
