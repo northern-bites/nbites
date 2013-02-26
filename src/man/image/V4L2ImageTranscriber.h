@@ -67,71 +67,32 @@
 #include <boost/shared_ptr.hpp>
 #include <linux/videodev2.h>
 
-#include "ThreadedImageTranscriber.h"
 #include "Camera.h"
 #include "ColorParams.h"
-
-#include "memory/MObjects.h"
+#include "VisionDef.h"
+#include "ThresholdedImage.h"
+#include "RoboGrams.h"
 
 namespace man {
-namespace corpus {
+namespace image {
 
-class V4L2ImageTranscriber: public ImageTranscriber {
-
+class V4L2ImageTranscriber {
 public:
 
-    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s, Camera::Type which,
-                         memory::MRawImages::ptr rawImages);
+    V4L2ImageTranscriber(Camera::Type which,
+                         portals::OutPortal<messages::ThresholdedImage> *out);
     virtual ~V4L2ImageTranscriber();
 
     const Camera::Settings* getSettings() const {
         return &settings;
     }
 
-    bool waitForImage();
-    bool releaseBuffer();
-    void releaseImage(){}
-
-    /**
-     * Note: this method blocks until it gets a new image
-     */
-    bool captureNew();
-    unsigned long long getTimeStamp() const;
-
-    void assertCameraSettings();
-
-    void initTable(const std::string& path);
+    // Methods that are actually useful to other classes
+    bool acquireImage();
+    void initTable(const std::string& filename);
 
 private:
-    Camera::Settings settings;
-    Camera::Type cameraType;
-
-    int cameraAdapterFd;
-
-    static const int frameBufferCount = 4; /**< Amount of available frame buffers. */
-    static const int WIDTH = 640;
-    static const int HEIGHT = 480;
-    static const int SIZE = WIDTH * HEIGHT * 2;
-
-    int fd;
-    void* mem[frameBufferCount]; /**< Frame buffer addresses. */
-    int memLength[frameBufferCount]; /* The length of each frame buffer. */
-    /* Reusable parameter struct for some ioctl calls. */
-    struct v4l2_buffer* buf;
-
-    struct v4l2_buffer* currentBuf; /**< The last dequeued frame buffer. */
-    unsigned long long timeStamp;
-
-    uint16_t* image;
-    unsigned char *table;
-    ColorParams params;
-
-    // to update memory images (for logging)
-    memory::MRawImages::ptr rawImages;
-
-    int getControlSetting(unsigned int id);
-    bool setControlSetting(unsigned int id, int value);
-
+    // All of the (magical) init methods
     void initSettings();
     void initOpenI2CAdapter();
     void initSelectCamera();
@@ -142,13 +103,64 @@ private:
     void initRequestAndMapBuffers();
     void initQueueAllBuffers();
     void startCapturing();
+    void assertCameraSettings();
 
-    // Can be used to get info about controls
+    // Helpers for controlling the camera's settings
+    int getControlSetting(unsigned int id);
+    bool setControlSetting(unsigned int id, int value);
+
+    // Used for image acquisition
+    bool releaseBuffer();
+    // Note: this method blocks until it gets a new image
+    bool captureNew();
+
+    // The image will be provided on this OutPortal
+    portals::OutPortal<messages::ThresholdedImage>* outPortal;
+
+    // @see Camera.h
+    Camera::Settings settings;
+    Camera::Type cameraType;
+
+    // Amount of available frame buffers
+    static const int frameBufferCount = 4;
+
+    /**********************************
+     *    @WTF: WHY DO WE DO THIS?    *
+     **********************************/
+    static const int WIDTH = 640;
+    static const int HEIGHT = 480;
+    static const int SIZE = WIDTH * HEIGHT * 2;
+
+    // @WTF: What are both of these?
+    int cameraAdapterFd;
+    int fd;
+
+    // @WTF: What does this mean?
+    // Frame buffer addresses.
+    void* mem[frameBufferCount];
+    // The length of each frame buffer.
+    int memLength[frameBufferCount];
+
+    // Reusable parameter struct for some ioctl calls.
+    struct v4l2_buffer* buf;
+
+    // The last dequeued frame buffer.
+    struct v4l2_buffer* currentBuf;
+    unsigned long long timeStamp;
+
+    unsigned char *table;
+
+    // @WTF: Look into what this is
+    ColorParams params;
+
+    // Can be used to get info about camera's controls
+    // Not used during normal running
     void enumerate_menu();
     void enumerate_controls();
     struct v4l2_queryctrl queryctrl;
     struct v4l2_querymenu querymenu;
 
+    // @WTF: Why do we make this?
     enum {
         y0 = 0,
         u0 = 0,
@@ -165,5 +177,6 @@ private:
         tableByteSize = yLimit * uLimit * vLimit
     };
 };
-} /* namespace corpus */
-} /* namespace man */
+
+}
+}
