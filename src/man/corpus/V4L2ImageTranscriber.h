@@ -67,21 +67,21 @@
 #include <boost/shared_ptr.hpp>
 #include <linux/videodev2.h>
 
+#include "ThreadedImageTranscriber.h"
 #include "Camera.h"
 #include "ColorParams.h"
-#include "VisionDef.h"
-#include "ThresholdedImage.h"
-#include "RoboGrams.h"
+
+#include "memory/MObjects.h"
 
 namespace man {
-namespace image {
+namespace corpus {
 
-class V4L2ImageTranscriber {
+class V4L2ImageTranscriber: public ImageTranscriber {
+
 public:
 
-    V4L2ImageTranscriber(Camera::Type which,
-                         portals::OutPortal<messages::ThresholdedImage> *out);
-
+    V4L2ImageTranscriber(boost::shared_ptr<Sensors> s, Camera::Type which,
+                         memory::MRawImages::ptr rawImages);
     virtual ~V4L2ImageTranscriber();
 
     const Camera::Settings* getSettings() const {
@@ -92,7 +92,9 @@ public:
     bool releaseBuffer();
     void releaseImage(){}
 
-    // Note: this method blocks until it gets a new image
+    /**
+     * Note: this method blocks until it gets a new image
+     */
     bool captureNew();
     unsigned long long getTimeStamp() const;
 
@@ -101,35 +103,32 @@ public:
     void initTable(const std::string& path);
 
 private:
-    portals::OutPortal<messages::ThresholdedImage>* outPortal;
-
     Camera::Settings settings;
     Camera::Type cameraType;
 
     int cameraAdapterFd;
 
-    // Amount of available frame buffers
-    static const int frameBufferCount = 4;
+    static const int frameBufferCount = 4; /**< Amount of available frame buffers. */
     static const int WIDTH = 640;
     static const int HEIGHT = 480;
     static const int SIZE = WIDTH * HEIGHT * 2;
 
     int fd;
-    // Frame buffer addresses.
-    void* mem[frameBufferCount];
-    // The length of each frame buffer.
-    int memLength[frameBufferCount];
-    // Reusable parameter struct for some ioctl calls.
+    void* mem[frameBufferCount]; /**< Frame buffer addresses. */
+    int memLength[frameBufferCount]; /* The length of each frame buffer. */
+    /* Reusable parameter struct for some ioctl calls. */
     struct v4l2_buffer* buf;
 
-    // The last dequeued frame buffer.
-    struct v4l2_buffer* currentBuf;
+    struct v4l2_buffer* currentBuf; /**< The last dequeued frame buffer. */
     unsigned long long timeStamp;
 
+    uint16_t* image;
     unsigned char *table;
     ColorParams params;
 
-    // For controlling the camera
+    // to update memory images (for logging)
+    memory::MRawImages::ptr rawImages;
+
     int getControlSetting(unsigned int id);
     bool setControlSetting(unsigned int id, int value);
 
@@ -166,6 +165,5 @@ private:
         tableByteSize = yLimit * uLimit * vLimit
     };
 };
-
-}
-}
+} /* namespace corpus */
+} /* namespace man */

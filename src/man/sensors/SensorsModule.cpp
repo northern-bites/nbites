@@ -2,90 +2,91 @@
 
 namespace man
 {
-    namespace sensors
-    {
-    SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
-        : portals::Module(),
-          jointsOutput_(base()),
-          chestboardButtonOutput_(base()),
-          footbumperOutput_(base()),
-          inertialsOutput_(base()),
-          sonarsOutput_(base()),
-          broker_(broker),
-          fastMemoryAccess_(new AL::ALMemoryFastAccess()),
-          sensorValues_(NUM_SENSOR_VALUES),
-          sensorKeys_(NUM_SENSOR_VALUES)
-    {
-        //std::cout << "SensorsModule : Constructor." << std::endl;
+namespace sensors
+{
 
-        // Initialize the Aldebaran fast access memory interface
-        // to quickly read sensor values from memory.
-        initializeSensorFastAccess();
-    }
+SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
+    : portals::Module(),
+      jointsOutput_(base()),
+      chestboardButtonOutput_(base()),
+      footbumperOutput_(base()),
+      inertialsOutput_(base()),
+      sonarsOutput_(base()),
+      broker_(broker),
+      fastMemoryAccess_(new AL::ALMemoryFastAccess()),
+      sensorValues_(NUM_SENSOR_VALUES),
+      sensorKeys_(NUM_SENSOR_VALUES)
+{
+    //std::cout << "SensorsModule : Constructor." << std::endl;
 
-    SensorsModule::~SensorsModule()
-    {
-        //std::cout << "SensorsModule : Destructor." << std::endl;
-    }
+    // Initialize the Aldebaran fast access memory interface
+    // to quickly read sensor values from memory.
+    initializeSensorFastAccess();
+}
 
-    void SensorsModule::initializeSensorFastAccess()
+SensorsModule::~SensorsModule()
+{
+    //std::cout << "SensorsModule : Destructor." << std::endl;
+}
+
+void SensorsModule::initializeSensorFastAccess()
+{
+    // There are 26 joints.
+    int i = 0;
+    for(; i < 26; ++i)
     {
-        // There are 26 joints.
-        int i = 0;
-        for(; i < 26; ++i)
-        {
         sensorKeys_[i] = std::string("Device/SubDeviceList/") + SensorNames[i] + std::string("/Position/Sensor/Value");
-        }
-        // There are 8 FSR sensors.
-        // (Left foot)
-        for(; i < 30; ++i)
-        {
-        sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/FSR/") + SensorNames[i] + std::string("/Sensor/Value");
-        }
-        // (Right foot)
-        for(; i < 34; ++i)
-        {
-        sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/FSR/") + SensorNames[i] + std::string("/Sensor/Value");
-        }
-        // There are 7 inertial sensors.
-        for(; i < 41; ++i)
-        {
-        sensorKeys_[i] = std::string("Device/SubDeviceList/InertialSensor/") + SensorNames[i] + std::string("/Sensor/Value");
-        }
-        // There are 2 important sonars.
-        sensorKeys_[i] = std::string("Device/SubDeviceList/US/Left/Sensor/Value");
-        i++;
-        sensorKeys_[i] = std::string("Device/SubDeviceList/US/Right/Sensor/Value");
-        i++;
-        // There are 4 foot bumpers.
-        sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value");
-        i++;
-        sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value");
-        i++;
-        sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value");
-        i++;
-        sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value");
-        i++;
-        // There is a single chest button.
-        sensorKeys_[i] = std::string("Device/SubDeviceList/Chestboard/Button/Sensor/Value");
-
-        fastMemoryAccess_->ConnectToVariables(broker_, sensorKeys_);
-
-        std::cout << "SensorsModule : Sensor keys initialized." << std::endl;
-        // for(std::vector<std::string>::iterator iter = sensorKeys_.begin();
-        //  iter != sensorKeys_.end();
-        //  ++iter)
-        // {
-        //  std::cout << *iter << std::endl;
-        // }
     }
-
-    void SensorsModule::initializeSonarValues()
+    // There are 8 FSR sensors.
+    // (Left foot)
+    for(; i < 30; ++i)
     {
-        // Get a proxy to the DCM.
-        boost::shared_ptr<AL::DCMProxy> dcmProxy = broker_->getDcmProxy();
-        if(dcmProxy != 0)
-        {
+        sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/FSR/") + SensorNames[i] + std::string("/Sensor/Value");
+    }
+    // (Right foot)
+    for(; i < 34; ++i)
+    {
+        sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/FSR/") + SensorNames[i] + std::string("/Sensor/Value");
+    }
+    // There are 7 inertial sensors.
+    for(; i < 41; ++i)
+    {
+        sensorKeys_[i] = std::string("Device/SubDeviceList/InertialSensor/") + SensorNames[i] + std::string("/Sensor/Value");
+    }
+    // There are 2 important sonars.
+    sensorKeys_[i] = std::string("Device/SubDeviceList/US/Left/Sensor/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/US/Right/Sensor/Value");
+    i++;
+    // There are 4 foot bumpers.
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value");
+    i++;
+    // There is a single chest button.
+    sensorKeys_[i] = std::string("Device/SubDeviceList/Chestboard/Button/Sensor/Value");
+
+    fastMemoryAccess_->ConnectToVariables(broker_, sensorKeys_);
+
+    std::cout << "SensorsModule : Sensor keys initialized." << std::endl;
+    // for(std::vector<std::string>::iterator iter = sensorKeys_.begin();
+    //  iter != sensorKeys_.end();
+    //  ++iter)
+    // {
+    //  std::cout << *iter << std::endl;
+    // }
+}
+
+void SensorsModule::initializeSonarValues()
+{
+    // Get a proxy to the DCM.
+    boost::shared_ptr<AL::DCMProxy> dcmProxy = broker_->getDcmProxy();
+    if(dcmProxy != 0)
+    {
         try
         {
             // For DCM::set() see:
@@ -108,124 +109,124 @@ namespace man
         {
             std::cout << "SensorsModule : Failed to initialize sonars, " << e.toString() << std::endl;
         }
-        }
     }
+}
 
-    void SensorsModule::updateSensorValues()
-    {
-        //std::cout << "SensorsModule : Retrieving sensor values from NAOqi." << std::endl;
-        // Update stored sensor values.
-        fastMemoryAccess_->GetValues(sensorValues_);
+void SensorsModule::updateSensorValues()
+{
+    //std::cout << "SensorsModule : Retrieving sensor values from NAOqi." << std::endl;
+    // Update stored sensor values.
+    fastMemoryAccess_->GetValues(sensorValues_);
 
-        // Update joints message.
-        updateJointsMessage();
-        // Update chestboard button message.
-        updateChestboardButtonMessage();
-        // Update footbumper message.
-        updateFootbumperMessage();
+    updateJointsMessage();
+    updateChestboardButtonMessage();
+    updateFootbumperMessage();
+    updateInertialsMessage();
+    updateSonarsMessage();
 
-        //std::cout << "SensorsModule : Sensor values " << std::endl;
-        // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
-        // {
-        //  std::cout << SensorNames[i] << " = " << sensorValues_[i] << std::endl;
-        // }
-    }
+    //std::cout << "SensorsModule : Sensor values " << std::endl;
+    // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
+    // {
+    //  std::cout << SensorNames[i] << " = " << sensorValues_[i] << std::endl;
+    // }
+}
 
-    void SensorsModule::updateJointsMessage()
-    {
-        portals::Message<messages::JointAngles> jointsMessage(0);
+void SensorsModule::updateJointsMessage()
+{
+    portals::Message<messages::JointAngles> jointsMessage(0);
 
-        *jointsMessage.get() = messages::JointAngles();
+    *jointsMessage.get() = messages::JointAngles();
 
-        jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
-        jointsMessage.get()->set_headpitch(sensorValues_[HeadPitch]);
-        jointsMessage.get()->set_lshoulderpitch(sensorValues_[LShoulderPitch]);
-        jointsMessage.get()->set_lshoulderroll(sensorValues_[LShoulderRoll]);
-        jointsMessage.get()->set_lelbowyaw(sensorValues_[LElbowYaw]);
-        jointsMessage.get()->set_lwristyaw(sensorValues_[LWristYaw]);
-        jointsMessage.get()->set_lhand(sensorValues_[LHand]);
-        jointsMessage.get()->set_rshoulderpitch(sensorValues_[RShoulderPitch]);
-        jointsMessage.get()->set_rshoulderroll(sensorValues_[RShoulderRoll]);
-        jointsMessage.get()->set_relbowyaw(sensorValues_[RElbowYaw]);
-        jointsMessage.get()->set_rwristyaw(sensorValues_[RWristYaw]);
-        jointsMessage.get()->set_rhand(sensorValues_[RHand]);
-        jointsMessage.get()->set_lhipyawpitch(sensorValues_[LHipYawPitch]);
-        jointsMessage.get()->set_rhipyawpitch(sensorValues_[RHipYawPitch]);
-        jointsMessage.get()->set_lhiproll(sensorValues_[LHipRoll]);
-        jointsMessage.get()->set_lhippitch(sensorValues_[LHipPitch]);
-        jointsMessage.get()->set_lkneepitch(sensorValues_[LKneePitch]);
-        jointsMessage.get()->set_lanklepitch(sensorValues_[LAnklePitch]);
-        jointsMessage.get()->set_lankleroll(sensorValues_[LAnkleRoll]);
-        jointsMessage.get()->set_rhiproll(sensorValues_[RHipRoll]);
-        jointsMessage.get()->set_rhippitch(sensorValues_[RHipPitch]);
-        jointsMessage.get()->set_rkneepitch(sensorValues_[RKneePitch]);
-        jointsMessage.get()->set_ranklepitch(sensorValues_[RAnklePitch]);
-        jointsMessage.get()->set_rankleroll(sensorValues_[RAnkleRoll]);
+    jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
+    jointsMessage.get()->set_headpitch(sensorValues_[HeadPitch]);
+    jointsMessage.get()->set_lshoulderpitch(sensorValues_[LShoulderPitch]);
+    jointsMessage.get()->set_lshoulderroll(sensorValues_[LShoulderRoll]);
+    jointsMessage.get()->set_lelbowyaw(sensorValues_[LElbowYaw]);
+    jointsMessage.get()->set_lwristyaw(sensorValues_[LWristYaw]);
+    jointsMessage.get()->set_lhand(sensorValues_[LHand]);
+    jointsMessage.get()->set_rshoulderpitch(sensorValues_[RShoulderPitch]);
+    jointsMessage.get()->set_rshoulderroll(sensorValues_[RShoulderRoll]);
+    jointsMessage.get()->set_relbowyaw(sensorValues_[RElbowYaw]);
+    jointsMessage.get()->set_rwristyaw(sensorValues_[RWristYaw]);
+    jointsMessage.get()->set_rhand(sensorValues_[RHand]);
+    jointsMessage.get()->set_lhipyawpitch(sensorValues_[LHipYawPitch]);
+    jointsMessage.get()->set_rhipyawpitch(sensorValues_[RHipYawPitch]);
+    jointsMessage.get()->set_lhiproll(sensorValues_[LHipRoll]);
+    jointsMessage.get()->set_lhippitch(sensorValues_[LHipPitch]);
+    jointsMessage.get()->set_lkneepitch(sensorValues_[LKneePitch]);
+    jointsMessage.get()->set_lanklepitch(sensorValues_[LAnklePitch]);
+    jointsMessage.get()->set_lankleroll(sensorValues_[LAnkleRoll]);
+    jointsMessage.get()->set_rhiproll(sensorValues_[RHipRoll]);
+    jointsMessage.get()->set_rhippitch(sensorValues_[RHipPitch]);
+    jointsMessage.get()->set_rkneepitch(sensorValues_[RKneePitch]);
+    jointsMessage.get()->set_ranklepitch(sensorValues_[RAnklePitch]);
+    jointsMessage.get()->set_rankleroll(sensorValues_[RAnkleRoll]);
 
-        jointsOutput_.setMessage(jointsMessage);
-    }
+    jointsOutput_.setMessage(jointsMessage);
+}
 
-    void SensorsModule::updateChestboardButtonMessage()
-    {
-        portals::Message<messages::ButtonState> chestboardMessage(0);
+void SensorsModule::updateChestboardButtonMessage()
+{
+    portals::Message<messages::ButtonState> chestboardMessage(0);
 
-        *chestboardMessage.get() = messages::ButtonState();
+    *chestboardMessage.get() = messages::ButtonState();
 
-        chestboardMessage.get()->set_pressed(
+    chestboardMessage.get()->set_pressed(
         sensorValues_[ChestboardButton] > 0.5f ? true : false
         );
 
-        chestboardButtonOutput_.setMessage(chestboardMessage);
-    }
+    chestboardButtonOutput_.setMessage(chestboardMessage);
+}
 
-    void SensorsModule::updateFootbumperMessage()
-    {
-        portals::Message<messages::FootBumperState> footbumperMessage(0);
+void SensorsModule::updateFootbumperMessage()
+{
+    portals::Message<messages::FootBumperState> footbumperMessage(0);
 
-        *footbumperMessage.get() = messages::FootBumperState();
+    *footbumperMessage.get() = messages::FootBumperState();
 
-        footbumperMessage.get()->mutable_lfootbumperleft()->set_pressed(
+    footbumperMessage.get()->mutable_lfootbumperleft()->set_pressed(
         sensorValues_[LFootBumperLeft] > 0.5f ? true : false
         );
 
-        footbumperOutput_.setMessage(footbumperMessage);
-    }
+    footbumperOutput_.setMessage(footbumperMessage);
+}
 
-    void SensorsModule::updateInertialsMessage()
-    {
-        portals::Message<messages::InertialState> inertialsMessage(0);
+void SensorsModule::updateInertialsMessage()
+{
+    portals::Message<messages::InertialState> inertialsMessage(0);
 
-        *inertialsMessage.get() = messages::InertialState();
+    *inertialsMessage.get() = messages::InertialState();
 
-        inertialsMessage.get()->set_accx(sensorValues_[AccX]);
-        inertialsMessage.get()->set_accy(sensorValues_[AccY]);
-        inertialsMessage.get()->set_accz(sensorValues_[AccZ]);
+    inertialsMessage.get()->set_accx(sensorValues_[AccX]);
+    inertialsMessage.get()->set_accy(sensorValues_[AccY]);
+    inertialsMessage.get()->set_accz(sensorValues_[AccZ]);
 
-        inertialsMessage.get()->set_gyrx(sensorValues_[GyrX]);
-        inertialsMessage.get()->set_gyry(sensorValues_[GyrY]);
+    inertialsMessage.get()->set_gyrx(sensorValues_[GyrX]);
+    inertialsMessage.get()->set_gyry(sensorValues_[GyrY]);
 
-        inertialsMessage.get()->set_anglex(sensorValues_[AngleX]);
-        inertialsMessage.get()->set_angley(sensorValues_[AngleY]);
+    inertialsMessage.get()->set_anglex(sensorValues_[AngleX]);
+    inertialsMessage.get()->set_angley(sensorValues_[AngleY]);
 
-        inertialsOutput_.setMessage(inertialsMessage);
-    }
+    inertialsOutput_.setMessage(inertialsMessage);
+}
 
-    void SensorsModule::updateSonarsMessage()
-    {
-        portals::Message<messages::SonarState> sonarsMessage(0);
+void SensorsModule::updateSonarsMessage()
+{
+    portals::Message<messages::SonarState> sonarsMessage(0);
 
-        *sonarsMessage.get() = messages::SonarState();
+    *sonarsMessage.get() = messages::SonarState();
 
-        sonarsMessage.get()->set_usleft(sensorValues_[USLeft]);
-        sonarsMessage.get()->set_usright(sensorValues_[USRight]);
+    sonarsMessage.get()->set_usleft(sensorValues_[USLeft]);
+    sonarsMessage.get()->set_usright(sensorValues_[USRight]);
 
-        sonarsOutput_.setMessage(sonarsMessage);
-    }
+    sonarsOutput_.setMessage(sonarsMessage);
+}
 
-    void SensorsModule::run_()
-    {
-        // Simply update all sensor readings from ALMemory.
-        updateSensorValues();
-    }
-    } // namespace sensors
+void SensorsModule::run_()
+{
+    // Simply update all sensor readings from ALMemory.
+    updateSensorValues();
+}
+
+} // namespace sensors
 } // namespace man

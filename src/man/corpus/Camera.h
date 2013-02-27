@@ -8,7 +8,7 @@
 #pragma once
 
 namespace man {
-namespace image {
+namespace corpus {
 
 class Camera {
 
