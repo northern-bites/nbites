@@ -26,11 +26,15 @@
 #include "RoboGrams.h"
 
 #include "TeamConnect.h"
-#include "TeamMember.h"
 #include "GameConnect.h"
-#include "GameData.h"
 #include "CommTimer.h"
 #include "NetworkMonitor.h"
+#include "Common.h"
+
+#include "WorldModel.pb.h"
+#include "TeamPacket.pb.h"
+#include "GameState.pb.h"
+#include "GCResponse.pb.h"
 
 namespace man{
 
@@ -66,22 +70,19 @@ public:
      */
     void receive();
 
-    /**
-     * Returns a pointer to the GameData object for other systems.
-     */
-    GameData getGameData();
-
-    /**
-     * Returns a pointer to a specific teammate.
-     * @param player: the player number of the teammate desired.
-     */
-    TeamMember getTeammate(int player);
-
     void setMyPlayerNumber(int p) {_myPlayerNumber = p;}
     int  myPlayerNumber() {return _myPlayerNumber;}
 
     void setTeamNumber(int tn);
     int  teamNumber();
+
+    /***** OUT PORTALS *****/
+    portals::OutPortal<messages::WorldModel>* _worldModels[NUM_PLAYERS_PER_TEAM];
+    portals::OutPortal<messages::GameState> _gameStateOutput;
+
+    /***** IN  PORTALS *****/
+    portals::InPortal<messages::WorldModel> _worldModelInput;
+    portals::InPortal<messages::GCResponse> _gcResponseInput;
 
 private:
     /**

@@ -1,7 +1,6 @@
 /**
  * This class provides functionality for communicating with the
- * GameController. Uses UDP for transmission and reception and
- * keeps track of the data with the GameData class.
+ * GameController. Uses UDP for transmission and reception.
  * @author Wils Dawson 5/29/2012
  */
 
@@ -26,13 +25,11 @@ GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m, int team, int player)
 {
     _socket = new UDPSocket();
     setUpSocket();
-
-    _data   = new GameData(team, player);
 }
 
 GameConnect::~GameConnect()
 {
-    delete _data;
+    delete _socket;
     std::cout << "GameConnect destructor" << std::endl;
 }
 
@@ -46,14 +43,19 @@ void GameConnect::setUpSocket()
     _socket->setTarget("127.0.0.1", GAMECONTROLLER_PORT);
 }
 
-void GameConnect::handle(int player = 0)
+void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
+                         portals::InPortal<messages::GCResponse>& in,
+                         int player)
 {
     char packet[sizeof(struct RoboCupGameControlData)];
     int result;
     struct sockaddr from;
     int addrlen = sizeof(from);
+    struct RoboCupGameControlData control;
     do
     {
+        portals::Message<messages::GameState> gameMessage(0);
+        *gameMessage.get() = messages::GameState();
         memset(&packet[0], 0, sizeof(struct RoboCupGameControlData));
 
         result = _socket->receiveFrom(&packet[0], sizeof(packet),
@@ -64,19 +66,26 @@ void GameConnect::handle(int player = 0)
 
         if (!verify(&packet[0]))
             continue;  // Bad Packet.
+        _haveRemoteGC = true;
 
-        getGameData()->setControl(packet);
+        memcpy(&control, &packet[0], sizeof(RoboCupGameControlData));
+        fillMessage(gameMessage.get(), control);
+        out.setMessage(gameMessage);
 
         _socket->setTarget(from);
         _socket->setBroadcast(false);
-        _haveRemoteGC = true;
+
+        in.latch();
 
         if (player)
-            respond(player);
+            respond(player, in.message().status());
         else
+        {
+            //@TODO: Currently can't respond with correct status,
+            //need InPortals for other players... Too much overhead?
             for (int i = 1; i <= NUM_PLAYERS_PER_TEAM; ++i)
                 respond(i);
-
+        }
     } while (true);
 }
 
@@ -115,6 +124,49 @@ bool GameConnect::verify(char* packet)
     return true;
 }
 
+void GameConnect::fillMessage(messages::GameState* msg,
+                              struct RoboCupGameControlData& control)
+{
+    msg->set_players_per_team(control.playersPerTeam);
+    msg->set_state(control.state);
+    msg->set_first_half(control.firstHalf);
+    msg->set_kick_off_team(control.kickOffTeam);
+    msg->set_secondary_state(control.secondaryState);
+    msg->set_drop_in_team(control.dropInTeam);
+    msg->set_drop_in_time(control.dropInTime);
+    msg->set_secs_remaining(control.secsRemaining);
+    msg->set_have_remote_gc(_haveRemoteGC);
+
+    messages::TeamInfo* blue = msg->add_team();
+    messages::TeamInfo* red  = msg->add_team();
+    fillTeam(blue, control.teams[TEAM_BLUE]);
+    fillTeam(red , control.teams[TEAM_RED ]);
+
+}
+
+
+void GameConnect::fillTeam(messages::TeamInfo* msg,
+                           struct TeamInfo& team)
+{
+    msg->set_team_number(team.teamNumber);
+    msg->set_team_color(team.teamColour);
+    msg->set_score(team.score);
+    msg->set_goal_color(team.goalColour);
+
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        messages::RobotInfo* player = msg->add_player();
+        fillPlayer(player, team.players[i]);
+    }
+}
+
+void GameConnect::fillPlayer(messages::RobotInfo* msg,
+                             struct RobotInfo& player)
+{
+    msg->set_penalty(player.penalty);
+    msg->set_secs_left(player.secsTillUnpenalised);
+}
+
 void GameConnect::respond(int player, unsigned int msg)
 {
     struct RoboCupGameControlReturnData response;
@@ -141,10 +193,7 @@ void GameConnect::respond(int player, unsigned int msg)
 void GameConnect::setMyTeamNumber(int tn, int pn)
 {
     _myTeamNumber = tn;
-    delete _data;
-    _data = new GameData(_myTeamNumber, pn);
 }
 
 }
-
 }

@@ -16,11 +16,8 @@ set( COMM_SRCS CommModule
                CommTimer
 	       NetworkMonitor
                TeamConnect
-               TeamMember
                GameConnect
-               GameData
                UDPSocket
-               RoboCupGameControlData
                )
 
 ############################ CHECK LIBRARY / EXECUTABLE OPTION

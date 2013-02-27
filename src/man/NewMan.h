@@ -18,6 +18,9 @@ public:
     virtual ~Man();
 
 private:
+
+    void startSubThreads();
+
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
 

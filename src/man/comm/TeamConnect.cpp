@@ -20,22 +20,12 @@ namespace comm {
 TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
     : timer(t), monitor(m)
 {
-    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-    {
-        teamMates[i] = new TeamMember(i+1);
-    }
-
     socket = new UDPSocket();
     setUpSocket();
 }
 
 TeamConnect::~TeamConnect()
 {
-    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-    {
-        delete teamMates[i];
-    }
-
     delete socket;
 }
 
@@ -112,86 +102,105 @@ end:
     }
 }
 
-void TeamConnect::send(int player, int team, int burst = 1)
+void TeamConnect::send(const messages::WorldModel& model,
+                       int player, int team, int burst = 1)
 {
-    TeamMember* robot = teamMates[player-1];
+    if (!model.IsInitialized())
+    {
+#ifdef DEBUG_COMM
+        std::cerr << "Comm does not have a valid input to send." << std::endl;
+#endif
+        return;
+    }
+    TeamMemberInfo robot = teamMates[player-1];
 
-    char packet[NUM_HEADER_BYTES + TeamMember::sizeOfData()];
+    portals::Message<messages::TeamPacket> teamMessage(0);
+    *teamMessage.get() = messages::TeamPacket();
 
-    float* payload = buildHeader(&packet[0], robot, team);
+    messages::TeamPacket* packet = teamMessage.get();
 
-    robot->generatePacket(payload);
+    packet->mutable_payload()->CopyFrom(model);
+    packet->set_sequence_number(robot.seqNum + 1);
+    packet->set_player_number(player);
+    packet->set_team_number(team);
+    packet->set_header(UNIQUE_ID);
+    packet->set_timestamp(timer->timestamp());
+
+    char datagram[packet->ByteSize()];
+    packet->SerializeToArray(&datagram[0], packet->GetCachedSize());
 
     for (int i = 0; i < burst; ++i)
     {
-        socket->sendToTarget(&packet[0], sizeof(packet));
+        socket->sendToTarget(&datagram[0], sizeof(packet));
     }
 }
 
-float* TeamConnect::buildHeader(char* packet, TeamMember* robot, int tn)
+void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],
+                          int player, int team)
 {
-    char* cptr = packet;  // Preserve packet pointer for caller.
-
-    *cptr = *UNIQUE_ID;
-    cptr += sizeof(UNIQUE_ID);  // Advance pointer.
-
-    *cptr   = (char)tn;
-    *++cptr = (char)robot->playerNumber();
-
-    int* iptr = (int*)++cptr;
-    int sn = robot->lastSeqNum() + 1;
-    *iptr = sn;
-    robot->setLastSeqNum(sn);
-
-    llong* lptr = (llong*)++iptr;
-    *lptr = timer->timestamp();
-    float* fptr = (float*)++lptr;
-
-    return fptr;
-}
-
-void TeamConnect::receive(int player, int team)
-{
-    char packet[NUM_HEADER_BYTES + TeamMember::sizeOfData()];
-    int result, playerNumber;
-    float* payload;
-    TeamMember* robot;
+    char packet[250];
+    int result;
+    int playerNum;
 
     do
     {
-        memset(&packet[0], 0, NUM_HEADER_BYTES + TeamMember::sizeOfData());
+        //initial setup
+        portals::Message<messages::TeamPacket> teamMessage(0);
+        *teamMessage.get() = messages::TeamPacket();
+        memset(&packet[0], 0, sizeof(packet));
 
+        //actually check socket
         result = socket->receive(&packet[0], sizeof(packet));
 
-        if (result <= 0)
-            break;
+        // Save the current time for later.
+        llong currtime = timer->timestamp();
 
-        playerNumber = verify(&packet[0], player, team);
-        if (playerNumber == 0)
+        if (result <= 0)
+            break; //leave on error or nothing to receive.
+
+        if (teamMessage.get()->ParseFromArray(&packet[0], result))
+        {
+            std::cerr << "Failed to parse GPB from socket in TeamConnect"
+                      << std::endl;
+        }
+
+        if (!verify(teamMessage.get(), currtime, player, team))
             continue;  // Bad Packet.
+
 #ifdef DEBUG_COMM
-        std::cout << "Recieved a packet from player: " << playerNumber << std::endl;
+        std::cout << "Recieved a packet:\n\n"
+                  << teamMessage.get()->DebugString()
+                  << std::endl;
 #endif
 
-        payload = (float*)(&packet[0] + NUM_HEADER_BYTES);
-        robot = teamMates[playerNumber -1];
-
-        robot->update(payload);
+        playerNum = teamMessage.get()->player_number();
+        portals::Message<messages::WorldModel> model(&teamMessage.get()->payload());
+        modelOuts[playerNum-1]->setMessage(model);
     } while (result > 0);
 }
 
-int TeamConnect::verify(char* packet, int player, int team)
+bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
+                        int player, int team)
 {
-    // Save the current time for later.
-    llong currtime = timer->timestamp();
+    if (memcmp(packet->header().c_str(), UNIQUE_ID, sizeof(UNIQUE_ID)))
+    {
+#ifdef DEBUG_COMM
+        std::cout << "Received packet with bad ID"
+                  << " in TeamConnect::verifyHeader()" << std::endl;
+#endif
+        return false;
+    }
 
-    if (!verifyHeader(packet, team))
-        return 0;
+    if (packet->team_number() != team)
+    {
+#ifdef DEBUG_COMM
+        std::cout << "Received packet with bad teamNumber"
+                  << " in TeamConnect::verifyHeader()" << std::endl;
+#endif
+        return false;
+    }
 
-    // get pointer after UNIQUE_ID and teamNumber
-    char* cptr = packet + sizeof(UNIQUE_ID) + 1;
-
-    int playerNum = (int)*cptr;
+    int playerNum = packet->player_number();
 
     if (playerNum < 0 || playerNum > NUM_PLAYERS_PER_TEAM)
     {
@@ -199,7 +208,7 @@ int TeamConnect::verify(char* packet, int player, int team)
         std::cout << "Received packet with bad playerNumber"
                   << " in TeamConnect::verify()" << std::endl;
 #endif
-        return 0;
+        return false;
     }
 
     // if we care about who we recieve from:
@@ -209,29 +218,27 @@ int TeamConnect::verify(char* packet, int player, int team)
         std::cout << "Received packet with unwanted playerNumber"
                   << " in TeamConnect::verify()" << std::endl;
 #endif
-        return 0;
+        return false;
     }
 
-    int* iptr = (int*)++cptr;
-    int seqNumber = *iptr;
+    int seqNumber = packet->sequence_number();
 
-    TeamMember* robot = teamMates[playerNum-1];
-    if (seqNumber <= robot->lastSeqNum())
+    TeamMemberInfo robot = teamMates[playerNum-1];
+    if (seqNumber <= robot.seqNum)
     {
 #ifdef DEBUG_COMM
         std::cout << "Received packet with old sequenceNumber"
                   << " in TeamConnect::verify()" << std::endl;
 #endif
-        return 0;
+        return false;
     }
 
     // Success! Update seqNum and timeStamp and parse!
-    int lastSeqNum = robot->lastSeqNum();
+    int lastSeqNum = robot.seqNum;
     int delayed = seqNumber - lastSeqNum - 1;
-    robot->setLastSeqNum(seqNumber);
+    robot.seqNum = seqNumber;
 
-    llong* lptr = (llong*)++iptr;
-    llong ts = *lptr;
+    llong ts = packet->timestamp();
 
     // Now attempt to syncronize the clocks of this robot and
     // the robot from which we just received. Eventually the
@@ -245,95 +252,33 @@ int TeamConnect::verify(char* packet, int player, int team)
         newOffset = ts + MIN_PACKET_DELAY - currtime;
         timer->addToOffset(newOffset);
     }
-    robot->setLastPacketTime(ts);
+    robot.timestamp = ts;
 
     // Update the monitor
     monitor->packetsDropped(delayed);
     monitor->packetReceived(ts, currtime + newOffset);
 
-    return playerNum;
-}
-
-bool TeamConnect::verifyHeader(char* header, int team)
-{
-    char* ptr = header;
-
-    const char* uID = UNIQUE_ID;
-    // memcmp returns 0 on equal.
-    if (memcmp(ptr, uID, sizeof(UNIQUE_ID)))
-    {
-#ifdef DEBUG_COMM
-        std::cout << "Received packet with bad ID"
-                  << " in TeamConnect::verifyHeader()" << std::endl;
-#endif
-        return false;
-    }
-    ptr += sizeof(UNIQUE_ID);
-
-    char tn = (char)team;
-    // Assumes teamNumber can fit in one byte.
-    if (memcmp(ptr, &tn, 1))
-    {
-#ifdef DEBUG_COMM
-        std::cout << "Received packet with bad teamNumber"
-                  << " in TeamConnect::verifyHeader()" << std::endl;
-#endif
-        return false;
-    }
     return true;
 }
 
-void TeamConnect::checkDeadTeammates(llong time, int player)
+void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],
+                                     llong time, int player)
 {
-    TeamMember* robot;
+    TeamMemberInfo robot;
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         robot = teamMates[i];
-        if (robot->playerNumber() == player)
-            robot->setActive(true);
-        else if (time - robot->lastPacketTime() > TEAMMATE_DEAD_THRESHOLD)
-            robot->setActive(false);
+        if (i+1 == player)
+            continue;
+        else if (time - robot.timestamp > TEAMMATE_DEAD_THRESHOLD)
+        {
+            portals::Message<messages::WorldModel> msg(0);
+            *msg.get() = messages::WorldModel();
+            msg.get()->set_active(false);
+            modelOuts[i]->setMessage(msg);
+        }
     }
 }
 
-
-// void TeamConnect::setLocData(int p,
-//                              float x , float y , float h ,
-//                              float xu, float yu, float hu)
-// {
-//     TeamMember* robot = teamMates[p-1];
-
-//     robot->setMyX(x);
-//     robot->setMyY(y);
-//     robot->setMyH(h);
-//     robot->setMyXUncert(xu);
-//     robot->setMyYUncert(yu);
-//     robot->setMyHUncert(hu);
-// }
-
-// void TeamConnect::setBallData(int p, float on,
-//                               float d , float b ,
-//                               float du, float bu)
-// {
-//     TeamMember* robot = teamMates[p-1];
-
-//     robot->setBallOn(on);
-//     robot->setBallDist(d);
-//     robot->setBallBearing(b);
-//     robot->setBallDistUncert(bu);
-//     robot->setBallBearingUncert(bu);
-// }
-
-// void TeamConnect::setBehaviorData(int p,
-//                                   float r, float sr, float ct)
-// {
-//     TeamMember* robot = teamMates[p-1];
-
-//     robot->setRole(r);
-//     robot->setSubRole(sr);
-//     robot->setChaseTime(ct);
-// }
-
 }
-
 }
