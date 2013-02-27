@@ -55,7 +55,7 @@ public:
     //getters
     bool isRobotFalling()const { return useFallProtection && falling; }
     bool isRobotFallen()const { return useFallProtection && fallen; }
-	bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
+    bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
 
     boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
 
@@ -80,7 +80,7 @@ public:
 private:
     void checkFalling();
     void checkFallen();
-	void checkFeetOnGround();
+    void checkFeetOnGround();
     void checkBatteryLevels();
     void checkTemperatures();
     bool checkConnection();

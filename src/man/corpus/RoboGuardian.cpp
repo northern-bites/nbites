@@ -121,9 +121,9 @@ bool isFalling(float angle_pos, float angle_vel) {
     // Test falling based on angle (note that angle_pos is assumed to be
     // the mag. of the angle).
     if (angle_pos >= FALLING_ANGLE_THRESH) {
-	//cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos
-	//     << ", angle_vel == " << angle_vel << endl;
-	return true;
+    //cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos
+    //     << ", angle_vel == " << angle_vel << endl;
+    return true;
     } else {
         if(angle_vel > FALL_SPEED_THRESH)
             return true;
@@ -157,7 +157,7 @@ void RoboGuardian::checkFallen() {
 
 #ifdef DEBUG_GUARDIAN_FALLING
     if (fallen)
-	cout << "Robot has fallen" <<endl;
+    cout << "Robot has fallen" <<endl;
 #endif
 }
 
@@ -182,42 +182,42 @@ void RoboGuardian::checkFeetOnGround() {
        off the ground (ruins SweetMoves, walking, etc) so this method will stop
        early and feetOnGround will always be true */
     if (sensors->percentBrokenFSR() > 0) {
-	feetOnGround = true;
-	return;
+    feetOnGround = true;
+    return;
     }
 
     const FSR left = sensors->getLeftFootFSR();
     const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
-	left.rearRight;
+    left.rearRight;
     const FSR right = sensors->getRightFootFSR();
     const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
-	right.rearRight;
+    right.rearRight;
 
     //printf("left: %f, right: %f, total: %f\n", leftSum, rightSum, (leftSum + rightSum));
 
     // buffer the transition in both directions
     if (feetOnGround) {
-	if (leftSum + rightSum < onGroundFSRThresh) {
-	    groundOffCounter++;
-	} else {
-	    groundOffCounter = 0;
-	}
+    if (leftSum + rightSum < onGroundFSRThresh) {
+        groundOffCounter++;
+    } else {
+        groundOffCounter = 0;
+    }
     }
     else {
-	if (leftSum + rightSum > onGroundFSRThresh) {
-	    groundOnCounter++;
-	}
-	else {
-	    groundOnCounter = 0;
-	}
+    if (leftSum + rightSum > onGroundFSRThresh) {
+        groundOnCounter++;
+    }
+    else {
+        groundOnCounter = 0;
+    }
     }
 
     if (groundOffCounter > GROUND_FRAMES_THRESH) {
-	feetOnGround = false;
-	groundOnCounter = groundOffCounter = 0;
+    feetOnGround = false;
+    groundOnCounter = groundOffCounter = 0;
     } else if (groundOnCounter > GROUND_FRAMES_THRESH) {
-	feetOnGround = true;
-	groundOnCounter = groundOffCounter = 0;
+    feetOnGround = true;
+    groundOnCounter = groundOffCounter = 0;
     }
 }
 
@@ -252,13 +252,13 @@ void RoboGuardian::checkFalling(){
     const bool falling_critical_angle = angleMag > FALLING_ANGLE_THRESH;
 
     if(isFalling(angleMag, angleSpeed)) {
-	// If falling, increment falling frames counter.
+    // If falling, increment falling frames counter.
         fallingFrames += 1;
         notFallingFrames = 0;
     } else if(!falling_critical_angle) {
-	// Otherwise, not falling.
-	fallingFrames = 0;
-	notFallingFrames += 1;
+    // Otherwise, not falling.
+    fallingFrames = 0;
+    notFallingFrames += 1;
     }
 
     /*
@@ -274,9 +274,9 @@ void RoboGuardian::checkFalling(){
     //already at a 45 degree angle, than we know we are falling
     if (fallingFrames > FALLING_FRAMES_THRESH){
         // When falling, execute the fall protection method.
-	//cout << "RoboGuardian::checkFalling() : FALLING!" << endl;
+    //cout << "RoboGuardian::checkFalling() : FALLING!" << endl;
         falling = true;
-	processFallingProtection();
+    processFallingProtection();
     }else if(notFallingFrames > FALLING_FRAMES_THRESH){
         falling = false;
     }
