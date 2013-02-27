@@ -123,6 +123,8 @@ namespace man
 	    updateChestboardButtonMessage();
 	    // Update footbumper message.
 	    updateFootbumperMessage();
+        updateInertialsMessage();
+        updateSonarsMessage();
 
 	    //std::cout << "SensorsModule : Sensor values " << std::endl;
 	    // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
