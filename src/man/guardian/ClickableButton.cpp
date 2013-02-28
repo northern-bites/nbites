@@ -22,12 +22,10 @@ ClickableButton::ClickableButton(int _fps)
       buttonClicks(0), numClicks(NO_CLICKS),
       registeredClickThisTime(false)
 {
-    pthread_mutex_init(&button_mutex, NULL);
 }
 
 ClickableButton::~ClickableButton()
 {
-    pthread_mutex_destroy(&button_mutex);
 }
 
 int ClickableButton::getAndClearNumClicks() const{

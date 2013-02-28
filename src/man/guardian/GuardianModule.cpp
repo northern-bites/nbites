@@ -1,28 +1,21 @@
-#include "RoboGuardian.h"
+#include "GuardianModule.h"
 
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
 
-using namespace std;
-
-#include "Kinematics.h"
-
-#include "guardian/SoundPaths.h"
+#include "SoundPaths.h"
 #include "Profiler.h"
 
-const int RoboGuardian::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
-//check the wifi connection every 10 seconds
-const int RoboGuardian::CONNECTION_CHECK_RATE = 10*RoboGuardian::GUARDIAN_FRAME_RATE;
+namespace man{
+namespace guardian{
+
+const int GuardianModule::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 // 1 second * 1000 ms/s * 1000 us/ms
-const int RoboGuardian::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
-    RoboGuardian::GUARDIAN_FRAME_RATE;
+const int GuardianModule::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
+    GuardianModule::GUARDIAN_FRAME_RATE;
 
-const int RoboGuardian::NO_CLICKS = -1;
-
-//TODO: remove
-using namespace man::corpus::guardian;
-using namespace man::corpus::guardian::sound_paths;
+const int GuardianModule::NO_CLICKS = -1;
 
 static const boost::shared_ptr<FreezeCommand> REMOVE_GAINS =
     boost::shared_ptr<FreezeCommand>
@@ -33,7 +26,7 @@ static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
     (new UnfreezeCommand());
 
 //Non blocking!!
-void RoboGuardian::playFile(string str)const{
+void GuardianModule::playFile(string str)const{
     // system returns an int.
     if(system((sout+str+" &").c_str()) != 0)
         cout << "Roboguardian could not play file." << endl;
@@ -41,9 +34,8 @@ void RoboGuardian::playFile(string str)const{
 
 
 
-RoboGuardian::RoboGuardian(boost::shared_ptr<Sensors> s)
-    : Thread("RoboGuardian"), sensors(s),
-      motion_interface(NULL),
+GuardianModule::GuardianModule()
+    : portals::Module(),
       lastTemps(sensors->getBodyTemperatures()),
       lastBatteryCharge(sensors->getBatteryCharge()),
       chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
@@ -54,55 +46,48 @@ RoboGuardian::RoboGuardian(boost::shared_ptr<Sensors> s)
       notFallingFrames(0),fallenCounter(0),
       groundOnCounter(0),groundOffCounter(0),
       registeredFalling(false),registeredShutdown(false),
-      wifiReconnectTimeout(0),
       falling(false),fallen(false),feetOnGround(true),
       useFallProtection(false),
-      lastHeatAudioWarning(0), lastHeatPrintWarning(0),
-      wifiAngel()
+      lastHeatAudioWarning(0), lastHeatPrintWarning(0)
 {
-    pthread_mutex_init(&click_mutex,NULL);
     executeStartupAction();
 }
-RoboGuardian::~RoboGuardian(){
-    pthread_mutex_destroy(&click_mutex);
+GuardianModule::~GuardianModule()
+{
 }
 
+void GuardianModule::executeStartupAction() const
+{
+}
 
-
-void RoboGuardian::run(){
-
+void GuardianModule::run_()
+{
+    PROF_ENTER(P_ROBOGUARDIAN);
     struct timespec interval, remainder;
     interval.tv_sec = 0;
     interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
-    while(Thread::running){
-        // @TODO: Thread safe?
-        PROF_ENTER(P_ROBOGUARDIAN);
-        countButtonPushes();
-        checkFalling();
-        checkFallen();
-        checkFeetOnGround();
-        checkBatteryLevels();
-        checkTemperatures();
-        processFallingProtection();
-        processChestButtonPushes();
-        if (frameCount % CONNECTION_CHECK_RATE == 0) {
-            //wifiAngel.check_on_wifi();
-        }
-        frameCount++;
-        nanosleep(&interval, &remainder);
-        PROF_EXIT(P_ROBOGUARDIAN);
-    }
+    countButtonPushes();
+    checkFalling();
+    checkFallen();
+    checkFeetOnGround();
+    checkBatteryLevels();
+    checkTemperatures();
+    processFallingProtection();
+    processChestButtonPushes();
+    frameCount++;
+    nanosleep(&interval, &remainder);
+    PROF_EXIT(P_ROBOGUARDIAN);
 }
 
-void RoboGuardian::shutoffGains(){
-    cout << "RoboGuardian::shutoffGains()" <<endl;
+void GuardianModule::shutoffGains(){
+    cout << "GuardianModule::shutoffGains()" <<endl;
     if(motion_interface != NULL)
         motion_interface->sendFreezeCommand(REMOVE_GAINS);
     playFile(stiffness_removed_wav);
 }
 
-void RoboGuardian::enableGains(){
-    cout << "RoboGuardian::enableGains()" <<endl;
+void GuardianModule::enableGains(){
+    cout << "GuardianModule::enableGains()" <<endl;
     if(motion_interface != NULL)
         motion_interface->sendFreezeCommand(ENABLE_GAINS);
     playFile(stiffness_enabled_wav);
@@ -121,7 +106,7 @@ bool isFalling(float angle_pos, float angle_vel) {
     // Test falling based on angle (note that angle_pos is assumed to be
     // the mag. of the angle).
     if (angle_pos >= FALLING_ANGLE_THRESH) {
-    //cout << "RoboGuardian::isFalling() : angle_pos == " << angle_pos
+    //cout << "GuardianModule::isFalling() : angle_pos == " << angle_pos
     //     << ", angle_vel == " << angle_vel << endl;
     return true;
     } else {
@@ -133,7 +118,7 @@ bool isFalling(float angle_pos, float angle_vel) {
 
 
 
-void RoboGuardian::checkFallen() {
+void GuardianModule::checkFallen() {
     if (!useFallProtection)
         return;
 
@@ -171,7 +156,7 @@ void RoboGuardian::checkFallen() {
  * GROUND_FRAMES_THRESH then we set feetOnGround=false
  *
  */
-void RoboGuardian::checkFeetOnGround() {
+void GuardianModule::checkFeetOnGround() {
     //this can be higher than the falling thresholds since stopping the walk
     //engine is less critical
     static const int GROUND_FRAMES_THRESH = 10;
@@ -235,7 +220,7 @@ void RoboGuardian::checkFeetOnGround() {
  * works.
  *
  */
-void RoboGuardian::checkFalling(){
+void GuardianModule::checkFalling(){
     if (!useFallProtection){
         return;
     }
@@ -274,7 +259,7 @@ void RoboGuardian::checkFalling(){
     //already at a 45 degree angle, than we know we are falling
     if (fallingFrames > FALLING_FRAMES_THRESH){
         // When falling, execute the fall protection method.
-    //cout << "RoboGuardian::checkFalling() : FALLING!" << endl;
+    //cout << "GuardianModule::checkFalling() : FALLING!" << endl;
         falling = true;
     processFallingProtection();
     }else if(notFallingFrames > FALLING_FRAMES_THRESH){
@@ -286,7 +271,7 @@ void RoboGuardian::checkFalling(){
 }
 
 
-void RoboGuardian::processFallingProtection(){
+void GuardianModule::processFallingProtection(){
     if(useFallProtection && falling && !registeredFalling){
         registeredFalling = true;
         executeFallProtection();
@@ -309,7 +294,7 @@ void RoboGuardian::processFallingProtection(){
 
 // We print each time the battery looses ten percent of charge
 //once the charge gets to %30 percent of capacity, we start to say "energy"
-void RoboGuardian::checkBatteryLevels(){
+void GuardianModule::checkBatteryLevels(){
     //Constants on 0-10 scale, sensor reading is on 0-1.0 scale
     static const float LOW_BATTERY_VALUE = 3.0f;
     static const float EMPTY_BATTERY_VALUE = 0.7f; //start nagging below 7%
@@ -346,7 +331,7 @@ void RoboGuardian::checkBatteryLevels(){
     lastBatteryCharge = newBatteryCharge;
 }
 
-void RoboGuardian::checkTemperatures(){
+void GuardianModule::checkTemperatures(){
     static const float HIGH_TEMP = 40.0f; //deg C
     static const float TEMP_THRESHOLD = 1.0f; //deg C
     static const float REALLY_HIGH_TEMP = 50.0f; //deg C
@@ -376,7 +361,7 @@ void RoboGuardian::checkTemperatures(){
     lastTemps = newTemps;
 }
 
-void RoboGuardian::countButtonPushes(){
+void GuardianModule::countButtonPushes(){
     //First, update the buttons with their new values
     const FootBumper left = sensors->getLeftFootBumper();
     const FootBumper right = sensors->getRightFootBumper();
@@ -387,7 +372,7 @@ void RoboGuardian::countButtonPushes(){
 
 }
 
-void RoboGuardian::processChestButtonPushes(){
+void GuardianModule::processChestButtonPushes(){
     static const int SHUTDOWN_THRESH = 3;
 
     //Then, process our actions locally
@@ -405,7 +390,7 @@ void RoboGuardian::processChestButtonPushes(){
 }
 
 
-bool RoboGuardian::executeChestClickAction(int nClicks){
+bool GuardianModule::executeChestClickAction(int nClicks){
 #ifdef DEBUG_GUARDIAN_CLICKS
     cout << "Processing "<<nClicks<< " clicks"<<endl;
 #endif
@@ -419,14 +404,11 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
         shutoffGains();
         break;
     case 3:
-        //Say IP Address
-        speakIPAddress();
         break;
     case 5:
         enableGains();
         break;
     case 7:
-        wifiAngel.reset_hard();
         break;
     case 9:
         //Easter EGG!
@@ -441,10 +423,10 @@ bool RoboGuardian::executeChestClickAction(int nClicks){
     return true;
 }
 
-void RoboGuardian::reloadMan() {
+void GuardianModule::reloadMan() {
 }
 
-void RoboGuardian::executeFallProtection(){
+void GuardianModule::executeFallProtection(){
     if(useFallProtection){
         cout << Thread::name <<": OH NO! I'm falling. Removing stiffness." <<endl;
         shutoffGains();
@@ -466,56 +448,14 @@ void RoboGuardian::executeFallProtection(){
 // #endif
 //     }
 
-
-void RoboGuardian::executeStartupAction() const{
-}
-
-void RoboGuardian::executeShutdownAction()const {
+void GuardianModule::executeShutdownAction()const {
     cout << Thread::name<<" is shutting down the robot NOW!!!"<<endl;
     playFile(shutdown_wav);
     if(system("shutdown -h now &") != 0)
         cout << "Roboguardian could not shutdown system." << endl;
 }
 
-//TODO: cache this - it's unlikely to change while we're running the code
-string RoboGuardian::getHostName() {
-    char name[40];
-    gethostname(name, 40);
-    return string(name);
-}
-
-const string RoboGuardian::discoverIP() const {
-    return wifiAngel.get_ip_string();
-}
-
-void RoboGuardian::speakIPAddress()const {
-    const string IP = discoverIP();//broker->getIP();
-    const string host = getHostName();
-
-    string speech_command = sout;
-    //speech_command += " "+mynameis_wav;
-    //speech_command += " "+nbsdir+host+wav;
-    speech_command += " "+my_address_is_wav;
-
-    for (unsigned int i = 0; i < IP.size(); i++){
-        char digit = IP[i];
-        if(digit == dot[0])
-            speech_command += " "+sdir+"point"+wav;
-        else
-            speech_command += " "+sdir+digit+wav;
-
-    }
-    speech_command += " &";
-    cout <<Thread::name<<" is speaking: My name is "<<host
-         << " my internet address is "
-         <<IP<<endl;
-
-    if(system(speech_command.c_str()) != 0)
-        cout << "Roboguardian could not speak IP address." << endl;
-}
-
-
-boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) const{
+boost::shared_ptr<ClickableButton>  GuardianModule::getButton(ButtonID buttonID) const{
     switch(buttonID){
     case CHEST_BUTTON:
         return chestButton;
@@ -529,15 +469,6 @@ boost::shared_ptr<ClickableButton>  RoboGuardian::getButton(ButtonID buttonID) c
     }
 }
 
-bool RoboGuardian::checkConnection(){
-    return wifiAngel.connected();
-}
 
-void RoboGuardian::ifUpDown(){
-    char ifdown[] = "su -c 'ifdown wlan0'";
-    char ifup[] = "su -c 'ifup wlan0'&";
-    cout << "RoboGuardian::ifUpDown() -- reconnecting interfaces\n";
-    playFile(wifi_restart_wav);
-    if(system(ifdown) != 0 || system(ifup) != 0)
-        cout << "Roboguardian ifUpDown checks failed." << endl;
+}
 }
