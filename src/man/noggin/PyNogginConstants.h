@@ -23,11 +23,6 @@ namespace noggin {
 
         ///// SWITCH BOARD /////
         static const bool LOG_LOC = false;
-        static const bool LOG_COMM = false;
-
-        ///// COM HEADER /////
-        static const char* PY_PACKET_HEADER = "ilikeyoulots";
-        static const int NUM_PACKET_ELEMENTS = 21;
 
         ///// WALK TIME CONSTANTS /////
         static const float TIME_STEP = 40.0;

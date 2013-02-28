@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd `dirname $0`
 set -eu
 
 read -p 'Enter team number for blue (default is 0): ' readBlue
@@ -9,7 +10,7 @@ declare -i blue=readBlue
 declare -i red=readRed
 declare broadcast=""
 
-echo "Starting GameController, team ${blue} plays in blue and team ${red} plays in red"
+echo "Starting SPL GameController, team ${blue} plays in blue and team ${red} plays in red"
 if [ -n "${1:-""}" ]; then
   broadcast="-broadcast ${1}"
   echo "Broadcasting to subnet ${1}"

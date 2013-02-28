@@ -1,39 +1,24 @@
-
-#ifndef CommDef_H
-#define CommDef_H
+#pragma once
 
 #include <string.h>
+#include <string>
 
 #include "Common.h"
 
-//
-// DataSerializer constants and MACRO definitions
-//
-
-// Comment out to turn off listening (will not bind to the local UDP port)
-//   Usefull if you're running in the simulator with multiple robots, or want
-//   to run the EKF localization debugger
-#if !defined(COMM_LISTEN) && !defined(COMM_DEAF)
-#  define COMM_LISTEN 1
-#endif
-#if !defined(COMM_SEND) && !defined(COMM_MUTE)
-#  define COMM_SEND 1
-#endif
-
-#define UDP_PORT  4000
-#define TCP_PORT  4001
-#define TOOL_PORT 4002
-static const short STREAMING_PORT_BASE = 4003;
+#define TEAM_PORT 4000
 
 #define UDP_BUF_SIZE 1024
 #define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
 
+#ifndef llong
 typedef long long llong;
+#endif
 #ifndef byte
 typedef unsigned char byte;
 #endif
 
 
+//@TODO: should probably not be in this file...
 #undef SIZEOF_INT
 #define SIZEOF_INT        4
 #undef SIZEOF_BYTE
@@ -63,34 +48,40 @@ typedef unsigned char byte;
 
 
 //
-// TOOLConnect constants and MACRO definitions
+// Multicast information
 //
 
-#define TOOL_COMMANDING 0
-#define TOOL_REQUESTING 1
+static const int NUM_ROBOTS = 5;    // Total number of robots we have
 
-#define COMMAND_MSG 0
-#define REQUEST_MSG 1
-#define DISCONNECT  2
+typedef struct robot_ip_pair_t
+{
+    std::string name;
+    std::string ip;
+}robot_ip_pair;
 
-#define CMD_TABLE      0
-#define CMD_MOTION     1
-#define CMD_HEAD       2
-#define CMD_JOINTS     3
+static const robot_ip_pair wash   = {"wash"  , "139.140.218.9" };
+static const robot_ip_pair river  = {"river" , "139.140.218.10"};
+static const robot_ip_pair jayne  = {"jayne" , "139.140.218.11"};
+static const robot_ip_pair mal    = {"mal"   , "139.140.218.16"};
+static const robot_ip_pair zoe    = {"zoe"   , "139.140.218.17"};
 
-
-static const char *TOOL_REQUEST_MSG = "TOOL:request";
-static const int TOOL_REQUEST_LEN = strlen(TOOL_REQUEST_MSG);
-static const char *TOOL_ACCEPT_MSG = "TOOL:accept";
-static const int TOOL_ACCEPT_LEN = strlen(TOOL_ACCEPT_MSG);
-static const int TOOL_ACCEPT_NAME_OFFSET = TOOL_ACCEPT_LEN + 3;
-
+static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
+                                                   mal, zoe};
 
 //
 // Comm constants and MACRO definitions
 //
 
-#define PACKET_HEADER "ilikeyoulots"
+/*   Packet Header: ("0" is null char)
+
+Byte| 1  | 2  | 3  | 4
+ 1  |"B" |"0" |team|player
+ 2  |.. sequence number ..
+
+ */
+
+#define UNIQUE_ID "B" // keep this as define so it stays 2 bytes, not 4.
+static const int NUM_HEADER_BYTES = 16;
 
 static const long PACKETS_PER_SECOND = 6;
 static const long SLEEP_MILLIS = 5000;
@@ -112,25 +103,3 @@ static const long long MIN_PACKETS_PER_SECOND = 4;   // 4 packets pers second.
 static const long long TEAMMATE_DEAD_THRESHOLD = 3 * MICROS_PER_SECOND;
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;
-
-typedef struct CommPacketHeader_t
-{
-    char header[sizeof(PACKET_HEADER)];
-    llong timestamp;
-    int number;
-    int team;
-    int player;
-    int color;
-} CommPacketHeader;
-
-typedef struct CommTeammatePacketInfo_t 
-{
-    CommTeammatePacketInfo_t()
-    : timestamp(0), lastNumber(0)
-	{ }
-
-    llong timestamp;       // Timestamp of last received packet.
-    int lastNumber;        // (Unique) number of last packet received.
-} CommTeammatePacketInfo;
-
-#endif /* CommDef.h */

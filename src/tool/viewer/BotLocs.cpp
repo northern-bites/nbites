@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include <QtNetwork/QHostAddress>
 #include <QtDebug>
+#include "NBMath.h"
 
 namespace qtool {
 namespace viewer {
@@ -15,7 +16,7 @@ BotLocs::BotLocs(QObject* parent) : QObject(parent) {
 }
 
 void BotLocs::startListening(){
-    udpSocket.bind(QHostAddress("0.0.0.0"), UDP_PORT);
+    udpSocket.bind(QHostAddress("0.0.0.0"), TEAM_PORT);
     connect(&udpSocket, SIGNAL(readyRead()), this, SLOT(readSocket()));
 }
 
@@ -34,13 +35,20 @@ void BotLocs::readSocket(){
 
         udpSocket.readDatagram(data, datagram_size, &datagram_source, &datagram_port);
 
-        if(datagram_size==112){ //this needs to be here to ignore
-            //the 60-byte discovery messages
-            CommPacketHeader* head = (CommPacketHeader*)data;
-            data+=sizeof(CommPacketHeader); //cut off the header bytes
-            float* floatdata = (float*) data;
+        if(datagram_size==72){
             Bot newBot;
 
+            data += 2;  // get past unique ID
+            newBot.teamNum = (int)*data;
+            newBot.playerNum = (int)*(++data);
+            newBot.teamColor = 0; // HACK! we don't communicate color
+                                  // we should assign teams random colors
+                                  // until we get a GC packet that
+                                  // says otherwise. Comm Module needed.
+
+            data += 4;   // get past seq. num
+
+            float* floatdata = (float*) data;
             newBot.address = datagram_source;
             newBot.xPos = floatdata[0];
             newBot.yPos = floatdata[1];
@@ -48,13 +56,11 @@ void BotLocs::readSocket(){
             newBot.xUncert = floatdata[3];
             newBot.yUncert = floatdata[4];
             newBot.headingUncert = floatdata[5];
-            newBot.xBall = floatdata[6];
-            newBot.yBall = floatdata[7];
-            newBot.xBallUncert = floatdata[8];
-            newBot.yBallUncert = floatdata[9];
-			newBot.teamNum = head->team;
-			newBot.teamColor = head->color;
-			newBot.playerNum = head->player;
+            newBot.ballOn = floatdata[6];
+            newBot.ballDist = floatdata[7];
+            newBot.ballBearing = floatdata[8];
+            newBot.ballDistUncert = floatdata[9];
+            newBot.ballBearingUncert = floatdata[10];
 
             //kill the previous instance of this robot in the array
             for(int i = 0; i < botPositions.size(); i++){
@@ -65,60 +71,90 @@ void BotLocs::readSocket(){
 
             botPositions.push_back(newBot);
         }
-		if (botPositions.size()>numBots)
-			qDebug()<<"Player"
-					<<botPositions.back().playerNum<<"on team"
-					<<botPositions.back().teamNum<<"connected.";
-		else if (botPositions.size()<numBots)
-			qDebug()<<"Robot connection lost,"
-					<<botPositions.size()-1<<" robots still connected.";
-		numBots=botPositions.size();
+        if (botPositions.size()>numBots)
+            qDebug()<<"Player"
+                    <<botPositions.back().playerNum<<"on team"
+                    <<botPositions.back().teamNum<<"connected.";
+        else if (botPositions.size()<numBots)
+            qDebug()<<"Robot connection lost,"
+                    <<botPositions.size()-1<<" robots still connected.";
+        numBots=botPositions.size();
 
         emit newRobotLocation();
     }
 }
 
 int BotLocs::getX(int i){
-    return botPositions[i].xPos;
+    return (int)botPositions[i].xPos;
 }
 int BotLocs::getY(int i){
-    return botPositions[i].yPos;
+    return (int)botPositions[i].yPos;
 }
 int BotLocs::getHeading(int i){
-    return botPositions[i].heading;
+    return (int)botPositions[i].heading;
 }
 int BotLocs::getXUncert(int i){
-    return botPositions[i].xUncert;
+    return (int)botPositions[i].xUncert;
 }
 int BotLocs::getYUncert(int i){
-    return botPositions[i].yUncert;
+    return (int)botPositions[i].yUncert;
 }
 int BotLocs::getheadUncert(int i){
-    return botPositions[i].headingUncert;
+    return (int)botPositions[i].headingUncert;
 }
 int BotLocs::getBallX(int i){
-    return botPositions[i].xBall;
+    return (int)getX(i)+botPositions[i].ballDist*std::cos(botPositions[i].heading+
+                                                     botPositions[i].ballBearing);
 }
 int BotLocs::getBallY(int i){
-    return botPositions[i].yBall;
+    return (int)getY(i)+botPositions[i].ballDist*std::sin(botPositions[i].heading+
+                                                     botPositions[i].ballBearing);
 }
 int BotLocs::getBallXUncert(int i){
-    return botPositions[i].xBallUncert;
+    int ballX = getBallX(i);
+    int ballY = getBallY(i);
+
+    int errX = getX(i)+(botPositions[i].ballDist+botPositions[i].ballDistUncert)*
+        std::cos(botPositions[i].heading+
+                 botPositions[i].headingUncert+
+                 botPositions[i].ballBearing+
+                 botPositions[i].ballBearingUncert);
+    int errY = getY(i)+(botPositions[i].ballDist+botPositions[i].ballDistUncert)*
+        std::sin(botPositions[i].heading+
+                 botPositions[i].headingUncert+
+                 botPositions[i].ballBearing+
+                 botPositions[i].ballBearingUncert);
+    return (int)std::sqrt((errX-ballX)*(errX-ballX)+(errY-ballY)*(errY-ballY))+
+        getXUncert(i);
 }
 int BotLocs::getBallYUncert(int i){
-    return botPositions[i].yBallUncert;
+    int ballX = getBallX(i);
+    int ballY = getBallY(i);
+
+    int errX = getX(i)+(botPositions[i].ballDist+botPositions[i].ballDistUncert)*
+        std::cos(botPositions[i].heading+
+                 botPositions[i].headingUncert+
+                 botPositions[i].ballBearing+
+                 botPositions[i].ballBearingUncert);
+    int errY = getY(i)+(botPositions[i].ballDist+botPositions[i].ballDistUncert)*
+        std::sin(botPositions[i].heading+
+                 botPositions[i].headingUncert+
+                 botPositions[i].ballBearing+
+                 botPositions[i].ballBearingUncert);
+    return (int)std::sqrt((errX-ballX)*(errX-ballX)+(errY-ballY)*(errY-ballY))+
+        getYUncert(i);
 }
 int BotLocs::getTeamNum(int i){
-	return botPositions[i].teamNum;
+    return botPositions[i].teamNum;
 }
 int BotLocs::getTeamColor(int i){//0=blue, 1=red
-	return botPositions[i].teamColor;
+    return botPositions[i].teamColor;
 }
 int BotLocs::getPlayerNum(int i){
-	return botPositions[i].playerNum;
+    return botPositions[i].playerNum;
 }
 int BotLocs::getSize(){
-	return botPositions.size();
+    return botPositions.size();
 }
 }
 }

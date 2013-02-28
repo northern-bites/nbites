@@ -14,6 +14,7 @@ typedef unsigned int   uint32;
 #define TEAM_CYAN                   0
 #define TEAM_RED                    1
 #define TEAM_MAGENTA                1
+#define DROPBALL                    2
 
 #define GOAL_BLUE                   0
 #define GOAL_YELLOW                 1
@@ -26,6 +27,7 @@ typedef unsigned int   uint32;
 
 #define STATE2_NORMAL               0
 #define STATE2_PENALTYSHOOT         1
+#define STATE2_OVERTIME             2
 
 #define PENALTY_NONE                        0
 // SPL
@@ -43,12 +45,16 @@ typedef unsigned int   uint32;
 #define PENALTY_HL_KID_ILLEGAL_ATTACK       3
 #define PENALTY_HL_KID_ILLEGAL_DEFENSE      4
 #define PENALTY_HL_KID_REQUEST_FOR_PICKUP   5
+#define PENALTY_HL_KID_REQUEST_FOR_SERVICE  6
+#define PENALTY_HL_KID_REQUEST_FOR_PICKUP_2_SERVICE 7
 // HL Teen Size
 #define PENALTY_HL_TEEN_BALL_MANIPULATION   1
 #define PENALTY_HL_TEEN_PHYSICAL_CONTACT    2
 #define PENALTY_HL_TEEN_ILLEGAL_ATTACK      3
 #define PENALTY_HL_TEEN_ILLEGAL_DEFENSE     4
 #define PENALTY_HL_TEEN_REQUEST_FOR_PICKUP  5
+#define PENALTY_HL_TEEN_REQUEST_FOR_SERVICE 6
+#define PENALTY_HL_TEEN_REQUEST_FOR_PICKUP_2_SERVICE 7
 
 #define PENALTY_MANUAL                      15
 
@@ -86,6 +92,7 @@ struct RoboCupGameControlData {
 
 #define GAMECONTROLLER_RETURN_MSG_MAN_PENALISE 0
 #define GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE 1
+#define GAMECONTROLLER_RETURN_MSG_ALIVE 2
 
 struct RoboCupGameControlReturnData {
     char    header[4];
