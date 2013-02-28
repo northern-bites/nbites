@@ -104,7 +104,8 @@ namespace man
             float translatedY = concreteCoords.y() - currentLocation.y();
 
             float calcDistance = std::sqrt(NBMath::square(translatedX) + NBMath::square(translatedY));
-            float calcBearing = NBMath::safe_atan2(translatedY, translatedX);
+            //float calcBearing = NBMath::safe_atan2(translatedY, translatedX);
+            float calcBearing = 1.f;
 
             boost::normal_distribution<float> distDistrib(calcDistance, DIST_STD_DEV);
             boost::normal_distribution<float> bearingDistrib(calcBearing, BEAR_STD_DEV);

@@ -7,6 +7,7 @@
 #include "RoboGrams.h"
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
+#include "localization/FakeLocInputModule.h"
 
 namespace man {
 
@@ -17,6 +18,8 @@ public:
     virtual ~Man();
 
 private:
+    DiagramThread fakeShitThread;
+    fakeInput::FakeLocInputModule fInput;
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
 };
