@@ -70,6 +70,13 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
 
         memcpy(&control, &packet[0], sizeof(RoboCupGameControlData));
         fillMessage(gameMessage.get(), control);
+
+#ifdef DEBUG_COMM
+        std::cout << "Received Game Controller message:\n\n"
+                  << gameMessage.get()->DebugString()
+                  << std::endl;
+#endif
+
         out.setMessage(gameMessage);
 
         _socket->setTarget(from);
