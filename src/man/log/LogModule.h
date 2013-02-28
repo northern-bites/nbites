@@ -14,6 +14,9 @@
  * for a good explanation of what this means. This is why you will see
  * all of the aio calls rather than simple writes.
  *
+ * Note that log files are written HEADER | SIZE | MSG | SIZE | MSG ...
+ * where each SIZE gives the number of bytes in the next MSG.
+ *
  * @author Lizzie Mamantov
  * @date February 2013
  * @author Octavian Neamtu
@@ -24,7 +27,7 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "IOExceptions.h"
+#include "LogDefinitions.h"
 #include <aio.h>
 #include <errno.h>
 #include <stdint.h>
@@ -36,15 +39,10 @@ namespace log {
 
 // The filepath on the robot where logs will end up
 static const std::string PATH = "/home/nao/nbites/log/";
-// Log version--in case we need to upgrade and stay backwards compatible
-static const std::string VERSION = "2.0";
-// Header. This could be updated with more useful information.
-static const std::string HEADER = "NORTHERN BITES LOG FILE VERSION " + VERSION;
 
 // Flags needed to open files appropriately
 static const int NEW_FLAG = O_WRONLY | O_CREAT | O_TRUNC | O_APPEND;
 static const int ALL_PERMISSIONS = S_IRWXU | S_IRWXG | S_IRWXO;
-
 
 /*
  * This struct is used to hold together an aiocb (control block) and the
@@ -121,7 +119,7 @@ public:
         // Serialize directly into the Write's buffer to avoid a copy
         msg.SerializeToString(&(current->buffer));
         // Write ths size of the message that will be written
-        writeValue<uint32_t>(msg.ByteSize());
+        writeValue<uint32_t>(current->buffer.length());
 
         // Recommended by aio--zeroes the control block
         memset(&current->control, 0, sizeof(current->control));
