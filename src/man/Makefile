@@ -25,7 +25,7 @@ CMAKE_STRAIGHT_FLAGS = -DCMAKE_TOOLCHAIN_FILE=$(STRAIGHT_TOOLCHAIN) -DCMAKE_INST
 UPLOAD_SCRIPT = $(BUILD_DIR)/upload.sh
 
 .PHONY: build
-build: $(BUILD_DIR)/Makefile
+build:  $(BUILD_DIR)/Makefile
 	$(MAKE) -C $(BUILD_DIR) --no-print-directory
 
 .PHONY: install

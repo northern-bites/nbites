@@ -7,6 +7,7 @@
 #include "RoboGrams.h"
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
+#include "comm/CommModule.h"
 
 namespace man {
 
@@ -17,8 +18,14 @@ public:
     virtual ~Man();
 
 private:
+
+    void startSubThreads();
+
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+
+    DiagramThread commThread;
+    comm::CommModule comm;
 };
 
 }

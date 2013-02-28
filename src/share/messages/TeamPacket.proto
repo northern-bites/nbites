@@ -1,0 +1,17 @@
+import "WorldModel.proto";
+
+package messages;
+
+message TeamPacket
+{
+        optional string header = 1 ;
+
+        optional int32  team_number = 2;
+        optional int32  player_number = 3;
+
+        optional int32  sequence_number = 4;
+
+        optional int64  timestamp = 5;
+
+        optional WorldModel payload = 6;
+}

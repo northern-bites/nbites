@@ -8,10 +8,26 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SHARE_DIR}/cmake/" )
 
 # A list of options that we do want
 include( cmake/RobotConfig.cmake )
+# A list of options for debugging various modules
+include( cmake/DebugConfig.cmake)
 # A list of options that should be advanced
 include( cmake/Advanced.cmake )
 # Compiler flags
 include( cmake/Flags.cmake )
+
+# Configure the robot options
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/RobotConfig.in"
+  "${PROJECT_BINARY_DIR}/RobotConfig.h"
+)
+
+# Configure the debug options
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/DebugConfig.in"
+  "${PROJECT_BINARY_DIR}/DebugConfig.h"
+)
+
+include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
@@ -57,6 +73,7 @@ include_directories( common )
 # Actual modules
 add_subdirectory( log )
 add_subdirectory( sensors )
+add_subdirectory( comm )
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
@@ -75,6 +92,7 @@ target_link_libraries(
   messages
   log
   sensors
+  comm
 )
 
 install( TARGETS man
