@@ -9,22 +9,29 @@ namespace man{
 namespace vision{
 
 
-  VisionModule::VisionModule() : Module(),
-				 pose(boost::shared_ptr<NaoPose>(new NaoPose()))
+VisionModule::VisionModule() : Module(),
+							   topImageIn(),
+							   bottomImageIn(),
+							   joint_angles(),
+							   inertial_state(),
+							   vision(boost::shared_ptr<Vision>(new Vision()))
 {
-  vision = boost::shared_ptr<Vision> (new Vision(pose));
 
 }
+VisionModule::~VisionModule()
+{
+}
+
 
 void VisionModule::run_()
 {
-  topImageIn.latch();
-  bottomImageIn.latch();
-  joint_angles.latch();
-  inertial_state.latch();  
+	topImageIn.latch();
+	bottomImageIn.latch();
+	joint_angles.latch();
+	inertial_state.latch();
 
-  vision->notifyImage(topImageIn.message().get_image(), bottomImageIn.message().get_image(),
-		      joint_angles.message(), inertial_state.message());
+	vision->notifyImage(topImageIn.message().get_image(), bottomImageIn.message().get_image(),
+						joint_angles.message(), inertial_state.message());
 }
 
 

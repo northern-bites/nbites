@@ -37,25 +37,22 @@
 #include "FieldLines/CornerDetector.h"
 #include "FieldLines/FieldLinesDetector.h"
 
-using std::cout;
-using std::endl;
-using std::list;
-using std::vector;
+using namespace std;
+using namespace ::messages;
 using boost::shared_ptr;
 
 static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
 // Vision Class Constructor
-Vision::Vision(boost::shared_ptr<NaoPose> _pose)
-    : pose(_pose),
-      yImg(&global_16_image[0]),
+Vision::Vision()
+    : yImg(&global_16_image[0]),
       linesDetector(new FieldLinesDetector()),
       cornerDetector(new CornerDetector()),
       frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
-
+	std::cout << "constructing visionModule\n";
     /* declaring class pointers for field objects, ball, leds, lines*/
     ygrp = new VisualFieldObject(YELLOW_GOAL_RIGHT_POST);
     yglp = new VisualFieldObject(YELLOW_GOAL_LEFT_POST);
@@ -73,7 +70,8 @@ Vision::Vision(boost::shared_ptr<NaoPose> _pose)
     cross = new VisualCross();
     fieldEdge = new VisualFieldEdge();
     obstacles = new VisualObstacle();
-
+	
+	pose = boost::shared_ptr<NaoPose>(new NaoPose());
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
     thresh->setYUV(&global_16_image[0]);
@@ -102,30 +100,30 @@ void Vision::copyImage(const byte* image) {
     thresh->setYUV(&global_16_image[0]);
 }
 
-void Vision::notifyImage(const uint16_t* y) {
-    yImg = y;
-    uImg = y + AVERAGED_IMAGE_SIZE;
-    vImg = uImg + AVERAGED_IMAGE_SIZE;
+// void Vision::notifyImage(const uint16_t* y) {
+//     yImg = y;
+//     uImg = y + AVERAGED_IMAGE_SIZE;
+//     vImg = uImg + AVERAGED_IMAGE_SIZE;
 
-    // Set the current image pointer in Threshold
-    thresh->setYUV(y);
-    notifyImage();
-}
+//     // Set the current image pointer in Threshold
+//     thresh->setYUV(y);
+//     notifyImage();
+// }
 
-void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
-    yImg = y_top;
-    uImg = y_top + AVERAGED_IMAGE_SIZE;
-    vImg = uImg + AVERAGED_IMAGE_SIZE;
+// void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
+//     yImg = y_top;
+//     uImg = y_top + AVERAGED_IMAGE_SIZE;
+//     vImg = uImg + AVERAGED_IMAGE_SIZE;
 
-    yImg_bot = y_bot;
-    uImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
-    vImg_bot = uImg + AVERAGED_IMAGE_SIZE;
+//     yImg_bot = y_bot;
+//     uImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
+//     vImg_bot = uImg + AVERAGED_IMAGE_SIZE;
 
-    // Set the current image pointer in Threshold
-    thresh->setYUV(y_top);
-    thresh->setYUV_bot(y_bot);
-    notifyImage();
-}
+//     // Set the current image pointer in Threshold
+//     thresh->setYUV(y_top);
+//     thresh->setYUV_bot(y_bot);
+//     notifyImage();
+// }
 
 /* notifyImage() -- The Image Loop
  *
@@ -145,7 +143,8 @@ void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
  */
 
 void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot,
-			 const messages::JointAngles& ja, const messages::InertialState& inert) {
+			 const JointAngles& ja, const InertialState& inert) {
+
     yImg = y_top;
     uImg = y_top + AVERAGED_IMAGE_SIZE;
     vImg = uImg + AVERAGED_IMAGE_SIZE;
@@ -173,10 +172,7 @@ void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot,
 //                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
-    
-    // - from Bende - I am going to try doing some obstacle avoidance stuff.
-    // - so there will be no visionLoop. Hopefully nothing breaks.
-    
+
     thresh->visionLoop(ja, inert);
     thresh->obstacleLoop(ja, inert);
 
@@ -186,7 +182,6 @@ void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot,
 //    drawVisualCorners(cornerDetector->getCorners());
 
     thresh->transposeDebugImage();
-
 
     // linesDetector.detect(yImg);
     

@@ -55,6 +55,7 @@ class HoughVisualCorner;
 #include "VisualCorner.h"
 #include "VisualObstacle.h"
 
+
 class Vision
 {
     friend class Threshold;
@@ -64,7 +65,7 @@ public:
     typedef boost::shared_ptr<const Vision> const_ptr;
 
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose);
+    Vision();
     ~Vision();
 
 private:
@@ -82,14 +83,14 @@ public:
     void copyImage(const byte *image);
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
-    void notifyImage(const uint16_t *image);
+//  void notifyImage(const uint16_t *image);
     // for when we have two cameras
-    void notifyImage(const uint16_t *top, const uint16_t *bot);
+//    void notifyImage(const uint16_t *top, const uint16_t *bot);
     // for use with modules
     void notifyImage(const uint16_t *top, const uint16_t *bot,
 		     const messages::JointAngles& ja, const messages::InertialState& inert);
     // utilize the current image pointer for vision processing
-    void notifyImage();
+//    void notifyImage();
     // set the current image pointer to the given pointer
     void setImage(const uint16_t* image);
 

@@ -82,17 +82,20 @@ NaoPose::NaoPose() :
  * Then we calculate horizon and camera height which is necessary for the
  * calculation of pix estimates.
  */
+
 void NaoPose::transform(bool _isTopCam, const JointAngles& ja, 
 			const InertialState& inert) {
 
     isTopCam = _isTopCam;
+
 
     // Make up bogus values
     std::vector<float> headAngles(2, 0.0f);
     std::vector<float> lLegAngles(6, 0.0f);
     std::vector<float> rLegAngles(6, 0.0f);
 
-    std::vector<float> bodyAngles;
+    std::vector<float> bodyAngles(24);
+
     bodyAngles[0] = ja.headyaw();
     bodyAngles[1] = ja.headpitch();
     bodyAngles[2] = ja.lshoulderpitch();
@@ -145,39 +148,39 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
     }
 
 
-    /*
-      The following basically assumes that we are always standing on our left
-      leg. THIS IS VERY BAD. We NEED to find a way to get support foot 
-      information to pose. Previously, sensors got this from the motion switch
-      board, but now we are trying to avoid that kind of dependency mess, so we need
-      a better way. 
+    
+      // The following basically assumes that we are always standing on our left
+      // leg. THIS IS VERY BAD. We NEED to find a way to get support foot 
+      // information to pose. Previously, sensors got this from the motion switch
+      // board, but now we are trying to avoid that kind of dependency mess, so we need
+      // a better way.
+				 
 
-      tl;dr THE FOLLOWING CODE IS BAAAAADDDDDD!!!!!!!!!!!!!!!!!!!
-    */
+      // tl;dr THE FOLLOWING CODE IS BAAAAADDDDDD!!!!!!!!!!!!!!!!!!!
     supportLegToBodyTransform = calculateForwardTransform(LLEG_CHAIN,
 							  lLegAngles);
 
     const ublas::vector<float>
             supportLegLocation(prod(supportLegToBodyTransform, origin));
 
-    // Now support leg to body is actually world to body. World is explained in
-    // the header.
+    // // Now support leg to body is actually world to body. World is explained in
+    // // the header.
     supportLegToBodyTransform(X_AXIS, W_AXIS) = 0.0f;
     supportLegToBodyTransform(Y_AXIS, W_AXIS) = 0.0f;
     supportLegToBodyTransform(Z_AXIS, W_AXIS) = 0.0f;
 
-    // **************************
-    // The code below is old but is kept around just in case the new code does
-    // not work. We used to get the body rotation using the leg transform, but
-    // now we use the accelerometers. The question is whether we should first
-    // apply the x rotation or the y one.
-    // **************************
-    // We need the inverse but we calculate the transpose because they are
-    // equivalent for orthogonal matrices and transpose is faster.
-     ublas::matrix<float>bodyToWorldTransform=trans(supportLegToBodyTransform);
-    // **************************
-    // End old code
-    // **************************
+    // // **************************
+    // // The code below is old but is kept around just in case the new code does
+    // // not work. We used to get the body rotation using the leg transform, but
+    // // now we use the accelerometers. The question is whether we should first
+    // // apply the x rotation or the y one.
+    // // **************************
+    // // We need the inverse but we calculate the transpose because they are
+    // // equivalent for orthogonal matrices and transpose is faster.
+    //  ublas::matrix<float>bodyToWorldTransform=trans(supportLegToBodyTransform);
+    // // **************************
+    // // End old code
+    // // **************************
 
 
     // At this time we trust inertial
@@ -186,11 +189,11 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
 
     //cout<<"inertial.x "<<bodyInclinationX<<" y: "<<bodyInclinationY<<endl;
 
- //   ublas::matrix<float> bodyToWorldTransform =
-  //          prod(CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,
- //                                         bodyInclinationY),
-   //              CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
-   //                                           bodyInclinationX));
+	 ublas::matrix<float> bodyToWorldTransform =
+	 	 prod(CoordFrame4D::rotation4D(CoordFrame4D::Y_AXIS,
+	 								   bodyInclinationY),
+	 		  CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
+	 								   bodyInclinationX));
 
     ublas::vector<float> torsoLocationInLegFrame = prod(bodyToWorldTransform,
                                                         supportLegLocation);
@@ -206,6 +209,7 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
 
     //cout<<"Joints: yaw:"<<headAngles[0]*TO_DEG<<" pitch: "<<headAngles[1]*TO_DEG<<endl;
     //cout<<"comHeight "<<comHeight<<endl;
+
 }
 
 /**

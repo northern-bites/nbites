@@ -10,25 +10,24 @@
 
 
 namespace man {
-  namespace vision{
+	namespace vision{
 
 
-    class VisionModule : public portals::Module {
+		class VisionModule : public portals::Module {
 
-    public:
-      VisionModule();
-      virtual ~VisionModule();
+		public:
+			VisionModule();
+			virtual ~VisionModule();
 
-      portals::InPortal<messages::ThresholdedImage> topImageIn;
-      portals::InPortal<messages::ThresholdedImage> bottomImageIn;
-      portals::InPortal<messages::JointAngles> joint_angles;
-      portals::InPortal<messages::InertialState> inertial_state;
+			portals::InPortal<messages::ThresholdedImage> topImageIn;
+			portals::InPortal<messages::ThresholdedImage> bottomImageIn;
+			portals::InPortal<messages::JointAngles> joint_angles;
+			portals::InPortal<messages::InertialState> inertial_state;
 
-    protected:
-      virtual void run_();
-      boost::shared_ptr<Vision> vision;
-      boost::shared_ptr<NaoPose> pose;
-    };
-  }
+		protected:
+			virtual void run_();
+			boost::shared_ptr<Vision> vision;
+	  		};
+	}
 }
- 
+

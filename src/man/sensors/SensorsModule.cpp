@@ -71,7 +71,6 @@ namespace man
 
 	    fastMemoryAccess_->ConnectToVariables(broker_, sensorKeys_);
 
-	    std::cout << "SensorsModule : Sensor keys initialized." << std::endl;
 	    // for(std::vector<std::string>::iterator iter = sensorKeys_.begin();
 	    // 	iter != sensorKeys_.end();
 	    // 	++iter)
@@ -123,7 +122,8 @@ namespace man
 	    updateChestboardButtonMessage();
 	    // Update footbumper message.
 	    updateFootbumperMessage();
-
+		updateInertialsMessage();
+		updateSonarsMessage();
 	    //std::cout << "SensorsModule : Sensor values " << std::endl;
 	    // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
 	    // {
@@ -224,6 +224,7 @@ namespace man
 
 	void SensorsModule::run_()
 	{
+
 	    // Simply update all sensor readings from ALMemory. 
 	    updateSensorValues();
 	}

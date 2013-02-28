@@ -165,6 +165,7 @@ class NaoPose {
     ~NaoPose() { }
 
     /********** Core Methods **********/
+	void angles(const messages::JointAngles& ja, const messages::InertialState& inert);
     void transform (bool _isTopCam, const messages::JointAngles& ja, 
 		    const messages::InertialState& inert);
 
