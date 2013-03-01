@@ -70,6 +70,8 @@ include_directories( common )
 add_subdirectory( log )
 add_subdirectory( sensors )
 add_subdirectory( comm )
+add_subdirectory( leds )
+add_subdirectory( testModule )
 
 add_library(
   man
@@ -89,6 +91,8 @@ target_link_libraries(
   log
   sensors
   comm
+  leds
+  testModule
 )
 
 install( TARGETS man
