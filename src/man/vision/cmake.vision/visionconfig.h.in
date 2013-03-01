@@ -9,15 +9,6 @@
 
 
 // :::::::::::::::::::::::::::::::::::::::::::::::::::::: Options variables :::..
-
-// Insert a 'fake' Vision object into the Python module
-#define USE_PYVISION_FAKE_BACKEND_${USE_PYVISION_FAKE_BACKEND}
-#ifdef  USE_PYVISION_FAKE_BACKEND_ON
-#  define USE_PYVISION_FAKE_BACKEND
-#else
-#  undef  USE_PYVISION_FAKE_BACKEND
-#endif
-
 #define OFFLINE_${OFFLINE}
 #ifdef OFFLINE_ON
 #  define OFFLINE

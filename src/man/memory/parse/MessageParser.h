@@ -45,6 +45,7 @@ public:
     virtual ~MessageParser();
 
     void readHeader();
+    void openFile();
     bool readNextMessage();
     bool getPrev(uint32_t n);
     bool getPrev();

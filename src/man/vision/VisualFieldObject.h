@@ -130,7 +130,7 @@ private: // Class Variables
         return (_distance-100.f)*(_distance-100.f)/4500.f + 10.f;
     }
     inline static float postBearingToSD(float _distance) {
-        return .0000002*(_distance*_distance) + 4 * TO_RAD;
+        return .0000002f*(_distance*_distance) + 4.f * TO_RAD;
     }
     const static float BOTH_UNSURE_DISTANCE_SD;
 };

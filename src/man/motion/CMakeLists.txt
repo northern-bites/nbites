@@ -95,11 +95,6 @@ SET( MOTION_SRCS
                      PyMotion
                      )
 
-IF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
-  MESSAGE( STATUS "Looking for extra motion sources in ${MAN_INCLUDE_DIR}" )
-  LIST( APPEND MOTION_SRCS ${MAN_INCLUDE_DIR}/Sensors )
-ENDIF( PYTHON_SHARED_MOTION AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
-
 SET( MOTION_PYTHON_SRCS __init__.py
                         MotionConstants.py
                         SweetMoves.py
@@ -117,30 +112,11 @@ SET( MOTION_PYTHON_SUBDIRS gaits )
 
 GET_TARGET_PROPERTY( MOTION_LOCATION ${MOTION_TARGET} LOCATION )
 
-IF( PYTHON_SHARED_MOTION )
-  ADD_LIBRARY(
-    ${MOTION_TARGET}
-    SHARED
-    ${MOTION_SRCS}
-    )
-  # Install to _motionmodule.so, instead of lib_motion.so
-  GET_TARGET_PROPERTY(
-    MOTION_TARGET_LOCATION ${MOTION_TARGET} LOCATION
-    )
-  INSTALL(
-    FILES ${MOTION_TARGET_LOCATION}
-    DESTINATION ${MOTION_PYTHON_TARGET_DIR}
-    CONFIGURATIONS "" Debug Release
-    RENAME ${MOTION_TARGET}module.so
-    )
-ELSE( PYTHON_SHARED_MOTION )
-  ADD_LIBRARY(
-    ${MOTION_TARGET}
-    STATIC
-    ${MOTION_SRCS}
-    )
-  # No INSTALL target when static
-ENDIF( PYTHON_SHARED_MOTION )
+ADD_LIBRARY(
+  ${MOTION_TARGET}
+  STATIC
+  ${MOTION_SRCS}
+  )
 
 INSTALL(
   FILES ${MOTION_PYTHON_SRCS}

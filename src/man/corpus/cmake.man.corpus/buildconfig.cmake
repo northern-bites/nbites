@@ -18,36 +18,8 @@
 
 # See documentation strings for descriptions
 OPTION(
-    PYTHON_SHARED_CORPUS
-    "Compile Python sensors and _leds module as a shared library for dynamic loading"
-    OFF
-    )
-OPTION(
-    USE_PYSENSORS_FAKE_BACKEND
-    "Insert a 'fake' Sensors object into the Python module"
-    OFF
-    )
-OPTION(
-    USE_PYLEDS_CXX_BACKEND
-    "Turn on/off the actual backend proxy calls to the ALLeds module"
-    ON
-    )
-
-OPTION(
     DEBUG_THREAD
     "Turn on/off debugging information for the Thread class."
-    OFF
-    )
-
-OPTION(
-    DEBUG_ALIMAGE
-    "Turn on/off debugging information for ALImageTranscriber"
-    OFF
-    )
-
-OPTION(
-    SAVE_ALL_FRAMES
-    "Turn on/off saving every frame in-game."
     OFF
     )
 OPTION(

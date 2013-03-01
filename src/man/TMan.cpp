@@ -32,10 +32,7 @@ void TMan::startSubThreads(){
 }
 
 void TMan::stopSubThreads(){
-
-#ifdef DEBUG_MAN_THREADING
-    cout << "  TMan stopping:" << endl;
-#endif
+    cout << "  TMan stopping!" << endl;
 
     threadedImageTranscriber->stop();
     threadedImageTranscriber->waitForThreadToFinish();

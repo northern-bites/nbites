@@ -61,7 +61,6 @@ def gameReady(player):
         player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePanFixedPitch()
-        player.brain.sensors.startSavingFrames()
 
     # Reset localization to proper starting position by player number.
     # Locations are defined in the wiki.
@@ -132,7 +131,6 @@ def gamePlaying(player):
         player.inKickingState = False
         if player.lastDiffState == 'gamePenalized':
             print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
-            player.brain.sensors.startSavingFrames()
             if player.lastStateTime > 5:
                 player.brain.resetLocalizationFromPenalty()
         if player.lastDiffState == 'gameSet':
@@ -161,7 +159,6 @@ def gamePenalized(player):
         player.inKickingState = False
         player.stopWalking()
         player.penalizeHeads()
-        player.brain.sensors.stopSavingFrames()
 
     return player.stay()
 
@@ -183,7 +180,6 @@ def gameFinished(player):
         player.stopWalking()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
-        player.brain.sensors.stopSavingFrames()
         return player.stay()
 
     if player.brain.nav.isStopped():

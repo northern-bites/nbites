@@ -18,7 +18,6 @@ MessageParser::MessageParser(InProvider::ptr in_provider,
         current_message_size(0),
         current_buffer(NULL), current_buffer_size(0)
 {
-
 }
 
 MessageParser::~MessageParser() {
@@ -28,6 +27,16 @@ MessageParser::~MessageParser() {
     in_provider->closeChannel();
     this->stop();
     this->waitForThreadToFinish();
+}
+
+void MessageParser::openFile() {
+   try {
+        in_provider->openCommunicationChannel();
+    } catch (io_exception& io_exception) {
+        cout << io_exception.what() << endl;
+        return;
+    }
+    this->readHeader();
 }
 
 void MessageParser::run() {
