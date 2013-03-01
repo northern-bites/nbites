@@ -55,7 +55,6 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
     do
     {
         portals::Message<messages::GameState> gameMessage(0);
-        *gameMessage.get() = messages::GameState();
         memset(&packet[0], 0, sizeof(struct RoboCupGameControlData));
 
         result = _socket->receiveFrom(&packet[0], sizeof(packet),
