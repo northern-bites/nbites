@@ -2,6 +2,6 @@ package messages;
 
 message SonarState
 {
-    required float USLeft = 1;
-    required float USRight = 2;
+    optional float us_left = 1;
+    optional float us_right = 2;
 }

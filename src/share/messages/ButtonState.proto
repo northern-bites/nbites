@@ -2,5 +2,5 @@ package messages;
 
 message ButtonState
 {
-    required bool pressed = 1;
+    optional bool pressed = 1;
 }
