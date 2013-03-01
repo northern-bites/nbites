@@ -1,9 +1,5 @@
 #include "CameraCalibrate.h"
 
-//TODO: introduce an unified configure file system
-
-namespace Kinematics {
-
 // order is Y, X because when we when we multiply a vector to the right the order
 // in which the vector is multiplied with the transforms is X, Y (since it goes right
 // to left; e.g. for M = ROT_Y * ROT_X, we have Mv = ROT_Y * ROT_X * v, so v gets multiplied
@@ -70,7 +66,5 @@ void CameraCalibrate::UpdateWithParams(float _paramsTop[], float _paramsBottom[]
             CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
                     ParamsBottom[ROLL]);
 
-
-}
 
 }

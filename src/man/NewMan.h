@@ -8,6 +8,8 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "vision/VisionModule.h"
+#include "image/ImageTranscriberModule.h"
 
 namespace man {
 
@@ -26,6 +28,9 @@ private:
 
     DiagramThread commThread;
     comm::CommModule comm;
+    sensors::SensorsModule sensors;
+	vision::VisionModule vision;
+	image::ImageTranscriberModule imageTranscriber;
 };
 
 }

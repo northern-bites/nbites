@@ -1,5 +1,5 @@
 #include "EdgeDetector.h"
-#include "visionconfig.h"
+
 
 #include <cmath>
 #include <iostream>
@@ -31,17 +31,15 @@ void EdgeDetector::detectEdges(int upperBound,
                                const uint16_t* channel,
                                Gradient& gradient)
 {
-    PROF_ENTER(P_EDGES);
     sobelOperator(upperBound, channel, gradient);
     findPeaks(upperBound, field_edge, gradient);
-    PROF_EXIT(P_EDGES);
 }
 
 void EdgeDetector::sobelOperator(int upperBound,
                                  const uint16_t* channel,
                                  Gradient& gradient)
 {
-    PROF_ENTER(P_SOBEL);
+
 #ifdef USE_MMX
     _sobel_operator(upperBound, threshold,
                     &channel[0], &gradient.values[0][0]);
@@ -93,14 +91,14 @@ void EdgeDetector::sobelOperator(int upperBound,
         }
     }
 #endif /* USE_MMX */
-    PROF_EXIT(P_SOBEL);
+
 }
 
 void EdgeDetector::findPeaks(int upperBound,
                              int * field_edge,
                              Gradient& gradient)
 {
-    PROF_ENTER(P_EDGE_PEAKS);
+
 #ifdef USE_MMX
     gradient.numPeaks = _find_edge_peaks(upperBound,
                                          &gradient.values[0][0],
@@ -141,5 +139,5 @@ void EdgeDetector::findPeaks(int upperBound,
     }
 #endif
     gradient.updatePeakGrid();
-    PROF_EXIT(P_EDGE_PEAKS);
+
 }
