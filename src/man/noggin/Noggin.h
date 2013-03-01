@@ -33,12 +33,12 @@ class Comm;
 class Noggin
 {
 public:
-    Noggin(boost::shared_ptr<Vision> v,
+    Noggin(/*boost::shared_ptr<Vision> v,
            boost::shared_ptr<Comm> c, boost::shared_ptr<RoboGuardian> rbg,
            boost::shared_ptr<Sensors> _sensors,
            boost::shared_ptr<man::memory::log::LoggingBoard> loggingBoard,
            MotionInterface * _minterface,
-           man::memory::Memory::ptr Memory
+           man::memory::Memory::ptr Memory*/
            );
     virtual ~Noggin();
 
@@ -47,7 +47,7 @@ public:
     // reload Brain module
     void reload_brain ();
     // reload specified modules
-    void reload_modules (std::string modules);
+    void reload_modules (std::string modules);//adds no functionality right now
     // run behavioral step
     void runStep();
 
@@ -82,7 +82,7 @@ private:
      *               fallen state. Provided by RoboGuardian
      *               (or BH walk engine FallDownState.)
      */
-    void updateRobotFallenState(bool fallen)
+    /*void updateRobotFallenState(bool fallen)
     {
 	if(!fallenState && fallen)
 	{
@@ -95,10 +95,10 @@ private:
 	    std::cout << "Noggin: No longer in fallen state." << std::endl;
 	    fallenState = false;
 	}
-    }
+    }*/
 
 private:
-    boost::shared_ptr<Vision> vision;
+    /*boost::shared_ptr<Vision> vision;
     boost::shared_ptr<Comm> comm;
     boost::shared_ptr<Sensors> sensors;
     boost::shared_ptr<RoboGuardian> guard;
@@ -111,7 +111,7 @@ private:
     boost::shared_ptr<ClickableButton> rightFootButton;
 
     boost::shared_ptr<MotionSystem> locMotionSystem;
-    boost::shared_ptr<VisionSystem> locVisionSystem;
+    boost::shared_ptr<VisionSystem> locVisionSystem;*/
 
     bool error_state;
     PyObject *module_helper;
@@ -133,13 +133,13 @@ public:
     boost::shared_ptr<LocSystem> loc;
     boost::shared_ptr<BallEKF> ballEKF;
 
-#ifdef LOG_LOCALIZATION
+/*#ifdef LOG_LOCALIZATION
     void startLocLog();
     void stopLocLog();
 
 private:
     bool loggingLoc;
-#endif // LOG_LOCALIZATION
+	#endif // LOG_LOCALIZATION*/
 };
 
 #endif // _Noggin_h_DEFINED

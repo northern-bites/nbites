@@ -42,10 +42,10 @@ using namespace boost;
 using namespace man::memory;
 using namespace man::memory::log;
 
-#ifdef LOG_LOCALIZATION
+/*#ifdef LOG_LOCALIZATION
 fstream outputFile;
 #include <ctime>
-#endif
+#endif*/
 
 const char * BRAIN_MODULE = "man.noggin.Brain";
 const int TEAMMATE_FRAMES_OFF_THRESH = 5;
@@ -94,9 +94,9 @@ Noggin::~Noggin ()
     cout << "Noggin destructor" << endl;
     Py_XDECREF(brain_instance);
     Py_XDECREF(brain_module);
-#   ifdef LOG_LOC
+/*#   ifdef LOG_LOC
     stopLocLog();
-#   endif
+	#   endif*/
 }
 
 void Noggin::initializePython()
@@ -105,15 +105,18 @@ void Noggin::initializePython()
     printf("  Initializing interpreter and extension modules\n");
 #   endif
 
-    // Initialize localization stuff
-    initializeLocalization();
+    /*// Initialize localization stuff
+	  initializeLocalization();*/
 
+	//MODULE NOTE: I have *no* idea what this does.
     Py_Initialize();
 
     modifySysPath();
 
     brain_module = NULL;
 
+	//MODULE NOTE: are these called through namespace boost?
+	//             correspond to PySensors, etc.
     // Initialize low-level modules
     c_init_sensors();
     //init_leds();
@@ -130,7 +133,7 @@ void Noggin::initializePython()
     c_init_goalie();
 }
 
-void Noggin::initializeLocalization()
+/*void Noggin::initializeLocalization()
 {
 #   ifdef DEBUG_NOGGIN_INITIALIZATION
     printf("  Initializing localization modules\n");
@@ -153,7 +156,7 @@ void Noggin::initializeLocalization()
 #   ifdef LOG_LOCALIZATION
     startLocLog();
 #   endif
-}
+}*/
 
 bool Noggin::import_modules ()
 {
@@ -249,13 +252,14 @@ void Noggin::getBrainInstance ()
 
 void Noggin::runStep ()
 {
-    static const int RELOAD_PYTHON_HARD = 6;
+    /*static const int RELOAD_PYTHON_HARD = 6;
     //Check to see if we should reload python or not:
     if (chestButton->peekNumClicks() == RELOAD_PYTHON_HARD) {
         chestButton->getAndClearNumClicks();
         reload_hard();
-    }
+		}*/
 
+	//MODULE NOTE: if in error state, keep restarting for awhile automatically
     static unsigned int num_crashed = 0;
     if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
         this->reload_hard();
@@ -263,17 +267,18 @@ void Noggin::runStep ()
         num_crashed++;
     }
 
-    //Check button pushes for game controller signals
-    processButtonClicks();
+    /*//Check button pushes for game controller signals
+	  processButtonClicks();*/
 
-    PROF_ENTER(P_PYTHON);
+//MODULE NOTE: we'll need to put this back in once the profiler is good
+    /*PROF_ENTER(P_PYTHON);*/
 
-#   ifdef RUN_LOCALIZATION
+/*#   ifdef RUN_LOCALIZATION
     // Update localization information
     PROF_ENTER(P_LOC);
     updateLocalization();
     PROF_EXIT(P_LOC);
-#   endif //RUN_LOCALIZATION
+	#   endif //RUN_LOCALIZATION*/
 
 
     // Call main run() method of Brain
@@ -297,21 +302,21 @@ void Noggin::runStep ()
     }
     PROF_EXIT(P_PYRUN);
 
-    updateComm();
+/*    updateComm();*/
 
     PROF_EXIT(P_PYTHON);
 }
 
-void Noggin::updateComm()
+/*void Noggin::updateComm()
 {
     comm->setLocData(0, loc->getXEst(), loc->getYEst(), loc->getHEst(),
                      loc->getXUncert(), loc->getYUncert(), loc->getHUncert());
     comm->setBallData(0, (float)vision->ball->isOn(),
                       ballEKF->getDistance(), ballEKF->getBearingDeg(),
                       0, 0);
-}
+					  }*/
 
-void Noggin::updateLocalization()
+ /*void Noggin::updateLocalization()
 {
     const ::MotionModel odometry = motion_interface->getOdometryUpdate();
 
@@ -449,10 +454,11 @@ void Noggin::updateLocalization()
     }
 #   endif
 
-}
+}*/
 
 
 //#define DEBUG_NOGGIN_GC
+//MODULE NOTE: still need to do this with message from guardian
 void Noggin::processButtonClicks(){
     static const int ADVANCE_STATES_CLICKS  = 1;
     static const int SWITCH_TEAM_CLICKS  = 1;
@@ -544,7 +550,7 @@ void Noggin::modifySysPath ()
     }
 }
 
-#ifdef LOG_LOCALIZATION
+/*#ifdef LOG_LOCALIZATION
 void Noggin::startLocLog()
 {
     if (loggingLoc) {
@@ -575,11 +581,11 @@ void Noggin::startLocLog()
                << ballEKF->getYVelocityEst() << " "
                << ballEKF->getXVelocityUncert() << " "
                << ballEKF->getYVelocityUncert() << endl;
-}
+			   }*/
 
-void Noggin::stopLocLog()
+ /*void Noggin::stopLocLog()
 {
     outputFile.close();
     loggingLoc = false;
 }
-#endif
+#endif*/
