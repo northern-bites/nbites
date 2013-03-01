@@ -162,7 +162,7 @@ Man::processFrame ()
     noggin->runStep();
 
     PROF_ENTER(P_LIGHTS);
-    lights->sendLights();
+    //lights->sendLights();
     PROF_EXIT(P_LIGHTS);
 }
 

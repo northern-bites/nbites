@@ -1,6 +1,7 @@
 #include "alerror/alerror.h"
 #include "NaoLights.h"
 #include "ALLedNames.h"
+#include <iostream>
 
 #define LEDS_ENABLED
 //#define DEBUG_NAOLIGHTS_INIT
@@ -21,15 +22,12 @@ NaoLights::NaoLights(boost::shared_ptr<AL::ALBroker> broker)
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         sendLightCommand(*ledList[i]->getCommand());
     }
-
-    pthread_mutex_init(&lights_mutex,NULL);
 }
 
 NaoLights::~NaoLights(){
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         delete ledList[i];
     }
-    pthread_mutex_destroy(&lights_mutex);
 }
 
 /**
@@ -54,7 +52,6 @@ void NaoLights::generateLeds(){
 }
 
 void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
-    pthread_mutex_lock(&lights_mutex);
     //Slow, but there are only 31 leds, so it shouldn't be too bad...
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){
         if(LED_NAMES[i].compare(led_id) == 0){
@@ -62,20 +59,16 @@ void NaoLights::setRGB(const std::string led_id, const int newRgbHex){
             break;
         }
     }
-    pthread_mutex_unlock(&lights_mutex);
 }
 
 void NaoLights::setRGB(const unsigned int led_id, const int newRgbHex){
-    pthread_mutex_lock(&lights_mutex);
     hexList[led_id] = newRgbHex;
-    pthread_mutex_unlock(&lights_mutex);
 }
 
 void NaoLights::sendLights(){
 #ifdef DEBUG_NAOLIGHTS_INIT
     // std::cout << "  NaoLights::sendLights() start" << std::endl;
 #endif
-    pthread_mutex_lock(&lights_mutex);
 
     for(unsigned int i = 0; i < ALNames::NUM_UNIQUE_LEDS; i++){ //HAack
         if(ledList[i]->updateCommand(hexList[i])){
@@ -84,8 +77,6 @@ void NaoLights::sendLights(){
     }
 
     //sendLightCommand(*(ledList[0]->getCommand()));
-
-    pthread_mutex_unlock(&lights_mutex);
 #ifdef DEBUG_NAOLIGHTS_INIT
     // std::cout << "  NaoLights::sendLights() end" << std::endl;
 #endif

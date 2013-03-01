@@ -1,7 +1,6 @@
 #ifndef _ALLedNames_h_DEFINED
 #define _ALLedNames_h_DEFINED
 
-#include "ALNames.h"
 namespace ALNames {
 
     static const std::string FaceLed ="Face/Led";
@@ -16,6 +15,13 @@ namespace ALNames {
 
     static const std::string Left ="/Left";
     static const std::string Right ="/Right";
+
+	static const std::string PositionPostFix = "/Position/Actuator/Value";
+    static const std::string HardnessPostFix = "/Hardness/Actuator/Value";
+    static const std::string LedPostFix      = "/Actuator/Value";
+    static const std::string ValuePostFix    = "/Position/Sensor/Value";
+    static const std::string ValuePreFix     = "Device/SubDeviceList/";
+    static const std::string TempValuePostFix= "/Temperature/Sensor/Value";
 
     enum LedColor{
         RED_LED = 0,

@@ -1,11 +1,9 @@
 #ifndef NaoLights_h_DEFINED
 #define NaoLights_h_DEFINED
 
-#include <pthread.h>
-
-#include "../Lights.h"
+#include "Lights.h"
 #include "alproxies/dcmproxy.h"
-#include "../../include/ALLedNames.h"
+#include "ALLedNames.h"
 #include "NaoRGBLight.h"
 /**
  *  This class implements LED capability on the Nao robot using the DCM in Naoqi
@@ -41,8 +39,6 @@ private:
     AL::ALValue leftFaceLedCommand;
     std::vector<NaoRGBLight*> ledList;
     std::vector<int> hexList;
-
-    mutable pthread_mutex_t lights_mutex;
 };
 
 #endif

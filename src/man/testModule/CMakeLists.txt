@@ -13,6 +13,6 @@ add_library(
 # Link project ot appropriate libraries.
 target_link_libraries(testModule
   portals
-  message
+  messages
   ${ALCOMMON_LIBRARIES}
 )

@@ -1,22 +1,23 @@
 #include "LedEnactorModule.h"
-
-using namespace portals;
-using boost::shared_ptr;
+#include <iostream>
 
 namespace man {
-	namespace image {
+	namespace led {
 
-		LedEnactorModule::LedEnactorModule(boost::shared_ptr<ALBroker> broker, portals::OutPortal<messages::LedCommand> out)
-			: Module(),
-			  naoLights = new NaoLights(broker);
+		LedEnactorModule::LedEnactorModule(boost::shared_ptr<AL::ALBroker> broker, portals::OutPortal<messages::LedCommand> out)
+			: portals::Module(),
+			  naoLights(broker)
 		{}
 
 		void LedEnactorModule::run_()
 		{
 			ledCommandsIn.latch();
 			messages::LedCommand command = ledCommandsIn.message();
+
+			std::cout<<command.DebugString()<<std::endl;
+
 			// This might not be the proper way to access proto values
-			naoLights.setRGB(command.led_id(),command.rgbHex());
+			naoLights.setRGB(command.led_id(),command.rgb_hex());
 		}
 
 	}
