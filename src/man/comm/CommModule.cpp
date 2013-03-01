@@ -32,11 +32,9 @@ CommModule::CommModule(int team, int player) :
     gameConnect = new GameConnect(timer, monitor, team, player);
 
     portals::Message<messages::WorldModel> model(0);
-    *model.get() = messages::WorldModel();
     _worldModelInput.setMessage(model);
 
     portals::Message<messages::GCResponse> response(0);
-    *response.get() = messages::GCResponse();
     _gcResponseInput.setMessage(response);
 }
 
@@ -79,7 +77,6 @@ void CommModule::run_()
 void CommModule::send()
 {
     _worldModelInput.latch();
-    messages::WorldModel message;
 
     teamConnect->send(_worldModelInput.message(), myPlayerNumber(),
                       gameConnect->myTeamNumber(), burstRate);
