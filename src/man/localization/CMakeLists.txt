@@ -26,4 +26,4 @@ add_library(
 target_link_libraries(localization
   portals
   messages
-  ${PROTOS_TARGET})
+  common)

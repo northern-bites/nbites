@@ -13,6 +13,9 @@
 
 #include "NBMath.h"
 
+#include <iostream>
+#include <fstream>
+
 #include <boost/random.hpp>
 
 namespace man
@@ -25,16 +28,18 @@ namespace man
 
         static const float FINAL_X = 150.f;
         static const float FINAL_Y = 150.f;
-        static const float FINAL_H = 1.f;
+        static const float FINAL_H = 1.3f;
 
-        static const float NUM_FRAMES = 60;
+        static const float NUM_FRAMES = 319;
 
         static const float MIN_OBS_DIST = 50;
         static const float MAX_OBS_DIST = 150;
-        static const float DIST_STD_DEV = 15;
-        static const float BEAR_STD_DEV = .349f; //20 degrees
+        static const float DIST_STD_DEV = 10;
+        static const float BEAR_STD_DEV = .174f; //~10 degrees
 
         static const float NUM_CORNER_OBS = 2;
+        static const float NUM_GOAL_OBS = 1;
+        static const bool CROSS_OBS = true;
 
 
         class FakeLocInputModule : public portals::Module
@@ -45,6 +50,8 @@ namespace man
 
             portals::OutPortal<messages::Motion> fMotionOutput;
             portals::OutPortal<messages::PVisionField> fVisionOutput;
+
+            boost::mt19937 rng;
 
         protected:
             void run_();
@@ -72,6 +79,9 @@ namespace man
 
             messages::PVisionField  noisyVision;
             messages::Motion        noisyMotion;
+
+
+
 
         };
     } //namespace fakeInput
