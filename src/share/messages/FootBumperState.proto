@@ -5,10 +5,10 @@ package messages;
 message FootBumperState
 {
     // Left foot bumpers.
-    optional buttonstate l_foot_bumper_left = 1;
-    optional buttonstate l_foot_bumper_right = 2;
+    optional ButtonState l_foot_bumper_left = 1;
+    optional ButtonState l_foot_bumper_right = 2;
 
     // Right foot bumpers.
-    optional buttonstate r_foot_bumper_left = 3;
-    optional buttonstate r_foot_bumper_right = 4;
+    optional ButtonState r_foot_bumper_left = 3;
+    optional ButtonState r_foot_bumper_right = 4;
 }
