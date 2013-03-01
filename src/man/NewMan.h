@@ -8,6 +8,8 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "led/LedEnactorModule.h"
+#include "testModule/TestModule.h"
 
 namespace man {
 
@@ -16,6 +18,7 @@ class Man : public AL::ALModule
 public:
     Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name);
     virtual ~Man();
+
 
 private:
 
@@ -26,6 +29,10 @@ private:
 
     DiagramThread commThread;
     comm::CommModule comm;
+
+    DiagramThread cognitionThread;
+	TestModule test;
+	led::LedEnactorModule leds;
 };
 
 }
