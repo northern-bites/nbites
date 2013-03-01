@@ -115,7 +115,6 @@ void TeamConnect::send(const messages::WorldModel& model,
     TeamMemberInfo robot = teamMates[player-1];
 
     portals::Message<messages::TeamPacket> teamMessage(0);
-    *teamMessage.get() = messages::TeamPacket();
 
     messages::TeamPacket* packet = teamMessage.get();
 
@@ -273,7 +272,6 @@ void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* m
         else if (time - robot.timestamp > TEAMMATE_DEAD_THRESHOLD)
         {
             portals::Message<messages::WorldModel> msg(0);
-            *msg.get() = messages::WorldModel();
             msg.get()->set_active(false);
             modelOuts[i]->setMessage(msg);
         }
