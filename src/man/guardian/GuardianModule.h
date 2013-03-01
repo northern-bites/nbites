@@ -13,12 +13,6 @@
 namespace man{
 namespace guardian{
 
-enum  ButtonID {
-    CHEST_BUTTON = 0,
-    LEFT_FOOT_BUTTON,
-    RIGHT_FOOT_BUTTON
-};
-
 class GuardianModule : public portals::Module
 {
 public:
@@ -35,11 +29,8 @@ public:
     bool isRobotFallen()const { return useFallProtection && fallen; }
     bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
 
-    void enableFallProtection(bool _useFallProtection) const
+    void enableFallProtection(bool _useFallProtection)
         { useFallProtection = _useFallProtection; };
-
-public:
-    static const int NO_CLICKS;
 
 private:
     void checkFalling();
@@ -58,13 +49,12 @@ private:
     void playFile(std::string filePath)const; //non-blocking
     void reloadMan();
 
-public:
+    static const int NO_CLICKS;
     static const int GUARDIAN_FRAME_RATE;
     static const int GUARDIAN_FRAME_LENGTH_uS;
     static const unsigned long long int TIME_BETWEEN_HEAT_WARNINGS =
         MICROS_PER_SECOND * 60;
 
-private:
     std::vector<float> lastTemps;
     float lastBatteryCharge;
 
@@ -80,7 +70,7 @@ private:
     bool registeredShutdown;
 
     bool falling, fallen, feetOnGround;
-    mutable bool useFallProtection;
+    bool useFallProtection;
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
 };
