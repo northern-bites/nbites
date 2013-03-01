@@ -1,22 +1,23 @@
 #include "TestModule.h"
+#include <string>
 
 namespace man {
 
 	TestModule::TestModule()
 		: portals::Module(),
-		  ledCommandsOut(base())
+		  AudioOut(base())
 	{}
 
 	void TestModule::run_()
 	{
 		//Send some out messages!
-		portals::Message<messages::LedCommand> ledCommand(0);
+		portals::Message<messages::Audio> Audio(0);
 
-		//values taken from Leds.py and ALLedNames.h
-		ledCommand.get()->set_led_id(26);//should be chest led
-		ledCommand.get()->set_rgb_hex(0xFF00FF);//should be purple
+		//test that bugger
+		std::string msg("this is a test");
+		Audio.get()->text_to_speech_msg(msg);
 
 		//now send the message out.
-		ledCommandsOut.setMessage(ledCommand);
+		AudioOut.setMessage(Audio);
 	}
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "LedCommand.pb.h"
+#include "Audio.pb.h"
 
 namespace man {
 
@@ -11,7 +11,7 @@ namespace man {
 		TestModule();
 		virtual ~TestModule() {}
 
-		portals::OutPortal<messages::LedCommand> ledCommandsOut;
+		portals::OutPortal<messages::Audio> AudioOut;
 
 	protected:
 		virtual void run_();
