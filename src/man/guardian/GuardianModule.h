@@ -35,8 +35,6 @@ public:
     bool isRobotFallen()const { return useFallProtection && fallen; }
     bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
 
-    boost::shared_ptr<ClickableButton> getButton(ButtonID)const;
-
     void enableFallProtection(bool _useFallProtection) const
         { useFallProtection = _useFallProtection; };
 
