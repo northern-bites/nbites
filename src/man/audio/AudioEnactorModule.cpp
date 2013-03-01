@@ -7,8 +7,8 @@ namespace man {
 	namespace audio {
 
 		AudioEnactorModule::AudioEnactorModule(boost::shared_ptr<ALBroker> broker, portals::OutPortal<messages::Audio> out)
-			: Module(),
-			  alspeech = new AlSpeech(broker);
+			: portals::Module(),
+			  alspeech(broker);
 		{}
 
 		void LedEnactorModule::run_()

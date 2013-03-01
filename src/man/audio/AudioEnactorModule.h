@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "../corpus/alconnect/AlSpeech.h"
+#include "AlSpeech.h"
 #include "alcommon/albroker.h"
 #include "Audio.pb.h"
 
@@ -14,7 +14,7 @@ namespace man {
 			AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker, portals::OutPortal<messages::Audio> out);
 			virtual ~AudioEnactorModule() {}
 
-			portals::InPortal<messages::AudioCommand> AudioIn;
+			portals::InPortal<messages::Audio> AudioIn;
 
 		protected:
 			virtual void run_();
