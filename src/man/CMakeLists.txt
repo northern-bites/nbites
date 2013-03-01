@@ -1,6 +1,11 @@
 project( man )
 cmake_minimum_required( VERSION 2.8.3 )
 
+# Make sure we can find the shared files
+set( SHARE_DIR "${NBITES_DIR}/src/share/" )
+# So that we can use find_package commands
+set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SHARE_DIR}/cmake/" )
+
 # A list of options that we do want
 include( cmake/RobotConfig.cmake )
 # A list of options for debugging various modules
@@ -26,17 +31,13 @@ include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
-include( cmake/FindNBITES_DIR.cmake )
 if( BUILD_PROTOBUF )
   # Only build them if the user wants to
-  include( cmake/BuildProtobuf.cmake )
+  include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
-# So that we can use find_package commands
-set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/" )
-
 # For Aldebaran's headers
-find_package( ALCOMMON REQUIRED )
+find_package(ALCOMMON REQUIRED)
 include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
 find_package( PROTOBUF REQUIRED )
@@ -48,19 +49,22 @@ configure_file(
   "${PROJECT_BINARY_DIR}/upload.sh"
 )
 
-set( MAN_SRCS main.cpp
-  NewMan.cpp
-  DiagramThread.cpp
-)
+# Our core includes come from here
+include_directories( ${SHARE_DIR}/include )
 
 # Compile portals, which is outside the source tree so specify a destination
-add_subdirectory( ../portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
+add_subdirectory( ${SHARE_DIR}/portals ${CMAKE_CURRENT_BINARY_DIR}/portals/ )
 # Make portals available to everything
-include_directories( ../portals )
+include_directories( ${SHARE_DIR}/portals )
 # Also messages
-add_subdirectory( ../messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+
+# If protobuf libs don't exist yet, make sure they build before man
+if( BUILD_PROTOBUF )
+add_dependencies(messages protobuf_libs)
+endif()
 
 # Actual subdirectories
 add_subdirectory( common )
@@ -73,16 +77,16 @@ add_subdirectory( comm )
 add_subdirectory( led )
 add_subdirectory( testModule )
 
+set( MAN_SRCS main.cpp
+  NewMan.cpp
+  DiagramThread.cpp
+)
+
 add_library(
   man
   SHARED
   ${MAN_SRCS}
 )
-
-# If protobuf libs don't exist yet, make sure they build before man
-if( BUILD_PROTOBUF )
-add_dependencies(messages protobuf_libs)
-endif()
 
 target_link_libraries(
   man

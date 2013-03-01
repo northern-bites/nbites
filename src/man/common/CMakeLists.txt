@@ -5,6 +5,7 @@ set( COMMON_SRCS NBMath
   dsp
   Common
   CommDef
+  RoboCupGameControlData
 )
 
 add_library(

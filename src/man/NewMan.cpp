@@ -16,21 +16,30 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
+    /** Sensors **/
     sensorsThread.addModule(sensors);
     sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
-    sensorsThread.start();
 
+    /** Comm **/
     commThread.addModule(comm);
-    commThread.start();
 
+	/** Cognition **/
 	cognitionThread.addModule(test);
 	cognitionThread.addModule(leds);
 	leds.ledCommandsIn.wireTo(&test.ledCommandsOut);
-	cognitionThread.start();
+
+    startSubThreads();
 }
 
 Man::~Man()
 {
+}
+
+void Man::startSubThreads()
+{
+    sensorsThread.start();
+    commThread.start();
+	cognitionThread.start();
 }
 
 }

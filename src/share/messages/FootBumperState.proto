@@ -1,0 +1,14 @@
+import "ButtonState.proto";
+
+package messages;
+
+message FootBumperState
+{
+    // Left foot bumpers.
+    optional ButtonState l_foot_bumper_left = 1;
+    optional ButtonState l_foot_bumper_right = 2;
+
+    // Right foot bumpers.
+    optional ButtonState r_foot_bumper_left = 3;
+    optional ButtonState r_foot_bumper_right = 4;
+}

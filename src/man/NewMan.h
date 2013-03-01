@@ -21,6 +21,9 @@ public:
 
 
 private:
+
+    void startSubThreads();
+
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
 

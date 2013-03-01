@@ -1,0 +1,40 @@
+package messages;
+
+message JointAngles
+{
+   // Head angles.
+   optional float head_yaw = 1;
+   optional float head_pitch = 2;
+
+   // Left arm angles.
+   optional float l_shoulder_pitch = 3;
+   optional float l_shoulder_roll = 4;
+   optional float l_elbow_yaw = 5;
+   optional float l_wrist_yaw = 6;
+   optional float l_hand = 7;
+
+   // Right arm angles.
+   optional float r_shoulder_pitch = 8;
+   optional float r_shoulder_roll = 9;
+   optional float r_elbow_yaw = 10;
+   optional float r_wrist_yaw = 11;
+   optional float r_hand = 12;
+
+   // Pelvis angles.
+   optional float l_hip_yaw_pitch = 13;
+   optional float r_hip_yaw_pitch = 14;
+
+   // Left leg angles.
+   optional float l_hip_roll = 15;
+   optional float l_hip_pitch = 16;
+   optional float l_knee_pitch = 17;
+   optional float l_ankle_pitch = 18;
+   optional float l_ankle_roll = 19;
+
+   // Right leg angles.
+   optional float r_hip_roll = 20;
+   optional float r_hip_pitch = 21;
+   optional float r_knee_pitch = 22;
+   optional float r_ankle_pitch = 23;
+   optional float r_ankle_roll = 24;
+}
