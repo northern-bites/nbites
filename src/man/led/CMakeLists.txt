@@ -5,13 +5,13 @@ set(LEDS_SRCS LedEnactorModule)
 
 # Add project as a library.
 add_library(
-  leds
+  led
   STATIC
   ${LEDS_SRCS}
 )
 
 # Link project to appropriate libraries.
-target_link_libraries(leds
+target_link_libraries(led
   portals
   messages
   ${ALCOMMON_LIBRARIES}

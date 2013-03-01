@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RoboGrams.h"
 #include "LedCommand.pb.h"
 
 namespace man {

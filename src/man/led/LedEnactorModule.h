@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RoboGrams.h"
 #include "../corpus/alconnect/NaoLights.h"
 #include "alcommon/albroker.h"
 #include "LedCommand.pb.h"

@@ -11,7 +11,7 @@ add_library(
 )
 
 # Link project ot appropriate libraries.
-target_link_libararies(testModule
+target_link_libraries(testModule
   portals
   message
   ${ALCOMMON_LIBRARIES}

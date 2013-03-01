@@ -4,5 +4,5 @@ message LedCommand
 {
 	// LED ID and hex value.
 	optional int32 led_id = 1;
-	optional int32 rgbHex = 2;
+	optional int32 rgb_hex = 2;
 }
