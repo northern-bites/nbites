@@ -135,30 +135,30 @@ void SensorsModule::updateJointsMessage()
 {
     portals::Message<messages::JointAngles> jointsMessage(0);
 
-    jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
-    jointsMessage.get()->set_headpitch(sensorValues_[HeadPitch]);
-    jointsMessage.get()->set_lshoulderpitch(sensorValues_[LShoulderPitch]);
-    jointsMessage.get()->set_lshoulderroll(sensorValues_[LShoulderRoll]);
-    jointsMessage.get()->set_lelbowyaw(sensorValues_[LElbowYaw]);
-    jointsMessage.get()->set_lwristyaw(sensorValues_[LWristYaw]);
-    jointsMessage.get()->set_lhand(sensorValues_[LHand]);
-    jointsMessage.get()->set_rshoulderpitch(sensorValues_[RShoulderPitch]);
-    jointsMessage.get()->set_rshoulderroll(sensorValues_[RShoulderRoll]);
-    jointsMessage.get()->set_relbowyaw(sensorValues_[RElbowYaw]);
-    jointsMessage.get()->set_rwristyaw(sensorValues_[RWristYaw]);
-    jointsMessage.get()->set_rhand(sensorValues_[RHand]);
-    jointsMessage.get()->set_lhipyawpitch(sensorValues_[LHipYawPitch]);
-    jointsMessage.get()->set_rhipyawpitch(sensorValues_[RHipYawPitch]);
-    jointsMessage.get()->set_lhiproll(sensorValues_[LHipRoll]);
-    jointsMessage.get()->set_lhippitch(sensorValues_[LHipPitch]);
-    jointsMessage.get()->set_lkneepitch(sensorValues_[LKneePitch]);
-    jointsMessage.get()->set_lanklepitch(sensorValues_[LAnklePitch]);
-    jointsMessage.get()->set_lankleroll(sensorValues_[LAnkleRoll]);
-    jointsMessage.get()->set_rhiproll(sensorValues_[RHipRoll]);
-    jointsMessage.get()->set_rhippitch(sensorValues_[RHipPitch]);
-    jointsMessage.get()->set_rkneepitch(sensorValues_[RKneePitch]);
-    jointsMessage.get()->set_ranklepitch(sensorValues_[RAnklePitch]);
-    jointsMessage.get()->set_rankleroll(sensorValues_[RAnkleRoll]);
+    jointsMessage.get()->set_head_yaw(sensorValues_[HeadYaw]);
+    jointsMessage.get()->set_head_pitch(sensorValues_[HeadPitch]);
+    jointsMessage.get()->set_l_shoulder_pitch(sensorValues_[LShoulderPitch]);
+    jointsMessage.get()->set_l_shoulder_roll(sensorValues_[LShoulderRoll]);
+    jointsMessage.get()->set_l_elbow_yaw(sensorValues_[LElbowYaw]);
+    jointsMessage.get()->set_l_wrist_yaw(sensorValues_[LWristYaw]);
+    jointsMessage.get()->set_l_hand(sensorValues_[LHand]);
+    jointsMessage.get()->set_r_shoulder_pitch(sensorValues_[RShoulderPitch]);
+    jointsMessage.get()->set_r_shoulder_roll(sensorValues_[RShoulderRoll]);
+    jointsMessage.get()->set_r_elbow_yaw(sensorValues_[RElbowYaw]);
+    jointsMessage.get()->set_r_wrist_yaw(sensorValues_[RWristYaw]);
+    jointsMessage.get()->set_r_hand(sensorValues_[RHand]);
+    jointsMessage.get()->set_l_hip_yaw_pitch(sensorValues_[LHipYawPitch]);
+    jointsMessage.get()->set_r_hip_yaw_pitch(sensorValues_[RHipYawPitch]);
+    jointsMessage.get()->set_l_hip_roll(sensorValues_[LHipRoll]);
+    jointsMessage.get()->set_l_hip_pitch(sensorValues_[LHipPitch]);
+    jointsMessage.get()->set_l_knee_pitch(sensorValues_[LKneePitch]);
+    jointsMessage.get()->set_l_ankle_pitch(sensorValues_[LAnklePitch]);
+    jointsMessage.get()->set_l_ankle_roll(sensorValues_[LAnkleRoll]);
+    jointsMessage.get()->set_r_hip_roll(sensorValues_[RHipRoll]);
+    jointsMessage.get()->set_r_hip_pitch(sensorValues_[RHipPitch]);
+    jointsMessage.get()->set_r_knee_pitch(sensorValues_[RKneePitch]);
+    jointsMessage.get()->set_r_ankle_pitch(sensorValues_[RAnklePitch]);
+    jointsMessage.get()->set_r_ankle_roll(sensorValues_[RAnkleRoll]);
 
     jointsOutput_.setMessage(jointsMessage);
 }
@@ -178,7 +178,7 @@ void SensorsModule::updateFootbumperMessage()
 {
     portals::Message<messages::FootBumperState> footbumperMessage(0);
 
-    footbumperMessage.get()->mutable_lfootbumperleft()->set_pressed(
+    footbumperMessage.get()->mutable_l_foot_bumper_left()->set_pressed(
         sensorValues_[LFootBumperLeft] > 0.5f ? true : false
         );
 
@@ -189,15 +189,15 @@ void SensorsModule::updateInertialsMessage()
 {
     portals::Message<messages::InertialState> inertialsMessage(0);
 
-    inertialsMessage.get()->set_accx(sensorValues_[AccX]);
-    inertialsMessage.get()->set_accy(sensorValues_[AccY]);
-    inertialsMessage.get()->set_accz(sensorValues_[AccZ]);
+    inertialsMessage.get()->set_acc_x(sensorValues_[AccX]);
+    inertialsMessage.get()->set_acc_y(sensorValues_[AccY]);
+    inertialsMessage.get()->set_acc_z(sensorValues_[AccZ]);
 
-    inertialsMessage.get()->set_gyrx(sensorValues_[GyrX]);
-    inertialsMessage.get()->set_gyry(sensorValues_[GyrY]);
+    inertialsMessage.get()->set_gyr_x(sensorValues_[GyrX]);
+    inertialsMessage.get()->set_gyr_y(sensorValues_[GyrY]);
 
-    inertialsMessage.get()->set_anglex(sensorValues_[AngleX]);
-    inertialsMessage.get()->set_angley(sensorValues_[AngleY]);
+    inertialsMessage.get()->set_angle_x(sensorValues_[AngleX]);
+    inertialsMessage.get()->set_angle_y(sensorValues_[AngleY]);
 
     inertialsOutput_.setMessage(inertialsMessage);
 }
@@ -206,8 +206,8 @@ void SensorsModule::updateSonarsMessage()
 {
     portals::Message<messages::SonarState> sonarsMessage(0);
 
-    sonarsMessage.get()->set_usleft(sensorValues_[USLeft]);
-    sonarsMessage.get()->set_usright(sensorValues_[USRight]);
+    sonarsMessage.get()->set_us_left(sensorValues_[USLeft]);
+    sonarsMessage.get()->set_us_right(sensorValues_[USRight]);
 
     sonarsOutput_.setMessage(sonarsMessage);
 }

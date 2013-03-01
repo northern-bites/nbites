@@ -52,19 +52,11 @@ namespace man
          * information.
          */
 
-        // Joints.
-        portals::OutPortal<messages::JointAngles> jointsOutput_;
-
-        // Chestboard button.
-        portals::OutPortal<messages::ButtonState> chestboardButtonOutput_;
-        // Foot bumpers.
+        portals::OutPortal<messages::JointAngles>     jointsOutput_;
+        portals::OutPortal<messages::ButtonState>     chestboardButtonOutput_;
         portals::OutPortal<messages::FootBumperState> footbumperOutput_;
-
-        // Inertial sensors.
-        portals::OutPortal<messages::InertialState> inertialsOutput_;
-
-        // Sonars.
-        portals::OutPortal<messages::SonarState> sonarsOutput_;
+        portals::OutPortal<messages::InertialState>   inertialsOutput_;
+        portals::OutPortal<messages::SonarState>      sonarsOutput_;
 
     private:
         /*

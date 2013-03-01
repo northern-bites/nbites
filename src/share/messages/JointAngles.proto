@@ -3,38 +3,38 @@ package messages;
 message JointAngles
 {
    // Head angles.
-   required float HeadYaw = 1;
-   required float HeadPitch = 2;
+   optional float head_yaw = 1;
+   optional float head_pitch = 2;
 
    // Left arm angles.
-   required float LShoulderPitch = 3;
-   required float LShoulderRoll = 4;
-   required float LElbowYaw = 5;
-   required float LWristYaw = 6;
-   required float LHand = 7;
+   optional float l_shoulder_pitch = 3;
+   optional float l_shoulder_roll = 4;
+   optional float l_elbow_yaw = 5;
+   optional float l_wrist_yaw = 6;
+   optional float l_hand = 7;
 
    // Right arm angles.
-   required float RShoulderPitch = 8;
-   required float RShoulderRoll = 9;
-   required float RElbowYaw = 10;
-   required float RWristYaw = 11;
-   required float RHand = 12;
+   optional float r_shoulder_pitch = 8;
+   optional float r_shoulder_roll = 9;
+   optional float r_elbow_yaw = 10;
+   optional float r_wrist_yaw = 11;
+   optional float r_hand = 12;
 
    // Pelvis angles.
-   required float LHipYawPitch = 13;
-   required float RHipYawPitch = 14;
+   optional float l_hip_yaw_pitch = 13;
+   optional float r_hip_yaw_pitch = 14;
 
    // Left leg angles.
-   required float LHipRoll = 15;
-   required float LHipPitch = 16;
-   required float LKneePitch = 17;
-   required float LAnklePitch = 18;
-   required float LAnkleRoll = 19;
+   optional float l_hip_roll = 15;
+   optional float l_hip_pitch = 16;
+   optional float l_knee_pitch = 17;
+   optional float l_ankle_pitch = 18;
+   optional float l_ankle_roll = 19;
 
    // Right leg angles.
-   required float RHipRoll = 20;
-   required float RHipPitch = 21;
-   required float RKneePitch = 22;
-   required float RAnklePitch = 23;
-   required float RAnkleRoll = 24;
+   optional float r_hip_roll = 20;
+   optional float r_hip_pitch = 21;
+   optional float r_knee_pitch = 22;
+   optional float r_ankle_pitch = 23;
+   optional float r_ankle_roll = 24;
 }
