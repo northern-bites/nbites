@@ -26,14 +26,6 @@ const int GuardianModule::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
 
 const int GuardianModule::NO_CLICKS = -1;
 
-static const boost::shared_ptr<FreezeCommand> REMOVE_GAINS =
-    boost::shared_ptr<FreezeCommand>
-    (new FreezeCommand());
-
-static const boost::shared_ptr<UnfreezeCommand> ENABLE_GAINS =
-    boost::shared_ptr<UnfreezeCommand>
-    (new UnfreezeCommand());
-
 //Non blocking!!
 void GuardianModule::playFile(string str)const{
     // system returns an int.
@@ -45,27 +37,17 @@ void GuardianModule::playFile(string str)const{
 
 GuardianModule::GuardianModule()
     : portals::Module(),
-      lastTemps(sensors->getBodyTemperatures()),
-      lastBatteryCharge(sensors->getBatteryCharge()),
-      chestButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
-      leftFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
-      rightFootButton(new ClickableButton(GUARDIAN_FRAME_RATE)),
-      frameCount(0),
-      lastInertial(sensors->getInertial()), fallingFrames(0),
-      notFallingFrames(0),fallenCounter(0),
-      groundOnCounter(0),groundOffCounter(0),
-      registeredFalling(false),registeredShutdown(false),
-      falling(false),fallen(false),feetOnGround(true),
-      useFallProtection(false),
-      lastHeatAudioWarning(0), lastHeatPrintWarning(0)
-{
-    executeStartupAction();
-}
-GuardianModule::~GuardianModule()
+      stiffnessControlOutput(base()),
+//@TODO:
+//      lastTemps(sensors->getBodyTemperatures()),
+//      lastBatteryCharge(sensors->getBatteryCharge()),
+      chestButton(GUARDIAN_FRAME_RATE),
+      leftFootButton(GUARDIAN_FRAME_RATE),
+      rightFootButton(GUARDIAN_FRAME_RATE),
 {
 }
 
-void GuardianModule::executeStartupAction() const
+GuardianModule::~GuardianModule()
 {
 }
 
@@ -90,13 +72,19 @@ void GuardianModule::run_()
 
 void GuardianModule::countButtonPushes()
 {
-    //First, update the buttons with their new values
-    const FootBumper left = sensors->getLeftFootBumper();
-    const FootBumper right = sensors->getRightFootBumper();
+    footBumperInput.latch();
+    chestButtonInput.latch();
 
-    chestButton->updateFrame(sensors->getChestButton());
-    leftFootButton->updateFrame(left.left || left.right);
-    rightFootButton->updateFrame(right.left || right.right);
+
+    chestButton->updateFrame(chestButtonInput.message().get()->pressed());
+    leftFootButton->updateFrame(footBumperInput.message().get()->
+                                l_foot_bumper_left().pressed() ||
+                                footBumperInput.message().get()->
+                                l_foot_bumper_right().pressed());
+    rightFootButton->updateFrame(footBumperInput.message().get()->
+                                 r_foot_bumper_left().pressed() ||
+                                 footBumperInput.message().get()->
+                                 r_foot_bumper_right().pressed())
 }
 
 /**

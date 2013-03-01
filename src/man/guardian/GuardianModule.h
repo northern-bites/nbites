@@ -9,9 +9,21 @@
 #include "ClickableButton.h"
 
 #include "RoboGrams.h"
+#include "JointAngles.pb.h"
+#include "ButtonState.pb.h"
+#include "FootBumperState.pb.h"
+#include "InertialState.pb.h"
+#include "StiffnessControl.pb.h"
 
 namespace man{
 namespace guardian{
+
+struct Inertial
+{
+    float angleX;
+    float angleY;
+};
+
 
 class GuardianModule : public portals::Module
 {
@@ -22,7 +34,6 @@ public:
     void run_();
 
     void executeShutdownAction()const;
-    void executeStartupAction()const;
 
     //getters
     bool isRobotFalling()const { return useFallProtection && falling; }
@@ -31,6 +42,13 @@ public:
 
     void enableFallProtection(bool _useFallProtection)
         { useFallProtection = _useFallProtection; };
+
+    portals::OutPortal<messages::StiffnessControl> stiffnessControlOutput;
+
+    portals::InPortal<messages::JointAngles>     jointsInput;
+    portals::InPortal<messages::ButtonState>     chestButtonInput;
+    portals::InPortal<messages::FootBumperState> footBumperInput;
+    portals::InPortal<messages::InertialState>   intertialInput;
 
 private:
     void checkFalling();
@@ -64,7 +82,7 @@ private:
 
     unsigned int frameCount;
 
-    Inertial lastInertial;
+    struct Inertial lastInertial;
     int fallingFrames,notFallingFrames,fallenCounter,groundOnCounter,groundOffCounter;
     bool registeredFalling;
     bool registeredShutdown;
