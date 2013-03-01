@@ -135,8 +135,6 @@ void SensorsModule::updateJointsMessage()
 {
     portals::Message<messages::JointAngles> jointsMessage(0);
 
-    *jointsMessage.get() = messages::JointAngles();
-
     jointsMessage.get()->set_headyaw(sensorValues_[HeadYaw]);
     jointsMessage.get()->set_headpitch(sensorValues_[HeadPitch]);
     jointsMessage.get()->set_lshoulderpitch(sensorValues_[LShoulderPitch]);
@@ -169,8 +167,6 @@ void SensorsModule::updateChestboardButtonMessage()
 {
     portals::Message<messages::ButtonState> chestboardMessage(0);
 
-    *chestboardMessage.get() = messages::ButtonState();
-
     chestboardMessage.get()->set_pressed(
         sensorValues_[ChestboardButton] > 0.5f ? true : false
         );
@@ -182,8 +178,6 @@ void SensorsModule::updateFootbumperMessage()
 {
     portals::Message<messages::FootBumperState> footbumperMessage(0);
 
-    *footbumperMessage.get() = messages::FootBumperState();
-
     footbumperMessage.get()->mutable_lfootbumperleft()->set_pressed(
         sensorValues_[LFootBumperLeft] > 0.5f ? true : false
         );
@@ -194,8 +188,6 @@ void SensorsModule::updateFootbumperMessage()
 void SensorsModule::updateInertialsMessage()
 {
     portals::Message<messages::InertialState> inertialsMessage(0);
-
-    *inertialsMessage.get() = messages::InertialState();
 
     inertialsMessage.get()->set_accx(sensorValues_[AccX]);
     inertialsMessage.get()->set_accy(sensorValues_[AccY]);
@@ -213,8 +205,6 @@ void SensorsModule::updateInertialsMessage()
 void SensorsModule::updateSonarsMessage()
 {
     portals::Message<messages::SonarState> sonarsMessage(0);
-
-    *sonarsMessage.get() = messages::SonarState();
 
     sonarsMessage.get()->set_usleft(sensorValues_[USLeft]);
     sonarsMessage.get()->set_usright(sensorValues_[USRight]);
