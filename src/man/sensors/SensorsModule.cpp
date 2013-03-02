@@ -12,6 +12,7 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
       footbumperOutput_(base()),
       inertialsOutput_(base()),
       sonarsOutput_(base()),
+      fsrOutput_(base()),
       broker_(broker),
       fastMemoryAccess_(new AL::ALMemoryFastAccess()),
       sensorValues_(NUM_SENSOR_VALUES),
@@ -210,6 +211,25 @@ void SensorsModule::updateSonarsMessage()
     sonarsMessage.get()->set_us_right(sensorValues_[USRight]);
 
     sonarsOutput_.setMessage(sonarsMessage);
+}
+
+void SensorsModule::updateFSRMessage()
+{
+    portals::Message<messages::FSR> fsrMessage(0);
+
+    // Left foot FSR values.
+    fsrMessage.get()->set_fsrlfl(sensorValues_[LFsrFL]);
+    fsrMessage.get()->set_fsrlfr(sensorValues_[LFsrFR]);
+    fsrMessage.get()->set_fsrlrl(sensorValues_[LFsrRL]);
+    fsrMessage.get()->set_fsrlrr(sensorValues_[LFsrRR]);
+
+    // Right foot FSR values.
+    fsrMessage.get()->set_fsrrfl(sensorValues_[RFsrFL]);
+    fsrMessage.get()->set_fsrrfr(sensorValues_[RFsrFR]);
+    fsrMessage.get()->set_fsrrrl(sensorValues_[RFsrRL]);
+    fsrMessage.get()->set_fsrrrr(sensorValues_[RFsrRR]);
+
+    fsrOutput_.setMessage(fsrMessage);
 }
 
 void SensorsModule::run_()
