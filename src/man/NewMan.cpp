@@ -11,7 +11,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       commThread("comm"),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
 	  cognitionThread("cognition"),
-	  test(),
 	  audio(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
@@ -22,11 +21,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Comm **/
     commThread.addModule(comm);
-
-	/** Cognition **/
-	cognitionThread.addModule(test);
-	cognitionThread.addModule(audio);
-	audio.AudioIn.wireTo(&test.AudioOut);
 
     startSubThreads();
 }
