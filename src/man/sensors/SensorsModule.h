@@ -29,106 +29,106 @@
 
 #include <boost/shared_ptr.hpp>
 
-namespace man
+namespace man {
+namespace sensors {
+
+/**
+ * @class SensorsModule
+ */
+class SensorsModule : public portals::Module
 {
-    namespace sensors
-    {
+public:
     /**
-     * @class SensorsModule
+     * @brief Constructor must take a pointer to the broker
+     *        passed to Man in order to communicate via
+     *        proxies to the DCM and ALMemory.
      */
-    class SensorsModule : public portals::Module
-    {
-    public:
-        /**
-         * @brief Constructor must take a pointer to the broker
-         *        passed to Man in order to communicate via
-         *        proxies to the DCM and ALMemory.
-         */
-        SensorsModule(boost::shared_ptr<AL::ALBroker> broker);
+    SensorsModule(boost::shared_ptr<AL::ALBroker> broker);
 
-        virtual ~SensorsModule();
+    virtual ~SensorsModule();
 
-        /*
-         * These portals enable other modules to get sensory
-         * information.
-         */
+    /*
+     * These portals enable other modules to get sensory
+     * information.
+     */
 
-        portals::OutPortal<messages::JointAngles>     jointsOutput_;
-        portals::OutPortal<messages::ButtonState>     chestboardButtonOutput_;
-        portals::OutPortal<messages::FootBumperState> footbumperOutput_;
-        portals::OutPortal<messages::InertialState>   inertialsOutput_;
-        portals::OutPortal<messages::SonarState>      sonarsOutput_;
-	portals::OutPortal<messages::FSR>             fsrOutput_;
+    portals::OutPortal<messages::JointAngles>     jointsOutput_;
+    portals::OutPortal<messages::ButtonState>     chestboardButtonOutput_;
+    portals::OutPortal<messages::FootBumperState> footbumperOutput_;
+    portals::OutPortal<messages::InertialState>   inertialsOutput_;
+    portals::OutPortal<messages::SonarState>      sonarsOutput_;
+    portals::OutPortal<messages::FSR>             fsrOutput_;
 
-    private:
-        /*
-         * Methods used to communicate with the NAO hardware
-         * through the NAOqi software interface.
-         */
+private:
+    /*
+     * Methods used to communicate with the NAO hardware
+     * through the NAOqi software interface.
+     */
 
-        /**
-         * @brief Initialize sensor aliases for fast access.
-         */
-        void initializeSensorFastAccess();
+    /**
+     * @brief Initialize sensor aliases for fast access.
+     */
+    void initializeSensorFastAccess();
 
-        /**
-         * @brief By default, the DCM does not write ultrasonic
-         *        sensor values to ALMemory, so we must notify
-         *        it to do so if we need sonar readings.
-         */
-        void initializeSonarValues();
+    /**
+     * @brief By default, the DCM does not write ultrasonic
+     *        sensor values to ALMemory, so we must notify
+     *        it to do so if we need sonar readings.
+     */
+    void initializeSonarValues();
 
-        /**
-         * @brief Updates the sensor readings. All readings are
-         *        stored and indexed appropriately in a vector.
-         */
-        void updateSensorValues();
+    /**
+     * @brief Updates the sensor readings. All readings are
+     *        stored and indexed appropriately in a vector.
+     */
+    void updateSensorValues();
 
-        /*
-         * Methods to update the messages provided by the
-         * out portals.
-         */
+    /*
+     * Methods to update the messages provided by the
+     * out portals.
+     */
 
-        /**
-         * @brief Updates the joint angles message.
-         */
-        void updateJointsMessage();
+    /**
+     * @brief Updates the joint angles message.
+     */
+    void updateJointsMessage();
 
-        /**
-         * @brief Updates the chestboard button message.
-         */
-        void updateChestboardButtonMessage();
+    /**
+     * @brief Updates the chestboard button message.
+     */
+    void updateChestboardButtonMessage();
 
-        /**
-         * @brief Updates the footbumper button message.
-         */
-        void updateFootbumperMessage();
+    /**
+     * @brief Updates the footbumper button message.
+     */
+    void updateFootbumperMessage();
 
-        /**
-         * @brief Updates the inertial sensors message.
-         */
-        void updateInertialsMessage();
+    /**
+     * @brief Updates the inertial sensors message.
+     */
+    void updateInertialsMessage();
 
-        /**
-         * @brief Updates the sonars message.
-         */
-        void updateSonarsMessage();
+    /**
+     * @brief Updates the sonars message.
+     */
+    void updateSonarsMessage();
 
-	/**
-	 * @brief Updates the FSR message.
-	 */
-	void updateFSRMessage();
+    /**
+     * @brief Updates the FSR message.
+     */
+    void updateFSRMessage();
 
-        /**
-         * @brief The main run routine, primarily updates sensor
-         *        readings.
-         */
-        void run_();
+    /**
+     * @brief The main run routine, primarily updates sensor
+     *        readings.
+     */
+    void run_();
 
-        boost::shared_ptr<AL::ALBroker>           broker_;
-        boost::shared_ptr<AL::ALMemoryFastAccess> fastMemoryAccess_;
-        std::vector<float>                        sensorValues_;
-        std::vector<std::string>                  sensorKeys_;
-    };
-    } // namespace sensors
+    boost::shared_ptr<AL::ALBroker>           broker_;
+    boost::shared_ptr<AL::ALMemoryFastAccess> fastMemoryAccess_;
+    std::vector<float>                        sensorValues_;
+    std::vector<std::string>                  sensorKeys_;
+};
+
+} // namespace sensors
 } // namespace man

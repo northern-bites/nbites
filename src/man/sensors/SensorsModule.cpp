@@ -1,9 +1,7 @@
 #include "SensorsModule.h"
 
-namespace man
-{
-namespace sensors
-{
+namespace man {
+namespace sensors {
 
 SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
     : portals::Module(),
@@ -36,23 +34,27 @@ void SensorsModule::initializeSensorFastAccess()
     int i = 0;
     for(; i < 26; ++i)
     {
-        sensorKeys_[i] = std::string("Device/SubDeviceList/") + SensorNames[i] + std::string("/Position/Sensor/Value");
+        sensorKeys_[i] = std::string("Device/SubDeviceList/") +
+            SensorNames[i] + std::string("/Position/Sensor/Value");
     }
     // There are 8 FSR sensors.
     // (Left foot)
     for(; i < 30; ++i)
     {
-        sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/FSR/") + SensorNames[i] + std::string("/Sensor/Value");
+        sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/FSR/") +
+            SensorNames[i] + std::string("/Sensor/Value");
     }
     // (Right foot)
     for(; i < 34; ++i)
     {
-        sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/FSR/") + SensorNames[i] + std::string("/Sensor/Value");
+        sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/FSR/") +
+            SensorNames[i] + std::string("/Sensor/Value");
     }
     // There are 7 inertial sensors.
     for(; i < 41; ++i)
     {
-        sensorKeys_[i] = std::string("Device/SubDeviceList/InertialSensor/") + SensorNames[i] + std::string("/Sensor/Value");
+        sensorKeys_[i] = std::string("Device/SubDeviceList/InertialSensor/") +
+            SensorNames[i] + std::string("/Sensor/Value");
     }
     // There are 2 important sonars.
     sensorKeys_[i] = std::string("Device/SubDeviceList/US/Left/Sensor/Value");
@@ -108,7 +110,8 @@ void SensorsModule::initializeSonarValues()
         }
         catch(AL::ALError& e)
         {
-            std::cout << "SensorsModule : Failed to initialize sonars, " << e.toString() << std::endl;
+            std::cout << "SensorsModule : Failed to initialize sonars, "
+                      << e.toString() << std::endl;
         }
     }
 }
@@ -220,16 +223,16 @@ void SensorsModule::updateFSRMessage()
     portals::Message<messages::FSR> fsrMessage(0);
 
     // Left foot FSR values.
-    fsrMessage.get()->set_fsr_lfl(sensorValues_[LFsrFL]);
-    fsrMessage.get()->set_fsr_lfr(sensorValues_[LFsrFR]);
-    fsrMessage.get()->set_fsr_lrl(sensorValues_[LFsrRL]);
-    fsrMessage.get()->set_fsr_lrr(sensorValues_[LFsrRR]);
+    fsrMessage.get()->set_lfl(sensorValues_[LFsrFL]);
+    fsrMessage.get()->set_lfr(sensorValues_[LFsrFR]);
+    fsrMessage.get()->set_lrl(sensorValues_[LFsrRL]);
+    fsrMessage.get()->set_lrr(sensorValues_[LFsrRR]);
 
     // Right foot FSR values.
-    fsrMessage.get()->set_fsr_rfl(sensorValues_[RFsrFL]);
-    fsrMessage.get()->set_fsr_rfr(sensorValues_[RFsrFR]);
-    fsrMessage.get()->set_fsr_rrl(sensorValues_[RFsrRL]);
-    fsrMessage.get()->set_fsr_rrr(sensorValues_[RFsrRR]);
+    fsrMessage.get()->set_rfl(sensorValues_[RFsrFL]);
+    fsrMessage.get()->set_rfr(sensorValues_[RFsrFR]);
+    fsrMessage.get()->set_rrl(sensorValues_[RFsrRL]);
+    fsrMessage.get()->set_rrr(sensorValues_[RFsrRR]);
 
     fsrOutput_.setMessage(fsrMessage);
 }
