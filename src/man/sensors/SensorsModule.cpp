@@ -6,6 +6,7 @@ namespace sensors {
 SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
     : portals::Module(),
       jointsOutput_(base()),
+      temperatureOutput_(base()),
       chestboardButtonOutput_(base()),
       footbumperOutput_(base()),
       inertialsOutput_(base()),
@@ -31,32 +32,49 @@ SensorsModule::~SensorsModule()
 
 void SensorsModule::initializeSensorFastAccess()
 {
-    // There are 26 joints.
     int i = 0;
-    for(; i < 26; ++i)
+
+    // Joint Angles
+    for(; i < END_JOINTS; ++i)
     {
         sensorKeys_[i] = std::string("Device/SubDeviceList/") +
             SensorNames[i] + std::string("/Position/Sensor/Value");
     }
-    // There are 8 FSR sensors.
-    // (Left foot)
-    for(; i < 30; ++i)
+    i++;
+
+    // Temperatures
+    for(; i < END_TEMPERATURES; ++i)
+    {
+        // Subtract 27 from index in SensorsNames[] to get correct value.
+        sensorKeys_[i] = std::string("Device/SubDeviceList/") +
+            SensorNames[i-27] + std::string("/Temperature/Sensor/Value");
+    }
+    i++;
+
+    // FSR (Left foot)
+    for(; i < END_FSRS_LEFT; ++i)
     {
         sensorKeys_[i] = std::string("Device/SubDeviceList/LFoot/FSR/") +
             SensorNames[i] + std::string("/Sensor/Value");
     }
-    // (Right foot)
-    for(; i < 34; ++i)
+    i++;
+
+    // FSR (Right foot)
+    for(; i < END_FSRS_RIGHT; ++i)
     {
         sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/FSR/") +
             SensorNames[i] + std::string("/Sensor/Value");
     }
-    // There are 7 inertial sensors.
-    for(; i < 41; ++i)
+    i++;
+
+    // Inertial Sensors
+    for(; i < END_INTERTIALS; ++i)
     {
         sensorKeys_[i] = std::string("Device/SubDeviceList/InertialSensor/") +
             SensorNames[i] + std::string("/Sensor/Value");
     }
+    i++;
+
     // There are 2 important sonars.
     sensorKeys_[i] = std::string("Device/SubDeviceList/US/Left/Sensor/Value");
     i++;
@@ -127,6 +145,7 @@ void SensorsModule::updateSensorValues()
     fastMemoryAccess_->GetValues(sensorValues_);
 
     updateJointsMessage();
+    updateTemperatureMessage();
     updateChestboardButtonMessage();
     updateFootbumperMessage();
     updateInertialsMessage();
@@ -172,6 +191,39 @@ void SensorsModule::updateJointsMessage()
     jointsMessage.get()->set_r_ankle_roll(sensorValues_[RAnkleRoll]);
 
     jointsOutput_.setMessage(jointsMessage);
+}
+
+void SensorsModule::updateTemperatureMessage()
+{
+    portals::Message<messages::JointAngles> temperaturesMessage(0);
+    temperaturesMessage.get()->set_head_yaw(sensorValues_[HeadYawTemp]);
+    temperaturesMessage.get()->set_head_pitch(sensorValues_[HeadPitchTemp]);
+    temperaturesMessage.get()->set_l_shoulder_pitch(sensorValues_[LShoulderPitchTemp]);
+    temperaturesMessage.get()->set_l_shoulder_roll(sensorValues_[LShoulderRollTemp]);
+    temperaturesMessage.get()->set_l_elbow_yaw(sensorValues_[LElbowYawTemp]);
+    temperaturesMessage.get()->set_l_elbow_roll(sensorValues_[LElbowRollTemp]);
+    temperaturesMessage.get()->set_l_wrist_yaw(sensorValues_[LWristYawTemp]);
+    temperaturesMessage.get()->set_l_hand(sensorValues_[LHandTemp]);
+    temperaturesMessage.get()->set_r_shoulder_pitch(sensorValues_[RShoulderPitchTemp]);
+    temperaturesMessage.get()->set_r_shoulder_roll(sensorValues_[RShoulderRollTemp]);
+    temperaturesMessage.get()->set_r_elbow_yaw(sensorValues_[RElbowYawTemp]);
+    temperaturesMessage.get()->set_r_elbow_roll(sensorValues_[RElbowRollTemp]);
+    temperaturesMessage.get()->set_r_wrist_yaw(sensorValues_[RWristYawTemp]);
+    temperaturesMessage.get()->set_r_hand(sensorValues_[RHandTemp]);
+    temperaturesMessage.get()->set_l_hip_yaw_pitch(sensorValues_[LHipYawPitchTemp]);
+    temperaturesMessage.get()->set_r_hip_yaw_pitch(sensorValues_[RHipYawPitchTemp]);
+    temperaturesMessage.get()->set_l_hip_roll(sensorValues_[LHipRollTemp]);
+    temperaturesMessage.get()->set_l_hip_pitch(sensorValues_[LHipPitchTemp]);
+    temperaturesMessage.get()->set_l_knee_pitch(sensorValues_[LKneePitchTemp]);
+    temperaturesMessage.get()->set_l_ankle_pitch(sensorValues_[LAnklePitchTemp]);
+    temperaturesMessage.get()->set_l_ankle_roll(sensorValues_[LAnkleRollTemp]);
+    temperaturesMessage.get()->set_r_hip_roll(sensorValues_[RHipRollTemp]);
+    temperaturesMessage.get()->set_r_hip_pitch(sensorValues_[RHipPitchTemp]);
+    temperaturesMessage.get()->set_r_knee_pitch(sensorValues_[RKneePitchTemp]);
+    temperaturesMessage.get()->set_r_ankle_pitch(sensorValues_[RAnklePitchTemp]);
+    temperaturesMessage.get()->set_r_ankle_roll(sensorValues_[RAnkleRollTemp]);
+
+    temperatureOutput_.setMessage(temperaturesMessage);
 }
 
 void SensorsModule::updateChestboardButtonMessage()

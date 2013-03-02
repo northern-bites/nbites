@@ -54,6 +54,7 @@ public:
      */
 
     portals::OutPortal<messages::JointAngles>     jointsOutput_;
+    portals::OutPortal<messages::JointAngles>     temperatureOutput_;
     portals::OutPortal<messages::ButtonState>     chestboardButtonOutput_;
     portals::OutPortal<messages::FootBumperState> footbumperOutput_;
     portals::OutPortal<messages::InertialState>   inertialsOutput_;
@@ -94,6 +95,11 @@ private:
      * @brief Updates the joint angles message.
      */
     void updateJointsMessage();
+
+    /**
+     * @brief Updates the temperatures message.
+     */
+    void updateTemperatureMessage();
 
     /**
      * @brief Updates the chestboard button message.
