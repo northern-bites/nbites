@@ -19,6 +19,7 @@
 #include "InitialState.pb.h"
 #include "FeetOnGround.pb.h"
 #include "FSR.pb.h"
+#include "FallStatus.pb.h"
 
 namespace man{
 namespace guardian{
@@ -51,6 +52,7 @@ public:
     portals::OutPortal<messages::StiffnessControl> stiffnessControlOutput;
     portals::OutPortal<messages::InitialState>     initialStateOutput;
     portals::OutPortal<messages::FeetOnGround>     feetOnGroundOutput;
+    portals::OutPortal<messages::FallStatus>      fallStatusOutput;
 
     portals::InPortal<messages::JointAngles>     jointsInput;
     portals::InPortal<messages::ButtonState>     chestButtonInput;

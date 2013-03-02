@@ -31,6 +31,7 @@ GuardianModule::GuardianModule()
       stiffnessControlOutput(base()),
       initialStateOutput(base()),
       feetOnGroundOutput(base()),
+      fallStatusOutput(base()),
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
@@ -375,14 +376,29 @@ void GuardianModule::checkFeetOnGround()
 
 void GuardianModule::processFallingProtection()
 {
+    portals::Message<messages::FallStatus> status(0);
     if(useFallProtection && falling && !registeredFalling)
     {
         registeredFalling = true;
         executeFallProtection();
+
+        status.get()->set_falling(true);
+        fallStatusOutput.setMessage(status);
     }
     else if(notFallingFrames > FALLING_RESET_FRAMES_THRESH)
     {
         registeredFalling = false;
+
+        status.get()->set_falling(true);
+        fallStatusOutput.setMessage(status);
+    }
+    if (fallen)
+    {
+        status.get()->set_fallen(true);
+    }
+    else
+    {
+        status.get()->set_fallen(false);
     }
 
 //     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle)
