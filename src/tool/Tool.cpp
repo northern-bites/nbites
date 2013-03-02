@@ -12,8 +12,7 @@ QFile file(QString("./.geometry"));
 
 Tool::Tool(const char* title) :
     QMainWindow(),
-    mainDiagram(),
-    dataManager(),
+    diagram(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -24,9 +23,6 @@ Tool::Tool(const char* title) :
     tabStartSize(new QSize(toolTabs->size()))
 
 {
-    // Set up the diagram
-    mainDiagram.addModule(dataManager);
-    dataManager.addUnlogger("/home/ecat/nbites/data/logs/joints");
 
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
@@ -68,7 +64,7 @@ Tool::~Tool() {
 
 // Button press methods
 void Tool::next() {
-    mainDiagram.run();
+    diagram.run();
 }
 
 void Tool::prev() {

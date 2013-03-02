@@ -11,8 +11,7 @@
 #include <QScrollArea>
 #include <QResizeEvent>
 
-#include "RoboGrams.h"
-#include "unlog/DataModule.h"
+#include "ToolDiagram.h"
 
 namespace tool {
 
@@ -36,10 +35,9 @@ protected:
 	void resizeEvent(QResizeEvent*);
 
     // Modules in this diagram will be run when data is updated
-    portals::RoboGram mainDiagram;
+    ToolDiagram diagram;
 
     // Modules
-    unlog::DataModule dataManager;
 
     // GUI stuff
     QTabWidget* toolTabs;

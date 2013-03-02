@@ -1,7 +1,6 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
-set( UNLOG_SRCS UnlogModule.cpp
-  DataModule.cpp)
+set( UNLOG_SRCS UnlogModule.cpp )
 
 add_library(
   unlog

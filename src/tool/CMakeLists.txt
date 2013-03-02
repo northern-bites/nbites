@@ -49,6 +49,7 @@ add_subdirectory( unlog )
 # Sources
 set( tool_srcs main.cpp
   Tool.cpp
+  ToolDiagram.cpp
   )
 
 set( tool_headers
