@@ -1,5 +1,6 @@
 #include "AudioEnactorModule.h"
 #include <iostream>
+#include <string>
 
 namespace man {
 namespace audio {
@@ -23,27 +24,27 @@ void AudioEnactorModule::run_()
 		alspeech.setVolume(audioCommand.volume());
 	}
 
-	//only process the message if the toggle is flipped
-	if(toggle!=audioCommand.toggle()){
-		if(audioCommand.has_text_to_speech_msg()){
-			alspeech.say(audioCommand.text_to_speech_msg());
-		}
-		if(audioCommand.has_path_to_audio_file()) {
-		    
-		}
+
+	if(audioCommand.has_tts_msg()){
+		alspeech.say(audioCommand.tts_msg());
 	}
+	if(audioCommand.has_audio_file()) {
+		// system returns an int.
+		if(system(("aplay -q "+audioCommand.audio_file()+" &").c_str()) != 0)
+			std::cout << "AudioEnactor could not play file." << std::endl;
+	}
+
 
 
 
 	/*if(audioCommand.path_to_audio_file()){
-		//herp ALSpeech has no method to deal with audio files right now, that's in guardian
+	//herp ALSpeech has no method to deal with audio files right now, that's in guardian
 	}
 	if (audioCommand.text_to_speech_msg()){
-		alspeech.say(audioCommand.text_to_speech_msg());
-		}*/
+	alspeech.say(audioCommand.text_to_speech_msg());
+	}*/
 
 
-	toggle = audioCommand.toggle();
 
 }
 

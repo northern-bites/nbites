@@ -16,6 +16,7 @@ namespace testmod{
 
 	protected:
 		virtual void run_();
+		bool msgSent;
 	};
 }
 }

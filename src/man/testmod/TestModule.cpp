@@ -14,14 +14,18 @@ void TestModule::run_()
 {
 	//Send some out messages!
 	portals::Message<messages::AudioCommand> AudioCommand(0);
+	AudioCommand.get()->Clear();
 
-	//test that bugger
-	std::string msg("test");
-	AudioCommand.get()->set_text_to_speech_msg(msg);
-	AudioCommand.get()->set_toggle(bool(true));
+	//test tts and audio
+	if(!msgSent){
+		std::string msg("test");
+		AudioCommand.get()->set_tts_msg(msg);
+		AudioCommand.get()->set_audio_file(shutdown_wav);
+	}
 
 	//now send the message out.
 	AudioOut.setMessage(AudioCommand);
+	msgSent = true;
 }
 }
 }

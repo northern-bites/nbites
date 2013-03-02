@@ -5,6 +5,7 @@
 #include <alcommon/albroker.h>
 #include "AudioCommand.pb.h"
 
+
 namespace man {
 namespace audio {
 
@@ -19,7 +20,6 @@ public:
 protected:
 	virtual void run_();
 	ALSpeech alspeech;
-	bool toggle;
 };
 
 }
