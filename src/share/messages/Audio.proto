@@ -1,8 +1,0 @@
-package messages;
-
-message Audio
-{
-    optional string path_to_audio_file = 1;
-    optional string text_to_speech_msg = 2;
-    optional float volume = 3;
-}

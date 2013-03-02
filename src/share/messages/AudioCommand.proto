@@ -1,0 +1,9 @@
+package messages;
+
+message AudioCommand
+{
+    optional string path_to_audio_file = 1;
+    optional string text_to_speech_msg = 2;
+    optional float volume = 3 [default = 0.95]; //between 0 and 1
+    optional bool toggle = 4;
+}

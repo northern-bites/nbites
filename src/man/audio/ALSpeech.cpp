@@ -5,7 +5,6 @@
 
 #include "alerror/alerror.h"
 
-#include "manconfig.h"
 
 
 ALSpeech::ALSpeech(boost::shared_ptr<AL::ALBroker> broker) : Speech(), volume(0)

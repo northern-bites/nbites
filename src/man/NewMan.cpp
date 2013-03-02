@@ -12,7 +12,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
 	  cognitionThread("cognition"),
 	  test(),
-	  audio(broker,test.AudioOut)
+	  audio(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 

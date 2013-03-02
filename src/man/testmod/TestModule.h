@@ -1,9 +1,10 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "Audio.pb.h"
+#include "AudioCommand.pb.h"
 
 namespace man {
+namespace testmod{
 
 	class TestModule : public portals::Module {
 
@@ -11,9 +12,10 @@ namespace man {
 		TestModule();
 		virtual ~TestModule() {}
 
-		portals::OutPortal<messages::Audio> AudioOut;
+		portals::OutPortal<messages::AudioCommand> AudioOut;
 
 	protected:
 		virtual void run_();
 	};
+}
 }

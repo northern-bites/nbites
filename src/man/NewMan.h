@@ -9,7 +9,7 @@
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
 #include "audio/AudioEnactorModule.h"
-#include "testModule/TestModule.h"
+#include "testmod/TestModule.h"
 
 namespace man {
 
@@ -31,7 +31,7 @@ private:
     comm::CommModule comm;
 
     DiagramThread cognitionThread;
-	TestModule test;
+	testmod::TestModule test;
 	audio::AudioEnactorModule audio;
 };
 

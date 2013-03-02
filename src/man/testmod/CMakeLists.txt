@@ -5,13 +5,13 @@ set(TESTMODULE_SRCS TestModule)
 
 # Add project as a library.
 add_library(
-  testModule
+  testmod
   STATIC
   ${TESTMODULE_SRCS}
 )
 
 # Link project ot appropriate libraries.
-target_link_libraries(testModule
+target_link_libraries(testmod
   portals
   messages
   ${ALCOMMON_LIBRARIES}
