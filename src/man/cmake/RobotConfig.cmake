@@ -19,10 +19,18 @@ set( @REMOTE_ADDRESS@
   CACHE STRING
   "The address to which the code will be installed."
 )
+
+set ( @PYTHON_PLAYER@
+  pNone
+  CACHE STRING
+  "Choose the player to be imported in Switch.py"
+  )
+
 # So that files can be configured
 set( REMOTE_ADDRESS ${@REMOTE_ADDRESS@})
 set( PLAYER_NUMBER ${@ROBOT_PLAYER_NUMBER@})
 set( TEAM_NUMBER ${@ROBOT_TEAM_NUMBER@})
+set( PYTHON_PLAYER ${@PYTHON_PLAYER@})
 
 set( INSTALL_LOCATION
   "nbites/"

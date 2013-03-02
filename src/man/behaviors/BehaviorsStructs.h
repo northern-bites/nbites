@@ -1,13 +1,12 @@
 /**
- * @file   NogginStructs.h
+ * @file   BehaviorsStructs.h
  * @author Tucker Hermans <thermans@bowdoin.edu>
  * @date   Mon Mar  9 19:32:25 2009
  *
- * @brief  Houses all of our struct classes for the Noggin module
+ * @brief  Houses all of our struct classes for the Behaviors module
  */
 
-#ifndef NogginStructs_h_DEFINED
-#define NogginStructs_h_DEFINED
+#pragma once
 #include "EKFStructs.h"
 #include <math.h>
 #include <ostream>
@@ -183,4 +182,3 @@ public:
     TeammateBallMeasurement(float _x = 0.0f, float _y = 0.0f) :
         ballX(_x), ballY(_y) {}
 };
-#endif // NogginStructs

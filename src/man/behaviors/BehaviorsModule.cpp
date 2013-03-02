@@ -1,34 +1,58 @@
-#include "NogginModule.h"
+#include "BehaviorsModule.h"
 
-using boost::shared_ptr;
+static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 
 namespace man {
-	namespace noggin {
+	namespace behaviors {
 
-		NogginModule::NogginModule()
+		BehaviorsModule::BehaviorsModule()
 			: Module(),
-			  error_state(false);
+			  error_state(false)
 		{}
 
-		void NogginModule::run_()
+		void BehaviorsModule::run_()
 		{
-			//latch in portals
+			// If in error, try restarting automatically.
+			static unsigned int num_crashed = 0;
+			if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
+				this->reload_hard();
+				error_state = false;
+				num_crashed++;
+			}
+
+			// Call main run() method of Brain
+			if (brain_instance != NULL) {
+				PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
+				if (result == NULL) {
+					// set Behaviors in error state
+					error_state = true;
+					// report error
+					fprintf(stderr, "Error occurred in behaviors.Brain.run() method\n");
+					if (PyErr_Occurred()) {
+						PyErr_Print();
+					} else {
+						fprintf(stderr, "  No Python exception information available\n");
+					}
+				} else {
+					Py_DECREF(result);
+				}
+			}
 		}
 
-		void NogginModule::reload_hard()
+		void BehaviorsModule::reload_hard()
 		{
-			printf("Reloading Noggin Python interpreter\n");
+			printf("Reloading Behaviors Python interpreter\n");
 			// finalize and reinitialize the Python interpreter
 			Py_Finalize();
 			// load C extension modules
 			initializePython();
-			// import noggin.Brain and instantiate a Brain reference
+			// import behaviors.Brain and instantiate a Brain reference
 			import_modules();
 			// instantiate a Brain instance
 			getBrainInstance();
 		}
 
-		void NogginModule::reload_brain()
+		void BehaviorsModule::reload_brain()
 		{
 			if (brain_module == NULL)
 				if (!import_modules())
@@ -40,9 +64,9 @@ namespace man {
 			getBrainInstance();
 		}
 
-		void NogginModule::initializePython()
+		void BehaviorsModule::initializePython()
 		{
-# ifdef DEBUG_NOGGIN_INITIALIZATION
+# ifdef DEBUG_BEHAVIORS_INITIALIZATION
 			printf("  Initializing interpreter and extension modules\n");
 # endif
 
@@ -50,22 +74,22 @@ namespace man {
 			modifySysPath();
 			brain_module = NULL;
 
-			//TODO: remove unnecessary calls here
+			//TODO: remove unnecessary calls here. All of them?
 			// Initialize low-level modules
-			c_init_sensors();
-			c_init_lights();
-			c_init_speed();
-			c_init_roboguardian();
-			c_init_motion();
-			c_init_comm();
-			c_init_logging();
-			c_init_vision();
-			c_init_noggin_constants();
-			c_init_objects();
-			c_init_goalie();
+			// c_init_sensors();
+			// c_init_lights();
+			// c_init_speed();
+			// c_init_roboguardian();
+			// c_init_motion();
+			// c_init_comm();
+			// c_init_logging();
+			// c_init_vision();
+			// c_init_noggin_constants();
+			// c_init_objects();
+			// c_init_goalie();
 		}
 
-		void NogginModule::modifySysPath()
+		void BehaviorsModule::modifySysPath()
 		{
 			//TODO: figure out if we still need this
 			// Enter the current working directory into the pyton module path
@@ -77,7 +101,7 @@ namespace man {
 			const char* cwd = "/home/nao/nbites/lib";
 #endif
 
-#ifdef DEBUG_NOGGIN_INITIALIZATION
+#ifdef DEBUG_BEHAVIORS_INITIALIZATION
 			printf("  Adding %s to sys.path\n", cwd);
 #endif
 
@@ -101,20 +125,20 @@ namespace man {
 			}
 		}
 
-		bool NogginModule::import_modules()
+		bool BehaviorsModule::import_modules()
 		{
 			// Load Brain module
 			if (brain_module == NULL) {
 				// Import brain module
-#ifdef DEBUG_NOGGIN_INITIALIZATION
-				printf("  Importing noggin.Brain\n");
+#ifdef DEBUG_BEHAVIORS_INITIALIZATION
+				printf("  Importing behaviors.Brain\n");
 #endif
-				brain_module = PyImport_ImportModule(BRAIN_MODULE);
+				brain_module = PyImport_ImportModule("man.behaviors.Brain");
 			}
 
 			if (brain_module == NULL) {
-				// error, couldn't import noggin.Brain
-				fprintf(stderr, "Error importing noggin.Brain module\n");
+				// error, couldn't import behaviors.Brain
+				fprintf(stderr, "Error importing behaviors.Brain module\n");
 				if (PyErr_Occurred())
 					PyErr_Print();
 				else
@@ -125,7 +149,7 @@ namespace man {
 			return true;
 		}
 
-		void NogginModule::getBrainInstance()
+		void BehaviorsModule::getBrainInstance()
 		{
 			if (brain_module == NULL)
 				if (!import_modules())
@@ -133,7 +157,7 @@ namespace man {
 
 			// drop old reference
 			Py_XDECREF(brain_instance);
-			// grab instantiate and hold a reference to a new noggin.Brain.Brain()
+			// grab instantiate and hold a reference to a new behaviors.Brain.Brain()
 			PyObject *dict = PyModule_GetDict(brain_module);
 			PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
 			if (brain_class != NULL)
@@ -142,11 +166,11 @@ namespace man {
 				brain_instance = NULL;
 
 			if (brain_instance == NULL) {
-				fprintf(stderr, "Error accessing noggin.Brain.Brain\n");
+				fprintf(stderr, "Error accessing behaviors.Brain.Brain\n");
 				if (PyErr_Occurred())
 					PyErr_Print();
 				else
-					fprintf(strderr, "  No error available\n");
+					fprintf(stderr, "  No error available\n");
 			}
 
 			// Successfully reloaded

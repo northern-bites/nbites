@@ -1,30 +1,31 @@
 #pragma once
 
+#include "RoboGrams.h"
 #include <Python.h>
-#include <boost/shared_ptr.hpp>
+//#include <boost/shared_ptr.hpp>
 //#include "Profiler.h"
 //#include "PyConstants.h"
 
-#include "LedCommand.ph.h"
+#include "LedCommand.pb.h"
 
 namespace man {
-	namespace noggin {
+	namespace behaviors {
 
-		class NogginModule : public portals::Module {
+		class BehaviorsModule : public portals::Module {
 
 		public:
-			NogginModule();
-			virtual ~NogginModule() {}
+			BehaviorsModule();
+			virtual ~BehaviorsModule() {}
 
 			// reinitialize and reload the Python interpreter
 			void reload_hard();
 			// reload Brain module
 			void reload_brain();
-			// current Noggin error status
+			// current Behaviors error status
 			bool inErrorState() { return error_state; }
 
 			//placeholder in portal
-			portals::InPortal<messages::Ball> ballMessageIn;
+			//portals::InPortal<essages::Ball> ballMessageIn;
 
 		protected:
 			virtual void run_();

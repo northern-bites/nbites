@@ -76,6 +76,7 @@ add_subdirectory( sensors )
 add_subdirectory( comm )
 add_subdirectory( led )
 add_subdirectory( testModule )
+add_subdirectory( behaviors )
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
@@ -97,6 +98,7 @@ target_link_libraries(
   comm
   led
   testModule
+  behaviors
 )
 
 install( TARGETS man
