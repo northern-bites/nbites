@@ -2,7 +2,7 @@
 
 #include "RoboGrams.h"
 #include "ALSpeech.h"
-#include "alcommon/albroker.h"
+#include <alcommon/albroker.h>
 #include "Audio.pb.h"
 
 namespace man {
@@ -11,7 +11,7 @@ namespace man {
 		class AudioEnactorModule : public portals::Module {
 
 		public:
-			AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker, portals::OutPortal<messages::Audio> out);
+			AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
 			virtual ~AudioEnactorModule() {}
 
 			portals::InPortal<messages::Audio> AudioIn;

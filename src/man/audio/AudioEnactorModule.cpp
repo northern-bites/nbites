@@ -1,14 +1,11 @@
 #include "AudioEnactorModule.h"
 
-using namespace portals;
-using boost::shared_ptr;
-
 namespace man {
 	namespace audio {
 
-		AudioEnactorModule::AudioEnactorModule(boost::shared_ptr<ALBroker> broker, portals::OutPortal<messages::Audio> out)
+		AudioEnactorModule::AudioEnactorModule(boost::shared_ptr<ALBroker> broker)
 			: portals::Module(),
-			  alspeech(broker);
+			  alspeech(broker)
 		{}
 
 		void LedEnactorModule::run_()
@@ -20,10 +17,10 @@ namespace man {
 				//herp ALSpeech has no method to deal with audio files right now, that's in guardian
 			}
 			if (audioCommand.text_to_speech_msg()){
-				alspeech.say(command.text_to_speech_msg());
+				alspeech.say(audioCommand.text_to_speech_msg());
 			}
 			if (audioCommand.volume()){
-				alspeech.setVolume(audioCommand.volume())
+				alspeech.setVolume(audioCommand.volume());
 			}
 		}
 
