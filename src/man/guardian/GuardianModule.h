@@ -48,11 +48,13 @@ public:
 
     portals::OutPortal<messages::StiffnessControl> stiffnessControlOutput;
     portals::OutPortal<messages::InitialState>     initialStateOutput;
+    portals::OutPortal<messages::FeetOnGround>     feetOnGroundOutput;
 
     portals::InPortal<messages::JointAngles>     jointsInput;
     portals::InPortal<messages::ButtonState>     chestButtonInput;
     portals::InPortal<messages::FootBumperState> footBumperInput;
     portals::InPortal<messages::InertialState>   inertialInput;
+    portals::InPortal<messages::FSR>             fsrInput;
 
 private:
     void resetMessages();
@@ -95,6 +97,8 @@ private:
 
     bool falling, fallen, feetOnGround;
     bool useFallProtection;
+
+    bool lastInitial;
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
 };

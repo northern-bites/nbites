@@ -30,6 +30,7 @@ GuardianModule::GuardianModule()
     : portals::Module(),
       stiffnessControlOutput(base()),
       initialStateOutput(base()),
+      feetOnGroundOutput(base()),
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
@@ -222,70 +223,84 @@ void GuardianModule::checkFallen()
  *
  */
 
-//@TODO
-// void GuardianModule::checkFeetOnGround()
-// {
-//     //this can be higher than the falling thresholds since stopping the walk
-//     //engine is less critical
-//     static const int GROUND_FRAMES_THRESH = 10;
-//     // lower pthan this, the robot is off the ground
-//     static const float onGroundFSRThresh = 1.0f;
+void GuardianModule::checkFeetOnGround()
+{
+    //this can be higher than the falling thresholds since stopping the walk
+    //engine is less critical
+    static const int GROUND_FRAMES_THRESH = 10;
+    // lower pthan this, the robot is off the ground
+    static const float onGroundFSRThresh = 1.0f;
 
-//     /* If the FSRs are broken, we don't want to accidentally assume that we're
-//        off the ground (ruins SweetMoves, walking, etc) so this method will stop
-//        early and feetOnGround will always be true */
-//     if (sensors->percentBrokenFSR() > 0)
-//     {
-//         feetOnGround = true;
-//         return;
-//     }
+    fsrInput.latch();
 
-//     const FSR left = sensors->getLeftFootFSR();
-//     const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
-//         left.rearRight;
-//     const FSR right = sensors->getRightFootFSR();
-//     const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
-//         right.rearRight;
+    /* If the FSRs are broken, we don't want to accidentally assume that we're
+       off the ground (ruins SweetMoves, walking, etc) so this method will stop
+       early and feetOnGround will always be true */
+    // @TODO currently no check for this. May want to incorperate
+    // error detection in Sensors Module. March 2, 2013
+    // if (sensors->percentBrokenFSR() > 0)
+    // {
+    //     feetOnGround = true;
+    //     return;
+    // }
 
-//     // printf("left: %f, right: %f, total: %f\n",
-//     //        leftSum, rightSum, (leftSum + rightSum));
 
-//     // buffer the transition in both directions
-//     if (feetOnGround)
-//     {
-//         if (leftSum + rightSum < onGroundFSRThresh)
-//         {
-//             groundOffCounter++;
-//         }
-//         else
-//         {
-//             groundOffCounter = 0;
-//         }
-//     }
-//     else
-//     {
-//         if (leftSum + rightSum > onGroundFSRThresh)
-//         {
-//             groundOnCounter++;
-//         }
-//         else
-//         {
-//             groundOnCounter = 0;
-//         }
-//     }
+    float leftSum  = fsrInput.message().lfl() +
+        fsrInput.message().lfr() +
+        fsrInput.message().lrl() +
+        fsrInput.message().lrr();
+    float rightSum = fsrInput.message().rfl() +
+        fsrInput.message().rfr() +
+        fsrInput.message().rrl() +
+        fsrInput.message().rrr();
 
-//     if (groundOffCounter > GROUND_FRAMES_THRESH)
-//     {
-//         feetOnGround = false;
-//         groundOnCounter = groundOffCounter = 0;
-//     }
-//     else if (groundOnCounter > GROUND_FRAMES_THRESH)
-//     {
-//         feetOnGround = true;
-//         groundOnCounter = groundOffCounter = 0;
-//     }
-// }
-// TODO TODO END
+
+    // printf("left: %f, right: %f, total: %f\n",
+    //        leftSum, rightSum, (leftSum + rightSum));
+
+    // buffer the transition in both directions
+    if (feetOnGround)
+    {
+        if (leftSum + rightSum < onGroundFSRThresh)
+        {
+            groundOffCounter++;
+        }
+        else
+        {
+            groundOffCounter = 0;
+        }
+    }
+    else
+    {
+        if (leftSum + rightSum > onGroundFSRThresh)
+        {
+            groundOnCounter++;
+        }
+        else
+        {
+            groundOnCounter = 0;
+        }
+    }
+
+    if (groundOffCounter > GROUND_FRAMES_THRESH)
+    {
+        feetOnGround = false;
+        groundOnCounter = groundOffCounter = 0;
+
+        portals::Message<messages::FeetOnGround> msg(0);
+        msg.get()->set_on_ground(false);
+        feetOnGroundOutput.setMessage(msg);
+    }
+    else if (groundOnCounter > GROUND_FRAMES_THRESH)
+    {
+        feetOnGround = true;
+        groundOnCounter = groundOffCounter = 0;
+
+        portals::Message<messages::FeetOnGround> msg(0);
+        msg.get()->set_on_ground(true);
+        feetOnGroundOutput.setMessage(msg);
+    }
+}
 
 // We print each time the battery looses ten percent of charge
 //once the charge gets to %30 percent of capacity, we start to say "energy"
@@ -495,8 +510,10 @@ void GuardianModule::initialState()
     std::cout << "Guardian::initialState()" << std::endl;
 
     portals::Message<messages::InitialState> command(0);
-    command.get()->set_go(true);
+    command.get()->set_go(!lastInitial);
     initialStateOutput.setMessage(command);
+
+    lastInitial = !lastInitial;
 }
 
 
