@@ -12,8 +12,7 @@
 #include <QResizeEvent>
 
 #include "RoboGrams.h"
-#include "unlog/UnlogModule.h"
-#include "JointAngles.pb.h"
+#include "unlog/DataModule.h"
 
 namespace tool {
 
@@ -40,8 +39,7 @@ protected:
     portals::RoboGram mainDiagram;
 
     // Modules
-    // IF YOU WANT TO SEE LOGS PUT YOUR UNLOGGER HERE
-    unlog::UnlogModule<messages::JointAngles> unlogger;
+    unlog::DataModule dataManager;
 
     // GUI stuff
     QTabWidget* toolTabs;

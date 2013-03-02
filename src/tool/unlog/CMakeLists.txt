@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
-set( UNLOG_SRCS UnlogModule.cpp )
+set( UNLOG_SRCS UnlogModule.cpp
+  DataModule.cpp)
 
 add_library(
   unlog
@@ -11,4 +12,5 @@ add_library(
 target_link_libraries(
   unlog
   portals
+  messages
 )

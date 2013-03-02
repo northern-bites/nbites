@@ -13,9 +13,7 @@ QFile file(QString("./.geometry"));
 Tool::Tool(const char* title) :
     QMainWindow(),
     mainDiagram(),
-    // IF YOU WANT TO SEE LOGS FOR THE TIME BEING, YOU HAVE TO DO THIS
-    // WE WILL FIX THIS HACK ASAP
-    unlogger("/home/ecat/nbites/data/logs/joint"),
+    dataManager(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -27,7 +25,8 @@ Tool::Tool(const char* title) :
 
 {
     // Set up the diagram
-    mainDiagram.addModule(unlogger);
+    mainDiagram.addModule(dataManager);
+    dataManager.addUnlogger("/home/ecat/nbites/data/logs/joints");
 
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
@@ -35,7 +34,6 @@ Tool::Tool(const char* title) :
     connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
     connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
     connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
-
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);

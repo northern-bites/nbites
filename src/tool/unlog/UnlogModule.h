@@ -37,23 +37,76 @@ public:
     UnlogBase(std::string path);
     virtual ~UnlogBase();
 
-protected:
-    // Inheriting classes still need to implement this
-    virtual void run_() = 0;
-
-    // Basic file control
-    void openFile() throw (file_exception);
-    void closeFile();
-    uint32_t readCharBuffer(char* buffer, uint32_t size)
-        const throw (file_read_exception);
-
     // Reads the next sizeof(T) bytes and interprets them as a T
-    template <typename T>
+    template <class T>
     T readValue() {
         T value;
         readCharBuffer((char *)(&value), sizeof(value));
         return value;
     }
+
+    template <class T>
+    T readNextMessage() {
+        // End of file
+        if (feof(file)) {
+            std::cout << "End of log file " << fileName << std::endl;
+            return T();
+        }
+
+        // Read in the next message's size
+        // @see LogModule.h for why this works
+        uint32_t currentMessageSize = readValue<uint32_t>();
+
+        // Keep track of the sizes we've read (to unwind)
+        messageSizes.push_back(currentMessageSize);
+
+       /*
+        * Note: We can't deserialize directly from a file to a protobuf.
+        * We have to read the file's contents into a buffer, then
+        * deserialize from that buffer into the protobuf.
+        */
+
+        // To hold the data read, and the number of bytes read
+        uint32_t bytes;
+        char buffer[currentMessageSize];
+
+        try {
+            // Actual file reading call
+            bytes = readCharBuffer(buffer, currentMessageSize);
+        } catch (std::exception& read_exception) {
+            std::cout << read_exception.what() << std::endl;
+            return T();
+        }
+
+        // If we have actually read some bytes, treat them like a message
+        T currentMessage;
+
+        if (bytes) {
+            // Parse into the message
+            currentMessage.ParseFromString(std::string(buffer, bytes));
+
+            // This is for debugging until the tool is back again
+            std::cout << "\nCurrent Message:\n" <<
+                currentMessage.DebugString();
+
+            return currentMessage;
+        }
+
+        // We read zero bytes at the end of a file w/o hitting feof
+        std::cout << "End of log file " << fileName << std::endl;
+        return currentMessage;
+    }
+
+    // Basic file control
+    void openFile() throw (file_exception);
+    void closeFile();
+
+protected:
+    // Inheriting classes still need to implement this
+    virtual void run_() = 0;
+
+    uint32_t readCharBuffer(char* buffer, uint32_t size)
+        const throw (file_read_exception);
 
     // Keeps track of whether the file is open/closed
     bool fileOpen;
@@ -61,6 +114,8 @@ protected:
     FILE* file;
     // Stores the full path of the file
     std::string fileName;
+    // Keeps track of the sizes of all the reads we've done
+    std::vector<uint32_t> messageSizes;
 };
 
 // Template Class
@@ -88,76 +143,20 @@ protected:
 
         // Reads the next message from the file and puts it on
         // the OutPortal
-        readNextMessage();
+        portals::Message<T> msg(0);
+        *msg.get() = readNextMessage<T>();
+        output.setMessage(msg);
     }
 
     // Reads in the header; called when the file is first opened
     void readHeader()
     {
-        // Shares HEADER definition with log in share/include/LogDefinitions.h
-        int len = HEADER.length();
-
-        char head[len];
-        uint32_t br = readCharBuffer(head, len);
-        std::cout << "Read header from " << fileName << std::endl;
+        Header head = readNextMessage<Header>();
+        // This is for debugging until the tool is back again
+        std::cout << "\nHeader for " << fileName << " :\n" <<
+            head.DebugString();
     }
 
-    bool readNextMessage() {
-        // End of file
-        if (feof(file)) {
-            std::cout << "End of log file " << fileName << std::endl;
-            return false;
-        }
-
-        // Read in the next message's size
-        // @see LogModule.h for why this works
-        uint32_t currentMessageSize = readValue<uint32_t>();
-
-        // Keep track of the sizes we've read (to unwind)
-        messageSizes.push_back(currentMessageSize);
-
-       /*
-        * Note: We can't deserialize directly from a file to a protobuf.
-        * We have to read the file's contents into a buffer, then
-        * deserialize from that buffer into the protobuf.
-        */
-
-        // To hold the data read, and the number of bytes read
-        uint32_t bytes;
-        char buffer[currentMessageSize];
-
-        try {
-            // Actual file reading call
-            bytes = readCharBuffer(buffer, currentMessageSize);
-        } catch (std::exception& read_exception) {
-            std::cout << read_exception.what() << std::endl;
-            return false;
-        }
-
-        // If we have actually read some bytes, treat them like a message
-        if (bytes) {
-            // Create a new message
-            portals::Message<T> currentMessage(0);
-            *currentMessage.get() = T();
-            // Parse into the message
-            currentMessage.get()->ParseFromString(std::string(buffer, bytes));
-
-            // This is for debugging until the tool is back again
-            std::cout << "\nCurrent Message:\n" <<
-                currentMessage.get()->DebugString();
-
-            // Provide the message on the output
-            output.setMessage(currentMessage);
-            return true;
-        }
-
-        // We read zero bytes at the end of a file w/o hitting feof
-        std::cout << "End of log file " << fileName << std::endl;
-        return false;
-    }
-
-    // Keeps track of the sizes of all the reads we've done
-    std::vector<uint32_t> messageSizes;
 };
 
 }

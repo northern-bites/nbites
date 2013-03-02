@@ -1,0 +1,6 @@
+message Header
+{
+    optional int64 timestamp = 1;
+    required string name = 2;
+    required int32 version = 3;
+}

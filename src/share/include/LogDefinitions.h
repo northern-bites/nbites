@@ -2,11 +2,10 @@
 
 #include <cstring>
 #include <exception>
+#include "Header.pb.h"
 
 // Log version--in case we need to upgrade and stay backwards compatible
-static const std::string VERSION = "2.0";
-// Header. This could be updated with more useful information.
-static const std::string HEADER = "NORTHERN BITES LOG FILE VERSION " + VERSION;
+static const int CURRENT_VERSION = 2;
 
 // IO Exceptions
 class read_exception: public std::exception {
