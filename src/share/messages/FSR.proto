@@ -1,0 +1,16 @@
+package messages;
+
+message FSR
+{
+    // Left foot. 
+    optional float FSRLFL = 1; // front left
+    optional float FSRLFR = 2; // front right
+    optional float FSRLRL = 3; // rear left
+    optional float FSRLRR = 4; // rear right
+
+    // Right foot.
+    optional float FSRRFL = 5; // front left
+    optional float FSRRFR = 6; // front right
+    optional float FSRRRL = 7; // rear left
+    optional float FSRRRR = 8; // rear right
+}

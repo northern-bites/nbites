@@ -20,6 +20,7 @@
 #include "FootBumperState.pb.h"
 #include "InertialState.pb.h"
 #include "SonarState.pb.h"
+#include "FSR.pb.h"
 
 #include <alcommon/albroker.h>
 #include <alproxies/almemoryproxy.h>
@@ -57,6 +58,7 @@ namespace man
         portals::OutPortal<messages::FootBumperState> footbumperOutput_;
         portals::OutPortal<messages::InertialState>   inertialsOutput_;
         portals::OutPortal<messages::SonarState>      sonarsOutput_;
+	portals::OutPortal<messages::FSR>             fsrOutput_;
 
     private:
         /*
@@ -112,16 +114,21 @@ namespace man
          */
         void updateSonarsMessage();
 
+	/**
+	 * @brief Updates the FSR message.
+	 */
+	void updateFSRMessage();
+
         /**
          * @brief The main run routine, primarily updates sensor
          *        readings.
          */
         void run_();
 
-        boost::shared_ptr<AL::ALBroker> broker_;
+        boost::shared_ptr<AL::ALBroker>           broker_;
         boost::shared_ptr<AL::ALMemoryFastAccess> fastMemoryAccess_;
-        std::vector<float> sensorValues_;
-        std::vector<std::string> sensorKeys_;
+        std::vector<float>                        sensorValues_;
+        std::vector<std::string>                  sensorKeys_;
     };
     } // namespace sensors
 } // namespace man
