@@ -8,6 +8,7 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "guardian/GuardianModule.h"
 
 namespace man {
 
@@ -23,6 +24,9 @@ private:
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+
+    DiagramThread guardianThread;
+    guardian::GuardianModule guardian;
 
     DiagramThread commThread;
     comm::CommModule comm;

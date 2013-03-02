@@ -6,6 +6,8 @@
 #include <string.h>
 #include <boost/shared_ptr.hpp>
 
+#include "Common.h"
+
 #include "ClickableButton.h"
 
 #include "RoboGrams.h"
@@ -14,6 +16,7 @@
 #include "FootBumperState.pb.h"
 #include "InertialState.pb.h"
 #include "StiffnessControl.pb.h"
+#include "InitialState.pb.h"
 
 namespace man{
 namespace guardian{
@@ -44,14 +47,17 @@ public:
         { useFallProtection = _useFallProtection; };
 
     portals::OutPortal<messages::StiffnessControl> stiffnessControlOutput;
+    portals::OutPortal<messages::InitialState>     initialStateOutput;
 
     portals::InPortal<messages::JointAngles>     jointsInput;
     portals::InPortal<messages::ButtonState>     chestButtonInput;
     portals::InPortal<messages::FootBumperState> footBumperInput;
-    portals::InPortal<messages::InertialState>   intertialInput;
+    portals::InPortal<messages::InertialState>   inertialInput;
 
 private:
+    void resetMessages();
     void checkFalling();
+    bool isFalling(float angle_pos, float angle_vel);
     void checkFallen();
     void checkFeetOnGround();
     void checkBatteryLevels();
@@ -63,9 +69,9 @@ private:
     void executeFallProtection();
     void shutoffGains();
     void enableGains();
-    void ifUpDown();
     void playFile(std::string filePath)const; //non-blocking
     void reloadMan();
+    void initialState();
 
     static const int NO_CLICKS;
     static const int GUARDIAN_FRAME_RATE;

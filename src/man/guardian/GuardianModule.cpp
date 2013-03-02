@@ -26,24 +26,17 @@ const int GuardianModule::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
 
 const int GuardianModule::NO_CLICKS = -1;
 
-//Non blocking!!
-void GuardianModule::playFile(string str)const{
-    // system returns an int.
-    if(system((sout+str+" &").c_str()) != 0)
-        cout << "Roboguardian could not play file." << endl;
-}
-
-
-
 GuardianModule::GuardianModule()
     : portals::Module(),
       stiffnessControlOutput(base()),
+      initialStateOutput(base()),
+      chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
+      leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
+      rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
+      useFallProtection(true)
 //@TODO:
 //      lastTemps(sensors->getBodyTemperatures()),
 //      lastBatteryCharge(sensors->getBatteryCharge()),
-      chestButton(GUARDIAN_FRAME_RATE),
-      leftFootButton(GUARDIAN_FRAME_RATE),
-      rightFootButton(GUARDIAN_FRAME_RATE),
 {
 }
 
@@ -57,6 +50,7 @@ void GuardianModule::run_()
     struct timespec interval, remainder;
     interval.tv_sec = 0;
     interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
+    resetMessages();
     countButtonPushes();
     checkFalling();
     checkFallen();
@@ -70,21 +64,24 @@ void GuardianModule::run_()
     PROF_EXIT(P_ROBOGUARDIAN);
 }
 
+void GuardianModule::resetMessages()
+{
+    portals::Message<messages::InitialState> command(0);
+    command.get()->set_go(true);
+    initialStateOutput.setMessage(command);
+}
+
 void GuardianModule::countButtonPushes()
 {
     footBumperInput.latch();
     chestButtonInput.latch();
 
 
-    chestButton->updateFrame(chestButtonInput.message().get()->pressed());
-    leftFootButton->updateFrame(footBumperInput.message().get()->
-                                l_foot_bumper_left().pressed() ||
-                                footBumperInput.message().get()->
-                                l_foot_bumper_right().pressed());
-    rightFootButton->updateFrame(footBumperInput.message().get()->
-                                 r_foot_bumper_left().pressed() ||
-                                 footBumperInput.message().get()->
-                                 r_foot_bumper_right().pressed())
+    chestButton->updateFrame(chestButtonInput.message().pressed());
+    leftFootButton->updateFrame(footBumperInput.message().l_foot_bumper_left().pressed() ||
+                                footBumperInput.message().l_foot_bumper_right().pressed());
+    rightFootButton->updateFrame(footBumperInput.message().r_foot_bumper_left().pressed() ||
+                                 footBumperInput.message().r_foot_bumper_right().pressed());
 }
 
 /**
@@ -107,7 +104,11 @@ void GuardianModule::checkFalling()
     {
         return;
     }
-    const Inertial inertial  = sensors->getInertial();
+
+    inertialInput.latch();
+
+    struct Inertial inertial = {inertialInput.message().angle_x(),
+                                 inertialInput.message().angle_y() };
 
     /***** Determine if the robot is in the process of FALLING ****/
     //Using just the magnitude:
@@ -149,7 +150,7 @@ void GuardianModule::checkFalling()
         // When falling, execute the fall protection method.
         //cout << "GuardianModule::checkFalling() : FALLING!" << endl;
         falling = true;
-        processFallingProtection();
+        //processFallingProtection(); // Should be called later in run_()
     }
     else if(notFallingFrames > FALLING_FRAMES_THRESH)
     {
@@ -183,7 +184,10 @@ void GuardianModule::checkFallen()
     if (!useFallProtection)
         return;
 
-    const Inertial inertial  = sensors->getInertial();
+    inertialInput.latch();
+
+    struct Inertial inertial = {inertialInput.message().angle_x(),
+                                 inertialInput.message().angle_y() };
 
     /***** Determine if the robot has FALLEN OVER *****/
     const bool fallen_now =
@@ -217,143 +221,150 @@ void GuardianModule::checkFallen()
  * GROUND_FRAMES_THRESH then we set feetOnGround=false
  *
  */
-void GuardianModule::checkFeetOnGround()
-{
-    //this can be higher than the falling thresholds since stopping the walk
-    //engine is less critical
-    static const int GROUND_FRAMES_THRESH = 10;
-    // lower pthan this, the robot is off the ground
-    static const float onGroundFSRThresh = 1.0f;
 
-    /* If the FSRs are broken, we don't want to accidentally assume that we're
-       off the ground (ruins SweetMoves, walking, etc) so this method will stop
-       early and feetOnGround will always be true */
-    if (sensors->percentBrokenFSR() > 0)
-    {
-        feetOnGround = true;
-        return;
-    }
+//@TODO
+// void GuardianModule::checkFeetOnGround()
+// {
+//     //this can be higher than the falling thresholds since stopping the walk
+//     //engine is less critical
+//     static const int GROUND_FRAMES_THRESH = 10;
+//     // lower pthan this, the robot is off the ground
+//     static const float onGroundFSRThresh = 1.0f;
 
-    const FSR left = sensors->getLeftFootFSR();
-    const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
-        left.rearRight;
-    const FSR right = sensors->getRightFootFSR();
-    const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
-        right.rearRight;
+//     /* If the FSRs are broken, we don't want to accidentally assume that we're
+//        off the ground (ruins SweetMoves, walking, etc) so this method will stop
+//        early and feetOnGround will always be true */
+//     if (sensors->percentBrokenFSR() > 0)
+//     {
+//         feetOnGround = true;
+//         return;
+//     }
 
-    // printf("left: %f, right: %f, total: %f\n",
-    //        leftSum, rightSum, (leftSum + rightSum));
+//     const FSR left = sensors->getLeftFootFSR();
+//     const float leftSum = left.frontLeft + left.frontRight + left.rearLeft +
+//         left.rearRight;
+//     const FSR right = sensors->getRightFootFSR();
+//     const float rightSum = right.frontLeft + right.frontRight + right.rearLeft +
+//         right.rearRight;
 
-    // buffer the transition in both directions
-    if (feetOnGround)
-    {
-        if (leftSum + rightSum < onGroundFSRThresh)
-        {
-            groundOffCounter++;
-        }
-        else
-        {
-            groundOffCounter = 0;
-        }
-    }
-    else
-    {
-        if (leftSum + rightSum > onGroundFSRThresh)
-        {
-            groundOnCounter++;
-        }
-        else
-        {
-            groundOnCounter = 0;
-        }
-    }
+//     // printf("left: %f, right: %f, total: %f\n",
+//     //        leftSum, rightSum, (leftSum + rightSum));
 
-    if (groundOffCounter > GROUND_FRAMES_THRESH)
-    {
-        feetOnGround = false;
-        groundOnCounter = groundOffCounter = 0;
-    }
-    else if (groundOnCounter > GROUND_FRAMES_THRESH)
-    {
-        feetOnGround = true;
-        groundOnCounter = groundOffCounter = 0;
-    }
-}
+//     // buffer the transition in both directions
+//     if (feetOnGround)
+//     {
+//         if (leftSum + rightSum < onGroundFSRThresh)
+//         {
+//             groundOffCounter++;
+//         }
+//         else
+//         {
+//             groundOffCounter = 0;
+//         }
+//     }
+//     else
+//     {
+//         if (leftSum + rightSum > onGroundFSRThresh)
+//         {
+//             groundOnCounter++;
+//         }
+//         else
+//         {
+//             groundOnCounter = 0;
+//         }
+//     }
+
+//     if (groundOffCounter > GROUND_FRAMES_THRESH)
+//     {
+//         feetOnGround = false;
+//         groundOnCounter = groundOffCounter = 0;
+//     }
+//     else if (groundOnCounter > GROUND_FRAMES_THRESH)
+//     {
+//         feetOnGround = true;
+//         groundOnCounter = groundOffCounter = 0;
+//     }
+// }
+// TODO TODO END
 
 // We print each time the battery looses ten percent of charge
 //once the charge gets to %30 percent of capacity, we start to say "energy"
-void GuardianModule::checkBatteryLevels()
-{
-    //Constants on 0-10 scale, sensor reading is on 0-1.0 scale
-    static const float LOW_BATTERY_VALUE = 3.0f;
-    static const float EMPTY_BATTERY_VALUE = 0.7f; //start nagging below 7%
+//@TODO
+// void GuardianModule::checkBatteryLevels()
+// {
+//     //Constants on 0-10 scale, sensor reading is on 0-1.0 scale
+//     static const float LOW_BATTERY_VALUE = 3.0f;
+//     static const float EMPTY_BATTERY_VALUE = 0.7f; //start nagging below 7%
 
-    //sometimes we get weird values from the battery (like -9.8...)
-    const float newBatteryCharge =  sensors->getBatteryCharge();
-    if(newBatteryCharge < 0 || newBatteryCharge > 1.0)
-    {
-        return;
-    }
+//     //sometimes we get weird values from the battery (like -9.8...)
+//     const float newBatteryCharge =  sensors->getBatteryCharge();
+//     if(newBatteryCharge < 0 || newBatteryCharge > 1.0)
+//     {
+//         return;
+//     }
 
-    if(newBatteryCharge != lastBatteryCharge)
-    {
-        //covert to a 0 - 10 scale
-        const float newLevel = floor(newBatteryCharge*10.0f);
-        const float oldLevel = floor(lastBatteryCharge*10.0f);
-        if(oldLevel != newLevel && oldLevel > newLevel &&
-           oldLevel - newLevel <= 1.0f)
-        {
-            std::cout << "Guardian: Battery charge is now at "
-                      << 10.0f * newBatteryCharge
-                      << " (was "<< oldLevel <<")"<< std::endl;
+//     if(newBatteryCharge != lastBatteryCharge)
+//     {
+//         //covert to a 0 - 10 scale
+//         const float newLevel = floor(newBatteryCharge*10.0f);
+//         const float oldLevel = floor(lastBatteryCharge*10.0f);
+//         if(oldLevel != newLevel && oldLevel > newLevel &&
+//            oldLevel - newLevel <= 1.0f)
+//         {
+//             std::cout << "Guardian: Battery charge is now at "
+//                       << 10.0f * newBatteryCharge
+//                       << " (was "<< oldLevel <<")"<< std::endl;
 
-            if (newLevel <= LOW_BATTERY_VALUE)
-            {
-                playFile(energy_wav);
-            }
-            else if(newLevel <= EMPTY_BATTERY_VALUE)
-            {
-                playFile(energy_wav); playFile(energy_wav);
-            }
-        }
-    }
-    lastBatteryCharge = newBatteryCharge;
-}
+//             if (newLevel <= LOW_BATTERY_VALUE)
+//             {
+//                 playFile(energy_wav);
+//             }
+//             else if(newLevel <= EMPTY_BATTERY_VALUE)
+//             {
+//                 playFile(energy_wav); playFile(energy_wav);
+//             }
+//         }
+//     }
+//     lastBatteryCharge = newBatteryCharge;
+// }
+// TODO TODO END
 
-void GuardianModule::checkTemperatures()
-{
-    static const float HIGH_TEMP = 40.0f; //deg C
-    static const float TEMP_THRESHOLD = 1.0f; //deg C
-    static const float REALLY_HIGH_TEMP = 50.0f; //deg C
+//@TODO
+// void GuardianModule::checkTemperatures()
+// {
+//     static const float HIGH_TEMP = 40.0f; //deg C
+//     static const float TEMP_THRESHOLD = 1.0f; //deg C
+//     static const float REALLY_HIGH_TEMP = 50.0f; //deg C
 
-    vector<float> newTemps = sensors->getBodyTemperatures();
+//     vector<float> newTemps = sensors->getBodyTemperatures();
 
-    bool sayWarning = false;
-    for(unsigned int joint = 0; joint < Kinematics::NUM_JOINTS; joint++)
-    {
-        const float tempDiff = newTemps[joint] - lastTemps[joint];
-        if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD &&
-           process_micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS)
-        {
-            lastHeatPrintWarning = process_micro_time();
-            std::cout < "Guardian:: TEMP-WARNING: "
-                      << Kinematics::JOINT_STRINGS[joint]
-                      << " is at " << setprecision(1)
-                      << newTemps[joint] <<" deg C"<< setprecision(6) << endl;
-            if(newTemps[joint] >= REALLY_HIGH_TEMP)
-            {
-                sayWarning = true;
-            }
-        }
-    }
-    if(sayWarning &&
-       process_micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS)
-    {
-        playFile(heat_wav);
-        lastHeatAudioWarning = process_micro_time();
-    }
-    lastTemps = newTemps;
-}
+//     bool sayWarning = false;
+//     for(unsigned int joint = 0; joint < Kinematics::NUM_JOINTS; joint++)
+//     {
+//         const float tempDiff = newTemps[joint] - lastTemps[joint];
+//         if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD &&
+//            process_micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS)
+//         {
+//             lastHeatPrintWarning = process_micro_time();
+//             std::cout < "Guardian:: TEMP-WARNING: "
+//                       << Kinematics::JOINT_STRINGS[joint]
+//                       << " is at " << setprecision(1)
+//                       << newTemps[joint] <<" deg C"<< setprecision(6) << endl;
+//             if(newTemps[joint] >= REALLY_HIGH_TEMP)
+//             {
+//                 sayWarning = true;
+//             }
+//         }
+//     }
+//     if(sayWarning &&
+//        process_micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS)
+//     {
+//         playFile(heat_wav);
+//         lastHeatAudioWarning = process_micro_time();
+//     }
+//     lastTemps = newTemps;
+// }
+// TODO TODO END
 
 void GuardianModule::processFallingProtection()
 {
@@ -395,14 +406,6 @@ void GuardianModule::executeFallProtection()
 #endif
 }
 
-void GuardianModule::shutoffGains(){
-    std::cout << "Guardian::shutoffGains()" << std::endl;
-    if(motion_interface != NULL)
-        motion_interface->sendFreezeCommand(REMOVE_GAINS);
-    playFile(stiffness_removed_wav);
-}
-
-
 void GuardianModule::processChestButtonPushes()
 {
     static const int SHUTDOWN_THRESH = 3;
@@ -425,7 +428,7 @@ void GuardianModule::processChestButtonPushes()
     }
 }
 
-void GuardianModulpe::executeShutdownAction() const
+void GuardianModule::executeShutdownAction() const
 {
     std::cout << "Guardian is attempting a shutting down..."<< std::endl;
     playFile(shutdown_wav);
@@ -445,9 +448,12 @@ bool GuardianModule::executeChestClickAction(int nClicks)
         shutoffGains();
         break;
     case 3:
+        enableGains();
+        break;
+    case 4:
+        initialState();
         break;
     case 5:
-        enableGains();
         break;
     case 7:
         break;
@@ -463,16 +469,49 @@ bool GuardianModule::executeChestClickAction(int nClicks)
     return true;
 }
 
+void GuardianModule::shutoffGains(){
+    std::cout << "Guardian::shutoffGains()" << std::endl;
+
+    portals::Message<messages::StiffnessControl> command(0);
+    command.get()->set_remove(true);
+    stiffnessControlOutput.setMessage(command);
+
+    playFile(stiffness_removed_wav);
+}
+
 void GuardianModule::enableGains()
 {
     std::cout << "Guardian::enableGains()" << std::endl;
-    if(motion_interface != NULL)
-        motion_interface->sendFreezeCommand(ENABLE_GAINS);
+
+    portals::Message<messages::StiffnessControl> command(0);
+    command.get()->set_remove(false);
+    stiffnessControlOutput.setMessage(command);
+
     playFile(stiffness_enabled_wav);
 }
 
+void GuardianModule::initialState()
+{
+    std::cout << "Guardian::initialState()" << std::endl;
 
-void GuardianModule::reloadMan() {
+    portals::Message<messages::InitialState> command(0);
+    command.get()->set_go(true);
+    initialStateOutput.setMessage(command);
+}
+
+
+void GuardianModule::reloadMan()
+{
+}
+
+
+//TODO: move to audio enactor.
+//Non blocking!!
+void GuardianModule::playFile(std::string str)const
+{
+    // system returns an int.
+    if(system((sout+str+" &").c_str()) != 0)
+        std::cout << "Roboguardian could not play file." << std::endl;
 }
 
 }

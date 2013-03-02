@@ -1,0 +1,6 @@
+package messages;
+
+message InitialState
+{
+        optional bool go = 1;
+}
