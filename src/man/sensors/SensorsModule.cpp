@@ -11,6 +11,7 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
       inertialsOutput_(base()),
       sonarsOutput_(base()),
       fsrOutput_(base()),
+      batteryOutput_(base()),
       broker_(broker),
       fastMemoryAccess_(new AL::ALMemoryFastAccess()),
       sensorValues_(NUM_SENSOR_VALUES),
@@ -72,6 +73,9 @@ void SensorsModule::initializeSensorFastAccess()
     i++;
     // There is a single chest button.
     sensorKeys_[i] = std::string("Device/SubDeviceList/Chestboard/Button/Sensor/Value");
+    i++;
+    //There is a single battery value.
+    sensorKeys_[i] = std::string("Device/SubDeviceList/Battery/Charge/Sensor/Value");
 
     fastMemoryAccess_->ConnectToVariables(broker_, sensorKeys_);
 
@@ -127,6 +131,7 @@ void SensorsModule::updateSensorValues()
     updateFootbumperMessage();
     updateInertialsMessage();
     updateSonarsMessage();
+    updateBatteryMessage();
 
     //std::cout << "SensorsModule : Sensor values " << std::endl;
     // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
@@ -235,6 +240,15 @@ void SensorsModule::updateFSRMessage()
     fsrMessage.get()->set_rrr(sensorValues_[RFsrRR]);
 
     fsrOutput_.setMessage(fsrMessage);
+}
+
+void SensorsModule::updateBatteryMessage()
+{
+    portals::Message<messages::BatteryState> batteryMessage(0);
+
+    batteryMessage.get()->set_charge(sensorValues_[BatteryCharge]);
+
+    batteryOutput_.setMessage(batteryMessage);
 }
 
 void SensorsModule::run_()

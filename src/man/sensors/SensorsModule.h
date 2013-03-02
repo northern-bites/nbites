@@ -21,6 +21,7 @@
 #include "InertialState.pb.h"
 #include "SonarState.pb.h"
 #include "FSR.pb.h"
+#include "BatteryState.pb.h"
 
 #include <alcommon/albroker.h>
 #include <alproxies/almemoryproxy.h>
@@ -58,6 +59,7 @@ public:
     portals::OutPortal<messages::InertialState>   inertialsOutput_;
     portals::OutPortal<messages::SonarState>      sonarsOutput_;
     portals::OutPortal<messages::FSR>             fsrOutput_;
+    portals::OutPortal<messages::BatteryState>    batteryOutput_;
 
 private:
     /*
@@ -117,6 +119,11 @@ private:
      * @brief Updates the FSR message.
      */
     void updateFSRMessage();
+
+    /**
+     * @brief Updates the Battery message.
+     */
+    void updateBatteryMessage();
 
     /**
      * @brief The main run routine, primarily updates sensor

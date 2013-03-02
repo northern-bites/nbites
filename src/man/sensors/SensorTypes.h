@@ -92,6 +92,9 @@ namespace man
         // The chest push-button.
         ChestboardButton,
 
+        // The battery charge.
+        BatteryCharge,
+
         NUM_SENSOR_VALUES
     };
 
@@ -144,7 +147,8 @@ namespace man
         "LFootBumperRight",
         "RFootBumperLeft",
         "RFootBumperRight",
-        "ChestboardButton"
+        "ChestboardButton",
+        "BatteryCharge"
     };
     } // namespace sensors
 } // namespace man
