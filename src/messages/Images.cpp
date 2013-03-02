@@ -48,7 +48,7 @@ void Image::makeMeWindowOf(const Image& img, int& x0, int& y0, int wd, int ht)
 #ifdef TRACE_BUFFERS
 void PixelBuffer::printTrace(bool releasing) const
 {
-  printf("%s %08X count = %d\n", releasing ? "Releasing" : "Grabbing ", this, referenceCount_);
+  printf("%s %08X count = %d\n", releasing ? "Releasing" : "Grabbing ", (unsigned int)this, referenceCount_);
 }
 #endif
 

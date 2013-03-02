@@ -8,6 +8,7 @@
 // ********************
 #include <assert.h>
 #include <string>
+#include <inttypes.h>
 
 // A primary challenge in designing image classes is that the need to support very efficient
 // pixel operations is at odds with a desire to have an elegant, modular, polymorphic set of
@@ -678,6 +679,8 @@ PackedImage<T>& PackedImage<T>::makeMeCopyOf(const MemoryImage<T>& img, CopyOpti
 // Some useful aliases for memory images
 typedef MemoryImage<unsigned char> MemoryImage8;
 typedef PackedImage<unsigned char> PackedImage8;
+typedef MemoryImage<uint16_t> MemoryImage16;
+typedef PackedImage<uint16_t> PackedImage16;
 
 // ***************
 // *             *
@@ -730,7 +733,77 @@ public:
   //          proper YUVImage (width is a multiple of 4 and x0 is adjusted to start
   //          on a YUYV boundary).
 
-  // HACK: makes it look like a proto to keep RoboGrams happy
+  // HACK: makes YUVImage look like a proto to keep RoboGrams happy
+  void Clear() { return; }
+  std::string DebugString() const { return "Not implemented."; }
+};
+
+// ***********************
+// *                     *
+// *  Threshold Image    *
+// *                     *
+// ***********************
+
+// A ThresholdImage is a packed image of unsigned 16-bit pixels. Every pixel can be one of seven colors.
+// Color segmentation is done in acquire_image_fast in src/man/image. ThresholdImage provides helper functions 
+// to identify pixels via bitwise operations.
+
+class ThresholdImage : public PackedImage16
+{
+  ThresholdImage(const PackedImage16& img) : PackedImage16(img) {}
+  // effect   Construct a copy of a PackedImage16
+  // note     A helper function for this class, the public is not allowed to use it.
+
+public:
+  ThresholdImage() {}
+  // effect   Default construct null image
+
+  ThresholdImage(int wd, int ht) : PackedImage16(wd, ht) {}
+  // effect   Construct new (not yet shared) image on heap of specified size.
+
+  ThresholdImage(uint16_t* pixels, int wd, int ht, int rowPitch) : PackedImage16(pixels, wd, ht, rowPitch) {}
+  // effect   Construct new image at specified address in memory, of specified size and pitch.
+
+  bool isGreen(unsigned char threshColor) const { return threshColor & GreenBit; }
+  // returns  True if pixel passed in is green, false otherwise
+
+  bool isWhite(unsigned char threshColor) const { return threshColor & WhiteBit; }
+  // returns  True if pixel passed in is white, false otherwise
+
+  bool isBlue(unsigned char threshColor) const { return threshColor & BlueBit; }
+  // returns  True if pixel passed in is blue, false otherwise
+
+  bool isYellow(unsigned char threshColor) const { return threshColor & YellowBit; }
+  // returns  True if pixel passed in is yellow, false otherwise
+
+  bool isOrange(unsigned char threshColor) const { return threshColor & OrangeBit; }
+  // returns  True if pixel passed in is orange, false otherwise
+
+  bool isNavy(unsigned char threshColor) const { return threshColor & NavyBit; }
+  // returns  True if pixel passed in is navy, false otherwise
+
+  bool isRed(unsigned char threshColor) const { return threshColor & RedBit; }
+  // returns  True if pixel passed in is red, false otherwise
+
+  bool isUndefined(unsigned char threshColor) const { return threshColor == UndefinedBit; }
+  // returns  True if pixel passed in is undefined, false otherwise
+
+  bool colorsEqual(unsigned char x, unsigned char y) const { return !((x & y) == 0x00); }
+  // returns  True if pixels passed in are the same, false otherwise
+
+  enum Colors {
+    WhiteBit = 0x01,
+    GreenBit = 0x02,
+    BlueBit = 0x04,
+    YellowBit = 0x08,
+    OrangeBit = 0x10,
+    RedBit = 0x20,
+    NavyBit = 0x40,
+    DrawingBit = 0x80, // not sure what this is for, do we need it?
+    UndefinedBit = 0x00
+  };
+
+  // HACK: makes ThresholdImage look like a proto to keep RoboGrams happy
   void Clear() { return; }
   std::string DebugString() const { return "Not implemented."; }
 };
