@@ -70,8 +70,10 @@
 #include "Camera.h"
 #include "ColorParams.h"
 #include "VisionDef.h"
-#include "ThresholdedImage.h"
+#include "Images.h"
 #include "RoboGrams.h"
+
+using namespace messages;
 
 namespace man {
 namespace image {
@@ -79,8 +81,7 @@ namespace image {
 class V4L2ImageTranscriber {
 public:
 
-    V4L2ImageTranscriber(Camera::Type which,
-                         portals::OutPortal<messages::ThresholdedImage> *out);
+    V4L2ImageTranscriber(Camera::Type which);
     virtual ~V4L2ImageTranscriber();
 
     const Camera::Settings* getSettings() const {
@@ -88,8 +89,8 @@ public:
     }
 
     // Methods that are actually useful to other classes
-    bool acquireImage();
-    void initTable(const std::string& filename);
+    YUVImage acquireImage(); // returns YUVImage from kernel land
+    bool releaseBuffer(); // release most recently filled buffer
 
 private:
     // All of the (magical) init methods
@@ -110,12 +111,9 @@ private:
     bool setControlSetting(unsigned int id, int value);
 
     // Used for image acquisition
-    bool releaseBuffer();
+    //bool releaseBuffer();
     // Note: this method blocks until it gets a new image
     bool captureNew();
-
-    // The image will be provided on this OutPortal
-    portals::OutPortal<messages::ThresholdedImage>* outPortal;
 
     // @see Camera.h
     Camera::Settings settings;
@@ -148,34 +146,12 @@ private:
     struct v4l2_buffer* currentBuf;
     unsigned long long timeStamp;
 
-    unsigned char *table;
-
-    // @WTF: Look into what this is
-    ColorParams params;
-
     // Can be used to get info about camera's controls
     // Not used during normal running
     void enumerate_menu();
     void enumerate_controls();
     struct v4l2_queryctrl queryctrl;
     struct v4l2_querymenu querymenu;
-
-    // @WTF: Why do we make this?
-    enum {
-        y0 = 0,
-        u0 = 0,
-        v0 = 0,
-
-        y1 = 256,
-        u1 = 256,
-        v1 = 256,
-
-        yLimit = 128,
-        uLimit = 128,
-        vLimit = 128,
-
-        tableByteSize = yLimit * uLimit * vLimit
-    };
 };
 
 }
