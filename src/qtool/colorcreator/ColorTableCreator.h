@@ -81,6 +81,9 @@ protected slots:
     void imageTabSwitched(int);
 
 private:
+    void loadLatestTable();
+    void serializeTableName(QString latestTableName);
+
     data::DataManager::ptr dataManager;
 
     QTabWidget* imageTabs;
@@ -100,6 +103,7 @@ private:
     viewer::BMPImageViewer* thresholdedImageViewer;
 
     QLabel* colorStats;
+    QLabel* colorTableName;
 
     ColorTable colorTable;
 

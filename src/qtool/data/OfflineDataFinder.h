@@ -12,6 +12,7 @@
 #include <QFileSystemModel>
 #include <QTreeView>
 #include <QHBoxLayout>
+#include <QLabel>
 
 #include "DataFinder.h"
 
@@ -28,6 +29,7 @@ public:
 private:
     void setupFSModel();
     void setupFSBrowser();
+    void setupLogLabels();
     void scanFolderForLogs(QString path);
 
 private slots:
@@ -36,6 +38,8 @@ private slots:
 private:
     QFileSystemModel* fsModel;
     QTreeView* fsBrowser;
+    QLineEdit* logPathLabel;
+    QLabel* logLabel;
 };
 
 }
