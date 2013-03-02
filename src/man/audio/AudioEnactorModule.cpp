@@ -15,37 +15,21 @@ void AudioEnactorModule::run_()
 	AudioIn.latch();
 	messages::AudioCommand audioCommand = AudioIn.message();
 
-	//audioenactor implements a toggle (logic gate) mechanism
-	//every time you send a message, you also must flip the toggle
-
 	//set volume if it's different than now - there will always be a volume
 	//(default 0.95) but it might not have changed
 	if(alspeech.getVolume()!=audioCommand.volume()){
 		alspeech.setVolume(audioCommand.volume());
 	}
 
-
 	if(audioCommand.has_tts_msg()){
 		alspeech.say(audioCommand.tts_msg());
 	}
+
 	if(audioCommand.has_audio_file()) {
 		// system returns an int.
 		if(system(("aplay -q "+audioCommand.audio_file()+" &").c_str()) != 0)
 			std::cout << "AudioEnactor could not play file." << std::endl;
 	}
-
-
-
-
-	/*if(audioCommand.path_to_audio_file()){
-	//herp ALSpeech has no method to deal with audio files right now, that's in guardian
-	}
-	if (audioCommand.text_to_speech_msg()){
-	alspeech.say(audioCommand.text_to_speech_msg());
-	}*/
-
-
-
 }
 
 }
