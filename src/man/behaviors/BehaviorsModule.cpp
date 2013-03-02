@@ -7,21 +7,38 @@ namespace man {
 
 		BehaviorsModule::BehaviorsModule()
 			: Module(),
-			  error_state(false)
-		{}
+			  brain_module(NULL),
+			  brain_instance(NULL),
+			  num_crashed(0)
+		{
+			initializePython();
+			getBrainInstance();
+		}
 
 		void BehaviorsModule::run_()
 		{
 			// If in error, try restarting automatically.
-			static unsigned int num_crashed = 0;
-			if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
+			// If too many consecutive failures, stop python and stop trying.
+			if (num_crashed > NUM_PYTHON_RESTARTS_MAX) {
+				return;
+			} else if (num_crashed == NUM_PYTHON_RESTARTS_MAX) {
+				Py_Finalize();
+				num_crashed++;
+				return;
+			} else if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
 				this->reload_hard();
 				error_state = false;
 				num_crashed++;
 			}
 
+			// Profiler
+			PROF_ENTER(P_PYTHON);
+
+			PROF_ENTER(P_PYTHON);
+
 			// Call main run() method of Brain
 			if (brain_instance != NULL) {
+				// Calls the run method with no args.
 				PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
 				if (result == NULL) {
 					// set Behaviors in error state
@@ -37,6 +54,10 @@ namespace man {
 					Py_DECREF(result);
 				}
 			}
+			// Profiler
+			PROF_EXIT(P_PYRUN);
+
+			PROF_EXIT(P_PYTHON);
 		}
 
 		void BehaviorsModule::reload_hard()
@@ -46,20 +67,6 @@ namespace man {
 			Py_Finalize();
 			// load C extension modules
 			initializePython();
-			// import behaviors.Brain and instantiate a Brain reference
-			import_modules();
-			// instantiate a Brain instance
-			getBrainInstance();
-		}
-
-		void BehaviorsModule::reload_brain()
-		{
-			if (brain_module == NULL)
-				if (!import_modules())
-					return;
-
-			// reload the Brain module
-			PyImport_ReloadModule(brain_module);
 			// instantiate a Brain instance
 			getBrainInstance();
 		}
@@ -94,8 +101,8 @@ namespace man {
 			//TODO: figure out if we still need this
 			// Enter the current working directory into the pyton module path
 #if defined OFFLINE || defined STRAIGHT
-			string dir1 = NBITES_DIR"/build/qtool";
-			string dir2 = NBITES_DIR"/build/qtool/man";
+			string dir1 = NBITES_DIR"/build/tool";
+			string dir2 = NBITES_DIR"/build/tool/man";
 			const char* cwd = "";
 #else
 			const char* cwd = "/home/nao/nbites/lib";
@@ -125,7 +132,7 @@ namespace man {
 			}
 		}
 
-		bool BehaviorsModule::import_modules()
+		bool BehaviorsModule::import_brain()
 		{
 			// Load Brain module
 			if (brain_module == NULL) {
@@ -152,7 +159,7 @@ namespace man {
 		void BehaviorsModule::getBrainInstance()
 		{
 			if (brain_module == NULL)
-				if (!import_modules())
+				if (!import_brain())
 					return;
 
 			// drop old reference
@@ -160,12 +167,14 @@ namespace man {
 			// grab instantiate and hold a reference to a new behaviors.Brain.Brain()
 			PyObject *dict = PyModule_GetDict(brain_module);
 			PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
-			if (brain_class != NULL)
-				brain_instance = PyObject_CallObject(brain_class, NULL);
-			else
+			if (brain_class != NULL) {
+				// Constructs brain object with args
+				int arg1 = 0; //placeholder arguments
+				int arg2 = 0;
+				PyObject brain_constructor_args = Py_buildValue("(ii)",arg1, arg2);
+				brain_instance = PyObject_CallObject(brain_class, brain_constructor_args);
+			} else {
 				brain_instance = NULL;
-
-			if (brain_instance == NULL) {
 				fprintf(stderr, "Error accessing behaviors.Brain.Brain\n");
 				if (PyErr_Occurred())
 					PyErr_Print();
@@ -173,7 +182,6 @@ namespace man {
 					fprintf(stderr, "  No error available\n");
 			}
 
-			// Successfully reloaded
 			error_state = (brain_instance == NULL);
 		}
 	}

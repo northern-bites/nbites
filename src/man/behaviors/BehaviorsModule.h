@@ -19,8 +19,6 @@ namespace man {
 
 			// reinitialize and reload the Python interpreter
 			void reload_hard();
-			// reload Brain module
-			void reload_brain();
 			// current Behaviors error status
 			bool inErrorState() { return error_state; }
 
@@ -45,6 +43,7 @@ namespace man {
 			PyObject *module_helper;//how is this used currently?
 			PyObject *brain_module;
 			PyObject *brain_instance;
+			unsigned int num_crashed;
 		};
 	}
 }
