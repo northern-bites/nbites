@@ -5,11 +5,14 @@ static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 namespace man {
 	namespace behaviors {
 
-		BehaviorsModule::BehaviorsModule()
-			: Module(),
+		BehaviorsModule::BehaviorsModule(unsigned int player_num, unsigned int team_num)
+			: portals::Module(),
 			  brain_module(NULL),
 			  brain_instance(NULL),
-			  num_crashed(0)
+			  num_crashed(0),
+			  player_number(player_num),
+			  team_number(team_num),
+			  ledCommandOut(base())
 		{
 			initializePython();
 			getBrainInstance();
@@ -32,14 +35,17 @@ namespace man {
 			}
 
 			// Profiler
-			PROF_ENTER(P_PYTHON);
+			//PROF_ENTER(P_PYTHON);
 
-			PROF_ENTER(P_PYTHON);
+			//PROF_ENTER(P_PYTHON);
 
 			// Call main run() method of Brain
 			if (brain_instance != NULL) {
+				// Serialize messages to send into python.
+				serializeInMessages();
+
 				// Calls the run method with no args.
-				PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
+				PyObject *result = PyObject_CallMethod(brain_instance, "run", "(s#)", in_proto1, in_size1);
 				if (result == NULL) {
 					// set Behaviors in error state
 					error_state = true;
@@ -51,13 +57,36 @@ namespace man {
 						fprintf(stderr, "  No Python exception information available\n");
 					}
 				} else {
+					// Retrieve serialized out messages.
+					parseOutMessages(result);
+					// Send out messages.
+					portals::Message<messages::LedCommand> ledCommand(0);
+					ledCommand.ParseFromArray(out_proto1,out_size1);
+					ledCommandOut.setMessage(ledCommand);
+
 					Py_DECREF(result);
 				}
 			}
 			// Profiler
-			PROF_EXIT(P_PYRUN);
+			//PROF_EXIT(P_PYRUN);
 
-			PROF_EXIT(P_PYTHON);
+			//PROF_EXIT(P_PYTHON);
+		}
+
+		void BehaviorsModule::serializeInMessages()
+		{
+			initialStateIn.latch();
+			// Size that serialized message will be.
+			in_size1 = initialStateIn.message().ByteSize();
+			// Set in_proto to be the serialized message.
+			initialStateIn.message().SerializeToArray(in_proto1,in_size1);
+		}
+
+		void BehaviorsModule::parseOutMessages(PyObject *tuple)
+		{
+			PyArg_UnpackTuple(tuple, "name", 1, 1, &out_serial1);
+			PyString_AsStringAndSize(out_serial1, &out_proto1, out_size_t1);
+			out_size1 = PyLong_AsLong(PyLong_FromSsize_t(*out_size_t1));
 		}
 
 		void BehaviorsModule::reload_hard()
@@ -169,9 +198,7 @@ namespace man {
 			PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
 			if (brain_class != NULL) {
 				// Constructs brain object with args
-				int arg1 = 0; //placeholder arguments
-				int arg2 = 0;
-				PyObject brain_constructor_args = Py_buildValue("(ii)",arg1, arg2);
+				PyObject *brain_constructor_args = Py_BuildValue("(ii)",player_number,team_number);
 				brain_instance = PyObject_CallObject(brain_class, brain_constructor_args);
 			} else {
 				brain_instance = NULL;

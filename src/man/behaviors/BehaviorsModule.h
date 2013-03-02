@@ -14,7 +14,7 @@ namespace man {
 		class BehaviorsModule : public portals::Module {
 
 		public:
-			BehaviorsModule();
+			BehaviorsModule(unsigned int player_num, unsigned int team_num);
 			virtual ~BehaviorsModule() {}
 
 			// reinitialize and reload the Python interpreter
@@ -35,7 +35,7 @@ namespace man {
 			void modifySysPath();
 			// Import the util.module_helper and noggin.Brain modules
 			// Note: these are not "real" modules like Motion or Sensors
-			bool import_modules();
+			bool import_brain();
 			// Instantiate a Brain instance
 			void getBrainInstance();
 
@@ -44,6 +44,27 @@ namespace man {
 			PyObject *brain_module;
 			PyObject *brain_instance;
 			unsigned int num_crashed;
+			unsigned int player_number;
+			unsigned int team_number;
+
+			// Latch protobufs and serialize them
+			void serializeInMessages();
+			// Parse python protobufs
+			void parseOutMessages(PyObject *tuple);
+
+			// message variables
+			char *in_proto1;
+			unsigned int in_size1;
+			PyObject *out_serial1;
+			char *out_proto1;
+			Py_ssize_t *out_size_t1;
+			long out_size1;
+
+		public:
+			// portals
+			// note: order of portals matches message variable names
+			portals::InPortal<messages::InitialState> initialStateIn;
+			portals::OutPortal<messages::LedCommand> ledCommandOut;
 		};
 	}
 }
