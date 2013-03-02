@@ -24,9 +24,10 @@ private:
     void startSubThreads();
 
     DiagramThread sensorsThread;
-    sensors::SensorsModule sensors;
-
     DiagramThread commThread;
+	DiagramThread cognitionThread;
+
+
     comm::CommModule comm;
     sensors::SensorsModule sensors;
 	vision::VisionModule vision;

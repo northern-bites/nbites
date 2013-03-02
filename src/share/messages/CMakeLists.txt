@@ -30,7 +30,8 @@ add_custom_command(
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-set( PROTOS_SRCS ${PROTO_GEN} )
+set( PROTOS_SRCS ${PROTO_GEN} 
+		 )
 
 ############################ Add sources
 

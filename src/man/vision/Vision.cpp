@@ -144,7 +144,8 @@ void Vision::copyImage(const byte* image) {
 
 void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot,
 			 const JointAngles& ja, const InertialState& inert) {
-
+	
+	
     yImg = y_top;
     uImg = y_top + AVERAGED_IMAGE_SIZE;
     vImg = uImg + AVERAGED_IMAGE_SIZE;

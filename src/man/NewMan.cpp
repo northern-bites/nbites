@@ -9,7 +9,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       sensorsThread("sensors"),
       sensors(broker),
       commThread("comm"),
-      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
+      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+	  cognitionThread("cognition"),
 	  imageTranscriber(),
 	  vision()
 {
@@ -21,9 +22,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Sensors **/
     sensorsThread.addModule(sensors);
-	sensorsThread.addModule(imageTranscriber);
-	sensorsThread.addModule(vision);
-    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
+	
+	
+	/** Cognition **/
+	cognitionThread.addModule(imageTranscriber);
+	cognitionThread.addModule(vision);
 
     /** Comm **/
     commThread.addModule(comm);
@@ -39,6 +42,7 @@ void Man::startSubThreads()
 {
     sensorsThread.start();
     commThread.start();
+	cognitionThread.start();
 }
 
 }
