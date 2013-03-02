@@ -7,6 +7,7 @@
 #include "RoboGrams.h"
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
+#include "image/ImageTranscriberModule.h"
 
 namespace man {
 
@@ -19,6 +20,9 @@ public:
 private:
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+
+    DiagramThread cognitionThread;
+    image::ImageTranscriberModule image;
 };
 
 }

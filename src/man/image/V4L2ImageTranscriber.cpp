@@ -280,7 +280,6 @@ bool V4L2ImageTranscriber::acquireImage() {
     uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
     if (current_image) {
         Message<ThresholdedImage> image(0);
-        *image.get() = *(new ThresholdedImage());
 
         //PROF_ENTER(P_ACQUIRE_IMAGE);
         ImageAcquisition::acquire_image_fast(table, params, current_image,
