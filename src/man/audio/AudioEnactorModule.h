@@ -1,7 +1,7 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "AlSpeech.h"
+#include "ALSpeech.h"
 #include "alcommon/albroker.h"
 #include "Audio.pb.h"
 
@@ -18,7 +18,7 @@ namespace man {
 
 		protected:
 			virtual void run_();
-			AlSpeech alspeech;
+			ALSpeech alspeech;
 		};
 
 	}

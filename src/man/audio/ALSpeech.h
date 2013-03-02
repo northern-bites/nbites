@@ -3,7 +3,7 @@
 
 #include <string>
 #include "alproxies/altexttospeechproxy.h"
-#include "Speech.h"
+#include "corpus/Speech.h"
 
 /**
  * An interface to the Aldebaran Text To Speech

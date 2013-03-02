@@ -8,7 +8,7 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
-#include "led/LedEnactorModule.h"
+#include "audio/AudioEnactorModule.h"
 #include "testModule/TestModule.h"
 
 namespace man {
@@ -32,7 +32,7 @@ private:
 
     DiagramThread cognitionThread;
 	TestModule test;
-	led::LedEnactorModule leds;
+	audio::AudioEnactorModule audio;
 };
 
 }
