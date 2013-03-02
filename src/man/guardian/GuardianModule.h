@@ -17,6 +17,8 @@
 #include "InertialState.pb.h"
 #include "StiffnessControl.pb.h"
 #include "InitialState.pb.h"
+#include "FeetOnGround.pb.h"
+#include "FSR.pb.h"
 
 namespace man{
 namespace guardian{
@@ -57,7 +59,6 @@ public:
     portals::InPortal<messages::FSR>             fsrInput;
 
 private:
-    void resetMessages();
     void checkFalling();
     bool isFalling(float angle_pos, float angle_vel);
     void checkFallen();

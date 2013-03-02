@@ -51,7 +51,6 @@ void GuardianModule::run_()
     struct timespec interval, remainder;
     interval.tv_sec = 0;
     interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
-    resetMessages();
     countButtonPushes();
     checkFalling();
     checkFallen();
@@ -63,13 +62,6 @@ void GuardianModule::run_()
     frameCount++;
     nanosleep(&interval, &remainder);
     PROF_EXIT(P_ROBOGUARDIAN);
-}
-
-void GuardianModule::resetMessages()
-{
-    portals::Message<messages::InitialState> command(0);
-    command.get()->set_go(true);
-    initialStateOutput.setMessage(command);
 }
 
 void GuardianModule::countButtonPushes()
@@ -510,7 +502,7 @@ void GuardianModule::initialState()
     std::cout << "Guardian::initialState()" << std::endl;
 
     portals::Message<messages::InitialState> command(0);
-    command.get()->set_go(!lastInitial);
+    command.get()->set_toggle(!lastInitial);
     initialStateOutput.setMessage(command);
 
     lastInitial = !lastInitial;
