@@ -7,6 +7,7 @@
 // *                  *
 // ********************
 #include <assert.h>
+#include <string>
 
 // A primary challenge in designing image classes is that the need to support very efficient
 // pixel operations is at odds with a desire to have an elegant, modular, polymorphic set of
@@ -67,6 +68,8 @@
 // *  Image Abstract Base Class  *
 // *                             *
 // *******************************
+
+namespace messages {
 
 class Image
 {
@@ -618,18 +621,18 @@ void PackedImage<T>::makeCopyOptions(CopyOptions co, int& wd, int& ht)
   switch (co)
   {
   case JustPixels:
-    if (width() < wd)
-      wd = width();
-    if (height() < ht)
-      ht = height();
+    if (this->width() < wd)
+      wd = this->width();
+    if (this->height() < ht)
+      ht = this->height();
     break;
 
   case Grow:
-    if (wd <= width() && ht <= height())
+    if (wd <= this->width() && ht <= this->height())
       break;
 
   case ExactSize:
-    if (wd != width() || ht != height())
+    if (wd != this->width() || ht != this->height())
       *this = PackedImage(wd, ht);
     break;
   }
@@ -645,7 +648,7 @@ PackedImage<T>& PackedImage<T>::makeMeCopyOf(const Image& img, CopyOptions co)
   // Here is a good example of a memory image pixel loop.
   for (int y = 0; y < ht; ++y)
   {
-    T* p = pixelAddress(0, y);
+    T* p = this->pixelAddress(0, y);
     for (int x = 0; x < wd; ++x)
       *p++ = (T)img.getPixel(x, y);
   }
@@ -664,7 +667,7 @@ PackedImage<T>& PackedImage<T>::makeMeCopyOf(const MemoryImage<T>& img, CopyOpti
  for (int y = 0; y < ht; ++y)
   {
     T* src = img.pixelAddress(0, y);
-    T* dst =     pixelAddress(0, y);
+    T* dst =     this->pixelAddress(0, y);
     for (int x = 0; x < wd; ++x, src += img.pixelPitch())
       *dst++ = *src;
   }
@@ -717,11 +720,6 @@ public:
   //          destroying it when it goes out of scope. Of course the pixels may be on the heap in
   //          a pixel buffer, but those buffers are separate from instances of image classes. 
 
-  YUVPrimeImage primeImage() const;
-  // returns  An image that is the YUV image with the two Y values combined into one.
-  // notes    This is slow. Because we are adding together the Y values, we create a new memory
-  //          block, rather than share pixels. Runs in the size of the image, not small constant time
-
   YUVImage& makeMeCopyOf(const Image&       , CopyOptions);
   YUVImage& makeMeCopyOf(const MemoryImage8&, CopyOptions);
   // note     Just like the ones in PackedImage<T>, but guarantee that the result is a
@@ -731,86 +729,11 @@ public:
   // note     Just like the one in PackedImage<T>, but guarantee that the result is a
   //          proper YUVImage (width is a multiple of 4 and x0 is adjusted to start
   //          on a YUYV boundary).
+
+  // HACK: makes it look like a proto to keep RoboGrams happy
+  void Clear() { return; }
+  std::string DebugString() const { return "Not implemented."; }
 };
+}
 
-// ***********************
-// *                     *
-// *  Threshold Image  *
-// *                     *
-// ***********************
-
-// A ThresholdImage is a packed image of unsigned 8-bit pixels. Each pixel is one of 7 colors.
-// Pixel values are determined via color table lookup in acquire_image_fast. Helper methods for
-// identifying colors are provided.
-
-class ThresholdImage : public PackedImage8
-{
-  ThresholdImage(const PackedImage8& img) : PackedImage8(img) {}
-  // effect   Construct a copy of a PackedImage8
-  // note     A helper function for this class, the public is not allowed to use it.
-
-
-public:
-  ThresholdImage() {}
-  // effect   Default construct null image
-
-  ThresholdImage(int wd, int ht) : PackedImage8(wd, ht) {}
-  // effect   Construct new (not yet shared) image on heap of specified size.
-
-  ThresholdImage(unsigned char* pixels, int wd, int ht, int rowPitch) : PackedImage8(pixels, wd, ht, rowPitch) {}
-  // effect   Construct new image at specified address in memory, of specified size and pitch.
-
-  static inline const bool ThresholdImage::isGreen(unsigned char threshColor)
-  {
-    return threshColor & GREEN_BIT;
-  } 
-
-  static inline const bool ThresholdImage::isWhite(unsigned char threshColor)
-  {
-    return threshColor & WHITE_BIT;
-  }
-
-  static inline const bool ThresholdImage::isBlue(unsigned char threshColor)
-  {
-    return threshColor & BLUE_BIT;
-  }
-
-  static inline const bool ThresholdImage::isYellow(unsigned char threshColor)
-  {
-    return threshColor & YELLOW_BIT;
-  }
-
-  static inline const bool ThresholdImage::isOrange(unsigned char threshColor)
-  {
-    return threshColor & ORANGE_BIT;
-  }
-
-  static inline const bool ThresholdImage::isNavy(unsigned char threshColor)
-  {
-    return threshColor & NAVY_BIT;
-  }
-
-  static inline const bool ThresholdImage::isRed(unsigned char threshColor)
-  {
-    return threshColor & RED_BIT;
-  }
-
-  static inline const bool ThresholdImage::isUndefined(unsigned char threshColor)
-  {
-    return threshColor == 0x00;
-  }
-
-  static inline const bool ThresholdImage::colorsEqual(unsigned char x, unsigned char y) 
-  {
-    return !((x & y) == 0x00);
-  }
-
-  static const int WHITE_BIT = 0x01;
-  static const int GREEN_BIT = 0x02;
-  static const int BLUE_BIT = 0x04;
-  static const int YELLOW_BIT = 0x08;
-  static const int ORANGE_BIT = 0x10;
-  static const int RED_BIT = 0x20;
-  static const int NAVY_BIT = 0x40;
-};
 #endif

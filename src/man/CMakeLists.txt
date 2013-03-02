@@ -51,10 +51,6 @@ include_directories( ../messages )
 add_subdirectory( common )
 include_directories( common )
 
-# Actual subdirectories
-add_subdirectory( common )
-include_directories( common )
-
 # Actual modules
 add_subdirectory( log )
 add_subdirectory( sensors )

@@ -7,6 +7,8 @@
 // *                             *
 // *******************************
 
+namespace messages {
+
 void Image::makeMeWindowOf(const Image& img, int& x0, int& y0, int wd, int ht)
 {
   // Top and left intersection
@@ -183,7 +185,7 @@ YUVImage& YUVImage::makeMeCopyOf(const Image& img, CopyOptions co)
   int ht = img.height();
   makeCopyOptions(co, wd, ht);
 
-  PackedImage8::makeMeCopyOf(img, PackedImage::JustPixels);
+  PackedImage8::makeMeCopyOf(img, PackedImage8::JustPixels);
   return *this;
 }
 
@@ -191,4 +193,5 @@ YUVImage& YUVImage::makeMeCopyOf(const MemoryImage8& img, CopyOptions co)
 {
   PackedImage8::makeMeCopyOf(img.window(0, 0, img.width() & ~3, img.height()), co);
   return *this;
+}
 }
