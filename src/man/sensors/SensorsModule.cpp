@@ -12,6 +12,7 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
       footbumperOutput_(base()),
       inertialsOutput_(base()),
       sonarsOutput_(base()),
+      fsrOutput_(base()),
       broker_(broker),
       fastMemoryAccess_(new AL::ALMemoryFastAccess()),
       sensorValues_(NUM_SENSOR_VALUES),
@@ -140,11 +141,13 @@ void SensorsModule::updateJointsMessage()
     jointsMessage.get()->set_l_shoulder_pitch(sensorValues_[LShoulderPitch]);
     jointsMessage.get()->set_l_shoulder_roll(sensorValues_[LShoulderRoll]);
     jointsMessage.get()->set_l_elbow_yaw(sensorValues_[LElbowYaw]);
+    jointsMessage.get()->set_l_elbow_roll(sensorValues_[LElbowRoll]);
     jointsMessage.get()->set_l_wrist_yaw(sensorValues_[LWristYaw]);
     jointsMessage.get()->set_l_hand(sensorValues_[LHand]);
     jointsMessage.get()->set_r_shoulder_pitch(sensorValues_[RShoulderPitch]);
     jointsMessage.get()->set_r_shoulder_roll(sensorValues_[RShoulderRoll]);
     jointsMessage.get()->set_r_elbow_yaw(sensorValues_[RElbowYaw]);
+    jointsMessage.get()->set_r_elbow_roll(sensorValues_[RElbowRoll]);
     jointsMessage.get()->set_r_wrist_yaw(sensorValues_[RWristYaw]);
     jointsMessage.get()->set_r_hand(sensorValues_[RHand]);
     jointsMessage.get()->set_l_hip_yaw_pitch(sensorValues_[LHipYawPitch]);
@@ -210,6 +213,25 @@ void SensorsModule::updateSonarsMessage()
     sonarsMessage.get()->set_us_right(sensorValues_[USRight]);
 
     sonarsOutput_.setMessage(sonarsMessage);
+}
+
+void SensorsModule::updateFSRMessage()
+{
+    portals::Message<messages::FSR> fsrMessage(0);
+
+    // Left foot FSR values.
+    fsrMessage.get()->set_fsr_lfl(sensorValues_[LFsrFL]);
+    fsrMessage.get()->set_fsr_lfr(sensorValues_[LFsrFR]);
+    fsrMessage.get()->set_fsr_lrl(sensorValues_[LFsrRL]);
+    fsrMessage.get()->set_fsr_lrr(sensorValues_[LFsrRR]);
+
+    // Right foot FSR values.
+    fsrMessage.get()->set_fsr_rfl(sensorValues_[RFsrFL]);
+    fsrMessage.get()->set_fsr_rfr(sensorValues_[RFsrFR]);
+    fsrMessage.get()->set_fsr_rrl(sensorValues_[RFsrRL]);
+    fsrMessage.get()->set_fsr_rrr(sensorValues_[RFsrRR]);
+
+    fsrOutput_.setMessage(fsrMessage);
 }
 
 void SensorsModule::run_()
