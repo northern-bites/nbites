@@ -12,11 +12,6 @@ BOOST_PYTHON_MODULE(noggin_constants)
 {
     // Switch board
     scope().attr("LOG_LOC") = LOG_LOC;
-    scope().attr("LOG_COMM") = LOG_COMM;
-
-    // Comm
-    scope().attr("PACKET_HEADER") = PY_PACKET_HEADER;
-    scope().attr("NUM_PACKET_ELEMENTS") = NUM_PACKET_ELEMENTS;
 
     // Walk time
     scope().attr("TIME_STEP") = TIME_STEP;

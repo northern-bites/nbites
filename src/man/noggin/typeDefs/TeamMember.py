@@ -1,7 +1,7 @@
 from objects import (RobotLocation, Location)
+import comm
 from math import fabs
 import noggin_constants as NogginConstants
-import time
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
                     NogginConstants.OPP_GOALBOX_MIDDLE_Y)
@@ -9,7 +9,7 @@ OPP_GOAL_LEFT_POST = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
                               NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
 OPP_GOAL_RIGHT_POST = Location(NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
                               NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y)
-PACKET_DEAD_PERIOD = 4
+
 DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_OFFENDER_NUMBER = 3
@@ -34,19 +34,14 @@ class TeamMember(RobotLocation):
     """class for keeping track of teammates' info """
 
     def __init__(self, tbrain=None):
-        '''variables include lots from the Packet class'''
         RobotLocation.__init__(self, 0.0, 0.0, 0.0)
-        # things in the Packet()
         self.playerNumber = 0
         self.ballDist = 0
         self.ballBearing = 0
-        self.ballX = 0
-        self.ballY = 0
         self.ballOn = False
         self.role = None
         self.subRole = None
         self.chaseTime = 0
-        self.lastPacketTime = time.time()
 
         #other info we want stored
         self.brain = tbrain # brain instance
@@ -54,48 +49,39 @@ class TeamMember(RobotLocation):
         self.grabbing = False
         self.dribbling = False
 
-    def update(self, packet):
+    def update(self, info):
         '''
-        receives a packet, updates teammate information. packets received
-        have already been verified by timestamp system, so we can assume
-        they are LEGIT.
+        Updates information from latest Comm
         '''
 
-        # stores packet information locally
-        self.playerNumber = packet.playerNumber
-        self.x = packet.playerX
-        self.y = packet.playerY
-        self.h = packet.playerH
-        self.ballDist = packet.ballDist
-        self.ballBearing = packet.ballBearing
-        self.ballX = packet.ballX
-        self.ballY = packet.ballY
-        self.ballOn = packet.ballOn
-        self.role = packet.role
-        self.subRole = packet.subRole
-        self.chaseTime = packet.chaseTime
+        # stores comm information locally
+        self.playerNumber = info.number
+        self.x = info.x
+        self.y = info.y
+        self.h = info.h
+        self.ballOn = info.ballOn
+        self.ballDist = info.ballDist
+        self.ballBearing = info.ballBearing
+        self.role = info.role
+        self.subRole = info.subRole
+        self.chaseTime = info.chaseTime
+        self.active = info.active
 
         # calculates ball localization distance, bearing
         self.bearingToGoal = self.getBearingToGoal()
-        # if we are recieving packets, teammate is active
-        self.active = True
-        self.grabbing = (self.ballDist <=
+        self.grabbing = (self.active and self.ballDist <=
                          BALL_TEAMMATE_DIST_GRABBING) and \
                          (fabs(self.ballBearing) <
                           BALL_TEAMMATE_BEARING_GRABBING)
 
         #potential problem when goalie is grabbing?
         #only going to be dribbling or grabbing if you see the ball
-        self.dribbling = self.ballDist <= \
-                          BALL_TEAMMATE_DIST_DRIBBLING
-
-        self.lastPacketTime = time.time()
-
+        self.dribbling = (self.active and self.ballDist <=
+                          BALL_TEAMMATE_DIST_DRIBBLING)
 
     def updateMe(self):
         """
-        updates my information as a teammate (since we don't get our own
-        packets)
+        updates my information as a teammate (since we may not get our own packets)
         """
 
         my = self.brain.my
@@ -104,11 +90,10 @@ class TeamMember(RobotLocation):
         self.x = my.x
         self.y = my.y
         self.h = my.h
+        self.ballOn = ball.vis.on
         self.ballDist = ball.loc.dist
         self.ballBearing = ball.loc.bearing
-        self.ballX = ball.loc.x
-        self.ballY = ball.loc.y
-        self.ballOn = ball.vis.on
+        self.ballDist = ball.loc.dist
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
@@ -116,21 +101,20 @@ class TeamMember(RobotLocation):
         self.active = (not self.brain.gameController.currentState ==
                        'gamePenalized')
 
-        self.dribbling = self.ballDist <= \
-                         BALL_TEAMMATE_DIST_DRIBBLING
+        self.dribbling = (self.active and self.ballDist <=
+                         BALL_TEAMMATE_DIST_DRIBBLING)
 
-        self.grabbing = (self.ballDist <=
+        self.grabbing = (self.active and self.ballDist <=
                          BALL_TEAMMATE_DIST_GRABBING) and \
                          (fabs(self.ballBearing) <
                           BALL_TEAMMATE_BEARING_GRABBING)
-
-        self.lastPacketTime = time.time()
 
     def reset(self):
         '''Reset all important Teammate variables'''
         self.x = 0
         self.y = 0
         self.h = 0
+        self.ballOn = 0
         self.ballDist = 0
         self.ballBearing = 0
         self.role = None
@@ -220,24 +204,10 @@ class TeamMember(RobotLocation):
     def isPenalized(self):
         """
         this checks GameController to see if a player is penalized.
-        this check is more redundant than anything, because our players stop
-        sending packets when they are penalized, so they will most likely
-        fall under the isTeammateDead() check anyways.
         """
-        #penalty state is the first item the player tuple [0]
-        #penalty state == 1 is penalized
         return (
-            self.brain.gameController.gc.players(self.playerNumber)[0]!=0
+            self.brain.comm.gd.isOurPlayerPenalized(self.playerNumber)
            )
-
-    def isDead(self):
-        """
-        returns True if teammates last timestamp is sufficiently behind ours.
-        however, the bot could still be on but sending really laggy packets.
-        """
-        if ((self.brain.time + PACKET_DEAD_PERIOD) < self.lastPacketTime):
-            print "\nTIME GOT RESET! AH!!!!!!!!!!!!!!!!!!!\n"
-        return (PACKET_DEAD_PERIOD < (self.brain.time - self.lastPacketTime))
 
     def __str__(self):
         return "I am player number " + self.playerNumber

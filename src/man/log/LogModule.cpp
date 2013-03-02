@@ -42,7 +42,7 @@ void LogBase::writeCharBuffer(const char* buffer, uint32_t size)
     Write* current = &ongoing.back();
 
     // Copy in the buffer
-    current->buffer = buffer;
+    current->buffer = std::string(buffer, size);
 
     // Recommended by aio--zeroes the CB
     memset(&current->control, 0, sizeof(current->control));

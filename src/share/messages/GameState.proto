@@ -1,0 +1,33 @@
+package messages;
+
+message GameState
+{
+        optional uint32 players_per_team = 1;
+        optional uint32 state = 2;
+        optional bool   first_half = 3;
+        optional uint32 kick_off_team = 4;
+        optional uint32 secondary_state = 5;
+        optional uint32 drop_in_team = 6;
+        optional uint32 drop_in_time = 7;
+        optional uint32 secs_remaining = 8;
+
+        optional bool have_remote_gc = 9;
+
+        repeated TeamInfo team = 10;
+}
+
+message TeamInfo
+{
+        optional uint32 team_number = 1;
+        optional uint32 team_color = 2;
+        optional uint32 score = 3;
+        optional uint32 goal_color =4;
+
+        repeated RobotInfo player = 5;
+}
+
+message RobotInfo
+{
+        optional uint32 penalty = 1;
+        optional uint32 secs_left = 2;
+}
