@@ -1,8 +1,8 @@
 /**
- * @class OfflineDataFinder
+ * @class DataSelector
  *
  * Extends DataFinder
- * A widget that lets the user browse his local files for a log
+ * A widget that lets the user browse her local files for a log
  *
  * @author Octavian Neamtu <oneamtu89@gmail.com>
  */
@@ -14,17 +14,17 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-#include "DataFinder.h"
+namespace tool {
 
-namespace qtool {
-namespace data {
-
-class OfflineDataFinder : public DataFinder {
-    Q_OBJECT
+class DataSelector : public QWidget {
+    Q_OBJECT;
 
 public:
-    OfflineDataFinder(QWidget *parent = 0);
-    ~OfflineDataFinder();
+    DataSelector(QWidget *parent = 0);
+    ~DataSelector();
+
+signals:
+    void signalNewDataSet(std::vector<std::string> files);
 
 private:
     void setupFSModel();
@@ -42,5 +42,4 @@ private:
     QLabel* logLabel;
 };
 
-}
 }

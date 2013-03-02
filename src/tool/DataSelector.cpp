@@ -1,22 +1,18 @@
-#include "OfflineDataFinder.h"
+#include "DataSelector.h"
+#include "PathConfig.h"
+#include "LogDefinitions.h"
 
 #include <iostream>
+#include <vector>
 #include <QCoreApplication>
 #include <QLineEdit>
 
-#include "NaoPaths.h"
-#include "io/FileInProvider.h"
-
-namespace qtool {
-namespace data {
-
-using namespace common::io;
-using namespace common::paths;
+namespace tool {
 
 static const int DEFAULT_NAME_COLUMN_WIDTH = 300;
 
-OfflineDataFinder::OfflineDataFinder(QWidget* parent) :
-    DataFinder(parent) {
+DataSelector::DataSelector(QWidget* parent) : QWidget(parent)
+{
     QLayout* layout = new QBoxLayout(QBoxLayout::TopToBottom);
 
     setupFSModel();
@@ -29,10 +25,10 @@ OfflineDataFinder::OfflineDataFinder(QWidget* parent) :
     this->setLayout(layout);
 }
 
-OfflineDataFinder::~OfflineDataFinder() {
+DataSelector::~DataSelector() {
 }
 
-void OfflineDataFinder::setupLogLabels() {
+void DataSelector::setupLogLabels() {
 
     logLabel = new QLabel(this);
     logLabel->setText("Current log:");
@@ -41,14 +37,14 @@ void OfflineDataFinder::setupLogLabels() {
     logPathLabel->setReadOnly(true);
 }
 
-void OfflineDataFinder::setupFSModel() {
+void DataSelector::setupFSModel() {
 
     fsModel = new QFileSystemModel(this);
     fsModel->setRootPath(QDir::homePath());
     fsModel->setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
 }
 
-void OfflineDataFinder::setupFSBrowser() {
+void DataSelector::setupFSBrowser() {
 
     fsBrowser = new QTreeView(this);
     fsBrowser->setModel(fsModel);
@@ -64,31 +60,37 @@ void OfflineDataFinder::setupFSBrowser() {
             this, SLOT(folderChanged(const QModelIndex&)));
 }
 
-void OfflineDataFinder::folderChanged(const QModelIndex& index) {
+void DataSelector::folderChanged(const QModelIndex& index) {
     this->scanFolderForLogs(fsModel->filePath(index));
 }
 
-void OfflineDataFinder::scanFolderForLogs(QString path) {
-    QString filter = QString(("*" + NAO_LOG_EXTENSION).data());
+void DataSelector::scanFolderForLogs(QString path) {
+    QString filter = QString(("*" + LOG_EXTENSION).data());
     QDir dir(path, filter);
     QFileInfoList list = dir.entryInfoList();
+    std::cout << "Found " << list.size() << " log files." << std::endl;
 
     if (list.size() == 0) {
         return;
     }
 
     logPathLabel->setText(path); // notify the user of the new log
-    emit signalNewDataSet();
 
+    std::vector<std::string> files;
     for (int i = 0; i < list.size(); i++) {
         QFileInfo fileInfo = list.at(i);
+        std::string path = fileInfo.absoluteFilePath().toStdString();
+
         if (fileInfo.size() != 0) {
-            std::string path = fileInfo.absoluteFilePath().toStdString();
-            InProvider::ptr file_in(new FileInProvider(path));
-            emit signalNewInputProvider(file_in, fileInfo.baseName().toStdString());
+            files.push_back(path);
+        }
+        else
+        {
+            std::cout << "Invalid log file: " << path << std::endl;
         }
     }
+
+    emit signalNewDataSet(files);
 }
 
-}
 }

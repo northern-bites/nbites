@@ -1,7 +1,9 @@
 #pragma once
 
+#include <QWidget>
 #include "unlog/UnlogModule.h"
 #include "Header.pb.h"
+#include <iostream>
 
 namespace tool{
 
@@ -10,8 +12,8 @@ typedef unlog::UnlogBase*(* Construct)(std::string);
 typedef std::map<std::string, Construct> TypeMap;
 
 #define ADD_MAPPED_TYPE(name) \
-    std::string nameStr = std::string("messages.") + std::string(#name); \
-    typeMap[nameStr] = &makeUnlogger<messages::name>;
+    typeMap[std::string("messages.") + std::string(#name)] = \
+        &makeUnlogger<messages::name>;
 
 template<class T> unlog::UnlogBase* makeUnlogger(std::string path)
 {
@@ -20,14 +22,19 @@ template<class T> unlog::UnlogBase* makeUnlogger(std::string path)
 
 // Actual class
 
-class ToolDiagram
+class ToolDiagram : public QObject
 {
+    Q_OBJECT;
+
 public:
-    ToolDiagram();
+    ToolDiagram(QWidget *parent = 0);
 
     void addModule(portals::Module& mod);
     bool unlogFrom(std::string path);
+
+public slots:
     void run() { diagram.run(); }
+    void addUnloggers(std::vector<std::string> paths);
 
 protected:
     portals::RoboGram diagram;

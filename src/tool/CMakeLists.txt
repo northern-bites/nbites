@@ -16,6 +16,12 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
+  "${PROJECT_BINARY_DIR}/PathConfig.h"
+)
+include_directories( ${PROJECT_BINARY_DIR} )
+
 # Dependencies
 find_package( Qt4 REQUIRED )
 
@@ -50,10 +56,13 @@ add_subdirectory( unlog )
 set( tool_srcs main.cpp
   Tool.cpp
   ToolDiagram.cpp
+  DataSelector.cpp
   )
 
 set( tool_headers
   Tool.h
+  ToolDiagram.h
+  DataSelector.h
 )
 
 # Qt4 goodness

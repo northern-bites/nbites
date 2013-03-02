@@ -6,6 +6,7 @@
 
 // Log version--in case we need to upgrade and stay backwards compatible
 static const int CURRENT_VERSION = 2;
+static const std::string LOG_EXTENSION = ".log";
 
 // IO Exceptions
 class read_exception: public std::exception {

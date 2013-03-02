@@ -12,6 +12,7 @@
 #include <QResizeEvent>
 
 #include "ToolDiagram.h"
+#include "DataSelector.h"
 
 namespace tool {
 
@@ -22,12 +23,6 @@ public:
     Tool(const char* title = "TOOL");
     ~Tool();
 
-protected slots:
-    // Called by the buttons in the main toolbar
-    void next();
-    void prev();
-    void record();
-
 protected:
     // For keyboard control
     virtual void keyPressEvent(QKeyEvent * event);
@@ -36,6 +31,7 @@ protected:
 
     // Modules in this diagram will be run when data is updated
     ToolDiagram diagram;
+    DataSelector selector;
 
     // Modules
 

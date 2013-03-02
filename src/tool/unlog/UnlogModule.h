@@ -84,11 +84,6 @@ public:
         if (bytes) {
             // Parse into the message
             currentMessage.ParseFromString(std::string(buffer, bytes));
-
-            // This is for debugging until the tool is back again
-            std::cout << "\nCurrent Message:\n" <<
-                currentMessage.DebugString();
-
             return currentMessage;
         }
 
@@ -145,16 +140,18 @@ protected:
         // the OutPortal
         portals::Message<T> msg(0);
         *msg.get() = readNextMessage<T>();
+
+        // This is for debugging until the tool is back again
+        std::cout << "\nCurrent Message from " << fileName << ":\n" <<
+            msg.get()->DebugString();
+
         output.setMessage(msg);
     }
 
     // Reads in the header; called when the file is first opened
     void readHeader()
     {
-        Header head = readNextMessage<Header>();
-        // This is for debugging until the tool is back again
-        std::cout << "\nHeader for " << fileName << " :\n" <<
-            head.DebugString();
+        readNextMessage<Header>();
     }
 
 };
