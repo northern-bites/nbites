@@ -97,7 +97,7 @@ add_subdirectory( guardian )
 add_subdirectory( audio )
 
 set( MAN_SRCS main.cpp
-  NewMan.cpp
+  Man.cpp
   DiagramThread.cpp
 )
 
