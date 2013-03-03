@@ -20,6 +20,7 @@
 #include "FeetOnGround.pb.h"
 #include "FSR.pb.h"
 #include "FallStatus.pb.h"
+#include "BatteryState.pb.h"
 
 namespace man{
 namespace guardian{
@@ -52,13 +53,14 @@ public:
     portals::OutPortal<messages::StiffnessControl> stiffnessControlOutput;
     portals::OutPortal<messages::InitialState>     initialStateOutput;
     portals::OutPortal<messages::FeetOnGround>     feetOnGroundOutput;
-    portals::OutPortal<messages::FallStatus>      fallStatusOutput;
+    portals::OutPortal<messages::FallStatus>       fallStatusOutput;
 
-    portals::InPortal<messages::JointAngles>     jointsInput;
+    portals::InPortal<messages::JointAngles>     temperaturesInput;
     portals::InPortal<messages::ButtonState>     chestButtonInput;
     portals::InPortal<messages::FootBumperState> footBumperInput;
     portals::InPortal<messages::InertialState>   inertialInput;
     portals::InPortal<messages::FSR>             fsrInput;
+    portals::InPortal<messages::BatteryState>    batteryInput;
 
 private:
     void checkFalling();
@@ -67,6 +69,7 @@ private:
     void checkFeetOnGround();
     void checkBatteryLevels();
     void checkTemperatures();
+    std::vector<float> vectorizeTemperatures(const messages::JointAngles& temps);
     void countButtonPushes();
     void processFallingProtection();
     void processChestButtonPushes();

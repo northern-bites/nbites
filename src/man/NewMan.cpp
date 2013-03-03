@@ -21,11 +21,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Guardian **/
     guardianThread.addModule(guardian);
-    guardian.jointsInput.wireTo(&sensors.jointsOutput_, true);
+    guardian.temperaturesInput.wireTo(&sensors.temperatureOutput_, true);
     guardian.chestButtonInput.wireTo(&sensors.chestboardButtonOutput_, true);
     guardian.footBumperInput.wireTo(&sensors.footbumperOutput_, true);
     guardian.inertialInput.wireTo(&sensors.inertialsOutput_, true);
     guardian.fsrInput.wireTo(&sensors.fsrOutput_, true);
+    guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
 
     /** Comm **/
     commThread.addModule(comm);

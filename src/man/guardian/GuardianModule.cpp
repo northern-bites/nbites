@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdlib>
+#include <google/protobuf/descriptor.h>
 
 #include "SoundPaths.h"
 #include "Profiler.h"
@@ -36,9 +37,6 @@ GuardianModule::GuardianModule()
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       useFallProtection(true)
-//@TODO:
-//      lastTemps(sensors->getBodyTemperatures()),
-//      lastBatteryCharge(sensors->getBatteryCharge()),
 {
 }
 
@@ -297,82 +295,134 @@ void GuardianModule::checkFeetOnGround()
 
 // We print each time the battery looses ten percent of charge
 //once the charge gets to %30 percent of capacity, we start to say "energy"
-//@TODO
-// void GuardianModule::checkBatteryLevels()
-// {
-//     //Constants on 0-10 scale, sensor reading is on 0-1.0 scale
-//     static const float LOW_BATTERY_VALUE = 3.0f;
-//     static const float EMPTY_BATTERY_VALUE = 0.7f; //start nagging below 7%
+void GuardianModule::checkBatteryLevels()
+{
+    //Constants on 0-100 scale, sensor reading is on 0-1.0 scale
+    static const float LOW_BATTERY_VALUE = 30.0f;
+    static const float EMPTY_BATTERY_VALUE = 10.0f; //start nagging below 10%
 
-//     //sometimes we get weird values from the battery (like -9.8...)
-//     const float newBatteryCharge =  sensors->getBatteryCharge();
-//     if(newBatteryCharge < 0 || newBatteryCharge > 1.0)
-//     {
-//         return;
-//     }
+    batteryInput.latch();
 
-//     if(newBatteryCharge != lastBatteryCharge)
-//     {
-//         //covert to a 0 - 10 scale
-//         const float newLevel = floor(newBatteryCharge*10.0f);
-//         const float oldLevel = floor(lastBatteryCharge*10.0f);
-//         if(oldLevel != newLevel && oldLevel > newLevel &&
-//            oldLevel - newLevel <= 1.0f)
-//         {
-//             std::cout << "Guardian: Battery charge is now at "
-//                       << 10.0f * newBatteryCharge
-//                       << " (was "<< oldLevel <<")"<< std::endl;
+    const float newBatteryCharge = batteryInput.message().charge();
+    if(newBatteryCharge < 0 || newBatteryCharge > 1.0)
+    {
+        std::cout << "Guardian:: Somehow getting battery current instead..."
+                  << std::endl;
+        return;
+    }
 
-//             if (newLevel <= LOW_BATTERY_VALUE)
-//             {
-//                 playFile(energy_wav);
-//             }
-//             else if(newLevel <= EMPTY_BATTERY_VALUE)
-//             {
-//                 playFile(energy_wav); playFile(energy_wav);
-//             }
-//         }
-//     }
-//     lastBatteryCharge = newBatteryCharge;
-// }
-// TODO TODO END
+    if(newBatteryCharge != lastBatteryCharge)
+    {
+        //covert to a % scale
+        const float newLevel = floorf(newBatteryCharge*100.0f);
+        const float oldLevel = floorf(lastBatteryCharge*100.0f);
+        if(oldLevel != newLevel && oldLevel > newLevel &&
+           oldLevel - newLevel >= 10.0f)
+        {
+            std::cout << "Guardian:: Battery charge is now at "
+                      << 10.0f * newBatteryCharge
+                      << " (was "<< oldLevel <<")"<< std::endl;
 
-//@TODO
-// void GuardianModule::checkTemperatures()
-// {
-//     static const float HIGH_TEMP = 40.0f; //deg C
-//     static const float TEMP_THRESHOLD = 1.0f; //deg C
-//     static const float REALLY_HIGH_TEMP = 50.0f; //deg C
+            if (newLevel <= EMPTY_BATTERY_VALUE)
+            {
+                std::cout << "Guardian:: Battery charge is critically "
+                          << "low!! PLUG ME IN!!!!!!!!!" << std::endl;
+                playFile(energy_wav);
+            }
+            else if(newLevel <= LOW_BATTERY_VALUE)
+            {
+                playFile(energy_wav);
+            }
+        }
+    }
+    lastBatteryCharge = newBatteryCharge;
+}
 
-//     vector<float> newTemps = sensors->getBodyTemperatures();
+void GuardianModule::checkTemperatures()
+{
+    static const float HIGH_TEMP = 40.0f; //deg C
+    static const float TEMP_THRESHOLD = 1.0f; //deg C
+    static const float REALLY_HIGH_TEMP = 50.0f; //deg C
 
-//     bool sayWarning = false;
-//     for(unsigned int joint = 0; joint < Kinematics::NUM_JOINTS; joint++)
-//     {
-//         const float tempDiff = newTemps[joint] - lastTemps[joint];
-//         if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD &&
-//            process_micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS)
-//         {
-//             lastHeatPrintWarning = process_micro_time();
-//             std::cout < "Guardian:: TEMP-WARNING: "
-//                       << Kinematics::JOINT_STRINGS[joint]
-//                       << " is at " << setprecision(1)
-//                       << newTemps[joint] <<" deg C"<< setprecision(6) << endl;
-//             if(newTemps[joint] >= REALLY_HIGH_TEMP)
-//             {
-//                 sayWarning = true;
-//             }
-//         }
-//     }
-//     if(sayWarning &&
-//        process_micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS)
-//     {
-//         playFile(heat_wav);
-//         lastHeatAudioWarning = process_micro_time();
-//     }
-//     lastTemps = newTemps;
-// }
-// TODO TODO END
+    temperaturesInput.latch();
+
+    std::vector<float> newTemps = vectorizeTemperatures(temperaturesInput.message());
+
+    if (frameCount == 0)
+    {
+        lastTemps = newTemps;
+        return;
+    }
+
+    bool sayWarning = false;
+    for(int joint = 0;
+        joint < temperaturesInput.message().GetDescriptor()->field_count();
+        joint++)
+    {
+        const float tempDiff = newTemps[joint] - lastTemps[joint];
+        if(newTemps[joint] >= HIGH_TEMP && tempDiff >= TEMP_THRESHOLD &&
+           process_micro_time() - lastHeatPrintWarning > TIME_BETWEEN_HEAT_WARNINGS)
+        {
+            lastHeatPrintWarning = process_micro_time();
+            std::cout << "Guardian:: TEMP-WARNING: "
+                      << temperaturesInput.message().GetDescriptor()->field(joint)->name()
+                      << " is at " << std::setprecision(1)
+                      << newTemps[joint] <<" deg C"<< std::setprecision(6)
+                      << std::endl;
+            if(newTemps[joint] >= REALLY_HIGH_TEMP)
+            {
+                sayWarning = true;
+            }
+        }
+    }
+    if(sayWarning &&
+       process_micro_time() - lastHeatAudioWarning > TIME_BETWEEN_HEAT_WARNINGS)
+    {
+        playFile(heat_wav);
+        lastHeatAudioWarning = process_micro_time();
+    }
+
+    lastTemps = newTemps;
+}
+
+std::vector<float> vectorizeTemperatures(messages::JointAngles& temps)
+{
+    std::vector<float> result;
+
+    result.push_back(temps.head_yaw());
+    result.push_back(temps.head_pitch());
+
+    result.push_back(temps.l_shoulder_pitch());
+    result.push_back(temps.l_shoulder_roll());
+    result.push_back(temps.l_elbow_yaw());
+    result.push_back(temps.l_elbow_roll());
+    result.push_back(temps.l_wrist_yaw());
+    result.push_back(temps.l_hand());
+
+    result.push_back(temps.r_shoulder_pitch());
+    result.push_back(temps.r_shoulder_roll());
+    result.push_back(temps.r_elbow_yaw());
+    result.push_back(temps.r_elbow_roll());
+    result.push_back(temps.r_wrist_yaw());
+    result.push_back(temps.r_hand());
+
+    result.push_back(temps.l_hip_yaw_pitch());
+    result.push_back(temps.r_hip_yaw_pitch());
+
+    result.push_back(temps.l_hip_roll());
+    result.push_back(temps.l_hip_pitch());
+    result.push_back(temps.l_knee_pitch());
+    result.push_back(temps.l_ankle_pitch());
+    result.push_back(temps.l_ankle_roll());
+
+    result.push_back(temps.r_hip_roll());
+    result.push_back(temps.r_hip_pitch());
+    result.push_back(temps.r_knee_pitch());
+    result.push_back(temps.r_ankle_pitch());
+    result.push_back(temps.r_ankle_roll());
+
+    return result;
+}
 
 void GuardianModule::processFallingProtection()
 {
