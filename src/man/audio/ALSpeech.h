@@ -2,7 +2,7 @@
 #define _ALSpeech_h_DEFINED
 
 #include <string>
-#include "alproxies/altexttospeechproxy.h"
+#include <alproxies/altexttospeechproxy.h>
 #include "Speech.h"
 
 /**

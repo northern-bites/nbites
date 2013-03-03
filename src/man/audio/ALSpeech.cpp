@@ -3,9 +3,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "alerror/alerror.h"
-
-
+#include <alerror/alerror.h>
 
 ALSpeech::ALSpeech(boost::shared_ptr<AL::ALBroker> broker) : Speech(), volume(0)
 {

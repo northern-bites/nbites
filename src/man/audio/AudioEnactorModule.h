@@ -12,14 +12,14 @@ namespace audio {
 class AudioEnactorModule : public portals::Module {
 
 public:
-	AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
-	virtual ~AudioEnactorModule() {}
+    AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
+    virtual ~AudioEnactorModule() {}
 
-	portals::InPortal<messages::AudioCommand> AudioIn;
+    portals::InPortal<messages::AudioCommand> AudioIn;
 
 protected:
-	virtual void run_();
-	ALSpeech alspeech;
+    virtual void run_();
+    ALSpeech alspeech;
 };
 
 }
