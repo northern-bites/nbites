@@ -90,7 +90,7 @@ void SensorsModule::initializeSensorFastAccess()
     sensorKeys_[i] = std::string("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value");
     i++;
     // There is a single chest button.
-    sensorKeys_[i] = std::string("Device/SubDeviceList/Chestboard/Button/Sensor/Value");
+    sensorKeys_[i] = std::string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value");
     i++;
     //There is a single battery value.
     sensorKeys_[i] = std::string("Device/SubDeviceList/Battery/Charge/Sensor/Value");
