@@ -33,6 +33,7 @@ GuardianModule::GuardianModule()
       initialStateOutput(base()),
       feetOnGroundOutput(base()),
       fallStatusOutput(base()),
+      audioOutput(base()),
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
@@ -50,6 +51,7 @@ void GuardianModule::run_()
     struct timespec interval, remainder;
     interval.tv_sec = 0;
     interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
+    sentAudio = false;
     countButtonPushes();
     checkFalling();
     checkFallen();
@@ -58,6 +60,7 @@ void GuardianModule::run_()
     checkTemperatures();
     processFallingProtection();
     processChestButtonPushes();
+    checkAudio();
     frameCount++;
     nanosleep(&interval, &remainder);
     PROF_EXIT(P_ROBOGUARDIAN);
@@ -67,7 +70,6 @@ void GuardianModule::countButtonPushes()
 {
     footBumperInput.latch();
     chestButtonInput.latch();
-
 
     chestButton->updateFrame(chestButtonInput.message().pressed());
     leftFootButton->updateFrame(footBumperInput.message().l_foot_bumper_left().pressed() ||
@@ -501,11 +503,11 @@ void GuardianModule::processChestButtonPushes()
     }
 }
 
-void GuardianModule::executeShutdownAction() const
+void GuardianModule::executeShutdownAction()
 {
     std::cout << "Guardian is attempting a shutting down..."<< std::endl;
     playFile(shutdown_wav);
-    if(system("shutdown -h now &") != 0)
+    if(system("sudo shutdown -h now &") != 0)
         std::cout << "Roboguardian could not shutdown system." << std::endl;
 }
 
@@ -580,13 +582,21 @@ void GuardianModule::reloadMan()
 }
 
 
-//TODO: move to audio enactor.
-//Non blocking!!
-void GuardianModule::playFile(std::string str)const
+void GuardianModule::playFile(std::string str)
 {
-    // system returns an int.
-    if(system((sout+str+" &").c_str()) != 0)
-        std::cout << "Roboguardian could not play file." << std::endl;
+    sentAudio = true;
+    portals::Message<messages::AudioCommand> command(0);
+    command.get()->set_audio_file(str);
+    audioOutput.setMessage(command);
+}
+
+void GuardianModule::checkAudio()
+{
+    if (!sentAudio)
+    {
+        portals::Message<messages::AudioCommand> command(0);
+        audioOutput.setMessage(command);
+    }
 }
 
 }

@@ -21,6 +21,7 @@
 #include "FSR.pb.h"
 #include "FallStatus.pb.h"
 #include "BatteryState.pb.h"
+#include "AudioCommand.pb.h"
 
 namespace man{
 namespace guardian{
@@ -40,12 +41,7 @@ public:
 
     void run_();
 
-    void executeShutdownAction()const;
-
-    //getters
-    bool isRobotFalling()const { return useFallProtection && falling; }
-    bool isRobotFallen()const { return useFallProtection && fallen; }
-    bool isFeetOnGround()const { return useFallProtection && feetOnGround; }
+    void executeShutdownAction();
 
     void enableFallProtection(bool _useFallProtection)
         { useFallProtection = _useFallProtection; };
@@ -54,6 +50,7 @@ public:
     portals::OutPortal<messages::InitialState>     initialStateOutput;
     portals::OutPortal<messages::FeetOnGround>     feetOnGroundOutput;
     portals::OutPortal<messages::FallStatus>       fallStatusOutput;
+    portals::OutPortal<messages::AudioCommand>     audioOutput;
 
     portals::InPortal<messages::JointAngles>     temperaturesInput;
     portals::InPortal<messages::ButtonState>     chestButtonInput;
@@ -77,7 +74,8 @@ private:
     void executeFallProtection();
     void shutoffGains();
     void enableGains();
-    void playFile(std::string filePath)const; //non-blocking
+    void playFile(std::string filePath);
+    void checkAudio();
     void reloadMan();
     void initialState();
 
@@ -105,6 +103,8 @@ private:
     bool useFallProtection;
 
     bool lastInitial;
+
+    bool sentAudio;
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
 };

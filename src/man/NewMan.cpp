@@ -29,6 +29,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     guardian.inertialInput.wireTo(&sensors.inertialsOutput_, true);
     guardian.fsrInput.wireTo(&sensors.fsrOutput_, true);
     guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
+    audio.audioIn.wireTo(&guardian.audioOutput);
 
     /** Comm **/
     commThread.addModule(comm);

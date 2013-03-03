@@ -12,8 +12,8 @@ AudioEnactorModule::AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker)
 
 void AudioEnactorModule::run_()
 {
-    AudioIn.latch();
-    messages::AudioCommand audioCommand = AudioIn.message();
+    audioIn.latch();
+    messages::AudioCommand audioCommand = audioIn.message();
 
     //set volume if it's different than now - there will always be a volume
     //(default 0.95) but it might not have changed

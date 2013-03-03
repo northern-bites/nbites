@@ -15,7 +15,7 @@ public:
     AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
     virtual ~AudioEnactorModule() {}
 
-    portals::InPortal<messages::AudioCommand> AudioIn;
+    portals::InPortal<messages::AudioCommand> audioIn;
 
 protected:
     virtual void run_();
