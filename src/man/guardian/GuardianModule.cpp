@@ -154,7 +154,7 @@ void GuardianModule::checkFalling()
 }
 
 //Check if the angle is unstable, (ie tending AWAY from zero)
-bool isFalling(float angle_pos, float angle_vel)
+bool GuardianModule::isFalling(float angle_pos, float angle_vel)
 {
     // Test falling based on angle (note that angle_pos is assumed to be
     // the mag. of the angle).
@@ -385,7 +385,7 @@ void GuardianModule::checkTemperatures()
     lastTemps = newTemps;
 }
 
-std::vector<float> vectorizeTemperatures(messages::JointAngles& temps)
+std::vector<float> GuardianModule::vectorizeTemperatures(const messages::JointAngles& temps)
 {
     std::vector<float> result;
 

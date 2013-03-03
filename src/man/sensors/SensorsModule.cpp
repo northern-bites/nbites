@@ -150,6 +150,7 @@ void SensorsModule::updateSensorValues()
     updateFootbumperMessage();
     updateInertialsMessage();
     updateSonarsMessage();
+    updateFSRMessage();
     updateBatteryMessage();
 
     //std::cout << "SensorsModule : Sensor values " << std::endl;
