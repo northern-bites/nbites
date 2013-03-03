@@ -33,10 +33,14 @@ void ImageTranscriberModule::run_()
 
     // get YUVImages from the message pool
     // this copying is slow and bad, but it will have to do until Bill figures out a better solution
-    topYUVMessage.get()->makeMeCopyOf(topImageTranscriber.acquireImage(),
-                                       YUVImage::Grow);
-    bottomYUVMessage.get()->makeMeCopyOf(bottomImageTranscriber.acquireImage(), 
-                                          YUVImage::Grow);
+    //topYUVMessage.get()->makeMeCopyOf(topImageTranscriber.acquireImage(),
+    //                                   YUVImage::ExactSize);
+    //bottomYUVMessage.get()->makeMeCopyOf(bottomImageTranscriber.acquireImage(), 
+    //                                      YUVImage::ExactSize);
+
+    // bug fix so that Ben can test vision code, but no support for logging as of now
+    *(topYUVMessage.get()) = topImageTranscriber.acquireImage();
+    *(bottomYUVMessage.get()) = bottomImageTranscriber.acquireImage();
 
     ImageAcquisition::acquire_image_fast(topTable, params, topYUVMessage.get()->pixelAddress(0,0), 
 					 topThrMessage.get()->get_mutable_image());

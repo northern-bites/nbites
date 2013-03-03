@@ -17,6 +17,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <cerrno>
+#include <iostream>
 
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
@@ -262,8 +263,8 @@ YUVImage V4L2ImageTranscriber::acquireImage() {
     }
     else {
         printf("Warning - the buffer we dequeued was NULL\n");
+        return YUVImage();
     }
-    return YUVImage();
 }
 
 bool V4L2ImageTranscriber::captureNew() {
