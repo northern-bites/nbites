@@ -25,19 +25,29 @@ namespace man
      * @brief Responsible for updating particles based on Visual Observations
      *        from the vision system.
      */
-    class VisionSystem : public SensorModel
+        class VisionSystem// : public SensorModel
     {
     public:
         VisionSystem();
         ~VisionSystem();
 
         ParticleSet update(ParticleSet& particles,
-                           messages::PVisionField visionInput);
+                           messages::PVisionField observations);
 
-        template <class VisualObservationT, class ConcreteLandmarkT>
-        float scoreFromLandmark(VisualObservationT observation,
-                                ConcreteLandmarkT landmark,
-                                Particle particle);
+        float scoreFromVisDetect(const Particle& particle,
+                                 const messages::PVisualDetection& obsv);
+
+        RelVector getRelativeVector(const Particle& particle,
+                                    float fieldX, float fieldY);
+
+        void setUpdated(bool val);
+
+        boost::mt19937 rng;
+
+    private:
+        float lastVisionTimestamp;
+        bool updated;
+
      };
     } // namespace localization
 } // namespace man

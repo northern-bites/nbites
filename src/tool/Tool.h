@@ -15,6 +15,7 @@
 #include "unlog/UnlogModule.h"
 #include "JointAngles.pb.h"
 #include "Vision.pb.h"
+#include "Common.pb.h"
 
 namespace tool {
 
@@ -42,7 +43,7 @@ protected:
 
     // Modules
     // IF YOU WANT TO SEE LOGS PUT YOUR UNLOGGER HERE
-    unlog::UnlogModule<messages::PVisionField> unlogger;
+    unlog::UnlogModule<messages::RobotLocation> unlogger;
 
     // GUI stuff
     QTabWidget* toolTabs;

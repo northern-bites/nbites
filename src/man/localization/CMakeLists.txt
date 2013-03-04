@@ -13,6 +13,8 @@ set(LOCALIZATION_SRCS LocalizationModule
 		      MotionModel
 		      SensorModel
 		      FakeLocInputModule
+		      VisionSystem
+		      MotionSystem
 )
 
 # Add project as a library.

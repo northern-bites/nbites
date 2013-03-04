@@ -35,19 +35,19 @@ namespace man
          * @brief Update the particles with a the control input
          *        according to the latest motion.
          */
-        virtual ParticleSet update(ParticleSet& particles,
-                                   messages::RobotLocation lastOdometry);
+        virtual void update(ParticleSet& particles,
+                            messages::RobotLocation lastOdometry);
 
         /*
          * These methods allow the client to access information as
          * to whether or not the SensorModel has performed an
          * update on the latest iteration.
          */
-        bool hasUpdated() const { return updated; }
-        void setUpdated(bool updated_) { updated = updated_; }
+       bool hasUpdated() const { return updated; }
+       void setUpdated(bool updated_) { updated = updated_; }
 
     private:
-        bool updated;    //! Flag indicates whether or not the particles have
+       bool updated;    //! Flag indicates whether or not the particles have
                          //! been updated with the latest sensor readings.
 
     };

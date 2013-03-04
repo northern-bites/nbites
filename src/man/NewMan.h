@@ -8,6 +8,7 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "localization/FakeLocInputModule.h"
+#include "localization/LocalizationModule.h"
 
 namespace man {
 
@@ -18,8 +19,9 @@ public:
     virtual ~Man();
 
 private:
-    DiagramThread fakeShitThread;
-    fakeInput::FakeLocInputModule fInput;
+    DiagramThread localizationThread;
+    fakeInput::FakeLocInputModule fOutput;
+    localization::LocalizationModule localization;
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
 };

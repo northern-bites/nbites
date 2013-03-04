@@ -5,17 +5,22 @@ namespace man {
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
-      fakeShitThread("fakeShit"),
+      localizationThread("localization"),
       sensorsThread("sensors"),
       sensors(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
     sensorsThread.addModule(sensors);
-    fakeShitThread.addModule(fInput);
-    fakeShitThread.log<messages::PVisionField>(&fInput.fVisionOutput, "fVision");
+    localizationThread.addModule(fOutput);
+    localizationThread.addModule(localization);
+
+    localization.motionInput.wireTo(&fOutput.fMotionOutput);
+    localization.visionInput.wireTo(&fOutput.fVisionOutput);
+
+    localizationThread.log<messages::RobotLocation>(&localization.output, "localization");
 //    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
     sensorsThread.start();
-    fakeShitThread.start();
+    localizationThread.start();
 }
 
 Man::~Man()

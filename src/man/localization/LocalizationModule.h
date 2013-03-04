@@ -13,6 +13,8 @@
 #include "SensorModel.h"
 #include "MotionModel.h"
 #include "ParticleFilter.h"
+#include "VisionSystem.h"
+#include "MotionSystem.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -49,10 +51,10 @@ namespace man
          */
         void update();
 
-        boost::shared_ptr<VisionSystem> visionModel;
+//        boost::shared_ptr<VisionSystem> visionModel;
         boost::shared_ptr<MotionSystem> motionModel;
 
-        boost::shared_ptr<ParticleFilter> particleFilter;
+//        boost::shared_ptr<ParticleFilter> particleFilter;
     };
     } // namespace localization
 } // namespace man

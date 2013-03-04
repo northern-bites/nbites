@@ -15,7 +15,7 @@ Tool::Tool(const char* title) :
     mainDiagram(),
     // IF YOU WANT TO SEE LOGS FOR THE TIME BEING, YOU HAVE TO DO THIS
     // WE WILL FIX THIS HACK ASAP
-    unlogger("/home/egoogins/Desktop/fVision"),
+    unlogger("/home/egoogins/Desktop/localization"),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),

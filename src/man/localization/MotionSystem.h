@@ -10,19 +10,22 @@
 
 #include "MotionModel.h"
 
+
 namespace man
 {
     namespace localization
     {
 
-    class MotionSystem : public MotionModel
+    class MotionSystem
     {
     public:
         MotionSystem();
         ~MotionSystem();
 
-        ParticleSet update(ParticleSet& particles,
-                           messages::RobotLocation deltaMotionInformation);
+        void update(ParticleSet& particles,
+                    messages::RobotLocation deltaMotionInfo);
+
+        void randomlyShiftParticle(Particle* particle);
 
         void setFallen(bool fallen);
 

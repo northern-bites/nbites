@@ -1,59 +1,53 @@
 #include "MotionSystem.h"
-#include "Particles.h"
 
 namespace man
 {
     namespace localization
     {
-        MotionSystem::MotionSystem(){};
-        MotionSystem::~MotionSystem(){};
+        MotionSystem::MotionSystem(){}
+        MotionSystem::~MotionSystem(){}
 
         /**
          * Updates the particle set according to the motion.
          *
          * @return the updated ParticleSet.
          */
-        ParticleSet MotionSystem::update(ParticleSet& particles,
-                                         messages::RobotLocation deltaMotionInformation)
+        void MotionSystem::update(ParticleSet& particles,
+                                  messages::RobotLocation deltaMotionInfo)
         {
-
-            if (visionInput.timestamp() > lastVisionTimestamp)
+            ParticleIt iter;
+            for(iter = particles.begin(); iter != particles.end(); iter++)
             {
-                ParticleIt iter;
-                for(iter = particles.begin(); iter != particles.end(); iter++)
-                {
-                    Particle* particle = &(*iter);
+                Particle* particle = &(*iter);
 
-                    float sinh, cosh;
-                    sincosf(deltaMotionInformation.h() - particle->getLocation().h(),
-                            &sinh, &cosh);
+                float sinh, cosh;
+                sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
+                        &sinh, &cosh);
 
-                    float changeX = cosh * deltaOdometry.x() + sinh * deltaOdometry.y();
-                    float changeY = cosh * deltaOdometry.y() - sinh * deltaOdometry.x();
-                    float changeH = deltaOdometry.h();
+                float changeX = cosh * deltaMotionInfo.x() + sinh * deltaMotionInfo.y();
+                float changeY = cosh * deltaMotionInfo.y() - sinh * deltaMotionInfo.x();
+                float changeH = deltaMotionInfo.h();
 
-                    randomlyShiftParticle(& particle);
-                    // @TODO NBMath::subPiAngle() the above shit
-
-                }
+                randomlyShiftParticle(particle);
+                // @TODO NBMath::subPiAngle() the above shit
             }
-
         }
 
-        void MotionSysem::randomlyShiftParticle(Particle* particle)
+        void MotionSystem::randomlyShiftParticle(Particle* particle)
         {
+
             // Create random number generators
             boost::mt19937 rng;
-            boost::uniform_real<float> coordRange(-.6, .6);
-            boost::uniform_real<float> headRange(-1.8, 1.8);
+            boost::uniform_real<float> coordRange(-.6f, .6f);
+            boost::uniform_real<float> headRange(-1.8f, 1.8f);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);
 
             // Determine random noise
-            messages::RobotLocation randomShiftAmount;
-            randomShiftAmount.set_x(coordNoise());
-            randomShiftAmount.set_y(coordNoise());
-            randomShiftAmount.set_h(headNoise());
+            messages::RobotLocation noise;
+            noise.set_x(coordNoise());
+            noise.set_y(coordNoise());
+            noise.set_h(headNoise());
 
             particle->shiftParticle(noise);
         }
