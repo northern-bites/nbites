@@ -93,6 +93,10 @@ class Brain(object):
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
+        # Messages
+        self.inMesssages = {}
+        self.outMessages = {}
+
     # def initFieldObjects(self):
     #     """
     #     Build our set of Field Objects which are team specific compared
@@ -195,7 +199,7 @@ class Brain(object):
 
         self.counter += 1
 
-    def run(self):
+    def run(self, msg1, msg2):
         """
         Main control loop called every TIME_STEP milliseconds
         """
@@ -206,6 +210,10 @@ class Brain(object):
         # Communications update
         # Comm data should now come in messages
         #self.getCommUpdate()
+
+        # Parse incoming messages
+        self.inMessages['initialState'] = msg1 #deserialze first!
+        self.inMessages['otherMessage'] = msg2
 
         # Update objects
         # TODO: update this functionality to get info from messages

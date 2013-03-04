@@ -14,6 +14,11 @@ namespace man {
 			  team_number(team_num),
 			  ledCommandOut(base())
 		{
+			message_format = "(";
+			for (int i=0; i<NUM_IN_MESSAGES; i++)
+				message_format += "s#";
+			message_format += ")";
+
 			initializePython();
 			getBrainInstance();
 		}
@@ -45,7 +50,13 @@ namespace man {
 				serializeInMessages();
 
 				// Calls the run method with no args.
-				PyObject *result = PyObject_CallMethod(brain_instance, "run", "(s#)", in_proto1, in_size1);
+				PyObject *result = PyObject_CallMethod(brain_instance,
+													   "run",
+													   message_format,
+													   in_proto[0],
+													   in_size[0],
+													   in_proto[1],
+													   in_size[1]);
 				if (result == NULL) {
 					// set Behaviors in error state
 					error_state = true;
@@ -61,7 +72,7 @@ namespace man {
 					parseOutMessages(result);
 					// Send out messages.
 					portals::Message<messages::LedCommand> ledCommand(0);
-					ledCommand.ParseFromArray(out_proto1,out_size1);
+					ledCommand.ParseFromArray(out_proto[0],out_size[0]);
 					ledCommandOut.setMessage(ledCommand);
 
 					Py_DECREF(result);
@@ -77,16 +88,18 @@ namespace man {
 		{
 			initialStateIn.latch();
 			// Size that serialized message will be.
-			in_size1 = initialStateIn.message().ByteSize();
+			in_size[0] = initialStateIn.message().ByteSize();
 			// Set in_proto to be the serialized message.
-			initialStateIn.message().SerializeToArray(in_proto1,in_size1);
+			initialStateIn.message().SerializeToArray(in_proto[0],in_size[0]);
 		}
 
 		void BehaviorsModule::parseOutMessages(PyObject *tuple)
 		{
-			PyArg_UnpackTuple(tuple, "name", 1, 1, &out_serial1);
-			PyString_AsStringAndSize(out_serial1, &out_proto1, out_size_t1);
-			out_size1 = PyLong_AsLong(PyLong_FromSsize_t(*out_size_t1));
+			PyArg_UnpackTuple(tuple, "name", NUM_OUT_MESSAGES, NUM_OUT_MESSAGES, &out_serial[0], &out_serial[1]);
+			for (int i=0; i<NUM_OUT_MESSAGES; i++) {
+				PyString_AsStringAndSize(out_serial[i], &out_proto[i], out_size_t[i]);
+				out_size[i] = PyLong_AsLong(PyLong_FromSsize_t(*out_size_t[i]));
+			}
 		}
 
 		void BehaviorsModule::reload_hard()

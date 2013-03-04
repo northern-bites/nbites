@@ -53,12 +53,15 @@ namespace man {
 			void parseOutMessages(PyObject *tuple);
 
 			// message variables
-			char *in_proto1;
-			unsigned int in_size1;
-			PyObject *out_serial1;
-			char *out_proto1;
-			Py_ssize_t *out_size_t1;
-			long out_size1;
+			static const unsigned int NUM_IN_MESSAGES = 2;
+			static const unsigned int NUM_OUT_MESSAGES = 2;
+			String message_format;
+			char *in_proto [NUM_IN_MESSAGES];
+			unsigned int in_size [NUM_IN_MESSAGES];
+			PyObject *out_serial [NUM_OUT_MESSAGES];
+			char *out_proto [NUM_OUT_MESSAGES];
+			Py_ssize_t *out_size_t [NUM_OUT_MESSAGES];
+			long out_size [NUM_OUT_MESSAGES];
 
 		public:
 			// portals
