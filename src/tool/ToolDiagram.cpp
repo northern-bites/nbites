@@ -41,6 +41,7 @@ bool ToolDiagram::unlogFrom(std::string path)
 
     unloggers.push_back(typeMap[head.name()](path));
     diagram.addModule(*unloggers.back());
+    unloggers.back()->run();
     return true;
 }
 

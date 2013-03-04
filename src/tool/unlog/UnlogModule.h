@@ -34,8 +34,10 @@ class UnlogBase : public portals::Module
 {
 public:
     // The path is expected to be a full path to the log file
-    UnlogBase(std::string path);
+    UnlogBase(std::string path, std::string type);
     virtual ~UnlogBase();
+
+    std::string getType() { return typeName; }
 
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
@@ -109,6 +111,7 @@ protected:
     FILE* file;
     // Stores the full path of the file
     std::string fileName;
+    std::string typeName;
     // Keeps track of the sizes of all the reads we've done
     std::vector<uint32_t> messageSizes;
 };
@@ -119,7 +122,7 @@ class UnlogModule : public UnlogBase
 {
 public:
     // Takes a file path to parse from
-    UnlogModule(std::string path) : UnlogBase(path),
+    UnlogModule(std::string path) : UnlogBase(path, T().GetTypeName()),
                                     output(base()) {}
 
     // Where the output will be provided

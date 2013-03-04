@@ -15,7 +15,8 @@ typedef std::map<std::string, Construct> TypeMap;
     typeMap[std::string("messages.") + std::string(#name)] = \
         &makeUnlogger<messages::name>;
 
-template<class T> unlog::UnlogBase* makeUnlogger(std::string path)
+template<class T>
+unlog::UnlogBase* makeUnlogger(std::string path)
 {
     return new unlog::UnlogModule<T>(path);
 }
@@ -31,6 +32,20 @@ public:
 
     void addModule(portals::Module& mod);
     bool unlogFrom(std::string path);
+
+    template<class T>
+    void connectToUnlogger(portals::InPortal<T>& input)
+    {
+        T test;
+        for (std::vector<unlog::UnlogBase*>::iterator i = unloggers.begin();
+             i != unloggers.end(); i++)
+        {
+            if(test.GetTypeName() == (*i)->getType())
+            {
+                input.wireTo(dynamic_cast<unlog::UnlogModule<T> >(*i));
+            }
+        }
+    }
 
 public slots:
     void run() { diagram.run(); }
