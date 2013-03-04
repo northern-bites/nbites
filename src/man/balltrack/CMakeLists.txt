@@ -8,6 +8,9 @@ project(balltrack)
 
 # Set source files here that need to be compiled.
 set(BALLTRACK_SRCS BallTrackModule
+                   EKF
+                   EKFStructs
+		   BallEKF
 
 )
 

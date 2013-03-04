@@ -9,7 +9,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "EKF.h"
-#include "VisualBall.h"
 #include "EKFStructs.h"
 #include "NBMath.h"
 #include "NogginStructs.h"

@@ -1,7 +1,6 @@
 #ifndef EKFStructs_h
 #define EKFStructs_h
 #include <ostream>
-#include "VisualBall.h"
 
 class MotionModel;
 typedef MotionModel DeltaMotionModel; //to be used to represent a delta CHANGE between MotionModels
@@ -33,34 +32,34 @@ public:
 };
 
 
-/**
- * BallMeasurement - A non-generic class for holding the basic type information
- *                   required (by Tucker) for running the correctionStep in EKF
- */
-struct RangeBearingMeasurement
-{
-    RangeBearingMeasurement(float _dist = 0.0f, float _bearing = 0.0f,
-                            float _distSD = 0.0f, float _bearingSD = 0.0f) :
-        distance(_dist), bearing(_bearing), distanceSD(_distSD),
-        bearingSD(_bearingSD) {}
-    RangeBearingMeasurement(const RangeBearingMeasurement& other) :
-        distance(other.distance), bearing(other.bearing),
-        distanceSD(other.distanceSD), bearingSD(other.bearingSD) {}
-    RangeBearingMeasurement(VisualBall * ball) :
-        distance(ball->getDistance()), bearing(ball->getBearing()),
-        distanceSD(ball->getDistanceSD()), bearingSD(ball->getBearingSD()) {}
+// /**
+//  * BallMeasurement - A non-generic class for holding the basic type information
+//  *                   required (by Tucker) for running the correctionStep in EKF
+//  */
+// struct RangeBearingMeasurement
+// {
+//     RangeBearingMeasurement(float _dist = 0.0f, float _bearing = 0.0f,
+//                             float _distSD = 0.0f, float _bearingSD = 0.0f) :
+//         distance(_dist), bearing(_bearing), distanceSD(_distSD),
+//         bearingSD(_bearingSD) {}
+//     RangeBearingMeasurement(const RangeBearingMeasurement& other) :
+//         distance(other.distance), bearing(other.bearing),
+//         distanceSD(other.distanceSD), bearingSD(other.bearingSD) {}
+//     RangeBearingMeasurement(VisualBall * ball) :
+//         distance(ball->getDistance()), bearing(ball->getBearing()),
+//         distanceSD(ball->getDistanceSD()), bearingSD(ball->getBearingSD()) {}
 
-    friend std::ostream& operator<< (std::ostream &o,
-                                     const RangeBearingMeasurement &m) {
-        return o << "(" << m.distance << ", " << m.bearing << ", "
-                 << m.distanceSD << ", " << m.bearingSD << ")";
-    }
+//     friend std::ostream& operator<< (std::ostream &o,
+//                                      const RangeBearingMeasurement &m) {
+//         return o << "(" << m.distance << ", " << m.bearing << ", "
+//                  << m.distanceSD << ", " << m.bearingSD << ")";
+//     }
 
-    float distance;
-    float bearing;
-    float distanceSD;
-    float bearingSD;
-};
+//     float distance;
+//     float bearing;
+//     float distanceSD;
+//     float bearingSD;
+// };
 
 
 /**

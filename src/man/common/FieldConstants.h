@@ -4,7 +4,6 @@
 #include <cmath>
 #ifndef NO_MANCONFIG
 #include "Common.h"
-#include "manconfig.h"
 #endif
 // Nao field constants
 
