@@ -4,9 +4,7 @@
 #include <string>
 
 namespace man {
-namespace corpus {
 namespace guardian {
-namespace sound_paths {
 
 static const std::string quiet = " -q ";
 static const std::string sout = "aplay"+quiet;
@@ -25,8 +23,6 @@ static const std::string falling_wav = nbsdir +"falling"+wav;
 static const std::string wifi_restart_wav = nbsdir +"wifi_restart"+wav;
 static const std::string dot = ".";
 
-}
-}
 }
 }
 

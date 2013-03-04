@@ -1,0 +1,6 @@
+package messages;
+
+message StiffnessControl
+{
+        optional bool remove = 1;
+}
