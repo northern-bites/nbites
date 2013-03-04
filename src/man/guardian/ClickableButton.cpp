@@ -1,6 +1,8 @@
 #include "ClickableButton.h"
+
 #include <iostream>
-using namespace std;
+
+#include "Common.h"
 
 //#define DEBUG_GUARDIAN_CLICKS
 
@@ -9,9 +11,7 @@ const int ClickableButton::SINGLE_CLICK_ACTIVE_MIN = 10;
 const int ClickableButton::SINGLE_CLICK_ACTIVE_MAX = MOTION_FRAME_RATE;
 const int ClickableButton::SINGLE_CLICK_INACTIVE_MIN = 8;
 const int ClickableButton::SINGLE_CLICK_INACTIVE_MAX = 36;
-const float ClickableButton::PUSHED = 1.0f;
 const int ClickableButton::SHUTDOWN_THRESH = 3*MOTION_FRAME_RATE; //Three seconds
-
 const int ClickableButton::NO_CLICKS = -1;
 
 
@@ -22,40 +22,35 @@ ClickableButton::ClickableButton(int _fps)
       buttonClicks(0), numClicks(NO_CLICKS),
       registeredClickThisTime(false)
 {
-    pthread_mutex_init(&button_mutex, NULL);
 }
 
 ClickableButton::~ClickableButton()
 {
-    pthread_mutex_destroy(&button_mutex);
 }
 
-int ClickableButton::getAndClearNumClicks() const{
-    pthread_mutex_lock(&button_mutex);
+int ClickableButton::getAndClearNumClicks() const
+{
     const int tempClicks = numClicks;
     numClicks = NO_CLICKS;
-    pthread_mutex_unlock(&button_mutex);
     return tempClicks;
 }
 
-void ClickableButton::setNumClicks(int _numClicks){
-    pthread_mutex_lock(&button_mutex);
-    numClicks = _numClicks;
-    pthread_mutex_unlock(&button_mutex);
-}
-
-void ClickableButton::updateFrame(float buttonValue){
-
-    if(buttonValue == PUSHED){
-
+void ClickableButton::updateFrame(bool buttonValue)
+{
+    if(buttonValue)
+    {
         buttonOnCounter += 1;
-        if(buttonOffCounter > 0){
+        if(buttonOffCounter > 0)
+        {
             lastButtonOffCounter = buttonOffCounter;
             buttonOffCounter  = 0;
         }
         registeredClickThisTime = false;
-    }else{
-        if(buttonOnCounter >0){
+    }
+    else
+    {
+        if(buttonOnCounter >0)
+        {
             lastButtonOnCounter = buttonOnCounter;
             buttonOnCounter = 0;
         }
@@ -67,18 +62,21 @@ void ClickableButton::updateFrame(float buttonValue){
         lastButtonOnCounter <= SINGLE_CLICK_ACTIVE_MAX &&
         buttonOffCounter >= SINGLE_CLICK_INACTIVE_MIN &&
         buttonOffCounter <= SINGLE_CLICK_INACTIVE_MAX &&
-        !registeredClickThisTime){
+        !registeredClickThisTime)
+    {
         buttonClicks += 1;
 #ifdef DEBUG_GUARDIAN_CLICKS
-        cout << "Registered a click, waiting to see if there are more"<<endl;
+        std::cout << "Registered a click."
+                  << " Waiting to see if there are more" << std::endl;
 #endif
         registeredClickThisTime = true;
     }
 
     if( buttonOffCounter > SINGLE_CLICK_INACTIVE_MAX &&
-        buttonClicks > 0){
+        buttonClicks > 0)
+    {
 #ifdef DEBUG_GUARDIAN_CLICKS
-        cout << "Processing " <<buttonClicks <<" clicks"<<endl;
+        std::cout << "Processing " << buttonClicks << " clicks" << std::endl;
 #endif
         setNumClicks(buttonClicks);
         buttonClicks = 0;

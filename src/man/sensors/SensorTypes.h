@@ -12,6 +12,7 @@ namespace man
     // Source: V4 NAO Documentation.
     enum SensorTypes
     {
+        /** Joint Angles **/
         // Head joints
         HeadYaw = 0,
         HeadPitch,
@@ -50,22 +51,71 @@ namespace man
         RAnklePitch,
         RAnkleRoll,
 
-        // Force Sensitive Resistors (FSR)
+        END_JOINTS,
+
+        /** Temperatures **/
+
+        // Head joints
+        HeadYawTemp,
+        HeadPitchTemp,
+
+        // Left Arm joints
+        LShoulderPitchTemp,
+        LShoulderRollTemp,
+        LElbowYawTemp,
+        LElbowRollTemp,
+        LWristYawTemp,
+        LHandTemp,
+
+        // Right Arm joints
+        RShoulderPitchTemp,
+        RShoulderRollTemp,
+        RElbowYawTemp,
+        RElbowRollTemp,
+        RWristYawTemp,
+        RHandTemp,
+
+        // Pelvis joints
+        LHipYawPitchTemp,
+        RHipYawPitchTemp,
+
+        // Left Leg joints
+        LHipRollTemp,
+        LHipPitchTemp,
+        LKneePitchTemp,
+        LAnklePitchTemp,
+        LAnkleRollTemp,
+
+        // Right Leg joints
+        RHipRollTemp,
+        RHipPitchTemp,
+        RKneePitchTemp,
+        RAnklePitchTemp,
+        RAnkleRollTemp,
+
+        END_TEMPERATURES,
+
+        /** Force Sensitive Resistors (FSR) **/
         // 4 on each foot
         // (Left Foot)
         LFsrFL, // front left
         LFsrFR, // front right
         LFsrRL, // rear left
         LFsrRR, // rear right
+
+        END_FSRS_LEFT,
+
         // (Right Foot)
         RFsrFL,
         RFsrFR,
         RFsrRL,
         RFsrRR,
 
-        // Inertial Measurement Units (IMUs) or
-        // Inertial Sensors (2 axis gyrometers,
-        // 1 3 axis accelerometer.)
+        END_FSRS_RIGHT,
+
+        /** Inertial Measurement Units (IMUs) or
+            Inertial Sensors (2 axis gyrometers,
+            1 3 axis accelerometer)              **/
         // Raw accelerometer data
         AccX,
         AccY,
@@ -77,11 +127,16 @@ namespace man
         AngleX,
         AngleY,
 
-        // Ultrasonic (sonar) sensors.
+        END_INTERTIALS,
+
+        /* Past here, unneccessary to have END_VARS because
+           the string keys are too unique to loop over.     */
+
+        /** Ultrasonic (sonar) sensors **/
         USLeft,
         USRight,
 
-        // Foot bumpers (push buttons).
+        /** Foot bumpers (push buttons) **/
         // 2 on the left foot,
         LFootBumperLeft,
         LFootBumperRight,
@@ -91,6 +146,9 @@ namespace man
 
         // The chest push-button.
         ChestboardButton,
+
+        // The battery charge.
+        BatteryCharge,
 
         NUM_SENSOR_VALUES
     };
@@ -123,6 +181,32 @@ namespace man
         "RKneePitch",
         "RAnklePitch",
         "RAnkleRoll",
+        "HeadYawTemp",
+        "HeadPitchTemp",
+        "LShoulderPitchTemp",
+        "LShoulderRollTemp",
+        "LElbowYawTemp",
+        "LElbowRollTemp",
+        "LWristYawTemp",
+        "LHandTemp",
+        "RShoulderPitchTemp",
+        "RShoulderRollTemp",
+        "RElbowYawTemp",
+        "RElbowRollTemp",
+        "RWristYawTemp",
+        "RHandTemp",
+        "LHipYawPitchTemp",
+        "RHipYawPitchTemp",
+        "LHipRollTemp",
+        "LHipPitchTemp",
+        "LKneePitchTemp",
+        "LAnklePitchTemp",
+        "LAnkleRollTemp",
+        "RHipRollTemp",
+        "RHipPitchTemp",
+        "RKneePitchTemp",
+        "RAnklePitchTemp",
+        "RAnkleRollTemp",
         "LFsrFL",
         "LFsrFR",
         "LFsrRL",
@@ -144,7 +228,8 @@ namespace man
         "LFootBumperRight",
         "RFootBumperLeft",
         "RFootBumperRight",
-        "ChestboardButton"
+        "ChestboardButton",
+        "BatteryCharge"
     };
     } // namespace sensors
 } // namespace man
