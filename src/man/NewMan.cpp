@@ -23,7 +23,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Sensors **/
     sensorsThread.addModule(sensors);
 	
-	
 	/** Cognition **/
 	cognitionThread.addModule(imageTranscriber);
 	cognitionThread.addModule(vision);

@@ -76,6 +76,7 @@ include_directories( ${SHARE_DIR}/portals )
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+include_directories( ${SHARE_DIR}/messages )
 
 # If protobuf libs don't exist yet, make sure they build before man
 if( BUILD_PROTOBUF )

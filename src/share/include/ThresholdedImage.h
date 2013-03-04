@@ -12,6 +12,8 @@ public:
     ThresholdedImage() : image(reinterpret_cast<uint16_t*>
                                (new uint8_t[IMAGE_BYTE_SIZE])) {}
 
+    ~ThresholdedImage() { delete image; }
+
     // These methods make this class look like a protobuf
     uint16_t* get_mutable_image() { return image; }
     uint16_t* get_image() const { return image; }

@@ -30,8 +30,8 @@ add_custom_command(
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project
-set( PROTOS_SRCS ${PROTO_GEN} 
-		 )
+set( PROTOS_SRCS ${PROTO_GEN} )
+set( MESSAGE_SRCS Images.cpp )
 
 ############################ Add sources
 
@@ -40,6 +40,7 @@ add_library(
   messages
   STATIC
   ${PROTOS_SRCS}
+  ${MESSAGE_SRCS}
   )
 
 target_link_libraries(

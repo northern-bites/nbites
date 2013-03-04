@@ -16,20 +16,20 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <cerrno>
+#include <iostream>
 
-#undef __STRICT_ANSI__
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
-#define __STRICT_ANSI__
-
-#include <cerrno>
 
 #include "ImageAcquisition.h"
 //#include "Profiler.h"
 
+#include "Images.h"
+
 // For checking the ioctls; prints error if one occurs
 #define VERIFY(x, str) {                               \
-        if( (x) < 0) {                                 \
+        if( (x) != 0) {                                \
             printf("CAMERA ERROR::");                  \
             printf(str);                               \
             printf("\n");                              \
@@ -38,7 +38,7 @@
         }                                              \
     }
 
-using namespace portals;
+//using namespace portals;
 using namespace messages;
 
 namespace man {
@@ -46,15 +46,11 @@ namespace image {
 
 using boost::shared_ptr;
 
-V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which,
-                                           OutPortal<ThresholdedImage>* out) :
-    outPortal(out),
+V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
     currentBuf(0),
-    timeStamp(0),
-    table(new unsigned char[yLimit * uLimit * vLimit]),
-    params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
+    timeStamp(0)
 {
     initOpenI2CAdapter();
     initSelectCamera();
@@ -89,45 +85,21 @@ V4L2ImageTranscriber::~V4L2ImageTranscriber() {
     free(buf);
 }
 
-void V4L2ImageTranscriber::initTable(const std::string& filename)
-{
-    FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
-
-    if (fp == NULL) {
-        printf("CAMERA::ERROR::initTable() FAILED to open filename: %s\n",
-               filename.c_str());
-#ifdef OFFLINE
-        exit(0);
-#else
-        return;
-#endif
-    }
-
-    // actually read the table into memory
-    // Color table is in VUY ordering
-    int rval;
-    for(int v=0; v < vLimit; ++v){
-        for(int u=0; u< uLimit; ++u){
-            rval = fread(&table[v * uLimit * yLimit + u * yLimit],
-                         sizeof(unsigned char), yLimit, fp);
-        }
-    }
-
-#ifndef OFFLINE
-    printf("CAMERA::Loaded colortable %s.\n",filename.c_str());
-#endif
-
-    fclose(fp);
-}
-
 void V4L2ImageTranscriber::initOpenI2CAdapter() {
     if(cameraType == Camera::TOP)
+    {
         cameraAdapterFd = open("/dev/i2c-camera0", O_RDWR);
+    }
     else
+    {
         cameraAdapterFd = open("/dev/i2c-camera1", O_RDWR);
+    }
 
     if(cameraAdapterFd == -1)
+    {
         printf("CAMERA::ERROR::Camera adapter FD is WRONG.\n");
+    }
+
     VERIFY((ioctl(cameraAdapterFd, 0x703, 8)),
            "Opening I2C adapter failed.");
 }
@@ -140,12 +112,18 @@ void V4L2ImageTranscriber::initSelectCamera() {
 void V4L2ImageTranscriber::initOpenVideoDevice() {
     // open device
     if(cameraType == Camera::TOP)
+    {
         fd = open("/dev/video0", O_RDWR);
+    }
     else
+    {
         fd = open("/dev/video1", O_RDWR);
+    }
 
     if(fd == -1)
+    {
         printf("CAMERA::ERROR::Video Device FD is WRONG.\n");
+    }
 }
 
 void V4L2ImageTranscriber::initSetCameraDefaults() {
@@ -159,8 +137,13 @@ void V4L2ImageTranscriber::initSetImageFormat() {
     struct v4l2_format fmt;
     memset(&fmt, 0, sizeof(struct v4l2_format));
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    // We ask for a 640 by 480 image
     fmt.fmt.pix.width = WIDTH;
     fmt.fmt.pix.height = HEIGHT;
+    //"In this format each four bytes is two pixels. Each four bytes is two
+    //Y's, a Cb and a Cr. Each Y goes to one of the pixels, and the Cb and
+    //Cr belong to both pixels. As you can see, the Cr and Cb components have
+    //half the horizontal resolution of the Y component."
     fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
     VERIFY((ioctl(fd, VIDIOC_S_FMT, &fmt)),
@@ -171,7 +154,7 @@ void V4L2ImageTranscriber::initSetImageFormat() {
 }
 
 void V4L2ImageTranscriber::initSetFrameRate() {
-    // set frame rate
+    // We want frame rate to be 30 fps
     struct v4l2_streamparm fps;
     memset(&fps, 0, sizeof(struct v4l2_streamparm));
     fps.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -194,7 +177,9 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
            "Requesting buffers failed.");
 
     if(rb.count != (unsigned int)frameBufferCount)
+    {
         printf("CAMERA ERROR::Buffer count is WRONG.\n");
+    }
 
     // map or prepare the buffers
     buf = static_cast<struct v4l2_buffer*>(calloc(1,
@@ -263,31 +248,23 @@ void V4L2ImageTranscriber::startCapturing() {
            "Start capture failed.");
 }
 
-bool V4L2ImageTranscriber::waitForImage() {
+YUVImage V4L2ImageTranscriber::acquireImage() {
     //PROF_ENTER(P_DQBUF);
     this->captureNew();
-    //PROF_EXIT(P_DQBUF);
+    //PROF_EXIT(P_DQBUF;)
     uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
     if (current_image) {
-
-        Message<ThresholdedImage> image(new ThresholdedImage());
-
         //PROF_ENTER(P_ACQUIRE_IMAGE);
-        ImageAcquisition::acquire_image_fast(table, params, current_image,
-                                             image.get()->get_mutable_image());
         //PROF_EXIT(P_ACQUIRE_IMAGE);
-
-        outPortal->setMessage(image);
-
         //PROF_ENTER(P_QBUF);
-        this->releaseBuffer();
         //PROF_EXIT(P_QBUF);
-        return true;
+        YUVImage current = YUVImage(current_image, WIDTH, HEIGHT, WIDTH * 2);
+        return current;
     }
     else {
         printf("Warning - the buffer we dequeued was NULL\n");
+        return YUVImage();
     }
-    return false;
 }
 
 bool V4L2ImageTranscriber::captureNew() {
