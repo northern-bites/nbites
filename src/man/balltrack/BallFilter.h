@@ -1,5 +1,5 @@
 /**
- * @brief  A naive implementation of a ball tracker for shits
+ * @brief  A naive implementation of some ball trackers for shits
  *         Implement a ring buffer to take obsv, average for estimate
  *         Wipe if threshold observations rejected in a row
  *
@@ -14,6 +14,7 @@ namespace man
     namespace balltrack
     {
         static const int DEFAULT_BUFFER_SIZE = 30;
+        static const float ALPHA = .6f;
 
         /*
          * @brief Struct to take observations from vision
@@ -35,12 +36,16 @@ namespace man
             void addObservation(BallObservation newObsv);
             BallObservation getObsv(int which);
 
-            BallObservation getEstimate();
+            BallObservation getNaiveEstimate();
+            BallObservation getExponentialEstimate();
+            BallObservation getWeightedNaiveEstimate();
 
         private:
             BallObservation *obsvBuffer;
             int curEntry;
             int bufferSize;
+
+            BallObservation curExpEstimate;
         };
     } //namespace balltrack
 } //namespace man
