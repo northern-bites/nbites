@@ -74,6 +74,8 @@ include_directories( common )
 add_subdirectory( log )
 add_subdirectory( sensors )
 add_subdirectory( comm )
+add_subdirectory( guardian )
+add_subdirectory( audio )
 
 set( MAN_SRCS main.cpp
   Man.cpp
@@ -93,6 +95,8 @@ target_link_libraries(
   log
   sensors
   comm
+  guardian
+  audio
 )
 
 install( TARGETS man

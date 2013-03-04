@@ -9,9 +9,6 @@
 #include "ColorTableCreator.h"
 #include <QMouseEvent>
 #include <QFileDialog>
-#include <QFile>
-#include <QDataStream>
-#include <QIODevice>
 
 #include "viewer/FilteredThresholdedViewer.h"
 
@@ -73,11 +70,8 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
-    colorTableName = new QLabel(this);
-    colorTableName->setMaximumHeight(colorTableName->sizeHint().height());
-
     colorStats = new QLabel(this);
-    colorStats->setMaximumHeight(colorStats->sizeHint().height());
+	colorStats->setAlignment(Qt::AlignTop);
 
     //set up the color selection combo box
     for (int i = 0; i < image::NUM_COLORS; i++) {
@@ -101,56 +95,14 @@ ColorTableCreator::ColorTableCreator(DataManager::ptr dataManager,
     connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveColorTable()));
 
     rightLayout->addWidget(thresholdedImageViewer);
-    rightLayout->addWidget(colorTableName);
     rightLayout->addWidget(colorStats);
 
-    mainLayout->addLayout(leftLayout);
-    mainLayout->addLayout(rightLayout);
+	mainLayout->addLayout(leftLayout);
+	mainLayout->addLayout(rightLayout);
 
-    this->setLayout(mainLayout);
+	this->setLayout(mainLayout);
 
-    loadLatestTable();
     this->updateThresholdedImage();
-}
-
-// Note: serizalization done by Qt
-void ColorTableCreator::loadLatestTable() {
-    if (imageTabs->currentIndex() == 0) {
-        QFile file("../../data/tables/latestTopTable.dat");
-        file.open(QIODevice::ReadOnly);
-        QDataStream in(&file);
-        QString filename;
-        in >> filename;
-        colorTable.read(filename.toStdString());
-        colorTableName->setText(filename);
-        updateColorStats();
-    }
-    else {
-        QFile file("../../data/tables/latestBottomTable.dat");
-        file.open(QIODevice::ReadOnly);
-        QDataStream in(&file);
-        QString filename;
-        in >> filename;
-        colorTable.read(filename.toStdString());
-        colorTableName->setText(filename);
-        updateColorStats();
-    }
-}
-
-// Note: serizalization done by Qt
-void ColorTableCreator::serializeTableName(QString latestTableName) {
-    if (imageTabs->currentIndex() == 0) {
-        QFile file("../../data/tables/latestTopTable.dat");
-        file.open(QIODevice::WriteOnly);
-        QDataStream out(&file);
-        out << latestTableName;
-    }
-    else {
-        QFile file("../../data/tables/latestBottomTable.dat");
-        file.open(QIODevice::WriteOnly);
-        QDataStream out(&file);
-        out << latestTableName;
-    }
 }
 
 void ColorTableCreator::loadColorTable(){
@@ -160,9 +112,6 @@ void ColorTableCreator::loadColorTable(){
                     base_directory,
                     tr("Color Table files (*.mtb)"));
     colorTable.read(filename.toStdString());
-    colorTableName->setText(filename);
-
-    serializeTableName(filename);
     updateThresholdedImage();
 }
 
@@ -173,9 +122,6 @@ void ColorTableCreator::saveColorTable(){
                     base_directory + "/new_table.mtb",
                     tr("Color Table files (*.mtb)"));
     colorTable.write(filename.toStdString());
-    colorTableName->setText(filename);
-
-    serializeTableName(filename);
 }
 
 void ColorTableCreator::updateThresholdedImage(){
@@ -276,7 +222,6 @@ void ColorTableCreator::imageTabSwitched(int) {
         currentCamera = Camera::BOTTOM;
     }
 
-    loadLatestTable(); // seperate tables for the two cameras!
     this->updateThresholdedImage();
 }
 

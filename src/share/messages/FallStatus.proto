@@ -1,0 +1,7 @@
+package messages;
+
+message FallStatus
+{
+        optional bool falling = 1;
+        optional bool fallen  = 2;
+}

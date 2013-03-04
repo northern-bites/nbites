@@ -1,0 +1,6 @@
+package messages;
+
+message BatteryState
+{
+        optional float charge = 1;
+}

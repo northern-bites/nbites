@@ -8,6 +8,8 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "guardian/GuardianModule.h"
+#include "audio/AudioEnactorModule.h"
 
 namespace man {
 
@@ -17,12 +19,17 @@ public:
     Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name);
     virtual ~Man();
 
+
 private:
 
     void startSubThreads();
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+
+    DiagramThread guardianThread;
+    guardian::GuardianModule guardian;
+    audio::AudioEnactorModule audio;
 
     DiagramThread commThread;
     comm::CommModule comm;

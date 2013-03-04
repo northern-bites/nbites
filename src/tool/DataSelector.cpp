@@ -5,7 +5,6 @@
 #include <iostream>
 #include <vector>
 #include <QCoreApplication>
-#include <QLineEdit>
 
 namespace tool {
 
@@ -17,9 +16,6 @@ DataSelector::DataSelector(QWidget* parent) : QWidget(parent)
 
     setupFSModel();
     setupFSBrowser();
-    setupLogLabels();
-    layout->addWidget(logLabel);
-    layout->addWidget(logPathLabel);
     layout->addWidget(fsBrowser);
 
     this->setLayout(layout);
@@ -38,7 +34,6 @@ void DataSelector::setupLogLabels() {
 }
 
 void DataSelector::setupFSModel() {
-
     fsModel = new QFileSystemModel(this);
     fsModel->setRootPath(QDir::homePath());
     fsModel->setFilter(QDir::Dirs | QDir::NoDotAndDotDot);
