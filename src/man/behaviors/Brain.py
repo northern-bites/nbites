@@ -8,26 +8,18 @@ sys.stderr = sys.stdout
 ## import pstats
 
 # Packages and modules from super-directories
-from man import motion
-import vision
-import comm
-
-#from man.corpus import leds
-import sensors
 import noggin_constants as Constants
-import loggingBoard
 
 # Modules from this directory
 from . import FallController
 from . import Stability
-from . import Loc
 from . import TeamConfig
 from . import Leds
 from . import robots
 
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
-from .typeDefs import (Sonar, Play, TeamMember)
+from .typeDefs import (Play, TeamMember)
 from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
@@ -39,7 +31,7 @@ import _roboguardian
 import _speech
 import _localization
 
-from objects import (MyInfo, FieldObject, Ball)
+from objects import (MyInfo, FieldObject)
 
 class Brain(object):
     """
@@ -57,29 +49,14 @@ class Brain(object):
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
 
-        # Setup nao modules inside brain for easy access
-        self.vision = vision.vision
-        self.sensors = sensors.sensors
-        self.logger = loggingBoard.loggingBoard
-        self.comm = comm.comm
-        self.comm.setTeam(TeamConfig.TEAM_NUMBER)
-        self.comm.setPlayer(TeamConfig.PLAYER_NUMBER)
-
         #initalize the leds
         #print leds
         self.leds = Leds.Leds(self)
         self.speech = _speech.speech
 
-        # Initialize motion interface and module references
-        self.motion = motion.MotionInterface()
-        self.motionModule = motion
-
         # Get the pointer to the C++ RoboGuardian object for use with Python
         self.roboguardian = _roboguardian.roboguardian
         self.roboguardian.enableFallProtection(True)
-
-        # Get our reference to the C++ localization system
-        self.loc = Loc()
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
@@ -98,12 +75,11 @@ class Brain(object):
         self.my.teamColor = Constants.teamColor.TEAM_BLUE
 
         # Information about the environment
-        self.initFieldObjects()
+        # All field objects should come in as messages now
+        #self.initFieldObjects()
         self.initTeamMembers()
-        self.ball = Ball(self.vision.ball, self.loc, self.my)
 
         self.play = Play.Play()
-        self.sonar = Sonar.Sonar()
 
         # Stability data
         self.stability = Stability.Stability(self.sensors)
@@ -117,73 +93,73 @@ class Brain(object):
         self.gameController = GameController.GameController(self)
         self.fallController = FallController.FallController(self)
 
-    def initFieldObjects(self):
-        """
-        Build our set of Field Objects which are team specific compared
-        to the generic forms used in the vision system
-        """
-        # Build instances of the vision based field objects
-        # Left post is on that goalie's left
-        # Note: As of 6/8/12, ygrp holds info about ambiguous posts
-        # Yellow goal left and right posts
-        self.yglp = FieldObject(self.vision.yglp,
-                                Constants.vis_landmark.VISION_YGLP,
-                                self.loc)
+    # def initFieldObjects(self):
+    #     """
+    #     Build our set of Field Objects which are team specific compared
+    #     to the generic forms used in the vision system
+    #     """
+    #     # Build instances of the vision based field objects
+    #     # Left post is on that goalie's left
+    #     # Note: As of 6/8/12, ygrp holds info about ambiguous posts
+    #     # Yellow goal left and right posts
+    #     self.yglp = FieldObject(self.vision.yglp,
+    #                             Constants.vis_landmark.VISION_YGLP,
+    #                             self.loc)
 
-        self.ygrp = FieldObject(self.vision.ygrp,
-                                Constants.vis_landmark.VISION_YGRP,
-                                self.loc)
+    #     self.ygrp = FieldObject(self.vision.ygrp,
+    #                             Constants.vis_landmark.VISION_YGRP,
+    #                             self.loc)
 
-        # Blue Goal left and right posts
-        self.bglp = FieldObject(self.vision.bglp,
-                                Constants.vis_landmark.VISION_BGLP,
-                                self.loc)
+    #     # Blue Goal left and right posts
+    #     self.bglp = FieldObject(self.vision.bglp,
+    #                             Constants.vis_landmark.VISION_BGLP,
+    #                             self.loc)
 
-        self.bgrp = FieldObject(self.vision.bgrp,
-                                Constants.vis_landmark.VISION_BGRP,
-                                self.loc)
+    #     self.bgrp = FieldObject(self.vision.bgrp,
+    #                             Constants.vis_landmark.VISION_BGRP,
+    #                             self.loc)
 
-        # Now we build the field objects to be based on our team color
-        self.makeFieldObjectsRelative()
+    #     # Now we build the field objects to be based on our team color
+    #     self.makeFieldObjectsRelative()
 
-    def makeFieldObjectsRelative(self):
-        """
-        Builds a list of fieldObjects based on their relative names to the robot
-        Needs to be called when team color is determined
-        """
-        # Note: corner directions are relative to perspective of own goalie
+    # def makeFieldObjectsRelative(self):
+    #     """
+    #     Builds a list of fieldObjects based on their relative names to the robot
+    #     Needs to be called when team color is determined
+    #     """
+    #     # Note: corner directions are relative to perspective of own goalie
 
-        # Blue team setup
-        if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
-            # Yellow goal
-            self.oppGoalRightPost = self.yglp
-            self.oppGoalLeftPost = self.ygrp
-            # Blue Goal
-            self.myGoalLeftPost = self.bglp
-            self.myGoalRightPost = self.bgrp
+    #     # Blue team setup
+    #     if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
+    #         # Yellow goal
+    #         self.oppGoalRightPost = self.yglp
+    #         self.oppGoalLeftPost = self.ygrp
+    #         # Blue Goal
+    #         self.myGoalLeftPost = self.bglp
+    #         self.myGoalRightPost = self.bgrp
 
-        # Yellow team setup
-        else:
-            # Yellow goal
-            self.myGoalLeftPost = self.yglp
-            self.myGoalRightPost = self.ygrp
-            # Blue Goal
-            self.oppGoalRightPost = self.bglp
-            self.oppGoalLeftPost = self.bgrp
+    #     # Yellow team setup
+    #     else:
+    #         # Yellow goal
+    #         self.myGoalLeftPost = self.yglp
+    #         self.myGoalRightPost = self.ygrp
+    #         # Blue Goal
+    #         self.oppGoalRightPost = self.bglp
+    #         self.oppGoalLeftPost = self.bgrp
 
-        # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
-        # we can set these regardless of our team color
-        self.myGoalLeftPost.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_GOAL_LEFT_POST)
-        self.myGoalRightPost.associateWithRelativeLandmark(
-            Constants.LANDMARK_MY_GOAL_RIGHT_POST)
-        self.oppGoalLeftPost.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_GOAL_LEFT_POST)
-        self.oppGoalRightPost.associateWithRelativeLandmark(
-            Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
+    #     # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
+    #     # we can set these regardless of our team color
+    #     self.myGoalLeftPost.associateWithRelativeLandmark(
+    #         Constants.LANDMARK_MY_GOAL_LEFT_POST)
+    #     self.myGoalRightPost.associateWithRelativeLandmark(
+    #         Constants.LANDMARK_MY_GOAL_RIGHT_POST)
+    #     self.oppGoalLeftPost.associateWithRelativeLandmark(
+    #         Constants.LANDMARK_OPP_GOAL_LEFT_POST)
+    #     self.oppGoalRightPost.associateWithRelativeLandmark(
+    #         Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
 
-        # Build a list of all of the field objects with respect to team color
-        self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
+    #     # Build a list of all of the field objects with respect to team color
+    #     self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -226,12 +202,13 @@ class Brain(object):
         # order here is very important
         # Update Environment
         self.time = time.time()
-        self.sonar.updateSensors(self.sensors)
 
         # Communications update
-        self.getCommUpdate()
+        # Comm data should now come in messages
+        #self.getCommUpdate()
 
         # Update objects
+        # TODO: update this functionality to get info from messages
         self.updateObjects()
 
         # Behavior stuff
@@ -241,27 +218,17 @@ class Brain(object):
         self.player.run()
         self.tracker.run()
         self.nav.run()
-        # Kinda of a hack...
-        # check and set loc boolean
-        if ((self.my.teamColor == Constants.teamColor.TEAM_BLUE and
-             self.loc.x > Constants.MIDFIELD_X - Constants.CENTER_CIRCLE_RADIUS) or
-            (self.my.teamColor == Constants.teamColor.TEAM_RED and
-             self.loc.x < Constants.MIDFIELD_X + Constants.CENTER_CIRCLE_RADIUS)):
-            self.onOwnFieldSide = False
 
         #Set LEDS
         self.leds.processLeds()
 
-        # Broadcast Report for Teammates
-        self.setCommData()
-
         # Update any logs we have
         self.out.updateLogs()
 
-    def getCommUpdate(self):
-        for i in range(len(self.teamMembers)):
-            mate = self.comm.teammate(i+1)
-            self.teamMembers[i].update(mate)
+    # def getCommUpdate(self):
+    #     for i in range(len(self.teamMembers)):
+    #         mate = self.comm.teammate(i+1)
+    #         self.teamMembers[i].update(mate)
 
     def updateObjects(self):
         """
@@ -281,22 +248,22 @@ class Brain(object):
         self.playbook.update(self.play)
 
     # move to comm
-    def setCommData(self):
-        # Team color, team number, and player number are all appended to this
-        # list by the underlying comm module implemented in C++
-        loc = self.loc
-        self.comm.setData(self.my.playerNumber,
-                          self.play.role, self.play.subRole,
-                          self.playbook.pb.me.chaseTime)
+    # def setCommData(self):
+    #     # Team color, team number, and player number are all appended to this
+    #     # list by the underlying comm module implemented in C++
+    #     loc = self.loc
+    #     self.comm.setData(self.my.playerNumber,
+    #                       self.play.role, self.play.subRole,
+    #                       self.playbook.pb.me.chaseTime)
 
     # TODO: Take this out once new comm is in...
-    def activeTeamMates(self):
-        activeMates = 0
-        for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
-            mate = self.teamMembers[i]
-            if mate.active:
-                activeMates += 1
-        return activeMates
+    # def activeTeamMates(self):
+    #     activeMates = 0
+    #     for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
+    #         mate = self.teamMembers[i]
+    #         if mate.active:
+    #             activeMates += 1
+    #     return activeMates
 
     def resetInitialLocalization(self):
         """
