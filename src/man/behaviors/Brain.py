@@ -33,6 +33,9 @@ import _localization
 
 from objects import (MyInfo, FieldObject)
 
+# Import message protocol buffers
+from .../share/messages import LedCommand_pb2
+
 class Brain(object):
     """
     Class brings all of our components together and runs the behaviors
@@ -212,7 +215,7 @@ class Brain(object):
         #self.getCommUpdate()
 
         # Parse incoming messages
-        self.inMessages['initialState'] = msg1 #deserialze first!
+        self.inMessages['initialState'] = initialStateMessage.parseFromString(msg1) #deserialze first!
         self.inMessages['otherMessage'] = msg2
 
         # Update objects
@@ -237,6 +240,13 @@ class Brain(object):
     #     for i in range(len(self.teamMembers)):
     #         mate = self.comm.teammate(i+1)
     #         self.teamMembers[i].update(mate)
+
+        # Serialize outgoing messages and return a tuple of them
+        self.outMessageList = list()
+        for i in self.outMessages:
+            self.outMessageList.append(i.SerializeToString())
+        self.outMessageTuple = tuple(self.outMessageList)
+        return self.outMessageTuple
 
     def updateObjects(self):
         """

@@ -14,11 +14,21 @@ namespace man {
 			  team_number(team_num),
 			  ledCommandOut(base())
 		{
+			// Build format string for messages.
 			message_format = "(";
 			for (int i=0; i<NUM_IN_MESSAGES; i++)
 				message_format += "s#";
 			message_format += ")";
 
+			// Initialize arrays for messages.
+			in_proto   = {};
+			in_size    = {};
+			out_serial = {};
+			out_proto  = {};
+			out_size_t = {};
+			out_size   = {};
+
+			// Initialize python and brain.
 			initializePython();
 			getBrainInstance();
 		}

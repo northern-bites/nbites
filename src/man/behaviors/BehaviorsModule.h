@@ -56,6 +56,7 @@ namespace man {
 			static const unsigned int NUM_IN_MESSAGES = 2;
 			static const unsigned int NUM_OUT_MESSAGES = 2;
 			String message_format;
+			// initialize arrays to 0, null, etc
 			char *in_proto [NUM_IN_MESSAGES];
 			unsigned int in_size [NUM_IN_MESSAGES];
 			PyObject *out_serial [NUM_OUT_MESSAGES];
@@ -65,7 +66,7 @@ namespace man {
 
 		public:
 			// portals
-			// note: order of portals matches message variable names
+			// note: order of portals matches message array indicies
 			portals::InPortal<messages::InitialState> initialStateIn;
 			portals::OutPortal<messages::LedCommand> ledCommandOut;
 		};
