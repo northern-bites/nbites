@@ -21,10 +21,9 @@
 #include <string>
 #include <iostream>
 
-#include "SensorTypes.h"
+#include "../sensors/SensorTypes.h"
 #include "RoboGrams.h"
 
-#include "JointStiffness.pb.h"
 #include "JointAngles.pb.h"
 
 namespace man

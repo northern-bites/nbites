@@ -1,0 +1,548 @@
+#include "MotionModule.h"
+
+namespace man
+{
+    namespace motion
+    {
+	MotionModule::MotionModule()
+	    : jointsInput_(),
+	      inertialsInput_(),
+	      fsrInput_(),
+	      walkProvider(),
+	      nullBodyProvider(),
+	      curProvider(&nullBodyProvider),
+	      nextProvider(&nullBodyProvider),
+	      nextJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
+	      nextStiffnesses(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
+	      lastJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
+	      running(false),
+	      newJoints(false),
+	      newInputJoints(false),
+	      readyToSend(false),
+	      noWalkTransitionCommand(true),
+	      frameCount(0)
+	{
+	    boost::shared_ptr<FreezeCommand> paralyze 
+		= boost::shared_ptr<FreezeCommand>(new FreezeCommand());
+	    
+	    nullBodyProvider.setCommand(paralyze);
+	}
+
+	MotionModule::~MotionModule()
+	{
+
+	}
+
+	void MotionModule::start()
+	{
+	    running = true;
+	}
+
+	void MotionModule::stop()
+	{
+	    running = false;
+	}
+
+	void MotionModule::run_()
+	{
+	    // (1) Before anything else happens, it is important to 
+	    //     retrieve the correct current joint angles.
+	    // @todo
+	    
+
+	    newInputJoints = false;
+
+	    if(running)	
+	    {
+		realityCheckJoints();
+
+		preProcess();
+		processJoints();
+		processStiffness();
+
+		newInputJoints = false;
+		frameCount++;
+	    }
+	}
+
+	void MotionModule::resetOdometry()
+	{
+	    walkProvider.resetOdometry();
+	}
+
+	void MotionModule::preProcess()
+	{
+	    preProcessBody();
+	}
+
+	void MotionModule::processJoints()
+	{
+	    processBodyJoints();
+	    safetyCheckJoints();
+	}
+
+/**
+ * Method to process remaining stiffness requests
+ * Technically this could be handled by another provider, but there isn't
+ * too much too it:
+ */
+	void MotionModule::processStiffness()
+	{
+	    using namespace Kinematics;
+	    // if(curHeadProvider->isActive()){
+	    // 	const vector <float > headStiffnesses =
+	    // 	    curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
+
+	    // 	for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
+	    // 	    nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
+	    // 	}
+	    // }
+
+	    if(curProvider->isActive()){
+		const std::vector<float> llegStiffnesses =
+		    curProvider->getChainStiffnesses(LLEG_CHAIN);
+
+		const std::vector<float> rlegStiffnesses =
+		    curProvider->getChainStiffnesses(RLEG_CHAIN);
+
+		const std::vector<float> rarmStiffnesses =
+		    curProvider->getChainStiffnesses(RARM_CHAIN);
+
+		const std::vector<float> larmStiffnesses =
+		    curProvider->getChainStiffnesses(LARM_CHAIN);
+
+		for(unsigned int i = 0; i < LEG_JOINTS; i ++){
+		    nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
+		    nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
+		}
+
+		for(unsigned int i = 0; i < ARM_JOINTS; i ++){
+		    nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
+		    nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
+		}
+	    }
+
+	    std::vector<float>::iterator i = nextStiffnesses.begin();
+	    for (; i != nextStiffnesses.end(); ++i) {
+		if (*i < MotionConstants::MIN_STIFFNESS){
+		    *i = MotionConstants::NO_STIFFNESS;
+		} else {
+		    *i = NBMath::clip(*i,
+				      MotionConstants::MIN_STIFFNESS,
+				      MotionConstants::MAX_STIFFNESS);
+		}
+	    }
+	}
+
+	bool MotionModule::postProcess()
+	{
+	    newJoints = true;
+
+	    //Make sure that if the current provider just became inactive,
+	    //and we have the next provider ready, then we want to swap to ensure
+	    //that we never have an inactive provider when an active one is potentially
+	    //ready to take over:
+	    if (curProvider != nextProvider && !curProvider->isActive())
+	    {
+		swapBodyProvider();
+	    }
+
+	    // Update sensors with the correct support foot because it may have
+	    // changed this frame.
+	    // TODO: This can be improved by keeping a local copy of the SupportFoot
+	    //       so that we only update sensors when there has been a change.
+	    //       The overhead of the mutex shouldn't be that high though.
+	    //sensors->setSupportFoot(curProvider->getSupportFoot());
+
+	    //return if one of the enactors is active
+	    return curProvider->isActive();
+	}
+	
+	void MotionModule::processBodyJoints()
+	{
+	    using namespace Kinematics; 
+
+	    if (curProvider->isActive())
+	    {
+		//TODO: move this
+		//let the walk engine know if it's in use or in standby
+		if (curProvider != &walkProvider) {
+		    walkProvider.setStandby(true);
+		    //"fake" calculate - this is just for the sensor computation
+		    walkProvider.calculateNextJointsAndStiffnesses(
+			sensorAngles, sensorInertials, sensorFSRs);
+		    curProvider->calculateNextJointsAndStiffnesses(
+			sensorAngles, sensorInertials, sensorFSRs);
+		} else {
+		    walkProvider.setStandby(false);
+		    walkProvider.calculateNextJointsAndStiffnesses(
+			sensorAngles, sensorInertials, sensorFSRs);
+		}
+
+		const std::vector<float> llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
+		const std::vector<float> rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
+		const std::vector<float> rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
+
+		const std::vector<float> larmJoints = curProvider->getChainJoints(LARM_CHAIN);
+
+		//copy and clip joints for safety
+		for(unsigned int i = 0; i < LEG_JOINTS; i ++)
+		{
+		    nextJoints[R_HIP_YAW_PITCH + i] = NBMath::clip(rlegJoints.at(i),
+								   RIGHT_LEG_BOUNDS[i][0], RIGHT_LEG_BOUNDS[i][1]);
+
+		    nextJoints[L_HIP_YAW_PITCH + i] = NBMath::clip(llegJoints.at(i),
+								   LEFT_LEG_BOUNDS[i][0], LEFT_LEG_BOUNDS[i][1]);
+		}
+
+		for(unsigned int i = 0; i < ARM_JOINTS; i ++)
+		{
+		    nextJoints[L_SHOULDER_PITCH + i] = NBMath::clip(larmJoints.at(i),
+								    LEFT_ARM_BOUNDS[i][0], LEFT_ARM_BOUNDS[i][1]);
+		    nextJoints[R_SHOULDER_PITCH + i] = NBMath::clip(rarmJoints.at(i),
+								    RIGHT_ARM_BOUNDS[i][0], RIGHT_ARM_BOUNDS[i][1]);
+		}
+	    }
+	}
+
+	void MotionModule::preProcessBody()
+	{
+	    if (curProvider != &nullBodyProvider &&
+		nextProvider == &nullBodyProvider)
+	    {
+		//scriptedProvider.hardReset();
+		walkProvider.hardReset();
+	    }
+
+	    //determine the curProvider, and do any necessary swapping
+	    if (curProvider != nextProvider)
+	    {
+		if (!curProvider->isStopping()) {
+		    curProvider->requestStop();
+		}
+
+		if (!curProvider->isActive()) {
+		    swapBodyProvider();
+		}
+	    }
+	}
+
+	void MotionModule::clipHeadJoints(std::vector<float>& joints)
+	{
+	    using namespace Kinematics;
+
+	    float yaw = fabs(joints[HEAD_YAW]);
+	    float pitch = joints[HEAD_PITCH];
+
+	    if (yaw < 0.5f)
+	    {
+		if (pitch > 0.46)
+		{
+		    pitch = 0.46f;
+		}
+	    }
+
+	    else if (yaw < 1.0f)
+	    {
+		if (pitch > 0.4f)
+		{
+		    pitch = 0.4f;
+		}
+	    }
+
+	    else if (yaw < 1.32f)
+	    {
+		if (pitch > 0.42f)
+		{
+		    pitch = 0.42f;
+		}
+	    }
+
+	    else if (yaw < 1.57f)
+	    {
+		//if (pitch > -0.2f)
+		//{
+		//    pitch = -0.2f;
+		//}
+		if (pitch > 0.2f)
+		{
+		    pitch = 0.2f;
+		}
+	    }
+
+	    else if (yaw >= 1.57f)
+	    {
+		//if (pitch > -0.3f)
+		//{
+		//    pitch = -0.3f;
+		//}
+		if (pitch > 0.2f)
+		{
+		    pitch = 0.2f;
+		}
+	    }
+
+	    joints[HEAD_PITCH] = pitch;
+	}
+
+	void MotionModule::safetyCheckJoints()
+	{
+	    using namespace Kinematics;
+
+	    for (unsigned int i = 0; i < NUM_JOINTS; i++)
+	    {
+		//We need to clip angles twice. Why? Because the sensor values are between
+		//20 and 40 ms old, so we can't strictly use the sensor reports to clip
+		// the velocity.
+		//We also can't just use the internaly held motion angles because these
+		// could be out of sync with reality, and thus allow us to send bad
+		// commands.
+		//As a balance, we clip both with respect to sensor readings which we
+		//ASSUME are 40 ms old (even if they are newer), AND we clip with respect
+		//to the internally held motion command angles, which ensures that we
+		//aren't sending commands which are in general too fast for the motors.
+		//For the sensor angles, we clip with TWICE the max speed.
+
+		const float allowedMotionDiffInRad = jointsMaxVelNoLoad[i];
+		const float allowedSensorDiffInRad = allowedMotionDiffInRad*6.0f;
+
+		//considering checking which clip is more restrictive each frame and
+		//only applying it
+		nextJoints[i] = NBMath::clip(nextJoints[i],
+					     lastJoints[i] - allowedMotionDiffInRad,
+					     lastJoints[i] + allowedMotionDiffInRad);
+
+		nextJoints[i] = NBMath::clip(nextJoints[i],
+					     sensorAngles[i] - allowedSensorDiffInRad,
+					     sensorAngles[i] + allowedSensorDiffInRad);
+
+		lastJoints[i] = nextJoints[i];
+	    }
+	}
+
+/**
+ * Method handles switching providers. Also handles any special action
+ * required when switching between providers
+ */
+	void MotionModule::swapBodyProvider()
+	{
+	    std::vector<BodyJointCommand::ptr> transitions;
+	    std::string old_provider = curProvider->getName();
+
+	    switch(nextProvider->getType())
+	    {
+	    case WALK_PROVIDER:
+		//WARNING THIS COULD CAUSE INFINITE LOOP IF SWITCHBOARD IS BROKEN!
+		//TODO/HACK: Since we overwrite Joint angles in realityCheck
+		//we may want to ensure that a gaitTranstition command is only run
+		// ONCE (Maybe twice?), instead of doing this forever.
+		//The potential symptoms of such a bug would be jittering when standing
+		//We need to ensure we are in the correct gait before walking
+		if(noWalkTransitionCommand){//only enqueue one
+		    noWalkTransitionCommand = false;
+		    transitions = generateNextBodyProviderTransitions();
+
+		    if(transitions.size() >= 1){
+			// for(unsigned int i = 0; i< transitions.size(); i++){
+			//     scriptedProvider.setCommand(transitions[i]);
+			// }
+			// curProvider = static_cast<MotionProvider * >(&scriptedProvider);
+			break;
+		    }
+		}
+		curProvider = nextProvider;
+		break;
+
+	    case NULL_PROVIDER:
+	    case SCRIPTED_PROVIDER:
+	    case HEAD_PROVIDER:
+	    default:
+		noWalkTransitionCommand = true;
+		curProvider = nextProvider;
+	    }
+	}
+
+	const std::vector<float> MotionModule::getNextStiffness() const
+	{
+	    std::vector<float> result(nextStiffnesses);
+	    return result;
+	}
+
+	void MotionModule::signalNextFrame()
+	{
+	    newInputJoints = true;
+	}
+
+/**
+ * Checks to ensure that the current MotionBodyAngles are close enough to
+ * what the sensors are reporting. If they are very different,
+ * then the bad value is replaced
+ */
+	int MotionModule::realityCheckJoints(){
+// 	    static const float joint_override_thresh = 0.12f;//radians
+// 	    static const float head_joint_override_thresh = 0.3f;//need diff for head
+
+// 	    int changed = 0;
+// 	    sensorAngles = sensors->getBodyAngles();
+// 	    vector<float> motionAngles = sensors->getMotionBodyAngles();
+
+// 	    //HEAD ANGLES - handled separately to avoid trouble in HeadProvider
+// 	    for(unsigned int i = 0; i < HEAD_JOINTS; i++){
+// 		if (fabs(sensorAngles[i] - motionAngles[i]) >
+// 		    head_joint_override_thresh){
+// #ifdef DEBUG_SWITCHBOARD_DISCREPANCIES
+// 		    cout << "RealityCheck discrepancy: "<<endl
+// 			 << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+// #endif
+// 		    nextJoints[i] = motionAngles[i] = sensorAngles[i];
+// 		    changed += 1;
+// 		}
+// 	    }
+
+// 	    //BODY ANGLES
+// 	    for(unsigned int i = HEAD_JOINTS -1; i < NUM_JOINTS; i++){
+// 		if (fabs(sensorAngles[i] - motionAngles[i]) > joint_override_thresh){
+// #ifdef DEBUG_SWITCHBOARD_DISCREPANCIES
+// 		    cout << "RealityCheck discrepancy: "<<endl
+// 			 << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+// #endif
+// 		    nextJoints[i] = motionAngles[i] = sensorAngles[i];
+// 		    changed += 1;
+// 		}
+// 	    }
+// 	    if(changed != 0)
+// 		sensors->setMotionBodyAngles(motionAngles);
+// 	    return changed;
+	    // @todo !! figure this out!
+	    return 0;
+	}
+
+	// void MotionModule::sendMotionCommand(const Gait::ptr command)
+	// {
+	//     //Don't request to switch providers when we get a gait command
+	//     walkProvider.setCommand(command);
+	// }
+
+	void MotionModule::sendMotionCommand(const WalkCommand::ptr command)
+	{
+	    nextProvider = &walkProvider;
+	    walkProvider.setCommand(command);
+	}
+
+	void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
+	{
+	    noWalkTransitionCommand = true;
+	    //nextProvider = &scriptedProvider;
+	    //scriptedProvider.setCommand(command);
+	}
+
+	// void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
+	// {
+	//     pthread_mutex_lock(&next_provider_mutex);
+	//     nextHeadProvider = &headProvider;
+	//     headProvider.setCommand(command);
+	//     pthread_mutex_unlock(&next_provider_mutex);
+
+	// }
+	// void MotionModule::sendMotionCommand(const CoordHeadCommand::ptr command){
+	//     pthread_mutex_lock(&next_provider_mutex);
+	//     nextHeadProvider = &headProvider;
+	//     headProvider.setCommand(command);
+	//     pthread_mutex_unlock(&next_provider_mutex);
+
+	// }
+	// void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command){
+	//     pthread_mutex_lock(&next_provider_mutex);
+	//     nextHeadProvider = &headProvider;
+	//     headProvider.setCommand(command);
+	//     pthread_mutex_unlock(&next_provider_mutex);
+
+	// }
+
+	void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
+	{
+	    nextProvider = &nullBodyProvider;
+	    //nextHeadProvider = &nullHeadProvider;
+
+	    //nullHeadProvider.setCommand(command);
+	    nullBodyProvider.setCommand(command);
+	}
+
+	void MotionModule::sendMotionCommand(const UnfreezeCommand::ptr command)
+	{
+	    // if(curHeadProvider == &nullHeadProvider){
+	    // 	nullHeadProvider.setCommand(command);
+	    // }
+	    if(curProvider == &nullBodyProvider){
+		nullBodyProvider.setCommand(command);
+	    }
+	}
+
+	// void MotionModule::sendMotionCommand(const StepCommand::ptr command){
+	//     pthread_mutex_lock(&next_provider_mutex);
+	//     nextProvider = &walkProvider;
+	//     walkProvider.setCommand(command);
+	//     pthread_mutex_unlock(&next_provider_mutex);
+	// }
+
+	void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
+	{
+	    nextProvider = &walkProvider;
+	    walkProvider.setCommand(command);
+	}
+
+	std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransitions() 
+	{
+	    std::vector<BodyJointCommand::ptr> commands;
+
+	    std::vector<float> providerJoints = nextProvider->getInitialStance();
+
+	    if (providerJoints.size() == 0)
+		return commands;
+
+	    float max_change = -M_PI_FLOAT*10.0f;
+
+	    //ignore the first chain since it's the head one
+	    for (unsigned i = 0; i < Kinematics::NUM_BODY_JOINTS; i++) {
+		max_change = std::max((double)max_change, fabs(sensorAngles[i + Kinematics::HEAD_JOINTS] - providerJoints[i]));
+	    }
+
+	    // this is the max we allow, not the max the hardware can do
+	    const float  MAX_RAD_PER_SEC =  M_PI_FLOAT*0.3f;
+	    float time = max_change/MAX_RAD_PER_SEC;
+
+	    if(time <= MOTION_FRAME_LENGTH_S){
+		return commands;
+	    }
+
+	    //larm: (0.,90.,0.,0.)
+	    //rarm: (0.,-90.,0.,0.)
+	    float larm_angles[] = {0.9f, 0.3f,0.0f,0.0f};
+	    float rarm_angles[] = {0.9f,-0.3f,0.0f,0.0f};
+
+	    std::vector<float> safe_larm(larm_angles, &larm_angles[Kinematics::ARM_JOINTS]);
+	    std::vector<float> safe_rarm(rarm_angles, &rarm_angles[Kinematics::ARM_JOINTS]);
+
+	    // HACK @joho get gait stiffness params. nextGait.maxStiffness
+	    std::vector<float> stiffness(Kinematics::NUM_JOINTS, 0.75f);
+	    std::vector<float> stiffness2(Kinematics::NUM_JOINTS, 0.75f);
+
+	    std::vector<float> empty(0);
+	    if (time > MOTION_FRAME_LENGTH_S * 30){
+		commands.push_back(
+		    BodyJointCommand::ptr (
+                        new BodyJointCommand(0.5f,safe_larm, empty,empty,safe_rarm,
+					     stiffness,
+					     Kinematics::INTERPOLATION_SMOOTH)) );
+	    }
+
+	    commands.push_back(
+		BodyJointCommand::ptr (
+                    new BodyJointCommand(time, providerJoints, stiffness2,
+					 Kinematics::INTERPOLATION_SMOOTH))  );
+
+	    return commands;
+ 	}
+
+    } // namespace motion
+} // namespace man
