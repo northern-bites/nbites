@@ -133,16 +133,9 @@ namespace man {
 			modifySysPath();
 			brain_module = NULL;
 
-			//TODO: remove unnecessary calls here. All of them?
+			//TODO: remove unnecessary calls here. The rest of them?
 			// Initialize low-level modules
-			// c_init_sensors();
-			// c_init_lights();
 			// c_init_speed();
-			// c_init_roboguardian();
-			// c_init_motion();
-			// c_init_comm();
-			// c_init_logging();
-			// c_init_vision();
 			// c_init_noggin_constants();
 			// c_init_objects();
 			// c_init_goalie();

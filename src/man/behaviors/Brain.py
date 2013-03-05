@@ -13,7 +13,6 @@ import noggin_constants as Constants
 # Modules from this directory
 from . import FallController
 from . import Stability
-from . import TeamConfig
 from . import Leds
 from . import robots
 
@@ -27,7 +26,6 @@ from .players import Switch
 from .kickDecider import KickDecider
 import GameController
 
-import _roboguardian
 import _localization
 
 from objects import (MyInfo, FieldObject)
@@ -40,10 +38,14 @@ class Brain(object):
     Class brings all of our components together and runs the behaviors
     """
 
-    def __init__(self):
+    def __init__(self, arguments):
         """
         Class constructor
         """
+        # Parse arguments
+        self.playerNumber = arguments[0]
+        self.teamNumber = arguments[1]
+
         self.counter = 0
         self.time = time.time()
 
@@ -55,24 +57,20 @@ class Brain(object):
         #print leds
         self.leds = Leds.Leds(self)
 
-        # Get the pointer to the C++ RoboGuardian object for use with Python
-        self.roboguardian = _roboguardian.roboguardian
-        self.roboguardian.enableFallProtection(True)
-
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
         self.CoA.setRobotGait(self.motion)
 
         # coa is Certificate of Authenticity (to keep things short)
         self.out.printf(self.CoA)
-        self.out.printf("GC:  I am on team "+str(TeamConfig.TEAM_NUMBER))
-        self.out.printf("GC:  I am player  "+str(TeamConfig.PLAYER_NUMBER))
+        self.out.printf("GC:  I am on team "+str(self.teamNumber))
+        self.out.printf("GC:  I am player  "+str(self.playerNumber))
 
         # Initialize various components
         self.my = MyInfo(self.loc)
 
         # Functional Variables
-        self.my.playerNumber = TeamConfig.PLAYER_NUMBER
+        self.my.playerNumber = self.playerNumber
         self.my.teamColor = Constants.teamColor.TEAM_BLUE
 
         # Information about the environment
@@ -204,7 +202,7 @@ class Brain(object):
         """
         Main control loop called every TIME_STEP milliseconds
         """
-        # order here is very important
+        # Order here is very important
         # Update Environment
         self.time = time.time()
 
@@ -228,11 +226,8 @@ class Brain(object):
         self.tracker.run()
         self.nav.run()
 
-        #Set LEDS
+        #Set LED message
         self.leds.processLeds()
-
-        # Update any logs we have
-        self.out.updateLogs()
 
     # def getCommUpdate(self):
     #     for i in range(len(self.teamMembers)):
