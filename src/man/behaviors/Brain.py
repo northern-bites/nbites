@@ -28,7 +28,6 @@ from .kickDecider import KickDecider
 import GameController
 
 import _roboguardian
-import _speech
 import _localization
 
 from objects import (MyInfo, FieldObject)
@@ -55,7 +54,6 @@ class Brain(object):
         #initalize the leds
         #print leds
         self.leds = Leds.Leds(self)
-        self.speech = _speech.speech
 
         # Get the pointer to the C++ RoboGuardian object for use with Python
         self.roboguardian = _roboguardian.roboguardian

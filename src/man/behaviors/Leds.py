@@ -3,6 +3,8 @@ import vision
 from playbook import PBConstants
 import noggin_constants as NogginConstants
 
+NUM_LED_GROUPS = 31
+
 # LED Related #
 GC_LEDS = True
 FOOT_LEDS = True
@@ -41,14 +43,14 @@ RIGHT_COMM_FIVE_LED,
 SUBROLE_LED,
 ROLE_LED,
 BALL_LED,
-LEFT_GOAL_LED, # 7
+LEFT_GOAL_LED,
 RIGHT_GOAL_LED,
 GOAL_ID_LED,
 CHEST_LED,
 LEFT_FOOT_LED,
 RIGHT_FOOT_LED,
 LEFT_UNUSED_LED,
-RIGHT_UNUSED_LED) = range(_lights.NUM_LED_GROUPS)
+RIGHT_UNUSED_LED) = range(NUM_LED_GROUPS)
 
 ###COLORS
 RED   = 0xFF0000
@@ -174,6 +176,9 @@ class Leds():
         self.numActiveMates = 0
 
     def processLeds(self):
+        # Reset brain's out message to a blank one.
+        self.brain.outMessages['ledCommand'] = LedCommand_pb2.LedCommand()
+
         if BALL_LEDS:
             if self.brain.ball.vis.framesOn == 1:
                 self.executeLeds(BALL_ON_LEDS)
@@ -182,9 +187,6 @@ class Leds():
 
         if GOAL_LEDS:
             newCertainty = self.brain.ygrp.vis.certainty
-
-#            print 'YGRP:\n\tON: {0}\n\tFramesON: {1}\n\tFramesOFF: {2}\nYGLP:\n\tON: {3}\n\tFramesON: {4}\n\tFramesOFF: {5}'.format(self.brain.ygrp.vis.on,self.brain.ygrp.vis.framesOn,self.brain.ygrp.vis.framesOff,self.brain.yglp.vis.on,self.brain.yglp.vis.framesOn,self.brain.yglp.vis.framesOff)
-#            print 'Certainty: {0}'.format(newCertainty)
 
             if (newCertainty == vision.certainty.NOT_SURE):
                 if (self.brain.ygrp.vis.on and
@@ -293,6 +295,7 @@ class Leds():
                     else:
                         self.executeLeds(OTHER_SUBROLE_LEDS)
         if LOC_LEDS:
+            # TODO: show loc uncertainty via LEDS
             pass
 
         if COMM_LEDS:
@@ -373,8 +376,10 @@ class Leds():
             if len(ledTuple) != 3:
                 self.printf("Invalid print command!! " + str(ledTuple))
                 continue
-            ledName     = ledTuple[0]
-            ledHexValue = ledTuple[1]
-            if ledTuple[2] != NOW:
-                print "Invalid timing command in Leds.py"
-            self.lights.setRGB(ledName,ledHexValue)
+            # Add command to brain's out message fields
+            self.brain.outMessages['ledCommand'].addLed_id(ledTuple[0])
+            self.brain.outMessages['ledCommand'].addRgb_hex(ledTuple[1])
+
+            # Unnecessary check, never triggered
+            #if ledTuple[2] != NOW:
+                #print "Invalid timing command in Leds.py"
