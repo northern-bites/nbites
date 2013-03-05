@@ -10,6 +10,8 @@
 #include "comm/CommModule.h"
 #include "vision/VisionModule.h"
 #include "image/ImageTranscriberModule.h"
+#include "guardian/GuardianModule.h"
+#include "audio/AudioEnactorModule.h"
 
 namespace man {
 
@@ -19,15 +21,19 @@ public:
     Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name);
     virtual ~Man();
 
+
 private:
 
     void startSubThreads();
 
     DiagramThread sensorsThread;
+    DiagramThread guardianThread;
     DiagramThread commThread;
 	DiagramThread cognitionThread;
 
 
+    guardian::GuardianModule guardian;
+    audio::AudioEnactorModule audio;
     comm::CommModule comm;
     sensors::SensorsModule sensors;
 	vision::VisionModule vision;

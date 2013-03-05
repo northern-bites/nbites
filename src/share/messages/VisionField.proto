@@ -1,7 +1,7 @@
 package messages;
 
 
-message PVisionField
+message VisionField
 {
 
    optional int64 timestamp = 1;

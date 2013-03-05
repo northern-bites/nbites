@@ -96,30 +96,30 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
 
     std::vector<float> bodyAngles(24);
 
-    bodyAngles[0] = ja.headyaw();
-    bodyAngles[1] = ja.headpitch();
-    bodyAngles[2] = ja.lshoulderpitch();
-    bodyAngles[3] = ja.lshoulderroll();
-    bodyAngles[4] = ja.lelbowyaw();
-    bodyAngles[5] = ja.lwristyaw();
-    bodyAngles[6] = ja.lhand();
-    bodyAngles[7] = ja.rshoulderpitch();
-    bodyAngles[8] = ja.rshoulderroll();
-    bodyAngles[9] = ja.relbowyaw();
-    bodyAngles[10] = ja.rwristyaw();
-    bodyAngles[11] = ja.rhand();
-    bodyAngles[12] = ja.lhipyawpitch();
-    bodyAngles[13] = ja.rhipyawpitch();
-    bodyAngles[14] = ja.lhiproll();
-    bodyAngles[15] = ja.lhippitch();
-    bodyAngles[16] = ja.lkneepitch();
-    bodyAngles[17] = ja.lanklepitch();
-    bodyAngles[18] = ja.lankleroll();
-    bodyAngles[19] = ja.rhiproll();
-    bodyAngles[20] = ja.rhippitch();
-    bodyAngles[21] = ja.rkneepitch();
-    bodyAngles[22] = ja.ranklepitch();
-    bodyAngles[23] = ja.rankleroll();
+    bodyAngles[0] = ja.head_yaw();
+    bodyAngles[1] = ja.head_pitch();
+    bodyAngles[2] = ja.l_shoulder_pitch();
+    bodyAngles[3] = ja.l_shoulder_roll();
+    bodyAngles[4] = ja.l_elbow_yaw();
+    bodyAngles[5] = ja.l_wrist_yaw();
+    bodyAngles[6] = ja.l_hand();
+    bodyAngles[7] = ja.r_shoulder_pitch();
+    bodyAngles[8] = ja.r_shoulder_roll();
+    bodyAngles[9] = ja.r_elbow_yaw();
+    bodyAngles[10] = ja.r_wrist_yaw();
+    bodyAngles[11] = ja.r_hand();
+    bodyAngles[12] = ja.l_hip_yaw_pitch();
+    bodyAngles[13] = ja.r_hip_yaw_pitch();
+    bodyAngles[14] = ja.l_hip_roll();
+    bodyAngles[15] = ja.l_hip_pitch();
+    bodyAngles[16] = ja.l_knee_pitch();
+    bodyAngles[17] = ja.l_ankle_pitch();
+    bodyAngles[18] = ja.l_ankle_roll();
+    bodyAngles[19] = ja.r_hip_roll();
+    bodyAngles[20] = ja.r_hip_pitch();
+    bodyAngles[21] = ja.r_knee_pitch();
+    bodyAngles[22] = ja.r_ankle_pitch();
+    bodyAngles[23] = ja.r_ankle_roll();
 
     //copy the values into a vector.
     copy(bodyAngles.begin(), bodyAngles.begin() + HEAD_JOINTS,
@@ -184,8 +184,8 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
 
 
     // At this time we trust inertial
-     bodyInclinationX = inert.anglex();
-     bodyInclinationY = inert.angley();
+     bodyInclinationX = inert.angle_x();
+     bodyInclinationY = inert.angle_y();
 
     //cout<<"inertial.x "<<bodyInclinationX<<" y: "<<bodyInclinationY<<endl;
 

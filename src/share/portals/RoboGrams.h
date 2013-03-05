@@ -426,7 +426,7 @@ public:
   const T* get() const { return rc_ ? &((const MessageHolder<T>*) rc_)->message : 0;}
         T* get()       { return rc_ ? &((      MessageHolder<T>*) rc_)->message : 0;}
   // effect   Return a pointer to the message referenced.
-  
+
   // The following static functions are used to operate the underlying MessagePool containing
   // the messages. They are here instead of in MessageHolder<T> for client convenience.
   static void setInitialize(bool b) { MessageHolder<T>::pool_.initialize(b);}
@@ -552,7 +552,7 @@ class OutPortal
   Module& module_;        // The module containing this output
 
 public:
-  OutPortal(Module& m) : module_(m) {}
+  OutPortal(Module& m) : message_(0), module_(m) {}
   // effect   Construct output on specified module
 
   // Default copy/assign OK

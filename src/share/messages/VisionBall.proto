@@ -1,0 +1,21 @@
+package messages;
+
+
+
+message VisionBall {
+
+	optional float distance = 1;
+        optional float bearing = 2;
+        optional float angle_x_deg = 3;
+        optional float angle_y_deg = 4;
+        optional float elevation_deg = 5;
+        optional float distance_sd = 6;
+        optional float bearing_sd = 7;
+	optional bool inTopCam = 8;
+	optional float radius = 9;
+	optional sint32 confidence = 10;
+	optional float heat = 11;
+	optional bool on = 12;
+	optional sint32 frames_on = 13;
+	optional sint32 frames_off = 14;
+}

@@ -1,33 +1,41 @@
 #pragma once
 
+#include <vector>
 
 #include "RoboGrams.h"
 #include "ThresholdedImage.h"
 #include "JointAngles.pb.h"
 #include "InertialState.pb.h"
+#include "VisionField.pb.h"
+#include "VisionBall.pb.h"
 #include "Vision.h"
 #include <boost/shared_ptr.hpp>
 
 
 namespace man {
-	namespace vision{
+namespace vision{
 
+	
+	class VisionModule : public portals::Module {
+		
+	public:
+		VisionModule();
+		virtual ~VisionModule();
+		
+		portals::InPortal<messages::ThresholdedImage> topImageIn;
+		portals::InPortal<messages::ThresholdedImage> bottomImageIn;
+		portals::InPortal<messages::JointAngles> joint_angles;
+		portals::InPortal<messages::InertialState> inertial_state;
 
-		class VisionModule : public portals::Module {
+		portals::OutPortal<messages::VisionField> vision_field;
+		portals::OutPortal<messages::VisionBall> vision_ball;
 
-		public:
-			VisionModule();
-			virtual ~VisionModule();
-
-			portals::InPortal<messages::ThresholdedImage> topImageIn;
-			portals::InPortal<messages::ThresholdedImage> bottomImageIn;
-			portals::InPortal<messages::JointAngles> joint_angles;
-			portals::InPortal<messages::InertialState> inertial_state;
-
-		protected:
-			virtual void run_();
-			boost::shared_ptr<Vision> vision;
-	  		};
-	}
+	protected:
+		virtual void run_();
+		boost::shared_ptr<Vision> vision;
+		void updateVisionField();
+		void updateVisionBall();
+	};
+}
 }
 

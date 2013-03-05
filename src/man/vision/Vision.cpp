@@ -140,13 +140,16 @@ void Vision::copyImage(const byte* image) {
  * -Handle image arrays if AiboConnect is requesting them
  * -Calculate Frames Per Second.
  *
+ *-----------The above is just not true-----------
+ *-----------(except for the part about it being important)-------
+ *
  */
 
 void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot,
 			 const JointAngles& ja, const InertialState& inert) {
 	
-	cout << "notifying image\n";
-	thresh->orange->setDebugBall(true);
+	// cout << "notifying image\n";
+	// thresh->orange->setDebugBall(true);
 	cout << endl << "the ball is at distance: " << ball->getDistance() << endl;
     yImg = y_top;
     uImg = y_top + AVERAGED_IMAGE_SIZE;
