@@ -12,7 +12,6 @@ import noggin_constants as Constants
 
 # Modules from this directory
 from . import FallController
-from . import Stability
 from . import Leds
 from . import robots
 
@@ -28,7 +27,7 @@ import GameController
 
 import _localization
 
-from objects import (MyInfo, FieldObject)
+from objects import (FieldObject)
 
 # Import message protocol buffers
 from .../share/messages import LedCommand_pb2
@@ -45,6 +44,7 @@ class Brain(object):
         # Parse arguments
         self.playerNumber = arguments[0]
         self.teamNumber = arguments[1]
+        self.teamColor = Constants.teamColor.TEAM_BLUE
 
         self.counter = 0
         self.time = time.time()
@@ -66,22 +66,12 @@ class Brain(object):
         self.out.printf("GC:  I am on team "+str(self.teamNumber))
         self.out.printf("GC:  I am player  "+str(self.playerNumber))
 
-        # Initialize various components
-        self.my = MyInfo(self.loc)
-
-        # Functional Variables
-        self.my.playerNumber = self.playerNumber
-        self.my.teamColor = Constants.teamColor.TEAM_BLUE
-
         # Information about the environment
         # All field objects should come in as messages now
         #self.initFieldObjects()
         self.initTeamMembers()
 
         self.play = Play.Play()
-
-        # Stability data
-        self.stability = Stability.Stability(self.sensors)
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
@@ -246,7 +236,6 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.ball.update()
-        self.my.update()
         self.yglp.setBest()
         self.ygrp.setBest()
         self.bglp.setBest()
@@ -281,44 +270,44 @@ class Brain(object):
         Reset loc according to team number and team color.
         Note: Loc uses truly global coordinates.
         """
-        if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
-            if self.my.playerNumber == 1:
+        if self.teamColor == Constants.teamColor.TEAM_BLUE:
+            if self.playerNumber == 1:
                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     Constants.HEADING_UP,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.my.playerNumber == 2:
+            elif self.playerNumber == 2:
                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                                     Constants.HEADING_DOWN,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.my.playerNumber == 3:
+            elif self.playerNumber == 3:
                 self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                                     Constants.HEADING_DOWN,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.my.playerNumber == 4:
+            elif self.playerNumber == 4:
                 self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     Constants.HEADING_UP,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
         else:
-            if self.my.playerNumber == 1:
+            if self.playerNumber == 1:
                 self.loc.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                                     Constants.HEADING_DOWN,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.my.playerNumber == 2:
+            elif self.playerNumber == 2:
                 self.loc.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     Constants.HEADING_UP,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.my.playerNumber == 3:
+            elif self.playerNumber == 3:
                 self.loc.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                     Constants.HEADING_UP,
                                     _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.my.playerNumber == 4:
+            elif self.playerNumber == 4:
                 self.loc.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
                                     Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                                     Constants.HEADING_DOWN,
@@ -334,7 +323,7 @@ class Brain(object):
 
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
-        if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
+        if self.teamColor == Constants.teamColor.TEAM_BLUE:
 # #            if self.my.playerNumber == 1:
 # #                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
 # #                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
@@ -367,7 +356,7 @@ class Brain(object):
         """
         Resets localization to both possible locations, depending on team color.
         """
-        if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
+        if self.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                 Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                 Constants.HEADING_UP,
@@ -393,7 +382,7 @@ class Brain(object):
         """
         Resets the goalie's localization to the manual position in the goalbox.
         """
-        if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
+        if self.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
                                 Constants.MIDFIELD_Y,
                                 Constants.HEADING_RIGHT,
