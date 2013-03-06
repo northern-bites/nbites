@@ -1,1 +1,1 @@
-from _localization import Loc
+from . import Brain

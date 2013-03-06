@@ -1,4 +1,3 @@
-from man.motion import SweetMoves as SweetMoves
 from . import FallStates
 from .util import FSA
 
@@ -52,11 +51,13 @@ class FallController(FSA.FSA):
         FSA.FSA.run(self)
 
     def getTimeRemainingEst(self):
-        if (self.currentState == "notFallen" or
-            self.currentState == "doneStanding"):
-            return 0
-        else:
-            return SweetMoves.getMoveTime(SweetMoves.STAND_UP_FRONT)
+        # TODO: turn this into a message
+        return 0
+        # if (self.currentState == "notFallen" or
+        #     self.currentState == "doneStanding"):
+        #     return 0
+        # else:
+        #     return SweetMoves.getMoveTime(SweetMoves.STAND_UP_FRONT)
 
     def enableFallProtection(self, isTrue):
         self.printf("Fall Protection is " + str(isTrue))

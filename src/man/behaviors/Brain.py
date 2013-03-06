@@ -25,12 +25,10 @@ from .players import Switch
 from .kickDecider import KickDecider
 import GameController
 
-import _localization
-
 from objects import (FieldObject)
 
 # Import message protocol buffers
-from .../share/messages import LedCommand_pb2
+from ...share.messages import LedCommand_pb2
 
 class Brain(object):
     """
@@ -86,73 +84,6 @@ class Brain(object):
         self.inMesssages = {}
         self.outMessages = {}
 
-    # def initFieldObjects(self):
-    #     """
-    #     Build our set of Field Objects which are team specific compared
-    #     to the generic forms used in the vision system
-    #     """
-    #     # Build instances of the vision based field objects
-    #     # Left post is on that goalie's left
-    #     # Note: As of 6/8/12, ygrp holds info about ambiguous posts
-    #     # Yellow goal left and right posts
-    #     self.yglp = FieldObject(self.vision.yglp,
-    #                             Constants.vis_landmark.VISION_YGLP,
-    #                             self.loc)
-
-    #     self.ygrp = FieldObject(self.vision.ygrp,
-    #                             Constants.vis_landmark.VISION_YGRP,
-    #                             self.loc)
-
-    #     # Blue Goal left and right posts
-    #     self.bglp = FieldObject(self.vision.bglp,
-    #                             Constants.vis_landmark.VISION_BGLP,
-    #                             self.loc)
-
-    #     self.bgrp = FieldObject(self.vision.bgrp,
-    #                             Constants.vis_landmark.VISION_BGRP,
-    #                             self.loc)
-
-    #     # Now we build the field objects to be based on our team color
-    #     self.makeFieldObjectsRelative()
-
-    # def makeFieldObjectsRelative(self):
-    #     """
-    #     Builds a list of fieldObjects based on their relative names to the robot
-    #     Needs to be called when team color is determined
-    #     """
-    #     # Note: corner directions are relative to perspective of own goalie
-
-    #     # Blue team setup
-    #     if self.my.teamColor == Constants.teamColor.TEAM_BLUE:
-    #         # Yellow goal
-    #         self.oppGoalRightPost = self.yglp
-    #         self.oppGoalLeftPost = self.ygrp
-    #         # Blue Goal
-    #         self.myGoalLeftPost = self.bglp
-    #         self.myGoalRightPost = self.bgrp
-
-    #     # Yellow team setup
-    #     else:
-    #         # Yellow goal
-    #         self.myGoalLeftPost = self.yglp
-    #         self.myGoalRightPost = self.ygrp
-    #         # Blue Goal
-    #         self.oppGoalRightPost = self.bglp
-    #         self.oppGoalLeftPost = self.bgrp
-
-    #     # Since, for ex.  bgrp points to the same things as myGoalLeftPost,
-    #     # we can set these regardless of our team color
-    #     self.myGoalLeftPost.associateWithRelativeLandmark(
-    #         Constants.LANDMARK_MY_GOAL_LEFT_POST)
-    #     self.myGoalRightPost.associateWithRelativeLandmark(
-    #         Constants.LANDMARK_MY_GOAL_RIGHT_POST)
-    #     self.oppGoalLeftPost.associateWithRelativeLandmark(
-    #         Constants.LANDMARK_OPP_GOAL_LEFT_POST)
-    #     self.oppGoalRightPost.associateWithRelativeLandmark(
-    #         Constants.LANDMARK_OPP_GOAL_RIGHT_POST)
-
-    #     # Build a list of all of the field objects with respect to team color
-    #     self.myFieldObjects = [self.yglp, self.ygrp, self.bglp, self.bgrp]
 
     def initTeamMembers(self):
         self.teamMembers = []
