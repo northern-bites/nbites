@@ -67,7 +67,7 @@ namespace man {
 		public:
 			// portals
 			// note: order of portals matches message array indicies
-			portals::InPortal<messages::InitialState> initialStateIn;
+			portals::InPortal<messages::GameState> gameStateIn;
 			portals::OutPortal<messages::LedCommand> ledCommandOut;
 		};
 	}

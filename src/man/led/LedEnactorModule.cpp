@@ -16,8 +16,11 @@ namespace man {
 
 			std::cout<<command.DebugString()<<std::endl;
 
-			// This might not be the proper way to access proto values
-			naoLights.setRGB(command.led_id(),command.rgb_hex());
+			// Loop through message and send each command
+			// TODO: make this more robust if arrays don't have the same size
+			for (int i=0; i<command.led_id_size(); i++) {
+				naoLights.setRGB(command.led_id(i),command.rgb_hex(i));
+			}
 		}
 
 	}

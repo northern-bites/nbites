@@ -75,7 +75,6 @@ add_subdirectory( log )
 add_subdirectory( sensors )
 add_subdirectory( comm )
 add_subdirectory( led )
-add_subdirectory( testModule )
 add_subdirectory( behaviors )
 add_subdirectory( guardian )
 add_subdirectory( audio )
@@ -99,7 +98,6 @@ target_link_libraries(
   sensors
   comm
   led
-  testModule
   behaviors
   guardian
   audio

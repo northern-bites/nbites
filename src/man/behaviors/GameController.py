@@ -18,15 +18,14 @@ class GameController(FSA.FSA):
     def __init__(self, brain):
         FSA.FSA.__init__(self,brain)
         self.brain = brain
-        self.gd = brain.comm.gd
         self.addStates(GameStates)
         self.currentState = 'gameInitial'
         self.setName('GameController')
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'green'
         self.setPrintFunction(self.brain.out.printf)
-        self.timeLeft = self.gd.timeRemaining
-        self.kickOff = self.gd.ourKickoff
+        self.timeLeft = 0 #temporary value
+        self.kickOff = 1 #temporary value
         self.penaltyShots = False
 
         if self.kickOff:
@@ -37,11 +36,18 @@ class GameController(FSA.FSA):
         print  "kickoff:%g teamColor:%g" % (self.kickOff, self.gd.myTeamColor)
 
     def run(self):
-        self.gd = self.brain.comm.gd
+        # Currently set up to ignore button presses if game
+        # controller is sending packets 3/6/2013
 
-        gcState = self.gd.currentState
+        self.gd = self.brain.inMessages['commGCData']
 
-        if self.gd.secondaryState == STATE2_PENALTYSHOOT:
+        gcState = self.gd.state
+        if self.gd.team[0].team_number == self.brain.teamNumber:
+            penalized = self.gd.team[0].player[self.brain.playerNumber-1].penalty
+        else:
+            penalized = self.gd.team[1].player[self.brain.playerNumber-1].penalty
+
+        if self.gd.secondary_state == STATE2_PENALTYSHOOT:
             if gcState == STATE_INITIAL:
                 self.switchTo('penaltyShotsGameInitial')
             elif gcState == STATE_SET:
@@ -49,7 +55,7 @@ class GameController(FSA.FSA):
             elif gcState == STATE_READY:
                 self.switchTo('penaltyShotsGameReady')
             elif gcState == STATE_PLAYING:
-                if self.gd.isOurPlayerPenalized(self.brain.my.playerNumber):
+                if penalized:
                     self.switchTo('penaltyShotsGamePenalized')
                 else:
                     self.switchTo("penaltyShotsGamePlaying")
@@ -57,9 +63,9 @@ class GameController(FSA.FSA):
                 self.switchTo('penaltyShotsGameFinished')
             else:
                 self.printf("ERROR: INVALID GAME CONTROLLER STATE")
-        elif self.gd.secondaryState == STATE2_NORMAL:
+        elif self.gd.secondary_state == STATE2_NORMAL:
             if gcState == STATE_PLAYING:
-                if self.gd.isOurPlayerPenalized(self.brain.my.playerNumber):
+                if penalized:
                     self.switchTo("gamePenalized")
                 else:
                     self.switchTo("gamePlaying")
@@ -74,7 +80,7 @@ class GameController(FSA.FSA):
             else:
                 self.printf("ERROR: INVALID GAME CONTROLLER STATE")
 
-        self.timeLeft = self.gd.timeRemaining
+        self.timeLeft = self.gd.secs_remaining
 
         #Set team color
         if self.gd.myTeamColor != self.brain.teamColor:

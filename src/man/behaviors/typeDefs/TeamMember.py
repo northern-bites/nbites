@@ -48,22 +48,24 @@ class TeamMember(RobotLocation):
         self.grabbing = False
         self.dribbling = False
 
+    # @param info: an instance of a WorldModel protobuf
     def update(self, info):
         '''
         Updates information from latest Comm
         '''
 
         # stores comm information locally
-        self.playerNumber = info.number
-        self.x = info.x
-        self.y = info.y
-        self.h = info.h
-        self.ballOn = info.ballOn
-        self.ballDist = info.ballDist
-        self.ballBearing = info.ballBearing
+        # Shouldn't need to update playerNumber ever.
+        #self.playerNumber = info.number
+        self.x = info.my_x
+        self.y = info.my_y
+        self.h = info.my_h
+        self.ballOn = info.ball_on
+        self.ballDist = info.ball_dist
+        self.ballBearing = info.ball_bearing
         self.role = info.role
-        self.subRole = info.subRole
-        self.chaseTime = info.chaseTime
+        self.subRole = info.sub_role
+        self.chaseTime = info.chase_time
         self.active = info.active
 
         # calculates ball localization distance, bearing
@@ -140,7 +142,7 @@ class TeamMember(RobotLocation):
             self.brain.out.printf("\tChase time base is " + str(t))
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if (not self.brain.ball.vis.framesOn > 3 and
+        if (not self.brain.ball.framesOn > 3 and
             not self.brain.player.inKickingState):
             t += BALL_OFF_PENALTY
 
@@ -163,7 +165,8 @@ class TeamMember(RobotLocation):
         #     self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
 
         # Add a penalty for being fallen over
-        t += self.brain.fallController.getTimeRemainingEst()
+        # TODO: fix this with messages
+        #t += self.brain.fallController.getTimeRemainingEst()
 
         if DEBUG_DETERMINE_CHASE_TIME:
             self.brain.out.printf("\tChase time after fallen over penalty " + str(t))

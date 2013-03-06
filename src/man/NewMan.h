@@ -9,7 +9,6 @@
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
 #include "led/LedEnactorModule.h"
-#include "testModule/TestModule.h"
 #include "behaviors/BehaviorsModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
@@ -38,7 +37,6 @@ private:
     comm::CommModule comm;
 
     DiagramThread cognitionThread;
-	TestModule test;
 	led::LedEnactorModule leds;
 };
 

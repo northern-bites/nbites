@@ -94,11 +94,11 @@ namespace man {
 
 		void BehaviorsModule::serializeInMessages()
 		{
-			initialStateIn.latch();
+			gameStateIn.latch();
 			// Size that serialized message will be.
-			in_size[0] = initialStateIn.message().ByteSize();
+			in_size[0] = gameStateIn.message().ByteSize();
 			// Set in_proto to be the serialized message.
-			initialStateIn.message().SerializeToArray(in_proto[0],in_size[0]);
+			gameStateIn.message().SerializeToArray(in_proto[0],in_size[0]);
 		}
 
 		void BehaviorsModule::parseOutMessages(PyObject *tuple)
