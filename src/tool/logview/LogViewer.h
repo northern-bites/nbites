@@ -14,16 +14,26 @@
 #include <vector>
 #include <QCheckBox>
 
-#include "MObjectViewer.h"
+#include "ProtoViewer.h"
 
 namespace tool {
+
+namespace unlog
+{
+class UnlogBase;
+}
+
 namespace viewer {
 
-class MemoryViewer : public QMainWindow{
+// Things for mapping names to types
+typedef tool::unlog::UnlogBase*(* Construct)(std::string);
+typedef std::map<std::string, Construct> TypeMap;
+
+class LogViewer : public QMainWindow {
     Q_OBJECT;
 
 public:
-    MemoryViewer(QWidget* parent = 0);
+    LogViewer(TypeMap map, QWidget* parent = 0);
 
 private:
     std::vector<QDockWidget*> dockWidget;

@@ -51,6 +51,7 @@ endif()
 
 # Actual subdirectories!
 add_subdirectory( unlog )
+add_subdirectory( logview )
 
 # Sources
 set( tool_srcs main.cpp

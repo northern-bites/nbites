@@ -1,34 +1,28 @@
-
+#include "ProtoViewer.h"
 #include <QtDebug>
+#include "treemodel/ProtoNode.h"
 
-#include "MObjectViewer.h"
-
-#include "data/treemodel/ProtoNode.h"
-
-namespace qtool {
+namespace tool {
 namespace viewer {
 
-using namespace data::treemodel;
-using namespace man::memory;
-using namespace common::io;
-
-MObjectViewer::MObjectViewer(ProtobufMessage::const_ptr messageViewed, QWidget* parent) :
-        QTreeView(parent), messageViewed(messageViewed) {
+ProtoViewer::ProtoViewer(google::protobuf::Message* msg, QWidget* parent) :
+        QTreeView(parent), messageViewed(msg)
+{
     this->createNewTreeModel();
 }
 
-MObjectViewer::~MObjectViewer() {
+ProtoViewer::~ProtoViewer() {
     delete treeModel;
 }
 
-void MObjectViewer::createNewTreeModel() {
+void ProtoViewer::createNewTreeModel() {
     ProtoNode* root = new ProtoNode(NULL, NULL,
-                                    messageViewed->getProtoMessage());
+                                    messageViewed);
     treeModel = new TreeModel(root);
     this->setModel(treeModel);
 }
 
-void MObjectViewer::updateView() {
+void ProtoViewer::updateView() {
     if (this->isVisible() && shouldRedraw) {
         treeModel->revalidateModel();
         QModelIndex top = treeModel->index(0, 0, QModelIndex());
@@ -40,14 +34,14 @@ void MObjectViewer::updateView() {
     this->QTreeView::update();
 }
 
-void MObjectViewer::showEvent(QShowEvent * e) {
+void ProtoViewer::showEvent(QShowEvent * e) {
     QTreeView::showEvent(e);
     //explicitely update the bitmap when the widget becomes visible again
     //since it might have changed!
     this->updateView();
 }
 
-void MObjectViewer::paintEvent(QPaintEvent* e) {
+void ProtoViewer::paintEvent(QPaintEvent* e) {
     QTreeView::paintEvent(e);
     shouldRedraw = true;
 }

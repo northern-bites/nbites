@@ -16,9 +16,8 @@
 #include <iostream>
 #include "ProtoNode.h"
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace viewer {
 
 using namespace google::protobuf;
 
@@ -319,6 +318,5 @@ const Message* ProtoNode::getMessage() const {
     return message;
 }
 
-}
 }
 }

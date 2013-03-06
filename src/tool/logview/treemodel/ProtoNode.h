@@ -30,9 +30,8 @@
 
 #include "Node.h"
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace viewer {
 
 namespace proto = google::protobuf;
 
@@ -100,5 +99,5 @@ private:
 
 }
 }
-}
+
 #endif /* ProtoNode_H_ */
