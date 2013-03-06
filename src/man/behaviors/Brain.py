@@ -11,7 +11,6 @@ sys.stderr = sys.stdout
 import noggin_constants as Constants
 
 # Modules from this directory
-from . import FallController
 from . import Leds
 from . import robots
 
@@ -52,7 +51,6 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
 
         #initalize the leds
-        #print leds
         self.leds = Leds.Leds(self)
 
         # Retrieve our robot identification and set per-robot parameters
@@ -66,6 +64,7 @@ class Brain(object):
         # Information about the environment
         # All field objects should come in as messages now
         #self.initFieldObjects()
+        self.ball = Ball.ball()
         self.initTeamMembers()
 
         self.play = Play.Play()
@@ -77,7 +76,6 @@ class Brain(object):
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
         self.gameController = GameController.GameController(self)
-        self.fallController = FallController.FallController(self)
 
         # Messages
         self.inMesssages = {}
@@ -136,7 +134,6 @@ class Brain(object):
 
         # Behavior stuff
         self.gameController.run()
-        self.fallController.run()
         self.updatePlaybook()
         self.player.run()
         self.tracker.run()

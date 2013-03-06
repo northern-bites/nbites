@@ -56,7 +56,7 @@ class GoTeam:
         if self.brain.gameController.currentState != 'gamePenalized':
             self.aPrioriTeammateUpdate()
 
-        if self.brain.gameController.currentState == 'gameReadyg':
+        if self.brain.gameController.currentState == 'gameReady':
             # Change which wing is forward based on the opponents score
             g = self.brain.gameController
             self.kickoffFormation = g.getScoreDifferential()%2

@@ -77,7 +77,7 @@ class GameController(FSA.FSA):
         self.timeLeft = self.gd.timeRemaining
 
         #Set team color
-        if self.gd.myTeamColor != self.brain.my.teamColor:
+        if self.gd.myTeamColor != self.brain.teamColor:
             if self.gd.myTeamColor == TEAM_BLUE:
                 self.brain.my.teamColor = TEAM_BLUE
             else:
