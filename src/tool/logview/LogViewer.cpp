@@ -3,7 +3,7 @@
 namespace tool {
 namespace viewer {
 
-LogViewer::LogViewer(TypeMap map, QWidget* parent) : QMainWindow(parent)
+LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
 {
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;

@@ -40,7 +40,6 @@ private:
     google::protobuf::Message* messageViewed;
     TreeModel* treeModel;
     bool shouldRedraw;
-
 };
 
 }
