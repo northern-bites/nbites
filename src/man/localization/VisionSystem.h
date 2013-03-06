@@ -13,7 +13,7 @@
 
 #include <vector>
 
-
+#include <boost/math/distributions.hpp>
 
 namespace man
 {
@@ -31,8 +31,9 @@ namespace man
         VisionSystem();
         ~VisionSystem();
 
-        ParticleSet update(ParticleSet& particles,
-                           messages::PVisionField observations);
+        // updates give particleset by reference, returns true if observations was nonempty
+        bool update(ParticleSet& particles,
+                    messages::PVisionField observations);
 
         float scoreFromVisDetect(const Particle& particle,
                                  const messages::PVisualDetection& obsv);

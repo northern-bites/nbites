@@ -10,27 +10,38 @@ namespace man
         /**
          * Updates the particle set according to the motion.
          *
+         * @TODO Currently assumes odometry is how FakeOdometryModule creates it,
+         *       Verify when motion module is pulled
          * @return the updated ParticleSet.
          */
         void MotionSystem::update(ParticleSet& particles,
                                   messages::RobotLocation deltaMotionInfo)
         {
+            std::cout<< "MOTION SYSTEM:  x:\t"<<deltaMotionInfo.x() <<"\ty:\t"<<deltaMotionInfo.y()<< "\n";
             ParticleIt iter;
             for(iter = particles.begin(); iter != particles.end(); iter++)
             {
                 Particle* particle = &(*iter);
 
-                float sinh, cosh;
-                sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
-                        &sinh, &cosh);
+                /** Should be used if odometry gives global **/
+                // float sinh, cosh;
+                // sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
+                //         &sinh, &cosh);
+                // float changeX = cosh * deltaMotionInfo.x() + sinh * deltaMotionInfo.y();
+                // float changeY = cosh * deltaMotionInfo.y() - sinh * deltaMotionInfo.x();
 
-                float changeX = cosh * deltaMotionInfo.x() + sinh * deltaMotionInfo.y();
-                float changeY = cosh * deltaMotionInfo.y() - sinh * deltaMotionInfo.x();
+
+                float changeX = deltaMotionInfo.x();
+                float changeY = deltaMotionInfo.y();
                 float changeH = deltaMotionInfo.h();
 
-                randomlyShiftParticle(particle);
+                particle->shift(changeX, changeY, changeH);
+
+                //randomlyShiftParticle(particle);
                 // @TODO NBMath::subPiAngle() the above shit
+
             }
+            std::cout << "\n\n Updated Particles w/ Motion \n";
         }
 
         void MotionSystem::randomlyShiftParticle(Particle* particle)
@@ -49,7 +60,7 @@ namespace man
             noise.set_y(coordNoise());
             noise.set_h(headNoise());
 
-            particle->shiftParticle(noise);
+            particle->shift(noise);
         }
 
     } // namespace localization

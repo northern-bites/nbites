@@ -32,9 +32,9 @@ namespace man
 
         void FakeLocInputModule::calcDeltaMotion()
         {
-            odometry.set_x((finalLocation.x() + initialLocation.x()) / frames);
-            odometry.set_y((finalLocation.y() + initialLocation.y()) / frames);
-            odometry.set_h((finalLocation.h() + initialLocation.h()) / frames);
+            odometry.set_x((finalLocation.x() - initialLocation.x()) / frames);
+            odometry.set_y((finalLocation.y() - initialLocation.y()) / frames);
+            odometry.set_h((finalLocation.h() - initialLocation.h()) / frames);
         }
 
         void FakeLocInputModule::genNoisyOdometry()
@@ -60,7 +60,6 @@ namespace man
 
             // copy the new noisy odometry to the noisyMotion member
             noisyMotion.mutable_odometry()->CopyFrom(noisyOdometry);
-
         }
 
         void FakeLocInputModule::addGoalObservation(bool rightGoal)
@@ -110,8 +109,13 @@ namespace man
             boost::variate_generator<boost::mt19937&,
                                      boost::normal_distribution<float> > bearingGen(rng, bearingDistrib);
 
+            // Set the obsv distance and bearing
             visualDetection.set_distance(distanceGen());
             visualDetection.set_bearing(bearingGen());
+
+            // Pass the Std Devs
+            visualDetection.set_distance_sd(DIST_STD_DEV);
+            visualDetection.set_bearing_sd(BEAR_STD_DEV);
 
         }
 
@@ -161,7 +165,7 @@ namespace man
 
         void FakeLocInputModule::run_()
         {
-
+            std::cout << "FakeLocInput run called\n";
             // messages::RobotLocation stupidOdometry;
             // stupidOdometry.set_x(1);
             // stupidOdometry.set_y(2);

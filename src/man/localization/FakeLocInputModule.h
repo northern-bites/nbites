@@ -37,9 +37,9 @@ namespace man
         static const float DIST_STD_DEV = 10;
         static const float BEAR_STD_DEV = .174f; //~10 degrees
 
-        static const float NUM_CORNER_OBS = 2;
-        static const float NUM_GOAL_OBS = 1;
-        static const bool CROSS_OBS = true;
+        static const float NUM_CORNER_OBS = 1;
+        static const float NUM_GOAL_OBS = 0;
+        static const bool CROSS_OBS = false;
 
 
         class FakeLocInputModule : public portals::Module

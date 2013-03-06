@@ -13,10 +13,10 @@ namespace man
         /**
          * Updates the particle set according to the observations from Vision
          *
-         * @return the updated ParticleSet.
+         * @return if observations were made
          */
-        ParticleSet VisionSystem::update(ParticleSet& particles,
-                                         messages::PVisionField observations)
+        bool VisionSystem::update(ParticleSet& particles,
+                                  messages::PVisionField observations)
         {
             const float TINY_WEIGHT = .00001f;
 
@@ -35,7 +35,9 @@ namespace man
                     {
                         messages::PVisualCorner visualCorner;
                         visualCorner.CopyFrom(observations.visual_corner(i));
-                        float newWeight = 1.0f; //scoreFromLandmark(**particle, visualCorner);
+                        float newWeight = scoreFromVisDetect(*particle,visualCorner.visual_detection());
+                        // std::cout << "Best Weight from the corner\t" << newWeight << "\n\n";
+                        //float newWeight = 1.0f; //scoreFromLandmark(**particle, visualCorner);
                         if (newWeight < TINY_WEIGHT)
                             newWeight = TINY_WEIGHT;
                         newParticleWeight *= newWeight;
@@ -63,7 +65,10 @@ namespace man
 
                     // We never updated the new particle weight, so no observations been made
                     if(newParticleWeight >= 1.0f)
-                        return particles;
+                    {
+                        std::cout << "In the Vision System, given a message with no observations...\n";
+                        return false;
+                    }
                     else
                     {
                         particle->setWeight(newParticleWeight);
@@ -83,7 +88,7 @@ namespace man
                 setUpdated(true);
             }
 
-            return particles;
+            return true;
         }
 
         void VisionSystem::setUpdated(bool val)
@@ -98,32 +103,42 @@ namespace man
         float VisionSystem::scoreFromVisDetect(const Particle& particle,
                                                const messages::PVisualDetection& obsv)
         {
+            // DEBUG VIS DETECT
+            // std::cout << "Scoring a visual detection and a particle ---------- \n";
+
             float bestScore = 0;
 
             for (int i=0; i<obsv.concrete_coords_size(); i++)
             {
+                // std::cout << "Concrete Obsv(x,y):\t(" << obsv.concrete_coords(i).x() << " , "
+                //           << obsv.concrete_coords(i).y() << ")\n";
+                // std::cout << "Particle (x,y,h):\t(" << particle.getLocation().x() << " , "
+                //           << particle.getLocation().y() << " , "
+                //           << particle.getLocation().h() <<")\n";
                 const messages::Point& fieldPoint = obsv.concrete_coords(i);
 
                 RelVector relVector = getRelativeVector(particle,
                                                         fieldPoint.x(),
                                                         fieldPoint.y());
 
+                // std::cout << "Calc Distance:\t" << relVector.magnitude << "\t VS\t" << obsv.distance() << "\n";
+                // std::cout << "Calc bear:\t" << relVector.direction << "\t VS\t" << obsv.bearing() << "\n";
+
                 float distanceDiff = obsv.distance() - relVector.magnitude;
                 float angleDiff = NBMath::subPIAngle(obsv.bearing() - relVector.direction);
 
-                boost::normal_distribution<float> pDist(0.0f, obsv.distance_sd());
-                boost::normal_distribution<float> pAngle(0.0f, obsv.bearing_sd());
-                boost::variate_generator<boost::mt19937&, boost::normal_distribution<float> > distGen(rng,
-                                                                                                      pDist);
-                boost::variate_generator<boost::mt19937&, boost::normal_distribution<float> > bearGen(rng,
-                                                                                                      pAngle);
+                // std::cout << "DistanceDiff:\t" << distanceDiff << "\tAngleDiff\t" << angleDiff << "\n";
+
+                boost::math::normal_distribution<float> pDist(0.0f, obsv.distance_sd());
+                float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 
 
-                float distanceProb = distGen();
-                float angleProb = bearGen();
+                boost::math::normal_distribution<float> pAngle(0.0f, obsv.bearing_sd());
+                float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 
                 // Better way to determine probability?
                 float score = distanceProb * angleProb;
+                // std::cout << "Score:\t" << score << "\n";
                 if (score > bestScore)
                     bestScore = score;
 
@@ -136,18 +151,14 @@ namespace man
         RelVector VisionSystem::getRelativeVector(const Particle& particle,
                                     float fieldX, float fieldY)
         {
-            float dx = fieldX - particle.getLocation().x();
-            float dy = fieldY - particle.getLocation().y();
+            float relX = fieldX - particle.getLocation().x();
+            float relY = fieldY - particle.getLocation().y();
 
-            float magnitude = std::sqrt(dx*dx + dy*dy);
+            float magnitude = std::sqrt(relX*relX + relY*relY);
 
-            float sinh, cosh;
-            sincosf(-1*particle.getLocation().h(), &sinh, &cosh);
-
-            float x_prime = cosh * dx - sinh * dy;
-            float y_prime = sinh * dx + cosh * dy;
-
-            float bearing = NBMath::safe_atan2(y_prime, x_prime);
+            // Know that the heading + bearing = angle from Field Origing (call it Theta)
+            // So calculate Theta using arctan(relX/relY) and then subtract the heading in 1 line
+            float bearing = NBMath::subPIAngle(NBMath::safe_atan2(relX,relY));
 
             return RelVector(magnitude, bearing);
         }

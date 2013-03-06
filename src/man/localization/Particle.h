@@ -48,11 +48,18 @@ namespace man
         void setY(float y) { location.set_y(y); }
         void setH(float h) { location.set_h(h); }
 
-        void shiftParticle(messages::RobotLocation shiftAmount)
+        void shift(messages::RobotLocation shiftAmount)
         {
             location.set_x(location.x() + shiftAmount.x());
             location.set_y(location.y() + shiftAmount.y());
             location.set_h(location.h() + shiftAmount.h());
+        }
+
+        void shift(float shiftX, float shiftY, float shiftH)
+        {
+            location.set_x(location.x() + shiftX);
+            location.set_y(location.y() + shiftY);
+            location.set_h(location.h() + shiftH);
         }
 
         void normalizeWeight(float totalWeight) {weight = weight/totalWeight;}
@@ -74,13 +81,14 @@ namespace man
             return (w1 < w2) ? true : false;
         }
 
-        friend std::ostream& operator<<(std::ostream& out,
-                                        Particle p)
-        {
-            out << "Particle with weight " << p.getWeight() << " with "
-                << p.getLocation().DebugString() << std::endl;
-            return out;
-        }
+        // friend std::ostream& operator<<(std::ostream& out,
+        //                                 Particle p)
+        // {
+        //     //out << "Particle with weight " << p.getWeight() << " with "
+        //     // << p.getLocation().DebugString() << std::endl;
+        //     out << "Particle x:\n"; << p.getLocation().x() << "\n";
+        //     return out;
+        // }
 
     private:
         float weight;                           //! The particle weight.

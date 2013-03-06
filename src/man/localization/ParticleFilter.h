@@ -64,7 +64,7 @@ namespace man
         void update(messages::Motion motionInput,
                     messages::PVisionField visionInput);
 
-        ParticleSet getParticles() const { return particles; }
+        ParticleSet getParticles() { return particles; }
 
         /**
          * @brief Returns the particle with the highest weight in the set
@@ -77,7 +77,7 @@ namespace man
          *        a useful metric for determining the error in the current
          *        estimate, or the rate of change of error over time.
          */
-        std::vector<float> findParticleSD() const;
+        std::vector<float> findParticleSD();
 
         void resetLocalization();
 

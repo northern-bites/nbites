@@ -49,9 +49,16 @@ namespace man
     void ParticleFilter::update(messages::Motion motionInput,
                                 messages::PVisionField visionInput)
     {
+        // float deltaX = motionInput.odometry().x();
+        // float deltaY = motionInput.odometry().y();
+        // float deltaH = motionInput.odometry().h();
+
+        // std::cout<< deltaX << "\t" << deltaY << "\t" << deltaH << "\n";
+
         // Update the Motion Model
         if (motionInput.timestamp() > lastMotionTimestamp)
         {
+            std::cout<< motionInput.timestamp() << "\n";
             lastMotionTimestamp = (float) motionInput.timestamp();
             motionSystem->update(particles, motionInput.odometry());
         }
@@ -60,59 +67,61 @@ namespace man
         if (visionInput.timestamp() > lastVisionTimestamp)
         {
             lastVisionTimestamp = (float) visionInput.timestamp();
-            visionSystem->update(particles, visionInput);
-            updatedVision = true;
+
+            // If updatedVision is true then we observed things
+            updatedVision = visionSystem->update(particles, visionInput);
         }
 
         // Resample if vision update
         if(updatedVision)
         {
             resample();
+            updatedVision = false;
         }
 
         // Update filters estimate
         updateEstimate();
 
-        // Check if the mean has gone out of bounds. If so,
-        // reset to the closest point in bounds with appropriate
-        // uncertainty.
-        bool resetInBounds = false;
+        // // Check if the mean has gone out of bounds. If so,
+        // // reset to the closest point in bounds with appropriate
+        // // uncertainty.
+        // bool resetInBounds = false;
 
-        if(poseEstimate.x() < 0)
-        {
-            resetInBounds = true;
-            poseEstimate.set_x(0);
-        }
+        // if(poseEstimate.x() < 0)
+        // {
+        //     resetInBounds = true;
+        //     poseEstimate.set_x(0);
+        // }
 
-        else if(poseEstimate.x() > parameters.fieldWidth)
-        {
-            resetInBounds = true;
-            poseEstimate.set_x(parameters.fieldWidth);
-        }
+        // else if(poseEstimate.x() > parameters.fieldWidth)
+        // {
+        //     resetInBounds = true;
+        //     poseEstimate.set_x(parameters.fieldWidth);
+        // }
 
-        if(poseEstimate.y() < 0)
-        {
-            resetInBounds = true;
-            poseEstimate.set_y(0);
-        }
-        else if(poseEstimate.y() > parameters.fieldHeight)
-        {
-            resetInBounds = true;
-            poseEstimate.set_y(parameters.fieldHeight);
-        }
+        // if(poseEstimate.y() < 0)
+        // {
+        //     resetInBounds = true;
+        //     poseEstimate.set_y(0);
+        // }
+        // else if(poseEstimate.y() > parameters.fieldHeight)
+        // {
+        //     resetInBounds = true;
+        //     poseEstimate.set_y(parameters.fieldHeight);
+        // }
 
-        // Only reset if one of the location coordinates is
-        // out of bounds; avoids unnecessary resets.
-        if(resetInBounds)
-        {
-            /*
-             * @TODO Actually reset to a location here
-             */
+        // // Only reset if one of the location coordinates is
+        // // out of bounds; avoids unnecessary resets.
+        // if(resetInBounds)
+        // {
+        //     /*
+        //      * @TODO Actually reset to a location here
+        //      */
 
-            std::cout << "Resetting to (" << poseEstimate.x()
-                      << ", " << poseEstimate.y() << ", "
-                      << poseEstimate.h() << ")." << std::endl;
-        }
+        //     std::cout << "Resetting to (" << poseEstimate.x()
+        //               << ", " << poseEstimate.y() << ", "
+        //               << poseEstimate.h() << ")." << std::endl;
+        // }
     }
 
     void ParticleFilter::updateEstimate()
@@ -156,7 +165,7 @@ namespace man
         return x*x;
     }
 
-    std::vector<float> ParticleFilter::findParticleSD() const
+    std::vector<float> ParticleFilter::findParticleSD()
     {
         man::localization::ParticleSet particles = this->getParticles();
 
@@ -386,12 +395,12 @@ namespace man
             return;
         }
 
-        //averageWeight = sum/(((float)parameters.numParticles)*1.0f);
+        float averageWeight = sum/(((float)parameters.numParticles)*1.0f);
 
         for(iter = particles.begin(); iter != particles.end(); ++iter)
         {
             float weight = (*iter).getWeight();
-            (*iter).setWeight(weight/sum);
+            (*iter).setWeight(weight/averageWeight);
         }
 
         // Map each normalized weight to the corresponding particle.
@@ -419,6 +428,8 @@ namespace man
         rand = (float)gen();
         newParticles.push_back(cdf.upper_bound(rand)->second);
         }
+
+        // FUN IDEA: Create a particle that equals the belief
 
         particles = newParticles;
     }
