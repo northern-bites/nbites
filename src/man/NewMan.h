@@ -10,6 +10,9 @@
 #include "comm/CommModule.h"
 #include "led/LedEnactorModule.h"
 #include "testModule/TestModule.h"
+#include "behaviors/BehaviorsModule.h"
+#include "guardian/GuardianModule.h"
+#include "audio/AudioEnactorModule.h"
 
 namespace man {
 
@@ -26,6 +29,10 @@ private:
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+
+    DiagramThread guardianThread;
+    guardian::GuardianModule guardian;
+    audio::AudioEnactorModule audio;
 
     DiagramThread commThread;
     comm::CommModule comm;

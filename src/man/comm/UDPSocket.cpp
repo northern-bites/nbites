@@ -46,7 +46,7 @@ bool UDPSocket::resolve(const char* addrStr, int port, struct sockaddr_in* addr)
 {
     memset(addr, 0, sizeof(struct sockaddr_in));
     addr -> sin_family = AF_INET;
-    addr -> sin_port   = htons(port);
+    addr -> sin_port   = htons((uint16_t)port);
 
     // Fill in addr->sin_addr at the same time as checking validity!
     if (1 != inet_pton(AF_INET, addrStr, &(addr->sin_addr.s_addr)))
@@ -269,7 +269,7 @@ bool UDPSocket::bind(const char* addrStr = "", int port = 0)
     static const int one = 1;
     struct sockaddr_in addr;
     addr.sin_addr.s_addr = INADDR_ANY;
-    addr.sin_port = htons(port);
+    addr.sin_port = htons((uint16_t)port);
     addr.sin_family = AF_INET;
     if (inet_pton(AF_INET, addrStr, &(addr.sin_addr)) )
     {

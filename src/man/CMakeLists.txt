@@ -77,6 +77,8 @@ add_subdirectory( comm )
 add_subdirectory( led )
 add_subdirectory( testModule )
 add_subdirectory( behaviors )
+add_subdirectory( guardian )
+add_subdirectory( audio )
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
@@ -99,6 +101,8 @@ target_link_libraries(
   led
   testModule
   behaviors
+  guardian
+  audio
 )
 
 install( TARGETS man
