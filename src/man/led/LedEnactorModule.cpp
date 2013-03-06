@@ -4,7 +4,7 @@
 namespace man {
 	namespace led {
 
-		LedEnactorModule::LedEnactorModule(boost::shared_ptr<AL::ALBroker> broker, portals::OutPortal<messages::LedCommand> out)
+		LedEnactorModule::LedEnactorModule(boost::shared_ptr<AL::ALBroker> broker)
 			: portals::Module(),
 			  naoLights(broker)
 		{}

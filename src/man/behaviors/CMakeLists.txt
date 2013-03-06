@@ -13,10 +13,8 @@ configure_file(
 
 ############################ INCLUDE DIRECTORY
 # Define include directories
-include_directories( ${PYTHON_INCLUDE_DIR}
-                     ${CFG_DIR}
-		     ${BOOST_INCLUDE_DIR}
-                     )
+#message (STATUS "PYTHON_INCLUDE_DIR_BEHAVIORS" ${PYTHON_INCLUDE_DIR})
+include_directories( ${PYTHON_INCLUDE_DIR} )
 
 
 ############################ PROJECT SOURCES FILES
@@ -50,7 +48,6 @@ set( BEHAVIORS_PYTHON_SUBDIRS headTracking
 
 
 ############################ BUILD TARGETS
-
 add_library(
   behaviors
   STATIC

@@ -60,7 +60,7 @@ namespace man {
 				// Calls the run method with no args.
 				PyObject *result = PyObject_CallMethod(brain_instance,
 													   "run",
-													   message_format.c_str(),
+													   const_cast<char*>(message_format.c_str()),
 													   in_proto[0],
 													   in_size[0],
 													   in_proto[1],
@@ -80,7 +80,7 @@ namespace man {
 					parseOutMessages(result);
 					// Send out messages.
 					portals::Message<messages::LedCommand> ledCommand(0);
-					ledCommand.ParseFromArray(out_proto[0],out_size[0]);
+					ledCommand.get()->ParseFromArray(out_proto[0],out_size[0]);
 					ledCommandOut.setMessage(ledCommand);
 
 					Py_DECREF(result);
@@ -104,7 +104,7 @@ namespace man {
 		void BehaviorsModule::parseOutMessages(PyObject *tuple)
 		{
 			PyArg_UnpackTuple(tuple, "name", NUM_OUT_MESSAGES, NUM_OUT_MESSAGES, &out_serial[0], &out_serial[1]);
-			for (int i=0; i<NUM_OUT_MESSAGES; i++) {
+			for (unsigned int i=0; i<NUM_OUT_MESSAGES; i++) {
 				PyString_AsStringAndSize(out_serial[i], &out_proto[i], out_size_t[i]);
 				out_size[i] = PyLong_AsLong(PyLong_FromSsize_t(*out_size_t[i]));
 			}

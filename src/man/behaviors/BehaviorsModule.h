@@ -7,6 +7,7 @@
 //#include "PyConstants.h"
 
 #include "LedCommand.pb.h"
+#include "GameState.pb.h"
 
 namespace man {
 	namespace behaviors {
@@ -40,7 +41,6 @@ namespace man {
 			void getBrainInstance();
 
 			bool error_state;
-			PyObject *module_helper;//how is this used currently?
 			PyObject *brain_module;
 			PyObject *brain_instance;
 			unsigned int num_crashed;

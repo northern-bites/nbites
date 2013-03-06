@@ -43,6 +43,10 @@ include_directories( ${ALCOMMON_INCLUDE_DIR} )
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
+# For Python
+find_package( PythonLibs REQUIRED)
+include_directories( ${PYTHON_INCLUDE_DIR} )
+
 # Configure the copy script based on our settings
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
