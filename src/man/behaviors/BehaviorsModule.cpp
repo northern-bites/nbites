@@ -12,21 +12,19 @@ namespace man {
 			  num_crashed(0),
 			  player_number(player_num),
 			  team_number(team_num),
+			  in_proto(),
+			  in_size(),
+			  out_serial(),
+			  out_proto(),
+			  out_size_t(),
+			  out_size(),
 			  ledCommandOut(base())
 		{
 			// Build format string for messages.
 			message_format = "(";
-			for (int i=0; i<NUM_IN_MESSAGES; i++)
+			for (unsigned int i=0; i<NUM_IN_MESSAGES; i++)
 				message_format += "s#";
 			message_format += ")";
-
-			// Initialize arrays for messages.
-			in_proto   = {};
-			in_size    = {};
-			out_serial = {};
-			out_proto  = {};
-			out_size_t = {};
-			out_size   = {};
 
 			// Initialize python and brain.
 			initializePython();
@@ -62,7 +60,7 @@ namespace man {
 				// Calls the run method with no args.
 				PyObject *result = PyObject_CallMethod(brain_instance,
 													   "run",
-													   message_format,
+													   message_format.c_str(),
 													   in_proto[0],
 													   in_size[0],
 													   in_proto[1],

@@ -55,7 +55,7 @@ namespace man {
 			// message variables
 			static const unsigned int NUM_IN_MESSAGES = 2;
 			static const unsigned int NUM_OUT_MESSAGES = 2;
-			String message_format;
+			std::string message_format;
 			// initialize arrays to 0, null, etc
 			char *in_proto [NUM_IN_MESSAGES];
 			unsigned int in_size [NUM_IN_MESSAGES];

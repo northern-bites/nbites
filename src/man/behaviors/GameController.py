@@ -1,4 +1,3 @@
-import comm
 import noggin_constants as Constants
 from . import GameStates
 from .util import FSA

@@ -1,5 +1,4 @@
 from objects import (RobotLocation, Location)
-import comm
 from math import fabs
 import noggin_constants as NogginConstants
 
@@ -201,12 +200,13 @@ class TeamMember(RobotLocation):
     def isDefaultDefender(self):
         return (self.playerNumber == DEFAULT_DEFENDER_NUMBER)
 
+    # TODO: move this into a message
     def isPenalized(self):
         """
         this checks GameController to see if a player is penalized.
         """
         return (
-            self.brain.comm.gd.isOurPlayerPenalized(self.playerNumber)
+            0 #self.brain.comm.gd.isOurPlayerPenalized(self.playerNumber)
            )
 
     def __str__(self):

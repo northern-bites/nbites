@@ -1,4 +1,4 @@
-from man.motion import SweetMoves as moves
+#from man.motion import SweetMoves as moves
 
 class BirthCertificate:
     '''Defines all the per-robot configurations that may need to be
@@ -33,54 +33,57 @@ class BirthCertificate:
         self.current_gait = None
         self.back_standup = back_standup
 
-    def setRobotGait(self, motion_interface):
-        if self.gait is not None and self.current_gait is not self.gait:
-            print '\033[32m'+ "Birth Certificates - Setting regular gait"+'\033[0m'
-            self.current_gait = self.gait
-            motion_interface.setGait(self.gait)
+    # Remove this functionality from python
+    # def setRobotGait(self, motion_interface):
+    #     if self.gait is not None and self.current_gait is not self.gait:
+    #         print '\033[32m'+ "Birth Certificates - Setting regular gait"+'\033[0m'
+    #         self.current_gait = self.gait
+    #         motion_interface.setGait(self.gait)
 
-    def setRobotDribbleGait(self, motion_interface):
-        if self.dribble_gait is not None and \
-                    self.current_gait is not self.dribble_gait:
-            print '\033[32m' + "BirthCertificates - Setting dribble gait" + '\033[0m'
-            self.current_gait = self.dribble_gait
-            motion_interface.setGait(self.dribble_gait)
+    # def setRobotDribbleGait(self, motion_interface):
+    #     if self.dribble_gait is not None and \
+    #                 self.current_gait is not self.dribble_gait:
+    #         print '\033[32m' + "BirthCertificates - Setting dribble gait" + '\033[0m'
+    #         self.current_gait = self.dribble_gait
+    #         motion_interface.setGait(self.dribble_gait)
 
-    def setRobotSlowGait(self, motion_interface):
-        if self.slow_gait is not None and \
-                    self.current_gait is not self.slow_gait:
-                print '\033[32m' + "BirthCertificates - Setting slow gait" + '\033[0m'
-                self.current_gait = self.slow_gait
-                motion_interface.setGait(self.slow_gait)
+    # def setRobotSlowGait(self, motion_interface):
+    #     if self.slow_gait is not None and \
+    #                 self.current_gait is not self.slow_gait:
+    #             print '\033[32m' + "BirthCertificates - Setting slow gait" + '\033[0m'
+    #             self.current_gait = self.slow_gait
+    #             motion_interface.setGait(self.slow_gait)
 
-    def getBackStandup(self):
-        if self.back_standup is None:
-            return moves.STAND_UP_BACK
-        else:
-            return self.back_standup
+    # Remove this functionality from python
+    # def getBackStandup(self):
+    #     if self.back_standup is None:
+    #         return moves.STAND_UP_BACK
+    #     else:
+    #         return self.back_standup
 
-    def setRobotSpinGait(self, motion_interface):
-        if self.spin_gait is not None and \
-                self.current_gait is not self.spin_gait:
-            print '\033[32m' + "BirthCertificates - Setting spin gait" + '\033[0m'
-            self.current_gait = self.spin_gait
-            motion_interface.setGait(self.spin_gait)
+    # Remove this functionality from python
+    # def setRobotSpinGait(self, motion_interface):
+    #     if self.spin_gait is not None and \
+    #             self.current_gait is not self.spin_gait:
+    #         print '\033[32m' + "BirthCertificates - Setting spin gait" + '\033[0m'
+    #         self.current_gait = self.spin_gait
+    #         motion_interface.setGait(self.spin_gait)
 
-    def setRobotBackwardsGait(self, motion_interface):
-        if self.backwards_gait is not None and \
-                self.current_gait is not self.backwards_gait:
-            print '\033[32m' + "BirthCertificates - Setting backwards gait" + '\033[0m'
-            self.current_gait = self.backwards_gait
-            motion_interface.setGait(self.backwards_gait)
+    # def setRobotBackwardsGait(self, motion_interface):
+    #     if self.backwards_gait is not None and \
+    #             self.current_gait is not self.backwards_gait:
+    #         print '\033[32m' + "BirthCertificates - Setting backwards gait" + '\033[0m'
+    #         self.current_gait = self.backwards_gait
+    #         motion_interface.setGait(self.backwards_gait)
 
-    def setRobotDynamicGait(self, motion_interface, dynGait):
-        print '\033[32m' + "BirthCertificates - Setting DYNAMIC gait" + '\033[0m'
-        self.current_gait = dynGait
-        motion_interface.setGait(dynGait)
+    # def setRobotDynamicGait(self, motion_interface, dynGait):
+    #     print '\033[32m' + "BirthCertificates - Setting DYNAMIC gait" + '\033[0m'
+    #     self.current_gait = dynGait
+    #     motion_interface.setGait(dynGait)
 
-    def __str__(self):
-        s = "CoA: " + self.long_name
-        if self.__doc__:
-            s += '\nCoA: ' + self.__doc__
-        return s
+    # def __str__(self):
+    #     s = "CoA: " + self.long_name
+    #     if self.__doc__:
+    #         s += '\nCoA: ' + self.__doc__
+    #     return s
 

@@ -57,7 +57,6 @@ class Brain(object):
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
-        self.CoA.setRobotGait(self.motion)
 
         # coa is Certificate of Authenticity (to keep things short)
         self.out.printf(self.CoA)
@@ -127,10 +126,6 @@ class Brain(object):
         # Update Environment
         self.time = time.time()
 
-        # Communications update
-        # Comm data should now come in messages
-        #self.getCommUpdate()
-
         # Parse incoming messages
         self.inMessages['initialState'] = initialStateMessage.parseFromString(msg1) #deserialze first!
         self.inMessages['otherMessage'] = msg2
@@ -166,11 +161,11 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball.update()
-        self.yglp.setBest()
-        self.ygrp.setBest()
-        self.bglp.setBest()
-        self.bgrp.setBest()
+        self.ball.visDist = self.inMessages['ballInfo'].vision_distance
+        #self.yglp.setBest()
+        #self.ygrp.setBest()
+        #self.bglp.setBest()
+        #self.bgrp.setBest()
 
     def updatePlaybook(self):
         """
