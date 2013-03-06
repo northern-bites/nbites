@@ -1,6 +1,6 @@
 package messages;
 
-message InitialState
+message Toggle
 {
         // signal when value is changed
         optional bool toggle = 1;
