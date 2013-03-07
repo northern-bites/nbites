@@ -36,6 +36,7 @@ namespace man
                 float changeH = deltaMotionInfo.h();
 
                 particle->shift(changeX, changeY, changeH);
+                randomlyShiftParticle(particle);
 
                 //randomlyShiftParticle(particle);
                 // @TODO NBMath::subPiAngle() the above shit
@@ -48,7 +49,7 @@ namespace man
         {
 
             // Create random number generators
-            boost::mt19937 rng;
+//            boost::mt19937 rng;
             boost::uniform_real<float> coordRange(-.6f, .6f);
             boost::uniform_real<float> headRange(-1.8f, 1.8f);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
@@ -59,6 +60,8 @@ namespace man
             noise.set_x(coordNoise());
             noise.set_y(coordNoise());
             noise.set_h(headNoise());
+
+            // std::cout << "X noise:\t" << noise.x() << "\n";
 
             particle->shift(noise);
         }

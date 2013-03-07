@@ -29,6 +29,7 @@ namespace man
 
         void setFallen(bool fallen);
 
+        boost::mt19937 rng;
     private:
         bool robotFallen;
     };
