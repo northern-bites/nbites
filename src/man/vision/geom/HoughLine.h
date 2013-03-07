@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "FieldLines/Gradient.h"
+#include "../FieldLines/Gradient.h"
 
 /**
  * A line defined in polar coordinates, also storing information from the

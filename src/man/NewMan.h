@@ -8,6 +8,8 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "vision/VisionModule.h"
+#include "image/ImageTranscriberModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
 
@@ -25,14 +27,17 @@ private:
     void startSubThreads();
 
     DiagramThread sensorsThread;
-    sensors::SensorsModule sensors;
-
     DiagramThread guardianThread;
+    DiagramThread commThread;
+	DiagramThread cognitionThread;
+
+
     guardian::GuardianModule guardian;
     audio::AudioEnactorModule audio;
-
-    DiagramThread commThread;
     comm::CommModule comm;
+    sensors::SensorsModule sensors;
+	image::ImageTranscriberModule imageTranscriber;
+	vision::VisionModule vision;
 };
 
 }

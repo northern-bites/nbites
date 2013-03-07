@@ -12,13 +12,23 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       guardian(),
       audio(broker),
       commThread("comm"),
-      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
+      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+	  cognitionThread("cognition"),
+	  imageTranscriber(),
+	  vision()
 {
+	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
     setModuleDescription("The Northern Bites' soccer player.");
 
     /** Sensors **/
     sensorsThread.addModule(sensors);
-    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
+	
+	/** Cognition **/
+	cognitionThread.addModule(imageTranscriber);
+	cognitionThread.addModule(vision);
 
     /** Guardian **/
     guardianThread.addModule(guardian);
@@ -47,6 +57,8 @@ void Man::startSubThreads()
     sensorsThread.start();
     guardianThread.start();
     commThread.start();
+	cognitionThread.start();
 }
 
 }
+ 

@@ -43,6 +43,22 @@ include_directories( ${ALCOMMON_INCLUDE_DIR} )
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
+############################ COLOR TABLE SELECTION
+# Set the path to the color table you wish to be loaded into install/etc
+SET( @TABLE_TOP@
+  "../../data/tables/120-top.mtb"
+  CACHE STRING
+  "Path relative to man directory for the desired top camera color table"
+  )
+SET( TABLE_TOP ${@TABLE_TOP@})
+
+SET( @TABLE_BOTTOM@
+  "../../data/tables/120-bottom.mtb"
+  CACHE STRING
+  "Path relative to man directory for the desired bottom camera color table"
+  )
+SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
+
 # Configure the copy script based on our settings
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
@@ -60,6 +76,7 @@ include_directories( ${SHARE_DIR}/portals )
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+include_directories( ${SHARE_DIR}/messages )
 
 # If protobuf libs don't exist yet, make sure they build before man
 if( BUILD_PROTOBUF )
@@ -71,7 +88,9 @@ add_subdirectory( common )
 include_directories( common )
 
 # Actual modules
+add_subdirectory( image )
 add_subdirectory( log )
+add_subdirectory( vision )
 add_subdirectory( sensors )
 add_subdirectory( comm )
 add_subdirectory( guardian )
@@ -95,6 +114,8 @@ target_link_libraries(
   log
   sensors
   comm
+  image
+  vision
   guardian
   audio
 )

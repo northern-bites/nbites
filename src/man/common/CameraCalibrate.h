@@ -9,9 +9,6 @@
 
 using namespace NBMath;
 
-//TODO: move this to the right namespace
-namespace Kinematics {
-
 class CameraCalibrate {
 
 public:
@@ -32,16 +29,15 @@ public:
     //we should just update the params once
     static void init(std::string name);
     static void UpdateWithParams(float paramsTop[], float paramsBottom[]);
-    static ufmatrix4* getTransforms(man::corpus::Camera::Type which) {
-        if (which == man::corpus::Camera::TOP) {
+    static ufmatrix4* getTransforms(man::image::Camera::Type which) {
+        if (which == man::image::Camera::TOP) {
             return TransformsTop;
         } else {
             return TransformsBottom;
         }
     }
 
-    };
-}
+};
 
 
 #endif
