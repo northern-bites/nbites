@@ -32,6 +32,7 @@ message VisionRobot
 message VisionObstacle
 {
 
-	optional bool onLeft = 1;
-	optional bool onRight = 2;
+	optional bool on_left = 1;
+	optional bool on_right = 2;
+	optional bool off_field = 3;
 }

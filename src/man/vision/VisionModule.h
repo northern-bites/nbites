@@ -36,6 +36,7 @@ namespace vision{
 		portals::OutPortal<messages::VisionField> vision_field;
 		portals::OutPortal<messages::VisionBall> vision_ball;
 		portals::OutPortal<messages::VisionRobot> vision_robot;
+		portals::OutPortal<messages::VisionObstacle> vision_obstacle;
 
 	protected:
 		virtual void run_();
@@ -43,6 +44,7 @@ namespace vision{
 		void updateVisionField();
 		void updateVisionBall();
 		void updateVisionRobot();
+		void updateVisionObstacle();
 	};
 	
 	void updateRobot(messages::VisionRobot::Robot* bot_message, VisualRobot* visualRobot);

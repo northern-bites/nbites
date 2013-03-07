@@ -17,6 +17,7 @@ namespace vision{
 								   vision_field(base()),
 								   vision_ball(base()),
 								   vision_robot(base()),
+								   vision_obstacle(base()),
 								   vision(boost::shared_ptr<Vision>(new Vision()))
 	{
 
@@ -39,6 +40,19 @@ namespace vision{
 		updateVisionBall();
 		updateVisionRobot();
 		updateVisionField();
+		updateVisionObstacle();
+	}
+
+	void VisionModule::updateVisionObstacle() {
+		
+		portals::Message<messages::VisionObstacle> obstacle_data(0);
+
+		obstacle_data.get()->set_on_left(vision->obstacles->onLeft());
+		obstacle_data.get()->set_on_right(vision->obstacles->onRight());
+		obstacle_data.get()->set_off_field(vision->obstacles->offField());
+
+		vision_obstacle.setMessage(obstacle_data);
+
 	}
 
 	void VisionModule::updateVisionBall() {
