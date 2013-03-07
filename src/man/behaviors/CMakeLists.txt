@@ -48,7 +48,7 @@ add_library(
 
 # How to install the python files for rsync
 set( PYTHON_INSTALL_DIR
-  ${CMAKE_CURRENT_BIN_DIR}/${CMAKE_INSTALL_PREFIX}/python )
+  lib/python )
 
 install(
  FILES ${BEHAVIORS_PYTHON_SRCS}

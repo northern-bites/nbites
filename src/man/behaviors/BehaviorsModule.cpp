@@ -188,7 +188,7 @@ namespace man {
 #ifdef DEBUG_BEHAVIORS_INITIALIZATION
 				printf("  Importing behaviors.Brain\n");
 #endif
-				brain_module = PyImport_ImportModule("man.behaviors.Brain");
+				brain_module = PyImport_ImportModule("python.behaviors.Brain");
 			}
 
 			if (brain_module == NULL) {
