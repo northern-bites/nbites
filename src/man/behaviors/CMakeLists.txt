@@ -1,8 +1,11 @@
 # required libraries for python
+
+find_package(Boost COMPONENTS filesystem system date_time python REQUIRED)
+message("Include dirs of boost: " ${Boost_INCLUDE_DIRS} )
+message("Libs of boost: " ${Boost_LIBRARIES} )
+
 find_package( PythonLibs   REQUIRED )
 include_directories( ${PYTHON_INCLUDE_DIR} )
-
-#find_package( Boost COMPONENTS python REQUIRED )
 
 # for configuring the player switch
 configure_file(
@@ -67,6 +70,7 @@ install(
  PATTERN "*.py"
  )
 
+message(STATUS "Boost py library"  ${Boost_LIBRARIES} )
 target_link_libraries(
   behaviors
   common
