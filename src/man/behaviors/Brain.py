@@ -32,6 +32,7 @@ from objects import (FieldObject)
 from ...share.messages import LedCommand_pb2
 from ...share.messages import GameState_pb2
 from ...share.messages import WorldModel_pb2
+from ...share.messages import BallModel_pb2
 
 class Brain(object):
     """
@@ -121,7 +122,7 @@ class Brain(object):
 
         self.counter += 1
 
-    def run(self, msg0, msg1):
+    def run(self, msg0, msg1, msg2):
         """
         Main control loop called every TIME_STEP milliseconds
         """
@@ -132,6 +133,7 @@ class Brain(object):
         # Parse incoming messages
         self.inMessages['gameState'] = GameState.parseFromString(msg0) #deserialze first!
         self.inMessages['worldModel'] = WorldModel.parseFromString(msg1)
+        self.inMessages['filteredBall'] = FilteredBall.parseFromString(msg2)
 
         # Update objects
         # TODO: update this functionality to get info from messages
@@ -165,7 +167,7 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball.visDist = self.inMessages['ballInfo'].vision_distance
+        self.ball.updateBallInfo(self.inMessages['filteredBall'])
         #self.yglp.setBest()
         #self.ygrp.setBest()
         #self.bglp.setBest()

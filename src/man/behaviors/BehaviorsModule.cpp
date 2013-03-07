@@ -68,7 +68,9 @@ namespace man {
 													   in_proto[0],
 													   in_size[0],
 													   in_proto[1],
-													   in_size[1]);
+													   in_size[1],
+													   in_proto[2],
+													   in_size[2]);
 				if (result == NULL) {
 					// set Behaviors in error state
 					error_state = true;
@@ -106,6 +108,9 @@ namespace man {
 			worldModelIn.latch();
 			in_size[1] = worldModelIn.message().ByteSize();
 			worldModelIn.message().SerializeToArray(in_proto[1],in_size[1]);
+			filteredBallIn.latch();
+			in_size[2] = filteredBallIn.message().ByteSize();
+			filteredBallIn.message().SerializeToArray(in_proto[2],in_size[2]);
 		}
 
 		void BehaviorsModule::parseOutMessages(PyObject *tuple)

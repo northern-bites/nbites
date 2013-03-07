@@ -8,6 +8,7 @@
 #include "LedCommand.pb.h"
 #include "GameState.pb.h"
 #include "WorldModel.pb.h"
+#include "BallModel.pb.h"
 
 namespace man {
 	namespace behaviors {
@@ -53,7 +54,7 @@ namespace man {
 			void parseOutMessages(PyObject *tuple);
 
 			// message variables
-			static const unsigned int NUM_IN_MESSAGES = 2;
+			static const unsigned int NUM_IN_MESSAGES = 3;
 			static const unsigned int NUM_OUT_MESSAGES = 2;
 			std::string message_format;
 			// initialize arrays to 0, null, etc
@@ -69,6 +70,7 @@ namespace man {
 			// note: order of portals matches message array indicies
 			portals::InPortal<messages::GameState> gameStateIn;
 			portals::InPortal<messages::WorldModel> worldModelIn;
+			portals::InPortal<messages::FilteredBall> filteredBallIn;
 			portals::OutPortal<messages::LedCommand> ledCommandOut;
 		};
 	}
