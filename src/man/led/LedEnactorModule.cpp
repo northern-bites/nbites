@@ -14,7 +14,7 @@ namespace man {
 			ledCommandsIn.latch();
 			messages::LedCommand command = ledCommandsIn.message();
 
-			std::cout<<command.DebugString()<<std::endl;
+			//std::cout<<command.DebugString()<<std::endl;
 
 			// Loop through message and send each command
 			// TODO: make this more robust if arrays don't have the same size

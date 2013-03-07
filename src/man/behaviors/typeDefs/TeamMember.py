@@ -91,10 +91,9 @@ class TeamMember(RobotLocation):
         self.x = my.x
         self.y = my.y
         self.h = my.h
-        self.ballOn = ball.vis.on
-        self.ballDist = ball.loc.dist
-        self.ballBearing = ball.loc.bearing
-        self.ballDist = ball.loc.dist
+        self.ballOn = ball.framesOn > 0
+        self.ballDist = ball.locDist
+        self.ballBearing = ball.locBearing
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()

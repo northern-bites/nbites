@@ -13,6 +13,8 @@ import noggin_constants as Constants
 # Modules from this directory
 from . import Leds
 from . import robots
+from . import Ball
+from . import MyInfo
 
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
@@ -28,6 +30,8 @@ from objects import (FieldObject)
 
 # Import message protocol buffers
 from ...share.messages import LedCommand_pb2
+from ...share.messages import GameState_pb2
+from ...share.messages import WorldModel_pb2
 
 class Brain(object):
     """
@@ -49,6 +53,7 @@ class Brain(object):
         self.on = True
         # Output Class
         self.out = NaoOutput.NaoOutput(self)
+        self.my = MyInfo.MyInfo()
 
         #initalize the leds
         self.leds = Leds.Leds(self)
@@ -64,7 +69,7 @@ class Brain(object):
         # Information about the environment
         # All field objects should come in as messages now
         #self.initFieldObjects()
-        self.ball = Ball.ball()
+        self.ball = Ball.Ball()
         self.initTeamMembers()
 
         self.play = Play.Play()
@@ -116,7 +121,7 @@ class Brain(object):
 
         self.counter += 1
 
-    def run(self, msg1, msg2):
+    def run(self, msg0, msg1):
         """
         Main control loop called every TIME_STEP milliseconds
         """
@@ -125,8 +130,8 @@ class Brain(object):
         self.time = time.time()
 
         # Parse incoming messages
-        self.inMessages['initialState'] = initialStateMessage.parseFromString(msg1) #deserialze first!
-        self.inMessages['otherMessage'] = msg2
+        self.inMessages['gameState'] = GameState.parseFromString(msg0) #deserialze first!
+        self.inMessages['worldModel'] = WorldModel.parseFromString(msg1)
 
         # Update objects
         # TODO: update this functionality to get info from messages
@@ -142,10 +147,7 @@ class Brain(object):
         #Set LED message
         self.leds.processLeds()
 
-    # def getCommUpdate(self):
-    #     for i in range(len(self.teamMembers)):
-    #         mate = self.comm.teammate(i+1)
-    #         self.teamMembers[i].update(mate)
+        self.out.printf("End of run() method")
 
         # Serialize outgoing messages and return a tuple of them
         self.outMessageList = list()
@@ -153,6 +155,11 @@ class Brain(object):
             self.outMessageList.append(i.SerializeToString())
         self.outMessageTuple = tuple(self.outMessageList)
         return self.outMessageTuple
+
+    def getCommUpdate(self):
+        # TODO: do this for more than one teamMember
+        #for i in range(len(self.teamMembers)):
+        self.teamMembers[0].update(self.inMessages['worldModel'])
 
     def updateObjects(self):
         """

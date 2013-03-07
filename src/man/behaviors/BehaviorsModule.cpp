@@ -1,17 +1,18 @@
 #include "BehaviorsModule.h"
+#include <iostream>
 
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 
 namespace man {
 	namespace behaviors {
 
-		BehaviorsModule::BehaviorsModule(unsigned int player_num, unsigned int team_num)
+		BehaviorsModule::BehaviorsModule()//unsigned int player_num, unsigned int team_num)
 			: portals::Module(),
 			  brain_module(NULL),
 			  brain_instance(NULL),
 			  num_crashed(0),
-			  player_number(player_num),
-			  team_number(team_num),
+			  player_number(1),//player_num),
+			  team_number(27),//team_num),
 			  in_proto(),
 			  in_size(),
 			  out_serial(),
@@ -35,6 +36,7 @@ namespace man {
 		{
 			// If in error, try restarting automatically.
 			// If too many consecutive failures, stop python and stop trying.
+
 			if (num_crashed > NUM_PYTHON_RESTARTS_MAX) {
 				return;
 			} else if (num_crashed == NUM_PYTHON_RESTARTS_MAX) {
@@ -99,6 +101,9 @@ namespace man {
 			in_size[0] = gameStateIn.message().ByteSize();
 			// Set in_proto to be the serialized message.
 			gameStateIn.message().SerializeToArray(in_proto[0],in_size[0]);
+			worldModelIn.latch();
+			in_size[1] = worldModelIn.message().ByteSize();
+			worldModelIn.message().SerializeToArray(in_proto[1],in_size[1]);
 		}
 
 		void BehaviorsModule::parseOutMessages(PyObject *tuple)

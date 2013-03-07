@@ -38,6 +38,7 @@ private:
 
     DiagramThread cognitionThread;
 	led::LedEnactorModule leds;
+	behaviors::BehaviorsModule behaviors;
 };
 
 }

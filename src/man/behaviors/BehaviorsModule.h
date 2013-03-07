@@ -8,6 +8,7 @@
 
 #include "LedCommand.pb.h"
 #include "GameState.pb.h"
+#include "WorldModel.pb.h"
 
 namespace man {
 	namespace behaviors {
@@ -15,7 +16,7 @@ namespace man {
 		class BehaviorsModule : public portals::Module {
 
 		public:
-			BehaviorsModule(unsigned int player_num, unsigned int team_num);
+			BehaviorsModule();//unsigned int player_num, unsigned int team_num);
 			virtual ~BehaviorsModule() {}
 
 			// reinitialize and reload the Python interpreter
@@ -68,6 +69,7 @@ namespace man {
 			// portals
 			// note: order of portals matches message array indicies
 			portals::InPortal<messages::GameState> gameStateIn;
+			portals::InPortal<messages::WorldModel> worldModelIn;
 			portals::OutPortal<messages::LedCommand> ledCommandOut;
 		};
 	}
