@@ -4,7 +4,6 @@
 #include <Python.h>
 //#include <boost/shared_ptr.hpp>
 //#include "Profiler.h"
-//#include "PyConstants.h"
 
 #include "LedCommand.pb.h"
 #include "GameState.pb.h"

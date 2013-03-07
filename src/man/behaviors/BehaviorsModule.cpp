@@ -1,4 +1,6 @@
 #include "BehaviorsModule.h"
+#include "PyConstants.h"
+
 #include <iostream>
 
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
@@ -139,7 +141,7 @@ namespace man {
 			//TODO: remove unnecessary calls here. The rest of them?
 			// Initialize low-level modules
 			// c_init_speed();
-			// c_init_noggin_constants();
+			c_init_noggin_constants();
 			// c_init_objects();
 			// c_init_goalie();
 		}
@@ -188,7 +190,7 @@ namespace man {
 #ifdef DEBUG_BEHAVIORS_INITIALIZATION
 				printf("  Importing behaviors.Brain\n");
 #endif
-				brain_module = PyImport_ImportModule("man.behaviors.Brain");
+				brain_module = PyImport_ImportModule("python.behaviors.Brain");
 			}
 
 			if (brain_module == NULL) {
