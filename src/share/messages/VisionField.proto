@@ -45,11 +45,16 @@ message VisionField
    message VisualLine
    {
       optional VisualDetection visual_detection = 1;
-      optional int32 line_id = 2;
-      optional int32 start_x = 3;
-      optional int32 start_y = 4;
-      optional int32 end_x = 5;
-      optional int32 end_y = 6;
+      optional int32 start_x = 2;
+      optional int32 start_y = 3;
+      optional int32 end_x = 4;
+      optional int32 end_y = 5;
+      optional float angle = 6;
+      optional float avg_width = 7;
+      optional float length = 8;
+      optional float slope = 9;
+      optional float y_int = 10;
+      repeated int32 possibilities = 11;
    }
 
    message VisualFieldEdge

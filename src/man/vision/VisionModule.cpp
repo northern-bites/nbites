@@ -119,9 +119,31 @@ namespace vision{
 
 		portals::Message<messages::VisionField> field_data(0);
 
-		//not doing lines yet
-		const std::vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
-		
+		//setting lines info
+		// const std::vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
+		// for(std::vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
+		// 	i != visualLines->end(); i++)
+		// {
+		// 	messages::VisionField::VisualLine *visLine = field_data.get()->add_visual_line();
+		// 	visLine->mutable_visual_detection()->set_distance(i->getDistance());
+		// 	visLine->mutable_visual_detection()->set_bearing(i->getBearing());
+		// 	visLine->mutable_visual_detection()->set_distance_sd(i->getDistanceSD());
+		// 	visLine->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
+		// 	//we wont set concrete coords for the lines, since they are lines
+		// 	visLine->set_start_x(i->getStartPoint().x);
+		// 	visLine->set_start_y(i->getStartPoint().y);
+		// 	visLine->set_end_x(i->getEndPoint().x);
+		// 	visLine->set_end_y(i->getEndPoint().y);
+		// 	visLine->set_angle(i->getAngle());
+		// 	visLine->set_avg_width(i->getAvgWidth());
+		// 	visLine->set_length(i->getLength());
+		// 	visLine->set_slope(i->getSlope());
+		// 	visLine->set_y_int(i->getYIntercept());
+		// 	const std::vector<lineID> id_for_line = i->getIDs();
+
+		// }
+		//end lines info
+
 		//setting the corner info
 		std::list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
 		for(std::list<VisualCorner>::iterator i = visualCorners->begin(); 

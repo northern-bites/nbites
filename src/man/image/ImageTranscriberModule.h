@@ -43,7 +43,6 @@ protected:
     ColorParams params;
     unsigned char *topTable;
     unsigned char *bottomTable;
-	int count;
 };
 
 }

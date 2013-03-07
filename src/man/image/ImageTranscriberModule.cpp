@@ -32,7 +32,6 @@ void ImageTranscriberModule::run_()
     portals::Message<ThresholdedImage> topThrMessage(0);
     portals::Message<ThresholdedImage> bottomThrMessage(0);
 
-	std::cout << "transcribing the " << count++ << "th image\n";
     // get YUVImages from the message pool
     // this copying is slow and bad, but it will have to do until Bill figures out a better solution
     //topYUVMessage.get()->makeMeCopyOf(topImageTranscriber.acquireImage(),

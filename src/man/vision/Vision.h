@@ -19,7 +19,7 @@
 
 #ifndef _Vision_h_DEFINED
 #define _Vision_h_DEFINED
-#define OFFLINE
+
 // c++ headers
 #include <sstream>
 #include <fstream>
