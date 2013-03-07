@@ -12,7 +12,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       guardian(),
       audio(broker),
       commThread("comm"),
-      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
+      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+	  cognitionThread("cognition"),
+	  leds(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -34,6 +36,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Comm **/
     commThread.addModule(comm);
 
+	/** Cognition **/
+	cognitionThread.addModule(leds);
+	cognitionThread.addModule(behaviors);
+	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, true);
+	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, false);
+	behaviors.worldModelIn.wireTo(comm._worldModels[0], false);
 
     startSubThreads();
 }
@@ -47,6 +55,7 @@ void Man::startSubThreads()
     sensorsThread.start();
     guardianThread.start();
     commThread.start();
+	cognitionThread.start();
 }
 
 }

@@ -43,6 +43,10 @@ include_directories( ${ALCOMMON_INCLUDE_DIR} )
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
+# For Python
+find_package( PythonLibs REQUIRED)
+include_directories( ${PYTHON_INCLUDE_DIR} )
+
 # Configure the copy script based on our settings
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
@@ -74,6 +78,8 @@ include_directories( common )
 add_subdirectory( log )
 add_subdirectory( sensors )
 add_subdirectory( comm )
+add_subdirectory( led )
+add_subdirectory( behaviors )
 add_subdirectory( guardian )
 add_subdirectory( audio )
 
@@ -95,6 +101,8 @@ target_link_libraries(
   log
   sensors
   comm
+  led
+  behaviors
   guardian
   audio
 )

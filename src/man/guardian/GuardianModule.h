@@ -2,6 +2,7 @@
 #define _RoboGuardian_h
 
 #include <vector>
+#include <queue>
 #include <string>
 #include <string.h>
 #include <boost/shared_ptr.hpp>
@@ -16,7 +17,7 @@
 #include "FootBumperState.pb.h"
 #include "InertialState.pb.h"
 #include "StiffnessControl.pb.h"
-#include "InitialState.pb.h"
+#include "Toggle.pb.h"
 #include "FeetOnGround.pb.h"
 #include "FSR.pb.h"
 #include "FallStatus.pb.h"
@@ -47,7 +48,10 @@ public:
         { useFallProtection = _useFallProtection; };
 
     portals::OutPortal<messages::StiffnessControl> stiffnessControlOutput;
-    portals::OutPortal<messages::InitialState>     initialStateOutput;
+    portals::OutPortal<messages::Toggle>           initialStateOutput;
+    portals::OutPortal<messages::Toggle>           advanceStateOutput;
+    portals::OutPortal<messages::Toggle>           switchTeamOutput;
+    portals::OutPortal<messages::Toggle>           switchKickOffOutput;
     portals::OutPortal<messages::FeetOnGround>     feetOnGroundOutput;
     portals::OutPortal<messages::FallStatus>       fallStatusOutput;
     portals::OutPortal<messages::AudioCommand>     audioOutput;
@@ -70,7 +74,10 @@ private:
     void countButtonPushes();
     void processFallingProtection();
     void processChestButtonPushes();
+    void processFootBumperPushes();
     bool executeChestClickAction(int);
+    bool executeLeftFootClickAction(int);
+    bool executeRightFootClickAction(int);
     void executeFallProtection();
     void shutoffGains();
     void enableGains();
@@ -78,6 +85,9 @@ private:
     void checkAudio();
     void reloadMan();
     void initialState();
+    void advanceState();
+    void switchTeams();
+    void switchKickOff();
 
     static const int NO_CLICKS;
     static const int GUARDIAN_FRAME_RATE;
@@ -103,8 +113,11 @@ private:
     bool useFallProtection;
 
     bool lastInitial;
+    bool lastAdvance;
+    bool lastTeamSwitch;
+    bool lastKickOffSwitch;
 
-    bool sentAudio;
+    std::queue<std::string> audioQueue;
 
     unsigned long long int lastHeatAudioWarning, lastHeatPrintWarning;
 };

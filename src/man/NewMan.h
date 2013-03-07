@@ -8,6 +8,8 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "led/LedEnactorModule.h"
+#include "behaviors/BehaviorsModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
 
@@ -33,6 +35,10 @@ private:
 
     DiagramThread commThread;
     comm::CommModule comm;
+
+    DiagramThread cognitionThread;
+	led::LedEnactorModule leds;
+	behaviors::BehaviorsModule behaviors;
 };
 
 }
