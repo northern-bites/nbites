@@ -1,8 +1,7 @@
 # required libraries for python
 
+set(Boost_NO_BOOST_CMAKE true)
 find_package(Boost COMPONENTS python REQUIRED)
-message("Include dirs of boost: " ${Boost_INCLUDE_DIRS} )
-message("Libs of boost: " ${Boost_LIBRARIES} )
 
 find_package( PythonLibs   REQUIRED )
 include_directories( ${PYTHON_INCLUDE_DIR} )
@@ -70,7 +69,6 @@ install(
  PATTERN "*.py"
  )
 
-message(STATUS "Boost py library"  ${Boost_LIBRARIES} )
 target_link_libraries(
   behaviors
   common
