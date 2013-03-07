@@ -6,8 +6,12 @@
  */
 #pragma once
 
+#include "BallFilter.h"
+
 #include "RoboGrams.h"
-#include "Common.pb.h"
+#include "BallModel.pb.h"
+
+#include <boost/shared_ptr.hpp>
 
 namespace man
 {
@@ -20,7 +24,8 @@ namespace man
         BallTrackModule();
         ~BallTrackModule();
 
-        portals::OutPortal<messages::RobotLocation> ballLocationOutput;
+        portals::InPortal<messages::VisionBall> visionBallInput;
+        portals::OutPortal<messages::FilteredBall> ballLocationOutput;
 
     protected:
         /**
@@ -29,6 +34,9 @@ namespace man
         void run_();
 
     private:
+//        boost::shared_ptr<BallFilter> ballFilter;
+        BallFilter *ballFilter;
+
         float ballX;
         float ballY;
     };

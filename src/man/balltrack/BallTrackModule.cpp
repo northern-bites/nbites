@@ -9,6 +9,8 @@ namespace man
         portals::Module(),
         ballLocationOutput(base())
     {
+        ballFilter = new BallFilter();
+
         ballX = 1.f;
         ballY = 2.f;
     }
@@ -19,10 +21,17 @@ namespace man
 
     void BallTrackModule::run_()
     {
-        portals::Message<messages::RobotLocation> ballMessage(0);
+        // Latch
 
-        ballMessage.get()->set_x(ballX);
-        ballMessage.get()->set_y(ballY);
+        // Update the Ball filter
+
+        // Fill the ballMessage with the filters representation
+
+
+        portals::Message<messages::FilteredBall> ballMessage(0);
+
+        ballMessage.get()->set_filter_rel_x(ballX);
+        ballMessage.get()->set_filter_rel_y(ballY);
 
         ballLocationOutput.setMessage(ballMessage);
     }
