@@ -17,15 +17,12 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <cerrno>
-#include <iostream>
 
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
 
 #include "ImageAcquisition.h"
 //#include "Profiler.h"
-
-#include "Images.h"
 
 // For checking the ioctls; prints error if one occurs
 #define VERIFY(x, str) {                               \
@@ -38,7 +35,7 @@
         }                                              \
     }
 
-//using namespace portals;
+using namespace portals;
 using namespace messages;
 
 namespace man {
@@ -46,11 +43,15 @@ namespace image {
 
 using boost::shared_ptr;
 
-V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which) :
+V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which,
+                                           OutPortal<ThresholdedImage>* out) :
+    outPortal(out),
     settings(Camera::getSettings(which)),
     cameraType(which),
     currentBuf(0),
-    timeStamp(0)
+    timeStamp(0),
+    table(new unsigned char[yLimit * uLimit * vLimit]),
+    params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
 {
     initOpenI2CAdapter();
     initSelectCamera();
@@ -83,6 +84,30 @@ V4L2ImageTranscriber::~V4L2ImageTranscriber() {
     close(cameraAdapterFd);
     close(fd);
     free(buf);
+}
+
+void V4L2ImageTranscriber::initTable(const std::string& filename)
+{
+    FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
+
+    if (fp == NULL) {
+        printf("CAMERA::ERROR::initTable() FAILED to open filename: %s\n",
+               filename.c_str());
+        return;
+    }
+
+    // actually read the table into memory
+    // Color table is in VUY ordering
+    int rval;
+    for(int v=0; v < vLimit; ++v){
+        for(int u=0; u< uLimit; ++u){
+            rval = fread(&table[v * uLimit * yLimit + u * yLimit],
+                         sizeof(unsigned char), yLimit, fp);
+        }
+    }
+
+    printf("CAMERA::Loaded colortable %s.\n",filename.c_str());
+    fclose(fp);
 }
 
 void V4L2ImageTranscriber::initOpenI2CAdapter() {
@@ -248,23 +273,31 @@ void V4L2ImageTranscriber::startCapturing() {
            "Start capture failed.");
 }
 
-YUVImage V4L2ImageTranscriber::acquireImage() {
+bool V4L2ImageTranscriber::acquireImage() {
     //PROF_ENTER(P_DQBUF);
     this->captureNew();
-    //PROF_EXIT(P_DQBUF;)
+    //PROF_EXIT(P_DQBUF);
     uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
     if (current_image) {
+        Message<ThresholdedImage> image(0);
+
         //PROF_ENTER(P_ACQUIRE_IMAGE);
+        ImageAcquisition::acquire_image_fast(table, params, current_image,
+                                             image.get()->get_mutable_image());
+        image.get()->set_timestamp(42);
         //PROF_EXIT(P_ACQUIRE_IMAGE);
+
+        outPortal->setMessage(image);
+
         //PROF_ENTER(P_QBUF);
+        this->releaseBuffer();
         //PROF_EXIT(P_QBUF);
-        YUVImage current = YUVImage(current_image, WIDTH, HEIGHT, WIDTH * 2);
-        return current;
+        return true;
     }
     else {
         printf("Warning - the buffer we dequeued was NULL\n");
-        return YUVImage();
     }
+    return false;
 }
 
 bool V4L2ImageTranscriber::captureNew() {
