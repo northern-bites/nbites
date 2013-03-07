@@ -19,8 +19,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 {
 	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
 	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-	vision.joint_angles.wireTo(&sensors.jointsOutput_);
-	vision.inertial_state.wireTo(&sensors.inertialsOutput_);
+	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
     setModuleDescription("The Northern Bites' soccer player.");
 
     /** Sensors **/

@@ -36,8 +36,8 @@ private:
     audio::AudioEnactorModule audio;
     comm::CommModule comm;
     sensors::SensorsModule sensors;
-	vision::VisionModule vision;
 	image::ImageTranscriberModule imageTranscriber;
+	vision::VisionModule vision;
 };
 
 }

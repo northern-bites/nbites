@@ -18,6 +18,7 @@ ImageTranscriberModule::ImageTranscriberModule()
       topTable(new unsigned char[yLimit * uLimit * vLimit]),
       bottomTable(new unsigned char[yLimit * uLimit * vLimit])
 {
+	std::cout << "ImageTrancriber constructing\n";
     initTable("/home/nao/nbites/lib/table/top_table.mtb", 0);
     initTable("/home/nao/nbites/lib/table/bottom_table.mtb", 1);
 }

@@ -8,7 +8,9 @@ namespace audio {
 AudioEnactorModule::AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker)
     : portals::Module(),
       alspeech(broker)
-{}
+{
+	std::cout << "AudioEnactor constructing\n";
+}
 
 void AudioEnactorModule::run_()
 {

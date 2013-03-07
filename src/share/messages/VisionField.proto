@@ -5,11 +5,12 @@ message VisionField
 {
 
    optional int64 timestamp = 1;
-   optional PVisualGoalPost goal_post_l = 2;
-   optional PVisualGoalPost goal_post_r = 3;
-   repeated PVisualCorner visual_corner = 4;
-   repeated PVisualLine visual_line = 5;
-   optional PVisualDetection visual_cross = 6;
+   optional VisualGoalPost goal_post_l = 2;
+   optional VisualGoalPost goal_post_r = 3;
+   repeated VisualCorner visual_corner = 4;
+   repeated VisualLine visual_line = 5;
+   optional VisualDetection visual_cross = 6;
+   optional VisualFieldEdge visual_field_edge = 7;
    
       message Point
       {
@@ -17,35 +18,45 @@ message VisionField
 	optional float y = 2;
       }
 
-      message PVisualDetection
+      message VisualDetection
       {
 	optional float distance = 1;
 	optional float bearing = 2;
-	repeated Point concrete_coords = 3;
+	optional float distance_sd = 3;
+	optional float bearing_sd = 4;
+	repeated Point concrete_coords = 5;
       }
       
-   message PVisualGoalPost
+   message VisualGoalPost
    {
-      optional PVisualDetection visual_detection = 1;
-      optional int32 height = 2;
-      optional int32 width = 3;
+      optional VisualDetection visual_detection = 1;
+      optional float height = 2;
+      optional float width = 3;
    }
 
-   message PVisualCorner
+   message VisualCorner
    {
-      optional PVisualDetection visual_detection = 1;
+      optional VisualDetection visual_detection = 1;
       optional float orientation = 2;
       optional int32 corner_type = 3;
+      optional float physical_orientation = 4;
    }
 
-   message PVisualLine
+   message VisualLine
    {
-      optional PVisualDetection visual_detection = 1;
+      optional VisualDetection visual_detection = 1;
       optional int32 line_id = 2;
       optional int32 start_x = 3;
       optional int32 start_y = 4;
       optional int32 end_x = 5;
       optional int32 end_y = 6;
+   }
+
+   message VisualFieldEdge
+   {
+      optional float distance_l = 1;
+      optional float distance_m = 2;
+      optional float distance_r = 3;
    }
 
 
