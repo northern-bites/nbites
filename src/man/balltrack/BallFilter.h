@@ -9,12 +9,16 @@
 
 #pragma once
 
+#include "NBMath.h"
+
+#include "BallModel.pb.h"
+
 namespace man
 {
     namespace balltrack
     {
         static const int DEFAULT_BUFFER_SIZE = 30;
-        static const float ALPHA = .6f;
+        static const float ALPHA = .7f;
 
         /*
          * @brief Struct to take observations from vision
@@ -27,18 +31,36 @@ namespace man
             float bear;
         };
 
+        /*
+         * @brief Struct to pass back Cartesian Ball Estimate
+         */
+        struct CartesianBallEstimate
+        {
+            CartesianBallEstimate(float relX_, float relY_) : relX(relX_), relY(relY_) {}
+            CartesianBallEstimate() {}
+            float relX;
+            float relY;
+        };
+
         class BallFilter
         {
         public:
             BallFilter(int bufferSize_ = DEFAULT_BUFFER_SIZE);
             ~BallFilter();
 
+            void update(messages::VisionBall visionBall);
+
             void addObservation(BallObservation newObsv);
             BallObservation getObsv(int which);
 
             BallObservation getNaiveEstimate();
+            CartesianBallEstimate getCartesianNaiveEstimate();
             BallObservation getExponentialEstimate();
+            CartesianBallEstimate getCartesianExponentialEstimate();
             BallObservation getWeightedNaiveEstimate();
+            CartesianBallEstimate getCartesianWeightedNaiveEstimate();
+
+            CartesianBallEstimate getCartesianRep(BallObservation obsv);
 
         private:
             BallObservation *obsvBuffer;
