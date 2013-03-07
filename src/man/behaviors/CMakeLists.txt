@@ -1,6 +1,6 @@
 # required libraries for python
 
-find_package(Boost COMPONENTS filesystem system date_time python REQUIRED)
+find_package(Boost COMPONENTS python REQUIRED)
 message("Include dirs of boost: " ${Boost_INCLUDE_DIRS} )
 message("Libs of boost: " ${Boost_LIBRARIES} )
 
