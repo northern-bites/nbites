@@ -7,6 +7,7 @@ set( COMMON_SRCS NBMath
   CommDef
   RoboCupGameControlData
   ALLedNames
+  NogginStructs
 )
 
 add_library(

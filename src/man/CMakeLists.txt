@@ -82,6 +82,7 @@ add_subdirectory( led )
 add_subdirectory( behaviors )
 add_subdirectory( guardian )
 add_subdirectory( audio )
+add_subdirectory( balltrack )
 
 set( MAN_SRCS main.cpp
   NewMan.cpp
@@ -105,6 +106,7 @@ target_link_libraries(
   behaviors
   guardian
   audio
+  balltrack
 )
 
 install( TARGETS man

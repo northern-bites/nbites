@@ -138,12 +138,11 @@ namespace man {
 			modifySysPath();
 			brain_module = NULL;
 
-			//TODO: remove unnecessary calls here. The rest of them?
+			// These boosted files are currently still necessary.
 			// Initialize low-level modules
-			// c_init_speed();
 			c_init_noggin_constants();
-			// c_init_objects();
-			// c_init_goalie();
+			c_init_objects();
+			c_init_goalie();
 		}
 
 		void BehaviorsModule::modifySysPath()
