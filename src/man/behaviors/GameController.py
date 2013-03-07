@@ -24,16 +24,11 @@ class GameController(FSA.FSA):
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'green'
         self.setPrintFunction(self.brain.out.printf)
-        self.timeLeft = 0 #temporary value
-        self.kickOff = 1 #temporary value
+        self.timeLeft = 600 #temporary value
+        self.ownKickOff = True
         self.penaltyShots = False
 
-        if self.kickOff:
-            self.ownKickOff = True
-        else:
-            self.ownKickOff = False
-
-        print  "kickoff:%g teamColor:%g" % (self.kickOff, self.gd.myTeamColor)
+        print  "kickoff:%g teamColor:%g" % (self.ownKickOff, self.gd.myTeamColor)
 
     def run(self):
         # Currently set up to ignore button presses if game
@@ -83,35 +78,25 @@ class GameController(FSA.FSA):
         self.timeLeft = self.gd.secs_remaining
 
         #Set team color
-        if self.gd.myTeamColor != self.brain.teamColor:
-            if self.gd.myTeamColor == TEAM_BLUE:
-                self.brain.my.teamColor = TEAM_BLUE
-            else:
-                self.brain.my.teamColor = TEAM_RED
+        for TeamInfo teamInfo in self.gd.team:
+            if teamInfo.team_number == self.brain.teamNumber:
+                if teamInfo.team_color != self.brain.teamColor:
+                    if teamInfo.team_color == TEAM_BLUE:
+                        self.brain.teamColor = TEAM_BLUE
+                    else:
+                        self.brain.teamColor = TEAM_RED
 
-            self.brain.leds.teamChange = True
-
-            self.brain.makeFieldObjectsRelative()
-            self.printf("Switching team color to: " +
-                        str(self.brain.my.teamColor))
+                    self.brain.leds.teamChange = True
 
             # need to update kickoff when we swap team color
-            if self.gd.ourKickoff:
+        if self.gd.kick_off_team == self.brain.teamColor:
+            if self.ownKickOff == False:
                 self.ownKickOff = True
                 self.brain.leds.kickoffChange = True
-            else:
+        else:
+            if self.ownKickOff == True:
                 self.ownKickOff = False
                 self.brain.leds.kickoffChange = True
-
-        if self.gd.ourKickoff != self.kickOff:
-            self.printf("Switching our kickoff to " + str(self.gd.ourKickoff))
-            self.kickOff = self.gd.ourKickoff
-
-            if self.kickOff:
-                self.ownKickOff = True
-            else:
-                self.ownKickOff = False
-            self.brain.leds.kickoffChange = True
 
         FSA.FSA.run(self)
 
@@ -125,4 +110,4 @@ class GameController(FSA.FSA):
         """
         negative when we're losing
         """
-        return self.gd.goalDifferential
+        return 0

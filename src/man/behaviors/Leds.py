@@ -180,12 +180,12 @@ class Leds():
         self.brain.outMessages['ledCommand'] = LedCommand_pb2.LedCommand()
 
         if BALL_LEDS:
-            if self.brain.ball.vis.framesOn == 1:
+            if self.brain.ball.framesOn == 1:
                 self.executeLeds(BALL_ON_LEDS)
-            elif self.brain.ball.vis.framesOff == 1:
+            elif self.brain.ball.framesOff == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
-        if GOAL_LEDS:
+        if False:#GOAL_LEDS:
             newCertainty = self.brain.ygrp.vis.certainty
 
             if (newCertainty == vision.certainty.NOT_SURE):
@@ -298,7 +298,7 @@ class Leds():
             # TODO: show loc uncertainty via LEDS
             pass
 
-        if COMM_LEDS:
+        if False:#COMM_LEDS:
             newActiveMates = self.brain.activeTeamMates()
             if (newActiveMates != self.numActiveMates):
                 self.numActiveMates = newActiveMates
@@ -364,7 +364,7 @@ class Leds():
                     self.executeLeds(NO_KICKOFF_LEDS)
                 self.kickoffChange = False
             if self.teamChange:
-                if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                if self.brain.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                     self.executeLeds(TEAM_BLUE_LEDS)
                 else:
                     self.executeLeds(TEAM_RED_LEDS)

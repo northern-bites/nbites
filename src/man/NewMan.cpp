@@ -14,7 +14,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       commThread("comm"),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
 	  cognitionThread("cognition"),
-	  leds(broker)
+	  leds(broker),
+	  behaviors()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
