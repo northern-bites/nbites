@@ -23,8 +23,8 @@ public:
 
 
 private:
-
     void startSubThreads();
+    void startAndCheckThread(DiagramThread& thread);
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;

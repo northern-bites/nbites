@@ -31,6 +31,8 @@ public:
     // How modules are passed to the diagram
     void addModule(portals::Module& mod);
 
+    std::string getName() { return name; }
+
     // Thread control
     int start();
     void stop();

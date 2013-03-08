@@ -1,4 +1,4 @@
-#include "NewMan.h"
+#include "Man.h"
 #include <iostream>
 #include "RobotConfig.h"
 
@@ -53,21 +53,18 @@ Man::~Man()
 
 void Man::startSubThreads()
 {
-    if(sensorsThread.start())
+    startAndCheckThread(sensorsThread);
+    startAndCheckThread(guardianThread);
+    startAndCheckThread(commThread);
+    startAndCheckThread(cognitionThread);
+}
+
+void Man::startAndCheckThread(DiagramThread& thread)
+{
+    if(thread.start())
     {
-        std::cout << "Sensors thread failed to start." << std::endl;
-    }
-    if(guardianThread.start())
-    {
-        std::cout << "Guardian thread failed to start." << std::endl;
-    }
-    if(commThread.start())
-    {
-        std::cout << "Comm thread failed to start." << std::endl;
-    }
-    if(cognitionThread.start())
-    {
-        std::cout << "Cognition thread failed to start." << std::endl;
+        std::cout << thread.getName() << "thread failed to start." <<
+            std::endl;
     }
 }
 
