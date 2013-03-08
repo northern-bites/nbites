@@ -39,7 +39,6 @@ GuardianModule::GuardianModule()
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       useFallProtection(true)
 {
-	std::cout << "Guardian constructing\n";
 }
 
 GuardianModule::~GuardianModule()

@@ -27,15 +27,16 @@ private:
     void startSubThreads();
 
     DiagramThread sensorsThread;
+    sensors::SensorsModule sensors;
+
     DiagramThread guardianThread;
-    DiagramThread commThread;
-	DiagramThread cognitionThread;
-
-
     guardian::GuardianModule guardian;
     audio::AudioEnactorModule audio;
+
+    DiagramThread commThread;
     comm::CommModule comm;
-    sensors::SensorsModule sensors;
+
+	DiagramThread cognitionThread;
 	image::ImageTranscriberModule imageTranscriber;
 	vision::VisionModule vision;
 };

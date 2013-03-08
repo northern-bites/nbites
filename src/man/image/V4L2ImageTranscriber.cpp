@@ -17,6 +17,7 @@
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <cerrno>
+#include <iostream>
 
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
@@ -27,11 +28,9 @@
 // For checking the ioctls; prints error if one occurs
 #define VERIFY(x, str) {                               \
         if( (x) != 0) {                                \
-            printf("CAMERA ERROR::");                  \
-            printf(str);                               \
-            printf("\n");                              \
-            printf("System Error Message: %s\n",       \
-                   strerror(errno));                   \
+            std::cerr << "CAMERA ERROR::" << str <<    \
+                "\nSystem Error Message: " <<          \
+                strerror(errno) << std::endl;;         \
         }                                              \
     }
 
@@ -91,8 +90,8 @@ void V4L2ImageTranscriber::initTable(const std::string& filename)
     FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
 
     if (fp == NULL) {
-        printf("CAMERA::ERROR::initTable() FAILED to open filename: %s\n",
-               filename.c_str());
+        std::cerr << "CAMERA::ERROR::initTable() FAILED to open filename:"
+                  << filename.c_str() << std::endl;
         return;
     }
 
@@ -106,7 +105,8 @@ void V4L2ImageTranscriber::initTable(const std::string& filename)
         }
     }
 
-    printf("CAMERA::Loaded colortable %s.\n",filename.c_str());
+    std::cerr << "CAMERA::Loaded colortable " << filename.c_str() <<
+        std::endl;
     fclose(fp);
 }
 
@@ -122,7 +122,8 @@ void V4L2ImageTranscriber::initOpenI2CAdapter() {
 
     if(cameraAdapterFd == -1)
     {
-        printf("CAMERA::ERROR::Camera adapter FD is WRONG.\n");
+        std::cerr << "CAMERA::ERROR::Camera adapter FD is WRONG." <<
+            std::endl;
     }
 
     VERIFY((ioctl(cameraAdapterFd, 0x703, 8)),
@@ -147,7 +148,7 @@ void V4L2ImageTranscriber::initOpenVideoDevice() {
 
     if(fd == -1)
     {
-        printf("CAMERA::ERROR::Video Device FD is WRONG.\n");
+        std::cerr << "CAMERA::ERROR::Video Device FD is WRONG." << std::endl;
     }
 }
 
@@ -175,7 +176,7 @@ void V4L2ImageTranscriber::initSetImageFormat() {
            "Setting image format failed.");
 
     if(fmt.fmt.pix.sizeimage != (unsigned int)SIZE)
-        printf("CAMERA ERROR::Size setting is WRONG.\n");
+        std::cerr << "CAMERA ERROR::Size setting is WRONG." << std::endl;
 }
 
 void V4L2ImageTranscriber::initSetFrameRate() {
@@ -203,7 +204,7 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
 
     if(rb.count != (unsigned int)frameBufferCount)
     {
-        printf("CAMERA ERROR::Buffer count is WRONG.\n");
+        std::cerr << "CAMERA ERROR::Buffer count is WRONG." << std::endl;
     }
 
     // map or prepare the buffers
@@ -220,7 +221,7 @@ void V4L2ImageTranscriber::initRequestAndMapBuffers() {
         mem[i] = mmap(0, buf->length, PROT_READ | PROT_WRITE,
                       MAP_SHARED, fd, buf->m.offset);
         if(mem[i] == MAP_FAILED)
-            printf("CAMERA ERROR::Map failed.\n");
+            std::cerr << "CAMERA ERROR::Map failed." << std::endl;
     }
 }
 
@@ -231,7 +232,7 @@ void V4L2ImageTranscriber::initQueueAllBuffers() {
         buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buf->memory = V4L2_MEMORY_MMAP;
         if(ioctl(fd, VIDIOC_QBUF, buf) == -1)
-            printf("Queueing a buffer failed.\n");
+            std::cerr << "Queueing a buffer failed." << std::endl;
     }
 }
 void V4L2ImageTranscriber::initSettings()
@@ -295,7 +296,7 @@ bool V4L2ImageTranscriber::acquireImage() {
         return true;
     }
     else {
-        printf("Warning - the buffer we dequeued was NULL\n");
+        std::cerr << "Warning - the buffer we dequeued was NULL" << std::endl;
     }
     return false;
 }
@@ -307,13 +308,13 @@ bool V4L2ImageTranscriber::captureNew() {
     VERIFY((ioctl(fd, VIDIOC_DQBUF, buf)),
            "Dequeueing the frame buffer failed.");
     if(buf->bytesused != (unsigned int)SIZE)
-        printf("CAMERA::ERROR::Wrong buffer size!.\n");
+        std::cerr << "CAMERA::ERROR::Wrong buffer size!" << std::endl;
     currentBuf = buf;
 
     static bool shout = true;
     if (shout) {
         shout = false;
-        printf("CAMERA::Camera is working.\n");
+        std::cerr << "CAMERA::Camera is working." << std::endl;
     }
 
     return true;
@@ -333,7 +334,7 @@ int V4L2ImageTranscriber::getControlSetting(unsigned int id) {
     control_s.id = id;
     if (ioctl(fd, VIDIOC_G_CTRL, &control_s) < 0)
     {
-        printf("CAMERA::Warning::Getting control failed.\n");
+        std::cerr << "CAMERA::Warning::Getting control failed." << std::endl;
         return -1;
     }
     return control_s.value;
@@ -351,13 +352,15 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     {
         if (ioctl(fd, VIDIOC_S_CTRL, &control_s) < 0)
         {
-            printf("CAMERA::Warning::Control setting failed.\n");
+            std::cerr << "CAMERA::Warning::Control setting failed." <<
+                std::endl;
             return false;
         }
 	counter++;
 	if(counter > 10)
 	  {
-	    printf("CAMERA::Warning::Timeout while setting a parameter.\n");
+          std::cerr << "CAMERA::Warning::Timeout while setting a parameter."
+                    << std::endl;
 	    return false;
 	  }
     }
@@ -374,11 +377,13 @@ void V4L2ImageTranscriber::assertCameraSettings() {
            "Getting settings failed");
 
     if (fps.parm.capture.timeperframe.numerator != 1) {
-        printf("CAMERA::fps.parm.capture.timeperframe.numerator is wrong.\n");
+        std::cerr << "CAMERA::fps.parm.capture.timeperframe.numerator is"
+                  << " wrong." << std::endl;
         allFine = false;
     }
     if (fps.parm.capture.timeperframe.denominator != 30) {
-        printf("CAMERA::fps.parm.capture.timeperframe.denominator is wrong.\n");
+        std::cerr << "CAMERA::fps.parm.capture.timeperframe.denominator" <<
+            " is wrong." << std::endl;
         allFine = false;
     }
 
@@ -393,73 +398,96 @@ void V4L2ImageTranscriber::assertCameraSettings() {
     int gain = getControlSetting(V4L2_CID_GAIN);
     int exposure = getControlSetting(V4L2_CID_EXPOSURE);
     int whitebalance = getControlSetting(V4L2_CID_DO_WHITE_BALANCE);
+    //std::cerr << "Done checking driver settings" << std::endl;
 
     if (hflip != settings.hflip)
     {
-        printf("CAMERA::WARNING::Horizontal flip setting is wrong:");
-        printf(" is %d, not %d.\n", hflip, settings.hflip);
+        std::cerr << "CAMERA::WARNING::Horizontal flip setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " << hflip << " not " << settings.hflip <<
+            std::endl;
         allFine = false;
     }
     if (vflip != settings.vflip)
     {
-        printf("CAMERA::WARNING::Vertical flip setting is wrong:");
-        printf(" is %d, not %d.\n", vflip, settings.vflip);
+        std::cerr << "CAMERA::WARNING::Vertical flip setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " << vflip  << " not " << settings.vflip <<
+            std::endl;
         allFine = false;
     }
     if (brightness != settings.brightness)
     {
-        printf("CAMERA::WARNING::Brightness setting is wrong:");
-        printf(" is %d, not %d.\n", brightness, settings.brightness);
+        std::cerr << "CAMERA::WARNING::Brightness setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  brightness << " not " << settings.brightness
+                  << std::endl;
         allFine = false;
     }
     if (contrast != settings.contrast)
     {
-        printf("CAMERA::WARNING::Contrast setting is wrong:");
-        printf(" is %d, not %d.\n", contrast, settings.contrast);
+        std::cerr << "CAMERA::WARNING::Contrast setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  contrast << " not " << settings.contrast
+                  << std::endl;
         allFine = false;
     }
     if (saturation != settings.saturation)
     {
-        printf("CAMERA::WARNING::Saturation setting is wrong:");
-        printf(" is %d, not %d.\n", saturation, settings.saturation);
+        std::cerr << "CAMERA::WARNING::Saturation setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  saturation << " not " << settings.saturation
+                  << std::endl;
         allFine = false;
     }
     if (hue != settings.hue)
     {
-        printf("CAMERA::WARNING::Hue setting is wrong:");
-        printf(" is %d, not %d.\n", hue, settings.hue);
+        std::cerr << "CAMERA::WARNING::Hue setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  hue << " not " << settings.hue
+                  << std::endl;
         allFine = false;
     }
    if (sharpness != settings.sharpness)
     {
-        printf("CAMERA::WARNING::Sharpness setting is wrong:");
-        printf(" is %d, not %d.\n", sharpness, settings.sharpness);
+        std::cerr << "CAMERA::WARNING::Sharpness setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  sharpness << " not " << settings.sharpness
+                  << std::endl;
         allFine = false;
     }
    if (gain != settings.gain)
     {
-        printf("CAMERA::WARNING::Gain setting is wrong:");
-        printf(" is %d, not %d.\n", gain, settings.gain);
+        std::cerr << "CAMERA::WARNING::Gain setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  gain << " not " << settings.gain
+                  << std::endl;
         allFine = false;
     }
    if (exposure != settings.exposure)
     {
-        printf("CAMERA::WARNING::Exposure setting is wrong:");
-        printf(" is %d, not %d.\n", exposure, settings.exposure);
+        std::cerr << "CAMERA::WARNING::Exposure setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  exposure << " not " << settings.exposure
+                  << std::endl;
         allFine = false;
     }
    if (whitebalance != settings.white_balance)
     {
-        printf("CAMERA::WARNING::Whitebalance setting is wrong:");
-        printf(" is %d, not %d.\n", whitebalance, settings.white_balance);
+        std::cerr << "CAMERA::WARNING::Whitebalance setting is wrong:"
+                  << std::endl;
+        std::cerr << " is " <<  whitebalance << " not " << settings.white_balance
+                  << std::endl;
         allFine = false;
     }
 
     if (allFine) {
-        printf("CAMERA::");
+        std::cerr << "CAMERA::";
         if(cameraType == Camera::BOTTOM)
-            printf("Bottom camera settings were set correctly.\n");
-        else printf("Top camera settings were set correctly.\n");
+            std::cerr << "Bottom camera settings were set correctly." <<
+                std::endl;
+        else std::cerr << "Top camera settings were set correctly." <<
+                 std::endl;
     }
 }
 
@@ -470,7 +498,7 @@ void V4L2ImageTranscriber::enumerate_controls()
 {
     memset (&queryctrl, 0, sizeof (queryctrl));
 
-    printf("Public controls:\n");
+    std::cout << "Public controls:" << std::endl;
     for (queryctrl.id = V4L2_CID_BASE;
          queryctrl.id < V4L2_CID_LASTP1;
          queryctrl.id++) {
@@ -478,11 +506,11 @@ void V4L2ImageTranscriber::enumerate_controls()
             if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
                 continue;
 
-            printf ("Control %s", queryctrl.name);
-            printf (" has id %d,", queryctrl.id);
-            printf (" steps %d,", queryctrl.step);
-            printf (" and min %d, max %d.\n\n", queryctrl.minimum,
-                    queryctrl.maximum);
+            std::cout << "Control " << queryctrl.name;
+            std::cout << " has id " << queryctrl.id;
+            std::cout << " steps " << queryctrl.step;
+            std::cout << " and min " << queryctrl.minimum << " max " <<
+                queryctrl.maximum << std::endl;
 
             if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
                 enumerate_menu ();
@@ -495,14 +523,14 @@ void V4L2ImageTranscriber::enumerate_controls()
         }
     }
 
-    printf("Private controls:\n");
+    std::cout << "Private controls:" << std::endl;;
     for (queryctrl.id = V4L2_CID_PRIVATE_BASE;;
          queryctrl.id++) {
         if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl)) {
             if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
                 continue;
 
-            printf ("Control %s\n", queryctrl.name);
+            std::cout << "Control " <<  queryctrl.name << std::endl;
 
             if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
                 enumerate_menu ();
@@ -523,13 +551,13 @@ void V4L2ImageTranscriber::enumerate_controls()
     if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl))
     {
             if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
-                printf("Disabled.\n");
+                std::cout << "Disabled." << std::endl;
     }
 
-    printf ("Control %s", queryctrl.name);
-    printf (" has id %d", queryctrl.id);
-    printf (" and min %d, max %d.\n\n", queryctrl.minimum,
-            queryctrl.maximum);
+    std::cout << "Control " << queryctrl.name;
+    std::cout << " has id " << queryctrl.id;
+    std::cout << " and min " << queryctrl.minimum << " max " <<
+        queryctrl.maximum << std::endl;
 
     if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
                 enumerate_menu ();
@@ -537,7 +565,7 @@ void V4L2ImageTranscriber::enumerate_controls()
 
 void V4L2ImageTranscriber::enumerate_menu ()
 {
-    printf ("  Menu items:\n");
+    std::cout << "  Menu items:" << std::endl;;
 
     memset (&querymenu, 0, sizeof (querymenu));
     querymenu.id = queryctrl.id;
@@ -546,7 +574,7 @@ void V4L2ImageTranscriber::enumerate_menu ()
          querymenu.index <= (unsigned)queryctrl.maximum;
          querymenu.index++) {
         if (0 == ioctl (fd, VIDIOC_QUERYMENU, &querymenu)) {
-            printf ("  %s\n", querymenu.name);
+            std::cout << "  " << querymenu.name << std::endl;
         }
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "V4L2ImageTranscriber.h"
+#include "Profiler.h"
 
 namespace man {
 namespace image {
@@ -18,6 +19,9 @@ protected:
     virtual void run_();
     V4L2ImageTranscriber topImageTranscriber;
     V4L2ImageTranscriber bottomImageTranscriber;
+
+    long long lastProcessTimeAvg;
+    struct timespec interval, remainder;
 };
 
 }

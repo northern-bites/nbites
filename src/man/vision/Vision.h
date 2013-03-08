@@ -55,7 +55,6 @@ class HoughVisualCorner;
 #include "VisualCorner.h"
 #include "VisualObstacle.h"
 
-
 class Vision
 {
     friend class Threshold;

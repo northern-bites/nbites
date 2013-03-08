@@ -245,7 +245,7 @@ void Threshold::obstacleLoop(const messages::JointAngles& ja, const messages::In
 void Threshold::visionLoop(const messages::JointAngles& ja, const messages::InertialState& inert) {
     usingTopCamera = true;
 
-	cout << "doing the visionloop\n";
+	//cout << "doing the visionloop\n";
     pose->transform(usingTopCamera, ja, inert);
 
 

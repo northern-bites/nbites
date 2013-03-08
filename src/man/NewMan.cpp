@@ -17,18 +17,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	  imageTranscriber(),
 	  vision()
 {
-	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
     setModuleDescription("The Northern Bites' soccer player.");
 
     /** Sensors **/
     sensorsThread.addModule(sensors);
-	
-	/** Cognition **/
-	cognitionThread.addModule(imageTranscriber);
-	cognitionThread.addModule(vision);
 
     /** Guardian **/
     guardianThread.addModule(guardian);
@@ -44,6 +36,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Comm **/
     commThread.addModule(comm);
 
+	/** Cognition **/
+	cognitionThread.addModule(imageTranscriber);
+	cognitionThread.addModule(vision);
+	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
     startSubThreads();
 }
@@ -54,11 +53,22 @@ Man::~Man()
 
 void Man::startSubThreads()
 {
-    sensorsThread.start();
-    guardianThread.start();
-    commThread.start();
-	cognitionThread.start();
+    if(sensorsThread.start())
+    {
+        std::cout << "Sensors thread failed to start." << std::endl;
+    }
+    if(guardianThread.start())
+    {
+        std::cout << "Guardian thread failed to start." << std::endl;
+    }
+    if(commThread.start())
+    {
+        std::cout << "Comm thread failed to start." << std::endl;
+    }
+    if(cognitionThread.start())
+    {
+        std::cout << "Cognition thread failed to start." << std::endl;
+    }
 }
 
 }
- 

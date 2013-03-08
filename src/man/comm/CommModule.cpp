@@ -20,9 +20,6 @@ CommModule::CommModule(int team, int player) :
     _gameStateOutput(base()),
     _myPlayerNumber(player)
 {
-
-	std::cout << "Comm constructing\n";
-
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         _worldModels[i] = new portals::OutPortal<messages::WorldModel>(base());

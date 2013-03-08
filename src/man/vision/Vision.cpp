@@ -52,7 +52,6 @@ Vision::Vision()
       frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
-	std::cout << "constructing visionModule\n";
     /* declaring class pointers for field objects, ball, leds, lines*/
     ygrp = new VisualFieldObject(YELLOW_GOAL_RIGHT_POST);
     yglp = new VisualFieldObject(YELLOW_GOAL_LEFT_POST);
@@ -80,7 +79,6 @@ Vision::Vision()
 // Vision Class Deconstructor
 Vision::~Vision()
 {
-    cout << "Vision destructor" << endl;
     delete thresh;
     delete navy2;
     delete navy1;
@@ -146,9 +144,8 @@ void Vision::copyImage(const byte* image) {
  */
 
 void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot,
-			 const JointAngles& ja, const InertialState& inert) {
-	
-
+			 const JointAngles& ja, const InertialState& inert)
+{
     yImg = y_top;
     uImg = y_top + AVERAGED_IMAGE_SIZE;
     vImg = uImg + AVERAGED_IMAGE_SIZE;
@@ -188,7 +185,6 @@ void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot,
     thresh->transposeDebugImage();
 
     // linesDetector.detect(yImg);
-    
 }
 
 
