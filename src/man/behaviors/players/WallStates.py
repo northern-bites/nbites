@@ -1,5 +1,4 @@
-import man.motion.SweetMoves as SweetMoves
-import man.motion.HeadMoves as HeadMoves
+from .. import SweetMoves
 from objects import RelRobotLocation
 from ..navigator import Navigator
 

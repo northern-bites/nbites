@@ -6,7 +6,7 @@ import ChaseBallConstants as constants
 import GoalieTransitions as goalTran
 from ..navigator import Navigator
 from ..playbook.PBConstants import GOALIE
-import man.motion.HeadMoves as HeadMoves
+import HeadMoves
 import man.noggin.kickDecider.HackKickInformation as hackKick
 import man.noggin.kickDecider.kicks as kicks
 from objects import RelRobotLocation

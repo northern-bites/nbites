@@ -1,8 +1,7 @@
 from . import TrackingConstants as constants
-import man.motion as motion
-from man.motion import MotionConstants
+from . import MotionConstants
 from ..util import MyMath as MyMath
-from man.motion import StiffnessModes
+from . import StiffnessModes
 from math import fabs
 
 class HeadTrackingHelper(object):

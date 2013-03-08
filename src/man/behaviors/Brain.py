@@ -12,27 +12,27 @@ import noggin_constants as Constants
 
 # Modules from this directory
 from . import Leds
-from . import robots
+#from . import robots
 from . import Ball
 from . import MyInfo
 
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (Play, TeamMember)
-from .navigator import Navigator
+#from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
 import GameController
 
-from objects import (FieldObject)
+#from objects import (FieldObject)
 
 # Import message protocol buffers
-from ...share.messages import LedCommand_pb2
-from ...share.messages import GameState_pb2
-from ...share.messages import WorldModel_pb2
-from ...share.messages import BallModel_pb2
+from messages import LedCommand_pb2
+from messages import GameState_pb2
+from messages import WorldModel_pb2
+from messages import BallModel_pb2
 
 class Brain(object):
     """
@@ -60,12 +60,12 @@ class Brain(object):
         self.leds = Leds.Leds(self)
 
         # Retrieve our robot identification and set per-robot parameters
-        self.CoA = robots.get_certificate()
+        #self.CoA = robots.get_certificate()
 
         # coa is Certificate of Authenticity (to keep things short)
-        self.out.printf(self.CoA)
-        self.out.printf("GC:  I am on team "+str(self.teamNumber))
-        self.out.printf("GC:  I am player  "+str(self.playerNumber))
+        #self.out.printf(self.CoA)
+        #self.out.printf("GC:  I am on team "+str(self.teamNumber))
+        #self.out.printf("GC:  I am player  "+str(self.playerNumber))
 
         # Information about the environment
         # All field objects should come in as messages now
@@ -78,7 +78,7 @@ class Brain(object):
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
-        self.nav = Navigator.Navigator(self)
+        #self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
         self.gameController = GameController.GameController(self)

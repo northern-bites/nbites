@@ -1,6 +1,6 @@
-import man.motion.HeadMoves as HeadMoves
+import HeadMoves as HeadMoves
 from . import TrackingConstants as constants
-from man.motion import MotionConstants
+from . import MotionConstants
 from ..playbook import PBConstants
 
 def scanBall(tracker):

@@ -1,5 +1,5 @@
-import man.motion.SweetMoves as SweetMoves
-import man.motion.HeadMoves as HeadMoves
+from .. import SweetMoves
+from .. import HeadMoves
 import ChaseBallConstants as constants
 import noggin_constants as NogginConstants
 from math import fabs

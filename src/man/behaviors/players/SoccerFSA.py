@@ -2,8 +2,7 @@
 # soccer-playing functionality
 #
 #
-from man.motion import HeadMoves
-import man.motion as motion
+from ..headTracking import HeadMoves
 from ..util import FSA
 from . import CoreSoccerStates
 
@@ -13,7 +12,6 @@ class SoccerFSA(FSA.FSA):
         #self.setTimeFunction(self.brain.nao.getSimulatedTime)
         self.addStates(CoreSoccerStates)
         self.brain = brain
-        self.motion = brain.motion
 
         #set default behavior for soccer players - override it if you want
         self.setPrintStateChanges(True)
@@ -92,19 +90,19 @@ class SoccerFSA(FSA.FSA):
         self.lastBall_y = self.brain.ball.loc.y
 
 ##### Direct Motion Calls
-    def gainsOff(self):
-        """
-        Turn off the gains
-        """
-        freeze = motion.FreezeCommand()
-        self.brain.motion.sendFreezeCommand(freeze)
+    # def gainsOff(self):
+    #     """
+    #     Turn off the gains
+    #     """
+    #     freeze = motion.FreezeCommand()
+    #     self.brain.motion.sendFreezeCommand(freeze)
 
-    def gainsOn(self):
-        """
-        Turn on the gains
-        """
-        unFreeze = motion.UnfreezeCommand(0.85)
-        self.brain.motion.sendFreezeCommand(unFreeze)
+    # def gainsOn(self):
+    #     """
+    #     Turn on the gains
+    #     """
+    #     unFreeze = motion.UnfreezeCommand(0.85)
+    #     self.brain.motion.sendFreezeCommand(unFreeze)
 
 ##### HEAD-TRACKING Methods
     def penalizeHeads(self):

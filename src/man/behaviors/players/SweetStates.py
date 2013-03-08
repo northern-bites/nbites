@@ -2,7 +2,7 @@
 # Defines states for SweetMove testing
 #
 
-import man.motion.SweetMoves as SweetMoves
+from .. import SweetMoves
 
 def gameInitial(player):
     if player.firstFrame():

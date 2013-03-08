@@ -2,10 +2,10 @@ import time
 from objects import RelRobotLocation
 from ..navigator import Navigator
 from ..kickDecider import kicks
-from man.motion import SweetMoves
+from .. import SweetMoves
 
-import man.motion.SweetMoves as SweetMoves
-import man.motion.HeadMoves as HeadMoves
+from .. import SweetMoves
+from .. import HeadMoves
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 

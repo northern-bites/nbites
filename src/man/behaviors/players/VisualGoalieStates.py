@@ -1,7 +1,7 @@
-from man.motion.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
-                                  FIXED_PITCH_RIGHT_SIDE_PAN,
-                                  FIXED_PITCH_PAN,
-                                  FIXED_PITCH_SLOW_GOALIE_PAN)
+from ..headTracking.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
+                                      FIXED_PITCH_RIGHT_SIDE_PAN,
+                                      FIXED_PITCH_PAN,
+                                      FIXED_PITCH_SLOW_GOALIE_PAN)
 from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition

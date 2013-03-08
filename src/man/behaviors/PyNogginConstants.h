@@ -17,8 +17,8 @@
 #include "FieldConstants.h"
 #include <vector>
 
-namespace noggin {
-namespace py_constants {
+namespace man {
+namespace behaviors {
 
 ///// SWITCH BOARD /////
 static const bool LOG_LOC = false;

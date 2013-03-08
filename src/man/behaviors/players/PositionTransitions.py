@@ -1,6 +1,6 @@
 import PositionConstants as constants
 from math import fabs
-from man.motion import MotionConstants
+from .. import MotionConstants
 
 ####### POSITIONING STUFF ##############
 def shouldKickAtPosition(player):

@@ -1,4 +1,3 @@
-from man.motion import HeadMoves
 
 MAX_PAN_SPEED = 125.0              # deg/sec
 

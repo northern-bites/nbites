@@ -4,7 +4,7 @@
 # as necessary to test new parts of goalie behavior.
 #
 
-import man.motion.SweetMoves as SweetMoves
+from .. import SweetMoves
 import GoalieTransitions as goalTran
 
 # ****************************

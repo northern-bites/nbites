@@ -5,6 +5,8 @@
 //#include <boost/shared_ptr.hpp>
 //#include "Profiler.h"
 #include "PyNogginConstants.h"
+#include "PyObjects.h"
+#include "PyGoalie.h"
 
 #include "LedCommand.pb.h"
 #include "GameState.pb.h"
@@ -55,10 +57,11 @@ namespace man {
 			void parseOutMessages(PyObject *tuple);
 
 			// message variables
-			static const unsigned int NUM_IN_MESSAGES = 3;
-			static const unsigned int NUM_OUT_MESSAGES = 2;
-			const char* py_string_format = 's#';
-			PyObject *brain_run = Py_BuildValue(format, "run", 3);
+			// Remember: n messages includes multiple world model messages
+			static const int NUM_IN_MESSAGES = 2+NUM_PLAYERS_PER_TEAM;
+			static const int NUM_OUT_MESSAGES = 2;
+#define py_string_format "s#"
+//			static char* py_string_format = "s#";
 			PyObject *in_list_serials;
 			// initialize arrays to 0, null, etc
 			char *in_proto [NUM_IN_MESSAGES];

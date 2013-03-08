@@ -1,4 +1,4 @@
-from man.motion import HeadMoves
+import HeadMoves
 
 def stopped(tracker):
     '''Default state where the tracker does nothing.'''

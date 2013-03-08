@@ -10,12 +10,6 @@
 #ifndef CombObjects_h_DEFINED
 #define CombObjects_h_DEFINED
 
-#include "VisualFieldObject.h"
-#include "VisualLandmark.h"
-#include "VisualBall.h"
-#include "PyLoc.h"
-#include "BallEKF.h"
-#include "PyLoc.h"
 #include "NBMath.h"
 #include <vector>
 #include <math.h>
@@ -24,7 +18,8 @@
 #include <boost/python.hpp>
 using boost::shared_ptr;
 
-namespace noggin {
+namespace man {
+namespace behaviors {
 
     // Forward declarations of all of the classes in this file
     class Location;
@@ -209,29 +204,29 @@ namespace noggin {
      * tracking info.
      */
 
-    class LocObject : public Location
-    {
-    public:
-        LocObject(PyLoc&);
-        virtual ~LocObject() {};
+    // class LocObject : public Location
+    // {
+    // public:
+    //     LocObject(PyLoc&);
+    //     virtual ~LocObject() {};
 
-        // Loc getters
-        const float getDist();
-        const degrees getBearing();
-        const float getRelX();
-        const float getRelY();
+    //     // Loc getters
+    //     const float getDist();
+    //     const degrees getBearing();
+    //     const float getRelX();
+    //     const float getRelY();
 
-        // Tracking: Is this used?
-        const int getTrackingFitness() { return trackingFitness; }
-        void setTrackingFitness(int tf) { trackingFitness = tf; }
+    //     // Tracking: Is this used?
+    //     const int getTrackingFitness() { return trackingFitness; }
+    //     void setTrackingFitness(int tf) { trackingFitness = tf; }
 
-        bool operator < (const LocObject& other) const;
-        bool operator > (const LocObject& other) const;
+    //     bool operator < (const LocObject& other) const;
+    //     bool operator > (const LocObject& other) const;
 
-    private:
-        int trackingFitness;
-        PyLoc* loc;
-    };
+    // private:
+    //     int trackingFitness;
+    //     PyLoc* loc;
+    // };
 
     /*
      * LOC BALL
@@ -240,48 +235,48 @@ namespace noggin {
      * relative to the correct team.
      */
 
-    class LocBall : public Location, public RelLocation
-    {
-    public:
-        LocBall(PyLoc&, MyInfo&);
+    // class LocBall : public Location, public RelLocation
+    // {
+    // public:
+    //     LocBall(PyLoc&, MyInfo&);
 
-        //Loc getters
-        const float getXUncert() { return loc->getBallXUncert(); }
-        const float getYUncert() { return loc-> getBallYUncert(); }
-        const float getSD() { return getXUncert()*getYUncert(); }
-        const float getVelX();
-        const float getVelY();
-        const float getVelXUncert() { return loc->getXVelocityUncert(); }
-        const float getVelYUncert() { return loc->getYVelocityUncert(); }
-        const degrees getHeading();
-        const float getRelX() const { return loc->getBallRelXEst(); }
-        const float getRelY() const { return loc->getBallRelYEst(); }
-        const float getRelVelX() { return loc->getRelXVelocityEst(); }
-        const float getRelVelY() { return loc->getRelYVelocityEst(); }
-        const float getAccX();
-        const float getAccY();
-        const float getAccXUncert() { return loc->getXAccelerationUncert(); }
-        const float getAccYUncert() { return loc->getYAccelerationUncert(); }
-        const float getRelAccX() { return loc->getRelXAccelerationEst(); }
-        const float getRelAccY() { return loc->getRelYAccelerationEst(); }
-        const float dX() { return dx; }
-        const float dY() { return dy; }
-        const float getEndY() { return endY; }
-        const float getDist() const { return loc->getBallDistance(); }
-        const degrees getBearing() const { return loc->getBallBearingDeg(); }
+    //     //Loc getters
+    //     const float getXUncert() { return loc->getBallXUncert(); }
+    //     const float getYUncert() { return loc-> getBallYUncert(); }
+    //     const float getSD() { return getXUncert()*getYUncert(); }
+    //     const float getVelX();
+    //     const float getVelY();
+    //     const float getVelXUncert() { return loc->getXVelocityUncert(); }
+    //     const float getVelYUncert() { return loc->getYVelocityUncert(); }
+    //     const degrees getHeading();
+    //     const float getRelX() const { return loc->getBallRelXEst(); }
+    //     const float getRelY() const { return loc->getBallRelYEst(); }
+    //     const float getRelVelX() { return loc->getRelXVelocityEst(); }
+    //     const float getRelVelY() { return loc->getRelYVelocityEst(); }
+    //     const float getAccX();
+    //     const float getAccY();
+    //     const float getAccXUncert() { return loc->getXAccelerationUncert(); }
+    //     const float getAccYUncert() { return loc->getYAccelerationUncert(); }
+    //     const float getRelAccX() { return loc->getRelXAccelerationEst(); }
+    //     const float getRelAccY() { return loc->getRelYAccelerationEst(); }
+    //     const float dX() { return dx; }
+    //     const float dY() { return dy; }
+    //     const float getEndY() { return endY; }
+    //     const float getDist() const { return loc->getBallDistance(); }
+    //     const degrees getBearing() const { return loc->getBallBearingDeg(); }
 
-        // Other
-        void update();
-        void setDX(float _dx) { dx = _dx; }
-        void setDY(float _dy) { dy = _dy; }
-        const float getLastRelX() { return lastRelX; }
-        const float getLastRelY() { return lastRelY; }
+    //     // Other
+    //     void update();
+    //     void setDX(float _dx) { dx = _dx; }
+    //     void setDY(float _dy) { dy = _dy; }
+    //     const float getLastRelX() { return lastRelX; }
+    //     const float getLastRelY() { return lastRelY; }
 
-    private:
-        MyInfo* my;
-        PyLoc* loc;
-        float lastRelX, lastRelY, dx, dy, endY;
-    };
+    // private:
+    //     MyInfo* my;
+    //     PyLoc* loc;
+    //     float lastRelX, lastRelY, dx, dy, endY;
+    // };
 
     /*
      * FIELD OBJECT
@@ -296,42 +291,42 @@ namespace noggin {
      * PyVision.cpp for the VisualFieldObject values exposed to Python.
      */
 
-    class FieldObject
-    {
-    public:
-        FieldObject(VisualFieldObject&,
-                    py_constants::vis_landmark,
-                    PyLoc&);
-        ~FieldObject() {};
+    // class FieldObject
+    // {
+    // public:
+    //     FieldObject(VisualFieldObject&,
+    //                 py_constants::vis_landmark,
+    //                 PyLoc&);
+    //     ~FieldObject() {};
 
-        VisualFieldObject* vis;
-        LocObject* loc;
+    //     VisualFieldObject* vis;
+    //     LocObject* loc;
 
-    private:
-        // These shouldn't be copied!
-        FieldObject(FieldObject& other);
+    // private:
+    //     // These shouldn't be copied!
+    //     FieldObject(FieldObject& other);
 
-        py_constants::vis_landmark visID;
-        int localID;
-        radians bearing;
-        float dist;
-        MyInfo* my;
+    //     py_constants::vis_landmark visID;
+    //     int localID;
+    //     radians bearing;
+    //     float dist;
+    //     MyInfo* my;
 
-    public:
-        static const int LOST_OBJECT_FRAMES_THRESH = 7;
+    // public:
+    //     static const int LOST_OBJECT_FRAMES_THRESH = 7;
 
-        const float getDist() { return dist; }
-        const degrees getBearing() { return bearing*TO_DEG; }
-        const py_constants::vis_landmark getVisID() { return visID; }
-        const int getLocalID() { return localID; }
+    //     const float getDist() { return dist; }
+    //     const degrees getBearing() { return bearing*TO_DEG; }
+    //     const py_constants::vis_landmark getVisID() { return visID; }
+    //     const int getLocalID() { return localID; }
 
-        // Other
-        void setBest();
-        void associateWithRelativeLandmark(boost::python::tuple relLandmark);
+    //     // Other
+    //     void setBest();
+    //     void associateWithRelativeLandmark(boost::python::tuple relLandmark);
 
-        // For Python
-        bool hasattr(boost::python::object, const std::string&);
-    };
+    //     // For Python
+    //     bool hasattr(boost::python::object, const std::string&);
+    // };
 
     /*
      * MY INFO
@@ -343,37 +338,37 @@ namespace noggin {
      * using the Location interface. LocScores represent how good localization
      * is, based on the three uncert values.
      */
-    class MyInfo : public RobotLocation
-    {
-    public:
-        MyInfo(PyLoc& pl);
-        ~MyInfo() {};
-        PyLoc* loc;
+    // class MyInfo : public RobotLocation
+    // {
+    // public:
+    //     MyInfo(PyLoc& pl);
+    //     ~MyInfo() {};
+    //     PyLoc* loc;
 
-    private:
-        MyInfo(const MyInfo& other);
+    // private:
+    //     MyInfo(const MyInfo& other);
 
-    public:
-        void update();
+    // public:
+    //     void update();
 
-        //Getters
-        const py_constants::teamColor getTeamColor() { return team_color; }
-        const py_constants::locScore getLocScoreTheta();
-        const py_constants::locScore getLocScoreXY();
-        const py_constants::locScore getLocScore();
-        const int getPlayerNumber() { return playerNumber; }
-        const float getXUncert() { return loc->getXUncert(); }
-        const float getYUncert() { return loc->getYUncert(); }
-        const degrees getHUncert() { return loc->getHUncert(); }
+    //     //Getters
+    //     const py_constants::teamColor getTeamColor() { return team_color; }
+    //     const py_constants::locScore getLocScoreTheta();
+    //     const py_constants::locScore getLocScoreXY();
+    //     const py_constants::locScore getLocScore();
+    //     const int getPlayerNumber() { return playerNumber; }
+    //     const float getXUncert() { return loc->getXUncert(); }
+    //     const float getYUncert() { return loc->getYUncert(); }
+    //     const degrees getHUncert() { return loc->getHUncert(); }
 
-        //Setters
-        void setTeamColor(py_constants::teamColor tc) { team_color = tc; }
-        void setPlayerNumber(int pn) { playerNumber = pn; }
+    //     //Setters
+    //     void setTeamColor(py_constants::teamColor tc) { team_color = tc; }
+    //     void setPlayerNumber(int pn) { playerNumber = pn; }
 
-    private:
-        py_constants::teamColor team_color;
-        int playerNumber;
-    };
+    // private:
+    //     py_constants::teamColor team_color;
+    //     int playerNumber;
+    // };
 
     /*
      * BALL
@@ -382,28 +377,29 @@ namespace noggin {
      * best values for dist and bearing.
      */
 
-    class Ball
-    {
-    public:
-        Ball(VisualBall&, PyLoc&, MyInfo&);
-        ~Ball() {};
+    // class Ball
+    // {
+    // public:
+    //     Ball(VisualBall&, PyLoc&, MyInfo&);
+    //     ~Ball() {};
 
-        LocBall* loc;
-        VisualBall* vis;
+    //     LocBall* loc;
+    //     VisualBall* vis;
 
-        // Getters
-        const float getDist() { return dist; }
-        const float getBearing() { return bearing; }
+    //     // Getters
+    //     const float getDist() { return dist; }
+    //     const float getBearing() { return bearing; }
 
-        void update();
+    //     void update();
 
-        // For Python
-        bool hasattr(boost::python::object, const std::string&);
+    //     // For Python
+    //     bool hasattr(boost::python::object, const std::string&);
 
-    private:
-        Ball(const Ball& other);
-        float dist;
-        degrees bearing;
-    };
+    // private:
+    //     Ball(const Ball& other);
+    //     float dist;
+    //     degrees bearing;
+    // };
+}
 }
 #endif //CombObjects_h_DEFINED

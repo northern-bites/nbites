@@ -18,7 +18,7 @@
 # roles while it is in the process of saving.  Both isSaving
 # and fall protection are dealt with in the doneSaving state.
 
-import man.motion.SweetMoves as SweetMoves
+from .. import SweetMoves
 import GoalieTransitions as helper
 import GoalieConstants as goalCon
 

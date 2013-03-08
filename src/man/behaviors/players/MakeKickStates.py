@@ -1,5 +1,5 @@
-from man.motion import SweetMoves
-from man.motion import StiffnessModes
+from .. import SweetMoves
+from .. import StiffnessModes
 
 
 def gamePlaying(player):

@@ -1,4 +1,4 @@
-from man.motion import SweetMoves
+from .. import SweetMoves
 from KickingConstants import DEFAULT_KICK_X_OFFSET
 
 class Kick(object):

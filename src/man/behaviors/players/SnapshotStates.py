@@ -1,6 +1,6 @@
-import man.motion.SweetMoves as SweetMoves
-import man.motion.HeadMoves as HeadMoves
-import man.motion.StiffnessModes as StiffnessModes
+from .. import SweetMoves
+from ..headTracking import HeadMoves
+from .. import StiffnessModes
 from ..navigator import BrunswickSpeeds as speeds
 from objects import RelRobotLocation
 from ..navigator import Navigator

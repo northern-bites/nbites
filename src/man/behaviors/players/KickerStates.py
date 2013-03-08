@@ -3,9 +3,8 @@
 # defines a state.
 #
 
-import man.motion as motion
-import man.motion.HeadMoves as HeadMoves
-import man.motion.SweetMoves as SweetMoves
+from .. import HeadMoves
+from .. import SweetMoves
 
 def gameInitial(player):
     if player.firstFrame():

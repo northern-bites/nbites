@@ -1,4 +1,4 @@
-import man.motion.SweetMoves as SweetMoves
+from .. import SweetMoves
 import noggin_constants as FC
 from math import hypot
 from ..typeDefs.Location import RobotLocation

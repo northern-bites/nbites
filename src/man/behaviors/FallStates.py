@@ -1,4 +1,4 @@
-from man.motion import SweetMoves as SweetMoves
+import SweetMoves as SweetMoves
 
 """
 Fall Protection and Recovery States

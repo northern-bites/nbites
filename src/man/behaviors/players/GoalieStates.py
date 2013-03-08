@@ -4,7 +4,7 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 import VisualGoalieStates as VisualStates
-import man.motion.SweetMoves as SweetMoves
+from .. import SweetMoves
 from GoalieConstants import RIGHT, LEFT
 
 def gameInitial(player):

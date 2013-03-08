@@ -14,8 +14,12 @@ configure_file(
 
 # CPP sources
 set( BEHAVIORS_SRCS BehaviorsModule
-		 PyConstants
-                 )
+  PyObjects
+  GoalieSystem
+  PyGoalie
+  CombinationObjects
+  PyConstants
+  )
 
 # Python sources
 set( BEHAVIORS_PYTHON_SRCS __init__.py
@@ -26,6 +30,11 @@ set( BEHAVIORS_PYTHON_SRCS __init__.py
 			Stability.py
                         FallStates.py
                         Leds.py
+			Ball.py
+			MyInfo.py
+			MotionConstants.py
+			StiffnessModes.py
+			SweetMoves.py
                         )
 
 # The switch file

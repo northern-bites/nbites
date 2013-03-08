@@ -1,5 +1,5 @@
 from . import TrackingConstants as constants
-import man.motion.HeadMoves as HeadMoves
+import HeadMoves as HeadMoves
 
 TIME_TO_LOOK_TO_TARGET = 1.0
 

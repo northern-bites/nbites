@@ -3,10 +3,10 @@ from . import PanningStates
 from . import ActiveLookStates
 from . import BasicStates
 from . import HeadTrackingHelper as helper
-import man.motion.HeadMoves as HeadMoves
+from . import HeadMoves
 from ..util import FSA
 
-import man.motion.StiffnessModes as stiff
+import StiffnessModes as stiff
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""

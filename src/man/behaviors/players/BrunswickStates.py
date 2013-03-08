@@ -1,5 +1,5 @@
 from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_KICKOFF)
-import man.motion.SweetMoves as SweetMoves
+import SweetMoves
 import noggin_constants as nogginConstants
 import _localization
 

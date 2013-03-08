@@ -23,11 +23,10 @@ namespace man {
 			  out_size(),
 			  ledCommandOut(base())
 		{
-			// Build Python lists of correct length
+			// Build Python list of correct length
 			// this cast might totally fail... but if it doesn't,
 			//  this is cleaner
 			in_list_serials = PyList_New((Py_ssize_t)NUM_IN_MESSAGES);
-			in_list_sizes = PyList_New((Py_ssize_t)NUM_IN_MESSAGES);
 
 			// Initialize python and brain.
 			initializePython();
@@ -60,11 +59,11 @@ namespace man {
 			if (brain_instance != NULL) {
 				// Serialize messages to send into python.
 				serializeInMessages();
-				// Assert: in_list_serials and in_list_sizes are properly constructed.
+				// Assert: in_list_serials is properly constructed.
 
 				// Calls the run method with no args.
 				PyObject *result = PyObject_CallMethodObjArgs(brain_instance,
-															  brain_run,
+															  Py_BuildValue(py_string_format,"run",3),
 															  in_list_serials,
 															  NULL);
 				if (result == NULL) {
@@ -103,7 +102,7 @@ namespace man {
 			gameStateIn.message().SerializeToArray(in_proto[GAME_STATE_IN],
 												   in_size[GAME_STATE_IN]);
 			in_serial[GAME_STATE_IN] = Py_BuildValue(py_string_format,
-													 in_portal[GAME_STATE_IN],
+													 in_proto[GAME_STATE_IN],
 													 in_size[GAME_STATE_IN]);
 
 			filteredBallIn.latch();
@@ -111,16 +110,16 @@ namespace man {
 			filteredBallIn.message().SerializeToArray(in_proto[FILTERED_BALL_IN],
 													  in_size[FILTERED_BALL_IN]);
 			in_serial[FILTERED_BALL_IN] = Py_BuildValue(py_string_format,
-														in_portal[FILTERED_BALL_IN],
+														in_proto[FILTERED_BALL_IN],
 														in_size[FILTERED_BALL_IN]);
 
 			for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
 				worldModelIn[i].latch();
-				in_size[WORLD_MODEL_IN+i] = worldModelIn.message().ByteSize();
-				worldModelIn.message().SerializeToArray(in_proto[WORLD_MODEL_IN+i],
+				in_size[WORLD_MODEL_IN+i] = worldModelIn[i].message().ByteSize();
+				worldModelIn[i].message().SerializeToArray(in_proto[WORLD_MODEL_IN+i],
 														in_size[WORLD_MODEL_IN+i]);
 				in_serial[WORLD_MODEL_IN+i] = Py_BuildValue(py_string_format,
-															in_portal[WORLD_MODEL_IN+i],
+															in_proto[WORLD_MODEL_IN+i],
 															in_size[WORLD_MODEL_IN+i]);
 			}
 
@@ -133,7 +132,7 @@ namespace man {
 		void BehaviorsModule::parseOutMessages(PyObject *tuple)
 		{
 			PyArg_UnpackTuple(tuple, "name", NUM_OUT_MESSAGES, NUM_OUT_MESSAGES, &out_serial[0], &out_serial[1]);
-			for (unsigned int i=0; i<NUM_OUT_MESSAGES; i++) {
+			for (int i=0; i<NUM_OUT_MESSAGES; i++) {
 				PyString_AsStringAndSize(out_serial[i], &out_proto[i], out_size_t[i]);
 				out_size[i] = PyLong_AsLong(PyLong_FromSsize_t(*out_size_t[i]));
 			}

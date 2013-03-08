@@ -7,7 +7,7 @@
 # When the robot is in playing, it does the same as in set
 # When the robot is in finish, it stops, sits down, and turns off its gains
 #
-import man.motion.SweetMoves as SweetMoves
+from .. import SweetMoves
 
 def gamePenalized(player):
     if player.firstFrame():

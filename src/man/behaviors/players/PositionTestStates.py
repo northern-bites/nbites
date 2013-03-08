@@ -1,4 +1,4 @@
-import man.motion.SweetMoves as SweetMoves
+from .. import SweetMoves
 from ..playbook import PBConstants
 
 def gameInitial(player):

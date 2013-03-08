@@ -9,7 +9,6 @@
 
 #include "CombinationObjects.h"
 
-// Called in Noggin.cpp to initialize the python module
-// No longer used in Module system.
-//void c_init_objects();
+// Called in BehaviorsModule.cpp to initialize the python module
+void c_init_objects();
 

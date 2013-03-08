@@ -4,7 +4,8 @@
 
 #include "GoalieSystem.h"
 
-namespace noggin {
+namespace man {
+namespace behaviors {
 
 GoalieSystem::GoalieSystem() : home(),
                                rightPostBearings(),
@@ -166,5 +167,6 @@ float GoalieSystem::computeAverage(std::deque<float> q)
         sum += *i;
     }
     return sum / float(q.size());
+}
 }
 }

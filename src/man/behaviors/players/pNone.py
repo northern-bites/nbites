@@ -1,6 +1,4 @@
 
-import man.motion as motion
-
 from . import SoccerFSA
 from . import NoneStates
 

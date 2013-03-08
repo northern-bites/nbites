@@ -6,7 +6,7 @@
 #include "PyObjects.h"
 
 using namespace boost::python;
-using namespace behaviors;
+using namespace man::behaviors;
 
 BOOST_PYTHON_MODULE(objects)
 {
@@ -59,82 +59,82 @@ BOOST_PYTHON_MODULE(objects)
         .def("__str__", &RelRobotLocation::toString)
         ;
 
-    class_<LocObject, bases<Location> >("LocObject", init<PyLoc&>())
-        .add_property("trackingFitness", &LocObject::getTrackingFitness,
-                      &LocObject::setTrackingFitness)
-        .def(self < self)
-        .def(self > self)
-        .add_property("dist", &LocObject::getDist)
-        .add_property("bearing", &LocObject::getBearing)
-        .add_property("relX", &LocObject::getRelX)
-        .add_property("relY", &LocObject::getRelY)
-        ;
+    // class_<LocObject, bases<Location> >("LocObject", init<PyLoc&>())
+    //     .add_property("trackingFitness", &LocObject::getTrackingFitness,
+    //                   &LocObject::setTrackingFitness)
+    //     .def(self < self)
+    //     .def(self > self)
+    //     .add_property("dist", &LocObject::getDist)
+    //     .add_property("bearing", &LocObject::getBearing)
+    //     .add_property("relX", &LocObject::getRelX)
+    //     .add_property("relY", &LocObject::getRelY)
+    //     ;
 
-    class_<FieldObject, boost::noncopyable>
-        ("FieldObject", init<VisualFieldObject&, py_constants::vis_landmark,
-         PyLoc&>())
-        .add_property("vis", make_getter(&FieldObject::vis, return_value_policy
-                                         <reference_existing_object>()))
-        .add_property("loc", make_getter(&FieldObject::loc, return_value_policy
-                                         <reference_existing_object>()))
-        .add_property("localId", &FieldObject::getLocalID)
-        .add_property("visId", &FieldObject::getVisID)
-        .add_property("dist", &FieldObject::getDist)
-        .add_property("bearing", &FieldObject::getBearing)
-        .def("setBest", &FieldObject::setBest)
-        .def("associateWithRelativeLandmark",
-             &FieldObject::associateWithRelativeLandmark)
-        .def("__hasattr__", &FieldObject::hasattr)
-        ;
+    // class_<FieldObject, boost::noncopyable>
+    //     ("FieldObject", init<VisualFieldObject&, py_constants::vis_landmark,
+    //      PyLoc&>())
+    //     .add_property("vis", make_getter(&FieldObject::vis, return_value_policy
+    //                                      <reference_existing_object>()))
+    //     .add_property("loc", make_getter(&FieldObject::loc, return_value_policy
+    //                                      <reference_existing_object>()))
+    //     .add_property("localId", &FieldObject::getLocalID)
+    //     .add_property("visId", &FieldObject::getVisID)
+    //     .add_property("dist", &FieldObject::getDist)
+    //     .add_property("bearing", &FieldObject::getBearing)
+    //     .def("setBest", &FieldObject::setBest)
+    //     .def("associateWithRelativeLandmark",
+    //          &FieldObject::associateWithRelativeLandmark)
+    //     .def("__hasattr__", &FieldObject::hasattr)
+    //     ;
 
-    class_<MyInfo, bases<RobotLocation>,
-           boost::noncopyable>("MyInfo", init<PyLoc&>())
-        .def("update", &MyInfo::update)
-        .add_property("teamColor", &MyInfo::getTeamColor, &MyInfo::setTeamColor)
-        .add_property("locScoreTheta", &MyInfo::getLocScoreTheta)
-        .add_property("locScoreXY", &MyInfo::getLocScoreXY)
-        .add_property("locScore", &MyInfo::getLocScore)
-        .add_property("playerNumber", &MyInfo::getPlayerNumber,
-                      &MyInfo::setPlayerNumber)
-        .add_property("uncertX", &MyInfo::getXUncert)
-        .add_property("uncertY", &MyInfo::getYUncert)
-        .add_property("uncertH", &MyInfo::getHUncert)
-        .def("spinDirToPoint", &RobotLocation::spinDirToPoint)
-        ;
+    // class_<MyInfo, bases<RobotLocation>,
+    //        boost::noncopyable>("MyInfo", init<PyLoc&>())
+    //     .def("update", &MyInfo::update)
+    //     .add_property("teamColor", &MyInfo::getTeamColor, &MyInfo::setTeamColor)
+    //     .add_property("locScoreTheta", &MyInfo::getLocScoreTheta)
+    //     .add_property("locScoreXY", &MyInfo::getLocScoreXY)
+    //     .add_property("locScore", &MyInfo::getLocScore)
+    //     .add_property("playerNumber", &MyInfo::getPlayerNumber,
+    //                   &MyInfo::setPlayerNumber)
+    //     .add_property("uncertX", &MyInfo::getXUncert)
+    //     .add_property("uncertY", &MyInfo::getYUncert)
+    //     .add_property("uncertH", &MyInfo::getHUncert)
+    //     .def("spinDirToPoint", &RobotLocation::spinDirToPoint)
+    //     ;
 
-    class_<LocBall, bases<Location, RelLocation> >("LocBall", init<PyLoc&, MyInfo&>())
-        .add_property("uncertX", &LocBall::getXUncert)
-        .add_property("uncertY", &LocBall::getYUncert)
-        .add_property("sd", &LocBall::getSD)
-        .add_property("velX", &LocBall::getVelX)
-        .add_property("velY", &LocBall::getVelY)
-        .add_property("uncertVelX", &LocBall::getVelXUncert)
-        .add_property("uncertVelY", &LocBall::getVelYUncert)
-        .add_property("heading", &LocBall::getHeading)
-        .add_property("relVelX", &LocBall::getRelVelX)
-        .add_property("relVelY", &LocBall::getRelVelY)
-        .add_property("accX", &LocBall::getAccX)
-        .add_property("accY", &LocBall::getAccY)
-        .add_property("dx", &LocBall::dX)
-        .add_property("dy", &LocBall::dY)
-        .add_property("endY", &LocBall::getEndY)
-        .add_property("uncertAccX", &LocBall::getAccXUncert)
-        .add_property("uncertAccY", &LocBall::getAccYUncert)
-        .add_property("relAccX", &LocBall::getRelAccX)
-        .add_property("relAccY", &LocBall::getRelAccY)
-        ;
+    // class_<LocBall, bases<Location, RelLocation> >("LocBall", init<PyLoc&, MyInfo&>())
+    //     .add_property("uncertX", &LocBall::getXUncert)
+    //     .add_property("uncertY", &LocBall::getYUncert)
+    //     .add_property("sd", &LocBall::getSD)
+    //     .add_property("velX", &LocBall::getVelX)
+    //     .add_property("velY", &LocBall::getVelY)
+    //     .add_property("uncertVelX", &LocBall::getVelXUncert)
+    //     .add_property("uncertVelY", &LocBall::getVelYUncert)
+    //     .add_property("heading", &LocBall::getHeading)
+    //     .add_property("relVelX", &LocBall::getRelVelX)
+    //     .add_property("relVelY", &LocBall::getRelVelY)
+    //     .add_property("accX", &LocBall::getAccX)
+    //     .add_property("accY", &LocBall::getAccY)
+    //     .add_property("dx", &LocBall::dX)
+    //     .add_property("dy", &LocBall::dY)
+    //     .add_property("endY", &LocBall::getEndY)
+    //     .add_property("uncertAccX", &LocBall::getAccXUncert)
+    //     .add_property("uncertAccY", &LocBall::getAccYUncert)
+    //     .add_property("relAccX", &LocBall::getRelAccX)
+    //     .add_property("relAccY", &LocBall::getRelAccY)
+    //     ;
 
-    class_<Ball, boost::noncopyable>("Ball", init<VisualBall&,
-                                     PyLoc&, MyInfo&>())
-        .add_property("vis", make_getter(&Ball::vis, return_value_policy
-                                         <reference_existing_object>()))
-        .add_property("loc", make_getter(&Ball::loc, return_value_policy
-                                         <reference_existing_object>()))
-        .add_property("dist", &Ball::getDist)
-        .add_property("bearing", &Ball::getBearing)
-        .def("update", &Ball::update)
-        .def("__hasattr__", &Ball::hasattr)
-        ;
+    // class_<Ball, boost::noncopyable>("Ball", init<VisualBall&,
+    //                                  PyLoc&, MyInfo&>())
+    //     .add_property("vis", make_getter(&Ball::vis, return_value_policy
+    //                                      <reference_existing_object>()))
+    //     .add_property("loc", make_getter(&Ball::loc, return_value_policy
+    //                                      <reference_existing_object>()))
+    //     .add_property("dist", &Ball::getDist)
+    //     .add_property("bearing", &Ball::getBearing)
+    //     .def("update", &Ball::update)
+    //     .def("__hasattr__", &Ball::hasattr)
+    //     ;
 }
 
 void c_init_objects() {

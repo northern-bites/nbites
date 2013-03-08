@@ -15,7 +15,8 @@
 
 #include <deque>
 
-namespace noggin {
+namespace man {
+namespace behaviors {
 
 // How far memory should go back
 static const float POST_Q_LENGTH = 20;
@@ -27,22 +28,22 @@ static const float RIGHT_X = FIELD_WHITE_LEFT_SIDELINE_X +
 static const float RIGHT_Y = FIELD_WHITE_BOTTOM_SIDELINE_Y;
 
 static const float RIGHT_SIDE_LP_ANGLE =
-    NBMath::safe_atan2(RIGHT_X - py_constants::LANDMARK_MY_GOAL_LEFT_POST_X,
-                       py_constants::LANDMARK_MY_GOAL_LEFT_POST_Y -
+    NBMath::safe_atan2(RIGHT_X - LANDMARK_MY_GOAL_LEFT_POST_X,
+                       LANDMARK_MY_GOAL_LEFT_POST_Y -
                        RIGHT_Y) * TO_DEG;
 static const float RIGHT_SIDE_LP_DISTANCE = NBMath::getHypotenuse(RIGHT_X -
-                       py_constants::LANDMARK_MY_GOAL_LEFT_POST_X,
-                       py_constants::LANDMARK_MY_GOAL_LEFT_POST_Y -
+                       LANDMARK_MY_GOAL_LEFT_POST_X,
+					   LANDMARK_MY_GOAL_LEFT_POST_Y -
                                                           RIGHT_Y);
 
 static const float RIGHT_SIDE_RP_ANGLE =
-    NBMath::safe_atan2(RIGHT_X - py_constants::LANDMARK_MY_GOAL_RIGHT_POST_X,
-                       py_constants::LANDMARK_MY_GOAL_RIGHT_POST_Y -
+    NBMath::safe_atan2(RIGHT_X - LANDMARK_MY_GOAL_RIGHT_POST_X,
+                       LANDMARK_MY_GOAL_RIGHT_POST_Y -
                        RIGHT_Y) * TO_DEG;
 
 static const float RIGHT_SIDE_RP_DISTANCE = NBMath::getHypotenuse(RIGHT_X -
-                       py_constants::LANDMARK_MY_GOAL_RIGHT_POST_X,
-                       py_constants::LANDMARK_MY_GOAL_RIGHT_POST_Y -
+                       LANDMARK_MY_GOAL_RIGHT_POST_X,
+                       LANDMARK_MY_GOAL_RIGHT_POST_Y -
                                                                RIGHT_Y);
 
 static const float RIGHT_SIDE_ANGLE = (RIGHT_SIDE_LP_ANGLE +
@@ -109,4 +110,5 @@ private:
 
     float computeAverage(std::deque<float>);
 };
+}
 }

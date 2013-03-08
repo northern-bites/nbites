@@ -21,7 +21,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Sensors **/
     sensorsThread.addModule(sensors);
-    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
+    //sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
 
     /** Guardian **/
     guardianThread.addModule(guardian);
