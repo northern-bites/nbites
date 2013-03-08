@@ -42,7 +42,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	cognitionThread.addModule(behaviors);
 	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, true);
 	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, false);
-	behaviors.worldModelIn.wireTo(comm._worldModels[0], false);
+	for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
+		behaviors.worldModelIn[i].wireTo(comm._worldModels[i], false);
+	}
 
     startSubThreads();
 }

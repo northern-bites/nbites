@@ -4,6 +4,7 @@
 #include <Python.h>
 //#include <boost/shared_ptr.hpp>
 //#include "Profiler.h"
+#include "PyNogginConstants.h"
 
 #include "LedCommand.pb.h"
 #include "GameState.pb.h"
@@ -56,10 +57,13 @@ namespace man {
 			// message variables
 			static const unsigned int NUM_IN_MESSAGES = 3;
 			static const unsigned int NUM_OUT_MESSAGES = 2;
-			std::string message_format;
+			const char* py_string_format = 's#';
+			PyObject *brain_run = Py_BuildValue(format, "run", 3);
+			PyObject *in_list_serials;
 			// initialize arrays to 0, null, etc
 			char *in_proto [NUM_IN_MESSAGES];
 			unsigned int in_size [NUM_IN_MESSAGES];
+			PyObject *in_serial [NUM_IN_MESSAGES];
 			PyObject *out_serial [NUM_OUT_MESSAGES];
 			char *out_proto [NUM_OUT_MESSAGES];
 			Py_ssize_t *out_size_t [NUM_OUT_MESSAGES];
@@ -67,9 +71,8 @@ namespace man {
 
 		public:
 			// portals
-			// note: order of portals matches message array indicies
 			portals::InPortal<messages::GameState> gameStateIn;
-			portals::InPortal<messages::WorldModel> worldModelIn;
+			portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
 			portals::InPortal<messages::FilteredBall> filteredBallIn;
 			portals::OutPortal<messages::LedCommand> ledCommandOut;
 		};

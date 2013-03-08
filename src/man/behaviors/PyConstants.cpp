@@ -239,6 +239,11 @@ BOOST_PYTHON_MODULE(noggin_constants)
     scope().attr("HEADING_DOWN") = HEADING_DOWN;
     scope().attr("HEADING_RIGHT") = HEADING_RIGHT;
 
+	// Messages
+	scope().attr("GAME_STATE_IN") = GAME_STATE_IN;
+	scope().attr("FILTERED_BALL_IN") = FILTERED_BALL_IN;
+	scope().attr("WORLD_MODEL_IN") = WORLD_MODEL_IN;
+
     // Robots
     scope().attr("NUM_POSSIBLE_ROBOTS") = NUM_POSSIBLE_ROBOTS;
 

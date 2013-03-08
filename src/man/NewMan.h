@@ -3,6 +3,7 @@
 #include <alcommon/almodule.h>
 #include <alcommon/albroker.h>
 #include <boost/shared_ptr.hpp>
+#include "behaviors/PyNogginConstants.h"
 
 #include "RoboGrams.h"
 #include "DiagramThread.h"

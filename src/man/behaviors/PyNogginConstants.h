@@ -190,6 +190,13 @@ static const float TOP_OPP_CORNER_Y = FIELD_HEIGHT;
 
 static const float FACING_SIDELINE_ANGLE = 30.0;
 
+///// MESSAGES /////
+static const int GAME_STATE_IN = 0;
+static const int FILTERED_BALL_IN = 1;
+// This should always be the last index
+// Uses NUM_PLAYERS_PER_TEAM indices in a row
+static const int WORLD_MODEL_IN = 2;
+
 ///// ROBOTS /////
 static const int NUM_POSSIBLE_ROBOTS = 6;
 

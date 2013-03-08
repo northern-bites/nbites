@@ -122,7 +122,7 @@ class Brain(object):
 
         self.counter += 1
 
-    def run(self, msg0, msg1, msg2):
+    def run(self, inMessagesList):
         """
         Main control loop called every TIME_STEP milliseconds
         """
@@ -131,9 +131,11 @@ class Brain(object):
         self.time = time.time()
 
         # Parse incoming messages
-        self.inMessages['gameState'] = GameState.parseFromString(msg0) #deserialze first!
-        self.inMessages['worldModel'] = WorldModel.parseFromString(msg1)
-        self.inMessages['filteredBall'] = FilteredBall.parseFromString(msg2)
+        self.inMessages['gameState'] = GameState.parseFromString(inMessagesList[Constants.GAME_STATE_IN])
+        self.inMessages['filteredBall'] = FilteredBall.parseFromString(inMessagesList[Constants.FILTERED_BALL_IN])
+        self.inMessages['worldModel'] = []
+        for i in range(Constants.NUM_PLAYERS_PER_TEAM):
+            self.inMessages['worldModel'].append(WorldModel.parseFromString(inMessagesList[Constants.WORLD_MODEL_IN+i]))
 
         # Update objects
         # TODO: update this functionality to get info from messages

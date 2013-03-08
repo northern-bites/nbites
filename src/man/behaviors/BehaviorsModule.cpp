@@ -23,11 +23,11 @@ namespace man {
 			  out_size(),
 			  ledCommandOut(base())
 		{
-			// Build format string for messages.
-			message_format = "(";
-			for (unsigned int i=0; i<NUM_IN_MESSAGES; i++)
-				message_format += "s#";
-			message_format += ")";
+			// Build Python lists of correct length
+			// this cast might totally fail... but if it doesn't,
+			//  this is cleaner
+			in_list_serials = PyList_New((Py_ssize_t)NUM_IN_MESSAGES);
+			in_list_sizes = PyList_New((Py_ssize_t)NUM_IN_MESSAGES);
 
 			// Initialize python and brain.
 			initializePython();
@@ -60,17 +60,13 @@ namespace man {
 			if (brain_instance != NULL) {
 				// Serialize messages to send into python.
 				serializeInMessages();
+				// Assert: in_list_serials and in_list_sizes are properly constructed.
 
 				// Calls the run method with no args.
-				PyObject *result = PyObject_CallMethod(brain_instance,
-													   "run",
-													   const_cast<char*>(message_format.c_str()),
-													   in_proto[0],
-													   in_size[0],
-													   in_proto[1],
-													   in_size[1],
-													   in_proto[2],
-													   in_size[2]);
+				PyObject *result = PyObject_CallMethodObjArgs(brain_instance,
+															  brain_run,
+															  in_list_serials,
+															  NULL);
 				if (result == NULL) {
 					// set Behaviors in error state
 					error_state = true;
@@ -102,15 +98,36 @@ namespace man {
 		{
 			gameStateIn.latch();
 			// Size that serialized message will be.
-			in_size[0] = gameStateIn.message().ByteSize();
+			in_size[GAME_STATE_IN] = gameStateIn.message().ByteSize();
 			// Set in_proto to be the serialized message.
-			gameStateIn.message().SerializeToArray(in_proto[0],in_size[0]);
-			worldModelIn.latch();
-			in_size[1] = worldModelIn.message().ByteSize();
-			worldModelIn.message().SerializeToArray(in_proto[1],in_size[1]);
+			gameStateIn.message().SerializeToArray(in_proto[GAME_STATE_IN],
+												   in_size[GAME_STATE_IN]);
+			in_serial[GAME_STATE_IN] = Py_BuildValue(py_string_format,
+													 in_portal[GAME_STATE_IN],
+													 in_size[GAME_STATE_IN]);
+
 			filteredBallIn.latch();
-			in_size[2] = filteredBallIn.message().ByteSize();
-			filteredBallIn.message().SerializeToArray(in_proto[2],in_size[2]);
+			in_size[FILTERED_BALL_IN] = filteredBallIn.message().ByteSize();
+			filteredBallIn.message().SerializeToArray(in_proto[FILTERED_BALL_IN],
+													  in_size[FILTERED_BALL_IN]);
+			in_serial[FILTERED_BALL_IN] = Py_BuildValue(py_string_format,
+														in_portal[FILTERED_BALL_IN],
+														in_size[FILTERED_BALL_IN]);
+
+			for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
+				worldModelIn[i].latch();
+				in_size[WORLD_MODEL_IN+i] = worldModelIn.message().ByteSize();
+				worldModelIn.message().SerializeToArray(in_proto[WORLD_MODEL_IN+i],
+														in_size[WORLD_MODEL_IN+i]);
+				in_serial[WORLD_MODEL_IN+i] = Py_BuildValue(py_string_format,
+															in_portal[WORLD_MODEL_IN+i],
+															in_size[WORLD_MODEL_IN+i]);
+			}
+
+			// in_serial[] and in_size[] are properly constructed
+			for (Py_ssize_t i=0; i<NUM_IN_MESSAGES; i++) {
+				PyList_SetItem(in_list_serials, i, in_serial[i]);
+			}
 		}
 
 		void BehaviorsModule::parseOutMessages(PyObject *tuple)

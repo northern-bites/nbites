@@ -10,6 +10,7 @@ STATE_FINISHED = 4
 PENALTY_NONE = 0
 STATE2_PENALTYSHOOT = 1
 STATE2_NORMAL = 0
+STATE2_OVERTIME = 2
 # @TODO: unify these constants!
 TEAM_BLUE = Constants.teamColor.TEAM_BLUE
 TEAM_RED = Constants.teamColor.TEAM_RED
@@ -34,7 +35,7 @@ class GameController(FSA.FSA):
         # Currently set up to ignore button presses if game
         # controller is sending packets 3/6/2013
 
-        self.gd = self.brain.inMessages['commGCData']
+        self.gd = self.brain.inMessages['gameState']
 
         gcState = self.gd.state
         if self.gd.team[0].team_number == self.brain.teamNumber:
