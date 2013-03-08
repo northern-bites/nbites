@@ -115,7 +115,7 @@ void EdgeDetector::findPeaks(int upperBound,
      * This has the effect of shrinking the image in by 4 rows and
      * columns, but oh well.
      */
-    for (int16_t i=2+upperBound; i < Gradient::rows-2; ++i) {
+    for (int16_t i=int16_t(2+upperBound); i < Gradient::rows-2; ++i) {
         for (int16_t j=2; j < Gradient::cols-2; ++j){
 
             const int z = gradient.getMagnitude(i,j);

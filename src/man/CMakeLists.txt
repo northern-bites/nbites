@@ -118,6 +118,7 @@ target_link_libraries(
   vision
   guardian
   audio
+  common
 )
 
 install( TARGETS man

@@ -66,8 +66,16 @@ static const long long MICROS_PER_SECOND = 1000000;
 
 const static float MOTION_FRAME_LENGTH_S = 0.01f;
 // 1 second * 1000 ms/s * 1000 us/ms
-const float MOTION_FRAME_LENGTH_uS = 1000.0f * 1000.0f * MOTION_FRAME_LENGTH_S;
 const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
+const int GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
+
+///// FRAME LENGTHS ////
+const long long MOTION_FRAME_LENGTH_uS = 1000 * 1000 * MOTION_FRAME_LENGTH_S;
+const long long COGNITION_FRAME_LENGTH_uS = 34000;
+const int GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 * \
+    GUARDIAN_FRAME_RATE;
+const long long SENSORS_FRAME_LENGTH_uS = MOTION_FRAME_LENGTH_uS;
+const long long COMM_FRAME_LENGTH_uS = MOTION_FRAME_LENGTH_uS;
 
 /**
  * Copies a struct using memcpy

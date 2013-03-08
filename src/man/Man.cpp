@@ -1,4 +1,5 @@
 #include "Man.h"
+#include "Common.h"
 #include <iostream>
 #include "RobotConfig.h"
 
@@ -6,14 +7,14 @@ namespace man {
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
-      sensorsThread("sensors"),
+      sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
       sensors(broker),
-      guardianThread("guardian"),
+      guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
       guardian(),
       audio(broker),
-      commThread("comm"),
+      commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-	  cognitionThread("cognition"),
+	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
 	  imageTranscriber(),
 	  vision()
 {
@@ -55,7 +56,7 @@ void Man::startSubThreads()
 {
     startAndCheckThread(sensorsThread);
     startAndCheckThread(guardianThread);
-    startAndCheckThread(commThread);
+    //startAndCheckThread(commThread);
     startAndCheckThread(cognitionThread);
 }
 

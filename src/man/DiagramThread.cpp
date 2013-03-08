@@ -1,5 +1,8 @@
 #include "DiagramThread.h"
+#include "Common.h"
 #include <iostream>
+
+#define DEBUG_THREADS
 
 using std::cout;
 using std::endl;
@@ -7,8 +10,58 @@ using namespace portals;
 
 namespace man{
 
-DiagramThread::DiagramThread(std::string name_) : name(name_),
-                                                  running(false)
+DiagramThread::RobotDiagram::RobotDiagram(std::string name_, long long frame)
+    : RoboGram(),
+      name(name_),
+      frameLengthMicro(frame)
+{
+}
+
+void DiagramThread::RobotDiagram::run()
+{
+    // start timer
+    const long long startTime = monotonic_micro_time();
+
+    RoboGram::run();
+
+    //stop timer
+    const long long processTime = monotonic_micro_time() - startTime;
+
+    //sleep until next frame
+    lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
+
+    if (processTime < frameLengthMicro)
+    {
+        const long int microSleepTime =
+            static_cast<long int>(frameLengthMicro - processTime);
+        const long int nanoSleepTime =
+            static_cast<long int>((microSleepTime %(1000 * 1000)) * 1000);
+
+        const long int secSleepTime =
+            static_cast<long int>(microSleepTime / (1000*1000));
+
+        //std::cerr << "Sleeping for nano: " << nanoSleepTime
+        //<< " and sec:" << secSleepTime << std::endl;
+
+        interval.tv_sec = static_cast<time_t>(secSleepTime);
+        interval.tv_nsec = nanoSleepTime;
+
+        nanosleep(&interval, &remainder);
+    }
+
+#ifdef DEBUG_THREADS
+    else if (processTime > frameLengthMicro*2) {
+        std::cout<< "Warning: time spent in " << name << " thread longer"
+                 << " than frame length: "<< processTime << "uS" <<
+            std::endl;
+    }
+#endif
+
+}
+
+DiagramThread::DiagramThread(std::string name_, long long frame) :
+    diagram(name_, frame),
+    running(false)
 {}
 
 DiagramThread::~DiagramThread()
@@ -27,7 +80,7 @@ int DiagramThread::start()
     // Don't let it recreate the same thread!
     if (running) return -1;
 
-    cout << "Thread " << name << " starting." << endl;
+    cout << "Thread " << diagram.name << " starting." << endl;
 
     // Since we don't need to join threads, creating them explicitly
     // detached may save resources
@@ -47,7 +100,7 @@ int DiagramThread::start()
 void DiagramThread::stop()
 {
     running = false;
-    cout << "Thread " << name << " stopping." << endl;
+    cout << "Thread " << diagram.name << " stopping." << endl;
 }
 
 /*
@@ -59,14 +112,14 @@ void* DiagramThread::runDiagram(void* _this)
 {
     DiagramThread* this_instance = reinterpret_cast<DiagramThread*>(_this);
 
-    cout << "Thread " << this_instance->name << " running." << endl;
+    cout << "Thread " << this_instance->diagram.name << " running." << endl;
 
     this_instance->running = true;
 
     // Run the diagram over and over again!
     while(this_instance->running) this_instance->diagram.run();
 
-    cout << "Thread " << this_instance->name << " exiting." << endl;
+    cout << "Thread " << this_instance->diagram.name << " exiting." << endl;
     pthread_exit(NULL);
 }
 

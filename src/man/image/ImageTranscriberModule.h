@@ -19,9 +19,6 @@ protected:
     virtual void run_();
     V4L2ImageTranscriber topImageTranscriber;
     V4L2ImageTranscriber bottomImageTranscriber;
-
-    long long lastProcessTimeAvg;
-    struct timespec interval, remainder;
 };
 
 }

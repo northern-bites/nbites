@@ -305,11 +305,7 @@ void SensorsModule::updateBatteryMessage()
 void SensorsModule::run_()
 {
     // Simply update all sensor readings from ALMemory.
-    struct timespec interval, remainder;
-    interval.tv_sec = 0;
-    interval.tv_nsec = static_cast<long long int> (MOTION_FRAME_LENGTH_uS * 100);
     updateSensorValues();
-    nanosleep(&interval, &remainder);
 }
 
 } // namespace sensors
