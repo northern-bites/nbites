@@ -27,6 +27,12 @@ configure_file(
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
 
+# Configure the copy script based on our settings
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
+  "${PROJECT_BINARY_DIR}/upload.sh"
+)
+
 include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off
@@ -42,28 +48,6 @@ include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
-
-# COLOR TABLE SELECTION
-# Set the path to the color table you wish to be loaded into install/etc
-SET( @TABLE_TOP@
-  "../../data/tables/120-top.mtb"
-  CACHE STRING
-  "Path relative to man directory for the desired top camera color table"
-  )
-SET( TABLE_TOP ${@TABLE_TOP@})
-
-SET( @TABLE_BOTTOM@
-  "../../data/tables/120-bottom.mtb"
-  CACHE STRING
-  "Path relative to man directory for the desired bottom camera color table"
-  )
-SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
-
-# Configure the copy script based on our settings
-configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
-  "${PROJECT_BINARY_DIR}/upload.sh"
-)
 
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )

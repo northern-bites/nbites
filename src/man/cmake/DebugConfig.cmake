@@ -11,6 +11,12 @@
 
 option(
   DEBUG_COMM
-  "Toggle comm debug mode"
+  "Toggle comm debug mode."
+  OFF
+)
+
+option(
+  DEBUG_THREADS
+  "Toggle threads debug mode."
   OFF
 )

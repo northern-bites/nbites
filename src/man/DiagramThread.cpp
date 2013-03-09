@@ -1,8 +1,7 @@
 #include "DiagramThread.h"
 #include "Common.h"
+#include "DebugConfig.h"
 #include <iostream>
-
-#define DEBUG_THREADS
 
 using std::cout;
 using std::endl;
