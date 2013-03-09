@@ -8,6 +8,7 @@
 #include "DiagramThread.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
+#include "jointenactor/JointEnactorModule.h"
 
 namespace man {
 
@@ -23,6 +24,7 @@ private:
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+    jointenactor::JointEnactorModule jointEnactor;
 
     DiagramThread commThread;
     comm::CommModule comm;

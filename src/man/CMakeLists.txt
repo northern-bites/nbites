@@ -75,6 +75,7 @@ add_subdirectory( log )
 add_subdirectory( sensors )
 add_subdirectory( comm )
 add_subdirectory( newmotion )
+add_subdirectory( jointenactor )
 
 set( MAN_SRCS main.cpp
   NewMan.cpp

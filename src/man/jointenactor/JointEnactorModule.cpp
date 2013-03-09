@@ -15,41 +15,6 @@ namespace man
 	    stop();
 	}
 
-	void JointEnactorModule::setStiffness(float stiffness)
-	{
-	    std::cout << "JointEnactorModule : Setting stiffnessess to " << stiffness << std::endl;
-	    AL::ALValue stiffnessCommand;
-	    int DCMTime;
-	    
-	    try
-	    {
-		// Get the DCM time in 1 second. 
-		DCMTime = dcmProxy_->getTime(1000);
-	    }
-	    catch(const AL::ALError& e)
-	    {
-		throw ALERROR("JointEnactorModule", "setStiffness", "Error getting DCM time: " + e.toString());
-	    }
-
-	    // Linearly merge stiffness values over 1 second from last
-	    // stiffness value to the desired new stiffness value. 
-	    stiffnessCommand.arraySetSize(3);
-	    stiffnessCommand[0] = std::string("jointStiffness");
-	    stiffnessCommand[1] = std::string("Merge");
-	    stiffnessCommand[2].arraySetSize(1);
-	    stiffnessCommand[2][0].arraySetSize(2);
-	    stiffnessCommand[2][0][0] = stiffness;
-	    stiffnessCommand[2][0][1] = DCMTime;
-	    try
-	    {
-		dcmProxy_->set(stiffnessCommand);
-	    }
-	    catch (const AL::ALError &e)
-	    {
-		throw ALERROR("JointEnactorModule", "setStiffness()", "Error when sending stiffness command to DCM: " + e.toString());
-	    }
-	}
-
 	void JointEnactorModule::enableMotion()
 	{
 	    motionEnabled_ = true;
@@ -189,7 +154,7 @@ namespace man
 
 	    // Initialize joint command.
 	    jointCommand_.arraySetSize(6);
-	    jointCommand_[0] = std::string("jointActuator");
+	    jointCommand_[0] = std::string("jointStiffness");
 	    jointCommand_[1] = std::string("ClearAll");
 	    jointCommand_[2] = std::string("time-separate");
 	    jointCommand_[3] = 0; // Importance level.
@@ -200,6 +165,21 @@ namespace man
 	    {
 		jointCommand_[5][i].arraySetSize(1);
 		jointCommand_[5][i][0] = 0.0f; // This will be the new joint angle. 
+	    }
+
+	    // Initialize stiffness command.
+	    stiffnessCommand_.arraySetSize(6);
+	    stiffnessCommand_[0] = std::string("jointActuator");
+	    stiffnessCommand_[1] = std::string("ClearAll");
+	    stiffnessCommand_[2] = std::string("time-separate");
+	    stiffnessCommand_[3] = 0; // Importance level.
+	    stiffnessCommand_[4].arraySetSize(1);
+	    stiffnessCommand_[5].arraySetSize(sensors::NUM_SENSOR_VALUES);
+	    // Set default joint stiffness values.
+	    for(int i = 0; i < sensors::NUM_SENSOR_VALUES; ++i)
+	    {
+		stiffnessCommand_[5][i].arraySetSize(1);
+		stiffnessCommand_[5][i][0] = 0.0f; // This will be the new joint stiffness. 
 	    }
 	}
 
@@ -241,8 +221,6 @@ namespace man
 
 	void JointEnactorModule::stop()
 	{
-	    // Kill the joint stiffnessess.
-	    setStiffness(0.0f);
 	    // Disconnect synchronized callback from DCM loop. 
 	    dcmPreProcessConnection_.disconnect();
 	}
@@ -251,11 +229,12 @@ namespace man
 	{
 	    // Update stiffnesses. 
 	    stiffnessInput_.latch();
-	    setStiffness(stiffnessInput_.message().stiffness());
+	    latestStiffness_ = stiffnessInput_.message();
 
 	    // Update joint angles. 
 	    jointsInput_.latch();
 	    latestJointAngles_ = jointsInput_.message();
+
 	    if(!motionEnabled_)
 		enableMotion();
 	}

@@ -2,12 +2,14 @@
 
 namespace man
 {
-    namespace motion
-    {
+namespace motion
+{
 	MotionModule::MotionModule()
 	    : jointsInput_(),
 	      inertialsInput_(),
 	      fsrInput_(),
+	      jointsOutput_(base()),
+	      stiffnessOutput_(base()),
 	      walkProvider(),
 	      nullBodyProvider(),
 	      curProvider(&nullBodyProvider),
@@ -47,18 +49,32 @@ namespace man
 	{
 	    // (1) Before anything else happens, it is important to 
 	    //     retrieve the correct current joint angles.
-	    // @todo
-	    
+	    jointsInput_.latch();
+	    inertialsInput_.latch();
+	    fsrInput_.latch();
 
+	    sensorAngles    = toJointAngles(jointsInput_.message());
+	    sensorInertials = inertialsInput_.message();
+	    sensorFSRs      = fsrInput_.message();
+	    
 	    newInputJoints = false;
 
+	    // (2) If motion is enabled, perform a single iteration
+	    //     of the main motion loop.
 	    if(running)	
 	    {
+		// (3) Do any necessary preprocessing of joint angles
+		//     then actually compute next joints and 
+		//     stiffnesses. 
 		realityCheckJoints();
 
 		preProcess();
 		processJoints();
 		processStiffness();
+
+		// (4) Send newly computed joints and stiffnesses to
+		//     the joint enactor module. 
+		setJointsAndStiffness();
 
 		newInputJoints = false;
 		frameCount++;
@@ -543,6 +559,87 @@ namespace man
 
 	    return commands;
  	}
+
+    void MotionModule::setJointsAndStiffness()
+    {
+	using namespace Kinematics;
+
+	portals::Message<messages::JointAngles> newJoints(0);
+	
+	// Head angles.
+	newJoints.get()->set_head_yaw(nextJoints[HEAD_YAW]);
+	newJoints.get()->set_head_pitch(nextJoints[HEAD_PITCH]);
+
+	// Left arm angles.
+	newJoints.get()->set_l_shoulder_pitch(nextJoints[L_SHOULDER_PITCH]);
+	newJoints.get()->set_l_shoulder_roll(nextJoints[L_SHOULDER_ROLL]);
+	newJoints.get()->set_l_elbow_yaw(nextJoints[L_ELBOW_YAW]);
+	newJoints.get()->set_l_elbow_roll(nextJoints[L_ELBOW_ROLL]);
+
+	// Right arm angles.
+	newJoints.get()->set_r_shoulder_pitch(nextJoints[R_SHOULDER_PITCH]);
+	newJoints.get()->set_r_shoulder_roll(nextJoints[R_SHOULDER_ROLL]);
+	newJoints.get()->set_r_elbow_yaw(nextJoints[R_ELBOW_YAW]);
+	newJoints.get()->set_r_elbow_roll(nextJoints[R_ELBOW_ROLL]);
+
+	// Pelvis angles.
+	newJoints.get()->set_l_hip_yaw_pitch(nextJoints[L_HIP_YAW_PITCH]);
+	newJoints.get()->set_r_hip_yaw_pitch(nextJoints[R_HIP_YAW_PITCH]);
+
+	// Left leg angles.
+	newJoints.get()->set_l_hip_roll(nextJoints[L_HIP_ROLL]);
+	newJoints.get()->set_l_hip_pitch(nextJoints[L_HIP_PITCH]);
+	newJoints.get()->set_l_knee_pitch(nextJoints[L_KNEE_PITCH]);
+	newJoints.get()->set_l_ankle_pitch(nextJoints[L_ANKLE_PITCH]);
+	newJoints.get()->set_l_ankle_roll(nextJoints[L_ANKLE_ROLL]);
+
+	// Right leg angles.
+	newJoints.get()->set_r_hip_roll(nextJoints[R_HIP_ROLL]);
+	newJoints.get()->set_r_hip_pitch(nextJoints[R_HIP_PITCH]);
+	newJoints.get()->set_r_knee_pitch(nextJoints[R_KNEE_PITCH]);
+	newJoints.get()->set_r_ankle_pitch(nextJoints[R_ANKLE_PITCH]);
+	newJoints.get()->set_r_ankle_roll(nextJoints[R_ANKLE_ROLL]);
+
+	jointsOutput_.setMessage(newJoints);
+
+	portals::Message<messages::JointAngles> newStiffness(0);
+
+	// Head stiffness.
+	newStiffness.get()->set_head_yaw(nextStiffnesses[HEAD_YAW]);
+	newStiffness.get()->set_head_pitch(nextStiffnesses[HEAD_PITCH]);
+
+	// Left arm angles.
+	newStiffness.get()->set_l_shoulder_pitch(nextStiffnesses[L_SHOULDER_PITCH]);
+	newStiffness.get()->set_l_shoulder_roll(nextStiffnesses[L_SHOULDER_ROLL]);
+	newStiffness.get()->set_l_elbow_yaw(nextStiffnesses[L_ELBOW_YAW]);
+	newStiffness.get()->set_l_elbow_roll(nextStiffnesses[L_ELBOW_ROLL]);
+
+	// Right arm angles.
+	newStiffness.get()->set_r_shoulder_pitch(nextStiffnesses[R_SHOULDER_PITCH]);
+	newStiffness.get()->set_r_shoulder_roll(nextStiffnesses[R_SHOULDER_ROLL]);
+	newStiffness.get()->set_r_elbow_yaw(nextStiffnesses[R_ELBOW_YAW]);
+	newStiffness.get()->set_r_elbow_roll(nextStiffnesses[R_ELBOW_ROLL]);
+
+	// Pelvis angles.
+	newStiffness.get()->set_l_hip_yaw_pitch(nextStiffnesses[L_HIP_YAW_PITCH]);
+	newStiffness.get()->set_r_hip_yaw_pitch(nextStiffnesses[R_HIP_YAW_PITCH]);
+
+	// Left leg angles.
+	newStiffness.get()->set_l_hip_roll(nextStiffnesses[L_HIP_ROLL]);
+	newStiffness.get()->set_l_hip_pitch(nextStiffnesses[L_HIP_PITCH]);
+	newStiffness.get()->set_l_knee_pitch(nextStiffnesses[L_KNEE_PITCH]);
+	newStiffness.get()->set_l_ankle_pitch(nextStiffnesses[L_ANKLE_PITCH]);
+	newStiffness.get()->set_l_ankle_roll(nextStiffnesses[L_ANKLE_ROLL]);
+
+	// Right leg angles.
+	newStiffness.get()->set_r_hip_roll(nextStiffnesses[R_HIP_ROLL]);
+	newStiffness.get()->set_r_hip_pitch(nextStiffnesses[R_HIP_PITCH]);
+	newStiffness.get()->set_r_knee_pitch(nextStiffnesses[R_KNEE_PITCH]);
+	newStiffness.get()->set_r_ankle_pitch(nextStiffnesses[R_ANKLE_PITCH]);
+	newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
+
+	stiffnessOutput_.setMessage(newStiffness);
+    }
 
     } // namespace motion
 } // namespace man

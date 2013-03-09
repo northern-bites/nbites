@@ -39,9 +39,7 @@ namespace man
 	    JointEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
 
 	    virtual ~JointEnactorModule();
-
-	    void setStiffness(float stiffness = 0.0f);
-
+	    
 	    /**
 	     * @brief Enables motion (joint angle) commands to be sent
 	     *        to the DCM.
@@ -56,7 +54,7 @@ namespace man
 	    void disableMotion();
 
 	    // Allows clients to set the stiffnesses of all joints.
-	    portals::InPortal<messages::JointStiffness> stiffnessInput_;
+	    portals::InPortal<messages::JointAngles> stiffnessInput_;
 
 	    // Accepts motion commands (i.e. joint angles.)
 	    portals::InPortal<messages::JointAngles> jointsInput_;
@@ -97,9 +95,11 @@ namespace man
 	    bool motionEnabled_;
 
 	    AL::ALValue jointCommand_;
+	    AL::ALValue stiffnessCommand_;
 	    AL::ALProcessSignals::ProcessSignalConnection dcmPreProcessConnection_;
 
 	    messages::JointAngles latestJointAngles_;
+	    messages::JointAngles latestStiffness_;
 	};
     } // namespace jointenactor
 } // namespace man

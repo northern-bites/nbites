@@ -10,6 +10,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
       sensorsThread("sensors"),
       sensors(broker),
+      jointEnactor(broker),
       commThread("comm"),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
 {
@@ -18,6 +19,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Sensors **/
     sensorsThread.addModule(sensors);
     sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_, "joints");
+    sensorsThread.addModule(jointEnactor);
 
     /** Comm **/
     commThread.addModule(comm);
