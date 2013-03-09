@@ -496,7 +496,7 @@ void GuardianModule::processChestButtonPushes()
 
 void GuardianModule::executeShutdownAction()
 {
-    std::cout << "Guardian is attempting a shutting down..."<< std::endl;
+    std::cout << "Guardian is attempting a shutdown..."<< std::endl;
     playFile(shutdown_wav);
     if(system("sudo shutdown -h now &") != 0)
         std::cout << "Roboguardian could not shutdown system." << std::endl;
