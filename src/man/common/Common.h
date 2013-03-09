@@ -69,7 +69,22 @@ const static float MOTION_FRAME_LENGTH_S = 0.01f;
 const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
 const int GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 
-///// FRAME LENGTHS ////
+/*
+ * FRAME LENGTHS
+ * A note about why these are what they are.
+ * Motion = 100 fps = 10000 uS per frame
+ *     This has to synchronize with the DCM.
+ * Cognition = 30 fps = 34000 uS (ish) per frame
+ *     This needs to run once per camera frame, which we get at 30 fps
+ * Guardian = same as motion
+ *     This needs to check often for falls and problems
+ * Sensors = same as motion
+ *     This needs to run fast so that it stays accurate when motion gets data
+ * Comm = same as cognition
+ *     Tried running this at the motion framerate, and it took too long
+ *     almost every frame. Also, it makes sense to run it with cognition bc
+ *     that's what it mainly interacts with.
+ */
 const long long MOTION_FRAME_LENGTH_uS = 1000 * 1000 / MOTION_FRAME_RATE;
 const long long COGNITION_FRAME_LENGTH_uS = 34000;
 const long long GUARDIAN_FRAME_LENGTH_uS = MOTION_FRAME_LENGTH_uS;
