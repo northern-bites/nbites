@@ -9,6 +9,7 @@ using namespace portals;
 
 namespace man{
 
+// Constructor for the private subclass
 DiagramThread::RobotDiagram::RobotDiagram(std::string name_, long long frame)
     : RoboGram(),
       name(name_),
@@ -20,18 +21,23 @@ DiagramThread::RobotDiagram::RobotDiagram(std::string name_, long long frame)
 #endif
 }
 
+// Overrides the RoboGram::run() method to do timing as well
 void DiagramThread::RobotDiagram::run()
 {
-    // start timer
+    // Start timer
     const long long startTime = realtime_micro_time();
 
     RoboGram::run();
 
-    //stop timer
+    // Stop timer
     const long long processTime = realtime_micro_time() - startTime;
 
+    // If we're under the frame length, this is good.
+    // We can sleep for the rest of the frame and let others process.
     if (processTime < frameLengthMicro)
     {
+        // Compute the time we should sleep from the amount of time
+        // we processed this frame and the amount of time allotted to a frame
         const long int microSleepTime =
             static_cast<long int>(frameLengthMicro - processTime);
         const long int nanoSleepTime =
@@ -43,6 +49,7 @@ void DiagramThread::RobotDiagram::run()
         interval.tv_sec = static_cast<time_t>(secSleepTime);
         interval.tv_nsec = nanoSleepTime;
 
+        // Sleep!
         nanosleep(&interval, &remainder);
     }
 
@@ -114,6 +121,8 @@ void* DiagramThread::runDiagram(void* _this)
     this_instance->running = true;
 
     // Run the diagram over and over again!
+    // NOTE: we can't do timing here because a sleep call here is made
+    //       from our main naoqi thread.
     while(this_instance->running) this_instance->diagram.run();
 
     cout << "Thread " << this_instance->diagram.name << " exiting." << endl;

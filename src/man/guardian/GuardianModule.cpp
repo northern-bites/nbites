@@ -504,7 +504,6 @@ void GuardianModule::executeShutdownAction()
 
 bool GuardianModule::executeChestClickAction(int nClicks)
 {
-    //NOTE: Please upade wiki/NaoChestButtonInterface when this is changed!!!
     switch(nClicks)
     {
     case NO_CLICKS:

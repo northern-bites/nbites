@@ -7,6 +7,13 @@
  * should be no further need of things like mutexes. Provides a way to log
  * any type of message from an appropriate OutPortal in this thread also.
  *
+ * Update: while we don't need mutexes, we DO need to limit the frame rate
+ * of each of our threads. Each thread needs to sleep for the rest of its
+ * "time slice" after it has processed. This way we don't process the same
+ * image twice, for example, or query naoqi over and over again for the
+ * same joint angles. Also, all of our systems get a turn at the CPU.
+ * all of this is handled in the private subclass of Diagram, RobotDiagram.
+ *
  * @author Lizzie Mamantov
  * @date February 2013
  *
@@ -52,16 +59,32 @@ public:
     }
 
 private:
+    /*
+     * @class RobotDiagram
+     *
+     * This is private to DiagramThread because nothing else should use
+     * it. It extends a typical diagram by giving a diagram a desired frame
+     * length. If the diagram's processing takes less time than the frame
+     * length, which is what we want, it sleeps for the rest of the frame.
+     * Turning on DEBUG_THREADS should help us figure out if a thread is
+     * always overrunning its frames.
+     */
     class RobotDiagram : public portals::RoboGram
     {
+        // Just so that we can get things without getters
         friend class DiagramThread;
     public:
+        // Holds the name of the thread
         RobotDiagram(std::string name_, long long frame);
+        // Overrides RoboGram::run() but also calls it
         void run();
 
     private:
+        // The name given to this thread
         std::string name;
+        // The length of a processing frame for this thread
         long long frameLengthMicro;
+        // Used for making nanosleep calls
         struct timespec interval, remainder;
     };
 
