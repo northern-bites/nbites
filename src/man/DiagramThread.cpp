@@ -20,15 +20,12 @@ DiagramThread::RobotDiagram::RobotDiagram(std::string name_, long long frame)
 void DiagramThread::RobotDiagram::run()
 {
     // start timer
-    const long long startTime = monotonic_micro_time();
+    const long long startTime = realtime_micro_time();
 
     RoboGram::run();
 
     //stop timer
-    const long long processTime = monotonic_micro_time() - startTime;
-
-    //sleep until next frame
-    lastProcessTimeAvg = lastProcessTimeAvg/2 + processTime/2;
+    const long long processTime = realtime_micro_time() - startTime;
 
     if (processTime < frameLengthMicro)
     {
@@ -39,9 +36,6 @@ void DiagramThread::RobotDiagram::run()
 
         const long int secSleepTime =
             static_cast<long int>(microSleepTime / (1000*1000));
-
-        //std::cerr << "Sleeping for nano: " << nanoSleepTime
-        //<< " and sec:" << secSleepTime << std::endl;
 
         interval.tv_sec = static_cast<time_t>(secSleepTime);
         interval.tv_nsec = nanoSleepTime;

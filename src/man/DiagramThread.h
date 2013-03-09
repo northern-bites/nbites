@@ -62,7 +62,6 @@ private:
     private:
         std::string name;
         long long frameLengthMicro;
-        long long lastProcessTimeAvg;
         struct timespec interval, remainder;
     };
 
