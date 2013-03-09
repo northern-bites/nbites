@@ -50,7 +50,7 @@ void DiagramThread::RobotDiagram::run()
 #ifdef DEBUG_THREADS
     else if (processTime > frameLengthMicro*2) {
         std::cout<< "Warning: time spent in " << name << " thread longer"
-                 << " than frame length: "<< processTime << "uS" <<
+                 << " than frame length: "<< processTime << " uS" <<
             std::endl;
     }
 #endif

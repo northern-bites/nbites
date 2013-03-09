@@ -56,7 +56,7 @@ void Man::startSubThreads()
 {
     startAndCheckThread(sensorsThread);
     startAndCheckThread(guardianThread);
-    //startAndCheckThread(commThread);
+    startAndCheckThread(commThread);
     startAndCheckThread(cognitionThread);
 }
 
