@@ -20,6 +20,13 @@ set( @REMOTE_ADDRESS@
   "The address to which the code will be installed."
 )
 
+# NOTE THAT THIS DOESN't ACTUALLY DO ANYTHING RIGHT NOW
+set ( @PYTHON_PLAYER@
+  pNone
+  CACHE STRING
+  "Choose the player to be imported in Switch.py"
+  )
+
 # COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
@@ -40,6 +47,7 @@ SET( TABLE_BOTTOM ${@TABLE_BOTTOM@})
 set( REMOTE_ADDRESS ${@REMOTE_ADDRESS@})
 set( PLAYER_NUMBER ${@ROBOT_PLAYER_NUMBER@})
 set( TEAM_NUMBER ${@ROBOT_TEAM_NUMBER@})
+set( PYTHON_PLAYER ${@PYTHON_PLAYER@})
 
 set( INSTALL_LOCATION
   "nbites/"

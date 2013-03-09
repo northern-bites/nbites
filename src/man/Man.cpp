@@ -16,7 +16,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
 	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
 	  imageTranscriber(),
-	  vision()
+	  vision(),
+      leds(broker),
+      behaviors()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -44,6 +46,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
 	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
 	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, true);
+	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, false);
+	for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
+		behaviors.worldModelIn[i].wireTo(comm._worldModels[i], false);
+	}
 
     startSubThreads();
 }

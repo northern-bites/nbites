@@ -9,11 +9,12 @@ set( COMMON_SRCS NBMath
   CoordFrame3D.cpp
   CoordFrame4D.cpp
   CameraCalibrate.cpp
-  )
+  ALLedNames
+  NogginStructs
+)
 
 add_library(
   common
   STATIC
   ${COMMON_SRCS}
 )
-

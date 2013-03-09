@@ -7,6 +7,8 @@ file(GLOB PROTO_INPUT
 
 #protobuf compiler
 set(PROTOC_C_OUT_FLAG --cpp_out)
+set(PROTOC_PY_OUT_FLAG --python_out)
+set(PYTHON_INSTALL_DIR lib/python)# TODO: move this to man/CMakeLists
 
 #protobuf output
 set(PROTO_GEN_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -24,8 +26,16 @@ add_custom_command(
   OUTPUT ${PROTO_GEN}
   COMMAND ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_INPUT}
   ${PROTOC_C_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
+  ${PROTOC_PY_OUT_FLAG} ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS ${PROTOBUF_PROTOC_EXECUTABLE} ${PROTO_INPUT}
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+
+install(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  DESTINATION ${PYTHON_INSTALL_DIR}
+  CONFIGURATIONS "" Debug Release
+  PATTERN "*.py" #TODO: this doesn't seem exclude c files... fix it!
   )
 
 ############################ PROJECT SOURCES FILES
