@@ -70,11 +70,11 @@ const float MOTION_FRAME_RATE = 1.0f / MOTION_FRAME_LENGTH_S;
 const int GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
 
 ///// FRAME LENGTHS ////
-//const long long MOTION_FRAME_LENGTH_uS = 1000 * 1000 * MOTION_FRAME_LENGTH_S;
+const long long MOTION_FRAME_LENGTH_uS = 1000 * 1000 / MOTION_FRAME_RATE;
 const long long COGNITION_FRAME_LENGTH_uS = 34000;
-const long long GUARDIAN_FRAME_LENGTH_uS = 10000;
-const long long SENSORS_FRAME_LENGTH_uS = 10000;
-const long long COMM_FRAME_LENGTH_uS = 10000;
+const long long GUARDIAN_FRAME_LENGTH_uS = MOTION_FRAME_LENGTH_uS;
+const long long SENSORS_FRAME_LENGTH_uS = MOTION_FRAME_LENGTH_uS;
+const long long COMM_FRAME_LENGTH_uS = MOTION_FRAME_LENGTH_uS;
 
 /**
  * Copies a struct using memcpy

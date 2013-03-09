@@ -15,6 +15,10 @@ DiagramThread::RobotDiagram::RobotDiagram(std::string name_, long long frame)
       name(name_),
       frameLengthMicro(frame)
 {
+#ifdef DEBUG_THREADS
+    std::cout << name << " thread has frame length " << frameLengthMicro <<
+        " uS " << std::endl;
+#endif
 }
 
 void DiagramThread::RobotDiagram::run()
