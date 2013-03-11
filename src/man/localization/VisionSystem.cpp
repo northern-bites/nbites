@@ -25,68 +25,74 @@ namespace man
                 ParticleIt iter;
                 // Record totalWeight for normalization
                 float totalWeight = 0.0f;
-                float newParticleWeight = 1.0f;
+                bool madeObsv = false;
 
+                std::cout << "Update the particle Weights:\n";
                 for(iter = particles.begin(); iter != particles.end(); iter++)
                 {
                     Particle* particle = &(*iter);
+                    float newParticleError = 0.f;
 
                     for (int i=0; i<observations.visual_corner_size(); i++)
                     {
+                        madeObsv = true;
+
                         messages::PVisualCorner visualCorner;
                         visualCorner.CopyFrom(observations.visual_corner(i));
-                        float newWeight = scoreFromVisDetect(*particle,visualCorner.visual_detection());
+                        float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
+                        newParticleError+= newError;
                         // std::cout << "Best Weight from the corner\t" << newWeight << "\n\n";
                         //float newWeight = 1.0f; //scoreFromLandmark(**particle, visualCorner);
-                        if (newWeight < TINY_WEIGHT)
-                            newWeight = TINY_WEIGHT;
-                        newParticleWeight *= newWeight;
-
+                        // if (newWeight < TINY_WEIGHT)
+                        //     newWeight = TINY_WEIGHT;
                     }
 
                     if (observations.has_goal_post_l()){
-                        float newWeight = 1.0f; //scoreFromLandmark(particle, observations.goal_post_l);
-                        if (newWeight < TINY_WEIGHT)
-                            newWeight = TINY_WEIGHT;
-                        newParticleWeight *= newWeight;
+                        madeObsv = true;
+                        // float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
+                        // newParticleError+= newError;
                     }
+
                     if (observations.has_goal_post_r()){
-                        float newWeight = 1.0f; //scoreFromLandmark(particle, observations.goal_post_l);
-                        if (newWeight < TINY_WEIGHT)
-                            newWeight = TINY_WEIGHT;
-                        newParticleWeight *= newWeight;
+                        madeObsv = true;
+                        // float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
+                        // newParticleError+= newError;
                     }
+
                     if (observations.has_visual_cross()){
-                        float newWeight = 1.0f; //scoreFromLandmark(particle, observations.goal_post_l);
-                        if (newWeight < TINY_WEIGHT)
-                            newWeight = TINY_WEIGHT;
-                        newParticleWeight *= newWeight;
+                        madeObsv = true;
+                        // float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
+                        // newParticleError+= newError;
                     }
 
                     // We never updated the new particle weight, so no observations been made
-                    if(newParticleWeight >= 1.0f)
+                    if(!madeObsv)
                     {
                         std::cout << "In the Vision System, given a message with no observations...\n";
                         return false;
                     }
                     else
                     {
-                        particle->setWeight(newParticleWeight);
-                        totalWeight += newParticleWeight;
+                        // Set the particle weight to 1/predictionError
+                        particle->setWeight(1/newParticleError);
+                        totalWeight += particle->getWeight();
                     }
                 }
 
+                std::cout << "Particle Weights:";
                 // normalize the particle weights
-//                ParticleIt iter;
                 for(iter = particles.begin(); iter != particles.end(); iter++)
                 {
                     Particle* particle = &(*iter);
                     particle->normalizeWeight(totalWeight);
+                    std::cout << "\t" << particle->getWeight();
                 }
+                std::cout << "\n\n";
 
                 // We've updated particles with vision, so tell PF to resample
                 setUpdated(true);
             }
+            std::cout << "UPDATED\n\n";
 
             return true;
         }
@@ -97,8 +103,9 @@ namespace man
         }
 
         /**
-         * @brief Takes a PVisualObservation and particle & returns the best
-         *        possible score for the combination
+         * @brief Takes a PVisualObservation and particle & returns the
+         *        distance between the observations real location and its
+         *        expected one
          */
         float VisionSystem::scoreFromVisDetect(const Particle& particle,
                                                const messages::PVisualDetection& obsv)
@@ -106,44 +113,82 @@ namespace man
             // DEBUG VIS DETECT
             // std::cout << "Scoring a visual detection and a particle ---------- \n";
 
-            float bestScore = 0;
+            float bestScore = 100;
 
             for (int i=0; i<obsv.concrete_coords_size(); i++)
             {
-                // std::cout << "Concrete Obsv(x,y):\t(" << obsv.concrete_coords(i).x() << " , "
-                //           << obsv.concrete_coords(i).y() << ")\n";
-                // std::cout << "Particle (x,y,h):\t(" << particle.getLocation().x() << " , "
-                //           << particle.getLocation().y() << " , "
-                //           << particle.getLocation().h() <<")\n";
+                std::cout << "Observation (r,b):\t(" << obsv.distance()
+                          << " , " << obsv.bearing() <<")\n";
+                std::cout << "Concrete Obsv(x,y):\t(" << obsv.concrete_coords(i).x() << " , "
+                           << obsv.concrete_coords(i).y() << ")\n";
+                std::cout << "Particle (x,y,h):\t(" << particle.getLocation().x() << " , "
+                          << particle.getLocation().y() << " , "
+                          << particle.getLocation().h() <<")\n";
                 const messages::Point& fieldPoint = obsv.concrete_coords(i);
 
-                RelVector relVector = getRelativeVector(particle,
-                                                        fieldPoint.x(),
-                                                        fieldPoint.y());
+                // Convert from obsv in polar to rep in cartesian
+                // @Todo:  Explain these calculations somewhere!!
+                float sin, cos;
+                // convert 90 degrees to bearings
+                float ninetyDeg = 1.5707963f;
+                sincosf(ninetyDeg - (particle.getLocation().h() + obsv.bearing()), &sin, &cos);
+                // float testSin, testCos;
+                // sincosf(ninetyDeg, &testSin, &testCos);
+                // std::cout << "sin(90),cos(90)\t" << testSin << "\t" << testCos << "\n";
+                float calcX = obsv.distance()*cos + particle.getLocation().x();
+                float calcY = obsv.distance()*sin + particle.getLocation().y();
+
+                // // Apply World Rotation and Translation
+                // float sinH, cosH;
+                // sincosf(particle.getLocation().h(), &sinH, &cosH);
+                // float worldFrameRelX = particleFrameRelX*cosH - particleFrameRelY*sinH;
+                // float worldFrameRelY = particleFrameRelX*sinH + particleFrameRelY*cosH;
+
+                // float calcX = particle.getLocation().x() + worldFrameRelX;
+                // float calcY = particle.getLocation().y() + worldFrameRelY;
+
+                std::cout << "Calculated FieldX:\t" << calcX << "\tFieldY:\t" << calcY << "\n";
+                std::cout << "Actual FieldX:    \t" << fieldPoint.x() << "\tFieldY:\t" << fieldPoint.y() << "\n";
+
+                // Calc distance between calculated coordinates and the concrete coords
+                float dist = std::sqrt(NBMath::square(calcX - fieldPoint.x())
+                                       + NBMath::square(calcY - fieldPoint.y()));
+
+
+
+                // RelVector relVector = getRelativeVector(particle,
+                //                                         fieldPoint.x(),
+                //                                         fieldPoint.y());
 
                 // std::cout << "Calc Distance:\t" << relVector.magnitude << "\t VS\t" << obsv.distance() << "\n";
                 // std::cout << "Calc bear:\t" << relVector.direction << "\t VS\t" << obsv.bearing() << "\n";
 
-                float distanceDiff = obsv.distance() - relVector.magnitude;
-                float angleDiff = NBMath::subPIAngle(obsv.bearing() - relVector.direction);
+                // float distanceDiff = obsv.distance() - relVector.magnitude;
+                // float angleDiff = NBMath::subPIAngle(obsv.bearing() - relVector.direction);
 
                 // std::cout << "DistanceDiff:\t" << distanceDiff << "\tAngleDiff\t" << angleDiff << "\n";
 
-                boost::math::normal_distribution<float> pDist(0.0f, obsv.distance_sd());
-                float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
+                // boost::math::normal_distribution<float> pDist(0.0f, obsv.distance_sd());
+                // float distanceProb = boost::math::pdf<float>(pDist, distanceDiff);
 
 
-                boost::math::normal_distribution<float> pAngle(0.0f, obsv.bearing_sd());
-                float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
+                // boost::math::normal_distribution<float> pAngle(0.0f, obsv.bearing_sd());
+                // float angleProb = boost::math::pdf<float>(pAngle, angleDiff);
 
-                // Better way to determine probability?
-                float score = distanceProb * angleProb;
-                // std::cout << "Score:\t" << score << "\n";
-                if (score > bestScore)
+                // // Better way to determine probability?
+                // float score = distanceProb * angleProb;
+
+                // // ***TEMP*** to debug the scoring step
+                // std::cout << "Score:\t" << score << "\n"
+                //           << "DistanceProb:\t" << distanceProb
+                //           << "\tAngleProb:\t" << angleProb << "\n";;
+
+                float score = dist;
+                if (score < bestScore)
                     bestScore = score;
 
             }
-
+            std::cout << "Particle Score:\t" << bestScore << "\n";
             return bestScore;
 
         }

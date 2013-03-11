@@ -63,11 +63,10 @@ namespace man
             motionSystem->update(particles, motionInput.odometry());
         }
 
-        // Update the Vision Model
-        if (visionInput.timestamp() > lastVisionTimestamp)
+        // Update the Vision Model ***TEMP***
+        if (visionInput.timestamp() > lastVisionTimestamp && visionInput.timestamp() < 319)
         {
             lastVisionTimestamp = (float) visionInput.timestamp();
-
             // If updatedVision is true then we observed things
             updatedVision = visionSystem->update(particles, visionInput);
         }
@@ -271,6 +270,8 @@ namespace man
             float pY = sampleNormal(y, params.sigma_x);
             float pH = sampleNormal(h, params.sigma_h);
 
+            std::cout << "Initial Particle H:\t" << pH << "\n\n";
+
             Particle p(pX, pY, pH, weight);
 
             particles.push_back(p);
@@ -383,30 +384,39 @@ namespace man
 
     void ParticleFilter::resample()
     {
-        // Normalize the particle weights, and find the average weight.
-        float sum = 0.0f;
-        ParticleIt iter;
-        for(iter = particles.begin(); iter != particles.end(); ++iter)
-            sum += (*iter).getWeight();
+        // // Normalize the particle weights, and find the average weight.
+        // float sum = 0.0f;
+        // ParticleIt iter;
+        // for(iter = particles.begin(); iter != particles.end(); ++iter)
+        // {
+        //     // DEBUG RESAMPLE ***TEMP***
+        //     // std::cout << "Particle X:\t" << (*iter).getLocation().x()
+        //     //           << "\tParticle Y:\t" << (*iter).getLocation().y()
+        //     //           << "\tParticle H:\t" << (*iter).getLocation().h()
+        //     //           << "\nParticle Weight:\t" << (*iter).getWeight() << "\n";
 
-        if(sum == 0)
-        {
-            std::cout << "\n\n\nZERO SUM!\n\n\n" << std::endl;
-            return;
-        }
+        //     sum += (*iter).getWeight();
+        // }
 
-        float averageWeight = sum/(((float)parameters.numParticles)*1.0f);
+        // if(sum == 0)
+        // {
+        //     std::cout << "\n\n\nZERO SUM!\n\n\n" << std::endl;
+        //     return;
+        // }
 
-        for(iter = particles.begin(); iter != particles.end(); ++iter)
-        {
-            float weight = (*iter).getWeight();
-            (*iter).setWeight(weight/averageWeight);
-        }
+        // float averageWeight = sum/(((float)parameters.numParticles)*1.0f);
+
+        // for(iter = particles.begin(); iter != particles.end(); ++iter)
+        // {
+        //     float weight = (*iter).getWeight();
+        //     (*iter).setWeight(weight/averageWeight);
+        // }
 
         // Map each normalized weight to the corresponding particle.
         std::map<float, Particle> cdf;
 
         float prev = 0.0f;
+        ParticleIt iter;
         for(iter = particles.begin(); iter != particles.end(); ++iter)
         {
             Particle particle = (*iter);
@@ -425,11 +435,31 @@ namespace man
         // normalized weights, and place them in a new particle set.
         for(int i = 0; i < parameters.numParticles; ++i)
         {
-        rand = (float)gen();
-        newParticles.push_back(cdf.upper_bound(rand)->second);
+            rand = (float)gen();
+            newParticles.push_back(cdf.upper_bound(rand)->second);
         }
 
         // FUN IDEA: Create a particle that equals the belief
+
+        // ***TEMP***
+        newParticles.clear();
+        Particle best;
+        float bestWeight =0.f;
+        for(iter = particles.begin(); iter != particles.end(); ++iter)
+        {
+            Particle particle = (*iter);
+
+            if(particle.getWeight() > bestWeight)
+            {
+                best = particle;
+                bestWeight = particle.getWeight();
+            }
+        }
+        for (int i=0; i<parameters.numParticles; i++)
+            newParticles.push_back(best);
+        // ***TEMP*** always choose best particle
+
+
 
         particles = newParticles;
     }

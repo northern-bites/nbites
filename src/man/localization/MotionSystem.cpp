@@ -17,7 +17,7 @@ namespace man
         void MotionSystem::update(ParticleSet& particles,
                                   messages::RobotLocation deltaMotionInfo)
         {
-            std::cout<< "MOTION SYSTEM:  x:\t"<<deltaMotionInfo.x() <<"\ty:\t"<<deltaMotionInfo.y()<< "\n";
+//            std::cout<< "MOTION SYSTEM:  x:\t"<<deltaMotionInfo.x() <<"\ty:\t"<<deltaMotionInfo.y()<< "\n";
             ParticleIt iter;
             for(iter = particles.begin(); iter != particles.end(); iter++)
             {
@@ -37,12 +37,8 @@ namespace man
 
                 particle->shift(changeX, changeY, changeH);
                 randomlyShiftParticle(particle);
-
-                //randomlyShiftParticle(particle);
-                // @TODO NBMath::subPiAngle() the above shit
-
             }
-            std::cout << "\n\n Updated Particles w/ Motion \n";
+//            std::cout << "\n\n Updated Particles w/ Motion \n";
         }
 
         void MotionSystem::randomlyShiftParticle(Particle* particle)
@@ -50,8 +46,10 @@ namespace man
 
             // Create random number generators
 //            boost::mt19937 rng;
-            boost::uniform_real<float> coordRange(-.6f, .6f);
-            boost::uniform_real<float> headRange(-1.8f, 1.8f);
+
+            // TODO: This should be experimentally determined
+            boost::uniform_real<float> coordRange(-.0001f, .0001f);
+            boost::uniform_real<float> headRange(-.0003f, .0003f);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);
 
@@ -59,7 +57,7 @@ namespace man
             messages::RobotLocation noise;
             noise.set_x(coordNoise());
             noise.set_y(coordNoise());
-            noise.set_h(headNoise());
+            noise.set_h(NBMath::subPIAngle(headNoise()));
 
             // std::cout << "X noise:\t" << noise.x() << "\n";
 

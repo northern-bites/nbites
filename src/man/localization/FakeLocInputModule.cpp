@@ -84,34 +84,44 @@ namespace man
         void FakeLocInputModule::genVisualDetection(messages::PVisualDetection &visualDetection)
         {
             // Choose concrete_coords randomly for the observation
-            boost::uniform_real<float> observationRange(MIN_OBS_DIST, MAX_OBS_DIST);
-            boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > randOffset(rng,
-                                                                                              observationRange);
-            // Fill in the Visual Detections distance and bearing with noise
-            // Use a gaussian since that's the assumption for a particle filter
-            float translatedX = randOffset();
-            float translatedY = randOffset();
+            boost::uniform_real<float> obsvDistRange(MIN_OBS_DIST, MAX_OBS_DIST);
+            boost::uniform_real<float> obsvBearRange(MIN_OBS_BEAR, MAX_OBS_BEAR);
+            boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > obsvDistGen(rng,
+                                                                                               obsvDistRange);
+            boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > obsvBearGen(rng,
+                                                                                               obsvBearRange);
+
+            float obsvDist = obsvDistGen();
+            float obsvBear = obsvBearGen();
+
+            // RelX and RelY
+            float sin, cos;
+            float ninetyDeg = 1.5707963f;
+            sincosf(ninetyDeg - (currentLocation.h() + obsvBear), &sin, &cos);
+            float calcX = obsvDist*cos + currentLocation.x();
+            float calcY = obsvDist*sin + currentLocation.y();
 
             // @TODO one line? Don't think so but try
             messages::Point concreteCoords;
-            concreteCoords.set_x(currentLocation.x() + translatedX);
-            concreteCoords.set_y(currentLocation.y() + translatedY);
+            concreteCoords.set_x(calcX);
+            concreteCoords.set_y(calcY);
             visualDetection.add_concrete_coords()->CopyFrom(concreteCoords);
 
-            float calcDistance = std::sqrt(NBMath::square(translatedX) + NBMath::square(translatedY));
-            float calcBearing = NBMath::safe_atan2(translatedY, translatedX);
-
-            boost::normal_distribution<float> distDistrib(calcDistance, DIST_STD_DEV);
-            boost::normal_distribution<float> bearingDistrib(calcBearing, BEAR_STD_DEV);
+            boost::normal_distribution<float> obsvDistDistrib(obsvDist, DIST_STD_DEV);
+            boost::normal_distribution<float> obsvBearDistrib(obsvBear, BEAR_STD_DEV);
 
             boost::variate_generator<boost::mt19937&,
-                                     boost::normal_distribution<float> > distanceGen(rng, distDistrib);
+                                     boost::normal_distribution<float> > noisyDist(rng, obsvDistDistrib);
             boost::variate_generator<boost::mt19937&,
-                                     boost::normal_distribution<float> > bearingGen(rng, bearingDistrib);
+                                     boost::normal_distribution<float> > noisyBear(rng, obsvBearDistrib);
 
-            // Set the obsv distance and bearing
+
             visualDetection.set_distance(distanceGen());
             visualDetection.set_bearing(bearingGen());
+
+            // FOR DEBUG ELIMINATE NOISE ***TEMP***
+            // visualDetection.set_distance(obsvDist);
+            // visualDetection.set_bearing(obsvBear);
 
             // Pass the Std Devs
             visualDetection.set_distance_sd(DIST_STD_DEV);
@@ -165,7 +175,7 @@ namespace man
 
         void FakeLocInputModule::run_()
         {
-            std::cout << "FakeLocInput run called\n";
+            std::cout << "\n--------------------------------------------------\n";
             // messages::RobotLocation stupidOdometry;
             // stupidOdometry.set_x(1);
             // stupidOdometry.set_y(2);
@@ -200,6 +210,12 @@ namespace man
             *visionMessage.get() = messages::PVisionField();
             visionMessage.get()->CopyFrom(noisyVision);
             fVisionOutput.setMessage(visionMessage);
+
+            // FOR DEBUGGING PARTICLE FILTER ***TEMP***
+            std::cout << "\nJust created fake information with real coordinates:\n"
+                      << "Real X:\t" << currentLocation.x()
+                      << "\tReal Y:\t" << currentLocation.y()
+                      << "\tReal H:\t" << currentLocation.h() << "\n\n";
 
             // increment timestamp, set negative if gen'd all frames so we terminate
             timestamp++;

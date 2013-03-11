@@ -20,6 +20,8 @@ namespace man
     namespace localization
     {
 
+        // There must be a point where it's better to have one over the other
+
     /**
      * @class Vision System
      * @brief Responsible for updating particles based on Visual Observations

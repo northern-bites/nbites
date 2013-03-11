@@ -39,6 +39,7 @@ namespace man
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
+        // ***TEMP*** change num of particles for debugging
         200,
         0.2f,
         0.05f

@@ -34,7 +34,10 @@ namespace man
 
         static const float MIN_OBS_DIST = 50;
         static const float MAX_OBS_DIST = 150;
-        static const float DIST_STD_DEV = 10;
+        static const float MIN_OBS_BEAR = -.785398f;
+        static const float MAX_OBS_BEAR = .785398f;
+
+        static const float DIST_STD_DEV = 10.f;
         static const float BEAR_STD_DEV = .174f; //~10 degrees
 
         static const float NUM_CORNER_OBS = 1;
