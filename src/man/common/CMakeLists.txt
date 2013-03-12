@@ -9,6 +9,7 @@ set( COMMON_SRCS NBMath
   CoordFrame3D.cpp
   CoordFrame4D.cpp
   CameraCalibrate.cpp
+  ColorParams.cpp
   )
 
 add_library(

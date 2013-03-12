@@ -135,9 +135,9 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
     ufmatrix4* camera_calibration;
     // factor in camera calibration
     if (_isTopCam) {
-        camera_calibration = CameraCalibrate::getTransforms(man::image::Camera::TOP);
+        camera_calibration = CameraCalibrate::getTransforms(man::Camera::TOP);
     } else {
-        camera_calibration = CameraCalibrate::getTransforms(man::image::Camera::BOTTOM);
+        camera_calibration = CameraCalibrate::getTransforms(man::Camera::BOTTOM);
     }
     for (int i = 0; i < CameraCalibrate::NUM_PARAMS; i++) {
 
@@ -146,13 +146,11 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
     }
 
 
-    
       // The following basically assumes that we are always standing on our left
       // leg. THIS IS VERY BAD. We NEED to find a way to get support foot 
       // information to pose. Previously, sensors got this from the motion switch
       // board, but now we are trying to avoid that kind of dependency mess, so we need
       // a better way.
-				 
 
       // tl;dr THE FOLLOWING CODE IS BAAAAADDDDDD!!!!!!!!!!!!!!!!!!!
     supportLegToBodyTransform = calculateForwardTransform(LLEG_CHAIN,

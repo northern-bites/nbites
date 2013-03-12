@@ -1,9 +1,7 @@
 #include "VisionModule.h"
 #include <iostream>
 
-
 using namespace portals;
-
 
 namespace man{
 namespace vision{
