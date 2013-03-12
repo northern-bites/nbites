@@ -34,79 +34,25 @@ class UnlogBase : public portals::Module
 {
 public:
     // The path is expected to be a full path to the log file
-    UnlogBase(std::string path);
+    UnlogBase(std::string path, std::string type);
     virtual ~UnlogBase();
 
-protected:
-    // Inheriting classes still need to implement this
-    virtual void run_() = 0;
-
-    // Basic file control
-    void openFile() throw (file_exception);
-    void closeFile();
-    uint32_t readCharBuffer(char* buffer, uint32_t size)
-        const throw (file_read_exception);
+    std::string getType() { return typeName; }
 
     // Reads the next sizeof(T) bytes and interprets them as a T
-    template <typename T>
+    template <class T>
     T readValue() {
         T value;
         readCharBuffer((char *)(&value), sizeof(value));
         return value;
     }
 
-    // Keeps track of whether the file is open/closed
-    bool fileOpen;
-    // Pointer to the file
-    FILE* file;
-    // Stores the full path of the file
-    std::string fileName;
-};
-
-// Template Class
-template<class T>
-class UnlogModule : public UnlogBase
-{
-public:
-    // Takes a file path to parse from
-    UnlogModule(std::string path) : UnlogBase(path),
-                                    output(base()) {}
-
-    // Where the output will be provided
-    portals::OutPortal<T> output;
-
-protected:
-    // Implements the Module run_ method
-    void run_()
-    {
-        // Makes sure the file is available to read
-        if (!fileOpen)
-        {
-            openFile();
-            readHeader();
-        }
-
-        // Reads the next message from the file and puts it on
-        // the OutPortal
-        readNextMessage();
-    }
-
-    // Reads in the header; called when the file is first opened
-    void readHeader()
-    {
-        // Shares HEADER definition with log in share/include/LogDefinitions.h
-        int len = HEADER.length();
-
-        char head[len];
-        uint32_t br = readCharBuffer(head, len);
-        std::cout << "Read header from " << fileName << std::endl;
-    }
-
-    bool readNextMessage() {
+    template <class T>
+    T readNextMessage() {
         // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
-            return false;
+            return T();
         }
 
         // Read in the next message's size
@@ -131,33 +77,86 @@ protected:
             bytes = readCharBuffer(buffer, currentMessageSize);
         } catch (std::exception& read_exception) {
             std::cout << read_exception.what() << std::endl;
-            return false;
+            return T();
         }
 
         // If we have actually read some bytes, treat them like a message
+        T currentMessage;
+
         if (bytes) {
-            // Create a new message
-            portals::Message<T> currentMessage(0);
-            *currentMessage.get() = T();
             // Parse into the message
-            currentMessage.get()->ParseFromString(std::string(buffer, bytes));
-
-            // This is for debugging until the tool is back again
-            std::cout << "\nCurrent Message:\n" <<
-                currentMessage.get()->DebugString();
-
-            // Provide the message on the output
-            output.setMessage(currentMessage);
-            return true;
+            currentMessage.ParseFromString(std::string(buffer, bytes));
+            return currentMessage;
         }
 
         // We read zero bytes at the end of a file w/o hitting feof
         std::cout << "End of log file " << fileName << std::endl;
-        return false;
+        return currentMessage;
     }
 
+    // Basic file control
+    void openFile() throw (file_exception);
+    void closeFile();
+
+protected:
+    // Inheriting classes still need to implement this
+    virtual void run_() = 0;
+
+    uint32_t readCharBuffer(char* buffer, uint32_t size)
+        const throw (file_read_exception);
+
+    // Keeps track of whether the file is open/closed
+    bool fileOpen;
+    // Pointer to the file
+    FILE* file;
+    // Stores the full path of the file
+    std::string fileName;
+    std::string typeName;
     // Keeps track of the sizes of all the reads we've done
     std::vector<uint32_t> messageSizes;
+};
+
+// Template Class
+template<class T>
+class UnlogModule : public UnlogBase
+{
+public:
+    // Takes a file path to parse from
+    UnlogModule(std::string path) : UnlogBase(path, T().GetTypeName()),
+                                    output(base()) {}
+
+    // Where the output will be provided
+    portals::OutPortal<T> output;
+
+protected:
+    // Implements the Module run_ method
+    void run_()
+    {
+        // Makes sure the file is available to read
+        if (!fileOpen)
+        {
+            openFile();
+            readHeader();
+        }
+
+        // Reads the next message from the file and puts it on
+        // the OutPortal
+        portals::Message<T> msg(0);
+        *msg.get() = readNextMessage<T>();
+
+        // This is for debugging until the tool is back again
+        std::cout << "\nCurrent Message from " << fileName << ":\n" <<
+            msg.get()->DebugString();
+
+        output.setMessage(msg);
+    }
+
+    // Reads in the header; called when the file is first opened
+    void readHeader()
+    {
+        readNextMessage<Header>();
+    }
+
 };
 
 }

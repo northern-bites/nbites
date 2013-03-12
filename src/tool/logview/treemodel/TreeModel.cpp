@@ -20,9 +20,8 @@
 #include <iostream>
 #include <assert.h>
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace viewer {
 
 using namespace std;
 
@@ -156,6 +155,5 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-}
 }
 }

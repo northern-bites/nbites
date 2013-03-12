@@ -12,9 +12,8 @@
 
 #include "TreeModel.h"
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace viewer {
 
 class TreeModel::Node {
 
@@ -48,7 +47,6 @@ protected:
     const Node* parent;
 };
 
-}
 }
 }
 #endif /* Node_H_ */

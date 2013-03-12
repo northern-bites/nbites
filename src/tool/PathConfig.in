@@ -1,0 +1,5 @@
+/* -*- C++ -*- Tell editors this is a C++ file (despite it's .in extension) */
+
+#pragma once
+
+#define NBITES_DIR "@NBITES_DIR@"

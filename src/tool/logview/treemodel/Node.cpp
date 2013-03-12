@@ -8,9 +8,8 @@
 #include "Node.h"
 #include <assert.h>
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace viewer {
 
 typedef TreeModel::Node Node;
 
@@ -61,6 +60,5 @@ int Node::indexOfChild(const Node* child) const {
     return children.indexOf(const_cast<Node*>(child));
 }
 
-}
 }
 }

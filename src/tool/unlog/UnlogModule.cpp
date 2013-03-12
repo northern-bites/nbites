@@ -5,8 +5,9 @@ namespace tool {
 namespace unlog {
 
 // Simple constructor, stores the file name
-UnlogBase::UnlogBase(std::string path) : Module(),
-                                         fileName(path)
+UnlogBase::UnlogBase(std::string path, std::string type) : Module(),
+                                                           fileName(path),
+                                                           typeName(type)
 {}
 
 // Closes the file as it destructs

@@ -89,40 +89,7 @@ protected:
         writeCharBuffer(reinterpret_cast<const char *>(&value), sizeof(value));
     }
 
-    // Keeps track of all writes that haven't finished yet
-    std::list<Write> ongoing;
-    // Has the file been opened?
-    bool fileOpen;
-    // The file that we've opened/are writing to
-    int fileDescriptor;
-    // The full path of the file
-    std::string fileName;
-    // Stores the maximum number of writes that should happen concurrently
-    unsigned int maxWrites;
-    // Stores how much we've written to this file to avoid huge files
-    unsigned int bytesWritten;
-};
-
-// Template Class
-template<class T>
-class LogModule : public LogBase {
-public:
-    /*
-     * @brief Takes an OutPortal and wires it to this new module so that
-     *        we can log its output.
-     */
-    LogModule(portals::OutPortal<T>* out, std::string name) : LogBase(name)
-    {
-        input.wireTo(out);
-    }
-
-    /*
-     * @brief Serializes a message and writes the message's size and
-     *        serialization to the file. Note: relies on protobuf methods
-     *        like SerializeToString. If you ever want this class to log
-     *        something that is not a protobuf, make sure it has these
-     *        methods and can pretend to be one, or specialize this template.
-     */
+    template<class T>
     void writeMessage(T msg)
     {
         // Don't enqueue this write if we've hit the upper limit
@@ -185,11 +152,43 @@ public:
 #endif
     }
 
-    // Simply writes the header defined at the beginning of this file
+    // Keeps track of all writes that haven't finished yet
+    std::list<Write> ongoing;
+    // Has the file been opened?
+    bool fileOpen;
+    // The file that we've opened/are writing to
+    int fileDescriptor;
+    // The full path of the file
+    std::string fileName;
+    // Stores the maximum number of writes that should happen concurrently
+    unsigned int maxWrites;
+    // Stores how much we've written to this file to avoid huge files
+    unsigned int bytesWritten;
+};
+
+// Template Class
+template<class T>
+class LogModule : public LogBase {
+public:
+    /*
+     * @brief Takes an OutPortal and wires it to this new module so that
+     *        we can log its output.
+     */
+    LogModule(portals::OutPortal<T>* out, std::string name) : LogBase(name)
+    {
+        input.wireTo(out);
+    }
+
+    // Writes out a header protobuf
     void writeHeader()
     {
+        Header head;
+        head.set_name(input.message().GetTypeName());
+        head.set_version(CURRENT_VERSION);
+        head.set_timestamp(42);
+        writeMessage<Header>(head);
+
         std::cout << "Writing header to " << fileName << std::endl;
-        writeCharBuffer(HEADER.data(), HEADER.length());
     }
 
 protected:
@@ -213,7 +212,7 @@ protected:
         checkWrites();
 
         // Start a new write for the current message
-        writeMessage(input.message());
+        writeMessage<T>(input.message());
     }
 
     portals::InPortal<T> input;

@@ -4,7 +4,7 @@ namespace man {
 namespace log {
 
 LogBase::LogBase(std::string name) : fileOpen(false),
-                                     fileName(PATH+name),
+                                     fileName(PATH+name+LOG_EXTENSION),
                                      maxWrites(DEFAULT_MAX_WRITES),
                                      bytesWritten(0)
 {
