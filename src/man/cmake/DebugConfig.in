@@ -17,3 +17,10 @@
 #else
 #   undef DEBUG_THREADS
 #endif
+
+#define DEBUG_LOGGING_${DEBUG_LOGGING}
+#ifdef  DEBUG_LOGGING_ON
+#   define DEBUG_LOGGING
+#else
+#   undef DEBUG_LOGGING
+#endif

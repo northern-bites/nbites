@@ -28,6 +28,7 @@
 
 #include "RoboGrams.h"
 #include "LogDefinitions.h"
+#include "DebugConfig.h"
 #include <aio.h>
 #include <errno.h>
 #include <stdint.h>
@@ -43,6 +44,10 @@ static const std::string PATH = "/home/nao/nbites/log/";
 // Flags needed to open files appropriately
 static const int NEW_FLAG = O_WRONLY | O_CREAT | O_TRUNC | O_APPEND;
 static const int ALL_PERMISSIONS = S_IRWXU | S_IRWXG | S_IRWXO;
+
+// Default value for write list size; can be reset--should be small
+// for large messages that could take up a lot of memory!
+static const int DEFAULT_MAX_WRITES = 10;
 
 /*
  * This struct is used to hold together an aiocb (control block) and the
@@ -63,6 +68,10 @@ public:
     // The name is used as the filename
     LogBase(std::string name);
     virtual ~LogBase();
+
+    // For controlling the max size of write list
+    int getMaxWrites() { return maxWrites; }
+    void setMaxWrites(int max) { maxWrites = max; }
 
 protected:
     // Note that inheriting classes still need to implement this!
@@ -88,6 +97,8 @@ protected:
     int fileDescriptor;
     // The full path of the file
     std::string fileName;
+    // Stores the maximum number of writes that should happen concurrently
+    unsigned int maxWrites;
 };
 
 // Template Class
@@ -112,6 +123,17 @@ public:
      */
     void writeMessage(T msg)
     {
+        // Don't enqueue this write if we've hit the upper limit
+        if (ongoing.size() == maxWrites)
+        {
+#ifdef DEBUG_LOGGING
+        std::cout << "Dropped a message because there are already "
+                  << maxWrites << " ongoing writes to " << fileName
+                  << std::endl;
+#endif
+        return;
+        }
+
         // Add a new write to the list of current writes
         ongoing.push_back(Write());
         Write* current = &ongoing.back();
@@ -139,6 +161,11 @@ public:
                      << std::endl;
         }
 
+#ifdef DEBUG_LOGGING
+        std::cout << "Enqueued a message for writing. There are "
+                  << ongoing.size() << " ongoing writes to " << fileName
+                  << std::endl;
+#endif
     }
 
     // Simply writes the header defined at the beginning of this file

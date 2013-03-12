@@ -20,3 +20,9 @@ option(
   "Toggle threads debug mode."
   OFF
 )
+
+option(
+  DEBUG_LOGGING
+  "Toggle logging debug mode."
+  OFF
+)
