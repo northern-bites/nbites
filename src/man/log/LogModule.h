@@ -111,18 +111,19 @@ protected:
         // Serialize directly into the Write's buffer to avoid a copy
         msg.SerializeToString(&(current->buffer));
 
-        bytesWritten += current->buffer.length();
-
         // Don't write if the file has gotten too huge
         if (bytesWritten >= FILE_MAX_SIZE)
         {
 #ifdef DEBUG_LOGGING
             std::cout << "Dropped a message because the file "
-                      << fileName << " has exceeded the max file size."
+                      << fileName << " has reached " << bytesWritten << " bytes "
                       << std::endl;
 #endif
+            ongoing.pop_back();
             return;
         }
+
+        bytesWritten += current->buffer.length();
 
         // Write ths size of the message that will be written
         writeValue<uint32_t>(current->buffer.length());
@@ -146,8 +147,7 @@ protected:
         }
 
 #ifdef DEBUG_LOGGING
-        std::cout << "Enqueued a message for writing. There are "
-                  << ongoing.size() << " ongoing writes to " << fileName
+        std::cout << "Enqueued a message for writing."
                   << std::endl;
 #endif
     }

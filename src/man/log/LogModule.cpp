@@ -50,18 +50,18 @@ void LogBase::writeCharBuffer(const char* buffer, uint32_t size)
         return;
     }
 
-    bytesWritten += size;
-
     // Don't write if the file has gotten too huge
     if (bytesWritten >= FILE_MAX_SIZE)
     {
 #ifdef DEBUG_LOGGING
         std::cout << "Dropped a char buffer because the file "
-                  << fileName << " has exceeded the max file size."
+                  << fileName << " has reached " << bytesWritten << " bytes "
                   << std::endl;
 #endif
         return;
     }
+
+    if (bytesWritten < FILE_MAX_SIZE) bytesWritten += size;
 
     // Add a new Write struct
     ongoing.push_back(Write());
@@ -90,8 +90,7 @@ void LogBase::writeCharBuffer(const char* buffer, uint32_t size)
     }
 
 #ifdef DEBUG_LOGGING
-        std::cout << "Enqueued a char buffer for writing. There are "
-                  << ongoing.size() << " ongoing writes to " << fileName
+        std::cout << "Enqueued a char buffer for writing."
                   << std::endl;
 #endif
 }
@@ -112,12 +111,6 @@ bool finished(Write& write)
         std::cout<< "AIO write failed with error " << strerror(errno)
                  << std::endl;
     }
-
-#ifdef DEBUG_LOGGING
-    std::cout << "A write finished successfully."
-                  << std::endl;
-#endif
-
     // And let the list know it's done
     return true;
 }
@@ -125,6 +118,12 @@ bool finished(Write& write)
 // Removes all finished writes from the list of ongoing writes
 void LogBase::checkWrites()
 {
+#ifdef DEBUG_LOGGING
+        std::cout << "There are currently "
+                  << ongoing.size() << " ongoing writes to " << fileName
+                  << std::endl;
+#endif
+
     ongoing.remove_if(finished);
 }
 
