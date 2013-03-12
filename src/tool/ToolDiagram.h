@@ -42,7 +42,7 @@ public:
         {
             if(test.GetTypeName() == (*i)->getType())
             {
-                input.wireTo(dynamic_cast<unlog::UnlogModule<T> >(*i));
+                input.wireTo(dynamic_cast<unlog::UnlogModule<T> >(*i).output);
             }
         }
     }
