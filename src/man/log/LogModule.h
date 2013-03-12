@@ -99,6 +99,8 @@ protected:
     std::string fileName;
     // Stores the maximum number of writes that should happen concurrently
     unsigned int maxWrites;
+    // Stores how much we've written to this file to avoid huge files
+    unsigned int bytesWritten;
 };
 
 // Template Class
@@ -134,12 +136,27 @@ public:
         return;
         }
 
+
         // Add a new write to the list of current writes
         ongoing.push_back(Write());
         Write* current = &ongoing.back();
 
         // Serialize directly into the Write's buffer to avoid a copy
         msg.SerializeToString(&(current->buffer));
+
+        bytesWritten += current->buffer.length();
+
+        // Don't write if the file has gotten too huge
+        if (bytesWritten >= FILE_MAX_SIZE)
+        {
+#ifdef DEBUG_LOGGING
+            std::cout << "Dropped a message because the file "
+                      << fileName << " has exceeded the max file size."
+                      << std::endl;
+#endif
+            return;
+        }
+
         // Write ths size of the message that will be written
         writeValue<uint32_t>(current->buffer.length());
 

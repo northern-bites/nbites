@@ -5,7 +5,8 @@ namespace log {
 
 LogBase::LogBase(std::string name) : fileOpen(false),
                                      fileName(PATH+name),
-                                     maxWrites(DEFAULT_MAX_WRITES)
+                                     maxWrites(DEFAULT_MAX_WRITES),
+                                     bytesWritten(0)
 {
 }
 
@@ -44,6 +45,19 @@ void LogBase::writeCharBuffer(const char* buffer, uint32_t size)
 #ifdef DEBUG_LOGGING
         std::cout << "Dropped a char buffer because there are already "
                   << maxWrites << " ongoing writes to " << fileName
+                  << std::endl;
+#endif
+        return;
+    }
+
+    bytesWritten += size;
+
+    // Don't write if the file has gotten too huge
+    if (bytesWritten >= FILE_MAX_SIZE)
+    {
+#ifdef DEBUG_LOGGING
+        std::cout << "Dropped a char buffer because the file "
+                  << fileName << " has exceeded the max file size."
                   << std::endl;
 #endif
         return;

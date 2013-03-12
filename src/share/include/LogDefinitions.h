@@ -8,6 +8,9 @@ static const std::string VERSION = "2.0";
 // Header. This could be updated with more useful information.
 static const std::string HEADER = "NORTHERN BITES LOG FILE VERSION " + VERSION;
 
+// 1 GB. We don't want to write files of absurd sizes.
+static const unsigned int FILE_MAX_SIZE = 1073741824;
+
 // IO Exceptions
 class read_exception: public std::exception {
 
