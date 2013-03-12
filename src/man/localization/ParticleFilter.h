@@ -39,8 +39,7 @@ namespace man
     {
         FIELD_GREEN_HEIGHT,
         FIELD_GREEN_WIDTH,
-        // ***TEMP*** change num of particles for debugging
-        200,
+        250,
         0.2f,
         0.05f
     };
@@ -57,8 +56,8 @@ namespace man
     {
 
     public:
-        ParticleFilter(boost::shared_ptr<MotionSystem> motionModel_,
-                       boost::shared_ptr<VisionSystem> sensorModel_,
+        ParticleFilter(boost::shared_ptr<MotionSystem> motionSystem_,
+                       boost::shared_ptr<VisionSystem> visionSystem_,
                        ParticleFilterParams parameters = DEFAULT_PARAMS);
         ~ParticleFilter();
 
@@ -106,18 +105,13 @@ namespace man
          *        to the normalized weights of the particles.
          */
         void resample();
-
         void updateEstimate();
 
         ParticleFilterParams parameters;
-
         messages::RobotLocation poseEstimate;
-
-        std::vector<float> standardDeviations;
-
+        std::vector<float> estimateUncertainty;
         ParticleSet particles;
 
-        // EJ ----------------------------------------------
         boost::shared_ptr<MotionSystem> motionSystem;
         boost::shared_ptr<VisionSystem> visionSystem;
 

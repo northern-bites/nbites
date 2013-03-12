@@ -19,6 +19,7 @@ namespace man
     class MotionSystem
     {
     public:
+        // add the coord and head range to the constructor!
         MotionSystem();
         ~MotionSystem();
 

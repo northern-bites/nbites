@@ -20,8 +20,6 @@ namespace man
     namespace localization
     {
 
-        // There must be a point where it's better to have one over the other
-
     /**
      * @class Vision System
      * @brief Responsible for updating particles based on Visual Observations
@@ -39,18 +37,10 @@ namespace man
 
         float scoreFromVisDetect(const Particle& particle,
                                  const messages::PVisualDetection& obsv);
-
-        RelVector getRelativeVector(const Particle& particle,
-                                    float fieldX, float fieldY);
-
         void setUpdated(bool val);
 
+        // Random number generator to be used throughout the system
         boost::mt19937 rng;
-
-    private:
-        float lastVisionTimestamp;
-        bool updated;
-
      };
     } // namespace localization
 } // namespace man

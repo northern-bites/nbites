@@ -43,9 +43,9 @@ namespace man
             noisyMotion.set_timestamp((google::protobuf::int64) timestamp);
 
             //Determine how much noise to add (10%)
-            float xVariance = (float) std::abs(odometry.x() * .1);
-            float yVariance = (float) std::abs(odometry.y() * .1);
-            float hVariance = (float) std::abs(odometry.h() * .1);
+            float xVariance = (float) std::abs(odometry.x() * .5);
+            float yVariance = (float) std::abs(odometry.y() * .5);
+            float hVariance = (float) std::abs(odometry.h() * .5);
 
             boost::uniform_real<float> xVarRange(odometry.x() - xVariance, odometry.x() + xVariance);
             boost::uniform_real<float> yVarRange(odometry.y() - yVariance, odometry.y() + yVariance);
@@ -116,8 +116,8 @@ namespace man
                                      boost::normal_distribution<float> > noisyBear(rng, obsvBearDistrib);
 
 
-            visualDetection.set_distance(distanceGen());
-            visualDetection.set_bearing(bearingGen());
+            visualDetection.set_distance(noisyDist());
+            visualDetection.set_bearing(noisyBear());
 
             // FOR DEBUG ELIMINATE NOISE ***TEMP***
             // visualDetection.set_distance(obsvDist);
@@ -175,7 +175,12 @@ namespace man
 
         void FakeLocInputModule::run_()
         {
-            std::cout << "\n--------------------------------------------------\n";
+            // increment timestamp, set negative if gen'd all frames so we terminate
+            timestamp++;
+            if (timestamp > frames)
+                timestamp = -1;
+
+            // std::cout << "\n--------------------------------------------------\n";
             // messages::RobotLocation stupidOdometry;
             // stupidOdometry.set_x(1);
             // stupidOdometry.set_y(2);
@@ -211,16 +216,12 @@ namespace man
             visionMessage.get()->CopyFrom(noisyVision);
             fVisionOutput.setMessage(visionMessage);
 
-            // FOR DEBUGGING PARTICLE FILTER ***TEMP***
-            std::cout << "\nJust created fake information with real coordinates:\n"
-                      << "Real X:\t" << currentLocation.x()
-                      << "\tReal Y:\t" << currentLocation.y()
-                      << "\tReal H:\t" << currentLocation.h() << "\n\n";
+            // std::cout << "\nJust created fake information with real coordinates:\n"
+            //           << "Real X:\t" << currentLocation.x()
+            //           << "\tReal Y:\t" << currentLocation.y()
+            //           << "\tReal H:\t" << currentLocation.h() << "\n\n";
 
-            // increment timestamp, set negative if gen'd all frames so we terminate
-            timestamp++;
-            if (timestamp > frames)
-                timestamp = -1;
+
         }
 
 

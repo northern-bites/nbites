@@ -28,32 +28,22 @@ namespace man
         motionInput.latch();
         visionInput.latch();
 
-        messages::RobotLocation jokeOutput;
-        jokeOutput.set_x(1);
-        jokeOutput.set_y(2);
-        jokeOutput.set_h(3);
-
-        std::cout << "Prepare to update filter \n";
+        //std::cout << "Prepare to update filter \n";
         particleFilter->update(motionInput.message(), visionInput.message());
-        std::cout << "Updated filter \n";
+        //std::cout << "Updated filter \n";
         portals::Message<messages::RobotLocation> locMessage(0);
         *locMessage.get() = messages::RobotLocation();
 
         messages::RobotLocation l = particleFilter->getCurrentEstimate();
-        std::cout << "X estimate:\t " << l.x() << "\nY estimate:\t " << l.y()
-                  << "\nH estimate:\t " << l.h() << "\n\n";
+        // std::cout << "X estimate:\t " << l.x() << "\nY estimate:\t " << l.y()
+        //           << "\nH estimate:\t " << l.h() << "\n\n";
 
         locMessage.get()->CopyFrom(particleFilter->getCurrentEstimate());
-//        locMessage.get()->CopyFrom(jokeOutput);
         output.setMessage(locMessage);
-
-
-        // output.setMessage(const particleFilter.getCurrentEstimate());
     }
 
     void LocalizationModule::run_()
     {
-        std::cout << "Localization run called\n";
         update();
     }
 

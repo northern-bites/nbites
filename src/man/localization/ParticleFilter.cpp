@@ -4,13 +4,13 @@ namespace man
 {
     namespace localization
     {
-    ParticleFilter::ParticleFilter(boost::shared_ptr<MotionSystem> motionModel_,
-                                   boost::shared_ptr<VisionSystem> sensorModel_,
+    ParticleFilter::ParticleFilter(boost::shared_ptr<MotionSystem> motionSystem_,
+                                   boost::shared_ptr<VisionSystem> visionSystem_,
                                    ParticleFilterParams params)
-        : parameters(params), standardDeviations(3, 0.0f)
+        : parameters(params), estimateUncertainty(3, 0.0f)
     {
-        motionSystem = motionModel_;
-        visionSystem = sensorModel_;
+        motionSystem = motionSystem_;
+        visionSystem = visionSystem_;
 
         boost::mt19937 rng;
         rng.seed(std::time(0));
@@ -41,6 +41,9 @@ namespace man
             Particle p(randomLocation, weight);
             particles.push_back(p);
         }
+
+        lastMotionTimestamp = 0;
+        lastVisionTimestamp = 0;
     }
 
     ParticleFilter::~ParticleFilter()
@@ -49,26 +52,27 @@ namespace man
     void ParticleFilter::update(messages::Motion motionInput,
                                 messages::PVisionField visionInput)
     {
-        // float deltaX = motionInput.odometry().x();
-        // float deltaY = motionInput.odometry().y();
-        // float deltaH = motionInput.odometry().h();
-
-        // std::cout<< deltaX << "\t" << deltaY << "\t" << deltaH << "\n";
-
-        // Update the Motion Model
+        // Update the Motion Model (Convention: protos only have info if timestamp >0)
         if (motionInput.timestamp() > lastMotionTimestamp)
         {
-            std::cout<< motionInput.timestamp() << "\n";
             lastMotionTimestamp = (float) motionInput.timestamp();
             motionSystem->update(particles, motionInput.odometry());
         }
+        else
+            std::cout<<"REPEAT OBSERVATION!!!!!!!!!\n\n\n\n\n";
 
-        // Update the Vision Model ***TEMP***
-        if (visionInput.timestamp() > lastVisionTimestamp && visionInput.timestamp() < 319)
+        // Update the Vision Model
+        if (visionInput.timestamp() > lastVisionTimestamp)
         {
             lastVisionTimestamp = (float) visionInput.timestamp();
-            // If updatedVision is true then we observed things
+            // set updated vision to determine if resampling necessary
             updatedVision = visionSystem->update(particles, visionInput);
+        }
+        else
+        {
+            std::cout<<"REPEAT OBSERVATION!!!!!!!!!\n\n\n\n\n";
+            std::cout<<"(x,y,h)\t("<< getXEst() << " , " << getYEst()
+                     <<" , " <<getHEst()<< " )\n\n\n";
         }
 
         // Resample if vision update
@@ -81,6 +85,14 @@ namespace man
         // Update filters estimate
         updateEstimate();
 
+        // std::cout<<"Time:\t" << motionInput.timestamp() <<"\n";
+        // std::cout<<"(x,y,h)\t("<< getXEst() << " , " << getYEst()
+        //          <<" , " <<getHEst()<< " )\n\n";
+
+        /**
+         * The following is to stop particles going off field
+         * Commented out until known if necessary (K.I.S.S.)
+         */
         // // Check if the mean has gone out of bounds. If so,
         // // reset to the closest point in bounds with appropriate
         // // uncertainty.
@@ -121,11 +133,14 @@ namespace man
         //               << ", " << poseEstimate.y() << ", "
         //               << poseEstimate.h() << ")." << std::endl;
         // }
+
     }
 
+    /**
+     *@brief  Updates the filters estimate of the robots position
+     */
     void ParticleFilter::updateEstimate()
     {
-        // Update estimates.
         float sumX = 0;
         float sumY = 0;
         float sumH = 0;
@@ -147,9 +162,13 @@ namespace man
         poseEstimate.set_y(sumY/parameters.numParticles);
         poseEstimate.set_h(sumH/parameters.numParticles);
 
-        standardDeviations = findParticleSD();
+        estimateUncertainty = findParticleSD();
     }
 
+    /**
+     * @brief  Return the particle which best predicted
+     *         the most recent observations
+     */
     Particle ParticleFilter::getBestParticle()
     {
         // Sort the particles in ascending order.
@@ -159,11 +178,10 @@ namespace man
         return particles[particles.size()-1];
     }
 
-    template <class T>
-    T square(T x) {
-        return x*x;
-    }
-
+    /**
+     * @brief  Calculate the standard deviation of the particle swarm
+     *         NOTE: Best measure of a particle filters uncertainty
+     */
     std::vector<float> ParticleFilter::findParticleSD()
     {
         man::localization::ParticleSet particles = this->getParticles();
@@ -194,9 +212,9 @@ namespace man
         // the ith particle.
         for(iter = particles.begin(); iter != particles.end(); ++iter)
         {
-            sd[0] += square((*iter).getLocation().x() - mean_x);
-            sd[1] += square((*iter).getLocation().y() - mean_y);
-            sd[2] += square((*iter).getLocation().h() - mean_h);
+            sd[0] += NBMath::square((*iter).getLocation().x() - mean_x);
+            sd[1] += NBMath::square((*iter).getLocation().y() - mean_y);
+            sd[2] += NBMath::square((*iter).getLocation().h() - mean_h);
         }
 
         sd[0] /= parameters.numParticles;
@@ -270,8 +288,6 @@ namespace man
             float pY = sampleNormal(y, params.sigma_x);
             float pH = sampleNormal(h, params.sigma_h);
 
-            std::cout << "Initial Particle H:\t" << pH << "\n\n";
-
             Particle p(pX, pY, pH, weight);
 
             particles.push_back(p);
@@ -303,9 +319,7 @@ namespace man
         poseEstimate.set_y(y);
         poseEstimate.set_h(h);
 
-
        particles.clear();
-
        float weight = 1.0f/parameters.numParticles;
 
        for(int i = 0; i < (parameters.numParticles / 2); ++i)
@@ -380,38 +394,12 @@ namespace man
         }
     }
 
-
-
+    /**
+     * @brief  Resample the particles based on vision observations
+     *         NOTE: Assume given a swarm with normalized weights
+     */
     void ParticleFilter::resample()
     {
-        // // Normalize the particle weights, and find the average weight.
-        // float sum = 0.0f;
-        // ParticleIt iter;
-        // for(iter = particles.begin(); iter != particles.end(); ++iter)
-        // {
-        //     // DEBUG RESAMPLE ***TEMP***
-        //     // std::cout << "Particle X:\t" << (*iter).getLocation().x()
-        //     //           << "\tParticle Y:\t" << (*iter).getLocation().y()
-        //     //           << "\tParticle H:\t" << (*iter).getLocation().h()
-        //     //           << "\nParticle Weight:\t" << (*iter).getWeight() << "\n";
-
-        //     sum += (*iter).getWeight();
-        // }
-
-        // if(sum == 0)
-        // {
-        //     std::cout << "\n\n\nZERO SUM!\n\n\n" << std::endl;
-        //     return;
-        // }
-
-        // float averageWeight = sum/(((float)parameters.numParticles)*1.0f);
-
-        // for(iter = particles.begin(); iter != particles.end(); ++iter)
-        // {
-        //     float weight = (*iter).getWeight();
-        //     (*iter).setWeight(weight/averageWeight);
-        // }
-
         // Map each normalized weight to the corresponding particle.
         std::map<float, Particle> cdf;
 
@@ -441,25 +429,23 @@ namespace man
 
         // FUN IDEA: Create a particle that equals the belief
 
-        // ***TEMP***
-        newParticles.clear();
-        Particle best;
-        float bestWeight =0.f;
-        for(iter = particles.begin(); iter != particles.end(); ++iter)
-        {
-            Particle particle = (*iter);
+        // ***TEMP*** This is used for testing, to only select the BEST particle
+        // newParticles.clear();
+        // Particle best;
+        // float bestWeight =0.f;
+        // for(iter = particles.begin(); iter != particles.end(); ++iter)
+        // {
+        //     Particle particle = (*iter);
 
-            if(particle.getWeight() > bestWeight)
-            {
-                best = particle;
-                bestWeight = particle.getWeight();
-            }
-        }
-        for (int i=0; i<parameters.numParticles; i++)
-            newParticles.push_back(best);
+        //     if(particle.getWeight() > bestWeight)
+        //     {
+        //         best = particle;
+        //         bestWeight = particle.getWeight();
+        //     }
+        // }
+        // for (int i=0; i<parameters.numParticles; i++)
+        //     newParticles.push_back(best);
         // ***TEMP*** always choose best particle
-
-
 
         particles = newParticles;
     }

@@ -6,12 +6,12 @@ namespace man
     {
 
         VisionSystem::VisionSystem() {
-            updated = false;
         }
         VisionSystem::~VisionSystem(){}
 
         /**
          * Updates the particle set according to the observations from Vision
+         * Assume that we are given NEW information (ie we checked for repeat message elsewhere)
          *
          * @return if observations were made
          */
@@ -20,86 +20,80 @@ namespace man
         {
             const float TINY_WEIGHT = .00001f;
 
-            if (observations.timestamp() > lastVisionTimestamp)
+
+            ParticleIt iter;
+            // Record totalWeight for normalization
+            float totalWeight = 0.0f;
+            bool madeObsv = false;
+
+            float times = 0;
+            for(iter = particles.begin(); iter != particles.end(); iter++)
             {
-                ParticleIt iter;
-                // Record totalWeight for normalization
-                float totalWeight = 0.0f;
-                bool madeObsv = false;
+                Particle* particle = &(*iter);
+                float newParticleError = 0.f;
 
-                std::cout << "Update the particle Weights:\n";
-                for(iter = particles.begin(); iter != particles.end(); iter++)
+                for (int i=0; i<observations.visual_corner_size(); i++)
                 {
-                    Particle* particle = &(*iter);
-                    float newParticleError = 0.f;
+                    madeObsv = true;
 
-                    for (int i=0; i<observations.visual_corner_size(); i++)
-                    {
-                        madeObsv = true;
-
-                        messages::PVisualCorner visualCorner;
-                        visualCorner.CopyFrom(observations.visual_corner(i));
-                        float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
-                        newParticleError+= newError;
-                        // std::cout << "Best Weight from the corner\t" << newWeight << "\n\n";
-                        //float newWeight = 1.0f; //scoreFromLandmark(**particle, visualCorner);
-                        // if (newWeight < TINY_WEIGHT)
-                        //     newWeight = TINY_WEIGHT;
-                    }
-
-                    if (observations.has_goal_post_l()){
-                        madeObsv = true;
-                        // float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
-                        // newParticleError+= newError;
-                    }
-
-                    if (observations.has_goal_post_r()){
-                        madeObsv = true;
-                        // float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
-                        // newParticleError+= newError;
-                    }
-
-                    if (observations.has_visual_cross()){
-                        madeObsv = true;
-                        // float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
-                        // newParticleError+= newError;
-                    }
-
-                    // We never updated the new particle weight, so no observations been made
-                    if(!madeObsv)
-                    {
-                        std::cout << "In the Vision System, given a message with no observations...\n";
-                        return false;
-                    }
-                    else
-                    {
-                        // Set the particle weight to 1/predictionError
-                        particle->setWeight(1/newParticleError);
-                        totalWeight += particle->getWeight();
-                    }
+                    messages::PVisualCorner visualCorner;
+                    visualCorner.CopyFrom(observations.visual_corner(i));
+                    float newError = scoreFromVisDetect(*particle,visualCorner.visual_detection());
+                    newParticleError+= newError;
+                    //float newWeight = 1.0f; //scoreFromLandmark(**particle, visualCorner);
+                    // if (newWeight < TINY_WEIGHT)
+                    //     newWeight = TINY_WEIGHT;
                 }
 
-                std::cout << "Particle Weights:";
-                // normalize the particle weights
-                for(iter = particles.begin(); iter != particles.end(); iter++)
-                {
-                    Particle* particle = &(*iter);
-                    particle->normalizeWeight(totalWeight);
-                    std::cout << "\t" << particle->getWeight();
-                }
-                std::cout << "\n\n";
+                // if (observations.has_goal_post_l()){
+                //     madeObsv = true;
+                //     float newError = scoreFromVisDetect(*particle,
+                //                                         observations.goal_post_l().visual_detection());
+                //     newParticleError+= newError;
+                // }
 
-                // We've updated particles with vision, so tell PF to resample
-                setUpdated(true);
+                // if (observations.has_goal_post_r()){
+                //     madeObsv = true;
+                //     float newError = scoreFromVisDetect(*particle,
+                //                                         observations.goal_post_r().visual_detection());
+                //     newParticleError+= newError;
+                // }
+
+                // if (observations.has_visual_cross()){
+                //     madeObsv = true;
+                //     float newError = scoreFromVisDetect(*particle,
+                //                                         observations.visual_cross());
+                //     newParticleError+= newError;
+                // }
+
+                // We never updated the new particle weight, so no observations been made
+                if(!madeObsv)
+                {
+                    std::cout << "In the Vision System, given a message with no observations...\n";
+                    return false;
+                }
+                else
+                {
+                    // Set the particle weight to 1/predictionError (no golf scores...)
+                    particle->setWeight(1/newParticleError);
+                    totalWeight += particle->getWeight();
+                }
             }
-            std::cout << "UPDATED\n\n";
 
+            // std::cout << "Particle Weights:";
+            // normalize the particle weights
+            for(iter = particles.begin(); iter != particles.end(); iter++)
+            {
+                Particle* particle = &(*iter);
+                particle->normalizeWeight(totalWeight);
+                // std::cout << "\t" << particle->getWeight();
+            }
+            // std::cout << "\n\n";
+
+            //std::cout << "UPDATED\n\n";
+
+            // Succesfully updated particles with Vision!
             return true;
-        }
-
-        void VisionSystem::setUpdated(bool val)
-        {
-            updated = val;
         }
 
         /**
@@ -111,19 +105,19 @@ namespace man
                                                const messages::PVisualDetection& obsv)
         {
             // DEBUG VIS DETECT
-            // std::cout << "Scoring a visual detection and a particle ---------- \n";
+            //std::cout << "Scoring a visual detection and a particle ---------- \n";
 
             float bestScore = 100;
 
             for (int i=0; i<obsv.concrete_coords_size(); i++)
             {
-                std::cout << "Observation (r,b):\t(" << obsv.distance()
-                          << " , " << obsv.bearing() <<")\n";
-                std::cout << "Concrete Obsv(x,y):\t(" << obsv.concrete_coords(i).x() << " , "
-                           << obsv.concrete_coords(i).y() << ")\n";
-                std::cout << "Particle (x,y,h):\t(" << particle.getLocation().x() << " , "
-                          << particle.getLocation().y() << " , "
-                          << particle.getLocation().h() <<")\n";
+                // std::cout << "Observation (r,b):\t(" << obsv.distance()
+                //           << " , " << obsv.bearing() <<")\n";
+                // std::cout << "Concrete Obsv(x,y):\t(" << obsv.concrete_coords(i).x() << " , "
+                //            << obsv.concrete_coords(i).y() << ")\n";
+                // std::cout << "Particle (x,y,h):\t(" << particle.getLocation().x() << " , "
+                //           << particle.getLocation().y() << " , "
+                //           << particle.getLocation().h() <<")\n";
                 const messages::Point& fieldPoint = obsv.concrete_coords(i);
 
                 // Convert from obsv in polar to rep in cartesian
@@ -147,8 +141,8 @@ namespace man
                 // float calcX = particle.getLocation().x() + worldFrameRelX;
                 // float calcY = particle.getLocation().y() + worldFrameRelY;
 
-                std::cout << "Calculated FieldX:\t" << calcX << "\tFieldY:\t" << calcY << "\n";
-                std::cout << "Actual FieldX:    \t" << fieldPoint.x() << "\tFieldY:\t" << fieldPoint.y() << "\n";
+                // std::cout << "Calculated FieldX:\t" << calcX << "\tFieldY:\t" << calcY << "\n";
+                // std::cout << "Actual FieldX:    \t" << fieldPoint.x() << "\tFieldY:\t" << fieldPoint.y() << "\n";
 
                 // Calc distance between calculated coordinates and the concrete coords
                 float dist = std::sqrt(NBMath::square(calcX - fieldPoint.x())
@@ -188,25 +182,9 @@ namespace man
                     bestScore = score;
 
             }
-            std::cout << "Particle Score:\t" << bestScore << "\n";
+            //std::cout <<"Scored a particle\n";
             return bestScore;
 
         }
-
-        RelVector VisionSystem::getRelativeVector(const Particle& particle,
-                                    float fieldX, float fieldY)
-        {
-            float relX = fieldX - particle.getLocation().x();
-            float relY = fieldY - particle.getLocation().y();
-
-            float magnitude = std::sqrt(relX*relX + relY*relY);
-
-            // Know that the heading + bearing = angle from Field Origing (call it Theta)
-            // So calculate Theta using arctan(relX/relY) and then subtract the heading in 1 line
-            float bearing = NBMath::subPIAngle(NBMath::safe_atan2(relX,relY));
-
-            return RelVector(magnitude, bearing);
-        }
-
     } // namespace localization
 } // namespace man
