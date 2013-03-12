@@ -8,11 +8,7 @@ namespace man
         : portals::Module(),
           output(base())
     {
-        motionModel = boost::shared_ptr<MotionSystem>(new MotionSystem());
-        visionModel = boost::shared_ptr<VisionSystem>(new VisionSystem());
-
-        particleFilter = boost::shared_ptr<ParticleFilter>(new ParticleFilter(motionModel,
-                                                                              visionModel));
+        particleFilter = new ParticleFilter();
         particleFilter->resetLocTo(100,100,0);
         std::cout << particleFilter->getXEst() << "\t"
                   << particleFilter->getYEst() << "\t"
@@ -21,6 +17,7 @@ namespace man
 
     LocalizationModule::~LocalizationModule()
     {
+        delete particleFilter;
     }
 
     void LocalizationModule::update()

@@ -4,13 +4,13 @@ namespace man
 {
     namespace localization
     {
-    ParticleFilter::ParticleFilter(boost::shared_ptr<MotionSystem> motionSystem_,
-                                   boost::shared_ptr<VisionSystem> visionSystem_,
-                                   ParticleFilterParams params)
-        : parameters(params), estimateUncertainty(3, 0.0f)
+    ParticleFilter::ParticleFilter(ParticleFilterParams params)
+        : parameters(params),
+          estimateUncertainty(3, 0.0f)
     {
-        motionSystem = motionSystem_;
-        visionSystem = visionSystem_;
+        motionSystem = new MotionSystem(params.odometryXYNoise,
+                                        params.odometryHNoise);
+        visionSystem = new VisionSystem;
 
         boost::mt19937 rng;
         rng.seed(std::time(0));
@@ -47,7 +47,10 @@ namespace man
     }
 
     ParticleFilter::~ParticleFilter()
-    {}
+    {
+        delete motionSystem;
+        delete visionSystem;
+    }
 
     void ParticleFilter::update(messages::Motion motionInput,
                                 messages::PVisionField visionInput)

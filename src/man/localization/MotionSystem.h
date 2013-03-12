@@ -20,7 +20,7 @@ namespace man
     {
     public:
         // add the coord and head range to the constructor!
-        MotionSystem();
+        MotionSystem(float xAndYNoise_, float hNoise_);
         ~MotionSystem();
 
         void update(ParticleSet& particles,
@@ -32,6 +32,9 @@ namespace man
 
         boost::mt19937 rng;
     private:
+        float xAndYNoise;
+        float hNoise;
+
         bool robotFallen;
     };
     } // namespace localization

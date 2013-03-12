@@ -41,7 +41,9 @@ namespace man
         FIELD_GREEN_WIDTH,
         250,
         0.2f,
-        0.05f
+        0.05f,
+        .5f,
+        .2f
     };
 
 
@@ -56,9 +58,7 @@ namespace man
     {
 
     public:
-        ParticleFilter(boost::shared_ptr<MotionSystem> motionSystem_,
-                       boost::shared_ptr<VisionSystem> visionSystem_,
-                       ParticleFilterParams parameters = DEFAULT_PARAMS);
+        ParticleFilter(ParticleFilterParams parameters = DEFAULT_PARAMS);
         ~ParticleFilter();
 
         void update(messages::Motion motionInput,
@@ -112,8 +112,8 @@ namespace man
         std::vector<float> estimateUncertainty;
         ParticleSet particles;
 
-        boost::shared_ptr<MotionSystem> motionSystem;
-        boost::shared_ptr<VisionSystem> visionSystem;
+        MotionSystem * motionSystem;
+        VisionSystem * visionSystem;
 
         float lastMotionTimestamp;
         float lastVisionTimestamp;

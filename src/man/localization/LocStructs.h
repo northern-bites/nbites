@@ -33,9 +33,9 @@ namespace man
         float numParticles;       //! Size of particle population.
         float alpha_fast;         //! Weight factor for fast exponential weight filter.
         float alpha_slow;         //! Weight factor for slow exponential weight filter.
-        // Variance for x,y in MotionSystem
-        // Varaince for h   in MotionSystem
-        // How much we prefer best particles
+        float odometryXYNoise;    //! Variance for x,y in MotionSystem when updating.
+        float odometryHNoise;     //! Variance for h in MotionSystem when updating.
+        // Need to add how much we prefer best particles
     };
 
 

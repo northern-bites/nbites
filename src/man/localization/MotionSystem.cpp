@@ -4,7 +4,11 @@ namespace man
 {
     namespace localization
     {
-        MotionSystem::MotionSystem(){}
+        MotionSystem::MotionSystem(float xAndYNoise_, float hNoise_)
+        {
+            xAndYNoise = xAndYNoise_;
+            hNoise = hNoise_;
+        }
         MotionSystem::~MotionSystem(){}
 
         /**
@@ -44,8 +48,8 @@ namespace man
         void MotionSystem::randomlyShiftParticle(Particle* particle)
         {
             // TODO: This should be experimentally determined
-            boost::uniform_real<float> coordRange(-.5f, .5f);
-            boost::uniform_real<float> headRange(-.2f, .2f);
+            boost::uniform_real<float> coordRange(-1.f * xAndYNoise, xAndYNoise);
+            boost::uniform_real<float> headRange (-1.f * hNoise    , hNoise);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
             boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);
 
