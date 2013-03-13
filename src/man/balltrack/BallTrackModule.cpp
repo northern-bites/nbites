@@ -23,9 +23,11 @@ namespace man
     {
         // Latch
         visionBallInput.latch();
+        motionInput.latch();
 
         // Update the Ball filter
-        ballFilter->update(visionBallInput.message());
+        ballFilter->update(visionBallInput.message(),
+                           motionInput.message());
 
         // Fill the ballMessage with the filters representation
         portals::Message<messages::FilteredBall> ballMessage(0);

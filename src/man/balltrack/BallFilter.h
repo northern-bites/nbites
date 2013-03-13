@@ -12,6 +12,7 @@
 #include "NBMath.h"
 
 #include "BallModel.pb.h"
+#include "Motion.pb.h"
 
 namespace man
 {
@@ -48,7 +49,8 @@ namespace man
             BallFilter(int bufferSize_ = DEFAULT_BUFFER_SIZE);
             ~BallFilter();
 
-            void update(messages::VisionBall visionBall);
+            void update(messages::VisionBall visionBall,
+                        messages::Motion odometry);
 
             void addObservation(BallObservation newObsv);
             BallObservation getObsv(int which);

@@ -15,7 +15,8 @@ namespace man
 
         BallFilter::~BallFilter(){}
 
-        void BallFilter::update(messages::VisionBall visionBall)
+        void BallFilter::update(messages::VisionBall visionBall,
+                                messages::Motion odometry)
         {
             addObservation(BallObservation(visionBall.distance(),
                                            visionBall.bearing()));
