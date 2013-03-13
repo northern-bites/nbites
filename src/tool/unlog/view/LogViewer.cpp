@@ -20,18 +20,25 @@ LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-    // std::vector<QTreeView> messageViewers;
-    // for (Memory::const_iterator iterator = memory->begin(); iterator != memory->end(); iterator++) {
-    //     QDockWidget* dockWidget = new QDockWidget(QString(iterator->first.c_str()), this);
-    //     dockWidget->setMinimumWidth(300);
-    //     dockWidget->setMaximumHeight(125);
-    //     MObjectViewer* view = new MObjectViewer(iterator->second, dockWidget);
-    //     dockWidget->setWidget(view);
-    //     this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-    //     memoryManager->connectSlot(view, SLOT(updateView()), iterator->first);
-    // }
-
 }
+
+void LogViewer::addProtoViewer(UnlogBase* unlogger)
+{
+    unlogger->useGUI(true);
+    QDockWidget* dockWidget =
+        new QDockWidget(QString(unlogger->getType().c_str()),
+                                this);
+    dockWidget->setMinimumWidth(300);
+    dockWidget->setMaximumHeight(125);
+    ProtoViewer* viewer = new ProtoViewer(unlogger->getMessage(), dockWidget);
+
+    QObject::connect(unlogger, SIGNAL(newMessage(const google::protobuf::Message*)),
+                     viewer, SLOT(updateView(const google::protobuf::Message*)));
+
+    dockWidget->setWidget(viewer);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+}
+
 }
 }
 }

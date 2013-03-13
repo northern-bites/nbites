@@ -24,15 +24,18 @@ class ProtoViewer : public QTreeView {
     Q_OBJECT;
 
 public:
-    ProtoViewer(google::protobuf::Message* msg, QWidget* parent = 0);
+    ProtoViewer(const google::protobuf::Message* msg, QWidget* parent = 0);
     virtual ~ProtoViewer();
 
 public slots:
-    void updateView();
+    void updateView(const google::protobuf::Message* msg);
 
 protected:
     void showEvent(QShowEvent* event);
     void paintEvent(QPaintEvent*);
+
+protected slots:
+    void updateView();
 
 private:
     void createNewTreeModel();

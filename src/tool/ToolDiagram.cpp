@@ -23,7 +23,8 @@
 
 namespace tool{
 
-ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
+ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent),
+                                            viewTab(parent)
 {
     ADD_MAPPED_TYPE(AudioCommand);
     ADD_MAPPED_TYPE(BatteryState);
@@ -62,6 +63,7 @@ bool ToolDiagram::unlogFrom(std::string path)
     unloggers.push_back(typeMap[head.name()](path));
     diagram.addModule(*unloggers.back());
     unloggers.back()->run();
+    viewTab.addProtoViewer(unloggers.back());
     return true;
 }
 

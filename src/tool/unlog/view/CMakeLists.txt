@@ -19,6 +19,7 @@ add_library(logview
 
 target_link_libraries(
   logview
+  treemodel
   ${PROTOBUF_LIBRARY}
   ${QT_LIBRARIES}
   )

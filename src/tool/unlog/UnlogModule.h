@@ -25,19 +25,30 @@
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>
+#include <google/protobuf/message.h>
+#include <QObject>
 
 namespace tool {
 namespace unlog {
 
 // Base Class
-class UnlogBase : public portals::Module
+class UnlogBase : public QObject, public portals::Module
 {
+    Q_OBJECT;
+
+signals:
+    void newMessage(const google::protobuf::Message*);
+
 public:
     // The path is expected to be a full path to the log file
     UnlogBase(std::string path, std::string type);
     virtual ~UnlogBase();
 
     std::string getType() { return typeName; }
+    void useGUI(bool on) { usingGUI = on; }
+
+    // The templated class needs to implement this!
+    virtual const google::protobuf::Message* getMessage() = 0;
 
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
@@ -105,6 +116,12 @@ protected:
     uint32_t readCharBuffer(char* buffer, uint32_t size)
         const throw (file_read_exception);
 
+    // For the inherited class to use the signal
+    void updateDisplay(const google::protobuf::Message* msg)
+    {
+        emit newMessage(msg);
+    }
+
     // Keeps track of whether the file is open/closed
     bool fileOpen;
     // Pointer to the file
@@ -114,6 +131,7 @@ protected:
     std::string typeName;
     // Keeps track of the sizes of all the reads we've done
     std::vector<uint32_t> messageSizes;
+    bool usingGUI;
 };
 
 // Template Class
@@ -127,6 +145,12 @@ public:
 
     // Where the output will be provided
     portals::OutPortal<T> output;
+
+    // Implementing the method required by the base class
+    const google::protobuf::Message* getMessage()
+    {
+        return output.getMessage(true).get();
+    }
 
 protected:
     // Implements the Module run_ method
@@ -149,6 +173,8 @@ protected:
             msg.get()->DebugString();
 
         output.setMessage(msg);
+
+        if (usingGUI) updateDisplay(output.getMessage(true).get());
     }
 
     // Reads in the header; called when the file is first opened

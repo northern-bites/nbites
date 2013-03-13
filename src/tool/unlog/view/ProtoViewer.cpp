@@ -6,8 +6,10 @@ namespace tool {
 namespace unlog {
 namespace view {
 
-ProtoViewer::ProtoViewer(google::protobuf::Message* msg, QWidget* parent) :
-        QTreeView(parent), messageViewed(msg)
+ProtoViewer::ProtoViewer(const google::protobuf::Message* msg,
+                         QWidget* parent) :
+        QTreeView(parent),
+        messageViewed(const_cast<google::protobuf::Message*>(msg))
 {
     this->createNewTreeModel();
 }
@@ -21,6 +23,12 @@ void ProtoViewer::createNewTreeModel() {
                                     messageViewed);
     treeModel = new TreeModel(root);
     this->setModel(treeModel);
+}
+
+void ProtoViewer::updateView(const google::protobuf::Message* msg)
+{
+    messageViewed->CopyFrom(*msg);
+    updateView();
 }
 
 void ProtoViewer::updateView() {

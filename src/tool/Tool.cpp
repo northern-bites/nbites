@@ -36,6 +36,7 @@ Tool::Tool(const char* title) :
     toolbar->addWidget(recordButton);
 
     toolTabs->addTab(&selector, tr("Data"));
+    toolTabs->addTab(diagram.getGUI(), tr("Log Viewer"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
