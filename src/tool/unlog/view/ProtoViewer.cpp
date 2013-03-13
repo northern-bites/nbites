@@ -3,7 +3,8 @@
 #include "treemodel/ProtoNode.h"
 
 namespace tool {
-namespace viewer {
+namespace unlog {
+namespace view {
 
 ProtoViewer::ProtoViewer(google::protobuf::Message* msg, QWidget* parent) :
         QTreeView(parent), messageViewed(msg)
@@ -46,5 +47,6 @@ void ProtoViewer::paintEvent(QPaintEvent* e) {
     shouldRedraw = true;
 }
 
+}
 }
 }

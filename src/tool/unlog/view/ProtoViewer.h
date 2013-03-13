@@ -17,7 +17,8 @@
 #include <google/protobuf/message.h>
 
 namespace tool {
-namespace viewer {
+namespace unlog {
+namespace view {
 
 class ProtoViewer : public QTreeView {
     Q_OBJECT;
@@ -42,5 +43,6 @@ private:
     bool shouldRedraw;
 };
 
+}
 }
 }

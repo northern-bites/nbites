@@ -9,7 +9,8 @@
 #include <assert.h>
 
 namespace tool {
-namespace viewer {
+namespace unlog {
+namespace view {
 
 typedef TreeModel::Node Node;
 
@@ -60,5 +61,6 @@ int Node::indexOfChild(const Node* child) const {
     return children.indexOf(const_cast<Node*>(child));
 }
 
+}
 }
 }

@@ -1,7 +1,8 @@
 #include "LogViewer.h"
 
 namespace tool {
-namespace viewer {
+namespace unlog {
+namespace view {
 
 LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
 {
@@ -30,6 +31,7 @@ LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
     //     memoryManager->connectSlot(view, SLOT(updateView()), iterator->first);
     // }
 
+}
 }
 }
 }

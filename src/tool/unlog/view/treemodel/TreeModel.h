@@ -23,7 +23,8 @@
 #include <QVariant>
 
 namespace tool {
-namespace viewer {
+namespace unlog {
+namespace view {
 
 class TreeModel : public QAbstractItemModel
 {
@@ -62,6 +63,8 @@ private:
 };
 }
 }
+}
+
 #include "Node.h"
 
 #endif // TreeModel_H

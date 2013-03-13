@@ -13,7 +13,8 @@
 #include "TreeModel.h"
 
 namespace tool {
-namespace viewer {
+namespace unlog {
+namespace view {
 
 class TreeModel::Node {
 
@@ -49,4 +50,6 @@ protected:
 
 }
 }
+}
+
 #endif /* Node_H_ */

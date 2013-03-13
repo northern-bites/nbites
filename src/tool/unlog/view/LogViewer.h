@@ -19,7 +19,8 @@
 #include "ProtoViewer.h"
 
 namespace tool {
-namespace viewer {
+namespace unlog {
+namespace view {
 
 class GenericMessageProviderBase : public QObject,
                                    public portals::Module
@@ -71,5 +72,6 @@ private:
     std::vector<QDockWidget*> dockWidget;
 };
 
+}
 }
 }
