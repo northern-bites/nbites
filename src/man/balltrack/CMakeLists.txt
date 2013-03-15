@@ -9,6 +9,7 @@ project(balltrack)
 # Set source files here that need to be compiled.
 set(BALLTRACK_SRCS BallTrackModule
                    BallFilter
+		   FakeBallTrackInput
 )
 
 # Add project as a library.
