@@ -1,5 +1,5 @@
 # To be run on the robot AS ROOT
-if [ $# -ne 2 ] ; then
+if [ $# -ne 1 ] ; then
     echo "Usage: ./setup-robot <new-hostname>"
     exit 1
 fi
@@ -25,7 +25,7 @@ mv *.wav nbites/audio
 # Move the libraries
 echo "Moving libraries..."
 mv libboost_python-mt.so /usr/lib/
-mv atom_libprotobuf.so.7 /usr/lib/libprotobuf.so.7
+mv libprotobuf.so.7 /usr/lib/libprotobuf.so.7
 
 # Set the hostname
 echo "Setting the hostname to $HOSTNAME..."
@@ -40,10 +40,9 @@ echo "ulimit -S -c unlimited" >> /etc/profile
 
 # Move the etc config
 echo "Moving etc files into place..."
-mv init_stuff/* /etc/init.d/
-rmdir init_stuff/
-mv wpa_stuff/* /etc/wpa_supplicant/
-rmdir wpa_stuff/
+mv init.d/* /etc/init.d/
+rmdir init.d/
+mv wpa_supplicant.conf /etc/wpa_supplicant/
 
 #switch connman to wpa_supplicant
 echo "Setting up networking..."
