@@ -9,6 +9,8 @@
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
 
+#include "balltrack/FakeBallTrackInput.h"
+
 namespace man {
 
 class Man : public AL::ALModule
@@ -18,7 +20,6 @@ public:
     virtual ~Man();
 
 private:
-
     void startSubThreads();
 
     DiagramThread sensorsThread;
@@ -26,6 +27,9 @@ private:
 
     DiagramThread commThread;
     comm::CommModule comm;
+
+    DiagramThread balltrackThread;
+    balltrack::FakeBallInputModule fOutput;
 };
 
 }

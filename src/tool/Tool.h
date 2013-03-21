@@ -14,6 +14,8 @@
 #include "RoboGrams.h"
 #include "unlog/UnlogModule.h"
 #include "JointAngles.pb.h"
+#include "Motion.pb.h"
+#include "BallModel.pb.h"
 
 namespace tool {
 
@@ -41,7 +43,7 @@ protected:
 
     // Modules
     // IF YOU WANT TO SEE LOGS PUT YOUR UNLOGGER HERE
-    unlog::UnlogModule<messages::JointAngles> unlogger;
+    unlog::UnlogModule<messages::VisionBall> unlogger;
 
     // GUI stuff
     QTabWidget* toolTabs;

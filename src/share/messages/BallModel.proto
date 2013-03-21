@@ -15,6 +15,7 @@ message VisionBall {
 	optional bool on = 12;
 	optional sint32 frames_on = 13;
 	optional sint32 frames_off = 14;
+	optional int64 timestamp = 15;
 }
 
 message FilteredBall
