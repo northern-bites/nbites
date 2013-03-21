@@ -42,6 +42,14 @@ echo "ulimit -S -c unlimited" >> /etc/profile
 echo "Moving etc files into place..."
 mv init_stuff/* /etc/init.d/
 rmdir init_stuff/
+mv wpa_stuff/* /etc/wpa_supplicant/
+rmdir wpa_stuff/
+
+#switch connman to wpa_supplicant
+echo "Setting up networking..."
+rc-update delete connman boot
+rc-update add /etc/init.d/utwireless boot
+rc-update add /etc/init.d/utwired boot
 
 # Move the autoload files
 echo "Moving autoload.ini files into place..."
