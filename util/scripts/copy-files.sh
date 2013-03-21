@@ -15,5 +15,6 @@ LIB_DIR=../../lib
 echo "Copying necessary files to the robot."
 scp $LIB_DIR/nao/* ../audio/* setup-robot.sh ../config/*autoload.ini $UNAME@$ADDR:
 scp -r ../config/init.d $UNAME@$ADDR:/home/nao/init_stuff
+scp -r ../config/wpa_supplicant.conf $UNAME@$ADDR:/home/nao/wpa_stuff
 
 echo "Now run setup-robot.sh ON THE ROBOT."

@@ -1,7 +1,6 @@
 # To be run on the robot AS ROOT
-
 if [ $# -ne 2 ] ; then
-    echo "Usage: ./setup-robot <new-hostname> <old-or-new>"
+    echo "Usage: ./setup-robot <new-hostname>"
     exit 1
 fi
 
@@ -10,17 +9,11 @@ if [ x$(whoami) != xroot ]; then
     exit 1
 fi
 
-if [ $2 != 'old' -a $2 != 'new' ]; then
-    echo "The second parameter needs to be 'old' or 'new'"
-    exit 1
-fi
-
 HOSTNAME=$1
-TYPE=$2
 
 # Make nbites folders
 echo "Making folders for nbites content..."
-mkdir -p nbites/audio nbites/frames nbites/log
+mkdir -p nbites/audio nbites/log
 chown -R nao nbites
 rm -rf behaviors
 rm -rf recordings
@@ -32,15 +25,7 @@ mv *.wav nbites/audio
 # Move the libraries
 echo "Moving libraries..."
 mv libboost_python-mt.so /usr/lib/
-if [ $TYPE == 'old' ]; then
-    mv lxv4l2.ko /lib/modules/2.6.29.6-rt24-aldebaran-rt/kernel/drivers/media/video/lxv4l2/
-    mv geode_libprotobuf.so.7 /usr/lib/libprotobuf.so.7
-    rm atom_libprotobuf.so.7
-elif [ $TYPE == 'new' ]; then
-    rm lxv4l2.ko
-    mv atom_libprotobuf.so.7 /usr/lib/libprotobuf.so.7
-    rm geode_libprotobuf.so.7
-fi
+mv atom_libprotobuf.so.7 /usr/lib/libprotobuf.so.7
 
 # Set the hostname
 echo "Setting the hostname to $HOSTNAME..."
@@ -57,6 +42,14 @@ echo "ulimit -S -c unlimited" >> /etc/profile
 echo "Moving etc files into place..."
 mv init_stuff/* /etc/init.d/
 rmdir init_stuff/
+mv wpa_stuff/* /etc/wpa_supplicant/
+rmdir wpa_stuff/
+
+#switch connman to wpa_supplicant
+echo "Setting up networking..."
+rc-update delete connman boot
+rc-update add /etc/init.d/utwireless boot
+rc-update add /etc/init.d/utwired boot
 
 # Move the autoload files
 echo "Moving autoload.ini files into place..."
