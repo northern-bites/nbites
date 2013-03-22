@@ -55,9 +55,6 @@ Vision Constants that span multiple classes and systems.
 // _Two_ bytes per pixel in EACH (y/color) image
 #define AVERAGED_Y_IMAGE_BYTE_SIZE AVERAGED_IMAGE_SIZE * 2
 
-#define VISION_FRAME_LENGTH_MS 34
-#define VISION_FRAME_LENGTH_uS 34000
-#define VISION_FRAME_LENGTH_PRINT_THRESH_uS 66000
 #define VISION_FPS 30
 
 #define IMAGE_WIDTH AVERAGED_IMAGE_WIDTH

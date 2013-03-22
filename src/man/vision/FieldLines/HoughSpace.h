@@ -6,8 +6,6 @@
 
 #include "Gradient.h"
 #include "geom/HoughLine.h"
-#include "Profiler.h"
-#include "visionconfig.h"
 #include "ActiveArray.h"
 #include "HoughConstants.h"
 

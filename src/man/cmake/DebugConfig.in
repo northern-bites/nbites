@@ -10,3 +10,10 @@
 #else
 #   undef DEBUG_COMM
 #endif
+
+#define DEBUG_THREADS_${DEBUG_THREADS}
+#ifdef  DEBUG_THREADS_ON
+#   define DEBUG_THREADS
+#else
+#   undef DEBUG_THREADS
+#endif

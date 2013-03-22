@@ -1,4 +1,5 @@
 #include "SensorsModule.h"
+#include "Common.h"
 
 namespace man {
 namespace sensors {
@@ -18,8 +19,6 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
       sensorValues_(NUM_SENSOR_VALUES),
       sensorKeys_(NUM_SENSOR_VALUES)
 {
-    //std::cout << "SensorsModule : Constructor." << std::endl;
-
     // Initialize the Aldebaran fast access memory interface
     // to quickly read sensor values from memory.
     initializeSensorFastAccess();
@@ -27,7 +26,6 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
 
 SensorsModule::~SensorsModule()
 {
-    //std::cout << "SensorsModule : Destructor." << std::endl;
 }
 
 void SensorsModule::initializeSensorFastAccess()

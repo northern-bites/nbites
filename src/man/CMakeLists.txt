@@ -27,6 +27,12 @@ configure_file(
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
 
+# Configure the copy script based on our settings
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
+  "${PROJECT_BINARY_DIR}/upload.sh"
+)
+
 include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off
@@ -43,12 +49,6 @@ include_directories( ${ALCOMMON_INCLUDE_DIR} )
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
-# Configure the copy script based on our settings
-configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
-  "${PROJECT_BINARY_DIR}/upload.sh"
-)
-
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
 
@@ -60,6 +60,7 @@ include_directories( ${SHARE_DIR}/portals )
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+include_directories( ${SHARE_DIR}/messages )
 
 # If protobuf libs don't exist yet, make sure they build before man
 if( BUILD_PROTOBUF )
@@ -71,14 +72,16 @@ add_subdirectory( common )
 include_directories( common )
 
 # Actual modules
+add_subdirectory( image )
 add_subdirectory( log )
+add_subdirectory( vision )
 add_subdirectory( sensors )
 add_subdirectory( comm )
 add_subdirectory( guardian )
 add_subdirectory( audio )
 
 set( MAN_SRCS main.cpp
-  NewMan.cpp
+  Man.cpp
   DiagramThread.cpp
 )
 
@@ -95,8 +98,11 @@ target_link_libraries(
   log
   sensors
   comm
+  image
+  vision
   guardian
   audio
+  common
 )
 
 install( TARGETS man

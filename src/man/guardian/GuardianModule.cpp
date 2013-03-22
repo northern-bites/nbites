@@ -20,11 +20,6 @@ static const int FALLING_RESET_FRAMES_THRESH = 10;
 static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/5.0f; //36.0 degrees
 static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
 
-const int GuardianModule::GUARDIAN_FRAME_RATE = MOTION_FRAME_RATE;
-// 1 second * 1000 ms/s * 1000 us/ms
-const int GuardianModule::GUARDIAN_FRAME_LENGTH_uS = 1 * 1000 * 1000 /
-    GuardianModule::GUARDIAN_FRAME_RATE;
-
 const int GuardianModule::NO_CLICKS = -1;
 
 GuardianModule::GuardianModule()
@@ -48,9 +43,6 @@ GuardianModule::~GuardianModule()
 void GuardianModule::run_()
 {
     PROF_ENTER(P_ROBOGUARDIAN);
-    struct timespec interval, remainder;
-    interval.tv_sec = 0;
-    interval.tv_nsec = static_cast<long long int> (GUARDIAN_FRAME_LENGTH_uS * 1000);
     sentAudio = false;
     countButtonPushes();
     checkFalling();
@@ -62,7 +54,6 @@ void GuardianModule::run_()
     processChestButtonPushes();
     checkAudio();
     frameCount++;
-    nanosleep(&interval, &remainder);
     PROF_EXIT(P_ROBOGUARDIAN);
 }
 
@@ -505,7 +496,7 @@ void GuardianModule::processChestButtonPushes()
 
 void GuardianModule::executeShutdownAction()
 {
-    std::cout << "Guardian is attempting a shutting down..."<< std::endl;
+    std::cout << "Guardian is attempting a shutdown..."<< std::endl;
     playFile(shutdown_wav);
     if(system("sudo shutdown -h now &") != 0)
         std::cout << "Roboguardian could not shutdown system." << std::endl;
@@ -513,7 +504,6 @@ void GuardianModule::executeShutdownAction()
 
 bool GuardianModule::executeChestClickAction(int nClicks)
 {
-    //NOTE: Please upade wiki/NaoChestButtonInterface when this is changed!!!
     switch(nClicks)
     {
     case NO_CLICKS:
