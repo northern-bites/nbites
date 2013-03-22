@@ -12,10 +12,12 @@ ROBOCUP=robocup.bowdoin.edu:/mnt/research/robocup
 lib_dir=../../lib
 audio_dir=../audio
 
-echo "Copying libraries from RoboCup."
-rsync -vr USERNAME@$ROBOCUP/lib/* $lib_dir/
+rm -f $lib_dir/nao/*
 
-rm $audio_dir/*
+echo "Copying libraries from RoboCup."
+rsync -vr $USERNAME@$ROBOCUP/lib/* $lib_dir/
+
+rm -f $audio_dir/*
 
 echo "Copying audio files from RoboCup."
-rsync -rv $1@$robocup/audio_for_robot/* $audio_dir/
+rsync -rv $USERNAME@$ROBOCUP/audio_for_robot/* $audio_dir/
