@@ -29,10 +29,10 @@ import GameController
 #from objects import (FieldObject)
 
 # Import message protocol buffers
-from messages import LedCommand_pb2
-from messages import GameState_pb2
-from messages import WorldModel_pb2
-from messages import BallModel_pb2
+from .messages import LedCommand_pb2
+from .messages import GameState_pb2
+from .messages import WorldModel_pb2
+from .messages import BallModel_pb2
 
 class Brain(object):
     """

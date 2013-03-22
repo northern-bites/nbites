@@ -31,8 +31,18 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
+# Installs the python-compiled protobufs to the python install directory
+# for copying to the robot
 install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  DESTINATION ${PYTHON_INSTALL_DIR}
+  CONFIGURATIONS "" Debug Release
+  FILES_MATCHING PATTERN "*.py"
+  )
+
+# Also gets any python files in this source dir, ie __init__
+install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   DESTINATION ${PYTHON_INSTALL_DIR}
   CONFIGURATIONS "" Debug Release
   FILES_MATCHING PATTERN "*.py"
