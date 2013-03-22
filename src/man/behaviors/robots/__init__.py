@@ -11,10 +11,10 @@ def read_hostname():
 	"""
 	return gethostname()
 
-#technically, we should set gaits according to the number stored in the chest
-#board, however, reading this is not currently setup. -js
+# TODO: We really don't need all of this stuff for each robot!
+#       Someone please figure out what we do need/delete the rest
 
-marvin = BirthCertificate.BirthCertificate(
+zoe = BirthCertificate.BirthCertificate(
 			name = 'zoe',
 			long_name = 'Zoe Washburne',
 			tts_name = 'zoe',
@@ -31,7 +31,7 @@ seem more tough than lovable, I'm married to Wash.''',
             back_standup = moves.STAND_UP_BACK,
 			)
 
-slarti = BirthCertificate.BirthCertificate(
+wash = BirthCertificate.BirthCertificate(
 			name = "wash",
 			long_name = "Hoban Washburne",
 			tts_name = "wash",
@@ -48,7 +48,7 @@ watch how I soar...''',
             back_standup = moves.STAND_UP_BACK,
 			)
 
-trillian = BirthCertificate.BirthCertificate(
+mal = BirthCertificate.BirthCertificate(
 			name = 'mal',
 			long_name = 'Malcolm Reynolds',
 			tts_name = 'mal',
@@ -65,7 +65,7 @@ Serenity can keep on flying, it's enough for me.''',
             back_standup = moves.STAND_UP_BACK,
 			)
 
-zaphod = BirthCertificate.BirthCertificate(
+river = BirthCertificate.BirthCertificate(
 			name = 'river',
 			long_name = 'River Tam',
 			tts_name = 'river',
@@ -82,7 +82,7 @@ power in the 'verse can stop me.''',
             back_standup = moves.STAND_UP_BACK,
 			)
 
-spock = BirthCertificate.BirthCertificate(
+jayne = BirthCertificate.BirthCertificate(
 		   name = 'jayne',
 		   long_name = 'Jayne Cobb',
 		   tts_name = 'jayne',
@@ -98,16 +98,14 @@ where I was forced to drop some money I stole from their rich magistrate.''',
 		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
-scotty = BirthCertificate.BirthCertificate(
-		   name = 'scotty',
-		   long_name = 'Montgomery "Scotty" Scott',
-		   tts_name = 'scotty',
+vera = BirthCertificate.BirthCertificate(
+		   name = 'vera',
+		   long_name = 'Vera',
+		   tts_name = 'vera',
 		   doc = '''\
-I am Montgomery Scott. Call me Scotty. I am the Chief Engineer of the Enterprise
-among other things. People call me a "miracle worker". My technical skill and
-knowledge allow me to devise unconventional and effective last-minute solutions
-to dire problems. When I crashed onto a Dyson Sphere, I rigged the ship's
-transporter to keep me suspended in transit for 75 years.''',
+I am Vera, Jayne's favorite gun in the entire universe. I'm a Callahan full-bore
+auto-lock with a customized trigger and double cartridge thorough gauge. When
+I get dressed up (in a space suit), I get taken out somewhere fun!''',
 		   gait = gaits.SCOTTY_GAIT,
 		   dribble_gait = gaits.SCOTTY_DRIBBLE_GAIT,
 		   backwards_gait = gaits.SCOTTY_BACKWARDS_GAIT,
@@ -115,16 +113,15 @@ transporter to keep me suspended in transit for 75 years.''',
 		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
-data = BirthCertificate.BirthCertificate(
-		   name = 'data',
-		   long_name = 'Lt. Commander Data',
-		   tts_name = 'data',
+kaylee = BirthCertificate.BirthCertificate(
+		   name = 'kaylee',
+		   long_name = 'Kaywinnet Lee Frye',
+		   tts_name = 'kaylee',
 		   doc = '''\
-I am Data, an android built by Dr. Noonien Soong. My positronic brain allows
-me to possess greater strength, agility, and computation than most living
-beings, but I would give it all up to be human. I was found by Starfleet on
-Omicron Theta and joined Starfleet soon after. I was decorated several times
-despite Dr. Maddox's attempt to prove me non-sentient.''',
+I am Kaylee Frye, Serenity's mechanic. I can fix just about anything because
+machines just talk to me. Although you might not guess it from the fact that
+I'm usually wearing work clothes and engine grease, I really like pretty
+pink frilly dresses! And strawberries!''',
 		   gait = gaits.DATA_GAIT,
 		   dribble_gait = gaits.DATA_DRIBBLE_GAIT,
 		   backwards_gait = gaits.DATA_BACKWARDS_GAIT,
@@ -132,15 +129,15 @@ despite Dr. Maddox's attempt to prove me non-sentient.''',
 		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
-dax = BirthCertificate.BirthCertificate(
-		   name = 'dax',
-		   long_name = 'Jedzia Dax',
-		   tts_name = 'dacks',
+simon = BirthCertificate.BirthCertificate(
+		   name = 'simon',
+		   long_name = 'Simon Tam',
+		   tts_name = 'simon',
 		   doc = '''\
-I am Jedzia Dax. I am a joined Trill living in symbiosis with the symbiont
-Dax. As a result, I have the personality characteristics of both and have
-access to the knowledge and memories of past hosts. I am the Chief Science
-Officer on the Deep Space Nine space station.''',
+I am Simon Tam, ship's doctor. I gave up a promising medical career back on
+Osiris to save my sister, River, from the evil experiments at the Academy.
+As a member of Serenity's crew, I can keep the two of us on the move and out
+of the Alliance's evil grasp--and keep an eye on that pretty mechanic...''',
 		   gait = gaits.DAX_GAIT,
 		   dribble_gait = gaits.DAX_DRIBBLE_GAIT,
 		   backwards_gait = gaits.DAX_BACKWARDS_GAIT,
@@ -148,16 +145,15 @@ Officer on the Deep Space Nine space station.''',
 		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
-annika = BirthCertificate.BirthCertificate(
-		   name = 'annika',
-		   long_name = 'Annika Hansen',
-		   tts_name = 'annika',
+inara = BirthCertificate.BirthCertificate(
+		   name = 'inara',
+		   long_name = 'Inara Serra',
+		   tts_name = 'inara',
 		   doc = '''\
-I am Annika Hansen. I was assimilated by the Borg at a young age and was
-given the designation Seven of Nine, Tertiary Adjunct of Unimatrix Zero-One.
-I was eventually rescued by the crew of the Voyager and disconnected from
-the Collective. I chose to retain my Borg designation as it is the life I
-know best, although the crew shortened it to Seven.''',
+I am Inara Serra, a registered Companion who rents one of Serenity's shuttles
+for my work. I'm glamorous and surprisingly respectable given the rest of
+the ship's crew, which makes me the ideal ambassador to open certain doors
+that might otherwise be closed.''',
 		   gait = gaits.ANNIKA_GAIT,
 		   dribble_gait = gaits.ANNIKA_DRIBBLE_GAIT,
 		   backwards_gait = gaits.ANNIKA_BACKWARDS_GAIT,
@@ -165,15 +161,15 @@ know best, although the crew shortened it to Seven.''',
 		   spin_gait = gaits.CUR_SPIN_GAIT,
 		   )
 
-robot_map = { marvin.name	: marvin,
-			  slarti.name	: slarti,
-			  trillian.name : trillian,
-			  zaphod.name	: zaphod,
-			  spock.name    : spock,
-			  scotty.name   : scotty,
-			  data.name     : data,
-			  dax.name      : dax,
-			  annika.name   : annika,
+robot_map = { mal.name	  : mal,
+			  river.name  : river,
+			  zoe.name    : zoe,
+			  wash.name	  : wash,
+			  jayne.name  : jayne,
+			  vera.name   : vera,
+			  kaylee.name : kaylee,
+			  simon.name  : simon,
+			  inara.name  : inara,
 			  }
 
 unknown = BirthCertificate.BirthCertificate(
