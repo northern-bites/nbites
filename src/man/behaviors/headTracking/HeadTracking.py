@@ -6,7 +6,7 @@ from . import HeadTrackingHelper as helper
 from . import HeadMoves
 from ..util import FSA
 
-import StiffnessModes as stiff
+from .. import StiffnessModes as stiff
 
 class HeadTracking(FSA.FSA):
     """FSA to control actions performed by head"""

@@ -2,7 +2,7 @@
 
 # TODO: update all pans to speeds that avoid motion blur. @summer 2012
 
-import StiffnessModes as stiff
+from .. import StiffnessModes as stiff
 
 HEAD_MOVE_LENGTH = 4
 
