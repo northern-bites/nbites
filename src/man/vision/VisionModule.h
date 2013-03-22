@@ -21,33 +21,32 @@
 namespace man {
 namespace vision{
 
-	
-	class VisionModule : public portals::Module {
-		
-	public:
-		VisionModule();
-		virtual ~VisionModule();
-		
-		portals::InPortal<messages::ThresholdedImage> topImageIn;
-		portals::InPortal<messages::ThresholdedImage> bottomImageIn;
-		portals::InPortal<messages::JointAngles> joint_angles;
-		portals::InPortal<messages::InertialState> inertial_state;
+class VisionModule : public portals::Module {
 
-		portals::OutPortal<messages::VisionField> vision_field;
-		portals::OutPortal<messages::VisionBall> vision_ball;
-		portals::OutPortal<messages::VisionRobot> vision_robot;
-		portals::OutPortal<messages::VisionObstacle> vision_obstacle;
+public:
+    VisionModule();
+    virtual ~VisionModule();
 
-	protected:
-		virtual void run_();
-		boost::shared_ptr<Vision> vision;
-		void updateVisionField();
-		void updateVisionBall();
-		void updateVisionRobot();
-		void updateVisionObstacle();
-	};
-	
-	void updateRobot(messages::VisionRobot::Robot* bot_message, VisualRobot* visualRobot);
+    portals::InPortal<messages::ThresholdedImage> topImageIn;
+    portals::InPortal<messages::ThresholdedImage> bottomImageIn;
+    portals::InPortal<messages::JointAngles> joint_angles;
+    portals::InPortal<messages::InertialState> inertial_state;
+
+    portals::OutPortal<messages::VisionField> vision_field;
+    portals::OutPortal<messages::VisionBall> vision_ball;
+    portals::OutPortal<messages::VisionRobot> vision_robot;
+    portals::OutPortal<messages::VisionObstacle> vision_obstacle;
+
+protected:
+    virtual void run_();
+    boost::shared_ptr<Vision> vision;
+    void updateVisionField();
+    void updateVisionBall();
+    void updateVisionRobot();
+    void updateVisionObstacle();
+};
+
+void updateRobot(messages::VisionRobot::Robot* bot_message, VisualRobot* visualRobot);
 }
 }
 

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
-set( IMAGE_SRCS ColorParams.cpp
+set( IMAGE_SRCS
   ImageAcquisition.cpp
   ImageTranscriberModule.cpp
   V4L2ImageTranscriber.cpp

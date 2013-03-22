@@ -11,7 +11,8 @@ set( COMMON_SRCS NBMath
   CameraCalibrate.cpp
   ALLedNames
   NogginStructs
-)
+  ColorParams.cpp
+  )
 
 add_library(
   common
