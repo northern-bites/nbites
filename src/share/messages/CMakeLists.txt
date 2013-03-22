@@ -35,7 +35,7 @@ install(
   DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DESTINATION ${PYTHON_INSTALL_DIR}
   CONFIGURATIONS "" Debug Release
-  PATTERN "*.py" #TODO: this doesn't seem exclude c files... fix it!
+  FILES_MATCHING PATTERN "*.py"
   )
 
 ############################ PROJECT SOURCES FILES
