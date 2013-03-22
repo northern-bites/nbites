@@ -1,4 +1,4 @@
-############################ Configure Options
+# Configuration Options for Debugging
 # Definitions for the CMake configurable build options.  Defined here, they
 # are set at build/configure time.  Corresponding C/C++ MACRO definitions
 # should reside in the DebugConfig.in file.  The DebugConfig.h header
@@ -11,6 +11,12 @@
 
 option(
   DEBUG_COMM
-  "Toggle comm debug mode"
+  "Toggle comm debug mode."
+  OFF
+)
+
+option(
+  DEBUG_THREADS
+  "Toggle threads debug mode."
   OFF
 )

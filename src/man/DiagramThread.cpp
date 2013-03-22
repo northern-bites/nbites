@@ -1,4 +1,6 @@
 #include "DiagramThread.h"
+#include "Common.h"
+#include "DebugConfig.h"
 #include <iostream>
 
 using std::cout;
@@ -7,8 +9,63 @@ using namespace portals;
 
 namespace man{
 
-DiagramThread::DiagramThread(std::string name_) : name(name_),
-                                                  running(false)
+// Constructor for the private subclass
+DiagramThread::RobotDiagram::RobotDiagram(std::string name_, long long frame)
+    : RoboGram(),
+      name(name_),
+      frameLengthMicro(frame)
+{
+#ifdef DEBUG_THREADS
+    std::cout << name << " thread has frame length " << frameLengthMicro <<
+        " uS " << std::endl;
+#endif
+}
+
+// Overrides the RoboGram::run() method to do timing as well
+void DiagramThread::RobotDiagram::run()
+{
+    // Start timer
+    const long long startTime = realtime_micro_time();
+
+    RoboGram::run();
+
+    // Stop timer
+    const long long processTime = realtime_micro_time() - startTime;
+
+    // If we're under the frame length, this is good.
+    // We can sleep for the rest of the frame and let others process.
+    if (processTime < frameLengthMicro)
+    {
+        // Compute the time we should sleep from the amount of time
+        // we processed this frame and the amount of time allotted to a frame
+        const long int microSleepTime =
+            static_cast<long int>(frameLengthMicro - processTime);
+        const long int nanoSleepTime =
+            static_cast<long int>((microSleepTime %(1000 * 1000)) * 1000);
+
+        const long int secSleepTime =
+            static_cast<long int>(microSleepTime / (1000*1000));
+
+        interval.tv_sec = static_cast<time_t>(secSleepTime);
+        interval.tv_nsec = nanoSleepTime;
+
+        // Sleep!
+        nanosleep(&interval, &remainder);
+    }
+
+#ifdef DEBUG_THREADS
+    else if (processTime > frameLengthMicro*2) {
+        std::cout<< "Warning: time spent in " << name << " thread longer"
+                 << " than frame length: "<< processTime << " uS" <<
+            std::endl;
+    }
+#endif
+
+}
+
+DiagramThread::DiagramThread(std::string name_, long long frame) :
+    diagram(name_, frame),
+    running(false)
 {}
 
 DiagramThread::~DiagramThread()
@@ -27,7 +84,7 @@ int DiagramThread::start()
     // Don't let it recreate the same thread!
     if (running) return -1;
 
-    cout << "Thread " << name << " starting." << endl;
+    cout << "Thread " << diagram.name << " starting." << endl;
 
     // Since we don't need to join threads, creating them explicitly
     // detached may save resources
@@ -47,7 +104,7 @@ int DiagramThread::start()
 void DiagramThread::stop()
 {
     running = false;
-    cout << "Thread " << name << " stopping." << endl;
+    cout << "Thread " << diagram.name << " stopping." << endl;
 }
 
 /*
@@ -59,14 +116,16 @@ void* DiagramThread::runDiagram(void* _this)
 {
     DiagramThread* this_instance = reinterpret_cast<DiagramThread*>(_this);
 
-    cout << "Thread " << this_instance->name << " running." << endl;
+    cout << "Thread " << this_instance->diagram.name << " running." << endl;
 
     this_instance->running = true;
 
     // Run the diagram over and over again!
+    // NOTE: we can't do timing here because a sleep call here is made
+    //       from our main naoqi thread.
     while(this_instance->running) this_instance->diagram.run();
 
-    cout << "Thread " << this_instance->name << " exiting." << endl;
+    cout << "Thread " << this_instance->diagram.name << " exiting." << endl;
     pthread_exit(NULL);
 }
 

@@ -1,179 +1,72 @@
-#include <iostream>
-#include <boost/shared_ptr.hpp>
-
 #include "Man.h"
-#include "manconfig.h"
-#include "synchro/synchro.h"
-#include "VisionDef.h"
 #include "Common.h"
-#include "Camera.h"
-#include "PyRoboGuardian.h"
-#include "PySensors.h"
-#include "PyLights.h"
-#include "PySpeech.h"
-#include "PyComm.h"
-#include "memory/log/OutputProviderFactory.h"
+#include <iostream>
+#include "RobotConfig.h"
 
-//#include <valgrind/callgrind.h>
+namespace man {
 
-using namespace std;
-using boost::shared_ptr;
-using namespace man::corpus;
-using namespace man::memory;
-using namespace man::memory::log;
-
-/////////////////////////////////////////
-//                                     //
-//  Module class function definitions  //
-//                                     //
-/////////////////////////////////////////
-
-Man::Man (RobotMemory::ptr memory,
-          boost::shared_ptr<Sensors> _sensors,
-          boost::shared_ptr<Transcriber> _transcriber,
-          boost::shared_ptr<ImageTranscriber> _imageTranscriber,
-          boost::shared_ptr<MotionEnactor> _enactor,
-          boost::shared_ptr<Lights> _lights,
-          boost::shared_ptr<Speech> _speech)
-    :     memory(memory),
-          sensors(_sensors),
-          transcriber(_transcriber),
-          imageTranscriber(_imageTranscriber),
-          enactor(_enactor),
-          lights(_lights),
-          speech(_speech)
+Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
+    : AL::ALModule(broker, name),
+      sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
+      sensors(broker),
+      guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
+      guardian(),
+      audio(broker),
+      commThread("comm", COMM_FRAME_LENGTH_uS),
+      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
+	  imageTranscriber(),
+	  vision()
 {
-#ifdef USE_TIME_PROFILING
-    Profiler::getInstance()->profileFrames(1400);
-#endif
+    setModuleDescription("The Northern Bites' soccer player.");
 
-    Kinematics::CameraCalibrate::init(RoboGuardian::getHostName());
+    /** Sensors **/
+    sensorsThread.addModule(sensors);
 
-    // give python a pointer to the sensors structure. Method defined in
-    // Sensors.h
-    set_sensors_pointer(sensors);
+    /** Guardian **/
+    guardianThread.addModule(guardian);
+    guardianThread.addModule(audio);
+    guardian.temperaturesInput.wireTo(&sensors.temperatureOutput_, true);
+    guardian.chestButtonInput.wireTo(&sensors.chestboardButtonOutput_, true);
+    guardian.footBumperInput.wireTo(&sensors.footbumperOutput_, true);
+    guardian.inertialInput.wireTo(&sensors.inertialsOutput_, true);
+    guardian.fsrInput.wireTo(&sensors.fsrOutput_, true);
+    guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
+    audio.audioIn.wireTo(&guardian.audioOutput);
 
-    imageTranscriber->setSubscriber(this);
+    /** Comm **/
+    commThread.addModule(comm);
 
-    guardian = boost::shared_ptr<RoboGuardian>(new RoboGuardian(sensors));
+	/** Cognition **/
+	cognitionThread.addModule(imageTranscriber);
+	cognitionThread.addModule(vision);
+	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
-    pose = boost::shared_ptr<NaoPose> (new NaoPose(sensors));
+    startSubThreads();
+}
 
-    // initialize core processing modules
-#ifdef USE_MOTION
-    motion = boost::shared_ptr<Motion> (new Motion(enactor, sensors, pose, memory->get<MMotion>()));
-    guardian->setMotionInterface(motion->getInterface());
-#endif
-    // initialize python roboguardian module.
-    // give python a pointer to the guardian. Method defined in PyRoboguardian.h
-    set_guardian_pointer(guardian);
-    set_lights_pointer(_lights);
-    set_speech_pointer(_speech);
+Man::~Man()
+{
+}
 
-    try {
-        vision = boost::shared_ptr<Vision> (new Vision(pose, memory->get<MVision>()));
+void Man::startSubThreads()
+{
+    startAndCheckThread(sensorsThread);
+    startAndCheckThread(guardianThread);
+    startAndCheckThread(commThread);
+    startAndCheckThread(cognitionThread);
+}
 
-        set_vision_pointer(vision);
-
-        comm = boost::shared_ptr<Comm> (new Comm());
-
-        set_comm_pointer(comm);
-
-        loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
-        set_logging_board_pointer(loggingBoard);
-
-        noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
-                                            loggingBoard,
-                                            motion->getInterface(), memory));
-
-    } catch(std::exception &e) {
-        std::cerr << e.what() << std::endl;
+void Man::startAndCheckThread(DiagramThread& thread)
+{
+    if(thread.start())
+    {
+        std::cout << thread.getName() << "thread failed to start." <<
+            std::endl;
     }
-
-    loggingBoard->setMemory(memory);
-
-
-#if defined USE_MEMORY && !defined OFFLINE
-    OutputProviderFactory::AllSocketOutput(memory.get(), loggingBoard.get());
-#endif
-    PROF_ENTER(P_GETIMAGE);
 }
 
-Man::~Man ()
-{
-  cout << "Man destructed." << endl;
-}
-
-void Man::startSubThreads() {
-    cout << "Man starting!" << endl;
-
-    if (guardian->start() != 0)
-        cout << "Guardian failed to start." << endl;
-
-    if (comm->start() != 0)
-        cout << "Comm failed to start." << endl;
-
-#ifdef USE_MOTION
-    // Start Motion thread (it handles its own threading
-    if (motion->start() != 0)
-        cout << "Motion failed to start." << endl;
-#endif
-
-    //  CALLGRIND_START_INSTRUMENTATION;
-    //  CALLGRIND_TOGGLE_COLLECT;
-}
-
-void Man::stopSubThreads() {
-    cout << "Man stopping!" << endl;
-
-    //remove stiffnesses
-    cout << "Killing stiffnesses." << endl;
-    motion->getInterface()->sendFreezeCommand(FreezeCommand::ptr(new FreezeCommand()));
-
-    loggingBoard->reset();
-
-    guardian->stop();
-    guardian->waitForThreadToFinish();
-
-#ifdef USE_MOTION
-    motion->stop();
-    motion->waitForThreadToFinish();
-#endif
-
-    //TODO: fix this from hanging
-    comm->stop();
-    comm->waitForThreadToFinish();
-    // @jfishman - tool will not exit, due to socket blocking
-    //comm->getTOOLTrigger()->await_off();
-}
-
-void
-Man::processFrame ()
-{
-    // Need to lock image and vision angles for duration of
-    // vision processing to ensure consistency.
-    sensors->lockImage();
-    PROF_ENTER(P_VISION);
-    vision->notifyImage(sensors->getImage(Camera::TOP), sensors->getImage(Camera::BOTTOM));
-    PROF_EXIT(P_VISION);
-    sensors->releaseImage();
-//    cout<<vision->ball->getDistance() << endl;
-
-    noggin->runStep();
-
-    PROF_ENTER(P_LIGHTS);
-    lights->sendLights();
-    PROF_EXIT(P_LIGHTS);
-}
-
-
-void Man::notifyNextVisionImage() {
-
-  transcriber->postVisionSensors();
-
-  // Process current frame
-  processFrame();
-
-  // Make sure messages are printed
-  fflush(stdout);
 }

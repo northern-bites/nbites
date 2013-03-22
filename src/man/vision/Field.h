@@ -6,7 +6,6 @@
 class Field;  // forward reference
 
 #include "Threshold.h"
-#include "Profiler.h"
 #include "NaoPose.h"
 
 // constants for Graham scanning to find convex hull
