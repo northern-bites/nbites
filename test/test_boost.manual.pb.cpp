@@ -1,8 +1,4 @@
-// Manual boost python wrapping for test.pb.h
-// kept around for reference and historical purposes
-// @author Octavian Neamtu <oneamtu89@gmail.com>
 #include <boost/python.hpp>
-
 using namespace boost::python;
 
 #include "test.pb.h"
