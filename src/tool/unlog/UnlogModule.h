@@ -7,6 +7,8 @@
  * only passed a filename, so another piece of code needs to try to match
  * the file with the correct type of protobuf in order to create the unlogger
  * appropriately.
+ * Also provides an option to emit the new message every time we get one so
+ * that a display can be updated.
  *
  * While we use AIO for logging, it wouldn't make sense to use the same for
  * the tool, so we use regular (blocking) IO.
@@ -167,10 +169,6 @@ protected:
         // the OutPortal
         portals::Message<T> msg(0);
         *msg.get() = readNextMessage<T>();
-
-        // This is for debugging until the tool is back again
-        std::cout << "\nCurrent Message from " << fileName << ":\n" <<
-            msg.get()->DebugString();
 
         output.setMessage(msg);
 
