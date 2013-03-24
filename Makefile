@@ -6,8 +6,7 @@ setup_test:
 	$(MAKE) -C test
 
 test: setup_test
-	python -m test.parser_test
-	python -m test.wrapped_code_test
+	python -m unittest discover test *_test.py
 
 clean:
 	rm *.pyc
