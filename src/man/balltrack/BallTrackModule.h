@@ -6,7 +6,7 @@
  */
 #pragma once
 
-#include "BallFilter.h"
+#include "NaiveBallFilter.h"
 
 #include "RoboGrams.h"
 #include "BallModel.pb.h"
@@ -36,8 +36,8 @@ namespace man
         void run_();
 
     private:
-//        boost::shared_ptr<BallFilter> ballFilter;
-        BallFilter *ballFilter;
+//        boost::shared_ptr<NaiveBallFilter> ballFilter;
+        NaiveBallFilter *ballFilter;
 
         float ballX;
         float ballY;

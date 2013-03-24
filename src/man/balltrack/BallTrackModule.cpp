@@ -9,7 +9,7 @@ namespace man
         portals::Module(),
         ballLocationOutput(base())
     {
-        ballFilter = new BallFilter();
+        ballFilter = new NaiveBallFilter();
 
         ballX = 1.f;
         ballY = 2.f;

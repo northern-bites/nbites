@@ -1,10 +1,10 @@
-#include "BallFilter.h"
+#include "NaiveBallFilter.h"
 
 namespace man
 {
     namespace balltrack
     {
-        BallFilter::BallFilter(int bufferSize_)
+        NaiveBallFilter::NaiveBallFilter(int bufferSize_)
         {
             bufferSize = bufferSize_;
             obsvBuffer = new BallObservation[bufferSize];
@@ -13,16 +13,16 @@ namespace man
             curExpEstimate.bear = 0;
         }
 
-        BallFilter::~BallFilter(){}
+        NaiveBallFilter::~NaiveBallFilter(){}
 
-        void BallFilter::update(messages::VisionBall visionBall,
+        void NaiveBallFilter::update(messages::VisionBall visionBall,
                                 messages::Motion odometry)
         {
             addObservation(BallObservation(visionBall.distance(),
                                            visionBall.bearing()));
         }
 
-        void BallFilter::addObservation(BallObservation newObsv)
+        void NaiveBallFilter::addObservation(BallObservation newObsv)
         {
             curEntry = (curEntry+1)%bufferSize;
             obsvBuffer[curEntry] = newObsv;
@@ -33,7 +33,7 @@ namespace man
                                       curExpEstimate.bear * (1 - ALPHA);
         }
 
-        CartesianBallEstimate BallFilter::getCartesianRep(BallObservation obsv)
+        CartesianBallEstimate NaiveBallFilter::getCartesianRep(BallObservation obsv)
         {
             float sinD, cosD;
             sincosf(obsv.bear, &sinD, &cosD);
@@ -41,12 +41,12 @@ namespace man
                                          obsv.dist*sinD);
         }
 
-        BallObservation BallFilter::getObsv(int which)
+        BallObservation NaiveBallFilter::getObsv(int which)
         {
             return obsvBuffer[curEntry + which];
         }
 
-        BallObservation BallFilter::getNaiveEstimate()
+        BallObservation NaiveBallFilter::getNaiveEstimate()
         {
             float distSum = 0;
             float bearSum = 0;
@@ -60,12 +60,12 @@ namespace man
                                    bearSum/(float)bufferSize);
         }
 
-        CartesianBallEstimate BallFilter::getCartesianNaiveEstimate()
+        CartesianBallEstimate NaiveBallFilter::getCartesianNaiveEstimate()
         {
             return getCartesianRep(getNaiveEstimate());
         }
 
-        BallObservation BallFilter::getWeightedNaiveEstimate()
+        BallObservation NaiveBallFilter::getWeightedNaiveEstimate()
         {
             float distSum = 0;
             float bearSum = 0;
@@ -81,17 +81,17 @@ namespace man
                                    bearSum/(float)totalWeights);
         }
 
-        CartesianBallEstimate BallFilter::getCartesianWeightedNaiveEstimate()
+        CartesianBallEstimate NaiveBallFilter::getCartesianWeightedNaiveEstimate()
         {
             return getCartesianRep(getWeightedNaiveEstimate());
         }
 
-        BallObservation BallFilter::getExponentialEstimate()
+        BallObservation NaiveBallFilter::getExponentialEstimate()
         {
             return curExpEstimate;
         }
 
-        CartesianBallEstimate BallFilter::getCartesianExponentialEstimate()
+        CartesianBallEstimate NaiveBallFilter::getCartesianExponentialEstimate()
         {
             return getCartesianRep(getExponentialEstimate());
         }
