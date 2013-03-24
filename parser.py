@@ -28,8 +28,7 @@ primitive_field_types = [
 # allow underscores in names
 name_word = Word(alphanums + '_')
 
-package_scope = name_word.setResultsName('name')
-package_scopes = delimitedList(package_scope, '.')
+package_scopes = delimitedList(name_word, '.')
 package_declaration = 'package' + package_scopes.setResultsName('scopes') + ';'
 
 default = Literal('[') + Literal('default') + Literal('=') + name_word + ']'

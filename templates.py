@@ -5,9 +5,15 @@ using namespace boost::python;
 
 #include "%(proto_header_file)s"
 
+"""
+
+MODULE_DECLARATION = """
 BOOST_PYTHON_MODULE(%(module_name)s) {
 
 """
+
+PACKAGE_SCOPE_DUMMY_CLASS = "class DummyClassFor%(scope_name)s {};\n"
+PACKAGE_SCOPE = "  scope %(scope_name)s_scope = class_<DummyClassFor%(scope_name)s>(\"%(scope_name)s\");\n"
 
 # These scopes ensure that nested classes and enums are also
 # properly namespaced/scoped in python

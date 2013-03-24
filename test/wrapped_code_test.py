@@ -3,6 +3,7 @@
 import unittest
 
 from test_proto import *
+from test_package_proto import *
 
 class TestBoostPyWrapping(unittest.TestCase):
 
@@ -92,6 +93,11 @@ class TestBoostPyWrapping(unittest.TestCase):
         self.assertEqual(self.test_message.repeated_int32_test_size(), 1)
         self.test_message.clear_repeated_int32_test()
         self.assertEqual(self.test_message.repeated_int32_test_size(), 0)
+
+    def test_package_wrapping(self):
+        test_package_message = foo.bar.Boo.Too()
+
+        self.assertNotEqual(test_package_message, None)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestBoostPyWrapping)

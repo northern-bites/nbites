@@ -75,17 +75,31 @@ def main(argv):
         known_messages = []
         known_enums = []
         wrapped_messages = []
+        scopes = []
+
+        if parsed_proto_file.package != '':
+            scopes = list(parsed_proto_file.package.scopes)
 
         for message in parsed_proto_file.messages:
             known_messages += extract_message_names(message)
             known_enums += extract_enum_names(message)
-            wrapped_messages += boostifier.process_message(message, known_messages, known_enums)
+            wrapped_messages += boostifier.process_message(message, known_messages, known_enums, scopes)
 
         output_file = open(output_file, 'w')
 
         proto_header_file = protoc_header_filename(input_basename)
-        module_name = input_basename + '_proto'
         output_file.write(templates.HEADER % locals())
+
+        for scope in scopes:
+            scope_name = scope
+            output_file.write(templates.PACKAGE_SCOPE_DUMMY_CLASS % locals())
+
+        module_name = input_basename + '_proto'
+        output_file.write(templates.MODULE_DECLARATION % locals())
+
+        for scope in scopes:
+            scope_name = scope
+            output_file.write(templates.PACKAGE_SCOPE % locals())
 
         for wrapped_message in wrapped_messages:
             output_file.write(wrapped_message)
