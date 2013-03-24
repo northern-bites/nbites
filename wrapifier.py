@@ -65,13 +65,18 @@ def main(argv):
 
         output_file = os.path.join(output_dir, boost_output_filename(input_basename))
 
-        parsed_proto_messages = parser.parse_proto_file(input_file_path)
+        parsed_proto_file = parser.parse_proto_file(input_file_path)
+
+        if len(parsed_proto_file.messages) == 0:
+            print 'Warning! Could not parse any messages out of %(file)s! If that\'s ' \
+                'not expected, that means there might be a bug with the parser!' \
+                % { 'file': input_file_path }
 
         known_messages = []
         known_enums = []
         wrapped_messages = []
 
-        for message in parsed_proto_messages:
+        for message in parsed_proto_file.messages:
             known_messages += extract_message_names(message)
             known_enums += extract_enum_names(message)
             wrapped_messages += boostifier.process_message(message, known_messages, known_enums)

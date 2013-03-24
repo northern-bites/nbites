@@ -46,6 +46,12 @@ class TestProtoParser(unittest.TestCase):
         self.assertEqual(parse_result.elements[1]['name'], 'TEST_ENUM_2')
         self.assertEqual(parse_result.elements[1]['value'], '2')
 
+    def test_package_declaration(self):
+        parse_result = parser.package_declaration.parseString("package foo.bar;")
+
+        self.assertEqual(parse_result.scopes[0], 'foo')
+        self.assertEqual(parse_result.scopes[1], 'bar')
+
     def test_recursive_message(self):
         parse_result = parser.message.parseString("message Parent { message Child { } } ")
 
@@ -102,7 +108,7 @@ class TestProtoParser(unittest.TestCase):
         self.assertEqual(enum2['name'], 'E2')
 
     def test_messages(self):
-        parse_result = parser.messages.parseString("message M1 {} message M2 {}")
+        parse_result = parser.proto_file.parseString("message M1 {} message M2 {}")
 
         self.assertEqual(parse_result[0]['message'], 'message')
         self.assertEqual(parse_result[0]['name'], 'M1')
