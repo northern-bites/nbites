@@ -10,6 +10,14 @@ class TestBoostPyWrapping(unittest.TestCase):
     def setUp(self):
         self.test_message = TestMessage()
 
+    def test_uppercase_field_name(self):
+        self.test_message.camelcasestring = "string"
+        self.assertEqual(self.test_message.camelcasestring, "string")
+
+        self.assertTrue(self.test_message.has_camelcasestring())
+        self.test_message.clear_camelcasestring()
+        self.assertFalse(self.test_message.has_camelcasestring())
+
     def test_string(self):
         self.test_message.string_test = "string"
         self.assertEqual(self.test_message.string_test, "string")

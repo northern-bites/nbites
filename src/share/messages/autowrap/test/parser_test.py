@@ -22,6 +22,11 @@ class TestProtoParser(unittest.TestCase):
         self.assertEqual(parse_result['name'], 'test_message')
         self.assertEqual(parse_result['id'], '15')
 
+    def test_default(self):
+        self.assertNotEqual(len(parser.default.parseString("[default=3]")), 0)
+        self.assertNotEqual(len(parser.default.parseString("[default = 3.32]")), 0)
+        self.assertNotEqual(len(parser.default.parseString("[default = \"\\0 poo\"]")), 0)
+
     def test_field_with_default(self):
         parse_result = parser.field.parseString("optional sint32 test_field = 5 [default=3];")
 

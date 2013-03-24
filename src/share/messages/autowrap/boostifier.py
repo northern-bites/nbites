@@ -72,7 +72,7 @@ def process_field(element, known_messages, known_enums, scope_stack):
         else:
             string_format = templates.SINGLE_PRIMITIVE
 
-    field_name = element.name
+    field_name = element.name.lower() # protoc converts fieldnames to lower
     field_type = element.type
     # should probably check straightaway against a primitive list rather
     # than just assume all types that are not known are primitives
@@ -84,42 +84,3 @@ def process_field(element, known_messages, known_enums, scope_stack):
 
 def scope(name, scope_list, delimiter = '::'):
     return delimiter.join(scope_list + [name])
-
-def repeated_message_def_template():
-    return "\n\
-    .def(\"add_repeated_{0}\", &{1}::add_repeated_{0}, return_value_policy<reference_existing_object>())\n\
-    .def(\"repeated_{0}\", {1}_repeated_{0}_from_index, return_value_policy<reference_existing_object>())\n\
-    .def(\"repeated_{0}_size\", &{1}::repeated_{0}_size)\n\
-    .def(\"clear_repeated_{0}\", &{1}::clear_repeated_{0})\n"
-
-def repeated_message_helper_alias_template():
-    return "::{1}::{2}* ({1}::*{1}_repeated_{0}_from_index)(int) = &{1}::mutable_repeated_{0};"
-
-def process_repeated_message(field, scope_stack):
-    return { 'field': repeated_message_def_template().format(field['name'], '::'.join(scope_stack), field['type']) }
-
-def repeated_string_def_template():
-    return "\n\
-    .def(\"add_repeated_{0}\", &{1}::add_repeated_{0})\n\
-    .def(\"set_repeated_{0}\", &{1}::set_repeated_{0})\n\
-    .def(\"repeated_{0}\", {1}_repeated_{0}_from_index)\n\
-    .def(\"repeated_{0}_size\", &{1}::repeated_{0}_size)\n\
-    .def(\"clear_repeated_{0}\", &{1}::clear_repeated_{0})"
-
-def repeated_string_helper_alias_template():
-    return "void ({1}::*{1}_set_{0})(const ::std::string&) = &{1}::set_{0};"
-
-def process_repeated_string(field, scope_stack):
-    return {'field': ''}#{ 'field': repeated_string_def_template().format(field['name'], '::'.join(scope_stack)),
-            #'helper_alias': repeated_string_helper_alias_template().format('_'.join(scope_stack) + '_' + field['name'], '::'.join(scope_stack))}
-
-def repeated_primitive_def_template():
-    return "\n\
-    .def(\"add_repeated_{0}\", &{1}::add_repeated_{0})\n\
-    .def(\"set_repeated_{0}\", &{1}::set_repeated_{0})\n\
-    .def(\"repeated_{0}\", {1}_repeated_{0}_from_index)\n\
-    .def(\"repeated_{0}_size\", &{1}::repeated_{0}_size)\n\
-    .def(\"clear_repeated_{0}\", &{1}::clear_repeated_{0})\n"
-
-def process_repeated_primitive(field, scope_stack):
-    return { 'field': single_primitive_def_template().format(field['name'], '::'.join(scope_stack))}

@@ -31,7 +31,8 @@ name_word = Word(alphanums + '_')
 package_scopes = delimitedList(name_word, '.')
 package_declaration = 'package' + package_scopes.setResultsName('scopes') + ';'
 
-default = Literal('[') + Literal('default') + Literal('=') + name_word + ']'
+default_value_word = Word(alphanums + '_.\"\\ ')
+default = Literal('[') + Literal('default') + Literal('=') + default_value_word + ']'
 
 field_types = primitive_field_types + [name_word]
 
