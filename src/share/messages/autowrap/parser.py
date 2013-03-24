@@ -28,6 +28,9 @@ primitive_field_types = [
 # allow underscores in names
 name_word = Word(alphanums + '_')
 
+package_scopes = delimitedList(name_word, '.')
+package_declaration = 'package' + package_scopes.setResultsName('scopes') + ';'
+
 default = Literal('[') + Literal('default') + Literal('=') + name_word + ']'
 
 field_types = primitive_field_types + [name_word]
@@ -35,7 +38,7 @@ field_types = primitive_field_types + [name_word]
 field_flavor = MatchFirst(field_flavors).setResultsName('flavor')
 field_type = MatchFirst(field_types).setResultsName('type')
 field_name = name_word.setResultsName('name')
-field_id = Word( nums ).setResultsName('id')
+field_id = Word(nums).setResultsName('id')
 field = field_flavor + field_type + field_name + Literal('=') + \
     field_id + Optional(default) + ';'
 
@@ -58,9 +61,9 @@ message_keyword = Keyword('message').setResultsName('message')
 message_name = name_word.setResultsName('name')
 message << message_keyword + message_name + '{' + nested_elements + '}'
 
-messages = ZeroOrMore(Group(message))
+proto_file = Optional(package_declaration).setResultsName('package') + ZeroOrMore(Group(message)).setResultsName('messages')
 
-messages.ignore(dblSlashComment)
+proto_file.ignore(dblSlashComment)
 
 def parse_proto_file(file_path):
-    return messages.parseFile(file_path)
+    return proto_file.parseFile(file_path)

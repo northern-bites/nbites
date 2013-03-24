@@ -1,6 +1,6 @@
 import templates
 
-def process_message(message, known_messages, known_enums, message_scope_stack = []):
+def process_message(message, known_messages, known_enums, scope_stack = []):
     """
     Recursively parse a tokenized protobuf message structure
     Returns a string that represents the boost wrapped code
@@ -11,19 +11,19 @@ def process_message(message, known_messages, known_enums, message_scope_stack = 
     other_wrapped_objects = []
 
     message_name = message.name
-    scoped_message_name = scope(message.name, message_scope_stack)
+    scoped_message_name = scope(message.name, scope_stack)
     result += templates.MESSAGE_SCOPE
-    message_scope_stack.append(message.name)
+    scope_stack.append(message.name)
 
     result += templates.MESSAGE_DECLARATION % locals()
 
     for element in message.elements:
         if 'message' in element:
-            other_wrapped_objects += [process_message(element, known_messages, known_enums, message_scope_stack)]
+            other_wrapped_objects += [process_message(element, known_messages, known_enums, scope_stack)]
         elif 'enum' in element:
-            other_wrapped_objects += [process_enum(element, message_scope_stack)]
+            other_wrapped_objects += [process_enum(element, scope_stack)]
         elif 'flavor' in element:
-            result += process_field(element, known_messages, known_enums, message_scope_stack)
+            result += process_field(element, known_messages, known_enums, scope_stack)
         else:
             raise 'Unknown type of element ' + str(element)
 
@@ -32,28 +32,28 @@ def process_message(message, known_messages, known_enums, message_scope_stack = 
     for other_wrapped_object in other_wrapped_objects:
         result += other_wrapped_object
 
-    message_scope_stack.pop()
+    scope_stack.pop()
     result += templates.MESSAGE_SCOPE_END
 
     return result
 
-def process_enum(enum, message_scope_stack):
+def process_enum(enum, scope_stack):
 
     result = ""
 
     enum_name = enum.name
-    scoped_enum_name = scope(enum.name, message_scope_stack)
+    scoped_enum_name = scope(enum.name, scope_stack)
     result += templates.ENUM_DECLARATION % locals()
 
     for enum_field in enum.elements:
         enum_field_name = enum_field.name
-        enum_field_value = scope(enum_field_name, message_scope_stack)
+        enum_field_value = scope(enum_field_name, scope_stack)
         result += templates.ENUM_FIELD % locals()
 
     result += templates.ENUM_DECLARATION_END
     return result
 
-def process_field(element, known_messages, known_enums, message_scope_stack):
+def process_field(element, known_messages, known_enums, scope_stack):
 
     string_format = ""
 
@@ -79,7 +79,7 @@ def process_field(element, known_messages, known_enums, message_scope_stack):
     # but it's 3:30 AM and I don't wanna figure it out right now
     if (field_type not in known_messages) and (field_type not in known_enums) and (field_type not in ['string', 'bytes']):
         field_type = '::google::protobuf::' + field_type
-    scope = '::'.join(message_scope_stack)
+    scope = '::'.join(scope_stack)
     return string_format % locals()
 
 def scope(name, scope_list, delimiter = '::'):
@@ -95,8 +95,8 @@ def repeated_message_def_template():
 def repeated_message_helper_alias_template():
     return "::{1}::{2}* ({1}::*{1}_repeated_{0}_from_index)(int) = &{1}::mutable_repeated_{0};"
 
-def process_repeated_message(field, message_scope_stack):
-    return { 'field': repeated_message_def_template().format(field['name'], '::'.join(message_scope_stack), field['type']) }
+def process_repeated_message(field, scope_stack):
+    return { 'field': repeated_message_def_template().format(field['name'], '::'.join(scope_stack), field['type']) }
 
 def repeated_string_def_template():
     return "\n\
@@ -109,9 +109,9 @@ def repeated_string_def_template():
 def repeated_string_helper_alias_template():
     return "void ({1}::*{1}_set_{0})(const ::std::string&) = &{1}::set_{0};"
 
-def process_repeated_string(field, message_scope_stack):
-    return {'field': ''}#{ 'field': repeated_string_def_template().format(field['name'], '::'.join(message_scope_stack)),
-            #'helper_alias': repeated_string_helper_alias_template().format('_'.join(message_scope_stack) + '_' + field['name'], '::'.join(message_scope_stack))}
+def process_repeated_string(field, scope_stack):
+    return {'field': ''}#{ 'field': repeated_string_def_template().format(field['name'], '::'.join(scope_stack)),
+            #'helper_alias': repeated_string_helper_alias_template().format('_'.join(scope_stack) + '_' + field['name'], '::'.join(scope_stack))}
 
 def repeated_primitive_def_template():
     return "\n\
@@ -121,5 +121,5 @@ def repeated_primitive_def_template():
     .def(\"repeated_{0}_size\", &{1}::repeated_{0}_size)\n\
     .def(\"clear_repeated_{0}\", &{1}::clear_repeated_{0})\n"
 
-def process_repeated_primitive(field, message_scope_stack):
-    return { 'field': single_primitive_def_template().format(field['name'], '::'.join(message_scope_stack))}
+def process_repeated_primitive(field, scope_stack):
+    return { 'field': single_primitive_def_template().format(field['name'], '::'.join(scope_stack))}

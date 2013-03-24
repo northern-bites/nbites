@@ -36,54 +36,75 @@ def extract_enum_names(parsed_proto_message):
 
 def main(argv):
 
-    output_file = ''
+    output_dir = ''
     input_file_path = ''
+
+    USAGE = 'Usage: test.py [-o <output_dir>] <inputfile>'
 
     try:
         opts, args = getopt.getopt(argv,"ho:",["output="])
     except getopt.GetoptError:
-        print 'Usage: test.py [-o <outputfile>] <inputfile>'
+        print USAGE
         sys.exit(2)
 
-    if len(args) != 1:
-        print 'Need to specify an input file!'
-        print 'Usage: test.py [-o <outputfile>] <inputfile>'
+    if len(args) < 1:
+        print 'Need to specify at least an input file!'
+        print USAGE
         sys.exit(2)
-    input_file_path = args[0]
 
     for opt, arg in opts:
         if opt == '-h':
-            print 'Usage: test.py [-o <outputfile>] <inputfile>'
+            print USAGE
             sys.exit()
         elif opt in ("-o", "--output"):
-            output_file = arg
+            output_dir = arg
 
-    input_basename = basename_no_extension(input_file_path)
+    for input_file_path in args:
 
-    if output_file == '':
-        output_file = boost_output_filename(input_basename)
+        input_basename = basename_no_extension(input_file_path)
 
-    parsed_proto_messages = parser.parse_proto_file(input_file_path)
+        output_file = os.path.join(output_dir, boost_output_filename(input_basename))
 
-    known_messages = []
-    known_enums = []
-    wrapped_messages = []
+        parsed_proto_file = parser.parse_proto_file(input_file_path)
 
-    for message in parsed_proto_messages:
-        known_messages += extract_message_names(message)
-        known_enums += extract_enum_names(message)
-        wrapped_messages += boostifier.process_message(message, known_messages, known_enums)
+        if len(parsed_proto_file.messages) == 0:
+            print 'Warning! Could not parse any messages out of %(file)s! If that\'s ' \
+                'not expected, that means there might be a bug with the parser!' \
+                % { 'file': input_file_path }
 
-    output_file = open(output_file, 'w')
+        known_messages = []
+        known_enums = []
+        wrapped_messages = []
+        scopes = []
 
-    proto_header_file = protoc_header_filename(input_basename)
-    module_name = input_basename + '_proto'
-    output_file.write(templates.HEADER % locals())
+        if parsed_proto_file.package != '':
+            scopes = list(parsed_proto_file.package.scopes)
 
-    for wrapped_message in wrapped_messages:
-        output_file.write(wrapped_message)
+        for message in parsed_proto_file.messages:
+            known_messages += extract_message_names(message)
+            known_enums += extract_enum_names(message)
+            wrapped_messages += boostifier.process_message(message, known_messages, known_enums, scopes)
 
-    output_file.write(templates.FOOTER)
+        output_file = open(output_file, 'w')
+
+        proto_header_file = protoc_header_filename(input_basename)
+        output_file.write(templates.HEADER % locals())
+
+        for scope in scopes:
+            scope_name = scope
+            output_file.write(templates.PACKAGE_SCOPE_DUMMY_CLASS % locals())
+
+        module_name = input_basename + '_proto'
+        output_file.write(templates.MODULE_DECLARATION % locals())
+
+        for scope in scopes:
+            scope_name = scope
+            output_file.write(templates.PACKAGE_SCOPE % locals())
+
+        for wrapped_message in wrapped_messages:
+            output_file.write(wrapped_message)
+
+        output_file.write(templates.FOOTER)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
