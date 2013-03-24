@@ -109,9 +109,11 @@ class TestBoostPyWrapping(unittest.TestCase):
         self.assertNotEqual(TestMessage2().add_nested_sibling_message_test, None)
 
     def test_package_wrapping(self):
-        test_package_message = foo.bar.Boo.Too()
-
-        self.assertNotEqual(test_package_message, None)
+        self.assertNotEqual(foo.bar.Boo.NestedBoo(), None)
+        self.assertNotEqual(foo.bar.Boo().add_repeated_nested_message, None)
+        self.assertNotEqual(foo.bar.Boo().add_forward_message, None)
+        self.assertNotEqual(foo.bar.BabyBoo(), None)
+        self.assertNotEqual(foo.bar.BabyBoo().add_sibling_message, None)
 
 if __name__ == '__main__':
     suite = unittest.TestLoader().loadTestsFromTestCase(TestBoostPyWrapping)

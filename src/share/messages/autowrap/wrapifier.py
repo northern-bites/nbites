@@ -87,7 +87,7 @@ def main(argv):
         unscoped_known_messages = extract_message_hierarchy(parsed_proto_file)
         # pack the known_messages within the scopes defined by package
         scoped_known_messages = unscoped_known_messages
-        for scope in scopes:
+        for scope in reversed(scopes):
             scoped_known_messages = {scope: scoped_known_messages}
 
         for message in parsed_proto_file.elements:

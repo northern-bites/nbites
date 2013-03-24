@@ -104,12 +104,14 @@ def scoped_message_type(message, known_messages, scope_stack):
         else:
             return None
 
-    scope = scope_stack.pop()
+    scope = scope_stack[0]
 
-    unscoped_messages = known_messages[scope]
-    found_message = scoped_message_type(message, unscoped_messages, scope_stack)
+    if known_messages.has_key(scope):
+        unscoped_messages = known_messages[scope]
+    else:
+        raise Exception('Unknow message type ' + message)
 
-    scope_stack.append(scope)
+    found_message = scoped_message_type(message, unscoped_messages, scope_stack[1:])
 
     if found_message is None and known_messages.has_key(message):
         return message

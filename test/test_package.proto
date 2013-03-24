@@ -1,5 +1,12 @@
 package foo.bar;
 
 message Boo {
-  message Too {}
+  message NestedBoo {}
+
+  repeated NestedBoo repeated_nested_message = 20;
+  repeated BabyBoo forward_message = 22;
+}
+
+message BabyBoo {
+  repeated Boo sibling_message = 2;
 }
