@@ -1,4 +1,5 @@
 import templates
+import protobuf_defs
 
 def process_message(message, known_messages, known_enums, scope_stack = []):
     """
@@ -57,30 +58,60 @@ def process_field(element, known_messages, known_enums, scope_stack):
 
     string_format = ""
 
-    if element.flavor == 'repeated':
-        if element.type in known_messages:
-            string_format = templates.REPEATED_MESSAGE
-        elif element.type in ['string', 'bytes']:
-            string_format = templates.REPEATED_STRING
-        else:
-            string_format = templates.REPEATED_PRIMITIVE
-    else:
-        if element.type in known_messages:
-            string_format = templates.SINGLE_MESSAGE
-        elif element.type in ['string', 'bytes']:
-            string_format = templates.SINGLE_STRING
-        else:
-            string_format = templates.SINGLE_PRIMITIVE
-
     field_name = element.name.lower() # protoc converts fieldnames to lower
     field_type = element.type
-    # should probably check straightaway against a primitive list rather
-    # than just assume all types that are not known are primitives
-    # but it's 3:30 AM and I don't wanna figure it out right now
-    if (field_type not in known_messages) and (field_type not in known_enums) and (field_type not in ['string', 'bytes']):
-        field_type = '::google::protobuf::' + field_type
     scope = '::'.join(scope_stack)
+
+    if element.flavor == 'repeated':
+        if element.type in protobuf_defs.STRING_TYPES:
+            string_format = templates.REPEATED_STRING
+        elif element.type in known_enums:
+            string_format = templates.REPEATED_PRIMITIVE
+        elif element.type in protobuf_defs.PRIMITIVE_TYPES:
+            field_type = '::google::protobuf::' + field_type
+            string_format = templates.REPEATED_PRIMITIVE
+        else:
+            field_type = scoped_message_type(field_type, known_messages, scope_stack)
+            string_format = templates.REPEATED_MESSAGE
+    else:
+        if element.type in protobuf_defs.STRING_TYPES:
+            string_format = templates.SINGLE_STRING
+        elif element.type in known_enums:
+            string_format = templates.SINGLE_PRIMITIVE
+        elif element.type in protobuf_defs.PRIMITIVE_TYPES:
+            field_type = '::google::protobuf::' + field_type
+            string_format = templates.SINGLE_PRIMITIVE
+        else:
+            field_type = scoped_message_type(field_type, known_messages, scope_stack)
+            string_format = templates.SINGLE_MESSAGE
+
     return string_format % locals()
 
 def scope(name, scope_list, delimiter = '::'):
     return delimiter.join(scope_list + [name])
+
+def scoped_message_type(message, known_messages, scope_stack):
+    """
+    Recursively looks in the known message deep dictionary for the
+    full scope of a message.
+    E.g. for message = Foo, scope_stack = [Bar], and
+    known_messages = {Bar: {Foo: {}}, Foo: {}}
+    then the return will be Bar::Foo (and not Foo)
+    """
+    if len(scope_stack) == 0:
+        if known_messages.has_key(message):
+            return message
+        else:
+            return None
+
+    scope = scope_stack.pop()
+
+    unscoped_messages = known_messages[scope]
+    found_message = scoped_message_type(message, unscoped_messages, scope_stack)
+
+    scope_stack.append(scope)
+
+    if found_message is None and known_messages.has_key(message):
+        return message
+
+    return scope + '::' + found_message
