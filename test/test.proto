@@ -39,6 +39,8 @@ message TestMessage { //test comment
 
   repeated int32 repeated_int32_test = 19;
   repeated string repeated_string_test = 20;
+  
+  required string camelCaseString = 21;
 }
 
 message TestMessage2 {
