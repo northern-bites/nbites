@@ -1,29 +1,5 @@
 from pyparsing import *
-
-field_flavors = [
-    Keyword('required'),
-    Keyword('optional'),
-    Keyword('repeated')
-]
-
-primitive_field_types = [
-    Keyword('string'),
-    Keyword('bytes'),
-    Keyword('int32'),
-    Keyword('int64'),
-    Keyword('uint32'),
-    Keyword('uint64'),
-    Keyword('sint32'),
-    Keyword('sint64'),
-    Keyword('fixed32'),
-    Keyword('fixed64'),
-    Keyword('sfixed32'),
-    Keyword('sfixed64'),
-    Keyword('float'),
-    Keyword('double'),
-    Keyword('bool'),
-    Keyword('message'),
-    Keyword('enum')]
+import protobuf_defs
 
 # allow underscores in names
 name_word = Word(alphanums + '_')
@@ -34,7 +10,19 @@ package_declaration = 'package' + package_scopes.setResultsName('scopes') + ';'
 default_value_word = Word(alphanums + '_.\"\\ ')
 default = Literal('[') + Literal('default') + Literal('=') + default_value_word + ']'
 
-field_types = primitive_field_types + [name_word]
+field_flavors = [
+    Keyword('required'),
+    Keyword('optional'),
+    Keyword('repeated')
+]
+
+field_types = []
+
+for type in protobuf_defs.ALL_TYPES:
+    field_types += [Keyword(type)]
+
+# allow enum and message types
+field_types += [name_word]
 
 field_flavor = MatchFirst(field_flavors).setResultsName('flavor')
 field_type = MatchFirst(field_types).setResultsName('type')
@@ -62,7 +50,10 @@ message_keyword = Keyword('message').setResultsName('message')
 message_name = name_word.setResultsName('name')
 message << message_keyword + message_name + '{' + nested_elements + '}'
 
-proto_file = Optional(package_declaration).setResultsName('package') + ZeroOrMore(Group(message)).setResultsName('messages')
+# messages in a proto_file are named elements so that top-level messages can
+# be processed just like nested messages (so they're nested under the global
+# namespace in some sense)
+proto_file = Optional(package_declaration).setResultsName('package') + ZeroOrMore(Group(message)).setResultsName('elements')
 
 proto_file.ignore(dblSlashComment)
 

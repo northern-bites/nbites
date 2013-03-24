@@ -102,6 +102,12 @@ class TestBoostPyWrapping(unittest.TestCase):
         self.test_message.clear_repeated_int32_test()
         self.assertEqual(self.test_message.repeated_int32_test_size(), 0)
 
+    def test_forward_message(self):
+        self.assertNotEqual(self.test_message.add_forward_message_test, None)
+
+    def test_nested_sibling_message(self):
+        self.assertNotEqual(TestMessage2().add_nested_sibling_message_test, None)
+
     def test_package_wrapping(self):
         test_package_message = foo.bar.Boo.Too()
 

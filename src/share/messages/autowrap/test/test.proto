@@ -39,10 +39,14 @@ message TestMessage { //test comment
 
   repeated int32 repeated_int32_test = 19;
   repeated string repeated_string_test = 20;
-  
+
   required string camelCaseString = 21;
+
+  repeated TestMessage2 forward_message_test = 22;
 }
 
 message TestMessage2 {
   required string string_test = 1;
+
+  repeated TestMessage nested_sibling_message_test = 2;
 }

@@ -14,18 +14,23 @@ def boost_output_filename(name):
 def protoc_header_filename(name):
     return '.'.join([name] + ['pb', 'h'])
 
-def extract_message_names(parsed_proto_message):
-    message_names = [parsed_proto_message.name]
-    # right now toss in messages and nested messages together
+def extract_message_hierarchy(parsed_proto_message):
+    """
+    Go through all elements of an object, find elements of type message
+    and construct a recursive dictionary map of all messages and nested
+    messages
+    E.g. for "message M1 { message NM1{} } message M2 {}" the dictionary
+    will look like { M1: { NM1: {}}, M2: {} }
+    """
+    nested_messages = {}
     for element in parsed_proto_message.elements:
         if 'message' in element:
-            message_names += extract_message_names(element)
+            nested_messages[element.name] = extract_message_hierarchy(element)
 
-    return message_names
+    return nested_messages
 
 def extract_enum_names(parsed_proto_message):
     enum_names = []
-    # right now toss in messages and nested messages together
     for element in parsed_proto_message.elements:
         if 'enum' in element:
             enum_names += [element.name]
@@ -67,12 +72,11 @@ def main(argv):
 
         parsed_proto_file = parser.parse_proto_file(input_file_path)
 
-        if len(parsed_proto_file.messages) == 0:
+        if len(parsed_proto_file.elements) == 0:
             print 'Warning! Could not parse any messages out of %(file)s! If that\'s ' \
                 'not expected, that means there might be a bug with the parser!' \
                 % { 'file': input_file_path }
 
-        known_messages = []
         known_enums = []
         wrapped_messages = []
         scopes = []
@@ -80,10 +84,17 @@ def main(argv):
         if parsed_proto_file.package != '':
             scopes = list(parsed_proto_file.package.scopes)
 
-        for message in parsed_proto_file.messages:
-            known_messages += extract_message_names(message)
+        unscoped_known_messages = extract_message_hierarchy(parsed_proto_file)
+        # pack the known_messages within the scopes defined by package
+        scoped_known_messages = unscoped_known_messages
+        for scope in scopes:
+            scoped_known_messages = {scope: scoped_known_messages}
+
+        for message in parsed_proto_file.elements:
             known_enums += extract_enum_names(message)
-            wrapped_messages += boostifier.process_message(message, known_messages, known_enums, scopes)
+
+        for message in parsed_proto_file.elements:
+            wrapped_messages += boostifier.process_message(message, scoped_known_messages, known_enums, scopes)
 
         output_file = open(output_file, 'w')
 

@@ -52,7 +52,7 @@ REPEATED_PRIMITIVE="""\
 REPEATED_STRING=""#NOT IMPLEMENTED YET!"
 REPEATED_MESSAGE="""\
     .def("add_%(field_name)s", &%(scope)s::add_%(field_name)s, return_value_policy<reference_existing_object>())
-    .def("%(field_name)s", (%(scope)s::%(field_type)s* (%(scope)s::*)(int))(&%(scope)s::mutable_%(field_name)s), return_value_policy<reference_existing_object>())
+    .def("%(field_name)s", (%(field_type)s* (%(scope)s::*)(int))(&%(scope)s::mutable_%(field_name)s), return_value_policy<reference_existing_object>())
     .def("%(field_name)s_size", &%(scope)s::%(field_name)s_size)
     .def("clear_%(field_name)s", &%(scope)s::clear_%(field_name)s)
 
