@@ -10,6 +10,7 @@ project(balltrack)
 set(BALLTRACK_SRCS BallTrackModule
                    NaiveBallFilter
 		   FakeBallTrackInput
+		   KalmanFilter
 )
 
 # Add project as a library.
@@ -25,3 +26,23 @@ target_link_libraries(balltrack
 		      portals
 		      messages
 		      ${PROTOS_TARGET})
+
+add_executable(
+  balltrack_test
+  tests/KalmanFilterTest.cpp
+)
+
+target_link_libraries(
+  balltrack_test
+  balltrack
+  pthread
+  ${GTEST_LIBRARY}
+)
+
+add_test(
+  balltrack_test
+  balltrack_test
+)
+
+add_custom_target(check
+                  DEPENDS balltrack_test)

@@ -10,6 +10,7 @@
 #pragma once
 
 #include "NBMath.h"
+#include "BallTrackStructs.h"
 
 #include "BallModel.pb.h"
 #include "Motion.pb.h"
@@ -20,28 +21,6 @@ namespace man
     {
         static const int DEFAULT_BUFFER_SIZE = 30;
         static const float ALPHA = .7f;
-
-        /*
-         * @brief Struct to take observations from vision
-         */
-        struct BallObservation
-        {
-            BallObservation(float dist_, float bear_) : dist(dist_), bear(bear) {}
-            BallObservation() {}
-            float dist;
-            float bear;
-        };
-
-        /*
-         * @brief Struct to pass back Cartesian Ball Estimate
-         */
-        struct CartesianBallEstimate
-        {
-            CartesianBallEstimate(float relX_, float relY_) : relX(relX_), relY(relY_) {}
-            CartesianBallEstimate() {}
-            float relX;
-            float relY;
-        };
 
         class NaiveBallFilter
         {
@@ -63,6 +42,8 @@ namespace man
             CartesianBallEstimate getCartesianWeightedNaiveEstimate();
 
             CartesianBallEstimate getCartesianRep(BallObservation obsv);
+
+            int getBufferSize(){return bufferSize;};
 
         private:
             BallObservation *obsvBuffer;

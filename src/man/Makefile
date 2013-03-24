@@ -56,7 +56,7 @@ cross:  $(CROSS_FILE)
 $(CROSS_FILE):
 	mkdir -p $(BUILD_DIR)
 	@if [ -e $(STRAIGHT_FILE) ]; then \
-		rm -r $(BUILD_DIR)/*; \
+		rm -rf $(BUILD_DIR)/*; \
 	fi
 	@touch $(CROSS_FILE)
 
@@ -69,7 +69,7 @@ straight: $(STRAIGHT_FILE)
 $(STRAIGHT_FILE):
 	mkdir -p $(BUILD_DIR)
 	@if [ -e $(CROSS_FILE) ]; then \
-		rm -r $(BUILD_DIR)/*; \
+		rm -rf $(BUILD_DIR)/*; \
 	fi
 	@touch $(STRAIGHT_FILE)
 

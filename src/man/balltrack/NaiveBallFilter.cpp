@@ -16,7 +16,7 @@ namespace man
         NaiveBallFilter::~NaiveBallFilter(){}
 
         void NaiveBallFilter::update(messages::VisionBall visionBall,
-                                messages::Motion odometry)
+                                     messages::Motion odometry)
         {
             addObservation(BallObservation(visionBall.distance(),
                                            visionBall.bearing()));
