@@ -1,256 +1,201 @@
-#include "BehaviorsModule.h"
-#include "PyConstants.h"
-
+#include <Python.h>
+#include <cstdlib>
+#include <exception>
+#include <boost/shared_ptr.hpp>
+#include <boost/python/errors.hpp>
 #include <iostream>
 
-static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
+#include "BehaviorsModule.h"
+#include "PyObjects.h"
+
+using namespace std;
+using namespace boost::python;
+
+extern "C" void initLedCommand_proto();
+extern "C" void initGameState_proto();
+extern "C" void initWorldModel_proto();
+extern "C" void initBallModel_proto();
+
 
 namespace man {
-	namespace behaviors {
+namespace behaviors {
 
-		BehaviorsModule::BehaviorsModule()//unsigned int player_num, unsigned int team_num)
-			: portals::Module(),
-			  brain_module(NULL),
-			  brain_instance(NULL),
-			  num_crashed(0),
-			  player_number(1),//player_num),
-			  team_number(27),//team_num),
-			  in_proto(),
-			  in_size(),
-			  out_serial(),
-			  out_proto(),
-			  out_size_t(),
-			  out_size(),
-			  ledCommandOut(base())
-		{
-			// Build Python list of correct length
-			// this cast might totally fail... but if it doesn't,
-			//  this is cleaner
-			in_list_serials = PyList_New((Py_ssize_t)NUM_IN_MESSAGES);
+const char * BRAIN_MODULE = "python.Brain";
+static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 
-			// Initialize python and brain.
-			initializePython();
-			getBrainInstance();
-		}
+BehaviorsModule::BehaviorsModule()
+    : error_state(false),
+      brain_module(NULL),
+      brain_instance(NULL),
+      do_reload(0)
+{
+    std::cout << "BehaviorsModule::initializing" << std::endl;
 
-		void BehaviorsModule::run_()
-		{
-			// If in error, try restarting automatically.
-			// If too many consecutive failures, stop python and stop trying.
+    // Initialize the interpreter and C python extensions
+    initializePython();
 
-			if (num_crashed > NUM_PYTHON_RESTARTS_MAX) {
-				return;
-			} else if (num_crashed == NUM_PYTHON_RESTARTS_MAX) {
-				Py_Finalize();
-				num_crashed++;
-				return;
-			} else if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
-				this->reload_hard();
-				error_state = false;
-				num_crashed++;
-			}
+    // import noggin.Brain and instantiate a Brain reference
+    import_modules();
 
-			// Profiler
-			//PROF_ENTER(P_PYTHON);
+    std::cout << "  Retrieving Brain.Brain instance" << std::endl;
 
-			//PROF_ENTER(P_PYTHON);
+    // Instantiate a Brain instance
+    getBrainInstance();
+}
 
-			// Call main run() method of Brain
-			if (brain_instance != NULL) {
-				// Serialize messages to send into python.
-				serializeInMessages();
-				// Assert: in_list_serials is properly constructed.
+BehaviorsModule::~BehaviorsModule ()
+{
+    std::cout << "BehaviorsModule destructor" << std::endl;
+    Py_XDECREF(brain_instance);
+    Py_XDECREF(brain_module);
+}
 
-				// Calls the run method with no args.
-				PyObject *result = PyObject_CallMethodObjArgs(brain_instance,
-															  Py_BuildValue(py_string_format,"run",3),
-															  in_list_serials,
-															  NULL);
-				if (result == NULL) {
-					// set Behaviors in error state
-					error_state = true;
-					// report error
-					fprintf(stderr, "Error occurred in behaviors.Brain.run() method\n");
-					if (PyErr_Occurred()) {
-						PyErr_Print();
-					} else {
-						fprintf(stderr, "  No Python exception information available\n");
-					}
-				} else {
-					// Retrieve serialized out messages.
-					parseOutMessages(result);
-					// Send out messages.
-					portals::Message<messages::LedCommand> ledCommand(0);
-					ledCommand.get()->ParseFromArray(out_proto[0],out_size[0]);
-					ledCommandOut.setMessage(ledCommand);
+void BehaviorsModule::initializePython()
+{
+    std::cout << "  Initializing interpreter and extension modules"
+              << std::endl;
 
-					Py_DECREF(result);
-				}
-			}
-			// Profiler
-			//PROF_EXIT(P_PYRUN);
+    Py_Initialize();
+    modifySysPath();
+    brain_module = NULL;
 
-			//PROF_EXIT(P_PYTHON);
-		}
+    c_init_noggin_constants();
+    c_init_objects();
 
-		void BehaviorsModule::serializeInMessages()
-		{
-			gameStateIn.latch();
-			// Size that serialized message will be.
-			in_size[GAME_STATE_IN] = gameStateIn.message().ByteSize();
-			// Set in_proto to be the serialized message.
-			gameStateIn.message().SerializeToArray(in_proto[GAME_STATE_IN],
-												   in_size[GAME_STATE_IN]);
-			in_serial[GAME_STATE_IN] = Py_BuildValue(py_string_format,
-													 in_proto[GAME_STATE_IN],
-													 in_size[GAME_STATE_IN]);
+    try{
+        initLedCommand_proto();
+        initGameState_proto();
+        initWorldModel_proto();
+        initBallModel_proto();
+    } catch (error_already_set) {
+        PyErr_Print();
+    }
+}
 
-			filteredBallIn.latch();
-			in_size[FILTERED_BALL_IN] = filteredBallIn.message().ByteSize();
-			filteredBallIn.message().SerializeToArray(in_proto[FILTERED_BALL_IN],
-													  in_size[FILTERED_BALL_IN]);
-			in_serial[FILTERED_BALL_IN] = Py_BuildValue(py_string_format,
-														in_proto[FILTERED_BALL_IN],
-														in_size[FILTERED_BALL_IN]);
+bool BehaviorsModule::import_modules ()
+{
+    // Load Brain module
+    //
+    if (brain_module == NULL) {
+        // Import brain module
+        std::cout << "  Importing noggin.Brain" << std::endl;
+        brain_module = PyImport_ImportModule(BRAIN_MODULE);
+    }
 
-			for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
-				worldModelIn[i].latch();
-				in_size[WORLD_MODEL_IN+i] = worldModelIn[i].message().ByteSize();
-				worldModelIn[i].message().SerializeToArray(in_proto[WORLD_MODEL_IN+i],
-														in_size[WORLD_MODEL_IN+i]);
-				in_serial[WORLD_MODEL_IN+i] = Py_BuildValue(py_string_format,
-															in_proto[WORLD_MODEL_IN+i],
-															in_size[WORLD_MODEL_IN+i]);
-			}
+    if (brain_module == NULL) {
+        // error, couldn't import noggin.Brain
+        std::cout << "Error importing noggin.Brain module" << std::endl;
+        if (PyErr_Occurred())
+            PyErr_Print();
+        else
+            std::cout << "  No Python exception information available"
+                      << std::endl;
+        return false;
+    }
 
-			// in_serial[] and in_size[] are properly constructed
-			for (Py_ssize_t i=0; i<NUM_IN_MESSAGES; i++) {
-				PyList_SetItem(in_list_serials, i, in_serial[i]);
-			}
-		}
+    return true;
+}
 
-		void BehaviorsModule::parseOutMessages(PyObject *tuple)
-		{
-			PyArg_UnpackTuple(tuple, "name", NUM_OUT_MESSAGES, NUM_OUT_MESSAGES, &out_serial[0], &out_serial[1]);
-			for (int i=0; i<NUM_OUT_MESSAGES; i++) {
-				PyString_AsStringAndSize(out_serial[i], &out_proto[i], out_size_t[i]);
-				out_size[i] = PyLong_AsLong(PyLong_FromSsize_t(*out_size_t[i]));
-			}
-		}
+void BehaviorsModule::reload_hard ()
+{
+    std::cout << "Reloading Python interpreter" << std::endl;
+    // finalize and reinitialize the Python interpreter
+    Py_Finalize();
+    // load C extension modules
+    initializePython();
+    // import noggin.Brain and instantiate a Brain reference
+    import_modules();
+    // Instantiate a Brain instance
+    getBrainInstance();
+}
 
-		void BehaviorsModule::reload_hard()
-		{
-			printf("Reloading Behaviors Python interpreter\n");
-			// finalize and reinitialize the Python interpreter
-			Py_Finalize();
-			// load C extension modules
-			initializePython();
-			// instantiate a Brain instance
-			getBrainInstance();
-		}
+void BehaviorsModule::getBrainInstance ()
+{
+    if (brain_module == NULL)
+        if (!import_modules())
+            return;
 
-		void BehaviorsModule::initializePython()
-		{
-# ifdef DEBUG_BEHAVIORS_INITIALIZATION
-			printf("  Initializing interpreter and extension modules\n");
-# endif
+    // drop old reference
+    Py_XDECREF(brain_instance);
+    // Grab instantiate and hold a reference to a new noggin.Brain.Brain()
+    PyObject *dict = PyModule_GetDict(brain_module);
+    PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
+    if (brain_class != NULL)
+        brain_instance = PyObject_CallObject(brain_class, NULL);
+    else
+        brain_instance = NULL;
 
-			Py_Initialize();
-			modifySysPath();
-			brain_module = NULL;
+    if (brain_instance == NULL) {
+        std::cout << "Error accessing Brain" << std::endl;
+        if (PyErr_Occurred())
+            PyErr_Print();
+        else
+            std::cout << "  No error available" << std::endl;
+    }
 
-			// These boosted files are currently still necessary.
-			// Initialize low-level modules
-			c_init_noggin_constants();
-			c_init_objects();
-			c_init_goalie();
-		}
+    // Successfully reloaded
+    error_state = (brain_instance == NULL);
+}
 
-		void BehaviorsModule::modifySysPath()
-		{
-			//TODO: figure out if we still need this
-			// Enter the current working directory into the pyton module path
-#if defined OFFLINE || defined STRAIGHT
-			string dir1 = NBITES_DIR"/build/tool";
-			string dir2 = NBITES_DIR"/build/tool/man";
-			const char* cwd = "";
-#else
-			const char* cwd = "/home/nao/nbites/lib";
-#endif
+void BehaviorsModule::runStep ()
+{
+    static unsigned int num_crashed = 0;
+    if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
+        this->reload_hard();
+        error_state = false;
+        num_crashed++;
+    }
 
-#ifdef DEBUG_BEHAVIORS_INITIALIZATION
-			printf("  Adding %s to sys.path\n", cwd);
-#endif
+    /*PROF_ENTER(P_PYTHON);*/
 
-			PyObject *sys_module = PyImport_ImportModule("sys");
-			if (sys_module == NULL) {
-				fprintf(stderr, "** Error importing sys module: **");
-				if (PyErr_Occurred())
-					PyErr_Print();
-				else
-					fprintf(stderr, "** No Python exception information available **");
-			}else {
-				PyObject *dict = PyModule_GetDict(sys_module);
-				PyObject *path = PyDict_GetItemString(dict, "path");
-#ifdef OFFLINE
-				PyList_Append(path, PyString_FromString(dir1.c_str()));
-				PyList_Append(path, PyString_FromString(dir2.c_str()));
-#else
-				PyList_Append(path, PyString_FromString(cwd));
-#endif
-				Py_DECREF(sys_module);
-			}
-		}
+    // Call main run() method of Brain
+    //PROF_ENTER(P_PYRUN);
+    if (brain_instance != NULL) {
+        PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
+        if (result == NULL) {
+            // set BehaviorsModule in error state
+            error_state = true;
+            // report error
+            std::cout << "Error occurred in Brain.run() method" << std::endl;
+            if (PyErr_Occurred()) {
+                PyErr_Print();
+            } else {
+                std::cout << "  No Python exception information available"
+                          << std::endl;
+            }
+        } else {
+            Py_DECREF(result);
+        }
+    }
+    //PROF_EXIT(P_PYRUN);
 
-		bool BehaviorsModule::import_brain()
-		{
-			// Load Brain module
-			if (brain_module == NULL) {
-				// Import brain module
-#ifdef DEBUG_BEHAVIORS_INITIALIZATION
-				printf("  Importing behaviors.Brain\n");
-#endif
-				brain_module = PyImport_ImportModule("python.behaviors.Brain");
-			}
+    // PROF_EXIT(P_PYTHON);
+}
 
-			if (brain_module == NULL) {
-				// error, couldn't import behaviors.Brain
-				fprintf(stderr, "Error importing behaviors.Brain module\n");
-				if (PyErr_Occurred())
-					PyErr_Print();
-				else
-					fprintf(stderr, "  No Python exception information available\n");
-				return false;
-			}
+void BehaviorsModule::modifySysPath ()
+{
+    // Enter the current working directory into the python module path
+       const char *cwd = "/home/nao/nbites/lib";
 
-			return true;
-		}
+       std::cout << "  Adding " << cwd << " to sys.path" << std::endl;
 
-		void BehaviorsModule::getBrainInstance()
-		{
-			if (brain_module == NULL)
-				if (!import_brain())
-					return;
+       PyObject *sys_module = PyImport_ImportModule("sys");
+       if (sys_module == NULL) {
+           std::cout << "** Error importing sys module: **" << std::endl;
+           if (PyErr_Occurred())
+               PyErr_Print();
+           else
+               std::cout << "** No Python exception information available **"
+                         << std::endl;
+       }
+       else
+       {
+        PyObject *dict = PyModule_GetDict(sys_module);
+        PyObject *path = PyDict_GetItemString(dict, "path");
+        PyList_Append(path, PyString_FromString(cwd));
+        Py_DECREF(sys_module);
+    }
+}
 
-			// drop old reference
-			Py_XDECREF(brain_instance);
-			// grab instantiate and hold a reference to a new behaviors.Brain.Brain()
-			PyObject *dict = PyModule_GetDict(brain_module);
-			PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
-			if (brain_class != NULL) {
-				// Constructs brain object with args
-				PyObject *brain_constructor_args = Py_BuildValue("(ii)",player_number,team_number);
-				brain_instance = PyObject_CallObject(brain_class, brain_constructor_args);
-			} else {
-				brain_instance = NULL;
-				fprintf(stderr, "Error accessing behaviors.Brain.Brain\n");
-				if (PyErr_Occurred())
-					PyErr_Print();
-				else
-					fprintf(stderr, "  No error available\n");
-			}
-
-			error_state = (brain_instance == NULL);
-		}
-	}
+}
 }

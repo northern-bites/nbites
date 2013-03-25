@@ -29,23 +29,23 @@ import GameController
 #from objects import (FieldObject)
 
 # Import message protocol buffers
-from .messages import LedCommand_pb2
-from .messages import GameState_pb2
-from .messages import WorldModel_pb2
-from .messages import BallModel_pb2
+import LedCommand_proto
+import GameState_proto
+import WorldModel_proto
+import BallModel_proto
 
 class Brain(object):
     """
     Class brings all of our components together and runs the behaviors
     """
 
-    def __init__(self, arguments):
+    def __init__(self):
         """
         Class constructor
         """
         # Parse arguments
-        self.playerNumber = arguments[0]
-        self.teamNumber = arguments[1]
+        #self.playerNumber = arguments[0]
+        #self.teamNumber = arguments[1]
         self.teamColor = Constants.teamColor.TEAM_BLUE
 
         self.counter = 0
@@ -57,7 +57,7 @@ class Brain(object):
         self.my = MyInfo.MyInfo()
 
         #initalize the leds
-        self.leds = Leds.Leds(self)
+        #self.leds = Leds.Leds(self)
 
         # Retrieve our robot identification and set per-robot parameters
         #self.CoA = robots.get_certificate()
