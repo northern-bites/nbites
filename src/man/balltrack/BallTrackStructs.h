@@ -2,6 +2,17 @@ namespace man
 {
 namespace balltrack
 {
+
+    struct KalmanFilterParams
+    {
+        float transXDeviation;   //Deviation from odometry in x direction
+        float transYDeviation;   //Deviation from odometry in y direction
+        float rotationDeviation; //Deviation from odometry in rotation
+        float processDevitaion;  //Deviation from difference between model & world
+        float ballFriction;      //Loss in acceleration over a unit of time
+
+    };
+
     /*
      * @brief Struct to take observations from vision
      */

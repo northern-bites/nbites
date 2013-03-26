@@ -17,10 +17,8 @@
 
 using namespace NBMath;
 
-namespace man
-{
-namespace balltrack
-{
+namespace man{
+namespace balltrack{
 
 class KalmanFilter
 {
