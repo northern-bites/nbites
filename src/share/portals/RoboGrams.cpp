@@ -60,9 +60,9 @@ Reference& Reference::operator=(Reference r)
 //
 // The special pool message that is returned for over-allocations is index 0. This
 // is accomplished by making the free list circular at the end: index 0 points to
-// itself. 
+// itself.
 MessagePoolBase::MessagePoolBase(int maxSize)
-  : maxSize_(maxSize), highWaterMark_(0), inUse_(0), initialize_(false), finalize_(false)
+  : maxSize_(maxSize), highWaterMark_(0), inUse_(0), initialize_(true), finalize_(false)
 {
   assert(maxSize > 0);
 

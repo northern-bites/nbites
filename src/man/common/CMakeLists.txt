@@ -6,10 +6,15 @@ set( COMMON_SRCS NBMath
   Common
   CommDef
   RoboCupGameControlData
-)
+  CoordFrame3D.cpp
+  CoordFrame4D.cpp
+  CameraCalibrate.cpp
+  ColorParams.cpp
+  )
 
 add_library(
   common
   STATIC
   ${COMMON_SRCS}
 )
+

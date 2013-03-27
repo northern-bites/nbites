@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <QCoreApplication>
-#include <QLineEdit>
 
 #include "NaoPaths.h"
 #include "io/FileInProvider.h"
@@ -17,28 +16,17 @@ static const int DEFAULT_NAME_COLUMN_WIDTH = 300;
 
 OfflineDataFinder::OfflineDataFinder(QWidget* parent) :
     DataFinder(parent) {
-    QLayout* layout = new QBoxLayout(QBoxLayout::TopToBottom);
+
+    QLayout* layout = new QHBoxLayout;
 
     setupFSModel();
     setupFSBrowser();
-    setupLogLabels();
-    layout->addWidget(logLabel);
-    layout->addWidget(logPathLabel);
     layout->addWidget(fsBrowser);
 
     this->setLayout(layout);
 }
 
 OfflineDataFinder::~OfflineDataFinder() {
-}
-
-void OfflineDataFinder::setupLogLabels() {
-
-    logLabel = new QLabel(this);
-    logLabel->setText("Current log:");
-
-    logPathLabel = new QLineEdit(this);
-    logPathLabel->setReadOnly(true);
 }
 
 void OfflineDataFinder::setupFSModel() {
@@ -77,7 +65,6 @@ void OfflineDataFinder::scanFolderForLogs(QString path) {
         return;
     }
 
-    logPathLabel->setText(path); // notify the user of the new log
     emit signalNewDataSet();
 
     for (int i = 0; i < list.size(); i++) {

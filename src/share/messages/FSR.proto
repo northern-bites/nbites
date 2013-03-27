@@ -2,15 +2,15 @@ package messages;
 
 message FSR
 {
-    // Left foot. 
-    optional float fsr_lfl = 1; // front left
-    optional float fsr_lfr = 2; // front right
-    optional float fsr_lrl = 3; // rear left
-    optional float fsr_lrr = 4; // rear right
+    // Left foot.
+    optional float lfl = 1; // front left
+    optional float lfr = 2; // front right
+    optional float lrl = 3; // rear left
+    optional float lrr = 4; // rear right
 
     // Right foot.
-    optional float fsr_rfl = 5; // front left
-    optional float fsr_rfr = 6; // front right
-    optional float fsr_rrl = 7; // rear left
-    optional float fsr_rrr = 8; // rear right
+    optional float rfl = 5; // front left
+    optional float rfr = 6; // front right
+    optional float rrl = 7; // rear left
+    optional float rrr = 8; // rear right
 }

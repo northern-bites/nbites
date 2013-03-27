@@ -32,7 +32,6 @@ struct linePoint;
 #include "Utility.h" //
 #include "NaoPose.h" // Used to estimate distances in the image
 #include "Vision.h"
-#include "Profiler.h"
 
 static const int NO_EDGE = -3;
 

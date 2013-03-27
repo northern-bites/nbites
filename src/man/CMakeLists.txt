@@ -27,6 +27,12 @@ configure_file(
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
 
+# Configure the copy script based on our settings
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
+  "${PROJECT_BINARY_DIR}/upload.sh"
+)
+
 include_directories( ${PROJECT_BINARY_DIR} )
 
 # Option to turn rebuilding our protobuf libs on/off
@@ -36,18 +42,23 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+# testing set up
+include ( ${SHARE_DIR}/cmake/gtest.cmake )
+enable_testing()
+set(CTEST_OUTPUT_ON_FAILURE TRUE)
+
+include_directories(
+  ${GTEST_INCLUDE_DIR}
+)
+
 # For Aldebaran's headers
-find_package(ALCOMMON REQUIRED)
-include_directories( ${ALCOMMON_INCLUDE_DIR} )
+if ( NOT OFFLINE )
+  find_package(ALCOMMON REQUIRED)
+  include_directories( ${ALCOMMON_INCLUDE_DIR} )
+endif()
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
-
-# Configure the copy script based on our settings
-configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
-  "${PROJECT_BINARY_DIR}/upload.sh"
-)
 
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
@@ -60,6 +71,7 @@ include_directories( ${SHARE_DIR}/portals )
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
 # And make sure generated pb.h files are visible
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages/ )
+include_directories( ${SHARE_DIR}/messages )
 
 # If protobuf libs don't exist yet, make sure they build before man
 if( BUILD_PROTOBUF )
@@ -72,14 +84,18 @@ include_directories( common )
 include_directories( newmotion/bhwalk ) # @todo hack?
 
 # Actual modules
+add_subdirectory( image )
 add_subdirectory( log )
+add_subdirectory( vision )
 add_subdirectory( sensors )
 add_subdirectory( comm )
 add_subdirectory( newmotion )
 add_subdirectory( jointenactor )
+add_subdirectory( guardian )
+add_subdirectory( audio )
 
 set( MAN_SRCS main.cpp
-  NewMan.cpp
+  Man.cpp
   DiagramThread.cpp
 )
 
@@ -99,6 +115,11 @@ target_link_libraries(
   comm
   motion
   bhwalk
+  image
+  vision
+  guardian
+  audio
+  common
 )
 
 install( TARGETS man

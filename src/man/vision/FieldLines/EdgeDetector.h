@@ -1,10 +1,8 @@
 #ifndef EdgeDetector_h_DEFINED
 #define EdgeDetector_h_DEFINED
 
-#include "visionconfig.h"
 #include "VisionDef.h"
 #include "Gradient.h"
-#include "Profiler.h"
 #include <stdint.h>
 
 #include "boost/shared_ptr.hpp"
