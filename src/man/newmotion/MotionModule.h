@@ -10,7 +10,7 @@
 
 // Motion providers 
 #include "bhwalk/BHWalkProvider.h"
-//#include "ScriptedProvider.h"
+#include "ScriptedProvider.h"
 #include "NullBodyProvider.h"
 
 // Motion commands
@@ -67,7 +67,7 @@ namespace motion
 	bool isBodyActive() { return curProvider->isActive();}
 
 	void resetWalkProvider(){ walkProvider.hardReset(); }
-	//void resetScriptedProvider(){ scriptedProvider.hardReset(); }
+	void resetScriptedProvider(){ scriptedProvider.hardReset(); }
 
 	//MotionModel getOdometryUpdate() const { return walkProvider.getOdometryUpdate(); }
 
@@ -108,7 +108,7 @@ namespace motion
 	void setJointsAndStiffness();
 
 	BHWalkProvider walkProvider;
-	//ScriptedProvider scriptedProvider;
+	ScriptedProvider scriptedProvider;
 	//HeadProvider headProvider;
 	//NullHeadProvider nullHeadProvider;
 	NullBodyProvider nullBodyProvider;

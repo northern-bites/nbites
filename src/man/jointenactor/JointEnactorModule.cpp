@@ -27,6 +27,8 @@ namespace man
 
 	void JointEnactorModule::start()
 	{
+	    std::cout << "(JointEnactorModule) Starting the joint enactor module." << std::endl;
+
 	    signed long isDCMRunning;
 
 	    try

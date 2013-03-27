@@ -1,5 +1,4 @@
-#ifndef BaseFreezeCommand_h
-#define BaseFreezeCommand_h
+#pragma once
 
 #include "MotionCommand.h"
 
@@ -21,4 +20,4 @@ private:
 } // namespace motion
 } // namespace man
 
-#endif
+

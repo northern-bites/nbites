@@ -21,7 +21,7 @@ namespace man
 	 * 
 	 * @return A vector of joint angles.
 	 */
-	std::vector<float> toJointAngles(
+	static std::vector<float> toJointAngles(
 	    const messages::JointAngles& ja
 	    )
 	{

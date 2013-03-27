@@ -69,6 +69,7 @@ endif()
 # Actual subdirectories
 add_subdirectory( common )
 include_directories( common )
+include_directories( newmotion/bhwalk ) # @todo hack?
 
 # Actual modules
 add_subdirectory( log )
@@ -94,8 +95,10 @@ target_link_libraries(
   messages
   log
   sensors
+  jointenactor
   comm
   motion
+  bhwalk
 )
 
 install( TARGETS man

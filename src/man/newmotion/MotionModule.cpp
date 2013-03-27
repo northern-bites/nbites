@@ -27,7 +27,7 @@ namespace motion
 	    boost::shared_ptr<FreezeCommand> paralyze 
 		= boost::shared_ptr<FreezeCommand>(new FreezeCommand());
 	    
-	    nullBodyProvider.setCommand(paralyze);
+	    //nullBodyProvider.setCommand(paralyze);
 	}
 
 	MotionModule::~MotionModule()
@@ -37,6 +37,7 @@ namespace motion
 
 	void MotionModule::start()
 	{
+	    std::cout << "(MotionModule) Starting motion." << std::endl;
 	    running = true;
 	}
 
@@ -47,6 +48,9 @@ namespace motion
 
 	void MotionModule::run_()
 	{
+	    // std::cout << "MM: Running (" << frameCount
+	    // 	      << ")" << std::endl;
+	    
 	    // (1) Before anything else happens, it is important to 
 	    //     retrieve the correct current joint angles.
 	    jointsInput_.latch();
@@ -58,6 +62,9 @@ namespace motion
 	    sensorFSRs      = fsrInput_.message();
 	    
 	    newInputJoints = false;
+
+	    // std::cout << "(MotionModule) Using " << 
+	    // 	curProvider->getName() << std::endl;
 
 	    // (2) If motion is enabled, perform a single iteration
 	    //     of the main motion loop.
@@ -71,10 +78,12 @@ namespace motion
 		preProcess();
 		processJoints();
 		processStiffness();
+		bool active = postProcess();
 
 		// (4) Send newly computed joints and stiffnesses to
 		//     the joint enactor module. 
-		setJointsAndStiffness();
+		if(active)
+		    setJointsAndStiffness();
 
 		newInputJoints = false;
 		frameCount++;
@@ -88,11 +97,13 @@ namespace motion
 
 	void MotionModule::preProcess()
 	{
+	    //preProcessHead();
 	    preProcessBody();
 	}
 
 	void MotionModule::processJoints()
 	{
+	    //processHeadJoints();
 	    processBodyJoints();
 	    safetyCheckJoints();
 	}
@@ -160,8 +171,15 @@ namespace motion
 	    //ready to take over:
 	    if (curProvider != nextProvider && !curProvider->isActive())
 	    {
+		std::cout << "postprocess swap" << std::endl;
 		swapBodyProvider();
 	    }
+
+
+	    // if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
+	    // {
+	    // 	swapHeadProvider();
+	    // }
 
 	    // Update sensors with the correct support foot because it may have
 	    // changed this frame.
@@ -171,7 +189,7 @@ namespace motion
 	    //sensors->setSupportFoot(curProvider->getSupportFoot());
 
 	    //return if one of the enactors is active
-	    return curProvider->isActive();
+	    return curProvider->isActive() /* || curHeadProvider->isActive()*/;
 	}
 	
 	void MotionModule::processBodyJoints()
@@ -226,18 +244,26 @@ namespace motion
 	    if (curProvider != &nullBodyProvider &&
 		nextProvider == &nullBodyProvider)
 	    {
-		//scriptedProvider.hardReset();
+		scriptedProvider.hardReset();
 		walkProvider.hardReset();
 	    }
 
 	    //determine the curProvider, and do any necessary swapping
 	    if (curProvider != nextProvider)
 	    {
+		std::cout << "MotionModule (" 
+			  << getFrameCount()
+			  << "): Current provider: "
+			  << curProvider->getName()
+			  << " next provider: "
+			  << nextProvider->getName() << std::endl;
 		if (!curProvider->isStopping()) {
+		    std::cout << "requesting stop" << std::endl;
 		    curProvider->requestStop();
 		}
 
 		if (!curProvider->isActive()) {
+		    std::cout << "swapping" << std::endl;
 		    swapBodyProvider();
 		}
 	    }
@@ -344,6 +370,8 @@ namespace motion
 	{
 	    std::vector<BodyJointCommand::ptr> transitions;
 	    std::string old_provider = curProvider->getName();
+	    std::cout << "(MotionModule) Last provider: " 
+		      << old_provider << "." << std::endl;
 
 	    switch(nextProvider->getType())
 	    {
@@ -359,10 +387,10 @@ namespace motion
 		    transitions = generateNextBodyProviderTransitions();
 
 		    if(transitions.size() >= 1){
-			// for(unsigned int i = 0; i< transitions.size(); i++){
-			//     scriptedProvider.setCommand(transitions[i]);
-			// }
-			// curProvider = static_cast<MotionProvider * >(&scriptedProvider);
+			for(unsigned int i = 0; i< transitions.size(); i++){
+			    scriptedProvider.setCommand(transitions[i]);
+			}
+			curProvider = static_cast<MotionProvider * >(&scriptedProvider);
 			break;
 		    }
 		}
@@ -447,9 +475,11 @@ namespace motion
 
 	void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 	{
+	    std::cout << "MotionModule: Received new BodyJointCommand."
+		      << std::endl;
 	    noWalkTransitionCommand = true;
-	    //nextProvider = &scriptedProvider;
-	    //scriptedProvider.setCommand(command);
+	    nextProvider = &scriptedProvider;
+	    scriptedProvider.setCommand(command);
 	}
 
 	// void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
@@ -563,6 +593,8 @@ namespace motion
     void MotionModule::setJointsAndStiffness()
     {
 	using namespace Kinematics;
+
+	// std::cout << "(MotionModule) Setting new joints and stiffnessess." << std::endl;
 
 	portals::Message<messages::JointAngles> newJoints(0);
 	

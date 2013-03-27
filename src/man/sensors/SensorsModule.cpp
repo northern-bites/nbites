@@ -124,6 +124,7 @@ void SensorsModule::updateSensorValues()
     updateFootbumperMessage();
     updateInertialsMessage();
     updateSonarsMessage();
+    updateFSRMessage();
 
     //std::cout << "SensorsModule : Sensor values " << std::endl;
     // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
