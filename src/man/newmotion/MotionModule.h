@@ -75,6 +75,33 @@ namespace motion
 
 	bool calibrated() { return walkProvider.calibrated(); }
 
+	messages::JointAngles genJointCommand(float headYaw, 
+					      float headPitch,
+					      float lShoulderPitch, 
+					      float lShoulderRoll,
+					      float lElbowYaw, 
+					      float lElbowRoll,
+					      float lWristYaw, 
+					      float lHand,
+					      float rShoulderPitch, 
+					      float rShoulderRoll,
+					      float rElbowYaw, 
+					      float rElbowRoll,
+					      float rWristYaw,
+					      float rHand,
+					      float lHipYawPitch, 
+					      float rHipYawPitch,
+					      float lHipRoll, 
+					      float lHipPitch,
+					      float lKneePitch, 
+					      float lAnklePitch, 
+					      float lAnkleRoll,
+					      float rHipRoll, 
+					      float rHipPitch,
+					      float rKneePitch, 
+					      float rAnklePitch, 
+					      float rAnkleRoll);
+
 	portals::InPortal<messages::JointAngles>   jointsInput_;
 	portals::InPortal<messages::InertialState> inertialsInput_;
 	portals::InPortal<messages::FSR>           fsrInput_; 

@@ -60,6 +60,7 @@ namespace man
 	    // initialize aliases and then connect synchronously
 	    // to the DCM loop. 
 	    initialize();
+	    connectToDCMLoop();
 	}
 
 	void JointEnactorModule::initialize()
@@ -156,7 +157,7 @@ namespace man
 
 	    // Initialize joint command.
 	    jointCommand_.arraySetSize(6);
-	    jointCommand_[0] = std::string("jointStiffness");
+	    jointCommand_[0] = std::string("jointActuator");
 	    jointCommand_[1] = std::string("ClearAll");
 	    jointCommand_[2] = std::string("time-separate");
 	    jointCommand_[3] = 0; // Importance level.
@@ -171,7 +172,7 @@ namespace man
 
 	    // Initialize stiffness command.
 	    stiffnessCommand_.arraySetSize(6);
-	    stiffnessCommand_[0] = std::string("jointActuator");
+	    stiffnessCommand_[0] = std::string("jointStiffness");
 	    stiffnessCommand_[1] = std::string("ClearAll");
 	    stiffnessCommand_[2] = std::string("time-separate");
 	    stiffnessCommand_[3] = 0; // Importance level.
@@ -210,6 +211,7 @@ namespace man
 		for(unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i)
 		{
 		    jointCommand_[5][i][0] = jointAngles[i];
+		    std::cout << "joint[" << i << "] = " << jointAngles[i] << std::endl;
 		    stiffnessCommand_[5][i][0] = jointStiffness[i];
 		}
 
@@ -247,6 +249,8 @@ namespace man
 
 	void JointEnactorModule::run_()
 	{
+	    std::cout << (motionEnabled_ ? "motion enabled" :
+			  "motion disabled") << std::endl;
 	    // Update stiffnesses. 
 	    stiffnessInput_.latch();
 	    latestStiffness_ = stiffnessInput_.message();
@@ -254,6 +258,14 @@ namespace man
 	    // Update joint angles. 
 	    jointsInput_.latch();
 	    latestJointAngles_ = jointsInput_.message();
+	    std::cout << "latest joint angles: " << std::endl;
+	    std::vector<float> angles = motion::toJointAngles(latestJointAngles_);
+	    for(std::vector<float>::iterator it = angles.begin();
+		it != angles.end();
+		++it)
+	    {
+		std::cout << *it << std::endl;
+	    }
 
 	    if(!motionEnabled_)
 		enableMotion();

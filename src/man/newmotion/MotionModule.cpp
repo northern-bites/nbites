@@ -27,7 +27,7 @@ namespace motion
 	    boost::shared_ptr<FreezeCommand> paralyze 
 		= boost::shared_ptr<FreezeCommand>(new FreezeCommand());
 	    
-	    //nullBodyProvider.setCommand(paralyze);
+	    nullBodyProvider.setCommand(paralyze);
 	}
 
 	MotionModule::~MotionModule()
@@ -79,6 +79,10 @@ namespace motion
 		processJoints();
 		processStiffness();
 		bool active = postProcess();
+
+		std::cout << "motion active? "
+			  << (active ? "yes" : "no")
+			  << std::endl;
 
 		// (4) Send newly computed joints and stiffnesses to
 		//     the joint enactor module. 
@@ -632,7 +636,10 @@ namespace motion
 	newJoints.get()->set_r_ankle_pitch(nextJoints[R_ANKLE_PITCH]);
 	newJoints.get()->set_r_ankle_roll(nextJoints[R_ANKLE_ROLL]);
 
-	jointsOutput_.setMessage(newJoints);
+	portals::Message<messages::JointAngles> testingJoints(&genJointCommand(0, 0, 90, 10, -90, -10, 0, 0, 90, -10, 82, 13.2, 0, 0, 0, 0, 0, -22.3, 43.5, -21.2, 0, 0, -22.3, 43.5, -21.2, 0));
+	
+	//jointsOutput_.setMessage(newJoints);
+	jointsOutput_.setMessage(testingJoints);
 
 	portals::Message<messages::JointAngles> newStiffness(0);
 
@@ -670,7 +677,64 @@ namespace motion
 	newStiffness.get()->set_r_ankle_pitch(nextStiffnesses[R_ANKLE_PITCH]);
 	newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
 
-	stiffnessOutput_.setMessage(newStiffness);
+	static const float O = 0.85f;
+	static const float A = 0.2f;
+
+	portals::Message<messages::JointAngles> testStiffness(&genJointCommand(O, O, A, A, A, A, O, O, A, A, A, A, O, O, O, O, O, O, O, O, O, O, O, O, O, O));
+
+	std::cout << "sending stiffness: " << testStiffness.get()->l_knee_pitch() << std::endl;
+
+	//stiffnessOutput_.setMessage(newStiffness);
+	stiffnessOutput_.setMessage(testStiffness);
+    }
+
+    messages::JointAngles MotionModule::genJointCommand(float headYaw, float headPitch,
+							       float lShoulderPitch, float lShoulderRoll,
+							       float lElbowYaw, float lElbowRoll,
+							       float lWristYaw, float lHand,
+							       float rShoulderPitch, float rShoulderRoll,
+							       float rElbowYaw, float rElbowRoll,
+							       float rWristYaw,float rHand,
+							       float lHipYawPitch, float rHipYawPitch,
+							       float lHipRoll, float lHipPitch,
+							       float lKneePitch, float lAnklePitch, float lAnkleRoll,
+							       float rHipRoll, float rHipPitch,
+							       float rKneePitch, float rAnklePitch, float rAnkleRoll)
+    {
+        messages::JointAngles newMessage;
+        newMessage.set_head_yaw(headYaw);
+        newMessage.set_head_pitch(headPitch);
+
+        newMessage.set_l_shoulder_pitch(lShoulderPitch);
+        newMessage.set_l_shoulder_roll(lShoulderRoll);
+        newMessage.set_l_elbow_yaw(lElbowYaw);
+        newMessage.set_l_elbow_roll(lElbowRoll);
+        newMessage.set_l_wrist_yaw(lWristYaw);
+        newMessage.set_l_hand(lHand);
+
+        newMessage.set_r_shoulder_pitch(rShoulderPitch);
+        newMessage.set_r_shoulder_roll(rShoulderRoll);
+        newMessage.set_r_elbow_yaw(rElbowYaw);
+        newMessage.set_r_elbow_roll(rElbowRoll);
+        newMessage.set_r_wrist_yaw(rWristYaw);
+        newMessage.set_r_hand(rHand);
+
+        newMessage.set_l_hip_yaw_pitch(lHipYawPitch);
+        newMessage.set_r_hip_yaw_pitch(rHipYawPitch);
+
+        newMessage.set_l_hip_roll(lHipRoll);
+        newMessage.set_l_hip_pitch(lHipPitch);
+        newMessage.set_l_knee_pitch(lKneePitch);
+        newMessage.set_l_ankle_pitch(lAnklePitch);
+        newMessage.set_l_ankle_roll(lAnkleRoll);
+
+        newMessage.set_r_hip_roll(rHipRoll);
+        newMessage.set_r_hip_pitch(rHipPitch);
+        newMessage.set_r_knee_pitch(rKneePitch);
+        newMessage.set_r_ankle_pitch(rAnklePitch);
+        newMessage.set_r_ankle_roll(rAnkleRoll);
+
+	return newMessage;
     }
 
     } // namespace motion

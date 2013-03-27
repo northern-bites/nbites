@@ -36,6 +36,7 @@ namespace man
 	    result[Kinematics::L_HIP_ROLL] = ja.l_hip_roll();
 	    result[Kinematics::L_HIP_PITCH] = ja.l_hip_pitch();
 	    result[Kinematics::L_KNEE_PITCH] = ja.l_knee_pitch();
+
 	    result[Kinematics::L_ANKLE_PITCH] = ja.l_ankle_pitch();
 	    result[Kinematics::L_ANKLE_ROLL] = ja.l_ankle_roll();
 	    result[Kinematics::R_HIP_YAW_PITCH] = ja.r_hip_yaw_pitch();
