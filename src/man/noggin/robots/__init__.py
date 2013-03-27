@@ -185,10 +185,10 @@ This robot is currently unknown.  That is, we could not identify it
 from its hostname (%s).	 The recognized robots are %s.''' %
 			#(socket.gethostname(), robot_map.keys()),# temp removed -js
 			('\'' + read_hostname() + '\'', robot_map.keys()),
-			gait = gaits.WEBOTS_GAIT,
-			dribble_gait = gaits.WEBOTS_GAIT,
+			gait = gaits.DAX_GAIT,
+			dribble_gait = gaits.ANNIKA_DRIBBLE_GAIT,
 			backwards_gait = gaits.BACKWARDS_GAIT,
-			slow_gait = gaits.WEBOTS_GAIT,
+			slow_gait = gaits.DAX_SLOW_GAIT,
 			spin_gait = gaits.CUR_SPIN_GAIT,
 			)
 

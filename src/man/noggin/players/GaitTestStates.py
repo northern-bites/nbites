@@ -10,7 +10,7 @@ DO NOT RUN THIS AS IT IS HORRIBLY BROKEN/OUTDATED
 
 import man.motion as motion
 import man.motion.SweetMoves as SweetMoves
-from .GaitLearnStates import setWalkVector, setGait, revertWebots
+from .GaitLearnStates import setWalkVector, setGait
 import man.noggin.util.GaitTestData as data
 
 from os.path import isfile
@@ -25,12 +25,8 @@ WALK = 0
 
 DURATION = 250
 
-if WEBOTS_ACTIVE:
-    PICKLE_FILE_PREFIX = ''
-    START_DELAY = 100
-else:
-    PICKLE_FILE_PREFIX = '/home/nao/gaits/'
-    START_DELAY = 30
+PICKLE_FILE_PREFIX = '/home/nao/gaits/'
+START_DELAY = 30
 
 GAITS = ('PSO_endGait.pickle.2198',
          'PSO_endGait.pickle.2230',
@@ -81,18 +77,9 @@ def gameReady(player):
 def saveAndEnd(player):
     syncDataToClass(player)
     saveTestData(player)
+    return player.goLater('sitdown')
 
-    if WEBOTS_ACTIVE:
-       revertWebots(player)
-    else:
-        return player.goLater('sitdown')
-
-if WEBOTS_ACTIVE:
-    gameInitial=gamePlaying
-    print "Webots is active!!!!"
-else:
     gamePenalized = saveAndEnd
-    print "Webots is in-active!!!!"
 
 def gaitTest(player):
     if player.counter == START_DELAY:
@@ -145,18 +132,6 @@ def walkTest(player):
 
 def switchDirections(player):
     return player.goNow('walkTest')
-
-def printResultsStop(player):
-   if player.firstFrame() and WEBOTS_ACTIVE:
-      i = 0
-      for gait in player.gaitTest:
-         print "gait file ", gait, \
-             " basically stable -> ", player.gaitTestResults[i]
-         i += 1
-
-   return player.goNow('saveAndStop')
-
-   return player.stay()
 
 def sitdown(player):
     if player.firstFrame():

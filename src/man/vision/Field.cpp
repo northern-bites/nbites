@@ -53,9 +53,6 @@
 
 #include <math.h>
 #include <assert.h>
-#if ROBOT(NAO_SIM)
-#  include <aldefinitions.h>
-#endif
 #include <boost/shared_ptr.hpp>
 
 #include "Field.h"

@@ -11,13 +11,4 @@
 #  undef  USE_TIME_PROFILING
 #endif
 
-// Turn on/off automatic profiling summary printing
-#define USE_PROFILER_AUTO_PRINT_${USE_PROFILER_AUTO_PRINT}
-#ifdef  USE_PROFILER_AUTO_PRINT_ON
-#  define USE_PROFILER_AUTO_PRINT
-#else
-#  undef  USE_PROFILER_AUTO_PRINT
-#endif
-
-
 #endif // !_profileconfig_h

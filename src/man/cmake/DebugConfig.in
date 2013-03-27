@@ -1,0 +1,19 @@
+/* -*- C++ -*- Tell editors this is a C++ file (despite it's .in extension) */
+
+#pragma once
+
+// :::::::::::::::::::::::::: Options variables :::..
+
+#define DEBUG_COMM_${DEBUG_COMM}
+#ifdef  DEBUG_COMM_ON
+#   define DEBUG_COMM
+#else
+#   undef DEBUG_COMM
+#endif
+
+#define DEBUG_THREADS_${DEBUG_THREADS}
+#ifdef  DEBUG_THREADS_ON
+#   define DEBUG_THREADS
+#else
+#   undef DEBUG_THREADS
+#endif

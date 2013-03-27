@@ -38,7 +38,6 @@ using boost::shared_ptr;
 
 shared_ptr<Sensors> sensors_pointer;
 
-// We want to be able to save frames, resetsaveframes
 BOOST_PYTHON_MODULE(sensors)
 {
     class_<FSR>("FSR", no_init)
@@ -85,10 +84,6 @@ BOOST_PYTHON_MODULE(sensors)
         .add_property("batteryCharge", &Sensors::getBatteryCharge)
         .add_property("batteryCurrent", &Sensors::getBatteryCurrent)
 
-        .def("saveFrame", &Sensors::saveFrame)
-        .def("resetSaveFrame", &Sensors::resetSaveFrame)
-        .def("startSavingFrames", &Sensors::startSavingFrames)
-        .def("stopSavingFrames", &Sensors::stopSavingFrames)
         .def("writeVarianceData", &Sensors::writeVarianceData)
         ;
 
