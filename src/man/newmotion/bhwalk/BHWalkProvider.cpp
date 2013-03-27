@@ -225,15 +225,15 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorData::angleX] = sensorInertials.angle_x();
     bh_sensors.data[SensorData::angleY] = sensorInertials.angle_y();
 
-    bh_sensors.data[SensorData::fsrLFL] = sensorFSRs.fsr_lfl();
-    bh_sensors.data[SensorData::fsrLFR] = sensorFSRs.fsr_lfr();
-    bh_sensors.data[SensorData::fsrLBL] = sensorFSRs.fsr_lrl();
-    bh_sensors.data[SensorData::fsrLBR] = sensorFSRs.fsr_lrr();
+    bh_sensors.data[SensorData::fsrLFL] = sensorFSRs.lfl();
+    bh_sensors.data[SensorData::fsrLFR] = sensorFSRs.lfr();
+    bh_sensors.data[SensorData::fsrLBL] = sensorFSRs.lrl();
+    bh_sensors.data[SensorData::fsrLBR] = sensorFSRs.lrr();
 
-    bh_sensors.data[SensorData::fsrRFL] = sensorFSRs.fsr_rfl();
-    bh_sensors.data[SensorData::fsrLFR] = sensorFSRs.fsr_lfr();
-    bh_sensors.data[SensorData::fsrLBL] = sensorFSRs.fsr_lrl();
-    bh_sensors.data[SensorData::fsrLBR] = sensorFSRs.fsr_lrr();
+    bh_sensors.data[SensorData::fsrRFL] = sensorFSRs.rfl();
+    bh_sensors.data[SensorData::fsrLFR] = sensorFSRs.lfr();
+    bh_sensors.data[SensorData::fsrLBL] = sensorFSRs.lrl();
+    bh_sensors.data[SensorData::fsrLBR] = sensorFSRs.lrr();
 
     walkingEngine.update();
 

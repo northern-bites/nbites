@@ -9,6 +9,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
       sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
       sensors(broker),
+      jointEnactor(broker),
+      motion(),
       guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
       guardian(),
       audio(broker),
@@ -22,6 +24,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Sensors **/
     sensorsThread.addModule(sensors);
+    sensorsThread.addModule(jointEnactor);
+    //sensorsThread.addModule(motion);
 
     /** Guardian **/
     guardianThread.addModule(guardian);

@@ -201,23 +201,41 @@ namespace man
 	{
 	    if(motionEnabled_)
 	    {
-	    // @todo
-	    // Send the next joint angles to the DCM for execution. 
-	    /*
-	      motionValues = switchboard->getNextJoints();
+		// Send the next joint angles and joint stiffnesses
+		// to the DCM for execution.
 
-	      for(int i = 0; i < NUM_JOINTS; ++i)
-	      {
-	      jointCommand[5][i][0] = motionValues[i];
-	      }
+		std::vector<float> jointAngles = motion::toJointAngles(latestJointAngles_);
+		std::vector<float> jointStiffness = motion::toJointAngles(latestStiffness_);
 
-	      try
-	      {
-	      jointCommand[4][0] = dcmProxy_->getTime(0);
-	      
-	      }
+		for(unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i)
+		{
+		    jointCommand_[5][i][0] = jointAngles[i];
+		    stiffnessCommand_[5][i][0] = jointStiffness[i];
+		}
 
-	     */
+		// (1) Send next angles.
+		try
+		{
+		    jointCommand_[4][0] = dcmProxy_->getTime(0);
+		    dcmProxy_->setAlias(jointCommand_);
+		}
+		catch(const AL::ALError& e)
+		{
+		    std::cout << "Error setting joint angles: " 
+			      << e.toString() << std::endl;
+		}
+
+		// (2) Send next stiffnesses.
+		try
+		{
+		    stiffnessCommand_[4][0] = dcmProxy_->getTime(0);
+		    dcmProxy_->setAlias(stiffnessCommand_);
+		}
+		catch(const AL::ALError& e)
+		{
+		    std::cout << "Error setting hardness: "
+			      << e.toString() << std::endl;
+		}
 	    }
 	}
 

@@ -22,6 +22,8 @@
 #include <iostream>
 
 #include "../sensors/SensorTypes.h"
+#include "../newmotion/MotionConstants.h"
+#include "../newmotion/Kinematics.h"
 #include "RoboGrams.h"
 
 #include "JointAngles.pb.h"

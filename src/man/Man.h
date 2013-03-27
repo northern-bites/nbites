@@ -12,6 +12,8 @@
 #include "image/ImageTranscriberModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
+#include "jointenactor/JointEnactorModule.h"
+#include "newmotion/MotionModule.h"
 
 namespace man {
 
@@ -28,6 +30,8 @@ private:
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+    jointenactor::JointEnactorModule jointEnactor;
+    motion::MotionModule motion;
 
     DiagramThread guardianThread;
     guardian::GuardianModule guardian;
