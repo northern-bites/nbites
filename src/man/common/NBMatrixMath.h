@@ -51,8 +51,6 @@ namespace NBMath {
                           const ufvector3 &b);
 
     const float length(ufvector4 &v);
-
-    // Kalman filter needs to be able to transpose square matrices
 }
 
 #endif

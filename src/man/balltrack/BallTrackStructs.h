@@ -1,3 +1,5 @@
+#pragma once
+
 namespace man
 {
 namespace balltrack
@@ -8,7 +10,10 @@ namespace balltrack
         float transXDeviation;   //Deviation from odometry in x direction
         float transYDeviation;   //Deviation from odometry in y direction
         float rotationDeviation; //Deviation from odometry in rotation
-        float processDevitaion;  //Deviation from difference between model & world
+        float processDeviationPosX;  //Deviation from difference between model & world
+        float processDeviationPosY;
+        float processDeviationVelX;
+        float processDeviationVelY;
         float ballFriction;      //Loss in acceleration over a unit of time
 
     };

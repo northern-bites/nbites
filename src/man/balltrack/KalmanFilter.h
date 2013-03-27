@@ -15,16 +15,32 @@
 #include "Motion.pb.h"
 #include "Common.pb.h"
 
+#include "BallTrackStructs.h"
+
 using namespace NBMath;
 
 namespace man{
 namespace balltrack{
 
+// HACK HACK HACK - Currently completely made up and untested
+// @TODO test this and determine correct values
+static const KalmanFilterParams DEFAULT_PARAMS =
+{
+    .05f,                   // transXDeviation
+    .05f,                   // trandYDeviation
+    .03f,                   // rotationDeviation
+    .6f,                    // processDeviation
+    .6f,
+    .6f,
+    .6f,
+    1.f                     // ballFriction
+};
+
 class KalmanFilter
 {
 
 public:
-    KalmanFilter();
+    KalmanFilter(KalmanFilterParams params_ = DEFAULT_PARAMS);
     ~KalmanFilter();
 
     void update(messages::VisionBall visionBall,
@@ -34,15 +50,28 @@ public:
     void setUpdate(bool updated_){updated = updated_;};
 
     void initialize();
+    void initialize(ufvector4 x_,
+                    ufmatrix4 cov_);
 
     // HACK - TEMP FOR TESTING
+    // In theory should be private
     void predict(messages::RobotLocation odometry, float deltaT);
 
     ufvector4 getStateEst(){return x;};
     float getRelXPosEst(){return x(0);};
     float getRelYPosEst(){return x(1);};
+    float getRelXVelEst(){return x(2);};
+    float getRelYVelEst(){return x(3);};
+
+    ufmatrix4 getCovEst(){return cov;};
+    float getCovXPosEst(){return cov(0,0);};
+    float getCovYPosEst(){return cov(1,1);};
+    float getCovXVelEst(){return cov(2,2);};
+    float getCovYVelEst(){return cov(3,3);};
 
 private:
+    KalmanFilterParams params;
+
     bool updated;
 
     // x is the state estimate, it holds relX & relY position and
