@@ -26,14 +26,15 @@ namespace balltrack{
 // @TODO test this and determine correct values
 static const KalmanFilterParams DEFAULT_PARAMS =
 {
-    .05f,                   // transXDeviation
-    .05f,                   // trandYDeviation
-    .03f,                   // rotationDeviation
+                            // @TODO Verify data set (newby?)
+    .03431976f,             // transXDeviation   CALC March 2013
+    .112422f,               // trandYDeviation   CALC March 2013
+    .06485467f,             // rotationDeviation CALC March 2013
     .6f,                    // processDeviation
     .6f,
     .6f,
     .6f,
-    1.f                     // ballFriction
+    1.f                     // ballFriction?
 };
 
 class KalmanFilter
