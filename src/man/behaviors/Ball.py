@@ -9,6 +9,9 @@ class Ball():
         self.locBearing = 0
         self.framesOn = 0
         self.framesOff = 0
+        # HACK
+        #self.loc.x = 0
+        #self.loc.y = 0
 
     # @param ballInfo: must be a filteredBall message
     def updateBallInfo(self, ballInfo):

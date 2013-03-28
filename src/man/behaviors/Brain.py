@@ -28,7 +28,8 @@ import GameController
 
 #from objects import (FieldObject)
 
-# Import message protocol buffers
+# Import message protocol buffers and interface
+import interface
 import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
@@ -43,9 +44,12 @@ class Brain(object):
         """
         Class constructor
         """
+
+        #self.out.printf("starting brain init method")
+
         # Parse arguments
-        #self.playerNumber = arguments[0]
-        #self.teamNumber = arguments[1]
+        self.playerNumber = 0
+        self.teamNumber = 0
         self.teamColor = Constants.teamColor.TEAM_BLUE
 
         self.counter = 0
@@ -76,16 +80,15 @@ class Brain(object):
         self.play = Play.Play()
 
         # FSAs
-        self.player = Switch.selectedPlayer.SoccerPlayer(self)
+        #self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         #self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
-        self.gameController = GameController.GameController(self)
+        #self.gameController = GameController.GameController(self)
 
-        # Messages
-        self.inMesssages = {}
-        self.outMessages = {}
+        # Message interface
+        self.interface = interface.Interface
 
 
     def initTeamMembers(self):
@@ -122,7 +125,7 @@ class Brain(object):
 
         self.counter += 1
 
-    def run(self, inMessagesList):
+    def run(self):
         """
         Main control loop called every TIME_STEP milliseconds
         """
@@ -130,35 +133,24 @@ class Brain(object):
         # Update Environment
         self.time = time.time()
 
-        # Parse incoming messages
-        self.inMessages['gameState'] = GameState.parseFromString(inMessagesList[Constants.GAME_STATE_IN])
-        self.inMessages['filteredBall'] = FilteredBall.parseFromString(inMessagesList[Constants.FILTERED_BALL_IN])
-        self.inMessages['worldModel'] = []
-        for i in range(Constants.NUM_PLAYERS_PER_TEAM):
-            self.inMessages['worldModel'].append(WorldModel.parseFromString(inMessagesList[Constants.WORLD_MODEL_IN+i]))
+        # test wrapping functionality
+        self.out.printf(self.interface.gameState)
 
         # Update objects
         # TODO: update this functionality to get info from messages
-        self.updateObjects()
+        #self.updateObjects()
 
         # Behavior stuff
-        self.gameController.run()
-        self.updatePlaybook()
-        self.player.run()
-        self.tracker.run()
-        self.nav.run()
+        #self.gameController.run()
+        #self.updatePlaybook()
+        #self.player.run()
+        #self.tracker.run()
+        #self.nav.run()
 
         #Set LED message
-        self.leds.processLeds()
+        #self.leds.processLeds()
 
         self.out.printf("End of run() method")
-
-        # Serialize outgoing messages and return a tuple of them
-        self.outMessageList = list()
-        for i in self.outMessages:
-            self.outMessageList.append(i.SerializeToString())
-        self.outMessageTuple = tuple(self.outMessageList)
-        return self.outMessageTuple
 
     def getCommUpdate(self):
         # TODO: do this for more than one teamMember
@@ -169,7 +161,7 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball.updateBallInfo(self.inMessages['filteredBall'])
+        #self.ball.updateBallInfo(self.inMessages['filteredBall'])
         #self.yglp.setBest()
         #self.ygrp.setBest()
         #self.bglp.setBest()

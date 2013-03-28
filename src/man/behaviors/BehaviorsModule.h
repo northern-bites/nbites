@@ -7,6 +7,9 @@
 
 #include "PyConstants.h"
 #include "RoboGrams.h"
+#include "PyInterface.h"
+
+#include "GameState.pb.h"
 
 /**
  *
@@ -44,6 +47,8 @@ private:
     bool import_modules();
     // Instantiate a Brain instance
     void getBrainInstance();
+	// Latch new messages
+	void latchMessages();
 
     bool error_state;
     PyObject *module_helper;
@@ -53,6 +58,10 @@ private:
     // Reload specifiers
     int do_reload;
     std::vector<std::string> module_list;
+
+	// Portals and interface
+	PyInterface interface;
+	portals::InPortal<messages::GameState> gameStateIn;
 };
 
 }

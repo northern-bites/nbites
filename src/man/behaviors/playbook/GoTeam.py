@@ -26,8 +26,8 @@ class GoTeam:
 
         # Information about teammates
         #self.position = []
-        self.me = self.brain.teamMembers[self.brain.my.playerNumber - 1]
-        self.me.playerNumber = self.brain.my.playerNumber
+        self.me = self.brain.teamMembers[self.brain.playerNumber - 1]
+        self.me.playerNumber = self.brain.playerNumber
         self.activeFieldPlayers = []
         self.numActiveFieldPlayers = 0
         self.kickoffFormation = 0
@@ -131,7 +131,7 @@ class GoTeam:
         chaser_mate = self.activeFieldPlayers[0]
 
         if PBConstants.DEBUG_DET_CHASER:
-            self.printf("chaser det: me == #%g"% self.brain.my.playerNumber)
+            self.printf("chaser det: me == #%g"% self.brain.playerNumber)
 
         # save processing time and skip the rest if we have the ball
         if self.brain.player.inKickingState:

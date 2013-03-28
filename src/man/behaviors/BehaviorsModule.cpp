@@ -15,6 +15,7 @@ extern "C" void initLedCommand_proto();
 extern "C" void initGameState_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initBallModel_proto();
+extern "C" void initinterface();
 
 
 namespace man {
@@ -67,6 +68,8 @@ void BehaviorsModule::initializePython()
         initGameState_proto();
         initWorldModel_proto();
         initBallModel_proto();
+		// Init the interface as well
+		initinterface();
     } catch (error_already_set) {
         PyErr_Print();
     }
@@ -111,6 +114,8 @@ void BehaviorsModule::reload_hard ()
 
 void BehaviorsModule::getBrainInstance ()
 {
+	/* * */std::cout << "beginning of getBrainInstance()" << std::endl;
+
     if (brain_module == NULL)
         if (!import_modules())
             return;
@@ -120,8 +125,9 @@ void BehaviorsModule::getBrainInstance ()
     // Grab instantiate and hold a reference to a new noggin.Brain.Brain()
     PyObject *dict = PyModule_GetDict(brain_module);
     PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
-    if (brain_class != NULL)
-        brain_instance = PyObject_CallObject(brain_class, NULL);
+    if (brain_class != NULL) {
+		/* * */std::cout << "about to call PyObject_CallObject()" << std::endl;
+        brain_instance = PyObject_CallObject(brain_class, NULL); }
     else
         brain_instance = NULL;
 
@@ -145,6 +151,9 @@ void BehaviorsModule::runStep ()
         error_state = false;
         num_crashed++;
     }
+
+	// Latch new messages
+	latchMessages();
 
     /*PROF_ENTER(P_PYTHON);*/
 
@@ -171,6 +180,12 @@ void BehaviorsModule::runStep ()
 
     // PROF_EXIT(P_PYTHON);
 }
+
+	void BehaviorsModule::latchMessages()
+	{
+		gameStateIn.latch();
+		interface.setGameState_ptr(&gameStateIn.message());
+	}
 
 void BehaviorsModule::modifySysPath ()
 {

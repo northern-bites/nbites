@@ -19,6 +19,7 @@ set( BEHAVIORS_SRCS BehaviorsModule
   PyGoalie
   CombinationObjects
   PyConstants
+  PyInterface
   )
 
 # Python sources
