@@ -27,7 +27,7 @@ namespace motion
 	    boost::shared_ptr<FreezeCommand> paralyze 
 		= boost::shared_ptr<FreezeCommand>(new FreezeCommand());
 	    
-	    nullBodyProvider.setCommand(paralyze);
+	    //nullBodyProvider.setCommand(paralyze);
 	}
 
 	MotionModule::~MotionModule()
@@ -636,10 +636,10 @@ namespace motion
 	newJoints.get()->set_r_ankle_pitch(nextJoints[R_ANKLE_PITCH]);
 	newJoints.get()->set_r_ankle_roll(nextJoints[R_ANKLE_ROLL]);
 
-	portals::Message<messages::JointAngles> testingJoints(&genJointCommand(0, 0, 90, 10, -90, -10, 0, 0, 90, -10, 82, 13.2, 0, 0, 0, 0, 0, -22.3, 43.5, -21.2, 0, 0, -22.3, 43.5, -21.2, 0));
+	// portals::Message<messages::JointAngles> testingJoints(&genJointCommand(0, 0, 90, 10, -90, -10, 0, 0, 90, -10, 82, 13.2, 0, 0, 0, 0, 0, -22.3, 43.5, -21.2, 0, 0, -22.3, 43.5, -21.2, 0));
 	
-	//jointsOutput_.setMessage(newJoints);
-	jointsOutput_.setMessage(testingJoints);
+	jointsOutput_.setMessage(newJoints);
+	//jointsOutput_.setMessage(testingJoints);
 
 	portals::Message<messages::JointAngles> newStiffness(0);
 
@@ -677,15 +677,15 @@ namespace motion
 	newStiffness.get()->set_r_ankle_pitch(nextStiffnesses[R_ANKLE_PITCH]);
 	newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
 
-	static const float O = 0.85f;
-	static const float A = 0.2f;
+	// static const float O = 0.85f;
+	// static const float A = 0.2f;
 
-	portals::Message<messages::JointAngles> testStiffness(&genJointCommand(O, O, A, A, A, A, O, O, A, A, A, A, O, O, O, O, O, O, O, O, O, O, O, O, O, O));
+	// portals::Message<messages::JointAngles> testStiffness(&genJointCommand(O, O, A, A, A, A, O, O, A, A, A, A, O, O, O, O, O, O, O, O, O, O, O, O, O, O));
 
-	std::cout << "sending stiffness: " << testStiffness.get()->l_knee_pitch() << std::endl;
+	// std::cout << "sending stiffness: " << testStiffness.get()->l_knee_pitch() << std::endl;
 
-	//stiffnessOutput_.setMessage(newStiffness);
-	stiffnessOutput_.setMessage(testStiffness);
+	stiffnessOutput_.setMessage(newStiffness);
+	//stiffnessOutput_.setMessage(testStiffness);
     }
 
     messages::JointAngles MotionModule::genJointCommand(float headYaw, float headPitch,

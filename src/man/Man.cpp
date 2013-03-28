@@ -59,6 +59,70 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
     startSubThreads();
+
+    // Test stand up.
+    std::vector<float> angles(Kinematics::NUM_JOINTS);
+    std::vector<float> stiffness(Kinematics::NUM_JOINTS);
+
+    angles[0] = 0.0f;
+    angles[1] = 0.0f;
+    angles[2] = TO_RAD * 90.0f;
+    angles[3] = TO_RAD * 10.0f;
+    angles[4] = TO_RAD * -90.0f;
+    angles[5] = TO_RAD * -10.0f;
+    angles[6] = 0.0f;
+    angles[7] = 0.0f;
+    angles[8] = TO_RAD * -22.3f;
+    angles[9] = TO_RAD * 43.5f;
+    angles[10] = TO_RAD * -21.2f;
+    angles[11] = 0;
+    angles[12] = 0;
+    angles[13] = 0;
+    angles[14] = TO_RAD * -22.3f;
+    angles[15] = TO_RAD * 43.5f;
+    angles[16] = TO_RAD * -21.2f;
+    angles[17] = 0;
+    angles[18] = TO_RAD * 90.0f;
+    angles[19] = TO_RAD * -10.0f;
+    angles[20] = TO_RAD * 82.0f;
+    angles[21] = TO_RAD * 13.2f;
+
+    const float O = 0.85f;
+    const float A = 0.2f;
+
+    stiffness[0] = O;
+    stiffness[1] = O;
+    stiffness[2] = O;
+    stiffness[3] = O;
+    stiffness[4] = A;
+    stiffness[5] = A;
+    stiffness[6] = A;
+    stiffness[7] = A;
+    stiffness[8] = O;
+    stiffness[9] = O;
+    stiffness[10] = O;
+    stiffness[11] = O;
+    stiffness[12] = O;
+    stiffness[13] = O;
+    stiffness[14] = O;
+    stiffness[15] = O;
+    stiffness[16] = O;
+    stiffness[17] = O;
+    stiffness[18] = A;
+    stiffness[19] = A;
+    stiffness[20] = A;
+    stiffness[21] = A;
+
+    motion::BodyJointCommand::ptr standUpCommand(
+	new motion::BodyJointCommand(
+	    3.0, 
+	    angles,
+	    stiffness,
+	    Kinematics::INTERPOLATION_SMOOTH
+	    )
+	);
+    
+    motion.sendMotionCommand(standUpCommand);
 }
 
 Man::~Man()
