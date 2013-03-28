@@ -8,6 +8,7 @@
 namespace man {
 	namespace behaviors {
 
+
 		class PyInterface
 		{
 		public:
@@ -19,5 +20,7 @@ namespace man {
 				}
 
 		};
+
+		void set_interface_ptr(boost::shared_ptr<PyInterface> ptr);
 	}
 }

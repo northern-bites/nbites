@@ -29,19 +29,22 @@ class GameController(FSA.FSA):
         self.ownKickOff = True
         self.penaltyShots = False
 
-        print  "kickoff:%g teamColor:%g" % (self.ownKickOff, self.gd.myTeamColor)
+        #print  "kickoff:%g teamColor:%g" % (self.ownKickOff, self.gd.myTeamColor)
 
     def run(self):
         # Currently set up to ignore button presses if game
         # controller is sending packets 3/6/2013
 
-        self.gd = self.brain.inMessages['gameState']
+        self.gd = self.brain.interface.gameState
 
         gcState = self.gd.state
-        if self.gd.team[0].team_number == self.brain.teamNumber:
-            penalized = self.gd.team[0].player[self.brain.playerNumber-1].penalty
+
+        self.brain.out.printf(self.gd.team(0))
+
+        if self.gd.team(0).team_number == self.brain.teamNumber:
+            penalized = self.gd.team(0).player(self.brain.playerNumber-1).penalty()
         else:
-            penalized = self.gd.team[1].player[self.brain.playerNumber-1].penalty
+            penalized = self.gd.team(1).player(self.brain.playerNumber-1).penalty()
 
         if self.gd.secondary_state == STATE2_PENALTYSHOOT:
             if gcState == STATE_INITIAL:

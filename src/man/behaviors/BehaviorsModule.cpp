@@ -28,9 +28,14 @@ BehaviorsModule::BehaviorsModule()
     : error_state(false),
       brain_module(NULL),
       brain_instance(NULL),
-      do_reload(0)
+      do_reload(0),
+	  pyInterface()
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
+
+	// Initialize the PyInterface pointer
+	set_interface_ptr(boost::shared_ptr<PyInterface> (&pyInterface));
+	std::cout << "IS IT NULL????????????" << &pyInterface << std::endl;
 
     // Initialize the interpreter and C python extensions
     initializePython();
@@ -114,7 +119,6 @@ void BehaviorsModule::reload_hard ()
 
 void BehaviorsModule::getBrainInstance ()
 {
-	/* * */std::cout << "beginning of getBrainInstance()" << std::endl;
 
     if (brain_module == NULL)
         if (!import_modules())
@@ -125,9 +129,8 @@ void BehaviorsModule::getBrainInstance ()
     // Grab instantiate and hold a reference to a new noggin.Brain.Brain()
     PyObject *dict = PyModule_GetDict(brain_module);
     PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
-    if (brain_class != NULL) {
-		/* * */std::cout << "about to call PyObject_CallObject()" << std::endl;
-        brain_instance = PyObject_CallObject(brain_class, NULL); }
+    if (brain_class != NULL)
+        brain_instance = PyObject_CallObject(brain_class, NULL);
     else
         brain_instance = NULL;
 
@@ -184,7 +187,8 @@ void BehaviorsModule::runStep ()
 	void BehaviorsModule::latchMessages()
 	{
 		gameStateIn.latch();
-		interface.setGameState_ptr(&gameStateIn.message());
+		std::cout << "This is the message. NULLL???" << &gameStateIn.message() << std::endl;
+		pyInterface.setGameState_ptr(&gameStateIn.message());
 	}
 
 void BehaviorsModule::modifySysPath ()

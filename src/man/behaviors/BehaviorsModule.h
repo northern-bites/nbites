@@ -60,7 +60,8 @@ private:
     std::vector<std::string> module_list;
 
 	// Portals and interface
-	PyInterface interface;
+	PyInterface pyInterface;
+public:
 	portals::InPortal<messages::GameState> gameStateIn;
 };
 

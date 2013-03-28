@@ -80,15 +80,15 @@ class Brain(object):
         self.play = Play.Play()
 
         # FSAs
-        #self.player = Switch.selectedPlayer.SoccerPlayer(self)
+        self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
         #self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
-        #self.gameController = GameController.GameController(self)
+        self.gameController = GameController.GameController(self)
 
         # Message interface
-        self.interface = interface.Interface
+        self.interface = interface.interface
 
 
     def initTeamMembers(self):
@@ -133,24 +133,19 @@ class Brain(object):
         # Update Environment
         self.time = time.time()
 
-        # test wrapping functionality
-        self.out.printf(self.interface.gameState)
-
         # Update objects
         # TODO: update this functionality to get info from messages
         #self.updateObjects()
 
         # Behavior stuff
-        #self.gameController.run()
-        #self.updatePlaybook()
-        #self.player.run()
-        #self.tracker.run()
+        self.gameController.run()
+        self.updatePlaybook()
+        self.player.run()
+        self.tracker.run()
         #self.nav.run()
 
         #Set LED message
         #self.leds.processLeds()
-
-        self.out.printf("End of run() method")
 
     def getCommUpdate(self):
         # TODO: do this for more than one teamMember

@@ -24,7 +24,7 @@ class SoccerFSA(FSA.FSA):
 
         # stuff so players don't crash.
         self.inKickingState = False
-        self.saveBallPosition()
+        #self.saveBallPosition()
 
         # Penalty kick player variables
         self.penaltyKicking = False
@@ -72,22 +72,22 @@ class SoccerFSA(FSA.FSA):
         """
         self.stand()
 
-    def ballMoved(self):
-        """
-        Returns true if the ball has moved in the absolute frame since the last time
-        saveBallPosition() was called, or if the uncertainty is too high
-        """
-        if abs(self.brain.ball.loc.x - self.lastBall_x) > 20 or \
-               abs(self.brain.ball.loc.y - self.lastBall_y) > 20:
-            print "Ball has moved globally since we last saved"
-            self.brain.speech.say("Ball moved")
-            return True
+    # def ballMoved(self):
+    #     """
+    #     Returns true if the ball has moved in the absolute frame since the last time
+    #     saveBallPosition() was called, or if the uncertainty is too high
+    #     """
+    #     if abs(self.brain.ball.loc.x - self.lastBall_x) > 20 or \
+    #            abs(self.brain.ball.loc.y - self.lastBall_y) > 20:
+    #         print "Ball has moved globally since we last saved"
+    #         self.brain.speech.say("Ball moved")
+    #         return True
 
-        return False
+    #     return False
 
-    def saveBallPosition(self):
-        self.lastBall_x = self.brain.ball.loc.x
-        self.lastBall_y = self.brain.ball.loc.y
+    # def saveBallPosition(self):
+    #     self.lastBall_x = self.brain.ball.loc.x
+    #     self.lastBall_y = self.brain.ball.loc.y
 
 ##### Direct Motion Calls
     # def gainsOff(self):
