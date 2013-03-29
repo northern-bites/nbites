@@ -50,6 +50,7 @@ $(CROSS_FILE):
 	fi
 	@touch $(CROSS_FILE)
 
+# Target for Serenity to build cross. Relies on default options being valid.
 .PHONY: scross
 scross:	$(CROSS_FILE)
 	cd $(BUILD_DIR); \
