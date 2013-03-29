@@ -1,7 +1,7 @@
 /**
  * @brief The joint enactor module communicates synchronously with the
- *        DCM to control the angles and stiffnesses of the joint 
- *        actuators. 
+ *        DCM to control the angles and stiffnesses of the joint
+ *        actuators.
  * @author Ellis Ratner <eratner@bowdoin.edu>
  * @date   January 2013
  */
@@ -32,76 +32,85 @@ namespace man
 {
     namespace jointenactor
     {
-	/**
-	 * @class JointEnactorModule
-	 */
-	class JointEnactorModule : public portals::Module
-	{
-	public:
-	    JointEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
+    /**
+     * @class JointEnactorModule
+     */
+    class JointEnactorModule : public portals::Module
+    {
+    public:
+        JointEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
 
-	    virtual ~JointEnactorModule();
-	    
-	    /**
-	     * @brief Enables motion (joint angle) commands to be sent
-	     *        to the DCM.
-	     */
-	    void enableMotion();
+        virtual ~JointEnactorModule();
 
-	    /**
-	     * @brief Disables motion (joint angle) commands from being
-	     *        sent to the DCM. Note that motion is initially
-	     *        disabled. 
-	     */
-	    void disableMotion();
+        /**
+         * @brief Enables motion (joint angle) commands to be sent
+         *        to the DCM.
+         */
+        void enableMotion();
 
-	    // Allows clients to set the stiffnesses of all joints.
-	    portals::InPortal<messages::JointAngles> stiffnessInput_;
+        /**
+         * @brief Disables motion (joint angle) commands from being
+         *        sent to the DCM. Note that motion is initially
+         *        disabled.
+         */
+        void disableMotion();
 
-	    // Accepts motion commands (i.e. joint angles.)
-	    portals::InPortal<messages::JointAngles> jointsInput_;
+        /**
+         * @brief Sets variable saying DCM has gotten most recent joints
+         */
+        void newJoints();
+        void jointsInDCM();
 
-	private:
-	    /**
-	     * @brief Gets a proxy to the DCM, does necessary initialization,
-	     *        and connects synchronous callback to the DCM loop.
-	     */
-	    void start();
 
-	    /**
-	     * @brief Do initialization of joint and stiffness aliases
-	     *        before connecting to the DCM. 
-	     */
-	    void initialize();
 
-	    void connectToDCMLoop();
+        // Allows clients to set the stiffnesses of all joints.
+        portals::InPortal<messages::JointAngles> stiffnessInput_;
 
-	    /**
-	     * @brief Synchronously called before each iteration of the
-	     *        DCM loop. All operations must be fast, so as not
-	     *        to slow down the DCM (e.g., no system calls or 
-	     *        dynamic memory allocation.)
-	     */
-	    void DCMPreProcessCallback();
+        // Accepts motion commands (i.e. joint angles.)
+        portals::InPortal<messages::JointAngles> jointsInput_;
 
-	    /**
-	     * @brief Disconnects from the DCM loop. 
-	     */
-	    void stop();
+    private:
+        /**
+         * @brief Gets a proxy to the DCM, does necessary initialization,
+         *        and connects synchronous callback to the DCM loop.
+         */
+        void start();
 
-	    void run_();
+        /**
+         * @brief Do initialization of joint and stiffness aliases
+         *        before connecting to the DCM.
+         */
+        void initialize();
 
-	    boost::shared_ptr<AL::ALBroker> broker_;
-	    boost::shared_ptr<AL::DCMProxy> dcmProxy_;
+        void connectToDCMLoop();
 
-	    bool motionEnabled_;
+        /**
+         * @brief Synchronously called before each iteration of the
+         *        DCM loop. All operations must be fast, so as not
+         *        to slow down the DCM (e.g., no system calls or
+         *        dynamic memory allocation.)
+         */
+        void DCMPreProcessCallback();
 
-	    AL::ALValue jointCommand_;
-	    AL::ALValue stiffnessCommand_;
-	    AL::ALProcessSignals::ProcessSignalConnection dcmPreProcessConnection_;
+        /**
+         * @brief Disconnects from the DCM loop.
+         */
+        void stop();
 
-	    messages::JointAngles latestJointAngles_;
-	    messages::JointAngles latestStiffness_;
-	};
+        void run_();
+
+        boost::shared_ptr<AL::ALBroker> broker_;
+        boost::shared_ptr<AL::DCMProxy> dcmProxy_;
+
+        bool motionEnabled_;
+        bool newJoints;
+
+        AL::ALValue jointCommand_;
+        AL::ALValue stiffnessCommand_;
+        AL::ALProcessSignals::ProcessSignalConnection dcmPreProcessConnection_;
+
+        messages::JointAngles latestJointAngles_;
+        messages::JointAngles latestStiffness_;
+    };
     } // namespace jointenactor
 } // namespace man
