@@ -8,7 +8,7 @@ import os
 parser = argparse.ArgumentParser(description="Sends a job to Serenity.")
 
 job_group = parser.add_mutually_exclusive_group()
-job_group.add_argument('-c', '--compile', action='store_true', default=False,
+job_group.add_argument('-c', '--compile', action='store_true', default=False, dest='build',
                        help='Only compiles. No test or pull request.')
 job_group.add_argument('-m', '--mock', action='store_true', default=False,
                        help='Compiles and tests with no pull request.')
@@ -67,7 +67,14 @@ if (acquire):
                 with open('cache.txt', 'w') as f:
                     f.write(str(cache))
 
+print "\n\n Transferring you to Serenity...\n\n"
 
-os.system("ssh northern-bites@139.140.109.49 './serenity.sh'")
+command = "ssh northern-bites@139.140.109.49 './serenity-server.sh "
+if (args.build):
+    command += "-c "
+if (args.mock):
+    command += "-m "
+command += "-b " + args.branch + " -n " + cache['git_name'] + " -u " + cache['git_url'] + "'"
+os.system(command)
 
 print args

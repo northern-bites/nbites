@@ -50,6 +50,13 @@ $(CROSS_FILE):
 	fi
 	@touch $(CROSS_FILE)
 
+.PHONY: scross
+scross:	$(CROSS_FILE)
+	cd $(BUILD_DIR); \
+	cmake $(CMAKE_CROSS_FLAGS) $(SRC_DIR); \
+	$(BUILD_DIR)/Makefile; \
+	$(MAKE) -C $(BUILD_DIR) --no-print-directory
+
 .PHONY: straight
 straight: $(STRAIGHT_FILE)
 	cd $(BUILD_DIR); \
