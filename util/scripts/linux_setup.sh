@@ -7,7 +7,7 @@ fi
 
 PACKAGES="build-essential cmake git-core \
 python2.7-dev emacs cmake-curses-gui ccache curl aptitude \
-ant qt4-dev-tools"
+ant qt4-dev-tools python-pyparsing"
 
 echo "Are you on 64-bit linux? (y/n)"
 read IS64BIT
@@ -43,22 +43,6 @@ if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
     fi
 fi
 
-echo "Do you want to run the deprecated Java tool on this computer? (y/n)"
-read WANTJAVA
-
-if [ $WANTJAVA == 'y' ]; then
-
-    if [ $VERSION == '11.10' ]; then
-	echo "Downloading Java. Accept the license by pressing TAB!"
-	sudo add-apt-repository ppa:ferramroberto/java
-	sudo apt-get update
-	sudo apt-get install sun-java6-jdk
-    else
-	echo "You will need to install Sun Java manually."
-	echo ""
-    fi
-fi
-
 echo ""
 echo "Downloading and installing software!"
 echo "..."
@@ -71,15 +55,12 @@ lib_dir=$nbites_dir/lib
 
 naoqi=naoqi-sdk-$naoqi_version-linux32.tar.gz
 atom=nbites-atom-toolchain-$naoqi_version.tar.gz
-geode=nbites-geode-toolchain-$naoqi_version.tar.gz
 
 naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
 atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
-geode_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$geode
 
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
-geode_local=$lib_dir/geodetoolchain
 
 ext=ext-nbites-linux32.tar.gz
 
@@ -99,9 +80,6 @@ rsync -v $USER_NAME@$naoqi_robocup $lib_dir/
 echo "Downloading Atom toolchain"
 rsync -v $USER_NAME@$atom_robocup $lib_dir/
 
-echo "Downloading Geode toolchain"
-rsync -v $USER_NAME@$geode_robocup $lib_dir/
-
 echo "Unpacking NaoQi"
 
 pushd $lib_dir
@@ -111,8 +89,6 @@ rm $naoqi
 mkdir $atom_local
 tar -xzf $atom -C $atom_local --strip-components 1
 
-mkdir $geode_local
-tar -xzf $geode -C $geode_local --strip-components 1
 popd
 
 echo "Downloading external components"
