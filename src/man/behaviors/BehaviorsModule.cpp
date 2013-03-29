@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/python/errors.hpp>
 #include <iostream>
+#include "Common.h"
 
 #include "BehaviorsModule.h"
 #include "PyObjects.h"
@@ -192,6 +193,11 @@ void BehaviorsModule::runStep ()
 		pyInterface.setGameState_ptr(&gameStateIn.message());
 		filteredBallIn.latch();
 		pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
+		for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
+			worldModelIn[i].latch();
+			pyInterface.setWorldModel_ptr(&worldModelIn[i].message(),i);
+				}
+
 
 		// Might be really broken.
 		ledCommand = portals::Message<messages::LedCommand>(0);

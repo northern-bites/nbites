@@ -14,6 +14,12 @@ namespace behaviors {
 
 boost::shared_ptr<PyInterface> interface_ptr;
 
+
+	void set_interface_ptr(boost::shared_ptr<PyInterface> ptr)
+	{
+		interface_ptr = ptr;
+	}
+
 BOOST_PYTHON_MODULE(interface)
 {
 	class_<PyInterface, boost::shared_ptr<PyInterface>, boost::noncopyable>("Interface", no_init)
@@ -29,12 +35,9 @@ BOOST_PYTHON_MODULE(interface)
 					  make_getter(&PyInterface::ledCommand_ptr,
 								  return_value_policy
 								  <reference_existing_object>()))
+		.def("worldModelList", &PyInterface::getWorldModelList)
 		;
 	scope().attr("interface") = interface_ptr;
 }
-	void set_interface_ptr(boost::shared_ptr<PyInterface> ptr)
-	{
-		interface_ptr = ptr;
-	}
 }
 }

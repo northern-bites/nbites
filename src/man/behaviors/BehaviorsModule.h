@@ -8,10 +8,12 @@
 #include "PyConstants.h"
 #include "RoboGrams.h"
 #include "PyInterface.h"
+#include "Common.h"
 
 #include "GameState.pb.h"
 #include "BallModel.pb.h"
 #include "LedCommand.pb.h"
+#include "WorldModel.pb.h"
 
 /**
  *
@@ -68,6 +70,7 @@ private:
 public:
 	portals::InPortal<messages::GameState> gameStateIn;
 	portals::InPortal<messages::FilteredBall> filteredBallIn;
+	portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
 	portals::OutPortal<messages::LedCommand> ledCommandOut;
 private:
 	portals::Message<messages::LedCommand> ledCommand;
