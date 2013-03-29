@@ -417,5 +417,17 @@ messages::YUVImage ImageTranscriber::getNextImage()
                               2*WIDTH, HEIGHT, 2*WIDTH);
 }
 
+TranscriberModule::TranscriberModule(ImageTranscriber& trans)
+    : imageOut(base()), it(trans)
+{
+}
+
+void TranscriberModule::run_()
+{
+    messages::YUVImage image = it.getNextImage();
+    portals::Message<messages::YUVImage> imageOutMessage(&image);
+    imageOut.setMessage(imageOutMessage);
+}
+
 }
 }

@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "VisionDef.h"
 #include "Images.h"
+#include "RoboGrams.h"
 
 namespace man {
 namespace image {
@@ -79,5 +80,15 @@ private:
     uint64_t timeStamp;
 };
 
+class TranscriberModule : public portals::Module
+{
+public :
+    TranscriberModule(ImageTranscriber&);
+    portals::OutPortal<messages::YUVImage> imageOut;
+protected :
+    virtual void run_();
+private :
+    ImageTranscriber& it;
+};
 }
 }
