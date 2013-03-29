@@ -402,6 +402,13 @@ protected:
   //          parameters, releasing any currently shared pixels. 
   // note     After this call, this image is the only one currently sharing the pixels.
 
+  void* makeMeInBuffer(PixelBuffer* buf, int wd, int ht, int rowPitch, int pixelPitch = 1);
+  // returns  Address of first pixel, for derived class use
+  // effect   Make me a new memory image of specified size in the specified buffer from
+  //          parameters, releasing any currently shared pixels. 
+  // requires Buffer must be made by the caller with operator new
+  // note     After this call, this image is the only one currently sharing the pixels.
+
   void makeMeWindowOf(const MemoryImageBase&, int& x0, int& y0, int wd, int ht);
   // effect   Make me a window of the specified memory image, sharing its pixels and releasing
   //          any currently shared pixels. Update x0 and y0 and the size of this image to
@@ -445,6 +452,9 @@ public:
 
   MemoryImage(T* pixels, int wd, int ht, int rowPitch, int pixelPitch = 1);
   // effect   Construct new image at specified address in memory, of specified size and pitch.
+
+  MemoryImage(PixelBuffer* buf, int wd, int ht, int rowPitch, int pixelPitch = 1);
+  // effect   Construct new image from pixel buffer, of specified size and pitch.
 
   MemoryImage(const MemoryImage&);
   // effect   Copy construct from spacified image, sharing pixels
@@ -526,6 +536,13 @@ MemoryImage<T>::MemoryImage(T* pixels, int wd, int ht, int rowPitch, int pixelPi
 }
 
 template<class T>
+MemoryImage<T>::MemoryImage(PixelBuffer* buf, int wd, int ht, int rowPitch, int pixelPitch)
+{
+  // Base class does all the work.
+  pixels_ = (T*)makeMeInBuffer(buf, wd, ht, rowPitch, pixelPitch);
+}
+
+template<class T>
 MemoryImage<T> MemoryImage<T>::window(int x0, int y0, int wd, int ht) const
 {
   MemoryImage<T> img;                         // Start with null image, no pixels.
@@ -587,6 +604,11 @@ public:
 
   PackedImage(T* pixels, int wd, int ht, int rowPitch) : MemoryImage<T>(pixels, wd, ht, rowPitch) {}
   // effect   Construct new image at specified address in memory, of specified size and pitch.
+  // note     Like the constructor in MemoryImage<T>, except that you can't specify pixelPitch, it
+  //          must be 1.
+
+  PackedImage(PixelBuffer* buf, int wd, int ht, int rowPitch) : MemoryImage<T>(buf, wd, ht, rowPitch) {}
+  // effect   Construct new image from buffer, of specified size and pitch.
   // note     Like the constructor in MemoryImage<T>, except that you can't specify pixelPitch, it
   //          must be 1.
 
@@ -708,6 +730,10 @@ public:
   //          to be a multiple of 4 by truncation.
 
   YUVImage(unsigned char* pixels, int wd, int ht, int rowPitch) : PackedImage8(pixels, wd & ~3, ht, rowPitch) {}
+  // effect   Construct new image at specified address in memory, of specified size and pitch.The
+  //          width is forced to be a multiple of 4 by truncation. 
+
+  YUVImage(PixelBuffer* buf, int wd, int ht, int rowPitch) : PackedImage8(buf, wd & ~3, ht, rowPitch) {}
   // effect   Construct new image at specified address in memory, of specified size and pitch.The
   //          width is forced to be a multiple of 4 by truncation. 
 
