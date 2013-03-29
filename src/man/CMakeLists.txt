@@ -43,13 +43,15 @@ if( BUILD_PROTOBUF )
 endif()
 
 # testing set up
-include ( ${SHARE_DIR}/cmake/gtest.cmake )
-enable_testing()
-set(CTEST_OUTPUT_ON_FAILURE TRUE)
+if ( OFFLINE )
+  include ( ${SHARE_DIR}/cmake/gtest.cmake )
+  enable_testing()
+  set(CTEST_OUTPUT_ON_FAILURE TRUE)
 
-include_directories(
-  ${GTEST_INCLUDE_DIR}
-)
+  include_directories(
+    ${GTEST_INCLUDE_DIR}
+    )
+endif()
 
 # For Aldebaran's headers
 if ( NOT OFFLINE )
