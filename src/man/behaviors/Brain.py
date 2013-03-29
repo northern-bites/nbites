@@ -59,7 +59,7 @@ class Brain(object):
         self.my = MyInfo.MyInfo()
 
         #initalize the leds
-        #self.leds = Leds.Leds(self)
+        self.leds = Leds.Leds(self)
 
         # Retrieve our robot identification and set per-robot parameters
         #self.CoA = robots.get_certificate()
@@ -144,7 +144,8 @@ class Brain(object):
         #self.nav.run()
 
         #Set LED message
-        #self.leds.processLeds()
+        self.out.printf("processing leds")
+        self.leds.processLeds()
 
     def getCommUpdate(self):
         # TODO: do this for more than one teamMember

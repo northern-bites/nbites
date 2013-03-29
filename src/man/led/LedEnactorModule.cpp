@@ -20,7 +20,10 @@ namespace man {
 			// TODO: make this more robust if arrays don't have the same size
 			for (int i=0; i<command.led_id_size(); i++) {
 				naoLights.setRGB(command.led_id(i),command.rgb_hex(i));
+				std::cout << "Sending led command with id: " << command.led_id(i) << " and rgb: " << command.rgb_hex(i) << std::endl;
 			}
+			// actually set robot leds
+			naoLights.sendLights();
 		}
 
 	}

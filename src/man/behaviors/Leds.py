@@ -165,7 +165,7 @@ STATE_FINISHED_LEDS = ((CHEST_LED, OFF,    NOW),)
 class Leds():
 
     def __init__(self, brainPtr):
-        self.lights = _lights.lights
+        #self.lights = _lights.lights
         self.brain = brainPtr
         self.kickoffChange = True
         self.teamChange = True
@@ -174,8 +174,6 @@ class Leds():
         self.numActiveMates = 0
 
     def processLeds(self):
-        # Reset brain's out message to a blank one.
-        self.brain.outMessages['ledCommand'] = LedCommand_pb2.LedCommand()
 
         if BALL_LEDS:
             if self.brain.ball.framesOn == 1:
@@ -369,14 +367,14 @@ class Leds():
                 self.teamChange = False
 
     def executeLeds(self,listOfLeds):
-
+        self.brain.out.printf("executing leds.")
         for ledTuple in listOfLeds:
             if len(ledTuple) != 3:
                 self.printf("Invalid print command!! " + str(ledTuple))
                 continue
             # Add command to brain's out message fields
-            self.brain.outMessages['ledCommand'].addLed_id(ledTuple[0])
-            self.brain.outMessages['ledCommand'].addRgb_hex(ledTuple[1])
+            self.brain.interface.ledCommand.add_led_id(ledTuple[0])
+            self.brain.interface.ledCommand.add_rgb_hex(ledTuple[1])
 
             # Unnecessary check, never triggered
             #if ledTuple[2] != NOW:
