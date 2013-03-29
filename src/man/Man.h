@@ -15,6 +15,8 @@
 #include "jointenactor/JointEnactorModule.h"
 #include "newmotion/MotionModule.h"
 
+#include <vector>
+
 namespace man {
 
 class Man : public AL::ALModule
