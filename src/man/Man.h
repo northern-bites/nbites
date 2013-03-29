@@ -6,6 +6,7 @@
 
 #include "RoboGrams.h"
 #include "DiagramThread.h"
+#include "DebugConfig.h"
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
 #include "vision/VisionModule.h"

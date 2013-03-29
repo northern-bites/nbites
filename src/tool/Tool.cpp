@@ -12,10 +12,8 @@ QFile file(QString("./.geometry"));
 
 Tool::Tool(const char* title) :
     QMainWindow(),
-    mainDiagram(),
-    // IF YOU WANT TO SEE LOGS FOR THE TIME BEING, YOU HAVE TO DO THIS
-    // WE WILL FIX THIS HACK ASAP
-    unlogger("/home/ecat/nbites/data/logs/joint"),
+    diagram(),
+    selector(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -26,21 +24,21 @@ Tool::Tool(const char* title) :
     tabStartSize(new QSize(toolTabs->size()))
 
 {
-    // Set up the diagram
-    mainDiagram.addModule(unlogger);
-
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
 
-    connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
-    connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
-    connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
-
+    connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(run()));
+    connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
+            &diagram, SLOT(addUnloggers(std::vector<std::string>)));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);
 
+    toolTabs->addTab(&selector, tr("Data"));
+    toolTabs->addTab(diagram.getGUI(), tr("Log Viewer"));
+
+    this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
 
     // Figure out the appropriate dimensions for the window
@@ -68,17 +66,6 @@ Tool::~Tool() {
     }
 }
 
-// Button press methods
-void Tool::next() {
-    mainDiagram.run();
-}
-
-void Tool::prev() {
-}
-
-void Tool::record() {
-}
-
 // Keyboard control
 void Tool::keyPressEvent(QKeyEvent * event)
 {
@@ -86,12 +73,11 @@ void Tool::keyPressEvent(QKeyEvent * event)
     case Qt::Key_J:
     case Qt::Key_D:
     case Qt::Key_N:
-        next();
+        diagram.run();
         break;
     case Qt::Key_K:
     case Qt::Key_S:
     case Qt::Key_P:
-        prev();
         break;
     default:
         QWidget::keyPressEvent(event);

@@ -22,9 +22,9 @@
 #include <QModelIndex>
 #include <QVariant>
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace unlog {
+namespace view {
 
 class TreeModel : public QAbstractItemModel
 {
@@ -64,6 +64,7 @@ private:
 }
 }
 }
+
 #include "Node.h"
 
 #endif // TreeModel_H
