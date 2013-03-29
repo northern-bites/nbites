@@ -150,7 +150,7 @@ class Brain(object):
     def getCommUpdate(self):
         # TODO: do this for more than one teamMember
         #for i in range(len(self.teamMembers)):
-        self.teamMembers[0].update(self.inMessages['worldModel'])
+        #self.teamMembers[0].update(self.inMessages['worldModel'])
 
     def updateObjects(self):
         """

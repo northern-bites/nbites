@@ -8,7 +8,6 @@
 #include "BehaviorsModule.h"
 #include "PyObjects.h"
 
-using namespace std;
 using namespace boost::python;
 
 extern "C" void initLedCommand_proto();
@@ -29,13 +28,13 @@ BehaviorsModule::BehaviorsModule()
       brain_module(NULL),
       brain_instance(NULL),
       do_reload(0),
-	  pyInterface()
+	  pyInterface(),
+	  ledCommandOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
 
 	// Initialize the PyInterface pointer
 	set_interface_ptr(boost::shared_ptr<PyInterface> (&pyInterface));
-	std::cout << "IS IT NULL????????????" << &pyInterface << std::endl;
 
     // Initialize the interpreter and C python extensions
     initializePython();
@@ -155,7 +154,7 @@ void BehaviorsModule::runStep ()
         num_crashed++;
     }
 
-	// Latch new messages
+	// Latch incoming messages and prepare outgoing messages
 	latchMessages();
 
     /*PROF_ENTER(P_PYTHON);*/
@@ -182,13 +181,26 @@ void BehaviorsModule::runStep ()
     //PROF_EXIT(P_PYRUN);
 
     // PROF_EXIT(P_PYTHON);
+
+	// Send outgoing messages
+	sendMessages();
 }
 
 	void BehaviorsModule::latchMessages()
 	{
 		gameStateIn.latch();
-		std::cout << "This is the message. NULLL???" << &gameStateIn.message() << std::endl;
 		pyInterface.setGameState_ptr(&gameStateIn.message());
+		filteredBallIn.latch();
+		pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
+
+		// Might be really broken.
+		ledCommand = portals::Message<messages::LedCommand>(0);
+		pyInterface.setLedCommand_ptr(ledCommand.get());
+	}
+
+	void BehaviorsModule::sendMessages()
+	{
+		ledCommandOut.setMessage(ledCommand);
 	}
 
 void BehaviorsModule::modifySysPath ()

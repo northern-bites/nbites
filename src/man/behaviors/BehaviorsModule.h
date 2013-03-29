@@ -10,6 +10,8 @@
 #include "PyInterface.h"
 
 #include "GameState.pb.h"
+#include "BallModel.pb.h"
+#include "LedCommand.pb.h"
 
 /**
  *
@@ -49,6 +51,8 @@ private:
     void getBrainInstance();
 	// Latch new messages
 	void latchMessages();
+	// Send out messages
+	void sendMessages();
 
     bool error_state;
     PyObject *module_helper;
@@ -63,6 +67,10 @@ private:
 	PyInterface pyInterface;
 public:
 	portals::InPortal<messages::GameState> gameStateIn;
+	portals::InPortal<messages::FilteredBall> filteredBallIn;
+	portals::OutPortal<messages::LedCommand> ledCommandOut;
+private:
+	portals::Message<messages::LedCommand> ledCommand;
 };
 
 }

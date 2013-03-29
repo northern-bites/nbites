@@ -32,14 +32,16 @@ class GameController(FSA.FSA):
         #print  "kickoff:%g teamColor:%g" % (self.ownKickOff, self.gd.myTeamColor)
 
     def run(self):
+        # Ignore all comm based game controller messages for the
+        # forseeable future; only use button presses 3/28/2013
+
         # Currently set up to ignore button presses if game
         # controller is sending packets 3/6/2013
 
+        '''
         self.gd = self.brain.interface.gameState
 
         gcState = self.gd.state
-
-        self.brain.out.printf(self.gd.team(0))
 
         if self.gd.team(0).team_number == self.brain.teamNumber:
             penalized = self.gd.team(0).player(self.brain.playerNumber-1).penalty()
@@ -101,6 +103,7 @@ class GameController(FSA.FSA):
             if self.ownKickOff == True:
                 self.ownKickOff = False
                 self.brain.leds.kickoffChange = True
+        '''
 
         FSA.FSA.run(self)
 
