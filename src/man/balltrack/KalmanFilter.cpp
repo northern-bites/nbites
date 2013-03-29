@@ -112,12 +112,11 @@ namespace balltrack
         noise(1) += odometry.y() * params.transYDeviation;
 
         // Add rotation deviation noise
-        // This is a little tricky, the rotation deviation is 1 dimensional
-        // and in degrees... lets assume rotating affects x and y equally
-        // and further assume the params are smart and calculated the rotation
-        // deviation out of degrees! Yay minimizing real time computation
+        // We've already made the matrix using the deviation matrix
+        // so lets pump it through
+        ufvector4 noiseFromRot = prod(rotationDeviationRotation, x);
         for (int i=0; i<4; i++)
-            noise(i) = odometry.h() * params.rotationDeviation;
+            noise(i) = noiseFromRot(i);
 
         // Add all this noise to the covariance
         for(int i=0; i<4; i++)

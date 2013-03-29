@@ -27,9 +27,9 @@ namespace balltrack{
 static const KalmanFilterParams DEFAULT_PARAMS =
 {
                             // @TODO Verify data set (newby?)
-    .03431976f,             // transXDeviation   CALC March 2013
-    .112422f,               // trandYDeviation   CALC March 2013
-    .06485467f,             // rotationDeviation CALC March 2013
+    .00117784f,             // transXDeviation   CALC March 2013
+    .01263870f,             // trandYDeviation   CALC March 2013
+    .00420612f,             // rotationDeviation CALC March 2013
     .6f,                    // processDeviation
     .6f,
     .6f,
