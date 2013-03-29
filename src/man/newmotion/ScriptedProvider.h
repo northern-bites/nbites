@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <vector>
 #include <queue>
@@ -22,10 +22,10 @@ public:
 
     void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses(
-	std::vector<float>&      sensorAngles,
-	messages::InertialState& sensorInertials,
-	messages::FSR&           sensorFSRs
-	);
+        std::vector<float>&      sensorAngles,
+        messages::InertialState& sensorInertials,
+        messages::FSR&           sensorFSRs
+        );
 
     void hardReset();
 
