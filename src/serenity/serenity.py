@@ -67,7 +67,7 @@ if (acquire):
                 with open('cache.txt', 'w') as f:
                     f.write(str(cache))
 
-print "\n\n Transferring you to Serenity...\n\n"
+print "\n Transferring you to Serenity...\n"
 
 command = "ssh northern-bites@139.140.109.49 './serenity-server.sh "
 if (args.build):
