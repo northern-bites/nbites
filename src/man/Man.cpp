@@ -43,7 +43,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	/** Cognition **/
 	cognitionThread.addModule(imageTranscriber);
 	cognitionThread.addModule(vision);
-	cognitionThread.addModule(ballTrack);
+	//cognitionThread.addModule(ballTrack);
 	cognitionThread.addModule(leds);
     cognitionThread.addModule(behaviors);
 	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
@@ -52,7 +52,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
 	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
-	behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+	//behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
 
     startSubThreads();
 }

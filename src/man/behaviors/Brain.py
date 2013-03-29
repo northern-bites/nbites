@@ -45,8 +45,6 @@ class Brain(object):
         Class constructor
         """
 
-        #self.out.printf("starting brain init method")
-
         # Parse arguments
         self.playerNumber = 0
         self.teamNumber = 0
@@ -129,6 +127,7 @@ class Brain(object):
         """
         Main control loop called every TIME_STEP milliseconds
         """
+
         # Order here is very important
         # Update Environment
         self.time = time.time()
@@ -149,6 +148,7 @@ class Brain(object):
 
     def getCommUpdate(self):
         # TODO: do this for more than one teamMember
+        pass
         #for i in range(len(self.teamMembers)):
         #self.teamMembers[0].update(self.inMessages['worldModel'])
 
@@ -156,6 +156,7 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
+        pass
         #self.ball.updateBallInfo(self.inMessages['filteredBall'])
         #self.yglp.setBest()
         #self.ygrp.setBest()
