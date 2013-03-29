@@ -28,6 +28,7 @@ Tool::Tool(const char* title) :
     this->setWindowTitle(tr(title));
 
     connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(run()));
+	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(rewind()));
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
 

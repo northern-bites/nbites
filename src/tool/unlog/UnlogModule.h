@@ -62,7 +62,7 @@ public:
 
     template <class T>
     T readNextMessage() {
-		std::cout<<"file location:"<<ftell(file)<<std::endl;
+		std::cout<<"Forwarded to file location:"<<ftell(file)<<std::endl;
         // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
@@ -76,11 +76,11 @@ public:
         // Keep track of the sizes we've read (to unwind)
         messageSizes.push_back(currentMessageSize);
 
-       /*
-        * Note: We can't deserialize directly from a file to a protobuf.
-        * We have to read the file's contents into a buffer, then
-        * deserialize from that buffer into the protobuf.
-        */
+		/*
+		 * Note: We can't deserialize directly from a file to a protobuf.
+		 * We have to read the file's contents into a buffer, then
+		 * deserialize from that buffer into the protobuf.
+		 */
 
         // To hold the data read, and the number of bytes read
         uint32_t bytes;
@@ -111,10 +111,15 @@ public:
 	//unwinding - implements things pretty much backwards from above function
 	template <class T>
 	T readPrevMessage() {
-        if (feof(file)) {
-            std::cout << "End of log file " << fileName << std::endl;
+		std::cout<<"Rewound to file location:"<<ftell(file)<<std::endl;
+        if (ftell(file)==0) {
+            std::cout << "Beginning of log file " << fileName << std::endl;
             return T();
         }
+
+		////////////////////////
+		//////////////TODO
+		////////////////////////
 	}
 
 
@@ -185,6 +190,24 @@ protected:
 
         if (usingGUI) updateDisplay(output.getMessage(true).get());
     }
+
+	void rewind_()
+	{
+	    // If the file has't already been opened, you can't rewind
+        if (!fileOpen)
+        {
+			std::cout<<"You can't rewind until you open a log."<<std::endl;
+        }
+
+        // Reads the previous message from the file and puts it on
+        // the OutPortal
+        portals::Message<T> msg(0);
+        *msg.get() = readPrevMessage<T>();
+
+        output.setMessage(msg);
+
+        if (usingGUI) updateDisplay(output.getMessage(true).get());
+	}
 
     // Reads in the header; called when the file is first opened
     void readHeader()
