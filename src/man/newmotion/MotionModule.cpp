@@ -196,10 +196,10 @@ namespace motion
         //return if one of the enactors is active
         return curProvider->isActive() /* || curHeadProvider->isActive()*/;
     }
-	
+
     void MotionModule::processBodyJoints()
     {
-        using namespace Kinematics; 
+        using namespace Kinematics;
 
         if (curProvider->isActive())
         {
@@ -485,6 +485,19 @@ namespace motion
         noWalkTransitionCommand = true;
         nextProvider = &scriptedProvider;
         scriptedProvider.setCommand(command);
+    }
+
+    void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands)
+    {
+        std::cout << "MotionModule: Received new BodyJointCommand vector."
+                  << std::endl;
+        noWalkTransitionCommand = true;
+        nextProvider = &scriptedProvider;
+        for(std::vector<BodyJointCommand::ptr>::const_iterator iter = commands.begin();
+            iter != commands.end();
+            iter++){
+            scriptedProvider.setCommand(*iter);
+        }
     }
 
     // void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)

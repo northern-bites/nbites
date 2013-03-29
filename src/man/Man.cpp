@@ -16,9 +16,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       audio(broker),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
-	  imageTranscriber(),
-	  vision()
+      cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
+      imageTranscriber(),
+      vision()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -50,13 +50,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Comm **/
     commThread.addModule(comm);
 
-	/** Cognition **/
-	cognitionThread.addModule(imageTranscriber);
-	cognitionThread.addModule(vision);
-	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+    /** Cognition **/
+    cognitionThread.addModule(imageTranscriber);
+    cognitionThread.addModule(vision);
+    vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+    vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+    vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+    vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
     startSubThreads();
 
@@ -121,61 +121,17 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
             )
         );
 
-    // Test sit down.
-    std::vector<float> anglesSit(Kinematics::NUM_JOINTS, 0.0f);
-    std::vector<float> stiffnessSit(Kinematics::NUM_JOINTS, 0.0f);
 
-    anglesSit[0] = 0;
-    anglesSit[1] = 0;
-    anglesSit[2] = 0;
-    anglesSit[3] = 0;
-    anglesSit[4] = 0.0f;
-    anglesSit[5] = 0.0f;
-    anglesSit[6] = 0;
-    anglesSit[7] = 0;
-    anglesSit[8] = 0;
-    anglesSit[9] = 0.0f;
-    anglesSit[10] = 0.0f;
-    anglesSit[11] = 0.0f;
-    anglesSit[12] = 0;
-    anglesSit[13] = 0;
-    anglesSit[14] = 0;
-    anglesSit[15] = 0.0f;
-    anglesSit[16] = 0;
-    anglesSit[17] = 0;
-    anglesSit[18] = 0;
-    anglesSit[19] = 0;
-    // anglesSit[20] = TO_RAD * 82.0f;
-    // anglesSit[21] = TO_RAD * 13.2f;
+    angles[0] = 0.f;
+    angles[16] = 0.f;
+    stiffness[2] = O;
+    stiffness[18] = O;
 
-    stiffnessSit[0] = 0;
-    stiffnessSit[1] = 0;
-    stiffnessSit[2] = 0;
-    stiffnessSit[3] = 0;
-    stiffnessSit[4] = 0;
-    stiffnessSit[5] = 0;
-    stiffnessSit[6] = 0;
-    stiffnessSit[7] = 0;
-    stiffnessSit[8] = 0;
-    stiffnessSit[9] = 0;
-    stiffnessSit[10] = 0;
-    stiffnessSit[11] = 0;
-    stiffnessSit[12] = 0;
-    stiffnessSit[13] = 0;
-    stiffnessSit[14] = 0;
-    stiffnessSit[15] = 0;
-    stiffnessSit[16] = 0;
-    stiffnessSit[17] = 0;
-    stiffnessSit[18] = 0;
-    stiffnessSit[19] = 0;
-    stiffnessSit[20] = 0;
-    stiffnessSit[21] = 0;
-
-    motion::BodyJointCommand::ptr sitDownCommand(
+    motion::BodyJointCommand::ptr standWithArmCommand(
         new motion::BodyJointCommand(
             3.0,
-            anglesSit,
-            stiffnessSit,
+            angles,
+            stiffness,
             Kinematics::INTERPOLATION_SMOOTH
             )
         );
@@ -185,8 +141,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
             "/home/nao/scripted_commands.bjc"
             );
 
-//    motion.sendMotionCommand(standUpCommand);
-    // motion.sendMotionCommand(sitDownCommand);
+    jointEnactor.enableMotion();
+    std::vector<motion::BodyJointCommand::ptr> scriptedMove;
+    scriptedMove.push_back(standUpCommand);
+    scriptedMove.push_back(standWithArmCommand);
+    motion.sendMotionCommand(scriptedMove);
 }
 
 Man::~Man()
