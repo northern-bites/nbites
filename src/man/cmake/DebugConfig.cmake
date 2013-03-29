@@ -20,3 +20,41 @@ option(
   "Toggle threads debug mode."
   OFF
 )
+
+option(
+  DEBUG_LOGGING
+  "Toggle logging debug mode."
+  OFF
+)
+
+option(
+  USE_LOGGING
+  "Enable logging on the robot."
+  OFF
+)
+
+if(USE_LOGGING)
+  option(
+    LOG_SENSORS
+    "Log the robot's sensor readings."
+    OFF
+    )
+
+  option(
+    LOG_GUARDIAN
+    "Log the robot's guardian state."
+    OFF
+    )
+
+  option(
+    LOG_COMM
+    "Log the robot's communication."
+    OFF
+    )
+
+  option(
+    LOG_VISION
+    "Log the robot's vision output."
+    OFF
+    )
+endif(USE_LOGGING)

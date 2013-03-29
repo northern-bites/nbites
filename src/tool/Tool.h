@@ -11,9 +11,8 @@
 #include <QScrollArea>
 #include <QResizeEvent>
 
-#include "RoboGrams.h"
-#include "unlog/UnlogModule.h"
-#include "JointAngles.pb.h"
+#include "ToolDiagram.h"
+#include "DataSelector.h"
 
 namespace tool {
 
@@ -24,12 +23,6 @@ public:
     Tool(const char* title = "TOOL");
     ~Tool();
 
-protected slots:
-    // Called by the buttons in the main toolbar
-    void next();
-    void prev();
-    void record();
-
 protected:
     // For keyboard control
     virtual void keyPressEvent(QKeyEvent * event);
@@ -37,11 +30,10 @@ protected:
 	void resizeEvent(QResizeEvent*);
 
     // Modules in this diagram will be run when data is updated
-    portals::RoboGram mainDiagram;
+    ToolDiagram diagram;
+    DataSelector selector;
 
     // Modules
-    // IF YOU WANT TO SEE LOGS PUT YOUR UNLOGGER HERE
-    unlog::UnlogModule<messages::JointAngles> unlogger;
 
     // GUI stuff
     QTabWidget* toolTabs;

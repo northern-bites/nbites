@@ -12,9 +12,9 @@
 
 #include "TreeModel.h"
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace unlog {
+namespace view {
 
 class TreeModel::Node {
 
@@ -51,4 +51,5 @@ protected:
 }
 }
 }
+
 #endif /* Node_H_ */
