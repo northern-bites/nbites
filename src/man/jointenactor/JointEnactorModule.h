@@ -103,7 +103,7 @@ namespace man
         boost::shared_ptr<AL::DCMProxy> dcmProxy_;
 
         bool motionEnabled_;
-        bool newJoints;
+        bool newJoints_;
 
         AL::ALValue jointCommand_;
         AL::ALValue stiffnessCommand_;

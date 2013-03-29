@@ -215,7 +215,7 @@ namespace jointenactor{
             }
 
             // (1) Send next angles.
-            bool jointToDCM = true;
+            bool jointsToDCM = true;
             try
             {
                 jointCommand_[4][0] = dcmProxy_->getTime(0);
@@ -248,15 +248,15 @@ namespace jointenactor{
 
     void JointEnactorModule::newJoints()
     {
-        if(newJoints)
+        if(newJoints_)
             std::cout << "WARNING - DCM missed a frame in motion\n";
         else
-            newJoints = true;
+            newJoints_ = true;
     }
 
     void JointEnactorModule::jointsInDCM()
     {
-        newJoints = false;
+        newJoints_ = false;
     }
 
     void JointEnactorModule::stop()
