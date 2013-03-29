@@ -180,7 +180,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
             )
         );
 
-    motion.sendMotionCommand(standUpCommand);
+    std::vector<motion::BodyJointCommand::ptr> commandSequence
+        = motion.readScriptedSequence(
+            "/home/nao/scripted_commands.bjc"
+            );
+
+//    motion.sendMotionCommand(standUpCommand);
     // motion.sendMotionCommand(sitDownCommand);
 }
 

@@ -40,8 +40,8 @@ namespace Kinematics {
 
     // Interpolation types
     enum InterpolationType {
-	INTERPOLATION_SMOOTH = 0,
-	INTERPOLATION_LINEAR
+        INTERPOLATION_SMOOTH = 0,
+        INTERPOLATION_LINEAR
     };
 
     /// Joint Name constants ///
@@ -170,7 +170,7 @@ namespace Kinematics {
 
 		//bound abs(yaw) < yawLimit
 		return NBMath::clip(yaw, yawLimit);
-	}
+    }
 
     // Order of arm joints: ShoulderPitch, SRoll, ElbowYaw, ERoll
     static const float LEFT_ARM_BOUNDS[][2] = {{-2.09f,2.09f},

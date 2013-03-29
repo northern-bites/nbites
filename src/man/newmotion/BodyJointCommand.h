@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -61,7 +60,7 @@ public:
                      const std::vector<float>& body_stiffness,
                      const Kinematics::InterpolationType _type);
 
-    virtual ~BodyJointCommand(void);
+    virtual ~BodyJointCommand();
 
     virtual const std::vector<float>&
     getJoints(Kinematics::ChainID chainID) const;

@@ -1,5 +1,7 @@
 #include "MotionModule.h"
 
+#include <fstream>
+
 namespace man
 {
 namespace motion
@@ -178,7 +180,6 @@ namespace motion
             std::cout << "postprocess swap" << std::endl;
             swapBodyProvider();
         }
-
 
         // if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
         // {
@@ -735,6 +736,69 @@ namespace motion
         newMessage.set_r_ankle_roll(rAnkleRoll);
 
         return newMessage;
+    }
+
+    std::vector<BodyJointCommand::ptr> MotionModule::readScriptedSequence(
+        const std::string& file)
+    {
+        std::fstream fileStream;
+        fileStream.open(file.c_str(), std::fstream::in);
+
+        std::vector<BodyJointCommand::ptr> scriptedSequence;
+
+        std::vector<float> angles(Kinematics::NUM_JOINTS, 0.0f);
+        std::vector<float> stiffness(Kinematics::NUM_JOINTS, 0.0f);
+
+        int numCommands = 0;
+        float time = 0.0f;
+        fileStream >> numCommands;
+
+        std::cout << "Reading a sequence of " << numCommands
+                  << " commands." << std::endl;
+
+        for(unsigned int c = 0; c < numCommands; ++c)
+        {
+            // (1) Get joint angles, excluding the head joints.
+            //     (we are only concerned with body joints and
+            //     stiffnesses).
+            std::cout << "Angles: ";
+            for(unsigned int i = 0; i < Kinematics::NUM_JOINTS-2; ++i)
+            {
+                fileStream >> angles[i];
+                std::cout << angles[i] << " ";
+            }
+            std::cout << std::endl;
+            // fileStream >> std::endl;
+
+            std::cout << "Stiffness: ";
+            // (2) Get joint stiffness.
+            for(unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i)
+            {
+                fileStream >> stiffness[i];
+                std::cout << stiffness[i] << " ";
+            }
+            std::cout << std::endl;
+            // fileStream >> std::endl;
+
+            fileStream >> time;
+            std::cout << "Time: " << time << std::endl;
+            std::cout << std::endl;
+
+            BodyJointCommand::ptr bjc(
+                new BodyJointCommand(
+                    time,
+                    angles,
+                    stiffness,
+                    Kinematics::INTERPOLATION_SMOOTH
+                    )
+                );
+
+            scriptedSequence.push_back(bjc);
+
+            // fileStream >> std::endl;
+        }
+
+        fileStream.close();
     }
 
 } // namespace motion
