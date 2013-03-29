@@ -62,6 +62,7 @@ public:
 
     template <class T>
     T readNextMessage() {
+		std::cout<<"file location:"<<ftell(file)<<std::endl;
         // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
@@ -106,6 +107,16 @@ public:
         std::cout << "End of log file " << fileName << std::endl;
         return currentMessage;
     }
+
+	//unwinding - implements things pretty much backwards from above function
+	template <class T>
+	T readPrevMessage() {
+        if (feof(file)) {
+            std::cout << "End of log file " << fileName << std::endl;
+            return T();
+        }
+	}
+
 
     // Basic file control
     void openFile() throw (file_exception);
