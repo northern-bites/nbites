@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "ProtoViewer.h"
-#include "/home/ecat/nbites/src/tool/unlog/UnlogModule.h"
+#include "unlog/UnlogModule.h"
 
 namespace tool {
 namespace unlog {

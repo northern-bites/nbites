@@ -21,6 +21,7 @@ configure_file(
   "${PROJECT_BINARY_DIR}/PathConfig.h"
 )
 include_directories( ${PROJECT_BINARY_DIR} )
+include_directories( ${CMAKE_SOURCE_DIR} )
 
 # Dependencies
 find_package( Qt4 REQUIRED )
