@@ -144,7 +144,6 @@ class Brain(object):
         #self.nav.run()
 
         #Set LED message
-        self.out.printf("processing leds")
         self.leds.processLeds()
 
     def getCommUpdate(self):

@@ -367,7 +367,6 @@ class Leds():
                 self.teamChange = False
 
     def executeLeds(self,listOfLeds):
-        self.brain.out.printf("executing leds.")
         for ledTuple in listOfLeds:
             if len(ledTuple) != 3:
                 self.printf("Invalid print command!! " + str(ledTuple))
