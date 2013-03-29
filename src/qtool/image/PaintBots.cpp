@@ -48,8 +48,18 @@ void PaintBots::buildBitmap()
             playerColor = redPlayer;
         }
 
-        QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
-        QPoint ballPt = QPoint(locs->getX(i)+locs->getBallX(i), locs->getY(i)+locs->getBallY(i));
+        //robot loc is absolute location
+		QPoint robotPt = QPoint(locs->getX(i), locs->getY(i));
+
+		//where the ball would be if ball loc was heading-independent
+		QPoint wrongBallPt = QPoint(locs->getX(i)+locs->getBallX(i), locs->getY(i)+locs->getBallY(i));
+
+		//where the bll actually is (coordinate transformation)
+		QPoint ballPt = QPoint(wrongBallPt.x() * cos(locs->getHeading(i)) +
+							   (wrongBallPt.y() * sin(locs->getHeading(i))),
+							   -1*wrongBallPt.x() * sin(locs->getHeading(i)) +
+							   wrongBallPt.y() * cos(locs->getHeading(i)));
+
 		QString robotLabel = QString::number(locs->getPlayerNum(i));
 
         //robot
@@ -77,8 +87,8 @@ void PaintBots::buildBitmap()
             //ball uncertainty
 			//don't draw uncertainty if more than half the field
 			if (!(locs->getBallXUncert(i)*4>FIELD_WIDTH || locs->getBallYUncert(i)*4 > FIELD_HEIGHT))
-            this->paintEllipseArea(painter, ball, ballPt,
-                                   locs->getBallXUncert(i), locs->getBallYUncert(i));
+				this->paintEllipseArea(painter, ball, ballPt,
+									   locs->getBallXUncert(i), locs->getBallYUncert(i));
 
             //robot-ball line
             painter.setPen(Qt::DashLine);
