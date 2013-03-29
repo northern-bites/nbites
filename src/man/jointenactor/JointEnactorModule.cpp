@@ -210,7 +210,6 @@ namespace jointenactor{
             for(unsigned int i = 0; i < Kinematics::NUM_JOINTS; ++i)
             {
                 jointCommand_[5][i][0] = jointAngles[i];
-                std::cout << "joint[" << i << "] = " << jointAngles[i] << std::endl;
                 stiffnessCommand_[5][i][0] = jointStiffness[i];
             }
 
@@ -227,7 +226,6 @@ namespace jointenactor{
                           << e.toString() << std::endl;
                 jointsToDCM = false;
             }
-
 
             // (2) Send next stiffnesses.
             try
@@ -276,14 +274,6 @@ namespace jointenactor{
         // Update joint angles.
         jointsInput_.latch();
         latestJointAngles_ = jointsInput_.message();
-        std::cout << "latest joint angles: " << std::endl;
-        std::vector<float> angles = motion::toJointAngles(latestJointAngles_);
-        for(std::vector<float>::iterator it = angles.begin();
-            it != angles.end();
-            ++it)
-        {
-            std::cout << *it << std::endl;
-        }
 
         newJoints();
     }

@@ -12,45 +12,6 @@ namespace man
     // Source: V4 NAO Documentation.
     enum SensorTypes
     {
-        /** Joint Angles **/
-        // Head joints
-        // HeadYaw = 0,
-        // HeadPitch,
-
-        // // Left Arm joints
-        // LShoulderPitch,
-        // LShoulderRoll,
-        // LElbowYaw,
-        // LElbowRoll,
-        // LWristYaw,
-        // LHand,
-
-        // // Right Arm joints
-        // RShoulderPitch,
-        // RShoulderRoll,
-        // RElbowYaw,
-        // RElbowRoll,
-        // RWristYaw,
-        // RHand,
-
-        // // Pelvis joints
-        // LHipYawPitch,
-        // RHipYawPitch,
-
-        // // Left Leg joints
-        // LHipRoll,
-        // LHipPitch,
-        // LKneePitch,
-        // LAnklePitch,
-        // LAnkleRoll,
-
-        // // Right Leg joints
-        // RHipRoll,
-        // RHipPitch,
-        // RKneePitch,
-        // RAnklePitch,
-        // RAnkleRoll,
-
         HeadYaw = 0,
         HeadPitch,
         // LARM,

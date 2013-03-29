@@ -136,16 +136,27 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
             )
         );
 
-    std::vector<motion::BodyJointCommand::ptr> commandSequence
-        = motion.readScriptedSequence(
-            "/home/nao/scripted_commands.bjc"
-            );
+    // std::vector<motion::BodyJointCommand::ptr> commandSequence
+    //     = motion.readScriptedSequence(
+    //         "/home/nao/scripted_commands.bjc"
+    //         );
 
     jointEnactor.enableMotion();
-    std::vector<motion::BodyJointCommand::ptr> scriptedMove;
-    scriptedMove.push_back(standUpCommand);
-    scriptedMove.push_back(standWithArmCommand);
-    motion.sendMotionCommand(scriptedMove);
+    //std::vector<motion::BodyJointCommand::ptr> scriptedMove;
+    //scriptedMove.push_back(standUpCommand);
+    //scriptedMove.push_back(standWithArmCommand);
+    //motion.sendMotionCommand(scriptedMove);
+    motion.sendMotionCommand(standUpCommand);
+
+    motion::DestinationCommand::ptr walkToCommand(
+        new motion::DestinationCommand(
+            100000.0f, // 10 cm in x
+            100000.0f, // 10 cm in y
+            0.0f     // 0 rad in theta
+            )
+        );
+
+    motion.sendMotionCommand(walkToCommand);
 }
 
 Man::~Man()

@@ -50,10 +50,7 @@ namespace motion
 
     void MotionModule::run_()
     {
-        // std::cout << "MM: Running (" << frameCount
-        //           << ")" << std::endl;
-
-        // (1) Before anything else happens, it is important to
+         // (1) Before anything else happens, it is important to
         //     retrieve the correct current joint angles.
         jointsInput_.latch();
         inertialsInput_.latch();
@@ -65,16 +62,17 @@ namespace motion
 
         newInputJoints = false;
 
-        // std::cout << "(MotionModule) Using " << 
-        // 	curProvider->getName() << std::endl;
+        std::cout << "MotionModule: Using "
+                  << curProvider->getName()
+                  << std::endl;
 
         // (2) If motion is enabled, perform a single iteration
         //     of the main motion loop.
-        if(running)	
+        if(running)
         {
             // (3) Do any necessary preprocessing of joint angles
-            //     then actually compute next joints and 
-            //     stiffnesses. 
+            //     then actually compute next joints and
+            //     stiffnesses.
             realityCheckJoints();
 
             preProcess();
@@ -87,7 +85,7 @@ namespace motion
                       << std::endl;
 
             // (4) Send newly computed joints and stiffnesses to
-            //     the joint enactor module. 
+            //     the joint enactor module.
             if(active)
                 setJointsAndStiffness();
 
@@ -466,12 +464,6 @@ namespace motion
         return 0;
     }
 
-    // void MotionModule::sendMotionCommand(const Gait::ptr command)
-    // {
-    //     //Don't request to switch providers when we get a gait command
-    //     walkProvider.setCommand(command);
-    // }
-
     void MotionModule::sendMotionCommand(const WalkCommand::ptr command)
     {
         nextProvider = &walkProvider;
@@ -480,8 +472,6 @@ namespace motion
 
     void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
     {
-        std::cout << "MotionModule: Received new BodyJointCommand."
-                  << std::endl;
         noWalkTransitionCommand = true;
         nextProvider = &scriptedProvider;
         scriptedProvider.setCommand(command);
@@ -542,12 +532,11 @@ namespace motion
         }
     }
 
-    // void MotionModule::sendMotionCommand(const StepCommand::ptr command){
-    //     pthread_mutex_lock(&next_provider_mutex);
-    //     nextProvider = &walkProvider;
-    //     walkProvider.setCommand(command);
-    //     pthread_mutex_unlock(&next_provider_mutex);
-    // }
+    void MotionModule::sendMotionCommand(const StepCommand::ptr command)
+    {
+        nextProvider = &walkProvider;
+        walkProvider.setCommand(command);
+    }
 
     void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
     {
@@ -555,7 +544,7 @@ namespace motion
         walkProvider.setCommand(command);
     }
 
-    std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransitions() 
+    std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransitions()
     {
         std::vector<BodyJointCommand::ptr> commands;
 
@@ -612,10 +601,8 @@ namespace motion
     {
         using namespace Kinematics;
 
-        // std::cout << "(MotionModule) Setting new joints and stiffnessess." << std::endl;
-
         portals::Message<messages::JointAngles> newJoints(0);
-	
+
         // Head angles.
         newJoints.get()->set_head_yaw(nextJoints[HEAD_YAW]);
         newJoints.get()->set_head_pitch(nextJoints[HEAD_PITCH]);
@@ -650,10 +637,7 @@ namespace motion
         newJoints.get()->set_r_ankle_pitch(nextJoints[R_ANKLE_PITCH]);
         newJoints.get()->set_r_ankle_roll(nextJoints[R_ANKLE_ROLL]);
 
-        // portals::Message<messages::JointAngles> testingJoints(&genJointCommand(0, 0, 90, 10, -90, -10, 0, 0, 90, -10, 82, 13.2, 0, 0, 0, 0, 0, -22.3, 43.5, -21.2, 0, 0, -22.3, 43.5, -21.2, 0));
-	
         jointsOutput_.setMessage(newJoints);
-        //jointsOutput_.setMessage(testingJoints);
 
         portals::Message<messages::JointAngles> newStiffness(0);
 
@@ -691,15 +675,7 @@ namespace motion
         newStiffness.get()->set_r_ankle_pitch(nextStiffnesses[R_ANKLE_PITCH]);
         newStiffness.get()->set_r_ankle_roll(nextStiffnesses[R_ANKLE_ROLL]);
 
-        // static const float O = 0.85f;
-        // static const float A = 0.2f;
-
-        // portals::Message<messages::JointAngles> testStiffness(&genJointCommand(O, O, A, A, A, A, O, O, A, A, A, A, O, O, O, O, O, O, O, O, O, O, O, O, O, O));
-
-        // std::cout << "sending stiffness: " << testStiffness.get()->l_knee_pitch() << std::endl;
-
         stiffnessOutput_.setMessage(newStiffness);
-        //stiffnessOutput_.setMessage(testStiffness);
     }
 
     messages::JointAngles MotionModule::genJointCommand(float headYaw, float headPitch,
@@ -781,7 +757,6 @@ namespace motion
                 std::cout << angles[i] << " ";
             }
             std::cout << std::endl;
-            // fileStream >> std::endl;
 
             std::cout << "Stiffness: ";
             // (2) Get joint stiffness.
@@ -791,7 +766,6 @@ namespace motion
                 std::cout << stiffness[i] << " ";
             }
             std::cout << std::endl;
-            // fileStream >> std::endl;
 
             fileStream >> time;
             std::cout << "Time: " << time << std::endl;
@@ -807,8 +781,6 @@ namespace motion
                 );
 
             scriptedSequence.push_back(bjc);
-
-            // fileStream >> std::endl;
         }
 
         fileStream.close();

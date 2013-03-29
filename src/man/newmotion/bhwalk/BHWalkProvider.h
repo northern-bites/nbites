@@ -24,67 +24,67 @@ namespace man
 {
     namespace motion 
     {
-	class BHWalkProvider : public MotionProvider 
-	{
-	public:
-	    BHWalkProvider();	
-	    virtual ~BHWalkProvider() {}
+        class BHWalkProvider : public MotionProvider 
+        {
+        public:
+            BHWalkProvider();
+            virtual ~BHWalkProvider() {}
 
-	    // Provide calibration boolean to the rest of the system.
-	    bool calibrated() const;
+            // Provide calibration boolean to the rest of the system.
+            bool calibrated() const;
 
-	    void requestStopFirstInstance();
-	    void calculateNextJointsAndStiffnesses(
-		std::vector<float>&      sensorAngles,
-		messages::InertialState& sensorInertials,
-		messages::FSR&           sensorFSRs
-		);
+            void requestStopFirstInstance();
+            void calculateNextJointsAndStiffnesses(
+                std::vector<float>&      sensorAngles,
+                messages::InertialState& sensorInertials,
+                messages::FSR&           sensorFSRs
+                );
 
-	    void hardReset();
-	    void resetOdometry();
+            void hardReset();
+            void resetOdometry();
 
-	    void setCommand(const WalkCommand::ptr command);
-	    void setCommand(const DestinationCommand::ptr command);
-	    //TODO: I'm taking over StepCommand (currently not used) and making
-	    //it an odometry destination walk
-	    void setCommand(const StepCommand::ptr command);
+            void setCommand(const WalkCommand::ptr command);
+            void setCommand(const DestinationCommand::ptr command);
+            //TODO: I'm taking over StepCommand (currently not used) and making
+            //it an odometry destination walk
+            void setCommand(const StepCommand::ptr command);
 
-	    std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
-		return std::vector<BodyJointCommand::ptr>();
-	    }
+            std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
+                return std::vector<BodyJointCommand::ptr>();
+            }
 
-	    //MotionModel getOdometryUpdate() const;
-	    virtual const SupportFoot getSupportFoot() const;
+            //MotionModel getOdometryUpdate() const;
+            virtual const SupportFoot getSupportFoot() const;
 
-	    static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
-	    //returns only body angles
-	    //TODO: this is in nature due to the fact that we don't separate head providers
-	    //from body providers - if we did we could separate the methods for each
-	    std::vector<float> getInitialStance() {
-		return std::vector<float>(INITIAL_BODY_POSE_ANGLES,
-					  INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
-	    }
+            static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
+            //returns only body angles
+            //TODO: this is in nature due to the fact that we don't separate head providers
+            //from body providers - if we did we could separate the methods for each
+            std::vector<float> getInitialStance() {
+                return std::vector<float>(INITIAL_BODY_POSE_ANGLES,
+                                          INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
+            }
 
-	    //TODO: rename this to isGoingToStand since it flags whether we are going to
-	    //a stand rather than be at a complete standstill
-	    bool isStanding() const;
-	    // !isWalkActive() means we're at a complete standstill. everything else is walking.
-	    bool isWalkActive() const;
+            //TODO: rename this to isGoingToStand since it flags whether we are going to
+            //a stand rather than be at a complete standstill
+            bool isStanding() const;
+            // !isWalkActive() means we're at a complete standstill. everything else is walking.
+            bool isWalkActive() const;
 
-	    void setStandby(bool value) { standby = value; }
+            void setStandby(bool value) { standby = value; }
 
-	protected:
-	    void stand();
-	    void setActive() {}
+        protected:
+            void stand();
+            void setActive() {}
 
 //    void playDead();
 
-	private:
-	    bool requestedToStop;
-	    bool standby;
-	    WalkingEngine walkingEngine;
-	    MotionCommand::ptr currentCommand;
-	    Pose2D startOdometry;
-	};
+        private:
+            bool requestedToStop;
+            bool standby;
+            WalkingEngine walkingEngine;
+            MotionCommand::ptr currentCommand;
+            Pose2D startOdometry;
+        };
     } // namespace motion
 } // namespace man

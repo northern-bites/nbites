@@ -42,9 +42,9 @@ private:
     DiagramThread commThread;
     comm::CommModule comm;
 
-	DiagramThread cognitionThread;
-	image::ImageTranscriberModule imageTranscriber;
-	vision::VisionModule vision;
+    DiagramThread cognitionThread;
+    image::ImageTranscriberModule imageTranscriber;
+    vision::VisionModule vision;
 };
 
 }

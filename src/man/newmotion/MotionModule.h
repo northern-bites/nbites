@@ -52,12 +52,11 @@ public:
     void sendMotionCommand(const BodyJointCommand::ptr command);
     void sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands);
     void sendMotionCommand(const WalkCommand::ptr command);
-    //void sendMotionCommand(const Gait::ptr command);
     //void sendMotionCommand(const SetHeadCommand::ptr command);
     //void sendMotionCommand(const CoordHeadCommand::ptr command);
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
-    //void sendMotionCommand(const StepCommand::ptr command);
+    void sendMotionCommand(const StepCommand::ptr command);
     void sendMotionCommand(const DestinationCommand::ptr command);
     //void stopHeadMoves() { headProvider.requestStop(); }
     void stopBodyMoves() { curProvider->requestStop(); }

@@ -239,8 +239,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     //ignore the first chain since it's the head one
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
-	std::vector<float> chain_angles;
-	std::vector<float> chain_hardness;
+        std::vector<float> chain_angles;
+        std::vector<float> chain_hardness;
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
             //position angle
