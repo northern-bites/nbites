@@ -424,6 +424,7 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
 
 void TranscriberModule::run_()
 {
+    //imageOut.setMessage(portals::Message<messages::YUVImage>(0));
     messages::YUVImage image = it.getNextImage();
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);

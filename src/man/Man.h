@@ -10,7 +10,8 @@
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
 #include "vision/VisionModule.h"
-#include "image/ImageTranscriberModule.h"
+#include "new_image/TranscriberModule.h"
+#include "new_image/ImageConverterModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
 
@@ -38,7 +39,10 @@ private:
     comm::CommModule comm;
 
 	DiagramThread cognitionThread;
-	image::ImageTranscriberModule imageTranscriber;
+	image::TranscriberModule topTranscriber;
+	image::TranscriberModule bottomTranscriber;
+    image::ImageConverterModule topConverter;
+    image::ImageConverterModule bottomConverter;
 	vision::VisionModule vision;
 };
 

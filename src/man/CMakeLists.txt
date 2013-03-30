@@ -72,7 +72,7 @@ add_subdirectory( common )
 include_directories( common )
 
 # Actual modules
-add_subdirectory( image )
+add_subdirectory( new_image )
 add_subdirectory( log )
 add_subdirectory( vision )
 add_subdirectory( sensors )

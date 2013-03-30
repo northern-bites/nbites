@@ -1,5 +1,6 @@
 #include "Man.h"
 #include "Common.h"
+#include "Camera.h"
 #include <iostream>
 #include "RobotConfig.h"
 
@@ -15,7 +16,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
 	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
-	  imageTranscriber(),
+      topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
+      bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
+      topConverter(Camera::TOP),
+      bottomConverter(Camera::BOTTOM),
 	  vision()
 {
     setModuleDescription("The Northern Bites' soccer player.");
@@ -73,12 +77,19 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
 
 	/** Cognition **/
-	cognitionThread.addModule(imageTranscriber);
-	cognitionThread.addModule(vision);
-	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+
+    cognitionThread.addModule(topTranscriber   );
+    cognitionThread.addModule(bottomTranscriber);
+    cognitionThread.addModule(topConverter     );
+    cognitionThread.addModule(bottomConverter  );
+    topConverter   .imageIn.wireTo(&   topTranscriber.imageOut);
+    bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
+
+	//cognitionThread.addModule(vision);
+	// vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+	// vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+	// vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+	// vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,
                                                "field");

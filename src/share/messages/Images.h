@@ -498,6 +498,12 @@ public:
   //          This is not the proper way to do subsampling for image analysis purposes (e.g.
   //          resolution pyramids). For that you need low-pass filtering. The primary purpose
   //          here is to extract Y, U, and V components from a YUV composite image. 
+
+  // makes ThresholdImage look like a proto to keep RoboGrams happy
+  void Clear()
+    { /**this = MemoryImage();*/ }
+
+  std::string DebugString() const { return "Not implemented."; }
 };
 
 //
@@ -758,10 +764,6 @@ public:
   // note     Just like the one in PackedImage<T>, but guarantee that the result is a
   //          proper YUVImage (width is a multiple of 4 and x0 is adjusted to start
   //          on a YUYV boundary).
-
-  // HACK: makes YUVImage look like a proto to keep RoboGrams happy
-  void Clear() { return; }
-  std::string DebugString() const { return "Not implemented."; }
 };
 
 // ***********************
@@ -776,13 +778,13 @@ public:
 
 class ThresholdImage : public PackedImage16
 {
-  ThresholdImage(const PackedImage16& img) : PackedImage16(img) {}
-  // effect   Construct a copy of a PackedImage16
-  // note     A helper function for this class, the public is not allowed to use it.
-
 public:
   ThresholdImage() {}
   // effect   Default construct null image
+
+  ThresholdImage(const PackedImage16& img) : PackedImage16(img) {}
+  // effect   Construct a copy of a PackedImage16
+  // note     A helper function for this class, the public is not allowed to use it.
 
   ThresholdImage(int wd, int ht) : PackedImage16(wd, ht) {}
   // effect   Construct new (not yet shared) image on heap of specified size.
@@ -828,10 +830,6 @@ public:
     DrawingBit = 0x80, // not sure what this is for, do we need it?
     UndefinedBit = 0x00
   };
-
-  // HACK: makes ThresholdImage look like a proto to keep RoboGrams happy
-  void Clear() { return; }
-  std::string DebugString() const { return "Not implemented."; }
 };
 }
 
