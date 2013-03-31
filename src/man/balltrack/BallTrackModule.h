@@ -15,31 +15,31 @@
 
 namespace man
 {
-    namespace balltrack
-    {
+namespace balltrack
+{
 
-    class BallTrackModule : public portals::Module
-    {
-    public:
-        BallTrackModule();
-        ~BallTrackModule();
+class BallTrackModule : public portals::Module
+{
+public:
+    BallTrackModule();
+    ~BallTrackModule();
 
-        portals::InPortal<messages::VisionBall> visionBallInput;
-        portals::OutPortal<messages::FilteredBall> ballLocationOutput;
+    portals::InPortal<messages::VisionBall> visionBallInput;
+    portals::OutPortal<messages::FilteredBall> ballLocationOutput;
 
-    protected:
-        /**
-         * @brief called through diagrams
-         */
-        void run_();
+protected:
+    /**
+     * @brief called through diagrams
+     */
+    void run_();
 
-    private:
+private:
 //        boost::shared_ptr<BallFilter> ballFilter;
-        BallFilter *ballFilter;
+    BallFilter *ballFilter;
 
-        float ballX;
-        float ballY;
-    };
+    float ballX;
+    float ballY;
+};
 
-    } //namespace balltrack
+} //namespace balltrack
 } //namespace man

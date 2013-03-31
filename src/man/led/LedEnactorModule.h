@@ -6,20 +6,20 @@
 #include "LedCommand.pb.h"
 
 namespace man {
-	namespace led {
+namespace led {
 
-		class LedEnactorModule : public portals::Module {
+class LedEnactorModule : public portals::Module {
 
-		public:
-			LedEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
-			virtual ~LedEnactorModule() {}
+public:
+    LedEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
+    virtual ~LedEnactorModule() {}
 
-			portals::InPortal<messages::LedCommand> ledCommandsIn;
+    portals::InPortal<messages::LedCommand> ledCommandsIn;
 
-		protected:
-			virtual void run_();
-			NaoLights naoLights;
-		};
+protected:
+    virtual void run_();
+    NaoLights naoLights;
+};
 
-	}
+}
 }

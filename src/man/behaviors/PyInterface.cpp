@@ -1,6 +1,6 @@
 /*
- This file contains the boost interface for accessing messages
- from python.
+  This file contains the boost interface for accessing messages
+  from python.
 */
 
 #include "PyInterface.h"
@@ -15,10 +15,10 @@ namespace behaviors {
 boost::shared_ptr<PyInterface> interface_ptr;
 
 
-	void set_interface_ptr(boost::shared_ptr<PyInterface> ptr)
-	{
-		interface_ptr = ptr;
-	}
+void set_interface_ptr(boost::shared_ptr<PyInterface> ptr)
+{
+    interface_ptr = ptr;
+}
 
 BOOST_PYTHON_MODULE(interface)
 {
