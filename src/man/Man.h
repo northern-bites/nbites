@@ -13,6 +13,9 @@
 #include "image/ImageTranscriberModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
+#include "led/LedEnactorModule.h"
+#include "balltrack/BallTrackModule.h"
+#include "behaviors/BehaviorsModule.h"
 
 namespace man {
 
@@ -40,6 +43,9 @@ private:
 	DiagramThread cognitionThread;
 	image::ImageTranscriberModule imageTranscriber;
 	vision::VisionModule vision;
+	balltrack::BallTrackModule ballTrack;
+	led::LedEnactorModule leds;
+	behaviors::BehaviorsModule behaviors;
 };
 
 }

@@ -10,7 +10,7 @@
 #include "InertialState.pb.h"
 
 #include "VisionField.pb.h"
-#include "VisionBall.pb.h"
+#include "BallModel.pb.h"
 #include "VisionRobot.pb.h"
 
 #include "Vision.h"

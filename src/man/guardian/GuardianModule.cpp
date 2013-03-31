@@ -26,13 +26,17 @@ GuardianModule::GuardianModule()
     : portals::Module(),
       stiffnessControlOutput(base()),
       initialStateOutput(base()),
+      advanceStateOutput(base()),
+      switchTeamOutput(base()),
+      switchKickOffOutput(base()),
       feetOnGroundOutput(base()),
       fallStatusOutput(base()),
       audioOutput(base()),
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
-      useFallProtection(true)
+      useFallProtection(true),
+      audioQueue()
 {
 }
 
@@ -43,7 +47,6 @@ GuardianModule::~GuardianModule()
 void GuardianModule::run_()
 {
     PROF_ENTER(P_ROBOGUARDIAN);
-    sentAudio = false;
     countButtonPushes();
     checkFalling();
     checkFallen();
@@ -52,6 +55,7 @@ void GuardianModule::run_()
     checkTemperatures();
     processFallingProtection();
     processChestButtonPushes();
+    processFootBumperPushes();
     checkAudio();
     frameCount++;
     PROF_EXIT(P_ROBOGUARDIAN);
@@ -494,6 +498,19 @@ void GuardianModule::processChestButtonPushes()
     }
 }
 
+void GuardianModule::processFootBumperPushes()
+{
+    if(executeLeftFootClickAction(leftFootButton->peekNumClicks()))
+    {
+        leftFootButton->getAndClearNumClicks();
+    }
+
+    if(executeRightFootClickAction(rightFootButton->peekNumClicks()))
+    {
+        rightFootButton->getAndClearNumClicks();
+    }
+}
+
 void GuardianModule::executeShutdownAction()
 {
     std::cout << "Guardian is attempting a shutdown..."<< std::endl;
@@ -508,6 +525,9 @@ bool GuardianModule::executeChestClickAction(int nClicks)
     {
     case NO_CLICKS:
         return false;
+        break;
+    case 1:
+        advanceState();
         break;
     case 2:
         shutoffGains();
@@ -528,6 +548,40 @@ bool GuardianModule::executeChestClickAction(int nClicks)
         break;
     default:
         //nothing
+        return false;
+        break;
+    }
+    return true;
+}
+
+bool GuardianModule::executeLeftFootClickAction(int nClicks)
+{
+    switch(nClicks)
+    {
+    case NO_CLICKS:
+        return false;
+        break;
+    case 1:
+        switchTeams();
+        break;
+    default:
+        return false;
+        break;
+    }
+    return true;
+}
+
+bool GuardianModule::executeRightFootClickAction(int nClicks)
+{
+    switch(nClicks)
+    {
+    case NO_CLICKS:
+        return false;
+        break;
+    case 1:
+        switchKickOff();
+        break;
+    default:
         return false;
         break;
     }
@@ -559,13 +613,45 @@ void GuardianModule::initialState()
 {
     std::cout << "Guardian::initialState()" << std::endl;
 
-    portals::Message<messages::InitialState> command(0);
+    portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastInitial);
     initialStateOutput.setMessage(command);
 
     lastInitial = !lastInitial;
 }
 
+void GuardianModule::advanceState()
+{
+    std::cout << "Guardian::advanceState()" << std::endl;
+
+    portals::Message<messages::Toggle> command(0);
+    command.get()->set_toggle(!lastAdvance);
+    advanceStateOutput.setMessage(command);
+
+    lastAdvance = !lastAdvance;
+}
+
+void GuardianModule::switchTeams()
+{
+    std::cout << "Guardian::switchTeams()" << std::endl;
+
+    portals::Message<messages::Toggle> command(0);
+    command.get()->set_toggle(!lastTeamSwitch);
+    switchTeamOutput.setMessage(command);
+
+    lastTeamSwitch = !lastTeamSwitch;
+}
+
+void GuardianModule::switchKickOff()
+{
+    std::cout << "Guardian::switchKickOff()" << std::endl;
+
+    portals::Message<messages::Toggle> command(0);
+    command.get()->set_toggle(!lastKickOffSwitch);
+    switchKickOffOutput.setMessage(command);
+
+    lastKickOffSwitch = !lastKickOffSwitch;
+}
 
 void GuardianModule::reloadMan()
 {
@@ -574,18 +660,23 @@ void GuardianModule::reloadMan()
 
 void GuardianModule::playFile(std::string str)
 {
-    sentAudio = true;
-    portals::Message<messages::AudioCommand> command(0);
-    command.get()->set_audio_file(str);
-    audioOutput.setMessage(command);
+    audioQueue.push(str);
 }
 
 void GuardianModule::checkAudio()
 {
-    if (!sentAudio)
+    if (audioQueue.empty())
     {
         portals::Message<messages::AudioCommand> command(0);
         audioOutput.setMessage(command);
+    }
+    else
+    {
+        std::string str = audioQueue.front();
+        portals::Message<messages::AudioCommand> command(0);
+        command.get()->set_audio_file(str);
+        audioOutput.setMessage(command);
+        audioQueue.pop();
     }
 }
 

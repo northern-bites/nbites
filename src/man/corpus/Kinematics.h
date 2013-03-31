@@ -24,7 +24,7 @@
 #include <math.h>
 #include "NBMath.h"
 #include "NBMatrixMath.h"
-#include "CoordFrame.h"
+#include "../include/CoordFrame.h"
 
 namespace Kinematics {
 
