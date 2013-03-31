@@ -10,11 +10,11 @@ message VisionBall {
         optional float bearing_sd = 7;
 	optional bool inTopCam = 8;
 	optional float radius = 9;
-	optional sint32 confidence = 10;
+	optional int32 confidence = 10;
 	optional float heat = 11;
 	optional bool on = 12;
-	optional sint32 frames_on = 13;
-	optional sint32 frames_off = 14;
+	optional int32 frames_on = 13;
+	optional int32 frames_off = 14;
 }
 
 message FilteredBall
