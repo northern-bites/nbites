@@ -8,9 +8,9 @@
 #include "Node.h"
 #include <assert.h>
 
-namespace qtool {
-namespace data {
-namespace treemodel {
+namespace tool {
+namespace unlog {
+namespace view {
 
 typedef TreeModel::Node Node;
 

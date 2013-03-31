@@ -25,6 +25,7 @@
 #include <pthread.h>
 #include <time.h>
 #include "RoboGrams.h"
+#include "DebugConfig.h"
 #include "log/LogModule.h"
 
 namespace man{
@@ -54,8 +55,11 @@ public:
     template<class T>
     void log(portals::OutPortal<T>* out, std::string name)
     {
+// Only let us do this if we really intend to log
+#ifdef USE_LOGGING
         logs.push_back(new log::LogModule<T>(out, name));
         diagram.addModule(*logs.back());
+#endif
     }
 
 private:
