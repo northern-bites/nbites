@@ -7,6 +7,7 @@
 #include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
+#include "MotionCommand.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -19,6 +20,7 @@ public:
     messages::FilteredBall* filteredBall_ptr;
     messages::LedCommand* ledCommand_ptr;
     messages::WorldModel* worldModel_ptr[4]; //TODO: use a constant
+    messages::MotionCommand* motionCommand_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -43,6 +45,10 @@ public:
             list.append(interface.worldModel_ptr[i]);
         }
         return list;
+    }
+    void setMotionCommand_ptr(const messages::MotionCommand* msg)
+    {
+        motionCommand_ptr = const_cast<messages::MotionCommand*> (msg);
     }
 
 };

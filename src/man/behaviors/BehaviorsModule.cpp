@@ -30,7 +30,8 @@ BehaviorsModule::BehaviorsModule()
       brain_instance(NULL),
       do_reload(0),
 	  pyInterface(),
-	  ledCommandOut(base())
+	  ledCommandOut(base()),
+      motionCommandOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
 
@@ -197,16 +198,20 @@ void BehaviorsModule::runStep ()
 			worldModelIn[i].latch();
 			pyInterface.setWorldModel_ptr(&worldModelIn[i].message(),i);
 				}
+        motionCommandIn.latch();
 
 
 		// Might be really broken.
 		ledCommand = portals::Message<messages::LedCommand>(0);
 		pyInterface.setLedCommand_ptr(ledCommand.get());
+        motionCommand = portals::Message<messages::MotionCommand>(0);
+        pyInterface.setMotionCommand_ptr(motionCommand.get());
 	}
 
 	void BehaviorsModule::sendMessages()
 	{
 		ledCommandOut.setMessage(ledCommand);
+        motionCommandOut.setMessage(motionCommand);
 	}
 
 void BehaviorsModule::modifySysPath ()
