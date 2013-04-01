@@ -2,7 +2,9 @@
 #define FieldConstantsDefined__h
 
 #include <cmath>
+#ifndef NO_MANCONFIG
 #include "Common.h"
+#endif
 // Nao field constants
 
 #ifdef USING_LAB_FIELD

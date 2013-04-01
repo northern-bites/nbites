@@ -16,7 +16,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
 	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
 	  imageTranscriber(),
-	  vision()
+	  vision(),
+	  ballTrack(),
+      leds(broker),
+      behaviors()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -75,10 +78,17 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	/** Cognition **/
 	cognitionThread.addModule(imageTranscriber);
 	cognitionThread.addModule(vision);
+	//cognitionThread.addModule(ballTrack);
+	cognitionThread.addModule(leds);
+    cognitionThread.addModule(behaviors);
 	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
 	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
 	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
 	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
+	//behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,
                                                "field");
