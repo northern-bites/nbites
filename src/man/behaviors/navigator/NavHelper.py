@@ -50,12 +50,11 @@ def setDestination(nav, dest, gain = 1.0):
     """
     Calls setDestination within the motion engine
     """
-    nav.currentCommand = motion.DestinationCommand(x = dest.relX,
-                                                   y = dest.relY,
-                                                   theta = dest.relH,
-                                                   gain = gain)
-
-    nav.brain.motion.sendDestCommand(nav.currentCommand)
+    command = nav.brain.interface.motionCommand
+    command.type = 0 #Destination Walk
+    command.dest.rel_x = dest.relX
+    command.dest.rel_y = dest.relY
+    command.dest.rel_h = dest.relH
 
 def setOdometryDestination(nav, dest, gain = 1.0):
     nav.currentCommand = motion.StepCommand(x = dest.relX,
@@ -90,17 +89,25 @@ def setSpeed(nav, speeds):
     createAndSendWalkVector(nav, *speeds)
 
 def createAndSendWalkVector(nav, x, y, theta):
-    walk = motion.WalkCommand(x = x, y = y, theta = theta)
-    nav.brain.motion.setNextWalkCommand(walk)
+    command = nav.brain.interface.motionCommand
+    command.type = 1 #Walk Command
+    command.speed.x = x
+    command.speed.y = y
+    command.speed.h = theta
 
-def executeMove(motionInst, sweetMove):
+def executeMove(nav, sweetMove):
     """
     Method to enqueue a SweetMove
     Can either take in a head move or a body command
     (see SweetMove files for descriptions of command tuples)
     """
+    command = nav.brain.interface.motionCommand
+    command.type = 2 #Scripted Move
+
     for position in sweetMove:
         if len(position) == 7:
+            command.script.add_commands
+            command.script.commands
             move = motion.BodyJointCommand(position[4], #time
                                            position[0], #larm
                                            position[1], #lleg

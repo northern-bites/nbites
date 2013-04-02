@@ -7,7 +7,7 @@
 #include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
-#include "MotionCommand.pb.h"
+#include "PMotion.pb.h"
 
 namespace man {
 namespace behaviors {

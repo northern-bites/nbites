@@ -34,7 +34,7 @@ import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
 import BallModel_proto
-import MotionCommand_proto
+import PMotion_proto
 
 class Brain(object):
     """

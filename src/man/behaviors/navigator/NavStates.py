@@ -11,7 +11,7 @@ DEBUG = False
 def scriptedMove(nav):
     '''State that we stay in while doing sweet moves'''
     if nav.firstFrame():
-        helper.executeMove(nav.brain.motion, scriptedMove.sweetMove)
+        helper.executeMove(nav, scriptedMove.sweetMove)
         return nav.stay()
 
     if not nav.brain.motion.isBodyActive():
