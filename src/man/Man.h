@@ -41,15 +41,15 @@ private:
     DiagramThread commThread;
     comm::CommModule comm;
 
-	DiagramThread cognitionThread;
-	image::TranscriberModule topTranscriber;
-	image::TranscriberModule bottomTranscriber;
+    DiagramThread cognitionThread;
+    image::TranscriberModule topTranscriber;
+    image::TranscriberModule bottomTranscriber;
     image::ImageConverterModule topConverter;
     image::ImageConverterModule bottomConverter;
-	vision::VisionModule vision;
-	balltrack::BallTrackModule ballTrack;
-	led::LedEnactorModule leds;
-	behaviors::BehaviorsModule behaviors;
+    vision::VisionModule vision;
+    balltrack::BallTrackModule ballTrack;
+    led::LedEnactorModule leds;
+    behaviors::BehaviorsModule behaviors;
 };
 
 }

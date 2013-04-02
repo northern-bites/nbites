@@ -15,13 +15,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       audio(broker),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
+      cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
       topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
       bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
       topConverter(Camera::TOP),
       bottomConverter(Camera::BOTTOM),
-	  vision(),
-	  ballTrack(),
+      vision(),
+      ballTrack(),
       leds(broker),
       behaviors()
 {
@@ -79,7 +79,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     commThread.log<messages::GameState>(&comm._gameStateOutput, "gamestate");
 #endif
 
-	/** Cognition **/
+    /** Cognition **/
 
     cognitionThread.addModule(topTranscriber   );
     cognitionThread.addModule(bottomTranscriber);
@@ -88,18 +88,18 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     topConverter   .imageIn.wireTo(&   topTranscriber.imageOut);
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
-	//cognitionThread.addModule(vision);
-	// vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-	// vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-	// vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-	// vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+    //cognitionThread.addModule(vision);
+    // vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+    // vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+    // vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+    // vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
-	//cognitionThread.addModule(ballTrack);
-	cognitionThread.addModule(leds);
+    //cognitionThread.addModule(ballTrack);
+    cognitionThread.addModule(leds);
     cognitionThread.addModule(behaviors);
-	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
-	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
-	//behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+    behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
+    //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,
