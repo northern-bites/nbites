@@ -2,6 +2,7 @@
 
 // @TODO: Make includes and map generation automagic
 #include "AudioCommand.pb.h"
+#include "BallModel.pb.h"
 #include "BatteryState.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
@@ -11,12 +12,10 @@
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
 #include "InertialState.pb.h"
-#include "InitialState.pb.h"
 #include "JointAngles.pb.h"
 #include "SonarState.pb.h"
 #include "StiffnessControl.pb.h"
 #include "TeamPacket.pb.h"
-#include "VisionBall.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
 #include "WorldModel.pb.h"
@@ -36,7 +35,6 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent),
     ADD_MAPPED_TYPE(GameState);
     ADD_MAPPED_TYPE(GCResponse);
     ADD_MAPPED_TYPE(InertialState);
-    ADD_MAPPED_TYPE(InitialState);
     ADD_MAPPED_TYPE(JointAngles);
     ADD_MAPPED_TYPE(SonarState);
     ADD_MAPPED_TYPE(StiffnessControl);
