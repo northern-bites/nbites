@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Kinematics.h"
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
 
 namespace man
 {

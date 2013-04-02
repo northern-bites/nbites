@@ -20,8 +20,9 @@
 #include "UnfreezeCommand.h"
 
 // Messages
-#include "JointAngles.pb.h"
+//#include "JointAngles.pb.h"
 #include "InertialState.pb.h"
+#include "PMotion.pb.h"
 
 #include <vector>
 
@@ -49,15 +50,22 @@ public:
     const std::vector<float> getNextStiffness() const;
     void signalNextFrame();
     //void sendMotionCommand(const HeadJointCommand::ptr command);
+
     void sendMotionCommand(const BodyJointCommand::ptr command);
     void sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands);
+    void sendMotionCommand(messages::ScriptedMove script);
+
     void sendMotionCommand(const WalkCommand::ptr command);
+    void sendMotionCommand(messages::WalkCommand command);
     //void sendMotionCommand(const SetHeadCommand::ptr command);
     //void sendMotionCommand(const CoordHeadCommand::ptr command);
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
     void sendMotionCommand(const StepCommand::ptr command);
+
     void sendMotionCommand(const DestinationCommand::ptr command);
+    void sendMotionCommand(messages::DestinationWalk command);
+
     //void stopHeadMoves() { headProvider.requestStop(); }
     void stopBodyMoves() { curProvider->requestStop(); }
 
@@ -108,6 +116,7 @@ public:
     portals::InPortal<messages::JointAngles>   jointsInput_;
     portals::InPortal<messages::InertialState> inertialsInput_;
     portals::InPortal<messages::FSR>           fsrInput_;
+    portals::InPortal<messages::MotionCommand> commandInput_;
 
     portals::OutPortal<messages::JointAngles>  jointsOutput_;
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
@@ -126,6 +135,8 @@ private:
     void swapBodyProvider();
     void swapHeadProvider();
     int realityCheckJoints();
+
+    void processMotionInput();
 
     static std::vector<float> getBodyJointsFromProvider(MotionProvider* provider);
     std::vector<BodyJointCommand::ptr> generateNextBodyProviderTransitions();
@@ -154,6 +165,7 @@ private:
     std::vector<float>      sensorStiffnesses;
     messages::FSR           sensorFSRs;
     messages::InertialState sensorInertials;
+    messages::MotionCommand motionCommand;
 
     std::vector<float>      nextJoints;
     std::vector<float>      nextStiffnesses;

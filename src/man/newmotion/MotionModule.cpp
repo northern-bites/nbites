@@ -10,6 +10,7 @@ namespace motion
         : jointsInput_(),
           inertialsInput_(),
           fsrInput_(),
+          commandInput_(),
           jointsOutput_(base()),
           stiffnessOutput_(base()),
           walkProvider(),
@@ -242,6 +243,22 @@ namespace motion
         }
     }
 
+    void MotionModule::processMotionInput()
+    {
+        // Is this a destination walk request?
+        if (motionCommand.type() == messages::MotionCommand::DESTINATION_WALK)
+            sendMotionCommand(motionCommand.dest());
+
+        // Walk request?
+        else if (motionCommand.type() == messages::MotionCommand::WALK_COMMAND)
+            sendMotionCommand(motionCommand.speed());
+
+        // Sweet Move request?
+        else if (motionCommand.type() == messages::MotionCommand::SCRIPTED_MOVE)
+            sendMotionCommand(motionCommand.script());
+
+    }
+
     void MotionModule::preProcessBody()
     {
         if (curProvider != &nullBodyProvider &&
@@ -470,6 +487,18 @@ namespace motion
         walkProvider.setCommand(command);
     }
 
+    void MotionModule::sendMotionCommand(messages::WalkCommand command)
+    {
+        nextProvider = &walkProvider;
+        WalkCommand::ptr walkCommand(
+            new WalkCommand(
+                command.x(),
+                command.y(),
+                command.h())
+            );
+        walkProvider.setCommand(walkCommand);
+    }
+
     void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
     {
         noWalkTransitionCommand = true;
@@ -489,6 +518,84 @@ namespace motion
             scriptedProvider.setCommand(*iter);
         }
     }
+
+
+    void MotionModule::sendMotionCommand(messages::ScriptedMove script)
+    {
+        // Create a command for every Body Joint Command
+        for (int i =0; i<script.commands_size(); i++)
+        {
+            std::vector<float> angles(26, 0.f);
+            std::vector<float> stiffness(26, 0.f);
+
+            // populate vectors
+            angles[0] = script.commands(i).angles().l_shoulder_pitch();
+            angles[1] = script.commands(i).angles().l_shoulder_roll();
+            angles[2] = script.commands(i).angles().l_elbow_yaw();
+            angles[3] = script.commands(i).angles().l_elbow_roll();
+            angles[4] = script.commands(i).angles().l_hip_yaw_pitch();
+            angles[5] = script.commands(i).angles().l_hip_roll();
+            angles[6] = script.commands(i).angles().l_hip_pitch();
+            angles[7] = script.commands(i).angles().l_knee_pitch();
+            angles[8] = script.commands(i).angles().l_ankle_pitch();
+            angles[9] = script.commands(i).angles().l_ankle_roll();
+            angles[10] = script.commands(i).angles().r_hip_yaw_pitch();
+            angles[11] = script.commands(i).angles().r_hip_roll();
+            angles[12] = script.commands(i).angles().r_hip_pitch();
+            angles[13] = script.commands(i).angles().r_knee_pitch();
+            angles[14] = script.commands(i).angles().r_ankle_pitch();
+            angles[15] = script.commands(i).angles().r_ankle_roll();
+            angles[16] = script.commands(i).angles().r_shoulder_pitch();
+            angles[17] = script.commands(i).angles().r_shoulder_roll();
+            angles[18] = script.commands(i).angles().r_elbow_yaw();
+            angles[19] = script.commands(i).angles().r_elbow_roll();
+
+            stiffness[0] = script.commands(i).stiffness().head_yaw();
+            stiffness[1] = script.commands(i).stiffness().head_pitch();
+            stiffness[2] = script.commands(i).stiffness().l_shoulder_pitch();
+            stiffness[3] = script.commands(i).stiffness().l_shoulder_roll();
+            stiffness[4] = script.commands(i).stiffness().l_elbow_yaw();
+            stiffness[5] = script.commands(i).stiffness().l_elbow_roll();
+            stiffness[6] = script.commands(i).stiffness().l_hip_yaw_pitch();
+            stiffness[7] = script.commands(i).stiffness().l_hip_roll();
+            stiffness[8] = script.commands(i).stiffness().l_hip_pitch();
+            stiffness[9] = script.commands(i).stiffness().l_knee_pitch();
+            stiffness[10] = script.commands(i).stiffness().l_ankle_pitch();
+            stiffness[11] = script.commands(i).stiffness().l_ankle_roll();
+            stiffness[12] = script.commands(i).stiffness().r_hip_yaw_pitch();
+            stiffness[13] = script.commands(i).stiffness().r_hip_roll();
+            stiffness[14] = script.commands(i).stiffness().r_hip_pitch();
+            stiffness[15] = script.commands(i).stiffness().r_knee_pitch();
+            stiffness[16] = script.commands(i).stiffness().r_ankle_pitch();
+            stiffness[17] = script.commands(i).stiffness().r_ankle_roll();
+            stiffness[18] = script.commands(i).stiffness().r_shoulder_pitch();
+            stiffness[19] = script.commands(i).stiffness().r_shoulder_roll();
+            stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
+            stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
+
+
+
+            Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
+            if(script.commands(i).interpolation() == 1)
+                interType = Kinematics::INTERPOLATION_LINEAR;
+
+            // create the BJC and set it
+            motion::BodyJointCommand::ptr newCommand(
+                new motion::BodyJointCommand(
+                    ((int)script.commands(i).time()),
+                    angles,
+                    stiffness,
+                    interType)
+                );
+
+            noWalkTransitionCommand = true;
+            nextProvider = &scriptedProvider;
+            scriptedProvider.setCommand(newCommand);
+        }
+    }
+
+
+
 
     // void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
     // {
@@ -542,6 +649,19 @@ namespace motion
     {
         nextProvider = &walkProvider;
         walkProvider.setCommand(command);
+    }
+
+    void MotionModule::sendMotionCommand(messages::DestinationWalk command)
+    {
+        nextProvider = &walkProvider;
+        DestinationCommand::ptr newCommand(
+            new DestinationCommand(
+                command.rel_x(),
+                command.rel_y(),
+                command.rel_h()
+                )
+            );
+        walkProvider.setCommand(newCommand);
     }
 
     std::vector<BodyJointCommand::ptr> MotionModule::generateNextBodyProviderTransitions()

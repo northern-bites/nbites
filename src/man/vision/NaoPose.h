@@ -114,7 +114,7 @@
 
 #include "Structs.h"
 
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
 #include "InertialState.pb.h"
 
 /**
