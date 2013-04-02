@@ -81,6 +81,7 @@ add_subdirectory( balltrack )
 add_subdirectory( behaviors )
 add_subdirectory( comm )
 add_subdirectory( guardian )
+add_subdirectory( gamestate )
 add_subdirectory( image )
 add_subdirectory( led )
 add_subdirectory( log )
@@ -106,6 +107,7 @@ target_link_libraries(
   comm
   common
   guardian
+  gamestate
   image
   led
   log

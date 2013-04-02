@@ -133,7 +133,6 @@ bool GameConnect::verify(char* packet)
 void GameConnect::fillMessage(messages::GameState* msg,
                               struct RoboCupGameControlData& control)
 {
-    msg->set_players_per_team(control.playersPerTeam);
     msg->set_state(control.state);
     msg->set_first_half(control.firstHalf);
     msg->set_kick_off_team(control.kickOffTeam);

@@ -16,6 +16,7 @@
 #include "led/LedEnactorModule.h"
 #include "balltrack/BallTrackModule.h"
 #include "behaviors/BehaviorsModule.h"
+#include "gamestate/GameStateModule.h"
 
 namespace man {
 
@@ -40,12 +41,13 @@ private:
     DiagramThread commThread;
     comm::CommModule comm;
 
-	DiagramThread cognitionThread;
-	image::ImageTranscriberModule imageTranscriber;
-	vision::VisionModule vision;
-	balltrack::BallTrackModule ballTrack;
-	led::LedEnactorModule leds;
-	behaviors::BehaviorsModule behaviors;
+    DiagramThread cognitionThread;
+    image::ImageTranscriberModule imageTranscriber;
+    vision::VisionModule vision;
+    balltrack::BallTrackModule ballTrack;
+    led::LedEnactorModule leds;
+    behaviors::BehaviorsModule behaviors;
+    gamestate::GameStateModule gamestate;
 };
 
 }
