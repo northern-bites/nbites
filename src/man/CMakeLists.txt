@@ -49,6 +49,10 @@ include_directories( ${ALCOMMON_INCLUDE_DIR} )
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
+# For Python
+find_package( PythonLibs REQUIRED)
+include_directories( ${PYTHON_INCLUDE_DIR} )
+
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
 
@@ -73,12 +77,15 @@ include_directories( common )
 
 # Actual modules
 add_subdirectory( new_image )
-add_subdirectory( log )
-add_subdirectory( vision )
-add_subdirectory( sensors )
+add_subdirectory( audio )
+add_subdirectory( balltrack )
+add_subdirectory( behaviors )
 add_subdirectory( comm )
 add_subdirectory( guardian )
-add_subdirectory( audio )
+add_subdirectory( led )
+add_subdirectory( log )
+add_subdirectory( sensors )
+add_subdirectory( vision )
 
 set( MAN_SRCS main.cpp
   Man.cpp
@@ -93,16 +100,19 @@ add_library(
 
 target_link_libraries(
   man
-  portals
-  messages
-  log
-  sensors
-  comm
-  image
-  vision
-  guardian
   audio
+  balltrack
+  behaviors
+  comm
   common
+  guardian
+  image
+  led
+  log
+  messages
+  portals
+  sensors
+  vision
 )
 
 install( TARGETS man

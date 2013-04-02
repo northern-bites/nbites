@@ -14,6 +14,9 @@
 #include "new_image/ImageConverterModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
+#include "led/LedEnactorModule.h"
+#include "balltrack/BallTrackModule.h"
+#include "behaviors/BehaviorsModule.h"
 
 namespace man {
 
@@ -44,6 +47,9 @@ private:
     image::ImageConverterModule topConverter;
     image::ImageConverterModule bottomConverter;
 	vision::VisionModule vision;
+	balltrack::BallTrackModule ballTrack;
+	led::LedEnactorModule leds;
+	behaviors::BehaviorsModule behaviors;
 };
 
 }

@@ -20,7 +20,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
       topConverter(Camera::TOP),
       bottomConverter(Camera::BOTTOM),
-	  vision()
+	  vision(),
+	  ballTrack(),
+      leds(broker),
+      behaviors()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -90,6 +93,14 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	// vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
 	// vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
 	// vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+
+	//cognitionThread.addModule(ballTrack);
+	cognitionThread.addModule(leds);
+    cognitionThread.addModule(behaviors);
+	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
+	//behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,
                                                "field");
