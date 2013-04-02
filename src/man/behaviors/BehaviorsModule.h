@@ -28,7 +28,7 @@ namespace behaviors {
 class BehaviorsModule : public portals::Module
 {
 public:
-    BehaviorsModule();
+    BehaviorsModule(int teamNum, int playerNum);
     virtual ~BehaviorsModule();
 
     // reinitialize and reload the Python interpreter
@@ -56,6 +56,9 @@ private:
 	void latchMessages();
 	// Send out messages
 	void sendMessages();
+
+    int teamNumber;
+    int playerNumber;
 
     bool error_state;
     PyObject *module_helper;

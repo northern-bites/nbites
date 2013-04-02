@@ -24,7 +24,7 @@ namespace behaviors {
 const char * BRAIN_MODULE = "python.Brain";
 static const unsigned int NUM_PYTHON_RESTARTS_MAX = 3;
 
-BehaviorsModule::BehaviorsModule()
+BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
     : error_state(false),
       brain_module(NULL),
       brain_instance(NULL),
@@ -34,6 +34,10 @@ BehaviorsModule::BehaviorsModule()
       motionCommandOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
+
+    // Store team and player numbers
+    teamNumber = teamNum;
+    playerNumber = playerNum;
 
 	// Initialize the PyInterface pointer
 	set_interface_ptr(boost::shared_ptr<PyInterface> (&pyInterface));
@@ -131,7 +135,7 @@ void BehaviorsModule::getBrainInstance ()
     PyObject *dict = PyModule_GetDict(brain_module);
     PyObject *brain_class = PyDict_GetItemString(dict, "Brain");
     if (brain_class != NULL)
-        brain_instance = PyObject_CallObject(brain_class, NULL);
+        brain_instance = PyObject_CallObject(brain_class, Py_BuildValue("ii", teamNumber, playerNumber));
     else
         brain_instance = NULL;
 

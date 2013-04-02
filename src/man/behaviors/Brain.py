@@ -40,14 +40,14 @@ class Brain(object):
     Class brings all of our components together and runs the behaviors
     """
 
-    def __init__(self):
+    def __init__(self, teamAndPlayerNums):
         """
         Class constructor
         """
 
         # Parse arguments
-        self.playerNumber = 0
-        self.teamNumber = 0
+        self.playerNumber = teamAndPlayerNums[1]
+        self.teamNumber = teamAndPlayerNums[0]
         self.teamColor = Constants.teamColor.TEAM_BLUE
 
         self.counter = 0

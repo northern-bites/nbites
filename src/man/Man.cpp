@@ -21,8 +21,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       vision(),
       ballTrack(),
       leds(broker),
-      behaviors(),
-      gamestate(0,0)//TODO: put team number, player number here
+      behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -44,7 +44,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     sensorsThread.log<messages::FSR>(&sensors.fsrOutput_,
                                      "fsrs");
     sensorsThread.log<messages::BatteryState>(&sensors.batteryOutput_,
-                                             "battery");
+                                              "battery");
 #endif
     sensorsThread.addModule(jointEnactor);
     sensorsThread.addModule(motion);
@@ -185,7 +185,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
 
 
-     // make the protobuff for testing
+    // make the protobuff for testing
     messages::BodyJointCommand standUpProtoCommand;
     messages::JointAngles standJointAngles;
     messages::JointAngles standJointStiffness;
