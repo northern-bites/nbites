@@ -121,7 +121,7 @@ public:
     void writeHeader()
     {
         Header head;
-        head.set_name(input.message().GetTypeName());
+        head.set_name(nameHelper());
         head.set_version(CURRENT_VERSION);
         head.set_timestamp(42);
 
@@ -146,14 +146,6 @@ public:
         return;
         }
 
-
-        // Add a new write to the list of current writes
-        ongoing.push_back(Write());
-        Write* current = &ongoing.back();
-
-        // Serialize directly into the Write's buffer to avoid a copy
-        msg.SerializeToString(&(current->buffer));
-
         // Don't write if the file has gotten too huge
         if (bytesWritten >= FILE_MAX_SIZE)
         {
@@ -165,6 +157,25 @@ public:
             ongoing.pop_back();
             return;
         }
+
+        writeInternal(msg);
+    }
+
+protected:
+    std::string nameHelper()
+    {
+        return input.message().GetTypeName();
+    }
+
+    void writeInternal(T msg)
+    {
+        // Add a new write to the list of current writes
+        ongoing.push_back(Write());
+        Write* current = &ongoing.back();
+
+        // Serialize directly into the Write's buffer to avoid a copy
+        msg.SerializeToString(&(current->buffer));
+
 
         bytesWritten += current->buffer.length();
 
@@ -193,9 +204,9 @@ public:
         std::cout << "Enqueued a message for writing."
                   << std::endl;
 #endif
+
     }
 
-protected:
     // Implements the Module run_ method
     virtual void run_()
     {
@@ -222,5 +233,10 @@ protected:
     portals::InPortal<T> input;
 };
 
+template<>
+void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage);
+
+template<>
+std::string LogModule<messages::YUVImage>::nameHelper();
 }
 }

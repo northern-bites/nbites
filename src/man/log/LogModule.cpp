@@ -127,5 +127,41 @@ void LogBase::checkWrites()
     ongoing.remove_if(finished);
 }
 
+template<>
+void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage msg)
+{
+    ongoing.push_back(Write());
+    Write* current = &ongoing.back();
+    int size = msg.width() * msg.height() * sizeof(unsigned char);
+    bytesWritten += size;
+    writeValue<int>(size);
+
+    // Configure the control block
+    current->control.aio_fildes = fileDescriptor;
+    current->control.aio_buf = msg.pixelAddress(0, 0);
+    current->control.aio_nbytes = size;
+    current->control.aio_sigevent.sigev_notify = SIGEV_NONE;
+
+    // Enqueue the write
+    int result = aio_write(&current->control);
+
+    // Verify that the write didn't immediately fail
+    if (result == -1) {
+        std::cout<< "AIO write enqueue failed with error " << strerror(errno)
+                 << std::endl;
+    }
+
+#ifdef DEBUG_LOGGING
+    std::cout << "Enqueued a message for writing."
+              << std::endl;
+#endif
+}
+
+template<>
+std::string LogModule<messages::YUVImage>::nameHelper()
+{
+    return "messages.YUVImage";
+}
+
 }
 }

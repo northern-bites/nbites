@@ -88,6 +88,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     topConverter   .imageIn.wireTo(&   topTranscriber.imageOut);
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
+    cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
+                                            "im");
+
     //cognitionThread.addModule(vision);
     // vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
     // vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
