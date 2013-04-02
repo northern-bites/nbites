@@ -49,7 +49,7 @@ bool ToolDiagram::unlogFrom(std::string path)
 {
     unlog::UnlogModule<Header> check(path);
     check.openFile();
-    Header head = check.readNextMessage<Header>();
+    Header head = check.readNextMessage();
     check.closeFile();
 
     if(typeMap.find(head.name()) == typeMap.end())
