@@ -50,6 +50,10 @@ def setDestination(nav, dest, gain = 1.0):
     """
     Calls setDestination within the motion engine
     """
+    # TODO: distinguish from setOdometryDestination method
+    #       this method should overwrite motion commands.
+    #       or, deprecate this method and use speed commands
+    #       via the createAndSendWalkVector method.
     command = nav.brain.interface.motionCommand
     command.type = 0 #Destination Walk
     command.dest.rel_x = dest.relX
@@ -57,12 +61,13 @@ def setDestination(nav, dest, gain = 1.0):
     command.dest.rel_h = dest.relH
 
 def setOdometryDestination(nav, dest, gain = 1.0):
-    nav.currentCommand = motion.StepCommand(x = dest.relX,
-                                            y = dest.relY,
-                                            theta = dest.relH,
-                                            gain = gain)
-
-    nav.brain.motion.sendStepCommand(nav.currentCommand)
+    # TODO: distinguish from setDestination method
+    #       this method should enqueue motion commands.
+    command = nav.brain.interface.motionCommand
+    command.type = 0 #Destination Walk
+    command.dest.rel_x = dest.relX
+    command.dest.rel_y = dest.relY
+    command.dest.rel_h = dest.relH
 
 #not used!
 def getOrbitLocation(radius, angle):
@@ -107,24 +112,32 @@ def executeMove(nav, sweetMove):
     for position in sweetMove:
         if len(position) == 7:
             command.script.add_commands
-            command.script.commands
-            move = motion.BodyJointCommand(position[4], #time
-                                           position[0], #larm
-                                           position[1], #lleg
-                                           position[2], #rleg
-                                           position[3], #rarm
-                                           position[6], # Chain Stiffnesses
-                                           position[5], #interpolation type
-                                           )
 
-        elif len(position) == 5:
-            move = motion.BodyJointCommand(position[2], # time
-                                           position[0], # chainID
-                                           position[1], # chain angles
-                                           position[4], # chain stiffnesses
-                                           position[3], # interpolation type
-                                           )
+            command.script.time = position[4]
+            command.script.interpolation_type = position[5]
+            command.script.chain_stiffnesses = position[6]
+
+            move = command.script.commands(commands_size-1) #Current joint command
+            move.l_shoulder_pitch = position[0][0]
+            move.l_shoulder_roll = position[0][1]
+            move.l_elbow_yaw = position[0][2]
+            move.l_elbow_roll = position[0][3]
+            move.l_hip_yaw_pitch = position[1][0]
+            move.l_hip_roll = position[1][1]
+            move.l_hip_pitch = position[1][2]
+            move.l_knee_pitch = position[1][3]
+            move.l_ankle_pitch = position[1][4]
+            move.l_ankle_roll = poisition[1][5]
+            move.r_hip_yaw_pitch = position[2][0]
+            move.r_hip_roll = position[2][1]
+            move.r_hip_pitch = position[2][2]
+            move.r_knee_pitch = position[2][3]
+            move.r_ankle_pitch = position[2][4]
+            move.r_ankle_roll = poisition[2][5]
+            move.r_shoulder_pitch = position[3][0]
+            move.r_shoulder_roll = position[3][1]
+            move.r_elbow_yaw = position[3][2]
+            move.r_elbow_roll = position[3][3]
 
         else:
             print("What kind of sweet ass-Move is this?")
-        motionInst.enqueue(move)

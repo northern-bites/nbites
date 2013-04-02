@@ -198,7 +198,6 @@ void BehaviorsModule::runStep ()
 			worldModelIn[i].latch();
 			pyInterface.setWorldModel_ptr(&worldModelIn[i].message(),i);
 				}
-        motionCommandIn.latch();
 
 
 		// Might be really broken.

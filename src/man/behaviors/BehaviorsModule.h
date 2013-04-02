@@ -14,7 +14,7 @@
 #include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
-#include "PModtion.pb.h"
+#include "PMotion.pb.h"
 
 /**
  *

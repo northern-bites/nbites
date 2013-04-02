@@ -100,7 +100,6 @@ add_subdirectory( sensors )
 add_subdirectory( vision )
 add_subdirectory( newmotion )
 add_subdirectory( jointenactor )
-add_subdirectory( audio )
 
 set( MAN_SRCS main.cpp
   Man.cpp
