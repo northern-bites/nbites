@@ -13,6 +13,8 @@ message MotionCommand
     optional ScriptedMove script = 2;
     optional DestinationWalk dest = 3;
     optional WalkCommand speed = 4;
+
+    optional bool processed_by_motion = 5;
 }
 
 message ScriptedMove
@@ -42,9 +44,9 @@ message DestinationWalk
 
 message WalkCommand
 {
-    optional float x = 1;
-    optional float y = 2;
-    optional float h = 3;
+    optional float x_percent = 1;
+    optional float y_percent = 2;
+    optional float h_percent = 3;
 }
 
 message JointAngles

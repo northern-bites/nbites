@@ -20,7 +20,6 @@
 #include "UnfreezeCommand.h"
 
 // Messages
-//#include "JointAngles.pb.h"
 #include "InertialState.pb.h"
 #include "PMotion.pb.h"
 
@@ -51,18 +50,22 @@ public:
     void signalNextFrame();
     //void sendMotionCommand(const HeadJointCommand::ptr command);
 
+    // Body Joint commands (sweet moves)
     void sendMotionCommand(const BodyJointCommand::ptr command);
     void sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands);
     void sendMotionCommand(messages::ScriptedMove script);
 
+    // Walk Commands (set speeds)
     void sendMotionCommand(const WalkCommand::ptr command);
     void sendMotionCommand(messages::WalkCommand command);
+
     //void sendMotionCommand(const SetHeadCommand::ptr command);
     //void sendMotionCommand(const CoordHeadCommand::ptr command);
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
     void sendMotionCommand(const StepCommand::ptr command);
 
+    // Odometry
     void sendMotionCommand(const DestinationCommand::ptr command);
     void sendMotionCommand(messages::DestinationWalk command);
 

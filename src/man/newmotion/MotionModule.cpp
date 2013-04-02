@@ -122,12 +122,12 @@ namespace motion
     {
         using namespace Kinematics;
         // if(curHeadProvider->isActive()){
-        // 	const vector <float > headStiffnesses =
-        // 	    curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
+        //      const vector <float > headStiffnesses =
+        //          curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
 
-        // 	for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
-        // 	    nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
-        // 	}
+        //      for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
+        //          nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
+        //      }
         // }
 
         if(curProvider->isActive()){
@@ -182,7 +182,7 @@ namespace motion
 
         // if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
         // {
-        // 	swapHeadProvider();
+        //     swapHeadProvider();
         // }
 
         // Update sensors with the correct support foot because it may have
@@ -245,17 +245,24 @@ namespace motion
 
     void MotionModule::processMotionInput()
     {
-        // Is this a destination walk request?
-        if (motionCommand.type() == messages::MotionCommand::DESTINATION_WALK)
-            sendMotionCommand(motionCommand.dest());
-
-        // Walk request?
-        else if (motionCommand.type() == messages::MotionCommand::WALK_COMMAND)
-            sendMotionCommand(motionCommand.speed());
-
-        // Sweet Move request?
-        else if (motionCommand.type() == messages::MotionCommand::SCRIPTED_MOVE)
-            sendMotionCommand(motionCommand.script());
+        if(motionCommand.processed_by_motion())
+        {
+            // Is this a destination walk request?
+            if (motionCommand.type() == messages::MotionCommand::DESTINATION_WALK){
+                sendMotionCommand(motionCommand.dest());
+                motionCommand.set_processed_by_motion(true);
+            }
+            // Walk request?
+            else if (motionCommand.type() == messages::MotionCommand::WALK_COMMAND){
+                sendMotionCommand(motionCommand.speed());
+                motionCommand.set_processed_by_motion(true);
+            }
+            // Sweet Move request?
+            else if (motionCommand.type() == messages::MotionCommand::SCRIPTED_MOVE){
+                sendMotionCommand(motionCommand.script());
+                motionCommand.set_processed_by_motion(true);
+            }
+        }
 
     }
 
@@ -271,7 +278,7 @@ namespace motion
         //determine the curProvider, and do any necessary swapping
         if (curProvider != nextProvider)
         {
-            std::cout << "MotionModule (" 
+            std::cout << "MotionModule ("
                       << getFrameCount()
                       << "): Current provider: "
                       << curProvider->getName()
@@ -293,7 +300,7 @@ namespace motion
     {
         using namespace Kinematics;
 
-        float yaw = fabs(joints[HEAD_YAW]);
+        float yaw = (float)fabs(joints[HEAD_YAW]);
         float pitch = joints[HEAD_PITCH];
 
         if (yaw < 0.5f)
@@ -390,7 +397,7 @@ namespace motion
     {
         std::vector<BodyJointCommand::ptr> transitions;
         std::string old_provider = curProvider->getName();
-        std::cout << "(MotionModule) Last provider: " 
+        std::cout << "(MotionModule) Last provider: "
                   << old_provider << "." << std::endl;
 
         switch(nextProvider->getType())
@@ -443,40 +450,40 @@ namespace motion
  * then the bad value is replaced
  */
     int MotionModule::realityCheckJoints(){
-// 	    static const float joint_override_thresh = 0.12f;//radians
-// 	    static const float head_joint_override_thresh = 0.3f;//need diff for head
+//          static const float joint_override_thresh = 0.12f;//radians
+//          static const float head_joint_override_thresh = 0.3f;//need diff for head
 
-// 	    int changed = 0;
-// 	    sensorAngles = sensors->getBodyAngles();
-// 	    vector<float> motionAngles = sensors->getMotionBodyAngles();
+//          int changed = 0;
+//          sensorAngles = sensors->getBodyAngles();
+//          vector<float> motionAngles = sensors->getMotionBodyAngles();
 
-// 	    //HEAD ANGLES - handled separately to avoid trouble in HeadProvider
-// 	    for(unsigned int i = 0; i < HEAD_JOINTS; i++){
-// 		if (fabs(sensorAngles[i] - motionAngles[i]) >
-// 		    head_joint_override_thresh){
+//          //HEAD ANGLES - handled separately to avoid trouble in HeadProvider
+//          for(unsigned int i = 0; i < HEAD_JOINTS; i++){
+//          if (fabs(sensorAngles[i] - motionAngles[i]) >
+//              head_joint_override_thresh){
 // #ifdef DEBUG_SWITCHBOARD_DISCREPANCIES
-// 		    cout << "RealityCheck discrepancy: "<<endl
-// 			 << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+//              cout << "RealityCheck discrepancy: "<<endl
+//               << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
 // #endif
-// 		    nextJoints[i] = motionAngles[i] = sensorAngles[i];
-// 		    changed += 1;
-// 		}
-// 	    }
+//              nextJoints[i] = motionAngles[i] = sensorAngles[i];
+//              changed += 1;
+//          }
+//          }
 
-// 	    //BODY ANGLES
-// 	    for(unsigned int i = HEAD_JOINTS -1; i < NUM_JOINTS; i++){
-// 		if (fabs(sensorAngles[i] - motionAngles[i]) > joint_override_thresh){
+//          //BODY ANGLES
+//          for(unsigned int i = HEAD_JOINTS -1; i < NUM_JOINTS; i++){
+//          if (fabs(sensorAngles[i] - motionAngles[i]) > joint_override_thresh){
 // #ifdef DEBUG_SWITCHBOARD_DISCREPANCIES
-// 		    cout << "RealityCheck discrepancy: "<<endl
-// 			 << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
+//             cout << "RealityCheck discrepancy: "<<endl
+//               << "    Joint "<<i << " is off from sensors by"<<sensorAngles[i] - motionAngles[i]<<endl;
 // #endif
-// 		    nextJoints[i] = motionAngles[i] = sensorAngles[i];
-// 		    changed += 1;
-// 		}
-// 	    }
-// 	    if(changed != 0)
-// 		sensors->setMotionBodyAngles(motionAngles);
-// 	    return changed;
+//              nextJoints[i] = motionAngles[i] = sensorAngles[i];
+//              changed += 1;
+//          }
+//          }
+//          if(changed != 0)
+//          sensors->setMotionBodyAngles(motionAngles);
+//          return changed;
         // @todo !! figure this out!
         return 0;
     }
@@ -492,9 +499,9 @@ namespace motion
         nextProvider = &walkProvider;
         WalkCommand::ptr walkCommand(
             new WalkCommand(
-                command.x(),
-                command.y(),
-                command.h())
+                command.x_percent(),
+                command.y_percent(),
+                command.h_percent())
             );
         walkProvider.setCommand(walkCommand);
     }
@@ -632,7 +639,7 @@ namespace motion
     void MotionModule::sendMotionCommand(const UnfreezeCommand::ptr command)
     {
         // if(curHeadProvider == &nullHeadProvider){
-        // 	nullHeadProvider.setCommand(command);
+        //      nullHeadProvider.setCommand(command);
         // }
         if(curProvider == &nullBodyProvider){
             nullBodyProvider.setCommand(command);
@@ -677,7 +684,7 @@ namespace motion
 
         //ignore the first chain since it's the head one
         for (unsigned i = 0; i < Kinematics::NUM_BODY_JOINTS; i++) {
-            max_change = std::max((double)max_change, fabs(sensorAngles[i + Kinematics::HEAD_JOINTS] - providerJoints[i]));
+            max_change = (float)std::max((double)max_change, fabs(sensorAngles[i + Kinematics::HEAD_JOINTS] - providerJoints[i]));
         }
 
         // this is the max we allow, not the max the hardware can do
@@ -865,7 +872,7 @@ namespace motion
         std::cout << "Reading a sequence of " << numCommands
                   << " commands." << std::endl;
 
-        for(unsigned int c = 0; c < numCommands; ++c)
+        for(unsigned int c = 0; (int)c < numCommands; ++c)
         {
             // (1) Get joint angles, excluding the head joints.
             //     (we are only concerned with body joints and

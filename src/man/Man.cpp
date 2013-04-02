@@ -217,9 +217,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     //         );
 
     messages::WalkCommand walkCommand;
-    walkCommand.set_x(0.f);
-    walkCommand.set_y(0.f);
-    walkCommand.set_h(.1f);
+    walkCommand.set_x_percent(0.f);
+    walkCommand.set_y_percent(0.f);
+    walkCommand.set_h_percent(.1f);
 
 
 
