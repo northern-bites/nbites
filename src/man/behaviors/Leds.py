@@ -330,8 +330,8 @@ class Leds():
                     self.executeLeds(RIGHT_COMM_FIVE_OFF_LEDS)
 
         if GC_LEDS:
-            if self.brain.gameController.counter == 1:
-                gcState = self.brain.gameController.currentState
+            if True: #TODO: only run when gamestate has changed
+                gcState = self.brain.interface.gameState.state
                 if (gcState == 'gameInitial' or
                     gcState == 'penaltyShotsGameInitial'):
                     self.executeLeds(STATE_INITIAL_LEDS)
@@ -354,7 +354,7 @@ class Leds():
 
         if FOOT_LEDS:
             if self.kickoffChange:
-                if self.brain.gameController.ownKickOff:
+                if self.brain.interface.gameState.kick_off_team == self.brain.teamNumber:
                     self.executeLeds(HAVE_KICKOFF_LEDS)
                 else:
                     self.executeLeds(NO_KICKOFF_LEDS)

@@ -24,7 +24,6 @@ from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
-import GameController
 
 #from objects import (FieldObject)
 
@@ -84,7 +83,6 @@ class Brain(object):
         #self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
-        self.gameController = GameController.GameController(self)
 
         # Message interface
         self.interface = interface.interface
@@ -138,7 +136,6 @@ class Brain(object):
         #self.updateObjects()
 
         # Behavior stuff
-        self.gameController.run()
         self.updatePlaybook()
         self.player.run()
         self.tracker.run()
