@@ -22,7 +22,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       ballTrack(),
       leds(broker),
       behaviors(),
-      gamestate()
+      gamestate(0,0)//TODO: put team number, player number here
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -105,7 +105,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
     gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
-    gamestate.switchKickOffInput.wireTo(&Guardian.switchKickOffOutput, true);
+    gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
     //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
     // @TODO wire behaviors to gamestate
 

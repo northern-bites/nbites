@@ -22,7 +22,6 @@
 
 #include <vector>
 
->>>>>>> wils/overhaul
 
 namespace man {
 
