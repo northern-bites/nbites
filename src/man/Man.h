@@ -16,6 +16,10 @@
 #include "led/LedEnactorModule.h"
 #include "balltrack/BallTrackModule.h"
 #include "behaviors/BehaviorsModule.h"
+#include "jointenactor/JointEnactorModule.h"
+#include "newmotion/MotionModule.h"
+
+#include <vector>
 
 namespace man {
 
@@ -32,6 +36,8 @@ private:
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+    jointenactor::JointEnactorModule jointEnactor;
+    motion::MotionModule motion;
 
     DiagramThread guardianThread;
     guardian::GuardianModule guardian;

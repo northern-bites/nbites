@@ -42,9 +42,20 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+# testing set up
+include ( ${SHARE_DIR}/cmake/gtest.cmake )
+enable_testing()
+set(CTEST_OUTPUT_ON_FAILURE TRUE)
+
+include_directories(
+  ${GTEST_INCLUDE_DIR}
+)
+
 # For Aldebaran's headers
-find_package(ALCOMMON REQUIRED)
-include_directories( ${ALCOMMON_INCLUDE_DIR} )
+if ( NOT OFFLINE )
+  find_package(ALCOMMON REQUIRED)
+  include_directories( ${ALCOMMON_INCLUDE_DIR} )
+endif()
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
@@ -74,6 +85,7 @@ endif()
 # Actual subdirectories
 add_subdirectory( common )
 include_directories( common )
+include_directories( newmotion/bhwalk ) # @todo hack?
 
 # Actual modules
 add_subdirectory( audio )
@@ -86,6 +98,9 @@ add_subdirectory( led )
 add_subdirectory( log )
 add_subdirectory( sensors )
 add_subdirectory( vision )
+add_subdirectory( newmotion )
+add_subdirectory( jointenactor )
+add_subdirectory( audio )
 
 set( MAN_SRCS main.cpp
   Man.cpp
@@ -106,6 +121,9 @@ target_link_libraries(
   comm
   common
   guardian
+  jointenactor
+  motion
+  bhwalk
   image
   led
   log

@@ -12,44 +12,37 @@ namespace man
     // Source: V4 NAO Documentation.
     enum SensorTypes
     {
-        /** Joint Angles **/
-        // Head joints
         HeadYaw = 0,
         HeadPitch,
-
-        // Left Arm joints
+        // LARM,
         LShoulderPitch,
         LShoulderRoll,
         LElbowYaw,
         LElbowRoll,
-        LWristYaw,
-        LHand,
-
-        // Right Arm joints
-        RShoulderPitch,
-        RShoulderRoll,
-        RElbowYaw,
-        RElbowRoll,
-        RWristYaw,
-        RHand,
-
-        // Pelvis joints
+        // LLEG,
         LHipYawPitch,
-        RHipYawPitch,
-
-        // Left Leg joints
         LHipRoll,
         LHipPitch,
         LKneePitch,
         LAnklePitch,
         LAnkleRoll,
-
-        // Right Leg joints
+        // RLEG,
+        RHipYawPitch,
         RHipRoll,
         RHipPitch,
         RKneePitch,
         RAnklePitch,
         RAnkleRoll,
+        // RARM,
+        RShoulderPitch,
+        RShoulderRoll,
+        RElbowYaw,
+        RElbowRoll,
+        // WRIST/HAND,
+        LWristYaw,
+        LHand,
+        RWristYaw,
+        RHand,
 
         END_JOINTS,
 
@@ -157,30 +150,36 @@ namespace man
     {
         "HeadYaw",
         "HeadPitch",
+        // LARM
         "LShoulderPitch",
         "LShoulderRoll",
         "LElbowYaw",
         "LElbowRoll",
-        "LWristYaw",
-        "LHand",
-        "RShoulderPitch",
-        "RShoulderRoll",
-        "RElbowYaw",
-        "RElbowRoll",
-        "RWristYaw",
-        "RHand",
+        // LLEG
         "LHipYawPitch",
-        "RHipYawPitch",
         "LHipRoll",
         "LHipPitch",
         "LKneePitch",
         "LAnklePitch",
         "LAnkleRoll",
+        // RLEG
+        "RHipYawPitch",
         "RHipRoll",
         "RHipPitch",
         "RKneePitch",
         "RAnklePitch",
         "RAnkleRoll",
+        // RARM
+        "RShoulderPitch",
+        "RShoulderRoll",
+        "RElbowYaw",
+        "RElbowRoll",
+        // HAND/WRIST
+        "LWristYaw",
+        "LHand",
+        "RWristYaw",
+        "RHand",
+        // TEMPS
         "HeadYawTemp",
         "HeadPitchTemp",
         "LShoulderPitchTemp",
