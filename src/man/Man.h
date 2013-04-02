@@ -18,8 +18,11 @@
 #include "behaviors/BehaviorsModule.h"
 #include "jointenactor/JointEnactorModule.h"
 #include "newmotion/MotionModule.h"
+#include "gamestate/GameStateModule.h"
 
 #include <vector>
+
+>>>>>>> wils/overhaul
 
 namespace man {
 
@@ -46,12 +49,13 @@ private:
     DiagramThread commThread;
     comm::CommModule comm;
 
-	DiagramThread cognitionThread;
-	image::ImageTranscriberModule imageTranscriber;
-	vision::VisionModule vision;
-	balltrack::BallTrackModule ballTrack;
-	led::LedEnactorModule leds;
-	behaviors::BehaviorsModule behaviors;
+    DiagramThread cognitionThread;
+    image::ImageTranscriberModule imageTranscriber;
+    vision::VisionModule vision;
+    balltrack::BallTrackModule ballTrack;
+    led::LedEnactorModule leds;
+    behaviors::BehaviorsModule behaviors;
+    gamestate::GameStateModule gamestate;
 };
 
 }

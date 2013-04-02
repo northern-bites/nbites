@@ -16,12 +16,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       audio(broker),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
-	  imageTranscriber(),
-	  vision(),
-	  ballTrack(),
+      cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
+      imageTranscriber(),
+      vision(),
+      ballTrack(),
       leds(broker),
-      behaviors()
+      behaviors(),
+      gamestate()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -88,20 +89,25 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     commThread.log<messages::GameState>(&comm._gameStateOutput, "gamestate");
 #endif
 
-<<<<<<< HEAD
 	/** Cognition **/
 	cognitionThread.addModule(imageTranscriber);
 	cognitionThread.addModule(vision);
 	//cognitionThread.addModule(ballTrack);
 	cognitionThread.addModule(leds);
     cognitionThread.addModule(behaviors);
-	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
-	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
-	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
-	//behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+    cognitionThread.addModule(gamestate);
+    vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+    vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+    vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+    vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+    gamestate.commInput.wireTo(&comm._gameStateOutput, true);
+    gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
+    gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
+    gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
+    gamestate.switchKickOffInput.wireTo(&Guardian.switchKickOffOutput, true);
+    //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+    // @TODO wire behaviors to gamestate
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,
