@@ -76,12 +76,12 @@ add_subdirectory( common )
 include_directories( common )
 
 # Actual modules
-add_subdirectory( new_image )
 add_subdirectory( audio )
 add_subdirectory( balltrack )
 add_subdirectory( behaviors )
 add_subdirectory( comm )
 add_subdirectory( guardian )
+add_subdirectory( image )
 add_subdirectory( led )
 add_subdirectory( log )
 add_subdirectory( sensors )

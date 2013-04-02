@@ -15,7 +15,7 @@ extern "C"
         AL::ALBrokerManager::setInstance(broker->fBrokerManager.lock());
         AL::ALBrokerManager::getInstance()->addBroker(broker);
         // create module instances
-        AL::ALModule::createModule<man::Man>(broker, "fake");
+        AL::ALModule::createModule<man::Man>(broker, "nbitesman");
         return 0;
     }
 
