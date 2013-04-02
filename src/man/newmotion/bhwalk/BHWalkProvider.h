@@ -14,17 +14,18 @@
 #include "../StepCommand.h"
 #include "../DestinationCommand.h"
 #include "../BodyJointCommand.h"
-//#include "EKFStructs.h"
 #include "../MotionProvider.h"
+
+#include "OdometryData.pb.h"
 
 //BH
 #include "WalkingEngine.h"
 
-namespace man 
+namespace man
 {
-    namespace motion 
+    namespace motion
     {
-        class BHWalkProvider : public MotionProvider 
+        class BHWalkProvider : public MotionProvider
         {
         public:
             BHWalkProvider();
@@ -53,7 +54,7 @@ namespace man
                 return std::vector<BodyJointCommand::ptr>();
             }
 
-            //MotionModel getOdometryUpdate() const;
+            messages::OdometryData getOdometryUpdate() const;
             virtual const SupportFoot getSupportFoot() const;
 
             static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];

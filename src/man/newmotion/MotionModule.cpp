@@ -12,6 +12,7 @@ namespace motion
           fsrInput_(),
           jointsOutput_(base()),
           stiffnessOutput_(base()),
+          odometryOutput_(base()),
           walkProvider(),
           nullBodyProvider(),
           curProvider(&nullBodyProvider),
@@ -88,6 +89,10 @@ namespace motion
             //     the joint enactor module.
             if(active)
                 setJointsAndStiffness();
+
+            // (5) Get the latest odometry measurements and update
+            //     the messages that we output.
+            updateOdometry();
 
             newInputJoints = false;
             frameCount++;
@@ -784,7 +789,20 @@ namespace motion
         }
 
         fileStream.close();
+
+        return scriptedSequence;
     }
 
+    void MotionModule::updateOdometry()
+    {
+        messages::OdometryData odometry =
+            walkProvider.getOdometryUpdate();
+
+        portals::Message<messages::OdometryData> odometryMessage(
+            &odometry
+            );
+
+        odometryOutput_.setMessage(odometryMessage);
+    }
 } // namespace motion
 } // namespace man

@@ -5,9 +5,9 @@
 
 #include "bhuman.h"
 
-namespace man 
+namespace man
 {
-namespace motion 
+namespace motion
 {
 
 using namespace boost;
@@ -58,7 +58,7 @@ BHWalkProvider::BHWalkProvider()
     hardReset();
 }
 
-void BHWalkProvider::requestStopFirstInstance() 
+void BHWalkProvider::requestStopFirstInstance()
 {
     requestedToStop = true;
 }
@@ -208,7 +208,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     //which is not used right now
     JointData& bh_joint_data = walkingEngine.theJointData;
 
-    for (int i = 0; i < JointData::numOfJoints; i++) 
+    for (int i = 0; i < JointData::numOfJoints; i++)
     {
         bh_joint_data.angles[nb_joint_order[i]] = sensorAngles[i];
     }
@@ -284,11 +284,17 @@ void BHWalkProvider::stand() {
     active();
 }
 
-// MotionModel BHWalkProvider::getOdometryUpdate() const {
-//     return MotionModel(walkingEngine.theOdometryData.translation.x * MM_TO_CM,
-//                        walkingEngine.theOdometryData.translation.y * MM_TO_CM,
-//                        walkingEngine.theOdometryData.rotation);
-// }
+messages::OdometryData BHWalkProvider::getOdometryUpdate() const
+{
+    messages::OdometryData odometryData;
+    odometryData.set_x(walkingEngine.theOdometryData.translation.x
+                       * MM_TO_CM);
+    odometryData.set_y(walkingEngine.theOdometryData.translation.y
+                       * MM_TO_CM);
+    odometryData.set_h(walkingEngine.theOdometryData.rotation);
+
+    return odometryData;
+}
 
 void BHWalkProvider::hardReset() {
 
