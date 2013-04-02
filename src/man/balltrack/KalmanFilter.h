@@ -51,12 +51,12 @@ public:
     void setUpdate(bool updated_){updated = updated_;};
 
     void initialize();
-    void initialize(ufvector4 x_,
-                    ufmatrix4 cov_);
+    void initialize(ufvector4 x_, ufmatrix4 cov_);
 
     // HACK - TEMP FOR TESTING
     // In theory should be private
     void predict(messages::RobotLocation odometry, float deltaT);
+    void updateWithObservation(messages::VisionBall visionBall);
 
     ufvector4 getStateEst(){return x;};
     float getRelXPosEst(){return x(0);};

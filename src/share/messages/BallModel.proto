@@ -16,6 +16,8 @@ message VisionBall {
 	optional sint32 frames_on = 13;
 	optional sint32 frames_off = 14;
 	optional int64 timestamp = 15;
+	optional float rel_x_variance = 16;
+	optional float rel_y_variance = 17;
 }
 
 message FilteredBall

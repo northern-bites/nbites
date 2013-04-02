@@ -96,6 +96,10 @@ namespace balltrack
         // Calculate the covariance Cov = A*Cov*ATranspose
         ufmatrix4 covTimesATranspose = prod(cov, ATranspose);
         cov = prod(A, covTimesATranspose);
+        std::cout <<"A*cov*A^t:\t";
+        for(int i=0; i<4; i++)
+            std::cout<<cov(i,i)<<"\t";
+        std::cout<<"\n";
 
         // Add noise: Process noise, rotation dev, translation dev
         ufvector4 noise;
@@ -119,9 +123,71 @@ namespace balltrack
             noise(i) = noiseFromRot(i);
 
         // Add all this noise to the covariance
-        for(int i=0; i<4; i++)
-            cov(i,i) = noise(i);
+        std::cout << "COV:\t";
+        for(int i=0; i<4; i++){
+            cov(i,i) += noise(i);
+            std::cout << cov(i,i) << "\t";
+        }
+        std::cout<<"\n";
 
+    }
+
+    void KalmanFilter::updateWithObservation(messages::VisionBall visionBall)
+    {
+        // Declare C and C transpose (ublas)
+        // C takes state estimate to observation frame so
+        // c = 1  0  0  0
+        //     0  1  0  0
+        ufmatrix c (2,4);
+        for(unsigned i=0; i<c.size1(); i++){
+            for(unsigned j=0; j<c.size2(); j++){
+                if(i == j)
+                    c(i,j) = 1.f;
+                else
+                    c(i,j) = 0.f;
+            }
+        }
+        ufmatrix cTranspose(4,2);
+        cTranspose = trans(c);
+
+        // Calculate the gain
+        // Calc c*cov*c^t
+        ufmatrix cCovCTranspose(2,2);
+        cCovCTranspose = prod(cov,cTranspose);
+        cCovCTranspose = prod(c,cCovCTranspose);
+
+        // Add the sensor variance
+        cCovCTranspose(0,0) = visionBall.rel_x_variance();
+        cCovCTranspose(1,1) = visionBall.rel_y_variance();
+
+        // gain = cov*cTrans*(c*cov*c^t + var)^-1
+        ufmatrix kalmanGain(2,2);
+        kalmanGain = prod(cTranspose,NBMath::invert2by2(cCovCTranspose));
+        kalmanGain = prod(cov,kalmanGain);
+
+        ufvector posEstimates(2);
+        posEstimates = prod(c, x);
+
+        // x straight ahead, y to the right
+        float sinB,cosB;
+        sincosf(visionBall.bearing(),&sinB,&cosB);
+
+        ufvector measurement(2);
+        measurement(0) = visionBall.distance()*cosB;
+        measurement(1) = visionBall.distance()*sinB;
+
+        ufvector innovation(2);
+        innovation = measurement - posEstimates;
+        ufvector correction(4);
+        correction = prod(kalmanGain,innovation);
+
+        x += correction;
+        //cov = cov - k*c*cov
+        ufmatrix4 identity;
+        identity = boost::numeric::ublas::identity_matrix <float>(4);
+        ufmatrix4 modifyCov;
+        modifyCov = identity - prod(kalmanGain,c);
+        cov = prod(modifyCov,cov);
     }
 
     void KalmanFilter::initialize()
