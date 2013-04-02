@@ -26,7 +26,7 @@
 #include "../newmotion/Kinematics.h"
 #include "RoboGrams.h"
 
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
 
 namespace man
 {

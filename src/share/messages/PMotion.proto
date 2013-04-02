@@ -1,5 +1,54 @@
 package messages;
 
+message MotionCommand
+{
+    enum CommandType {
+        DESTINATION_WALK = 0;
+	WALK_COMMAND = 1;
+	SCRIPTED_MOVE = 2;
+    }
+
+    optional CommandType type = 1;
+
+    optional ScriptedMove script = 2;
+    optional DestinationWalk dest = 3;
+    optional WalkCommand speed = 4;
+
+    optional bool processed_by_motion = 5;
+}
+
+message ScriptedMove
+{
+    repeated BodyJointCommand commands = 1;
+}
+
+message BodyJointCommand
+{
+    optional float time = 1;
+    optional JointAngles angles = 2;
+    optional JointAngles stiffness = 3;
+
+    enum InterpolationType {
+        SMOOTH = 0;
+	LINEAR = 1;
+    }
+    optional InterpolationType interpolation = 4;
+}
+
+message DestinationWalk
+{
+    optional float rel_x = 1;
+    optional float rel_y = 2;
+    optional float rel_h = 3;
+}
+
+message WalkCommand
+{
+    optional float x_percent = 1;
+    optional float y_percent = 2;
+    optional float h_percent = 3;
+}
+
 message JointAngles
 {
    // Head angles.

@@ -32,7 +32,7 @@
 #include "VisionDef.h"
 
 // including message types
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
 #include "InertialState.pb.h"
 
 class Vision;   // forward reference

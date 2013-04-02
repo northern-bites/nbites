@@ -122,10 +122,85 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         );
 
 
+
+     // make the protobuff for testing
+    messages::BodyJointCommand standUpProtoCommand;
+    messages::JointAngles standJointAngles;
+    messages::JointAngles standJointStiffness;
+
+    standJointAngles.set_l_shoulder_pitch(angles[0]);
+    standJointAngles.set_l_shoulder_roll(angles[1]);
+    standJointAngles.set_l_elbow_yaw(angles[2]);
+    standJointAngles.set_l_elbow_roll(angles[3]);
+    standJointAngles.set_l_hip_yaw_pitch(angles[4]);
+    standJointAngles.set_l_hip_roll(angles[5]);
+    standJointAngles.set_l_hip_pitch(angles[6]);
+    standJointAngles.set_l_knee_pitch(angles[7]);
+    standJointAngles.set_l_ankle_pitch(angles[8]);
+    standJointAngles.set_l_ankle_roll(angles[9]);
+    standJointAngles.set_r_hip_yaw_pitch(angles[10]);
+    standJointAngles.set_r_hip_roll(angles[11]);
+    standJointAngles.set_r_hip_pitch(angles[12]);
+    standJointAngles.set_r_knee_pitch(angles[13]);
+    standJointAngles.set_r_ankle_pitch(angles[14]);
+    standJointAngles.set_r_ankle_roll(angles[15]);
+    standJointAngles.set_r_shoulder_pitch(angles[16]);
+    standJointAngles.set_r_shoulder_roll(angles[17]);
+    standJointAngles.set_r_elbow_yaw(angles[18]);
+    standJointAngles.set_r_elbow_roll(angles[19]);
+
+
+    standJointStiffness.set_head_yaw(stiffness[0]);
+    standJointStiffness.set_head_pitch(stiffness[1]);
+    standJointStiffness.set_l_shoulder_pitch(stiffness[2]);
+    standJointStiffness.set_l_shoulder_roll(stiffness[3]);
+    standJointStiffness.set_l_elbow_yaw(stiffness[4]);
+    standJointStiffness.set_l_elbow_roll(stiffness[5]);
+    standJointStiffness.set_l_hip_yaw_pitch(stiffness[6]);
+    standJointStiffness.set_l_hip_roll(stiffness[7]);
+    standJointStiffness.set_l_hip_pitch(stiffness[8]);
+    standJointStiffness.set_l_knee_pitch(stiffness[9]);
+    standJointStiffness.set_l_ankle_pitch(stiffness[10]);
+    standJointStiffness.set_l_ankle_roll(stiffness[11]);
+    standJointStiffness.set_r_hip_yaw_pitch(stiffness[12]);
+    standJointStiffness.set_r_hip_roll(stiffness[13]);
+    standJointStiffness.set_r_hip_pitch(stiffness[14]);
+    standJointStiffness.set_r_knee_pitch(stiffness[15]);
+    standJointStiffness.set_r_ankle_pitch(stiffness[16]);
+    standJointStiffness.set_r_ankle_roll(stiffness[17]);
+    standJointStiffness.set_r_shoulder_pitch(stiffness[18]);
+    standJointStiffness.set_r_shoulder_roll(stiffness[19]);
+    standJointStiffness.set_r_elbow_yaw(stiffness[20]);
+    standJointStiffness.set_r_elbow_roll(stiffness[21]);
+
+    standUpProtoCommand.set_time(3.f);
+    standUpProtoCommand.mutable_angles()->CopyFrom(standJointAngles);
+    standUpProtoCommand.mutable_stiffness()->CopyFrom(standJointStiffness);
+    standUpProtoCommand.set_interpolation(messages::BodyJointCommand::SMOOTH);
+
+    messages::ScriptedMove sweetMove;
+    sweetMove.add_commands()->CopyFrom(standUpProtoCommand);
+
+
     angles[0] = 0.f;
     angles[16] = 0.f;
     stiffness[2] = O;
     stiffness[18] = O;
+
+    // make the protobuff for testing
+    messages::BodyJointCommand standArmProtoCommand;
+
+    standJointAngles.set_l_shoulder_pitch(angles[0]);
+    standJointAngles.set_r_shoulder_pitch(angles[16]);
+    standJointStiffness.set_l_shoulder_pitch(stiffness[0]);
+    standJointStiffness.set_r_shoulder_pitch(stiffness[16]);
+
+    standArmProtoCommand.set_time(3.f);
+    standArmProtoCommand.mutable_angles()->CopyFrom(standJointAngles);
+    standArmProtoCommand.mutable_stiffness()->CopyFrom(standJointStiffness);
+    standArmProtoCommand.set_interpolation(messages::BodyJointCommand::SMOOTH);
+
+    sweetMove.add_commands()->CopyFrom(standArmProtoCommand);
 
     motion::BodyJointCommand::ptr standWithArmCommand(
         new motion::BodyJointCommand(
@@ -141,22 +216,28 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     //         "/home/nao/scripted_commands.bjc"
     //         );
 
+    messages::WalkCommand walkCommand;
+    walkCommand.set_x_percent(0.f);
+    walkCommand.set_y_percent(0.f);
+    walkCommand.set_h_percent(.1f);
+
+
+
     jointEnactor.enableMotion();
+    motion.sendMotionCommand(walkCommand);
+    //motion.sendMotionCommand(sweetMove);
     //std::vector<motion::BodyJointCommand::ptr> scriptedMove;
     //scriptedMove.push_back(standUpCommand);
     //scriptedMove.push_back(standWithArmCommand);
     //motion.sendMotionCommand(scriptedMove);
-    motion.sendMotionCommand(standUpCommand);
+    // motion.sendMotionCommand(standUpCommand);
 
-    motion::DestinationCommand::ptr walkToCommand(
-        new motion::DestinationCommand(
-            100000.0f, // 10 cm in x
-            100000.0f, // 10 cm in y
-            0.0f     // 0 rad in theta
-            )
-        );
 
-    motion.sendMotionCommand(walkToCommand);
+
+
+
+
+
 }
 
 Man::~Man()
