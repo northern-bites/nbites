@@ -162,11 +162,15 @@ public:
     }
 
 protected:
+    // This helper can be specialized if the type is not a proto
     std::string nameHelper()
     {
         return input.message().GetTypeName();
     }
 
+    // Handles all of the message-specific writing actions. Kept as a
+    // separate helper method so that it can be specialized for images
+    // or any other non-proto types
     void writeInternal(T msg)
     {
         // Add a new write to the list of current writes
@@ -233,9 +237,13 @@ protected:
     portals::InPortal<T> input;
 };
 
+
+// These specialize the above template so that YUVImages can be logged
+// without having to be serialized and have protobuf methods
 template<>
 void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage);
 
+// Lets us provide a name string for YUV image
 template<>
 std::string LogModule<messages::YUVImage>::nameHelper();
 }

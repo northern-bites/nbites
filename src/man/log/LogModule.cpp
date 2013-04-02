@@ -132,12 +132,14 @@ void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage msg)
 {
     ongoing.push_back(Write());
     Write* current = &ongoing.back();
+    // We know the width, height of the image and what each pixel holds
     int size = msg.width() * msg.height() * sizeof(unsigned char);
     bytesWritten += size;
     writeValue<int>(size);
 
     // Configure the control block
     current->control.aio_fildes = fileDescriptor;
+    // Note we don't use the Write's string field here.
     current->control.aio_buf = msg.pixelAddress(0, 0);
     current->control.aio_nbytes = size;
     current->control.aio_sigevent.sigev_notify = SIGEV_NONE;
