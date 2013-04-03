@@ -2,6 +2,7 @@
 
 // @TODO: Make includes and map generation automagic
 #include "AudioCommand.pb.h"
+#include "BallModel.pb.h"
 #include "BatteryState.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
@@ -11,20 +12,17 @@
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
 #include "InertialState.pb.h"
-#include "InitialState.pb.h"
 #include "JointAngles.pb.h"
 #include "SonarState.pb.h"
 #include "StiffnessControl.pb.h"
 #include "TeamPacket.pb.h"
-#include "VisionBall.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
 #include "WorldModel.pb.h"
 
 namespace tool{
 
-ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent),
-                                            viewTab(parent)
+ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
 {
     ADD_MAPPED_TYPE(AudioCommand);
     ADD_MAPPED_TYPE(BatteryState);
@@ -36,7 +34,6 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent),
     ADD_MAPPED_TYPE(GameState);
     ADD_MAPPED_TYPE(GCResponse);
     ADD_MAPPED_TYPE(InertialState);
-    ADD_MAPPED_TYPE(InitialState);
     ADD_MAPPED_TYPE(JointAngles);
     ADD_MAPPED_TYPE(SonarState);
     ADD_MAPPED_TYPE(StiffnessControl);
@@ -51,7 +48,7 @@ bool ToolDiagram::unlogFrom(std::string path)
 {
     unlog::UnlogModule<Header> check(path);
     check.openFile();
-    Header head = check.readNextMessage<Header>();
+    Header head = check.readNextMessage();
     check.closeFile();
 
     if(typeMap.find(head.name()) == typeMap.end())
@@ -61,9 +58,10 @@ bool ToolDiagram::unlogFrom(std::string path)
     }
 
     unloggers.push_back(typeMap[head.name()](path));
+    providers.push_back((unloggers.back()->makeMeAProvider()));
     diagram.addModule(*unloggers.back());
+    diagram.addModule(*providers.back());
     unloggers.back()->run();
-    viewTab.addProtoViewer(unloggers.back());
     return true;
 }
 
@@ -77,5 +75,7 @@ void ToolDiagram::addUnloggers(std::vector<std::string> paths)
             std::cout << "Created Unlogger for file " <<  *i << std::endl;
         }
     }
+
+    emit signalNewProviders(providers);
 }
 }

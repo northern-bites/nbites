@@ -9,6 +9,8 @@ set( COMMON_SRCS NBMath
   CoordFrame3D.cpp
   CoordFrame4D.cpp
   CameraCalibrate.cpp
+  ALLedNames
+  NogginStructs
   ColorParams.cpp
   )
 
@@ -17,4 +19,3 @@ add_library(
   STATIC
   ${COMMON_SRCS}
 )
-

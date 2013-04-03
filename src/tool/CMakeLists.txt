@@ -52,6 +52,7 @@ endif()
 
 # Actual subdirectories!
 add_subdirectory( unlog )
+add_subdirectory( logview )
 
 # Sources
 set( tool_srcs main.cpp
@@ -79,5 +80,6 @@ target_link_libraries(
   portals
   messages
   unlog
+  logview
   ${QT_LIBRARIES}
   )

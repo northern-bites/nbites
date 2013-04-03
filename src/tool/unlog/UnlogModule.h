@@ -33,29 +33,53 @@
 namespace tool {
 namespace unlog {
 
-// Base Class
-class UnlogBase : public QObject, public portals::Module
+class GenericProviderModule : public QObject, public portals::Module
 {
     Q_OBJECT;
+
+public:
+    GenericProviderModule(std::string t) : type(t) {}
+
+    void setMessage(google::protobuf::Message* m) { msg = m; }
+    google::protobuf::Message* getMessage() { return msg; }
+    std::string getType() { return type; }
 
 signals:
     void newMessage(const google::protobuf::Message*);
 
+protected:
+    virtual void run_() = 0;
+    google::protobuf::Message* msg;
+    std::string type;
+};
+
+template<class T>
+class ProviderModule : public GenericProviderModule
+{
+public:
+    ProviderModule(std::string t) : GenericProviderModule(t) {}
+
+    portals::InPortal<T> input;
+
+protected:
+    virtual void run_()
+    {
+        input.latch();
+        msg->CopyFrom(input.message());
+        emit newMessage(msg);
+    }
+};
+
+// Base Class
+class UnlogBase : public portals::Module
+{
 public:
     // The path is expected to be a full path to the log file
     UnlogBase(std::string path, std::string type);
     virtual ~UnlogBase();
 
     std::string getType() { return typeName; }
-    void useGUI(bool on) { usingGUI = on; }
-
-    // The templated class needs to implement this!
-    virtual const google::protobuf::Message* getMessage() = 0;
-
-	//which direction we're reading in
-	//1 = forward, 0 = rewind
-	template <class T>
-	bool UnlogBase<T>::readDir;
+    virtual GenericProviderModule* makeMeAProvider() = 0;
 
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
@@ -65,9 +89,51 @@ public:
         return value;
     }
 
-    template <class T>
-    T readNextMessage() {
-		std::cout<<"Forwarded to file location:"<<ftell(file)<<std::endl;
+    // Basic file control
+    void openFile() throw (file_exception);
+    void closeFile();
+
+protected:
+    // Inheriting classes still need to implement this
+    virtual void run_() = 0;
+
+    uint32_t readCharBuffer(char* buffer, uint32_t size)
+        const throw (file_read_exception);
+
+    // Keeps track of whether the file is open/closed
+    bool fileOpen;
+    // Pointer to the file
+    FILE* file;
+    // Stores the full path of the file
+    std::string fileName;
+    std::string typeName;
+    // Keeps track of the sizes of all the reads we've done
+    std::vector<uint32_t> messageSizes;
+};
+
+// Template Class
+template<class T>
+class UnlogModule : public UnlogBase
+{
+public:
+    // Takes a file path to parse from
+    UnlogModule(std::string path) : UnlogBase(path, T().GetTypeName()),
+                                    output(base()) {}
+
+    // Where the output will be provided
+    portals::OutPortal<T> output;
+
+    GenericProviderModule* makeMeAProvider()
+    {
+        ProviderModule<T>* gpm = new ProviderModule<T>(typeName);
+        // Have to actually initialize the generic message to correct type
+        gpm->setMessage(new T());
+        gpm->input.wireTo(&output);
+        return gpm;
+    }
+
+    T readNextMessage()
+    {
         // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
@@ -81,11 +147,11 @@ public:
         // Keep track of the sizes we've read (to unwind)
         messageSizes.push_back(currentMessageSize);
 
-		/*
-		 * Note: We can't deserialize directly from a file to a protobuf.
-		 * We have to read the file's contents into a buffer, then
-		 * deserialize from that buffer into the protobuf.
-		 */
+       /*
+        * Note: We can't deserialize directly from a file to a protobuf.
+        * We have to read the file's contents into a buffer, then
+        * deserialize from that buffer into the protobuf.
+        */
 
         // To hold the data read, and the number of bytes read
         uint32_t bytes;
@@ -113,68 +179,6 @@ public:
         return currentMessage;
     }
 
-	//unwinding - implements things pretty much backwards from above function
-	template <class T>
-	T readPrevMessage() {
-		std::cout<<"Rewound to file location:"<<ftell(file)<<std::endl;
-        if (ftell(file)==0) {
-            std::cout << "Beginning of log file " << fileName << std::endl;
-            return T();
-        }
-
-		////////////////////////
-		//////////////TODO
-		////////////////////////
-	}
-
-
-    // Basic file control
-    void openFile() throw (file_exception);
-    void closeFile();
-
-protected:
-    // Inheriting classes still need to implement this
-    virtual void run_() = 0;
-
-    uint32_t readCharBuffer(char* buffer, uint32_t size)
-        const throw (file_read_exception);
-
-    // For the inherited class to use the signal
-    void updateDisplay(const google::protobuf::Message* msg)
-    {
-        emit newMessage(msg);
-    }
-
-    // Keeps track of whether the file is open/closed
-    bool fileOpen;
-    // Pointer to the file
-    FILE* file;
-    // Stores the full path of the file
-    std::string fileName;
-    std::string typeName;
-    // Keeps track of the sizes of all the reads we've done
-    std::vector<uint32_t> messageSizes;
-    bool usingGUI;
-};
-
-// Template Class
-template<class T>
-class UnlogModule : public UnlogBase
-{
-public:
-    // Takes a file path to parse from
-    UnlogModule(std::string path) : UnlogBase(path, T().GetTypeName()),
-                                    output(base()) {}
-
-    // Where the output will be provided
-    portals::OutPortal<T> output;
-
-    // Implementing the method required by the base class
-    const google::protobuf::Message* getMessage()
-    {
-        return output.getMessage(true).get();
-    }
-
 protected:
     // Implements the Module run_ method
     void run_()
@@ -186,28 +190,41 @@ protected:
             readHeader();
         }
 
-        //switch the read direction based on a static bool
-		if (readDir){
-			// Reads the next message from the file and puts it on
-			// the OutPortal
-			portals::Message<T> msg(0);
-			*msg.get() = readNextMessage<T>();
-			output.setMessage(msg);
-		} else {
-			// Reads the previous message from the file and puts it on
-			// the OutPortal
-			portals::Message<T> msg(0);
-			*msg.get() = readPrevMessage<T>();
-			output.setMessage(msg);
-		}
+        // Reads the next message from the file and puts it on
+        // the OutPortal
+        portals::Message<T> msg(0);
+        *msg.get() = readNextMessage();
 
-        if (usingGUI) updateDisplay(output.getMessage(true).get());
+        output.setMessage(msg);
     }
 
     // Reads in the header; called when the file is first opened
     void readHeader()
     {
-        readNextMessage<Header>();
+        uint32_t currentMessageSize = readValue<uint32_t>();
+
+        // Keep track of the sizes we've read (to unwind)
+        messageSizes.push_back(currentMessageSize);
+
+        // To hold the data read, and the number of bytes read
+        uint32_t bytes;
+        char buffer[currentMessageSize];
+
+        try {
+            // Actual file reading call
+            bytes = readCharBuffer(buffer, currentMessageSize);
+        } catch (std::exception& read_exception) {
+            std::cout << read_exception.what() << std::endl;
+            return;
+        }
+
+        // If we have actually read some bytes, treat them like a message
+        Header header;
+
+        if (bytes) {
+            // Parse into the message
+            header.ParseFromString(std::string(buffer, bytes));
+        }
     }
 
 };

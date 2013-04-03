@@ -57,4 +57,9 @@ if(USE_LOGGING)
     "Log the robot's vision output."
     OFF
     )
+else(USE_LOGGING)
+  unset(LOG_SENSORS CACHE)
+  unset(LOG_GUARDIAN CACHE)
+  unset(LOG_COMM CACHE)
+  unset(LOG_VISION CACHE)
 endif(USE_LOGGING)

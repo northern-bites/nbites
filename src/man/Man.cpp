@@ -1,5 +1,6 @@
 #include "Man.h"
 #include "Common.h"
+#include "Camera.h"
 #include <iostream>
 #include "RobotConfig.h"
 
@@ -14,9 +15,15 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       audio(broker),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
-	  imageTranscriber(),
-	  vision()
+      cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
+      topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
+      bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
+      topConverter(Camera::TOP),
+      bottomConverter(Camera::BOTTOM),
+      vision(),
+      ballTrack(),
+      leds(broker),
+      behaviors()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -72,13 +79,31 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     commThread.log<messages::GameState>(&comm._gameStateOutput, "gamestate");
 #endif
 
-	/** Cognition **/
-	cognitionThread.addModule(imageTranscriber);
-	cognitionThread.addModule(vision);
-	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+    /** Cognition **/
+
+    cognitionThread.addModule(topTranscriber   );
+    cognitionThread.addModule(bottomTranscriber);
+    cognitionThread.addModule(topConverter     );
+    cognitionThread.addModule(bottomConverter  );
+    topConverter   .imageIn.wireTo(&   topTranscriber.imageOut);
+    bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
+
+    cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
+                                            "im");
+
+    //cognitionThread.addModule(vision);
+    // vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
+    // vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+    // vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+    // vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+
+    //cognitionThread.addModule(ballTrack);
+    cognitionThread.addModule(leds);
+    cognitionThread.addModule(behaviors);
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+    behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
+    //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,
                                                "field");

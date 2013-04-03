@@ -2,7 +2,6 @@
 
 #include <QWidget>
 #include "unlog/UnlogModule.h"
-#include "unlog/view/LogViewer.h"
 #include "Header.pb.h"
 #include <iostream>
 
@@ -34,8 +33,6 @@ public:
     void addModule(portals::Module& mod);
     bool unlogFrom(std::string path);
 
-    unlog::view::LogViewer* getGUI() { return &viewTab; }
-
     template<class T>
     void connectToUnlogger(portals::InPortal<T>& input)
     {
@@ -50,6 +47,9 @@ public:
         }
     }
 
+signals:
+    void signalNewProviders(std::vector<unlog::GenericProviderModule*>);
+
 public slots:
     void run() { diagram.run(); }
     void addUnloggers(std::vector<std::string> paths);
@@ -57,7 +57,7 @@ public slots:
 protected:
     portals::RoboGram diagram;
     std::vector<unlog::UnlogBase*> unloggers;
-    unlog::view::LogViewer viewTab;
+    std::vector<unlog::GenericProviderModule*> providers;
 
     TypeMap typeMap;
 };

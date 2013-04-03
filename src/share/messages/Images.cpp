@@ -117,6 +117,16 @@ void* MemoryImageBase::makeMeInMemory(void* pixels, int wd, int ht, int rowPitch
   return buffer_->getAddress();
 }
 
+void* MemoryImageBase::makeMeInBuffer(PixelBuffer* buf, int wd, int ht, int rowPitch, int pixelPitch)
+{
+  setSize(wd, ht);
+  rowPitch_   = rowPitch;
+  pixelPitch_ = pixelPitch;
+  buffer_     = buf;
+
+  return buffer_->getAddress();
+}
+
 void MemoryImageBase::makeMeWindowOf(const MemoryImageBase& img, int& x0, int& y0, int wd, int ht)
 {
   Image::makeMeWindowOf(img, x0, y0, wd, ht);

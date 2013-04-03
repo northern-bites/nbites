@@ -10,9 +10,13 @@
 #include "sensors/SensorsModule.h"
 #include "comm/CommModule.h"
 #include "vision/VisionModule.h"
-#include "image/ImageTranscriberModule.h"
+#include "image/TranscriberModule.h"
+#include "image/ImageConverterModule.h"
 #include "guardian/GuardianModule.h"
 #include "audio/AudioEnactorModule.h"
+#include "led/LedEnactorModule.h"
+#include "balltrack/BallTrackModule.h"
+#include "behaviors/BehaviorsModule.h"
 
 namespace man {
 
@@ -37,9 +41,15 @@ private:
     DiagramThread commThread;
     comm::CommModule comm;
 
-	DiagramThread cognitionThread;
-	image::ImageTranscriberModule imageTranscriber;
-	vision::VisionModule vision;
+    DiagramThread cognitionThread;
+    image::TranscriberModule topTranscriber;
+    image::TranscriberModule bottomTranscriber;
+    image::ImageConverterModule topConverter;
+    image::ImageConverterModule bottomConverter;
+    vision::VisionModule vision;
+    balltrack::BallTrackModule ballTrack;
+    led::LedEnactorModule leds;
+    behaviors::BehaviorsModule behaviors;
 };
 
 }
