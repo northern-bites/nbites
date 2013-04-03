@@ -4,6 +4,8 @@
 
 #ifndef Common_h_DEFINED
 #define Common_h_DEFINED
+// HACK - the hackest of hacks
+#define OFFLINE
 
 #include <math.h> // for PI
 #include "NBMath.h"

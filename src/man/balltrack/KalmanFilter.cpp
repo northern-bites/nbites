@@ -8,17 +8,48 @@ namespace man
 namespace balltrack
 {
     KalmanFilter::KalmanFilter(KalmanFilterParams params_)
+        :  params(params_),
+           updated(false),
+           lastUpdateTime(0),
+           deltaTime(0.f)
+
     {
-        updated = false;
-        params = params_;
+
+
     }
 
     KalmanFilter::~KalmanFilter(){}
+
+    void KalmanFilter::updateDeltaTime()
+    {
+        // Get time since last update
+        const long long int time = monotonic_micro_time(); //from common
+        deltaTime = static_cast<float>(time - lastUpdateTime)/
+            1000000.0f; // u_s to sec
+
+        // Guard against a zero dt (maybe possible?)
+        if (deltaTime == 0.0){
+            deltaTime = 0.0001f;
+        }
+        lastUpdateTime = time;
+    }
 
     void KalmanFilter::update(messages::VisionBall visionBall,
                               messages::Motion     motion)
     {
         updated = true;
+
+        //Get passed time
+        updateDeltaTime();
+
+        predict(motion.odometry());
+        updateWithObservation(visionBall);
+    }
+
+    void KalmanFilter::predict(messages::RobotLocation odometry)
+    {
+        // Overload for offline data simulation
+        predict(odometry, deltaTime);
     }
 
     void KalmanFilter::predict(messages::RobotLocation odometry, float deltaT)

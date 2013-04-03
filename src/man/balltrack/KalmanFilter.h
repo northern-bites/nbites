@@ -10,6 +10,7 @@
 #include "NBMath.h"
 #include "NBMatrixMath.h"
 #include "NBVector.h"
+#include "Common.h"
 
 #include "BallModel.pb.h"
 #include "Motion.pb.h"
@@ -55,6 +56,7 @@ public:
 
     // HACK - TEMP FOR TESTING
     // In theory should be private
+    void predict(messages::RobotLocation odometry);
     void predict(messages::RobotLocation odometry, float deltaT);
     void updateWithObservation(messages::VisionBall visionBall);
 
@@ -75,6 +77,8 @@ private:
 
     bool updated;
 
+    void updateDeltaTime();
+
     // x is the state estimate, it holds relX & relY position and
     //                                   relX & relY velocity
     // This is the convention for all matrices and vectors
@@ -88,6 +92,7 @@ private:
     float gain;
 
     // Time passed since last vision observation
+    long long int lastUpdateTime;
     float deltaTime;
 
     // true if the filter assumes the ball is stationary, if stationary
