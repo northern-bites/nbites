@@ -52,6 +52,11 @@ public:
     // The templated class needs to implement this!
     virtual const google::protobuf::Message* getMessage() = 0;
 
+	//which direction we're reading in
+	//1 = forward, 0 = rewind
+	template <class T>
+	bool UnlogBase<T>::readDir;
+
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
     T readValue() {
@@ -181,33 +186,23 @@ protected:
             readHeader();
         }
 
-        // Reads the next message from the file and puts it on
-        // the OutPortal
-        portals::Message<T> msg(0);
-        *msg.get() = readNextMessage<T>();
-
-        output.setMessage(msg);
+        //switch the read direction based on a static bool
+		if (readDir){
+			// Reads the next message from the file and puts it on
+			// the OutPortal
+			portals::Message<T> msg(0);
+			*msg.get() = readNextMessage<T>();
+			output.setMessage(msg);
+		} else {
+			// Reads the previous message from the file and puts it on
+			// the OutPortal
+			portals::Message<T> msg(0);
+			*msg.get() = readPrevMessage<T>();
+			output.setMessage(msg);
+		}
 
         if (usingGUI) updateDisplay(output.getMessage(true).get());
     }
-
-	void rewind_()
-	{
-	    // If the file has't already been opened, you can't rewind
-        if (!fileOpen)
-        {
-			std::cout<<"You can't rewind until you open a log."<<std::endl;
-        }
-
-        // Reads the previous message from the file and puts it on
-        // the OutPortal
-        portals::Message<T> msg(0);
-        *msg.get() = readPrevMessage<T>();
-
-        output.setMessage(msg);
-
-        if (usingGUI) updateDisplay(output.getMessage(true).get());
-	}
 
     // Reads in the header; called when the file is first opened
     void readHeader()

@@ -74,11 +74,14 @@ void Tool::keyPressEvent(QKeyEvent * event)
     case Qt::Key_J:
     case Qt::Key_D:
     case Qt::Key_N:
+		//unlog::UnlogBase::readDir = 1;
         diagram.run();
         break;
     case Qt::Key_K:
     case Qt::Key_S:
     case Qt::Key_P:
+		//unlog::UnlogBase::readDir = 0;
+		diagram.run();
         break;
     default:
         QWidget::keyPressEvent(event);
