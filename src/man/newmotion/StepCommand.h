@@ -26,7 +26,7 @@ public:
     const float gain;
 
 protected:
-	virtual void setChainList() {
+    virtual void setChainList() {
         chainList.assign(MotionConstants::STEP_CHAINS,
                          MotionConstants::STEP_CHAINS +
                          MotionConstants::STEP_NUM_CHAINS);
