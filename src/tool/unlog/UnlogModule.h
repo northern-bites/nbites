@@ -89,6 +89,9 @@ public:
         return value;
     }
 
+	bool readDir;
+
+
     // Basic file control
     void openFile() throw (file_exception);
     void closeFile();
@@ -179,6 +182,18 @@ public:
         return currentMessage;
     }
 
+	T readPrevMessage() {
+		std::cout<<"Rewound to file location:"<<ftell(file)<<std::endl;
+        if (ftell(file)==0) {
+            std::cout << "Beginning of log file " << fileName << std::endl;
+            return T();
+        }
+
+		////////////////////////
+		//////////////TODO
+		////////////////////////
+	}
+
 protected:
     // Implements the Module run_ method
     void run_()
@@ -192,9 +207,20 @@ protected:
 
         // Reads the next message from the file and puts it on
         // the OutPortal
-        portals::Message<T> msg(0);
-        *msg.get() = readNextMessage();
+		portals::Message<T> msg(0);
 
+        //switch the read direction based on a static bool
+		if (1){
+			// Reads the next message from the file and puts it on
+			// the OutPortal
+			*msg.get() = readNextMessage();
+			output.setMessage(msg);
+		} else {
+			// Reads the previous message from the file and puts it on
+			// the OutPortal
+			*msg.get() = readPrevMessage();
+			output.setMessage(msg);
+		}
         output.setMessage(msg);
     }
 
