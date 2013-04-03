@@ -107,13 +107,13 @@ namespace motion
 
     void MotionModule::preProcess()
     {
-        //preProcessHead();
+        preProcessHead();
         preProcessBody();
     }
 
     void MotionModule::processJoints()
     {
-        //processHeadJoints();
+        processHeadJoints();
         processBodyJoints();
         safetyCheckJoints();
     }
@@ -185,10 +185,10 @@ namespace motion
             swapBodyProvider();
         }
 
-        // if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
-        // {
-        //     swapHeadProvider();
-        // }
+        if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
+        {
+            swapHeadProvider();
+        }
 
         // Update sensors with the correct support foot because it may have
         // changed this frame.
@@ -198,7 +198,7 @@ namespace motion
         //sensors->setSupportFoot(curProvider->getSupportFoot());
 
         //return if one of the enactors is active
-        return curProvider->isActive() /* || curHeadProvider->isActive()*/;
+        return curProvider->isActive()  || curHeadProvider->isActive();
     }
 
     void MotionModule::processBodyJoints()
@@ -606,25 +606,19 @@ namespace motion
         }
     }
 
+    void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
+    {
+        nextHeadProvider = &headProvider;
+        headProvider.setCommand(command);
+    }
 
+    void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
+    {
+        nextHeadProvider = &headProvider;
+        headProvider.setCommand(command);
+    }
 
-
-    // void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
-    // {
-    //     pthread_mutex_lock(&next_provider_mutex);
-    //     nextHeadProvider = &headProvider;
-    //     headProvider.setCommand(command);
-    //     pthread_mutex_unlock(&next_provider_mutex);
-
-    // }
     // void MotionModule::sendMotionCommand(const CoordHeadCommand::ptr command){
-    //     pthread_mutex_lock(&next_provider_mutex);
-    //     nextHeadProvider = &headProvider;
-    //     headProvider.setCommand(command);
-    //     pthread_mutex_unlock(&next_provider_mutex);
-
-    // }
-    // void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command){
     //     pthread_mutex_lock(&next_provider_mutex);
     //     nextHeadProvider = &headProvider;
     //     headProvider.setCommand(command);
@@ -635,17 +629,17 @@ namespace motion
     void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
     {
         nextProvider = &nullBodyProvider;
-        //nextHeadProvider = &nullHeadProvider;
+        nextHeadProvider = &nullHeadProvider;
 
-        //nullHeadProvider.setCommand(command);
+        nullHeadProvider.setCommand(command);
         nullBodyProvider.setCommand(command);
     }
 
     void MotionModule::sendMotionCommand(const UnfreezeCommand::ptr command)
     {
-        // if(curHeadProvider == &nullHeadProvider){
-        //      nullHeadProvider.setCommand(command);
-        // }
+        if(curHeadProvider == &nullHeadProvider){
+             nullHeadProvider.setCommand(command);
+        }
         if(curProvider == &nullBodyProvider){
             nullBodyProvider.setCommand(command);
         }

@@ -9,7 +9,9 @@ set(MOTION_SRCS MotionModule
 		SmoothChoppedCommand
 		LinearChoppedCommand
 		ChopShop
-		ScriptedProvider)
+		ScriptedProvider
+		HeadJointCommand
+		HeadProvider)
 
 include_directories( bhwalk )
 

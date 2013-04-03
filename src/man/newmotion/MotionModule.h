@@ -17,6 +17,8 @@
 #include "bhwalk/BHWalkProvider.h"
 #include "ScriptedProvider.h"
 #include "NullBodyProvider.h"
+#include "HeadProvider.h"
+#include "NullHeadProvider.h"
 
 // Motion commands
 #include "BodyJointCommand.h"
@@ -59,11 +61,10 @@ public:
      * @brief Reset the odometry.
      */
     void resetOdometry();
-
     const std::vector<float> getNextJoints() const;
     const std::vector<float> getNextStiffness() const;
     void signalNextFrame();
-    //void sendMotionCommand(const HeadJointCommand::ptr command);
+    void sendMotionCommand(const HeadJointCommand::ptr command);
 
     // Body Joint commands (sweet moves)
     void sendMotionCommand(const BodyJointCommand::ptr command);
@@ -74,7 +75,7 @@ public:
     void sendMotionCommand(const WalkCommand::ptr command);
     void sendMotionCommand(messages::WalkCommand command);
 
-    //void sendMotionCommand(const SetHeadCommand::ptr command);
+    void sendMotionCommand(const SetHeadCommand::ptr command);
     //void sendMotionCommand(const CoordHeadCommand::ptr command);
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
@@ -84,12 +85,12 @@ public:
     void sendMotionCommand(const DestinationCommand::ptr command);
     void sendMotionCommand(messages::DestinationWalk command);
 
-    //void stopHeadMoves() { headProvider.requestStop(); }
+    void stopHeadMoves() { headProvider.requestStop(); }
     void stopBodyMoves() { curProvider->requestStop(); }
 
     bool isWalkActive() { return walkProvider.isWalkActive(); }
     bool isStanding()   { return walkProvider.isStanding(); }
-    //bool isHeadActive() { return headProvider.isActive(); }
+    bool isHeadActive() { return headProvider.isActive(); }
     bool isBodyActive() { return curProvider->isActive();}
 
     void resetWalkProvider(){ walkProvider.hardReset(); }
@@ -189,8 +190,8 @@ private:
 
     BHWalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
-    //HeadProvider headProvider;
-    //NullHeadProvider nullHeadProvider;
+    HeadProvider headProvider;
+    NullHeadProvider nullHeadProvider;
     NullBodyProvider nullBodyProvider;
 
     MotionProvider*         curProvider;
