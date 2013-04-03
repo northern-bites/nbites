@@ -243,7 +243,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     messages::ScriptedMove sweetMove;
     sweetMove.add_commands()->CopyFrom(standUpProtoCommand);
 
-
     angles[0] = 0.f;
     angles[16] = 0.f;
     stiffness[2] = O;
@@ -293,13 +292,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     //scriptedMove.push_back(standWithArmCommand);
     //motion.sendMotionCommand(scriptedMove);
     // motion.sendMotionCommand(standUpCommand);
-
-
-
-
-
-
-
 }
 
 Man::~Man()
