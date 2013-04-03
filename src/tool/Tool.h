@@ -13,7 +13,7 @@
 
 #include "ToolDiagram.h"
 #include "DataSelector.h"
-#include "unlog/view/LogViewer.h"
+#include "logview/LogViewer.h"
 
 namespace tool {
 
