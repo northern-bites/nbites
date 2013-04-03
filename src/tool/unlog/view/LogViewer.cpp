@@ -22,21 +22,25 @@ LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
 
 }
 
-void LogViewer::addProtoViewer(UnlogBase* unlogger)
+void LogViewer::addProtoViewers(std::vector<unlog::GenericProviderModule*>
+                                inputs)
 {
-    unlogger->useGUI(true);
-    QDockWidget* dockWidget =
-        new QDockWidget(QString(unlogger->getType().c_str()),
+    for(std::vector<unlog::GenericProviderModule*>::iterator i =
+            inputs.begin(); i != inputs.end(); i++)
+    {
+        QDockWidget* dockWidget =
+            new QDockWidget(QString((*i)->getType().data()),
                                 this);
-    dockWidget->setMinimumWidth(300);
-    dockWidget->setMaximumHeight(125);
-    ProtoViewer* viewer = new ProtoViewer(unlogger->getMessage(), dockWidget);
+        dockWidget->setMinimumWidth(300);
+        dockWidget->setMaximumHeight(125);
+        ProtoViewer* viewer = new ProtoViewer((*i)->getMessage(), dockWidget);
 
-    QObject::connect(unlogger, SIGNAL(newMessage(const google::protobuf::Message*)),
-                     viewer, SLOT(updateView(const google::protobuf::Message*)));
+        QObject::connect(*i, SIGNAL(newMessage(const google::protobuf::Message*)),
+                         viewer, SLOT(updateView(const google::protobuf::Message*)));
 
-    dockWidget->setWidget(viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+        dockWidget->setWidget(viewer);
+        this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    }
 }
 
 }

@@ -14,6 +14,7 @@ Tool::Tool(const char* title) :
     QMainWindow(),
     diagram(),
     selector(),
+    logView(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -22,7 +23,6 @@ Tool::Tool(const char* title) :
     scrollArea(new QScrollArea),
     scrollBarSize(new QSize(5, 35)),
     tabStartSize(new QSize(toolTabs->size()))
-
 {
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
@@ -31,12 +31,15 @@ Tool::Tool(const char* title) :
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
 
+    connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
+            &logView, SLOT(addProtoViewers(std::vector<unlog::GenericProviderModule*>)));
+
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);
 
     toolTabs->addTab(&selector, tr("Data"));
-    toolTabs->addTab(diagram.getGUI(), tr("Log Viewer"));
+    toolTabs->addTab(&logView, tr("Log View"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);

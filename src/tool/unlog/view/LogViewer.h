@@ -13,8 +13,8 @@
 #include <QtGui>
 #include <vector>
 
-#include "ProtoViewer.h"
 #include "unlog/UnlogModule.h"
+#include "ProtoViewer.h"
 
 namespace tool {
 namespace unlog {
@@ -26,7 +26,8 @@ class LogViewer : public QMainWindow {
 public:
     LogViewer(QWidget* parent = 0);
 
-    void addProtoViewer(UnlogBase* unlogger);
+public slots:
+    void addProtoViewers(std::vector<unlog::GenericProviderModule*>);
 
 private:
     std::vector<QDockWidget*> dockWidget;

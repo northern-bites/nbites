@@ -13,6 +13,7 @@
 
 #include "ToolDiagram.h"
 #include "DataSelector.h"
+#include "unlog/view/LogViewer.h"
 
 namespace tool {
 
@@ -31,9 +32,9 @@ protected:
 
     // Modules in this diagram will be run when data is updated
     ToolDiagram diagram;
-    DataSelector selector;
 
-    // Modules
+    DataSelector selector;
+    unlog::view::LogViewer logView;
 
     // GUI stuff
     QTabWidget* toolTabs;

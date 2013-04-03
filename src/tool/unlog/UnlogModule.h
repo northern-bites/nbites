@@ -33,24 +33,53 @@
 namespace tool {
 namespace unlog {
 
-// Base Class
-class UnlogBase : public QObject, public portals::Module
+class GenericProviderModule : public QObject, public portals::Module
 {
     Q_OBJECT;
+
+public:
+    GenericProviderModule(std::string t) : type(t) {}
+
+    void setMessage(google::protobuf::Message* m) { msg = m; }
+    google::protobuf::Message* getMessage() { return msg; }
+    std::string getType() { return type; }
 
 signals:
     void newMessage(const google::protobuf::Message*);
 
+protected:
+    virtual void run_() = 0;
+    google::protobuf::Message* msg;
+    std::string type;
+};
+
+template<class T>
+class ProviderModule : public GenericProviderModule
+{
+public:
+    ProviderModule(std::string t) : GenericProviderModule(t) {}
+
+    portals::InPortal<T> input;
+
+protected:
+    virtual void run_()
+    {
+        input.latch();
+        msg->CopyFrom(input.message());
+        emit newMessage(msg);
+    }
+};
+
+// Base Class
+class UnlogBase : public portals::Module
+{
 public:
     // The path is expected to be a full path to the log file
     UnlogBase(std::string path, std::string type);
     virtual ~UnlogBase();
 
     std::string getType() { return typeName; }
-    void useGUI(bool on) { usingGUI = on; }
-
-    // The templated class needs to implement this!
-    virtual const google::protobuf::Message* getMessage() = 0;
+    virtual GenericProviderModule* makeMeAProvider() = 0;
 
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
@@ -71,12 +100,6 @@ protected:
     uint32_t readCharBuffer(char* buffer, uint32_t size)
         const throw (file_read_exception);
 
-    // For the inherited class to use the signal
-    void updateDisplay(const google::protobuf::Message* msg)
-    {
-        emit newMessage(msg);
-    }
-
     // Keeps track of whether the file is open/closed
     bool fileOpen;
     // Pointer to the file
@@ -86,7 +109,6 @@ protected:
     std::string typeName;
     // Keeps track of the sizes of all the reads we've done
     std::vector<uint32_t> messageSizes;
-    bool usingGUI;
 };
 
 // Template Class
@@ -101,13 +123,17 @@ public:
     // Where the output will be provided
     portals::OutPortal<T> output;
 
-    // Implementing the method required by the base class
-    const google::protobuf::Message* getMessage()
+    GenericProviderModule* makeMeAProvider()
     {
-        return output.getMessage(true).get();
+        ProviderModule<T>* gpm = new ProviderModule<T>(typeName);
+        // Have to actually initialize the generic message to correct type
+        gpm->setMessage(new T());
+        gpm->input.wireTo(&output);
+        return gpm;
     }
 
-    T readNextMessage() {
+    T readNextMessage()
+    {
         // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
@@ -170,8 +196,6 @@ protected:
         *msg.get() = readNextMessage();
 
         output.setMessage(msg);
-
-        if (usingGUI) updateDisplay(output.getMessage(true).get());
     }
 
     // Reads in the header; called when the file is first opened

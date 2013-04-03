@@ -22,8 +22,7 @@
 
 namespace tool{
 
-ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent),
-                                            viewTab(parent)
+ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
 {
     ADD_MAPPED_TYPE(AudioCommand);
     ADD_MAPPED_TYPE(BatteryState);
@@ -59,9 +58,10 @@ bool ToolDiagram::unlogFrom(std::string path)
     }
 
     unloggers.push_back(typeMap[head.name()](path));
+    providers.push_back((unloggers.back()->makeMeAProvider()));
     diagram.addModule(*unloggers.back());
+    diagram.addModule(*providers.back());
     unloggers.back()->run();
-    viewTab.addProtoViewer(unloggers.back());
     return true;
 }
 
@@ -75,5 +75,7 @@ void ToolDiagram::addUnloggers(std::vector<std::string> paths)
             std::cout << "Created Unlogger for file " <<  *i << std::endl;
         }
     }
+
+    emit signalNewProviders(providers);
 }
 }
