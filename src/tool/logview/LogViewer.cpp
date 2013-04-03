@@ -1,8 +1,7 @@
 #include "LogViewer.h"
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
 {
@@ -43,6 +42,5 @@ void LogViewer::addProtoViewers(std::vector<unlog::GenericProviderModule*>
     }
 }
 
-}
 }
 }

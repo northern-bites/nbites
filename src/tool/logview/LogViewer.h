@@ -17,8 +17,7 @@
 #include "ProtoViewer.h"
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 class LogViewer : public QMainWindow {
     Q_OBJECT;
@@ -33,6 +32,5 @@ private:
     std::vector<QDockWidget*> dockWidget;
 };
 
-}
 }
 }

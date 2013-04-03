@@ -34,7 +34,7 @@ protected:
     ToolDiagram diagram;
 
     DataSelector selector;
-    unlog::view::LogViewer logView;
+    logview::LogViewer logView;
 
     // GUI stuff
     QTabWidget* toolTabs;
