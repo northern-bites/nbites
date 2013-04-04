@@ -61,23 +61,11 @@ uint32_t UnlogBase::readCharBuffer(char* buffer, uint32_t size)
     return bytes;
 }
 
-// This is stupid copy-pasting
+// Overloaded for images
 uint32_t UnlogBase::readCharBuffer(unsigned char* buffer, uint32_t size)
     const throw (file_read_exception)
 {
-    // Make sure we're taking from an open file
-    if (!file) {
-        throw file_read_exception(file_read_exception::NOT_OPEN);
-    }
-
-    // Store how many bytes were read so that we can return it
-    uint32_t bytes = fread(buffer, sizeof(unsigned char), size, file);
-
-    if (ferror(file)) {
-        throw file_read_exception(file_read_exception::READ, ferror(file));
-    }
-
-    return bytes;
+    return readCharBuffer((char*)buffer, size);
 }
 
 template<>
@@ -140,6 +128,7 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage() {
 
     // To hold the data read, and the number of bytes read
     uint32_t bytes;
+    // TODO: write width and height instead of just size for images
     messages::YUVImage* img = new messages::YUVImage(currentSize/480, 480);
 
     try {
