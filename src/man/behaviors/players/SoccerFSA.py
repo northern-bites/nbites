@@ -38,7 +38,7 @@ class SoccerFSA(FSA.FSA):
         if self.currentState == 'gamePenalized' or \
                self.currentState == 'gameFinished':
             if not self.wroteVarianceData:
-                self.brain.sensors.writeVarianceData()
+                #self.brain.sensors.writeVarianceData()
                 self.wroteVarianceData = True
         else:
             self.wroteVarianceData = False

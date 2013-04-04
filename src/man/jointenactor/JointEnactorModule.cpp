@@ -265,8 +265,6 @@ namespace jointenactor{
 
     void JointEnactorModule::run_()
     {
-        std::cout << (motionEnabled_ ? "motion enabled" :
-                      "motion disabled") << std::endl;
         // Update stiffnesses.
         stiffnessInput_.latch();
         latestStiffness_ = stiffnessInput_.message();

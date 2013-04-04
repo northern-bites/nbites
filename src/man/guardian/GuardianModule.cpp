@@ -67,10 +67,10 @@ void GuardianModule::countButtonPushes()
     chestButtonInput.latch();
 
     chestButton->updateFrame(chestButtonInput.message().pressed());
-    leftFootButton->updateFrame(footBumperInput.message().l_foot_bumper_left().pressed() ||
-                                footBumperInput.message().l_foot_bumper_right().pressed());
-    rightFootButton->updateFrame(footBumperInput.message().r_foot_bumper_left().pressed() ||
-                                 footBumperInput.message().r_foot_bumper_right().pressed());
+    leftFootButton->updateFrame( footBumperInput.message().l_foot_bumper_left() .pressed() ||
+                                 footBumperInput.message().l_foot_bumper_right().pressed()   );
+    rightFootButton->updateFrame(footBumperInput.message().r_foot_bumper_left() .pressed() ||
+                                 footBumperInput.message().r_foot_bumper_right().pressed()   );
 }
 
 /**

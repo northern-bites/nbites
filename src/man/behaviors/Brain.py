@@ -15,6 +15,7 @@ from . import Leds
 #from . import robots
 from . import Ball
 from . import MyInfo
+from . import GameController
 
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
@@ -40,14 +41,14 @@ class Brain(object):
     Class brings all of our components together and runs the behaviors
     """
 
-    def __init__(self, teamAndPlayerNums):
+    def __init__(self, teamNum, playerNum):
         """
         Class constructor
         """
 
         # Parse arguments
-        self.playerNumber = teamAndPlayerNums[1]
-        self.teamNumber = teamAndPlayerNums[0]
+        self.playerNumber = playerNum
+        self.teamNumber = teamNum
         self.teamColor = Constants.teamColor.TEAM_BLUE
 
         self.counter = 0
@@ -58,8 +59,9 @@ class Brain(object):
         self.out = NaoOutput.NaoOutput(self)
         self.my = MyInfo.MyInfo()
 
-        #initalize the leds
+        #initalize the leds and game controller
         self.leds = Leds.Leds(self)
+        self.gameController = GameController.GameController(self)
 
         # Retrieve our robot identification and set per-robot parameters
         #self.CoA = robots.get_certificate()
@@ -127,6 +129,17 @@ class Brain(object):
         Main control loop called every TIME_STEP milliseconds
         """
 
+        # Check if any messages are null.
+        # self.out.printf("Check for null messages:")
+        # self.out.printf("ledCommand:    ")
+        # self.out.printf(self.interface.ledCommand)
+        # self.out.printf("gameState:     ")
+        # self.out.printf(self.interface.gameState)
+        # self.out.printf("filteredBall:  ")
+        # self.out.printf(self.interface.filteredBall)
+        # self.out.printf("motionCommand: ")
+        # self.out.printf(self.interface.motionCommand)
+
         # Order here is very important
         # Update Environment
         self.time = time.time()
@@ -136,9 +149,10 @@ class Brain(object):
         #self.updateObjects()
 
         # Behavior stuff
+        self.gameController.run()
         self.updatePlaybook()
         self.player.run()
-        self.tracker.run()
+        #self.tracker.run()
         #self.nav.run()
 
         #Set LED message
@@ -155,7 +169,7 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         pass
-        #self.ball.updateBallInfo(self.inMessages['filteredBall'])
+        #self.ball.updateBallInfo(self.interface.filteredBall)
         #self.yglp.setBest()
         #self.ygrp.setBest()
         #self.bglp.setBest()

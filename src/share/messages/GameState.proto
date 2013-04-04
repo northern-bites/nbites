@@ -7,7 +7,7 @@ message GameState
         optional uint32 kick_off_team = 3;
         optional uint32 secondary_state = 4;
         optional uint32 drop_in_team = 5;
-        optional uint32 drop_in_time = 6;
+        optional sint32 drop_in_time = 6 [default = -1];
         optional uint32 secs_remaining = 7 [default = 600];
 
         optional bool have_remote_gc = 8;

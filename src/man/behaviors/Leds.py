@@ -1,5 +1,13 @@
 from playbook import PBConstants
 import noggin_constants as NogginConstants
+import GameController
+
+############################ IMPORTANT ############################
+# DO NOT check any values directly from messages in this class.   #
+# Leds.run() is called once during Brain.init(), so messages will #
+# all be null. Instead, take values from brain.ball,              #
+# brain.gameController, etc.                                      #
+############################ IMPORTANT ############################
 
 NUM_LED_GROUPS = 31
 
@@ -7,10 +15,10 @@ NUM_LED_GROUPS = 31
 GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
-GOAL_LEDS = True
-PLAYBOOK_LEDS = True
+GOAL_LEDS = False
+PLAYBOOK_LEDS = False
 LOC_LEDS = False
-COMM_LEDS = True
+COMM_LEDS = False
 
 ####### LED DEFINITIONS #############
 LED_OFF = 0
@@ -181,7 +189,7 @@ class Leds():
             elif self.brain.ball.framesOff == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
-        if False:#GOAL_LEDS:
+        if GOAL_LEDS:
             newCertainty = self.brain.ygrp.vis.certainty
 
             if (newCertainty == vision.certainty.NOT_SURE):
@@ -294,7 +302,7 @@ class Leds():
             # TODO: show loc uncertainty via LEDS
             pass
 
-        if False:#COMM_LEDS:
+        if COMM_LEDS:
             newActiveMates = self.brain.activeTeamMates()
             if (newActiveMates != self.numActiveMates):
                 self.numActiveMates = newActiveMates
@@ -330,41 +338,37 @@ class Leds():
                     self.executeLeds(RIGHT_COMM_FIVE_OFF_LEDS)
 
         if GC_LEDS:
-            if True: #TODO: only run when gamestate has changed
-                gcState = self.brain.interface.gameState.state
-                if (gcState == 'gameInitial' or
-                    gcState == 'penaltyShotsGameInitial'):
-                    self.executeLeds(STATE_INITIAL_LEDS)
-                elif (gcState == 'gameReady' or
-                      gcState == 'penaltyShotsGameReady'):
-                    self.executeLeds(STATE_READY_LEDS)
-                elif (gcState == 'gameSet' or
-                      gcState == 'penaltyShotsGameSet'):
-                    self.executeLeds(STATE_SET_LEDS)
-                elif (gcState == 'gamePlaying' or
-                      gcState == 'penaltyShotsGamePlaying'):
-                    self.executeLeds(STATE_PLAYING_LEDS)
-                elif (gcState == 'gamePenalized' or
-                      gcState == 'penaltyShotsGamePenalized'):
+            if self.brain.gameController.stateChanged:
+                gcState = self.brain.gameController.currentState
+                if (self.brain.gameController.penalized):
                     self.executeLeds(STATE_PENALIZED_LEDS)
-                elif (gcState == 'gameFinished' or
-                      gcState == 'penaltyShotsGameFinished'):
+                elif (gcState == GameController.STATE_INITIAL):
+                    self.executeLeds(STATE_INITIAL_LEDS)
+                elif (gcState == GameController.STATE_READY):
+                    self.executeLeds(STATE_READY_LEDS)
+                elif (gcState == GameController.STATE_SET):
+                    self.executeLeds(STATE_SET_LEDS)
+                elif (gcState == GameController.STATE_PLAYING):
+                    self.executeLeds(STATE_PLAYING_LEDS)
+                elif (gcState == GameController.STATE_FINISHED):
                     self.executeLeds(STATE_FINISHED_LEDS)
 
 
         if FOOT_LEDS:
-            if self.kickoffChange:
-                if self.brain.interface.gameState.kick_off_team == self.brain.teamNumber:
+            if (self.brain.gameController.kickOffChanged
+                or self.brain.gameController.teamColorChanged):
+                # At starts of halves, either kickOffChanged or
+                # teamColorChanged will trigger but not both, and
+                # both LEDs should update.
+                if self.brain.gameController.ownKickOff:
                     self.executeLeds(HAVE_KICKOFF_LEDS)
                 else:
                     self.executeLeds(NO_KICKOFF_LEDS)
-                self.kickoffChange = False
-            if self.teamChange:
-                if self.brain.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+
+                if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                     self.executeLeds(TEAM_BLUE_LEDS)
                 else:
                     self.executeLeds(TEAM_RED_LEDS)
-                self.teamChange = False
 
     def executeLeds(self,listOfLeds):
         for ledTuple in listOfLeds:

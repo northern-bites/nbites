@@ -15,6 +15,7 @@ extern "C" void initLedCommand_proto();
 extern "C" void initGameState_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initBallModel_proto();
+extern "C" void initPMotion_proto();
 extern "C" void initinterface();
 
 
@@ -78,6 +79,7 @@ void BehaviorsModule::initializePython()
         initGameState_proto();
         initWorldModel_proto();
         initBallModel_proto();
+        initPMotion_proto();
 		// Init the interface as well
 		initinterface();
     } catch (error_already_set) {

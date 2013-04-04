@@ -240,8 +240,18 @@ void SensorsModule::updateFootbumperMessage()
 {
     portals::Message<messages::FootBumperState> footbumperMessage(0);
 
-    footbumperMessage.get()->mutable_l_foot_bumper_left()->set_pressed(
-        sensorValues_[LFootBumperLeft] > 0.5f ? true : false
+    footbumperMessage.get()->mutable_l_foot_bumper_left() ->set_pressed(
+        sensorValues_[LFootBumperLeft]  > 0.5f ? true : false
+        );
+    footbumperMessage.get()->mutable_l_foot_bumper_right()->set_pressed(
+        sensorValues_[LFootBumperRight] > 0.5f ? true : false
+        );
+
+    footbumperMessage.get()->mutable_r_foot_bumper_left() ->set_pressed(
+        sensorValues_[RFootBumperLeft]  > 0.5f ? true : false
+        );
+    footbumperMessage.get()->mutable_r_foot_bumper_right()->set_pressed(
+        sensorValues_[RFootBumperRight] > 0.5f ? true : false
         );
 
     footbumperOutput_.setMessage(footbumperMessage);

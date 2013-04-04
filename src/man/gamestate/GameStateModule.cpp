@@ -134,7 +134,11 @@ void GameStateModule::reset()
 }
 void GameStateModule::switchTeam()
 {
+    // Switch the order of the TeamInfo messages' indicies
+    // Set the new blue team to blue, and the new red team to red
     latest_data.mutable_team()->SwapElements(0,1);
+    latest_data.mutable_team(TEAM_BLUE)->set_team_color(TEAM_BLUE);
+    latest_data.mutable_team(TEAM_RED)->set_team_color(TEAM_RED);
 }
 void GameStateModule::switchKickOff()
 {

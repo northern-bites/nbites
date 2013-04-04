@@ -18,6 +18,8 @@ namespace motion
           nullBodyProvider(),
           curProvider(&nullBodyProvider),
           nextProvider(&nullBodyProvider),
+          curHeadProvider(&nullHeadProvider),
+          nextHeadProvider(&nullHeadProvider),
           nextJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
           nextStiffnesses(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
           lastJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
@@ -64,9 +66,9 @@ namespace motion
 
         newInputJoints = false;
 
-        std::cout << "MotionModule: Using "
-                  << curProvider->getName()
-                  << std::endl;
+        //std::cout << "MotionModule: Using "
+        //          << curProvider->getName()
+        //          << std::endl;
 
         // (2) If motion is enabled, perform a single iteration
         //     of the main motion loop.
@@ -82,9 +84,9 @@ namespace motion
             processStiffness();
             bool active = postProcess();
 
-            std::cout << "motion active? "
-                      << (active ? "yes" : "no")
-                      << std::endl;
+            //std::cout << "motion active? "
+            //          << (active ? "yes" : "no")
+            //          << std::endl;
 
             // (4) Send newly computed joints and stiffnesses to
             //     the joint enactor module.
@@ -248,6 +250,20 @@ namespace motion
         }
     }
 
+// written as a stopgap measure by Josh Z 4/3/2013
+void MotionModule::processHeadJoints()
+{
+    using namespace Kinematics;
+
+    if (curHeadProvider->isActive())
+    {
+        const std::vector<float> headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
+
+        nextJoints[HEAD_YAW]   = boundHeadYaw(headJoints.at(0),headJoints.at(1));
+        nextJoints[HEAD_PITCH] = headJoints.at(1);
+    }
+}
+
     void MotionModule::processMotionInput()
     {
         if(motionCommand.processed_by_motion())
@@ -283,23 +299,36 @@ namespace motion
         //determine the curProvider, and do any necessary swapping
         if (curProvider != nextProvider)
         {
-            std::cout << "MotionModule ("
-                      << getFrameCount()
-                      << "): Current provider: "
-                      << curProvider->getName()
-                      << " next provider: "
-                      << nextProvider->getName() << std::endl;
             if (!curProvider->isStopping()) {
-                std::cout << "requesting stop" << std::endl;
                 curProvider->requestStop();
             }
 
             if (!curProvider->isActive()) {
-                std::cout << "swapping" << std::endl;
                 swapBodyProvider();
             }
         }
     }
+
+// written as stopgap measure by Josh Z 4/3/2013
+void MotionModule::preProcessHead()
+{
+    if (curHeadProvider != &nullHeadProvider &&
+        nextHeadProvider == &nullHeadProvider)
+    {
+        headProvider.hardReset();
+    }
+
+    //determine the curHeadProvider, and do any necessary swapping
+    if (curHeadProvider != nextHeadProvider)
+    {
+        if (!curHeadProvider->isStopping()) {
+            curHeadProvider->requestStop();
+        }
+        if (!curHeadProvider->isActive()) {
+            swapHeadProvider();
+        }
+    }
+}
 
     void MotionModule::clipHeadJoints(std::vector<float>& joints)
     {
@@ -437,6 +466,18 @@ namespace motion
             curProvider = nextProvider;
         }
     }
+
+// written as stopgap measure by Josh Z 4/3/2013
+void MotionModule::swapHeadProvider()
+{
+    switch(nextHeadProvider->getType())
+    {
+    case HEAD_PROVIDER:
+    case NULL_PROVIDER:
+    default:
+        curHeadProvider = nextHeadProvider;
+    }
+}
 
     const std::vector<float> MotionModule::getNextStiffness() const
     {

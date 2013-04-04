@@ -53,13 +53,13 @@ class GoTeam:
 
     def run(self, play):
         """We run this each frame to get the latest info"""
-        if self.brain.gameController.currentState != 'gamePenalized':
+        if self.brain.interface.gameState.state != 'gamePenalized':
             self.aPrioriTeammateUpdate()
 
-        if self.brain.gameController.currentState == 'gameReady':
+        if self.brain.interface.gameState.state == 'gameReady':
             # Change which wing is forward based on the opponents score
-            g = self.brain.gameController
-            self.kickoffFormation = g.getScoreDifferential()%2
+            # TODO: implement this
+            pass
 
         play.changed = False
         self.strategize(play)
@@ -72,7 +72,7 @@ class GoTeam:
         creates a play, picks the strategy to run, returns the play after
         it is modified by Strategies
         """
-        currentGCState = self.brain.gameController.currentState
+        currentGCState = self.brain.interface.gameState.state
         # We don't control anything in initial or finished
         if (currentGCState == 'gameInitial' or
             currentGCState == 'gameFinished'):
@@ -425,8 +425,8 @@ class GoTeam:
         #if self.numActiveFieldPlayers == 0:
             #return False
 
-        if self.brain.gameController.currentState == 'gameReady' or\
-                self.brain.gameController.currentState =='gameSet':
+        if self.brain.interface.gameState.state == 'gameReady' or\
+                self.brain.interface.gameState.state =='gameSet':
             return False
 
         for mate in self.brain.teamMembers:
@@ -437,8 +437,10 @@ class GoTeam:
         return True
 
     def useKickoffFormation(self):
-        if (self.brain.gameController.timeSincePlay() < \
-            PBConstants.KICKOFF_FORMATION_TIME):
+        #TODO: implement this
+        if (True):
+            #self.brain.interface.gameState.time_since_kickoff < \
+            #PBConstants.KICKOFF_FORMATION_TIME):
             return True
         else:
             return False
