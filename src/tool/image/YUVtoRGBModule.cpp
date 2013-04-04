@@ -1,4 +1,5 @@
 #include "YUVtoRGBModule.h"
+#include <iostream>
 
 rgbvalue convertPixel(byte y, byte u, byte v)
 {
@@ -35,9 +36,9 @@ RGBImage* YUVtoRGBModule::convert(messages::YUVImage in)
     RGBImage* out = new RGBImage(yuvIn.message().width()/2,
                                 yuvIn.message().height());
 
-    for(int i = 0; i < in.width(); i++)
+    for(int i = 0; i < out->width(); i++)
     {
-        for (int j = 0; j < in.height(); j++)
+        for (int j = 0; j < out->height(); j++)
         {
             out->putPixel(i, j, convertPixel(y.getPixel(i, j),
                                              u.getPixel(i/2, j),
