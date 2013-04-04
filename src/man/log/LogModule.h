@@ -243,6 +243,9 @@ protected:
 template<>
 void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage);
 
+template<>
+void LogModule<messages::YUVImage>::writeHeader();
+
 // Lets us provide a name string for YUV image
 template<>
 std::string LogModule<messages::YUVImage>::nameHelper();

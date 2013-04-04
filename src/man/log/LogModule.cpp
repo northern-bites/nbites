@@ -128,6 +128,36 @@ void LogBase::checkWrites()
 }
 
 template<>
+void LogModule<messages::YUVImage>::writeHeader()
+{
+    Header head;
+    head.set_name(nameHelper());
+    head.set_version(CURRENT_VERSION);
+    head.set_timestamp(42);
+
+    if(getIdFromPath(fileName) == "top")
+    {
+        head.set_top_camera(true);
+    }
+    else if(getIdFromPath(fileName) == "bottom")
+    {
+        head.set_top_camera(false);
+    }
+    else
+    {
+        std::cout << "Warning: Unexpected camera type specified by file name."
+                  << std::endl;
+    }
+
+    std::string buf;
+    head.SerializeToString(&buf);
+    writeValue<uint32_t>(buf.length());
+    writeCharBuffer(buf.data(), buf.length());
+
+    std::cout << "Writing header to " << fileName << std::endl;
+}
+
+template<>
 void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage msg)
 {
     ongoing.push_back(Write());

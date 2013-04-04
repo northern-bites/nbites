@@ -63,7 +63,17 @@ bool ToolDiagram::unlogFrom(std::string path)
     if(head.name() == "messages.YUVImage")
     {
         converters.push_back(new image::YUVtoRGBModule());
-        connectToUnlogger<messages::YUVImage>(converters.back()->yuvIn);
+        if(head.has_top_camera() && head.top_camera())
+        {
+            connectToUnlogger<messages::YUVImage>(converters.back()->yuvIn,
+                                                  "top");
+        }
+        else
+        {
+            connectToUnlogger<messages::YUVImage>(converters.back()->yuvIn,
+                                                  "bottom");
+        }
+
         diagram.addModule(*converters.back());
     }
     else
@@ -77,19 +87,23 @@ bool ToolDiagram::unlogFrom(std::string path)
 }
 
 template<>
-void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input)
+void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input, std::string name)
 {
     for (std::vector<unlog::UnlogBase*>::iterator i = unloggers.begin();
          i != unloggers.end(); i++)
     {
         if((*i)->getType() == "messages.YUVImage")
         {
-            unlog::UnlogModule<messages::YUVImage>* u =
-                dynamic_cast<unlog::UnlogModule<messages::YUVImage>*>(*i);
-            input.wireTo(&u->output);
-            std::cout << "Connected successfully to image unlogger!" <<
-                std::endl;
-            return;
+            if(name == getIdFromPath((*i)->getFilePath()) || name == "none")
+            {
+                unlog::UnlogModule<messages::YUVImage>* u =
+                    dynamic_cast<unlog::UnlogModule<messages::YUVImage>*>(*i);
+                input.wireTo(&u->output);
+                std::cout << "Connected " << name << " camera input to "
+                          << getIdFromPath((*i)->getFilePath())
+                          << " camera unlogger." << std::endl;
+                return;
+            }
         }
     }
 

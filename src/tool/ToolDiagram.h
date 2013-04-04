@@ -36,7 +36,8 @@ public:
     bool unlogFrom(std::string path);
 
     template<class T>
-    void connectToUnlogger(portals::InPortal<T>& input)
+    void connectToUnlogger(portals::InPortal<T>& input,
+                           std::string path = "none")
     {
         T test;
         for (std::vector<unlog::UnlogBase*>::iterator i = unloggers.begin();
@@ -89,6 +90,7 @@ protected:
 };
 
 template<>
-void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input);
+void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input,
+                                    std::string path);
 
 }

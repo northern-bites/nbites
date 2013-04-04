@@ -94,6 +94,7 @@ public:
     virtual ~UnlogBase();
 
     std::string getType() { return typeName; }
+    std::string getFilePath() { return fileName; }
     virtual GenericProviderModule* makeCorrespondingProvider() = 0;
 
     // Reads the next sizeof(T) bytes and interprets them as a T

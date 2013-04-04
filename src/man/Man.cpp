@@ -88,8 +88,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     topConverter   .imageIn.wireTo(&   topTranscriber.imageOut);
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
+
+#ifdef LOG_IMAGES
     cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
-                                            "im");
+                                            "top");
+    cognitionThread.log<messages::YUVImage>(&bottomTranscriber.imageOut,
+                                            "bottom");
+#endif
 
     cognitionThread.addModule(vision);
     vision.topThrImage.wireTo(&topConverter.thrImage);
@@ -102,7 +107,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	vision.botUImage.wireTo(&bottomConverter.uImage);
 	vision.botVImage.wireTo(&bottomConverter.vImage);
 
-    
 	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
