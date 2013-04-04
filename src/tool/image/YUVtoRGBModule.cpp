@@ -3,15 +3,11 @@
 
 rgbvalue convertPixel(byte y, byte u, byte v)
 {
-    byte r = y + 1.13983f * v;
-    byte g = y - 0.39465f * u - 0.58060f * v;
-    byte b = y + 2.03211f * u;
-
     rgbvalue result;
     ((byte*) &result)[3] = 0xFF;
-    ((byte*) &result)[2] = r;
-    ((byte*) &result)[1] = g;
-    ((byte*) &result)[0] = b;
+    ((byte*) &result)[2] = y + 1.13983f * v;
+    ((byte*) &result)[1] = y - 0.39465f * u - 0.58060f * v;
+    ((byte*) &result)[0] = y + 2.03211f * u;
     return result;
 }
 

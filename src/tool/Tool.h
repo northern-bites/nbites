@@ -10,6 +10,9 @@
 #include <QToolBar>
 #include <QScrollArea>
 #include <QResizeEvent>
+#include <QPixmap>
+#include <QImage>
+#include <QLabel>
 
 #include "ToolDiagram.h"
 #include "DataSelector.h"
@@ -40,6 +43,9 @@ protected:
     DataSelector selector;
     logview::LogViewer logView;
     YUVtoRGBModule convert;
+
+    QPixmap pm;
+    QLabel label;
 
     // GUI stuff
     QTabWidget* toolTabs;

@@ -77,6 +77,15 @@ Tool::~Tool() {
 void Tool::setUpModules()
 {
     diagram.connectToUnlogger<messages::YUVImage>(convert.yuvIn);
+    diagram.run();
+    unsigned int * start = convert.rgbOut.getMessage(true).get()->pixelAddress(0, 0);
+    QImage temp = QImage((unsigned char*) start,
+                         convert.rgbOut.getMessage(true).get()->width(),
+                         convert.rgbOut.getMessage(true).get()->height(),
+                         QImage::Format_ARGB32);
+    pm = QPixmap::fromImage(temp);
+    label.setPixmap(pm);
+    toolTabs->addTab(&label, tr("Image..."));
 }
 
 // Keyboard control
