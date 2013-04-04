@@ -81,46 +81,16 @@ uint32_t UnlogBase::readCharBuffer(unsigned char* buffer, uint32_t size)
 }
 
 template<>
-void UnlogModule<messages::YUVImage>::run_()
-{
-    // Makes sure the file is available to read
-    if (!file)
-    {
-        openFile();
-    }
-
-    // Reads the next message from the file and puts it on
-    // the OutPortal
-    portals::Message<messages::YUVImage> msg(0);
-
-    //switch the read direction based on a static bool
-    if (readDir()){
-        // Reads the next message from the file and puts it on
-        // the OutPortal
-
-        *msg.get() = readNextMessage();
-        output.setMessage(msg);
-    } else {
-        // Reads the previous message from the file and puts it on
-        // the OutPortal
-        *msg.get() = readPrevMessage();
-        output.setMessage(msg);
-    }
-}
-
-
-template<>
 messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
 {
+    // Can return this if we are at the end--avoid returning null image
+    const messages::YUVImage* current = output.getMessage(true).get();
+
     // End of file
     if (feof(file))
     {
         std::cout << "End of log file " << fileName << std::endl;
-        return *output.getMessage(true).get();
-    }
-
-    if (ftell(file)==0) {
-        readHeader();
+        return *current;
     }
 
     // Read in the next message's size
@@ -140,7 +110,7 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
         bytes = readCharBuffer(img->pixelAddress(0, 0), currentSize);
     } catch (std::exception& read_exception) {
         std::cout << read_exception.what() << std::endl;
-        return *output.getMessage(true).get();
+        return *current;
     }
 
     if (bytes) {
@@ -149,27 +119,24 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
 
     // We read zero bytes at the end of a file w/o hitting feof
     std::cout << "End of log file " << fileName << std::endl;
-    return *output.getMessage(true).get();
+    return *current;
 }
 
 //inverses the above message, with a few minor differences
 template<>
 messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage() {
-    if (ftell(file)==0) {
+    // Can return this if we are at the beginning--won't return null image
+    const messages::YUVImage* current = output.getMessage(true).get();
+
+    if (ftell(file) < current->width()*current->height()*2)
+    {
         std::cout << "Beginning of log file " << fileName << std::endl;
-        return *output.getMessage(true).get();
+        return *current;
     }
 
     //we've been storing the message sizes to use right now
     uint32_t currentSize = messageSizes.back();
     messageSizes.pop_back();
-
-    if (currentSize < 640*480*2)
-    {
-        fseek(file, -1*(currentSize+sizeof(int)), SEEK_CUR);
-        std::cout << "Beginning of log file " << fileName << std::endl;
-        return *output.getMessage(true).get();
-    }
 
     // To hold the data read, and the number of bytes read
     uint32_t bytes;
@@ -186,7 +153,7 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage() {
         fseek(file, -1*(currentSize+sizeof(int)), SEEK_CUR);
     } catch (std::exception& read_exception) {
         std::cout << read_exception.what() << std::endl;
-        return *output.getMessage(true).get();
+        return *current;
     }
 
     if (bytes) {
@@ -195,7 +162,7 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage() {
 
     // We read zero bytes at the end of a file w/o hitting feof
     std::cout << "Beginning of log file " << fileName << std::endl;
-    return *output.getMessage(true).get();
+    return *current;
 }
 
 template<>

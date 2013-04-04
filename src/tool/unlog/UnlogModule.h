@@ -245,9 +245,6 @@ protected:
 };
 
 template<>
-void UnlogModule<messages::YUVImage>::run_();
-
-template<>
 messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage();
 
 template<>
