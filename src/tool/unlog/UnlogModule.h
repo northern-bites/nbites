@@ -89,8 +89,10 @@ public:
         return value;
     }
 
-	bool readDir;
-
+    bool& readDir() {
+		static bool readDir = 1;
+		return readDir;
+	}
 
     // Basic file control
     void openFile() throw (file_exception);
@@ -210,7 +212,7 @@ protected:
 		portals::Message<T> msg(0);
 
         //switch the read direction based on a static bool
-		if (1){
+		if (readDir()){
 			// Reads the next message from the file and puts it on
 			// the OutPortal
 			*msg.get() = readNextMessage();
