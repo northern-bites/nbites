@@ -17,7 +17,6 @@
 #include "ToolDiagram.h"
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
-#include "image/YUVtoRGBModule.h"
 
 namespace tool {
 
@@ -42,10 +41,6 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
-    YUVtoRGBModule convert;
-
-    QPixmap pm;
-    QLabel label;
 
     // GUI stuff
     QTabWidget* toolTabs;

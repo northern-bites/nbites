@@ -1,6 +1,9 @@
 #include "YUVtoRGBModule.h"
 #include <iostream>
 
+namespace tool {
+namespace image {
+
 rgbvalue convertPixel(byte y, byte u, byte v)
 {
     rgbvalue result;
@@ -43,4 +46,7 @@ RGBImage* YUVtoRGBModule::convert(messages::YUVImage in)
     }
 
     return out;
+}
+
+}
 }

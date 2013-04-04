@@ -27,9 +27,6 @@ public:
 
 public slots:
     void addProtoViewers(std::vector<unlog::GenericProviderModule*>);
-
-private:
-    std::vector<QDockWidget*> dockWidget;
 };
 
 }

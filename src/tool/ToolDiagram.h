@@ -2,6 +2,7 @@
 
 #include <QWidget>
 #include "unlog/UnlogModule.h"
+#include "image/YUVtoRGBModule.h"
 #include "Header.pb.h"
 #include <iostream>
 
@@ -75,6 +76,7 @@ protected:
     portals::RoboGram diagram;
     std::vector<unlog::UnlogBase*> unloggers;
     std::vector<unlog::GenericProviderModule*> providers;
+    std::vector<image::YUVtoRGBModule*> converters;
 
     TypeMap typeMap;
 };

@@ -15,7 +15,6 @@ Tool::Tool(const char* title) :
     diagram(),
     selector(),
     logView(this),
-    convert(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -43,8 +42,6 @@ Tool::Tool(const char* title) :
             &logView, SLOT(addProtoViewers(std::vector<unlog::GenericProviderModule*>)));
     connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
             this, SLOT(setUpModules()));
-
-    diagram.addModule(convert);
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
@@ -83,16 +80,7 @@ Tool::~Tool() {
 
 void Tool::setUpModules()
 {
-    diagram.connectToUnlogger<messages::YUVImage>(convert.yuvIn);
-    diagram.run();
-    unsigned int * start = convert.rgbOut.getMessage(true).get()->pixelAddress(0, 0);
-    QImage temp = QImage((unsigned char*) start,
-                         convert.rgbOut.getMessage(true).get()->width(),
-                         convert.rgbOut.getMessage(true).get()->height(),
-                         QImage::Format_ARGB32);
-    pm = QPixmap::fromImage(temp);
-    label.setPixmap(pm);
-    toolTabs->addTab(&label, tr("Image..."));
+    // Use this to connect all modules when new dataset happens!
 }
 
 // Keyboard control

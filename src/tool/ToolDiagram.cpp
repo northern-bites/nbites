@@ -60,9 +60,19 @@ bool ToolDiagram::unlogFrom(std::string path)
     }
 
     unloggers.push_back(typeMap[head.name()](path));
-    providers.push_back((unloggers.back()->makeCorrespondingProvider()));
+    if(head.name() == "messages.YUVImage")
+    {
+        converters.push_back(new image::YUVtoRGBModule());
+        connectToUnlogger<messages::YUVImage>(converters.back()->yuvIn);
+        diagram.addModule(*converters.back());
+    }
+    else
+    {
+        providers.push_back((unloggers.back()->makeCorrespondingProvider()));
+        diagram.addModule(*providers.back());
+
+    }
     diagram.addModule(*unloggers.back());
-    diagram.addModule(*providers.back());
     unloggers.back()->run();
     return true;
 }

@@ -7,6 +7,9 @@ typedef unsigned char byte;
 typedef unsigned int rgbvalue;
 typedef messages::PackedImage<rgbvalue> RGBImage;
 
+namespace tool {
+namespace image {
+
 class YUVtoRGBModule : public portals::Module
 {
 public:
@@ -20,3 +23,6 @@ protected:
 
     RGBImage* convert(messages::YUVImage);
 };
+
+}
+}
