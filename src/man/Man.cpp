@@ -91,11 +91,20 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
                                             "im");
 
-    //cognitionThread.addModule(vision);
-    // vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-    // vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
-    // vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-    // vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+    cognitionThread.addModule(vision);
+    vision.topThrImage.wireTo(&topConverter.thrImage);
+	vision.topYImage.wireTo(&topConverter.yImage);
+	vision.topUImage.wireTo(&topConverter.uImage);
+	vision.topVImage.wireTo(&topConverter.vImage);
+
+	vision.botThrImage.wireTo(&bottomConverter.thrImage);
+	vision.botYImage.wireTo(&bottomConverter.yImage);
+	vision.botUImage.wireTo(&bottomConverter.uImage);
+	vision.botVImage.wireTo(&bottomConverter.vImage);
+
+    
+	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+    vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
     //cognitionThread.addModule(ballTrack);
     cognitionThread.addModule(leds);
