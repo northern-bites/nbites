@@ -87,6 +87,9 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
     if (feof(file))
     {
         std::cout << "End of log file " << fileName << std::endl;
+        // This returning a blank image causes an assertion to fail
+        // in other classes at end/beginning of log files.
+        // FIXME
         return messages::YUVImage();
     }
 
@@ -111,12 +114,50 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
     }
 
     if (bytes) {
-        std::cout << "A random pixel is: " << img->getPixel(30, 30) << std::endl;
         return *img;
     }
 
     // We read zero bytes at the end of a file w/o hitting feof
     std::cout << "End of log file " << fileName << std::endl;
+    return *img;
+}
+
+//inverses the above message, with a few minor differences
+template<>
+messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage() {
+    if (ftell(file)==0) {
+        std::cout << "Beginning of log file " << fileName << std::endl;
+        return messages::YUVImage();
+    }
+
+    //we've been storing the message sizes to use right now
+    uint32_t currentSize = messageSizes.back();
+    messageSizes.pop_back();
+
+    // To hold the data read, and the number of bytes read
+    uint32_t bytes;
+    messages::YUVImage* img = new messages::YUVImage(currentSize/480, 480);
+
+    try {
+        // Actual file reading call
+        //set the file pointer BACK currentMessageSize bits
+        fseek(file, -1*currentSize, SEEK_CUR);
+        //then read forward
+        bytes = readCharBuffer(img->pixelAddress(0, 0), currentSize);
+        //then set it back again, so it appears that we read backwards
+        //plus rewind four bites to get past the thing that says the size of the frame
+        fseek(file, -1*(currentSize+sizeof(int)), SEEK_CUR);
+    } catch (std::exception& read_exception) {
+        std::cout << read_exception.what() << std::endl;
+        return messages::YUVImage();
+    }
+
+    if (bytes) {
+        return *img;
+    }
+
+    // We read zero bytes at the end of a file w/o hitting feof
+    std::cout << "Beginning of log file " << fileName << std::endl;
     return *img;
 }
 

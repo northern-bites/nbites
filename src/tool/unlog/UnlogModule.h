@@ -308,6 +308,9 @@ template<>
 messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage();
 
 template<>
+messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage();
+
+template<>
 UnlogModule<messages::YUVImage>::UnlogModule(std::string path);
 
 template<>
