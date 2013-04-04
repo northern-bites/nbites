@@ -38,17 +38,6 @@ Tool::Tool(const char* title) :
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
 
-    connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
-            &logView, SLOT(addProtoViewers(std::vector<unlog::GenericProviderModule*>)));
-    connect(&diagram, SIGNAL(signalNewImageProviders(std::vector<image::YUVtoRGBModule*>)),
-            &logView, SLOT(addImageViewers(std::vector<image::YUVtoRGBModule*>)));
-
-    connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
-            this, SLOT(setUpModules()));
-
-    connect(&logView, SIGNAL(newDisplayModule(image::ImageDisplayQModule*)),
-            &diagram, SLOT(addDisplayModule(image::ImageDisplayQModule*)));
-
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);

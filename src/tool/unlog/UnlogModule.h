@@ -34,57 +34,6 @@ n * the contents of that file into a protobuf of its template type. It is
 namespace tool {
 namespace unlog {
 
-class GenericProviderModule : public QObject, public portals::Module
-{
-    Q_OBJECT;
-
-public:
-    GenericProviderModule(std::string t) : type(t) {}
-
-    void setMessage(google::protobuf::Message* m) { msg = m; }
-    google::protobuf::Message* getMessage() { return msg; }
-    std::string getType() { return type; }
-
-signals:
-    void newMessage(const google::protobuf::Message*);
-
-protected:
-    virtual void run_() = 0;
-    google::protobuf::Message* msg;
-    std::string type;
-};
-
-class ImageProviderModule : public GenericProviderModule
-{
-public:
-    ImageProviderModule(std::string t) : GenericProviderModule(t) {}
-
-    portals::InPortal<messages::YUVImage> input;
-
-protected:
-    virtual void run_()
-    {
-        input.latch();
-    }
-};
-
-template<class T>
-class ProviderModule : public GenericProviderModule
-{
-public:
-    ProviderModule(std::string t) : GenericProviderModule(t) {}
-
-    portals::InPortal<T> input;
-
-protected:
-    virtual void run_()
-    {
-        input.latch();
-        msg->CopyFrom(input.message());
-        emit newMessage(msg);
-    }
-};
-
 // Base Class
 class UnlogBase : public portals::Module
 {
@@ -95,7 +44,6 @@ public:
 
     std::string getType() { return typeName; }
     std::string getFilePath() { return fileName; }
-    virtual GenericProviderModule* makeCorrespondingProvider() = 0;
 
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
@@ -144,15 +92,6 @@ public:
 
     // Where the output will be provided
     portals::OutPortal<T> output;
-
-    GenericProviderModule* makeCorrespondingProvider()
-    {
-        ProviderModule<T>* gpm = new ProviderModule<T>(typeName);
-        // Have to actually initialize the generic message to correct type
-        gpm->setMessage(new T());
-        gpm->input.wireTo(&output);
-        return gpm;
-    }
 
     T readNextMessage()
     {
@@ -313,9 +252,6 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage();
 
 template<>
 UnlogModule<messages::YUVImage>::UnlogModule(std::string path);
-
-template<>
-GenericProviderModule* UnlogModule<messages::YUVImage>::makeCorrespondingProvider();
 
 }
 }

@@ -168,11 +168,5 @@ UnlogModule<messages::YUVImage>::UnlogModule(std::string path) :
 {
 }
 
-template<>
-GenericProviderModule* UnlogModule<messages::YUVImage>::makeCorrespondingProvider()
-{
-    return new ImageProviderModule("messages.YUVImage");
-}
-
 }
 }

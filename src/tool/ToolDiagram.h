@@ -2,8 +2,6 @@
 
 #include <QWidget>
 #include "unlog/UnlogModule.h"
-#include "image/YUVtoRGBModule.h"
-#include "image/ImageDisplayQModule.h"
 #include "Header.pb.h"
 #include <iostream>
 
@@ -59,14 +57,9 @@ public:
                   << std::endl;
     }
 
-signals:
-    void signalNewProviders(std::vector<unlog::GenericProviderModule*>);
-    void signalNewImageProviders(std::vector<image::YUVtoRGBModule*>);
-
 public slots:
     void run() { diagram.run(); }
     void addUnloggers(std::vector<std::string> paths);
-    void addDisplayModule(image::ImageDisplayQModule*);
 
     // Change whether we are parsing backwareds or forward in unloggers
 	void setBackDir()
@@ -83,8 +76,6 @@ public slots:
 protected:
     portals::RoboGram diagram;
     std::vector<unlog::UnlogBase*> unloggers;
-    std::vector<unlog::GenericProviderModule*> providers;
-    std::vector<image::YUVtoRGBModule*> converters;
 
     TypeMap typeMap;
 };

@@ -62,27 +62,17 @@ bool ToolDiagram::unlogFrom(std::string path)
     unloggers.push_back(typeMap[head.name()](path));
     if(head.name() == "messages.YUVImage")
     {
-        converters.push_back(new image::YUVtoRGBModule());
         if(head.has_top_camera() && head.top_camera())
         {
-            connectToUnlogger<messages::YUVImage>(converters.back()->yuvIn,
-                                                  "top");
         }
         else
         {
-            connectToUnlogger<messages::YUVImage>(converters.back()->yuvIn,
-                                                  "bottom");
         }
-
-        diagram.addModule(*converters.back());
     }
     else
     {
-        providers.push_back((unloggers.back()->makeCorrespondingProvider()));
-        diagram.addModule(*providers.back());
     }
     diagram.addModule(*unloggers.back());
-    unloggers.back()->run();
     return true;
 }
 
@@ -121,14 +111,6 @@ void ToolDiagram::addUnloggers(std::vector<std::string> paths)
             std::cout << "Created Unlogger for file " <<  *i << std::endl;
         }
     }
-
-    emit signalNewProviders(providers);
-    emit signalNewImageProviders(converters);
-}
-
-void ToolDiagram::addDisplayModule(image::ImageDisplayQModule* mod)
-{
-    diagram.addModule(*mod);
 }
 
 }
