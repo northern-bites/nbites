@@ -104,6 +104,11 @@ public:
         return value;
     }
 
+    static bool& readDir() {
+		static bool readDir = 1;
+		return readDir;
+	}
+
     // Basic file control
     void openFile() throw (file_exception);
     void closeFile();
@@ -150,7 +155,7 @@ public:
 
     T readNextMessage()
     {
-        // End of file
+       // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
             return T();
@@ -195,6 +200,49 @@ public:
         return currentMessage;
     }
 
+	//inverses the above message, with a few minor differences
+	T readPrevMessage() {
+        if (ftell(file)==0) {
+            std::cout << "Beginning of log file " << fileName << std::endl;
+            return T();
+        }
+
+		//we've been storing the message sizes to use right now
+		uint32_t currentMessageSize = messageSizes.back();
+		messageSizes.pop_back();
+
+       // To hold the data read, and the number of bytes read
+        uint32_t bytes;
+        char buffer[currentMessageSize];
+
+        try {
+            // Actual file reading call
+			//set the file pointer BACK currentMessageSize bits
+			fseek(file, -1*currentMessageSize, SEEK_CUR);
+			//then read forward
+            bytes = readCharBuffer(buffer, currentMessageSize);
+			//then set it back again, so it appears that we read backwards
+			//plus rewind four bites to get past the thing that says the size of the frame
+			fseek(file, -1*(currentMessageSize+sizeof(int)), SEEK_CUR);
+        } catch (std::exception& read_exception) {
+            std::cout << read_exception.what() << std::endl;
+            return T();
+        }
+
+        // If we have actually read some bytes, treat them like a message
+        T currentMessage;
+
+        if (bytes) {
+            // Parse into the message
+            currentMessage.ParseFromString(std::string(buffer, bytes));
+            return currentMessage;
+        }
+
+        // We read zero bytes at the end of a file w/o hitting feof
+        std::cout << "Beginning of log file " << fileName << std::endl;
+        return currentMessage;
+	}
+
 protected:
     // Implements the Module run_ method
     void run_()
@@ -208,9 +256,20 @@ protected:
 
         // Reads the next message from the file and puts it on
         // the OutPortal
-        portals::Message<T> msg(0);
-        *msg.get() = readNextMessage();
+		portals::Message<T> msg(0);
 
+        //switch the read direction based on a static bool
+		if (readDir()){
+			// Reads the next message from the file and puts it on
+			// the OutPortal
+			*msg.get() = readNextMessage();
+			output.setMessage(msg);
+		} else {
+			// Reads the previous message from the file and puts it on
+			// the OutPortal
+			*msg.get() = readPrevMessage();
+			output.setMessage(msg);
+		}
         output.setMessage(msg);
     }
 
