@@ -54,11 +54,11 @@ public slots:
     void run() { diagram.run(); }
     void addUnloggers(std::vector<std::string> paths);
 	void setBackDir() {
-		if(!unlog::UnlogBase::readDir())
+		if(unlog::UnlogBase::readDir())
 		   unlog::UnlogBase::readDir()=0;
 	}
 	void setForwardDir() {
-		if(unlog::UnlogBase::readDir())
+		if(!unlog::UnlogBase::readDir())
 		   unlog::UnlogBase::readDir()=1;
 	}
 
