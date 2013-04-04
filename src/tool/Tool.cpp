@@ -15,6 +15,7 @@ Tool::Tool(const char* title) :
     diagram(),
     selector(),
     logView(this),
+    convert(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -33,6 +34,10 @@ Tool::Tool(const char* title) :
 
     connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
             &logView, SLOT(addProtoViewers(std::vector<unlog::GenericProviderModule*>)));
+    connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
+            this, SLOT(setUpModules()));
+
+    diagram.addModule(convert);
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
@@ -67,6 +72,11 @@ Tool::~Tool() {
             << this->width() << "\n"
             << this->height() << "\n";
     }
+}
+
+void Tool::setUpModules()
+{
+    diagram.connectToUnlogger<messages::YUVImage>(convert.yuvIn);
 }
 
 // Keyboard control

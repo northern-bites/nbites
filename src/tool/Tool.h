@@ -14,6 +14,7 @@
 #include "ToolDiagram.h"
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
+#include "image/YUVtoRGBModule.h"
 
 namespace tool {
 
@@ -23,6 +24,9 @@ class Tool : public QMainWindow {
 public:
     Tool(const char* title = "TOOL");
     ~Tool();
+
+public slots:
+    void setUpModules();
 
 protected:
     // For keyboard control
@@ -35,6 +39,7 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
+    YUVtoRGBModule convert;
 
     // GUI stuff
     QTabWidget* toolTabs;

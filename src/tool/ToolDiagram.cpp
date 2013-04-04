@@ -11,6 +11,7 @@
 #include "FSR.pb.h"
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
+#include "Images.h"
 #include "InertialState.pb.h"
 #include "JointAngles.pb.h"
 #include "SonarState.pb.h"
@@ -42,6 +43,7 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(VisionField);
     ADD_MAPPED_TYPE(VisionRobot);
     ADD_MAPPED_TYPE(WorldModel);
+    ADD_MAPPED_TYPE(YUVImage);
 }
 
 bool ToolDiagram::unlogFrom(std::string path)
@@ -58,11 +60,32 @@ bool ToolDiagram::unlogFrom(std::string path)
     }
 
     unloggers.push_back(typeMap[head.name()](path));
-    providers.push_back((unloggers.back()->makeMeAProvider()));
+    providers.push_back((unloggers.back()->makeCorrespondingProvider()));
     diagram.addModule(*unloggers.back());
     diagram.addModule(*providers.back());
     unloggers.back()->run();
     return true;
+}
+
+template<>
+void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input)
+{
+    for (std::vector<unlog::UnlogBase*>::iterator i = unloggers.begin();
+         i != unloggers.end(); i++)
+    {
+        if((*i)->getType() == "messages.YUVImage")
+        {
+            unlog::UnlogModule<messages::YUVImage>* u =
+                dynamic_cast<unlog::UnlogModule<messages::YUVImage>*>(*i);
+            input.wireTo(&u->output);
+            std::cout << "Connected successfully to image unlogger!" <<
+                std::endl;
+            return;
+        }
+    }
+
+    std::cout << "Tried to connect a module to nonexistent image unlogger!" <<
+    std::endl;
 }
 
 void ToolDiagram::addUnloggers(std::vector<std::string> paths)

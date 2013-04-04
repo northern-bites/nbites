@@ -30,7 +30,7 @@ class ToolDiagram : public QObject
 public:
     ToolDiagram(QWidget *parent = 0);
 
-    void addModule(portals::Module& mod);
+    void addModule(portals::Module& mod) { diagram.addModule(mod); }
     bool unlogFrom(std::string path);
 
     template<class T>
@@ -42,9 +42,18 @@ public:
         {
             if(test.GetTypeName() == (*i)->getType())
             {
-                input.wireTo(dynamic_cast<unlog::UnlogModule<T> >(*i).output);
+                unlog::UnlogModule<T>* u =
+                    dynamic_cast<unlog::UnlogModule<T>*>(*i);
+                input.wireTo(&u->output);
+                std::cout << "Connected successfully to "
+                          << test.GetTypeName() << " unlogger!"
+                          << std::endl;
+                return;
             }
         }
+
+        std::cout << "Tried to connect a module to a nonexistent unlogger!"
+                  << std::endl;
     }
 
 signals:
@@ -61,5 +70,8 @@ protected:
 
     TypeMap typeMap;
 };
+
+template<>
+void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input);
 
 }

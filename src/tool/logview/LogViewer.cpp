@@ -1,4 +1,5 @@
 #include "LogViewer.h"
+#include <iostream>
 
 namespace tool {
 namespace logview {
@@ -27,6 +28,8 @@ void LogViewer::addProtoViewers(std::vector<unlog::GenericProviderModule*>
     for(std::vector<unlog::GenericProviderModule*>::iterator i =
             inputs.begin(); i != inputs.end(); i++)
     {
+        if ((*i)->getType() == "messages.YUVImage") continue;
+
         QDockWidget* dockWidget =
             new QDockWidget(QString((*i)->getType().data()),
                                 this);

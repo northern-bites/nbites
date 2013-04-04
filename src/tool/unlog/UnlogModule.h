@@ -3,7 +3,7 @@
  * @class UnlogBase
  *
  * The UnlogModule is a templated class that can read from a file and parse
- * the contents of that file into a protobuf of its template type. It is
+n * the contents of that file into a protobuf of its template type. It is
  * only passed a filename, so another piece of code needs to try to match
  * the file with the correct type of protobuf in order to create the unlogger
  * appropriately.
@@ -24,6 +24,7 @@
 
 #include "RoboGrams.h"
 #include "LogDefinitions.h"
+#include "Images.h"
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>
@@ -53,6 +54,20 @@ protected:
     std::string type;
 };
 
+class ImageProviderModule : public GenericProviderModule
+{
+public:
+    ImageProviderModule(std::string t) : GenericProviderModule(t) {}
+
+    portals::InPortal<messages::YUVImage> input;
+
+protected:
+    virtual void run_()
+    {
+        input.latch();
+    }
+};
+
 template<class T>
 class ProviderModule : public GenericProviderModule
 {
@@ -79,7 +94,7 @@ public:
     virtual ~UnlogBase();
 
     std::string getType() { return typeName; }
-    virtual GenericProviderModule* makeMeAProvider() = 0;
+    virtual GenericProviderModule* makeCorrespondingProvider() = 0;
 
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
@@ -100,8 +115,9 @@ protected:
     uint32_t readCharBuffer(char* buffer, uint32_t size)
         const throw (file_read_exception);
 
-    // Keeps track of whether the file is open/closed
-    bool fileOpen;
+    uint32_t readCharBuffer(unsigned char* buffer, uint32_t size)
+        const throw (file_read_exception);
+
     // Pointer to the file
     FILE* file;
     // Stores the full path of the file
@@ -123,7 +139,7 @@ public:
     // Where the output will be provided
     portals::OutPortal<T> output;
 
-    GenericProviderModule* makeMeAProvider()
+    GenericProviderModule* makeCorrespondingProvider()
     {
         ProviderModule<T>* gpm = new ProviderModule<T>(typeName);
         // Have to actually initialize the generic message to correct type
@@ -184,7 +200,7 @@ protected:
     void run_()
     {
         // Makes sure the file is available to read
-        if (!fileOpen)
+        if (!file)
         {
             openFile();
             readHeader();
@@ -228,6 +244,15 @@ protected:
     }
 
 };
+
+template<>
+messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage();
+
+template<>
+UnlogModule<messages::YUVImage>::UnlogModule(std::string path);
+
+template<>
+GenericProviderModule* UnlogModule<messages::YUVImage>::makeCorrespondingProvider();
 
 }
 }
