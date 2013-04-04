@@ -27,8 +27,14 @@ Tool::Tool(const char* title) :
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
 
-    connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(run()));
-	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(rewind()));
+	//connect both to a slot that switches the run direction boolean if neccessary
+	connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(setForwardDir()));
+	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(setBackDir()));
+
+    //connect both fwd and prv button to the run slot
+	connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(run()));
+	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(run()));
+
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
 

@@ -8,9 +8,7 @@ namespace unlog {
 UnlogBase::UnlogBase(std::string path, std::string type) : Module(),
                                                            fileName(path),
                                                            typeName(type)
-{
-	readDir = 1;
-}
+{}
 
 // Closes the file as it destructs
 UnlogBase::~UnlogBase()

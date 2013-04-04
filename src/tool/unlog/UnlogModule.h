@@ -89,7 +89,7 @@ public:
         return value;
     }
 
-    bool& readDir() {
+    static bool& readDir() {
 		static bool readDir = 1;
 		return readDir;
 	}
@@ -139,7 +139,9 @@ public:
 
     T readNextMessage()
     {
-        // End of file
+		std::cout<<"Moved forward to file location:"<<ftell(file)<<std::endl;
+
+       // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
             return T();
