@@ -1,17 +1,15 @@
 #include "LogViewer.h"
-#include <iostream>
 
 namespace tool {
 namespace logview {
 
-LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
+LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent),
+                                        imageTabs(this)
 {
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;
-    // We don't need this right now but...
-    QTabWidget* imageTabs = new QTabWidget();
 
-	mainLayout->addWidget(imageTabs);
+	mainLayout->addWidget(&imageTabs);
 	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	mainWidget->setLayout(mainLayout);
     this->setCentralWidget(mainWidget);
@@ -19,7 +17,6 @@ LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-
 }
 
 void LogViewer::addProtoViewers(std::vector<unlog::GenericProviderModule*>
@@ -28,7 +25,7 @@ void LogViewer::addProtoViewers(std::vector<unlog::GenericProviderModule*>
     for(std::vector<unlog::GenericProviderModule*>::iterator i =
             inputs.begin(); i != inputs.end(); i++)
     {
-        if ((*i)->getType() == "messages.YUVImage") continue;
+        //if ((*i)->getType() == "messages.YUVImage") continue;
 
         QDockWidget* dockWidget =
             new QDockWidget(QString((*i)->getType().data()),
@@ -42,6 +39,18 @@ void LogViewer::addProtoViewers(std::vector<unlog::GenericProviderModule*>
 
         dockWidget->setWidget(viewer);
         this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    }
+}
+
+void LogViewer::addImageViewers(std::vector<image::YUVtoRGBModule*> inputs)
+{
+    for(std::vector<image::YUVtoRGBModule*>::iterator i =
+            inputs.begin(); i != inputs.end(); i++)
+    {
+        image::ImageDisplayQModule* disp = new image::ImageDisplayQModule();
+        disp->imageIn.wireTo(&(*i)->rgbOut);
+        emit newDisplayModule(disp);
+        imageTabs.addTab(disp, tr("An Image!"));
     }
 }
 

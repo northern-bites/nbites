@@ -70,7 +70,6 @@ bool ToolDiagram::unlogFrom(std::string path)
     {
         providers.push_back((unloggers.back()->makeCorrespondingProvider()));
         diagram.addModule(*providers.back());
-
     }
     diagram.addModule(*unloggers.back());
     unloggers.back()->run();
@@ -110,5 +109,12 @@ void ToolDiagram::addUnloggers(std::vector<std::string> paths)
     }
 
     emit signalNewProviders(providers);
+    emit signalNewImageProviders(converters);
 }
+
+void ToolDiagram::addDisplayModule(image::ImageDisplayQModule* mod)
+{
+    diagram.addModule(*mod);
+}
+
 }

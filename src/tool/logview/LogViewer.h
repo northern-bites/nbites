@@ -14,6 +14,8 @@
 #include <vector>
 
 #include "unlog/UnlogModule.h"
+#include "image/ImageDisplayQModule.h"
+#include "image/YUVtoRGBModule.h"
 #include "ProtoViewer.h"
 
 namespace tool {
@@ -25,8 +27,15 @@ class LogViewer : public QMainWindow {
 public:
     LogViewer(QWidget* parent = 0);
 
+signals:
+    void newDisplayModule(image::ImageDisplayQModule*);
+
 public slots:
     void addProtoViewers(std::vector<unlog::GenericProviderModule*>);
+    void addImageViewers(std::vector<image::YUVtoRGBModule*>);
+
+protected:
+    QTabWidget imageTabs;
 };
 
 }

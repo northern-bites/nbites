@@ -40,8 +40,14 @@ Tool::Tool(const char* title) :
 
     connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
             &logView, SLOT(addProtoViewers(std::vector<unlog::GenericProviderModule*>)));
+    connect(&diagram, SIGNAL(signalNewImageProviders(std::vector<image::YUVtoRGBModule*>)),
+            &logView, SLOT(addImageViewers(std::vector<image::YUVtoRGBModule*>)));
+
     connect(&diagram, SIGNAL(signalNewProviders(std::vector<unlog::GenericProviderModule*>)),
             this, SLOT(setUpModules()));
+
+    connect(&logView, SIGNAL(newDisplayModule(image::ImageDisplayQModule*)),
+            &diagram, SLOT(addDisplayModule(image::ImageDisplayQModule*)));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
@@ -80,7 +86,6 @@ Tool::~Tool() {
 
 void Tool::setUpModules()
 {
-    // Use this to connect all modules when new dataset happens!
 }
 
 // Keyboard control

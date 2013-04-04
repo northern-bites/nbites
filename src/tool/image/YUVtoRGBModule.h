@@ -3,12 +3,12 @@
 #include "RoboGrams.h"
 #include "Images.h"
 
+namespace tool {
+namespace image {
+
 typedef unsigned char byte;
 typedef unsigned int rgbvalue;
 typedef messages::PackedImage<rgbvalue> RGBImage;
-
-namespace tool {
-namespace image {
 
 class YUVtoRGBModule : public portals::Module
 {
