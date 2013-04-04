@@ -203,9 +203,6 @@ private:
     // Last information retrieved from the sensors.
     std::vector<float>      sensorAngles;
     std::vector<float>      sensorStiffnesses;
-    messages::FSR           sensorFSRs;
-    messages::InertialState sensorInertials;
-    messages::MotionCommand motionCommand;
 
     std::vector<float>      nextJoints;
     std::vector<float>      nextStiffnesses;

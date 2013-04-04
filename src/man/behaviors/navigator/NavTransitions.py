@@ -1,7 +1,7 @@
 from math import fabs, hypot
 from . import NavConstants as constants
 import NavStates as states
-from man.noggin.util import MyMath
+from ..util import MyMath
 import noggin_constants as NogginConstants
 from ..players import ChaseBallTransitions
 from . import NavHelper as helper

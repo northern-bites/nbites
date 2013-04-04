@@ -89,9 +89,9 @@ bool hasPassed(const Pose2D& p1, const Pose2D& p2) {
  * * The BH joint data is in a different order;
  */
 void BHWalkProvider::calculateNextJointsAndStiffnesses(
-    std::vector<float>&      sensorAngles,
-    messages::InertialState& sensorInertials,
-    messages::FSR&           sensorFSRs
+    std::vector<float>&            sensorAngles,
+    const messages::InertialState& sensorInertials,
+    const messages::FSR&           sensorFSRs
     ) {
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
@@ -284,16 +284,16 @@ void BHWalkProvider::stand() {
     active();
 }
 
-messages::OdometryData BHWalkProvider::getOdometryUpdate() const
+void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::OdometryData> out) const
 {
-    messages::OdometryData odometryData;
-    odometryData.set_x(walkingEngine.theOdometryData.translation.x
-                       * MM_TO_CM);
-    odometryData.set_y(walkingEngine.theOdometryData.translation.y
-                       * MM_TO_CM);
-    odometryData.set_h(walkingEngine.theOdometryData.rotation);
+    portals::Message<messages::OdometryData> odometryData(0);
+    odometryData.get()->set_x(walkingEngine.theOdometryData.translation.x
+                              * MM_TO_CM);
+    odometryData.get()->set_y(walkingEngine.theOdometryData.translation.y
+                              * MM_TO_CM);
+    odometryData.get()->set_h(walkingEngine.theOdometryData.rotation);
 
-    return odometryData;
+    out.setMessage(odometryData);
 }
 
 void BHWalkProvider::hardReset() {

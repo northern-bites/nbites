@@ -20,7 +20,7 @@ from . import GameController
 # Packages and modules from sub-directories
 from .headTracking import HeadTracking
 from .typeDefs import (Play, TeamMember)
-#from .navigator import Navigator
+from .navigator import Navigator
 from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
@@ -82,7 +82,7 @@ class Brain(object):
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracking.HeadTracking(self)
-        #self.nav = Navigator.Navigator(self)
+        self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
 
@@ -153,7 +153,7 @@ class Brain(object):
         self.updatePlaybook()
         self.player.run()
         #self.tracker.run()
-        #self.nav.run()
+        self.nav.run()
 
         #Set LED message
         self.leds.processLeds()

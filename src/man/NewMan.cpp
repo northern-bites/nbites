@@ -95,7 +95,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 		)
 	    );
 
-    motion.sendMotionCommand(bjc);
+    //motion.sendMotionCommand(bjc);
 }
 
 Man::~Man()

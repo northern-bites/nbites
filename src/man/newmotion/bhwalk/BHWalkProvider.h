@@ -16,6 +16,7 @@
 #include "../BodyJointCommand.h"
 #include "../MotionProvider.h"
 
+#include "RoboGrams.h"
 #include "OdometryData.pb.h"
 
 //BH
@@ -36,9 +37,9 @@ namespace man
 
             void requestStopFirstInstance();
             void calculateNextJointsAndStiffnesses(
-                std::vector<float>&      sensorAngles,
-                messages::InertialState& sensorInertials,
-                messages::FSR&           sensorFSRs
+                std::vector<float>&            sensorAngles,
+                const messages::InertialState& sensorInertials,
+                const messages::FSR&           sensorFSRs
                 );
 
             void hardReset();
@@ -54,7 +55,7 @@ namespace man
                 return std::vector<BodyJointCommand::ptr>();
             }
 
-            messages::OdometryData getOdometryUpdate() const;
+            void getOdometryUpdate(portals::OutPortal<messages::OdometryData> out) const;
             virtual const SupportFoot getSupportFoot() const;
 
             static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];

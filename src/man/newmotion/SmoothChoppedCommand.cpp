@@ -1,6 +1,6 @@
 #include "SmoothChoppedCommand.h"
 #include "MotionConstants.h"
-#include <cmath>
+#include <math.h>
 
 using namespace Kinematics;
 
@@ -118,7 +118,7 @@ void SmoothChoppedCommand::subtractChainStartFromFinalAngles(int chain){
 }
 
 float SmoothChoppedCommand::getCycloidAngle(float d_theta, float t) {
-    return ( (d_theta/(2*(float)M_PI_FLOAT)) * (t - sin(t)) );
+    return ( (d_theta/(2*M_PI_FLOAT)) * (t - sinf(t)) );
 }
 
 float SmoothChoppedCommand::getCycloidStep( int id ) {

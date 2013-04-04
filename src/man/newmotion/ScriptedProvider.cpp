@@ -32,13 +32,13 @@ void ScriptedProvider::requestStopFirstInstance() { }
 
 void ScriptedProvider::hardReset(){
     while(!bodyCommandQueue.empty()){
-	BodyJointCommand::ptr next = bodyCommandQueue.front();
-	next->finishedExecuting();
+        BodyJointCommand::ptr next = bodyCommandQueue.front();
+        next->finishedExecuting();
         bodyCommandQueue.pop();
     }
 
     if (currCommand)
-	currCommand = ChoppedCommand::ptr();
+        currCommand = ChoppedCommand::ptr();
 
     setActive();
 }
@@ -71,9 +71,9 @@ bool ScriptedProvider::commandQueueEmpty(){
 }
 
 void ScriptedProvider::calculateNextJointsAndStiffnesses(
-    std::vector<float>&      sensorAngles,
-    messages::InertialState& sensorInertials,
-    messages::FSR&           sensorFSRs) 
+    std::vector<float>&            sensorAngles,
+    const messages::InertialState& sensorInertials,
+    const messages::FSR&           sensorFSRs)
 {
     if (currCommandEmpty())
 	setNextBodyCommand(sensorAngles);

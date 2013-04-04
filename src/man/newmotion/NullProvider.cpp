@@ -40,9 +40,9 @@ void NullProvider::setCommand(const boost::shared_ptr<UnfreezeCommand> command){
 
 
 void NullProvider::calculateNextJointsAndStiffnesses(
-    std::vector<float>&      sensorAngles,
-    messages::InertialState& sensorInertials,
-    messages::FSR&           sensorFSRs)
+    std::vector<float>&            sensorAngles,
+    const messages::InertialState& sensorInertials,
+    const messages::FSR&           sensorFSRs)
 {
     readNewStiffness();
 

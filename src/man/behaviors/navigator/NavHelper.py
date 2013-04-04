@@ -1,4 +1,3 @@
-import man.motion as motion
 from math import fabs
 from ..util import MyMath
 import NavConstants as constants
@@ -59,6 +58,8 @@ def setDestination(nav, dest, gain = 1.0):
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
+    # Mark this message for sending
+    command.processed_by_motion = false
 
 def setOdometryDestination(nav, dest, gain = 1.0):
     # TODO: distinguish from setDestination method
@@ -68,6 +69,8 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
+    # Mark this message for sending
+    command.processed_by_motion = false
 
 #not used!
 def getOrbitLocation(radius, angle):
@@ -99,6 +102,8 @@ def createAndSendWalkVector(nav, x, y, theta):
     command.speed.x = x
     command.speed.y = y
     command.speed.h = theta
+    # Mark this message for sending
+    command.processed_by_motion = false
 
 def executeMove(nav, sweetMove):
     """
@@ -138,6 +143,9 @@ def executeMove(nav, sweetMove):
             move.r_shoulder_roll = position[3][1]
             move.r_elbow_yaw = position[3][2]
             move.r_elbow_roll = position[3][3]
+
+            # Mark this message for sending
+            command.processed_by_motion = false
 
         else:
             print("What kind of sweet ass-Move is this?")

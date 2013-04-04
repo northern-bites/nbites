@@ -4,7 +4,7 @@ namespace man {
 namespace jointenactor{
 
     JointEnactorModule::JointEnactorModule(boost::shared_ptr<AL::ALBroker> broker)
-        : portals::Module(), broker_(broker), motionEnabled_(false)
+        : portals::Module(), broker_(broker), motionEnabled_(true)
     {
         start();
     }

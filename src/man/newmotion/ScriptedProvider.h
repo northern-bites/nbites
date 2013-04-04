@@ -22,9 +22,9 @@ public:
 
     void requestStopFirstInstance();
     void calculateNextJointsAndStiffnesses(
-        std::vector<float>&      sensorAngles,
-        messages::InertialState& sensorInertials,
-        messages::FSR&           sensorFSRs
+        std::vector<float>&            sensorAngles,
+        const messages::InertialState& sensorInertials,
+        const messages::FSR&           sensorFSRs
         );
 
     void hardReset();

@@ -11,16 +11,16 @@ namespace man
 {
 namespace motion
 {
-class NullProvider : public MotionProvider 
+class NullProvider : public MotionProvider
 {
 public:
     NullProvider(const bool chain_mask[Kinematics::NUM_CHAINS]);
     virtual ~NullProvider();
 
     void calculateNextJointsAndStiffnesses(
-	std::vector<float>&      sensorAngles,
-	messages::InertialState& sensorInertials,
-	messages::FSR&           sensorFSRs
+	std::vector<float>&            sensorAngles,
+	const messages::InertialState& sensorInertials,
+	const messages::FSR&           sensorFSRs
 	);
     void hardReset(){} //Not implemented
 

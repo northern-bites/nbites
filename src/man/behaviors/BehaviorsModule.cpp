@@ -163,7 +163,7 @@ void BehaviorsModule::runStep ()
     }
 
 	// Latch incoming messages and prepare outgoing messages
-	latchMessages();
+	prepareMessages();
 
     /*PROF_ENTER(P_PYTHON);*/
 
@@ -194,8 +194,9 @@ void BehaviorsModule::runStep ()
 	sendMessages();
 }
 
-	void BehaviorsModule::latchMessages()
+	void BehaviorsModule::prepareMessages()
 	{
+        // Latch incoming messages
 		gameStateIn.latch();
 		pyInterface.setGameState_ptr(&gameStateIn.message());
 		filteredBallIn.latch();
@@ -206,7 +207,7 @@ void BehaviorsModule::runStep ()
 				}
 
 
-		// Might be really broken.
+        // Prepare potential out messages for python
 		ledCommand = portals::Message<messages::LedCommand>(0);
 		pyInterface.setLedCommand_ptr(ledCommand.get());
         motionCommand = portals::Message<messages::MotionCommand>(0);
@@ -216,7 +217,11 @@ void BehaviorsModule::runStep ()
 	void BehaviorsModule::sendMessages()
 	{
 		ledCommandOut.setMessage(ledCommand);
-        motionCommandOut.setMessage(motionCommand);
+        // Only set motion commands that python has actually used
+        if (motionCommand.get()->processed_by_motion())
+        {
+            motionCommandOut.setMessage(motionCommand);
+        }
 	}
 
 void BehaviorsModule::modifySysPath ()

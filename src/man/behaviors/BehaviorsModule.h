@@ -52,8 +52,8 @@ private:
     bool import_modules();
     // Instantiate a Brain instance
     void getBrainInstance();
-	// Latch new messages
-	void latchMessages();
+	// Latch new messages and prep out messages
+	void prepareMessages();
 	// Send out messages
 	void sendMessages();
 

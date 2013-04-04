@@ -46,9 +46,9 @@ void HeadProvider::hardReset()
 }
 
 void HeadProvider::calculateNextJointsAndStiffnesses(
-    std::vector<float>&      sensorAngles,
-    messages::InertialState& sensorInertials,
-    messages::FSR&           sensorFSRs
+    std::vector<float>&            sensorAngles,
+    const messages::InertialState& sensorInertials,
+    const messages::FSR&           sensorFSRs
     )
 {
     latestJointAngles = sensorAngles;

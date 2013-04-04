@@ -33,7 +33,7 @@ set( bhwalk_srcs
     Tools/Streams/OutStreams.cpp
     Tools/Streams/StreamHandler.cpp
     Tools/Streams/Streamable.cpp
-    Tools/Configuration/ConfigMap.cpp    
+    Tools/Configuration/ConfigMap.cpp
     Tools/Configuration/ConfigMapParser.cpp )
 
 include_directories( . )
@@ -55,4 +55,5 @@ target_link_libraries(
     bhwalk
     common
     messages
+    portals
 )

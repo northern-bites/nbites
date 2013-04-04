@@ -72,9 +72,9 @@ namespace motion
         const bool isStopping() const { return _stopping; }
 
         virtual void calculateNextJointsAndStiffnesses(
-            std::vector<float>&      sensorAngles,
-            messages::InertialState& sensorInertials,
-            messages::FSR&           sensorFSRs
+            std::vector<float>&            sensorAngles,
+            const messages::InertialState& sensorInertials,
+            const messages::FSR&           sensorFSRs
             ) = 0;
 
         std::vector<float> getChainJoints(const Kinematics::ChainID id) {
