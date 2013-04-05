@@ -652,11 +652,9 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
         stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
 
-
-
         // Interpolation is set for the entire script, not per command
         Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
-        if(script.interpolation() == 1)
+        if(script.interpolation_type() == 1)
             interType = Kinematics::INTERPOLATION_LINEAR;
 
         // create the BJC and set it
@@ -684,13 +682,14 @@ void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
 void MotionModule::sendMotionCommand(const messages::SetHeadCommand& command)
 {
     nextHeadProvider = &headProvider;
-    if (command.max_speed_yaw == -1 || command.max_speed_pitch == -1)
+    if (command.max_speed_yaw() == -1 || command.max_speed_pitch() == -1)
     {
         SetHeadCommand::ptr setHeadCommand(
             new SetHeadCommand(command.head_yaw(),
                                command.head_pitch()
                 )
             );
+        headProvider.setCommand(setHeadCommand);
     }
     else
     {
@@ -701,8 +700,8 @@ void MotionModule::sendMotionCommand(const messages::SetHeadCommand& command)
                                command.max_speed_pitch()
                 )
             );
+        headProvider.setCommand(setHeadCommand);
     }
-    headProvider.setCommand(setHeadCommand);
 }
 
 void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)

@@ -239,10 +239,10 @@ void BehaviorsModule::run_ ()
         pyInterface.setLedCommand_ptr(ledCommand.get());
 
         bodyMotionCommand = portals::Message<messages::MotionCommand>(0);
-        pyInterface.setBodyMotionCommand_ptr(motionCommand.get());
+        pyInterface.setBodyMotionCommand_ptr(bodyMotionCommand.get());
 
         headMotionCommand = portals::Message<messages::HeadMotionCommand>(0);
-        pyInterface.setHeadMotionCommand_ptr(motionCommand.get());
+        pyInterface.setHeadMotionCommand_ptr(headMotionCommand.get());
     }
 
     void BehaviorsModule::sendMessages()
