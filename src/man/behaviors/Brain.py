@@ -188,14 +188,13 @@ class Brain(object):
     #                       self.play.role, self.play.subRole,
     #                       self.playbook.pb.me.chaseTime)
 
-    # TODO: Take this out once new comm is in...
-    # def activeTeamMates(self):
-    #     activeMates = 0
-    #     for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
-    #         mate = self.teamMembers[i]
-    #         if mate.active:
-    #             activeMates += 1
-    #     return activeMates
+    def activeTeamMates(self):
+        activeMates = 0
+        for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
+            mate = self.teamMembers[i]
+            if mate.active:
+                activeMates += 1
+        return activeMates
 
     def resetInitialLocalization(self):
         """
