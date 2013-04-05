@@ -39,33 +39,11 @@ void LogBase::closeFile()
 // enqueues the IO
 void LogBase::writeCharBuffer(const char* buffer, uint32_t size)
 {
-    // Don't enqueue any more writes if we already have too many!
-    if (ongoing.size() == maxWrites)
-    {
-#ifdef DEBUG_LOGGING
-        std::cout << "Dropped a char buffer because there are already "
-                  << maxWrites << " ongoing writes to " << fileName
-                  << std::endl;
-#endif
-        return;
-    }
-
-    // Don't write if the file has gotten too huge
-    if (bytesWritten >= FILE_MAX_SIZE)
-    {
-#ifdef DEBUG_LOGGING
-        std::cout << "Dropped a char buffer because the file "
-                  << fileName << " has reached " << bytesWritten << " bytes "
-                  << std::endl;
-#endif
-        return;
-    }
-
     if (bytesWritten < FILE_MAX_SIZE) bytesWritten += size;
 
     // Add a new Write struct
-    ongoing.push_back(Write());
-    Write* current = &ongoing.back();
+    ongoingSizes.push_back(Write());
+    Write* current = &ongoingSizes.back();
 
     // Copy in the buffer
     current->buffer = std::string(buffer, size);
@@ -120,11 +98,13 @@ void LogBase::checkWrites()
 {
 #ifdef DEBUG_LOGGING
         std::cout << "There are currently "
-                  << ongoing.size() << " ongoing writes to " << fileName
-                  << std::endl;
+                  << ongoing.size() << " ongoing message writes to "
+                  << fileName << " and " << ongoingSizes.size()
+                  << " ongoing non-message writes" << std::endl;
 #endif
 
     ongoing.remove_if(finished);
+    ongoingSizes.remove_if(finished);
 }
 
 template<>
@@ -151,7 +131,7 @@ void LogModule<messages::YUVImage>::writeHeader()
 
     std::string buf;
     head.SerializeToString(&buf);
-    writeValue<uint32_t>(buf.length());
+    writeSize(buf.length());
     writeCharBuffer(buf.data(), buf.length());
 
     std::cout << "Writing header to " << fileName << std::endl;
@@ -162,10 +142,15 @@ void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage msg)
 {
     ongoing.push_back(Write());
     Write* current = &ongoing.back();
+
     // We know the width, height of the image and what each pixel holds
     int size = msg.width() * msg.height() * sizeof(unsigned char);
     bytesWritten += size;
-    writeValue<int>(size);
+
+    // We write width and height as well as size for clarity on unlogging side
+    writeSize(size);
+    writeSize(msg.width());
+    writeSize(msg.height());
 
     // Configure the control block
     current->control.aio_fildes = fileDescriptor;

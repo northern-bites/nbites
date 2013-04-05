@@ -259,7 +259,6 @@ protected:
             header.ParseFromString(std::string(buffer, bytes));
         }
     }
-
 };
 
 template<>

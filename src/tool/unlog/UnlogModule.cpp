@@ -85,10 +85,11 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
 
     // Read in the next message's size
     // @see LogModule.h for why this works
-    uint32_t currentSize = readValue<uint32_t>();
+    int size = readValue<uint32_t>();
+    int width = readValue<uint32_t>();
+    int height = readValue<uint32_t>();
 
-    if (currentSize !=
-        current->width()*current->height()*sizeof(unsigned char) &&
+     if (size != current->width()*current->height()*sizeof(unsigned char) &&
         !current->isNull())
     {
         std::cout << "End of log file " << fileName << std::endl;
@@ -96,15 +97,17 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
     }
 
     // Keep track of the sizes we've read (to unwind)
-    messageSizes.push_back(currentSize);
+    messageSizes.push_back(size);
+    messageSizes.push_back(width);
+    messageSizes.push_back(height);
 
     // To hold the data read, and the number of bytes read
     uint32_t bytes;
-    messages::YUVImage* img = new messages::YUVImage(currentSize/480, 480);
+    messages::YUVImage* img = new messages::YUVImage(width, height);
 
     try {
         // Actual file reading call
-        bytes = readCharBuffer(img->pixelAddress(0, 0), currentSize);
+        bytes = readCharBuffer(img->pixelAddress(0, 0), size);
     } catch (std::exception& read_exception) {
         std::cout << read_exception.what() << std::endl;
         return *current;
@@ -131,24 +134,28 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage() {
         return *current;
     }
 
-    //we've been storing the message sizes to use right now
-    uint32_t currentSize = messageSizes.back();
+    // We've been storing the message sizes to use right now
+    // Pull these off in reverse order from when we pushed them on
+    uint32_t height = messageSizes.back();
+    messageSizes.pop_back();
+    uint32_t width = messageSizes.back();
+    messageSizes.pop_back();
+    uint32_t size = messageSizes.back();
     messageSizes.pop_back();
 
     // To hold the data read, and the number of bytes read
     uint32_t bytes;
-    // TODO: write width and height instead of just size for images
-    messages::YUVImage* img = new messages::YUVImage(currentSize/480, 480);
+    messages::YUVImage* img = new messages::YUVImage(width, height);
 
     try {
         // Actual file reading call
         //set the file pointer BACK currentMessageSize bits
-        fseek(file, -1*currentSize, SEEK_CUR);
+        fseek(file, -1*size, SEEK_CUR);
         //then read forward
-        bytes = readCharBuffer(img->pixelAddress(0, 0), currentSize);
+        bytes = readCharBuffer(img->pixelAddress(0, 0), size);
         //then set it back again, so it appears that we read backwards
         //plus rewind four bites to get past the thing that says the size of the frame
-        fseek(file, -1*(currentSize+sizeof(int)), SEEK_CUR);
+        fseek(file, -1*(size+3*sizeof(int)), SEEK_CUR);
     } catch (std::exception& read_exception) {
         std::cout << read_exception.what() << std::endl;
         return *current;
