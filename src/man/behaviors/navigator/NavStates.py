@@ -131,7 +131,6 @@ def stopped(nav):
 
 def atPosition(nav):
     if nav.firstFrame():
-        nav.brain.speech.say("At Position")
         helper.stand(nav)
 
     return Transition.getNextState(nav, atPosition)

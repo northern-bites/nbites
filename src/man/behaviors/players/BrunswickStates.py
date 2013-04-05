@@ -75,7 +75,7 @@ def gameSet(player):
         player.brain.nav.stand()
         player.brain.tracker.trackBallFixedPitch()
 
-        if (player.brain.my.playerNumber == 4 and
+        if (player.brain.playerNumber == 4 and
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
             player.shouldKickOff = True
