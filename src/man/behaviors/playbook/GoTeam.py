@@ -569,22 +569,17 @@ class GoTeam:
     def printf(self, outputString, printingColor='purple'):
         """FSA print function that allows colors to be specified"""
         if printingColor == 'red':
-            self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'blue':
-            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'yellow':
-            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'cyan':
-            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'purple':
-            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         else:
-            self.brain.out.printf(str(outputString))
+            print(str(outputString))
 
 
     # Reset counters for role transitions

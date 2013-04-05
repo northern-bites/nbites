@@ -21,10 +21,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
       imageTranscriber(),
       vision(),
+      localization(),
       ballTrack(),
-      leds(broker),
+      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
+      leds(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -95,21 +96,24 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Cognition **/
     cognitionThread.addModule(imageTranscriber);
     cognitionThread.addModule(vision);
+    cognitionThread.addModule(localization);
     cognitionThread.addModule(ballTrack);
-    cognitionThread.addModule(leds);
-    cognitionThread.addModule(behaviors);
     cognitionThread.addModule(gamestate);
+    cognitionThread.addModule(behaviors);
+    cognitionThread.addModule(leds);
     vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
     vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
     vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
-    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
+    localization.visionInput.wireTo(&vision.vision_field);
+    localization.motionInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
     gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
     gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
+    //behaviors.localizationInput.wireTo(&localization.output);
     behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
     behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
     behaviors.visionFieldIn.wireTo(&vision.vision_field);
@@ -121,7 +125,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
-
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,

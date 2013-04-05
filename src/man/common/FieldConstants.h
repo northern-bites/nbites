@@ -1,10 +1,8 @@
-#ifndef FieldConstantsDefined__h
-#define FieldConstantsDefined__h
+#pragma once
 
 #include <cmath>
-#ifndef NO_MANCONFIG
 #include "Common.h"
-#endif
+
 // Nao field constants
 
 #ifdef USING_LAB_FIELD
@@ -137,5 +135,3 @@ static const float HEADING_RIGHT = 0;
 static const float HEADING_UP = 90;
 static const float HEADING_LEFT = 180;
 static const float HEADING_DOWN = -90;
-
-#endif // File

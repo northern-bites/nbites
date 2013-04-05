@@ -19,6 +19,7 @@
 #include "jointenactor/JointEnactorModule.h"
 #include "newmotion/MotionModule.h"
 #include "gamestate/GameStateModule.h"
+#include "localization/LocalizationModule.h"
 
 #include <vector>
 
@@ -51,10 +52,11 @@ private:
     DiagramThread cognitionThread;
     image::ImageTranscriberModule imageTranscriber;
     vision::VisionModule vision;
+    localization::LocalizationModule localization;
     balltrack::BallTrackModule ballTrack;
-    led::LedEnactorModule leds;
-    behaviors::BehaviorsModule behaviors;
     gamestate::GameStateModule gamestate;
+    behaviors::BehaviorsModule behaviors;
+    led::LedEnactorModule leds;
 };
 
 }

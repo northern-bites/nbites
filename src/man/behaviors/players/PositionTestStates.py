@@ -18,13 +18,13 @@ def gameReady(player):
 
 def gameSet(player):
     if player.firstFrame:
-        player.brain.out.printf("GAME SET")
+        pass
 
     return player.stay()
 
 def gamePlaying(player):
     if player.firstFrame:
-        player.brain.out.printf("GAME PLAYING")
+        pass
 
     return player.stay()
 
@@ -41,6 +41,3 @@ def doneState(player):
         player.brain.tracker.stopHeadMoves()
 
     return player.stay()
-
-
-

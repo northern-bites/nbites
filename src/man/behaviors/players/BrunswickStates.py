@@ -61,7 +61,7 @@ def gameReady(player):
             player.brain.resetLocalizationFromPenalty()
 
     # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
+    if not player.brain.motion.calibrated:
         return player.stay()
 
     return player.goLater('playbookPosition')
@@ -86,7 +86,7 @@ def gameSet(player):
             player.brain.resetSetLocalization()
 
     # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
+    if not player.brain.motion.calibrated:
         return player.stay()
 
     return player.stay()
@@ -104,7 +104,7 @@ def gamePlaying(player):
             player.brain.resetSetLocalization()
 
     # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
+    if not player.brain.motion.calibrated:
         return player.stay()
 
     if player.lastDiffState == 'gamePenalized' and  player.brain.play.isChaser():
@@ -158,7 +158,7 @@ def penaltyShotsGameSet(player):
         player.inKickingState = False
 
     # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
+    if not player.brain.motion.calibrated:
         return player.stay()
 
         if player.lastDiffState == 'gamePenalized':
@@ -180,7 +180,7 @@ def penaltyShotsGamePlaying(player):
         player.penaltyKicking = True
 
     # Wait until the sensors are calibrated before moving.
-    while (not player.brain.motion.calibrated()):
+    if (not player.brain.motion.calibrated):
         return player.stay()
 
     return player.goNow('chase')

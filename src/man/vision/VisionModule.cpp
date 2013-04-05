@@ -147,7 +147,7 @@ void VisionModule::updateVisionField() {
     for(std::list<VisualCorner>::iterator i = visualCorners->begin();
         i != visualCorners->end(); i++)
     {
-        messages::VisionField::VisualCorner *visCorner = field_data.get()->add_visual_corner();
+        messages::VisualCorner *visCorner = field_data.get()->add_visual_corner();
         visCorner->set_orientation(i->getOrientation());
         visCorner->set_corner_type(i->getShape());
         visCorner->set_physical_orientation(i->getPhysicalOrientation());
@@ -160,7 +160,7 @@ void VisionModule::updateVisionField() {
         for(std::list<const ConcreteCorner*>::const_iterator j = possible->begin();
             j != possible->end(); j++)
         {
-            messages::VisionField::Point *field_point =
+            messages::Point *field_point =
                 visCorner->mutable_visual_detection()->add_concrete_coords();
 
             field_point->set_x((**j).getFieldX());
@@ -201,7 +201,7 @@ void VisionModule::updateVisionField() {
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_l->begin();
         i != possible_l->end(); i++)
     {
-        messages::VisionField::Point *field_point =
+        messages::Point *field_point =
             field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
             add_concrete_coords();
 
@@ -240,7 +240,7 @@ void VisionModule::updateVisionField() {
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_r->begin();
         i != possible_r->end(); i++)
     {
-        messages::VisionField::Point *field_point =
+        messages::Point *field_point =
             field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
             add_concrete_coords();
 
@@ -269,7 +269,7 @@ void VisionModule::updateVisionField() {
     for (std::list<const ConcreteCross*>::const_iterator i = possible_cross->begin();
          i != possible_cross->end(); i++)
     {
-        messages::VisionField::Point *field_point =
+        messages::Point *field_point =
             field_data.get()->mutable_visual_cross()->add_concrete_coords();
 
         field_point->set_x((**i).getFieldX());
