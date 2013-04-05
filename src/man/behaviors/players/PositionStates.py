@@ -1,8 +1,7 @@
 import noggin_constants as NogginConstants
-import man.noggin.util.MyMath as MyMath
+from   ..util import MyMath
 import PositionConstants as constants
-import PositionTransitions as PosTran
-import vision
+import PositionTransitions
 
 def positionLocalize(player):
     """
@@ -26,17 +25,17 @@ def playbookPosition(player):
         brain.tracker.repeatWidePanFixedPitch()
 
     #TODO: I think the transition is broken right now!
-    #if PosTran.leavingTheField(player):
+    #if PositionTransitions.leavingTheField(player):
     #    return player.goLater('spinToField')
 
     return player.stay()
 
 def spinToField(player):
 
-    fieldEdge = player.brain.vision.fieldEdge
+    fieldEdge = player.brain.interface.visualField.visual_field_edge
 
     if player.firstFrame():
-        if fieldEdge.shape == vision.basicShape.RISING_LEFT:
+        if fieldEdge.distance_l > fieldEdge.distance_r:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_LEFT)
             player.brain.tracker.spinPanFixedPitch()
         else:

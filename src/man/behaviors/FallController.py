@@ -10,7 +10,6 @@ class FallController(FSA.FSA):
         self.setName('FallController')
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'blue'
-        self.setPrintFunction(self.brain.out.printf)
 
         self.standingUp = False
         self.fallCount = 0

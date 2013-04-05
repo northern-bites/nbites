@@ -18,7 +18,7 @@ BALL_LEDS = True
 GOAL_LEDS = False
 PLAYBOOK_LEDS = False
 LOC_LEDS = False
-COMM_LEDS = False
+COMM_LEDS = True
 
 ####### LED DEFINITIONS #############
 LED_OFF = 0
@@ -184,9 +184,9 @@ class Leds():
     def processLeds(self):
 
         if BALL_LEDS:
-            if self.brain.ball.framesOn == 1:
+            if self.brain.ball.vis.frames_on == 1:
                 self.executeLeds(BALL_ON_LEDS)
-            elif self.brain.ball.framesOff == 1:
+            elif self.brain.ball.vis.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
         if GOAL_LEDS:
@@ -194,32 +194,32 @@ class Leds():
 
             if (newCertainty == vision.certainty.NOT_SURE):
                 if (self.brain.ygrp.vis.on and
-                    (self.brain.ygrp.vis.framesOn == 1 or
+                    (self.brain.ygrp.vis.frames_on == 1 or
                      self.goalCertainty != newCertainty)):
                     #we see an ambiguous post for the first time!
                     self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
                     self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
             if(newCertainty == vision.certainty._SURE and
                self.brain.ygrp.vis.on and
-               (self.brain.ygrp.vis.framesOn == 1 or
+               (self.brain.ygrp.vis.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the right post for the first time!
                 self.executeLeds(RIGHT_POST_ON_LEDS)
             if(self.brain.yglp.vis.on and
-               (self.brain.yglp.vis.framesOn == 1 or
+               (self.brain.yglp.vis.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the left post for the first time!
                 self.executeLeds(LEFT_POST_ON_LEDS)
-            if(self.brain.ygrp.vis.framesOff == 1):
+            if(self.brain.ygrp.vis.frames_off == 1):
                 #we don't see the right post for the first time
                 self.executeLeds(RIGHT_POST_OFF_LEDS)
-            if((self.brain.yglp.vis.framesOff == 1 and
+            if((self.brain.yglp.vis.frames_off == 1 and
                 (newCertainty != vision.certainty.NOT_SURE and
-                 self.brain.ygrp.vis.framesOff >= 1)) or
-               (self.brain.yglp.vis.framesOff >=1 and
+                 self.brain.ygrp.vis.frames_off >= 1)) or
+               (self.brain.yglp.vis.frames_off >=1 and
                 ((newCertainty != vision.certainty.NOT_SURE and
                   newCertainty != self.goalCertainty) or
-                 self.brain.ygrp.vis.framesOff == 1))):
+                 self.brain.ygrp.vis.frames_off == 1))):
                 #we don't see the left post for the first time
                 self.executeLeds(LEFT_POST_OFF_LEDS)
 
@@ -255,7 +255,6 @@ class Leds():
                 elif self.brain.play.isRole(PBConstants.DEFENDER):
                     self.executeLeds(DEFENDER_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.DEFENDER_DUB_D):
-                    print "IN DUB D"
                     self.executeLeds(DUB_DEFEND_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.GOALIE):
                     self.executeLeds(GOALIE_ON_LEDS)
@@ -353,7 +352,6 @@ class Leds():
                 elif (gcState == GameController.STATE_FINISHED):
                     self.executeLeds(STATE_FINISHED_LEDS)
 
-
         if FOOT_LEDS:
             if (self.brain.gameController.kickOffChanged
                 or self.brain.gameController.teamColorChanged):
@@ -373,7 +371,7 @@ class Leds():
     def executeLeds(self,listOfLeds):
         for ledTuple in listOfLeds:
             if len(ledTuple) != 3:
-                self.printf("Invalid print command!! " + str(ledTuple))
+                print "Invalid print command!! " + str(ledTuple)
                 continue
             # Add command to brain's out message fields
             self.brain.interface.ledCommand.add_led_id(ledTuple[0])

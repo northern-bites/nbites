@@ -15,8 +15,11 @@
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
+#include "MotionStatus.pb.h"
+#include "SonarState.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
+#include "FootBumperState.pb.h"
 
 /**
  *
@@ -36,14 +39,11 @@ public:
     // reinitialize and reload the Python interpreter
     void reload_hard ();
 
-    // run behavioral step
-    void runStep();
-
     // current Noggin error status
     bool inErrorState() { return error_state; }
 
-protected:
-    virtual void run_() { runStep(); }
+    // Runs the module
+    virtual void run_();
 
 private:
     // Initialize the interpreter and C Python extensions
@@ -75,17 +75,28 @@ private:
     PyInterface pyInterface;
 public:
     portals::InPortal<messages::GameState> gameStateIn;
+    portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    portals::InPortal<messages::MotionStatus> motionStatusIn;
+    portals::InPortal<messages::RobotLocation> odometryIn;
+    portals::InPortal<messages::SonarState> sonarStateIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
     portals::InPortal<messages::VisionField> visionFieldIn;
     portals::InPortal<messages::VisionRobot> visionRobotIn;
+    portals::InPortal<messages::VisionObstacle> visionObstacleIn;
+    portals::InPortal<messages::FootBumperState> footBumperStateIn;
+    portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
-    portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
-
+    portals::InPortal<messages::JointAngles> jointAnglesIn;
     portals::OutPortal<messages::LedCommand> ledCommandOut;
-    portals::OutPortal<messages::MotionCommand> motionCommandOut;
+    portals::OutPortal<messages::MotionRequest> motionRequestOut;
+    portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;
+    portals::OutPortal<messages::HeadMotionCommand> headMotionCommandOut;
+
 private:
     portals::Message<messages::LedCommand> ledCommand;
-    portals::Message<messages::MotionCommand> motionCommand;
+    portals::Message<messages::MotionRequest> motionRequest;
+    portals::Message<messages::MotionCommand> bodyMotionCommand;
+    portals::Message<messages::HeadMotionCommand> headMotionCommand;
 };
 
 }

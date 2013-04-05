@@ -3,6 +3,8 @@
 #include <iostream>
 #include "RobotConfig.h"
 
+SET_POOL_SIZE(messages::WorldModel, 15);
+
 namespace man {
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
@@ -19,10 +21,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
       imageTranscriber(),
       vision(),
+      localization(),
       ballTrack(),
-      leds(broker),
+      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER)
+      leds(broker)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -52,7 +55,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     motion.jointsInput_.wireTo(&sensors.jointsOutput_);
     motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
     motion.fsrInput_.wireTo(&sensors.fsrOutput_);
-    motion.bodyCommandInput_.wireTo(&behaviors.motionCommandOut, true);
+    motion.stiffnessInput_.wireTo(&guardian.stiffnessControlOutput, true);
+    motion.bodyCommandInput_.wireTo(&behaviors.bodyMotionCommandOut, true);
+    motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
+    motion.motionRequestInput_.wireTo(&behaviors.motionRequestOut, true);
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
@@ -91,22 +97,40 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Cognition **/
     cognitionThread.addModule(imageTranscriber);
     cognitionThread.addModule(vision);
-    //cognitionThread.addModule(ballTrack);
-    cognitionThread.addModule(leds);
-    cognitionThread.addModule(behaviors);
+    cognitionThread.addModule(localization);
+    cognitionThread.addModule(ballTrack);
     cognitionThread.addModule(gamestate);
+    cognitionThread.addModule(behaviors);
+    cognitionThread.addModule(leds);
     vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
     vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
     vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
-    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+    localization.visionInput.wireTo(&vision.vision_field);
+    localization.motionInput.wireTo(&motion.odometryOutput_, true);
+    ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+    ballTrack.localizationInput.wireTo(&localization.output);
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
     gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
     gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
-    //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
-    behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput, false);
+    behaviors.localizationIn.wireTo(&localization.output);
+    behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
+    behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
+    behaviors.visionFieldIn.wireTo(&vision.vision_field);
+    behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+    behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
+    behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+    behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
+    behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
+    behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
+    }
+    behaviors.jointAnglesIn.wireTo(&sensors.jointsOutput_, true);
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,

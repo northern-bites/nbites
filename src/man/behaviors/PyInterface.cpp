@@ -27,16 +27,20 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::gameState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("visionBall",
-                      make_getter(&PyInterface::visionBall_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
         .add_property("visionRobot",
                       make_getter(&PyInterface::visionRobot_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         .add_property("visionField",
                       make_getter(&PyInterface::visionField_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("visionObstacle",
+                      make_getter(&PyInterface::visionObstacle_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("robotLocation",
+                      make_getter(&PyInterface::robotLocation_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         .add_property("filteredBall",
@@ -48,8 +52,36 @@ BOOST_PYTHON_MODULE(interface)
                                   return_value_policy
                                   <reference_existing_object>()))
         .def("worldModelList", &PyInterface::getWorldModelList)
-        .add_property("motionCommand",
-                      make_getter(&PyInterface::motionCommand_ptr,
+        .add_property("bodyMotionCommand",
+                      make_getter(&PyInterface::bodyMotionCommand_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("headMotionCommand",
+                      make_getter(&PyInterface::headMotionCommand_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("motionStatus",
+                      make_getter(&PyInterface::motionStatus_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("motionRequest",
+                      make_getter(&PyInterface::motionRequest_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("odometry",
+                      make_getter(&PyInterface::odometry_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("sonarState",
+                      make_getter(&PyInterface::sonarState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("footBumperState",
+                      make_getter(&PyInterface::footBumperState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("jointAngles",
+                      make_getter(&PyInterface::jointAngles_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         ;

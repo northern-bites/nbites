@@ -119,7 +119,6 @@ class GoTeam:
         """
         # Print changes and Say changes
         if play.changed:
-            self.brain.speech.say(PBConstants.SUB_ROLES[play.subRole])
             if self.printStateChanges:
                 self.printf("Play switched to " + play.__str__())
 
@@ -456,7 +455,7 @@ class GoTeam:
         # No matter what state we are we don't
         # Want to become an illegal defender
         # TODO: When ball information is better make this inMyGoalBox
-        if ball.loc.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
+        if ball.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
             self.willBeIllegalD += 1
             if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
                 self.stopAvoidingBox = 0
@@ -569,22 +568,17 @@ class GoTeam:
     def printf(self, outputString, printingColor='purple'):
         """FSA print function that allows colors to be specified"""
         if printingColor == 'red':
-            self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'blue':
-            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'yellow':
-            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'cyan':
-            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'purple':
-            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         else:
-            self.brain.out.printf(str(outputString))
+            print(str(outputString))
 
 
     # Reset counters for role transitions

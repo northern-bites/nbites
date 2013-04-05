@@ -10,6 +10,7 @@ MotionModule::MotionModule()
     : jointsOutput_(base()),
       stiffnessOutput_(base()),
       odometryOutput_(base()),
+      motionStatusOutput_(base()),
       curProvider(&nullBodyProvider),
       nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
@@ -29,7 +30,6 @@ MotionModule::MotionModule()
 
 MotionModule::~MotionModule()
 {
-
 }
 
 void MotionModule::start()
@@ -50,7 +50,10 @@ void MotionModule::run_()
     jointsInput_.latch();
     inertialsInput_.latch();
     fsrInput_.latch();
+    stiffnessInput_.latch();
     bodyCommandInput_.latch();
+    headCommandInput_.latch();
+    motionRequestInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -81,6 +84,7 @@ void MotionModule::run_()
         // (5) Get the latest odometry measurements and update
         //     the messages that we output.
         updateOdometry();
+        updateStatus();
 
         newInputJoints = false;
         frameCount++;
@@ -174,6 +178,7 @@ bool MotionModule::postProcess()
 
     if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
     {
+        std::cout << "postprocess swap head provider" << std::endl;
         swapHeadProvider();
     }
 
@@ -250,44 +255,79 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
-    // (1) First process body commands.
-    if(!bodyCommandInput_.message().processed_by_motion())
-    {
-        std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
-                  << bodyCommandInput_.message().dest().rel_y() << " "
-                  << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
+    // This doesn't work. ELLIS!!!!!!!!
+    // // First check: is guardian turning stiffness off?
+    // if(stiffnessInput_.message().remove() && gainsOn)
+    // {
+    //     gainsOn = false;
+    //     std::cout << "Sending freeze command." << std::endl;
+    //     sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+    //     return;
+    // }
+    // if(!stiffnessInput_.message().remove() && !gainsOn)
+    // {
+    //     gainsOn = true;
+    //     std::cout << "Sending unfreeze command." << std::endl;
+    //     sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+    //     return;
+    // }
 
-        // Is this a destination walk request?
-        if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK){
-            sendMotionCommand(bodyCommandInput_.message().dest());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
+    // (1) Process body commands.
+    if(!motionRequestInput_.message().processed_by_motion())
+    {
+        if (motionRequestInput_.message().type() == messages::MotionRequest::STOP_BODY)
+        {
+            stopBodyMoves();
         }
-        // Walk request?
-        else if (bodyCommandInput_.message().type() == messages::MotionCommand::WALK_COMMAND){
-            sendMotionCommand(bodyCommandInput_.message().speed());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
+        else if (motionRequestInput_.message().type() == messages::MotionRequest::STOP_HEAD)
+        {
+            stopHeadMoves();
         }
-        // Sweet Move request?
-        else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE){
-            sendMotionCommand(bodyCommandInput_.message().script());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
+        else if (motionRequestInput_.message().type() == messages::MotionRequest::RESET_ODO)
+        {
+            resetOdometry();
         }
-        std::cout << "POST!! " << bodyCommandInput_.message().processed_by_motion() << std::endl;
+        const_cast<messages::MotionRequest&>(motionRequestInput_.message()).set_processed_by_motion(true);
     }
 
-    // (2) Process head commands.
+    // (2) Process body commands.
+    if(!bodyCommandInput_.message().processed_by_motion())
+    {
+        // std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
+        //           << bodyCommandInput_.message().dest().rel_y() << " "
+        //           << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
+
+        // Is this a destination walk request?
+        if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK)
+        {
+            sendMotionCommand(bodyCommandInput_.message().dest());
+        }
+        // Walk request?
+        else if (bodyCommandInput_.message().type() == messages::MotionCommand::WALK_COMMAND)
+        {
+            sendMotionCommand(bodyCommandInput_.message().speed());
+        }
+        // Sweet Move request?
+        else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE)
+        {
+            sendMotionCommand(bodyCommandInput_.message().script());
+        }
+        const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
+    }
+
+    // (3) Process head commands.
     if(!headCommandInput_.message().processed_by_motion())
     {
         if(headCommandInput_.message().type() == messages::HeadMotionCommand::SET_HEAD_COMMAND)
         {
             sendMotionCommand(headCommandInput_.message().set_command());
-            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
         }
         else if(headCommandInput_.message().type() == messages::HeadMotionCommand::SCRIPTED_HEAD_COMMAND)
         {
+            std::cout << "SENDING SCRIPTED COMMAND" << std::endl;
             sendMotionCommand(headCommandInput_.message().scripted_command());
-            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
         }
+        const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
     }
 }
 
@@ -582,66 +622,66 @@ void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> co
 void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 {
     // Create a command for every Body Joint Command
-    for (int i = 0; i < script.commands_size(); i++)
+    for (int i = 0; i < script.command_size(); i++)
     {
         std::vector<float> angles(26, 0.f);
         std::vector<float> stiffness(26, 0.f);
 
         // populate vectors
-        angles[0] = script.commands(i).angles().l_shoulder_pitch();
-        angles[1] = script.commands(i).angles().l_shoulder_roll();
-        angles[2] = script.commands(i).angles().l_elbow_yaw();
-        angles[3] = script.commands(i).angles().l_elbow_roll();
-        angles[4] = script.commands(i).angles().l_hip_yaw_pitch();
-        angles[5] = script.commands(i).angles().l_hip_roll();
-        angles[6] = script.commands(i).angles().l_hip_pitch();
-        angles[7] = script.commands(i).angles().l_knee_pitch();
-        angles[8] = script.commands(i).angles().l_ankle_pitch();
-        angles[9] = script.commands(i).angles().l_ankle_roll();
-        angles[10] = script.commands(i).angles().r_hip_yaw_pitch();
-        angles[11] = script.commands(i).angles().r_hip_roll();
-        angles[12] = script.commands(i).angles().r_hip_pitch();
-        angles[13] = script.commands(i).angles().r_knee_pitch();
-        angles[14] = script.commands(i).angles().r_ankle_pitch();
-        angles[15] = script.commands(i).angles().r_ankle_roll();
-        angles[16] = script.commands(i).angles().r_shoulder_pitch();
-        angles[17] = script.commands(i).angles().r_shoulder_roll();
-        angles[18] = script.commands(i).angles().r_elbow_yaw();
-        angles[19] = script.commands(i).angles().r_elbow_roll();
+        angles[0] = script.command(i).angles().l_shoulder_pitch();
+        angles[1] = script.command(i).angles().l_shoulder_roll();
+        angles[2] = script.command(i).angles().l_elbow_yaw();
+        angles[3] = script.command(i).angles().l_elbow_roll();
+        angles[4] = script.command(i).angles().l_hip_yaw_pitch();
+        angles[5] = script.command(i).angles().l_hip_roll();
+        angles[6] = script.command(i).angles().l_hip_pitch();
+        angles[7] = script.command(i).angles().l_knee_pitch();
+        angles[8] = script.command(i).angles().l_ankle_pitch();
+        angles[9] = script.command(i).angles().l_ankle_roll();
+        angles[10] = script.command(i).angles().r_hip_yaw_pitch();
+        angles[11] = script.command(i).angles().r_hip_roll();
+        angles[12] = script.command(i).angles().r_hip_pitch();
+        angles[13] = script.command(i).angles().r_knee_pitch();
+        angles[14] = script.command(i).angles().r_ankle_pitch();
+        angles[15] = script.command(i).angles().r_ankle_roll();
+        angles[16] = script.command(i).angles().r_shoulder_pitch();
+        angles[17] = script.command(i).angles().r_shoulder_roll();
+        angles[18] = script.command(i).angles().r_elbow_yaw();
+        angles[19] = script.command(i).angles().r_elbow_roll();
 
-        stiffness[0] = script.commands(i).stiffness().head_yaw();
-        stiffness[1] = script.commands(i).stiffness().head_pitch();
-        stiffness[2] = script.commands(i).stiffness().l_shoulder_pitch();
-        stiffness[3] = script.commands(i).stiffness().l_shoulder_roll();
-        stiffness[4] = script.commands(i).stiffness().l_elbow_yaw();
-        stiffness[5] = script.commands(i).stiffness().l_elbow_roll();
-        stiffness[6] = script.commands(i).stiffness().l_hip_yaw_pitch();
-        stiffness[7] = script.commands(i).stiffness().l_hip_roll();
-        stiffness[8] = script.commands(i).stiffness().l_hip_pitch();
-        stiffness[9] = script.commands(i).stiffness().l_knee_pitch();
-        stiffness[10] = script.commands(i).stiffness().l_ankle_pitch();
-        stiffness[11] = script.commands(i).stiffness().l_ankle_roll();
-        stiffness[12] = script.commands(i).stiffness().r_hip_yaw_pitch();
-        stiffness[13] = script.commands(i).stiffness().r_hip_roll();
-        stiffness[14] = script.commands(i).stiffness().r_hip_pitch();
-        stiffness[15] = script.commands(i).stiffness().r_knee_pitch();
-        stiffness[16] = script.commands(i).stiffness().r_ankle_pitch();
-        stiffness[17] = script.commands(i).stiffness().r_ankle_roll();
-        stiffness[18] = script.commands(i).stiffness().r_shoulder_pitch();
-        stiffness[19] = script.commands(i).stiffness().r_shoulder_roll();
-        stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
-        stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
+        stiffness[0] = script.command(i).stiffness().head_yaw();
+        stiffness[1] = script.command(i).stiffness().head_pitch();
+        stiffness[2] = script.command(i).stiffness().l_shoulder_pitch();
+        stiffness[3] = script.command(i).stiffness().l_shoulder_roll();
+        stiffness[4] = script.command(i).stiffness().l_elbow_yaw();
+        stiffness[5] = script.command(i).stiffness().l_elbow_roll();
+        stiffness[6] = script.command(i).stiffness().l_hip_yaw_pitch();
+        stiffness[7] = script.command(i).stiffness().l_hip_roll();
+        stiffness[8] = script.command(i).stiffness().l_hip_pitch();
+        stiffness[9] = script.command(i).stiffness().l_knee_pitch();
+        stiffness[10] = script.command(i).stiffness().l_ankle_pitch();
+        stiffness[11] = script.command(i).stiffness().l_ankle_roll();
+        stiffness[12] = script.command(i).stiffness().r_hip_yaw_pitch();
+        stiffness[13] = script.command(i).stiffness().r_hip_roll();
+        stiffness[14] = script.command(i).stiffness().r_hip_pitch();
+        stiffness[15] = script.command(i).stiffness().r_knee_pitch();
+        stiffness[16] = script.command(i).stiffness().r_ankle_pitch();
+        stiffness[17] = script.command(i).stiffness().r_ankle_roll();
+        stiffness[18] = script.command(i).stiffness().r_shoulder_pitch();
+        stiffness[19] = script.command(i).stiffness().r_shoulder_roll();
+        stiffness[20] = script.command(i).stiffness().r_elbow_yaw();
+        stiffness[21] = script.command(i).stiffness().r_elbow_roll();
 
-
-
+        // Interpolation is set for the entire script, not per command
         Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
-        if(script.commands(i).interpolation() == 1)
+        if(script.interpolation_type() == 1)
             interType = Kinematics::INTERPOLATION_LINEAR;
 
         // create the BJC and set it
         motion::BodyJointCommand::ptr newCommand(
             new motion::BodyJointCommand(
-                (script.commands(i).time()),
+                // Time is set for the entire script, not per command
+                (script.time()),
                 angles,
                 stiffness,
                 interType)
@@ -659,17 +699,29 @@ void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
     headProvider.setCommand(command);
 }
 
-void MotionModule::sendMotionCommand(const messages::SetHeadCommand& command)
+void MotionModule::sendMotionCommand(const messages::SetHeadCommand command)
 {
     nextHeadProvider = &headProvider;
-    SetHeadCommand::ptr setHeadCommand(
-        new SetHeadCommand(command.head_yaw(),
-                           command.head_pitch(),
-                           command.max_speed_yaw(),
-                           command.max_speed_pitch()
-            )
-        );
-    headProvider.setCommand(setHeadCommand);
+    if (command.max_speed_yaw() == -1 || command.max_speed_pitch() == -1)
+    {
+        SetHeadCommand::ptr setHeadCommand(
+            new SetHeadCommand(command.head_yaw(),
+                               command.head_pitch()
+                )
+            );
+        headProvider.setCommand(setHeadCommand);
+    }
+    else
+    {
+        SetHeadCommand::ptr setHeadCommand(
+            new SetHeadCommand(command.head_yaw(),
+                               command.head_pitch(),
+                               command.max_speed_yaw(),
+                               command.max_speed_pitch()
+                )
+            );
+        headProvider.setCommand(setHeadCommand);
+    }
 }
 
 void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
@@ -678,10 +730,60 @@ void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
     headProvider.setCommand(command);
 }
 
-void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand& command)
+void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
 {
     nextHeadProvider = &headProvider;
-    // @todo
+    // Create a command for every Body Joint Command
+    for (int i = 0; i < script.command_size(); i++)
+    {
+        std::vector<float> angles(26, 0.f);
+        std::vector<float> stiffness(26, 0.f);
+
+        // populate vectors
+        angles[0] = script.command(i).angles().head_yaw();
+        angles[1] = script.command(i).angles().head_pitch();
+
+        stiffness[0] = script.command(i).stiffness().head_yaw();
+        stiffness[1] = script.command(i).stiffness().head_pitch();
+        stiffness[2] = script.command(i).stiffness().l_shoulder_pitch();
+        stiffness[3] = script.command(i).stiffness().l_shoulder_roll();
+        stiffness[4] = script.command(i).stiffness().l_elbow_yaw();
+        stiffness[5] = script.command(i).stiffness().l_elbow_roll();
+        stiffness[6] = script.command(i).stiffness().l_hip_yaw_pitch();
+        stiffness[7] = script.command(i).stiffness().l_hip_roll();
+        stiffness[8] = script.command(i).stiffness().l_hip_pitch();
+        stiffness[9] = script.command(i).stiffness().l_knee_pitch();
+        stiffness[10] = script.command(i).stiffness().l_ankle_pitch();
+        stiffness[11] = script.command(i).stiffness().l_ankle_roll();
+        stiffness[12] = script.command(i).stiffness().r_hip_yaw_pitch();
+        stiffness[13] = script.command(i).stiffness().r_hip_roll();
+        stiffness[14] = script.command(i).stiffness().r_hip_pitch();
+        stiffness[15] = script.command(i).stiffness().r_knee_pitch();
+        stiffness[16] = script.command(i).stiffness().r_ankle_pitch();
+        stiffness[17] = script.command(i).stiffness().r_ankle_roll();
+        stiffness[18] = script.command(i).stiffness().r_shoulder_pitch();
+        stiffness[19] = script.command(i).stiffness().r_shoulder_roll();
+        stiffness[20] = script.command(i).stiffness().r_elbow_yaw();
+        stiffness[21] = script.command(i).stiffness().r_elbow_roll();
+
+
+
+        Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
+        if(script.command(i).interpolation() == 1)
+            interType = Kinematics::INTERPOLATION_LINEAR;
+
+        // create the HJC and set it
+        motion::HeadJointCommand::ptr newCommand(
+            new motion::HeadJointCommand(
+                (script.command(i).time()),
+                angles,
+                stiffness,
+                interType)
+            );
+
+        headProvider.setCommand(newCommand);
+        std::cout << "ADDED CMD " << i << std::endl;
+    }
 }
 
 void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
@@ -975,6 +1077,19 @@ std::vector<BodyJointCommand::ptr> MotionModule::readScriptedSequence(
 void MotionModule::updateOdometry()
 {
     walkProvider.getOdometryUpdate(odometryOutput_);
+}
+
+void MotionModule::updateStatus()
+{
+    portals::Message<messages::MotionStatus> status(0);
+
+    status.get()->set_standing(isStanding());
+    status.get()->set_body_is_active(isBodyActive());
+    status.get()->set_walk_is_active(isWalkActive());
+    status.get()->set_head_is_active(isHeadActive());
+    status.get()->set_calibrated(calibrated());
+
+    motionStatusOutput_.setMessage(status);
 }
 
 } // namespace motion

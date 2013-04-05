@@ -25,7 +25,7 @@ static const float ALPHA = .7f;
  */
 struct BallObservation
 {
-    BallObservation(float dist_, float bear_) : dist(dist_), bear(bear) {}
+    BallObservation(float dist_, float bear_) : dist(dist_), bear(bear_) {}
     BallObservation() {}
     float dist;
     float bear;

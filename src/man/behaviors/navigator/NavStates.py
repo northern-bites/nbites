@@ -14,7 +14,7 @@ def scriptedMove(nav):
         helper.executeMove(nav, scriptedMove.sweetMove)
         return nav.stay()
 
-    if not nav.brain.motion.isBodyActive():
+    if not nav.brain.interface.motionStatus.body_is_active:
         return nav.goNow('stopped')
 
     return nav.stay()
@@ -29,8 +29,7 @@ def goToPosition(nav):
     Absolute locations get transformed to relative locations based on current loc
     For relative locations we use our bearing to that point as the heading
     """
-
-    relDest = helper.getRelativeDestination(nav.brain.my, goToPosition.dest)
+    relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
     goToPosition.deltaDest = relDest # cache it for later use
 
 #    if nav.counter % 10 is 0:
@@ -96,7 +95,7 @@ def walkingTo(nav):
         helper.stand(nav)
         return nav.stay()
 
-    if nav.brain.motion.isStanding():
+    if nav.brain.interface.motionStatus.standing:
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
@@ -115,7 +114,8 @@ def walking(nav):
     State to be used when setSpeed is called
     """
 
-    if (walking.speeds != walking.lastSpeeds) or not nav.brain.motion.isWalkActive():
+    if ((walking.speeds != walking.lastSpeeds)
+        or not nav.brain.interface.motionStatus.walk_is_active):
         helper.setSpeed(nav, walking.speeds)
     walking.lastSpeeds = walking.speeds
 
@@ -131,7 +131,6 @@ def stopped(nav):
 
 def atPosition(nav):
     if nav.firstFrame():
-        nav.brain.speech.say("At Position")
         helper.stand(nav)
 
     return Transition.getNextState(nav, atPosition)
@@ -139,14 +138,14 @@ def atPosition(nav):
 def stand(nav):
     """
     Transitional state between walking and standing
-    Could still be walking, but we can give it new walk commands
-    so we shouldn't wait to go for it to go to standing before we
-    give it new commands
+    So we can give new walk commands before we complete
+    the stand if desired
     """
     if nav.firstFrame():
         helper.stand(nav)
+        return nav.stay()
 
-    if not nav.brain.motion.isWalkActive():
+    if not nav.brain.interface.motionStatus.walk_is_active:
         return nav.goNow('standing')
 
     return nav.stay()

@@ -9,12 +9,11 @@ sys.stderr = sys.stdout
 
 # Packages and modules from super-directories
 import noggin_constants as Constants
+from objects import RobotLocation
 
 # Modules from this directory
 from . import Leds
-#from . import robots
-from . import Ball
-from . import MyInfo
+from . import robots
 from . import GameController
 
 # Packages and modules from sub-directories
@@ -26,17 +25,20 @@ from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
 
-#from objects import (FieldObject)
 
 # Import message protocol buffers and interface
 import interface
 import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
+import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
+import MotionStatus_proto
+import SonarState_proto
 import VisionRobot_proto
 import VisionField_proto
+import FootBumperState_proto
 
 class Brain(object):
     """
@@ -55,28 +57,23 @@ class Brain(object):
         self.counter = 0
         self.time = time.time()
 
-        self.on = True
-        # Output Class
-        self.out = NaoOutput.NaoOutput(self)
-        self.my = MyInfo.MyInfo()
-
         #initalize the leds and game controller
         self.leds = Leds.Leds(self)
         self.gameController = GameController.GameController(self)
 
         # Retrieve our robot identification and set per-robot parameters
-        #self.CoA = robots.get_certificate()
+        self.CoA = robots.get_certificate()
 
         # coa is Certificate of Authenticity (to keep things short)
-        #self.out.printf(self.CoA)
-        #self.out.printf("GC:  I am on team "+str(self.teamNumber))
-        #self.out.printf("GC:  I am player  "+str(self.playerNumber))
+        print '\033[32m'+str(self.CoA)                              +'\033[0m'
+        print '\033[32m'+"GC:  I am on team "+str(self.teamNumber)  +'\033[0m'
+        print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
 
         # Information about the environment
-        # All field objects should come in as messages now
-        #self.initFieldObjects()
-        self.ball = Ball.Ball()
+        self.ball = None
         self.initTeamMembers()
+        self.motion = None
+        self.game = None
 
         self.play = Play.Play()
 
@@ -89,7 +86,6 @@ class Brain(object):
 
         # Message interface
         self.interface = interface.interface
-
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -130,47 +126,44 @@ class Brain(object):
         Main control loop called every TIME_STEP milliseconds
         """
 
-        # Check if any messages are null.
-        # self.out.printf("Check for null messages:")
-        # self.out.printf("ledCommand:    ")
-        # self.out.printf(self.interface.ledCommand)
-        # self.out.printf("gameState:     ")
-        # self.out.printf(self.interface.gameState)
-        # self.out.printf("filteredBall:  ")
-        # self.out.printf(self.interface.filteredBall)
-        # self.out.printf("motionCommand: ")
-        # self.out.printf(self.interface.motionCommand)
-
         # Order here is very important
         # Update Environment
         self.time = time.time()
 
         # Update objects
         self.updateVisionObjects()
+        self.updateMotion()
+        self.updateLoc()
+        self.getCommUpdate()
 
         # Behavior stuff
         self.gameController.run()
         self.updatePlaybook()
         self.player.run()
-        #self.tracker.run()
+        self.tracker.run()
         self.nav.run()
 
         #Set LED message
         self.leds.processLeds()
 
-    def getCommUpdate(self):
-        # TODO: do this for more than one teamMember
-        pass
-        #for i in range(len(self.teamMembers)):
-        #self.teamMembers[0].update(self.inMessages['worldModel'])
+        # Flush the output
+        sys.stdout.flush()
 
-    def updateObjects(self):
+    def getCommUpdate(self):
+        self.game = self.interface.gameState
+        for i in range(len(self.teamMembers)):
+            self.teamMembers[i].update(self.interface.worldModelList()[i])
+
+    def updateMotion(self):
+        self.motion = self.interface.motionStatus
+
+    def updateVisionObjects(self):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball = self.brain.interface.visionBall
-        self.yglp = self.brain.interface.visionField.goal_post_l.visual_detection
-        self.ygrp = self.brain.interface.visionField.goal_post_r.visual_detection
+        self.ball = self.interface.filteredBall
+        self.yglp = self.interface.visionField.goal_post_l.visual_detection
+        self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 
     def updatePlaybook(self):
         """
@@ -178,29 +171,31 @@ class Brain(object):
         """
         self.playbook.update(self.play)
 
-    # move to comm
-    # def setCommData(self):
-    #     # Team color, team number, and player number are all appended to this
-    #     # list by the underlying comm module implemented in C++
-    #     loc = self.loc
-    #     self.comm.setData(self.my.playerNumber,
-    #                       self.play.role, self.play.subRole,
-    #                       self.playbook.pb.me.chaseTime)
+    def activeTeamMates(self):
+        activeMates = 0
+        for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
+            mate = self.teamMembers[i]
+            if mate.active:
+                activeMates += 1
+        return activeMates
 
-    # TODO: Take this out once new comm is in...
-    # def activeTeamMates(self):
-    #     activeMates = 0
-    #     for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
-    #         mate = self.teamMembers[i]
-    #         if mate.active:
-    #             activeMates += 1
-    #     return activeMates
+    def updateLoc(self):
+        """
+        Update brain's loc reference
+        """
+        self.loc = RobotLocation(self.interface.robotLocation.x,
+                                 self.interface.robotLocation.y,
+                                 self.interface.robotLocation.h )
+
 
     def resetInitialLocalization(self):
         """
         Reset loc according to team number and team color.
         Note: Loc uses truly global coordinates.
         """
+
+        return # HACK HACK HACK for no localization module
+
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             if self.playerNumber == 1:
                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
@@ -252,6 +247,10 @@ class Brain(object):
     #should make this nicer (or at least the locations)
     def resetSetLocalization(self):
 
+
+        return # HACK HACK HACK for no localization module
+
+
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
@@ -287,6 +286,10 @@ class Brain(object):
         """
         Resets localization to both possible locations, depending on team color.
         """
+
+        return # HACK HACK HACK for no localization module
+
+
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                 Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,

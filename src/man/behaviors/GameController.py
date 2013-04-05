@@ -1,8 +1,8 @@
 import noggin_constants as Constants
 
 STATE_INITIAL = 0
-STATE_SET = 1
-STATE_READY = 2
+STATE_READY = 1
+STATE_SET = 2
 STATE_PLAYING = 3
 STATE_FINISHED = 4
 PENALTY_NONE = 0

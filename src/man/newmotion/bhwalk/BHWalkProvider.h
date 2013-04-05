@@ -17,7 +17,7 @@
 #include "../MotionProvider.h"
 
 #include "RoboGrams.h"
-#include "OdometryData.pb.h"
+#include "RobotLocation.pb.h"
 
 //BH
 #include "WalkingEngine.h"
@@ -55,7 +55,7 @@ namespace man
                 return std::vector<BodyJointCommand::ptr>();
             }
 
-            void getOdometryUpdate(portals::OutPortal<messages::OdometryData> out) const;
+            void getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const;
             virtual const SupportFoot getSupportFoot() const;
 
             static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];

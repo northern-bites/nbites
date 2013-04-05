@@ -3,72 +3,70 @@ package messages;
 
 message VisionField
 {
+        optional int64 timestamp = 1;
+        optional VisualGoalPost goal_post_l = 2;
+        optional VisualGoalPost goal_post_r = 3;
+        repeated VisualCorner visual_corner = 4;
+        repeated VisualLine visual_line = 5;
+        optional VisualDetection visual_cross = 6;
+        optional VisualFieldEdge visual_field_edge = 7;
+}
 
-   optional int64 timestamp = 1;
-   optional VisualGoalPost goal_post_l = 2;
-   optional VisualGoalPost goal_post_r = 3;
-   repeated VisualCorner visual_corner = 4;
-   repeated VisualLine visual_line = 5;
-   optional VisualDetection visual_cross = 6;
-   optional VisualFieldEdge visual_field_edge = 7;
+message Point
+{
+        optional float x = 1;
+        optional float y = 2;
+}
 
-      message Point
-      {
-	optional float x = 1;
-	optional float y = 2;
-      }
-
-      message VisualDetection
-      {
-	optional float distance = 1;
-	optional float bearing = 2;
+message VisualDetection
+{
+        optional float distance = 1;
+        optional float bearing = 2;
         optional float bearing_deg = 3;
-	optional float distance_sd = 4;
-	optional float bearing_sd = 5;
+        optional float distance_sd = 4;
+        optional float bearing_sd = 5;
         optional int32 certainty = 6;
         optional bool  on = 7;
         optional int32 frames_on = 8;
         optional int32 frames_off = 9;
-	repeated Point concrete_coords = 10;
-      }
+        repeated Point concrete_coords = 10;
+        optional bool red_goalie = 11; // HACK until we have a unified message for goal posts.
+        optional bool navy_goalie = 12;
+}
 
-   message VisualGoalPost
-   {
-      optional VisualDetection visual_detection = 1;
-      optional float height = 2;
-      optional float width = 3;
-   }
+message VisualGoalPost
+{
+        optional VisualDetection visual_detection = 1;
+        optional float height = 2;
+        optional float width = 3;
+}
 
-   message VisualCorner
-   {
-      optional VisualDetection visual_detection = 1;
-      optional float orientation = 2;
-      optional int32 corner_type = 3;
-      optional float physical_orientation = 4;
-   }
+message VisualCorner
+{
+        optional VisualDetection visual_detection = 1;
+        optional float orientation = 2;
+        optional int32 corner_type = 3;
+        optional float physical_orientation = 4;
+}
 
-   message VisualLine
-   {
-      optional VisualDetection visual_detection = 1;
-      optional int32 start_x = 2;
-      optional int32 start_y = 3;
-      optional int32 end_x = 4;
-      optional int32 end_y = 5;
-      optional float angle = 6;
-      optional float avg_width = 7;
-      optional float length = 8;
-      optional float slope = 9;
-      optional float y_int = 10;
-      repeated int32 possibilities = 11;
-   }
+message VisualLine
+{
+        optional VisualDetection visual_detection = 1;
+        optional int32 start_x = 2;
+        optional int32 start_y = 3;
+        optional int32 end_x = 4;
+        optional int32 end_y = 5;
+        optional float angle = 6;
+        optional float avg_width = 7;
+        optional float length = 8;
+        optional float slope = 9;
+        optional float y_int = 10;
+        repeated int32 possibilities = 11;
+}
 
-   message VisualFieldEdge
-   {
-      optional float distance_l = 1;
-      optional float distance_m = 2;
-      optional float distance_r = 3;
-   }
-
-
-
+message VisualFieldEdge
+{
+        optional float distance_l = 1;
+        optional float distance_m = 2;
+        optional float distance_r = 3;
 }

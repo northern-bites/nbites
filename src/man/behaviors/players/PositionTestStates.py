@@ -1,30 +1,25 @@
 from .. import SweetMoves
 from ..playbook import PBConstants
+from objects import RelRobotLocation
 
 def gameInitial(player):
-    if player.firstFrame():
-        player.stopWalking()
-        player.gainsOn()
-        player.zeroHeads()
-
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.stand()
-        player.brain.tracker.locPans()
 
-    return player.goLater('playbookPosition')
+    return player.stay()
 
 def gameSet(player):
     if player.firstFrame:
-        player.brain.out.printf("GAME SET")
+        pass
 
     return player.stay()
 
 def gamePlaying(player):
     if player.firstFrame:
-        player.brain.out.printf("GAME PLAYING")
+        pass
 
     return player.stay()
 
@@ -41,6 +36,3 @@ def doneState(player):
         player.brain.tracker.stopHeadMoves()
 
     return player.stay()
-
-
-
