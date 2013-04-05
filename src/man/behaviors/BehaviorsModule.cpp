@@ -247,6 +247,9 @@ void BehaviorsModule::prepareMessages()
     footBumperStateIn.latch();
     pyInterface.setFootBumperState_ptr(&footBumperStateIn.message());
 
+    jointAnglesIn.latch();
+    pyInterface.setJointAngles_ptr(&jointAnglesIn.message());
+
     ledCommand = portals::Message<messages::LedCommand>(0);
     pyInterface.setLedCommand_ptr(ledCommand.get());
 

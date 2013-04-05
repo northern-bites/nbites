@@ -86,6 +86,7 @@ public:
     portals::InPortal<messages::FootBumperState> footBumperStateIn;
     portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
+    portals::InPortal<messages::JointAngles> jointAnglesIn;
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;

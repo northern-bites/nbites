@@ -179,6 +179,7 @@ bool MotionModule::postProcess()
 
     if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
     {
+        std::cout << "postprocess swap head provider" << std::endl;
         swapHeadProvider();
     }
 
@@ -278,18 +279,16 @@ void MotionModule::processMotionInput()
         if (motionRequestInput_.message().type() == messages::MotionRequest::STOP_BODY)
         {
             stopBodyMoves();
-            const_cast<messages::MotionRequest&>(motionRequestInput_.message()).set_processed_by_motion(true);
         }
         else if (motionRequestInput_.message().type() == messages::MotionRequest::STOP_HEAD)
         {
             stopHeadMoves();
-            const_cast<messages::MotionRequest&>(motionRequestInput_.message()).set_processed_by_motion(true);
         }
         else if (motionRequestInput_.message().type() == messages::MotionRequest::RESET_ODO)
         {
             resetOdometry();
-            const_cast<messages::MotionRequest&>(motionRequestInput_.message()).set_processed_by_motion(true);
         }
+        const_cast<messages::MotionRequest&>(motionRequestInput_.message()).set_processed_by_motion(true);
     }
 
     // (2) Process body commands.
@@ -300,20 +299,21 @@ void MotionModule::processMotionInput()
         //           << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
 
         // Is this a destination walk request?
-        if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK){
+        if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK)
+        {
             sendMotionCommand(bodyCommandInput_.message().dest());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
         // Walk request?
-        else if (bodyCommandInput_.message().type() == messages::MotionCommand::WALK_COMMAND){
+        else if (bodyCommandInput_.message().type() == messages::MotionCommand::WALK_COMMAND)
+        {
             sendMotionCommand(bodyCommandInput_.message().speed());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
         // Sweet Move request?
-        else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE){
+        else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE)
+        {
             sendMotionCommand(bodyCommandInput_.message().script());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
+        const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
     }
 
     // (3) Process head commands.
@@ -322,13 +322,13 @@ void MotionModule::processMotionInput()
         if(headCommandInput_.message().type() == messages::HeadMotionCommand::SET_HEAD_COMMAND)
         {
             sendMotionCommand(headCommandInput_.message().set_command());
-            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
         }
         else if(headCommandInput_.message().type() == messages::HeadMotionCommand::SCRIPTED_HEAD_COMMAND)
         {
+            std::cout << "SENDING SCRIPTED COMMAND" << std::endl;
             sendMotionCommand(headCommandInput_.message().scripted_command());
-            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
         }
+        const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
     }
 }
 
@@ -783,6 +783,7 @@ void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
             );
 
         headProvider.setCommand(newCommand);
+        std::cout << "ADDED CMD " << i << std::endl;
     }
 }
 

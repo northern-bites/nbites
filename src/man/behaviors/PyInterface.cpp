@@ -80,6 +80,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::footBumperState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("jointAngles",
+                      make_getter(&PyInterface::jointAngles_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         ;
     scope().attr("interface") = interface_ptr;
 }

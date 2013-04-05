@@ -40,6 +40,7 @@ public:
     messages::RobotLocation     const * odometry_ptr;
     messages::SonarState        const * sonarState_ptr;
     messages::FootBumperState   const * footBumperState_ptr;
+    messages::JointAngles       const * jointAngles_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -108,6 +109,10 @@ public:
     void setFootBumperState_ptr(const messages::FootBumperState* msg)
     {
         footBumperState_ptr = msg;
+    }
+    void setJointAngles_ptr(const messages::JointAngles* msg)
+    {
+        jointAngles_ptr = msg;
     }
 
 };

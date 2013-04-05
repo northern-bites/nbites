@@ -61,9 +61,6 @@ class HeadTracking(FSA.FSA):
         """Executes the given headMove, then stops."""
         if headMove != self.headMove or self.currentState != 'doHeadMove':
             self.headMove = headMove
-            # If we were already in the state, reset our counter so that
-            #  firstFrame() will be true again.
-            self.switchTo('stop')
             self.switchTo('doHeadMove')
 
     # Note: safe to call every frame.
