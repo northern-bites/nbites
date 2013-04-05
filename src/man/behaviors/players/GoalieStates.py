@@ -8,7 +8,7 @@ from GoalieConstants import RIGHT, LEFT
 
 def gameInitial(player):
     if player.firstFrame():
-        player.brain.nav.stop()
+        player.stand()
         player.zeroHeads()
         player.side = LEFT
         player.isSaving = False
@@ -18,7 +18,7 @@ def gameInitial(player):
 def gameReady(player):
     if player.firstFrame():
         player.penaltyKicking = False
-        player.brain.nav.stand()
+        player.stand()
         player.brain.tracker.lookToAngle(0)
         if player.lastDiffState != 'gameInitial':
             player.brain.nav.walkTo(RelRobotLocation(120, 0, 0))
@@ -32,7 +32,7 @@ def gameReady(player):
 def gameSet(player):
     if player.firstFrame():
         player.penaltyKicking = False
-        player.brain.nav.stand()
+        player.stand()
         #player.brain.loc.resetBall()
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)

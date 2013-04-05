@@ -145,6 +145,7 @@ def stand(nav):
     """
     if nav.firstFrame():
         helper.stand(nav)
+        return nav.stay()
 
     if not nav.brain.interface.motionStatus.walk_is_active:
         return nav.goNow('standing')
