@@ -38,7 +38,7 @@ import MotionStatus_proto
 import SonarState_proto
 import VisionRobot_proto
 import VisionField_proto
-import FootBumberState_proto
+import FootBumperState_proto
 
 class Brain(object):
     """

@@ -241,7 +241,6 @@ void BehaviorsModule::run_ ()
         pyInterface.setLedCommand_ptr(ledCommand.get());
 
         motionCommand = portals::Message<messages::MotionCommand>(0);
-        std::cout << "MOTION COMMAND!  " << motionCommand.get() << std::endl;
         pyInterface.setMotionCommand_ptr(motionCommand.get());
     }
 
