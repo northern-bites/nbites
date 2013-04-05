@@ -15,8 +15,11 @@
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
+#include "MotionStatus.pb.h"
+#include "SonarState.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
+#include "FootBumperState.pb.h"
 
 /**
  *
@@ -71,14 +74,16 @@ private:
     // Portals and interface
     PyInterface pyInterface;
 public:
-    portals::InPortal<messages::GameState> gameStateIn;
+	portals::InPortal<messages::GameState> gameStateIn;
+	portals::InPortal<messages::FilteredBall> filteredBallIn;
+	portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    portals::InPortal<messages::MotionStatus> motionStatusIn;
+    portals::InPortal<messages::SonarState> sonarStateIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
     portals::InPortal<messages::VisionField> visionFieldIn;
     portals::InPortal<messages::VisionRobot> visionRobotIn;
-    portals::InPortal<messages::FilteredBall> filteredBallIn;
-    portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
-
-    portals::OutPortal<messages::LedCommand> ledCommandOut;
+    portals::InPortal<messages::FootBumperState> footBumperStateIn;
+	portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionCommand> motionCommandOut;
 private:
     portals::Message<messages::LedCommand> ledCommand;

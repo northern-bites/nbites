@@ -10,6 +10,7 @@ MotionModule::MotionModule()
     : jointsOutput_(base()),
       stiffnessOutput_(base()),
       odometryOutput_(base()),
+      motionStatusOutput_(base()),
       curProvider(&nullBodyProvider),
       nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),

@@ -110,10 +110,14 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.visionBallIn.wireTo(&vision.vision_ball);
     behaviors.visionFieldIn.wireTo(&vision.vision_field);
     behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+    behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+    behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
+    behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
+
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,

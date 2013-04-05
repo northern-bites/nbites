@@ -52,8 +52,20 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::motionCommand_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        ;
-    scope().attr("interface") = interface_ptr;
+        .add_property("motionStatus",
+                      make_getter(&PyInterface::motionStatus_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("sonarState",
+                      make_getter(&PyInterface::sonarState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("footBumperState",
+                      make_getter(&PyInterface::footBumperState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+		;
+	scope().attr("interface") = interface_ptr;
 }
 }
 }

@@ -18,6 +18,9 @@ extern "C" void initVisionRobot_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
+extern "C" void initMotionStatus_proto();
+extern "C" void initSonarState_proto();
+extern "C" void initFootBumperState_proto();
 extern "C" void initinterface();
 
 
@@ -84,8 +87,11 @@ void BehaviorsModule::initializePython()
         initWorldModel_proto();
         initBallModel_proto();
         initPMotion_proto();
-        // Init the interface as well
-        initinterface();
+        initMotionStatus_proto();
+        initSonarState_proto();
+        initFootBumperState_proto();
+		// Init the interface as well
+		initinterface();
     } catch (error_already_set) {
         PyErr_Print();
     }
@@ -221,10 +227,19 @@ void BehaviorsModule::run_ ()
             pyInterface.setWorldModel_ptr(&worldModelIn[i].message(),i);
                 }
 
+        motionStatusIn.latch();
+        pyInterface.setMotionStatus_ptr(&motionStatusIn.message());
+
+        sonarStateIn.latch();
+        pyInterface.setSonarState_ptr(&sonarStateIn.message());
+
+        footBumperStateIn.latch();
+        pyInterface.setFootBumperState_ptr(&footBumperStateIn.message());
 
         // Prepare potential out messages for python
         ledCommand = portals::Message<messages::LedCommand>(0);
         pyInterface.setLedCommand_ptr(ledCommand.get());
+
         motionCommand = portals::Message<messages::MotionCommand>(0);
         std::cout << "MOTION COMMAND!  " << motionCommand.get() << std::endl;
         pyInterface.setMotionCommand_ptr(motionCommand.get());

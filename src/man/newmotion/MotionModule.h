@@ -30,6 +30,7 @@
 #include "InertialState.pb.h"
 #include "OdometryData.pb.h"
 #include "PMotion.pb.h"
+#include "MotionStatus.pb.h"
 
 #include <vector>
 
@@ -151,9 +152,8 @@ public:
 
     portals::OutPortal<messages::JointAngles>  jointsOutput_;
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
-
-    /* Control interface with motion users. */
     portals::OutPortal<messages::OdometryData> odometryOutput_;
+    portals::OutPortal<messages::MotionStatus> motionStatusOutput_;
 
 private:
     void preProcess();
