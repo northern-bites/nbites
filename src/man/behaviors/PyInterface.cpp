@@ -56,6 +56,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::motionStatus_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("odometry",
+                      make_getter(&PyInterface::odometry_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         .add_property("sonarState",
                       make_getter(&PyInterface::sonarState_ptr,
                                   return_value_policy

@@ -284,7 +284,7 @@ void BHWalkProvider::stand() {
     active();
 }
 
-void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation> out) const
+void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const
 {
     portals::Message<messages::RobotLocation> odometryData(0);
     odometryData.get()->set_x(walkingEngine.theOdometryData.translation.x

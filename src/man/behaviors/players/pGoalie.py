@@ -134,22 +134,22 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.reachedMyDestination,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
-            : GoalieStates.kickBall
+            : GoalieStates.kickBall,
 
-            # Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
-            #                            Transition.ALL_OF_THE_TIME,
-            #                            90)
-            # : VisualGoalieStates.returnToGoal,
+            Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
+                                       Transition.ALL_OF_THE_TIME,
+                                       90)
+            : VisualGoalieStates.returnToGoal,
 
-            # Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : VisualGoalieStates.returnToGoal
+            Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.returnToGoal,
 
-            # Transition.CountTransition(GoalieTransitions.walkedTooFar,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : VisualGoalieStates.returnToGoal
+            Transition.CountTransition(GoalieTransitions.walkedTooFar,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.returnToGoal
             }
 
         VisualGoalieStates.repositionAfterWhiff.transitions = {

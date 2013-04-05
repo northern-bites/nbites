@@ -55,7 +55,7 @@ namespace man
                 return std::vector<BodyJointCommand::ptr>();
             }
 
-            void getOdometryUpdate(portals::OutPortal<messages::RobotLocation> out) const;
+            void getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const;
             virtual const SupportFoot getSupportFoot() const;
 
             static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];

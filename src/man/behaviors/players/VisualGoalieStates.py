@@ -119,6 +119,7 @@ def clearIt(player):
                                             kickPose[1],
                                             0.0)
 
+        # WE NEED TO BE ABLE TO DO THIS
         # reset odometry
         #player.brain.motion.resetOdometry()
         clearIt.odoDelay = True
@@ -180,12 +181,11 @@ def returnToGoal(player):
                         returnToGoal.kickPose)
         correctedDest.relX = correctedDest.relX
 
-        # NEED ODO
-        # else:
-        #     correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
-        #                      RelRobotLocation(player.brain.loc.lastOdoX,
-        #                                       player.brain.loc.lastOdoY,
-        #                                       0.0))
+    else:
+        correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
+                         RelRobotLocation(player.brain.interface.odometry.x,
+                                          player.brain.interface.odometry.y,
+                                          0.0))
 
         if fabs(correctedDest.relX) < 5:
             correctedDest.relX = 0.0
@@ -261,7 +261,8 @@ def centerAtGoalBasedOnCorners(player):
 
 def repositionAfterWhiff(player):
     if player.firstFrame():
-        player.brain.motion.resetOdometry()
+        # We need to be able to reset ODO
+        #player.brain.motion.resetOdometry()
         if player.brain.ball.filter_rel_y < 0.0:
             player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
@@ -278,18 +279,12 @@ def repositionAfterWhiff(player):
                               nav.FAST_SPEED)
 
     # if it took more than 5 seconds, forget it
-    # WE NEED ODO
     if player.counter > 150:
-        returnToGoal.kickPose.relX = 0
-        returnToGoal.kickPose.relY = 0
-        returnToGoal.kickPose.relH = 0
+        returnToGoal.kickPose.relX += player.brain.interface.odometry.x
+        returnToGoal.kickPose.relY += player.brain.interface.odometry.y
+        returnToGoal.kickPose.relH += player.brain.interface.odometry.h
 
-    # Wow hilarious copy-paste programming on my part
-    #     returnToGoal.kickPose.relX += player.brain.loc.lastOdoX
-    #     returnToGoal.kickPose.relX += player.brain.loc.lastOdoY
-    #     returnToGoal.kickPose.relX += player.brain.loc.lastOdoTheta
-
-    #     return player.goLater('returnToGoal')
+        return player.goLater('returnToGoal')
 
     kickPose = player.kick.getPosition()
     repositionAfterWhiff.ballDest.relX = (player.brain.ball.filter_rel_x -

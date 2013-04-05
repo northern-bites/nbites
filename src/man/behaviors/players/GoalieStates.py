@@ -108,20 +108,19 @@ def kickBall(player):
     """
     if player.firstFrame():
         # save odometry if this was your first kick
-        # WE NEED ODO
-        # if player.lastDiffState == 'clearIt':
-        #     VisualStates.returnToGoal.kickPose = \
-        #         RelRobotLocation(player.brain.loc.lastOdoX,
-        #                          player.brain.loc.lastOdoY,
-        #                          player.brain.loc.lastOdoTheta)
+        if player.lastDiffState == 'clearIt':
+            VisualStates.returnToGoal.kickPose = \
+                RelRobotLocation(player.brain.interface.odometry.x,
+                                 player.brain.interface.odometry.y,
+                                 player.brain.interface.odometry.h)
         #otherwise add to previously saved odo
-        # else:
-        #     VisualStates.returnToGoal.kickPose.relX += \
-        #         player.brain.loc.lastOdoX
-        #     VisualStates.returnToGoal.kickPose.relX += \
-        #         player.brain.loc.lastOdoY
-        #    VisualStates.returnToGoal.kickPose.relX += \
-        #        player.brain.loc.lastOdoTheta
+        else:
+            VisualStates.returnToGoal.kickPose.relX += \
+                player.brain.interface.odometry.x
+            VisualStates.returnToGoal.kickPose.relX += \
+                player.brain.interface.odometry.y
+            VisualStates.returnToGoal.kickPose.relX += \
+                player.brain.interface.odometry.h
 
         VisualStates.returnToGoal.kickPose.relX = 0
         VisualStates.returnToGoal.kickPose.relX = 0

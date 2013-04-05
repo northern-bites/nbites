@@ -119,6 +119,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.visionFieldIn.wireTo(&vision.vision_field);
     behaviors.visionRobotIn.wireTo(&vision.vision_robot);
     behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+    behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
     behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)

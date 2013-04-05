@@ -226,10 +226,8 @@ def walkedTooFar(player):
     if player.aggressive:
         return False
 
-    return True
-    # WE NEED ODOMETRY
-    # return (player.brain.loc.lastOdoX > 90.0 or
-    #         fabs(player.brain.loc.lastOdoY) > 140.0)
+    return (player.brain.interface.odometry.x > 90.0 or
+            fabs(player.brain.interface.odometry.y) > 140.0)
 
 def reachedMyDestination(player):
     """
