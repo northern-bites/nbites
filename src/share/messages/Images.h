@@ -500,8 +500,7 @@ public:
   //          here is to extract Y, U, and V components from a YUV composite image. 
 
   // makes ThresholdImage look like a proto to keep RoboGrams happy
-  void Clear()
-    { /**this = MemoryImage();*/ }
+  void Clear() {}
 
   std::string DebugString() const { return "Not implemented."; }
 };

@@ -81,6 +81,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Cognition **/
 
+    // Turn ON the finalize method for images, which we've specialized
+    portals::Message<messages::YUVImage>::setFinalize(true);
+    portals::Message<messages::ThresholdImage>::setFinalize(true);
+    portals::Message<messages::PackedImage16>::setFinalize(true);
+    portals::Message<messages::PackedImage8>::setFinalize(true);
+
     cognitionThread.addModule(topTranscriber   );
     cognitionThread.addModule(bottomTranscriber);
     cognitionThread.addModule(topConverter     );

@@ -62,7 +62,8 @@ void MemoryImageBase::shareBuffer(const MemoryImageBase& img)
 {
   // In case this image is already sharing a buffer with img, must getAddress before
   // release.
-  img.buffer_->getAddress();
+  if(img.buffer_)
+    img.buffer_->getAddress();
   if (buffer_)
     buffer_->release();
   buffer_ = img.buffer_;
