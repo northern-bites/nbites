@@ -52,6 +52,48 @@ message WalkCommand
     optional float h_percent = 3;
 }
 
+message HeadMotionCommand
+{
+    enum CommandType {
+    	 SET_HEAD_COMMAND = 0;
+	 SCRIPTED_HEAD_COMMAND = 1;
+    }
+
+    optional CommandType type = 1;
+
+    optional SetHeadCommand set_command = 2;
+    optional ScriptedHeadCommand scripted_command = 3;
+
+    optional bool processed_by_motion = 4 [default = true];
+}
+
+message SetHeadCommand
+{
+    optional float head_yaw = 1;
+    optional float head_pitch = 2;
+    optional float max_speed_yaw = 3;
+    optional float max_speed_pitch = 4;
+}
+
+message ScriptedHeadCommand
+{
+    repeated HeadJointCommand commands = 1;
+}
+
+message HeadJointCommand
+{
+    optional float time = 1;
+    optional JointAngles angles = 2;
+    optional JointAngles stiffness = 3;
+
+    enum InterpolationType {
+        SMOOTH = 0;
+	LINEAR = 1;
+    }
+
+    optional InterpolationType interpolation = 4;
+}
+
 message JointAngles
 {
    // Head angles.

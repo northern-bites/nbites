@@ -52,7 +52,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     motion.jointsInput_.wireTo(&sensors.jointsOutput_);
     motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
     motion.fsrInput_.wireTo(&sensors.fsrOutput_);
-    motion.commandInput_.wireTo(&behaviors.motionCommandOut , true);
+    motion.bodyCommandInput_.wireTo(&behaviors.motionCommandOut, true);
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
