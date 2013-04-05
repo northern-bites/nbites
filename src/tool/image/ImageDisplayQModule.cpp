@@ -12,11 +12,11 @@ ImageDisplayQModule::ImageDisplayQModule(QWidget* parent) : QLabel(parent)
 void ImageDisplayQModule::run_()
 {
     imageIn.latch();
-    setPixmap(QPixmap::fromImage(
-                  QImage((unsigned char*)imageIn.message().pixelAddress(0, 0),
-                         imageIn.message().width(),
-                         imageIn.message().height(),
-                         QImage::Format_ARGB32)));
+    // setPixmap(QPixmap::fromImage(
+    //               QImage((unsigned char*)imageIn.message().pixelAddress(0, 0),
+    //                      imageIn.message().width(),
+    //                      imageIn.message().height(),
+    //                      QImage::Format_ARGB32)));
 }
 
 }

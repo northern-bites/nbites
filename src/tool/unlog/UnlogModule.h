@@ -25,14 +25,22 @@ n * the contents of that file into a protobuf of its template type. It is
 #include "RoboGrams.h"
 #include "LogDefinitions.h"
 #include "Images.h"
+#include "logview/ProtoViewer.h"
+#include "image/ImageDisplayQModule.h"
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>
 #include <google/protobuf/message.h>
-#include <QObject>
+#include <QWidget>
 
 namespace tool {
 namespace unlog {
+
+struct GUI
+{
+    portals::Module* module;
+    QWidget* qwidget;
+};
 
 // Base Class
 class UnlogBase : public portals::Module
@@ -61,6 +69,8 @@ public:
     // Basic file control
     void openFile() throw (file_exception);
     void closeFile();
+
+    virtual GUI makeMyGUI() = 0;
 
 protected:
     // Inheriting classes still need to implement this
@@ -92,6 +102,17 @@ public:
 
     // Where the output will be provided
     portals::OutPortal<T> output;
+
+    GUI makeMyGUI()
+    {
+        GUI gui;
+        logview::TypedProtoViewer<T>* viewer = new logview::TypedProtoViewer<T>();
+        viewer->input.wireTo(&output);
+
+        gui.module = viewer;
+        gui.qwidget = viewer;
+        return gui;
+    }
 
     T readNextMessage()
     {
@@ -253,5 +274,7 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage();
 template<>
 UnlogModule<messages::YUVImage>::UnlogModule(std::string path);
 
+template<>
+GUI UnlogModule<messages::YUVImage>::makeMyGUI();
 }
 }

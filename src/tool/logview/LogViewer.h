@@ -26,6 +26,9 @@ class LogViewer : public QMainWindow {
 public:
     LogViewer(QWidget* parent = 0);
 
+public slots:
+    void newDisplayWidget(QWidget*, std::string);
+
 protected:
     QTabWidget imageTabs;
 };

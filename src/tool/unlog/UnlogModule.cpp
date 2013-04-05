@@ -161,5 +161,18 @@ UnlogModule<messages::YUVImage>::UnlogModule(std::string path) :
 {
 }
 
+template<>
+GUI UnlogModule<messages::YUVImage>::makeMyGUI()
+{
+    GUI gui;
+
+    image::ImageDisplayQModule* disp = new image::ImageDisplayQModule();
+    disp->imageIn.wireTo(&output);
+    gui.module = disp;
+    gui.qwidget = disp;
+
+    return gui;
+}
+
 }
 }

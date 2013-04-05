@@ -38,6 +38,9 @@ Tool::Tool(const char* title) :
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
 
+    connect(&diagram, SIGNAL(signalNewDisplayWidget(QWidget*, std::string)),
+            &logView, SLOT(newDisplayWidget(QWidget*, std::string)));
+
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);

@@ -7,8 +7,6 @@
 namespace tool {
 namespace image {
 
-typedef messages::PackedImage<unsigned int> RGBImage;
-
 class ImageDisplayQModule : public QLabel, public portals::Module
 {
     Q_OBJECT;
@@ -16,7 +14,7 @@ class ImageDisplayQModule : public QLabel, public portals::Module
 public:
     ImageDisplayQModule(QWidget* parent = 0);
 
-    portals::InPortal<RGBImage> imageIn;
+    portals::InPortal<messages::YUVImage> imageIn;
 
 protected:
     virtual void run_();

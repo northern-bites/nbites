@@ -57,6 +57,9 @@ public:
                   << std::endl;
     }
 
+signals:
+    void signalNewDisplayWidget(QWidget*, std::string);
+
 public slots:
     void run() { diagram.run(); }
     void addUnloggers(std::vector<std::string> paths);
@@ -76,6 +79,7 @@ public slots:
 protected:
     portals::RoboGram diagram;
     std::vector<unlog::UnlogBase*> unloggers;
+    std::vector<portals::Module*> displays;
 
     TypeMap typeMap;
 };

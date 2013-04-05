@@ -60,19 +60,28 @@ bool ToolDiagram::unlogFrom(std::string path)
     }
 
     unloggers.push_back(typeMap[head.name()](path));
+    diagram.addModule(*unloggers.back());
+
+    unlog::GUI gui = unloggers.back()->makeMyGUI();
+    diagram.addModule(*gui.module);
+    displays.push_back(gui.module);
+
     if(head.name() == "messages.YUVImage")
     {
         if(head.has_top_camera() && head.top_camera())
         {
+            emit signalNewDisplayWidget(gui.qwidget, "Top Image");
         }
         else
         {
+            emit signalNewDisplayWidget(gui.qwidget, "Bottom Image");
         }
     }
     else
     {
+        emit signalNewDisplayWidget(gui.qwidget, head.name());
     }
-    diagram.addModule(*unloggers.back());
+
     return true;
 }
 

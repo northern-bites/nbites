@@ -19,5 +19,24 @@ LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent),
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
 
+void LogViewer::newDisplayWidget(QWidget* widget, std::string title)
+{
+    if (title != "Top Image" && title != "Bottom Image")
+    {
+        QDockWidget* dockWidget =
+            new QDockWidget(QString(title.data()), this);
+        dockWidget->setMinimumWidth(300);
+        dockWidget->setMaximumHeight(125);
+
+        dockWidget->setWidget(widget);
+        this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    }
+    else
+    {
+        imageTabs.addTab(widget, QString(title.data()));
+    }
+
+}
+
 }
 }
