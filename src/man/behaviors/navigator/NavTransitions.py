@@ -28,8 +28,9 @@ def shouldDodgeLeft(nav):
         return False
 
     # check sonars
-    sonars = (nav.brain.sonar.rightDist != nav.brain.sonar.UNKNOWN_VALUE and
-              nav.brain.sonar.rightDist < constants.AVOID_OBSTACLE_SIDE_DIST)
+    sonarState = nav.brain.interface.sonarState
+    sonars = (sonarState.us_right != -1 and
+              sonarState.us_right < constants.AVOID_OBSTACLE_SIDE_DIST)
 
     #check vision
     vision = nav.brain.vision.obstacles.onRight
@@ -53,8 +54,9 @@ def shouldDodgeRight(nav):
         return False
 
     # check sonars
-    sonars = (nav.brain.sonar.leftDist != nav.brain.sonar.UNKNOWN_VALUE and
-              nav.brain.sonar.leftDist < constants.AVOID_OBSTACLE_SIDE_DIST)
+    sonarState = nav.brain.interface.sonarState
+    sonars = (sonarState.us_left != -1 and
+              sonarState.us_left < constants.AVOID_OBSTACLE_SIDE_DIST)
     #check vision
     vision = nav.brain.vision.obstacles.onLeft
 

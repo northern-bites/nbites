@@ -16,7 +16,8 @@ extern "C" void initGameState_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
-extern "C" void initMotionStatus();
+extern "C" void initMotionStatus_proto();
+extern "C" void initSonarState_proto();
 extern "C" void initinterface();
 
 
@@ -82,6 +83,7 @@ void BehaviorsModule::initializePython()
         initBallModel_proto();
         initPMotion_proto();
         initMotionStatus_proto();
+        initSonarState_proto();
 		// Init the interface as well
 		initinterface();
     } catch (error_already_set) {
@@ -209,7 +211,8 @@ void BehaviorsModule::runStep ()
 				}
         motionStatusIn.latch();
         pyInterface.setMotionStatus_ptr(&motionStatusIn.message());
-
+        sonarStateIn.latch();
+        pyInterface.setSonarState_ptr(&sonarStateIn.message());
 
         // Prepare potential out messages for python
 		ledCommand = portals::Message<messages::LedCommand>(0);

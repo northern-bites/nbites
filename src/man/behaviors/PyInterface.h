@@ -9,6 +9,7 @@
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
+#include "SonarState.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -23,6 +24,7 @@ public:
     messages::WorldModel* worldModel_ptr[4]; //TODO: use a constant
     messages::MotionCommand* motionCommand_ptr;
     messages::MotionStatus* motionStatus_ptr;
+    messages::SonarState* sonarState_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -55,6 +57,10 @@ public:
     void setMotionStatus_ptr(const messages::MotionStatus* msg)
     {
         motionStatus_ptr = const_cast<messages::MotionStatus*> (msg);
+    }
+    void setSonarState_ptr(const messages::SonarState* msg)
+    {
+        sonarState_ptr = const_cast<messages::SonarState*> (msg);
     }
 
 };

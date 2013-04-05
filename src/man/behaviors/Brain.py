@@ -36,6 +36,7 @@ import WorldModel_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
+import SonarState_proto
 
 class Brain(object):
     """
