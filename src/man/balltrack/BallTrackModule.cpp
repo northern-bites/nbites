@@ -42,7 +42,7 @@ void BallTrackModule::run_()
     // ballMessage.get()->set_filter_rel_x(ballFilter->getExponentialWeightedNaiveEstimate().relX);
     // ballMessage.get()->set_filter_rel_y(ballFilter->getExponentialWeightedNaiveEstimate().relY);
 
-    ballMessage.get()->mutable_vision_ball()->CopyFrom(visionBallInput.message());
+    ballMessage.get()->mutable_vis()->CopyFrom(visionBallInput.message());
 
     ballLocationOutput.setMessage(ballMessage);
 }

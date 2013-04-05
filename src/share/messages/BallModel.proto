@@ -20,7 +20,7 @@ message VisionBall {
 
 message FilteredBall
 {
-	optional VisionBall vision_ball = 1;
+	optional VisionBall vis = 1;
 	optional float filter_distance = 2;
 	optional float filter_bearing = 3;
 	optional float filter_rel_x = 4;
