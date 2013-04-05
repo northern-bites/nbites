@@ -194,32 +194,32 @@ class Leds():
 
             if (newCertainty == vision.certainty.NOT_SURE):
                 if (self.brain.ygrp.vis.on and
-                    (self.brain.ygrp.vis.framesOn == 1 or
+                    (self.brain.ygrp.vis.frames_on == 1 or
                      self.goalCertainty != newCertainty)):
                     #we see an ambiguous post for the first time!
                     self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
                     self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
             if(newCertainty == vision.certainty._SURE and
                self.brain.ygrp.vis.on and
-               (self.brain.ygrp.vis.framesOn == 1 or
+               (self.brain.ygrp.vis.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the right post for the first time!
                 self.executeLeds(RIGHT_POST_ON_LEDS)
             if(self.brain.yglp.vis.on and
-               (self.brain.yglp.vis.framesOn == 1 or
+               (self.brain.yglp.vis.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the left post for the first time!
                 self.executeLeds(LEFT_POST_ON_LEDS)
-            if(self.brain.ygrp.vis.framesOff == 1):
+            if(self.brain.ygrp.vis.frames_off == 1):
                 #we don't see the right post for the first time
                 self.executeLeds(RIGHT_POST_OFF_LEDS)
-            if((self.brain.yglp.vis.framesOff == 1 and
+            if((self.brain.yglp.vis.frames_off == 1 and
                 (newCertainty != vision.certainty.NOT_SURE and
-                 self.brain.ygrp.vis.framesOff >= 1)) or
-               (self.brain.yglp.vis.framesOff >=1 and
+                 self.brain.ygrp.vis.frames_off >= 1)) or
+               (self.brain.yglp.vis.frames_off >=1 and
                 ((newCertainty != vision.certainty.NOT_SURE and
                   newCertainty != self.goalCertainty) or
-                 self.brain.ygrp.vis.framesOff == 1))):
+                 self.brain.ygrp.vis.frames_off == 1))):
                 #we don't see the left post for the first time
                 self.executeLeds(LEFT_POST_OFF_LEDS)
 
