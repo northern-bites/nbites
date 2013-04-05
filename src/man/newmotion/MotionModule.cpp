@@ -638,7 +638,7 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 
         // Interpolation is set for the entire script, not per command
         Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
-        if(script.interpolation() == 1)
+        if(script.interpolation_type() == 1)
             interType = Kinematics::INTERPOLATION_LINEAR;
 
         // create the BJC and set it
@@ -663,10 +663,10 @@ void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
     headProvider.setCommand(command);
 }
 
-void MotionModule::sendMotionCommand(const messages::SetHeadCommand& command)
+void MotionModule::sendMotionCommand(const messages::SetHeadCommand command)
 {
     nextHeadProvider = &headProvider;
-    if (command.max_speed_yaw == -1 || command.max_speed_pitch == -1)
+    if (command.max_speed_yaw() == -1 || command.max_speed_pitch() == -1)
     {
         SetHeadCommand::ptr setHeadCommand(
             new SetHeadCommand(command.head_yaw(),
@@ -693,7 +693,7 @@ void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
     headProvider.setCommand(command);
 }
 
-void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand& script)
+void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
 {
     nextHeadProvider = &headProvider;
     // Create a command for every Body Joint Command

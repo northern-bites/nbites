@@ -78,9 +78,9 @@ public:
 
     // Head Commands.
     void sendMotionCommand(const SetHeadCommand::ptr command);
-    void sendMotionCommand(const messages::SetHeadCommand& command);
+    void sendMotionCommand(const messages::SetHeadCommand command);
     void sendMotionCommand(const HeadJointCommand::ptr command);
-    void sendMotionCommand(const messages::ScriptedHeadCommand& command);
+    void sendMotionCommand(const messages::ScriptedHeadCommand command);
 
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
