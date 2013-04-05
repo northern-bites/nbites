@@ -36,8 +36,9 @@ def shouldDodgeLeft(nav):
     vision = nav.brain.vision.obstacles.onRight
 
     #check feet
-    feet = (nav.brain.sensors.rightFootBumper.left or
-            nav.brain.sensors.rightFootBumper.right)
+    footBumperState = nav.brain.interface.footBumperState
+    feet = (footBumperState.r_foot_bumper_left or
+            footBumperState.r_foot_bumper_right)
 
     if (feet and vision):
         return True
@@ -61,8 +62,9 @@ def shouldDodgeRight(nav):
     vision = nav.brain.vision.obstacles.onLeft
 
     #check feet
-    feet = (nav.brain.sensors.leftFootBumper.left or
-            nav.brain.sensors.leftFootBumper.right)
+    footBumperState = nav.brain.interface.footBumperState
+    feet = (footBumperState.l_foot_bumper_left or
+            footBumperState.l_foot_bumper_right)
 
     if (feet and vision):
         return True
@@ -75,7 +77,7 @@ def shouldDodgeRight(nav):
         return False
 
 def doneDodging(nav):
-    return nav.brain.motion.isStanding()
+    return nav.brain.interface.motionStatus.standing
 
 def notAtLocPosition(nav):
     return not atDestination(nav)
@@ -97,6 +99,7 @@ def walkedEnough(nav):
 ######### BALL IN BOX ###############
 
 #keeping this code around for posterity; do we actually need it?
+#not safe to call as of 4/4/2013
 
 def shouldChaseAroundBox(my, ball):
 

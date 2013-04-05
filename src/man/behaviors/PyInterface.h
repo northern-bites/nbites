@@ -14,6 +14,7 @@
 #include "SonarState.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
+#include "FootBumperState.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -22,16 +23,17 @@ namespace behaviors {
 class PyInterface
 {
 public:
-    messages::GameState     const * gameState_ptr;
-    messages::VisionBall    const * visionBall_ptr;
-    messages::VisionRobot   const * visionRobot_ptr;
-    messages::VisionField   const * visionField_ptr;
-    messages::FilteredBall  const * filteredBall_ptr;
-    messages::LedCommand    const * ledCommand_ptr;
-    messages::WorldModel    const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
-    messages::MotionCommand const * motionCommand_ptr;
-    messages::MotionStatus  const * motionStatus_ptr;
-    messages::SonarState    const * sonarState_ptr;
+    messages::GameState       const * gameState_ptr;
+    messages::VisionBall      const * visionBall_ptr;
+    messages::VisionRobot     const * visionRobot_ptr;
+    messages::VisionField     const * visionField_ptr;
+    messages::FilteredBall    const * filteredBall_ptr;
+    messages::LedCommand      const * ledCommand_ptr;
+    messages::WorldModel      const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
+    messages::MotionCommand   const * motionCommand_ptr;
+    messages::MotionStatus    const * motionStatus_ptr;
+    messages::SonarState      const * sonarState_ptr;
+    messages::FootBumperState const * footBumperState_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -80,6 +82,10 @@ public:
     void setSonarState_ptr(const messages::SonarState* msg)
     {
         sonarState_ptr = msg;
+    }
+    void setFootBumperState_ptr(const messages::FootBumperState* msg)
+    {
+        footBumperState_ptr = msg;
     }
 
 };

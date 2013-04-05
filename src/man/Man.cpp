@@ -109,6 +109,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput, false);
     behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
+    behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,

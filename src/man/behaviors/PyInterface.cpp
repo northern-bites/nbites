@@ -60,6 +60,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::sonarState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("footBumperState",
+                      make_getter(&PyInterface::footBumperState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
 		;
 	scope().attr("interface") = interface_ptr;
 }
