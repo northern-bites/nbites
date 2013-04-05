@@ -52,8 +52,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     motion.jointsInput_.wireTo(&sensors.jointsOutput_);
     motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
     motion.fsrInput_.wireTo(&sensors.fsrOutput_);
-    motion.commandInput_.wireTo(&behaviors.motionCommandOut , true);
     motion.stiffnessInput_.wireTo(&guardian.stiffnessControlOutput, true);
+    motion.bodyCommandInput_.wireTo(&behaviors.motionCommandOut, true);
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
@@ -92,7 +92,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     /** Cognition **/
     cognitionThread.addModule(imageTranscriber);
     cognitionThread.addModule(vision);
-    //cognitionThread.addModule(ballTrack);
+    cognitionThread.addModule(ballTrack);
     cognitionThread.addModule(leds);
     cognitionThread.addModule(behaviors);
     cognitionThread.addModule(gamestate);
@@ -101,14 +101,14 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
     leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
+    ballTrack.visionBallInput.wireTo(&vision.vision_ball);
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
     gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
     gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
-    //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+    behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
     behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
-    behaviors.visionBallIn.wireTo(&vision.vision_ball);
     behaviors.visionFieldIn.wireTo(&vision.vision_field);
     behaviors.visionRobotIn.wireTo(&vision.vision_robot);
     behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);

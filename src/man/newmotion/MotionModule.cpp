@@ -27,8 +27,6 @@ MotionModule::MotionModule()
 {
     boost::shared_ptr<FreezeCommand> paralyze
         = boost::shared_ptr<FreezeCommand>(new FreezeCommand());
-
-    //nullBodyProvider.setCommand(paralyze);
 }
 
 MotionModule::~MotionModule()
@@ -53,16 +51,12 @@ void MotionModule::run_()
     jointsInput_.latch();
     inertialsInput_.latch();
     fsrInput_.latch();
-    commandInput_.latch();
     stiffnessInput_.latch();
+    bodyCommandInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
     newInputJoints = false;
-
-    //std::cout << "MotionModule: Using "
-    //          << curProvider->getName()
-    //          << std::endl;
 
     // (2) If motion is enabled, perform a single iteration
     //     of the main motion loop.
@@ -81,11 +75,7 @@ void MotionModule::run_()
         processStiffness();
         bool active = postProcess();
 
-        //std::cout << "motion active? "
-        //          << (active ? "yes" : "no")
-        //          << std::endl;
-
-        // (4) Send newly computed joints and stiffnesses to
+       // (4) Send newly computed joints and stiffnesses to
         //     the joint enactor module.
         if(active)
             setJointsAndStiffness();
@@ -280,30 +270,45 @@ void MotionModule::processMotionInput()
     //     return;
     // }
 
-    if(!commandInput_.message().processed_by_motion())
+    // (1) First process body commands.
+    if(!bodyCommandInput_.message().processed_by_motion())
     {
-        std::cout << "MESSAGE" << commandInput_.message().dest().rel_x() << " "
-                  << commandInput_.message().dest().rel_y() << " "
-                  << commandInput_.message().dest().rel_h() << " "<< std::endl;
+        std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
+                  << bodyCommandInput_.message().dest().rel_y() << " "
+                  << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
 
         // Is this a destination walk request?
-        if (commandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK){
-            sendMotionCommand(commandInput_.message().dest());
-            const_cast<messages::MotionCommand&>(commandInput_.message()).set_processed_by_motion(true);
+        if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK){
+            sendMotionCommand(bodyCommandInput_.message().dest());
+            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
         // Walk request?
-        else if (commandInput_.message().type() == messages::MotionCommand::WALK_COMMAND){
-            sendMotionCommand(commandInput_.message().speed());
-            const_cast<messages::MotionCommand&>(commandInput_.message()).set_processed_by_motion(true);
+        else if (bodyCommandInput_.message().type() == messages::MotionCommand::WALK_COMMAND){
+            sendMotionCommand(bodyCommandInput_.message().speed());
+            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
         // Sweet Move request?
-        else if (commandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE){
-            sendMotionCommand(commandInput_.message().script());
-            const_cast<messages::MotionCommand&>(commandInput_.message()).set_processed_by_motion(true);
+        else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE){
+            sendMotionCommand(bodyCommandInput_.message().script());
+            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
-        std::cout << "POST!! " << commandInput_.message().processed_by_motion() << std::endl;
+        std::cout << "POST!! " << bodyCommandInput_.message().processed_by_motion() << std::endl;
     }
 
+    // (2) Process head commands.
+    if(!headCommandInput_.message().processed_by_motion())
+    {
+        if(headCommandInput_.message().type() == messages::HeadMotionCommand::SET_HEAD_COMMAND)
+        {
+            sendMotionCommand(headCommandInput_.message().set_command());
+            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
+        }
+        else if(headCommandInput_.message().type() == messages::HeadMotionCommand::SCRIPTED_HEAD_COMMAND)
+        {
+            sendMotionCommand(headCommandInput_.message().scripted_command());
+            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
+        }
+    }
 }
 
 void MotionModule::preProcessBody()
@@ -328,22 +333,28 @@ void MotionModule::preProcessBody()
     }
 }
 
-// written as stopgap measure by Josh Z 4/3/2013
 void MotionModule::preProcessHead()
 {
-    if (curHeadProvider != &nullHeadProvider &&
-        nextHeadProvider == &nullHeadProvider)
+    if(curHeadProvider != &nullHeadProvider &&
+       nextHeadProvider == &nullHeadProvider)
     {
         headProvider.hardReset();
+        swapHeadProvider();
+        // Skip other checks since we are performing a hard
+        // reset.
+        return;
     }
 
-    //determine the curHeadProvider, and do any necessary swapping
-    if (curHeadProvider != nextHeadProvider)
+    // determine the curHeadProvider, and do any necessary swapping
+    if(curHeadProvider != nextHeadProvider)
     {
-        if (!curHeadProvider->isStopping()) {
+        if(!curHeadProvider->isStopping())
+        {
             curHeadProvider->requestStop();
         }
-        if (!curHeadProvider->isActive()) {
+
+        if (!curHeadProvider->isActive())
+        {
             swapHeadProvider();
         }
     }
@@ -486,13 +497,11 @@ void MotionModule::swapBodyProvider()
     }
 }
 
-// written as stopgap measure by Josh Z 4/3/2013
 void MotionModule::swapHeadProvider()
 {
     switch(nextHeadProvider->getType())
     {
     case HEAD_PROVIDER:
-    case NULL_PROVIDER:
     default:
         curHeadProvider = nextHeadProvider;
     }
@@ -580,8 +589,6 @@ void MotionModule::sendMotionCommand(const BodyJointCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands)
 {
-    std::cout << "MotionModule: Received new BodyJointCommand vector."
-              << std::endl;
     noWalkTransitionCommand = true;
     nextProvider = &scriptedProvider;
     for(std::vector<BodyJointCommand::ptr>::const_iterator iter = commands.begin();
@@ -595,7 +602,7 @@ void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> co
 void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 {
     // Create a command for every Body Joint Command
-    for (int i =0; i<script.commands_size(); i++)
+    for (int i = 0; i < script.commands_size(); i++)
     {
         std::vector<float> angles(26, 0.f);
         std::vector<float> stiffness(26, 0.f);
@@ -666,25 +673,36 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
     }
 }
 
-void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
-{
-    nextHeadProvider = &headProvider;
-    headProvider.setCommand(command);
-}
-
 void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
 {
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
 
-// void MotionModule::sendMotionCommand(const CoordHeadCommand::ptr command){
-//     pthread_mutex_lock(&next_provider_mutex);
-//     nextHeadProvider = &headProvider;
-//     headProvider.setCommand(command);
-//     pthread_mutex_unlock(&next_provider_mutex);
+void MotionModule::sendMotionCommand(const messages::SetHeadCommand& command)
+{
+    nextHeadProvider = &headProvider;
+    SetHeadCommand::ptr setHeadCommand(
+        new SetHeadCommand(command.head_yaw(),
+                           command.head_pitch(),
+                           command.max_speed_yaw(),
+                           command.max_speed_pitch()
+            )
+        );
+    headProvider.setCommand(setHeadCommand);
+}
 
-// }
+void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
+{
+    nextHeadProvider = &headProvider;
+    headProvider.setCommand(command);
+}
+
+void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand& command)
+{
+    nextHeadProvider = &headProvider;
+    // @todo
+}
 
 void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
 {
