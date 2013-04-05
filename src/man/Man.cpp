@@ -3,6 +3,8 @@
 #include <iostream>
 #include "RobotConfig.h"
 
+SET_POOL_SIZE(messages::WorldModel, 15);
+
 namespace man {
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
