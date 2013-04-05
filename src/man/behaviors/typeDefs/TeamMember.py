@@ -134,7 +134,7 @@ class TeamMember(RobotLocation):
         t = (self.ballDist / CHASE_SPEED)
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time base is " + str(t))
+            print "\tChase time base is " + str(t)
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
         if (not self.brain.ball.frames_on > 3 and
@@ -142,7 +142,7 @@ class TeamMember(RobotLocation):
             t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after ball on bonus " + str(t))
+            print "\tChase time after ball on bonus " + str(t)
 
         # Commented out Summer 2012 due to unreliable Localization.
         # # Give penalties for not lining up along the ball-goal line
@@ -157,13 +157,13 @@ class TeamMember(RobotLocation):
         #     t += BALL_GOAL_LINE_PENALTY
 
         # if DEBUG_DETERMINE_CHASE_TIME:
-        #     self.brain.out.printf("\tChase time after ball-goal-line penalty "+str(t))
+        #     print "\tChase time after ball-goal-line penalty "+str(t)
 
         # Add a penalty for being fallen over
         t += 20 * (self.brain.player.currentState == 'fallen')
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after fallen over penalty " + str(t))
+            print "\tChase time after fallen over penalty " + str(t)
 
         t *= CHASE_SPEED
 
@@ -171,8 +171,8 @@ class TeamMember(RobotLocation):
         t = t * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
 
         if DEBUG_DETERMINE_CHASE_TIME:
-            self.brain.out.printf("\tChase time after filter " +str(t))
-            self.brain.out.printf("")
+            print "\tChase time after filter " +str(t)
+            print ""
 
         return t
 

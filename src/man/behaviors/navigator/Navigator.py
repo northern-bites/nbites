@@ -42,7 +42,6 @@ class Navigator(FSA.FSA):
         self.currentState = 'stopped'
         self.setName('Navigator')
         self.setPrintStateChanges(True)
-        self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
 
         #transitions

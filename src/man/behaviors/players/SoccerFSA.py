@@ -17,7 +17,6 @@ class SoccerFSA(FSA.FSA):
         self.setPrintStateChanges(True)
         # set printing to be done with colors
         self.stateChangeColor = 'red'
-        self.setPrintFunction(self.brain.out.printf)
 
         # for writing variance data only once per appropriate state
         self.wroteVarianceData = False

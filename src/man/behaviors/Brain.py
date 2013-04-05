@@ -12,7 +12,7 @@ import noggin_constants as Constants
 
 # Modules from this directory
 from . import Leds
-#from . import robots
+from . import robots
 from . import MyInfo
 from . import GameController
 
@@ -57,9 +57,6 @@ class Brain(object):
         self.counter = 0
         self.time = time.time()
 
-        self.on = True
-        # Output Class
-        self.out = NaoOutput.NaoOutput(self)
         self.my = MyInfo.MyInfo()
 
         #initalize the leds and game controller
@@ -67,12 +64,12 @@ class Brain(object):
         self.gameController = GameController.GameController(self)
 
         # Retrieve our robot identification and set per-robot parameters
-        #self.CoA = robots.get_certificate()
+        self.CoA = robots.get_certificate()
 
         # coa is Certificate of Authenticity (to keep things short)
-        #self.out.printf(self.CoA)
-        #self.out.printf("GC:  I am on team "+str(self.teamNumber))
-        #self.out.printf("GC:  I am player  "+str(self.playerNumber))
+        print '\033[32m'+str(self.CoA)                              +'\033[0m'
+        print '\033[32m'+"GC:  I am on team "+str(self.teamNumber)  +'\033[0m'
+        print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
 
         # Information about the environment
         # All field objects should come in as messages now
