@@ -188,6 +188,9 @@ private:
      */
     void updateOdometry();
 
+    // Make a new status proto and set it on the out portal
+    void updateStatus();
+
     BHWalkProvider walkProvider;
     ScriptedProvider scriptedProvider;
     HeadProvider headProvider;

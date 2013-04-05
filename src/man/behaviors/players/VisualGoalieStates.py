@@ -18,39 +18,6 @@ import noggin_constants as nogginConstants
 DEBUG_OBSERVATIONS = False
 DEBUG_POSITION = False
 
-def updatePostObservations(player):
-    """
-    Updates the underlying C++ data structures.
-    """
-    if (player.brain.vision.ygrp.on and
-        player.brain.vision.yglp.on):
-
-        if(player.brain.vision.ygrp.dist != 0.0 and
-        #magic number
-        player.brain.vision.ygrp.dist < 400.0):
-            player.system.pushRightPostObservation(player.brain.vision.ygrp.dist,
-                                                   player.brain.vision.ygrp.bearing)
-            if DEBUG_OBSERVATIONS:
-                print "RIGHT: Saw right post."
-                print "  Avg right x is now " + str(player.system.rightPostRelX())
-                print "  Avg right y is now " + str(player.system.rightPostRelY())
-
-        if (player.brain.vision.yglp.dist != 0.0 and
-            #magic number
-            player.brain.vision.yglp.dist < 400.0):
-            player.system.pushLeftPostObservation(player.brain.vision.yglp.dist,
-                                                  player.brain.vision.yglp.bearing)
-            if DEBUG_OBSERVATIONS:
-                print "LEFT: Saw left post."
-                print "  Avg left x is now " + str(player.system.leftPostRelX())
-                print "  Avg left y is now " + str(player.system.leftPostRelY())
-
-def updateCrossObservations(player):
-    if(player.brain.vision.cross.on and
-       player.brain.vision.cross.dist != 0.0):
-        player.system.pushCrossObservation(player.brain.vision.cross.dist,
-                                           player.brain.vision.cross.bearing)
-
 def spinToFaceGoal(player):
     if player.firstFrame():
         if (player.lastDiffState == 'decideRightSide'):
@@ -83,30 +50,7 @@ def walkToGoal(player):
             # don't change side
             player.side = player.side
 
-        # based on that side, set up post observations
-        if player.side == RIGHT:
-            player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
-                                     goalie.RIGHT_SIDE_RP_ANGLE,
-                                     goalie.RIGHT_SIDE_LP_DISTANCE,
-                                     0.0)
-        if player.side == LEFT:
-            player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
-                                     0.0,
-                                     goalie.LEFT_SIDE_LP_DISTANCE,
-                                     goalie.LEFT_SIDE_LP_ANGLE)
-
-
-        player.system.home.relH = 0.0
-        player.brain.nav.goTo(player.system.home, nav.CLOSE_ENOUGH,
-                              nav.MEDIUM_SPEED, True)
-
-    updatePostObservations(player)
-    player.brain.tracker.lookToAngle(player.system.centerGoalBearing())
-    player.system.home.relY = player.system.centerGoalRelY()
-    player.system.home.relX = player.system.centerGoalRelX()
-    player.system.home.relH = player.system.centerGoalBearing()
-
-    return Transition.getNextState(player, walkToGoal)
+    return player.stay()
 
 def dodgeBall(player):
     if player.firstFrame():
@@ -144,14 +88,13 @@ def gatherPostInfo(player):
 
 def spinAtGoal(player):
     if player.firstFrame():
-        player.system.home.relX = 0
-        player.system.home.relY = 0
+        spinAtGoal.home = RelRobotLocation(0, 0, 0)
         # Decide which way to rotate based on the way we came from
         if player.side == RIGHT:
-            player.system.home.relH = -90
+            spinAtGoal.home.relH = -90
         else:
-            player.system.home.relH = 90
-        player.brain.nav.goTo(player.system.home,
+            spinAtGoal.home.relH = 90
+        player.brain.nav.goTo(spinAtGoal.home,
                               nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
 
         player.brain.tracker.lookToAngle(0.0)

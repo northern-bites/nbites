@@ -2,7 +2,6 @@ import time
 from objects import RelRobotLocation
 from ..navigator import Navigator as nav
 from ..util import Transition
-from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
 from GoalieConstants import RIGHT, LEFT
@@ -10,50 +9,36 @@ from GoalieConstants import RIGHT, LEFT
 def gameInitial(player):
     if player.firstFrame():
         player.brain.nav.stop()
-        player.gainsOn()
         player.zeroHeads()
-        player.GAME_INITIAL_satDown = False
-        player.system = GoalieSystem()
         player.side = LEFT
         player.isSaving = False
-
-    elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
-          and not player.motion.isBodyActive()):
-        player.GAME_INITIAL_satDown = True
-        player.executeMove(SweetMoves.SIT_POS)
-
-    elif (not player.motion.isBodyActive()):
-        player.gainsOff()
 
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.penaltyKicking = False
-        player.gainsOn()
         player.brain.nav.stand()
         player.brain.tracker.lookToAngle(0)
         if player.lastDiffState != 'gameInitial':
             player.brain.nav.walkTo(RelRobotLocation(120, 0, 0))
 
     # Wait until the sensors are calibrated before moving.
-    if(not player.brain.motion.calibrated()):
+    if(not player.brain.motion.calibrated):
         return player.stay()
 
     return player.stay()
 
 def gameSet(player):
     if player.firstFrame():
-        player.brain.logger.startLogging()
         player.penaltyKicking = False
         player.brain.nav.stand()
-        player.gainsOn()
-        player.brain.loc.resetBall()
+        #player.brain.loc.resetBall()
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)
 
     # Wait until the sensors are calibrated before moving.
-    if (not player.brain.motion.calibrated()):
+    if (not player.brain.motion.calibrated):
         return player.stay()
 
     return player.stay()
@@ -61,11 +46,10 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.penaltyKicking = False
-        player.gainsOn()
         player.brain.nav.stand()
 
     # Wait until the sensors are calibrated before moving.
-    if (not player.brain.motion.calibrated()):
+    if (not player.brain.motion.calibrated):
         return player.stay()
 
     if (player.lastDiffState == 'gamePenalized' and
@@ -79,18 +63,16 @@ def gamePlaying(player):
 
 def gamePenalized(player):
     if player.firstFrame():
-        player.brain.logger.stopLogging()
         player.inKickingState = False
         player.stopWalking()
         player.penalizeHeads()
 
     if player.lastDiffState == '':
         # Just started up! Need to calibrate sensors
-        player.gainsOn()
         player.brain.nav.stand()
 
     # Wait until the sensors are calibrated before moving.
-    if (not player.brain.motion.calibrated()):
+    if (not player.brain.motion.calibrated):
         return player.stay()
 
     return player.stay()
@@ -102,8 +84,9 @@ def gameFinished(player):
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
 
-    if player.brain.nav.isStopped():
-        player.gainsOff()
+    # Add me back when this works
+    #if player.brain.nav.isStopped():
+        #player.gainsOff()
 
     return player.stay()
 
@@ -184,7 +167,6 @@ def upUpUP(player):
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
-        player.gainsOn()
         player.stopWalking()
         player.stand()
         player.brain.loc.resetBall()
@@ -201,7 +183,6 @@ def penaltyShotsGameSet(player):
 
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
-        player.gainsOn()
         player.stand()
         player.brain.tracker.trackBallFixedPitch()
         player.brain.nav.walkTo(RelRobotLocation(0.0, 30.0, 0.0))

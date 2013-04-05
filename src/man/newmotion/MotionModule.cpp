@@ -33,7 +33,6 @@ MotionModule::MotionModule()
 
 MotionModule::~MotionModule()
 {
-
 }
 
 void MotionModule::start()
@@ -93,6 +92,7 @@ void MotionModule::run_()
         // (5) Get the latest odometry measurements and update
         //     the messages that we output.
         updateOdometry();
+        updateStatus();
 
         newInputJoints = false;
         frameCount++;
@@ -959,6 +959,19 @@ std::vector<BodyJointCommand::ptr> MotionModule::readScriptedSequence(
 void MotionModule::updateOdometry()
 {
     walkProvider.getOdometryUpdate(odometryOutput_);
+}
+
+void MotionModule::updateStatus()
+{
+    portals::Message<messages::MotionStatus> status(0);
+
+    status.get()->set_standing(isStanding());
+    status.get()->set_body_is_active(isBodyActive());
+    status.get()->set_walk_is_active(isWalkActive());
+    status.get()->set_head_is_active(isHeadActive());
+    status.get()->set_calibrated(calibrated());
+
+    motionStatusOutput_.setMessage(status);
 }
 
 } // namespace motion
