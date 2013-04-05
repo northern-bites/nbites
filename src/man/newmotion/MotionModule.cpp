@@ -51,7 +51,9 @@ void MotionModule::run_()
     jointsInput_.latch();
     inertialsInput_.latch();
     fsrInput_.latch();
+    stiffnessInput_.latch();
     bodyCommandInput_.latch();
+    headCommandInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -252,6 +254,23 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
+    // This doesn't work. ELLIS!!!!!!!!
+    // // First check: is guardian turning stiffness off?
+    // if(stiffnessInput_.message().remove() && gainsOn)
+    // {
+    //     gainsOn = false;
+    //     std::cout << "Sending freeze command." << std::endl;
+    //     sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+    //     return;
+    // }
+    // if(!stiffnessInput_.message().remove() && !gainsOn)
+    // {
+    //     gainsOn = true;
+    //     std::cout << "Sending unfreeze command." << std::endl;
+    //     sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+    //     return;
+    // }
+
     // (1) First process body commands.
     if(!bodyCommandInput_.message().processed_by_motion())
     {
@@ -273,6 +292,21 @@ void MotionModule::processMotionInput()
         else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE){
             sendMotionCommand(bodyCommandInput_.message().script());
             const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
+        }
+    }
+
+    // (2) Process head commands.
+    if(!headCommandInput_.message().processed_by_motion())
+    {
+        if(headCommandInput_.message().type() == messages::HeadMotionCommand::SET_HEAD_COMMAND)
+        {
+            sendMotionCommand(headCommandInput_.message().set_command());
+            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
+        }
+        else if(headCommandInput_.message().type() == messages::HeadMotionCommand::SCRIPTED_HEAD_COMMAND)
+        {
+            sendMotionCommand(headCommandInput_.message().scripted_command());
+            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
         }
     }
 }
@@ -618,16 +652,16 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
         stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
 
-
-
+        // Interpolation is set for the entire script, not per command
         Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
-        if(script.commands(i).interpolation() == 1)
+        if(script.interpolation_type() == 1)
             interType = Kinematics::INTERPOLATION_LINEAR;
 
         // create the BJC and set it
         motion::BodyJointCommand::ptr newCommand(
             new motion::BodyJointCommand(
-                (script.commands(i).time()),
+                // Time is set for the entire script, not per command
+                (script.time()),
                 angles,
                 stiffness,
                 interType)
@@ -645,17 +679,29 @@ void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
     headProvider.setCommand(command);
 }
 
-void MotionModule::sendMotionCommand(const messages::SetHeadCommand& command)
+void MotionModule::sendMotionCommand(const messages::SetHeadCommand command)
 {
     nextHeadProvider = &headProvider;
-    SetHeadCommand::ptr setHeadCommand(
-        new SetHeadCommand(command.head_yaw(),
-                           command.head_pitch(),
-                           command.max_speed_yaw(),
-                           command.max_speed_pitch()
-            )
-        );
-    headProvider.setCommand(setHeadCommand);
+    if (command.max_speed_yaw() == -1 || command.max_speed_pitch() == -1)
+    {
+        SetHeadCommand::ptr setHeadCommand(
+            new SetHeadCommand(command.head_yaw(),
+                               command.head_pitch()
+                )
+            );
+        headProvider.setCommand(setHeadCommand);
+    }
+    else
+    {
+        SetHeadCommand::ptr setHeadCommand(
+            new SetHeadCommand(command.head_yaw(),
+                               command.head_pitch(),
+                               command.max_speed_yaw(),
+                               command.max_speed_pitch()
+                )
+            );
+        headProvider.setCommand(setHeadCommand);
+    }
 }
 
 void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
@@ -664,10 +710,59 @@ void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
     headProvider.setCommand(command);
 }
 
-void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand& command)
+void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
 {
     nextHeadProvider = &headProvider;
-    // @todo
+    // Create a command for every Body Joint Command
+    for (int i = 0; i < script.commands_size(); i++)
+    {
+        std::vector<float> angles(26, 0.f);
+        std::vector<float> stiffness(26, 0.f);
+
+        // populate vectors
+        angles[0] = script.commands(i).angles().head_yaw();
+        angles[1] = script.commands(i).angles().head_pitch();
+
+        stiffness[0] = script.commands(i).stiffness().head_yaw();
+        stiffness[1] = script.commands(i).stiffness().head_pitch();
+        stiffness[2] = script.commands(i).stiffness().l_shoulder_pitch();
+        stiffness[3] = script.commands(i).stiffness().l_shoulder_roll();
+        stiffness[4] = script.commands(i).stiffness().l_elbow_yaw();
+        stiffness[5] = script.commands(i).stiffness().l_elbow_roll();
+        stiffness[6] = script.commands(i).stiffness().l_hip_yaw_pitch();
+        stiffness[7] = script.commands(i).stiffness().l_hip_roll();
+        stiffness[8] = script.commands(i).stiffness().l_hip_pitch();
+        stiffness[9] = script.commands(i).stiffness().l_knee_pitch();
+        stiffness[10] = script.commands(i).stiffness().l_ankle_pitch();
+        stiffness[11] = script.commands(i).stiffness().l_ankle_roll();
+        stiffness[12] = script.commands(i).stiffness().r_hip_yaw_pitch();
+        stiffness[13] = script.commands(i).stiffness().r_hip_roll();
+        stiffness[14] = script.commands(i).stiffness().r_hip_pitch();
+        stiffness[15] = script.commands(i).stiffness().r_knee_pitch();
+        stiffness[16] = script.commands(i).stiffness().r_ankle_pitch();
+        stiffness[17] = script.commands(i).stiffness().r_ankle_roll();
+        stiffness[18] = script.commands(i).stiffness().r_shoulder_pitch();
+        stiffness[19] = script.commands(i).stiffness().r_shoulder_roll();
+        stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
+        stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
+
+
+
+        Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
+        if(script.commands(i).interpolation() == 1)
+            interType = Kinematics::INTERPOLATION_LINEAR;
+
+        // create the HJC and set it
+        motion::HeadJointCommand::ptr newCommand(
+            new motion::HeadJointCommand(
+                (script.commands(i).time()),
+                angles,
+                stiffness,
+                interType)
+            );
+
+        headProvider.setCommand(newCommand);
+    }
 }
 
 void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)

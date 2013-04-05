@@ -29,7 +29,6 @@ def goToPosition(nav):
     Absolute locations get transformed to relative locations based on current loc
     For relative locations we use our bearing to that point as the heading
     """
-
     relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
     goToPosition.deltaDest = relDest # cache it for later use
 

@@ -44,6 +44,7 @@ void NullProvider::calculateNextJointsAndStiffnesses(
     const messages::InertialState& sensorInertials,
     const messages::FSR&           sensorFSRs)
 {
+    std::cout << "Null provider calculating." << std::endl;
     readNewStiffness();
 
     //transcode the appropriate stiffness and joint values
