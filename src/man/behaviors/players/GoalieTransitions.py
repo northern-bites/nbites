@@ -4,9 +4,7 @@
 # for transitions are contained in these transitions.
 #
 
-import noggin_constants as NogCon
 import GoalieConstants as goalCon
-import PositionTransitions as PosTran
 from math import fabs
 #from vision import cornerID as IDs
 import VisualGoalieStates
@@ -307,47 +305,3 @@ def shouldSaveLeft(player):
     return (ball.loc.endY > goalCon.CENTER_SAVE_THRESH
             and ball.loc.endY < goalCon.DONT_SAVE_LIMIT
             and goalieInBox(player))
-
-# Not used
-# If you should save but you shouldnt
-# dive you will always center save
-def shouldSaveCenter(player):
-    ball= player.brain.ball
-
-    return False
-
-def shouldHoldSave(player):
-    """
-    Decision to keep goalie in save.
-    If penalty kick then dont ever get
-    up.
-    """
-    return (player.penaltyKicking or
-            player.stateTime <= goalCon.TIME_ON_GROUND)
-
-# ********************
-# POSITION TRANSITIONS
-# ********************
-
-def goalieInBox(player):
-    """
-    The goalie is in its box
-    """
-    return player.brain.my.inMyGoalBox()
-
-def goalieIsLost(player):
-    """
-    Goalie is facing off field
-    """
-    return PosTran.leavingTheField(player)
-
-# *****************
-# CHASE TRANSITIONS
-# *****************
-
-def dangerousBall(player):
-    """
-    The ball is in the box behind the goalie
-    """
-
-    return (player.brain.ball.loc.relX < 0 and goalieInBox(player))

@@ -250,11 +250,11 @@ void BehaviorsModule::run_ ()
         ledCommandOut.setMessage(ledCommand);
 
         // Only set motion commands that python has actually used
-        if (bodyMotionCommand.get()->processed_by_motion())
+        if (!bodyMotionCommand.get()->processed_by_motion())
         {
             bodyMotionCommandOut.setMessage(bodyMotionCommand);
         }
-        if (headMotionCommand.get()->processed_by_motion())
+        if (!headMotionCommand.get()->processed_by_motion())
         {
             headMotionCommandOut.setMessage(headMotionCommand);
         }

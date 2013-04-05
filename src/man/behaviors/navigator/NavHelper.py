@@ -2,6 +2,8 @@ from math import fabs
 from ..util import MyMath
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
+# TODO: Import CommandType properly.
+#import PMotion_proto
 
 def stand(nav):
     createAndSendWalkVector(nav, 0, 0, 0)

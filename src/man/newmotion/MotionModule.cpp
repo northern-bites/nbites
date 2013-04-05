@@ -31,7 +31,6 @@ MotionModule::MotionModule()
 
 MotionModule::~MotionModule()
 {
-
 }
 
 void MotionModule::start()
@@ -52,6 +51,7 @@ void MotionModule::run_()
     jointsInput_.latch();
     inertialsInput_.latch();
     fsrInput_.latch();
+    stiffnessInput_.latch();
     bodyCommandInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
@@ -83,6 +83,7 @@ void MotionModule::run_()
         // (5) Get the latest odometry measurements and update
         //     the messages that we output.
         updateOdometry();
+        updateStatus();
 
         newInputJoints = false;
         frameCount++;
@@ -252,6 +253,23 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
+    // This doesn't work. ELLIS!!!!!!!!
+    // // First check: is guardian turning stiffness off?
+    // if(stiffnessInput_.message().remove() && gainsOn)
+    // {
+    //     gainsOn = false;
+    //     std::cout << "Sending freeze command." << std::endl;
+    //     sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+    //     return;
+    // }
+    // if(!stiffnessInput_.message().remove() && !gainsOn)
+    // {
+    //     gainsOn = true;
+    //     std::cout << "Sending unfreeze command." << std::endl;
+    //     sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+    //     return;
+    // }
+
     // (1) First process body commands.
     if(!bodyCommandInput_.message().processed_by_motion())
     {
@@ -634,8 +652,6 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
         stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
 
-
-
         // Interpolation is set for the entire script, not per command
         Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
         if(script.interpolation_type() == 1)
@@ -673,6 +689,7 @@ void MotionModule::sendMotionCommand(const messages::SetHeadCommand command)
                                command.head_pitch()
                 )
             );
+        headProvider.setCommand(setHeadCommand);
     }
     else
     {
@@ -683,8 +700,8 @@ void MotionModule::sendMotionCommand(const messages::SetHeadCommand command)
                                command.max_speed_pitch()
                 )
             );
+        headProvider.setCommand(setHeadCommand);
     }
-    headProvider.setCommand(setHeadCommand);
 }
 
 void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
@@ -1039,6 +1056,19 @@ std::vector<BodyJointCommand::ptr> MotionModule::readScriptedSequence(
 void MotionModule::updateOdometry()
 {
     walkProvider.getOdometryUpdate(odometryOutput_);
+}
+
+void MotionModule::updateStatus()
+{
+    portals::Message<messages::MotionStatus> status(0);
+
+    status.get()->set_standing(isStanding());
+    status.get()->set_body_is_active(isBodyActive());
+    status.get()->set_walk_is_active(isWalkActive());
+    status.get()->set_head_is_active(isHeadActive());
+    status.get()->set_calibrated(calibrated());
+
+    motionStatusOutput_.setMessage(status);
 }
 
 } // namespace motion

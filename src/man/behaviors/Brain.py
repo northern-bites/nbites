@@ -91,6 +91,7 @@ class Brain(object):
         # Message interface
         self.interface = interface.interface
 
+        self.motion = None
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -137,6 +138,7 @@ class Brain(object):
 
         # Update objects
         self.updateVisionObjects()
+        self.updateMotion()
         self.getCommUpdate()
 
         # Behavior stuff
@@ -155,6 +157,9 @@ class Brain(object):
     def getCommUpdate(self):
         for i in range(len(self.teamMembers)):
             self.teamMembers[i].update(self.interface.worldModelList()[i])
+
+    def updateMotion(self):
+        self.motion = self.interface.motionStatus
 
     def updateVisionObjects(self):
         """
