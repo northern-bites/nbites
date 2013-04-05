@@ -46,7 +46,6 @@ protected:
     void updateVisionObstacle();
 };
 
-void updateRobot(messages::VisionRobot::Robot* bot_message, VisualRobot* visualRobot);
+void updateRobot(messages::Robot* bot_message, VisualRobot* visualRobot);
 }
 }
-

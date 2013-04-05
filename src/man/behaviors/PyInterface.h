@@ -27,6 +27,7 @@ public:
     messages::GameState       const * gameState_ptr;
     messages::VisionRobot     const * visionRobot_ptr;
     messages::VisionField     const * visionField_ptr;
+    messages::VisionObstacle  const * visionObstacle_ptr;
     messages::RobotLocation   const * robotLocation_ptr;
     messages::FilteredBall    const * filteredBall_ptr;
     messages::LedCommand      const * ledCommand_ptr;
@@ -43,6 +44,10 @@ public:
     void setVisionRobot_ptr(const messages::VisionRobot* msg)
     {
         visionRobot_ptr = msg;
+    }
+    void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
+    {
+        visionObstacle_ptr = msg;
     }
     void setVisionField_ptr(const messages::VisionField* msg)
     {

@@ -35,6 +35,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::visionField_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("visionObstacle",
+                      make_getter(&PyInterface::visionObstacle_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         .add_property("robotLocation",
                       make_getter(&PyInterface::robotLocation_ptr,
                                   return_value_policy

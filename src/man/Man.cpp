@@ -115,6 +115,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
     behaviors.visionFieldIn.wireTo(&vision.vision_field);
     behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+    behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
     behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
     behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);

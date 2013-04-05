@@ -80,25 +80,25 @@ void VisionModule::updateVisionRobot() {
 
     portals::Message<messages::VisionRobot> robot_data(0);
 
-    messages::VisionRobot::Robot* red1 = robot_data.get()->mutable_red1();
+    messages::Robot* red1 = robot_data.get()->mutable_red1();
     updateRobot(red1, vision->red1);
-    messages::VisionRobot::Robot* red2 = robot_data.get()->mutable_red2();
+    messages::Robot* red2 = robot_data.get()->mutable_red2();
     updateRobot(red2, vision->red2);
-    messages::VisionRobot::Robot* red3 = robot_data.get()->mutable_red3();
+    messages::Robot* red3 = robot_data.get()->mutable_red3();
     updateRobot(red3, vision->red3);
 
-    messages::VisionRobot::Robot* navy1 = robot_data.get()->mutable_navy1();
+    messages::Robot* navy1 = robot_data.get()->mutable_navy1();
     updateRobot(navy1, vision->navy1);
-    messages::VisionRobot::Robot* navy2 = robot_data.get()->mutable_navy2();
+    messages::Robot* navy2 = robot_data.get()->mutable_navy2();
     updateRobot(navy2, vision->navy2);
-    messages::VisionRobot::Robot* navy3 = robot_data.get()->mutable_navy3();
+    messages::Robot* navy3 = robot_data.get()->mutable_navy3();
     updateRobot(navy3, vision->navy3);
 
     vision_robot.setMessage(robot_data);
 
 }
 
-void updateRobot(messages::VisionRobot::Robot* bot_, VisualRobot* visualRobot) {
+void updateRobot(messages::Robot* bot_, VisualRobot* visualRobot) {
 
     bot_->set_distance(visualRobot->getDistance());
     bot_->set_bearing(visualRobot->getBearing());

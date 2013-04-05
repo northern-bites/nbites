@@ -218,6 +218,9 @@ void BehaviorsModule::prepareMessages()
     visionRobotIn.latch();
     pyInterface.setVisionRobot_ptr(&visionRobotIn.message());
 
+    visionObstacleIn.latch();
+    pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
+
     filteredBallIn.latch();
     pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
 
