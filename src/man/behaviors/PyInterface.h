@@ -57,11 +57,11 @@ public:
     {
         worldModel_ptr[i] = msg;
     }
-    boost::python::list getWorldModelList(PyInterface interface)
+    boost::python::list getWorldModelList()//PyInterface interface)
     {
         boost::python::list list;
-        for (int i=0; i<4; i++) {
-            list.append(interface.worldModel_ptr[i]);
+        for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
+            list.append(worldModel_ptr[i]);
         }
         return list;
     }

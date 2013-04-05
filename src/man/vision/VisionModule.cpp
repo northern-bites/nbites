@@ -192,6 +192,10 @@ void VisionModule::updateVisionField() {
         set_frames_off(vision->yglp->getFramesOff());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_certainty(vision->yglp->getIDCertainty());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_red_goalie(vision->yglp->getRedGoalieCertain());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_navy_goalie(vision->yglp->getNavyGoalieCertain());
 
     const std::list<const ConcreteFieldObject *>* possible_l = vision->yglp->getPossibilities();
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_l->begin();
@@ -227,6 +231,10 @@ void VisionModule::updateVisionField() {
         set_frames_off(vision->ygrp->getFramesOff());
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_certainty(vision->ygrp->getIDCertainty());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_red_goalie(vision->ygrp->getRedGoalieCertain());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_navy_goalie(vision->ygrp->getNavyGoalieCertain());
 
     const std::list<const ConcreteFieldObject *>* possible_r = vision->ygrp->getPossibilities();
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_r->begin();

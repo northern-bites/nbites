@@ -157,7 +157,7 @@ void BehaviorsModule::getBrainInstance ()
     error_state = (brain_instance == NULL);
 }
 
-void BehaviorsModule::runStep ()
+void BehaviorsModule::run_ ()
 {
     static unsigned int num_crashed = 0;
     if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
@@ -226,6 +226,7 @@ void BehaviorsModule::runStep ()
         ledCommand = portals::Message<messages::LedCommand>(0);
         pyInterface.setLedCommand_ptr(ledCommand.get());
         motionCommand = portals::Message<messages::MotionCommand>(0);
+        std::cout << "MOTION COMMAND!  " << motionCommand.get() << std::endl;
         pyInterface.setMotionCommand_ptr(motionCommand.get());
     }
 

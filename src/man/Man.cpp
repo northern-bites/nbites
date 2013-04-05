@@ -99,14 +99,21 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
     vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
-    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
     gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
     gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
     //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
-    behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput, false);
+    behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
+    behaviors.visionBallIn.wireTo(&vision.vision_ball);
+    behaviors.visionFieldIn.wireTo(&vision.vision_field);
+    behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
+    }
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,

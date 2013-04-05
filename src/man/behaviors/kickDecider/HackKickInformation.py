@@ -83,40 +83,40 @@ class KickInformation:
         if self.dangerousBall():
             self.dangerousBallCount += 1
 
-        if self.brain.yglp.vis.on:
+        if self.brain.yglp.on:
             self.sawGoal = True
-            if self.brain.yglp.vis.certainty == vision.certainty._SURE:
-                if self.brain.yglp.vis.dist > 300:
-                    self.farGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
-                    self.farGoalLeftPostDists.append(self.brain.yglp.vis.dist)
-                    if self.brain.yglp.vis.redGoalieCertain:
+            if self.brain.yglp.certainty == 2: # HACK for early messages
+                if self.brain.yglp.distance > 300:
+                    self.farGoalLeftPostBearings.append(self.brain.yglp.bearing_deg)
+                    self.farGoalLeftPostDists.append(self.brain.yglp.vis.distance)
+                    if self.brain.yglp.red_goalie:
                         self.farGoalieRed += 1
-                    elif self.brain.yglp.vis.navyGoalieCertain:
+                    elif self.brain.yglp.navy_goalie:
                         self.farGoalieNavy += 1
-                if self.brain.yglp.vis.dist < 300:
-                    self.nearGoalLeftPostBearings.append(self.brain.yglp.vis.bearing)
-                    self.nearGoalLeftPostDists.append(self.brain.yglp.vis.dist)
-                    if self.brain.yglp.vis.redGoalieCertain:
+                if self.brain.yglp.distance < 300:
+                    self.nearGoalLeftPostBearings.append(self.brain.yglp.bearing_deg)
+                    self.nearGoalLeftPostDists.append(self.brain.yglp.distance)
+                    if self.brain.yglp.red_goalie:
                         self.nearGoalieRed += 1
-                    elif self.brain.yglp.vis.navyGoalieCertain:
+                    elif self.brain.yglp.navy_goalie:
                         self.nearGoalieNavy += 1
 
-        if self.brain.ygrp.vis.on:
+        if self.brain.ygrp.on:
             self.sawGoal = True
-            if self.brain.ygrp.vis.certainty == vision.certainty._SURE:
-                if self.brain.ygrp.vis.dist > 300:
-                    self.farGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
-                    self.farGoalRightPostDists.append(self.brain.ygrp.vis.dist)
-                    if self.brain.ygrp.vis.redGoalieCertain:
+            if self.brain.ygrp.certainty == 2: # HACK for early messages
+                if self.brain.ygrp.distance > 300:
+                    self.farGoalRightPostBearings.append(self.brain.ygrp.bearing_deg)
+                    self.farGoalRightPostDists.append(self.brain.ygrp.distance)
+                    if self.brain.ygrp.red_goalie:
                         self.farGoalieRed += 1
-                    elif self.brain.ygrp.vis.navyGoalieCertain:
+                    elif self.brain.ygrp.navy_goalie:
                         self.farGoalieNavy += 1
-                if self.brain.ygrp.vis.dist < 300:
-                    self.nearGoalRightPostBearings.append(self.brain.ygrp.vis.bearing)
-                    self.nearGoalRightPostDists.append(self.brain.ygrp.vis.dist)
-                    if self.brain.ygrp.vis.redGoalieCertain:
+                if self.brain.ygrp.distance < 300:
+                    self.nearGoalRightPostBearings.append(self.brain.ygrp.bearing_deg)
+                    self.nearGoalRightPostDists.append(self.brain.ygrp.distance)
+                    if self.brain.ygrp.red_goalie:
                         self.nearGoalieRed += 1
-                    elif self.brain.ygrp.vis.navyGoalieCertain:
+                    elif self.brain.ygrp.navy_goalie:
                         self.nearGoalieNavy += 1
 
     def hasEnoughInformation(self):
@@ -213,9 +213,9 @@ class KickInformation:
              self.brain.gameController.teamColor == constants.teamColor.TEAM_BLUE)):
             self.farGoalieOwn = True
         if ((self.nearGoalieRed > 5 and
-             self.brain.my.teamColor == constants.teamColor.TEAM_RED) or
+             self.brain.gameController.teamColor == constants.teamColor.TEAM_RED) or
             (self.nearGoalieNavy > 5 and
-             self.brain.my.teamColor == constants.teamColor.TEAM_BLUE)):
+             self.brain.gameController.teamColor == constants.teamColor.TEAM_BLUE)):
             self.nearGoalieOwn = True
 
     # Hack from US open 2012
@@ -629,7 +629,8 @@ class KickInformation:
         How we choose which kick to do when we're facing the ball. For now,
         simply pick the foot that's closer to the ball.
         """
-        if self.brain.ball.loc.relY > 0:
+        if self.brain.ball.bearing_deg > 0: # TODO should be relY but
+            # no message for it yet.
             return True
         else:
             return False

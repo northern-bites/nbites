@@ -54,12 +54,12 @@ def setDestination(nav, dest, gain = 1.0):
     #       or, deprecate this method and use speed commands
     #       via the createAndSendWalkVector method.
     command = nav.brain.interface.motionCommand
-    command.type = 0 #Destination Walk
+    command.type = nav.brain.interface.motionCommand.CommandType.DESTINATION_WALK #0 #Destination Walk
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
     # Mark this message for sending
-    command.processed_by_motion = false
+    command.processed_by_motion = False
 
 def setOdometryDestination(nav, dest, gain = 1.0):
     # TODO: distinguish from setDestination method
@@ -70,7 +70,7 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
     # Mark this message for sending
-    command.processed_by_motion = false
+    command.processed_by_motion = False
 
 #not used!
 def getOrbitLocation(radius, angle):
@@ -98,12 +98,12 @@ def setSpeed(nav, speeds):
 
 def createAndSendWalkVector(nav, x, y, theta):
     command = nav.brain.interface.motionCommand
-    command.type = 1 #Walk Command
+    command.type = nav.brain.interface.motionCommand.CommandType.WALK_COMMAND #1 #Walk Command
     command.speed.x = x
     command.speed.y = y
     command.speed.h = theta
     # Mark this message for sending
-    command.processed_by_motion = false
+    command.processed_by_motion = False
 
 def executeMove(nav, sweetMove):
     """
@@ -112,7 +112,7 @@ def executeMove(nav, sweetMove):
     (see SweetMove files for descriptions of command tuples)
     """
     command = nav.brain.interface.motionCommand
-    command.type = 2 #Scripted Move
+    command.type = nav.brain.interface.motionCommand.CommandType.SCRIPTED_MOVE #2 #Scripted Move
 
     for position in sweetMove:
         if len(position) == 7:
@@ -145,7 +145,7 @@ def executeMove(nav, sweetMove):
             move.r_elbow_roll = position[3][3]
 
             # Mark this message for sending
-            command.processed_by_motion = false
+            command.processed_by_motion = False
 
         else:
             print("What kind of sweet ass-Move is this?")

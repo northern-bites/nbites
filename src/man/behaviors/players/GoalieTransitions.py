@@ -8,7 +8,7 @@ import noggin_constants as NogCon
 import GoalieConstants as goalCon
 import PositionTransitions as PosTran
 from math import fabs
-from vision import cornerID as IDs
+#from vision import cornerID as IDs
 import VisualGoalieStates
 from objects import RelRobotLocation
 
@@ -351,5 +351,3 @@ def dangerousBall(player):
     """
 
     return (player.brain.ball.loc.relX < 0 and goalieInBox(player))
-
-

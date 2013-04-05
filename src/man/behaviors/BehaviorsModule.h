@@ -36,14 +36,11 @@ public:
     // reinitialize and reload the Python interpreter
     void reload_hard ();
 
-    // run behavioral step
-    void runStep();
-
     // current Noggin error status
     bool inErrorState() { return error_state; }
 
-protected:
-    virtual void run_() { runStep(); }
+    // Runs the module
+    virtual void run_();
 
 private:
     // Initialize the interpreter and C Python extensions

@@ -30,6 +30,8 @@ message VisionField
         optional int32 frames_on = 8;
         optional int32 frames_off = 9;
 	repeated Point concrete_coords = 10;
+        optional bool red_goalie = 11; // HACK until we have a unified message for goal posts.
+        optional bool navy_goalie = 12;
       }
 
    message VisualGoalPost

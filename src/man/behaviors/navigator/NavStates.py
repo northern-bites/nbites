@@ -139,14 +139,13 @@ def atPosition(nav):
 def stand(nav):
     """
     Transitional state between walking and standing
-    Could still be walking, but we can give it new walk commands
-    so we shouldn't wait to go for it to go to standing before we
-    give it new commands
+    So we can give new walk commands before we complete
+    the stand if desired
     """
     if nav.firstFrame():
         helper.stand(nav)
 
-    if not nav.brain.motion.isWalkActive():
+    if counter > 45# HACK not nav.brain.motion.isWalkActive():
         return nav.goNow('standing')
 
     return nav.stay()

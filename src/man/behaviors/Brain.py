@@ -13,7 +13,6 @@ import noggin_constants as Constants
 # Modules from this directory
 from . import Leds
 #from . import robots
-from . import Ball
 from . import MyInfo
 from . import GameController
 
@@ -75,7 +74,7 @@ class Brain(object):
         # Information about the environment
         # All field objects should come in as messages now
         #self.initFieldObjects()
-        self.ball = Ball.Ball()
+        self.ball = None
         self.initTeamMembers()
 
         self.play = Play.Play()
@@ -147,10 +146,11 @@ class Brain(object):
 
         # Update objects
         self.updateVisionObjects()
+        self.getCommUpdate()
 
         # Behavior stuff
         self.gameController.run()
-        self.updatePlaybook()
+        #self.updatePlaybook()
         self.player.run()
         #self.tracker.run()
         self.nav.run()
@@ -159,18 +159,16 @@ class Brain(object):
         self.leds.processLeds()
 
     def getCommUpdate(self):
-        # TODO: do this for more than one teamMember
-        pass
-        #for i in range(len(self.teamMembers)):
-        #self.teamMembers[0].update(self.inMessages['worldModel'])
+        for i in range(len(self.teamMembers)):
+            self.teamMembers[i].update(self.interface.worldModelList()[i])
 
-    def updateObjects(self):
+    def updateVisionObjects(self):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball = self.brain.interface.visionBall
-        self.yglp = self.brain.interface.visionField.goal_post_l.visual_detection
-        self.ygrp = self.brain.interface.visionField.goal_post_r.visual_detection
+        self.ball = self.interface.visionBall
+        self.yglp = self.interface.visionField.goal_post_l.visual_detection
+        self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 
     def updatePlaybook(self):
         """
@@ -201,6 +199,9 @@ class Brain(object):
         Reset loc according to team number and team color.
         Note: Loc uses truly global coordinates.
         """
+
+        pass # HACK HACK HACK for no localization module
+
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             if self.playerNumber == 1:
                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
@@ -252,6 +253,12 @@ class Brain(object):
     #should make this nicer (or at least the locations)
     def resetSetLocalization(self):
 
+
+
+        pass # HACK HACK HACK for no localization module
+
+
+
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
@@ -287,6 +294,10 @@ class Brain(object):
         """
         Resets localization to both possible locations, depending on team color.
         """
+
+        pass # HACK HACK HACK for no localization module
+
+
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                 Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,

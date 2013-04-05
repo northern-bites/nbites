@@ -2,17 +2,17 @@ from ..headTracking.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
                                       FIXED_PITCH_RIGHT_SIDE_PAN,
                                       FIXED_PITCH_PAN,
                                       FIXED_PITCH_SLOW_GOALIE_PAN)
-from vision import certainty
+#from vision import certainty
 from ..navigator import Navigator as nav
 from ..util import Transition
-import goalie
+#import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
 import GoalieTransitions
 from objects import RelRobotLocation, RelLocation
 from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
-from vision import cornerID as IDs
+#from vision import cornerID as IDs
 from math import fabs
-import man.noggin.kickDecider.kicks as kicks
+from ..kickDecider import kicks
 import noggin_constants as nogginConstants
 
 DEBUG_OBSERVATIONS = False

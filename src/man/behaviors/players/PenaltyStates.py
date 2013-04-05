@@ -1,6 +1,6 @@
 import noggin_constants as NogginConstants
 from ..headTracking import HeadMoves
-import man.noggin.util.MyMath as MyMath
+from   ..util import MyMath
 import PositionConstants as constants
 import ChaseBallTransitions as transitions
 from objects import RelRobotLocation
