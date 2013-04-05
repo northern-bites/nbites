@@ -2,7 +2,7 @@ project( man )
 cmake_minimum_required( VERSION 2.8.3 )
 
 # Make sure we can find the shared files
-set( SHARE_DIR "${NBITES_DIR}/src/share/" )
+set( SHARE_DIR "${NBITES_DIR}/src/share" )
 # So that we can use find_package commands
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SHARE_DIR}/cmake/" )
 
@@ -44,13 +44,7 @@ endif()
 
 # testing set up
 if ( OFFLINE )
-  include ( ${SHARE_DIR}/cmake/gtest.cmake )
-  enable_testing()
-  set(CTEST_OUTPUT_ON_FAILURE TRUE)
-
-  include_directories(
-    ${GTEST_INCLUDE_DIR}
-    )
+  include ( ${SHARE_DIR}/cmake/BuildGTest.cmake )
 endif()
 
 # For Aldebaran's headers

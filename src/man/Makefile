@@ -84,10 +84,10 @@ $(STRAIGHT_FILE):
 clean:
 	rm -rf $(BUILD_DIR)/*
 
-# .PHONY: check
-# check:
-# 	@if [ -e $(CROSS_FILE) ]; then \
-# 		echo "Making cross."; \
-# 	elif [ -e $(STRAIGHT_FILE) ]; then \
-# 		echo "Making straight."; \
-# 	fi
+.PHONY: check
+check:
+	@if [ -e $(CROSS_FILE) ]; then \
+		echo "Making cross."; \
+	elif [ -e $(STRAIGHT_FILE) ]; then \
+		echo "Making straight."; \
+	fi
