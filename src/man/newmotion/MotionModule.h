@@ -31,6 +31,7 @@
 #include "OdometryData.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
+#include "StiffnessControl.pb.h"
 
 #include <vector>
 
@@ -149,6 +150,7 @@ public:
     portals::InPortal<messages::InertialState> inertialsInput_;
     portals::InPortal<messages::FSR>           fsrInput_;
     portals::InPortal<messages::MotionCommand> commandInput_;
+    portals::InPortal<messages::StiffnessControl> stiffnessInput_;
 
     portals::OutPortal<messages::JointAngles>  jointsOutput_;
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
@@ -222,7 +224,7 @@ private:
 
     void run_();
 
-    bool running_;
+    bool gainsOn;
 };
 } // namespace motion
 } // namespace man

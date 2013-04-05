@@ -2,6 +2,8 @@ from math import fabs
 from ..util import MyMath
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
+# TODO: Import CommandType properly.
+#import PMotion_proto
 
 def stand(nav):
     createAndSendWalkVector(nav, 0, 0, 0)
@@ -65,7 +67,7 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     # TODO: distinguish from setDestination method
     #       this method should enqueue motion commands.
     command = nav.brain.interface.motionCommand
-    command.type = 0 #Destination Walk
+    command.type = nav.brain.interface.motionCommand.CommandType.DESTINATION_WALK #Destination Walk
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH

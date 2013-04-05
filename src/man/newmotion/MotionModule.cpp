@@ -54,6 +54,7 @@ void MotionModule::run_()
     inertialsInput_.latch();
     fsrInput_.latch();
     commandInput_.latch();
+    stiffnessInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -262,6 +263,23 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
+    // This doesn't work. ELLIS!!!!!!!!
+    // // First check: is guardian turning stiffness off?
+    // if(stiffnessInput_.message().remove() && gainsOn)
+    // {
+    //     gainsOn = false;
+    //     std::cout << "Sending freeze command." << std::endl;
+    //     sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+    //     return;
+    // }
+    // if(!stiffnessInput_.message().remove() && !gainsOn)
+    // {
+    //     gainsOn = true;
+    //     std::cout << "Sending unfreeze command." << std::endl;
+    //     sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+    //     return;
+    // }
+
     if(!commandInput_.message().processed_by_motion())
     {
         std::cout << "MESSAGE" << commandInput_.message().dest().rel_x() << " "
