@@ -184,9 +184,9 @@ class Leds():
     def processLeds(self):
 
         if BALL_LEDS:
-            if self.brain.ball.frames_on == 1:
+            if self.brain.ball.vision_ball.frames_on == 1:
                 self.executeLeds(BALL_ON_LEDS)
-            elif self.brain.ball.frames_off == 1:
+            elif self.brain.ball.vision_ball.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
         if GOAL_LEDS:
@@ -340,18 +340,24 @@ class Leds():
         if GC_LEDS:
             if self.brain.gameController.stateChanged:
                 gcState = self.brain.gameController.currentState
+                print("LEDS- CURRENT STATE: "+`gcState`)
                 if (self.brain.gameController.penalized):
                     self.executeLeds(STATE_PENALIZED_LEDS)
                 elif (gcState == GameController.STATE_INITIAL):
                     self.executeLeds(STATE_INITIAL_LEDS)
+                    print("LEDS- initial leds")
                 elif (gcState == GameController.STATE_READY):
                     self.executeLeds(STATE_READY_LEDS)
+                    print("LEDS- ready leds")
                 elif (gcState == GameController.STATE_SET):
                     self.executeLeds(STATE_SET_LEDS)
+                    print("LEDS- set leds")
                 elif (gcState == GameController.STATE_PLAYING):
                     self.executeLeds(STATE_PLAYING_LEDS)
+                    print("LEDS- playing leds")
                 elif (gcState == GameController.STATE_FINISHED):
                     self.executeLeds(STATE_FINISHED_LEDS)
+                    print("LEDS- penalized leds")
 
 
         if FOOT_LEDS:

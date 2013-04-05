@@ -210,9 +210,6 @@ void BehaviorsModule::prepareMessages()
     gameStateIn.latch();
     pyInterface.setGameState_ptr(&gameStateIn.message());
 
-    visionBallIn.latch();
-    pyInterface.setVisionBall_ptr(&visionBallIn.message());
-
     visionFieldIn.latch();
     pyInterface.setVisionField_ptr(&visionFieldIn.message());
 

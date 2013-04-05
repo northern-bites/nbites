@@ -129,17 +129,6 @@ class Brain(object):
         Main control loop called every TIME_STEP milliseconds
         """
 
-        # Check if any messages are null.
-        # self.out.printf("Check for null messages:")
-        # self.out.printf("ledCommand:    ")
-        # self.out.printf(self.interface.ledCommand)
-        # self.out.printf("gameState:     ")
-        # self.out.printf(self.interface.gameState)
-        # self.out.printf("filteredBall:  ")
-        # self.out.printf(self.interface.filteredBall)
-        # self.out.printf("motionCommand: ")
-        # self.out.printf(self.interface.motionCommand)
-
         # Order here is very important
         # Update Environment
         self.time = time.time()
@@ -158,6 +147,9 @@ class Brain(object):
         #Set LED message
         self.leds.processLeds()
 
+        # Flush the output
+        sys.stdout.flush()
+
     def getCommUpdate(self):
         for i in range(len(self.teamMembers)):
             self.teamMembers[i].update(self.interface.worldModelList()[i])
@@ -166,7 +158,7 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        self.ball = self.interface.visionBall
+        self.ball = self.interface.filteredBall
         self.yglp = self.interface.visionField.goal_post_l.visual_detection
         self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 

@@ -24,7 +24,6 @@ class PyInterface
 {
 public:
     messages::GameState       const * gameState_ptr;
-    messages::VisionBall      const * visionBall_ptr;
     messages::VisionRobot     const * visionRobot_ptr;
     messages::VisionField     const * visionField_ptr;
     messages::FilteredBall    const * filteredBall_ptr;
@@ -38,10 +37,6 @@ public:
     void setGameState_ptr(const messages::GameState* msg)
     {
         gameState_ptr = msg;
-    }
-    void setVisionBall_ptr(const messages::VisionBall* msg)
-    {
-        visionBall_ptr = msg;
     }
     void setVisionRobot_ptr(const messages::VisionRobot* msg)
     {

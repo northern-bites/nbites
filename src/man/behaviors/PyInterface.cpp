@@ -27,10 +27,6 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::gameState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("visionBall",
-                      make_getter(&PyInterface::visionBall_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
         .add_property("visionRobot",
                       make_getter(&PyInterface::visionRobot_ptr,
                                   return_value_policy

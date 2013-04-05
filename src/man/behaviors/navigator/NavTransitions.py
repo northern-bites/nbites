@@ -37,8 +37,10 @@ def shouldDodgeLeft(nav):
 
     #check feet
     footBumperState = nav.brain.interface.footBumperState
-    feet = (footBumperState.r_foot_bumper_left or
-            footBumperState.r_foot_bumper_right)
+    feet = (False)
+            # Not currently usable: proto cannot be parsed
+            #footBumperState.r_foot_bumper_left or
+            #footBumperState.r_foot_bumper_right)
 
     if (feet and vision):
         return True
@@ -63,8 +65,10 @@ def shouldDodgeRight(nav):
 
     #check feet
     footBumperState = nav.brain.interface.footBumperState
-    feet = (footBumperState.l_foot_bumper_left or
-            footBumperState.l_foot_bumper_right)
+    feet = (False)
+            # Not currently usable: proto cannot be parsed
+            #(footBumperState.l_foot_bumper_left or
+            #footBumperState.l_foot_bumper_right)
 
     if (feet and vision):
         return True
