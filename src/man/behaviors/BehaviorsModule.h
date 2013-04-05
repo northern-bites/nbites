@@ -75,7 +75,6 @@ private:
     PyInterface pyInterface;
 public:
 	portals::InPortal<messages::GameState> gameStateIn;
-	portals::InPortal<messages::FilteredBall> filteredBallIn;
 	portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
     portals::InPortal<messages::MotionStatus> motionStatusIn;
     portals::InPortal<messages::SonarState> sonarStateIn;
@@ -83,6 +82,7 @@ public:
     portals::InPortal<messages::VisionField> visionFieldIn;
     portals::InPortal<messages::VisionRobot> visionRobotIn;
     portals::InPortal<messages::FootBumperState> footBumperStateIn;
+    portals::InPortal<messages::FilteredBall> filteredBallIn;
 	portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionCommand> motionCommandOut;
 private:

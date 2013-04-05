@@ -98,7 +98,11 @@ class Navigator(FSA.FSA):
         self.goTo(self.brain.play.getPosition(), avoidObstacles = True)
 
     def chaseBall(self, speed = FULL_SPEED):
-        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed, True)
+        ball = self.brain.ball
+        ballRelRobotLocation = RelRobotLocation(ball.filter_rel_x,
+                                                ball.filter_rel_y,
+                                                ball.filter_bearing)
+        self.goTo(ballRelRobotLocation, CLOSE_ENOUGH, speed, True)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False):
         """
