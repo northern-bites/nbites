@@ -196,7 +196,7 @@ class Brain(object):
         Note: Loc uses truly global coordinates.
         """
 
-        pass # HACK HACK HACK for no localization module
+        return # HACK HACK HACK for no localization module
 
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             if self.playerNumber == 1:
@@ -250,9 +250,7 @@ class Brain(object):
     def resetSetLocalization(self):
 
 
-
-        pass # HACK HACK HACK for no localization module
-
+        return # HACK HACK HACK for no localization module
 
 
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
@@ -291,7 +289,7 @@ class Brain(object):
         Resets localization to both possible locations, depending on team color.
         """
 
-        pass # HACK HACK HACK for no localization module
+        return # HACK HACK HACK for no localization module
 
 
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:

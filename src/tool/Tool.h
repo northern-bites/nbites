@@ -27,7 +27,7 @@ protected:
     // For keyboard control
     virtual void keyPressEvent(QKeyEvent * event);
 
-	void resizeEvent(QResizeEvent*);
+    void resizeEvent(QResizeEvent*);
 
     // Modules in this diagram will be run when data is updated
     ToolDiagram diagram;
@@ -41,10 +41,10 @@ protected:
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;
-	QPushButton* scrollButton;
-	QScrollArea* scrollArea;
-	QSize* scrollBarSize;
-	QSize* tabStartSize;
-	QRect* geometry;
+    QPushButton* scrollButton;
+    QScrollArea* scrollArea;
+    QSize* scrollBarSize;
+    QSize* tabStartSize;
+    QRect* geometry;
 };
 }

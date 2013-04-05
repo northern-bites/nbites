@@ -43,6 +43,7 @@ void SensorsModule::initializeSensorFastAccess()
     // Temperatures
     for(; i < END_TEMPERATURES; ++i)
     {
+<<<<<<< HEAD
         // Subtract 27 from index in SensorsNames[] to get correct value.
         sensorKeys_[i] = std::string("Device/SubDeviceList/") +
             SensorNames[i-27] + std::string("/Temperature/Sensor/Value");

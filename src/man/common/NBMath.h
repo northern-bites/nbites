@@ -100,5 +100,8 @@ namespace NBMath {
 
     float getHypotenuse(float x, float y);
 
+    template <class T>
+    T square(T x) { return x*x; }
+
 }
 #endif //NBMath_h

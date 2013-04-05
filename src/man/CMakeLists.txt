@@ -103,6 +103,7 @@ add_subdirectory( sensors )
 add_subdirectory( vision )
 add_subdirectory( newmotion )
 add_subdirectory( jointenactor )
+add_subdirectory( localization )
 
 set( MAN_SRCS main.cpp
   Man.cpp
@@ -134,6 +135,7 @@ target_link_libraries(
   portals
   sensors
   vision
+  localization
 )
 
 install( TARGETS man
