@@ -38,7 +38,7 @@ namespace man
 
         ~Particle() { }
 
-        messages::RobotLocation& getLocation() const { return location; }
+        const messages::RobotLocation& getLocation() const { return location; }
         void setLocation(messages::RobotLocation& location_) { location = location_; }
 
         float getWeight() const { return weight; }

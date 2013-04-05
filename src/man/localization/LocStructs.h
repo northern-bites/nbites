@@ -10,7 +10,6 @@
 #include <vector>
 #include <cmath>
 
-#include "Common.pb.h"
 #include "NBMath.h"
 
 #include <boost/random.hpp>

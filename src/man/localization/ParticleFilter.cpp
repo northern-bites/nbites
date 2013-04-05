@@ -49,10 +49,9 @@ namespace man
         delete visionSystem;
     }
 
-    void ParticleFilter::update(messages::RobotLocation& odometryInput,
-                                messages::VisionField& visionInput)
+    void ParticleFilter::update(const messages::RobotLocation& odometryInput,
+                                const messages::VisionField& visionInput)
     {
-        lastMotionTimestamp = (float) motionInput.timestamp();
         motionSystem->update(particles, odometryInput);
 
         // Update the Vision Model

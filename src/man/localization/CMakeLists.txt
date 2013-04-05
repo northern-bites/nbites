@@ -12,7 +12,7 @@ set(LOCALIZATION_SRCS LocalizationModule
 		      Particle
 		      MotionModel
 		      SensorModel
-		      FakeLocInputModule
+#		      FakeLocInputModule
 		      VisionSystem
 		      MotionSystem
 )

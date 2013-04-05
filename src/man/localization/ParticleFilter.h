@@ -60,8 +60,8 @@ namespace man
         ParticleFilter(ParticleFilterParams parameters = DEFAULT_PARAMS);
         ~ParticleFilter();
 
-        void update(messages::RobotLocation& motionInput,
-                    messages::VisionField& visionInput);
+        void update(const messages::RobotLocation& motionInput,
+                    const messages::VisionField& visionInput);
 
         ParticleSet getParticles() { return particles; }
 
@@ -83,7 +83,7 @@ namespace man
         void updateMotionModel();
 
         // Getters
-        messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
+        const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
         float getXEst() const {return poseEstimate.x();}
         float getYEst() const {return poseEstimate.y();}
         float getHEst() const {return poseEstimate.h();}

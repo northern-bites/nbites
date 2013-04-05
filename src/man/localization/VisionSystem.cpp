@@ -16,7 +16,7 @@ namespace man
          * @return if observations were made
          */
         bool VisionSystem::update(ParticleSet& particles,
-                                  messages::VisionField& observations)
+                                  const messages::VisionField& observations)
         {
             const float TINY_WEIGHT = .00001f;
 
@@ -67,7 +67,7 @@ namespace man
                 // We never updated the new particle weight, so no observations been made
                 if(!madeObsv)
                 {
-                    std::cout << "In the Vision System, given a message with no observations...\n";
+                    //std::cout << "In the Vision System, given a message with no observations...\n";
                     return false;
                 }
                 else

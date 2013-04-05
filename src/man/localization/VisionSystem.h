@@ -33,7 +33,7 @@ namespace man
 
         // updates give particleset by reference, returns true if observations was nonempty
         bool update(ParticleSet& particles,
-                    messages::VisionField& observations);
+                    const messages::VisionField& observations);
 
         float scoreFromVisDetect(const Particle& particle,
                                  const messages::VisualDetection& obsv);

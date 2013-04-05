@@ -8,9 +8,8 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "Common.pb.h"
-#include "Vision.pb.h"
-#include "Motion.pb.h"
+#include "VisionField.pb.h"
+#include "RobotLocation.pb.h"
 
 #include <vector>
 
@@ -42,7 +41,7 @@ namespace man
         virtual void resetLocToSide(bool blueSide) = 0;
 
         // Getters
-        virtual messages::RobotLocation& getCurrentEstimate() const = 0;
+        virtual const messages::RobotLocation& getCurrentEstimate() const = 0;
         virtual float getXEst() const = 0;
         virtual float getYEst() const = 0;
         virtual float getHEst() const = 0;

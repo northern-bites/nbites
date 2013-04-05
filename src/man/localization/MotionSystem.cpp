@@ -20,7 +20,7 @@ namespace man
          * @return the updated ParticleSet.
          */
         void MotionSystem::update(ParticleSet& particles,
-                                  messages::RobotLocation& deltaMotionInfo)
+                                  const messages::RobotLocation& deltaMotionInfo)
         {
             ParticleIt iter;
             for(iter = particles.begin(); iter != particles.end(); iter++)
