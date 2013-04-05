@@ -15,6 +15,7 @@
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
+#include "MotionStatus.pb.h"
 
 /**
  *
@@ -75,6 +76,7 @@ public:
 	portals::InPortal<messages::GameState> gameStateIn;
 	portals::InPortal<messages::FilteredBall> filteredBallIn;
 	portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    portals::InPortal<messages::MotionStatus> motionStatusIn;
 	portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionCommand> motionCommandOut;
 private:

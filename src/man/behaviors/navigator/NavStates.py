@@ -14,7 +14,7 @@ def scriptedMove(nav):
         helper.executeMove(nav, scriptedMove.sweetMove)
         return nav.stay()
 
-    if not nav.brain.motion.isBodyActive():
+    if not nav.brain.interface.motionStatus.bodyIsActive:
         return nav.goNow('stopped')
 
     return nav.stay()
@@ -96,7 +96,7 @@ def walkingTo(nav):
         helper.stand(nav)
         return nav.stay()
 
-    if nav.brain.motion.isStanding():
+    if nav.brain.interface.motionStatus.standing:
         if len(walkingTo.destQueue) > 0:
             dest = walkingTo.destQueue.popleft()
             helper.setOdometryDestination(nav, dest, walkingTo.speed)
@@ -115,7 +115,7 @@ def walking(nav):
     State to be used when setSpeed is called
     """
 
-    if (walking.speeds != walking.lastSpeeds) or not nav.brain.motion.isWalkActive():
+    if (walking.speeds != walking.lastSpeeds) or not nav.brain.interface.motionStatus.walkIsActive:
         helper.setSpeed(nav, walking.speeds)
     walking.lastSpeeds = walking.speeds
 
@@ -146,7 +146,7 @@ def stand(nav):
     if nav.firstFrame():
         helper.stand(nav)
 
-    if not nav.brain.motion.isWalkActive():
+    if not nav.brain.interface.motionStatus.walkIsActive:
         return nav.goNow('standing')
 
     return nav.stay()

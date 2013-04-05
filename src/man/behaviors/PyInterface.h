@@ -8,6 +8,7 @@
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
+#include "MotionStatus.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -21,6 +22,7 @@ public:
     messages::LedCommand* ledCommand_ptr;
     messages::WorldModel* worldModel_ptr[4]; //TODO: use a constant
     messages::MotionCommand* motionCommand_ptr;
+    messages::MotionStatus* motionStatus_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -49,6 +51,10 @@ public:
     void setMotionCommand_ptr(const messages::MotionCommand* msg)
     {
         motionCommand_ptr = const_cast<messages::MotionCommand*> (msg);
+    }
+    void setMotionStatus_ptr(const messages::MotionStatus* msg)
+    {
+        motionStatus_ptr = const_cast<messages::MotionStatus*> (msg);
     }
 
 };

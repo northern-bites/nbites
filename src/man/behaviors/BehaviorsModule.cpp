@@ -16,6 +16,7 @@ extern "C" void initGameState_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
+extern "C" void initMotionStatus();
 extern "C" void initinterface();
 
 
@@ -80,6 +81,7 @@ void BehaviorsModule::initializePython()
         initWorldModel_proto();
         initBallModel_proto();
         initPMotion_proto();
+        initMotionStatus_proto();
 		// Init the interface as well
 		initinterface();
     } catch (error_already_set) {
@@ -205,6 +207,8 @@ void BehaviorsModule::runStep ()
 			worldModelIn[i].latch();
 			pyInterface.setWorldModel_ptr(&worldModelIn[i].message(),i);
 				}
+        motionStatusIn.latch();
+        pyInterface.setMotionStatus_ptr(&motionStatusIn.message());
 
 
         // Prepare potential out messages for python

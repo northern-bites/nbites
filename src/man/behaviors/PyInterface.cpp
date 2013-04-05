@@ -40,6 +40,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::motionCommand_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("motionStatus",
+                      make_getter(&PyInterface::motionStatus_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
 		;
 	scope().attr("interface") = interface_ptr;
 }

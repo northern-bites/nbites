@@ -107,6 +107,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
     //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
     behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput, false);
+    behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,

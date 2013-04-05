@@ -1,0 +1,9 @@
+package messages:
+
+message MotionStatus
+{
+    optional bool standing = 0;
+    optional bool bodyIsActive = 1;
+    optional bool walkIsActive = 2;
+}
+
