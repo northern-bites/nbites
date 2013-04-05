@@ -7,12 +7,12 @@
 namespace tool {
 namespace image {
 
-class ImageDisplayQModule : public QLabel, public portals::Module
+class ImageDisplayModule : public QLabel, public portals::Module
 {
     Q_OBJECT;
 
 public:
-    ImageDisplayQModule(QWidget* parent = 0);
+    ImageDisplayModule(QWidget* parent = 0);
 
     portals::InPortal<messages::YUVImage> imageIn;
 

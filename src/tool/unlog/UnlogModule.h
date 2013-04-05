@@ -26,7 +26,7 @@ n * the contents of that file into a protobuf of its template type. It is
 #include "LogDefinitions.h"
 #include "Images.h"
 #include "logview/ProtoViewer.h"
-#include "image/ImageDisplayQModule.h"
+#include "image/ImageDisplayModule.h"
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>

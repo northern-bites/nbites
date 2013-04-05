@@ -1,15 +1,15 @@
-#include "ImageDisplayQModule.h"
+#include "ImageDisplayModule.h"
 #include <iostream>
 
 namespace tool {
 namespace image {
 
-ImageDisplayQModule::ImageDisplayQModule(QWidget* parent) : QLabel(parent)
+ImageDisplayModule::ImageDisplayModule(QWidget* parent) : QLabel(parent)
 {
     setText(tr("No image loaded!"));
 }
 
-void ImageDisplayQModule::run_()
+void ImageDisplayModule::run_()
 {
     imageIn.latch();
     // setPixmap(QPixmap::fromImage(

@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "unlog/UnlogModule.h"
-#include "image/ImageDisplayQModule.h"
+#include "image/ImageDisplayModule.h"
 #include "ProtoViewer.h"
 
 namespace tool {

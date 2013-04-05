@@ -166,7 +166,7 @@ GUI UnlogModule<messages::YUVImage>::makeMyGUI()
 {
     GUI gui;
 
-    image::ImageDisplayQModule* disp = new image::ImageDisplayQModule();
+    image::ImageDisplayModule* disp = new image::ImageDisplayModule();
     disp->imageIn.wireTo(&output);
     gui.module = disp;
     gui.qwidget = disp;
