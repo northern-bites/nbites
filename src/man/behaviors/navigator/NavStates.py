@@ -30,7 +30,8 @@ def goToPosition(nav):
     For relative locations we use our bearing to that point as the heading
     """
 
-    relDest = helper.getRelativeDestination(nav.brain.my, goToPosition.dest)
+    # TODO: put my localization info as first param
+    relDest = helper.getRelativeDestination(0, goToPosition.dest)
     goToPosition.deltaDest = relDest # cache it for later use
 
 #    if nav.counter % 10 is 0:
@@ -50,12 +51,16 @@ def goToPosition(nav):
 
     #if y-distance is small, ignore it to avoid strafing
     #strafelessDest = helper.getStrafelessDest(relDest)
-    helper.setDestination(nav, relDest, speed)
+
+    #HACKERDOO
+    if nav.counter == 1 or nav.counter == 2:
+        helper.setDestination(nav, relDest, speed)
 
 #    if navTrans.shouldAvoidObstacle(nav):
 #        return nav.goLater('avoidObstacle')
 
-    return Transition.getNextState(nav, goToPosition)
+    #HACKERDOO
+    return nav.stay()#Transition.getNextState(nav, goToPosition)
 
 goToPosition.speed = "speed gain from 0 to 1"
 goToPosition.dest = "destination, can be any type of location"

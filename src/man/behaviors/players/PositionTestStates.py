@@ -1,30 +1,27 @@
 from .. import SweetMoves
 from ..playbook import PBConstants
+from objects import RelRobotLocation
 
 def gameInitial(player):
-    if player.firstFrame():
-        player.stopWalking()
-        player.gainsOn()
-        player.zeroHeads()
-
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
         player.stand()
-        player.brain.tracker.locPans()
 
-    return player.goLater('playbookPosition')
+    return player.stay()
 
 def gameSet(player):
-    if player.firstFrame:
-        player.brain.out.printf("GAME SET")
+    if player.counter == 1 or player.counter == 10:
+        # Send two commands to check overwrite vs. enqueue
+        #player.brain.nav.goTo(RelRobotLocation(50.0,0.0,0.0))
+        player.brain.nav.performSweetMove(SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
 
     return player.stay()
 
 def gamePlaying(player):
     if player.firstFrame:
-        player.brain.out.printf("GAME PLAYING")
+        pass
 
     return player.stay()
 

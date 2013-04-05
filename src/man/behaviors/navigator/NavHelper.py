@@ -118,36 +118,64 @@ def executeMove(nav, sweetMove):
 
     for position in sweetMove:
         if len(position) == 7:
-            command.script.add_commands
+            move = command.script.add_commands() # Current body joint command
 
             command.script.time = position[4]
             command.script.interpolation_type = position[5]
-            command.script.chain_stiffnesses = position[6]
 
-            move = command.script.commands(commands_size-1) #Current joint command
-            move.l_shoulder_pitch = position[0][0]
-            move.l_shoulder_roll = position[0][1]
-            move.l_elbow_yaw = position[0][2]
-            move.l_elbow_roll = position[0][3]
-            move.l_hip_yaw_pitch = position[1][0]
-            move.l_hip_roll = position[1][1]
-            move.l_hip_pitch = position[1][2]
-            move.l_knee_pitch = position[1][3]
-            move.l_ankle_pitch = position[1][4]
-            move.l_ankle_roll = poisition[1][5]
-            move.r_hip_yaw_pitch = position[2][0]
-            move.r_hip_roll = position[2][1]
-            move.r_hip_pitch = position[2][2]
-            move.r_knee_pitch = position[2][3]
-            move.r_ankle_pitch = position[2][4]
-            move.r_ankle_roll = poisition[2][5]
-            move.r_shoulder_pitch = position[3][0]
-            move.r_shoulder_roll = position[3][1]
-            move.r_elbow_yaw = position[3][2]
-            move.r_elbow_roll = position[3][3]
+            #move = command.script.commands(command.script.commands_size()-1) #Current body joint command
+            move.angles.l_shoulder_pitch = position[0][0]
+            move.angles.l_shoulder_roll =  position[0][1]
+            move.angles.l_elbow_yaw =      position[0][2]
+            move.angles.l_elbow_roll =     position[0][3]
+            move.angles.l_hip_yaw_pitch =  position[1][0]
+            move.angles.l_hip_roll =       position[1][1]
+            move.angles.l_hip_pitch =      position[1][2]
+            move.angles.l_knee_pitch =     position[1][3]
+            move.angles.l_ankle_pitch =    position[1][4]
+            move.angles.l_ankle_roll =     position[1][5]
+            move.angles.r_hip_yaw_pitch =  position[2][0]
+            move.angles.r_hip_roll =       position[2][1]
+            move.angles.r_hip_pitch =      position[2][2]
+            move.angles.r_knee_pitch =     position[2][3]
+            move.angles.r_ankle_pitch =    position[2][4]
+            move.angles.r_ankle_roll =     position[2][5]
+            move.angles.r_shoulder_pitch = position[3][0]
+            move.angles.r_shoulder_roll =  position[3][1]
+            move.angles.r_elbow_yaw =      position[3][2]
+            move.angles.r_elbow_roll =     position[3][3]
+
+            # Set all stiffnesses, since this command specifies them all
+            move.stiffness.head_yaw =         position[6][0]
+            move.stiffness.head_pitch =       position[6][1]
+
+            move.stiffness.l_shoulder_pitch = position[6][2]
+            move.stiffness.l_shoulder_roll =  position[6][3]
+            move.stiffness.l_elbow_yaw =      position[6][4]
+            move.stiffness.l_elbow_roll =     position[6][5]
+
+            move.stiffness.r_shoulder_pitch = position[6][18]
+            move.stiffness.r_shoulder_roll =  position[6][19]
+            move.stiffness.r_elbow_yaw =      position[6][20]
+            move.stiffness.r_elbow_roll =     position[6][21]
+
+            move.stiffness.l_hip_yaw_pitch =  position[6][6]
+            move.stiffness.l_hip_roll =       position[6][7]
+            move.stiffness.l_hip_pitch =      position[6][8]
+            move.stiffness.l_knee_pitch =     position[6][9]
+            move.stiffness.l_ankle_pitch =    position[6][10]
+            move.stiffness.l_ankle_roll =     position[6][11]
+
+            move.stiffness.r_hip_yaw_pitch =  position[6][12]
+            move.stiffness.r_hip_roll =       position[6][13]
+            move.stiffness.r_hip_pitch =      position[6][14]
+            move.stiffness.r_knee_pitch =     position[6][15]
+            move.stiffness.r_ankle_pitch =    position[6][16]
+            move.stiffness.r_ankle_roll =     position[6][17]
 
             # Mark this message for sending
             command.processed_by_motion = False
+            print("Sent a scripted move.")
 
         else:
             print("What kind of sweet ass-Move is this?")

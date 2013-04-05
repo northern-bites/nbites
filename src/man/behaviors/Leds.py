@@ -255,7 +255,6 @@ class Leds():
                 elif self.brain.play.isRole(PBConstants.DEFENDER):
                     self.executeLeds(DEFENDER_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.DEFENDER_DUB_D):
-                    print "IN DUB D"
                     self.executeLeds(DUB_DEFEND_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.GOALIE):
                     self.executeLeds(GOALIE_ON_LEDS)
@@ -340,24 +339,18 @@ class Leds():
         if GC_LEDS:
             if self.brain.gameController.stateChanged:
                 gcState = self.brain.gameController.currentState
-                print("LEDS- CURRENT STATE: "+`gcState`)
                 if (self.brain.gameController.penalized):
                     self.executeLeds(STATE_PENALIZED_LEDS)
                 elif (gcState == GameController.STATE_INITIAL):
                     self.executeLeds(STATE_INITIAL_LEDS)
-                    print("LEDS- initial leds")
                 elif (gcState == GameController.STATE_READY):
                     self.executeLeds(STATE_READY_LEDS)
-                    print("LEDS- ready leds")
                 elif (gcState == GameController.STATE_SET):
                     self.executeLeds(STATE_SET_LEDS)
-                    print("LEDS- set leds")
                 elif (gcState == GameController.STATE_PLAYING):
                     self.executeLeds(STATE_PLAYING_LEDS)
-                    print("LEDS- playing leds")
                 elif (gcState == GameController.STATE_FINISHED):
                     self.executeLeds(STATE_FINISHED_LEDS)
-                    print("LEDS- penalized leds")
 
 
         if FOOT_LEDS:

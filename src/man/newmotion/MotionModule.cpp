@@ -53,6 +53,7 @@ void MotionModule::run_()
     fsrInput_.latch();
     stiffnessInput_.latch();
     bodyCommandInput_.latch();
+    headCommandInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -273,9 +274,9 @@ void MotionModule::processMotionInput()
     // (1) First process body commands.
     if(!bodyCommandInput_.message().processed_by_motion())
     {
-        std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
-                  << bodyCommandInput_.message().dest().rel_y() << " "
-                  << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
+        //std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
+        //          << bodyCommandInput_.message().dest().rel_y() << " "
+        //          << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
 
         // Is this a destination walk request?
         if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK){
@@ -292,7 +293,7 @@ void MotionModule::processMotionInput()
             sendMotionCommand(bodyCommandInput_.message().script());
             const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
-        std::cout << "POST!! " << bodyCommandInput_.message().processed_by_motion() << std::endl;
+        //std::cout << "POST!! " << bodyCommandInput_.message().processed_by_motion() << std::endl;
     }
 
     // (2) Process head commands.
