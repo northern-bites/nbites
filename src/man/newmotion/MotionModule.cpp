@@ -24,8 +24,7 @@ MotionModule::MotionModule()
       readyToSend(false),
       noWalkTransitionCommand(true)
 {
-    boost::shared_ptr<FreezeCommand> paralyze
-        = boost::shared_ptr<FreezeCommand>(new FreezeCommand());
+
 }
 
 MotionModule::~MotionModule()
