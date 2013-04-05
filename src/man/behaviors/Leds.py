@@ -184,9 +184,9 @@ class Leds():
     def processLeds(self):
 
         if BALL_LEDS:
-            if self.brain.ball.vision_ball.frames_on == 1:
+            if self.brain.ball.vis.frames_on == 1:
                 self.executeLeds(BALL_ON_LEDS)
-            elif self.brain.ball.vision_ball.frames_off == 1:
+            elif self.brain.ball.vis.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
         if GOAL_LEDS:

@@ -65,7 +65,7 @@ public:
     const std::vector<float> getNextJoints() const;
     const std::vector<float> getNextStiffness() const;
     void signalNextFrame();
-    void sendMotionCommand(const HeadJointCommand::ptr command);
+
 
     // Body Joint commands (sweet moves)
     void sendMotionCommand(const BodyJointCommand::ptr command);
@@ -76,8 +76,12 @@ public:
     void sendMotionCommand(const WalkCommand::ptr command);
     void sendMotionCommand(messages::WalkCommand command);
 
+    // Head Commands.
     void sendMotionCommand(const SetHeadCommand::ptr command);
-    //void sendMotionCommand(const CoordHeadCommand::ptr command);
+    void sendMotionCommand(const messages::SetHeadCommand& command);
+    void sendMotionCommand(const HeadJointCommand::ptr command);
+    void sendMotionCommand(const messages::ScriptedHeadCommand& command);
+
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
     void sendMotionCommand(const StepCommand::ptr command);
@@ -94,8 +98,8 @@ public:
     bool isHeadActive() { return headProvider.isActive(); }
     bool isBodyActive() { return curProvider->isActive();}
 
-    void resetWalkProvider(){ walkProvider.hardReset(); }
-    void resetScriptedProvider(){ scriptedProvider.hardReset(); }
+    void resetWalkProvider()     { walkProvider.hardReset(); }
+    void resetScriptedProvider() { scriptedProvider.hardReset(); }
 
     int getFrameCount() const { return frameCount; }
 
@@ -145,10 +149,11 @@ public:
         const std::string& file);
 
     /* Input/Output related to executing motion commands. */
-    portals::InPortal<messages::JointAngles>   jointsInput_;
-    portals::InPortal<messages::InertialState> inertialsInput_;
-    portals::InPortal<messages::FSR>           fsrInput_;
-    portals::InPortal<messages::MotionCommand> commandInput_;
+    portals::InPortal<messages::JointAngles>       jointsInput_;
+    portals::InPortal<messages::InertialState>     inertialsInput_;
+    portals::InPortal<messages::FSR>               fsrInput_;
+    portals::InPortal<messages::MotionCommand>     bodyCommandInput_;
+    portals::InPortal<messages::HeadMotionCommand> headCommandInput_;
 
     portals::OutPortal<messages::JointAngles>  jointsOutput_;
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
@@ -191,11 +196,11 @@ private:
     // Make a new status proto and set it on the out portal
     void updateStatus();
 
-    BHWalkProvider walkProvider;
-    ScriptedProvider scriptedProvider;
-    HeadProvider headProvider;
-    NullHeadProvider nullHeadProvider;
-    NullBodyProvider nullBodyProvider;
+    BHWalkProvider          walkProvider;
+    ScriptedProvider        scriptedProvider;
+    HeadProvider            headProvider;
+    NullHeadProvider        nullHeadProvider;
+    NullBodyProvider        nullBodyProvider;
 
     MotionProvider*         curProvider;
     MotionProvider*         nextProvider;
