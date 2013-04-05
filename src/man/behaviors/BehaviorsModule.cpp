@@ -13,6 +13,8 @@ using namespace boost::python;
 
 extern "C" void initLedCommand_proto();
 extern "C" void initGameState_proto();
+extern "C" void initVisionField_proto();
+extern "C" void initVisionRobot_proto();
 extern "C" void initWorldModel_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
@@ -32,8 +34,8 @@ BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
       brain_module(NULL),
       brain_instance(NULL),
       do_reload(0),
-	  pyInterface(),
-	  ledCommandOut(base()),
+      pyInterface(),
+      ledCommandOut(base()),
       motionCommandOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
@@ -42,8 +44,8 @@ BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
     teamNumber = teamNum;
     playerNumber = playerNum;
 
-	// Initialize the PyInterface pointer
-	set_interface_ptr(boost::shared_ptr<PyInterface> (&pyInterface));
+    // Initialize the PyInterface pointer
+    set_interface_ptr(boost::shared_ptr<PyInterface> (&pyInterface));
 
     // Initialize the interpreter and C python extensions
     initializePython();
@@ -79,13 +81,20 @@ void BehaviorsModule::initializePython()
     try{
         initLedCommand_proto();
         initGameState_proto();
+        initVisionField_proto();
+        initVisionRobot_proto();
         initWorldModel_proto();
         initBallModel_proto();
         initPMotion_proto();
+<<<<<<< HEAD
         initMotionStatus_proto();
         initSonarState_proto();
 		// Init the interface as well
 		initinterface();
+=======
+        // Init the interface as well
+        initinterface();
+>>>>>>> wils/behaviors
     } catch (error_already_set) {
         PyErr_Print();
     }
@@ -166,8 +175,8 @@ void BehaviorsModule::runStep ()
         num_crashed++;
     }
 
-	// Latch incoming messages and prepare outgoing messages
-	prepareMessages();
+    // Latch incoming messages and prepare outgoing messages
+    prepareMessages();
 
     /*PROF_ENTER(P_PYTHON);*/
 
@@ -194,13 +203,14 @@ void BehaviorsModule::runStep ()
 
     // PROF_EXIT(P_PYTHON);
 
-	// Send outgoing messages
-	sendMessages();
+    // Send outgoing messages
+    sendMessages();
 }
 
-	void BehaviorsModule::prepareMessages()
-	{
+    void BehaviorsModule::prepareMessages()
+    {
         // Latch incoming messages
+<<<<<<< HEAD
 		gameStateIn.latch();
 		pyInterface.setGameState_ptr(&gameStateIn.message());
 		filteredBallIn.latch();
@@ -213,23 +223,45 @@ void BehaviorsModule::runStep ()
         pyInterface.setMotionStatus_ptr(&motionStatusIn.message());
         sonarStateIn.latch();
         pyInterface.setSonarState_ptr(&sonarStateIn.message());
+=======
+        gameStateIn.latch();
+        pyInterface.setGameState_ptr(&gameStateIn.message());
+
+        visionBallIn.latch();
+        pyInterface.setVisionBall_ptr(&visionBallIn.message());
+
+        visionFieldIn.latch();
+        pyInterface.setVisionField_ptr(&visionFieldIn.message());
+
+        visionRobotIn.latch();
+        pyInterface.setVisionRobot_ptr(&visionRobotIn.message());
+
+        filteredBallIn.latch();
+        pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
+
+        for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
+            worldModelIn[i].latch();
+            pyInterface.setWorldModel_ptr(&worldModelIn[i].message(),i);
+                }
+
+>>>>>>> wils/behaviors
 
         // Prepare potential out messages for python
-		ledCommand = portals::Message<messages::LedCommand>(0);
-		pyInterface.setLedCommand_ptr(ledCommand.get());
+        ledCommand = portals::Message<messages::LedCommand>(0);
+        pyInterface.setLedCommand_ptr(ledCommand.get());
         motionCommand = portals::Message<messages::MotionCommand>(0);
         pyInterface.setMotionCommand_ptr(motionCommand.get());
-	}
+    }
 
-	void BehaviorsModule::sendMessages()
-	{
-		ledCommandOut.setMessage(ledCommand);
+    void BehaviorsModule::sendMessages()
+    {
+        ledCommandOut.setMessage(ledCommand);
         // Only set motion commands that python has actually used
         if (motionCommand.get()->processed_by_motion())
         {
             motionCommandOut.setMessage(motionCommand);
         }
-	}
+    }
 
 void BehaviorsModule::modifySysPath ()
 {

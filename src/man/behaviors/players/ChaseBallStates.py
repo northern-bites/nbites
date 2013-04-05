@@ -3,12 +3,9 @@ Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
-import GoalieTransitions as goalTran
 from ..navigator import Navigator
-from ..playbook.PBConstants import GOALIE
-import HeadMoves
-import man.noggin.kickDecider.HackKickInformation as hackKick
-import man.noggin.kickDecider.kicks as kicks
+from ..kickDecider import HackKickInformation as hackKick
+from ..kickDecider import kicks
 from objects import RelRobotLocation
 from math import fabs
 import noggin_constants as nogginConstants
@@ -19,9 +16,6 @@ def chase(player):
     """
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
-
-    if player.brain.play.isRole(GOALIE) and goalTran.dangerousBall(player):
-        return player.goNow('approachDangerousBall')
 
     else:
         return player.goNow('spinToBall')
@@ -195,24 +189,5 @@ def lookAround(player):
                 return player.goNow('orbitBall')
             else:
                 return player.goLater('chase')
-
-    return player.stay()
-
-def approachDangerousBall(player):
-    """adjusts position to be farther away from the ball
-    if the goalie is too close to the ball while in
-    the goal box"""
-    if player.firstFrame():
-        player.stopWalking()
-
-    #move away from the ball so it is no longer dangerous
-    if player.brain.nav.isStopped():
-        if player.brain.ball.loc.relY > 0:
-            player.brain.nav.walk(0, -15, 0)
-        else:
-            player.brain.nav.walk(0, 15, 0)
-
-    if not goalTran.dangerousBall(player) or transitions.shouldFindBall(player):
-        return player.goLater('chase')
 
     return player.stay()

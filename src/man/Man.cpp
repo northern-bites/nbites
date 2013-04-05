@@ -88,11 +88,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     commThread.log<messages::GameState>(&comm._gameStateOutput, "gamestate");
 #endif
 
-	/** Cognition **/
-	cognitionThread.addModule(imageTranscriber);
-	cognitionThread.addModule(vision);
-	//cognitionThread.addModule(ballTrack);
-	cognitionThread.addModule(leds);
+    /** Cognition **/
+    cognitionThread.addModule(imageTranscriber);
+    cognitionThread.addModule(vision);
+    //cognitionThread.addModule(ballTrack);
+    cognitionThread.addModule(leds);
     cognitionThread.addModule(behaviors);
     cognitionThread.addModule(gamestate);
     vision.topImageIn.wireTo(&imageTranscriber.topImageOut);

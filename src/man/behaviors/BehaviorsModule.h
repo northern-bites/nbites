@@ -17,6 +17,8 @@
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
 #include "SonarState.pb.h"
+#include "VisionField.pb.h"
+#include "VisionRobot.pb.h"
 
 /**
  *
@@ -54,10 +56,10 @@ private:
     bool import_modules();
     // Instantiate a Brain instance
     void getBrainInstance();
-	// Latch new messages and prep out messages
-	void prepareMessages();
-	// Send out messages
-	void sendMessages();
+    // Latch new messages and prep out messages
+    void prepareMessages();
+    // Send out messages
+    void sendMessages();
 
     int teamNumber;
     int playerNumber;
@@ -71,8 +73,8 @@ private:
     int do_reload;
     std::vector<std::string> module_list;
 
-	// Portals and interface
-	PyInterface pyInterface;
+    // Portals and interface
+    PyInterface pyInterface;
 public:
 	portals::InPortal<messages::GameState> gameStateIn;
 	portals::InPortal<messages::FilteredBall> filteredBallIn;
@@ -80,9 +82,12 @@ public:
     portals::InPortal<messages::MotionStatus> motionStatusIn;
     portals::InPortal<messages::SonarState> sonarStateIn;
 	portals::OutPortal<messages::LedCommand> ledCommandOut;
+    portals::InPortal<messages::VisionBall> visionBallIn;
+    portals::InPortal<messages::VisionField> visionFieldIn;
+    portals::InPortal<messages::VisionRobot> visionRobotIn;
     portals::OutPortal<messages::MotionCommand> motionCommandOut;
 private:
-	portals::Message<messages::LedCommand> ledCommand;
+    portals::Message<messages::LedCommand> ledCommand;
     portals::Message<messages::MotionCommand> motionCommand;
 };
 
