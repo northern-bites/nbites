@@ -55,8 +55,8 @@ def setDestination(nav, dest, gain = 1.0):
     #       this method should overwrite motion commands.
     #       or, deprecate this method and use speed commands
     #       via the createAndSendWalkVector method.
-    command = nav.brain.interface.motionCommand
-    command.type = nav.brain.interface.motionCommand.CommandType.DESTINATION_WALK #0 #Destination Walk
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.DESTINATION_WALK #Destination Walk
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
@@ -66,8 +66,8 @@ def setDestination(nav, dest, gain = 1.0):
 def setOdometryDestination(nav, dest, gain = 1.0):
     # TODO: distinguish from setDestination method
     #       this method should enqueue motion commands.
-    command = nav.brain.interface.motionCommand
-    command.type = nav.brain.interface.motionCommand.CommandType.DESTINATION_WALK #Destination Walk
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.DESTINATION_WALK #Destination Walk
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
@@ -99,8 +99,8 @@ def setSpeed(nav, speeds):
     createAndSendWalkVector(nav, *speeds)
 
 def createAndSendWalkVector(nav, x, y, theta):
-    command = nav.brain.interface.motionCommand
-    command.type = nav.brain.interface.motionCommand.CommandType.WALK_COMMAND #1 #Walk Command
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.WALK_COMMAND #Walk Command
     command.speed.x = x
     command.speed.y = y
     command.speed.h = theta
@@ -113,8 +113,8 @@ def executeMove(nav, sweetMove):
     Can either take in a head move or a body command
     (see SweetMove files for descriptions of command tuples)
     """
-    command = nav.brain.interface.motionCommand
-    command.type = nav.brain.interface.motionCommand.CommandType.SCRIPTED_MOVE #2 #Scripted Move
+    command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.SCRIPTED_MOVE #Scripted Move
 
     for position in sweetMove:
         if len(position) == 7:

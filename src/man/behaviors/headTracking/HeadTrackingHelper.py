@@ -3,6 +3,7 @@ from .. import MotionConstants
 from ..util import MyMath as MyMath
 from .. import StiffnessModes
 from math import fabs
+import HeadMoves
 
 class HeadTrackingHelper(object):
     def __init__(self, tracker):
@@ -10,18 +11,57 @@ class HeadTrackingHelper(object):
 
     def executeHeadMove(self, headMove):
         """performs a sweetmove"""
+        command = self.tracker.brain.interface.headMotionCommand
+        command.type = command.CommandType.SCRIPTED_HEAD_COMMAND
+
         for position in headMove:
             if len(position) == 4:
-                move = motion.HeadJointCommand(position[1] ,# time
-                                               position[0], # head pos
-                                               position[3], # chain stiffnesses
-                                               position[2], # interpolation type
-                                               )
+                command.scripted_command.add_commands
+
+                # Set most recent command
+                headJoints = command.scripted_command.command(commands_size-1)
+                headJoints.time = position[1]
+                if position[2] == 1: # Smooth interpolation
+                    headJoints.interpolation = headJoints.InterpolationType.SMOOTH
+                else:
+                    headJoints.interpolation = headJoints.InterpolationType.LINEAR
+
+                # Only set the head angles, since this command never sets any other angles
+                headJoints.angles.head_yaw = position[0][0]
+                headJoints.angles.head_pitch = position[0][1]
+
+                # Set all stiffnesses, since this command specifies them all
+                headJoints.stiffness.head_yaw =         position[3][0]
+                headJoints.stiffness.head_pitch =       position[3][1]
+
+                headJoints.stiffness.l_shoulder_pitch = position[3][2]
+                headJoints.stiffness.l_shoulder_roll =  position[3][3]
+                headJoints.stiffness.l_elbow_yaw =      position[3][4]
+                headJoints.stiffness.l_elbow_roll =     position[3][5]
+
+                headJoints.stiffness.r_shoulder_pitch = position[3][18]
+                headJoints.stiffness.r_shoulder_roll =  position[3][19]
+                headJoints.stiffness.r_elbow_yaw =      position[3][20]
+                headJoints.stiffness.r_elbow_roll =     position[3][21]
+
+                headJoints.stiffness.l_hip_yaw_pitch =  position[3][6]
+                headJoints.stiffness.l_hip_roll =       position[3][7]
+                headJoints.stiffness.l_hip_pitch =      position[3][8]
+                headJoints.stiffness.l_knee_pitch =     position[3][9]
+                headJoints.stiffness.l_ankle_pitch =    position[3][10]
+                headJoints.stiffness.l_ankle_roll =     position[3][11]
+
+                headJoints.stiffness.r_hip_yaw_pitch =  position[3][12]
+                headJoints.stiffness.r_hip_roll =       position[3][13]
+                headJoints.stiffness.r_hip_pitch =      position[3][14]
+                headJoints.stiffness.r_knee_pitch =     position[3][15]
+                headJoints.stiffness.r_ankle_pitch =    position[3][16]
+                headJoints.stiffness.r_ankle_roll =     position[3][17]
+
             else:
                 self.tracker.printf("What kind of sweet ass-Move is this?")
 
-            self.tracker.brain.motion.enqueue(move)
-
+        command.process_by_motion = False
         # Returns the last HJC in the HeadMove for keeping track of
         # when a move is done
         return move
@@ -122,9 +162,17 @@ class HeadTrackingHelper(object):
         newYaw = MyMath.clip(newYaw, -80., 80.)
 
         maxSpeed = 2.0
-        headMove = motion.SetHeadCommand(newYaw, newPitch,
-                                         maxSpeed, maxSpeed)
-        self.tracker.brain.motion.setHead(headMove)
+
+        # Set message fields
+        command = self.tracker.brain.interface.headMotionCommand
+        command.type = command.CommandType.SET_HEAD_COMMAND
+
+        command.set_command.head_yaw = newYaw
+        command.set_command.head_pitch = newPitch
+        command.set_command.max_speed_yaw = maxSpeed
+        command.set_command.max_speed_pitch = maxSpeed
+
+        command.process_by_motion = False
 
     # Fixed Pitch
     def trackObjectFixedPitch(self):
@@ -165,9 +213,17 @@ class HeadTrackingHelper(object):
         # ignore newPitch: pitch is fixed
 
         maxSpeed = 2.0
-        headMove = motion.SetHeadCommand(newYaw, 20.0, # MAKE A CONSTANT FOR THIS
-                                         maxSpeed, maxSpeed)
-        self.tracker.brain.motion.setHead(headMove)
+
+        # Set message fields
+        command = self.tracker.brain.interface.headMotionCommand
+        command.type = command.CommandType.SET_HEAD_COMMAND
+
+        command.set_command.head_yaw = newYaw
+        command.set_command.head_pitch = 20.0 # MAKE A CONSTANT FOR THIS
+        command.set_command.max_speed_yaw = maxSpeed
+        command.set_command.max_speed_pitch = maxSpeed
+
+        command.process_by_motion = False
 
     # Not called anywhere in the code.
     def lookToTargetAngles(self, target):
@@ -188,8 +244,14 @@ class HeadTrackingHelper(object):
             # by default, do nothing
             return
 
-        headMove = motion.SetHeadCommand(yaw,pitch)
-        self.tracker.brain.motion.setHead(headMove)
+        # Set message fields
+        command = self.tracker.brain.interface.headMotionCommand
+        command.type = command.CommandType.SET_HEAD_COMMAND
+
+        command.set_command.head_yaw = yaw
+        command.set_command.head_pitch = pitch
+        # Leave max speeds to default
+        command.process_by_motion = False
 
     def panTo(self, heads):
         """
@@ -240,12 +302,13 @@ class HeadTrackingHelper(object):
             target = target.loc
 
         if target.relY > 0:
-            self.executeHeadMove(motion.HeadMoves.FIXED_PITCH_LOOK_LEFT)
+            self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
         else:
-            self.executeHeadMove(motion.HeadMoves.FIXED_PITCH_LOOK_RIGHT)
+            self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
     # broken?
     # Not called anywhere in code.
+    # Unsafe to call as of 4/5/2013
     def lookToAngles(self, yaw=0, pitch=0):
         headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
                                          MyMath.degrees(pitch))
