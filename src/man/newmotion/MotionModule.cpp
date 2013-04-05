@@ -255,9 +255,9 @@ void MotionModule::processMotionInput()
     // (1) First process body commands.
     if(!bodyCommandInput_.message().processed_by_motion())
     {
-        std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
-                  << bodyCommandInput_.message().dest().rel_y() << " "
-                  << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
+        // std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
+        //           << bodyCommandInput_.message().dest().rel_y() << " "
+        //           << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
 
         // Is this a destination walk request?
         if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK){
@@ -273,22 +273,6 @@ void MotionModule::processMotionInput()
         else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE){
             sendMotionCommand(bodyCommandInput_.message().script());
             const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
-        }
-        std::cout << "POST!! " << bodyCommandInput_.message().processed_by_motion() << std::endl;
-    }
-
-    // (2) Process head commands.
-    if(!headCommandInput_.message().processed_by_motion())
-    {
-        if(headCommandInput_.message().type() == messages::HeadMotionCommand::SET_HEAD_COMMAND)
-        {
-            sendMotionCommand(headCommandInput_.message().set_command());
-            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
-        }
-        else if(headCommandInput_.message().type() == messages::HeadMotionCommand::SCRIPTED_HEAD_COMMAND)
-        {
-            sendMotionCommand(headCommandInput_.message().scripted_command());
-            const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
         }
     }
 }

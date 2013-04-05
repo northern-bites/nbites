@@ -127,6 +127,6 @@ This robot is currently unknown.'''
 
 
 def get_certificate():
-    return robot_map.setdefault(read _hostname(),
+    return robot_map.setdefault(read_hostname(),
                                 unknown) # switched to use the file read method
     #return robot_map.setdefault(socket.gethostname(), unknown)
