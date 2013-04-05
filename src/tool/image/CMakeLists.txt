@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 
 set( IMAGE_SRCS
   ImageDisplayModule.cpp
+  Color.cpp
     )
 
 set( IMAGE_HEADERS
