@@ -71,8 +71,8 @@ message SetHeadCommand
 {
     optional float head_yaw = 1;
     optional float head_pitch = 2;
-    optional float max_speed_yaw = 3;
-    optional float max_speed_pitch = 4;
+    optional float max_speed_yaw = 3 [default = -1];
+    optional float max_speed_pitch = 4 [default = -1];
 }
 
 message ScriptedHeadCommand

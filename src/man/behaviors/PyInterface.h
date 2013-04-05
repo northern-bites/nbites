@@ -29,7 +29,8 @@ public:
     messages::FilteredBall    const * filteredBall_ptr;
     messages::LedCommand      const * ledCommand_ptr;
     messages::WorldModel      const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
-    messages::MotionCommand   const * motionCommand_ptr;
+    messages::MotionCommand   const * bodyMotionCommand_ptr;
+    messages::HeadMotionCommand   const * headMotionCommand_ptr;
     messages::MotionStatus    const * motionStatus_ptr;
     messages::SonarState      const * sonarState_ptr;
     messages::FootBumperState const * footBumperState_ptr;
@@ -66,9 +67,13 @@ public:
         }
         return list;
     }
-    void setMotionCommand_ptr(const messages::MotionCommand* msg)
+    void setBodyMotionCommand_ptr(const messages::MotionCommand* msg)
     {
-        motionCommand_ptr =  msg;
+        bodyMotionCommand_ptr =  msg;
+    }
+    void setHeadMotionCommand_ptr(const messages::HeadMotionCommand* msg)
+    {
+        headMotionCommand_ptr = msg;
     }
     void setMotionStatus_ptr(const messages::MotionStatus* msg)
     {

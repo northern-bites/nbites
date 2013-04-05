@@ -44,8 +44,12 @@ BOOST_PYTHON_MODULE(interface)
                                   return_value_policy
                                   <reference_existing_object>()))
         .def("worldModelList", &PyInterface::getWorldModelList)
-        .add_property("motionCommand",
-                      make_getter(&PyInterface::motionCommand_ptr,
+        .add_property("bodyMotionCommand",
+                      make_getter(&PyInterface::bodyMotionCommand_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("headMotionCommand",
+                      make_getter(&PyInterface::headMotionCommand_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         .add_property("motionStatus",
