@@ -3,6 +3,8 @@
 #include <iostream>
 #include "RobotConfig.h"
 
+SET_POOL_SIZE(messages::WorldModel, 15);
+
 namespace man {
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
@@ -119,6 +121,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.visionRobotIn.wireTo(&vision.vision_robot);
     behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
     behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+    behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
     behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)

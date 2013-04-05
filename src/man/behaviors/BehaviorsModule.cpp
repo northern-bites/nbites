@@ -20,10 +20,10 @@ extern "C" void initRobotLocation_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
+extern "C" void initRobotLocation_proto();
 extern "C" void initSonarState_proto();
 extern "C" void initFootBumperState_proto();
 extern "C" void initinterface();
-
 
 namespace man {
 namespace behaviors {
@@ -93,6 +93,7 @@ void BehaviorsModule::initializePython()
         initMotionStatus_proto();
         initSonarState_proto();
         initFootBumperState_proto();
+        initRobotLocation_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -236,6 +237,9 @@ void BehaviorsModule::prepareMessages()
     motionStatusIn.latch();
     pyInterface.setMotionStatus_ptr(&motionStatusIn.message());
 
+    odometryIn.latch();
+    pyInterface.setOdometry_ptr(&odometryIn.message());
+
     sonarStateIn.latch();
     pyInterface.setSonarState_ptr(&sonarStateIn.message());
 
@@ -257,7 +261,7 @@ void BehaviorsModule::sendMessages()
     ledCommandOut.setMessage(ledCommand);
 
     // Only set motion commands that python has actually used
-    if (!motionCommand.get()->processed_by_motion())
+    if (!bodyMotionCommand.get()->processed_by_motion())
     {
         bodyMotionCommandOut.setMessage(bodyMotionCommand);
     }

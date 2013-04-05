@@ -16,6 +16,7 @@
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
 #include "FootBumperState.pb.h"
+#include "RobotLocation.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -33,10 +34,11 @@ public:
     messages::LedCommand      const * ledCommand_ptr;
     messages::WorldModel      const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
     messages::MotionCommand   const * bodyMotionCommand_ptr;
-    messages::HeadMotionCommand   const * headMotionCommand_ptr;
-    messages::MotionStatus    const * motionStatus_ptr;
-    messages::SonarState      const * sonarState_ptr;
-    messages::FootBumperState const * footBumperState_ptr;
+    messages::HeadMotionCommand const * headMotionCommand_ptr;
+    messages::MotionStatus      const * motionStatus_ptr;
+    messages::RobotLocation     const * odometry_ptr;
+    messages::SonarState        const * sonarState_ptr;
+    messages::FootBumperState   const * footBumperState_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -89,6 +91,10 @@ public:
     void setMotionStatus_ptr(const messages::MotionStatus* msg)
     {
         motionStatus_ptr = msg;
+    }
+    void setOdometry_ptr(const messages::RobotLocation* msg)
+    {
+        odometry_ptr = msg;
     }
     void setSonarState_ptr(const messages::SonarState* msg)
     {

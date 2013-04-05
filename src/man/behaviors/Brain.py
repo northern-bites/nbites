@@ -72,6 +72,8 @@ class Brain(object):
         # Information about the environment
         self.ball = None
         self.initTeamMembers()
+        self.motion = None
+        self.game = None
 
         self.play = Play.Play()
 
@@ -148,6 +150,7 @@ class Brain(object):
         sys.stdout.flush()
 
     def getCommUpdate(self):
+        self.game = self.interface.gameState
         for i in range(len(self.teamMembers)):
             self.teamMembers[i].update(self.interface.worldModelList()[i])
 

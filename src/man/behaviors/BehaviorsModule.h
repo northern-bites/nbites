@@ -77,6 +77,7 @@ public:
     portals::InPortal<messages::GameState> gameStateIn;
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
     portals::InPortal<messages::MotionStatus> motionStatusIn;
+    portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::SonarState> sonarStateIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
     portals::InPortal<messages::VisionField> visionFieldIn;
@@ -86,7 +87,7 @@ public:
     portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::OutPortal<messages::LedCommand> ledCommandOut;
-    portals::OutPortal<messages::MotionCommand> bodymotionCommandOut;
+    portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;
     portals::OutPortal<messages::HeadMotionCommand> headMotionCommandOut;
 
 private:
