@@ -4,6 +4,8 @@
 namespace tool {
 namespace unlog {
 
+bool UnlogBase::readBackward = false;
+
 // Simple constructor, stores the file name
 UnlogBase::UnlogBase(std::string path, std::string type) : Module(),
                                                            file(0),
@@ -85,12 +87,19 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
     // @see LogModule.h for why this works
     uint32_t currentSize = readValue<uint32_t>();
 
+    if (currentSize !=
+        current->width()*current->height()*sizeof(unsigned char) &&
+        !current->isNull())
+    {
+        std::cout << "End of log file " << fileName << std::endl;
+        return *current;
+    }
+
     // Keep track of the sizes we've read (to unwind)
     messageSizes.push_back(currentSize);
 
     // To hold the data read, and the number of bytes read
     uint32_t bytes;
-    //
     messages::YUVImage* img = new messages::YUVImage(currentSize/480, 480);
 
     try {
@@ -116,7 +125,7 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage() {
     // Can return this if we are at the beginning--won't return null image
     const messages::YUVImage* current = output.getMessage(true).get();
 
-    if (ftell(file) < current->width()*current->height()*2)
+    if (ftell(file) < current->width()*current->height())
     {
         std::cout << "Beginning of log file " << fileName << std::endl;
         return *current;

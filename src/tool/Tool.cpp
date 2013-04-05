@@ -27,13 +27,9 @@ Tool::Tool(const char* title) :
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
 
-	//connect both to a slot that switches the run direction boolean if neccessary
-	connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(setForwardDir()));
-	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(setBackDir()));
-
     //connect both fwd and prv button to the run slot
-	connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(run()));
-	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(run()));
+	connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(runForward()));
+	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(runBackward()));
 
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
@@ -84,17 +80,11 @@ void Tool::setUpModules()
 void Tool::keyPressEvent(QKeyEvent * event)
 {
     switch (event->key()) {
-    case Qt::Key_J:
-    case Qt::Key_D:
     case Qt::Key_N:
-		//unlog::UnlogBase::readDir = 1;
-        diagram.run();
+        diagram.runForward();
         break;
-    case Qt::Key_K:
-    case Qt::Key_S:
     case Qt::Key_P:
-		//unlog::UnlogBase::readDir = 0;
-		diagram.run();
+		diagram.runBackward();
         break;
     default:
         QWidget::keyPressEvent(event);

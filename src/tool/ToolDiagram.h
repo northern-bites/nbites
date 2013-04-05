@@ -61,20 +61,9 @@ signals:
     void signalNewDisplayWidget(QWidget*, std::string);
 
 public slots:
-    void run() { diagram.run(); }
+    void runForward();
+    void runBackward();
     void addUnloggers(std::vector<std::string> paths);
-
-    // Change whether we are parsing backwareds or forward in unloggers
-	void setBackDir()
-    {
-		if(unlog::UnlogBase::readDir())
-		   unlog::UnlogBase::readDir()=0;
-	}
-	void setForwardDir()
-    {
-		if(!unlog::UnlogBase::readDir())
-		   unlog::UnlogBase::readDir()=1;
-	}
 
 protected:
     portals::RoboGram diagram;

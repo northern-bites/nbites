@@ -110,6 +110,18 @@ void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input
     std::endl;
 }
 
+void ToolDiagram::runForward()
+{
+    unlog::UnlogBase::readBackward = false;
+    diagram.run();
+}
+
+void ToolDiagram::runBackward()
+{
+    unlog::UnlogBase::readBackward = true;
+    diagram.run();
+}
+
 void ToolDiagram::addUnloggers(std::vector<std::string> paths)
 {
     for (std::vector<std::string>::iterator i = paths.begin();
