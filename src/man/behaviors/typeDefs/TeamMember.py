@@ -1,5 +1,5 @@
 from objects import (RobotLocation, Location)
-from math import fabs
+from math import fabs, degrees
 import noggin_constants as NogginConstants
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
@@ -81,21 +81,20 @@ class TeamMember(RobotLocation):
         updates my information as a teammate (since we may not get our own packets)
         """
 
-        my = self.brain.my
+        loc = self.brain.loc
         ball = self.brain.ball
 
-        self.x = my.x
-        self.y = my.y
-        self.h = my.h
-        self.ballOn = ball.frames_on > 0
+        self.x = loc.x
+        self.y = loc.y
+        self.h = loc.h
+        self.ballOn = ball.vis.frames_on > 0
         self.ballDist = ball.distance
         self.ballBearing = ball.bearing_deg
         self.role = self.brain.play.role
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
 
-        self.active = (not self.brain.interface.gameState.state ==
-                       'gamePenalized')
+        self.active = (not self.isPenalized())
 
         self.dribbling = (self.active and self.ballDist <=
                          BALL_TEAMMATE_DIST_DRIBBLING)
@@ -137,7 +136,7 @@ class TeamMember(RobotLocation):
             print "\tChase time base is " + str(t)
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if (not self.brain.ball.frames_on > 3 and
+        if (not self.brain.ball.vis.frames_on > 3 and
             not self.brain.player.inKickingState):
             t += BALL_OFF_PENALTY
 
@@ -201,7 +200,7 @@ class TeamMember(RobotLocation):
         """
         this checks GameController to see if a player is penalized.
         """
-        return self.brain.interface.gameState.team[self.brain.gameController.teamColor].player[self.playerNumber-1].penalty
+        return self.brain.interface.gameState.team(self.brain.gameController.teamColor).player(self.playerNumber-1).penalty
 
     def __str__(self):
         return "I am player number " + self.playerNumber

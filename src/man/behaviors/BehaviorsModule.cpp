@@ -16,6 +16,7 @@ extern "C" void initGameState_proto();
 extern "C" void initVisionField_proto();
 extern "C" void initVisionRobot_proto();
 extern "C" void initWorldModel_proto();
+extern "C" void initRobotLocation_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
@@ -86,6 +87,7 @@ void BehaviorsModule::initializePython()
         initVisionRobot_proto();
         initWorldModel_proto();
         initBallModel_proto();
+        initRobotLocation_proto();
         initPMotion_proto();
         initMotionStatus_proto();
         initSonarState_proto();
@@ -218,6 +220,9 @@ void BehaviorsModule::prepareMessages()
 
     filteredBallIn.latch();
     pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
+
+    localizationIn.latch();
+    pyInterface.setRobotLocation_ptr(&localizationIn.message());
 
     for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
         worldModelIn[i].latch();

@@ -35,6 +35,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::visionField_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("robotLocation",
+                      make_getter(&PyInterface::robotLocation_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         .add_property("filteredBall",
                       make_getter(&PyInterface::filteredBall_ptr,
                                   return_value_policy
@@ -60,8 +64,8 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::footBumperState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-		;
-	scope().attr("interface") = interface_ptr;
+        ;
+    scope().attr("interface") = interface_ptr;
 }
 }
 }

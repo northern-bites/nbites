@@ -9,11 +9,11 @@ sys.stderr = sys.stdout
 
 # Packages and modules from super-directories
 import noggin_constants as Constants
+from objects import RobotLocation
 
 # Modules from this directory
 from . import Leds
 from . import robots
-from . import MyInfo
 from . import GameController
 
 # Packages and modules from sub-directories
@@ -25,13 +25,13 @@ from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
 
-#from objects import (FieldObject)
 
 # Import message protocol buffers and interface
 import interface
 import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
+import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
@@ -57,8 +57,6 @@ class Brain(object):
         self.counter = 0
         self.time = time.time()
 
-        self.my = MyInfo.MyInfo()
-
         #initalize the leds and game controller
         self.leds = Leds.Leds(self)
         self.gameController = GameController.GameController(self)
@@ -72,8 +70,6 @@ class Brain(object):
         print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
 
         # Information about the environment
-        # All field objects should come in as messages now
-        #self.initFieldObjects()
         self.ball = None
         self.initTeamMembers()
 
@@ -88,8 +84,6 @@ class Brain(object):
 
         # Message interface
         self.interface = interface.interface
-
-        self.motion = None
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -137,11 +131,12 @@ class Brain(object):
         # Update objects
         self.updateVisionObjects()
         self.updateMotion()
+        self.updateLoc()
         self.getCommUpdate()
 
         # Behavior stuff
         self.gameController.run()
-        #self.updatePlaybook()
+        self.updatePlaybook()
         self.player.run()
         #self.tracker.run()
         self.nav.run()
@@ -173,15 +168,6 @@ class Brain(object):
         """
         self.playbook.update(self.play)
 
-    # move to comm
-    # def setCommData(self):
-    #     # Team color, team number, and player number are all appended to this
-    #     # list by the underlying comm module implemented in C++
-    #     loc = self.loc
-    #     self.comm.setData(self.my.playerNumber,
-    #                       self.play.role, self.play.subRole,
-    #                       self.playbook.pb.me.chaseTime)
-
     def activeTeamMates(self):
         activeMates = 0
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
@@ -189,6 +175,15 @@ class Brain(object):
             if mate.active:
                 activeMates += 1
         return activeMates
+
+    def updateLoc(self):
+        """
+        Update brain's loc reference
+        """
+        self.loc = RobotLocation(self.interface.robotLocation.x,
+                                 self.interface.robotLocation.y,
+                                 self.interface.robotLocation.h )
+
 
     def resetInitialLocalization(self):
         """

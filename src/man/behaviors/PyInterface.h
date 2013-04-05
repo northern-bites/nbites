@@ -6,6 +6,7 @@
 #include "Common.h"
 
 #include "GameState.pb.h"
+#include "RobotLocation.pb.h"
 #include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
@@ -26,6 +27,7 @@ public:
     messages::GameState       const * gameState_ptr;
     messages::VisionRobot     const * visionRobot_ptr;
     messages::VisionField     const * visionField_ptr;
+    messages::RobotLocation   const * robotLocation_ptr;
     messages::FilteredBall    const * filteredBall_ptr;
     messages::LedCommand      const * ledCommand_ptr;
     messages::WorldModel      const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -45,6 +47,10 @@ public:
     void setVisionField_ptr(const messages::VisionField* msg)
     {
         visionField_ptr = msg;
+    }
+    void setRobotLocation_ptr(const messages::RobotLocation* msg)
+    {
+        robotLocation_ptr = msg;
     }
     void setFilteredBall_ptr(const messages::FilteredBall* msg)
     {

@@ -104,12 +104,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+    ballTrack.localizationInput.wireTo(&localization.output);
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
     gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
     gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
-    //behaviors.localizationInput.wireTo(&localization.output);
+    behaviors.localizationIn.wireTo(&localization.output);
     behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
     behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
     behaviors.visionFieldIn.wireTo(&vision.vision_field);

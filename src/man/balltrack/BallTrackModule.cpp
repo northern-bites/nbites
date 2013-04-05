@@ -1,4 +1,6 @@
 #include "BallTrackModule.h"
+#include "NBMath.h"
+#include <math.h>
 
 namespace man
 {
@@ -23,6 +25,7 @@ void BallTrackModule::run_()
 {
     // Latch
     visionBallInput.latch();
+    localizationInput.latch();
 
     // Update the Ball filter
     ballFilter->update(visionBallInput.message());
@@ -31,10 +34,17 @@ void BallTrackModule::run_()
     portals::Message<messages::FilteredBall> ballMessage(0);
 
     // Use the Weighted Naive Estimate
-    ballMessage.get()->set_filter_distance(ballFilter->getWeightedNaiveEstimate().dist);
-    ballMessage.get()->set_filter_bearing(ballFilter->getWeightedNaiveEstimate().bear);
-    ballMessage.get()->set_filter_rel_x(ballFilter->getCartesianWeightedNaiveEstimate().relX);
-    ballMessage.get()->set_filter_rel_y(ballFilter->getCartesianWeightedNaiveEstimate().relY);
+    ballMessage.get()->set_distance(ballFilter->getWeightedNaiveEstimate().dist);
+    ballMessage.get()->set_bearing(ballFilter->getWeightedNaiveEstimate().bear);
+    ballMessage.get()->set_bearing_deg(ballFilter->getWeightedNaiveEstimate().bear * TO_DEG);
+    float x = localizationInput.message().x() +
+        ballMessage.get()->distance() * cosf(localizationInput.message().h());
+    float y = localizationInput.message().y() +
+        ballMessage.get()->distance() * sinf(localizationInput.message().h());
+    ballMessage.get()->set_x(x);
+    ballMessage.get()->set_y(y);
+    ballMessage.get()->set_rel_x(ballFilter->getCartesianWeightedNaiveEstimate().relX);
+    ballMessage.get()->set_rel_y(ballFilter->getCartesianWeightedNaiveEstimate().relY);
 
     // Use the Exponential Filter Estimate
     // ballMessage.get()->set_filter_distance(ballFilter->getExponentialEstimate().dist);
