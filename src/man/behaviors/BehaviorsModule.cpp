@@ -38,6 +38,7 @@ BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
       do_reload(0),
       pyInterface(),
       ledCommandOut(base()),
+      motionRequestOut(base()),
       bodyMotionCommandOut(base()),
       headMotionCommandOut(base())
 {
@@ -249,6 +250,9 @@ void BehaviorsModule::prepareMessages()
     ledCommand = portals::Message<messages::LedCommand>(0);
     pyInterface.setLedCommand_ptr(ledCommand.get());
 
+    motionRequest = portals::Message<messages::MotionRequest>(0);
+    pyInterface.setMotionRequest_ptr(motionRequest.get());
+
     bodyMotionCommand = portals::Message<messages::MotionCommand>(0);
     pyInterface.setBodyMotionCommand_ptr(bodyMotionCommand.get());
 
@@ -269,7 +273,10 @@ void BehaviorsModule::sendMessages()
     {
         headMotionCommandOut.setMessage(headMotionCommand);
     }
-
+    if (!motionRequest.get()->processed_by_motion())
+    {
+        motionRequestOut.setMessage(motionRequest);
+    }
 }
 
 void BehaviorsModule::modifySysPath ()

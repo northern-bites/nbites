@@ -118,12 +118,11 @@ def executeMove(nav, sweetMove):
 
     for position in sweetMove:
         if len(position) == 7:
-            move = command.script.add_commands() # Current body joint command
+            move = command.script.add_command() # Current body joint command
 
             command.script.time = position[4]
             command.script.interpolation_type = position[5]
 
-            #move = command.script.commands(command.script.commands_size()-1) #Current body joint command
             move.angles.l_shoulder_pitch = position[0][0]
             move.angles.l_shoulder_roll =  position[0][1]
             move.angles.l_elbow_yaw =      position[0][2]

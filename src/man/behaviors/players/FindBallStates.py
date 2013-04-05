@@ -1,7 +1,7 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from ..playbook.PBConstants import GOALIE
-
+from objects import Location
 
 def findBall(player):
     """
@@ -55,9 +55,9 @@ def spinFindBall(player):
         player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
-        my = player.brain.my
-        ball = player.brain.ball
-        spinDir = my.spinDirToPoint(ball.loc)
+        my = player.brain.loc
+        ball = Location(player.brain.ball.x, player.brain.ball.y)
+        spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
         player.brain.tracker.spinPanFixedPitch()

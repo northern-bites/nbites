@@ -25,15 +25,16 @@ namespace behaviors {
 class PyInterface
 {
 public:
-    messages::GameState       const * gameState_ptr;
-    messages::VisionRobot     const * visionRobot_ptr;
-    messages::VisionField     const * visionField_ptr;
-    messages::VisionObstacle  const * visionObstacle_ptr;
-    messages::RobotLocation   const * robotLocation_ptr;
-    messages::FilteredBall    const * filteredBall_ptr;
-    messages::LedCommand      const * ledCommand_ptr;
-    messages::WorldModel      const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
-    messages::MotionCommand   const * bodyMotionCommand_ptr;
+    messages::GameState         const * gameState_ptr;
+    messages::VisionRobot       const * visionRobot_ptr;
+    messages::VisionField       const * visionField_ptr;
+    messages::VisionObstacle    const * visionObstacle_ptr;
+    messages::RobotLocation     const * robotLocation_ptr;
+    messages::FilteredBall      const * filteredBall_ptr;
+    messages::LedCommand        const * ledCommand_ptr;
+    messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
+    messages::MotionCommand     const * bodyMotionCommand_ptr;
+    messages::MotionRequest     const * motionRequest_ptr;
     messages::HeadMotionCommand const * headMotionCommand_ptr;
     messages::MotionStatus      const * motionStatus_ptr;
     messages::RobotLocation     const * odometry_ptr;
@@ -79,6 +80,10 @@ public:
             list.append(worldModel_ptr[i]);
         }
         return list;
+    }
+    void setMotionRequest_ptr(const messages::MotionRequest* msg)
+    {
+        motionRequest_ptr =  msg;
     }
     void setBodyMotionCommand_ptr(const messages::MotionCommand* msg)
     {

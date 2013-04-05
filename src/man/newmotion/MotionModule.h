@@ -153,6 +153,7 @@ public:
     portals::InPortal<messages::JointAngles>       jointsInput_;
     portals::InPortal<messages::InertialState>     inertialsInput_;
     portals::InPortal<messages::FSR>               fsrInput_;
+    portals::InPortal<messages::MotionRequest>     motionRequestInput_;
     portals::InPortal<messages::MotionCommand>     bodyCommandInput_;
     portals::InPortal<messages::HeadMotionCommand> headCommandInput_;
     portals::InPortal<messages::StiffnessControl>  stiffnessInput_;

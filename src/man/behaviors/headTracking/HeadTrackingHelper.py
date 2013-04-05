@@ -16,10 +16,8 @@ class HeadTrackingHelper(object):
 
         for position in headMove:
             if len(position) == 4:
-                command.scripted_command.add_commands
+                headJoints = command.scripted_command.add_command()
 
-                # Set most recent command
-                headJoints = command.scripted_command.command(commands_size-1)
                 headJoints.time = position[1]
                 if position[2] == 1: # Smooth interpolation
                     headJoints.interpolation = headJoints.InterpolationType.SMOOTH
@@ -62,9 +60,6 @@ class HeadTrackingHelper(object):
                 self.tracker.printf("What kind of sweet ass-Move is this?")
 
         command.process_by_motion = False
-        # Returns the last HJC in the HeadMove for keeping track of
-        # when a move is done
-        return move
 
     def startingPan(self, headMove):
         """Calculates the first part of a fixed pitch pan to get there quickly."""

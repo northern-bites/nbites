@@ -215,7 +215,8 @@ class Navigator(FSA.FSA):
         Make the robot stand; Standing should be the default action when we're not
         walking/executing a sweet move
         """
-        self.switchTo('stand')
+        if self.currentState not in ['stand', 'standing']:
+            self.switchTo('stand')
 
     # informative methods
     def isAtPosition(self):

@@ -87,11 +87,13 @@ public:
     portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::OutPortal<messages::LedCommand> ledCommandOut;
+    portals::OutPortal<messages::MotionRequest> motionRequestOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;
     portals::OutPortal<messages::HeadMotionCommand> headMotionCommandOut;
 
 private:
     portals::Message<messages::LedCommand> ledCommand;
+    portals::Message<messages::MotionRequest> motionRequest;
     portals::Message<messages::MotionCommand> bodyMotionCommand;
     portals::Message<messages::HeadMotionCommand> headMotionCommand;
 };
