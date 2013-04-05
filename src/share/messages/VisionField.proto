@@ -11,7 +11,7 @@ message VisionField
    repeated VisualLine visual_line = 5;
    optional VisualDetection visual_cross = 6;
    optional VisualFieldEdge visual_field_edge = 7;
-   
+
       message Point
       {
 	optional float x = 1;
@@ -22,11 +22,16 @@ message VisionField
       {
 	optional float distance = 1;
 	optional float bearing = 2;
-	optional float distance_sd = 3;
-	optional float bearing_sd = 4;
-	repeated Point concrete_coords = 5;
+        optional float bearing_deg = 3;
+	optional float distance_sd = 4;
+	optional float bearing_sd = 5;
+        optional int32 certainty = 6;
+        optional bool  on = 7;
+        optional int32 frames_on = 8;
+        optional int32 frames_off = 9;
+	repeated Point concrete_coords = 10;
       }
-      
+
    message VisualGoalPost
    {
       optional VisualDetection visual_detection = 1;

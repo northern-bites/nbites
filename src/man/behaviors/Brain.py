@@ -35,6 +35,8 @@ import GameState_proto
 import WorldModel_proto
 import BallModel_proto
 import PMotion_proto
+import VisionRobot_proto
+import VisionField_proto
 
 class Brain(object):
     """
@@ -49,7 +51,6 @@ class Brain(object):
         # Parse arguments
         self.playerNumber = playerNum
         self.teamNumber = teamNum
-        self.teamColor = Constants.teamColor.TEAM_BLUE
 
         self.counter = 0
         self.time = time.time()
@@ -145,8 +146,7 @@ class Brain(object):
         self.time = time.time()
 
         # Update objects
-        # TODO: update this functionality to get info from messages
-        #self.updateObjects()
+        self.updateVisionObjects()
 
         # Behavior stuff
         self.gameController.run()
@@ -168,12 +168,9 @@ class Brain(object):
         """
         Update estimates of robot and ball positions on the field
         """
-        pass
-        #self.ball.updateBallInfo(self.interface.filteredBall)
-        #self.yglp.setBest()
-        #self.ygrp.setBest()
-        #self.bglp.setBest()
-        #self.bgrp.setBest()
+        self.ball = self.brain.interface.visionBall
+        self.yglp = self.brain.interface.visionField.goal_post_l.visual_detection
+        self.ygrp = self.brain.interface.visionField.goal_post_r.visual_detection
 
     def updatePlaybook(self):
         """
@@ -204,7 +201,7 @@ class Brain(object):
         Reset loc according to team number and team color.
         Note: Loc uses truly global coordinates.
         """
-        if self.teamColor == Constants.teamColor.TEAM_BLUE:
+        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             if self.playerNumber == 1:
                 self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
                                     Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
@@ -257,7 +254,7 @@ class Brain(object):
 
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
-        if self.teamColor == Constants.teamColor.TEAM_BLUE:
+        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
 # #            if self.my.playerNumber == 1:
 # #                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
 # #                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
@@ -290,7 +287,7 @@ class Brain(object):
         """
         Resets localization to both possible locations, depending on team color.
         """
-        if self.teamColor == Constants.teamColor.TEAM_BLUE:
+        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                                 Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                                 Constants.HEADING_UP,
@@ -316,7 +313,7 @@ class Brain(object):
         """
         Resets the goalie's localization to the manual position in the goalbox.
         """
-        if self.teamColor == Constants.teamColor.TEAM_BLUE:
+        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
             self.loc.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
                                 Constants.MIDFIELD_Y,
                                 Constants.HEADING_RIGHT,
