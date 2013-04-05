@@ -14,20 +14,20 @@ from objects import RelRobotLocation
 
 def facingGoal(player):
     if player.side == goalCon.RIGHT:
-        return (player.brain.vision.yglp.on and
-                fabs(player.brain.vision.yglp.bearing) < 10.0
-                and player.brain.vision.yglp.dist < 400.0)
+        return (player.brain.yglp.on and
+                fabs(player.brain.yglp.bearing_deg) < 10.0
+                and player.brain.yglp.distance < 400.0)
     else:
-        return (player.brain.vision.ygrp.on and
-                fabs(player.brain.vision.ygrp.bearing) < 10.0
-                and player.brain.vision.ygrp.dist < 400.0)
+        return (player.brain.ygrp.on and
+                fabs(player.brain.ygrp.bearing_deg) < 10.0
+                and player.brain.ygrp.distance < 400.0)
 
 def atGoalArea(player):
     """
     Checks if robot is close enough to the field edge to be at the goal.
     """
     #magic number
-    return player.brain.vision.fieldEdge.centerDist < 110.0
+    return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
 
 def ballIsInMyWay(player):
     """
@@ -36,33 +36,34 @@ def ballIsInMyWay(player):
     if not player.brain.ball.vis.on:
         return False
 
-    return (fabs(player.brain.ball.loc.relY) < 20.0 and
-            player.brain.ball.loc.relX < 30.0)
+    return (fabs(player.brain.ball.filter_rel_y < 20.0 and
+                 player.brain.ball.filter_rel_x < 30.0))
 
 def foundACorner(player):
     """
     Loops through corners to find a visible goalbox corner.
     """
-    if player.brain.vision.fieldLines.numCorners == 0:
-        return False
+    # FIGURE THIS OUT
+    # if player.brain.vision.fieldLines.numCorners == 0:
+    #     return False
 
-    # Throw away false positives from the net!
-    if player.brain.vision.fieldEdge.centerDist < 110.0:
-        return False
+    # # Throw away false positives from the net!
+    # if player.brain.vision.fieldEdge.centerDist < 110.0:
+    #     return False
 
-    for corner in player.brain.vision.fieldLines.corners:
-        if (IDs.YELLOW_GOAL_LEFT_L in corner.possibilities and
-            corner.visualOrientation < 0 and
-            corner.bearing > 0):
-            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_LEFT_L
-            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
-            return True
-        elif (IDs.YELLOW_GOAL_RIGHT_L in corner.possibilities and
-              corner.visualOrientation > 0 and
-              corner.bearing < 0):
-            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_RIGHT_L
-            VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
-            return True
+    # for corner in player.brain.vision.fieldLines.corners:
+    #     if (IDs.YELLOW_GOAL_LEFT_L in corner.possibilities and
+    #         corner.visualOrientation < 0 and
+    #         corner.bearing > 0):
+    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_LEFT_L
+    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
+    #         return True
+    #     elif (IDs.YELLOW_GOAL_RIGHT_L in corner.possibilities and
+    #           corner.visualOrientation > 0 and
+    #           corner.bearing < 0):
+    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_RIGHT_L
+    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
+    #         return True
 
     return False
 
@@ -83,10 +84,10 @@ def ballMoreImportant(player):
     """
     Goalie needs to chase, not localize itself.
     """
-    if player.brain.ball.vis.on and player.brain.ball.vis.dist < 100.0:
+    if player.brain.ball.vis.on and player.brain.ball.vis.distance < 100.0:
         return True
 
-    if (player.brain.ball.vis.on and player.brain.ball.vis.dist < 150.0 and
+    if (player.brain.ball.vis.on and player.brain.ball.vis.distance < 150.0 and
         player.aggressive):
         return True
 
@@ -96,16 +97,18 @@ def facingForward(player):
     if it is in the goal.
     """
     #magic numbers
-    return (player.brain.vision.fieldEdge.centerDist > 800.0 or
-            (fabs(player.brain.vision.cross.bearing) < 10.0 and
-             player.brain.vision.cross.on))
+    return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
+    return (player.brain.interface.visionField.visual_field_edge.distance_m > 800.0)
+# WE NEED VISUAL CROSSES
+#            or (fabs(player.brain.vision.cross.bearing) < 10.0 and
+#             player.brain.vision.cross.on))
 
 def facingBall(player):
     """
     Checks if the ball is right in front of it.
     """
     #magic numbers
-    return (fabs(player.brain.ball.vis.bearing) < 10.0 and
+    return (fabs(player.brain.ball.vis.bearing_deg) < 10.0 and
             player.brain.ball.vis.on)
 
 def onThisSideline(player):
@@ -113,15 +116,16 @@ def onThisSideline(player):
     Looks for a T corner or far goals to determine which sideline it's
     standing on.
     """
-    for corner in player.brain.vision.fieldLines.corners:
-        if ( (IDs.CENTER_TOP_T in corner.possibilities) or
-             (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
-            return True
-    return ((player.brain.vision.ygrp.on and
+    # FIGURE OUT CORNERS
+    # for corner in player.brain.vision.fieldLines.corners:
+    #     if ( (IDs.CENTER_TOP_T in corner.possibilities) or
+    #          (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
+    #         return True
+    return ((player.brain.ygrp.on and
              #magic numbers
-             player.brain.vision.ygrp.dist > 400.0) or
-            (player.brain.vision.yglp.on and
-             player.brain.vision.yglp.dist > 400.0))
+             player.brain.ygrp.distance > 400.0) or
+            (player.brain.yglp.on and
+             player.brain.yglp.distance > 400.0))
 
 def unsure(player):
     return (not onThisSideline(player) and
@@ -139,20 +143,20 @@ def shouldPerformSave(player):
     Checks that the ball is moving toward it and close enough to save.
     """
     return (player.brain.ball.loc.relVelX < -50.0 and
-            player.brain.ball.vis.framesOn > 4)
+            player.brain.ball.vis.frames_on > 4)
 
 def facingSideways(player):
     """
     If the robot is facing a post directly, it's probably turned around.
     """
-    if ((player.brain.vision.yglp.on and
-         fabs(player.brain.vision.yglp.bearing) < 30.0 and
-         player.brain.vision.yglp.bearing != 0.0 and
-         player.brain.vision.yglp.dist < 300.0) or
-        (player.brain.vision.ygrp.on and
-         fabs(player.brain.vision.ygrp.bearing) < 30.0 and
-         player.brain.vision.ygrp.bearing != 0.0 and
-         player.brain.vision.ygrp.dist < 300.0)):
+    if ((player.brain.yglp.on and
+         fabs(player.brain.yglp.bearing_deg) < 30.0 and
+         player.brain.yglp.bearing_deg != 0.0 and
+         player.brain.yglp.distance < 300.0) or
+        (player.brain.ygrp.on and
+         fabs(player.brain.ygrp.bearing_deg) < 30.0 and
+         player.brain.ygrp.bearing_deg != 0.0 and
+         player.brain.ygrp.distance < 300.0)):
         return True
     else:
         return False
@@ -162,9 +166,9 @@ def shouldClearBall(player):
     Checks that the ball is more or less in the goal box.
     """
     # less than 1.5 minutes left or winning/losing badly
-    shouldBeAggressive = (player.brain.comm.gc.timeRemaining() < 90 or
-                          (abs(player.brain.comm.gc.teams(0)[1] -
-                               player.brain.comm.gc.teams(1)[1]) > 1))
+    shouldBeAggressive = (player.brain.game.secs_remaining < 90 or
+                          (abs(player.brain.game.team(0).score -
+                               player.brain.game.team(1).score) > 1))
 
     if shouldBeAggressive and not player.aggressive:
         print "The goalie is now AGGRESSIVE"
@@ -178,21 +182,21 @@ def shouldClearBall(player):
         return False
 
     # if definitely within goal box
-    if (player.brain.ball.vis.dist < 80.0):
+    if (player.brain.ball.vis.distance < 80.0):
         return True
 
     # farther out but being aggressive
-    if (player.brain.ball.vis.dist < 120 and
+    if (player.brain.ball.vis.distance < 120 and
         player.aggressive):
         return True
 
     # if to sides of box
-    if (player.brain.ball.vis.dist < 120.0 and
-        fabs(player.brain.ball.vis.bearing) > 40.0):
+    if (player.brain.ball.vis.distance < 120.0 and
+        fabs(player.brain.ball.vis.bearing_deg) > 40.0):
         return True
 
     # to goalie's sides, being aggressive
-    if (fabs(player.brain.ball.vis.bearing) > 50.0 and
+    if (fabs(player.brain.ball.vis.bearing_deg) > 50.0 and
         player.aggressive):
         return True
 
@@ -211,7 +215,7 @@ def ballMovedStopChasing(player):
     If the robot has been chasing for a while and it is far away, it should
     stop chasing.
     """
-    return (player.brain.ball.vis.dist > 100.0 and
+    return (player.brain.ball.vis.distance > 100.0 and
             player.counter > 200.0)
 
 def walkedTooFar(player):
@@ -222,8 +226,10 @@ def walkedTooFar(player):
     if player.aggressive:
         return False
 
-    return (player.brain.loc.lastOdoX > 90.0 or
-            fabs(player.brain.loc.lastOdoY) > 140.0)
+    return True
+    # WE NEED ODOMETRY
+    # return (player.brain.loc.lastOdoX > 90.0 or
+    #         fabs(player.brain.loc.lastOdoY) > 140.0)
 
 def reachedMyDestination(player):
     """
@@ -245,63 +251,6 @@ def whiffed(player):
     If the ball is just sitting at the goalie's feet after kicking, it
     should try again.
     """
-    return (player.brain.ball.loc.relX < 40.0 and
-            fabs(player.brain.ball.loc.relY) < 25.0 and
+    return (player.brain.ball.filter_rel_x < 40.0 and
+            fabs(player.brain.ball.filter_rel_y) < 25.0 and
             player.brain.ball.vis.on)
-
-# ******************
-# SAVING TRANSITIONS
-# ******************
-
-def shouldSave(player):
-    """
-    Decision on if goalie should prepare to save
-    """
-    ball = player.brain.ball
-
-    if(ball.loc.relVelX < goalCon.VEL_HIGH
-       and ball.vis.heat <= goalCon.HEAT_LOW):
-        player.shouldSaveCounter += 1
-        if player.shouldSaveCounter > 1:
-            player.shouldSaveCounter = 0
-            return True
-
-    else:
-        player.shouldSaveCounter = 0
-        return False
-
-# NOT USED
-# Unsure if it works
-def strafeDirForSave(player):
-    ball = player.brain.ball
-    my = player.brain.my
-    timeUntilSave = getTimeUntilSave(player)
-    anticipatedY = (ball.loc.relY + ball.loc.relVelY * timeUntilSave)
-    if anticipatedY < my.y - goalCon.CENTER_SAVE_THRESH:
-        return -1
-    elif anticipatedY > my.y + goalCon.CENTER_SAVE_THRESH:
-        return 1
-    else:
-        return 0
-
-def shouldSaveRight(player):
-    """
-    Decision for saving diving right
-    """
-    ball= player.brain.ball
-    my = player.brain.my
-
-    return(ball.loc.endY < -goalCon.CENTER_SAVE_THRESH
-           and ball.loc.endY > -goalCon.DONT_SAVE_LIMIT
-           and goalieInBox(player))
-
-def shouldSaveLeft(player):
-    """
-    Decision for saving diving left
-    """
-    ball= player.brain.ball
-    my = player.brain.my
-
-    return (ball.loc.endY > goalCon.CENTER_SAVE_THRESH
-            and ball.loc.endY < goalCon.DONT_SAVE_LIMIT
-            and goalieInBox(player))

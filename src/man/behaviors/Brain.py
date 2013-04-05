@@ -92,6 +92,7 @@ class Brain(object):
         self.interface = interface.interface
 
         self.motion = None
+        self.game = None
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -155,6 +156,7 @@ class Brain(object):
         sys.stdout.flush()
 
     def getCommUpdate(self):
+        self.game = self.interface.gameState
         for i in range(len(self.teamMembers)):
             self.teamMembers[i].update(self.interface.worldModelList()[i])
 

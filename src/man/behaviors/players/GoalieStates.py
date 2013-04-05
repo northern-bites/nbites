@@ -108,19 +108,24 @@ def kickBall(player):
     """
     if player.firstFrame():
         # save odometry if this was your first kick
-        if player.lastDiffState == 'clearIt':
-            VisualStates.returnToGoal.kickPose = \
-                RelRobotLocation(player.brain.loc.lastOdoX,
-                                 player.brain.loc.lastOdoY,
-                                 player.brain.loc.lastOdoTheta)
+        # WE NEED ODO
+        # if player.lastDiffState == 'clearIt':
+        #     VisualStates.returnToGoal.kickPose = \
+        #         RelRobotLocation(player.brain.loc.lastOdoX,
+        #                          player.brain.loc.lastOdoY,
+        #                          player.brain.loc.lastOdoTheta)
         #otherwise add to previously saved odo
-        else:
-            VisualStates.returnToGoal.kickPose.relX += \
-                player.brain.loc.lastOdoX
-            VisualStates.returnToGoal.kickPose.relX += \
-                player.brain.loc.lastOdoY
-            VisualStates.returnToGoal.kickPose.relX += \
-                player.brain.loc.lastOdoTheta
+        # else:
+        #     VisualStates.returnToGoal.kickPose.relX += \
+        #         player.brain.loc.lastOdoX
+        #     VisualStates.returnToGoal.kickPose.relX += \
+        #         player.brain.loc.lastOdoY
+        #    VisualStates.returnToGoal.kickPose.relX += \
+        #        player.brain.loc.lastOdoTheta
+
+        VisualStates.returnToGoal.kickPose.relX = 0
+        VisualStates.returnToGoal.kickPose.relX = 0
+        VisualStates.returnToGoal.kickPose.relX = 0
 
         player.brain.tracker.trackBallFixedPitch()
 
@@ -169,7 +174,8 @@ def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stopWalking()
         player.stand()
-        player.brain.loc.resetBall()
+        # WE NEED RESET METHODS
+        #player.brain.loc.resetBall()
 
         player.brain.tracker.trackBallFixedPitch()
         player.initialDelayCounter = 0

@@ -53,6 +53,7 @@ void MotionModule::run_()
     fsrInput_.latch();
     stiffnessInput_.latch();
     bodyCommandInput_.latch();
+    headCommandInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
