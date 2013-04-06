@@ -14,6 +14,7 @@ Tool::Tool(const char* title) :
     QMainWindow(),
     diagram(),
     selector(),
+    logView(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -22,21 +23,26 @@ Tool::Tool(const char* title) :
     scrollArea(new QScrollArea),
     scrollBarSize(new QSize(5, 35)),
     tabStartSize(new QSize(toolTabs->size()))
-
 {
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
 
-    connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(run()));
+    //connect both fwd and prv button to the run slot
+	connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(runForward()));
+	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(runBackward()));
+
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
+
+    connect(&diagram, SIGNAL(signalNewDisplayWidget(QWidget*, std::string)),
+            &logView, SLOT(newDisplayWidget(QWidget*, std::string)));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);
 
     toolTabs->addTab(&selector, tr("Data"));
-    toolTabs->addTab(diagram.getGUI(), tr("Log Viewer"));
+    toolTabs->addTab(&logView, tr("Log View"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
@@ -66,18 +72,19 @@ Tool::~Tool() {
     }
 }
 
+void Tool::setUpModules()
+{
+}
+
 // Keyboard control
 void Tool::keyPressEvent(QKeyEvent * event)
 {
     switch (event->key()) {
-    case Qt::Key_J:
-    case Qt::Key_D:
     case Qt::Key_N:
-        diagram.run();
+        diagram.runForward();
         break;
-    case Qt::Key_K:
-    case Qt::Key_S:
     case Qt::Key_P:
+		diagram.runBackward();
         break;
     default:
         QWidget::keyPressEvent(event);
