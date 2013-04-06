@@ -1,5 +1,6 @@
 #include "Man.h"
 #include "Common.h"
+#include "Camera.h"
 #include <iostream>
 #include "RobotConfig.h"
 
@@ -14,10 +15,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       audio(broker),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-	  cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
-	  imageTranscriber(),
-	  vision(),
-	  ballTrack(),
+      cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
+      topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
+      bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
+      topConverter(Camera::TOP),
+      bottomConverter(Camera::BOTTOM),
+      vision(),
+      ballTrack(),
       leds(broker),
       behaviors()
 {
@@ -75,19 +79,49 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     commThread.log<messages::GameState>(&comm._gameStateOutput, "gamestate");
 #endif
 
-	/** Cognition **/
-	cognitionThread.addModule(imageTranscriber);
-	cognitionThread.addModule(vision);
-	//cognitionThread.addModule(ballTrack);
-	cognitionThread.addModule(leds);
-    cognitionThread.addModule(behaviors);
-	vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
-	vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
+    /** Cognition **/
+
+    // Turn ON the finalize method for images, which we've specialized
+    portals::Message<messages::YUVImage>::setFinalize(true);
+    portals::Message<messages::ThresholdImage>::setFinalize(true);
+    portals::Message<messages::PackedImage16>::setFinalize(true);
+    portals::Message<messages::PackedImage8>::setFinalize(true);
+
+    cognitionThread.addModule(topTranscriber   );
+    cognitionThread.addModule(bottomTranscriber);
+    cognitionThread.addModule(topConverter     );
+    cognitionThread.addModule(bottomConverter  );
+    topConverter   .imageIn.wireTo(&   topTranscriber.imageOut);
+    bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
+
+
+#ifdef LOG_IMAGES
+    cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
+                                            "top");
+    cognitionThread.log<messages::YUVImage>(&bottomTranscriber.imageOut,
+                                            "bottom");
+#endif
+
+    cognitionThread.addModule(vision);
+    vision.topThrImage.wireTo(&topConverter.thrImage);
+	vision.topYImage.wireTo(&topConverter.yImage);
+	vision.topUImage.wireTo(&topConverter.uImage);
+	vision.topVImage.wireTo(&topConverter.vImage);
+
+	vision.botThrImage.wireTo(&bottomConverter.thrImage);
+	vision.botYImage.wireTo(&bottomConverter.yImage);
+	vision.botUImage.wireTo(&bottomConverter.uImage);
+	vision.botVImage.wireTo(&bottomConverter.vImage);
+
 	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-	vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
-	leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
-	behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
-	//behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
+    vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+
+    //cognitionThread.addModule(ballTrack);
+    cognitionThread.addModule(leds);
+    cognitionThread.addModule(behaviors);
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut, false);
+    behaviors.gameStateIn.wireTo(&comm._gameStateOutput, true);
+    //behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput, true);
 
 #ifdef LOG_VISION
     cognitionThread.log<messages::VisionField>(&vision.vision_field,

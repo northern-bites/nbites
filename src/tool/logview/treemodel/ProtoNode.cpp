@@ -17,8 +17,7 @@
 #include "ProtoNode.h"
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 using namespace google::protobuf;
 
@@ -319,6 +318,5 @@ const Message* ProtoNode::getMessage() const {
     return message;
 }
 
-}
 }
 }

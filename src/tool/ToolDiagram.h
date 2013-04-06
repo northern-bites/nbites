@@ -2,7 +2,6 @@
 
 #include <QWidget>
 #include "unlog/UnlogModule.h"
-#include "unlog/view/LogViewer.h"
 #include "Header.pb.h"
 #include <iostream>
 
@@ -31,13 +30,12 @@ class ToolDiagram : public QObject
 public:
     ToolDiagram(QWidget *parent = 0);
 
-    void addModule(portals::Module& mod);
+    void addModule(portals::Module& mod) { diagram.addModule(mod); }
     bool unlogFrom(std::string path);
 
-    unlog::view::LogViewer* getGUI() { return &viewTab; }
-
     template<class T>
-    void connectToUnlogger(portals::InPortal<T>& input)
+    void connectToUnlogger(portals::InPortal<T>& input,
+                           std::string path = "none")
     {
         T test;
         for (std::vector<unlog::UnlogBase*>::iterator i = unloggers.begin();
@@ -45,21 +43,38 @@ public:
         {
             if(test.GetTypeName() == (*i)->getType())
             {
-                input.wireTo(dynamic_cast<unlog::UnlogModule<T> >(*i).output);
+                unlog::UnlogModule<T>* u =
+                    dynamic_cast<unlog::UnlogModule<T>*>(*i);
+                input.wireTo(&u->output);
+                std::cout << "Connected successfully to "
+                          << test.GetTypeName() << " unlogger!"
+                          << std::endl;
+                return;
             }
         }
+
+        std::cout << "Tried to connect a module to a nonexistent unlogger!"
+                  << std::endl;
     }
 
+signals:
+    void signalNewDisplayWidget(QWidget*, std::string);
+
 public slots:
-    void run() { diagram.run(); }
+    void runForward();
+    void runBackward();
     void addUnloggers(std::vector<std::string> paths);
 
 protected:
     portals::RoboGram diagram;
     std::vector<unlog::UnlogBase*> unloggers;
-    unlog::view::LogViewer viewTab;
+    std::vector<portals::Module*> displays;
 
     TypeMap typeMap;
 };
+
+template<>
+void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input,
+                                    std::string path);
 
 }

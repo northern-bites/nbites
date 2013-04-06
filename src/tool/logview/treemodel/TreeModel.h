@@ -23,8 +23,7 @@
 #include <QVariant>
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 class TreeModel : public QAbstractItemModel
 {
@@ -61,7 +60,6 @@ private:
     Node* root;
 
 };
-}
 }
 }
 

@@ -1,16 +1,4 @@
-/*
- * V4L2ImageTranscriber.cpp
- *
- *  Created on: Jun 27, 2011
- *      Author: Octavian Neamtu
- *     Updated: April 18, 2012
- *      Author: Lizzie Mamantov
- *
- * Based on B-Human 2011 code release.
- * See header file for license and further information.
- */
-
-#include "V4L2ImageTranscriber.h"
+#include "TranscriberModule.h"
 
 #include <cstring>
 #include <fcntl.h>
@@ -18,39 +6,41 @@
 #include <sys/mman.h>
 #include <cerrno>
 #include <iostream>
-
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
-
-#include "ImageAcquisition.h"
-//#include "Profiler.h"
-
-// For checking the ioctls; prints error if one occurs
-#define VERIFY(x, str) {                               \
-        if( (x) != 0) {                                \
-            std::cerr << "CAMERA ERROR::" << str <<    \
-                "\nSystem Error Message: " <<          \
-                strerror(errno) << std::endl;;         \
-        }                                              \
-    }
-
-using namespace portals;
-using namespace messages;
 
 namespace man {
 namespace image {
 
-using boost::shared_ptr;
+static void verify(int x, const char* msg)
+{
+    if(x != 0)
+    {
+        std::cerr << "CAMERA ERROR::" << msg <<
+            "\nSystem Error Message: " <<
+            strerror(errno) << std::endl;
+    }
+}
 
-V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which,
-                                           OutPortal<ThresholdedImage>* out) :
-    outPortal(out),
+TranscriberBuffer::TranscriberBuffer(void* pixels,
+                                    int fd,
+                                    const struct v4l2_buffer& buf)
+    : VideoPixelBuffer(pixels),
+      fd(fd)
+{
+    releaseBuff = buf;
+}
+
+TranscriberBuffer::~TranscriberBuffer()
+{
+    verify(ioctl(fd, VIDIOC_QBUF, &releaseBuff),
+           "Releasing buffer failed.");
+}
+
+ImageTranscriber::ImageTranscriber(Camera::Type which) :
     settings(Camera::getSettings(which)),
     cameraType(which),
-    currentBuf(0),
-    timeStamp(0),
-    table(new unsigned char[yLimit * uLimit * vLimit]),
-    params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit)
+    timeStamp(0)
 {
     initOpenI2CAdapter();
     initSelectCamera();
@@ -61,56 +51,28 @@ V4L2ImageTranscriber::V4L2ImageTranscriber(Camera::Type which,
     initRequestAndMapBuffers();
     initQueueAllBuffers();
 
-    // Uncomment if you want info about control settings printed!
-    //enumerate_controls();
-
     initSettings();
     assertCameraSettings();
     startCapturing();
 }
 
-V4L2ImageTranscriber::~V4L2ImageTranscriber() {
+ImageTranscriber::~ImageTranscriber()
+{
     // disable streaming
     int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    VERIFY((ioctl(fd, VIDIOC_STREAMOFF, &type)),
+    verify(ioctl(fd, VIDIOC_STREAMOFF, &type),
            "Capture stop failed.");
 
     // unmap buffers
-    for (int i = 0; i < frameBufferCount; ++i)
+    for (int i = 0; i < NUM_BUFFERS; ++i)
         munmap(mem[i], memLength[i]);
 
     // close the device
     close(cameraAdapterFd);
     close(fd);
-    free(buf);
 }
 
-void V4L2ImageTranscriber::initTable(const std::string& filename)
-{
-    FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
-
-    if (fp == NULL) {
-        std::cerr << "CAMERA::ERROR::initTable() FAILED to open filename:"
-                  << filename.c_str() << std::endl;
-        return;
-    }
-
-    // actually read the table into memory
-    // Color table is in VUY ordering
-    int rval;
-    for(int v=0; v < vLimit; ++v){
-        for(int u=0; u< uLimit; ++u){
-            rval = fread(&table[v * uLimit * yLimit + u * yLimit],
-                         sizeof(unsigned char), yLimit, fp);
-        }
-    }
-
-    std::cerr << "CAMERA::Loaded colortable " << filename.c_str() <<
-        std::endl;
-    fclose(fp);
-}
-
-void V4L2ImageTranscriber::initOpenI2CAdapter() {
+void ImageTranscriber::initOpenI2CAdapter() {
     if(cameraType == Camera::TOP)
     {
         cameraAdapterFd = open("/dev/i2c-camera0", O_RDWR);
@@ -126,16 +88,16 @@ void V4L2ImageTranscriber::initOpenI2CAdapter() {
             std::endl;
     }
 
-    VERIFY((ioctl(cameraAdapterFd, 0x703, 8)),
+    verify(ioctl(cameraAdapterFd, 0x703, 8),
            "Opening I2C adapter failed.");
 }
 
-void V4L2ImageTranscriber::initSelectCamera() {
+void ImageTranscriber::initSelectCamera() {
     unsigned char cmd[2] = { (unsigned char) cameraType, 0 };
     i2c_smbus_write_block_data(cameraAdapterFd, 220, 1, cmd);
 }
 
-void V4L2ImageTranscriber::initOpenVideoDevice() {
+void ImageTranscriber::initOpenVideoDevice() {
     // open device
     if(cameraType == Camera::TOP)
     {
@@ -152,13 +114,13 @@ void V4L2ImageTranscriber::initOpenVideoDevice() {
     }
 }
 
-void V4L2ImageTranscriber::initSetCameraDefaults() {
+void ImageTranscriber::initSetCameraDefaults() {
     v4l2_std_id esid0 = WIDTH == 320 ? 0x04000000UL : 0x08000000UL;
-    VERIFY((ioctl(fd, VIDIOC_S_STD, &esid0)),
+    verify(ioctl(fd, VIDIOC_S_STD, &esid0),
            "Setting default parameters failed.");
-}
+    }
 
-void V4L2ImageTranscriber::initSetImageFormat() {
+void ImageTranscriber::initSetImageFormat() {
     // set format
     struct v4l2_format fmt;
     memset(&fmt, 0, sizeof(struct v4l2_format));
@@ -172,70 +134,68 @@ void V4L2ImageTranscriber::initSetImageFormat() {
     //half the horizontal resolution of the Y component."
     fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
-    VERIFY((ioctl(fd, VIDIOC_S_FMT, &fmt)),
+    verify(ioctl(fd, VIDIOC_S_FMT, &fmt),
            "Setting image format failed.");
 
     if(fmt.fmt.pix.sizeimage != (unsigned int)SIZE)
         std::cerr << "CAMERA ERROR::Size setting is WRONG." << std::endl;
 }
 
-void V4L2ImageTranscriber::initSetFrameRate() {
+void ImageTranscriber::initSetFrameRate() {
     // We want frame rate to be 30 fps
     struct v4l2_streamparm fps;
     memset(&fps, 0, sizeof(struct v4l2_streamparm));
     fps.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    VERIFY((ioctl(fd, VIDIOC_G_PARM, &fps)),
+    verify(ioctl(fd, VIDIOC_G_PARM, &fps),
            "Getting FPS failed.");
     fps.parm.capture.timeperframe.numerator = 1;
     fps.parm.capture.timeperframe.denominator = 30;
-    VERIFY((ioctl(fd, VIDIOC_S_PARM, &fps)),
+    verify(ioctl(fd, VIDIOC_S_PARM, &fps),
            "Setting FPS failed.");
 }
 
-void V4L2ImageTranscriber::initRequestAndMapBuffers() {
+void ImageTranscriber::initRequestAndMapBuffers() {
     // request buffers
     struct v4l2_requestbuffers rb;
     memset(&rb, 0, sizeof(struct v4l2_requestbuffers));
-    rb.count = frameBufferCount;
+    rb.count = NUM_BUFFERS;
     rb.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     rb.memory = V4L2_MEMORY_MMAP;
-    VERIFY((ioctl(fd, VIDIOC_REQBUFS, &rb)),
+    verify(ioctl(fd, VIDIOC_REQBUFS, &rb),
            "Requesting buffers failed.");
 
-    if(rb.count != (unsigned int)frameBufferCount)
+    if(rb.count != (unsigned int)NUM_BUFFERS)
     {
         std::cerr << "CAMERA ERROR::Buffer count is WRONG." << std::endl;
     }
 
     // map or prepare the buffers
-    buf = static_cast<struct v4l2_buffer*>(calloc(1,
-            sizeof(struct v4l2_buffer)));
-    for(int i = 0; i < frameBufferCount; ++i)
+    for(int i = 0; i < NUM_BUFFERS; ++i)
     {
-        buf->index = i;
-        buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        buf->memory = V4L2_MEMORY_MMAP;
-        VERIFY((ioctl(fd, VIDIOC_QUERYBUF, buf)),
+        requestBuff.index = i;
+        requestBuff.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        requestBuff.memory = V4L2_MEMORY_MMAP;
+        verify(ioctl(fd, VIDIOC_QUERYBUF, &requestBuff),
                "Querying buffer failed.");
-        memLength[i] = buf->length;
-        mem[i] = mmap(0, buf->length, PROT_READ | PROT_WRITE,
-                      MAP_SHARED, fd, buf->m.offset);
+        memLength[i] = requestBuff.length;
+        mem[i] = mmap(0, requestBuff.length, PROT_READ | PROT_WRITE,
+                      MAP_SHARED, fd, requestBuff.m.offset);
         if(mem[i] == MAP_FAILED)
             std::cerr << "CAMERA ERROR::Map failed." << std::endl;
     }
 }
 
-void V4L2ImageTranscriber::initQueueAllBuffers() {
+void ImageTranscriber::initQueueAllBuffers() {
     // queue the buffers
-    for (int i = 0; i < frameBufferCount; ++i) {
-        buf->index = i;
-        buf->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        buf->memory = V4L2_MEMORY_MMAP;
-        if(ioctl(fd, VIDIOC_QBUF, buf) == -1)
+    for (int i = 0; i < NUM_BUFFERS; ++i) {
+        requestBuff.index = i;
+        requestBuff.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        requestBuff.memory = V4L2_MEMORY_MMAP;
+        if(ioctl(fd, VIDIOC_QBUF, &requestBuff) == -1)
             std::cerr << "Queueing a buffer failed." << std::endl;
     }
 }
-void V4L2ImageTranscriber::initSettings()
+void ImageTranscriber::initSettings()
 {
     // DO NOT SCREW UP THE ORDER BELOW
 
@@ -268,68 +228,7 @@ void V4L2ImageTranscriber::initSettings()
     setControlSetting(V4L2_CID_DO_WHITE_BALANCE, settings.white_balance);
 }
 
-void V4L2ImageTranscriber::startCapturing() {
-    int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    VERIFY((ioctl(fd, VIDIOC_STREAMON, &type)),
-           "Start capture failed.");
-}
-
-bool V4L2ImageTranscriber::acquireImage() {
-    //PROF_ENTER(P_DQBUF);
-    this->captureNew();
-    //PROF_EXIT(P_DQBUF);
-    uint8_t* current_image = static_cast<uint8_t*>(mem[currentBuf->index]);
-    if (current_image) {
-        Message<ThresholdedImage> image(0);
-
-        //PROF_ENTER(P_ACQUIRE_IMAGE);
-        ImageAcquisition::acquire_image_fast(table, params, current_image,
-                                             image.get()->get_mutable_image());
-        image.get()->set_timestamp(42);
-        //PROF_EXIT(P_ACQUIRE_IMAGE);
-
-        outPortal->setMessage(image);
-
-        //PROF_ENTER(P_QBUF);
-        this->releaseBuffer();
-        //PROF_EXIT(P_QBUF);
-        return true;
-    }
-    else {
-        std::cerr << "Warning - the buffer we dequeued was NULL" << std::endl;
-    }
-    return false;
-}
-
-bool V4L2ImageTranscriber::captureNew() {
-    // dequeue a frame buffer (this call blocks when there is
-    // no new image available)
-
-    VERIFY((ioctl(fd, VIDIOC_DQBUF, buf)),
-           "Dequeueing the frame buffer failed.");
-    if(buf->bytesused != (unsigned int)SIZE)
-        std::cerr << "CAMERA::ERROR::Wrong buffer size!" << std::endl;
-    currentBuf = buf;
-
-    static bool shout = true;
-    if (shout) {
-        shout = false;
-        std::cerr << "CAMERA::Camera is working." << std::endl;
-    }
-
-    return true;
-}
-
-bool V4L2ImageTranscriber::releaseBuffer() {
-    if (currentBuf) {
-        VERIFY((ioctl(fd, VIDIOC_QBUF, currentBuf)),
-               "Releasing buffer failed.");
-    }
-    return true;
-}
-
-// These two methods now assume the control is valid!
-int V4L2ImageTranscriber::getControlSetting(unsigned int id) {
+int ImageTranscriber::getControlSetting(unsigned int id) {
     struct v4l2_control control_s;
     control_s.id = id;
     if (ioctl(fd, VIDIOC_G_CTRL, &control_s) < 0)
@@ -340,7 +239,7 @@ int V4L2ImageTranscriber::getControlSetting(unsigned int id) {
     return control_s.value;
 }
 
-bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
+bool ImageTranscriber::setControlSetting(unsigned int id, int value) {
     struct v4l2_control control_s;
     control_s.id = id;
     control_s.value = value;
@@ -367,13 +266,13 @@ bool V4L2ImageTranscriber::setControlSetting(unsigned int id, int value) {
     return true;
 }
 
-void V4L2ImageTranscriber::assertCameraSettings() {
+void ImageTranscriber::assertCameraSettings() {
     bool allFine = true;
     // check frame rate
     struct v4l2_streamparm fps;
     memset(&fps, 0, sizeof(fps));
     fps.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    VERIFY((ioctl(fd, VIDIOC_G_PARM, &fps)),
+    verify(ioctl(fd, VIDIOC_G_PARM, &fps),
            "Getting settings failed");
 
     if (fps.parm.capture.timeperframe.numerator != 1) {
@@ -491,92 +390,44 @@ void V4L2ImageTranscriber::assertCameraSettings() {
     }
 }
 
-
-// Taken from V4L2 specs example
-// If you need to determine info about driver, use this method
-void V4L2ImageTranscriber::enumerate_controls()
-{
-    memset (&queryctrl, 0, sizeof (queryctrl));
-
-    std::cout << "Public controls:" << std::endl;
-    for (queryctrl.id = V4L2_CID_BASE;
-         queryctrl.id < V4L2_CID_LASTP1;
-         queryctrl.id++) {
-        if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl)) {
-            if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
-                continue;
-
-            std::cout << "Control " << queryctrl.name;
-            std::cout << " has id " << queryctrl.id;
-            std::cout << " steps " << queryctrl.step;
-            std::cout << " and min " << queryctrl.minimum << " max " <<
-                queryctrl.maximum << std::endl;
-
-            if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
-                enumerate_menu ();
-        } else {
-            if (errno == EINVAL)
-                continue;
-
-            perror ("VIDIOC_QUERYCTRL");
-            exit (EXIT_FAILURE);
-        }
-    }
-
-    std::cout << "Private controls:" << std::endl;;
-    for (queryctrl.id = V4L2_CID_PRIVATE_BASE;;
-         queryctrl.id++) {
-        if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl)) {
-            if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
-                continue;
-
-            std::cout << "Control " <<  queryctrl.name << std::endl;
-
-            if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
-                enumerate_menu ();
-        } else {
-            if (errno == EINVAL)
-                break;
-
-            perror ("VIDIOC_QUERYCTRL");
-            exit (EXIT_FAILURE);
-        }
-    }
-
-    /* have to look for auto exposure separately
-       some controls may be much further than the loop looks!
-       this is just the most important right now */
-    queryctrl.id = V4L2_CID_EXPOSURE_AUTO;
-
-    if (0 == ioctl (fd, VIDIOC_QUERYCTRL, &queryctrl))
-    {
-            if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED)
-                std::cout << "Disabled." << std::endl;
-    }
-
-    std::cout << "Control " << queryctrl.name;
-    std::cout << " has id " << queryctrl.id;
-    std::cout << " and min " << queryctrl.minimum << " max " <<
-        queryctrl.maximum << std::endl;
-
-    if (queryctrl.type == V4L2_CTRL_TYPE_MENU)
-                enumerate_menu ();
+void ImageTranscriber::startCapturing() {
+    int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+    verify(ioctl(fd, VIDIOC_STREAMON, &type),
+           "Start capture failed.");
 }
 
-void V4L2ImageTranscriber::enumerate_menu ()
+messages::YUVImage ImageTranscriber::getNextImage()
 {
-    std::cout << "  Menu items:" << std::endl;;
+    // dequeue a frame buffer (this call blocks when there is
+    // no new image available)
+    verify(ioctl(fd, VIDIOC_DQBUF, &requestBuff),
+           "Dequeueing the frame buffer failed.");
+    if(requestBuff.bytesused != (unsigned int)SIZE)
+        std::cerr << "CAMERA::ERROR::Wrong buffer size!" << std::endl;
 
-    memset (&querymenu, 0, sizeof (querymenu));
-    querymenu.id = queryctrl.id;
-
-    for (querymenu.index = queryctrl.minimum;
-         querymenu.index <= (unsigned)queryctrl.maximum;
-         querymenu.index++) {
-        if (0 == ioctl (fd, VIDIOC_QUERYMENU, &querymenu)) {
-            std::cout << "  " << querymenu.name << std::endl;
-        }
+    static bool shout = true;
+    if (shout) {
+        shout = false;
+        std::cerr << "CAMERA::Camera is working." << std::endl;
     }
+
+    return messages::YUVImage(new TranscriberBuffer(mem[requestBuff.index],
+                                                    fd,
+                                                    requestBuff),
+                              2*WIDTH, HEIGHT, 2*WIDTH);
+}
+
+TranscriberModule::TranscriberModule(ImageTranscriber& trans)
+    : imageOut(base()), it(trans)
+{
+}
+
+void TranscriberModule::run_()
+{
+    //imageOut.setMessage(portals::Message<messages::YUVImage>(0));
+    messages::YUVImage image = it.getNextImage();
+    portals::Message<messages::YUVImage> imageOutMessage(&image);
+    imageOut.setMessage(imageOutMessage);
 }
 
 }

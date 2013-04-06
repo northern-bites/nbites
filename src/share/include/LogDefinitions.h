@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <iostream>
 #include <exception>
 #include "Header.pb.h"
 
@@ -10,6 +11,13 @@ static const std::string LOG_EXTENSION = ".log";
 
 // 1 GB. We don't want to write files of absurd sizes.
 static const unsigned int FILE_MAX_SIZE = 1073741824;
+
+inline std::string getIdFromPath(std::string path)
+{
+    int begin = path.find_last_of("/") + 1;
+    int end = path.find_last_of(".");
+    return path.substr(begin, end-begin);
+}
 
 // IO Exceptions
 class read_exception: public std::exception {
