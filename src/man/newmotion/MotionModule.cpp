@@ -54,6 +54,7 @@ void MotionModule::run_()
     stiffnessInput_.latch();
     bodyCommandInput_.latch();
     headCommandInput_.latch();
+    requestInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -68,7 +69,6 @@ void MotionModule::run_()
         //     stiffnesses.
         realityCheckJoints();
 
-        // Josh and Wils are gonna try this. Does it work? Does it blend??
         processMotionInput();
 
         preProcess();
@@ -271,7 +271,28 @@ void MotionModule::processMotionInput()
     //     return;
     // }
 
-    // (1) First process body commands.
+    // (1) Process requests.
+    if(!requestInput_.message().processed_by_motion())
+    {
+        if (requestInput_.message().type() ==
+            messages::MotionRequest::STOP_BODY)
+        {
+            stopBodyMoves();
+        }
+        else if (requestInput_.message().type() ==
+                 messages::MotionRequest::STOP_HEAD)
+        {
+            stopHeadMoves();
+        }
+        else if (requestInput_.message().type() ==
+                 messages::MotionRequest::RESET_ODO)
+        {
+            resetOdometry();
+        }
+        const_cast<messages::MotionRequest&>(requestInput_.message()).set_processed_by_motion(true);
+    }
+
+    // (2) Process body commands.
     if(!bodyCommandInput_.message().processed_by_motion())
     {
         // std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
@@ -279,20 +300,24 @@ void MotionModule::processMotionInput()
         //           << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
 
         // Is this a destination walk request?
-        if (bodyCommandInput_.message().type() == messages::MotionCommand::DESTINATION_WALK){
+        if (bodyCommandInput_.message().type() ==
+            messages::MotionCommand::DESTINATION_WALK)
+        {
             sendMotionCommand(bodyCommandInput_.message().dest());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
         // Walk request?
-        else if (bodyCommandInput_.message().type() == messages::MotionCommand::WALK_COMMAND){
+        else if (bodyCommandInput_.message().type() ==
+                 messages::MotionCommand::WALK_COMMAND)
+        {
             sendMotionCommand(bodyCommandInput_.message().speed());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
         // Sweet Move request?
-        else if (bodyCommandInput_.message().type() == messages::MotionCommand::SCRIPTED_MOVE){
+        else if (bodyCommandInput_.message().type() ==
+                 messages::MotionCommand::SCRIPTED_MOVE)
+        {
             sendMotionCommand(bodyCommandInput_.message().script());
-            const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
         }
+        const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
     }
 }
 

@@ -1,5 +1,17 @@
 package messages;
 
+message MotionRequest
+{
+    enum RequestType {
+        STOP_BODY = 0;
+        STOP_HEAD = 1;
+        RESET_ODO = 2;
+    }
+    optional RequestType type = 1;
+
+    optional bool processed_by_motion = 2 [default = true];
+}
+
 message MotionCommand
 {
     enum CommandType {

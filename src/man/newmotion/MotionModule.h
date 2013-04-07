@@ -159,6 +159,7 @@ public:
     portals::InPortal<messages::MotionCommand>     bodyCommandInput_;
     portals::InPortal<messages::HeadMotionCommand> headCommandInput_;
     portals::InPortal<messages::StiffnessControl>  stiffnessInput_;
+    portals::InPortal<messages::MotionRequest>     requestInput_;
 
     portals::OutPortal<messages::JointAngles>  jointsOutput_;
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;

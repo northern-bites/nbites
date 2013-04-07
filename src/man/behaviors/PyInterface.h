@@ -33,6 +33,7 @@ public:
     messages::MotionCommand   const * bodyMotionCommand_ptr;
     messages::HeadMotionCommand const * headMotionCommand_ptr;
     messages::MotionStatus      const * motionStatus_ptr;
+    messages::MotionRequest   const * motionRequest_ptr;
     messages::RobotLocation     const * odometry_ptr;
     messages::SonarState        const * sonarState_ptr;
     messages::FootBumperState   const * footBumperState_ptr;
@@ -80,6 +81,10 @@ public:
     void setMotionStatus_ptr(const messages::MotionStatus* msg)
     {
         motionStatus_ptr = msg;
+    }
+    void setMotionRequest_ptr(const messages::MotionRequest* msg)
+    {
+        motionRequest_ptr = msg;
     }
     void setOdometry_ptr(const messages::RobotLocation* msg)
     {
