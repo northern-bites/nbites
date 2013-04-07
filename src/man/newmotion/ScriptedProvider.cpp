@@ -47,7 +47,9 @@ void ScriptedProvider::hardReset(){
 //classes can check the status of this one
 void ScriptedProvider::setActive(){
     if(isDone())
+    {
         inactive();
+    }
     else
         active();
 }

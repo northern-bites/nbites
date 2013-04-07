@@ -20,7 +20,6 @@ from . import GameController
 from .headTracking import HeadTracking
 from .typeDefs import (Play, TeamMember)
 from .navigator import Navigator
-from .util import NaoOutput
 from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider

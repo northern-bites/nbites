@@ -167,43 +167,43 @@ void BehaviorsModule::getBrainInstance ()
 
 void BehaviorsModule::run_ ()
 {
-    // static unsigned int num_crashed = 0;
-    // if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
-    //     this->reload_hard();
-    //     error_state = false;
-    //     num_crashed++;
-    // }
+    static unsigned int num_crashed = 0;
+    if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
+        this->reload_hard();
+        error_state = false;
+        num_crashed++;
+    }
 
-    // // Latch incoming messages and prepare outgoing messages
-    // prepareMessages();
+    // Latch incoming messages and prepare outgoing messages
+    prepareMessages();
 
-    // /*PROF_ENTER(P_PYTHON);*/
+    /*PROF_ENTER(P_PYTHON);*/
 
-    // // Call main run() method of Brain
-    // //PROF_ENTER(P_PYRUN);
-    // if (brain_instance != NULL) {
-    //     PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
-    //     if (result == NULL) {
-    //         // set BehaviorsModule in error state
-    //         error_state = true;
-    //         // report error
-    //         std::cout << "Error occurred in Brain.run() method" << std::endl;
-    //         if (PyErr_Occurred()) {
-    //             PyErr_Print();
-    //         } else {
-    //             std::cout << "  No Python exception information available"
-    //                       << std::endl;
-    //         }
-    //     } else {
-    //         Py_DECREF(result);
-    //     }
-    // }
-    // //PROF_EXIT(P_PYRUN);
+    // Call main run() method of Brain
+    //PROF_ENTER(P_PYRUN);
+    if (brain_instance != NULL) {
+        PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
+        if (result == NULL) {
+            // set BehaviorsModule in error state
+            error_state = true;
+            // report error
+            std::cout << "Error occurred in Brain.run() method" << std::endl;
+            if (PyErr_Occurred()) {
+                PyErr_Print();
+            } else {
+                std::cout << "  No Python exception information available"
+                          << std::endl;
+            }
+        } else {
+            Py_DECREF(result);
+        }
+    }
+    //PROF_EXIT(P_PYRUN);
 
-    // // PROF_EXIT(P_PYTHON);
+    // PROF_EXIT(P_PYTHON);
 
-    // // Send outgoing messages
-    // sendMessages();
+    // Send outgoing messages
+    sendMessages();
 }
 
 void BehaviorsModule::prepareMessages()
