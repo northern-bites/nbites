@@ -118,7 +118,7 @@ def executeMove(nav, sweetMove):
 
     for position in sweetMove:
         if len(position) == 7:
-            move = command.script.add_commands() # Current body joint command
+            move = command.script.add_command() # Current body joint command
 
             move.time = position[4]
             if position[5] == 1:

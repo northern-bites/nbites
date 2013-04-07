@@ -16,47 +16,46 @@ class HeadTrackingHelper(object):
 
         for position in headMove:
             if len(position) == 4:
-                command.scripted_command.add_commands
+                move = command.scripted_command.add_command()
 
                 # Set most recent command
-                headJoints = command.scripted_command.command(commands_size-1)
-                headJoints.time = position[1]
-                if position[2] == 1: # Smooth interpolation
-                    headJoints.interpolation = headJoints.InterpolationType.SMOOTH
+                move.time = position[1]
+                if position[2] == 1:
+                    move.interpolation = move.InterpolationType.LINEAR
                 else:
-                    headJoints.interpolation = headJoints.InterpolationType.LINEAR
+                    move.interpolation = move.InterpolationType.SMOOTH
 
-                # Only set the head angles, since this command never sets any other angles
-                headJoints.angles.head_yaw = position[0][0]
-                headJoints.angles.head_pitch = position[0][1]
+                # Only set the head angles
+                move.angles.head_yaw   = position[0][0]
+                move.angles.head_pitch = position[0][1]
 
                 # Set all stiffnesses, since this command specifies them all
-                headJoints.stiffness.head_yaw =         position[3][0]
-                headJoints.stiffness.head_pitch =       position[3][1]
+                move.stiffness.head_yaw =         position[3][0]
+                move.stiffness.head_pitch =       position[3][1]
 
-                headJoints.stiffness.l_shoulder_pitch = position[3][2]
-                headJoints.stiffness.l_shoulder_roll =  position[3][3]
-                headJoints.stiffness.l_elbow_yaw =      position[3][4]
-                headJoints.stiffness.l_elbow_roll =     position[3][5]
+                move.stiffness.l_shoulder_pitch = position[3][2]
+                move.stiffness.l_shoulder_roll =  position[3][3]
+                move.stiffness.l_elbow_yaw =      position[3][4]
+                move.stiffness.l_elbow_roll =     position[3][5]
 
-                headJoints.stiffness.r_shoulder_pitch = position[3][18]
-                headJoints.stiffness.r_shoulder_roll =  position[3][19]
-                headJoints.stiffness.r_elbow_yaw =      position[3][20]
-                headJoints.stiffness.r_elbow_roll =     position[3][21]
+                move.stiffness.r_shoulder_pitch = position[3][18]
+                move.stiffness.r_shoulder_roll =  position[3][19]
+                move.stiffness.r_elbow_yaw =      position[3][20]
+                move.stiffness.r_elbow_roll =     position[3][21]
 
-                headJoints.stiffness.l_hip_yaw_pitch =  position[3][6]
-                headJoints.stiffness.l_hip_roll =       position[3][7]
-                headJoints.stiffness.l_hip_pitch =      position[3][8]
-                headJoints.stiffness.l_knee_pitch =     position[3][9]
-                headJoints.stiffness.l_ankle_pitch =    position[3][10]
-                headJoints.stiffness.l_ankle_roll =     position[3][11]
+                move.stiffness.l_hip_yaw_pitch =  position[3][6]
+                move.stiffness.l_hip_roll =       position[3][7]
+                move.stiffness.l_hip_pitch =      position[3][8]
+                move.stiffness.l_knee_pitch =     position[3][9]
+                move.stiffness.l_ankle_pitch =    position[3][10]
+                move.stiffness.l_ankle_roll =     position[3][11]
 
-                headJoints.stiffness.r_hip_yaw_pitch =  position[3][12]
-                headJoints.stiffness.r_hip_roll =       position[3][13]
-                headJoints.stiffness.r_hip_pitch =      position[3][14]
-                headJoints.stiffness.r_knee_pitch =     position[3][15]
-                headJoints.stiffness.r_ankle_pitch =    position[3][16]
-                headJoints.stiffness.r_ankle_roll =     position[3][17]
+                move.stiffness.r_hip_yaw_pitch =  position[3][12]
+                move.stiffness.r_hip_roll =       position[3][13]
+                move.stiffness.r_hip_pitch =      position[3][14]
+                move.stiffness.r_knee_pitch =     position[3][15]
+                move.stiffness.r_ankle_pitch =    position[3][16]
+                move.stiffness.r_ankle_roll =     position[3][17]
 
             else:
                 self.tracker.printf("What kind of sweet ass-Move is this?")

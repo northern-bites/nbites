@@ -19,7 +19,7 @@ message MotionCommand
 
 message ScriptedMove
 {
-    repeated BodyJointCommand commands = 1;
+    repeated BodyJointCommand command = 1;
 }
 
 message BodyJointCommand
@@ -75,7 +75,7 @@ message SetHeadCommand
 
 message ScriptedHeadCommand
 {
-    repeated HeadJointCommand commands = 1;
+    repeated HeadJointCommand command = 1;
 }
 
 message HeadJointCommand
