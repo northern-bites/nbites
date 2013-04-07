@@ -16,13 +16,13 @@ class HeadTrackingHelper(object):
 
         for position in headMove:
             if len(position) == 4:
-                headJoints = command.scripted_command.add_command()
+                headJoints = command.scripted_command.add_commands()
 
                 headJoints.time = position[1]
-                if position[2] == 1: # Smooth interpolation
-                    headJoints.interpolation = headJoints.InterpolationType.SMOOTH
-                else:
+                if position[2] == 1:
                     headJoints.interpolation = headJoints.InterpolationType.LINEAR
+                else:
+                    headJoints.interpolation = headJoints.InterpolationType.SMOOTH
 
                 # Only set the head angles, since this command never sets any other angles
                 headJoints.angles.head_yaw = position[0][0]

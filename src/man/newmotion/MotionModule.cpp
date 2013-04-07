@@ -63,9 +63,6 @@ void MotionModule::run_()
     //     of the main motion loop.
     if(running)
     {
-        std::cout << "Motion running. Current provider:"
-                  << curProvider->getName()
-                  << std::endl;
         // (3) Do any necessary preprocessing of joint angles
         //     then actually compute next joints and
         //     stiffnesses.
@@ -278,9 +275,6 @@ void MotionModule::processHeadJoints()
                 + Kinematics::HEAD_JOINTS;
             ++i)
         {
-            std::cout << "Setting joint " << i
-                      << " to " << headJoints.at(i)
-                      << std::endl;
             nextJoints[i] = headJoints.at(i);
         }
     }
@@ -530,8 +524,6 @@ void MotionModule::swapBodyProvider()
 {
     std::vector<BodyJointCommand::ptr> transitions;
     std::string old_provider = curProvider->getName();
-    std::cout << "(MotionModule) Last provider: "
-              << old_provider << "." << std::endl;
 
     switch(nextProvider->getType())
     {
@@ -675,7 +667,7 @@ void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> co
 void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 {
     // Create a command for every Body Joint Command
-    for (int i = 0; i < script.command_size(); i++)
+    for (int i = 0; i < script.commands_size(); i++)
     {
         std::vector<float> angles(26, 0.f);
         std::vector<float> stiffness(26, 0.f);
