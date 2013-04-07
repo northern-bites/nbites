@@ -593,27 +593,29 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         std::vector<float> stiffness(26, 0.f);
 
         // populate vectors
-        angles[0] = script.commands(i).angles().l_shoulder_pitch();
-        angles[1] = script.commands(i).angles().l_shoulder_roll();
-        angles[2] = script.commands(i).angles().l_elbow_yaw();
-        angles[3] = script.commands(i).angles().l_elbow_roll();
-        angles[4] = script.commands(i).angles().l_hip_yaw_pitch();
-        angles[5] = script.commands(i).angles().l_hip_roll();
-        angles[6] = script.commands(i).angles().l_hip_pitch();
-        angles[7] = script.commands(i).angles().l_knee_pitch();
-        angles[8] = script.commands(i).angles().l_ankle_pitch();
-        angles[9] = script.commands(i).angles().l_ankle_roll();
-        angles[10] = script.commands(i).angles().r_hip_yaw_pitch();
-        angles[11] = script.commands(i).angles().r_hip_roll();
-        angles[12] = script.commands(i).angles().r_hip_pitch();
-        angles[13] = script.commands(i).angles().r_knee_pitch();
-        angles[14] = script.commands(i).angles().r_ankle_pitch();
-        angles[15] = script.commands(i).angles().r_ankle_roll();
-        angles[16] = script.commands(i).angles().r_shoulder_pitch();
-        angles[17] = script.commands(i).angles().r_shoulder_roll();
-        angles[18] = script.commands(i).angles().r_elbow_yaw();
-        angles[19] = script.commands(i).angles().r_elbow_roll();
+        // Script angles are given in degrees, convert to Radians
+        angles[0] = TO_RAD * script.commands(i).angles().l_shoulder_pitch();
+        angles[1] = TO_RAD * script.commands(i).angles().l_shoulder_roll();
+        angles[2] = TO_RAD * script.commands(i).angles().l_elbow_yaw();
+        angles[3] = TO_RAD * script.commands(i).angles().l_elbow_roll();
+        angles[4] = TO_RAD * script.commands(i).angles().l_hip_yaw_pitch();
+        angles[5] = TO_RAD * script.commands(i).angles().l_hip_roll();
+        angles[6] = TO_RAD * script.commands(i).angles().l_hip_pitch();
+        angles[7] = TO_RAD * script.commands(i).angles().l_knee_pitch();
+        angles[8] = TO_RAD * script.commands(i).angles().l_ankle_pitch();
+        angles[9] = TO_RAD * script.commands(i).angles().l_ankle_roll();
+        angles[10] = TO_RAD * script.commands(i).angles().r_hip_yaw_pitch();
+        angles[11] = TO_RAD * script.commands(i).angles().r_hip_roll();
+        angles[12] = TO_RAD * script.commands(i).angles().r_hip_pitch();
+        angles[13] = TO_RAD * script.commands(i).angles().r_knee_pitch();
+        angles[14] = TO_RAD * script.commands(i).angles().r_ankle_pitch();
+        angles[15] = TO_RAD * script.commands(i).angles().r_ankle_roll();
+        angles[16] = TO_RAD * script.commands(i).angles().r_shoulder_pitch();
+        angles[17] = TO_RAD * script.commands(i).angles().r_shoulder_roll();
+        angles[18] = TO_RAD * script.commands(i).angles().r_elbow_yaw();
+        angles[19] = TO_RAD * script.commands(i).angles().r_elbow_roll();
 
+        // Stiffness given as gains, can take direct
         stiffness[0] = script.commands(i).stiffness().head_yaw();
         stiffness[1] = script.commands(i).stiffness().head_pitch();
         stiffness[2] = script.commands(i).stiffness().l_shoulder_pitch();
@@ -637,16 +639,15 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
         stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
 
-        // Interpolation is set for the entire script, not per command
+        // Interpolation is set per command
         Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
-        if(script.interpolation_type() == 1)
+        if(script.commands(i).interpolation() == 1)
             interType = Kinematics::INTERPOLATION_LINEAR;
 
         // create the BJC and set it
         motion::BodyJointCommand::ptr newCommand(
             new motion::BodyJointCommand(
-                // Time is set for the entire script, not per command
-                (script.time()),
+                script.commands(i).time(),
                 angles,
                 stiffness,
                 interType)

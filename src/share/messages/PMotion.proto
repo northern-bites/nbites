@@ -20,9 +20,6 @@ message MotionCommand
 message ScriptedMove
 {
     repeated BodyJointCommand commands = 1;
-    optional float time = 2;
-    optional int32 interpolation_type = 3;
-    optional int32 chain_stiffnesses = 4;
 }
 
 message BodyJointCommand
