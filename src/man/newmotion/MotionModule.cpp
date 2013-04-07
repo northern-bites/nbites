@@ -783,9 +783,14 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
 
 void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 {
+    // Message is coming from behaviors in centimeters and degrees
+    // StepCommands take millimeters and radians so Convert!
+    float relX = command.rel_x() * CM_TO_MM;
+    float relY = command.rel_y() * CM_TO_MM;
+    float relH = command.rel_h() * TO_RAD;
     nextProvider = &walkProvider;
-    DestinationCommand::ptr newCommand(
-        new DestinationCommand(
+    StepCommand::ptr newCommand(
+        new StepCommand(
             command.rel_x(),
             command.rel_y(),
             command.rel_h()
