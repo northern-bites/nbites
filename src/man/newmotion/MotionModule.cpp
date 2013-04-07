@@ -319,6 +319,8 @@ void MotionModule::processMotionInput()
         }
         const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
     }
+
+    // (3) Process head commands.
 }
 
 void MotionModule::preProcessBody()
