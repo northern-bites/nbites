@@ -637,6 +637,10 @@ void MotionModule::sendMotionCommand(const WalkCommand::ptr command)
     walkProvider.setCommand(command);
 }
 
+// TESTED by EJ. Don't fuck with unless I'm told.
+/*
+ * Given a vector of percentages for set speeds
+ */
 void MotionModule::sendMotionCommand(messages::WalkCommand command)
 {
     nextProvider = &walkProvider;
@@ -667,7 +671,7 @@ void MotionModule::sendMotionCommand(const std::vector<BodyJointCommand::ptr> co
     }
 }
 
-
+// TESTED by EJ. DO NOT FUCK with any of this without telling me.
 void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 {
     // Create a command for every Body Joint Command
@@ -872,6 +876,14 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
     walkProvider.setCommand(command);
 }
 
+
+// TESTED by EJ, works appropriately. Don't fuck with unless I'm told.
+/*
+ * Given a DestinationWalk proto,
+ * Rel x and y given in cm, rel h in degrees
+ * If gain is defined in the proto then it also sets the speed
+ * to that gain, else does .5 by default (half speed)
+ */
 void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 {
     // Message is coming from behaviors in centimeters and degrees
@@ -879,13 +891,21 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
     float relX = command.rel_x() * CM_TO_MM;
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
+
+    // For now go at half speed for odometry walk
+    // @TODO major refactoring on all dis shit. lets make it hot
+    float DEFAULT_SPEED = .5f;
+    float gain = DEFAULT_SPEED;
+    if(command.gain() > 0.f)
+        gain = command.gain();
+
     nextProvider = &walkProvider;
     StepCommand::ptr newCommand(
         new StepCommand(
-            command.rel_x(),
-            command.rel_y(),
-            command.rel_h()
-            )
+            relX,
+            relY,
+            relH,
+            gain)
         );
     walkProvider.setCommand(newCommand);
 }
