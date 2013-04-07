@@ -35,6 +35,9 @@
 
 #include <vector>
 
+// For Conversions
+#include "NBMath.h"
+
 namespace man
 {
 namespace motion

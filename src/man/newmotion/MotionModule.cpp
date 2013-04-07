@@ -676,61 +676,61 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         std::vector<float> angles(26, 0.f);
         std::vector<float> stiffness(26, 0.f);
 
-        // populate vectors
-        angles[0] = script.command(i).angles().l_shoulder_pitch();
-        angles[1] = script.command(i).angles().l_shoulder_roll();
-        angles[2] = script.command(i).angles().l_elbow_yaw();
-        angles[3] = script.command(i).angles().l_elbow_roll();
-        angles[4] = script.command(i).angles().l_hip_yaw_pitch();
-        angles[5] = script.command(i).angles().l_hip_roll();
-        angles[6] = script.command(i).angles().l_hip_pitch();
-        angles[7] = script.command(i).angles().l_knee_pitch();
-        angles[8] = script.command(i).angles().l_ankle_pitch();
-        angles[9] = script.command(i).angles().l_ankle_roll();
-        angles[10] = script.command(i).angles().r_hip_yaw_pitch();
-        angles[11] = script.command(i).angles().r_hip_roll();
-        angles[12] = script.command(i).angles().r_hip_pitch();
-        angles[13] = script.command(i).angles().r_knee_pitch();
-        angles[14] = script.command(i).angles().r_ankle_pitch();
-        angles[15] = script.command(i).angles().r_ankle_roll();
-        angles[16] = script.command(i).angles().r_shoulder_pitch();
-        angles[17] = script.command(i).angles().r_shoulder_roll();
-        angles[18] = script.command(i).angles().r_elbow_yaw();
-        angles[19] = script.command(i).angles().r_elbow_roll();
+        // Script angles are given in degrees, convert to Radians
+        angles[0] = TO_RAD * script.commands(i).angles().l_shoulder_pitch();
+        angles[1] = TO_RAD * script.commands(i).angles().l_shoulder_roll();
+        angles[2] = TO_RAD * script.commands(i).angles().l_elbow_yaw();
+        angles[3] = TO_RAD * script.commands(i).angles().l_elbow_roll();
+        angles[4] = TO_RAD * script.commands(i).angles().l_hip_yaw_pitch();
+        angles[5] = TO_RAD * script.commands(i).angles().l_hip_roll();
+        angles[6] = TO_RAD * script.commands(i).angles().l_hip_pitch();
+        angles[7] = TO_RAD * script.commands(i).angles().l_knee_pitch();
+        angles[8] = TO_RAD * script.commands(i).angles().l_ankle_pitch();
+        angles[9] = TO_RAD * script.commands(i).angles().l_ankle_roll();
+        angles[10] = TO_RAD * script.commands(i).angles().r_hip_yaw_pitch();
+        angles[11] = TO_RAD * script.commands(i).angles().r_hip_roll();
+        angles[12] = TO_RAD * script.commands(i).angles().r_hip_pitch();
+        angles[13] = TO_RAD * script.commands(i).angles().r_knee_pitch();
+        angles[14] = TO_RAD * script.commands(i).angles().r_ankle_pitch();
+        angles[15] = TO_RAD * script.commands(i).angles().r_ankle_roll();
+        angles[16] = TO_RAD * script.commands(i).angles().r_shoulder_pitch();
+        angles[17] = TO_RAD * script.commands(i).angles().r_shoulder_roll();
+        angles[18] = TO_RAD * script.commands(i).angles().r_elbow_yaw();
+        angles[19] = TO_RAD * script.commands(i).angles().r_elbow_roll();
 
-        stiffness[0] = script.command(i).stiffness().head_yaw();
-        stiffness[1] = script.command(i).stiffness().head_pitch();
-        stiffness[2] = script.command(i).stiffness().l_shoulder_pitch();
-        stiffness[3] = script.command(i).stiffness().l_shoulder_roll();
-        stiffness[4] = script.command(i).stiffness().l_elbow_yaw();
-        stiffness[5] = script.command(i).stiffness().l_elbow_roll();
-        stiffness[6] = script.command(i).stiffness().l_hip_yaw_pitch();
-        stiffness[7] = script.command(i).stiffness().l_hip_roll();
-        stiffness[8] = script.command(i).stiffness().l_hip_pitch();
-        stiffness[9] = script.command(i).stiffness().l_knee_pitch();
-        stiffness[10] = script.command(i).stiffness().l_ankle_pitch();
-        stiffness[11] = script.command(i).stiffness().l_ankle_roll();
-        stiffness[12] = script.command(i).stiffness().r_hip_yaw_pitch();
-        stiffness[13] = script.command(i).stiffness().r_hip_roll();
-        stiffness[14] = script.command(i).stiffness().r_hip_pitch();
-        stiffness[15] = script.command(i).stiffness().r_knee_pitch();
-        stiffness[16] = script.command(i).stiffness().r_ankle_pitch();
-        stiffness[17] = script.command(i).stiffness().r_ankle_roll();
-        stiffness[18] = script.command(i).stiffness().r_shoulder_pitch();
-        stiffness[19] = script.command(i).stiffness().r_shoulder_roll();
-        stiffness[20] = script.command(i).stiffness().r_elbow_yaw();
-        stiffness[21] = script.command(i).stiffness().r_elbow_roll();
+        // Stiffness given as gains, can take direct
+        stiffness[0] = script.commands(i).stiffness().head_yaw();
+        stiffness[1] = script.commands(i).stiffness().head_pitch();
+        stiffness[2] = script.commands(i).stiffness().l_shoulder_pitch();
+        stiffness[3] = script.commands(i).stiffness().l_shoulder_roll();
+        stiffness[4] = script.commands(i).stiffness().l_elbow_yaw();
+        stiffness[5] = script.commands(i).stiffness().l_elbow_roll();
+        stiffness[6] = script.commands(i).stiffness().l_hip_yaw_pitch();
+        stiffness[7] = script.commands(i).stiffness().l_hip_roll();
+        stiffness[8] = script.commands(i).stiffness().l_hip_pitch();
+        stiffness[9] = script.commands(i).stiffness().l_knee_pitch();
+        stiffness[10] = script.commands(i).stiffness().l_ankle_pitch();
+        stiffness[11] = script.commands(i).stiffness().l_ankle_roll();
+        stiffness[12] = script.commands(i).stiffness().r_hip_yaw_pitch();
+        stiffness[13] = script.commands(i).stiffness().r_hip_roll();
+        stiffness[14] = script.commands(i).stiffness().r_hip_pitch();
+        stiffness[15] = script.commands(i).stiffness().r_knee_pitch();
+        stiffness[16] = script.commands(i).stiffness().r_ankle_pitch();
+        stiffness[17] = script.commands(i).stiffness().r_ankle_roll();
+        stiffness[18] = script.commands(i).stiffness().r_shoulder_pitch();
+        stiffness[19] = script.commands(i).stiffness().r_shoulder_roll();
+        stiffness[20] = script.commands(i).stiffness().r_elbow_yaw();
+        stiffness[21] = script.commands(i).stiffness().r_elbow_roll();
 
-        // Interpolation is set for the entire script, not per command
+        // Interpolation is set per command
         Kinematics::InterpolationType interType = Kinematics::INTERPOLATION_SMOOTH;
-        if(script.interpolation_type() == 1)
+        if(script.commands(i).interpolation() == 1)
             interType = Kinematics::INTERPOLATION_LINEAR;
 
         // create the BJC and set it
         motion::BodyJointCommand::ptr newCommand(
             new motion::BodyJointCommand(
-                // Time is set for the entire script, not per command
-                (script.time()),
+                script.commands(i).time(),
                 angles,
                 stiffness,
                 interType)
@@ -874,9 +874,14 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
 
 void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 {
+    // Message is coming from behaviors in centimeters and degrees
+    // StepCommands take millimeters and radians so Convert!
+    float relX = command.rel_x() * CM_TO_MM;
+    float relY = command.rel_y() * CM_TO_MM;
+    float relH = command.rel_h() * TO_RAD;
     nextProvider = &walkProvider;
-    DestinationCommand::ptr newCommand(
-        new DestinationCommand(
+    StepCommand::ptr newCommand(
+        new StepCommand(
             command.rel_x(),
             command.rel_y(),
             command.rel_h()
