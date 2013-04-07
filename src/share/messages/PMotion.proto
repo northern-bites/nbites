@@ -65,19 +65,19 @@ message WalkCommand
 message HeadMotionCommand
 {
     enum CommandType {
-    	 SET_HEAD_COMMAND = 0;
+    	 POS_HEAD_COMMAND = 0; // AKA set_head_command
 	 SCRIPTED_HEAD_COMMAND = 1;
     }
 
     optional CommandType type = 1;
 
-    optional SetHeadCommand set_command = 2;
+    optional PositionHeadCommand pos_command = 2;
     optional ScriptedHeadCommand scripted_command = 3;
 
     optional bool processed_by_motion = 4 [default = true];
 }
 
-message SetHeadCommand
+message PositionHeadCommand
 {
     optional float head_yaw = 1;
     optional float head_pitch = 2;

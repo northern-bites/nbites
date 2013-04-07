@@ -34,13 +34,15 @@ def neutralHead(tracker):
 
 def doHeadMove(tracker):
     '''Executes the currently set headMove, then stops.'''
-    if tracker.firstFrame():
-        tracker.activeLocOn = False
-        request = tracker.brain.interface.motionRequest
-        request.type = request.STOP_HEAD
-        request.processed_by_motion = False
-        tracker.helper.executeHeadMove(tracker.headMove)
+    tracker.activeLocOn = False
+    request = tracker.brain.interface.motionRequest
+    request.type = request.STOP_HEAD
+    request.processed_by_motion = False
+    tracker.helper.executeHeadMove(tracker.headMove)
 
+    return tracker.goLater('doingHeadMove')
+
+def doingHeadMove(tracker):
     if not tracker.brain.interface.motionStatus.head_is_active:
         return tracker.goLater('stopped')
 

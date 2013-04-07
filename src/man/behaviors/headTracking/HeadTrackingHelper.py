@@ -60,7 +60,7 @@ class HeadTrackingHelper(object):
             else:
                 self.tracker.printf("What kind of sweet ass-Move is this?")
 
-        command.process_by_motion = False
+        command.processed_by_motion = False
         # Returns the last HJC in the HeadMove for keeping track of
         # when a move is done
         return move
@@ -164,14 +164,14 @@ class HeadTrackingHelper(object):
 
         # Set message fields
         command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.SET_HEAD_COMMAND
+        command.type = command.CommandType.POS_HEAD_COMMAND
 
-        command.set_command.head_yaw = newYaw
-        command.set_command.head_pitch = newPitch
-        command.set_command.max_speed_yaw = maxSpeed
-        command.set_command.max_speed_pitch = maxSpeed
+        command.pos_command.head_yaw = newYaw
+        command.pos_command.head_pitch = newPitch
+        command.pos_command.max_speed_yaw = maxSpeed
+        command.pos_command.max_speed_pitch = maxSpeed
 
-        command.process_by_motion = False
+        command.processed_by_motion = False
 
     # Fixed Pitch
     def trackObjectFixedPitch(self):
@@ -215,14 +215,14 @@ class HeadTrackingHelper(object):
 
         # Set message fields
         command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.SET_HEAD_COMMAND
+        command.type = command.CommandType.POS_HEAD_COMMAND
 
-        command.set_command.head_yaw = newYaw
-        command.set_command.head_pitch = 20.0 # MAKE A CONSTANT FOR THIS
-        command.set_command.max_speed_yaw = maxSpeed
-        command.set_command.max_speed_pitch = maxSpeed
+        command.pos_command.head_yaw = newYaw
+        command.pos_command.head_pitch = 20.0 # MAKE A CONSTANT FOR THIS
+        command.pos_command.max_speed_yaw = maxSpeed
+        command.pos_command.max_speed_pitch = maxSpeed
 
-        command.process_by_motion = False
+        command.processed_by_motion = False
 
     # Not called anywhere in the code.
     def lookToTargetAngles(self, target):
@@ -245,12 +245,12 @@ class HeadTrackingHelper(object):
 
         # Set message fields
         command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.SET_HEAD_COMMAND
+        command.type = command.CommandType.POS_HEAD_COMMAND
 
-        command.set_command.head_yaw = yaw
-        command.set_command.head_pitch = pitch
+        command.pos_command.head_yaw = yaw
+        command.pos_command.head_pitch = pitch
         # Leave max speeds to default
-        command.process_by_motion = False
+        command.processed_by_motion = False
 
     def panTo(self, heads):
         """
@@ -269,6 +269,7 @@ class HeadTrackingHelper(object):
         self.executeHeadMove(((heads, panTime, 0,
                                StiffnessModes.LOW_HEAD_STIFFNESSES), ))
 
+    # Unsafe to call... TODO: CoordHeadCommands for messages.
     def lookToPoint(self, target):
         if hasattr(target, "height"):
             height = target.height
@@ -305,14 +306,6 @@ class HeadTrackingHelper(object):
         else:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
-    # broken?
-    # Not called anywhere in code.
-    # Unsafe to call as of 4/5/2013
-    def lookToAngles(self, yaw=0, pitch=0):
-        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
-                                         MyMath.degrees(pitch))
-        self.tracker.brain.motion.setHead(headMove)
-
     # Fixed Pitch
     def lookToAngleFixedPitch(self, yaw):
         """
@@ -344,15 +337,3 @@ class HeadTrackingHelper(object):
                 bestPost = p
                 minDiff = diff
         return bestPost
-
-    # Debug method to print current head pitch and yaw.
-    def printHeadAngles(self):
-
-        # hijacked for vision testing
-        curPitch = self.tracker.brain.sensors.motionAngles[MotionConstants.HeadPitch]
-        curYaw = self.tracker.brain.sensors.motionAngles[MotionConstants.HeadYaw]
-
-        self.tracker.printf("Head pitch is:")
-        self.tracker.printf(curPitch)
-        self.tracker.printf("Head yaw is:")
-        self.tracker.printf(curYaw)
