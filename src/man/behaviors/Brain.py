@@ -144,7 +144,7 @@ class Brain(object):
         #self.updatePlaybook()
         self.player.run()
         self.tracker.run()
-        #self.nav.run()
+        self.nav.run()
 
         #Set LED message
         self.leds.processLeds()

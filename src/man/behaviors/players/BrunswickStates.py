@@ -16,7 +16,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.stand()
-        player.kickScan()
+        player.zeroHeads()
         # Reset localization to proper starting position by player number.
         # Locations are defined in the wiki.
 # HACK HACK until localization is implemented in messages we cant do this.
