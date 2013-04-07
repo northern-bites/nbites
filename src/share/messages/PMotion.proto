@@ -40,6 +40,7 @@ message DestinationWalk
     optional float rel_x = 1;
     optional float rel_y = 2;
     optional float rel_h = 3;
+    optional float gain  = 4;
 }
 
 message WalkCommand
