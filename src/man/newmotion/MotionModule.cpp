@@ -63,12 +63,14 @@ void MotionModule::run_()
     //     of the main motion loop.
     if(running)
     {
+        std::cout << "Motion running. Current provider:"
+                  << curProvider->getName()
+                  << std::endl;
         // (3) Do any necessary preprocessing of joint angles
         //     then actually compute next joints and
         //     stiffnesses.
         realityCheckJoints();
 
-        // Josh and Wils are gonna try this. Does it work? Does it blend??
         processMotionInput();
 
         preProcess();
@@ -116,37 +118,42 @@ void MotionModule::processJoints()
  */
 void MotionModule::processStiffness()
 {
-    using namespace Kinematics;
-    // if(curHeadProvider->isActive()){
-    //      const vector <float > headStiffnesses =
-    //          curHeadProvider->getChainStiffnesses(HEAD_CHAIN);
+    if(curHeadProvider->isActive())
+    {
+        const std::vector<float> headStiffnesses =
+            curHeadProvider->getChainStiffnesses(Kinematics::HEAD_CHAIN);
 
-    //      for(unsigned int i = 0; i < HEAD_JOINTS; i ++){
-    //          nextStiffnesses[HEAD_YAW + i] = headStiffnesses.at(i);
-    //      }
-    // }
+         for(unsigned int i = 0;
+             i < Kinematics::HEAD_JOINTS;
+             ++i)
+         {
+             nextStiffnesses[Kinematics::HEAD_YAW + i]
+                 = headStiffnesses.at(i);
+         }
+    }
 
-    if(curProvider->isActive()){
+    if(curProvider->isActive())
+    {
         const std::vector<float> llegStiffnesses =
-            curProvider->getChainStiffnesses(LLEG_CHAIN);
+            curProvider->getChainStiffnesses(Kinematics::LLEG_CHAIN);
 
         const std::vector<float> rlegStiffnesses =
-            curProvider->getChainStiffnesses(RLEG_CHAIN);
+            curProvider->getChainStiffnesses(Kinematics::RLEG_CHAIN);
 
         const std::vector<float> rarmStiffnesses =
-            curProvider->getChainStiffnesses(RARM_CHAIN);
+            curProvider->getChainStiffnesses(Kinematics::RARM_CHAIN);
 
         const std::vector<float> larmStiffnesses =
-            curProvider->getChainStiffnesses(LARM_CHAIN);
+            curProvider->getChainStiffnesses(Kinematics::LARM_CHAIN);
 
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++){
-            nextStiffnesses[L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
-            nextStiffnesses[R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
+        for(unsigned int i = 0; i < Kinematics::LEG_JOINTS; i ++){
+            nextStiffnesses[Kinematics::L_HIP_YAW_PITCH + i] = llegStiffnesses.at(i);
+            nextStiffnesses[Kinematics::R_HIP_YAW_PITCH + i] = rlegStiffnesses.at(i);
         }
 
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++){
-            nextStiffnesses[L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
-            nextStiffnesses[R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
+        for(unsigned int i = 0; i < Kinematics::ARM_JOINTS; i ++){
+            nextStiffnesses[Kinematics::L_SHOULDER_PITCH + i] = larmStiffnesses.at(i);
+            nextStiffnesses[Kinematics::R_SHOULDER_PITCH + i] = rarmStiffnesses.at(i);
         }
     }
 
@@ -172,14 +179,12 @@ bool MotionModule::postProcess()
     //ready to take over:
     if (curProvider != nextProvider && !curProvider->isActive())
     {
-        std::cout << "postprocess swap" << std::endl;
-        swapBodyProvider();
+         swapBodyProvider();
     }
 
     if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
     {
-        std::cout << "postprocess swap head provider" << std::endl;
-        swapHeadProvider();
+         swapHeadProvider();
     }
 
     // Update sensors with the correct support foot because it may have
@@ -195,82 +200,110 @@ bool MotionModule::postProcess()
 
 void MotionModule::processBodyJoints()
 {
-    using namespace Kinematics;
-
     if (curProvider->isActive())
     {
         //TODO: move this
         //let the walk engine know if it's in use or in standby
-        if (curProvider != &walkProvider) {
+        if (curProvider != &walkProvider)
+        {
             walkProvider.setStandby(true);
             //"fake" calculate - this is just for the sensor computation
             walkProvider.calculateNextJointsAndStiffnesses(
                 sensorAngles, inertialsInput_.message(), fsrInput_.message());
             curProvider->calculateNextJointsAndStiffnesses(
                 sensorAngles, inertialsInput_.message(), fsrInput_.message());
-        } else {
+        }
+        else
+        {
             walkProvider.setStandby(false);
             walkProvider.calculateNextJointsAndStiffnesses(
                 sensorAngles, inertialsInput_.message(), fsrInput_.message());
         }
 
-        const std::vector<float> llegJoints = curProvider->getChainJoints(LLEG_CHAIN);
-        const std::vector<float> rlegJoints = curProvider->getChainJoints(RLEG_CHAIN);
-        const std::vector<float> rarmJoints = curProvider->getChainJoints(RARM_CHAIN);
-        const std::vector<float> larmJoints = curProvider->getChainJoints(LARM_CHAIN);
+        const std::vector<float> llegJoints
+            = curProvider->getChainJoints(Kinematics::LLEG_CHAIN);
+        const std::vector<float> rlegJoints
+            = curProvider->getChainJoints(Kinematics::RLEG_CHAIN);
+        const std::vector<float> rarmJoints
+            = curProvider->getChainJoints(Kinematics::RARM_CHAIN);
+        const std::vector<float> larmJoints
+            = curProvider->getChainJoints(Kinematics::LARM_CHAIN);
 
         //copy and clip joints for safety
-        for(unsigned int i = 0; i < LEG_JOINTS; i ++)
+        for(unsigned int i = 0; i < Kinematics::LEG_JOINTS; i ++)
         {
-            nextJoints[R_HIP_YAW_PITCH + i] = NBMath::clip(rlegJoints.at(i),
-                                                           RIGHT_LEG_BOUNDS[i][0], RIGHT_LEG_BOUNDS[i][1]);
+            nextJoints[Kinematics::R_HIP_YAW_PITCH + i]
+                = NBMath::clip(rlegJoints.at(i),
+                               Kinematics::RIGHT_LEG_BOUNDS[i][0],
+                               Kinematics::RIGHT_LEG_BOUNDS[i][1]);
 
-            nextJoints[L_HIP_YAW_PITCH + i] = NBMath::clip(llegJoints.at(i),
-                                                           LEFT_LEG_BOUNDS[i][0], LEFT_LEG_BOUNDS[i][1]);
+            nextJoints[Kinematics::L_HIP_YAW_PITCH + i]
+                = NBMath::clip(llegJoints.at(i),
+                               Kinematics::LEFT_LEG_BOUNDS[i][0],
+                               Kinematics::LEFT_LEG_BOUNDS[i][1]);
         }
 
-        for(unsigned int i = 0; i < ARM_JOINTS; i ++)
+        for(unsigned int i = 0; i < Kinematics::ARM_JOINTS; i ++)
         {
-            nextJoints[L_SHOULDER_PITCH + i] = NBMath::clip(larmJoints.at(i),
-                                                            LEFT_ARM_BOUNDS[i][0], LEFT_ARM_BOUNDS[i][1]);
-            nextJoints[R_SHOULDER_PITCH + i] = NBMath::clip(rarmJoints.at(i),
-                                                            RIGHT_ARM_BOUNDS[i][0], RIGHT_ARM_BOUNDS[i][1]);
+            nextJoints[Kinematics::L_SHOULDER_PITCH + i]
+                = NBMath::clip(larmJoints.at(i),
+                               Kinematics::LEFT_ARM_BOUNDS[i][0],
+                               Kinematics::LEFT_ARM_BOUNDS[i][1]);
+
+            nextJoints[Kinematics::R_SHOULDER_PITCH + i]
+                = NBMath::clip(rarmJoints.at(i),
+                               Kinematics::RIGHT_ARM_BOUNDS[i][0],
+                               Kinematics::RIGHT_ARM_BOUNDS[i][1]);
         }
     }
 }
 
-// written as a stopgap measure by Josh Z 4/3/2013
 void MotionModule::processHeadJoints()
 {
-    using namespace Kinematics;
-
-    if (curHeadProvider->isActive())
+    if(curHeadProvider->isActive())
     {
-        const std::vector<float> headJoints = curHeadProvider->getChainJoints(HEAD_CHAIN);
+        curHeadProvider->calculateNextJointsAndStiffnesses(
+            sensorAngles,
+            inertialsInput_.message(),
+            fsrInput_.message()
+            );
 
-        nextJoints[HEAD_YAW]   = boundHeadYaw(headJoints.at(0),headJoints.at(1));
-        nextJoints[HEAD_PITCH] = headJoints.at(1);
+        std::vector<float> headJoints
+            = curHeadProvider->getChainJoints(Kinematics::HEAD_CHAIN);
+
+        clipHeadJoints(headJoints);
+
+        for(unsigned int i = Kinematics::FIRST_HEAD_JOINT;
+            i < Kinematics::FIRST_HEAD_JOINT
+                + Kinematics::HEAD_JOINTS;
+            ++i)
+        {
+            std::cout << "Setting joint " << i
+                      << " to " << headJoints.at(i)
+                      << std::endl;
+            nextJoints[i] = headJoints.at(i);
+        }
     }
 }
 
 void MotionModule::processMotionInput()
 {
     // This doesn't work. ELLIS!!!!!!!!
-    // // First check: is guardian turning stiffness off?
-    // if(stiffnessInput_.message().remove() && gainsOn)
-    // {
-    //     gainsOn = false;
-    //     std::cout << "Sending freeze command." << std::endl;
-    //     sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
-    //     return;
-    // }
-    // if(!stiffnessInput_.message().remove() && !gainsOn)
-    // {
-    //     gainsOn = true;
-    //     std::cout << "Sending unfreeze command." << std::endl;
-    //     sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
-    //     return;
-    // }
+    // First check: is guardian turning stiffness off?
+    if(stiffnessInput_.message().remove() && gainsOn)
+    {
+        gainsOn = false;
+        std::cout << "Sending freeze command." << std::endl;
+        sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+        return;
+    }
+    if(!stiffnessInput_.message().remove() && !gainsOn)
+    {
+        gainsOn = true;
+        std::cout << "Sending unfreeze command." << std::endl;
+        sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+        return;
+    }
 
     // (1) Process body commands.
     if(!motionRequestInput_.message().processed_by_motion())
@@ -343,11 +376,13 @@ void MotionModule::preProcessBody()
     //determine the curProvider, and do any necessary swapping
     if (curProvider != nextProvider)
     {
-        if (!curProvider->isStopping()) {
+        if (!curProvider->isStopping())
+        {
             curProvider->requestStop();
         }
 
-        if (!curProvider->isActive()) {
+        if (!curProvider->isActive())
+        {
             swapBodyProvider();
         }
     }
@@ -440,9 +475,7 @@ void MotionModule::clipHeadJoints(std::vector<float>& joints)
 
 void MotionModule::safetyCheckJoints()
 {
-    using namespace Kinematics;
-
-    for (unsigned int i = 0; i < NUM_JOINTS; i++)
+    for (unsigned int i = 0; i < Kinematics::NUM_JOINTS; i++)
     {
         //We need to clip angles twice. Why? Because the sensor values are between
         //20 and 40 ms old, so we can't strictly use the sensor reports to clip
@@ -456,18 +489,34 @@ void MotionModule::safetyCheckJoints()
         //aren't sending commands which are in general too fast for the motors.
         //For the sensor angles, we clip with TWICE the max speed.
 
-        const float allowedMotionDiffInRad = jointsMaxVelNoLoad[i];
+        const float allowedMotionDiffInRad = Kinematics::jointsMaxVelNoLoad[i];
         const float allowedSensorDiffInRad = allowedMotionDiffInRad*6.0f;
+       // std::cout << "nj before: " << nextJoints[i] << std::endl;
 
-        //considering checking which clip is more restrictive each frame and
-        //only applying it
-        nextJoints[i] = NBMath::clip(nextJoints[i],
-                                     lastJoints[i] - allowedMotionDiffInRad,
-                                     lastJoints[i] + allowedMotionDiffInRad);
+       //  //considering checking which clip is more restrictive each frame and
+       //  //only applying it
+       //  nextJoints[i] = NBMath::clip(nextJoints[i],
+       //                               lastJoints[i] - allowedMotionDiffInRad,
+       //                               lastJoints[i] + allowedMotionDiffInRad);
 
-        nextJoints[i] = NBMath::clip(nextJoints[i],
-                                     sensorAngles[i] - allowedSensorDiffInRad,
-                                     sensorAngles[i] + allowedSensorDiffInRad);
+       //  std::cout << "(nj, nj - amdir, lj + amdir) = "
+       //            << "(" << nextJoints[i] << ", "
+       //            << ", " << lastJoints[i] - allowedMotionDiffInRad
+       //            << ", " << lastJoints[i] + allowedMotionDiffInRad
+       //            << std::endl;
+
+       //  nextJoints[i] = NBMath::clip(nextJoints[i],
+       //                               sensorAngles[i] - allowedSensorDiffInRad,
+       //                               sensorAngles[i] + allowedSensorDiffInRad);
+
+       //  std::cout << "(nj, sa - asdir, sa + asdir) = "
+       //            << "(" << nextJoints[i] << ", "
+       //            << ", " << sensorAngles[i] - allowedSensorDiffInRad
+       //            << ", " << sensorAngles[i] + allowedSensorDiffInRad
+       //            << std::endl;
+
+       //  std::cout << "nj after: " << nextJoints[i] << std::endl;
+       //  std::cout << std::endl;
 
         lastJoints[i] = nextJoints[i];
     }
@@ -695,6 +744,10 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 
 void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
 {
+    std::cout << "Set head to (yaw, pitch) = ("
+              << command->getYaw() << ", "
+              << command->getPitch() << ")"
+              << std::endl;
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
@@ -797,10 +850,12 @@ void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const UnfreezeCommand::ptr command)
 {
-    if(curHeadProvider == &nullHeadProvider){
+    if(curHeadProvider == &nullHeadProvider)
+    {
         nullHeadProvider.setCommand(command);
     }
-    if(curProvider == &nullBodyProvider){
+    if(curProvider == &nullBodyProvider)
+    {
         nullBodyProvider.setCommand(command);
     }
 }

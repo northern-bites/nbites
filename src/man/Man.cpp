@@ -144,6 +144,15 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
 
     startSubThreads();
+
+    motion::SetHeadCommand::ptr shc(
+        new motion::SetHeadCommand(40.0f * TO_RAD,
+                                   10.0f * TO_RAD)
+        );
+
+    motion.start();
+
+    motion.sendMotionCommand(shc);
 }
 
 Man::~Man()

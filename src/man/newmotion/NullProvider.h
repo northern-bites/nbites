@@ -18,10 +18,10 @@ public:
     virtual ~NullProvider();
 
     void calculateNextJointsAndStiffnesses(
-	std::vector<float>&            sensorAngles,
-	const messages::InertialState& sensorInertials,
-	const messages::FSR&           sensorFSRs
-	);
+        std::vector<float>&            sensorAngles,
+        const messages::InertialState& sensorInertials,
+        const messages::FSR&           sensorFSRs
+        );
     void hardReset(){} //Not implemented
 
     void setCommand(const boost::shared_ptr<FreezeCommand> command);
