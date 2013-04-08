@@ -77,13 +77,9 @@ def locPans(tracker):
     Repeatedly execute the headMove QUICK_PANS.
     """
     if tracker.firstFrame():
-<<<<<<< HEAD
-        tracker.brain.tracker.stopHeadMoves()
-=======
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
         request.processed_by_motion = False
->>>>>>> 8a45e14017826af5462a283ed203896b352f403c
         tracker.helper.executeHeadMove(HeadMoves.QUICK_PANS)
 
     if not tracker.brain.motion.head_is_active:
@@ -99,13 +95,9 @@ def fullPanFixedPitch(tracker):
     Once the ball is located, switches to lastDiffState.
     """
     if tracker.firstFrame():
-<<<<<<< HEAD
-        tracker.brain.tracker.stopHeadMoves()
-=======
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
         request.processed_by_motion = False
->>>>>>> 8a45e14017826af5462a283ed203896b352f403c
         tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
     if not tracker.brain.motion.head_is_active:
@@ -122,13 +114,9 @@ def lookLeftFixedPitch(tracker):
     Looks to the left as far as possible without being blocked by the shoulder pad.
     """
     if tracker.firstFrame():
-<<<<<<< HEAD
-        tracker.brain.tracker.stopHeadMoves()
-=======
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
         request.processed_by_motion = False
->>>>>>> 8a45e14017826af5462a283ed203896b352f403c
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
 
     if not tracker.brain.motion.head_is_active:
@@ -142,13 +130,9 @@ def lookRightFixedPitch(tracker):
     Looks to the right as far as possible without being blocked by the shoulder pad.
     """
     if tracker.firstFrame():
-<<<<<<< HEAD
-        tracker.brain.tracker.stopHeadMoves()
-=======
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
         request.processed_by_motion = False
->>>>>>> 8a45e14017826af5462a283ed203896b352f403c
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
     if not tracker.brain.motion.head_is_active:
@@ -173,14 +157,8 @@ def activeLocScan(tracker):
     """
     if tracker.target.vis.on:
         return tracker.goLater('activeTracking')
-
-<<<<<<< HEAD
-    if tracker.firstFrame() \
-            or not tracker.brain.motion.head_is_active:
-=======
     if (tracker.firstFrame()
         or not tracker.brain.motion.head_is_active):
->>>>>>> 8a45e14017826af5462a283ed203896b352f403c
         tracker.helper.executeHeadMove(HeadMoves.MID_UP_SCAN_BALL)
 
     return tracker.stay()
