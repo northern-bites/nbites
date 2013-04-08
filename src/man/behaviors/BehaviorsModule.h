@@ -19,7 +19,7 @@
 #include "SonarState.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
-#include "FootBumperState.pb.h"
+#include "ButtonState.pb.h"
 
 /**
  *
@@ -89,9 +89,9 @@ public:
     portals::InPortal<messages::JointAngles> jointsIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
+    portals::OutPortal<messages::MotionRequest> motionRequestOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;
     portals::OutPortal<messages::HeadMotionCommand> headMotionCommandOut;
-    portals::OutPortal<messages::MotionRequest> motionRequestOut;
 private:
     portals::Message<messages::LedCommand> ledCommand;
     portals::Message<messages::MotionCommand> bodyMotionCommand;

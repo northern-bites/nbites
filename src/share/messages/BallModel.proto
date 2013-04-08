@@ -24,6 +24,8 @@ message FilteredBall
 	optional float distance = 2;
 	optional float bearing = 3;
         optional float bearing_deg = 4;
-	optional float rel_x = 5;
-	optional float rel_y = 6;
+        optional float x = 5;
+        optional float y = 6;
+	optional float rel_x = 7;
+	optional float rel_y = 8;
 }

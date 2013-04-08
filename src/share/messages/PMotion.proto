@@ -7,6 +7,7 @@ message MotionRequest
         STOP_HEAD = 1;
         RESET_ODO = 2;
     }
+
     optional RequestType type = 1;
 
     optional bool processed_by_motion = 2 [default = true];

@@ -84,7 +84,7 @@ public:
     void sendMotionCommand(const SetHeadCommand::ptr command);
     void sendMotionCommand(const messages::PositionHeadCommand& command);
     void sendMotionCommand(const HeadJointCommand::ptr command);
-    void sendMotionCommand(const messages::ScriptedHeadCommand& command);
+    void sendMotionCommand(const messages::ScriptedHeadCommand command);
 
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
@@ -156,6 +156,7 @@ public:
     portals::InPortal<messages::JointAngles>       jointsInput_;
     portals::InPortal<messages::InertialState>     inertialsInput_;
     portals::InPortal<messages::FSR>               fsrInput_;
+    portals::InPortal<messages::MotionRequest>     motionRequestInput_;
     portals::InPortal<messages::MotionCommand>     bodyCommandInput_;
     portals::InPortal<messages::HeadMotionCommand> headCommandInput_;
     portals::InPortal<messages::StiffnessControl>  stiffnessInput_;

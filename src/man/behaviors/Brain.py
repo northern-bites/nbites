@@ -9,6 +9,7 @@ sys.stderr = sys.stdout
 
 # Packages and modules from super-directories
 import noggin_constants as Constants
+from objects import RobotLocation
 
 # Modules from this directory
 from . import Leds
@@ -23,20 +24,19 @@ from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
 
-from objects import RobotLocation
-
 # Import message protocol buffers and interface
 import interface
 import LedCommand_proto
 import GameState_proto
 import WorldModel_proto
+import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
 import SonarState_proto
 import VisionRobot_proto
 import VisionField_proto
-import FootBumperState_proto
+import ButtonState_proto
 
 class Brain(object):
     """
@@ -68,10 +68,10 @@ class Brain(object):
         print '\033[32m'+"GC:  I am player  "+str(self.playerNumber)+'\033[0m'
 
         # Information about the environment
-        # All field objects should come in as messages now
-        #self.initFieldObjects()
         self.ball = None
         self.initTeamMembers()
+        self.motion = None
+        self.game = None
 
         self.play = Play.Play()
 
@@ -84,9 +84,6 @@ class Brain(object):
 
         # Message interface
         self.interface = interface.interface
-
-        self.motion = None
-        self.game = None
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -134,6 +131,7 @@ class Brain(object):
         # Update objects
         self.updateVisionObjects()
         self.updateMotion()
+        self.updateLoc()
         self.getCommUpdate()
         self.updateLoc()
 

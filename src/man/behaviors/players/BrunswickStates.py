@@ -16,7 +16,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.stand()
-        player.zeroHeads()
+        # player.zeroHeads()
         # Reset localization to proper starting position by player number.
         # Locations are defined in the wiki.
 # HACK HACK until localization is implemented in messages we cant do this.
@@ -75,7 +75,7 @@ def gameSet(player):
         player.brain.nav.stand()
         player.brain.tracker.trackBallFixedPitch()
 
-        if (player.brain.my.playerNumber == 4 and
+        if (player.brain.playerNumber == 4 and
             player.brain.gameController.ownKickOff):
             print "Setting Kickoff to True"
             player.shouldKickOff = True

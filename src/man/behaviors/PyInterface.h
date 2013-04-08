@@ -6,6 +6,7 @@
 #include "Common.h"
 
 #include "GameState.pb.h"
+#include "RobotLocation.pb.h"
 #include "BallModel.pb.h"
 #include "LedCommand.pb.h"
 #include "WorldModel.pb.h"
@@ -14,7 +15,7 @@
 #include "SonarState.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
-#include "FootBumperState.pb.h"
+#include "ButtonState.pb.h"
 #include "RobotLocation.pb.h"
 
 namespace man {
@@ -24,18 +25,18 @@ namespace behaviors {
 class PyInterface
 {
 public:
-    messages::GameState       const * gameState_ptr;
-    messages::RobotLocation   const * loc_ptr;
-    messages::VisionRobot     const * visionRobot_ptr;
-    messages::VisionField     const * visionField_ptr;
-    messages::VisionObstacle  const * visionObstacle_ptr;
-    messages::FilteredBall    const * filteredBall_ptr;
-    messages::LedCommand      const * ledCommand_ptr;
-    messages::WorldModel      const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
-    messages::MotionCommand   const * bodyMotionCommand_ptr;
+    messages::GameState         const * gameState_ptr;
+    messages::RobotLocation     const * loc_ptr;
+    messages::VisionRobot       const * visionRobot_ptr;
+    messages::VisionField       const * visionField_ptr;
+    messages::VisionObstacle    const * visionObstacle_ptr;
+    messages::FilteredBall      const * filteredBall_ptr;
+    messages::LedCommand        const * ledCommand_ptr;
+    messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
+    messages::MotionCommand     const * bodyMotionCommand_ptr;
     messages::HeadMotionCommand const * headMotionCommand_ptr;
     messages::MotionStatus      const * motionStatus_ptr;
-    messages::MotionRequest   const * motionRequest_ptr;
+    messages::MotionRequest     const * motionRequest_ptr;
     messages::RobotLocation     const * odometry_ptr;
     messages::SonarState        const * sonarState_ptr;
     messages::FootBumperState   const * footBumperState_ptr;
@@ -53,13 +54,13 @@ public:
     {
         visionRobot_ptr = msg;
     }
-    void setVisionField_ptr(const messages::VisionField* msg)
-    {
-        visionField_ptr = msg;
-    }
     void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
     {
         visionObstacle_ptr = msg;
+    }
+    void setVisionField_ptr(const messages::VisionField* msg)
+    {
+        visionField_ptr = msg;
     }
     void setFilteredBall_ptr(const messages::FilteredBall* msg)
     {

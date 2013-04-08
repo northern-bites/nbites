@@ -1,5 +1,5 @@
 from objects import (RobotLocation, Location)
-from math import fabs
+from math import fabs, degrees
 import noggin_constants as NogginConstants
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
@@ -80,7 +80,6 @@ class TeamMember(RobotLocation):
         """
         updates my information as a teammate (since we may not get our own packets)
         """
-
         ball = self.brain.ball
 
         self.x = self.brain.loc.x
@@ -93,8 +92,7 @@ class TeamMember(RobotLocation):
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
 
-        self.active = (not self.brain.interface.gameState.state ==
-                       'gamePenalized')
+        self.active = (not self.isPenalized())
 
         self.dribbling = (self.active and self.ballDist <=
                          BALL_TEAMMATE_DIST_DRIBBLING)

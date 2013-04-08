@@ -11,7 +11,7 @@ HeadProvider::HeadProvider()
     : MotionProvider(HEAD_PROVIDER),
       chopper(),
       nextJoints(),
-      latestJointAngles(),
+      latestJointAngles(Kinematics::NUM_JOINTS, 0.0f),
       currChoppedCommand(new ChoppedCommand()),
       headCommandQueue(),
       curMode(SCRIPTED),
@@ -146,57 +146,6 @@ void HeadProvider::setCommand(const HeadJointCommand::ptr command)
     setActive();
 }
 
-/**
- * @todo Right now, the CoordHeadCommand require information about
- *       the current "pose" (posture) of the robot, but this is
- *       not easily accessed at the moment.
- */
-
-/**
- * A coord command is really just a set command with extra computation
- * to find the destination angles. We calculate the angles and then
- * run like a set command.
- */
-// void HeadProvider::setCommand(const CoordHeadCommand::ptr command) {
-//     pthread_mutex_lock(&head_provider_mutex);
-
-//     transitionTo(SET);
-
-//     float relY = command->getRelY() - pose->getFocalPointInWorldFrameY();
-//     float relX = command->getRelX() - pose->getFocalPointInWorldFrameX();
-
-//     //adjust for robot center's distance above ground
-//     float relZ = (command->getRelZ() -
-//                   pose->getFocalPointInWorldFrameZ() -
-//                   pose->getBodyCenterHeight());
-
-//     yawDest = atan(relY/relX);
-
-//     float hypoDist = hypotf(relY, relX);
-
-//     pitchDest = -atan(relZ/hypoDist) -
-//         Kinematics::LOWER_CAMERA_ANGLE; //constant for lower camera
-
-//     yawMaxSpeed = command->getMaxSpeedYaw();
-//     pitchMaxSpeed = command->getMaxSpeedPitch();
-
-//     yawDest = Kinematics::boundHeadYaw(yawDest,pitchDest);
-
-//     yawMaxSpeed = clip(yawMaxSpeed,
-//                        0,
-//                        Kinematics::jointsMaxVelNominal
-//                        [Kinematics::HEAD_YAW] * 0.2f);
-//     pitchMaxSpeed = clip(pitchMaxSpeed,
-//                          0,
-//                          Kinematics::jointsMaxVelNominal
-//                          [Kinematics::HEAD_PITCH] * 0.2f);
-
-//     currHeadCommand = command;
-
-//     setActive();
-//     pthread_mutex_unlock(&head_provider_mutex);
-// }
-
 void HeadProvider::enqueueSequence(std::vector<HeadJointCommand::ptr> &seq)
 {
     // Take in vec of commands and enqueue them all
@@ -219,7 +168,7 @@ std::vector<float> HeadProvider::getCurrentHeads(std::vector<float>& sensorAngle
 {
     std::vector<float> currentHeads(HEAD_JOINTS);
 
-    for(unsigned int i = 0;i < HEAD_JOINTS; i++)
+    for(unsigned int i = 0; i < HEAD_JOINTS; i++)
     {
         currentHeads[i] = sensorAngles[i];
     }

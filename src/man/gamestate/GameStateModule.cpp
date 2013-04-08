@@ -59,13 +59,15 @@ void GameStateModule::update()
     if (switchTeamInput.message().toggle() != last_team)
     {
         last_team = !last_team;
-        if (!commInput.message().have_remote_gc())
+        if (!commInput.message().have_remote_gc()
+            && latest_data.state() == STATE_INITIAL)
             switchTeam();
     }
     if (switchKickOffInput.message().toggle() != last_kickoff)
     {
         last_kickoff = !last_kickoff;
-        if (!commInput.message().have_remote_gc())
+        if (!commInput.message().have_remote_gc()
+            && latest_data.state() == STATE_INITIAL)
             switchKickOff();
     }
     if (commInput.message().have_remote_gc())

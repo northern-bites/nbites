@@ -177,6 +177,7 @@ def executeMove(nav, sweetMove):
 
             # Mark this message for sending
             command.processed_by_motion = False
+            print("Sent a scripted move.")
 
         else:
             print("What kind of sweet ass-Move is this?")

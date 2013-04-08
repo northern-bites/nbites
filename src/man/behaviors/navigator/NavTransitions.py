@@ -14,12 +14,13 @@ def atDestination(nav):
     Takes into account loc uncertainty to check if we're at least close to
     the destination according to our belief
     """
-    relDest = helper.getRelativeDestination(nav.brain.my, states.goToPosition.dest)
-    my = nav.brain.my
+    relDest = helper.getRelativeDestination(nav.brain.loc, states.goToPosition.dest)
+    my = nav.brain.loc
     (x, y, h) = states.goToPosition.precision
 
     if (not helper.isDestinationRelative(states.goToPosition.dest)):
-        return relDest.within((x + my.uncertX, y + my.uncertY, h + my.uncertH))
+        # HACK HACK '30's below should be loc uncerts.
+        return relDest.within((x + 30, y + 30, h + 30))
     else:
         return relDest.within((x, y, h))
 
@@ -109,31 +110,31 @@ def shouldChaseAroundBox(my, ball):
 
     # 3 common, simple cases where we don't need to worry about the box.
     if my.x > NogginConstants.MY_GOALBOX_RIGHT_X:
-        if ball.loc.x > NogginConstants.MY_GOALBOX_RIGHT_X:
+        if ball.x > NogginConstants.MY_GOALBOX_RIGHT_X:
             return False
 
     if my.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
-        if ball.loc.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
+        if ball.y < NogginConstants.MY_GOALBOX_BOTTOM_Y:
             return False
 
     if my.y > NogginConstants.MY_GOALBOX_TOP_Y:
-        if ball.loc.y > NogginConstants.MY_GOALBOX_TOP_Y:
+        if ball.y > NogginConstants.MY_GOALBOX_TOP_Y:
             return False
 
     # handle more complex cases where correct behavior isn't obvious
     intersect = MyMath.linesIntersect
 
-    return ( intersect( my.x, my.y, ball.loc.x, ball.loc.y, # BOTTOM_GOALBOX_LINE
+    return ( intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_LEFT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-             intersect( my.x, my.y, ball.loc.x, ball.loc.y, # LEFT_GOALBOX_LINE
+             intersect( my.x, my.y, ball.x, ball.y, # LEFT_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,
                         NogginConstants.MY_GOALBOX_BOTTOM_Y) or
-             intersect( my.x, my.y, ball.loc.x, ball.loc.y, # BOTTOM_GOALBOX_LINE
+             intersect( my.x, my.y, ball.x, ball.y, # BOTTOM_GOALBOX_LINE
                         NogginConstants.MY_GOALBOX_LEFT_X,
                         NogginConstants.MY_GOALBOX_TOP_Y,
                         NogginConstants.MY_GOALBOX_RIGHT_X,

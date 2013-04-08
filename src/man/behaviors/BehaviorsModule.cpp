@@ -16,12 +16,13 @@ extern "C" void initGameState_proto();
 extern "C" void initVisionField_proto();
 extern "C" void initVisionRobot_proto();
 extern "C" void initWorldModel_proto();
+extern "C" void initRobotLocation_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
 extern "C" void initRobotLocation_proto();
 extern "C" void initSonarState_proto();
-extern "C" void initFootBumperState_proto();
+extern "C" void initButtonState_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -37,9 +38,9 @@ BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
       do_reload(0),
       pyInterface(),
       ledCommandOut(base()),
+      motionRequestOut(base()),
       bodyMotionCommandOut(base()),
-      headMotionCommandOut(base()),
-      motionRequestOut(base())
+      headMotionCommandOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
 
@@ -88,10 +89,11 @@ void BehaviorsModule::initializePython()
         initVisionRobot_proto();
         initWorldModel_proto();
         initBallModel_proto();
+        initRobotLocation_proto();
         initPMotion_proto();
         initMotionStatus_proto();
         initSonarState_proto();
-        initFootBumperState_proto();
+        initButtonState_proto();
         initRobotLocation_proto();
         // Init the interface as well
         initinterface();
@@ -251,6 +253,9 @@ void BehaviorsModule::prepareMessages()
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);
     pyInterface.setLedCommand_ptr(ledCommand.get());
+
+    motionRequest = portals::Message<messages::MotionRequest>(0);
+    pyInterface.setMotionRequest_ptr(motionRequest.get());
 
     bodyMotionCommand = portals::Message<messages::MotionCommand>(0);
     pyInterface.setBodyMotionCommand_ptr(bodyMotionCommand.get());

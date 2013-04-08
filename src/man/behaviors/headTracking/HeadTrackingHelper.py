@@ -2,7 +2,7 @@ from . import TrackingConstants as constants
 from .. import MotionConstants
 from ..util import MyMath as MyMath
 from .. import StiffnessModes
-from math import fabs
+from math import fabs, degrees
 import HeadMoves
 
 class HeadTrackingHelper(object):
@@ -76,7 +76,7 @@ class HeadTrackingHelper(object):
         headMovePitch = headMove[1][0][1]
 
         #TODO do this math in C++
-        curYaw = self.tracker.brain.interface.joints.head_yaw
+        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
         degreesPerSecond = 80 #fast, but hopefully won't destabilize the walk much
         yawDiff = MyMath.fabs(curYaw - headMoveYaw)
         totalTime = yawDiff/degreesPerSecond
@@ -96,8 +96,7 @@ class HeadTrackingHelper(object):
         headMoveYaw = headMove[0][0][0]
         headMovePitch = headMove[0][0][1]
 
-        motionAngles = self.tracker.brain.interface.joints
-        curYaw = self.tracker.brain.interface.joints.head_yaw
+        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
         degreesPerSecond = (headMoveYaw*2)/headMove[0][1]
         yawDiff = MyMath.fabs(curYaw-headMoveYaw)
         totalTime = yawDiff/degreesPerSecond
@@ -142,12 +141,11 @@ class HeadTrackingHelper(object):
 
         # Find the target's angular distance from the center of the screen
         # if we have an object, track that
-        changeX = target.vis.angleX
-        changeY = target.vis.angleY #the pitch is pos = down
+        changeX = target.vis.angle_x_deg
+        changeY = target.vis.angle_y_deg #the pitch is pos = down
 
-        motionAngles = self.tracker.brain.interface.joints
-        curYaw   = self.tracker.brain.interface.joints.head_yaw
-        curPitch = self.tracker.brain.interface.joints.head_pitch
+        curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
+        curPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
 
         maxChange = 13.0
 
@@ -183,24 +181,23 @@ class HeadTrackingHelper(object):
 
         # If we cannot see the target, abort.
         if not target or \
-                (target.loc.relX == 0.0 and target.loc.relY == 0.0) or \
-                (target.vis.framesOff > 0 and target.vis.framesOff < 3):
+                (target.rel_x == 0.0 and target.rel_y == 0.0) or \
+                (target.vis.frames_off > 0 and target.vis.frames_off < 3):
             return
 
         # If we haven't seen the target, look towards loc model.
-        if target.vis.framesOff > 3:
+        if target.vis.frames_off > 3:
             self.lookToPointFixedPitch(target)
             return
 
         # Assert: target is visible.
 
         # Find the target's angular distance from yaw center.
-        changeX = target.vis.angleX
+        changeX = target.vis.angle_x_deg
         # ignore changeY: pitch is fixed
 
-        motionAngles = self.tracker.brain.interface.joints
-        curYaw   = self.tracker.brain.interface.joints.head_yaw
-        curPitch = self.tracker.brain.interface.joints.head_pitch
+        curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
+        curPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
         maxChange = 13.0
 
         # Warning- no gain is applied currently!
@@ -228,14 +225,13 @@ class HeadTrackingHelper(object):
         """
         Uses setHeadCommands to bring given target to center of frame.
         """
-        motionAngles = self.tracker.brain.interface.joints
-        yaw = self.tracker.brain.interface.joints.head_yaw
-        pitch = self.tracker.brain.interface.joints.head_pitch
+        yaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+        pitch = degrees(self.tracker.brain.interface.joints.head_pitch)
 
         # Find the target's angular distance from the center of vision
         if not target is None and target.vis.on:
-            yaw += target.vis.angleX
-            pitch -= target.vis.angleY
+            yaw += target.vis.angle_x_deg
+            pitch -= target.vis.angle_y_deg
             #note: angleY is positive up from center of vision frame
             #note: angleX is positive left from center of vision frame
         else:
@@ -255,8 +251,8 @@ class HeadTrackingHelper(object):
         """
         Pan heads at appropriate speed to given heads
         """
-        headYaw = self.tracker.brain.interface.joints.head_yaw
-        headPitch = self.tracker.brain.interface.joints.head_pitch
+        headYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+        headPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
 
         yawDiff = fabs(heads[0] - headYaw)
         pitchDiff = fabs(heads[1] - headPitch)
@@ -276,10 +272,10 @@ class HeadTrackingHelper(object):
         if hasattr(target, "loc"):
             target = target.loc
 
-        print str(target.relX) + " " + str(target.relY)
+        print str(target.rel_x) + " " + str(target.rel_y)
 
-        headMove = motion.CoordHeadCommand(relX = target.relX,
-                                           relY = target.relY,
+        headMove = motion.CoordHeadCommand(relX = target.rel_x,
+                                           relY = target.rel_y,
                                            relZ = height)
 
         self.tracker.brain.motion.coordHead(headMove)
@@ -318,12 +314,12 @@ class HeadTrackingHelper(object):
                                StiffnessModes.LOW_HEAD_STIFFNESSES),))
 
     # Consider updating this for new loc and vision systems (summer 2012)
+    # Currently broken in Portals system.
     def calculateClosestLandmark(self):
         brain = self.tracker.brain
         posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]
 
-
-        currYaw = brain.interface.joints.head_yaw
+        currYaw = degrees(brain.interface.joints.head_yaw)
 
         minDiff = 1000000000
         bestPost = None

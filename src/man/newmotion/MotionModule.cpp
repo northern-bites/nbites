@@ -25,8 +25,7 @@ MotionModule::MotionModule()
       readyToSend(false),
       noWalkTransitionCommand(true)
 {
-    boost::shared_ptr<FreezeCommand> paralyze
-        = boost::shared_ptr<FreezeCommand>(new FreezeCommand());
+
 }
 
 MotionModule::~MotionModule()
@@ -127,7 +126,8 @@ void MotionModule::processStiffness()
         }
     }
 
-    if(curProvider->isActive()){
+    if(curProvider->isActive())
+    {
         const std::vector<float> llegStiffnesses =
             curProvider->getChainStiffnesses(Kinematics::LLEG_CHAIN);
 
@@ -178,7 +178,7 @@ bool MotionModule::postProcess()
 
     if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
     {
-        swapHeadProvider();
+         swapHeadProvider();
     }
 
     // Update sensors with the correct support foot because it may have
@@ -481,16 +481,32 @@ void MotionModule::safetyCheckJoints()
 
         const float allowedMotionDiffInRad = Kinematics::jointsMaxVelNoLoad[i];
         const float allowedSensorDiffInRad = allowedMotionDiffInRad*6.0f;
+       // std::cout << "nj before: " << nextJoints[i] << std::endl;
 
-        //considering checking which clip is more restrictive each frame and
-        //only applying it
-        nextJoints[i] = NBMath::clip(nextJoints[i],
-                                     lastJoints[i] - allowedMotionDiffInRad,
-                                     lastJoints[i] + allowedMotionDiffInRad);
+       //  //considering checking which clip is more restrictive each frame and
+       //  //only applying it
+       //  nextJoints[i] = NBMath::clip(nextJoints[i],
+       //                               lastJoints[i] - allowedMotionDiffInRad,
+       //                               lastJoints[i] + allowedMotionDiffInRad);
 
-        nextJoints[i] = NBMath::clip(nextJoints[i],
-                                     sensorAngles[i] - allowedSensorDiffInRad,
-                                     sensorAngles[i] + allowedSensorDiffInRad);
+       //  std::cout << "(nj, nj - amdir, lj + amdir) = "
+       //            << "(" << nextJoints[i] << ", "
+       //            << ", " << lastJoints[i] - allowedMotionDiffInRad
+       //            << ", " << lastJoints[i] + allowedMotionDiffInRad
+       //            << std::endl;
+
+       //  nextJoints[i] = NBMath::clip(nextJoints[i],
+       //                               sensorAngles[i] - allowedSensorDiffInRad,
+       //                               sensorAngles[i] + allowedSensorDiffInRad);
+
+       //  std::cout << "(nj, sa - asdir, sa + asdir) = "
+       //            << "(" << nextJoints[i] << ", "
+       //            << ", " << sensorAngles[i] - allowedSensorDiffInRad
+       //            << ", " << sensorAngles[i] + allowedSensorDiffInRad
+       //            << std::endl;
+
+       //  std::cout << "nj after: " << nextJoints[i] << std::endl;
+       //  std::cout << std::endl;
 
         lastJoints[i] = nextJoints[i];
     }
@@ -504,8 +520,6 @@ void MotionModule::swapBodyProvider()
 {
     std::vector<BodyJointCommand::ptr> transitions;
     std::string old_provider = curProvider->getName();
-    std::cout << "(MotionModule) Last provider: "
-              << old_provider << "." << std::endl;
 
     switch(nextProvider->getType())
     {
@@ -654,7 +668,6 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
         std::vector<float> angles(26, 0.f);
         std::vector<float> stiffness(26, 0.f);
 
-        // populate vectors
         // Script angles are given in degrees, convert to Radians
         angles[0] = TO_RAD * script.command(i).angles().l_shoulder_pitch();
         angles[1] = TO_RAD * script.command(i).angles().l_shoulder_roll();
@@ -723,6 +736,10 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 
 void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
 {
+    std::cout << "Set head to (yaw, pitch) = ("
+              << command->getYaw() << ", "
+              << command->getPitch() << ")"
+              << std::endl;
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
@@ -758,7 +775,7 @@ void MotionModule::sendMotionCommand(const HeadJointCommand::ptr command)
     headProvider.setCommand(command);
 }
 
-void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand& script)
+void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
 {
     nextHeadProvider = &headProvider;
     // Create a command for every Body Joint Command
@@ -810,6 +827,7 @@ void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand& script
             );
 
         headProvider.setCommand(newCommand);
+        std::cout << "ADDED CMD " << i << std::endl;
     }
 }
 
@@ -824,10 +842,12 @@ void MotionModule::sendMotionCommand(const FreezeCommand::ptr command)
 
 void MotionModule::sendMotionCommand(const UnfreezeCommand::ptr command)
 {
-    if(curHeadProvider == &nullHeadProvider){
+    if(curHeadProvider == &nullHeadProvider)
+    {
         nullHeadProvider.setCommand(command);
     }
-    if(curProvider == &nullBodyProvider){
+    if(curProvider == &nullBodyProvider)
+    {
         nullBodyProvider.setCommand(command);
     }
 }

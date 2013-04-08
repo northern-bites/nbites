@@ -110,6 +110,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+    ballTrack.localizationInput.wireTo(&localization.output);
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
@@ -144,6 +145,15 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
 
     startSubThreads();
+
+    motion::SetHeadCommand::ptr shc(
+        new motion::SetHeadCommand(40.0f * TO_RAD,
+                                   10.0f * TO_RAD)
+        );
+
+    motion.start();
+
+    motion.sendMotionCommand(shc);
 }
 
 Man::~Man()

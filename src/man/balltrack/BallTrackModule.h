@@ -10,6 +10,7 @@
 
 #include "RoboGrams.h"
 #include "BallModel.pb.h"
+#include "RobotLocation.pb.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -25,6 +26,7 @@ public:
     ~BallTrackModule();
 
     portals::InPortal<messages::VisionBall> visionBallInput;
+    portals::InPortal<messages::RobotLocation> localizationInput;
     portals::OutPortal<messages::FilteredBall> ballLocationOutput;
 
 protected:
