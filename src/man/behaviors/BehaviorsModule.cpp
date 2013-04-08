@@ -22,7 +22,7 @@ extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
 extern "C" void initRobotLocation_proto();
 extern "C" void initSonarState_proto();
-extern "C" void initFootBumperState_proto();
+extern "C" void initButtonState_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -93,7 +93,7 @@ void BehaviorsModule::initializePython()
         initPMotion_proto();
         initMotionStatus_proto();
         initSonarState_proto();
-        initFootBumperState_proto();
+        initButtonState_proto();
         initRobotLocation_proto();
         // Init the interface as well
         initinterface();
