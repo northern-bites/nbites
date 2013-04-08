@@ -8,7 +8,7 @@ DEBUG = False
 
 def ballTracking(tracker):
     '''Super state which handles following/refinding the ball'''
-    if tracker.target.vis.framesOff <= \
+    if tracker.target.vis.frames_off <= \
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('tracking')
     else:
@@ -43,7 +43,7 @@ def tracking(tracker):
 
     if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
-        if tracker.target.vis.framesOff > \
+        if tracker.target.vis.frames_off > \
                 constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
             return tracker.goLater('ballTracking')
         return tracker.stay()
@@ -61,7 +61,7 @@ def trackingFixedPitch(tracker):
 
     if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
-        if tracker.target.vis.framesOff > \
+        if tracker.target.vis.frames_off > \
                 constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
             return tracker.goLater(tracker.lastDiffState)
 
@@ -69,7 +69,7 @@ def trackingFixedPitch(tracker):
 
 def ballSpinTracking(tracker):
 #    '''Super state which handles following/refinding the ball'''
-#    if tracker.target.vis.framesOff <= \
+#    if tracker.target.vis.frames_off <= \
 #            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
 #        return tracker.goNow('tracking')
 #    else:
@@ -98,7 +98,7 @@ def activeTracking(tracker):
     else:
         tracker.shouldStareAtBall = 0
 
-    if tracker.target.vis.framesOff > \
+    if tracker.target.vis.frames_off > \
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH and \
             tracker.counter > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goLater('activeLocScan')

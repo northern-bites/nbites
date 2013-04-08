@@ -61,7 +61,7 @@ def relocalize(player):
     else:
         player.shouldRelocalizeCounter = 0
 
-    if not player.brain.motion.isHeadActive():
+    if not player.brain.motion.head_is_active:
         player.brain.tracker.repeatWidePanFixedPitch()
 
 #    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:

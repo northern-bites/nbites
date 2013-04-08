@@ -69,7 +69,7 @@ def shouldChase(team):
     if (team.brain.player.penaltyKicking):
         return False
 
-    if (ball.vis.framesOff > goalCon.BALL_LOST):
+    if (ball.vis.frames_off > goalCon.BALL_LOST):
         return False
 
     if (ball.loc.x < goalCon.CHASE_RIGHT_X_LIMIT - goalCon.CHASE_BUFFER
@@ -94,7 +94,7 @@ def shouldStopChase(team):
     ball= team.brain.ball
     my = team.brain.my
 
-    if(ball.vis.framesOff > goalCon.BALL_LOST):
+    if(ball.vis.frames_off > goalCon.BALL_LOST):
         team.resetGoalieRoleCounters()
         return True
 
@@ -125,7 +125,7 @@ def shouldPositionCenter(team):
 
     ball = team.brain.ball
 
-    if ball.vis.framesOff > goalCon.BALL_LOST:
+    if ball.vis.frames_off > goalCon.BALL_LOST:
         team.resetGoalieRoleCounters()
         return True
 
@@ -143,7 +143,7 @@ def shouldPositionRight(team):
 
     ball = team.brain.ball
 
-    if ball.vis.framesOff > goalCon.BALL_LOST:
+    if ball.vis.frames_off > goalCon.BALL_LOST:
         return False
 
     if (ball.loc.y < goalCon.CHASE_LOWER_Y_LIMIT + goalCon.CHASE_BUFFER
@@ -162,7 +162,7 @@ def shouldPositionLeft(team):
 
     ball = team.brain.ball
 
-    if ball.vis.framesOff > goalCon.BALL_LOST:
+    if ball.vis.frames_off > goalCon.BALL_LOST:
         return False
 
     if (ball.loc.y > goalCon.CHASE_UPPER_Y_LIMIT + goalCon.CHASE_BUFFER

@@ -33,7 +33,7 @@ def gamePlaying(player):
             player.brain.nav.stand()
 
     # if ball comes close enough, kick it away.
-    if player.brain.ball.vis.framesOn > 5 and \
+    if player.brain.ball.vis.frames_on > 5 and \
             player.brain.ball.vis.dist < 17:
         return player.goLater('kickBall')
 

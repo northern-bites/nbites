@@ -26,7 +26,7 @@ def afterPenalty(player):
 
     # Would be great if loc worked. Hacked out for US OPEN 2012
     """
-    if not player.brain.motion.isHeadActive():
+    if not player.brain.motion.head_is_active:
         ##looking to the side
         if player.brain.yglp.vis.on or player.brain.ygrp.vis.on:
             #see the goal posts in multiple frames for safety
@@ -114,7 +114,7 @@ def penaltyRelocalize(player):
     if player.firstFrame():
         player.setWalk(1, 0, 0)
 
-    if player.brain.ball.vis.framesOn >= OBJ_SEEN_THRESH:
+    if player.brain.ball.vis.frames_on >= OBJ_SEEN_THRESH:
         player.brain.tracker.trackBallFixedPitch()
         return player.goLater(gcState)
 
@@ -128,7 +128,7 @@ def penaltyRelocalize(player):
     else:
         player.shouldRelocalizeCounter = 0
 
-    if not player.brain.motion.isHeadActive():
+    if not player.brain.motion.head_is_active:
         player.brain.tracker.repeatWidePanFixedPitch()
 
     return player.stay()

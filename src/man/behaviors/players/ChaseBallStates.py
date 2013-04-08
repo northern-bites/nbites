@@ -178,7 +178,7 @@ def lookAround(player):
         player.brain.tracker.repeatBasicPanFixedPitch()
 
     # Make sure we leave this state...
-    if player.brain.ball.vis.framesOff > 200:
+    if player.brain.ball.vis.frames_off > 200:
         return player.goLater('chase')
 
     if player.brain.tracker.isStopped() and player.counter > 2:

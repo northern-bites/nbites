@@ -126,7 +126,7 @@ class HeadTracking(FSA.FSA):
         """
         # HACK
         self.switchTo('stopped')
-        self.brain.motion.stopHeadMoves()
+        self.stopHeadMoves()
         self.helper.lookToAngleFixedPitch(yaw)
 
     def lookStraightThenTrackFixedPitch(self):

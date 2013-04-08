@@ -85,7 +85,7 @@ def gaurd(player):
         print "become a chaser!" #/* ** */ ADD CHASER CODE
 
     # Is the ball nearby? Omni approach it.
-    if player.brain.ball.vis.framesOn > 4 and \
+    if player.brain.ball.vis.frames_on > 4 and \
             player.brain.ball.vis.dist < 150:
         return player.goLater('omniApproach')
 

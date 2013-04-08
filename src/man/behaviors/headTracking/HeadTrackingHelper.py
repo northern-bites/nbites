@@ -132,10 +132,10 @@ class HeadTrackingHelper(object):
             return
 
         # If we haven't seen the object in the very recent past, look
-        # towards where the model says it is. The framesOff > 3
+        # towards where the model says it is. The frames_off > 3
         # provides a buffer to ensure that it's not just a flickering
         # image problem (prevents twitchy robot)
-        if target.vis.framesOff > 3:
+        if target.vis.frames_off > 3:
             self.lookToPoint(target)
             return
 
@@ -303,7 +303,7 @@ class HeadTrackingHelper(object):
     def lookToAngleFixedPitch(self, yaw):
         """
         Looks to the given yaw at the appropriate fixed pitch.
-        NOTE: should call brain.motion.stopHeadMoves() first!
+        NOTE: should call brain.tracker.stopHeadMoves() first!
         """
         if yaw > 55 or yaw < -55:
             pitch = 11.0
