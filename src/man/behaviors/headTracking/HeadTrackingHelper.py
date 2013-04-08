@@ -75,8 +75,8 @@ class HeadTrackingHelper(object):
         headMoveYaw = headMove[1][0][0]
         headMovePitch = headMove[1][0][1]
 
-        motionAngles = self.tracker.brain.sensors.motionAngles
-        curYaw = motionAngles[MotionConstants.HeadYaw]
+        #TODO do this math in C++
+        curYaw = self.tracker.brain.interface.joints.head_yaw
         degreesPerSecond = 80 #fast, but hopefully won't destabilize the walk much
         yawDiff = MyMath.fabs(curYaw - headMoveYaw)
         totalTime = yawDiff/degreesPerSecond
@@ -96,8 +96,8 @@ class HeadTrackingHelper(object):
         headMoveYaw = headMove[0][0][0]
         headMovePitch = headMove[0][0][1]
 
-        motionAngles = self.tracker.brain.sensors.motionAngles
-        curYaw = motionAngles[MotionConstants.HeadYaw]
+        motionAngles = self.tracker.brain.interface.joints
+        curYaw = self.tracker.brain.interface.joints.head_yaw
         degreesPerSecond = (headMoveYaw*2)/headMove[0][1]
         yawDiff = MyMath.fabs(curYaw-headMoveYaw)
         totalTime = yawDiff/degreesPerSecond
@@ -145,9 +145,9 @@ class HeadTrackingHelper(object):
         changeX = target.vis.angleX
         changeY = target.vis.angleY #the pitch is pos = down
 
-        motionAngles = self.tracker.brain.sensors.motionAngles
-        curPitch = motionAngles[MotionConstants.HeadPitch]
-        curYaw = motionAngles[MotionConstants.HeadYaw]
+        motionAngles = self.tracker.brain.interface.joints
+        curYaw   = self.tracker.brain.interface.joints.head_yaw
+        curPitch = self.tracker.brain.interface.joints.head_pitch
 
         maxChange = 13.0
 
@@ -198,10 +198,9 @@ class HeadTrackingHelper(object):
         changeX = target.vis.angleX
         # ignore changeY: pitch is fixed
 
-        motionAngles = self.tracker.brain.sensors.motionAngles
-        curPitch = motionAngles[MotionConstants.HeadPitch]
-        curYaw = motionAngles[MotionConstants.HeadYaw]
-
+        motionAngles = self.tracker.brain.interface.joints
+        curYaw   = self.tracker.brain.interface.joints.head_yaw
+        curPitch = self.tracker.brain.interface.joints.head_pitch
         maxChange = 13.0
 
         # Warning- no gain is applied currently!
@@ -229,9 +228,9 @@ class HeadTrackingHelper(object):
         """
         Uses setHeadCommands to bring given target to center of frame.
         """
-        motionAngles = self.tracker.brain.sensors.motionAngles
-        yaw = motionAngles[MotionConstants.HeadYaw]
-        pitch = motionAngles[MotionConstants.HeadPitch]
+        motionAngles = self.tracker.brain.interface.joints
+        yaw = self.tracker.brain.interface.joints.head_yaw
+        pitch = self.tracker.brain.interface.joints.head_pitch
 
         # Find the target's angular distance from the center of vision
         if not target is None and target.vis.on:
@@ -256,10 +255,8 @@ class HeadTrackingHelper(object):
         """
         Pan heads at appropriate speed to given heads
         """
-        motionAngles = self.tracker.brain.sensors.motionAngles
-
-        headPitch = motionAngles[MotionConstants.HeadPitch]
-        headYaw = motionAngles[MotionConstants.HeadYaw]
+        headYaw = self.tracker.brain.interface.joints.head_yaw
+        headPitch = self.tracker.brain.interface.joints.head_pitch
 
         yawDiff = fabs(heads[0] - headYaw)
         pitchDiff = fabs(heads[1] - headPitch)
@@ -325,7 +322,8 @@ class HeadTrackingHelper(object):
         brain = self.tracker.brain
         posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]
 
-        currYaw = brain.sensors.motionAngles[MotionConstants.HeadYaw]
+
+        currYaw = brain.interface.joints.head_yaw
 
         minDiff = 1000000000
         bestPost = None

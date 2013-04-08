@@ -25,8 +25,10 @@ class PyInterface
 {
 public:
     messages::GameState       const * gameState_ptr;
+    messages::RobotLocation   const * loc_ptr;
     messages::VisionRobot     const * visionRobot_ptr;
     messages::VisionField     const * visionField_ptr;
+    messages::VisionObstacle  const * visionObstacle_ptr;
     messages::FilteredBall    const * filteredBall_ptr;
     messages::LedCommand      const * ledCommand_ptr;
     messages::WorldModel      const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -37,10 +39,15 @@ public:
     messages::RobotLocation     const * odometry_ptr;
     messages::SonarState        const * sonarState_ptr;
     messages::FootBumperState   const * footBumperState_ptr;
+    messages::JointAngles       const * joints_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
         gameState_ptr = msg;
+    }
+    void setLoc_ptr(const messages::RobotLocation* msg)
+    {
+        loc_ptr = msg;
     }
     void setVisionRobot_ptr(const messages::VisionRobot* msg)
     {
@@ -49,6 +56,10 @@ public:
     void setVisionField_ptr(const messages::VisionField* msg)
     {
         visionField_ptr = msg;
+    }
+    void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
+    {
+        visionObstacle_ptr = msg;
     }
     void setFilteredBall_ptr(const messages::FilteredBall* msg)
     {
@@ -97,6 +108,10 @@ public:
     void setFootBumperState_ptr(const messages::FootBumperState* msg)
     {
         footBumperState_ptr = msg;
+    }
+    void setJoints_ptr(const messages::JointAngles* msg)
+    {
+        joints_ptr = msg;
     }
 
 };

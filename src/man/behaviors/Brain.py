@@ -13,7 +13,6 @@ import noggin_constants as Constants
 # Modules from this directory
 from . import Leds
 from . import robots
-from . import MyInfo
 from . import GameController
 
 # Packages and modules from sub-directories
@@ -24,7 +23,7 @@ from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
 
-#from objects import (FieldObject)
+from objects import RobotLocation
 
 # Import message protocol buffers and interface
 import interface
@@ -55,8 +54,6 @@ class Brain(object):
 
         self.counter = 0
         self.time = time.time()
-
-        self.my = MyInfo.MyInfo()
 
         #initalize the leds and game controller
         self.leds = Leds.Leds(self)
@@ -138,6 +135,7 @@ class Brain(object):
         self.updateVisionObjects()
         self.updateMotion()
         self.getCommUpdate()
+        self.updateLoc()
 
         # Behavior stuff
         self.gameController.run()
@@ -174,15 +172,6 @@ class Brain(object):
         """
         self.playbook.update(self.play)
 
-    # move to comm
-    # def setCommData(self):
-    #     # Team color, team number, and player number are all appended to this
-    #     # list by the underlying comm module implemented in C++
-    #     loc = self.loc
-    #     self.comm.setData(self.my.playerNumber,
-    #                       self.play.role, self.play.subRole,
-    #                       self.playbook.pb.me.chaseTime)
-
     def activeTeamMates(self):
         activeMates = 0
         for i in xrange(Constants.NUM_PLAYERS_PER_TEAM):
@@ -190,6 +179,14 @@ class Brain(object):
             if mate.active:
                 activeMates += 1
         return activeMates
+
+    def updateLoc(self):
+        """
+        Make Loc info a RobotLocation.
+        """
+        self.loc = RobotLocation(self.interface.loc.x,
+                                 self.interface.loc.y,
+                                 self.interface.loc.h)
 
     def resetInitialLocalization(self):
         """
@@ -257,7 +254,7 @@ class Brain(object):
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
-# #            if self.my.playerNumber == 1:
+# #            if self.playerNumber == 1:
 # #                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
 # #                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
 # #                                    Constants.HEADING_UP)

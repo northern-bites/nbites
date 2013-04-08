@@ -213,11 +213,17 @@ void BehaviorsModule::prepareMessages()
     gameStateIn.latch();
     pyInterface.setGameState_ptr(&gameStateIn.message());
 
+    localizationIn.latch();
+    pyInterface.setLoc_ptr(&localizationIn.message());
+
     visionFieldIn.latch();
     pyInterface.setVisionField_ptr(&visionFieldIn.message());
 
     visionRobotIn.latch();
     pyInterface.setVisionRobot_ptr(&visionRobotIn.message());
+
+    visionObstacleIn.latch();
+    pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
 
     filteredBallIn.latch();
     pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
@@ -238,6 +244,9 @@ void BehaviorsModule::prepareMessages()
 
     footBumperStateIn.latch();
     pyInterface.setFootBumperState_ptr(&footBumperStateIn.message());
+
+    jointsIn.latch();
+    pyInterface.setJoints_ptr(&jointsIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);

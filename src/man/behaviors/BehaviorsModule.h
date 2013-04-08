@@ -79,11 +79,14 @@ public:
     portals::InPortal<messages::MotionStatus> motionStatusIn;
     portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::SonarState> sonarStateIn;
+    portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
     portals::InPortal<messages::VisionField> visionFieldIn;
     portals::InPortal<messages::VisionRobot> visionRobotIn;
+    portals::InPortal<messages::VisionObstacle> visionObstacleIn;
     portals::InPortal<messages::FootBumperState> footBumperStateIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
+    portals::InPortal<messages::JointAngles> jointsIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;

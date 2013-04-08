@@ -30,7 +30,7 @@ def goToPosition(nav):
     For relative locations we use our bearing to that point as the heading
     """
 
-    relDest = helper.getRelativeDestination(nav.brain.my, goToPosition.dest)
+    relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
     goToPosition.deltaDest = relDest # cache it for later use
 
 #    if nav.counter % 10 is 0:
