@@ -27,6 +27,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::gameState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("loc",
+                      make_getter(&PyInterface::loc_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         .add_property("visionRobot",
                       make_getter(&PyInterface::visionRobot_ptr,
                                   return_value_policy
@@ -37,10 +41,6 @@ BOOST_PYTHON_MODULE(interface)
                                   <reference_existing_object>()))
         .add_property("visionObstacle",
                       make_getter(&PyInterface::visionObstacle_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
-        .add_property("robotLocation",
-                      make_getter(&PyInterface::robotLocation_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         .add_property("filteredBall",
@@ -80,8 +80,8 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::footBumperState_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("jointAngles",
-                      make_getter(&PyInterface::jointAngles_ptr,
+        .add_property("joints",
+                      make_getter(&PyInterface::joints_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         ;

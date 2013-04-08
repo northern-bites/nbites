@@ -238,9 +238,7 @@ void HeadProvider::transitionTo(HeadMode newMode)
     }
     else
     {
-        std::cout << "No transition need to get to: "
-                  << curMode
-                  << std::endl;
+        // No transition required.
     }
 }
 

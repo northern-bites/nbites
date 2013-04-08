@@ -24,7 +24,6 @@ from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
 
-
 # Import message protocol buffers and interface
 import interface
 import LedCommand_proto
@@ -134,12 +133,13 @@ class Brain(object):
         self.updateMotion()
         self.updateLoc()
         self.getCommUpdate()
+        self.updateLoc()
 
         # Behavior stuff
         self.gameController.run()
         #self.updatePlaybook()
         self.player.run()
-        #self.tracker.run()
+        self.tracker.run()
         self.nav.run()
 
         #Set LED message
@@ -180,12 +180,11 @@ class Brain(object):
 
     def updateLoc(self):
         """
-        Update brain's loc reference
+        Make Loc info a RobotLocation.
         """
-        self.loc = RobotLocation(self.interface.robotLocation.x,
-                                 self.interface.robotLocation.y,
-                                 self.interface.robotLocation.h )
-
+        self.loc = RobotLocation(self.interface.loc.x,
+                                 self.interface.loc.y,
+                                 self.interface.loc.h)
 
     def resetInitialLocalization(self):
         """
@@ -253,7 +252,7 @@ class Brain(object):
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
         if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
-# #            if self.my.playerNumber == 1:
+# #            if self.playerNumber == 1:
 # #                self.loc.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
 # #                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
 # #                                    Constants.HEADING_UP)

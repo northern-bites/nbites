@@ -3,7 +3,8 @@
 #include <iostream>
 #include "RobotConfig.h"
 
-SET_POOL_SIZE(messages::WorldModel, 15);
+SET_POOL_SIZE(messages::WorldModel,  15);
+SET_POOL_SIZE(messages::JointAngles, 15);
 
 namespace man {
 
@@ -58,7 +59,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     motion.stiffnessInput_.wireTo(&guardian.stiffnessControlOutput, true);
     motion.bodyCommandInput_.wireTo(&behaviors.bodyMotionCommandOut, true);
     motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
-    motion.motionRequestInput_.wireTo(&behaviors.motionRequestOut, true);
+    motion.requestInput_.wireTo(&behaviors.motionRequestOut, true);
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
@@ -125,6 +126,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
     behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
+    behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);

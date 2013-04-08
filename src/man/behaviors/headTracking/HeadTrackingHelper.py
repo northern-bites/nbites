@@ -16,50 +16,54 @@ class HeadTrackingHelper(object):
 
         for position in headMove:
             if len(position) == 4:
-                headJoints = command.scripted_command.add_commands()
+                move = command.scripted_command.add_command()
 
-                headJoints.time = position[1]
+                # Set most recent command
+                move.time = position[1]
                 if position[2] == 1:
-                    headJoints.interpolation = headJoints.InterpolationType.LINEAR
+                    move.interpolation = move.InterpolationType.LINEAR
                 else:
-                    headJoints.interpolation = headJoints.InterpolationType.SMOOTH
+                    move.interpolation = move.InterpolationType.SMOOTH
 
-                # Only set the head angles, since this command never sets any other angles
-                headJoints.angles.head_yaw = position[0][0]
-                headJoints.angles.head_pitch = position[0][1]
+                # Only set the head angles
+                move.angles.head_yaw   = position[0][0]
+                move.angles.head_pitch = position[0][1]
 
                 # Set all stiffnesses, since this command specifies them all
-                headJoints.stiffness.head_yaw =         position[3][0]
-                headJoints.stiffness.head_pitch =       position[3][1]
+                move.stiffness.head_yaw =         position[3][0]
+                move.stiffness.head_pitch =       position[3][1]
 
-                headJoints.stiffness.l_shoulder_pitch = position[3][2]
-                headJoints.stiffness.l_shoulder_roll =  position[3][3]
-                headJoints.stiffness.l_elbow_yaw =      position[3][4]
-                headJoints.stiffness.l_elbow_roll =     position[3][5]
+                move.stiffness.l_shoulder_pitch = position[3][2]
+                move.stiffness.l_shoulder_roll =  position[3][3]
+                move.stiffness.l_elbow_yaw =      position[3][4]
+                move.stiffness.l_elbow_roll =     position[3][5]
 
-                headJoints.stiffness.r_shoulder_pitch = position[3][18]
-                headJoints.stiffness.r_shoulder_roll =  position[3][19]
-                headJoints.stiffness.r_elbow_yaw =      position[3][20]
-                headJoints.stiffness.r_elbow_roll =     position[3][21]
+                move.stiffness.r_shoulder_pitch = position[3][18]
+                move.stiffness.r_shoulder_roll =  position[3][19]
+                move.stiffness.r_elbow_yaw =      position[3][20]
+                move.stiffness.r_elbow_roll =     position[3][21]
 
-                headJoints.stiffness.l_hip_yaw_pitch =  position[3][6]
-                headJoints.stiffness.l_hip_roll =       position[3][7]
-                headJoints.stiffness.l_hip_pitch =      position[3][8]
-                headJoints.stiffness.l_knee_pitch =     position[3][9]
-                headJoints.stiffness.l_ankle_pitch =    position[3][10]
-                headJoints.stiffness.l_ankle_roll =     position[3][11]
+                move.stiffness.l_hip_yaw_pitch =  position[3][6]
+                move.stiffness.l_hip_roll =       position[3][7]
+                move.stiffness.l_hip_pitch =      position[3][8]
+                move.stiffness.l_knee_pitch =     position[3][9]
+                move.stiffness.l_ankle_pitch =    position[3][10]
+                move.stiffness.l_ankle_roll =     position[3][11]
 
-                headJoints.stiffness.r_hip_yaw_pitch =  position[3][12]
-                headJoints.stiffness.r_hip_roll =       position[3][13]
-                headJoints.stiffness.r_hip_pitch =      position[3][14]
-                headJoints.stiffness.r_knee_pitch =     position[3][15]
-                headJoints.stiffness.r_ankle_pitch =    position[3][16]
-                headJoints.stiffness.r_ankle_roll =     position[3][17]
+                move.stiffness.r_hip_yaw_pitch =  position[3][12]
+                move.stiffness.r_hip_roll =       position[3][13]
+                move.stiffness.r_hip_pitch =      position[3][14]
+                move.stiffness.r_knee_pitch =     position[3][15]
+                move.stiffness.r_ankle_pitch =    position[3][16]
+                move.stiffness.r_ankle_roll =     position[3][17]
 
             else:
                 self.tracker.printf("What kind of sweet ass-Move is this?")
 
-        command.process_by_motion = False
+        command.processed_by_motion = False
+        # Returns the last HJC in the HeadMove for keeping track of
+        # when a move is done
+        return move
 
     def startingPan(self, headMove):
         """Calculates the first part of a fixed pitch pan to get there quickly."""
@@ -71,7 +75,8 @@ class HeadTrackingHelper(object):
         headMoveYaw = headMove[1][0][0]
         headMovePitch = headMove[1][0][1]
 
-        curYaw = degrees(self.tracker.brain.interface.jointAngles.head_yaw)
+        #TODO do this math in C++
+        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
         degreesPerSecond = 80 #fast, but hopefully won't destabilize the walk much
         yawDiff = MyMath.fabs(curYaw - headMoveYaw)
         totalTime = yawDiff/degreesPerSecond
@@ -91,7 +96,7 @@ class HeadTrackingHelper(object):
         headMoveYaw = headMove[0][0][0]
         headMovePitch = headMove[0][0][1]
 
-        curYaw = degrees(self.tracker.brain.interface.jointAngles.head_yaw)
+        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
         degreesPerSecond = (headMoveYaw*2)/headMove[0][1]
         yawDiff = MyMath.fabs(curYaw-headMoveYaw)
         totalTime = yawDiff/degreesPerSecond
@@ -139,8 +144,8 @@ class HeadTrackingHelper(object):
         changeX = target.vis.angle_x_deg
         changeY = target.vis.angle_y_deg #the pitch is pos = down
 
-        curPitch = degrees(self.tracker.brain.interface.jointAngles.head_pitch)
-        curYaw   = degrees(self.tracker.brain.interface.jointAngles.head_yaw)
+        curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
+        curPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
 
         maxChange = 13.0
 
@@ -157,14 +162,14 @@ class HeadTrackingHelper(object):
 
         # Set message fields
         command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.SET_HEAD_COMMAND
+        command.type = command.CommandType.POS_HEAD_COMMAND
 
-        command.set_command.head_yaw = newYaw
-        command.set_command.head_pitch = newPitch
-        command.set_command.max_speed_yaw = maxSpeed
-        command.set_command.max_speed_pitch = maxSpeed
+        command.pos_command.head_yaw = newYaw
+        command.pos_command.head_pitch = newPitch
+        command.pos_command.max_speed_yaw = maxSpeed
+        command.pos_command.max_speed_pitch = maxSpeed
 
-        command.process_by_motion = False
+        command.processed_by_motion = False
 
     # Fixed Pitch
     def trackObjectFixedPitch(self):
@@ -191,9 +196,8 @@ class HeadTrackingHelper(object):
         changeX = target.vis.angle_x_deg
         # ignore changeY: pitch is fixed
 
-        curPitch = degrees(self.tracker.brain.interface.jointAngles.head_pitch)
-        curYaw =   degrees(self.tracker.brain.interface.jointAngles.head_yaw)
-
+        curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
+        curPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
         maxChange = 13.0
 
         # Warning- no gain is applied currently!
@@ -207,22 +211,22 @@ class HeadTrackingHelper(object):
 
         # Set message fields
         command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.SET_HEAD_COMMAND
+        command.type = command.CommandType.POS_HEAD_COMMAND
 
-        command.set_command.head_yaw = newYaw
-        command.set_command.head_pitch = 20.0 # MAKE A CONSTANT FOR THIS
-        command.set_command.max_speed_yaw = maxSpeed
-        command.set_command.max_speed_pitch = maxSpeed
+        command.pos_command.head_yaw = newYaw
+        command.pos_command.head_pitch = 20.0 # MAKE A CONSTANT FOR THIS
+        command.pos_command.max_speed_yaw = maxSpeed
+        command.pos_command.max_speed_pitch = maxSpeed
 
-        command.process_by_motion = False
+        command.processed_by_motion = False
 
     # Not called anywhere in the code.
     def lookToTargetAngles(self, target):
         """
         Uses setHeadCommands to bring given target to center of frame.
         """
-        pitch = degrees(self.tracker.brain.interface.jointAngles.head_pitch)
-        yaw =   degrees(self.tracker.brain.interface.jointAngles.head_yaw)
+        yaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+        pitch = degrees(self.tracker.brain.interface.joints.head_pitch)
 
         # Find the target's angular distance from the center of vision
         if not target is None and target.vis.on:
@@ -236,19 +240,19 @@ class HeadTrackingHelper(object):
 
         # Set message fields
         command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.SET_HEAD_COMMAND
+        command.type = command.CommandType.POS_HEAD_COMMAND
 
-        command.set_command.head_yaw = yaw
-        command.set_command.head_pitch = pitch
+        command.pos_command.head_yaw = yaw
+        command.pos_command.head_pitch = pitch
         # Leave max speeds to default
-        command.process_by_motion = False
+        command.processed_by_motion = False
 
     def panTo(self, heads):
         """
         Pan heads at appropriate speed to given heads
         """
-        headPitch = degrees(self.tracker.brain.interface.jointAngles.head_pitch)
-        headYaw =   degrees(self.tracker.brain.interface.jointAngles.head_yaw)
+        headYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
+        headPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
 
         yawDiff = fabs(heads[0] - headYaw)
         pitchDiff = fabs(heads[1] - headPitch)
@@ -258,6 +262,7 @@ class HeadTrackingHelper(object):
         self.executeHeadMove(((heads, panTime, 0,
                                StiffnessModes.LOW_HEAD_STIFFNESSES), ))
 
+    # Unsafe to call... TODO: CoordHeadCommands for messages.
     def lookToPoint(self, target):
         if hasattr(target, "height"):
             height = target.height
@@ -294,14 +299,6 @@ class HeadTrackingHelper(object):
         else:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
-    # broken?
-    # Not called anywhere in code.
-    # Unsafe to call as of 4/5/2013
-    def lookToAngles(self, yaw=0, pitch=0):
-        headMove = motion.SetHeadCommand(MyMath.degrees(yaw),
-                                         MyMath.degrees(pitch))
-        self.tracker.brain.motion.setHead(headMove)
-
     # Fixed Pitch
     def lookToAngleFixedPitch(self, yaw):
         """
@@ -322,7 +319,7 @@ class HeadTrackingHelper(object):
         brain = self.tracker.brain
         posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]
 
-        currYaw = degrees(self.tracker.brain.interface.jointAngles.head_yaw)
+        currYaw = degrees(brain.interface.joints.head_yaw)
 
         minDiff = 1000000000
         bestPost = None
@@ -334,13 +331,3 @@ class HeadTrackingHelper(object):
                 bestPost = p
                 minDiff = diff
         return bestPost
-
-    # Debug method to print current head pitch and yaw.
-    def printHeadAngles(self):
-        headPitch = self.tracker.brain.interface.jointAngles.head_pitch
-        yawPitch = self.tracker.brain.interface.jointAngles.head_yaw
-
-        self.tracker.printf("Head pitch is:")
-        self.tracker.printf(curPitch)
-        self.tracker.printf("Head yaw is:")
-        self.tracker.printf(curYaw)

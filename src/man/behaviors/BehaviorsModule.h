@@ -79,6 +79,7 @@ public:
     portals::InPortal<messages::MotionStatus> motionStatusIn;
     portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::SonarState> sonarStateIn;
+    portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
     portals::InPortal<messages::VisionField> visionFieldIn;
     portals::InPortal<messages::VisionRobot> visionRobotIn;
@@ -86,17 +87,18 @@ public:
     portals::InPortal<messages::FootBumperState> footBumperStateIn;
     portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
-    portals::InPortal<messages::JointAngles> jointAnglesIn;
+    portals::InPortal<messages::JointAngles> jointsIn;
+
     portals::OutPortal<messages::LedCommand> ledCommandOut;
-    portals::OutPortal<messages::MotionRequest> motionRequestOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;
     portals::OutPortal<messages::HeadMotionCommand> headMotionCommandOut;
-
+    portals::OutPortal<messages::MotionRequest> motionRequestOut;
 private:
     portals::Message<messages::LedCommand> ledCommand;
     portals::Message<messages::MotionRequest> motionRequest;
     portals::Message<messages::MotionCommand> bodyMotionCommand;
     portals::Message<messages::HeadMotionCommand> headMotionCommand;
+    portals::Message<messages::MotionRequest> motionRequest;
 };
 
 }

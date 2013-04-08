@@ -40,7 +40,8 @@ BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
       ledCommandOut(base()),
       motionRequestOut(base()),
       bodyMotionCommandOut(base()),
-      headMotionCommandOut(base())
+      headMotionCommandOut(base()),
+      motionRequestOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
 
@@ -215,6 +216,9 @@ void BehaviorsModule::prepareMessages()
     gameStateIn.latch();
     pyInterface.setGameState_ptr(&gameStateIn.message());
 
+    localizationIn.latch();
+    pyInterface.setLoc_ptr(&localizationIn.message());
+
     visionFieldIn.latch();
     pyInterface.setVisionField_ptr(&visionFieldIn.message());
 
@@ -247,9 +251,10 @@ void BehaviorsModule::prepareMessages()
     footBumperStateIn.latch();
     pyInterface.setFootBumperState_ptr(&footBumperStateIn.message());
 
-    jointAnglesIn.latch();
-    pyInterface.setJointAngles_ptr(&jointAnglesIn.message());
+    jointsIn.latch();
+    pyInterface.setJoints_ptr(&jointsIn.message());
 
+    // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);
     pyInterface.setLedCommand_ptr(ledCommand.get());
 
@@ -261,6 +266,9 @@ void BehaviorsModule::prepareMessages()
 
     headMotionCommand = portals::Message<messages::HeadMotionCommand>(0);
     pyInterface.setHeadMotionCommand_ptr(headMotionCommand.get());
+
+    motionRequest = portals::Message<messages::MotionRequest>(0);
+    pyInterface.setMotionRequest_ptr(motionRequest.get());
 }
 
 void BehaviorsModule::sendMessages()
