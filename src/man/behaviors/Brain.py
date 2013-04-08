@@ -139,7 +139,7 @@ class Brain(object):
 
         # Behavior stuff
         self.gameController.run()
-        #self.updatePlaybook()
+        self.updatePlaybook()
         self.player.run()
         self.tracker.run()
         self.nav.run()

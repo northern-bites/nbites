@@ -437,10 +437,8 @@ class GoTeam:
         return True
 
     def useKickoffFormation(self):
-        #TODO: implement this
-        if (True):
-            #self.brain.interface.gameState.time_since_kickoff < \
-            #PBConstants.KICKOFF_FORMATION_TIME):
+        if(self.brain.interface.gameState.time_since_kickoff
+           < PBConstants.KICKOFF_FORMATION_TIME):
             return True
         else:
             return False
@@ -456,7 +454,7 @@ class GoTeam:
         # No matter what state we are we don't
         # Want to become an illegal defender
         # TODO: When ball information is better make this inMyGoalBox
-        if ball.loc.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
+        if ball.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
             self.willBeIllegalD += 1
             if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
                 self.stopAvoidingBox = 0
@@ -479,7 +477,7 @@ class GoTeam:
             return not self.brain.player.inKickingState
 
     def defenderShouldChase(self):
-        ballX = self.brain.ball.loc.relX
+        ballX = self.brain.ball.rel_x
         goalie = self.brain.teamMembers[0]
         return(ballX < PBConstants.DEFENDER_SHOULD_CHASE_THRESH and
                not goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER) )
@@ -510,8 +508,8 @@ class GoTeam:
     def getPointBetweenBallAndGoal(self, ball, dist_from_ball):
         """returns defensive position between ball (x,y) and goal (x,y)
         at <dist_from_ball> centimeters away from ball"""
-        delta_y = ball.loc.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
-        delta_x = ball.loc.x - NogginConstants.MY_GOALBOX_LEFT_X
+        delta_y = ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+        delta_x = ball.x - NogginConstants.MY_GOALBOX_LEFT_X
 
         # don't divide by 0
         if delta_x == 0:
@@ -519,16 +517,16 @@ class GoTeam:
         if delta_y == 0:
             delta_y = 0.001
 
-        pos_x = ball.loc.x - ( dist_from_ball/
+        pos_x = ball.x - ( dist_from_ball/
                            hypot(delta_x,delta_y) )*delta_x
-        pos_y = ball.loc.y - ( dist_from_ball/
+        pos_y = ball.y - ( dist_from_ball/
                            hypot(delta_x,delta_y) )*delta_y
 
         return pos_x,pos_y
 
 
-    # This is not used right now but when Loc and walking are better
-    # a TODO should be to make this work.
+    # a TODO should be to make this work if we decide to integrate
+    # a goalie player back into playbook.
     def fancyGoaliePosition(self):
         """returns a goalie position using ellipse"""
 

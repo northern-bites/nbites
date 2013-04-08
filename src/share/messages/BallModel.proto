@@ -21,8 +21,9 @@ message VisionBall {
 message FilteredBall
 {
 	optional VisionBall vis = 1;
-	optional float filter_distance = 2;
-	optional float filter_bearing = 3;
-	optional float filter_rel_x = 4;
-	optional float filter_rel_y = 5;
+	optional float distance = 2;
+	optional float bearing = 3;
+        optional float bearing_deg = 4;
+	optional float rel_x = 5;
+	optional float rel_y = 6;
 }
