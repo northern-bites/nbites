@@ -34,7 +34,6 @@ MotionModule::~MotionModule()
 
 void MotionModule::start()
 {
-    std::cout << "(MotionModule) Starting motion." << std::endl;
     running = true;
 }
 
@@ -736,10 +735,6 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 
 void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
 {
-    std::cout << "Set head to (yaw, pitch) = ("
-              << command->getYaw() << ", "
-              << command->getPitch() << ")"
-              << std::endl;
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
@@ -827,7 +822,6 @@ void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
             );
 
         headProvider.setCommand(newCommand);
-        std::cout << "ADDED CMD " << i << std::endl;
     }
 }
 

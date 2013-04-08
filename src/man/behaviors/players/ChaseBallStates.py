@@ -6,7 +6,7 @@ import ChaseBallConstants as constants
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
-from objects import RelRobotLocation
+from objects import RelRobotLocation, Location
 from math import fabs
 import noggin_constants as nogginConstants
 
@@ -31,8 +31,9 @@ def spinToBall(player):
     if transitions.shouldStopSpinningToBall(player):
         return player.goNow('approachBall')
     else:
-        spinDir = player.brain.my.spinDirToPoint(player.brain.ball.loc)
-        if fabs(player.brain.ball.loc.bearing) > constants.CHANGE_SPEED_THRESH:
+        spinDir = player.brain.loc.spinDirToPoint(Location(player.brain.ball.x,
+                                                           player.brain.ball.y))
+        if fabs(player.brain.ball.bearing_deg) > constants.CHANGE_SPEED_THRESH:
             speed = Navigator.GRADUAL_SPEED
         else:
             speed = Navigator.SLOW_SPEED
@@ -55,7 +56,7 @@ def approachBall(player):
         player.brain.nav.isAtPosition()):
         player.inKickingState = True
         if player.shouldKickOff:
-            if player.brain.ball.loc.relY > 0:
+            if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
             else:
                 player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
@@ -69,14 +70,14 @@ def approachBall(player):
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
-        player.orbitDistance = player.brain.ball.loc.dist
+        player.orbitDistance = player.brain.ball.distance
         player.brain.tracker.performKickPanFixedPitch(prepareForKick.hackKick.shouldKickPanRight())
         player.brain.nav.stand()
         return player.stay()
 
     prepareForKick.hackKick.collectData()
 
-    if player.brain.ball.loc.dist > 40:
+    if player.brain.ball.distance > 40:
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
@@ -139,10 +140,10 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    ballLoc = player.brain.ball.loc
+    ball = player.brain.ball
     kick_pos = player.kick.getPosition()
-    positionForKick.kickPose = RelRobotLocation(ballLoc.relX - kick_pos[0],
-                                                ballLoc.relY - kick_pos[1],
+    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
+                                                ball.rel_y - kick_pos[1],
                                                 0)
 
     #only enque the new goTo destination once
@@ -178,7 +179,7 @@ def lookAround(player):
         player.brain.tracker.repeatBasicPanFixedPitch()
 
     # Make sure we leave this state...
-    if player.brain.ball.vis.framesOff > 200:
+    if player.brain.ball.vis.frames_off > 200:
         return player.goLater('chase')
 
     if player.brain.tracker.isStopped() and player.counter > 2:

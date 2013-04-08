@@ -70,7 +70,7 @@ def ballNearPosition(player):
     ball = player.brain.ball
     return ((constants.SHOULD_KICK_AGAIN_CLOSE_X < ball.rel_x <
               constants.SHOULD_KICK_AGAIN_FAR_X) and
-             fabs(ball.loc.rel_y) < constants.SHOULD_KICK_AGAIN_Y)
+             fabs(ball.rel_y) < constants.SHOULD_KICK_AGAIN_Y)
 
 def shouldKick(player):
     """
@@ -94,8 +94,8 @@ def shouldCancelOrbit(player):
     """
     Ball is far away. Don't want to finish slow orbit.
     """
-    return (player.brain.ball.vis.framesOn > 4 and
-            player.brain.ball.loc.distance > constants.SHOULD_CANCEL_ORBIT_BALL_DIST)
+    return (player.brain.ball.vis.frames_on > 4 and
+            player.brain.ball.distance > constants.SHOULD_CANCEL_ORBIT_BALL_DIST)
 
 ####### PENALTY KICK STUFF ###########
 
