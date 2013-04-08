@@ -131,7 +131,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
-    behaviors.jointAnglesIn.wireTo(&sensors.jointsOutput_, true);
     leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
 
 #ifdef LOG_VISION

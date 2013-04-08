@@ -82,10 +82,6 @@ public:
         }
         return list;
     }
-    void setMotionRequest_ptr(const messages::MotionRequest* msg)
-    {
-        motionRequest_ptr =  msg;
-    }
     void setBodyMotionCommand_ptr(const messages::MotionCommand* msg)
     {
         bodyMotionCommand_ptr =  msg;
