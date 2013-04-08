@@ -42,6 +42,8 @@ class GameController():
         self.penaltyShots = False
         self.penalized = False
         self.penalizedChanged = False
+        self.timeSincePlaying = 0
+        self.playingStartTime = 0
 
     def run(self):
         gameState = self.brain.interface.gameState
@@ -53,6 +55,11 @@ class GameController():
             self.stateChanged = True
             self.lastState = self.currentState
             self.currentState = gameState.state
+            if (self.currentState == STATE_PLAYING):
+                self.playingStartTime = self.brain.time
+            else:
+                self.playingStartTime = 0
+        self.timeSincePlaying = self.brain.time - self.playingStartTime
 
         # reset field for change
         self.teamColorChanged = False

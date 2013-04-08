@@ -14,15 +14,19 @@ def lookToTarget(tracker):
     If too much time passes, perform naive pans.
     If ball is seen, go to 'targetTracking' or 'activeTracking'.
     """
-    if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
-        tracker.brain.motion.stopHeadMoves()
+    if tracker.target.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        request = tracker.brain.interface.motionRequest
+        request.type = request.RequestType.STOP_HEAD
+        request.processed_by_motion = False
         if tracker.activeLocOn:
             return tracker.goNow('activeTracking')
         else:
             return tracker.goNow('targetTracking')
 
     elif tracker.stateTime >= TIME_TO_LOOK_TO_TARGET:
-        tracker.brain.motion.stopHeadMoves()
+        request = tracker.brain.interface.motionRequest
+        request.type = request.RequestType.STOP_HEAD
+        request.processed_by_motion = False
         return tracker.goLater('scanForTarget')
 
     tracker.helper.lookToPoint(tracker.target)
@@ -34,16 +38,20 @@ def scanForTarget(tracker):
     Performs naive scan for target.
     If ball is seen, go to 'targetTracking' or 'activeTracking'.
     """
-    if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.target.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         if tracker.activeLocOn:
-            tracker.brain.motion.stopHeadMoves()
+            request = tracker.brain.interface.motionRequest
+            request.type = request.RequestType.STOP_HEAD
+            request.processed_by_motion = False
             return tracker.goNow('activeTracking')
         else:
-            tracker.brain.motion.stopHeadMoves()
+            request = tracker.brain.interface.motionRequest
+            request.type = request.RequestType.STOP_HEAD
+            request.processed_by_motion = False
             return tracker.goNow('targetTracking')
 
-    if not tracker.brain.motion.isHeadActive():
-        targetDist = tracker.target.loc.dist
+    if not tracker.brain.motion.head_is_active:
+        targetDist = tracker.target.distance
 
         if targetDist > HeadMoves.HIGH_SCAN_CLOSE_BOUND:
             tracker.helper.executeHeadMove(HeadMoves.HIGH_SCAN_BALL)
@@ -64,10 +72,12 @@ def targetTracking(tracker):
     If that fails, use naive scans.
     """
     if tracker.firstFrame():
-        tracker.brain.motion.stopHeadMoves()
+        request = tracker.brain.interface.motionRequest
+        request.type = request.RequestType.STOP_HEAD
+        request.processed_by_motion = False
         tracker.activeLocOn = False
 
-    if tracker.target.vis.framesOff > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
+    if tracker.target.vis.frames_off > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goLater('lookToTarget')
 
     tracker.helper.trackObject()
@@ -83,7 +93,7 @@ def trackBallFixedPitch(tracker):
     """
     tracker.target = tracker.brain.ball
 
-    if tracker.target.vis.framesOff <= \
+    if tracker.target.vis.frames_off <= \
             constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
         return tracker.goNow('trackingFixedPitch')
     else:
@@ -96,11 +106,13 @@ def lookStraightThenTrackFixedPitch(tracker):
     Once ball is seen enough, track it.
     """
     if tracker.firstFrame():
-        tracker.brain.motion.stopHeadMoves()
+        request = tracker.brain.interface.motionRequest
+        request.type = request.RequestType.STOP_HEAD
+        request.processed_by_motion = False
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
         tracker.target = tracker.brain.ball
 
-    if tracker.target.vis.framesOn > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.target.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         tracker.trackBallFixedPitch()
 
     return tracker.stay()

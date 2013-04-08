@@ -41,6 +41,7 @@ void GameStateModule::latchInputs()
 
 void GameStateModule::update()
 {
+    // Check comm input last so we can reset button toggles.
     if (buttonPressInput.message().toggle() != last_button)
     {
         last_button = !last_button;
@@ -73,6 +74,18 @@ void GameStateModule::update()
     if (commInput.message().have_remote_gc())
     {
         latest_data = commInput.message();
+        if (latest_data.state() != STATE_PLAYING)
+        {
+            keep_time = false;
+        }
+        else
+        {
+            keep_time = true;
+        }
+    }
+    if (keep_time)
+    {
+        // @TODO: keep track of secs remaining if we have no comm.
     }
 }
 
@@ -114,6 +127,7 @@ void GameStateModule::manual_penalize()
 
 void GameStateModule::reset()
 {
+    keep_time = false;
     latest_data.Clear();
     messages::TeamInfo* myTeam = latest_data.add_team();
     myTeam->set_team_number(team_number);

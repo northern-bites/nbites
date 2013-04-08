@@ -126,7 +126,9 @@ class HeadTracking(FSA.FSA):
         """
         # HACK
         self.switchTo('stopped')
-        self.brain.motion.stopHeadMoves()
+        request = tracker.brain.interface.motionRequest
+        request.type = request.RequestType.STOP_HEAD
+        request.processed_by_motion = False
         self.helper.lookToAngleFixedPitch(yaw)
 
     def lookStraightThenTrackFixedPitch(self):

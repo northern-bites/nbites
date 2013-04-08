@@ -128,14 +128,14 @@ class HeadTrackingHelper(object):
 
         # TODO: generalize this to objects which we cannot see.
         if not target or \
-                (target.loc.relX == 0.0 and target.loc.relY == 0.0):
+                (target.rel_x == 0.0 and target.rel_y == 0.0):
             return
 
         # If we haven't seen the object in the very recent past, look
         # towards where the model says it is. The framesOff > 3
         # provides a buffer to ensure that it's not just a flickering
         # image problem (prevents twitchy robot)
-        if target.vis.framesOff > 3:
+        if target.vis.frames_off > 3:
             self.lookToPoint(target)
             return
 
@@ -197,7 +197,6 @@ class HeadTrackingHelper(object):
         # ignore changeY: pitch is fixed
 
         curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
-        curPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
         maxChange = 13.0
 
         # Warning- no gain is applied currently!
@@ -294,7 +293,7 @@ class HeadTrackingHelper(object):
         if hasattr(target, "loc"):
             target = target.loc
 
-        if target.relY > 0:
+        if target.rel_y > 0:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
         else:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)

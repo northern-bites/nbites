@@ -49,7 +49,7 @@ private:
     bool last_team;
     bool last_kickoff;
 
-    bool keep_time; // @TODO implement this feature.
+    bool keep_time;
 };
 
 }
