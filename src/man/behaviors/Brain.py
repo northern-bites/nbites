@@ -121,10 +121,8 @@ class Brain(object):
 
     def run(self):
         """
-        Main control loop called every TIME_STEP milliseconds
+        Main control loop
         """
-
-        # Order here is very important
         # Update Environment
         self.time = time.time()
 
@@ -136,6 +134,7 @@ class Brain(object):
         self.updateLoc()
 
         # Behavior stuff
+        # Order here is very important
         self.gameController.run()
         self.updatePlaybook()
         self.player.run()

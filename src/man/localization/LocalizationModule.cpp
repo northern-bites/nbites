@@ -10,9 +10,6 @@ namespace man
     {
         particleFilter = new ParticleFilter();
         particleFilter->resetLocTo(100,100,0);
-        std::cout << particleFilter->getXEst() << "\t"
-                  << particleFilter->getYEst() << "\t"
-                  << particleFilter->getHEst() << "\n";
     }
 
     LocalizationModule::~LocalizationModule()

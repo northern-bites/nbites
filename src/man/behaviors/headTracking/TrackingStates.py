@@ -90,7 +90,7 @@ def activeTracking(tracker):
     tracker.helper.trackObject()
 
     # If we are close to the ball and have seen it consistently
-    if tracker.target.loc.dist < constants.STARE_TRACK_DIST:
+    if tracker.target.distance < constants.STARE_TRACK_DIST:
         tracker.shouldStareAtBall += 1
 
         if tracker.shouldStareAtBall > constants.STARE_TRACK_THRESH:
@@ -134,7 +134,7 @@ def panToFieldObject(tracker):
         if hasattr(closest, "loc"):
             closest = closest.loc
 
-        target = tracker.brain.my.relativeLocationOf(closest)
+        target = tracker.brain.loc.relativeLocationOf(closest)
         target.height = 45      # stare at the center of the post
                                 # rather than the bottom
 

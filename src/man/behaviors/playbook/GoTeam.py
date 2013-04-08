@@ -151,9 +151,8 @@ class GoTeam:
                                 % mate.playerNumber)
                 continue
 
-            # 20000 is synced with the penalty for not seeing the ball
-            # Hacked in so we don't have to import. Summer 2012
-            elif mate.hasBall() and mate.chaseTime < 20000:
+            elif (mate.hasBall() and
+                  mate.chaseTime < self.brain.TeamMember.BALL_OFF_PENALTY):
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
@@ -223,6 +222,7 @@ class GoTeam:
         # A will become chaser_mate if:
         # [ (chaseTime(A) - chaseTime(B) < e) or
         #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
+        # A is higher robot that has decided to be chaser.
         return((mate.chaseTime < chaser_mate.chaseTime * 1.1) or
                ((mate.chaseTime < chaser_mate.chaseTime * 1.5) and
                 mate.isTeammateRole(PBConstants.CHASER)))
@@ -233,6 +233,8 @@ class GoTeam:
         # A will become chaser_mate if:
         # [ (chaseTime(A) - chaseTime(B) < e) or
         #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
+        # Note: d > e
+        # A is higher robot that has decided to be chaser.
         return(((mate.chaseTime - chaser_mate.chaseTime) <
                 PBConstants.CALL_OFF_THRESH) or
                ((mate.chaseTime - chaser_mate.chaseTime) <
@@ -242,7 +244,7 @@ class GoTeam:
     def shouldListen(self, chaser_mate, mate):
         """Decides if mate should listen to the chaser_mate after calling off"""
         # mate = A, chaser_mate = B.
-        # A will relinquish chaser to chaser_mate if:
+        # A will relinquish chaser to B if:
         # chaseTime(B) < chaseTime(A) - m
         # A is higher robot that has decided to be chaser.
         return (chaser_mate.chaseTime < (mate.chaseTime -
@@ -424,8 +426,10 @@ class GoTeam:
         #if self.numActiveFieldPlayers == 0:
             #return False
 
-        if self.brain.interface.gameState.state == 'gameReady' or\
-                self.brain.interface.gameState.state =='gameSet':
+        if (self.brain.gameController.currentState ==
+            self.brain.GameController.STATE_READY
+            or self.brain.gameController.currentState ==
+            self.brain.GameController.STATE_SET):
             return False
 
         for mate in self.brain.teamMembers:
@@ -436,7 +440,7 @@ class GoTeam:
         return True
 
     def useKickoffFormation(self):
-        if(self.brain.interface.gameState.time_since_kickoff
+        if(self.brain.gameController.timeSincePlaying
            < PBConstants.KICKOFF_FORMATION_TIME):
             return True
         else:
