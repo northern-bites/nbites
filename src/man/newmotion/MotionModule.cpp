@@ -62,6 +62,12 @@ void MotionModule::run_()
     //     of the main motion loop.
     if(running)
     {
+        // std::cout << "current provider: "
+        //           << curProvider->getName()
+        //           << " next provider: "
+        //           << nextProvider->getName()
+        //           << std::endl;
+
         // (3) Do any necessary preprocessing of joint angles
         //     then actually compute next joints and
         //     stiffnesses.
@@ -275,50 +281,43 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
-    // This doesn't work. ELLIS!!!!!!!!
-    // // First check: is guardian turning stiffness off?
-    // if(stiffnessInput_.message().remove() && gainsOn)
-    // {
-    //     gainsOn = false;
-    //     std::cout << "Sending freeze command." << std::endl;
-    //     sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
-    //     return;
-    // }
-    // if(!stiffnessInput_.message().remove() && !gainsOn)
-    // {
-    //     gainsOn = true;
-    //     std::cout << "Sending unfreeze command." << std::endl;
-    //     sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
-    //     return;
-    // }
+    // First check: is guardian turning stiffness off?
+    if(stiffnessInput_.message().remove() && gainsOn)
+    {
+        gainsOn = false;
+        sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+        return;
+    }
+    if(!stiffnessInput_.message().remove() && !gainsOn)
+    {
+        gainsOn = true;
+        sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+        return;
+    }
 
     // (1) Process requests.
-    if(!requestInput_.message().processed_by_motion())
+    if(lastRequest != requestInput_.message().timestamp())
     {
-        if (requestInput_.message().type() ==
-            messages::MotionRequest::STOP_BODY)
+        lastRequest = requestInput_.message().timestamp();
+
+        if (requestInput_.message().stop_body())
         {
             stopBodyMoves();
         }
-        else if (requestInput_.message().type() ==
-                 messages::MotionRequest::STOP_HEAD)
+        if (requestInput_.message().stop_head())
         {
             stopHeadMoves();
         }
-        else if (requestInput_.message().type() ==
-                 messages::MotionRequest::RESET_ODO)
+        if (requestInput_.message().reset_odometry())
         {
             resetOdometry();
         }
-        const_cast<messages::MotionRequest&>(requestInput_.message()).set_processed_by_motion(true);
     }
 
     // (2) Process body commands.
-    if(!bodyCommandInput_.message().processed_by_motion())
+    if(lastBodyCommand != bodyCommandInput_.message().timestamp())
     {
-        // std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
-        //           << bodyCommandInput_.message().dest().rel_y() << " "
-        //           << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
+        lastBodyCommand = bodyCommandInput_.message().timestamp();
 
         if (bodyCommandInput_.message().type() ==
             messages::MotionCommand::DESTINATION_WALK)
@@ -335,12 +334,13 @@ void MotionModule::processMotionInput()
         {
             sendMotionCommand(bodyCommandInput_.message().script());
         }
-        const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
     }
 
     // (3) Process head commands.
-    if(!headCommandInput_.message().processed_by_motion())
+    if(lastHeadCommand != headCommandInput_.message().timestamp())
     {
+        lastHeadCommand = headCommandInput_.message().timestamp();
+
         if (headCommandInput_.message().type() ==
             messages::HeadMotionCommand::POS_HEAD_COMMAND)
         {
@@ -351,7 +351,6 @@ void MotionModule::processMotionInput()
         {
             sendMotionCommand(headCommandInput_.message().scripted_command());
         }
-        const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
     }
 }
 

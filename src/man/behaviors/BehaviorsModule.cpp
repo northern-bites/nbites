@@ -40,7 +40,8 @@ BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
       ledCommandOut(base()),
       motionRequestOut(base()),
       bodyMotionCommandOut(base()),
-      headMotionCommandOut(base())
+      headMotionCommandOut(base()),
+      resetLocOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
 
@@ -265,22 +266,27 @@ void BehaviorsModule::prepareMessages()
 
     motionRequest = portals::Message<messages::MotionRequest>(0);
     pyInterface.setMotionRequest_ptr(motionRequest.get());
+
+    resetLocRequest = portals::Message<messages::RobotLocation>(0);
+    pyInterface.setResetLocRequest_ptr(resetLocRequest.get());
 }
 
 void BehaviorsModule::sendMessages()
 {
     ledCommandOut.setMessage(ledCommand);
 
-    // Only set motion commands that python has actually used
-    if (!bodyMotionCommand.get()->processed_by_motion())
+    if (resetLocRequest.get()->timestamp() != 0)
+        resetLocOut.setMessage(resetLocRequest);
+
+    if (bodyMotionCommand.get()->timestamp() != 0)
     {
         bodyMotionCommandOut.setMessage(bodyMotionCommand);
     }
-    if (!headMotionCommand.get()->processed_by_motion())
+    if (headMotionCommand.get()->timestamp() != 0)
     {
         headMotionCommandOut.setMessage(headMotionCommand);
     }
-    if (!motionRequest.get()->processed_by_motion())
+    if (motionRequest.get()->timestamp() != 0)
     {
         motionRequestOut.setMessage(motionRequest);
     }

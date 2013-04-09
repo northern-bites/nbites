@@ -61,7 +61,7 @@ class HeadTrackingHelper(object):
             else:
                 self.tracker.printf("What kind of sweet ass-Move is this?")
 
-        command.processed_by_motion = False
+        command.timestamp = int(self.tracker.brain.time * 1000)
         # Returns the last HJC in the HeadMove for keeping track of
         # when a move is done
         return move
@@ -146,7 +146,7 @@ class HeadTrackingHelper(object):
         command.pos_command.max_speed_yaw = maxSpeed
         command.pos_command.max_speed_pitch = maxSpeed
 
-        command.processed_by_motion = False
+        command.timestamp = int(self.tracker.brain.time * 1000)
 
     # Unsafe to call... TODO: CoordHeadCommands for messages.
     def lookAtTarget(self, target):

@@ -41,6 +41,7 @@ public:
     messages::SonarState        const * sonarState_ptr;
     messages::FootBumperState   const * footBumperState_ptr;
     messages::JointAngles       const * joints_ptr;
+    messages::RobotLocation     const * resetLocRequest_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -113,6 +114,10 @@ public:
     void setJoints_ptr(const messages::JointAngles* msg)
     {
         joints_ptr = msg;
+    }
+    void setResetLocRequest_ptr(const messages::RobotLocation* msg)
+    {
+        resetLocRequest_ptr = msg;
     }
 
 };

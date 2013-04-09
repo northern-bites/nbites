@@ -2,23 +2,19 @@ package messages;
 
 message MotionRequest
 {
-    enum RequestType {
-        STOP_BODY = 0;
-        STOP_HEAD = 1;
-        RESET_ODO = 2;
-    }
 
-    optional RequestType type = 1;
-
-    optional bool processed_by_motion = 2 [default = true];
+    optional bool stop_body = 1;
+    optional bool stop_head = 2;
+    optional bool reset_odometry = 3;
+    optional int64 timestamp = 4;
 }
 
 message MotionCommand
 {
     enum CommandType {
         DESTINATION_WALK = 0;
-	WALK_COMMAND = 1;
-	SCRIPTED_MOVE = 2;
+        WALK_COMMAND = 1;
+        SCRIPTED_MOVE = 2;
     }
 
     optional CommandType type = 1;
@@ -27,7 +23,7 @@ message MotionCommand
     optional DestinationWalk dest = 3;
     optional WalkCommand speed = 4;
 
-    optional bool processed_by_motion = 5 [default = true];
+    optional int64 timestamp = 5;
 }
 
 message ScriptedMove
@@ -43,7 +39,7 @@ message BodyJointCommand
 
     enum InterpolationType {
         SMOOTH = 0;
-	LINEAR = 1;
+        LINEAR = 1;
     }
     optional InterpolationType interpolation = 4;
 }
@@ -66,8 +62,8 @@ message WalkCommand
 message HeadMotionCommand
 {
     enum CommandType {
-    	 POS_HEAD_COMMAND = 0; // AKA set_head_command
-	 SCRIPTED_HEAD_COMMAND = 1;
+        POS_HEAD_COMMAND = 0; // AKA set_head_command
+        SCRIPTED_HEAD_COMMAND = 1;
     }
 
     optional CommandType type = 1;
@@ -75,7 +71,7 @@ message HeadMotionCommand
     optional PositionHeadCommand pos_command = 2;
     optional ScriptedHeadCommand scripted_command = 3;
 
-    optional bool processed_by_motion = 4 [default = true];
+    optional int64 timestamp = 4;
 }
 
 message PositionHeadCommand
@@ -99,7 +95,7 @@ message HeadJointCommand
 
     enum InterpolationType {
         SMOOTH = 0;
-	LINEAR = 1;
+        LINEAR = 1;
     }
 
     optional InterpolationType interpolation = 4;

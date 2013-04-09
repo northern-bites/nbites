@@ -103,19 +103,25 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.addModule(gamestate);
     cognitionThread.addModule(behaviors);
     cognitionThread.addModule(leds);
+
     vision.topImageIn.wireTo(&imageTranscriber.topImageOut);
     vision.bottomImageIn.wireTo(&imageTranscriber.bottomImageOut);
     vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
+    localization.resetInput.wireTo(&behaviors.resetLocOut, true);
+
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
     ballTrack.localizationInput.wireTo(&localization.output);
+
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
     gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
     gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
     gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
+
     behaviors.localizationIn.wireTo(&localization.output);
     behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
     behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);

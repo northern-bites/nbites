@@ -13,78 +13,63 @@ from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 #from vision import cornerID as IDs
 from math import fabs, degrees
 from ..kickDecider import kicks
-import noggin_constants as nogginConstants
+import noggin_constants as Constants
 
 DEBUG_OBSERVATIONS = False
 DEBUG_POSITION = False
-
-def spinToFaceGoal(player):
-    if player.firstFrame():
-        if (player.lastDiffState == 'decideRightSide'):
-            player.side = RIGHT
-        else:
-            player.side = LEFT
-
-        spinToFaceGoal.facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if player.side == RIGHT:
-            spinToFaceGoal.facingDest.relH = 90
-        else:
-            spinToFaceGoal.facingDest.relH = -90
-
-    player.brain.tracker.lookToAngle(0)
-
-    if player.counter == 20:
-        player.brain.nav.goTo(spinToFaceGoal.facingDest,
-                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
-
-    return Transition.getNextState(player, spinToFaceGoal)
-
 
 def walkToGoal(player):
     """
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        # first decide which side you're coming in from
-        if player.lastDiffState == 'gatherPostInfo':
-            # don't change side
-            player.side = player.side
+        if player.side == RIGHT:
+            if (player.brain.gameController.teamColor ==
+                Constants.teamColor.TEAM_BLUE):
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        Constants.HEADING_UP)
+            else:
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        Constants.HEADING_DOWN)
+        else:
+            if (player.brain.gameController.teamColor ==
+                Constants.teamColor.TEAM_BLUE):
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        Constants.HEADING_UP)
+            else:
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        Constants.HEADING_DOWN)
+
+    player.brain.nav.goTo(RobotLocation(Constants.FIELD_GREEN_LEFT_SIDELINE_X,
+                                        Constants.MIDFIELD_Y,
+                                        Constants.HEADING_RIGHT))
 
     return player.stay()
 
 def dodgeBall(player):
     if player.firstFrame():
-        if player.brain.ball.filter_rel_y < 0.0:
-            dodgeDestY = player.brain.ball.filter_rel_y + 20.0
+        if player.brain.ball.rel_y < 0.0:
+            dodgeDestY = player.brain.ball.rel_y + 20.0
         else:
-            dodgeDestY = player.brain.ball.filter_rel_y - 20.0
+            dodgeDestY = player.brain.ball.rel_y - 20.0
         player.brain.tracker.trackBall()
-        dodgeBall.dodgeDest = RelRobotLocation(player.brain.ball.filter_rel_x,
-                                           dodgeDestY,
-                                           0.0)
+        dodgeBall.dodgeDest = RelRobotLocation(player.brain.ball.rel_x,
+                                               dodgeDestY,
+                                               0.0)
         player.brain.nav.goTo(dodgeBall.dodgeDest)
 
     # update dest based on ball loc
-    if player.brain.ball.filter_rel_y < 0.0:
-        dodgeBall.dodgeDest.relY = player.brain.ball.filter_rel_y + 20.0
+    if player.brain.ball.rel_y < 0.0:
+        dodgeBall.dodgeDest.relY = player.brain.ball.rel_y + 20.0
     else:
-        dodgeBall.dodgeDest.relY = player.brain.ball.filter_rel_y - 20.0
-    dodgeBall.dodgeDest.relX = player.brain.ball.filter_rel_x
+        dodgeBall.dodgeDest.relY = player.brain.ball.rel_y - 20.0
+    dodgeBall.dodgeDest.relX = player.brain.ball.rel_x
 
     return Transition.getNextState(player, dodgeBall)
-
-def gatherPostInfo(player):
-    if player.firstFrame():
-        if player.side == RIGHT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
-        if player.side == LEFT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
-        player.brain.nav.stop()
-
-    if player.counter > 90:
-        return player.goLater('walkToGoal')
-
-    return player.stay()
 
 def spinAtGoal(player):
     if player.firstFrame():
@@ -105,7 +90,7 @@ def spinAtGoal(player):
 def clearIt(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if player.brain.ball.filter_rel_y < 0.0:
+        if player.brain.ball.rel_y < 0.0:
             player.side = RIGHT
             player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
@@ -113,15 +98,15 @@ def clearIt(player):
             player.kick = kicks.LEFT_STRAIGHT_KICK
 
         kickPose = player.kick.getPosition()
-        clearIt.ballDest = RelRobotLocation(player.brain.ball.filter_rel_x -
+        clearIt.ballDest = RelRobotLocation(player.brain.ball.rel_x -
                                             kickPose[0],
-                                            player.brain.ball.filter_rel_y -
+                                            player.brain.ball.rel_y -
                                             kickPose[1],
                                             0.0)
 
-        # WE NEED TO BE ABLE TO DO THIS
         # reset odometry
-        #player.brain.motion.resetOdometry()
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
         clearIt.odoDelay = True
         return player.stay()
 
@@ -132,8 +117,8 @@ def clearIt(player):
                               nav.FAST_SPEED)
 
     kickPose = player.kick.getPosition()
-    clearIt.ballDest.relX = player.brain.ball.filter_rel_x - kickPose[0]
-    clearIt.ballDest.relY = player.brain.ball.filter_rel_y - kickPose[1]
+    clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
+    clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
 
     return Transition.getNextState(player, clearIt)
 
@@ -151,7 +136,7 @@ def didIKickIt(player):
 def spinToFaceBall(player):
     if player.firstFrame():
         facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if degrees(player.brain.ball.filter_bearing) < 0.0:
+        if player.brain.ball.bearing_deg < 0.0:
             facingDest.relH = -90
         else:
             facingDest.relH = 90
@@ -176,16 +161,14 @@ def decideRightSide(player):
 
 def returnToGoal(player):
     if player.firstFrame():
-        #if player.lastDiffState == 'didIKickIt':
-        correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
-                        returnToGoal.kickPose)
-        correctedDest.relX = correctedDest.relX
-
-    else:
-        correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
-                         RelRobotLocation(player.brain.interface.odometry.x,
-                                          player.brain.interface.odometry.y,
-                                          0.0))
+        if player.lastDiffState == 'didIKickIt':
+            correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
+                            returnToGoal.kickPose)
+        else:
+            correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
+                             RelRobotLocation(player.brain.interface.odometry.x,
+                                              player.brain.interface.odometry.y,
+                                              0.0))
 
         if fabs(correctedDest.relX) < 5:
             correctedDest.relX = 0.0
@@ -217,14 +200,14 @@ def centerAtGoalBasedOnCorners(player):
         if(centerAtGoalBasedOnCorners.cornerID in corner.possibilities):
             if(centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L
                and corner.visualOrientation < 0 and
-               player.brain.vision.fieldEdge.centerDist > 110.0):
+               player.brain.interface.visionField.vision_field_edge.distance_m > 110.0):
                 centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
                 heading = corner.getRobotGlobalHeadingIfFieldAngleIs(90)
                 relX = corner.getRobotRelXIfFieldAngleIs(90)
                 relY = corner.getRobotRelYIfFieldAngleIs(90)
             elif(centerAtGoalBasedOnCorners.cornerID ==
                  IDs.YELLOW_GOAL_RIGHT_L and corner.visualOrientation > 0 and
-                 player.brain.vision.fieldEdge.centerDist > 110.0):
+                 player.brain.interface.visionField.vision_field_edge.distance_m > 110.0):
                 centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
                 heading = corner.getRobotGlobalHeadingIfFieldAngleIs(0)
                 relX = corner.getRobotRelXIfFieldAngleIs(0)
@@ -261,17 +244,19 @@ def centerAtGoalBasedOnCorners(player):
 
 def repositionAfterWhiff(player):
     if player.firstFrame():
-        # We need to be able to reset ODO
-        #player.brain.motion.resetOdometry()
-        if player.brain.ball.filter_rel_y < 0.0:
+        # reset odometry
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+
+        if player.brain.ball.rel_y < 0.0:
             player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
             player.kick = kicks.LEFT_STRAIGHT_KICK
 
         kickPose = player.kick.getPosition()
-        repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.filter_rel_x -
+        repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.rel_x -
                                                          kickPose[0],
-                                                         player.brain.ball.filter_rel_y -
+                                                         player.brain.ball.rel_y -
                                                          kickPose[1],
                                                          0.0)
         player.brain.nav.goTo(repositionAfterWhiff.ballDest,
@@ -287,9 +272,9 @@ def repositionAfterWhiff(player):
         return player.goLater('returnToGoal')
 
     kickPose = player.kick.getPosition()
-    repositionAfterWhiff.ballDest.relX = (player.brain.ball.filter_rel_x -
+    repositionAfterWhiff.ballDest.relX = (player.brain.ball.rel_x -
                                           kickPose[0])
-    repositionAfterWhiff.ballDest.relY = (player.brain.ball.filter_rel_y -
+    repositionAfterWhiff.ballDest.relY = (player.brain.ball.rel_y -
                                           kickPose[1])
 
     return Transition.getNextState(player, repositionAfterWhiff)

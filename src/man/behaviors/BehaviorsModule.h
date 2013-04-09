@@ -92,11 +92,14 @@ public:
     portals::OutPortal<messages::MotionRequest> motionRequestOut;
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;
     portals::OutPortal<messages::HeadMotionCommand> headMotionCommandOut;
+    portals::OutPortal<messages::RobotLocation> resetLocOut;
+
 private:
     portals::Message<messages::LedCommand> ledCommand;
     portals::Message<messages::MotionCommand> bodyMotionCommand;
     portals::Message<messages::HeadMotionCommand> headMotionCommand;
     portals::Message<messages::MotionRequest> motionRequest;
+    portals::Message<messages::RobotLocation> resetLocRequest;
 };
 
 }

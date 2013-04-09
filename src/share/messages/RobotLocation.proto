@@ -5,4 +5,5 @@ message RobotLocation
     optional float x = 1;
     optional float y = 2;
     optional float h = 3;
+    optional int64 timestamp = 4;
 }

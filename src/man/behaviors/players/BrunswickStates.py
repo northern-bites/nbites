@@ -16,30 +16,30 @@ def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.stand()
-        # player.zeroHeads()
-        # Reset localization to proper starting position by player number.
-        # Locations are defined in the wiki.
-# HACK HACK until localization is implemented in messages we cant do this.
-        # if player.brain.my.playerNumber == 1:
-        #     player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
-        #                                 nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-        #                                 nogginConstants.HEADING_UP,
-        #                                 _localization.LocNormalParams(15.0, 15.0, 1.0))
-        # elif player.brain.my.playerNumber == 2:
-        #     player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-        #                                 nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-        #                                 nogginConstants.HEADING_UP,
-        #                                 _localization.LocNormalParams(15.0, 15.0, 1.0))
-        # elif player.brain.my.playerNumber == 3:
-        #     player.brain.loc.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-        #                                 nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-        #                                 nogginConstants.HEADING_DOWN,
-        #                                 _localization.LocNormalParams(15.0, 15.0, 1.0))
-        # elif player.brain.my.playerNumber == 4:
-        #     player.brain.loc.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
-        #                                 nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-        #                                 nogginConstants.HEADING_DOWN,
-        #                                 _localization.LocNormalParams(15.0, 15.0, 1.0))
+        player.zeroHeads()
+        Reset localization to proper starting position by player number.
+        Locations are defined in the wiki.
+HACK HACK until localization is implemented in messages we cant do this.
+        if player.brain.my.playerNumber == 1:
+            player.brain.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
+                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        nogginConstants.HEADING_UP,
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
+        elif player.brain.my.playerNumber == 2:
+            player.brain.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        nogginConstants.HEADING_UP,
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
+        elif player.brain.my.playerNumber == 3:
+            player.brain.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        nogginConstants.HEADING_DOWN,
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
+        elif player.brain.my.playerNumber == 4:
+            player.brain.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
+                                        nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        nogginConstants.HEADING_DOWN,
+                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
 
     return player.stay()
 

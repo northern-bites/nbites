@@ -5,6 +5,7 @@ from ..util import Transition
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
 from GoalieConstants import RIGHT, LEFT
+import noggin_constants as Constants
 
 def gameInitial(player):
     if player.firstFrame():
@@ -33,7 +34,9 @@ def gameSet(player):
     if player.firstFrame():
         player.penaltyKicking = False
         player.stand()
-        #player.brain.loc.resetBall()
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)
 

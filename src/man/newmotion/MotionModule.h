@@ -234,7 +234,9 @@ private:
 
     void run_();
 
+    // For deciding if requests/commands have been processed already
     bool gainsOn;
+    long long lastRequest, lastBodyCommand, lastHeadCommand;
 };
 } // namespace motion
 } // namespace man

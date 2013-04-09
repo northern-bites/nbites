@@ -21,6 +21,15 @@ namespace man
     {
         motionInput.latch();
         visionInput.latch();
+        resetInput.latch();
+
+        if (lastReset != resetInput.message().timestamp())
+        {
+            lastReset = resetInput.message().timestamp();
+            particleFilter->resetLocTo(resetInput.message().x(),
+                                       resetInput.message().y(),
+                                       resetInput.message().h());
+        }
 
         //std::cout << "Prepare to update filter \n";
         particleFilter->update(motionInput.message(), visionInput.message());

@@ -32,6 +32,7 @@ namespace man
 
         portals::InPortal<messages::RobotLocation> motionInput;
         portals::InPortal<messages::VisionField> visionInput;
+        portals::InPortal<messages::RobotLocation> resetInput;
         portals::OutPortal<messages::RobotLocation> output;
 
         float lastMotionTimestamp;
@@ -51,6 +52,7 @@ namespace man
         void update();
 
         ParticleFilter * particleFilter;
+        long long lastReset;
     };
     } // namespace localization
 } // namespace man

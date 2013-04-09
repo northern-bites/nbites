@@ -9,8 +9,8 @@ def stop(tracker):
     if tracker.firstFrame():
         # Send the motion request message to stop
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
 
     if not tracker.brain.motion.head_is_active:
         return tracker.goNow('stopped')
@@ -22,8 +22,8 @@ def neutralHead(tracker):
     if tracker.firstFrame():
         # Send the motion request message to stop
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
         # Perform the headmove
         tracker.helper.executeHeadMove(HeadMoves.NEUT_HEADS)
 
@@ -36,8 +36,8 @@ def doHeadMove(tracker):
     '''Executes the currently set headMove, then stops.'''
     # Send the motion request message to stop
     request = tracker.brain.interface.motionRequest
-    request.type = request.RequestType.STOP_HEAD
-    request.processed_by_motion = False
+    request.stop_head = True
+    request.timestamp = int(tracker.brain.time * 1000)
     # Perform the headmove
     tracker.helper.executeHeadMove(tracker.headMove)
 
@@ -55,8 +55,8 @@ def repeatHeadMove(tracker):
     if tracker.firstFrame():
         # Send the motion request message to stop
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
         # Perform the headmove
         tracker.helper.startingPan(tracker.headMove)
 
@@ -75,8 +75,8 @@ def penalizeHeads(tracker):
     if tracker.firstFrame():
         # Send the motion request to stop
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
         # Perform the headmove
         tracker.helper.executeHeadMove(HeadMoves.PENALIZED_HEADS)
 
