@@ -6,7 +6,6 @@ import math
 DEBUG_KICK_DECISION = False
 USE_LOC = False
 USE_LOC_HALF_FIELD = False
-USE_LAB_FIELD = False
 
 class KickInformation:
     """
@@ -17,7 +16,7 @@ class KickInformation:
         self.brain = brain
 
         # Set goal distance depending on type of field being used
-        if USE_LAB_FIELD:
+        if constants.USING_LAB_FIELD:
             self.closeGoalThresh = 250
         else:
             self.closeGoalThresh = 300
