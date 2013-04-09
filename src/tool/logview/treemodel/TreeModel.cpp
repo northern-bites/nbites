@@ -21,8 +21,7 @@
 #include <assert.h>
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 using namespace std;
 
@@ -156,6 +155,5 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-}
 }
 }

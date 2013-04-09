@@ -29,6 +29,7 @@
 #include "RoboGrams.h"
 #include "LogDefinitions.h"
 #include "DebugConfig.h"
+#include "Images.h"
 #include <aio.h>
 #include <errno.h>
 #include <stdint.h>
@@ -47,7 +48,7 @@ static const int ALL_PERMISSIONS = S_IRWXU | S_IRWXG | S_IRWXO;
 
 // Default value for write list size; can be reset--should be small
 // for large messages that could take up a lot of memory!
-static const int DEFAULT_MAX_WRITES = 10;
+static const int DEFAULT_MAX_WRITES = 5;
 
 /*
  * This struct is used to hold together an aiocb (control block) and the
@@ -80,80 +81,18 @@ protected:
     // Basic file/writing operations
     void openFile() throw (file_exception);
     void closeFile();
-    void writeCharBuffer(const char* buffer, uint32_t size);
     void checkWrites();
 
-    // Writes any type that can be reinterpret_casted to a string
-    template <class T>
-    void writeValue(const T &value) {
-        writeCharBuffer(reinterpret_cast<const char *>(&value), sizeof(value));
-    }
+    void writeCharBuffer(const char* buffer, uint32_t size);
 
-    template<class T>
-    void writeMessage(T msg)
+    void writeSize(uint32_t value)
     {
-        // Don't enqueue this write if we've hit the upper limit
-        if (ongoing.size() == maxWrites)
-        {
-#ifdef DEBUG_LOGGING
-        std::cout << "Dropped a message because there are already "
-                  << maxWrites << " ongoing writes to " << fileName
-                  << std::endl;
-#endif
-        return;
-        }
-
-
-        // Add a new write to the list of current writes
-        ongoing.push_back(Write());
-        Write* current = &ongoing.back();
-
-        // Serialize directly into the Write's buffer to avoid a copy
-        msg.SerializeToString(&(current->buffer));
-
-        // Don't write if the file has gotten too huge
-        if (bytesWritten >= FILE_MAX_SIZE)
-        {
-#ifdef DEBUG_LOGGING
-            std::cout << "Dropped a message because the file "
-                      << fileName << " has reached " << bytesWritten << " bytes "
-                      << std::endl;
-#endif
-            ongoing.pop_back();
-            return;
-        }
-
-        bytesWritten += current->buffer.length();
-
-        // Write ths size of the message that will be written
-        writeValue<uint32_t>(current->buffer.length());
-
-        // Recommended by aio--zeroes the control block
-        memset(&current->control, 0, sizeof(current->control));
-
-        // Configure the control block
-        current->control.aio_fildes = fileDescriptor;
-        current->control.aio_buf = const_cast<char *>(current->buffer.data());
-        current->control.aio_nbytes = current->buffer.length();
-        current->control.aio_sigevent.sigev_notify = SIGEV_NONE;
-
-        // Enqueue the write
-        int result = aio_write(&current->control);
-
-        // Verify that the write didn't immediately fail
-        if (result == -1) {
-            std::cout<< "AIO write enqueue failed with error " << strerror(errno)
-                     << std::endl;
-        }
-
-#ifdef DEBUG_LOGGING
-        std::cout << "Enqueued a message for writing."
-                  << std::endl;
-#endif
+        writeCharBuffer(reinterpret_cast<const char *>(&value), sizeof(value));
     }
 
     // Keeps track of all writes that haven't finished yet
     std::list<Write> ongoing;
+    std::list<Write> ongoingSizes;
     // Has the file been opened?
     bool fileOpen;
     // The file that we've opened/are writing to
@@ -183,15 +122,95 @@ public:
     void writeHeader()
     {
         Header head;
-        head.set_name(input.message().GetTypeName());
+        head.set_name(nameHelper());
         head.set_version(CURRENT_VERSION);
         head.set_timestamp(42);
-        writeMessage<Header>(head);
+
+        std::string buf;
+        head.SerializeToString(&buf);
+        writeSize(buf.length());
+        writeCharBuffer(buf.data(), buf.length());
 
         std::cout << "Writing header to " << fileName << std::endl;
     }
 
+    void writeMessage(T msg)
+    {
+        // Don't enqueue this write if we've hit the upper limit
+        if (ongoing.size() == maxWrites)
+        {
+#ifdef DEBUG_LOGGING
+        std::cout << "Dropped a message because there are already "
+                  << maxWrites << " ongoing writes to " << fileName
+                  << std::endl;
+#endif
+        return;
+        }
+
+        // Don't write if the file has gotten too huge
+        if (bytesWritten >= FILE_MAX_SIZE)
+        {
+#ifdef DEBUG_LOGGING
+            std::cout << "Dropped a message because the file "
+                      << fileName << " has reached " << bytesWritten << " bytes "
+                      << std::endl;
+#endif
+            ongoing.pop_back();
+            return;
+        }
+
+        writeInternal(msg);
+    }
+
 protected:
+    // This helper can be specialized if the type is not a proto
+    std::string nameHelper()
+    {
+        return input.message().GetTypeName();
+    }
+
+    // Handles all of the message-specific writing actions. Kept as a
+    // separate helper method so that it can be specialized for images
+    // or any other non-proto types
+    void writeInternal(T msg)
+    {
+        // Add a new write to the list of current writes
+        ongoing.push_back(Write());
+        Write* current = &ongoing.back();
+
+        // Serialize directly into the Write's buffer to avoid a copy
+        msg.SerializeToString(&(current->buffer));
+
+        bytesWritten += current->buffer.length();
+
+        // Write ths size of the message that will be written
+        writeSize(current->buffer.length());
+
+        // Recommended by aio--zeroes the control block
+        memset(&current->control, 0, sizeof(current->control));
+
+        // Configure the control block
+        current->control.aio_fildes = fileDescriptor;
+        current->control.aio_buf = const_cast<char *>(current->buffer.data());
+        current->control.aio_nbytes = current->buffer.length();
+        current->control.aio_sigevent.sigev_notify = SIGEV_NONE;
+
+        // Enqueue the write
+        int result = aio_write(&current->control);
+
+        // Verify that the write didn't immediately fail
+        if (result == -1) {
+            std::cout<< "AIO write enqueue failed with error " << strerror(errno)
+                     << std::endl;
+        }
+
+#ifdef DEBUG_LOGGING
+        std::cout << "Enqueued a message for writing."
+                  << std::endl;
+#endif
+
+    }
+
     // Implements the Module run_ method
     virtual void run_()
     {
@@ -205,18 +224,30 @@ protected:
                 std::cout << io_exception.what() << std::endl;
                 return;
             }
-            this->writeHeader();
+            writeHeader();
         }
 
         // Check for and remove finished writes from the list
         checkWrites();
 
         // Start a new write for the current message
-        writeMessage<T>(input.message());
+        writeMessage(input.message());
     }
 
     portals::InPortal<T> input;
 };
 
+
+// These specialize the above template so that YUVImages can be logged
+// without having to be serialized and have protobuf methods
+template<>
+void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage);
+
+template<>
+void LogModule<messages::YUVImage>::writeHeader();
+
+// Lets us provide a name string for YUV image
+template<>
+std::string LogModule<messages::YUVImage>::nameHelper();
 }
 }

@@ -3,15 +3,11 @@
 #include "treemodel/ProtoNode.h"
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
-ProtoViewer::ProtoViewer(const google::protobuf::Message* msg,
-                         QWidget* parent) :
-        QTreeView(parent),
-        messageViewed(const_cast<google::protobuf::Message*>(msg))
+ProtoViewer::ProtoViewer(QWidget* parent) :
+        QTreeView(parent)
 {
-    this->createNewTreeModel();
 }
 
 ProtoViewer::~ProtoViewer() {
@@ -23,12 +19,6 @@ void ProtoViewer::createNewTreeModel() {
                                     messageViewed);
     treeModel = new TreeModel(root);
     this->setModel(treeModel);
-}
-
-void ProtoViewer::updateView(const google::protobuf::Message* msg)
-{
-    messageViewed->CopyFrom(*msg);
-    updateView();
 }
 
 void ProtoViewer::updateView() {
@@ -45,7 +35,7 @@ void ProtoViewer::updateView() {
 
 void ProtoViewer::showEvent(QShowEvent * e) {
     QTreeView::showEvent(e);
-    //explicitely update the bitmap when the widget becomes visible again
+    //explicitly update the bitmap when the widget becomes visible again
     //since it might have changed!
     this->updateView();
 }
@@ -55,6 +45,5 @@ void ProtoViewer::paintEvent(QPaintEvent* e) {
     shouldRedraw = true;
 }
 
-}
 }
 }

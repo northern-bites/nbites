@@ -10,9 +10,13 @@
 #include <QToolBar>
 #include <QScrollArea>
 #include <QResizeEvent>
+#include <QPixmap>
+#include <QImage>
+#include <QLabel>
 
 #include "ToolDiagram.h"
 #include "DataSelector.h"
+#include "logview/LogViewer.h"
 
 namespace tool {
 
@@ -23,6 +27,9 @@ public:
     Tool(const char* title = "TOOL");
     ~Tool();
 
+public slots:
+    void setUpModules();
+
 protected:
     // For keyboard control
     virtual void keyPressEvent(QKeyEvent * event);
@@ -31,9 +38,9 @@ protected:
 
     // Modules in this diagram will be run when data is updated
     ToolDiagram diagram;
-    DataSelector selector;
 
-    // Modules
+    DataSelector selector;
+    logview::LogViewer logView;
 
     // GUI stuff
     QTabWidget* toolTabs;

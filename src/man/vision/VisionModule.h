@@ -5,8 +5,9 @@
 
 #include "RoboGrams.h"
 
-#include "ThresholdedImage.h"
+#include "Images.h"
 #include "PMotion.pb.h"
+
 #include "InertialState.pb.h"
 
 #include "VisionField.pb.h"
@@ -27,9 +28,17 @@ public:
     VisionModule();
     virtual ~VisionModule();
 
-    portals::InPortal<messages::ThresholdedImage> topImageIn;
-    portals::InPortal<messages::ThresholdedImage> bottomImageIn;
-    portals::InPortal<messages::JointAngles> joint_angles;
+    portals::InPortal<messages::ThresholdImage> topThrImage;
+	portals::InPortal<messages::PackedImage16> topYImage;
+	portals::InPortal<messages::PackedImage16> topUImage;
+	portals::InPortal<messages::PackedImage16> topVImage;
+
+    portals::InPortal<messages::ThresholdImage> botThrImage;
+	portals::InPortal<messages::PackedImage16> botYImage;
+	portals::InPortal<messages::PackedImage16> botUImage;
+	portals::InPortal<messages::PackedImage16> botVImage;
+
+	portals::InPortal<messages::JointAngles> joint_angles;
     portals::InPortal<messages::InertialState> inertial_state;
 
     portals::OutPortal<messages::VisionField> vision_field;

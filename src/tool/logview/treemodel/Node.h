@@ -13,8 +13,7 @@
 #include "TreeModel.h"
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 class TreeModel::Node {
 
@@ -48,7 +47,6 @@ protected:
     const Node* parent;
 };
 
-}
 }
 }
 

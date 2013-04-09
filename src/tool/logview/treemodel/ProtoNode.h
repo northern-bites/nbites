@@ -31,8 +31,7 @@
 #include "Node.h"
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 namespace proto = google::protobuf;
 
@@ -102,4 +101,3 @@ private:
 }
 
 #endif /* ProtoNode_H_ */
-}

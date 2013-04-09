@@ -7,8 +7,14 @@ namespace man{
 namespace vision{
 
 VisionModule::VisionModule() : Module(),
-                               topImageIn(),
-                               bottomImageIn(),
+                               topThrImage(),
+                               topYImage(),
+                               topUImage(),
+                               topVImage(),
+                               botThrImage(),
+                               botYImage(),
+                               botUImage(),
+                               botVImage(),
                                joint_angles(),
                                inertial_state(),
                                vision_field(base()),
@@ -26,13 +32,21 @@ VisionModule::~VisionModule()
 
 void VisionModule::run_()
 {
-    topImageIn.latch();
-    bottomImageIn.latch();
+    topThrImage.latch();
+    topYImage.latch();
+    topUImage.latch();
+    topVImage.latch();
+    botThrImage.latch();
+    botYImage.latch();
+    botUImage.latch();
+    botVImage.latch();
     joint_angles.latch();
     inertial_state.latch();
 
-    vision->notifyImage(topImageIn.message().get_image(), bottomImageIn.message().get_image(),
-                        joint_angles.message(), inertial_state.message());
+    vision->notifyImage(topThrImage.message(), topYImage.message(), topUImage.message(), 
+                        topVImage.message(), botThrImage.message(), botYImage.message(),
+                        botUImage.message(), botVImage.message(), joint_angles.message(), 
+                        inertial_state.message());
 
     updateVisionBall();
     updateVisionRobot();
@@ -278,7 +292,6 @@ void VisionModule::updateVisionField() {
 
     vision_field.setMessage(field_data);
 }
-
 
 }
 }
