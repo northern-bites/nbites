@@ -275,22 +275,21 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
-    // This doesn't work. ELLIS!!!!!!!!
-    // // First check: is guardian turning stiffness off?
-    // if(stiffnessInput_.message().remove() && gainsOn)
-    // {
-    //     gainsOn = false;
-    //     std::cout << "Sending freeze command." << std::endl;
-    //     sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
-    //     return;
-    // }
-    // if(!stiffnessInput_.message().remove() && !gainsOn)
-    // {
-    //     gainsOn = true;
-    //     std::cout << "Sending unfreeze command." << std::endl;
-    //     sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
-    //     return;
-    // }
+    // First check: is guardian turning stiffness off?
+    if(stiffnessInput_.message().remove() && gainsOn)
+    {
+        gainsOn = false;
+        std::cout << "Sending freeze command." << std::endl;
+        sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+        return;
+    }
+    if(!stiffnessInput_.message().remove() && !gainsOn)
+    {
+        gainsOn = true;
+        std::cout << "Sending unfreeze command." << std::endl;
+        sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+        return;
+    }
 
     // (1) Process requests.
     if(lastRequest != requestInput_.message().timestamp())
