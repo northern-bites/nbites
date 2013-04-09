@@ -1713,13 +1713,11 @@ const uint16_t* Threshold::getYUV() {
 /* I haven't a clue what this method is for.
  * @param newyuv     presumably a new yuv value in bytes or something
  */
-void Threshold::setIm(const uint16_t* thrIm) {
-     thresholded = const_cast<uint8_t*>(
-		 reinterpret_cast<const uint8_t*>(thrIm));
+void Threshold::setIm(uint8_t* thrIm) {
+     thresholded = thrIm;
 }
-void Threshold::setIm_bot(const uint16_t* thrIm) {
-    thresholdedBottom = const_cast<uint8_t*>(
-        reinterpret_cast<const uint8_t*>(thrIm));
+void Threshold::setIm_bot(uint8_t* thrIm) {
+    thresholdedBottom = thrIm;
    }
 
 /* Calculate the distance between two objects (x distance only).

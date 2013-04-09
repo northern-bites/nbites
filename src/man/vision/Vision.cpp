@@ -73,7 +73,7 @@ Vision::Vision()
 	pose = boost::shared_ptr<NaoPose>(new NaoPose());
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
-    thresh->setIm(&global_16_image[0]);
+    thresh->setIm(&global_8_image[0]);
 }
 
 // Vision Class Deconstructor
@@ -97,7 +97,7 @@ Vision::~Vision()
 //DO NOT USE THIS FUNCTION - bende 4/3/2013
 void Vision::copyImage(const byte* image) {
     memcpy(&global_16_image[0], image, IMAGE_BYTE_SIZE);
-    thresh->setIm(&global_16_image[0]);
+    thresh->setIm(&global_8_image[0]);
 }
 
 // void Vision::notifyImage(const uint16_t* y) {
@@ -193,7 +193,7 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
 }
 
 //DO NOT USE THIS FUNCTION - bende 4/3/2013
-void Vision::setImage(const uint16_t *image) {
+void Vision::setImage(uint8_t *image) {
     thresh->setIm(image);
 }
 
