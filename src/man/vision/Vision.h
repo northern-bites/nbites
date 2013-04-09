@@ -36,11 +36,16 @@
 #include "InertialState.pb.h"
 #include "Images.h"
 
-class Vision;   // forward reference
-class FieldLinesDetector;
-class CornerDetector;
-class HoughVisualLine;
-class HoughVisualCorner;
+namespace man {
+namespace vision {
+	class Vision;   // forward reference
+	class FieldLinesDetector;
+	class CornerDetector;
+	class HoughVisualLine;
+	class HoughVisualCorner;
+}
+}
+
 
 // including Class header files
 #include "VisualCrossbar.h"
@@ -55,6 +60,9 @@ class HoughVisualCorner;
 #include "FieldLines.h"
 #include "VisualCorner.h"
 #include "VisualObstacle.h"
+
+namespace man {
+namespace vision {
 
 class Vision
 {
@@ -221,5 +229,8 @@ private:
 
 
 };
+
+}
+}
 
 #endif // _Vision_h_DEFINED

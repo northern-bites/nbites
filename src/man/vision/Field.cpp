@@ -62,6 +62,9 @@
 using namespace std;
 using boost::shared_ptr;
 
+namespace man {
+namespace vision {
+
 // Constructor for Field class. passed an instance of Vision and Pose
 Field::Field(Vision* vis, Threshold * thr)
 : vision(vis), thresh(thr)
@@ -613,4 +616,7 @@ void Field::drawMore(int x, int y, int c)
 	vision->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
 	vision->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
 #endif
+}
+
+}
 }

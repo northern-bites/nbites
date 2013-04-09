@@ -5,6 +5,9 @@
 #include <iostream>
 #include <stdio.h>
 
+namespace man {
+namespace vision {
+
 enum {
     default_edge_value = 50
 };
@@ -140,4 +143,7 @@ void EdgeDetector::findPeaks(int upperBound,
 #endif
     gradient.updatePeakGrid();
 
+}
+
+}
 }

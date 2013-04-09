@@ -3,14 +3,20 @@
 
 #include <list>
 #include <vector>
-
-class HoughSpace;
-class EdgeDetector;
-class Gradient;
+namespace man {
+namespace vision {
+	class HoughSpace;
+	class EdgeDetector;
+	class Gradient;
+}
+}
 
 #include "geom/HoughLine.h"
 #include "VisualCorner.h"
 #include "HoughVisualLine.h"
+
+namespace man {
+namespace vision {
 
 class FieldLinesDetector
 {
@@ -52,5 +58,8 @@ private:
     std::list<VisualCorner> mCorners;
     boost::shared_ptr<HoughSpace> mHough;
 };
+
+}
+}
 
 #endif /* _FieldLinesDetector_h_DEFINED */

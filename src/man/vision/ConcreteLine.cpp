@@ -1,6 +1,9 @@
 #include "ConcreteLine.h"
 using namespace std;
 
+namespace man {
+namespace vision {
+
 ConcreteLine::ConcreteLine(const float _fieldX1, const float _fieldY1,
                            const float _fieldX2, const float _fieldY2,
                            const lineID _id) :
@@ -284,4 +287,7 @@ const ConcreteLine& ConcreteLine::midline()
                  MIDLINE);
 
     return midline_line;
+}
+
+}
 }

@@ -5,8 +5,12 @@
 
 typedef unsigned char uchar;
 
-class Threshold;  // forward reference
-class Gradient;
+namespace man {
+namespace vision {
+	class Threshold;  // forward reference
+	class Gradient;
+}
+}
 
 #include "Vision.h"
 
@@ -19,7 +23,8 @@ class Gradient;
 #include "Context.h"
 #include "NaoPose.h"
 
-
+namespace man {
+namespace vision {
 //#define SOFTCOLORS
 
 //
@@ -315,5 +320,8 @@ private:
     static const bool debugVisualLines = false;
 #endif
 };
+
+}
+}
 
 #endif // RLE_h_DEFINED

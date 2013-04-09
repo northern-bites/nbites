@@ -8,6 +8,8 @@
 using namespace std;
 using namespace boost;
 
+namespace man {
+namespace vision {
 //-------------------------------
 // Static VisualCorner variables:
 const point <int> VisualCorner::
@@ -609,6 +611,7 @@ bool VisualCorner::doesItPointRight()
 /**
  * Returns true when the endpoint is below the corner on the screen.
  */
+
 bool VisualCorner::doesItPointLeft()
 {
     return orientation < 0.0;
@@ -624,4 +627,7 @@ const std::vector<cornerID> VisualCorner::getIDs() {
   }
 
   return poss;
+}
+
+}
 }

@@ -65,6 +65,9 @@ using std::min;
 using std::endl;
 #define PRINT_VISION_INFO
 
+namespace man {
+namespace vision {
+
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr)
@@ -1875,3 +1878,6 @@ void Threshold::setDebugRobots(bool _bool) {
 	red->setDebugRobots(_bool);
 }
 #endif
+
+}
+}

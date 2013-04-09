@@ -29,6 +29,9 @@ using namespace NBMath;
 using namespace CoordFrame4D;
 using namespace angle;
 
+namespace man {
+namespace vision {
+
 // From camera docs:
 const float NaoPose::IMAGE_WIDTH_MM = 2.45f;
 const float NaoPose::IMAGE_HEIGHT_MM = 1.84f;
@@ -734,3 +737,5 @@ estimate NaoPose::estimateFromObjectSize(pixels pixelX, pixels pixelY, mms objec
     return makeEstimateFrom(pixelInWorldFrame, distance2D, objectHeight);
 }
 
+}
+}

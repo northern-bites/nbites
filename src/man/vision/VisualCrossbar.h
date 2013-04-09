@@ -4,7 +4,11 @@
 #include <iomanip>
 #include <cstdlib>
 
-class VisualCrossbar;
+namespace man {
+namespace vision {
+	class VisualCrossbar;
+}
+}
 
 #include "VisualLandmark.h"
 #include "VisualDetection.h"
@@ -13,6 +17,9 @@ class VisualCrossbar;
 #include "Structs.h"
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
+
+namespace man {
+namespace vision {
 
 class VisualCrossbar : public VisualDetection {
 
@@ -90,5 +97,8 @@ private: // Class Variables
     float crossbarDistanceToSD(float _distance) { return 1.0f; }
     float crossbarBearingToSD(float _bearing) { return 0.01f; }
 };
+
+}
+}
 
 #endif // VisualCrossbar_hpp_defined

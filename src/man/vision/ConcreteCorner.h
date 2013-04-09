@@ -1,7 +1,13 @@
 #ifndef ConcreteCorner_h_defined
 #define ConcreteCorner_h_defined
 
-class ConcreteCorner;
+namespace man {
+namespace vision {
+
+	class ConcreteCorner;
+
+}
+}
 
 #include <ostream>
 #include <iostream>
@@ -14,6 +20,9 @@ class ConcreteCorner;
 #include "ConcreteLine.h"
 #include "ConcreteLandmark.h"
 #include "NBMath.h"
+
+namespace man {
+namespace vision {
 
 enum cornerID {
     L_INNER_CORNER = 0,
@@ -282,5 +291,8 @@ public:
             possibilities.end();
     }
 };
+
+}
+}
 
 #endif

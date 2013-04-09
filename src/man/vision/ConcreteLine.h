@@ -9,6 +9,9 @@
 // Includes
 #include "FieldConstants.h"
 
+namespace man {
+namespace vision {
+
 // Line ID values
 enum lineID {
     // Ambiguous lines
@@ -114,6 +117,9 @@ private:
     lineID id;
 
 }; // class ConcreteLine
+
+}
+}
 
 #endif // ConcreteLine_h_defined
 

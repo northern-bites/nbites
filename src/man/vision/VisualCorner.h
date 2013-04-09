@@ -6,13 +6,20 @@
 #include <vector>
 #include "Structs.h"
 
-class VisualCorner;
+namespace man {
+namespace vision {
+	class VisualCorner;
+}
+}
 
 #include "ConcreteCorner.h"
 #include "Utility.h"
 #include "VisualObject.h"
 #include "VisualLine.h"
 #include <boost/shared_ptr.hpp>
+
+namespace man {
+namespace vision {
 
 class NaoPose;
 
@@ -258,5 +265,8 @@ public:
                         abs(edges.bottom - y) < minPixelSeparation));
     }
 };
+
+}
+}
 
 #endif

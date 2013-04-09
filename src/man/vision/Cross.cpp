@@ -28,6 +28,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 Cross::Cross(Vision* vis, Threshold* thr, Field* fie, Context* con)
 : vision(vis), thresh(thr), field(fie), context(con)
 {
@@ -420,5 +423,5 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
     return false;
 }
 
-
-
+}
+}

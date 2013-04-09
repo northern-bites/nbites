@@ -41,6 +41,9 @@ using namespace std;
 using namespace ::messages;
 using boost::shared_ptr;
 
+namespace man {
+namespace vision {
+
 static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
@@ -668,4 +671,8 @@ void Vision::drawVisualCorners(const vector<HoughVisualCorner>& corners)
         }
     }
 #endif
+}
+
+
+}
 }

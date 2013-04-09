@@ -3,6 +3,9 @@
 
 #include "Structs.h"
 
+namespace man {
+namespace vision {
+
 // a blob structure that holds information about its own location, and
 // information involving its larger blob structure
 struct blob {
@@ -28,5 +31,8 @@ struct stop {
     int good;
     int span;
 };
+
+}
+}
 
 #endif // VisionStructs_h_defined
