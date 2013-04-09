@@ -59,9 +59,9 @@ def ballInPosition(player, kickPose):
 
     #Get the current kick sweet spot information
 
-    return (fabs(kickPose.rel_x) < constants.BALL_X_OFFSET and
-            fabs(kickPose.rel_y) < constants.BALL_Y_OFFSET and
-            fabs(kickPose.rel_h) < constants.GOOD_ENOUGH_H)
+    return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
+            fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
+            fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
 def ballNearPosition(player):
     """

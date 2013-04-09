@@ -88,7 +88,7 @@ class KickInformation:
             if self.brain.yglp.certainty == 2: # HACK for early messages
                 if self.brain.yglp.distance > 300:
                     self.farGoalLeftPostBearings.append(self.brain.yglp.bearing_deg)
-                    self.farGoalLeftPostDists.append(self.brain.yglp.vis.distance)
+                    self.farGoalLeftPostDists.append(self.brain.yglp.distance)
                     if self.brain.yglp.red_goalie:
                         self.farGoalieRed += 1
                     elif self.brain.yglp.navy_goalie:
