@@ -278,16 +278,15 @@ void BehaviorsModule::sendMessages()
     if (resetLocRequest.get()->timestamp() != 0)
         resetLocOut.setMessage(resetLocRequest);
 
-    // Only set motion commands that python has actually used
-    if (!bodyMotionCommand.get()->processed_by_motion())
+    if (bodyMotionCommand.get()->timestamp() != 0)
     {
         bodyMotionCommandOut.setMessage(bodyMotionCommand);
     }
-    if (!headMotionCommand.get()->processed_by_motion())
+    if (headMotionCommand.get()->timestamp() != 0)
     {
         headMotionCommandOut.setMessage(headMotionCommand);
     }
-    if (!motionRequest.get()->processed_by_motion())
+    if (motionRequest.get()->timestamp() != 0)
     {
         motionRequestOut.setMessage(motionRequest);
     }

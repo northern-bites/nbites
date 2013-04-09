@@ -17,7 +17,7 @@ def lookToTarget(tracker):
     if tracker.target.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         if tracker.activeLocOn:
             return tracker.goNow('activeTracking')
         else:
@@ -26,7 +26,7 @@ def lookToTarget(tracker):
     elif tracker.stateTime >= TIME_TO_LOOK_TO_TARGET:
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         return tracker.goLater('scanForTarget')
 
     tracker.helper.lookToPoint(tracker.target)
@@ -42,12 +42,12 @@ def scanForTarget(tracker):
         if tracker.activeLocOn:
             request = tracker.brain.interface.motionRequest
             request.type = request.RequestType.STOP_HEAD
-            request.processed_by_motion = False
+            request.timestamp = int(tracker.brain.time * 1000)
             return tracker.goNow('activeTracking')
         else:
             request = tracker.brain.interface.motionRequest
             request.type = request.RequestType.STOP_HEAD
-            request.processed_by_motion = False
+            request.timestamp = int(tracker.brain.time * 1000)
             return tracker.goNow('targetTracking')
 
     if not tracker.brain.motion.head_is_active:
@@ -74,7 +74,7 @@ def targetTracking(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.activeLocOn = False
 
     if tracker.target.vis.frames_off > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
@@ -108,7 +108,7 @@ def lookStraightThenTrackFixedPitch(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
         tracker.target = tracker.brain.ball
 

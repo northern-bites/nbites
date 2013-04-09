@@ -62,7 +62,7 @@ def scanning(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(tracker.currentHeadScan)
 
     if not tracker.brain.motion.head_is_active:
@@ -79,7 +79,7 @@ def locPans(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.QUICK_PANS)
 
     if not tracker.brain.motion.head_is_active:
@@ -97,7 +97,7 @@ def fullPanFixedPitch(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
     if not tracker.brain.motion.head_is_active:
@@ -116,7 +116,7 @@ def lookLeftFixedPitch(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
 
     if not tracker.brain.motion.head_is_active:
@@ -132,7 +132,7 @@ def lookRightFixedPitch(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
     if not tracker.brain.motion.head_is_active:

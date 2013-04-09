@@ -60,7 +60,7 @@ class HeadTrackingHelper(object):
             else:
                 self.tracker.printf("What kind of sweet ass-Move is this?")
 
-        command.processed_by_motion = False
+        command.timestamp = int(self.tracker.brain.time * 1000)
         # Returns the last HJC in the HeadMove for keeping track of
         # when a move is done
         return move
@@ -169,7 +169,7 @@ class HeadTrackingHelper(object):
         command.pos_command.max_speed_yaw = maxSpeed
         command.pos_command.max_speed_pitch = maxSpeed
 
-        command.processed_by_motion = False
+        command.timestamp = int(self.tracker.brain.time * 1000)
 
     # Fixed Pitch
     def trackObjectFixedPitch(self):
@@ -217,7 +217,7 @@ class HeadTrackingHelper(object):
         command.pos_command.max_speed_yaw = maxSpeed
         command.pos_command.max_speed_pitch = maxSpeed
 
-        command.processed_by_motion = False
+        command.timestamp = int(self.tracker.brain.time * 1000)
 
     # Not called anywhere in the code.
     def lookToTargetAngles(self, target):
@@ -244,7 +244,7 @@ class HeadTrackingHelper(object):
         command.pos_command.head_yaw = yaw
         command.pos_command.head_pitch = pitch
         # Leave max speeds to default
-        command.processed_by_motion = False
+        command.timestamp = int(self.tracker.brain.time * 1000)
 
     def panTo(self, heads):
         """

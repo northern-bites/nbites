@@ -61,7 +61,7 @@ def setDestination(nav, dest, gain = 1.0):
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
     # Mark this message for sending
-    command.processed_by_motion = False
+    command.timestamp = int(nav.brain.time * 1000)
 
 def setOdometryDestination(nav, dest, gain = 1.0):
     # TODO: distinguish from setDestination method
@@ -72,7 +72,7 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
     # Mark this message for sending
-    command.processed_by_motion = False
+    command.timestamp = int(nav.brain.time * 1000)
 
 #not used!
 def getOrbitLocation(radius, angle):
@@ -105,7 +105,7 @@ def createAndSendWalkVector(nav, x, y, theta):
     command.speed.y = y
     command.speed.h = theta
     # Mark this message for sending
-    command.processed_by_motion = False
+    command.timestamp = int(nav.brain.time * 1000)
 
 def executeMove(nav, sweetMove):
     """
@@ -176,7 +176,7 @@ def executeMove(nav, sweetMove):
             move.stiffness.r_ankle_roll =     position[6][17]
 
             # Mark this message for sending
-            command.processed_by_motion = False
+            command.timestamp = int(nav.brain.time * 1000)
             print("Sent a scripted move.")
 
         else:

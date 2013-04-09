@@ -11,7 +11,7 @@ def stop(tracker):
         tracker.activeLocOn = False
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
 
     if not tracker.brain.motion.head_is_active:
         return tracker.goNow('stopped')
@@ -24,7 +24,7 @@ def neutralHead(tracker):
         tracker.activeLocOn = False
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.NEUT_HEADS)
 
     if not tracker.brain.motion.head_is_active:
@@ -37,7 +37,7 @@ def doHeadMove(tracker):
     tracker.activeLocOn = False
     request = tracker.brain.interface.motionRequest
     request.type = request.RequestType.STOP_HEAD
-    request.processed_by_motion = False
+    request.timestamp = int(tracker.brain.time * 1000)
     tracker.helper.executeHeadMove(tracker.headMove)
 
     return tracker.goLater('doingHeadMove')
@@ -53,7 +53,7 @@ def repeatHeadMove(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.startingPan(tracker.headMove)
 
     if not tracker.brain.motion.head_is_active:
@@ -66,7 +66,7 @@ def penalizeHeads(tracker):
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.PENALIZED_HEADS)
 
     if not tracker.brain.motion.head_is_active:

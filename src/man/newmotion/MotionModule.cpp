@@ -294,8 +294,10 @@ void MotionModule::processMotionInput()
     // }
 
     // (1) Process requests.
-    if(!requestInput_.message().processed_by_motion())
+    if(lastRequest != requestInput_.message().timestamp())
     {
+        lastRequest = requestInput_.message().timestamp();
+
         if (requestInput_.message().type() ==
             messages::MotionRequest::STOP_BODY)
         {
@@ -311,15 +313,12 @@ void MotionModule::processMotionInput()
         {
             resetOdometry();
         }
-        const_cast<messages::MotionRequest&>(requestInput_.message()).set_processed_by_motion(true);
     }
 
     // (2) Process body commands.
-    if(!bodyCommandInput_.message().processed_by_motion())
+    if(lastBodyCommand != bodyCommandInput_.message().timestamp())
     {
-        // std::cout << "MESSAGE" << bodyCommandInput_.message().dest().rel_x() << " "
-        //           << bodyCommandInput_.message().dest().rel_y() << " "
-        //           << bodyCommandInput_.message().dest().rel_h() << " "<< std::endl;
+        lastBodyCommand = bodyCommandInput_.message().timestamp();
 
         if (bodyCommandInput_.message().type() ==
             messages::MotionCommand::DESTINATION_WALK)
@@ -336,12 +335,13 @@ void MotionModule::processMotionInput()
         {
             sendMotionCommand(bodyCommandInput_.message().script());
         }
-        const_cast<messages::MotionCommand&>(bodyCommandInput_.message()).set_processed_by_motion(true);
     }
 
     // (3) Process head commands.
-    if(!headCommandInput_.message().processed_by_motion())
+    if(lastHeadCommand != headCommandInput_.message().timestamp())
     {
+        lastHeadCommand = headCommandInput_.message().timestamp();
+
         if (headCommandInput_.message().type() ==
             messages::HeadMotionCommand::POS_HEAD_COMMAND)
         {
@@ -352,7 +352,6 @@ void MotionModule::processMotionInput()
         {
             sendMotionCommand(headCommandInput_.message().scripted_command());
         }
-        const_cast<messages::HeadMotionCommand&>(headCommandInput_.message()).set_processed_by_motion(true);
     }
 }
 
