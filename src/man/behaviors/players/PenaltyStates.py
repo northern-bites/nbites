@@ -82,23 +82,23 @@ def setLocInfo(player):
     if player.headCount <= LOOK_DIR_THRESH:
         #looking left
         if player.yellowCount > 0:
-            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+            player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                               NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
                               -90.0)
             return
             #must see blue
-        player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+        player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                           NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
                           90.0)
         return
         #must be looking right
     if player.yellowCount > 0:
-        player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+        player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                           NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
                           90.0)
         return
         #must see blue
-    player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+    player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                       NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
                       -90.0)
     return
