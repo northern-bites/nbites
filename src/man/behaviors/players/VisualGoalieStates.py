@@ -1,4 +1,4 @@
-from ..headTracking.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
+from ..headTracker.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
                                       FIXED_PITCH_RIGHT_SIDE_PAN,
                                       FIXED_PITCH_PAN,
                                       FIXED_PITCH_SLOW_GOALIE_PAN)

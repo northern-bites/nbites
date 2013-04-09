@@ -1,5 +1,5 @@
-import man.motion.HeadMoves as HeadMoves
-from ..headTracking import TrackingConstants as constants
+from ..headTracker import HeadMoves
+from ..headTracker import TrackingConstants as constants
 from man.motion import MotionConstants
 
 def gameInitial(player):

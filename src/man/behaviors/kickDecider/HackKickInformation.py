@@ -6,6 +6,7 @@ import math
 DEBUG_KICK_DECISION = False
 USE_LOC = False
 USE_LOC_HALF_FIELD = False
+USE_LAB_FIELD = False
 
 class KickInformation:
     """
@@ -14,6 +15,12 @@ class KickInformation:
     def __init__(self, brain):
 #        self.decider = decider
         self.brain = brain
+
+        # Set goal distance depending on type of field being used
+        if USE_LAB_FIELD:
+            self.closeGoalThresh = 250
+        else:
+            self.closeGoalThresh = 300
 
         # If true, we will always aim for the center of the goal.
         # If false, we will aim for the corners of the goal.
@@ -86,14 +93,14 @@ class KickInformation:
         if self.brain.yglp.on:
             self.sawGoal = True
             if self.brain.yglp.certainty == 2: # HACK for early messages
-                if self.brain.yglp.distance > 300:
+                if self.brain.yglp.distance > self.closeGoalThresh:
                     self.farGoalLeftPostBearings.append(self.brain.yglp.bearing_deg)
                     self.farGoalLeftPostDists.append(self.brain.yglp.distance)
                     if self.brain.yglp.red_goalie:
                         self.farGoalieRed += 1
                     elif self.brain.yglp.navy_goalie:
                         self.farGoalieNavy += 1
-                if self.brain.yglp.distance < 300:
+                if self.brain.yglp.distance < self.closeGoalThresh:
                     self.nearGoalLeftPostBearings.append(self.brain.yglp.bearing_deg)
                     self.nearGoalLeftPostDists.append(self.brain.yglp.distance)
                     if self.brain.yglp.red_goalie:
@@ -104,14 +111,14 @@ class KickInformation:
         if self.brain.ygrp.on:
             self.sawGoal = True
             if self.brain.ygrp.certainty == 2: # HACK for early messages
-                if self.brain.ygrp.distance > 300:
+                if self.brain.ygrp.distance > self.closeGoalThresh:
                     self.farGoalRightPostBearings.append(self.brain.ygrp.bearing_deg)
                     self.farGoalRightPostDists.append(self.brain.ygrp.distance)
                     if self.brain.ygrp.red_goalie:
                         self.farGoalieRed += 1
                     elif self.brain.ygrp.navy_goalie:
                         self.farGoalieNavy += 1
-                if self.brain.ygrp.distance < 300:
+                if self.brain.ygrp.distance < self.closeGoalThresh:
                     self.nearGoalRightPostBearings.append(self.brain.ygrp.bearing_deg)
                     self.nearGoalRightPostDists.append(self.brain.ygrp.distance)
                     if self.brain.ygrp.red_goalie:
@@ -222,7 +229,7 @@ class KickInformation:
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
             if mate.playerNumber in [1] and mate.active:
-                if mate.ballOn and mate.ballDist < 350:
+                if mate.ballOn and mate.ballDist < self.closeGoalThresh+50:
                     return True
 
         return False
