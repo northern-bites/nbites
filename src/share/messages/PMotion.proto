@@ -10,7 +10,7 @@ message MotionRequest
 
     optional RequestType type = 1;
 
-    optional bool processed_by_motion = 2 [default = true];
+    optional int64 timestamp = 2;
 }
 
 message MotionCommand
@@ -27,7 +27,7 @@ message MotionCommand
     optional DestinationWalk dest = 3;
     optional WalkCommand speed = 4;
 
-    optional bool processed_by_motion = 5 [default = true];
+    optional int64 timestamp = 5;
 }
 
 message ScriptedMove
@@ -75,7 +75,7 @@ message HeadMotionCommand
     optional PositionHeadCommand pos_command = 2;
     optional ScriptedHeadCommand scripted_command = 3;
 
-    optional bool processed_by_motion = 4 [default = true];
+    optional int64 timestamp = 4;
 }
 
 message PositionHeadCommand

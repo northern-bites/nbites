@@ -84,6 +84,11 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::joints_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("resetLocRequest",
+                      make_getter(&PyInterface::resetLocRequest_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+
         ;
     scope().attr("interface") = interface_ptr;
 }

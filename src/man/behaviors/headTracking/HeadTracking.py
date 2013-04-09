@@ -128,7 +128,7 @@ class HeadTracking(FSA.FSA):
         self.switchTo('stopped')
         request = tracker.brain.interface.motionRequest
         request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.timestamp = int(self.brain.time * 1000)
         self.helper.lookToAngleFixedPitch(yaw)
 
     def lookStraightThenTrackFixedPitch(self):

@@ -27,7 +27,7 @@ def afterPenalty(player):
     # TODO: Make this work for two yellow goals & resetLoc to one place?
     # Would be great if loc worked. Hacked out for US OPEN 2012
     """
-    if not player.brain.motion.head_is_active():
+    if not player.brain.motion.head_is_active:
         ##looking to the side
         if player.brain.yglp.on or player.brain.ygrp.on:
             #see the goal posts in multiple frames for safety
@@ -83,23 +83,23 @@ def setLocInfo(player):
     if player.headCount <= LOOK_DIR_THRESH:
         #looking left
         if player.yellowCount > 0:
-            player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+            player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                               NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
                               -90.0)
             return
             #must see blue
-        player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+        player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                           NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
                           90.0)
         return
         #must be looking right
     if player.yellowCount > 0:
-        player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+        player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                           NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
                           90.0)
         return
         #must see blue
-    player.brain.loc.resetLocTo(NogginConstants.CENTER_FIELD_X, \
+    player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
                       NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
                       -90.0)
     return

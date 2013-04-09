@@ -13,42 +13,40 @@ from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 #from vision import cornerID as IDs
 from math import fabs, degrees
 from ..kickDecider import kicks
-import noggin_constants as nogginConstants
+import noggin_constants as Constants
 
 DEBUG_OBSERVATIONS = False
 DEBUG_POSITION = False
-
-def spinToFaceGoal(player):
-    if player.firstFrame():
-        if (player.lastDiffState == 'decideRightSide'):
-            player.side = RIGHT
-        else:
-            player.side = LEFT
-
-        spinToFaceGoal.facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if player.side == RIGHT:
-            spinToFaceGoal.facingDest.relH = 90
-        else:
-            spinToFaceGoal.facingDest.relH = -90
-
-    player.brain.tracker.lookToAngle(0)
-
-    if player.counter == 20:
-        player.brain.nav.goTo(spinToFaceGoal.facingDest,
-                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
-
-    return Transition.getNextState(player, spinToFaceGoal)
-
 
 def walkToGoal(player):
     """
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        # first decide which side you're coming in from
-        if player.lastDiffState == 'gatherPostInfo':
-            # don't change side
-            player.side = player.side
+        if player.side == RIGHT:
+            if (player.brain.gameController.teamColor ==
+                Constants.teamColor.TEAM_BLUE):
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        Constants.HEADING_UP)
+            else:
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        Constants.HEADING_DOWN)
+        else:
+            if (player.brain.gameController.teamColor ==
+                Constants.teamColor.TEAM_BLUE):
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                                        Constants.HEADING_UP)
+            else:
+                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                                        Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                                        Constants.HEADING_DOWN)
+
+    player.brain.nav.goTo(RobotLocation(Constants.FIELD_GREEN_LEFT_SIDELINE_X,
+                                        Constants.MIDFIELD_Y,
+                                        Constants.HEADING_RIGHT))
 
     return player.stay()
 
@@ -72,19 +70,6 @@ def dodgeBall(player):
     dodgeBall.dodgeDest.relX = player.brain.ball.rel_x
 
     return Transition.getNextState(player, dodgeBall)
-
-def gatherPostInfo(player):
-    if player.firstFrame():
-        if player.side == RIGHT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_LEFT_SIDE_PAN)
-        if player.side == LEFT:
-            player.brain.tracker.repeatHeadMove(FIXED_PITCH_RIGHT_SIDE_PAN)
-        player.brain.nav.stop()
-
-    if player.counter > 90:
-        return player.goLater('walkToGoal')
-
-    return player.stay()
 
 def spinAtGoal(player):
     if player.firstFrame():
@@ -176,16 +161,14 @@ def decideRightSide(player):
 
 def returnToGoal(player):
     if player.firstFrame():
-        #if player.lastDiffState == 'didIKickIt':
-        correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
-                        returnToGoal.kickPose)
-        correctedDest.relX = correctedDest.relX
-
-    else:
-        correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
-                         RelRobotLocation(player.brain.interface.odometry.x,
-                                          player.brain.interface.odometry.y,
-                                          0.0))
+        if player.lastDiffState == 'didIKickIt':
+            correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
+                            returnToGoal.kickPose)
+        else:
+            correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
+                             RelRobotLocation(player.brain.interface.odometry.x,
+                                              player.brain.interface.odometry.y,
+                                              0.0))
 
         if fabs(correctedDest.relX) < 5:
             correctedDest.relX = 0.0

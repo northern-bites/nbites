@@ -69,7 +69,7 @@ def trackingFixedPitch(tracker):
 
 def ballSpinTracking(tracker):
 #    '''Super state which handles following/refinding the ball'''
-#    if tracker.target.vis.framesOff <= \
+#    if tracker.target.vis.frames_off <= \
 #            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
 #        return tracker.goNow('tracking')
 #    else:
