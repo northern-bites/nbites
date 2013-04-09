@@ -62,6 +62,12 @@ void MotionModule::run_()
     //     of the main motion loop.
     if(running)
     {
+        // std::cout << "current provider: "
+        //           << curProvider->getName()
+        //           << " next provider: "
+        //           << nextProvider->getName()
+        //           << std::endl;
+
         // (3) Do any necessary preprocessing of joint angles
         //     then actually compute next joints and
         //     stiffnesses.
@@ -279,14 +285,12 @@ void MotionModule::processMotionInput()
     if(stiffnessInput_.message().remove() && gainsOn)
     {
         gainsOn = false;
-        std::cout << "Sending freeze command." << std::endl;
         sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
         return;
     }
     if(!stiffnessInput_.message().remove() && !gainsOn)
     {
         gainsOn = true;
-        std::cout << "Sending unfreeze command." << std::endl;
         sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
         return;
     }
