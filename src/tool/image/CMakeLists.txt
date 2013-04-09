@@ -1,64 +1,26 @@
-
-############ QTool/Image
-
-project( image )
 cmake_minimum_required(VERSION 2.8.3)
 
-########### Dependencies
-
-find_package(Qt4 REQUIRED)
-find_library(SWSCALE_LIBRARY swscale PATHS)
-find_library(AVUTIL_LIBRARY avutil PATHS)
-
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
-
-########### Sources
-
-set( Image_srcs
-    YUVImage
-    BMPYUVImage
-    Color
-    ThresholdedImage
-    VisualInfoImage
-    FastYUVToBMPImage
-    PaintField
-    PaintBots
-    PaintLocalization
-    PaintFieldObjects
-    PaintRobotWorldState
+set( IMAGE_SRCS
+  ImageDisplayModule.cpp
+  Color.cpp
     )
 
-set( Image_headers
-  BMPImage.h
-  FastYUVToBMPImage.h
-  PaintField.h
-  PaintBots.h
-  PaintLocalization.h
-  PaintGroundTruth.h
-  PaintFieldObjects.h
-  PaintRobotWorldState.h)
+set( IMAGE_HEADERS
+  ImageDisplayModule.h
+  )
 
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
-
-############ Qt4 goodness
-
-Qt4_wrap_cpp(Image_headers_moc ${Image_headers})
-
-######### The Library
+Qt4_wrap_cpp( IMAGE_HEADERS_MOC ${IMAGE_HEADERS} )
 
 add_library(image
     STATIC
-    ${Image_srcs}
-    ${Image_headers_moc}
+    ${IMAGE_SRCS}
+    ${IMAGE_HEADERS_MOC}
     )
 
 
 target_link_libraries(
   image
-  viewer
-  overseer_client
+  messages
+  portals
   ${QT_LIBRARIES}
-  ${SWSCALE_LIBRARY}
-  ${AVUTIL_LIBRARY}
   )

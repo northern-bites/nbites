@@ -13,12 +13,12 @@
 #include <QtGui>
 #include <vector>
 
-#include "ProtoViewer.h"
 #include "unlog/UnlogModule.h"
+#include "image/ImageDisplayModule.h"
+#include "ProtoViewer.h"
 
 namespace tool {
-namespace unlog {
-namespace view {
+namespace logview {
 
 class LogViewer : public QMainWindow {
     Q_OBJECT;
@@ -26,12 +26,12 @@ class LogViewer : public QMainWindow {
 public:
     LogViewer(QWidget* parent = 0);
 
-    void addProtoViewer(UnlogBase* unlogger);
+public slots:
+    void newDisplayWidget(QWidget*, std::string);
 
-private:
-    std::vector<QDockWidget*> dockWidget;
+protected:
+    QTabWidget imageTabs;
 };
 
-}
 }
 }

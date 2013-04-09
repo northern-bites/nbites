@@ -34,6 +34,7 @@
 // including message types
 #include "PMotion.pb.h"
 #include "InertialState.pb.h"
+#include "Images.h"
 
 class Vision;   // forward reference
 class FieldLinesDetector;
@@ -86,12 +87,15 @@ public:
     // for when we have two cameras
 //    void notifyImage(const uint16_t *top, const uint16_t *bot);
     // for use with modules
-    void notifyImage(const uint16_t *top, const uint16_t *bot,
-		     const messages::JointAngles& ja, const messages::InertialState& inert);
+    void notifyImage(const messages::ThresholdImage& topThrIm, const messages::PackedImage16& topYIm,
+					 const messages::PackedImage16& topUIm, const messages::PackedImage16& topVIm,
+					 const messages::ThresholdImage& botThrIm, const messages::PackedImage16& botYIm,
+					 const messages::PackedImage16& botUIm, const messages::PackedImage16& botVIm,
+					 const messages::JointAngles& ja, const messages::InertialState& inert);
     // utilize the current image pointer for vision processing
 //    void notifyImage();
     // set the current image pointer to the given pointer
-    void setImage(const uint16_t* image);
+    void setImage(uint8_t* image);
 
     // visualization methods
     void drawBox(int left, int right, int bottom, int top, int c);

@@ -43,7 +43,8 @@ include_directories( ${SHARE_DIR}/portals )
 
 # Compile messages into messages folder
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
-include_directories(  ${CMAKE_CURRENT_BINARY_DIR}/messages )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages )
+include_directories( ${SHARE_DIR}/messages )
 
 # If protobuf libs don't exist yet, make sure they build before man
 if( BUILD_PROTOBUF )
@@ -52,6 +53,8 @@ endif()
 
 # Actual subdirectories!
 add_subdirectory( unlog )
+add_subdirectory( logview )
+add_subdirectory( image )
 
 # Sources
 set( tool_srcs main.cpp
@@ -79,5 +82,7 @@ target_link_libraries(
   portals
   messages
   unlog
+  logview
+  image
   ${QT_LIBRARIES}
   )

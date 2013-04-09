@@ -57,4 +57,15 @@ if(USE_LOGGING)
     "Log the robot's vision output."
     OFF
     )
+  option(
+    LOG_IMAGES
+    "Log the raw images from the camera."
+    OFF
+    )
+else(USE_LOGGING)
+  unset(LOG_SENSORS CACHE)
+  unset(LOG_GUARDIAN CACHE)
+  unset(LOG_COMM CACHE)
+  unset(LOG_VISION CACHE)
+  unset(LOG_IMAGES CACHE)
 endif(USE_LOGGING)
