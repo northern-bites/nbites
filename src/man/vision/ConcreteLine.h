@@ -8,41 +8,37 @@
 
 // Includes
 #include "FieldConstants.h"
+#include "VisionField.pb.h"
 
 namespace man {
 namespace vision {
 
 // Line ID values
-enum lineID {
-    // Ambiguous lines
-    UNKNOWN_LINE = 50,
-    SIDE_OR_ENDLINE,
-    SIDELINE_LINE,
-    ENDLINE_LINE,
-    GOALBOX_LINE,
-    GOALBOX_SIDE_LINE,			// 55
-    GOALBOX_TOP_LINE,
 
-    // Distinct lines:
-	// Named by looking from center field out, left end is at the blue goal
-
-	// Endlines
-    BLUE_GOAL_ENDLINE,
-    YELLOW_GOAL_ENDLINE,
-
-    TOP_SIDELINE,
-    BOTTOM_SIDELINE,
-    MIDLINE,
-
-	// GOALBOX LINES:
-	// Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
-    BLUE_GOALBOX_TOP_LINE,
-    BLUE_GOALBOX_LEFT_LINE,
-    BLUE_GOALBOX_RIGHT_LINE,
-    YELLOW_GOALBOX_TOP_LINE,
-    YELLOW_GOALBOX_LEFT_LINE,
-    YELLOW_GOALBOX_RIGHT_LINE
-};
+	typedef ::messages::VisionField::line_id lineID;
+	static const lineID UNKNOWN_LINE = ::messages::VisionField_line_id_UNKNOWN_LINE;
+	static const lineID SIDE_OR_ENDLINE = ::messages::VisionField_line_id_SIDE_OR_ENDLINE;
+	static const lineID SIDELINE_LINE = ::messages::VisionField_line_id_SIDELINE_LINE;
+	static const lineID ENDLINE_LINE = ::messages::VisionField_line_id_ENDLINE_LINE;
+	static const lineID GOALBOX_LINE = ::messages::VisionField_line_id_GOALBOX_LINE;
+	static const lineID GOALBOX_SIDE_LINE = ::messages::VisionField_line_id_GOALBOX_SIDE_LINE;
+	static const lineID GOALBOX_TOP_LINE = ::messages::VisionField_line_id_GOALBOX_TOP_LINE;
+	static const lineID BLUE_GOAL_ENDLINE = ::messages::VisionField_line_id_BLUE_GOAL_ENDLINE;
+	static const lineID YELLOW_GOAL_ENDLINE = ::messages::VisionField_line_id_YELLOW_GOAL_ENDLINE;
+	static const lineID TOP_SIDELINE = ::messages::VisionField_line_id_TOP_SIDELINE;
+	static const lineID BOTTOM_SIDELINE = ::messages::VisionField_line_id_BOTTOM_SIDELINE;
+	static const lineID MIDLINE = ::messages::VisionField_line_id_MIDLINE;
+	static const lineID BLUE_GOALBOX_TOP_LINE = ::messages::VisionField_line_id_BLUE_GOALBOX_TOP_LINE;
+	static const lineID BLUE_GOALBOX_LEFT_LINE = 
+		::messages::VisionField_line_id_BLUE_GOALBOX_LEFT_LINE;
+	static const lineID BLUE_GOALBOX_RIGHT_LINE = 
+		::messages::VisionField_line_id_BLUE_GOALBOX_RIGHT_LINE;
+	static const lineID YELLOW_GOALBOX_TOP_LINE = 
+		::messages::VisionField_line_id_YELLOW_GOALBOX_TOP_LINE;
+	static const lineID YELLOW_GOALBOX_LEFT_LINE = 
+		::messages::VisionField_line_id_YELLOW_GOALBOX_LEFT_LINE;
+	static const lineID YELLOW_GOALBOX_RIGHT_LINE = 
+		::messages::VisionField_line_id_YELLOW_GOALBOX_RIGHT_LINE;
 
 class ConcreteLine
 {

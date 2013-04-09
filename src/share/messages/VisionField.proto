@@ -38,8 +38,9 @@ message VisionField
    {
       optional VisualDetection visual_detection = 1;
       optional float orientation = 2;
-      optional int32 corner_type = 3;
+      optional shape corner_type = 3;
       optional float physical_orientation = 4;
+      repeated  corner_id poss_id = 5;
    }
 
    message VisualLine
@@ -54,7 +55,7 @@ message VisionField
       optional float length = 8;
       optional float slope = 9;
       optional float y_int = 10;
-      repeated int32 possibilities = 11;
+      repeated line_id possibilities = 11;
    }
 
    message VisualFieldEdge
@@ -65,5 +66,111 @@ message VisionField
    }
 
 
+   enum corner_id {
+      L_INNER_CORNER = 0;
+      L_OUTER_CORNER = 1;
+      T_CORNER = 2;
+      CENTER_CIRCLE = 3;
+
+      // FUZZY/CLEAR CORNER IDS start at = 4
+      BLUE_GOAL_T = 4;
+      YELLOW_GOAL_T = 5;
+      BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L = 6;
+      BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L = 7;
+      BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L = 8;
+      BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L = 9;
+      CORNER_INNER_L = 10;
+      GOAL_BOX_INNER_L = 11;
+
+      // FUZZY/CLEAR CORNER IDS start at = 12
+      BLUE_GOAL_OUTER_L = 12;
+      YELLOW_GOAL_OUTER_L = 13;
+      CENTER_T = 14;
+
+      // SPECIFIC CORNER IDS start at = 15
+      BLUE_CORNER_TOP_L = 15;
+      BLUE_CORNER_BOTTOM_L = 16;
+      BLUE_GOAL_LEFT_T = 17;
+      BLUE_GOAL_RIGHT_T = 18;
+      BLUE_GOAL_LEFT_L = 19;
+      BLUE_GOAL_RIGHT_L = 20; // 20
+      CENTER_BOTTOM_T = 21;
+      CENTER_TOP_T = 22;
+      YELLOW_CORNER_BOTTOM_L = 23;
+      YELLOW_CORNER_TOP_L = 24;
+      YELLOW_GOAL_LEFT_T = 25; // 25
+      YELLOW_GOAL_RIGHT_T = 26;
+      YELLOW_GOAL_LEFT_L = 27;
+      YELLOW_GOAL_RIGHT_L = 28;
+      CORNER_NO_IDEA_ID = 29;
+      TOP_CC = 30; // 30
+      BOTTOM_CC = 31;
+    }
+
+    enum shape {
+      UNKNOWN = 0;
+      INNER_L = 1;
+      OUTER_L = 2;
+      T = 3;
+      CIRCLE = 4;
+      // secondary shapes - arranged from most general to most specific
+      GOAL_L = 5;   // 5
+      CORNER_L = 6;
+      LEFT_GOAL_L = 7;
+      RIGHT_GOAL_L = 8;
+      RIGHT_GOAL_CORNER = 9; // 9
+      LEFT_GOAL_CORNER = 10;
+      GOAL_T = 11;
+      SIDE_T = 12;
+      LEFT_GOAL_T = 13;      // 13
+      RIGHT_GOAL_T = 14;
+      YELLOW_GOAL_BOTTOM = 15;
+      YELLOW_GOAL_TOP = 16;
+      BLUE_GOAL_BOTTOM = 17; // 17
+      BLUE_GOAL_TOP = 18;
+      LEFT_GOAL_YELLOW_L = 19;
+      LEFT_GOAL_BLUE_L = 20;
+      RIGHT_GOAL_YELLOW_L = 21; // 21
+      RIGHT_GOAL_BLUE_L = 22;
+      RIGHT_GOAL_YELLOW_T = 23;
+      LEFT_GOAL_YELLOW_T = 24;
+      RIGHT_GOAL_BLUE_T = 25; // 25
+      LEFT_GOAL_BLUE_T = 26;
+      CENTER_T_TOP = 27;
+      CENTER_T_BOTTOM = 28;
+      CENTER_CIRCLE_TOP = 29;  // 29
+      CENTER_CIRCLE_BOTTOM = 30;
+    }
+
+    enum line_id {
+       // Ambiguous lines
+       UNKNOWN_LINE = 50;
+       SIDE_OR_ENDLINE = 51;
+       SIDELINE_LINE = 52;
+       ENDLINE_LINE = 53;
+       GOALBOX_LINE = 54;
+       GOALBOX_SIDE_LINE = 55;			// 55
+       GOALBOX_TOP_LINE = 56;
+
+       // Distinct lines:
+       // Named by looking from center field out, left end is at the blue goal
+
+       // Endlines
+       BLUE_GOAL_ENDLINE = 57;
+       YELLOW_GOAL_ENDLINE = 58;
+
+       TOP_SIDELINE = 59;
+       BOTTOM_SIDELINE = 60;
+       MIDLINE = 61;
+
+       // GOALBOX LINES:
+       // Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
+       BLUE_GOALBOX_TOP_LINE = 62;
+       BLUE_GOALBOX_LEFT_LINE = 63;
+       BLUE_GOALBOX_RIGHT_LINE = 64;
+       YELLOW_GOALBOX_TOP_LINE = 65;
+       YELLOW_GOALBOX_LEFT_LINE = 66;
+       YELLOW_GOALBOX_RIGHT_LINE = 67;
+    }
 
 }

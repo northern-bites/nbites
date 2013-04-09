@@ -21,85 +21,84 @@ namespace vision {
 #include "ConcreteLandmark.h"
 #include "NBMath.h"
 
+#include "VisionField.pb.h"
+
+
 namespace man {
 namespace vision {
 
-enum cornerID {
-    L_INNER_CORNER = 0,
-    L_OUTER_CORNER,
-    T_CORNER,
-    CENTER_CIRCLE,
+	typedef ::messages::VisionField::corner_id cornerID;
+	static const cornerID L_INNER_CORNER = ::messages::VisionField_corner_id_L_INNER_CORNER;
+	static const cornerID L_OUTER_CORNER = ::messages::VisionField_corner_id_L_OUTER_CORNER;
+	static const cornerID T_CORNER = ::messages::VisionField_corner_id_T_CORNER;
+	static const cornerID CENTER_CIRCLE = ::messages::VisionField_corner_id_CENTER_CIRCLE;
+	static const cornerID BLUE_GOAL_T = ::messages::VisionField_corner_id_BLUE_GOAL_T;
+	static const cornerID YELLOW_GOAL_T = ::messages::VisionField_corner_id_YELLOW_GOAL_T;
+	static const cornerID BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L = 
+		::messages::VisionField_corner_id_BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L;
+	static const cornerID BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L = 
+		::messages::VisionField_corner_id_BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L;
+	static const cornerID BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L = 
+		::messages::VisionField_corner_id_BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L;
+	static const cornerID BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L = 
+		::messages::VisionField_corner_id_BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L;
+	static const cornerID CORNER_INNER_L = ::messages::VisionField_corner_id_CORNER_INNER_L;
+	static const cornerID GOAL_BOX_INNER_L = ::messages::VisionField_corner_id_GOAL_BOX_INNER_L;
+	static const cornerID BLUE_GOAL_OUTER_L = ::messages::VisionField_corner_id_BLUE_GOAL_OUTER_L;
+	static const cornerID YELLOW_GOAL_OUTER_L = ::messages::VisionField_corner_id_YELLOW_GOAL_OUTER_L;
+	static const cornerID CENTER_T = ::messages::VisionField_corner_id_CENTER_T;
+	static const cornerID BLUE_CORNER_TOP_L = ::messages::VisionField_corner_id_BLUE_CORNER_TOP_L;
+	static const cornerID BLUE_CORNER_BOTTOM_L = 
+		::messages::VisionField_corner_id_BLUE_CORNER_BOTTOM_L;
+	static const cornerID BLUE_GOAL_LEFT_T = ::messages::VisionField_corner_id_BLUE_GOAL_LEFT_T;
+	static const cornerID BLUE_GOAL_RIGHT_T = ::messages::VisionField_corner_id_BLUE_GOAL_RIGHT_T;
+	static const cornerID BLUE_GOAL_LEFT_L = ::messages::VisionField_corner_id_BLUE_GOAL_LEFT_L;
+	static const cornerID BLUE_GOAL_RIGHT_L = ::messages::VisionField_corner_id_BLUE_GOAL_RIGHT_L;
+	static const cornerID CENTER_BOTTOM_T = ::messages::VisionField_corner_id_CENTER_BOTTOM_T;
+	static const cornerID CENTER_TOP_T = ::messages::VisionField_corner_id_CENTER_TOP_T;
+	static const cornerID YELLOW_CORNER_BOTTOM_L = 
+		::messages::VisionField_corner_id_YELLOW_CORNER_BOTTOM_L;
+	static const cornerID YELLOW_CORNER_TOP_L = ::messages::VisionField_corner_id_YELLOW_CORNER_TOP_L;
+	static const cornerID YELLOW_GOAL_LEFT_T = ::messages::VisionField_corner_id_YELLOW_GOAL_LEFT_T;
+	static const cornerID YELLOW_GOAL_RIGHT_T = ::messages::VisionField_corner_id_YELLOW_GOAL_RIGHT_T;
+	static const cornerID YELLOW_GOAL_LEFT_L = ::messages::VisionField_corner_id_YELLOW_GOAL_LEFT_L;
+	static const cornerID YELLOW_GOAL_RIGHT_L = ::messages::VisionField_corner_id_YELLOW_GOAL_RIGHT_L;
+	static const cornerID CORNER_NO_IDEA_ID = ::messages::VisionField_corner_id_CORNER_NO_IDEA_ID;
+	static const cornerID TOP_CC = ::messages::VisionField_corner_id_TOP_CC;
+	static const cornerID BOTTOM_CC = ::messages::VisionField_corner_id_BOTTOM_CC;
 
-    // FUZZY/CLEAR CORNER IDS start at = 4
-    BLUE_GOAL_T,
-    YELLOW_GOAL_T,
-    BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L,
-    BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L,
-    BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L,
-    BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L,
-    CORNER_INNER_L,
-    GOAL_BOX_INNER_L,
-
-    // FUZZY/CLEAR CORNER IDS start at = 12
-    BLUE_GOAL_OUTER_L,
-    YELLOW_GOAL_OUTER_L,
-    CENTER_T,
-
-    // SPECIFIC CORNER IDS start at = 15
-    BLUE_CORNER_TOP_L,
-    BLUE_CORNER_BOTTOM_L,
-    BLUE_GOAL_LEFT_T,
-    BLUE_GOAL_RIGHT_T,
-    BLUE_GOAL_LEFT_L,
-    BLUE_GOAL_RIGHT_L, // 20
-    CENTER_BOTTOM_T,
-    CENTER_TOP_T,
-    YELLOW_CORNER_BOTTOM_L,
-    YELLOW_CORNER_TOP_L,
-    YELLOW_GOAL_LEFT_T, // 25
-    YELLOW_GOAL_RIGHT_T,
-    YELLOW_GOAL_LEFT_L,
-    YELLOW_GOAL_RIGHT_L,
-    CORNER_NO_IDEA_ID,
-    TOP_CC, // 30
-    BOTTOM_CC
-
-};
-
-enum shape {
-    UNKNOWN,
-    INNER_L,
-    OUTER_L,
-    T,
-    CIRCLE,
-    // secondary shapes - arranged from most general to most specific
-	GOAL_L,   // 5
-	CORNER_L,
-    LEFT_GOAL_L,
-    RIGHT_GOAL_L,
-    RIGHT_GOAL_CORNER, // 9
-    LEFT_GOAL_CORNER,
-    GOAL_T,
-	SIDE_T,
-    LEFT_GOAL_T,      // 13
-    RIGHT_GOAL_T,
-    YELLOW_GOAL_BOTTOM,
-    YELLOW_GOAL_TOP,
-    BLUE_GOAL_BOTTOM, // 17
-    BLUE_GOAL_TOP,
-    LEFT_GOAL_YELLOW_L,
-    LEFT_GOAL_BLUE_L,
-    RIGHT_GOAL_YELLOW_L, // 21
-    RIGHT_GOAL_BLUE_L,
-    RIGHT_GOAL_YELLOW_T,
-    LEFT_GOAL_YELLOW_T,
-    RIGHT_GOAL_BLUE_T, // 25
-    LEFT_GOAL_BLUE_T,
-    CENTER_T_TOP,
-    CENTER_T_BOTTOM,
-    CENTER_CIRCLE_TOP,  // 29
-    CENTER_CIRCLE_BOTTOM
-};
+	typedef ::messages::VisionField::shape shape;
+	static const shape UNKNOWN = ::messages::VisionField_shape_UNKNOWN;
+	static const shape INNER_L = ::messages::VisionField_shape_INNER_L;
+	static const shape OUTER_L = ::messages::VisionField_shape_OUTER_L;
+	static const shape T = ::messages::VisionField_shape_T;
+	static const shape CIRCLE = ::messages::VisionField_shape_CIRCLE;
+	static const shape GOAL_L = ::messages::VisionField_shape_GOAL_L;
+	static const shape CORNER_L = ::messages::VisionField_shape_CORNER_L;
+	static const shape LEFT_GOAL_L = ::messages::VisionField_shape_LEFT_GOAL_L;
+	static const shape RIGHT_GOAL_L = ::messages::VisionField_shape_RIGHT_GOAL_L;
+	static const shape RIGHT_GOAL_CORNER = ::messages::VisionField_shape_RIGHT_GOAL_CORNER;
+	static const shape LEFT_GOAL_CORNER = ::messages::VisionField_shape_LEFT_GOAL_CORNER;
+	static const shape GOAL_T = ::messages::VisionField_shape_GOAL_T;
+	static const shape SIDE_T = ::messages::VisionField_shape_SIDE_T;
+	static const shape LEFT_GOAL_T = ::messages::VisionField_shape_LEFT_GOAL_T;
+	static const shape RIGHT_GOAL_T = ::messages::VisionField_shape_RIGHT_GOAL_T;
+	static const shape YELLOW_GOAL_BOTTOM = ::messages::VisionField_shape_YELLOW_GOAL_BOTTOM;
+	static const shape YELLOW_GOAL_TOP = ::messages::VisionField_shape_YELLOW_GOAL_TOP;
+	static const shape BLUE_GOAL_BOTTOM = ::messages::VisionField_shape_BLUE_GOAL_BOTTOM;
+	static const shape BLUE_GOAL_TOP = ::messages::VisionField_shape_BLUE_GOAL_TOP;
+	static const shape LEFT_GOAL_YELLOW_L = ::messages::VisionField_shape_LEFT_GOAL_YELLOW_L;
+	static const shape LEFT_GOAL_BLUE_L = ::messages::VisionField_shape_LEFT_GOAL_BLUE_L;
+	static const shape RIGHT_GOAL_YELLOW_L = ::messages::VisionField_shape_RIGHT_GOAL_YELLOW_L;
+	static const shape RIGHT_GOAL_BLUE_L = ::messages::VisionField_shape_RIGHT_GOAL_BLUE_L;
+	static const shape RIGHT_GOAL_YELLOW_T = ::messages::VisionField_shape_RIGHT_GOAL_YELLOW_T;
+	static const shape LEFT_GOAL_YELLOW_T = ::messages::VisionField_shape_LEFT_GOAL_YELLOW_T;
+	static const shape RIGHT_GOAL_BLUE_T = ::messages::VisionField_shape_RIGHT_GOAL_BLUE_T;
+	static const shape LEFT_GOAL_BLUE_T = ::messages::VisionField_shape_LEFT_GOAL_BLUE_T;
+	static const shape CENTER_T_TOP = ::messages::VisionField_shape_CENTER_T_TOP;
+	static const shape CENTER_T_BOTTOM = ::messages::VisionField_shape_CENTER_T_BOTTOM;
+	static const shape CENTER_CIRCLE_TOP = ::messages::VisionField_shape_CENTER_CIRCLE_TOP;
+	static const shape CENTER_CIRCLE_BOTTOM = ::messages::VisionField_shape_CENTER_CIRCLE_BOTTOM;
 
 
 class ConcreteCorner : public ConcreteLandmark {

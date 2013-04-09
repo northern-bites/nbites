@@ -129,29 +129,32 @@ namespace vision{
 
 		portals::Message<messages::VisionField> field_data(0);
 
-		//setting lines info
-		// const std::vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
-		// for(std::vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
-		// 	i != visualLines->end(); i++)
-		// {
-		// 	messages::VisionField::VisualLine *visLine = field_data.get()->add_visual_line();
-		// 	visLine->mutable_visual_detection()->set_distance(i->getDistance());
-		// 	visLine->mutable_visual_detection()->set_bearing(i->getBearing());
-		// 	visLine->mutable_visual_detection()->set_distance_sd(i->getDistanceSD());
-		// 	visLine->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
-		// 	//we wont set concrete coords for the lines, since they are lines
-		// 	visLine->set_start_x(i->getStartPoint().x);
-		// 	visLine->set_start_y(i->getStartPoint().y);
-		// 	visLine->set_end_x(i->getEndPoint().x);
-		// 	visLine->set_end_y(i->getEndPoint().y);
-		// 	visLine->set_angle(i->getAngle());
-		// 	visLine->set_avg_width(i->getAvgWidth());
-		// 	visLine->set_length(i->getLength());
-		// 	visLine->set_slope(i->getSlope());
-		// 	visLine->set_y_int(i->getYIntercept());
-		// 	const std::vector<lineID> id_for_line = i->getIDs();
+		//	setting lines info
+		const std::vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
+		for(std::vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
+			i != visualLines->end(); i++)
+		{
+			messages::VisionField::VisualLine *visLine = field_data.get()->add_visual_line();
+			visLine->mutable_visual_detection()->set_distance(i->get()->getDistance());
+			visLine->mutable_visual_detection()->set_bearing(i->get()->getBearing());
+			visLine->mutable_visual_detection()->set_distance_sd(i->get()->getDistanceSD());
+			visLine->mutable_visual_detection()->set_bearing_sd(i->get()->getBearingSD());
+			//we wont set concrete coords for the lines, since they are lines
+			visLine->set_start_x(i->get()->getStartpoint().x);
+			visLine->set_start_y(i->get()->getStartpoint().y);
+			visLine->set_end_x(i->get()->getEndpoint().x);
+			visLine->set_end_y(i->get()->getEndpoint().y);
+			visLine->set_angle(i->get()->getAngle());
+			visLine->set_avg_width(i->get()->getAvgWidth());
+			visLine->set_length(i->get()->getLength());
+			visLine->set_slope(i->get()->getSlope());
+			visLine->set_y_int(i->get()->getYIntercept());
+			const std::vector<lineID> id_for_line = i->get()->getIDs();
+			for (int k = 0; k < id_for_line.size(); k++) {
+				visLine->add_possibilities(id_for_line[k]);
+			}
 
-		// }
+		}
 		//end lines info
 
 		//setting the corner info
@@ -177,6 +180,12 @@ namespace vision{
 				
 				field_point->set_x((**j).getFieldX());
 				field_point->set_y((**j).getFieldY());
+			}
+			
+			const std::vector<cornerID> p_id = i->getIDs();
+			for (int k = 0; k < p_id.size(); k++)
+			{
+				visCorner->add_poss_id(p_id[k]);
 			}
 	
 

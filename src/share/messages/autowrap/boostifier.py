@@ -66,6 +66,8 @@ def process_field(element, known_messages, known_enums, scope_stack):
         if element.type in protobuf_defs.STRING_TYPES:
             string_format = templates.REPEATED_STRING
         elif element.type in known_enums:
+            #BENDE HACK: must figure out how to do this properly
+            field_type = 'messages::VisionField::' + field_type
             string_format = templates.REPEATED_PRIMITIVE
         elif element.type in protobuf_defs.PRIMITIVE_TYPES:
             field_type = '::google::protobuf::' + field_type
