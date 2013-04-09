@@ -63,6 +63,12 @@ void MotionModule::run_()
     //     of the main motion loop.
     if(running)
     {
+        // std::cout << "current provider: "
+        //           << curProvider->getName()
+        //           << " next provider: "
+        //           << nextProvider->getName()
+        //           << std::endl;
+
         // (3) Do any necessary preprocessing of joint angles
         //     then actually compute next joints and
         //     stiffnesses.
@@ -289,6 +295,15 @@ void MotionModule::processMotionInput()
         gainsOn = true;
         std::cout << "Sending unfreeze command." << std::endl;
         sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+        if(frameCount > 30)
+        {
+            std::cout << "sending unfreeze walk" << std::endl;
+            sendMotionCommand(
+                WalkCommand::ptr(
+                    new WalkCommand(0.0f, 0.0f, 0.0f)
+                    )
+                );
+        }
         return;
     }
 
@@ -322,16 +337,19 @@ void MotionModule::processMotionInput()
         if (bodyCommandInput_.message().type() ==
             messages::MotionCommand::DESTINATION_WALK)
         {
+            std::cout << "received destination walk command" << std::endl;
             sendMotionCommand(bodyCommandInput_.message().dest());
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::WALK_COMMAND)
         {
+            std::cout << "received walk command" << std::endl;
             sendMotionCommand(bodyCommandInput_.message().speed());
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::SCRIPTED_MOVE)
         {
+            std::cout << "received scripted command." << std::endl;
             sendMotionCommand(bodyCommandInput_.message().script());
         }
     }
@@ -825,7 +843,6 @@ void MotionModule::sendMotionCommand(const messages::ScriptedHeadCommand script)
             );
 
         headProvider.setCommand(newCommand);
-        std::cout << "ADDED CMD " << i << std::endl;
     }
 }
 
