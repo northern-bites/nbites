@@ -97,7 +97,6 @@ def facingForward(player):
     if it is in the goal.
     """
     #magic numbers
-    return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
     return (player.brain.interface.visionField.visual_field_edge.distance_m > 800.0)
 # WE NEED VISUAL CROSSES
 #            or (fabs(player.brain.vision.cross.bearing) < 10.0 and
@@ -123,9 +122,9 @@ def onThisSideline(player):
     #         return True
     return ((player.brain.ygrp.on and
              #magic numbers
-             player.brain.ygrp.distance > 400.0) or
+             player.brain.ygrp.distance > 100.0) or
             (player.brain.yglp.on and
-             player.brain.yglp.distance > 400.0))
+             player.brain.yglp.distance > 100.0))
 
 def unsure(player):
     return (not onThisSideline(player) and
