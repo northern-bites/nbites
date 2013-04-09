@@ -1,6 +1,5 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
-from ..playbook.PBConstants import GOALIE
 from objects import Location
 
 def findBall(player):
@@ -33,9 +32,7 @@ def scanFindBall(player):
     if transitions.shouldChaseBall(player):
         return player.goNow('findBall')
 
-    # a time based check. may be a problem for goalie. if it's not
-    # good for him to spin, he should prbly not be chaser anymore, so
-    # this wouldn't get reached
+    # a time based check.
     if transitions.shouldSpinFindBall(player):
         return player.goLater('spinFindBall')
 
@@ -62,9 +59,8 @@ def spinFindBall(player):
 
         player.brain.tracker.spinPanFixedPitch()
 
-    if not player.brain.play.isRole(GOALIE):
-        if transitions.shouldWalkFindBall(player):
-            return player.goLater('walkFindBall')
+    if transitions.shouldWalkFindBall(player):
+        return player.goLater('walkFindBall')
 
     return player.stay()
 

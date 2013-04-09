@@ -66,8 +66,8 @@ class HeadTracking(FSA.FSA):
     # Note: safe to call every frame.
     def repeatHeadMove(self, headMove):
         '''Execute the given headMove, then repeats it forever.'''
-        if (self.headMove != headMove or \
-                self.currentState != 'repeatHeadMove'):
+        if (self.headMove != headMove
+            or self.currentState != 'repeatHeadMove'):
             self.headMove = headMove
             self.switchTo('repeatHeadMove')
 

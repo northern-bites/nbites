@@ -101,9 +101,9 @@ def setSpeed(nav, speeds):
 def createAndSendWalkVector(nav, x, y, theta):
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_COMMAND #Walk Command
-    command.speed.x = x
-    command.speed.y = y
-    command.speed.h = theta
+    command.speed.x_percent = x
+    command.speed.y_percent = y
+    command.speed.h_percent = theta
     # Mark this message for sending
     command.processed_by_motion = False
 
