@@ -45,31 +45,3 @@ def spinToField(player):
     elif player.brain.nav.isAtPosition():
         return player.goLater('playbookPosition')
     return player.stay()
-
-
-def relocalize(player):
-    if player.firstFrame():
-        player.setWalk(constants.RELOC_X_SPEED, 0, 0)
-
-    if player.brain.my.locScore is not NogginConstants.locScore.BAD_LOC:
-        player.shouldRelocalizeCounter += 1
-
-        if player.shouldRelocalizeCounter > 30:
-            player.shouldRelocalizeCounter = 0
-            return player.goLater(player.lastDiffState)
-
-    else:
-        player.shouldRelocalizeCounter = 0
-
-    if not player.brain.motion.isHeadActive():
-        player.brain.tracker.repeatWidePanFixedPitch()
-
-#    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
-#        direction = MyMath.sign(player.getWalk()[2])
-#        if direction == 0:
-#            direction = 1
-#@todo: we just spin left to relocalize since getWalk was deprecated
-# maybe we can make this smarter?
-        player.setWalk(0, 0, constants.RELOC_SPIN_SPEED)
-
-    return player.stay()

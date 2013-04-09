@@ -54,22 +54,22 @@ def walkToGoal(player):
 
 def dodgeBall(player):
     if player.firstFrame():
-        if player.brain.ball.filter_rel_y < 0.0:
-            dodgeDestY = player.brain.ball.filter_rel_y + 20.0
+        if player.brain.ball.rel_y < 0.0:
+            dodgeDestY = player.brain.ball.rel_y + 20.0
         else:
-            dodgeDestY = player.brain.ball.filter_rel_y - 20.0
+            dodgeDestY = player.brain.ball.rel_y - 20.0
         player.brain.tracker.trackBallFixedPitch()
-        dodgeBall.dodgeDest = RelRobotLocation(player.brain.ball.filter_rel_x,
-                                           dodgeDestY,
-                                           0.0)
+        dodgeBall.dodgeDest = RelRobotLocation(player.brain.ball.rel_x,
+                                               dodgeDestY,
+                                               0.0)
         player.brain.nav.goTo(dodgeBall.dodgeDest)
 
     # update dest based on ball loc
-    if player.brain.ball.filter_rel_y < 0.0:
-        dodgeBall.dodgeDest.relY = player.brain.ball.filter_rel_y + 20.0
+    if player.brain.ball.rel_y < 0.0:
+        dodgeBall.dodgeDest.relY = player.brain.ball.rel_y + 20.0
     else:
-        dodgeBall.dodgeDest.relY = player.brain.ball.filter_rel_y - 20.0
-    dodgeBall.dodgeDest.relX = player.brain.ball.filter_rel_x
+        dodgeBall.dodgeDest.relY = player.brain.ball.rel_y - 20.0
+    dodgeBall.dodgeDest.relX = player.brain.ball.rel_x
 
     return Transition.getNextState(player, dodgeBall)
 
@@ -105,7 +105,7 @@ def spinAtGoal(player):
 def clearIt(player):
     if player.firstFrame():
         player.brain.tracker.trackBallFixedPitch()
-        if player.brain.ball.filter_rel_y < 0.0:
+        if player.brain.ball.rel_y < 0.0:
             player.side = RIGHT
             player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
@@ -113,9 +113,9 @@ def clearIt(player):
             player.kick = kicks.LEFT_STRAIGHT_KICK
 
         kickPose = player.kick.getPosition()
-        clearIt.ballDest = RelRobotLocation(player.brain.ball.filter_rel_x -
+        clearIt.ballDest = RelRobotLocation(player.brain.ball.rel_x -
                                             kickPose[0],
-                                            player.brain.ball.filter_rel_y -
+                                            player.brain.ball.rel_y -
                                             kickPose[1],
                                             0.0)
 
@@ -132,8 +132,8 @@ def clearIt(player):
                               nav.FAST_SPEED)
 
     kickPose = player.kick.getPosition()
-    clearIt.ballDest.relX = player.brain.ball.filter_rel_x - kickPose[0]
-    clearIt.ballDest.relY = player.brain.ball.filter_rel_y - kickPose[1]
+    clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
+    clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
 
     return Transition.getNextState(player, clearIt)
 
@@ -151,7 +151,7 @@ def didIKickIt(player):
 def spinToFaceBall(player):
     if player.firstFrame():
         facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if degrees(player.brain.ball.filter_bearing) < 0.0:
+        if player.brain.ball.bearing_deg < 0.0:
             facingDest.relH = -90
         else:
             facingDest.relH = 90
@@ -217,14 +217,14 @@ def centerAtGoalBasedOnCorners(player):
         if(centerAtGoalBasedOnCorners.cornerID in corner.possibilities):
             if(centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L
                and corner.visualOrientation < 0 and
-               player.brain.vision.fieldEdge.centerDist > 110.0):
+               player.brain.interface.visionField.vision_field_edge.distance_m > 110.0):
                 centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
                 heading = corner.getRobotGlobalHeadingIfFieldAngleIs(90)
                 relX = corner.getRobotRelXIfFieldAngleIs(90)
                 relY = corner.getRobotRelYIfFieldAngleIs(90)
             elif(centerAtGoalBasedOnCorners.cornerID ==
                  IDs.YELLOW_GOAL_RIGHT_L and corner.visualOrientation > 0 and
-                 player.brain.vision.fieldEdge.centerDist > 110.0):
+                 player.brain.interface.visionField.vision_field_edge.distance_m > 110.0):
                 centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
                 heading = corner.getRobotGlobalHeadingIfFieldAngleIs(0)
                 relX = corner.getRobotRelXIfFieldAngleIs(0)
@@ -263,15 +263,15 @@ def repositionAfterWhiff(player):
     if player.firstFrame():
         # We need to be able to reset ODO
         #player.brain.motion.resetOdometry()
-        if player.brain.ball.filter_rel_y < 0.0:
+        if player.brain.ball.rel_y < 0.0:
             player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
             player.kick = kicks.LEFT_STRAIGHT_KICK
 
         kickPose = player.kick.getPosition()
-        repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.filter_rel_x -
+        repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.rel_x -
                                                          kickPose[0],
-                                                         player.brain.ball.filter_rel_y -
+                                                         player.brain.ball.rel_y -
                                                          kickPose[1],
                                                          0.0)
         player.brain.nav.goTo(repositionAfterWhiff.ballDest,
@@ -287,9 +287,9 @@ def repositionAfterWhiff(player):
         return player.goLater('returnToGoal')
 
     kickPose = player.kick.getPosition()
-    repositionAfterWhiff.ballDest.relX = (player.brain.ball.filter_rel_x -
+    repositionAfterWhiff.ballDest.relX = (player.brain.ball.rel_x -
                                           kickPose[0])
-    repositionAfterWhiff.ballDest.relY = (player.brain.ball.filter_rel_y -
+    repositionAfterWhiff.ballDest.relY = (player.brain.ball.rel_y -
                                           kickPose[1])
 
     return Transition.getNextState(player, repositionAfterWhiff)

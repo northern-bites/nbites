@@ -36,8 +36,8 @@ def ballIsInMyWay(player):
     if not player.brain.ball.vis.on:
         return False
 
-    return (fabs(player.brain.ball.filter_rel_y < 20.0 and
-                 player.brain.ball.filter_rel_x < 30.0))
+    return (fabs(player.brain.ball.rel_y < 20.0 and
+                 player.brain.ball.rel_x < 30.0))
 
 def foundACorner(player):
     """
@@ -249,6 +249,6 @@ def whiffed(player):
     If the ball is just sitting at the goalie's feet after kicking, it
     should try again.
     """
-    return (player.brain.ball.filter_rel_x < 40.0 and
-            fabs(player.brain.ball.filter_rel_y) < 25.0 and
+    return (player.brain.ball.rel_x < 40.0 and
+            fabs(player.brain.ball.rel_y) < 25.0 and
             player.brain.ball.vis.on)
