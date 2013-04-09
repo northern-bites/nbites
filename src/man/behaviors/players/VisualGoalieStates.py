@@ -20,6 +20,7 @@ DEBUG_POSITION = False
 
 def spinToFaceGoal(player):
     if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
         if (player.lastDiffState == 'decideRightSide'):
             player.side = RIGHT
         else:
@@ -30,8 +31,6 @@ def spinToFaceGoal(player):
             spinToFaceGoal.facingDest.relH = 90
         else:
             spinToFaceGoal.facingDest.relH = -90
-
-    player.brain.tracker.lookToAngle(0)
 
     if player.counter == 20:
         player.brain.nav.goTo(spinToFaceGoal.facingDest,
@@ -176,16 +175,14 @@ def decideRightSide(player):
 
 def returnToGoal(player):
     if player.firstFrame():
-        #if player.lastDiffState == 'didIKickIt':
-        correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
-                        returnToGoal.kickPose)
-        correctedDest.relX = correctedDest.relX
-
-    else:
-        correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
-                         RelRobotLocation(player.brain.interface.odometry.x,
-                                          player.brain.interface.odometry.y,
-                                          0.0))
+        if player.lastDiffState == 'didIKickIt':
+            correctedDest =(RelRobotLocation(0.0, 0.0, 0.0 ) -
+                            returnToGoal.kickPose)
+        else:
+            correctedDest = (RelRobotLocation(0.0, 0.0, 0.0) -
+                             RelRobotLocation(player.brain.interface.odometry.x,
+                                              player.brain.interface.odometry.y,
+                                              0.0))
 
         if fabs(correctedDest.relX) < 5:
             correctedDest.relX = 0.0
