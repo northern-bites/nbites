@@ -286,24 +286,13 @@ void MotionModule::processMotionInput()
     if(stiffnessInput_.message().remove() && gainsOn)
     {
         gainsOn = false;
-        std::cout << "Sending freeze command." << std::endl;
         sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
         return;
     }
     if(!stiffnessInput_.message().remove() && !gainsOn)
     {
         gainsOn = true;
-        std::cout << "Sending unfreeze command." << std::endl;
         sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
-        if(frameCount > 30)
-        {
-            std::cout << "sending unfreeze walk" << std::endl;
-            sendMotionCommand(
-                WalkCommand::ptr(
-                    new WalkCommand(0.0f, 0.0f, 0.0f)
-                    )
-                );
-        }
         return;
     }
 
@@ -334,19 +323,16 @@ void MotionModule::processMotionInput()
         if (bodyCommandInput_.message().type() ==
             messages::MotionCommand::DESTINATION_WALK)
         {
-            std::cout << "received destination walk command" << std::endl;
             sendMotionCommand(bodyCommandInput_.message().dest());
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::WALK_COMMAND)
         {
-            std::cout << "received walk command" << std::endl;
             sendMotionCommand(bodyCommandInput_.message().speed());
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::SCRIPTED_MOVE)
         {
-            std::cout << "received scripted command." << std::endl;
             sendMotionCommand(bodyCommandInput_.message().script());
         }
     }
@@ -749,10 +735,6 @@ void MotionModule::sendMotionCommand(messages::ScriptedMove script)
 
 void MotionModule::sendMotionCommand(const SetHeadCommand::ptr command)
 {
-    std::cout << "Set head to (yaw, pitch) = ("
-              << command->getYaw() << ", "
-              << command->getPitch() << ")"
-              << std::endl;
     nextHeadProvider = &headProvider;
     headProvider.setCommand(command);
 }
