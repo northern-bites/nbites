@@ -20,9 +20,9 @@ def playbookPosition(player):
         nav.positionPlaybook()
 
     if nav.isAtPosition():
-        brain.tracker.trackBallFixedPitch()
+        brain.tracker.trackBall()
     else:
-        brain.tracker.repeatWidePanFixedPitch()
+        brain.tracker.repeatWidePan()
 
     #TODO: I think the transition is broken right now!
     #if PositionTransitions.leavingTheField(player):
@@ -37,10 +37,10 @@ def spinToField(player):
     if player.firstFrame():
         if fieldEdge.distance_l > fieldEdge.distance_r:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_LEFT)
-            player.brain.tracker.spinPanFixedPitch()
+            player.brain.tracker.spinPan()
         else:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_RIGHT)
-            player.brain.tracker.spinPanFixedPitch()
+            player.brain.tracker.spinPan()
 
     elif player.brain.nav.isAtPosition():
         return player.goLater('playbookPosition')
@@ -62,7 +62,7 @@ def relocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.repeatWidePan()
 
 #    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
 #        direction = MyMath.sign(player.getWalk()[2])

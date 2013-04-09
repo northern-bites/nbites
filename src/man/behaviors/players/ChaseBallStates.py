@@ -22,7 +22,7 @@ def chase(player):
 
 def spinToBall(player):
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
     if transitions.shouldFindBall(player):
@@ -42,7 +42,7 @@ def spinToBall(player):
 
 def approachBall(player):
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         if player.shouldKickOff:
             player.brain.nav.chaseBall(Navigator.QUICK_SPEED)
         else:
@@ -71,7 +71,7 @@ def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
         player.orbitDistance = player.brain.ball.distance
-        player.brain.tracker.performKickPanFixedPitch(prepareForKick.hackKick.shouldKickPanRight())
+        player.brain.tracker.performKickPan(prepareForKick.hackKick.shouldKickPanRight())
         player.brain.nav.stand()
         return player.stay()
 
@@ -112,7 +112,7 @@ def orbitBall(player):
             return player.goNow('positionForKick')
 
         # Reset from pre-kick pan to straight, then track the ball.
-        player.brain.tracker.lookStraightThenTrackFixedPitch()
+        player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
 
     elif player.brain.nav.isStopped():
@@ -149,7 +149,7 @@ def positionForKick(player):
     #only enque the new goTo destination once
     if player.firstFrame():
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
-        player.brain.tracker.lookStraightThenTrackFixedPitch()
+        player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
                               Navigator.GRADUAL_SPEED,
@@ -176,14 +176,14 @@ def lookAround(player):
     if player.firstFrame():
         player.stopWalking()
         player.brain.tracker.stopHeadMoves() # HACK so that tracker goes back to stopped.
-        player.brain.tracker.repeatBasicPanFixedPitch()
+        player.brain.tracker.repeatBasicPan()
 
     # Make sure we leave this state...
     if player.brain.ball.vis.frames_off > 200:
         return player.goLater('chase')
 
     if player.brain.tracker.isStopped() and player.counter > 2:
-            player.brain.tracker.trackBallFixedPitch()
+            player.brain.tracker.trackBall()
             player.brain.kickDecider.decideKick()
             if transitions.shouldOrbit(player) and not player.penaltyKicking:
                 print "Don't have a kick, orbitting"

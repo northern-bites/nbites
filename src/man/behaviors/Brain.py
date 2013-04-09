@@ -17,7 +17,7 @@ from . import robots
 from . import GameController
 
 # Packages and modules from sub-directories
-from .headTracking import HeadTracking
+from .headTracking import HeadTracker
 from .typeDefs import (Play, TeamMember)
 from .navigator import Navigator
 from .playbook import PBInterface
@@ -77,7 +77,7 @@ class Brain(object):
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
-        self.tracker = HeadTracking.HeadTracking(self)
+        self.tracker = HeadTracker.HeadTracker(self)
         self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)

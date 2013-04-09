@@ -11,6 +11,7 @@ class HeadTrackingHelper(object):
 
     def executeHeadMove(self, headMove):
         """performs a sweetmove"""
+        # Note: Do not call every frame!
         command = self.tracker.brain.interface.headMotionCommand
         command.type = command.CommandType.SCRIPTED_HEAD_COMMAND
 
@@ -65,27 +66,6 @@ class HeadTrackingHelper(object):
         # when a move is done
         return move
 
-    def startingPan(self, headMove):
-        """Calculates the first part of a fixed pitch pan to get there quickly."""
-        if len(headMove) < 2:
-            # Not a normal pan: there's only 1 headMove.
-            # Don't do a starting move.
-            return
-
-        headMoveYaw = headMove[1][0][0]
-        headMovePitch = headMove[1][0][1]
-
-        #TODO do this math in C++
-        curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
-        degreesPerSecond = 80 #fast, but hopefully won't destabilize the walk much
-        yawDiff = MyMath.fabs(curYaw - headMoveYaw)
-        totalTime = yawDiff/degreesPerSecond
-
-        newHeadMove = ( ((headMoveYaw,headMovePitch), totalTime, 1,
-                         StiffnessModes.LOW_HEAD_STIFFNESSES), )
-
-        self.executeHeadMove(newHeadMove)
-
     # Should be generalized.
     def convertKickPan(self, headMove, invert):
         """
@@ -97,18 +77,18 @@ class HeadTrackingHelper(object):
         headMovePitch = headMove[0][0][1]
 
         curYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
-        degreesPerSecond = (headMoveYaw*2)/headMove[0][1]
+        degreesPerSecond = (headMoveYaw*2)/headMove[0][1] # double the yaw b/c pans are symmetric
         yawDiff = MyMath.fabs(curYaw-headMoveYaw)
         totalTime = yawDiff/degreesPerSecond
 
         if invert is True:
-            newHeadMove = ( ((-1*headMoveYaw,headMovePitch), totalTime, 1,
-                             StiffnessModes.LOW_HEAD_STIFFNESSES),
+            newHeadMove = ( ((-1*headMoveYaw,headMovePitch),
+                             totalTime, headMove[0][2], headMove[0][3]),
                             ((-1*headMove[1][0][0],headMove[1][0][1]),
                              headMove[1][1], headMove[1][2], headMove[1][3]) )
         else:
-            newHeadMove = ( ((headMoveYaw,headMovePitch), totalTime, 1,
-                             StiffnessModes.LOW_HEAD_STIFFNESSES),
+            newHeadMove = ( ((headMoveYaw,headMovePitch),
+                             totalTime, 1, headMove[0][3]),
                             headMove[1] )
 
         return newHeadMove
@@ -119,75 +99,24 @@ class HeadTrackingHelper(object):
         Should only be called explicitly from state
         methods in TrackingStates.py
         """
-        target = self.tracker.target
+        # Note: safe to call every frame.
 
-        changeX, changeY = 0.0 , 0.0
-
-        # If we don't see it, let's try to use our model of it to find
-        # it and track it
-
-        # TODO: generalize this to objects which we cannot see.
-        if not target or \
-                (target.rel_x == 0.0 and target.rel_y == 0.0):
-            return
-
-        # If we haven't seen the object in the very recent past, look
-        # towards where the model says it is. The framesOff > 3
-        # provides a buffer to ensure that it's not just a flickering
-        # image problem (prevents twitchy robot)
-        if target.vis.frames_off > 3:
-            self.lookToPoint(target)
-            return
-
-        # Find the target's angular distance from the center of the screen
-        # if we have an object, track that
-        changeX = target.vis.angle_x_deg
-        changeY = target.vis.angle_y_deg #the pitch is pos = down
-
-        curYaw   = degrees(self.tracker.brain.interface.joints.head_yaw)
-        curPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
-
-        maxChange = 13.0
-
-        # Warning- no gain is applied currently!
-        safeChangeX = MyMath.clip(changeX, -maxChange, maxChange )
-        safeChangeY = MyMath.clip(changeY, -maxChange, maxChange )
-
-        newYaw = curYaw + safeChangeX
-        newPitch = curPitch - safeChangeY
-
-        newYaw = MyMath.clip(newYaw, -80., 80.)
-
-        maxSpeed = 2.0
-
-        # Set message fields
-        command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.POS_HEAD_COMMAND
-
-        command.pos_command.head_yaw = newYaw
-        command.pos_command.head_pitch = newPitch
-        command.pos_command.max_speed_yaw = maxSpeed
-        command.pos_command.max_speed_pitch = maxSpeed
-
-        command.processed_by_motion = False
-
-    # Fixed Pitch
-    def trackObjectFixedPitch(self):
-        """
-        Analogous to trackObject, but with a fixed value for pitch.
-        """
         target = self.tracker.target
         changeX, changeY = 0.0, 0.0
 
         # If we cannot see the target, abort.
-        if not target or \
-                (target.rel_x == 0.0 and target.rel_y == 0.0) or \
-                (target.vis.frames_off > 0 and target.vis.frames_off < 3):
+        if not (target # target is null
+                or (target.rel_x == 0.0 and target.rel_y == 0.0) # target is under us (info error)
+                or (target.vis.frames_off > 0 and target.vis.frames_off < 3)): # off frame, but under thresh
+# TODO: use a constant above
             return
 
         # If we haven't seen the target, look towards loc model.
         if target.vis.frames_off > 3:
-            self.lookToPointFixedPitch(target)
+# TODO: use a constant above
+            self.lookToPoint(target)
+# TODO: safeguard above call from errors due to calling every frame
+# TODO: use loc information and helper.lookAtTarget instead??
             return
 
         # Assert: target is visible.
@@ -206,82 +135,47 @@ class HeadTrackingHelper(object):
         newYaw = curYaw + safeChangeX
         # ignore newPitch: pitch is fixed
 
-        maxSpeed = 2.0
+        maxSpeed = 2.0 # TODO: use a constant
 
-        # Set message fields
+        # Set motion message fields
         command = self.tracker.brain.interface.headMotionCommand
         command.type = command.CommandType.POS_HEAD_COMMAND
 
         command.pos_command.head_yaw = newYaw
-        command.pos_command.head_pitch = 20.0 # MAKE A CONSTANT FOR THIS
+        command.pos_command.head_pitch = 20.0 # TODO: MAKE A CONSTANT FOR THIS
         command.pos_command.max_speed_yaw = maxSpeed
         command.pos_command.max_speed_pitch = maxSpeed
 
         command.processed_by_motion = False
 
-    # Not called anywhere in the code.
-    def lookToTargetAngles(self, target):
-        """
-        Uses setHeadCommands to bring given target to center of frame.
-        """
-        yaw = degrees(self.tracker.brain.interface.joints.head_yaw)
-        pitch = degrees(self.tracker.brain.interface.joints.head_pitch)
-
-        # Find the target's angular distance from the center of vision
-        if not target is None and target.vis.on:
-            yaw += target.vis.angle_x_deg
-            pitch -= target.vis.angle_y_deg
-            #note: angleY is positive up from center of vision frame
-            #note: angleX is positive left from center of vision frame
-        else:
-            # by default, do nothing
-            return
-
-        # Set message fields
-        command = self.tracker.brain.interface.headMotionCommand
-        command.type = command.CommandType.POS_HEAD_COMMAND
-
-        command.pos_command.head_yaw = yaw
-        command.pos_command.head_pitch = pitch
-        # Leave max speeds to default
-        command.processed_by_motion = False
-
-    def panTo(self, heads):
-        """
-        Pan heads at appropriate speed to given heads
-        """
-        headYaw = degrees(self.tracker.brain.interface.joints.head_yaw)
-        headPitch = degrees(self.tracker.brain.interface.joints.head_pitch)
-
-        yawDiff = fabs(heads[0] - headYaw)
-        pitchDiff = fabs(heads[1] - headPitch)
-
-        maxDiff = max(pitchDiff, yawDiff)
-        panTime = maxDiff/constants.MAX_PAN_SPEED
-        self.executeHeadMove(((heads, panTime, 0,
-                               StiffnessModes.LOW_HEAD_STIFFNESSES), ))
-
     # Unsafe to call... TODO: CoordHeadCommands for messages.
+    def lookAtTarget(self, target):
+
+        '''
+        Hacked warning message.
+        Method is unsafe to call!!
+        '''
+        print ("HeadTrackingHelper.lookAtTarget method was called. METHOD IS UNSAFE! Looking in general direction of target in lieu of using target's exact loc values.")
+        self.lookToPoint(target)
+
+        # if hasattr(target, "height"):
+        #     height = target.height
+        # else:
+        #     height = 0
+
+        # if hasattr(target, "loc"):
+        #     target = target.loc
+
+        # print str(target.rel_x) + " " + str(target.rel_y)
+
+        # headMove = motion.CoordHeadCommand(relX = target.rel_x,
+        #                                    relY = target.rel_y,
+        #                                    relZ = height)
+
+        # self.tracker.brain.motion.coordHead(headMove)
+        # return headMove
+
     def lookToPoint(self, target):
-        if hasattr(target, "height"):
-            height = target.height
-        else:
-            height = 0
-
-        if hasattr(target, "loc"):
-            target = target.loc
-
-        print str(target.rel_x) + " " + str(target.rel_y)
-
-        headMove = motion.CoordHeadCommand(relX = target.rel_x,
-                                           relY = target.rel_y,
-                                           relZ = height)
-
-        self.tracker.brain.motion.coordHead(headMove)
-        return headMove
-
-    # Fixed Pitch
-    def lookToPointFixedPitch(self, target):
         """
         If the relative y is positive, look left. Otherwise, look right.
         """
@@ -290,30 +184,30 @@ class HeadTrackingHelper(object):
         else:
             height = 0
 
-        if hasattr(target, "loc"):
-            target = target.loc
-
         if target.rel_y > 0:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
         else:
             self.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
-    # Fixed Pitch
-    def lookToAngleFixedPitch(self, yaw):
+    def lookToAngle(self, yaw):
         """
-        Looks to the given yaw at the appropriate fixed pitch.
-        NOTE: should call brain.motion.stopHeadMoves() first!
+        Returns a headmove that will make the robot
+        look to the given yaw at an appropriate (fixed) pitch.
+
+        Note: Use as parameter for tracker.performHeadMove()
         """
         if yaw > 55 or yaw < -55:
             pitch = 11.0
         else:
             pitch = 17.0
 
-        self.executeHeadMove((((yaw, pitch), 2.0, 1,
-                               StiffnessModes.LOW_HEAD_STIFFNESSES),))
+        return (((yaw, pitch),
+                 2.0, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
+        # TODO: use constants above
 
     # Consider updating this for new loc and vision systems (summer 2012)
     # Currently broken in Portals system.
+    # TODO: scrap this or make it work.
     def calculateClosestLandmark(self):
         brain = self.tracker.brain
         posts = [brain.yglp, brain.ygrp, brain.bgrp, brain.bglp]

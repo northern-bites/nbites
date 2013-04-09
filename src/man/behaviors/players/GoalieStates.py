@@ -97,7 +97,7 @@ def fallen(player):
 
 def watch(player):
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.brain.nav.stand()
 
     return Transition.getNextState(player, watch)
@@ -126,7 +126,7 @@ def kickBall(player):
         VisualStates.returnToGoal.kickPose.relX = 0
         VisualStates.returnToGoal.kickPose.relX = 0
 
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
 
         player.executeMove(player.kick.sweetMove)
 
@@ -176,7 +176,7 @@ def penaltyShotsGameSet(player):
         # WE NEED RESET METHODS
         #player.brain.loc.resetBall()
 
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.initialDelayCounter = 0
         player.penaltyKicking = True
 
@@ -189,14 +189,14 @@ def penaltyShotsGameSet(player):
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.stand()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.brain.nav.walkTo(RelRobotLocation(0.0, 30.0, 0.0))
 
     return Transition.getNextState(player, penaltyShotsGamePlaying)
 
 def waitForPenaltySave(player):
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.brain.nav.stop()
     return Transition.getNextState(player, waitForPenaltySave)
 

@@ -29,7 +29,7 @@ def goaliePosition(player):
 
     if player.firstFrame():
         nav.positionPlaybook()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
 
     if goalTran.goalieIsLost(player):
         return player.goLater('spinToField')
@@ -46,7 +46,7 @@ def kickOffPosition(player):
 
     if player.firstFrame():
         player.brain.resetGoalieLocalization()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.brain.nav.walkTo(goalCon.MOVE_IN_KICKOFF, 0, 0)
         if player.penaltyKicking:
             player.gainsOn()

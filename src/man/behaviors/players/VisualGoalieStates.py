@@ -58,7 +58,7 @@ def dodgeBall(player):
             dodgeDestY = player.brain.ball.filter_rel_y + 20.0
         else:
             dodgeDestY = player.brain.ball.filter_rel_y - 20.0
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         dodgeBall.dodgeDest = RelRobotLocation(player.brain.ball.filter_rel_x,
                                            dodgeDestY,
                                            0.0)
@@ -104,7 +104,7 @@ def spinAtGoal(player):
 # clearIt->kickBall->didIKickIt->returnToGoal
 def clearIt(player):
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         if player.brain.ball.filter_rel_y < 0.0:
             player.side = RIGHT
             player.kick = kicks.RIGHT_STRAIGHT_KICK
@@ -139,7 +139,7 @@ def clearIt(player):
 
 def shouldISaveIt(player):
     if player.firstFrame():
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.brain.nav.stop()
     return Transition.getNextState(player, shouldISaveIt)
 

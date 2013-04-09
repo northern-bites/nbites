@@ -50,7 +50,7 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.nav.stand()
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.repeatWidePan()
 
     # Reset localization to proper starting position by player number.
     # Locations are defined in the wiki.
@@ -73,7 +73,7 @@ def gameSet(player):
     if player.firstFrame():
         player.inKickingState = False
         player.brain.nav.stand()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
 
         if (player.brain.playerNumber == 4 and
             player.brain.gameController.ownKickOff):
@@ -94,7 +94,7 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.brain.nav.stand()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         player.inKickingState = False
         if player.lastDiffState == 'gamePenalized':
             print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
@@ -164,7 +164,7 @@ def penaltyShotsGameSet(player):
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetPenaltyKickLocalization()
         else:
-            player.brain.tracker.trackBallFixedPitch()
+            player.brain.tracker.trackBall()
 
     return player.stay()
 

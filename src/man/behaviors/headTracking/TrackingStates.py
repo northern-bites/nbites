@@ -1,4 +1,5 @@
 from . import TrackingConstants as constants
+import HeadMoves
 from objects import RelLocation
 import noggin_constants as NogginConstants
 from ..playbook import PBConstants
@@ -6,144 +7,80 @@ from ..players import GoalieConstants
 
 DEBUG = False
 
-def ballTracking(tracker):
-    '''Super state which handles following/refinding the ball'''
-    if tracker.target.vis.frames_off <= \
-            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-        return tracker.goNow('tracking')
-    else:
-        if tracker.brain.player.currentState == 'spinFindBall':
-            return tracker.goNow('ballSpinTracking')
-        return tracker.goNow('scanBall')
-
 def tracking(tracker):
     """
     While the target is visible, track it via vision values.
-    If the ball is lost, go to last diff state.
-    """
-    if tracker.firstFrame():
-        tracker.activeLocOn = False
-
-    if tracker.brain.play.isRole(PBConstants.GOALIE):
-        minActiveDist = GoalieConstants.ACTIVE_LOC_THRESH
-    else:
-        minActiveDist = constants.ACTIVE_TRACK_DIST
-
-    # I think that not having the right distance
-    # might be the problem on tracking
-    # TODO: Check ball information problem
-    #       tracker.printf(tracker.target.loc.dist);
-    #if tracker.target.loc.dist > minActiveDist:
-    #    return tracker.goLater('activeTracking')
-
-    if tracker.target.vis.on:
-        tracker.helper.trackObject()
-#    else:
-#        tracker.helper.lookToPoint(tracker.target)
-
-    if not tracker.target.vis.on and tracker.counter > 15:
-        if DEBUG : tracker.printf("Missing object this frame",'cyan')
-        if tracker.target.vis.frames_off > \
-                constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-            return tracker.goLater('ballTracking')
-        return tracker.stay()
-
-    return tracker.stay()
-
-# Fixed Pitch
-def trackingFixedPitch(tracker):
-    """
-    While the target is visible, track it via vision values.
-    If the target is lost, return to lastDiffState.
+    If the target is lost, switches to fullPan.
     """
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
-    tracker.helper.trackObjectFixedPitch()
+    tracker.helper.trackObject()
 
     if not tracker.target.vis.on and tracker.counter > 15:
         if DEBUG : tracker.printf("Missing object this frame",'cyan')
-        if tracker.target.vis.frames_off > \
-                constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-            return tracker.goLater(tracker.lastDiffState)
+        if (tracker.target.vis.frames_off >
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
+            return tracker.goLater('fullPan')
 
     return tracker.stay()
 
-def ballSpinTracking(tracker):
-#    '''Super state which handles following/refinding the ball'''
-#    if tracker.target.vis.framesOff <= \
-#            constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-#        return tracker.goNow('tracking')
-#    else:
-    return tracker.goNow('spinScanBall')
+# Not currently used, but would be good functionality to have in the future.
+def lookAtTarget(tracker):
+    """Look to the localization coords of the stored target."""
+    tracker.helper.lookAtTarget(tracker.target)
+    return tracker.stay()
 
-def activeTracking(tracker):
+def lookStraightThenTrack(tracker):
     """
-    If ball is visible and close, track it via vision values.
-    If ball is not visible, execute naive pans.
-    If state counter is low enough (< 45), track ball via vision values.
-    If state counter is high enough, perform triangle pans
-    and return to last head angles.
+    Perform a 'look straight' head move.
+    Once ball is seen enough, track it.
+
+    Usually, this is used to lock the robot's
+    head forward while it spins and searches
+    for the ball.
     """
     if tracker.firstFrame():
-        tracker.shouldStareAtBall = 0
-        tracker.activeLocOn = True
+        # Send the motion request message to stop
+        request = tracker.brain.interface.motionRequest
+        request.type = request.RequestType.STOP_HEAD
+        request.processed_by_motion = False
+        # Perform the head move to look straight ahead
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+        # Make sure target is set right
+        tracker.target = tracker.brain.ball
 
-    tracker.helper.trackObject()
-
-    # If we are close to the ball and have seen it consistently
-    if tracker.target.distance < constants.STARE_TRACK_DIST:
-        tracker.shouldStareAtBall += 1
-
-        if tracker.shouldStareAtBall > constants.STARE_TRACK_THRESH:
-            return tracker.goLater('tracking')
-    else:
-        tracker.shouldStareAtBall = 0
-
-    if tracker.target.vis.frames_off > \
-            constants.TRACKER_FRAMES_OFF_REFIND_THRESH and \
-            tracker.counter > constants.TRACKER_FRAMES_OFF_REFIND_THRESH:
-        return tracker.goLater('activeLocScan')
-
-    elif tracker.counter >= constants.BALL_ON_ACTIVE_PAN_THRESH and \
-            tracker.target.vis.on:
-        if tracker.brain.play.isRole(PBConstants.GOALIE):
-            return tracker.goLater('trianglePan')
-        if False and tracker.brain.my.locScore == NogginConstants.locScore.GOOD_LOC:
-            return tracker.goLater('panToFieldObject')
-        else:
-            return tracker.goLater('trianglePan')
+    if tracker.target.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        tracker.trackBall()
 
     return tracker.stay()
 
-# Only called from activeTracking.
-def panToFieldObject(tracker):
+def fullPan(tracker):
     """
-    Calculate which goalpost is easiest to look at and look to it.
-    After we look at it for a bit, look back at target.
+    Repeatedly executes the headMove FIXED_PITCH_PAN.
+    Once the ball is located, switches to tracking.
     """
-    # Calculate closest field object
     if tracker.firstFrame():
-        tracker.shouldStareAtBall = 0 # Reuse this counter
+        # Send the motion request message to stop
+        request = tracker.brain.interface.motionRequest
+        request.type = request.RequestType.STOP_HEAD
+        request.processed_by_motion = False
+        # Smartly start the pan
+        tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
-        closest = tracker.helper.calculateClosestLandmark()
+    if not tracker.brain.motion.head_is_active:
+        # Repeat the pan
+        tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-        # For some reason, we aren't going to look at anything, so go
-        # back to tracking
-        if closest is None:
-            return tracker.goLater('activeTracking')
+    if tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+        return tracker.goLater('tracking')
 
-        if hasattr(closest, "loc"):
-            closest = closest.loc
+    return tracker.stay()
 
-        target = tracker.brain.loc.relativeLocationOf(closest)
-        target.height = 45      # stare at the center of the post
-                                # rather than the bottom
-
-        tracker.lastMove = tracker.helper.lookToPoint(target)
-
-    elif tracker.lastMove.isDone():
-        tracker.shouldStareAtBall += 1
-
-        if tracker.shouldStareAtBall > constants.LOOK_FIELD_OBJ_FRAMES:
-            return tracker.goLater('activeTracking')
+def afterKickScan(tracker):
+    """
+    Looks in the direction the ball was kicked in.
+    If the ball is seen, go to state 'ballTracking'.
+    """
+    if tracker.firstFrame():
+        tracker.performHeadMove(constants.KICK_DICT[tracker.kickName])
 
     return tracker.stay()

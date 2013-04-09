@@ -14,7 +14,7 @@ def afterPenalty(player):
 
     if player.firstFrame():
         # pan for the ball
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.repeatWidePan()
         # walk towards your own field cross
         player.brain.nav.walkTo(RelRobotLocation(200,0,0))
 
@@ -115,7 +115,7 @@ def penaltyRelocalize(player):
         player.setWalk(1, 0, 0)
 
     if player.brain.ball.vis.framesOn >= OBJ_SEEN_THRESH:
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         return player.goLater(gcState)
 
     if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
@@ -129,6 +129,6 @@ def penaltyRelocalize(player):
         player.shouldRelocalizeCounter = 0
 
     if not player.brain.motion.isHeadActive():
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.repeatWidePan()
 
     return player.stay()

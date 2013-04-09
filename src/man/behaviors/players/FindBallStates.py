@@ -27,7 +27,7 @@ def scanFindBall(player):
     State to move the head to find the ball. If we find the ball, we
     mppove to align on it. If we don't find it, we spin to keep looking
     """
-    player.brain.tracker.trackBallFixedPitch()
+    player.brain.tracker.trackBall()
 
     if transitions.shouldChaseBall(player):
         return player.goNow('findBall')
@@ -45,7 +45,7 @@ def spinFindBall(player):
     """
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         return player.goNow('findBall')
 
     if player.firstFrame():
@@ -57,7 +57,7 @@ def spinFindBall(player):
         spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
-        player.brain.tracker.spinPanFixedPitch()
+        player.brain.tracker.spinPan()
 
     if transitions.shouldWalkFindBall(player):
         return player.goLater('walkFindBall')
@@ -71,11 +71,11 @@ def walkFindBall(player):
     if player.firstFrame():
         player.stopWalking()
         # Do a slow pan
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.repeatWidePan()
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         return player.goNow('findBall')
 
     if player.brain.nav.isStopped():

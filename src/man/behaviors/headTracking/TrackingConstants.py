@@ -1,3 +1,4 @@
+import HeadMoves
 
 MAX_PAN_SPEED = 125.0              # deg/sec
 
@@ -15,19 +16,21 @@ LOOK_FIELD_OBJ_FRAMES = 10
 
 PAN_UP_PITCH_THRESH = 10
 
-KICK_DICT = {"L_Side"           : 'lookRightFixedPitch',
-             "R_Side"           : 'lookLeftFixedPitch',
-             "L_Short_Side"     : 'lookRightFixedPitch',
-             "R_Short_Side"     : 'lookLeftFixedPitch',
-             "L_Straight"       : 'afterKickScan',
-             "R_Straight"       : 'afterKickScan',
-             "L_Short_Straight" : 'afterKickScan',
-             "R_Short_Straight" : 'afterKickScan',
-             "L_Quick_Straight" : 'afterKickScan',
-             "R_Quick_Straight" : 'afterKickScan',
-             "L_Big_Straight"   : 'afterKickScan',
-             "R_Big_Straight"   : 'afterKickScan',
-             "L_Long_Back"      : 'afterKickScan',
-             "R_Long_Back"      : 'afterKickScan',
-             "L_Short_Back"     : 'afterKickScan',
-             "R_Short_Back"     : 'afterKickScan'}
+KICK_DICT = {"L_Side"           : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
+             "R_Side"           : HeadMoves.FIXED_PITCH_LOOK_LEFT,
+             "L_Short_Side"     : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
+             "R_Short_Side"     : HeadMoves.FIXED_PITCH_LOOK_LEFT,
+             "L_Straight"       : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Straight"       : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Short_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Short_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Quick_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Quick_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Big_Straight"   : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Big_Straight"   : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Long_Back"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Long_Back"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "L_Short_Back"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "R_Short_Back"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT}
+# TODO: Test and improve these pans.
+
