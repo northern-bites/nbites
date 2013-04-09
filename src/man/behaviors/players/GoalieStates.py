@@ -21,7 +21,6 @@ def gameReady(player):
         player.penaltyKicking = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
-        player.brain.resetLocTo(3, 2, 1)
         if player.lastDiffState != 'gameInitial':
             player.brain.nav.walkTo(RelRobotLocation(120, 0, 0))
 
@@ -35,9 +34,9 @@ def gameSet(player):
     if player.firstFrame():
         player.penaltyKicking = False
         player.stand()
-        player.brain.resetLocTo(Constants.FIELD_GREEN_LEFT_SIDELINE_X,
-                                Constants.MIDFIELD_Y,
-                                Constants.HEADING_RIGHT)
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)
 
@@ -51,7 +50,6 @@ def gamePlaying(player):
     if player.firstFrame():
         player.penaltyKicking = False
         player.brain.nav.stand()
-        player.brain.resetLocTo(42, 42, 42)
 
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
