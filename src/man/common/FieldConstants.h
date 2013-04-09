@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include "RobotConfig.h"
 #include "Common.h"
 
 // Nao field constants
