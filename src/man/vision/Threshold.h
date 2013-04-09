@@ -177,8 +177,8 @@ public:
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
-    void setIm(const uint16_t* thrIm);
-    void setIm_bot(const uint16_t* thrIm);
+    void setIm(uint8_t* thrIm);
+    void setIm_bot(uint8_t* thrIm);
     const uint16_t* getYUV();
     static const char * getShortColor(int _id);
 

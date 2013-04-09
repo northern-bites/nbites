@@ -34,39 +34,34 @@ ImageConverterModule::ImageConverterModule(Camera::Type which)
 
 void ImageConverterModule::run_()
 {
-    //Message<PackedImage16> yMessage(0);
-    //Message<PackedImage16> uMessage(0);
-    //Message<PackedImage16> vMessage(0);
-    //Message<ThresholdImage> thrMessage(0);
-    PackedImage16 image;
-
     imageIn.latch();
 
     const YUVImage& yuv = imageIn.message();
 
-    PackedImage16 tempOutput(yuv.width() / 4, yuv.height() * 7 / 4);
+    /* This assembly method below is not general, it assumes the input image is of size 1280x480, 
+       therefore we make no attempt to keep this run_ method general, as only a 1280x480 image
+       will be processed correctly. 
+       IMPORTANT imageIn must be of size 1280x480. */
+    HeapPixelBuffer *tempBuffer = new HeapPixelBuffer(614400);
+    PackedImage16 tempOutput16(tempBuffer, 320, 840, 320);
+    PackedImage8 tempOutput8(tempBuffer, 320, 840, 320);
 
     ImageAcquisition::acquire_image_fast(table,
                                          params,
                                          yuv.pixelAddress(0, 0),
-                                         tempOutput.pixelAddress(0, 0));
+                                         tempOutput16.pixelAddress(0, 0));
 
-    image = tempOutput.window(0, 0, 320, 240);
+    PackedImage16 image = tempOutput16.window(0, 0, 320, 240);
     yImage.setMessage(Message<PackedImage16>(&image));
 
-    image = tempOutput.window(0, 240, 320, 240);
+    image = tempOutput16.window(0, 240, 320, 240);
     uImage.setMessage(Message<PackedImage16>(&image));
 
-    image = tempOutput.window(0, 480, 320, 240);
+    image = tempOutput16.window(0, 480, 320, 240);
     vImage.setMessage(Message<PackedImage16>(&image));
 
-    ThresholdImage thr = tempOutput.window(0, 720, 320, 120);
+    ThresholdImage thr = tempOutput8.window(0, 720, 320, 120);
     thrImage.setMessage(Message<ThresholdImage>(&thr));
-
-    //yImage.setMessage(yMessage);
-    //uImage.setMessage(uMessage);
-    //vImage.setMessage(vMessage);
-    //thrImage.setMessage(thrMessage);
 }
 
 void ImageConverterModule::initTable(const std::string& filename)
