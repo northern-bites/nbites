@@ -61,7 +61,7 @@ def scanning(tracker):
     """
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(tracker.currentHeadScan)
 
@@ -78,7 +78,7 @@ def locPans(tracker):
     """
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.QUICK_PANS)
 
@@ -96,7 +96,7 @@ def fullPanFixedPitch(tracker):
     """
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 
@@ -115,7 +115,7 @@ def lookLeftFixedPitch(tracker):
     """
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_LEFT)
 
@@ -131,7 +131,7 @@ def lookRightFixedPitch(tracker):
     """
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_RIGHT)
 
