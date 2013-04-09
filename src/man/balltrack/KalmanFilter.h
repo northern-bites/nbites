@@ -28,13 +28,13 @@ namespace balltrack{
 static const KalmanFilterParams DEFAULT_PARAMS =
 {
                             // @TODO Verify data set (newby?)
-    .00117784f,             // transXDeviation   CALC March 2013
-    .01263870f,             // trandYDeviation   CALC March 2013
-    .00420612f,             // rotationDeviation CALC March 2013
-    .6f,                    // processDeviation
-    .6f,
-    .6f,
-    .6f,
+    .5f,             // transXDeviation   CALC March 2013
+    .5f,             // trandYDeviation   CALC March 2013
+    .5f,             // rotationDeviation CALC March 2013
+    .1f,                    // processDeviation
+    .1f,
+    .1f,
+    .1f,
     1.f                     // ballFriction?
 };
 
@@ -59,6 +59,29 @@ public:
     void predict(messages::RobotLocation odometry);
     void predict(messages::RobotLocation odometry, float deltaT);
     void updateWithObservation(messages::VisionBall visionBall);
+
+    messages::RobotLocation genOdometry(float x, float y, float h)
+    {
+        messages::RobotLocation odometry;
+        odometry.set_x(x);
+        odometry.set_y(y);
+        odometry.set_h(h);
+
+        return odometry;
+    };
+
+    messages::VisionBall genVisBall(float dist, float bear)
+    {
+        messages::VisionBall obsv;
+        obsv.set_rel_x_variance(5.f);
+        obsv.set_rel_y_variance(5.f);
+        obsv.set_distance(dist);
+        obsv.set_bearing(bear);
+
+        return obsv;
+    };
+
+
 
     ufvector4 getStateEst(){return x;};
     float getRelXPosEst(){return x(0);};
