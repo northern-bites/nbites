@@ -3,7 +3,7 @@
 # defines a state.
 #
 
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 from .. import SweetMoves
 
 def gameInitial(player):

@@ -1,5 +1,5 @@
 from .. import SweetMoves
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 from .. import StiffnessModes
 from ..navigator import BrunswickSpeeds as speeds
 from objects import RelRobotLocation

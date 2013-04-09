@@ -6,7 +6,7 @@ from ..util import FSA
 
 from .. import StiffnessModes as stiff
 
-class HeadTracking(FSA.FSA):
+class HeadTracker(FSA.FSA):
     """FSA to control actions performed by head"""
 
     def __init__(self, brain):
@@ -20,7 +20,7 @@ class HeadTracking(FSA.FSA):
         # Set debug printing variables
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'yellow'
-        self.setName('headTracking')
+        self.setName('headTracker')
 
         # Set state variables
         self.currentState = 'stopped'
@@ -67,7 +67,8 @@ class HeadTracking(FSA.FSA):
     def repeatHeadMove(self, headMove):
         '''Executes the given headMove, then repeats it forever.'''
         if (self.headMove != headMove
-            or self.currentState != 'repeatHeadMove'):
+            or (self.currentState != 'repeatHeadMove' and
+                self.currentState != 'repeatingHeadMove')):
             self.headMove = headMove
             self.switchTo('repeatHeadMove')
 

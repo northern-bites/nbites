@@ -17,7 +17,7 @@ from . import robots
 from . import GameController
 
 # Packages and modules from sub-directories
-from .headTracking import HeadTracker
+from .headTracker import HeadTracker
 from .typeDefs import (Play, TeamMember)
 from .navigator import Navigator
 from .playbook import PBInterface

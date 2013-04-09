@@ -1,5 +1,5 @@
 import noggin_constants as NogginConstants
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 from   ..util import MyMath
 import PositionConstants as constants
 import ChaseBallTransitions as transitions

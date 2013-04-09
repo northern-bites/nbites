@@ -41,8 +41,8 @@ def lookStraightThenTrack(tracker):
     if tracker.firstFrame():
         # Send the motion request message to stop
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
         # Perform the head move to look straight ahead
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
         # Make sure target is set right
@@ -61,8 +61,8 @@ def fullPan(tracker):
     if tracker.firstFrame():
         # Send the motion request message to stop
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
-        request.processed_by_motion = False
+        request.stop_head = True
+        request.timestamp = int(tracker.brain.time * 1000)
         # Smartly start the pan
         tracker.helper.startingPan(HeadMoves.FIXED_PITCH_PAN)
 

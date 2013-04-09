@@ -1,5 +1,5 @@
 from .. import SweetMoves
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 import ChaseBallConstants as constants
 import noggin_constants as NogginConstants
 from math import fabs

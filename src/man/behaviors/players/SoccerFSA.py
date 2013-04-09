@@ -2,7 +2,7 @@
 # soccer-playing functionality
 #
 #
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 from ..util import FSA
 from . import CoreSoccerStates
 
