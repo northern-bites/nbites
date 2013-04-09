@@ -16,7 +16,7 @@ def lookToTarget(tracker):
     """
     if tracker.target.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         if tracker.activeLocOn:
             return tracker.goNow('activeTracking')
@@ -25,7 +25,7 @@ def lookToTarget(tracker):
 
     elif tracker.stateTime >= TIME_TO_LOOK_TO_TARGET:
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         return tracker.goLater('scanForTarget')
 
@@ -41,12 +41,12 @@ def scanForTarget(tracker):
     if tracker.target.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
         if tracker.activeLocOn:
             request = tracker.brain.interface.motionRequest
-            request.type = request.RequestType.STOP_HEAD
+            request.stop_head = True
             request.timestamp = int(tracker.brain.time * 1000)
             return tracker.goNow('activeTracking')
         else:
             request = tracker.brain.interface.motionRequest
-            request.type = request.RequestType.STOP_HEAD
+            request.stop_head = True
             request.timestamp = int(tracker.brain.time * 1000)
             return tracker.goNow('targetTracking')
 
@@ -73,7 +73,7 @@ def targetTracking(tracker):
     """
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         tracker.activeLocOn = False
 
@@ -107,7 +107,7 @@ def lookStraightThenTrackFixedPitch(tracker):
     """
     if tracker.firstFrame():
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(tracker.brain.time * 1000)
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
         tracker.target = tracker.brain.ball

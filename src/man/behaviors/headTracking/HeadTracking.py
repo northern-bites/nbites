@@ -127,7 +127,7 @@ class HeadTracking(FSA.FSA):
         # HACK
         self.switchTo('stopped')
         request = tracker.brain.interface.motionRequest
-        request.type = request.RequestType.STOP_HEAD
+        request.stop_head = True
         request.timestamp = int(self.brain.time * 1000)
         self.helper.lookToAngleFixedPitch(yaw)
 

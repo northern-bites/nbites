@@ -298,18 +298,15 @@ void MotionModule::processMotionInput()
     {
         lastRequest = requestInput_.message().timestamp();
 
-        if (requestInput_.message().type() ==
-            messages::MotionRequest::STOP_BODY)
+        if (requestInput_.message().stop_body())
         {
             stopBodyMoves();
         }
-        else if (requestInput_.message().type() ==
-                 messages::MotionRequest::STOP_HEAD)
+        if (requestInput_.message().stop_head())
         {
             stopHeadMoves();
         }
-        else if (requestInput_.message().type() ==
-                 messages::MotionRequest::RESET_ODO)
+        if (requestInput_.message().reset_odometry())
         {
             resetOdometry();
         }

@@ -104,9 +104,9 @@ def clearIt(player):
                                             kickPose[1],
                                             0.0)
 
-        # WE NEED TO BE ABLE TO DO THIS
         # reset odometry
-        #player.brain.motion.resetOdometry()
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
         clearIt.odoDelay = True
         return player.stay()
 
@@ -244,8 +244,10 @@ def centerAtGoalBasedOnCorners(player):
 
 def repositionAfterWhiff(player):
     if player.firstFrame():
-        # We need to be able to reset ODO
-        #player.brain.motion.resetOdometry()
+        # reset odometry
+        player.brain.interface.motionRequest.reset_odometry = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
+
         if player.brain.ball.rel_y < 0.0:
             player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
