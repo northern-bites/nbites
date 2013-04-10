@@ -4,6 +4,7 @@
 #define PyConstants_h_DEFINED
 
 #include "PyNogginConstants.h"
+#include "RobotConfig.h"
 
 void c_init_noggin_constants();
 
