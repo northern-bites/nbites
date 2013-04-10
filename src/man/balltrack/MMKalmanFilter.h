@@ -62,6 +62,9 @@ public:
     float getCovXVelEst(){return covEst(2,2);};
     float getCovYVelEst(){return covEst(3,3);};
 
+    float getFilteredDist(){return filters.at(bestFilter)->getFilteredDist();};
+    float getFilteredBear(){return filters.at(bestFilter)->getFilteredBear();};
+
     bool isStationary(){return stationary;};
 
     void printEst(){std::cout << "Filter Estimate:\n\t"
@@ -83,8 +86,6 @@ private:
 
     unsigned normalizeFilterWeights();
     void updateDeltaTime();
-
-    ufvector4 vector4D(float x, float y, float z, float w);
 
     MMKalmanFilterParams params;
 

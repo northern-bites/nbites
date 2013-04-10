@@ -3,6 +3,14 @@
 namespace man{
 namespace balltrack{
 
+/**
+ * @ Brief- Constructor of my 'Puppetmaster'
+ *          Grab the params, gen a bunch of filters to avoid nulls
+ *          Set frames w/o ball high so we re-init based on initial observations
+ *          Clearle consecutive observation is false if we havent seen the ball...
+ *          State est and vis history can stay zero, that'll change as the filters start rolling
+ *          Same with bestFilter, stationary, and lastUpdateTime
+ */
 MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
 {
     params = params_;
@@ -11,50 +19,49 @@ MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
         filters.push_back(new KalmanFilter());
 
     framesWithoutBall = params.framesTillReset;
+    consecutiveObservation = false;
 }
 
+/**
+ * @Brief - #nomememoryleaks
+ *           (hopefully)
+ */
 MMKalmanFilter::~MMKalmanFilter()
 {
     delete &filters;
 }
 
+/**
+ * @Brief - Main interface, takes in an update with a visionBall and a motion message
+ *          Should be called whenever new information, and simply dont pass it the same
+ *               message twice!
+ * @params - visionball is a NEW vision message
+           - motion is a NEW motion message
+ */
 void MMKalmanFilter::update(messages::VisionBall visionBall,
                             messages::Motion     motion)
 {
     // Predict the filters!
-
-    // HACK HACK HACK for offline
-    predictFilters(motion.odometry(),1.f);
-
-    for(unsigned i=0; i<filters.size(); i++)
-    {
-        std::cout << "Filter " << i << "x est:\t"
-                  <<filters.at(i)->getRelXPosEst() << "\n"
-                  <<"y est:\t" << filters.at(i)->getRelYPosEst()
-                  <<std::endl;
-    }
-
+    predictFilters(motion.odometry());
 
     // Update with sensor if we have made an observation
     if(visionBall.on()) // We see the ball
     {
-        //Before we mess with anything, decide if we aw the ball twice in a row
+        //Before we mess with anything, decide if we saw the ball twice in a row
         consecutiveObservation = (framesWithoutBall == 0) ? true : false;
 
+        // Update our visual observation history
         lastVisRelX = visRelX;
         lastVisRelY = visRelY;
-
         //Calc relx and rely from vision
         float sinB,cosB;
         sincosf(visionBall.bearing(),&sinB,&cosB);
         visRelX = visionBall.distance()*cosB;
         visRelY = visionBall.distance()*sinB;
 
-        // We haven't seen a ball for a long time
+        // If we havent seen the ball for a long time, re-init our filters
         if (framesWithoutBall >= params.framesTillReset)
         {
-            std::cout << "Haven't seen ball in a long time" << std::endl;
-
             // Reset the filters
             initialize(visRelX, visRelY, params.initCovX, params.initCovY);
 
@@ -62,27 +69,15 @@ void MMKalmanFilter::update(messages::VisionBall visionBall,
             framesWithoutBall = 0;
         }
 
+        // Now correct our filters with the vision observation
         updateWithVision(visionBall);
 
-        std::cout << "UPDATE WITH VISION" << std::endl;
-        for(unsigned i=0; i<filters.size(); i++)
-        {
-            std::cout << "Filter " << i << "x est:\t"
-                      <<filters.at(i)->getRelXPosEst() << "\n"
-                      <<"y est:\t" << filters.at(i)->getRelYPosEst()
-                      <<std::endl;
-        }
         //Normalize all of the filter weights, find best one
         bestFilter = normalizeFilterWeights();
-
-        std::cout << "Best Filter\t" << bestFilter << std::endl;
     }
 
-    else
-    {
+    else // Didn't see the ball, need to know for when we cycle
         consecutiveObservation = false;
-        framesWithoutBall ++;
-    }
 
     // Now update our estimates before housekeeping
     prevStateEst = stateEst;
@@ -97,13 +92,15 @@ void MMKalmanFilter::update(messages::VisionBall visionBall,
     // Housekeep
     framesWithoutBall = (visionBall.on()) ? (0) : (framesWithoutBall+1);
     stationary = filters.at(bestFilter)->isStationary();
-
-
 }
 
+/**
+ * @brief - In charge of cycling through the filters, finding the worst stationary
+ *           and replacing it with a new init filter. Also re-inits a new moving filter
+ *            if we have had two consecutive observations and can calculate velocity
+ */
 void MMKalmanFilter::cycleFilters()
 {
-    std::cout << "---------------------" << "CYCLE FILTERS"<<std::endl;
     //Find the two worst filters
     int worstStationary = -1;
     int worstMoving = -1;
@@ -129,7 +126,6 @@ void MMKalmanFilter::cycleFilters()
     ufmatrix4 newCov = boost::numeric::ublas::zero_matrix<float>(4);
     newCov(0,0) = params.initCovX;
     newCov(1,1) = params.initCovY;
-
     filters.at((unsigned) worstStationary)->initialize(newX, newCov);
 
     // Re-init the worst moving filter if we can calc a velocity
@@ -137,16 +133,20 @@ void MMKalmanFilter::cycleFilters()
         std::cout << "Re-init moving filter\t"<<worstMoving<<std::endl;
         newX(2) = (visRelX - lastVisRelX) / deltaTime;
         newX(3) = (visRelY - lastVisRelY) / deltaTime;
+
+        // HACK - magic number. need this in master asap though
         newCov(2,2) = 30.f;
         newCov(3,3) = 30.f;
 
         filters.at((unsigned) worstMoving)->initialize(newX, newCov);
     }
-
-
 }
 
+/*
+ * @brief - Normalize the filter weights, pretty standard
+ */
 unsigned MMKalmanFilter::normalizeFilterWeights(){
+    // Calc sum of the weights to normalize
     float totalWeights = 0;
     for(unsigned i=0; i<filters.size(); i++)
     {
@@ -172,9 +172,16 @@ unsigned MMKalmanFilter::normalizeFilterWeights(){
     }
 
     return tempBestFilter;
-
 }
 
+/**
+ * @brief - Initialize all the filters!
+ * @params- given a relX and relY for the position mean
+ *          also a covX and covY since we may want to init
+ *          w/ diff certainties throughout the life
+ * @choice  I chose to have the velocities randomly initialized since there are
+            soooo many combos
+ */
 void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
 {
     // clear the filters
@@ -205,8 +212,9 @@ void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
         ufmatrix4 cov = boost::numeric::ublas::zero_matrix<float>(4);
         cov(0,0) = covX + positionGen();
         cov(1,1) = covY + positionGen();
-        stationaryFilter->initialize(x, cov);
 
+        // init and push it back
+        stationaryFilter->initialize(x, cov);
         filters.push_back(stationaryFilter);
     }
 
@@ -221,11 +229,11 @@ void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
         x(1)= relY;
         x(2) = velocityGen();
         x(3) = velocityGen();
-        //= vector4D(relX, relY, velocityGen(), velocityGen());
 
+        // Choose to assum obsv mean is perfect and just have noisy velocity
         ufmatrix4 cov = boost::numeric::ublas::zero_matrix<float>(4);
-        cov(0,0) = covX;// + positionGen();
-        cov(1,1) = covY;// + positionGen();
+        cov(0,0) = covX;
+        cov(1,1) = covY;
         cov(2,2) = 20.f;
         cov(3,3) = 20.f;
 
@@ -233,7 +241,8 @@ void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
         filters.push_back(movingFilter);
     }
 }
-// for offline
+
+// for offline testing, need to be able to specify the time which passed
 void MMKalmanFilter::predictFilters(messages::RobotLocation odometry, float t)
 {
     deltaTime = t;
@@ -242,17 +251,25 @@ void MMKalmanFilter::predictFilters(messages::RobotLocation odometry, float t)
         (*it)->predict(odometry, deltaTime);
     }
 }
-
+/**
+ * @brief - Predict each of the filters given info on where robot has moved
+ *          Grab delta time from the system and then call the predict on each filter
+ *
+ */
 void MMKalmanFilter::predictFilters(messages::RobotLocation odometry)
 {
+    // Update the time passed
     updateDeltaTime();
 
+    // Update each filter
     for (std::vector<KalmanFilter *>::iterator it = filters.begin(); it != filters.end(); it++)
-    {
         (*it)->predict(odometry, deltaTime);
-    }
 }
 
+/**
+ * @brief - Correct each filter given an observation
+ *          Pretty straightforward...
+ */
 void MMKalmanFilter::updateWithVision(messages::VisionBall visionBall)
 {
     for (std::vector<KalmanFilter *>::iterator it = filters.begin(); it != filters.end(); it++)
@@ -261,6 +278,10 @@ void MMKalmanFilter::updateWithVision(messages::VisionBall visionBall)
     }
 }
 
+/**
+ * @brief - Update the delta time from the system. Delta time is in Seconds
+ *
+ */
 void MMKalmanFilter::updateDeltaTime()
 {
     // Get time since last update

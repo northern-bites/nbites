@@ -42,7 +42,8 @@ class KalmanFilter
 {
 
 public:
-    KalmanFilter(KalmanFilterParams params_ = DEFAULT_PARAMS);
+    KalmanFilter(bool stationary_ = true,
+                 KalmanFilterParams params_ = DEFAULT_PARAMS);
     ~KalmanFilter();
 
     void update(messages::VisionBall visionBall,
@@ -77,6 +78,7 @@ public:
         obsv.set_rel_y_variance(5.f);
         obsv.set_distance(dist);
         obsv.set_bearing(bear);
+        obsv.set_on(true);
 
         return obsv;
     };
@@ -94,6 +96,14 @@ public:
     float getCovYPosEst(){return cov(1,1);};
     float getCovXVelEst(){return cov(2,2);};
     float getCovYVelEst(){return cov(3,3);};
+
+    float getFilteredDist(){return filteredDist;};
+    float getFilteredBear(){return filteredBear;};
+
+    float getWeight(){return weight;};
+    void setWeight(float weight_){weight=weight_;};
+
+    bool isStationary(){return stationary;};
 
 private:
     KalmanFilterParams params;
@@ -125,6 +135,12 @@ private:
     //temp move to public for testing
 //    void predict(messages::RobotLocation odometry, float deltaT);
     ufvector4 vector4D(float x, float y, float z, float w);
+
+    float filteredDist;
+    float filteredBear;
+
+    // For the MMKalman
+    float weight;
 };
 
 

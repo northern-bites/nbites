@@ -15,7 +15,16 @@ namespace balltrack
         float processDeviationVelX;
         float processDeviationVelY;
         float ballFriction;      //Loss in acceleration over a unit of time
+    };
 
+    struct MMKalmanFilterParams
+    {
+        int numFilters;          // Number of filters (even)
+        int framesTillReset;   // Frames we can see a ball and not reset
+        float initCovX;
+        float initCovY;
+        float initCovVelX;
+        float initCovVelY;
     };
 
     /*
@@ -39,5 +48,8 @@ namespace balltrack
         float relX;
         float relY;
     };
+
+
+
 } // namespace balltrack
 } // namespace man

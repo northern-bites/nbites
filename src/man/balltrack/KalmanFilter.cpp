@@ -7,13 +7,14 @@ namespace man
 {
 namespace balltrack
 {
-    KalmanFilter::KalmanFilter(KalmanFilterParams params_)
+    KalmanFilter::KalmanFilter(bool stationary_,
+                               KalmanFilterParams params_)
         :  params(params_),
            updated(false),
            lastUpdateTime(0),
            deltaTime(0.f)
     {
-        stationary = false;
+        stationary = stationary_;
 
     }
 
@@ -43,6 +44,10 @@ namespace balltrack
 
         predict(motion.odometry());
         updateWithObservation(visionBall);
+
+        // I think?
+        filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
+        filteredBear = NBMath::safe_atan2(x(1),x(0));
     }
 
     void KalmanFilter::predict(messages::RobotLocation odometry)
@@ -53,10 +58,10 @@ namespace balltrack
 
     void KalmanFilter::predict(messages::RobotLocation odometry, float deltaT)
     {
-        std::cout<<"Ball X Est\t" << x(0)
-                 <<"\nBall Y Est\t" << x(1) << std::endl;
-        std::cout<<"Cov X\t" << cov(0,0)
-                 <<"\nCov Y\t" << cov(1,1) << std::endl;
+        // std::cout<<"Ball X Est\t" << x(0)
+        //          <<"\nBall Y Est\t" << x(1) << std::endl;
+        // std::cout<<"Cov X\t" << cov(0,0)
+        //          <<"\nCov Y\t" << cov(1,1) << std::endl;
 
         //Calculate A = rotation matrix * trajectory matrix
         //First calc rotation matrix
@@ -135,6 +140,7 @@ namespace balltrack
         ufmatrix4 A = prod(rotation,trajectory);
         ufmatrix4 ATranspose = trans(A);
         ufvector4 p = prod(A,x);
+
         x = p + translation;
 
         // Calculate the covariance Cov = A*Cov*ATranspose
@@ -170,11 +176,11 @@ namespace balltrack
          for(int i=0; i<4; i++){
              cov(i,i) += noise(i);
          }
- 
-        std::cout<<"Ball X Est\t" << x(0)
-                 <<"\nBall Y Est\t" << x(1) << std::endl;
-        std::cout<<"Cov X\t" << cov(0,0)
-                 <<"\nCov Y\t" << cov(1,1) << std::endl;
+
+        // std::cout<<"Ball X Est\t" << x(0)
+        //          <<"\nBall Y Est\t" << x(1) << std::endl;
+        // std::cout<<"Cov X\t" << cov(0,0)
+        //          <<"\nCov Y\t" << cov(1,1) << std::endl;
     }
 
     void KalmanFilter::updateWithObservation(messages::VisionBall visionBall)
@@ -222,18 +228,25 @@ namespace balltrack
         measurement(0) = visionBall.distance()*cosB;
         measurement(1) = visionBall.distance()*sinB;
 
-        std::cout << "See a ball at x:\t" << measurement(0)
-                  <<"\nand at        y:\t" << measurement(1) << std::endl;
+        // std::cout << "See a ball at x:\t" << measurement(0)
+        //           <<"\nand at        y:\t" << measurement(1) << std::endl;
 
         ufvector innovation(2);
         innovation = measurement - posEstimates;
-        std::cout << "Innovation\t" << innovation(0) << " , " << innovation(1) << std::endl;
+
+        // std::cout << "Innovation\t" << innovation(0) << " , " << innovation(1) << std::endl;
 
         ufvector correction(4);
         correction = prod(kalmanGain,innovation);
-        std::cout << "Correction\t" << correction(0) << " , " << correction(1) << std::endl;
+        // std::cout << "Correction\t" << correction(0) << " , " << correction(1) << std::endl;
+
+        // Lets try using the size of the correction to determine how well the filter has been modeling
+        weight = 1 / (std::sqrt(correction(0)*correction(0)
+                                + correction(1)*correction(1)));
 
         x += correction;
+
+
         //cov = cov - k*c*cov
         ufmatrix4 identity;
         identity = boost::numeric::ublas::identity_matrix <float>(4);
@@ -241,10 +254,10 @@ namespace balltrack
         modifyCov = identity - prod(kalmanGain,c);
         cov = prod(modifyCov,cov);
 
-        std::cout<<"Ball X Est\t" << x(0)
-                 <<"\nBall Y Est\t" << x(1) << std::endl;
-        std::cout<<"Cov X\t" << cov(0,0)
-                 <<"\nCov Y\t" << cov(1,1) << std::endl;
+        // std::cout<<"Ball X Est\t" << x(0)
+        //          <<"\nBall Y Est\t" << x(1) << std::endl;
+        // std::cout<<"Cov X\t" << cov(0,0)
+        //          <<"\nCov Y\t" << cov(1,1) << std::endl;
     }
 
     void KalmanFilter::initialize()

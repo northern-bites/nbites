@@ -35,4 +35,5 @@ message FilteredBall
 	optional float var_rel_y = 9;
 	optional float var_vel_x = 10;
 	optional float var_vel_y = 11;
+	optional bool  is_stationary = 12;
 }

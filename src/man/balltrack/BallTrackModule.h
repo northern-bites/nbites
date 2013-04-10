@@ -7,6 +7,8 @@
 #pragma once
 
 #include "NaiveBallFilter.h"
+#include "KalmanFilter.h"
+#include "MMKalmanFilter.h"
 
 #include "RoboGrams.h"
 #include "BallModel.pb.h"
@@ -36,11 +38,7 @@ namespace man
         void run_();
 
     private:
-//        boost::shared_ptr<NaiveBallFilter> ballFilter;
-        NaiveBallFilter *ballFilter;
-
-        float ballX;
-        float ballY;
+        MMKalmanFilter* filters;
     };
 
     } //namespace balltrack
