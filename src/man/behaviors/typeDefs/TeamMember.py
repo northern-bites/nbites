@@ -85,6 +85,7 @@ class TeamMember(RobotLocation):
         self.x = self.brain.loc.x
         self.y = self.brain.loc.y
         self.h = self.brain.loc.h
+
         self.ballOn = ball.vis.frames_on > 0
         self.ballDist = ball.distance
         self.ballBearing = ball.bearing_deg

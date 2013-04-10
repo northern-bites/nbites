@@ -13,8 +13,6 @@
 #include "RoboGrams.h"
 #include "BallModel.pb.h"
 #include "RobotLocation.pb.h"
-#include "Motion.pb.h"
-
 #include <boost/shared_ptr.hpp>
 
 namespace man
@@ -30,6 +28,7 @@ public:
 
     portals::InPortal<messages::VisionBall> visionBallInput;
     portals::InPortal<messages::RobotLocation> odometryInput;
+    portals::InPortal<messages::RobotLocation> localizationInput;
     portals::OutPortal<messages::FilteredBall> ballLocationOutput;
 
 protected:

@@ -38,8 +38,6 @@ message FilteredBall
 	optional float var_vel_y = 11;
 	optional bool  is_stationary = 12;
 	optional float bearing_deg = 13;
-
-	// HACK
-	optional float x = 14;
-	optional float y = 15;
+        optional float x = 14;
+        optional float y = 15;
 }

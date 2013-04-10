@@ -85,6 +85,7 @@ public:
     portals::InPortal<messages::VisionRobot> visionRobotIn;
     portals::InPortal<messages::VisionObstacle> visionObstacleIn;
     portals::InPortal<messages::FootBumperState> footBumperStateIn;
+    portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::InPortal<messages::JointAngles> jointsIn;
 
