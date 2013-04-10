@@ -15,6 +15,7 @@ namespace balltrack
            deltaTime(0.f)
     {
         stationary = stationary_;
+        initialize();
 
     }
 
@@ -137,8 +138,29 @@ namespace balltrack
 
 
         // Calculate the expected state
+
+
+
         ufmatrix4 A = prod(rotation,trajectory);
+
+        // std::cout << "A = prod rotation, trajectory" << std::endl;
+        // for(int i=0; i<4; i++)
+        // {
+        //     for (int j=0; j<4; j++)
+        //     {
+        //         std::cout << A(i,j) << "\t";
+        //     }
+        //     std::cout << std::endl;
+        // }
+        // std::cout << std::endl;
+
         ufmatrix4 ATranspose = trans(A);
+
+        // std::cout << "X:\n";
+        // for (int i=0; i<4; i++)
+        //     std::cout << x(i) << "\t";
+        // std::cout << std::endl;
+
         ufvector4 p = prod(A,x);
 
         x = p + translation;
@@ -262,7 +284,7 @@ namespace balltrack
 
     void KalmanFilter::initialize()
     {
-        x = vector4D(0.f, 0.f, 1.f, 0.5f);
+        x = vector4D(50.f, 50.f, 50.f, 50.f);
         cov = boost::numeric::ublas::identity_matrix <float>(4);
     }
 

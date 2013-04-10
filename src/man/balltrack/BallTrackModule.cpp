@@ -36,14 +36,15 @@ void BallTrackModule::run_()
     // Fill the ballMessage with the filters representation
     portals::Message<messages::FilteredBall> ballMessage(0);
 
-    ballMessage.get()->mutable_vision_ball()->CopyFrom(visionBallInput.message());
-    ballMessage.get()->set_filter_distance(filters->getFilteredDist());
-    ballMessage.get()->set_filter_bearing(filters->getFilteredBear());
+    ballMessage.get()->mutable_vis()->CopyFrom(visionBallInput.message());
+    ballMessage.get()->set_distance(filters->getFilteredDist());
+    ballMessage.get()->set_bearing(filters->getFilteredBear());
+    ballMessage.get()->set_bearing_deg(filters->getFilteredBear() * TO_DEG);
 
-    ballMessage.get()->set_filter_rel_x(filters->getRelXPosEst());
-    ballMessage.get()->set_filter_rel_y(filters->getRelYPosEst());
-    ballMessage.get()->set_filter_vel_x(filters->getRelXVelEst());
-    ballMessage.get()->set_filter_vel_y(filters->getRelYVelEst());
+    ballMessage.get()->set_rel_x(filters->getRelXPosEst());
+    ballMessage.get()->set_rel_y(filters->getRelYPosEst());
+    ballMessage.get()->set_vel_x(filters->getRelXVelEst());
+    ballMessage.get()->set_vel_y(filters->getRelYVelEst());
 
     ballMessage.get()->set_var_rel_x(filters->getCovXPosEst());
     ballMessage.get()->set_var_rel_y(filters->getCovYPosEst());

@@ -23,18 +23,23 @@ message VisionBall {
 
 message FilteredBall
 {
-	optional VisionBall vision_ball = 1;
-	optional float filter_distance = 2;
-	optional float filter_bearing = 3;
+	optional VisionBall vis = 1;
+	optional float distance = 2;
+	optional float bearing = 3;
 
 	// State of best filter
-	optional float filter_rel_x = 4;
-	optional float filter_rel_y = 5;
-	optional float filter_vel_x = 6;
-	optional float filter_vel_y = 7;
+	optional float rel_x = 4;
+	optional float rel_y = 5;
+	optional float vel_x = 6;
+	optional float vel_y = 7;
 	optional float var_rel_x = 8;
 	optional float var_rel_y = 9;
 	optional float var_vel_x = 10;
 	optional float var_vel_y = 11;
 	optional bool  is_stationary = 12;
+	optional float bearing_deg = 13;
+
+	// HACK
+	optional float x = 14;
+	optional float y = 15;
 }

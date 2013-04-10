@@ -76,7 +76,7 @@ public:
                               << "Uncertainty x:\t" << covEst(0,0) << "\t,\t"
                               << "y:\t" << covEst(1,1) << std::endl;};
 
-    void initialize(float relX, float relY, float covX, float covY);
+    void initialize(float relX=50.f, float relY=50.f, float covX=50.f, float covY=50.f);
 private:
     void predictFilters(messages::RobotLocation odometry);
     void predictFilters(messages::RobotLocation odometry, float t);
@@ -101,7 +101,7 @@ private:
     ufmatrix4 covEst;
 
 
-    unsigned bestFilter;
+    int bestFilter;
 
     bool stationary;
     bool consecutiveObservation;

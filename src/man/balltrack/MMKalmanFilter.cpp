@@ -13,6 +13,8 @@ namespace balltrack{
  */
 MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
 {
+
+
     params = params_;
 
     for(int i=0; i< params.numFilters; i++)
@@ -20,6 +22,8 @@ MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
 
     framesWithoutBall = params.framesTillReset;
     consecutiveObservation = false;
+    bestFilter = 0;
+    initialize();
 }
 
 /**
@@ -73,7 +77,7 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         updateWithVision(visionBall);
 
         //Normalize all of the filter weights, find best one
-        bestFilter = normalizeFilterWeights();
+        bestFilter = (int)normalizeFilterWeights();
     }
 
     else // Didn't see the ball, need to know for when we cycle
@@ -82,8 +86,9 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
     // Now update our estimates before housekeeping
     prevStateEst = stateEst;
     prevCovEst   = covEst;
-    stateEst = filters.at(bestFilter)->getStateEst();
-    covEst   = filters.at(bestFilter)->getCovEst();
+
+    stateEst = filters.at((unsigned)bestFilter)->getStateEst();
+    covEst   = filters.at((unsigned)bestFilter)->getCovEst();
 
     // Kill the two worst estimates and re-init them if we made an observation
     if(visionBall.on())
@@ -91,7 +96,7 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
 
     // Housekeep
     framesWithoutBall = (visionBall.on()) ? (0) : (framesWithoutBall+1);
-    stationary = filters.at(bestFilter)->isStationary();
+    stationary = filters.at((unsigned)bestFilter)->isStationary();
 }
 
 /**
@@ -130,7 +135,6 @@ void MMKalmanFilter::cycleFilters()
 
     // Re-init the worst moving filter if we can calc a velocity
     if (consecutiveObservation){
-        std::cout << "Re-init moving filter\t"<<worstMoving<<std::endl;
         newX(2) = (visRelX - lastVisRelX) / deltaTime;
         newX(3) = (visRelY - lastVisRelY) / deltaTime;
 
@@ -240,6 +244,7 @@ void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
         movingFilter->initialize(x, cov);
         filters.push_back(movingFilter);
     }
+
 }
 
 // for offline testing, need to be able to specify the time which passed
