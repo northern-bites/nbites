@@ -1,4 +1,4 @@
-#include "BallFilter.h"
+#include "NaiveBallFilter.h"
 
 namespace man
 {
