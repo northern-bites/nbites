@@ -27,7 +27,12 @@
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 
-class Context; // forward reference
+namespace man {
+namespace vision {
+	class Context; // forward reference
+}
+}
+
 #include "ObjectFragments.h"
 #include "Threshold.h"
 #include "VisualFieldObject.h"
@@ -39,189 +44,195 @@ class Context; // forward reference
 #include "Vision.h"
 #include "Field.h"
 
-enum facing {
-    FACING_GOAL = 0,
-    FACING_SIDELINE,
-    FACING_UNKNOWN
-};
+namespace man {
+namespace vision {
 
-enum half {
-    HALF_UNKNOWN
-};
+	enum facing {
+		FACING_GOAL = 0,
+		FACING_SIDELINE,
+		FACING_UNKNOWN
+	};
 
-
-class Context {
-public:
-    Context(Vision* vis, Threshold* thr, Field* fie);
-    virtual ~Context() {}
-
-    void init();
-    void setContext();
-
-    // setters
-    void setTCorner() {tCorner++;}
-    void setLCorner() {lCorner++;}
-    void setOLCorner() {oCorner++; lCorner++;}
-    void setILCorner() {iCorner++; lCorner++;}
-    void setCCCorner() {cCorner++; seeCenterCircle = true;}
-    void setRightYellowPost() {rightPost = true; seePost = true;}
-    void setLeftYellowPost() {leftPost = true; seePost = true;}
-    void setUnknownYellowPost() {unknownPost = true; seePost = true;}
-    void setRightBluePost() {rightPost = true; seePost = true;}
-    void setLeftBluePost() {leftPost = true; seePost = true;}
-    void setUnknownBluePost() {unknownPost = true; seePost = true;}
-    void setUnknownCross() {unknownCross = true; cross = true;}
-    void setYellowCross() {yellowCross = true; cross = true;}
-    void setBlueCross() {blueCross = true; cross = true;}
-    void setCross() {cross = true;}
-    void setBall() {ball = true;}
-    void setGoalBoxLines() {seeGoalBoxLines = true;}
-    void setSeeCenterCircle(){seeCenterCircle = true;}
-	void setSameHalf() {sameHalf = true;}
-
-    // getters
-    int  getTCorner() {return tCorner;}
-    int  getLCorner() {return lCorner;}
-    int  getILCorner() {return iCorner;}
-    int  getOLCorner() {return oCorner;}
-    bool getRightYellowPost() {return rightPost;}
-    bool getLeftYellowPost() {return leftPost;}
-    bool getUnknownYellowPost() {return unknownPost;}
-    bool getYellowPost() {return seePost;}
-    bool getRightBluePost() {return rightPost;}
-    bool getLeftBluePost() {return leftPost;}
-    bool getUnknownBluePost() {return unknownPost;}
-    bool getCross() {return cross;}
-    bool getUnknownCross() {return unknownCross;}
-    bool getYellowCross() {return yellowCross;}
-    bool getBlueCross() {return blueCross;}
-    bool getBall() {return ball;}
-    bool getGoalBoxLines() {return seeGoalBoxLines;}
-
-    // other
-    // Given a list of VisualCorners, attempts to assign ConcreteCorners
-    // (ideally one, but sometimes multiple) that correspond with where the
-    // corner could possibly be on the field.  For instance, if we have a T
-    // corner and it is right next to the blue goal left post, then it is the
-    // blue goal right T. Modifies the corners passed in by calling the
-    // setPossibleCorners method; in certain cases the shape of a corner might
-    // be switched too (if an L corner is determined to be a T instead, its
-    // shape is changed accordingly).
-    void identifyCorners(std::list<VisualCorner> &corners);
-    void checkForConnectedCorners(std::list<VisualCorner> &corners);
-    void checkForSidelineInformation(std::list<VisualCorner> &corners);
-
-    void unconnectedInnerLs(VisualCorner & inner, VisualCorner & outer);
-    void findUnconnectedCornerRelationship(VisualCorner & first,
-                                           VisualCorner & second);
-    void checkConnectedTs(VisualCorner & first, VisualCorner & second);
-    void checkInnerToOuter(VisualCorner & inner, VisualCorner & outer);
-    void checkOuterToOuter(VisualCorner & inner, VisualCorner & outer);
-	void checkForBadTID(VisualCorner & first, VisualCorner & second,
-						boost::shared_ptr<VisualLine> common);
-    void checkTToCenter(VisualCorner & first, VisualCorner & second);
-    void checkTToGoal(VisualCorner & t, VisualCorner & l1,
-                      boost::shared_ptr<VisualLine> common);
-    void checkTToFieldCorner(VisualCorner & t, VisualCorner & l1);
-    void findCornerRelationship(VisualCorner & first, VisualCorner & second);
-    void setFieldCorner(VisualCorner & corner);
-    void checkUnknownGoalCorner(VisualCorner & corner, float l1, float l2,
-                                bool l1IsLeft);
-    void checkGoalCornerWithPost(VisualCorner & corner, int y1, int y2,
-                                 bool l1IsLeft, float dist);
-    void checkLowOuterL(VisualCorner & corner, bool line1IsLonger);
-    void lookForFieldCorner(VisualCorner & first, float l1, float l2);
-    void classifyInnerL(VisualCorner & first);
-    void classifyOuterL(VisualCorner &first);
-	void classifyOuterLMidAngle(VisualCorner & corner,
-								boost::shared_ptr<VisualLine> shorty,
-								boost::shared_ptr<VisualLine> longy);
-
-    void classifyT(VisualCorner &first);
-
-    const std::list<const ConcreteCorner*> classifyCornerWithObjects(
-        const VisualCorner &corner,
-        const std::vector <const VisualFieldObject*> &visibleObjects) const;
+	enum half {
+		HALF_UNKNOWN
+	};
 
 
-	void checkForKickDanger(VisualRobot *robot);
-	void checkForKickDangerNoRobots();
+	class Context {
+	public:
+		Context(Vision* vis, Threshold* thr, Field* fie);
+		virtual ~Context() {}
 
-    const bool arePointsCloseEnough(const float estimatedDistance,
-                                    const ConcreteCorner* j,
-                                    const VisualFieldObject* k,
-                                    const float distToCorner, int n) const;
+		void init();
+		void setContext();
+
+		// setters
+		void setTCorner() {tCorner++;}
+		void setLCorner() {lCorner++;}
+		void setOLCorner() {oCorner++; lCorner++;}
+		void setILCorner() {iCorner++; lCorner++;}
+		void setCCCorner() {cCorner++; seeCenterCircle = true;}
+		void setRightYellowPost() {rightPost = true; seePost = true;}
+		void setLeftYellowPost() {leftPost = true; seePost = true;}
+		void setUnknownYellowPost() {unknownPost = true; seePost = true;}
+		void setRightBluePost() {rightPost = true; seePost = true;}
+		void setLeftBluePost() {leftPost = true; seePost = true;}
+		void setUnknownBluePost() {unknownPost = true; seePost = true;}
+		void setUnknownCross() {unknownCross = true; cross = true;}
+		void setYellowCross() {yellowCross = true; cross = true;}
+		void setBlueCross() {blueCross = true; cross = true;}
+		void setCross() {cross = true;}
+		void setBall() {ball = true;}
+		void setGoalBoxLines() {seeGoalBoxLines = true;}
+		void setSeeCenterCircle(){seeCenterCircle = true;}
+		void setSameHalf() {sameHalf = true;}
+
+		// getters
+		int  getTCorner() {return tCorner;}
+		int  getLCorner() {return lCorner;}
+		int  getILCorner() {return iCorner;}
+		int  getOLCorner() {return oCorner;}
+		bool getRightYellowPost() {return rightPost;}
+		bool getLeftYellowPost() {return leftPost;}
+		bool getUnknownYellowPost() {return unknownPost;}
+		bool getYellowPost() {return seePost;}
+		bool getRightBluePost() {return rightPost;}
+		bool getLeftBluePost() {return leftPost;}
+		bool getUnknownBluePost() {return unknownPost;}
+		bool getCross() {return cross;}
+		bool getUnknownCross() {return unknownCross;}
+		bool getYellowCross() {return yellowCross;}
+		bool getBlueCross() {return blueCross;}
+		bool getBall() {return ball;}
+		bool getGoalBoxLines() {return seeGoalBoxLines;}
+
+		// other
+		// Given a list of VisualCorners, attempts to assign ConcreteCorners
+		// (ideally one, but sometimes multiple) that correspond with where the
+		// corner could possibly be on the field.  For instance, if we have a T
+		// corner and it is right next to the blue goal left post, then it is the
+		// blue goal right T. Modifies the corners passed in by calling the
+		// setPossibleCorners method; in certain cases the shape of a corner might
+		// be switched too (if an L corner is determined to be a T instead, its
+		// shape is changed accordingly).
+		void identifyCorners(std::list<VisualCorner> &corners);
+		void checkForConnectedCorners(std::list<VisualCorner> &corners);
+		void checkForSidelineInformation(std::list<VisualCorner> &corners);
+
+		void unconnectedInnerLs(VisualCorner & inner, VisualCorner & outer);
+		void findUnconnectedCornerRelationship(VisualCorner & first,
+											   VisualCorner & second);
+		void checkConnectedTs(VisualCorner & first, VisualCorner & second);
+		void checkInnerToOuter(VisualCorner & inner, VisualCorner & outer);
+		void checkOuterToOuter(VisualCorner & inner, VisualCorner & outer);
+		void checkForBadTID(VisualCorner & first, VisualCorner & second,
+							boost::shared_ptr<VisualLine> common);
+		void checkTToCenter(VisualCorner & first, VisualCorner & second);
+		void checkTToGoal(VisualCorner & t, VisualCorner & l1,
+						  boost::shared_ptr<VisualLine> common);
+		void checkTToFieldCorner(VisualCorner & t, VisualCorner & l1);
+		void findCornerRelationship(VisualCorner & first, VisualCorner & second);
+		void setFieldCorner(VisualCorner & corner);
+		void checkUnknownGoalCorner(VisualCorner & corner, float l1, float l2,
+									bool l1IsLeft);
+		void checkGoalCornerWithPost(VisualCorner & corner, int y1, int y2,
+									 bool l1IsLeft, float dist);
+		void checkLowOuterL(VisualCorner & corner, bool line1IsLonger);
+		void lookForFieldCorner(VisualCorner & first, float l1, float l2);
+		void classifyInnerL(VisualCorner & first);
+		void classifyOuterL(VisualCorner &first);
+		void classifyOuterLMidAngle(VisualCorner & corner,
+									boost::shared_ptr<VisualLine> shorty,
+									boost::shared_ptr<VisualLine> longy);
+
+		void classifyT(VisualCorner &first);
+
+		const std::list<const ConcreteCorner*> classifyCornerWithObjects(
+			const VisualCorner &corner,
+			const std::vector <const VisualFieldObject*> &visibleObjects) const;
 
 
-    float getAllowedDistanceError(const VisualFieldObject* obj) const;
+		void checkForKickDanger(VisualRobot *robot);
+		void checkForKickDangerNoRobots();
 
-    // Uses the actual objects' locations on the field to calculate straight
-    // line distance
-    float getRealDistance(const ConcreteCorner *c,
-                          const VisualFieldObject *obj, int w) const;
-    // Helper method that iterates over a list of ConcreteCorner pointers and
-    // prints their string representations
-    void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
-    // Determines which field objects are visible on the screen and returns
-    // a std::vector of the pointers of the objects that are visible.
-    std::vector<const VisualFieldObject*> getVisibleFieldObjects();
+		const bool arePointsCloseEnough(const float estimatedDistance,
+										const ConcreteCorner* j,
+										const VisualFieldObject* k,
+										const float distToCorner, int n) const;
 
-    std::vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
 
-    const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
+		float getAllowedDistanceError(const VisualFieldObject* obj) const;
 
-    float realDistance(int x1, int y1, int x2, int y2) const;
-    float realLineDistance(boost::shared_ptr<VisualLine> line);
-    void setFacing();
-    void setFieldHalf();
-    void printContext();
+		// Uses the actual objects' locations on the field to calculate straight
+		// line distance
+		float getRealDistance(const ConcreteCorner *c,
+							  const VisualFieldObject *obj, int w) const;
+		// Helper method that iterates over a list of ConcreteCorner pointers and
+		// prints their string representations
+		void printPossibilities(const std::list <const ConcreteCorner*> &list)const;
+		// Determines which field objects are visible on the screen and returns
+		// a std::vector of the pointers of the objects that are visible.
+		std::vector<const VisualFieldObject*> getVisibleFieldObjects();
+
+		std::vector<const VisualFieldObject*> getAllVisibleFieldObjects() const;
+
+		const bool goalSuitableForPixEstimate(const VisualFieldObject * goal) const;
+
+		float realDistance(int x1, int y1, int x2, int y2) const;
+		float realLineDistance(boost::shared_ptr<VisualLine> line);
+		void setFacing();
+		void setFieldHalf();
+		void printContext();
 
 #ifdef OFFLINE
-    void setDebugIdentifyCorners(bool _bool) {debugIdentifyCorners = _bool;}
-    const bool getDebugIdentifyCorners() const { return debugIdentifyCorners;}
-	void setDebugDangerousBall(bool _bool) {debugDangerousBall = _bool;}
-	const bool setDebugDangerousBall() const {return debugDangerousBall;}
+		void setDebugIdentifyCorners(bool _bool) {debugIdentifyCorners = _bool;}
+		const bool getDebugIdentifyCorners() const { return debugIdentifyCorners;}
+		void setDebugDangerousBall(bool _bool) {debugDangerousBall = _bool;}
+		const bool setDebugDangerousBall() const {return debugDangerousBall;}
 #endif
 
 
-private:
-    Vision* vision;
-    Threshold* thresh;
-    Field* field;
+	private:
+		Vision* vision;
+		Threshold* thresh;
+		Field* field;
 
-    static const int NUM_FIELD_OBJECTS_WITH_DIST_INFO = 4;
-    VisualFieldObject const * allFieldObjects[NUM_FIELD_OBJECTS_WITH_DIST_INFO];
+		static const int NUM_FIELD_OBJECTS_WITH_DIST_INFO = 4;
+		VisualFieldObject const * allFieldObjects[NUM_FIELD_OBJECTS_WITH_DIST_INFO];
 
-    facing face;
-    half fieldHalf;
+		facing face;
+		half fieldHalf;
 
-    bool rightPost;
-    bool leftPost;
-    bool unknownPost;
-    bool seePost;
-    int  tCorner;
-    int  lCorner;
-    int  iCorner;
-    int  oCorner;
-    int  cCorner;
-    bool cross;
-    bool unknownCross;
-    bool yellowCross;
-    bool blueCross;
-    bool ball;
-    bool seeGoalBoxLines;
-    bool sameHalf;
-    bool seeCenterCircle;
-    int objectRightX;
-    int objectRightY;
-	float objectDistance;
+		bool rightPost;
+		bool leftPost;
+		bool unknownPost;
+		bool seePost;
+		int  tCorner;
+		int  lCorner;
+		int  iCorner;
+		int  oCorner;
+		int  cCorner;
+		bool cross;
+		bool unknownCross;
+		bool yellowCross;
+		bool blueCross;
+		bool ball;
+		bool seeGoalBoxLines;
+		bool sameHalf;
+		bool seeCenterCircle;
+		int objectRightX;
+		int objectRightY;
+		float objectDistance;
 #ifdef OFFLINE
-    bool debugIdentifyCorners;
-	bool debugDangerousBall;
+		bool debugIdentifyCorners;
+		bool debugDangerousBall;
 #else
-    static const bool debugIdentifyCorners = false;
-	static const bool debugDangerousBall = false;
+		static const bool debugIdentifyCorners = false;
+		static const bool debugDangerousBall = false;
 #endif
-};
+	};
+
+}
+}
 
 #endif // Context_h_DEFINED

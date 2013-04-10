@@ -5,6 +5,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 void CornerDetector::detect(int upperBound,
                             int * field_edge,
                             const std::vector<HoughVisualLine>& lines)
@@ -32,4 +35,7 @@ void CornerDetector::detect(int upperBound,
         }
     }
 
+}
+
+}
 }

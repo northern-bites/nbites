@@ -27,6 +27,8 @@
 #include "FieldLines.h"
 using namespace std;
 
+namespace man {
+namespace vision {
 
 #ifndef OFFLINE
 #define haveFound(edgeY) edgeY != NO_EDGE
@@ -2619,6 +2621,7 @@ const bool FieldLines::isIntersectionOnScreen(const point<int>& intersection,
 	return true;
 }
 
+
 const bool FieldLines::isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
                                           boost::shared_ptr<VisualLine> j,
                                           const point<int>& intersection,
@@ -4526,3 +4529,6 @@ bool FieldLines::countersHitSanityChecks(const int numWhite,
     return false;
 }
 #endif
+
+}
+}
