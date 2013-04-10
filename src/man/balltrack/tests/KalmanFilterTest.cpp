@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "../KalmanFilter.h"
+#include "../MMKalmanFilter.h"
 #include "../NaiveBallFilter.h"
 
 using namespace man::balltrack;
@@ -11,7 +12,7 @@ int main(int argc, char **argv) {
 }
 
 TEST (KalmanFilterTest, FilterCanUpdate) {
-    KalmanFilter *kf = new KalmanFilter();
+    KalmanFilter *kf = new KalmanFilter(true);
     kf->isUpdated();
     bool yes = true;
     bool no = false;
@@ -25,7 +26,7 @@ TEST (KalmanFilterTest, FilterCanUpdate) {
 }
 
 TEST (KalmanFilterTest, FilterCanPredict) {
-    KalmanFilter *kf = new KalmanFilter();
+    KalmanFilter *kf = new KalmanFilter(false);
     kf->initialize();
     float initX = 0.f;
     float initY = 0.f;
@@ -76,4 +77,83 @@ TEST (KalmanFilterTest, KalmanFilterCanInitialize) {
     ASSERT_EQ(kf->getCovYPosEst(), 2.f);
     ASSERT_EQ(kf->getCovXVelEst(), 3.f);
     ASSERT_EQ(kf->getCovYVelEst(), 4.f);
+}
+
+TEST (KalmanFilterTest, Works) {
+    KalmanFilter *kf = new KalmanFilter(true);
+
+    ufvector4 initX = boost::numeric::ublas::zero_vector<float> (4);
+    initX(0) = 50.f;
+    initX(1) = 0.f;
+    initX(2) = 0.f;
+    initX(3) = 0.f;
+    ufmatrix4 initCov = boost::numeric::ublas::identity_matrix<float> (4);
+    initCov(0,0) = 5.f;
+    initCov(1,1) = 5.f;
+    initCov(2,2) = 0.f;
+    initCov(3,3) = 0.f;
+
+    kf->initialize(initX, initCov);
+
+    kf->predict(kf->genOdometry(-5.f, 0.f, 0.f),10.f);
+    kf->updateWithObservation(kf->genVisBall(58.f, 0.f));
+
+    kf->predict(kf->genOdometry(0.f, 0.f, 0.f),.1f);
+    kf->updateWithObservation(kf->genVisBall(55.f, .05f));
+    kf->predict(kf->genOdometry(0.f, 0.f, 0.f),.1f);
+    kf->updateWithObservation(kf->genVisBall(55.f, .05f));
+    kf->predict(kf->genOdometry(0.f, 0.f, 0.f),.1f);
+    kf->updateWithObservation(kf->genVisBall(55.f, .05f));
+    kf->predict(kf->genOdometry(0.f, 0.f, 0.f),.1f);
+    kf->updateWithObservation(kf->genVisBall(83.f, .05f));
+}
+
+TEST (KalmanFilterTest, MMWorks) {
+    MMKalmanFilter *kf = new MMKalmanFilter();
+    KalmanFilter *poor = new KalmanFilter();
+
+    kf->initialize(50.f, 0.f, 5.f, 5.f);
+
+    messages::Motion inpMotion;
+    inpMotion.mutable_odometry()->CopyFrom(poor->genOdometry(0.f,0.f,0.f));
+
+    kf->update(poor->genVisBall(55.5f, 0.f),
+               inpMotion);
+
+    kf->update(poor->genVisBall(62.f, 0.f),
+               inpMotion);
+
+    kf->update(poor->genVisBall(64.f, 0.f),
+               inpMotion);
+
+    kf->update(poor->genVisBall(71.f, 0.f),
+               inpMotion);
+    kf->printEst();
+/*
+    kf->update(poor->genVisBall(75.f, 0.f),
+               inpMotion);
+
+
+    kf->update(poor->genVisBall(74.f, 0.f),
+               inpMotion);
+
+    kf->update(poor->genVisBall(76.f, 0.f),
+               inpMotion);
+
+    kf->update(poor->genVisBall(75.f, 0.f),
+               inpMotion);
+    kf->update(poor->genVisBall(75.f, 0.f),
+               inpMotion);
+    kf->update(poor->genVisBall(75.f, 0.f),
+               inpMotion);
+    kf->update(poor->genVisBall(75.f, 0.f),
+               inpMotion);
+    kf->update(poor->genVisBall(75.f, 0.f),
+               inpMotion);
+
+ */
+
+
+
+
 }

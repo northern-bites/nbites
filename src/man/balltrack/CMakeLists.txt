@@ -11,6 +11,7 @@ set(BALLTRACK_SRCS BallTrackModule
                    NaiveBallFilter
 		   FakeBallTrackInput
 		   KalmanFilter
+		   MMKalmanFilter
 )
 
 # Add project as a library.
