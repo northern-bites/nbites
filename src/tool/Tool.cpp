@@ -28,8 +28,8 @@ Tool::Tool(const char* title) :
     this->setWindowTitle(tr(title));
 
     //connect both fwd and prv button to the run slot
-	connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(runForward()));
-	connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(runBackward()));
+    connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(runForward()));
+    connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(runBackward()));
 
     connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
             &diagram, SLOT(addUnloggers(std::vector<std::string>)));
@@ -84,7 +84,7 @@ void Tool::keyPressEvent(QKeyEvent * event)
         diagram.runForward();
         break;
     case Qt::Key_P:
-		diagram.runBackward();
+        diagram.runBackward();
         break;
     default:
         QWidget::keyPressEvent(event);

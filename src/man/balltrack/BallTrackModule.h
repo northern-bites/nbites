@@ -6,11 +6,14 @@
  */
 #pragma once
 
-#include "BallFilter.h"
+#include "NaiveBallFilter.h"
+#include "KalmanFilter.h"
+#include "MMKalmanFilter.h"
 
 #include "RoboGrams.h"
 #include "BallModel.pb.h"
 #include "RobotLocation.pb.h"
+#include "Motion.pb.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -36,12 +39,9 @@ protected:
     void run_();
 
 private:
-//        boost::shared_ptr<BallFilter> ballFilter;
-    BallFilter *ballFilter;
-
-    float ballX;
-    float ballY;
+    MMKalmanFilter* filters;
 };
+
 
 } //namespace balltrack
 } //namespace man
