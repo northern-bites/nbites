@@ -63,10 +63,6 @@ public:
     {
         visionField_ptr = msg;
     }
-    void setRobotLocation_ptr(const messages::RobotLocation* msg)
-    {
-        robotLocation_ptr = msg;
-    }
     void setFilteredBall_ptr(const messages::FilteredBall* msg)
     {
         filteredBall_ptr = msg;

@@ -233,9 +233,6 @@ void BehaviorsModule::prepareMessages()
     filteredBallIn.latch();
     pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
 
-    localizationIn.latch();
-    pyInterface.setRobotLocation_ptr(&localizationIn.message());
-
     for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
         worldModelIn[i].latch();
         pyInterface.setWorldModel_ptr(&worldModelIn[i].message(),i);
