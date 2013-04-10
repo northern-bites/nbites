@@ -37,6 +37,16 @@ install: $(BUILD_DIR)/Makefile
 		echo "You must build cross to install to a robot."; \
 	fi
 
+# .PHONY: test
+# test: $(BUILD_DIR)/Makefile
+# 	@if [ -e $(CROSS_FILE) ]; then \
+# 		echo "You must build straight to run the tests."; \
+# 	else \
+# 		$(MAKE) check -C $(BUILD_DIR) --no-print-directory && \
+# 		cd $(BUILD_DIR) && \
+# 		ctest -V; \
+# 	fi
+
 .PHONY: cross
 cross:  $(CROSS_FILE)
 	cd $(BUILD_DIR); \
@@ -46,7 +56,7 @@ cross:  $(CROSS_FILE)
 $(CROSS_FILE):
 	mkdir -p $(BUILD_DIR)
 	@if [ -e $(STRAIGHT_FILE) ]; then \
-		rm -r $(BUILD_DIR)/*; \
+		rm -rf $(BUILD_DIR)/*; \
 	fi
 	@touch $(CROSS_FILE)
 
@@ -59,18 +69,18 @@ straight: $(STRAIGHT_FILE)
 $(STRAIGHT_FILE):
 	mkdir -p $(BUILD_DIR)
 	@if [ -e $(CROSS_FILE) ]; then \
-		rm -r $(BUILD_DIR)/*; \
+		rm -rf $(BUILD_DIR)/*; \
 	fi
 	@touch $(STRAIGHT_FILE)
 
 .PHONY: clean
 clean:
-	rm -r $(BUILD_DIR)/*
+	rm -rf $(BUILD_DIR)/*
 
-.PHONY: check
-check:
-	@if [ -e $(CROSS_FILE) ]; then \
-		echo "Making cross."; \
-	elif [ -e $(STRAIGHT_FILE) ]; then \
-		echo "Making straight."; \
-	fi
+# .PHONY: check
+# check:
+# 	@if [ -e $(CROSS_FILE) ]; then \
+# 		echo "Making cross."; \
+# 	elif [ -e $(STRAIGHT_FILE) ]; then \
+# 		echo "Making straight."; \
+# 	fi
