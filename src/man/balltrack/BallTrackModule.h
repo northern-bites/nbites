@@ -29,7 +29,7 @@ public:
     ~BallTrackModule();
 
     portals::InPortal<messages::VisionBall> visionBallInput;
-    portals::InPortal<messages::RobotLocation> localizationInput;
+    portals::InPortal<messages::RobotLocation> odometryInput;
     portals::OutPortal<messages::FilteredBall> ballLocationOutput;
 
 protected:

@@ -15,7 +15,7 @@
 
 #include "BallModel.pb.h"
 #include "Motion.pb.h"
-#include "Common.pb.h"
+#include "RobotLocation.pb.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/random.hpp>
@@ -47,8 +47,8 @@ public:
     MMKalmanFilter(MMKalmanFilterParams params_ = DEFAULT_MM_PARAMS);
     ~MMKalmanFilter();
 
-    void update(messages::VisionBall visionBall,
-                messages::Motion     motion);
+    void update(messages::VisionBall    visionBall,
+                messages::RobotLocation odometry);
 
     ufvector4 getStateEst(){return stateEst;};
     float getRelXPosEst(){return stateEst(0);};

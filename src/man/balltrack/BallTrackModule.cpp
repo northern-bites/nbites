@@ -25,13 +25,13 @@ void BallTrackModule::run_()
 {
     // Latch
     visionBallInput.latch();
-    motionInput.latch();
+    odometryInput.latch();
 
     // Update the Ball filter
     // NOTE: Should be tested but having the same observation twice will be damaging
     //       should try and avoid a const cast, but may need same hack as motion...
     filters->update(visionBallInput.message(),
-                    motionInput.message());
+                    odometryInput.message());
 
     // Fill the ballMessage with the filters representation
     portals::Message<messages::FilteredBall> ballMessage(0);

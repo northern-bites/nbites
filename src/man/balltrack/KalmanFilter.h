@@ -14,7 +14,7 @@
 
 #include "BallModel.pb.h"
 #include "Motion.pb.h"
-#include "Common.pb.h"
+#include "RobotLocation.pb.h"
 
 #include "BallTrackStructs.h"
 

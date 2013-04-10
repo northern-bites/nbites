@@ -1,6 +1,6 @@
 package messages;
 
-import "Common.proto";
+import "RobotLocation.proto";
 
 message WalkProvider {
 

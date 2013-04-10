@@ -38,11 +38,11 @@ MMKalmanFilter::~MMKalmanFilter()
  * @params - visionball is a NEW vision message
            - motion is a NEW motion message
  */
-void MMKalmanFilter::update(messages::VisionBall visionBall,
-                            messages::Motion     motion)
+void MMKalmanFilter::update(messages::VisionBall    visionBall,
+                            messages::RobotLocation odometry)
 {
     // Predict the filters!
-    predictFilters(motion.odometry());
+    predictFilters(odometry);
 
     // Update with sensor if we have made an observation
     if(visionBall.on()) // We see the ball

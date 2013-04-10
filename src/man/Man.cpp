@@ -122,16 +122,16 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
     vision.topThrImage.wireTo(&topConverter.thrImage);
-	vision.topYImage.wireTo(&topConverter.yImage);
-	vision.topUImage.wireTo(&topConverter.uImage);
-	vision.topVImage.wireTo(&topConverter.vImage);
+    vision.topYImage.wireTo(&topConverter.yImage);
+    vision.topUImage.wireTo(&topConverter.uImage);
+    vision.topVImage.wireTo(&topConverter.vImage);
 
-	vision.botThrImage.wireTo(&bottomConverter.thrImage);
-	vision.botYImage.wireTo(&bottomConverter.yImage);
-	vision.botUImage.wireTo(&bottomConverter.uImage);
-	vision.botVImage.wireTo(&bottomConverter.vImage);
+    vision.botThrImage.wireTo(&bottomConverter.thrImage);
+    vision.botYImage.wireTo(&bottomConverter.yImage);
+    vision.botUImage.wireTo(&bottomConverter.uImage);
+    vision.botVImage.wireTo(&bottomConverter.vImage);
 
-	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+    vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
     cognitionThread.addModule(ballTrack);
@@ -142,7 +142,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     localization.resetInput.wireTo(&behaviors.resetLocOut, true);
 
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
-    ballTrack.localizationInput.wireTo(&localization.output);
+    ballTrack.odometryInput.wireTo(&motion.odometryOutput_);
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);

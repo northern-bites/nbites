@@ -18,6 +18,7 @@ message VisionBall {
 	optional sint32 frames_off = 14;
 	optional float rel_x_variance = 16;
 	optional float rel_y_variance = 17;
+	optional float bearing_deg = 18;
 }
 
 message FilteredBall
