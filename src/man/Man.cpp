@@ -81,6 +81,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Cognition **/
 
+    // Turn ON the finalize method for images, which we've specialized
+    portals::Message<messages::YUVImage>::setFinalize(true);
+    portals::Message<messages::ThresholdImage>::setFinalize(true);
+    portals::Message<messages::PackedImage16>::setFinalize(true);
+    portals::Message<messages::PackedImage8>::setFinalize(true);
+
     cognitionThread.addModule(topTranscriber   );
     cognitionThread.addModule(bottomTranscriber);
     cognitionThread.addModule(topConverter     );
@@ -88,8 +94,13 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     topConverter   .imageIn.wireTo(&   topTranscriber.imageOut);
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
+
+#ifdef LOG_IMAGES
     cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
-                                            "im");
+                                            "top");
+    cognitionThread.log<messages::YUVImage>(&bottomTranscriber.imageOut,
+                                            "bottom");
+#endif
 
     cognitionThread.addModule(vision);
     vision.topThrImage.wireTo(&topConverter.thrImage);
@@ -102,7 +113,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 	vision.botUImage.wireTo(&bottomConverter.uImage);
 	vision.botVImage.wireTo(&bottomConverter.vImage);
 
-    
 	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 

@@ -278,7 +278,7 @@ class HeapPixelBuffer : public PixelBuffer
 
 protected:
   virtual ~HeapPixelBuffer() { delete [] pixels_;}
-  // effect   The destroctor just deletes the buffer
+  // effect   The destructor just deletes the buffer
 
   virtual void* address() { return pixels_;}
   // returns  The address of the first pixel
@@ -500,8 +500,7 @@ public:
   //          here is to extract Y, U, and V components from a YUV composite image. 
 
   // makes ThresholdImage look like a proto to keep RoboGrams happy
-  void Clear()
-    { /**this = MemoryImage();*/ }
+  void Clear() {}
 
   std::string DebugString() const { return "Not implemented."; }
 };
@@ -772,24 +771,24 @@ public:
 // *                     *
 // ***********************
 
-// A ThresholdImage is a packed image of unsigned 16-bit pixels. Every pixel can be one of seven colors.
+// A ThresholdImage is a packed image of unsigned 8-bit pixels. Every pixel can be one of seven colors.
 // Color segmentation is done in acquire_image_fast in src/man/image. ThresholdImage provides helper functions 
 // to identify pixels via bitwise operations.
 
-class ThresholdImage : public PackedImage16
+class ThresholdImage : public PackedImage8
 {
 public:
   ThresholdImage() {}
   // effect   Default construct null image
 
-  ThresholdImage(const PackedImage16& img) : PackedImage16(img) {}
-  // effect   Construct a copy of a PackedImage16
+  ThresholdImage(const PackedImage8& img) : PackedImage8(img) {}
+  // effect   Construct a copy of a PackedImage8
   // note     A helper function for this class, the public is not allowed to use it.
 
-  ThresholdImage(int wd, int ht) : PackedImage16(wd, ht) {}
+  ThresholdImage(int wd, int ht) : PackedImage8(wd, ht) {}
   // effect   Construct new (not yet shared) image on heap of specified size.
 
-  ThresholdImage(uint16_t* pixels, int wd, int ht, int rowPitch) : PackedImage16(pixels, wd, ht, rowPitch) {}
+  ThresholdImage(uint8_t* pixels, int wd, int ht, int rowPitch) : PackedImage8(pixels, wd, ht, rowPitch) {}
   // effect   Construct new image at specified address in memory, of specified size and pitch.
 
   bool isGreen(unsigned char threshColor) const { return threshColor & GreenBit; }

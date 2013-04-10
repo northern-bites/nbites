@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "unlog/UnlogModule.h"
+#include "image/ImageDisplayModule.h"
 #include "ProtoViewer.h"
 
 namespace tool {
@@ -26,10 +27,10 @@ public:
     LogViewer(QWidget* parent = 0);
 
 public slots:
-    void addProtoViewers(std::vector<unlog::GenericProviderModule*>);
+    void newDisplayWidget(QWidget*, std::string);
 
-private:
-    std::vector<QDockWidget*> dockWidget;
+protected:
+    QTabWidget imageTabs;
 };
 
 }

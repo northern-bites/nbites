@@ -1,11 +1,7 @@
 #include "Color.h"
 
-namespace qtool {
+namespace tool {
 namespace image {
-
-Color::Color() : red(0), grn(0), blue(0)
-{
-}
 
 float Color::getH()
 {

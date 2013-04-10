@@ -13,6 +13,21 @@
 #include "Images.h"
 #include "RoboGrams.h"
 
+namespace portals {
+
+#define MAKE_FINALIZE(msgType)                              \
+template<>                                                  \
+inline void MessageHolder<messages::msgType>::finalize()    \
+{                                                           \
+    message = messages::msgType();                          \
+}
+
+MAKE_FINALIZE(YUVImage)
+MAKE_FINALIZE(ThresholdImage)
+MAKE_FINALIZE(PackedImage16)
+MAKE_FINALIZE(PackedImage8)
+}
+
 namespace man {
 namespace image {
 
@@ -90,5 +105,6 @@ protected :
 private :
     ImageTranscriber& it;
 };
+
 }
 }

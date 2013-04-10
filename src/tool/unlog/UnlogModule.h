@@ -3,7 +3,7 @@
  * @class UnlogBase
  *
  * The UnlogModule is a templated class that can read from a file and parse
- * the contents of that file into a protobuf of its template type. It is
+n * the contents of that file into a protobuf of its template type. It is
  * only passed a filename, so another piece of code needs to try to match
  * the file with the correct type of protobuf in order to create the unlogger
  * appropriately.
@@ -24,50 +24,22 @@
 
 #include "RoboGrams.h"
 #include "LogDefinitions.h"
+#include "Images.h"
+#include "logview/ProtoViewer.h"
+#include "image/ImageDisplayModule.h"
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>
 #include <google/protobuf/message.h>
-#include <QObject>
+#include <QWidget>
 
 namespace tool {
 namespace unlog {
 
-class GenericProviderModule : public QObject, public portals::Module
+struct GUI
 {
-    Q_OBJECT;
-
-public:
-    GenericProviderModule(std::string t) : type(t) {}
-
-    void setMessage(google::protobuf::Message* m) { msg = m; }
-    google::protobuf::Message* getMessage() { return msg; }
-    std::string getType() { return type; }
-
-signals:
-    void newMessage(const google::protobuf::Message*);
-
-protected:
-    virtual void run_() = 0;
-    google::protobuf::Message* msg;
-    std::string type;
-};
-
-template<class T>
-class ProviderModule : public GenericProviderModule
-{
-public:
-    ProviderModule(std::string t) : GenericProviderModule(t) {}
-
-    portals::InPortal<T> input;
-
-protected:
-    virtual void run_()
-    {
-        input.latch();
-        msg->CopyFrom(input.message());
-        emit newMessage(msg);
-    }
+    portals::Module* module;
+    QWidget* qwidget;
 };
 
 // Base Class
@@ -79,7 +51,7 @@ public:
     virtual ~UnlogBase();
 
     std::string getType() { return typeName; }
-    virtual GenericProviderModule* makeMeAProvider() = 0;
+    std::string getFilePath() { return fileName; }
 
     // Reads the next sizeof(T) bytes and interprets them as a T
     template <class T>
@@ -89,9 +61,13 @@ public:
         return value;
     }
 
+    static bool readBackward;
+
     // Basic file control
     void openFile() throw (file_exception);
     void closeFile();
+
+    virtual GUI makeMyGUI() = 0;
 
 protected:
     // Inheriting classes still need to implement this
@@ -100,8 +76,9 @@ protected:
     uint32_t readCharBuffer(char* buffer, uint32_t size)
         const throw (file_read_exception);
 
-    // Keeps track of whether the file is open/closed
-    bool fileOpen;
+    uint32_t readCharBuffer(unsigned char* buffer, uint32_t size)
+        const throw (file_read_exception);
+
     // Pointer to the file
     FILE* file;
     // Stores the full path of the file
@@ -123,18 +100,20 @@ public:
     // Where the output will be provided
     portals::OutPortal<T> output;
 
-    GenericProviderModule* makeMeAProvider()
+    GUI makeMyGUI()
     {
-        ProviderModule<T>* gpm = new ProviderModule<T>(typeName);
-        // Have to actually initialize the generic message to correct type
-        gpm->setMessage(new T());
-        gpm->input.wireTo(&output);
-        return gpm;
+        GUI gui;
+        logview::TypedProtoViewer<T>* viewer = new logview::TypedProtoViewer<T>();
+        viewer->input.wireTo(&output);
+
+        gui.module = viewer;
+        gui.qwidget = viewer;
+        return gui;
     }
 
     T readNextMessage()
     {
-        // End of file
+       // End of file
         if (feof(file)) {
             std::cout << "End of log file " << fileName << std::endl;
             return T();
@@ -179,12 +158,55 @@ public:
         return currentMessage;
     }
 
+	//inverses the above message, with a few minor differences
+	T readPrevMessage() {
+        if (ftell(file)==0) {
+            std::cout << "Beginning of log file " << fileName << std::endl;
+            return T();
+        }
+
+		//we've been storing the message sizes to use right now
+		uint32_t currentMessageSize = messageSizes.back();
+		messageSizes.pop_back();
+
+       // To hold the data read, and the number of bytes read
+        uint32_t bytes;
+        char buffer[currentMessageSize];
+
+        try {
+            // Actual file reading call
+			//set the file pointer BACK currentMessageSize bits
+			fseek(file, -1*currentMessageSize, SEEK_CUR);
+			//then read forward
+            bytes = readCharBuffer(buffer, currentMessageSize);
+			//then set it back again, so it appears that we read backwards
+			//plus rewind four bites to get past the thing that says the size of the frame
+			fseek(file, -1*(currentMessageSize+sizeof(int)), SEEK_CUR);
+        } catch (std::exception& read_exception) {
+            std::cout << read_exception.what() << std::endl;
+            return T();
+        }
+
+        // If we have actually read some bytes, treat them like a message
+        T currentMessage;
+
+        if (bytes) {
+            // Parse into the message
+            currentMessage.ParseFromString(std::string(buffer, bytes));
+            return currentMessage;
+        }
+
+        // We read zero bytes at the end of a file w/o hitting feof
+        std::cout << "Beginning of log file " << fileName << std::endl;
+        return currentMessage;
+	}
+
 protected:
     // Implements the Module run_ method
     void run_()
     {
         // Makes sure the file is available to read
-        if (!fileOpen)
+        if (!file)
         {
             openFile();
             readHeader();
@@ -192,9 +214,20 @@ protected:
 
         // Reads the next message from the file and puts it on
         // the OutPortal
-        portals::Message<T> msg(0);
-        *msg.get() = readNextMessage();
+		portals::Message<T> msg(0);
 
+        //switch the read direction based on a static bool
+		if (!readBackward){
+			// Reads the next message from the file and puts it on
+			// the OutPortal
+            *msg.get() = readNextMessage();
+            output.setMessage(msg);
+		} else {
+			// Reads the previous message from the file and puts it on
+			// the OutPortal
+			*msg.get() = readPrevMessage();
+			output.setMessage(msg);
+		}
         output.setMessage(msg);
     }
 
@@ -226,8 +259,18 @@ protected:
             header.ParseFromString(std::string(buffer, bytes));
         }
     }
-
 };
 
+template<>
+messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage();
+
+template<>
+messages::YUVImage UnlogModule<messages::YUVImage>::readPrevMessage();
+
+template<>
+UnlogModule<messages::YUVImage>::UnlogModule(std::string path);
+
+template<>
+GUI UnlogModule<messages::YUVImage>::makeMyGUI();
 }
 }

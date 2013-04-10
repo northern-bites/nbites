@@ -59,3 +59,10 @@
 #else
 #   undef LOG_VISION
 #endif
+
+#define LOG_IMAGES_${LOG_IMAGES}
+#ifdef  LOG_IMAGES_ON
+#   define LOG_IMAGES
+#else
+#   undef LOG_IMAGES
+#endif

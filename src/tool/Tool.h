@@ -10,6 +10,9 @@
 #include <QToolBar>
 #include <QScrollArea>
 #include <QResizeEvent>
+#include <QPixmap>
+#include <QImage>
+#include <QLabel>
 
 #include "ToolDiagram.h"
 #include "DataSelector.h"
@@ -23,6 +26,9 @@ class Tool : public QMainWindow {
 public:
     Tool(const char* title = "TOOL");
     ~Tool();
+
+public slots:
+    void setUpModules();
 
 protected:
     // For keyboard control

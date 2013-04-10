@@ -10,12 +10,9 @@
 
 #include "BMPImage.h"
 #include "Color.h"
-#include "YUVImage.h"
-#include "ClassHelper.h"
+#include "Images.h"
 
-#include "man/corpus/Camera.h"
-
-namespace qtool {
+namespace tool {
 namespace image {
 
 static const std::string ChannelType_label[] = {

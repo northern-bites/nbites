@@ -48,7 +48,7 @@ static const int ALL_PERMISSIONS = S_IRWXU | S_IRWXG | S_IRWXO;
 
 // Default value for write list size; can be reset--should be small
 // for large messages that could take up a lot of memory!
-static const int DEFAULT_MAX_WRITES = 10;
+static const int DEFAULT_MAX_WRITES = 5;
 
 /*
  * This struct is used to hold together an aiocb (control block) and the
@@ -81,17 +81,18 @@ protected:
     // Basic file/writing operations
     void openFile() throw (file_exception);
     void closeFile();
-    void writeCharBuffer(const char* buffer, uint32_t size);
     void checkWrites();
 
-    // Writes any type that can be reinterpret_casted to a string
-    template <class T>
-    void writeValue(const T &value) {
+    void writeCharBuffer(const char* buffer, uint32_t size);
+
+    void writeSize(uint32_t value)
+    {
         writeCharBuffer(reinterpret_cast<const char *>(&value), sizeof(value));
     }
 
     // Keeps track of all writes that haven't finished yet
     std::list<Write> ongoing;
+    std::list<Write> ongoingSizes;
     // Has the file been opened?
     bool fileOpen;
     // The file that we've opened/are writing to
@@ -127,7 +128,7 @@ public:
 
         std::string buf;
         head.SerializeToString(&buf);
-        writeValue<uint32_t>(buf.length());
+        writeSize(buf.length());
         writeCharBuffer(buf.data(), buf.length());
 
         std::cout << "Writing header to " << fileName << std::endl;
@@ -180,11 +181,10 @@ protected:
         // Serialize directly into the Write's buffer to avoid a copy
         msg.SerializeToString(&(current->buffer));
 
-
         bytesWritten += current->buffer.length();
 
         // Write ths size of the message that will be written
-        writeValue<uint32_t>(current->buffer.length());
+        writeSize(current->buffer.length());
 
         // Recommended by aio--zeroes the control block
         memset(&current->control, 0, sizeof(current->control));
@@ -224,7 +224,7 @@ protected:
                 std::cout << io_exception.what() << std::endl;
                 return;
             }
-            this->writeHeader();
+            writeHeader();
         }
 
         // Check for and remove finished writes from the list
@@ -242,6 +242,9 @@ protected:
 // without having to be serialized and have protobuf methods
 template<>
 void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage);
+
+template<>
+void LogModule<messages::YUVImage>::writeHeader();
 
 // Lets us provide a name string for YUV image
 template<>

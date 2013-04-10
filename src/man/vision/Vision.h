@@ -103,7 +103,7 @@ public:
     // utilize the current image pointer for vision processing
 //    void notifyImage();
     // set the current image pointer to the given pointer
-    void setImage(const uint16_t* image);
+    void setImage(uint8_t* image);
 
     // visualization methods
     void drawBox(int left, int right, int bottom, int top, int c);

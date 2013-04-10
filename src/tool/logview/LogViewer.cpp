@@ -3,14 +3,13 @@
 namespace tool {
 namespace logview {
 
-LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
+LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent),
+                                        imageTabs(this)
 {
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;
-    // We don't need this right now but...
-    QTabWidget* imageTabs = new QTabWidget();
 
-	mainLayout->addWidget(imageTabs);
+	mainLayout->addWidget(&imageTabs);
 	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	mainWidget->setLayout(mainLayout);
     this->setCentralWidget(mainWidget);
@@ -18,28 +17,25 @@ LogViewer::LogViewer(QWidget* parent) : QMainWindow(parent)
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-
 }
 
-void LogViewer::addProtoViewers(std::vector<unlog::GenericProviderModule*>
-                                inputs)
+void LogViewer::newDisplayWidget(QWidget* widget, std::string title)
 {
-    for(std::vector<unlog::GenericProviderModule*>::iterator i =
-            inputs.begin(); i != inputs.end(); i++)
+    if (title != "Top Image" && title != "Bottom Image")
     {
         QDockWidget* dockWidget =
-            new QDockWidget(QString((*i)->getType().data()),
-                                this);
+            new QDockWidget(QString(title.data()), this);
         dockWidget->setMinimumWidth(300);
         dockWidget->setMaximumHeight(125);
-        ProtoViewer* viewer = new ProtoViewer((*i)->getMessage(), dockWidget);
 
-        QObject::connect(*i, SIGNAL(newMessage(const google::protobuf::Message*)),
-                         viewer, SLOT(updateView(const google::protobuf::Message*)));
-
-        dockWidget->setWidget(viewer);
+        dockWidget->setWidget(widget);
         this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
     }
+    else
+    {
+        imageTabs.addTab(widget, QString(title.data()));
+    }
+
 }
 
 }
