@@ -1,5 +1,5 @@
 from .. import SweetMoves
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 from .. import StiffnessModes
 from ..navigator import BrunswickSpeeds as speeds
 from objects import RelRobotLocation
@@ -23,7 +23,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.brain.tracker.repeatBasicPanFixedPitch()
+        player.brain.tracker.repeatBasicPan()
 
 def gamePenalized(player):
 #    if player.firstFrame():

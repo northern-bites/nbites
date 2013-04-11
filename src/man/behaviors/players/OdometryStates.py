@@ -1,7 +1,7 @@
 import copy
 
 from .. import SweetMoves
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 from .. import StiffnessModes
 from ..navigator import NavStates
 from objects import RobotLocation, RelRobotLocation

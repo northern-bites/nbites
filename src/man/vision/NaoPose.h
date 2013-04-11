@@ -114,9 +114,12 @@
 
 #include "Structs.h"
 
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
 #include "InertialState.pb.h"
 
+
+namespace man {
+namespace vision {
 /**
  *  *****************   Various constants follow   **********************
  */
@@ -295,5 +298,8 @@ class NaoPose {
 
     bool isTopCam; //true = using the top camera
 };
+
+}
+}
 
 #endif

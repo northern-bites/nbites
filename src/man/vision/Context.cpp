@@ -43,6 +43,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // Used in discriminating Ts that are part of goalbox or not
 static const float GOALBOX_FUDGE = 1.5;
 
@@ -2043,4 +2046,8 @@ void Context::printContext() {
     if (seeGoalBoxLines) {
         cout << "    We see goal box lines" << endl;
     }
+}
+
+
+}
 }

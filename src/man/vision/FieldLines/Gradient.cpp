@@ -7,6 +7,9 @@
 using std::cout;
 using std::endl;
 
+namespace man {
+namespace vision {
+
 const int Gradient::dxTab[DIRECTIONS] = { 1,  1,  0, -1, -1, -1,  0,  1};
 const int Gradient::dyTab[DIRECTIONS] = { 0,  1,  1,  1,  0, -1, -1, -1};
 
@@ -151,4 +154,7 @@ void Gradient::createSegment(const point<int>& l,
                      static_cast<int16_t>(y));
         }
     }
+}
+
+}
 }

@@ -65,6 +65,9 @@ using std::min;
 using std::endl;
 #define PRINT_VISION_INFO
 
+namespace man {
+namespace vision {
+
 // Constructor for Threshold class. passed an instance of Vision and Pose
 Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr)
@@ -1713,11 +1716,15 @@ const uint16_t* Threshold::getYUV() {
 /* I haven't a clue what this method is for.
  * @param newyuv     presumably a new yuv value in bytes or something
  */
-void Threshold::setIm(uint8_t* thrIm) {
-     thresholded = thrIm;
+void Threshold::setIm(const uint16_t* thrIm) {
+	thresholded = const_cast<uint8_t*>(
+		reinterpret_cast<const uint8_t*>(thrIm) +
+		Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
 }
-void Threshold::setIm_bot(uint8_t* thrIm) {
-    thresholdedBottom = thrIm;
+void Threshold::setIm_bot(const uint16_t* thrIm) {
+    thresholdedBottom = const_cast<uint8_t*>(
+		reinterpret_cast<const uint8_t*>(thrIm) +
+		Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
    }
 
 /* Calculate the distance between two objects (x distance only).
@@ -1873,3 +1880,6 @@ void Threshold::setDebugRobots(bool _bool) {
 	red->setDebugRobots(_bool);
 }
 #endif
+
+}
+}

@@ -7,13 +7,11 @@
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "FeetOnGround.pb.h"
-#include "FootBumperState.pb.h"
 #include "FSR.pb.h"
 #include "GameState.pb.h"
 #include "GCResponse.pb.h"
 #include "Images.h"
 #include "InertialState.pb.h"
-#include "JointAngles.pb.h"
 #include "SonarState.pb.h"
 #include "StiffnessControl.pb.h"
 #include "TeamPacket.pb.h"
@@ -30,12 +28,10 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(ButtonState);
     ADD_MAPPED_TYPE(FallStatus);
     ADD_MAPPED_TYPE(FeetOnGround);
-    ADD_MAPPED_TYPE(FootBumperState);
     ADD_MAPPED_TYPE(FSR);
     ADD_MAPPED_TYPE(GameState);
     ADD_MAPPED_TYPE(GCResponse);
     ADD_MAPPED_TYPE(InertialState);
-    ADD_MAPPED_TYPE(JointAngles);
     ADD_MAPPED_TYPE(SonarState);
     ADD_MAPPED_TYPE(StiffnessControl);
     ADD_MAPPED_TYPE(TeamPacket);

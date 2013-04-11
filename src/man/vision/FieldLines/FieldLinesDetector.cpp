@@ -8,6 +8,9 @@
 using namespace std;
 using boost::shared_ptr;
 
+namespace man {
+namespace vision {
+
 FieldLinesDetector::FieldLinesDetector() :
     mEdges(new EdgeDetector),
     mGradient(new Gradient),
@@ -83,4 +86,7 @@ list<HoughLine> FieldLinesDetector::getHoughLines() const
         lines.push_back(i->second);
     }
     return lines;
+}
+
+}
 }

@@ -383,7 +383,7 @@ public:
 
 // Override the default pool size for a given type by providing a template specialization.
 #define SET_POOL_SIZE(type, size) \
-    template<> MessagePool<MessageHolder<type> > MessageHolder<type>::pool_(size)
+    template<> portals::MessagePool<portals::MessageHolder<type> > portals::MessageHolder<type>::pool_(size)
 
 // For setting the default size within this template, the template<> isn't needed
 #define SET_POOL_SIZE_DEFAULT(type, size) \

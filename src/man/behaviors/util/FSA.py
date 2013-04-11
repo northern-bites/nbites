@@ -173,10 +173,10 @@ class FSA:
             self.outputFunction(WHITE_BG_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
         elif printingColor == 'greenbg':
             self.outputFunction(GREEN_BG_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
-        elif printingColor == 'green':
+        else: #elif printingColor == 'green':
             self.outputFunction(GREEN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE)
-        else:
-            self.outputFunction(str(outputString))
+        # else:
+        #     self.outputFunction(str(outputString))
 
     def updateStateInfo(self):
         """
@@ -190,7 +190,8 @@ class FSA:
                 self.printf(self.name+": switched to '"+
                             self.currentState+"\' after " +
                             str(self.counter + 1) +
-                            " frames in state \'"+self.lastState+"\'", self.stateChangeColor)
+                            " frames in state \'"+self.lastState+"\'",
+                            self.stateChangeColor)
             self.lastDiffState = self.lastState
             self.counter = 0
             self.lastStateTime = self.stateTime

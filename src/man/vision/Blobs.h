@@ -6,6 +6,9 @@
 #include "VisionHelpers.h"
 #include "Blob.h"
 
+namespace man {
+namespace vision {
+
 static const int BADONE = -10000;
 
 class Blobs {
@@ -50,4 +53,7 @@ private:
     int numBlobs;
     Blob* blobs;
 };
+
+}
+}
 #endif

@@ -1,0 +1,143 @@
+package messages;
+
+message MotionRequest
+{
+
+    optional bool stop_body = 1;
+    optional bool stop_head = 2;
+    optional bool reset_odometry = 3;
+    optional int64 timestamp = 4;
+}
+
+message MotionCommand
+{
+    enum CommandType {
+        DESTINATION_WALK = 0;
+        WALK_COMMAND = 1;
+        SCRIPTED_MOVE = 2;
+    }
+
+    optional CommandType type = 1;
+
+    optional ScriptedMove script = 2;
+    optional DestinationWalk dest = 3;
+    optional WalkCommand speed = 4;
+
+    optional int64 timestamp = 5;
+}
+
+message ScriptedMove
+{
+    repeated BodyJointCommand command = 1;
+}
+
+message BodyJointCommand
+{
+    optional float time = 1;
+    optional JointAngles angles = 2;
+    optional JointAngles stiffness = 3;
+
+    enum InterpolationType {
+        SMOOTH = 0;
+        LINEAR = 1;
+    }
+    optional InterpolationType interpolation = 4;
+}
+
+message DestinationWalk
+{
+    optional float rel_x = 1;
+    optional float rel_y = 2;
+    optional float rel_h = 3;
+    optional float gain  = 4;
+}
+
+message WalkCommand
+{
+    optional float x_percent = 1;
+    optional float y_percent = 2;
+    optional float h_percent = 3;
+}
+
+message HeadMotionCommand
+{
+    enum CommandType {
+        POS_HEAD_COMMAND = 0; // AKA set_head_command
+        SCRIPTED_HEAD_COMMAND = 1;
+    }
+
+    optional CommandType type = 1;
+
+    optional PositionHeadCommand pos_command = 2;
+    optional ScriptedHeadCommand scripted_command = 3;
+
+    optional int64 timestamp = 4;
+}
+
+message PositionHeadCommand
+{
+    optional float head_yaw = 1;
+    optional float head_pitch = 2;
+    optional float max_speed_yaw = 3 [default = -1];
+    optional float max_speed_pitch = 4 [default = -1];
+}
+
+message ScriptedHeadCommand
+{
+    repeated HeadJointCommand command = 1;
+}
+
+message HeadJointCommand
+{
+    optional float time = 1;
+    optional JointAngles angles = 2;
+    optional JointAngles stiffness = 3;
+
+    enum InterpolationType {
+        SMOOTH = 0;
+        LINEAR = 1;
+    }
+
+    optional InterpolationType interpolation = 4;
+}
+
+message JointAngles
+{
+   // Head angles.
+   optional float head_yaw = 1;
+   optional float head_pitch = 2;
+
+   // Left arm angles.
+   optional float l_shoulder_pitch = 3;
+   optional float l_shoulder_roll = 4;
+   optional float l_elbow_yaw = 5;
+   optional float l_elbow_roll = 6;
+   optional float l_wrist_yaw = 7;
+   optional float l_hand = 8;
+
+   // Right arm angles.
+   optional float r_shoulder_pitch = 9;
+   optional float r_shoulder_roll = 10;
+   optional float r_elbow_yaw = 11;
+   optional float r_elbow_roll = 12;
+   optional float r_wrist_yaw = 13;
+   optional float r_hand = 14;
+
+   // Pelvis angles.
+   optional float l_hip_yaw_pitch = 15;
+   optional float r_hip_yaw_pitch = 16;
+
+   // Left leg angles.
+   optional float l_hip_roll = 17;
+   optional float l_hip_pitch = 18;
+   optional float l_knee_pitch = 19;
+   optional float l_ankle_pitch = 20;
+   optional float l_ankle_roll = 21;
+
+   // Right leg angles.
+   optional float r_hip_roll = 22;
+   optional float r_hip_pitch = 23;
+   optional float r_knee_pitch = 24;
+   optional float r_ankle_pitch = 25;
+   optional float r_ankle_roll = 26;
+}

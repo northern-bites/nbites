@@ -17,7 +17,7 @@ def gameInitial(player):
         player.GAME_INITIAL_satDown = False
 
     elif (player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown
-          and not player.motion.isBodyActive()):
+          and not player.motion.body_is_active):
         player.GAME_INITIAL_satDown = True
         player.executeMove(SweetMoves.SIT_POS)
 
@@ -77,16 +77,16 @@ def gaurd(player):
         player.brain.tracker.trackBall()
 
     # First, sanity check on visible goal distance
-    yglpVis = player.brain.yglp.vis
-    ygrpVis = player.brain.ygrp.vis
-    if (yglpVis.on and yglpVis.dist < 200) or \
-            (ygrpVis.on and ygrpVis.dist < 200):
+    yglpVis = player.brain.yglp
+    ygrpVis = player.brain.ygrp
+    if (yglpVis.on and yglpVis.distance < 200) or \
+            (ygrpVis.on and ygrpVis.distance < 200):
         # Goals are close: become a full fledged chaser!
         print "become a chaser!" #/* ** */ ADD CHASER CODE
 
     # Is the ball nearby? Omni approach it.
-    if player.brain.ball.vis.framesOn > 4 and \
-            player.brain.ball.vis.dist < 150:
+    if player.brain.ball.vis.frames_on > 4 and \
+            player.brain.ball.distance < 150:
         return player.goLater('omniApproach')
 
     # No luck. Sit tight.
@@ -94,7 +94,7 @@ def gaurd(player):
 
 def omniApproach(player):
     # If close to ball, switch to omniPosition
-    if player.brain.ball.vis.dist < 50:
+    if player.brain.ball.distance < 50:
         return player.goLater('omniPositionForKick')
 
     # If lost the ball, stop and chill.

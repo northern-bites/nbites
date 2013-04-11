@@ -152,6 +152,8 @@ namespace Kinematics {
     static const float HEAD_BOUNDS[2][2] = {{-2.09f,2.09f},{-.785f,.785f}};
 
 	// Head bounds to prevent significant collisions with shoulder pads
+    //TODO: update this for two camera system
+    //      should we define pitch as a function of yaw?
 	static const float boundHeadYaw(float yaw, float pitch) {
 		float yawLimit = 2.0f;
 

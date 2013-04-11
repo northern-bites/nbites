@@ -53,13 +53,13 @@ class GoTeam:
 
     def run(self, play):
         """We run this each frame to get the latest info"""
-        if self.brain.gameController.currentState != 'gamePenalized':
+        if self.brain.interface.gameState.state != 'gamePenalized':
             self.aPrioriTeammateUpdate()
 
-        if self.brain.gameController.currentState == 'gameReady':
+        if self.brain.interface.gameState.state == 'gameReady':
             # Change which wing is forward based on the opponents score
-            g = self.brain.gameController
-            self.kickoffFormation = g.getScoreDifferential()%2
+            # TODO: implement this
+            pass
 
         play.changed = False
         self.strategize(play)
@@ -72,7 +72,7 @@ class GoTeam:
         creates a play, picks the strategy to run, returns the play after
         it is modified by Strategies
         """
-        currentGCState = self.brain.gameController.currentState
+        currentGCState = self.brain.interface.gameState.state
         # We don't control anything in initial or finished
         if (currentGCState == 'gameInitial' or
             currentGCState == 'gameFinished'):
@@ -119,7 +119,6 @@ class GoTeam:
         """
         # Print changes and Say changes
         if play.changed:
-            self.brain.speech.say(PBConstants.SUB_ROLES[play.subRole])
             if self.printStateChanges:
                 self.printf("Play switched to " + play.__str__())
 
@@ -152,9 +151,8 @@ class GoTeam:
                                 % mate.playerNumber)
                 continue
 
-            # 20000 is synced with the penalty for not seeing the ball
-            # Hacked in so we don't have to import. Summer 2012
-            elif mate.hasBall() and mate.chaseTime < 20000:
+            elif (mate.hasBall() and
+                  mate.chaseTime < self.brain.TeamMember.BALL_OFF_PENALTY):
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate
@@ -224,6 +222,7 @@ class GoTeam:
         # A will become chaser_mate if:
         # [ (chaseTime(A) - chaseTime(B) < e) or
         #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
+        # A is higher robot that has decided to be chaser.
         return((mate.chaseTime < chaser_mate.chaseTime * 1.1) or
                ((mate.chaseTime < chaser_mate.chaseTime * 1.5) and
                 mate.isTeammateRole(PBConstants.CHASER)))
@@ -234,6 +233,8 @@ class GoTeam:
         # A will become chaser_mate if:
         # [ (chaseTime(A) - chaseTime(B) < e) or
         #   (chaseTime(A) - chaseTime(B) < d and A is already chasing)]
+        # Note: d > e
+        # A is higher robot that has decided to be chaser.
         return(((mate.chaseTime - chaser_mate.chaseTime) <
                 PBConstants.CALL_OFF_THRESH) or
                ((mate.chaseTime - chaser_mate.chaseTime) <
@@ -243,7 +244,7 @@ class GoTeam:
     def shouldListen(self, chaser_mate, mate):
         """Decides if mate should listen to the chaser_mate after calling off"""
         # mate = A, chaser_mate = B.
-        # A will relinquish chaser to chaser_mate if:
+        # A will relinquish chaser to B if:
         # chaseTime(B) < chaseTime(A) - m
         # A is higher robot that has decided to be chaser.
         return (chaser_mate.chaseTime < (mate.chaseTime -
@@ -425,8 +426,10 @@ class GoTeam:
         #if self.numActiveFieldPlayers == 0:
             #return False
 
-        if self.brain.gameController.currentState == 'gameReady' or\
-                self.brain.gameController.currentState =='gameSet':
+        if (self.brain.gameController.currentState ==
+            self.brain.GameController.STATE_READY
+            or self.brain.gameController.currentState ==
+            self.brain.GameController.STATE_SET):
             return False
 
         for mate in self.brain.teamMembers:
@@ -437,8 +440,8 @@ class GoTeam:
         return True
 
     def useKickoffFormation(self):
-        if (self.brain.gameController.timeSincePlay() < \
-            PBConstants.KICKOFF_FORMATION_TIME):
+        if(self.brain.gameController.timeSincePlaying
+           < PBConstants.KICKOFF_FORMATION_TIME):
             return True
         else:
             return False
@@ -454,7 +457,7 @@ class GoTeam:
         # No matter what state we are we don't
         # Want to become an illegal defender
         # TODO: When ball information is better make this inMyGoalBox
-        if ball.loc.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
+        if ball.x < (NogginConstants.MY_GOALBOX_RIGHT_X + 10):
             self.willBeIllegalD += 1
             if self.willBeIllegalD > PBConstants.DONT_ILLEGAL_D_THRESH:
                 self.stopAvoidingBox = 0
@@ -477,7 +480,7 @@ class GoTeam:
             return not self.brain.player.inKickingState
 
     def defenderShouldChase(self):
-        ballX = self.brain.ball.loc.relX
+        ballX = self.brain.ball.rel_x
         goalie = self.brain.teamMembers[0]
         return(ballX < PBConstants.DEFENDER_SHOULD_CHASE_THRESH and
                not goalie.isTeammateSubRole(PBConstants.GOALIE_CHASER) )
@@ -508,8 +511,8 @@ class GoTeam:
     def getPointBetweenBallAndGoal(self, ball, dist_from_ball):
         """returns defensive position between ball (x,y) and goal (x,y)
         at <dist_from_ball> centimeters away from ball"""
-        delta_y = ball.loc.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
-        delta_x = ball.loc.x - NogginConstants.MY_GOALBOX_LEFT_X
+        delta_y = ball.y - NogginConstants.MY_GOALBOX_MIDDLE_Y
+        delta_x = ball.x - NogginConstants.MY_GOALBOX_LEFT_X
 
         # don't divide by 0
         if delta_x == 0:
@@ -517,16 +520,16 @@ class GoTeam:
         if delta_y == 0:
             delta_y = 0.001
 
-        pos_x = ball.loc.x - ( dist_from_ball/
+        pos_x = ball.x - ( dist_from_ball/
                            hypot(delta_x,delta_y) )*delta_x
-        pos_y = ball.loc.y - ( dist_from_ball/
+        pos_y = ball.y - ( dist_from_ball/
                            hypot(delta_x,delta_y) )*delta_y
 
         return pos_x,pos_y
 
 
-    # This is not used right now but when Loc and walking are better
-    # a TODO should be to make this work.
+    # a TODO should be to make this work if we decide to integrate
+    # a goalie player back into playbook.
     def fancyGoaliePosition(self):
         """returns a goalie position using ellipse"""
 
@@ -567,22 +570,17 @@ class GoTeam:
     def printf(self, outputString, printingColor='purple'):
         """FSA print function that allows colors to be specified"""
         if printingColor == 'red':
-            self.brain.out.printf(RED_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print RED_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'blue':
-            self.brain.out.printf(BLUE_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print BLUE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'yellow':
-            self.brain.out.printf(YELLOW_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print YELLOW_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'cyan':
-            self.brain.out.printf(CYAN_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print CYAN_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         elif printingColor == 'purple':
-            self.brain.out.printf(PURPLE_COLOR_CODE + str(outputString) +\
-                                      RESET_COLORS_CODE)
+            print PURPLE_COLOR_CODE + str(outputString) + RESET_COLORS_CODE
         else:
-            self.brain.out.printf(str(outputString))
+            print(str(outputString))
 
 
     # Reset counters for role transitions

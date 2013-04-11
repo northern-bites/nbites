@@ -42,7 +42,6 @@ class Navigator(FSA.FSA):
         self.currentState = 'stopped'
         self.setName('Navigator')
         self.setPrintStateChanges(True)
-        self.setPrintFunction(self.brain.out.printf)
         self.stateChangeColor = 'cyan'
 
         #transitions
@@ -98,7 +97,11 @@ class Navigator(FSA.FSA):
         self.goTo(self.brain.play.getPosition(), avoidObstacles = True)
 
     def chaseBall(self, speed = FULL_SPEED):
-        self.goTo(self.brain.ball.loc, CLOSE_ENOUGH, speed, True)
+        ball = self.brain.ball
+        ballRelRobotLocation = RelRobotLocation(ball.rel_x,
+                                                ball.rel_y,
+                                                ball.bearing_deg)
+        self.goTo(ballRelRobotLocation, CLOSE_ENOUGH, speed, True)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False):
         """
