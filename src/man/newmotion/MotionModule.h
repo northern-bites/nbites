@@ -32,6 +32,7 @@
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
 #include "StiffnessControl.pb.h"
+#include "FallStatus.pb.h"
 
 #include <vector>
 
@@ -161,6 +162,7 @@ public:
     portals::InPortal<messages::HeadMotionCommand> headCommandInput_;
     portals::InPortal<messages::StiffnessControl>  stiffnessInput_;
     portals::InPortal<messages::MotionRequest>     requestInput_;
+    portals::InPortal<messages::FallStatus>        fallInput_;
 
     portals::OutPortal<messages::JointAngles>  jointsOutput_;
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
@@ -236,6 +238,7 @@ private:
 
     // For deciding if requests/commands have been processed already
     bool gainsOn;
+    bool falling;
     long long lastRequest, lastBodyCommand, lastHeadCommand;
 };
 } // namespace motion
