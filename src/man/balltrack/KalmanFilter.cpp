@@ -135,7 +135,6 @@ namespace balltrack
 
         // TODO - INCORPORATE FRICTION
 
-
         // Calculate the expected state
         ufmatrix4 A = prod(rotation,trajectory);
         ufmatrix4 ATranspose = trans(A);
