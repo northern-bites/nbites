@@ -122,14 +122,10 @@ def kickBall(player):
         else:
             VisualStates.returnToGoal.kickPose.relX += \
                 player.brain.interface.odometry.x
-            VisualStates.returnToGoal.kickPose.relX += \
+            VisualStates.returnToGoal.kickPose.relY += \
                 player.brain.interface.odometry.y
-            VisualStates.returnToGoal.kickPose.relX += \
+            VisualStates.returnToGoal.kickPose.relH += \
                 player.brain.interface.odometry.h
-
-        VisualStates.returnToGoal.kickPose.relX = 0
-        VisualStates.returnToGoal.kickPose.relX = 0
-        VisualStates.returnToGoal.kickPose.relX = 0
 
         player.brain.tracker.trackBall()
 

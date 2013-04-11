@@ -6,6 +6,8 @@
 
 SET_POOL_SIZE(messages::WorldModel,  15);
 SET_POOL_SIZE(messages::JointAngles, 15);
+SET_POOL_SIZE(messages::PackedImage16, 16);
+SET_POOL_SIZE(messages::RobotLocation, 16);
 
 namespace man {
 
