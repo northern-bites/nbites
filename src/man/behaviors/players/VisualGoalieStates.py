@@ -8,47 +8,106 @@ from ..util import Transition
 #import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
 import GoalieTransitions
-from objects import RelRobotLocation, RelLocation
+from objects import RelRobotLocation, RelLocation, Location
 from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 #from vision import cornerID as IDs
 from math import fabs, degrees
 from ..kickDecider import kicks
 import noggin_constants as Constants
+import goalie
 
 DEBUG_OBSERVATIONS = False
 DEBUG_POSITION = False
+
+def updatePostObservations(player):
+    """
+    Updates the underlying C++ data structures.
+    """
+    if (player.brain.ygrp.on and
+        player.brain.yglp.on):
+
+        if(player.brain.ygrp.distance != 0.0 and
+        #magic number
+        player.brain.ygrp.distance < 400.0):
+            player.system.pushRightPostObservation(player.brain.ygrp.distance,
+                                                   player.brain.ygrp.bearing)
+            if DEBUG_OBSERVATIONS:
+                print "RIGHT: Saw right post."
+                print "  Avg right x is now " + str(player.system.rightPostRelX())
+                print "  Avg right y is now " + str(player.system.rightPostRelY())
+
+        if (player.brain.yglp.distance != 0.0 and
+            #magic number
+            player.brain.yglp.distance < 400.0):
+            player.system.pushLeftPostObservation(player.brain.yglp.distance,
+                                                  player.brain.yglp.bearing)
+            if DEBUG_OBSERVATIONS:
+                print "LEFT: Saw left post."
+                print "  Avg left x is now " + str(player.system.leftPostRelX())
+                print "  Avg left y is now " + str(player.system.leftPostRelY())
+
+def updateCrossObservations(player):
+    if(player.brain.vision.cross.on and
+       player.brain.vision.cross.distance != 0.0):
+        player.system.pushCrossObservation(player.brain.vision.cross.distance,
+                                           player.brain.vision.cross.bearing)
+
+def spinToFaceGoal(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
+
+        if (player.lastDiffState == 'decideRightSide'):
+            player.side = RIGHT
+        else:
+            player.side = LEFT
+
+        spinToFaceGoal.facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+        if player.side == RIGHT:
+            spinToFaceGoal.facingDest.relH = 45
+        else:
+            spinToFaceGoal.facingDest.relH = -45
+
+    if player.counter == 20:
+        player.brain.nav.goTo(spinToFaceGoal.facingDest,
+                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
+
+    return Transition.getNextState(player, spinToFaceGoal)
+
 
 def walkToGoal(player):
     """
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
+        # first decide which side you're coming in from
+        if player.lastDiffState == 'gatherPostInfo':
+            # don't change side
+            player.side = player.side
+
+        # based on that side, set up post observations
         if player.side == RIGHT:
-            if (player.brain.gameController.teamColor ==
-                Constants.teamColor.TEAM_BLUE):
-                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        Constants.HEADING_UP)
-            else:
-                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        Constants.HEADING_DOWN)
-        else:
-            if (player.brain.gameController.teamColor ==
-                Constants.teamColor.TEAM_BLUE):
-                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        Constants.HEADING_UP)
-            else:
-                player.brain.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        Constants.HEADING_DOWN)
+            player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
+                                     goalie.RIGHT_SIDE_RP_ANGLE,
+                                     goalie.RIGHT_SIDE_LP_DISTANCE,
+                                     0.0)
+        if player.side == LEFT:
+            player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
+                                     0.0,
+                                     goalie.LEFT_SIDE_LP_DISTANCE,
+                                     goalie.LEFT_SIDE_LP_ANGLE)
 
-    player.brain.nav.goTo(RobotLocation(Constants.FIELD_GREEN_LEFT_SIDELINE_X,
-                                        Constants.MIDFIELD_Y,
-                                        Constants.HEADING_RIGHT))
 
-    return player.stay()
+        player.system.home.relH = 0.0
+        player.brain.nav.goTo(player.system.home, nav.CLOSE_ENOUGH,
+                              nav.MEDIUM_SPEED, True)
+
+    updatePostObservations(player)
+    player.brain.tracker.lookToAngle(player.system.centerGoalBearing())
+    player.system.home.relY = player.system.centerGoalRelY()
+    player.system.home.relX = player.system.centerGoalRelX()
+    player.system.home.relH = player.system.centerGoalBearing()
+
+    return Transition.getNextState(player, walkToGoal)
 
 def dodgeBall(player):
     if player.firstFrame():

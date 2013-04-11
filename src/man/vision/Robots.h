@@ -23,7 +23,12 @@
 
 #include <stdlib.h>
 
-class Robots; // forward reference
+namespace man {
+namespace vision {
+	class Robots; // forward reference
+}
+}
+
 #include "Threshold.h"
 #include "Context.h"
 #include "VisionStructs.h"
@@ -33,6 +38,8 @@ class Robots; // forward reference
 #include "Field.h"
 #include "Cross.h"
 
+namespace man {
+namespace vision {
 
 class Robots {
 public:
@@ -96,4 +103,8 @@ private:
     static const bool debugRobots = false;
 #endif
 };
+
+}
+}
+
 #endif

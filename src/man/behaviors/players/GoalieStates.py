@@ -4,6 +4,7 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
+from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
@@ -11,6 +12,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.stand()
         player.zeroHeads()
+        player.system = GoalieSystem()
         player.side = LEFT
         player.isSaving = False
 
@@ -120,14 +122,10 @@ def kickBall(player):
         else:
             VisualStates.returnToGoal.kickPose.relX += \
                 player.brain.interface.odometry.x
-            VisualStates.returnToGoal.kickPose.relX += \
+            VisualStates.returnToGoal.kickPose.relY += \
                 player.brain.interface.odometry.y
-            VisualStates.returnToGoal.kickPose.relX += \
+            VisualStates.returnToGoal.kickPose.relH += \
                 player.brain.interface.odometry.h
-
-        VisualStates.returnToGoal.kickPose.relX = 0
-        VisualStates.returnToGoal.kickPose.relX = 0
-        VisualStates.returnToGoal.kickPose.relX = 0
 
         player.brain.tracker.trackBall()
 

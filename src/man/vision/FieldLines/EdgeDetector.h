@@ -7,6 +7,9 @@
 
 #include "boost/shared_ptr.hpp"
 
+namespace man {
+namespace vision {
+
 /**
  * Used to find the step edges in a given channel of an image according to a
  * preset, fixed threshold.
@@ -69,5 +72,8 @@ protected:
 private:
     uint8_t threshold;
 };
+
+}
+}
 
 #endif /* EdgeDetector_h_DEFINED */

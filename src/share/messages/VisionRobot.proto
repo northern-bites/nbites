@@ -33,3 +33,4 @@ message VisionObstacle
         optional bool on_right = 2;
         optional bool off_field = 3;
 }
+

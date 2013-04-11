@@ -44,7 +44,7 @@ SINGLE_MESSAGE="""\
 REPEATED_PRIMITIVE="""\
     .def("add_%(field_name)s", &%(scope)s::add_%(field_name)s)
     .def("set_%(field_name)s", &%(scope)s::set_%(field_name)s)
-    .def("%(field_name)s", (%(field_type)s (%(scope)s::*)(int) const)(&%(scope)s::%(field_name)s))
+    .def("%(field_name)s", static_cast< %(field_type)s (%(scope)s::*)(int) const >(&%(scope)s::%(field_name)s))
     .def("%(field_name)s_size", &%(scope)s::%(field_name)s_size)
     .def("clear_%(field_name)s", &%(scope)s::clear_%(field_name)s)
 

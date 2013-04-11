@@ -15,7 +15,7 @@ NUM_LED_GROUPS = 31
 GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
-GOAL_LEDS = False
+GOAL_LEDS = True
 PLAYBOOK_LEDS = False
 LOC_LEDS = False
 COMM_LEDS = True
@@ -190,36 +190,36 @@ class Leds():
                 self.executeLeds(BALL_OFF_LEDS)
 
         if GOAL_LEDS:
-            newCertainty = self.brain.ygrp.vis.certainty
+            newCertainty = self.brain.ygrp.certainty
 
-            if (newCertainty == vision.certainty.NOT_SURE):
-                if (self.brain.ygrp.vis.on and
-                    (self.brain.ygrp.vis.frames_on == 1 or
+            if (newCertainty == 0):
+                if (self.brain.ygrp.on and
+                    (self.brain.ygrp.frames_on == 1 or
                      self.goalCertainty != newCertainty)):
                     #we see an ambiguous post for the first time!
                     self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
                     self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
-            if(newCertainty == vision.certainty._SURE and
-               self.brain.ygrp.vis.on and
-               (self.brain.ygrp.vis.frames_on == 1 or
+            if(newCertainty == 2 and
+               self.brain.ygrp.on and
+               (self.brain.ygrp.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the right post for the first time!
                 self.executeLeds(RIGHT_POST_ON_LEDS)
-            if(self.brain.yglp.vis.on and
-               (self.brain.yglp.vis.frames_on == 1 or
+            if(self.brain.yglp.on and
+               (self.brain.yglp.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the left post for the first time!
                 self.executeLeds(LEFT_POST_ON_LEDS)
-            if(self.brain.ygrp.vis.frames_off == 1):
+            if(self.brain.ygrp.frames_off == 1):
                 #we don't see the right post for the first time
                 self.executeLeds(RIGHT_POST_OFF_LEDS)
-            if((self.brain.yglp.vis.frames_off == 1 and
-                (newCertainty != vision.certainty.NOT_SURE and
-                 self.brain.ygrp.vis.frames_off >= 1)) or
-               (self.brain.yglp.vis.frames_off >=1 and
-                ((newCertainty != vision.certainty.NOT_SURE and
+            if((self.brain.yglp.frames_off == 1 and
+                (newCertainty != 1 and
+                 self.brain.ygrp.frames_off >= 1)) or
+               (self.brain.yglp.frames_off >=1 and
+                ((newCertainty != 1 and
                   newCertainty != self.goalCertainty) or
-                 self.brain.ygrp.vis.frames_off == 1))):
+                 self.brain.ygrp.frames_off == 1))):
                 #we don't see the left post for the first time
                 self.executeLeds(LEFT_POST_OFF_LEDS)
 
@@ -228,17 +228,17 @@ class Leds():
 
             # TODO make this part actually tell us if we are looking at our goal or not
             # via flag in loc (???)
-            newFacingOpp = (-90 < self.brain.my.h < 90)
+            newFacingOpp = (-90 < self.brain.loc.h < 90)
             if (newFacingOpp != self.facingOpp or
                 self.facingOpp == -1):
                 self.facingOpp = newFacingOpp
-                if -90 < self.brain.my.h < 90:
-                    if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                if -90 < self.brain.loc.h < 90:
+                    if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                         self.executeLeds(PINK_GOAL_LEDS)
                     else:
                         self.executeLeds(BLUE_GOAL_LEDS)
                 else:
-                    if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                    if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                         self.executeLeds(BLUE_GOAL_LEDS)
                     else:
                         self.executeLeds(PINK_GOAL_LEDS)

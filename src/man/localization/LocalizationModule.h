@@ -53,6 +53,10 @@ namespace man
 
         ParticleFilter * particleFilter;
         long long lastReset;
+
+        messages::RobotLocation lastOdometry;
+        messages::RobotLocation curOdometry;
+        messages::RobotLocation deltaOdometry;
     };
     } // namespace localization
 } // namespace man
