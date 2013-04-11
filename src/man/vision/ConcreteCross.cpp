@@ -1,6 +1,9 @@
 #include "ConcreteCross.h"
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // Constructors
 ConcreteCross::ConcreteCross(const float _fieldX,
                                          const float _fieldY,
@@ -85,3 +88,5 @@ const float ConcreteCross::getHeightFromGround(const int _id)
     return 0;
 }
 
+}
+}

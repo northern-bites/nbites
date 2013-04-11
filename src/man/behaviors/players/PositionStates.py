@@ -1,8 +1,7 @@
 import noggin_constants as NogginConstants
-import man.noggin.util.MyMath as MyMath
+from   ..util import MyMath
 import PositionConstants as constants
-import PositionTransitions as PosTran
-import vision
+import PositionTransitions
 
 def positionLocalize(player):
     """
@@ -21,56 +20,28 @@ def playbookPosition(player):
         nav.positionPlaybook()
 
     if nav.isAtPosition():
-        brain.tracker.trackBallFixedPitch()
+        brain.tracker.trackBall()
     else:
-        brain.tracker.repeatWidePanFixedPitch()
+        brain.tracker.repeatWidePan()
 
     #TODO: I think the transition is broken right now!
-    #if PosTran.leavingTheField(player):
+    #if PositionTransitions.leavingTheField(player):
     #    return player.goLater('spinToField')
 
     return player.stay()
 
 def spinToField(player):
 
-    fieldEdge = player.brain.vision.fieldEdge
+    fieldEdge = player.brain.interface.visualField.visual_field_edge
 
     if player.firstFrame():
-        if fieldEdge.shape == vision.basicShape.RISING_LEFT:
+        if fieldEdge.distance_l > fieldEdge.distance_r:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_LEFT)
-            player.brain.tracker.spinPanFixedPitch()
+            player.brain.tracker.spinPan()
         else:
             player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_RIGHT)
-            player.brain.tracker.spinPanFixedPitch()
+            player.brain.tracker.spinPan()
 
     elif player.brain.nav.isAtPosition():
         return player.goLater('playbookPosition')
-    return player.stay()
-
-
-def relocalize(player):
-    if player.firstFrame():
-        player.setWalk(constants.RELOC_X_SPEED, 0, 0)
-
-    if player.brain.my.locScore is not NogginConstants.locScore.BAD_LOC:
-        player.shouldRelocalizeCounter += 1
-
-        if player.shouldRelocalizeCounter > 30:
-            player.shouldRelocalizeCounter = 0
-            return player.goLater(player.lastDiffState)
-
-    else:
-        player.shouldRelocalizeCounter = 0
-
-    if not player.brain.motion.isHeadActive():
-        player.brain.tracker.repeatWidePanFixedPitch()
-
-#    if player.counter > constants.RELOC_SPIN_FRAME_THRESH:
-#        direction = MyMath.sign(player.getWalk()[2])
-#        if direction == 0:
-#            direction = 1
-#@todo: we just spin left to relocalize since getWalk was deprecated
-# maybe we can make this smarter?
-        player.setWalk(0, 0, constants.RELOC_SPIN_SPEED)
-
     return player.stay()

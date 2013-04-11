@@ -5,6 +5,9 @@
 #include <math.h>
 #include "../FieldLines/Gradient.h"
 
+namespace man {
+namespace vision {
+
 /**
  * A line defined in polar coordinates, also storing information from the
  * Hough Space in which it was found.
@@ -112,5 +115,8 @@ private:
         acceptable_xy_diff = 5,
     };
 };
+
+}
+}
 
 #endif /* _HoughLine_h_DEFINED */

@@ -32,7 +32,7 @@ def goalieSave(player):
 
     if player.firstFrame():
         player.stopWalking()
-        brain.tracker.trackBallFixedPitch()
+        brain.tracker.trackBall()
         player.isSaving = True
 
     if helper.shouldSave(player):

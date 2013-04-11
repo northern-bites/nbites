@@ -6,7 +6,8 @@
 #include "RoboGrams.h"
 
 #include "Images.h"
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
+
 #include "InertialState.pb.h"
 
 #include "VisionField.pb.h"
@@ -36,8 +37,7 @@ public:
 	portals::InPortal<messages::PackedImage16> botYImage;
 	portals::InPortal<messages::PackedImage16> botUImage;
 	portals::InPortal<messages::PackedImage16> botVImage;
-   
-	
+
 	portals::InPortal<messages::JointAngles> joint_angles;
     portals::InPortal<messages::InertialState> inertial_state;
 
@@ -55,7 +55,6 @@ protected:
     void updateVisionObstacle();
 };
 
-void updateRobot(messages::VisionRobot::Robot* bot_message, VisualRobot* visualRobot);
+void updateRobot(messages::Robot* bot_message, VisualRobot* visualRobot);
 }
 }
-

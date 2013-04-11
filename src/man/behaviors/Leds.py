@@ -1,5 +1,13 @@
 from playbook import PBConstants
 import noggin_constants as NogginConstants
+import GameController
+
+############################ IMPORTANT ############################
+# DO NOT check any values directly from messages in this class.   #
+# Leds.run() is called once during Brain.init(), so messages will #
+# all be null. Instead, take values from brain.ball,              #
+# brain.gameController, etc.                                      #
+############################ IMPORTANT ############################
 
 NUM_LED_GROUPS = 31
 
@@ -8,7 +16,7 @@ GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
 GOAL_LEDS = True
-PLAYBOOK_LEDS = True
+PLAYBOOK_LEDS = False
 LOC_LEDS = False
 COMM_LEDS = True
 
@@ -176,42 +184,42 @@ class Leds():
     def processLeds(self):
 
         if BALL_LEDS:
-            if self.brain.ball.framesOn == 1:
+            if self.brain.ball.vis.frames_on == 1:
                 self.executeLeds(BALL_ON_LEDS)
-            elif self.brain.ball.framesOff == 1:
+            elif self.brain.ball.vis.frames_off == 1:
                 self.executeLeds(BALL_OFF_LEDS)
 
-        if False:#GOAL_LEDS:
-            newCertainty = self.brain.ygrp.vis.certainty
+        if GOAL_LEDS:
+            newCertainty = self.brain.ygrp.certainty
 
-            if (newCertainty == vision.certainty.NOT_SURE):
-                if (self.brain.ygrp.vis.on and
-                    (self.brain.ygrp.vis.framesOn == 1 or
+            if (newCertainty == 0):
+                if (self.brain.ygrp.on and
+                    (self.brain.ygrp.frames_on == 1 or
                      self.goalCertainty != newCertainty)):
                     #we see an ambiguous post for the first time!
                     self.executeLeds(LEFT_POST_AMBIGUOUS_LEDS)
                     self.executeLeds(RIGHT_POST_AMBIGUOUS_LEDS)
-            if(newCertainty == vision.certainty._SURE and
-               self.brain.ygrp.vis.on and
-               (self.brain.ygrp.vis.framesOn == 1 or
+            if(newCertainty == 2 and
+               self.brain.ygrp.on and
+               (self.brain.ygrp.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the right post for the first time!
                 self.executeLeds(RIGHT_POST_ON_LEDS)
-            if(self.brain.yglp.vis.on and
-               (self.brain.yglp.vis.framesOn == 1 or
+            if(self.brain.yglp.on and
+               (self.brain.yglp.frames_on == 1 or
                 self.goalCertainty != newCertainty)):
                 #we see the left post for the first time!
                 self.executeLeds(LEFT_POST_ON_LEDS)
-            if(self.brain.ygrp.vis.framesOff == 1):
+            if(self.brain.ygrp.frames_off == 1):
                 #we don't see the right post for the first time
                 self.executeLeds(RIGHT_POST_OFF_LEDS)
-            if((self.brain.yglp.vis.framesOff == 1 and
-                (newCertainty != vision.certainty.NOT_SURE and
-                 self.brain.ygrp.vis.framesOff >= 1)) or
-               (self.brain.yglp.vis.framesOff >=1 and
-                ((newCertainty != vision.certainty.NOT_SURE and
+            if((self.brain.yglp.frames_off == 1 and
+                (newCertainty != 1 and
+                 self.brain.ygrp.frames_off >= 1)) or
+               (self.brain.yglp.frames_off >=1 and
+                ((newCertainty != 1 and
                   newCertainty != self.goalCertainty) or
-                 self.brain.ygrp.vis.framesOff == 1))):
+                 self.brain.ygrp.frames_off == 1))):
                 #we don't see the left post for the first time
                 self.executeLeds(LEFT_POST_OFF_LEDS)
 
@@ -220,17 +228,17 @@ class Leds():
 
             # TODO make this part actually tell us if we are looking at our goal or not
             # via flag in loc (???)
-            newFacingOpp = (-90 < self.brain.my.h < 90)
+            newFacingOpp = (-90 < self.brain.loc.h < 90)
             if (newFacingOpp != self.facingOpp or
                 self.facingOpp == -1):
                 self.facingOpp = newFacingOpp
-                if -90 < self.brain.my.h < 90:
-                    if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                if -90 < self.brain.loc.h < 90:
+                    if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                         self.executeLeds(PINK_GOAL_LEDS)
                     else:
                         self.executeLeds(BLUE_GOAL_LEDS)
                 else:
-                    if self.brain.my.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+                    if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                         self.executeLeds(BLUE_GOAL_LEDS)
                     else:
                         self.executeLeds(PINK_GOAL_LEDS)
@@ -247,7 +255,6 @@ class Leds():
                 elif self.brain.play.isRole(PBConstants.DEFENDER):
                     self.executeLeds(DEFENDER_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.DEFENDER_DUB_D):
-                    print "IN DUB D"
                     self.executeLeds(DUB_DEFEND_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.GOALIE):
                     self.executeLeds(GOALIE_ON_LEDS)
@@ -294,7 +301,7 @@ class Leds():
             # TODO: show loc uncertainty via LEDS
             pass
 
-        if False:#COMM_LEDS:
+        if COMM_LEDS:
             newActiveMates = self.brain.activeTeamMates()
             if (newActiveMates != self.numActiveMates):
                 self.numActiveMates = newActiveMates
@@ -330,46 +337,41 @@ class Leds():
                     self.executeLeds(RIGHT_COMM_FIVE_OFF_LEDS)
 
         if GC_LEDS:
-            if self.brain.gameController.counter == 1:
+            if self.brain.gameController.stateChanged:
                 gcState = self.brain.gameController.currentState
-                if (gcState == 'gameInitial' or
-                    gcState == 'penaltyShotsGameInitial'):
-                    self.executeLeds(STATE_INITIAL_LEDS)
-                elif (gcState == 'gameReady' or
-                      gcState == 'penaltyShotsGameReady'):
-                    self.executeLeds(STATE_READY_LEDS)
-                elif (gcState == 'gameSet' or
-                      gcState == 'penaltyShotsGameSet'):
-                    self.executeLeds(STATE_SET_LEDS)
-                elif (gcState == 'gamePlaying' or
-                      gcState == 'penaltyShotsGamePlaying'):
-                    self.executeLeds(STATE_PLAYING_LEDS)
-                elif (gcState == 'gamePenalized' or
-                      gcState == 'penaltyShotsGamePenalized'):
+                if (self.brain.gameController.penalized):
                     self.executeLeds(STATE_PENALIZED_LEDS)
-                elif (gcState == 'gameFinished' or
-                      gcState == 'penaltyShotsGameFinished'):
+                elif (gcState == GameController.STATE_INITIAL):
+                    self.executeLeds(STATE_INITIAL_LEDS)
+                elif (gcState == GameController.STATE_READY):
+                    self.executeLeds(STATE_READY_LEDS)
+                elif (gcState == GameController.STATE_SET):
+                    self.executeLeds(STATE_SET_LEDS)
+                elif (gcState == GameController.STATE_PLAYING):
+                    self.executeLeds(STATE_PLAYING_LEDS)
+                elif (gcState == GameController.STATE_FINISHED):
                     self.executeLeds(STATE_FINISHED_LEDS)
 
-
         if FOOT_LEDS:
-            if self.kickoffChange:
+            if (self.brain.gameController.kickOffChanged
+                or self.brain.gameController.teamColorChanged):
+                # At starts of halves, either kickOffChanged or
+                # teamColorChanged will trigger but not both, and
+                # both LEDs should update.
                 if self.brain.gameController.ownKickOff:
                     self.executeLeds(HAVE_KICKOFF_LEDS)
                 else:
                     self.executeLeds(NO_KICKOFF_LEDS)
-                self.kickoffChange = False
-            if self.teamChange:
-                if self.brain.teamColor == NogginConstants.teamColor.TEAM_BLUE:
+
+                if self.brain.gameController.teamColor == NogginConstants.teamColor.TEAM_BLUE:
                     self.executeLeds(TEAM_BLUE_LEDS)
                 else:
                     self.executeLeds(TEAM_RED_LEDS)
-                self.teamChange = False
 
     def executeLeds(self,listOfLeds):
         for ledTuple in listOfLeds:
             if len(ledTuple) != 3:
-                self.printf("Invalid print command!! " + str(ledTuple))
+                print "Invalid print command!! " + str(ledTuple)
                 continue
             # Add command to brain's out message fields
             self.brain.interface.ledCommand.add_led_id(ledTuple[0])

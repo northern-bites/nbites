@@ -22,22 +22,74 @@ void set_interface_ptr(boost::shared_ptr<PyInterface> ptr)
 
 BOOST_PYTHON_MODULE(interface)
 {
-	class_<PyInterface, boost::shared_ptr<PyInterface>, boost::noncopyable>("Interface", no_init)
-		.add_property("gameState",
-					  make_getter(&PyInterface::gameState_ptr,
-								  return_value_policy
-								  <reference_existing_object>()))
-		.add_property("filteredBall",
-					  make_getter(&PyInterface::filteredBall_ptr,
-								  return_value_policy
-								  <reference_existing_object>()))
-		.add_property("ledCommand",
-					  make_getter(&PyInterface::ledCommand_ptr,
-								  return_value_policy
-								  <reference_existing_object>()))
-		.def("worldModelList", &PyInterface::getWorldModelList)
-		;
-	scope().attr("interface") = interface_ptr;
+    class_<PyInterface, boost::shared_ptr<PyInterface>, boost::noncopyable>("Interface", no_init)
+        .add_property("gameState",
+                      make_getter(&PyInterface::gameState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("loc",
+                      make_getter(&PyInterface::loc_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("visionRobot",
+                      make_getter(&PyInterface::visionRobot_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("visionField",
+                      make_getter(&PyInterface::visionField_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("visionObstacle",
+                      make_getter(&PyInterface::visionObstacle_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("filteredBall",
+                      make_getter(&PyInterface::filteredBall_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("ledCommand",
+                      make_getter(&PyInterface::ledCommand_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .def("worldModelList", &PyInterface::getWorldModelList)
+        .add_property("bodyMotionCommand",
+                      make_getter(&PyInterface::bodyMotionCommand_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("headMotionCommand",
+                      make_getter(&PyInterface::headMotionCommand_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("motionStatus",
+                      make_getter(&PyInterface::motionStatus_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("motionRequest",
+                      make_getter(&PyInterface::motionRequest_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("odometry",
+                      make_getter(&PyInterface::odometry_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("sonarState",
+                      make_getter(&PyInterface::sonarState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("footBumperState",
+                      make_getter(&PyInterface::footBumperState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("joints",
+                      make_getter(&PyInterface::joints_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("resetLocRequest",
+                      make_getter(&PyInterface::resetLocRequest_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        ;
+    scope().attr("interface") = interface_ptr;
 }
 }
 }

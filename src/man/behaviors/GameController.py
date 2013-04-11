@@ -1,10 +1,8 @@
 import noggin_constants as Constants
-from . import GameStates
-from .util import FSA
 
 STATE_INITIAL = 0
-STATE_SET = 1
-STATE_READY = 2
+STATE_READY = 1
+STATE_SET = 2
 STATE_PLAYING = 3
 STATE_FINISHED = 4
 PENALTY_NONE = 0
@@ -15,106 +13,99 @@ STATE2_OVERTIME = 2
 TEAM_BLUE = Constants.teamColor.TEAM_BLUE
 TEAM_RED = Constants.teamColor.TEAM_RED
 
-class GameController(FSA.FSA):
-    def __init__(self, brain):
-        FSA.FSA.__init__(self,brain)
-        self.brain = brain
-        self.addStates(GameStates)
-        self.currentState = 'gameInitial'
-        self.setName('GameController')
-        self.setPrintStateChanges(True)
-        self.stateChangeColor = 'green'
-        self.setPrintFunction(self.brain.out.printf)
-        self.timeLeft = 600 #temporary value
-        self.ownKickOff = True
-        self.penaltyShots = False
+# Dictionary for input state:output state
+# @inputs are from gameState messages
+# @outputs are FSA states
+convertStateFormat = { STATE_INITIAL : 'gameInitial',
+                       STATE_READY : 'gameReady',
+                       STATE_SET : 'gameSet',
+                       STATE_PLAYING : 'gamePlaying',
+                       STATE_FINISHED : 'gameFinished'
+                       }
+convertStateFormatPenaltyShots = { STATE_INITIAL : 'penaltyShotsGameSet',
+                                   STATE_READY : 'penaltyShotsGameSet',
+                                   STATE_SET : 'penaltyShotsGameSet',
+                                   STATE_PLAYING : 'penaltyShotsGamePlaying',
+                                   STATE_FINISHED : 'gameFinished'
+                                   }
 
-        #print  "kickoff:%g teamColor:%g" % (self.ownKickOff, self.gd.myTeamColor)
+class GameController():
+    def __init__(self, brain):
+        self.brain = brain
+        self.currentState = -1
+        self.lastState = -1
+        self.stateChanged = False
+        self.teamColor = TEAM_BLUE
+        self.teamColorChanged = False
+        self.ownKickOff = False
+        self.kickOffChanged = False
+        self.penaltyShots = False
+        self.penalized = False
+        self.penalizedChanged = False
+        self.timeSincePlaying = 0
+        self.playingStartTime = 0
 
     def run(self):
-        # Ignore all comm based game controller messages for the
-        # forseeable future; only use button presses 3/28/2013
+        gameState = self.brain.interface.gameState
 
-        # Currently set up to ignore button presses if game
-        # controller is sending packets 3/6/2013
+        # reset field for change
+        self.stateChanged = False
 
-        '''
-        self.gd = self.brain.interface.gameState
-
-        gcState = self.gd.state
-
-        if self.gd.team(0).team_number == self.brain.teamNumber:
-            penalized = self.gd.team(0).player(self.brain.playerNumber-1).penalty()
-        else:
-            penalized = self.gd.team(1).player(self.brain.playerNumber-1).penalty()
-
-        if self.gd.secondary_state == STATE2_PENALTYSHOOT:
-            if gcState == STATE_INITIAL:
-                self.switchTo('penaltyShotsGameInitial')
-            elif gcState == STATE_SET:
-                self.switchTo('penaltyShotsGameSet')
-            elif gcState == STATE_READY:
-                self.switchTo('penaltyShotsGameReady')
-            elif gcState == STATE_PLAYING:
-                if penalized:
-                    self.switchTo('penaltyShotsGamePenalized')
-                else:
-                    self.switchTo("penaltyShotsGamePlaying")
-            elif gcState == STATE_FINISHED:
-                self.switchTo('penaltyShotsGameFinished')
+        if (self.currentState != gameState.state):
+            self.stateChanged = True
+            self.lastState = self.currentState
+            self.currentState = gameState.state
+            if (self.currentState == STATE_PLAYING):
+                self.playingStartTime = self.brain.time
             else:
-                self.printf("ERROR: INVALID GAME CONTROLLER STATE")
-        elif self.gd.secondary_state == STATE2_NORMAL:
-            if gcState == STATE_PLAYING:
-                if penalized:
-                    self.switchTo("gamePenalized")
-                else:
-                    self.switchTo("gamePlaying")
-            elif gcState == STATE_READY:
-                self.switchTo('gameReady')
-            elif gcState == STATE_SET:
-                self.switchTo('gameSet')
-            elif gcState == STATE_INITIAL:
-                self.switchTo('gameInitial')
-            elif gcState == STATE_FINISHED:
-                self.switchTo('gameFinished')
-            else:
-                self.printf("ERROR: INVALID GAME CONTROLLER STATE")
+                self.playingStartTime = 0
+        self.timeSincePlaying = self.brain.time - self.playingStartTime
 
-        self.timeLeft = self.gd.secs_remaining
+        # reset field for change
+        self.teamColorChanged = False
 
-        #Set team color
-        for teamInfo in self.gd.team:
-            if teamInfo.team_number == self.brain.teamNumber:
-                if teamInfo.team_color != self.brain.teamColor:
-                    if teamInfo.team_color == TEAM_BLUE:
-                        self.brain.teamColor = TEAM_BLUE
-                    else:
-                        self.brain.teamColor = TEAM_RED
+        if (gameState.team(self.teamColor).team_number != self.brain.teamNumber):
+            # We have the wrong team color
+            self.teamColorChanged = True
+            # This function might look weird, but!
+            #   0 -> 1 so team blue switches to team red
+            #   1 -> 0 so team red  switches to team blue
+            self.teamColor = -1*(self.teamColor)+1
 
-                    self.brain.leds.teamChange = True
+        # reset field for change
+        self.kickOffChanged = False
 
-            # need to update kickoff when we swap team color
-        if self.gd.kick_off_team == self.brain.teamColor:
-            if self.ownKickOff == False:
+        if (gameState.kick_off_team == self.teamColor):
+            # It is currently our kick off
+            if not self.ownKickOff:
+                self.kickOffChanged = True
                 self.ownKickOff = True
-                self.brain.leds.kickoffChange = True
         else:
-            if self.ownKickOff == True:
+            # It is currently not our kick off
+            if self.ownKickOff:
+                self.kickOffChanged = True
                 self.ownKickOff = False
-                self.brain.leds.kickoffChange = True
-        '''
 
-        FSA.FSA.run(self)
+        # Egocentric check for penalty.
+        # Note: being penalized is considered a state change, and should
+        # override self.currentState when checked by the player FSA.
+        if (gameState.team(self.teamColor).player(self.brain.playerNumber-1).penalty):
+            # I am penalized.
+            if not self.penalized:
+                self.stateChanged = True
+                self.penalized = True
+        else:
+            # I am not penalized.
+            if self.penalized:
+                self.stateChanged = True
+                self.penalized = False
 
-    def timeRemaining(self):
-        return self.timeLeft
-
-    def timeSincePlay(self):
-        return Constants.LENGTH_OF_HALF - self.timeLeft
-
-    def getScoreDifferential(self):
-        """
-        negative when we're losing
-        """
-        return 0
+        # If state has changed, tell player FSA to switch to new state
+        if self.stateChanged:
+            if self.penalized:
+                self.brain.player.switchTo('gamePenalized')
+            else:
+                if gameState.secondary_state != STATE2_PENALTYSHOOT:
+                    self.brain.player.switchTo(convertStateFormat[self.currentState])
+                else:
+                    self.brain.player.switchTo(convertStateFormatPenaltyShots[self.currentState])

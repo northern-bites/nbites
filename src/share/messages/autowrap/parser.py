@@ -7,7 +7,7 @@ name_word = Word(alphanums + '_')
 package_scopes = delimitedList(name_word, '.')
 package_declaration = 'package' + package_scopes.setResultsName('scopes') + ';'
 
-default_value_word = Word(alphanums + '_.\"\\ ')
+default_value_word = Word(alphanums + '-_.\"\\ ')
 default = Literal('[') + Literal('default') + Literal('=') + default_value_word + ']'
 
 field_flavors = [

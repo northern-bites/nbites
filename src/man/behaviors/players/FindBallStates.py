@@ -1,7 +1,6 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
-from ..playbook.PBConstants import GOALIE
-
+from objects import Location
 
 def findBall(player):
     """
@@ -28,14 +27,12 @@ def scanFindBall(player):
     State to move the head to find the ball. If we find the ball, we
     mppove to align on it. If we don't find it, we spin to keep looking
     """
-    player.brain.tracker.trackBallFixedPitch()
+    player.brain.tracker.trackBall()
 
     if transitions.shouldChaseBall(player):
         return player.goNow('findBall')
 
-    # a time based check. may be a problem for goalie. if it's not
-    # good for him to spin, he should prbly not be chaser anymore, so
-    # this wouldn't get reached
+    # a time based check.
     if transitions.shouldSpinFindBall(player):
         return player.goLater('spinFindBall')
 
@@ -48,23 +45,22 @@ def spinFindBall(player):
     """
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         return player.goNow('findBall')
 
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
-        my = player.brain.my
-        ball = player.brain.ball
-        spinDir = my.spinDirToPoint(ball.loc)
+        my = player.brain.loc
+        ball = Location(player.brain.ball.x, player.brain.ball.y)
+        spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
-        player.brain.tracker.spinPanFixedPitch()
+        player.brain.tracker.spinPan()
 
-    if not player.brain.play.isRole(GOALIE):
-        if transitions.shouldWalkFindBall(player):
-            return player.goLater('walkFindBall')
+    if transitions.shouldWalkFindBall(player):
+        return player.goLater('walkFindBall')
 
     return player.stay()
 
@@ -75,11 +71,11 @@ def walkFindBall(player):
     if player.firstFrame():
         player.stopWalking()
         # Do a slow pan
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.repeatWidePan()
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         return player.goNow('findBall')
 
     if player.brain.nav.isStopped():

@@ -33,8 +33,8 @@ def gamePlaying(player):
             player.brain.nav.stand()
 
     # if ball comes close enough, kick it away.
-    if player.brain.ball.vis.framesOn > 5 and \
-            player.brain.ball.vis.dist < 17:
+    if player.brain.ball.vis.frames_on > 5 and \
+            player.brain.ball.distance < 17:
         return player.goLater('kickBall')
 
     return player.stay()
@@ -45,7 +45,7 @@ def kickBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if player.brain.ball.loc.relY < 0:
+        if player.brain.ball.rel_y < 0:
             kick = SweetMoves.RIGHT_BIG_KICK
         else:
             kick = SweetMoves.LEFT_BIG_KICK
@@ -56,4 +56,3 @@ def kickBall(player):
         return player.goLater('gamePlaying')
 
     return player.stay()
-

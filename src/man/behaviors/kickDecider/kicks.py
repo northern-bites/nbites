@@ -89,7 +89,7 @@ RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.5, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
 def chooseAlignedKickFromKick(player, kick):
-    ballRelY = player.brain.ball.loc.relY
+    ballRelY = player.brain.ball.rel_y
     if (kick == LEFT_STRAIGHT_KICK or
         kick == RIGHT_STRAIGHT_KICK):
         if ballRelY > 0:

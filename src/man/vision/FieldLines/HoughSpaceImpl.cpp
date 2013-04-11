@@ -2,6 +2,9 @@
 #include <limits>
 
 using namespace std;
+
+namespace man {
+namespace vision {
 namespace HC = HoughConstants;
 
 const int HoughSpaceImpl::drTab[HC::peak_points] = {  1,  1,  0, -1 };
@@ -366,4 +369,7 @@ void HoughSpaceImpl::addPeak(uint16_t r, uint16_t t, uint16_t z)
     p.r = r;
     p.t = t;
     p.z = z;
+}
+
+}
 }

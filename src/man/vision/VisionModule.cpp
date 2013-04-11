@@ -74,6 +74,7 @@ void VisionModule::updateVisionBall() {
     ball_data.get()->set_angle_x_deg(vision->ball->getAngleXDeg());
     ball_data.get()->set_angle_y_deg(vision->ball->getAngleYDeg());
     ball_data.get()->set_bearing(vision->ball->getBearing());
+    ball_data.get()->set_bearing_deg(vision->ball->getBearingDeg());
     ball_data.get()->set_elevation_deg(vision->ball->getElevationDeg());
     ball_data.get()->set_distance_sd(vision->ball->getDistanceSD());
     ball_data.get()->set_bearing_sd(vision->ball->getBearingSD());
@@ -93,27 +94,29 @@ void VisionModule::updateVisionRobot() {
 
     portals::Message<messages::VisionRobot> robot_data(0);
 
-    messages::VisionRobot::Robot* red1 = robot_data.get()->mutable_red1();
+    messages::Robot* red1 = robot_data.get()->mutable_red1();
     updateRobot(red1, vision->red1);
-    messages::VisionRobot::Robot* red2 = robot_data.get()->mutable_red2();
+    messages::Robot* red2 = robot_data.get()->mutable_red2();
     updateRobot(red2, vision->red2);
-    messages::VisionRobot::Robot* red3 = robot_data.get()->mutable_red3();
+    messages::Robot* red3 = robot_data.get()->mutable_red3();
     updateRobot(red3, vision->red3);
 
-    messages::VisionRobot::Robot* navy1 = robot_data.get()->mutable_navy1();
+    messages::Robot* navy1 = robot_data.get()->mutable_navy1();
     updateRobot(navy1, vision->navy1);
-    messages::VisionRobot::Robot* navy2 = robot_data.get()->mutable_navy2();
+    messages::Robot* navy2 = robot_data.get()->mutable_navy2();
     updateRobot(navy2, vision->navy2);
-    messages::VisionRobot::Robot* navy3 = robot_data.get()->mutable_navy3();
+    messages::Robot* navy3 = robot_data.get()->mutable_navy3();
+
     updateRobot(navy3, vision->navy3);
 
     vision_robot.setMessage(robot_data);
 
 }
 
-void updateRobot(messages::VisionRobot::Robot* bot_, VisualRobot* visualRobot) {
+void updateRobot(messages::Robot* bot_, VisualRobot* visualRobot) {
 
     bot_->set_distance(visualRobot->getDistance());
+    bot_->set_bearing(visualRobot->getBearing());
     bot_->set_bearing_deg(visualRobot->getBearingDeg());
     bot_->set_angle_x_deg(visualRobot->getAngleXDeg());
     bot_->set_angle_y_deg(visualRobot->getAngleYDeg());
@@ -129,37 +132,40 @@ void VisionModule::updateVisionField() {
 
     portals::Message<messages::VisionField> field_data(0);
 
-    //setting lines info
-    // const std::vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
-    // for(std::vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
-    // 	i != visualLines->end(); i++)
-    // {
-    // 	messages::VisionField::VisualLine *visLine = field_data.get()->add_visual_line();
-    // 	visLine->mutable_visual_detection()->set_distance(i->getDistance());
-    // 	visLine->mutable_visual_detection()->set_bearing(i->getBearing());
-    // 	visLine->mutable_visual_detection()->set_distance_sd(i->getDistanceSD());
-    // 	visLine->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
-    // 	//we wont set concrete coords for the lines, since they are lines
-    // 	visLine->set_start_x(i->getStartPoint().x);
-    // 	visLine->set_start_y(i->getStartPoint().y);
-    // 	visLine->set_end_x(i->getEndPoint().x);
-    // 	visLine->set_end_y(i->getEndPoint().y);
-    // 	visLine->set_angle(i->getAngle());
-    // 	visLine->set_avg_width(i->getAvgWidth());
-    // 	visLine->set_length(i->getLength());
-    // 	visLine->set_slope(i->getSlope());
-    // 	visLine->set_y_int(i->getYIntercept());
-    // 	const std::vector<lineID> id_for_line = i->getIDs();
+    //	setting lines info
+    const std::vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
+    for(std::vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
+        i != visualLines->end(); i++)
+    {
+        messages::VisualLine *visLine = field_data.get()->add_visual_line();
+        visLine->mutable_visual_detection()->set_distance(i->get()->getDistance());
+        visLine->mutable_visual_detection()->set_bearing(i->get()->getBearing());
+        visLine->mutable_visual_detection()->set_distance_sd(i->get()->getDistanceSD());
+        visLine->mutable_visual_detection()->set_bearing_sd(i->get()->getBearingSD());
+        //we wont set concrete coords for the lines, since they are lines
+        visLine->set_start_x(i->get()->getStartpoint().x);
+        visLine->set_start_y(i->get()->getStartpoint().y);
+        visLine->set_end_x(i->get()->getEndpoint().x);
+        visLine->set_end_y(i->get()->getEndpoint().y);
+        visLine->set_angle(i->get()->getAngle());
+        visLine->set_avg_width(i->get()->getAvgWidth());
+        visLine->set_length(i->get()->getLength());
+        visLine->set_slope(i->get()->getSlope());
+        visLine->set_y_int(i->get()->getYIntercept());
+        const std::vector<lineID> id_for_line = i->get()->getIDs();
+        for (unsigned int k = 0; k < id_for_line.size(); k++) {
+            visLine->add_possibilities(id_for_line[k]);
+        }
 
-    // }
+    }
     //end lines info
 
     //setting the corner info
     std::list<VisualCorner>* visualCorners = vision->fieldLines->getCorners();
-    for(std::list<VisualCorner>::iterator i = visualCorners->begin(); 
+    for(std::list<VisualCorner>::iterator i = visualCorners->begin();
         i != visualCorners->end(); i++)
     {
-        messages::VisionField::VisualCorner *visCorner = field_data.get()->add_visual_corner();
+        messages::VisualCorner *visCorner = field_data.get()->add_visual_corner();
         visCorner->set_orientation(i->getOrientation());
         visCorner->set_corner_type(i->getShape());
         visCorner->set_physical_orientation(i->getPhysicalOrientation());
@@ -172,17 +178,23 @@ void VisionModule::updateVisionField() {
         for(std::list<const ConcreteCorner*>::const_iterator j = possible->begin();
             j != possible->end(); j++)
         {
-            messages::VisionField::Point *field_point = 
+            messages::Point *field_point =
                 visCorner->mutable_visual_detection()->add_concrete_coords();
-				
+
             field_point->set_x((**j).getFieldX());
             field_point->set_y((**j).getFieldY());
         }
-	
+
+        const std::vector<cornerID> p_id = i->getIDs();
+        for (unsigned int k = 0; k < p_id.size(); k++)
+        {
+            visCorner->add_poss_id(p_id[k]);
+        }
+
 
     }
     //end corner info
-		
+
     //setting goalpostleft info
     field_data.get()->mutable_goal_post_l()->set_height(vision->yglp->getHeight());
     field_data.get()->mutable_goal_post_l()->set_width(vision->yglp->getWidth());
@@ -191,15 +203,29 @@ void VisionModule::updateVisionField() {
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_bearing(vision->yglp->getBearing());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_bearing_deg(vision->yglp->getBearingDeg());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_distance_sd(vision->yglp->getDistanceSD());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_bearing_sd(vision->yglp->getBearingSD());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_on(vision->yglp->isOn());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_frames_on(vision->yglp->getFramesOn());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_frames_off(vision->yglp->getFramesOff());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_certainty(vision->yglp->getIDCertainty());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_red_goalie(vision->yglp->getRedGoalieCertain());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_navy_goalie(vision->yglp->getNavyGoalieCertain());
 
     const std::list<const ConcreteFieldObject *>* possible_l = vision->yglp->getPossibilities();
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_l->begin();
         i != possible_l->end(); i++)
     {
-        messages::VisionField::Point *field_point = 
+        messages::Point *field_point =
             field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
             add_concrete_coords();
 
@@ -216,15 +242,29 @@ void VisionModule::updateVisionField() {
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_bearing(vision->ygrp->getBearing());
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_bearing_deg(vision->ygrp->getBearingDeg());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_distance_sd(vision->ygrp->getDistanceSD());
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_bearing_sd(vision->ygrp->getBearingSD());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_on(vision->ygrp->isOn());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_frames_on(vision->ygrp->getFramesOn());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_frames_off(vision->ygrp->getFramesOff());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_certainty(vision->ygrp->getIDCertainty());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_red_goalie(vision->ygrp->getRedGoalieCertain());
+    field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+        set_navy_goalie(vision->ygrp->getNavyGoalieCertain());
 
     const std::list<const ConcreteFieldObject *>* possible_r = vision->ygrp->getPossibilities();
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_r->begin();
         i != possible_r->end(); i++)
     {
-        messages::VisionField::Point *field_point = 
+        messages::Point *field_point =
             field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
             add_concrete_coords();
 
@@ -253,7 +293,7 @@ void VisionModule::updateVisionField() {
     for (std::list<const ConcreteCross*>::const_iterator i = possible_cross->begin();
          i != possible_cross->end(); i++)
     {
-        messages::VisionField::Point *field_point =
+        messages::Point *field_point =
             field_data.get()->mutable_visual_cross()->add_concrete_coords();
 
         field_point->set_x((**i).getFieldX());
@@ -262,7 +302,6 @@ void VisionModule::updateVisionField() {
 
     vision_field.setMessage(field_data);
 }
-
 
 }
 }

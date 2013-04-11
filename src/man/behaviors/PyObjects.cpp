@@ -38,6 +38,7 @@ BOOST_PYTHON_MODULE(objects)
         .def(self + other<RelRobotLocation>())
         .def("relativeRobotLocationOf", &RobotLocation::getRelRobotLocationOf)
         .def("getRelativeBearing", &RobotLocation::getRelativeBearing)
+        .def("spinDirToPoint", &RobotLocation::spinDirToPoint)
         .def("__str__", &RobotLocation::toString)
         ;
 
@@ -146,5 +147,3 @@ void c_init_objects() {
         PyErr_Print();
     }
 }
-
-

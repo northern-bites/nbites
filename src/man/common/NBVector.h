@@ -1,5 +1,4 @@
-#ifndef NBVector_h
-#define NBVector_h
+#pragma once
 
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -19,4 +18,3 @@ namespace NBMath {
     typedef boost::numeric::ublas::vector <float> ufvector;
 
 }
-#endif //NBVector_h

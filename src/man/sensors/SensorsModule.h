@@ -15,9 +15,8 @@
 #include "RoboGrams.h"
 #include "SensorTypes.h"
 
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
 #include "ButtonState.pb.h"
-#include "FootBumperState.pb.h"
 #include "InertialState.pb.h"
 #include "SonarState.pb.h"
 #include "FSR.pb.h"
