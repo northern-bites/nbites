@@ -136,7 +136,6 @@ namespace balltrack
 
         // TODO - INCORPORATE FRICTION
 
-
         // Calculate the expected state
 
 
