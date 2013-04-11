@@ -137,7 +137,7 @@ void GuardianModule::checkFalling()
     if (fallingFrames > FALLING_FRAMES_THRESH)
     {
         // When falling, execute the fall protection method.
-        //cout << "GuardianModule::checkFalling() : FALLING!" << endl;
+        std::cout << "GuardianModule::checkFalling() : FALLING!" << std::endl;
         falling = true;
         //processFallingProtection(); // Should be called later in run_()
     }
@@ -436,7 +436,7 @@ void GuardianModule::processFallingProtection()
     {
         registeredFalling = false;
 
-        status.get()->set_falling(true);
+        status.get()->set_falling(false);
         fallStatusOutput.setMessage(status);
     }
     if (fallen)
