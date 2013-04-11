@@ -621,8 +621,6 @@ void GuardianModule::initialState()
 
 void GuardianModule::advanceState()
 {
-    std::cout << "Guardian::advanceState()" << std::endl;
-
     portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastAdvance);
     advanceStateOutput.setMessage(command);
@@ -632,8 +630,6 @@ void GuardianModule::advanceState()
 
 void GuardianModule::switchTeams()
 {
-    std::cout << "Guardian::switchTeams()" << std::endl;
-
     portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastTeamSwitch);
     switchTeamOutput.setMessage(command);
@@ -643,8 +639,6 @@ void GuardianModule::switchTeams()
 
 void GuardianModule::switchKickOff()
 {
-    std::cout << "Guardian::switchKickOff()" << std::endl;
-
     portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastKickOffSwitch);
     switchKickOffOutput.setMessage(command);
