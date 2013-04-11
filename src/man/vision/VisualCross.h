@@ -15,6 +15,9 @@
 
 // Values for the Standard Deviation calculations
 
+namespace man {
+namespace vision {
+
 class VisualCross : public VisualObject {
 
 public:
@@ -103,4 +106,6 @@ private: // Class Variables
 
 };
 
+}
+}
 #endif // VisualCross_hpp_defined

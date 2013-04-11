@@ -2,7 +2,7 @@
 # soccer-playing functionality
 #
 #
-from ..headTracking import HeadMoves
+from ..headTracker import HeadMoves
 from ..util import FSA
 from . import CoreSoccerStates
 
@@ -17,7 +17,6 @@ class SoccerFSA(FSA.FSA):
         self.setPrintStateChanges(True)
         # set printing to be done with colors
         self.stateChangeColor = 'red'
-        self.setPrintFunction(self.brain.out.printf)
 
         # for writing variance data only once per appropriate state
         self.wroteVarianceData = False
@@ -38,7 +37,7 @@ class SoccerFSA(FSA.FSA):
         if self.currentState == 'gamePenalized' or \
                self.currentState == 'gameFinished':
             if not self.wroteVarianceData:
-                self.brain.sensors.writeVarianceData()
+                #self.brain.sensors.writeVarianceData()
                 self.wroteVarianceData = True
         else:
             self.wroteVarianceData = False
@@ -89,13 +88,14 @@ class SoccerFSA(FSA.FSA):
     #     self.lastBall_x = self.brain.ball.loc.x
     #     self.lastBall_y = self.brain.ball.loc.y
 
-##### Direct Motion Calls
-    # def gainsOff(self):
-    #     """
-    #     Turn off the gains
-    #     """
-    #     freeze = motion.FreezeCommand()
-    #     self.brain.motion.sendFreezeCommand(freeze)
+    def gainsOff(self):
+        """
+        Turn off the gains
+        """
+        pass
+        # TODO send a message instead
+        freeze = motion.FreezeCommand()
+        self.brain.motion.sendFreezeCommand(freeze)
 
     # def gainsOn(self):
     #     """

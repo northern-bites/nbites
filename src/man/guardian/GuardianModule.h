@@ -12,9 +12,8 @@
 #include "ClickableButton.h"
 
 #include "RoboGrams.h"
-#include "JointAngles.pb.h"
+#include "PMotion.pb.h"
 #include "ButtonState.pb.h"
-#include "FootBumperState.pb.h"
 #include "InertialState.pb.h"
 #include "StiffnessControl.pb.h"
 #include "Toggle.pb.h"

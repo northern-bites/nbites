@@ -12,7 +12,7 @@ def process_message(message, known_messages, known_enums, scope_stack = []):
     other_wrapped_objects = []
 
     message_name = message.name
-    scoped_message_name = scope(message.name, scope_stack)
+    scoped_message_name = scoped_name(message.name, scope_stack)
     result += templates.MESSAGE_SCOPE
     scope_stack.append(message.name)
 
@@ -43,19 +43,18 @@ def process_enum(enum, scope_stack):
     result = ""
 
     enum_name = enum.name
-    scoped_enum_name = scope(enum.name, scope_stack)
+    scoped_enum_name = scoped_name(enum.name, scope_stack)
     result += templates.ENUM_DECLARATION % locals()
 
     for enum_field in enum.elements:
         enum_field_name = enum_field.name
-        enum_field_value = scope(enum_field_name, scope_stack)
+        enum_field_value = scoped_name(enum_field_name, scope_stack)
         result += templates.ENUM_FIELD % locals()
 
     result += templates.ENUM_DECLARATION_END
     return result
 
 def process_field(element, known_messages, known_enums, scope_stack):
-
     string_format = ""
 
     field_name = element.name.lower() # protoc converts fieldnames to lower
@@ -66,6 +65,7 @@ def process_field(element, known_messages, known_enums, scope_stack):
         if element.type in protobuf_defs.STRING_TYPES:
             string_format = templates.REPEATED_STRING
         elif element.type in known_enums:
+            field_type = scoped_name(element.type, scope_stack)
             string_format = templates.REPEATED_PRIMITIVE
         elif element.type in protobuf_defs.PRIMITIVE_TYPES:
             field_type = '::google::protobuf::' + field_type
@@ -87,7 +87,7 @@ def process_field(element, known_messages, known_enums, scope_stack):
 
     return string_format % locals()
 
-def scope(name, scope_list, delimiter = '::'):
+def scoped_name(name, scope_list, delimiter = '::'):
     return delimiter.join(scope_list + [name])
 
 def scoped_message_type(message, known_messages, scope_stack):

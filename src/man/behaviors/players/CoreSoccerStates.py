@@ -41,7 +41,7 @@ def gameReady(player):
     if player.firstFrame():
         player.stopWalking()
         player.stand()
-        player.brain.tracker.repeatWidePanFixedPitch()
+        player.brain.tracker.repeatWidePan()
     return player.stay()
 
 def gameSet(player):
@@ -50,7 +50,7 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.stopWalking()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
     return player.stay()
 
 def gamePlaying(player):

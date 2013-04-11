@@ -41,6 +41,9 @@ using namespace std;
 using namespace ::messages;
 using boost::shared_ptr;
 
+namespace man {
+namespace vision {
+
 static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
@@ -73,7 +76,7 @@ Vision::Vision()
 	pose = boost::shared_ptr<NaoPose>(new NaoPose());
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
-    thresh->setIm(&global_8_image[0]);
+	// thresh->setIm(&global_8_image[0]);
 }
 
 // Vision Class Deconstructor
@@ -97,7 +100,7 @@ Vision::~Vision()
 //DO NOT USE THIS FUNCTION - bende 4/3/2013
 void Vision::copyImage(const byte* image) {
     memcpy(&global_16_image[0], image, IMAGE_BYTE_SIZE);
-    thresh->setIm(&global_8_image[0]);
+    //thresh->setIm(&global_8_image[0]);
 }
 
 // void Vision::notifyImage(const uint16_t* y) {
@@ -160,8 +163,8 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
     vImg_bot = botVIm.pixelAddress(0, 0);
 
     // Set the current image pointer in Threshold
-    thresh->setIm(topThrIm.pixelAddress(0, 0));
-    thresh->setIm_bot(botThrIm.pixelAddress(0, 0));
+    thresh->setIm(topYIm.pixelAddress(0, 0));
+    thresh->setIm_bot(botYIm.pixelAddress(0, 0));
 
 
     // NORMAL VISION LOOP
@@ -194,7 +197,7 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
 
 //DO NOT USE THIS FUNCTION - bende 4/3/2013
 void Vision::setImage(uint8_t *image) {
-    thresh->setIm(image);
+//    thresh->setIm(image);
 }
 
 std::string Vision::getThreshColor(int _id) {
@@ -668,4 +671,8 @@ void Vision::drawVisualCorners(const vector<HoughVisualCorner>& corners)
         }
     }
 #endif
+}
+
+
+}
 }

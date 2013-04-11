@@ -11,22 +11,16 @@ def kickBallExecute(player):
     Kick the ball
     """
     if player.firstFrame():
-        player.brain.speech.say("Kick it")
-        player.brain.tracker.trackBallFixedPitch()
-
-        print "Performing " + str(player.kick)
-
-        #print "ball is at {0}, {1}".format(player.brain.ball.loc.relX,
-        #                                         player.brain.ball.loc.relY)
-    
+        player.brain.tracker.trackBall()
 
         kickBallExecute.sweetMove = player.kick.sweetMove
-        
+
         kickBallExecute.preKickDelay = 30
         return player.stay()
-    
-    kickBallExecute.preKickDelay-=1
-    
+
+    # wait a second for stability.
+    kickBallExecute.preKickDelay -= 1
+
     if kickBallExecute.preKickDelay == 0:
         player.executeMove(kickBallExecute.sweetMove)
         return player.stay()
@@ -73,7 +67,7 @@ def spinAfterBackKick(player):
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
-        player.brain.tracker.trackBallFixedPitch()
+        player.brain.tracker.trackBall()
         return player.goLater('chase')
 
     if player.firstFrame():
@@ -88,6 +82,6 @@ def spinAfterBackKick(player):
         else:
             player.setWalk(0, 0, -1*constants.FIND_BALL_SPIN_SPEED)
 
-        player.brain.tracker.spinPanFixedPitch()
+        player.brain.tracker.spinPan()
 
     return player.stay()

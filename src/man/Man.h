@@ -17,6 +17,13 @@
 #include "led/LedEnactorModule.h"
 #include "balltrack/BallTrackModule.h"
 #include "behaviors/BehaviorsModule.h"
+#include "jointenactor/JointEnactorModule.h"
+#include "newmotion/MotionModule.h"
+#include "gamestate/GameStateModule.h"
+#include "localization/LocalizationModule.h"
+
+#include <vector>
+
 
 namespace man {
 
@@ -33,6 +40,8 @@ private:
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
+    jointenactor::JointEnactorModule jointEnactor;
+    motion::MotionModule motion;
 
     DiagramThread guardianThread;
     guardian::GuardianModule guardian;
@@ -47,9 +56,11 @@ private:
     image::ImageConverterModule topConverter;
     image::ImageConverterModule bottomConverter;
     vision::VisionModule vision;
+    localization::LocalizationModule localization;
     balltrack::BallTrackModule ballTrack;
-    led::LedEnactorModule leds;
+    gamestate::GameStateModule gamestate;
     behaviors::BehaviorsModule behaviors;
+    led::LedEnactorModule leds;
 };
 
 }

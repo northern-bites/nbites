@@ -9,6 +9,8 @@
 #include "Common.h"
 #include "Structs.h"
 
+namespace man {
+namespace vision {
 
 // x, y coords are stored relative to image center (origin)
 struct AnglePeak {
@@ -195,5 +197,8 @@ public:
 private:
     Gradient(const Gradient& other);
 };
+
+}
+}
 
 #endif /* _Gradient_h_DEFINED */
