@@ -13,6 +13,9 @@
 
 #include "Structs.h"
 
+namespace man {
+namespace vision {
+
 // What is the certainty associated with the identification of the object
 enum certainty {
     NOT_SURE,
@@ -80,5 +83,7 @@ public:
     virtual const bool hasPositiveID() = 0;
 };
 
+}
+}
 
 #endif

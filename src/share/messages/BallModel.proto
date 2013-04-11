@@ -3,19 +3,22 @@ package messages;
 message VisionBall {
 	optional float distance = 1;
         optional float bearing = 2;
-        optional float bearing_deg = 3;
-        optional float angle_x_deg = 4;
-        optional float angle_y_deg = 5;
-        optional float elevation_deg = 6;
-        optional float distance_sd = 7;
-        optional float bearing_sd = 8;
-	optional bool inTopCam = 9;
-	optional float radius = 10;
-	optional int32 confidence = 11;
-	optional float heat = 12;
-	optional bool on = 13;
-	optional int32 frames_on = 14;
-	optional int32 frames_off = 15;
+
+        optional float angle_x_deg = 3;
+        optional float angle_y_deg = 4;
+        optional float elevation_deg = 5;
+        optional float distance_sd = 6;
+        optional float bearing_sd = 7;
+	optional bool inTopCam = 8;
+	optional float radius = 9;
+	optional sint32 confidence = 10;
+	optional float heat = 11;
+	optional bool on = 12;
+	optional sint32 frames_on = 13;
+	optional sint32 frames_off = 14;
+	optional float rel_x_variance = 16;
+	optional float rel_y_variance = 17;
+	optional float bearing_deg = 18;
 }
 
 message FilteredBall
@@ -23,9 +26,18 @@ message FilteredBall
 	optional VisionBall vis = 1;
 	optional float distance = 2;
 	optional float bearing = 3;
-        optional float bearing_deg = 4;
-        optional float x = 5;
-        optional float y = 6;
-	optional float rel_x = 7;
-	optional float rel_y = 8;
+
+	// State of best filter
+	optional float rel_x = 4;
+	optional float rel_y = 5;
+	optional float vel_x = 6;
+	optional float vel_y = 7;
+	optional float var_rel_x = 8;
+	optional float var_rel_y = 9;
+	optional float var_vel_x = 10;
+	optional float var_vel_y = 11;
+	optional bool  is_stationary = 12;
+	optional float bearing_deg = 13;
+        optional float x = 14;
+        optional float y = 15;
 }

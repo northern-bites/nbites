@@ -179,6 +179,7 @@ namespace man
         "LHand",
         "RWristYaw",
         "RHand",
+        "!!END!!",
         // TEMPS
         "HeadYawTemp",
         "HeadPitchTemp",
@@ -206,14 +207,21 @@ namespace man
         "RKneePitchTemp",
         "RAnklePitchTemp",
         "RAnkleRollTemp",
+        "!!END!!",
+        //FSRS
+        // left
         "LFsrFL",
         "LFsrFR",
         "LFsrRL",
         "LFsrRR",
+        "!!END!!",
+        // right
         "RFsrFL",
         "RFsrFR",
         "RFsrRL",
         "RFsrRR",
+        "!!END!!",
+        //INERTIALS
         "AccX",
         "AccY",
         "AccZ",
@@ -221,6 +229,8 @@ namespace man
         "GyrY",
         "AngleX",
         "AngleY",
+        "!!END!!",
+        //OTHERS
         "USLeft",
         "USRight",
         "LFootBumperLeft",
@@ -228,7 +238,8 @@ namespace man
         "RFootBumperLeft",
         "RFootBumperRight",
         "ChestboardButton",
-        "BatteryCharge"
+        "BatteryCharge",
+        "!!END!!"
     };
     } // namespace sensors
 } // namespace man

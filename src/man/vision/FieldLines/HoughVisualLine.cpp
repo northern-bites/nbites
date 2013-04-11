@@ -2,6 +2,9 @@
 using namespace std;
 #include <iostream>
 
+namespace man {
+namespace vision {
+
 bool HoughVisualLine::intersects(const HoughVisualLine& other,
                                  point<int>& out) const
 {
@@ -17,4 +20,7 @@ bool HoughVisualLine::intersects(const HoughVisualLine& other,
         out.y = (a.y + b.y + c.y + d.y)/4;
     }
     return allIntersecting;
+}
+
+}
 }

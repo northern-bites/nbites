@@ -42,6 +42,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 static const float CLOSE_DIST = 150.0f;  // box corner to post distance
 static const float FAR_DIST = 180.0f;    // corner of field to post
 static const float BOX_FUDGE = 10.0f;          // allow for errors
@@ -2891,4 +2894,7 @@ void ObjectFragments::drawBlob(Blob b, int c) {
                      b.getRightBottomX(), b.getRightBottomY(),
                      c);
 #endif
+}
+
+}
 }

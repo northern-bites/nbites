@@ -73,6 +73,7 @@ private:
 
     // Portals and interface
     PyInterface pyInterface;
+
 public:
     portals::InPortal<messages::GameState> gameStateIn;
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];

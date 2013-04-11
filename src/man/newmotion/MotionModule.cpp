@@ -53,6 +53,7 @@ void MotionModule::run_()
     bodyCommandInput_.latch();
     headCommandInput_.latch();
     requestInput_.latch();
+    fallInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -62,12 +63,6 @@ void MotionModule::run_()
     //     of the main motion loop.
     if(running)
     {
-        // std::cout << "current provider: "
-        //           << curProvider->getName()
-        //           << " next provider: "
-        //           << nextProvider->getName()
-        //           << std::endl;
-
         // (3) Do any necessary preprocessing of joint angles
         //     then actually compute next joints and
         //     stiffnesses.
@@ -281,6 +276,8 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
+    // (1) Guardian checks.
+
     // First check: is guardian turning stiffness off?
     if(stiffnessInput_.message().remove() && gainsOn)
     {
@@ -288,14 +285,33 @@ void MotionModule::processMotionInput()
         sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
         return;
     }
-    if(!stiffnessInput_.message().remove() && !gainsOn)
+    if(!stiffnessInput_.message().remove() && !gainsOn && !falling)
     {
         gainsOn = true;
         sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
         return;
     }
 
-    // (1) Process requests.
+    // Second check: does guardian detect the robot falling?
+    if(fallInput_.message().falling() && !falling)
+    {
+        falling = true;
+        gainsOn = false;
+        sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+        return;
+    }
+    if(!fallInput_.message().falling() && falling)
+    {
+        falling = false;
+    }
+
+    if(fallInput_.message().falling() && !fallInput_.message().fallen() && !gainsOn)
+    {
+        // Disallow any commands from being processed.
+        return;
+    }
+
+    // (2) Process requests.
     if(lastRequest != requestInput_.message().timestamp())
     {
         lastRequest = requestInput_.message().timestamp();
@@ -314,7 +330,7 @@ void MotionModule::processMotionInput()
         }
     }
 
-    // (2) Process body commands.
+    // (3) Process body commands.
     if(lastBodyCommand != bodyCommandInput_.message().timestamp())
     {
         lastBodyCommand = bodyCommandInput_.message().timestamp();
@@ -334,9 +350,11 @@ void MotionModule::processMotionInput()
         {
             sendMotionCommand(bodyCommandInput_.message().script());
         }
+        // Useful for falling purposes.
+        gainsOn = true;
     }
 
-    // (3) Process head commands.
+    // (4) Process head commands.
     if(lastHeadCommand != headCommandInput_.message().timestamp())
     {
         lastHeadCommand = headCommandInput_.message().timestamp();

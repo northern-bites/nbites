@@ -6,6 +6,8 @@
 
 SET_POOL_SIZE(messages::WorldModel,  15);
 SET_POOL_SIZE(messages::JointAngles, 15);
+SET_POOL_SIZE(messages::PackedImage16, 16);
+SET_POOL_SIZE(messages::RobotLocation, 16);
 
 namespace man {
 
@@ -64,6 +66,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     motion.bodyCommandInput_.wireTo(&behaviors.bodyMotionCommandOut, true);
     motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
     motion.requestInput_.wireTo(&behaviors.motionRequestOut, true);
+    motion.fallInput_.wireTo(&guardian.fallStatusOutput, true);
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
@@ -122,16 +125,16 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
     vision.topThrImage.wireTo(&topConverter.thrImage);
-	vision.topYImage.wireTo(&topConverter.yImage);
-	vision.topUImage.wireTo(&topConverter.uImage);
-	vision.topVImage.wireTo(&topConverter.vImage);
+    vision.topYImage.wireTo(&topConverter.yImage);
+    vision.topUImage.wireTo(&topConverter.uImage);
+    vision.topVImage.wireTo(&topConverter.vImage);
 
-	vision.botThrImage.wireTo(&bottomConverter.thrImage);
-	vision.botYImage.wireTo(&bottomConverter.yImage);
-	vision.botUImage.wireTo(&bottomConverter.uImage);
-	vision.botVImage.wireTo(&bottomConverter.vImage);
+    vision.botThrImage.wireTo(&bottomConverter.thrImage);
+    vision.botYImage.wireTo(&bottomConverter.yImage);
+    vision.botUImage.wireTo(&bottomConverter.uImage);
+    vision.botVImage.wireTo(&bottomConverter.vImage);
 
-	vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
+    vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
     cognitionThread.addModule(ballTrack);
@@ -142,6 +145,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     localization.resetInput.wireTo(&behaviors.resetLocOut, true);
 
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+    ballTrack.odometryInput.wireTo(&motion.odometryOutput_);
     ballTrack.localizationInput.wireTo(&localization.output);
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);

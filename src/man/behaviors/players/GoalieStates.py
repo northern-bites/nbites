@@ -122,14 +122,10 @@ def kickBall(player):
         else:
             VisualStates.returnToGoal.kickPose.relX += \
                 player.brain.interface.odometry.x
-            VisualStates.returnToGoal.kickPose.relX += \
+            VisualStates.returnToGoal.kickPose.relY += \
                 player.brain.interface.odometry.y
-            VisualStates.returnToGoal.kickPose.relX += \
+            VisualStates.returnToGoal.kickPose.relH += \
                 player.brain.interface.odometry.h
-
-        VisualStates.returnToGoal.kickPose.relX = 0
-        VisualStates.returnToGoal.kickPose.relX = 0
-        VisualStates.returnToGoal.kickPose.relX = 0
 
         player.brain.tracker.trackBall()
 
@@ -145,7 +141,7 @@ def saveIt(player):
         player.brain.tracker.lookToAngle(0)
         player.executeMove(SweetMoves.GOALIE_SQUAT)
         player.isSaving = False
-        player.brain.fallController.enableFallProtection(False)
+        #player.brain.fallController.enableFallProtection(False)
     if (not player.motion.isBodyActive() and not player.isSaving):
         player.squatTime = time.time()
         player.isSaving = True
