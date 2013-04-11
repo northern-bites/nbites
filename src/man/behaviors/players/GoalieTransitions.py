@@ -123,7 +123,7 @@ def onThisSideline(player):
             if ((vision.visual_corner(i).poss_id(j) ==
                  vision.visual_corner(i).corner_id.CENTER_TOP_T) or
                 (vision.visual_corner(i).poss_id(j) ==
-                 vision.visual_corner(i).corner_id.CENTER_BOTTOM_)):
+                 vision.visual_corner(i).corner_id.CENTER_BOTTOM_T)):
               return True
     return ((player.brain.ygrp.on and
              #magic numbers
