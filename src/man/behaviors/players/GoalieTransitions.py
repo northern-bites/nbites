@@ -117,11 +117,14 @@ def onThisSideline(player):
     Looks for a T corner or far goals to determine which sideline it's
     standing on.
     """
-    # FIGURE OUT CORNERS
-     # for corner in player.brain.interface.visionField.visual_corner:
-     #     if ( (IDs.CENTER_TOP_T in corner.possibilities) or
-     #          (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
-     #         return True
+    vision = player.brain.interface.visionField
+    for i in range(0, vision.visual_corner_size()):
+        for j in range(0, vision.visual_corner(i).poss_id_size()):
+            if ((vision.visual_corner(i).poss_id(j) ==
+                 vision.visual_corner(i).corner_id.CENTER_TOP_T) or
+                (vision.visual_corner(i).poss_id(j) ==
+                 vision.visual_corner(i).corner_id.CENTER_BOTTOM_)):
+              return True
     return ((player.brain.ygrp.on and
              #magic numbers
              player.brain.ygrp.distance > 100.0) or
