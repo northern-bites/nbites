@@ -47,10 +47,9 @@ def updatePostObservations(player):
                 print "  Avg left y is now " + str(player.system.leftPostRelY())
 
 def updateCrossObservations(player):
-    if(player.brain.vision.cross.on and
-       player.brain.vision.cross.distance != 0.0):
-        player.system.pushCrossObservation(player.brain.vision.cross.distance,
-                                           player.brain.vision.cross.bearing)
+    cross = player.brain.interface.visionField.visual_cross
+    if(cross.on and cross.distance != 0.0):
+        player.system.pushCrossObservation(cross.distance,cross.bearing)
 
 def spinToFaceGoal(player):
     if player.firstFrame():

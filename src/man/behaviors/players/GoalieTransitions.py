@@ -43,6 +43,8 @@ def foundACorner(player):
     """
     Loops through corners to find a visible goalbox corner.
     """
+    return False
+
     # FIGURE THIS OUT
     # if player.brain.vision.fieldLines.numCorners == 0:
     #     return False
@@ -64,8 +66,6 @@ def foundACorner(player):
     #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_RIGHT_L
     #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
     #         return True
-
-    return False
 
 def lostCorner(player):
     """
@@ -97,10 +97,10 @@ def facingForward(player):
     if it is in the goal.
     """
     #magic numbers
-    return (player.brain.interface.visionField.visual_field_edge.distance_m > 800.0)
-# WE NEED VISUAL CROSSES
-#            or (fabs(player.brain.vision.cross.bearing) < 10.0 and
-#             player.brain.vision.cross.on))
+    vision = player.brain.interface.visionField
+    return (vision.visual_field_edge.distance_m > 800.0
+            or(fabs(vision.visual_cross.bearing) < 10.0 and
+               vision.visual_cross.distance > 0.0))
 
 def facingBall(player):
     """
@@ -116,10 +116,10 @@ def onThisSideline(player):
     standing on.
     """
     # FIGURE OUT CORNERS
-    # for corner in player.brain.vision.fieldLines.corners:
-    #     if ( (IDs.CENTER_TOP_T in corner.possibilities) or
-    #          (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
-    #         return True
+     # for corner in player.brain.interface.visionField.visual_corner:
+     #     if ( (IDs.CENTER_TOP_T in corner.possibilities) or
+     #          (IDs.CENTER_BOTTOM_T in corner.possibilities) ) :
+     #         return True
     return ((player.brain.ygrp.on and
              #magic numbers
              player.brain.ygrp.distance > 100.0) or
