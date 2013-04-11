@@ -285,7 +285,7 @@ void MotionModule::processMotionInput()
         sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
         return;
     }
-    if(!stiffnessInput_.message().remove() && !gainsOn)
+    if(!stiffnessInput_.message().remove() && !gainsOn && !falling)
     {
         gainsOn = true;
         sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
@@ -293,11 +293,21 @@ void MotionModule::processMotionInput()
     }
 
     // Second check: does guardian detect the robot falling?
-    if(fallInput_.message().falling() && gainsOn)
+    if(fallInput_.message().falling() && !falling)
     {
-        std::cout << "falling!" << std::endl;
+        falling = true;
         gainsOn = false;
         sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+        return;
+    }
+    if(!fallInput_.message().falling() && falling)
+    {
+        falling = false;
+    }
+
+    if(fallInput_.message().falling() && !fallInput_.message().fallen() && !gainsOn)
+    {
+        // Disallow any commands from being processed.
         return;
     }
 
@@ -340,6 +350,8 @@ void MotionModule::processMotionInput()
         {
             sendMotionCommand(bodyCommandInput_.message().script());
         }
+        // Useful for falling purposes.
+        gainsOn = true;
     }
 
     // (4) Process head commands.
