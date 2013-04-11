@@ -6,7 +6,6 @@
 
 import GoalieConstants as goalCon
 from math import fabs
-#from vision import cornerID as IDs
 import VisualGoalieStates
 from objects import RelRobotLocation
 
@@ -43,29 +42,32 @@ def foundACorner(player):
     """
     Loops through corners to find a visible goalbox corner.
     """
-    return False
+    vision = player.brain.interface.visionField
+    if vision.visual_corner_size() == 0:
+        return False
 
-    # FIGURE THIS OUT
-    # if player.brain.vision.fieldLines.numCorners == 0:
-    #     return False
+    for i in range(0, vision.visual_corner_size()):
+        for j in range(0, vision.visual_corner(i).poss_id_size()):
+            if (vision.visual_corner(i).poss_id(j) ==
+                vision.visual_corner(i).corner_id.YELLOW_GOAL_LEFT_L):
+                if (vision.visual_corner(i).orientation < 0 and
+                    vision.visual_corner(i).visual_detection.bearing > 0):
+                    VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = \
+                        vision.visual_corner(i).corner_id.YELLOW_GOAL_LEFT_L
+                    VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = \
+                        vision.visual_corner(i).visual_detection.bearing
+                    return True
+            if (vision.visual_corner(i).poss_id(j) ==
+                vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L):
+                if(vision.visual_corner(i).orientation > 0 and
+                   vision.visual_corner(i).visual_detection.bearing < 0):
+                    VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = \
+                        vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L
+                    VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = \
+                        vision.visual_corner(i).visual_detection.bearing
+                    return True
 
-    # # Throw away false positives from the net!
-    # if player.brain.vision.fieldEdge.centerDist < 110.0:
-    #     return False
-
-    # for corner in player.brain.vision.fieldLines.corners:
-    #     if (IDs.YELLOW_GOAL_LEFT_L in corner.possibilities and
-    #         corner.visualOrientation < 0 and
-    #         corner.bearing > 0):
-    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_LEFT_L
-    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
-    #         return True
-    #     elif (IDs.YELLOW_GOAL_RIGHT_L in corner.possibilities and
-    #           corner.visualOrientation > 0 and
-    #           corner.bearing < 0):
-    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerID = IDs.YELLOW_GOAL_RIGHT_L
-    #         VisualGoalieStates.centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
-    #         return True
+        return False
 
 def lostCorner(player):
     """
@@ -141,7 +143,7 @@ def shouldPerformSave(player):
     """
     Checks that the ball is moving toward it and close enough to save.
     """
-    return (player.brain.ball.loc.relVelX < -50.0 and
+    return (player.brain.ball.vel_x < -50.0 and
             player.brain.ball.vis.frames_on > 4)
 
 def facingSideways(player):

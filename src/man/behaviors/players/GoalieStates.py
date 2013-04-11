@@ -141,7 +141,7 @@ def saveIt(player):
         player.brain.tracker.lookToAngle(0)
         player.executeMove(SweetMoves.GOALIE_SQUAT)
         player.isSaving = False
-        player.brain.fallController.enableFallProtection(False)
+        #player.brain.fallController.enableFallProtection(False)
     if (not player.motion.isBodyActive() and not player.isSaving):
         player.squatTime = time.time()
         player.isSaving = True
