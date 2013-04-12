@@ -38,13 +38,14 @@ void ImageConverterModule::run_()
 
     const YUVImage& yuv = imageIn.message();
 
-    /* This assembly method below is not general, it assumes the input image is of size 1280x480, 
-       therefore we make no attempt to keep this run_ method general, as only a 1280x480 image
-       will be processed correctly.
-       IMPORTANT imageIn must be of size 1280x480. */
-    HeapPixelBuffer *tempBuffer = new HeapPixelBuffer(614400);
-    PackedImage16 tempOutput16(tempBuffer, 320, 840, 320);
-    PackedImage8 tempOutput8(tempBuffer, 640, 840, 640);
+    /* This assembly method below is not general, it assumes the input image is
+       of size 640x480, therefore we make no attempt to keep this run_ method
+       general, as only a 640x480 image will be processed correctly.
+       IMPORTANT imageIn must be of size 640x480. */
+    // Temp buffer holds three 320x240 16-bit images and one 320x240 8-bit image
+    HeapPixelBuffer *tempBuffer = new HeapPixelBuffer(320*240*2*3 + 320*240);
+    PackedImage16 tempOutput16(tempBuffer, 320, 3*240, 320);
+    PackedImage8 tempOutput8(tempBuffer, 320, (3*2 + 1)*240, 320);
 
     ImageAcquisition::acquire_image_fast(table,
                                          params,
@@ -60,7 +61,7 @@ void ImageConverterModule::run_()
     image = tempOutput16.window(0, 480, 320, 240);
     vImage.setMessage(Message<PackedImage16>(&image));
 
-    ThresholdImage thr = tempOutput8.window(0, 720, 320, 120);
+    ThresholdImage thr = tempOutput8.window(0, 3*2*240, 320, 240);
     thrImage.setMessage(Message<ThresholdImage>(&thr));
 }
 
