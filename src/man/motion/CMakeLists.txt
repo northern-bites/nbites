@@ -1,150 +1,33 @@
+cmake_minimum_required(VERSION 2.8.3)
 
+# Set source files here that need to be compiled.
+set(MOTION_SRCS MotionModule
+                NullProvider
+		BaseFreezeCommand
+		BodyJointCommand
+		ChoppedCommand
+		SmoothChoppedCommand
+		LinearChoppedCommand
+		ChopShop
+		ScriptedProvider
+		HeadJointCommand
+		HeadProvider)
 
-############################ PROJECT NAME
-# The name of this cmake project
-PROJECT( MOTION )
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
+include_directories( bhwalk )
 
-############################ BASE DEFINITIONS
-# Include  the basic definitions accross all projects
-INCLUDE( ../cmake/base_definitions.cmake )
+add_subdirectory( bhwalk )
 
-
-############################ FIND PACKAGE
-# Libraries specifics. Define here cmake packages
-# usefull to your project
-#FIND_PACKAGE( Threads  REQUIRED )
-FIND_PACKAGE( PythonLibs   REQUIRED )
-FIND_PACKAGE( Boost COMPONENTS python REQUIRED )
-
-include( ../cmake/FindALCOMMON.cmake )
-
-
-############################ BUILDCONFIG
-# Include the config file for this build
-INCLUDE( ${MOTION_CMAKE_DIR}/buildconfig.cmake )
-
-
-############################ CONFIG.H GENERATION
-CONFIGURE_FILE(
-  ${MOTION_CMAKE_DIR}/motionconfig.in
-  ${CFG_DIR}/motionconfig.h
-  ESCAPE_QUOTES
-  )
-
-############################ DEFINITIONS
-# Add here definition needed.
-ADD_DEFINITIONS(
-               ${CMAKE_THREAD_LIBS_INIT}
-                )
-
-
-############################ INCLUDE DIRECTORY
-# Define include directories
-INCLUDE_DIRECTORIES( ${NBCOMMON_INCLUDE_DIR}
-                     ${ALCOMMON_INCLUDE_DIR}
-                     ${PYTHON_INCLUDE_PATH}
-                     ${CORPUS_INCLUDE_DIR}
-		             ${CFG_DIR}
-		             )
-
-
-############################ PROJECT SOURCES FILES
-# Add here source files needed to compile this project
-SET( MOTION_SRCS
-  #CallbackAction
-                     BodyJointCommand
-		     HeadJointCommand
-		     JointCommand
-		     MotionCommand
-                     MotionConstants
-                     Motion
-                     MotionInterface
-		     MotionSwitchboard
-		     ScriptedProvider
-		     ChoppedCommand
-		     LinearChoppedCommand
-		     SmoothChoppedCommand
-		     PreviewChoppedCommand
-		     COMPreview
-		     BalancingChoppedCommand
-		     BaseFreezeCommand
-		     HeadProvider
-		     ChopShop
-		     NullProvider
-		     WalkProvider
-		     Step
-		     Gait
-		     AbstractGait
-		     MetaGait
-		     SensorAngles
-		     SpringSensor
-		     WalkingLeg
-		     OdometryFilter
-		     WalkingArm
-		     BalancingArm
-		     PreviewController
-		     Observer
-		     ZmpExp
-		     ZmpAccExp
-		     ZmpEKF
-		     ZmpAccEKF
-		     StepGenerator
-                     ${CORPUS_INCLUDE_DIR}/InverseKinematics
-                     ${CORPUS_INCLUDE_DIR}/COMKinematics
-                     PyMotion
-                     )
-
-SET( MOTION_PYTHON_SRCS __init__.py
-                        MotionConstants.py
-                        SweetMoves.py
-                        HeadMoves.py
-                        RobotGaits.py
-                        StiffnessModes.py
-                        )
-
-SET( MOTION_PYTHON_SUBDIRS gaits )
-
-
-############################ CHECK LIBRARY / EXECUTABLE OPTION
-# Configure the output execuatable or shared library, and the install
-# commands
-
-GET_TARGET_PROPERTY( MOTION_LOCATION ${MOTION_TARGET} LOCATION )
-
-ADD_LIBRARY(
-  ${MOTION_TARGET}
+# Add project as a library.
+add_library(
+  motion
   STATIC
   ${MOTION_SRCS}
-  )
+)
 
-INSTALL(
-  FILES ${MOTION_PYTHON_SRCS}
-  DESTINATION ${MOTION_PYTHON_TARGET_DIR}
-  CONFIGURATIONS "" Debug Release
-  )
-
-INSTALL(
-  DIRECTORY ${MOTION_PYTHON_SUBDIRS}
-  DESTINATION ${MOTION_PYTHON_TARGET_DIR}/
-  CONFIGURATIONS "" Debug Release
-  PATTERN "*.py"
-  )
-
-############################ SET LIBRARIES TO LINK WITH
-TARGET_LINK_LIBRARIES(
-  ${MOTION_TARGET}
-  ${PYTHON_LIBRARY}
-  ${SENSORS_TARGET}
-  ${Boost_PYTHON_LIBRARY}
+# Link project to appropriate libraries.
+target_link_libraries(motion
+  portals
+  messages
+  common
   bhwalk
-  )
-
-
-############################ (SUB)DIRECTORY COMPILATION
-# Set the sudirectories (some may not actually be subdirectories) to
-# include in this package
-add_subdirectory( bhwalk )
-#SUBDIRS(
-#  ${CORPUS_CMAKE_DIR}
-#  )
+)
