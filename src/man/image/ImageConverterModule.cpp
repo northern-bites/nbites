@@ -97,5 +97,10 @@ void ImageConverterModule::initTable(const std::string& filename)
     fclose(fp);
 }
 
+void ImageConverterModule::initTable(unsigned char* otherTable)
+{
+    table = otherTable;
+}
+
 }
 }

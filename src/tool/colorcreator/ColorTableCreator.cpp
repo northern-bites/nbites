@@ -15,10 +15,17 @@ namespace color {
 
 ColorTableCreator::ColorTableCreator(QWidget *parent) :
     QWidget(parent),
+    bottomImageIn(&bottomConverter.imageIn),
+    topImageIn(&topConverter.imageIn),
     currentCamera(Camera::TOP),
     topConverter(Camera::TOP),
     bottomConverter(Camera::BOTTOM)
 {
+    // BACKEND
+    subdiagram.addModule(topConverter);
+    subdiagram.addModule(bottomConverter);
+
+    // GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
     QHBoxLayout* leftLayout = new QHBoxLayout;
 
@@ -64,6 +71,14 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
 	setLayout(mainLayout);
 }
 
+void ColorTableCreator::run_()
+{
+    bottomImageIn->latch();
+    topImageIn->latch();
+
+    updateThresholdedImage();
+}
+
 void ColorTableCreator::loadColorTable()
 {
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
@@ -86,10 +101,10 @@ void ColorTableCreator::saveColorTable()
 
 void ColorTableCreator::updateThresholdedImage()
 {
-    // imageTranscribe->initTable(colorTable.getTable());
-    // imageTranscribe->acquireNewImage();
-	// thresholdedImageViewer->updateView(0);
-    // this->updateColorStats();
+    topConverter.initTable(colorTable.getTable());
+    bottomConverter.initTable(colorTable.getTable());
+    subdiagram.run();
+    updateColorStats();
 }
 
 void ColorTableCreator::updateColorStats()

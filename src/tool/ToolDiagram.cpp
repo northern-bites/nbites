@@ -128,6 +128,8 @@ void ToolDiagram::addUnloggers(std::vector<std::string> paths)
             std::cout << "Created Unlogger for file " <<  *i << std::endl;
         }
     }
+
+    emit signalUnloggersReady();
 }
 
 }

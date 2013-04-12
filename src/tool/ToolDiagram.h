@@ -59,6 +59,7 @@ public:
 
 signals:
     void signalNewDisplayWidget(QWidget*, std::string);
+    void signalUnloggersReady();
 
 public slots:
     void runForward();

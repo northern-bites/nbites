@@ -95,5 +95,6 @@ target_link_libraries(
   logview
   image_display
   image # man image
+  colorcreator
   ${QT_LIBRARIES}
   )

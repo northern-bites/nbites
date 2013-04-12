@@ -59,8 +59,9 @@ public:
 
     void paintStroke(const BrushStroke& brushStroke);
 
-    portals::InPortal<messages::YUVImage> bottomImageIn;
-    portals::InPortal<messages::YUVImage> topImageIn;
+    // These are just pointers to the converter modules' InPortals
+    portals::InPortal<messages::YUVImage>* bottomImageIn;
+    portals::InPortal<messages::YUVImage>* topImageIn;
 
 protected slots:
     void loadColorTable();
