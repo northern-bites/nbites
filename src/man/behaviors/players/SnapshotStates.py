@@ -22,6 +22,8 @@ def gamePlaying(player):
     if player.firstFrame():
         player.brain.tracker.repeatBasicPan()
 
+    return player.stay()
+
 def gamePenalized(player):
 #    if player.firstFrame():
 #        player.executeMove(SweetMoves.SIT_POS)
