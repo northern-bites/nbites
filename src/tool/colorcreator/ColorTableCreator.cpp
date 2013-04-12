@@ -206,8 +206,10 @@ void ColorTableCreator::imageTabSwitched(int)
 {
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;
+        thrDisplay.imageIn.wireTo(&topConverter.thrImage);
     } else {
         currentCamera = Camera::BOTTOM;
+        thrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
     }
 }
 

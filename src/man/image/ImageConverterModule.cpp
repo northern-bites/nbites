@@ -40,11 +40,11 @@ void ImageConverterModule::run_()
 
     /* This assembly method below is not general, it assumes the input image is of size 1280x480, 
        therefore we make no attempt to keep this run_ method general, as only a 1280x480 image
-       will be processed correctly. 
+       will be processed correctly.
        IMPORTANT imageIn must be of size 1280x480. */
     HeapPixelBuffer *tempBuffer = new HeapPixelBuffer(614400);
     PackedImage16 tempOutput16(tempBuffer, 320, 840, 320);
-    PackedImage8 tempOutput8(tempBuffer, 320, 840, 320);
+    PackedImage8 tempOutput8(tempBuffer, 640, 840, 640);
 
     ImageAcquisition::acquire_image_fast(table,
                                          params,
