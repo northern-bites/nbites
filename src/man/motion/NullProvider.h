@@ -7,16 +7,21 @@
 #include "FreezeCommand.h"
 #include "UnfreezeCommand.h"
 
-#include "Sensors.h"
-#include "Kinematics.h"
-
-class NullProvider : public MotionProvider {
+namespace man
+{
+namespace motion
+{
+class NullProvider : public MotionProvider
+{
 public:
-    NullProvider(boost::shared_ptr<Sensors> s,
-                 const bool chain_mask[Kinematics::NUM_CHAINS]);
+    NullProvider(const bool chain_mask[Kinematics::NUM_CHAINS]);
     virtual ~NullProvider();
 
-    void calculateNextJointsAndStiffnesses();
+    void calculateNextJointsAndStiffnesses(
+        std::vector<float>&            sensorAngles,
+        const messages::InertialState& sensorInertials,
+        const messages::FSR&           sensorFSRs
+        );
     void hardReset(){} //Not implemented
 
     void setCommand(const boost::shared_ptr<FreezeCommand> command);
@@ -28,13 +33,13 @@ protected:
 private:
     void readNewStiffness();
 private:
-    boost::shared_ptr<Sensors> sensors;
     std::vector<float> nextStiffness,lastStiffness;
     bool chainMask[Kinematics::NUM_CHAINS];
-    mutable pthread_mutex_t null_provider_mutex;
     bool frozen, freezingOn, freezingOff, newCommand;
     bool doOnce;
     boost::shared_ptr<BaseFreezeCommand> nextCommand;
 };
+} // namespace motion
+} // namespace man
 
 #endif

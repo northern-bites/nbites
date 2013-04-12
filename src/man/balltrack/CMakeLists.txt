@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
 
-# Project name.
-project(balltrack)
-
-# Include directories.
-#include_directories( ... )
-
 # Set source files here that need to be compiled.
 set(BALLTRACK_SRCS BallTrackModule
 #                   NaiveBallFilter
@@ -23,10 +17,10 @@ add_library(
 
 # Link project to appropriate libraries.
 target_link_libraries(balltrack
-                      common
+                      support
 		      portals
 		      messages
-		      ${PROTOS_TARGET})
+		      )
 
 # if offline on, then we're prob running unit tests
 IF ( OFFLINE )
