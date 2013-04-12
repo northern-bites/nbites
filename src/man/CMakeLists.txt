@@ -87,7 +87,7 @@ endif()
 # Actual subdirectories
 add_subdirectory( common )
 include_directories( common )
-include_directories( newmotion/bhwalk ) # @todo hack?
+include_directories( motion/bhwalk ) # @todo hack?
 
 # Actual modules
 add_subdirectory( audio )
@@ -101,7 +101,7 @@ add_subdirectory( led )
 add_subdirectory( log )
 add_subdirectory( sensors )
 add_subdirectory( vision )
-add_subdirectory( newmotion )
+add_subdirectory( motion )
 add_subdirectory( jointenactor )
 add_subdirectory( localization )
 

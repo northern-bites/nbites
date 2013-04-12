@@ -18,7 +18,7 @@
 #include "balltrack/BallTrackModule.h"
 #include "behaviors/BehaviorsModule.h"
 #include "jointenactor/JointEnactorModule.h"
-#include "newmotion/MotionModule.h"
+#include "motion/MotionModule.h"
 #include "gamestate/GameStateModule.h"
 #include "localization/LocalizationModule.h"
 
