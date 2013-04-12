@@ -85,8 +85,8 @@ add_dependencies(messages protobuf_libs)
 endif()
 
 # Actual subdirectories
-add_subdirectory( common )
-include_directories( common )
+add_subdirectory( support )
+include_directories( support )
 include_directories( motion/bhwalk ) # @todo hack?
 
 # Actual modules
@@ -122,7 +122,7 @@ target_link_libraries(
   balltrack
   behaviors
   comm
-  common
+  support
   guardian
   jointenactor
   motion

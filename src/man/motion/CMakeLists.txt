@@ -28,6 +28,6 @@ add_library(
 target_link_libraries(motion
   portals
   messages
-  common
+  support
   bhwalk
 )

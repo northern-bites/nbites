@@ -53,7 +53,7 @@ add_library(
 
 target_link_libraries(
     bhwalk
-    common
+    support
     messages
     portals
 )

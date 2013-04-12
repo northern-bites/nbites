@@ -15,7 +15,7 @@ set( COMMON_SRCS NBMath
   )
 
 add_library(
-  common
+  support
   STATIC
   ${COMMON_SRCS}
 )
