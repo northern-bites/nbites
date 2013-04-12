@@ -5,6 +5,7 @@
 #include "Color.h"
 #include <QLabel>
 #include <QImage>
+#include <QMouseEvent>
 
 namespace tool {
 namespace image {
@@ -47,8 +48,6 @@ public:
 
     ChannelType getChannelType() { return channel; }
     std::string getChannelLabel() { return ChannelType_label[channel]; }
-    int width() { return imageIn.message().width(); }
-    int height() { return imageIn.message().height(); }
 
 protected:
     virtual void run_();
@@ -57,6 +56,32 @@ protected:
 
     ChannelType channel;
 };
+
+class ImageDisplayListener: public ImageDisplayModule {
+    Q_OBJECT;
+
+    static const int DEFAULT_BRUSH_SIZE = 10;
+
+public:
+    ImageDisplayListener(QWidget *parent = 0);
+
+    void mouseReleaseEvent ( QMouseEvent *event);
+    // Scroll up or down to increase or decrease brush size
+    void wheelEvent(QWheelEvent* event);
+    void setBrushColor(QColor _brushColor) { brushColor = _brushColor; updateBrushCursor();}
+    int getBrushSize() { return brushSize; }
+
+signals:
+    void mouseClicked(int x, int y, int brushSize, bool leftClick);
+
+private:
+    void updateBrushCursor();
+
+private:
+    QColor brushColor;
+    int brushSize;
+};
+
 
 }
 }

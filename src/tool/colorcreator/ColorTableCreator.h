@@ -17,6 +17,7 @@
 
 #include "RoboGrams.h"
 #include "image/ImageConverterModule.h"
+#include "image/ImageDisplayModule.h"
 #include "Camera.h"
 #include "Images.h"
 #include "PathConfig.h"
@@ -60,8 +61,8 @@ public:
     void paintStroke(const BrushStroke& brushStroke);
 
     // These are just pointers to the converter modules' InPortals
-    portals::InPortal<messages::YUVImage>* bottomImageIn;
-    portals::InPortal<messages::YUVImage>* topImageIn;
+    portals::InPortal<messages::YUVImage> bottomImageIn;
+    portals::InPortal<messages::YUVImage> topImageIn;
 
 protected slots:
     void loadColorTable();
@@ -86,6 +87,12 @@ private:
     // Modules
     man::image::ImageConverterModule topConverter;
     man::image::ImageConverterModule bottomConverter;
+    image::ImageDisplayListener topDisplay;
+    image::ImageDisplayListener bottomDisplay;
+
+    // So that multiple things in this module can connect to these
+    portals::OutPortal<messages::YUVImage> bottomImage;
+    portals::OutPortal<messages::YUVImage> topImage;
 
     QLabel* colorStats;
     QComboBox colorSelect;

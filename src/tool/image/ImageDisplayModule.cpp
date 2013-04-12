@@ -18,6 +18,11 @@ void ImageDisplayModule::run_()
 
 QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel)
 {
+    // This makes the clicking work properly for listener
+    // Kind of a hack
+    this->setFixedWidth(imageIn.message().width()/2);
+    this->setFixedHeight(imageIn.message().height());
+
     messages::MemoryImage8 yImg = imageIn.message().yImage();
     messages::MemoryImage8 uImg = imageIn.message().uImage();
     messages::MemoryImage8 vImg = imageIn.message().vImage();
@@ -25,10 +30,10 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel)
     QImage image(yImg.width(), yImg.height(), QImage::Format_RGB32);
     Color c;
 
-	for (int j = 0; j < height(); j++)
+	for (int j = 0; j < imageIn.message().height(); j++)
     {
 	    rgb_value* qImageLine = (rgb_value*) (image.scanLine(j));
-		for (int i = 0; i < width()/2; ++i)
+		for (int i = 0; i < (imageIn.message().width())/2; ++i)
         {
 		    byte y = yImg.getPixel(i, j);
             byte u = uImg.getPixel(i/2, j);
@@ -89,6 +94,50 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel)
 	}
 
     return image;
+}
+
+ImageDisplayListener::ImageDisplayListener(QWidget *parent)
+    : ImageDisplayModule(parent),
+      brushSize(DEFAULT_BRUSH_SIZE)
+{
+
+    QWidget::setAttribute(Qt::WA_NoMousePropagation, true );
+}
+
+void ImageDisplayListener::mouseReleaseEvent ( QMouseEvent * event )
+{
+    bool left;
+    if(event->button() == Qt::LeftButton) {
+        left = true;
+    } else {
+        left = false;
+    }
+
+    int mouseX = event->x();
+    int mouseY = event->y();
+
+    emit mouseClicked((int)((float)mouseX),
+					  (int)((float)mouseY), brushSize, left);
+}
+
+void ImageDisplayListener::wheelEvent(QWheelEvent* event) {
+    if (event->delta() > 0) {
+        brushSize++;
+    } else {
+        brushSize--;
+    }
+
+    if (brushSize == 0) {
+        brushSize = 1;
+    }
+    updateBrushCursor();
+}
+
+void ImageDisplayListener::updateBrushCursor() {
+    QPixmap cursor(brushSize, brushSize);
+
+    cursor.fill(brushColor);
+    this->setCursor(QCursor(cursor, brushSize, 0)); // not exactly sure why this works
 }
 
 }

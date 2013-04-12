@@ -15,15 +15,24 @@ namespace color {
 
 ColorTableCreator::ColorTableCreator(QWidget *parent) :
     QWidget(parent),
-    bottomImageIn(&bottomConverter.imageIn),
-    topImageIn(&topConverter.imageIn),
     currentCamera(Camera::TOP),
     topConverter(Camera::TOP),
-    bottomConverter(Camera::BOTTOM)
+    bottomConverter(Camera::BOTTOM),
+    topDisplay(this),
+    bottomDisplay(this),
+    bottomImage(base()),
+    topImage(base())
 {
     // BACKEND
     subdiagram.addModule(topConverter);
     subdiagram.addModule(bottomConverter);
+    subdiagram.addModule(topDisplay);
+    subdiagram.addModule(bottomDisplay);
+
+    topConverter.imageIn.wireTo(&topImage, true);
+    bottomConverter.imageIn.wireTo(&bottomImage, true);
+    topDisplay.imageIn.wireTo(&topImage, true);
+    bottomDisplay.imageIn.wireTo(&bottomImage, true);
 
     // GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
@@ -32,11 +41,16 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     imageTabs = new QTabWidget(this);
     leftLayout->addWidget(imageTabs);
 
-    //imageTabs->addTab(topImageViewer, "Top Image");
-    //imageTabs->addTab(bottomImageViewer, "Bottom Image");
+    imageTabs->addTab(&topDisplay, "Top Image");
+    imageTabs->addTab(&bottomDisplay, "Bottom Image");
 
-    //connect(imageTabs, SIGNAL(currentChanged(int)),
-    //this, SLOT(imageTabSwitched(int)));
+    connect(imageTabs, SIGNAL(currentChanged(int)),
+            this, SLOT(imageTabSwitched(int)));
+
+    connect(&topDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(canvasClicked(int, int, int, bool)));
+    connect(&bottomDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(canvasClicked(int, int, int, bool)));
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
@@ -73,8 +87,13 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
 
 void ColorTableCreator::run_()
 {
-    bottomImageIn->latch();
-    topImageIn->latch();
+    bottomImageIn.latch();
+    topImageIn.latch();
+
+    bottomImage.setMessage(portals::Message<messages::YUVImage>(
+                               &bottomImageIn.message()));
+    topImage.setMessage(portals::Message<messages::YUVImage>(
+                            &topImageIn.message()));
 
     updateThresholdedImage();
 }
@@ -118,7 +137,7 @@ void ColorTableCreator::canvasClicked(int x, int y, int brushSize, bool leftClic
 {
     BrushStroke brushStroke(x, y, (image::Color::ColorID) currentColor, brushSize, leftClick);
     brushStrokes.push_back(brushStroke);
-    this->paintStroke(brushStroke);
+    paintStroke(brushStroke);
 }
 
 void ColorTableCreator::undo() {
@@ -127,83 +146,72 @@ void ColorTableCreator::undo() {
         return;
 
     BrushStroke reverseStroke = brushStrokes.back().invert();
-    this->paintStroke(reverseStroke);
+    paintStroke(reverseStroke);
     brushStrokes.pop_back();
 }
 
 void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
 {
     // Check the click was on the image
-    for (int i = -brushStroke.brushSize/2; i <= brushStroke.brushSize/2; i++) {
-        for (int j = -brushStroke.brushSize/2; j <= brushStroke.brushSize/2; j++) {
-
+    for (int i = -brushStroke.brushSize/2; i <= brushStroke.brushSize/2; i++)
+    {
+        for (int j = -brushStroke.brushSize/2; j <= brushStroke.brushSize/2; j++)
+        {
             int brush_x = i + brushStroke.x;
             int brush_y = j + brushStroke.y;
 
-            //BMPYUVImage* image;
+            messages::YUVImage image;
 
-            if (currentCamera == Camera::TOP) {
-//                image = topImage;
-            } else {
-//                image = bottomImage;
+            if (currentCamera == Camera::TOP)
+            {
+                image = topImageIn.message();
+            }
+            else
+            {
+                image = bottomImageIn.message();
             }
 
-    //         // Get the color from the image and emit it
-    //         if(0 < brush_x && brush_x < image->getWidth() &&  0 < brush_y && brush_y < image->getHeight()) {
+            // Get the color from the image and emit it
+            if(0 < brush_x && brush_x < image.width()/2 &&
+               0 < brush_y && brush_y < image.height())
+            {
+                byte y = image.yImage().getPixel(brush_x, brush_y);
+                byte u = image.uImage().getPixel(brush_x/2, brush_y);
+                byte v = image.vImage().getPixel(brush_x/2, brush_y);
 
-    //             byte y = image->getYUVImage()->getY(brush_x, brush_y);
-    //             byte u = image->getYUVImage()->getU(brush_x, brush_y);
-    //             byte v = image->getYUVImage()->getV(brush_x, brush_y);
+                //std::cout << (int) y << " " << (int) u << " " << (int) v
+                //       << std::endl;
 
-    //             //TODO: hack? there must be a better way to do this - Octavian
-
-    //             // these values reflect the downscaled Y, U, V values from the image acquisition
-
-    //             int scaled_brush_x = brush_x/2;
-    //             int scaled_brush_y = brush_y/2;
-
-    //             // y image stores the sum of 4 neighboring pixels, so average it
-    //             int y1 = sensors->getYImage(Camera::BOTTOM)[scaled_brush_y*AVERAGED_IMAGE_WIDTH + scaled_brush_x]/2;
-    //             // u,v image stores the sum of 2 neighboring pixels so average it
-    //             // also since they're stored together we need to compute special offsets for each
-    //             int u1 = sensors->getUVImage(Camera::BOTTOM)[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2];
-    //             int v1 = sensors->getUVImage(Camera::BOTTOM)[scaled_brush_y*AVERAGED_IMAGE_WIDTH*2 + scaled_brush_x*2 + 1];
-
-    //             std::cout << (int) y << " " << (int) u << " " << (int) v << std::endl;
-    //             std::cout << (int) y1 << " " << (int) u1 << " " << (int) v1 << std::endl;
-
-    //             if (brushStroke.define) {
-    //                 colorTable.setColor(y, u, v, image::Color_bits[brushStroke.color]);
-    //                 colorTable.setColor(y1, u1, v1, image::Color_bits[brushStroke.color]);
-    //             } else {
-    //                 colorTable.unSetColor(y, u, v, image::Color_bits[brushStroke.color]);
-    //                 colorTable.unSetColor(y1, u1, v1, image::Color_bits[brushStroke.color]);
-    //             }
-    //         }
-    //     }
-    // }
-
-   updateThresholdedImage();
+                if (brushStroke.define)
+                {
+                    colorTable.setColor(y, u, v,
+                                        image::Color_bits[brushStroke.color]);
+                }
+                else
+                {
+                    colorTable.unSetColor(y, u, v,
+                                          image::Color_bits[brushStroke.color]);
+                }
+            }
         }
     }
+   updateThresholdedImage();
 }
 
 void ColorTableCreator::imageTabSwitched(int)
 {
-    // if (imageTabs->currentWidget() == topImageViewer) {
-    //     currentCamera = Camera::TOP;
-    // } else {
-    //     currentCamera = Camera::BOTTOM;
-    // }
-
-    // this->updateThresholdedImage();
+    if (imageTabs->currentWidget() == &topDisplay) {
+        currentCamera = Camera::TOP;
+    } else {
+        currentCamera = Camera::BOTTOM;
+    }
 }
 
 void ColorTableCreator::updateColorSelection(int color)
 {
     currentColor = color;
-//    topImageViewer->setBrushColor(QColor(image::Color_RGB[color]));
-//    bottomImageViewer->setBrushColor(QColor(image::Color_RGB[color]));
+    topDisplay.setBrushColor(QColor(image::Color_RGB[color]));
+    bottomDisplay.setBrushColor(QColor(image::Color_RGB[color]));
     updateColorStats();
 }
 

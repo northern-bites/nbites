@@ -80,9 +80,9 @@ Tool::~Tool() {
 void Tool::setUpModules()
 {
     diagram.addModule(tableCreator);
-    diagram.connectToUnlogger<messages::YUVImage>(*(tableCreator.topImageIn),
+    diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
                                                   "top");
-    diagram.connectToUnlogger<messages::YUVImage>(*(tableCreator.bottomImageIn),
+    diagram.connectToUnlogger<messages::YUVImage>(tableCreator.bottomImageIn,
                                                   "bottom");
 }
 
