@@ -20,7 +20,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "NaoPose.h"
-using namespace std; 
+using namespace std;
 using namespace ::messages;
 using boost::shared_ptr;
 using namespace boost::numeric;
@@ -138,9 +138,9 @@ void NaoPose::transform(bool _isTopCam, const JointAngles& ja,
     ufmatrix4* camera_calibration;
     // factor in camera calibration
     if (_isTopCam) {
-        camera_calibration = CameraCalibrate::getTransforms(man::Camera::TOP);
+        camera_calibration = CameraCalibrate::getTransforms(Camera::TOP);
     } else {
-        camera_calibration = CameraCalibrate::getTransforms(man::Camera::BOTTOM);
+        camera_calibration = CameraCalibrate::getTransforms(Camera::BOTTOM);
     }
     for (int i = 0; i < CameraCalibrate::NUM_PARAMS; i++) {
 

@@ -7,8 +7,6 @@
 
 #pragma once
 
-namespace man {
-
 class Camera {
 
 public:
@@ -119,5 +117,3 @@ public:
         }
     }
 };
-
-}
