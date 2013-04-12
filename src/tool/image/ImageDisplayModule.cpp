@@ -4,6 +4,51 @@
 namespace tool {
 namespace image {
 
+ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
+    : QLabel(parent),
+      filter(ALL_COLORS)
+{
+    setText(tr("No image loaded!"));
+}
+
+void ThresholdedImageDisplayModule::run_()
+{
+    imageIn.latch();
+    setPixmap(QPixmap::fromImage(makeImage(filter)));
+}
+
+QImage ThresholdedImageDisplayModule::makeImage(byte filter_)
+{
+    QImage image(imageIn.message().width(),
+                 imageIn.message().height(),
+                 QImage::Format_RGB32);
+
+    for (int j = 0; j < image.height(); ++j)
+    {
+        QRgb* bitmapLine = (QRgb*) image.scanLine(j);
+        for (int i = 0; i < image.width(); ++i)
+        {
+            int rawColor = imageIn.message().getPixel(i, j);
+            int threshColor = 0, mix = 1;
+            for (int c = 0; c < Color::NUM_COLORS; c++) {
+                if ((rawColor & Color_bits[c]) > 0 &&
+                    ((Color_bits[c] & filter_) > 0))
+                {
+                    threshColor += Color_RGB[c];
+                    threshColor /= mix;
+                    mix++;
+                }
+            }
+
+            if (threshColor == 0) threshColor = Color_RGB[0];
+
+            bitmapLine[i] = threshColor;
+        }
+    }
+
+    return image;
+}
+
 ImageDisplayModule::ImageDisplayModule(QWidget* parent) : QLabel(parent),
                                                           channel(RGB)
 {
@@ -16,7 +61,7 @@ void ImageDisplayModule::run_()
     setPixmap(QPixmap::fromImage(makeImageOfChannel(channel)));
 }
 
-QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel)
+QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
 {
     // This makes the clicking work properly for listener
     // Kind of a hack
@@ -43,7 +88,7 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel)
 		    QRgb rgb;
 		    c.setYuv(y, u, v);
 
-			switch (channel)
+			switch (channel_)
             {
 			case RGB:
 			    qImageLine[i] = c.getRGB();

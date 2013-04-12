@@ -89,6 +89,7 @@ private:
     man::image::ImageConverterModule bottomConverter;
     image::ImageDisplayListener topDisplay;
     image::ImageDisplayListener bottomDisplay;
+    image::ThresholdedImageDisplayModule thrDisplay;
 
     // So that multiple things in this module can connect to these
     portals::OutPortal<messages::YUVImage> bottomImage;

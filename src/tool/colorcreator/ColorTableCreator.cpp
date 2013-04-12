@@ -20,6 +20,7 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     bottomConverter(Camera::BOTTOM),
     topDisplay(this),
     bottomDisplay(this),
+    thrDisplay(this),
     bottomImage(base()),
     topImage(base())
 {
@@ -28,11 +29,13 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     subdiagram.addModule(bottomConverter);
     subdiagram.addModule(topDisplay);
     subdiagram.addModule(bottomDisplay);
+    subdiagram.addModule(thrDisplay);
 
     topConverter.imageIn.wireTo(&topImage, true);
     bottomConverter.imageIn.wireTo(&bottomImage, true);
     topDisplay.imageIn.wireTo(&topImage, true);
     bottomDisplay.imageIn.wireTo(&bottomImage, true);
+    thrDisplay.imageIn.wireTo(&topConverter.thrImage);
 
     // GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
@@ -78,6 +81,7 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     rightLayout->addWidget(saveBtn);
     connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveColorTable()));
 
+    rightLayout->addWidget(&thrDisplay);
     rightLayout->addWidget(colorStats);
 	mainLayout->addLayout(leftLayout);
 	mainLayout->addLayout(rightLayout);

@@ -37,7 +37,32 @@ static const std::string ChannelType_label[] = {
     "Value"
 };
 
-class ImageDisplayModule : public QLabel, public portals::Module
+// This could be a whole hell of a lot more elegant
+// But I am hacking as fast as I can
+// So future person who is reading this code, please don't judge me
+// --Lizzie
+class ThresholdedImageDisplayModule : public QLabel,
+                                      public portals::Module
+{
+    Q_OBJECT;
+
+public:
+    ThresholdedImageDisplayModule(QWidget* parent = 0);
+
+    portals::InPortal<messages::ThresholdImage> imageIn;
+
+    void setFilter(byte filter_) { filter = filter; }
+
+protected:
+    virtual void run_();
+
+    QImage makeImage(byte filter);
+
+    byte filter;
+};
+
+class ImageDisplayModule : public QLabel,
+                           public portals::Module
 {
     Q_OBJECT;
 
