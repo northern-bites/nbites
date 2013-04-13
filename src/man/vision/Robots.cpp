@@ -28,6 +28,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 #ifdef OFFLINE
 static const bool ROBOTSDEBUG = false;
 #else
@@ -912,3 +915,5 @@ void Robots::printBlob(Blob b) {
 #endif
 }
 
+}
+}

@@ -1,12 +1,23 @@
 #pragma once
 
 #include <cstring>
+#include <iostream>
 #include <exception>
+#include "Header.pb.h"
 
 // Log version--in case we need to upgrade and stay backwards compatible
-static const std::string VERSION = "2.0";
-// Header. This could be updated with more useful information.
-static const std::string HEADER = "NORTHERN BITES LOG FILE VERSION " + VERSION;
+static const int CURRENT_VERSION = 2;
+static const std::string LOG_EXTENSION = ".log";
+
+// 1 GB. We don't want to write files of absurd sizes.
+static const unsigned int FILE_MAX_SIZE = 1073741824;
+
+inline std::string getIdFromPath(std::string path)
+{
+    int begin = path.find_last_of("/") + 1;
+    int end = path.find_last_of(".");
+    return path.substr(begin, end-begin);
+}
 
 // IO Exceptions
 class read_exception: public std::exception {

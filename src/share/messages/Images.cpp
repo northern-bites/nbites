@@ -62,7 +62,8 @@ void MemoryImageBase::shareBuffer(const MemoryImageBase& img)
 {
   // In case this image is already sharing a buffer with img, must getAddress before
   // release.
-  img.buffer_->getAddress();
+  if(img.buffer_)
+    img.buffer_->getAddress();
   if (buffer_)
     buffer_->release();
   buffer_ = img.buffer_;
@@ -113,6 +114,16 @@ void* MemoryImageBase::makeMeInMemory(void* pixels, int wd, int ht, int rowPitch
   rowPitch_   = rowPitch;
   pixelPitch_ = pixelPitch;
   buffer_     = new VideoPixelBuffer(pixels);
+
+  return buffer_->getAddress();
+}
+
+void* MemoryImageBase::makeMeInBuffer(PixelBuffer* buf, int wd, int ht, int rowPitch, int pixelPitch)
+{
+  setSize(wd, ht);
+  rowPitch_   = rowPitch;
+  pixelPitch_ = pixelPitch;
+  buffer_     = buf;
 
   return buffer_->getAddress();
 }

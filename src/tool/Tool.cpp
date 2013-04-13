@@ -12,10 +12,9 @@ QFile file(QString("./.geometry"));
 
 Tool::Tool(const char* title) :
     QMainWindow(),
-    mainDiagram(),
-    // IF YOU WANT TO SEE LOGS FOR THE TIME BEING, YOU HAVE TO DO THIS
-    // WE WILL FIX THIS HACK ASAP
-    unlogger("/home/ecat/nbites/data/logs/joint"),
+    diagram(),
+    selector(),
+    logView(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -24,23 +23,28 @@ Tool::Tool(const char* title) :
     scrollArea(new QScrollArea),
     scrollBarSize(new QSize(5, 35)),
     tabStartSize(new QSize(toolTabs->size()))
-
 {
-    // Set up the diagram
-    mainDiagram.addModule(unlogger);
-
     // Set up the GUI and slots
     this->setWindowTitle(tr(title));
 
-    connect(nextButton, SIGNAL(clicked()), this, SLOT(next()));
-    connect(prevButton, SIGNAL(clicked()), this, SLOT(prev()));
-    connect(recordButton, SIGNAL(clicked()), this, SLOT(record()));
+    //connect both fwd and prv button to the run slot
+    connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(runForward()));
+    connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(runBackward()));
 
+    connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
+            &diagram, SLOT(addUnloggers(std::vector<std::string>)));
+
+    connect(&diagram, SIGNAL(signalNewDisplayWidget(QWidget*, std::string)),
+            &logView, SLOT(newDisplayWidget(QWidget*, std::string)));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);
 
+    toolTabs->addTab(&selector, tr("Data"));
+    toolTabs->addTab(&logView, tr("Log View"));
+
+    this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
 
     // Figure out the appropriate dimensions for the window
@@ -68,30 +72,19 @@ Tool::~Tool() {
     }
 }
 
-// Button press methods
-void Tool::next() {
-    mainDiagram.run();
-}
-
-void Tool::prev() {
-}
-
-void Tool::record() {
+void Tool::setUpModules()
+{
 }
 
 // Keyboard control
 void Tool::keyPressEvent(QKeyEvent * event)
 {
     switch (event->key()) {
-    case Qt::Key_J:
-    case Qt::Key_D:
     case Qt::Key_N:
-        next();
+        diagram.runForward();
         break;
-    case Qt::Key_K:
-    case Qt::Key_S:
     case Qt::Key_P:
-        prev();
+        diagram.runBackward();
         break;
     default:
         QWidget::keyPressEvent(event);

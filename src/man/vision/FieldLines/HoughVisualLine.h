@@ -3,6 +3,9 @@
 
 #include "geom/HoughLine.h"
 
+namespace man {
+namespace vision {
+
 class HoughVisualLine
 {
 public:
@@ -18,5 +21,8 @@ public:
 private:
     std::pair<HoughLine, HoughLine> mLines;
 };
+
+}
+}
 
 #endif /* _HOUGHVISUALLINE_H_ */

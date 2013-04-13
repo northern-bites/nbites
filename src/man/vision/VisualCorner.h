@@ -6,13 +6,20 @@
 #include <vector>
 #include "Structs.h"
 
-class VisualCorner;
+namespace man {
+namespace vision {
+	class VisualCorner;
+}
+}
 
 #include "ConcreteCorner.h"
 #include "Utility.h"
 #include "VisualObject.h"
 #include "VisualLine.h"
 #include <boost/shared_ptr.hpp>
+
+namespace man {
+namespace vision {
 
 class NaoPose;
 
@@ -92,21 +99,6 @@ public:
     virtual const bool hasPositiveID();
 
     const std::vector<cornerID> getIDs();
-
-    //TODO: prettify this
-    //HACK Mexico 2012 from Octavian to Lizzie
-    // Takes degrees because this is for Python. Lovely.
-    float getRobotGlobalHeadingIfFieldAngleIs(angle::degrees alpha) const {
-        return (physicalOrientation + alpha*TO_RAD - bearing)*TO_DEG;
-    }
-
-    float getRobotRelXIfFieldAngleIs(angle::degrees alpha) const {
-        return - distance * std::cos(physicalOrientation + alpha*TO_RAD);
-    }
-
-    float getRobotRelYIfFieldAngleIs(angle::degrees alpha) const {
-        return - distance * std::sin(physicalOrientation + alpha*TO_RAD);
-    }
 
     //reliable corner types
     bool isReliable() const {
@@ -258,5 +250,8 @@ public:
                         abs(edges.bottom - y) < minPixelSeparation));
     }
 };
+
+}
+}
 
 #endif

@@ -56,6 +56,10 @@ endif()
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
 
+# For Python
+find_package( PythonLibs REQUIRED)
+include_directories( ${PYTHON_INCLUDE_DIR} )
+
 # Our core includes come from here
 include_directories( ${SHARE_DIR}/include )
 
@@ -75,17 +79,25 @@ add_dependencies(messages protobuf_libs)
 endif()
 
 # Actual subdirectories
-add_subdirectory( common )
-include_directories( common )
+add_subdirectory( support )
+include_directories( support )
+include_directories( motion/bhwalk ) # @todo hack?
 
 # Actual modules
-add_subdirectory( image )
-add_subdirectory( log )
-add_subdirectory( vision )
-add_subdirectory( sensors )
+add_subdirectory( audio )
+add_subdirectory( balltrack )
+add_subdirectory( behaviors )
 add_subdirectory( comm )
 add_subdirectory( guardian )
-add_subdirectory( audio )
+add_subdirectory( gamestate )
+add_subdirectory( image )
+add_subdirectory( led )
+add_subdirectory( log )
+add_subdirectory( sensors )
+add_subdirectory( vision )
+add_subdirectory( motion )
+add_subdirectory( jointenactor )
+add_subdirectory( localization )
 
 set( MAN_SRCS main.cpp
   Man.cpp
@@ -100,16 +112,24 @@ add_library(
 
 target_link_libraries(
   man
-  portals
-  messages
-  log
-  sensors
-  comm
-  image
-  vision
-  guardian
   audio
-  common
+  balltrack
+  behaviors
+  comm
+  support
+  guardian
+  jointenactor
+  motion
+  bhwalk
+  gamestate
+  image
+  led
+  log
+  messages
+  portals
+  sensors
+  vision
+  localization
 )
 
 install( TARGETS man

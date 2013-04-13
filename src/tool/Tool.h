@@ -10,10 +10,13 @@
 #include <QToolBar>
 #include <QScrollArea>
 #include <QResizeEvent>
+#include <QPixmap>
+#include <QImage>
+#include <QLabel>
 
-#include "RoboGrams.h"
-#include "unlog/UnlogModule.h"
-#include "JointAngles.pb.h"
+#include "ToolDiagram.h"
+#include "DataSelector.h"
+#include "logview/LogViewer.h"
 
 namespace tool {
 
@@ -24,24 +27,20 @@ public:
     Tool(const char* title = "TOOL");
     ~Tool();
 
-protected slots:
-    // Called by the buttons in the main toolbar
-    void next();
-    void prev();
-    void record();
+public slots:
+    void setUpModules();
 
 protected:
     // For keyboard control
     virtual void keyPressEvent(QKeyEvent * event);
 
-	void resizeEvent(QResizeEvent*);
+    void resizeEvent(QResizeEvent*);
 
     // Modules in this diagram will be run when data is updated
-    portals::RoboGram mainDiagram;
+    ToolDiagram diagram;
 
-    // Modules
-    // IF YOU WANT TO SEE LOGS PUT YOUR UNLOGGER HERE
-    unlog::UnlogModule<messages::JointAngles> unlogger;
+    DataSelector selector;
+    logview::LogViewer logView;
 
     // GUI stuff
     QTabWidget* toolTabs;
@@ -49,10 +48,10 @@ protected:
     QPushButton* prevButton;
     QPushButton* nextButton;
     QPushButton* recordButton;
-	QPushButton* scrollButton;
-	QScrollArea* scrollArea;
-	QSize* scrollBarSize;
-	QSize* tabStartSize;
-	QRect* geometry;
+    QPushButton* scrollButton;
+    QScrollArea* scrollArea;
+    QSize* scrollBarSize;
+    QSize* tabStartSize;
+    QRect* geometry;
 };
 }

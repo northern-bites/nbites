@@ -3,41 +3,89 @@
 
 #include <cmath>
 #include <string>
-#include "VisionDef.h"
-#include "Common.h"
+#include "ColorDefinitions.h"
 
-namespace qtool {
+namespace tool {
 namespace image {
 
-enum ColorID {Grey, White, Green, Blue, Yellow, Orange, Red, Navy, NUM_COLORS};
-enum MixedColorID {GreenBlue, OrangeRed, BlueNavy, UnknownMixed};
+typedef unsigned char byte;
+// holds an rgb value in the form #XXRRGGBB
+typedef unsigned int rgb_value;
 
-static const std::string Color_label[] = {
-        "Grey", "White", "Green", "Blue", "Yellow", "Orange", "Red", "Navy" };
-
-static const int Color_RGB[] = {
-        0xc0c0c0, 0xffffff, 0x66cc66, 0x3366ff, 0xffff00, 0xed9121,
-        0xff0000, 0x3300cc
+static const std::string Color_label[] =
+{
+        "Grey",
+        "White",
+        "Green",
+        "Blue",
+        "Yellow",
+        "Orange",
+        "Red",
+        "Navy"
 };
 
-static const int Color_bits[] = {
-       GREY_BIT, WHITE_BIT, GREEN_BIT, BLUE_BIT, YELLOW_BIT, ORANGE_BIT,
-       RED_BIT, NAVY_BIT
+enum MixedColorID
+{
+    GreenBlue,
+    OrangeRed,
+    BlueNavy,
+    UnknownMixed
 };
 
-static const int MixedColor_RGB[] = {
-        0x20b2aa, 0xff4500, 0x191970, 0x9400d3
+static const int Color_RGB[] =
+{
+        0xc0c0c0,
+        0xffffff,
+        0x66cc66,
+        0x3366ff,
+        0xffff00,
+        0xed9121,
+        0xff0000,
+        0x3300cc
+};
+
+static const int Color_bits[] =
+{
+       GREY_BIT,
+       WHITE_BIT,
+       GREEN_BIT,
+       BLUE_BIT,
+       YELLOW_BIT,
+       ORANGE_BIT,
+       RED_BIT,
+       NAVY_BIT
+};
+
+static const int MixedColor_RGB[] =
+{
+        0x20b2aa,
+        0xff4500,
+        0x191970,
+        0x9400d3
 };
 
 static const byte ALL_COLORS = 0xFF;
 
 class Color
 {
-    // holds an rgb value in the form #XXRRGGBB
-    typedef unsigned int RGB;
+
+enum ColorID
+{
+    Grey,
+    White,
+    Green,
+    Blue,
+    Yellow,
+    Orange,
+    Red,
+    Navy,
+    NUM_COLORS
+};
 
 public:
-    static ColorID getColorIDFromBitColor(int bits) {
+
+    static ColorID getColorIDFromBitColor(int bits)
+    {
         for (int i = 0; i < NUM_COLORS; i++) {
             if (bits == Color_bits[i]) {
                 return (ColorID) i;
@@ -46,7 +94,8 @@ public:
         return Grey;
     }
 
-    static MixedColorID getMixedColorIDFromBitColor(int bits) {
+    static MixedColorID getMixedColorIDFromBitColor(int bits)
+    {
         switch(bits) {
         case GREEN_BIT | BLUE_BIT :
             return GreenBlue;
@@ -64,11 +113,9 @@ public:
         return UnknownMixed;
     }
 
-public:
-    Color();
-
-    static RGB makeRGB(byte r, byte g, byte b, byte a = 0xFF) {
-        RGB result;
+    static rgb_value makeRGB(byte r, byte g, byte b, byte a = 0xFF)
+    {
+        rgb_value result;
         ((byte*) &result)[3] = a;
         ((byte*) &result)[2] = r;
         ((byte*) &result)[1] = g;
@@ -76,7 +123,8 @@ public:
         return result;
     }
 
-    static RGB makeRGBFromSingleByte(byte single_byte) {
+    static rgb_value makeRGBFromSingleByte(byte single_byte)
+    {
         return makeRGB(single_byte, single_byte, single_byte);
     }
 
@@ -90,12 +138,13 @@ public:
     float getS() { return getC() / getZ();}
     float getZ() { return max(max(red, grn), blue); }
     float getC() { return getZ() - min(min(red, grn), blue);}
-    bool valid() { return 0 <= red && red < 1 && 0 <= grn && grn < 1 && 0 <= blue && blue < 1;}
+    bool valid() { return 0 <= red && red < 1 && 0 <= grn && grn < 1 &&
+            0 <= blue && blue < 1;}
 
     void setRgb(float r, float g, float b) { red = r; grn = g; blue = b;}
     void setRgb(byte r, byte g, byte b) {
         setRgb((float)r / 256.0f, (float)g / 256.0f, (float)b / 256.0f);}
-    void setRgb(RGB rgb) {
+    void setRgb(rgb_value rgb) {
         byte r = ((byte*) &rgb)[2];
         byte g = ((byte*) &rgb)[1];
         byte b = ((byte*) &rgb)[0];
@@ -128,7 +177,7 @@ public:
     byte getHb() { return cvb(getH());}
     byte getSb() { return cvb(getS());}
     byte getZb() { return cvb(getZ());}
-    RGB getRGB() { return makeRGB(getRb(), getGb(), getBb());}
+    rgb_value getRGB() { return makeRGB(getRb(), getGb(), getBb());}
 
     static float min(float a, float b) {if (a < b) return a; return b;}
     static float max(float a, float b) {if (a > b) return a; return b;}

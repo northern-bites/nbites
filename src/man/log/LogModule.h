@@ -28,6 +28,8 @@
 
 #include "RoboGrams.h"
 #include "LogDefinitions.h"
+#include "DebugConfig.h"
+#include "Images.h"
 #include <aio.h>
 #include <errno.h>
 #include <stdint.h>
@@ -43,6 +45,10 @@ static const std::string PATH = "/home/nao/nbites/log/";
 // Flags needed to open files appropriately
 static const int NEW_FLAG = O_WRONLY | O_CREAT | O_TRUNC | O_APPEND;
 static const int ALL_PERMISSIONS = S_IRWXU | S_IRWXG | S_IRWXO;
+
+// Default value for write list size; can be reset--should be small
+// for large messages that could take up a lot of memory!
+static const int DEFAULT_MAX_WRITES = 5;
 
 /*
  * This struct is used to hold together an aiocb (control block) and the
@@ -64,6 +70,10 @@ public:
     LogBase(std::string name);
     virtual ~LogBase();
 
+    // For controlling the max size of write list
+    int getMaxWrites() { return maxWrites; }
+    void setMaxWrites(int max) { maxWrites = max; }
+
 protected:
     // Note that inheriting classes still need to implement this!
     virtual void run_() = 0;
@@ -71,23 +81,28 @@ protected:
     // Basic file/writing operations
     void openFile() throw (file_exception);
     void closeFile();
-    void writeCharBuffer(const char* buffer, uint32_t size);
     void checkWrites();
 
-    // Writes any type that can be reinterpret_casted to a string
-    template <class T>
-    void writeValue(const T &value) {
+    void writeCharBuffer(const char* buffer, uint32_t size);
+
+    void writeSize(uint32_t value)
+    {
         writeCharBuffer(reinterpret_cast<const char *>(&value), sizeof(value));
     }
 
     // Keeps track of all writes that haven't finished yet
     std::list<Write> ongoing;
+    std::list<Write> ongoingSizes;
     // Has the file been opened?
     bool fileOpen;
     // The file that we've opened/are writing to
     int fileDescriptor;
     // The full path of the file
     std::string fileName;
+    // Stores the maximum number of writes that should happen concurrently
+    unsigned int maxWrites;
+    // Stores how much we've written to this file to avoid huge files
+    unsigned int bytesWritten;
 };
 
 // Template Class
@@ -103,14 +118,61 @@ public:
         input.wireTo(out);
     }
 
-    /*
-     * @brief Serializes a message and writes the message's size and
-     *        serialization to the file. Note: relies on protobuf methods
-     *        like SerializeToString. If you ever want this class to log
-     *        something that is not a protobuf, make sure it has these
-     *        methods and can pretend to be one, or specialize this template.
-     */
+    // Writes out a header protobuf
+    void writeHeader()
+    {
+        Header head;
+        head.set_name(nameHelper());
+        head.set_version(CURRENT_VERSION);
+        head.set_timestamp(42);
+
+        std::string buf;
+        head.SerializeToString(&buf);
+        writeSize(buf.length());
+        writeCharBuffer(buf.data(), buf.length());
+
+        std::cout << "Writing header to " << fileName << std::endl;
+    }
+
     void writeMessage(T msg)
+    {
+        // Don't enqueue this write if we've hit the upper limit
+        if (ongoing.size() == maxWrites)
+        {
+#ifdef DEBUG_LOGGING
+        std::cout << "Dropped a message because there are already "
+                  << maxWrites << " ongoing writes to " << fileName
+                  << std::endl;
+#endif
+        return;
+        }
+
+        // Don't write if the file has gotten too huge
+        if (bytesWritten >= FILE_MAX_SIZE)
+        {
+#ifdef DEBUG_LOGGING
+            std::cout << "Dropped a message because the file "
+                      << fileName << " has reached " << bytesWritten << " bytes "
+                      << std::endl;
+#endif
+            ongoing.pop_back();
+            return;
+        }
+
+        writeInternal(msg);
+    }
+
+protected:
+    // This helper can be specialized if the type is not a proto
+    std::string nameHelper()
+    {
+        return input.message().GetTypeName();
+    }
+
+    // Handles all of the message-specific writing actions. Kept as a
+    // separate helper method so that it can be specialized for images
+    // or any other non-proto types
+    void writeInternal(T msg)
     {
         // Add a new write to the list of current writes
         ongoing.push_back(Write());
@@ -118,8 +180,11 @@ public:
 
         // Serialize directly into the Write's buffer to avoid a copy
         msg.SerializeToString(&(current->buffer));
+
+        bytesWritten += current->buffer.length();
+
         // Write ths size of the message that will be written
-        writeValue<uint32_t>(current->buffer.length());
+        writeSize(current->buffer.length());
 
         // Recommended by aio--zeroes the control block
         memset(&current->control, 0, sizeof(current->control));
@@ -139,16 +204,13 @@ public:
                      << std::endl;
         }
 
+#ifdef DEBUG_LOGGING
+        std::cout << "Enqueued a message for writing."
+                  << std::endl;
+#endif
+
     }
 
-    // Simply writes the header defined at the beginning of this file
-    void writeHeader()
-    {
-        std::cout << "Writing header to " << fileName << std::endl;
-        writeCharBuffer(HEADER.data(), HEADER.length());
-    }
-
-protected:
     // Implements the Module run_ method
     virtual void run_()
     {
@@ -162,7 +224,7 @@ protected:
                 std::cout << io_exception.what() << std::endl;
                 return;
             }
-            this->writeHeader();
+            writeHeader();
         }
 
         // Check for and remove finished writes from the list
@@ -175,5 +237,17 @@ protected:
     portals::InPortal<T> input;
 };
 
+
+// These specialize the above template so that YUVImages can be logged
+// without having to be serialized and have protobuf methods
+template<>
+void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage);
+
+template<>
+void LogModule<messages::YUVImage>::writeHeader();
+
+// Lets us provide a name string for YUV image
+template<>
+std::string LogModule<messages::YUVImage>::nameHelper();
 }
 }

@@ -1,0 +1,41 @@
+#pragma once
+
+// THRESHOLD COLORS
+#define GREY 0
+#define WHITE 1
+#define GREEN 2
+#define BLUE 3
+#define YELLOW 4
+#define ORANGE 5
+#define YELLOWWHITE 6
+#define BLUEGREEN 7
+#define ORANGERED 8
+#define ORANGEYELLOW 9
+#define RED 10
+#define NAVY 11
+#define BLACK 12
+#define PINK 13
+#define SHADOW 14
+#define CYAN 15
+#define DARK_TURQUOISE 16
+#define LAWN_GREEN 17
+#define PALE_GREEN 18
+#define BROWN 19
+#define SEA_GREEN 20
+#define ROYAL_BLUE 21
+#define POWDER_BLUE 22
+#define MEDIUM_PURPLE 23
+#define MAROON 24
+#define LIGHT_SKY_BLUE 25
+#define MAGENTA 26
+#define PURPLE 27
+
+#define GREY_BIT 0x00
+#define WHITE_BIT 0x01
+#define GREEN_BIT 0x02
+#define BLUE_BIT 0x04
+#define YELLOW_BIT 0x08
+#define ORANGE_BIT 0x10
+#define RED_BIT 0x20
+#define NAVY_BIT 0x40
+#define DRAWING_BIT 0x80
