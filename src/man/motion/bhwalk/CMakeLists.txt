@@ -1,9 +1,6 @@
-
 project( BHWALK )
-cmake_minimum_required( VERSION 2.8.0 )
 
-# Include  the basic definitions accross all projects
-include( ../../cmake/base_definitions.cmake )
+cmake_minimum_required( VERSION 2.8.0 )
 
 add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 
@@ -39,6 +36,8 @@ set( bhwalk_srcs
     Tools/Configuration/ConfigMap.cpp
     Tools/Configuration/ConfigMapParser.cpp )
 
+include_directories( . )
+
 #install configs
 if( NOT OFFLINE )
     set( BHWALK_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/config )
@@ -54,5 +53,7 @@ add_library(
 
 target_link_libraries(
     bhwalk
-    ${SENSORS_TARGET}
+    support
+    messages
+    portals
 )

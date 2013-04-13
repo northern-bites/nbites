@@ -1,12 +1,14 @@
-
-
-#ifndef __LinearChoppedCommand_h
-#define __LinearChoppedCommand_h
+#pragma once
 
 #include <vector>
 #include "Kinematics.h"
 #include "JointCommand.h"
 #include "ChoppedCommand.h"
+
+namespace man
+{
+namespace motion
+{
 
 // At the moment, this only works for Linear Interpolation.
 // Will later extended to apply to Smooth Interpolation
@@ -49,4 +51,5 @@ private:
 
 };
 
-#endif
+} // namespace motion
+} // namespace man
