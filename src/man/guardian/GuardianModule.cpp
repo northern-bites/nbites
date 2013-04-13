@@ -443,6 +443,14 @@ void GuardianModule::processFallingProtection()
     if (fallen)
     {
         status.get()->set_fallen(true);
+        if (inertialInput.message().angle_y() > 0)
+        {
+            status.get()->set_on_front(true);
+        }
+        else
+        {
+            status.get()->set_on_front(false);
+        }
     }
     else
     {
@@ -464,15 +472,6 @@ void GuardianModule::processFallingProtection()
 // #endif
 //     }
 
-}
-
-// Old method. Might be useful someday.
-void GuardianModule::executeFallProtection()
-{
-    if(useFallProtection)
-    {
-        shutoffGains();
-    }
 }
 
 void GuardianModule::processChestButtonPushes()
