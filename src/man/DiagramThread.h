@@ -62,6 +62,17 @@ public:
 #endif
     }
 
+    template<class T>
+    void logImage(portals::OutPortal<T>* out, std::string name)
+    {
+// Only let us do this if we really intend to log
+#ifdef USE_LOGGING
+        logs.push_back(new log::ImageLogModule<T>(out, name));
+        logs.back()->setMaxWrites(2);
+        diagram.addModule(*logs.back());
+#endif
+    }
+
 private:
     /*
      * @class RobotDiagram
