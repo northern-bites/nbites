@@ -174,10 +174,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
 
 #ifdef LOG_IMAGES
-    cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
-                                            "top");
-    cognitionThread.log<messages::YUVImage>(&bottomTranscriber.imageOut,
-                                            "bottom");
+    cognitionThread.logImage<messages::YUVImage>(&topTranscriber.imageOut,
+                                                 "top");
+    cognitionThread.logImage<messages::YUVImage>(&bottomTranscriber.imageOut,
+                                                 "bottom");
 #endif
 
 #ifdef LOG_VISION
