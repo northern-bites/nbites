@@ -98,7 +98,7 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
 
     // #HACK - shouldnt know how many filters there are but... US OPEN!
         //Determine if we are using the stationary
-    std::cout << "Velocity Mag:\t" << filters.at((unsigned)1)->getVelMag() << std::endl;
+    // std::cout << "Velocity Mag:\t" << filters.at((unsigned)1)->getVelMag() << std::endl;
     if (filters.at((unsigned)1)->getVelMag() > params.movingThresh)
     { // consider the ball to be moving
         bestFilter = 1;
