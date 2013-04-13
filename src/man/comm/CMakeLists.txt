@@ -19,7 +19,7 @@ add_library(
 # Link project to appropriate libraries.
 target_link_libraries(
   comm
-  common
+  support
   portals
   messages
   )

@@ -76,7 +76,7 @@ install(
 
 target_link_libraries(
   behaviors
-  common
+  support
   portals
   messages
   ${PYTHON_LIBRARY}

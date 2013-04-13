@@ -90,7 +90,7 @@ ADD_LIBRARY(
 TARGET_LINK_LIBRARIES(
   vision
   portals
-  common
+  support
   messages)
 
 

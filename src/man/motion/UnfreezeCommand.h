@@ -5,7 +5,12 @@
 
 #include "BaseFreezeCommand.h"
 
-class UnfreezeCommand : public BaseFreezeCommand {
+namespace man
+{
+namespace motion
+{
+class UnfreezeCommand : public BaseFreezeCommand 
+{
 public:
     typedef boost::shared_ptr<UnfreezeCommand> ptr;
 
@@ -13,5 +18,7 @@ public:
     ~UnfreezeCommand(){};
 
 };
+} // namespace motion
+} // namespace man
 
 #endif
