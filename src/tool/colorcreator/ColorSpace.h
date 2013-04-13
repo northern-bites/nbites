@@ -13,10 +13,9 @@
 #include <QObject>
 #include <QTextStream>
 #include "image/Color.h"
-#include "ClassHelper.h"
 
-namespace qtool {
-namespace colorcreator {
+namespace tool {
+namespace color {
 
 static const std::string fltChannel_names[] = {
         "hMin", "hMax",
@@ -26,10 +25,9 @@ static const std::string fltChannel_names[] = {
         "vMin", "vMax"
 };
 
-class ColorSpace : public QObject {
-
+class ColorSpace : public QObject
+{
     Q_OBJECT;
-    ADD_NULL_INSTANCE(ColorSpace)
 
 public:
     enum Channel {

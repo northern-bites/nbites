@@ -4,9 +4,10 @@
 #include <iostream>
 #include "RobotConfig.h"
 
-SET_POOL_SIZE(messages::WorldModel,  15);
-SET_POOL_SIZE(messages::JointAngles, 15);
+SET_POOL_SIZE(messages::WorldModel,  16);
+SET_POOL_SIZE(messages::JointAngles, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
+SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
 
 namespace man {
