@@ -131,7 +131,6 @@ class Brain(object):
         self.updateMotion()
         self.updateLoc()
         self.getCommUpdate()
-        self.updateLoc()
 
         # Behavior stuff
         # Order here is very important

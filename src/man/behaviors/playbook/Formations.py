@@ -162,8 +162,7 @@ def fFourField(team, workingPlay):
     # Used as our pull goalie formation (2011)
     workingPlay.setFormation(PBConstants.FOUR_FIELD)
     if team.me.isDefaultGoalie():
-        #Roles.rGoalie(team, workingPlay)
-        Roles.rDefender(team, workingPlay)
+        Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.determineChaser(workingPlay)
         if chaser_mate.playerNumber == team.brain.my.playerNumber:
@@ -171,8 +170,11 @@ def fFourField(team, workingPlay):
         else:
             otherMates = team.getOtherActiveFieldPlayers(chaser_mate.playerNumber)
             forward = team.getForward(otherMates)
+            back = team.getBack(otherMates)
             if forward.playerNumber == team.brain.my.playerNumber:
                 Roles.rOffender(team, workingPlay)
+            elif back.playerNumber == team.brain.my.playerNumber:
+                Roles.rDefender(team, workingPlay)
             else:
                 Roles.rMiddie(team, workingPlay)
 

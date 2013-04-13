@@ -58,14 +58,14 @@ def sTwoZone(team, workingPlay):
 
 #### Three Field Players ####
 
-def sWin(team, workingPlay):
+def sThreeField(team, workingPlay):
     '''
     Main Strategy (2011)
     '''
-    workingPlay.setStrategy(PBConstants.S_WIN)
+    workingPlay.setStrategy(PBConstants.S_THREE_FIELD_PLAYERS)
     # Post-Kickoff Formations
     if team.useKickoffFormation():
-        Formations.fKickoff(team,workingPlay)
+        Formations.fKickoff(team, workingPlay)
     # Double defensive support for ball in our goalbox
     elif team.shouldUseDubD():
         Formations.fThreeDubD(team, workingPlay)
@@ -81,6 +81,23 @@ def sWin(team, workingPlay):
 
 
 #### Four Field Players ####
+
+def sWin(team, workingPlay):
+    '''
+    Default strategy (2013)
+    '''
+    workingPlay.setStrategy(PBConstants.S_WIN)
+    # Post-Kickoff Formations
+    if team.useKickoffFormation():
+        Formations.fKickoff(team, workingPlay)
+    # Double defensive support for ball in our goalbox
+    elif team.shouldUseDubD():
+        Formations.fFourDubD(team, workingPlay)
+    # Standard Formation
+    else:
+        Formations.fFourField(team, workingPlay
+
+#### Five Field Players ####
 
 def sPullGoalie(team, workingPlay):
     '''

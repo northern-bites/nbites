@@ -111,7 +111,9 @@ class GoTeam:
         elif self.numActiveFieldPlayers == 2:
             Strategies.sTwoField(self, play)
         elif self.numActiveFieldPlayers == 3:
-            Strategies.sWin(self, play)
+            Strategies.sThreeField(self, play)
+        elif self.numActiveFieldPlayers == 4:
+            Strategies.sFourField(self, play)
 
     def updateStateInfo(self, play):
         """
@@ -360,7 +362,7 @@ class GoTeam:
 
         for mate in self.brain.teamMembers:## @TODO!!!! figure out
             #what happened here. We thought we were with another bot
-            #when it was in penalty.
+            #when it was in penalty. 7/2011
 
             # don't check inactive mates or the goalie.
             if (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
