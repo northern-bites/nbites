@@ -36,15 +36,17 @@ namespace balltrack
     }
 
     void KalmanFilter::update(messages::VisionBall visionBall,
-                              messages::Motion     motion)
+                              messages::RobotLocation  motion)
     {
         updated = true;
 
         //Get passed time
         updateDeltaTime();
 
-        predict(motion.odometry());
-        updateWithObservation(visionBall);
+        predict(motion);
+        //Note: Only update if we have an observation...
+        if(visionBall.on())
+            updateWithObservation(visionBall);
 
         // I think?
         filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
@@ -134,12 +136,27 @@ namespace balltrack
                                                   yTransDev,
                                                   0.f, 0.f);
 
-        // TODO - INCORPORATE FRICTION
+        // Incorporate Friction
+        // Have params.ballFriction in cm/sec^2
+        // ballFriction * deltaT = impact from friction that frame in cm/sec (velocity)
+        // in each direction, so need to add that impact if velocity is positive,
+        //                       need to subtract that impact if velocity is negative
+
+        // Incorporate friction if the ball is moving
+        if (!stationary) // moving
+        {
+            // Determine if ball is still moving
+            float velMagnitude = getVelMag();
+            if(velMagnitude > 2.f) // basically still moving
+            {
+                // vel = vel * (absVel + decel)/absVel
+                x(2) *= (std::abs(x(2)) + params.ballFriction*deltaT)/std::abs(x(2));
+                x(3) *= (std::abs(x(3)) + params.ballFriction*deltaT)/std::abs(x(3));
+            }
+        }
+
 
         // Calculate the expected state
-
-
-
         ufmatrix4 A = prod(rotation,trajectory);
 
         // std::cout << "A = prod rotation, trajectory" << std::endl;
@@ -194,7 +211,7 @@ namespace balltrack
             noise(i) += std::abs(noiseFromRot(i));
 
         // Add all this noise to the covariance
-         for(int i=0; i<4; i++){
+        for(int i=0; i<4; i++){
              cov(i,i) += noise(i);
          }
 
@@ -228,15 +245,17 @@ namespace balltrack
         cCovCTranspose = prod(cov,cTranspose);
         cCovCTranspose = prod(c,cCovCTranspose);
 
-        // Add the sensor variance
-        cCovCTranspose(0,0) += visionBall.rel_x_variance();
-        cCovCTranspose(1,1) += visionBall.rel_y_variance();
+        cCovCTranspose(0,0) += params.obsvRelXVariance;
+        cCovCTranspose(1,1) += params.obsvRelYVariance;
+
+        // cCovCTranspose(0,0) += visionBall.rel_x_variance();
+        // cCovCTranspose(1,1) += visionBall.rel_y_variance();
 
         // gain = cov*c^t*(c*cov*c^t + var)^-1
         ufmatrix kalmanGain(2,2);
 
         kalmanGain = prod(cTranspose,NBMath::invert2by2(cCovCTranspose));
-         kalmanGain = prod(cov,kalmanGain);
+        kalmanGain = prod(cov,kalmanGain);
 
         ufvector posEstimates(2);
         posEstimates = prod(c, x);
@@ -261,10 +280,6 @@ namespace balltrack
         correction = prod(kalmanGain,innovation);
         // std::cout << "Correction\t" << correction(0) << " , " << correction(1) << std::endl;
 
-        // Lets try using the size of the correction to determine how well the filter has been modeling
-        weight = 1 / (std::sqrt(correction(0)*correction(0)
-                                + correction(1)*correction(1)));
-
         x += correction;
 
 
@@ -274,6 +289,12 @@ namespace balltrack
         ufmatrix4 modifyCov;
         modifyCov = identity - prod(kalmanGain,c);
         cov = prod(modifyCov,cov);
+
+        // uncertainty = (std::sqrt((double)cov(0,0)*cov(0,0) + cov(1,1)*cov(1,1)));
+        // std::cout << "Uncertainty:\t" << uncertainty << std::endl;
+
+        weight *= 1 / (std::sqrt(cov(0,0)*cov(0,0)
+                                 + cov(1,1)*cov(1,1)));
 
         // std::cout<<"Ball X Est\t" << x(0)
         //          <<"\nBall Y Est\t" << x(1) << std::endl;

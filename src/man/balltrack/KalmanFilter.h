@@ -31,11 +31,13 @@ static const KalmanFilterParams DEFAULT_PARAMS =
     .5f,             // transXDeviation   CALC March 2013
     .5f,             // trandYDeviation   CALC March 2013
     .5f,             // rotationDeviation CALC March 2013
+    10.f,            // obsvRelX deviation
+    10.f,            // obsvRelY deviation
     .1f,                    // processDeviation
     .1f,
     .1f,
     .1f,
-    1.f                     // ballFriction?
+    -35.f                     // ballFriction?
 };
 
 class KalmanFilter
@@ -47,7 +49,7 @@ public:
     ~KalmanFilter();
 
     void update(messages::VisionBall visionBall,
-                messages::Motion     motion);
+                messages::RobotLocation     motion);
 
     bool isUpdated() {return updated;};
     void setUpdate(bool updated_){updated = updated_;};
@@ -105,6 +107,18 @@ public:
 
     bool isStationary(){return stationary;};
 
+    float getVelMag(){return std::sqrt(x(2)*x(2) + x(3)*x(3));};
+
+
+    void printEst(){std::cout << "Filter Estimate:\n\t"
+                              << "'Stationary' is\t" << stationary << "\n\t"
+                              << "X-Pos:\t" << x(0) << "Y-Pos:\t" << x(1)
+                              << "\n\t"
+                              << "x-Vel:\t" << x(2) << "y-Vel:\t" << x(3)
+                              << "\n\t"
+                              << "Uncertainty x:\t" << cov(0,0) << "\t,\t"
+                              << "y:\t" << cov(1,1) << std::endl;};
+
 private:
     KalmanFilterParams params;
 
@@ -141,6 +155,7 @@ private:
 
     // For the MMKalman
     float weight;
+    float uncertainty;
 };
 
 
