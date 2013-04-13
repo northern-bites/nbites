@@ -1,5 +1,4 @@
 #constants file to store all our sweet ass-moves for the Nao
-#import MotionConstants
 
 import StiffnessModes as stiff
 

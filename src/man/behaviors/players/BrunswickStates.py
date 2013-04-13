@@ -15,6 +15,8 @@ def gameInitial(player):
     """
     if player.firstFrame():
         player.inKickingState = False
+        player.gameState = player.currentState
+        player.brain.fallController.enabled = False
         player.stand()
         player.zeroHeads()
         #Reset localization to proper starting position by player number.
@@ -49,6 +51,8 @@ def gameReady(player):
     """
     if player.firstFrame():
         player.inKickingState = False
+        player.brain.fallController.enabled = True
+        player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePan()
 
@@ -74,6 +78,8 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
+        player.brain.fallController.enabled = False
+        player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
 
@@ -96,9 +102,11 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
+        player.inKickingState = False
+        player.brain.fallController.enabled = True
+        player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
-        player.inKickingState = False
         if player.lastDiffState == 'gamePenalized':
             print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
             #HACK
@@ -120,13 +128,11 @@ def gamePlaying(player):
 
 
 def gamePenalized(player):
-    if player.lastDiffState == '':
-        # Just started up! Need to calibrate sensors
-        player.brain.nav.stand()
-
     if player.firstFrame():
         player.inKickingState = False
-        player.stopWalking()
+        player.brain.fallController.enabled = False
+        player.gameState = player.currentState
+        player.stand()
         player.penalizeHeads()
 
     return player.stay()
@@ -145,6 +151,8 @@ def gameFinished(player):
     """
     if player.firstFrame():
         player.inKickingState = False
+        player.brain.fallController.enabled = False
+        player.gameState = player.currentState
         player.stopWalking()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
@@ -161,6 +169,7 @@ def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stand()
         player.inKickingState = False
+        player.brain.fallController.enabled = False
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
@@ -180,6 +189,7 @@ def penaltyShotsGamePlaying(player):
 
     if player.firstFrame():
         player.stand()
+        player.brain.fallController.enabled = True
         player.inKickingState = False
         player.shouldKickOff = False
         player.penaltyKicking = True
