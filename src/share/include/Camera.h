@@ -98,7 +98,7 @@ public:
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 98;
+    static const int BOTTOM_BRIGHTNESS = 96;
     static const int BOTTOM_CONTRAST = 45;
     static const int BOTTOM_SATURATION = 124;
     static const int BOTTOM_HUE = 0;

@@ -368,6 +368,10 @@ protected:
     // Implements the Module run_ method
     virtual void run_()
     {
+        // Check for and remove finished writes from the list
+        checkSizeWrites();
+        checkImageWrites();
+
         frameCounter++;
 
         // EPIC HACK: 10-second delay
@@ -388,10 +392,6 @@ protected:
             }
             writeHeader();
         }
-
-        // Check for and remove finished writes from the list
-        checkSizeWrites();
-        checkImageWrites();
 
         // Start a new write for the current message
         writeImage(input.message());

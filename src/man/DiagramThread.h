@@ -68,7 +68,9 @@ public:
 // Only let us do this if we really intend to log
 #ifdef USE_LOGGING
         logs.push_back(new log::ImageLogModule<T>(out, name));
-        logs.back()->setMaxWrites(2);
+        // THIS HAS TO BE SET TO 1 IF WE ARE LOGGING FROM THE TRANSCRIBER
+        // BECAUSE IT ONLY HAS 4 BUFFERS TOTAL AND WE DON'T WANT TO KEEP THEM
+        logs.back()->setMaxWrites(1);
         diagram.addModule(*logs.back());
 #endif
     }

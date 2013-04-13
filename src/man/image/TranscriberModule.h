@@ -50,6 +50,7 @@ public:
 
     messages::YUVImage getNextImage();
     uint64_t getTimestamp() const;
+    Camera::Type type() { return cameraType; }
 
 private:
     enum
