@@ -79,11 +79,18 @@ Tool::~Tool() {
 
 void Tool::setUpModules()
 {
-    diagram.addModule(tableCreator);
-    diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
-                                                  "top");
-    diagram.connectToUnlogger<messages::YUVImage>(tableCreator.bottomImageIn,
-                                                  "bottom");
+    if (diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
+                                                      "top") &&
+        diagram.connectToUnlogger<messages::YUVImage>(tableCreator.bottomImageIn,
+                                                      "bottom"))
+    {
+        diagram.addModule(tableCreator);
+    }
+    else
+    {
+        std::cout << "Right now you can't use the color table creator without"
+                  << " two image logs." << std::endl;
+    }
 }
 
 // Keyboard control

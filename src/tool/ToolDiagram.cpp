@@ -82,7 +82,7 @@ bool ToolDiagram::unlogFrom(std::string path)
 }
 
 template<>
-void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input, std::string name)
+bool ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input, std::string name)
 {
     for (std::vector<unlog::UnlogBase*>::iterator i = unloggers.begin();
          i != unloggers.end(); i++)
@@ -97,13 +97,14 @@ void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input
                 std::cout << "Connected " << name << " camera input to "
                           << getIdFromPath((*i)->getFilePath())
                           << " camera unlogger." << std::endl;
-                return;
+                return true;
             }
         }
     }
 
     std::cout << "Tried to connect a module to nonexistent image unlogger!" <<
     std::endl;
+    return false;
 }
 
 void ToolDiagram::runForward()

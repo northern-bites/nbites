@@ -34,7 +34,7 @@ public:
     bool unlogFrom(std::string path);
 
     template<class T>
-    void connectToUnlogger(portals::InPortal<T>& input,
+    bool connectToUnlogger(portals::InPortal<T>& input,
                            std::string path = "none")
     {
         T test;
@@ -49,12 +49,13 @@ public:
                 std::cout << "Connected successfully to "
                           << test.GetTypeName() << " unlogger!"
                           << std::endl;
-                return;
+                return true;
             }
         }
 
         std::cout << "Tried to connect a module to a nonexistent unlogger!"
                   << std::endl;
+        return false;
     }
 
 signals:
@@ -75,7 +76,7 @@ protected:
 };
 
 template<>
-void ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input,
+bool ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input,
                                     std::string path);
 
 }
