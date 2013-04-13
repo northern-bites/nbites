@@ -20,6 +20,7 @@
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
+#include "FallStatus.pb.h"
 
 /**
  *
@@ -88,6 +89,7 @@ public:
     portals::InPortal<messages::FootBumperState> footBumperStateIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::InPortal<messages::JointAngles> jointsIn;
+    portals::InPortal<messages::FallStatus> fallStatusIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;

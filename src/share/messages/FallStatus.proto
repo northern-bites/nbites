@@ -2,6 +2,7 @@ package messages;
 
 message FallStatus
 {
-        optional bool falling = 1;
-        optional bool fallen  = 2;
+    optional bool falling  = 1;
+    optional bool fallen   = 2;
+    optional bool on_front = 3; //On back if false, undefined if not fallen.
 }
