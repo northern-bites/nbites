@@ -145,6 +145,10 @@ def stand(nav):
         helper.stand(nav)
         return nav.stay()
 
+    if (nav.counter % 300 == 0):
+        helper.stand(nav)
+        return nav.stay()
+
     if not nav.brain.interface.motionStatus.walk_is_active:
         return nav.goNow('standing')
 

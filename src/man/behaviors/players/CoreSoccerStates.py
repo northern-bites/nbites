@@ -23,14 +23,7 @@ def gameInitial(player):
     Also, in the future, gameInitial may be responsible for turning off the gains
     """
     if player.firstFrame():
-        player.brain.nav.stop()
-        player.gainsOn()
         player.zeroHeads()
-        player.GAME_INITIAL_satDown = False
-
-    elif player.brain.nav.isStopped() and not player.GAME_INITIAL_satDown:
-        player.GAME_INITIAL_satDown = True
-        player.executeMove(SweetMoves.SIT_POS)
 
     return player.stay()
 
@@ -39,7 +32,6 @@ def gameReady(player):
     Stand up, and pan for localization
     """
     if player.firstFrame():
-        player.stopWalking()
         player.stand()
         player.brain.tracker.repeatWidePan()
     return player.stay()
@@ -88,8 +80,6 @@ def gameFinished(player):
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
 
-    if not player.motion.isBodyActive() and  player.GAME_FINISHED_satDown:
-        player.gainsOff()
     return player.stay()
 
 

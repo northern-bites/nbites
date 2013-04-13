@@ -53,7 +53,6 @@ void MotionModule::run_()
     bodyCommandInput_.latch();
     headCommandInput_.latch();
     requestInput_.latch();
-    fallInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -178,7 +177,7 @@ bool MotionModule::postProcess()
 
     if (curHeadProvider != nextHeadProvider && !curHeadProvider->isActive())
     {
-         swapHeadProvider();
+        swapHeadProvider();
     }
 
     // Update sensors with the correct support foot because it may have
@@ -276,42 +275,7 @@ void MotionModule::processHeadJoints()
 
 void MotionModule::processMotionInput()
 {
-    // (1) Guardian checks.
-
-    // First check: is guardian turning stiffness off?
-    if(stiffnessInput_.message().remove() && gainsOn)
-    {
-        gainsOn = false;
-        sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
-        return;
-    }
-    if(!stiffnessInput_.message().remove() && !gainsOn && !falling)
-    {
-        gainsOn = true;
-        sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
-        return;
-    }
-
-    // Second check: does guardian detect the robot falling?
-    if(fallInput_.message().falling() && !falling)
-    {
-        falling = true;
-        gainsOn = false;
-        sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
-        return;
-    }
-    if(!fallInput_.message().falling() && falling)
-    {
-        falling = false;
-    }
-
-    if(fallInput_.message().falling() && !fallInput_.message().fallen() && !gainsOn)
-    {
-        // Disallow any commands from being processed.
-        return;
-    }
-
-    // (2) Process requests.
+    // (1) Process Behavior requests.
     if(lastRequest != requestInput_.message().timestamp())
     {
         lastRequest = requestInput_.message().timestamp();
@@ -328,9 +292,49 @@ void MotionModule::processMotionInput()
         {
             resetOdometry();
         }
+        if (requestInput_.message().remove_stiffness())
+        {
+            // Don't set gainsOn to false or else we won't freeze from behaviors
+            // Side effect is that if behaviors tells motion to freeze,
+            // we won't be able to enable gains with a button. Oh well
+            if (gainsOn)
+            {
+                sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+            }
+        }
+        if (requestInput_.message().enable_stiffness())
+        {
+            // Set gains on so that if our button got pressed we will
+            // freeze again next frame.
+            if (!stiffnessInput_.message().remove())
+            {
+                sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+                gainsOn = true;
+            }
+        }
     }
 
-    // (3) Process body commands.
+    // (2) Guardian checks.
+    if(stiffnessInput_.message().remove() && gainsOn)
+    {
+        gainsOn = false;
+        sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+        return;
+    }
+    if(!stiffnessInput_.message().remove() && !gainsOn)
+    {
+        gainsOn = true;
+        sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+        return;
+    }
+
+    // (3) Disallow further commands if we turned gains off.
+    if (!gainsOn)
+        return;
+
+
+
+    // (4) Process body commands.
     if(lastBodyCommand != bodyCommandInput_.message().timestamp())
     {
         lastBodyCommand = bodyCommandInput_.message().timestamp();
@@ -348,13 +352,13 @@ void MotionModule::processMotionInput()
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::SCRIPTED_MOVE)
         {
+            // Send an unfreeze command so we can stand up.
+            sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
             sendMotionCommand(bodyCommandInput_.message().script());
         }
-        // Useful for falling purposes.
-        gainsOn = true;
     }
 
-    // (4) Process head commands.
+    // (5) Process head commands.
     if(lastHeadCommand != headCommandInput_.message().timestamp())
     {
         lastHeadCommand = headCommandInput_.message().timestamp();
