@@ -11,8 +11,9 @@ OPP_GOAL_RIGHT_POST = Location(NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
 
 DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
-DEFAULT_OFFENDER_NUMBER = 3
-DEFAULT_CHASER_NUMBER = 4
+DEFAULT_MIDDIE_NUMBER = 3
+DEFAULT_OFFENDER_NUMBER = 4
+DEFAULT_CHASER_NUMBER = 5
 DEBUG_DETERMINE_CHASE_TIME = False
 SEC_TO_MILLIS = 1000.0
 CHASE_SPEED = 20.00 #cm/sec
@@ -194,6 +195,9 @@ class TeamMember(RobotLocation):
 
     def isDefaultDefender(self):
         return (self.playerNumber == DEFAULT_DEFENDER_NUMBER)
+
+    def isDefaultMiddie(self):
+        return (self.playerNumber == DEFAULT_MIDDIE_NUMBER)
 
     def isPenalized(self):
         """

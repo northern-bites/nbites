@@ -195,7 +195,7 @@ def fKickoff(team, workingPlay):
             Roles.rChaser(team, workingPlay)
         else:
             Roles.rDefender(team, workingPlay)
-    else:
+    elif team.numActiveFieldPlayers == 3:
         if team.me.isDefaultChaser():
             Roles.rChaser(team, workingPlay)
         elif team.me.isDefaultDefender():
@@ -203,6 +203,8 @@ def fKickoff(team, workingPlay):
         elif team.me.isDefaultOffender():
             workingPlay.setRole(PBConstants.OFFENDER)
             SubRoles.pKickoffStriker(team, workingPlay)
+        elif team.me.isDefaultMiddie():
+            Roles.rMiddie(team, workingPlay)
 
 def fReady(team, workingPlay):
     '''pre-kickoff positions'''

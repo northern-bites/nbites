@@ -91,11 +91,12 @@ def sWin(team, workingPlay):
     if team.useKickoffFormation():
         Formations.fKickoff(team, workingPlay)
     # Double defensive support for ball in our goalbox
-    elif team.shouldUseDubD():
+    # TODO: implement DubD for 4 field players
+    elif False: #team.shouldUseDubD():
         Formations.fFourDubD(team, workingPlay)
     # Standard Formation
     else:
-        Formations.fFourField(team, workingPlay
+        Formations.fFourField(team, workingPlay)
 
 #### Five Field Players ####
 
