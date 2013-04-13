@@ -1,6 +1,5 @@
 import PositionConstants as constants
 from math import fabs
-from .. import MotionConstants
 
 ####### POSITIONING STUFF ##############
 def shouldKickAtPosition(player):
@@ -23,7 +22,7 @@ def leavingTheField(player):
     # print "maxDist: " + str(fieldEdge.maxDist)
     # print "shape: " + str(fieldEdge.shape)
 
-    if (fabs(player.brain.sensors.motionAngles[MotionConstants.HeadYaw])
+    if (fabs(degrees(self.tracker.brain.interface.joints.head_yaw))
         < constants.LOOK_FORWARD_THRESH):
         total = total + fieldEdge.maxDist
         count += 1

@@ -21,9 +21,9 @@
 #include <string>
 #include <iostream>
 
-#include "../sensors/SensorTypes.h"
-#include "../newmotion/MotionConstants.h"
-#include "../newmotion/Kinematics.h"
+#include "SensorTypes.h"
+#include "MotionConstants.h"
+#include "Kinematics.h"
 #include "RoboGrams.h"
 
 #include "PMotion.pb.h"

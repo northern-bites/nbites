@@ -66,7 +66,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     motion.bodyCommandInput_.wireTo(&behaviors.bodyMotionCommandOut, true);
     motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
     motion.requestInput_.wireTo(&behaviors.motionRequestOut, true);
-    motion.fallInput_.wireTo(&guardian.fallStatusOutput, true);
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
@@ -160,6 +159,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.visionFieldIn.wireTo(&vision.vision_field);
     behaviors.visionRobotIn.wireTo(&vision.vision_robot);
     behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
+    behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
     behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
     behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
@@ -169,6 +169,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
+
     leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
 
 #ifdef LOG_IMAGES

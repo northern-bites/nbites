@@ -28,4 +28,4 @@ add_library(
 target_link_libraries(localization
   portals
   messages
-  common)
+  support)
