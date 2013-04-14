@@ -1,6 +1,6 @@
 #
 # This is our walk-engine parameter optimizer. It uses a particle swarm (util/PSO.py)
-# to search a predefined gait space (motion/gaits/GaitLearnBoundaries.py) for an 
+# to search a predefined gait space (motion/gaits/GaitLearnBoundaries.py) for an
 # optimal set of parameters.
 #
 # Things that need to happen before team-wide gait optimization can start:
@@ -280,7 +280,7 @@ def setWalkVectorCustomGait(player, x, y, theta):
 def setGait(player, gaitTuple):
     """
     Builds a new gait using gaitTuple, creates it as a GaitCommand
-    and sets it as the Robot's current gait. No bounds checking is done 
+    and sets it as the Robot's current gait. No bounds checking is done
     here, so you can give the robot horrible values.
     """
     newGait = motion.GaitCommand(gaitTuple[0],
@@ -300,4 +300,3 @@ def ensure_dir(filename):
 
     if not exists(d):
         makedirs(d)
-

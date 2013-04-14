@@ -77,7 +77,6 @@ private:
     bool executeChestClickAction(int);
     bool executeLeftFootClickAction(int);
     bool executeRightFootClickAction(int);
-    void executeFallProtection();
     void shutoffGains();
     void enableGains();
     void playFile(std::string filePath);

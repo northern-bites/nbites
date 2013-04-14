@@ -109,22 +109,19 @@ def penaltyRelocalize(player):
     Note: This is the old code that I'm using as a back-up in case we can't
     see any goal posts. It may be possible to make this smarter. -Wils
     """
-    #@todo: Go back to game playing rather than the gameControllerState?
-    gcState = player.brain.gameController.currentState
-
     if player.firstFrame():
         player.setWalk(1, 0, 0)
 
     if player.brain.ball.vis.frames_on >= OBJ_SEEN_THRESH:
         player.brain.tracker.trackBall()
-        return player.goLater(gcState) #TODO: This won't work.
+        return player.goLater(player.gameState)
 
     if player.brain.my.locScore != NogginConstants.locScore.BAD_LOC:
         player.shouldRelocalizeCounter += 1
 
         if player.shouldRelocalizeCounter > 30:
             player.shouldRelocalizeCounter = 0
-            return player.goLater(gcState) #TODO: This won't work.
+            return player.goLater(player.gameState)
 
     else:
         player.shouldRelocalizeCounter = 0
