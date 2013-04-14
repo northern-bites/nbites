@@ -11,7 +11,7 @@ set( IMAGE_HEADERS
 
 Qt4_wrap_cpp( IMAGE_HEADERS_MOC ${IMAGE_HEADERS} )
 
-add_library(image
+add_library(image_display
     STATIC
     ${IMAGE_SRCS}
     ${IMAGE_HEADERS_MOC}
@@ -19,7 +19,7 @@ add_library(image
 
 
 target_link_libraries(
-  image
+  image_display
   messages
   portals
   ${QT_LIBRARIES}

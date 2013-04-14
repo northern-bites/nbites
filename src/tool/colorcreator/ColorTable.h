@@ -10,10 +10,10 @@
 #include "image/Color.h"
 #include "ColorSpace.h"
 
-#include "VisionDef.h"
+namespace tool {
+namespace color {
 
-namespace qtool {
-namespace colorcreator {
+typedef unsigned char byte;
 
 class ColorTable
 {
