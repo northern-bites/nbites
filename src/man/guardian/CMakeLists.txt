@@ -16,7 +16,7 @@ add_library(
 # Link project to appropriate libraries.
 target_link_libraries(
   guardian
-  common
+  support
   portals
   messages
   )

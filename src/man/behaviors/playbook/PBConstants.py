@@ -22,10 +22,9 @@ KICKOFF_FORMATION_TIME = 10 # Length of time to spend in the kickoff play
 ####
 #### Role Switching / Tie Breaking ####
 ####
-# The following constants are in milliseconds
-CALL_OFF_THRESH = 1500.             # how likely it is to be chaser
-LISTEN_THRESH = 3000.               # how likely it is to stop being chaser
-STOP_CALLING_THRESH = 3500.         # how likely you are to ignore teammates ideas.
+# The following constants are in seconds
+CALL_OFF_THRESH = 1.5             # how likely it is to be chaser
+STOP_CALLING_THRESH = 3.0         # how likely you are to ignore teammates ideas.
 
 GOALIE_CHASER_COUNT_THRESH = 25      # how long we wait before goalie calls us off.
 

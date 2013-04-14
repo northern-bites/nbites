@@ -23,7 +23,7 @@ class SoccerFSA(FSA.FSA):
 
         # stuff so players don't crash.
         self.inKickingState = False
-        #self.saveBallPosition()
+        self.gameState = self.currentState
 
         # Penalty kick player variables
         self.penaltyKicking = False
@@ -92,17 +92,15 @@ class SoccerFSA(FSA.FSA):
         """
         Turn off the gains
         """
-        pass
-        # TODO send a message instead
-        freeze = motion.FreezeCommand()
-        self.brain.motion.sendFreezeCommand(freeze)
+        self.brain.interface.motionRequest.remove_stiffness = True
+        self.brain.interface.motionRequest.timestamp = int(self.brain.time * 1000)
 
-    # def gainsOn(self):
-    #     """
-    #     Turn on the gains
-    #     """
-    #     unFreeze = motion.UnfreezeCommand(0.85)
-    #     self.brain.motion.sendFreezeCommand(unFreeze)
+    def gainsOn(self):
+        """
+        Turn on the gains
+        """
+        self.brain.interface.motionRequest.enable_stiffness = True
+        self.brain.interface.motionRequest.timestamp = int(self.brain.time * 1000)
 
 ##### HEAD-TRACKING Methods
     def penalizeHeads(self):

@@ -16,6 +16,6 @@ add_library(
 target_link_libraries(led
   portals
   messages
-  common
+  support
   ${ALCOMMON_LIBRARIES}
 )

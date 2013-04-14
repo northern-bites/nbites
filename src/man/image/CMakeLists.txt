@@ -13,6 +13,16 @@ set_property(SOURCE
   ImageAcquisitionFast.s
   PROPERTY LANGUAGE C )
 
+# When we compile this dir for the tool
+if( OFFLINE )
+set( IMAGE_SRCS
+  ImageConverterModule.cpp
+  ImageAcquisition.cpp
+  ImageAcquisitionFast.s
+  ImageAcquisition.s
+)
+endif( OFFLINE )
+
 add_library(
   image
   STATIC
@@ -21,7 +31,7 @@ add_library(
 
 target_link_libraries(
   image
-  common
+  support
   messages
   portals
 )

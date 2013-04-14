@@ -24,6 +24,7 @@ extern "C" void initMotionStatus_proto();
 extern "C" void initRobotLocation_proto();
 extern "C" void initSonarState_proto();
 extern "C" void initButtonState_proto();
+extern "C" void initFallStatus_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -98,6 +99,7 @@ void BehaviorsModule::initializePython()
         initSonarState_proto();
         initButtonState_proto();
         initRobotLocation_proto();
+        initFallStatus_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -252,6 +254,9 @@ void BehaviorsModule::prepareMessages()
 
     jointsIn.latch();
     pyInterface.setJoints_ptr(&jointsIn.message());
+
+    fallStatusIn.latch();
+    pyInterface.setFallStatus_ptr(&fallStatusIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);
