@@ -9,6 +9,9 @@
 #include "ColorTableCreator.h"
 #include <QMouseEvent>
 #include <QFileDialog>
+#include <QFile>
+#include <QDataStream>
+#include <QIODevice>
 
 namespace tool {
 namespace color {
@@ -57,8 +60,11 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
+    colorTableName = new QLabel(this);
+    colorTableName->setMaximumHeight(colorTableName->sizeHint().height());
+
     colorStats = new QLabel(this);
-	colorStats->setAlignment(Qt::AlignTop);
+    colorStats->setMaximumHeight(colorTableName->sizeHint().height());
 
     //set up the color selection combo box
     for (int i = 0; i < image::Color::NUM_COLORS; i++) {
@@ -82,11 +88,55 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveColorTable()));
 
     rightLayout->addWidget(&thrDisplay);
+    rightLayout->addWidget(colorTableName);
     rightLayout->addWidget(colorStats);
-	mainLayout->addLayout(leftLayout);
-	mainLayout->addLayout(rightLayout);
 
-	setLayout(mainLayout);
+    mainLayout->addLayout(leftLayout);
+    mainLayout->addLayout(rightLayout);
+
+    setLayout(mainLayout);
+    loadLatestTable();
+}
+
+// Note: serizalization done by Qt
+void ColorTableCreator::loadLatestTable() 
+{
+    if (imageTabs->currentIndex() == 0) {
+        QFile file("../../data/tables/latestTopTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        QString filename;
+        in >> filename;
+        colorTable.read(filename.toStdString());
+        colorTableName->setText(filename);
+    }
+    else {
+        QFile file("../../data/tables/latestBottomTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        QString filename;
+        in >> filename;
+        colorTable.read(filename.toStdString());
+        colorTableName->setText(filename);
+    }
+    updateColorStats();
+}
+
+// Note: serizalization done by Qt
+void ColorTableCreator::serializeTableName(QString latestTableName) 
+{
+    if (imageTabs->currentIndex() == 0) {
+        QFile file("../../data/tables/latestTopTable.dat");
+        file.open(QIODevice::WriteOnly);
+        QDataStream out(&file);
+        out << latestTableName;
+    }
+    else {
+        QFile file("../../data/tables/latestBottomTable.dat");
+        file.open(QIODevice::WriteOnly);
+        QDataStream out(&file);
+        out << latestTableName;
+    }
 }
 
 void ColorTableCreator::run_()
@@ -110,6 +160,10 @@ void ColorTableCreator::loadColorTable()
                     base_directory,
                     tr("Color Table files (*.mtb)"));
     colorTable.read(filename.toStdString());
+    colorTableName->setText(filename);
+
+    serializeTableName(filename);
+    updateThresholdedImage();
 }
 
 void ColorTableCreator::saveColorTable()
@@ -120,6 +174,9 @@ void ColorTableCreator::saveColorTable()
                     base_directory + "/new_table.mtb",
                     tr("Color Table files (*.mtb)"));
     colorTable.write(filename.toStdString());
+    colorTableName->setText(filename);
+
+    serializeTableName(filename);
 }
 
 void ColorTableCreator::updateThresholdedImage()
@@ -136,7 +193,6 @@ void ColorTableCreator::updateColorStats()
     colorStats->setText("Color count: " + QVariant(colorCount).toString());
 }
 
-
 void ColorTableCreator::canvasClicked(int x, int y, int brushSize, bool leftClick)
 {
     BrushStroke brushStroke(x, y, (image::Color::ColorID) currentColor, brushSize, leftClick);
@@ -144,8 +200,8 @@ void ColorTableCreator::canvasClicked(int x, int y, int brushSize, bool leftClic
     paintStroke(brushStroke);
 }
 
-void ColorTableCreator::undo() {
-
+void ColorTableCreator::undo() 
+{
     if (brushStrokes.empty())
         return;
 
@@ -211,6 +267,9 @@ void ColorTableCreator::imageTabSwitched(int)
         currentCamera = Camera::BOTTOM;
         thrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
     }
+
+    loadLatestTable();
+    updateThresholdedImage();
 }
 
 void ColorTableCreator::updateColorSelection(int color)
