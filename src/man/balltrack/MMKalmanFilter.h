@@ -32,12 +32,13 @@ namespace balltrack{
 
 static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
 {
-    12,                 // numFilters
-    200,                // framesTillReset
+    2,                 // numFilters
+    500,                // framesTillReset
     10.f,               // initCovX
     10.f,               // initCovY
     25.f,               // initCovVelX
-    25.f                // initCovVelY
+    25.f,               // initCovVelY
+    7.f                 // threshold for ball is moving!
 };
 
 class MMKalmanFilter
@@ -66,6 +67,8 @@ public:
     float getFilteredBear(){return filters.at(bestFilter)->getFilteredBear();};
 
     bool isStationary(){return stationary;};
+
+    void printBothFilters();
 
     void printEst(){std::cout << "Filter Estimate:\n\t"
                               << "'Stationary' is\t" << stationary << "\n\t"
