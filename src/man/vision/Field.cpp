@@ -53,9 +53,6 @@
 
 #include <math.h>
 #include <assert.h>
-#if ROBOT(NAO_SIM)
-#  include <aldefinitions.h>
-#endif
 #include <boost/shared_ptr.hpp>
 
 #include "Field.h"
@@ -64,6 +61,9 @@
 
 using namespace std;
 using boost::shared_ptr;
+
+namespace man {
+namespace vision {
 
 // Constructor for Field class. passed an instance of Vision and Pose
 Field::Field(Vision* vis, Threshold * thr)
@@ -616,4 +616,7 @@ void Field::drawMore(int x, int y, int c)
 	vision->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
 	vision->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
 #endif
+}
+
+}
 }

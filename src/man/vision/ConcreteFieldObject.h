@@ -1,9 +1,12 @@
 #ifndef ConcreteFieldObject_h_defined
 #define ConcreteFieldObject_h_defined
 
+namespace man {
+namespace vision {
 // Forward Reference
-class ConcreteFieldObject;
-
+	class ConcreteFieldObject;
+}
+}
 // STL libraries
 #include <ostream>
 #include <string>
@@ -14,6 +17,9 @@ class ConcreteFieldObject;
 #include "Structs.h"
 #include "FieldConstants.h"
 #include "ConcreteLandmark.h"
+
+namespace man {
+namespace vision {
 
 #define CONCRETE_FIELD_OBJECT_START_ID 40
 enum fieldObjectID {
@@ -119,5 +125,9 @@ static const point <float> YELLOW_GOAL_BOTTOM_POST_LOC =
 
 static const point <float> UNKNOWN_LOC =
     point<float>(-1, -1);
+
+
+}
+}
 
 #endif // ConcreteFieldObject_h_defined

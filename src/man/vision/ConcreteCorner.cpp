@@ -3,6 +3,10 @@ using namespace std;
 
 // Directions which a corner can point
 //TODO (EJ) document convention
+
+namespace man {
+namespace vision {
+
 static const float NORTH = M_PI_FLOAT;
 static const float WEST = -M_PI_FLOAT/2.0f;
 static const float SOUTH = 0;
@@ -883,3 +887,5 @@ bool ConcreteCorner::isLineInCorner(const ConcreteLine* line) const
     return (line == line1) || (line == line2);
 }
 
+}
+}

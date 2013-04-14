@@ -1,6 +1,12 @@
 #ifndef StepCommand_h
 #define StepCommand_h
 
+#include "MotionCommand.h"
+
+namespace man
+{
+namespace motion
+{
 class StepCommand : public MotionCommand {
 
 
@@ -20,7 +26,7 @@ public:
     const float gain;
 
 protected:
-	virtual void setChainList() {
+    virtual void setChainList() {
         chainList.assign(MotionConstants::STEP_CHAINS,
                          MotionConstants::STEP_CHAINS +
                          MotionConstants::STEP_NUM_CHAINS);
@@ -36,4 +42,6 @@ public:
         }
 };
 
+}
+}
 #endif

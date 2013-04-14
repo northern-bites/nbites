@@ -27,6 +27,9 @@
 
 //using namespace std;
 
+namespace man {
+namespace vision {
+
 Blobs::Blobs(int howMany) {
 	total = howMany;
 	blobs = (Blob*)malloc(sizeof(Blob) * howMany);
@@ -411,4 +414,7 @@ void Blobs::newBlobIt(int i, int j, bool newBlob) {
     blobs[numBlobs].setArea(25);
     numBlobs++;
   }
+}
+
+}
 }

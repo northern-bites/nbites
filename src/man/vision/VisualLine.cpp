@@ -9,6 +9,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // Return true if y is higher in the image (towards 0)
 const bool YOrder::operator() (const linePoint& first, const linePoint& second)
  const
@@ -674,4 +677,7 @@ const std::vector<lineID> VisualLine::getIDs() {
   }
 
   return poss;
+}
+
+}
 }

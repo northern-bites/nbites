@@ -2,6 +2,9 @@
 #include <limits>
 
 using namespace std;
+
+namespace man {
+namespace vision {
 namespace HC = HoughConstants;
 
 const int HoughSpaceImpl::drTab[HC::peak_points] = {  1,  1,  0, -1 };
@@ -22,12 +25,10 @@ HoughSpaceImpl::HoughSpaceImpl() :
 list<pair<HoughLine, HoughLine> >
 HoughSpaceImpl::findLines(Gradient& g)
 {
-    PROF_ENTER(P_HOUGH);
     reset();
     findHoughLines(g);
     list<pair<HoughLine, HoughLine> > lines = narrowHoughLines();
 
-    PROF_EXIT(P_HOUGH);
     return lines;
 }
 
@@ -50,13 +51,12 @@ list<pair<HoughLine, HoughLine> > HoughSpaceImpl::narrowHoughLines()
         lines.push_back(pair<HoughLine, HoughLine>(activeLines[(*i).first],
                                                    activeLines[(*i).second]));
     }
-    PROF_EXIT(P_HOUGH);
     return lines;
 }
 
 void HoughSpaceImpl::markEdges(Gradient& g)
 {
-    PROF_ENTER(P_MARK_EDGES);
+    
 #ifdef USE_MMX
     if (g.numPeaks > 0){
         // _mark_edges(g.numPeaks, angleSpread, g.angles, &hs[0][0]);
@@ -73,7 +73,7 @@ void HoughSpaceImpl::markEdges(Gradient& g)
              g.getAngle(i) + getAngleSpread());
     }
 #endif /* USE_MMX */
-    PROF_EXIT(P_MARK_EDGES);
+    
 }
 
 void HoughSpaceImpl::edge(int x, int y, int t0, int t1)
@@ -104,8 +104,7 @@ int HoughSpaceImpl::getR(int x, int y, int t)
 
 void HoughSpaceImpl::smooth()
 {
-    PROF_ENTER(P_SMOOTH);
-
+   
 #ifdef USE_MMX
     _smooth_hough(&hs[0][0], getAcceptThreshold());
 #else
@@ -123,12 +122,10 @@ void HoughSpaceImpl::smooth()
     }
 #endif
 
-    PROF_EXIT(P_SMOOTH);
 }
 
 void HoughSpaceImpl::peaks()
 {
-    PROF_ENTER(P_HOUGH_PEAKS);
     for (uint16_t t = HC::first_peak_row;
          t < HC::t_span + HC::first_peak_row;
          ++t) {
@@ -158,7 +155,7 @@ void HoughSpaceImpl::peaks()
             continue;
         }
     }
-    PROF_EXIT(P_HOUGH_PEAKS);
+
 }
 
 void HoughSpaceImpl::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
@@ -174,7 +171,7 @@ void HoughSpaceImpl::createLinesFromPeaks(ActiveArray<HoughLine>& lines)
 
 void HoughSpaceImpl::suppress(ActiveArray<HoughLine>& lines)
 {
-    PROF_ENTER(P_SUPPRESS);
+
     const int size = lines.size();
     bool toDelete[size];
 
@@ -231,7 +228,7 @@ void HoughSpaceImpl::suppress(ActiveArray<HoughLine>& lines)
             lines.deactivate(i);
         }
     }
-    PROF_EXIT(P_SUPPRESS);
+
 }
 
 /** Compute a ray to line intersection to check if the gradient from
@@ -276,7 +273,6 @@ bool gradientsPointIn(HoughLine i, HoughLine j)
 
 list<pair<int, int> > HoughSpaceImpl::pairLines(ActiveArray<HoughLine>& lines)
 {
-    PROF_ENTER(P_PAIR_LINES);
     list<pair<int, int> > pairs;
     const int size = lines.size();
 
@@ -341,7 +337,6 @@ list<pair<int, int> > HoughSpaceImpl::pairLines(ActiveArray<HoughLine>& lines)
 
         pairs.push_back(pair<int,int>(i, pair_array[i]));
     }
-    PROF_EXIT(P_PAIR_LINES);
     return pairs;
 }
 
@@ -374,4 +369,7 @@ void HoughSpaceImpl::addPeak(uint16_t r, uint16_t t, uint16_t z)
     p.r = r;
     p.t = t;
     p.z = z;
+}
+
+}
 }

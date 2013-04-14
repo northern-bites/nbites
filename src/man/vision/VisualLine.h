@@ -13,6 +13,9 @@
 #include "FieldLines/Gradient.h"
 #include "VisualLandmark.h"
 
+namespace man {
+namespace vision {
+
 class VisualLine;
 
 enum ScanDirection {
@@ -78,9 +81,14 @@ class YOrder {
     const bool operator() (const linePoint& first, const linePoint& second) const;
 };
 
+}
+}
 
 #include "Structs.h"
 #include "Utility.h"
+
+namespace man {
+namespace vision {
 
 class VisualLine : public VisualLandmark {
     // Private constants
@@ -485,6 +493,9 @@ inline void VisualLine::setDistance(float _distance)
 inline void VisualLine::setDistanceSD(float _distanceSD)
 {
     distanceSD = _distanceSD;
+}
+
+}
 }
 
 #endif

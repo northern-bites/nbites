@@ -1,9 +1,11 @@
 #include "BaseFreezeCommand.h"
 
-
-
+namespace man
+{
+namespace motion
+{
 BaseFreezeCommand::BaseFreezeCommand(float stiffness)
-    :MotionCommand(MotionConstants::FREEZE)
+    : MotionCommand(MotionConstants::FREEZE)
 {
     setChainList();
     targetStiffness = stiffness;
@@ -23,4 +25,6 @@ BaseFreezeCommand::~BaseFreezeCommand(){
 
 float BaseFreezeCommand::getStiffness(){
     return targetStiffness;
+}
+}
 }

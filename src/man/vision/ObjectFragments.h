@@ -27,7 +27,12 @@
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 
-class ObjectFragments; // forward reference
+namespace man {
+namespace vision {
+	class ObjectFragments; // forward reference
+}
+}
+
 #include "Threshold.h"
 #include "Context.h"
 #include "VisualFieldObject.h"
@@ -35,6 +40,9 @@ class ObjectFragments; // forward reference
 #include "VisualBall.h"
 #include "Vision.h"
 #include "Field.h"
+
+namespace man {
+namespace vision {
 
 static const int MAX_BLOBS = 400;
 static const int MAX_POINTS = 100;
@@ -207,5 +215,8 @@ private:
 #endif
 
 };
+
+}
+}
 
 #endif // ObjectFragments_h_DEFINED

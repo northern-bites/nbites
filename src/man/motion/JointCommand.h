@@ -33,6 +33,10 @@
 #include "MotionCommand.h"
 #include "Kinematics.h"
 
+namespace man
+{
+namespace motion
+{
 class JointCommand : public MotionCommand {
 public:
     typedef boost::shared_ptr<JointCommand> ptr;
@@ -63,4 +67,7 @@ private:
     JointCommand(const JointCommand& other);
     const std::vector<float> stiffness;
 };
+
+}
+}
 #endif
