@@ -15,6 +15,7 @@ Tool::Tool(const char* title) :
     diagram(),
     selector(),
     logView(this),
+    tableCreator(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -37,12 +38,16 @@ Tool::Tool(const char* title) :
     connect(&diagram, SIGNAL(signalNewDisplayWidget(QWidget*, std::string)),
             &logView, SLOT(newDisplayWidget(QWidget*, std::string)));
 
+    connect(&diagram, SIGNAL(signalUnloggersReady()),
+            this, SLOT(setUpModules()));
+
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
     toolbar->addWidget(recordButton);
 
     toolTabs->addTab(&selector, tr("Data"));
     toolTabs->addTab(&logView, tr("Log View"));
+    toolTabs->addTab(&tableCreator, tr("Color Creator"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
@@ -74,6 +79,18 @@ Tool::~Tool() {
 
 void Tool::setUpModules()
 {
+    if (diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
+                                                      "top") &&
+        diagram.connectToUnlogger<messages::YUVImage>(tableCreator.bottomImageIn,
+                                                      "bottom"))
+    {
+        diagram.addModule(tableCreator);
+    }
+    else
+    {
+        std::cout << "Right now you can't use the color table creator without"
+                  << " two image logs." << std::endl;
+    }
 }
 
 // Keyboard control
