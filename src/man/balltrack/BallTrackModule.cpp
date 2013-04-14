@@ -43,9 +43,11 @@ void BallTrackModule::run_()
 
     // Use the Weighted Naive Estimate
     float x = localizationInput.message().x() +
-        ballMessage.get()->distance() * cosf(localizationInput.message().h());
+        ballMessage.get()->distance() * cosf(localizationInput.message().h() +
+                                             ballMessage.get()->bearing());
     float y = localizationInput.message().y() +
-        ballMessage.get()->distance() * sinf(localizationInput.message().h());
+        ballMessage.get()->distance() * sinf(localizationInput.message().h() +
+                                             ballMessage.get()->bearing());
     ballMessage.get()->set_x(x);
     ballMessage.get()->set_y(y);
 
@@ -53,6 +55,11 @@ void BallTrackModule::run_()
     ballMessage.get()->set_rel_y(filters->getRelYPosEst());
     ballMessage.get()->set_vel_x(filters->getRelXVelEst());
     ballMessage.get()->set_vel_y(filters->getRelYVelEst());
+
+    std::cout << "BEAR " << ballMessage.get()->bearing_deg() << std::endl;
+    std::cout << "DIST " << ballMessage.get()->distance() << std::endl;
+    std::cout << "BALL " << ballMessage.get()->x() << ", " << ballMessage.get()->y() << std::endl;
+    std::cout << "ME   " << localizationInput.message().x() << ", " << localizationInput.message().y() << std::endl;
 
     ballMessage.get()->set_var_rel_x(filters->getCovXPosEst());
     ballMessage.get()->set_var_rel_y(filters->getCovYPosEst());

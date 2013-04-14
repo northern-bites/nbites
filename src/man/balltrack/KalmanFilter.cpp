@@ -49,8 +49,9 @@ namespace balltrack
             updateWithObservation(visionBall);
 
         // I think?
-        filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
-        filteredBear = NBMath::safe_atan2(x(1),x(0));
+
+        std::cout << "RelX:\t" << x(0) << "\tRelY:\t" << x(1) << std::endl;
+
     }
 
     void KalmanFilter::predict(messages::RobotLocation odometry)
@@ -215,6 +216,10 @@ namespace balltrack
              cov(i,i) += noise(i);
          }
 
+        // Housekeep
+        filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
+        filteredBear = NBMath::safe_atan2(x(1),x(0));
+
         // std::cout<<"Ball X Est\t" << x(0)
         //          <<"\nBall Y Est\t" << x(1) << std::endl;
         // std::cout<<"Cov X\t" << cov(0,0)
@@ -295,6 +300,10 @@ namespace balltrack
 
         weight *= 1 / (std::sqrt(cov(0,0)*cov(0,0)
                                  + cov(1,1)*cov(1,1)));
+
+        // Housekeep
+        filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
+        filteredBear = NBMath::safe_atan2(x(1),x(0));
 
         // std::cout<<"Ball X Est\t" << x(0)
         //          <<"\nBall Y Est\t" << x(1) << std::endl;
