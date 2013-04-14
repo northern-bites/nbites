@@ -10,20 +10,19 @@ FRAME_SAVE_RATE = 1
 NUM_FRAMES_TO_SAVE = 150
 
 def gameReady(player):
-    if player.firstFrame():
-        player.gainsOn()
-        #player.executeMove(SweetMoves.INITIAL_POS)
-    return player.stay()
+     return player.stay()
 
 def gameSet(player):
     if player.firstFrame():
-        player.brain.nav.stand()
+        player.stand()
 
     return player.stay()
 
 def gamePlaying(player):
     if player.firstFrame():
         player.brain.tracker.repeatBasicPan()
+
+    return player.stay()
 
 def gamePenalized(player):
 #    if player.firstFrame():
