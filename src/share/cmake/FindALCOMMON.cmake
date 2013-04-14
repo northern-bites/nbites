@@ -15,14 +15,11 @@ if( NOT OFFLINE )
     ${OE_SYSROOT}/usr/lib/libalcommon.so
     ${OE_SYSROOT}/usr/lib/libalmemoryfastaccess.so)
 else()
+  set( CMAKE_PREFIX_PATH ${AL_DIR} )
   set( ALCOMMON_LIBRARIES
     ${AL_DIR}/lib/libalcommon.so
     ${AL_DIR}/lib/libalmemoryfastaccess.so)
 endif()
-
-# if( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
-#     set( ALCOMMON_FOUND TRUE )
-# endif( EXISTS "${ALCOMMON_LIBRARIES}" AND ALCOMMON_LIBRARIES )
 
 if( NOT ALCOMMON_FOUND_TRUE AND ALCOMMON_FIND_REQUIRED )
     if( NOT ALCOMMON_INCLUDE_DIR )
