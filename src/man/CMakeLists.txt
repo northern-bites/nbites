@@ -48,10 +48,8 @@ if ( OFFLINE )
 endif()
 
 # For Aldebaran's headers
-if ( NOT OFFLINE )
-  find_package(ALCOMMON REQUIRED)
-  include_directories( ${ALCOMMON_INCLUDE_DIR} )
-endif()
+find_package(ALCOMMON REQUIRED)
+include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
