@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <stdlib.h>
 
 namespace tool {
 namespace color {
