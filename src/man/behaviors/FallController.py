@@ -1,64 +1,62 @@
-from . import FallStates
-from .util import FSA
+import SweetMoves as SweetMoves
 
-class FallController(FSA.FSA):
+class FallController():
     def __init__(self, brain):
-        FSA.FSA.__init__(self,brain)
         self.brain = brain
-        self.addStates(FallStates)
-        self.currentState = 'notFallen'
-        self.setName('FallController')
-        self.setPrintStateChanges(True)
         self.stateChangeColor = 'blue'
 
+        self.falling = False
+        self.fell = False
         self.standingUp = False
-        self.fallCount = 0
-        self.doneStandingCount = 0
+        self.standDelay = 0
+        self.startStandupTime = 0
         self.standupMoveTime = 0
 
-        self.DONE_STANDING_THRESH = 2
-
-        self.executeStandup = True
         self.enabled = True
 
     def run(self):
         if not self.enabled:
             return
 
-        # Only try to stand up when playing or localizing in ready because
-        # it's really annoying otherwise.
-        if ('Playing' in self.brain.gameController.currentState or
-            'Ready' in self.brain.gameController.currentState):
+        # Check if we have just begun falling.
+        if (not self.falling and self.brain.interface.fallStatus.falling):
+            # Save the player. We are falling
+            self.falling = True
+            self.brain.player.gainsOff()
+            self.brain.player.switchTo('fallen')
 
-            #self.printf("run angleY is "+str(inertial.angleY))
+        # Check if we have fallen.
+        # HACK Guardian's `fallen` is not actually on the ground
+        #      Put in a delay to ensure we hit the ground softly
+        if (not self.fell and self.brain.interface.fallStatus.fallen):
+            self.standDelay += 1
+            if (self.standDelay == 15): # Half a second
+                self.fell = True
 
-            if (not self.standingUp and self.brain.roboguardian.isRobotFallen() ):
-                self.standingUp = True
-                self.fallCount = 0
-                self.switchTo('fallen')
-                #         elif self.brain.guardian.falling:
-                #             self.switchTo('falling')
+        # Send a stand up move once.
+        elif (not self.standingUp and self.fell):
+            self.standingUp = True
 
-            # disabled due to flakey FSRs (7/8/11)
-            """
-            elif (not self.standingUp and
-                  not self.brain.nav.doingSweetMove and
-                  not self.brain.roboguardian.isFeetOnGround()):
-                self.switchTo('feetOffGround')
-            """
+            self.brain.player.gainsOn()
+            self.brain.tracker.setNeutralHead()
 
-        FSA.FSA.run(self)
+            move = None
+            if (self.brain.interface.fallStatus.on_front):
+                move = SweetMoves.STAND_UP_FRONT
+            else:
+                move = SweetMoves.STAND_UP_BACK
 
-    def getTimeRemainingEst(self):
-        # TODO: turn this into a message
-        return 0
-        # if (self.currentState == "notFallen" or
-        #     self.currentState == "doneStanding"):
-        #     return 0
-        # else:
-        #     return SweetMoves.getMoveTime(SweetMoves.STAND_UP_FRONT)
+            self.brain.player.executeMove(move)
 
-    def enableFallProtection(self, isTrue):
-        self.printf("Fall Protection is " + str(isTrue))
-        self.enabled = isTrue
-        self.brain.roboguardian.enableFallProtection(isTrue)
+            self.standupMoveTime = SweetMoves.getMoveTime(move)
+            self.startStandupTime = self.brain.time
+
+        # If we are standing, check if we are done.
+        elif (self.standingUp):
+            if (self.brain.time - self.startStandupTime > self.standupMoveTime):
+                self.brain.player.stand()
+                self.brain.player.switchTo(self.brain.player.gameState)
+                self.falling = False
+                self.fell = False
+                self.standingUp = False
+                self.standDelay = 0

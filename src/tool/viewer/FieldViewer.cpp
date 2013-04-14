@@ -6,7 +6,6 @@
 #include <QVBoxLayout>
 #include <vector>
 
-
 namespace qtool {
 namespace viewer {
 

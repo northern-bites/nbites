@@ -79,8 +79,8 @@ void PaintBots::buildBitmap()
             //ball uncertainty
 			//don't draw uncertainty if more than half the field
 			if (!(locs->getBallXUncert(i)*4>FIELD_WIDTH || locs->getBallYUncert(i)*4 > FIELD_HEIGHT))
-            this->paintEllipseArea(painter, ball, ballPt,
-                                   locs->getBallXUncert(i), locs->getBallYUncert(i));
+				this->paintEllipseArea(painter, ball, ballPt,
+									   locs->getBallXUncert(i), locs->getBallYUncert(i));
 
             //robot-ball line
             painter.setPen(Qt::DashLine);

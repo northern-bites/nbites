@@ -95,8 +95,6 @@ BodyJointCommand::getJoints (ChainID chainID) const
     case RARM_CHAIN:
         return rarm_joints;
     default:
-	std::cout << "SHOULD NOT ASK FOR THIS TYPE OF CHAIN FROM BODYJOINTCOMMAND"
-		  << std::endl;
         static std::vector<float> empty;
         return empty;
     }
@@ -139,7 +137,7 @@ void
 BodyJointCommand::setChainList() {
     chainList.insert(chainList.end(),
                      MotionConstants::BODY_JOINT_CHAINS,
-                     MotionConstants::BODY_JOINT_CHAINS + 
+                     MotionConstants::BODY_JOINT_CHAINS +
 		     MotionConstants::BODY_JOINT_NUM_CHAINS);
 }
 

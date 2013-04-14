@@ -17,6 +17,7 @@
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "RobotLocation.pb.h"
+#include "FallStatus.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -42,6 +43,7 @@ public:
     messages::FootBumperState   const * footBumperState_ptr;
     messages::JointAngles       const * joints_ptr;
     messages::RobotLocation     const * resetLocRequest_ptr;
+    messages::FallStatus        const * fallStatus_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -118,6 +120,10 @@ public:
     void setResetLocRequest_ptr(const messages::RobotLocation* msg)
     {
         resetLocRequest_ptr = msg;
+    }
+    void setFallStatus_ptr(const messages::FallStatus* msg)
+    {
+        fallStatus_ptr = msg;
     }
 
 };

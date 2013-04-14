@@ -17,6 +17,7 @@ from . import robots
 from . import GameController
 
 # Packages and modules from sub-directories
+from . import FallController
 from .headTracker import HeadTracker
 from .typeDefs import (Play, TeamMember)
 from .navigator import Navigator
@@ -37,6 +38,7 @@ import SonarState_proto
 import VisionRobot_proto
 import VisionField_proto
 import ButtonState_proto
+import FallStatus_proto
 
 class Brain(object):
     """
@@ -55,9 +57,12 @@ class Brain(object):
         self.counter = 0
         self.time = time.time()
 
-        #initalize the leds and game controller
+        # Initalize the leds and game controller
         self.leds = Leds.Leds(self)
         self.gameController = GameController.GameController(self)
+
+        # Initialize fallController
+        self.fallController = FallController.FallController(self)
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
@@ -136,6 +141,7 @@ class Brain(object):
         # Order here is very important
         self.gameController.run()
         self.updatePlaybook()
+        self.fallController.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()
