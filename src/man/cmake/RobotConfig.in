@@ -1,0 +1,16 @@
+/* -*- C++ -*- Tell editors this is a C++ file (despite it's .in extension) */
+
+#pragma once
+
+// :::::::::::::::::::::::::: Options variables :::..
+
+#define MY_PLAYER_NUMBER @PLAYER_NUMBER@
+
+#define MY_TEAM_NUMBER @TEAM_NUMBER@
+
+#define USING_LAB_FIELD_${USING_LAB_FIELD}
+#ifdef  USING_LAB_FIELD_ON
+#   define USING_LAB_FIELD
+#else
+#   undef USING_LAB_FIELD
+#endif

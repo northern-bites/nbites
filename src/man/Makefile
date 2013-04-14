@@ -1,194 +1,86 @@
-#Directory setup
-CUR_DIR = $(shell pwd)
-NBITES_DIR = $(CUR_DIR)/../..
-BUILD_DIR = $(NBITES_DIR)/build/man
-MAN_DIR = $(CUR_DIR)
+# Main man makefile
 
-ATOM_DIR = $(BUILD_DIR)/atom
-GEODE_DIR = $(BUILD_DIR)/geode
-WEBOTS_DIR = $(BUILD_DIR)/webots
-GEODE_INSTALL_DIR = $(BUILD_DIR)/geode_install
-WEBOTS_INSTALL_DIR = $(BUILD_DIR)/webots_install
-ATOM_INSTALL_DIR = $(BUILD_DIR)/atom_install
-CMAKE_DIR = 
-CMAKE_ATOM_DEPEND = $(ATOM_DIR)/Makefile
-CMAKE_WEBOTS_DEPEND = $(WEBOTS_DIR)/Makefile
-CMAKE_GEDOE_DEPEND = $(GEODE_DIR)/Makefile
+# Toolchain for cross-compiling for the robot
+ATOM_TOOLCHAIN = ../share/cmake/atom.cmake
+# Toolchain for building natively
+STRAIGHT_TOOLCHAIN = ../share/cmake/generic.cmake
 
-#File setup
-CONFIG_FILE = manconfig.h
-INSTALL_SCRIPT = upload.sh
-GEODE_FILE = $(BUILD_DIR)/geode_file
-ATOM_FILE = $(BUILD_DIR)/atom_file
-WEBOTS_FILE = $(BUILD_DIR)/webots_file
+# Where the build output will be placed relative to here
+BUILD_DIR = ../../build/man
+# Here relative to the build dir
+SRC_DIR = ../../src/man
 
-PYC_FILES = $(shell find . -name "*.pyc")
+# Where the files will be installed
+INSTALL_PREFIX = install/
 
-#general definitions
-#TODO: in cmake make everything relative to NBITES_DIR
-CMAKE_DEFS = -DNBITES_DIR=$(NBITES_DIR)
-#toolchains
-GEODE_TOOLCHAIN = $(abspath $(CURDIR)/cmake/geode.cmake)
-ATOM_TOOLCHAIN = $(abspath $(CURDIR)/cmake/atom.cmake)
-#specialized defs
-CMAKE_ATOM_DEFS = $(CMAKE_DEFS) -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) -DMAN_INSTALL_PREFIX=$(ATOM_INSTALL_DIR)
-CMAKE_GEODE_DEFS = $(CMAKE_DEFS) -DCMAKE_TOOLCHAIN_FILE=$(GEODE_TOOLCHAIN) -DMAN_INSTALL_PREFIX=$(GEODE_INSTALL_DIR)
-CMAKE_WEBOTS_DEFS = $(CMAKE_DEFS) -DOE_CROSS_BUILD=OFF -DMAN_IS_REMOTE_=ON -DWEBOTS_BACKEND=ON -DCOLOR_TABLE=../../tables/uvy/webots/webots_6_2.mtb -DMAN_INSTALL_PREFIX=$(WEBOTS_INSTALL_DIR)
-#Commands setup
-CD=cd
-RM=rm
-CMAKE=cmake
-CCMAKE=ccmake
-CCMAKE_GUI=cmake-gui
-MKDIR=mkdir
-TOUCH=touch
-MAKE_OPTIONS=--no-print-directory
-MAN_TARGET=man
+# Used to determine which kind of build
+STRAIGHT_FILE = $(BUILD_DIR)/straight
+CROSS_FILE = $(BUILD_DIR)/cross
 
-.PHONY: default_target all atom geode cclean clean install noconfig
-.PHONY: clean_install
+# Different flags depending on the type of build
+CMAKE_CROSS_FLAGS = -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) -DCMAKE_INSTALL_PREFIX=install/
+CMAKE_STRAIGHT_FLAGS = -DCMAKE_TOOLCHAIN_FILE=$(STRAIGHT_TOOLCHAIN) -DCMAKE_INSTALL_PREFIX=install/
 
+# Name of the script that copies files to the robot
+UPLOAD_SCRIPT = $(BUILD_DIR)/upload.sh
 
-default_target: all
+.PHONY: build
+build:  $(BUILD_DIR)/Makefile
+	$(MAKE) -C $(BUILD_DIR) --no-print-directory
 
-all: $(CMAKE_ATOM_DEPEND) $(CMAKE_WEBOTS_DEPEND) $(CMAKE_GEODE_DEPEND)
-	@if [ -e $(GEODE_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(GEODE_DIR) ${MAN_TARGET}; \
-	elif [ -e $(ATOM_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(ATOM_DIR) ${MAN_TARGET}; \
-	elif [ -e $(WEBOTS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) ${MAN_TARGET}; \
-	fi
-
-$(CMAKE_WEBOTS_DEPEND):
-	@if [ -f $(WEBOTS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) webots; \
-	fi
-
-$(CMAKE_ATOM_DEPEND):
-	@if [ -f $(ATOM_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) atom; \
-	fi
-
-$(CMAKE_GEODE_DEPEND):
-	@if [ -f $(GEODE_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) geode; \
-	fi
-
-build_atom:
-	$(MAKE) $(MAKE_OPTIONS) -C $(ATOM_DIR) ${MAN_TARGET}; \
-
-atom: $(ATOM_FILE)
-	@set -e;
-		$(CD) $(ATOM_DIR); \
-		$(CCMAKE) .
-
-atom_gui: $(ATOM_FILE)
-	@set -e;
-		$(CD) $(ATOM_DIR); \
-		$(CCMAKE_GUI) .
-
-$(ATOM_FILE):
-	@if [ -e $(GEODE_FILE) ]; then \
-		$(RM) $(GEODE_FILE); \
-	fi
-	@if [ -e $(WEBOTS_FILE) ]; then \
-		$(RM) $(WEBOTS_FILE); \
-	fi
-	@set -e; \
-		$(MKDIR) -p $(BUILD_DIR); \
-		$(TOUCH) $(ATOM_FILE); \
-		$(MKDIR) -p $(ATOM_DIR); \
-		$(CD) $(ATOM_DIR); \
-		$(CMAKE) $(CMAKE_ATOM_DEFS) $(CURDIR)/$(CMAKE_DIR)
-
-build_geode:
-	$(MAKE) $(MAKE_OPTIONS) -C $(GEODE_DIR) ${MAN_TARGET}; \
-
-
-geode: $(GEODE_FILE)
-	@set -e ; \
-		$(CD) $(GEODE_DIR); \
-		$(CCMAKE) $(CCMAKE_CROSS_OPT) .
-
-geode_gui: $(GEODE_FILE)
-	@set -e ; \
-		$(CD) $(GEODE_DIR); \
-		$(CCMAKE_GUI) $(CCMAKE_CROSS_OPT) .
-
-$(GEODE_FILE):
-	@if [ -e $(ATOM_FILE) ]; then \
-		$(RM) $(ATOM_FILE); \
-	fi
-	@if [ -e $(WEBOTS_FILE) ]; then \
-		$(RM) $(WEBOTS_FILE); \
-	fi
-	@set -e; \
-		$(MKDIR) -p $(BUILD_DIR); \
-		$(TOUCH) $(GEODE_FILE); \
-		$(MKDIR) -p $(GEODE_DIR); \
-		$(CD) $(GEODE_DIR); \
-		$(CMAKE) $(CMAKE_GEODE_DEFS) $(CURDIR)/$(CMAKE_DIR)
-
-build_webots:
-	$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) ${MAN_TARGET}; \
-
-webots: $(WEBOTS_FILE)
-	@set -e;
-		$(CD) $(WEBOTS_DIR); \
-		$(CCMAKE) .
-
-webots_gui: $(WEBOTS_FILE)
-	@set -e;
-		$(CD) $(WEBOTS_DIR); \
-		$(CCMAKE_GUI) .
-
-$(WEBOTS_FILE):
-	@if [ -e $(ATOM_FILE) ]; then \
-		$(RM) $(ATOM_FILE); \
-	fi
-	@if [ -e $(GEODE_FILE) ]; then \
-		$(RM) $(GEODE_FILE); \
-	fi
-	@set -e; \
-		$(MKDIR) -p $(BUILD_DIR); \
-		$(TOUCH) $(WEBOTS_FILE); \
-		$(MKDIR) -p $(WEBOTS_DIR); \
-		$(CD) $(WEBOTS_DIR); \
-		$(CMAKE) $(CMAKE_WEBOTS_DEFS) $(CURDIR)/$(CMAKE_DIR)
-
-
-install: $(CMAKE_DEPEND)
-	@if [ -e $(GEODE_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(GEODE_DIR) install; \
-		$(GEODE_DIR)/$(INSTALL_SCRIPT); \
-	elif [ -e $(WEBOTS_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(WEBOTS_DIR) install; \
-		$(WEBOTS_DIR)/$(INSTALL_SCRIPT); \
-	elif [ -e $(ATOM_FILE) ]; then \
-		$(MAKE) $(MAKE_OPTIONS) -C $(ATOM_DIR) install; \
-		$(ATOM_DIR)/$(INSTALL_SCRIPT); \
+.PHONY: install
+install: $(BUILD_DIR)/Makefile
+	@if [ -e $(CROSS_FILE) ]; then \
+		$(MAKE) install -C $(BUILD_DIR) --no-print-directory; \
+		$(UPLOAD_SCRIPT) \
 	else \
-		echo "Must have ATOM/GEODE or WEBOTS build configured to 'make install'"; \
+		echo "You must build cross to install to a robot."; \
 	fi
 
+.PHONY: test
+test: $(BUILD_DIR)/Makefile
+	@if [ -e $(CROSS_FILE) ]; then \
+		echo "You must build straight to run the tests."; \
+	else \
+		$(MAKE) check -C $(BUILD_DIR) --no-print-directory && \
+		cd $(BUILD_DIR) && \
+		ctest -V; \
+	fi
 
-clean_install:
-	$(RM) -r $(GEODE_INSTALL_DIR)/*
-	$(RM) -r $(ATOM_INSTALL_DIR)/*
-	$(RM) -r $(WEBOTS_INSTALL_DIR)/*
+.PHONY: cross
+cross:  $(CROSS_FILE)
+	cd $(BUILD_DIR); \
+	cmake  $(CMAKE_CROSS_FLAGS) $(SRC_DIR); \
+	ccmake $(SRC_DIR)
 
-cclean: $(CMAKE_DEPEND)
-	@$(MAKE) $(MAKE_OPTIONS) -C $(BUILD_DIR) clean
+$(CROSS_FILE):
+	mkdir -p $(BUILD_DIR)
+	@if [ -e $(STRAIGHT_FILE) ]; then \
+		rm -rf $(BUILD_DIR)/*; \
+	fi
+	@touch $(CROSS_FILE)
 
+.PHONY: straight
+straight: $(STRAIGHT_FILE)
+	cd $(BUILD_DIR); \
+	cmake  $(CMAKE_STRAIGHT_FLAGS) $(SRC_DIR); \
+	ccmake $(SRC_DIR)
+
+$(STRAIGHT_FILE):
+	mkdir -p $(BUILD_DIR)
+	@if [ -e $(CROSS_FILE) ]; then \
+		rm -rf $(BUILD_DIR)/*; \
+	fi
+	@touch $(STRAIGHT_FILE)
+
+.PHONY: clean
 clean:
-	$(RM) -r $(BUILD_DIR)
+	rm -rf $(BUILD_DIR)/*
 
+.PHONY: check
 check:
-	@if [ -e $(GEODE_FILE) ]; then \
-		echo "Making for GEODE"; \
-	elif [ -e $(ATOM_FILE) ]; then \
-		echo "Making for ATOM"; \
-	elif [ -e $(WEBOTS_FILE) ]; then \
-		echo "Making for WEBOTS"; \
+	@if [ -e $(CROSS_FILE) ]; then \
+		echo "Making cross."; \
+	elif [ -e $(STRAIGHT_FILE) ]; then \
+		echo "Making straight."; \
 	fi

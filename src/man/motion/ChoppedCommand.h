@@ -1,13 +1,15 @@
-
-
-#ifndef __ChoppedCommand_h
-#define __ChoppedCommand_h
+#pragma once
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 #include "JointCommand.h"
 #include "Kinematics.h"
+
+namespace man
+{
+namespace motion
+{
 
 class ChoppedCommand
 {
@@ -62,4 +64,5 @@ private:
 
 };
 
-#endif
+} // namespace motion
+} // namespace man

@@ -1,0 +1,41 @@
+# This script installs the man code to where it needs to go.
+# It also copies the color table to the correct location
+
+# Exit on error
+set -e
+# No uninitialized variables
+set -o nounset
+
+ADDRESS=@REMOTE_ADDRESS@
+LOCATION=@INSTALL_LOCATION@
+
+TOP_COLOR_TABLE_PATH=@TABLE_TOP@
+BOTTOM_COLOR_TABLE_PATH=@TABLE_BOTTOM@
+COLOR_TABLE_DIR=@CMAKE_INSTALL_PREFIX@/lib/table
+TOP_TABLE_STD_NAME=top_table.mtb
+BOTTOM_TABLE_STD_NAME=bottom_table.mtb
+
+echo "Installing to the robot."
+
+if [ ! -n "$ADDRESS" ]; then
+    echo "Upload Error : No remote address specified."
+    exit 1
+fi
+
+SOURCE=@CMAKE_CURRENT_BIN_DIR@/@CMAKE_INSTALL_PREFIX@
+DESTINATION=nao@$ADDRESS:$LOCATION
+
+mkdir -p $COLOR_TABLE_DIR
+echo "cp $TOP_COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TOP_TABLE_STD_NAME"
+cp $TOP_COLOR_TABLE_PATH $COLOR_TABLE_DIR/$TOP_TABLE_STD_NAME
+
+echo "cp $BOTTOM_COLOR_TABLE_PATH $COLOR_TABLE_DIR/$BOTTOM_TABLE_STD_NAME"
+cp $BOTTOM_COLOR_TABLE_PATH $COLOR_TABLE_DIR/$BOTTOM_TABLE_STD_NAME
+
+rm -f $COLOR_TABLE_DIR/whichtable.txt
+touch $COLOR_TABLE_DIR/whichtable.txt
+echo $TOP_COLOR_TABLE_PATH >> $COLOR_TABLE_DIR/whichtable.txt
+echo $BOTTOM_COLOR_TABLE_PATH >> $COLOR_TABLE_DIR/whichtable.txt
+
+echo "rsync -rcLv $SOURCE/ $DESTINATION/"
+rsync -rcLv $SOURCE/ $DESTINATION/

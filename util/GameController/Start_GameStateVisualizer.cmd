@@ -1,7 +1,5 @@
 @echo off
 
-echo Starting GameStateVisualizer
-
-
+echo Starting SPL GameStateVisualizer
 
 java -jar GameStateVisualizer.jar -spl

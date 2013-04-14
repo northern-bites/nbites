@@ -1,0 +1,17 @@
+package messages;
+
+message InertialState
+{
+    // Raw accelerometer data.
+    optional float acc_x = 1;
+    optional float acc_y = 2;
+    optional float acc_z = 3;
+
+    // Raw gyrometer data.
+    optional float gyr_x = 4;
+    optional float gyr_y = 5;
+
+    // Filtered angle data.
+    optional float angle_x = 6;
+    optional float angle_y = 7;
+}

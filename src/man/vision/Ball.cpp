@@ -39,6 +39,10 @@
 
 using namespace std;
 
+
+namespace man{
+namespace vision{
+
 // Ball constants
 // EXAMINED: look at this switch - SMALLBALLDIM
 static const int SMALLBALLDIM = 3; // below this size balls are considered small
@@ -1287,4 +1291,6 @@ void Ball::drawLine(int x, int y, int x1, int y1, int c) {
 #ifdef OFFLINE
     vision->drawLine(x, y, x1, y1, c);
 #endif
+}
+}
 }

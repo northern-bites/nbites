@@ -27,18 +27,25 @@
 #include <boost/shared_ptr.hpp>
 #include <stdint.h>
 
-#include  "visionconfig.h"
 // including info header files
 #include "Common.h"
-#include "ClassHelper.h"
 #include "VisionDef.h"
-#include "Profiler.h"
 
-class Vision;   // forward reference
-class FieldLinesDetector;
-class CornerDetector;
-class HoughVisualLine;
-class HoughVisualCorner;
+// including message types
+#include "PMotion.pb.h"
+#include "InertialState.pb.h"
+#include "Images.h"
+
+namespace man {
+namespace vision {
+	class Vision;   // forward reference
+	class FieldLinesDetector;
+	class CornerDetector;
+	class HoughVisualLine;
+	class HoughVisualCorner;
+}
+}
+
 
 // including Class header files
 #include "VisualCrossbar.h"
@@ -53,19 +60,20 @@ class HoughVisualCorner;
 #include "FieldLines.h"
 #include "VisualCorner.h"
 #include "VisualObstacle.h"
-//memory
-#include "memory/MObjects.h"
-#include "memory/MemoryProvider.h"
+
+namespace man {
+namespace vision {
 
 class Vision
 {
     friend class Threshold;
 
-    ADD_SHARED_PTR(Vision)
+public:
+    typedef boost::shared_ptr<Vision> ptr;
+    typedef boost::shared_ptr<const Vision> const_ptr;
 
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose,
-           man::memory::MVision::ptr mVision = man::memory::MVision::ptr());
+    Vision();
     ~Vision();
 
 private:
@@ -83,13 +91,19 @@ public:
     void copyImage(const byte *image);
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
-    void notifyImage(const uint16_t *image);
+//  void notifyImage(const uint16_t *image);
     // for when we have two cameras
-    void notifyImage(const uint16_t *top, const uint16_t *bot);
+//    void notifyImage(const uint16_t *top, const uint16_t *bot);
+    // for use with modules
+    void notifyImage(const messages::ThresholdImage& topThrIm, const messages::PackedImage16& topYIm,
+					 const messages::PackedImage16& topUIm, const messages::PackedImage16& topVIm,
+					 const messages::ThresholdImage& botThrIm, const messages::PackedImage16& botYIm,
+					 const messages::PackedImage16& botUIm, const messages::PackedImage16& botVIm,
+					 const messages::JointAngles& ja, const messages::InertialState& inert);
     // utilize the current image pointer for vision processing
-    void notifyImage();
+//    void notifyImage();
     // set the current image pointer to the given pointer
-    void setImage(const uint16_t* image);
+    void setImage(uint8_t* image);
 
     // visualization methods
     void drawBox(int left, int right, int bottom, int top, int c);
@@ -112,8 +126,7 @@ public:
     void drawVisualLines(const std::vector<HoughVisualLine>& lines);
     void drawX(int x, int y, int c);
 
-    // Memory update
-    void updateMVision(man::memory::MVision::ptr) const;
+
 
     //
     // SETTERS
@@ -213,9 +226,11 @@ private:
 
     // information
     std::string colorTable;
-    man::memory::MemoryProvider<man::memory::MVision, Vision> memoryProvider;
 
 
 };
+
+}
+}
 
 #endif // _Vision_h_DEFINED
