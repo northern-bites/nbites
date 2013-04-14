@@ -30,7 +30,11 @@
 #include "Blob.h"
 #include "Blobs.h"
 
-class Ball; // forward reference
+namespace man {
+	namespace vision {
+		class Ball; // forward reference
+	}
+}
 #include "Threshold.h"
 #include "Context.h"
 #include "Field.h"
@@ -38,6 +42,8 @@ class Ball; // forward reference
 #include "Vision.h"
 
 
+namespace man{
+	namespace vision{
 //constants to constrain blob and point amounts
 static const int MAX_BALLS = 400;
 static const int MAX_BALL_POINTS = 100;
@@ -157,5 +163,7 @@ private:
 #endif
 
 };
+	}
+}
 
 #endif // Ball_h_DEFINED

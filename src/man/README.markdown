@@ -16,9 +16,7 @@ This will take you to a configuration screen.  If you want to simply test if
 your code compiles, than press `c` to begin configuration and then press `g` to
 generate the configuration files.
 
-If you are compiling for the robot you should make sure `@MAN_IS_REMOTE@` is set
-to OFF.  If it is set to OFF, you can change it by moving over the OFF text area
-and hitting the enter key.  Here you should also set the appropriate player for
+Here you should set the appropriate player for
 the robot and the IP address. Help for the configuration tool is accessible by
 typing h while the tool is running.
 

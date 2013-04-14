@@ -6,13 +6,20 @@
 #include <vector>
 #include "Structs.h"
 
-class VisualCorner;
+namespace man {
+namespace vision {
+	class VisualCorner;
+}
+}
 
 #include "ConcreteCorner.h"
 #include "Utility.h"
 #include "VisualObject.h"
 #include "VisualLine.h"
 #include <boost/shared_ptr.hpp>
+
+namespace man {
+namespace vision {
 
 class NaoPose;
 
@@ -93,21 +100,6 @@ public:
 
     const std::vector<cornerID> getIDs();
 
-    //TODO: prettify this
-    //HACK Mexico 2012 from Octavian to Lizzie
-    // Takes degrees because this is for Python. Lovely.
-    float getRobotGlobalHeadingIfFieldAngleIs(angle::degrees alpha) const {
-        return (physicalOrientation + alpha*TO_RAD - bearing)*TO_DEG;
-    }
-
-    float getRobotRelXIfFieldAngleIs(angle::degrees alpha) const {
-        return - distance * std::cos(physicalOrientation + alpha*TO_RAD);
-    }
-
-    float getRobotRelYIfFieldAngleIs(angle::degrees alpha) const {
-        return - distance * std::sin(physicalOrientation + alpha*TO_RAD);
-    }
-
     //reliable corner types
     bool isReliable() const {
         return cornerType == INNER_L || cornerType == OUTER_L || cornerType == T;
@@ -147,7 +139,7 @@ private: // private methods
         return 0.0000002f * _distance * _distance * _distance + 5.f;
     }
     inline static float cornerBearingToSD(float _bearing, float _distance) {
-        return .0000002*(_distance*_distance) + 4 * TO_RAD;
+        return .0000002f*(_distance*_distance) + 4.f * TO_RAD;
     }
 
 
@@ -258,5 +250,8 @@ public:
                         abs(edges.bottom - y) < minPixelSeparation));
     }
 };
+
+}
+}
 
 #endif
