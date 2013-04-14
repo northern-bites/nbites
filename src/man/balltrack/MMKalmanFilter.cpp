@@ -203,6 +203,13 @@ unsigned MMKalmanFilter::normalizeFilterWeights(){
     return tempBestFilter;
 }
 
+void MMKalmanFilter::printBothFilters() {
+    std::cout << "-------Stationary Filter---------" << std::endl;
+    filters.at((unsigned) 0)->printEst();
+    std::cout << std::endl << "-------Moving Filter---------" << std::endl;
+    filters.at((unsigned) 1)->printEst();
+}
+
 /**
  * @brief - Initialize all the filters!
  * @params- given a relX and relY for the position mean

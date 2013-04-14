@@ -68,6 +68,8 @@ public:
 
     bool isStationary(){return stationary;};
 
+    void printBothFilters();
+
     void printEst(){std::cout << "Filter Estimate:\n\t"
                               << "'Stationary' is\t" << stationary << "\n\t"
                               << "X-Pos:\t" << stateEst(0) << "Y-Pos:\t" << stateEst(1)

@@ -47,11 +47,6 @@ namespace balltrack
         //Note: Only update if we have an observation...
         if(visionBall.on())
             updateWithObservation(visionBall);
-
-        // I think?
-
-        std::cout << "RelX:\t" << x(0) << "\tRelY:\t" << x(1) << std::endl;
-
     }
 
     void KalmanFilter::predict(messages::RobotLocation odometry)
@@ -153,6 +148,10 @@ namespace balltrack
                 // vel = vel * (absVel + decel)/absVel
                 x(2) *= (std::abs(x(2)) + params.ballFriction*deltaT)/std::abs(x(2));
                 x(3) *= (std::abs(x(3)) + params.ballFriction*deltaT)/std::abs(x(3));
+            }
+            else {
+                x(2) = .000001f;
+                x(3) = .000001f;
             }
         }
 
