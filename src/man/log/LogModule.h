@@ -62,6 +62,13 @@ struct Write
     std::string buffer;
 };
 
+// Alternate version for images
+struct ImageWrite
+{
+    aiocb control;
+    messages::YUVImage image;
+};
+
 // Base Class
 class LogBase : public portals::Module
 {
@@ -81,7 +88,9 @@ protected:
     // Basic file/writing operations
     void openFile() throw (file_exception);
     void closeFile();
-    void checkWrites();
+    void checkSizeWrites();
+    static bool finished(Write& write);
+    static bool imageFinished(ImageWrite& write);
 
     void writeCharBuffer(const char* buffer, uint32_t size);
 
@@ -91,7 +100,6 @@ protected:
     }
 
     // Keeps track of all writes that haven't finished yet
-    std::list<Write> ongoing;
     std::list<Write> ongoingSizes;
     // Has the file been opened?
     bool fileOpen;
@@ -122,7 +130,7 @@ public:
     void writeHeader()
     {
         Header head;
-        head.set_name(nameHelper());
+        head.set_name(input.message().GetTypeName());
         head.set_version(CURRENT_VERSION);
         head.set_timestamp(42);
 
@@ -163,12 +171,6 @@ public:
     }
 
 protected:
-    // This helper can be specialized if the type is not a proto
-    std::string nameHelper()
-    {
-        return input.message().GetTypeName();
-    }
-
     // Handles all of the message-specific writing actions. Kept as a
     // separate helper method so that it can be specialized for images
     // or any other non-proto types
@@ -211,6 +213,11 @@ protected:
 
     }
 
+    void checkMessageWrites()
+    {
+        ongoing.remove_if(LogBase::finished);
+    }
+
     // Implements the Module run_ method
     virtual void run_()
     {
@@ -228,26 +235,171 @@ protected:
         }
 
         // Check for and remove finished writes from the list
-        checkWrites();
+        checkSizeWrites();
+        checkMessageWrites();
 
         // Start a new write for the current message
         writeMessage(input.message());
     }
 
     portals::InPortal<T> input;
+    std::list<Write> ongoing;
 };
 
+// Special for Images
+template<class T>
+class ImageLogModule : public LogBase {
+public:
+    /*
+     * @brief Takes an OutPortal and wires it to this new module so that
+     *        we can log its output.
+     */
+    ImageLogModule(portals::OutPortal<T>* out, std::string name) : LogBase(name)
+    {
+        input.wireTo(out);
+    }
 
-// These specialize the above template so that YUVImages can be logged
-// without having to be serialized and have protobuf methods
-template<>
-void LogModule<messages::YUVImage>::writeInternal(messages::YUVImage);
+    // Writes out a header protobuf
+    void writeHeader()
+    {
+        Header head;
+        // Specialized to YUVImage, fixme
+        head.set_name("messages.YUVImage");
+        head.set_version(CURRENT_VERSION);
+        head.set_timestamp(42);
 
-template<>
-void LogModule<messages::YUVImage>::writeHeader();
+        if(getIdFromPath(fileName) == "top")
+        {
+            head.set_top_camera(true);
+        }
+        else if(getIdFromPath(fileName) == "bottom")
+        {
+            head.set_top_camera(false);
+        }
+        else
+        {
+            std::cout << "Warning: Unexpected camera type specified by file name."
+                      << std::endl;
+        }
 
-// Lets us provide a name string for YUV image
-template<>
-std::string LogModule<messages::YUVImage>::nameHelper();
+        std::string buf;
+        head.SerializeToString(&buf);
+        writeSize(buf.length());
+        writeCharBuffer(buf.data(), buf.length());
+
+        std::cout << "Writing header to " << fileName << std::endl;
+    }
+
+    void writeImage(T msg)
+    {
+        // Don't enqueue this write if we've hit the upper limit
+        if (ongoing.size() == maxWrites)
+        {
+#ifdef DEBUG_LOGGING
+        std::cout << "Dropped a message because there are already "
+                  << maxWrites << " ongoing writes to " << fileName
+                  << std::endl;
+#endif
+        return;
+        }
+
+        // Don't write if the file has gotten too huge
+        if (bytesWritten >= FILE_MAX_SIZE)
+        {
+#ifdef DEBUG_LOGGING
+            std::cout << "Dropped a message because the file "
+                      << fileName << " has reached " << bytesWritten << " bytes "
+                      << std::endl;
+#endif
+            ongoing.pop_back();
+            return;
+        }
+
+        writeInternal(msg);
+    }
+
+protected:
+    // Handles all of the image-specific writing actions. Kept as a
+    // separate helper method so that it can be specialized for images
+    // or any other non-proto types
+    void writeInternal(T msg)
+    {
+        // Add a new write to the list of current writes
+        ongoing.push_back(ImageWrite());
+        ImageWrite* current = &ongoing.back();
+        current->image = msg;
+
+        // We know the width, height of the image and what each pixel holds
+        int size = msg.width() * msg.height() * sizeof(unsigned char);
+        bytesWritten += size;
+
+        // We write width and height as well as size for clarity on unlogging side
+        writeSize(size);
+        writeSize(msg.width());
+        writeSize(msg.height());
+
+        // Configure the control block
+        current->control.aio_fildes = fileDescriptor;
+        // Note we don't use the Write's string field here.
+        current->control.aio_buf = current->image.pixelAddress(0, 0);
+        current->control.aio_nbytes = size;
+        current->control.aio_sigevent.sigev_notify = SIGEV_NONE;
+
+        // Enqueue the write
+        int result = aio_write(&current->control);
+
+        // Verify that the write didn't immediately fail
+        if (result == -1) {
+            std::cout<< "AIO write enqueue failed with error " << strerror(errno)
+                     << std::endl;
+        }
+
+#ifdef DEBUG_LOGGING
+        std::cout << "Enqueued an image for writing."
+                  << std::endl;
+#endif
+    }
+
+    void checkImageWrites()
+    {
+        ongoing.remove_if(LogBase::imageFinished);
+    }
+
+    // Implements the Module run_ method
+    virtual void run_()
+    {
+        // Check for and remove finished writes from the list
+        checkSizeWrites();
+        checkImageWrites();
+
+        frameCounter++;
+
+        // EPIC HACK: 10-second delay
+        if (frameCounter < 300) return;
+
+        // EPIC HACK: don't try to log every image
+        if (frameCounter%5 != 0) return;
+
+        input.latch();
+
+        // Open the file and write the header if it hasn't been done
+        if (!fileOpen) {
+            try {
+                openFile();
+            } catch (io_exception& io_exception) {
+                std::cout << io_exception.what() << std::endl;
+                return;
+            }
+            writeHeader();
+        }
+
+        // Start a new write for the current message
+        writeImage(input.message());
+    }
+
+    portals::InPortal<T> input;
+    std::list<ImageWrite> ongoing;
+    int frameCounter;
+};
 }
 }

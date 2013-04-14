@@ -17,6 +17,7 @@
 #include "ToolDiagram.h"
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
+#include "colorcreator/ColorTableCreator.h"
 
 namespace tool {
 
@@ -41,6 +42,7 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
+    color::ColorTableCreator tableCreator;
 
     // GUI stuff
     QTabWidget* toolTabs;
