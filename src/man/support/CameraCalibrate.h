@@ -29,8 +29,8 @@ public:
     //we should just update the params once
     static void init(std::string name);
     static void UpdateWithParams(float paramsTop[], float paramsBottom[]);
-    static ufmatrix4* getTransforms(man::Camera::Type which) {
-        if (which == man::Camera::TOP) {
+    static ufmatrix4* getTransforms(Camera::Type which) {
+        if (which == Camera::TOP) {
             return TransformsTop;
         } else {
             return TransformsBottom;

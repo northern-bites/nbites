@@ -4,6 +4,7 @@
 #include "RoboGrams.h"
 #include <stdarg.h>
 #include <cstdio>
+#include <iostream>
 
 // **********************
 // *                    *
@@ -82,6 +83,11 @@ MessagePoolBase::~MessagePoolBase()
 int MessagePoolBase::alloc()
 {
   assert(inUse_ < maxSize_);
+  if (inUse_ >= maxSize_)
+  {
+      std::cout << "WARNING: A message pool has exceeded its max size."
+                << std::endl;
+  }
   int i;
   {
     Mutex mu(mu_);
