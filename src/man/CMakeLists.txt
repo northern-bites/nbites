@@ -42,22 +42,9 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
-# testing set up
-# if( OFFLINE )
-# include ( ${SHARE_DIR}/cmake/gtest.cmake )
-# enable_testing()
-# set(CTEST_OUTPUT_ON_FAILURE TRUE)
-
-# include_directories(
-#   ${GTEST_INCLUDE_DIR}
-# )
-# endif()
-
 # For Aldebaran's headers
-if ( NOT OFFLINE )
-  find_package(ALCOMMON REQUIRED)
-  include_directories( ${ALCOMMON_INCLUDE_DIR} )
-endif()
+find_package(ALCOMMON REQUIRED)
+include_directories( ${ALCOMMON_INCLUDE_DIR} )
 
 find_package( PROTOBUF REQUIRED )
 include_directories( SYSTEM ${PROTOBUF_INCLUDE_DIR} )
