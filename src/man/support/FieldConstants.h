@@ -84,8 +84,9 @@ static const float GOALBOX_WIDTH = 220.f;
 
 // These are used by the vision system
 // The distance the goalie box extends out past each goal post
-static const float GOALBOX_OVERAGE = GOALBOX_WIDTH - (CROSSBAR_CM_WIDTH +
-                                                      2.0f * GOAL_POST_CM_WIDTH);
+static const float GOALBOX_OVERAGE = (GOALBOX_WIDTH -
+                                      (CROSSBAR_CM_WIDTH +
+                                       2.0f * GOAL_POST_RADIUS)) / 2.0f;
 // The distance from any goal post to the goalie box corner nearest it
 static const float POST_CORNER = sqrtf(GOALBOX_DEPTH * GOALBOX_DEPTH +
                                        GOALBOX_OVERAGE * GOALBOX_OVERAGE);
