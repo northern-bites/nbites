@@ -40,4 +40,7 @@ message FilteredBall
 	optional float bearing_deg = 13;
         optional float x = 14;
         optional float y = 15;
+
+	optional float rel_x_dest = 16;
+	optional float rel_y_dest = 17;
 }

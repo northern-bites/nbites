@@ -31,11 +31,13 @@ static const KalmanFilterParams DEFAULT_PARAMS =
     .5f,             // transXDeviation   CALC March 2013
     .5f,             // trandYDeviation   CALC March 2013
     .5f,             // rotationDeviation CALC March 2013
+    10.f,            // obsvRelX deviation
+    10.f,            // obsvRelY deviation
     .1f,                    // processDeviation
     .1f,
     .1f,
     .1f,
-    1.f                     // ballFriction?
+    -29.f                     // ballFriction?
 };
 
 class KalmanFilter
@@ -47,7 +49,7 @@ public:
     ~KalmanFilter();
 
     void update(messages::VisionBall visionBall,
-                messages::Motion     motion);
+                messages::RobotLocation     motion);
 
     bool isUpdated() {return updated;};
     void setUpdate(bool updated_){updated = updated_;};
@@ -55,12 +57,12 @@ public:
     void initialize();
     void initialize(ufvector4 x_, ufmatrix4 cov_);
 
-    // HACK - TEMP FOR TESTING
-    // In theory should be private
     void predict(messages::RobotLocation odometry);
     void predict(messages::RobotLocation odometry, float deltaT);
     void updateWithObservation(messages::VisionBall visionBall);
+    void predictBallDest();
 
+    // FOR OFFLINE TESTING
     messages::RobotLocation genOdometry(float x, float y, float h)
     {
         messages::RobotLocation odometry;
@@ -70,7 +72,6 @@ public:
 
         return odometry;
     };
-
     messages::VisionBall genVisBall(float dist, float bear)
     {
         messages::VisionBall obsv;
@@ -100,10 +101,24 @@ public:
     float getFilteredDist(){return filteredDist;};
     float getFilteredBear(){return filteredBear;};
 
+    float getRelXDest(){return relXDest;};
+    float getRelYDest(){return relYDest;};
+
     float getWeight(){return weight;};
     void setWeight(float weight_){weight=weight_;};
 
     bool isStationary(){return stationary;};
+
+    float getSpeed(){return std::sqrt(x(2)*x(2) + x(3)*x(3));};
+
+    void printEst(){std::cout << "Filter Estimate:\n\t"
+                              << "'Stationary' is\t" << stationary << "\n\t"
+                              << "X-Pos:\t" << x(0) << "Y-Pos:\t" << x(1)
+                              << "\n\t"
+                              << "x-Vel:\t" << x(2) << "y-Vel:\t" << x(3)
+                              << "\n\t"
+                              << "Uncertainty x:\t" << cov(0,0) << "\t,\t"
+                              << "y:\t" << cov(1,1) << std::endl;};
 
 private:
     KalmanFilterParams params;
@@ -139,8 +154,12 @@ private:
     float filteredDist;
     float filteredBear;
 
+    float relXDest;
+    float relYDest;
+
     // For the MMKalman
     float weight;
+    float uncertainty;
 };
 
 

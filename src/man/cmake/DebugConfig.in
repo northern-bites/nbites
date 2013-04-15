@@ -11,6 +11,13 @@
 #   undef DEBUG_COMM
 #endif
 
+#define DEBUG_BALLTRACK_${DEBUG_BALLTRACK}
+#ifdef  DEBUG_BALLTRACK_ON
+#   define DEBUG_BALLTRACK
+#else
+#   undef DEBUG_BALLTRACK
+#endif
+
 #define DEBUG_THREADS_${DEBUG_THREADS}
 #ifdef  DEBUG_THREADS_ON
 #   define DEBUG_THREADS
