@@ -12,8 +12,8 @@ static const float FIELD_WHITE_HEIGHT = 330.f;
 static const float GREEN_PAD_X = 20.f;
 static const float GREEN_PAD_Y = 15.f;
 #else
-static const float FIELD_WHITE_WIDTH = 600.f;
-static const float FIELD_WHITE_HEIGHT = 400.f;
+static const float FIELD_WHITE_WIDTH = 900.f;
+static const float FIELD_WHITE_HEIGHT = 600.f;
 static const float GREEN_PAD_X = 71.0f;
 static const float GREEN_PAD_Y = 71.0f;
 #endif // USING_LAB_FIELD
@@ -46,9 +46,9 @@ static const float MIDFIELD_Y = FIELD_GREEN_HEIGHT * .5f;
 // Other Field object dimensions
 static const float GOAL_POST_CM_HEIGHT = 80.0f;
 static const float GOAL_POST_CM_WIDTH = 10.0f;
-static const float CROSSBAR_CM_WIDTH = 140.f;
-static const float CROSSBAR_CM_HEIGHT = 5.0f;
-static const float GOAL_DEPTH = 40.0f;
+static const float CROSSBAR_CM_WIDTH = 150.f;
+static const float CROSSBAR_CM_HEIGHT = 10.0f;
+static const float GOAL_DEPTH = 50.0f;
 static const float GOAL_POST_RADIUS = GOAL_POST_CM_WIDTH / 2.0f;
 
 // GOAL CONSTANTS
@@ -70,7 +70,7 @@ static const float LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y =
 static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
     CENTER_FIELD_Y + CROSSBAR_CM_WIDTH / 2.0f;
 
-static const float CENTER_CIRCLE_RADIUS = 60.0f; // Not scaled
+static const float CENTER_CIRCLE_RADIUS = 75.0f; // Not scaled
 
 #ifdef USING_LAB_FIELD
 static const float GOALBOX_DEPTH = 60.f;
@@ -83,7 +83,7 @@ static const float GOALBOX_WIDTH = 220.f;
 
 // These are used by the vision system
 // The distance the goalie box extends out past each goal post
-static const float GOALBOX_OVERAGE = 40.0f;
+static const float GOALBOX_OVERAGE = 30.0f;
 // The distance from any goal post to the goalie box corner nearest it
 static const float POST_CORNER = sqrtf(GOALBOX_DEPTH * GOALBOX_DEPTH +
                                        GOALBOX_OVERAGE * GOALBOX_OVERAGE);
