@@ -337,15 +337,13 @@ void KalmanFilter::predictBallDest()
     else // moving
     {
         float speed = getSpeed();
-        //Hack to think less friction for the goalie estimates
-        float decreasedFriction = params.ballFriction + 10.f;
 
         //Calculate time until stop
-        float timeToStop = std::abs(speed / decreasedFriction);
+        float timeToStop = std::abs(speed / params.ballFriction);
 
         //Calculate deceleration in each direction
-        float decelX = (x(2)/speed) * decreasedFriction;
-        float decelY = (x(3)/speed) * decreasedFriction;
+        float decelX = (x(2)/speed) * params.ballFriction;
+        float decelY = (x(3)/speed) * params.ballFriction;
 
         // Calculate end position
         relXDest = x(0) + x(2)*timeToStop + .5f*decelX*timeToStop*timeToStop;
