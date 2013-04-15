@@ -10,11 +10,13 @@ namespace balltrack
         float transXDeviation;   //Deviation from odometry in x direction
         float transYDeviation;   //Deviation from odometry in y direction
         float rotationDeviation; //Deviation from odometry in rotation
+        float obsvRelXVariance;  //Variance from observing a ball
+        float obsvRelYVariance;  //Variance from observing a ball in y
         float processDeviationPosX;  //Deviation from difference between model & world
         float processDeviationPosY;
         float processDeviationVelX;
         float processDeviationVelY;
-        float ballFriction;      //Loss in acceleration over a unit of time
+        float ballFriction;      // cm/sec^2
     };
 
     struct MMKalmanFilterParams
@@ -25,6 +27,7 @@ namespace balltrack
         float initCovY;
         float initCovVelX;
         float initCovVelY;
+        float movingThresh;
     };
 
     /*

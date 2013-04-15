@@ -39,6 +39,10 @@ protected:
 
 private:
     MMKalmanFilter* filters;
+
+    messages::RobotLocation lastOdometry;
+    messages::RobotLocation curOdometry;
+    messages::RobotLocation deltaOdometry;
 };
 
 
