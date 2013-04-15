@@ -1,10 +1,16 @@
 /**
  * Multimodel Kalman Filter
  *
- * The idea is to have some even number of filters with half assuming the Kalman Filter is
- * is stationary, the other half assuming the ball is moving with some velocity. Each frame
- * the 'best' model is chosen and used to output the estimates. The worst filter of each type
- * (stationary and moving) are also re-initialized based on the previous frames. Boom. Robocup Solved.
+ * The idea is to have 2 filters, one assuming the ball is stationary,
+ * one assuming the ball is moving. When the moving filter thinks the velocity
+ * is above a threshold then we switch to using that filter for our estimates.
+ * Otherwise we use the stationary filter
+ *
+ * The initial concept was to pull a B-Human and compute 12 filters, constantly
+ * re-initializing the worst filters, but the inability to choose the best filter
+ * consistently due to (obviously) noisy estimates lead to currently having 2.
+ * There is still some legacy code from that attempt in case it wants to be
+ * RESURRECTED! (spelling?)
  *
  */
 #pragma once
@@ -63,8 +69,11 @@ public:
     float getCovXVelEst(){return covEst(2,2);};
     float getCovYVelEst(){return covEst(3,3);};
 
-    float getFilteredDist(){return filters.at(bestFilter)->getFilteredDist();};
-    float getFilteredBear(){return filters.at(bestFilter)->getFilteredBear();};
+    float getFilteredDist(){return filters.at((unsigned)bestFilter)->getFilteredDist();};
+    float getFilteredBear(){return filters.at((unsigned)bestFilter)->getFilteredBear();};
+
+    float getRelXDest(){return filters.at((unsigned)bestFilter)->getRelXDest();};
+    float getRelYDest(){return filters.at((unsigned)bestFilter)->getRelYDest();};
 
     bool isStationary(){return stationary;};
 
@@ -84,6 +93,8 @@ private:
     void predictFilters(messages::RobotLocation odometry);
     void predictFilters(messages::RobotLocation odometry, float t);
     void updateWithVision(messages::VisionBall visionBall);
+
+    void updatePredictions();
 
     void cycleFilters();
 

@@ -37,7 +37,7 @@ static const KalmanFilterParams DEFAULT_PARAMS =
     .1f,
     .1f,
     .1f,
-    -35.f                     // ballFriction?
+    -29.f                     // ballFriction?
 };
 
 class KalmanFilter
@@ -57,12 +57,12 @@ public:
     void initialize();
     void initialize(ufvector4 x_, ufmatrix4 cov_);
 
-    // HACK - TEMP FOR TESTING
-    // In theory should be private
     void predict(messages::RobotLocation odometry);
     void predict(messages::RobotLocation odometry, float deltaT);
     void updateWithObservation(messages::VisionBall visionBall);
+    void predictBallDest();
 
+    // FOR OFFLINE TESTING
     messages::RobotLocation genOdometry(float x, float y, float h)
     {
         messages::RobotLocation odometry;
@@ -72,7 +72,6 @@ public:
 
         return odometry;
     };
-
     messages::VisionBall genVisBall(float dist, float bear)
     {
         messages::VisionBall obsv;
@@ -102,13 +101,15 @@ public:
     float getFilteredDist(){return filteredDist;};
     float getFilteredBear(){return filteredBear;};
 
+    float getRelXDest(){return relXDest;};
+    float getRelYDest(){return relYDest;};
+
     float getWeight(){return weight;};
     void setWeight(float weight_){weight=weight_;};
 
     bool isStationary(){return stationary;};
 
-    float getVelMag(){return std::sqrt(x(2)*x(2) + x(3)*x(3));};
-
+    float getSpeed(){return std::sqrt(x(2)*x(2) + x(3)*x(3));};
 
     void printEst(){std::cout << "Filter Estimate:\n\t"
                               << "'Stationary' is\t" << stationary << "\n\t"
@@ -152,6 +153,9 @@ private:
 
     float filteredDist;
     float filteredBear;
+
+    float relXDest;
+    float relYDest;
 
     // For the MMKalman
     float weight;

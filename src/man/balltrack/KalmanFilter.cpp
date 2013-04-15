@@ -12,7 +12,9 @@ namespace balltrack
         :  params(params_),
            updated(false),
            lastUpdateTime(0),
-           deltaTime(0.f)
+           deltaTime(0.f),
+           relXDest(0.f),
+           relYDest(0.f)
     {
         stationary = stationary_;
         initialize();
@@ -142,7 +144,7 @@ namespace balltrack
         if (!stationary) // moving
         {
             // Determine if ball is still moving
-            float velMagnitude = getVelMag();
+            float velMagnitude = getSpeed();
             if(velMagnitude > 2.f) // basically still moving
             {
                 // vel = vel * (absVel + decel)/absVel
@@ -334,7 +336,29 @@ namespace balltrack
         return p;
     }
 
+void KalmanFilter::predictBallDest()
+{
+    if(stationary)
+    {
+        relXDest = x(0);
+        relYDest = x(1);
+    }
+    else // moving
+    {
+        float speed = getSpeed();
 
+        //Calculate time until stop
+        float timeToStop = std::abs(speed / params.ballFriction);
+
+        //Calculate deceleration in each direction
+        float decelX = (x(2)/speed) * params.ballFriction;
+        float decelY = (x(3)/speed) * params.ballFriction;
+
+        // Calculate end position
+        relXDest = x(0) + x(2)*timeToStop + .5f*decelX*timeToStop*timeToStop;
+        relYDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;
+    }
+}
 
 
 } // namespace balltrack

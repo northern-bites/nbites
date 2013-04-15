@@ -8,7 +8,7 @@ namespace balltrack{
  *          Grab the params, gen a bunch of filters to avoid nulls
  *          Set frames w/o ball high so we re-init based on initial observations
  *          Clearle consecutive observation is false if we havent seen the ball...
- *          State est and vis history can stay zero, that'll change as the filters start rolling
+ *          State est and vis history can stay zero,
  *          Same with bestFilter, stationary, and lastUpdateTime
  */
 MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
@@ -80,7 +80,7 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         }
 
         // #HACK for competition - If we get into a bad observation cycle then change it
-        if (filters.at((unsigned)1)->getVelMag() > 700.f && consecutiveObservation)
+        if (filters.at((unsigned)1)->getSpeed() > 700.f && consecutiveObservation)
             initialize(visRelX, visRelY, params.initCovX, params.initCovY);
 
 
@@ -90,7 +90,7 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         //Normalize all of the filter weights, currently ignore 'best' weight
         normalizeFilterWeights();
 
-
+        updatePredictions();
     }
 
     else // Didn't see the ball, need to know for when we cycle
@@ -98,8 +98,8 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
 
     // #HACK - shouldnt know how many filters there are but... US OPEN!
         //Determine if we are using the stationary
-    // std::cout << "Velocity Mag:\t" << filters.at((unsigned)1)->getVelMag() << std::endl;
-    if (filters.at((unsigned)1)->getVelMag() > params.movingThresh)
+    // std::cout << "Velocity Mag:\t" << filters.at((unsigned)1)->getSpeed() << std::endl;
+    if (filters.at((unsigned)1)->getSpeed() > params.movingThresh)
     { // consider the ball to be moving
         bestFilter = 1;
     }
@@ -316,6 +316,15 @@ void MMKalmanFilter::updateWithVision(messages::VisionBall visionBall)
     {
         (*it)->updateWithObservation(visionBall);
     }
+}
+
+/**
+ * @brief - update the filters predictions for where the ball will stop moving
+ */
+void MMKalmanFilter::updatePredictions()
+{
+    for (std::vector<KalmanFilter *>::iterator it = filters.begin(); it != filters.end(); it++)
+        (*it)->predictBallDest();
 }
 
 /**
