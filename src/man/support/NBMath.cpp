@@ -90,6 +90,14 @@ float NBMath::getHypotenuse(float x, float y) {
     return std::sqrt(x*x + y*y);
 }
 
+float NBMath::getLargestMagRoot(float a, float b, float c)
+{
+    float posRoot = std::abs((-b + std::sqrt((b*b)-4*a*c))/(2*a));
+    float negRoot = std::abs((-b - std::sqrt((b*b)-4*a*c))/(2*a));
+
+    return ((posRoot>negRoot) ? posRoot : negRoot);
+}
+
 const float  NBMath::cycloidx(const float theta){
     return theta - std::sin(theta);
 }

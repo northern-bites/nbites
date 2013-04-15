@@ -266,8 +266,8 @@ void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
         ufvector4 x = boost::numeric::ublas::zero_vector<float>(4);
         x(0)= relX;
         x(1)= relY;
-        x(2) = velocityGen();
-        x(3) = velocityGen();
+        x(2) = 10.f;
+        x(3) = 10.f;
 
         // Choose to assum obsv mean is perfect and just have noisy velocity
         ufmatrix4 cov = boost::numeric::ublas::zero_matrix<float>(4);
