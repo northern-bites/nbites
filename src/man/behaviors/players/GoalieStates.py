@@ -161,7 +161,7 @@ def saveIt(player):
             player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         player.isSaving = False
         #player.brain.fallController.enableFallProtection(False)
-    if (not player.motion.isBodyActive() and not player.isSaving):
+    if (not player.brain.motion.body_is_active and not player.isSaving):
         player.squatTime = time.time()
         player.isSaving = True
         return player.stay()
@@ -176,7 +176,7 @@ def saveIt(player):
 
 def upUpUP(player):
     if player.firstFrame():
-        player.brain.fallController.enableFallProtection(True)
+        #player.brain.fallController.enableFallProtection(True)
         player.upDelay = 0
 
     if player.brain.nav.isStanding():
