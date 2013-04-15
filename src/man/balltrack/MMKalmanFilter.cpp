@@ -23,6 +23,9 @@ MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
     framesWithoutBall = params.framesTillReset;
     consecutiveObservation = false;
     bestFilter = 0;
+    obsvBuffer = new CartesianObservation[params.bufferSize];
+    curEntry = 0;
+    fullBuffer = false;
     initialize();
 }
 
@@ -69,8 +72,17 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         visRelX = visionBall.distance()*cosB;
         visRelY = visionBall.distance()*sinB;
 
+        // Update our observation buffer for re-initializing the moving filter
+        curEntry = (curEntry+1)%params.bufferSize;
+        obsvBuffer[curEntry] = CartesianObservation(visRelX, visRelY);
+
+        if (!fullBuffer && curEntry==0)
+        { // If buffer wasnt full but is now
+            fullBuffer = true;
+        }
+
         // If we havent seen the ball for a long time, re-init our filters
-        if (framesWithoutBall >= params.framesTillReset && consecutiveObservation)
+        if (framesWithoutBall >= params.framesTillReset)
         {
             // Reset the filters
             initialize(visRelX, visRelY, params.initCovX, params.initCovY);
@@ -80,8 +92,40 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         }
 
         // #HACK for competition - If we get into a bad observation cycle then change it
-        if (filters.at((unsigned)1)->getSpeed() > 700.f && consecutiveObservation)
+        else if (filters.at((unsigned)1)->getSpeed() > 700.f && consecutiveObservation){
             initialize(visRelX, visRelY, params.initCovX, params.initCovY);
+        }
+
+        else if (fullBuffer) {
+            // Calc velocity through these frames, if high reset moving filter
+            CartesianObservation vel = calcVelocityOfBuffer();
+            float speedThroughFrames = calcSpeed(vel.relX, vel.relY);
+
+            // Calc diff between observation and estimata
+            float estDiff = calcSpeed(visRelX - filters.at((unsigned)0)->getRelXPosEst(),
+                                      visRelY - filters.at((unsigned)0)->getRelYPosEst());
+
+            // Much higher than our current estimate
+            // if ((speedThroughFrames > filters.at((unsigned)1)->getSpeed() + 60.f)
+            //     && (estDiff > params.badStationaryThresh))
+            //if(estDiff > params.badStationaryThresh)
+
+            // If moving velocity <10, give this a try
+            if (std::abs(filters.at((unsigned)1)->getSpeed()) < 10.f)
+            {
+                //std::cout << "\nBall Kicked!" << std::endl;
+                ufvector4 newMovingX = filters.at((unsigned)0)->getStateEst();
+                newMovingX(2) = vel.relX;
+                newMovingX(3) = vel.relY;
+                ufmatrix4 newMovingCov = boost::numeric::ublas::identity_matrix <float>(4);
+                newMovingCov(0,0) = 10.f;
+                newMovingCov(1,1) = 10.f;
+                newMovingCov(2,2) = 20.f;
+                newMovingCov(3,3) = 20.f;
+
+                filters.at((unsigned)1)->initialize(newMovingX, newMovingCov);
+            }
+        }
 
 
         // Now correct our filters with the vision observation
@@ -93,8 +137,13 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         updatePredictions();
     }
 
-    else // Didn't see the ball, need to know for when we cycle
+    else {
         consecutiveObservation = false;
+
+        // don't use/wipeout buffer
+        fullBuffer = false;
+        curEntry = 0;
+    }
 
     // #HACK - shouldnt know how many filters there are but... US OPEN!
         //Determine if we are using the stationary
@@ -122,6 +171,9 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
     // Housekeep
     framesWithoutBall = (visionBall.on()) ? (0) : (framesWithoutBall+1);
     stationary = filters.at((unsigned)bestFilter)->isStationary();
+    // std::cout << "Frames w/o Ball\t" << framesWithoutBall << std::endl;
+    // std::cout << "Consecutive\t" << consecutiveObservation << std::endl;
+
 }
 
 /**
@@ -343,6 +395,53 @@ void MMKalmanFilter::updateDeltaTime()
         deltaTime = 0.0001f;
     }
     lastUpdateTime = time;
+}
+
+CartesianObservation MMKalmanFilter::calcVelocityOfBuffer()
+{
+    CartesianObservation calcVel;
+
+    float sumVelX = 0;
+    float sumVelY = 0;
+    for(int i=1; i<params.bufferSize; i++)
+    {
+        sumVelX += (obsvBuffer[i].relX - obsvBuffer[i-1].relX) / deltaTime;
+        sumVelY += (obsvBuffer[i].relY - obsvBuffer[i-1].relY) / deltaTime;
+    }
+
+    calcVel.relX = sumVelX / (float)params.bufferSize;
+    calcVel.relY = sumVelY / (float)params.bufferSize;
+
+    // SANITY CHECKS
+    // Major Concern with calculating from a large history is we don't want our
+    // calculation to be watered down by observations when the ball was stationary
+    // So check if there is a drastic inconsistency (off by 100 cm/s) in the speed
+    bool consistent = true;
+    float estSpeed = calcSpeed(calcVel.relX, calcVel.relY);
+    for(int i=1; i<params.bufferSize; i++)
+    {
+        //current speed
+        float curSpeed = calcSpeed((obsvBuffer[i].relX - obsvBuffer[i-1].relX)/deltaTime,
+                                   (obsvBuffer[i].relY - obsvBuffer[i-1].relY)/deltaTime);
+
+        if (diff(curSpeed,estSpeed) > 100)
+            consistent = false;
+    }
+
+    if (consistent)
+        return calcVel;
+    else //wasnt consistent so return no velocity
+        return CartesianObservation(0.f,0.f);
+}
+
+float MMKalmanFilter::diff(float a, float b)
+{
+    return std::abs(std::abs(a) - std::abs(b));
+}
+
+float MMKalmanFilter::calcSpeed(float a, float b)
+{
+    return std::sqrt(a*a + b*b);
 }
 
 }
