@@ -43,4 +43,7 @@ message FilteredBall
 
 	optional float rel_x_dest = 16;
 	optional float rel_y_dest = 17;
+
+	// For Goalie, know where the ball is going to intersect y-axis
+	optional float rel_y_intersect_dest = 18;
 }

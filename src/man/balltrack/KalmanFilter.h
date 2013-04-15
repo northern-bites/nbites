@@ -103,6 +103,7 @@ public:
 
     float getRelXDest(){return relXDest;};
     float getRelYDest(){return relYDest;};
+    float getRelYIntersectDest(){return relYIntersectDest;};
 
     float getWeight(){return weight;};
     void setWeight(float weight_){weight=weight_;};
@@ -156,6 +157,7 @@ private:
 
     float relXDest;
     float relYDest;
+    float relYIntersectDest;
 
     // For the MMKalman
     float weight;
