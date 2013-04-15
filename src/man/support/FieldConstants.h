@@ -14,13 +14,8 @@ static const float GREEN_PAD_Y = 15.f;
 #else
 static const float FIELD_WHITE_WIDTH = 900.f;
 static const float FIELD_WHITE_HEIGHT = 600.f;
-<<<<<<< HEAD
-static const float GREEN_PAD_X = 70.0f;
-static const float GREEN_PAD_Y = 70.0f;
-=======
 static const float GREEN_PAD_X = 63.0f;
 static const float GREEN_PAD_Y = 65.0f;
->>>>>>> josh/master
 #endif // USING_LAB_FIELD
 
 static const float LINE_WIDTH = 5.0f;
