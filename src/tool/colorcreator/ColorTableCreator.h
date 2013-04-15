@@ -78,8 +78,18 @@ protected:
     virtual void run_();
 
 private:
-    QTabWidget* imageTabs;
+    ColorTable colorTable;
+
+    QLabel* colorStats;
+    QLabel* colorTableName;
+
+    QComboBox colorSelect;
+    int currentColor;
+
     Camera::Type currentCamera;
+    std::vector<BrushStroke> brushStrokes;
+
+    QTabWidget* imageTabs;
 
     // This module contains its own diagram! Trippy.
     portals::RoboGram subdiagram;
@@ -95,13 +105,8 @@ private:
     portals::OutPortal<messages::YUVImage> bottomImage;
     portals::OutPortal<messages::YUVImage> topImage;
 
-    QLabel* colorStats;
-    QComboBox colorSelect;
-    int currentColor;
-
-    ColorTable colorTable;
-
-    std::vector<BrushStroke> brushStrokes;
+    void loadLatestTable();
+    void serializeTableName(QString latestTableName);
 };
 
 class FixedLayout: public QVBoxLayout{
