@@ -8,8 +8,13 @@ from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
+SAVING = False
+
 def gameInitial(player):
     if player.firstFrame():
+        player.inKickingState = False
+        player.gameState = player.currentState
+        player.brain.fallController.enabled = False
         player.stand()
         player.zeroHeads()
         player.system = GoalieSystem()
@@ -20,6 +25,9 @@ def gameInitial(player):
 
 def gameReady(player):
     if player.firstFrame():
+        player.inKickingState = False
+        player.brain.fallController.enabled = True
+        player.gameState = player.currentState
         player.penaltyKicking = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
@@ -34,6 +42,9 @@ def gameReady(player):
 
 def gameSet(player):
     if player.firstFrame():
+        player.inKickingState = False
+        player.brain.fallController.enabled = False
+        player.gameState = player.currentState
         player.penaltyKicking = False
         player.stand()
         player.brain.interface.motionRequest.reset_odometry = True
@@ -50,6 +61,9 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
+        player.inKickingState = False
+        player.brain.fallController.enabled = True
+        player.gameState = player.currentState
         player.penaltyKicking = False
         player.brain.nav.stand()
 
@@ -69,6 +83,8 @@ def gamePlaying(player):
 def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
+        player.brain.fallController.enabled = False
+        player.gameState = player.currentState
         player.stopWalking()
         player.penalizeHeads()
 
@@ -84,20 +100,20 @@ def gamePenalized(player):
 
 def gameFinished(player):
     if player.firstFrame():
+        player.inKickingState = False
+        player.brain.fallController.enabled = False
+        player.gameState = player.currentState
         player.stopWalking()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
-
-    # Add me back when this works
-    #if player.brain.nav.isStopped():
-        #player.gainsOff()
 
     return player.stay()
 
 ##### EXTRA METHODS
 
 def fallen(player):
+    player.inKickingState = False
     return player.stay()
 
 def watch(player):
@@ -139,10 +155,13 @@ def kickBall(player):
 def saveIt(player):
     if player.firstFrame():
         player.brain.tracker.lookToAngle(0)
-        player.executeMove(SweetMoves.GOALIE_SQUAT)
+        if SAVING:
+            player.executeMove(SweetMoves.GOALIE_SQUAT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         player.isSaving = False
         #player.brain.fallController.enableFallProtection(False)
-    if (not player.motion.isBodyActive() and not player.isSaving):
+    if (not player.brain.motion.body_is_active and not player.isSaving):
         player.squatTime = time.time()
         player.isSaving = True
         return player.stay()
@@ -150,13 +169,14 @@ def saveIt(player):
         stopTime = time.time()
         # This is to stand up before a penalty is called.
         if (stopTime - player.squatTime > 2):
-            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            if SAVING:
+                player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
     return player.stay()
 
 def upUpUP(player):
     if player.firstFrame():
-        player.brain.fallController.enableFallProtection(True)
+        #player.brain.fallController.enableFallProtection(True)
         player.upDelay = 0
 
     if player.brain.nav.isStanding():
@@ -174,9 +194,6 @@ def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stopWalking()
         player.stand()
-        # WE NEED RESET METHODS
-        #player.brain.loc.resetBall()
-
         player.brain.tracker.trackBall()
         player.initialDelayCounter = 0
         player.penaltyKicking = True

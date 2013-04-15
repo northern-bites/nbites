@@ -77,10 +77,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         GoalieStates.watch.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldGetReadyToSave,
+            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.shouldISaveIt,
+            : GoalieStates.saveIt,
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
                                        Transition.SOME_OF_THE_TIME,

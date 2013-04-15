@@ -39,8 +39,6 @@ def gamePenalized(player):
 
 def standup(player):
     if player.firstFrame():
-        #player.brain.tracker.setNeutralHead()
-        #player.gainsOn()
         player.brain.nav.stand()
 
     if player.counter == 100:
@@ -49,13 +47,5 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        #print player.brain.ball.loc.relX, player.brain.ball.loc.relY
-        player.executeMove(SweetMoves.LEFT_FAR_KICK)
-    if player.brain.nav.isStopped() and player.counter > 100:
-        return player.goLater('done')
-    return player.stay()
-
-def done(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.SIT_POS)
+        player.executeMove(SweetMoves.STAND_UP_FRONT)
     return player.stay()

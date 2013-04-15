@@ -280,7 +280,7 @@ def centerAtGoalBasedOnCorners(player):
                    vision.visual_corner(i).orientation < 0):
                     corner = vision.visual_corner(i)
                     centerAtGoalBasedOnCorners.cornerDirection = \
-                        corner.visual_detection.bearing
+                        degrees(corner.visual_detection.bearing)
                     heading = \
                         getRobotGlobalHeading(90,
                                               corner.visual_detection.bearing,
@@ -291,13 +291,12 @@ def centerAtGoalBasedOnCorners(player):
                     relY = getRobotRelY(90,
                                         corner.visual_detection.distance,
                                         corner.physical_orientation)
-
                 elif(centerAtGoalBasedOnCorners.cornerID ==
                    vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L and
                    vision.visual_corner(i).orientation > 0):
                     corner = vision.visual_corner(i)
                     centerAtGoalBasedOnCorners.cornerDirection = \
-                        corner.visual_detection.bearing
+                        degrees(corner.visual_detection.bearing)
                     heading = \
                         getRobotGlobalHeading(0,
                                               corner.visual_detection.bearing,
