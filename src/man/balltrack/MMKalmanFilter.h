@@ -74,6 +74,7 @@ public:
 
     float getRelXDest(){return filters.at((unsigned)bestFilter)->getRelXDest();};
     float getRelYDest(){return filters.at((unsigned)bestFilter)->getRelYDest();};
+    float getRelYIntersectDest(){return filters.at((unsigned)bestFilter)->getRelYIntersectDest();};
 
     bool isStationary(){return stationary;};
 

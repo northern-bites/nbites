@@ -357,9 +357,14 @@ void KalmanFilter::predictBallDest()
         // Calculate end position
         relXDest = x(0) + x(2)*timeToStop + .5f*decelX*timeToStop*timeToStop;
         relYDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;
+
+        //Calculate the time until intersects with robots y axis
+        float timeToIntersect = NBMath::getLargestMagRoot(x(0),x(2),.5f*decelX);
+        // Use quadratic :(
+        relYIntersectDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;
+
     }
 }
-
 
 } // namespace balltrack
 } // namespace man

@@ -100,6 +100,8 @@ namespace NBMath {
 
     float getHypotenuse(float x, float y);
 
+    float getLargestMagRoot(float a, float b, float c);
+
     template <class T>
     T square(T x) { return x*x; }
 

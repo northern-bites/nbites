@@ -81,6 +81,7 @@ void BallTrackModule::run_()
 
     ballMessage.get()->set_rel_x_dest(filters->getRelXDest());
     ballMessage.get()->set_rel_y_dest(filters->getRelYDest());
+    ballMessage.get()->set_rel_y_intersect_dest(filters->getRelYIntersectDest());
 
 #ifdef DEBUG_BALLTRACK
     // Print the observation given, each filter after update, and which filter chosen
