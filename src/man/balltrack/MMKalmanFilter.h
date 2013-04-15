@@ -72,6 +72,7 @@ public:
     float getFilteredDist(){return filters.at((unsigned)bestFilter)->getFilteredDist();};
     float getFilteredBear(){return filters.at((unsigned)bestFilter)->getFilteredBear();};
 
+    float getSpeed(){return filters.at((unsigned)bestFilter)->getSpeed();};
     float getRelXDest(){return filters.at((unsigned)bestFilter)->getRelXDest();};
     float getRelYDest(){return filters.at((unsigned)bestFilter)->getRelYDest();};
     float getRelYIntersectDest(){return filters.at((unsigned)bestFilter)->getRelYIntersectDest();};
