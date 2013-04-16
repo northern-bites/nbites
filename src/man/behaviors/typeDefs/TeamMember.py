@@ -149,7 +149,7 @@ class TeamMember(RobotLocation):
         # Add a penalty for not facing the ball
         t += fabs(self.brain.ball.bearing_deg) / 60  # 3 seconds to spin 180
 
-        if Debug_DETERMINE_CHASE_TIME:
+        if DEBUG_DETERMINE_CHASE_TIME:
             print "\tChase time after ball-bearing penalty "+str(t)
 
         # Filter by IIR to reduce noise

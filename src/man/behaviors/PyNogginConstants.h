@@ -20,9 +20,6 @@
 namespace man {
 namespace behaviors {
 
-///// SWITCH BOARD /////
-static const bool LOG_LOC = false;
-
 ///// WALK TIME CONSTANTS /////
 static const float TIME_STEP = 40.0;
 static const float TIME_PER_STEP = TIME_STEP/float(1000.0);

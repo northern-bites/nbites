@@ -11,10 +11,11 @@ using namespace man::behaviors;
 BOOST_PYTHON_MODULE(noggin_constants)
 {
     // Lab Field or Full Field?
-    scope().attr("USING_LAB_FIELD") = USING_LAB_FIELD;
-
-    // Switch board
-    scope().attr("LOG_LOC") = LOG_LOC;
+#ifdef USING_LAB_FIELD
+    scope().attr("USING_LAB_FIELD") = true;
+#else
+    scope().attr("USING_LAB_FIELD") = false;
+#endif
 
     // Walk time
     scope().attr("TIME_STEP") = TIME_STEP;
