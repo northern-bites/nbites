@@ -38,6 +38,9 @@ Tool::Tool(const char* title) :
     connect(&diagram, SIGNAL(signalNewDisplayWidget(QWidget*, std::string)),
             &logView, SLOT(newDisplayWidget(QWidget*, std::string)));
 
+    connect(&diagram, SIGNAL(signalDeleteDisplayWidgets()),
+            &logView, SLOT(deleteDisplayWidgets()));
+
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
 
