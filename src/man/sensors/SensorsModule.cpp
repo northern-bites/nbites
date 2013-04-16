@@ -314,8 +314,17 @@ void SensorsModule::updateBatteryMessage()
 
 void SensorsModule::run_()
 {
+    printInput.latch();
+
     // Simply update all sensor readings from ALMemory.
     updateSensorValues();
+
+    if(printInput.message().toggle() != lastPrint)
+    {
+        std::cout << jointsOutput_.getMessage(true).get()->DebugString()
+                  << std::endl;
+        lastPrint = !lastPrint;
+    }
 }
 
 } // namespace sensors
