@@ -57,5 +57,5 @@ set( INSTALL_LOCATION
 option(
   USING_LAB_FIELD
   "Turn on if we are in the lab and not on a full-size field"
-  ON
+  OFF
   )
