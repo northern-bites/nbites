@@ -8,7 +8,7 @@ from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
-SAVING = False
+SAVING = True
 
 def gameInitial(player):
     if player.firstFrame():
