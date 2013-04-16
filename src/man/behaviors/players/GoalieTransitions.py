@@ -150,6 +150,7 @@ def shouldPerformSave(player):
             player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
             abs(player.brain.ball.rel_y_intersect_dest) < 80.0 and
+            player.brain.ball.distance < 230.0 and
             player.brain.ball.vis.frames_on > 4)
 
 def facingSideways(player):

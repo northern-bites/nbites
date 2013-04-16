@@ -28,6 +28,8 @@ namespace balltrack
         float initCovVelX;
         float initCovVelY;
         float movingThresh;
+        int bufferSize;       // Size of buffer used to re-init moving filters
+        float badStationaryThresh;
     };
 
     /*
@@ -48,6 +50,17 @@ namespace balltrack
     {
         CartesianBallEstimate(float relX_, float relY_) : relX(relX_), relY(relY_) {}
         CartesianBallEstimate() {}
+        float relX;
+        float relY;
+    };
+
+    /*
+     * @brief Struct to use when storing visual history
+     */
+    struct CartesianObservation
+    {
+        CartesianObservation(float relX_, float relY_) : relX(relX_), relY(relY_) {}
+        CartesianObservation() {}
         float relX;
         float relY;
     };

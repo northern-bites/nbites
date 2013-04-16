@@ -122,7 +122,7 @@ namespace balltrack
         // Calculate the translation from odometry
         // NOTE: Using notation from Probabilistic Robotics, B = Identity
         //       so no need to compute it or calculate anything with it
-        ufvector4 translation = vector4D(-odometry.x(), -odometry.y(), 0.f, 0.f);
+        ufvector4 translation = NBMath::vector4D(-odometry.x(), -odometry.y(), 0.f, 0.f);
         // And deviation
         float xTransDev = odometry.x() * params.transXDeviation;
         xTransDev *= xTransDev;
@@ -130,7 +130,7 @@ namespace balltrack
         float yTransDev = odometry.y() * params.transYDeviation;
         yTransDev *= yTransDev;
 
-        ufvector4 translationDeviation = vector4D(xTransDev,
+        ufvector4 translationDeviation = NBMath::vector4D(xTransDev,
                                                   yTransDev,
                                                   0.f, 0.f);
 
@@ -314,7 +314,7 @@ namespace balltrack
 
     void KalmanFilter::initialize()
     {
-        x = vector4D(50.f, 50.f, 50.f, 50.f);
+        x = NBMath::vector4D(50.f, 50.f, 50.f, 50.f);
         cov = boost::numeric::ublas::identity_matrix <float>(4);
     }
 
@@ -326,15 +326,6 @@ namespace balltrack
         cov = cov_;
     }
 
-    ufvector4 KalmanFilter::vector4D(float x, float y, float z, float w)
-    {
-        ufvector4 p = boost::numeric::ublas::zero_vector <float> (4);
-        p(0) = x;
-        p(1) = y;
-        p(2) = z;
-        p(3) = w;
-        return p;
-    }
 
 void KalmanFilter::predictBallDest()
 {
@@ -346,15 +337,13 @@ void KalmanFilter::predictBallDest()
     else // moving
     {
         float speed = getSpeed();
-        //Hack to think less friction for the goalie estimates
-        float decreasedFriction = params.ballFriction + 10.f;
 
         //Calculate time until stop
-        float timeToStop = std::abs(speed / decreasedFriction);
+        float timeToStop = std::abs(speed / params.ballFriction);
 
         //Calculate deceleration in each direction
-        float decelX = (x(2)/speed) * decreasedFriction;
-        float decelY = (x(3)/speed) * decreasedFriction;
+        float decelX = (x(2)/speed) * params.ballFriction;
+        float decelY = (x(3)/speed) * params.ballFriction;
 
         // Calculate end position
         relXDest = x(0) + x(2)*timeToStop + .5f*decelX*timeToStop*timeToStop;
@@ -363,9 +352,7 @@ void KalmanFilter::predictBallDest()
         //Calculate the time until intersects with robots y axis
         float timeToIntersect = NBMath::getLargestMagRoot(x(0),x(2),.5f*decelX);
         // Use quadratic :(
-        relYIntersectDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;
-
-    }
+        relYIntersectDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;    }
 }
 
 } // namespace balltrack
