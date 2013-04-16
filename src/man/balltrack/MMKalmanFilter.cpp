@@ -99,6 +99,7 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         else if (fullBuffer) {
             // Calc velocity through these frames, if high reset moving filter
             CartesianObservation vel = calcVelocityOfBuffer();
+
             float speedThroughFrames = calcSpeed(vel.relX, vel.relY);
 
             // Calc diff between observation and estimata
@@ -111,7 +112,8 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
             //if(estDiff > params.badStationaryThresh)
 
             // If moving velocity <10, give this a try
-            if (std::abs(filters.at((unsigned)1)->getSpeed()) < 10.f)
+            if (std::abs(filters.at((unsigned)1)->getSpeed()) < 10.f
+                && speedThroughFrames > 10.f)
             {
                 //std::cout << "\nBall Kicked!" << std::endl;
                 ufvector4 newMovingX = filters.at((unsigned)0)->getStateEst();
@@ -418,7 +420,14 @@ CartesianObservation MMKalmanFilter::calcVelocityOfBuffer()
     // So check if there is a drastic inconsistency (off by 100 cm/s) in the speed
     bool consistent = true;
     float estSpeed = calcSpeed(calcVel.relX, calcVel.relY);
-    for(int i=1; i<params.bufferSize; i++)
+
+    // Also check that we're getting these values from relatively close balls
+    //    ie within 300 centimeters
+    float dist = calcSpeed(obsvBuffer[curEntry].relX, obsvBuffer[curEntry].relY);
+    if (dist > 300.f)
+        consistent = false;
+
+    for(int i=1; i<params.bufferSize && consistent; i++)
     {
         //current speed
         float curSpeed = calcSpeed((obsvBuffer[i].relX - obsvBuffer[i-1].relX)/deltaTime,

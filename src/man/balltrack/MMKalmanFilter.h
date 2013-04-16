@@ -45,7 +45,7 @@ static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
     25.f,               // initCovVelX
     25.f,               // initCovVelY
     15.f,                 // threshold for ball is moving!
-    12,                   // buffer size
+    4,                   // buffer size
     30.f                 // badStationaryThresh
 };
 
