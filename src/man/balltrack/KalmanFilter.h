@@ -150,7 +150,6 @@ private:
 
     //temp move to public for testing
 //    void predict(messages::RobotLocation odometry, float deltaT);
-    ufvector4 vector4D(float x, float y, float z, float w);
 
     float filteredDist;
     float filteredBear;

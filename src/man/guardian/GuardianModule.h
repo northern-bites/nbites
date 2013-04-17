@@ -49,6 +49,7 @@ public:
     portals::OutPortal<messages::StiffnessControl> stiffnessControlOutput;
     portals::OutPortal<messages::Toggle>           initialStateOutput;
     portals::OutPortal<messages::Toggle>           advanceStateOutput;
+    portals::OutPortal<messages::Toggle>           printJointsOutput;
     portals::OutPortal<messages::Toggle>           switchTeamOutput;
     portals::OutPortal<messages::Toggle>           switchKickOffOutput;
     portals::OutPortal<messages::FeetOnGround>     feetOnGroundOutput;
@@ -84,6 +85,7 @@ private:
     void reloadMan();
     void initialState();
     void advanceState();
+    void printJointAngles();
     void switchTeams();
     void switchKickOff();
 
@@ -110,6 +112,8 @@ private:
 
     bool lastInitial;
     bool lastAdvance;
+    bool lastPrint;
+
     bool lastTeamSwitch;
     bool lastKickOffSwitch;
 
