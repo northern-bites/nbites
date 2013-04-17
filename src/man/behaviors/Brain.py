@@ -202,50 +202,30 @@ class Brain(object):
     def resetInitialLocalization(self):
         """
         Reset loc according to team number and team color.
-        Note: Loc uses truly global coordinates.
+        Assumes manual positioning.
+        Note: Loc uses truly global coordinates, and the
+              blue goalbox constants always match up with our goal.
         """
-        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
-            if self.playerNumber == 1:
-                self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
-                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.playerNumber == 2:
-                self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
-                                    Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.playerNumber == 3:
-                self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.playerNumber == 4:
-                self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
-        else:
-            if self.playerNumber == 1:
-                self.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
-                                    Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.playerNumber == 2:
-                self.resetLocTo(Constants.YELLOW_GOALBOX_LEFT_X,
-                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.playerNumber == 3:
-                self.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
-                                    Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                    Constants.HEADING_UP,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
-            elif self.playerNumber == 4:
-                self.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
-                                    Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                    Constants.HEADING_DOWN,
-                                    _localization.LocNormalParams(15.0, 15.0, 1.0))
+        if self.playerNumber == 1:
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+                            Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                            Constants.HEADING_UP)
+        elif self.playerNumber == 2:
+            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+                            Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                            Constants.HEADING_DOWN)
+        elif self.playerNumber == 3:
+            self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                            Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                            Constants.HEADING_UP)
+        elif self.playerNumber == 4:
+            self.resetLocTo(Constants.BLUE_CROSS_CIRCLE_MIDPOINT_X,
+                            Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                            Constants.HEADING_DOWN)
+        elif self.playerNumber == 5:
+            self.resetLocTo(Constants.BLUE_CROSS_CIRCLE_MIDPOINT_X,
+                            Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                            Constants.HEADING_UP)
 
         # Loc knows the side of the field now. Reset accordingly.
         self.onOwnFieldSide = True
@@ -253,6 +233,7 @@ class Brain(object):
     #@todo: HACK HACK HACK Mexico 2012 to make sure we still re-converge properly even if
     #we get manually positioned
     #should make this nicer (or at least the locations)
+    # Broken as of 4/2013
     def resetSetLocalization(self):
         gameSetResetUncertainties = _localization.LocNormalParams(50, 200, 1.0)
 
@@ -286,30 +267,19 @@ class Brain(object):
                                 gameSetResetUncertainties)
             #self.loc.resetLocToSide(False)
 
-    def resetLocalizationFromPenalty(self):
+    def resetLocalizationFromPenalty(self, top):
         """
-        Resets localization to both possible locations, depending on team color.
+        Resets localization from penalty.
+        @param top: true is our goal is to our right, false if it is to our left.
         """
-        return ## HACK -- these resetLocs are too complicated!
-        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
+        if top:
             self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                Constants.HEADING_UP,
-                                Constants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                Constants.HEADING_DOWN,
-                                _localization.LocNormalParams(15.0, 15.0, 1.0),
-                                _localization.LocNormalParams(15.0, 15.0, 1.0))
+                            Constants.FIELD_WHITE_TOP_SIDELINE_Y,
+                            Constants.HEADING_DOWN)
         else:
-            self.resetLocTo(Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
-                                Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                Constants.HEADING_UP,
-                                Constants.LANDMARK_YELLOW_GOAL_CROSS_X,
-                                Constants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                Constants.HEADING_DOWN,
-                                _localization.LocNormalParams(15.0, 15.0, 1.0),
-                                _localization.LocNormalParams(15.0, 15.0, 1.0))
-
+            self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+                            Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
+                            Constants.HEADING_UP)
         # Loc knows the side of the field now. Reset accordingly.
         self.onOwnFieldSide = True
 

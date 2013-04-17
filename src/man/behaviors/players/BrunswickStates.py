@@ -21,28 +21,7 @@ def gameInitial(player):
         player.zeroHeads()
         #Reset localization to proper starting position by player number.
         #Locations are defined in the wiki.
-        """HACK HACK until localization is implemented in messages we cant do this.
-        if player.brain.playerNumber == 1:
-            player.brain.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
-                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        nogginConstants.HEADING_UP,
-                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
-        elif player.brain.playerNumber == 2:
-            player.brain.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        nogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
-                                        nogginConstants.HEADING_UP,
-                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
-        elif player.brain.playerNumber == 3:
-            player.brain.resetLocTo(nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X,
-                                        nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        nogginConstants.HEADING_DOWN,
-                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
-        elif player.brain.playerNumber == 4:
-            player.brain.resetLocTo(nogginConstants.BLUE_GOALBOX_RIGHT_X,
-                                        nogginConstants.FIELD_WHITE_TOP_SIDELINE_Y,
-                                        nogginConstants.HEADING_DOWN,
-                                        _localization.LocNormalParams(15.0, 15.0, 1.0))
-                                        END HACK"""
+        player.brain.resetInitialLocalization()
     return player.stay()
 
 def gameReady(player):
@@ -58,13 +37,11 @@ def gameReady(player):
 
     # Reset localization to proper starting position by player number.
     # Locations are defined in the wiki.
-    """ HACK HACK until loc is in messages we can't do this.
         if player.lastDiffState == 'gameInitial':
             player.brain.resetInitialLocalization()
 
         if player.lastDiffState == 'gamePenalized':
-            player.brain.resetLocalizationFromPenalty()
-            END HACK"""
+            return player.goNow('afterPenalty')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
@@ -90,9 +67,8 @@ def gameSet(player):
         else:
             player.shouldKickOff = False
 
-        #HACK
-        #if player.lastDiffState == 'gamePenalized':
-        #    player.brain.resetSetLocalization()
+        if player.lastDiffState == 'gamePenalized':
+            player.brain.resetSetLocalization()
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
@@ -109,12 +85,8 @@ def gamePlaying(player):
         player.brain.tracker.trackBall()
         if player.lastDiffState == 'gamePenalized':
             print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
-            #HACK
-            #if player.lastStateTime > 5:
-            #    player.brain.resetLocalizationFromPenalty()
-        #HACK
-        #if player.lastDiffState == 'gameSet':
-        #    player.brain.resetSetLocalization()
+            if player.lastStateTime > 5:
+                return player.goNow('afterPenalty')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
