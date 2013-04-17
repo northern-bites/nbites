@@ -65,7 +65,9 @@ add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
-#add_subdirectory( viewer )
+add_subdirectory( viewer )
+add_subdirectory( common )
+
 
 # Sources
 set( tool_srcs main.cpp
@@ -97,7 +99,8 @@ target_link_libraries(
   image_display
   image # man image
   image_display
+  viewer
+  tool_common
   colorcreator
-  #viewer
   ${QT_LIBRARIES}
   )

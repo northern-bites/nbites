@@ -8,9 +8,10 @@
 #pragma once
 
 #include <QtGui>
+#include <QCheckBox>
 #include <vector>
 
-//#include "PaintField.h"
+#include "common/PaintField.h"
 
 namespace tool{
 namespace viewer{
@@ -22,11 +23,26 @@ class FieldViewer : public QWidget
 public:
     FieldViewer(QWidget* parent = 0);
 
-protected:
-//    PaintField* fieldPainter;
+protected slots:
+    void paintParticleView(bool state);
 
-    QVBoxLayout* mainLayout;
+protected:
+    PaintField* fieldPainter;
+
+    QHBoxLayout* mainLayout;
     QHBoxLayout* field;
+    QVBoxLayout* checkBoxes;
+
+    QCheckBox* particleViewBox;
+    QCheckBox* selector2;
+    QCheckBox* selector3;
+    QCheckBox* selector4;
+    QCheckBox* selector5;
+    QCheckBox* selector6;
+    QCheckBox* selector7;
+    QCheckBox* selector8;
+
+
     float scaleFactor;
 };
 

@@ -3,12 +3,10 @@ cmake_minimum_required(VERSION 2.8.3)
 set( IMAGE_SRCS
   ImageDisplayModule.cpp
   Color.cpp
-  PaintField.cpp
     )
 
 set( IMAGE_HEADERS
   ImageDisplayModule.h
-  PaintField.h
   )
 
 Qt4_wrap_cpp( IMAGE_HEADERS_MOC ${IMAGE_HEADERS} )
