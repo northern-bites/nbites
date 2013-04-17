@@ -43,7 +43,7 @@ S_TWO_ZONE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.2
 #### Information about the Strategies ####
 ####
 
-NUM_STRATEGIES = 13
+NUM_STRATEGIES = 14
 
 # dictionary of strategies
 STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
