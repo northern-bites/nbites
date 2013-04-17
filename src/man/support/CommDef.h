@@ -27,7 +27,7 @@ typedef unsigned char byte;
 // Multicast information
 //
 
-static const int NUM_ROBOTS = 5;    // Total number of robots we have
+static const int NUM_ROBOTS = 9;    // Total number of robots we have
 
 typedef struct robot_ip_pair_t
 {
@@ -35,26 +35,24 @@ typedef struct robot_ip_pair_t
     std::string ip;
 }robot_ip_pair;
 
-static const robot_ip_pair wash   = {"wash"  , "139.140.218.9" };
-static const robot_ip_pair river  = {"river" , "139.140.218.10"};
-static const robot_ip_pair jayne  = {"jayne" , "139.140.218.11"};
-static const robot_ip_pair mal    = {"mal"   , "139.140.218.16"};
-static const robot_ip_pair zoe    = {"zoe"   , "139.140.218.17"};
+static const robot_ip_pair wash    = {"wash"   , "139.140.218.9" };
+static const robot_ip_pair river   = {"river"  , "139.140.218.10"};
+static const robot_ip_pair jayne   = {"jayne"  , "139.140.218.11"};
+static const robot_ip_pair simon   = {"simon"  , "139.140.218.12"};
+static const robot_ip_pair inara   = {"inara"  , "139.140.218.13"};
+static const robot_ip_pair kaylee  = {"kaylee" , "139.140.218.14"};
+static const robot_ip_pair vera    = {"vera"   , "139.140.218.15"};
+static const robot_ip_pair mal     = {"mal"    , "139.140.218.16"};
+static const robot_ip_pair zoe     = {"zoe"    , "139.140.218.17"};
+
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
-                                                   mal, zoe};
+                                                   simon, inara, kaylee,
+                                                   vera, mal, zoe};
 
 //
 // Comm constants and MACRO definitions
 //
-
-/*   Packet Header: ("0" is null char)
-
-Byte| 1  | 2  | 3  | 4
- 1  |"B" |"0" |team|player
- 2  |.. sequence number ..
-
- */
 
 #define UNIQUE_ID "B" // keep this as define so it stays 2 bytes, not 4.
 static const int NUM_HEADER_BYTES = 16;
