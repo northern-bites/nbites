@@ -2,12 +2,7 @@ import noggin_constants as NogginConstants
 from   ..util import MyMath
 import PositionConstants as constants
 import PositionTransitions
-
-def positionLocalize(player):
-    """
-    Localize better in order to position
-    """
-    return player.stay()
+from math import fabs
 
 def playbookPosition(player):
     """
