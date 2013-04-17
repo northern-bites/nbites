@@ -8,7 +8,7 @@ namespace viewer{
 FieldViewer::FieldViewer(QWidget* parent):
     QWidget(parent)
 {
-    fieldPainter = new PaintField(this);
+    fieldPainter = new FieldViewerPainter(this);
 
     mainLayout = new QHBoxLayout(this);
 

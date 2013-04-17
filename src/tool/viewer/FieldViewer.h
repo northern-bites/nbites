@@ -11,7 +11,8 @@
 #include <QCheckBox>
 #include <vector>
 
-#include "common/PaintField.h"
+//#include "common/PaintField.h"
+#include "FieldViewerPainter.h"
 
 namespace tool{
 namespace viewer{
@@ -27,7 +28,7 @@ protected slots:
     void paintParticleView(bool state);
 
 protected:
-    PaintField* fieldPainter;
+    FieldViewerPainter* fieldPainter;
 
     QHBoxLayout* mainLayout;
     QHBoxLayout* field;
