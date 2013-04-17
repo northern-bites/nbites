@@ -1,64 +1,36 @@
 /**
- * @class Viewer
+ * Class responsible for holding a PaintField object and
+ * interacting with the user and field (Controller!)
  *
- * This class is going to be the WorldController from
- * the previous Tool.  It will show the field with
- * robots and balls in their positions which are
- * passed in.
- *
- * @author Dani McAvoy
- * @date October 2011
- *
- *
- * @modified Brian Jacobel
- * @date April 2012
+ * @author EJ Googins
+ * @date   April 2013
  */
-
 #pragma once
 
-#include <QWidget>
-#include <QPushButton>
 #include <QtGui>
-#include <QPainter>
 #include <vector>
 
-#include "data/DataManager.h"
-#include "image/PaintField.h"
-#include "image/PaintLocalization.h"
-#include "BMPImageViewer.h"
-#include "image/PaintBots.h"
+//#include "PaintField.h"
 
-namespace qtool {
-namespace viewer {
+namespace tool{
+namespace viewer{
 
-class FieldViewer : public QWidget{
-	Q_OBJECT
+class FieldViewer : public QWidget
+{
+    Q_OBJECT;
 
-	public:
-	FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
-	~FieldViewer();
-
-public slots:
-	void stopDrawing();
-	void drawBots();
-
-private:
-	data::DataManager::ptr dataManager;
-	viewer::BMPImageViewer* fieldView;
-	image::OverlayedImage* overlayImage;
-	image::PaintBots* bot_locs;
-	image::PaintField* fieldImage;
-	bool keepDrawing;
+public:
+    FieldViewer(QWidget* parent = 0);
 
 protected:
-	QPushButton* startButton;
-	QPushButton* stopButton;
-	QVBoxLayout* mainLayout;
-	QHBoxLayout* buttonLayout;
-	QHBoxLayout* field;
-	QSpacerItem* spacer;
-	float scaleFactor;
+//    PaintField* fieldPainter;
+
+    QVBoxLayout* mainLayout;
+    QHBoxLayout* field;
+    float scaleFactor;
 };
+
+
 
 }
 }

@@ -16,6 +16,7 @@ Tool::Tool(const char* title) :
     selector(),
     logView(this),
     tableCreator(this),
+    fieldView(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -48,6 +49,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&selector, tr("Data"));
     toolTabs->addTab(&logView, tr("Log View"));
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
+    toolTabs->addTab(&fieldView, tr("FieldView"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
