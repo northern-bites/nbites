@@ -1,5 +1,6 @@
 #include "SensorsModule.h"
 #include "Common.h"
+#include <stdio.h>
 
 namespace man {
 namespace sensors {
@@ -312,6 +313,37 @@ void SensorsModule::updateBatteryMessage()
     batteryOutput_.setMessage(batteryMessage);
 }
 
+// Helper method so that we can print out a Sweet Moves joint angle
+// tuple directly when we want to (ie 5 button presses)
+std::string makeSweetMoveTuple(const messages::JointAngles* angles)
+{
+    char output[240];
+
+    sprintf(output, "((%3.1f, %3.1f, %3.1f, %3.1f),\n(%3.1f, %3.1f, %3.1f, %3.1f, %3.1f, %3.1f),\n(%3.1f, %3.1f, %3.1f, %3.1f, %3.1f, %3.1f),\n(%3.1f, %3.1f, %3.1f, %3.1f))\n",
+            TO_DEG*angles->l_shoulder_pitch(),
+            TO_DEG*angles->l_shoulder_roll(),
+            TO_DEG*angles->l_elbow_yaw(),
+            TO_DEG*angles->l_elbow_roll(),
+            TO_DEG*angles->l_hip_yaw_pitch(),
+            TO_DEG*angles->l_hip_roll(),
+            TO_DEG*angles->l_hip_pitch(),
+            TO_DEG*angles->l_knee_pitch(),
+            TO_DEG*angles->l_ankle_pitch(),
+            TO_DEG*angles->l_ankle_roll(),
+            TO_DEG*angles->r_hip_yaw_pitch(),
+            TO_DEG*angles->r_hip_roll(),
+            TO_DEG*angles->r_hip_pitch(),
+            TO_DEG*angles->r_knee_pitch(),
+            TO_DEG*angles->r_ankle_pitch(),
+            TO_DEG*angles->r_ankle_roll(),
+            TO_DEG*angles->r_shoulder_pitch(),
+            TO_DEG*angles->r_shoulder_roll(),
+            TO_DEG*angles->r_elbow_yaw(),
+            TO_DEG*angles->r_elbow_roll());
+
+    return std::string(output);
+}
+
 void SensorsModule::run_()
 {
     printInput.latch();
@@ -321,7 +353,7 @@ void SensorsModule::run_()
 
     if(printInput.message().toggle() != lastPrint)
     {
-        std::cout << jointsOutput_.getMessage(true).get()->DebugString()
+        std::cout << makeSweetMoveTuple(jointsOutput_.getMessage(true).get())
                   << std::endl;
         lastPrint = !lastPrint;
     }
