@@ -27,6 +27,7 @@ GuardianModule::GuardianModule()
       stiffnessControlOutput(base()),
       initialStateOutput(base()),
       advanceStateOutput(base()),
+      printJointsOutput(base()),
       switchTeamOutput(base()),
       switchKickOffOutput(base()),
       feetOnGroundOutput(base()),
@@ -537,6 +538,7 @@ bool GuardianModule::executeChestClickAction(int nClicks)
         initialState();
         break;
     case 5:
+        printJointAngles();
         break;
     case 7:
         break;
@@ -625,6 +627,15 @@ void GuardianModule::advanceState()
     advanceStateOutput.setMessage(command);
 
     lastAdvance = !lastAdvance;
+}
+
+void GuardianModule::printJointAngles()
+{
+    portals::Message<messages::Toggle> command(0);
+    command.get()->set_toggle(!lastPrint);
+    printJointsOutput.setMessage(command);
+
+    lastPrint = !lastPrint;
 }
 
 void GuardianModule::switchTeams()
