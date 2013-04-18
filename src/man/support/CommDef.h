@@ -5,7 +5,7 @@
 
 #include "Common.h"
 
-#define TEAM_PORT 4000
+#define TEAM_PORT 4500
 
 #define UDP_BUF_SIZE 1024
 #define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
@@ -74,6 +74,6 @@ static const long long MIN_PACKET_DELAY = 0;
 // The minimum and maximum number of packets we can send per second.
 static const long long MAX_PACKETS_PER_SECOND = 10;  // 10 packets per second.
 static const long long MIN_PACKETS_PER_SECOND = 4;   // 4 packets pers second.
-static const long long TEAMMATE_DEAD_THRESHOLD = 3 * MICROS_PER_SECOND;
+static const long long TEAMMATE_DEAD_THRESHOLD = 10 * MICROS_PER_SECOND;
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;

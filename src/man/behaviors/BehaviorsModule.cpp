@@ -43,7 +43,8 @@ BehaviorsModule::BehaviorsModule(int teamNum, int playerNum)
       motionRequestOut(base()),
       bodyMotionCommandOut(base()),
       headMotionCommandOut(base()),
-      resetLocOut(base())
+      resetLocOut(base()),
+      myWorldModelOut(base())
 {
     std::cout << "BehaviorsModule::initializing" << std::endl;
 
@@ -276,6 +277,9 @@ void BehaviorsModule::prepareMessages()
 
     resetLocRequest = portals::Message<messages::RobotLocation>(0);
     pyInterface.setResetLocRequest_ptr(resetLocRequest.get());
+
+    myWorldModel = portals::Message<messages::WorldModel>(0);
+    pyInterface.setMyWorldModel_ptr(myWorldModel.get());
 }
 
 void BehaviorsModule::sendMessages()
@@ -296,6 +300,10 @@ void BehaviorsModule::sendMessages()
     if (motionRequest.get()->timestamp() != 0)
     {
         motionRequestOut.setMessage(motionRequest);
+    }
+    if (myWorldModel.get()->timestamp() != 0)
+    {
+        myWorldModelOut.setMessage(myWorldModel);
     }
 }
 

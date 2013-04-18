@@ -96,6 +96,7 @@ public:
     portals::OutPortal<messages::MotionCommand> bodyMotionCommandOut;
     portals::OutPortal<messages::HeadMotionCommand> headMotionCommandOut;
     portals::OutPortal<messages::RobotLocation> resetLocOut;
+    portals::OutPortal<messages::WorldModel> myWorldModelOut;
 
 private:
     portals::Message<messages::LedCommand> ledCommand;
@@ -103,6 +104,7 @@ private:
     portals::Message<messages::HeadMotionCommand> headMotionCommand;
     portals::Message<messages::MotionRequest> motionRequest;
     portals::Message<messages::RobotLocation> resetLocRequest;
+    portals::Message<messages::WorldModel> myWorldModel;
 };
 
 }

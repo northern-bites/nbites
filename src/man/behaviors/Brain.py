@@ -146,15 +146,49 @@ class Brain(object):
         self.tracker.run()
         self.nav.run()
 
-        #Set LED message
+        # Set LED message
         self.leds.processLeds()
 
+        # Set myWorldModel for Comm
+        self.updateComm()
         # Flush the output
         sys.stdout.flush()
+
+    def updateComm(self):
+        output = self.interface.myWorldModel
+
+        output.timestamp = int(self.time * 1000)
+
+        output.my_x = self.loc.x
+        output.my_y = self.loc.y
+        output.my_h = self.loc.h
+
+        #TODO get actual uncertainties
+        output.my_x_uncert = 0
+        output.my_y_uncert = 0
+        output.my_h_uncert = 0
+
+        output.ball_on = self.ball.vis.on
+
+        output.ball_dist = self.ball.distance
+        output.ball_bearing = self.ball.bearing_deg
+
+        #TODO get actual uncertainties, or transition to rel_x
+        output.ball_dist_uncert = 0
+        output.ball_bearing_uncert = 0
+
+        output.chase_time = self.teamMembers[self.playerNumber-1].chaseTime
+
+        output.role = self.teamMembers[self.playerNumber-1].role
+        output.sub_role = self.teamMembers[self.playerNumber-1].subRole
+
+        output.active = self.teamMembers[self.playerNumber-1].active
 
     def getCommUpdate(self):
         self.game = self.interface.gameState
         for i in range(len(self.teamMembers)):
+            if (i == self.playerNumber - 1):
+                continue
             self.teamMembers[i].update(self.interface.worldModelList()[i])
 
     def updateMotion(self):

@@ -32,7 +32,7 @@ def sTwoField(team, workingPlay):
     elif team.shouldUseDubD():
         Formations.fTwoDubD(team, workingPlay)
     # Agressive middie support for ball deep in opponents' territory.
-    elif team.brain.ball.loc.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Formations.fNeutralTwoField(team, workingPlay)
     # Standard formation
     else:
@@ -49,7 +49,7 @@ def sTwoZone(team, workingPlay):
         Formations.fKickoff(team, workingPlay)
     # Ball on offensive side of the field, keep defender
     # @TODO: this can cause chaser to ossilate back and forth. need tie-breaking
-    elif team.brain.ball.loc.x > PBConstants.S_TWO_ZONE_DEFENDER_THRESH:
+    elif team.brain.ball.x > PBConstants.S_TWO_ZONE_DEFENDER_THRESH:
         Formations.fTwoZoneD(team, workingPlay)
     # Ball on defensive side of the field, keep offender
     else:
@@ -70,10 +70,10 @@ def sThreeField(team, workingPlay):
     elif team.shouldUseDubD():
         Formations.fThreeDubD(team, workingPlay)
     # Make the defender a middie if the ball is close enough to opp goal
-    elif team.brain.ball.loc.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+    elif team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Formations.fNeutralOThreeField(team, workingPlay)
     # Make the offender a middie if the ball is close enough to our goal
-    elif team.brain.ball.loc.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
+    elif team.brain.ball.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
         Formations.fNeutralDThreeField(team, workingPlay)
     # Standard Formation
     else:
