@@ -15,6 +15,9 @@
 
 // Values for the Standard Deviation calculations
 
+namespace man {
+namespace vision {
+
 class VisualCross : public VisualObject {
 
 public:
@@ -98,9 +101,11 @@ private: // Class Variables
         return 0.0000002f * _distance * _distance * _distance + 5.f;
     }
     inline static float robotBearingToSD(float _bearing, float _distance) {
-        return .0000002*(_distance*_distance) + 4 * TO_RAD;
+        return .0000002f*(_distance*_distance) + 4.f * TO_RAD;
     }
 
 };
 
+}
+}
 #endif // VisualCross_hpp_defined

@@ -1,6 +1,0 @@
-WEBOTS_ACTIVE = "${WEBOTS_BACKEND}"
-
-if WEBOTS_ACTIVE == "ON":
-    WEBOTS_ACTIVE = True
-else:
-    WEBOTS_ACTIVE = False

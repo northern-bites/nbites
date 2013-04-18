@@ -3,11 +3,17 @@
 
 #include <boost/shared_ptr.hpp>
 
-class Field;  // forward reference
+namespace man {
+namespace vision {
+	class Field;  // forward reference
+}
+}
 
 #include "Threshold.h"
-#include "Profiler.h"
 #include "NaoPose.h"
+
+namespace man {
+namespace vision {
 
 // constants for Graham scanning to find convex hull
 static const int RUNSIZE = 8;
@@ -76,5 +82,8 @@ private:
     static const bool debugFieldEdge = false;
 #endif
 };
+
+}
+}
 
 #endif // Field_h_DEFINED

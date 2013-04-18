@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -35,6 +34,10 @@
 #include "JointCommand.h"
 #include "MotionConstants.h"
 
+namespace man
+{
+namespace motion
+{
 class BodyJointCommand : public JointCommand {
 public:
     typedef boost::shared_ptr<BodyJointCommand> ptr;
@@ -57,7 +60,7 @@ public:
                      const std::vector<float>& body_stiffness,
                      const Kinematics::InterpolationType _type);
 
-    virtual ~BodyJointCommand(void);
+    virtual ~BodyJointCommand();
 
     virtual const std::vector<float>&
     getJoints(Kinematics::ChainID chainID) const;
@@ -85,4 +88,6 @@ private:
     std::vector<float> rarm_joints;
 };
 
+}
+}
 #endif

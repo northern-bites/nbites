@@ -1,0 +1,13 @@
+package messages;
+
+message AudioCommand
+{
+    //path to wav file (look at SoundPaths.h)
+    optional string audio_file = 1;
+
+    //string to speak in text to speech
+    optional string tts_msg = 2;
+
+    //TTS volume (I don't think this applies to wav files)
+    optional float volume = 3 [default = 0.95]; //between 0 and 1
+}

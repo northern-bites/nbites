@@ -3,6 +3,9 @@
 
 #include "Structs.h"
 
+namespace man {
+namespace vision {
+
 class HoughVisualCorner
 {
 public:
@@ -15,5 +18,8 @@ public:
 private:
     point<int> mImagePoint;
 };
+
+}
+}
 
 #endif /* _HOUGHVISUALCORNER_H_ */

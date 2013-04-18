@@ -1,6 +1,8 @@
 #ifndef _HOUGHCONSTANTS_H_
 #define _HOUGHCONSTANTS_H_
 
+namespace man {
+namespace vision {
 namespace HoughConstants
 {
 
@@ -30,5 +32,6 @@ enum
     suppress_r_bound = 4
 };
 }
-
+}
+}
 #endif /* _HOUGHCONSTANTS_H_ */

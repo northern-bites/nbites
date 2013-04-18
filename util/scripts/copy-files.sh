@@ -13,7 +13,6 @@ LIB_DIR=../../lib
 
 # Copy important libraries to home folder
 echo "Copying necessary files to the robot."
-scp $LIB_DIR/nao/* ../audio/* setup-robot.sh ../config/*autoload.ini $UNAME@$ADDR:
-scp -r ../config/init.d $UNAME@$ADDR:/home/nao/init_stuff
+scp -r $LIB_DIR/nao/* ../audio/* setup-robot.sh ../config/* $UNAME@$ADDR:
 
 echo "Now run setup-robot.sh ON THE ROBOT."
