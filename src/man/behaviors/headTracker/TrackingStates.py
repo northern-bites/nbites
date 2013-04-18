@@ -23,6 +23,15 @@ def tracking(tracker):
 
     return tracker.stay()
 
+def trackingFieldObject(tracker):
+    tracker.helper.trackStationaryObject()
+    if not tracker.target.on and tracker.counter > 15:
+        if (tracker.target.frames_off >
+            constants.TRACKER_FRAMES_OFF_REFIND_THRESH):
+            return tracker.goLater('fullPan')
+
+    return tracker.stay()
+
 # Not currently used, but would be good functionality to have in the future.
 def lookAtTarget(tracker):
     """Look to the localization coords of the stored target."""
@@ -70,7 +79,11 @@ def fullPan(tracker):
         # Repeat the pan
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    if tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH:
+    if tracker.target.on:
+        return tracker.goLater('trackingFieldObject')
+
+    if (tracker.target is tracker.brain.ball and
+        tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
         return tracker.goLater('tracking')
 
     return tracker.stay()
