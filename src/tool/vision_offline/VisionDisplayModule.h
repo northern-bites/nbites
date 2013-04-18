@@ -10,6 +10,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QtGui>
 #include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
@@ -23,6 +24,7 @@
 #include "colorcreator/ColorTable.h"
 #include "Camera.h"
 #include "Images.h"
+#include "logview/ProtoViewer.h"
 #include "PathConfig.h"
 
 #include "vision/VisionModule.h"
@@ -30,7 +32,7 @@
 namespace tool {
 namespace vision {
 
-class VisionDisplayModule : public QWidget,
+class VisionDisplayModule : public QMainWindow,
 							public portals::Module
 
 {
@@ -70,6 +72,13 @@ private:
 	image::ThresholdedImageDisplayModule botThrDisplay;
 	man::vision::VisionModule visMod;
 	color::ColorTable colorTable;
+
+
+	// to view vision data
+	logview::TypedProtoViewer<messages::VisionField>* field_viewer;
+	logview::TypedProtoViewer<messages::VisionRobot>* robot_viewer;
+	logview::TypedProtoViewer<messages::VisionBall>* ball_viewer;
+	logview::TypedProtoViewer<messages::VisionObstacle>* obstacle_viewer;
 
     // So that multiple things in this module can connect to these
     portals::OutPortal<messages::YUVImage> bottomImage;

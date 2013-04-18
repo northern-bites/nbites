@@ -9,7 +9,7 @@ namespace vision {
 
 
 VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
-	QWidget(parent),
+	QMainWindow(parent),
 	currentCamera(Camera::TOP),
 	topConverter(Camera::TOP),
 	bottomConverter(Camera::BOTTOM),
@@ -54,28 +54,64 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	visMod.inertial_state.setMessage(inertials);
 
 
+	field_viewer = new logview::TypedProtoViewer<messages::VisionField>();
+	field_viewer->input.wireTo(&visMod.vision_field);
+	subdiagram.addModule(*field_viewer);
+	robot_viewer = new logview::TypedProtoViewer<messages::VisionRobot>();
+	robot_viewer->input.wireTo(&visMod.vision_robot);
+	subdiagram.addModule(*robot_viewer);
+	ball_viewer = new logview::TypedProtoViewer<messages::VisionBall>();
+	ball_viewer->input.wireTo(&visMod.vision_ball);
+	subdiagram.addModule(*ball_viewer);
+	obstacle_viewer = new logview::TypedProtoViewer<messages::VisionObstacle>();
+	obstacle_viewer->input.wireTo(&visMod.vision_obstacle);
+	subdiagram.addModule(*obstacle_viewer);
+	
+	QDockWidget* dockWidget = new QDockWidget("Vision Field", this);
+	dockWidget->setMinimumWidth(300);
+	dockWidget->setWidget(field_viewer);
+	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+	
+	dockWidget = new QDockWidget("Vision Robot", this);
+	dockWidget->setMinimumWidth(300);
+	dockWidget->setWidget(robot_viewer);
+	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+
+	dockWidget = new QDockWidget("Vision Ball", this);
+	dockWidget->setMinimumWidth(300);
+	dockWidget->setWidget(ball_viewer);
+	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+
+	dockWidget = new QDockWidget("Vision Obstacle", this);
+	dockWidget->setMinimumWidth(300);
+	dockWidget->setWidget(obstacle_viewer);
+	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+
 	// GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
-    QHBoxLayout* leftLayout = new QHBoxLayout;
+	QWidget* mainWidget = new QWidget;
 
 	QToolBar* toolBar = new QToolBar(this);
-    QPushButton* loadBtn = new QPushButton("Load", this);
+    QPushButton* loadBtn = new QPushButton("Load Table", this);
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
 	toolBar->addWidget(loadBtn);
-	leftLayout->addWidget(toolBar); 
+	this->addToolBar(toolBar); 
 
     imageTabs = new QTabWidget(this);
-    leftLayout->addWidget(imageTabs);
+    mainLayout->addWidget(imageTabs);
 
     imageTabs->addTab(&topDisplay, "Top Image");
     imageTabs->addTab(&bottomDisplay, "Bottom Image");
 	imageTabs->addTab(&topThrDisplay, "Top Thresh");
 	imageTabs->addTab(&botThrDisplay, "Bottom Thresh");
-
-	mainLayout->addLayout(leftLayout);
 	
-	setLayout(mainLayout);
+	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	mainWidget->setLayout(mainLayout);
+	this->setCentralWidget(mainWidget);
 
+    //corner ownership
+    this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+    this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
 }
 
