@@ -20,6 +20,8 @@
 #include "colorcreator/ColorTableCreator.h"
 #include "viewer/FieldViewer.h"
 
+#include "ParticleSwarm.pb.h"
+
 namespace tool {
 
 class Tool : public QMainWindow {

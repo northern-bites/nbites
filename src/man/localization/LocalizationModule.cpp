@@ -6,7 +6,8 @@ namespace man
     {
     LocalizationModule::LocalizationModule()
         : portals::Module(),
-          output(base())
+          output(base()),
+          particleOutput(base())
     {
         particleFilter = new ParticleFilter();
         particleFilter->resetLocTo(100,100,0);
@@ -50,6 +51,13 @@ namespace man
 
         portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                              getCurrentEstimate());
+
+#ifdef LOG_LOCALIZATON
+        portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
+                                                               getCurrentSwarm());
+        particleOutput.setMessage(swarmMessage);
+#endif
+
         output.setMessage(locMessage);
     }
 

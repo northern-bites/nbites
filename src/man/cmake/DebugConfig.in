@@ -73,3 +73,17 @@
 #else
 #   undef LOG_IMAGES
 #endif
+
+#define LOG_LOCATION_${LOG_LOCATION}
+#ifdef  LOG_LOCATION_ON
+#   define LOG_LOCATION
+#else
+#   undef LOG_LOCATION
+#endif
+
+#define LOG_LOCALIZATION_${LOG_LOCALIZATION}
+#ifdef  LOG_LOCALIZATION_ON
+#   define LOG_LOCALIZATION
+#else
+#   undef LOG_LOCALIZATION
+#endif

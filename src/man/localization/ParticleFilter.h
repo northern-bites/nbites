@@ -18,6 +18,8 @@
 
 #include "NBMath.h"
 
+#include "ParticleSwarm.pb.h"
+
 #include <vector>
 #include <iostream>
 #include <map>
@@ -84,6 +86,8 @@ namespace man
 
         // Getters
         const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
+        const messages::ParticleSwarm& getCurrentSwarm();
+
         float getXEst() const {return poseEstimate.x();}
         float getYEst() const {return poseEstimate.y();}
         float getHEst() const {return poseEstimate.h();}
@@ -118,6 +122,9 @@ namespace man
         float lastVisionTimestamp;
 
         bool updatedVision;
+
+        // For use when logging particle swarm
+        messages::ParticleSwarm swarm;
     };
     } // namespace localization
 } // namespace man

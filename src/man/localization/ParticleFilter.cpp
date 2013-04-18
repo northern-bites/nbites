@@ -431,5 +431,22 @@ namespace man
 
         particles = newParticles;
     }
+
+    const messages::ParticleSwarm& ParticleFilter::getCurrentSwarm()
+    {
+        messages::Particle newParticle;
+        ParticleIt iter;
+        for(iter = particles.begin(); iter != particles.end(); ++iter)
+        {
+            newParticle.mutable_loc()->CopyFrom((*iter).getLocation());
+            newParticle.set_weight((*iter).getWeight());
+            swarm.add_particle()->CopyFrom(newParticle);
+        }
+
+        return swarm;
+
+
+    }
+
     } // namespace localization
 } // namespace man

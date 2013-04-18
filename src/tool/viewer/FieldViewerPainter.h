@@ -16,6 +16,8 @@
 
 #include "common/PaintField.h"
 
+#include "RobotLocation.pb.h"
+
 namespace tool {
 namespace viewer {
 
@@ -25,6 +27,27 @@ class FieldViewerPainter : public PaintField
 
 public:
     FieldViewerPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
+
+    void updateWithLocationMessage(messages::RobotLocation newLoc);
+
+protected slots:
+    void paintParticleAction(bool state);
+    void paintLocationAction(bool state);
+
+protected:
+    // Paint the field
+    void paintEvent(QPaintEvent* event);
+
+    // Paint a RobotLocation
+    void paintRobotLocation(QPaintEvent* event,
+                            messages::RobotLocation loc,
+                            bool red = false);
+
+private:
+    bool shouldPaintParticles;
+    bool shouldPaintLocation;
+
+    messages::RobotLocation curLoc;
 
 };
 

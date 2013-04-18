@@ -12,6 +12,7 @@
 #include "GCResponse.pb.h"
 #include "Images.h"
 #include "InertialState.pb.h"
+#include "RobotLocation.pb.h"
 #include "SonarState.pb.h"
 #include "StiffnessControl.pb.h"
 #include "TeamPacket.pb.h"
@@ -32,6 +33,7 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(GameState);
     ADD_MAPPED_TYPE(GCResponse);
     ADD_MAPPED_TYPE(InertialState);
+    ADD_MAPPED_TYPE(RobotLocation);
     ADD_MAPPED_TYPE(SonarState);
     ADD_MAPPED_TYPE(StiffnessControl);
     ADD_MAPPED_TYPE(TeamPacket);

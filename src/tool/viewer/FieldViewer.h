@@ -11,21 +11,32 @@
 #include <QCheckBox>
 #include <vector>
 
-//#include "common/PaintField.h"
+#include "RoboGrams.h"
+#include "RobotLocation.pb.h"
+
 #include "FieldViewerPainter.h"
 
 namespace tool{
 namespace viewer{
 
-class FieldViewer : public QWidget
+    class FieldViewer : public QWidget,
+                    public portals::Module
 {
     Q_OBJECT;
 
 public:
     FieldViewer(QWidget* parent = 0);
 
+    void confirmParticleLogs(bool haveLogs);
+    void confirmLocationLogs(bool haveLogs);
+
+    portals::InPortal<messages::RobotLocation> locationIn;
+
 protected slots:
-    void paintParticleView(bool state);
+    void noLogError();
+
+protected:
+    virtual void run_();
 
 protected:
     FieldViewerPainter* fieldPainter;
@@ -35,7 +46,8 @@ protected:
     QVBoxLayout* checkBoxes;
 
     QCheckBox* particleViewBox;
-    QCheckBox* selector2;
+    QCheckBox* locationViewBox;
+
     QCheckBox* selector3;
     QCheckBox* selector4;
     QCheckBox* selector5;
@@ -45,6 +57,10 @@ protected:
 
 
     float scaleFactor;
+
+private:
+    bool haveParticleLogs;
+    bool haveLocationLogs;
 };
 
 

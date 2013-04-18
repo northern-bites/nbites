@@ -6,14 +6,16 @@ namespace tool{
 namespace viewer{
 
 FieldViewer::FieldViewer(QWidget* parent):
-    QWidget(parent)
+    QWidget(parent),
+    haveParticleLogs(false),
+    haveLocationLogs(false)
 {
     fieldPainter = new FieldViewerPainter(this);
 
     mainLayout = new QHBoxLayout(this);
 
     particleViewBox = new QCheckBox("Particle Viewer",this);
-    selector2 = new QCheckBox("test2", this);
+    locationViewBox = new QCheckBox("Location Viewer", this);
     selector3 = new QCheckBox("test3",this);
     selector4 = new QCheckBox("test4", this);
     selector5= new QCheckBox("test5",this);
@@ -27,7 +29,7 @@ FieldViewer::FieldViewer(QWidget* parent):
     checkBoxes = new QVBoxLayout();
 
     checkBoxes->addWidget(particleViewBox);
-    checkBoxes->addWidget(selector2);
+    checkBoxes->addWidget(locationViewBox);
     checkBoxes->addWidget(selector3);
     checkBoxes->addWidget(selector4);
     checkBoxes->addWidget(selector5);
@@ -35,8 +37,15 @@ FieldViewer::FieldViewer(QWidget* parent):
     checkBoxes->addWidget(selector7);
     checkBoxes->addWidget(selector8);
 
+    // Connect checkbox interface with slots in the painter
+    // Assume no unloggers, hookup if proven wrong
     connect(particleViewBox, SIGNAL(toggled(bool)), this,
-            SLOT(paintParticleView(bool)));
+            SLOT(noLogError()));
+    connect(locationViewBox, SIGNAL(toggled(bool)), this,
+            SLOT(noLogError()));
+
+    // HACK - Remove when unloggers
+    confirmParticleLogs(true);
 
     mainLayout->addLayout(field);
     mainLayout->addLayout(checkBoxes);
@@ -44,11 +53,57 @@ FieldViewer::FieldViewer(QWidget* parent):
     this->setLayout(mainLayout);
 }
 
-void FieldViewer::paintParticleView(bool state) {
-    if (state)
-        qDebug() << "Paint Particle View";
-    else
-        qDebug() << "Don't Paint Particle View";
+void FieldViewer::confirmParticleLogs(bool haveLogs)
+{
+    haveParticleLogs = haveLogs;
+    if(haveLogs) {
+        connect(particleViewBox, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintParticleAction(bool)));
+
+        disconnect(particleViewBox, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+    else {
+        disconnect(particleViewBox, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintParticleAction(bool)));
+
+        connect(particleViewBox, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+}
+
+void FieldViewer::confirmLocationLogs(bool haveLogs)
+{
+    haveLocationLogs = haveLogs;
+    if(haveLogs) {
+        connect(locationViewBox, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintLocationAction(bool)));
+
+        disconnect(locationViewBox, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+    else {
+        disconnect(locationViewBox, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintLocationAction(bool)));
+
+        connect(locationViewBox, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+}
+
+
+void FieldViewer::noLogError()
+{
+    qDebug() << "Sorry, the opened log file does not include those logs";
+}
+
+void FieldViewer::run_()
+{
+    if (haveLocationLogs) {
+        locationIn.latch();
+        fieldPainter->updateWithLocationMessage(locationIn.message());
+    }
+
 }
 
 } // namespace viewer

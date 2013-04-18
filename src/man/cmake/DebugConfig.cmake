@@ -68,10 +68,23 @@ if(USE_LOGGING)
     "Log the raw images from the camera."
     OFF
     )
+  option(
+    LOG_LOCATION
+    "Log the robots location belief"
+    OFF
+    )
+  option(
+    LOG_LOCALIZATION
+    "Log the robots localization particle belief"
+    OFF
+    )
+
 else(USE_LOGGING)
   unset(LOG_SENSORS CACHE)
   unset(LOG_GUARDIAN CACHE)
   unset(LOG_COMM CACHE)
   unset(LOG_VISION CACHE)
   unset(LOG_IMAGES CACHE)
+  unset(LOG_LOCATION CACHE)
+  unset(LOG_LOCALIZATION CACHE)
 endif(USE_LOGGING)

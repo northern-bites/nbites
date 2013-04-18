@@ -8,6 +8,7 @@
 #include "RoboGrams.h"
 #include "VisionField.pb.h"
 #include "RobotLocation.pb.h"
+#include "ParticleSwarm.pb.h"
 
 #include "SensorModel.h"
 #include "MotionModel.h"
@@ -33,7 +34,10 @@ namespace man
         portals::InPortal<messages::RobotLocation> motionInput;
         portals::InPortal<messages::VisionField> visionInput;
         portals::InPortal<messages::RobotLocation> resetInput;
+
         portals::OutPortal<messages::RobotLocation> output;
+
+        portals::OutPortal<messages::ParticleSwarm> particleOutput;
 
         float lastMotionTimestamp;
         float lastVisionTimestamp;
