@@ -15,7 +15,8 @@ Tool::Tool(const char* title) :
     diagram(),
     selector(),
     logView(this),
-    tableCreator(this),
+	tableCreator(this),
+	visDispMod(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -47,7 +48,8 @@ Tool::Tool(const char* title) :
 
     toolTabs->addTab(&selector, tr("Data"));
     toolTabs->addTab(&logView, tr("Log View"));
-    toolTabs->addTab(&tableCreator, tr("Color Creator"));
+	toolTabs->addTab(&tableCreator, tr("Color Creator"));
+	toolTabs->addTab(&visDispMod, tr("Offline Vision"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
@@ -61,7 +63,7 @@ Tool::Tool(const char* title) :
     }
     // If we don't have dimensions, default to hard-coded values
     if((geometry->width() == 0) && (geometry->height() == 0)){
-        geometry = new QRect(75, 75, 1132, 958);
+        geometry = new QRect(75, 75, 1000, 900);
     }
     this->setGeometry(*geometry);
 }
@@ -79,18 +81,17 @@ Tool::~Tool() {
 
 void Tool::setUpModules()
 {
-    if (diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
-                                                      "top") &&
-        diagram.connectToUnlogger<messages::YUVImage>(tableCreator.bottomImageIn,
-                                                      "bottom"))
-    {
-        diagram.addModule(tableCreator);
-    }
-    else
-    {
-        std::cout << "Right now you can't use the color table creator without"
-                  << " two image logs." << std::endl;
-    }
+    diagram.addModule(tableCreator);
+    diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
+                                                  "top");
+    diagram.connectToUnlogger<messages::YUVImage>(tableCreator.bottomImageIn,
+                                                  "bottom");
+
+	diagram.addModule(visDispMod);
+	diagram.connectToUnlogger<messages::YUVImage>(visDispMod.topImageIn,
+												  "top");
+	diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
+												  "bottom");
 }
 
 // Keyboard control
