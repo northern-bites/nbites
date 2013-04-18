@@ -1,24 +1,16 @@
-
 #include "BHWalkProvider.h"
 
 #include <cassert>
 #include <string>
 
-#include "NullStream.h"
 #include "bhuman.h"
 
-namespace man {
-namespace motion {
+namespace man
+{
+namespace motion
+{
 
 using namespace boost;
-using namespace std;
-
-//#define DEBUG_BHWALK
-#ifdef DEBUG_BHWALK
-#define bhwalk_out std::cout
-#else
-#define bhwalk_out (*NullStream::NullInstance())
-#endif
 
 const float BHWalkProvider::INITIAL_BODY_POSE_ANGLES[] =
 {
@@ -60,15 +52,15 @@ static const JointData::Joint nb_joint_order[] = {
         JointData::RElbowRoll
 };
 
-BHWalkProvider::BHWalkProvider(boost::shared_ptr<Sensors> s, boost::shared_ptr<NaoPose> p) :
-        MotionProvider(WALK_PROVIDER), requestedToStop(false),
-        sensors(s) {
+BHWalkProvider::BHWalkProvider()
+    : MotionProvider(WALK_PROVIDER), requestedToStop(false)
+{
     hardReset();
 }
 
-void BHWalkProvider::requestStopFirstInstance() {
+void BHWalkProvider::requestStopFirstInstance()
+{
     requestedToStop = true;
-    bhwalk_out << "stop requested!" << endl;
 }
 
 bool hasLargerMagnitude(float x, float y) {
@@ -96,7 +88,11 @@ bool hasPassed(const Pose2D& p1, const Pose2D& p2) {
  * Main differences:
  * * The BH joint data is in a different order;
  */
-void BHWalkProvider::calculateNextJointsAndStiffnesses() {
+void BHWalkProvider::calculateNextJointsAndStiffnesses(
+    std::vector<float>&            sensorAngles,
+    const messages::InertialState& sensorInertials,
+    const messages::FSR&           sensorFSRs
+    ) {
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
 
@@ -137,12 +133,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
             Pose2D absoluteTarget(command->theta_rads, command->x_mms, command->y_mms);
 
             Pose2D relativeTarget = absoluteTarget - (deltaOdometry + walkingEngine.upcomingOdometryOffset);
-
-            //        bhwalk_out << deltaOdometry.rotation << " " << absoluteTarget.rotation << std::endl;
-
-            //        bhwalk_out << relativeTarget.translation.x << " " <<
-            //                      relativeTarget.translation.y << " " <<
-            //                      relativeTarget.rotation << std::endl;
 
             if (!hasPassed(deltaOdometry + walkingEngine.upcomingOdometryOffset, absoluteTarget)) {
 
@@ -217,46 +207,40 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses() {
     //Note: temperatures are unused, and currents are used by the GroundContactDetector
     //which is not used right now
     JointData& bh_joint_data = walkingEngine.theJointData;
-    vector<float> nb_joint_data = sensors->getBodyAngles();
 
-    for (int i = 0; i < JointData::numOfJoints; i++) {
-        bh_joint_data.angles[nb_joint_order[i]] = nb_joint_data[i];
+    for (int i = 0; i < JointData::numOfJoints; i++)
+    {
+        bh_joint_data.angles[nb_joint_order[i]] = sensorAngles[i];
     }
 
     SensorData& bh_sensors = walkingEngine.theSensorData;
 
-    Inertial nb_raw_inertial = sensors->getUnfilteredInertial();
+    bh_sensors.data[SensorData::gyroX] = sensorInertials.gyr_x();
+    bh_sensors.data[SensorData::gyroY] = sensorInertials.gyr_y();
 
-    bh_sensors.data[SensorData::gyroX] = nb_raw_inertial.gyrX;
-    bh_sensors.data[SensorData::gyroY] = nb_raw_inertial.gyrY;
+    bh_sensors.data[SensorData::accX] = sensorInertials.acc_x();
+    bh_sensors.data[SensorData::accY] = sensorInertials.acc_y();
+    bh_sensors.data[SensorData::accZ] = sensorInertials.acc_z();
 
-    bh_sensors.data[SensorData::accX] = nb_raw_inertial.accX;
-    bh_sensors.data[SensorData::accY] = nb_raw_inertial.accY;
-    bh_sensors.data[SensorData::accZ] = nb_raw_inertial.accZ;
+    bh_sensors.data[SensorData::angleX] = sensorInertials.angle_x();
+    bh_sensors.data[SensorData::angleY] = sensorInertials.angle_y();
 
-    bh_sensors.data[SensorData::angleX] = nb_raw_inertial.angleX;
-    bh_sensors.data[SensorData::angleY] = nb_raw_inertial.angleY;
+    bh_sensors.data[SensorData::fsrLFL] = sensorFSRs.lfl();
+    bh_sensors.data[SensorData::fsrLFR] = sensorFSRs.lfr();
+    bh_sensors.data[SensorData::fsrLBL] = sensorFSRs.lrl();
+    bh_sensors.data[SensorData::fsrLBR] = sensorFSRs.lrr();
 
-    FSR nb_fsr_l = sensors->getLeftFootFSR();
-
-    bh_sensors.data[SensorData::fsrLFL] = nb_fsr_l.frontLeft;
-    bh_sensors.data[SensorData::fsrLFR] = nb_fsr_l.frontRight;
-    bh_sensors.data[SensorData::fsrLBL] = nb_fsr_l.rearLeft;
-    bh_sensors.data[SensorData::fsrLBR] = nb_fsr_l.rearRight;
-
-    FSR nb_fsr_r = sensors->getRightFootFSR();
-
-    bh_sensors.data[SensorData::fsrRFL] = nb_fsr_r.frontLeft;
-    bh_sensors.data[SensorData::fsrLFR] = nb_fsr_r.frontRight;
-    bh_sensors.data[SensorData::fsrLBL] = nb_fsr_r.rearLeft;
-    bh_sensors.data[SensorData::fsrLBR] = nb_fsr_r.rearRight;
+    bh_sensors.data[SensorData::fsrRFL] = sensorFSRs.rfl();
+    bh_sensors.data[SensorData::fsrLFR] = sensorFSRs.lfr();
+    bh_sensors.data[SensorData::fsrLBL] = sensorFSRs.lrl();
+    bh_sensors.data[SensorData::fsrLBR] = sensorFSRs.lrr();
 
     walkingEngine.update();
 
     //ignore the first chain since it's the head one
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
-        vector<float> chain_angles;
-        vector<float> chain_hardness;
+        std::vector<float> chain_angles;
+        std::vector<float> chain_hardness;
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
             //position angle
@@ -294,16 +278,22 @@ bool BHWalkProvider::isWalkActive() const {
 }
 
 void BHWalkProvider::stand() {
-    bhwalk_out << "BHWalk stand requested" << endl;
+//    bhwalk_out << "BHWalk stand requested" << endl;
 
     currentCommand = MotionCommand::ptr();
     active();
 }
 
-MotionModel BHWalkProvider::getOdometryUpdate() const {
-    return MotionModel(walkingEngine.theOdometryData.translation.x * MM_TO_CM,
-                       walkingEngine.theOdometryData.translation.y * MM_TO_CM,
-                       walkingEngine.theOdometryData.rotation);
+void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const
+{
+    portals::Message<messages::RobotLocation> odometryData(0);
+    odometryData.get()->set_x(walkingEngine.theOdometryData.translation.x
+                              * MM_TO_CM);
+    odometryData.get()->set_y(walkingEngine.theOdometryData.translation.y
+                              * MM_TO_CM);
+    odometryData.get()->set_h(walkingEngine.theOdometryData.rotation);
+
+    out.setMessage(odometryData);
 }
 
 void BHWalkProvider::hardReset() {
@@ -345,8 +335,8 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 
     currentCommand = command;
 
-    bhwalk_out << "BHWalk speed walk requested with command ";
-    bhwalk_out << *(command.get());
+//    bhwalk_out << "BHWalk speed walk requested with command ";
+//    bhwalk_out << *(command.get());
 
     active();
 }
@@ -356,14 +346,11 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
     motionRequest.motion = MotionRequest::walk;
     walkingEngine.theMotionRequest = motionRequest;
 
-    //reset odometry
-    walkingEngine.theOdometryData = OdometryData();
-
     startOdometry = walkingEngine.theOdometryData;
     currentCommand = command;
 
-    bhwalk_out << "BHWalk step walk requested with command ";
-    bhwalk_out << *(command.get()) << endl;
+//    bhwalk_out << "BHWalk step walk requested with command ";
+//    bhwalk_out << *(command.get()) << endl;
 
     active();
 }
@@ -371,9 +358,6 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
 void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 
     currentCommand = command;
-
-    bhwalk_out << "BHWalk destination walk requested with command ";
-    bhwalk_out << *(command.get()) << endl;
 
     active();
 }
@@ -388,53 +372,6 @@ const SupportFoot BHWalkProvider::getSupportFoot() const {
 
 bool BHWalkProvider::calibrated() const {
     return walkingEngine.theInertiaSensorData.calibrated;
-}
-
-static void copyOver(const Pose2D& target, proto::RobotLocation* location) {
-
-    location->set_h(target.rotation);
-    location->set_x(target.translation.x);
-    location->set_y(target.translation.y);
-}
-
-void BHWalkProvider::update(proto::WalkProvider* walkProvider) const {
-
-    using namespace proto;
-
-    walkProvider->set_active(isActive());
-    walkProvider->set_is_walking(isWalkActive());
-    walkProvider->set_stopping(isStopping());
-    walkProvider->set_requested_to_stop(requestedToStop);
-    walkProvider->set_is_standing(isStanding());
-    walkProvider->set_calibrated(calibrated());
-
-    if (currentCommand.get()) {
-        walkProvider->set_command_type(currentCommand->getType());
-    } else {
-        walkProvider->set_command_type(-1);
-    }
-
-    WalkProvider::BHDebug* bhdebug = walkProvider->mutable_bhdebug();
-
-    bhdebug->set_motion_type(walkingEngine.theMotionRequest.motion);
-    bhdebug->set_motion_name(MotionRequest::getName(walkingEngine.theMotionRequest.motion));
-
-    bhdebug->set_selected_motion_type(walkingEngine.theMotionSelection.targetMotion);
-    bhdebug->set_selected_motion_name(MotionRequest::getName(walkingEngine.theMotionSelection.targetMotion));
-
-    copyOver(walkingEngine.theMotionRequest.walkRequest.target, bhdebug->mutable_target());
-    copyOver(walkingEngine.theMotionRequest.walkRequest.speed, bhdebug->mutable_speeds());
-
-
-    bhdebug->set_ground_contact_safe(walkingEngine.theGroundContactState.contactSafe);
-    bhdebug->set_instable(walkingEngine.instable);
-
-//    RepeatedFloats* ratios = bhdebug->mutable_select_ratios();
-
-    bhdebug->clear_select_ratios();
-    for (int i = 0; i < MotionRequest::numOfMotions; i++) {
-        bhdebug->add_select_ratios(walkingEngine.theMotionSelection.ratios[i]);
-    }
 }
 
 }

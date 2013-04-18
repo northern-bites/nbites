@@ -11,7 +11,7 @@ import GoalieTransitions
 from objects import RelRobotLocation, RelLocation, Location
 from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 #from vision import cornerID as IDs
-from math import fabs, degrees
+from math import fabs, degrees, radians, sin, cos
 from ..kickDecider import kicks
 import noggin_constants as Constants
 import goalie
@@ -47,10 +47,9 @@ def updatePostObservations(player):
                 print "  Avg left y is now " + str(player.system.leftPostRelY())
 
 def updateCrossObservations(player):
-    if(player.brain.vision.cross.on and
-       player.brain.vision.cross.distance != 0.0):
-        player.system.pushCrossObservation(player.brain.vision.cross.distance,
-                                           player.brain.vision.cross.bearing)
+    cross = player.brain.interface.visionField.visual_cross
+    if(cross.on and cross.distance != 0.0):
+        player.system.pushCrossObservation(cross.distance,cross.bearing)
 
 def spinToFaceGoal(player):
     if player.firstFrame():
@@ -247,6 +246,17 @@ def findGoalboxCorner(player):
 
     return Transition.getNextState(player, findGoalboxCorner)
 
+def getRobotGlobalHeading(alpha, bearing, phys):
+    return degrees(phys + radians(alpha) - bearing)
+
+# Rel X of corner from robot
+def getCornerRelX(alpha, distance, phys):
+    return (distance * cos(phys + radians(alpha)))
+
+# Rel Y of corner from robot
+def getCornerRelY(alpha, distance, phys):
+    return (distance * sin(phys + radians(alpha)))
+
 def centerAtGoalBasedOnCorners(player):
     if player.firstFrame():
         centerAtGoalBasedOnCorners.home = RelRobotLocation(-10.0, 0.0, 0.0)
@@ -254,40 +264,66 @@ def centerAtGoalBasedOnCorners(player):
                               nav.GENERAL_AREA,
                               nav.FAST_SPEED)
 
-    for corner in player.brain.vision.fieldLines.corners:
+    vision = player.brain.interface.visionField
+
+    if vision.visual_corner_size() == 0:
+        return Transition.getNextState(player, centerAtGoalBasedOnCorners)
+
+    corner = vision.visual_corner(0)
+
+    for i in range(0, vision.visual_corner_size()):
         # if it is possible that this is the desired corner
-        if(centerAtGoalBasedOnCorners.cornerID in corner.possibilities):
-            if(centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L
-               and corner.visualOrientation < 0 and
-               player.brain.interface.visionField.vision_field_edge.distance_m > 110.0):
-                centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
-                heading = corner.getRobotGlobalHeadingIfFieldAngleIs(90)
-                relX = corner.getRobotRelXIfFieldAngleIs(90)
-                relY = corner.getRobotRelYIfFieldAngleIs(90)
-            elif(centerAtGoalBasedOnCorners.cornerID ==
-                 IDs.YELLOW_GOAL_RIGHT_L and corner.visualOrientation > 0 and
-                 player.brain.interface.visionField.vision_field_edge.distance_m > 110.0):
-                centerAtGoalBasedOnCorners.cornerDirection = corner.bearing
-                heading = corner.getRobotGlobalHeadingIfFieldAngleIs(0)
-                relX = corner.getRobotRelXIfFieldAngleIs(0)
-                relY = corner.getRobotRelYIfFieldAngleIs(0)
-            else:
-                continue
+        for j in range(0, vision.visual_corner(i).poss_id_size()):
+            if (vision.visual_corner(i).poss_id(j) ==
+                centerAtGoalBasedOnCorners.cornerID):
+                if(centerAtGoalBasedOnCorners.cornerID ==
+                   vision.visual_corner(i).corner_id.YELLOW_GOAL_LEFT_L and
+                   vision.visual_corner(i).orientation < 0):
+                    corner = vision.visual_corner(i)
+                    centerAtGoalBasedOnCorners.cornerDirection = \
+                        degrees(corner.visual_detection.bearing)
+                    heading = \
+                        getRobotGlobalHeading(90,
+                                              corner.visual_detection.bearing,
+                                              corner.physical_orientation)
+                    relX = getCornerRelX(90,
+                                         corner.visual_detection.distance,
+                                         corner.physical_orientation)
+                    relY = getCornerRelY(90,
+                                         corner.visual_detection.distance,
+                                         corner.physical_orientation)
+                elif(centerAtGoalBasedOnCorners.cornerID ==
+                   vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L and
+                   vision.visual_corner(i).orientation > 0):
+                    corner = vision.visual_corner(i)
+                    centerAtGoalBasedOnCorners.cornerDirection = \
+                        degrees(corner.visual_detection.bearing)
+                    heading = \
+                        getRobotGlobalHeading(0,
+                                              corner.visual_detection.bearing,
+                                              corner.physical_orientation-radians(15.0))
+                    relX = getCornerRelX(0,
+                                         corner.visual_detection.distance,
+                                         corner.physical_orientation-radians(15.0))
+                    relY = getCornerRelY(0,
+                                         corner.visual_detection.distance,
+                                         corner.physical_orientation-radians(15.0))
+                else:
+                    continue
 
-            centerAtGoalBasedOnCorners.home.relH = -heading
-            centerAtGoalBasedOnCorners.home.relX = -(GOALBOX_DEPTH + relX)
-            if centerAtGoalBasedOnCorners.cornerID == IDs.YELLOW_GOAL_LEFT_L:
-                centerAtGoalBasedOnCorners.home.relY = -(GOALBOX_WIDTH/2.0 +
-                                                         relY)
-            else:
-                centerAtGoalBasedOnCorners.home.relY = (GOALBOX_WIDTH/2.0 -
-                                                        relY)
+                centerAtGoalBasedOnCorners.home.relH = -heading
+                centerAtGoalBasedOnCorners.home.relX = -(GOALBOX_DEPTH - relX)
+                if (centerAtGoalBasedOnCorners.cornerID ==
+                    corner.corner_id.YELLOW_GOAL_LEFT_L):
+                    centerAtGoalBasedOnCorners.home.relY = \
+                        -(GOALBOX_WIDTH/2.0 - relY)
+                else:
+                    centerAtGoalBasedOnCorners.home.relY = \
+                        (GOALBOX_WIDTH/2.0 + relY)
 
-            lookTo = RelLocation(-relX, -relY)
+                player.brain.tracker.lookToAngle(centerAtGoalBasedOnCorners.cornerDirection)
 
-            player.brain.tracker.lookToAngle(centerAtGoalBasedOnCorners.cornerDirection)
-
-            break
+                break
 
     # corrections to make nav STOP!
     if fabs(centerAtGoalBasedOnCorners.home.relH) < 5:

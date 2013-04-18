@@ -21,6 +21,7 @@
 #include "SonarState.pb.h"
 #include "FSR.pb.h"
 #include "BatteryState.pb.h"
+#include "Toggle.pb.h"
 
 #include <alcommon/albroker.h>
 #include <alproxies/almemoryproxy.h>
@@ -51,6 +52,7 @@ public:
      * These portals enable other modules to get sensory
      * information.
      */
+    portals::InPortal<messages::Toggle>           printInput;
 
     portals::OutPortal<messages::JointAngles>     jointsOutput_;
     portals::OutPortal<messages::JointAngles>     temperatureOutput_;
@@ -140,6 +142,8 @@ private:
     boost::shared_ptr<AL::ALMemoryFastAccess> fastMemoryAccess_;
     std::vector<float>                        sensorValues_;
     std::vector<std::string>                  sensorKeys_;
+
+    bool lastPrint;
 };
 
 } // namespace sensors

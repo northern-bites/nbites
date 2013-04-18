@@ -4,9 +4,10 @@
 #include <iostream>
 #include "RobotConfig.h"
 
-SET_POOL_SIZE(messages::WorldModel,  15);
-SET_POOL_SIZE(messages::JointAngles, 15);
+SET_POOL_SIZE(messages::WorldModel,  16);
+SET_POOL_SIZE(messages::JointAngles, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
+SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
 
 namespace man {
@@ -58,6 +59,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
     sensorsThread.addModule(jointEnactor);
     sensorsThread.addModule(motion);
+
+    sensors.printInput.wireTo(&guardian.printJointsOutput, true);
 
     motion.jointsInput_.wireTo(&sensors.jointsOutput_);
     motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
@@ -160,6 +163,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.visionFieldIn.wireTo(&vision.vision_field);
     behaviors.visionRobotIn.wireTo(&vision.vision_robot);
     behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
+    behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
     behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
     behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
@@ -169,13 +173,14 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
+
     leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
 
 #ifdef LOG_IMAGES
-    cognitionThread.log<messages::YUVImage>(&topTranscriber.imageOut,
-                                            "top");
-    cognitionThread.log<messages::YUVImage>(&bottomTranscriber.imageOut,
-                                            "bottom");
+    cognitionThread.logImage<messages::YUVImage>(&topTranscriber.imageOut,
+                                                 "top");
+    cognitionThread.logImage<messages::YUVImage>(&bottomTranscriber.imageOut,
+                                                 "bottom");
 #endif
 
 #ifdef LOG_VISION

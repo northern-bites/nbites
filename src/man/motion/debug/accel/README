@@ -1,7 +1,0 @@
-To run,
-type 'make run'. This will compile the sources, run them, and then run R on their output and generate some nice pdf graphs.
-
-Assumes that there is a tab separated csv located at
-../../../../Desktop/accels.csv
-
-To change this file path, edit the make file or run ./accel <file-path> manually.

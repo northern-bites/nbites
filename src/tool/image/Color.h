@@ -68,21 +68,19 @@ static const byte ALL_COLORS = 0xFF;
 
 class Color
 {
-
-enum ColorID
-{
-    Grey,
-    White,
-    Green,
-    Blue,
-    Yellow,
-    Orange,
-    Red,
-    Navy,
-    NUM_COLORS
-};
-
 public:
+    enum ColorID
+    {
+        Grey,
+        White,
+        Green,
+        Blue,
+        Yellow,
+        Orange,
+        Red,
+        Navy,
+        NUM_COLORS
+    };
 
     static ColorID getColorIDFromBitColor(int bits)
     {

@@ -10,11 +10,13 @@ namespace balltrack
         float transXDeviation;   //Deviation from odometry in x direction
         float transYDeviation;   //Deviation from odometry in y direction
         float rotationDeviation; //Deviation from odometry in rotation
+        float obsvRelXVariance;  //Variance from observing a ball
+        float obsvRelYVariance;  //Variance from observing a ball in y
         float processDeviationPosX;  //Deviation from difference between model & world
         float processDeviationPosY;
         float processDeviationVelX;
         float processDeviationVelY;
-        float ballFriction;      //Loss in acceleration over a unit of time
+        float ballFriction;      // cm/sec^2
     };
 
     struct MMKalmanFilterParams
@@ -25,6 +27,9 @@ namespace balltrack
         float initCovY;
         float initCovVelX;
         float initCovVelY;
+        float movingThresh;
+        int bufferSize;       // Size of buffer used to re-init moving filters
+        float badStationaryThresh;
     };
 
     /*
@@ -45,6 +50,17 @@ namespace balltrack
     {
         CartesianBallEstimate(float relX_, float relY_) : relX(relX_), relY(relY_) {}
         CartesianBallEstimate() {}
+        float relX;
+        float relY;
+    };
+
+    /*
+     * @brief Struct to use when storing visual history
+     */
+    struct CartesianObservation
+    {
+        CartesianObservation(float relX_, float relY_) : relX(relX_), relY(relY_) {}
+        CartesianObservation() {}
         float relX;
         float relY;
     };

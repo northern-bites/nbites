@@ -4,6 +4,9 @@ cmake_minimum_required( VERSION 2.8.3 )
 
 # Make sure we can find the shared files
 set( SHARE_DIR "${NBITES_DIR}/src/share/" )
+set( MAN_DIR "${NBITES_DIR}/src/man" )
+include_directories( ${MAN_DIR})
+
 # So that we can use find_package commands
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SHARE_DIR}/cmake/" )
 mark_as_advanced( CMAKE_INSTALL_PREFIX )
@@ -51,10 +54,17 @@ if( BUILD_PROTOBUF )
 add_dependencies(messages protobuf_libs)
 endif()
 
+# Man modules that we need to use
+include_directories( ${MAN_DIR}/support )
+add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
+
+add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
+
 # Actual subdirectories!
 add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
+add_subdirectory( colorcreator )
 
 # Sources
 set( tool_srcs main.cpp
@@ -83,6 +93,8 @@ target_link_libraries(
   messages
   unlog
   logview
-  image
+  image_display
+  image # man image
+  colorcreator
   ${QT_LIBRARIES}
   )

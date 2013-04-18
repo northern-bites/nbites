@@ -27,6 +27,7 @@ GuardianModule::GuardianModule()
       stiffnessControlOutput(base()),
       initialStateOutput(base()),
       advanceStateOutput(base()),
+      printJointsOutput(base()),
       switchTeamOutput(base()),
       switchKickOffOutput(base()),
       feetOnGroundOutput(base()),
@@ -47,6 +48,14 @@ GuardianModule::~GuardianModule()
 void GuardianModule::run_()
 {
     PROF_ENTER(P_ROBOGUARDIAN);
+
+    temperaturesInput.latch();
+    chestButtonInput.latch();
+    footBumperInput.latch();
+    inertialInput.latch();
+    fsrInput.latch();
+    batteryInput.latch();
+
     countButtonPushes();
     checkFalling();
     checkFallen();
@@ -63,9 +72,6 @@ void GuardianModule::run_()
 
 void GuardianModule::countButtonPushes()
 {
-    footBumperInput.latch();
-    chestButtonInput.latch();
-
     chestButton->updateFrame(chestButtonInput.message().pressed());
     leftFootButton->updateFrame( footBumperInput.message().l_foot_bumper_left() .pressed() ||
                                  footBumperInput.message().l_foot_bumper_right().pressed()   );
@@ -94,8 +100,6 @@ void GuardianModule::checkFalling()
         return;
     }
 
-    inertialInput.latch();
-
     struct Inertial inertial = {inertialInput.message().angle_x(),
                                  inertialInput.message().angle_y() };
 
@@ -115,7 +119,7 @@ void GuardianModule::checkFalling()
         fallingFrames += 1;
         notFallingFrames = 0;
     }
-    else if(!falling_critical_angle)
+    else
     {
         // Otherwise, not falling.
         fallingFrames = 0;
@@ -173,8 +177,6 @@ void GuardianModule::checkFallen()
     if (!useFallProtection)
         return;
 
-    inertialInput.latch();
-
     struct Inertial inertial = {inertialInput.message().angle_x(),
                                  inertialInput.message().angle_y() };
 
@@ -218,8 +220,6 @@ void GuardianModule::checkFeetOnGround()
     static const int GROUND_FRAMES_THRESH = 10;
     // lower pthan this, the robot is off the ground
     static const float onGroundFSRThresh = 1.0f;
-
-    fsrInput.latch();
 
     /* If the FSRs are broken, we don't want to accidentally assume that we're
        off the ground (ruins SweetMoves, walking, etc) so this method will stop
@@ -298,8 +298,6 @@ void GuardianModule::checkBatteryLevels()
     static const float LOW_BATTERY_VALUE = 30.0f;
     static const float EMPTY_BATTERY_VALUE = 10.0f; //start nagging below 10%
 
-    batteryInput.latch();
-
     const float newBatteryCharge = batteryInput.message().charge();
     if(newBatteryCharge < 0 || newBatteryCharge > 1.0)
     {
@@ -340,8 +338,6 @@ void GuardianModule::checkTemperatures()
     static const float HIGH_TEMP = 40.0f; //deg C
     static const float TEMP_THRESHOLD = 1.0f; //deg C
     static const float REALLY_HIGH_TEMP = 50.0f; //deg C
-
-    temperaturesInput.latch();
 
     std::vector<float> newTemps = vectorizeTemperatures(temperaturesInput.message());
 
@@ -424,29 +420,45 @@ std::vector<float> GuardianModule::vectorizeTemperatures(const messages::JointAn
 void GuardianModule::processFallingProtection()
 {
     portals::Message<messages::FallStatus> status(0);
-    if(useFallProtection && falling && !registeredFalling)
+    if(useFallProtection && falling)
     {
+        if (!registeredFalling)
+        {
+            std::cout << "Guardian: OH NO! I'm falling."
+                      << " Removing stiffness." << std::endl;
+#ifdef DEBUG_GUARDIAN_FALLING
+            playFile(falling_wav);
+#endif
+        }
+
         registeredFalling = true;
-        executeFallProtection();
 
         status.get()->set_falling(true);
-        fallStatusOutput.setMessage(status);
     }
-    else if(notFallingFrames > FALLING_RESET_FRAMES_THRESH)
+    else if (registeredFalling && notFallingFrames > FALLING_RESET_FRAMES_THRESH)
     {
         registeredFalling = false;
 
         status.get()->set_falling(false);
-        fallStatusOutput.setMessage(status);
     }
     if (fallen)
     {
         status.get()->set_fallen(true);
+        if (inertialInput.message().angle_y() > 0)
+        {
+            status.get()->set_on_front(true);
+        }
+        else
+        {
+            status.get()->set_on_front(false);
+        }
     }
     else
     {
         status.get()->set_fallen(false);
     }
+
+    fallStatusOutput.setMessage(status);
 
 //     if(fallingFrames == FALLING_FRAMES_THRESH && falling_critical_angle)
 //     {
@@ -461,19 +473,6 @@ void GuardianModule::processFallingProtection()
 // #endif
 //     }
 
-}
-
-void GuardianModule::executeFallProtection()
-{
-    if(useFallProtection)
-    {
-        std::cout << "Guardian: OH NO! I'm falling."
-                  << " Removing stiffness." << std::endl;
-        shutoffGains();
-    }
-#ifdef DEBUG_GUARDIAN_FALLING
-    playFile(falling_wav);
-#endif
 }
 
 void GuardianModule::processChestButtonPushes()
@@ -539,6 +538,7 @@ bool GuardianModule::executeChestClickAction(int nClicks)
         initialState();
         break;
     case 5:
+        printJointAngles();
         break;
     case 7:
         break;
@@ -622,8 +622,6 @@ void GuardianModule::initialState()
 
 void GuardianModule::advanceState()
 {
-    std::cout << "Guardian::advanceState()" << std::endl;
-
     portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastAdvance);
     advanceStateOutput.setMessage(command);
@@ -631,10 +629,17 @@ void GuardianModule::advanceState()
     lastAdvance = !lastAdvance;
 }
 
+void GuardianModule::printJointAngles()
+{
+    portals::Message<messages::Toggle> command(0);
+    command.get()->set_toggle(!lastPrint);
+    printJointsOutput.setMessage(command);
+
+    lastPrint = !lastPrint;
+}
+
 void GuardianModule::switchTeams()
 {
-    std::cout << "Guardian::switchTeams()" << std::endl;
-
     portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastTeamSwitch);
     switchTeamOutput.setMessage(command);
@@ -644,8 +649,6 @@ void GuardianModule::switchTeams()
 
 void GuardianModule::switchKickOff()
 {
-    std::cout << "Guardian::switchKickOff()" << std::endl;
-
     portals::Message<messages::Toggle> command(0);
     command.get()->set_toggle(!lastKickOffSwitch);
     switchKickOffOutput.setMessage(command);

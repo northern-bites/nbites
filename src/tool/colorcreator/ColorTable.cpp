@@ -9,9 +9,11 @@
 #include "ColorTable.h"
 
 #include <iostream>
+#include <assert.h>
+#include <stdlib.h>
 
-namespace qtool {
-namespace colorcreator {
+namespace tool {
+namespace color {
 
 using namespace image;
 using namespace std;
@@ -57,7 +59,6 @@ void ColorTable::write(string filename) {
 }
 
 int ColorTable::countColor(byte color) {
-
     int count = 0;
 
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -96,7 +97,7 @@ void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
                 Color color;
                 assert(2*y >=y && 2*x >= x && 2*z >= z); //overflow
                 color.setYuv((byte) (2*y), (byte) (2*x), (byte) (2*z));
-                for (int c = 0; c < image::NUM_COLORS; c++)
+                for (int c = 0; c < image::Color::NUM_COLORS; c++)
                 {
                     if (colorSpaces[c].contains(color)) {
                         temp = temp | image::Color_bits[c];

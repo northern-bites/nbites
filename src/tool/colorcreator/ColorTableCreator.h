@@ -12,27 +12,20 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QComboBox>
+#include <QLabel>
+#include <QBoxLayout>
 
-// colorcreator
+#include "RoboGrams.h"
+#include "image/ImageConverterModule.h"
+#include "image/ImageDisplayModule.h"
+#include "Camera.h"
+#include "Images.h"
+#include "PathConfig.h"
+
 #include "ColorTable.h"
 
-#include "data/DataManager.h"
-#include "image/BMPYUVImage.h"
-#include "corpus/alconnect/ALConstants.h"
-#include "corpus/ColorParams.h"
-#include "corpus/ImageAcquisition.h"
-//qtool
-#include "viewer/BMPImageViewerListener.h"
-#include "ColorEdit.h"
-#include "ColorSpace.h"
-#include "ColorSpaceWidget.h"
-#include "ColorWheel.h"
-#include "image/ThresholdedImage.h"
-
-#include "man/corpus/offlineconnect/OfflineImageTranscriber.h"
-
-namespace qtool {
-namespace colorcreator {
+namespace tool {
+namespace color {
 
 /**
  * @class BrushStroke
@@ -43,71 +36,77 @@ namespace colorcreator {
 class BrushStroke {
 
 public:
-    BrushStroke(int x, int y, image::ColorID color, int brushSize, bool define)
+    BrushStroke(int x, int y, image::Color::ColorID color, int brushSize, bool define)
         : x(x), y(y), color(color), brushSize(brushSize), define(define) { }
 
     BrushStroke invert() const { return BrushStroke(x, y, color, brushSize, !define); }
 
     int x, y;
-    image::ColorID color;
+    image::Color::ColorID color;
     int brushSize;
     bool define;
 
 };
 
-class ColorTableCreator: public QWidget {
-
-    Q_OBJECT
-
-public:
-    static const image::ColorID STARTING_COLOR = image::Orange;
+class ColorTableCreator: public QWidget,
+                         public portals::Module
+{
+    Q_OBJECT;
 
 public:
-    ColorTableCreator(qtool::data::DataManager::ptr dataManager,
-            QWidget *parent = 0);
-    ~ColorTableCreator() {    }
+    static const image::Color::ColorID STARTING_COLOR = image::Color::Orange;
 
-    void paintMeLikeOneOfYourFrenchGirls(const BrushStroke& brushStroke);
+    ColorTableCreator(QWidget *parent = 0);
 
+    void paintStroke(const BrushStroke& brushStroke);
+
+    // These are just pointers to the converter modules' InPortals
+    portals::InPortal<messages::YUVImage> bottomImageIn;
+    portals::InPortal<messages::YUVImage> topImageIn;
 
 protected slots:
     void loadColorTable();
     void saveColorTable();
     void updateThresholdedImage();
-    void canvassClicked(int x, int y, int brushSize, bool leftClick);
+    void canvasClicked(int x, int y, int brushSize, bool leftClick);
     void undo();
     void updateColorSelection(int color);
     void updateColorStats();
     void imageTabSwitched(int);
 
+protected:
+    virtual void run_();
+
 private:
-    data::DataManager::ptr dataManager;
-
-    QTabWidget* imageTabs;
-
-    man::corpus::Camera::Type currentCamera;
-
-    image::BMPYUVImage* topImage;
-    viewer::BMPImageViewerListener* topImageViewer;
-
-    image::BMPYUVImage* bottomImage;
-    viewer::BMPImageViewerListener* bottomImageViewer;
-
-    boost::shared_ptr<Sensors> sensors;
-    man::corpus::OfflineImageTranscriber::ptr imageTranscribe;
-    boost::shared_ptr<man::memory::proto::PRawImage> rawThresholdedImageData; // Octavians idea for name
-    image::ThresholdedImage* threshImage;
-    viewer::BMPImageViewer* thresholdedImageViewer;
+    ColorTable colorTable;
 
     QLabel* colorStats;
-
-    ColorTable colorTable;
+    QLabel* colorTableName;
 
     QComboBox colorSelect;
     int currentColor;
 
+    Camera::Type currentCamera;
     std::vector<BrushStroke> brushStrokes;
 
+    QTabWidget* imageTabs;
+
+    // This module contains its own diagram! Trippy.
+    portals::RoboGram subdiagram;
+
+    // Modules
+    man::image::ImageConverterModule topConverter;
+    man::image::ImageConverterModule bottomConverter;
+    image::ImageDisplayListener topDisplay;
+    image::ImageDisplayListener bottomDisplay;
+    image::ThresholdedImageDisplayModule thrDisplay;
+
+    // So that multiple things in this module can connect to these
+    portals::OutPortal<messages::YUVImage> bottomImage;
+    portals::OutPortal<messages::YUVImage> topImage;
+
+    void loadLatestTable();
+    void serializeTableName(QString latestTableName);
 };
 
 class FixedLayout: public QVBoxLayout{

@@ -21,8 +21,13 @@ public:
     portals::OutPortal<messages::PackedImage16> vImage;
     portals::OutPortal<messages::ThresholdImage> thrImage;
 
+    // Used offline
+    void initTable(unsigned char* otherTable);
+
 protected:
     virtual void run_();
+
+    // Used on the robot
     void initTable(const std::string& filename);
 
     Camera::Type whichCamera;

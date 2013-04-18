@@ -16,6 +16,12 @@ option(
 )
 
 option(
+  DEBUG_BALLTRACK
+  "Toggle balltrack debug mode."
+  OFF
+)
+
+option(
   DEBUG_THREADS
   "Toggle threads debug mode."
   OFF
