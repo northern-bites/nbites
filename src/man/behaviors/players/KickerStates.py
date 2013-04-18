@@ -8,28 +8,33 @@ from .. import SweetMoves
 
 def gameInitial(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        pass
         #player.gainsOn()
+        #player.brain.fallController.enableFallProtection(False)
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        pass
+        #player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
 
 def gameSet(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        pass
+        #player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        pass
+        #player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
 
 def gamePenalized(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        pass
+        #player.brain.fallController.enableFallProtection(False)
     return player.goLater('standup')
 
 def standup(player):
@@ -42,15 +47,5 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        #print player.brain.ball.loc.relX, player.brain.ball.loc.relY
-        print "TEST! TEST!"
-        player.executeMove(SweetMoves.STAND_UP_BACK)
-    if player.brain.nav.isStopped() and player.counter > 100:
-        return player.goLater('done')
-    return player.stay()
-
-def done(player):
-    if player.firstFrame():
-        pass
-#        player.executeMove(SweetMoves.SIT_POS)
+        player.executeMove(SweetMoves.STAND_UP_FRONT)
     return player.stay()
