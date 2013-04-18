@@ -90,6 +90,8 @@ void BallTrackModule::run_()
     if(visionBallInput.message().on()) {
         std::cout << "See a ball with (dist,bearing):\t( " << visionBallInput.message().distance()
                   << " , " << visionBallInput.message().bearing() << " )" << std::endl;
+        std::cout << "and a ball with (relX,relY):  \t( " << filters->visRelX
+                  << " , " << filters->visRelY << std::endl;
     }
 
     std::cout << "Odometry is (x,y,h):\t( " << deltaOdometry.x() << " , "
