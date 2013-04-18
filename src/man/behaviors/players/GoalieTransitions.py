@@ -11,24 +11,18 @@ from objects import RelRobotLocation
 
 # Visual Goalie
 
-def facingGoal(player):
-    if player.side == goalCon.RIGHT:
-        return (player.brain.yglp.on and
-                fabs(player.brain.yglp.bearing_deg) < 10.0
-                and player.brain.yglp.distance < 400.0)
-    else:
-        return (player.brain.ygrp.on and
-                fabs(player.brain.ygrp.bearing_deg) < 10.0
-                and player.brain.ygrp.distance < 400.0)
-
 def atGoalArea(player):
     """
     Checks if robot is close enough to the field edge to be at the goal.
     """
     #magic number
     vision = player.brain.interface.visionField
-    return (vision.visual_field_edge.distance_m < 110.0
-            and vision.visual_field_edge.distance_m != 0.0)
+    return ((vision.visual_field_edge.distance_m < 150.0
+             and vision.visual_field_edge.distance_m != 0.0)
+            or (player.brain.yglp.distance < 40.0
+                and not player.brain.yglp.distance == 0.0)
+            or (player.brain.ygrp.distance < 40.0
+                and not player.brain.ygrp.distance == 0.0))
 
 def ballIsInMyWay(player):
     """

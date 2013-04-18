@@ -51,23 +51,6 @@ def updateCrossObservations(player):
     if(cross.on and cross.distance != 0.0):
         player.system.pushCrossObservation(cross.distance,cross.bearing)
 
-def spinToFaceGoal(player):
-    if player.firstFrame():
-        player.brain.tracker.lookToAngle(0)
-
-        spinToFaceGoal.facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if player.side == RIGHT:
-            spinToFaceGoal.facingDest.relH = 45
-        else:
-            spinToFaceGoal.facingDest.relH = -45
-
-    if player.counter == 20:
-        player.brain.nav.goTo(spinToFaceGoal.facingDest,
-                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
-
-    return Transition.getNextState(player, spinToFaceGoal)
-
-
 def walkToGoal(player):
     """
     Has the goalie walk in the general direction of the goal.
@@ -78,7 +61,11 @@ def walkToGoal(player):
     if player.brain.ygrp.on and not(player.brain.ygrp.distance == 0.0):
         relx = player.brain.ygrp.distance * cos(player.brain.ygrp.bearing)
         rely = player.brain.ygrp.distance * sin(player.brain.ygrp.bearing)
-        player.brain.nav.goTo(RelRobotLocation(relx, rely, player.brain.ygrp.bearing))
+        if player.side == LEFT:
+            relx -= 50.0
+        else:
+            relx += 50.0
+        player.brain.nav.goTo(RelRobotLocation(relx, rely, 0.0))
 
     return Transition.getNextState(player, walkToGoal)
 
