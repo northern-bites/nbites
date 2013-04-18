@@ -28,16 +28,17 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : VisualGoalieStates.walkToGoal
             }
+
         VisualGoalieStates.walkToGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal,
+            : VisualGoalieStates.spinAtGoal
 
-            Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.dodgeBall
+            # Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
+            #                            Transition.MOST_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : VisualGoalieStates.dodgeBall
             }
 
         VisualGoalieStates.spinAtGoal.transitions = {
@@ -50,6 +51,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.clearIt
+            }
+
+        VisualGoalieStates.waitToFaceField.transitions = {
+            Transition.CountTransition(GoalieTransitions.notTurnedAround,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.HIGH_PRECISION)
+            : VisualGoalieStates.decideLeftSide
             }
 
         VisualGoalieStates.decideLeftSide.transitions = {

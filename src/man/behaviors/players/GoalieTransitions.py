@@ -26,7 +26,9 @@ def atGoalArea(player):
     Checks if robot is close enough to the field edge to be at the goal.
     """
     #magic number
-    return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
+    vision = player.brain.interface.visionField
+    return (vision.visual_field_edge.distance_m < 110.0
+            and vision.visual_field_edge.distance_m != 0.0)
 
 def ballIsInMyWay(player):
     """
@@ -112,24 +114,24 @@ def facingBall(player):
     return (fabs(player.brain.ball.vis.bearing_deg) < 10.0 and
             player.brain.ball.vis.on)
 
+def notTurnedAround(player):
+    """
+    Checks that we are actually facing the field when returning from
+    penalty.
+    """
+    return (player.brain.interface.visionField.visual_field_edge.distance_m
+            > 400.0 or
+            player.brain.interface.visionField.visual_field_edge.distance_m
+            == 0.0 )
+
 def onThisSideline(player):
     """
     Looks for a T corner or far goals to determine which sideline it's
     standing on.
     """
     vision = player.brain.interface.visionField
-    for i in range(0, vision.visual_corner_size()):
-        for j in range(0, vision.visual_corner(i).poss_id_size()):
-            if ((vision.visual_corner(i).poss_id(j) ==
-                 vision.visual_corner(i).corner_id.CENTER_TOP_T) or
-                (vision.visual_corner(i).poss_id(j) ==
-                 vision.visual_corner(i).corner_id.CENTER_BOTTOM_T)):
-              return True
-    return ((player.brain.ygrp.on and
-             #magic numbers
-             player.brain.ygrp.distance > 100.0) or
-            (player.brain.yglp.on and
-             player.brain.yglp.distance > 100.0))
+    return (vision.visual_field_edge.distance_m < 300.0 and
+            vision.visual_field_edge.distance_m > 100.0)
 
 def unsure(player):
     return (not onThisSideline(player) and
@@ -151,7 +153,7 @@ def shouldPerformSave(player):
             player.brain.ball.rel_x_dest < 0.0 and
             abs(player.brain.ball.rel_y_intersect_dest) < 80.0 and
             player.brain.ball.distance < 230.0 and
-            player.brain.ball.vis.frames_on > 4)
+            player.brain.ball.vis.on)
 
 def facingSideways(player):
     """
