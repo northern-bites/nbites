@@ -177,8 +177,12 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.log<messages::RobotLocation>(&localization.output, "location");
 #endif
 
-#ifdef LOG_LOCATION
-    cognitionThread.log<messages::RobotLocation>(&localization.particleOutput, "particleSwarm");
+#ifdef LOG_OBSERVATIONS
+    cognitionThread.log<messages::VisionField>(&vision.vision_field, "observations");
+#endif
+
+#ifdef LOG_LOCALIZATION
+    cognitionThread.log<messages::ParticleSwarm>(&localization.particleOutput, "particleSwarm");
 #endif
 
 #ifdef LOG_IMAGES

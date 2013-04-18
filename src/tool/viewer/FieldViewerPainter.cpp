@@ -75,18 +75,16 @@ void FieldViewerPainter::paintRobotLocation(QPaintEvent* event,
 
 void FieldViewerPainter::updateWithLocationMessage(messages::RobotLocation newLoc)
 {
+    curLoc = newLoc;
     if(shouldPaintLocation) {
-        shouldPaintLocation = true;
-        curLoc = newLoc;
         repaint();
     }
 }
 
 void FieldViewerPainter::updateWithParticleMessage(messages::ParticleSwarm newSwarm)
 {
+    curSwarm = newSwarm;
     if(shouldPaintParticles) {
-        shouldPaintParticles = true;
-        curSwarm = newSwarm;
         repaint();
     }
 }

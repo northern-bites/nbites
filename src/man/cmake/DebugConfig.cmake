@@ -78,6 +78,11 @@ if(USE_LOGGING)
     "Log the robots localization particle belief"
     OFF
     )
+  option(
+    LOG_OBSERVATIONS
+    "Log the vision field proto (observations given to loc)"
+    OFF
+    )
 
 else(USE_LOGGING)
   unset(LOG_SENSORS CACHE)
@@ -87,4 +92,5 @@ else(USE_LOGGING)
   unset(LOG_IMAGES CACHE)
   unset(LOG_LOCATION CACHE)
   unset(LOG_LOCALIZATION CACHE)
+  unset(LOG_OBSERVATIONS CACHE)
 endif(USE_LOGGING)
