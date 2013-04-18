@@ -358,7 +358,7 @@ void MotionModule::processMotionInput()
     }
 
     // (5) Process head commands.
->    if(lastHeadCommand != headCommandInput_.message().timestamp())
+    if(lastHeadCommand != headCommandInput_.message().timestamp())
     {
         lastHeadCommand = headCommandInput_.message().timestamp();
 
