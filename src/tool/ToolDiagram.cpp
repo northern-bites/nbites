@@ -40,6 +40,8 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(VisionRobot);
     ADD_MAPPED_TYPE(WorldModel);
     ADD_MAPPED_TYPE(YUVImage);
+
+    diagram = new portals::RoboGram; // on heap so we can delete when new log is loaded
 }
 
 bool ToolDiagram::unlogFrom(std::string path)
@@ -56,10 +58,10 @@ bool ToolDiagram::unlogFrom(std::string path)
     }
 
     unloggers.push_back(typeMap[head.name()](path));
-    diagram.addModule(*unloggers.back());
+    diagram->addModule(*unloggers.back());
 
     unlog::GUI gui = unloggers.back()->makeMyGUI();
-    diagram.addModule(*gui.module);
+    diagram->addModule(*gui.module);
     displays.push_back(gui.module);
 
     if(head.name() == "messages.YUVImage")
@@ -110,17 +112,41 @@ bool ToolDiagram::connectToUnlogger(portals::InPortal<messages::YUVImage>& input
 void ToolDiagram::runForward()
 {
     unlog::UnlogBase::readBackward = false;
-    diagram.run();
+    diagram->run();
 }
 
 void ToolDiagram::runBackward()
 {
     unlog::UnlogBase::readBackward = true;
-    diagram.run();
+    diagram->run();
 }
 
+// addUnloggers should only be called once for log folder
+// IMPORTANT whenever this is called, all old unloggers and guis are deleted
+// MUST follow the once per log folder rule for tool to behave correctly
 void ToolDiagram::addUnloggers(std::vector<std::string> paths)
 {
+    // delete the last set of unloggers
+    for (std::vector<unlog::UnlogBase*>::iterator i = unloggers.begin();
+         i != unloggers.end(); i++)
+    {
+        delete *i;
+    }
+    unloggers.clear();
+
+    // delete the last set of displays and remove all widgets
+    for (std::vector<portals::Module*>::iterator i = displays.begin();
+         i != displays.end(); i++)
+    {
+        delete *i;
+    }
+    displays.clear();
+    emit signalDeleteDisplayWidgets();
+
+    // delete old diagram, make new one
+    delete diagram;
+    diagram = new portals::RoboGram;
+
     for (std::vector<std::string>::iterator i = paths.begin();
          i != paths.end(); i++)
     {

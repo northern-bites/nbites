@@ -19,6 +19,7 @@ PACKAGE_SCOPE = "  scope %(scope_name)s_scope = class_<DummyClassFor%(scope_name
 # properly namespaced/scoped in python
 MESSAGE_SCOPE = "  {\n"
 MESSAGE_DECLARATION = "  scope the_scope = class_<%(scoped_message_name)s>(\"%(message_name)s\")\n"
+MESSAGE_TOSTRING = """    .def("__str__", &%(scoped_message_name)s::DebugString)\n"""
 MESSAGE_DECLARATION_END = "  ;\n\n"
 MESSAGE_SCOPE_END = "  }\n"
 
@@ -38,7 +39,6 @@ SINGLE_MESSAGE="""\
     .add_property("%(field_name)s", make_function(&%(scope)s::mutable_%(field_name)s, return_value_policy<reference_existing_object>()))
     .def("has_%(field_name)s", &%(scope)s::has_%(field_name)s)
     .def("clear_%(field_name)s", &%(scope)s::clear_%(field_name)s)
-
 """
 
 REPEATED_PRIMITIVE="""\

@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <stdlib.h>
 
 namespace tool {
 namespace color {
@@ -58,7 +59,6 @@ void ColorTable::write(string filename) {
 }
 
 int ColorTable::countColor(byte color) {
-
     int count = 0;
 
     for (int i = 0; i < TABLE_SIZE; i++) {

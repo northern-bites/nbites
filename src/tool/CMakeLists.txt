@@ -19,11 +19,6 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
-# If protobuf libs don't exist yet, make sure they build before man
-if( BUILD_PROTOBUF )
-add_dependencies(messages protobuf_libs)
-endif()
-
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
   "${PROJECT_BINARY_DIR}/PathConfig.h"
@@ -53,6 +48,11 @@ include_directories( ${SHARE_DIR}/portals )
 add_subdirectory( ${SHARE_DIR}/messages ${CMAKE_CURRENT_BINARY_DIR}/messages )
 include_directories( ${CMAKE_CURRENT_BINARY_DIR}/messages )
 include_directories( ${SHARE_DIR}/messages )
+
+# If protobuf libs don't exist yet, make sure they build before man
+if( BUILD_PROTOBUF )
+add_dependencies(messages protobuf_libs)
+endif()
 
 # Man modules that we need to use
 include_directories( ${MAN_DIR}/support )
