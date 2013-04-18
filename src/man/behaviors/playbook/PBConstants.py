@@ -179,7 +179,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 26
+NUM_SUB_ROLES = 27
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
 
@@ -215,10 +215,11 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 22-25
+                                            # READY SUB ROLES 22-26
                                             "READY_GOALIE",
                                             "READY_CHASER",
                                             "READY_DEFENDER",
+                                            "READY_MIDDIE",
                                             "READY_OFFENDER" )))
 # tuple of subRoles
 (INIT_SUB_ROLE,
@@ -253,6 +254,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  READY_GOALIE,
  READY_CHASER,
  READY_DEFENDER,
+ READY_MIDDIE,
  READY_OFFENDER
 ) = range(NUM_SUB_ROLES)
 
@@ -268,7 +270,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 # |G |      +    |  C+
 # |  |            \__|
 # 0  |  D            |
-# |__|               |
+# |__|             M |
 # |__________________|
 #
 # Above is our ready position_0 when kicking-off. Can mirror for position_1
@@ -285,14 +287,21 @@ READY_KICKOFF_DEFENDER_X = ((NogginConstants.CENTER_FIELD_X -
                             NogginConstants.GREEN_PAD_X)
 READY_KICKOFF_DEFENDER_0_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y
 READY_KICKOFF_DEFENDER_1_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y
+"""MIDDIE"""
+READY_KICKOFF_MIDDIE_X = (NogginConstants.CENTERFIELD_X -
+                          NogginConstants.CENTER_CIRCLE_RADIUS * 0.5)
+READY_KICKOFF_FORWARD_OFFSET = 165. # Can be as large as you want as long as robot can side-kick that distance
+READY_KICKOFF_MIDDIE_0_Y = (NogginConstants.CENTER_FIELD_Y -
+                            READY_KICKOFF_FORWARD_OFFSET)
+READY_KICKOFF_MIDDIE_1_Y = (NogginConstants.CENTER_FIELD_Y +
+                            READY_KICKOFF_FORWARD_OFFSET)
 """OFFENDER"""
 READY_KICKOFF_OFFENDER_X = (NogginConstants.CENTER_FIELD_X -
                             NogginConstants.CENTER_CIRCLE_RADIUS * 0.5)
-READY_KICKOFF_OFFENDER_OFFSET = 165. # Can be as large as you want as long as robot can side-kick that distance
 READY_KICKOFF_OFFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y +
-                              READY_KICKOFF_OFFENDER_OFFSET)
+                              READY_KICKOFF_FORWARD_OFFSET)
 READY_KICKOFF_OFFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
-                              READY_KICKOFF_OFFENDER_OFFSET)
+                              READY_KICKOFF_FORWARD_OFFSET)
 """CHASER"""
 # Use offset to leave room for chaser's feet/ room to position on the kick.
 READY_KICKOFF_CHASER_OFFSET = NogginConstants.CENTER_CIRCLE_RADIUS * 0.5
@@ -328,6 +337,14 @@ READY_NON_KICKOFF_DEFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
                                   READY_NON_KICKOFF_DEFENDER_OFFSET)
 READY_NON_KICKOFF_DEFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y +
                                   READY_NON_KICKOFF_DEFENDER_OFFSET)
+"""MIDDIE"""
+READY_NON_KICKOFF_MIDDIE_X = (NogginConstants.CENTER_FIELD_X -
+                              NogginConstants.GREEN_PAD_X) * 0.5
+READY_NON_KICKOFF_MIDDIE_OFFSET = 90.0 # very arbitrary
+READY_NON_KICKOFF_MIDDIE_1_Y = (NogginConstants.CENTER_FIELD_Y +
+                                READY_NON_KICKOFF_MIDDIE_OFFSET)
+READY_NON_KICKOFF_MIDDIE_0_Y = (NogginConstants.CENTER_FIELD_Y -
+                                READY_NON_KICKOFF_MIDDIE_OFFSET)
 """OFFENDER"""
 READY_NON_KICKOFF_OFFENDER_X = (NogginConstants.CENTER_FIELD_X -
                                 NogginConstants.GREEN_PAD_X) * 0.5

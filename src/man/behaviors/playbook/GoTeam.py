@@ -311,12 +311,20 @@ class GoTeam:
                 self.numActiveFieldPlayers += 1
 
     def highestActivePlayerNumber(self):
-        """returns true if the player is the highest active player number"""
+        """returns the highest active player number"""
         highNumber = 0
         for mate in self.activeFieldPlayers:
             if mate.playerNumber > highNumber:
                 highNumber = mate.playerNumber
         return highNumber
+
+    def lowestActivePlayerNumber(self):
+        """returns the lowest active player number"""
+        lowNumber = 10
+        for mate in self.activeFieldPlayers:
+            if mate.playerNumber < lowNumber:
+                lowNumber = mate.playerNumber
+        return lowNumber
 
     def getOtherActiveFieldPlayers(self, exceptNumbers):
         """returns the active teammates who don't have

@@ -68,6 +68,7 @@ def afterPenalty(player):
     if player.reset_loc != 0:
         print "Localized after penalty. Goal to my right?  " + str(player.reset_loc < 0)
         player.brain.resetLocalizationFromPenalty(player.reset_loc < 0)
+        # temp HACK
         player.corner_l_sightings = 0
         player.goal_t_sightings = 0
         player.center_sightings = 0

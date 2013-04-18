@@ -222,6 +222,18 @@ def fReady(team, workingPlay):
         else:
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
+    elif team.numActiveFieldPlayers == 3:
+        highNumber = team.highestActivePlayerNumber()
+        lowNumber = team.lowestActivePlayerNumber()
+        if team.me.playerNumber == highNumber:
+            workingPlay.setRole(PBConstants.CHASER)
+            SubRoles.pReadyChaser(team, workingPlay)
+        elif team.me.playerNumber == lowNumber:
+            workingPlay.setRole(PBConstants.DEFENDER)
+            SubRoles.pReadyDefender(team, workingPlay)
+        else:
+            workingPlay.setRole(PBConstants.OFFENDER)
+            SubRoles.pReadyOffender(team, workingPlay)
     else:
         if team.me.isDefaultChaser():
             workingPlay.setRole(PBConstants.CHASER)
@@ -229,6 +241,9 @@ def fReady(team, workingPlay):
         elif team.me.isDefaultDefender():
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
+        elif team.me.isDefaultMiddie():
+            workingPlay.setRole(PBConstants.MIDDIE)
+            SubRoles.pReadyMiddie(team, workingPlay)
         elif team.me.isDefaultOffender():
             workingPlay.setRole(PBConstants.OFFENDER)
             SubRoles.pReadyOffender(team, workingPlay)
