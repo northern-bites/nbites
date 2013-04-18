@@ -1,7 +1,7 @@
 import ChaseBallTransitions as transitions
 from math import copysign, fabs
 
-OBJ_SEEN_THRESH = 5
+OBJ_SEEN_THRESH = 6
 
 # @Summer 2012: This entire state appears to be a hack for localization.
 # Consider removing entirely.
@@ -16,6 +16,7 @@ def afterPenalty(player):
         player.center_sightings = 0
         player.post_l_sightings = 0
         player.post_r_sightings = 0
+        player.goal_right = 0
         player.reset_loc = 0
 
     vision = player.brain.interface.visionField
@@ -40,41 +41,40 @@ def afterPenalty(player):
     # Do we see a goalpost?
     if vision.goal_post_l.visual_detection.on:
         # Saw a goalpost! (adjust for which goalpost)
-        player.post_l_sightings += (copysign(1, vision.goal_post_l.visual_detection.bearing) *
-                                    copysign(1, 500 - vision.goal_post_l.visual_detection.distance))
+        if not vision.goal_post_l.visual_detection.bearing == 0:
+            player.post_l_sightings += (copysign(1, vision.goal_post_l.visual_detection.bearing) *
+                                    copysign(1, 700 - vision.goal_post_l.visual_detection.distance))
     if vision.goal_post_r.visual_detection.on:
         # Saw a goalpost! (adjust for which goalpost)
-        player.post_r_sightings += (copysign(1, vision.goal_post_r.visual_detection.bearing) *
-                                    copysign(1, 500 - vision.goal_post_r.visual_detection.distance))
+        if not vision.goal_post_r.visual_detection.bearing == 0:
+            player.post_r_sightings += (copysign(1, vision.goal_post_r.visual_detection.bearing) *
+                                    copysign(1, 700 - vision.goal_post_r.visual_detection.distance))
 
     # If we've seen any landmark enough, reset localization.
     if fabs(player.corner_l_sightings) > OBJ_SEEN_THRESH:
         player.reset_loc = copysign(1, player.corner_l_sightings)
-        print "Localizing from l corners. Value: " + str(player.reset_loc)
     if fabs(player.goal_t_sightings) > OBJ_SEEN_THRESH:
         player.reset_loc = copysign(1, player.goal_t_sightings)
-        print "Localizing from t corners. Value: " + str(player.reset_loc)
     if fabs(player.center_sightings) > OBJ_SEEN_THRESH:
         player.reset_loc = copysign(1, player.center_sightings) * -1
-        print "Localizing from center circle/t. Value: " + str(player.reset_loc)
     if fabs(player.post_l_sightings) > OBJ_SEEN_THRESH:
         player.reset_loc = copysign(1, player.post_l_sightings)
-        print "Localizing from l post. Value: " + str(player.reset_loc)
     if fabs(player.post_r_sightings) > OBJ_SEEN_THRESH:
         player.reset_loc = copysign(1, player.post_r_sightings)
-        print "Localizing from r post. Value: " + str(player.reset_loc)
 
     # Send the reset loc command.
     if player.reset_loc != 0:
-        print "Localized after penalty. Goal to my right?  " + str(player.reset_loc < 0)
-        player.brain.resetLocalizationFromPenalty(player.reset_loc < 0)
-        # temp HACK
+        player.goal_right += player.reset_loc
         player.corner_l_sightings = 0
         player.goal_t_sightings = 0
         player.center_sightings = 0
         player.post_l_sightings = 0
         player.post_r_sightings = 0
         player.reset_loc = 0
+
+    if fabs(player.goal_right) > 5:
+        player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
+        return player.goNow(player.gameState)
 
 
     return player.stay()

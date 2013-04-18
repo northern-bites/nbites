@@ -288,7 +288,7 @@ READY_KICKOFF_DEFENDER_X = ((NogginConstants.CENTER_FIELD_X -
 READY_KICKOFF_DEFENDER_0_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y
 READY_KICKOFF_DEFENDER_1_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y
 """MIDDIE"""
-READY_KICKOFF_MIDDIE_X = (NogginConstants.CENTERFIELD_X -
+READY_KICKOFF_MIDDIE_X = (NogginConstants.CENTER_FIELD_X -
                           NogginConstants.CENTER_CIRCLE_RADIUS * 0.5)
 READY_KICKOFF_FORWARD_OFFSET = 165. # Can be as large as you want as long as robot can side-kick that distance
 READY_KICKOFF_MIDDIE_0_Y = (NogginConstants.CENTER_FIELD_Y -

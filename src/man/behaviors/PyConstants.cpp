@@ -215,6 +215,9 @@ BOOST_PYTHON_MODULE(noggin_constants)
         LANDMARK_MY_FIELD_CROSS[0],
         LANDMARK_MY_FIELD_CROSS[1]);
 
+    scope().attr("BLUE_CC_NEAREST_POINT_X") = BLUE_CC_NEAREST_POINT_X;
+    scope().attr("BLUE_CROSS_CIRCLE_MIDPOINT_X") = BLUE_CROSS_CIRCLE_MIDPOINT_X;
+
     scope().attr("NUM_LOC_SCORES") = NUM_LOC_SCORES;
 
     enum_<locScore>("locScore")
