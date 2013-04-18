@@ -18,6 +18,7 @@
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
+#include "vision_offline/VisionDisplayModule.h"
 
 namespace tool {
 
@@ -42,7 +43,9 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
-    color::ColorTableCreator tableCreator;
+	color::ColorTableCreator tableCreator;
+	vision::VisionDisplayModule visDispMod;
+	
 
     // GUI stuff
     QTabWidget* toolTabs;

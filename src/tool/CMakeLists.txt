@@ -5,6 +5,7 @@ cmake_minimum_required( VERSION 2.8.3 )
 # Make sure we can find the shared files
 set( SHARE_DIR "${NBITES_DIR}/src/share/" )
 set( MAN_DIR "${NBITES_DIR}/src/man" )
+set( OFFLINE ON )
 include_directories( ${MAN_DIR})
 
 # So that we can use find_package commands
@@ -19,6 +20,8 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+include( ${MAN_DIR}/cmake/RobotConfig.cmake )
+
 # If protobuf libs don't exist yet, make sure they build before man
 if( BUILD_PROTOBUF )
 add_dependencies(messages protobuf_libs)
@@ -27,6 +30,11 @@ endif()
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
   "${PROJECT_BINARY_DIR}/PathConfig.h"
+)
+# Configure the robot options
+configure_file(
+  "${MAN_DIR}/cmake/RobotConfig.in"
+  "${PROJECT_BINARY_DIR}/RobotConfig.h"
 )
 include_directories( ${PROJECT_BINARY_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR} )
@@ -59,12 +67,14 @@ include_directories( ${MAN_DIR}/support )
 add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
 
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
+add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
 
 # Actual subdirectories!
 add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
+add_subdirectory( vision_offline )
 
 # Sources
 set( tool_srcs main.cpp
@@ -95,6 +105,8 @@ target_link_libraries(
   logview
   image_display
   image # man image
+  vision # man vision
   colorcreator
+  vision_offline
   ${QT_LIBRARIES}
   )
