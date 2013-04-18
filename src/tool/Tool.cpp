@@ -121,7 +121,7 @@ void Tool::setUpModules()
         std::cout << "Warning: Particles were'nt logged in this file" << std::endl;
     }
     if(shouldAddFieldView)
-        diagram.addModule(fieldField);
+        diagram.addModule(fieldView);
 
 
 }

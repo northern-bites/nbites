@@ -24,20 +24,12 @@ void FieldViewerPainter::paintLocationAction(bool state) {
     repaint();
 }
 
-
-
 void FieldViewerPainter::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
 
     if(shouldPaintParticles) {
-        // Paint all particles
-        messages::RobotLocation test;
-        test.set_x(50.f);
-        test.set_y(50.f);
-        test.set_h(0.f);
-
-        paintRobotLocation(event, test);
+        paintParticleSwarm(event, curSwarm);
     }
 
     if(shouldPaintLocation) {
@@ -46,6 +38,19 @@ void FieldViewerPainter::paintEvent(QPaintEvent* event)
     }
 
 }
+
+void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
+                                            messages::ParticleSwarm swarm)
+{
+    QPainter painter(this);
+
+    for (int i=0; i<swarm.particle_size(); i++)
+    {
+        //Idea:Update scale factor based on weight? @Todo
+        paintRobotLocation(event,swarm.particle(i).loc());
+    }
+}
+
 
 void FieldViewerPainter::paintRobotLocation(QPaintEvent* event,
                                             messages::RobotLocation loc,
@@ -70,9 +75,20 @@ void FieldViewerPainter::paintRobotLocation(QPaintEvent* event,
 
 void FieldViewerPainter::updateWithLocationMessage(messages::RobotLocation newLoc)
 {
-    shouldPaintLocation = true;
-    curLoc = newLoc;
-    repaint();
+    if(shouldPaintLocation) {
+        shouldPaintLocation = true;
+        curLoc = newLoc;
+        repaint();
+    }
+}
+
+void FieldViewerPainter::updateWithParticleMessage(messages::ParticleSwarm newSwarm)
+{
+    if(shouldPaintParticles) {
+        shouldPaintParticles = true;
+        curSwarm = newSwarm;
+        repaint();
+    }
 }
 
 

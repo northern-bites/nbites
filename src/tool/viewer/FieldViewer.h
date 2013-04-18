@@ -13,6 +13,7 @@
 
 #include "RoboGrams.h"
 #include "RobotLocation.pb.h"
+#include "ParticleSwarm.pb.h"
 
 #include "FieldViewerPainter.h"
 
@@ -31,6 +32,7 @@ public:
     void confirmLocationLogs(bool haveLogs);
 
     portals::InPortal<messages::RobotLocation> locationIn;
+    portals::InPortal<messages::ParticleSwarm> particlesIn;
 
 protected slots:
     void noLogError();
@@ -47,8 +49,8 @@ protected:
 
     QCheckBox* particleViewBox;
     QCheckBox* locationViewBox;
+    QCheckBox* robotFieldViewBox;
 
-    QCheckBox* selector3;
     QCheckBox* selector4;
     QCheckBox* selector5;
     QCheckBox* selector6;
@@ -61,6 +63,7 @@ protected:
 private:
     bool haveParticleLogs;
     bool haveLocationLogs;
+    bool haveVisionFieldLogs;
 };
 
 

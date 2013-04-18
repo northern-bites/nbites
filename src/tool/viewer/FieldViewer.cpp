@@ -8,15 +8,17 @@ namespace viewer{
 FieldViewer::FieldViewer(QWidget* parent):
     QWidget(parent),
     haveParticleLogs(false),
-    haveLocationLogs(false)
+    haveLocationLogs(false),
+    haveVisionFieldLogs(false)
 {
     fieldPainter = new FieldViewerPainter(this);
 
     mainLayout = new QHBoxLayout(this);
 
+    //GUI
     particleViewBox = new QCheckBox("Particle Viewer",this);
     locationViewBox = new QCheckBox("Location Viewer", this);
-    selector3 = new QCheckBox("test3",this);
+    robotFieldViewBox = new QCheckBox("Robot Field Viewer",this);
     selector4 = new QCheckBox("test4", this);
     selector5= new QCheckBox("test5",this);
     selector6 = new QCheckBox("test6", this);
@@ -30,7 +32,7 @@ FieldViewer::FieldViewer(QWidget* parent):
 
     checkBoxes->addWidget(particleViewBox);
     checkBoxes->addWidget(locationViewBox);
-    checkBoxes->addWidget(selector3);
+    checkBoxes->addWidget(robotFieldViewBox);
     checkBoxes->addWidget(selector4);
     checkBoxes->addWidget(selector5);
     checkBoxes->addWidget(selector6);
@@ -43,9 +45,6 @@ FieldViewer::FieldViewer(QWidget* parent):
             SLOT(noLogError()));
     connect(locationViewBox, SIGNAL(toggled(bool)), this,
             SLOT(noLogError()));
-
-    // HACK - Remove when unloggers
-    confirmParticleLogs(true);
 
     mainLayout->addLayout(field);
     mainLayout->addLayout(checkBoxes);

@@ -17,6 +17,7 @@
 #include "common/PaintField.h"
 
 #include "RobotLocation.pb.h"
+#include "ParticleSwarm.pb.h"
 
 namespace tool {
 namespace viewer {
@@ -29,6 +30,7 @@ public:
     FieldViewerPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
 
     void updateWithLocationMessage(messages::RobotLocation newLoc);
+    void updateWithParticleMessage(messages::ParticleSwarm newSwarm);
 
 protected slots:
     void paintParticleAction(bool state);
@@ -42,12 +44,16 @@ protected:
     void paintRobotLocation(QPaintEvent* event,
                             messages::RobotLocation loc,
                             bool red = false);
+    // Paint a Particle Swarm
+    void paintParticleSwarm(QPaintEvent* event,
+                            messages::ParticleSwarm swarm);
 
 private:
     bool shouldPaintParticles;
     bool shouldPaintLocation;
 
     messages::RobotLocation curLoc;
+    messages::ParticleSwarm curSwarm;
 
 };
 
