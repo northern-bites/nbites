@@ -4,6 +4,7 @@ from objects import RelLocation
 import noggin_constants as NogginConstants
 from ..playbook import PBConstants
 from ..players import GoalieConstants
+import BallModel_proto as BallModel
 
 DEBUG = False
 
@@ -79,10 +80,11 @@ def fullPan(tracker):
         # Repeat the pan
         tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
 
-    if tracker.target.on:
-        return tracker.goLater('trackingFieldObject')
+    if not isinstance(tracker.target, BallModel.messages.FilteredBall):
+        if tracker.target.on:
+            return tracker.goLater('trackingFieldObject')
 
-    if (tracker.target is tracker.brain.ball and
+    if (isinstance(tracker.target, BallModel.messages.FilteredBall) and
         tracker.brain.ball.vis.frames_on > constants.TRACKER_FRAMES_ON_TRACK_THRESH):
         return tracker.goLater('tracking')
 
