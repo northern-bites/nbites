@@ -1,12 +1,7 @@
-import noggin_constants as NogginConstants
-from ..headTracker import HeadMoves
-from   ..util import MyMath
-import PositionConstants as constants
 import ChaseBallTransitions as transitions
-from objects import RelRobotLocation
+from math import copysign, fabs
 
-OBJ_SEEN_THRESH = 5
-LOOK_DIR_THRESH = 10
+OBJ_SEEN_THRESH = 6
 
 # @Summer 2012: This entire state appears to be a hack for localization.
 # Consider removing entirely.
@@ -15,94 +10,74 @@ def afterPenalty(player):
     if player.firstFrame():
         # pan for the ball
         player.brain.tracker.repeatWidePan()
-        # walk towards your own field cross
-        player.brain.nav.walkTo(RelRobotLocation(200,0,0))
+        # reset state specific counters
+        player.corner_l_sightings = 0
+        player.goal_t_sightings = 0
+        player.center_sightings = 0
+        player.post_l_sightings = 0
+        player.post_r_sightings = 0
+        player.goal_right = 0
+        player.reset_loc = 0
 
-    if transitions.shouldChaseBall(player):
-        if not player.brain.play.isChaser():
-            return player.goLater('playbookPosition')
-        else:
-            return player.goLater('chase')
+    vision = player.brain.interface.visionField
+    # Do we see a corner?
+    for i in range(0, vision.visual_corner_size()):
+        corner = vision.visual_corner(i)
+        for j in range(0, corner.poss_id_size()):
+            poss_id = corner.poss_id(j)
+            if (poss_id == corner.corner_id.L_INNER_CORNER or
+                poss_id == corner.corner_id.L_OUTER_CORNER):
+                # Saw an L-corner!
+                player.corner_l_sightings += copysign(1, corner.visual_detection.bearing)
+            if (poss_id == corner.corner_id.BLUE_GOAL_T or
+                poss_id == corner.corner_id.YELLOW_GOAL_T):
+                # Saw a goal T-corner!
+                player.goal_t_sightings += copysign(1, corner.visual_detection.bearing)
+            if (poss_id == corner.corner_id.CENTER_CIRCLE or
+                poss_id == corner.corner_id.CENTER_T):
+                # Saw a center corner (+ or T)
+                player.center_sightings += copysign(1, corner.visual_detection.bearing)
 
-    # TODO: Make this work for two yellow goals & resetLoc to one place?
-    # Would be great if loc worked. Hacked out for US OPEN 2012
-    """
-    if not player.brain.motion.head_is_active:
-        ##looking to the side
-        if player.brain.yglp.on or player.brain.ygrp.on:
-            #see the goal posts in multiple frames for safety
-            seeYellow(player)
-            if player.yellowCount >= OBJ_SEEN_THRESH:
-                setLocInfo(player)
-                #now you know where you are!
-                return player.goLater(gcState)
+    # Do we see a goalpost?
+    if vision.goal_post_l.visual_detection.on:
+        # Saw a goalpost! (adjust for which goalpost)
+        if not vision.goal_post_l.visual_detection.bearing == 0:
+            player.post_l_sightings += (copysign(1, vision.goal_post_l.visual_detection.bearing) *
+                                    copysign(1, 700 - vision.goal_post_l.visual_detection.distance))
+    if vision.goal_post_r.visual_detection.on:
+        # Saw a goalpost! (adjust for which goalpost)
+        if not vision.goal_post_r.visual_detection.bearing == 0:
+            player.post_r_sightings += (copysign(1, vision.goal_post_r.visual_detection.bearing) *
+                                    copysign(1, 700 - vision.goal_post_r.visual_detection.distance))
 
-        if player.brain.bglp.vis.on or player.brain.bgrp.vis.on:
-            #see the goal posts in multiple frames for safety
-            seeBlue(player)
-            if player.blueCount >= OBJ_SEEN_THRESH:
-                setLocInfo(player)
-                #now you know where you are!
-                return player.goLater(gcState)
-        player.headCount += 1
-    """
+    # If we've seen any landmark enough, reset localization.
+    if fabs(player.corner_l_sightings) > OBJ_SEEN_THRESH:
+        player.reset_loc = copysign(1, player.corner_l_sightings)
+    if fabs(player.goal_t_sightings) > OBJ_SEEN_THRESH:
+        player.reset_loc = copysign(1, player.goal_t_sightings)
+    if fabs(player.center_sightings) > OBJ_SEEN_THRESH:
+        player.reset_loc = copysign(1, player.center_sightings) * -1
+    if fabs(player.post_l_sightings) > OBJ_SEEN_THRESH:
+        player.reset_loc = copysign(1, player.post_l_sightings)
+    if fabs(player.post_r_sightings) > OBJ_SEEN_THRESH:
+        player.reset_loc = copysign(1, player.post_r_sightings)
 
-    # If done walking forward, start relocalizing normally
-    if player.brain.nav.isStopped() or player.counter > 250:
-        player.brain.nav.stop()
-        return player.goLater('findBall')
+    # Send the reset loc command.
+    if player.reset_loc != 0:
+        player.goal_right += player.reset_loc
+        player.corner_l_sightings = 0
+        player.goal_t_sightings = 0
+        player.center_sightings = 0
+        player.post_l_sightings = 0
+        player.post_r_sightings = 0
+        player.reset_loc = 0
+
+    if fabs(player.goal_right) > 5:
+        player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
+        return player.goNow(player.gameState)
+
 
     return player.stay()
-
-def initPenaltyReloc(player):
-    player.headCount = 0
-    player.yellowCount = 0
-    player.blueCount = 0
-
-"""
-Note: the way that yellowCount and blueCount are set is:  if a
-post of a different color is seen after the first color, the first
-counter will reset. So if I see a blue post in frame 1, nothing in
-frame 2, and a yellow post in frame 3, and nothing in frame 4,
-my counters will be:
-blueCount == 0
-yellowCount == 1
-This should never happen if vision is set correctly, but just in
-case it isn't...
-"""
-
-def seeYellow(player):
-    player.blueCount = 0
-    player.yellowCount += 1
-
-def seeBlue(player):
-    player.yellowCount = 0
-    player.blueCount += 1
-
-def setLocInfo(player):
-    if player.headCount <= LOOK_DIR_THRESH:
-        #looking left
-        if player.yellowCount > 0:
-            player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
-                              NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
-                              -90.0)
-            return
-            #must see blue
-        player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
-                          NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
-                          90.0)
-        return
-        #must be looking right
-    if player.yellowCount > 0:
-        player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
-                          NogginConstants.FIELD_WHITE_BOTTOM_SIDELINE_Y, \
-                          90.0)
-        return
-        #must see blue
-    player.brain.resetLocTo(NogginConstants.CENTER_FIELD_X, \
-                      NogginConstants.FIELD_WHITE_TOP_SIDELINE_Y, \
-                      -90.0)
-    return
 
 def penaltyRelocalize(player):
     """

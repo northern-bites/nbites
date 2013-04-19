@@ -318,6 +318,28 @@ def pReadyOffender(team, workingPlay):
     pos = (x,y,h)
     workingPlay.setPosition(pos)
 
+def pReadyMiddie(team, workingPlay):
+    workingPlay.setSubRole(PBConstants.READY_MIDDIE)
+    kickOff = team.brain.gameController.ownKickOff
+    if kickOff:
+        x = PBConstants.READY_KICKOFF_MIDDIE_X
+        if team.kickoffFormation == 0:
+            y = PBConstants.READY_KICKOFF_MIDDIE_0_Y
+        else:
+            y = PBConstants.READY_KICKOFF_MIDDIE_1_Y
+    else:
+        x = PBConstants.READY_NON_KICKOFF_MIDDIE_X
+        if team.kickoffFormation == 0:
+            y = PBConstants.READY_NON_KICKOFF_MIDDIE_0_Y
+        else:
+            y = PBConstants.READY_NON_KICKOFF_MIDDIE_1_Y
+
+    dest = Location(x, y)
+    h = dest.headingTo(PBConstants.CENTER_FIELD)
+
+    pos = (x,y,h)
+    workingPlay.setPosition(pos)
+
 def pReadyDefender(team, workingPlay):
     workingPlay.setSubRole(PBConstants.READY_DEFENDER)
     kickOff = team.brain.gameController.ownKickOff

@@ -28,6 +28,14 @@ def getRelativeDestination(my, dest):
         relLocation = my.relativeRobotLocationOf(field_dest)
         relLocation.relH = my.getRelativeBearing(field_dest)
         return relLocation
+
+    elif (hasattr(field_dest, 'rel_x') and
+          hasattr(field_dest, 'rel_y') and
+          hasattr(field_dest, 'bearing_deg')):
+        return RelRobotLocation(field_dest.rel_x,
+                                field_dest.rel_y,
+                                field_dest.bearing_deg)
+
     else:
         raise TypeError, "Navigator dest is not a Location type!" + str(dest)
 

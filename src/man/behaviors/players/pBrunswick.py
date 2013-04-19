@@ -61,10 +61,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def run(self):
         self.play = self.brain.play
-        gcState = self.brain.gameController.currentState
+        gcState = self.gameState
 
         if (gcState == 'gamePlaying'):
-            if (self.brain.gameController.counter != 1):
+            if not (self.currentState == 'gamePlaying'
+                and self.counter != 1):
                 # Make sure gamePlaying gets run
                 roleState = self.getNextState()
 
@@ -106,21 +107,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
+            if self.lastDiffState == 'gameSet':
+                return 'kickoff'
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
-        if self.play.isRole(PBConstants.GOALIE):
-            return self.getRoleStateGoalie()
         else:
             return 'playbookPosition'
-
-    def getRoleStateGoalie(self):
-        if self.play.isSubRole(PBConstants.GOALIE_KICKOFF):
-            return 'kickOffPosition'
-        elif self.play.isSubRole(PBConstants.GOALIE_CHASER):
-            return 'chase'
-        elif self.play.isSubRole(PBConstants.GOALIE_SAVE):
-            return 'goalieSave'
-        else:
-            return 'goaliePosition'
-
