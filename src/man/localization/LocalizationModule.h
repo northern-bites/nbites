@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include "RobotConfig.h"
+#include "DebugConfig.h"
 
 #include "RoboGrams.h"
 #include "VisionField.pb.h"

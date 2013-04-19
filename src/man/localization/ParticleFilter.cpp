@@ -447,8 +447,6 @@ namespace man
         }
 
         return swarm;
-
-
     }
 
     } // namespace localization

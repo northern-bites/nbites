@@ -12,6 +12,13 @@ namespace man
         particleFilter = new ParticleFilter();
         particleFilter->resetLocTo(100,100,0);
 
+        std::cout << "Logging localization? ";
+#ifdef LOG_LOCALIZATION
+        std::cout << "Yes." << std::endl;
+#else
+        std::cout << "No." << std::endl;
+#endif
+
         //Note: All the RobotLocation messages default to zero values to start (yay!)
     }
 
@@ -55,6 +62,9 @@ namespace man
 #ifdef LOG_LOCALIZATION
         portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                                getCurrentSwarm());
+        std::cout << "Logging localization particles ("
+                  << swarmMessage.get()->particle().size()
+                  << ")." << std::endl;
         particleOutput.setMessage(swarmMessage);
 #endif
 
@@ -67,4 +77,4 @@ namespace man
     }
 
     } // namespace localization
-} // namespace localization
+} // namespace man
