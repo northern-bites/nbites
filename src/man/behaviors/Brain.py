@@ -262,8 +262,6 @@ class Brain(object):
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
 
-        # Loc knows the side of the field now. Reset accordingly.
-        self.onOwnFieldSide = True
 
     #@todo: HACK HACK HACK Mexico 2012 to make sure we still re-converge properly even if
     #we get manually positioned
@@ -315,8 +313,6 @@ class Brain(object):
             self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
-        # Loc knows the side of the field now. Reset accordingly.
-        self.onOwnFieldSide = True
 
     def resetGoalieLocalization(self):
         """
@@ -333,8 +329,6 @@ class Brain(object):
                                 Constants.HEADING_LEFT,
                                 _localization.LocNormalParams(15.0, 15.0, 1.0))
 
-        # Loc knows the side of the field now. Reset accordingly.
-        self.onOwnFieldSide = True
 
     #TODO: write this method!
     def resetPenaltyKickLocalization(self):

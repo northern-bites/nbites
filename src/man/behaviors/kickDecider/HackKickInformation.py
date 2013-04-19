@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 USE_LOC = False
 USE_LOC_HALF_FIELD = False
 
@@ -70,9 +70,6 @@ class KickInformation:
         self.destDist = 500.
 
         self.orbitAngle = 0.0
-
-        if not USE_LOC_HALF_FIELD:
-            self.brain.onOwnFieldSide = False
 
     def getKickObjective(self):
         """
@@ -298,8 +295,7 @@ class KickInformation:
             # Goalie detection too easily fooled.
             #  Screw it. We need it anyway.
             if (self.dangerousBallCount > 5 or
-                self.nearGoalieOwn or
-                self.brain.onOwnFieldSide):
+                self.nearGoalieOwn):
                 # Don't aim at the near goal.
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
@@ -316,8 +312,7 @@ class KickInformation:
             # Goalie detection too easily fooled.
             #  Screw it. We need it anyway.
             if (self.dangerousBallCount > 5 or
-                self.nearGoalieOwn or
-                self.brain.onOwnFieldSide):
+                self.nearGoalieOwn):
 
                 # Can only see our own goal: Use goalie to make decision
                 if self.dangerousBallCount > 5:
