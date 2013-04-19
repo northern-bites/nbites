@@ -22,8 +22,8 @@ add_library(worldview
 
 # Link project to appropriate libraries.
 target_link_libraries(worldview
+  tool_common
   portals
   messages
-  tool_common
   ${QT_LIBRARIES}
 )

@@ -16,7 +16,7 @@
 #include "FieldConstants.h"
 
 namespace tool{
-namespace common{
+namespace tool_common{
 
 class PaintField : public QWidget
 {
