@@ -51,6 +51,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&selector, tr("Data"));
     toolTabs->addTab(&logView, tr("Log View"));
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
+	toolTabs->addTab(&worldView, tr("World Viewer"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);

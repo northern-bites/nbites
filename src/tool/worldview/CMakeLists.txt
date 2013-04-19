@@ -2,14 +2,20 @@ cmake_minimum_required(VERSION 2.8.3)
 
 # Set source files here that need to be compiled.
 set(WORLDVIEW_SRCS
-  WorldView
+  WorldView.cpp
 )
 
+set(WORLDVIEW_HEADERS
+  WorldView.h
+)
+
+Qt4_wrap_cpp( WORLDVIEW_HEADERS_MOC ${WORLDVIEW_HEADERS} )
+
 # Add project as a library.
-add_library(
-  worldview
+add_library(worldview
   STATIC
   ${WORLDVIEW_SRCS}
+  ${WORLDVIEW_HEADERS_MOC}
 )
 
 # Link project to appropriate libraries.
@@ -18,5 +24,5 @@ target_link_libraries(worldview
   messages
   support
   tool_common
-  ${ALCOMMON_LIBRARIES}
+  ${QT_LIBRARIES}
 )

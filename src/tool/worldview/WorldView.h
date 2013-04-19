@@ -9,13 +9,12 @@
 namespace tool {
 namespace worldview {
 
-class WorldView : public portals::Module, public QWidget {
+class WorldView : public QWidget, public portals::Module{
 
 	Q_OBJECT;
 
 public:
     WorldView(QWidget* parent = 0);
-    virtual ~WorldView() {}
 
     portals::InPortal<messages::WorldModel> commIn;
 

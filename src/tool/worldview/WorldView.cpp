@@ -11,6 +11,7 @@ WorldView::WorldView(QWidget* parent)
 {
 }
 
+
 void WorldView::run_()
 {
     commIn.latch();
