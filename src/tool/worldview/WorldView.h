@@ -5,6 +5,8 @@
 #include "RoboGrams.h"
 #include "WorldModel.pb.h"
 
+#include "WorldViewPainter.h"
+
 
 namespace tool {
 namespace worldview {
@@ -20,6 +22,13 @@ public:
 
 protected:
     virtual void run_();
+
+protected:
+	WorldViewPainter* fieldPainter;
+
+    QHBoxLayout* mainLayout;
+    QHBoxLayout* field;
+    QVBoxLayout* options;
 };
 
 }
