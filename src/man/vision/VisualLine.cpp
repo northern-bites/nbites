@@ -1,10 +1,16 @@
+#include "VisualLine.h"
 
 #include <algorithm>    // for sort()
 #include <cstdlib>      // git rid of overloaded abs() errors
 #include "NBMath.h"
+#include "ActiveArray.h"
 
-#include "VisualLine.h"
+// #define DEBUG_VISUAL_LINE
+
 using namespace std;
+
+namespace man {
+namespace vision {
 
 // Return true if y is higher in the image (towards 0)
 const bool YOrder::operator() (const linePoint& first, const linePoint& second)
@@ -13,6 +19,205 @@ const bool YOrder::operator() (const linePoint& first, const linePoint& second)
     return first.y < second.y;
 }
 
+
+VisualLine::VisualLine(const HoughLine& a,
+                       const HoughLine& b,
+                       const Gradient& g) :
+    VisualLandmark(UNKNOWN_LINE), hLine1(a), hLine2(b)
+{
+    findEndpoints(a,b,g);
+    // findDimensions();
+    // find3DCoords();
+}
+
+/**
+ * Find the endpoints of the line from the gradient
+ */
+void VisualLine::findEndpoints(const HoughLine& a,
+                               const HoughLine& b,
+                               const Gradient& g)
+{
+    PointsPair aEnds = findHoughLineEndpoints(a,g);
+    PointsPair bEnds = findHoughLineEndpoints(b,g);
+
+    setDirectionalEndpoints(aEnds, bEnds);
+    trimEndpoints();
+}
+
+VisualLine::PointsPair
+VisualLine::findHoughLineEndpoints(const HoughLine& l,
+                                   const Gradient& g)
+{
+    const float sn = l.getSinT();
+    const float cs = l.getCosT();
+
+    const float x0 = l.getRadius() * cs;
+    const float y0 = l.getRadius() * sn;
+
+    // vector along line is (sin, -cos)
+    float uMean = 0, uMeanSq = 0;
+    int numPts = 0;
+
+    // Scan through the gradient's edges
+    for (int i = 0; g.isPeak(i); ++i) {
+        // Find points which lie on the HoughLine
+        // Add them to the ActiveArray
+        if ( l.isOnLine(g.angles[i]) ){
+
+            float u = (sn * (static_cast<float>(g.angles[i].x) - x0) +
+                       -cs * (static_cast<float>(g.angles[i].y) - y0));
+
+            uMean   += u;
+            uMeanSq += u*u;
+            numPts++;
+        }
+    }
+
+    const float numPtsF = static_cast<float>(numPts);
+    uMean   /= numPtsF;
+    uMeanSq /= numPtsF;
+
+    float uVar = uMeanSq - uMean*uMean;
+    float uSd = sqrtf(uVar);
+
+    point<int> meanPt(static_cast<int>(uMean *  sn + x0) + IMAGE_WIDTH/2,
+                      static_cast<int>(uMean * -cs + y0) + IMAGE_HEIGHT/2);
+
+    float xOff = sn * uSd * 1.5f;
+    float yOff = -cs * uSd * 1.5f;
+
+    // Package and return endpoints
+    point<int> endA(static_cast<int>((float)meanPt.x + xOff),
+                    static_cast<int>((float)meanPt.y + yOff));
+
+    point<int> endB(static_cast<int>((float)meanPt.x - xOff),
+                    static_cast<int>((float)meanPt.y - yOff));
+
+    return PointsPair(endA, endB);
+}
+
+/**
+ * Assign the various endpoints of the visual line
+ */
+void VisualLine::setDirectionalEndpoints(const PointsPair& a,
+                                         const PointsPair& b )
+{
+    const PointsPair* top, *bottom;
+
+    // Y is inverted (top is actually the lesser of the two for human
+    // viewing purposes)
+    if (a.first.y < b.first.y){
+        top    = &a;
+        bottom = &b;
+    } else {
+        top    = &b;
+        bottom = &a;
+    }
+
+    if (top->first.x < top->second.x){
+        tl = top->first;
+        tr = top->second;
+    } else {
+        tl = top->second;
+        tr = top->first;
+    }
+
+    if (bottom->first.x < bottom->second.x){
+        bl = bottom->first;
+        br = bottom->second;
+    } else {
+        bl = bottom->second;
+        br = bottom->first;
+    }
+}
+
+/**
+ * Trim the two lines outlining the VisualLine to be of roughly the same length
+ */
+void VisualLine::trimEndpoints()
+{
+    // We find the closest point on the bottom line to the top right
+    // point. If that point is between the bottom endpoints, it means
+    // the bottom line is longer and should be truncated. We truncate
+    // it to the intersection point.
+
+
+    // Truncate the right side
+    point<int> perp = Utility::getClosestPointOnLine(tr, bl, br);
+    if (Utility::between(perp, bl, br)){
+        br = perp;
+    } else {
+        perp = Utility::getClosestPointOnLine(br, tl, tr);
+
+        if (!Utility::between(perp, tl, tr)){
+
+#ifdef DEBUG_VISUAL_LINE
+            cout << "The sides of this line don't overlap. Throwing away."
+                 << endl;
+#endif
+                // Set line to bad.
+
+                return;
+        }
+
+        tr = perp;
+    }
+
+    // Truncate the left side
+    perp = Utility::getClosestPointOnLine(tl, bl, br);
+    if (Utility::between(perp, bl, br)){
+        bl = perp;
+    } else {
+        tl = Utility::getClosestPointOnLine(bl, tl, tr);
+    }
+}
+
+/**
+ * Find various line dimensions:
+ *                            - Angle
+ */
+void VisualLine::findDimensions()
+{
+
+}
+
+/**
+ * Calculate the position of the line relative to the robot rather
+ * than just in the image frame
+ */
+void VisualLine::find3DCoords()
+{
+
+}
+
+bool VisualLine::isLineEdge(const HoughLine& line,
+                            const Gradient& g,
+                            double x0, double y0,
+                            int& _x, int& _y)
+{
+    // Look 3 points on either side of line for an edge in the same
+    // direction
+    for(double u = -edge_pt_buffer; u <= edge_pt_buffer; u += 1.0){
+
+        int x = static_cast<int>(line.getCosT() * u + x0);
+        int y = static_cast<int>(line.getSinT() * u + y0);
+
+        if (y < 0 || x < 0 || y > IMAGE_WIDTH || x > IMAGE_WIDTH){
+            continue;
+        }
+
+        if (g.peaks[y][x] != -1){
+            int tDiff = abs(((g.peaks[y][x] - line.getTIndex()) & 0xff)
+                            << 24 >> 24);
+            if(tDiff < angle_epsilon){
+                _x = x;
+                _y = y;
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 VisualLine::VisualLine(list<list<linePoint>::iterator> &nodes)
     : VisualLandmark(UNKNOWN_LINE), ccLine(false),
@@ -80,7 +285,8 @@ VisualLine::VisualLine(const VisualLine& other)
       distance(other.getDistance()), bearing(other.getBearing()),
       distanceSD(other.getDistanceSD()), bearingSD(other.getBearingSD()),
       ccLine(other.getCCLine()),
-      possibleLines(other.getPossibilities())
+      possibleLines(other.getPossibilities()),
+      tr(other.tr), tl(other.tl), br(other.br), bl(other.bl)
 {
 }
 
@@ -464,7 +670,7 @@ const bool VisualLine::hasPositiveID()
 const std::vector<lineID> VisualLine::getIDs() {
   std::vector<lineID> poss;
 
-  for (list<const ConcreteLine*>::const_iterator 
+  for (list<const ConcreteLine*>::const_iterator
 	 currLine = possibleLines.begin();
        currLine != possibleLines.end(); currLine++) {
     poss.push_back((**currLine).getID());
@@ -473,3 +679,5 @@ const std::vector<lineID> VisualLine::getIDs() {
   return poss;
 }
 
+}
+}

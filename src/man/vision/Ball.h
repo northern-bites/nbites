@@ -30,7 +30,11 @@
 #include "Blob.h"
 #include "Blobs.h"
 
-class Ball; // forward reference
+namespace man {
+	namespace vision {
+		class Ball; // forward reference
+	}
+}
 #include "Threshold.h"
 #include "Context.h"
 #include "Field.h"
@@ -38,6 +42,8 @@ class Ball; // forward reference
 #include "Vision.h"
 
 
+namespace man{
+	namespace vision{
 //constants to constrain blob and point amounts
 static const int MAX_BALLS = 400;
 static const int MAX_BALL_POINTS = 100;
@@ -83,9 +89,9 @@ public:
     std::pair<int, int> scanMidlinesForRoundnessInformation(Blob b);
     std::pair<int, int> scanDiagonalsForRoundnessInformation(Blob b);
     bool badSurround(Blob b);
-    void setBallInfo(int w, int h, VisualBall *thisBall, estimate e);
-    void checkForReflections(int h, int w, VisualBall * thisBall,
-                             estimate e);
+    float ballDistanceEstFromRadius(float radius);
+    void setBallInfo(int w, int h, VisualBall *thisBall);
+    void checkForReflections(int h, int w, VisualBall * thisBall);
     bool ballIsClose(VisualBall * thisBall);
     bool ballIsNotSquare(int h, int w);
 
@@ -99,7 +105,7 @@ public:
 
     // sanity checks
     void preScreenBlobsBasedOnSizeAndColor();
-    bool sanityChecks(int w, int h, estimate e, VisualBall * thisBall);
+    bool sanityChecks(int w, int h, VisualBall * thisBall);
     bool blobOk(Blob b);
     bool blobIsBigEnoughToBeABall(int w, int h);
 
@@ -137,7 +143,11 @@ private:
     Blob *topBlob, zeroBlob;
     //Blob checker, obj, pole, leftBox, rightBox;
     Blobs *blobs;
-    estimate focalDist;
+
+    //estimates for current blob
+    estimate radiusBasedEst;
+    estimate kinematicsBasedEst;
+
     int inferredConfidence;
     float slope;
     int occlusion;
@@ -151,6 +161,9 @@ private:
     static const bool BALLDISTDEBUG = false;
     static const bool BALLDEBUG = false;
 #endif
+
 };
+	}
+}
 
 #endif // Ball_h_DEFINED

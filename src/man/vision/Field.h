@@ -3,11 +3,17 @@
 
 #include <boost/shared_ptr.hpp>
 
-class Field;  // forward reference
+namespace man {
+namespace vision {
+	class Field;  // forward reference
+}
+}
 
 #include "Threshold.h"
-#include "Profiler.h"
 #include "NaoPose.h"
+
+namespace man {
+namespace vision {
 
 // constants for Graham scanning to find convex hull
 static const int RUNSIZE = 8;
@@ -25,7 +31,7 @@ public:
 
     // main methods
     int findGreenHorizon(int pH, float sl);
-	void findConvexHull(int pH);
+    void findConvexHull(int pH);
     void initialScanForTopGreenPoints(int pH);
     void findTopEdges(int M);
     int getInitialHorizonEstimate(int pH);
@@ -33,6 +39,9 @@ public:
 	int horizonAt(int x);
 	float distanceToHorizon(int x, int y);
 	int ccw(point<int> p1, point<int> p2, point<int> p3);
+    int * getTopEdge(){
+        return topEdge;
+    }
 
     // scan operations
     int yProject(int startx, int starty, int newy);
@@ -73,5 +82,8 @@ private:
     static const bool debugFieldEdge = false;
 #endif
 };
+
+}
+}
 
 #endif // Field_h_DEFINED

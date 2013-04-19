@@ -23,7 +23,12 @@
 
 #include <stdlib.h>
 
-class Robots; // forward reference
+namespace man {
+namespace vision {
+	class Robots; // forward reference
+}
+}
+
 #include "Threshold.h"
 #include "Context.h"
 #include "VisionStructs.h"
@@ -33,58 +38,73 @@ class Robots; // forward reference
 #include "Field.h"
 #include "Cross.h"
 
+namespace man {
+namespace vision {
 
 class Robots {
 public:
     Robots(Vision* vis, Threshold* thr, Field* fie, Context* con,
-		   unsigned char c);
+           unsigned char c);
     virtual ~Robots() {}
 
-	void init();
+    void init();
+    void findRobots(Cross* cross);
+    void findUniforms();
 	void preprocess();
-	void robot(Cross *cross);
-	void expandRobotBlob(int which);
-	bool noWhite(Blob b);
-	void updateRobots(int w, int i);
-	void mergeBigBlobs();
+	void robot(Cross* cross);
+	void newRun(int x, int y, int h);
+    void findRobotParts();
+    Blob correctBlob(Blob area);
+    bool checkWhiteAllignment(Blob candidate);
+    Blob createAreaOfInterest(Blob robotBlob);
+    bool noWhite(Blob b);
+    void updateRobots(int w, int i);
+    void mergeBigBlobs();
     void checkMerge(int i, int j);
-	bool closeEnough(int i, int j);
-    bool sanityChecks(Blob candidate, Cross* cross);
-	bool bigEnough(Blob a, Blob b);
-	bool notGreen(Blob a);
+    bool closeEnough(int i, int j);
+    bool sanityChecks(int index);
+	bool sanityChecks(Blob b, Cross* cross);
+    bool notGreen(Blob a);
     bool whiteBelow(Blob a);
     bool whiteAbove(Blob b);
-	bool checkHorizontal(int l, int r, int t, int b);
-	bool checkVertical(int l, int r, int t, int b);
-	bool viableRobot(Blob a);
-	void createObject();
-	void newRun(int x, int y, int h);
-	void setColor(unsigned char c);
-	void allocateColorRuns();
-	int distance(int x, int x1, int x2, int x3);
-	void printBlob(Blob a);
+    void allocateColorRuns();
+    int  distance(int x, int x1, int x2, int x3);
+    void printBlob(Blob a);
+    void setImageBox(int i, int j, int value);
+    void incImageBox(int i, int j) {imageBoxes[i][j] += 1;}
+    int getImageBox(int i, int j) {return imageBoxes[i][j];}
 
 #ifdef OFFLINE
     void setDebugRobots(bool debug) {debugRobots = debug;}
 #endif
+
+    //cant be accessed if private
+    static const int widthScale = 5;
+    static const int heightScale = 5;
 
 
 private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
-	Field* field;
+    Field* field;
     Context* context;
-
-	Blobs* blobs;
-	int numberOfRuns, runsize;
-	unsigned char color;
-	Blob* topBlob;
-	run* runs;
+    
+    int imageBoxes[IMAGE_WIDTH/widthScale][IMAGE_HEIGHT/heightScale];
+    //depends on image size, however ratio will be correct, given a 4:3 image.
+    Blobs* blobs;
+    Blobs* whiteBlobs;
+    int numberOfRuns, runsize;
+    unsigned char color;
+    run* runs;
 #ifdef OFFLINE
     bool debugRobots;
 #else
     static const bool debugRobots = false;
 #endif
 };
+
+}
+}
+
 #endif

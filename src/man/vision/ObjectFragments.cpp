@@ -35,13 +35,15 @@
 
 #include <iostream>
 #include "ObjectFragments.h"
-#include "debug.h"
 #include "FieldConstants.h"
 #include "Utility.h"
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 using namespace std;
+
+namespace man {
+namespace vision {
 
 static const float CLOSE_DIST = 150.0f;  // box corner to post distance
 static const float FAR_DIST = 180.0f;    // corner of field to post
@@ -81,7 +83,7 @@ static const float GOODRAT = 0.75f;
 static const float SQUATRAT = 1.2f;
 // EXAMINED: lowered
 // goal posts of the same color have to be this far apart
-static const int MIN_POST_SEPARATION = 7;
+static const int MIN_POST_SEPARATION = 20;
 // how big a post is to be declared a big post
 // EXAMINED: change this
 static const int BIGPOST = 25;
@@ -117,7 +119,7 @@ void ObjectFragments::init(float s)
 
 
 /* This is the entry  point from object recognition in Threshold.cc	 For now it
- * is only called on yellow, blue and orange.
+ * is only called on yellow.
  * In each case we search for objects that have the corresponding colors.
  * @param  c			color we are processing
  * @return				always 0
@@ -126,10 +128,6 @@ void ObjectFragments::init(float s)
 void ObjectFragments::createObject() {
     // these are in the relative order that they should be called
     switch (color) {
-    case BLUE_BIT:
-        lookForFirstPost(vision->bglp, vision->bgrp,
-                         vision->bgCrossbar, BLUE_BIT);
-        break;
     case YELLOW_BIT:
         lookForFirstPost(vision->yglp, vision->ygrp,
                          vision->ygCrossbar, YELLOW_BIT);
@@ -929,86 +927,6 @@ void ObjectFragments::squareGoal(int x, int y, int left, int right, int minY,
             }
         }
     }
-	// because we are over-caution about BLUE_BIT
-	/*if (color == BLUE_BIT) {
-		float distant = 0.0f;
-		boost::shared_ptr<VisualLine> goalLine;
-		const vector < boost::shared_ptr<VisualLine> > * lines =
-			vision->fieldLines->getLines();
-		int linesFound = 0;
-		for (vector < boost::shared_ptr<VisualLine> >::const_iterator i =
-				 lines->begin();
-			 i != lines->end(); ++i) {
-			int lineLeft = (*i)->getLeftEndpoint().x;
-			int lineRight = (*i)->getRightEndpoint().x;
-			if (lineLeft < leftBottom.x && lineRight > rightBottom.x &&
-				lineRight - lineLeft > IMAGE_WIDTH / 3) {
-				if ((*i)->getDistance() > distant) {
-					distant = (*i)->getDistance();
-					goalLine = *i;
-				}
-				linesFound++;
-			}
-		}
-		if (distant > 0.0f) {
-			if (POSTDEBUG) {
-				cout << "Extending bottom of blue goal" << endl;
-				cout << "Old ys are " << leftBottom.y << " " <<
-					rightBottom.y << endl;
-			}
-			int oldy = leftBottom.y;
-			int oldy2 = rightBottom.y;
-			int size = 0;
-			point<int> leftBig;
-			leftBig.x = leftBottom.x;
-			leftBig.y = IMAGE_HEIGHT - 1;
-			std::pair<int, int> intersect = Utility::plumbIntersection(
-				leftBottom, leftBig, goalLine->getLeftEndpoint(),
-				goalLine->getRightEndpoint());
-			vision->drawPoint(intersect.first, intersect.second, MAROON);
-			leftBottom.x = xProject(leftBottom.x, leftBottom.y,
-									intersect.second);
-			leftBottom.y = intersect.second;
-			if (!goodValuePoint(leftBottom) || !goodValuePoint(rightBottom)) {
-				return;
-			}
-			leftBig.x = rightBottom.x;
-			leftBig.y = IMAGE_HEIGHT - 1;
-			intersect = Utility::plumbIntersection(
-				leftBottom, leftBig, goalLine->getLeftEndpoint(),
-				goalLine->getRightEndpoint());
-			rightBottom.x = xProject(rightBottom.x, rightBottom.y,
-									 intersect.second);
-			rightBottom.y = intersect.second;
-			size = min(leftBottom.y - oldy, rightBottom.y - oldy2);
-			leftBottom.y = oldy + size;
-			rightBottom.y = oldy2 + size;
-			if (leftBottom.x > -1 && leftBottom.x < IMAGE_WIDTH &&
-				rightBottom.x > -1 && rightBottom.x < IMAGE_WIDTH &&
-				size > 3) {
-				// make sure we aren't extending to the goal front line
-				int bad = 0;
-				int xCheck = (leftBottom.x + rightBottom.x) / 2;
-				for (int i = oldy; i <= leftBottom.y; i++) {
-					if (Utility::isGreen(thresh->getThresholded(i, xCheck))) {
-						bad++;
-					}
-					if (Utility::isWhite(thresh->getThresholded(i, xCheck))) {
-						bad++;
-					}
-				}
-				if (!(bad * 2 > size) || (linesFound > 1 &&
-										  bad * 3 < size * 2)) {
-					obj.setBlob(leftTop, rightTop, leftBottom, rightBottom);
-					if (POSTDEBUG) {
-						cout << "New Ys " << leftBottom.y << " " << rightBottom.y <<
-							endl;
-					}
-				}
-			}
-		}
-		}*/
-
 }
 
 /* A collection of miscelaneous methods used in processing goals.
@@ -1027,19 +945,9 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
     one->updateObject(&two, _certainty, _distCertainty);
     // update the context variables too
     if (!_certainty) {
-        if (color == BLUE_BIT) {
-            context->setUnknownBluePost();
-        } else {
-            context->setUnknownYellowPost();
-        }
+		context->setUnknownYellowPost();
     } else {
         switch (one->getID()) {
-        case BLUE_GOAL_LEFT_POST:
-            context->setLeftBluePost();
-            break;
-        case BLUE_GOAL_RIGHT_POST:
-            context->setRightBluePost();
-            break;
         case YELLOW_GOAL_LEFT_POST:
             context->setLeftYellowPost();
             break;
@@ -1048,9 +956,6 @@ bool ObjectFragments::updateObject(VisualFieldObject* one, Blob two,
             break;
         case YELLOW_GOAL_POST:
             context->setUnknownYellowPost();
-            break;
-        case BLUE_GOAL_POST:
-            context->setUnknownBluePost();
             break;
         default:
             break;
@@ -2554,10 +2459,8 @@ bool ObjectFragments::badDistance(Blob b) {
         int bottom = b.getBottom();
         estimate e = vision->pose->pixEstimate(x, y, 0.0);
         distanceCertainty dc = checkDist(b);
-        float disth = thresh->getGoalPostDistFromHeight(static_cast<float>
-                                                        (b.height()));
-        float distw = thresh->getGoalPostDistFromWidth(static_cast<float>
-                                                       (b.width()));
+        float disth = thresh->getGoalPostEstimateFromHeight(x, y, (float) b.height()).dist;
+        float distw = thresh->getGoalPostEstimateFromWidth(x, y, (float) (b.width())).dist;
         float choose = 0.0f;
         if (b.getTop() < 5 || y > IMAGE_HEIGHT - 5) {
             if (x < 5 || b.getRight() > IMAGE_WIDTH - 5) {
@@ -2583,15 +2486,6 @@ bool ObjectFragments::badDistance(Blob b) {
             }
             return true;
         }
-		if (vision->pose->getHorizonY(0) < -100 && color == BLUE_BIT &&
-			(choose > 200.0f || choose > 2 * diste)) {
-			if (POSTDEBUG) {
-				cout << "Throwing away questionable blue post" <<
-					choose << " " << diste << " " <<
-					vision->pose->getHorizonY(0) << endl;
-			}
-			return true;
-		}
 		if (b.getTop() > IMAGE_HEIGHT / 3 && diste < 100.0f) {
 			if (POSTDEBUG) {
 				cout << "Close post, but in bottom of image " << diste << endl;
@@ -2636,13 +2530,6 @@ bool ObjectFragments::locationOk(Blob b)
     int spanX = b.width();
     int spanY = b.height();
     int mh = min(horizonLeft, horizonRight);
-    // file this one under "very specific sanity checks"
-    if (color == BLUE_BIT && spanY < TALL_POST && trueTop > IMAGE_HEIGHT / 2) {
-        if (SANITY) {
-            cout << "Screening blue post that is uniform-like" << endl;
-        }
-        return false;
-    }
 	if (trueTop > mh && trueTop > 3) {
 		if (SANITY) {
 			cout << "Top was less than horizon " << trueTop << " " << mh << endl;
@@ -2734,6 +2621,8 @@ bool ObjectFragments::secondPostFarEnough(Blob post1, Blob post2, int post) {
     point <int> right1 = post1.getRightBottom();
     point <int> left2 = post2.getLeftBottom();
     point <int> right2 = post2.getRightBottom();
+	int width1 = post1.width();
+	int width2 = post2.width();
     if (SANITY) {
         cout << "Separations " << (dist(left1.x, left1.y, right2.x, right2.y))
              << " " << (dist(left2.x, left2.y, right1.x, right1.y)) << endl;
@@ -2751,10 +2640,18 @@ bool ObjectFragments::secondPostFarEnough(Blob post1, Blob post2, int post) {
 		(right1.x >= left2.x - 2 && right1.x <= right2.x + 2)) {
 		return false;
 	}
-    if (dist(left1.x, left1.y, right2.x, right2.y) > MIN_POST_SEPARATION &&
-        dist(left2.x, left2.y, right1.x, right1.y) > MIN_POST_SEPARATION) {
-        if (dist(left1.x, left1.y, left2.x, left2.y) > MIN_POST_SEPARATION &&
-            dist(right2.x, right2.y, right1.x, right1.y) > MIN_POST_SEPARATION){
+	// posts should only be really close from the side
+	int separationNeeded = MIN_POST_SEPARATION;
+	if (max(width1, width2) < 50) {
+		separationNeeded = 40;
+	}
+	if (max(post1.height(), post2.height()) > 50) {
+		separationNeeded = 60;
+	}
+    if (dist(left1.x, left1.y, right2.x, right2.y) > separationNeeded &&
+        dist(left2.x, left2.y, right1.x, right1.y) > separationNeeded) {
+        if (dist(left1.x, left1.y, left2.x, left2.y) > separationNeeded &&
+            dist(right2.x, right2.y, right1.x, right1.y) > separationNeeded){
             return true;
         }
     }
@@ -2945,14 +2842,6 @@ void ObjectFragments::printObject(VisualFieldObject * objs) {
 void ObjectFragments::printObjs() {
 #if defined OFFLINE
     if (PRINTOBJS) {
-        if (vision->bglp->getWidth() >	0) {
-            cout << "Vision found left blue post " << endl;
-            printObject(vision->bglp);
-        }
-        if (vision->bgrp->getWidth() >	0) {
-            cout << "Vision found right blue post " << endl;
-            printObject(vision->bgrp);
-        }
         if (vision->yglp->getWidth() >	0) {
             cout << "Vision found left yellow post " << endl;
             printObject(vision->yglp);
@@ -2960,10 +2849,6 @@ void ObjectFragments::printObjs() {
         if (vision->ygrp->getWidth() >	0) {
             cout << "Vision found right yellow post " << endl;
             printObject(vision->ygrp);
-        }
-        if (vision->bgCrossbar->getWidth() >  0) {
-            cout << "Vision found blue backstop " << endl;
-            //printObject(vision->bgCrossbar);
         }
         if (vision->ygCrossbar->getWidth() >  0) {
             cout << "Vision found yellow backstop " << endl;
@@ -3009,4 +2894,7 @@ void ObjectFragments::drawBlob(Blob b, int c) {
                      b.getRightBottomX(), b.getRightBottomY(),
                      c);
 #endif
+}
+
+}
 }

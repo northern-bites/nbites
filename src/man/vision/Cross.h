@@ -23,13 +23,21 @@
 
 #include <stdlib.h>
 
-class Cross; // forward reference
+namespace man {
+namespace vision {
+	class Cross; // forward reference
+}
+}
+
 #include "Threshold.h"
 #include "Context.h"
 #include "VisionStructs.h"
 #include "VisualLine.h"
 #include "Blob.h"
 #include "Blobs.h"
+
+namespace man {
+namespace vision {
 
 static const int NOISE = 4;
 
@@ -38,35 +46,41 @@ public:
     Cross(Vision* vis, Threshold* thr, Field* fie, Context* con);
     virtual ~Cross() {}
 
-	void init();
-	void createObject();
+    void init();
+    void createObject();
     void checkForCrosses();
+	bool checkForRobotBlobs(Blob b);
     bool checkSizeAgainstPixEstimate(Blob b);
     bool scanAroundPerimeter(Blob b);
     bool checkForLineIntersection(Blob b);
-	void checkForX(Blob b);
-	void newRun(int x, int y, int h);
-	void allocateColorRuns();
-	bool rightBlobColor(Blob b, float perc);
-    bool checkForRobotBlobs(Blob b);
+    void checkForX(Blob b);
+    void newRun(int x, int y, int h);
+    void allocateColorRuns();
+    bool rightBlobColor(Blob b, float perc);
+    Blobs* getBlobs();
+
 #ifdef OFFLINE
-	void setCrossDebug(bool debug) {CROSSDEBUG = debug;}
+    void setCrossDebug(bool debug) {CROSSDEBUG = debug;}
 #endif
 
 private:
     // class pointers
     Vision* vision;
     Threshold* thresh;
-	Field* field;
+    Field* field;
     Context* context;
 
-	Blobs* blobs;
-	int numberOfRuns, runsize;
-	run* runs;
+    Blobs* blobs;
+    int numberOfRuns, runsize;
+    run* runs;
 #ifdef OFFLINE
-	bool CROSSDEBUG;
+    bool CROSSDEBUG;
 #else
-	static const bool CROSSDEBUG = false;
+    static const bool CROSSDEBUG = false;
 #endif
 };
+
+}
+}
+
 #endif

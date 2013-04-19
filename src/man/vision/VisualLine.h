@@ -5,10 +5,16 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <utility>
 #include <boost/shared_ptr.hpp>
 
 #include "ConcreteLine.h"
+#include "geom/HoughLine.h"
+#include "FieldLines/Gradient.h"
 #include "VisualLandmark.h"
+
+namespace man {
+namespace vision {
 
 class VisualLine;
 
@@ -75,19 +81,32 @@ class YOrder {
     const bool operator() (const linePoint& first, const linePoint& second) const;
 };
 
+}
+}
 
 #include "Structs.h"
 #include "Utility.h"
 
+namespace man {
+namespace vision {
+
 class VisualLine : public VisualLandmark {
+    // Private constants
+    enum {
+        edge_pts_for_line = 6,
+        edge_pt_buffer = 4,
+        angle_epsilon = 5
+    };
  public: // Constants
-    // number of points to be a valid line
+
     static const unsigned int NUM_POINTS_TO_BE_VALID_LINE = 3;
 
  public:
     VisualLine(std::list<std::list<linePoint>::iterator> &listOfIterators);
     VisualLine(std::list<linePoint> &listOfPoints);
     VisualLine();
+    VisualLine(const HoughLine& a, const HoughLine& b, const Gradient& g);
+
     VisualLine(float _dist, float _bearing);
     VisualLine(const VisualLine& other);
     ~VisualLine();
@@ -132,6 +151,25 @@ class VisualLine : public VisualLandmark {
         }
 
  private: // Member functions
+    typedef std::pair<point<int>, point<int> > PointsPair;
+
+    void findEndpoints(const HoughLine& a,
+                       const HoughLine& b,
+                       const Gradient& g);
+    PointsPair findHoughLineEndpoints(const HoughLine& a,
+                                      const Gradient& g);
+    void setDirectionalEndpoints(const PointsPair& a, const PointsPair& b);
+    void trimEndpoints();
+    void findDimensions();
+    void find3DCoords();
+    void findLineEdgeEnds(const HoughLine& line, const Gradient& g,
+                          point<int>& r, point<int>& l);
+
+    bool isLineEdge(const HoughLine& line,
+                    const Gradient& g,
+                    double x0, double y0,
+                    int& _x, int& _y);
+
     void init();
     void calculateWidths();
     const float calculateAngle() const;
@@ -180,6 +218,18 @@ class VisualLine : public VisualLandmark {
     bool ccLine;                // Is this line part of the center circle?
     std::list <const ConcreteLine*> possibleLines; // Possible ConcreteLines
 
+    // New VisualLine member variables
+    //
+    // bearing, sd (3 space)
+    // distance, sd (3 space)
+    // point<int> start, end
+    // point<int>* left, *right
+    // length
+    HoughLine hLine1, hLine2;
+    float radius; // (on screen)
+    float theta; // (on screen)
+    point<int> tr, tl, br, bl;  // top right/left, bottom right/left
+
  public:
     // Getters
     inline const bool getCCLine() const;
@@ -212,6 +262,10 @@ class VisualLine : public VisualLandmark {
     inline const point<int> getRightEndpoint() const;
     inline const point<int> getStartpoint() const;
     inline const point<int> getTopEndpoint() const;
+    inline const point<int> getTopRightEndpoint() const;
+    inline const point<int> getTopLeftEndpoint() const;
+    inline const point<int> getBottomRightEndpoint() const;
+    inline const point<int> getBottomLeftEndpoint() const;
 
     inline const bool isParallel() const;
 
@@ -333,6 +387,24 @@ inline const point<int> VisualLine::getBottomEndpoint() const
     return (bottomBound == start.y ? start : end);
 }
 
+
+inline const point<int> VisualLine::getTopRightEndpoint() const
+{
+    return tr;
+}
+inline const point<int> VisualLine::getTopLeftEndpoint() const
+{
+    return tl;
+}
+inline const point<int> VisualLine::getBottomRightEndpoint() const
+{
+    return br;
+}
+inline const point<int> VisualLine::getBottomLeftEndpoint() const
+{
+    return bl;
+}
+
 inline const linePoint VisualLine::getLeftLinePoint() const
 {
     return points.front();
@@ -421,6 +493,9 @@ inline void VisualLine::setDistance(float _distance)
 inline void VisualLine::setDistanceSD(float _distanceSD)
 {
     distanceSD = _distanceSD;
+}
+
+}
 }
 
 #endif

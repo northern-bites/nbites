@@ -1,6 +1,9 @@
 #include "ConcreteFieldObject.h"
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // Constructors
 ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,
                                          const float _fieldY,
@@ -43,7 +46,13 @@ const ConcreteFieldObject* ConcreteFieldObject::BLUE_GOAL_POSTS[
     NUM_BLUE_GOAL_POSTS] = {&blue_goal_left_post, &blue_goal_right_post};
 
 const ConcreteFieldObject* ConcreteFieldObject::YELLOW_GOAL_POSTS[
-    NUM_YELLOW_GOAL_POSTS] = {&yellow_goal_left_post, &yellow_goal_right_post};
+    2] = {&yellow_goal_left_post, &yellow_goal_right_post};
+
+const ConcreteFieldObject* ConcreteFieldObject::RIGHT_GOAL_POSTS[
+    NUM_RIGHT_GOAL_POSTS] = {&yellow_goal_right_post, &blue_goal_right_post};
+
+const ConcreteFieldObject* ConcreteFieldObject::LEFT_GOAL_POSTS[
+    NUM_LEFT_GOAL_POSTS] = {&yellow_goal_left_post, &blue_goal_left_post};
 
 
 const list <const ConcreteFieldObject*> ConcreteFieldObject::blueGoalPosts =
@@ -55,6 +64,23 @@ const list <const ConcreteFieldObject*> ConcreteFieldObject::yellowGoalPosts =
     list <const ConcreteFieldObject*>( ConcreteFieldObject::YELLOW_GOAL_POSTS,
                                         &ConcreteFieldObject::YELLOW_GOAL_POSTS[
                                             NUM_YELLOW_GOAL_POSTS]);
+
+const list <const ConcreteFieldObject*> ConcreteFieldObject::rightPosts =
+    list <const ConcreteFieldObject*>( ConcreteFieldObject::RIGHT_GOAL_POSTS,
+                                        &ConcreteFieldObject::RIGHT_GOAL_POSTS[
+                                            NUM_RIGHT_GOAL_POSTS]);
+
+const list <const ConcreteFieldObject*> ConcreteFieldObject::leftPosts =
+    list <const ConcreteFieldObject*>( ConcreteFieldObject::LEFT_GOAL_POSTS,
+                                        &ConcreteFieldObject::LEFT_GOAL_POSTS[
+                                            NUM_LEFT_GOAL_POSTS]);
+
+const list <const ConcreteFieldObject*> ConcreteFieldObject::allPosts =
+    list <const ConcreteFieldObject*>( ConcreteFieldObject::concreteFieldObjectList,
+                                        &ConcreteFieldObject::concreteFieldObjectList[
+                                            NUM_FIELD_OBJECTS]);
+
+
 // Lists of single posts, to make the functions easier to call...
 const list <const ConcreteFieldObject*>
 ConcreteFieldObject::blueGoalLeftPostList =
@@ -130,3 +156,5 @@ const float ConcreteFieldObject::getHeightFromGround(const int _id)
     return 0;
 }
 
+}
+}

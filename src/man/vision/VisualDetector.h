@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-
+namespace man {
+namespace vision {
 /**
  * Base class for visual object detectors.
  *
@@ -22,10 +23,15 @@ public:
     VisualDetector() { };
     virtual ~VisualDetector() { };
 
-    virtual void detect(const uint16_t * image) = 0;
+    virtual void detect(int upperBound,
+                        int * field_edge,
+                        const uint16_t * image) = 0;
 
     // @TODO: Implement!
     // virtual void identify(Context *context) = 0;
 };
+
+}
+}
 
 #endif /* _VisualDetector_h_DEFINED */

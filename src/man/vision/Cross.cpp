@@ -25,9 +25,11 @@
 
 #include <iostream>
 #include "Cross.h"
-#include "debug.h"
 
 using namespace std;
+
+namespace man {
+namespace vision {
 
 Cross::Cross(Vision* vis, Threshold* thr, Field* fie, Context* con)
 : vision(vis), thresh(thr), field(fie), context(con)
@@ -81,6 +83,8 @@ bool Cross::checkForRobotBlobs(Blob blob) {
     }
     return false;
 }
+
+
 
 /* See if any of our candidate blobs are actually worthy crosses.
  */
@@ -326,6 +330,11 @@ void Cross::checkForX(Blob b) {
     }
 }
 
+//returns the blobs data structure containing white blob info
+Blobs* Cross::getBlobs(){
+    return blobs;
+}
+
 /* Adds a new run to the basic data structure.
 
    runs structure contains:
@@ -414,5 +423,5 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
     return false;
 }
 
-
-
+}
+}

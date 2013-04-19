@@ -13,6 +13,9 @@
 
 #include "Structs.h"
 
+namespace man {
+namespace vision {
+
 // What is the certainty associated with the identification of the object
 enum certainty {
     NOT_SURE,
@@ -77,8 +80,10 @@ public:
     // setting the distance; should be used whenever a legitimate distance
     // measurement is set
 
-	virtual const bool hasPositiveID() = 0;
+    virtual const bool hasPositiveID() = 0;
 };
 
+}
+}
 
 #endif

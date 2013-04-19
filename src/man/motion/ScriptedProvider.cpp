@@ -1,47 +1,24 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-#include <boost/shared_ptr.hpp>
 #include "ScriptedProvider.h"
 
-using namespace std;
 using namespace Kinematics;
-using boost::shared_ptr;
 
-ScriptedProvider::ScriptedProvider(shared_ptr<Sensors> s)
+namespace man
+{
+namespace motion
+{
+
+ScriptedProvider::ScriptedProvider()
     : MotionProvider(SCRIPTED_PROVIDER),
-      sensors(s),
-      chopper(sensors),
+      chopper(),
       currCommand(),
       bodyCommandQueue()
-
 {
-    // Create mutexes
-    // (?) Need one mutex per queue (?)
-    pthread_mutex_init (&scripted_mutex, NULL);
+
 }
 
 ScriptedProvider::~ScriptedProvider() {
     // Wait until not active anymore
     while ( isActive() );
-    pthread_mutex_destroy(&scripted_mutex);
     // Don't have to delete commandQueue, since it will
     // be empty once we're not active.
 }
@@ -54,25 +31,25 @@ ScriptedProvider::~ScriptedProvider() {
 void ScriptedProvider::requestStopFirstInstance() { }
 
 void ScriptedProvider::hardReset(){
-    pthread_mutex_lock(&scripted_mutex);
     while(!bodyCommandQueue.empty()){
-	BodyJointCommand::ptr next = bodyCommandQueue.front();
-	next->finishedExecuting();
+        BodyJointCommand::ptr next = bodyCommandQueue.front();
+        next->finishedExecuting();
         bodyCommandQueue.pop();
     }
 
     if (currCommand)
-	currCommand = ChoppedCommand::ptr();
+        currCommand = ChoppedCommand::ptr();
 
     setActive();
-    pthread_mutex_unlock(&scripted_mutex);
 }
 
 //Checks if this chain is currently providing angles so that external
 //classes can check the status of this one
 void ScriptedProvider::setActive(){
     if(isDone())
+    {
         inactive();
+    }
     else
         active();
 }
@@ -95,16 +72,17 @@ bool ScriptedProvider::commandQueueEmpty(){
     return bodyCommandQueue.empty();
 }
 
-void ScriptedProvider::calculateNextJointsAndStiffnesses() {
-    PROF_ENTER(P_SCRIPTED);
-    pthread_mutex_lock(&scripted_mutex);
+void ScriptedProvider::calculateNextJointsAndStiffnesses(
+    std::vector<float>&            sensorAngles,
+    const messages::InertialState& sensorInertials,
+    const messages::FSR&           sensorFSRs)
+{
     if (currCommandEmpty())
-	setNextBodyCommand();
-
+	setNextBodyCommand(sensorAngles);
 
     // Go through the chains and enqueue the next
     // joints from the ChoppedCommand.
-    shared_ptr<vector <vector <float> > > currentChains(getCurrentChains());
+    boost::shared_ptr<std::vector <std::vector <float> > > currentChains(getCurrentChains(sensorAngles));
 
     currCommand->nextFrame(); // so Python can keep track of progress
 
@@ -124,8 +102,6 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
     }
 
     setActive();
-    pthread_mutex_unlock(&scripted_mutex);
-    PROF_EXIT(P_SCRIPTED);
 }
 
 /*
@@ -138,55 +114,48 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses() {
  * a time, even if they deal with different joints or chains.
  */
 void ScriptedProvider::setCommand(const BodyJointCommand::ptr command) {
-    pthread_mutex_lock(&scripted_mutex);
     bodyCommandQueue.push(command);
     setActive();
-    pthread_mutex_unlock(&scripted_mutex);
 }
 
 
 void ScriptedProvider::enqueueSequence(std::vector<BodyJointCommand::ptr> &seq) {
     // Take in vec of commands and enqueue them all
-    vector<BodyJointCommand::ptr>::iterator i;
+    std::vector<BodyJointCommand::ptr>::iterator i;
     for (i = seq.begin(); i != seq.end(); ++i)
 	setCommand(*i);
 }
 
-void ScriptedProvider::setNextBodyCommand() {
+void ScriptedProvider::setNextBodyCommand(std::vector<float>& sensorAngles) {
     // If there are no more commands, don't try to enqueue one
     if ( !bodyCommandQueue.empty() ) {
 	BodyJointCommand::ptr nextCommand = bodyCommandQueue.front();
 	bodyCommandQueue.pop();
 
 	// Replace the current command
-	PROF_ENTER(P_CHOPPED);
-	const bool useComPreviews = true;
-	currCommand = chopper.chopCommand(nextCommand, useComPreviews);
-	PROF_EXIT(P_CHOPPED);
+	currCommand = chopper.chopCommand(nextCommand, sensorAngles);
     }
 }
 
 // Get the chain's current positions. Gives a shared pointer to
 // a vector containing a vector for each chain. Makes accessing
 // each chain very simple.
-shared_ptr<vector<vector<float> > > ScriptedProvider::getCurrentChains() {
-    shared_ptr<vector<vector<float> > >currentChains(
-	new vector<vector<float> >(Kinematics::NUM_CHAINS) );
-
-    vector<float> currentJoints = sensors->getBodyAngles();
+boost::shared_ptr<std::vector<std::vector<float> > > ScriptedProvider::getCurrentChains(std::vector<float>& sensorAngles) {
+    boost::shared_ptr<std::vector<std::vector<float> > > currentChains(
+	new std::vector<std::vector<float> >(Kinematics::NUM_CHAINS) );
 
     unsigned int lastChainJoint,joint,chain;
     lastChainJoint= 0;
     joint = 0;
     chain = 0;
 
-    vector<vector<float> >::iterator i = currentChains->begin();
+    std::vector<std::vector<float> >::iterator i = currentChains->begin();
 
     while (i != currentChains->end() ) {
         lastChainJoint += chain_lengths[chain];
 
         for ( ; joint < lastChainJoint ; joint++) {
-            i->push_back(currentJoints.at(joint));
+            i->push_back(sensorAngles.at(joint));
         }
 
 	++i;
@@ -194,3 +163,6 @@ shared_ptr<vector<vector<float> > > ScriptedProvider::getCurrentChains() {
     }
     return currentChains;
 }
+
+} // namespace motion
+} // namespace man

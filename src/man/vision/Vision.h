@@ -1,4 +1,3 @@
-
 // This file is part of Man, a robotic perception, locomotion, and
 // team strategy application created by the Northern Bites RoboCup
 // team of Bowdoin College in Brunswick, Maine, for the Aldebaran
@@ -28,14 +27,25 @@
 #include <boost/shared_ptr.hpp>
 #include <stdint.h>
 
-#include  "visionconfig.h"
 // including info header files
 #include "Common.h"
 #include "VisionDef.h"
-#include "Profiler.h"
-#include "FieldLinesDetector.h"
 
-class Vision;   // forward reference
+// including message types
+#include "PMotion.pb.h"
+#include "InertialState.pb.h"
+#include "Images.h"
+
+namespace man {
+namespace vision {
+	class Vision;   // forward reference
+	class FieldLinesDetector;
+	class CornerDetector;
+	class HoughVisualLine;
+	class HoughVisualCorner;
+}
+}
+
 
 // including Class header files
 #include "VisualCrossbar.h"
@@ -49,13 +59,21 @@ class Vision;   // forward reference
 #include "NaoPose.h"
 #include "FieldLines.h"
 #include "VisualCorner.h"
+#include "VisualObstacle.h"
+
+namespace man {
+namespace vision {
 
 class Vision
 {
     friend class Threshold;
 
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose);
+    typedef boost::shared_ptr<Vision> ptr;
+    typedef boost::shared_ptr<const Vision> const_ptr;
+
+public:
+    Vision();
     ~Vision();
 
 private:
@@ -73,27 +91,41 @@ public:
     void copyImage(const byte *image);
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
-    void notifyImage(const uint16_t *image);
+//  void notifyImage(const uint16_t *image);
+    // for when we have two cameras
+//    void notifyImage(const uint16_t *top, const uint16_t *bot);
+    // for use with modules
+    void notifyImage(const messages::ThresholdImage& topThrIm, const messages::PackedImage16& topYIm,
+					 const messages::PackedImage16& topUIm, const messages::PackedImage16& topVIm,
+					 const messages::ThresholdImage& botThrIm, const messages::PackedImage16& botYIm,
+					 const messages::PackedImage16& botUIm, const messages::PackedImage16& botVIm,
+					 const messages::JointAngles& ja, const messages::InertialState& inert);
     // utilize the current image pointer for vision processing
-    void notifyImage();
+//    void notifyImage();
     // set the current image pointer to the given pointer
-    void setImage(const uint16_t* image);
+    void setImage(uint8_t* image);
 
     // visualization methods
-    void drawBoxes(void);
-    void drawFieldObject(VisualFieldObject* obj, int color);
-    void drawCrossbar(VisualCrossbar* obj, int color);
     void drawBox(int left, int right, int bottom, int top, int c);
+    void drawBoxes(void);
     void drawCenters(void);
-    void drawRect(int left, int top, int width, int height, int c);
-    void drawLine(int x, int y, int x1, int y1, int c);
+    void drawCrossbar(VisualCrossbar* obj, int color);
+    void drawDot(int x, int y, int c);
+    void drawEdges(Gradient& g);
+    void drawFieldLines();
+    void drawFieldObject(VisualFieldObject* obj, int color);
+    void drawHoughLines(const std::list<HoughLine>& lines);
+    void drawHoughLine(const HoughLine& line, int color);
+    void drawVisualCorners(const std::vector<HoughVisualCorner>& corners);
     void drawLine(boost::shared_ptr<VisualLine> line, const int color);
     void drawLine(const point<int> start, const point<int> end,
-		  const int c);
-    void drawDot(int x, int y, int c);
-    void drawFieldLines();
-    void drawX(int x, int y, int c);
+                  const int c);
+    void drawLine(int x, int y, int x1, int y1, int c);
     void drawPoint(int x, int y, int c);
+    void drawRect(int left, int top, int width, int height, int c);
+    void drawVisualLines(const std::vector<HoughVisualLine>& lines);
+    void drawX(int x, int y, int c);
+
 
 
     //
@@ -136,19 +168,22 @@ public:
     VisualCrossbar *ygCrossbar, *bgCrossbar;
     VisualRobot *red1, *red2, *red3;
     VisualRobot *navy1, *navy2, *navy3;
-	VisualCross *cross;
+    VisualCross *cross;
     VisualBall *ball;
-	VisualFieldEdge *fieldEdge;
+    VisualFieldEdge *fieldEdge;
     Threshold *thresh;
+    VisualObstacle* obstacles;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<FieldLines> fieldLines;
 
     fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3
 
-    const uint16_t * yImg, *uvImg;
+    const uint16_t * yImg, *uImg, *vImg;
+    const uint16_t * yImg_bot, *uImg_bot, *vImg_bot;
+    boost::shared_ptr<FieldLinesDetector> linesDetector;
+    boost::shared_ptr<CornerDetector> cornerDetector;
 
-    FieldLinesDetector linesDetector;
 protected:
     //
     // Protected Variable
@@ -194,5 +229,8 @@ private:
 
 
 };
+
+}
+}
 
 #endif // _Vision_h_DEFINED

@@ -1,4 +1,8 @@
 #include "VisualRobot.h"
+
+namespace man {
+namespace vision {
+
 VisualRobot::VisualRobot() : VisualDetection()
 {
     init();
@@ -20,7 +24,6 @@ void VisualRobot::init()
     centerY = 0;
     angleX = 0;
     angleY = 0;
-    focDist = 0;
     setDistance(0);
     setBearing(0);
     elevation = 0;
@@ -75,4 +78,7 @@ void VisualRobot::setBearingWithSD(float _bearing)
 {
     setBearing(_bearing);
     setBearingSD(robotBearingToSD(_bearing));
+}
+
+}
 }

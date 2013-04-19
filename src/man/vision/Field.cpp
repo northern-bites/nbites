@@ -53,18 +53,17 @@
 
 #include <math.h>
 #include <assert.h>
-#if ROBOT(NAO_SIM)
-#  include <aldefinitions.h>
-#endif
 #include <boost/shared_ptr.hpp>
 
 #include "Field.h"
 #include "VisualFieldEdge.h"
-#include "debug.h"
 #include "Utility.h"
 
 using namespace std;
 using boost::shared_ptr;
+
+namespace man {
+namespace vision {
 
 // Constructor for Field class. passed an instance of Vision and Pose
 Field::Field(Vision* vis, Threshold * thr)
@@ -88,7 +87,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	for (int i = 0; i < HULLS; i++) {
 		good = 0;
 		ok = 0;
-		int poseProject = thresh->blue->yProject(0, pH, i * SCANSIZE);
+		int poseProject = thresh->yellow->yProject(0, pH, i * SCANSIZE);
 		if (poseProject <= 0) {
 			poseProject = 0;
 		} else if (pH == 0) {
@@ -331,7 +330,7 @@ int Field::getInitialHorizonEstimate(int pH) {
 			//pixel = thresh->thresholded[scanY][i];
 			pixel = thresh->getColor(i, scanY);
 			// project the line to get the next y value
-			scanY = thresh->blue->yProject(0, j, i);
+			scanY = thresh->yellow->yProject(0, j, i);
 			if (Utility::isGreen(pixel)) {
 				greenPixels++;
                 // since green pixels are likely to be next to other ones
@@ -399,7 +398,7 @@ int Field::getImprovedEstimate(int horizon) {
 				run = 0;
 			}
 			// next Y value in this scan
-			scanY = thresh->blue->yProject(0, k, l);
+			scanY = thresh->yellow->yProject(0, k, l);
 		}
 		// now check how we did in this scanline - remember now we are
 		// looking for the first line where we DON'T have lots of green
@@ -424,7 +423,7 @@ int Field::getImprovedEstimate(int horizon) {
 					greenPixels++;
 					firstpix = j;
 				}
-				scanY = thresh->blue->yProject(0, k, j);
+				scanY = thresh->yellow->yProject(0, k, j);
 			}
 			// if we still meet the criteria then we are done
 			if (run < MIN_GREEN_SIZE && greenPixels < MIN_PIXELS_PRECISE) {
@@ -617,4 +616,7 @@ void Field::drawMore(int x, int y, int c)
 	vision->drawLine(x - 1, y, x - lineBuff - 1, y - lineBuff, c);
 	vision->drawLine(x - 1, y, x - lineBuff - 1, y + lineBuff, c);
 #endif
+}
+
+}
 }

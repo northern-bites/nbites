@@ -27,6 +27,9 @@
 
 //using namespace std;
 
+namespace man {
+namespace vision {
+
 Blobs::Blobs(int howMany) {
 	total = howMany;
 	blobs = (Blob*)malloc(sizeof(Blob) * howMany);
@@ -173,6 +176,23 @@ void Blobs::blobIt(int x, int y, int h, bool merge)
     }
 }
 
+//adds a blob to the blobs
+void Blobs::add(Blob blob) {
+
+    // sanity check: too many blobs on screen
+    if (numBlobs >= total) {
+        //cout << "Ran out of blob space " << color << endl;
+        // We're seeing too many blobs -it is unlikely we can do anything
+        // useful with this color
+        numBlobs = 0;
+        numberOfRuns = 0;
+        return;
+    }
+
+    blobs[numBlobs] = blob;
+    numBlobs++;
+}
+
 /* Checks if any of our blobs are overlapping.  If so, then merge then and
    eliminate one of them.
  */
@@ -259,16 +279,34 @@ Blob* Blobs::getWidest()
 */
 int Blobs::getBiggest()
 {
-	int index = 0;
+    int index = 0;
     int size = 0;
     //check each blob in the array
     for (int i = 0; i < numBlobs; i++) {
-		if (blobs[i].getArea() > size) {
+        if (blobs[i].getArea() > size) {
             size = blobs[i].getArea();
-			index = i;
+            index = i;
         }
     }
-	return index;
+    return index;
+}
+
+/*
+  Checks all of the blobs of this color and finds the biggest one.
+  returns its index. Only checks blobs after index i
+*/
+int Blobs::getBiggest(int i)
+{
+    int index = i;
+    int size = 0;
+    //check each blob in the array
+    for (i; i < numBlobs; i++) {
+        if (blobs[i].getArea() > size) {
+            size = blobs[i].getArea();
+            index = i;
+        }
+    }
+    return index;
 }
 
 
@@ -293,4 +331,90 @@ void Blobs::mergeBlobs(int first, int second)
 	zeroTheBlob(second);
 }
 
+/* Sort blobs in descending order using selection sort.
+   NOTE: if efficiency is an issue this sort can be improved
+*/
+void Blobs::sort() {
+    for (int i = 0; i < number(); i++){
+        Blob temp = blobs[i];
+        int biggest = getBiggest(i);
+        blobs[i] = blobs[biggest];
+        blobs[biggest] = temp;
+    }
+}
 
+
+void Blobs::newBlobIt(int i, int j, bool newBlob) {
+  //this method is the blobber for the macropixel array.
+  //the value 5 reflects the size of the macropixels.
+  //the modifications for using the macropixels instead
+  //of runs is the only real difference between this 
+  //and the other blobbing method.
+  int x = 5*i;
+  int y = 5*j;
+  int h = 5;
+  if (numBlobs >= total) {
+    // We're seeing too many blobs -it is unlikely we can do anything
+    // useful with this color
+    numBlobs = 0;
+    numberOfRuns = 0;
+    return;
+  }
+  //first, create new blob at coordinates
+
+  //now, check to see if new blob is close to other blob
+  for (int n = 0; n < numBlobs; n++) {
+
+    int contig = 5;
+    //checking to see if newBlob is close enough to an existing one to merge them
+    if ((x+h) >= blobs[n].getLeftTopX()) {
+      if (x <= blobs[n].getRightTopX()) {
+    if ((y+h) >= blobs[n].getRightTopY()) {
+      if (y <= blobs[n].getRightBottomY()) {
+        //this pixel will be part of an existing blob.
+        newBlob = false;
+
+        //so we will merge the blobs, check bounding boxes
+
+        //assign the right, if it is better
+        if (x+h > blobs[n].getRightTopX()) {
+          blobs[n].setRightTopX(x+h);
+          blobs[n].setRightBottomX(x+h);
+        }
+
+        //assign the top, if it is better
+        if (blobs[n].getLeftTopY() > y) {
+          blobs[n].setLeftTopY(y);
+          blobs[n].setRightTopY(y);
+        }
+
+        // assign the bottom, if it is better
+        if ((y+h) > blobs[n].getLeftBottomY()) {
+          blobs[n].setLeftBottomY(y+h);
+          blobs[n].setRightBottomY(y+h);
+        }
+        //in case a blob is newly free
+        checkForMergers();
+        break;
+      }
+    }
+      }
+    }
+  }
+  if (newBlob) {
+    blobs[numBlobs].setLeftTopX(x);
+    blobs[numBlobs].setLeftTopY(y);
+    blobs[numBlobs].setRightTopX(x+h);
+    blobs[numBlobs].setRightTopY(y);
+    blobs[numBlobs].setLeftBottomX(x);
+    blobs[numBlobs].setLeftBottomY(y+h);
+    blobs[numBlobs].setRightBottomX(x+h);
+    blobs[numBlobs].setRightBottomY(y+h);
+    blobs[numBlobs].setPixels(25);
+    blobs[numBlobs].setArea(25);
+    numBlobs++;
+  }
+}
+
+}
+}

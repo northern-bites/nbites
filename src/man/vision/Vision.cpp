@@ -34,21 +34,27 @@
 
 #include <boost/shared_ptr.hpp>
 #include "Vision.h" // Vision Class Header File
+#include "FieldLines/CornerDetector.h"
+#include "FieldLines/FieldLinesDetector.h"
 
 using namespace std;
+using namespace ::messages;
 using boost::shared_ptr;
+
+namespace man {
+namespace vision {
 
 static uint8_t global_8_image[IMAGE_BYTE_SIZE];
 static uint16_t global_16_image[IMAGE_BYTE_SIZE];
 
 // Vision Class Constructor
-Vision::Vision(shared_ptr<NaoPose> _pose)
-    : pose(_pose),
-      yImg(&global_16_image[0]), linesDetector(),
+Vision::Vision()
+    : yImg(&global_16_image[0]),
+      linesDetector(new FieldLinesDetector()),
+      cornerDetector(new CornerDetector()),
       frameNumber(0), colorTable("table.mtb")
 {
     // variable initialization
-
     /* declaring class pointers for field objects, ball, leds, lines*/
     ygrp = new VisualFieldObject(YELLOW_GOAL_RIGHT_POST);
     yglp = new VisualFieldObject(YELLOW_GOAL_LEFT_POST);
@@ -59,22 +65,23 @@ Vision::Vision(shared_ptr<NaoPose> _pose)
     ball = new VisualBall();
     red1 = new VisualRobot();
     red2 = new VisualRobot();
-	red3 = new VisualRobot();
+    red3 = new VisualRobot();
     navy1 = new VisualRobot();
     navy2 = new VisualRobot();
-	navy3 = new VisualRobot();
-	cross = new VisualCross();
-	fieldEdge = new VisualFieldEdge();
-
+    navy3 = new VisualRobot();
+    cross = new VisualCross();
+    fieldEdge = new VisualFieldEdge();
+    obstacles = new VisualObstacle();
+	
+	pose = boost::shared_ptr<NaoPose>(new NaoPose());
     thresh = new Threshold(this, pose);
-    fieldLines = shared_ptr<FieldLines>(new FieldLines(this, pose));
-    thresh->setYUV(&global_16_image[0]);
+    fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
+	// thresh->setIm(&global_8_image[0]);
 }
 
 // Vision Class Deconstructor
 Vision::~Vision()
 {
-    cout << "Vision destructor" << endl;
     delete thresh;
     delete navy2;
     delete navy1;
@@ -89,19 +96,37 @@ Vision::~Vision()
     delete ygrp;
 }
 
+
+//DO NOT USE THIS FUNCTION - bende 4/3/2013
 void Vision::copyImage(const byte* image) {
     memcpy(&global_16_image[0], image, IMAGE_BYTE_SIZE);
-    thresh->setYUV(&global_16_image[0]);
+    //thresh->setIm(&global_8_image[0]);
 }
 
-void Vision::notifyImage(const uint16_t* y) {
-    yImg = y;
-    uvImg = y + AVERAGED_IMAGE_SIZE;
+// void Vision::notifyImage(const uint16_t* y) {
+//     yImg = y;
+//     uImg = y + AVERAGED_IMAGE_SIZE;
+//     vImg = uImg + AVERAGED_IMAGE_SIZE;
 
-    // Set the current image pointer in Threshold
-    thresh->setYUV(y);
-    notifyImage();
-}
+//     // Set the current image pointer in Threshold
+//     thresh->setYUV(y);
+//     notifyImage();
+// }
+
+// void Vision::notifyImage(const uint16_t* y_top, const uint16_t* y_bot) {
+//     yImg = y_top;
+//     uImg = y_top + AVERAGED_IMAGE_SIZE;
+//     vImg = uImg + AVERAGED_IMAGE_SIZE;
+
+//     yImg_bot = y_bot;
+//     uImg_bot = y_bot + AVERAGED_IMAGE_SIZE;
+//     vImg_bot = uImg + AVERAGED_IMAGE_SIZE;
+
+//     // Set the current image pointer in Threshold
+//     thresh->setYUV(y_top);
+//     thresh->setYUV_bot(y_bot);
+//     notifyImage();
+// }
 
 /* notifyImage() -- The Image Loop
  *
@@ -118,27 +143,61 @@ void Vision::notifyImage(const uint16_t* y) {
  * -Handle image arrays if AiboConnect is requesting them
  * -Calculate Frames Per Second.
  *
+ *-----------The above is just not true-----------
+ *-----------(except for the part about it being important)-------
+ *
  */
-void Vision::notifyImage() {
+
+void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& topYIm,
+						 const PackedImage16& topUIm, const PackedImage16& topVIm,
+						 const ThresholdImage& botThrIm, const PackedImage16& botYIm,
+						 const PackedImage16& botUIm, const PackedImage16& botVIm,
+						 const JointAngles& ja, const InertialState& inert)
+{
+    yImg = topYIm.pixelAddress(0, 0);
+    uImg = topUIm.pixelAddress(0, 0);
+    vImg = topVIm.pixelAddress(0, 0);
+
+    yImg_bot = botYIm.pixelAddress(0, 0);
+    uImg_bot = botUIm.pixelAddress(0, 0);
+    vImg_bot = botVIm.pixelAddress(0, 0);
+
+    // Set the current image pointer in Threshold
+    thresh->setIm(topYIm.pixelAddress(0, 0));
+    thresh->setIm_bot(botYIm.pixelAddress(0, 0));
+
 
     // NORMAL VISION LOOP
     frameNumber++;
     // counts the frameNumber
     if (frameNumber > 1000000) frameNumber = 0;
 
-    // Transform joints into pose estimations and horizon line
-    PROF_ENTER(P_TRANSFORM);
-    pose->transform();
-    PROF_EXIT(P_TRANSFORM);
+//    linesDetector->detect(thresh->getVisionHorizon(),
+//                         thresh->field->getTopEdge(),
+//                         yImg);
+//
+//    cornerDetector->detect(thresh->getVisionHorizon(),
+//                           thresh->field->getTopEdge(),
+//                           linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
-    thresh->visionLoop();
+
+    thresh->visionLoop(ja, inert);
+    thresh->obstacleLoop(ja, inert);
+
+//    drawEdges(*linesDetector->getEdges());
+//    drawHoughLines(linesDetector->getHoughLines());
+//    drawVisualLines(linesDetector->getLines());
+//    drawVisualCorners(cornerDetector->getCorners());
+
+    thresh->transposeDebugImage();
 
     // linesDetector.detect(yImg);
 }
 
-void Vision::setImage(const uint16_t *image) {
-    thresh->setYUV(image);
+//DO NOT USE THIS FUNCTION - bende 4/3/2013
+void Vision::setImage(uint8_t *image) {
+//    thresh->setIm(image);
 }
 
 std::string Vision::getThreshColor(int _id) {
@@ -189,9 +248,9 @@ void Vision::drawBoxes(void)
     // balls
     // orange
     /*if(ball->getWidth() > 0)
-        drawRect(ball->getX(), ball->getY(),
-                 NBMath::ROUND(ball->getWidth()),
-                 NBMath::ROUND(ball->getHeight()), PINK);*/
+	  drawRect(ball->getX(), ball->getY(),
+	  NBMath::ROUND(ball->getWidth()),
+	  NBMath::ROUND(ball->getHeight()), PINK);*/
 
     // lines
     drawFieldLines();
@@ -262,29 +321,29 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c)
 
     for (int i = left; i < left + width; i++) {
         if (top >= 0 &&
-                top < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
+			top < IMAGE_HEIGHT &&
+			i >= 0 &&
+			i < IMAGE_WIDTH) {
             thresh->debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
-                (top + height) < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
+			(top + height) < IMAGE_HEIGHT &&
+			i >= 0 &&
+			i < IMAGE_WIDTH) {
             thresh->debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
         if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                left >= 0 &&
-                left < IMAGE_WIDTH) {
+			i < IMAGE_HEIGHT &&
+			left >= 0 &&
+			left < IMAGE_WIDTH) {
             thresh->debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                (left+width) >= 0 &&
-                (left+width) < IMAGE_WIDTH) {
+			i < IMAGE_HEIGHT &&
+			(left+width) >= 0 &&
+			(left+width) < IMAGE_WIDTH) {
             thresh->debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
@@ -340,23 +399,23 @@ void Vision::drawRect(int left, int top, int width, int height, int c)
             thresh->debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
-                (top + height) < IMAGE_HEIGHT &&
-                i >= 0 &&
-                i < IMAGE_WIDTH) {
+			(top + height) < IMAGE_HEIGHT &&
+			i >= 0 &&
+			i < IMAGE_WIDTH) {
             thresh->debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
         if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                left >= 0 &&
-                left < IMAGE_WIDTH) {
+			i < IMAGE_HEIGHT &&
+			left >= 0 &&
+			left < IMAGE_WIDTH) {
             thresh->debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
-                i < IMAGE_HEIGHT &&
-                (left+width) >= 0 &&
-                (left+width) < IMAGE_WIDTH) {
+			i < IMAGE_HEIGHT &&
+			(left+width) >= 0 &&
+			(left+width) < IMAGE_WIDTH) {
             thresh->debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
@@ -385,7 +444,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c)
         }
         for (int i = y; i != y1; i += sign) {
             int newx = x +
-                    static_cast<int>(slope * static_cast<float>(i - y) );
+				static_cast<int>(slope * static_cast<float>(i - y) );
 
             if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT) {
                 thresh->debugImage[i][newx] = static_cast<unsigned char>(c);
@@ -398,7 +457,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c)
         }
         for (int i = x; i != x1; i += sign) {
             int newy = y +
-                    static_cast<int>(slope * static_cast<float>(i - x) );
+				static_cast<int>(slope * static_cast<float>(i - x) );
 
             if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
                 thresh->debugImage[newy][i] = static_cast<unsigned char>(c);
@@ -445,9 +504,9 @@ void Vision::drawDot(int x, int y, int c)
 void Vision::drawFieldLines()
 {
 #ifdef OFFLINE
-    const vector< shared_ptr<VisualLine> >* lines = fieldLines->getLines();
+    const vector< boost::shared_ptr<VisualLine> >* lines = fieldLines->getLines();
 
-    for (vector< shared_ptr<VisualLine> >::const_iterator i = lines->begin();
+    for (vector< boost::shared_ptr<VisualLine> >::const_iterator i = lines->begin();
          i != lines->end(); i++) {
         drawLine(*i, BLUE);
 
@@ -538,4 +597,82 @@ void Vision::drawPoint(int x, int y, int c)
         thresh->debugImage[y][x-2] = static_cast<unsigned char>(c);
     }
 #endif
+}
+
+void Vision::drawEdges(Gradient& g)
+{
+#ifdef OFFLINE
+    if (thresh->debugEdgeDetection){
+        for (int i=0; g.isPeak(i); ++i) {
+            drawDot(g.getAnglesXCoord(i) + IMAGE_WIDTH/2,
+                    g.getAnglesYCoord(i) + IMAGE_HEIGHT/2,
+                    PINK);
+        }
+    }
+#endif
+}
+
+void Vision::drawHoughLines(const list<HoughLine>& lines)
+{
+#ifdef OFFLINE
+	if (thresh->debugHoughTransform){
+		list<HoughLine>::const_iterator line;
+		for (line = lines.begin() ; line != lines.end(); line++){
+			drawHoughLine(*line, MAROON);
+		}
+	}
+#endif
+}
+
+void Vision::drawHoughLine(const HoughLine& line, int color)
+{
+#ifdef OFFLINE
+    const double sn = line.getSinT();
+    const double cs = line.getCosT();
+
+    double uStart = 0, uEnd = 0;
+    HoughLine::findLineImageIntersects(line, uStart, uEnd);
+
+    const double x0 = line.getRadius() * cs + IMAGE_WIDTH/2;
+    const double y0 = line.getRadius() * sn + IMAGE_HEIGHT/2;
+
+    for (double u = uStart; u <= uEnd; u+=1.){
+        int x = (int)round(x0 + u * sn);
+        int y = (int)round(y0 - u * cs); // cs goes opposite direction
+        drawDot(x,y, color);
+    }
+#endif
+}
+
+void Vision::drawVisualLines(const vector<HoughVisualLine>& lines)
+{
+#ifdef OFFLINE
+    if (thresh->debugVisualLines){
+        vector<HoughVisualLine>::const_iterator line;
+        int color = 5;
+        for (line = lines.begin(); line != lines.end(); line++){
+            pair<HoughLine, HoughLine> lp = line->getHoughLines();
+            drawHoughLine(lp.first, color);
+            drawHoughLine(lp.second, color);
+            color++;
+        }
+    }
+#endif
+}
+
+void Vision::drawVisualCorners(const vector<HoughVisualCorner>& corners)
+{
+#ifdef OFFLINE
+    if (thresh->debugVisualCorners) {
+        for (vector<HoughVisualCorner>::const_iterator i = corners.begin();
+             i != corners.end(); ++i) {
+            point<int> pt = i->getImageLocation();
+            drawX(pt.x, pt.y, SEA_GREEN);
+        }
+    }
+#endif
+}
+
+
+}
 }

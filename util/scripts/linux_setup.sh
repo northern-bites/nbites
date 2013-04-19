@@ -1,114 +1,136 @@
 #!/bin/bash
 
 if [ $# -ne 1 ]; then
-	echo "usage: ./linux_setup.sh [ naoqi-version ]"
+	echo "usage: ./linux_setup.sh [naoqi-version]"
 	exit 1
 fi
 
 PACKAGES="build-essential cmake git-core \
-python2.6-dev emacs cmake-curses-gui ccache curl aptitude \
+python2.7-dev emacs cmake-curses-gui ccache curl aptitude \
 ant qt4-dev-tools"
 
-echo "Are you on 64-bit linux?(y/n)"
+echo "Are you on 64-bit linux? (y/n)"
 read IS64BIT
-echo "What version of Ubuntu are you on? (example: 11.04)"
-read VERSION
 
 if [ $IS64BIT == 'y' ]; then
-  PACKAGES="$PACKAGES g++-4.4-multilib"
+    echo ""
+    echo "64 bit Linux is NOT SUPPORTED!"
+    echo "The Northern Bites code base depends on too many 32-bit libraries."
+    echo "Please switch to 32-bit or set up your system manually."
+    echo "Exiting."
+    exit 1
 fi
 
-if [ $VERSION == '10.10' ]; then
-    echo "Downloading Java. Accept the license by pressing TAB!"
-    sudo add-apt-repository ppa:sun-java-community-team/sun-java6
-    sudo apt-get update
-    sudo apt-get install sun-java6-jdk
-    sudo update-java-alternatives -s java-6-sun
-elif [ $VERSION == '11.04' ]; then
-    echo "Downloading Java. Accept the license by pressing TAB!"
-    sudo add-apt-repository ppa:ferramroberto/java
-    sudo apt-get update
-    sudo apt-get install sun-java6-jdk
-elif [ $VERSION == '11.10' ]; then
-    echo "Downloading Java. Accept the license by pressing TAB!"
-    sudo add-apt-repository ppa:ferramroberto/java
-    sudo apt-get update
-    sudo apt-get install sun-java6-jdk
-else
-    echo "That version is not supported. Please use 10.10 or 11.04. However, \
-if you are very sure of what you're doing, you can \
-finish running the script and install Sun Java manually when it is done."
+echo ""
+echo "What version of Ubuntu are you on? (example: 12.04)"
+read VERSION
+
+if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
+
     echo ""
-    echo "Continue? (y/n)"
-    read CONTINUE
-    if [ $CONTINUE == 'n' ]; then
+    echo "That version is NOT SUPPORTED."
+    echo "Some packages will not be the right version or may not exist."
+    echo "--------------------------------------------------------------"
+    echo "If you are very sure of what you are doing, you may continue and"
+    echo "configure broken packages manually."
+    echo "Otherwise, please switch to Ubuntu 11.10 or 12.04."
+    echo ""
+    echo "Abort? (y/n)"
+    read ABORT
+    if [ $ABORT == 'y' ]; then
 	echo "Exiting."
 	exit 1
     fi
 fi
 
-echo "Downloading awesome free stuff!"
-sudo apt-get install $PACKAGES
+echo "Do you want to run the deprecated Java tool on this computer? (y/n)"
+read WANTJAVA
 
-echo "Downloading and unpacking NBites files"
+if [ $WANTJAVA == 'y' ]; then
+
+    if [ $VERSION == '11.10' ]; then
+	echo "Downloading Java. Accept the license by pressing TAB!"
+	sudo add-apt-repository ppa:ferramroberto/java
+	sudo apt-get update
+	sudo apt-get install sun-java6-jdk
+    else
+	echo "You will need to install Sun Java manually."
+	echo ""
+    fi
+fi
+
+echo ""
+echo "Downloading and installing software!"
+echo "..."
+sudo apt-get install $PACKAGES
 
 naoqi_version=$1
 robocup=robocup.bowdoin.edu:/mnt/research/robocup
 nbites_dir=$PWD/../..
 lib_dir=$nbites_dir/lib
 
-naoqi=naoqi-sdk-$naoqi_version-linux-nbites.tar.gz
-naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
-naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux
+naoqi=naoqi-sdk-$naoqi_version-linux32.tar.gz
+atom=nbites-atom-toolchain-$naoqi_version.tar.gz
+geode=nbites-geode-toolchain-$naoqi_version.tar.gz
 
-ext=ext-nbites-linux.tar.gz
+naoqi_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$naoqi
+atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
+geode_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$geode
+
+naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
+atom_local=$lib_dir/atomtoolchain
+geode_local=$lib_dir/geodetoolchain
+
+ext=ext-nbites-linux32.tar.gz
+
 ext_robocup=$robocup/software/$ext
 
 echo ""
 echo "What's your Bowdoin username?"
 read USER_NAME
 
+echo ""
+echo "Downloading and unpacking NBites files."
+
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
 rsync -v $USER_NAME@$naoqi_robocup $lib_dir/
+
+echo "Downloading Atom toolchain"
+rsync -v $USER_NAME@$atom_robocup $lib_dir/
+
+echo "Downloading Geode toolchain"
+rsync -v $USER_NAME@$geode_robocup $lib_dir/
 
 echo "Unpacking NaoQi"
 
 pushd $lib_dir
 tar -xzf $naoqi
 rm $naoqi
+
+mkdir $atom_local
+tar -xzf $atom -C $atom_local --strip-components 1
+
+mkdir $geode_local
+tar -xzf $geode -C $geode_local --strip-components 1
 popd
-
-if [ $IS64BIT == 'y' ]; then
-
-ctc=linux-x64-crosstoolchain.tar.gz
-ctc_robocup=$robocup/software/nao/cross_compiler_stuff/$ctc
-
-echo "Downloading the CTC"
-rsync -v $USER_NAME@$ctc_robocup $naoqi_local/
-
-echo "Unpacking the CTC"
-
-pushd $naoqi_local
-tar -xzf $ctc
-rm $ctc
-popd
-fi
 
 echo "Downloading external components"
 
 rsync -v $USER_NAME@$ext_robocup $nbites_dir/
 
-echo "Unpacking ext"
+echo "Unpacking external components"
 pushd $nbites_dir
 tar -xzf $ext
 rm $ext
 popd
 
-echo "Setting up git stuff .."
+echo ""
+echo "Configuring git."
 ./git_setup.sh
 
-echo "Setting up bash stuff ..."
+echo ""
+echo "Configuring bash."
 
 nbites_bash=$nbites_dir/util/scripts/nbites.bash
 
@@ -116,6 +138,8 @@ echo "export NBITES_DIR=$nbites_dir" >> $nbites_bash
 echo "export AL_DIR=$naoqi_local" >> $nbites_bash
 echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> $nbites_bash
 echo "export PATH=$nbites_dir/ext/bin:$PATH" >> $nbites_bash
+
+echo ""
 echo "Done! The last step is just to add the following line:"
 echo "source $nbites_bash"
 echo "to your .bashrc (which is in your home directory)"
@@ -124,10 +148,13 @@ echo "Would you like this to be done automatically? (y/n)"
 read AUTO
 
 if [ $AUTO == 'y' ]; then
+    echo "" >> ~/.bashrc
     echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
     echo "source $nbites_bash" >> ~/.bashrc
+    echo ""
     echo "You're good to go!"
 else
+    echo ""
     echo "Add the line manually, and you'll be all set up!"
 fi
 

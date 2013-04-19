@@ -6,6 +6,9 @@
 #include "VisionHelpers.h"
 #include <stdlib.h>
 
+namespace man {
+namespace vision {
+
 class Blob {
 public:
     Blob();
@@ -67,7 +70,8 @@ public:
     void init();
     void merge(Blob other);
     void printBlob() const;
-    bool isAligned(Blob b);
+    bool isAligned(Blob other);
+    bool contains(Blob other);
 
 private:
     // bounding coordinates of the blob
@@ -79,4 +83,6 @@ private:
     int area;
 };
 
+}
+}
 #endif // Blob_h_defined

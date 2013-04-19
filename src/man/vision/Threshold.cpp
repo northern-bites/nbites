@@ -52,53 +52,35 @@
 
 #include <math.h>
 #include <assert.h>
-#if ROBOT(NAO_SIM)
-#  include <aldefinitions.h>
-#endif
 #include <boost/shared_ptr.hpp>
 
 #include "Threshold.h"
-#include "debug.h"
 
 #include "ColorParams.h"
+#include "FieldLines/Gradient.h"
 
-using namespace std;
-using boost::shared_ptr;
+using std::cout;
+using std::max;
+using std::min;
+using std::endl;
 #define PRINT_VISION_INFO
 
+namespace man {
+namespace vision {
+
 // Constructor for Threshold class. passed an instance of Vision and Pose
-Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
+Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     : vision(vis), pose(posPtr)
 {
-
-    // loads the color table on the MS into memory
-#if ROBOT(NAO_RL)
-# if ! defined WEBOTS_BACKEND && ! defined OFFLINE
-    initTable("/home/nao/naoqi/lib/naoqi/table.mtb");
-# elif defined WEBOTS_BACKEND
-    initTable(string(string(getenv("WEBOTS_HOME"))+
-                     "/projects/contests/robotstadium/" +
-                     "controllers/nao_team_1/lib/table.mtb"));
-
-# endif
-
-#elif ROBOT(NAO_SIM)
-#  error Compressed table not set up for simulator Nao yet
-#else
-#  error Undefined robot type
-#endif // OFFLINE
-
     // Set up object recognition object pointers
     field = new Field(vision, this);
     context = new Context(vision, this, field);
-    blue = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                           field, context,
-                                                           BLUE_BIT));
-    yellow = shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
-                                                             field, context,
-                                                             YELLOW_BIT));
+    yellow = boost::shared_ptr<ObjectFragments>(new ObjectFragments(vision, this,
+																	field, context,
+																	YELLOW_BIT));
     navyblue = new Robots(vision, this, field, context, NAVY_BIT);
     red = new Robots(vision, this, field, context, RED_BIT);
+    unid = new Robots(vision, this, field, context, 0x00);
     orange = new Ball(vision, this, field, context, ORANGE_BIT);
     cross = new Cross(vision, this, field, context);
     for (int i = 0; i < IMAGE_WIDTH; i++) {
@@ -106,31 +88,192 @@ Threshold::Threshold(Vision* vis, shared_ptr<NaoPose> posPtr)
     }
 }
 
+//this loop will perform obstabcle detection, and for now it is seperate from
+//other detection, though in the future, we should change this.
+void Threshold::obstacleLoop(const messages::JointAngles& ja, const messages::InertialState& inert) {
+	vision->obstacles->init();
+
+	usingTopCamera = false;
+	/************************************/pose->transform(usingTopCamera, ja, inert);
+
+	unsigned char pixel = GREEN;
+  
+	float tempTotalLeft = 0.0, tempTotalRight = 0.0;
+	float greenLeftB = 0.0, greenRightB = 0.0;
+	float yellowLeftB = 0.0, yellowRightB = 0.0;
+	float whiteLeftB = 0.0, whiteRightB = 0.0;
+	float undefLeftB = 0.0, undefRightB = 0.0;
+	bool postBottom = false, bottomLeftFree = false, bottomRightFree = false;
+  
+	for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+		for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
+			pixel = getThresholded(j, i);
+			if (Utility::isGreen(pixel))
+				greenLeftB++;
+			else if (Utility::isYellow(pixel))
+				yellowLeftB++;
+			else if (Utility::isWhite(pixel))
+				whiteLeftB++;
+			else if (Utility::isUndefined(pixel))
+				undefLeftB++;
+			tempTotalLeft++;
+		}
+		for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
+			pixel = getThresholded(j, i);
+			if (Utility::isGreen(pixel))
+				greenRightB++;
+			else if (Utility::isYellow(pixel))
+				yellowRightB++;
+			else if (Utility::isWhite(pixel))
+				whiteRightB++;
+			else if (Utility::isUndefined(pixel))
+				undefRightB++;
+			tempTotalRight++;
+		}
+	}
+	greenLeftB /= tempTotalLeft; greenRightB /= tempTotalRight;
+	yellowLeftB /= tempTotalLeft; yellowRightB /= tempTotalRight;
+	whiteLeftB /= tempTotalLeft; whiteRightB /= tempTotalRight;
+	undefLeftB /= tempTotalLeft; undefRightB /= tempTotalRight;
+
+	/**********************************************
+	 *This is the first set of detections*
+	 *********************************************/
+	//First, we throw things out.
+	if (greenLeftB > yellowLeftB && greenLeftB > whiteLeftB && greenLeftB > undefLeftB) {
+		bottomLeftFree = true;
+	}
+	if (greenRightB > yellowRightB && greenRightB > whiteRightB && greenRightB > undefRightB) {
+		bottomRightFree = true;
+	}
+	if (bottomLeftFree && bottomRightFree) {
+		return;
+	}
+
+	//Only Posts can be uniquely thrown out in the bottom
+	if ((yellowLeftB - greenLeftB > 0.1) || (yellowRightB - greenRightB > 0.1)) {
+		if (yellowLeftB - greenLeftB > 0.1) {
+			vision->obstacles->setPostLeft(true);
+		}
+		if (yellowRightB - greenRightB > 0.1) {
+			vision->obstacles->setPostRight(true);
+		}
+		postBottom = true;
+	}
+
+
+  
+	usingTopCamera = true;
+	/****************************************************/pose->transform(usingTopCamera, ja, inert);
+  
+	tempTotalLeft = 0.0, tempTotalRight = 0.0;
+	float greenLeftT = 0.0, greenRightT = 0.0;
+	float yellowLeftT = 0.0, yellowRightT = 0.0;
+	float whiteLeftT = 0.0, whiteRightT = 0.0;
+	float undefLeftT = 0.0, undefRightT = 0.0;
+	bool topLeftFree = false, topRightFree = false;
+
+	for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+		for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
+			pixel = getThresholded(j, i);
+			if (Utility::isGreen(pixel))
+				greenLeftT++;
+			else if (Utility::isYellow(pixel))
+				yellowLeftT++;
+			else if (Utility::isWhite(pixel))
+				whiteLeftT++;
+			else if (Utility::isUndefined(pixel))
+				undefLeftT++;
+			tempTotalLeft++;
+		}
+		for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
+			pixel = getThresholded(j, i);
+			if (Utility::isGreen(pixel))
+				greenRightT++;
+			else if (Utility::isYellow(pixel))
+				yellowRightT++;
+			else if (Utility::isWhite(pixel))
+				whiteRightT++;
+			else if (Utility::isUndefined(pixel))
+				undefRightT++;
+			tempTotalRight++;
+		}
+	}
+	greenLeftT /= tempTotalLeft; greenRightT /= tempTotalRight;
+	yellowLeftT /= tempTotalLeft; yellowRightT /= tempTotalRight;
+	whiteLeftT /= tempTotalLeft; whiteRightT /= tempTotalRight;
+	undefLeftT /= tempTotalLeft; undefRightT /= tempTotalRight;
+
+
+	/***********************************************************
+	 *This is the second set of detections*
+	 **********************************************************/
+	if(!bottomLeftFree) { //if no obstacle in bottom, then not in top either
+		if (greenLeftT > yellowLeftT && greenLeftT > whiteLeftT && greenLeftT > undefLeftT && 
+			!vision->obstacles->onLeft()) {
+			topLeftFree = true;
+		}
+		if (!topLeftFree) { // same principle as !bottomLeftFree
+			if (undefLeftT - (greenLeftT + whiteLeftT + yellowLeftT) > 0.1) {
+				vision->obstacles->setOffField(true);
+			} 
+			else if (whiteLeftT > greenLeftT && (undefLeftT - (whiteLeftT + greenLeftT) < 0.1)) {
+				vision->obstacles->setLeft(true);
+			}
+		}
+	}
+
+
+
+	if (!bottomRightFree) { //if no obstacle in bottom, not in top either
+		if (greenRightT > yellowRightT && greenRightT > whiteRightT && greenRightT > undefRightT &&
+			!vision->obstacles->onRight()) {
+			topRightFree = true;
+		}
+		if (!topRightFree) { // same principle as !bottomRightFree
+			if (undefRightT - (greenRightT + whiteRightT + yellowRightT) > 0.1) {
+				vision->obstacles->setOffField(true);
+			} 
+			else if (whiteRightT > greenRightT && (undefRightT - (whiteRightT + greenRightT) < 0.1)) {
+				vision->obstacles->setRight(true);
+			}
+		}  
+    
+	}
+  
+}
+
 /* Main vision loop, called by Vision.cc
  */
-void Threshold::visionLoop() {
+void Threshold::visionLoop(const messages::JointAngles& ja, const messages::InertialState& inert) {
+    usingTopCamera = true;
+
+	//cout << "doing the visionloop\n";
+    pose->transform(usingTopCamera, ja, inert);
+
+
     // threshold image and create runs
     thresholdAndRuns();
+
+    newFindRobots();
+
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-    PROF_ENTER(P_LINES);
+
     vision->fieldLines->lineLoop();
-    PROF_EXIT(P_LINES);
+
 
     // do recognition
-    PROF_ENTER(P_OBJECT);
+
     objectRecognition();
-    PROF_EXIT(P_OBJECT);
+
 
     vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
-    if (vision->bgCrossbar->getWidth() > 0) {
-        setShot(vision->bgCrossbar);
-    }
-    if (vision->ygCrossbar->getWidth() > 0) {
+	if (vision->ygCrossbar->getWidth() > 0) {
         setShot(vision->ygCrossbar);
     }
     // for now we also don't use open field information
@@ -140,14 +283,84 @@ void Threshold::visionLoop() {
     if (visualHorizonDebug) {
         drawVisualHorizon();
     }
-    transposeDebugImage();
 #endif
+
+    if (vision->ball->getRadius() == 0) {
+      
+		usingTopCamera = false;
+      
+      
+		/*****************************************/pose->transform(usingTopCamera, ja, inert);
+
+      
+		orange->init(pose->getHorizonSlope());
+		lowerRuns();
+      
+		vision->ball->init();
+		vision->ball->setTopCam(usingTopCamera);
+      
+		if (horizon < IMAGE_HEIGHT) {
+			orange->createBall(horizon);
+		} else {
+			orange->createBall(pose->getHorizonY(0));
+		}
+    }
+    bool left = vision->yglp->getWidth() > 0;
+    bool right = vision->ygrp->getWidth() > 0;
+    bool ylp = left &&
+		(vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+		 vision->yglp->getRightBottomY() > IMAGE_HEIGHT - 5);
+    bool yrp = right &&
+		(vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+		 vision->ygrp->getRightBottomY() > IMAGE_HEIGHT - 5);
+    
+    if ((ylp || yrp) && !(left && right)) {
+		usingTopCamera = false;
+      
+		/************************************************/pose->transform(usingTopCamera, ja, inert);
+		yellow->init(pose->getHorizonSlope());
+		if (ylp) {
+			vision->yglp->init();
+			vision->yglp->setTopCam(usingTopCamera);
+		}
+		if (yrp) {
+			vision->ygrp->init();
+			vision->ygrp->setTopCam(usingTopCamera);
+		}
+		int lowYellow = 0;
+		for (int i = 0; i < IMAGE_WIDTH; i++) {
+			int result = findPostsInLowerCamera(i);
+			if (result > lowYellow) {
+				lowYellow = result;
+			}
+		}
+		//cout << "Low yellow is " << lowYellow << endl;
+		yellow->createObject();
+		if (ylp) {
+			vision->yglp->setLeftTopY(0);
+			vision->yglp->setRightTopY(0);
+			// make sure we use pix estimate
+			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+			vision->yglp->setTopCam(usingTopCamera);
+			setFieldObjectInfo(vision->yglp);
+			//cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
+		}
+		if (yrp) {
+			vision->ygrp->setLeftTopY(0);
+			vision->ygrp->setRightTopY(0);
+			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+			vision->ygrp->setTopCam(usingTopCamera);
+			setFieldObjectInfo(vision->ygrp);
+			//cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
+		}
+      
+    }
 }
 
 /*
  * Threshold and runs.  The goal here is to scan the image and collect up "runs"
  * of color.
- * The ones we're particularly interested in are blue, yellow, orange and green
+ * The ones we're particularly interested in are yellow, orange and green
  * (also red and dark blue).
  * Then we send the runs off to the object recognition system.  We scan the
  * image from bottom to top. Along the way we keep track of things like: where
@@ -156,22 +369,22 @@ void Threshold::visionLoop() {
  * NOTE: The name is now a misnomer.  We no longer threshold here.
  */
 void Threshold::thresholdAndRuns() {
-    PROF_ENTER(P_THRESHRUNS); // profiling
+ 
 
     initColors();
 
     // Determine where the field horizon is
-    PROF_ENTER(P_FGHORIZON);
+ 
     horizon = field->findGreenHorizon(pose->getHorizonY(0),
                                       pose->getHorizonSlope());
-    PROF_EXIT(P_FGHORIZON);
+ 
 
     // 'Run' up the image to find color-grouped pixel sequences
-    PROF_ENTER(P_RUNS);
+ 
     runs();
-    PROF_EXIT(P_RUNS);
+ 
 
-    PROF_EXIT(P_THRESHRUNS);
+ 
 }
 
 /* Thresholding.  Since there's no real benefit (and in fact can it can be a
@@ -218,16 +431,16 @@ void Threshold::thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg) {
 }
 
 /*  Returns the color at the sent in point.  If we aren't using color tables
-	it does a lookup in the big table, otherwise it just gets the thresholded
-	value.
- */
+    it does a lookup in the big table, otherwise it just gets the thresholded
+    value.
+*/
 unsigned char Threshold::getColor(int x1, int y1) {
     return getThresholded(y1,x1);
 }
 
 /*  When we have identified a possible post we open up the color spectrum a
-	bit to get better coverage.
- */
+    bit to get better coverage.
+*/
 
 unsigned char Threshold::getExpandedColor(int x, int y, unsigned char col) {
     return getColor(x, y);
@@ -247,9 +460,9 @@ void Threshold::runs() {
     // back when the robots had colored shoulder pads we worried about seeing them
     detectSelf();
 #endif
-	for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
-		pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
-	}
+    for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
+        pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+    }
     for (int i = 0; i < NUMBLOCKS; i++) {
         block[i] = 0;
         evidence[i] = 0;
@@ -268,6 +481,18 @@ void Threshold::runs() {
     }
 }
 
+/** Does the same thing as the previous function (runs) except for
+ * the lower camera.  Just looks for the ball.
+ */
+void Threshold::lowerRuns() {
+    for (int i = 0; i < IMAGE_WIDTH; i += 1) {
+        int topEdge = max(0, field->horizonAt(i));
+		findBallLowerCamera(i, 0);
+		//debugSelf = true;
+		//detectSelf();
+    }
+}
+
 /** Ideally goals will be either right at the field edge, or will have part above
  * and part below.  So we scan up from the edge and also scan down.  All we're doing
  * is trying to collect big runs of either BLUE or YELLOW.  We tolerate some noise.
@@ -277,31 +502,19 @@ void Threshold::runs() {
  */
 
 void Threshold::findGoals(int column, int topEdge) {
-    const int BADSIZE = 10;
-	const int GAP = 15;
+    const int BADSIZE = 15;
+    const int GAP = BADSIZE * 2;
     // scan up for goals
-    int bad = 0, blues = 0, yellows = 0, pinks = 0;
-    int firstBlue = topEdge, firstYellow = topEdge, lastBlue = topEdge,
+    int bad = 0, yellows = 0, pinks = 0, navy = 0;
+    int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
         lastYellow = topEdge, firstPink = topEdge, lastPink = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
-	int blueRun = 0;
-	bool faceDown2 = pose->getHorizonY(0) < -100;
-    for (int j = topEdge; bad < BADSIZE && j >= 0; j--) {
+    bool faceDown2 = pose->getHorizonY(0) < -100;
+    int j;
+    for (j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
-        if (Utility::isBlue(pixel)) {
-			if (j - lastBlue < 4) {
-				lastBlue = j;
-				if (!faceDown2) {
-					blues++;
-					bad--;
-				}
-				if (firstBlue == topEdge) {
-					firstBlue = j;
-				}
-			}
-        }
         if (Utility::isYellow(pixel)) {
             lastYellow = j;
             yellows++;
@@ -313,68 +526,104 @@ void Threshold::findGoals(int column, int topEdge) {
         if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
         }
-		if (Utility::isRed(pixel)) {
-			lastPink = j;
-			pinks++;
-			bad++;
-			if (firstPink == topEdge) {
-				firstPink = j;
-			}
-		}
+        if (Utility::isNavy(pixel)) {
+            lastNavy = j;
+            navy++;
+            if (firstNavy == topEdge) {
+                firstNavy = j;
+            }
+        }
+        if (Utility::isRed(pixel)) {
+            lastPink = j;
+            pinks++;
+            if (firstPink == topEdge) {
+                firstPink = j;
+            }
+        }
         if (Utility::isUndefined(pixel)) {
             bad++;
         }
-		if (lastYellow - j > GAP && lastBlue - j > GAP) {
-			break;
-		}
+        if (lastYellow - j > GAP) {
+            break;
+        }
     }
     // now do the same going down from the horizon
     bad = 0;
-	blueRun = 0;
-	int greens = 0;
-    for (int j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
+    int greens = 0;
+    for (j = topEdge + 1; bad < BADSIZE && j < lowerBound[column]; j++) {
         // note:  These were thresholded in the findBallsCrosses loop
         unsigned char pixel = getThresholded(j,column);
         bool found = false;
-        if (Utility::isBlue(pixel) && !Utility::isGreen(pixel)) {
-            blues++;
-			blueRun++;
-			if (blueRun > 3 && greens < 4) {
-				firstBlue = j;
-			}
-            found = true;
-        }
         if (Utility::isYellow(pixel)) {
             firstYellow = j;
             yellows++;
-			blueRun = 0;
             found = true;
         }
+
         if (Utility::isNavy(pixel) || Utility::isRed(pixel)) {
             robots++;
+            found = true;
+            if (Utility::isNavy(pixel)) {
+                navy++;
+                firstNavy = j;
+            } else {
+                pinks++;
+                firstPink = j;
+            }
+        }
+
+        if (Utility::isGreen(pixel)) {
+            bad++;
+            greens++;
+        }
+        if (!found) {
+            bad++;
+        }
+    }
+    if (yellows > 10) {
+        yellow->newRun(column, lastYellow, firstYellow - lastYellow);
+    }
+
+    if (pinks > 5) {
+        red->newRun(column, lastPink, firstPink - lastPink);
+    }
+    if (navy > 5) {
+        navyblue->newRun(column, lastNavy, firstNavy - lastNavy);
+    }
+
+    if (shoot[column] && robots > 5) {
+        shoot[column] = false;
+    }
+}
+
+int Threshold::findPostsInLowerCamera(int column) {
+    const int BADSIZE = 10;
+    // scan up for goals
+    int bad = 0, yellows = 0;
+    int firstYellow = 0;
+    int j;
+    bad = 0;
+    int greens = 0;
+    for (j = 0; bad < BADSIZE && j < lowerBound[column]; j++) {
+        unsigned char pixel = getThresholded(j,column);
+        bool found = false;
+        if (Utility::isYellow(pixel)) {
+            firstYellow = j;
+            yellows++;
             found = true;
         }
         if (Utility::isGreen(pixel)) {
             bad++;
-			blueRun = 0;
-			greens++;
+            greens++;
         }
         if (!found) {
             bad++;
-			blueRun = 0;
         }
     }
-    if (blues > 10) {
-        blue->newRun(column, lastBlue, firstBlue - lastBlue);
-    } else if (yellows > 10) {
-        yellow->newRun(column, lastYellow, firstYellow - lastYellow);
+    if (yellows > 10) {
+        yellow->newRun(column, 0, firstYellow);
     }
-	if (pinks > 5) {
-		red->newRun(column, lastPink, firstPink - lastPink);
-	}
-    if (shoot[column] && robots > 5) {
-        shoot[column] = false;
-    }
+	return firstYellow;
 }
 
 /* Balls and field crosses can only be on the actual field.  So we scan
@@ -396,13 +645,13 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
     int robots = 0, greens = 0, greys = 0;
     int lastGood = IMAGE_HEIGHT - 1;
     int maxWhite = 0;
-	bool faceDown = pose->getHorizonY(0) < 0;
-	bool faceDown2 = pose->getHorizonY(0) < -100;
+    bool faceDown = pose->getHorizonY(0) < 0;
+    bool faceDown2 = pose->getHorizonY(0) < -100;
     shoot[column] = true;
     // if a ball is in the middle of the boundary, then look a little lower
     if (bound < IMAGE_HEIGHT - 1) {
         while (bound < IMAGE_HEIGHT &&
-			   Utility::isOrange(getColor(column, bound))) {
+               Utility::isOrange(getColor(column, bound))) {
             bound++;
         }
     }
@@ -420,12 +669,12 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         // otherwise, do stuff according to color
         if (lastPixel != pixel || j == topEdge) { // end of column
             // Note: pixel can contain multiple colors, so we check all of them
-			if (Utility::isOrange(lastPixel)) {
+            if (Utility::isOrange(lastPixel)) {
                 // add to Ball data structure
                 //drawPoint(column, j, MAROON);
                 if (j == topEdge) {
                     while (j > 0 && Utility::isOrange(getThresholded(j,column)))
-					{
+                    {
                         currentRun++;
                         j--;
                     }
@@ -434,8 +683,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     orange->newRun(column, j, currentRun);
                 }
                 greens += currentRun;
-			}
-			if (Utility::isWhite(lastPixel)) {
+            }
+            if (Utility::isWhite(lastPixel)) {
                 // add to the cross data structure
                 if (currentRun > 2) {
                     cross->newRun(column, j, currentRun);
@@ -443,8 +692,8 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         maxWhite = currentRun;
                     }
                 }
-			}
-			if (Utility::isUndefined(lastPixel)) {
+            }
+            if (Utility::isUndefined(lastPixel)) {
                 if (currentRun > 15) {
                     greys+= currentRun;
                 }
@@ -458,22 +707,23 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         vision->drawPoint(column, j + currentRun, MAROON);
                     }
                 }
-			}
-			if (Utility::isGreen(lastPixel)) {
+            }
+            if (Utility::isGreen(lastPixel)) {
                 greens+= currentRun;
                 lastGood = j;
-				// we often see navy in shadowed places
-				if (currentRun > 3) {
-					robots = 0;
-				}
-			}
-			if (Utility::isNavy(lastPixel)) {
+                // we often see navy in shadowed places
+                if (currentRun > 3) {
+                    robots = 0;
+                }
+            }
+
+            if (Utility::isNavy(lastPixel)) {
                 robots+= currentRun;
                 if (currentRun > 5) {
                     navyblue->newRun(column, j, currentRun);
                 }
                 if (robots > 10 && column > 10 && column < IMAGE_WIDTH - 10
-					&& shoot[column] && !faceDown) {
+                    && shoot[column] && !faceDown) {
                     evidence[column / divider]++;
                     if (block[column / divider] < j + currentRun) {
                         block[column / divider] = lastGood;//j + currentRun;
@@ -484,9 +734,9 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                     }
                 }
             }
-			if (Utility::isRed(lastPixel)) {
+            if (Utility::isRed(lastPixel)) {
                 robots+= currentRun;
-                if (currentRun > 3) {
+                if (currentRun > 5) {
                     red->newRun(column, j, currentRun);
                 }
                 if (robots > 10 && shoot[column]) {
@@ -499,27 +749,27 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
                         vision->drawPoint(column, j + currentRun, MAROON);
                     }
                 }
-			}
+            }
             // since this loop runs when a run ends, restart # pixels in run counter
             currentRun = 1;
         }
         lastPixel = pixel;
         /*if (isOrange(pixel)) {
-            while (j >= topEdge && isOrange(getThresholded(j, column))) {
-                currentRun++;
-                j--;
-            }
+		  while (j >= topEdge && isOrange(getThresholded(j, column))) {
+		  currentRun++;
+		  j--;
+		  }
 
-            currentRun--;
-            j++;
+		  currentRun--;
+		  j++;
 
-            if ((j == 0 || j >= topEdge) && currentRun > 2) {
-                orange->newRun(column, j, currentRun);
-            }
+		  if ((j == 0 || j >= topEdge) && currentRun > 2) {
+		  orange->newRun(column, j, currentRun);
+		  }
 
-            greens+= currentRun;
-            lastPixel = ORANGE;
-			}*/
+		  greens+= currentRun;
+		  lastPixel = ORANGE;
+		  }*/
     }
     if (shoot[column] && greens < (bound - topEdge) / 2) {
         if (block[column / divider] == 0) {
@@ -529,6 +779,48 @@ void Threshold::findBallsCrosses(int column, int topEdge) {
         shoot[column] = false;
         if (debugShot) {
             vision->drawPoint(column, IMAGE_HEIGHT - 4, RED);
+        }
+    }
+}
+
+/* For starters with the bottom camera we'll only look for the ball.
+ * @param column     the current vertical scanline
+ * @param topEdge    the top of the field in that scanline
+ */
+
+void Threshold::findBallLowerCamera(int column, int topEdge) {
+    // scan down finding balls and crosses
+    static const int SCANSIZE = 8;
+    int currentRun = 0;
+    int bound = IMAGE_HEIGHT - 1;//lowerBound[column];
+    // if a ball is in the middle of the boundary, then look a little lower
+    if (bound < IMAGE_HEIGHT - 1) {
+        while (bound < IMAGE_HEIGHT &&
+               Utility::isOrange(getColor(column, bound))) {
+            bound++;
+        }
+    }
+    // scan down the column looking for ORANGE
+    for (int j = bound; j >= topEdge; j-= SCANSIZE) {
+        // get the next pixel
+        currentRun = 0;
+        unsigned char pixel = getThresholded(j,column);
+        if (Utility::isOrange(pixel)) {
+            //drawPoint(column, j, MAROON);
+            int scanner = j+1;
+            while (scanner < j + SCANSIZE &&
+                   Utility::isOrange(getThresholded(scanner, column))) {
+                currentRun++;
+                scanner++;
+            }
+            while (j > 0 && Utility::isOrange(getThresholded(j,column)))
+            {
+                currentRun++;
+                j--;
+            }
+            if (currentRun > 1) {
+                orange->newRun(column, j, currentRun);
+            }
         }
     }
 }
@@ -571,14 +863,14 @@ void Threshold::setOpenFieldInformation() {
    image and work our way out.  The results indicate whether we should kick, and
    also suggest a direction to move if the kick would be blocked.
    @param   one         The "crossbar" which is our target area, also used to return
-                        results
- */
+   results
+*/
 
 void Threshold::setShot(VisualCrossbar* one) {
     int bx = one->getLeftBottomX(), brx = one->getRightBottomX();
     const int WIDTH_DIVISOR = 5;   // gives a percent of the width
     int lx = one->getLeftTopX(), ly = one->getLeftTopY(),
-            rx = one->getRightTopX(), ry = one->getRightTopY();
+		rx = one->getRightTopX(), ry = one->getRightTopY();
     if (debugShot) {
         cout << "Looking for shot " << bx << " " << brx << endl;
     }
@@ -598,7 +890,7 @@ void Threshold::setShot(VisualCrossbar* one) {
     for ( ;r1 < brx && r1 >= bx && shoot[r1]; r1--) {}
     for ( ;r2 > bx && r2 <= rx && shoot[r2]; r2++) {}
     if (r2 - r1 < MINSHOTWIDTH || abs(r1 - IMAGE_WIDTH / 2) < MINSHOTWIDTH / 2||
-            abs(r2 - IMAGE_WIDTH / 2) < MINSHOTWIDTH) {
+		abs(r2 - IMAGE_WIDTH / 2) < MINSHOTWIDTH) {
         one->setShoot(false);
         one->setBackLeft(-1);
         one->setBackRight(-1);
@@ -638,7 +930,7 @@ void Threshold::setShot(VisualCrossbar* one) {
     }
     if (debugShot) {
         cout << "Crossbar info: Left Col: " << r1 << " Right Col: " << r2
-                << " Dir: " << one->getBackDir();
+			 << " Dir: " << one->getBackDir();
         if (one->shotAvailable()) {
             cout << " Take the shot!" << endl;
         } else {
@@ -684,9 +976,9 @@ void Threshold::setBoundaryPoints(int x1, int y1, int x2, int y2, int x3, int y3
 }
 
 /** Detect the shoulders of the robot and ignore them.  Our goal is to set lower
-	bounds for all of the vertical scanlines.
-	To Do:  Detect feet and hands.
- */
+    bounds for all of the vertical scanlines.
+    To Do:  Detect feet and hands.
+*/
 void Threshold::detectSelf() {
     // To do:  This boundary could be much better.
     // To do:  Detect feet and arms too
@@ -703,6 +995,12 @@ void Threshold::detectSelf() {
     const int TOPRIGHT = 250;
     const int HIGHBOUND = -50;
     const int COMPENSATION = 20;
+#ifdef OFFLINE
+	if (debugSelf) {
+		cout << "Boundaries " << pixInImageLeft << " " <<
+			pixInImageRight << endl;
+	}
+#endif
 
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
@@ -771,186 +1069,202 @@ int Threshold::getRobotBottom(int x, int c) {
     return navyBottoms[x];
 }
 
-/* Check if a robot is close enough to a post that we need to worry about
-   recognizing one as the other
-   @param robot         a robot wearing a navy uniform - we think
-   @param post          a blue post - we think
-   @return              true when they are close
- */
-bool Threshold::overlap(VisualRobot* robot, VisualFieldObject* post) {
-    int left = robot->getLeftTopX();
-    int right = robot->getRightTopX();
-    int left2 = post->getLeftTopX();
-    int right2 = post->getRightTopX();
-    if (distance(left, right, left2, right2) < 25) {
-        return true;
-    }
-    return false;
-}
 
+void Threshold::newFindRobots() {
 
-/* A blue robot and a blue post appear to align vertically.  This will almost
-   never happen for real.  So get rid of one of them.
-   @param robot       a blue robot
-   @param post        a blue post
-   @return            the status of whether it is a post or not
- */
-bool Threshold::checkRobotAgainstBluePost(VisualRobot* robot,
-                                          VisualFieldObject* post) {
-    if (overlap(robot, post)) {
-        int topRobot = robot->getLeftTopY();
-        int topPost = post->getLeftTopY();
-        // Essentially if the post extends above the uniform in the visual
-        // field then it is most likely a post.  If they are the same, then
-        // it is probably a post
-        // ToDo: Make this more robust
-        if (topRobot - topPost > 15) {
-            robot->init();
-        } else {
-            post->init();
-            return false;
+    //this is the robot detection method.
+    //we perform robot detection by performing another pass through the image
+    //and looking for filled macro pixels of red or navy.
+
+    //we want macro pixels of this size
+    int widthScale = Robots::widthScale;
+    int heightScale = Robots::heightScale;
+    unsigned char pixel = GREEN;
+    float navyColorCount = 0;
+    float redColorCount = 0;
+    float totalCellCount = (float) (widthScale * heightScale);
+
+    //in this loop, we go first through the macro pixels,
+    //then, in each macro pixel, we count how much red or navy
+    //there is in it. Then we determine if there is enough to be interested
+    //in that particular macro pixel
+    for (int i = 0; i < IMAGE_WIDTH; i += widthScale) {
+        for (int j = 0; j < IMAGE_HEIGHT; j += heightScale) {
+            pixel = getThresholded(j, i);
+            if (Utility::isNavy(pixel))
+                navyblue->incImageBox(i / widthScale, j / heightScale);
+            else if (Utility::isRed(pixel))
+                red->incImageBox(i / widthScale, j / heightScale);
         }
     }
-    return true;
+    for (int i = 0; i < IMAGE_WIDTH / widthScale; i++) {
+        for (int j = 0; j < IMAGE_HEIGHT / heightScale; j++) {
+            navyColorCount = (float)navyblue->getImageBox(i, j);
+            redColorCount  = (float)red->getImageBox(i, j);
+            if (navyColorCount / totalCellCount >= 0.6) {
+                navyblue->setImageBox(i, j, 1);
+                //the following line allows us to see which pixel has been activated.
+                //vision->drawRect(i, j, widthScale, heightScale, MAROON);
+            }
+            if (redColorCount / totalCellCount >= 0.4) {
+                red->setImageBox(i, j, 1);
+                //vision->drawRect(i, j, widthScale, heightScale, WHITE);
+            }
+            navyColorCount = 0;
+            redColorCount = 0;
+        }
+    }
 }
+
+void Threshold::identifyGoalie() {
+    int leftX, rightX, topY, bottomY;
+    leftX = vision->ygrp->getRightBottomX();
+    rightX = vision->yglp->getLeftBottomX();
+    topY = min(vision->ygrp->getRightTopY(), vision->yglp->getLeftTopY());
+    bottomY = max(vision->ygrp->getRightBottomY(), vision->yglp->getLeftBottomY());
+    bool redRobot = false, navyRobot = false;
+    // first just check if we already identified any robots
+    if (vision->red1->getHeight() > 0) {
+        int redX = vision->red1->getCenterX();
+        if (redX > leftX && redX < rightX) {
+            redRobot = true;
+        }
+    }
+    if (vision->navy1->getHeight() > 0) {
+        int navyX = vision->navy1->getCenterX();
+        if (navyX > leftX && navyX < rightX) {
+            navyRobot = true;
+        }
+    }
+    // scan the box
+    int height = bottomY - topY;
+    int redTotal = 0, navyTotal = 0, redRun = 0, navyRun = 0, currentRun = 0;
+    int columnRed = 0, columnNavy = 0;
+    int whiteBefore = 0;
+    int navyCols = 0, redCols = 0;
+    for (int i = leftX; i < rightX; i++) {
+        whiteBefore = 0;
+        columnRed = 0;
+        columnNavy = 0;
+        for (int j = bottomY; j > topY; j--) {
+            if (Utility::isWhite(getColor(i, j))) {
+                whiteBefore++;
+            }
+            if (Utility::isRed(getColor(i, j))) {
+                j--;
+                redTotal++;
+                currentRun = 1;
+                if (whiteBefore > 20) {
+                    while (Utility::isRed(getColor(i, j))) {
+                        j--;
+                        currentRun++;
+                        redTotal++;
+                    }
+                    if (currentRun > 3) {
+                        redRun += currentRun;
+                        columnRed += currentRun;
+                    }
+                }
+            }
+            if (Utility::isNavy(getColor(i, j))) {
+                j--;
+                navyTotal++;
+                currentRun = 1;
+                if (whiteBefore > 20) {
+                    while (Utility::isNavy(getColor(i, j))) {
+                        j--;
+                        currentRun++;
+                        navyTotal++;
+                    }
+                    if (currentRun > 3) {
+                        navyRun += currentRun;
+                        columnNavy += currentRun;
+                    }
+                }
+            }
+        }
+        if (whiteBefore > height / 3) {
+            if (columnRed > 1) {
+                redCols++;
+            }
+            if (columnNavy > 1) {
+                navyCols++;
+            }
+        }
+    }
+    /*cout << "Goalie box " << leftX << " " << rightX << " " << bottomY << " " <<
+	  topY << endl;
+	  cout << "Red " << redTotal << " blue " << navyTotal << endl;
+	  cout << "Runs red " << redRun << " navy " << navyRun << endl;
+	  cout << "Red cols " << redCols << " navy cols " << navyCols << endl; */
+    if ((redRobot || (redCols > 2 * navyCols && redCols > 5)) && !navyRobot) {
+        if (debugShot) {
+            cout << "Red goalie " << endl;
+        }
+        vision->yglp->setRedGoalieCertain();
+        vision->ygrp->setRedGoalieCertain();
+    } else if ((navyRobot || (navyCols > 2 * redCols && navyCols > 5)) && !redRobot) {
+        if (debugShot) {
+            cout << "Navy goalie " << endl;
+        }
+        vision->yglp->setNavyGoalieCertain();
+        vision->ygrp->setNavyGoalieCertain();
+    } else if (redCols > 1 && navyCols == 0 && redTotal > 30 && !navyRobot) {
+        if (debugShot) {
+            cout << "Probably a red goalie" << endl;
+        }
+        vision->yglp->setRedGoalieProbable();
+        vision->ygrp->setRedGoalieProbable();
+    } else if (navyCols > 1 && redCols == 0 && navyTotal > 30 && !redRobot) {
+        if (debugShot) {
+            cout << "Probably a navy goalie" << endl;
+        }
+        vision->yglp->setNavyGoalieProbable();
+        vision->ygrp->setNavyGoalieProbable();
+    }
+}
+
 
 /*  Makes the calls to the vision system to recognize objects.  Then performs
  * some extra sanity checks to make sure we don't have weird cases.
  */
-
 void Threshold::objectRecognition() {
     initObjects();
     // now get the posts and goals
-	// we need to make the white blobs before checking on robots
+
+    // we need to make the white blobs before checking on robots
     cross->createObject();
     red->robot(cross);
     navyblue->robot(cross);
+    //red->findRobots(cross);
+    //navyblue->findRobots(cross);
+    //unid->findRobots(cross);
     yellow->createObject();
-    blue->createObject();
     cross->checkForCrosses();
 
     bool ylp = vision->yglp->getWidth() > 0;
     bool yrp = vision->ygrp->getWidth() > 0;
-    bool blp = vision->bglp->getWidth() > 0;
-    bool brp = vision->bgrp->getWidth() > 0;
-
-    // make sure we don't see a blue post in a Navy uniform
-    // or for that matter a navy uniform in a blue post
-    // Note: It may be that this sort of thing should be moved to Context
-    if (vision->navy1->getWidth() > 0) {
-        if (blp) {
-            blp = checkRobotAgainstBluePost(vision->navy1, vision->bglp);
-        }
-        if (brp) {
-            brp = checkRobotAgainstBluePost(vision->navy1, vision->bgrp);
-        }
-    }
-    if (vision->navy2->getWidth() > 0) {
-        if (blp) {
-            blp = checkRobotAgainstBluePost(vision->navy2, vision->bglp);
-        }
-        if (brp) {
-            brp = checkRobotAgainstBluePost(vision->navy2, vision->bgrp);
-        }
-    }
-    if (vision->navy3->getWidth() > 0) {
-        if (blp) {
-            blp = checkRobotAgainstBluePost(vision->navy3, vision->bglp);
-        }
-        if (brp) {
-            brp = checkRobotAgainstBluePost(vision->navy3, vision->bgrp);
-        }
-    }
-
-    if ((ylp || yrp) && (blp || brp)) {
-        // we see one of each, so pick the biggest one
-        float ylpw = vision->yglp->getWidth();
-        float yrpw = vision->ygrp->getWidth();
-        float blpw = vision->bglp->getWidth();
-        float brpw = vision->bgrp->getWidth();
-        if (ylpw > yrpw) {
-            if (blpw > brpw) {
-                if (ylpw > blpw) {
-                    vision->bglp->init();
-                    vision->bgrp->init();
-                }
-                else {
-                    vision->yglp->init();
-                    vision->ygrp->init();
-                }
-            } else {
-                if (ylpw > brpw) {
-                    vision->bgrp->init();
-                    vision->bglp->init();
-                }
-                else {
-                    vision->yglp->init();
-                    vision->ygrp->init();
-                }
-            }
-        } else {
-            if (blpw > brpw) {
-                if (yrpw > blpw) {
-                    vision->bglp->init();
-                    vision->bgrp->init();
-                }
-                else {
-                    vision->ygrp->init();
-                    vision->yglp->init();
-                }
-            } else {
-                if (yrpw > brpw) {
-                    vision->bglp->init();
-                    vision->bgrp->init();
-                }
-                else {
-                    vision->yglp->init();
-                    vision->ygrp->init();
-                }
-            }
-            //}
-        }
-    }
-
-
-    // throw blue goal objects through a filter to eliminate noise in corners
-    //reset these bools, incase we changed them above
-    ylp = vision->yglp->getWidth() > 0;
-    yrp = vision->ygrp->getWidth() > 0;
-    blp = vision->bglp->getWidth() > 0;
-    brp = vision->bgrp->getWidth() > 0;
-
-    // make sure we don't see a false crossbar when looking at the other goal
-    if (ylp || yrp) {
-        vision->bgCrossbar->init();
-    }
-    if (blp || brp) {
-        vision->ygCrossbar->init();
-    }
 
     if (horizon < IMAGE_HEIGHT) {
         orange->createBall(horizon);
     } else {
         orange->createBall(pose->getHorizonY(0));
     }
-    if (ylp || yrp) {
+    if (ylp && yrp) {
         field->bestShot(vision->ygrp, vision->yglp, vision->ygCrossbar, YELLOW);
+        identifyGoalie();
     }
-    if (blp || brp) {
-        field->bestShot(vision->bgrp, vision->bglp, vision->bgCrossbar, BLUE);
-    }
-
     storeFieldObjects();
-	if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
-		vision->ball->getHeat() < 1.0f) {
-		context->checkForKickDangerNoRobots();
-	}
+    if (vision->ball->getWidth() > 0 && vision->ball->getDistance() > 15.0f &&
+        vision->ball->getHeat() < 1.0f) {
+        context->checkForKickDangerNoRobots();
+    }
 
 }
 
 /*
   RLE Helper Methods
- */
+*/
 
 /* Calculates and stores all landmark field objects info.
  */
@@ -962,47 +1276,43 @@ void Threshold::storeFieldObjects() {
     setFieldObjectInfo(vision->ygrp);
     setFramesOnAndOff(vision->ygrp);
 
-    setFieldObjectInfo(vision->bglp);
-    setFramesOnAndOff(vision->bglp);
-
-    setFieldObjectInfo(vision->bgrp);
-    setFramesOnAndOff(vision->bgrp);
+//    setFieldObjectInfo(vision->bglp);
+//    setFramesOnAndOff(vision->bglp);
+//
+//    setFieldObjectInfo(vision->bgrp);
+//    setFramesOnAndOff(vision->bgrp);
 
     setVisualCrossInfo(vision->cross);
     setFramesOnAndOff(vision->cross);
 
-    vision->ygCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
-    vision->bgCrossbar->setFocDist(0.0); // sometimes set to 1.0 for some reason
     vision->ygCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
     vision->bgCrossbar->setDistance(0.0); // sometimes set to 1.0 for some reason
 
-#if ROBOT(NAO)
     setVisualRobotInfo(vision->red1);
     setFramesOnAndOff(vision->red1);
 
     setVisualRobotInfo(vision->red2);
     setFramesOnAndOff(vision->red2);
 
-	setVisualRobotInfo(vision->red3);
+    setVisualRobotInfo(vision->red3);
     setFramesOnAndOff(vision->red3);
 
     setVisualRobotInfo(vision->navy1);
     setFramesOnAndOff(vision->navy1);
 
+
     setVisualRobotInfo(vision->navy2);
     setFramesOnAndOff(vision->navy2);
 
-	setVisualRobotInfo(vision->navy3);
+    setVisualRobotInfo(vision->navy3);
     setFramesOnAndOff(vision->navy3);
-#endif
-
 }
 
 /*
  * Sets frames on/off to the correct number for a VisualFieldObject
  */
 void Threshold::setFramesOnAndOff(VisualDetection *objPtr) {
-   if (objPtr->isOn()) {
+	if (objPtr->isOn()) {
         objPtr->setFramesOn(objPtr->getFramesOn()+1);
         objPtr->setFramesOff(0);
     }
@@ -1010,7 +1320,7 @@ void Threshold::setFramesOnAndOff(VisualDetection *objPtr) {
         objPtr->setFramesOff(objPtr->getFramesOff()+1);
         objPtr->setFramesOn(0);
     }
- }
+}
 
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
@@ -1028,27 +1338,22 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
-					      objPtr->getCenterX() ) /
-			   static_cast<float>(HALF_IMAGE_WIDTH) *
-			   MAX_BEARING_RAD );
+											  objPtr->getCenterX() ) /
+						   static_cast<float>(HALF_IMAGE_WIDTH) *
+						   MAX_BEARING_RAD );
         objPtr->setAngleY(static_cast<float>(HALF_IMAGE_HEIGHT -
-					     objPtr->getCenterY() )/
-			  static_cast<float>(HALF_IMAGE_HEIGHT) *
-			  MAX_ELEVATION_RAD);
+											 objPtr->getCenterY() )/
+						  static_cast<float>(HALF_IMAGE_HEIGHT) *
+						  MAX_ELEVATION_RAD);
 
         // if object is a goal post
         if (objPtr == vision->yglp ||
-                objPtr == vision->ygrp ||
-                objPtr == vision->bglp ||
-                objPtr == vision->bgrp) {
+			objPtr == vision->ygrp ||
+			objPtr == vision->bglp ||
+			objPtr == vision->bgrp) {
             //print("we've got a post!");
-            float dist = 0.0;
             float width = objPtr->getWidth();
             float height = objPtr->getHeight();
-
-            distanceCertainty cert = objPtr->getDistanceCertainty();
-            float distw = getGoalPostDistFromWidth(width);
-            float disth = getGoalPostDistFromHeight(height);
 
             const int bottomLeftX = objPtr->getLeftBottomX();
             const int bottomRightX = objPtr->getRightBottomX();
@@ -1056,68 +1361,63 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
             const int bottomRightY = objPtr->getRightBottomY();
 
             const float bottomOfObjectX = static_cast<float>(bottomLeftX +
-                    bottomRightX) * 0.5f;
+															 bottomRightX) * 0.5f;
             const float bottomOfObjectY = static_cast<float>(bottomLeftY
-                    + bottomRightY) * 0.5f;
+															 + bottomRightY) * 0.5f;
 
             const int intBottomOfObjectX = static_cast<int>(bottomOfObjectX);
             const int intBottomOfObjectY = static_cast<int>(bottomOfObjectY);
 
-            float distwnew = pose->sizeBasedEstimate(intBottomOfObjectX,
+            estimate estFromWidth = this->getGoalPostEstimateFromWidth(intBottomOfObjectX,
+																	   intBottomOfObjectY, width);
+
+            estimate estFromHeight = this->getGoalPostEstimateFromHeight(intBottomOfObjectX,
+																		 intBottomOfObjectY,  height);
+
+            estimate estFromPose = pose->pixEstimate(intBottomOfObjectX,
                                                      intBottomOfObjectY,
-                                                     0.0f,
-                                                     width,
-                                                     GOAL_POST_CM_WIDTH*10).dist;
+                                                     0.0f);
 
-            float disthnew = pose->sizeBasedEstimate(intBottomOfObjectX,
-                                                     intBottomOfObjectY,
-                                                     0.0f,
-                                                     height,
-                                                     GOAL_POST_CM_HEIGHT*10).dist;
-
-
-            const float poseDist = pose->pixEstimate(
-                    static_cast<int>(bottomOfObjectX),
-                    static_cast<int>(bottomOfObjectY), 0.0f).dist;
-
-            //TODO: remove the old code, make new code better on distances
-            dist = chooseGoalDistance(cert, disth, distw, poseDist,
-                                      static_cast<int>(bottomOfObjectY));
-            //TODO: hack
-            float distnew = chooseGoalDistance(cert, disthnew, distw, poseDist,
-											   static_cast<int>(bottomOfObjectY));
-            dist = distnew;
+            distanceCertainty cert = objPtr->getDistanceCertainty();
+            estimate obj_est = chooseBestGoalEstimate(cert, estFromHeight, estFromWidth,
+													  estFromPose, static_cast<int>(bottomOfObjectY));
 
             // sanity check: throw ridiculous distance estimates out
             // constants in Threshold.h
-            if (dist < POST_MIN_FOC_DIST ||
-				dist > POST_MAX_FOC_DIST) {
-                dist = 0.0;
+            if (obj_est.dist < POST_MIN_FOC_DIST || obj_est.dist > POST_MAX_FOC_DIST) {
+                obj_est = NULL_ESTIMATE;
             }
-            objPtr->setDistance(dist);
-			if (dist < MIDFIELD_X + 150) {
-				context->setSameHalf();
-			}
-		} else { // don't know what object it is
+
+            if (obj_est.dist == 0.0f || obj_est.dist == estFromWidth.dist) {
+                objPtr->setEstimateCertain(false);
+            } else {
+                objPtr->setEstimateCertain(true);
+            }
+
+            bool debugEstimates = false;
+            if (debugEstimates) {
+                cout << "width " << estFromWidth << endl;
+                cout << "height " << estFromHeight << endl;
+                cout << "pose " << estFromPose << endl;
+                cout << "chosen " << obj_est << endl << endl;
+            }
+
+            objPtr->setDistanceWithSD(obj_est.dist);
+            objPtr->setBearingWithSD(obj_est.bearing, obj_est.dist);
+            objPtr->setElevation(obj_est.elevation);
+
+            if (obj_est.dist < MIDFIELD_X + 150) {
+                context->setSameHalf();
+            }
+        } else { // don't know what object it is
             //print("setFieldObjectInfo: unrecognized FieldObject");
-			//cout << "What the heck!" << endl;
+            //cout << "What the heck!" << endl;
             return;
         }
-        // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
-        // convert dist + angle estimates to body center
-        estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              objPtr->getDistance());
-        objPtr->setDistanceWithSD(obj_est.dist);
-        objPtr->setBearingWithSD(obj_est.bearing);
-        objPtr->setElevation(obj_est.elevation);
     }
     else {
-        objPtr->setFocDist(0.0);
-
         objPtr->setDistanceWithSD(0.0);
-        objPtr->setBearingWithSD(0.0);
+        objPtr->setBearingWithSD(0.0, 0.0);
         objPtr->setElevation(0.0);
     }
 }
@@ -1125,58 +1425,26 @@ void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
  * the sizes of width and height.
  */
 
-float Threshold::chooseGoalDistance(distanceCertainty cert, float disth,
-                                    float distw, float poseDist, int bottom) {
-    float dist = 0.0f;
-	if (poseDist < 200.0f && poseDist > 0 && bottom <= IMAGE_HEIGHT - 5) {
-		//cout << "Returning pose dist " << poseDist << endl;
-		return poseDist;
-	}
+estimate Threshold::chooseBestGoalEstimate(distanceCertainty cert, const estimate& estFromHeight,
+										   const estimate& estFromWidth, const estimate& estFromPose, int bottom) {
+
+    bool bottomReliableForPixEst = bottom <= IMAGE_HEIGHT - 5;
+
     switch (cert) {
-    case HEIGHT_UNSURE:
-        dist = distw;
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            dist = poseDist;
-        }
-        break;
-    case WIDTH_UNSURE:
-        dist = disth;
-		if (disth > distw) {
-			dist = distw;
-			if (bottom <= IMAGE_HEIGHT - 5) {
-				dist = poseDist;
-			}
-		}
-        break;
-    case BOTH_UNSURE:
-        // We choose the min distance here, since that means more pixels
-		dist = min( poseDist, min(disth, distw));
-        if (bottom <= IMAGE_HEIGHT - 5) {
-            //dist = min( poseDist, min(disth, distw));
-        } else if (dist > 100) {
-            dist = 0.0f;
-		}
-        break;
     case BOTH_SURE:
-		// pick the one right in the middle
-		if (poseDist < disth) {
-			if (poseDist < distw) {
-				dist = min(disth, distw);
-			} else {
-				dist = poseDist;
-			}
-		} else {
-			if (poseDist < distw) {
-				dist = poseDist;
-			} else {
-				dist = max(disth, distw);
-			}
-		}
-        break;
+    case WIDTH_UNSURE:
+        return estFromHeight;
+    case HEIGHT_UNSURE:
+        if (bottomReliableForPixEst)
+            return estFromPose;
+        else
+            return estFromWidth;
+    case BOTH_UNSURE:
+        if (bottomReliableForPixEst) {
+            return estFromPose;
+        }
     }
-	/*cout << "Distances disth " << disth << " distw " << distw <<
-	  " posedist " << poseDist << " returning " << dist << endl;*/
-    return dist;
+    return NULL_ESTIMATE;
 }
 
 /* Figures out center x,y, angle x,y, and foc/body dists for field objects.
@@ -1194,32 +1462,27 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
-					      objPtr->getCenterX() ) /
-			   static_cast<float>(HALF_IMAGE_WIDTH) *
-			   MAX_BEARING_RAD );
+											  objPtr->getCenterX() ) /
+						   static_cast<float>(HALF_IMAGE_WIDTH) *
+						   MAX_BEARING_RAD );
         objPtr->setAngleY( static_cast<float>(HALF_IMAGE_HEIGHT -
-					      objPtr->getCenterY() ) /
-			   static_cast<float>(HALF_IMAGE_HEIGHT) *
-			   MAX_ELEVATION_RAD );
+											  objPtr->getCenterY() ) /
+						   static_cast<float>(HALF_IMAGE_HEIGHT) *
+						   MAX_ELEVATION_RAD );
 
         // sets focal distance of the field object
-        objPtr->setFocDist(objPtr->getDistance());
-		estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
-											  objPtr->getCenterY(),
-											  265.0f);
-		// convert dist + angle estimates to body center
-		estimate obj_est = pose->bodyEstimate(objPtr->getCenterX(),
-											  objPtr->getCenterY(),
-											  pose_est.dist);
-		objPtr->setDistanceWithSD(obj_est.dist);
-		objPtr->setBearingWithSD(obj_est.bearing);
-		objPtr->setElevation(obj_est.elevation);
-		// now that we have the robot information check if it might kick
-		if (vision->ball->getWidth() > 0) {
-			context->checkForKickDanger(objPtr);
-		}
+        estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
+                                              objPtr->getCenterY(),
+                                              265.0f);
+
+        objPtr->setDistanceWithSD(pose_est.dist);
+        objPtr->setBearingWithSD(pose_est.bearing);
+        objPtr->setElevation(pose_est.elevation);
+        // now that we have the robot information check if it might kick
+        if (vision->ball->getWidth() > 0) {
+            context->checkForKickDanger(objPtr);
+        }
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
         objPtr->setBearingWithSD(0.0);
         objPtr->setElevation(0.0);
@@ -1240,84 +1503,40 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
 
         // find angle x/y (relative to camera)
         objPtr->setAngleX( static_cast<float>(HALF_IMAGE_WIDTH -
-                objPtr->getCenterX() ) /
-                MAX_BEARING_RAD );
+											  objPtr->getCenterX() ) /
+						   MAX_BEARING_RAD );
         objPtr->setAngleY( static_cast<float>(HALF_IMAGE_HEIGHT -
-                objPtr->getCenterY() ) /
-                MAX_ELEVATION_RAD );
+											  objPtr->getCenterY() ) /
+						   MAX_ELEVATION_RAD );
 
         int crossX = objPtr->getCenterX();
         int crossY = objPtr->getCenterY();
         // convert dist + angle estimates to body center
         estimate obj_est = pose->pixEstimate(crossX, crossY, 0.0);
-        obj_est = pose->bodyEstimate(crossX, crossY, obj_est.dist);
         if (obj_est.dist > 1500.0f) { // pose problem which happens rarely
-            objPtr->setFocDist(0.0);
             objPtr->setDistanceWithSD(0.0);
-            objPtr->setBearingWithSD(0.0);
+            objPtr->setBearingWithSD(0.0, 0.0);
             objPtr->setElevation(0.0);
         } else {
             objPtr->setDistanceWithSD(obj_est.dist);
-            objPtr->setBearingWithSD(obj_est.bearing);
+            objPtr->setBearingWithSD(obj_est.bearing, obj_est.dist);
             objPtr->setElevation(obj_est.elevation);
             // now let's see if we can id this guy
             // at this point we've sorted out all of the goal post info
             // if we see a post see how far it is to the cross
             bool ylp = vision->yglp->getDistance() > 0.0f;
             bool yrp = vision->ygrp->getDistance() > 0.0f;
-            bool blp = vision->bglp->getDistance() > 0.0f;
-            bool brp = vision->bgrp->getDistance() > 0.0f;
             float dist = 0.0f;
-			float postDist = 0.0f;
+            float postDist = 0.0f;
             const float CLOSECROSS = 250.0f;
             const float FARCROSS = 405.0f;
-			const float LONGPOST = 450.0f;
+            const float LONGPOST = 450.0f;
             int postX = 0, postY = 0;
-            if (ylp || yrp) {
-                // get the relevant distances
-                if (ylp) {
-                    postX = vision->yglp->getLeftBottomX();
-                    postY = vision->yglp->getLeftBottomY();
-					postDist = vision->yglp->getDistance();
-                } else {
-                    postX = vision->ygrp->getLeftBottomX();
-                    postY = vision->ygrp->getLeftBottomY();
-					postDist = vision->ygrp->getDistance();
-                }
-                dist = realDistance(crossX, crossY, postX, postY);
-				if (postDist > LONGPOST) {
-					objPtr->setID(BLUE_GOAL_CROSS);
-				} else if (dist < CLOSECROSS) {
-                    objPtr->setID(YELLOW_GOAL_CROSS);
-				} else {
-                    objPtr->setID(ABSTRACT_CROSS);
-                }
-            } else if (blp || brp) {
-                if (blp) {
-                    postX = vision->bglp->getLeftBottomX();
-                    postY = vision->bglp->getLeftBottomY();
-					postDist = vision->bglp->getDistance();
-                } else {
-                    postX = vision->bgrp->getLeftBottomX();
-                    postY = vision->bgrp->getLeftBottomY();
-					postDist = vision->bgrp->getDistance();
-                }
-                dist = realDistance(crossX, crossY, postX, postY);
-				if (postDist > LONGPOST) {
-					objPtr->setID(YELLOW_GOAL_CROSS);
-				} else if (dist < CLOSECROSS) {
-                    objPtr->setID(BLUE_GOAL_CROSS);
-                } else {
-                    objPtr->setID(ABSTRACT_CROSS);
-                }
-            } else {
-                objPtr->setID(ABSTRACT_CROSS);
-            }
+            objPtr->setID(ABSTRACT_CROSS);
         }
     } else {
-        objPtr->setFocDist(0.0);
         objPtr->setDistanceWithSD(0.0);
-        objPtr->setBearingWithSD(0.0);
+        objPtr->setBearingWithSD(0.0, 0.0);
         objPtr->setElevation(0.0);
     }
 }
@@ -1326,28 +1545,16 @@ void Threshold::setVisualCrossInfo(VisualCross *objPtr) {
  * @param height     the height of the post in pixels
  * @return           the distance to the post in centimeters
  */
-float Threshold::getGoalPostDistFromHeight(float height) {
-#if ROBOT(NAO_SIM)
-    return 17826*pow((double) height,-1.0254);
-#else
-    // return pose->pixHeightToDistance(height, GOAL_POST_CM_HEIGHT);
-    return 32880.0f/height - 11.8597f;
-#endif
+estimate Threshold::getGoalPostEstimateFromHeight(int bottomX, int bottomY, float height) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, height, GOAL_POST_CM_HEIGHT * CM_TO_MM);
 }
 
 /* Looks up goal post width in pixels to focal distance function.
  * @param width     the width of the post
  * @return          the distance to the post
  */
-float Threshold::getGoalPostDistFromWidth(float width) {
-#if ROBOT(NAO_SIM)
-    //floor distance, seems to be best for the width
-    //camera dist - 2585.4*pow(width,-1.0678);//OLD return 100.0*13.0/width;
-    return 2360.1*pow((double) width,-1.0516);
-#else
-    // return pose->pixWidthToDistance(width, GOAL_POST_CM_WIDTH);
-    return 3116.59f/width + 21.75f;
-#endif
+estimate Threshold::getGoalPostEstimateFromWidth(int bottomX, int bottomY, float width) {
+    return pose->estimateFromObjectSize(bottomX, bottomY, 0.0f, width, GOAL_POST_CM_WIDTH * CM_TO_MM);
 }
 
 /*
@@ -1358,23 +1565,20 @@ void Threshold::initObjects(void) {
     // yellow goal objs
     vision->ygrp->init();
     vision->yglp->init();
+	vision->ygrp->setTopCam(usingTopCamera);
+	vision->yglp->setTopCam(usingTopCamera);
     vision->ygCrossbar->init();
-
-    // blue goal objs
-    vision->bgrp->init();
-    vision->bglp->init();
-    vision->bgCrossbar->init();
 
     // robots
     vision->red1->init();
     vision->red2->init();
-	vision->red3->init();
+    vision->red3->init();
     vision->navy1->init();
     vision->navy2->init();
-	vision->navy3->init();
+    vision->navy3->init();
     // balls
     vision->ball->init();
-
+    vision->ball->setTopCam(usingTopCamera);
     // crosses
     vision->cross->init();
 } // initObjects
@@ -1385,8 +1589,8 @@ void Threshold::initObjects(void) {
 void Threshold::initColors() {
 
     orange->init(pose->getHorizonSlope());
-    blue->init(pose->getHorizonSlope());
     yellow->init(pose->getHorizonSlope());
+    //blue->init(pose->getHorizonSlope());
     red->init();
     navyblue->init();
     cross->init();
@@ -1404,7 +1608,7 @@ void Threshold::initTable(std::string filename) {
     //cout << filename << endl;
     fp = fopen(filename.c_str(), "r");   //open table for reading
     if (fp == NULL) {
-        print("initTable() FAILED to open filename: %s", filename.c_str());
+        printf("initTable() FAILED to open filename: %s", filename.c_str());
 #ifdef OFFLINE
         exit(0);
 #else
@@ -1416,11 +1620,11 @@ void Threshold::initTable(std::string filename) {
     int return_val;
     for(int i=0; i< UMAX; i++)
         for(int j=0; j<VMAX; j++){
-            return_val = fread(bigTable[i][j], sizeof(unsigned char), YMAX, fp);
+//            return_val = fread(bigTable[i][j], sizeof(unsigned char), YMAX, fp);
         }
 
 #ifndef OFFLINE
-    print("Loaded colortable %s\n",filename.c_str());
+    printf("Loaded colortable %s\n",filename.c_str());
 #endif
 
     fclose(fp);
@@ -1448,62 +1652,62 @@ void Threshold::initTableFromBuffer(byte * tbfr)
  * @param filename      the file to load
  */
 /*
-void Threshold::initCompressedTable(std::string filename){
-#ifndef NO_ZLIB
-    FILE* fp;
-    //cout << filename << endl;
-    fp = fopen(filename.c_str(), "r");   //open table for reading
-    if (fp == NULL) {
-        printf("initTable() FAILED to open filename: %s , exiting",
-               filename.c_str());
-#ifdef OFFLINE
-        exit(0);
-#else
-        // crash
-        int x = 0;
-        x = 1/x;
-#endif
-    }
+  void Threshold::initCompressedTable(std::string filename){
+  #ifndef NO_ZLIB
+  FILE* fp;
+  //cout << filename << endl;
+  fp = fopen(filename.c_str(), "r");   //open table for reading
+  if (fp == NULL) {
+  printf("initTable() FAILED to open filename: %s , exiting",
+  filename.c_str());
+  #ifdef OFFLINE
+  exit(0);
+  #else
+  // crash
+  int x = 0;
+  x = 1/x;
+  #endif
+  }
 
-    unsigned char *fileData = NULL;
-    int length;
-    fileData = Zlib::readCompressedFile(fp, length);
-    if(!fileData) {
-        //crash
-        print("something went wrong with decompression\n");
-#ifdef OFFLINE
-        exit(0);
-#else
-        // crash
-        int x = 0;
-        x = 1/x;
-#endif
-    }
-    else
-        printf("everything went fine\n");
-
-
-    unsigned char *fileTraverse = fileData;
+  unsigned char *fileData = NULL;
+  int length;
+  fileData = Zlib::readCompressedFile(fp, length);
+  if(!fileData) {
+  //crash
+  print("something went wrong with decompression\n");
+  #ifdef OFFLINE
+  exit(0);
+  #else
+  // crash
+  int x = 0;
+  x = 1/x;
+  #endif
+  }
+  else
+  printf("everything went fine\n");
 
 
-    for(int i=0; i< UMAX; i++) {
-        //printf("vtoro");
-        for(int j=0; j<VMAX; j++){
-            //64 bytes per chunk
-            //fread(bigTable[i][j], sizeof(unsigned char), vMax, fp);
-            for(int k=0; k<YMAX; k++) {
-                bigTable[i][j][k] = *fileTraverse;
-                fileTraverse++;
-            }
-        }
-    }
+  unsigned char *fileTraverse = fileData;
 
-    print("Loaded colortable %s",filename.c_str());
-    free(fileData);
 
-    fclose(fp);
-#endif 
-}*/
+  for(int i=0; i< UMAX; i++) {
+  //printf("vtoro");
+  for(int j=0; j<VMAX; j++){
+  //64 bytes per chunk
+  //fread(bigTable[i][j], sizeof(unsigned char), vMax, fp);
+  for(int k=0; k<YMAX; k++) {
+  bigTable[i][j][k] = *fileTraverse;
+  fileTraverse++;
+  }
+  }
+  }
+
+  print("Loaded colortable %s",filename.c_str());
+  free(fileData);
+
+  fclose(fp);
+  #endif
+  }*/
 
 const uint16_t* Threshold::getYUV() {
     return yuv;
@@ -1512,13 +1716,16 @@ const uint16_t* Threshold::getYUV() {
 /* I haven't a clue what this method is for.
  * @param newyuv     presumably a new yuv value in bytes or something
  */
-void Threshold::setYUV(const uint16_t* newyuv) {
-    yuv = newyuv;
-    thresholded = const_cast<uint8_t*>(
-        reinterpret_cast<const uint8_t*>(yuv) +
-        Y_IMAGE_BYTE_SIZE + UV_IMAGE_BYTE_SIZE);
-    yplane = yuv;
+void Threshold::setIm(const uint16_t* thrIm) {
+	thresholded = const_cast<uint8_t*>(
+		reinterpret_cast<const uint8_t*>(thrIm) +
+		Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
 }
+void Threshold::setIm_bot(const uint16_t* thrIm) {
+    thresholdedBottom = const_cast<uint8_t*>(
+		reinterpret_cast<const uint8_t*>(thrIm) +
+		Y_IMAGE_BYTE_SIZE + U_IMAGE_BYTE_SIZE + V_IMAGE_BYTE_SIZE);
+   }
 
 /* Calculate the distance between two objects (x distance only).
  * @param x1   one end point of the first object
@@ -1538,19 +1745,19 @@ int Threshold::distance(int x1, int x2, int x3, int x4) {
     return 0;
 }
 
-/*	Calculate the actual distance between two points.  Uses functions
-	from NaoPose.cpp in Noggin
-	@param x1	x coord of object 1
-	@param y1	y coord of object 1
-	@param x2	x coord of object 2
-	@param y2	y coord of object 2
-	@return		the distance in centimeters
- */
+/*  Calculate the actual distance between two points.  Uses functions
+    from NaoPose.cpp in Noggin
+    @param x1   x coord of object 1
+    @param y1   y coord of object 1
+    @param x2   x coord of object 2
+    @param y2   y coord of object 2
+    @return     the distance in centimeters
+*/
 
 float Threshold::realDistance(int x1, int y1, int x2, int y2) {
-	estimate r = vision->pose->pixEstimate(x1, y1, 0.0);
-	estimate l = vision->pose->pixEstimate(x2, y2, 0.0);
-	return vision->pose->getDistanceBetweenTwoObjects(l, r);
+    estimate r = vision->pose->pixEstimate(x1, y1, 0.0);
+    estimate l = vision->pose->pixEstimate(x2, y2, 0.0);
+    return vision->pose->getDistanceBetweenTwoObjects(l, r);
 }
 
 /*  Returns the euclidian distance between two points.
@@ -1601,17 +1808,23 @@ void Threshold::initDebugImage(){
  * to the real image.
  */
 void Threshold::transposeDebugImage(){
-#if defined OFFLINE && defined DEBUG_IMAGE
-    for(int x = 0 ; x < IMAGE_WIDTH;x++)
-        for(int y = 0; y < IMAGE_HEIGHT;y++)
-            if(debugImage[y][x]!=GREY){
-                thresholded[y][x] = debugImage[y][x];}
+#ifdef OFFLINE
+    for(int x = 0 ; x < IMAGE_WIDTH; x++) {
+        for(int y = 0; y < IMAGE_HEIGHT; y++) {
+            if(debugImage[y][x] != GREY){
+                setThresholded(y, x, debugImage[y][x]);
+            }
+        }
+    }
+
+    initDebugImage();
 #endif
 }
 
 // Draws the visual horizon on the image
 void Threshold::drawVisualHorizon() {
-    vision->drawLine(0, horizon, IMAGE_WIDTH, horizon, VISUAL_HORIZON_COLOR);
+	vision->drawLine(0, field->horizonAt(0), 
+					 IMAGE_WIDTH - 1, field->horizonAt(IMAGE_WIDTH - 1), VISUAL_HORIZON_COLOR);
 }
 
 const char* Threshold::getShortColor(int _id) {
@@ -1642,26 +1855,31 @@ int Threshold::getY(int j, int i) const {
     return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
 }
 
-/**
- * Get the V channel information for a given point in the image.
- * This is used to help identify the Ball which shows up well
- * in the V channel.
- */
-int Threshold::getV(int x, int y) const {
-    return static_cast<int>(vision->uvImg[y*IMAGE_WIDTH*2 + x*2 + 1]);
-}
+
 
 /**
  * Get the U channel information for a given point.  This has the
  * potential to help id post edges. We don't currently use it though.
  */
 int Threshold::getU(int j, int i) const {
-    return static_cast<int>(vision->uvImg[i*IMAGE_WIDTH*2 + j*2]);
+    return static_cast<int>(vision->uImg[i*IMAGE_WIDTH + j]);
+}
+
+/**
+ * Get the V channel information for a given point in the image.
+ * This is used to help identify the Ball which shows up well
+ * in the V channel.
+ */
+int Threshold::getV(int j, int i) const {
+    return static_cast<int>(vision->vImg[i*IMAGE_WIDTH + j]);
 }
 
 #ifdef OFFLINE
 void Threshold::setDebugRobots(bool _bool) {
-        navyblue->setDebugRobots(_bool);
-        red->setDebugRobots(_bool);
-    }
+	navyblue->setDebugRobots(_bool);
+	red->setDebugRobots(_bool);
+}
 #endif
+
+}
+}
