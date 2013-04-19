@@ -21,6 +21,8 @@ VisionModule::VisionModule() : Module(),
                                vision_ball(base()),
                                vision_robot(base()),
                                vision_obstacle(base()),
+							   topOutPic(base()),
+							   botOutPic(base()),
                                vision(boost::shared_ptr<Vision>(new Vision()))
 {
 }
@@ -52,6 +54,15 @@ void VisionModule::run_()
     updateVisionRobot();
     updateVisionField();
     updateVisionObstacle();
+
+	portals::Message<messages::ThresholdImage> top, bot;
+	top = new messages::ThresholdImage(vision->thresh->thresholded, 320, 240, 320);
+	bot = new messages::ThresholdImage(vision->thresh->thresholdedBottom, 320, 240, 320);
+
+	topOutPic.setMessage(top);
+	botOutPic.setMessage(bot);
+		
+
 }
 
 void VisionModule::updateVisionObstacle() {

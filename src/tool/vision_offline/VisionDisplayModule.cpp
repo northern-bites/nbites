@@ -34,8 +34,8 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	bottomConverter.imageIn.wireTo(&bottomImage, true);
 	topDisplay.imageIn.wireTo(&topImage, true);
 	bottomDisplay.imageIn.wireTo(&bottomImage, true);
-	topThrDisplay.imageIn.wireTo(&topConverter.thrImage);
-	botThrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
+	topThrDisplay.imageIn.wireTo(&visMod.topOutPic, true);
+	botThrDisplay.imageIn.wireTo(&visMod.botOutPic, true);
 	// Dummy Sensors messages for VisMod
 	portals::Message<messages::JointAngles> joints(0);
 	portals::Message<messages::InertialState> inertials(0);
