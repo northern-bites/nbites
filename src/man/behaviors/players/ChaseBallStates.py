@@ -79,10 +79,6 @@ def approachBall(player):
         player.brain.nav.isAtPosition()):
         player.inKickingState = True
 
-        #HACK HACK TAKE ME OUT
-        player.kick = kicks.LEFT_SHORT_BACK_KICK
-        return player.goNow('positionForKick')
-
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -185,7 +181,6 @@ def positionForKick(player):
                               False,
                               Navigator.ADAPTIVE)
     else:
-        print "Ball at {0}, {1}".format(ball.rel_x, ball.rel_y)
         player.brain.nav.updateDest(positionForKick.kickPose)
 
     if transitions.shouldFindBallKick(player) and player.counter > 15:
@@ -194,7 +189,6 @@ def positionForKick(player):
 
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
-        print "SWEET SPOT at {0}, {1}".format(ball.rel_x, ball.rel_y)
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 
