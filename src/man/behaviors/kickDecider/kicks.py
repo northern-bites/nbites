@@ -53,9 +53,9 @@ LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
 RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 15.5, y = .5,
                              move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
 #new- sweet spots done
-LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 15.8, y = 5.0,
+LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 15.8, y = -5.0,
+RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
 #new- sweet spots done

@@ -92,6 +92,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::resetLocRequest_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("myWorldModel",
+                      make_getter(&PyInterface::myWorldModel_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         ;
     scope().attr("interface") = interface_ptr;
 }

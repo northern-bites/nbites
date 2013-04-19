@@ -2,26 +2,28 @@ package messages;
 
 message WorldModel
 {
-        optional float my_x = 1;
-        optional float my_y = 2;
-        optional float my_h = 3;
+	optional int64 timestamp = 1;
 
-        optional float my_x_uncert = 4;
-        optional float my_y_uncert = 5;
-        optional float my_h_uncert = 6;
+        optional float my_x = 2;
+        optional float my_y = 3;
+        optional float my_h = 4;
 
-        optional bool  ball_on = 7;
+        optional float my_x_uncert = 5;
+        optional float my_y_uncert = 6;
+        optional float my_h_uncert = 7;
 
-        optional float ball_dist = 8;
-        optional float ball_bearing = 9;
+        optional bool  ball_on = 8;
 
-        optional float ball_dist_uncert = 10;
-        optional float ball_bearing_uncert = 11;
+        optional float ball_dist = 9;
+        optional float ball_bearing = 10;
 
-        optional float chase_time = 12;
+        optional float ball_dist_uncert = 11;
+        optional float ball_bearing_uncert = 12;
 
-        optional int32 role = 13;
-        optional int32 sub_role = 14;
+        optional float chase_time = 13;
 
-        optional bool  active = 15;
+        optional int32 role = 14;
+        optional int32 sub_role = 15;
+
+        optional bool  active = 16;
 }

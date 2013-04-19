@@ -10,8 +10,12 @@ using namespace man::behaviors;
 
 BOOST_PYTHON_MODULE(noggin_constants)
 {
-    // Switch board
-    scope().attr("LOG_LOC") = LOG_LOC;
+    // Lab Field or Full Field?
+#ifdef USING_LAB_FIELD
+    scope().attr("USING_LAB_FIELD") = true;
+#else
+    scope().attr("USING_LAB_FIELD") = false;
+#endif
 
     // Walk time
     scope().attr("TIME_STEP") = TIME_STEP;
@@ -210,6 +214,9 @@ BOOST_PYTHON_MODULE(noggin_constants)
     scope().attr("LANDMARK_MY_FIELD_CROSS") = make_tuple(
         LANDMARK_MY_FIELD_CROSS[0],
         LANDMARK_MY_FIELD_CROSS[1]);
+
+    scope().attr("BLUE_CC_NEAREST_POINT_X") = BLUE_CC_NEAREST_POINT_X;
+    scope().attr("BLUE_CROSS_CIRCLE_MIDPOINT_X") = BLUE_CROSS_CIRCLE_MIDPOINT_X;
 
     scope().attr("NUM_LOC_SCORES") = NUM_LOC_SCORES;
 

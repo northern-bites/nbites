@@ -4,7 +4,7 @@
 #include <iostream>
 #include "RobotConfig.h"
 
-SET_POOL_SIZE(messages::WorldModel,  16);
+SET_POOL_SIZE(messages::WorldModel,  24);
 SET_POOL_SIZE(messages::JointAngles, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
@@ -100,6 +100,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     /** Comm **/
     commThread.addModule(comm);
+    comm._worldModelInput.wireTo(&behaviors.myWorldModelOut, true);
+    comm._gcResponseInput.wireTo(&gamestate.gcResponseOutput, true);
 #ifdef LOG_COMM
     commThread.log<messages::GameState>(&comm._gameStateOutput, "gamestate");
 #endif
@@ -147,7 +149,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     localization.resetInput.wireTo(&behaviors.resetLocOut, true);
 
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
-    ballTrack.odometryInput.wireTo(&motion.odometryOutput_);
+    ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.localizationInput.wireTo(&localization.output);
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
