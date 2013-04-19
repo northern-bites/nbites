@@ -19,7 +19,7 @@ class KickInformation:
         if constants.USING_LAB_FIELD:
             self.closeGoalThresh = 250
         else:
-            self.closeGoalThresh = 300
+            self.closeGoalThresh = 450
 
         # If true, we will always aim for the center of the goal.
         # If false, we will aim for the corners of the goal.
@@ -230,7 +230,8 @@ class KickInformation:
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
             if mate.playerNumber in [1] and mate.active:
-                if mate.ballOn and mate.ballDist < self.closeGoalThresh+50:
+                if mate.ballOn:# and mate.ballDist < self.closeGoalThresh+50:
+                    # Goalie can't really see past midfield, so don't worry about distance 4/19
                     return True
 
         return False
