@@ -18,6 +18,7 @@
 
 #include "RobotLocation.pb.h"
 #include "ParticleSwarm.pb.h"
+#include "VisionField.pb.h"
 
 namespace tool {
 namespace viewer {
@@ -31,10 +32,12 @@ public:
 
     void updateWithLocationMessage(messages::RobotLocation newLoc);
     void updateWithParticleMessage(messages::ParticleSwarm newSwarm);
+    void updateWithObsvMessage(messages::VisionField newObservations);
 
 protected slots:
     void paintParticleAction(bool state);
     void paintLocationAction(bool state);
+    void paintObsvAction(bool state);
 
 protected:
     // Paint the field
@@ -47,13 +50,20 @@ protected:
     // Paint a Particle Swarm
     void paintParticleSwarm(QPaintEvent* event,
                             messages::ParticleSwarm swarm);
+    // Paint observations
+    void paintObservations(QPaintEvent* event,
+                           messages::VisionField obsv);
+
+    QPoint getRelLoc(float dist, float bear);
 
 private:
     bool shouldPaintParticles;
     bool shouldPaintLocation;
+    bool shouldPaintObsv;
 
     messages::RobotLocation curLoc;
     messages::ParticleSwarm curSwarm;
+    messages::VisionField curObsv;
 
 };
 

@@ -20,7 +20,7 @@
 namespace tool{
 namespace viewer{
 
-    class FieldViewer : public QWidget,
+class FieldViewer : public QWidget,
                     public portals::Module
 {
     Q_OBJECT;
@@ -30,9 +30,11 @@ public:
 
     void confirmParticleLogs(bool haveLogs);
     void confirmLocationLogs(bool haveLogs);
+    void confirmObsvLogs(bool haveLogs);
 
     portals::InPortal<messages::RobotLocation> locationIn;
     portals::InPortal<messages::ParticleSwarm> particlesIn;
+    portals::InPortal<messages::VisionField> observationsIn;
 
 protected slots:
     void noLogError();

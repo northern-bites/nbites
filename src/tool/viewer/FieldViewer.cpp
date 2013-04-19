@@ -45,6 +45,8 @@ FieldViewer::FieldViewer(QWidget* parent):
             SLOT(noLogError()));
     connect(locationViewBox, SIGNAL(toggled(bool)), this,
             SLOT(noLogError()));
+    connect(robotFieldViewBox, SIGNAL(toggled(bool)), this,
+            SLOT(noLogError()));
 
     mainLayout->addLayout(field);
     mainLayout->addLayout(checkBoxes);
@@ -90,6 +92,24 @@ void FieldViewer::confirmLocationLogs(bool haveLogs)
     }
 }
 
+void FieldViewer::confirmObsvLogs(bool haveLogs)
+{
+    haveVisionFieldLogs = haveLogs;
+    if(haveLogs) {
+        connect(robotFieldViewBox, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintLocationAction(bool)));
+
+        disconnect(robotFieldViewBox, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+    else {
+        disconnect(robotFieldViewBox, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintLocationAction(bool)));
+
+        connect(robotFieldViewBox, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+}
 
 void FieldViewer::noLogError()
 {

@@ -120,6 +120,16 @@ void Tool::setUpModules()
     {
         std::cout << "Warning: Particles were'nt logged in this file" << std::endl;
     }
+    if(diagram.connectToUnlogger<messages::VisionField>(fieldView.observationsIn,
+                                                        "observations"))
+    {
+        fieldView.confirmObsvLogs(true);
+        shouldAddFieldView = true;
+    }
+    else
+    {
+        std::cout << "Warning: Observations were'nt logged in this file" << std::endl;
+    }
     if(shouldAddFieldView)
         diagram.addModule(fieldView);
 

@@ -24,6 +24,12 @@ void FieldViewerPainter::paintLocationAction(bool state) {
     repaint();
 }
 
+void FieldViewerPainter::paintObsvAction(bool state) {
+
+    shouldPaintObsv = state;
+    repaint();
+}
+
 void FieldViewerPainter::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
@@ -35,6 +41,10 @@ void FieldViewerPainter::paintEvent(QPaintEvent* event)
     if(shouldPaintLocation) {
         // Paint actual location
         paintRobotLocation(event, curLoc, true);
+    }
+
+    if(shouldPaintObsv) {
+        paintObservations(event, curObsv);
     }
 
 }
@@ -50,6 +60,58 @@ void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
         paintRobotLocation(event,swarm.particle(i).loc());
     }
 }
+
+QPoint FieldViewerPainter::getRelLoc(float dist, float bear)
+{
+    float sin, cos;
+    float ninetyDeg = 1.5707963;
+    sincosf(ninetyDeg - (curLoc.h() + bear), &sin, &cos);
+
+    float relX = dist*cos + curLoc.x();
+    float relY = dist*sin + curLoc.y();
+    QPoint relLoc(relX,relY);
+    return relLoc;
+}
+
+void FieldViewerPainter::paintObservations(QPaintEvent* event,
+                                           messages::VisionField obsv)
+{
+    QPainter painter(this);
+    painter.setPen(Qt::black);
+
+    // ToDo: paint orientation/shape
+    // Corners
+
+    for (int i=0; i<obsv.visual_corner_size(); i++) {
+        painter.setBrush(Qt::black);
+        QPoint relLoc= getRelLoc(obsv.visual_corner(i).visual_detection().distance(),
+                                 obsv.visual_corner(i).visual_detection().bearing());
+        painter.drawEllipse(relLoc, 10, 10);
+    }
+
+    if (obsv.has_goal_post_l()) {
+        painter.setBrush(Qt::yellow);
+        QPoint relLoc= getRelLoc(obsv.goal_post_l().visual_detection().distance(),
+                                 obsv.goal_post_l().visual_detection().bearing());
+        painter.drawEllipse(relLoc, 10, 10);
+    }
+
+    if (obsv.has_goal_post_r()) {
+        painter.setBrush(Qt::yellow);
+        QPoint relLoc= getRelLoc(obsv.goal_post_r().visual_detection().distance(),
+                                 obsv.goal_post_r().visual_detection().bearing());
+        painter.drawEllipse(relLoc, 10, 10);
+    }
+
+    if (obsv.has_visual_cross()) {
+        painter.setBrush(Qt::black);
+        QPoint relLoc= getRelLoc(obsv.visual_cross().distance(),
+                                 obsv.visual_cross().bearing());
+        painter.drawEllipse(relLoc, 10, 10);
+    }
+}
+
+
 
 
 void FieldViewerPainter::paintRobotLocation(QPaintEvent* event,
@@ -85,6 +147,14 @@ void FieldViewerPainter::updateWithParticleMessage(messages::ParticleSwarm newSw
 {
     curSwarm = newSwarm;
     if(shouldPaintParticles) {
+        repaint();
+    }
+}
+
+void FieldViewerPainter::updateWithObsvMessage(messages::VisionField newObservations)
+{
+    curObsv = newObservations;
+    if(shouldPaintObsv) {
         repaint();
     }
 }
