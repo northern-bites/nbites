@@ -69,6 +69,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     motion.bodyCommandInput_.wireTo(&behaviors.bodyMotionCommandOut, true);
     motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
     motion.requestInput_.wireTo(&behaviors.motionRequestOut, true);
+    motion.fallInput_.wireTo(&guardian.fallStatusOutput, true);
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
@@ -149,7 +150,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     localization.resetInput.wireTo(&behaviors.resetLocOut, true);
 
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
-    ballTrack.odometryInput.wireTo(&motion.odometryOutput_);
+    ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.localizationInput.wireTo(&localization.output);
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
