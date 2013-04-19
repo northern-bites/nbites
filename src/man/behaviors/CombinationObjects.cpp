@@ -158,7 +158,7 @@ RelRobotLocation RobotLocation::getRelRobotLocationOf(const RobotLocation& other
 
 const degrees RobotLocation::getRelativeBearing(Location& other)
 {
-    return (headingToInRad(other) - h) * TO_DEG;
+    return (NBMath::subPIAngle(headingToInRad(other) - h)) * TO_DEG;
 }
 
 // Returns -1, 0, 1 to tell the robot which way to spin

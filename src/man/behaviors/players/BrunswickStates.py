@@ -60,15 +60,14 @@ def gameSet(player):
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
 
-        if (player.brain.playerNumber == 5 and
-            player.brain.gameController.ownKickOff):
-            print "Setting Kickoff to True"
-            player.shouldKickOff = True
-        else:
-            player.shouldKickOff = False
-
         if player.lastDiffState == 'gamePenalized':
             player.brain.resetSetLocalization()
+
+    if (player.play.isChaser() and
+        player.brain.gameController.ownKickOff):
+        player.shouldKickOff = True
+    else:
+        player.shouldKickOff = False
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
