@@ -1,5 +1,6 @@
 import time
 import sys
+from math import pi
 
 # Redirect standard error to standard out
 _stderr = sys.stderr
@@ -222,7 +223,7 @@ class Brain(object):
         """
         self.loc = RobotLocation(self.interface.loc.x,
                                  self.interface.loc.y,
-                                 self.interface.loc.h)
+                                 self.interface.loc.h * (180. / pi))
 
     def resetLocTo(self, x, y, h):
         """
@@ -230,7 +231,7 @@ class Brain(object):
         """
         self.interface.resetLocRequest.x = x
         self.interface.resetLocRequest.y = y
-        self.interface.resetLocRequest.h = h
+        self.interface.resetLocRequest.h = h * (pi / 180.)
         self.interface.resetLocRequest.timestamp = int(self.time * 1000)
 
     def resetInitialLocalization(self):

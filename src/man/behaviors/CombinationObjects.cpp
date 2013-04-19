@@ -140,21 +140,21 @@ RobotLocation RobotLocation::operator+ (const RelRobotLocation& other) const
     return RobotLocation(x + other.getRelX(), y + other.getRelY(), h + other.getRelH());
 }
 
-    RelRobotLocation RobotLocation::getRelRobotLocationOf(const RobotLocation& other) const {
-        RelRobotLocation relRobotLocation;
+RelRobotLocation RobotLocation::getRelRobotLocationOf(const RobotLocation& other) const {
+    RelRobotLocation relRobotLocation;
 
-        float dx = other.x - x;
-        float dy = other.y - y;
+    float dx = other.x - x;
+    float dy = other.y - y;
 
-        float sinh, cosh;
-        sincosf(-h, &sinh, &cosh);
+    float sinh, cosh;
+    sincosf(-h, &sinh, &cosh);
 
-        relRobotLocation.setRelX(cosh * dx - sinh * dy);
-        relRobotLocation.setRelY(sinh * dx + cosh * dy);
-        relRobotLocation.setRelH((other.h - h)*TO_DEG);
+    relRobotLocation.setRelX(cosh * dx - sinh * dy);
+    relRobotLocation.setRelY(sinh * dx + cosh * dy);
+    relRobotLocation.setRelH((other.h - h)*TO_DEG);
 
-        return relRobotLocation;
-    }
+    return relRobotLocation;
+}
 
 const degrees RobotLocation::getRelativeBearing(Location& other)
 {
@@ -165,6 +165,9 @@ const degrees RobotLocation::getRelativeBearing(Location& other)
 const float RobotLocation::spinDirToPoint(Location& other)
 {
     float targetH = getRelativeBearing(other);
+    std::cout << "Me     : " << x << ", " << y << ", " << h << std::endl;
+    std::cout << "Other  : " << other.getX() << ", " << other.getY() << std::endl;
+    std::cout << "TargetH: " << targetH << std::endl;
     if(targetH == 0) return 0;
     else return NBMath::sign(targetH);
 }
