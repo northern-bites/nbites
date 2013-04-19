@@ -29,12 +29,14 @@ class FallController():
         # HACK Guardian's `fallen` is not actually on the ground
         #      Put in a delay to ensure we hit the ground softly
         if (not self.fell and self.brain.interface.fallStatus.fallen):
+            print "Fallen count"
             self.standDelay += 1
             if (self.standDelay == 15): # Half a second
                 self.fell = True
 
         # Send a stand up move once.
         elif (not self.standingUp and self.fell):
+            print "Standing"
             self.standingUp = True
 
             self.brain.player.gainsOn()
