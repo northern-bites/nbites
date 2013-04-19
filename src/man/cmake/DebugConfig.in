@@ -94,3 +94,10 @@
 #else
 #   undef LOG_OBSERVATIONS
 #endif
+
+#define LOG_ODOMETRY_${LOG_ODOMETRY}
+#ifdef  LOG_ODOMETRY_ON
+#   define LOG_ODOMETRY
+#else
+#   undef LOG_ODOMETRY
+#endif

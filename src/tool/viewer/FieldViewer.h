@@ -31,8 +31,10 @@ public:
     void confirmParticleLogs(bool haveLogs);
     void confirmLocationLogs(bool haveLogs);
     void confirmObsvLogs(bool haveLogs);
+    void confirmOdometryLogs(bool haveLogs);
 
     portals::InPortal<messages::RobotLocation> locationIn;
+    portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::ParticleSwarm> particlesIn;
     portals::InPortal<messages::VisionField> observationsIn;
 
@@ -66,6 +68,7 @@ private:
     bool haveParticleLogs;
     bool haveLocationLogs;
     bool haveVisionFieldLogs;
+    bool haveOdometryLogs;
 };
 
 

@@ -142,7 +142,7 @@ namespace man
 
         poseEstimate.set_x(sumX/parameters.numParticles);
         poseEstimate.set_y(sumY/parameters.numParticles);
-        poseEstimate.set_h(sumH/parameters.numParticles);
+        poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
 
         estimateUncertainty = findParticleSD();
     }
@@ -434,6 +434,9 @@ namespace man
 
     const messages::ParticleSwarm& ParticleFilter::getCurrentSwarm()
     {
+        // Clear the repeated particle field
+        swarm.clear_particle();
+
         messages::Particle newParticle;
         ParticleIt iter;
         for(iter = particles.begin(); iter != particles.end(); ++iter)

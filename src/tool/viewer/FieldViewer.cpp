@@ -73,6 +73,11 @@ void FieldViewer::confirmParticleLogs(bool haveLogs)
     }
 }
 
+void FieldViewer::confirmOdometryLogs(bool haveLogs)
+{
+    haveOdometryLogs = haveLogs;
+}
+
 void FieldViewer::confirmLocationLogs(bool haveLogs)
 {
     haveLocationLogs = haveLogs;
@@ -97,14 +102,14 @@ void FieldViewer::confirmObsvLogs(bool haveLogs)
     haveVisionFieldLogs = haveLogs;
     if(haveLogs) {
         connect(robotFieldViewBox, SIGNAL(toggled(bool)), fieldPainter,
-                SLOT(paintLocationAction(bool)));
+                SLOT(paintObsvAction(bool)));
 
         disconnect(robotFieldViewBox, SIGNAL(toggled(bool)), this,
                    SLOT(noLogError()));
     }
     else {
         disconnect(robotFieldViewBox, SIGNAL(toggled(bool)), fieldPainter,
-                SLOT(paintLocationAction(bool)));
+                SLOT(paintObsvAction(bool)));
 
         connect(robotFieldViewBox, SIGNAL(toggled(bool)), this,
                    SLOT(noLogError()));
@@ -121,6 +126,16 @@ void FieldViewer::run_()
     if (haveLocationLogs) {
         locationIn.latch();
         fieldPainter->updateWithLocationMessage(locationIn.message());
+    }
+
+    if (haveParticleLogs) {
+        particlesIn.latch();
+        fieldPainter->updateWithParticleMessage(particlesIn.message());
+    }
+
+    if (haveVisionFieldLogs) {
+        observationsIn.latch();
+        fieldPainter->updateWithObsvMessage(observationsIn.message());
     }
 
 }

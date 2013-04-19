@@ -8,7 +8,8 @@ static const int PARTICLE_WIDTH = 8;
 FieldViewerPainter::FieldViewerPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_),
     shouldPaintParticles(false),
-    shouldPaintLocation(false)
+    shouldPaintLocation(false),
+    shouldPaintObsv(false)
 {
 }
 
@@ -65,7 +66,7 @@ QPoint FieldViewerPainter::getRelLoc(float dist, float bear)
 {
     float sin, cos;
     float ninetyDeg = 1.5707963;
-    sincosf(ninetyDeg - (curLoc.h() + bear), &sin, &cos);
+    sincosf((curLoc.h() + bear), &sin, &cos);
 
     float relX = dist*cos + curLoc.x();
     float relY = dist*sin + curLoc.y();
@@ -83,31 +84,39 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
     // Corners
 
     for (int i=0; i<obsv.visual_corner_size(); i++) {
-        painter.setBrush(Qt::black);
-        QPoint relLoc= getRelLoc(obsv.visual_corner(i).visual_detection().distance(),
-                                 obsv.visual_corner(i).visual_detection().bearing());
-        painter.drawEllipse(relLoc, 10, 10);
+        if(obsv.visual_corner(i).visual_detection().on()){
+                painter.setBrush(Qt::black);
+                QPoint relLoc= getRelLoc(obsv.visual_corner(i).visual_detection().distance(),
+                                         obsv.visual_corner(i).visual_detection().bearing());
+                painter.drawEllipse(relLoc, 10, 10);
+            }
     }
 
     if (obsv.has_goal_post_l()) {
-        painter.setBrush(Qt::yellow);
-        QPoint relLoc= getRelLoc(obsv.goal_post_l().visual_detection().distance(),
-                                 obsv.goal_post_l().visual_detection().bearing());
-        painter.drawEllipse(relLoc, 10, 10);
+        if (obsv.goal_post_l().visual_detection().on()) {
+            painter.setBrush(Qt::yellow);
+            QPoint relLoc= getRelLoc(obsv.goal_post_l().visual_detection().distance(),
+                                     obsv.goal_post_l().visual_detection().bearing());
+            painter.drawEllipse(relLoc, 10, 10);
+        }
     }
 
     if (obsv.has_goal_post_r()) {
-        painter.setBrush(Qt::yellow);
-        QPoint relLoc= getRelLoc(obsv.goal_post_r().visual_detection().distance(),
-                                 obsv.goal_post_r().visual_detection().bearing());
-        painter.drawEllipse(relLoc, 10, 10);
+        if (obsv.goal_post_r().visual_detection().on()) {
+            painter.setBrush(Qt::yellow);
+            QPoint relLoc= getRelLoc(obsv.goal_post_r().visual_detection().distance(),
+                                     obsv.goal_post_r().visual_detection().bearing());
+            painter.drawEllipse(relLoc, 10, 10);
+        }
     }
 
     if (obsv.has_visual_cross()) {
-        painter.setBrush(Qt::black);
-        QPoint relLoc= getRelLoc(obsv.visual_cross().distance(),
-                                 obsv.visual_cross().bearing());
-        painter.drawEllipse(relLoc, 10, 10);
+        if (obsv.visual_cross().on()) {
+            painter.setBrush(Qt::black);
+            QPoint relLoc= getRelLoc(obsv.visual_cross().distance(),
+                                     obsv.visual_cross().bearing());
+            painter.drawEllipse(relLoc, 10, 10);
+        }
     }
 }
 

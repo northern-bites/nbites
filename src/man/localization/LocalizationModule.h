@@ -5,6 +5,8 @@
  */
 #pragma once
 
+#include "RobotConfig.h"
+
 #include "RoboGrams.h"
 #include "VisionField.pb.h"
 #include "RobotLocation.pb.h"

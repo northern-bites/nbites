@@ -52,7 +52,7 @@ namespace man
         portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                              getCurrentEstimate());
 
-#ifdef LOG_LOCALIZATON
+#ifdef LOG_LOCALIZATION
         portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                                getCurrentSwarm());
         particleOutput.setMessage(swarmMessage);

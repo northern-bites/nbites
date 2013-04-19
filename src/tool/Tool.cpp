@@ -112,6 +112,16 @@ void Tool::setUpModules()
     {
         std::cout << "Warning: location wasn't logged in this file" << std::endl;
     }
+    if(diagram.connectToUnlogger<messages::RobotLocation>(fieldView.odometryIn,
+                                                          "odometry"))
+    {
+        fieldView.confirmOdometryLogs(true);
+        shouldAddFieldView = true;
+    }
+    else
+    {
+        std::cout << "Warning: odometry wasn't logged in this file" << std::endl;
+    }
 
     if(diagram.connectToUnlogger<messages::ParticleSwarm>(fieldView.particlesIn,
                                                           "particleSwarm"))

@@ -83,6 +83,11 @@ if(USE_LOGGING)
     "Log the vision field proto (observations given to loc)"
     OFF
     )
+  option(
+    LOG_ODOMETRY
+    "Log the odometry from motion"
+    OFF
+    )
 
 else(USE_LOGGING)
   unset(LOG_SENSORS CACHE)
@@ -93,4 +98,5 @@ else(USE_LOGGING)
   unset(LOG_LOCATION CACHE)
   unset(LOG_LOCALIZATION CACHE)
   unset(LOG_OBSERVATIONS CACHE)
+  unset(LOG_ODOMETRY CACHE)
 endif(USE_LOGGING)

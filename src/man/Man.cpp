@@ -179,6 +179,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.log<messages::RobotLocation>(&localization.output, "location");
 #endif
 
+#ifdef LOG_ODOMETRY
+    cognitionThread.log<messages::RobotLocation>(&motion.odometryOutput_, "odometry");
+#endif
+
+
 #ifdef LOG_OBSERVATIONS
     cognitionThread.log<messages::VisionField>(&vision.vision_field, "observations");
 #endif
