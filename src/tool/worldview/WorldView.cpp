@@ -26,7 +26,7 @@ WorldView::WorldView(QWidget* parent)
 void WorldView::run_()
 {
     commIn.latch();
-	std::cout<<"commPacket size: "<<commIn.message().DebugString()<<std::endl;
+	std::cout<<"commPacket says: "<<commIn.message().DebugString()<<std::endl;
 }
 
 }
