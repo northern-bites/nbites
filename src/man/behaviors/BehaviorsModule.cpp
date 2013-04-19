@@ -21,7 +21,6 @@ extern "C" void initRobotLocation_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
-extern "C" void initRobotLocation_proto();
 extern "C" void initSonarState_proto();
 extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
@@ -99,7 +98,6 @@ void BehaviorsModule::initializePython()
         initMotionStatus_proto();
         initSonarState_proto();
         initButtonState_proto();
-        initRobotLocation_proto();
         initFallStatus_proto();
         // Init the interface as well
         initinterface();

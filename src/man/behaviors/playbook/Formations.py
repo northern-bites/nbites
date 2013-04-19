@@ -168,7 +168,7 @@ def fFourField(team, workingPlay):
         if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
-            otherMates = team.getOtherActiveFieldPlayers(chaser_mate.playerNumber)
+            otherMates = team.getOtherActiveFieldPlayers([chaser_mate.playerNumber])
             forward = team.getForward(otherMates)
             back = team.getBack(otherMates)
             if forward.playerNumber == team.brain.playerNumber:

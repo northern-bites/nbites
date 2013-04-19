@@ -163,11 +163,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
 
         if (!verify(teamMessage.get(), currtime, player, team))
         {
-            std::cout << "BAD PACKET" << std::endl;
             continue;  // Bad Packet.
         }
-
-        std::cout << "VALID!!!!!!!" << std::endl;
 
 #ifdef DEBUG_COMM
         std::cout << "Recieved a packet:\n\n"
@@ -225,20 +222,23 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
 
     int seqNumber = packet->sequence_number();
 
-    TeamMemberInfo robot = teamMates[playerNum-1];
-    if (seqNumber <= robot.seqNum)
+    if (seqNumber <= teamMates[playerNum-1].seqNum)
     {
+        if (teamMates[playerNum-1].seqNum - seqNumber < RESET_SEQ_NUM_THRESHOLD)
+        {
 #ifdef DEBUG_COMM
-        std::cout << "Received packet with old sequenceNumber"
-                  << " in TeamConnect::verify()" << std::endl;
+            std::cout << "Received packet with old sequenceNumber"
+                      << " in TeamConnect::verify()" << std::endl;
 #endif
-        return false;
+            return false;
+        }
+        // Else we've restarted a robot, so consider it's packets new.
     }
 
     // Success! Update seqNum and timeStamp and parse!
-    int lastSeqNum = robot.seqNum;
+    int lastSeqNum = teamMates[playerNum-1].seqNum;
     int delayed = seqNumber - lastSeqNum - 1;
-    robot.seqNum = seqNumber;
+    teamMates[playerNum-1].seqNum = seqNumber;
 
     llong ts = packet->timestamp();
 
@@ -254,7 +254,7 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
         newOffset = ts + MIN_PACKET_DELAY - currtime;
         timer->addToOffset(newOffset);
     }
-    robot.timestamp = timer->timestamp();
+    teamMates[playerNum-1].timestamp = timer->timestamp();
 
     // Update the monitor
     monitor->packetsDropped(delayed);
@@ -266,17 +266,14 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
 void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],
                                      llong time, int player)
 {
-    TeamMemberInfo robot;
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        robot = teamMates[i];
         if (i+1 == player)
         {
             continue;
         }
-        else if (time - robot.timestamp > TEAMMATE_DEAD_THRESHOLD)
+        else if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
         {
-            std::cout << "INACTIVE" << std::endl;
             portals::Message<messages::WorldModel> msg(0);
             msg.get()->set_active(false);
             modelOuts[i]->setMessage(msg);

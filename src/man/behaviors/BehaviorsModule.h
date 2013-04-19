@@ -21,6 +21,7 @@
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
+#include "RobotLocation.pb.h"
 
 /**
  *

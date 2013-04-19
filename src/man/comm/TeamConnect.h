@@ -22,6 +22,7 @@ namespace comm {
 struct TeamMemberInfo {
     int   seqNum;
     llong timestamp;
+    TeamMemberInfo() : seqNum(0), timestamp(0) {}
 };
 
 class TeamConnect

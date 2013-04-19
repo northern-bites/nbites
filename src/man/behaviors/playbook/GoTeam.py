@@ -1,5 +1,6 @@
 from math import (hypot, atan2, cos, sin, acos, asin)
 from ..util import MyMath
+from ..typeDefs import TeamMember
 from . import PBConstants
 from . import Strategies
 import noggin_constants as NogginConstants
@@ -113,7 +114,7 @@ class GoTeam:
         elif self.numActiveFieldPlayers == 3:
             Strategies.sThreeField(self, play)
         elif self.numActiveFieldPlayers == 4:
-            Strategies.sFourField(self, play)
+            Strategies.sWin(self, play)
 
     def updateStateInfo(self, play):
         """
@@ -154,7 +155,7 @@ class GoTeam:
                 continue
 
             elif (mate.hasBall() and
-                  mate.chaseTime < self.brain.TeamMember.BALL_OFF_PENALTY):
+                  mate.chaseTime < TeamMember.BALL_OFF_PENALTY):
                 if PBConstants.DEBUG_DET_CHASER:
                     self.printf("mate %g has ball" % mate.playerNumber)
                 chaser_mate = mate

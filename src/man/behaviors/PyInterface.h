@@ -17,7 +17,6 @@
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
-#include "RobotLocation.pb.h"
 #include "FallStatus.pb.h"
 
 namespace man {
