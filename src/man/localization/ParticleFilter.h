@@ -106,7 +106,7 @@ namespace man
         void resample();
 
         /** FOR ISOLATING SEGFAULT **/
-        void resampleA(std::map<float, Particle>& cdf)
+        void resampleA(std::map<float, Particle*>& cdf)
         {
             float prev = 0.0f;
             ParticleIt iter;
@@ -114,22 +114,26 @@ namespace man
                 iter != particles.end();
                 ++iter)
             {
-                // cdf[prev + iter->getWeight()] = (*iter);
-                // prev += iter->getWeight();
+                //Particle& particle = (*iter);
+
+                // cdf[prev + iter->getWeight()] = &particle;
+                // prev += particle.getWeight();
                 resampleALoop(cdf, iter, prev);
             }
         }
 
-        void resampleALoop(std::map<float, Particle>& cdf,
+        void resampleALoop(std::map<float, Particle*>& cdf,
                            ParticleIt& iter,
                            float& prev)
         {
-            cdf[prev + iter->getWeight()] = (*iter);
-            prev += iter->getWeight();
+            Particle& particle = (*iter);
+
+            cdf[prev + iter->getWeight()] = &particle;
+            prev += particle.getWeight();
         }
 
         void resampleB(boost::uniform_01<boost::mt19937>& gen,
-                       std::map<float, Particle>& cdf,
+                       std::map<float, Particle*>& cdf,
                        ParticleSet& newParticles)
         {
             float rand;
@@ -139,18 +143,18 @@ namespace man
             for(int i = 0; i < parameters.numParticles; ++i)
             {
                 // rand = (float)gen();
-                // newParticles.push_back(cdf.upper_bound(rand)->second);
+                // newParticles.push_back(*(cdf.upper_bound(rand)->second));
                 resampleBLoop(gen, cdf, newParticles, rand);
             }
         }
 
         void resampleBLoop(boost::uniform_01<boost::mt19937>& gen,
-                           std::map<float, Particle>& cdf,
+                           std::map<float, Particle*>& cdf,
                            ParticleSet& newParticles,
                            float& rand)
         {
             rand = (float)gen();
-            newParticles.push_back(cdf.upper_bound(rand)->second);
+            newParticles.push_back(*(cdf.upper_bound(rand)->second));
         }
 
         void updateEstimate();
