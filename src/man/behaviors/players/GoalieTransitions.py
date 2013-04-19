@@ -100,9 +100,9 @@ def facingForward(player):
     """
     #magic numbers
     vision = player.brain.interface.visionField
-    return (vision.visual_field_edge.distance_m > 800.0
-            or(fabs(vision.visual_cross.bearing) < 10.0 and
-               vision.visual_cross.distance > 0.0))
+    #return #(vision.visual_field_edge.distance_m > 800.0
+    return (fabs(vision.visual_cross.bearing) < 10.0 and
+            vision.visual_cross.distance > 0.0)
 
 def facingBall(player):
     """
@@ -146,7 +146,11 @@ def shouldPerformSave(player):
     """
     Checks that the ball is moving toward it and close enough to save.
     """
-    return (player.brain.ball.vel_x < -50.0 and
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 15.0 and
+            player.brain.ball.rel_x_dest < 0.0 and
+            abs(player.brain.ball.rel_y_intersect_dest) < 80.0 and
+            player.brain.ball.distance < 230.0 and
             player.brain.ball.vis.frames_on > 4)
 
 def facingSideways(player):

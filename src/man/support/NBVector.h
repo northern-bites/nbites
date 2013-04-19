@@ -17,4 +17,5 @@ namespace NBMath {
 
     typedef boost::numeric::ublas::vector <float> ufvector;
 
+    ufvector4 vector4D(float x, float y, float z, float w);
 }

@@ -17,6 +17,7 @@ def process_message(message, known_messages, known_enums, scope_stack = []):
     scope_stack.append(message.name)
 
     result += templates.MESSAGE_DECLARATION % locals()
+    result += templates.MESSAGE_TOSTRING % locals()
 
     for element in message.elements:
         if 'message' in element:

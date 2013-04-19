@@ -44,7 +44,9 @@ static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
     10.f,               // initCovY
     25.f,               // initCovVelX
     25.f,               // initCovVelY
-    7.f                 // threshold for ball is moving!
+    15.f,                 // threshold for ball is moving!
+    4,                   // buffer size
+    30.f                 // badStationaryThresh
 };
 
 class MMKalmanFilter
@@ -91,6 +93,9 @@ public:
                               << "y:\t" << covEst(1,1) << std::endl;};
 
     void initialize(float relX=50.f, float relY=50.f, float covX=50.f, float covY=50.f);
+
+    float visRelX;
+    float visRelY;
 private:
     void predictFilters(messages::RobotLocation odometry);
     void predictFilters(messages::RobotLocation odometry, float t);
@@ -102,6 +107,10 @@ private:
 
     unsigned normalizeFilterWeights();
     void updateDeltaTime();
+
+    CartesianObservation calcVelocityOfBuffer();
+    float diff(float a, float b);
+    float calcSpeed(float a, float b);
 
     MMKalmanFilterParams params;
 
@@ -116,6 +125,10 @@ private:
     ufvector4 stateEst;
     ufmatrix4 covEst;
 
+    // Keep track of the last couple observations
+    CartesianObservation *obsvBuffer;
+    int curEntry;
+    bool fullBuffer;
 
     int bestFilter;
 
@@ -124,8 +137,7 @@ private:
 
     float lastVisRelX;
     float lastVisRelY;
-    float visRelX;
-    float visRelY;
+
 
     // Keep track of real time passing for calculations
     long long int lastUpdateTime;
