@@ -14,14 +14,14 @@
 #include <QtGui>
 #include <vector>
 
-#include "FieldConstants.h"
+#include "common/FieldConstants.h"
 
 #include "common/PaintField.h"
 
 #include "RobotLocation.pb.h"
 
 namespace tool {
-namespace WorldView {
+namespace worldview {
 
 class WorldViewPainter : public PaintField
 {

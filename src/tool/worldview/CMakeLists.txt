@@ -24,7 +24,6 @@ add_library(worldview
 target_link_libraries(worldview
   portals
   messages
-  support
   tool_common
   ${QT_LIBRARIES}
 )
