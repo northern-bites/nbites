@@ -332,8 +332,6 @@ void MotionModule::processMotionInput()
     if (!gainsOn)
         return;
 
-
-
     // (4) Process body commands.
     if(lastBodyCommand != bodyCommandInput_.message().timestamp())
     {

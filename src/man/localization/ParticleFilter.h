@@ -104,6 +104,59 @@ namespace man
          *        to the normalized weights of the particles.
          */
         void resample();
+
+        /** FOR ISOLATING SEGFAULT **/
+        void resampleA(std::map<float, Particle*>& cdf)
+        {
+            float prev = 0.0f;
+            ParticleIt iter;
+            for(iter = particles.begin();
+                iter != particles.end();
+                ++iter)
+            {
+                //Particle& particle = (*iter);
+
+                // cdf[prev + iter->getWeight()] = &particle;
+                // prev += particle.getWeight();
+                resampleALoop(cdf, iter, prev);
+            }
+        }
+
+        void resampleALoop(std::map<float, Particle*>& cdf,
+                           ParticleIt& iter,
+                           float& prev)
+        {
+            Particle& particle = (*iter);
+
+            cdf[prev + iter->getWeight()] = &particle;
+            prev += particle.getWeight();
+        }
+
+        void resampleB(boost::uniform_01<boost::mt19937>& gen,
+                       std::map<float, Particle*>& cdf,
+                       ParticleSet& newParticles)
+        {
+            float rand;
+            //ParticleSet newParticles;
+            // Sample numParticles particles with replacement according to the
+            // normalized weights, and place them in a new particle set.
+            for(int i = 0; i < parameters.numParticles; ++i)
+            {
+                // rand = (float)gen();
+                // newParticles.push_back(*(cdf.upper_bound(rand)->second));
+                resampleBLoop(gen, cdf, newParticles, rand);
+            }
+        }
+
+        void resampleBLoop(boost::uniform_01<boost::mt19937>& gen,
+                           std::map<float, Particle*>& cdf,
+                           ParticleSet& newParticles,
+                           float& rand)
+        {
+            rand = (float)gen();
+            newParticles.push_back(*(cdf.upper_bound(rand)->second));
+        }
+
         void updateEstimate();
 
         ParticleFilterParams parameters;
