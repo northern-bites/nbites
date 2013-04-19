@@ -62,9 +62,6 @@ namespace man
 #ifdef LOG_LOCALIZATION
         portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                                getCurrentSwarm());
-        std::cout << "Logging localization particles ("
-                  << swarmMessage.get()->particle().size()
-                  << ")." << std::endl;
         particleOutput.setMessage(swarmMessage);
 #endif
 
