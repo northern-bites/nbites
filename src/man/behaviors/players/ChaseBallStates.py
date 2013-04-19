@@ -55,6 +55,7 @@ def spinToBall(player):
     else:
         spinDir = player.brain.loc.spinDirToPoint(Location(player.brain.ball.x,
                                                            player.brain.ball.y))
+
         if fabs(player.brain.ball.bearing_deg) > constants.CHANGE_SPEED_THRESH:
             speed = Navigator.GRADUAL_SPEED
         else:
@@ -86,6 +87,7 @@ def approachBall(player):
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')
+
     else:
         return player.stay()
 
@@ -146,7 +148,7 @@ def orbitBall(player):
             player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
             return player.goNow('positionForKick')
 
-    if (transitions.shouldFindBallKick(player) or
+    if (transitions.shouldFindBall(player) or
         transitions.shouldCancelOrbit(player)):
         player.inKickingState = False
         return player.goLater('chase')
