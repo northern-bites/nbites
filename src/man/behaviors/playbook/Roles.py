@@ -42,11 +42,11 @@ def rDefender(team, workingPlay):
     if not workingPlay.isRole(PBConstants.DEFENDER):
         team.subRoleSwitchTime = -1
     workingPlay.setRole(PBConstants.DEFENDER)
-    if team.brain.ball.loc.x < PBConstants.SWEEPER_X_THRESH:
+    if team.brain.ball.x < PBConstants.SWEEPER_X_THRESH:
         subRoleOnDeck = PBConstants.SWEEPER
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pSweeper(team, workingPlay)
-    elif team.brain.ball.loc.x < PBConstants.CENTER_BACK_X_THRESH:
+    elif team.brain.ball.x < PBConstants.CENTER_BACK_X_THRESH:
         subRoleOnDeck = PBConstants.CENTER_BACK
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pCenterBack(team, workingPlay)
@@ -61,7 +61,7 @@ def rDefenderDubD(team, workingPlay):
         team.subRoleSwitchTime = -1
     workingPlay.setRole(PBConstants.DEFENDER_DUB_D)
     other_mates = None # put in scope
-    myNumber = team.me.playerNumber
+    myNumber = team.brain.playerNumber
     if team.numActiveFieldPlayers == 2:
         other_mates = team.getOtherActiveFieldPlayers([myNumber])
     elif team.numActiveFieldPlayers == 3:
@@ -88,8 +88,8 @@ def rOffender(team, workingPlay):
         team.subRoleSwitchTime = -1
     workingPlay.setRole(PBConstants.OFFENDER)
 
-    ballX = team.brain.ball.loc.x
-    ballY = team.brain.ball.loc.y
+    ballX = team.brain.ball.x
+    ballY = team.brain.ball.y
     if ballX > PBConstants.PICKER_X_THRESH:
         subRoleOnDeck = PBConstants.PICKER
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
@@ -122,7 +122,7 @@ def rMiddie(team, workingPlay):
         subRoleOnDeck = PBConstants.DUB_D_MIDDIE
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pDubDMiddie(team, workingPlay)
-    elif (team.brain.ball.loc.x > NogginConstants.CENTER_FIELD_X):
+    elif (team.brain.ball.x > NogginConstants.CENTER_FIELD_X):
         subRoleOnDeck = PBConstants.DEFENSIVE_MIDDIE
         if team.shouldSwitchSubRole(subRoleOnDeck, workingPlay):
             SubRoles.pDefensiveMiddie(team, workingPlay)

@@ -11,6 +11,7 @@ namespace gamestate{
 GameStateModule::GameStateModule(int team, int player) :
     portals::Module(),
     gameStateOutput(base()),
+    gcResponseOutput(base()),
     team_number(team),
     player_number(player)
 {
@@ -23,11 +24,16 @@ GameStateModule::~GameStateModule()
 
 void GameStateModule::run_()
 {
+    response_status = GAMECONTROLLER_RETURN_MSG_ALIVE;
     latchInputs();
     update();
 
     portals::Message<messages::GameState> output(&latest_data);
     gameStateOutput.setMessage(output);
+
+    portals::Message<messages::GCResponse> response(0);
+    response.get()->set_status(response_status);
+    gcResponseOutput.setMessage(response);
 }
 
 void GameStateModule::latchInputs()
@@ -118,8 +124,16 @@ void GameStateModule::manual_penalize()
         if (team->team_number() == team_number)
         {
             messages::RobotInfo* player = team->mutable_player(player_number-1);
-            player->penalty() ? player->set_penalty(PENALTY_NONE) :
+            if (player->penalty())
+            {
+                player->set_penalty(PENALTY_NONE);
+                response_status = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
+            }
+            else
+            {
                 player->set_penalty(PENALTY_MANUAL);
+                response_status = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
+            }
             break;
         }
     }

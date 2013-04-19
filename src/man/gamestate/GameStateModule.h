@@ -3,6 +3,7 @@
 #include "RoboGrams.h"
 #include "Toggle.pb.h"
 #include "GameState.pb.h"
+#include "GCResponse.pb.h"
 
 namespace man{
 namespace gamestate{
@@ -24,6 +25,7 @@ public:
     void run_();
 
     portals::OutPortal<messages::GameState> gameStateOutput;
+    portals::OutPortal<messages::GCResponse> gcResponseOutput;
 
     portals::InPortal<messages::GameState> commInput;
     portals::InPortal<messages::Toggle>    buttonPressInput;
@@ -48,6 +50,7 @@ private:
     bool last_initial;
     bool last_team;
     bool last_kickoff;
+    int  response_status;
 
     bool keep_time;
 };

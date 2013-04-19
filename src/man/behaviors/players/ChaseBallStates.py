@@ -20,6 +20,28 @@ def chase(player):
     else:
         return player.goNow('spinToBall')
 
+def kickoff(player):
+    """
+    Have the robot kickoff if it needs to kick it.
+    Otherwise wait 10 seconds or wait for the ball to move.
+    """
+    if player.shouldKickOff:
+        return player.goNow('chase')
+
+    if player.firstFrame():
+        kickoff.ballRelX = player.brain.ball.rel_x
+        kickoff.ballRelY = player.brain.ball.rel_y
+
+    if (player.stateTime > 10 or
+        fabs(player.brain.ball.rel_x - kickoff.ballRelX) > 5 or
+        fabs(player.brain.ball.rel_y - kickoff.ballRelY) > 5):
+        return player.goNow('chase')
+
+    return player.stay()
+
+kickoff.ballRelX = "the relX position of the ball when we started"
+kickoff.ballRelY = "the relY position of the ball when we started"
+
 def spinToBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()

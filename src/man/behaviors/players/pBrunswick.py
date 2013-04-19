@@ -106,6 +106,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
+            if self.lastDiffState == 'gameSet':
+                return 'kickoff'
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):
             return 'gamePenalized'
@@ -123,4 +125,3 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'goalieSave'
         else:
             return 'goaliePosition'
-
