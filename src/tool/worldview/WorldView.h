@@ -8,6 +8,7 @@
 #include "WorldViewPainter.h"
 
 #include "comm/CommModule.h"
+//#include "man/RobotConfig.h"
 
 
 namespace tool {
@@ -31,6 +32,8 @@ protected:
     QHBoxLayout* mainLayout;
     QHBoxLayout* field;
     QVBoxLayout* options;
+
+	QPushButton* startButton;
 
 	man::comm::CommModule wview_comm;
 };

@@ -6,13 +6,11 @@ namespace tool {
 namespace worldview {
 
 WorldView::WorldView(QWidget* parent)
-    : wview_comm(99,99),
+    : wview_comm(0,/*MY_TEAM_NUMBER*/0),
 	  portals::Module(),
 	  QWidget(parent)
 
 {
-    //wview_comm = new man::comm::CommModule(99,99);
-
 	fieldPainter = new WorldViewPainter(this);
     mainLayout = new QHBoxLayout(this);
 
@@ -20,8 +18,12 @@ WorldView::WorldView(QWidget* parent)
     field->addWidget(fieldPainter);
 
 	options = new QVBoxLayout();
+    options->setAlignment(Qt::AlignTop);
+	startButton = new QPushButton(QString("Start World Viewer"));
+	options->addWidget(startButton);
 
     mainLayout->addLayout(field);
+	mainLayout->addLayout(options);
 
     this->setLayout(mainLayout);
 
