@@ -23,7 +23,7 @@ configure_file(
 
 # Configure the debug options
 configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/DebugConfig.in"
+  "${SHARE_DIR}/cmake/DebugConfig.in"
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
 
