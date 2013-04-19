@@ -383,15 +383,15 @@ namespace man
     void ParticleFilter::resample()
     {
         // Map each normalized weight to the corresponding particle.
-        std::map<float, Particle> cdf;
+        std::map<float, Particle*> cdf;
 
         float prev = 0.0f;
         ParticleIt iter;
         for(iter = particles.begin(); iter != particles.end(); ++iter)
         {
-            Particle particle = (*iter);
+            Particle& particle = (*iter);
 
-            cdf[prev + particle.getWeight()] = particle;
+            cdf[prev + particle.getWeight()] = &particle;
             prev += particle.getWeight();
         }
 
@@ -406,7 +406,7 @@ namespace man
         for(int i = 0; i < parameters.numParticles; ++i)
         {
             rand = (float)gen();
-            newParticles.push_back(cdf.upper_bound(rand)->second);
+            newParticles.push_back(*(cdf.upper_bound(rand)->second));
         }
 
         // FUN IDEA: Create a particle that equals the belief
