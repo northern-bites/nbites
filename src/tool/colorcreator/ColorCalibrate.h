@@ -11,22 +11,31 @@
 
 #pragma once
 
+#include <QObject>
 #include <QWidget>
 #include <QPushButton>
+#include <QImage>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QSlider>
+#include <QTabWidget>
+#include <QComboBox>
+#include <QSizePolicy>
 
 //qtool
-#include "viewer/ChannelImageViewer.h"
-#include "data/DataManager.h"
-#include "image/BMPYUVImage.h"
-#include "viewer/BMPImageViewerListener.h"
+//#include "viewer/ChannelImageViewer.h"
+/* #include "data/DataManager.h" */
+/* #include "image/BMPYUVImage.h" */
+//#include "viewer/BMPImageViewerListener.h"
 //colorcreator
-#include "ColorEdit.h"
-#include "ColorTable.h"
-#include "ColorSpace.h"
-#include "ColorSpaceWidget.h"
-#include "ColorWheel.h"
+/* #include "ColorEdit.h" */
+/* #include "ColorTable.h" */
+/* #include "ColorSpace.h" */
+/* #include "ColorSpaceWidget.h" */
+/* #include "ColorWheel.h" */
 
-namespace qtool {
+namespace tool {
 namespace colorcreator {
 
 class ColorCalibrate : public QWidget
@@ -34,22 +43,22 @@ class ColorCalibrate : public QWidget
     Q_OBJECT
 
 public:
-    static const image::ColorID STARTING_COLOR = image::Orange;
+  //    static const image::ColorID STARTING_COLOR = image::Orange;
 
 public:
-    ColorCalibrate(qtool::data::DataManager::ptr dataManager,
-            QWidget *parent = 0);
-    ~ColorCalibrate() {}
+    /*   ColorCalibrate(qtool::data::DataManager::ptr dataManager, */
+  ColorCalibrate(QWidget *parent = 0);
+	~ColorCalibrate() {}
 
 protected slots:
-    void selectColorSpace(int index);
-    void updateThresholdedImage();
+    //void selectColorSpace(int index);
+    //void updateThresholdedImage();
     void loadSlidersBtnPushed();
     void saveSlidersBtnPushed();
-    void saveColorTableBtnPushed();
-    void imageTabSwitched(int);
-	void setFullColors(bool state);
-    void canvassClicked(int x, int y, int brushSize, bool leftClick);
+    //void saveColorTableBtnPushed();
+    //void imageTabSwitched(int);
+	//void setFullColors(bool state);
+    //void canvassClicked(int x, int y, int brushSize, bool leftClick);
 
 
 protected:
@@ -57,24 +66,24 @@ protected:
     void writeColorSpaces(QString filename);
 
 private:
-    data::DataManager::ptr dataManager;
+    /* data::DataManager::ptr dataManager; */
 
-    QTabWidget* imageTabs;
-    man::corpus::Camera::Type currentImage;
+     QTabWidget* imageTabs;
+    /* man::corpus::Camera::Type currentImage; */
 
-    image::BMPYUVImage* topImage;
-    viewer::ChannelImageViewer topChannelImage;
-    viewer::BMPImageViewerListener* topImageViewer;
+    /* image::BMPYUVImage* topImage; */
+    /* viewer::ChannelImageViewer topChannelImage; */
+    /* viewer::BMPImageViewerListener* topImageViewer; */
 
-    image::BMPYUVImage* bottomImage;
-    viewer::ChannelImageViewer bottomChannelImage;
-    viewer::BMPImageViewerListener* bottomImageViewer;
+    /* image::BMPYUVImage* bottomImage; */
+    /* viewer::ChannelImageViewer bottomChannelImage; */
+    /* viewer::BMPImageViewerListener* bottomImageViewer; */
 
-    ColorSpace colorSpace[image::NUM_COLORS];
-    ColorSpace* currentColorSpace;
-    QComboBox colorSelect;
-    ColorSpaceWidget colorSpaceWidget;
-    ColorWheel colorWheel;
+    /* ColorSpace colorSpace[image::NUM_COLORS]; */
+    /* ColorSpace* currentColorSpace; */
+     QComboBox colorSelect;
+    /* ColorSpaceWidget colorSpaceWidget; */
+    /* ColorWheel colorWheel; */
     QLabel thresholdedImagePlaceholder;
     QImage thresholdedImage;
     QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
@@ -84,6 +93,15 @@ private:
 	QVBoxLayout* leftJunk;
 	QVBoxLayout* mainLayout;
     QHBoxLayout* topLayout;
+
+	//Sliders & stuff for tweaking the color table
+	QSlider* hMin;
+	QSlider* hMax;
+	QSlider* sMin;
+	QSlider* sMax;
+	QSlider* zMin;
+	QSlider* zMax;
+	int hLow, hHigh, sLow, sHigh, zLow, zHigh;
 
 	bool displayAllColors;
 	int lastClickedX, lastClickedY;

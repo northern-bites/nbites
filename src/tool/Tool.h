@@ -18,6 +18,7 @@
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
+#include "colorcreator/ColorCalibrate.h"
 
 namespace tool {
 
@@ -43,6 +44,7 @@ protected:
     DataSelector selector;
     logview::LogViewer logView;
     color::ColorTableCreator tableCreator;
+	colorcreator::ColorCalibrate colorCalibrate;
 
     // GUI stuff
     QTabWidget* toolTabs;
