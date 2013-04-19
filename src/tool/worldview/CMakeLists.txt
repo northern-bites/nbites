@@ -16,5 +16,7 @@ add_library(
 target_link_libraries(worldview
   portals
   messages
+  support
+  tool_common
   ${ALCOMMON_LIBRARIES}
 )

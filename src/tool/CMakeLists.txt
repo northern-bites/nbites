@@ -72,7 +72,6 @@ add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
-add_subdirectory( viewer )
 add_subdirectory( common )
 add_subdirectory( worldview )
 
@@ -108,7 +107,6 @@ target_link_libraries(
   image # man image
   comm # man comm
   image_display
-  viewer
   worldview
   tool_common
   colorcreator
