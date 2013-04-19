@@ -57,9 +57,6 @@ void BallTrackModule::run_()
     ballMessage.get()->set_bearing(filters->getFilteredBear());
     ballMessage.get()->set_bearing_deg(filters->getFilteredBear() * TO_DEG);
 
-    std::cout << "BALL_DIST: " << ballMessage.get()->distance() << std::endl;
-    std::cout << "BALL_BEAR: " << ballMessage.get()->bearing_deg() << std::endl;
-
     float x = localizationInput.message().x() +
         ballMessage.get()->distance() * cosf(localizationInput.message().h() +
                                              ballMessage.get()->bearing());

@@ -165,9 +165,6 @@ const degrees RobotLocation::getRelativeBearing(Location& other)
 const float RobotLocation::spinDirToPoint(Location& other)
 {
     float targetH = getRelativeBearing(other);
-    std::cout << "Me     : " << x << ", " << y << ", " << h << std::endl;
-    std::cout << "Other  : " << other.getX() << ", " << other.getY() << std::endl;
-    std::cout << "TargetH: " << targetH << std::endl;
     if(targetH == 0) return 0;
     else return NBMath::sign(targetH);
 }
