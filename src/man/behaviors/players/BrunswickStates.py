@@ -140,6 +140,7 @@ def gameFinished(player):
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stand()
+        player.gameState = player.currentState
         player.inKickingState = False
         player.brain.fallController.enabled = False
 
@@ -161,6 +162,7 @@ def penaltyShotsGamePlaying(player):
 
     if player.firstFrame():
         player.stand()
+        player.gameState = player.currentState
         player.brain.fallController.enabled = True
         player.inKickingState = False
         player.shouldKickOff = False

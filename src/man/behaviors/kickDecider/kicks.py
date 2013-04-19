@@ -48,14 +48,14 @@ LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
 RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 15.5, y = .5,
                              move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
 
-LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 15.8, y = 5.0,
+LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
-RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 15.8, y = -5.0,
+RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 16.5, y =  5.3,
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 16.9, y =  5.3,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 16.5, y = -5.3,
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 16.9, y = -5.3,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 # Not used 04-19-13
