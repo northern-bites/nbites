@@ -3,10 +3,12 @@ cmake_minimum_required(VERSION 2.8.3)
 # Set source files here that need to be compiled.
 set(WORLDVIEW_SRCS
   WorldView.cpp
+  WorldViewPainter.cpp
 )
 
 set(WORLDVIEW_HEADERS
   WorldView.h
+  WorldViewPainter.h
 )
 
 Qt4_wrap_cpp( WORLDVIEW_HEADERS_MOC ${WORLDVIEW_HEADERS} )
