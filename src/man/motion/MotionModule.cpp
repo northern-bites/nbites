@@ -53,7 +53,6 @@ void MotionModule::run_()
     bodyCommandInput_.latch();
     headCommandInput_.latch();
     requestInput_.latch();
-    fallInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 

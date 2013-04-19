@@ -385,27 +385,30 @@ namespace man
         // Map each normalized weight to the corresponding particle.
         std::map<float, Particle> cdf;
 
-        float prev = 0.0f;
-        ParticleIt iter;
-        for(iter = particles.begin(); iter != particles.end(); ++iter)
-        {
-            cdf[prev + iter->getWeight()] = (*iter);
-            prev += iter->getWeight();
-        }
+        // float prev = 0.0f;
+        // ParticleIt iter;
+        // for(iter = particles.begin(); iter != particles.end(); ++iter)
+        // {
+        //     cdf[prev + iter->getWeight()] = (*iter);
+        //     prev += iter->getWeight();
+        // }
+
+        resampleA(cdf);
 
         boost::mt19937 rng;
         rng.seed(static_cast<unsigned>(std::time(0)));
         boost::uniform_01<boost::mt19937> gen(rng);
 
-        float rand;
+        //float rand;
         ParticleSet newParticles;
         // Sample numParticles particles with replacement according to the
         // normalized weights, and place them in a new particle set.
-        for(int i = 0; i < parameters.numParticles; ++i)
-        {
-            rand = (float)gen();
-            newParticles.push_back(cdf.upper_bound(rand)->second);
-        }
+        // for(int i = 0; i < parameters.numParticles; ++i)
+        // {
+        //     rand = (float)gen();
+        //     newParticles.push_back(cdf.upper_bound(rand)->second);
+        // }
+        resampleB(gen, cdf, newParticles);
 
         // FUN IDEA: Create a particle that equals the belief
 

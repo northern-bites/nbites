@@ -32,7 +32,6 @@
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
 #include "StiffnessControl.pb.h"
-#include "FallStatus.pb.h"
 
 #include <vector>
 
@@ -162,7 +161,6 @@ public:
     portals::InPortal<messages::HeadMotionCommand> headCommandInput_;
     portals::InPortal<messages::StiffnessControl>  stiffnessInput_;
     portals::InPortal<messages::MotionRequest>     requestInput_;
-    portals::InPortal<messages::FallStatus>        fallInput_;
 
     portals::OutPortal<messages::JointAngles>  jointsOutput_;
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
