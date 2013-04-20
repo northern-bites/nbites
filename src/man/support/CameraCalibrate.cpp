@@ -52,7 +52,7 @@ void CameraCalibrate::init() {
     } else if (name == "vera") {
         paramsTop[PITCH] = 0.07f;
         paramsTop[ROLL] = -0.01f;
-        paramsBottom[PITCH] = 0.6f;
+        paramsBottom[PITCH] = 0.06f;
     } else if (name == "inara") {
         paramsTop[PITCH] = 0.09f;
         paramsTop[ROLL] = -0.01f;
