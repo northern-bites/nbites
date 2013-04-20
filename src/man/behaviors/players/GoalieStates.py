@@ -72,8 +72,8 @@ def gamePlaying(player):
         return player.stay()
 
     if (player.lastDiffState == 'gamePenalized' and
-        player.lastStateTime > 10):
-        return player.goLater('decideLeftSide')
+        player.lastStateTime > 0):
+        return player.goLater('waitToFaceField')
 
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
@@ -156,7 +156,7 @@ def saveIt(player):
     if player.firstFrame():
         player.brain.tracker.lookToAngle(0)
         if SAVING:
-            player.executeMove(SweetMoves.GOALIE_SQUAT)
+            player.executeMove(SweetMoves.GOALIE_NEW_SQUAT)
         else:
             player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         player.isSaving = False
@@ -170,7 +170,7 @@ def saveIt(player):
         # This is to stand up before a penalty is called.
         if (stopTime - player.squatTime > 2):
             if SAVING:
-                player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+                player.executeMove(SweetMoves.GOALIE_NEW_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
     return player.stay()
 

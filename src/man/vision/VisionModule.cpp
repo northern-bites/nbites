@@ -217,6 +217,10 @@ void VisionModule::updateVisionField() {
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_certainty(vision->yglp->getIDCertainty());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_angle_x_deg(vision->yglp->getAngleXDeg());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_angle_y_deg(vision->yglp->getAngleYDeg());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_red_goalie(vision->yglp->getRedGoalieCertain());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_navy_goalie(vision->yglp->getNavyGoalieCertain());
