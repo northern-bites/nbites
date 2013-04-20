@@ -191,7 +191,7 @@ def centerAtGoalBasedOnCorners(player):
                               nav.GENERAL_AREA,
                               nav.FAST_SPEED)
 
-    if player.counter > 120:
+    if player.counter > 180:
         return player.goLater('watch')
 
     vision = player.brain.interface.visionField
