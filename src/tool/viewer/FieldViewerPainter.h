@@ -23,6 +23,8 @@
 namespace tool {
 namespace viewer {
 
+static const int PARTICLE_WIDTH = 8;
+
 class FieldViewerPainter : public PaintField
 {
     Q_OBJECT;
@@ -46,7 +48,8 @@ protected:
     // Paint a RobotLocation
     void paintRobotLocation(QPaintEvent* event,
                             messages::RobotLocation loc,
-                            bool red = false);
+                            bool red = false,
+                            int size = PARTICLE_WIDTH);
     // Paint a Particle Swarm
     void paintParticleSwarm(QPaintEvent* event,
                             messages::ParticleSwarm swarm);

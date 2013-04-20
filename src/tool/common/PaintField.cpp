@@ -31,7 +31,9 @@ void PaintField::paintEvent(QPaintEvent* event)
 {
 
     QPainter painter(this);
-    painter.scale(scaleFactor, scaleFactor);
+    //Move origin to bottem left and scale to flip the y axis
+    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.scale(scaleFactor, -scaleFactor);
 
     // Field Areas
 
