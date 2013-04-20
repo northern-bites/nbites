@@ -18,6 +18,8 @@
 
 #include "NBMath.h"
 
+#include "ParticleSwarm.pb.h"
+
 #include <vector>
 #include <iostream>
 #include <map>
@@ -36,13 +38,13 @@ namespace man
     // Define the default parameters for the Particle Filter
     static const ParticleFilterParams DEFAULT_PARAMS =
     {
-        FIELD_GREEN_HEIGHT,
-        FIELD_GREEN_WIDTH,
-        250,
-        0.2f,
-        0.05f,
-        .5f,
-        .2f
+        FIELD_GREEN_HEIGHT,         // Field Height
+        FIELD_GREEN_WIDTH,          // Field Width
+        250,                        // Num Particles
+        0.2f,                       // Exponential Filter alpha
+        0.05f,                      //                    beta
+        5.f,                        // Variance in x-y odometry
+        .50f                         // Variance in h odometry
     };
 
 
@@ -84,6 +86,8 @@ namespace man
 
         // Getters
         const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
+        const messages::ParticleSwarm& getCurrentSwarm();
+
         float getXEst() const {return poseEstimate.x();}
         float getYEst() const {return poseEstimate.y();}
         float getHEst() const {return poseEstimate.h();}
@@ -118,6 +122,11 @@ namespace man
         float lastVisionTimestamp;
 
         bool updatedVision;
+
+        bool lost;
+
+        // For use when logging particle swarm
+        messages::ParticleSwarm swarm;
     };
     } // namespace localization
 } // namespace man

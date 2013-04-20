@@ -99,7 +99,7 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
 }
 
 // Note: serizalization done by Qt
-void ColorTableCreator::loadLatestTable() 
+void ColorTableCreator::loadLatestTable()
 {
     if (imageTabs->currentIndex() == 0) {
         QFile file("../../data/tables/latestTopTable.dat");

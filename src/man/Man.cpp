@@ -176,6 +176,23 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
 
+#ifdef LOG_LOCATION
+    cognitionThread.log<messages::RobotLocation>(&localization.output, "location");
+#endif
+
+#ifdef LOG_ODOMETRY
+    cognitionThread.log<messages::RobotLocation>(&motion.odometryOutput_, "odometry");
+#endif
+
+
+#ifdef LOG_OBSERVATIONS
+    cognitionThread.log<messages::VisionField>(&vision.vision_field, "observations");
+#endif
+
+#ifdef LOG_LOCALIZATION
+    cognitionThread.log<messages::ParticleSwarm>(&localization.particleOutput, "particleSwarm");
+#endif
+
 #ifdef LOG_IMAGES
     cognitionThread.logImage<messages::YUVImage>(&topTranscriber.imageOut,
                                                  "top");
