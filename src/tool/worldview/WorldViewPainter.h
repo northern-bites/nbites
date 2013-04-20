@@ -18,6 +18,7 @@
 #include "common/PaintField.h"
 
 #include "RobotLocation.pb.h"
+#include "WorldModel.pb.h"
 
 namespace tool {
 namespace worldview {
@@ -46,7 +47,7 @@ protected:
 private:
     bool shouldPaintLocation;
 
-    messages::RobotLocation curLoc;
+    messages::WorldModel curLoc;
 };
 
 } // namespace viewer

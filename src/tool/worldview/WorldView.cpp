@@ -5,17 +5,19 @@
 namespace tool {
 namespace worldview {
 
+
+//TODO this is kind of royally screwed
 //SET_POOL_SIZE(messages::WorldModel, 24);
 
 WorldView::WorldView(QWidget* parent)
     : commThread("comm", COMM_FRAME_LENGTH_uS),
-	  wview_comm(16,69), //TODO for some reason MY_TEAM_NUMBER doesn't work
+	  wviewComm(16,69), //TODO for some reason MY_TEAM_NUMBER doesn't work
 	  portals::Module(),
 	  QWidget(parent)
 
 {
 	commThread.addModule(*this);
-	commThread.addModule(wview_comm);
+	commThread.addModule(wviewComm);
 	commThread.start();
 
 	fieldPainter = new WorldViewPainter(this);
@@ -26,7 +28,7 @@ WorldView::WorldView(QWidget* parent)
 
 	options = new QVBoxLayout();
     options->setAlignment(Qt::AlignTop);
-	startButton = new QPushButton(QString("Start World Viewer"));  
+	startButton = new QPushButton(QString("Start World Viewer"));
 	options->addWidget(startButton);
 
     mainLayout->addLayout(field);
@@ -36,7 +38,7 @@ WorldView::WorldView(QWidget* parent)
 
 	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        commIn[i].wireTo(wview_comm._worldModels[i], true);
+        commIn[i].wireTo(wviewComm._worldModels[i], true);
     }
 
 }
@@ -53,7 +55,7 @@ void WorldView::run_()
 
 	//proof of concept: latch just one portal
 	commIn[3].latch();
-	std::cout<<"commPacket says: "<<commIn[3].message().DebugString()<<std::endl;
+	fieldPainter->updateWithLocationMessage(commIn[3].message());
 }
 
 }

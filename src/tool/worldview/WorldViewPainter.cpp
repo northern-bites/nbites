@@ -7,7 +7,7 @@ static const int PARTICLE_WIDTH = 8;
 
 WorldViewPainter::WorldViewPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_),
-    shouldPaintLocation(false)
+    shouldPaintLocation(true)
 {
 }
 
@@ -32,28 +32,38 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                                             messages::WorldModel loc,
                                             bool red)
 {
-    QPainter painter(this);
+	QPainter painter(this);
 
     if (red)
         painter.setBrush(Qt::red);
 
     QPoint locCenter(loc.my_x(), loc.my_y());
 
-    painter.drawEllipse(locCenter,
+    //draw myself
+	painter.drawEllipse(locCenter,
                         PARTICLE_WIDTH,
                         PARTICLE_WIDTH);
 
-    painter.drawLine(loc.my_x(),
+    //draw my heading
+	painter.drawLine(loc.my_x(),
                      loc.my_y(),
                      PARTICLE_WIDTH * std::cos(loc.my_h()) + loc.my_x(),
                      PARTICLE_WIDTH * std::sin(loc.my_h()) + loc.my_y());
+
+	//draw my uncertainty
+
+	//draw where I think the ball is
+
+	//draw how sure I am about where the ball is
+
+
 }
 
 void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc)
 {
     curLoc = newLoc;
     if(shouldPaintLocation) {
-        repaint();
+        update();
     }
 }
 

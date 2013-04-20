@@ -35,10 +35,7 @@ protected:
 
 	QPushButton* startButton;
 
-    man::comm::CommModule wview_comm;
-
-	//add a diagram to a module in a diagram itself??!
-	//portals::RoboGram commGram;
+    man::comm::CommModule wviewComm;
 
     man::DiagramThread commThread;
 };
