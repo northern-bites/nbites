@@ -21,6 +21,8 @@
 
 namespace tool{
 
+//////////////////////////SET_POOL_SIZE(messages::WorldModel, 24);
+
 ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
 {
     ADD_MAPPED_TYPE(AudioCommand);

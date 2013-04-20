@@ -6,11 +6,13 @@ namespace tool {
 namespace worldview {
 
 WorldView::WorldView(QWidget* parent)
-    : wview_comm(2,16),
+    : wview_comm(16,0),
 	  portals::Module(),
 	  QWidget(parent)
 
 {
+	commGram.addModule(wview_comm);
+
 	fieldPainter = new WorldViewPainter(this);
     mainLayout = new QHBoxLayout(this);
 

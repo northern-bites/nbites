@@ -2,14 +2,13 @@
 
 #include <QtGui>
 
-#include "RoboGrams.h"
 #include "WorldModel.pb.h"
 
 #include "WorldViewPainter.h"
 
 #include "comm/CommModule.h"
-
 #include "RobotConfig.h"
+#include "RoboGrams.h"
 
 
 namespace tool {
@@ -36,7 +35,10 @@ protected:
 
 	QPushButton* startButton;
 
-	man::comm::CommModule wview_comm;
+    man::comm::CommModule wview_comm;
+
+	//add a diagram to a module in a diagram itself??!
+	portals::RoboGram commGram;
 };
 
 }
