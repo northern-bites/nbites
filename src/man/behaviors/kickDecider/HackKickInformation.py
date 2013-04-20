@@ -615,9 +615,9 @@ class KickInformation:
             return kicks.RIGHT_SHORT_BACK_KICK
         """
         if self.kickWithLeftFoot():
-            return kicks.LEFT_SHORT_BACK_KICK
+            return kicks.LEFT_LONG_BACK_KICK
         else:
-            return kicks.RIGHT_SHORT_BACK_KICK
+            return kicks.RIGHT_LONG_BACK_KICK
 
     def kickWithLeftFoot(self):
         """
@@ -652,12 +652,12 @@ class KickInformation:
             else:
                 kick = kicks.RIGHT_STRAIGHT_KICK
             return kick
-        elif kick == kicks.LEFT_SHORT_BACK_KICK or \
-                kick == kicks.RIGHT_SHORT_BACK_KICK:
+        elif kick == kicks.LEFT_LONG_BACK_KICK or \
+                kick == kicks.RIGHT_LONG_BACK_KICK:
             if self.kickWithLeftFoot():
-                kick = kicks.LEFT_SHORT_BACK_KICK
+                kick = kicks.LEFT_LONG_BACK_KICK
             else:
-                kick = kicks.RIGHT_SHORT_BACK_KICK
+                kick = kicks.RIGHT_LONG_BACK_KICK
             return kick
         else:
             # If the case was missed, just return the original kick.
