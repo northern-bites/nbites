@@ -52,6 +52,10 @@ void VisionModule::run_()
     updateVisionRobot();
     updateVisionField();
     updateVisionObstacle();
+
+
+		
+
 }
 
 void VisionModule::updateVisionObstacle() {
@@ -173,6 +177,8 @@ void VisionModule::updateVisionField() {
         visCorner->mutable_visual_detection()->set_bearing(i->getBearing());
         visCorner->mutable_visual_detection()->set_distance_sd(i->getDistanceSD());
         visCorner->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
+		visCorner->mutable_visual_detection()->set_angle_x_deg(i->getAngleXDeg());
+		visCorner->mutable_visual_detection()->set_angle_y_deg(i->getAngleYDeg());
 
         const std::list<const ConcreteCorner *>* possible = i->getPossibilities();
         for(std::list<const ConcreteCorner*>::const_iterator j = possible->begin();
@@ -220,6 +226,10 @@ void VisionModule::updateVisionField() {
         set_red_goalie(vision->yglp->getRedGoalieCertain());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_navy_goalie(vision->yglp->getNavyGoalieCertain());
+	field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+		set_angle_x_deg(vision->yglp->getAngleXDeg());
+	field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+		set_angle_y_deg(vision->yglp->getAngleYDeg());
 
     const std::list<const ConcreteFieldObject *>* possible_l = vision->yglp->getPossibilities();
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_l->begin();
@@ -259,6 +269,10 @@ void VisionModule::updateVisionField() {
         set_red_goalie(vision->ygrp->getRedGoalieCertain());
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_navy_goalie(vision->ygrp->getNavyGoalieCertain());
+	field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+		set_angle_x_deg(vision->ygrp->getAngleXDeg());
+	field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+		set_angle_y_deg(vision->ygrp->getAngleYDeg());
 
     const std::list<const ConcreteFieldObject *>* possible_r = vision->ygrp->getPossibilities();
     for(std::list<const ConcreteFieldObject*>::const_iterator i = possible_r->begin();
@@ -288,6 +302,8 @@ void VisionModule::updateVisionField() {
     field_data.get()->mutable_visual_cross()->set_bearing(vision->cross->getBearing());
     field_data.get()->mutable_visual_cross()->set_distance_sd(vision->cross->getDistanceSD());
     field_data.get()->mutable_visual_cross()->set_bearing_sd(vision->cross->getBearingSD());
+	field_data.get()->mutable_visual_cross()->set_angle_x_deg(vision->cross->getAngleXDeg());
+	field_data.get()->mutable_visual_cross()->set_angle_y_deg(vision->cross->getAngleYDeg());
 
     const std::list<const ConcreteCross *>* possible_cross = vision->cross->getPossibilities();
     for (std::list<const ConcreteCross*>::const_iterator i = possible_cross->begin();
