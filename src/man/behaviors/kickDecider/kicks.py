@@ -52,9 +52,9 @@ LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
 RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 16.9, y =  5.3,
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 16.0, y =  4.9,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 16.9, y = -5.3,
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 16.0, y = -4.9,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 # Not used 04-19-13
@@ -73,14 +73,14 @@ RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 11, y = -3,
 ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
 
 # Not used 04-19-13
-LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 16.5, y =  4,
+LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 16.9, y =  4.2,
                             move=SweetMoves.LEFT_LONG_BACK_KICK)
-RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 16.5, y = -4,
+RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 16.9, y = -4.2,
                             move=SweetMoves.RIGHT_LONG_BACK_KICK)
 
-LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.5, y =  4,
+LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
-RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.5, y = -4,
+RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
 def chooseAlignedKickFromKick(player, kick):
