@@ -34,8 +34,7 @@ namespace man
 
                 for (int i=0; i<obsv.visual_corner_size(); i++)
                 {
-                    if(obsv.visual_corner(i).visual_detection().on()
-                       && (obsv.visual_corner(i).visual_detection().distance() > 0.f)) {
+                    if(obsv.visual_corner(i).visual_detection().distance() > 0.f) {
                         madeObsv = true;
 
                         float newError = scoreFromVisDetect(*particle,
