@@ -70,7 +70,7 @@ def gamePlaying(player):
         return player.stay()
 
     if (player.lastDiffState == 'gamePenalized' and
-        player.lastStateTime > 0):
+        player.lastStateTime > 10):
         return player.goLater('waitToFaceField')
 
     if player.lastDiffState == 'fallen':
