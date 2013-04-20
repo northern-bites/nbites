@@ -48,9 +48,7 @@ protected:
     logview::LogViewer logView;
 	color::ColorTableCreator tableCreator;
 	vision::VisionDisplayModule visDispMod;
-	
-    color::ColorTableCreator tableCreator;
-    viewer::FieldViewer fieldView;
+	viewer::FieldViewer fieldView;
 
     // GUI stuff
     QTabWidget* toolTabs;

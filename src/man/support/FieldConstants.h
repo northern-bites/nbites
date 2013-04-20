@@ -2,8 +2,10 @@
 
 #include <cmath>
 #include "Common.h"
-#include "DebugConfig.h"
+#include "RobotConfig.h"
 
+
+namespace man {
 // Nao field constants
 
 #ifdef USING_LAB_FIELD
@@ -146,3 +148,5 @@ static const float HEADING_RIGHT = 0.0f;
 static const float HEADING_UP = 90.0f;
 static const float HEADING_LEFT = 180.0f;
 static const float HEADING_DOWN = -90.0f;
+
+}
