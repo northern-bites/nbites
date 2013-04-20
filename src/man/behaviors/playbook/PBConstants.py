@@ -316,7 +316,7 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # |  | D          /  |
 # |G |      +    |   +
 # |  |      C     \__|
-# 0  |               |
+# 0  |     M         |
 # |__|               |
 # |__________________|
 #
@@ -329,7 +329,7 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # NOTE: Constants are to set up triangle blocking the line of sight to the goalposts
 
 # Use the MAX_X to ensure we don't cross the line even with the tips of our feet.
-READY_NON_KICKOFF_MAX_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[1] - 45
+READY_NON_KICKOFF_MAX_X = NogginConstants.CENTER_FIELD_X - NogginConstants.CENTER_CIRCLE_RADIUS - 45
 """DEFENDER"""
 READY_NON_KICKOFF_DEFENDER_X = NogginConstants.GREEN_PAD_X + 80.
 READY_NON_KICKOFF_DEFENDER_OFFSET = 51.3
@@ -439,7 +439,7 @@ A L/R wing moves in a small line vertically (in the X) opposite the ball (ie. if
             chaser. The Wing will also be on the opposite side of the field as
             ball.
 A Picker hangs out dead center in front of the opponent goalbox waiting for a pass
-            from a chaser who is in a coner. It's like a real coner-kick in soccer!
+            from a chaser who is in a corner. It's like a real corner-kick in soccer!
 """
 FORWARD_X = (NogginConstants.CENTER_FIELD_X +
              NogginConstants.CENTER_CIRCLE_RADIUS + 30)
