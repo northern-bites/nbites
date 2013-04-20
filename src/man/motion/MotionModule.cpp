@@ -53,6 +53,7 @@ void MotionModule::run_()
     bodyCommandInput_.latch();
     headCommandInput_.latch();
     requestInput_.latch();
+    fallInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -331,8 +332,6 @@ void MotionModule::processMotionInput()
     // (3) Disallow further commands if we turned gains off.
     if (!gainsOn)
         return;
-
-
 
     // (4) Process body commands.
     if(lastBodyCommand != bodyCommandInput_.message().timestamp())

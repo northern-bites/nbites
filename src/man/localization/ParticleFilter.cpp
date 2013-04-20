@@ -389,10 +389,8 @@ namespace man
         ParticleIt iter;
         for(iter = particles.begin(); iter != particles.end(); ++iter)
         {
-            Particle particle = (*iter);
-
-            cdf[prev + particle.getWeight()] = particle;
-            prev += particle.getWeight();
+            cdf[prev + iter->getWeight()] = (*iter);
+            prev += iter->getWeight();
         }
 
         boost::mt19937 rng;
