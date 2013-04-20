@@ -967,10 +967,10 @@ LEFT_STRAIGHT_KICK = (
 
     # Lift/cock leg
     ((20.,30.,0.,0.),
-     (0.,17, -30.,100.,-40.,-25.),
-     (0.,10,-27,45.,-22.5,-18),
+     (0., 17, -40., 100.,-50.,-25.),
+     (0., 10,-27,45.,-22.5,-18),
      (100.,-30,0.,0),
-     .3,0, stiff.NORMAL_STIFFNESSES),
+     .4,0, stiff.NORMAL_STIFFNESSES),
 
     # Kick?
     ((43.,30.,0.,0.),
@@ -990,7 +990,8 @@ LEFT_STRAIGHT_KICK = (
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (0.0,0.0,-22.3,43.5,-21.2, 0.0),
      (90.,-10.,82.,13.2),
-     .7,0,stiff.NORMAL_STIFFNESSES),)
+     .7,0,stiff.NORMAL_STIFFNESSES),
+    )
 
 RIGHT_STRAIGHT_KICK = mirrorMove(LEFT_STRAIGHT_KICK)
 
