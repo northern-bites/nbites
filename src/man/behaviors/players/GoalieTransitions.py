@@ -17,11 +17,13 @@ def atGoalArea(player):
     """
     #magic number
     vision = player.brain.interface.visionField
-    return ((vision.visual_field_edge.distance_m < 150.0
+    return ((vision.visual_field_edge.distance_m < 110.0
              and vision.visual_field_edge.distance_m != 0.0)
-            or (player.brain.yglp.distance < 40.0
+            or (player.brain.yglp.distance < 20.0
+                and player.brain.yglp.on
                 and not player.brain.yglp.distance == 0.0)
-            or (player.brain.ygrp.distance < 40.0
+            or (player.brain.ygrp.distance < 20.0
+                and player.brain.ygrp.on
                 and not player.brain.ygrp.distance == 0.0))
 
 def ballIsInMyWay(player):
@@ -122,7 +124,7 @@ def onThisSideline(player):
     standing on.
     """
     vision = player.brain.interface.visionField
-    return (vision.visual_field_edge.distance_m < 300.0 and
+    return (vision.visual_field_edge.distance_m < 250.0 and
             vision.visual_field_edge.distance_m > 100.0)
 
 def unsure(player):

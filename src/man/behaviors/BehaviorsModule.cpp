@@ -84,7 +84,6 @@ void BehaviorsModule::initializePython()
 
     c_init_noggin_constants();
     c_init_objects();
-    c_init_goalie();
 
     try{
         initLedCommand_proto();

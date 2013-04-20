@@ -4,7 +4,6 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
-from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
@@ -17,7 +16,6 @@ def gameInitial(player):
         player.brain.fallController.enabled = False
         player.stand()
         player.zeroHeads()
-        player.system = GoalieSystem()
         player.side = LEFT
         player.isSaving = False
 
@@ -170,7 +168,7 @@ def saveIt(player):
         # This is to stand up before a penalty is called.
         if (stopTime - player.squatTime > 2):
             if SAVING:
-                player.executeMove(SweetMoves.GOALIE_NEW_SQUAT_STAND_UP)
+                player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
     return player.stay()
 
