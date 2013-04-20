@@ -23,7 +23,6 @@ target_link_libraries(
   viewer
   messages
   portals
-  support
   tool_common
   ${QT_LIBRARIES}
   )

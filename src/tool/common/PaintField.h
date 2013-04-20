@@ -13,7 +13,7 @@
 #include <QtGui>
 #include <vector>
 
-#include "FieldConstants.h"
+#include "common/FieldConstants.h"
 
 namespace tool{
 namespace viewer{
