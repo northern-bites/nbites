@@ -63,7 +63,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.play = self.brain.play
         gcState = self.gameState
 
-        if (gcState == 'gamePlaying'):
+        if (gcState == 'gamePlaying' and
+            not self.currentState == 'gamePenalized'):
             if not (self.currentState == 'gamePlaying'
                 and self.counter != 1):
                 # Make sure gamePlaying gets run
