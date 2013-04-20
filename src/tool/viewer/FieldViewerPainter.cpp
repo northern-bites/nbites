@@ -92,8 +92,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
     // Corners
 
     for (int i=0; i<obsv.visual_corner_size(); i++) {
-        if(obsv.visual_corner(i).visual_detection().on()
-           && (obsv.visual_corner(i).visual_detection().distance() > 0.f)){
+        if(obsv.visual_corner(i).visual_detection().distance() > 0.f){
                 painter.setBrush(Qt::black);
                 QPoint relLoc= getRelLoc(obsv.visual_corner(i).visual_detection().distance(),
                                          obsv.visual_corner(i).visual_detection().bearing());
@@ -150,8 +149,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
     }
 
     if (obsv.has_visual_cross()) {
-        if (obsv.visual_cross().on()
-            && (obsv.visual_cross().distance() > 0.f)){
+        if (obsv.visual_cross().distance() > 0.f){
             painter.setBrush(Qt::black);
             QPoint relLoc= getRelLoc(obsv.visual_cross().distance(),
                                      obsv.visual_cross().bearing());
