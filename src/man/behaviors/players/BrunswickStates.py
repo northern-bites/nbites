@@ -91,7 +91,8 @@ def gamePlaying(player):
     if not player.brain.motion.calibrated:
         return player.stay()
 
-    if player.lastDiffState == 'gamePenalized' and  player.brain.play.isChaser():
+    if (player.lastDiffState == 'gamePenalized'
+        and  player.brain.play.isChaser()):
         return player.goNow('afterPenalty')
 
     roleState = player.getRoleState()
@@ -139,6 +140,7 @@ def gameFinished(player):
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stand()
+        player.gameState = player.currentState
         player.inKickingState = False
         player.brain.fallController.enabled = False
 
@@ -160,6 +162,7 @@ def penaltyShotsGamePlaying(player):
 
     if player.firstFrame():
         player.stand()
+        player.gameState = player.currentState
         player.brain.fallController.enabled = True
         player.inKickingState = False
         player.shouldKickOff = False

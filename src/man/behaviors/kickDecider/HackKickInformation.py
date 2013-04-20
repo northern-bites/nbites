@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 USE_LOC = False
 USE_LOC_HALF_FIELD = False
 
@@ -19,7 +19,7 @@ class KickInformation:
         if constants.USING_LAB_FIELD:
             self.closeGoalThresh = 250
         else:
-            self.closeGoalThresh = 300
+            self.closeGoalThresh = 450
 
         # If true, we will always aim for the center of the goal.
         # If false, we will aim for the corners of the goal.
@@ -71,9 +71,6 @@ class KickInformation:
 
         self.orbitAngle = 0.0
 
-        if not USE_LOC_HALF_FIELD:
-            self.brain.onOwnFieldSide = False
-
     def getKickObjective(self):
         """
         Return a kick objective based on what we've observed
@@ -91,7 +88,7 @@ class KickInformation:
 
         if self.brain.yglp.on:
             self.sawGoal = True
-            if self.brain.yglp.certainty == 2: # HACK for early messages
+            if self.brain.yglp.certainty == 2: # HACK for early messages, means _SURE
                 if self.brain.yglp.distance > self.closeGoalThresh:
                     self.farGoalLeftPostBearings.append(self.brain.yglp.bearing_deg)
                     self.farGoalLeftPostDists.append(self.brain.yglp.distance)
@@ -109,7 +106,7 @@ class KickInformation:
 
         if self.brain.ygrp.on:
             self.sawGoal = True
-            if self.brain.ygrp.certainty == 2: # HACK for early messages
+            if self.brain.ygrp.certainty == 2: # HACK for early messages, means _SURE
                 if self.brain.ygrp.distance > self.closeGoalThresh:
                     self.farGoalRightPostBearings.append(self.brain.ygrp.bearing_deg)
                     self.farGoalRightPostDists.append(self.brain.ygrp.distance)
@@ -164,7 +161,7 @@ class KickInformation:
                 len(self.nearGoalLeftPostBearings)+len(self.nearGoalRightPostBearings)
 
         # bearing averages
-        # Need more than 4 frames of each post to consider it "real".
+        # Need more than 7 frames of each post to consider it "real".
         if len(self.farGoalLeftPostBearings) > 7:
             self.farLeftPostBearing = (sum(self.farGoalLeftPostBearings) /
                                        len(self.farGoalLeftPostBearings))
@@ -177,6 +174,7 @@ class KickInformation:
         if len(self.nearGoalRightPostBearings) > 7:
             self.nearRightPostBearing = (sum(self.nearGoalRightPostBearings) /
                                          len(self.nearGoalRightPostBearings))
+
         # distance averages
         if len(self.farGoalLeftPostDists) > 7:
             self.farLeftPostDist = (sum(self.farGoalLeftPostDists) /
@@ -190,6 +188,7 @@ class KickInformation:
         if len(self.nearGoalRightPostDists) > 7:
             self.nearRightPostDist = (sum(self.nearGoalRightPostDists) /
                                       len(self.nearGoalRightPostDists))
+
         # average post distances
         if self.farLeftPostBearing is not None and \
                 self.farRightPostBearing is not None:
@@ -228,7 +227,8 @@ class KickInformation:
     def dangerousBall(self):
         for mate in self.brain.teamMembers:
             if mate.playerNumber in [1] and mate.active:
-                if mate.ballOn and mate.ballDist < self.closeGoalThresh+50:
+                if mate.ballOn:# and mate.ballDist < self.closeGoalThresh+50:
+                    # Goalie can't really see past midfield, so don't worry about distance 4/19
                     return True
 
         return False
@@ -294,21 +294,25 @@ class KickInformation:
         if self.farAvgPostDist != 0 and self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
             #  Screw it. We need it anyway.
-            if self.dangerousBallCount > 5 or self.nearGoalieOwn or \
-                    self.brain.onOwnFieldSide:
+            if (self.dangerousBallCount > 5 or
+                self.nearGoalieOwn):
+                # Don't aim at the near goal.
                 rightPostBearing = self.farRightPostBearing
                 leftPostBearing = self.farLeftPostBearing
             else:
+                # Aim at the near goal.
                 rightPostBearing = self.nearRightPostBearing
                 leftPostBearing = self.nearLeftPostBearing
         elif self.farAvgPostDist != 0:
+            # Only saw far goal? Kick towards it and hope.
+            # Goalie detection too unreliable for far goal?
             rightPostBearing = self.farRightPostBearing
             leftPostBearing = self.farLeftPostBearing
         elif self.nearAvgPostDist != 0:
             # Goalie detection too easily fooled.
             #  Screw it. We need it anyway.
-            if self.dangerousBallCount > 5 or self.nearGoalieOwn or \
-                    self.brain.onOwnFieldSide:
+            if (self.dangerousBallCount > 5 or
+                self.nearGoalieOwn):
 
                 # Can only see our own goal: Use goalie to make decision
                 if self.dangerousBallCount > 5:
@@ -392,7 +396,7 @@ class KickInformation:
 
         # Did we pick a kick yet?
         if kick is not None:
-            kick.h = 0 # Straight is fine.
+            kick.h = 0 # Straight is fine- don't orbit.
             return kick
 
         # Choose whichever kick is closest to being between the score points.
@@ -478,7 +482,8 @@ class KickInformation:
     def goalieBasedKick(self):
         # Assert: Neither far post was seen.
         #         At least one near post was seen.
-        #         Either Goalie can see the ball, or not.
+        #         Goalie registered dangerous balls.
+        #         Either Goalie can currently see the ball, or not.
         goalieBearing = 0
         goalieDist = 0
         kick = None
@@ -529,6 +534,7 @@ class KickInformation:
 
         if DEBUG_KICK_DECISION:
             print "myGlobalHeading: ",myGlobalHeading
+            print "ballX: ",ballX
             print "ballY: ",ballY
 
         # Determine which kick I should do.
@@ -573,6 +579,7 @@ class KickInformation:
     def triangulateClearKick(self):
         # Assert: Neither far post was seen.
         #         Both near posts were seen.
+        #         Use near posts to hack a loc for ourselves.
         bearingDiff = self.nearLeftPostBearing - self.nearRightPostBearing
         leftDist = self.nearRightPostDist
         rightDist = self.nearLeftPostDist
@@ -681,7 +688,7 @@ class KickInformation:
         heading = self.brain.loc.h
         xPosition = self.brain.loc.x
 
-        if xPosition < 370:
+        if xPosition < 520:
             # Blue half of field.
             if heading > 0:
                 return False

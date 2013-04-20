@@ -8,33 +8,29 @@ from .. import SweetMoves
 
 def gameInitial(player):
     if player.firstFrame():
-        pass
-        #player.gainsOn()
-        #player.brain.fallController.enableFallProtection(False)
+        player.gainsOn()
+        player.brain.fallController.enabled = False
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
     return player.goLater('standup')
 
 def gameSet(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
     return player.goLater('standup')
 
 def gamePlaying(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
     return player.goLater('standup')
 
 def gamePenalized(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
+
     return player.goLater('standup')
 
 def standup(player):
@@ -47,5 +43,15 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.STAND_UP_FRONT)
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
+
+    if player.counter == 150:
+        return player.goLater('restore')
+
+    return player.stay()
+
+def restore(player):
+    if player.firstFrame():
+        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+
     return player.stay()

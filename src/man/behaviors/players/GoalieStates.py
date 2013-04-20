@@ -156,7 +156,7 @@ def saveIt(player):
     if player.firstFrame():
         player.brain.tracker.lookToAngle(0)
         if SAVING:
-            player.executeMove(SweetMoves.GOALIE_SQUAT)
+            player.executeMove(SweetMoves.GOALIE_NEW_SQUAT)
         else:
             player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         player.isSaving = False
@@ -170,7 +170,7 @@ def saveIt(player):
         # This is to stand up before a penalty is called.
         if (stopTime - player.squatTime > 2):
             if SAVING:
-                player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+                player.executeMove(SweetMoves.GOALIE_NEW_SQUAT_STAND_UP)
             return player.goLater('upUpUP')
     return player.stay()
 
