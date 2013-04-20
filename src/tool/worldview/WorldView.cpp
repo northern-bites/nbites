@@ -11,7 +11,7 @@ namespace worldview {
 
 WorldView::WorldView(QWidget* parent)
     : commThread("comm", COMM_FRAME_LENGTH_uS),
-	  wviewComm(16,69), //TODO for some reason MY_TEAM_NUMBER doesn't work
+	  wviewComm(16,5), //TODO for some reason MY_TEAM_NUMBER doesn't work
 	  portals::Module(),
 	  QWidget(parent)
 
@@ -46,12 +46,13 @@ WorldView::WorldView(QWidget* parent)
 
 
 void WorldView::run_()
-{
-	//this only works when the pool size is increased by ~4x (24 works)
+{ 
+    //this only works when the pool size is increased by ~4x (24 works)
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         commIn[i].latch();
-		fieldPainter->updateWithLocationMessage(commIn[i].message());
+		if(!(commIn[i].message().my_x()==0 && commIn[i].message().my_y()==0))
+			fieldPainter->updateWithLocationMessage(commIn[i].message());
     }
 
 	//proof of concept: latch just one portal

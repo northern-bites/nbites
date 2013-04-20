@@ -33,11 +33,15 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                                             bool red)
 {
 	QPainter painter(this);
+	painter.translate(0, FIELD_GREEN_HEIGHT);
+    painter.scale(1, -1);
 
     if (red)
         painter.setBrush(Qt::red);
 
     QPoint locCenter(loc.my_x(), loc.my_y());
+
+	//std::cout<<"Painting at "<<loc.my_x()<<" "<<loc.my_y()<<std::endl;
 
     //draw myself
 	painter.drawEllipse(locCenter,
@@ -60,8 +64,8 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
 		painter.setBrush(Qt::darkYellow); //Orange isn't a thing??
 		painter.drawEllipse(loc.my_x()+loc.ball_dist()*std::cos(loc.my_h()+loc.ball_bearing()),
 							loc.my_y()+loc.ball_dist()*std::sin(loc.my_h()+loc.ball_bearing()),
-							5,
-							5);
+							25,
+							25);
 
 		//draw how sure I am about where the ball is
 		//TODO

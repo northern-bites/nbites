@@ -12,6 +12,7 @@
 
 #include <QtGui>
 #include <vector>
+#include <iostream>
 
 #include "common/FieldConstants.h"
 
