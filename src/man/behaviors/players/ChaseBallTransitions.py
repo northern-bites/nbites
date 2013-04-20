@@ -85,7 +85,7 @@ def shouldKickAgain(player):
     """
     Ball hasn't changed enough to warrant new kick decision.
     """
-    return ballNearPosition(player)
+    return player.brain.ball.vis.on and ballNearPosition(player)
 
 def shouldOrbit(player):
     """

@@ -25,8 +25,8 @@ SHOULD_CANCEL_ORBIT_BALL_DIST = APPROACH_BALL_AGAIN_DIST
 
 # Should kick again
 SHOULD_KICK_AGAIN_CLOSE_X = 9.5
-SHOULD_KICK_AGAIN_FAR_X = 20
-SHOULD_KICK_AGAIN_Y = 9
+SHOULD_KICK_AGAIN_FAR_X = 25
+SHOULD_KICK_AGAIN_Y = 15
 
 # Ball in position
 ## NOTE: important that these values slightly overestimate the values in
