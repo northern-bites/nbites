@@ -9,7 +9,7 @@ set( COMMON_HEADERS
    FieldConstants.h
   )
 
-Qt4_wrap_cpp( COMMON_HEADERS_MOC ${COMMON_HEADERS} )
+Qt4_wrap_cpp( COMMON_HEADERS_MOC PaintField.h )
 
 add_library(tool_common
     STATIC
