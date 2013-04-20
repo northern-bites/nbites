@@ -156,7 +156,7 @@ def saveIt(player):
     if player.firstFrame():
         player.brain.tracker.lookToAngle(0)
         if SAVING:
-            player.executeMove(SweetMoves.GOALIE_NEW_SQUAT)
+            player.executeMove(SweetMoves.GOALIE_SQUAT)
         else:
             player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
         player.isSaving = False

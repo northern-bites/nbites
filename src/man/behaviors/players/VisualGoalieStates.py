@@ -268,13 +268,13 @@ def centerAtGoalBasedOnCorners(player):
                     heading = \
                         getRobotGlobalHeading(0,
                                               corner.visual_detection.bearing,
-                                              corner.physical_orientation-radians(15.0))
+                                              corner.physical_orientation)
                     relX = getCornerRelX(0,
                                          corner.visual_detection.distance,
-                                         corner.physical_orientation-radians(15.0))
+                                         corner.physical_orientation)
                     relY = getCornerRelY(0,
                                          corner.visual_detection.distance,
-                                         corner.physical_orientation-radians(15.0))
+                                         corner.physical_orientation)
                 else:
                     continue
 
