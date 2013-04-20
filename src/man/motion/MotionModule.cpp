@@ -53,6 +53,7 @@ void MotionModule::run_()
     bodyCommandInput_.latch();
     headCommandInput_.latch();
     requestInput_.latch();
+    fallInput_.latch();
 
     sensorAngles    = toJointAngles(jointsInput_.message());
 
@@ -292,6 +293,11 @@ void MotionModule::processMotionInput()
         {
             resetOdometry();
         }
+        if (requestInput_.message().reset_providers())
+        {
+            resetScriptedProvider();
+            resetWalkProvider();
+        }
         if (requestInput_.message().remove_stiffness())
         {
             // Don't set gainsOn to false or else we won't freeze from behaviors
@@ -331,8 +337,6 @@ void MotionModule::processMotionInput()
     // (3) Disallow further commands if we turned gains off.
     if (!gainsOn)
         return;
-
-
 
     // (4) Process body commands.
     if(lastBodyCommand != bodyCommandInput_.message().timestamp())

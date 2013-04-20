@@ -28,8 +28,8 @@ static const int PACKET_DROPPED = 1;
 // Constants for the Boxcar
 static const int BOXCAR_WIDTH = 150;
 //@TODO: empirically find actual constants...
-static const double NETWORK_BAD  = 10.0f;
-static const double NETWORK_GOOD = 2.0f;
+static const double NETWORK_BAD  = 20.0f;
+static const double NETWORK_GOOD = 5.0f;
 
 // Not currently used, but might be useful as a sanity check
 static const double PACKETS_DROPPED_THRESHOLD = 0.3333f;

@@ -76,6 +76,7 @@ NaoPose::NaoPose() :
                                                                             0),
             horizonRight(0, 0), horizonSlope(0.0f), perpenHorizonSlope(0.0f),
             cameraInWorldFrame(0.0f, 0.0f, 0.0f), comHeight(0.0f) {
+    CameraCalibrate::init();
 }
 
 /**

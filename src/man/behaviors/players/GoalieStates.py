@@ -4,7 +4,6 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
-from goalie import GoalieSystem, RIGHT_SIDE_ANGLE, LEFT_SIDE_ANGLE
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
@@ -17,7 +16,6 @@ def gameInitial(player):
         player.brain.fallController.enabled = False
         player.stand()
         player.zeroHeads()
-        player.system = GoalieSystem()
         player.side = LEFT
         player.isSaving = False
 
@@ -72,8 +70,8 @@ def gamePlaying(player):
         return player.stay()
 
     if (player.lastDiffState == 'gamePenalized' and
-        player.lastStateTime > 10):
-        return player.goLater('decideLeftSide')
+        player.lastStateTime > 0):
+        return player.goLater('waitToFaceField')
 
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')

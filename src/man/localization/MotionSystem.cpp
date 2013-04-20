@@ -14,13 +14,11 @@ namespace man
         /**
          * Updates the particle set according to the motion.
          *
-         * @TODO Currently assumes odometry is how FakeOdometryModule creates it,
-         *       ie (delta X, delta Y, etc...
-         *       Verify when motion module is pulled
          * @return the updated ParticleSet.
          */
         void MotionSystem::update(ParticleSet& particles,
-                                  const messages::RobotLocation& deltaMotionInfo)
+                                  const messages::RobotLocation& deltaMotionInfo,
+                                  bool lost)
         {
             ParticleIt iter;
             for(iter = particles.begin(); iter != particles.end(); iter++)

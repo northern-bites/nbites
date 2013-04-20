@@ -1,4 +1,5 @@
 #include "CameraCalibrate.h"
+#include <cstdlib>
 
 // order is Y, X because when we when we multiply a vector to the right the order
 // in which the vector is multiplied with the transforms is X, Y (since it goes right
@@ -20,10 +21,15 @@ ufmatrix4 CameraCalibrate::TransformsBottom[2] =
   CoordFrame4D::rotation4D(CoordFrame4D::X_AXIS,
                            CameraCalibrate::ParamsBottom[CameraCalibrate::ROLL])};
 
-void CameraCalibrate::init(std::string name) {
+void CameraCalibrate::init() {
+    char getName[40];
+    gethostname(getName, 40);
+    std::string name(getName);
 
     float paramsTop[] = {0.0f, 0.0f};
     float paramsBottom[] = {0.0f, 0.0f};
+
+    std::cout << "Setting CameraCalibrate for " << name << std::endl;
 
     if (name == "river") {
         paramsTop[PITCH] = -.042f;
@@ -31,14 +37,31 @@ void CameraCalibrate::init(std::string name) {
         paramsTop[PITCH] = -.04f;
         paramsBottom[PITCH] = -.12f;
     } else if (name == "zoe") {
-        paramsTop[ROLL] = -0.02f;
-        paramsTop[PITCH] = 0.018f;
-        paramsBottom[PITCH] = 0.02f;
+        paramsTop[ROLL] = -0.03f;
+        paramsTop[PITCH] = -0.01f;
+        paramsBottom[ROLL] = -0.02f;
     } else if (name == "jayne") {
         paramsTop[PITCH] = 0.025f;
         paramsBottom[PITCH] = 0.005f;
     } else if (name == "wash") {
-        paramsTop[PITCH] = -.005f;
+        paramsTop[ROLL] = -0.01f;
+    } else if (name == "kaylee") {
+        paramsTop[PITCH] = 0.08f;
+        paramsTop[ROLL] = 0.02f;
+        paramsBottom[PITCH] = 0.1f;
+    } else if (name == "vera") {
+        paramsTop[PITCH] = 0.07f;
+        paramsTop[ROLL] = -0.01f;
+        paramsBottom[PITCH] = 0.06f;
+    } else if (name == "inara") {
+        paramsTop[PITCH] = 0.09f;
+        paramsTop[ROLL] = -0.01f;
+        paramsBottom[PITCH] = 0.06f;
+        paramsBottom[ROLL] = -0.03f;
+    } else if (name == "simon") {
+        paramsTop[PITCH] = 0.08f;
+        paramsTop[ROLL] = 0.02f;
+        paramsBottom[PITCH] = 0.1f;
     }
 
     UpdateWithParams(paramsTop, paramsBottom);

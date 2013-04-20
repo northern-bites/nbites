@@ -24,7 +24,8 @@ namespace man
         ~MotionSystem();
 
         void update(ParticleSet& particles,
-                    const messages::RobotLocation& deltaMotionInfo);
+                    const messages::RobotLocation& deltaMotionInfo,
+                    bool lost = false);
 
         void randomlyShiftParticle(Particle* particle);
 

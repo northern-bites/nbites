@@ -80,6 +80,9 @@ add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
 add_subdirectory( vision_offline )
+add_subdirectory( viewer )
+add_subdirectory( common )
+
 
 # Sources
 set( tool_srcs main.cpp
@@ -111,6 +114,8 @@ target_link_libraries(
   image_display
   image # man image
   vision # man vision
+  viewer
+  tool_common
   colorcreator
   vision_offline
   ${QT_LIBRARIES}
