@@ -11,6 +11,12 @@ namespace man
         }
         MotionSystem::~MotionSystem(){}
 
+        void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
+        {
+            xAndYNoise = xyNoise_;
+            hNoise = hNoise_;
+        }
+
         /**
          * Updates the particle set according to the motion.
          *

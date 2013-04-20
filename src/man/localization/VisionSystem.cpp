@@ -27,11 +27,13 @@ namespace man
             bool madeObsv = false;
 
             float times = 0;
+            float lowestParticleError = 10000000.f;
             for(iter = particles.begin(); iter != particles.end(); iter++)
             {
                 Particle* particle = &(*iter);
-                float newParticleError = 0.f;
 
+                float curParticleError = 0;
+                int numObsv = 0;
                 for (int i=0; i<obsv.visual_corner_size(); i++)
                 {
                     if(obsv.visual_corner(i).visual_detection().distance() > 0.f) {
@@ -39,7 +41,8 @@ namespace man
 
                         float newError = scoreFromVisDetect(*particle,
                                                             obsv.visual_corner(i).visual_detection());
-                        newParticleError+= newError;
+                        curParticleError+= newError;
+                        numObsv++;
 
                     }
                 }
@@ -49,7 +52,8 @@ namespace man
                     madeObsv = true;
                     float newError = scoreFromVisDetect(*particle,
                                                         obsv.goal_post_l().visual_detection());
-                    newParticleError+= newError;
+                    curParticleError+= newError;
+                    numObsv++;
                 }
 
                 if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
@@ -57,14 +61,16 @@ namespace man
                     madeObsv = true;
                     float newError = scoreFromVisDetect(*particle,
                                                         obsv.goal_post_r().visual_detection());
-                    newParticleError+= newError;
+                    curParticleError+= newError;
+                    numObsv++;
                 }
 
                 if (obsv.visual_cross().distance() > 0.f) {
                     madeObsv = true;
                     float newError = scoreFromVisDetect(*particle,
                                                         obsv.visual_cross());
-                    newParticleError+= newError;
+                    curParticleError+= newError;
+                    numObsv++;
                 }
 
                 // We never updated the new particle weight, so no observations been made
@@ -76,8 +82,11 @@ namespace man
                 else
                 {
                     // Set the particle weight to 1/predictionError (no golf scores...)
-                    particle->setWeight(1/newParticleError);
+                    particle->setWeight(1/curParticleError);
                     totalWeight += particle->getWeight();
+                    // Update the total swarm error
+                    if ((curParticleError/(float)numObsv) < lowestParticleError)
+                        lowestParticleError = curParticleError/(float)numObsv;
                 }
             }
 
@@ -88,9 +97,9 @@ namespace man
                 particle->normalizeWeight(totalWeight);
                 // std::cout << "\t" << particle->getWeight();
             }
-            // std::cout << "\n\n";
 
-            //std::cout << "UPDATED\n\n";
+            if (madeObsv)
+                currentLowestError = lowestParticleError;
 
             // Succesfully updated particles with Vision!
             return true;

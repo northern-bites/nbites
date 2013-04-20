@@ -31,6 +31,8 @@ namespace man
 
         void setFallen(bool fallen);
 
+        void resetNoise(float xyNoise_, float hNoise_);
+
         boost::mt19937 rng;
     private:
         float xAndYNoise;
