@@ -48,8 +48,8 @@ def goToPosition(nav):
 #    print "distance {0} and speed {1}".format(relDest.dist, speed)
 
     #if y-distance is small, ignore it to avoid strafing
-    #strafelessDest = helper.getStrafelessDest(relDest)
-    helper.setDestination(nav, relDest, speed)
+    strafelessDest = helper.getStrafelessDest(relDest)
+    helper.setDestination(nav, strafelessDest, speed)
 
 #    if navTrans.shouldAvoidObstacle(nav):
 #        return nav.goLater('avoidObstacle')
