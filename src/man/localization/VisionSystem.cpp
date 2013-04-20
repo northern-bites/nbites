@@ -16,7 +16,7 @@ namespace man
          * @return if observations were made
          */
         bool VisionSystem::update(ParticleSet& particles,
-                                  const messages::VisionField& observations)
+                                  const messages::VisionField& obsv)
         {
             const float TINY_WEIGHT = .00001f;
 
@@ -32,37 +32,42 @@ namespace man
                 Particle* particle = &(*iter);
                 float newParticleError = 0.f;
 
-                for (int i=0; i<observations.visual_corner_size(); i++)
+                for (int i=0; i<obsv.visual_corner_size(); i++)
                 {
-                    madeObsv = true;
+                    if(obsv.visual_corner(i).visual_detection().on()
+                       && (obsv.visual_corner(i).visual_detection().distance() > 0.f)) {
+                        madeObsv = true;
 
-                    float newError = scoreFromVisDetect(*particle,observations.visual_corner(i).visual_detection());
-                    newParticleError+= newError;
-                    //float newWeight = 1.0f; //scoreFromLandmark(**particle, visualCorner);
-                    // if (newWeight < TINY_WEIGHT)
-                    //     newWeight = TINY_WEIGHT;
+                        float newError = scoreFromVisDetect(*particle,
+                                                            obsv.visual_corner(i).visual_detection());
+                        newParticleError+= newError;
+
+                    }
                 }
 
-                // if (observations.has_goal_post_l()){
-                //     madeObsv = true;
-                //     float newError = scoreFromVisDetect(*particle,
-                //                                         observations.goal_post_l().visual_detection());
-                //     newParticleError+= newError;
-                // }
+                if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
+                    && (obsv.goal_post_l().visual_detection().distance() > 0.f)) {
+                    madeObsv = true;
+                    float newError = scoreFromVisDetect(*particle,
+                                                        obsv.goal_post_l().visual_detection());
+                    newParticleError+= newError;
+                }
 
-                // if (observations.has_goal_post_r()){
-                //     madeObsv = true;
-                //     float newError = scoreFromVisDetect(*particle,
-                //                                         observations.goal_post_r().visual_detection());
-                //     newParticleError+= newError;
-                // }
+                if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
+                    && (obsv.goal_post_r().visual_detection().distance() > 0.f)) {
+                    madeObsv = true;
+                    float newError = scoreFromVisDetect(*particle,
+                                                        obsv.goal_post_r().visual_detection());
+                    newParticleError+= newError;
+                }
 
-                // if (observations.has_visual_cross()){
-                //     madeObsv = true;
-                //     float newError = scoreFromVisDetect(*particle,
-                //                                         observations.visual_cross());
-                //     newParticleError+= newError;
-                // }
+                if (obsv.has_visual_cross() && obsv.visual_cross().on()
+                    && (obsv.visual_cross().distance() > 0.f)) {
+                    madeObsv = true;
+                    float newError = scoreFromVisDetect(*particle,
+                                                        obsv.visual_cross());
+                    newParticleError+= newError;
+                }
 
                 // We never updated the new particle weight, so no observations been made
                 if(!madeObsv)
@@ -78,7 +83,6 @@ namespace man
                 }
             }
 
-            // std::cout << "Particle Weights:";
             // normalize the particle weights
             for(iter = particles.begin(); iter != particles.end(); iter++)
             {
@@ -120,9 +124,7 @@ namespace man
                 // Convert from obsv in polar to rep in cartesian
                 // @Todo:  Explain these calculations somewhere!!
                 float sin, cos;
-                // convert 90 degrees to bearings
-                float ninetyDeg = 1.5707963f;
-                sincosf(ninetyDeg - (particle.getLocation().h() + obsv.bearing()), &sin, &cos);
+                sincosf((particle.getLocation().h() + obsv.bearing()), &sin, &cos);
                 // float testSin, testCos;
                 // sincosf(ninetyDeg, &testSin, &testCos);
                 // std::cout << "sin(90),cos(90)\t" << testSin << "\t" << testCos << "\n";

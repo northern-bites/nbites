@@ -22,5 +22,6 @@ target_link_libraries(
   image_display
   messages
   portals
+  support
   ${QT_LIBRARIES}
   )
