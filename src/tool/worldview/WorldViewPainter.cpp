@@ -51,11 +51,21 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                      PARTICLE_WIDTH * std::sin(loc.my_h()) + loc.my_y());
 
 	//draw my uncertainty
+	painter.drawEllipse(locCenter,
+						(int)loc.my_x_uncert(),
+						(int)loc.my_y_uncert());
 
-	//draw where I think the ball is
+	if(loc.ball_on()){
+		//draw where I think the ball is
+		painter.setBrush(Qt::darkYellow); //Orange isn't a thing??
+		painter.drawEllipse(loc.my_x()+loc.ball_dist()*std::cos(loc.my_h()+loc.ball_bearing()),
+							loc.my_y()+loc.ball_dist()*std::sin(loc.my_h()+loc.ball_bearing()),
+							5,
+							5);
 
-	//draw how sure I am about where the ball is
-
+		//draw how sure I am about where the ball is
+		//TODO
+	}
 
 }
 

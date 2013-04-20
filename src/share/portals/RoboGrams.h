@@ -390,8 +390,10 @@ public:
     MessagePool<MessageHolder<type> > MessageHolder<type>::pool_(size)
 
 // Here is the default pool size
+//I CHANGED THIS AND IT WAS PROBABLY A REALLY BAD IDEA
+//BRIAN -- APR 20 2013
 template<class T>
-SET_POOL_SIZE_DEFAULT(T, 8);
+SET_POOL_SIZE_DEFAULT(T, 24);
 
 template<class T>
 void MessageHolder<T>::release()

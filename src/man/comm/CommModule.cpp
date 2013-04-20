@@ -54,7 +54,7 @@ CommModule::~CommModule()
 
 void CommModule::run_()
 {
-    PROF_ENTER(P_COMM);
+	PROF_ENTER(P_COMM);
 
     receive();
 

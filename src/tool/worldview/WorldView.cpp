@@ -18,7 +18,6 @@ WorldView::WorldView(QWidget* parent)
 {
 	commThread.addModule(*this);
 	commThread.addModule(wviewComm);
-	commThread.start();
 
 	fieldPainter = new WorldViewPainter(this);
     mainLayout = new QHBoxLayout(this);
@@ -36,6 +35,8 @@ WorldView::WorldView(QWidget* parent)
 
     this->setLayout(mainLayout);
 
+	connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+
 	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         commIn[i].wireTo(wviewComm._worldModels[i], true);
@@ -46,16 +47,30 @@ WorldView::WorldView(QWidget* parent)
 
 void WorldView::run_()
 {
-	//this would work if the pool size wasn't an issue
-    /*for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+	//this only works when the pool size is increased by ~4x (24 works)
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         commIn[i].latch();
-	    std::cout<<"commPacket says: "<<commIn[i].message().DebugString()<<std::endl;
-    }*/
+		fieldPainter->updateWithLocationMessage(commIn[i].message());
+    }
 
 	//proof of concept: latch just one portal
-	commIn[3].latch();
-	fieldPainter->updateWithLocationMessage(commIn[3].message());
+	//commIn[3].latch();
+	//fieldPainter->updateWithLocationMessage(commIn[3].message());
+}
+
+void WorldView::startButtonClicked(){
+	commThread.start();
+	startButton->setText(QString("Stop World Viewer"));
+	disconnect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+	connect(startButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+}
+
+void WorldView::stopButtonClicked(){
+	commThread.stop();
+	startButton->setText(QString("Start World Viewer"));
+	disconnect(startButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+	connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
 }
 
 }

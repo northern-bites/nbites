@@ -38,6 +38,10 @@ protected:
     man::comm::CommModule wviewComm;
 
     man::DiagramThread commThread;
+
+protected slots:
+    void startButtonClicked();
+    void stopButtonClicked();
 };
 
 }
