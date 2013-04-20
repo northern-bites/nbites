@@ -1,4 +1,3 @@
- 
 /**
  * Class responsible for drawing more things on the field, inherits from PaintField
  * so that the field itself is already drawn. Based on specs from the FieldViewer

@@ -31,7 +31,8 @@ void PaintField::paintEvent(QPaintEvent* event)
 {
 
     QPainter painter(this);
-    painter.scale(scaleFactor, scaleFactor);
+	painter.translate(0, FIELD_GREEN_HEIGHT);
+    painter.scale(scaleFactor, -scaleFactor);
 
     // Field Areas
 

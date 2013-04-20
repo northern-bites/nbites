@@ -8,7 +8,8 @@
 #include "WorldViewPainter.h"
 
 #include "comm/CommModule.h"
-//#include "man/RobotConfig.h"
+
+#include "RobotConfig.h"
 
 
 namespace tool {

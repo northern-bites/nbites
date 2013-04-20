@@ -13,10 +13,10 @@ set(WORLDVIEW_HEADERS
 
 Qt4_wrap_cpp( WORLDVIEW_HEADERS_MOC ${WORLDVIEW_HEADERS} )
 
-#configure_file(
-#  "${CMAKE_CURRENT_LIST_DIR}/cmake/RobotConfig.in"
-#  "${PROJECT_BINARY_DIR}/RobotConfig.h"
-#)
+configure_file(
+  "${MAN_DIR}/cmake/RobotConfig.in"
+  "${PROJECT_BINARY_DIR}/RobotConfig.h"
+)
 
 # Add project as a library.
 add_library(worldview

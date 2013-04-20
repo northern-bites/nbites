@@ -6,7 +6,7 @@ namespace tool {
 namespace worldview {
 
 WorldView::WorldView(QWidget* parent)
-    : wview_comm(0,/*MY_TEAM_NUMBER*/0),
+    : wview_comm(2,16),
 	  portals::Module(),
 	  QWidget(parent)
 

@@ -29,6 +29,12 @@ configure_file(
   "${SHARE_DIR}/cmake/DebugConfig.in"
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
+
+configure_file(
+  "${MAN_DIR}/cmake/RobotConfig.in"
+  "${PROJECT_BINARY_DIR}/RobotConfig.h"
+)
+
 include_directories( ${PROJECT_BINARY_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR} )
 
@@ -105,9 +111,9 @@ target_link_libraries(
   logview
   image_display
   image # man image
-  comm # man comm
   image_display
   worldview
+  comm # man comm
   tool_common
   colorcreator
   ${QT_LIBRARIES}
