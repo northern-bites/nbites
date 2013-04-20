@@ -37,14 +37,14 @@ void CameraCalibrate::init() {
         paramsTop[PITCH] = -.04f;
         paramsBottom[PITCH] = -.12f;
     } else if (name == "zoe") {
-        paramsTop[ROLL] = -0.02f;
-        paramsTop[PITCH] = 0.018f;
-        paramsBottom[PITCH] = 0.02f;
+        paramsTop[ROLL] = -0.03f;
+        paramsTop[PITCH] = -0.01f;
+        paramsBottom[ROLL] = -0.02f;
     } else if (name == "jayne") {
         paramsTop[PITCH] = 0.025f;
         paramsBottom[PITCH] = 0.005f;
     } else if (name == "wash") {
-        paramsTop[PITCH] = -.005f;
+        paramsTop[ROLL] = -0.01f;
     } else if (name == "kaylee") {
         paramsTop[PITCH] = 0.08f;
         paramsTop[ROLL] = 0.02f;
@@ -56,8 +56,12 @@ void CameraCalibrate::init() {
     } else if (name == "inara") {
         paramsTop[PITCH] = 0.09f;
         paramsTop[ROLL] = -0.01f;
-        paramsBottom[PITCH] = 0.6f;
+        paramsBottom[PITCH] = 0.06f;
         paramsBottom[ROLL] = -0.03f;
+    } else if (name == "simon") {
+        paramsTop[PITCH] = 0.08f;
+        paramsTop[ROLL] = 0.02f;
+        paramsBottom[PITCH] = 0.1f;
     }
 
     UpdateWithParams(paramsTop, paramsBottom);
