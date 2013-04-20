@@ -5,13 +5,18 @@
 namespace tool {
 namespace worldview {
 
+//SET_POOL_SIZE(messages::WorldModel, 24);
+
 WorldView::WorldView(QWidget* parent)
-    : wview_comm(16,0),
+    : commThread("comm", COMM_FRAME_LENGTH_uS),
+	  wview_comm(16,69), //TODO for some reason MY_TEAM_NUMBER doesn't work
 	  portals::Module(),
 	  QWidget(parent)
 
 {
-	commGram.addModule(wview_comm);
+	commThread.addModule(*this);
+	commThread.addModule(wview_comm);
+	commThread.start();
 
 	fieldPainter = new WorldViewPainter(this);
     mainLayout = new QHBoxLayout(this);
@@ -21,7 +26,7 @@ WorldView::WorldView(QWidget* parent)
 
 	options = new QVBoxLayout();
     options->setAlignment(Qt::AlignTop);
-	startButton = new QPushButton(QString("Start World Viewer"));
+	startButton = new QPushButton(QString("Start World Viewer"));  
 	options->addWidget(startButton);
 
     mainLayout->addLayout(field);
@@ -39,12 +44,16 @@ WorldView::WorldView(QWidget* parent)
 
 void WorldView::run_()
 {
-	commGram.run();
-	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+	//this would work if the pool size wasn't an issue
+    /*for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-		commIn[i].latch();
-		std::cout<<"commPacket says: "<<commIn[i].message().DebugString()<<std::endl;
-	}
+        commIn[i].latch();
+	    std::cout<<"commPacket says: "<<commIn[i].message().DebugString()<<std::endl;
+    }*/
+
+	//proof of concept: latch just one portal
+	commIn[3].latch();
+	std::cout<<"commPacket says: "<<commIn[3].message().DebugString()<<std::endl;
 }
 
 }

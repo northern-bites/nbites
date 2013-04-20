@@ -69,7 +69,7 @@ Tool::Tool(const char* title) :
     }
     this->setGeometry(*geometry);
 
-	diagram.addModule(worldView);
+	//diagram.addModule(worldView);
 }
 
 Tool::~Tool() {

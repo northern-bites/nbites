@@ -9,7 +9,7 @@
 #include "comm/CommModule.h"
 #include "RobotConfig.h"
 #include "RoboGrams.h"
-
+#include "DiagramThread.h"
 
 namespace tool {
 namespace worldview {
@@ -38,7 +38,9 @@ protected:
     man::comm::CommModule wview_comm;
 
 	//add a diagram to a module in a diagram itself??!
-	portals::RoboGram commGram;
+	//portals::RoboGram commGram;
+
+    man::DiagramThread commThread;
 };
 
 }

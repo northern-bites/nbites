@@ -29,7 +29,7 @@ void WorldViewPainter::paintEvent(QPaintEvent* event)
 }
 
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
-                                            messages::RobotLocation loc,
+                                            messages::WorldModel loc,
                                             bool red)
 {
     QPainter painter(this);
@@ -37,19 +37,19 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
     if (red)
         painter.setBrush(Qt::red);
 
-    QPoint locCenter(loc.x(), loc.y());
+    QPoint locCenter(loc.my_x(), loc.my_y());
 
     painter.drawEllipse(locCenter,
                         PARTICLE_WIDTH,
                         PARTICLE_WIDTH);
 
-    painter.drawLine(loc.x(),
-                     loc.y(),
-                     PARTICLE_WIDTH * std::cos(loc.h()) + loc.x(),
-                     PARTICLE_WIDTH * std::sin(loc.h()) + loc.y());
+    painter.drawLine(loc.my_x(),
+                     loc.my_y(),
+                     PARTICLE_WIDTH * std::cos(loc.my_h()) + loc.my_x(),
+                     PARTICLE_WIDTH * std::sin(loc.my_h()) + loc.my_y());
 }
 
-void WorldViewPainter::updateWithLocationMessage(messages::RobotLocation newLoc)
+void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc)
 {
     curLoc = newLoc;
     if(shouldPaintLocation) {

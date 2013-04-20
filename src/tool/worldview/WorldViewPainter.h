@@ -29,7 +29,7 @@ class WorldViewPainter : public tool_common::PaintField
 public:
     WorldViewPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
 
-    void updateWithLocationMessage(messages::RobotLocation newLoc);
+    void updateWithLocationMessage(messages::WorldModel newLoc);
 
 protected slots:
     void paintLocationAction(bool state);
@@ -40,7 +40,7 @@ protected:
 
     // Paint a RobotLocation
     void paintRobotLocation(QPaintEvent* event,
-                            messages::RobotLocation loc,
+                            messages::WorldModel loc,
                             bool red = false);
 
 private:

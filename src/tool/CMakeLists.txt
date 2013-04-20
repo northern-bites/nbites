@@ -87,6 +87,7 @@ set( tool_srcs main.cpp
   Tool.cpp
   ToolDiagram.cpp
   DataSelector.cpp
+  ${MAN_DIR}/DiagramThread.cpp
   )
 
 set( tool_headers
