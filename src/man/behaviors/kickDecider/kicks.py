@@ -78,9 +78,9 @@ LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 16.9, y =  4.2,
 RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 16.9, y = -4.2,
                             move=SweetMoves.RIGHT_LONG_BACK_KICK)
 
-LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.5, y =  4,
+LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
-RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.5, y = -4,
+RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
 def chooseAlignedKickFromKick(player, kick):
