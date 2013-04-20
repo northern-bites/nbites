@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = True
+DEBUG_KICK_DECISION = False
 USE_LOC = False
 USE_LOC_HALF_FIELD = False
 
@@ -55,27 +55,11 @@ class KickInformation:
         self.farGoalieOwn = False
         self.nearGoalieOwn = False
 
-        self.sawGoal = False
-        self.sawNearGoal = False
-        self.sawFarGoal = False
-
         self.dangerousBallCount = 0
 
         self.haveData = False
 
         self.aimAtOtherGoal = False
-        self.kickObjective = None
-        self.kick = None
-        self.kickDest = None
-        self.destDist = 500.
-
-        self.orbitAngle = 0.0
-
-    def getKickObjective(self):
-        """
-        Return a kick objective based on what we've observed
-        """
-        self.calculateDataAverages()
 
     def collectData(self):
         """
@@ -87,7 +71,6 @@ class KickInformation:
             self.dangerousBallCount += 1
 
         if self.brain.yglp.on:
-            self.sawGoal = True
             if self.brain.yglp.certainty == 2: # HACK for early messages, means _SURE
                 if self.brain.yglp.distance > self.closeGoalThresh:
                     self.farGoalLeftPostBearings.append(self.brain.yglp.bearing_deg)
@@ -105,7 +88,6 @@ class KickInformation:
                         self.nearGoalieNavy += 1
 
         if self.brain.ygrp.on:
-            self.sawGoal = True
             if self.brain.ygrp.certainty == 2: # HACK for early messages, means _SURE
                 if self.brain.ygrp.distance > self.closeGoalThresh:
                     self.farGoalRightPostBearings.append(self.brain.ygrp.bearing_deg)
