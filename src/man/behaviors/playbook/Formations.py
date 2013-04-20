@@ -212,20 +212,23 @@ def fReady(team, workingPlay):
     if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
     elif team.numActiveFieldPlayers == 1:
+        # Just a chaser
         workingPlay.setRole(PBConstants.CHASER)
         SubRoles.pReadyChaser(team, workingPlay)
     elif team.numActiveFieldPlayers == 2:
-        highNumber = team.highestActivePlayerNumber()
-        if team.me.playerNumber == highNumber:
+        # Chaser and Defender
+        chaser_mate = team.determineChaser(workingPlay)
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             workingPlay.setRole(PBConstants.CHASER)
             SubRoles.pReadyChaser(team, workingPlay)
         else:
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
     elif team.numActiveFieldPlayers == 3:
-        highNumber = team.highestActivePlayerNumber()
-        lowNumber = team.lowestActivePlayerNumber()
-        if team.me.playerNumber == highNumber:
+        # Chaser, Defender, and Offender
+        chaser_mate = team.determineChaser(workingPlay)
+        lowNumber = team.lowestActivePlayerNumber([chaser_mate.playerNumber])
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             workingPlay.setRole(PBConstants.CHASER)
             SubRoles.pReadyChaser(team, workingPlay)
         elif team.me.playerNumber == lowNumber:
@@ -235,18 +238,22 @@ def fReady(team, workingPlay):
             workingPlay.setRole(PBConstants.OFFENDER)
             SubRoles.pReadyOffender(team, workingPlay)
     else:
-        if team.me.isDefaultChaser():
+        # All 4 field players
+        chaser_mate = team.determineChaser(workingPlay)
+        lowNumber = team.lowestActivePlayerNumber([chaser_mate.playerNumber])
+        highNumber = team.highestActivePlayerNumber([chaser_mate.playerNumber])
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             workingPlay.setRole(PBConstants.CHASER)
             SubRoles.pReadyChaser(team, workingPlay)
-        elif team.me.isDefaultDefender():
+        elif team.me.playerNumber == lowNumber:
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
-        elif team.me.isDefaultMiddie():
-            workingPlay.setRole(PBConstants.MIDDIE)
-            SubRoles.pReadyMiddie(team, workingPlay)
-        elif team.me.isDefaultOffender():
+        elif team.me.playerNumber == highNumber:
             workingPlay.setRole(PBConstants.OFFENDER)
             SubRoles.pReadyOffender(team, workingPlay)
+        else:
+            workingPlay.setRole(PBConstants.MIDDIE)
+            SubRoles.pReadyMiddie(team, workingPlay)
 
 
 #### Test Formations ####
