@@ -39,6 +39,7 @@ noggin/util/fakeData/*
 /noggin/offline/faker
 /noggin/offline/fakerData/*
 /util/GameController/GameController.log
+/util/GameController/*.txt
 /util/GameController/GameController/*
 *.geometry
 *~
