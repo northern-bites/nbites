@@ -39,6 +39,7 @@ WorldView::WorldView(QWidget* parent)
 
 void WorldView::run_()
 {
+	commGram.run();
 	for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
 		commIn[i].latch();

@@ -68,6 +68,8 @@ Tool::Tool(const char* title) :
         geometry = new QRect(75, 75, 1132, 958);
     }
     this->setGeometry(*geometry);
+
+	diagram.addModule(worldView);
 }
 
 Tool::~Tool() {
