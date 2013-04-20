@@ -14,34 +14,35 @@
 namespace tool {
 namespace worldview {
 
-class WorldView : public QWidget, public portals::Module{
+class WorldView : public QWidget, public portals::Module {
 
-	Q_OBJECT;
+Q_OBJECT;
 
 public:
-    WorldView(QWidget* parent = 0);
+WorldView(QWidget* parent = 0);
 
-    portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
-
-protected:
-    virtual void run_();
+portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
 
 protected:
-	WorldViewPainter* fieldPainter;
+virtual void run_();
 
-    QHBoxLayout* mainLayout;
-    QHBoxLayout* field;
-    QVBoxLayout* options;
+protected:
+WorldViewPainter* fieldPainter;
 
-	QPushButton* startButton;
+QHBoxLayout* mainLayout;
+QHBoxLayout* field;
+QVBoxLayout* options;
 
-    man::comm::CommModule wviewComm;
 
-    man::DiagramThread commThread;
+QPushButton* startButton;
+
+man::comm::CommModule wviewComm;
+
+man::DiagramThread commThread;
 
 protected slots:
-    void startButtonClicked();
-    void stopButtonClicked();
+void startButtonClicked();
+void stopButtonClicked();
 };
 
 }
