@@ -60,8 +60,7 @@ namespace man
                     newParticleError+= newError;
                 }
 
-                if (obsv.has_visual_cross() && obsv.visual_cross().on()
-                    && (obsv.visual_cross().distance() > 0.f)) {
+                if (obsv.visual_cross().distance() > 0.f) {
                     madeObsv = true;
                     float newError = scoreFromVisDetect(*particle,
                                                         obsv.visual_cross());
