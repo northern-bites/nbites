@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include "Common.h"
+#include "DebugConfig.h"
 
 // Nao field constants
 
