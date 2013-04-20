@@ -293,6 +293,11 @@ void MotionModule::processMotionInput()
         {
             resetOdometry();
         }
+        if (requestInput_.message().reset_providers())
+        {
+            resetScriptedProvider();
+            resetWalkProvider();
+        }
         if (requestInput_.message().remove_stiffness())
         {
             // Don't set gainsOn to false or else we won't freeze from behaviors

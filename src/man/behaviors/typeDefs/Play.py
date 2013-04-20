@@ -21,7 +21,7 @@ class Play:
         self.formation = formation
         self.role = role
         self.subRole = subRole
-        self.position = RobotLocation(0,0,0)
+        self.position = position
         self.changed = True
 
     def setStrategy(self, strategy):

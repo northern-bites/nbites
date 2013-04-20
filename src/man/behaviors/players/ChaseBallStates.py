@@ -20,6 +20,28 @@ def chase(player):
     else:
         return player.goNow('spinToBall')
 
+def kickoff(player):
+    """
+    Have the robot kickoff if it needs to kick it.
+    Otherwise wait 10 seconds or wait for the ball to move.
+    """
+    if player.shouldKickOff:
+        return player.goNow('chase')
+
+    if player.firstFrame():
+        kickoff.ballRelX = player.brain.ball.rel_x
+        kickoff.ballRelY = player.brain.ball.rel_y
+
+    if (player.stateTime > 10 or
+        fabs(player.brain.ball.rel_x - kickoff.ballRelX) > 5 or
+        fabs(player.brain.ball.rel_y - kickoff.ballRelY) > 5):
+        return player.goNow('chase')
+
+    return player.stay()
+
+kickoff.ballRelX = "the relX position of the ball when we started"
+kickoff.ballRelY = "the relY position of the ball when we started"
+
 def spinToBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -33,6 +55,7 @@ def spinToBall(player):
     else:
         spinDir = player.brain.loc.spinDirToPoint(Location(player.brain.ball.x,
                                                            player.brain.ball.y))
+
         if fabs(player.brain.ball.bearing_deg) > constants.CHANGE_SPEED_THRESH:
             speed = Navigator.GRADUAL_SPEED
         else:
@@ -55,6 +78,7 @@ def approachBall(player):
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
         player.inKickingState = True
+
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -64,6 +88,7 @@ def approachBall(player):
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')
+
     else:
         return player.stay()
 
@@ -124,7 +149,7 @@ def orbitBall(player):
             player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
             return player.goNow('positionForKick')
 
-    if (transitions.shouldFindBallKick(player) or
+    if (transitions.shouldFindBall(player) or
         transitions.shouldCancelOrbit(player)):
         player.inKickingState = False
         return player.goLater('chase')

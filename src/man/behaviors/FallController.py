@@ -21,6 +21,7 @@ class FallController():
         # Check if we have just begun falling.
         if (not self.falling and self.brain.interface.fallStatus.falling):
             # Save the player. We are falling
+            print "START FALL AT ", self.brain.time
             self.falling = True
             self.brain.player.gainsOff()
             self.brain.player.switchTo('fallen')
@@ -29,15 +30,21 @@ class FallController():
         # HACK Guardian's `fallen` is not actually on the ground
         #      Put in a delay to ensure we hit the ground softly
         if (not self.fell and self.brain.interface.fallStatus.fallen):
+            print "Fallen count at ", self.brain.time
             self.standDelay += 1
+            if (self.standDelay == 14):
+                self.brain.interface.motionRequest.reset_providers = True
+                self.brain.interface.motionRequest.timestamp = int(self.brain.time*1000)
+                self.brain.player.gainsOn()
+
             if (self.standDelay == 15): # Half a second
                 self.fell = True
 
         # Send a stand up move once.
         elif (not self.standingUp and self.fell):
+            print "Standing at ", self.brain.time
             self.standingUp = True
 
-            self.brain.player.gainsOn()
             self.brain.tracker.setNeutralHead()
 
             move = None
