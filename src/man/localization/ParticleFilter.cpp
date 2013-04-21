@@ -67,12 +67,12 @@ namespace man
             updatedVision = false;
 
             //If shitty swarm according to vision, expand search
-            lost = (visionSystem->getLowestError() > 20);
+            lost = (visionSystem->getLowestError() > 40);
 
         }
 
         if (lost)
-            motionSystem->resetNoise(10.f, .5f);
+            motionSystem->resetNoise(4.f, .2f);
         else {
             motionSystem->resetNoise(parameters.odometryXYNoise,
                                      parameters.odometryHNoise);
