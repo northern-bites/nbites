@@ -70,8 +70,6 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    return player.goLater('waitForPenaltySave')
-
     if (player.lastDiffState == 'gamePenalized' and
         player.lastStateTime > 10):
         return player.goLater('waitToFaceField')
