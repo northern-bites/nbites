@@ -67,9 +67,9 @@ def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.QUICK_SPEED)
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
         else:
-            player.brain.nav.chaseBall()
+            player.brain.nav.chaseBall(fast = True)
 
     if (transitions.shouldFindBall(player) or
         transitions.shouldSpinToBall(player)):

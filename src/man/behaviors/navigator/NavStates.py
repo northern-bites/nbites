@@ -37,64 +37,93 @@ def goToPosition(nav):
 #        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
 #                                                 nav.brain.ball.loc.relY,
 #                                                 nav.brain.ball.loc.bearing)
-    if goToPosition.adaptive and relDest.relX >= 0:
-        #reduce the speed if we're close to the target
-        speed = helper.adaptSpeed(relDest.dist,
-                                 constants.ADAPT_DISTANCE,
-                                 goToPosition.speed)
+
+    if goToPosition.lastFast != goToPosition.fast:
+        print "Fast changed to " + str(goToPosition.fast)
+
+    goToPosition.lastFast = goToPosition.fast
+
+    if goToPosition.fast:
+        velX, velY, velH = 0, 0, 0
+
+        HEADING_ADAPT_CUTOFF = 103
+        DISTANCE_ADAPT_CUTOFF = 60
+
+        MAX_TURN = .5
+
+        BOOK_IT_DISTANCE_THRESHOLD = 60
+        BOOK_IT_TURN_THRESHOLD = 23
+
+        if relDest.relH >= HEADING_ADAPT_CUTOFF:
+            velH = MAX_TURN
+        elif relDest.relH <= -HEADING_ADAPT_CUTOFF:
+            velH = -MAX_TURN
+        else:
+            velH = helper.adaptSpeed(relDest.relH,
+                                    HEADING_ADAPT_CUTOFF,
+                                    MAX_TURN)
+    #        print "velH = " + str(velH)
+
+        if relDest.relX >= DISTANCE_ADAPT_CUTOFF:
+            velX = goToPosition.speed
+        elif relDest.relX <= -DISTANCE_ADAPT_CUTOFF:
+            velX = -goToPosition.speed
+        else:
+            velX = helper.adaptSpeed(relDest.relX,
+                                    DISTANCE_ADAPT_CUTOFF,
+                                    goToPosition.speed)
+    #        print "velX = " + str(velX)
+
+        if relDest.relY >= DISTANCE_ADAPT_CUTOFF:
+            velY = goToPosition.speed
+        elif relDest.relY <= -DISTANCE_ADAPT_CUTOFF:
+            velY = -goToPosition.speed
+        else:
+            velY = helper.adaptSpeed(relDest.relY,
+                                    DISTANCE_ADAPT_CUTOFF,
+                                    goToPosition.speed)
+    #        print "velY = " + str(velY)
+
+        lastBookingIt = goToPosition.bookingIt
+        if fabs(relDest.dist) > BOOK_IT_DISTANCE_THRESHOLD:
+            if fabs(relDest.relH) > BOOK_IT_TURN_THRESHOLD:
+                velX = 0
+                velY = 0
+                goToPosition.bookingIt = False
+            else:
+                velY = 0
+                goToPosition.bookingIt = True
+        else:
+            goToPosition.bookingIt = False
+
+        if goToPosition.bookingIt != lastBookingIt:
+            print "Booking it turned to " + str(goToPosition.bookingIt)
+
+
+        goToPosition.speeds = (velX, velY, velH)
+
+    #    helper.setDestination(nav, relDest, speed)
+
+        if ((goToPosition.speeds != goToPosition.lastSpeeds)
+            or not nav.brain.interface.motionStatus.walk_is_active):
+            helper.setSpeed(nav, goToPosition.speeds)
+        goToPosition.lastSpeeds = goToPosition.speeds
+
     else:
-        speed = goToPosition.speed
+        if goToPosition.adaptive and relDest.relX >= 0:
+            #reduce the speed if we're close to the target
+            speed = helper.adaptSpeed(relDest.dist,
+                                    constants.ADAPT_DISTANCE,
+                                    goToPosition.speed)
+        else:
+            speed = goToPosition.speed
 
-#    print "distance {0} and speed {1}".format(relDest.dist, speed)
+    #    print "distance {0} and speed {1}".format(relDest.dist, speed)
 
-    #if y-distance is small, ignore it to avoid strafing
-    #strafelessDest = helper.getStrafelessDest(relDest)
+        #if y-distance is small, ignore it to avoid strafing
+        #strafelessDest = helper.getStrafelessDest(relDest)
 
-    velX = 0
-    velY = 0
-    velH = 0
-
-    if relDest.relH >= 103:
-        velH = 0.5
-    elif relDest.relH <= -103:
-        velH = -0.5
-    else:
-        velH = helper.adaptSpeed(relDest.relH,
-                                 103,
-                                 0.5)
-#        print "velH = " + str(velH)
-
-    if relDest.relX >= 60:
-        velX = 1
-    elif relDest.relX <= -60:
-        velX = -1
-    else:
-        velX = helper.adaptSpeed(relDest.relX,
-                                 60,
-                                 1)
-#        print "velX = " + str(velX)
-
-    if relDest.relY >= 60:
-        velY = 1
-    elif relDest.relY <= -60:
-        velY = -1
-    else:
-        velY = helper.adaptSpeed(relDest.relY,
-                                 60,
-                                 1)
-#        print "velY = " + str(velY)
-
-    goToPosition.speeds = (velX, velY, velH)
-
-#    helper.setDestination(nav, relDest, speed)
-
-    if ((goToPosition.speeds != goToPosition.lastSpeeds)
-        or not nav.brain.interface.motionStatus.walk_is_active):
-        helper.setSpeed(nav, goToPosition.speeds)
-    goToPosition.lastSpeeds = goToPosition.speeds
-
-#    if navTrans.shouldAvoidObstacle(nav):
-#        return nav.goLater('avoidObstacle')
+        helper.setDestination(nav, relDest, speed)
 
     return Transition.getNextState(nav, goToPosition)
 
@@ -106,6 +135,8 @@ goToPosition.precision = "how precise we want to be in moving"
 
 goToPosition.speeds = ''
 goToPosition.lastSpeeds = ''
+goToPosition.bookingIt = False
+goToPosition.lastFast = False
 
 def avoidLeft(nav):
     if nav.firstFrame():
