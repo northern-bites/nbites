@@ -13,6 +13,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.gameState = player.currentState
+        player.returningFromPenalty = False
         player.brain.fallController.enabled = False
         player.stand()
         player.zeroHeads()
@@ -118,6 +119,7 @@ def watch(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
+        player.returningFromPenalty = False
 
     return Transition.getNextState(player, watch)
 
