@@ -18,6 +18,7 @@ message MotionCommand
         DESTINATION_WALK = 0;
         WALK_COMMAND = 1;
         SCRIPTED_MOVE = 2;
+        ODOMETRY_WALK = 3;
     }
 
     optional CommandType type = 1;
@@ -25,6 +26,7 @@ message MotionCommand
     optional ScriptedMove script = 2;
     optional DestinationWalk dest = 3;
     optional WalkCommand speed = 4;
+    optional OdometryWalk odometry_dest = 6;
 
     optional int64 timestamp = 5;
 }
@@ -48,6 +50,14 @@ message BodyJointCommand
 }
 
 message DestinationWalk
+{
+    optional float rel_x = 1;
+    optional float rel_y = 2;
+    optional float rel_h = 3;
+    optional float gain  = 4;
+}
+
+message OdometryWalk
 {
     optional float rel_x = 1;
     optional float rel_y = 2;

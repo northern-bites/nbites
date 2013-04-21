@@ -59,10 +59,6 @@ def setDestination(nav, dest, gain = 1.0):
     """
     Calls setDestination within the motion engine
     """
-    # TODO: distinguish from setOdometryDestination method
-    #       this method should overwrite motion commands.
-    #       or, deprecate this method and use speed commands
-    #       via the createAndSendWalkVector method.
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK #Destination Walk
     command.dest.rel_x = dest.relX
@@ -72,13 +68,11 @@ def setDestination(nav, dest, gain = 1.0):
     command.timestamp = int(nav.brain.time * 1000)
 
 def setOdometryDestination(nav, dest, gain = 1.0):
-    # TODO: distinguish from setDestination method
-    #       this method should enqueue motion commands.
     command = nav.brain.interface.bodyMotionCommand
-    command.type = command.CommandType.DESTINATION_WALK #Destination Walk
-    command.dest.rel_x = dest.relX
-    command.dest.rel_y = dest.relY
-    command.dest.rel_h = dest.relH
+    command.type = command.CommandType.ODOMETRY_WALK #Destination Walk
+    command.odometry_dest.rel_x = dest.relX
+    command.odometry_dest.rel_y = dest.relY
+    command.odometry_dest.rel_h = dest.relH
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 

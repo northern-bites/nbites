@@ -89,11 +89,14 @@ public:
 
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
-    void sendMotionCommand(const StepCommand::ptr command);
 
-    // Odometry
+    // Destination
     void sendMotionCommand(const DestinationCommand::ptr command);
     void sendMotionCommand(messages::DestinationWalk command);
+
+    // Odometry
+    void sendMotionCommand(const StepCommand::ptr command);
+    void sendMotionCommand(messages::OdometryWalk command);
 
     void stopHeadMoves() { headProvider.requestStop(); }
     void stopBodyMoves() { curProvider->requestStop(); }
