@@ -94,12 +94,12 @@ class Navigator(FSA.FSA):
         self.switchTo('scriptedMove')
 
     def positionPlaybook(self):
-        self.goTo(self.brain.play.getPosition(), avoidObstacles = True)
+        self.goTo(self.brain.play.getPosition(), speed = FAST_SPEED, avoidObstacles = True, fast = True)
 
-    def chaseBall(self, speed = FULL_SPEED):
-        self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True)
+    def chaseBall(self, speed = FULL_SPEED, fast = False):
+        self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False):
+    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False, fast = False):
         """
         General go to method
         Ideal for going to a field position, or for going to a
@@ -128,6 +128,7 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.precision = precision
         NavStates.goToPosition.avoidObstacles = avoidObstacles
         NavStates.goToPosition.adaptive = adaptive
+        NavStates.goToPosition.fast = fast
 
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
