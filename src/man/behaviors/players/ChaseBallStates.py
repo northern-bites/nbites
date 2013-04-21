@@ -18,7 +18,7 @@ def chase(player):
         return player.goNow('findBall')
 
     else:
-        return player.goNow('spinToBall')
+        return player.goNow('approachBall')
 
 def kickoff(player):
     """
@@ -42,34 +42,34 @@ def kickoff(player):
 kickoff.ballRelX = "the relX position of the ball when we started"
 kickoff.ballRelY = "the relY position of the ball when we started"
 
-def spinToBall(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.brain.nav.stand()
+#def spinToBall(player):
+    #if player.firstFrame():
+        #player.brain.tracker.trackBall()
+        #player.brain.nav.stand()
 
-    if transitions.shouldFindBall(player):
-        return player.goLater('chase')
+    #if transitions.shouldFindBall(player):
+        #return player.goLater('chase')
 
-    if transitions.shouldStopSpinningToBall(player):
-        return player.goNow('approachBall')
-    else:
-        spinDir = player.brain.loc.spinDirToPoint(Location(player.brain.ball.x,
-                                                           player.brain.ball.y))
+    #if transitions.shouldStopSpinningToBall(player):
+        #return player.goNow('approachBall')
+    #else:
+        #spinDir = player.brain.loc.spinDirToPoint(Location(player.brain.ball.x,
+                                                           #player.brain.ball.y))
 
-        if fabs(player.brain.ball.bearing_deg) > constants.CHANGE_SPEED_THRESH:
-            speed = Navigator.GRADUAL_SPEED
-        else:
-            speed = Navigator.SLOW_SPEED
-        player.setWalk(0,0,spinDir*speed)
-        return player.stay()
+        #if fabs(player.brain.ball.bearing_deg) > constants.CHANGE_SPEED_THRESH:
+            #speed = Navigator.GRADUAL_SPEED
+        #else:
+            #speed = Navigator.SLOW_SPEED
+        #player.setWalk(0,0,spinDir*speed)
+        #return player.stay()
 
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.QUICK_SPEED)
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
         else:
-            player.brain.nav.chaseBall()
+            player.brain.nav.chaseBall(fast = True)
 
     if (transitions.shouldFindBall(player) or
         transitions.shouldSpinToBall(player)):
