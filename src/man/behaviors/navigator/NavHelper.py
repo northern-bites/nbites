@@ -43,7 +43,8 @@ def isDestinationRelative(dest):
     return isinstance(dest, RelLocation)
 
 def adaptSpeed(distance, cutoffDistance, maxSpeed):
-    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
+    return (distance / cutoffDistance) * maxSpeed
+#    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
 def getStrafelessDest(dest):
     if ((dest.relX > 150 and dest.relY < 50) or

@@ -48,8 +48,50 @@ def goToPosition(nav):
 #    print "distance {0} and speed {1}".format(relDest.dist, speed)
 
     #if y-distance is small, ignore it to avoid strafing
-    strafelessDest = helper.getStrafelessDest(relDest)
-    helper.setDestination(nav, strafelessDest, speed)
+    #strafelessDest = helper.getStrafelessDest(relDest)
+
+    velX = 0
+    velY = 0
+    velH = 0
+
+    if relDest.relH >= 103:
+        velH = 0.5
+    elif relDest.relH <= -103:
+        velH = -0.5
+    else:
+        velH = helper.adaptSpeed(relDest.relH,
+                                 103,
+                                 0.5)
+#        print "velH = " + str(velH)
+
+    if relDest.relX >= 60:
+        velX = 1
+    elif relDest.relX <= -60:
+        velX = -1
+    else:
+        velX = helper.adaptSpeed(relDest.relX,
+                                 60,
+                                 1)
+#        print "velX = " + str(velX)
+
+    if relDest.relY >= 60:
+        velY = 1
+    elif relDest.relY <= -60:
+        velY = -1
+    else:
+        velY = helper.adaptSpeed(relDest.relY,
+                                 60,
+                                 1)
+#        print "velY = " + str(velY)
+
+    goToPosition.speeds = (velX, velY, velH)
+
+#    helper.setDestination(nav, relDest, speed)
+
+    if ((goToPosition.speeds != goToPosition.lastSpeeds)
+        or not nav.brain.interface.motionStatus.walk_is_active):
+        helper.setSpeed(nav, goToPosition.speeds)
+    goToPosition.lastSpeeds = goToPosition.speeds
 
 #    if navTrans.shouldAvoidObstacle(nav):
 #        return nav.goLater('avoidObstacle')
@@ -61,6 +103,9 @@ goToPosition.dest = "destination, can be any type of location"
 goToPosition.deltaDest = "how much we have left to travel to location (or rel destination)"
 goToPosition.adaptive = "adapts the speed to the distance of the destination"
 goToPosition.precision = "how precise we want to be in moving"
+
+goToPosition.speeds = ''
+goToPosition.lastSpeeds = ''
 
 def avoidLeft(nav):
     if nav.firstFrame():
