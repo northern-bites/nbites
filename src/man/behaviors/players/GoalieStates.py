@@ -70,6 +70,8 @@ def gamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
+    return player.goLater('waitForPenaltySave')
+
     if (player.lastDiffState == 'gamePenalized' and
         player.lastStateTime > 10):
         return player.goLater('waitToFaceField')
@@ -192,15 +194,15 @@ def upUpUP(player):
 
 def penaltyShotsGameSet(player):
     if player.firstFrame():
-        player.stopWalking()
+        player.inKickingState = False
+        player.gameState = player.currentState
+        player.returningFromPenalty = False
+        player.brain.fallController.enabled = False
         player.stand()
         player.brain.tracker.trackBall()
-        player.initialDelayCounter = 0
+        player.side = LEFT
+        player.isSaving = False
         player.penaltyKicking = True
-
-    if player.initialDelayCounter < 230:
-        player.initialDelayCounter += 1
-        return player.stay()
 
     return player.stay()
 
@@ -208,19 +210,33 @@ def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.stand()
         player.brain.tracker.trackBall()
-        player.brain.nav.walkTo(RelRobotLocation(0.0, 30.0, 0.0))
 
-    return Transition.getNextState(player, penaltyShotsGamePlaying)
+    return player.goLater('waitForPenaltySave')
 
 def waitForPenaltySave(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         player.brain.nav.stop()
+
     return Transition.getNextState(player, waitForPenaltySave)
 
-def diveForPenaltySave(player):
+def diveRight(player):
     if player.firstFrame():
-        player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
         player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+
+    return player.stay()
+
+def diveLeft(player):
+    if player.firstFrame():
+        player.brain.fallController.enabled = False
+        player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+
+    return player.stay()
+
+def squat(player):
+    if player.firstFrame():
+        player.brain.fallController.enabled = False
+        player.executeMove(SweetMoves.GOALIE_SQUAT)
 
     return player.stay()
