@@ -71,16 +71,6 @@ public:
     const std::vector<float> getNextStiffness() const;
     void signalNextFrame();
 
-
-    // Body Joint commands (sweet moves)
-    void sendMotionCommand(const BodyJointCommand::ptr command);
-    void sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands);
-    void sendMotionCommand(messages::ScriptedMove script);
-
-    // Walk Commands (set speeds)
-    void sendMotionCommand(const WalkCommand::ptr command);
-    void sendMotionCommand(messages::WalkCommand command);
-
     // Head Commands.
     void sendMotionCommand(const SetHeadCommand::ptr command);
     void sendMotionCommand(const messages::PositionHeadCommand& command);
@@ -90,13 +80,75 @@ public:
     void sendMotionCommand(const FreezeCommand::ptr command);
     void sendMotionCommand(const UnfreezeCommand::ptr command);
 
-    // Destination
+    /*
+     * Body Joint Commands
+     *
+     * Enqueues a vector of body joints, and then transitions
+     * from the current to the next set of joints using the desired interpolation.
+     *
+     * This is how we do SweetMoves.
+     */
+    void sendMotionCommand(const BodyJointCommand::ptr command);
+    void sendMotionCommand(const std::vector<BodyJointCommand::ptr> commands);
+    void sendMotionCommand(messages::ScriptedMove script);
+
+    /*
+     * Velocity Walk
+     *
+     * Sets the desired walk velocities in the walk engine.
+     * All velocities are (0.0 - 1.0) scalars
+     *
+     * Good for walking fast in some direction
+     */
+    void sendMotionCommand(const WalkCommand::ptr command);
+    void sendMotionCommand(messages::WalkCommand command);
+
+    /*
+     * Destination Walk
+     *
+     * Puts the walk engine in target walk mode, and sets the target
+     * destination. The walk engine handles the rest.
+     *
+     * Good for walking into a specific (x, y, h) position for the robot.
+     *
+     * TODO: make turning on pedantic (stable, but less fast mode)
+     * as an option in the command
+     */
     void sendMotionCommand(const DestinationCommand::ptr command);
     void sendMotionCommand(messages::DestinationWalk command);
 
-    // Odometry
+    /*
+     * Odometry Walk
+     *
+     * Very similar to a destination walk command, except it uses odometry
+     * to determine whether we reached our destination; once it reaches
+     * the destination it stands.
+     *
+     * It records the starting odometry when this command gets enqued,
+     * and then uses the difference between the odometry we walked and
+     * the command destination to set the walk target in the walk engine.
+     *
+     * So if the command was (100, 0, 0) (walk 10 cm forward), it will
+     * stash the starting odometry and then start walking towards target (100, 0, 0).
+     * After a couple frames, the deltaOdometry will be (50, 0, 0) (walked 5 cm),
+     * so the walk engine target will be (50, 0, 0).
+     *
+     * It works fairly well with small distances and simple destinations.
+     *
+     * Since the start odometry gets stashed when the command gets enqued,
+     * calling this command multiple times will reset the start odometry, so
+     * to use it properly enqueue it once and wait for the walk to go to
+     * stand.
+     *
+     * It puts the walk engine into pedantic mode which makes the walk more stable,
+     * but less fast.
+     *
+     * TODO: change the name of the StepCommand to an OdometryWalkCommand
+     */
     void sendMotionCommand(const StepCommand::ptr command);
     void sendMotionCommand(messages::OdometryWalk command);
+
+    //TODO: add a stand command!
 
     void stopHeadMoves() { headProvider.requestStop(); }
     void stopBodyMoves() { curProvider->requestStop(); }

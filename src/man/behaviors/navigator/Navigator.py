@@ -29,9 +29,6 @@ PRECISELY = (1.0, 1.0, 5)
 LEFT = 1
 RIGHT = -LEFT
 
-
-DEBUG_DESTINATION = False
-
 class Navigator(FSA.FSA):
     """it gets you where you want to go"""
 
@@ -88,22 +85,33 @@ class Navigator(FSA.FSA):
 
     def performSweetMove(self, move):
         """
-        Navigator function to do the sweet move
+        Do a sweet ass move. Goes to stopped after done.
         """
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
 
     def positionPlaybook(self):
+        """
+        Calls goTo on the playbook position, which should be a RobotLocation.
+        """
         self.goTo(self.brain.play.getPosition(), speed = FAST_SPEED, avoidObstacles = True)
 
     def chaseBall(self, speed = FULL_SPEED, fast = False):
+        """
+        Calls goTo on ball, which should be a RobotLocation.
+
+        Theoretically walks into the ball, so make sure to switch the behavior beforehand.
+        """
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False, fast = False):
         """
-        General go to method
-        Ideal for going to a field position, or for going to a
-        relative location that we can track/see
+        General go to method.
+        Ideal for going to a field position, or for going to a relative location
+        that we can track/see.
+
+        Goes to atPosition after done. At position will switch back to goingTo if
+        the dest changes are we're not at the dest anymore (considering precision)
 
         @param dest: must be a Location, RobotLocation, RelLocation
         or RelRobotLocation.
@@ -116,12 +124,22 @@ class Navigator(FSA.FSA):
         since there's no way for the robot to keep track of how close it is to the
         location, so if you don't update it it will keep walking to that destination
         indefinitely
+
         @param speedGain: controls how fast the robot does the goTo; use provided
         constants for some good ballparks
+
         @param precision: a tuple of deltaX, deltaY, deltaH for how close
         you want to get to the location
+
         @param adaptive: if true, then the speed is adapted to how close the target
-        is and the speed paramater is interpreted as the maximum speed
+        is and the speed paramater is interpreted as the maximum speed; only affects
+        the non-fast walk, since the fast walk adapts its velocities dynamically anyway.
+        Don't use it the estimates to the target are good.
+
+        @param avoidObstacle: uses obstacle avoidance
+
+        @param fast: books it using velocity walk; Best if dest is straight ahead!
+        Use it to look like a baller on the field.
         """
 
         self.updateDest(dest, speed)
@@ -141,13 +159,13 @@ class Navigator(FSA.FSA):
 
     def walkTo(self, walkToDest, speed = FULL_SPEED):
         """
-        Walks to a RelRobotLocation
-        Checks if reached the destination using odometry
+        Walks to a RelRobotLocation while checking odometry to see if
+        we reached the destination.
         Great for close destinations (since odometry gets bad over time) in
-        case loc is bad
+        case loc is bad.
         Doesn't avoid obstacles! (that would make it very confused and odometry
-        very bad, especially if we're being pushed)
-        Switches to standing at the end
+        very bad, especially if we're being pushed).
+        Switches to standing at the end.
         @todo: Calling this again before the other walk is done does some weird stuff
         """
         if not isinstance(walkToDest, RelRobotLocation):
@@ -172,12 +190,13 @@ class Navigator(FSA.FSA):
 
     def orbitAngle(self, radius, angle):
         """
-        Orbits a point at a certain radius for a certain angle using walkTo
+        Orbits a point at a certain radius for a certain angle using walkTo commands.
         Splits the command into multiple smaller commands
         Don't rely on it too much since it depends on the odometry of strafes
-        and turns which slip a lot
+        and turns which slips a lot
         It will orbit in steps, each orbit taking ~30 degrees (more like 45
         when I test it out)
+        TODO: please change this to just use a velocity walk -Octavian
         """
 
         NavStates.walkingTo.destQueue.clear()
@@ -194,23 +213,19 @@ class Navigator(FSA.FSA):
 
         NavStates.walkingTo.speed = FAST_SPEED
         self.switchTo('walkingTo')
-        #self.walkTo(helper.getOrbitLocation(radius, angle), speed)
-        #self.walk(0, .75, -.5)
-
 
     def walk(self, x, y, theta):
         """
-        Starts a new walk command
-        Does nothing if it is the same as the current walk
-        Switches to it otherwise
+        Starts a new velocity walk command.
+        Does nothing if it the velocities the same as the current velocities.
         """
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
     def stand(self):
         """
-        Make the robot stand; Standing should be the default action when we're not
-        walking/executing a sweet move
+        Make the robot stand. Standing should be the default action when we're not
+        walking/executing a sweet move.
         """
         self.switchTo('stand')
 
