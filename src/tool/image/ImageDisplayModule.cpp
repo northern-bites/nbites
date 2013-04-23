@@ -14,9 +14,17 @@ ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
 void ThresholdedImageDisplayModule::run_()
 {
     imageIn.latch();
+    // Note that you have to pass a label a QPixmap, but you can't really edit
+    // the pixels of a pixmap, so you have to edit a QImage then make a
+    // pixmap from it. *rolls eyes*
     setPixmap(QPixmap::fromImage(makeImage(filter)));
 }
 
+/*
+ * To display a thresholded image, we need to create a RGB-formatted QImage.
+ * This method takes the image on the InPortal and creates a displayable
+ * QImage from it.
+ */
 QImage ThresholdedImageDisplayModule::makeImage(byte filter_)
 {
     QImage image(imageIn.message().width(),
@@ -58,13 +66,24 @@ ImageDisplayModule::ImageDisplayModule(QWidget* parent) : QLabel(parent),
 void ImageDisplayModule::run_()
 {
     imageIn.latch();
+    // @see ThresholdedImageDisplayModule's run_ method for why this is this
     setPixmap(QPixmap::fromImage(makeImageOfChannel(channel)));
 }
 
+/*
+ * To display a thresholded image, we need to create a RGB-formatted QImage.
+ * This method takes the image on the InPortal and creates a displayable
+ * QImage from it. It takes into account which channel we want to display
+ * to create RGB values for the QImage.
+ *
+ * We divide width by 2 here in several places because of the YUYV format;
+ * one set of YU or YV gets turned into just one RGB pixel.
+ */
 QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
 {
-    // This makes the clicking work properly for listener
-    // Kind of a hack
+    // This makes the clicking work properly for listener--we need the qlabel
+    // to be exactly the same size of the image
+    // Kind of a hack...
     this->setFixedWidth(imageIn.message().width()/2);
     this->setFixedHeight(imageIn.message().height());
 
@@ -88,6 +107,7 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
 		    QRgb rgb;
 		    c.setYuv(y, u, v);
 
+            // Make the pixels's RGB value based on what channel we want
 			switch (channel_)
             {
 			case RGB:
@@ -141,11 +161,11 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
     return image;
 }
 
+// The following are all stolen from BMPImageViewerListener...
 ImageDisplayListener::ImageDisplayListener(QWidget *parent)
     : ImageDisplayModule(parent),
       brushSize(DEFAULT_BRUSH_SIZE)
 {
-
     QWidget::setAttribute(Qt::WA_NoMousePropagation, true );
 }
 
