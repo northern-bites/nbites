@@ -1,5 +1,6 @@
 #include "ImageDisplayModule.h"
 #include <iostream>
+#include <QPainter>
 
 namespace tool {
 namespace image {
@@ -159,6 +160,16 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
 	}
 
     return image;
+}
+
+// Draws the base image then paints the overlay over it.
+void OverlayDisplayModule::run_()
+{
+    imageIn.latch();
+    QImage base = ImageDisplayModule::makeImageOfChannel(channel);
+    QPainter painter(&base);
+    painter.drawImage(base.rect(), overlay);
+    setPixmap(QPixmap::fromImage(base));
 }
 
 // The following are all stolen from BMPImageViewerListener...

@@ -1,6 +1,7 @@
 /*
  * @class ThresholdedImageDisplayModule
  * @class ImageDisplayModule
+ * @class OverlayDisplayModule
  * @class ImageDisplayListener
  *
  * All of these classes subclass both QLabel, so that they can be added to a
@@ -22,6 +23,9 @@
  *     underlying image, with whatever channel filter was reqquested, to RGB
  *     pixels so that Qt can actually display it (side note: no one uses
  *     YUV422, so we have to convert this to a format that Qt can understand).
+ *
+ * OverlayDisplayModule: Inherits from ImageDisplayModule. Adds the ability to
+ *     create a QImage and set it as the overlay for the YUV image.
  *
  * ImageDisplayListener: Inherits from ImageDisplayModule, simply to add
  *     mouse-listening methods. So if the user clicks on this module, it can
@@ -139,6 +143,23 @@ protected:
 
     // Which channel are we currently displaying?
     ChannelType channel;
+};
+
+/*
+ * OVERLAY DISPLAY
+ */
+
+class OverlayDisplayModule : public ImageDisplayModule
+{
+public:
+    OverlayDisplayModule(QWidget* parent = 0) : ImageDisplayModule(parent) {};
+    void setOverlay(QImage overlay_) { overlay = overlay_; }
+
+protected:
+    // Replaces ImageDisplayModule's run method to do the overlaying
+    virtual void run_();
+
+    QImage overlay;
 };
 
 /*
