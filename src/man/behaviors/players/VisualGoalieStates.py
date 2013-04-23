@@ -30,6 +30,8 @@ def walkToGoal(player):
 
     return Transition.getNextState(player, walkToGoal)
 
+## NOT USED right now, but is a good idea so that the goalie won't walk the
+## ball into the goal
 def dodgeBall(player):
     if player.firstFrame():
         if player.brain.ball.rel_y < 0.0:
