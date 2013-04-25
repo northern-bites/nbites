@@ -32,10 +32,10 @@
 
 namespace man
 {
-    namespace localization
-    {
+namespace localization
+{
 
-    const float LOST_THRESHOLD = 60;
+   const float LOST_THRESHOLD = 60;
 
     // Define the default parameters for the Particle Filter
     static const ParticleFilterParams DEFAULT_PARAMS =
