@@ -149,6 +149,27 @@ def shouldPerformSave(player):
             player.brain.ball.distance < 230.0 and
             player.brain.ball.vis.on)
 
+def shouldDiveRight(player):
+    """
+    Checks that the ball is moving toward it and close enough to save.
+    """
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_y_intersect_dest < -5.0)
+
+def shouldDiveLeft(player):
+    """
+    Checks that the ball is moving toward it and close enough to save.
+    """
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_y_intersect_dest > 5.0)
+
+def shouldSquat(player):
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            abs(player.brain.ball.rel_y_intersect_dest) < 10.0)
+
 def facingSideways(player):
     """
     If the robot is facing a post directly, it's probably turned around.

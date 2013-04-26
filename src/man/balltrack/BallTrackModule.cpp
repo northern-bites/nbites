@@ -93,6 +93,9 @@ void BallTrackModule::run_()
                   << " , " << filters->visRelY << std::endl;
     }
 
+    std::cout << "Speed:\t" << filters->getSpeed() << std::endl;
+    std::cout << "RelY Int Dest:\t" << filters->getRelYIntersectDest() << std::endl;
+
     std::cout << "Odometry is (x,y,h):\t( " << deltaOdometry.x() << " , "
               << deltaOdometry.y() << " , " << deltaOdometry.h() << " )" << std::endl;
 
