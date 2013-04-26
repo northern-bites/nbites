@@ -28,6 +28,10 @@ namespace man
 
             float times = 0;
             float lowestParticleError = 10000000.f;
+
+            // Clear out the reconstructed observation list
+            reconstructedLocations.clear();
+
             for(iter = particles.begin(); iter != particles.end(); iter++)
             {
                 Particle* particle = &(*iter);
@@ -44,6 +48,7 @@ namespace man
                         curParticleError+= newError;
                         numObsv++;
 
+                        addCornerReconstructionsToList(obsv.visual_corner(i));
                     }
                 }
 
@@ -100,6 +105,14 @@ namespace man
 
             if (madeObsv)
                 currentLowestError = lowestParticleError;
+
+            // Generate a list of all possible calculated poses
+            // If we have two goal posts then call addGoalPostReconstructionsToList
+
+            // for each corner add the reconstructions
+
+
+
 
             // Succesfully updated particles with Vision!
             return true;
@@ -192,5 +205,40 @@ namespace man
             return bestScore;
 
         }
+
+/**
+ * Takes in a corner observation as well as the dist, bear measurements to
+ * that observation to calculate the exact location of the robot on the field
+ */
+
+void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
+{
+    // Loop through all concrete coords of the corner
+    for (int i=0; i< corner.visual_detection().concrete_coords_size(); i++)
+    {
+        //angle between the robot's visual heading line (or bearing to corner line)
+        //and the line parallel to the x axis oriented towards the corner
+        //(so x axis flipped)
+        float globalPhysicalOrientation = corner.physical_orientation()
+            + corner.visual_detection().concrete_coords(i).field_angle();
+
+        float sin_global_orientation, cos_global_orientation;
+        //sin and cos altogether (faster)
+        sincosf(globalPhysicalOrientation, &sin_global_orientation, &cos_global_orientation);
+
+        float pose_x = corner.visual_detection().concrete_coords(i).x()
+                       - corner.visual_detection().distance()*cos_global_orientation;
+        float pose_y = corner.visual_detection().concrete_coords(i).y()
+                       - corner.visual_detection().distance()*sin_global_orientation;
+        float pose_h = globalPhysicalOrientation - corner.visual_detection().bearing();
+        float side   = pose_x < CENTER_FIELD_X;
+
+        ReconstructedLocation newLoc(pose_x, pose_y, pose_h, side);
+
+        reconstructedLocations.push_back(newLoc);
+    }
+}
+
+
     } // namespace localization
 } // namespace man

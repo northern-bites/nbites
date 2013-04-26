@@ -11,7 +11,10 @@
 #include "SensorModel.h"
 #include "NBMath.h"
 
+#include "FieldConstants.h"
+
 #include <vector>
+#include <list>
 
 #include <boost/math/distributions.hpp>
 
@@ -40,9 +43,17 @@ namespace man
         void setUpdated(bool val);
         float getLowestError(){return currentLowestError;};
 
+        std::list<ReconstructedLocation> getReconstructedLocations(){return reconstructedLocations;};
+
         // Random number generator to be used throughout the system
         boost::mt19937 rng;
     private:
+        // Functions to calculate possible positions observation viewed from
+        void addCornerReconstructionsToList(messages::VisualCorner corner);
+        void addGoalPostReconstructionsToList(messages::VisualGoalPost leftPost,
+                                              messages::VisualGoalPost rightPost);
+
+        std::list<ReconstructedLocation> reconstructedLocations;
         float currentLowestError;
      };
     } // namespace localization
