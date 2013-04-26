@@ -35,7 +35,7 @@ namespace man
 namespace localization
 {
 
-   const float LOST_THRESHOLD = 60;
+   const float LOST_THRESHOLD = 40;
 
     // Define the default parameters for the Particle Filter
     static const ParticleFilterParams DEFAULT_PARAMS =
@@ -95,6 +95,8 @@ namespace localization
         float getHEst() const {return poseEstimate.h();}
         float getHEstDeg() const {return poseEstimate.h()*TO_DEG;}
 
+        bool onDefendingSide() {return (poseEstimate.x() < CENTER_FIELD_X);};
+
         void resetLoc();
         void resetLocTo(float x, float y, float h,
                         LocNormalParams params = LocNormalParams());
@@ -111,6 +113,8 @@ namespace localization
          */
         void resample();
         void updateEstimate();
+
+        messages::RobotLocation getMirrorLocation(messages::RobotLocation loc);
 
         ParticleFilterParams parameters;
         messages::RobotLocation poseEstimate;

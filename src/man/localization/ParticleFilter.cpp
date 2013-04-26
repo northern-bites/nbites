@@ -9,7 +9,7 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
       estimateUncertainty(3, 0.0f)
 {
     motionSystem = new MotionSystem(params.odometryXYNoise,
-                                        params.odometryHNoise);
+                                    params.odometryHNoise);
     visionSystem = new VisionSystem;
 
     boost::mt19937 rng;
@@ -67,7 +67,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         updatedVision = false;
 
         //If shitty swarm according to vision, expand search
-        lost = (visionSystem->getLowestError() > 40);
+        lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
 
     }
 
@@ -412,33 +412,37 @@ void ParticleFilter::resample()
 
     float rand;
     ParticleSet newParticles;
+
+    // First add reconstructed particles from corner observations
+    int numReconParticlesAdded = 0;
+    std::list<ReconstructedLocation> reconLocs= visionSystem->getReconstructedLocations();
+    std::list<ReconstructedLocation>::const_iterator recLocIt;
+    for (recLocIt = reconLocs.begin();
+         recLocIt != reconLocs.end();
+         recLocIt ++)
+    {
+        std::cout << "Should I process corner " << numReconParticlesAdded << std::endl;
+        if ((*recLocIt).defSide == onDefendingSide())
+        {
+            Particle reconstructedParticle((*recLocIt).x,
+                                          (*recLocIt).y,
+                                          (*recLocIt).h,
+                                          1.f/250.f);
+
+            newParticles.push_back(reconstructedParticle);
+
+            numReconParticlesAdded++;
+        }
+        numReconParticlesAdded++;
+    }
+
     // Sample numParticles particles with replacement according to the
     // normalized weights, and place them in a new particle set.
-    for(int i = 0; i < parameters.numParticles; ++i)
+    for(int i = 0; i < (parameters.numParticles - numReconParticlesAdded); ++i)
     {
         rand = (float)gen();
         newParticles.push_back(cdf.upper_bound(rand)->second);
     }
-
-    // FUN IDEA: Create a particle that equals the belief
-
-    // ***TEMP*** This is used for testing, to only select the BEST particle
-    // newParticles.clear();
-    // Particle best;
-    // float bestWeight =0.f;
-    // for(iter = particles.begin(); iter != particles.end(); ++iter)
-    // {
-    //     Particle particle = (*iter);
-
-    //     if(particle.getWeight() > bestWeight)
-    //     {
-    //         best = particle;
-    //         bestWeight = particle.getWeight();
-    //     }
-    // }
-    // for (int i=0; i<parameters.numParticles; i++)
-    //     newParticles.push_back(best);
-    // ***TEMP*** always choose best particle
 
     particles = newParticles;
 }
@@ -458,6 +462,20 @@ const messages::ParticleSwarm& ParticleFilter::getCurrentSwarm()
     }
 
     return swarm;
+}
+
+messages::RobotLocation ParticleFilter::getMirrorLocation(messages::RobotLocation loc)
+{
+    float newX = FIELD_GREEN_WIDTH - loc.x();  // Calc new X
+    float newY = FIELD_GREEN_HEIGHT - loc.y(); // Calc new Y
+    float newH = NBMath::subPIAngle(loc.h() + M_PI_FLOAT); //Flip the heading
+
+    messages::RobotLocation mirroredLocation;
+    mirroredLocation.set_x(newX);
+    mirroredLocation.set_y(newY);
+    mirroredLocation.set_h(newH);
+
+    return mirroredLocation;
 }
 
 } // namespace localization
