@@ -59,6 +59,10 @@ namespace man
         portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                              getCurrentEstimate());
 
+        // Alternative-use best particle
+        // portals::Message<messages::RobotLocation> locMessage(&particleFilter->
+        //                                                      getBestParticle().getLocation());
+
 #ifdef LOG_LOCALIZATION
         portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                                getCurrentSwarm());
