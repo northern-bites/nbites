@@ -77,6 +77,18 @@ namespace man
         float sigma_h;
     };
 
+    struct ReconstructedLocation
+    {
+        ReconstructedLocation(float x_, float y_, float h_, float defSide_)
+            : x(x_), y(y_), h(h_), defSide(defSide_)
+        {
+        }
+        float x;
+        float y;
+        float h; // Robot Pose
+
+        bool defSide;
+    };
 
     } // namespace localization
 } // namespace man

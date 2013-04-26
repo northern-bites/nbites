@@ -1,6 +1,7 @@
 /**
  * @brief  Defines a particle for localization purposes.
  * @author Ellis Ratner <eratner@bowdoin.edu>
+ * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   January 2013
  */
 #pragma once
