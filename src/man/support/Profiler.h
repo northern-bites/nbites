@@ -18,15 +18,16 @@ class Profiler;
 
 enum ProfiledComponent {
     P_MAIN = 0,
-    P_GETIMAGE,
-    P_DQBUF,
-    P_ACQUIRE_IMAGE,
-    P_QBUF,
+
+    P_TOP_DQBUF,
+    P_TOP_ACQUIRE_IMAGE,
+
+    P_BOT_DQBUF,
+    P_BOT_ACQUIRE_IMAGE,
 
     P_VISION,
     P_TRANSFORM,
     P_THRESHRUNS,
-    P_THRESHOLD,
     P_FGHORIZON,
     P_RUNS,
     P_OBJECT,
@@ -55,8 +56,6 @@ enum ProfiledComponent {
     P_LOGGING,
 
     P_PYTHON,
-    P_PYUPDATE,
-    P_PYRUN,
 
     P_LIGHTS,
 

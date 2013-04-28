@@ -12,15 +12,16 @@ using namespace std;
 
 static const char *PCOMPONENT_NAMES[] = {
     "Main Loop",
-    "GetImage",
-    "Dequeue buf",
-    "Acquire image",
-    "Queue buf",
+
+    "Dequeue Top buf",
+    "Acquire Top image",
+
+    "Dequeue Bottom buf",
+    "Acquire Bottom image",
 
     "Vision",
     "Transform",
     "ThreshRuns",
-    "Threshold",
     "FGHorizon",
     "Runs",
     "Object",
@@ -79,16 +80,16 @@ static const char *PCOMPONENT_NAMES[] = {
 // summary percentages.  Mapping to self means no parent.
 static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_MAIN                   --> */ P_TOTAL,
-    /*P_GETIMAGE               --> */ P_MAIN,
 
-    /*P_DQBUF                  --> */ P_GETIMAGE,
-    /*P_ACQUIRE_IMAGE          --> */ P_GETIMAGE,
-    /*P_QBUF                   --> */ P_GETIMAGE,
+    /*P_TOP_DQBUF              --> */ P_MAIN,
+    /*P_TOP_ACQUIRE_IMAGE      --> */ P_MAIN,
+
+    /*P_BOT_DQBUF              --> */ P_MAIN,
+    /*P_BOT_ACQUIRE_IMAGE      --> */ P_MAIN,
 
     /*P_VISION                 --> */ P_MAIN,
     /*P_TRANSFORM              --> */ P_VISION,
     /*P_THRESHRUNS             --> */ P_VISION,
-    /*P_THRESHOLD              --> */ P_THRESHRUNS,
     /*P_FGHORIZON              --> */ P_THRESHRUNS,
     /*P_RUNS                   --> */ P_THRESHRUNS,
     /*P_OBJECT                 --> */ P_VISION,
@@ -103,7 +104,6 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_SMOOTH,                --> */ P_HOUGH,
     /*P_HOUGH_PEAKS,           --> */ P_HOUGH,
     /*P_SUPPRESS,              --> */ P_HOUGH,
-    /*P_PAIR_LINES,            --> */ P_HOUGH,
 
     /*P_LINES                  --> */ P_VISION,
     /*P_VERT_LINES,            --> */ P_LINES,

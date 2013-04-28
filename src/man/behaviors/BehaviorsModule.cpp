@@ -5,6 +5,7 @@
 #include <boost/python/errors.hpp>
 #include <iostream>
 #include "Common.h"
+#include "Profiler.h"
 
 #include "BehaviorsModule.h"
 #include "PyObjects.h"
@@ -182,10 +183,9 @@ void BehaviorsModule::run_ ()
     // Latch incoming messages and prepare outgoing messages
     prepareMessages();
 
-    /*PROF_ENTER(P_PYTHON);*/
+    PROF_ENTER(P_PYTHON);
 
     // Call main run() method of Brain
-    //PROF_ENTER(P_PYRUN);
     if (brain_instance != NULL) {
         PyObject *result = PyObject_CallMethod(brain_instance, "run", NULL);
         if (result == NULL) {
@@ -203,9 +203,7 @@ void BehaviorsModule::run_ ()
             Py_DECREF(result);
         }
     }
-    //PROF_EXIT(P_PYRUN);
-
-    // PROF_EXIT(P_PYTHON);
+    PROF_EXIT(P_PYTHON);
 
     // Send outgoing messages
     sendMessages();

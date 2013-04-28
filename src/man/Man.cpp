@@ -217,7 +217,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
 
 #ifdef USE_TIME_PROFILING
-    Profiler::getInstance->profileFrames(1400);
+    Profiler::getInstance()->profileFrames(1400);
 #endif
 
     startSubThreads();
