@@ -1,7 +1,10 @@
 #include "Man.h"
-#include "Common.h"
-#include "Camera.h"
+
 #include <iostream>
+
+#include "Common.h"
+#include "Profiler.h"
+#include "Camera.h"
 #include "RobotConfig.h"
 
 SET_POOL_SIZE(messages::WorldModel,  24);
@@ -211,6 +214,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
                                                "robot");
     cognitionThread.log<messages::VisionObstacle>(&vision.vision_obstacle,
                                                   "obstacle");
+#endif
+
+#ifdef USE_TIME_PROFILING
+    Profiler::getInstance->profileFrames(1400);
 #endif
 
     startSubThreads();
