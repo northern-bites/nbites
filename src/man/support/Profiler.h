@@ -1,4 +1,3 @@
-
 #ifndef _Profiler_h_DEFINED
 #define _Profiler_h_DEFINED
 
@@ -51,11 +50,6 @@ enum ProfiledComponent {
     P_FIT_UNUSED,
     P_INTERSECT_LINES,
 
-    P_MEMORY_VISION,
-    P_MEMORY_VISION_SENSORS,
-    P_MEMORY_MOTION_SENSORS,
-    P_MEMORY_IMAGE,
-
     P_LOC,
     P_MCL,
     P_LOGGING,
@@ -81,7 +75,7 @@ enum ProfiledComponent {
     P_ENACTOR,
 
     P_COMM,
-    P_TOOLCONNECT,
+
     P_ROBOGUARDIAN,
 
     P_TOTAL

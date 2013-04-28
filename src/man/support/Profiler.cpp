@@ -1,4 +1,3 @@
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -12,74 +11,68 @@
 using namespace std;
 
 static const char *PCOMPONENT_NAMES[] = {
-  "Main Loop",
-  "GetImage",
-  "Dequeue buf",
-  "Acquire image",
-  "Queue buf",
+    "Main Loop",
+    "GetImage",
+    "Dequeue buf",
+    "Acquire image",
+    "Queue buf",
 
-  "Vision",
-  "Transform",
-  "ThreshRuns",
-  "Threshold",
-  "FGHorizon",
-  "Runs",
-  "Object",
-  "Robots",
+    "Vision",
+    "Transform",
+    "ThreshRuns",
+    "Threshold",
+    "FGHorizon",
+    "Runs",
+    "Object",
+    "Robots",
 
-  "Edges",
-  "Sobel",
-  "Edge Peaks",
+    "Edges",
+    "Sobel",
+    "Edge Peaks",
 
-  "Hough Transform",
-  "Mark Hough Edges",
-  "Smooth Hough Space",
-  "Hough Peaks",
-  "Suppress Hough Lines",
-  "Pair Hough Lines",
+    "Hough Transform",
+    "Mark Hough Edges",
+    "Smooth Hough Space",
+    "Hough Peaks",
+    "Suppress Hough Lines",
 
-  "Lines",
-  "Vert Lines",
-  "Hor Lines",
-  "Create Lines",
-  "Join Lines",
-  "Fit Unused",
-  "Intersect Lines",
+    "Lines",
+    "Vert Lines",
+    "Hor Lines",
+    "Create Lines",
+    "Join Lines",
+    "Fit Unused",
+    "Intersect Lines",
 
-  "MemoryVision",
-  "MemoryVisionSensors",
-  "MemoryMotionSensors",
-  "MemoryImage",
+    "Localization",
+    "MCL",
+    "Logging",
 
-  "Localization",
-  "MCL",
-  "Logging",
+    "Python",
+    "PyUpdate",
+    "PyRun",
 
-  "Python",
-  "PyUpdate",
-  "PyRun",
+    "Lights",
 
-  "Lights",
+    "DCM",
+    "Pre-Process",
+    "Send Joints",
+    "Send Hardness",
+    "Post-Process",
 
-  "DCM",
-  "Pre-Process",
-  "Send Joints",
-  "Send Hardness",
-  "Post-Process",
+    "Switchboard",
+    "Scripted Provider CalcJS",
+    "ChoppedCommand",
+    "Walk Provider CalcJS",
+    "tick_legs()",
+    "Head Provider CalcJS",
+    "Enactor",
 
-  "Switchboard",
-  "Scripted Provider CalcJS",
-  "ChoppedCommand",
-  "Walk Provider CalcJS",
-  "tick_legs()",
-  "Head Provider CalcJS",
-  "Enactor",
+    "Comm",
 
-  "Comm",
-  "TOOLConnect",
-  "RoboGuardian",
+    "RoboGuardian",
 
-  "Total"
+    "Total"
 };
 
 // Map from subcomponent (index) to meta-component (value) for calculating
@@ -110,7 +103,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_SMOOTH,                --> */ P_HOUGH,
     /*P_HOUGH_PEAKS,           --> */ P_HOUGH,
     /*P_SUPPRESS,              --> */ P_HOUGH,
-    /*P_PAIR_LINES,             --> */ P_HOUGH,
+    /*P_PAIR_LINES,            --> */ P_HOUGH,
 
     /*P_LINES                  --> */ P_VISION,
     /*P_VERT_LINES,            --> */ P_LINES,
@@ -195,8 +188,8 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
  */
 
 Profiler::Profiler (long long (*thread_time_f)(),
-        long long (*process_time_f)(),
-        long long (*global_time_f)())
+                    long long (*process_time_f)(),
+                    long long (*global_time_f)())
     : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),
       thread_timeFunction(thread_time_f),
       process_timeFunction(process_time_f),
@@ -212,15 +205,14 @@ Profiler::~Profiler ()
 
 Profiler* Profiler::getInstance() {
     static boost::shared_ptr<Profiler>instance(
-            new Profiler(&thread_micro_time,
-                         &process_micro_time,
-                         &monotonic_micro_time));
+        new Profiler(&thread_micro_time,
+                     &process_micro_time,
+                     &monotonic_micro_time));
     return instance.get();
 }
 
 
-void
-Profiler::profileFrames (int num_frames)
+void Profiler::profileFrames (int num_frames)
 {
     printf("Profiling for %i frames\n", num_frames);
     this->reset();
@@ -228,71 +220,67 @@ Profiler::profileFrames (int num_frames)
     start_next_frame = true;
 }
 
-void
-Profiler::reset ()
+void Profiler::reset ()
 {
-  profiling = false;
-  start_next_frame = false;
-  num_profile_frames = -1;
-  current_frame = 0;
+    profiling = false;
+    start_next_frame = false;
+    num_profile_frames = -1;
+    current_frame = 0;
 
-  for (int i = 0; i < NUM_PCOMPONENTS; i++) {
-    enterTime[i] = 0;
-    lastTime[i] = 0;
-    sumTime[i] = 0;
-    maxTime[i] = 0;
-    minTime[i] = INT_MAX;
-  }
-}
-
-bool
-Profiler::nextFrame() {
-  // trigger start of profiling
-  if (start_next_frame) {
-    profiling = true;
-    profile_process_start_time = process_timeFunction();
-    profile_global_start_time = global_timeFunction();
-    printf("Starting profiling next frame!\n");
-    return start_next_frame = false;
-  }
-
-  // still currently profiling
-  if (profiling) {
-    // reached end of preset profile frames
-    if (num_profile_frames >= 0 && current_frame >= num_profile_frames - 1) {
-      // at finish, stop profiling
-      profiling = false;
-      printSummary();
-      return false;
-    }else {
-      // add this frame's times to the sums
-      for (int i = 0; i < NUM_PCOMPONENTS; i++) {
-        sumTime[i] += lastTime[i];
-        if (PCOMPONENT_SUB_ORDER[i] == P_TOTAL) {
-            sumTime[P_TOTAL] += lastTime[i];
-        }
+    for (int i = 0; i < NUM_PCOMPONENTS; i++) {
+        enterTime[i] = 0;
         lastTime[i] = 0;
-      }
-      // continue to the next frame
-      current_frame++;
-      return true;
+        sumTime[i] = 0;
+        maxTime[i] = 0;
+        minTime[i] = INT_MAX;
     }
-  }else
-    return false;
 }
 
-void
-Profiler::printCurrent ()
+bool Profiler::nextFrame() {
+    // trigger start of profiling
+    if (start_next_frame) {
+        profiling = true;
+        profile_process_start_time = process_timeFunction();
+        profile_global_start_time = global_timeFunction();
+        printf("Starting profiling next frame!\n");
+        return start_next_frame = false;
+    }
+
+    // still currently profiling
+    if (profiling) {
+        // reached end of preset profile frames
+        if (num_profile_frames >= 0 && current_frame >= num_profile_frames - 1) {
+            // at finish, stop profiling
+            profiling = false;
+            printSummary();
+            return false;
+        }else {
+            // add this frame's times to the sums
+            for (int i = 0; i < NUM_PCOMPONENTS; i++) {
+                sumTime[i] += lastTime[i];
+                if (PCOMPONENT_SUB_ORDER[i] == P_TOTAL) {
+                    sumTime[P_TOTAL] += lastTime[i];
+                }
+                lastTime[i] = 0;
+            }
+            // continue to the next frame
+            current_frame++;
+            return true;
+        }
+    }else
+        return false;
+}
+
+void Profiler::printCurrent ()
 {
-  printf("Profiler Data: Frame %i:\n", (current_frame-1));
-  for (int i = 0; i < NUM_PCOMPONENTS; i++) {
-    printf("%-13s: %.6llu last, %.10llu total\n", PCOMPONENT_NAMES[i],
-        lastTime[i], sumTime[i]);
-  }
+    printf("Profiler Data: Frame %i:\n", (current_frame-1));
+    for (int i = 0; i < NUM_PCOMPONENTS; i++) {
+        printf("%-13s: %.6llu last, %.10llu total\n", PCOMPONENT_NAMES[i],
+               lastTime[i], sumTime[i]);
+    }
 }
 
-void
-Profiler::printSummary ()
+void Profiler::printSummary ()
 {
 #ifdef PRINT_CSV
     printCSVSummary();
@@ -301,8 +289,7 @@ Profiler::printSummary ()
 #endif /* PRINT_CSV */
 }
 
-void
-Profiler::printCSVSummary()
+void Profiler::printCSVSummary()
 {
     printf("%s,%s,%s", "Component Name", "Sum Time", "Avg. Time\n");
     for (int i = 0; i < NUM_PCOMPONENTS; ++i) {
@@ -316,74 +303,73 @@ Profiler::printCSVSummary()
     }
 }
 
-void
-Profiler::printIndentedSummary()
+void Profiler::printIndentedSummary()
 {
-  printf("Profiler Summary: %i Frames\n", (current_frame+1));
+    printf("Profiler Summary: %i Frames\n", (current_frame+1));
 
-  // Calculate depths of sub-components, for indented display
-  int depths[NUM_PCOMPONENTS];
-  int length, max_length = 0;
-  int comp;
-  for (int i = 0; i < NUM_PCOMPONENTS; i++) {
+    // Calculate depths of sub-components, for indented display
+    int depths[NUM_PCOMPONENTS];
+    int length, max_length = 0;
+    int comp;
+    for (int i = 0; i < NUM_PCOMPONENTS; i++) {
 
-    depths[i] = 0;
-    comp = i;
-	//comp = PCOMPONENT_SUB_ORDER[i];
-    while (comp != PCOMPONENT_SUB_ORDER[comp]) {
-      depths[i]++;
-      comp = PCOMPONENT_SUB_ORDER[comp];
+        depths[i] = 0;
+        comp = i;
+        //comp = PCOMPONENT_SUB_ORDER[i];
+        while (comp != PCOMPONENT_SUB_ORDER[comp]) {
+            depths[i]++;
+            comp = PCOMPONENT_SUB_ORDER[comp];
+        }
+
+        length = strlen(PCOMPONENT_NAMES[i]) + depths[i]*2;
+        max_length = max_length > length ? max_length : length;
     }
 
-    length = strlen(PCOMPONENT_NAMES[i]) + depths[i]*2;
-    max_length = max_length > length ? max_length : length;
-  }
+    // Calculate and display the percentages (and totals) for each component
+    float parent_sum;
+    for (int i = 0; i < NUM_PCOMPONENTS; i++) {
+        comp = PCOMPONENT_SUB_ORDER[i];
+        parent_sum = (float)sumTime[comp];
 
-  // Calculate and display the percentages (and totals) for each component
-  float parent_sum;
-  for (int i = 0; i < NUM_PCOMPONENTS; i++) {
-    comp = PCOMPONENT_SUB_ORDER[i];
-    parent_sum = (float)sumTime[comp];
+        if (shouldNotPrintLine(i) ||
+            (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
+            continue;
 
-    if (shouldNotPrintLine(i) ||
-        (maxPrintDepth != PRINT_ALL_DEPTHS && depths[i] > maxPrintDepth))
-        continue;
-
-    // depth-based indentation
-    printf("%*s", depths[i]*2, "");
-    if (sumTime[i] == 0)
-      printf("  %-*s:      0%% (0000000000 total, 000000 avg.)\n",
-          (max_length-depths[i]*2), PCOMPONENT_NAMES[i]);
-    else if (parent_sum == 0)
-      printf("  %-*s: 100.00%% (%.10lli total, %.6lli avg.,"
-             " %lli min, %.6lli max )\n",
-             (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
-             (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
-    else {
-        if (verbose == true) {
-            printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.,"
-                    " %.6lli min, %.6lli max)\n",
-                    (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
-                    ((float)sumTime[i] / parent_sum * 100), sumTime[i],
-                    (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
-        } else {
-            printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.)\n",
-                            (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
-                            ((float)sumTime[i] / parent_sum * 100), sumTime[i],
-                            (sumTime[i] / (current_frame+1)));
+        // depth-based indentation
+        printf("%*s", depths[i]*2, "");
+        if (sumTime[i] == 0)
+            printf("  %-*s:      0%% (0000000000 total, 000000 avg.)\n",
+                   (max_length-depths[i]*2), PCOMPONENT_NAMES[i]);
+        else if (parent_sum == 0)
+            printf("  %-*s: 100.00%% (%.10lli total, %.6lli avg.,"
+                   " %lli min, %.6lli max )\n",
+                   (max_length-depths[i]*2), PCOMPONENT_NAMES[i], sumTime[i],
+                   (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
+        else {
+            if (verbose == true) {
+                printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.,"
+                       " %.6lli min, %.6lli max)\n",
+                       (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
+                       ((float)sumTime[i] / parent_sum * 100), sumTime[i],
+                       (sumTime[i] / (current_frame+1)), minTime[i], maxTime[i]);
+            } else {
+                printf("  %-*s: %6.2f%% (%.10lli total, %.6lli avg.)\n",
+                       (max_length-depths[i]*2), PCOMPONENT_NAMES[i],
+                       ((float)sumTime[i] / parent_sum * 100), sumTime[i],
+                       (sumTime[i] / (current_frame+1)));
+            }
         }
     }
-  }
-  long long process_run_time =
-          process_timeFunction() - profile_process_start_time;
-  long long avg_process_time = process_run_time/(current_frame+1);
-  long long global_run_time =
-            global_timeFunction() - profile_global_start_time;
+    long long process_run_time =
+        process_timeFunction() - profile_process_start_time;
+    long long avg_process_time = process_run_time/(current_frame+1);
+    long long global_run_time =
+        global_timeFunction() - profile_global_start_time;
     long long avg_global_time = global_run_time/(current_frame+1);
-  printf("\n Process-wise, we ran for an average of %lli per frame\n",
+    printf("\n Process-wise, we ran for an average of %lli per frame\n",
            avg_process_time);
-  printf("\n Ran for a total of %lli, for an average of %lli per frame\n",
-          global_run_time, avg_global_time);
-  float fps = MICROS_PER_SECOND/static_cast<float>(avg_global_time);
-  printf("FPS: %f\n", fps);
+    printf("\n Ran for a total of %lli, for an average of %lli per frame\n",
+           global_run_time, avg_global_time);
+    float fps = MICROS_PER_SECOND/static_cast<float>(avg_global_time);
+    printf("FPS: %f\n", fps);
 }
