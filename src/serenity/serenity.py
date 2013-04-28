@@ -8,7 +8,8 @@ import os
 parser = argparse.ArgumentParser(description="Sends a job to Serenity.")
 
 job_group = parser.add_mutually_exclusive_group()
-job_group.add_argument('-c', '--compile', action='store_true', default=False, dest='build',
+job_group.add_argument('-c', '--compile', action='store_true', default=False,
+                       dest='build',
                        help='Only compiles. No test or pull request.')
 job_group.add_argument('-m', '--mock', action='store_true', default=False,
                        help='Compiles and tests with no pull request.')
@@ -77,4 +78,4 @@ if (args.mock):
 command += "-b " + args.branch + " -n " + cache['git_name'] + " -u " + cache['git_url'] + "'"
 os.system(command)
 
-print args
+print "ALL DONE"
