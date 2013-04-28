@@ -34,6 +34,18 @@ option(
 )
 
 option(
+  PROFILE
+  "Enable time profiling for the robot"
+  OFF
+)
+
+option(
+  USING_LAB_FIELD
+  "Turn on if we are in the lab and not on a full-size field"
+  OFF
+)
+
+option(
   USE_LOGGING
   "Enable logging on the robot."
   OFF
