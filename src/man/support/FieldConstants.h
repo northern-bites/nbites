@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cmath>
-#include "RobotConfig.h"
 #include "Common.h"
+#include "DebugConfig.h"
 
 // Nao field constants
 
@@ -12,10 +12,10 @@ static const float FIELD_WHITE_HEIGHT = 330.f;
 static const float GREEN_PAD_X = 20.f;
 static const float GREEN_PAD_Y = 15.f;
 #else
-static const float FIELD_WHITE_WIDTH = 600.f;
-static const float FIELD_WHITE_HEIGHT = 400.f;
-static const float GREEN_PAD_X = 71.0f;
-static const float GREEN_PAD_Y = 71.0f;
+static const float FIELD_WHITE_WIDTH = 900.f;
+static const float FIELD_WHITE_HEIGHT = 600.f;
+static const float GREEN_PAD_X = 63.0f;
+static const float GREEN_PAD_Y = 65.0f;
 #endif // USING_LAB_FIELD
 
 static const float LINE_WIDTH = 5.0f;
@@ -44,11 +44,12 @@ static const float MIDFIELD_X = FIELD_GREEN_WIDTH * .5f;
 static const float MIDFIELD_Y = FIELD_GREEN_HEIGHT * .5f;
 
 // Other Field object dimensions
-static const float GOAL_POST_CM_HEIGHT = 80.0f;
+static const float GOAL_POST_CM_HEIGHT = 90.0f; // 80cm to the bottom
+                                                // of the crossbar.
 static const float GOAL_POST_CM_WIDTH = 10.0f;
-static const float CROSSBAR_CM_WIDTH = 140.f;
-static const float CROSSBAR_CM_HEIGHT = 5.0f;
-static const float GOAL_DEPTH = 40.0f;
+static const float CROSSBAR_CM_WIDTH = 150.f;
+static const float CROSSBAR_CM_HEIGHT = 10.0f;
+static const float GOAL_DEPTH = 50.0f;
 static const float GOAL_POST_RADIUS = GOAL_POST_CM_WIDTH / 2.0f;
 
 // GOAL CONSTANTS
@@ -70,7 +71,7 @@ static const float LANDMARK_YELLOW_GOAL_BOTTOM_POST_Y =
 static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
     CENTER_FIELD_Y + CROSSBAR_CM_WIDTH / 2.0f;
 
-static const float CENTER_CIRCLE_RADIUS = 60.0f; // Not scaled
+static const float CENTER_CIRCLE_RADIUS = 75.0f; // Not scaled
 
 #ifdef USING_LAB_FIELD
 static const float GOALBOX_DEPTH = 60.f;
@@ -83,11 +84,14 @@ static const float GOALBOX_WIDTH = 220.f;
 
 // These are used by the vision system
 // The distance the goalie box extends out past each goal post
-static const float GOALBOX_OVERAGE = 40.0f;
+static const float GOALBOX_OVERAGE = (GOALBOX_WIDTH -
+                                      (CROSSBAR_CM_WIDTH +
+                                       2.0f * GOAL_POST_RADIUS)) / 2.0f;
 // The distance from any goal post to the goalie box corner nearest it
 static const float POST_CORNER = sqrtf(GOALBOX_DEPTH * GOALBOX_DEPTH +
                                        GOALBOX_OVERAGE * GOALBOX_OVERAGE);
 
+// Headings to goal from center
 static const float YELLOW_GOAL_HEADING = 0;
 static const float BLUE_GOAL_HEADING = 180;
 
@@ -107,9 +111,9 @@ static const float YELLOW_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
 
 // Crosses on the Field
 #ifdef USING_LAB_FIELD
-static const float LINE_CROSS_OFFSET = 130;
+static const float LINE_CROSS_OFFSET = 130.0f;
 #else
-static const float LINE_CROSS_OFFSET = 180;
+static const float LINE_CROSS_OFFSET = 180.0f;
 #endif // USING_LAB_FIELD
 
 static const float LANDMARK_BLUE_GOAL_CROSS_X = FIELD_WHITE_LEFT_SIDELINE_X +
@@ -129,10 +133,16 @@ static const float BOTTOM_CC_X = CENTER_FIELD_X;
 
 static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
 
+// Useful constants for initial localization
+static const float BLUE_CC_NEAREST_POINT_X = CENTER_FIELD_X -
+    CENTER_CIRCLE_RADIUS;
+static const float BLUE_CROSS_CIRCLE_MIDPOINT_X = LANDMARK_BLUE_GOAL_CROSS_X +
+    ((BLUE_CC_NEAREST_POINT_X-LANDMARK_BLUE_GOAL_CROSS_X)/2.0);
+
 // Constants for heading
 //  Right is towards opponents' goal.
 //  Left is towards own goal.
-static const float HEADING_RIGHT = 0;
-static const float HEADING_UP = 90;
-static const float HEADING_LEFT = 180;
-static const float HEADING_DOWN = -90;
+static const float HEADING_RIGHT = 0.0f;
+static const float HEADING_UP = 90.0f;
+static const float HEADING_LEFT = 180.0f;
+static const float HEADING_DOWN = -90.0f;

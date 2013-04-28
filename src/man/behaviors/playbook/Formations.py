@@ -39,7 +39,7 @@ def fTwoField(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.determineChaser(workingPlay)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
             Roles.rDefender(team, workingPlay)
@@ -51,7 +51,7 @@ def fNeutralTwoField(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.determineChaser(workingPlay)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
             Roles.rMiddie(team, workingPlay)
@@ -71,7 +71,7 @@ def fTwoZoneD(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.getForward(team.activeFieldPlayers)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
             Roles.rDefender(team, workingPlay)
@@ -83,7 +83,7 @@ def fTwoZoneO(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.getBack(team.activeFieldPlayers)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
             Roles.rOffender(team, workingPlay)
@@ -98,12 +98,12 @@ def fThreeField(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.determineChaser(workingPlay)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
             otherMates = team.getOtherActiveFieldPlayers([chaser_mate.playerNumber])
             forward = team.getForward(otherMates)
-            if forward.playerNumber == team.brain.my.playerNumber:
+            if forward.playerNumber == team.brain.playerNumber:
                 Roles.rOffender(team, workingPlay)
             else:
                 Roles.rDefender(team, workingPlay)
@@ -115,12 +115,12 @@ def fNeutralOThreeField(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.determineChaser(workingPlay)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
             otherMates = team.getOtherActiveFieldPlayers([chaser_mate.playerNumber])
             forward = team.getForward(otherMates)
-            if forward.playerNumber == team.brain.my.playerNumber:
+            if forward.playerNumber == team.brain.playerNumber:
                 Roles.rOffender(team, workingPlay)
             else:
                 Roles.rMiddie(team, workingPlay)
@@ -132,12 +132,12 @@ def fNeutralDThreeField(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.determineChaser(workingPlay)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
             otherMates = team.getOtherActiveFieldPlayers([chaser_mate.playerNumber])
             forward = team.getForward(otherMates)
-            if forward.playerNumber == team.brain.my.playerNumber:
+            if forward.playerNumber == team.brain.playerNumber:
                 Roles.rMiddie(team, workingPlay)
             else:
                 Roles.rDefender(team, workingPlay)
@@ -149,7 +149,7 @@ def fThreeDubD(team, workingPlay):
         Roles.rGoalie(team, workingPlay)
     else:
         forward = team.getForward(team.activeFieldPlayers)
-        if forward.playerNumber == team.brain.my.playerNumber:
+        if forward.playerNumber == team.brain.playerNumber:
             Roles.rMiddie(team, workingPlay)
         else:
             Roles.rDefenderDubD(team, workingPlay)
@@ -162,17 +162,19 @@ def fFourField(team, workingPlay):
     # Used as our pull goalie formation (2011)
     workingPlay.setFormation(PBConstants.FOUR_FIELD)
     if team.me.isDefaultGoalie():
-        #Roles.rGoalie(team, workingPlay)
-        Roles.rDefender(team, workingPlay)
+        Roles.rGoalie(team, workingPlay)
     else:
         chaser_mate = team.determineChaser(workingPlay)
-        if chaser_mate.playerNumber == team.brain.my.playerNumber:
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             Roles.rChaser(team, workingPlay)
         else:
-            otherMates = team.getOtherActiveFieldPlayers(chaser_mate.playerNumber)
+            otherMates = team.getOtherActiveFieldPlayers([chaser_mate.playerNumber])
             forward = team.getForward(otherMates)
-            if forward.playerNumber == team.brain.my.playerNumber:
+            back = team.getBack(otherMates)
+            if forward.playerNumber == team.brain.playerNumber:
                 Roles.rOffender(team, workingPlay)
+            elif back.playerNumber == team.brain.playerNumber:
+                Roles.rDefender(team, workingPlay)
             else:
                 Roles.rMiddie(team, workingPlay)
 
@@ -193,7 +195,7 @@ def fKickoff(team, workingPlay):
             Roles.rChaser(team, workingPlay)
         else:
             Roles.rDefender(team, workingPlay)
-    else:
+    elif team.numActiveFieldPlayers == 3:
         if team.me.isDefaultChaser():
             Roles.rChaser(team, workingPlay)
         elif team.me.isDefaultDefender():
@@ -201,6 +203,8 @@ def fKickoff(team, workingPlay):
         elif team.me.isDefaultOffender():
             workingPlay.setRole(PBConstants.OFFENDER)
             SubRoles.pKickoffStriker(team, workingPlay)
+        elif team.me.isDefaultMiddie():
+            Roles.rMiddie(team, workingPlay)
 
 def fReady(team, workingPlay):
     '''pre-kickoff positions'''
@@ -208,40 +212,62 @@ def fReady(team, workingPlay):
     if team.me.isDefaultGoalie():
         Roles.rGoalie(team, workingPlay)
     elif team.numActiveFieldPlayers == 1:
+        # Just a chaser
         workingPlay.setRole(PBConstants.CHASER)
         SubRoles.pReadyChaser(team, workingPlay)
     elif team.numActiveFieldPlayers == 2:
-        highNumber = team.highestActivePlayerNumber()
-        if team.me.playerNumber == highNumber:
+        # Chaser and Defender
+        chaser_mate = team.determineChaser(workingPlay)
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             workingPlay.setRole(PBConstants.CHASER)
             SubRoles.pReadyChaser(team, workingPlay)
         else:
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
-    else:
-        if team.me.isDefaultChaser():
+    elif team.numActiveFieldPlayers == 3:
+        # Chaser, Defender, and Offender
+        chaser_mate = team.determineChaser(workingPlay)
+        lowNumber = team.lowestActivePlayerNumber([chaser_mate.playerNumber])
+        if chaser_mate.playerNumber == team.brain.playerNumber:
             workingPlay.setRole(PBConstants.CHASER)
             SubRoles.pReadyChaser(team, workingPlay)
-        elif team.me.isDefaultDefender():
+        elif team.me.playerNumber == lowNumber:
             workingPlay.setRole(PBConstants.DEFENDER)
             SubRoles.pReadyDefender(team, workingPlay)
-        elif team.me.isDefaultOffender():
+        else:
             workingPlay.setRole(PBConstants.OFFENDER)
             SubRoles.pReadyOffender(team, workingPlay)
+    else:
+        # All 4 field players
+        chaser_mate = team.determineChaser(workingPlay)
+        lowNumber = team.lowestActivePlayerNumber([chaser_mate.playerNumber])
+        highNumber = team.highestActivePlayerNumber([chaser_mate.playerNumber])
+        if chaser_mate.playerNumber == team.brain.playerNumber:
+            workingPlay.setRole(PBConstants.CHASER)
+            SubRoles.pReadyChaser(team, workingPlay)
+        elif team.me.playerNumber == lowNumber:
+            workingPlay.setRole(PBConstants.DEFENDER)
+            SubRoles.pReadyDefender(team, workingPlay)
+        elif team.me.playerNumber == highNumber:
+            workingPlay.setRole(PBConstants.OFFENDER)
+            SubRoles.pReadyOffender(team, workingPlay)
+        else:
+            workingPlay.setRole(PBConstants.MIDDIE)
+            SubRoles.pReadyMiddie(team, workingPlay)
 
 
 #### Test Formations ####
 
 def fTestDefender(team, workingPlay):
     workingPlay.setFormation(PBConstants.TEST_DEFEND)
-    if team.brain.ball.loc.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
+    if team.brain.ball.x > PBConstants.S_MIDDIE_DEFENDER_THRESH:
         Roles.rMiddie(team, workingPlay)
     else:
         Roles.rDefender(team, workingPlay)
 
 def fTestOffender(team, workingPlay):
     workingPlay.setFormation(PBConstants.TEST_OFFEND)
-    if team.brain.ball.loc.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
+    if team.brain.ball.x < PBConstants.S_MIDDIE_OFFENDER_THRESH:
         Roles.rMiddie(team, workingPlay)
     else:
         Roles.rOffender(team, workingPlay)

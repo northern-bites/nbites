@@ -5,7 +5,7 @@
 
 #include "Common.h"
 
-#define TEAM_PORT 4000
+#define TEAM_PORT 4500
 
 #define UDP_BUF_SIZE 1024
 #define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
@@ -27,7 +27,7 @@ typedef unsigned char byte;
 // Multicast information
 //
 
-static const int NUM_ROBOTS = 5;    // Total number of robots we have
+static const int NUM_ROBOTS = 9;    // Total number of robots we have
 
 typedef struct robot_ip_pair_t
 {
@@ -35,26 +35,24 @@ typedef struct robot_ip_pair_t
     std::string ip;
 }robot_ip_pair;
 
-static const robot_ip_pair wash   = {"wash"  , "139.140.218.9" };
-static const robot_ip_pair river  = {"river" , "139.140.218.10"};
-static const robot_ip_pair jayne  = {"jayne" , "139.140.218.11"};
-static const robot_ip_pair mal    = {"mal"   , "139.140.218.16"};
-static const robot_ip_pair zoe    = {"zoe"   , "139.140.218.17"};
+static const robot_ip_pair wash    = {"wash"   , "139.140.218.9" };
+static const robot_ip_pair river   = {"river"  , "139.140.218.10"};
+static const robot_ip_pair jayne   = {"jayne"  , "139.140.218.11"};
+static const robot_ip_pair simon   = {"simon"  , "139.140.218.12"};
+static const robot_ip_pair inara   = {"inara"  , "139.140.218.13"};
+static const robot_ip_pair kaylee  = {"kaylee" , "139.140.218.14"};
+static const robot_ip_pair vera    = {"vera"   , "139.140.218.15"};
+static const robot_ip_pair mal     = {"mal"    , "139.140.218.16"};
+static const robot_ip_pair zoe     = {"zoe"    , "139.140.218.17"};
+
 
 static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
-                                                   mal, zoe};
+                                                   simon, inara, kaylee,
+                                                   vera, mal, zoe};
 
 //
 // Comm constants and MACRO definitions
 //
-
-/*   Packet Header: ("0" is null char)
-
-Byte| 1  | 2  | 3  | 4
- 1  |"B" |"0" |team|player
- 2  |.. sequence number ..
-
- */
 
 #define UNIQUE_ID "B" // keep this as define so it stays 2 bytes, not 4.
 static const int NUM_HEADER_BYTES = 16;
@@ -76,6 +74,8 @@ static const long long MIN_PACKET_DELAY = 0;
 // The minimum and maximum number of packets we can send per second.
 static const long long MAX_PACKETS_PER_SECOND = 10;  // 10 packets per second.
 static const long long MIN_PACKETS_PER_SECOND = 4;   // 4 packets pers second.
-static const long long TEAMMATE_DEAD_THRESHOLD = 3 * MICROS_PER_SECOND;
+static const long long TEAMMATE_DEAD_THRESHOLD = 10 * MICROS_PER_SECOND;
+static const int       RESET_SEQ_NUM_THRESHOLD = 30 * PACKETS_PER_SECOND;
+
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;

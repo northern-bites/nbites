@@ -29,14 +29,14 @@ set ( @PYTHON_PLAYER@
 # COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
-  "../../data/tables/120-top.mtb"
+  "../../data/tables/watson13.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
   )
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/120-bottom.mtb"
+  "../../data/tables/watson13.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )
@@ -57,5 +57,5 @@ set( INSTALL_LOCATION
 option(
   USING_LAB_FIELD
   "Turn on if we are in the lab and not on a full-size field"
-  ON
+  OFF
   )

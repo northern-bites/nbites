@@ -20,7 +20,7 @@ typedef int pixels;
 typedef float cms;
 typedef float mms;
 
-static const int NUM_PLAYERS_PER_TEAM = 4;
+static const int NUM_PLAYERS_PER_TEAM = 5;
 
 // game controller constants for structure information
 #define GAME_CONTROLLER_LIST_SIZE 11

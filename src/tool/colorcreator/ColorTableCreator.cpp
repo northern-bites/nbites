@@ -1,14 +1,13 @@
 /**
  * @class ColorTableCreator
- *
- * Tool to define/calibrate a color table
- *
- * @author EJ Googins
  */
 
 #include "ColorTableCreator.h"
 #include <QMouseEvent>
 #include <QFileDialog>
+#include <QFile>
+#include <QDataStream>
+#include <QIODevice>
 
 namespace tool {
 namespace color {
@@ -25,6 +24,9 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     topImage(base())
 {
     // BACKEND
+    // We need converter modules to threshold both the top and bottom images,
+    // and ImageDisplayModule for each image, and a ThresholdedDisplayModule
+    // for whichever image is currently being workied on
     subdiagram.addModule(topConverter);
     subdiagram.addModule(bottomConverter);
     subdiagram.addModule(topDisplay);
@@ -57,8 +59,11 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
 
+    colorTableName = new QLabel(this);
+    colorTableName->setMaximumHeight(colorTableName->sizeHint().height());
+
     colorStats = new QLabel(this);
-	colorStats->setAlignment(Qt::AlignTop);
+    colorStats->setMaximumHeight(colorTableName->sizeHint().height());
 
     //set up the color selection combo box
     for (int i = 0; i < image::Color::NUM_COLORS; i++) {
@@ -82,13 +87,59 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveColorTable()));
 
     rightLayout->addWidget(&thrDisplay);
+    rightLayout->addWidget(colorTableName);
     rightLayout->addWidget(colorStats);
-	mainLayout->addLayout(leftLayout);
-	mainLayout->addLayout(rightLayout);
 
-	setLayout(mainLayout);
+    mainLayout->addLayout(leftLayout);
+    mainLayout->addLayout(rightLayout);
+
+    setLayout(mainLayout);
+    loadLatestTable();
 }
 
+// Note: serizalization done by Qt
+void ColorTableCreator::loadLatestTable()
+{
+    if (imageTabs->currentIndex() == 0) {
+        QFile file("../../data/tables/latestTopTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        QString filename;
+        in >> filename;
+        colorTable.read(filename.toStdString());
+        colorTableName->setText(filename);
+    }
+    else {
+        QFile file("../../data/tables/latestBottomTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        QString filename;
+        in >> filename;
+        colorTable.read(filename.toStdString());
+        colorTableName->setText(filename);
+    }
+    updateColorStats();
+}
+
+// Note: serizalization done by Qt
+void ColorTableCreator::serializeTableName(QString latestTableName) 
+{
+    if (imageTabs->currentIndex() == 0) {
+        QFile file("../../data/tables/latestTopTable.dat");
+        file.open(QIODevice::WriteOnly);
+        QDataStream out(&file);
+        out << latestTableName;
+    }
+    else {
+        QFile file("../../data/tables/latestBottomTable.dat");
+        file.open(QIODevice::WriteOnly);
+        QDataStream out(&file);
+        out << latestTableName;
+    }
+}
+
+// This gets called every time the logs are advanced, ie every time the
+// "forward" button is pressed in the main tool
 void ColorTableCreator::run_()
 {
     bottomImageIn.latch();
@@ -110,6 +161,10 @@ void ColorTableCreator::loadColorTable()
                     base_directory,
                     tr("Color Table files (*.mtb)"));
     colorTable.read(filename.toStdString());
+    colorTableName->setText(filename);
+
+    serializeTableName(filename);
+    updateThresholdedImage();
 }
 
 void ColorTableCreator::saveColorTable()
@@ -120,12 +175,18 @@ void ColorTableCreator::saveColorTable()
                     base_directory + "/new_table.mtb",
                     tr("Color Table files (*.mtb)"));
     colorTable.write(filename.toStdString());
+    colorTableName->setText(filename);
+
+    serializeTableName(filename);
 }
 
+// Updates the color tables for both image converters and runs all of the
+// submodules, creating an updated thresholded image
 void ColorTableCreator::updateThresholdedImage()
 {
     topConverter.initTable(colorTable.getTable());
     bottomConverter.initTable(colorTable.getTable());
+    // Run all of the modules that are kept in our subdiagram
     subdiagram.run();
     updateColorStats();
 }
@@ -136,7 +197,6 @@ void ColorTableCreator::updateColorStats()
     colorStats->setText("Color count: " + QVariant(colorCount).toString());
 }
 
-
 void ColorTableCreator::canvasClicked(int x, int y, int brushSize, bool leftClick)
 {
     BrushStroke brushStroke(x, y, (image::Color::ColorID) currentColor, brushSize, leftClick);
@@ -144,8 +204,8 @@ void ColorTableCreator::canvasClicked(int x, int y, int brushSize, bool leftClic
     paintStroke(brushStroke);
 }
 
-void ColorTableCreator::undo() {
-
+void ColorTableCreator::undo()
+{
     if (brushStrokes.empty())
         return;
 
@@ -204,6 +264,7 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
 
 void ColorTableCreator::imageTabSwitched(int)
 {
+    // Rewire the thresholded display's inPortal to get the right thing
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;
         thrDisplay.imageIn.wireTo(&topConverter.thrImage);
@@ -211,6 +272,9 @@ void ColorTableCreator::imageTabSwitched(int)
         currentCamera = Camera::BOTTOM;
         thrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
     }
+
+    loadLatestTable();
+    updateThresholdedImage();
 }
 
 void ColorTableCreator::updateColorSelection(int color)

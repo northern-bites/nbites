@@ -11,22 +11,20 @@ from objects import RelRobotLocation
 
 # Visual Goalie
 
-def facingGoal(player):
-    if player.side == goalCon.RIGHT:
-        return (player.brain.yglp.on and
-                fabs(player.brain.yglp.bearing_deg) < 10.0
-                and player.brain.yglp.distance < 400.0)
-    else:
-        return (player.brain.ygrp.on and
-                fabs(player.brain.ygrp.bearing_deg) < 10.0
-                and player.brain.ygrp.distance < 400.0)
-
 def atGoalArea(player):
     """
     Checks if robot is close enough to the field edge to be at the goal.
     """
     #magic number
-    return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
+    vision = player.brain.interface.visionField
+    return ((vision.visual_field_edge.distance_m < 110.0
+             and vision.visual_field_edge.distance_m != 0.0)
+            or (player.brain.yglp.distance < 20.0
+                and player.brain.yglp.on
+                and not player.brain.yglp.distance == 0.0)
+            or (player.brain.ygrp.distance < 20.0
+                and player.brain.ygrp.on
+                and not player.brain.ygrp.distance == 0.0))
 
 def ballIsInMyWay(player):
     """
@@ -100,9 +98,9 @@ def facingForward(player):
     """
     #magic numbers
     vision = player.brain.interface.visionField
-    return (vision.visual_field_edge.distance_m > 800.0
-            or(fabs(vision.visual_cross.bearing) < 10.0 and
-               vision.visual_cross.distance > 0.0))
+    return (vision.visual_field_edge.distance_m > 800.0 or
+            (fabs(vision.visual_cross.bearing) < 10.0 and
+             vision.visual_cross.distance > 0.0))
 
 def facingBall(player):
     """
@@ -112,32 +110,26 @@ def facingBall(player):
     return (fabs(player.brain.ball.vis.bearing_deg) < 10.0 and
             player.brain.ball.vis.on)
 
+def notTurnedAround(player):
+    """
+    Checks that we are actually facing the field when returning from
+    penalty.
+    """
+    return (player.brain.interface.visionField.visual_field_edge.distance_m
+            > 400.0)
+
 def onThisSideline(player):
     """
     Looks for a T corner or far goals to determine which sideline it's
     standing on.
     """
     vision = player.brain.interface.visionField
-    for i in range(0, vision.visual_corner_size()):
-        for j in range(0, vision.visual_corner(i).poss_id_size()):
-            if ((vision.visual_corner(i).poss_id(j) ==
-                 vision.visual_corner(i).corner_id.CENTER_TOP_T) or
-                (vision.visual_corner(i).poss_id(j) ==
-                 vision.visual_corner(i).corner_id.CENTER_BOTTOM_T)):
-              return True
-    return ((player.brain.ygrp.on and
-             #magic numbers
-             player.brain.ygrp.distance > 100.0) or
-            (player.brain.yglp.on and
-             player.brain.yglp.distance > 100.0))
+    return (vision.visual_field_edge.distance_m < 250.0 and
+            vision.visual_field_edge.distance_m > 100.0)
 
 def unsure(player):
     return (not onThisSideline(player) and
             player.counter > 60)
-
-def shouldGetReadyToSave(player):
-    return (player.brain.ball.vis.heat > 10.0 and
-            not shouldClearBall(player))
 
 def noSave(player):
    return player.counter > 60
@@ -146,8 +138,34 @@ def shouldPerformSave(player):
     """
     Checks that the ball is moving toward it and close enough to save.
     """
-    return (player.brain.ball.vel_x < -50.0 and
-            player.brain.ball.vis.frames_on > 4)
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 15.0 and
+            player.brain.ball.rel_x_dest < 0.0 and
+            abs(player.brain.ball.rel_y_intersect_dest) < 80.0 and
+            player.brain.ball.distance < 230.0 and
+            player.brain.ball.vis.on)
+
+## These three are penalty kick transitions. They need to be tuned.
+def shouldDiveRight(player):
+    """
+    Checks that the ball is moving toward it and close enough to save.
+    """
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_y_intersect_dest < -5.0)
+
+def shouldDiveLeft(player):
+    """
+    Checks that the ball is moving toward it and close enough to save.
+    """
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_y_intersect_dest > 5.0)
+
+def shouldSquat(player):
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            abs(player.brain.ball.rel_y_intersect_dest) < 10.0)
 
 def facingSideways(player):
     """

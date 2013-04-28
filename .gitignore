@@ -7,6 +7,8 @@ lib/*
 *.ekf
 *.mcl
 *.obs
+util/GameController/GameController.log
+util/GameController/*.txt
 *.geometry
 *~
 *#*#
@@ -16,5 +18,4 @@ docs/*
 *.pdf
 *.o
 util/scripts/nbites.bash
-util/GameController/GameController.log
 src/serenity/cache.txt

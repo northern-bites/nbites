@@ -27,6 +27,7 @@ GuardianModule::GuardianModule()
       stiffnessControlOutput(base()),
       initialStateOutput(base()),
       advanceStateOutput(base()),
+      printJointsOutput(base()),
       switchTeamOutput(base()),
       switchKickOffOutput(base()),
       feetOnGroundOutput(base()),
@@ -140,7 +141,7 @@ void GuardianModule::checkFalling()
     if (fallingFrames > FALLING_FRAMES_THRESH)
     {
         // When falling, execute the fall protection method.
-        //cout << "GuardianModule::checkFalling() : FALLING!" << endl;
+        //std::cout << "GuardianModule::checkFalling() : FALLING!" << std::endl;
         falling = true;
         //processFallingProtection(); // Should be called later in run_()
     }
@@ -537,6 +538,7 @@ bool GuardianModule::executeChestClickAction(int nClicks)
         initialState();
         break;
     case 5:
+        printJointAngles();
         break;
     case 7:
         break;
@@ -625,6 +627,15 @@ void GuardianModule::advanceState()
     advanceStateOutput.setMessage(command);
 
     lastAdvance = !lastAdvance;
+}
+
+void GuardianModule::printJointAngles()
+{
+    portals::Message<messages::Toggle> command(0);
+    command.get()->set_toggle(!lastPrint);
+    printJointsOutput.setMessage(command);
+
+    lastPrint = !lastPrint;
 }
 
 void GuardianModule::switchTeams()

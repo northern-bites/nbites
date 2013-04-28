@@ -8,39 +8,33 @@ from .. import SweetMoves
 
 def gameInitial(player):
     if player.firstFrame():
-        pass
-        #player.gainsOn()
-        #player.brain.fallController.enableFallProtection(False)
+        player.gainsOn()
+        player.brain.fallController.enabled = False
     return player.stay()
 
 def gameReady(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
     return player.goLater('standup')
 
 def gameSet(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
     return player.goLater('standup')
 
 def gamePlaying(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
     return player.goLater('standup')
 
 def gamePenalized(player):
     if player.firstFrame():
-        pass
-        #player.brain.fallController.enableFallProtection(False)
+        player.brain.fallController.enabled = False
+
     return player.goLater('standup')
 
 def standup(player):
     if player.firstFrame():
-        #player.brain.tracker.setNeutralHead()
-        #player.gainsOn()
         player.brain.nav.stand()
 
     if player.counter == 100:
@@ -49,13 +43,15 @@ def standup(player):
 
 def kickStraight(player):
     if player.firstFrame():
-        #print player.brain.ball.loc.relX, player.brain.ball.loc.relY
-        player.executeMove(SweetMoves.LEFT_FAR_KICK)
-    if player.brain.nav.isStopped() and player.counter > 100:
-        return player.goLater('done')
+        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
+
+    # if player.counter == 150:
+    #     return player.goLater('restore')
+
     return player.stay()
 
-def done(player):
+def restore(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.SIT_POS)
+        player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+
     return player.stay()

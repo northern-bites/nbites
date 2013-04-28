@@ -1,64 +1,77 @@
 /**
- * @class Viewer
+ * Class responsible for holding a PaintField object and
+ * interacting with the user and field (Controller!)
  *
- * This class is going to be the WorldController from
- * the previous Tool.  It will show the field with
- * robots and balls in their positions which are
- * passed in.
- *
- * @author Dani McAvoy
- * @date October 2011
- *
- *
- * @modified Brian Jacobel
- * @date April 2012
+ * @author EJ Googins
+ * @date   April 2013
  */
-
 #pragma once
 
-#include <QWidget>
-#include <QPushButton>
 #include <QtGui>
-#include <QPainter>
+#include <QCheckBox>
 #include <vector>
 
-#include "data/DataManager.h"
-#include "image/PaintField.h"
-#include "image/PaintLocalization.h"
-#include "BMPImageViewer.h"
-#include "image/PaintBots.h"
+#include "RoboGrams.h"
+#include "RobotLocation.pb.h"
+#include "ParticleSwarm.pb.h"
 
-namespace qtool {
-namespace viewer {
+#include "FieldViewerPainter.h"
 
-class FieldViewer : public QWidget{
-	Q_OBJECT
+namespace tool{
+namespace viewer{
 
-	public:
-	FieldViewer(data::DataManager::ptr dataManager, QWidget* parent = 0);
-	~FieldViewer();
+class FieldViewer : public QWidget,
+                    public portals::Module
+{
+    Q_OBJECT;
 
-public slots:
-	void stopDrawing();
-	void drawBots();
+public:
+    FieldViewer(QWidget* parent = 0);
 
-private:
-	data::DataManager::ptr dataManager;
-	viewer::BMPImageViewer* fieldView;
-	image::OverlayedImage* overlayImage;
-	image::PaintBots* bot_locs;
-	image::PaintField* fieldImage;
-	bool keepDrawing;
+    void confirmParticleLogs(bool haveLogs);
+    void confirmLocationLogs(bool haveLogs);
+    void confirmObsvLogs(bool haveLogs);
+    void confirmOdometryLogs(bool haveLogs);
+
+    portals::InPortal<messages::RobotLocation> locationIn;
+    portals::InPortal<messages::RobotLocation> odometryIn;
+    portals::InPortal<messages::ParticleSwarm> particlesIn;
+    portals::InPortal<messages::VisionField> observationsIn;
+
+protected slots:
+    void noLogError();
 
 protected:
-	QPushButton* startButton;
-	QPushButton* stopButton;
-	QVBoxLayout* mainLayout;
-	QHBoxLayout* buttonLayout;
-	QHBoxLayout* field;
-	QSpacerItem* spacer;
-	float scaleFactor;
+    virtual void run_();
+
+protected:
+    FieldViewerPainter* fieldPainter;
+
+    QHBoxLayout* mainLayout;
+    QHBoxLayout* field;
+    QVBoxLayout* checkBoxes;
+
+    QCheckBox* particleViewBox;
+    QCheckBox* locationViewBox;
+    QCheckBox* robotFieldViewBox;
+
+    QCheckBox* selector4;
+    QCheckBox* selector5;
+    QCheckBox* selector6;
+    QCheckBox* selector7;
+    QCheckBox* selector8;
+
+
+    float scaleFactor;
+
+private:
+    bool haveParticleLogs;
+    bool haveLocationLogs;
+    bool haveVisionFieldLogs;
+    bool haveOdometryLogs;
 };
+
+
 
 }
 }

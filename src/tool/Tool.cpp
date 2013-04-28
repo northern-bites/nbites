@@ -16,6 +16,7 @@ Tool::Tool(const char* title) :
     selector(),
     logView(this),
     tableCreator(this),
+    fieldView(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -38,6 +39,9 @@ Tool::Tool(const char* title) :
     connect(&diagram, SIGNAL(signalNewDisplayWidget(QWidget*, std::string)),
             &logView, SLOT(newDisplayWidget(QWidget*, std::string)));
 
+    connect(&diagram, SIGNAL(signalDeleteDisplayWidgets()),
+            &logView, SLOT(deleteDisplayWidgets()));
+
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
 
@@ -48,6 +52,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&selector, tr("Data"));
     toolTabs->addTab(&logView, tr("Log View"));
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
+    toolTabs->addTab(&fieldView, tr("FieldView"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
@@ -79,6 +84,7 @@ Tool::~Tool() {
 
 void Tool::setUpModules()
 {
+    /** Color Table Creator Tab **/
     if (diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
                                                       "top") &&
         diagram.connectToUnlogger<messages::YUVImage>(tableCreator.bottomImageIn,
@@ -91,6 +97,56 @@ void Tool::setUpModules()
         std::cout << "Right now you can't use the color table creator without"
                   << " two image logs." << std::endl;
     }
+
+
+    /** FieldViewer Tab **/
+    // Should add field view
+    bool shouldAddFieldView = false;
+    if(diagram.connectToUnlogger<messages::RobotLocation>(fieldView.locationIn,
+                                                          "location"))
+    {
+        fieldView.confirmLocationLogs(true);
+        shouldAddFieldView = true;
+    }
+    else
+    {
+        std::cout << "Warning: location wasn't logged in this file" << std::endl;
+    }
+    if(diagram.connectToUnlogger<messages::RobotLocation>(fieldView.odometryIn,
+                                                          "odometry"))
+    {
+        fieldView.confirmOdometryLogs(true);
+        shouldAddFieldView = true;
+    }
+    else
+    {
+        std::cout << "Warning: odometry wasn't logged in this file" << std::endl;
+    }
+
+    if(diagram.connectToUnlogger<messages::ParticleSwarm>(fieldView.particlesIn,
+                                                          "particleSwarm"))
+    {
+        fieldView.confirmParticleLogs(true);
+        shouldAddFieldView = true;
+    }
+    else
+    {
+        std::cout << "Warning: Particles were'nt logged in this file" << std::endl;
+    }
+    if(diagram.connectToUnlogger<messages::VisionField>(fieldView.observationsIn,
+                                                        "observations"))
+    {
+        fieldView.confirmObsvLogs(true);
+        shouldAddFieldView = true;
+    }
+    else
+    {
+        std::cout << "Warning: Observations were'nt logged in this file" << std::endl;
+    }
+    if(shouldAddFieldView)
+        diagram.addModule(fieldView);
+
+
 }
 
 // Keyboard control

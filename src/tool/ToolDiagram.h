@@ -30,7 +30,7 @@ class ToolDiagram : public QObject
 public:
     ToolDiagram(QWidget *parent = 0);
 
-    void addModule(portals::Module& mod) { diagram.addModule(mod); }
+    void addModule(portals::Module& mod) { diagram->addModule(mod); }
     bool unlogFrom(std::string path);
 
     template<class T>
@@ -60,6 +60,7 @@ public:
 
 signals:
     void signalNewDisplayWidget(QWidget*, std::string);
+    void signalDeleteDisplayWidgets();
     void signalUnloggersReady();
 
 public slots:
@@ -68,7 +69,7 @@ public slots:
     void addUnloggers(std::vector<std::string> paths);
 
 protected:
-    portals::RoboGram diagram;
+    portals::RoboGram* diagram;
     std::vector<unlog::UnlogBase*> unloggers;
     std::vector<portals::Module*> displays;
 
