@@ -8,7 +8,6 @@
 
 #include "BehaviorsModule.h"
 #include "PyObjects.h"
-#include "PyGoalie.h"
 
 using namespace boost::python;
 

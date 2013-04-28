@@ -1,9 +1,5 @@
 /**
  * @class ColorTableCreator
- *
- * Tool to define/calibrate a color table
- *
- * @author EJ Googins
  */
 
 #include "ColorTableCreator.h"
@@ -28,6 +24,9 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     topImage(base())
 {
     // BACKEND
+    // We need converter modules to threshold both the top and bottom images,
+    // and ImageDisplayModule for each image, and a ThresholdedDisplayModule
+    // for whichever image is currently being workied on
     subdiagram.addModule(topConverter);
     subdiagram.addModule(bottomConverter);
     subdiagram.addModule(topDisplay);
@@ -139,6 +138,8 @@ void ColorTableCreator::serializeTableName(QString latestTableName)
     }
 }
 
+// This gets called every time the logs are advanced, ie every time the
+// "forward" button is pressed in the main tool
 void ColorTableCreator::run_()
 {
     bottomImageIn.latch();
@@ -179,10 +180,13 @@ void ColorTableCreator::saveColorTable()
     serializeTableName(filename);
 }
 
+// Updates the color tables for both image converters and runs all of the
+// submodules, creating an updated thresholded image
 void ColorTableCreator::updateThresholdedImage()
 {
     topConverter.initTable(colorTable.getTable());
     bottomConverter.initTable(colorTable.getTable());
+    // Run all of the modules that are kept in our subdiagram
     subdiagram.run();
     updateColorStats();
 }
@@ -200,7 +204,7 @@ void ColorTableCreator::canvasClicked(int x, int y, int brushSize, bool leftClic
     paintStroke(brushStroke);
 }
 
-void ColorTableCreator::undo() 
+void ColorTableCreator::undo()
 {
     if (brushStrokes.empty())
         return;
@@ -260,6 +264,7 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
 
 void ColorTableCreator::imageTabSwitched(int)
 {
+    // Rewire the thresholded display's inPortal to get the right thing
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;
         thrDisplay.imageIn.wireTo(&topConverter.thrImage);
