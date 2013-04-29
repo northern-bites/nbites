@@ -43,6 +43,7 @@ namespace man
         void setUpdated(bool val);
         float getLowestError(){return currentLowestError;};
         float getAvgError(){return avgError;};
+        float getWeightedAvgError(){return weightedAvgError;};
 
         std::list<ReconstructedLocation> getReconstructedLocations(){return reconstructedLocations;};
 
@@ -56,6 +57,7 @@ namespace man
 
         std::list<ReconstructedLocation> reconstructedLocations;
         float avgError;
+        float weightedAvgError;
         float currentLowestError;
      };
     } // namespace localization

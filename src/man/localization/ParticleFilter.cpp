@@ -67,65 +67,23 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         updatedVision = false;
 
         //If shitty swarm according to vision, expand search
-        lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
+        lost = (visionSystem->getWeightedAvgError() > LOST_THRESHOLD);
+        // std::cout << "Not weighted avg error:\t" << visionSystem->getAvgError() << std::endl;
+        // std::cout << "weighted avg error:\t" << visionSystem->getWeightedAvgError() << std::endl;
+        // std::cout << "Best Particle error:\t" << visionSystem->getLowestError() << std::endl << std::endl;
 
     }
 
-    if (lost)
-        motionSystem->resetNoise(4.f, .2f);
-    else {
-        motionSystem->resetNoise(parameters.odometryXYNoise,
-                                 parameters.odometryHNoise);
-    }
+    // Perhaps unnecessary with corner reconstruction injection?
+    // if (lost)
+    //     motionSystem->resetNoise(4.f, .2f);
+    // else {
+    //     motionSystem->resetNoise(parameters.odometryXYNoise,
+    //                              parameters.odometryHNoise);
+    //}
 
     // Update filters estimate
     updateEstimate();
-
-    /**
-     * The following is to stop particles going off field
-     * Commented out until known if necessary (K.I.S.S.)
-     */
-    // // Check if the mean has gone out of bounds. If so,
-    // // reset to the cloesst point in bounds with appropriate
-    // // uncertainty.
-    // bool resetInBounds = false;
-
-    // if(poseEstimate.x() < 0)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_x(0);
-    // }
-
-    // else if(poseEstimate.x() > parameters.fieldWidth)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_x(parameters.fieldWidth);
-    // }
-
-    // if(poseEstimate.y() < 0)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_y(0);
-    // }
-    // else if(poseEstimate.y() > parameters.fieldHeight)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_y(parameters.fieldHeight);
-    // }
-
-    // // Only reset if one of the location coordinates is
-    // // out of bounds; avoids unnecessary resets.
-    // if(resetInBounds)
-    // {
-    //     /*
-    //      * @TODO Actually reset to a location here
-    //      */
-
-    //     std::cout << "Resetting to (" << poseEstimate.x()
-    //               << ", " << poseEstimate.y() << ", "
-    //               << poseEstimate.h() << ")." << std::endl;
-    // }
-
 }
 
 /**
@@ -391,6 +349,7 @@ void ParticleFilter::resetLocToSide(bool blueSide)
  */
 void ParticleFilter::resample()
 {
+    //std::cout << "In resample" << std::endl;
     // Map each normalized weight to the corresponding particle.
     std::map<float, Particle> cdf;
 
@@ -411,23 +370,24 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
-    std::list<ReconstructedLocation>::const_iterator recLocIt;
-    for (recLocIt = reconLocs.begin();
-         recLocIt != reconLocs.end();
-         recLocIt ++)
-    {
-        if ((*recLocIt).defSide == onDefendingSide())
+    if (lost) { // may also want to check if you're near midfield so we dont inject to other side
+        std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
+        std::list<ReconstructedLocation>::const_iterator recLocIt;
+        for (recLocIt = reconLocs.begin();
+             recLocIt != reconLocs.end();
+             recLocIt ++)
         {
-            Particle reconstructedParticle((*recLocIt).x,
-                                          (*recLocIt).y,
-                                          (*recLocIt).h,
-                                          1.f/250.f);
+            if ((*recLocIt).defSide == onDefendingSide())
+            {
+                Particle reconstructedParticle((*recLocIt).x,
+                                               (*recLocIt).y,
+                                               (*recLocIt).h,
+                                               1.f/250.f);
 
-            newParticles.push_back(reconstructedParticle);
-            //std::cout << "Inject Corner " << numReconParticlesAdded << std::endl;
+                newParticles.push_back(reconstructedParticle);
+            }
+            numReconParticlesAdded++;
         }
-        numReconParticlesAdded++;
     }
 
     // Sample numParticles particles with replacement according to the

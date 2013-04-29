@@ -41,13 +41,15 @@ namespace man
 
         const messages::RobotLocation& getLocation() const { return location; }
         void setLocation(messages::RobotLocation& location_) { location = location_; }
+        void setX(float x) { location.set_x(x); }
+        void setY(float y) { location.set_y(y); }
+        void setH(float h) { location.set_h(h); }
 
         float getWeight() const { return weight; }
         void setWeight(float weight_) { weight = weight_; }
 
-        void setX(float x) { location.set_x(x); }
-        void setY(float y) { location.set_y(y); }
-        void setH(float h) { location.set_h(h); }
+        float getError() const { return avgError; }
+        void setError(float err){ avgError = err; }
 
         void shift(messages::RobotLocation& shiftAmount)
         {
@@ -94,7 +96,7 @@ namespace man
     private:
         float weight;                           //! The particle weight.
         messages::RobotLocation location;  //! The particle location (x, y, heading).
-
+        float avgError;
     };
 
     /*
