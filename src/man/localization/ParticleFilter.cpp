@@ -81,10 +81,6 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // Update filters estimate
     updateEstimate();
 
-    // std::cout<<"Time:\t" << motionInput.timestamp() <<"\n";
-    // std::cout<<"(x,y,h)\t("<< getXEst() << " , " << getYEst()
-    //          <<" , " <<getHEst()<< " )\n\n";
-
     /**
      * The following is to stop particles going off field
      * Commented out until known if necessary (K.I.S.S.)
@@ -415,13 +411,12 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    std::list<ReconstructedLocation> reconLocs= visionSystem->getReconstructedLocations();
+    std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
     std::list<ReconstructedLocation>::const_iterator recLocIt;
     for (recLocIt = reconLocs.begin();
          recLocIt != reconLocs.end();
          recLocIt ++)
     {
-        std::cout << "Should I process corner " << numReconParticlesAdded << std::endl;
         if ((*recLocIt).defSide == onDefendingSide())
         {
             Particle reconstructedParticle((*recLocIt).x,
@@ -430,15 +425,14 @@ void ParticleFilter::resample()
                                           1.f/250.f);
 
             newParticles.push_back(reconstructedParticle);
-
-            numReconParticlesAdded++;
+            //std::cout << "Inject Corner " << numReconParticlesAdded << std::endl;
         }
         numReconParticlesAdded++;
     }
 
     // Sample numParticles particles with replacement according to the
     // normalized weights, and place them in a new particle set.
-    for(int i = 0; i < (parameters.numParticles - numReconParticlesAdded); ++i)
+    for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
     {
         rand = (float)gen();
         newParticles.push_back(cdf.upper_bound(rand)->second);

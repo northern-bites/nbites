@@ -42,6 +42,7 @@ namespace man
                                  const messages::VisualDetection& obsv);
         void setUpdated(bool val);
         float getLowestError(){return currentLowestError;};
+        float getAvgError(){return avgError;};
 
         std::list<ReconstructedLocation> getReconstructedLocations(){return reconstructedLocations;};
 
@@ -54,6 +55,7 @@ namespace man
                                               messages::VisualGoalPost rightPost);
 
         std::list<ReconstructedLocation> reconstructedLocations;
+        float avgError;
         float currentLowestError;
      };
     } // namespace localization

@@ -28,9 +28,9 @@ namespace man
 
             float times = 0;
             float lowestParticleError = 10000000.f;
+            float sumParticleError = 0.f;
 
-            // Clear out the reconstructed observation list
-            reconstructedLocations.clear();
+
 
             for(iter = particles.begin(); iter != particles.end(); iter++)
             {
@@ -48,7 +48,7 @@ namespace man
                         curParticleError+= newError;
                         numObsv++;
 
-                        addCornerReconstructionsToList(obsv.visual_corner(i));
+
                     }
                 }
 
@@ -90,6 +90,7 @@ namespace man
                     particle->setWeight(1/curParticleError);
                     totalWeight += particle->getWeight();
                     // Update the total swarm error
+                    sumParticleError +=curParticleError/(float)numObsv;
                     if ((curParticleError/(float)numObsv) < lowestParticleError)
                         lowestParticleError = curParticleError/(float)numObsv;
                 }
@@ -103,14 +104,24 @@ namespace man
                 // std::cout << "\t" << particle->getWeight();
             }
 
+            // Calc avgError by dividing the total by the num particles
+            avgError = sumParticleError / (float)particles.size();
+
             if (madeObsv)
                 currentLowestError = lowestParticleError;
 
             // Generate a list of all possible calculated poses
             // If we have two goal posts then call addGoalPostReconstructionsToList
 
-            // for each corner add the reconstructions
+            // Clear out the reconstructed observation list
+            reconstructedLocations.clear();
 
+            // for each corner add the reconstructions
+            for (int i=0; i<obsv.visual_corner_size(); i++)
+            {
+                if(obsv.visual_corner(i).visual_detection().distance() > 0.f)
+                    addCornerReconstructionsToList(obsv.visual_corner(i));
+            }
 
 
 
@@ -213,9 +224,12 @@ namespace man
 
 void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
 {
+    int concreteNum = 0;
     // Loop through all concrete coords of the corner
     for (int i=0; i< corner.visual_detection().concrete_coords_size(); i++)
     {
+        concreteNum++;
+//        std::cout << "This is the " << concreteNum << " processed concrete corner" << std::endl;
         //angle between the robot's visual heading line (or bearing to corner line)
         //and the line parallel to the x axis oriented towards the corner
         //(so x axis flipped)
@@ -237,6 +251,7 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
 
         reconstructedLocations.push_back(newLoc);
     }
+    std::cout << concreteNum << " particles should be injected" << std::endl;
 }
 
 
