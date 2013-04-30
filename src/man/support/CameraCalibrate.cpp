@@ -32,7 +32,8 @@ void CameraCalibrate::init() {
     std::cout << "Setting CameraCalibrate for " << name << std::endl;
 
     if (name == "river") {
-        paramsTop[PITCH] = -.042f;
+        paramsTop[PITCH] = -0.06f;
+        paramsBottom[ROLL] = -0.02f;
     } else if (name == "mal") {
         paramsTop[PITCH] = -.04f;
         paramsBottom[PITCH] = -.12f;
@@ -41,8 +42,9 @@ void CameraCalibrate::init() {
         paramsTop[PITCH] = -0.01f;
         paramsBottom[ROLL] = -0.02f;
     } else if (name == "jayne") {
-        paramsTop[PITCH] = 0.025f;
-        paramsBottom[PITCH] = 0.005f;
+        paramsTop[PITCH] = 0.01f;
+        paramsTop[ROLL] = 0.01f;
+        paramsBottom[ROLL] = 0.02f;
     } else if (name == "wash") {
         paramsTop[ROLL] = -0.01f;
     } else if (name == "kaylee") {

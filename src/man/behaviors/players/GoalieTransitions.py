@@ -131,10 +131,6 @@ def unsure(player):
     return (not onThisSideline(player) and
             player.counter > 60)
 
-def shouldGetReadyToSave(player):
-    return (player.brain.ball.vis.heat > 10.0 and
-            not shouldClearBall(player))
-
 def noSave(player):
    return player.counter > 60
 
@@ -148,6 +144,28 @@ def shouldPerformSave(player):
             abs(player.brain.ball.rel_y_intersect_dest) < 80.0 and
             player.brain.ball.distance < 230.0 and
             player.brain.ball.vis.on)
+
+## These three are penalty kick transitions. They need to be tuned.
+def shouldDiveRight(player):
+    """
+    Checks that the ball is moving toward it and close enough to save.
+    """
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_y_intersect_dest < -5.0)
+
+def shouldDiveLeft(player):
+    """
+    Checks that the ball is moving toward it and close enough to save.
+    """
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_y_intersect_dest > 5.0)
+
+def shouldSquat(player):
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            abs(player.brain.ball.rel_y_intersect_dest) < 10.0)
 
 def facingSideways(player):
     """
