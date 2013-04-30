@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include "Common.h"
-#include "DebugConfig.h"
+#include "RobotConfig.h"
 
 // Nao field constants
 

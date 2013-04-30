@@ -9,7 +9,7 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
       estimateUncertainty(3, 0.0f)
 {
     motionSystem = new MotionSystem(params.odometryXYNoise,
-                                        params.odometryHNoise);
+                                    params.odometryHNoise);
     visionSystem = new VisionSystem;
 
     boost::mt19937 rng;
@@ -67,69 +67,23 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         updatedVision = false;
 
         //If shitty swarm according to vision, expand search
-        lost = (visionSystem->getLowestError() > 40);
+        lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
+        // std::cout << "Not weighted avg error:\t" << visionSystem->getAvgError() << std::endl;
+        // std::cout << "weighted avg error:\t" << visionSystem->getWeightedAvgError() << std::endl;
+        // std::cout << "Best Particle error:\t" << visionSystem->getLowestError() << std::endl << std::endl;
 
     }
 
-    if (lost)
-        motionSystem->resetNoise(4.f, .2f);
-    else {
-        motionSystem->resetNoise(parameters.odometryXYNoise,
-                                 parameters.odometryHNoise);
-    }
+    // Perhaps unnecessary with corner reconstruction injection?
+    // if (lost)
+    //     motionSystem->resetNoise(4.f, .2f);
+    // else {
+    //     motionSystem->resetNoise(parameters.odometryXYNoise,
+    //                              parameters.odometryHNoise);
+    //}
 
     // Update filters estimate
     updateEstimate();
-
-    // std::cout<<"Time:\t" << motionInput.timestamp() <<"\n";
-    // std::cout<<"(x,y,h)\t("<< getXEst() << " , " << getYEst()
-    //          <<" , " <<getHEst()<< " )\n\n";
-
-    /**
-     * The following is to stop particles going off field
-     * Commented out until known if necessary (K.I.S.S.)
-     */
-    // // Check if the mean has gone out of bounds. If so,
-    // // reset to the cloesst point in bounds with appropriate
-    // // uncertainty.
-    // bool resetInBounds = false;
-
-    // if(poseEstimate.x() < 0)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_x(0);
-    // }
-
-    // else if(poseEstimate.x() > parameters.fieldWidth)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_x(parameters.fieldWidth);
-    // }
-
-    // if(poseEstimate.y() < 0)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_y(0);
-    // }
-    // else if(poseEstimate.y() > parameters.fieldHeight)
-    // {
-    //     resetInBounds = true;
-    //     poseEstimate.set_y(parameters.fieldHeight);
-    // }
-
-    // // Only reset if one of the location coordinates is
-    // // out of bounds; avoids unnecessary resets.
-    // if(resetInBounds)
-    // {
-    //     /*
-    //      * @TODO Actually reset to a location here
-    //      */
-
-    //     std::cout << "Resetting to (" << poseEstimate.x()
-    //               << ", " << poseEstimate.y() << ", "
-    //               << poseEstimate.h() << ")." << std::endl;
-    // }
-
 }
 
 /**
@@ -395,6 +349,7 @@ void ParticleFilter::resetLocToSide(bool blueSide)
  */
 void ParticleFilter::resample()
 {
+    //std::cout << "In resample" << std::endl;
     // Map each normalized weight to the corresponding particle.
     std::map<float, Particle> cdf;
 
@@ -412,33 +367,38 @@ void ParticleFilter::resample()
 
     float rand;
     ParticleSet newParticles;
+
+    // First add reconstructed particles from corner observations
+    int numReconParticlesAdded = 0;
+    if (lost && visionSystem->getLastNumObsv() > 1 && !nearMidField())
+    {
+        std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
+        std::list<ReconstructedLocation>::const_iterator recLocIt;
+        for (recLocIt = reconLocs.begin();
+             recLocIt != reconLocs.end();
+             recLocIt ++)
+        {
+            if ((*recLocIt).defSide == onDefendingSide())
+            {
+                Particle reconstructedParticle((*recLocIt).x,
+                                               (*recLocIt).y,
+                                               (*recLocIt).h,
+                                               1.f/250.f);
+
+                newParticles.push_back(reconstructedParticle);
+                std::cout << "Inject Corner Reconstruction" << std::endl;
+            }
+            numReconParticlesAdded++;
+        }
+    }
+
     // Sample numParticles particles with replacement according to the
     // normalized weights, and place them in a new particle set.
-    for(int i = 0; i < parameters.numParticles; ++i)
+    for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
     {
         rand = (float)gen();
         newParticles.push_back(cdf.upper_bound(rand)->second);
     }
-
-    // FUN IDEA: Create a particle that equals the belief
-
-    // ***TEMP*** This is used for testing, to only select the BEST particle
-    // newParticles.clear();
-    // Particle best;
-    // float bestWeight =0.f;
-    // for(iter = particles.begin(); iter != particles.end(); ++iter)
-    // {
-    //     Particle particle = (*iter);
-
-    //     if(particle.getWeight() > bestWeight)
-    //     {
-    //         best = particle;
-    //         bestWeight = particle.getWeight();
-    //     }
-    // }
-    // for (int i=0; i<parameters.numParticles; i++)
-    //     newParticles.push_back(best);
-    // ***TEMP*** always choose best particle
 
     particles = newParticles;
 }
@@ -458,6 +418,20 @@ const messages::ParticleSwarm& ParticleFilter::getCurrentSwarm()
     }
 
     return swarm;
+}
+
+messages::RobotLocation ParticleFilter::getMirrorLocation(messages::RobotLocation loc)
+{
+    float newX = FIELD_GREEN_WIDTH - loc.x();  // Calc new X
+    float newY = FIELD_GREEN_HEIGHT - loc.y(); // Calc new Y
+    float newH = NBMath::subPIAngle(loc.h() + M_PI_FLOAT); //Flip the heading
+
+    messages::RobotLocation mirroredLocation;
+    mirroredLocation.set_x(newX);
+    mirroredLocation.set_y(newY);
+    mirroredLocation.set_h(newH);
+
+    return mirroredLocation;
 }
 
 } // namespace localization
