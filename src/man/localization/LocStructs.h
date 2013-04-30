@@ -88,7 +88,24 @@ namespace man
         float h; // Robot Pose
 
         bool defSide;
+
+        friend bool operator ==(const ReconstructedLocation& first,
+                         const ReconstructedLocation& second)
+        {
+            if(fabs(first.x - second.x) > 15.f)
+                return false;
+            if(fabs(first.y - second.y) > 15.f)
+                return false;
+            if(fabs(first.h - second.h) > TO_RAD*20.f)
+                return false;
+
+            // Made it through, so close enough
+            return true;
+        }
+
     };
+
+
 
     } // namespace localization
 } // namespace man

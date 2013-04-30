@@ -67,7 +67,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         updatedVision = false;
 
         //If shitty swarm according to vision, expand search
-        lost = (visionSystem->getWeightedAvgError() > LOST_THRESHOLD);
+        lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
         // std::cout << "Not weighted avg error:\t" << visionSystem->getAvgError() << std::endl;
         // std::cout << "weighted avg error:\t" << visionSystem->getWeightedAvgError() << std::endl;
         // std::cout << "Best Particle error:\t" << visionSystem->getLowestError() << std::endl << std::endl;
@@ -370,7 +370,8 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    if (lost) { // may also want to check if you're near midfield so we dont inject to other side
+    if (lost && visionSystem->getLastNumObsv() > 1 && !nearMidField())
+    {
         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
         std::list<ReconstructedLocation>::const_iterator recLocIt;
         for (recLocIt = reconLocs.begin();
@@ -385,6 +386,7 @@ void ParticleFilter::resample()
                                                1.f/250.f);
 
                 newParticles.push_back(reconstructedParticle);
+                std::cout << "Inject Corner Reconstruction" << std::endl;
             }
             numReconParticlesAdded++;
         }

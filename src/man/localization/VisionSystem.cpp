@@ -91,6 +91,8 @@ bool VisionSystem::update(ParticleSet& particles,
             particle->setError(avgErr);
             if (avgErr < lowestParticleError)
                 lowestParticleError = avgErr;
+
+            lastNumObsv = numObsv;
         }
     }
 
@@ -193,6 +195,41 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
         reconstructedLocations.push_back(newLoc);
     }
     //std::cout << concreteNum << " particles should be injected" << std::endl;
+}
+
+void VisionSystem::opitmizeReconstructions()
+{
+    // // The idea here is to go through the list and only keep locations
+    // // which are reconstructed more than once.
+
+    std::list<ReconstructedLocation> optimized;
+    // Add all of the corners from the list to the map with key 0
+    std::list<ReconstructedLocation>::const_iterator iter1, iter2;
+    iter1 = reconstructedLocations.begin();
+    for(int i=0; i<(int)reconstructedLocations.size(); i++)
+    {
+        // Compare each particle to all the others
+        int numSimReconstructions = 0;
+        for(int j=0; j<(int)reconstructedLocations.size(); j++)
+        {
+            iter2 = reconstructedLocations.begin();
+            //compare
+            if ( (*iter1) == (*iter2))
+                numSimReconstructions++;
+
+            iter2++;
+        }
+        if (numSimReconstructions > 1) {
+            optimized.push_back((*iter1));
+            std::cout << "Injecting a confident corner reconstruction" << std::endl;
+        }
+        iter1++;
+    }
+
+    reconstructedLocations.clear();
+    std::list<ReconstructedLocation>::const_iterator optIt;
+    for(optIt = optimized.begin(); optIt != optimized.end(); optIt++)
+        reconstructedLocations.push_back((*optIt));
 }
 
 } // namespace localization
