@@ -48,19 +48,25 @@ void ImageConverterModule::run_()
     PackedImage8 tempOutput8(tempBuffer, 320, (3*2 + 1)*240, 320);
 
     if (whichCamera == Camera::TOP)
+    {
         PROF_ENTER(P_TOP_ACQUIRE_IMAGE);
+    }
     else
+    {
         PROF_ENTER(P_BOT_ACQUIRE_IMAGE);
-
+    }
     ImageAcquisition::acquire_image_fast(table,
                                          params,
                                          yuv.pixelAddress(0, 0),
                                          tempOutput16.pixelAddress(0, 0));
-
     if (whichCamera == Camera::TOP)
+    {
         PROF_EXIT(P_TOP_ACQUIRE_IMAGE);
+    }
     else
+    {
         PROF_EXIT(P_BOT_ACQUIRE_IMAGE);
+    }
 
     PackedImage16 image = tempOutput16.window(0, 0, 320, 240);
     yImage.setMessage(Message<PackedImage16>(&image));

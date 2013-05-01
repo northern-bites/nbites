@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
 #include "Common.h"
+#include "DebugConfig.h"
 class Profiler;
 
 #ifdef USE_TIME_PROFILING

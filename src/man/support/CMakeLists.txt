@@ -5,6 +5,7 @@ set( COMMON_SRCS NBMath
   NBMatrixMath
   dsp
   Common
+  Profiler
   CommDef
   RoboCupGameControlData
   CoordFrame3D.cpp
