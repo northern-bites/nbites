@@ -36,6 +36,7 @@ namespace localization
 {
 
 const float LOST_THRESHOLD = 50;
+const float ALPHA = .05; // Impact for ~76 frames
 
 // Define the default parameters for the Particle Filter
 static const ParticleFilterParams DEFAULT_PARAMS =
@@ -130,6 +131,7 @@ private:
     bool updatedVision;
 
     bool lost;
+    float filteredLostValues;
 
     // For use when logging particle swarm
     messages::ParticleSwarm swarm;

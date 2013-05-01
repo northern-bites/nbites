@@ -68,19 +68,19 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
         //If shitty swarm according to vision, expand search
         lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
+        filteredLostValues = visionSystem->getLowestError()*ALPHA
+                             + filteredLostValues*(1-ALPHA);
+        // if (lost)
+        //     std::cout << "LOST! In the moment" << std::endl;
+
+        // if (filteredLostValues > LOST_THRESHOLD)
+        //     std::cout << "LOST FOR A FUCKING WHILLLEEEEE" << std::endl;
+
         // std::cout << "Not weighted avg error:\t" << visionSystem->getAvgError() << std::endl;
         // std::cout << "weighted avg error:\t" << visionSystem->getWeightedAvgError() << std::endl;
         // std::cout << "Best Particle error:\t" << visionSystem->getLowestError() << std::endl << std::endl;
 
     }
-
-    // Perhaps unnecessary with corner reconstruction injection?
-    // if (lost)
-    //     motionSystem->resetNoise(4.f, .2f);
-    // else {
-    //     motionSystem->resetNoise(parameters.odometryXYNoise,
-    //                              parameters.odometryHNoise);
-    //}
 
     // Update filters estimate
     updateEstimate();
@@ -370,7 +370,8 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    if (lost && visionSystem->getLastNumObsv() > 1 && !nearMidField())
+    if (lost && (filteredLostValues > LOST_THRESHOLD)
+        && visionSystem->getLastNumObsv() > 1 && !nearMidField())
     {
         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
         std::list<ReconstructedLocation>::const_iterator recLocIt;
@@ -386,9 +387,9 @@ void ParticleFilter::resample()
                                                1.f/250.f);
 
                 newParticles.push_back(reconstructedParticle);
-                std::cout << "Inject Corner Reconstruction" << std::endl;
             }
             numReconParticlesAdded++;
+            std::cout << "Inject Corner Reconstruction" << std::endl;
         }
     }
 
