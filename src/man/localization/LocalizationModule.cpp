@@ -50,6 +50,14 @@ namespace man
         deltaOdometry.set_y(curOdometry.y() - lastOdometry.y());
         deltaOdometry.set_h(curOdometry.h() - lastOdometry.h());
 
+        if((fabs(deltaOdometry.x()) > 3.f) || (fabs(deltaOdometry.y()) > 3.f))
+        {
+            // Odometry was reset (WTF) so just pretend we didnt move this frame
+            deltaOdometry.set_x(0.f);
+            deltaOdometry.set_y(0.f);
+            deltaOdometry.set_h(0.f);
+        }
+
         // Update the Particle Filter with the new observations/odometry
         particleFilter->update(deltaOdometry, visionInput.message());
 
