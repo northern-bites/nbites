@@ -5,8 +5,7 @@ namespace man
 namespace localization
 {
 ParticleFilter::ParticleFilter(ParticleFilterParams params)
-    : parameters(params),
-      estimateUncertainty(3, 0.0f)
+    : parameters(params)
 {
     motionSystem = new MotionSystem(params.odometryXYNoise,
                                     params.odometryHNoise);
@@ -68,12 +67,12 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
         //If shitty swarm according to vision, expand search
         lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
-        filteredLostValues = visionSystem->getLowestError()*ALPHA
-                             + filteredLostValues*(1-ALPHA);
+        errorMagnitude = visionSystem->getLowestError()*ALPHA
+                             + errorMagnitude*(1-ALPHA);
         // if (lost)
         //     std::cout << "LOST! In the moment" << std::endl;
 
-        // if (filteredLostValues > LOST_THRESHOLD)
+        // if (errorMagnitude > LOST_THRESHOLD)
         //     std::cout << "LOST FOR A FUCKING WHILLLEEEEE" << std::endl;
 
         // std::cout << "Not weighted avg error:\t" << visionSystem->getAvgError() << std::endl;
@@ -88,6 +87,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
 /**
  *@brief  Updates the filters estimate of the robots position
+ *        by averaging all particles
  */
 void ParticleFilter::updateEstimate()
 {
@@ -111,7 +111,7 @@ void ParticleFilter::updateEstimate()
     poseEstimate.set_y(sumY/parameters.numParticles);
     poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
 
-    estimateUncertainty = findParticleSD();
+    poseEstimate.set_uncert(errorMagnitude);
 }
 
 /**
@@ -127,56 +127,67 @@ Particle ParticleFilter::getBestParticle()
     return particles[particles.size()-1];
 }
 
-/**
- * @brief  Calculate the standard deviation of the particle swarm
- *         NOTE: Best measure of a particle filters uncertainty
- */
- std::vector<float> ParticleFilter::findParticleSD()
- {
-     man::localization::ParticleSet particles = this->getParticles();
+float ParticleFilter::getMagnitudeError()
+{
+    // Idea: no need to think about different SD's for x, y, h since
+    //       that's not how we evaluate particles
+    //       Instead return the filtered value of avg error per obsv
 
-     std::vector<float> sd(3, 0.0f);
-     float mean_x = 0.0f, mean_y = 0.0f, mean_h = 0.0f;
-     man::localization::ParticleIt iter;
-     for(iter = particles.begin(); iter != particles.end(); ++iter)
-     {
-         mean_x += (*iter).getLocation().x();
-         mean_y += (*iter).getLocation().y();
-         mean_h += (*iter).getLocation().h();
-     }
+    // Think of as a circle with radius errorMagnitude that grows and
+    // shrinks as the filter gets better and worse observations
+    return errorMagnitude;
+}
 
-     if(parameters.numParticles == 0)
-     {
-         std::cout << "Invalid number of particles!" << std::endl;
-         return sd;
-     }
+// /**
+//  * @brief  Calculate the standard deviation of the particle swarm
+//  *         NOTE: Best measure of a particle filters uncertainty
+//  */
+//  std::vector<float> ParticleFilter::findParticleSD()
+//  {
+//      man::localization::ParticleSet particles = this->getParticles();
 
-     mean_x /= parameters.numParticles;
-     mean_y /= parameters.numParticles;
-     mean_h /= parameters.numParticles;
+//      std::vector<float> sd(3, 0.0f);
+//      float mean_x = 0.0f, mean_y = 0.0f, mean_h = 0.0f;
+//      man::localization::ParticleIt iter;
+//      for(iter = particles.begin(); iter != particles.end(); ++iter)
+//      {
+//          mean_x += (*iter).getLocation().x();
+//          mean_y += (*iter).getLocation().y();
+//          mean_h += (*iter).getLocation().h();
+//      }
 
-     // Calculate the standard deviation:
-     // \sigma_x = \sqrt{\frac{1}{N}\sum_{i=0}^{N-1}(x_i - \bar{x})^2}
-     // where x_i stands for either the x, y, or heading of
-     // the ith particle.
-     for(iter = particles.begin(); iter != particles.end(); ++iter)
-     {
-         sd[0] += NBMath::square((*iter).getLocation().x() - mean_x);
-         sd[1] += NBMath::square((*iter).getLocation().y() - mean_y);
-         sd[2] += NBMath::square((*iter).getLocation().h() - mean_h);
-     }
+//      if(parameters.numParticles == 0)
+//      {
+//          std::cout << "Invalid number of particles!" << std::endl;
+//          return sd;
+//      }
 
-     sd[0] /= parameters.numParticles;
-     sd[1] /= parameters.numParticles;
-     sd[2] /= parameters.numParticles;
+//      mean_x /= parameters.numParticles;
+//      mean_y /= parameters.numParticles;
+//      mean_h /= parameters.numParticles;
 
-     // Convert variances into standard deviations.
-     sd[0] = std::sqrt(sd[0]);
-     sd[1] = std::sqrt(sd[1]);
-     sd[2] = std::sqrt(sd[2]);
+//      // Calculate the standard deviation:
+//      // \sigma_x = \sqrt{\frac{1}{N}\sum_{i=0}^{N-1}(x_i - \bar{x})^2}
+//      // where x_i stands for either the x, y, or heading of
+//      // the ith particle.
+//      for(iter = particles.begin(); iter != particles.end(); ++iter)
+//      {
+//          sd[0] += NBMath::square((*iter).getLocation().x() - mean_x);
+//          sd[1] += NBMath::square((*iter).getLocation().y() - mean_y);
+//          sd[2] += NBMath::square((*iter).getLocation().h() - mean_h);
+//      }
 
-     return sd;
- }
+//      sd[0] /= parameters.numParticles;
+//      sd[1] /= parameters.numParticles;
+//      sd[2] /= parameters.numParticles;
+
+//      // Convert variances into standard deviations.
+//      sd[0] = std::sqrt(sd[0]);
+//      sd[1] = std::sqrt(sd[1]);
+//      sd[2] = std::sqrt(sd[2]);
+
+//      return sd;
+//  }
 
 /*
  * @brief The following are all of the resetLoc functions
@@ -378,7 +389,7 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    if (lost && (filteredLostValues > LOST_THRESHOLD)
+    if (lost && (errorMagnitude > LOST_THRESHOLD)
         && visionSystem->getLastNumObsv() > 1 && !nearMidField())
     {
         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();

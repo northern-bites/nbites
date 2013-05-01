@@ -64,8 +64,33 @@ public:
     ParticleFilter(ParticleFilterParams parameters = DEFAULT_PARAMS);
     ~ParticleFilter();
 
+    /**
+     *  @brief Given a new motion and vision input, update the filter
+     */
     void update(const messages::RobotLocation& motionInput,
                 const messages::VisionField& visionInput);
+
+    // /**
+    //  * @brief Find the standard deviation of the particle set. This is
+    //  *        a useful metric for determining the error in the current
+    //  *        estimate, or the rate of change of error over time.
+    //  */
+    // std::vector<float> findParticleSD();
+
+    float getMagnitudeError();
+
+    void resetLocalization();
+
+    void updateMotionModel();
+
+    /** Accessors **/
+    const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
+    const messages::ParticleSwarm& getCurrentSwarm();
+
+    float getXEst() const {return poseEstimate.x();}
+    float getYEst() const {return poseEstimate.y();}
+    float getHEst() const {return poseEstimate.h();}
+    float getHEstDeg() const {return poseEstimate.h()*TO_DEG;}
 
     ParticleSet getParticles() { return particles; }
 
@@ -75,39 +100,38 @@ public:
      */
     Particle getBestParticle();
 
-    /**
-     * @brief Find the standard deviation of the particle set. This is
-     *        a useful metric for determining the error in the current
-     *        estimate, or the rate of change of error over time.
-     */
-    std::vector<float> findParticleSD();
-
-    void resetLocalization();
-
-    void updateMotionModel();
-
-    // Getters
-    const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
-    const messages::ParticleSwarm& getCurrentSwarm();
-
-    float getXEst() const {return poseEstimate.x();}
-    float getYEst() const {return poseEstimate.y();}
-    float getHEst() const {return poseEstimate.h();}
-    float getHEstDeg() const {return poseEstimate.h()*TO_DEG;}
-
     bool onDefendingSide() {return (poseEstimate.x() < CENTER_FIELD_X);};
     bool nearMidField() {return (fabs(poseEstimate.x() - CENTER_FIELD_X) < 20);};
 
+    /** Reset Functions **/
+
+    /*
+     * @Brief - Reset the system by spreading through environment
+     */
     void resetLoc();
+
+    /*
+     * @Brief - Reset the system by injecting particles around given pose
+     */
     void resetLocTo(float x, float y, float h,
                     LocNormalParams params = LocNormalParams());
+
+    /*
+     * @Brief - Reset the system by injecting particles around two given pose
+     */
     void resetLocTo(float x, float y, float h,
                     float x_, float y_, float h_,
                     LocNormalParams params1 = LocNormalParams(),
                     LocNormalParams params2 = LocNormalParams());
+
+    /*
+     * @Brief - Reset the system by injecting particles throughout one side
+     */
     void resetLocToSide(bool blueSide);
 
-    // Flip the localization system to the other side of the field
+    /*
+     * @Brief - Flip all particles to the other side symmetric location
+     */
     void flipLoc();
 
 private:
@@ -116,13 +140,21 @@ private:
      *        to the normalized weights of the particles.
      */
     void resample();
+
+    /**
+     * @brief - Update the poseEstimate by avging all particles
+     */
     void updateEstimate();
 
+    /**
+     * @brief - Return symmetric location from given one
+     */
     messages::RobotLocation getMirrorLocation(messages::RobotLocation loc);
+
 
     ParticleFilterParams parameters;
     messages::RobotLocation poseEstimate;
-    std::vector<float> estimateUncertainty;
+
     ParticleSet particles;
 
     MotionSystem * motionSystem;
@@ -134,7 +166,7 @@ private:
     bool updatedVision;
 
     bool lost;
-    float filteredLostValues;
+    float errorMagnitude;
 
     // For use when logging particle swarm
     messages::ParticleSwarm swarm;

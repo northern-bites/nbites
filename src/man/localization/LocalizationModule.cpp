@@ -10,6 +10,7 @@ namespace man
           particleOutput(base())
     {
         particleFilter = new ParticleFilter();
+        // Chooose on the field looking up as a random initial
         particleFilter->resetLocTo(100,100,0);
 
         std::cout << "Logging localization? ";
@@ -18,8 +19,6 @@ namespace man
 #else
         std::cout << "No." << std::endl;
 #endif
-
-        //Note: All the RobotLocation messages default to zero values to start (yay!)
     }
 
     LocalizationModule::~LocalizationModule()
@@ -29,10 +28,7 @@ namespace man
 
     void LocalizationModule::update()
     {
-        motionInput.latch();
-        visionInput.latch();
-        resetInput.latch();
-
+        // Modify based on control portal
         if (lastReset != resetInput.message().timestamp())
         {
             lastReset = resetInput.message().timestamp();
@@ -41,7 +37,7 @@ namespace man
                                        resetInput.message().h());
         }
 
-        // NOTE: Particle Filter wants to get deltaX, deltaY, etc...
+        // Calculate the deltaX,Y,H (PF takes increments from robot frame)
         lastOdometry.set_x(curOdometry.x());
         lastOdometry.set_y(curOdometry.y());
         lastOdometry.set_h(curOdometry.h());
@@ -54,15 +50,12 @@ namespace man
         deltaOdometry.set_y(curOdometry.y() - lastOdometry.y());
         deltaOdometry.set_h(curOdometry.h() - lastOdometry.h());
 
+        // Update the Particle Filter with the new observations/odometry
         particleFilter->update(deltaOdometry, visionInput.message());
 
+        // Update the locMessage and the swarm (if logging)
         portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                              getCurrentEstimate());
-
-        // Alternative-use best particle
-        // portals::Message<messages::RobotLocation> locMessage(&particleFilter->
-        //                                                      getBestParticle().getLocation());
-
 #ifdef LOG_LOCALIZATION
         portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                                getCurrentSwarm());
@@ -74,6 +67,12 @@ namespace man
 
     void LocalizationModule::run_()
     {
+        // Get new information
+        motionInput.latch();
+        visionInput.latch();
+        resetInput.latch();
+
+        // Update the filter
         update();
     }
 

@@ -1,5 +1,7 @@
 /*
- * @brief  The abstract localization module base class.
+ * @brief  The localization module class. Takes input from motion and vision for
+ *             calculations, also an inPortal for resetting
+ *
  * @author EJ Googins <egoogins@bowdoin.edu>
  * @date   February 2013
  */
@@ -7,11 +9,13 @@
 
 #include "DebugConfig.h"
 
+/** Messages **/
 #include "RoboGrams.h"
 #include "VisionField.pb.h"
 #include "RobotLocation.pb.h"
 #include "ParticleSwarm.pb.h"
 
+/** Filter Headers **/
 #include "SensorModel.h"
 #include "MotionModel.h"
 #include "ParticleFilter.h"
@@ -33,12 +37,13 @@ namespace man
         LocalizationModule();
         ~LocalizationModule();
 
+        /** In Portals **/
         portals::InPortal<messages::RobotLocation> motionInput;
         portals::InPortal<messages::VisionField> visionInput;
         portals::InPortal<messages::RobotLocation> resetInput;
 
+        /** Out Portals **/
         portals::OutPortal<messages::RobotLocation> output;
-
         portals::OutPortal<messages::ParticleSwarm> particleOutput;
 
         float lastMotionTimestamp;
@@ -46,7 +51,7 @@ namespace man
 
     protected:
         /**
-         * @brief Calls Update
+         * @brief Update inputs, calculate new state of the filter
          */
         void run_();
 
@@ -60,6 +65,7 @@ namespace man
         ParticleFilter * particleFilter;
         long long lastReset;
 
+        // Previous information
         messages::RobotLocation lastOdometry;
         messages::RobotLocation curOdometry;
         messages::RobotLocation deltaOdometry;
