@@ -221,6 +221,14 @@ void ParticleFilter::resetLoc()
 void ParticleFilter::resetLocTo(float x, float y, float h,
                                 LocNormalParams params)
 {
+    // HACK HACK HACK - If told to reset to negative x,y,h then flip
+    if (x<0 && y<0 && h<0)
+    {
+        flipLoc();
+        return;
+    }
+
+
     // Reset the estimate
     poseEstimate.set_x(x);
     poseEstimate.set_y(y);
@@ -433,6 +441,21 @@ messages::RobotLocation ParticleFilter::getMirrorLocation(messages::RobotLocatio
     mirroredLocation.set_h(newH);
 
     return mirroredLocation;
+}
+
+/*
+ * @brief The following are all of the resetLoc functions
+ */
+void ParticleFilter::flipLoc()
+{
+    // Flip every particle
+    ParticleIt iter;
+    messages::RobotLocation flippedLocation;
+    for(iter = particles.begin(); iter != particles.end(); iter++)
+    {
+        flippedLocation.CopyFrom(getMirrorLocation((*iter).getLocation()));
+        (*iter).setLocation(flippedLocation);
+    }
 }
 
 } // namespace localization
