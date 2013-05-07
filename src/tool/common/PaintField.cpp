@@ -149,6 +149,36 @@ void PaintField::paintEvent(QPaintEvent* event)
     painter.setPen(Qt::yellow);
     painter.drawRect(yellowGoal);
 
+    // // Paintings for figures in THESIS
+    // // Draw 5 locations where ball was shot
+    // painter.setBrush(Qt::red);
+    // painter.setPen(Qt::black);
+    // // SHOT from the FIELD CROSS
+    // QPoint curLoc = QPoint(LANDMARK_BLUE_GOAL_CROSS_X,
+    //                        LANDMARK_BLUE_GOAL_CROSS_Y);
+    // painter.drawEllipse(curLoc,(int)GOAL_POST_RADIUS, (int)GOAL_POST_RADIUS);
+
+    // // Bottom Angle
+    // curLoc = QPoint(LANDMARK_BLUE_GOAL_CROSS_X - 30,
+    //                 LANDMARK_BLUE_GOAL_CROSS_Y - 200);
+    // painter.drawEllipse(curLoc,(int)GOAL_POST_RADIUS, (int)GOAL_POST_RADIUS);
+
+    // // Top Angle
+    // curLoc = QPoint(LANDMARK_BLUE_GOAL_CROSS_X - 30,
+    //                 LANDMARK_BLUE_GOAL_CROSS_Y + 200);
+    // painter.drawEllipse(curLoc,(int)GOAL_POST_RADIUS, (int)GOAL_POST_RADIUS);
+
+    // // Midfield Bottom
+    // curLoc = QPoint(CENTER_FIELD_X - 60,
+    //                 LANDMARK_BLUE_GOAL_CROSS_Y - 100);
+    // painter.drawEllipse(curLoc,(int)GOAL_POST_RADIUS, (int)GOAL_POST_RADIUS);
+
+    // // Midfield Top
+    // curLoc = QPoint(CENTER_FIELD_X - 60,
+    //                 LANDMARK_BLUE_GOAL_CROSS_Y + 100);
+    // painter.drawEllipse(curLoc,(int)GOAL_POST_RADIUS, (int)GOAL_POST_RADIUS);
+
+
 }
 
 } // namespace viewer

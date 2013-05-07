@@ -3,7 +3,7 @@
 #include <cmath>
 #include "Common.h"
 
-#define USING_LAB_FIELD
+//#define USING_LAB_FIELD
 
 // Nao field constants
 
