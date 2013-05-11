@@ -68,7 +68,7 @@ while(True):
                 handle(commit, pull.head)
 
         # Check GitHub once a minute.
-        sleep(60)
+        time.sleep(60)
 
     except GithubException:
         if commit == None:
