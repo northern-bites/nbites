@@ -1,81 +1,87 @@
 #!/usr/bin/env python
 
-import argparse
-import subprocess
-import ast
-import os
+import sys, os, time, subprocess
+from github import Github
 
-parser = argparse.ArgumentParser(description="Sends a job to Serenity.")
+"""
+username = os.environ['GITHUB_USERNAME']
+password = os.enviorn['GITHUB_PASSWORD']
+cl_id = os.environ['GITHUB_CLIENT_ID']
+cl_secret = os.environ['GITHUB_CLIENT_SECRET']
+"""
+#HACK
+username = 'nbites'
+password = 'H0td4wgs'
+cl_id = '0dc4879786b3ae1d20b8'
+cl_secret = 'f64eecd9430fdae4677d157f6fe9cf17be981ef8'
 
-job_group = parser.add_mutually_exclusive_group()
-job_group.add_argument('-c', '--compile', action='store_true', default=False,
-                       dest='build',
-                       help='Only compiles. No test or pull request.')
-job_group.add_argument('-m', '--mock', action='store_true', default=False,
-                       help='Compiles and tests with no pull request.')
+repo_name = 'northern-bites/nbites'
+org_name, repo_short_name = repo_name.split('/')
 
-cache_group = parser.add_mutually_exclusive_group()
-cache_group.add_argument('--cache', action='store_true', default=None,
-                         help='Overwrite cache information for future use.')
-cache_group.add_argument('--no-cache', action='store_false', dest='cache',
-                         help='Do not cache information this time.')
 
-parser.add_argument('-b', '--branch',
-                    help='Branch to test on. Defaults to current branch.')
+def handle(commit, head):
+    # Get the Pull Request.
+    args = "-b "+ head.ref +" -n "+ head.user.login +" -u "+ head.repo.git_url
+    fail = subprocess.call(["get-pull-req.sh", args])
 
-args = parser.parse_args()
+    if fail:
+        commit.create_status(state='error', description="What the hell's goin' on in the engine room? Were there monkeys? Some terrifying space monkeys maybe got loose?")
 
-branch = subprocess.check_output("git-branch.sh").rstrip()
+    # Run the Build Script.
+    fail = subprocess.call("build-script.sh")
 
-if (args.branch == None):
-    args.branch = branch
+    if fail:
+        commit.create_status(state='failed', description="This food is problematic.")
 
-cache = {}
+    else:
+        commit.create_status(state='success', description="If you can't do something smart, do something right.")
 
-acquire = True
 
-if (args.cache == None):
-    print "Attempting to use cached data."
-    try:
-        with open('cache.txt') as f:
-            cache = ast.literal_eval(f.read())
-        print "Using Cache:\n\tUsername:\t{0}\n\tURL:\t\t{1}".format(cache['git_name'],
-                                                                     cache['git_url'])
-        acquire = False
-    except IOError:
-        print "Could not find a cache file."
+#########################
+#                       #
+# Execution Starts Here #
+#                       #
+#########################
 
-if (acquire):
-    print "Please provide information to get your code."
-    cache['git_name']= raw_input("Enter your github username: ")
-    cache['git_url'] = raw_input("Enter your github url "+
-                                 "(i.e. git://github.com/user/nbites.git): ")
+g = Github(username, password, client_id = cl_id, client_secret = cl_secret, user_agent = username)
 
-    print "You entered:\n\tUsername:\t{0}\n\tURL:\t\t{1}".format(cache['git_name'],
-                                                                 cache['git_url'])
+org = g.get_organization(org_name)
+repo = org.get_repo(repo_short_name)
 
-    if (args.cache == None):
-        ack = None
-        while ack == None:
-            ack = raw_input("Would you like to cache this data for next time?(Y/n) ")
-            if (ack == "" or ack == "y" or ack == "Y"):
-                with open('cache.txt', 'w') as f:
-                    f.write(str(cache))
-            elif (ack != "n" and ack != "N"):
-                print "Did not recognize input..."
-                ack = None
-            elif (args.cache == True):
-                with open('cache.txt', 'w') as f:
-                    f.write(str(cache))
+checked = False
 
-print "\n Transferring you to Serenity...\n"
+while(True):
+    rate = g.rate_limiting
+    #print "RATE {0} of {1}".format(rate[0], rate[1])
 
-command = "ssh northern-bites@139.140.109.49 './serenity-server.sh "
-if (args.build):
-    command += "-c "
-if (args.mock):
-    command += "-m "
-command += "-b " + args.branch + " -n " + cache['git_name'] + " -u " + cache['git_url'] + "'"
-os.system(command)
+    # if (time.time() % 60 != 0):
+    #     continue
 
-print "ALL DONE"
+    # if (checked):
+    #     if (time.time() % 60 != 0):
+    #         checked = False
+    #     continue
+
+    for pull in repo.get_pulls():
+        handled = False
+        print "Pull #{0} found: {1}".format(pull.number, pull.title)
+
+        commit = repo.get_commit(pull.head.sha)
+
+        for status in commit.get_statuses():
+            # If this loop is executing, then this PR has been
+            # previously handled and should be skipped.
+            handled = True
+            break
+
+        if (not handled):
+            print "\tHandling new data..."
+
+            commit.create_status(state='pending', description='Time for some thrilling heroics.')
+
+            handle(commit, pull.head)
+
+        handle(commit, pull.head)
+
+    # HACK Only run main loop once
+    break
