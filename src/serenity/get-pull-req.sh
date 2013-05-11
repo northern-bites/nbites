@@ -17,7 +17,8 @@ do
              ;;
      esac
 done
- if [[ -z $BRANCH ]] || [[ -z $NAME ]] || [[ -z $URL ]]
+
+if [[ -z $BRANCH ]] || [[ -z $NAME ]] || [[ -z $URL ]]
 then
      exit 1
 fi
@@ -27,4 +28,7 @@ cd $NBITES_DIR
 # Get the Pull Request
 git remote add $NAME $URL
 git remote update
-git checkout $NAME/$BRANCH
+
+$BRANCH="$NAME/$BRANCH"
+
+git checkout $BRANCH

@@ -21,8 +21,9 @@ org_name, repo_short_name = repo_name.split('/')
 
 def handle(commit, head):
     # Get the Pull Request.
-    args = "-b "+ head.ref +" -n "+ head.user.login +" -u "+ head.repo.git_url
-    fail = subprocess.call(["get-pull-req.sh", args])
+
+    fail = subprocess.call(["get-pull-req.sh", "-b "+head.ref,
+                            "-n "+head.user.login, "-u "+head.repo.git_url])
 
     if fail:
         commit.create_status(state='error', description="What the hell's goin' on in the engine room? Were there monkeys? Some terrifying space monkeys maybe got loose?")
