@@ -28,7 +28,7 @@ def handle(commit, head):
     print "Python fail ", fail
 
     if fail:
-        commit.create_status(state='failed', description="This food is problematic.")
+        commit.create_status(state='failure', description="This food is problematic.")
 
     else:
         commit.create_status(state='success', description="If you can't do something smart, do something right.")
