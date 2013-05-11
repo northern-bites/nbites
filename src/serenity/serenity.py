@@ -82,7 +82,5 @@ while(True):
 
             handle(commit, pull.head)
 
-        handle(commit, pull.head)
-
     # HACK Only run main loop once
     break
