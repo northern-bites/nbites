@@ -49,17 +49,6 @@ while(True):
     commit = None
 
     try:
-        # Check GitHub once a minute
-        if (checked):
-            if (int(time.time()) % 60 != 0):
-                checked = False
-                continue
-
-        # Two ifs so that we don't repeat the check more than once in the
-        # first second.
-        if (int(time.time()) % 60 != 0):
-            continue
-
         for pull in repo.get_pulls():
             checked = True
             handled = False
@@ -79,6 +68,9 @@ while(True):
                 commit.create_status(state='pending', description='Time for some thrilling heroics.')
 
                 handle(commit, pull.head)
+
+        # Check GitHub once a minute.
+        sleep(60)
 
     except GithubException:
         if commit == None:
