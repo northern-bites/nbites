@@ -1,4 +1,5 @@
 #include "LocalizationModule.h"
+#include "Profiler.h"
 
 namespace man
 {
@@ -70,7 +71,9 @@ namespace man
 
     void LocalizationModule::run_()
     {
+        PROF_ENTER(P_LOC);
         update();
+        PROF_EXIT(P_LOC);
     }
 
     } // namespace localization
