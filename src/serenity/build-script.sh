@@ -5,12 +5,14 @@ cd $NBITES_DIR/src/man
 
 make clean
 
-result=`make scross`
+make scross
 
 echo "Making..."
-#if result non zero
-#  exit $result
+if [ $? -ne 0 ]
+then exit $?
+fi
 
-result=`make`
+make
+
 
 # Tool
