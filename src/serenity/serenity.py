@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import sys, os, time, subprocess
-from github import Github
+from github import Github, GithubException
 
 username = os.environ['GITHUB_USERNAME']
 password = os.environ['GITHUB_PASSWORD']
