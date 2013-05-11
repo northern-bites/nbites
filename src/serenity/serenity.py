@@ -48,12 +48,14 @@ checked = False
 while(True):
 
     # Check GitHub once a minute
-    if (time.time() % 60 != 0):
-        continue
-
     if (checked):
-        if (time.time() % 60 != 0):
+        if (int(time.time()) % 60 != 0):
             checked = False
+            continue
+
+    # Two ifs so that we don't repeat the check more than once in the
+    # first second.
+    if (int(time.time()) % 60 != 0):
         continue
 
     for pull in repo.get_pulls():
