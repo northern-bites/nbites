@@ -3,17 +3,11 @@
 import sys, os, time, subprocess
 from github import Github
 
-"""
 username = os.environ['GITHUB_USERNAME']
 password = os.enviorn['GITHUB_PASSWORD']
 cl_id = os.environ['GITHUB_CLIENT_ID']
 cl_secret = os.environ['GITHUB_CLIENT_SECRET']
-"""
-#HACK
-username = 'nbites'
-password = 'H0td4wgs'
-cl_id = '0dc4879786b3ae1d20b8'
-cl_secret = 'f64eecd9430fdae4677d157f6fe9cf17be981ef8'
+
 
 repo_name = 'northern-bites/nbites'
 org_name, repo_short_name = repo_name.split('/')

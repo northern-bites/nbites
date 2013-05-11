@@ -29,6 +29,6 @@ cd $NBITES_DIR
 git remote add $NAME $URL
 git remote update
 
-$BRANCH="$NAME/$BRANCH"
+BRANCH="$NAME/$BRANCH"
 
 git checkout $BRANCH
