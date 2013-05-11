@@ -76,11 +76,11 @@ while(True):
             if (not handled):
                 print "\tHandling new data..."
 
-                commit.create_status(state='pending', description='Time for some thrilling heroics.')
+                commit.create_status(state='pend', description='Time for some thrilling heroics.')
 
                 handle(commit, pull.head)
 
-    except:
+    except GithubException:
         if commit == None:
             print "Serenity Encountered An Unknown Error"
         else:
