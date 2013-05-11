@@ -43,14 +43,11 @@ g = Github(username, password, client_id = cl_id, client_secret = cl_secret, use
 org = g.get_organization(org_name)
 repo = org.get_repo(repo_short_name)
 
-checked = False
-
 while(True):
     commit = None
 
     try:
         for pull in repo.get_pulls():
-            checked = True
             handled = False
             print "Pull #{0} found: {1}".format(pull.number, pull.title)
 
@@ -59,6 +56,7 @@ while(True):
             for status in commit.get_statuses():
                 # If this loop is executing, then this PR has been
                 # previously handled and should be skipped.
+                # Annoyingly, there's currently no way to get size directly.
                 handled = True
                 break
 
