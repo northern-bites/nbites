@@ -4,7 +4,7 @@ import sys, os, time, subprocess
 from github import Github
 
 username = os.environ['GITHUB_USERNAME']
-password = os.enviorn['GITHUB_PASSWORD']
+password = os.environ['GITHUB_PASSWORD']
 cl_id = os.environ['GITHUB_CLIENT_ID']
 cl_secret = os.environ['GITHUB_CLIENT_SECRET']
 
