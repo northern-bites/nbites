@@ -46,18 +46,18 @@ repo = org.get_repo(repo_short_name)
 checked = False
 
 while(True):
-    rate = g.rate_limiting
-    #print "RATE {0} of {1}".format(rate[0], rate[1])
 
-    # if (time.time() % 60 != 0):
-    #     continue
+    # Check GitHub once a minute
+    if (time.time() % 60 != 0):
+        continue
 
-    # if (checked):
-    #     if (time.time() % 60 != 0):
-    #         checked = False
-    #     continue
+    if (checked):
+        if (time.time() % 60 != 0):
+            checked = False
+        continue
 
     for pull in repo.get_pulls():
+        checked = True
         handled = False
         print "Pull #{0} found: {1}".format(pull.number, pull.title)
 
@@ -75,6 +75,3 @@ while(True):
             commit.create_status(state='pending', description='Time for some thrilling heroics.')
 
             handle(commit, pull.head)
-
-    # HACK Only run main loop once
-    break
