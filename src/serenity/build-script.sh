@@ -7,12 +7,23 @@ make clean
 
 make scross
 
-echo "Making..."
 if [ $? -ne 0 ]
 then exit $?
 fi
 
 make
 
+if [ $? -ne 0 ]
+then exit $?
+fi
 
 # Tool
+cd $NBITES_DIR/src/tool
+
+make clean
+
+make
+
+if [ $? -ne 0 ]
+then exit $?
+fi
