@@ -9,7 +9,7 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SHARE_DIR}/cmake/" )
 # A list of options that we do want
 include( cmake/RobotConfig.cmake )
 # A list of options for debugging various modules
-include( cmake/DebugConfig.cmake)
+include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
 # A list of options that should be advanced
 include( cmake/Advanced.cmake )
 # Compiler flags
@@ -23,7 +23,7 @@ configure_file(
 
 # Configure the debug options
 configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/DebugConfig.in"
+  "${SHARE_DIR}/cmake/DebugConfig.in"
   "${PROJECT_BINARY_DIR}/DebugConfig.h"
 )
 

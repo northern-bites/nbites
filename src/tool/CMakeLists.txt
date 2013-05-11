@@ -19,6 +19,13 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
+# Configure the debug options
+configure_file(
+  "${SHARE_DIR}/cmake/DebugConfig.in"
+  "${PROJECT_BINARY_DIR}/DebugConfig.h"
+)
+
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
   "${PROJECT_BINARY_DIR}/PathConfig.h"
