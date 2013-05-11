@@ -46,34 +46,42 @@ repo = org.get_repo(repo_short_name)
 checked = False
 
 while(True):
+    commit = None
 
-    # Check GitHub once a minute
-    if (checked):
+    try:
+        # Check GitHub once a minute
+        if (checked):
+            if (int(time.time()) % 60 != 0):
+                checked = False
+                continue
+
+        # Two ifs so that we don't repeat the check more than once in the
+        # first second.
         if (int(time.time()) % 60 != 0):
-            checked = False
             continue
 
-    # Two ifs so that we don't repeat the check more than once in the
-    # first second.
-    if (int(time.time()) % 60 != 0):
-        continue
+        for pull in repo.get_pulls():
+            checked = True
+            handled = False
+            print "Pull #{0} found: {1}".format(pull.number, pull.title)
 
-    for pull in repo.get_pulls():
-        checked = True
-        handled = False
-        print "Pull #{0} found: {1}".format(pull.number, pull.title)
+            commit = repo.get_commit(pull.head.sha)
 
-        commit = repo.get_commit(pull.head.sha)
+            for status in commit.get_statuses():
+                # If this loop is executing, then this PR has been
+                # previously handled and should be skipped.
+                handled = True
+                break
 
-        for status in commit.get_statuses():
-            # If this loop is executing, then this PR has been
-            # previously handled and should be skipped.
-            handled = True
-            break
+            if (not handled):
+                print "\tHandling new data..."
 
-        if (not handled):
-            print "\tHandling new data..."
+                commit.create_status(state='pending', description='Time for some thrilling heroics.')
 
-            commit.create_status(state='pending', description='Time for some thrilling heroics.')
+                handle(commit, pull.head)
 
-            handle(commit, pull.head)
+    except:
+        if commit == None:
+            print "Serenity Encountered An Unknown Error"
+        else:
+            commit.create_status(state='error', description="What the hell's goin' on in the engine room? Were there monkeys? Some terrifying space monkeys maybe got loose?")
