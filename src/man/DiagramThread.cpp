@@ -1,5 +1,6 @@
 #include "DiagramThread.h"
 #include "Common.h"
+#include "Profiler.h"
 #include "DebugConfig.h"
 #include <iostream>
 
@@ -27,7 +28,18 @@ void DiagramThread::RobotDiagram::run()
     // Start timer
     const long long startTime = realtime_micro_time();
 
+    if (name == "cognition")
+    {
+        PROF_ENTER(P_MAIN);
+    }
+
     RoboGram::run();
+
+    if (name == "cognition")
+    {
+        PROF_EXIT(P_MAIN);
+        PROF_NFRAME();
+    }
 
     // Stop timer
     const long long processTime = realtime_micro_time() - startTime;
