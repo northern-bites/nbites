@@ -24,6 +24,7 @@ make clean
 
 make
 
+echo $?
 if [ $? -ne 0 ]
 then exit $?
 fi

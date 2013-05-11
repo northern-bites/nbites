@@ -25,6 +25,8 @@ def handle(commit, head):
     # Run the Build Script.
     fail = subprocess.call("build-script.sh")
 
+    print "Python fail ", fail
+
     if fail:
         commit.create_status(state='failed', description="This food is problematic.")
 
