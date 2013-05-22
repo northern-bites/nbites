@@ -11,16 +11,20 @@ namespace man
         }
         MotionSystem::~MotionSystem(){}
 
+        void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
+        {
+            xAndYNoise = xyNoise_;
+            hNoise = hNoise_;
+        }
+
         /**
          * Updates the particle set according to the motion.
          *
-         * @TODO Currently assumes odometry is how FakeOdometryModule creates it,
-         *       ie (delta X, delta Y, etc...
-         *       Verify when motion module is pulled
          * @return the updated ParticleSet.
          */
         void MotionSystem::update(ParticleSet& particles,
-                                  const messages::RobotLocation& deltaMotionInfo)
+                                  const messages::RobotLocation& deltaMotionInfo,
+                                  bool lost)
         {
             ParticleIt iter;
             for(iter = particles.begin(); iter != particles.end(); iter++)
@@ -29,17 +33,21 @@ namespace man
 
                 /** Should be used if odometry gives global **/
                 /** Should also be TESTED extensively       **/
-                // float sinh, cosh;
-                // sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
-                //         &sinh, &cosh);
+                float sinh, cosh;
+                sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
+                        &sinh, &cosh);
                 // float changeX = cosh * deltaMotionInfo.x() + sinh * deltaMotionInfo.y();
                 // float changeY = cosh * deltaMotionInfo.y() - sinh * deltaMotionInfo.x();
+                particle->setX(particle->getLocation().x() + cosh*deltaMotionInfo.x() + sinh*deltaMotionInfo.y());
+                particle->setY(particle->getLocation().y() + cosh*deltaMotionInfo.y() - sinh*deltaMotionInfo.x());
+                particle->setH(NBMath::subPIAngle(particle->getLocation().h() + deltaMotionInfo.h()));
 
-                float changeX = deltaMotionInfo.x();
-                float changeY = deltaMotionInfo.y();
-                float changeH = deltaMotionInfo.h();
 
-                particle->shift(changeX, changeY, changeH);
+                // float changeX = deltaMotionInfo.x()*cosh + sinh*deltaMotionInfo.y();
+                // float changeY = deltaMotionInfo.y()*cosh + sinh*deltaMotionInfo.x();
+                // float changeH = deltaMotionInfo.h();
+
+                // particle->shift(changeX, changeY, changeH);
                 randomlyShiftParticle(particle);
             }
 //            std::cout << "\n\n Updated Particles w/ Motion \n";

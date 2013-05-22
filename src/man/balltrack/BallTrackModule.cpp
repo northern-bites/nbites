@@ -57,7 +57,6 @@ void BallTrackModule::run_()
     ballMessage.get()->set_bearing(filters->getFilteredBear());
     ballMessage.get()->set_bearing_deg(filters->getFilteredBear() * TO_DEG);
 
-    // From Wils for behaviors
     float x = localizationInput.message().x() +
         ballMessage.get()->distance() * cosf(localizationInput.message().h() +
                                              ballMessage.get()->bearing());
@@ -93,6 +92,9 @@ void BallTrackModule::run_()
         std::cout << "and a ball with (relX,relY):  \t( " << filters->visRelX
                   << " , " << filters->visRelY << std::endl;
     }
+
+    std::cout << "Speed:\t" << filters->getSpeed() << std::endl;
+    std::cout << "RelY Int Dest:\t" << filters->getRelYIntersectDest() << std::endl;
 
     std::cout << "Odometry is (x,y,h):\t( " << deltaOdometry.x() << " , "
               << deltaOdometry.y() << " , " << deltaOdometry.h() << " )" << std::endl;

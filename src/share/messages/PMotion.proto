@@ -8,7 +8,8 @@ message MotionRequest
     optional bool reset_odometry = 3;
     optional bool remove_stiffness = 4;
     optional bool enable_stiffness = 5;
-    optional int64 timestamp = 6;
+    optional bool reset_providers = 6;
+    optional int64 timestamp = 7;
 }
 
 message MotionCommand

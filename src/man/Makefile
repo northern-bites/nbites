@@ -37,15 +37,15 @@ install: $(BUILD_DIR)/Makefile
 		echo "You must build cross to install to a robot."; \
 	fi
 
-.PHONY: test
-test: $(BUILD_DIR)/Makefile
-	@if [ -e $(CROSS_FILE) ]; then \
-		echo "You must build straight to run the tests."; \
-	else \
-		$(MAKE) check -C $(BUILD_DIR) --no-print-directory && \
-		cd $(BUILD_DIR) && \
-		ctest -V; \
-	fi
+# .PHONY: test
+# test: $(BUILD_DIR)/Makefile
+# 	@if [ -e $(CROSS_FILE) ]; then \
+# 		echo "You must build straight to run the tests."; \
+# 	else \
+# 		$(MAKE) check -C $(BUILD_DIR) --no-print-directory && \
+# 		cd $(BUILD_DIR) && \
+# 		ctest -V; \
+# 	fi
 
 .PHONY: cross
 cross:  $(CROSS_FILE)
@@ -59,6 +59,12 @@ $(CROSS_FILE):
 		rm -rf $(BUILD_DIR)/*; \
 	fi
 	@touch $(CROSS_FILE)
+
+# Target for Serenity to build cross. Relies on default options being valid.
+.PHONY: scross
+scross:	$(CROSS_FILE)
+	cd $(BUILD_DIR); \
+	cmake $(CMAKE_CROSS_FLAGS) $(SRC_DIR)
 
 .PHONY: straight
 straight: $(STRAIGHT_FILE)

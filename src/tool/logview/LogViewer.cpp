@@ -26,7 +26,7 @@ void LogViewer::newDisplayWidget(QWidget* widget, std::string title)
         QDockWidget* dockWidget =
             new QDockWidget(QString(title.data()), this);
         dockWidget->setMinimumWidth(300);
-        dockWidget->setMaximumHeight(125);
+        dockWidget->setMaximumHeight(800);
 
         dockWidget->setWidget(widget);
         dockWidgets.push_back(dockWidget);

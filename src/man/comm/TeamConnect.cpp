@@ -18,7 +18,7 @@ namespace man {
 namespace comm {
 
 TeamConnect::TeamConnect(CommTimer* t, NetworkMonitor* m)
-    : timer(t), monitor(m)
+    : timer(t), monitor(m), myLastSeqNum(0)
 {
     socket = new UDPSocket();
     setUpSocket();
@@ -112,14 +112,12 @@ void TeamConnect::send(const messages::WorldModel& model,
 #endif
         return;
     }
-    TeamMemberInfo robot = teamMates[player-1];
-
     portals::Message<messages::TeamPacket> teamMessage(0);
 
     messages::TeamPacket* packet = teamMessage.get();
 
     packet->mutable_payload()->CopyFrom(model);
-    packet->set_sequence_number(robot.seqNum + 1);
+    packet->set_sequence_number(myLastSeqNum++); // ONE LINE INCREMENT!!
     packet->set_player_number(player);
     packet->set_team_number(team);
     packet->set_header(UNIQUE_ID);
@@ -130,7 +128,7 @@ void TeamConnect::send(const messages::WorldModel& model,
 
     for (int i = 0; i < burst; ++i)
     {
-        socket->sendToTarget(&datagram[0], sizeof(packet));
+        socket->sendToTarget(&datagram[0], packet->GetCachedSize());
     }
 }
 
@@ -157,14 +155,16 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         if (result <= 0)
             break; //leave on error or nothing to receive.
 
-        if (teamMessage.get()->ParseFromArray(&packet[0], result))
+        if (!teamMessage.get()->ParseFromArray(&packet[0], result))
         {
-            std::cerr << "Failed to parse GPB from socket in TeamConnect"
-                      << std::endl;
+            std::cerr << "Failed to parse GPB from socket in TeamConnect. "
+                      << "Got a packet of size " << result << std::endl;
         }
 
         if (!verify(teamMessage.get(), currtime, player, team))
+        {
             continue;  // Bad Packet.
+        }
 
 #ifdef DEBUG_COMM
         std::cout << "Recieved a packet:\n\n"
@@ -222,20 +222,23 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
 
     int seqNumber = packet->sequence_number();
 
-    TeamMemberInfo robot = teamMates[playerNum-1];
-    if (seqNumber <= robot.seqNum)
+    if (seqNumber <= teamMates[playerNum-1].seqNum)
     {
+        if (teamMates[playerNum-1].seqNum - seqNumber < RESET_SEQ_NUM_THRESHOLD)
+        {
 #ifdef DEBUG_COMM
-        std::cout << "Received packet with old sequenceNumber"
-                  << " in TeamConnect::verify()" << std::endl;
+            std::cout << "Received packet with old sequenceNumber"
+                      << " in TeamConnect::verify()" << std::endl;
 #endif
-        return false;
+            return false;
+        }
+        // Else we've restarted a robot, so consider it's packets new.
     }
 
     // Success! Update seqNum and timeStamp and parse!
-    int lastSeqNum = robot.seqNum;
+    int lastSeqNum = teamMates[playerNum-1].seqNum;
     int delayed = seqNumber - lastSeqNum - 1;
-    robot.seqNum = seqNumber;
+    teamMates[playerNum-1].seqNum = seqNumber;
 
     llong ts = packet->timestamp();
 
@@ -251,7 +254,7 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
         newOffset = ts + MIN_PACKET_DELAY - currtime;
         timer->addToOffset(newOffset);
     }
-    robot.timestamp = ts;
+    teamMates[playerNum-1].timestamp = timer->timestamp();
 
     // Update the monitor
     monitor->packetsDropped(delayed);
@@ -263,13 +266,13 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
 void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],
                                      llong time, int player)
 {
-    TeamMemberInfo robot;
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        robot = teamMates[i];
         if (i+1 == player)
+        {
             continue;
-        else if (time - robot.timestamp > TEAMMATE_DEAD_THRESHOLD)
+        }
+        else if (time - teamMates[i].timestamp > TEAMMATE_DEAD_THRESHOLD)
         {
             portals::Message<messages::WorldModel> msg(0);
             msg.get()->set_active(false);
