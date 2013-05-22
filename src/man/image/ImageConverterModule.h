@@ -15,25 +15,28 @@ public:
     ImageConverterModule(Camera::Type);
     virtual ~ImageConverterModule() {}
 
+    // Gets an image from the Transcriber module (from the camera)
     portals::InPortal<messages::YUVImage> imageIn;
+    // Outs four images for vision, YUV split up and a color segmented image
     portals::OutPortal<messages::PackedImage16> yImage;
     portals::OutPortal<messages::PackedImage16> uImage;
     portals::OutPortal<messages::PackedImage16> vImage;
     portals::OutPortal<messages::ThresholdImage> thrImage;
 
-    // Used offline
+    // Used offline, table can be anywhere on the file system
     void initTable(unsigned char* otherTable);
 
 protected:
     virtual void run_();
 
-    // Used on the robot
+    // Used on the robot, table must be in /home/nao/nbites/lib/table
     void initTable(const std::string& filename);
 
     Camera::Type whichCamera;
     ColorParams params;
     unsigned char *table;
 
+    // Constants used for reading a color table into memory
     enum InitTableConstants {
         y0 = 0,
         u0 = 0,
