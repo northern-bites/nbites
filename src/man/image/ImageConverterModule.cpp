@@ -9,28 +9,26 @@ namespace image {
 using namespace messages;
 using namespace portals;
 
-ImageConverterModule::ImageConverterModule(Camera::Type which)
+ImageConverterModule::ImageConverterModule()
     : Module(),
       yImage(base()),
       uImage(base()),
       vImage(base()),
       thrImage(base()),
-      whichCamera(which),
+      params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
+      table(new unsigned char[tableByteSize])
+{}
+
+ImageConverterModule::ImageConverterModule(char *table_pathname)
+    : Module(),
+      yImage(base()),
+      uImage(base()),
+      vImage(base()),
+      thrImage(base()),
       params(y0, u0, v0, y1, u1, v1, yLimit, uLimit, vLimit),
       table(new unsigned char[tableByteSize])
 {
-    // Color table name is a function of which camera is being used
-    switch (whichCamera)
-    {
-    case Camera::TOP:
-        initTable("/home/nao/nbites/lib/table/top_table.mtb");
-        break;
-    case Camera::BOTTOM:
-        initTable("/home/nao/nbites/lib/table/bottom_table.mtb");
-        break;
-    default:
-        break;
-    }
+    initTable(table_pathname);
 }
 
 void ImageConverterModule::run_()
@@ -50,26 +48,10 @@ void ImageConverterModule::run_()
     PackedImage16 tempOutput16(tempBuffer, 320, 3*240, 320);
     PackedImage8 tempOutput8(tempBuffer, 320, (3*2 + 1)*240, 320);
 
-    if (whichCamera == Camera::TOP)
-    {
-        PROF_ENTER(P_TOP_ACQUIRE_IMAGE);
-    }
-    else
-    {
-        PROF_ENTER(P_BOT_ACQUIRE_IMAGE);
-    }
     ImageAcquisition::acquire_image_fast(table,
                                          params,
                                          yuv.pixelAddress(0, 0),
                                          tempOutput16.pixelAddress(0, 0));
-    if (whichCamera == Camera::TOP)
-    {
-        PROF_EXIT(P_TOP_ACQUIRE_IMAGE);
-    }
-    else
-    {
-        PROF_EXIT(P_BOT_ACQUIRE_IMAGE);
-    }
 
     // First 320x240 image = all the Y values in imageIn.message()
     PackedImage16 image = tempOutput16.window(0, 0, 320, 240);
@@ -89,12 +71,12 @@ void ImageConverterModule::run_()
 }
 
 // Read a color table into memory from pathname
-void ImageConverterModule::initTable(const std::string& filename)
+void ImageConverterModule::initTable(char *filename)
 {
-    FILE *fp = fopen(filename.c_str(), "r");   //open table for reading
+    FILE *fp = fopen(filename, "r");   //open table for reading
 
     if (fp == NULL) {
-        printf("CAMERA::ERROR::initTable() FAILED to open filename: %s\n", filename.c_str());
+        printf("CAMERA::ERROR::initTable() FAILED to open filename: %s\n", filename);
         return;
     }
 
@@ -108,14 +90,14 @@ void ImageConverterModule::initTable(const std::string& filename)
         }
     }
 
-    printf("CAMERA::Loaded colortable %s.\n",filename.c_str());
+    printf("CAMERA::Loaded colortable %s.\n",filename);
     fclose(fp);
 }
 
 // Read a color table already in memory
-void ImageConverterModule::initTable(unsigned char* otherTable)
+void ImageConverterModule::changeTable(unsigned char *newTable)
 {
-    table = otherTable;
+    table = newTable;
 }
 
 }

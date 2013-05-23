@@ -12,7 +12,10 @@ namespace image {
 class ImageConverterModule : public portals::Module {
 
 public:
-    ImageConverterModule(Camera::Type);
+    // For tool, doesn't load color table at converter construction time
+    ImageConverterModule();
+    // For robots, load color table at converter construction time
+    ImageConverterModule(char *table_pathname);
     virtual ~ImageConverterModule() {}
 
     // Gets an image from the Transcriber module (from the camera)
@@ -23,16 +26,14 @@ public:
     portals::OutPortal<messages::PackedImage16> vImage;
     portals::OutPortal<messages::ThresholdImage> thrImage;
 
-    // Used offline, table can be anywhere on the file system
-    void initTable(unsigned char* otherTable);
+    // For offline use, allows table to change after construction
+    void changeTable(unsigned char *newTable);
 
 protected:
     virtual void run_();
 
-    // Used on the robot, table must be in /home/nao/nbites/lib/table
-    void initTable(const std::string& filename);
+    void initTable(char *filename);
 
-    Camera::Type whichCamera;
     ColorParams params;
     unsigned char *table;
 
