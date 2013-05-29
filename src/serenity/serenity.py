@@ -47,6 +47,11 @@ while(True):
     commit = None
 
     try:
+        # Check GitHub once an hour.
+        time.sleep(3600)
+
+        print "Serenity Checking GitHub at " + time.strftime("%X")
+
         for pull in repo.get_pulls():
             handled = False
             print "Pull #{0} found: {1}".format(pull.number, pull.title)
@@ -67,11 +72,11 @@ while(True):
 
                 handle(commit, pull.head)
 
-        # Check GitHub once a minute.
-        time.sleep(60)
+            commit = None
 
-    except GithubException:
+    except GithubException as e:
         if commit == None:
-            print "Serenity Encountered An Unknown Error"
+            print "Serenity Encountered An Unknown Error\n" + str(e)
         else:
             commit.create_status(state='error', description="What the hell's goin' on in the engine room? Were there monkeys? Some terrifying space monkeys maybe got loose?")
+            commit.create_comment(str(e))
