@@ -6,4 +6,10 @@ git remote update
 
 git checkout master
 
-./serenity.py
+while [ 1 ]
+do
+    ./serenity.py
+    echo ""
+    echo "Serenity crashed... Restarting..."
+    echo ""
+done
