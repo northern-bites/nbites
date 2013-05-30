@@ -73,6 +73,7 @@ add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
 add_subdirectory( viewer )
+add_subdirectory( playbook )
 add_subdirectory( common )
 
 
@@ -107,6 +108,7 @@ target_link_libraries(
   image # man image
   image_display
   viewer
+  playbook
   tool_common
   colorcreator
   ${QT_LIBRARIES}

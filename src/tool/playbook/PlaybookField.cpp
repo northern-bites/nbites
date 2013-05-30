@@ -4,10 +4,7 @@ namespace tool {
 namespace playbook {
 
 PlaybookField::PlaybookField(QWidget* parent, float scaleFactor_) :
-    PaintField(parent, scaleFactor_),
-    shouldPaintParticles(false),
-    shouldPaintLocation(false),
-    shouldPaintObsv(false)
+    PaintField(parent, scaleFactor_)
 {
 }
 

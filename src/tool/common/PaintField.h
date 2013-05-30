@@ -16,7 +16,6 @@
 #include "common/FieldConstants.h"
 
 namespace tool{
-namespace viewer{
 
 class PaintField : public QWidget
 {
@@ -39,6 +38,4 @@ protected:
     float scaleFactor;
 };
 
-
 } //namespace tool
-} //namespace viewer

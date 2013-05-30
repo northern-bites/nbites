@@ -1,7 +1,6 @@
 #include "PaintField.h"
 
 namespace tool{
-namespace viewer{
 
 PaintField::PaintField(QWidget* parent, float scaleFactor_) :
     QWidget(parent),
@@ -151,5 +150,4 @@ void PaintField::paintEvent(QPaintEvent* event)
 
 }
 
-} // namespace viewer
 } // namespace tool

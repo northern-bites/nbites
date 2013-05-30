@@ -19,6 +19,7 @@
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
 #include "viewer/FieldViewer.h"
+#include "playbook/PlaybookCreator.h"
 
 #include "ParticleSwarm.pb.h"
 
@@ -47,6 +48,7 @@ protected:
     logview::LogViewer logView;
     color::ColorTableCreator tableCreator;
     viewer::FieldViewer fieldView;
+    playbook::PlaybookCreator playbookCreator;
 
     // GUI stuff
     QTabWidget* toolTabs;

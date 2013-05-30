@@ -3,8 +3,8 @@
  * inherits from PaintField so that the field itself is already drawn.
  * Based on specs from the PlaybookCreator Class
  *
- * @author Wils Dawson May 2013
- *
+ * @author Wils Dawson
+ * @date May 2013
  */
 
 #pragma once
@@ -18,8 +18,6 @@
 
 namespace tool {
 namespace playbook {
-
-static const int PARTICLE_WIDTH = 8;
 
 class PlaybookField : public PaintField
 {

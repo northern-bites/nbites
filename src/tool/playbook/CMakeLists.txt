@@ -6,8 +6,8 @@ set( PLAYBOOK_SRCS
   )
 
 set( PLAYBOOK_HEADERS
-  PlaybookCreator.cpp
-  PlaybookField.cpp
+  PlaybookCreator.h
+  PlaybookField.h
   )
 
 Qt4_wrap_cpp( PLAYBOOK_HEADERS_MOC ${PLAYBOOK_HEADERS} )
