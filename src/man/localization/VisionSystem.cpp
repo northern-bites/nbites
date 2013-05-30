@@ -192,7 +192,11 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
 
         ReconstructedLocation newLoc(pose_x, pose_y, pose_h, side);
 
-        reconstructedLocations.push_back(newLoc);
+        // Sanity check the reconstructinos aren't off-field
+        // Lets assume if we're off-field then we're already fucked
+        if( (newLoc.x >= 0 && newLoc.y <= FIELD_GREEN_WIDTH) &&
+            (newLoc.y >= 0 && newLoc.y <= FIELD_GREEN_HEIGHT)  )
+            reconstructedLocations.push_back(newLoc);
     }
     //std::cout << concreteNum << " particles should be injected" << std::endl;
 }
