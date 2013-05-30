@@ -35,6 +35,8 @@ namespace man
     namespace localization
     {
 
+    const float LOST_THRESHOLD = 60;
+
     // Define the default parameters for the Particle Filter
     static const ParticleFilterParams DEFAULT_PARAMS =
     {
@@ -43,8 +45,8 @@ namespace man
         250,                        // Num Particles
         0.2f,                       // Exponential Filter alpha
         0.05f,                      //                    beta
-        5.f,                        // Variance in x-y odometry
-        .50f                         // Variance in h odometry
+        .5f,                        // Variance in x-y odometry
+        .15f                         // Variance in h odometry
     };
 
 

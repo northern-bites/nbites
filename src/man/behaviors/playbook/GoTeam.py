@@ -73,7 +73,7 @@ class GoTeam:
         creates a play, picks the strategy to run, returns the play after
         it is modified by Strategies
         """
-        currentGCState = self.brain.interface.gameState.state
+        currentGCState = self.brain.player.gameState
         # We don't control anything in initial or finished
         if (currentGCState == 'gameInitial' or
             currentGCState == 'gameFinished'):

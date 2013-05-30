@@ -27,11 +27,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
             : VisualGoalieStates.spinAtGoal
-
-            # Transition.CountTransition(GoalieTransitions.ballIsInMyWay,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.OK_PRECISION)
-            # : VisualGoalieStates.dodgeBall
             }
 
         VisualGoalieStates.spinAtGoal.transitions = {
@@ -195,26 +190,24 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : GoalieStates.watch
             }
 
-        GoalieStates.penaltyShotsGamePlaying.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldGetReadyToSave,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.waitForPenaltySave
-            }
-
         GoalieStates.waitForPenaltySave.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+            Transition.CountTransition(GoalieTransitions.shouldDiveRight,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.diveForPenaltySave
+            : GoalieStates.diveRight,
+
+            Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.diveLeft,
+
+            Transition.CountTransition(GoalieTransitions.shouldSquat,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.squat
+
             }
 
     def run(self):
         gcState = self.brain.gameController.currentState
-
-        # if (gcState == 'gamePlaying'):
-        #     # Make sure gamePlaying gets run
-        #     if (self.brain.gameController.counter == 2):
-        #         self.switchTo('watch')
-
         SoccerFSA.SoccerFSA.run(self)

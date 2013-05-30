@@ -20,12 +20,13 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
-include( ${MAN_DIR}/cmake/RobotConfig.cmake )
+include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
+# Configure the debug options
+configure_file(
+  "${SHARE_DIR}/cmake/DebugConfig.in"
+  "${PROJECT_BINARY_DIR}/DebugConfig.h"
+)
 
-# If protobuf libs don't exist yet, make sure they build before man
-if( BUILD_PROTOBUF )
-add_dependencies(messages protobuf_libs)
-endif()
 
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"

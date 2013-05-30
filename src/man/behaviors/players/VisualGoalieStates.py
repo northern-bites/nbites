@@ -21,14 +21,17 @@ def walkToGoal(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackFieldObject(player.brain.ygrp)
+        player.returningFromPenalty = True
 
     if player.brain.ygrp.on and not(player.brain.ygrp.distance == 0.0):
         relx = player.brain.ygrp.distance * cos(player.brain.ygrp.bearing)
         rely = player.brain.ygrp.distance * sin(player.brain.ygrp.bearing)
-        player.brain.nav.goTo(RelRobotLocation(relx, rely, 0.0))
+        player.brain.nav.goTo(RelRobotLocation(relx, rely, player.brain.ygrp.bearing_deg))
 
     return Transition.getNextState(player, walkToGoal)
 
+## NOT USED right now, but is a good idea so that the goalie won't walk the
+## ball into the goal
 def dodgeBall(player):
     if player.firstFrame():
         if player.brain.ball.rel_y < 0.0:
@@ -93,7 +96,8 @@ def clearIt(player):
         clearIt.odoDelay = False
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
-                              nav.FAST_SPEED)
+                              nav.FAST_SPEED,
+                              adaptive = False)
 
     kickPose = player.kick.getPosition()
     clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
@@ -191,7 +195,7 @@ def centerAtGoalBasedOnCorners(player):
                               nav.GENERAL_AREA,
                               nav.FAST_SPEED)
 
-    if player.counter > 180:
+    if player.counter > 180 and not player.returningFromPenalty:
         return player.goLater('watch')
 
     vision = player.brain.interface.visionField

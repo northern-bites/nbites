@@ -41,6 +41,8 @@ namespace man
             Particle p(randomLocation, weight);
             particles.push_back(p);
         }
+
+        lost = false;
     }
 
     ParticleFilter::~ParticleFilter()
@@ -63,6 +65,17 @@ namespace man
         {
             resample();
             updatedVision = false;
+
+            //If shitty swarm according to vision, expand search
+            lost = (visionSystem->getLowestError() > 40);
+
+        }
+
+        if (lost)
+            motionSystem->resetNoise(4.f, .2f);
+        else {
+            motionSystem->resetNoise(parameters.odometryXYNoise,
+                                     parameters.odometryHNoise);
         }
 
         // Update filters estimate
@@ -77,7 +90,7 @@ namespace man
          * Commented out until known if necessary (K.I.S.S.)
          */
         // // Check if the mean has gone out of bounds. If so,
-        // // reset to the closest point in bounds with appropriate
+        // // reset to the cloesst point in bounds with appropriate
         // // uncertainty.
         // bool resetInBounds = false;
 

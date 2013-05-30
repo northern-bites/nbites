@@ -38,9 +38,12 @@ namespace man
         float scoreFromVisDetect(const Particle& particle,
                                  const messages::VisualDetection& obsv);
         void setUpdated(bool val);
+        float getLowestError(){return currentLowestError;};
 
         // Random number generator to be used throughout the system
         boost::mt19937 rng;
+    private:
+        float currentLowestError;
      };
     } // namespace localization
 } // namespace man
