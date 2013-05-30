@@ -198,8 +198,6 @@ void FieldViewerPainter::handleZoomIn()
 
 void FieldViewerPainter::handleZoomOut()
 {
-    qDebug() << "Zoom out";
-
     scaleFactor -= .1;
     repaint();
 }
