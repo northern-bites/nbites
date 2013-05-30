@@ -170,6 +170,12 @@ void VisualLine::trimEndpoints()
     } else {
         tl = Utility::getClosestPointOnLine(bl, tl, tr);
     }
+	
+	start.x = (tl.x + bl.x) / 2;
+	start.y = (tl.y + bl.y) / 2;
+	
+	end.x = (tr.x + br.x) / 2;
+	end.y = (tr.y + br.y) / 2;
 }
 
 /**

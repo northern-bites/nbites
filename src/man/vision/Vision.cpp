@@ -63,7 +63,7 @@ Vision::Vision()
     ygCrossbar = new VisualCrossbar();
     bgCrossbar = new VisualCrossbar();
     ball = new VisualBall();
-    red1 = new VisualRobot();
+    red1 = new VisualRobot(); 
     red2 = new VisualRobot();
     red3 = new VisualRobot();
     navy1 = new VisualRobot();
@@ -172,22 +172,22 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
     // counts the frameNumber
     if (frameNumber > 1000000) frameNumber = 0;
 
-//    linesDetector->detect(thresh->getVisionHorizon(),
-//                         thresh->field->getTopEdge(),
-//                         yImg);
-//
-//    cornerDetector->detect(thresh->getVisionHorizon(),
-//                           thresh->field->getTopEdge(),
-//                           linesDetector->getLines());
+   linesDetector->detect(thresh->getVisionHorizon(),
+                        thresh->field->getTopEdge(),
+                        yImg);
+
+   cornerDetector->detect(thresh->getVisionHorizon(),
+                          thresh->field->getTopEdge(),
+                          linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
 
     thresh->visionLoop(ja, inert);
-    thresh->obstacleLoop(ja, inert);
+//    thresh->obstacleLoop(ja, inert);
 
-//    drawEdges(*linesDetector->getEdges());
-//    drawHoughLines(linesDetector->getHoughLines());
-//    drawVisualLines(linesDetector->getLines());
+   // drawEdges(*linesDetector->getEdges());
+   // drawHoughLines(linesDetector->getHoughLines());
+	drawVisualLines(linesDetector->getLines(), *linesDetector->getEdges());
 //    drawVisualCorners(cornerDetector->getCorners());
 
     thresh->transposeDebugImage();
@@ -644,17 +644,18 @@ void Vision::drawHoughLine(const HoughLine& line, int color)
 #endif
 }
 
-void Vision::drawVisualLines(const vector<HoughVisualLine>& lines)
+	void Vision::drawVisualLines(const vector<HoughVisualLine>& lines, Gradient& g)
 {
 #ifdef OFFLINE
-    if (thresh->debugVisualLines){
+    if (true){
         vector<HoughVisualLine>::const_iterator line;
         int color = 5;
         for (line = lines.begin(); line != lines.end(); line++){
             pair<HoughLine, HoughLine> lp = line->getHoughLines();
-            drawHoughLine(lp.first, color);
-            drawHoughLine(lp.second, color);
+            VisualLine *vl = new VisualLine(lp.first, lp.second, g);
+			drawLine(vl->getStartpoint(), vl->getEndpoint(), color);
             color++;
+			cout << "start: " << vl->getStartpoint() << " end: " << vl->getEndpoint() << endl;
         }
     }
 #endif

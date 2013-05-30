@@ -19,6 +19,7 @@
 
 #ifndef _Vision_h_DEFINED
 #define _Vision_h_DEFINED
+#define OFFLINE
 
 // c++ headers
 #include <sstream>
@@ -123,7 +124,7 @@ public:
     void drawLine(int x, int y, int x1, int y1, int c);
     void drawPoint(int x, int y, int c);
     void drawRect(int left, int top, int width, int height, int c);
-    void drawVisualLines(const std::vector<HoughVisualLine>& lines);
+    void drawVisualLines(const std::vector<HoughVisualLine>& lines, Gradient& g);
     void drawX(int x, int y, int c);
 
 

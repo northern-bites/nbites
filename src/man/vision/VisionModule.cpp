@@ -59,6 +59,7 @@ void VisionModule::run_()
 	top = new messages::ThresholdImage(vision->thresh->thresholded, 320, 240, 320);
 	bot = new messages::ThresholdImage(vision->thresh->thresholdedBottom, 320, 240, 320);
 
+
 	topOutPic.setMessage(top);
 	botOutPic.setMessage(bot);
 		
