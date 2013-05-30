@@ -1,10 +1,10 @@
-
 #ifndef _Profiler_h_DEFINED
 #define _Profiler_h_DEFINED
 
 #include <algorithm>
 #include <boost/shared_ptr.hpp>
 #include "Common.h"
+#include "DebugConfig.h"
 class Profiler;
 
 #ifdef USE_TIME_PROFILING
@@ -19,15 +19,16 @@ class Profiler;
 
 enum ProfiledComponent {
     P_MAIN = 0,
-    P_GETIMAGE,
-    P_DQBUF,
-    P_ACQUIRE_IMAGE,
-    P_QBUF,
+
+    P_TOP_DQBUF,
+    P_TOP_ACQUIRE_IMAGE,
+
+    P_BOT_DQBUF,
+    P_BOT_ACQUIRE_IMAGE,
 
     P_VISION,
     P_TRANSFORM,
     P_THRESHRUNS,
-    P_THRESHOLD,
     P_FGHORIZON,
     P_RUNS,
     P_OBJECT,
@@ -51,18 +52,11 @@ enum ProfiledComponent {
     P_FIT_UNUSED,
     P_INTERSECT_LINES,
 
-    P_MEMORY_VISION,
-    P_MEMORY_VISION_SENSORS,
-    P_MEMORY_MOTION_SENSORS,
-    P_MEMORY_IMAGE,
-
     P_LOC,
     P_MCL,
     P_LOGGING,
 
     P_PYTHON,
-    P_PYUPDATE,
-    P_PYRUN,
 
     P_LIGHTS,
 
@@ -81,7 +75,7 @@ enum ProfiledComponent {
     P_ENACTOR,
 
     P_COMM,
-    P_TOOLCONNECT,
+
     P_ROBOGUARDIAN,
 
     P_TOTAL

@@ -1,4 +1,5 @@
 #include "LocalizationModule.h"
+#include "Profiler.h"
 
 namespace man
 {
@@ -67,6 +68,9 @@ namespace man
 
     void LocalizationModule::run_()
     {
+        // Profiler
+        PROF_ENTER(P_LOC);
+
         // Get new information
         motionInput.latch();
         visionInput.latch();
@@ -74,6 +78,9 @@ namespace man
 
         // Update the filter
         update();
+
+        // Profiler
+        PROF_EXIT(P_LOC);
     }
 
     } // namespace localization

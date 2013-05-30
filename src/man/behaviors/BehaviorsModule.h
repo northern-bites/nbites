@@ -3,8 +3,6 @@
 #include <Python.h>
 #include <boost/shared_ptr.hpp>
 
-//#include "Profiler.h"
-
 #include "PyConstants.h"
 #include "RoboGrams.h"
 #include "PyInterface.h"

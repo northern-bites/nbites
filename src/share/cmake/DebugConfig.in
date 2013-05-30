@@ -32,6 +32,20 @@
 #   undef DEBUG_LOGGING
 #endif
 
+#define PROFILE_${PROFILE}
+#ifdef  PROFILE_ON
+#   define USE_TIME_PROFILING
+#else
+#   undef  USE_TIME_PROFILING
+#endif
+
+#define USING_LAB_FIELD_${USING_LAB_FIELD}
+#ifdef  USING_LAB_FIELD_ON
+#   define USING_LAB_FIELD
+#else
+#   undef USING_LAB_FIELD
+#endif
+
 #define USE_LOGGING_${USE_LOGGING}
 #ifdef  USE_LOGGING_ON
 #   define USE_LOGGING
@@ -88,9 +102,16 @@
 #   undef LOG_LOCALIZATION
 #endif
 
-#define LOG_OBSERVATIONS_${LOG_LOCALIZATION}
+#define LOG_OBSERVATIONS_${LOG_OBSERVATIONS}
 #ifdef  LOG_OBSERVATIONS_ON
 #   define LOG_OBSERVATIONS
 #else
 #   undef LOG_OBSERVATIONS
+#endif
+
+#define LOG_ODOMETRY_${LOG_ODOMETRY}
+#ifdef  LOG_ODOMETRY_ON
+#   define LOG_ODOMETRY
+#else
+#   undef LOG_ODOMETRY
 #endif

@@ -71,8 +71,7 @@ def approachBall(player):
         else:
             player.brain.nav.chaseBall(fast = True)
 
-    if (transitions.shouldFindBall(player) or
-        transitions.shouldSpinToBall(player)):
+    if (transitions.shouldFindBall(player)):
         return player.goLater('chase')
 
     if (transitions.shouldPrepareForKick(player) or

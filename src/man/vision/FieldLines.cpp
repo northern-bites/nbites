@@ -1,29 +1,9 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-
 /* Field Lines class */
 
 #include <algorithm>    // for sort() and merge()
 #include <boost/shared_ptr.hpp>
 
+#include "Profiler.h"
 #include "FieldLines.h"
 using namespace std;
 
@@ -139,13 +119,13 @@ void FieldLines::lineLoop()
 {
     vector<linePoint> vertLinePoints, horLinePoints;
 
-
+    PROF_ENTER(P_VERT_LINES);
     findVerticalLinePoints(vertLinePoints);
+    PROF_EXIT(P_VERT_LINES);
 
-
-
+    PROF_ENTER(P_HOR_LINES);
     findHorizontalLinePoints(horLinePoints);
-
+    PROF_EXIT(P_HOR_LINES);
 
     sort(horLinePoints.begin(), horLinePoints.end());
 
@@ -155,30 +135,29 @@ void FieldLines::lineLoop()
           horLinePoints.begin(), horLinePoints.end(),
           linePoints.begin());
 
-
+    PROF_ENTER(P_CREATE_LINES);
     createLines(linePoints);
+    PROF_EXIT(P_CREATE_LINES);
 
-
-
-	joinLines();
-
+    PROF_ENTER(P_JOIN_LINES);
+    joinLines();
+    PROF_EXIT(P_JOIN_LINES);
 
     extendLines(linesList);
 
     // Only those linePoints which were not used in any line remain within the
     // linePoints list
     // unusedPoints is used by vision to draw points on the screen
-
+    PROF_ENTER(P_FIT_UNUSED);
     unusedPointsList = linePoints;
-	fitUnusedPoints(linesList, unusedPointsList);
+    fitUnusedPoints(linesList, unusedPointsList);
 
+    removeDuplicateLines();
+    PROF_EXIT(P_FIT_UNUSED);
 
-	removeDuplicateLines();
-
-
+    PROF_ENTER(P_INTERSECT_LINES);
     cornersList = intersectLines();
-
-
+    PROF_EXIT(P_INTERSECT_LINES);
 }
 
 // While lineLoop is called before object recognition so that ObjectFragments

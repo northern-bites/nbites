@@ -53,9 +53,3 @@ set( INSTALL_LOCATION
   CACHE STRING
   "The folder on the robot where the code will end up."
 )
-
-option(
-  USING_LAB_FIELD
-  "Turn on if we are in the lab and not on a full-size field"
-  OFF
-  )
