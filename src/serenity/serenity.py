@@ -48,6 +48,7 @@ while(True):
 
     try:
         # Check GitHub once an hour.
+        print "Serenity is sleeping for an hour..."
         time.sleep(3600)
 
         print "Serenity Checking GitHub at " + time.strftime("%X")
