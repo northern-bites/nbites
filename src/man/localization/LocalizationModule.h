@@ -26,49 +26,49 @@
 
 namespace man
 {
-    namespace localization
-    {
+namespace localization
+{
+/**
+ * @class LocalizationModule
+ */
+class LocalizationModule : public portals::Module
+{
+public:
+    LocalizationModule();
+    ~LocalizationModule();
+
+    /** In Portals **/
+    portals::InPortal<messages::RobotLocation> motionInput;
+    portals::InPortal<messages::VisionField> visionInput;
+    portals::InPortal<messages::RobotLocation> resetInput;
+
+    /** Out Portals **/
+    portals::OutPortal<messages::RobotLocation> output;
+    portals::OutPortal<messages::ParticleSwarm> particleOutput;
+
+    float lastMotionTimestamp;
+    float lastVisionTimestamp;
+
+protected:
     /**
-     * @class LocalizationModule
+     * @brief Update inputs, calculate new state of the filter
      */
-    class LocalizationModule : public portals::Module
-    {
-    public:
-        LocalizationModule();
-        ~LocalizationModule();
+    void run_();
 
-        /** In Portals **/
-        portals::InPortal<messages::RobotLocation> motionInput;
-        portals::InPortal<messages::VisionField> visionInput;
-        portals::InPortal<messages::RobotLocation> resetInput;
+    /**
+     * @brief Updates the current robot pose estimate given
+     *        the most recent motion control inputs and
+     *        measurements taken.
+     */
+    void update();
 
-        /** Out Portals **/
-        portals::OutPortal<messages::RobotLocation> output;
-        portals::OutPortal<messages::ParticleSwarm> particleOutput;
+    ParticleFilter * particleFilter;
+    long long lastReset;
 
-        float lastMotionTimestamp;
-        float lastVisionTimestamp;
-
-    protected:
-        /**
-         * @brief Update inputs, calculate new state of the filter
-         */
-        void run_();
-
-        /**
-         * @brief Updates the current robot pose estimate given
-         *        the most recent motion control inputs and
-         *        measurements taken.
-         */
-        void update();
-
-        ParticleFilter * particleFilter;
-        long long lastReset;
-
-        // Previous information
-        messages::RobotLocation lastOdometry;
-        messages::RobotLocation curOdometry;
-        messages::RobotLocation deltaOdometry;
-    };
-    } // namespace localization
+    // Previous information
+    messages::RobotLocation lastOdometry;
+    messages::RobotLocation curOdometry;
+    messages::RobotLocation deltaOdometry;
+};
+} // namespace localization
 } // namespace man

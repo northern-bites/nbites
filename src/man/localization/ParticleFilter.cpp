@@ -1,9 +1,8 @@
 #include "ParticleFilter.h"
 
-namespace man
-{
-namespace localization
-{
+namespace man {
+namespace localization {
+
 ParticleFilter::ParticleFilter(ParticleFilterParams params)
     : parameters(params)
 {
