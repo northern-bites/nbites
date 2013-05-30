@@ -48,10 +48,12 @@ void ImageConverterModule::run_()
     PackedImage16 tempOutput16(tempBuffer, 320, 3*240, 320);
     PackedImage8 tempOutput8(tempBuffer, 320, (3*2 + 1)*240, 320);
 
+    PROF_ENTER(P_ACQUIRE_IMAGE);
     ImageAcquisition::acquire_image_fast(table,
                                          params,
                                          yuv.pixelAddress(0, 0),
                                          tempOutput16.pixelAddress(0, 0));
+    PROF_EXIT(P_ACQUIRE_IMAGE);
 
     // First 320x240 image = all the Y values in imageIn.message()
     PackedImage16 image = tempOutput16.window(0, 0, 320, 240);

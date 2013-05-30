@@ -21,10 +21,9 @@ enum ProfiledComponent {
     P_MAIN = 0,
 
     P_TOP_DQBUF,
-    P_TOP_ACQUIRE_IMAGE,
-
     P_BOT_DQBUF,
-    P_BOT_ACQUIRE_IMAGE,
+
+    P_ACQUIRE_IMAGE,
 
     P_VISION,
     P_TRANSFORM,
