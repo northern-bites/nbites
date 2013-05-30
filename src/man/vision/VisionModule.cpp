@@ -188,6 +188,7 @@ void VisionModule::updateVisionField() {
 
             field_point->set_x((**j).getFieldX());
             field_point->set_y((**j).getFieldY());
+            field_point->set_field_angle((**j).getFieldAngle());
         }
 
         const std::vector<cornerID> p_id = i->getIDs();

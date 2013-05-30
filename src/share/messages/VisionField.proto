@@ -15,6 +15,7 @@ message Point
 {
         optional float x = 1;
         optional float y = 2;
+	optional float field_angle = 3; //Used only for corners... HACK
 }
 
 message VisualDetection
