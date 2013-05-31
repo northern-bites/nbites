@@ -13,8 +13,9 @@
 #include "image/Color.h"
 #include "ColorSpace.h"
 
-namespace qtool {
+namespace tool {
 namespace colorcreator {
+  using color::ColorSpace;
 
 class ColorSpaceWidget: public QWidget {
 
@@ -24,8 +25,8 @@ public:
     static const float FLOAT_SLIDER_SCALE = 256.0f;
 
 public:
-    ColorSpaceWidget(ColorSpace* colorSpace = ColorSpace::NullInstance(),
-                     QWidget* parent = NULL);
+    ColorSpaceWidget(ColorSpace* colorSpace, QWidget* parent = NULL);
+
     ~ColorSpaceWidget() {}
 
     void setColorSpace(ColorSpace* _colorSpace);
@@ -35,7 +36,7 @@ protected slots:
 
 private:
     QMap<QSlider*, ColorSpace::Channel> sliders;
-    ColorSpace* colorSpace;
+	ColorSpace* colorSpace;
 };
 
 }

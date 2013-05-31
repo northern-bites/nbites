@@ -7,51 +7,68 @@
 #include <QCheckBox>
 #include <QMouseEvent>
 
-namespace tool {
-namespace colorcreator {
+typedef unsigned char byte;
 
-  //using namespace qtool::data;
-  //using namespace qtool::image;
-  //using namespace man::corpus;
-  //using namespace man::memory;
+namespace tool {
+namespace colorcreator{
 
 static const int BOX = 5;
 
-  //ColorCalibrate(DataManager::ptr dataManager, QWidget *parent) :
   ColorCalibrate::ColorCalibrate(QWidget *parent) :
         QWidget(parent), 
-		//dataManager(dataManager), 
-		imageTabs(new QTabWidget(this)){
-        //topImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::TOP,
+		imageTabs(new QTabWidget(this)),
+	//topImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::TOP,
 		//                                 BMPYUVImage::RGB, this)),
-//bottomImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::BOTTOM,
-		//                          BMPYUVImage::RGB, this)),
-        // topChannelImage(topImage, this),
-        // bottomChannelImage(bottomImage, this),
-        // currentColorSpace(&colorSpace[STARTING_COLOR]),
-        // colorSpaceWidget(currentColorSpace, this),
-        // colorWheel(currentColorSpace, this) 
+	//bottomImage(new BMPYUVImage(dataManager->getMemory()->get<MRawImages>(), Camera::BOTTOM,
+	//                          BMPYUVImage::RGB, this)),
+	// topChannelImage(topImage, this),
+	// bottomChannelImage(bottomImage, this),
+		currentColorSpace(&colorSpace[STARTING_COLOR]),
+		colorSpaceWidget(currentColorSpace, this),
+		colorWheel(currentColorSpace, this),
+
+		currentCamera(Camera::TOP),
+		topConverter(Camera::TOP),
+		bottomConverter(Camera::BOTTOM),
+		topDisplay(this),
+		bottomDisplay(this),
+		topImageListener(this),
+		bottomImageListener(this),
+		topImage(base()),
+		bottomImage(base())
+  {
 
 	mainLayout = new QVBoxLayout;
   
 	topLayout = new QHBoxLayout;
 
+	//Adds modules to diagram then wires them together
+	subdiagram.addModule(topConverter);
+	subdiagram.addModule(bottomConverter);
+	subdiagram.addModule(topImageListener);
+	subdiagram.addModule(bottomImageListener);
+
+	topConverter.imageIn.wireTo(&topImage, true);
+	bottomConverter.imageIn.wireTo(&bottomImage, true);
+	topImageListener.imageIn.wireTo(&topImage, true);
+	bottomImageListener.imageIn.wireTo(&bottomImage, true);
+
     //connect all the color spaces to update the thresholded
     //image when their parameters change
-    // for (int i = 0; i < image::NUM_COLORS; i++) {
-    //     connect(&colorSpace[i], SIGNAL(parametersChanged()),
-    //             this, SLOT(updateThresholdedImage()));
-    // }
+    for (int i = 0; i < image::Color::NUM_COLORS; i++) {
+        connect(&colorSpace[i], SIGNAL(parametersChanged()),
+                this, SLOT(updateThresholdedImage()));
+    }
 
 	imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     topLayout->addWidget(imageTabs);
 	thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
 	topLayout->addWidget(&thresholdedImagePlaceholder);
 
-    // QObject::connect(&topChannelImage, SIGNAL(mouseClicked(int, int, int, bool)),
-    //                  this, SLOT(canvassClicked(int, int, int, bool)));
-    // QObject::connect(&bottomChannelImage, SIGNAL(mouseClicked(int, int, int, bool)),
-    //                  this, SLOT(canvassClicked(int, int, int, bool)));
+    QObject::connect(&topDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+                      this, SLOT(canvassClicked(int, int, int, bool)));
+    QObject::connect(&bottomDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+                      this, SLOT(canvassClicked(int, int, int, bool)));
 
 
     imageTabs->addTab(new QWidget, "Top Image");
@@ -71,19 +88,18 @@ static const int BOX = 5;
 	leftJunk = new QVBoxLayout;
 
     //set up the color selection combo box
-    // for (int i = 0; i < image::NUM_COLORS; i++) {
-	//   colorSelect.addItem(image::Color_label[i].c_str());
-    // }
-	colorSelect.addItem("PLACE");
-	colorSelect.addItem("HOLDER");
+	for (int i = 0; i < image::Color::NUM_COLORS; i++) {
+	  colorSelect.addItem(image::Color_label[i].c_str());
+    }
+
     colorSelect.setCurrentIndex(0);
-    // connect(&colorSelect, SIGNAL(currentIndexChanged(int)),
-    //         this, SLOT(selectColorSpace(int)));
+    connect(&colorSelect, SIGNAL(currentIndexChanged(int)),
+            this, SLOT(selectColorSpace(int)));
 	leftJunk->addWidget(&colorSelect);
-    //leftJunk->addWidget(&colorWheel);
+   leftJunk->addWidget(&colorWheel);
 
 	bottomLayout->addLayout(leftJunk);
-	//bottomLayout->addWidget(&colorSpaceWidget);
+	bottomLayout->addWidget(&colorSpaceWidget);
 
     loadSlidersBtn.setText("Load Sliders");
     colorButtons->addWidget(&loadSlidersBtn);
@@ -104,7 +120,7 @@ static const int BOX = 5;
 
     QCheckBox* fullColors = new QCheckBox(tr("All colors"));
     colorButtons->addWidget(fullColors);
-    //connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
+    connect(fullColors, SIGNAL(toggled(bool)), this, SLOT(setFullColors(bool)));
 	displayAllColors = false;
 
 	mainLayout->addLayout(topLayout);
@@ -117,191 +133,209 @@ static const int BOX = 5;
 	lastClickedY = -BOX;
 }
 
-// // flip between one and all colors
-// 	void ColorCalibrate::setFullColors(bool state) {
-// 		displayAllColors = !displayAllColors;
-// 		updateThresholdedImage();
-// 	}
+// flip between one and all colors
+	void ColorCalibrate::setFullColors(bool state) {
+		displayAllColors = !displayAllColors;
+		updateThresholdedImage();
+	}
 
-// void ColorCalibrate::canvassClicked(int x, int y, int brushSize, bool leftClick) {
-// 	std::cout << "Clicked " << x << " " << y << " " << std::endl;
-//     BMPYUVImage* image;
+void ColorCalibrate::canvassClicked(int x, int y, int brushSize, bool leftClick) {
+	std::cout << "Clicked " << x << " " << y << " " << std::endl;
+	messages::YUVImage image;
 
-//     if (currentImage == Camera::TOP) {
-//         image = topImage;
-//     } else {
-//         image = bottomImage;
-//     }
-
-// 	byte yi = image->getYUVImage()->getY(x, y);
-// 	byte u = image->getYUVImage()->getU(x, y);
-// 	byte v = image->getYUVImage()->getV(x, y);
-
-// 	std::cout << "YUV " << (int)yi << " " << (int)u << " " <<
-// 		(int)v << std::endl;
-
-// 	Color color;
-// 	color.setYuv(yi, u, v);
-// 	std::cout << "HSZ " << color.getH() << " " << color.getS() <<
-// 		" " << color.getZ() << std::endl;
-
-// 	currentColorSpace->verboseContains(color);
-// 	if (!leftClick) {
-// 		std::cout << "Right click " << std::endl;
-// 		bool changed = currentColorSpace->expandToFit(color);
-// 		if (changed) {
-// 			colorSpaceWidget.setColorSpace(currentColorSpace);
-// 		}
-// 	}
-// 	lastClickedX = x;
-// 	lastClickedY = y;
-// 	updateThresholdedImage();
-// 	std::cout << std::endl;
-// }
-
-// void ColorCalibrate::selectColorSpace(int index) {
-//     currentColorSpace = &colorSpace[index];
-//     colorWheel.setColorSpace(currentColorSpace);
-//     colorSpaceWidget.setColorSpace(currentColorSpace);
-// 	if (!displayAllColors) {
-// 		updateThresholdedImage();
-// 	}
-// }
-
-// // TODO: Ideally we'd want to have this in a separate class
-// // or unify this with our regular thresholding process (maybe
-// // by converting the color space parameters to a table continuously?
-// 	void ColorCalibrate::updateThresholdedImage() {
-
-//     BMPYUVImage* image;
-
-//     if (currentImage == Camera::TOP) {
-//         image = topImage;
-//     } else {
-//         image = bottomImage;
-//     }
-
-//     //check for size changes and make sure
-//     //the thresholded image is the same size as the image
-//     if (thresholdedImage.width() != image->getWidth()
-//             || thresholdedImage.height() != image->getHeight()) {
-//         //TODO: should be ARGB premultiplied?
-//         thresholdedImage = QImage(image->getWidth(),
-//                                   image->getHeight(),
-//                                   QImage::Format_RGB32);
-//     }
-
-//     //threshold the image
-//     for (int j = 0; j < thresholdedImage.height(); j++) {
-//         QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
-//         const YUVImage* yuvImage = image->getYUVImage();
-
-//         const byte** yImage = yuvImage->getYImage();
-//         const byte** uImage = yuvImage->getUImage();
-//         const byte** vImage = yuvImage->getVImage();
-
-//         for (int i = 0; i < thresholdedImage.width(); i++) {
-//             Color color;
-//             color.setYuv(yImage[i][j], uImage[i][j], vImage[i][j]);
-//             //default color
-//             thresholdedImageLine[i] = image::Grey;
-//             //temporary variables for blending colors
-//             int count = 0;
-//             long long tempColor = 0;
-//             for (int c = 0; c < image::NUM_COLORS; c++) {
-//                 if (colorSpace[c].contains(color) &&
-// 					(displayAllColors || currentColorSpace == &colorSpace[c])) {
-//                     //blend colors in by averaging them
-//                     tempColor *= count;
-//                     tempColor += image::Color_RGB[c];
-//                     count++;
-//                     tempColor /= count;
-//                 }
-//             }
-// 			// lame hack to show a "cursor" on the thresholded image
-// 			// TODO do a true cursor mirroring on the thresholded image
-// 			if ((abs(j - lastClickedY) < BOX) && (abs(i - lastClickedX) < BOX)) {
-// 				tempColor = image::Color_RGB[3];
-// 			}
-//             if (tempColor) {
-//                 thresholdedImageLine[i] = (QRgb) tempColor;
-//             }
-//         }
-//     }
-//     //set it
-//     thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
-// }
+    if (currentCamera == Camera::TOP) {
+	  image = topImageIn.message();
+    } else {
+	  image = bottomImageIn.message();
+    }
 
 
-// void ColorCalibrate::loadColorSpaces(QString filename) {
+	const messages::MemoryImage8 yImage = image.yImage();
+	const messages::MemoryImage8 uImage = image.uImage();
+	const messages::MemoryImage8 vImage = image.vImage();
 
-//     QFile dataFile(filename);
-//     qDebug() << "Attempt to open filename = " << filename << endl;
-//     if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text))
-//     {
-//         qDebug() << "Succeed" << endl;
-//         QString nextString;
-//         QTextStream dataFileStream(&dataFile);
+	byte yi = (byte)image.yImage().getPixel(x, y);
+	byte u = (byte)image.uImage().getPixel(x, y);
+	byte v = (byte)image.vImage().getPixel(x, y);
 
-//         //_____FOR_FORMATTING____//
-//         //read the first line
-//         dataFileStream.readLine();
+	std::cout << "YUV " << (int)yi << " " << (int)u << " " <<
+		(int)v << std::endl;
 
-//         for (int i = 0; i < image::NUM_COLORS; i++)
-//         {
-//             //read the dummy label
-//             dataFileStream >> nextString;
-//             float parameters[ColorSpace::NUM_CHANNELS];
-//             for (int j=0; j < ColorSpace::NUM_CHANNELS; j++)
-//             {
-//                 dataFileStream >> nextString;
-//                 parameters[j] = nextString.toFloat();
-//             }
-//             colorSpace[i].setParametersSilently(parameters);
-//         }
-//     }
-//     //reset to the default color space
-//     colorSelect.setCurrentIndex(STARTING_COLOR);
-//     selectColorSpace(STARTING_COLOR);
-//     updateThresholdedImage();
-// }
+	image::Color color;
+	color.setYuv(yi, u, v);
+	std::cout << "HSZ " << color.getH() << " " << color.getS() <<
+		" " << color.getZ() << std::endl;
 
-// void ColorCalibrate::writeColorSpaces(QString filename) {
+	currentColorSpace->verboseContains(color);
+	if (!leftClick) {
+		std::cout << "Right click " << std::endl;
+		bool changed = currentColorSpace->expandToFit(color);
+		if (changed) {
+			colorSpaceWidget.setColorSpace(currentColorSpace);
+		}
+	}
+	lastClickedX = x;
+	lastClickedY = y;
+	updateThresholdedImage();
+	std::cout << std::endl;
+}
 
-//     //Create the file to store the current values
-//     QFile newFile(filename);
-//     if (newFile.open(QIODevice::WriteOnly | QIODevice::Text))
-//     {
-//         QTextStream newFileStream(&newFile);
+void ColorCalibrate::selectColorSpace(int index) {
+    currentColorSpace = &colorSpace[index];
+    colorWheel.setColorSpace(currentColorSpace);
+    colorSpaceWidget.setColorSpace(currentColorSpace);
+	if (!displayAllColors) {
+		updateThresholdedImage();
+	}
+}
 
-//         //____FOR_FORMATTING____//
-//         //Write the first line
-//         for (int i = 0; i < ColorSpace::NUM_CHANNELS; i++) {
-//             newFileStream << fltChannel_names[i].c_str() << " ";
-//         }
-//         newFileStream << endl;
+// TODO: Ideally we'd want to have this in a separate class
+// or unify this with our regular thresholding process (maybe
+// by converting the color space parameters to a table continuously?
+	void ColorCalibrate::updateThresholdedImage() {
 
-//         for (int i = 0; i < image::NUM_COLORS; i++)
-//         {
-//             newFileStream << Color_label[i].c_str() << " ";
-//             for (int j = 0; j < ColorSpace::NUM_CHANNELS; j++) {
-//                 newFileStream << colorSpace[i].getParameter(ColorSpace::Channel(j)) << " ";
-//             }
-//             newFileStream << endl;
-//         }
-//     }
-// }
+    messages::YUVImage image;
 
-// void ColorCalibrate::imageTabSwitched(int) {
-//     if (imageTabs->currentWidget() == &topChannelImage) {
-//         currentImage = Camera::TOP;
-//         this->updateThresholdedImage();
-//     }
-//     if (imageTabs->currentWidget() == &bottomChannelImage) {
-//         currentImage = Camera::BOTTOM;
-//         this->updateThresholdedImage();
-//     }
-// }
+    if (currentCamera == Camera::TOP) {
+	  image = topImageIn.message();
+    } else {
+	  image = bottomImageIn.message();
+    }
+
+    //check for size changes and make sure
+    //the thresholded image is the same size as the image
+    if (thresholdedImage.width() != image.width()
+            || thresholdedImage.height() != image.height()) {
+        //TODO: should be ARGB premultiplied?
+        thresholdedImage = QImage(image.width(),
+                                  image.height(),
+                                  QImage::Format_RGB32);
+    }
+
+	//const messages::YUVImage* yuvImage = image->getYUVImage();
+
+	const messages::MemoryImage8 yImage = image.yImage();
+	const messages::MemoryImage8 uImage = image.uImage();
+	const messages::MemoryImage8 vImage = image.vImage();
+    //threshold the image
+    for (int j = 0; j < thresholdedImage.height(); j++) {
+        QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
+    
+        for (int i = 0; i < thresholdedImage.width(); i++) {
+		  image::Color color;
+		  color.setYuv((byte)yImage.getPixel(i,j), (byte)uImage.getPixel(i,j),
+					   (byte)vImage.getPixel(i,j));
+            //default color
+            thresholdedImageLine[i] = image::Color::Grey;
+            //temporary variables for blending colors
+            int count = 0;
+            long long tempColor = 0;
+            for (int c = 0; c < image::Color::NUM_COLORS; c++) {
+                if (colorSpace[c].contains(color) &&
+					(displayAllColors || currentColorSpace == &colorSpace[c])) {
+                    //blend colors in by averaging them
+                    tempColor *= count;
+                    tempColor += image::Color_RGB[c];
+                    count++;
+                    tempColor /= count;
+                }
+            }
+			// lame hack to show a "cursor" on the thresholded image
+			// TODO do a true cursor mirroring on the thresholded image
+			if ((abs(j - lastClickedY) < BOX) && (abs(i - lastClickedX) < BOX)) {
+			  tempColor = image::Color_RGB[3];
+			}
+            if (tempColor) {
+                thresholdedImageLine[i] = (QRgb) tempColor;
+            }
+        }
+    }
+    //set it
+    thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
+}
+
+  void ColorCalibrate::run_()
+  {
+	topImageIn.latch();
+	bottomImageIn.latch();
+
+	topImage.setMessage(portals::Message<messages::YUVImage>(
+										   &bottomImageIn.message()));
+	bottomImage.setMessage(portals::Message<messages::YUVImage>(
+										   &bottomImageIn.message()));
+  }
+
+
+void ColorCalibrate::loadColorSpaces(QString filename) {
+
+    QFile dataFile(filename);
+    qDebug() << "Attempt to open filename = " << filename << endl;
+    if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Succeed" << endl;
+        QString nextString;
+        QTextStream dataFileStream(&dataFile);
+
+        //_____FOR_FORMATTING____//
+        //read the first line
+        dataFileStream.readLine();
+
+        for (int i = 0; i < image::Color::NUM_COLORS; i++)
+        {
+            //read the dummy label
+            dataFileStream >> nextString;
+            float parameters[ColorSpace::NUM_CHANNELS];
+            for (int j=0; j < ColorSpace::NUM_CHANNELS; j++)
+            {
+                dataFileStream >> nextString;
+                parameters[j] = nextString.toFloat();
+            }
+            colorSpace[i].setParametersSilently(parameters);
+        }
+    }
+    //reset to the default color space
+    colorSelect.setCurrentIndex(STARTING_COLOR);
+    selectColorSpace(STARTING_COLOR);
+    updateThresholdedImage();
+}
+
+void ColorCalibrate::writeColorSpaces(QString filename) {
+
+    //Create the file to store the current values
+    QFile newFile(filename);
+    if (newFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        QTextStream newFileStream(&newFile);
+
+        //____FOR_FORMATTING____//
+        //Write the first line
+        for (int i = 0; i < ColorSpace::NUM_CHANNELS; i++) {
+		  newFileStream << color::fltChannel_names[i].c_str() << " ";
+        }
+        newFileStream << endl;
+
+        for (int i = 0; i < image::Color::NUM_COLORS; i++)
+        {
+		  newFileStream << image::Color_label[i].c_str() << " ";
+            for (int j = 0; j < ColorSpace::NUM_CHANNELS; j++) {
+                newFileStream << colorSpace[i].
+				  getParameter(ColorSpace::Channel(j)) << " ";
+            }
+            newFileStream << endl;
+        }
+    }
+}
+
+void ColorCalibrate::imageTabSwitched() {
+    if (imageTabs->currentWidget() == &topDisplay) {
+        currentCamera = Camera::TOP;
+        this->updateThresholdedImage();
+    }
+    if (imageTabs->currentWidget() == &bottomDisplay) {
+        currentCamera = Camera::BOTTOM;
+        this->updateThresholdedImage();
+    }
+}
 
 void ColorCalibrate::loadSlidersBtnPushed() {
   //QString base_directory = QString(NBITES_DIR) + "/data/sliders";
@@ -326,15 +360,15 @@ void ColorCalibrate::saveSlidersBtnPushed() {
     //this->writeColorSpaces(filename);
 }
 
-// void ColorCalibrate::saveColorTableBtnPushed() {
-//     QString base_directory = QString("~/nbites") + "/data/tables";
-//     QString filename =
-//             QFileDialog::getSaveFileName(this,
-//                     tr("Save Color Table to File"),
-//                     base_directory + "/new_table.mtb",
-//                     tr("Color Tables(*.mtb)"));
-//     ColorTable::writeFromSliders(filename, colorSpace);
-// }
+void ColorCalibrate::saveColorTableBtnPushed() {
+    QString base_directory = QString("~/nbites") + "/data/tables";
+    QString filename =
+            QFileDialog::getSaveFileName(this,
+                    tr("Save Color Table to File"),
+                    base_directory + "/new_table.mtb",
+                    tr("Color Tables(*.mtb)"));
+	color::ColorTable::writeFromSliders(filename, colorSpace);
+}
 
 }
 }

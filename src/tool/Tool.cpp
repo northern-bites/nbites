@@ -16,7 +16,7 @@ Tool::Tool(const char* title) :
     selector(),
     logView(this),
     tableCreator(this),
-	colorCalibrate(this),
+	//	colorCalibrate(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),

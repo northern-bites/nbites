@@ -1,15 +1,17 @@
 
 #include "ColorWheel.h"
+#include "image/Color.h"
 
 #include "NBMath.h"
 #include "image/Color.h"
 #include <cmath>
 #include <assert.h>
 
-namespace qtool {
+namespace tool {
 namespace colorcreator {
 
-using namespace qtool::image;
+  //using namespace qtool::image;
+  using color::ColorSpace;
 
 ColorWheel::ColorWheel(ColorSpace* _colorSpace, QWidget* parent) :
         QWidget(parent), colorSpace(NULL),
@@ -67,7 +69,7 @@ void ColorWheel::updateWheel() {
                 assert(0 <= h);
                 assert(h <= 1);
 
-                Color color;
+				image::Color color;
                 color.setHsz(h, s, zSlice);
                 if (colorSpace->contains(color)) {
                     qImageLine[j + DEFAULT_SIZE/2] =  color.getRGB();

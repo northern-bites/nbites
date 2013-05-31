@@ -15,20 +15,20 @@
 #include <QLayout>
 #include "ColorSpace.h"
 
-namespace qtool {
+namespace tool {
 namespace colorcreator {
+  using color::ColorSpace;
 
 class ColorWheel : public QWidget {
     Q_OBJECT
 
-public:
+	  //public:
     static const int DEFAULT_SIZE = 200;
     static const int DEFAULT_RADIUS = 100;
     static const float ZSLICE_RANGE = 256.0f;
 
 public:
-    ColorWheel(ColorSpace* _colorSpace = ColorSpace::NullInstance(),
-               QWidget *parent = NULL);
+    ColorWheel(ColorSpace* _colorSpace, QWidget* parent = NULL);
     virtual ~ColorWheel() {}
 
     QSize minimumSizeHint() const { return sizeHint(); }
