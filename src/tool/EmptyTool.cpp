@@ -88,6 +88,20 @@ void EmptyTool::keyPressEvent(QKeyEvent * event)
     case Qt::Key_P:
         diagram.runBackward();
         break;
+    case Qt::Key_M:
+        diagram.runForward();
+        diagram.runForward();
+        diagram.runForward();
+        diagram.runForward();
+        diagram.runForward();
+        break;
+    case Qt::Key_BracketLeft:
+        diagram.runBackward();
+        diagram.runBackward();
+        diagram.runBackward();
+        diagram.runBackward();
+        diagram.runBackward();
+        break;
     default:
         QWidget::keyPressEvent(event);
     }
