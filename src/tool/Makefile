@@ -36,7 +36,7 @@ config:
 
 .PHONY: clean
 clean:
-	rm -r $(BUILD_DIR)/*
+	rm -rf $(BUILD_DIR)/*
 
 .PHONY: loc
 loc: build
@@ -49,3 +49,4 @@ vision: build
 	@echo "Running VisionTool executable."
 	@cd $(BUILD_DIR); \
 	./$(VISION_EXECUTABLE)
+
