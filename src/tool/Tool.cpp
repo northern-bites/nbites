@@ -100,6 +100,20 @@ void Tool::setUpModules()
                   << " two image logs." << std::endl;
     }
 
+    /** Color Calibrate Tab **/
+    if (diagram.connectToUnlogger<messages::YUVImage>(colorCalibrate.topImageIn,
+                                                      "top") &&
+        diagram.connectToUnlogger<messages::YUVImage>(colorCalibrate.bottomImageIn,
+                                                      "bottom"))
+    {
+        diagram.addModule(colorCalibrate);
+    }
+    else
+    {
+        std::cout << "Right now you can't use the color calibrator without"
+                  << " two image logs." << std::endl;
+    }
+
 
     /** FieldViewer Tab **/
     // Should add field view

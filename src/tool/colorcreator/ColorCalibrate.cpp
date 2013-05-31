@@ -26,14 +26,12 @@ static const int BOX = 5;
 		currentColorSpace(&colorSpace[STARTING_COLOR]),
 		colorSpaceWidget(currentColorSpace, this),
 		colorWheel(currentColorSpace, this),
-
 		currentCamera(Camera::TOP),
 		topConverter(Camera::TOP),
 		bottomConverter(Camera::BOTTOM),
 		topDisplay(this),
 		bottomDisplay(this),
-		topImageListener(this),
-		bottomImageListener(this),
+		thrDisplay(this),
 		topImage(base()),
 		bottomImage(base())
   {
@@ -45,13 +43,15 @@ static const int BOX = 5;
 	//Adds modules to diagram then wires them together
 	subdiagram.addModule(topConverter);
 	subdiagram.addModule(bottomConverter);
-	subdiagram.addModule(topImageListener);
-	subdiagram.addModule(bottomImageListener);
+	subdiagram.addModule(topDisplay);
+	subdiagram.addModule(bottomDisplay);
+	subdiagram.addModule(thrDisplay);
 
 	topConverter.imageIn.wireTo(&topImage, true);
 	bottomConverter.imageIn.wireTo(&bottomImage, true);
-	topImageListener.imageIn.wireTo(&topImage, true);
-	bottomImageListener.imageIn.wireTo(&bottomImage, true);
+	topDisplay.imageIn.wireTo(&topImage, true);
+	bottomDisplay.imageIn.wireTo(&bottomImage, true);
+	thrDisplay.imageIn.wireTo(&topConverter.thrImage);
 
     //connect all the color spaces to update the thresholded
     //image when their parameters change
@@ -65,23 +65,24 @@ static const int BOX = 5;
 	thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
 	topLayout->addWidget(&thresholdedImagePlaceholder);
 
-    QObject::connect(&topDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
-                      this, SLOT(canvassClicked(int, int, int, bool)));
-    QObject::connect(&bottomDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
-                      this, SLOT(canvassClicked(int, int, int, bool)));
+    connect(&topDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+			this, SLOT(canvassClicked(int, int, int, bool)));
+    connect(&bottomDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+			this, SLOT(canvassClicked(int, int, int, bool)));
 
 
-    imageTabs->addTab(new QWidget, "Top Image");
+    imageTabs->addTab(&topDisplay, "Top Image");
     //dataManager->connectSlot(&topChannelImage, SLOT(updateView()), "MRawImages");
 
-    imageTabs->addTab(new QWidget, "Bottom Image");
+    imageTabs->addTab(&bottomDisplay, "Bottom Image");
     //dataManager->connectSlot(&bottomChannelImage, SLOT(updateView()), "MRawImages");
 
     //update the threshold when the underlying image changes
     // dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
     // dataManager->connectSlot(this, SLOT(updateThresholdedImage()), "MRawImages");
 
-    connect(imageTabs, SIGNAL(currentChanged(int)), this, SLOT(imageTabSwitched(int)));
+    connect(imageTabs, SIGNAL(currentChanged(int)), 
+			this, SLOT(imageTabSwitched(int)));
 
     bottomLayout = new QHBoxLayout;
 	colorButtons = new QVBoxLayout;
@@ -181,6 +182,7 @@ void ColorCalibrate::canvassClicked(int x, int y, int brushSize, bool leftClick)
 }
 
 void ColorCalibrate::selectColorSpace(int index) {
+  std::cout << "I'm here!, I want index: " << index;
     currentColorSpace = &colorSpace[index];
     colorWheel.setColorSpace(currentColorSpace);
     colorSpaceWidget.setColorSpace(currentColorSpace);
@@ -201,6 +203,8 @@ void ColorCalibrate::selectColorSpace(int index) {
     } else {
 	  image = bottomImageIn.message();
     }
+
+	std::cout << "I'm in updateThresholdedImage() \n";
 
     //check for size changes and make sure
     //the thresholded image is the same size as the image
@@ -263,6 +267,8 @@ void ColorCalibrate::selectColorSpace(int index) {
 										   &bottomImageIn.message()));
 	bottomImage.setMessage(portals::Message<messages::YUVImage>(
 										   &bottomImageIn.message()));
+
+	updateThresholdedImage();
   }
 
 
@@ -326,7 +332,7 @@ void ColorCalibrate::writeColorSpaces(QString filename) {
     }
 }
 
-void ColorCalibrate::imageTabSwitched() {
+void ColorCalibrate::imageTabSwitched(int i) {
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;
         this->updateThresholdedImage();

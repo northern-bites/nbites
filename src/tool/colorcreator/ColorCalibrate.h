@@ -65,7 +65,7 @@ protected slots:
     void loadSlidersBtnPushed();
     void saveSlidersBtnPushed();
     void saveColorTableBtnPushed();
-    void imageTabSwitched();
+    void imageTabSwitched(int i);
 	void setFullColors(bool state);
     void canvassClicked(int x, int y, int brushSize, bool leftClick);
 
@@ -83,11 +83,9 @@ private:
 
 	 man::image::ImageConverterModule topConverter;
 	 man::image::ImageConverterModule bottomConverter;
-
-	 image::ImageDisplayModule topDisplay;
-	 image::ImageDisplayModule bottomDisplay;
-	 image::ImageDisplayListener topImageListener;
-	 image::ImageDisplayListener bottomImageListener;
+	 image::ImageDisplayListener topDisplay;
+	 image::ImageDisplayListener bottomDisplay;
+	 image::ThresholdedImageDisplayModule thrDisplay;
 
 	 portals::OutPortal<messages::YUVImage> topImage;
 	 portals::OutPortal<messages::YUVImage> bottomImage;
