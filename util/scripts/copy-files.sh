@@ -6,13 +6,19 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
-ADDR=$1
-UNAME=$2
+ROBOT=$1
+ROBOT_UNAME=$2
+ROBOCUP=robocup.bowdoin.edu:/mnt/research/robocup
+FOLDER=nao_files
 
-LIB_DIR=../../lib
+# Get the files from the server
+echo "Type username for RoboCup server, followed by [ENTER]"
+read SERVER_UNAME
+
+rsync -vr $SERVER_UNAME@$ROBOCUP/$FOLDER .
 
 # Copy important libraries to home folder
 echo "Copying necessary files to the robot."
-scp -r $LIB_DIR/nao/* ../audio/* setup-robot.sh ../config/* $UNAME@$ADDR:
+scp -r $FOLDER setup-robot.sh $ROBOT_UNAME@$ROBOT:
 
 echo "Now run setup-robot.sh ON THE ROBOT."
