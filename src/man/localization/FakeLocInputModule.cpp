@@ -227,4 +227,3 @@ void FakeLocInputModule::run_()
 
 } //namespace fakeInput
 } // namespace man
-n
