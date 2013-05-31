@@ -1,13 +1,18 @@
 # The makefile!
 
-# How to find the build dir from here
-BUILD_DIR = ../../build/tool
-# How to find the src dir from build
-SRC_DIR = ../../src/tool
+PROJECT_DIR  = $(PWD)/../..
+BUILD_DIR    = $(PROJECT_DIR)/build/tool
+SRC_DIR      = $(PROJECT_DIR)/src/tool
+GEN_MAKEFILE = $(BIN_DIR)/Makefile
 
-TOOLCHAIN = ../share/cmake/generic.cmake
+TOOLCHAIN    = ../share/cmake/generic.cmake
+FLAGS        = -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)
+
 EXECUTABLE = tool
-FLAGS = -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN) -DTOOL_EXECUTABLE=$(EXECUTABLE)
+LOC_EXECUTABLE = loc_tool
+VISION_EXECUTABLE = vision_tool
+
+
 
 .PHONY: build
 build:
@@ -16,8 +21,8 @@ build:
 	cmake $(FLAGS) $(SRC_DIR); \
 	$(MAKE) --no-print-directory
 
-.PHONY: run
-run: build
+.PHONY: tool
+tool: build
 	@echo "Running tool executable."
 	@cd $(BUILD_DIR); \
 	./$(EXECUTABLE)
@@ -32,3 +37,15 @@ config:
 .PHONY: clean
 clean:
 	rm -r $(BUILD_DIR)/*
+
+.PHONY: loc
+loc: build
+	@echo "Running LocTool executable."
+	@cd $(BUILD_DIR); \
+	./$(LOC_EXECUTABLE)
+
+.PHONY: vision
+vision: build
+	@echo "Running VisionTool executable."
+	@cd $(BUILD_DIR); \
+	./$(VISION_EXECUTABLE)
