@@ -9,6 +9,8 @@
 #include <linux/version.h>
 #include <bn/i2c/i2c-dev.h>
 
+#include "Profiler.h"
+
 namespace man {
 namespace image {
 
@@ -255,13 +257,13 @@ bool ImageTranscriber::setControlSetting(unsigned int id, int value) {
                 std::endl;
             return false;
         }
-	counter++;
-	if(counter > 10)
-	  {
+    counter++;
+    if(counter > 10)
+      {
           std::cerr << "CAMERA::Warning::Timeout while setting a parameter."
                     << std::endl;
-	    return false;
-	  }
+        return false;
+      }
     }
     return true;
 }
@@ -400,8 +402,25 @@ messages::YUVImage ImageTranscriber::getNextImage()
 {
     // dequeue a frame buffer (this call blocks when there is
     // no new image available)
+    if(cameraType == Camera::TOP)
+    {
+        PROF_ENTER(P_TOP_DQBUF);
+    }
+    else
+    {
+        PROF_ENTER(P_BOT_DQBUF);
+    }
     verify(ioctl(fd, VIDIOC_DQBUF, &requestBuff),
            "Dequeueing the frame buffer failed.");
+    if(cameraType == Camera::TOP)
+    {
+        PROF_EXIT(P_TOP_DQBUF);
+    }
+    else
+    {
+        PROF_EXIT(P_BOT_DQBUF);
+    }
+
     if(requestBuff.bytesused != (unsigned int)SIZE)
         std::cerr << "CAMERA::ERROR::Wrong buffer size!" << std::endl;
 

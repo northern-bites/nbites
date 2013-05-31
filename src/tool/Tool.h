@@ -19,6 +19,9 @@
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
 #include "colorcreator/ColorCalibrate.h"
+#include "viewer/FieldViewer.h"
+#include "ParticleSwarm.pb.h"
+
 
 namespace tool {
 
@@ -45,6 +48,7 @@ protected:
     logview::LogViewer logView;
     color::ColorTableCreator tableCreator;
 	colorcreator::ColorCalibrate colorCalibrate;
+    viewer::FieldViewer fieldView;
 
     // GUI stuff
     QTabWidget* toolTabs;

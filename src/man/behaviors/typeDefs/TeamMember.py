@@ -11,15 +11,14 @@ OPP_GOAL_RIGHT_POST = Location(NogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
 
 DEFAULT_GOALIE_NUMBER = 1
 DEFAULT_DEFENDER_NUMBER = 2
-DEFAULT_OFFENDER_NUMBER = 3
-DEFAULT_CHASER_NUMBER = 4
+DEFAULT_MIDDIE_NUMBER = 3
+DEFAULT_OFFENDER_NUMBER = 4
+DEFAULT_CHASER_NUMBER = 5
 DEBUG_DETERMINE_CHASE_TIME = False
 SEC_TO_MILLIS = 1000.0
-CHASE_SPEED = 20.00 #cm/sec
-CHASE_TIME_SCALE = 0.45              # How much new measurement is used.
-BALL_OFF_PENALTY = 1000.             # Big penalty for not seeing the ball.
-                                     # If you change this, modify determineChaser
-BALL_GOAL_LINE_PENALTY = 10.
+CHASE_SPEED = 20.00 #cm/sec          # How fast we walk
+CHASE_TIME_SCALE = 0.45              # How much new measurement is used in IIR.
+BALL_OFF_PENALTY = 100.              # Big penalty for not seeing the ball.
 
 # Behavior constants
 BALL_TEAMMATE_DIST_GRABBING = 35
@@ -125,7 +124,7 @@ class TeamMember(RobotLocation):
         """
         Attempt to define a time in seconds to get to the ball.
         Can give penalties in certain situations.
-        @ return: returns a time in milliseconds with penalties.
+        @ return: returns a time in seconds with penalties.
         Note: Don't give bonuses. It can result in negative chase times
               which can screw up the math later on. --Wils (06/25/11)
         """
@@ -135,27 +134,12 @@ class TeamMember(RobotLocation):
             print "\tChase time base is " + str(t)
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if (not self.brain.ball.vis.frames_on > 3 and
+        if (self.brain.ball.vis.frames_off > 3 and
             not self.brain.player.inKickingState):
             t += BALL_OFF_PENALTY
 
         if DEBUG_DETERMINE_CHASE_TIME:
             print "\tChase time after ball on bonus " + str(t)
-
-        # Commented out Summer 2012 due to unreliable Localization.
-        # # Give penalties for not lining up along the ball-goal line
-        # lpb = self.getRelativeBearing(OPP_GOAL_LEFT_POST) #left post bearing
-        # rpb = self.getRelativeBearing(OPP_GOAL_RIGHT_POST) #right post bearing
-        # # TODO: scale these by how far off we are??
-        # # ball is not lined up
-        # if (self.ballBearing > lpb or rpb > self.ballBearing):
-        #     t += BALL_GOAL_LINE_PENALTY
-        # # we are not lined up
-        # if (lpb < 0 or rpb > 0):
-        #     t += BALL_GOAL_LINE_PENALTY
-
-        # if DEBUG_DETERMINE_CHASE_TIME:
-        #     print "\tChase time after ball-goal-line penalty "+str(t)
 
         # Add a penalty for being fallen over
         t += 20 * (self.brain.player.currentState == 'fallen')
@@ -163,10 +147,15 @@ class TeamMember(RobotLocation):
         if DEBUG_DETERMINE_CHASE_TIME:
             print "\tChase time after fallen over penalty " + str(t)
 
-        t *= CHASE_SPEED
+        # Add a penalty for not facing the ball
+        t += fabs(self.brain.ball.bearing_deg) / 60  # 3 seconds to spin 180
+
+        if DEBUG_DETERMINE_CHASE_TIME:
+            print "\tChase time after ball-bearing penalty "+str(t)
 
         # Filter by IIR to reduce noise
-        t = t * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
+        # Actually this is probably terrible.
+        #t = t * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
 
         if DEBUG_DETERMINE_CHASE_TIME:
             print "\tChase time after filter " +str(t)
@@ -194,6 +183,9 @@ class TeamMember(RobotLocation):
 
     def isDefaultDefender(self):
         return (self.playerNumber == DEFAULT_DEFENDER_NUMBER)
+
+    def isDefaultMiddie(self):
+        return (self.playerNumber == DEFAULT_MIDDIE_NUMBER)
 
     def isPenalized(self):
         """

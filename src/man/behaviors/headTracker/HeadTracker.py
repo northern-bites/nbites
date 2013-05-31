@@ -108,6 +108,11 @@ class HeadTracker(FSA.FSA):
                 self.currentState is not 'tracking'):
             self.switchTo('tracking')
 
+    def trackFieldObject(self, newTarget):
+        self.target = newTarget
+        if self.currentState is not 'trackingFieldObject':
+            self.switchTo('trackingFieldObject')
+
     def spinPan(self):
         """
         Regardless of which direction we are spinning, look directly ahead.

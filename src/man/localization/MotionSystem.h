@@ -24,11 +24,14 @@ namespace man
         ~MotionSystem();
 
         void update(ParticleSet& particles,
-                    const messages::RobotLocation& deltaMotionInfo);
+                    const messages::RobotLocation& deltaMotionInfo,
+                    bool lost = false);
 
         void randomlyShiftParticle(Particle* particle);
 
         void setFallen(bool fallen);
+
+        void resetNoise(float xyNoise_, float hNoise_);
 
         boost::mt19937 rng;
     private:

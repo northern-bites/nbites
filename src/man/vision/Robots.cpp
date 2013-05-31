@@ -447,7 +447,7 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
             return false;
         }
         // uniforms should be wider than they are tall
-        if (candidate.height() > candidate.width()) {
+        if (candidate.height() > 2*candidate.width()) {
             return false;
         }
         // there ought to be some white below the uniform

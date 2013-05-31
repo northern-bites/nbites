@@ -14,100 +14,24 @@ from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
 from math import fabs, degrees, radians, sin, cos
 from ..kickDecider import kicks
 import noggin_constants as Constants
-import goalie
-
-DEBUG_OBSERVATIONS = False
-DEBUG_POSITION = False
-
-def updatePostObservations(player):
-    """
-    Updates the underlying C++ data structures.
-    """
-    if (player.brain.ygrp.on and
-        player.brain.yglp.on):
-
-        if(player.brain.ygrp.distance != 0.0 and
-        #magic number
-        player.brain.ygrp.distance < 400.0):
-            player.system.pushRightPostObservation(player.brain.ygrp.distance,
-                                                   player.brain.ygrp.bearing)
-            if DEBUG_OBSERVATIONS:
-                print "RIGHT: Saw right post."
-                print "  Avg right x is now " + str(player.system.rightPostRelX())
-                print "  Avg right y is now " + str(player.system.rightPostRelY())
-
-        if (player.brain.yglp.distance != 0.0 and
-            #magic number
-            player.brain.yglp.distance < 400.0):
-            player.system.pushLeftPostObservation(player.brain.yglp.distance,
-                                                  player.brain.yglp.bearing)
-            if DEBUG_OBSERVATIONS:
-                print "LEFT: Saw left post."
-                print "  Avg left x is now " + str(player.system.leftPostRelX())
-                print "  Avg left y is now " + str(player.system.leftPostRelY())
-
-def updateCrossObservations(player):
-    cross = player.brain.interface.visionField.visual_cross
-    if(cross.on and cross.distance != 0.0):
-        player.system.pushCrossObservation(cross.distance,cross.bearing)
-
-def spinToFaceGoal(player):
-    if player.firstFrame():
-        player.brain.tracker.lookToAngle(0)
-
-        if (player.lastDiffState == 'decideRightSide'):
-            player.side = RIGHT
-        else:
-            player.side = LEFT
-
-        spinToFaceGoal.facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if player.side == RIGHT:
-            spinToFaceGoal.facingDest.relH = 45
-        else:
-            spinToFaceGoal.facingDest.relH = -45
-
-    if player.counter == 20:
-        player.brain.nav.goTo(spinToFaceGoal.facingDest,
-                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
-
-    return Transition.getNextState(player, spinToFaceGoal)
-
 
 def walkToGoal(player):
     """
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        # first decide which side you're coming in from
-        if player.lastDiffState == 'gatherPostInfo':
-            # don't change side
-            player.side = player.side
+        player.brain.tracker.trackFieldObject(player.brain.ygrp)
+        player.returningFromPenalty = True
 
-        # based on that side, set up post observations
-        if player.side == RIGHT:
-            player.system.resetPosts(goalie.RIGHT_SIDE_RP_DISTANCE,
-                                     goalie.RIGHT_SIDE_RP_ANGLE,
-                                     goalie.RIGHT_SIDE_LP_DISTANCE,
-                                     0.0)
-        if player.side == LEFT:
-            player.system.resetPosts(goalie.LEFT_SIDE_RP_DISTANCE,
-                                     0.0,
-                                     goalie.LEFT_SIDE_LP_DISTANCE,
-                                     goalie.LEFT_SIDE_LP_ANGLE)
-
-
-        player.system.home.relH = 0.0
-        player.brain.nav.goTo(player.system.home, nav.CLOSE_ENOUGH,
-                              nav.MEDIUM_SPEED, True)
-
-    updatePostObservations(player)
-    player.brain.tracker.lookToAngle(player.system.centerGoalBearing())
-    player.system.home.relY = player.system.centerGoalRelY()
-    player.system.home.relX = player.system.centerGoalRelX()
-    player.system.home.relH = player.system.centerGoalBearing()
+    if player.brain.ygrp.on and not(player.brain.ygrp.distance == 0.0):
+        relx = player.brain.ygrp.distance * cos(player.brain.ygrp.bearing)
+        rely = player.brain.ygrp.distance * sin(player.brain.ygrp.bearing)
+        player.brain.nav.goTo(RelRobotLocation(relx, rely, player.brain.ygrp.bearing_deg))
 
     return Transition.getNextState(player, walkToGoal)
 
+## NOT USED right now, but is a good idea so that the goalie won't walk the
+## ball into the goal
 def dodgeBall(player):
     if player.firstFrame():
         if player.brain.ball.rel_y < 0.0:
@@ -172,7 +96,8 @@ def clearIt(player):
         clearIt.odoDelay = False
         player.brain.nav.goTo(clearIt.ballDest,
                               nav.CLOSE_ENOUGH,
-                              nav.FAST_SPEED)
+                              nav.FAST_SPEED,
+                              adaptive = False)
 
     kickPose = player.kick.getPosition()
     clearIt.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
@@ -203,17 +128,23 @@ def spinToFaceBall(player):
 
     return Transition.getNextState(player, spinToFaceBall)
 
+def waitToFaceField(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
+
+    return Transition.getNextState(player, waitToFaceField)
+
 def decideLeftSide(player):
     if player.firstFrame():
-        player.side = UNKNOWN
-        player.brain.tracker.lookToAngle(90)
+        player.side = LEFT
+        player.brain.tracker.lookToAngle(-90)
 
     return Transition.getNextState(player, decideLeftSide)
 
 def decideRightSide(player):
     if player.firstFrame():
-        player.side = UNKNOWN
-        player.brain.tracker.lookToAngle(-90)
+        player.side = RIGHT
+        player.brain.tracker.lookToAngle(90)
 
     return Transition.getNextState(player, decideRightSide)
 
@@ -264,6 +195,9 @@ def centerAtGoalBasedOnCorners(player):
                               nav.GENERAL_AREA,
                               nav.FAST_SPEED)
 
+    if player.counter > 180 and not player.returningFromPenalty:
+        return player.goLater('watch')
+
     vision = player.brain.interface.visionField
 
     if vision.visual_corner_size() == 0:
@@ -301,18 +235,18 @@ def centerAtGoalBasedOnCorners(player):
                     heading = \
                         getRobotGlobalHeading(0,
                                               corner.visual_detection.bearing,
-                                              corner.physical_orientation-radians(15.0))
+                                              corner.physical_orientation)
                     relX = getCornerRelX(0,
                                          corner.visual_detection.distance,
-                                         corner.physical_orientation-radians(15.0))
+                                         corner.physical_orientation)
                     relY = getCornerRelY(0,
                                          corner.visual_detection.distance,
-                                         corner.physical_orientation-radians(15.0))
+                                         corner.physical_orientation)
                 else:
                     continue
 
                 centerAtGoalBasedOnCorners.home.relH = -heading
-                centerAtGoalBasedOnCorners.home.relX = -(GOALBOX_DEPTH - relX)
+                centerAtGoalBasedOnCorners.home.relX = -(GOALBOX_DEPTH - relX - 10)
                 if (centerAtGoalBasedOnCorners.cornerID ==
                     corner.corner_id.YELLOW_GOAL_LEFT_L):
                     centerAtGoalBasedOnCorners.home.relY = \

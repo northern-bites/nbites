@@ -19,6 +19,13 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
+# Configure the debug options
+configure_file(
+  "${SHARE_DIR}/cmake/DebugConfig.in"
+  "${PROJECT_BINARY_DIR}/DebugConfig.h"
+)
+
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
   "${PROJECT_BINARY_DIR}/PathConfig.h"
@@ -65,6 +72,9 @@ add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
+add_subdirectory( viewer )
+add_subdirectory( common )
+
 
 # Sources
 set( tool_srcs main.cpp
@@ -95,6 +105,9 @@ target_link_libraries(
   logview
   image_display
   image # man image
+  image_display
+  viewer
+  tool_common
   colorcreator
   ${QT_LIBRARIES}
   )
