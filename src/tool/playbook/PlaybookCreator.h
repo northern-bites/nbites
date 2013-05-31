@@ -32,6 +32,9 @@ protected:
     QHBoxLayout* field;
     QVBoxLayout* settings;
 
+    QPushButton* undoBtn;
+    QPushButton* loadBtn;
+    QPushButton* saveBtn;
     QCheckBox* lockDefender;
     QCheckBox* lockMiddie;
     QCheckBox* lockOffender;

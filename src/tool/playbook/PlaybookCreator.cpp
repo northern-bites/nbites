@@ -14,16 +14,22 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     mainLayout = new QHBoxLayout(this);
 
     //GUI
-    lockDefender = new QCheckBox("Lock Defender", this);
-    lockMiddie = new QCheckBox("Lock Middie", this);
-    lockOffender = new QCheckBox("Lock Offender", this);
-    goalie = new QCheckBox("Goalie Inactive", this);
-
     field = new QHBoxLayout();
     field->addWidget(fieldPainter);
 
     settings = new QVBoxLayout();
 
+    undoBtn = new QPushButton("Undo", this);
+    loadBtn = new QPushButton("Load", this);
+    saveBtn = new QPushButton("Save", this);
+    lockDefender = new QCheckBox("Lock Defender", this);
+    lockMiddie = new QCheckBox("Lock Middie", this);
+    lockOffender = new QCheckBox("Lock Offender", this);
+    goalie = new QCheckBox("Goalie Inactive", this);
+
+    settings->addWidget(undoBtn);
+    settings->addWidget(loadBtn);
+    settings->addWidget(saveBtn);
     settings->addWidget(lockDefender);
     settings->addWidget(lockMiddie);
     settings->addWidget(lockOffender);
