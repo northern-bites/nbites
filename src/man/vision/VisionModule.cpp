@@ -1,4 +1,6 @@
 #include "VisionModule.h"
+
+#include "Profiler.h"
 #include <iostream>
 
 using namespace portals;
@@ -45,10 +47,15 @@ void VisionModule::run_()
     joint_angles.latch();
     inertial_state.latch();
 
-    vision->notifyImage(topThrImage.message(), topYImage.message(), topUImage.message(), 
-                        topVImage.message(), botThrImage.message(), botYImage.message(),
-                        botUImage.message(), botVImage.message(), joint_angles.message(), 
-                        inertial_state.message());
+    PROF_ENTER(P_VISION);
+
+    vision->notifyImage(topThrImage.message(), topYImage.message(),
+                        topUImage.message(), topVImage.message(),
+                        botThrImage.message(), botYImage.message(),
+                        botUImage.message(), botVImage.message(),
+                        joint_angles.message(), inertial_state.message());
+
+    PROF_EXIT(P_VISION);
 
     updateVisionBall();
     updateVisionRobot();
@@ -97,9 +104,7 @@ void VisionModule::updateVisionBall() {
     ball_data.get()->set_on(vision->ball->isOn());
     ball_data.get()->set_confidence(vision->ball->getConfidence());
 
-
     vision_ball.setMessage(ball_data);
-
 }
 
 void VisionModule::updateVisionRobot() {
@@ -144,7 +149,7 @@ void VisionModule::updateVisionField() {
 
     portals::Message<messages::VisionField> field_data(0);
 
-    //	setting lines info
+    // setting lines info
     const std::vector<boost::shared_ptr<VisualLine> >* visualLines = vision->fieldLines->getLines();
     for(std::vector<boost::shared_ptr<VisualLine> >::const_iterator i = visualLines->begin();
         i != visualLines->end(); i++)
@@ -228,6 +233,10 @@ void VisionModule::updateVisionField() {
         set_frames_off(vision->yglp->getFramesOff());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_certainty(vision->yglp->getIDCertainty());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_angle_x_deg(vision->yglp->getAngleXDeg());
+    field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+        set_angle_y_deg(vision->yglp->getAngleYDeg());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_red_goalie(vision->yglp->getRedGoalieCertain());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->

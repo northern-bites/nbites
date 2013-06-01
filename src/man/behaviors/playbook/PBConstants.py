@@ -22,10 +22,9 @@ KICKOFF_FORMATION_TIME = 10 # Length of time to spend in the kickoff play
 ####
 #### Role Switching / Tie Breaking ####
 ####
-# The following constants are in milliseconds
-CALL_OFF_THRESH = 1500.             # how likely it is to be chaser
-LISTEN_THRESH = 3000.               # how likely it is to stop being chaser
-STOP_CALLING_THRESH = 3500.         # how likely you are to ignore teammates ideas.
+# The following constants are in seconds
+CALL_OFF_THRESH = 1.5             # how likely it is to be chaser
+STOP_CALLING_THRESH = 3.0         # how likely you are to ignore teammates ideas.
 
 GOALIE_CHASER_COUNT_THRESH = 25      # how long we wait before goalie calls us off.
 
@@ -44,7 +43,7 @@ S_TWO_ZONE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.2
 #### Information about the Strategies ####
 ####
 
-NUM_STRATEGIES = 13
+NUM_STRATEGIES = 14
 
 # dictionary of strategies
 STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
@@ -62,9 +61,12 @@ STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
                                               "TWO_PLAYER_ZONE",
 
                                               # 3 field player strats
-                                              "WIN",
+                                              "THREE_FIELD_PLAYERS",
 
                                               # 4 field player strats
+                                              "WIN",
+
+                                              # 5 field player strats
                                               "PULL_GOALIE",
 
                                               # Test strategies
@@ -86,8 +88,9 @@ STRATEGIES = dict(zip(range(NUM_STRATEGIES), ("INIT_STRATEGY",
  S_TWO_FIELD_PLAYERS,
  S_TWO_ZONE,
 
- S_WIN,
+ S_THREE_FIELD_PLAYERS,
 
+ S_WIN,
  S_PULL_GOALIE,
 
  S_TEST_DEFENDER,
@@ -176,7 +179,7 @@ ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
 
 SUB_ROLE_SWITCH_BUFFER = 10.
 # dictionary of subRoles
-NUM_SUB_ROLES = 26
+NUM_SUB_ROLES = 27
 SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "PENALTY_SUB_ROLE",
 
@@ -212,10 +215,11 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
                                             "KICKOFF_SWEEPER",
                                             "KICKOFF_STRIKER",
 
-                                            # READY SUB ROLES 22-25
+                                            # READY SUB ROLES 22-26
                                             "READY_GOALIE",
                                             "READY_CHASER",
                                             "READY_DEFENDER",
+                                            "READY_MIDDIE",
                                             "READY_OFFENDER" )))
 # tuple of subRoles
 (INIT_SUB_ROLE,
@@ -250,6 +254,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
  READY_GOALIE,
  READY_CHASER,
  READY_DEFENDER,
+ READY_MIDDIE,
  READY_OFFENDER
 ) = range(NUM_SUB_ROLES)
 
@@ -265,7 +270,7 @@ SUB_ROLES = dict(zip(range(NUM_SUB_ROLES), ("INIT_SUB_ROLE",
 # |G |      +    |  C+
 # |  |            \__|
 # 0  |  D            |
-# |__|               |
+# |__|             M |
 # |__________________|
 #
 # Above is our ready position_0 when kicking-off. Can mirror for position_1
@@ -282,14 +287,21 @@ READY_KICKOFF_DEFENDER_X = ((NogginConstants.CENTER_FIELD_X -
                             NogginConstants.GREEN_PAD_X)
 READY_KICKOFF_DEFENDER_0_Y = NogginConstants.LANDMARK_MY_GOAL_RIGHT_POST_Y
 READY_KICKOFF_DEFENDER_1_Y = NogginConstants.LANDMARK_MY_GOAL_LEFT_POST_Y
+"""MIDDIE"""
+READY_KICKOFF_MIDDIE_X = (NogginConstants.CENTER_FIELD_X -
+                          NogginConstants.CENTER_CIRCLE_RADIUS * 0.5)
+READY_KICKOFF_FORWARD_OFFSET = 165. # Can be as large as you want as long as robot can side-kick that distance
+READY_KICKOFF_MIDDIE_0_Y = (NogginConstants.CENTER_FIELD_Y -
+                            READY_KICKOFF_FORWARD_OFFSET)
+READY_KICKOFF_MIDDIE_1_Y = (NogginConstants.CENTER_FIELD_Y +
+                            READY_KICKOFF_FORWARD_OFFSET)
 """OFFENDER"""
 READY_KICKOFF_OFFENDER_X = (NogginConstants.CENTER_FIELD_X -
                             NogginConstants.CENTER_CIRCLE_RADIUS * 0.5)
-READY_KICKOFF_OFFENDER_OFFSET = 165. # Can be as large as you want as long as robot can side-kick that distance
 READY_KICKOFF_OFFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y +
-                              READY_KICKOFF_OFFENDER_OFFSET)
+                              READY_KICKOFF_FORWARD_OFFSET)
 READY_KICKOFF_OFFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
-                              READY_KICKOFF_OFFENDER_OFFSET)
+                              READY_KICKOFF_FORWARD_OFFSET)
 """CHASER"""
 # Use offset to leave room for chaser's feet/ room to position on the kick.
 READY_KICKOFF_CHASER_OFFSET = NogginConstants.CENTER_CIRCLE_RADIUS * 0.5
@@ -304,7 +316,7 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # |  | D          /  |
 # |G |      +    |   +
 # |  |      C     \__|
-# 0  |               |
+# 0  |     M         |
 # |__|               |
 # |__________________|
 #
@@ -317,7 +329,7 @@ READY_KICKOFF_CHASER_Y = NogginConstants.CENTER_FIELD_Y # near center
 # NOTE: Constants are to set up triangle blocking the line of sight to the goalposts
 
 # Use the MAX_X to ensure we don't cross the line even with the tips of our feet.
-READY_NON_KICKOFF_MAX_X = NogginConstants.LANDMARK_MY_FIELD_CROSS[1] - 45
+READY_NON_KICKOFF_MAX_X = NogginConstants.CENTER_FIELD_X - NogginConstants.CENTER_CIRCLE_RADIUS - 45
 """DEFENDER"""
 READY_NON_KICKOFF_DEFENDER_X = NogginConstants.GREEN_PAD_X + 80.
 READY_NON_KICKOFF_DEFENDER_OFFSET = 51.3
@@ -325,6 +337,14 @@ READY_NON_KICKOFF_DEFENDER_1_Y = (NogginConstants.CENTER_FIELD_Y -
                                   READY_NON_KICKOFF_DEFENDER_OFFSET)
 READY_NON_KICKOFF_DEFENDER_0_Y = (NogginConstants.CENTER_FIELD_Y +
                                   READY_NON_KICKOFF_DEFENDER_OFFSET)
+"""MIDDIE"""
+READY_NON_KICKOFF_MIDDIE_X = (NogginConstants.CENTER_FIELD_X -
+                              NogginConstants.GREEN_PAD_X) * 0.5
+READY_NON_KICKOFF_MIDDIE_OFFSET = 90.0 # very arbitrary
+READY_NON_KICKOFF_MIDDIE_1_Y = (NogginConstants.CENTER_FIELD_Y +
+                                READY_NON_KICKOFF_MIDDIE_OFFSET)
+READY_NON_KICKOFF_MIDDIE_0_Y = (NogginConstants.CENTER_FIELD_Y -
+                                READY_NON_KICKOFF_MIDDIE_OFFSET)
 """OFFENDER"""
 READY_NON_KICKOFF_OFFENDER_X = (NogginConstants.CENTER_FIELD_X -
                                 NogginConstants.GREEN_PAD_X) * 0.5
@@ -419,7 +439,7 @@ A L/R wing moves in a small line vertically (in the X) opposite the ball (ie. if
             chaser. The Wing will also be on the opposite side of the field as
             ball.
 A Picker hangs out dead center in front of the opponent goalbox waiting for a pass
-            from a chaser who is in a coner. It's like a real coner-kick in soccer!
+            from a chaser who is in a corner. It's like a real corner-kick in soccer!
 """
 FORWARD_X = (NogginConstants.CENTER_FIELD_X +
              NogginConstants.CENTER_CIRCLE_RADIUS + 30)

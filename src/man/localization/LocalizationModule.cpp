@@ -1,4 +1,5 @@
 #include "LocalizationModule.h"
+#include "Profiler.h"
 
 namespace man
 {
@@ -6,10 +7,18 @@ namespace man
     {
     LocalizationModule::LocalizationModule()
         : portals::Module(),
-          output(base())
+          output(base()),
+          particleOutput(base())
     {
         particleFilter = new ParticleFilter();
         particleFilter->resetLocTo(100,100,0);
+
+        std::cout << "Logging localization? ";
+#ifdef LOG_LOCALIZATION
+        std::cout << "Yes." << std::endl;
+#else
+        std::cout << "No." << std::endl;
+#endif
 
         //Note: All the RobotLocation messages default to zero values to start (yay!)
     }
@@ -50,13 +59,22 @@ namespace man
 
         portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                              getCurrentEstimate());
+
+#ifdef LOG_LOCALIZATION
+        portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
+                                                               getCurrentSwarm());
+        particleOutput.setMessage(swarmMessage);
+#endif
+
         output.setMessage(locMessage);
     }
 
     void LocalizationModule::run_()
     {
+        PROF_ENTER(P_LOC);
         update();
+        PROF_EXIT(P_LOC);
     }
 
     } // namespace localization
-} // namespace localization
+} // namespace man

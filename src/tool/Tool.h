@@ -19,6 +19,9 @@
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
 #include "vision_offline/VisionDisplayModule.h"
+#include "viewer/FieldViewer.h"
+
+#include "ParticleSwarm.pb.h"
 
 namespace tool {
 
@@ -45,7 +48,8 @@ protected:
     logview::LogViewer logView;
 	color::ColorTableCreator tableCreator;
 	vision::VisionDisplayModule visDispMod;
-	
+    viewer::FieldViewer fieldView;
+
 
     // GUI stuff
     QTabWidget* toolTabs;

@@ -15,8 +15,6 @@ configure_file(
 # CPP sources
 set( BEHAVIORS_SRCS BehaviorsModule
   PyObjects
-  GoalieSystem
-  PyGoalie
   CombinationObjects
   PyConstants
   PyInterface

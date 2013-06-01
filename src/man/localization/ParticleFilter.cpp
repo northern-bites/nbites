@@ -41,6 +41,8 @@ namespace man
             Particle p(randomLocation, weight);
             particles.push_back(p);
         }
+
+        lost = false;
     }
 
     ParticleFilter::~ParticleFilter()
@@ -63,6 +65,17 @@ namespace man
         {
             resample();
             updatedVision = false;
+
+            //If shitty swarm according to vision, expand search
+            lost = (visionSystem->getLowestError() > 40);
+
+        }
+
+        if (lost)
+            motionSystem->resetNoise(4.f, .2f);
+        else {
+            motionSystem->resetNoise(parameters.odometryXYNoise,
+                                     parameters.odometryHNoise);
         }
 
         // Update filters estimate
@@ -77,7 +90,7 @@ namespace man
          * Commented out until known if necessary (K.I.S.S.)
          */
         // // Check if the mean has gone out of bounds. If so,
-        // // reset to the closest point in bounds with appropriate
+        // // reset to the cloesst point in bounds with appropriate
         // // uncertainty.
         // bool resetInBounds = false;
 
@@ -142,7 +155,7 @@ namespace man
 
         poseEstimate.set_x(sumX/parameters.numParticles);
         poseEstimate.set_y(sumY/parameters.numParticles);
-        poseEstimate.set_h(sumH/parameters.numParticles);
+        poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
 
         estimateUncertainty = findParticleSD();
     }
@@ -389,10 +402,8 @@ namespace man
         ParticleIt iter;
         for(iter = particles.begin(); iter != particles.end(); ++iter)
         {
-            Particle particle = (*iter);
-
-            cdf[prev + particle.getWeight()] = particle;
-            prev += particle.getWeight();
+            cdf[prev + iter->getWeight()] = (*iter);
+            prev += iter->getWeight();
         }
 
         boost::mt19937 rng;
@@ -431,5 +442,23 @@ namespace man
 
         particles = newParticles;
     }
+
+    const messages::ParticleSwarm& ParticleFilter::getCurrentSwarm()
+    {
+        // Clear the repeated particle field
+        swarm.clear_particle();
+
+        messages::Particle newParticle;
+        ParticleIt iter;
+        for(iter = particles.begin(); iter != particles.end(); ++iter)
+        {
+            newParticle.mutable_loc()->CopyFrom((*iter).getLocation());
+            newParticle.set_weight((*iter).getWeight());
+            swarm.add_particle()->CopyFrom(newParticle);
+        }
+
+        return swarm;
+    }
+
     } // namespace localization
 } // namespace man

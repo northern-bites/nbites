@@ -72,7 +72,7 @@ Vision::Vision()
     cross = new VisualCross();
     fieldEdge = new VisualFieldEdge();
     obstacles = new VisualObstacle();
-	
+
 	pose = boost::shared_ptr<NaoPose>(new NaoPose());
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
@@ -149,10 +149,10 @@ void Vision::copyImage(const byte* image) {
  */
 
 void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& topYIm,
-						 const PackedImage16& topUIm, const PackedImage16& topVIm,
-						 const ThresholdImage& botThrIm, const PackedImage16& botYIm,
-						 const PackedImage16& botUIm, const PackedImage16& botVIm,
-						 const JointAngles& ja, const InertialState& inert)
+                         const PackedImage16& topUIm, const PackedImage16& topVIm,
+                         const ThresholdImage& botThrIm, const PackedImage16& botYIm,
+                         const PackedImage16& botUIm, const PackedImage16& botVIm,
+                         const JointAngles& ja, const InertialState& inert)
 {
     yImg = topYIm.pixelAddress(0, 0);
     uImg = topUIm.pixelAddress(0, 0);

@@ -1,24 +1,3 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-
 /**
  * This file and a related file (ObjectFragments.cc) do the bulk of the Vision
  * processing in a given frame. The algorithm used is (relatively)
@@ -48,6 +27,7 @@
  */
 
 #include "Common.h"
+#include "Profiler.h"
 #include "Utility.h"
 
 #include <math.h>
@@ -90,190 +70,197 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
 
 //this loop will perform obstabcle detection, and for now it is seperate from
 //other detection, though in the future, we should change this.
-void Threshold::obstacleLoop(const messages::JointAngles& ja, const messages::InertialState& inert) {
-	vision->obstacles->init();
+void Threshold::obstacleLoop(const messages::JointAngles& ja,
+                             const messages::InertialState& inert) {
+    vision->obstacles->init();
 
-	usingTopCamera = false;
-	/************************************/pose->transform(usingTopCamera, ja, inert);
+    usingTopCamera = false;
+    /************************************/pose->transform(usingTopCamera, ja, inert);
 
-	unsigned char pixel = GREEN;
-  
-	float tempTotalLeft = 0.0, tempTotalRight = 0.0;
-	float greenLeftB = 0.0, greenRightB = 0.0;
-	float yellowLeftB = 0.0, yellowRightB = 0.0;
-	float whiteLeftB = 0.0, whiteRightB = 0.0;
-	float undefLeftB = 0.0, undefRightB = 0.0;
-	bool postBottom = false, bottomLeftFree = false, bottomRightFree = false;
-  
-	for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
-		for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
-			pixel = getThresholded(j, i);
-			if (Utility::isGreen(pixel))
-				greenLeftB++;
-			else if (Utility::isYellow(pixel))
-				yellowLeftB++;
-			else if (Utility::isWhite(pixel))
-				whiteLeftB++;
-			else if (Utility::isUndefined(pixel))
-				undefLeftB++;
-			tempTotalLeft++;
-		}
-		for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
-			pixel = getThresholded(j, i);
-			if (Utility::isGreen(pixel))
-				greenRightB++;
-			else if (Utility::isYellow(pixel))
-				yellowRightB++;
-			else if (Utility::isWhite(pixel))
-				whiteRightB++;
-			else if (Utility::isUndefined(pixel))
-				undefRightB++;
-			tempTotalRight++;
-		}
-	}
-	greenLeftB /= tempTotalLeft; greenRightB /= tempTotalRight;
-	yellowLeftB /= tempTotalLeft; yellowRightB /= tempTotalRight;
-	whiteLeftB /= tempTotalLeft; whiteRightB /= tempTotalRight;
-	undefLeftB /= tempTotalLeft; undefRightB /= tempTotalRight;
+    unsigned char pixel = GREEN;
 
-	/**********************************************
-	 *This is the first set of detections*
-	 *********************************************/
-	//First, we throw things out.
-	if (greenLeftB > yellowLeftB && greenLeftB > whiteLeftB && greenLeftB > undefLeftB) {
-		bottomLeftFree = true;
-	}
-	if (greenRightB > yellowRightB && greenRightB > whiteRightB && greenRightB > undefRightB) {
-		bottomRightFree = true;
-	}
-	if (bottomLeftFree && bottomRightFree) {
-		return;
-	}
+    float tempTotalLeft = 0.0, tempTotalRight = 0.0;
+    float greenLeftB = 0.0, greenRightB = 0.0;
+    float yellowLeftB = 0.0, yellowRightB = 0.0;
+    float whiteLeftB = 0.0, whiteRightB = 0.0;
+    float undefLeftB = 0.0, undefRightB = 0.0;
+    bool postBottom = false, bottomLeftFree = false, bottomRightFree = false;
 
-	//Only Posts can be uniquely thrown out in the bottom
-	if ((yellowLeftB - greenLeftB > 0.1) || (yellowRightB - greenRightB > 0.1)) {
-		if (yellowLeftB - greenLeftB > 0.1) {
-			vision->obstacles->setPostLeft(true);
-		}
-		if (yellowRightB - greenRightB > 0.1) {
-			vision->obstacles->setPostRight(true);
-		}
-		postBottom = true;
-	}
+    for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+        for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
+            pixel = getThresholded(j, i);
+            if (Utility::isGreen(pixel))
+                greenLeftB++;
+            else if (Utility::isYellow(pixel))
+                yellowLeftB++;
+            else if (Utility::isWhite(pixel))
+                whiteLeftB++;
+            else if (Utility::isUndefined(pixel))
+                undefLeftB++;
+            tempTotalLeft++;
+        }
+        for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
+            pixel = getThresholded(j, i);
+            if (Utility::isGreen(pixel))
+                greenRightB++;
+            else if (Utility::isYellow(pixel))
+                yellowRightB++;
+            else if (Utility::isWhite(pixel))
+                whiteRightB++;
+            else if (Utility::isUndefined(pixel))
+                undefRightB++;
+            tempTotalRight++;
+        }
+    }
+    greenLeftB /= tempTotalLeft; greenRightB /= tempTotalRight;
+    yellowLeftB /= tempTotalLeft; yellowRightB /= tempTotalRight;
+    whiteLeftB /= tempTotalLeft; whiteRightB /= tempTotalRight;
+    undefLeftB /= tempTotalLeft; undefRightB /= tempTotalRight;
 
+    /**********************************************
+     *This is the first set of detections*
+     *********************************************/
+    //First, we throw things out.
+    if (greenLeftB > yellowLeftB && greenLeftB > whiteLeftB && greenLeftB > undefLeftB) {
+        bottomLeftFree = true;
+    }
+    if (greenRightB > yellowRightB && greenRightB > whiteRightB && greenRightB > undefRightB) {
+        bottomRightFree = true;
+    }
+    if (bottomLeftFree && bottomRightFree) {
+        return;
+    }
 
-  
-	usingTopCamera = true;
-	/****************************************************/pose->transform(usingTopCamera, ja, inert);
-  
-	tempTotalLeft = 0.0, tempTotalRight = 0.0;
-	float greenLeftT = 0.0, greenRightT = 0.0;
-	float yellowLeftT = 0.0, yellowRightT = 0.0;
-	float whiteLeftT = 0.0, whiteRightT = 0.0;
-	float undefLeftT = 0.0, undefRightT = 0.0;
-	bool topLeftFree = false, topRightFree = false;
-
-	for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
-		for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
-			pixel = getThresholded(j, i);
-			if (Utility::isGreen(pixel))
-				greenLeftT++;
-			else if (Utility::isYellow(pixel))
-				yellowLeftT++;
-			else if (Utility::isWhite(pixel))
-				whiteLeftT++;
-			else if (Utility::isUndefined(pixel))
-				undefLeftT++;
-			tempTotalLeft++;
-		}
-		for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
-			pixel = getThresholded(j, i);
-			if (Utility::isGreen(pixel))
-				greenRightT++;
-			else if (Utility::isYellow(pixel))
-				yellowRightT++;
-			else if (Utility::isWhite(pixel))
-				whiteRightT++;
-			else if (Utility::isUndefined(pixel))
-				undefRightT++;
-			tempTotalRight++;
-		}
-	}
-	greenLeftT /= tempTotalLeft; greenRightT /= tempTotalRight;
-	yellowLeftT /= tempTotalLeft; yellowRightT /= tempTotalRight;
-	whiteLeftT /= tempTotalLeft; whiteRightT /= tempTotalRight;
-	undefLeftT /= tempTotalLeft; undefRightT /= tempTotalRight;
-
-
-	/***********************************************************
-	 *This is the second set of detections*
-	 **********************************************************/
-	if(!bottomLeftFree) { //if no obstacle in bottom, then not in top either
-		if (greenLeftT > yellowLeftT && greenLeftT > whiteLeftT && greenLeftT > undefLeftT && 
-			!vision->obstacles->onLeft()) {
-			topLeftFree = true;
-		}
-		if (!topLeftFree) { // same principle as !bottomLeftFree
-			if (undefLeftT - (greenLeftT + whiteLeftT + yellowLeftT) > 0.1) {
-				vision->obstacles->setOffField(true);
-			} 
-			else if (whiteLeftT > greenLeftT && (undefLeftT - (whiteLeftT + greenLeftT) < 0.1)) {
-				vision->obstacles->setLeft(true);
-			}
-		}
-	}
+    //Only Posts can be uniquely thrown out in the bottom
+    if ((yellowLeftB - greenLeftB > 0.1) || (yellowRightB - greenRightB > 0.1)) {
+        if (yellowLeftB - greenLeftB > 0.1) {
+            vision->obstacles->setPostLeft(true);
+        }
+        if (yellowRightB - greenRightB > 0.1) {
+            vision->obstacles->setPostRight(true);
+        }
+        postBottom = true;
+    }
 
 
 
-	if (!bottomRightFree) { //if no obstacle in bottom, not in top either
-		if (greenRightT > yellowRightT && greenRightT > whiteRightT && greenRightT > undefRightT &&
-			!vision->obstacles->onRight()) {
-			topRightFree = true;
-		}
-		if (!topRightFree) { // same principle as !bottomRightFree
-			if (undefRightT - (greenRightT + whiteRightT + yellowRightT) > 0.1) {
-				vision->obstacles->setOffField(true);
-			} 
-			else if (whiteRightT > greenRightT && (undefRightT - (whiteRightT + greenRightT) < 0.1)) {
-				vision->obstacles->setRight(true);
-			}
-		}  
-    
-	}
-  
+    usingTopCamera = true;
+    /****************************************************/pose->transform(usingTopCamera, ja, inert);
+
+    tempTotalLeft = 0.0, tempTotalRight = 0.0;
+    float greenLeftT = 0.0, greenRightT = 0.0;
+    float yellowLeftT = 0.0, yellowRightT = 0.0;
+    float whiteLeftT = 0.0, whiteRightT = 0.0;
+    float undefLeftT = 0.0, undefRightT = 0.0;
+    bool topLeftFree = false, topRightFree = false;
+
+    for (int j = 0; j < IMAGE_HEIGHT; j += 1) {
+        for (int i = 0; i < IMAGE_WIDTH/2; i += 1) {
+            pixel = getThresholded(j, i);
+            if (Utility::isGreen(pixel))
+                greenLeftT++;
+            else if (Utility::isYellow(pixel))
+                yellowLeftT++;
+            else if (Utility::isWhite(pixel))
+                whiteLeftT++;
+            else if (Utility::isUndefined(pixel))
+                undefLeftT++;
+            tempTotalLeft++;
+        }
+        for (int i = IMAGE_WIDTH/2; i < IMAGE_WIDTH; i += 1) {
+            pixel = getThresholded(j, i);
+            if (Utility::isGreen(pixel))
+                greenRightT++;
+            else if (Utility::isYellow(pixel))
+                yellowRightT++;
+            else if (Utility::isWhite(pixel))
+                whiteRightT++;
+            else if (Utility::isUndefined(pixel))
+                undefRightT++;
+            tempTotalRight++;
+        }
+    }
+    greenLeftT /= tempTotalLeft; greenRightT /= tempTotalRight;
+    yellowLeftT /= tempTotalLeft; yellowRightT /= tempTotalRight;
+    whiteLeftT /= tempTotalLeft; whiteRightT /= tempTotalRight;
+    undefLeftT /= tempTotalLeft; undefRightT /= tempTotalRight;
+
+
+    /***********************************************************
+     *This is the second set of detections*
+     **********************************************************/
+    if(!bottomLeftFree) { //if no obstacle in bottom, then not in top either
+        if (greenLeftT > yellowLeftT && greenLeftT > whiteLeftT && greenLeftT > undefLeftT &&
+            !vision->obstacles->onLeft()) {
+            topLeftFree = true;
+        }
+        if (!topLeftFree) { // same principle as !bottomLeftFree
+            if (undefLeftT - (greenLeftT + whiteLeftT + yellowLeftT) > 0.1) {
+                vision->obstacles->setOffField(true);
+            }
+            else if (whiteLeftT > greenLeftT && (undefLeftT - (whiteLeftT + greenLeftT) < 0.1)) {
+                vision->obstacles->setLeft(true);
+            }
+        }
+    }
+
+
+
+    if (!bottomRightFree) { //if no obstacle in bottom, not in top either
+        if (greenRightT > yellowRightT && greenRightT > whiteRightT && greenRightT > undefRightT &&
+            !vision->obstacles->onRight()) {
+            topRightFree = true;
+        }
+        if (!topRightFree) { // same principle as !bottomRightFree
+            if (undefRightT - (greenRightT + whiteRightT + yellowRightT) > 0.1) {
+                vision->obstacles->setOffField(true);
+            }
+            else if (whiteRightT > greenRightT && (undefRightT - (whiteRightT + greenRightT) < 0.1)) {
+                vision->obstacles->setRight(true);
+            }
+        }
+
+    }
+
 }
 
 /* Main vision loop, called by Vision.cc
  */
-void Threshold::visionLoop(const messages::JointAngles& ja, const messages::InertialState& inert) {
+void Threshold::visionLoop(const messages::JointAngles& ja,
+                           const messages::InertialState& inert) {
     usingTopCamera = true;
 
-	//cout << "doing the visionloop\n";
-    pose->transform(usingTopCamera, ja, inert);
+    //cout << "doing the visionloop\n";
 
+    PROF_ENTER(P_TRANSFORM);
+    pose->transform(usingTopCamera, ja, inert);
+    PROF_EXIT(P_TRANSFORM);
 
     // threshold image and create runs
+    PROF_ENTER(P_THRESHRUNS);
     thresholdAndRuns();
+    PROF_EXIT(P_THRESHRUNS);
 
+    PROF_ENTER(P_ROBOTS);
     newFindRobots();
-
+    PROF_EXIT(P_ROBOTS);
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
     // will be able to supply information about them through getLines() and
     // getCorners().
-
+    PROF_ENTER(P_LINES);
     vision->fieldLines->lineLoop();
-
+    PROF_EXIT(P_LINES);
 
     // do recognition
-
+    PROF_ENTER(P_OBJECT);
     objectRecognition();
-
+    PROF_EXIT(P_OBJECT);
 
     vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
-	if (vision->ygCrossbar->getWidth() > 0) {
+    if (vision->ygCrossbar->getWidth() > 0) {
         setShot(vision->ygCrossbar);
     }
     // for now we also don't use open field information
@@ -286,74 +273,68 @@ void Threshold::visionLoop(const messages::JointAngles& ja, const messages::Iner
 #endif
 
     if (vision->ball->getRadius() == 0) {
-      
-		usingTopCamera = false;
-      
-      
-		/*****************************************/pose->transform(usingTopCamera, ja, inert);
+        usingTopCamera = false;
 
-      
-		orange->init(pose->getHorizonSlope());
-		lowerRuns();
-      
-		vision->ball->init();
-		vision->ball->setTopCam(usingTopCamera);
-      
-		if (horizon < IMAGE_HEIGHT) {
-			orange->createBall(horizon);
-		} else {
-			orange->createBall(pose->getHorizonY(0));
-		}
+        orange->init(pose->getHorizonSlope());
+        lowerRuns();
+
+        vision->ball->init();
+        vision->ball->setTopCam(usingTopCamera);
+
+        if (horizon < IMAGE_HEIGHT) {
+            orange->createBall(horizon);
+        } else {
+            orange->createBall(pose->getHorizonY(0));
+        }
     }
     bool left = vision->yglp->getWidth() > 0;
     bool right = vision->ygrp->getWidth() > 0;
     bool ylp = left &&
-		(vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
-		 vision->yglp->getRightBottomY() > IMAGE_HEIGHT - 5);
+        (vision->yglp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+         vision->yglp->getRightBottomY() > IMAGE_HEIGHT - 5);
     bool yrp = right &&
-		(vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
-		 vision->ygrp->getRightBottomY() > IMAGE_HEIGHT - 5);
-    
+        (vision->ygrp->getLeftBottomY() > IMAGE_HEIGHT - 5 ||
+         vision->ygrp->getRightBottomY() > IMAGE_HEIGHT - 5);
+
     if ((ylp || yrp) && !(left && right)) {
-		usingTopCamera = false;
-      
-		/************************************************/pose->transform(usingTopCamera, ja, inert);
-		yellow->init(pose->getHorizonSlope());
-		if (ylp) {
-			vision->yglp->init();
-			vision->yglp->setTopCam(usingTopCamera);
-		}
-		if (yrp) {
-			vision->ygrp->init();
-			vision->ygrp->setTopCam(usingTopCamera);
-		}
-		int lowYellow = 0;
-		for (int i = 0; i < IMAGE_WIDTH; i++) {
-			int result = findPostsInLowerCamera(i);
-			if (result > lowYellow) {
-				lowYellow = result;
-			}
-		}
-		//cout << "Low yellow is " << lowYellow << endl;
-		yellow->createObject();
-		if (ylp) {
-			vision->yglp->setLeftTopY(0);
-			vision->yglp->setRightTopY(0);
-			// make sure we use pix estimate
-			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
-			vision->yglp->setTopCam(usingTopCamera);
-			setFieldObjectInfo(vision->yglp);
-			//cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
-		}
-		if (yrp) {
-			vision->ygrp->setLeftTopY(0);
-			vision->ygrp->setRightTopY(0);
-			vision->yglp->setDistanceCertainty(BOTH_UNSURE);
-			vision->ygrp->setTopCam(usingTopCamera);
-			setFieldObjectInfo(vision->ygrp);
-			//cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
-		}
-      
+        usingTopCamera = false;
+
+        yellow->init(pose->getHorizonSlope());
+        if (ylp) {
+            vision->yglp->init();
+            vision->yglp->setTopCam(usingTopCamera);
+        }
+        if (yrp) {
+            vision->ygrp->init();
+            vision->ygrp->setTopCam(usingTopCamera);
+        }
+        int lowYellow = 0;
+        for (int i = 0; i < IMAGE_WIDTH; i++) {
+            int result = findPostsInLowerCamera(i);
+            if (result > lowYellow) {
+                lowYellow = result;
+            }
+        }
+        //cout << "Low yellow is " << lowYellow << endl;
+        yellow->createObject();
+        if (ylp) {
+            vision->yglp->setLeftTopY(0);
+            vision->yglp->setRightTopY(0);
+            // make sure we use pix estimate
+            vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+            vision->yglp->setTopCam(usingTopCamera);
+            setFieldObjectInfo(vision->yglp);
+            //cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
+        }
+        if (yrp) {
+            vision->ygrp->setLeftTopY(0);
+            vision->ygrp->setRightTopY(0);
+            vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+            vision->ygrp->setTopCam(usingTopCamera);
+            setFieldObjectInfo(vision->ygrp);
+            //cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
+        }
+
     }
 }
 
@@ -369,22 +350,21 @@ void Threshold::visionLoop(const messages::JointAngles& ja, const messages::Iner
  * NOTE: The name is now a misnomer.  We no longer threshold here.
  */
 void Threshold::thresholdAndRuns() {
- 
+
 
     initColors();
 
     // Determine where the field horizon is
- 
+
+    PROF_ENTER(P_FGHORIZON);
     horizon = field->findGreenHorizon(pose->getHorizonY(0),
                                       pose->getHorizonSlope());
- 
+    PROF_EXIT(P_FGHORIZON);
 
     // 'Run' up the image to find color-grouped pixel sequences
- 
+    PROF_ENTER(P_RUNS);
     runs();
- 
-
- 
+    PROF_EXIT(P_RUNS);
 }
 
 /* Thresholding.  Since there's no real benefit (and in fact can it can be a
@@ -1825,7 +1805,7 @@ void Threshold::transposeDebugImage(){
 
 // Draws the visual horizon on the image
 void Threshold::drawVisualHorizon() {
-	vision->drawLine(0, field->horizonAt(0), 
+	vision->drawLine(0, field->horizonAt(0),
 					 IMAGE_WIDTH - 1, field->horizonAt(IMAGE_WIDTH - 1), VISUAL_HORIZON_COLOR);
 }
 

@@ -47,14 +47,14 @@ GuardianModule::~GuardianModule()
 
 void GuardianModule::run_()
 {
-    PROF_ENTER(P_ROBOGUARDIAN);
-
     temperaturesInput.latch();
     chestButtonInput.latch();
     footBumperInput.latch();
     inertialInput.latch();
     fsrInput.latch();
     batteryInput.latch();
+
+    PROF_ENTER(P_ROBOGUARDIAN);
 
     countButtonPushes();
     checkFalling();
@@ -67,6 +67,7 @@ void GuardianModule::run_()
     processFootBumperPushes();
     checkAudio();
     frameCount++;
+
     PROF_EXIT(P_ROBOGUARDIAN);
 }
 
@@ -141,7 +142,7 @@ void GuardianModule::checkFalling()
     if (fallingFrames > FALLING_FRAMES_THRESH)
     {
         // When falling, execute the fall protection method.
-        //cout << "GuardianModule::checkFalling() : FALLING!" << endl;
+        //std::cout << "GuardianModule::checkFalling() : FALLING!" << std::endl;
         falling = true;
         //processFallingProtection(); // Should be called later in run_()
     }

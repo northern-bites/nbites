@@ -14,7 +14,8 @@ ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
 
 void ThresholdedImageDisplayModule::run_()
 {
-	imageIn.latch();
+    imageIn.latch();
+
     // Note that you have to pass a label a QPixmap, but you can't really edit
     // the pixels of a pixmap, so you have to edit a QImage then make a
     // pixmap from it. *rolls eyes*
@@ -65,9 +66,9 @@ ImageDisplayModule::ImageDisplayModule(QWidget* parent) : QLabel(parent),
 
 void ImageDisplayModule::run_()
 {
-	imageIn.latch();
+    imageIn.latch();
     // @see ThresholdedImageDisplayModule's run_ method for why this is this
-	setPixmap(QPixmap::fromImage(makeImageOfChannel(channel)));
+    setPixmap(QPixmap::fromImage(makeImageOfChannel(channel)));
 }
 
 /*
@@ -84,8 +85,8 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
     // This makes the clicking work properly for listener--we need the qlabel
     // to be exactly the same size of the image
     // Kind of a hack...
-	this->setFixedWidth(imageIn.message().width()/2);
-	this->setFixedHeight(imageIn.message().height());
+    this->setFixedWidth(imageIn.message().width()/2);
+    this->setFixedHeight(imageIn.message().height());
 
 	messages::MemoryImage8 yImg = imageIn.message().yImage();
 	messages::MemoryImage8 uImg = imageIn.message().uImage();

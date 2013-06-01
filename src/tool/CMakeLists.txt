@@ -20,12 +20,14 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
-include( ${MAN_DIR}/cmake/RobotConfig.cmake )
 
-# If protobuf libs don't exist yet, make sure they build before man
-if( BUILD_PROTOBUF )
-add_dependencies(messages protobuf_libs)
-endif()
+include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
+# Configure the debug options
+configure_file(
+  "${SHARE_DIR}/cmake/DebugConfig.in"
+  "${PROJECT_BINARY_DIR}/DebugConfig.h"
+)
+
 
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
@@ -80,6 +82,9 @@ add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
 add_subdirectory( vision_offline )
+add_subdirectory( viewer )
+add_subdirectory( common )
+
 
 # Sources
 set( tool_srcs main.cpp
@@ -111,6 +116,8 @@ target_link_libraries(
   image_display
   image # man image
   vision # man vision
+  viewer
+  tool_common
   colorcreator
   vision_offline
   ${QT_LIBRARIES}
