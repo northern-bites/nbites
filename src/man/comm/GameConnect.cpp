@@ -89,8 +89,8 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
         {
             //@TODO: Currently can't respond with correct status,
             //need InPortals for other players... Too much overhead?
-            for (int i = 1; i <= NUM_PLAYERS_PER_TEAM; ++i)
-                respond(i);
+            // for (int i = 1; i <= NUM_PLAYERS_PER_TEAM; ++i)
+            //     respond(i);
         }
     } while (true);
 }

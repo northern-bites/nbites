@@ -19,30 +19,30 @@ class WorldView : public QWidget, public portals::Module {
 Q_OBJECT;
 
 public:
-WorldView(QWidget* parent = 0);
+    WorldView(QWidget* parent = 0);
 
-portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
-
-protected:
-virtual void run_();
+    //portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
+    portals::InPortal<messages::WorldModel> commIn;
 
 protected:
-WorldViewPainter* fieldPainter;
+    virtual void run_();
 
-QHBoxLayout* mainLayout;
-QHBoxLayout* field;
-QVBoxLayout* options;
+protected:
+    WorldViewPainter* fieldPainter;
 
+    QHBoxLayout* mainLayout;
+    QHBoxLayout* field;
+    QVBoxLayout* options;
 
-QPushButton* startButton;
+    QPushButton* startButton;
 
-man::comm::CommModule wviewComm;
+    man::comm::CommModule wviewComm;
 
-man::DiagramThread commThread;
+    man::DiagramThread commThread;
 
 protected slots:
-void startButtonClicked();
-void stopButtonClicked();
+    void startButtonClicked();
+    void stopButtonClicked();
 };
 
 }
