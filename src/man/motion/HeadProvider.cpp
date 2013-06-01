@@ -1,4 +1,5 @@
 #include "HeadProvider.h"
+#include "Profiler.h"
 
 using namespace Kinematics;
 
@@ -51,6 +52,8 @@ void HeadProvider::calculateNextJointsAndStiffnesses(
     const messages::FSR&           sensorFSRs
     )
 {
+    PROF_ENTER(P_HEAD);
+
     latestJointAngles = sensorAngles;
 
     switch(curMode)
@@ -63,6 +66,8 @@ void HeadProvider::calculateNextJointsAndStiffnesses(
         break;
     }
     setActive();
+
+    PROF_EXIT(P_HEAD);
 }
 
 //Method called during the 'SET' Mode

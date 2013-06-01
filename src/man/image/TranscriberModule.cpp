@@ -410,8 +410,10 @@ messages::YUVImage ImageTranscriber::getNextImage()
     {
         PROF_ENTER(P_BOT_DQBUF);
     }
+
     verify(ioctl(fd, VIDIOC_DQBUF, &requestBuff),
            "Dequeueing the frame buffer failed.");
+
     if(cameraType == Camera::TOP)
     {
         PROF_EXIT(P_TOP_DQBUF);

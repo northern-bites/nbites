@@ -145,9 +145,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
-    cognitionThread.addModule(ballTrack);
-    cognitionThread.addModule(leds);
-    cognitionThread.addModule(behaviors);
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
     localization.resetInput.wireTo(&behaviors.resetLocOut, true);

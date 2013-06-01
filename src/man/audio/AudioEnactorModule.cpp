@@ -1,4 +1,5 @@
 #include "AudioEnactorModule.h"
+#include "Profiler.h"
 #include <iostream>
 #include <string>
 
@@ -13,6 +14,8 @@ AudioEnactorModule::AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker)
 
 void AudioEnactorModule::run_()
 {
+    PROF_ENTER(P_AUDIO);
+
     audioIn.latch();
     messages::AudioCommand audioCommand = audioIn.message();
 
@@ -34,6 +37,8 @@ void AudioEnactorModule::run_()
         if(system(("aplay -q "+audioCommand.audio_file()+" &").c_str()) != 0)
             std::cout << "AudioEnactor could not play file." << std::endl;
     }
+
+    PROF_EXIT(P_AUDIO);
 }
 
 }
