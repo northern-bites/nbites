@@ -4,6 +4,8 @@ cd $NBITES_DIR/src/serenity
 
 git remote update
 
+git merge origin/master
+
 git checkout master
 
 while [ 1 ]
