@@ -1,8 +1,6 @@
 #pragma once
 
 #include "RoboGrams.h"
-#include "ALSpeech.h"
-#include <alcommon/albroker.h>
 #include "AudioCommand.pb.h"
 
 
@@ -12,14 +10,13 @@ namespace audio {
 class AudioEnactorModule : public portals::Module {
 
 public:
-    AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker);
+    AudioEnactorModule();
     virtual ~AudioEnactorModule() {}
 
     portals::InPortal<messages::AudioCommand> audioIn;
 
 protected:
     virtual void run_();
-    //ALSpeech alspeech;
 };
 
 }

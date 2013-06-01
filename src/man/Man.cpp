@@ -23,7 +23,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       motion(),
       guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
       guardian(),
-      audio(broker),
+      audio(),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
