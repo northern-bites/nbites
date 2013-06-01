@@ -35,7 +35,7 @@ MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
  */
 MMKalmanFilter::~MMKalmanFilter()
 {
-    delete &filters;
+    //delete &filters;
 }
 
 /**

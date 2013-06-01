@@ -19,7 +19,7 @@ public:
 
 protected:
     virtual void run_();
-    ALSpeech alspeech;
+    //ALSpeech alspeech;
 };
 
 }
