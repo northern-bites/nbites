@@ -50,8 +50,6 @@ static const char *PCOMPONENT_NAMES[] = {
     "Logging",
 
     "Python",
-    "PyUpdate",
-    "PyRun",
 
     "Lights",
 
@@ -113,18 +111,11 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_FIT_UNUSED,            --> */ P_LINES,
     /*P_INTERSECT_LINES,       --> */ P_LINES,
 
-    /*P_MEMORY_VISION,         --> */ P_MAIN,
-    /*P_MEMORY_VISION_SENSORS, --> */ P_MAIN,
-    /*P_MEMORY_MOTION_SENSORS, --> */ P_MAIN,
-    /*P_MEMORY_IMAGE,          --> */ P_MAIN,
-
     /*P_LOC                    --> */ P_MAIN,
     /*P_MCL                    --> */ P_LOC,
     /*P_LOGGING                --> */ P_TOTAL,
 
     /*P_PYTHON                 --> */ P_MAIN,
-    /*P_PYUPDATE               --> */ P_PYTHON,
-    /*P_PYRUN                  --> */ P_PYTHON,
 
     /*P_LIGHTS                 --> */ P_MAIN,
 
@@ -143,7 +134,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_ENACTOR                --> */ P_SWITCHBOARD,
 
     /*P_COMM                   --> */ P_TOTAL,
-    /*P_TOOLCONNECT            --> */ P_TOTAL,
+
     /*P_ROBOGUARDIAN           --> */ P_TOTAL,
 
     /*P_TOTAL                  --> */ P_TOTAL
