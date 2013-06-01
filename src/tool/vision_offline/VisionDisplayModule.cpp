@@ -11,27 +11,29 @@ namespace vision {
 VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	QMainWindow(parent),
 	currentCamera(Camera::TOP),
-	topConverter(Camera::TOP),
-	bottomConverter(Camera::BOTTOM),
 	topDisplay(this),
 	bottomDisplay(this),
 	topThrDisplay(this),
 	botThrDisplay(this),
 	bottomImage(base()),
 	topImage(base()),
+	tTImage(base()),
+	tYImage(base()),
+	tUImage(base()),
+	tVImage(base()),
+	bTImage(base()),
+	bYImage(base()),
+	bUImage(base()),
+	bVImage(base()),
 	visMod()
 {
 
-	subdiagram.addModule(topConverter);
-	subdiagram.addModule(bottomConverter);
 	subdiagram.addModule(topDisplay);
 	subdiagram.addModule(bottomDisplay);
 	subdiagram.addModule(topThrDisplay);
 	subdiagram.addModule(botThrDisplay);
 	subdiagram.addModule(visMod);
 
-	topConverter.imageIn.wireTo(&topImage, true);
-	bottomConverter.imageIn.wireTo(&bottomImage, true);
 	topDisplay.imageIn.wireTo(&topImage, true);
 	bottomDisplay.imageIn.wireTo(&bottomImage, true);
 	topThrDisplay.imageIn.wireTo(&visMod.topOutPic, true);
@@ -40,15 +42,15 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	portals::Message<messages::JointAngles> joints(0);
 	portals::Message<messages::InertialState> inertials(0);
 	
-	visMod.topThrImage.wireTo(&topConverter.thrImage);
-    visMod.topYImage.wireTo(&topConverter.yImage);
-    visMod.topUImage.wireTo(&topConverter.uImage);
-    visMod.topVImage.wireTo(&topConverter.vImage);
+	visMod.topThrImage.wireTo(&tTImage, true);
+    visMod.topYImage.wireTo(&tYImage, true);
+    visMod.topUImage.wireTo(&tUImage, true);
+    visMod.topVImage.wireTo(&tVImage, true);
 
-    visMod.botThrImage.wireTo(&bottomConverter.thrImage);
-    visMod.botYImage.wireTo(&bottomConverter.yImage);
-    visMod.botUImage.wireTo(&bottomConverter.uImage);
-    visMod.botVImage.wireTo(&bottomConverter.vImage);
+    visMod.botThrImage.wireTo(&bTImage, true);
+    visMod.botYImage.wireTo(&bYImage, true);
+    visMod.botUImage.wireTo(&bUImage, true);
+    visMod.botVImage.wireTo(&bVImage, true);
 
     visMod.joint_angles.setMessage(joints);
 	visMod.inertial_state.setMessage(inertials);
@@ -91,12 +93,6 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     QHBoxLayout* mainLayout = new QHBoxLayout;
 	QWidget* mainWidget = new QWidget;
 
-	QToolBar* toolBar = new QToolBar(this);
-    QPushButton* loadBtn = new QPushButton("Load Table", this);
-    connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
-	toolBar->addWidget(loadBtn);
-	this->addToolBar(toolBar); 
-
     imageTabs = new QTabWidget(this);
     mainLayout->addWidget(imageTabs);
 
@@ -120,13 +116,38 @@ void VisionDisplayModule::run_()
     bottomImageIn.latch();
     topImageIn.latch();
 
+	tTImage_in.latch();
+	tYImage_in.latch();
+	tUImage_in.latch();
+	tVImage_in.latch();
+	bTImage_in.latch();
+	bYImage_in.latch();
+	bUImage_in.latch();
+	bVImage_in.latch();
+	
+	
+
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
     topImage.setMessage(portals::Message<messages::YUVImage>(
                             &topImageIn.message()));
 	
-	topConverter.initTable(colorTable.getTable());
-    bottomConverter.initTable(colorTable.getTable());
+	tTImage.setMessage(portals::Message<messages::ThresholdImage>(
+						   &tTImage_in.message()));
+	tYImage.setMessage(portals::Message<messages::PackedImage16>(
+						   &tYImage_in.message()));
+	tUImage.setMessage(portals::Message<messages::PackedImage16>(
+						   &tUImage_in.message()));
+	tVImage.setMessage(portals::Message<messages::PackedImage16>(
+						   &tVImage_in.message()));
+	bTImage.setMessage(portals::Message<messages::ThresholdImage>(
+						   &bTImage_in.message()));
+	bYImage.setMessage(portals::Message<messages::PackedImage16>(
+						   &bYImage_in.message()));
+	bUImage.setMessage(portals::Message<messages::PackedImage16>(
+						   &bUImage_in.message()));
+	bVImage.setMessage(portals::Message<messages::PackedImage16>(
+						   &bVImage_in.message()));
 
     subdiagram.run();
 	
@@ -143,10 +164,12 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
     painter.setPen(QColor(246, 15, 15));
 
 	const messages::VisionField *visField = visMod.vision_field.getMessage(true).get();
+	
 
 	if (which == Camera::TOP) {
+		std::cout << "there are " << visField->visual_line_size() << " lines in the image\n";
 		for (int i = 0; i < visField->visual_line_size(); i++) {
-			
+
 			painter.drawLine(visField->visual_line(i).start_x(),
 							 visField->visual_line(i).start_y(),
 							 visField->visual_line(i).end_x(),
@@ -158,15 +181,6 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 
 }
 
-void VisionDisplayModule::loadColorTable()
-{
-    QString base_directory = QString(NBITES_DIR) + "/data/tables";
-    QString filename = QFileDialog::getOpenFileName(this,
-                    tr("Load Color Table from File"),
-                    base_directory,
-                    tr("Color Table files (*.mtb)"));
-    colorTable.read(filename.toStdString());
-}
 
 }
 }
