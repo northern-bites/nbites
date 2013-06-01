@@ -12,7 +12,7 @@
 #include <QtGui>
 #include <vector>
 
-#include "common/FieldConstants.h"
+#include "FieldConstants.h"
 
 #include "common/PaintField.h"
 

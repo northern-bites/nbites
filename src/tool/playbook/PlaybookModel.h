@@ -8,7 +8,7 @@
 #pragma once
 
 #include <QObject>
-#include "common/FieldConstants.h"
+#include "FieldConstants.h"
 
 static const int BOX_SIZE = 100;  // Size in cm for each grid box.
 
