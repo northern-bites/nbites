@@ -6,7 +6,6 @@ set( COMMON_SRCS
 
 set( COMMON_HEADERS
    PaintField.h
-   #FieldConstants.h
   )
 
 

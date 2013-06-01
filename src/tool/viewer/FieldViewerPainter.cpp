@@ -1,9 +1,9 @@
 #include "FieldViewerPainter.h"
 
+#include <cmath>
+
 namespace tool {
 namespace viewer {
-
-
 
 FieldViewerPainter::FieldViewerPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_),

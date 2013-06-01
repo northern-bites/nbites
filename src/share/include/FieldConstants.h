@@ -2,8 +2,7 @@
 #define FIELD_CONSTANTS_H
 
 #include <cmath>
-#include "Common.h"
-#include "RobotConfig.h"
+#include "DebugConfig.h"
 
 // Nao field constants
 
