@@ -164,7 +164,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
     painter.setPen(QColor(246, 15, 15));
 
 	const messages::VisionField *visField = visMod.vision_field.getMessage(true).get();
-	
+	const messages::VisionBall *visBall = visMod.vision_ball.getMessage(true).get();
 
 	if (which == Camera::TOP) {
 		std::cout << "there are " << visField->visual_line_size() << " lines in the image\n";
@@ -175,6 +175,20 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 							 visField->visual_line(i).end_x(),
 							 visField->visual_line(i).end_y());
 		}
+	
+	
+		if (visBall->intopcam()) {
+			int ball_x = visBall->x();
+			int ball_y = visBall->y();
+			int ball_radius = visBall->radius();
+
+			std::cout << "ball_x = " << ball_x << std::endl;
+
+			painter.setPen(QPen(QColor(0,0,255,200), 3, Qt::SolidLine, Qt::FlatCap));
+			painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
+			painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
+		}
+
 	}
 	
 	return lineImage;

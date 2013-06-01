@@ -102,6 +102,9 @@ void Tool::loadColorTable()
                     base_directory,
                     tr("Color Table files (*.mtb)"));
     globalColorTable.read(filename.toStdString());
+	topConverter.initTable(globalColorTable.getTable());
+    bottomConverter.initTable(globalColorTable.getTable());
+
 
 }
 
