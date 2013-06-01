@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "PlaybookField.h"
+#include "PlaybookModel.h"
 
 namespace tool{
 namespace playbook{
@@ -27,6 +28,7 @@ protected slots:
 
 protected:
     PlaybookField* fieldPainter;
+    PlaybookModel* model;
 
     QHBoxLayout* mainLayout;
     QHBoxLayout* field;

@@ -3,11 +3,13 @@ cmake_minimum_required(VERSION 2.8.3)
 set( PLAYBOOK_SRCS
   PlaybookCreator.cpp
   PlaybookField.cpp
+  PlaybookModel.cpp
   )
 
 set( PLAYBOOK_HEADERS
   PlaybookCreator.h
   PlaybookField.h
+  PlaybookModel.h
   )
 
 Qt4_wrap_cpp( PLAYBOOK_HEADERS_MOC ${PLAYBOOK_HEADERS} )
