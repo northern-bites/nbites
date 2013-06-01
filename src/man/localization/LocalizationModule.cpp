@@ -52,7 +52,7 @@ void LocalizationModule::update()
     deltaOdometry.set_h(curOdometry.h() - lastOdometry.h());
 
     // Ensure deltaOdometry is reasonable (initial fix lost in git?)
-    if(std::abs(deltaOdometry.x()) > 1.f || std::abs(deltaOdometry.y()) > 1.f)
+    if((fabs(deltaOdometry.x()) > 3.f) || (fabs(deltaOdometry.y()) > 3.f))
     {
         deltaOdometry.set_x(0.f);
         deltaOdometry.set_y(0.f);
@@ -65,6 +65,7 @@ void LocalizationModule::update()
     // Update the locMessage and the swarm (if logging)
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                          getCurrentEstimate());
+
 #ifdef LOG_LOCALIZATION
     portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                            getCurrentSwarm());
