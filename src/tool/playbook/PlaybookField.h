@@ -27,6 +27,7 @@ public:
     PlaybookField(QWidget* parent = 0, float scaleFactor_ = 1.f);
 
 protected slots:
+    void drawGoalie(bool on);
 
 protected:
     // Paint the field

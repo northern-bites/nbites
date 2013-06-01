@@ -6,7 +6,10 @@ namespace tool{
 namespace playbook{
 
 PlaybookModel::PlaybookModel(QObject* parent) :
-    QObject(parent)
+    QObject(parent),
+    changedIndex(),
+    changedPositions(),
+    goalieOn(1)
 {
     playbook = new PlaybookPosition***[2];
     for(int goalie = 0; goalie < 2; ++goalie)
@@ -25,6 +28,13 @@ PlaybookModel::PlaybookModel(QObject* parent) :
         }
     }
 }
+
+void PlaybookModel::toggleGoalie(bool on)
+{
+    goalieOn = on ? 1 : 0;
+    qDebug() << "goalieOn is now " << goalieOn;
+}
+
 
 
 }

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <QObject>
+#include <QStack>
 #include "FieldConstants.h"
 
 static const int BOX_SIZE = 100;  // Size in cm for each grid box.
@@ -29,7 +30,7 @@ struct PlaybookPosition
     {}
 };
 
-class PlaybookModel : QObject
+class PlaybookModel : public QObject
 {
     Q_OBJECT;
 
@@ -58,6 +59,15 @@ public:
 
     PlaybookPosition**** playbook; // [2][3+2+1][GRID_WIDTH][GRID_HEIGHT];
 
+protected slots:
+    void toggleGoalie(bool on);
+
+protected:
+    QStack<int> changedIndex;  // Holds the indecies in the playbook
+                               // that were changed.
+    QStack<PlaybookPosition> changedPositions; // The old positions.
+
+    int goalieOn;
 
 };
 

@@ -23,9 +23,6 @@ class PlaybookCreator : public QWidget
 public:
     PlaybookCreator(QWidget* parent = 0);
 
-protected slots:
-    void noPlaybookError();
-
 protected:
     PlaybookField* fieldPainter;
     PlaybookModel* model;
