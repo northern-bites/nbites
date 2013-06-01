@@ -81,7 +81,7 @@ void VisionModule::updateVisionBall() {
 
     portals::Message<messages::VisionBall> ball_data(0);
 
-    ball_data.get()->set_on(vision->ball->isTopCam());
+    ball_data.get()->set_intopcam(vision->ball->isTopCam());
     ball_data.get()->set_distance(vision->ball->getDistance());
     ball_data.get()->set_angle_x_deg(vision->ball->getAngleXDeg());
     ball_data.get()->set_angle_y_deg(vision->ball->getAngleYDeg());

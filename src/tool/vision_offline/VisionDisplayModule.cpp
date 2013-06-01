@@ -129,9 +129,34 @@ void VisionDisplayModule::run_()
     bottomConverter.initTable(colorTable.getTable());
 
     subdiagram.run();
-
+	
+	topDisplay.setOverlay(makeOverlay(Camera::TOP));
+	bottomDisplay.setOverlay(makeOverlay(Camera::BOTTOM));
+	
 }
 
+QImage VisionDisplayModule::makeOverlay(Camera::Type which)
+{
+	QImage lineImage(320, 240, QImage::Format_ARGB32);
+    lineImage.fill(qRgba(0, 0, 0, 0));
+    QPainter painter(&lineImage);
+    painter.setPen(QColor(246, 15, 15));
+
+	const messages::VisionField *visField = visMod.vision_field.getMessage(true).get();
+
+	if (which == Camera::TOP) {
+		for (int i = 0; i < visField->visual_line_size(); i++) {
+			
+			painter.drawLine(visField->visual_line(i).start_x(),
+							 visField->visual_line(i).start_y(),
+							 visField->visual_line(i).end_x(),
+							 visField->visual_line(i).end_y());
+		}
+	}
+	
+	return lineImage;
+
+}
 
 void VisionDisplayModule::loadColorTable()
 {

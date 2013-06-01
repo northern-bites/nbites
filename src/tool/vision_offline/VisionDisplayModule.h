@@ -56,6 +56,9 @@ protected:
 
 private:
 	
+	QImage makeOverlay(Camera::Type which);
+
+	
 	QTabWidget* imageTabs;
 	Camera::Type currentCamera;
 	
@@ -66,8 +69,8 @@ private:
 	// Modules
 	man::image::ImageConverterModule topConverter;
 	man::image::ImageConverterModule bottomConverter;
-	image::ImageDisplayListener topDisplay;
-    image::ImageDisplayListener bottomDisplay;
+	image::OverlayDisplayModule topDisplay;
+    image::OverlayDisplayModule bottomDisplay;
     image::ThresholdedImageDisplayModule topThrDisplay;
 	image::ThresholdedImageDisplayModule botThrDisplay;
 	man::vision::VisionModule visMod;
