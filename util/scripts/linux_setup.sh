@@ -6,7 +6,7 @@ if [ $# -ne 1 ]; then
 fi
 
 PACKAGES="build-essential cmake git-core \
-python2.7-dev emacs cmake-curses-gui ccache curl aptitude \
+python2.7-dev emacs cmake-curses-gui ccache aptitude \
 qt4-dev-tools python-pyparsing libboost-dev"
 
 echo "Are you on 64-bit linux? (y/n)"
@@ -84,6 +84,7 @@ rm $naoqi
 
 mkdir $atom_local
 tar -xzf $atom -C $atom_local --strip-components 1
+rm $atom
 
 popd
 
