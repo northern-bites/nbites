@@ -26,6 +26,10 @@ echo "Moving libraries..."
 mv $FOLDER/libboost_python.so.1.48.0 /usr/lib/
 mv $FOLDER/libprotobuf.so.7 /usr/lib/
 
+# Put the camera driver in place
+echo "Moving camera driver..."
+mv $FOLDER/mt9m114.ko /lib/modules/2.6.33.9-rt31-aldebaran-rt/kernel/drivers/media/video/
+
 # Set the hostname
 echo "Setting the hostname to $HOSTNAME..."
 echo $HOSTNAME > /etc/hostname

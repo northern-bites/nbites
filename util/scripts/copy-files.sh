@@ -12,13 +12,14 @@ ROBOCUP=robocup.bowdoin.edu:/mnt/research/robocup
 FOLDER=nao_files
 
 # Get the files from the server
+echo "Downloading files FROM ROBOCUP!"
 echo "Type username for RoboCup server, followed by [ENTER]"
 read SERVER_UNAME
 
 rsync -vr $SERVER_UNAME@$ROBOCUP/$FOLDER .
 
 # Copy important libraries to home folder
-echo "Copying necessary files to the robot."
+echo "Copying necessary files TO THE ROBOT!"
 scp -r $FOLDER setup-robot.sh $ROBOT_UNAME@$ROBOT:
 
 echo "Now run setup-robot.sh ON THE ROBOT."
