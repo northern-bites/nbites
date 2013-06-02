@@ -173,6 +173,7 @@ void BehaviorsModule::getBrainInstance ()
 
 void BehaviorsModule::run_ ()
 {
+    PROF_ENTER(P_BEHAVIORS);
     static unsigned int num_crashed = 0;
     if (error_state && num_crashed < NUM_PYTHON_RESTARTS_MAX) {
         this->reload_hard();
@@ -207,6 +208,8 @@ void BehaviorsModule::run_ ()
 
     // Send outgoing messages
     sendMessages();
+
+    PROF_EXIT(P_BEHAVIORS);
 }
 
 void BehaviorsModule::prepareMessages()
