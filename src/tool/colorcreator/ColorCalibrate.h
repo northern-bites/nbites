@@ -59,14 +59,14 @@ public:
     portals::InPortal<messages::YUVImage> bottomImageIn;
 
 protected slots:
-    void selectColorSpace(int index); // CHECK
+    void selectColorSpace(int index);
     void updateThresholdedImage();
-    void loadSlidersBtnPushed();      // CHECK
-    void saveSlidersBtnPushed();      // CHECK
+    void loadSlidersBtnPushed();     
+    void saveSlidersBtnPushed();     
     void loadColorTableBtnPushed();
     void saveColorTableBtnPushed();   // Assuming ColorTable has the same functionality
-    void imageTabSwitched(int i);     // CHECK
-    void setFullColors(bool state);   // CHECK
+    void imageTabSwitched(int i);    
+    void setFullColors(bool state);
 
 protected:
     virtual void run_();

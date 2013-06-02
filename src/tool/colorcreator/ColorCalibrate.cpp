@@ -141,7 +141,9 @@ void ColorCalibrate::selectColorSpace(int index) {
 // or unify this with our regular thresholding process (maybe
 // by converting the color space parameters to a table continuously?
 void ColorCalibrate::updateThresholdedImage() {
-    qDebug() << "updateThreshold";
+    subdiagram.run();
+
+    qDebug() << "updateThreshold\n";
 
     QString filename = QString(NBITES_DIR) + "/data/tables/live";
     botThrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
@@ -151,82 +153,65 @@ void ColorCalibrate::updateThresholdedImage() {
     topConverter.initTable(colorTable.getTable());
     bottomConverter.initTable(colorTable.getTable());
 
-    subdiagram.run();
 
     //threshold the top image
-    // messages::YUVImage image;
-    // image = topImageIn.message();
+    messages::YUVImage image;
+    image = topImageIn.message();
 
-    // //check for size changes and make sure
-    // //the thresholded image is the same size as the image
-    // if (thresholdedImage.width() != image.width()
-    //     || thresholdedImage.height() != image.height()) {
-    //     //TODO: should be ARGB premultiplied?
-    //     thresholdedImage = QImage(image.width(),
-    //                               image.height(),
-    //                               QImage::Format_RGB32);
-    // }
+    //check for size changes and make sure
+    //the thresholded image is the same size as the image
+    if (thresholdedImage.width() != image.width()
+        || thresholdedImage.height() != image.height()) {
+        //TODO: should be ARGB premultiplied?
+	  thresholdedImage = QImage(image.width(),
+                                  image.height(),
+                                  QImage::Format_RGB32);
+    }
 
-    // const messages::MemoryImage8 yImage = image.yImage();
-    // const messages::MemoryImage8 uImage = image.uImage();
-    // const messages::MemoryImage8 vImage = image.vImage();
+    const messages::MemoryImage8 yImage = image.yImage();
+    const messages::MemoryImage8 uImage = image.uImage();
+    const messages::MemoryImage8 vImage = image.vImage();
     // subdiagram.run();
 
     // Get the image being thresholded on
     // messages::YUVImage image;
-    // if (currentCamera == Camera::TOP) {
-    //     image = topImageIn.message();
-    // } else {
-    //     image = bottomImageIn.message();
-    // }
+    if (currentCamera == Camera::TOP) {
+        image = topImageIn.message();
+    } else {
+        image = bottomImageIn.message();
+    }
 
-    // //check for size changes and make sure
-    // //the thresholded image is the same size as the image
-    // if (thresholdedImage.width() != image.width()
-    //     || thresholdedImage.height() != image.height()) {
-    //     //TODO: should be ARGB premultiplied?
-    //     thresholdedImage = QImage(image.width(),
-    //                               image.height(),
-    //                               QImage::Format_RGB32);
-    // }
+	qDebug() << "\nheights: \n" << thresholdedImage.height() << "\n";
+	qDebug() << yImage.height();
 
-    // const messages::MemoryImage8 yImage = image.yImage();
-    // const messages::MemoryImage8 uImage = image.uImage();
-    // const messages::MemoryImage8 vImage = image.vImage();
+	qDebug() << "\nwidths: \n" << thresholdedImage.width() << "\n";
+	qDebug() << yImage.width();
 
-    // //threshold the image
-    // for (int j = 0; j < thresholdedImage.height(); j++) {
-    //     QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
-
-    //     // for (int i = 0; i < thresholdedImage.width(); i++) {
-    //     //     image::Color color;
-    //     //     color.setYuv((byte)yImage.getPixel(i,j), (byte)uImage.getPixel(i,j),
-    //     //                  (byte)vImage.getPixel(i,j));
-    //     //     //default color
-    //     //     thresholdedImageLine[i] = image::Color::Grey;
-    //     //     //temporary variables for blending colors
-    //     //     int count = 0;
-    //     //     long long tempColor = 0;
-    //     //     for (int c = 0; c < image::Color::NUM_COLORS; c++) {
-    //     //         if (colorSpace[c].contains(color) &&
-    //     //             (displayAllColors || currentColorSpace == &colorSpace[c])) {
-    //     //             //blend colors in by averaging them
-    //     //             tempColor *= count;
-    //     //             tempColor += image::Color_RGB[c];
-    //     //             count++;
-    //     //             tempColor /= count;
-    //     //         }
-    //     //     }
-    //     //   // lame hack to show a "cursor" on the thresholded image
-    //     //   // TODO do a true cursor mirroring on the thresholded image
-    //     //     if ((abs(j - lastClickedY) < BOX) && (abs(i - lastClickedX) < BOX)) {
-    //     //         tempColor = image::Color_RGB[3];
-    //     //     }
-    //     //     if (tempColor) {
-    //     //         thresholdedImageLine[i] = (QRgb) tempColor;
-    //     //     }
-    //     // }
-    // }
+    //threshold the image
+    for (int j = 0; j < thresholdedImage.height(); j++) {
+        QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
+		
+        for (int i = 0; i < thresholdedImage.width(); i++) {
+            image::Color color;
+		    color.setYuv((byte)yImage.getPixel(i,j), (byte)uImage.getPixel(i,j),
+                         (byte)vImage.getPixel(i,j));
+            //default color
+            thresholdedImageLine[i] = image::Color::Grey;
+            //temporary variables for blending colors
+            int count = 0;
+            long long tempColor = 0;
+            for (int c = 0; c < image::Color::NUM_COLORS; c++) {
+                if (colorSpace[c].contains(color) &&
+                    (displayAllColors || currentColorSpace == &colorSpace[c])) {
+                    //blend colors in by averaging them
+                    tempColor *= count;
+                    tempColor += image::Color_RGB[c];
+                    count++;
+                    tempColor /= count;
+                }
+            }
+        }
+    }
 
     // //set it
     // thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
@@ -241,6 +226,8 @@ void ColorCalibrate::run_()
                             &topImageIn.message()));
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
+
+  	subdiagram.run();
     updateThresholdedImage();
 }
 
