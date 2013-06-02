@@ -7,7 +7,7 @@ fi
 
 PACKAGES="build-essential cmake git-core \
 python2.7-dev emacs cmake-curses-gui ccache curl aptitude \
-ant qt4-dev-tools python-pyparsing"
+qt4-dev-tools python-pyparsing libboost-dev"
 
 echo "Are you on 64-bit linux? (y/n)"
 read IS64BIT
@@ -62,10 +62,6 @@ atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
 
-ext=ext-nbites-linux32.tar.gz
-
-ext_robocup=$robocup/software/$ext
-
 echo ""
 echo "What's your Bowdoin username?"
 read USER_NAME
@@ -89,16 +85,6 @@ rm $naoqi
 mkdir $atom_local
 tar -xzf $atom -C $atom_local --strip-components 1
 
-popd
-
-echo "Downloading external components"
-
-rsync -v $USER_NAME@$ext_robocup $nbites_dir/
-
-echo "Unpacking external components"
-pushd $nbites_dir
-tar -xzf $ext
-rm $ext
 popd
 
 echo ""
