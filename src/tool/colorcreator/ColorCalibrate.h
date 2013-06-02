@@ -24,15 +24,14 @@
 #include <QSizePolicy>
 
 //tool
-//#include "viewer/ChannelImageViewer.h"
 #include "RoboGrams.h"
 #include "image/ImageDisplayModule.h"
 #include "image/ImageConverterModule.h"
 #include "Camera.h"
-/* #include "image/BMPYUVImage.h" */
-//#include "viewer/BMPImageViewerListener.h"
 
 #include "image/Color.h"
+
+#include "PathConfig.h"
 
 //colorcreator
 #include "ColorEdit.h"
@@ -45,86 +44,68 @@ namespace tool {
 namespace colorcreator {
 
 class ColorCalibrate : public QWidget,
-	                   public portals::Module
+                       public portals::Module
 {
     Q_OBJECT
 
-public:
-  static const image::Color::ColorID STARTING_COLOR = image::Color::Orange;
+    public:
+    static const image::Color::ColorID STARTING_COLOR = image::Color::Orange;
 
 public:
-  ColorCalibrate(QWidget *parent = 0);
-	~ColorCalibrate() {}
+    ColorCalibrate(QWidget *parent = 0);
+    ~ColorCalibrate() {}
 
-	portals::InPortal<messages::YUVImage> topImageIn;
-	portals::InPortal<messages::YUVImage> bottomImageIn;
+    portals::InPortal<messages::YUVImage> topImageIn;
+    portals::InPortal<messages::YUVImage> bottomImageIn;
 
 protected slots:
-    void selectColorSpace(int index);
+    void selectColorSpace(int index); // CHECK
     void updateThresholdedImage();
-    void loadSlidersBtnPushed();
-    void saveSlidersBtnPushed();
-    void saveColorTableBtnPushed();
-    void imageTabSwitched(int i);
-	void setFullColors(bool state);
-    void canvassClicked(int x, int y, int brushSize, bool leftClick);
-
+    void loadSlidersBtnPushed();      // CHECK
+    void saveSlidersBtnPushed();      // CHECK
+    void loadColorTableBtnPushed();
+    void saveColorTableBtnPushed();   // Assuming ColorTable has the same functionality
+    void imageTabSwitched(int i);     // CHECK
+    void setFullColors(bool state);   // CHECK
 
 protected:
-	virtual void run_();
+    virtual void run_();
     void loadColorSpaces(QString filename);
     void writeColorSpaces(QString filename);
 
 private:
-     QTabWidget* imageTabs;
+    color::ColorTable colorTable;
+
+    QTabWidget* imageTabs;
     Camera::Type currentCamera;
 
-	 portals::RoboGram subdiagram;
+    portals::RoboGram subdiagram;
 
-	 man::image::ImageConverterModule topConverter;
-	 man::image::ImageConverterModule bottomConverter;
-	 image::ImageDisplayListener topDisplay;
-	 image::ImageDisplayListener bottomDisplay;
-	 image::ThresholdedImageDisplayModule thrDisplay;
+    man::image::ImageConverterModule topConverter;
+    man::image::ImageConverterModule bottomConverter;
+    image::ImageDisplayModule topDisplay;
+    image::ImageDisplayModule bottomDisplay;
+    image::ThresholdedImageDisplayModule thrDisplay;
 
-	 portals::OutPortal<messages::YUVImage> topImage;
-	 portals::OutPortal<messages::YUVImage> bottomImage;
-	 
-    /* image::BMPYUVImage* topImage; */
-    /* viewer::ChannelImageViewer topChannelImage; */
-    /* viewer::BMPImageViewerListener* topImageViewer; */
+    portals::OutPortal<messages::YUVImage> topImage;
+    portals::OutPortal<messages::YUVImage> bottomImage;
 
-    /* image::BMPYUVImage* bottomImage; */
-    /* viewer::ChannelImageViewer bottomChannelImage; */
-    /* viewer::BMPImageViewerListener* bottomImageViewer; */
+    color::ColorSpace colorSpace[image::Color::NUM_COLORS];
+    color::ColorSpace* currentColorSpace;
+    QComboBox colorSelect;
+    ColorSpaceWidget colorSpaceWidget;
+    ColorWheel colorWheel;
+    QLabel thresholdedImagePlaceholder;
+    QImage thresholdedImage;
+    QPushButton loadSlidersBtn, saveSlidersBtn, loadColorTableBtn, saveColorTableBtn;
 
-	 color::ColorSpace colorSpace[image::Color::NUM_COLORS];
-	 color::ColorSpace* currentColorSpace;
-     QComboBox colorSelect;
-	 ColorSpaceWidget colorSpaceWidget;
-	 ColorWheel colorWheel;
-	 QLabel thresholdedImagePlaceholder;
-	 QImage thresholdedImage;
-	 QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
+    QHBoxLayout* bottomLayout;
+    QVBoxLayout* colorButtons;
+    QVBoxLayout* leftJunk;
+    QVBoxLayout* mainLayout;
+    QHBoxLayout* topLayout;
 
-	 QHBoxLayout* bottomLayout;
-	 QVBoxLayout* colorButtons;
-	 QVBoxLayout* leftJunk;
-	 QVBoxLayout* mainLayout;
-	 QHBoxLayout* topLayout;
-
-	//Sliders & stuff for tweaking the color table
-	QSlider* hMin;
-	QSlider* hMax;
-	QSlider* sMin;
-	QSlider* sMax;
-	QSlider* zMin;
-	QSlider* zMax;
-	int hLow, hHigh, sLow, sHigh, zLow, zHigh;
-
-	bool displayAllColors;
-	int lastClickedX, lastClickedY;
-
+    bool displayAllColors;
 };
 
 }
