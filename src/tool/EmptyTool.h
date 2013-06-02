@@ -17,27 +17,18 @@
 #include "ToolDiagram.h"
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
-#include "colorcreator/ColorTableCreator.h"
-#include "colorcreator/ColorTable.h"
-#include "vision_offline/VisionDisplayModule.h"
-#include "viewer/FieldViewer.h"
-
-#include "image/ImageConverterModule.h"
-
-#include "ParticleSwarm.pb.h"
 
 namespace tool {
 
-class Tool : public QMainWindow {
+class EmptyTool : public QMainWindow {
     Q_OBJECT;
 
 public:
-    Tool(const char* title = "TOOL");
-    ~Tool();
+    EmptyTool(const char* title = "TOOL");
+    ~EmptyTool();
 
 public slots:
     void setUpModules();
-    void loadColorTable();
 
 protected:
     // For keyboard control
@@ -50,14 +41,6 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
-    color::ColorTableCreator tableCreator;
-    vision::VisionDisplayModule visDispMod;
-    viewer::FieldViewer fieldView;
-
-    man::image::ImageConverterModule topConverter;
-    man::image::ImageConverterModule bottomConverter;
-
-    color::ColorTable globalColorTable;
 
     // GUI stuff
     QTabWidget* toolTabs;

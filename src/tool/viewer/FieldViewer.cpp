@@ -13,31 +13,28 @@ FieldViewer::FieldViewer(QWidget* parent):
 {
     fieldPainter = new FieldViewerPainter(this);
 
-    mainLayout = new QHBoxLayout(this);
+    mainLayout = new QVBoxLayout(this);
 
     //GUI
     particleViewBox = new QCheckBox("Particle Viewer",this);
     locationViewBox = new QCheckBox("Location Viewer", this);
     robotFieldViewBox = new QCheckBox("Robot Field Viewer",this);
-    selector4 = new QCheckBox("test4", this);
-    selector5= new QCheckBox("test5",this);
-    selector6 = new QCheckBox("test6", this);
-    selector7 = new QCheckBox("test7",this);
-    selector8 = new QCheckBox("test8", this);
+
+    zoomInButton = new QPushButton("+", this);
+    zoomOutButton = new QPushButton("-", this);
 
     field = new QHBoxLayout();
     field->addWidget(fieldPainter);
 
-    checkBoxes = new QVBoxLayout();
+    checkBoxes = new QHBoxLayout();
+    resizeLayout = new QHBoxLayout();
 
     checkBoxes->addWidget(particleViewBox);
     checkBoxes->addWidget(locationViewBox);
     checkBoxes->addWidget(robotFieldViewBox);
-    checkBoxes->addWidget(selector4);
-    checkBoxes->addWidget(selector5);
-    checkBoxes->addWidget(selector6);
-    checkBoxes->addWidget(selector7);
-    checkBoxes->addWidget(selector8);
+
+    resizeLayout->addWidget(zoomInButton);
+    resizeLayout->addWidget(zoomOutButton);
 
     // Connect checkbox interface with slots in the painter
     // Assume no unloggers, hookup if proven wrong
@@ -48,8 +45,15 @@ FieldViewer::FieldViewer(QWidget* parent):
     connect(robotFieldViewBox, SIGNAL(toggled(bool)), this,
             SLOT(noLogError()));
 
-    mainLayout->addLayout(field);
+    // Connect the resize paintfield buttons
+    connect(zoomInButton, SIGNAL(released()), fieldPainter,
+            SLOT(handleZoomIn()));
+    connect(zoomOutButton, SIGNAL(released()), fieldPainter,
+            SLOT(handleZoomOut()));
+
     mainLayout->addLayout(checkBoxes);
+    mainLayout->addLayout(resizeLayout);
+    mainLayout->addLayout(field);
 
     this->setLayout(mainLayout);
 }

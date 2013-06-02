@@ -391,7 +391,7 @@ public:
 
 // Here is the default pool size
 template<class T>
-SET_POOL_SIZE_DEFAULT(T, 8);
+SET_POOL_SIZE_DEFAULT(T, 30);
 
 template<class T>
 void MessageHolder<T>::release()

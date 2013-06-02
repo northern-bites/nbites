@@ -41,6 +41,9 @@ protected slots:
     void paintLocationAction(bool state);
     void paintObsvAction(bool state);
 
+    void handleZoomIn();
+    void handleZoomOut();
+
 protected:
     // Paint the field
     void paintEvent(QPaintEvent* event);
@@ -67,7 +70,6 @@ private:
     messages::RobotLocation curLoc;
     messages::ParticleSwarm curSwarm;
     messages::VisionField curObsv;
-
 };
 
 } // namespace viewer
