@@ -37,7 +37,7 @@ public:
 
 public slots:
     void setUpModules();
-	void loadColorTable();
+    void loadColorTable();
 
 protected:
     // For keyboard control
@@ -50,14 +50,14 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
-	color::ColorTableCreator tableCreator;
-	vision::VisionDisplayModule visDispMod;
+    color::ColorTableCreator tableCreator;
+    vision::VisionDisplayModule visDispMod;
     viewer::FieldViewer fieldView;
 
-	man::image::ImageConverterModule topConverter;
-	man::image::ImageConverterModule bottomConverter;
+    man::image::ImageConverterModule topConverter;
+    man::image::ImageConverterModule bottomConverter;
 
-	color::ColorTable globalColorTable;
+    color::ColorTable globalColorTable;
 
     // GUI stuff
     QTabWidget* toolTabs;

@@ -208,5 +208,6 @@ target_link_libraries(
   viewer
   tool_common
   colorcreator
+  vision_offline
   ${QT_LIBRARIES}
   )
