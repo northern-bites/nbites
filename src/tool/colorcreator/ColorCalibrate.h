@@ -85,7 +85,8 @@ private:
     man::image::ImageConverterModule bottomConverter;
     image::ImageDisplayModule topDisplay;
     image::ImageDisplayModule bottomDisplay;
-    image::ThresholdedImageDisplayModule thrDisplay;
+    image::ThresholdedImageDisplayModule topThrDisplay;
+    image::ThresholdedImageDisplayModule botThrDisplay;
 
     portals::OutPortal<messages::YUVImage> topImage;
     portals::OutPortal<messages::YUVImage> bottomImage;

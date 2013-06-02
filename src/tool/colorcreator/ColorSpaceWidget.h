@@ -36,9 +36,8 @@ protected slots:
 
 private:
     QMap<QSlider*, ColorSpace::Channel> sliders;
-	ColorSpace* colorSpace;
+    ColorSpace* colorSpace;
 };
 
 }
 }
-

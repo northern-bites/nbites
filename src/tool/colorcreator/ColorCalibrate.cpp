@@ -144,7 +144,8 @@ void ColorCalibrate::updateThresholdedImage() {
     qDebug() << "updateThreshold";
 
     QString filename = QString(NBITES_DIR) + "/data/tables/live";
-    color::ColorTable::writeFromSliders(filename, colorSpace);
+    botThrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
+
     colorTable.read(filename.toStdString());
 
     topConverter.initTable(colorTable.getTable());
@@ -152,7 +153,7 @@ void ColorCalibrate::updateThresholdedImage() {
 
     subdiagram.run();
 
-    // //threshold the top image
+    //threshold the top image
     // messages::YUVImage image;
     // image = topImageIn.message();
 
@@ -169,7 +170,7 @@ void ColorCalibrate::updateThresholdedImage() {
     // const messages::MemoryImage8 yImage = image.yImage();
     // const messages::MemoryImage8 uImage = image.uImage();
     // const messages::MemoryImage8 vImage = image.vImage();
-    //subdiagram.run();
+    // subdiagram.run();
 
     // Get the image being thresholded on
     // messages::YUVImage image;

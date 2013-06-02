@@ -1,4 +1,3 @@
-
 #include "ColorWheel.h"
 #include "image/Color.h"
 
@@ -6,6 +5,7 @@
 #include "image/Color.h"
 #include <cmath>
 #include <assert.h>
+#include <iostream>
 
 namespace tool {
 namespace colorcreator {
