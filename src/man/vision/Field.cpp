@@ -123,7 +123,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
             if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
                 convex[good].y > 15) {
                 if (debugFieldEdge) {
-                    //cout << "Spike at " << convex[good].x << " " << convex[good].y <<
+                    cout << "Spike at " << convex[good].x << " " << convex[good].y <<
                         endl;
                 }
                 convex[good].y = convex[good-1].y;
