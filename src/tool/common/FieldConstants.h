@@ -4,6 +4,8 @@
 #include <cmath>
 #include "Common.h"
 
+//#define USING_LAB_FIELD
+
 // Nao field constants
 
 #ifdef USING_LAB_FIELD

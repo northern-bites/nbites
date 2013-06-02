@@ -7,7 +7,7 @@ from .. import SweetMoves
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
-SAVING = True
+SAVING = False
 
 def gameInitial(player):
     if player.firstFrame():
