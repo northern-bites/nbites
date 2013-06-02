@@ -16,14 +16,14 @@ org_name, repo_short_name = repo_name.split('/')
 def handle(commit, head):
     # Get the Pull Request.
 
-    fail = subprocess.call(["get-pull-req.sh", "-b"+head.ref,
+    fail = subprocess.call(["./get-pull-req.sh", "-b"+head.ref,
                             "-n"+head.user.login, "-u"+head.repo.git_url])
 
     if fail:
         commit.create_status(state='error', description="What the hell's goin' on in the engine room? Were there monkeys? Some terrifying space monkeys maybe got loose?")
 
     # Run the Build Script.
-    fail = subprocess.call("build-script.sh")
+    fail = subprocess.call("./build-script.sh")
 
     if fail:
         commit.create_status(state='failure', description="This food is problematic.")
@@ -48,6 +48,7 @@ while(True):
 
     try:
         # Check GitHub once an hour.
+        print "Serenity is sleeping for an hour..."
         time.sleep(3600)
 
         print "Serenity Checking GitHub at " + time.strftime("%X")
@@ -62,8 +63,8 @@ while(True):
                 # If this loop is executing, then this PR has been
                 # previously handled and should be skipped.
                 # Annoyingly, there's currently no way to get size directly.
-                handled = True
-                break
+                if (status.state != 'pending'):
+                    handled = True
 
             if (not handled):
                 print "\tHandling new data..."
