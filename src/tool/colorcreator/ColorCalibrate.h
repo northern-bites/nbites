@@ -69,6 +69,7 @@ protected slots:
     void saveColorTableBtnPushed();   // Assuming ColorTable has the same functionality
     void imageTabSwitched(int i);    
     void setFullColors(bool state);
+	void canvasClicked(int x, int y, int brushSize, bool leftClick);
 
 protected:
     virtual void run_();
@@ -83,15 +84,9 @@ private:
 
     portals::RoboGram subdiagram;
 
-	//The converter modules
-    man::image::ImageConverterModule topConverter;
-    man::image::ImageConverterModule bottomConverter;
-
 	//Display modules for the 4 images
-    image::ImageDisplayModule topDisplay;
-    image::ImageDisplayModule bottomDisplay;
-    image::ThresholdedImageDisplayModule topThrDisplay;
-    image::ThresholdedImageDisplayModule botThrDisplay;
+    image::ImageDisplayListener topDisplay;
+    image::ImageDisplayListener bottomDisplay;
 
 	//Unfortunately we have to use these intermediary portals because we can't
 	//get them directly from the tool
@@ -104,7 +99,7 @@ private:
     ColorSpaceWidget colorSpaceWidget;
     ColorWheel colorWheel;
     QLabel thresholdedImagePlaceholder;
-    QImage thresholdedImage;
+	QImage thresholdedImage;
     QPushButton loadSlidersBtn, saveSlidersBtn, loadColorTableBtn, saveColorTableBtn;
 
 	QHBoxLayout* topImageLayout;

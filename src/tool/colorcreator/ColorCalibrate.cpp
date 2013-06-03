@@ -21,12 +21,8 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
     colorSpaceWidget(currentColorSpace, this),
     colorWheel(currentColorSpace, this),
     currentCamera(Camera::TOP),
-    topConverter(Camera::TOP),
-    bottomConverter(Camera::BOTTOM),
     topDisplay(this),
     bottomDisplay(this),
-    topThrDisplay(this),
-    botThrDisplay(this),
     topImage(base()),
     bottomImage(base())
 {
@@ -36,19 +32,11 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
     topLayout = new QHBoxLayout;
 
     //Adds modules to diagram then wires them together
-    subdiagram.addModule(topConverter);
-    subdiagram.addModule(bottomConverter);
     subdiagram.addModule(topDisplay);
     subdiagram.addModule(bottomDisplay);
-    subdiagram.addModule(topThrDisplay);
-    subdiagram.addModule(botThrDisplay);
 
-    topConverter.imageIn.wireTo(&topImage, true);
-    bottomConverter.imageIn.wireTo(&bottomImage, true);
     topDisplay.imageIn.wireTo(&topImage, true);
     bottomDisplay.imageIn.wireTo(&bottomImage, true);
-    topThrDisplay.imageIn.wireTo(&topConverter.thrImage);
-    botThrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
 
     //connect all the color spaces to update the thresholded
     //image when their parameters change
@@ -59,23 +47,11 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
 
     imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     topLayout->addWidget(imageTabs);
+	thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
+	topLayout->addWidget(&thresholdedImagePlaceholder);
  
-	//Used so that we can get two widgets in the same tab
-	topImageLayout = new QHBoxLayout;
-	bottomImageLayout = new QHBoxLayout;
-
-	topImageLayout->addWidget(&topDisplay);
-	topImageLayout->addWidget(&topThrDisplay);
-	bottomImageLayout->addWidget(&bottomDisplay);
-	bottomImageLayout->addWidget(&botThrDisplay);
-
-	QWidget* topImagesTogether = new QWidget;
-	QWidget* bottomImagesTogether = new QWidget; 
-	topImagesTogether->setLayout(topImageLayout);
-	bottomImagesTogether->setLayout(bottomImageLayout);
-
-	imageTabs->addTab(topImagesTogether, "Top Image");
-	imageTabs->addTab(bottomImagesTogether, "Bottom Image");
+	imageTabs->addTab(&topDisplay, "Top Image");
+	imageTabs->addTab(&bottomDisplay, "Bottom Image");
 
     connect(imageTabs, SIGNAL(currentChanged(int)),
             this, SLOT(imageTabSwitched(int)));
@@ -119,6 +95,11 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
     connect(&saveColorTableBtn, SIGNAL(clicked()),
             this, SLOT(saveColorTableBtnPushed()));
 
+    connect(&topDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(canvasClicked(int, int, int, bool)));
+    connect(&bottomDisplay, SIGNAL(mouseClicked(int, int, int, bool)),
+            this, SLOT(canvasClicked(int, int, int, bool)));
+
     bottomLayout->addLayout(colorButtons);
 
     QCheckBox* fullColors = new QCheckBox(tr("All colors"));
@@ -154,11 +135,7 @@ void ColorCalibrate::selectColorSpace(int index) {
 void ColorCalibrate::updateThresholdedImage() {
     subdiagram.run();
 
-    topConverter.initTable(colorTable.getTable());
-    bottomConverter.initTable(colorTable.getTable());
-
-
-    //threshold the top image
+    //threshold the image
     messages::YUVImage image;
     image = topImageIn.message();
 
@@ -178,7 +155,6 @@ void ColorCalibrate::updateThresholdedImage() {
     const messages::MemoryImage8 vImage = image.vImage();
 
     // Get the image being thresholded on
-    // messages::YUVImage image;
     if (currentCamera == Camera::TOP) {
         image = topImageIn.message();
     } else {
@@ -202,8 +178,8 @@ void ColorCalibrate::updateThresholdedImage() {
             int count = 0;
             long long tempColor = 0;
             for (int c = 0; c < image::Color::NUM_COLORS; c++) {
-                if (colorSpace[c].contains(color) &&
-                    (displayAllColors || currentColorSpace == &colorSpace[c])) {
+			  if (colorSpace[c].contains(color) &&
+				  (displayAllColors || currentColorSpace == &colorSpace[c])) {
                     //blend colors in by averaging them
                     tempColor *= count;
                     tempColor += image::Color_RGB[c];
@@ -212,13 +188,48 @@ void ColorCalibrate::updateThresholdedImage() {
                 }
             }
 			//We now have a color for this pixel
-			thresholdedImageLine[i] = tempColor;
+			thresholdedImageLine[i] = (QRgb)tempColor;
         }
     }
 
     // //set it
-    //thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
+	thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
+
 }
+
+  void ColorCalibrate::canvasClicked(int x, int y, int brushSize, bool leftClick)
+  {
+	std::cout << "Clicked " << x << " " << y << " " << std::endl;
+
+	messages::YUVImage image;
+	if(currentCamera == Camera::TOP) image = topImageIn.message();
+	else image = bottomImageIn.message();
+
+	byte yi = image.yImage().getPixel(x, y);
+	byte u = image.uImage().getPixel(x/2, y);
+	byte v = image.vImage().getPixel(x/2, y);
+
+	std::cout << "YUV " << (int)yi << " " << (int)u << " " <<
+	  (int)v << std::endl;
+
+	image::Color color;
+	color.setYuv(yi, u, v);
+	std::cout << "HSZ " << color.getH() << " " << color.getS() <<
+	  " " << color.getZ() << std::endl;
+	
+	currentColorSpace->verboseContains(color);
+
+	if (!leftClick) {
+	  std::cout << "Right click " << std::endl;
+	  bool changed = currentColorSpace->expandToFit(color);
+	  if (changed) {
+		colorSpaceWidget.setColorSpace(currentColorSpace);
+	  }
+	}
+
+	updateThresholdedImage();
+	std::cout << std::endl;
+  }
 
 void ColorCalibrate::run_()
 {
@@ -296,11 +307,9 @@ void ColorCalibrate::writeColorSpaces(QString filename) {
 void ColorCalibrate::imageTabSwitched(int i) {
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;
-        topThrDisplay.imageIn.wireTo(&topConverter.thrImage);
     }
     if (imageTabs->currentWidget() == &bottomDisplay) {
         currentCamera = Camera::BOTTOM;
-        botThrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
     }
     updateThresholdedImage();
 }
