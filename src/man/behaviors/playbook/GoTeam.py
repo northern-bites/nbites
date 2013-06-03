@@ -18,12 +18,14 @@ CYAN_COLOR_CODE = '\033[36m'
 
 class GoTeam:
     """This is the class which controls all of our coordinated
-       behavior system. Should act as a replacement to the old
-       PlayBook monolith approach"""
+       behavior system."""
     def __init__(self, brain):
         self.brain = brain
         self.printStateChanges = True
         self.time = time.time()
+
+        # Playbook Table
+        self.table = self.readPlaybookTable()
 
         # Information about teammates
         #self.position = []
@@ -52,6 +54,54 @@ class GoTeam:
         self.shouldStopChaseCounter = 0
         self.shouldStopSaveCounter = 0
 
+    def readPlaybookTable(self):
+        """
+        Read in the playbook table that was created in the Tool
+        and build a data structure for it.
+
+        FORMAT: Each line of x,y,h should be ints separated by whitespace.
+                Each entry of 12 lines should be on consecutive lines.
+                Each entry should begin with # on its own line.
+                Each row of entries should end with @ on its own line.
+                All data (after any meta data for the tool) should begin with & on its own line.
+        """
+        with open(PBConstants.PLAYBOOK_FILE, 'r') as table:
+            playbookTable = []
+            currentRow = []
+
+            while table.readline().split()[0] != &:
+                continue
+
+            while True:
+                # Read in first row of entries
+                rawLine = table.readline().split()
+                if rawLine == "":
+                    #end of file
+                    return tuple(playbookTable)
+                elif rawLine == '#':
+                    #new entry
+                    currentRow.append(self.readTableEntry(table))
+                elif rawLine == '@':
+                    #end of row
+                    playbookTable.append(tuple(currentRow))
+                    currentRow = []
+                else:
+                    print "Error reading playbook table."
+                    return tuple(playbookTable)
+
+    def readTableEntry(self, table):
+        """
+        Helper method for reading the playbook table file.
+        """
+        entry = []
+        for i in range(PBConstants.TABLE_ENTRY_SIZE):
+            rawLine = table.readline().split()
+            if len(rawLine) != 3:
+                print "Error reading playbook entry: not x,y,h."
+                return entry
+            entry.append(tuple(int(rawLine[0]),int(rawLine[1]),int(rawLine[2])))
+        return tuple(entry)
+
     def run(self, play):
         """We run this each frame to get the latest info"""
         if self.brain.interface.gameState.state != 'gamePenalized':
@@ -65,7 +115,7 @@ class GoTeam:
         play.changed = False
         self.strategize(play)
 
-        # Update all of our new infos
+        # If the play has changed, print.
         self.updateStateInfo(play)
 
     def strategize(self, play):

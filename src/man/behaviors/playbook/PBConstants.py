@@ -38,6 +38,11 @@ S_MIDDIE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.5
 S_MIDDIE_OFFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 0.5
 S_TWO_ZONE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.2
 
+# Constants for building playbook table
+PLAYBOOK_FILE = 'file.txt' #placeholder value
+TABLE_GRID_SIZE = 500      #placeholder value
+TABLE_ENTRY_SIZE = 12 # 3,2,1 field players, with and without an active goalie
+
 
 ####
 #### Information about the Strategies ####
