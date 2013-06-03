@@ -59,13 +59,23 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
 
     imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     topLayout->addWidget(imageTabs);
-    thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
-    topLayout->addWidget(&thresholdedImagePlaceholder);
+ 
+	//Used so that we can get two widgets in the same tab
+	topImageLayout = new QHBoxLayout;
+	bottomImageLayout = new QHBoxLayout;
 
-    imageTabs->addTab(&topDisplay, "Top Image");
-    imageTabs->addTab(&bottomDisplay, "Bottom Image");
-    imageTabs->addTab(&topThrDisplay, "Top Image Thresh");
-    imageTabs->addTab(&botThrDisplay, "Bottom Image Thresh");
+	topImageLayout->addWidget(&topDisplay);
+	topImageLayout->addWidget(&topThrDisplay);
+	bottomImageLayout->addWidget(&bottomDisplay);
+	bottomImageLayout->addWidget(&botThrDisplay);
+
+	QWidget* topImagesTogether = new QWidget;
+	QWidget* bottomImagesTogether = new QWidget; 
+	topImagesTogether->setLayout(topImageLayout);
+	bottomImagesTogether->setLayout(bottomImageLayout);
+
+	imageTabs->addTab(topImagesTogether, "Top Image");
+	imageTabs->addTab(bottomImagesTogether, "Bottom Image");
 
     connect(imageTabs, SIGNAL(currentChanged(int)),
             this, SLOT(imageTabSwitched(int)));
@@ -79,6 +89,7 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
         colorSelect.addItem(image::Color_label[i].c_str());
     }
 
+	//All of the other Qt stuff
     colorSelect.setCurrentIndex(0);
     connect(&colorSelect, SIGNAL(currentIndexChanged(int)),
             this, SLOT(selectColorSpace(int)));
@@ -143,13 +154,6 @@ void ColorCalibrate::selectColorSpace(int index) {
 void ColorCalibrate::updateThresholdedImage() {
     subdiagram.run();
 
-    qDebug() << "updateThreshold\n";
-
-    QString filename = QString(NBITES_DIR) + "/data/tables/live";
-    botThrDisplay.imageIn.wireTo(&bottomConverter.thrImage);
-
-    colorTable.read(filename.toStdString());
-
     topConverter.initTable(colorTable.getTable());
     bottomConverter.initTable(colorTable.getTable());
 
@@ -163,15 +167,15 @@ void ColorCalibrate::updateThresholdedImage() {
     if (thresholdedImage.width() != image.width()
         || thresholdedImage.height() != image.height()) {
         //TODO: should be ARGB premultiplied?
-	  thresholdedImage = QImage(image.width(),
+	  thresholdedImage = QImage(image.width()/2,
                                   image.height(),
                                   QImage::Format_RGB32);
     }
 
+	//Seperates out the 3 parts of the YUV image
     const messages::MemoryImage8 yImage = image.yImage();
     const messages::MemoryImage8 uImage = image.uImage();
     const messages::MemoryImage8 vImage = image.vImage();
-    // subdiagram.run();
 
     // Get the image being thresholded on
     // messages::YUVImage image;
@@ -181,20 +185,17 @@ void ColorCalibrate::updateThresholdedImage() {
         image = bottomImageIn.message();
     }
 
-	qDebug() << "\nheights: \n" << thresholdedImage.height() << "\n";
-	qDebug() << yImage.height();
-
-	qDebug() << "\nwidths: \n" << thresholdedImage.width() << "\n";
-	qDebug() << yImage.width();
-
     //threshold the image
     for (int j = 0; j < thresholdedImage.height(); j++) {
+	    //We threshold an image by grabbing each line and thresholding that line
         QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
 		
         for (int i = 0; i < thresholdedImage.width(); i++) {
             image::Color color;
-		    color.setYuv((byte)yImage.getPixel(i,j), (byte)uImage.getPixel(i,j),
-                         (byte)vImage.getPixel(i,j));
+			//The division by two is because the u and v images are not as wide
+			//as the thresholded image. Due to making the threshodedImage a QImage
+		    color.setYuv((byte)yImage.getPixel(i,j), (byte)uImage.getPixel(i/2,j),
+                         (byte)vImage.getPixel(i/2,j));
             //default color
             thresholdedImageLine[i] = image::Color::Grey;
             //temporary variables for blending colors
@@ -210,11 +211,13 @@ void ColorCalibrate::updateThresholdedImage() {
                     tempColor /= count;
                 }
             }
+			//We now have a color for this pixel
+			thresholdedImageLine[i] = tempColor;
         }
     }
 
     // //set it
-    // thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
+    //thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
 }
 
 void ColorCalibrate::run_()

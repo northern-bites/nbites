@@ -6,6 +6,7 @@
  * @author Eric Chown
  * @author EJ Googins
  * @author Octavian Neamtu
+ * @author Daniel Zeller
  */
 
 
@@ -55,6 +56,7 @@ public:
     ColorCalibrate(QWidget *parent = 0);
     ~ColorCalibrate() {}
 
+	//Where we actually get the images via the tool
     portals::InPortal<messages::YUVImage> topImageIn;
     portals::InPortal<messages::YUVImage> bottomImageIn;
 
@@ -81,13 +83,18 @@ private:
 
     portals::RoboGram subdiagram;
 
+	//The converter modules
     man::image::ImageConverterModule topConverter;
     man::image::ImageConverterModule bottomConverter;
+
+	//Display modules for the 4 images
     image::ImageDisplayModule topDisplay;
     image::ImageDisplayModule bottomDisplay;
     image::ThresholdedImageDisplayModule topThrDisplay;
     image::ThresholdedImageDisplayModule botThrDisplay;
 
+	//Unfortunately we have to use these intermediary portals because we can't
+	//get them directly from the tool
     portals::OutPortal<messages::YUVImage> topImage;
     portals::OutPortal<messages::YUVImage> bottomImage;
 
@@ -100,6 +107,8 @@ private:
     QImage thresholdedImage;
     QPushButton loadSlidersBtn, saveSlidersBtn, loadColorTableBtn, saveColorTableBtn;
 
+	QHBoxLayout* topImageLayout;
+	QHBoxLayout* bottomImageLayout;
     QHBoxLayout* bottomLayout;
     QVBoxLayout* colorButtons;
     QVBoxLayout* leftJunk;
