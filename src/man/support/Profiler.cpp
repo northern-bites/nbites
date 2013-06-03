@@ -11,13 +11,14 @@
 using namespace std;
 
 static const char *PCOMPONENT_NAMES[] = {
-    "Main Loop",
+    // COGNITION THREAD
+    "Cognition Thread",
 
-    "Dequeue Top buf",
-    "Acquire Top image",
+    "Dequeue Top Image Buffer",
+    "Top Image Conversion",
 
-    "Dequeue Bottom buf",
-    "Acquire Bottom image",
+    "Dequeue Top Image Buffer",
+    "Bottom Image Conversion",
 
     "Vision",
     "Transform",
@@ -46,32 +47,35 @@ static const char *PCOMPONENT_NAMES[] = {
     "Intersect Lines",
 
     "Localization",
-    "MCL",
-    "Logging",
+    "Ball Track",
 
+    "Behaviors",
     "Python",
-    "PyUpdate",
-    "PyRun",
 
     "Lights",
 
-    "DCM",
+    // MOTION THREAD
+    "Motion Thread",
+
+    "Joint Enactor",
     "Pre-Process",
     "Send Joints",
     "Send Hardness",
-    "Post-Process",
 
-    "Switchboard",
+    "Motion",
     "Scripted Provider CalcJS",
     "ChoppedCommand",
     "Walk Provider CalcJS",
-    "tick_legs()",
     "Head Provider CalcJS",
-    "Enactor",
 
-    "Comm",
+    // COMM THREAD
+    "Comm Thread",
 
-    "RoboGuardian",
+    // GUARDIAN THREAD
+    "RoboGuardian Thread",
+
+    "Guardian",
+    "Audio",
 
     "Total"
 };
@@ -79,15 +83,15 @@ static const char *PCOMPONENT_NAMES[] = {
 // Map from subcomponent (index) to meta-component (value) for calculating
 // summary percentages.  Mapping to self means no parent.
 static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
-    /*P_MAIN                   --> */ P_TOTAL,
+    /*P_COGNITION_THREAD       --> */ P_TOTAL,
 
-    /*P_TOP_DQBUF              --> */ P_MAIN,
-    /*P_TOP_ACQUIRE_IMAGE      --> */ P_MAIN,
+    /*P_TOP_DQBUF              --> */ P_COGNITION_THREAD,
+    /*P_TOP_CONVERTER          --> */ P_COGNITION_THREAD,
 
-    /*P_BOT_DQBUF              --> */ P_MAIN,
-    /*P_BOT_ACQUIRE_IMAGE      --> */ P_MAIN,
+    /*P_BOT_DQBUF              --> */ P_COGNITION_THREAD,
+    /*P_BOT_CONVERTER          --> */ P_COGNITION_THREAD,
 
-    /*P_VISION                 --> */ P_MAIN,
+    /*P_VISION                 --> */ P_COGNITION_THREAD,
     /*P_TRANSFORM              --> */ P_VISION,
     /*P_THRESHRUNS             --> */ P_VISION,
     /*P_FGHORIZON              --> */ P_THRESHRUNS,
@@ -113,43 +117,36 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_FIT_UNUSED,            --> */ P_LINES,
     /*P_INTERSECT_LINES,       --> */ P_LINES,
 
-    /*P_MEMORY_VISION,         --> */ P_MAIN,
-    /*P_MEMORY_VISION_SENSORS, --> */ P_MAIN,
-    /*P_MEMORY_MOTION_SENSORS, --> */ P_MAIN,
-    /*P_MEMORY_IMAGE,          --> */ P_MAIN,
+    /*P_SELF_LOC               --> */ P_COGNITION_THREAD,
+    /*P_BALL_TRACK             --> */ P_COGNITION_THREAD,
 
-    /*P_LOC                    --> */ P_MAIN,
-    /*P_MCL                    --> */ P_LOC,
-    /*P_LOGGING                --> */ P_TOTAL,
+    /*P_BEHAVIORS              --> */ P_COGNITION_THREAD,
+    /*P_PYTHON                 --> */ P_BEHAVIORS,
 
-    /*P_PYTHON                 --> */ P_MAIN,
-    /*P_PYUPDATE               --> */ P_PYTHON,
-    /*P_PYRUN                  --> */ P_PYTHON,
+    /*P_LIGHTS                 --> */ P_COGNITION_THREAD,
 
-    /*P_LIGHTS                 --> */ P_MAIN,
+    /*P_MOTION_THREAD          --> */ P_TOTAL,
 
-    /*P_DCM                    --> */ P_TOTAL,
-    /*P_PRE_PROCESS            --> */ P_DCM,
+    /*P_JOINT_ENACTOR          --> */ P_MOTION_THREAD,
+    /*P_PRE_PROCESS            --> */ P_JOINT_ENACTOR,
     /*P_SEND_JOINTS            --> */ P_PRE_PROCESS,
     /*P_SEND_HARDNESS          --> */ P_PRE_PROCESS,
-    /*P_POST_PROCESS           --> */ P_DCM,
 
-    /*P_SWITCHBOARD            --> */ P_TOTAL,
-    /*P_SCRIPTED               --> */ P_SWITCHBOARD,
+    /*P_MOTION                 --> */ P_MOTION_THREAD,
+    /*P_SCRIPTED               --> */ P_MOTION,
     /*P_CHOPPED                --> */ P_SCRIPTED,
-    /*P_WALK                   --> */ P_SWITCHBOARD,
-    /*P_TICKLEGS               --> */ P_WALK,
-    /*P_HEAD                   --> */ P_SWITCHBOARD,
-    /*P_ENACTOR                --> */ P_SWITCHBOARD,
+    /*P_WALK                   --> */ P_MOTION,
+    /*P_HEAD                   --> */ P_MOTION,
 
-    /*P_COMM                   --> */ P_TOTAL,
-    /*P_TOOLCONNECT            --> */ P_TOTAL,
-    /*P_ROBOGUARDIAN           --> */ P_TOTAL,
+    /*P_COMM_THREAD            --> */ P_TOTAL,
+
+    /*P_GUARDIAN_THREAD        --> */ P_TOTAL,
+
+    /*P_GUARDIAN               --> */ P_GUARDIAN_THREAD,
+    /*P_AUDIO                  --> */ P_GUARDIAN_THREAD,
 
     /*P_TOTAL                  --> */ P_TOTAL
 };
-
-
 
 /**
  * Some important notes about how the Profiler class is structured to work.
@@ -190,12 +187,13 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
 Profiler::Profiler (long long (*thread_time_f)(),
                     long long (*process_time_f)(),
                     long long (*global_time_f)())
-    : printEmpty(true), maxPrintDepth(PRINT_ALL_DEPTHS),
+    : printEmpty(false),
+      maxPrintDepth(PRINT_ALL_DEPTHS),
       thread_timeFunction(thread_time_f),
       process_timeFunction(process_time_f),
       global_timeFunction(global_time_f),
-      verbose(false) {
-
+      verbose(true)
+{
     reset();
 }
 
@@ -210,7 +208,6 @@ Profiler* Profiler::getInstance() {
                      &monotonic_micro_time));
     return instance.get();
 }
-
 
 void Profiler::profileFrames (int num_frames)
 {
