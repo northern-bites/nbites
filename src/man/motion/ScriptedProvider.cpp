@@ -1,4 +1,5 @@
 #include "ScriptedProvider.h"
+#include "Profiler.h"
 
 using namespace Kinematics;
 
@@ -77,6 +78,8 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses(
     const messages::InertialState& sensorInertials,
     const messages::FSR&           sensorFSRs)
 {
+    PROF_ENTER(P_SCRIPTED);
+
     if (currCommandEmpty())
 	setNextBodyCommand(sensorAngles);
 
@@ -102,6 +105,8 @@ void ScriptedProvider::calculateNextJointsAndStiffnesses(
     }
 
     setActive();
+
+    PROF_EXIT(P_SCRIPTED);
 }
 
 /*
@@ -132,8 +137,10 @@ void ScriptedProvider::setNextBodyCommand(std::vector<float>& sensorAngles) {
 	BodyJointCommand::ptr nextCommand = bodyCommandQueue.front();
 	bodyCommandQueue.pop();
 
+    PROF_ENTER(P_CHOPPED);
 	// Replace the current command
 	currCommand = chopper.chopCommand(nextCommand, sensorAngles);
+    PROF_EXIT(P_CHOPPED);
     }
 }
 

@@ -1,4 +1,5 @@
 #include "BHWalkProvider.h"
+#include "Profiler.h"
 
 #include <cassert>
 #include <string>
@@ -93,6 +94,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     const messages::InertialState& sensorInertials,
     const messages::FSR&           sensorFSRs
     ) {
+
+    PROF_ENTER(P_WALK);
 
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
 
@@ -267,6 +270,8 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         //from other providers
         walkingEngine.theOdometryData = OdometryData();
     }
+
+    PROF_EXIT(P_WALK);
 }
 
 bool BHWalkProvider::isStanding() const {
