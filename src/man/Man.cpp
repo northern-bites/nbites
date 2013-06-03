@@ -7,11 +7,13 @@
 #include "Camera.h"
 #include "RobotConfig.h"
 
+#ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
 SET_POOL_SIZE(messages::JointAngles, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
+#endif
 
 namespace man {
 
