@@ -36,6 +36,9 @@ protected:
     void paintGoalie(QPaintEvent* event);
 
 private:
+    static const float ROBOT_SIZE_X = 18.0f;
+    static const float ROBOT_SIZE_Y = 35.0f;
+
     void paintRobot(QPaintEvent* event,
                     QPainter& painter,
                     int x, int y, int h,

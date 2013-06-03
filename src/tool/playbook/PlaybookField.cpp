@@ -15,10 +15,7 @@ void PlaybookField::drawGoalie(bool on)
 {
     shouldPaintGoalie = on;
     qDebug() << "Drawing goalie " << on;
-    if (shouldPaintGoalie)
-    {
-        update();
-    }
+    update();
 }
 
 void PlaybookField::paintEvent(QPaintEvent* event)
@@ -38,22 +35,39 @@ void PlaybookField::paintGoalie(QPaintEvent* event)
     painter.translate(0,FIELD_GREEN_HEIGHT);
     painter.scale(scaleFactor, -scaleFactor);
 
-    painter.setBrush(Qt::magenta);
+    paintRobot(event, painter,
+               FIELD_WHITE_LEFT_SIDELINE_X + 15, CENTER_FIELD_Y, 0,
+               Qt::magenta);
+}
 
-    QPoint goalieCenter(FIELD_WHITE_LEFT_SIDELINE_X, CENTER_FIELD_Y);
-    QRect goalie(FIELD_WHITE_LEFT_SIDELINE_X,
-                 CENTER_FIELD_Y,
-                 18*scaleFactor,
-                 35*scaleFactor);
+void PlaybookField::paintRobot(QPaintEvent* event,
+                               QPainter& painter,
+                               int x, int y, int h,
+                               Qt::GlobalColor c,
+                               float sizeX, float sizeY)
+{
+    painter.save();
 
-    goalie.moveCenter(goalieCenter);
+    painter.setBrush(c);
 
-    painter.drawRect(goalie);
+    painter.translate(x,y);
+    painter.rotate(h);
 
-    QPoint lineEnd( 9.0*scaleFactor * std::cos(0) + FIELD_WHITE_LEFT_SIDELINE_X,
-                   17.5*scaleFactor * std::sin(0) + CENTER_FIELD_Y);
+    QPoint center(0, 0);
+    QRect robot(0, 0, sizeX*scaleFactor, sizeY*scaleFactor);
 
-    painter.drawLine(goalieCenter, lineEnd);
+    QPoint lineEnd(0.125*x*scaleFactor,
+                   0);
+
+    robot.moveCenter(center);
+
+    painter.drawRect(robot);
+
+    painter.drawLine(center, lineEnd);
+
+    painter.rotate(-h);
+
+    painter.restore();
 }
 
 } // namespace playbook
