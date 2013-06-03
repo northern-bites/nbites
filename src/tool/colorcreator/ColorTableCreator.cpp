@@ -243,28 +243,15 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
                 byte u = image.uImage().getPixel(brush_x/2, brush_y);
                 byte v = image.vImage().getPixel(brush_x/2, brush_y);
 
-                //std::cout << (int) y << " " << (int) u << " " << (int) v
-                //       << std::endl;
-
-//                std::cout << "Color\t" << colorTable.getColor(y,u,v) << std::endl;
-
                 if (brushStroke.define)
                 {
+                    // Change the radius' to determine how 'close' colors must be to get defined
                     const int yRadius = 4, uRadius = 2, vRadius = 2;
                     for (int dy = -yRadius; dy <= yRadius; ++dy)
                         for (int du = -uRadius; du <= uRadius; ++du)
                             for (int dv = -vRadius; dv <= vRadius; ++dv)
                                 colorTable.setColor(y+dy, u+du, v+dv,
                                                     image::Color_bits[brushStroke.color]);
-
-
-                    if((int)colorTable.getColor(y,u,v) != image::Color_bits[brushStroke.color]){
-                        std::cout << "Couldn't define a color" << std::endl;
-                        std::cout << "Wanted color:\t" << image::Color_bits[brushStroke.color] << std::endl;
-                        std::cout << "Has color:\t" << (int)colorTable.getColor(y,u,v) << std::endl;
-                        //std::cout << "Color\t" << (int)colorTable.getColor(y,u,v) << std::endl;
-                    }
-
                 }
                 else
                 {
@@ -274,9 +261,6 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
             }
         }
     }
-    std::cout << std::endl;
-
-    // For testing: write all values of the color table to be 0x8
 
    updateThresholdedImage();
 }

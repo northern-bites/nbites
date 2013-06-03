@@ -12,11 +12,9 @@ int ImageAcquisition::acquire_image_fast(uint8_t *table,
                                          const uint8_t *yuv, uint16_t *out )
 {
 #if defined( __linux__) && !CPP_ACQUIRE
-    std::cout << "Assembly image acquire" << std::endl;
    _acquire_image_fast(table, const_cast<ColorParams*>(&params), yuv, out);
 #else
-   // This should be bit-identical to the ASM code
-   std::cout << "C++ image acquire" << std::endl;
+    // This should be bit-identical to the ASM code
     uint16_t *yOut = out;
     uint16_t *uvOut = out + AVERAGED_IMAGE_SIZE;
     uint8_t *color = reinterpret_cast<uint8_t*>(out + AVERAGED_IMAGE_SIZE*3);
