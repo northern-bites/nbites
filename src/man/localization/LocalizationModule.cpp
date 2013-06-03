@@ -71,9 +71,9 @@ namespace man
 
     void LocalizationModule::run_()
     {
-        PROF_ENTER(P_LOC);
+        PROF_ENTER(P_SELF_LOC);
         update();
-        PROF_EXIT(P_LOC);
+        PROF_EXIT(P_SELF_LOC);
     }
 
     } // namespace localization

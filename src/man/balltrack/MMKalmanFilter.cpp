@@ -35,7 +35,8 @@ MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
  */
 MMKalmanFilter::~MMKalmanFilter()
 {
-    delete &filters;
+    // EJ--fixme?
+    //delete &filters;
 }
 
 /**

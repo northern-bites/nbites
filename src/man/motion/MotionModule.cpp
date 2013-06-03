@@ -1,4 +1,5 @@
 #include "MotionModule.h"
+#include "Profiler.h"
 
 #include <fstream>
 
@@ -44,6 +45,7 @@ void MotionModule::stop()
 
 void MotionModule::run_()
 {
+    PROF_ENTER(P_MOTION);
     // (1) Before anything else happens, it is important to
     //     retrieve the correct current joint angles.
     jointsInput_.latch();
@@ -88,6 +90,8 @@ void MotionModule::run_()
         newInputJoints = false;
         frameCount++;
     }
+
+    PROF_EXIT(P_MOTION);
 }
 
 void MotionModule::resetOdometry()
