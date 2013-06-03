@@ -3,6 +3,7 @@ from ..util import MyMath
 from ..typeDefs import TeamMember
 from . import PBConstants
 from . import Strategies
+from objects import Location, RobotLocation, RelRobotLocation
 import noggin_constants as NogginConstants
 import time
 
@@ -46,6 +47,7 @@ class GoTeam:
 
 
         # Goalie
+        self.goalieIsActive = False
         self.shouldPositionLeftCounter = 0
         self.shouldPositionRightCounter = 0
         self.shouldPositionCenterCounter = 0
@@ -59,8 +61,9 @@ class GoTeam:
         Read in the playbook table that was created in the Tool
         and build a data structure for it.
 
-        FORMAT: Each line of x,y,h should be ints separated by whitespace.
+        FORMAT: Each line of x,y,h,r should be ints separated by whitespace.
                 Each entry of 12 lines should be on consecutive lines.
+                    3,2,1 playbook players, repeated for goalie inactive
                 Each entry should begin with # on its own line.
                 Each row of entries should end with @ on its own line.
                 All data (after any meta data for the tool) should begin with & on its own line.
@@ -69,11 +72,11 @@ class GoTeam:
             playbookTable = []
             currentRow = []
 
-            while table.readline().split()[0] != &:
+            # Strip out any meta data at the top of the file.
+            while table.readline().split()[0] != '&':
                 continue
 
             while True:
-                # Read in first row of entries
                 rawLine = table.readline().split()
                 if rawLine == "":
                     #end of file
@@ -96,8 +99,8 @@ class GoTeam:
         entry = []
         for i in range(PBConstants.TABLE_ENTRY_SIZE):
             rawLine = table.readline().split()
-            if len(rawLine) != 3:
-                print "Error reading playbook entry: not x,y,h."
+            if len(rawLine) != 4:
+                print "Error reading playbook entry: not x,y,h,r."
                 return entry
             entry.append(tuple(int(rawLine[0]),int(rawLine[1]),int(rawLine[2])))
         return tuple(entry)
@@ -165,6 +168,63 @@ class GoTeam:
             Strategies.sThreeField(self, play)
         elif self.numActiveFieldPlayers == 4:
             Strategies.sWin(self, play)
+
+    def tableLookup(self):
+        """
+        Given where we think the ball is on the field (from loc),
+        use the playbook table to look up where we should position.
+        @return: list of position tuples in order of priority.
+        """
+        #Which grid entry is the ball in?
+        #TODO: add thresholding to avoid edge oscillation for the ball.
+        ball_x = int(ceil((self.brain.ball.x - NogginConstants.GREEN_PAD_X) / PBConstants.TABLE_GRID_SIZE))
+        ball_y = int(ceil((self.brain.ball.y - NogginConstants.GREEN_PAD_Y) / PBConstants.TABLE_GRID_SIZE))
+
+        # Currently, assuming x values are first in data structure
+        # TODO: verify this with wils
+        entry = self.table[ball_x][ball_y]
+        index = 0
+        positions = []
+
+        if self.activeFieldPlayers == 3:
+            index = index + 3
+        elif self.activeFieldPlayers == 2:
+            index = index + 2
+        if !self.goalieIsActive:
+            index = index + 6
+
+        for i in range(self.activeFieldPlayers):
+            positions.append(entry[i])
+
+        return positions
+
+    #TODO: finish writing this method
+    def priorityPositions(self, positions, play):
+        """
+        Determine which player should go to each position.
+        """
+        locations = map(self.mapPositionToRobotLocation, positions)
+
+        # Find which active field player should go to each position
+        firstPlayer = self.findClosestPlayer(locations[0])
+        if firstPlayer == self.brain.playerNumber:
+            play.setRole = positions[0][3] #TODO: make this actually work
+            play.setPosition(locations[0])
+        else:
+            secondPlayer = self.findClosestPlayer(locations[1], [firstPlayer])
+            if secondPlayer == self.brain.playerNumber:
+                play.setRole = positions[1][3]
+                play.setPosition(locations[1])
+            else:
+                play.setRole = positions[2][3]
+                play.setPosition(locations[2])
+
+    def mapPositionToRobotLocation(self, position):
+        """
+        Position must be a tuple with x, y, heading, role.
+        @return: that position as a Robot Location
+        """
+        return RobotLocation(position[0], position[1], position[2])
 
     def updateStateInfo(self, play):
         """
@@ -332,6 +392,14 @@ class GoTeam:
             # returns a Location
             return chosenPositions[self.me.playerNumber -1]
 
+    #TODO finish writing this method
+    def findClosestPlayer(location, exceptNumbers = []):
+        minimum = 10000
+        playerNum = -1
+        for mate in self.activeFieldPlayers:
+            #check time to reach location
+            pass
+        return playerNum
 
 
     ######################################################
@@ -346,6 +414,7 @@ class GoTeam:
         self.time = time.time()
         self.me.updateMe()
 
+        self.goalieIsActive = False
         # loop through teammates
         self.activeFieldPlayers = []
         append = self.activeFieldPlayers.append
@@ -356,10 +425,14 @@ class GoTeam:
             #what happened here. We thought we were with another bot
             #when it was in penalty. 7/2011
 
-            # don't check inactive mates or the goalie.
-            if (mate.active and not mate.isTeammateRole(PBConstants.GOALIE)):
-                append(mate)
-                self.numActiveFieldPlayers += 1
+            # don't check inactive mates
+            if mate.active:
+                # the goalie isn't a field players
+                if mate.isTeammateRole(PBConstants.GOALIE):
+                    self.goalieIsActive = True
+                else:
+                    append(mate)
+                    self.numActiveFieldPlayers += 1
 
     def highestActivePlayerNumber(self, exceptNumbers = []):
         """returns the highest active player number"""

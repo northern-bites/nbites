@@ -2,7 +2,7 @@ from objects import (RobotLocation, Location)
 from math import fabs, degrees
 import noggin_constants as NogginConstants
 
-OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_LEFT_X,
+OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_RIGHT_X,
                     NogginConstants.OPP_GOALBOX_MIDDLE_Y)
 OPP_GOAL_LEFT_POST = Location(NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_X,
                               NogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)

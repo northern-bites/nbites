@@ -45,9 +45,12 @@ class Play:
             self.changed = True
 
     def setPosition(self, position):
-        self.position.x = position[0]
-        self.position.y = position[1]
-        self.position.h = position[2]
+        if isinstance(position, RobotLocation):
+            self.position = position
+        else:
+            self.position.x = position[0]
+            self.position.y = position[1]
+            self.position.h = position[2]
 
     def isSubRole(self, subRoleToTest):
         return (self.subRole == subRoleToTest)
