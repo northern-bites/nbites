@@ -33,7 +33,17 @@ protected:
     // Paint the field
     void paintEvent(QPaintEvent* event);
 
+    void paintGoalie(QPaintEvent* event);
+
 private:
+    void paintRobot(QPaintEvent* event,
+                    QPainter& painter,
+                    int x, int y, int h,
+                    Qt::GlobalColor c,
+                    float sizeX = 18.0f, float sizeY = 35.0f);
+
+private:
+    bool shouldPaintGoalie;
 
 };
 
