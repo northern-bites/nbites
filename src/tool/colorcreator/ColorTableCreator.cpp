@@ -122,7 +122,7 @@ void ColorTableCreator::loadLatestTable()
 }
 
 // Note: serizalization done by Qt
-void ColorTableCreator::serializeTableName(QString latestTableName) 
+void ColorTableCreator::serializeTableName(QString latestTableName)
 {
     if (imageTabs->currentIndex() == 0) {
         QFile file("../../data/tables/latestTopTable.dat");
@@ -217,9 +217,9 @@ void ColorTableCreator::undo()
 void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
 {
     // Check the click was on the image
-    for (int i = -brushStroke.brushSize/2; i <= brushStroke.brushSize/2; i++)
+    for (int i = -brushStroke.brushSize; i <= 0; i++)
     {
-        for (int j = -brushStroke.brushSize/2; j <= brushStroke.brushSize/2; j++)
+        for (int j = 0; j <= brushStroke.brushSize; j++)
         {
             int brush_x = i + brushStroke.x;
             int brush_y = j + brushStroke.y;
@@ -246,10 +246,25 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
                 //std::cout << (int) y << " " << (int) u << " " << (int) v
                 //       << std::endl;
 
+//                std::cout << "Color\t" << colorTable.getColor(y,u,v) << std::endl;
+
                 if (brushStroke.define)
                 {
-                    colorTable.setColor(y, u, v,
-                                        image::Color_bits[brushStroke.color]);
+                    const int yRadius = 4, uRadius = 2, vRadius = 2;
+                    for (int dy = -yRadius; dy <= yRadius; ++dy)
+                        for (int du = -uRadius; du <= uRadius; ++du)
+                            for (int dv = -vRadius; dv <= vRadius; ++dv)
+                                colorTable.setColor(y+dy, u+du, v+dv,
+                                                    image::Color_bits[brushStroke.color]);
+
+
+                    if((int)colorTable.getColor(y,u,v) != image::Color_bits[brushStroke.color]){
+                        std::cout << "Couldn't define a color" << std::endl;
+                        std::cout << "Wanted color:\t" << image::Color_bits[brushStroke.color] << std::endl;
+                        std::cout << "Has color:\t" << (int)colorTable.getColor(y,u,v) << std::endl;
+                        //std::cout << "Color\t" << (int)colorTable.getColor(y,u,v) << std::endl;
+                    }
+
                 }
                 else
                 {
@@ -259,6 +274,10 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
             }
         }
     }
+    std::cout << std::endl;
+
+    // For testing: write all values of the color table to be 0x8
+
    updateThresholdedImage();
 }
 
