@@ -153,7 +153,7 @@ class OverlayDisplayModule : public ImageDisplayModule
 {
 public:
     OverlayDisplayModule(QWidget* parent = 0) : ImageDisplayModule(parent) {};
-    void setOverlay(QImage overlay_) { overlay = overlay_; }
+    void setOverlay(QImage overlay_) { overlay = overlay_; run_(); }
 
 protected:
     // Replaces ImageDisplayModule's run method to do the overlaying
