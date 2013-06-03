@@ -49,11 +49,11 @@ void ImageConverterModule::run_()
 
     if (whichCamera == Camera::TOP)
     {
-        PROF_ENTER(P_TOP_ACQUIRE_IMAGE);
+        PROF_ENTER(P_TOP_CONVERTER);
     }
     else
     {
-        PROF_ENTER(P_BOT_ACQUIRE_IMAGE);
+        PROF_ENTER(P_BOT_CONVERTER);
     }
     ImageAcquisition::acquire_image_fast(table,
                                          params,
@@ -61,11 +61,11 @@ void ImageConverterModule::run_()
                                          tempOutput16.pixelAddress(0, 0));
     if (whichCamera == Camera::TOP)
     {
-        PROF_EXIT(P_TOP_ACQUIRE_IMAGE);
+        PROF_EXIT(P_TOP_CONVERTER);
     }
     else
     {
-        PROF_EXIT(P_BOT_ACQUIRE_IMAGE);
+        PROF_EXIT(P_BOT_CONVERTER);
     }
 
     PackedImage16 image = tempOutput16.window(0, 0, 320, 240);
