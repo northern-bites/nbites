@@ -26,8 +26,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     loadBtn = new QPushButton("Load", this);
     saveBtn = new QPushButton("Save", this);
     lockDefender = new QCheckBox("Lock Defender", this);
-    lockMiddie = new QCheckBox("Lock Middie", this);
     lockOffender = new QCheckBox("Lock Offender", this);
+    lockMiddie = new QCheckBox("Lock Middie", this);
     goalie = new QCheckBox("Goalie Active", this);
     goalie->setChecked(true);
 
@@ -39,7 +39,16 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings->addWidget(lockOffender);
     settings->addWidget(goalie);
 
-    // Connect checkbox interface with slots in the painter
+    // Connect checkbox interface
+    connect(lockDefender, SIGNAL(toggled(bool)), model,
+            SLOT(toggleDefender(bool)));
+
+    connect(lockOffender, SIGNAL(toggled(bool)), model,
+            SLOT(toggleOffender(bool)));
+
+    connect(lockMiddie, SIGNAL(toggled(bool)), model,
+            SLOT(toggleMiddie(bool)));
+
     connect(goalie, SIGNAL(toggled(bool)), model,
             SLOT(toggleGoalie(bool)));
     connect(goalie, SIGNAL(toggled(bool)), fieldPainter,

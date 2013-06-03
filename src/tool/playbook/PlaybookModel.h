@@ -61,6 +61,9 @@ public:
 
 protected slots:
     void toggleGoalie(bool on);
+    void toggleDefender(bool on);
+    void toggleOffender(bool on);
+    void toggleMiddie(bool on);
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
@@ -68,6 +71,9 @@ protected:
     QStack<PlaybookPosition> changedPositions; // The old positions.
 
     int goalieOn;
+    bool defenderLocked;
+    bool offenderLocked;
+    bool middieLocked;
 
 };
 
