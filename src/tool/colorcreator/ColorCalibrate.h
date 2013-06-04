@@ -6,19 +6,34 @@
  * @author Eric Chown
  * @author EJ Googins
  * @author Octavian Neamtu
+ * @author Daniel Zeller
  */
 
 
 #pragma once
 
+#include <QObject>
 #include <QWidget>
 #include <QPushButton>
+#include <QImage>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QSlider>
+#include <QTabWidget>
+#include <QComboBox>
+#include <QSizePolicy>
 
-//qtool
-#include "viewer/ChannelImageViewer.h"
-#include "data/DataManager.h"
-#include "image/BMPYUVImage.h"
-#include "viewer/BMPImageViewerListener.h"
+//tool
+#include "RoboGrams.h"
+#include "image/ImageDisplayModule.h"
+#include "image/ImageConverterModule.h"
+#include "Camera.h"
+
+#include "image/Color.h"
+
+#include "PathConfig.h"
+
 //colorcreator
 #include "ColorEdit.h"
 #include "ColorTable.h"
@@ -26,68 +41,76 @@
 #include "ColorSpaceWidget.h"
 #include "ColorWheel.h"
 
-namespace qtool {
+namespace tool {
 namespace colorcreator {
 
-class ColorCalibrate : public QWidget
+class ColorCalibrate : public QWidget,
+                       public portals::Module
 {
     Q_OBJECT
 
-public:
-    static const image::ColorID STARTING_COLOR = image::Orange;
+    public:
+    static const image::Color::ColorID STARTING_COLOR = image::Color::Orange;
 
 public:
-    ColorCalibrate(qtool::data::DataManager::ptr dataManager,
-            QWidget *parent = 0);
+    ColorCalibrate(QWidget *parent = 0);
     ~ColorCalibrate() {}
+
+	//Where we actually get the images via the tool
+    portals::InPortal<messages::YUVImage> topImageIn;
+    portals::InPortal<messages::YUVImage> bottomImageIn;
 
 protected slots:
     void selectColorSpace(int index);
     void updateThresholdedImage();
-    void loadSlidersBtnPushed();
-    void saveSlidersBtnPushed();
-    void saveColorTableBtnPushed();
-    void imageTabSwitched(int);
-	void setFullColors(bool state);
-    void canvassClicked(int x, int y, int brushSize, bool leftClick);
-
+    void loadSlidersBtnPushed();     
+    void saveSlidersBtnPushed();     
+    void loadColorTableBtnPushed();
+    void saveColorTableBtnPushed();   // Assuming ColorTable has the same functionality
+    void imageTabSwitched(int i);    
+    void setFullColors(bool state);
+	void canvasClicked(int x, int y, int brushSize, bool leftClick);
 
 protected:
+    virtual void run_();
     void loadColorSpaces(QString filename);
     void writeColorSpaces(QString filename);
 
 private:
-    data::DataManager::ptr dataManager;
+    color::ColorTable colorTable;
 
     QTabWidget* imageTabs;
-    man::corpus::Camera::Type currentImage;
+    Camera::Type currentCamera;
 
-    image::BMPYUVImage* topImage;
-    viewer::ChannelImageViewer topChannelImage;
-    viewer::BMPImageViewerListener* topImageViewer;
+    portals::RoboGram subdiagram;
 
-    image::BMPYUVImage* bottomImage;
-    viewer::ChannelImageViewer bottomChannelImage;
-    viewer::BMPImageViewerListener* bottomImageViewer;
+	//Display modules for the 4 images
+    image::ImageDisplayListener topDisplay;
+    image::ImageDisplayListener bottomDisplay;
 
-    ColorSpace colorSpace[image::NUM_COLORS];
-    ColorSpace* currentColorSpace;
+	//Unfortunately we have to use these intermediary portals because we can't
+	//get them directly from the tool
+    portals::OutPortal<messages::YUVImage> topImage;
+    portals::OutPortal<messages::YUVImage> bottomImage;
+
+    color::ColorSpace colorSpace[image::Color::NUM_COLORS];
+    color::ColorSpace* currentColorSpace;
     QComboBox colorSelect;
     ColorSpaceWidget colorSpaceWidget;
     ColorWheel colorWheel;
     QLabel thresholdedImagePlaceholder;
-    QImage thresholdedImage;
-    QPushButton loadSlidersBtn, saveSlidersBtn, saveColorTableBtn;
+	QImage thresholdedImage;
+    QPushButton loadSlidersBtn, saveSlidersBtn, loadColorTableBtn, saveColorTableBtn;
 
-	QHBoxLayout* bottomLayout;
-	QVBoxLayout* colorButtons;
-	QVBoxLayout* leftJunk;
-	QVBoxLayout* mainLayout;
+	QHBoxLayout* topImageLayout;
+	QHBoxLayout* bottomImageLayout;
+    QHBoxLayout* bottomLayout;
+    QVBoxLayout* colorButtons;
+    QVBoxLayout* leftJunk;
+    QVBoxLayout* mainLayout;
     QHBoxLayout* topLayout;
 
-	bool displayAllColors;
-	int lastClickedX, lastClickedY;
-
+    bool displayAllColors;
 };
 
 }

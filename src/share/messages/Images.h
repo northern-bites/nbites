@@ -12,7 +12,7 @@
 
 // A primary challenge in designing image classes is that the need to support very efficient
 // pixel operations is at odds with a desire to have an elegant, modular, polymorphic set of
-// classes. The class hierarchy herein achieves a reasonable tradeoff. 
+// classes. The class hierarchy herein achieves a reasonable tradeoff.
 //
 // At the base of the hierarchy, the abstract base class Image defines an interface to any
 // image, where an image is a two-dimensional zero-based array of pixels whose size is determined
@@ -20,35 +20,35 @@
 // written using relatively inefficient virtual functions, and a rectangular subset ("window") of
 // the image can be made in small constant time. An image can be null, having no pixels. Attempts
 // to read or write outside the bounds of an image results in an assertion failure in debug mode
-// and are undefined in release mode. 
+// and are undefined in release mode.
 //
 // The pixels of an image may reside in memory or may be computed from their (x, y) coordinates
 // by any suitable formula. Computed images are read-only. Other, more exotic images can be
-// derived from Image. 
+// derived from Image.
 //
 // Code that takes an image as input and is not speed-critical should be written to operate on
-// Image, for maximum flexibility. 
+// Image, for maximum flexibility.
 //
 // The derived template class MemoryImage<T> is the concrete base class for any image whose
 // pixels, of type T, reside in memory. T is expected to be an integer type. Pixels may reside on
 // the heap or in a fixed video memory. Heap pixels are managed by these classes and are
-// automatically deleted when all images sharing those pixels are destroyed. 
+// automatically deleted when all images sharing those pixels are destroyed.
 //
 // A MemoryImage supports efficient pixel operations using native C++ pointers, and supports an
 // efficient window operation where the window image shares pixels with the source image and so
 // can be made without copying pixels. A client cannot tell whether or not a MemoryImage is a
 // window of another image, so any image processing operation on a MemoryImage will work on
-// full iamges and windows alike. 
+// full iamges and windows alike.
 //
 // A MemoryImage supports an efficient subsample operation, which makes a new MemoryImage that
 // consists of every xSample pixel in x and every ySample pixel in y. The new image is made in
 // small constant time without copying pixels. This is not a good way to do subsampling for use
 // as an image processing operation (e.g. for resolution pyramids); instead its main purpose is
-// to obtain a Y, U, or V image that is part of a YUV composite image. 
+// to obtain a Y, U, or V image that is part of a YUV composite image.
 //
 // Code that takes an image as input and is speed-critical should generally operate on a
 // MemoryImage. This allows the code to operate on every memory image type, including the Y, U,
-// and V components of a YUV image as separate images without pixel copying. 
+// and V components of a YUV image as separate images without pixel copying.
 //
 // Sometimes code assumes that pixels are sequential in memory, which is called a "packed" image.
 // The Y, U, and V components of a YUV image are not packed, but most other images are. The
@@ -56,13 +56,13 @@
 // are packed. While MemoryImage is preferred, legacy or assembly language code may assume a
 // packed image and can be written to operate on PackedImage. By doing so, attempts to pass a
 // potentially not packed image to one of these routines can be detected at compile time,
-// avoiding the need to figure out how to handle such an error at run time. 
+// avoiding the need to figure out how to handle such an error at run time.
 //
 // A YUVImage is a packed image of unsigned 8-bit pixels in the YUV composite format. The Y, U,
 // and V components can be extracted as MemoryImages in small constant time. The width of a YUV
 // image is guaranteed to be a multiple of 4. YUVImage has special versions of window and other
 // member functions that insure that windows and copies of YUV images are valid YUV images (width
-// is multiple of 4, pixels in YUYV order). 
+// is multiple of 4, pixels in YUYV order).
 
 // *******************************
 // *                             *
@@ -100,7 +100,7 @@ protected:
   //          default copy constructor, because the public can't construct Image anyway because
   //          it's abstract. The call to check() in setSize should be unnecessary because the
   //          argument img has already been constructed and therefore has been checked and is
-  //          valid, but no harm in checking again. 
+  //          valid, but no harm in checking again.
 
   Image& operator=(const Image& img) { setSize(img.width_, img.height_); return *this;}
   // returns  This object as l-value, the standard behavior of assignment operators
