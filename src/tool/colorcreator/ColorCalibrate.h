@@ -56,20 +56,20 @@ public:
     ColorCalibrate(QWidget *parent = 0);
     ~ColorCalibrate() {}
 
-	//Where we actually get the images via the tool
+    //Where we actually get the images via the tool
     portals::InPortal<messages::YUVImage> topImageIn;
     portals::InPortal<messages::YUVImage> bottomImageIn;
 
 protected slots:
     void selectColorSpace(int index);
     void updateThresholdedImage();
-    void loadSlidersBtnPushed();     
-    void saveSlidersBtnPushed();     
+    void loadSlidersBtnPushed();
+    void saveSlidersBtnPushed();
     void loadColorTableBtnPushed();
-    void saveColorTableBtnPushed();   // Assuming ColorTable has the same functionality
-    void imageTabSwitched(int i);    
+    void saveColorTableBtnPushed();
+    void imageTabSwitched(int i);
     void setFullColors(bool state);
-	void canvasClicked(int x, int y, int brushSize, bool leftClick);
+    void canvasClicked(int x, int y, int brushSize, bool leftClick);
 
 protected:
     virtual void run_();
@@ -84,12 +84,12 @@ private:
 
     portals::RoboGram subdiagram;
 
-	//Display modules for the 4 images
+    //Display modules for the 4 images
     image::ImageDisplayListener topDisplay;
     image::ImageDisplayListener bottomDisplay;
 
-	//Unfortunately we have to use these intermediary portals because we can't
-	//get them directly from the tool
+    //Unfortunately we have to use these intermediary portals because we can't
+    //get them directly from the tool
     portals::OutPortal<messages::YUVImage> topImage;
     portals::OutPortal<messages::YUVImage> bottomImage;
 
@@ -99,11 +99,11 @@ private:
     ColorSpaceWidget colorSpaceWidget;
     ColorWheel colorWheel;
     QLabel thresholdedImagePlaceholder;
-	QImage thresholdedImage;
+    QImage thresholdedImage;
     QPushButton loadSlidersBtn, saveSlidersBtn, loadColorTableBtn, saveColorTableBtn;
 
-	QHBoxLayout* topImageLayout;
-	QHBoxLayout* bottomImageLayout;
+    QHBoxLayout* topImageLayout;
+    QHBoxLayout* bottomImageLayout;
     QHBoxLayout* bottomLayout;
     QVBoxLayout* colorButtons;
     QVBoxLayout* leftJunk;
