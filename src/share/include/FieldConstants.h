@@ -19,8 +19,8 @@ static const float GREEN_PAD_Y = 65.0f;
 
 static const float LINE_WIDTH = 5.0f;
 
-static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_Y;
-static const float FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + 2.0f * GREEN_PAD_X;
+static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_X;
+static const float FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + 2.0f * GREEN_PAD_Y;
 static const float FIELD_WIDTH = FIELD_GREEN_WIDTH;
 static const float FIELD_HEIGHT = FIELD_GREEN_HEIGHT;
 

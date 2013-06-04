@@ -45,12 +45,12 @@ void PaintField::paintEvent(QPaintEvent* event)
 
     // Goal Boxes
     QRect blueGoalBox(FIELD_WHITE_LEFT_SIDELINE_X,
-            MIDFIELD_Y -(GOALBOX_WIDTH/2),
-            GOALBOX_DEPTH, GOALBOX_WIDTH);
+                      BLUE_GOALBOX_BOTTOM_Y,
+                      GOALBOX_DEPTH, GOALBOX_WIDTH);
     QRect yellowGoalBox(FIELD_WHITE_RIGHT_SIDELINE_X -
-            (GOALBOX_DEPTH),
-            MIDFIELD_Y - (GOALBOX_WIDTH/2),
-            GOALBOX_DEPTH, GOALBOX_WIDTH);
+                        GOALBOX_DEPTH,
+                        YELLOW_GOALBOX_BOTTOM_Y,
+                        GOALBOX_DEPTH, GOALBOX_WIDTH);
 
     // Goals
     QRect blueGoal(LANDMARK_BLUE_GOAL_BOTTOM_POST_X -
