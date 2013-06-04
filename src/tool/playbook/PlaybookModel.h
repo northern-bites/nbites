@@ -19,10 +19,14 @@ struct PlaybookPosition
     short x;
     short y;
     short h;
-    PlaybookPosition(int x_, int y_, int h_) :
-        x(x_), y(y_), h(h_)
+    char  role;
+    PlaybookPosition(int x_, int y_, int h_, char r) :
+        x(x_), y(y_), h(h_), role(r)
     {}
 };
+
+// For use in initializing playbook.
+static const char roleList [] = {'d', 'o', 'm', 'd', 'o', 'd'};
 
 class PlaybookModel : public QObject
 {

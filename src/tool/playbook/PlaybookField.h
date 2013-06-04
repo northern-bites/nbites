@@ -16,6 +16,16 @@
 
 #include "common/PaintField.h"
 
+enum Role {
+    DEFENDER = 0,
+    MIDDIE,
+    OFFENDER,
+    GOALIE
+};
+
+static const Qt::GlobalColor roleColors [] = {Qt::blue, Qt::cyan,
+                                              Qt::yellow, Qt::magenta};
+
 namespace tool {
 namespace playbook {
 

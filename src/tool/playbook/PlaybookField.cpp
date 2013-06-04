@@ -68,7 +68,7 @@ void PlaybookField::paintGoalie(QPaintEvent* event)
 
     paintRobot(event, painter,
                FIELD_WHITE_LEFT_SIDELINE_X + 15, CENTER_FIELD_Y, 0,
-               Qt::magenta);
+               roleColors[GOALIE]);
 }
 
 void PlaybookField::paintRobot(QPaintEvent* event,
