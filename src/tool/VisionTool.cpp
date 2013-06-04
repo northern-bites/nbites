@@ -10,8 +10,8 @@ namespace tool {
 VisionTool::VisionTool(const char* title) :
     tableCreator(this),
     visDispMod(this),
-    topConverter(Camera::TOP),
-    bottomConverter(Camera::BOTTOM),
+    topConverter(),
+    bottomConverter(),
     EmptyTool(title)
 {
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
@@ -37,8 +37,8 @@ void VisionTool::setUpModules()
 
     diagram.addModule(topConverter);
     diagram.addModule(bottomConverter);
-    topConverter.initTable(globalColorTable.getTable());
-    bottomConverter.initTable(globalColorTable.getTable());
+    topConverter.changeTable(globalColorTable.getTable());
+    bottomConverter.changeTable(globalColorTable.getTable());
 
     diagram.addModule(visDispMod);
     diagram.connectToUnlogger<messages::YUVImage>(visDispMod.topImageIn,
@@ -80,8 +80,8 @@ void VisionTool::loadColorTable()
                     base_directory,
                     tr("Color Table files (*.mtb)"));
     globalColorTable.read(filename.toStdString());
-    topConverter.initTable(globalColorTable.getTable());
-    bottomConverter.initTable(globalColorTable.getTable());
+    topConverter.changeTable(globalColorTable.getTable());
+    bottomConverter.changeTable(globalColorTable.getTable());
 
 
 }

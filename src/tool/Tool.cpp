@@ -19,8 +19,8 @@ Tool::Tool(const char* title) :
     visDispMod(this),
     colorCalibrate(this),
     fieldView(this),
-    topConverter(Camera::TOP),
-    bottomConverter(Camera::BOTTOM),
+    topConverter(),
+    bottomConverter(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -107,8 +107,8 @@ void Tool::loadColorTable()
                     base_directory,
                     tr("Color Table files (*.mtb)"));
     globalColorTable.read(filename.toStdString());
-    topConverter.initTable(globalColorTable.getTable());
-    bottomConverter.initTable(globalColorTable.getTable());
+    topConverter.changeTable(globalColorTable.getTable());
+    bottomConverter.changeTable(globalColorTable.getTable());
 
 
 }
@@ -120,8 +120,8 @@ void Tool::setUpModules()
 
     diagram.addModule(topConverter);
     diagram.addModule(bottomConverter);
-    topConverter.initTable(globalColorTable.getTable());
-    bottomConverter.initTable(globalColorTable.getTable());
+    topConverter.changeTable(globalColorTable.getTable());
+    bottomConverter.changeTable(globalColorTable.getTable());
 
 
 
