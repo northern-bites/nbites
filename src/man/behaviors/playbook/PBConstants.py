@@ -43,6 +43,9 @@ PLAYBOOK_FILE = 'file.txt' #placeholder value
 TABLE_GRID_SIZE = 500      #placeholder value
 TABLE_ENTRY_SIZE = 12 # 3,2,1 field players, with and without an active goalie
 
+WALKING_SPEED = 20 # cm/second
+TURNING_RATE = 60  # degrees/second
+
 
 ####
 #### Information about the Strategies ####

@@ -4,6 +4,7 @@ from ..typeDefs import TeamMember
 from . import PBConstants
 from . import Strategies
 from objects import Location, RobotLocation, RelRobotLocation
+from math import degrees
 import noggin_constants as NogginConstants
 import time
 
@@ -409,13 +410,27 @@ class GoTeam:
             # returns a Location
             return chosenPositions[self.me.playerNumber -1]
 
-    #TODO finish writing this method
+    #@param location: this is a RobotLocation
     def findClosestPlayer(location, exceptNumbers = []):
-        minimum = 10000
+        """
+        Using a simple model to determine time to reach the given location,
+        find which active team player (not in exceptNumbers) has the
+        minimum time to reach destination, and return their player number.
+        """
+        minimumTime = 10000
         playerNum = -1
         for mate in self.activeFieldPlayers:
-            #check time to reach location
-            pass
+            if mate.playerNumber in exceptNumbers:
+                continue
+
+            time = mate.hackedDistTo(location) / PBConstants.WALKING_SPEED
+            #time += 20 * fallen_status
+            time += degrees((mate - location).h) / PBConstants.TURNING_RATE
+
+            if time < minimumTime:
+                minimumTime = time
+                playerNum = mate.playerNumber
+
         return playerNum
 
 

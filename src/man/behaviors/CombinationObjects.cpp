@@ -177,6 +177,17 @@ boost::python::str RobotLocation::toString()
     return *(new boost::python::str(info));
 }
 
+const float RobotLocation::hackedDistTo(const RobotLocation& other)
+{
+    // HACK for infinity values, shouldn't happen
+    if (isinf(other.x) || isinf(other.y)) {
+        std::cout << "INFINITY DISTANCE" << std::endl;
+        return INFINITE_DISTANCE;
+    }
+
+    return hypotf((other.y-y), (other.x-x));
+}
+
 //////////// RelLocation Methods ///////////////
 
 RelLocation::RelLocation(float dx, float dy)
