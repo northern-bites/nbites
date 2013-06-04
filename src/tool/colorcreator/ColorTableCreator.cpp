@@ -82,6 +82,10 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     rightLayout->addWidget(loadBtn);
 
+    QPushButton* saveAsBtn = new QPushButton("Save as", this);
+    rightLayout->addWidget(saveAsBtn);
+    connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveColorTableAs()));
+
     QPushButton* saveBtn = new QPushButton("Save", this);
     rightLayout->addWidget(saveBtn);
     connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveColorTable()));
@@ -167,7 +171,7 @@ void ColorTableCreator::loadColorTable()
     updateThresholdedImage();
 }
 
-void ColorTableCreator::saveColorTable()
+void ColorTableCreator::saveColorTableAs()
 {
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
     QString filename = QFileDialog::getSaveFileName(this,
@@ -178,6 +182,25 @@ void ColorTableCreator::saveColorTable()
     colorTableName->setText(filename);
 
     serializeTableName(filename);
+}
+
+void ColorTableCreator::saveColorTable()
+{
+    QString filename;
+    if (imageTabs->currentIndex() == 0) {
+        QFile file("../../data/tables/latestTopTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        in >> filename;
+    }
+    else {
+        QFile file("../../data/tables/latestBottomTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        in >> filename;
+    }
+    colorTable.write(filename.toStdString());
+    colorTableName->setText(filename);
 }
 
 // Updates the color tables for both image converters and runs all of the
