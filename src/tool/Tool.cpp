@@ -17,6 +17,7 @@ Tool::Tool(const char* title) :
     logView(this),
     tableCreator(this),
     visDispMod(this),
+    colorCalibrate(this),
     fieldView(this),
     topConverter(Camera::TOP),
     bottomConverter(Camera::BOTTOM),
@@ -56,6 +57,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&logView, tr("Log View"));
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
     toolTabs->addTab(&visDispMod, tr("Offline Vision"));
+    toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
     toolTabs->addTab(&fieldView, tr("FieldView"));
 
     this->setCentralWidget(toolTabs);
@@ -146,6 +148,20 @@ void Tool::setUpModules()
     else
     {
         std::cout << "Right now you can't use the color table creator without"
+                  << " two image logs." << std::endl;
+    }
+
+    /** Color Calibrate Tab **/
+    if (diagram.connectToUnlogger<messages::YUVImage>(colorCalibrate.topImageIn,
+                                                      "top") &&
+        diagram.connectToUnlogger<messages::YUVImage>(colorCalibrate.bottomImageIn,
+                                                      "bottom"))
+    {
+        diagram.addModule(colorCalibrate);
+    }
+    else
+    {
+        std::cout << "Right now you can't use the color calibrator without"
                   << " two image logs." << std::endl;
     }
 

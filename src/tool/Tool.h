@@ -18,13 +18,19 @@
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
+
 #include "colorcreator/ColorTable.h"
 #include "vision_offline/VisionDisplayModule.h"
 #include "viewer/FieldViewer.h"
 
 #include "image/ImageConverterModule.h"
 
+
+#include "colorcreator/ColorCalibrate.h"
+#include "viewer/FieldViewer.h"
+
 #include "ParticleSwarm.pb.h"
+
 
 namespace tool {
 
@@ -52,6 +58,7 @@ protected:
     logview::LogViewer logView;
     color::ColorTableCreator tableCreator;
     vision::VisionDisplayModule visDispMod;
+    colorcreator::ColorCalibrate colorCalibrate;
     viewer::FieldViewer fieldView;
 
     man::image::ImageConverterModule topConverter;

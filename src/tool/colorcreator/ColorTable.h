@@ -47,6 +47,7 @@ public:
 
     //     NOTE: Left this in for Octavians stuff to work, he should verify
     static void writeFromSliders(QString filename, ColorSpace* colorSpaces);
+    //static byte* getTableFromSliders(ColorSpace* colorSpaces);
 
 private:
     byte* table;
