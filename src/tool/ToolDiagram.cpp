@@ -24,6 +24,7 @@
 
 namespace tool{
 
+
 ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
 {
     ADD_MAPPED_TYPE(AudioCommand);

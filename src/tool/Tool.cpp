@@ -59,6 +59,8 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&visDispMod, tr("Offline Vision"));
     toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
     toolTabs->addTab(&fieldView, tr("FieldView"));
+    toolTabs->addTab(&worldView, tr("World Viewer"));
+
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);
@@ -82,6 +84,7 @@ Tool::Tool(const char* title) :
     toolBar->addWidget(loadBtn);
     this->addToolBar(toolBar);
 
+    //diagram.addModule(worldView);
 }
 
 Tool::~Tool() {

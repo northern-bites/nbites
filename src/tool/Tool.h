@@ -18,6 +18,7 @@
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
+#include "worldview/WorldView.h"
 
 #include "colorcreator/ColorTable.h"
 #include "vision_offline/VisionDisplayModule.h"
@@ -65,6 +66,8 @@ protected:
     man::image::ImageConverterModule bottomConverter;
 
     color::ColorTable globalColorTable;
+    worldview::WorldView worldView;
+
 
     // GUI stuff
     QTabWidget* toolTabs;

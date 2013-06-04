@@ -6,10 +6,12 @@ set( COMMON_SRCS
 
 set( COMMON_HEADERS
    PaintField.h
-   FieldConstants.h
+   #FieldConstants.h
   )
 
-Qt4_wrap_cpp( COMMON_HEADERS_MOC PaintField.h )
+
+Qt4_wrap_cpp( COMMON_HEADERS_MOC ${COMMON_HEADERS} )
+
 
 add_library(tool_common
     STATIC

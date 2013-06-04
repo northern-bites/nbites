@@ -37,11 +37,19 @@ configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
   "${PROJECT_BINARY_DIR}/PathConfig.h"
 )
-# Configure the robot options
+
+# Configure the debug options
+configure_file(
+  "${SHARE_DIR}/cmake/DebugConfig.in"
+  "${PROJECT_BINARY_DIR}/DebugConfig.h"
+)
+
 configure_file(
   "${MAN_DIR}/cmake/RobotConfig.in"
   "${PROJECT_BINARY_DIR}/RobotConfig.h"
 )
+
+
 include_directories( ${PROJECT_BINARY_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR} )
 
@@ -81,7 +89,7 @@ add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
 
 ########### Actual subdirectories!
-
+add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
 add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
@@ -89,15 +97,16 @@ add_subdirectory( colorcreator )
 add_subdirectory( vision_offline )
 add_subdirectory( viewer )
 add_subdirectory( common )
+add_subdirectory( worldview )
+
 
 ############### SOURCES ####################
-
 # QTool Sources
 set( tool_srcs main.cpp
   ToolDiagram.cpp
   DataSelector.cpp
-
   Tool.cpp
+  ${MAN_DIR}/DiagramThread.cpp
   )
 
 set( tool_headers
@@ -164,10 +173,12 @@ target_link_libraries(
   image_display
   image # man image
   vision # man vision
+  comm # man comm
   viewer
   tool_common
   colorcreator
   vision_offline
+  worldview
   ${QT_LIBRARIES}
   )
 
@@ -188,6 +199,7 @@ target_link_libraries(
   viewer
   tool_common
   colorcreator
+  worldview
   ${QT_LIBRARIES}
   )
 
@@ -206,6 +218,8 @@ target_link_libraries(
   image # man image
   image_display
   viewer
+  image_display
+  worldview
   tool_common
   colorcreator
   vision_offline

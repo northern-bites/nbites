@@ -12,7 +12,7 @@
 #include <QtGui>
 #include <vector>
 
-#include "common/FieldConstants.h"
+#include "support/FieldConstants.h"
 
 #include "common/PaintField.h"
 
@@ -25,7 +25,7 @@ namespace viewer {
 
 static const int PARTICLE_WIDTH = 8;
 
-class FieldViewerPainter : public PaintField
+class FieldViewerPainter : public tool_common::PaintField
 {
     Q_OBJECT;
 

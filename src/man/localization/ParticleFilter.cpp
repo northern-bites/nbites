@@ -247,7 +247,7 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
     // Reset the estimate
     poseEstimate.set_x(x);
     poseEstimate.set_y(y);
-    poseEstimate.set_h(h);
+    poseEstimate.set_h(NBMath::subPIAngle(h));
 
     particles.clear();
 
@@ -290,7 +290,7 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
     // Reset the estimates.
     poseEstimate.set_x(x);
     poseEstimate.set_y(y);
-    poseEstimate.set_h(h);
+    poseEstimate.set_h(NBMath::subPIAngle(h));
 
     particles.clear();
     float weight = 1.0f/parameters.numParticles;
