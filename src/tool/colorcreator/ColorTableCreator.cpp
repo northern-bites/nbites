@@ -8,7 +8,6 @@
 #include <QFile>
 #include <QDataStream>
 #include <QIODevice>
-#include <iostream>
 
 namespace tool {
 namespace color {
