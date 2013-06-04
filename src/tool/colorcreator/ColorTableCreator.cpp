@@ -15,8 +15,8 @@ namespace color {
 ColorTableCreator::ColorTableCreator(QWidget *parent) :
     QWidget(parent),
     currentCamera(Camera::TOP),
-    topConverter(Camera::TOP),
-    bottomConverter(Camera::BOTTOM),
+    topConverter(),
+    bottomConverter(),
     topDisplay(this),
     bottomDisplay(this),
     thrDisplay(this),
@@ -81,6 +81,10 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     QPushButton* loadBtn = new QPushButton("Load", this);
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     rightLayout->addWidget(loadBtn);
+
+    QPushButton* saveAsBtn = new QPushButton("Save as", this);
+    rightLayout->addWidget(saveAsBtn);
+    connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveColorTableAs()));
 
     QPushButton* saveBtn = new QPushButton("Save", this);
     rightLayout->addWidget(saveBtn);
@@ -167,7 +171,7 @@ void ColorTableCreator::loadColorTable()
     updateThresholdedImage();
 }
 
-void ColorTableCreator::saveColorTable()
+void ColorTableCreator::saveColorTableAs()
 {
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
     QString filename = QFileDialog::getSaveFileName(this,
@@ -180,12 +184,31 @@ void ColorTableCreator::saveColorTable()
     serializeTableName(filename);
 }
 
+void ColorTableCreator::saveColorTable()
+{
+    QString filename;
+    if (imageTabs->currentIndex() == 0) {
+        QFile file("../../data/tables/latestTopTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        in >> filename;
+    }
+    else {
+        QFile file("../../data/tables/latestBottomTable.dat");
+        file.open(QIODevice::ReadOnly);
+        QDataStream in(&file);
+        in >> filename;
+    }
+    colorTable.write(filename.toStdString());
+    colorTableName->setText(filename);
+}
+
 // Updates the color tables for both image converters and runs all of the
 // submodules, creating an updated thresholded image
 void ColorTableCreator::updateThresholdedImage()
 {
-    topConverter.initTable(colorTable.getTable());
-    bottomConverter.initTable(colorTable.getTable());
+    topConverter.changeTable(colorTable.getTable());
+    bottomConverter.changeTable(colorTable.getTable());
     // Run all of the modules that are kept in our subdiagram
     subdiagram.run();
     updateColorStats();

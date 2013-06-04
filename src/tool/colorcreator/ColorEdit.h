@@ -5,10 +5,12 @@
 #include <QSlider>
 #include <QLabel>
 #include <QGridLayout>
-#include "image/YUVImage.h"
+#include "Images.h"
 
 namespace qtool {
 namespace colorcreator {
+
+  using messages::YUVImage;
 
 class ColorEdit : public QWidget
 {
@@ -35,7 +37,7 @@ private:
     QSlider *zMin;
     QSlider *zMax;
     int hLow, hHigh, sLow, sHigh, zLow, zHigh;
-    YUVImage r;
+	YUVImage r;
     Colors color;
 
 

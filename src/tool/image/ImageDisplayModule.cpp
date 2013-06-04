@@ -95,69 +95,69 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
     QImage image(yImg.width(), yImg.height(), QImage::Format_RGB32);
     Color c;
 
-	for (int j = 0; j < imageIn.message().height(); j++)
+    for (int j = 0; j < imageIn.message().height(); j++)
     {
-	    rgb_value* qImageLine = (rgb_value*) (image.scanLine(j));
-		for (int i = 0; i < (imageIn.message().width())/2; ++i)
+        rgb_value* qImageLine = (rgb_value*) (image.scanLine(j));
+        for (int i = 0; i < (imageIn.message().width())/2; ++i)
         {
-		    byte y = yImg.getPixel(i, j);
+            byte y = yImg.getPixel(i, j);
             byte u = uImg.getPixel(i/2, j);
             byte v = vImg.getPixel(i/2, j);
 
-		    byte color_byte;
-		    QRgb rgb;
-		    c.setYuv(y, u, v);
+            byte color_byte;
+            QRgb rgb;
+            c.setYuv(y, u, v);
 
             // Make the pixels's RGB value based on what channel we want
-			switch (channel_)
+            switch (channel_)
             {
-			case RGB:
-			    qImageLine[i] = c.getRGB();
-				break;
+            case RGB:
+                qImageLine[i] = c.getRGB();
+                break;
 
-			case Y:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(y);
-				break;
+            case Y:
+                qImageLine[i] = Color::makeRGBFromSingleByte(y);
+                break;
 
-			case U:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(u);
-			    break;
+            case U:
+                qImageLine[i] = Color::makeRGBFromSingleByte(u);
+                break;
 
-			case V:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(v);
-			    break;
+            case V:
+                qImageLine[i] = Color::makeRGBFromSingleByte(v);
+                break;
 
-			case Red:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(c.getRb());
-				break;
+            case Red:
+                qImageLine[i] = Color::makeRGBFromSingleByte(c.getRb());
+                break;
 
-			case Green:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(c.getGb());
-				break;
+            case Green:
+                qImageLine[i] = Color::makeRGBFromSingleByte(c.getGb());
+                break;
 
-			case Blue:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(c.getBb());
-				break;
+            case Blue:
+                qImageLine[i] = Color::makeRGBFromSingleByte(c.getBb());
+                break;
 
-			case Hue:
-			    c.setHsz(c.getH(), c.getS(), 0.875f);
-			    qImageLine[i] = c.getRGB();
-				break;
+            case Hue:
+                c.setHsz(c.getH(), c.getS(), 0.875f);
+                qImageLine[i] = c.getRGB();
+                break;
 
-			case Saturation:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(c.getSb());
-			    break;
+            case Saturation:
+                qImageLine[i] = Color::makeRGBFromSingleByte(c.getSb());
+                break;
 
-			case Value:
-			    qImageLine[i] = Color::makeRGBFromSingleByte(c.getVb());
-			    break;
+            case Value:
+                qImageLine[i] = Color::makeRGBFromSingleByte(c.getVb());
+                break;
 
-			default:
-			    qImageLine[i] = Color::makeRGB(0, 0, 0);
-				break;
-			}
-		}
-	}
+            default:
+                qImageLine[i] = Color::makeRGB(0, 0, 0);
+                break;
+            }
+        }
+    }
 
     return image;
 }

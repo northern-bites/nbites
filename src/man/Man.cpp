@@ -7,11 +7,13 @@
 #include "Camera.h"
 #include "RobotConfig.h"
 
+#ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
 SET_POOL_SIZE(messages::JointAngles, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
+#endif
 
 namespace man {
 
@@ -29,8 +31,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
       topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
       bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-      topConverter(Camera::TOP),
-      bottomConverter(Camera::BOTTOM),
+      topConverter(TOP_TABLE_PATHNAME),
+      bottomConverter(BOTTOM_TABLE_PATHNAME),
       vision(),
       localization(),
       ballTrack(),
