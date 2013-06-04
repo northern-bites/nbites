@@ -42,6 +42,21 @@ void PlaybookField::paintGrid(QPaintEvent* event)
     painter.scale(scaleFactor, -scaleFactor);
 
     painter.setBrush(Qt::black);
+
+    //Draw Vertical Lines
+    for (int i = FIELD_WHITE_LEFT_SIDELINE_X;
+         i < FIELD_GREEN_RIGHT_SIDELINE_X;
+         i += BOX_SIZE)
+    {
+        painter.drawLine(i, 0, i, FIELD_HEIGHT);
+    }
+
+    //Draw Horizontal Lines
+    for (int i = FIELD_WHITE_BOTTOM_SIDELINE_Y; i < FIELD_HEIGHT; i += BOX_SIZE)
+    {
+        painter.drawLine(0, i, FIELD_WIDTH, i);
+    }
+
 }
 
 void PlaybookField::paintGoalie(QPaintEvent* event)
