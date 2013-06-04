@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FIELD_CONSTANTS_H
+#define FIELD_CONSTANTS_H
 
 #include <cmath>
 #include "Common.h"
@@ -149,4 +150,9 @@ static const float HEADING_UP = 90.0f;
 static const float HEADING_LEFT = 180.0f;
 static const float HEADING_DOWN = -90.0f;
 
+
 }
+
+
+#endif
+

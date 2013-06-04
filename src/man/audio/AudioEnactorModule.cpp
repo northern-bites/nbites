@@ -1,32 +1,21 @@
 #include "AudioEnactorModule.h"
+#include "Profiler.h"
 #include <iostream>
 #include <string>
 
 namespace man {
 namespace audio {
 
-AudioEnactorModule::AudioEnactorModule(boost::shared_ptr<AL::ALBroker> broker)
-    : portals::Module(),
-      alspeech(broker)
+AudioEnactorModule::AudioEnactorModule() : portals::Module()
 {
 }
 
 void AudioEnactorModule::run_()
 {
+    PROF_ENTER(P_AUDIO);
+
     audioIn.latch();
     messages::AudioCommand audioCommand = audioIn.message();
-
-    //set volume if it's different than now - there will always be a volume
-    //(default 0.95) but it might not have changed
-    if(alspeech.getVolume()!=audioCommand.volume())
-    {
-        alspeech.setVolume(audioCommand.volume());
-    }
-
-    if(audioCommand.has_tts_msg())
-    {
-        alspeech.say(audioCommand.tts_msg());
-    }
 
     if(audioCommand.has_audio_file())
     {
@@ -34,6 +23,8 @@ void AudioEnactorModule::run_()
         if(system(("aplay -q "+audioCommand.audio_file()+" &").c_str()) != 0)
             std::cout << "AudioEnactor could not play file." << std::endl;
     }
+
+    PROF_EXIT(P_AUDIO);
 }
 
 }

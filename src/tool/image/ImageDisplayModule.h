@@ -85,6 +85,8 @@ static const std::string ChannelType_label[] = {
 // But I am hacking as fast as I can
 // So future person who is reading this code, please don't judge me
 // --Lizzie
+//
+// So much judgement -EJ
 
 /*
  * THRESHOLDED IMAGE DISPLAY
@@ -153,7 +155,7 @@ class OverlayDisplayModule : public ImageDisplayModule
 {
 public:
     OverlayDisplayModule(QWidget* parent = 0) : ImageDisplayModule(parent) {};
-    void setOverlay(QImage overlay_) { overlay = overlay_; }
+    void setOverlay(QImage overlay_) { overlay = overlay_; run_(); }
 
 protected:
     // Replaces ImageDisplayModule's run method to do the overlaying

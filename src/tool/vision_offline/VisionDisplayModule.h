@@ -19,7 +19,6 @@
 
 
 #include "RoboGrams.h"
-#include "image/ImageConverterModule.h"
 #include "image/ImageDisplayModule.h"
 #include "colorcreator/ColorTable.h"
 #include "Camera.h"
@@ -46,15 +45,28 @@ public:
     // These are just pointers to the converter modules' InPortals
 	portals::InPortal<messages::YUVImage> bottomImageIn;
 	portals::InPortal<messages::YUVImage> topImageIn;
+	
+	portals::InPortal<messages::ThresholdImage> tTImage_in;
+	portals::InPortal<messages::PackedImage16> tYImage_in;
+	portals::InPortal<messages::PackedImage16> tUImage_in;
+	portals::InPortal<messages::PackedImage16> tVImage_in;
+
+    portals::InPortal<messages::ThresholdImage> bTImage_in;
+	portals::InPortal<messages::PackedImage16> bYImage_in;
+	portals::InPortal<messages::PackedImage16> bUImage_in;
+	portals::InPortal<messages::PackedImage16> bVImage_in;
+													
 
 protected slots:
 	
-	void loadColorTable();
 
 protected:
 	virtual void run_();
 
 private:
+	
+	QImage makeOverlay(Camera::Type which);
+
 	
 	QTabWidget* imageTabs;
 	Camera::Type currentCamera;
@@ -64,10 +76,8 @@ private:
 	
 	
 	// Modules
-	man::image::ImageConverterModule topConverter;
-	man::image::ImageConverterModule bottomConverter;
-	image::ImageDisplayListener topDisplay;
-    image::ImageDisplayListener bottomDisplay;
+	image::OverlayDisplayModule topDisplay;
+    image::OverlayDisplayModule bottomDisplay;
     image::ThresholdedImageDisplayModule topThrDisplay;
 	image::ThresholdedImageDisplayModule botThrDisplay;
 	man::vision::VisionModule visMod;
@@ -83,6 +93,15 @@ private:
     // So that multiple things in this module can connect to these
     portals::OutPortal<messages::YUVImage> bottomImage;
     portals::OutPortal<messages::YUVImage> topImage;
+	portals::OutPortal<messages::ThresholdImage> tTImage;
+	portals::OutPortal<messages::PackedImage16> tYImage;
+	portals::OutPortal<messages::PackedImage16> tUImage;
+	portals::OutPortal<messages::PackedImage16> tVImage;
+
+    portals::OutPortal<messages::ThresholdImage> bTImage;
+	portals::OutPortal<messages::PackedImage16> bYImage;
+	portals::OutPortal<messages::PackedImage16> bUImage;
+	portals::OutPortal<messages::PackedImage16> bVImage;
 
 
 };

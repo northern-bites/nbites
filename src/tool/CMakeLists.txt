@@ -20,6 +20,7 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+
 include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
 # Configure the debug options
 configure_file(

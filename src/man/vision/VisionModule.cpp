@@ -23,6 +23,8 @@ VisionModule::VisionModule() : Module(),
                                vision_ball(base()),
                                vision_robot(base()),
                                vision_obstacle(base()),
+							   topOutPic(base()),
+							   botOutPic(base()),
                                vision(boost::shared_ptr<Vision>(new Vision()))
 {
 }
@@ -60,7 +62,13 @@ void VisionModule::run_()
     updateVisionField();
     updateVisionObstacle();
 
+	portals::Message<messages::ThresholdImage> top, bot;
+	top = new messages::ThresholdImage(vision->thresh->thresholded, 320, 240, 320);
+	bot = new messages::ThresholdImage(vision->thresh->thresholdedBottom, 320, 240, 320);
 
+
+	topOutPic.setMessage(top);
+	botOutPic.setMessage(bot);
 		
 
 }
@@ -80,7 +88,7 @@ void VisionModule::updateVisionBall() {
 
     portals::Message<messages::VisionBall> ball_data(0);
 
-    ball_data.get()->set_on(vision->ball->isTopCam());
+    ball_data.get()->set_intopcam(vision->ball->isTopCam());
     ball_data.get()->set_distance(vision->ball->getDistance());
     ball_data.get()->set_angle_x_deg(vision->ball->getAngleXDeg());
     ball_data.get()->set_angle_y_deg(vision->ball->getAngleYDeg());
@@ -95,6 +103,8 @@ void VisionModule::updateVisionBall() {
     ball_data.get()->set_heat(vision->ball->getHeat());
     ball_data.get()->set_on(vision->ball->isOn());
     ball_data.get()->set_confidence(vision->ball->getConfidence());
+	ball_data.get()->set_x(vision->ball->getX());
+	ball_data.get()->set_y(vision->ball->getY());
 
     vision_ball.setMessage(ball_data);
 }
@@ -184,6 +194,8 @@ void VisionModule::updateVisionField() {
         visCorner->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
 		visCorner->mutable_visual_detection()->set_angle_x_deg(i->getAngleXDeg());
 		visCorner->mutable_visual_detection()->set_angle_y_deg(i->getAngleYDeg());
+		visCorner->set_x(i->getX());
+		visCorner->set_y(i->getY());
 
         const std::list<const ConcreteCorner *>* possible = i->getPossibilities();
         for(std::list<const ConcreteCorner*>::const_iterator j = possible->begin();
@@ -209,6 +221,27 @@ void VisionModule::updateVisionField() {
     //setting goalpostleft info
     field_data.get()->mutable_goal_post_l()->set_height(vision->yglp->getHeight());
     field_data.get()->mutable_goal_post_l()->set_width(vision->yglp->getWidth());
+
+	field_data.get()->mutable_goal_post_l()->mutable_left_top()->
+		set_x(vision->yglp->getLeftTopX());
+	field_data.get()->mutable_goal_post_l()->mutable_left_top()->
+		set_y(vision->yglp->getLeftTopY());
+	field_data.get()->mutable_goal_post_l()->mutable_right_top()->
+		set_x(vision->yglp->getRightTopX());
+	field_data.get()->mutable_goal_post_l()->mutable_right_top()->
+		set_y(vision->yglp->getRightTopY());
+	field_data.get()->mutable_goal_post_l()->mutable_left_bot()->
+		set_x(vision->yglp->getLeftBottomX());
+	field_data.get()->mutable_goal_post_l()->mutable_left_bot()->
+		set_y(vision->yglp->getLeftBottomY());
+	field_data.get()->mutable_goal_post_l()->mutable_right_bot()->
+		set_x(vision->yglp->getRightBottomX());
+	field_data.get()->mutable_goal_post_l()->mutable_right_bot()->
+		set_y(vision->yglp->getRightBottomY());
+
+	field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+		set_intopcam(vision->yglp->isTopCam());
+
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_distance(vision->yglp->getDistance());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
@@ -256,6 +289,27 @@ void VisionModule::updateVisionField() {
     //setting goalpostright info
     field_data.get()->mutable_goal_post_r()->set_height(vision->ygrp->getHeight());
     field_data.get()->mutable_goal_post_r()->set_width(vision->ygrp->getWidth());
+
+	field_data.get()->mutable_goal_post_r()->mutable_left_top()->
+		set_x(vision->ygrp->getLeftTopX());
+	field_data.get()->mutable_goal_post_r()->mutable_left_top()->
+		set_y(vision->ygrp->getLeftTopY());
+	field_data.get()->mutable_goal_post_r()->mutable_right_top()->
+		set_x(vision->ygrp->getRightTopX());
+	field_data.get()->mutable_goal_post_r()->mutable_right_top()->
+		set_y(vision->ygrp->getRightTopY());
+	field_data.get()->mutable_goal_post_r()->mutable_left_bot()->
+		set_x(vision->ygrp->getLeftBottomX());
+	field_data.get()->mutable_goal_post_r()->mutable_left_bot()->
+		set_y(vision->ygrp->getLeftBottomY());
+	field_data.get()->mutable_goal_post_r()->mutable_right_bot()->
+		set_x(vision->ygrp->getRightBottomX());
+	field_data.get()->mutable_goal_post_r()->mutable_right_bot()->
+		set_y(vision->ygrp->getRightBottomY());
+
+	field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+		set_intopcam(vision->ygrp->isTopCam());
+
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_distance(vision->ygrp->getDistance());
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
@@ -313,6 +367,8 @@ void VisionModule::updateVisionField() {
     field_data.get()->mutable_visual_cross()->set_bearing_sd(vision->cross->getBearingSD());
 	field_data.get()->mutable_visual_cross()->set_angle_x_deg(vision->cross->getAngleXDeg());
 	field_data.get()->mutable_visual_cross()->set_angle_y_deg(vision->cross->getAngleYDeg());
+	field_data.get()->mutable_visual_cross()->set_x(vision->cross->getX());
+	field_data.get()->mutable_visual_cross()->set_y(vision->cross->getY());
 
     const std::list<const ConcreteCross *>* possible_cross = vision->cross->getPossibilities();
     for (std::list<const ConcreteCross*>::const_iterator i = possible_cross->begin();

@@ -6,15 +6,16 @@ namespace tool {
 namespace image {
 
 ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
-    : QLabel(parent),
-      filter(ALL_COLORS)
+  : QLabel(parent),
+	filter(ALL_COLORS)
 {
-    setText(tr("No image loaded!"));
+	setText(tr("No image loaded!"));
 }
 
 void ThresholdedImageDisplayModule::run_()
 {
     imageIn.latch();
+
     // Note that you have to pass a label a QPixmap, but you can't really edit
     // the pixels of a pixmap, so you have to edit a QImage then make a
     // pixmap from it. *rolls eyes*
@@ -28,40 +29,39 @@ void ThresholdedImageDisplayModule::run_()
  */
 QImage ThresholdedImageDisplayModule::makeImage(byte filter_)
 {
-    QImage image(imageIn.message().width(),
-                 imageIn.message().height(),
-                 QImage::Format_RGB32);
+	QImage image(imageIn.message().width(),
+				 imageIn.message().height(),
+				 QImage::Format_RGB32);
 
-    for (int j = 0; j < image.height(); ++j)
-    {
-        QRgb* bitmapLine = (QRgb*) image.scanLine(j);
-        for (int i = 0; i < image.width(); ++i)
-        {
-            int rawColor = imageIn.message().getPixel(i, j);
-            int threshColor = 0, mix = 1;
-            for (int c = 0; c < Color::NUM_COLORS; c++) {
-                if ((rawColor & Color_bits[c]) > 0 &&
-                    ((Color_bits[c] & filter_) > 0))
-                {
-                    threshColor += Color_RGB[c];
-                    threshColor /= mix;
-                    mix++;
-                }
-            }
+	for (int j = 0; j < image.height(); ++j)
+	{
+		QRgb* bitmapLine = (QRgb*) image.scanLine(j);
+		for (int i = 0; i < image.width(); ++i)
+		{
+			int rawColor = imageIn.message().getPixel(i, j);
+			int threshColor = 0, mix = 1;
+			for (int c = 0; c < Color::NUM_COLORS; c++) {
+				if ((rawColor & Color_bits[c]) > 0 &&
+					((Color_bits[c] & filter_) > 0))
+				{
+					threshColor += Color_RGB[c];
+					threshColor /= mix;
+					mix++;
+				}
+			}
 
-            if (threshColor == 0) threshColor = Color_RGB[0];
+			if (threshColor == 0) threshColor = Color_RGB[0];
+			bitmapLine[i] = threshColor;
+		}
+	}
 
-            bitmapLine[i] = threshColor;
-        }
-    }
-
-    return image;
+	return image;
 }
 
 ImageDisplayModule::ImageDisplayModule(QWidget* parent) : QLabel(parent),
-                                                          channel(RGB)
+														  channel(RGB)
 {
-    setText(tr("No image loaded!"));
+	setText(tr("No image loaded!"));
 }
 
 void ImageDisplayModule::run_()
@@ -88,29 +88,29 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
     this->setFixedWidth(imageIn.message().width()/2);
     this->setFixedHeight(imageIn.message().height());
 
-    messages::MemoryImage8 yImg = imageIn.message().yImage();
-    messages::MemoryImage8 uImg = imageIn.message().uImage();
-    messages::MemoryImage8 vImg = imageIn.message().vImage();
+	messages::MemoryImage8 yImg = imageIn.message().yImage();
+	messages::MemoryImage8 uImg = imageIn.message().uImage();
+	messages::MemoryImage8 vImg = imageIn.message().vImage();
 
-    QImage image(yImg.width(), yImg.height(), QImage::Format_RGB32);
-    Color c;
+	QImage image(yImg.width(), yImg.height(), QImage::Format_RGB32);
+	Color c;
 
 	for (int j = 0; j < imageIn.message().height(); j++)
-    {
+	{
 	    rgb_value* qImageLine = (rgb_value*) (image.scanLine(j));
 		for (int i = 0; i < (imageIn.message().width())/2; ++i)
-        {
+		{
 		    byte y = yImg.getPixel(i, j);
-            byte u = uImg.getPixel(i/2, j);
-            byte v = vImg.getPixel(i/2, j);
+			byte u = uImg.getPixel(i/2, j);
+			byte v = vImg.getPixel(i/2, j);
 
-		    byte color_byte;
-		    QRgb rgb;
-		    c.setYuv(y, u, v);
+            byte color_byte;
+            QRgb rgb;
+            c.setYuv(y, u, v);
 
             // Make the pixels's RGB value based on what channel we want
 			switch (channel_)
-            {
+			{
 			case RGB:
 			    qImageLine[i] = c.getRGB();
 				break;
@@ -159,61 +159,61 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
 		}
 	}
 
-    return image;
+	return image;
 }
 
 // Draws the base image then paints the overlay over it.
 void OverlayDisplayModule::run_()
 {
-    imageIn.latch();
-    QImage base = ImageDisplayModule::makeImageOfChannel(channel);
-    QPainter painter(&base);
-    painter.drawImage(base.rect(), overlay);
-    setPixmap(QPixmap::fromImage(base));
+	imageIn.latch();
+	QImage base = ImageDisplayModule::makeImageOfChannel(channel);
+	QPainter painter(&base);
+	painter.drawImage(base.rect(), overlay);
+	setPixmap(QPixmap::fromImage(base));
 }
 
 // The following are all stolen from BMPImageViewerListener...
 ImageDisplayListener::ImageDisplayListener(QWidget *parent)
-    : ImageDisplayModule(parent),
-      brushSize(DEFAULT_BRUSH_SIZE)
+  : ImageDisplayModule(parent),
+	brushSize(DEFAULT_BRUSH_SIZE)
 {
-    QWidget::setAttribute(Qt::WA_NoMousePropagation, true );
+	QWidget::setAttribute(Qt::WA_NoMousePropagation, true );
 }
 
 void ImageDisplayListener::mouseReleaseEvent ( QMouseEvent * event )
 {
-    bool left;
-    if(event->button() == Qt::LeftButton) {
-        left = true;
-    } else {
-        left = false;
-    }
+	bool left;
+	if(event->button() == Qt::LeftButton) {
+		left = true;
+	} else {
+		left = false;
+	}
 
-    int mouseX = event->x();
-    int mouseY = event->y();
-
-    emit mouseClicked((int)((float)mouseX),
+	int mouseX = event->x();
+	int mouseY = event->y();
+	
+	emit mouseClicked((int)((float)mouseX),
 					  (int)((float)mouseY), brushSize, left);
 }
 
 void ImageDisplayListener::wheelEvent(QWheelEvent* event) {
-    if (event->delta() > 0) {
-        brushSize++;
-    } else {
-        brushSize--;
-    }
+	if (event->delta() > 0) {
+		brushSize++;
+	} else {
+		brushSize--;
+	}
 
-    if (brushSize == 0) {
-        brushSize = 1;
-    }
-    updateBrushCursor();
+	if (brushSize == 0) {
+		brushSize = 1;
+	}
+	updateBrushCursor();
 }
 
 void ImageDisplayListener::updateBrushCursor() {
-    QPixmap cursor(brushSize, brushSize);
+	QPixmap cursor(brushSize, brushSize);
 
-    cursor.fill(brushColor);
-    this->setCursor(QCursor(cursor, brushSize, 0)); // not exactly sure why this works
+	cursor.fill(brushColor);
+	this->setCursor(QCursor(cursor, brushSize, 0)); // not exactly sure why this works
 }
 
 }
