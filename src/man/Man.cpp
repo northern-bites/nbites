@@ -213,6 +213,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
                                                "robot");
     cognitionThread.log<messages::VisionObstacle>(&vision.vision_obstacle,
                                                   "obstacle");
+    cognitionThread.log<messages::JointAngles>(&vision.joint_angles_out,
+                                             "joint");
+    cognitionThread.log<messages::InertialState>(&vision.inertial_state_out,
+                                               "inertials");
 #endif
 
 #ifdef USE_TIME_PROFILING

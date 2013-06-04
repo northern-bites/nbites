@@ -25,6 +25,8 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	bYImage(base()),
 	bUImage(base()),
 	bVImage(base()),
+	joints(base()),
+	inertials(base()),
 	visMod()
 {
 
@@ -38,9 +40,6 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	bottomDisplay.imageIn.wireTo(&bottomImage, true);
 	topThrDisplay.imageIn.wireTo(&visMod.topOutPic);
 	botThrDisplay.imageIn.wireTo(&visMod.botOutPic);
-	// Dummy Sensors messages for VisMod
-	portals::Message<messages::JointAngles> joints(0);
-	portals::Message<messages::InertialState> inertials(0);
 	
 	visMod.topThrImage.wireTo(&tTImage, true);
     visMod.topYImage.wireTo(&tYImage, true);
@@ -52,8 +51,8 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     visMod.botUImage.wireTo(&bUImage, true);
     visMod.botVImage.wireTo(&bVImage, true);
 
-    visMod.joint_angles.setMessage(joints);
-	visMod.inertial_state.setMessage(inertials);
+    visMod.joint_angles.wireTo(&joints, true);
+	visMod.inertial_state.wireTo(&inertials, true);
 
 
 	field_viewer = new logview::TypedProtoViewer<messages::VisionField>();
@@ -126,6 +125,8 @@ void VisionDisplayModule::run_()
 	bUImage_in.latch();
 	bVImage_in.latch();
 	
+	joints_in.latch();
+	inerts_in.latch();
 	
 
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
@@ -149,6 +150,12 @@ void VisionDisplayModule::run_()
 						   &bUImage_in.message()));
 	bVImage.setMessage(portals::Message<messages::PackedImage16>(
 						   &bVImage_in.message()));
+
+	joints.setMessage(portals::Message<messages::JointAngles>(
+						  &joints_in.message()));
+	inertials.setMessage(portals::Message<messages::InertialState>(
+							 &inerts_in.message()));
+
 	subdiagram.run();	
 
 	topDisplay.setOverlay(makeOverlay(Camera::TOP));

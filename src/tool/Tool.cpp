@@ -126,6 +126,10 @@ void Tool::setUpModules()
 												  "top");
 	diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
 												  "bottom");
+	diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
+													 "joints");
+	diagram.connectToUnlogger<messages::InertialState>(visDispMod.inerts_in,
+													   "inertials");
 	visDispMod.tTImage_in.wireTo(&topConverter.thrImage, true);
 	visDispMod.tYImage_in.wireTo(&topConverter.yImage, true);
 	visDispMod.tUImage_in.wireTo(&topConverter.uImage, true);

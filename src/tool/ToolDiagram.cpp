@@ -46,6 +46,7 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(VisionField);
     ADD_MAPPED_TYPE(VisionRobot);
 	ADD_MAPPED_TYPE(VisionObstacle);
+    ADD_MAPPED_TYPE(JointAngles);
     ADD_MAPPED_TYPE(WorldModel);
     ADD_MAPPED_TYPE(YUVImage);
 
