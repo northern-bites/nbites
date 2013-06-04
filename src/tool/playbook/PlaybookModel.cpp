@@ -5,14 +5,17 @@
 namespace tool{
 namespace playbook{
 
-PlaybookModel::PlaybookModel(QObject* parent) :
+PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     QObject(parent),
     changedIndex(),
     changedPositions(),
     goalieOn(1),
     defenderLocked(false),
     offenderLocked(false),
-    middieLocked(false)
+    middieLocked(false),
+    BOX_SIZE(b_s),
+    GRID_WIDTH(g_w),
+    GRID_HEIGHT(g_h)
 {
     playbook = new PlaybookPosition***[2];
     for(int goalie = 0; goalie < 2; ++goalie)

@@ -9,9 +9,9 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     QWidget(parent),
     havePlaybook(false)
 {
-    model = new PlaybookModel(this);
+    model = new PlaybookModel(BOX_SIZE, GRID_WIDTH, GRID_HEIGHT, this);
 
-    fieldPainter = new PlaybookField(this);
+    fieldPainter = new PlaybookField(BOX_SIZE, GRID_WIDTH, GRID_HEIGHT, this);
 
     mainLayout = new QHBoxLayout(this);
 

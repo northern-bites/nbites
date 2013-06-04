@@ -5,9 +5,13 @@
 namespace tool {
 namespace playbook {
 
-PlaybookField::PlaybookField(QWidget* parent, float scaleFactor_) :
+PlaybookField::PlaybookField(int b_s, int g_w, int g_h, QWidget* parent,
+                             float scaleFactor_) :
     PaintField(parent, scaleFactor_),
-    shouldPaintGoalie(true)
+    shouldPaintGoalie(true),
+    BOX_SIZE(b_s),
+    GRID_WIDTH(g_w),
+    GRID_HEIGHT(g_h)
 {
 }
 
@@ -22,10 +26,22 @@ void PlaybookField::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
 
+    paintGrid(event);
+
     if(shouldPaintGoalie)
     {
         paintGoalie(event);
     }
+}
+
+void PlaybookField::paintGrid(QPaintEvent* event)
+{
+    QPainter painter(this);
+    //Move orign to bottom left and scale to flip y axis
+    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.scale(scaleFactor, -scaleFactor);
+
+    painter.setBrush(Qt::black);
 }
 
 void PlaybookField::paintGoalie(QPaintEvent* event)
@@ -55,17 +71,13 @@ void PlaybookField::paintRobot(QPaintEvent* event,
 
     QPoint center(0, 0);
     QRect robot(0, 0, sizeX*scaleFactor, sizeY*scaleFactor);
-
     QPoint lineEnd(0.125*x*scaleFactor,
                    0);
 
     robot.moveCenter(center);
 
     painter.drawRect(robot);
-
     painter.drawLine(center, lineEnd);
-
-    painter.rotate(-h);
 
     painter.restore();
 }

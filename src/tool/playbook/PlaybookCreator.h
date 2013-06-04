@@ -16,6 +16,11 @@
 namespace tool{
 namespace playbook{
 
+static const int BOX_SIZE = 100;  // Size in cm for each grid box.
+
+static const int GRID_WIDTH  = (int(FIELD_WHITE_WIDTH) / BOX_SIZE) + 2;
+static const int GRID_HEIGHT = (int(FIELD_WHITE_HEIGHT)/ BOX_SIZE) + 2;
+
 class PlaybookCreator : public QWidget
 {
     Q_OBJECT;

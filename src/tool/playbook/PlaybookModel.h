@@ -11,12 +11,6 @@
 #include <QStack>
 #include "FieldConstants.h"
 
-static const int BOX_SIZE = 100;  // Size in cm for each grid box.
-
-static const int GRID_WIDTH  = (int(FIELD_WHITE_WIDTH) / BOX_SIZE) + 2;
-static const int GRID_HEIGHT = (int(FIELD_WHITE_HEIGHT)/ BOX_SIZE) + 2;
-
-
 namespace tool {
 namespace playbook {
 
@@ -35,7 +29,7 @@ class PlaybookModel : public QObject
     Q_OBJECT;
 
 public:
-    PlaybookModel(QObject* parent = 0);
+    PlaybookModel(int b_s, int g_w, int g_h, QObject* parent = 0);
 
     // Playbook is a big table of positions organized by:
     // 1) Goalie presence       2 possibilities
@@ -75,6 +69,9 @@ protected:
     bool offenderLocked;
     bool middieLocked;
 
+    int BOX_SIZE;
+    int GRID_WIDTH;
+    int GRID_HEIGHT;
 };
 
 }

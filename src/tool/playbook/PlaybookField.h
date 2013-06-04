@@ -24,18 +24,19 @@ class PlaybookField : public PaintField
     Q_OBJECT;
 
 public:
-    PlaybookField(QWidget* parent = 0, float scaleFactor_ = 1.f);
+    PlaybookField(int b_s, int g_w, int g_h, QWidget* parent = 0,
+                  float scaleFactor_ = 1.f);
 
 protected slots:
     void drawGoalie(bool on);
 
 protected:
-    // Paint the field
     void paintEvent(QPaintEvent* event);
+
+    void paintGrid(QPaintEvent*event);
 
     void paintGoalie(QPaintEvent* event);
 
-private:
     static const float ROBOT_SIZE_X = 18.0f;
     static const float ROBOT_SIZE_Y = 35.0f;
 
@@ -48,6 +49,9 @@ private:
 private:
     bool shouldPaintGoalie;
 
+    int BOX_SIZE;
+    int GRID_WIDTH;
+    int GRID_HEIGHT;
 };
 
 } // namespace playbook
