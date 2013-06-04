@@ -9,10 +9,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "Profiler.h"
-
 namespace man {
-
 namespace comm {
 
 CommModule::CommModule(int team, int player) :
@@ -54,8 +51,6 @@ CommModule::~CommModule()
 
 void CommModule::run_()
 {
-    PROF_ENTER(P_COMM);
-
     receive();
 
     teamConnect->checkDeadTeammates(_worldModels,
@@ -71,7 +66,6 @@ void CommModule::run_()
         send();
     }
 
-    PROF_EXIT(P_COMM);
 }
 
 void CommModule::send()

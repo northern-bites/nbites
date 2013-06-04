@@ -30,15 +30,40 @@ void DiagramThread::RobotDiagram::run()
 
     if (name == "cognition")
     {
-        PROF_ENTER(P_MAIN);
+        PROF_ENTER(P_COGNITION_THREAD);
+    }
+    else if (name == "sensors")
+    {
+        PROF_ENTER(P_MOTION_THREAD);
+    }
+    else if (name == "comm")
+    {
+        PROF_ENTER(P_COMM_THREAD);
+    }
+    else if (name == "guardian")
+    {
+        PROF_ENTER(P_GUARDIAN_THREAD);
     }
 
     RoboGram::run();
 
     if (name == "cognition")
     {
-        PROF_EXIT(P_MAIN);
+        PROF_EXIT(P_COGNITION_THREAD);
+        // Count cognition frames
         PROF_NFRAME();
+    }
+    else if (name == "sensors")
+    {
+        PROF_EXIT(P_MOTION_THREAD);
+    }
+    else if (name == "comm")
+    {
+        PROF_EXIT(P_COMM_THREAD);
+    }
+    else if (name == "guardian")
+    {
+        PROF_EXIT(P_GUARDIAN_THREAD);
     }
 
     // Stop timer
