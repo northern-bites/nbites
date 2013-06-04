@@ -22,6 +22,10 @@ typedef float mms;
 
 static const int NUM_PLAYERS_PER_TEAM = 5;
 
+// Location of pathnames of color tables on robot
+#define TOP_TABLE_PATHNAME "/home/nao/nbites/lib/table/top_table.mtb"
+#define BOTTOM_TABLE_PATHNAME "/home/nao/nbites/lib/table/bottom_table.mtb"
+
 // game controller constants for structure information
 #define GAME_CONTROLLER_LIST_SIZE 11
 #define GAME_CONTROLLER_TEAMS_LIST_SIZE 2

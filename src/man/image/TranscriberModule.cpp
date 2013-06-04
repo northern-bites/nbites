@@ -407,6 +407,7 @@ void ImageTranscriber::startCapturing() {
            "Start capture failed.");
 }
 
+// The heart of the transcriber, returns an image full of pixels from video mem
 messages::YUVImage ImageTranscriber::getNextImage()
 {
     // dequeue a frame buffer (this call blocks when there is
@@ -441,6 +442,7 @@ messages::YUVImage ImageTranscriber::getNextImage()
         std::cerr << "CAMERA::Camera is working." << std::endl;
     }
 
+    // Pixels -> TranscriberBuffer -> YUVImage
     return messages::YUVImage(new TranscriberBuffer(mem[requestBuff.index],
                                                     fd,
                                                     requestBuff),
@@ -452,6 +454,7 @@ TranscriberModule::TranscriberModule(ImageTranscriber& trans)
 {
 }
 
+// Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
     messages::YUVImage image = it.getNextImage();

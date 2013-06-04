@@ -22,10 +22,9 @@ enum ProfiledComponent {
     P_COGNITION_THREAD = 0,
 
     P_TOP_DQBUF,
-    P_TOP_CONVERTER,
-
     P_BOT_DQBUF,
-    P_BOT_CONVERTER,
+
+    P_ACQUIRE_IMAGE,
 
     P_VISION,
     P_TRANSFORM,

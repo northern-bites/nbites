@@ -12,28 +12,32 @@ namespace image {
 class ImageConverterModule : public portals::Module {
 
 public:
-    ImageConverterModule(Camera::Type);
+    // For tool, doesn't load color table at converter construction time
+    ImageConverterModule();
+    // For robots, load color table at converter construction time
+    ImageConverterModule(char *table_pathname);
     virtual ~ImageConverterModule() {}
 
+    // Gets an image from the Transcriber module (from the camera)
     portals::InPortal<messages::YUVImage> imageIn;
+    // Outs four images for vision, YUV split up and a color segmented image
     portals::OutPortal<messages::PackedImage16> yImage;
     portals::OutPortal<messages::PackedImage16> uImage;
     portals::OutPortal<messages::PackedImage16> vImage;
     portals::OutPortal<messages::ThresholdImage> thrImage;
 
-    // Used offline
-    void initTable(unsigned char* otherTable);
+    // For offline use, allows table to change after construction
+    void changeTable(unsigned char *newTable);
 
 protected:
     virtual void run_();
 
-    // Used on the robot
-    void initTable(const std::string& filename);
+    void initTable(char *filename);
 
-    Camera::Type whichCamera;
     ColorParams params;
     unsigned char *table;
 
+    // Constants used for reading a color table into memory
     enum InitTableConstants {
         y0 = 0,
         u0 = 0,
