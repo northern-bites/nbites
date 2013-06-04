@@ -4,10 +4,17 @@ set( ColorCreator_srcs
   ColorTable.cpp
   ColorTableCreator.cpp
   Stats.cpp
+  ColorCalibrate.cpp
+  ColorWheel.cpp
+  ColorSpaceWidget.cpp
   )
 
 set(ColorCreator_headers
     ColorTableCreator.h
+	ColorCalibrate.h
+	ColorSpace.h
+	ColorWheel.h
+	ColorSpaceWidget.h
 )
 
 Qt4_wrap_cpp(ColorCreator_headers_moc ${ColorCreator_headers})
