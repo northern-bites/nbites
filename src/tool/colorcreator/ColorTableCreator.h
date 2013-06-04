@@ -90,6 +90,7 @@ public:
 protected slots:
     // Color table manipulation
     void loadColorTable();
+    void saveColorTableAs();
     void saveColorTable();
 
     // Re-threshold the thresholded image
