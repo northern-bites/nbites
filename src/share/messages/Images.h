@@ -826,7 +826,7 @@ public:
     OrangeBit = 0x10,
     RedBit = 0x20,
     NavyBit = 0x40,
-    DrawingBit = 0x80, // not sure what this is for, do we need it?
+    DrawingBit = 0x80,
     UndefinedBit = 0x00
   };
 };

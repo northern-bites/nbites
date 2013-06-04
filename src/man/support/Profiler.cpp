@@ -15,10 +15,8 @@ static const char *PCOMPONENT_NAMES[] = {
     "Cognition Thread",
 
     "Dequeue Top Image Buffer",
-    "Top Image Conversion",
-
-    "Dequeue Top Image Buffer",
-    "Bottom Image Conversion",
+    "Dequeue Bottom Image Buffer",
+    "Image Conversion",
 
     "Vision",
     "Transform",
@@ -86,10 +84,8 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_COGNITION_THREAD       --> */ P_TOTAL,
 
     /*P_TOP_DQBUF              --> */ P_COGNITION_THREAD,
-    /*P_TOP_CONVERTER          --> */ P_COGNITION_THREAD,
-
     /*P_BOT_DQBUF              --> */ P_COGNITION_THREAD,
-    /*P_BOT_CONVERTER          --> */ P_COGNITION_THREAD,
+    /*P_ACQUIRE_IMAGE          --> */ P_COGNITION_THREAD,
 
     /*P_VISION                 --> */ P_COGNITION_THREAD,
     /*P_TRANSFORM              --> */ P_VISION,
@@ -97,7 +93,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_FGHORIZON              --> */ P_THRESHRUNS,
     /*P_RUNS                   --> */ P_THRESHRUNS,
     /*P_OBJECT                 --> */ P_VISION,
-    /*P_ROBOTS                 --> */ P_OBJECT,
+    /*P_ROBOTS                 --> */ P_VISION,
 
     /*P_EDGES,                 --> */ P_VISION,
     /*P_SOBEL,                 --> */ P_EDGES,
