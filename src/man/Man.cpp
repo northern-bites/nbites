@@ -7,11 +7,13 @@
 #include "Camera.h"
 #include "RobotConfig.h"
 
+#ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
 SET_POOL_SIZE(messages::JointAngles, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
+#endif
 
 namespace man {
 
@@ -23,14 +25,14 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       motion(),
       guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
       guardian(),
-      audio(broker),
+      audio(),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
       topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
       bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
-      topConverter(Camera::TOP),
-      bottomConverter(Camera::BOTTOM),
+      topConverter(TOP_TABLE_PATHNAME),
+      bottomConverter(BOTTOM_TABLE_PATHNAME),
       vision(),
       localization(),
       ballTrack(),
@@ -145,9 +147,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
     vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
 
-    cognitionThread.addModule(ballTrack);
-    cognitionThread.addModule(leds);
-    cognitionThread.addModule(behaviors);
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
     localization.resetInput.wireTo(&behaviors.resetLocOut, true);

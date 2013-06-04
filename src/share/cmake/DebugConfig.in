@@ -32,6 +32,13 @@
 #   undef DEBUG_LOGGING
 #endif
 
+#define OFFLINE_${OFFLINE}
+#ifdef OFFLINE_ON
+#   define OFFLINE
+#else
+#   undef  OFFLINE
+#endif
+
 #define PROFILE_${PROFILE}
 #ifdef  PROFILE_ON
 #   define USE_TIME_PROFILING

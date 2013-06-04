@@ -85,6 +85,8 @@ static const std::string ChannelType_label[] = {
 // But I am hacking as fast as I can
 // So future person who is reading this code, please don't judge me
 // --Lizzie
+//
+// So much judgement -EJ
 
 /*
  * THRESHOLDED IMAGE DISPLAY

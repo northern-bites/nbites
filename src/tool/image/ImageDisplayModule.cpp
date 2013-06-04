@@ -104,9 +104,9 @@ QImage ImageDisplayModule::makeImageOfChannel(ChannelType channel_)
 			byte u = uImg.getPixel(i/2, j);
 			byte v = vImg.getPixel(i/2, j);
 
-		    byte color_byte;
-		    QRgb rgb;
-		    c.setYuv(y, u, v);
+            byte color_byte;
+            QRgb rgb;
+            c.setYuv(y, u, v);
 
             // Make the pixels's RGB value based on what channel we want
 			switch (channel_)
