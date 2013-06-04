@@ -28,6 +28,10 @@ void WorldViewPainter::paintEvent(QPaintEvent* event)
 
 }
 
+/**
+ *  NOTE: Comm information is coming from behaviors -> is in degrees
+ *
+ */
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                                             messages::WorldModel loc,
                                             bool red)
@@ -51,8 +55,8 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
     //draw my heading
     painter.drawLine(loc.my_x(),
                      loc.my_y(),
-                     PARTICLE_WIDTH * std::cos(loc.my_h()) + loc.my_x(),
-                     PARTICLE_WIDTH * std::sin(loc.my_h()) + loc.my_y());
+                     PARTICLE_WIDTH * std::cos(TO_RAD*loc.my_h()) + loc.my_x(),
+                     PARTICLE_WIDTH * std::sin(TO_RAD*loc.my_h()) + loc.my_y());
 
     //draw my uncertainty
     painter.drawEllipse(locCenter,
@@ -62,8 +66,8 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
     if(loc.ball_on()){
         //draw where I think the ball is
         painter.setBrush(Qt::darkYellow); //Orange isn't a thing??
-        painter.drawEllipse(loc.my_x()+loc.ball_dist()*std::cos(loc.my_h()+loc.ball_bearing()),
-                            loc.my_y()+loc.ball_dist()*std::sin(loc.my_h()+loc.ball_bearing()),
+        painter.drawEllipse(loc.my_x()+loc.ball_dist()*std::cos(TO_RAD*loc.my_h()+loc.ball_bearing()),
+                            loc.my_y()+loc.ball_dist()*std::sin(TO_RAD*loc.my_h()+loc.ball_bearing()),
                             25,
                             25);
 

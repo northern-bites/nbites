@@ -21,6 +21,8 @@
 #include "RobotLocation.pb.h"
 #include "WorldModel.pb.h"
 
+#include "NBMath.h"
+
 namespace tool {
 namespace worldview {
 
