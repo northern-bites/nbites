@@ -73,7 +73,7 @@ public:
  */
 
 class ColorTableCreator: public QWidget,
-                         public portals::Module
+                          public portals::Module
 {
     Q_OBJECT;
 

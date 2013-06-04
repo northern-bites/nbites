@@ -40,6 +40,8 @@ void ColorTable::read(string filename) {
     if (bytesRead == 0) {
         cerr << "Error reading color table " << filename;
     }
+    else
+        std::cout << "Succeed: Read " << filename << std::endl;
 
     fclose(tableFile);
 }
@@ -110,6 +112,40 @@ void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
     file.write(table);
     file.close();
 }
+
+
+// /* Return a color table using bitwise definitions
+//  * using information from a set of NUM_COLORS colorSpace
+//  */
+// static byte* ColorTable::getTableFromSliders(ColorSpace* colorSpaces) {
+
+//     byte V_MAX = 128, U_MAX = 128, Y_MAX = 128;
+//     QByteArray table;
+
+//     // loop through all possible table values - our tables are v-u-y
+//     int count = 0;
+//     for (int z = 0; z < V_MAX; z++)
+//     {
+//         for (int x = 0; x < U_MAX; x++)
+//         {
+//             for (int y = 0; y < Y_MAX; y++)
+//             {
+//                 byte temp = 0;
+//                 Color color;
+//                 assert(2*y >=y && 2*x >= x && 2*z >= z); //overflow
+//                 color.setYuv((byte) (2*y), (byte) (2*x), (byte) (2*z));
+//                 for (int c = 0; c < image::Color::NUM_COLORS; c++)
+//                 {
+//                     if (colorSpaces[c].contains(color)) {
+//                         temp = temp | image::Color_bits[c];
+//                     }
+//                 }
+//                 table.append(temp);
+//             }
+//         }
+//     }
+//     return table;
+// }
 
 }
 }
