@@ -14,6 +14,8 @@
 #include <vector>
 #include <string>
 
+#include "DebugConfig.h"
+
 namespace portals {
 
 // Prohibit copy/assignment of some class
@@ -390,8 +392,16 @@ public:
     MessagePool<MessageHolder<type> > MessageHolder<type>::pool_(size)
 
 // Here is the default pool size
+
+// After many struggles, we decided on this work around for the
+// redefinition of pool_ for our compiler.
+#ifdef OFFLINE
+template<class T>
+SET_POOL_SIZE_DEFAULT(T, 24);
+#else
 template<class T>
 SET_POOL_SIZE_DEFAULT(T, 8);
+#endif
 
 template<class T>
 void MessageHolder<T>::release()
@@ -595,4 +605,3 @@ public:
 }
 
 #endif
-
