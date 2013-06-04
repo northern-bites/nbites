@@ -145,6 +145,7 @@ class GoTeam:
                 play.setSubRole(PBConstants.PENALTY_SUB_ROLE)
 
         # Check for testing stuff
+        # Not currently being called as of 6/4/13
         elif PBConstants.TEST_DEFENDER:
             Strategies.sTestDefender(self, play)
         elif PBConstants.TEST_OFFENDER:
@@ -157,17 +158,21 @@ class GoTeam:
               currentGCState =='gameSet'):
             Strategies.sReady(self, play)
 
-        # Now we look at game strategies
-        elif self.numActiveFieldPlayers == 0:
-            Strategies.sNoFieldPlayers(self, play)
-        elif self.numActiveFieldPlayers == 1:
-            Strategies.sOneField(self, play)
-        elif self.numActiveFieldPlayers == 2:
-            Strategies.sTwoField(self, play)
-        elif self.numActiveFieldPlayers == 3:
-            Strategies.sThreeField(self, play)
-        elif self.numActiveFieldPlayers == 4:
-            Strategies.sWin(self, play)
+        else:
+            # Use the playbook table to determine position.
+            self.priorityPositions(self.tableLookup, play)
+
+        # # Now we look at game strategies
+        # elif self.numActiveFieldPlayers == 0:
+        #     Strategies.sNoFieldPlayers(self, play)
+        # elif self.numActiveFieldPlayers == 1:
+        #     Strategies.sOneField(self, play)
+        # elif self.numActiveFieldPlayers == 2:
+        #     Strategies.sTwoField(self, play)
+        # elif self.numActiveFieldPlayers == 3:
+        #     Strategies.sThreeField(self, play)
+        # elif self.numActiveFieldPlayers == 4:
+        #     Strategies.sWin(self, play)
 
     def tableLookup(self):
         """
@@ -198,7 +203,6 @@ class GoTeam:
 
         return positions
 
-    #TODO: finish writing this method
     def priorityPositions(self, positions, play):
         """
         Determine which player should go to each position.
@@ -208,15 +212,15 @@ class GoTeam:
         # Find which active field player should go to each position
         firstPlayer = self.findClosestPlayer(locations[0])
         if firstPlayer == self.brain.playerNumber:
-            play.setRole = positions[0][3] #TODO: make this actually work
+            play.setRole(self.parseRoleChar(positions[0][3]))
             play.setPosition(locations[0])
         else:
             secondPlayer = self.findClosestPlayer(locations[1], [firstPlayer])
             if secondPlayer == self.brain.playerNumber:
-                play.setRole = positions[1][3]
+                play.setRole(self.parseRoleChar(positions[1][3]))
                 play.setPosition(locations[1])
             else:
-                play.setRole = positions[2][3]
+                play.setRole(self.parseRoleChar(positions[2][3]))
                 play.setPosition(locations[2])
 
     def mapPositionToRobotLocation(self, position):
@@ -225,6 +229,19 @@ class GoTeam:
         @return: that position as a Robot Location
         """
         return RobotLocation(position[0], position[1], position[2])
+
+    def parseRoleChar(self, role):
+        """
+        @method: char 'd' -> defender
+                      'm' -> middie
+                      'o' -> offender
+        """
+        if role == 'd':
+            return PBConstants.DEFENDER
+        elif role == 'm':
+            return PBConstants.MIDDIE
+        elif role == 'o':
+            return PBConstants.OFFENDER
 
     def updateStateInfo(self, play):
         """
