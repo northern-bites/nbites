@@ -31,6 +31,9 @@ MAKE_FINALIZE(PackedImage8)
 namespace man {
 namespace image {
 
+// Specialized pixel buffer for holding pixels in video memory
+// IMPORTANT see images.h for more information on pixel buffers
+// fd and v4l2_buffer needed to access video (kernel-land) memory
 class TranscriberBuffer : public messages::VideoPixelBuffer
 {
 public:
@@ -42,12 +45,14 @@ private:
     int fd;
 };
 
+// The transcriber itself, returns image class of pixels from video memory
 class ImageTranscriber
 {
 public:
     ImageTranscriber(Camera::Type);
     ~ImageTranscriber();
 
+    // The heart of the transcriber, clients calls this for new image
     messages::YUVImage getNextImage();
     uint64_t getTimestamp() const;
     Camera::Type type() { return cameraType; }
@@ -96,6 +101,8 @@ private:
     uint64_t timeStamp;
 };
 
+// Module that wraps Transcriber's functionality
+// Outportals image from video memory
 class TranscriberModule : public portals::Module
 {
 public :

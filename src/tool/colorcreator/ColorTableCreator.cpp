@@ -15,8 +15,8 @@ namespace color {
 ColorTableCreator::ColorTableCreator(QWidget *parent) :
     QWidget(parent),
     currentCamera(Camera::TOP),
-    topConverter(Camera::TOP),
-    bottomConverter(Camera::BOTTOM),
+    topConverter(),
+    bottomConverter(),
     topDisplay(this),
     bottomDisplay(this),
     thrDisplay(this),
@@ -184,8 +184,8 @@ void ColorTableCreator::saveColorTable()
 // submodules, creating an updated thresholded image
 void ColorTableCreator::updateThresholdedImage()
 {
-    topConverter.initTable(colorTable.getTable());
-    bottomConverter.initTable(colorTable.getTable());
+    topConverter.changeTable(colorTable.getTable());
+    bottomConverter.changeTable(colorTable.getTable());
     // Run all of the modules that are kept in our subdiagram
     subdiagram.run();
     updateColorStats();
