@@ -23,7 +23,6 @@ enum ProfiledComponent {
 
     P_TOP_DQBUF,
     P_BOT_DQBUF,
-
     P_ACQUIRE_IMAGE,
 
     P_VISION,
