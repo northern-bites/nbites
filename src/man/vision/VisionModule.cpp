@@ -237,6 +237,9 @@ void VisionModule::updateVisionField() {
 	field_data.get()->mutable_goal_post_l()->mutable_right_bot()->
 		set_y(vision->yglp->getRightBottomY());
 
+	field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
+		set_intopcam(vision->yglp->isTopCam());
+
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_distance(vision->yglp->getDistance());
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
@@ -297,6 +300,9 @@ void VisionModule::updateVisionField() {
 		set_x(vision->ygrp->getRightBottomX());
 	field_data.get()->mutable_goal_post_r()->mutable_right_bot()->
 		set_y(vision->ygrp->getRightBottomY());
+
+	field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
+		set_intopcam(vision->ygrp->isTopCam());
 
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_distance(vision->ygrp->getDistance());

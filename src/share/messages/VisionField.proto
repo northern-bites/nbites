@@ -33,8 +33,9 @@ message VisualDetection
 	optional float angle_y_deg = 12;
         optional bool red_goalie = 13; // HACK until we have a unified message for goal posts.
         optional bool navy_goalie = 14;
-	optional int32 x = 15;
-	optional int32 y = 16;
+	optional bool intopcam = 15;
+	optional int32 x = 17;
+	optional int32 y = 18;
 }
 
 message VisualGoalPost

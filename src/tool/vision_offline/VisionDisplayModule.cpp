@@ -36,8 +36,8 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 
 	topDisplay.imageIn.wireTo(&topImage, true);
 	bottomDisplay.imageIn.wireTo(&bottomImage, true);
-	topThrDisplay.imageIn.wireTo(&visMod.topOutPic, true);
-	botThrDisplay.imageIn.wireTo(&visMod.botOutPic, true);
+	topThrDisplay.imageIn.wireTo(&visMod.topOutPic);
+	botThrDisplay.imageIn.wireTo(&visMod.botOutPic);
 	// Dummy Sensors messages for VisMod
 	portals::Message<messages::JointAngles> joints(0);
 	portals::Message<messages::InertialState> inertials(0);
@@ -176,7 +176,19 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 							 visField->visual_line(i).end_x(),
 							 visField->visual_line(i).end_y());
 		}
-	
+		
+		painter.setPen(Qt::magenta);
+		for (int i = 0; i < visField->visual_corner_size(); i++) {
+			
+			painter.drawLine(visField->visual_corner(i).x() - 5,
+							 visField->visual_corner(i).y() - 5,
+							 visField->visual_corner(i).x() + 5,
+							 visField->visual_corner(i).y() + 5);
+			painter.drawLine(visField->visual_corner(i).x() + 5,
+							 visField->visual_corner(i).y() - 5,
+							 visField->visual_corner(i).x() - 5,
+							 visField->visual_corner(i).y() + 5);
+		}
 	
 		if (visBall->intopcam()) {
 			int ball_x = visBall->x();
@@ -195,7 +207,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 		painter.setBrush(QBrush(QColor(255,255,0,80), Qt::SolidPattern));
 		if (ygrp.visual_detection().certainty() == 2)
 			painter.setPen(QColor(0,0,255,200));
-		if (ygrp.visual_detection().on()) { // if we see the post at all
+		if (ygrp.visual_detection().on() && ygrp.visual_detection().intopcam()) {
 			QPoint r_points[4] = {
 				QPoint(ygrp.left_top().x(), ygrp.left_top().y()),
 				QPoint(ygrp.right_top().x(), ygrp.right_top().y()),
@@ -204,7 +216,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 			};
 			painter.drawConvexPolygon(r_points, 4);
 		}
-		if (yglp.visual_detection().on()) { // if we see the post at all
+		if (yglp.visual_detection().on() && yglp.visual_detection().intopcam()) {
 			painter.setPen(QColor(255,0,0,200));
 			QPoint l_points[4] = {
 				QPoint(yglp.left_top().x(), yglp.left_top().y()),
@@ -227,6 +239,32 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 			painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
 			painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
 			painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
+		}
+		const messages::VisualGoalPost yglp = visField->goal_post_l();
+		const messages::VisualGoalPost ygrp = visField->goal_post_r();
+		// Now we are to draw the goal posts
+		painter.setPen(QColor(0,0,0,200));
+		painter.setBrush(QBrush(QColor(255,255,0,80), Qt::SolidPattern));
+		if (ygrp.visual_detection().certainty() == 2)
+			painter.setPen(QColor(0,0,255,200));
+		if (ygrp.visual_detection().on() && !ygrp.visual_detection().intopcam()) {
+			QPoint r_points[4] = {
+				QPoint(ygrp.left_top().x(), ygrp.left_top().y()),
+				QPoint(ygrp.right_top().x(), ygrp.right_top().y()),
+				QPoint(ygrp.right_bot().x(), ygrp.right_bot().y()),
+				QPoint(ygrp.left_bot().x(), ygrp.left_bot().y())
+			};
+			painter.drawConvexPolygon(r_points, 4);
+		}
+		if (yglp.visual_detection().on() && !yglp.visual_detection().intopcam()) {
+			painter.setPen(QColor(255,0,0,200));
+			QPoint l_points[4] = {
+				QPoint(yglp.left_top().x(), yglp.left_top().y()),
+				QPoint(yglp.right_top().x(), yglp.right_top().y()),
+				QPoint(yglp.right_bot().x(), yglp.right_bot().y()),
+				QPoint(yglp.left_bot().x(), yglp.left_bot().y())
+			};
+			painter.drawConvexPolygon(l_points, 4);
 		}
 	}
 	
