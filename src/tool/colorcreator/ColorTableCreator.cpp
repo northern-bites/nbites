@@ -126,7 +126,7 @@ void ColorTableCreator::loadLatestTable()
 }
 
 // Note: serizalization done by Qt
-void ColorTableCreator::serializeTableName(QString latestTableName) 
+void ColorTableCreator::serializeTableName(QString latestTableName)
 {
     if (imageTabs->currentIndex() == 0) {
         QFile file("../../data/tables/latestTopTable.dat");
@@ -240,9 +240,9 @@ void ColorTableCreator::undo()
 void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
 {
     // Check the click was on the image
-    for (int i = -brushStroke.brushSize/2; i <= brushStroke.brushSize/2; i++)
+    for (int i = -brushStroke.brushSize; i <= 0; i++)
     {
-        for (int j = -brushStroke.brushSize/2; j <= brushStroke.brushSize/2; j++)
+        for (int j = 0; j <= brushStroke.brushSize; j++)
         {
             int brush_x = i + brushStroke.x;
             int brush_y = j + brushStroke.y;
@@ -266,13 +266,15 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
                 byte u = image.uImage().getPixel(brush_x/2, brush_y);
                 byte v = image.vImage().getPixel(brush_x/2, brush_y);
 
-                //std::cout << (int) y << " " << (int) u << " " << (int) v
-                //       << std::endl;
-
                 if (brushStroke.define)
                 {
-                    colorTable.setColor(y, u, v,
-                                        image::Color_bits[brushStroke.color]);
+                    // Change the radius' to determine how 'close' colors must be to get defined
+                    const int yRadius = 4, uRadius = 2, vRadius = 2;
+                    for (int dy = -yRadius; dy <= yRadius; ++dy)
+                        for (int du = -uRadius; du <= uRadius; ++du)
+                            for (int dv = -vRadius; dv <= vRadius; ++dv)
+                                colorTable.setColor(y+dy, u+du, v+dv,
+                                                    image::Color_bits[brushStroke.color]);
                 }
                 else
                 {
@@ -282,6 +284,7 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
             }
         }
     }
+
    updateThresholdedImage();
 }
 

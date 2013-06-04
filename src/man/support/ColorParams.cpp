@@ -51,4 +51,3 @@ void ColorParams::printParams()
     printf("uvLimit:\n\t%016llx\n", uvLimit);
     printf("uvDim:\n\t%016llx\n", uvDim);
 }
-

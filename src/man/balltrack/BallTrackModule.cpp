@@ -46,6 +46,14 @@ void BallTrackModule::run_()
     deltaOdometry.set_y(curOdometry.y() - lastOdometry.y());
     deltaOdometry.set_h(curOdometry.h() - lastOdometry.h());
 
+    // Ensure deltaOdometry is reasonable (initial fix lost in git?)
+    if(std::abs(deltaOdometry.x()) > 1.f || std::abs(deltaOdometry.y()) > 1.f)
+    {
+        deltaOdometry.set_x(0.f);
+        deltaOdometry.set_y(0.f);
+        deltaOdometry.set_h(0.f);
+    }
+
     // Update the Ball filter
     // NOTE: Should be tested but having the same observation twice will be damaging
     //       should try and avoid a const cast, but may need same hack as motion...
