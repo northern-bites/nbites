@@ -174,6 +174,8 @@ def positionForKick(player):
     if player.firstFrame():
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
+        #TODO: try getting rid of ADAPTIVE here, if ball estimates are good,
+        #we don't need to lower the speed/shuffle to the ball
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
                               Navigator.GRADUAL_SPEED,

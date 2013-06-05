@@ -329,9 +329,9 @@ void GuardianModule::checkBatteryLevels()
             {
                 playFile(energy_wav);
             }
+            lastBatteryCharge = newBatteryCharge;
         }
     }
-    lastBatteryCharge = newBatteryCharge;
 }
 
 void GuardianModule::checkTemperatures()
