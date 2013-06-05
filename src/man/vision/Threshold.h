@@ -250,6 +250,7 @@ public:
 #ifdef OFFLINE
     //write lines, points, boxes to this array to avoid changing the real image
     uint8_t debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
+	uint8_t betterDebugImage[IMAGE_HEIGHT * IMAGE_WIDTH];
 #endif
 
     bool usingTopCamera;

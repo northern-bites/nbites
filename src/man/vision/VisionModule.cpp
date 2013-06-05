@@ -66,15 +66,16 @@ void VisionModule::run_()
     updateVisionField();
     updateVisionObstacle();
 
+#ifdef OFFLINE
 	portals::Message<messages::ThresholdImage> top, bot;
-	top = new messages::ThresholdImage(vision->thresh->thresholded, 320, 240, 320);
+	top = new messages::ThresholdImage(vision->thresh->betterDebugImage, 320, 240, 320);
 	bot = new messages::ThresholdImage(vision->thresh->thresholdedBottom, 320, 240, 320);
 
 
 	topOutPic.setMessage(top);
 	botOutPic.setMessage(bot);
 		
-
+#endif
     /* In order to keep logs synced up, joint angs and inert states are passed 
      * thru the vision system. Joint angles are taken at around 100 hz, but 
      * images are taken at 30 hz, but by passing joint angles thru vision we 

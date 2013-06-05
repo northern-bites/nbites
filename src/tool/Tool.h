@@ -40,6 +40,8 @@ public slots:
     void setUpModules();
 	void loadColorTable();
 	void changeTableValues(byte y, byte u, byte v, byte col);
+	void unChangeTableValues(byte y, byte u, byte v, byte col);
+	void saveAsGlobalTable();
 	void saveGlobalTable();
 
 protected:

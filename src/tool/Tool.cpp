@@ -50,10 +50,10 @@ Tool::Tool(const char* title) :
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
 
-	connect(&tableCreator, SIGNAL(tableChanges(byte, byte, byte, byte)),
+	connect(&tableCreator, SIGNAL(tableChanges(byte, byte, byte, byte)), 
 			this, SLOT(changeTableValues(byte, byte, byte, byte)));
-	connect(&colorCalibrate, SIGNAL(tableChanges(byte, byte, byte, byte)),
-			this, SLOT(changeTableValues(byte, byte, byte, byte)));
+	connect(&tableCreator, SIGNAL(tableUnChanges(byte, byte, byte, byte)), 
+			this, SLOT(unChangeTableValues(byte, byte, byte, byte)));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
@@ -86,10 +86,14 @@ Tool::Tool(const char* title) :
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
 	toolBar->addWidget(loadBtn);
 	this->addToolBar(toolBar); 
-
+	
 	QPushButton* saveBtn = new QPushButton(tr("Save"));
 	connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveGlobalTable()));
 	toolBar->addWidget(saveBtn);
+
+	QPushButton* saveAsBtn = new QPushButton(tr("Save As"));
+	connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
+	toolBar->addWidget(saveAsBtn);
 
 }
 
@@ -107,7 +111,28 @@ Tool::~Tool() {
 void Tool::saveGlobalTable()
 {
 
+	if (loadBtn->text() == QString("Load Table")) { // no table loaded yet
+		saveAsGlobalTable();
+		return;
+	}
+	
+	QString filename = loadBtn->text();
+	globalColorTable.write(filename.toStdString());
 }
+void Tool::saveAsGlobalTable()
+{
+
+    QString base_directory = QString(NBITES_DIR) + "/data/tables";
+    QString filename = QFileDialog::getSaveFileName(this,
+					tr("Save Color Table to File"),
+					base_directory + "/new_table.mtb",
+					tr("Color Table files (*.mtb)"));
+	globalColorTable.write(filename.toStdString());
+	
+	if (!filename.isEmpty())
+		loadBtn->setText(filename);
+}
+
 void Tool::loadColorTable()
 {
 
@@ -117,16 +142,25 @@ void Tool::loadColorTable()
                     base_directory,
                     tr("Color Table files (*.mtb)"));
     globalColorTable.read(filename.toStdString());
-	topConverter.changeTable(globalColorTable.getTable());
-    bottomConverter.changeTable(globalColorTable.getTable());
+	topConverter.loadTable(globalColorTable.getTable());
+    bottomConverter.loadTable(globalColorTable.getTable());
 	
-	loadBtn->setText(filename);
+	if (!filename.isEmpty())
+		loadBtn->setText(filename);
 
 }
 
 void Tool::changeTableValues(byte y, byte u, byte v, byte col)
 {
 	globalColorTable.setColor(y, u, v, col);
+	topConverter.changeTable(globalColorTable.getTable());
+	bottomConverter.changeTable(globalColorTable.getTable());
+
+}
+	
+void Tool::unChangeTableValues(byte y, byte u, byte v, byte col)
+{
+	globalColorTable.unSetColor(y, u, v, col);
 	topConverter.changeTable(globalColorTable.getTable());
 	bottomConverter.changeTable(globalColorTable.getTable());
 }
@@ -138,8 +172,8 @@ void Tool::setUpModules()
 	diagram.connectToUnlogger<messages::YUVImage>(bottomConverter.imageIn, "bottom");
 	diagram.addModule(topConverter);
 	diagram.addModule(bottomConverter);
-	topConverter.changeTable(globalColorTable.getTable());
-    bottomConverter.changeTable(globalColorTable.getTable());
+	topConverter.loadTable(globalColorTable.getTable());
+    bottomConverter.loadTable(globalColorTable.getTable());
 
 
 	diagram.addModule(visDispMod);
@@ -168,6 +202,8 @@ void Tool::setUpModules()
                                                       "bottom"))
     {
         diagram.addModule(tableCreator);
+		tableCreator.topThrIn.wireTo(&topConverter.thrImage, true);
+		tableCreator.botThrIn.wireTo(&bottomConverter.thrImage, true);
     }
     else
     {

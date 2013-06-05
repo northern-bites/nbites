@@ -72,6 +72,14 @@ int ColorTable::countColor(byte color) {
     return count;
 }
 
+void ColorTable::copyTable(byte *newTable)
+{
+
+	for (int i = 0; i < TABLE_SIZE; i++) {
+		table[i] = newTable[i];
+	}
+
+}
 /* Write out a color table using bitwise definitions
  * using information from a set of NUM_COLORS colorSpace
  */
