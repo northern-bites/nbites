@@ -1,4 +1,5 @@
 #include "MotionModule.h"
+#include "Profiler.h"
 
 #include <fstream>
 
@@ -44,6 +45,7 @@ void MotionModule::stop()
 
 void MotionModule::run_()
 {
+    PROF_ENTER(P_MOTION);
     // (1) Before anything else happens, it is important to
     //     retrieve the correct current joint angles.
     jointsInput_.latch();
@@ -88,6 +90,8 @@ void MotionModule::run_()
         newInputJoints = false;
         frameCount++;
     }
+
+    PROF_EXIT(P_MOTION);
 }
 
 void MotionModule::resetOdometry()
@@ -347,6 +351,12 @@ void MotionModule::processMotionInput()
             messages::MotionCommand::DESTINATION_WALK)
         {
             sendMotionCommand(bodyCommandInput_.message().dest());
+        }
+        else if (bodyCommandInput_.message().type() ==
+            messages::MotionCommand::ODOMETRY_WALK)
+        {
+            sendMotionCommand(bodyCommandInput_.message().odometry_dest());
+
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::WALK_COMMAND)
@@ -892,6 +902,40 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
  * to that gain, else does .5 by default (half speed)
  */
 void MotionModule::sendMotionCommand(messages::DestinationWalk command)
+{
+    // Message is coming from behaviors in centimeters and degrees
+    // StepCommands take millimeters and radians so Convert!
+    float relX = command.rel_x() * CM_TO_MM;
+    float relY = command.rel_y() * CM_TO_MM;
+    float relH = command.rel_h() * TO_RAD;
+
+    // For now go at half speed for odometry walk
+    // @TODO major refactoring on all dis shit. lets make it hot
+    float DEFAULT_SPEED = .5f;
+    float gain = DEFAULT_SPEED;
+    if(command.gain() > 0.f)
+        gain = command.gain();
+
+    nextProvider = &walkProvider;
+    DestinationCommand::ptr newCommand(
+        new DestinationCommand(
+            relX,
+            relY,
+            relH,
+            gain)
+        );
+    walkProvider.setCommand(newCommand);
+}
+
+// TESTED by EJ, works appropriately. Don't fuck with unless I'm told.
+// Sorry EJ had to fuck with it - Octavian
+/*
+ * Given a OdometryWalk proto,
+ * Rel x and y given in cm, rel h in degrees
+ * If gain is defined in the proto then it also sets the speed
+ * to that gain, else does .5 by default (half speed)
+ */
+void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 {
     // Message is coming from behaviors in centimeters and degrees
     // StepCommands take millimeters and radians so Convert!

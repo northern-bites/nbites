@@ -2,6 +2,7 @@
 #include "NBMath.h"
 #include <math.h>
 #include "NBMath.h"
+#include "Profiler.h"
 
 #include "DebugConfig.h"
 
@@ -24,6 +25,8 @@ BallTrackModule::~BallTrackModule()
 
 void BallTrackModule::run_()
 {
+    PROF_ENTER(P_BALL_TRACK);
+
     // Latch
     visionBallInput.latch();
     odometryInput.latch();
@@ -111,6 +114,8 @@ void BallTrackModule::run_()
 
 
     ballLocationOutput.setMessage(ballMessage);
+
+    PROF_EXIT(P_BALL_TRACK);
 }
 
 } //namespace balltrack
