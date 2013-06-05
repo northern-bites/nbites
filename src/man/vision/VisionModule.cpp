@@ -23,6 +23,8 @@ VisionModule::VisionModule() : Module(),
                                vision_ball(base()),
                                vision_robot(base()),
                                vision_obstacle(base()),
+							   topOutPic(base()),
+							   botOutPic(base()),
                                vision(boost::shared_ptr<Vision>(new Vision()))
 {
 }
@@ -59,6 +61,16 @@ void VisionModule::run_()
     updateVisionRobot();
     updateVisionField();
     updateVisionObstacle();
+
+	portals::Message<messages::ThresholdImage> top, bot;
+	top = new messages::ThresholdImage(vision->thresh->thresholded, 320, 240, 320);
+	bot = new messages::ThresholdImage(vision->thresh->thresholdedBottom, 320, 240, 320);
+
+
+	topOutPic.setMessage(top);
+	botOutPic.setMessage(bot);
+		
+
 }
 
 void VisionModule::updateVisionObstacle() {
@@ -76,7 +88,7 @@ void VisionModule::updateVisionBall() {
 
     portals::Message<messages::VisionBall> ball_data(0);
 
-    ball_data.get()->set_on(vision->ball->isTopCam());
+    ball_data.get()->set_intopcam(vision->ball->isTopCam());
     ball_data.get()->set_distance(vision->ball->getDistance());
     ball_data.get()->set_angle_x_deg(vision->ball->getAngleXDeg());
     ball_data.get()->set_angle_y_deg(vision->ball->getAngleYDeg());
@@ -91,6 +103,8 @@ void VisionModule::updateVisionBall() {
     ball_data.get()->set_heat(vision->ball->getHeat());
     ball_data.get()->set_on(vision->ball->isOn());
     ball_data.get()->set_confidence(vision->ball->getConfidence());
+	ball_data.get()->set_x(vision->ball->getX());
+	ball_data.get()->set_y(vision->ball->getY());
 
     vision_ball.setMessage(ball_data);
 }
@@ -188,6 +202,7 @@ void VisionModule::updateVisionField() {
 
             field_point->set_x((**j).getFieldX());
             field_point->set_y((**j).getFieldY());
+            field_point->set_field_angle((**j).getFieldAngle());
         }
 
         const std::vector<cornerID> p_id = i->getIDs();

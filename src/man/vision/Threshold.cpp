@@ -1069,8 +1069,8 @@ void Threshold::newFindRobots() {
     //then, in each macro pixel, we count how much red or navy
     //there is in it. Then we determine if there is enough to be interested
     //in that particular macro pixel
-    for (int i = 0; i < IMAGE_WIDTH; i += widthScale) {
-        for (int j = 0; j < IMAGE_HEIGHT; j += heightScale) {
+    for (int i = 0; i < IMAGE_WIDTH; i++) {
+        for (int j = 0; j < IMAGE_HEIGHT; j++) {
             pixel = getThresholded(j, i);
             if (Utility::isNavy(pixel))
                 navyblue->incImageBox(i / widthScale, j / heightScale);
@@ -1087,10 +1087,12 @@ void Threshold::newFindRobots() {
                 //the following line allows us to see which pixel has been activated.
                 //vision->drawRect(i, j, widthScale, heightScale, MAROON);
             }
+			else navyblue->setImageBox(i, j, 0);
             if (redColorCount / totalCellCount >= 0.4) {
                 red->setImageBox(i, j, 1);
                 //vision->drawRect(i, j, widthScale, heightScale, WHITE);
             }
+			else red->setImageBox(i, j, 0);
             navyColorCount = 0;
             redColorCount = 0;
         }

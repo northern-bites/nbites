@@ -18,11 +18,11 @@ add_library(viewer
     ${VIEWER_HEADERS_MOC}
     )
 
-
 target_link_libraries(
   viewer
   messages
   portals
   tool_common
+  support
   ${QT_LIBRARIES}
   )

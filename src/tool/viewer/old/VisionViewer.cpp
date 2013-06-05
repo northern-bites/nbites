@@ -44,6 +44,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
 	QToolBar* toolBar2 = new QToolBar(this);
     QPushButton* loadTableButton = new QPushButton(tr("&Load Table"));
     connect(loadTableButton, SIGNAL(clicked()), this, SLOT(loadColorTable()));
+
 	toolBar->addWidget(loadTableButton);
 	this->addToolBar(toolBar);
 	this->addToolBarBreak();
@@ -62,6 +63,7 @@ VisionViewer::VisionViewer(RobotMemoryManager::const_ptr memoryManager) :
                 this, SLOT(func(int)));             \
         toolBar2->addWidget(debug);                 \
     }
+
 
     ADD_DEBUG_CHECKBOX1("Horizon Debug", setHorizonDebug);
     ADD_DEBUG_CHECKBOX1("Shooting Debug", setShootingDebug);
