@@ -4,7 +4,7 @@ import noggin_constants as constants
 import math
 
 DEBUG_KICK_DECISION = False
-USE_LOC = True
+USE_LOC = False
 
 class KickInformation:
     """
