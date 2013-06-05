@@ -10,6 +10,7 @@ ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
 	filter(ALL_COLORS)
 {
 	setText(tr("No image loaded!"));
+	setHeight(480); // twice as big as normal
 }
 
 void ThresholdedImageDisplayModule::run_()
@@ -54,6 +55,8 @@ QImage ThresholdedImageDisplayModule::makeImage(byte filter_)
 			bitmapLine[i] = threshColor;
 		}
 	}
+
+	image = image.scaledToHeight(height);
 
 	return image;
 }
