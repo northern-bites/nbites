@@ -26,6 +26,7 @@ Tool::Tool(const char* title) :
     nextButton(new QPushButton(tr(">"))),
     prevButton(new QPushButton(tr("<"))),
     recordButton(new QPushButton(tr("Rec"))),
+	loadBtn(new QPushButton(tr("Load Table"))),
     scrollArea(new QScrollArea),
     scrollBarSize(new QSize(5, 35)),
     tabStartSize(new QSize(toolTabs->size()))
@@ -48,6 +49,11 @@ Tool::Tool(const char* title) :
 
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
+
+	connect(&tableCreator, SIGNAL(tableChanges(byte, byte, byte, byte)),
+			this, SLOT(changeTableValues(byte, byte, byte, byte)));
+	connect(&colorCalibrate, SIGNAL(tableChanges(byte, byte, byte, byte)),
+			this, SLOT(changeTableValues(byte, byte, byte, byte)));
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
@@ -77,10 +83,13 @@ Tool::Tool(const char* title) :
     this->setGeometry(*geometry);
 
 	QToolBar* toolBar = new QToolBar(this);
-    QPushButton* loadBtn = new QPushButton("Load Table", this);
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
 	toolBar->addWidget(loadBtn);
 	this->addToolBar(toolBar); 
+
+	QPushButton* saveBtn = new QPushButton(tr("Save"));
+	connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveGlobalTable()));
+	toolBar->addWidget(saveBtn);
 
 }
 
@@ -95,6 +104,10 @@ Tool::~Tool() {
     }
 }
 
+void Tool::saveGlobalTable()
+{
+
+}
 void Tool::loadColorTable()
 {
 
@@ -106,8 +119,16 @@ void Tool::loadColorTable()
     globalColorTable.read(filename.toStdString());
 	topConverter.changeTable(globalColorTable.getTable());
     bottomConverter.changeTable(globalColorTable.getTable());
+	
+	loadBtn->setText(filename);
 
+}
 
+void Tool::changeTableValues(byte y, byte u, byte v, byte col)
+{
+	globalColorTable.setColor(y, u, v, col);
+	topConverter.changeTable(globalColorTable.getTable());
+	bottomConverter.changeTable(globalColorTable.getTable());
 }
 
 void Tool::setUpModules()

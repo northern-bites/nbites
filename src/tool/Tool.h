@@ -39,6 +39,8 @@ public:
 public slots:
     void setUpModules();
 	void loadColorTable();
+	void changeTableValues(byte y, byte u, byte v, byte col);
+	void saveGlobalTable();
 
 protected:
     // For keyboard control
@@ -68,6 +70,7 @@ protected:
     QPushButton* nextButton;
     QPushButton* recordButton;
     QPushButton* scrollButton;
+	QPushButton* loadBtn;
     QScrollArea* scrollArea;
     QSize* scrollBarSize;
     QSize* tabStartSize;

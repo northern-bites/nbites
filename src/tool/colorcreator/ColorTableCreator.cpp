@@ -273,6 +273,7 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
                 {
                     colorTable.setColor(y, u, v,
                                         image::Color_bits[brushStroke.color]);
+					emit tableChanges(y, u, v, image::Color_bits[brushStroke.color]);
                 }
                 else
                 {

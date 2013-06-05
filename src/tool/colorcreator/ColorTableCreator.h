@@ -87,6 +87,11 @@ public:
     portals::InPortal<messages::YUVImage> bottomImageIn;
     portals::InPortal<messages::YUVImage> topImageIn;
 
+
+signals:
+	// Color table manipulation
+	void tableChanges(byte y, byte u, byte v, byte col);
+
 protected slots:
     // Color table manipulation
     void loadColorTable();
