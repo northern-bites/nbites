@@ -36,10 +36,14 @@ void CommTimer::teamPacketSent()
     //       we generate random numbers until we get one less than 33,333.
 
     int random;
-    do
+    // Truly random is too slow. Do this instead.
+    random = rand() % 33333;
+/*    do
     {
         random = rand();
     } while (random > 33333); // Ensure nextSendTime doesn't exceed 50,000
+*/
+
     nextSendTime += random + 16667;
 }
 
