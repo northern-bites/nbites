@@ -1,6 +1,5 @@
 #ifndef _Vision_h_DEFINED
 #define _Vision_h_DEFINED
-//#define OFFLINE
 
 // c++ headers
 #include <sstream>
@@ -12,6 +11,7 @@
 // including info header files
 #include "Common.h"
 #include "VisionDef.h"
+#include "DebugConfig.h"
 
 // including message types
 #include "PMotion.pb.h"
