@@ -13,13 +13,6 @@ LocalizationModule::LocalizationModule()
     particleFilter = new ParticleFilter();
     // Chooose on the field looking up as a random initial
     particleFilter->resetLocTo(100,100,0);
-
-    std::cout << "Logging localization? ";
-#ifdef LOG_LOCALIZATION
-    std::cout << "Yes." << std::endl;
-#else
-    std::cout << "No." << std::endl;
-#endif
 }
 
 LocalizationModule::~LocalizationModule()
