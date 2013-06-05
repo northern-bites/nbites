@@ -148,7 +148,7 @@ def orbitBall(player):
             player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
             return player.goNow('positionForKick')
 
-    if (transitions.shouldFindBall(player) or
+    if (transitions.shouldFindBallKick(player) or
         transitions.shouldCancelOrbit(player)):
         player.inKickingState = False
         return player.goLater('chase')
