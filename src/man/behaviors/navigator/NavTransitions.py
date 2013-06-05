@@ -87,20 +87,6 @@ def doneDodging(nav):
 def notAtLocPosition(nav):
     return not atDestination(nav)
 
-def walkedEnough(nav):
-    deltaDest = states.walkingTo.deltaDest
-    dest = states.walkingTo.dest
-    precision = states.walkingTo.precision
-
-    #check if we've "passed" the point we were supposed to go to
-    #with odometry
-    if (dest.relX * deltaDest.relX < 0 and
-        dest.relY * deltaDest.relY < 0 and
-        dest.relH * deltaDest.relH < 0):
-        return True
-
-    return deltaDest.within(precision)
-
 ######### BALL IN BOX ###############
 
 #keeping this code around for posterity; do we actually need it?

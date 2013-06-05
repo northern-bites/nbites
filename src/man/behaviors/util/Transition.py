@@ -46,9 +46,12 @@ class CountTransition:
     """
     Class that represents a transition to a different state based
     on satisfying a given condition for a certain percent of the frames
-    in a window of time
+    in a window of time.
+
     The higher the value of frameWindow, the better the precision,
-    but the worse the delay before the transition occurs
+    but the worse the delay before the transition occurs.
+
+    Basically a rolling filter on frameWindow frames.
     """
 
     def __init__(self, condition, threshold = MOST_OF_THE_TIME, frameWindow = OK_PRECISION):
