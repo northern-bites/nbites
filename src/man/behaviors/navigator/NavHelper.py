@@ -6,9 +6,24 @@ from objects import RelLocation, RelRobotLocation, RobotLocation, Location
 #import PMotion_proto
 
 def stand(nav):
+    """
+    Makes the motion engine stand
+    Right now this is done by sending a (0, 0, 0) velocity vector
+    TODO: make a command for stand
+    """
     createAndSendWalkVector(nav, 0, 0, 0)
 
 def getRelativeDestination(my, dest):
+    """
+    Takes in a dest that can be of various types and
+    then returns a relative robot location to get to that location.
+
+    If it's an absolute location, the it uses the robot location to compute
+    the relative location of the point.
+
+    If dest doesn't have a heading (Location, RelLocation), then it will
+    use the bearing to the point.
+    """
 
     field_dest = dest
 
@@ -40,29 +55,19 @@ def getRelativeDestination(my, dest):
         raise TypeError, "Navigator dest is not a Location type!" + str(dest)
 
 def isDestinationRelative(dest):
+    #TODO: test if this works for both RelLocation and RelRobotLocation
+    # I think it does, but someone should try it and then note the result -O
     return isinstance(dest, RelLocation)
 
 def adaptSpeed(distance, cutoffDistance, maxSpeed):
     return (distance / cutoffDistance) * maxSpeed
 #    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
-def getStrafelessDest(dest):
-    if ((dest.relX > 150 and dest.relY < 50) or
-        (dest.relX <= 150 and dest.relX > 50 and dest.relY < 20) or
-        (dest.relX <= 50 and dest.relX > 20 and dest.relY < 10)):
-        #print "old dest: " + str(dest)
-        return RelRobotLocation(dest.relX, 0, dest.relH)
-    else:
-        return dest
-
 def setDestination(nav, dest, gain = 1.0):
     """
-    Calls setDestination within the motion engine
+    Method to set the next destination walk command
+    See MotionModule.h for more info on the odometry walk command
     """
-    # TODO: distinguish from setOdometryDestination method
-    #       this method should overwrite motion commands.
-    #       or, deprecate this method and use speed commands
-    #       via the createAndSendWalkVector method.
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK #Destination Walk
     command.dest.rel_x = dest.relX
@@ -72,29 +77,17 @@ def setDestination(nav, dest, gain = 1.0):
     command.timestamp = int(nav.brain.time * 1000)
 
 def setOdometryDestination(nav, dest, gain = 1.0):
-    # TODO: distinguish from setDestination method
-    #       this method should enqueue motion commands.
+    """
+    Method to set the next walk command
+    See MotionModule.h for more info on the odometry walk command
+    """
     command = nav.brain.interface.bodyMotionCommand
-    command.type = command.CommandType.DESTINATION_WALK #Destination Walk
-    command.dest.rel_x = dest.relX
-    command.dest.rel_y = dest.relY
-    command.dest.rel_h = dest.relH
+    command.type = command.CommandType.ODOMETRY_WALK #Destination Walk
+    command.odometry_dest.rel_x = dest.relX
+    command.odometry_dest.rel_y = dest.relY
+    command.odometry_dest.rel_h = dest.relH
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
-
-#not used!
-def getOrbitLocation(radius, angle):
-    """
-    Returns the RelRobotLocation destination of an orbit
-    """
-    if angle > 0:
-        return RelRobotLocation(0.0, radius / 2, -angle)
-    else:
-        return RelRobotLocation(0.0, -radius / 2, -angle)
-
-    dest = RelRobotLocation(radius, 0, 0)
-    dest.rotate(-angle)
-    return RelRobotLocation(0.0, -dest.relY, -angle)
 
 def setSpeed(nav, speeds):
     """
@@ -107,6 +100,10 @@ def setSpeed(nav, speeds):
     createAndSendWalkVector(nav, *speeds)
 
 def createAndSendWalkVector(nav, x, y, theta):
+    """
+    Method to set the next velocity walk command
+    See MotionModule.h for more info on the velocity walk command
+    """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_COMMAND #Walk Command
     command.speed.x_percent = x

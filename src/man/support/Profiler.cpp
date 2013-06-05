@@ -68,6 +68,12 @@ static const char *PCOMPONENT_NAMES[] = {
 
     // COMM THREAD
     "Comm Thread",
+    "Comm Receiving",
+    "Comm Sending",
+    "Comm Building",
+    "Comm Serializing",
+    "Comm To Socket",
+    "Comm Timer",
 
     // GUARDIAN THREAD
     "RoboGuardian Thread",
@@ -135,6 +141,12 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_HEAD                   --> */ P_MOTION,
 
     /*P_COMM_THREAD            --> */ P_TOTAL,
+    /*P_COMM_RECEIVE           --> */ P_COMM_THREAD,
+    /*P_COMM_SEND              --> */ P_COMM_THREAD,
+    /*P_COMM_BUILD_PACKET      --> */ P_COMM_SEND,
+    /*P_COMM_SERIALIZE_PACKET  --> */ P_COMM_SEND,
+    /*P_COMM_TO_SOCKET         --> */ P_COMM_SEND,
+    /*P_COMM_TIMER             --> */ P_COMM_SEND,
 
     /*P_GUARDIAN_THREAD        --> */ P_TOTAL,
 

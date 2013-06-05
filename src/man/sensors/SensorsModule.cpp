@@ -74,6 +74,14 @@ void SensorsModule::initializeSensorFastAccess()
     }
     i++;
 
+    // There are 2 battery values.
+    sensorKeys_[i] = std::string("Device/SubDeviceList/Battery/Charge/Sensor/Value");
+    i++;
+    /* IMPORTANT for some reason, battery charge cannot be read correctly unless
+     * battery current is read also, who knows why, bad aldebaran code?
+     * NOT ACTUALLY OUTPORTALED OR USED AT ALL, current is needed for bug fix */
+    sensorKeys_[i] = std::string("Device/SubDeviceList/Battery/Current/Sensor/Value");
+    i++;
     // There are 2 important sonars.
     sensorKeys_[i] = std::string("Device/SubDeviceList/US/Left/Sensor/Value");
     i++;
@@ -90,9 +98,6 @@ void SensorsModule::initializeSensorFastAccess()
     i++;
     // There is a single chest button.
     sensorKeys_[i] = std::string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value");
-    i++;
-    //There is a single battery value.
-    sensorKeys_[i] = std::string("Device/SubDeviceList/Battery/Charge/Sensor/Value");
 
     fastMemoryAccess_->ConnectToVariables(broker_, sensorKeys_);
 
