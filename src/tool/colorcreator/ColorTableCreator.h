@@ -8,6 +8,9 @@
  *
  * @updated Lizzie Mamantov
  * @date April 2013
+ *
+ * @update Benjamin Mende
+ * @date June 2013
  */
 
 #pragma once
