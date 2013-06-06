@@ -181,20 +181,30 @@ void Tool::setUpModules()
 												  "top");
 	diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
 												  "bottom");
-	diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
-													 "joints");
-	diagram.connectToUnlogger<messages::InertialState>(visDispMod.inerts_in,
-													   "inertials");
+	if (diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
+														 "joints") ||
+		diagram.connectToUnlogger<messages::InertialState>(visDispMod.inerts_in,
+														   "inertials"))
+	{
+		// All is well
+	}
+	else {
+		std::cout << "Warning: Joints and Inertials not logged in this file.\n";
+		portals::Message<messages::JointAngles> joints(0);
+		portals::Message<messages::InertialState> inertials(0);
+		visDispMod.joints_in.setMessage(joints);
+		visDispMod.inerts_in.setMessage(inertials);
+	}
 	visDispMod.tTImage_in.wireTo(&topConverter.thrImage, true);
 	visDispMod.tYImage_in.wireTo(&topConverter.yImage, true);
 	visDispMod.tUImage_in.wireTo(&topConverter.uImage, true);
-    visDispMod.tVImage_in.wireTo(&topConverter.vImage, true);
-
-    visDispMod.bTImage_in.wireTo(&bottomConverter.thrImage, true);
-    visDispMod.bYImage_in.wireTo(&bottomConverter.yImage, true);
-    visDispMod.bUImage_in.wireTo(&bottomConverter.uImage, true);
-    visDispMod.bVImage_in.wireTo(&bottomConverter.vImage, true);
-
+	visDispMod.tVImage_in.wireTo(&topConverter.vImage, true);
+	
+	visDispMod.bTImage_in.wireTo(&bottomConverter.thrImage, true);
+	visDispMod.bYImage_in.wireTo(&bottomConverter.yImage, true);
+	visDispMod.bUImage_in.wireTo(&bottomConverter.uImage, true);
+	visDispMod.bVImage_in.wireTo(&bottomConverter.vImage, true);
+	
 	/** Color Table Creator Tab **/
     if (diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
                                                       "top") &&
