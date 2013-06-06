@@ -71,7 +71,7 @@ void LocalizationModule::update()
 void LocalizationModule::run_()
 {
     // Profiler
-    PROF_ENTER(P_LOC);
+    PROF_ENTER(P_SELF_LOC);
 
     // Get new information
     motionInput.latch();
@@ -82,7 +82,7 @@ void LocalizationModule::run_()
     update();
 
     // Profiler
-    PROF_EXIT(P_LOC);
+    PROF_EXIT(P_SELF_LOC);
 }
 
 } // namespace localization
