@@ -20,6 +20,8 @@
 #include "colorcreator/ColorTableCreator.h"
 #include "colorcreator/ColorCalibrate.h"
 #include "viewer/FieldViewer.h"
+#include "playbook/PlaybookCreator.h"
+
 #include "ParticleSwarm.pb.h"
 
 
@@ -49,6 +51,7 @@ protected:
     color::ColorTableCreator tableCreator;
 	colorcreator::ColorCalibrate colorCalibrate;
     viewer::FieldViewer fieldView;
+    playbook::PlaybookCreator playbookCreator;
 
     // GUI stuff
     QTabWidget* toolTabs;

@@ -18,6 +18,7 @@ Tool::Tool(const char* title) :
     tableCreator(this),
 	colorCalibrate(this),
     fieldView(this),
+    playbookCreator(this),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
@@ -55,6 +56,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
 	toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
     toolTabs->addTab(&fieldView, tr("FieldView"));
+    toolTabs->addTab(&playbookCreator, tr("Playbook Creator"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);

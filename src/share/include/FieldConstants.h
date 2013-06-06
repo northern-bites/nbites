@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cmath>
-#include "Common.h"
+#include "DebugConfig.h"
 
 // Nao field constants
 
@@ -19,8 +19,8 @@ static const float GREEN_PAD_Y = 65.0f;
 
 static const float LINE_WIDTH = 5.0f;
 
-static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_Y;
-static const float FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + 2.0f * GREEN_PAD_X;
+static const float FIELD_GREEN_WIDTH = FIELD_WHITE_WIDTH + 2.0f * GREEN_PAD_X;
+static const float FIELD_GREEN_HEIGHT = FIELD_WHITE_HEIGHT + 2.0f * GREEN_PAD_Y;
 static const float FIELD_WIDTH = FIELD_GREEN_WIDTH;
 static const float FIELD_HEIGHT = FIELD_GREEN_HEIGHT;
 
@@ -131,6 +131,12 @@ static const float BOTTOM_CC_Y = CENTER_FIELD_Y - CENTER_CIRCLE_RADIUS;
 static const float BOTTOM_CC_X = CENTER_FIELD_X;
 
 static const float LINE_CROSS_LENGTH = 10.0f; // length of each cross in cm
+
+// Useful constants for initial localization
+static const float BLUE_CC_NEAREST_POINT_X = CENTER_FIELD_X -
+    CENTER_CIRCLE_RADIUS;
+static const float BLUE_CROSS_CIRCLE_MIDPOINT_X = LANDMARK_BLUE_GOAL_CROSS_X +
+    ((BLUE_CC_NEAREST_POINT_X-LANDMARK_BLUE_GOAL_CROSS_X)/2.0);
 
 // Constants for heading
 //  Right is towards opponents' goal.

@@ -13,10 +13,9 @@
 #include <QtGui>
 #include <vector>
 
-#include "common/FieldConstants.h"
+#include "FieldConstants.h"
 
 namespace tool{
-namespace viewer{
 
 class PaintField : public QWidget
 {
@@ -39,6 +38,4 @@ protected:
     float scaleFactor;
 };
 
-
 } //namespace tool
-} //namespace viewer

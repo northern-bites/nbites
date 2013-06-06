@@ -6,7 +6,6 @@ set( COMMON_SRCS
 
 set( COMMON_HEADERS
    PaintField.h
-   FieldConstants.h
   )
 
 Qt4_wrap_cpp( COMMON_HEADERS_MOC PaintField.h )
