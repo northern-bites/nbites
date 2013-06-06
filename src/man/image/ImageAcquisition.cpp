@@ -6,7 +6,7 @@
  * The same as _acquire_image_fast, but in C++ for the sake of
  * portability. I blame Mac OS X and its non GNU assembler. --Jack
  */
-#define CPP_ACQUIRE 1
+#define CPP_ACQUIRE 0
 int ImageAcquisition::acquire_image_fast(uint8_t *table,
                                          const ColorParams &params,
                                          const uint8_t *yuv, uint16_t *out )
