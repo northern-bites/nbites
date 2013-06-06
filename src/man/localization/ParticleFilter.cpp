@@ -195,7 +195,7 @@ float ParticleFilter::getMagnitudeError()
  */
 void ParticleFilter::resetLoc()
 {
-    std::cout << "WTF: LOC IS RESETTING! 1" << std::endl;
+    //std::cout << "WTF: LOC IS RESETTING! 1" << std::endl;
 
     // Clear the existing particles.
     particles.clear();
@@ -235,7 +235,7 @@ void ParticleFilter::resetLoc()
 void ParticleFilter::resetLocTo(float x, float y, float h,
                                 LocNormalParams params)
 {
-    std::cout << "WTF: LOC IS RESETTING! 2" << std::endl;
+    //std::cout << "WTF: LOC IS RESETTING! 2" << std::endl;
     // HACK HACK HACK - If told to reset to negative x,y,h then flip
     if (x<0 && y<0 && h<0)
     {
@@ -286,7 +286,7 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
                                 LocNormalParams params1,
                                 LocNormalParams params2)
 {
-    std::cout << "WTF: LOC IS RESETTING! 3" << std::endl;
+    //std::cout << "WTF: LOC IS RESETTING! 3" << std::endl;
     // Reset the estimates.
     poseEstimate.set_x(x);
     poseEstimate.set_y(y);
@@ -323,7 +323,7 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
 
 void ParticleFilter::resetLocToSide(bool blueSide)
 {
-    std::cout << "WTF: LOC IS RESETTING! 1" << std::endl;
+    //std::cout << "WTF: LOC IS RESETTING! 1" << std::endl;
     // Clear the existing particles.
     particles.clear();
 
@@ -416,7 +416,7 @@ void ParticleFilter::resample()
             numReconParticlesAdded++;
         }
 
-        std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
+        //std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
     }
 
     // Sample numParticles particles with replacement according to the
