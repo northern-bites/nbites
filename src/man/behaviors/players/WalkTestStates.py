@@ -50,7 +50,7 @@ START_STOP_DEST = ((DEST, (100, 0, 0), 500),
 def gameSet(player):
     if player.firstFrame():
         player.brain.nav.stand()
-        
+
     return player.stay()
 
 def gamePlaying(player):

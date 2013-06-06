@@ -6,8 +6,6 @@ from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
 
-DEBUG = False
-
 def scriptedMove(nav):
     '''State that we stay in while doing sweet moves'''
     if nav.firstFrame():
@@ -30,16 +28,15 @@ def goToPosition(nav):
     For relative locations we use our bearing to that point as the heading
     """
     relDest = helper.getRelativeDestination(nav.brain.loc, goToPosition.dest)
-    goToPosition.deltaDest = relDest # cache it for later use
 
-#    if nav.counter % 10 is 0:
-#        print "going to " + str(relDest)
-#        print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
-#                                                 nav.brain.ball.loc.relY,
-#                                                 nav.brain.ball.loc.bearing)
+    #if nav.counter % 10 is 0:
+    #    print "going to " + str(relDest)
+    #    print "ball is at {0}, {1}, {2} ".format(nav.brain.ball.loc.relX,
+    #                                             nav.brain.ball.loc.relY,
+    #                                             nav.brain.ball.loc.bearing)
 
-    if goToPosition.lastFast != goToPosition.fast:
-        print "Fast changed to " + str(goToPosition.fast)
+    #if goToPosition.lastFast != goToPosition.fast:
+    #    print "Fast changed to " + str(goToPosition.fast)
 
     goToPosition.lastFast = goToPosition.fast
 
@@ -62,7 +59,7 @@ def goToPosition(nav):
             velH = helper.adaptSpeed(relDest.relH,
                                     HEADING_ADAPT_CUTOFF,
                                     MAX_TURN)
-    #        print "velH = " + str(velH)
+            #print "velH = " + str(velH)
 
         if relDest.relX >= DISTANCE_ADAPT_CUTOFF:
             velX = goToPosition.speed
@@ -72,7 +69,7 @@ def goToPosition(nav):
             velX = helper.adaptSpeed(relDest.relX,
                                     DISTANCE_ADAPT_CUTOFF,
                                     goToPosition.speed)
-    #        print "velX = " + str(velX)
+            #print "velX = " + str(velX)
 
         if relDest.relY >= DISTANCE_ADAPT_CUTOFF:
             velY = goToPosition.speed
@@ -82,7 +79,7 @@ def goToPosition(nav):
             velY = helper.adaptSpeed(relDest.relY,
                                     DISTANCE_ADAPT_CUTOFF,
                                     goToPosition.speed)
-    #        print "velY = " + str(velY)
+            #print "velY = " + str(velY)
 
         lastBookingIt = goToPosition.bookingIt
         if fabs(relDest.dist) > BOOK_IT_DISTANCE_THRESHOLD:
@@ -96,13 +93,10 @@ def goToPosition(nav):
         else:
             goToPosition.bookingIt = False
 
-        if goToPosition.bookingIt != lastBookingIt:
-            print "Booking it turned to " + str(goToPosition.bookingIt)
-
+        #if goToPosition.bookingIt != lastBookingIt:
+        #    print "Booking it turned to " + str(goToPosition.bookingIt)
 
         goToPosition.speeds = (velX, velY, velH)
-
-    #    helper.setDestination(nav, relDest, speed)
 
         if ((goToPosition.speeds != goToPosition.lastSpeeds)
             or not nav.brain.interface.motionStatus.walk_is_active):
@@ -118,18 +112,12 @@ def goToPosition(nav):
         else:
             speed = goToPosition.speed
 
-    #    print "distance {0} and speed {1}".format(relDest.dist, speed)
-
-        #if y-distance is small, ignore it to avoid strafing
-        #strafelessDest = helper.getStrafelessDest(relDest)
-
         helper.setDestination(nav, relDest, speed)
 
     return Transition.getNextState(nav, goToPosition)
 
 goToPosition.speed = "speed gain from 0 to 1"
 goToPosition.dest = "destination, can be any type of location"
-goToPosition.deltaDest = "how much we have left to travel to location (or rel destination)"
 goToPosition.adaptive = "adapts the speed to the distance of the destination"
 goToPosition.precision = "how precise we want to be in moving"
 
@@ -165,7 +153,7 @@ def briefStand(nav):
 
 def walkingTo(nav):
     """
-    Walks to a relative location based on odometry
+    State to be used for odometry walking.
     """
     if nav.firstFrame():
         helper.stand(nav)
@@ -187,7 +175,7 @@ walkingTo.speed = 0
 # State to be used with standard setSpeed movement
 def walking(nav):
     """
-    State to be used when setSpeed is called
+    State to be used for velocity walking.
     """
 
     if ((walking.speeds != walking.lastSpeeds)
@@ -206,6 +194,9 @@ def stopped(nav):
     return nav.stay()
 
 def atPosition(nav):
+    """
+    Switches back if we're not at the destination anymore.
+    """
     if nav.firstFrame():
         helper.stand(nav)
 
