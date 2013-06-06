@@ -5,7 +5,6 @@ cmake_minimum_required( VERSION 2.8.3 )
 # Make sure we can find the shared files
 set( SHARE_DIR "${NBITES_DIR}/src/share/" )
 set( MAN_DIR "${NBITES_DIR}/src/man" )
-set( OFFLINE ON )
 include_directories( ${MAN_DIR} )
 
 # So that we can use find_package commands
