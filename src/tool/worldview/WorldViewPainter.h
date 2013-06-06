@@ -14,7 +14,7 @@
 #include <vector>
 #include <iostream>
 
-#include "support/FieldConstants.h"
+#include "FieldConstants.h"
 
 #include "common/PaintField.h"
 

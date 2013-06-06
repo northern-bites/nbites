@@ -14,7 +14,6 @@ set( COMMON_SRCS NBMath
   ALLedNames
   NogginStructs
   ColorParams.cpp
-  FieldConstants.h
   )
 
 add_library(
