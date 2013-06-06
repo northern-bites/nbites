@@ -182,7 +182,7 @@ void Tool::setUpModules()
 	diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
 												  "bottom");
 	if (diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
-														 "joints") ||
+														 "joints") &&
 		diagram.connectToUnlogger<messages::InertialState>(visDispMod.inerts_in,
 														   "inertials"))
 	{
