@@ -22,13 +22,10 @@
 
 #include "colorcreator/ColorTable.h"
 #include "vision_offline/VisionDisplayModule.h"
-#include "viewer/FieldViewer.h"
+#include "fieldview/FieldViewer.h"
 
 #include "image/ImageConverterModule.h"
-
-
 #include "colorcreator/ColorCalibrate.h"
-#include "viewer/FieldViewer.h"
 
 #include "ParticleSwarm.pb.h"
 

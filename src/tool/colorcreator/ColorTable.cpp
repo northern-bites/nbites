@@ -32,13 +32,13 @@ void ColorTable::read(string filename) {
     FILE *tableFile = fopen(filename.c_str(), "r");   //open table for reading
 
     if (!tableFile) {
-        cerr << "Could not open color table " << filename;
+        cerr << "Could not open color table " << filename << std::endl;
         return;
     }
 
     size_t bytesRead = fread(table, sizeof(byte), TABLE_SIZE, tableFile);
     if (bytesRead == 0) {
-        cerr << "Error reading color table " << filename;
+        cerr << "Error reading color table " << filename << std::endl;
     }
     else
         std::cout << "Succeed: Read " << filename << std::endl;

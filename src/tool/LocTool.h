@@ -6,7 +6,7 @@
 
 #include "EmptyTool.h"
 
-#include "viewer/FieldViewer.h"
+#include "fieldview/FieldViewer.h"
 
 #include "ParticleSwarm.pb.h"
 

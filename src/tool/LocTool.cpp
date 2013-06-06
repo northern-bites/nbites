@@ -56,7 +56,7 @@ void LocTool::setUpModules()
     }
     else
     {
-        std::cout << "Warning: Particles were'nt logged in this file" << std::endl;
+        std::cout << "Warning: Particles weren't logged in this file" << std::endl;
     }
     if(diagram.connectToUnlogger<messages::VisionField>(fieldView.observationsIn,
                                                         "observations"))
@@ -66,7 +66,7 @@ void LocTool::setUpModules()
     }
     else
     {
-        std::cout << "Warning: Observations were'nt logged in this file" << std::endl;
+        std::cout << "Warning: Observations weren't logged in this file" << std::endl;
     }
     if(shouldAddFieldView)
         diagram.addModule(fieldView);

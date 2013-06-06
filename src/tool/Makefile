@@ -14,18 +14,43 @@ VISION_EXECUTABLE = vision_tool
 
 
 
-.PHONY: build
-build:
+.PHONY: build_tool
+build_tool:
 	mkdir -p $(BUILD_DIR)
 	cd $(BUILD_DIR); \
 	cmake $(FLAGS) $(SRC_DIR); \
-	$(MAKE) --no-print-directory
+	$(MAKE) --no-print-directory $(EXECUTABLE)
 
 .PHONY: tool
-tool: build
+tool: build_tool
 	@echo "Running tool executable."
+	@$(BUILD_DIR)/$(EXECUTABLE)
+
+.PHONY: build_loc
+build_loc:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(LOC_EXECUTABLE)
+
+.PHONY: loc
+loc: build_loc
+	@echo "Running loc_tool executable."
 	@cd $(BUILD_DIR); \
-	./$(EXECUTABLE)
+	./$(LOC_EXECUTABLE)
+
+.PHONY: build_vision
+build_vision:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(VISION_EXECUTABLE)
+
+.PHONY: vision
+vision: build_vision
+	@echo "Running vision_tool executable."
+	@cd $(BUILD_DIR); \
+	./$(VISION_EXECUTABLE)
 
 .PHONY: config
 config:
@@ -37,16 +62,3 @@ config:
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)/*
-
-.PHONY: loc
-loc: build
-	@echo "Running LocTool executable."
-	@cd $(BUILD_DIR); \
-	./$(LOC_EXECUTABLE)
-
-.PHONY: vision
-vision: build
-	@echo "Running VisionTool executable."
-	@cd $(BUILD_DIR); \
-	./$(VISION_EXECUTABLE)
-
