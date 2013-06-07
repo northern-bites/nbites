@@ -10,6 +10,9 @@
 #include "vision_offline/VisionDisplayModule.h"
 #include "colorcreator/ColorTableCreator.h"
 
+#include "image/ImageConverterModule.h"
+#include "colorcreator/ColorCalibrate.h"
+
 namespace tool {
 
 class VisionTool : public EmptyTool {
@@ -29,6 +32,8 @@ public slots:
 
     man::image::ImageConverterModule topConverter;
     man::image::ImageConverterModule bottomConverter;
+
+    colorcreator::ColorCalibrate colorCalibrate;
 
     color::ColorTable globalColorTable;
 

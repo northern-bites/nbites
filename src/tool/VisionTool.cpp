@@ -10,12 +10,14 @@ namespace tool {
 VisionTool::VisionTool(const char* title) :
     tableCreator(this),
     visDispMod(this),
+    colorCalibrate(this),
     topConverter(),
     bottomConverter(),
     EmptyTool(title)
 {
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
     toolTabs->addTab(&visDispMod, tr("Offline Vision"));
+    toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
 
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
@@ -69,6 +71,21 @@ void VisionTool::setUpModules()
         std::cout << "Right now you can't use the color table creator without"
                   << " two image logs." << std::endl;
     }
+
+    /** Color Calibrate Tab **/
+    if (diagram.connectToUnlogger<messages::YUVImage>(colorCalibrate.topImageIn,
+                                                      "top") &&
+        diagram.connectToUnlogger<messages::YUVImage>(colorCalibrate.bottomImageIn,
+                                                      "bottom"))
+    {
+        diagram.addModule(colorCalibrate);
+    }
+    else
+    {
+        std::cout << "Right now you can't use the color calibrator without"
+                  << " two image logs." << std::endl;
+    }
+
 }
 
 void VisionTool::loadColorTable()
