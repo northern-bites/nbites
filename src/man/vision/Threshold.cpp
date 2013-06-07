@@ -237,9 +237,9 @@ void Threshold::visionLoop(const messages::JointAngles& ja, const messages::Iner
     thresholdAndRuns();
     PROF_EXIT(P_THRESHRUNS);
 
-    PROF_ENTER(P_ROBOTS);
-    newFindRobots();
-    PROF_EXIT(P_ROBOTS);
+    //PROF_ENTER(P_ROBOTS);
+    //   newFindRobots();
+    //PROF_EXIT(P_ROBOTS);
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines

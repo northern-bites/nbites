@@ -1,7 +1,7 @@
 #include "PaintField.h"
 
 namespace tool{
-namespace viewer{
+namespace tool_common{
 
 PaintField::PaintField(QWidget* parent, float scaleFactor_) :
     QWidget(parent),
@@ -32,11 +32,10 @@ void PaintField::paintEvent(QPaintEvent* event)
 
     QPainter painter(this);
     //Move origin to bottem left and scale to flip the y axis
-    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.translate(0,FIELD_GREEN_HEIGHT*scaleFactor);
     painter.scale(scaleFactor, -scaleFactor);
 
     // Field Areas
-
     QRect field(FIELD_GREEN_LEFT_SIDELINE_X,
                 FIELD_GREEN_BOTTOM_SIDELINE_Y,
                 FIELD_GREEN_WIDTH, FIELD_GREEN_HEIGHT);
@@ -148,7 +147,6 @@ void PaintField::paintEvent(QPaintEvent* event)
     painter.drawRect(blueGoal);
     painter.setPen(Qt::yellow);
     painter.drawRect(yellowGoal);
-
 }
 
 } // namespace viewer

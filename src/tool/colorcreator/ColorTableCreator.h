@@ -8,6 +8,9 @@
  *
  * @updated Lizzie Mamantov
  * @date April 2013
+ *
+ * @update Benjamin Mende
+ * @date June 2013
  */
 
 #pragma once
@@ -29,6 +32,10 @@
 
 namespace tool {
 namespace color {
+
+struct colorChanges {
+	byte y, u, v, color;
+};
 
 /**
  * @class BrushStroke
@@ -92,8 +99,8 @@ public:
 
 signals:
 	// Color table manipulation
-	void tableChanges(byte y, byte u, byte v, byte col);
-	void tableUnChanges(byte y, byte u, byte v, byte col);
+	void tableChanges(std::vector<color::colorChanges> tableAdjustments);
+	void tableUnChanges(std::vector<color::colorChanges> tableAdjustments);
 
 
 protected slots:

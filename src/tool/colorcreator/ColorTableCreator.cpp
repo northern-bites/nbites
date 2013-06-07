@@ -124,10 +124,12 @@ void ColorTableCreator::undo()
 
 void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
 {
+
+	std::vector<colorChanges> tableAdjustments;
     // Check the click was on the image
-    for (int i = -brushStroke.brushSize/2; i <= brushStroke.brushSize/2; i++)
+    for (int i = -brushStroke.brushSize; i <= 0; i++)
     {
-        for (int j = -brushStroke.brushSize/2; j <= brushStroke.brushSize/2; j++)
+        for (int j = 0; j <= brushStroke.brushSize; j++)
         {
             int brush_x = i + brushStroke.x;
             int brush_y = j + brushStroke.y;
@@ -150,22 +152,32 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
                 byte y = image.yImage().getPixel(brush_x, brush_y);
                 byte u = image.uImage().getPixel(brush_x/2, brush_y);
                 byte v = image.vImage().getPixel(brush_x/2, brush_y);
+				// Change the radius' to determine how 'close' colors must be to get defined
+				const int yRadius = 4, uRadius = 2, vRadius = 2;
+				for (int dy = -yRadius; dy <= yRadius; ++dy) {
+					for (int du = -uRadius; du <= uRadius; ++du) {
+						for (int dv = -vRadius; dv <= vRadius; ++dv) {
+							colorChanges adjustment;
+							adjustment.y = y+dy;
+							adjustment.u = u+du;
+							adjustment.v = v+dv;
+							adjustment.color = image::Color_bits[brushStroke.color];
+							tableAdjustments.push_back(adjustment);
+						}
+					}
+				}
 
-                //std::cout << (int) y << " " << (int) u << " " << (int) v
-                //       << std::endl;
-
-                if (brushStroke.define)
-                {
-					emit tableChanges(y, u, v, image::Color_bits[brushStroke.color]);
-                }
-                else
-                {
-					emit tableUnChanges(y, u, v,
-										image::Color_bits[brushStroke.color]);
-                }
             }
         }
     }
+	if (brushStroke.define)
+	{
+		emit tableChanges(tableAdjustments);
+	}
+	else
+	{
+		emit tableUnChanges(tableAdjustments);
+	}
 	updateThresholdedImage();
 }
 

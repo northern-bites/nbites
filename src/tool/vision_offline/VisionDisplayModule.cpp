@@ -1,10 +1,9 @@
-
 #include "VisionDisplayModule.h"
 #include <QFileDialog>
 
 
 namespace tool {
-namespace vision { 
+namespace vision {
 
 
 
@@ -90,19 +89,19 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 
 	// GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
-	QWidget* mainWidget = new QWidget;
+    QWidget* mainWidget = new QWidget;
 
     imageTabs = new QTabWidget(this);
     mainLayout->addWidget(imageTabs);
 
     imageTabs->addTab(&topDisplay, "Top Image");
     imageTabs->addTab(&bottomDisplay, "Bottom Image");
-	imageTabs->addTab(&topThrDisplay, "Top Thresh");
-	imageTabs->addTab(&botThrDisplay, "Bottom Thresh");
-	
-	mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	mainWidget->setLayout(mainLayout);
-	this->setCentralWidget(mainWidget);
+    imageTabs->addTab(&topThrDisplay, "Top Thresh");
+    imageTabs->addTab(&botThrDisplay, "Bottom Thresh");
+
+    mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    mainWidget->setLayout(mainLayout);
+    this->setCentralWidget(mainWidget);
 
     //corner ownership
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
@@ -133,23 +132,23 @@ void VisionDisplayModule::run_()
                                &bottomImageIn.message()));
     topImage.setMessage(portals::Message<messages::YUVImage>(
                             &topImageIn.message()));
-	
-	tTImage.setMessage(portals::Message<messages::ThresholdImage>(
-						   &tTImage_in.message()));
-	tYImage.setMessage(portals::Message<messages::PackedImage16>(
-						   &tYImage_in.message()));
-	tUImage.setMessage(portals::Message<messages::PackedImage16>(
-						   &tUImage_in.message()));
-	tVImage.setMessage(portals::Message<messages::PackedImage16>(
-						   &tVImage_in.message()));
-	bTImage.setMessage(portals::Message<messages::ThresholdImage>(
-						   &bTImage_in.message()));
-	bYImage.setMessage(portals::Message<messages::PackedImage16>(
-						   &bYImage_in.message()));
-	bUImage.setMessage(portals::Message<messages::PackedImage16>(
-						   &bUImage_in.message()));
-	bVImage.setMessage(portals::Message<messages::PackedImage16>(
-						   &bVImage_in.message()));
+
+    tTImage.setMessage(portals::Message<messages::ThresholdImage>(
+                           &tTImage_in.message()));
+    tYImage.setMessage(portals::Message<messages::PackedImage16>(
+                           &tYImage_in.message()));
+    tUImage.setMessage(portals::Message<messages::PackedImage16>(
+                           &tUImage_in.message()));
+    tVImage.setMessage(portals::Message<messages::PackedImage16>(
+                           &tVImage_in.message()));
+    bTImage.setMessage(portals::Message<messages::ThresholdImage>(
+                           &bTImage_in.message()));
+    bYImage.setMessage(portals::Message<messages::PackedImage16>(
+                           &bYImage_in.message()));
+    bUImage.setMessage(portals::Message<messages::PackedImage16>(
+                           &bUImage_in.message()));
+    bVImage.setMessage(portals::Message<messages::PackedImage16>(
+                           &bVImage_in.message()));
 
 	joints.setMessage(portals::Message<messages::JointAngles>(
 						  &joints_in.message()));
@@ -160,17 +159,15 @@ void VisionDisplayModule::run_()
 
 	topDisplay.setOverlay(makeOverlay(Camera::TOP));
 	bottomDisplay.setOverlay(makeOverlay(Camera::BOTTOM));
-	
 
 }
 
 QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 {
-	QImage lineImage(320, 240, QImage::Format_ARGB32);
+    QImage lineImage(320, 240, QImage::Format_ARGB32);
     lineImage.fill(qRgba(0, 0, 0, 0));
     QPainter painter(&lineImage);
     painter.setPen(QColor(246, 15, 15));
-
 	const messages::VisionField *visField = visMod.vision_field.getMessage(true).get();
 	const messages::VisionBall *visBall = visMod.vision_ball.getMessage(true).get();
 
