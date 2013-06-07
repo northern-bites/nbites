@@ -70,13 +70,6 @@ public:
     void update(const messages::RobotLocation& motionInput,
                 const messages::VisionField& visionInput);
 
-    // /**
-    //  * @brief Find the standard deviation of the particle set. This is
-    //  *        a useful metric for determining the error in the current
-    //  *        estimate, or the rate of change of error over time.
-    //  */
-    // std::vector<float> findParticleSD();
-
     float getMagnitudeError();
 
     void resetLocalization();

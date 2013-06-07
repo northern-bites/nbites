@@ -30,6 +30,13 @@ option(
 )
 
 option(
+  DEBUG_LOC
+  "Toggle localization debug mode."
+  OFF
+)
+
+
+option(
   DEBUG_THREADS
   "Toggle threads debug mode."
   OFF
