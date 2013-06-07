@@ -15,9 +15,14 @@ public:
 
 public slots:
     void setUpModules();
+    void runForward();
+    void runBackward();
 
 protected:
     calibrate::CalibrationModule calibrator;
+	image::OverlayDisplayModule topDisplay;
+    image::OverlayDisplayModule bottomDisplay;
+    QTabWidget images;
 };
 
 }

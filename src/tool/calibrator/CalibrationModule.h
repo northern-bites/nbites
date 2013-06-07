@@ -15,17 +15,13 @@
 namespace tool {
 namespace calibrate {
 
-class CalibrationModule : public QMainWindow,
+class CalibrationModule : public QWidget,
                           public portals::Module
 {
     Q_OBJECT;
 
 public:
     CalibrationModule(QWidget *parent = 0);
-
-    // To the displays
-    portals::InPortal<messages::YUVImage>* bottomImageIn;
-    portals::InPortal<messages::YUVImage>* topImageIn;
 
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialIn;
@@ -34,23 +30,24 @@ protected:
     virtual void run_();
 
 protected slots:
-    void imageTabSwitched();
+    void imageTabSwitched(int i);
 
 private:
     man::vision::Vision vision;
 
-    portals::RoboGram subdiagram;
-
     //QImage makeOverlay(Camera::Type which);
 
-	QTabWidget imageTabs;
 	Camera::Type currentCamera;
     int currentX;
     int currentY;
     int currentH;
 
-	image::OverlayDisplayModule topDisplay;
-    image::OverlayDisplayModule bottomDisplay;
+    QRadioButton goalie, center;
+    // QRadioButton other;
+    QSpinBox rollBox, pitchBox;
+    QLabel rollLabel, pitchLabel;
+
+    QGridLayout layout;
 };
 
 }
