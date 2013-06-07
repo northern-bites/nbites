@@ -46,6 +46,12 @@ option(
 )
 
 option(
+  LOG_EVERY_FIFTH
+  "Enable to log every fifth frame in order to stay synced with image logging"
+  ON
+)
+
+option(
   USE_LOGGING
   "Enable logging on the robot."
   OFF
