@@ -30,8 +30,8 @@ message VisualDetection
         optional int32 frames_on = 8;
         optional int32 frames_off = 9;
         repeated Point concrete_coords = 10;
-	optional float angle_x_deg = 11;
-	optional float angle_y_deg = 12;
+        optional float angle_x_deg = 11;
+        optional float angle_y_deg = 12;
         optional bool red_goalie = 13; // HACK until we have a unified message for goal posts.
         optional bool navy_goalie = 14;
 }
@@ -125,7 +125,7 @@ message VisualCorner
         optional float orientation = 2;
         optional shape corner_type = 3;
         optional float physical_orientation = 4;
-	repeated corner_id poss_id = 5;
+        repeated corner_id poss_id = 5;
 }
 
 message VisualLine
@@ -137,7 +137,7 @@ message VisualLine
        SIDELINE_LINE = 52;
        ENDLINE_LINE = 53;
        GOALBOX_LINE = 54;
-       GOALBOX_SIDE_LINE = 55;			// 55
+       GOALBOX_SIDE_LINE = 55;                  // 55
        GOALBOX_TOP_LINE = 56;
 
        // Distinct lines:
@@ -172,6 +172,11 @@ message VisualLine
         optional float slope = 9;
         optional float y_int = 10;
         repeated line_id possibilities = 11;
+}
+
+message CalibrateLines
+{
+        repeated VisualLine expected_line = 1;
 }
 
 message VisualFieldEdge
