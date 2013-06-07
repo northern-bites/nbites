@@ -12,6 +12,7 @@
 #include "GCResponse.pb.h"
 #include "Images.h"
 #include "InertialState.pb.h"
+#include "PMotion.pb.h"
 #include "ParticleSwarm.pb.h"
 #include "RobotLocation.pb.h"
 #include "SonarState.pb.h"
@@ -42,6 +43,8 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(VisionBall);
     ADD_MAPPED_TYPE(VisionField);
     ADD_MAPPED_TYPE(VisionRobot);
+    ADD_MAPPED_TYPE(VisionObstacle);
+    ADD_MAPPED_TYPE(JointAngles);
     ADD_MAPPED_TYPE(WorldModel);
     ADD_MAPPED_TYPE(YUVImage);
 

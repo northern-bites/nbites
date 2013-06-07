@@ -221,6 +221,16 @@ protected:
     // Implements the Module run_ method
     virtual void run_()
     {
+        /* Only possible to log 1 in every 5 images, do same thing with
+           all unlogers to stay synced with images */
+#ifdef LOG_EVERY_FIFTH
+        frameCounter++;
+        // EPIC HACK: 10-second delay
+        if (frameCounter < 300) return;
+        // EPIC HACK: don't try to log every image
+        if (frameCounter%5 != 0) return;
+#endif
+
         input.latch();
 
         // Open the file and write the header if it hasn't been done
@@ -244,6 +254,9 @@ protected:
 
     portals::InPortal<T> input;
     std::list<Write> ongoing;
+#ifdef LOG_EVERY_FIFTH
+    int frameCounter;
+#endif
 };
 
 // Special for Images
