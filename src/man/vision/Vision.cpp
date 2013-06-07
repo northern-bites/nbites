@@ -151,13 +151,13 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
     // counts the frameNumber
     if (frameNumber > 1000000) frameNumber = 0;
 
-   linesDetector->detect(thresh->getVisionHorizon(),
-                        thresh->field->getTopEdge(),
-                        yImg);
+   // linesDetector->detect(thresh->getVisionHorizon(),
+   //                      thresh->field->getTopEdge(),
+   //                      yImg);
 
-   cornerDetector->detect(thresh->getVisionHorizon(),
-                          thresh->field->getTopEdge(),
-                          linesDetector->getLines());
+   // cornerDetector->detect(thresh->getVisionHorizon(),
+   //                        thresh->field->getTopEdge(),
+   //                        linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
 
@@ -166,7 +166,7 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
 
    // drawEdges(*linesDetector->getEdges());
    // drawHoughLines(linesDetector->getHoughLines());
-    drawVisualLines(linesDetector->getLines(), *linesDetector->getEdges());
+    //drawVisualLines(linesDetector->getLines(), *linesDetector->getEdges());
 //    drawVisualCorners(cornerDetector->getCorners());
 
     thresh->transposeDebugImage();
