@@ -48,6 +48,12 @@ namespace vision {
 Field::Field(Vision* vis, Threshold * thr)
   : vision(vis), thresh(thr)
 {
+	// NOTE: leave this in please, else I will "git blame" and cut off your
+	// funding. - chown
+#ifdef OFFLINE
+	debugFieldEdge = false;
+	debugHorizon = false;
+#endif
 }
 
 /* As part of finding the convex hull, we need to know where the
@@ -58,57 +64,99 @@ Field::Field(Vision* vis, Threshold * thr)
    @param pH    the horizon found by findGreenHorizon
 */
 void Field::initialScanForTopGreenPoints(int pH) {
-    int good, ok, top;
-    unsigned char pixel;
-    int topGreen = 0;
-    int greenRun = 0;
-    // we need a better criteria for what the top is
-    for (int i = 0; i < HULLS; i++) {
-        good = 0;
-        ok = 0;
-        int poseProject = thresh->yellow->yProject(0, pH, i * SCANSIZE);
-        if (poseProject <= 0) {
-            poseProject = 0;
-        } else if (pH == 0) {
-            poseProject = 0;
-        }
-        topGreen = IMAGE_HEIGHT - 1;
-        greenRun = 0;
-        for (top = max(poseProject, 0);
-             good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
-            // scan until we find a run of green pixels
-            int x = i * SCANSIZE;
-            if (i == HULLS - 1) {
-                x--;
+	int good, ok, top;
+	unsigned char pixel;
+	int topGreen = 0;
+	int greenRun = 0;
+    float possible = 0.0f;
+    const float BUFFER = 200.0f; // other fields should be farther than this
+	// we need a better criteria for what the top is
+	for (int i = 0; i < HULLS; i++) {
+		good = 0;
+		ok = 0;
+		int poseProject = thresh->yellow->yProject(0, pH, i * SCANSIZE);
+		if (poseProject <= 0) {
+			poseProject = 0;
+		} else if (pH == 0) {
+			poseProject = 0;
+		}
+		topGreen = IMAGE_HEIGHT - 1;
+		greenRun = 0;
+		for (top = max(poseProject, 0);
+				good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
+			// scan until we find a run of green pixels
+			int x = i * SCANSIZE;
+			if (i == HULLS - 1) {
+				x--;
+			}
+			pixel = thresh->getColor(x, top);
+            // watch out for patches of green off the field
+            if (topGreen != IMAGE_HEIGHT - 1 &&
+                possible - thresh->getPixDistance(top) > BUFFER) {
+                topGreen = IMAGE_HEIGHT - 1;
             }
-            pixel = thresh->getColor(x, top);
-            //pixel = thresh->thresholded[top][x];
-            if (Utility::isGreen(pixel) || Utility::isOrange(pixel)) {
-                good++;
-                greenRun++;
-                if (greenRun > 3 && topGreen == IMAGE_HEIGHT - 1) {
-                    topGreen = top - greenRun;
+			//pixel = thresh->thresholded[top][x];
+			if (Utility::isGreen(pixel) || Utility::isOrange(pixel)) {
+				good++;
+				greenRun++;
+				if (greenRun > 3 && topGreen == IMAGE_HEIGHT - 1) {
+					topGreen = top - greenRun;
+                    possible = thresh->getPixDistance(topGreen);
+				}
+                // before we finish make sure we haven't seen another field
+                if (good == RUNSIZE) {
+                    float topDist = thresh->getPixDistance(topGreen);
+                    float newDist = thresh->getPixDistance(top);
+                    if (topDist > BUFFER) {
+                        if (topDist - newDist > BUFFER / 2) {
+                            topGreen = top - greenRun;
+                        } else {
+                            while (Utility::isGreen(pixel) &&
+                                   top < IMAGE_HEIGHT - 1) {
+                                top++;
+                                pixel = thresh->getColor(x, top);
+                            }
+                            float edgeDist = thresh->getPixDistance(top);
+                            int greens = 0;
+                            int start = top;
+                            while (thresh->getPixDistance(top) > BUFFER) {
+                                top++;
+                                pixel = thresh->getColor(x, top);
+                                if (Utility::isGreen(pixel)) {
+                                    greens++;
+                                }
+                            }
+                            // if we're a way away, make sure there is more green
+                            if (top > start + 5) {
+                                if (greens / (top - start) < 0.30f) {
+                                    topGreen = IMAGE_HEIGHT - 1;
+                                    good = 0;
+                                    greenRun = 0;
+                                }
+                            }
+                        }
+                    }
                 }
-            } else if (Utility::isOrange(pixel) || Utility::isWhite(pixel)) {
-                //good++;
-                greenRun = 0;
-            } else if (Utility::isUndefined(pixel)) {
-                ok++;
-                if (ok > SCANNOISE) {
-                    good = 0;
-                    ok = 0;
-                }
-                greenRun = 0;
-            } else {
-                good = 0;
-                ok = 0;
-                greenRun = 0;
-            }
-        }
-        if (good == RUNSIZE) {
-            convex[i] = point<int>(i * SCANSIZE, topGreen);
-            if (poseProject < 0 && topGreen < 10) {
-                convex[i] = point<int>(i * SCANSIZE, 0);
+			} else if (Utility::isOrange(pixel) || Utility::isWhite(pixel)) {
+				//good++;
+				greenRun = 0;
+			} else if (Utility::isUndefined(pixel)) {
+				ok++;
+				if (ok > SCANNOISE) {
+					good = 0;
+					ok = 0;
+				}
+				greenRun = 0;
+			} else {
+				good = 0;
+				ok = 0;
+				greenRun = 0;
+			}
+		}
+		if (good == RUNSIZE) {
+			convex[i] = point<int>(i * SCANSIZE, topGreen);
+			if (poseProject < 0 && topGreen < 10) {
+				convex[i] = point<int>(i * SCANSIZE, 0);
             }
         } else {
             convex[i] = point<int>(i * SCANSIZE, IMAGE_HEIGHT);

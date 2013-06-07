@@ -485,6 +485,12 @@ void Threshold::lowerRuns() {
 void Threshold::findGoals(int column, int topEdge) {
     const int BADSIZE = 15;
     const int GAP = BADSIZE * 2;
+	const float BUFFER = 200.0f;
+	// don't scan too high up
+	float horDist = getPixDistance(topEdge);
+	int highTop = topEdge;
+	for ( ; highTop > -1 && getPixDistance(highTop) - horDist < BUFFER; highTop--) {
+	}
     // scan up for goals
     int bad = 0, yellows = 0, pinks = 0, navy = 0;
     int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
@@ -493,7 +499,7 @@ void Threshold::findGoals(int column, int topEdge) {
     int robots = 0;
     bool faceDown2 = pose->getHorizonY(0) < -100;
     int j;
-    for (j = topEdge; bad < BADSIZE && j >= 0; j--) {
+    for (j = topEdge; bad < BADSIZE && j >= 0 && (yellows > 3 || j >=highTop); j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
         if (Utility::isYellow(pixel)) {
@@ -1781,9 +1787,10 @@ int Threshold::getPixelBoundaryUp() {
  */
 void Threshold::initDebugImage(){
 #ifdef OFFLINE
-    for(int x = 0 ; x < IMAGE_WIDTH;x++)
+    for(int x = 0 ; x < IMAGE_WIDTH;x++) 
         for(int y = 0; y < IMAGE_HEIGHT;y++)
             debugImage[y][x] = GREY;
+	
 #endif
 }
 
@@ -1792,12 +1799,18 @@ void Threshold::initDebugImage(){
  */
 void Threshold::transposeDebugImage(){
 #ifdef OFFLINE
+	for(int i = 0; i < IMAGE_HEIGHT * IMAGE_WIDTH; i++)
+		betterDebugImage[i] = GREY;
     for(int x = 0 ; x < IMAGE_WIDTH; x++) {
         for(int y = 0; y < IMAGE_HEIGHT; y++) {
             if(debugImage[y][x] != GREY){
-                setThresholded(y, x, debugImage[y][x]);
+                betterDebugImage[y * IMAGE_WIDTH + x] = debugImage[y][x];
             }
-        }
+			else {
+				usingTopCamera = true;
+				betterDebugImage[y * IMAGE_WIDTH + x] = getThresholded(y, x);
+			}
+		}
     }
 
     initDebugImage();
