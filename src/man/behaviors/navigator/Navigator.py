@@ -96,7 +96,7 @@ class Navigator(FSA.FSA):
         """
         self.goTo(self.brain.play.getPosition(), speed = FAST_SPEED, avoidObstacles = True)
 
-    def chaseBall(self, speed = FULL_SPEED, fast = False):
+    def chaseBall(self, speed = FAST_SPEED, fast = False):
         """
         Calls goTo on ball, which should be a RobotLocation.
 
