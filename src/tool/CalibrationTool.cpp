@@ -13,9 +13,9 @@ CalibrationTool::CalibrationTool(const char* title) : EmptyTool(title),
 
 void CalibrationTool::setUpModules()
 {
-    if (diagram.connectToUnlogger<messages::YUVImage>(calibrator.topImageIn,
+    if (diagram.connectToUnlogger<messages::YUVImage>(*calibrator.topImageIn,
                                                       "top") &&
-        diagram.connectToUnlogger<messages::YUVImage>(calibrator.bottomImageIn,
+        diagram.connectToUnlogger<messages::YUVImage>(*calibrator.bottomImageIn,
                                                       "bottom"))
     {
         diagram.addModule(calibrator);

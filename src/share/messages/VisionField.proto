@@ -174,11 +174,6 @@ message VisualLine
         repeated line_id possibilities = 11;
 }
 
-message CalibrateLines
-{
-        repeated VisualLine expected_line = 1;
-}
-
 message VisualFieldEdge
 {
         optional float distance_l = 1;
