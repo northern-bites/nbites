@@ -5,6 +5,8 @@ namespace tool {
 namespace calibrate {
 
 CalibrationModule::CalibrationModule(QWidget *parent) :
+    QMainWindow(parent),
+    central(this),
     goalie("Goalie Postition", this),
     center("Center Field Position", this),
     rollBox(this),
@@ -12,14 +14,19 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     rollLabel(tr("Roll")),
     pitchLabel(tr("Pitch"))
 {
-    layout.addWidget(&goalie, 0, 0, 1, 2);
-    layout.addWidget(&center, 1, 0, 1, 2);
-    layout.addWidget(&rollBox, 2, 0);
-    layout.addWidget(&rollLabel, 2, 1);
-    layout.addWidget(&pitchBox, 3, 0);
-    layout.addWidget(&pitchLabel, 3, 1);
+    images.addTab(&topImage, "TOP");
+    images.addTab(&bottomImage, "BOTTOM");
 
-    setLayout(&layout);
+    layout.addWidget(&images, 0, 0, 4, 1);
+    layout.addWidget(&goalie, 0, 1);
+    layout.addWidget(&center, 1, 1);
+    layout.addWidget(&rollBox, 2, 1);
+    layout.addWidget(&rollLabel, 2, 2);
+    layout.addWidget(&pitchBox, 3, 1);
+    layout.addWidget(&pitchLabel, 3, 2);
+
+    central.setLayout(&layout);
+    setCentralWidget(&central);
 }
 
 void CalibrationModule::run_()
@@ -27,29 +34,43 @@ void CalibrationModule::run_()
     jointsIn.latch();
     inertialIn.latch();
 
-    std::vector<boost::shared_ptr<man::vision::VisualLine> > lines =
-        vision.getExpectedLines(currentCamera,
-                                jointsIn.message(),
-                                inertialIn.message(),
-                                currentX,
-                                currentY,
-                                currentH);
+    LineVector lines = vision.getExpectedLines(currentCamera,
+                                               jointsIn.message(),
+                                               inertialIn.message(),
+                                               currentX,
+                                               currentY,
+                                               currentH);
 }
 
 void CalibrationModule::imageTabSwitched(int i)
 {
-    if (i == 0)
+    if (i == images.indexOf(&topImage))
     {
         currentCamera = Camera::TOP;
     }
-    else if (i == 1)
+    else
     {
         currentCamera = Camera::BOTTOM;
     }
-    else
+}
+
+QImage CalibrationModule::makeOverlay(LineVector expected)
+{
+    QImage lineImage(320, 240, QImage::Format_ARGB32);
+    lineImage.fill(qRgba(0, 0, 0, 0));
+    QPainter painter(&lineImage);
+    painter.setPen(QColor(246, 15, 15));
+
+    for(LineVector::iterator i = expected.begin();
+        i != expected.end(); i++)
     {
-        std::cout << "What is going on with your image tabs?" << std::endl;
+        painter.drawLine(lines->top_expected_line(i).start_x(),
+                         lines->top_expected_line(i).start_y(),
+                         lines->top_expected_line(i).end_x(),
+                         lines->top_expected_line(i).end_y());
     }
+
+    return lineImage;
 }
 
 }

@@ -15,7 +15,9 @@
 namespace tool {
 namespace calibrate {
 
-class CalibrationModule : public QWidget,
+typedef std::vector<boost::shared_ptr<man::vision::VisualLines> > LineVector;
+
+class CalibrationModule : public QMainWindow,
                           public portals::Module
 {
     Q_OBJECT;
@@ -25,6 +27,8 @@ public:
 
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialIn;
+    portals::InPortal<messages::YUVImage> topImageIn;
+    portals::InPortal<messages::YUVImage> bottomImageIn;
 
 protected:
     virtual void run_();
@@ -34,14 +38,16 @@ protected slots:
 
 private:
     man::vision::Vision vision;
+    QWidget central;
 
-    //QImage makeOverlay(Camera::Type which);
+    QImage makeOverlay(LineVector expected);
 
 	Camera::Type currentCamera;
-    int currentX;
-    int currentY;
-    int currentH;
+    int currentX, currentY, currentH;
 
+    image::OverlayDisplayModule topImage, bottomImage;
+
+    QTabWidget images;
     QRadioButton goalie, center;
     // QRadioButton other;
     QSpinBox rollBox, pitchBox;
