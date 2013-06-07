@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 USE_LOC = False
 USE_LOC_HALF_FIELD = False
 
