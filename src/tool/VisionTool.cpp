@@ -1,4 +1,4 @@
-#include "Tool.h"
+#include "VisionTool.h"
 #include <QTextStream>
 #include <QFileDialog>
 #include <QKeyEvent>
@@ -7,45 +7,18 @@
 
 namespace tool {
 
-// This file saves the dimensions from the last use of the tool
-QFile file(QString("./.geometry"));
-
-Tool::Tool(const char* title) :
-    QMainWindow(),
-    diagram(),
-    selector(),
-    logView(this),
-	tableCreator(this),
-	visDispMod(this),
-    fieldView(this),
-  	colorCalibrate(this),
-	topConverter(),
-	bottomConverter(),
-    toolTabs(new QTabWidget),
-    toolbar(new QToolBar),
-    nextButton(new QPushButton(tr(">"))),
-    prevButton(new QPushButton(tr("<"))),
-    recordButton(new QPushButton(tr("Rec"))),
+VisionTool::VisionTool(const char* title) :
+    tableCreator(this),
+    visDispMod(this),
+    colorCalibrate(this),
 	loadBtn(new QPushButton(tr("Load Table"))),
-    scrollArea(new QScrollArea),
-    scrollBarSize(new QSize(5, 35)),
-    tabStartSize(new QSize(toolTabs->size()))
+    topConverter(),
+    bottomConverter(),
+    EmptyTool(title)
 {
-    // Set up the GUI and slots
-    this->setWindowTitle(tr(title));
-
-    //connect both fwd and prv button to the run slot
-    connect(nextButton, SIGNAL(clicked()), &diagram, SLOT(runForward()));
-    connect(prevButton, SIGNAL(clicked()), &diagram, SLOT(runBackward()));
-
-    connect(&selector, SIGNAL(signalNewDataSet(std::vector<std::string>)),
-            &diagram, SLOT(addUnloggers(std::vector<std::string>)));
-
-    connect(&diagram, SIGNAL(signalNewDisplayWidget(QWidget*, std::string)),
-            &logView, SLOT(newDisplayWidget(QWidget*, std::string)));
-
-    connect(&diagram, SIGNAL(signalDeleteDisplayWidgets()),
-            &logView, SLOT(deleteDisplayWidgets()));
+    toolTabs->addTab(&tableCreator, tr("Color Creator"));
+    toolTabs->addTab(&visDispMod, tr("Offline Vision"));
+    toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
 
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
@@ -54,35 +27,6 @@ Tool::Tool(const char* title) :
 			this, SLOT(changeTableValues(std::vector<color::colorChanges>)));
 	connect(&tableCreator, SIGNAL(tableUnChanges(std::vector<color::colorChanges>)), 
 			this, SLOT(unChangeTableValues(std::vector<color::colorChanges>)));
-
-    toolbar->addWidget(prevButton);
-    toolbar->addWidget(nextButton);
-    toolbar->addWidget(recordButton);
-
-    toolTabs->addTab(&selector, tr("Data"));
-    toolTabs->addTab(&logView, tr("Log View"));
-	toolTabs->addTab(&tableCreator, tr("Color Creator"));
-	toolTabs->addTab(&visDispMod, tr("Offline Vision"));
-	toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
-    toolTabs->addTab(&fieldView, tr("FieldView"));
-    toolTabs->addTab(&worldView, tr("World Viewer"));
-
-
-    this->setCentralWidget(toolTabs);
-    this->addToolBar(toolbar);
-
-    // Figure out the appropriate dimensions for the window
-    if (file.open(QIODevice::ReadWrite)){
-            QTextStream in(&file);
-            geometry = new QRect(in.readLine().toInt(), in.readLine().toInt(),
-                                 in.readLine().toInt(), in.readLine().toInt());
-            file.close();
-    }
-    // If we don't have dimensions, default to hard-coded values
-    if((geometry->width() == 0) && (geometry->height() == 0)){
-        geometry = new QRect(75, 75, 1000, 900);
-    }
-    this->setGeometry(*geometry);
 
 	QToolBar* toolBar = new QToolBar(this);
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
@@ -96,23 +40,13 @@ Tool::Tool(const char* title) :
 	QPushButton* saveAsBtn = new QPushButton(tr("Save As"));
 	connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
 	toolBar->addWidget(saveAsBtn);
-
-
-    //diagram.addModule(worldView);
 }
 
-Tool::~Tool() {
-    // Write the current dimensions to the .geometry file for next use
-    if (file.open(QIODevice::ReadWrite)){
-        QTextStream out(&file);
-        out << this->pos().x() << "\n"
-            << this->pos().y() << "\n"
-            << this->width() << "\n"
-            << this->height() << "\n";
-    }
+VisionTool::~VisionTool() {
 }
 
-void Tool::saveGlobalTable()
+
+void VisionTool::saveGlobalTable()
 {
 
 	if (loadBtn->text() == QString("Load Table")) { // no table loaded yet
@@ -123,7 +57,7 @@ void Tool::saveGlobalTable()
 	QString filename = loadBtn->text();
 	globalColorTable.write(filename.toStdString());
 }
-void Tool::saveAsGlobalTable()
+void VisionTool::saveAsGlobalTable()
 {
 
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
@@ -137,7 +71,7 @@ void Tool::saveAsGlobalTable()
 		loadBtn->setText(filename);
 }
 
-void Tool::loadColorTable()
+void VisionTool::loadColorTable()
 {
 
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
@@ -155,7 +89,7 @@ void Tool::loadColorTable()
 
 }
 
-void Tool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)
+void VisionTool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)
 {
 	for (int i = 0; i < tableAdjustments.size(); i++) {
 		byte y = tableAdjustments[i].y;
@@ -169,7 +103,7 @@ void Tool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)
 
 }
 	
-void Tool::unChangeTableValues(std::vector<color::colorChanges> tableAdjustments)
+void VisionTool::unChangeTableValues(std::vector<color::colorChanges> tableAdjustments)
 {
 	for (int i = 0; i < tableAdjustments.size(); i++) {
 		byte y = tableAdjustments[i].y;
@@ -182,7 +116,7 @@ void Tool::unChangeTableValues(std::vector<color::colorChanges> tableAdjustments
 	bottomConverter.changeTable(globalColorTable.getTable());
 }
 
-void Tool::setUpModules()
+void VisionTool::setUpModules()
 {
     diagram.connectToUnlogger<messages::YUVImage>(topConverter.imageIn, "top");
     diagram.connectToUnlogger<messages::YUVImage>(bottomConverter.imageIn, "bottom");
@@ -253,82 +187,7 @@ void Tool::setUpModules()
         std::cout << "Right now you can't use the color calibrator without"
                   << " two image logs." << std::endl;
     }
-
-
-    /** FieldViewer Tab **/
-    // Should add field view
-    bool shouldAddFieldView = false;
-    if(diagram.connectToUnlogger<messages::RobotLocation>(fieldView.locationIn,
-                                                          "location"))
-    {
-        fieldView.confirmLocationLogs(true);
-        shouldAddFieldView = true;
-    }
-    else
-    {
-        std::cout << "Warning: location wasn't logged in this file" << std::endl;
-    }
-    if(diagram.connectToUnlogger<messages::RobotLocation>(fieldView.odometryIn,
-                                                          "odometry"))
-    {
-        fieldView.confirmOdometryLogs(true);
-        shouldAddFieldView = true;
-    }
-    else
-    {
-        std::cout << "Warning: odometry wasn't logged in this file" << std::endl;
-    }
-
-    if(diagram.connectToUnlogger<messages::ParticleSwarm>(fieldView.particlesIn,
-                                                          "particleSwarm"))
-    {
-        fieldView.confirmParticleLogs(true);
-        shouldAddFieldView = true;
-    }
-    else
-    {
-        std::cout << "Warning: Particles weren't logged in this file" << std::endl;
-    }
-    if(diagram.connectToUnlogger<messages::VisionField>(fieldView.observationsIn,
-                                                        "observations"))
-    {
-        fieldView.confirmObsvLogs(true);
-        shouldAddFieldView = true;
-    }
-    else
-    {
-        std::cout << "Warning: Observations weren't logged in this file" << std::endl;
-    }
-    if(shouldAddFieldView)
-        diagram.addModule(fieldView);
-
-
 }
 
-// Keyboard control
-void Tool::keyPressEvent(QKeyEvent * event)
-{
-    switch (event->key()) {
-    case Qt::Key_N:
-        diagram.runForward();
-        break;
-    case Qt::Key_P:
-        diagram.runBackward();
-        break;
-    default:
-        QWidget::keyPressEvent(event);
-    }
-}
-
-// Provides scrollbars appropriately if the window gets too small
-void Tool::resizeEvent(QResizeEvent* ev)
-{
-    QSize widgetSize = ev->size();
-    if((widgetSize.width() > tabStartSize->width()) ||
-       (widgetSize.height() > tabStartSize->height())) {
-        toolTabs->resize(widgetSize-*scrollBarSize);
-    }
-    QWidget::resizeEvent(ev);
-}
 
 }

@@ -24,6 +24,7 @@
 
 namespace tool{
 
+
 ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
 {
     ADD_MAPPED_TYPE(AudioCommand);
@@ -31,12 +32,12 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(ButtonState);
     ADD_MAPPED_TYPE(FallStatus);
     ADD_MAPPED_TYPE(FeetOnGround);
-	ADD_MAPPED_TYPE(FootBumperState);
+    ADD_MAPPED_TYPE(FootBumperState);
     ADD_MAPPED_TYPE(FSR);
     ADD_MAPPED_TYPE(GameState);
     ADD_MAPPED_TYPE(GCResponse);
     ADD_MAPPED_TYPE(InertialState);
-	ADD_MAPPED_TYPE(JointAngles);
+    ADD_MAPPED_TYPE(JointAngles);
     ADD_MAPPED_TYPE(ParticleSwarm);
     ADD_MAPPED_TYPE(RobotLocation);
     ADD_MAPPED_TYPE(SonarState);
@@ -47,6 +48,7 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(VisionRobot);
 	ADD_MAPPED_TYPE(VisionObstacle);
     ADD_MAPPED_TYPE(JointAngles);
+    ADD_MAPPED_TYPE(VisionObstacle);
     ADD_MAPPED_TYPE(WorldModel);
     ADD_MAPPED_TYPE(YUVImage);
 

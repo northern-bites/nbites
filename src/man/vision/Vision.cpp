@@ -1,24 +1,3 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
-
 /**
  * Vision.cc  -- The Main Vision Module Class file.
  *
@@ -63,7 +42,7 @@ Vision::Vision()
     ygCrossbar = new VisualCrossbar();
     bgCrossbar = new VisualCrossbar();
     ball = new VisualBall();
-    red1 = new VisualRobot(); 
+    red1 = new VisualRobot();
     red2 = new VisualRobot();
     red3 = new VisualRobot();
     navy1 = new VisualRobot();
@@ -73,10 +52,10 @@ Vision::Vision()
     fieldEdge = new VisualFieldEdge();
     obstacles = new VisualObstacle();
 
-	pose = boost::shared_ptr<NaoPose>(new NaoPose());
+    pose = boost::shared_ptr<NaoPose>(new NaoPose());
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
-	// thresh->setIm(&global_8_image[0]);
+    // thresh->setIm(&global_8_image[0]);
 }
 
 // Vision Class Deconstructor
@@ -172,13 +151,13 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
     // counts the frameNumber
     if (frameNumber > 1000000) frameNumber = 0;
 
-   linesDetector->detect(thresh->getVisionHorizon(),
-                        thresh->field->getTopEdge(),
-                        yImg);
+   // linesDetector->detect(thresh->getVisionHorizon(),
+   //                      thresh->field->getTopEdge(),
+   //                      yImg);
 
-   cornerDetector->detect(thresh->getVisionHorizon(),
-                          thresh->field->getTopEdge(),
-                          linesDetector->getLines());
+   // cornerDetector->detect(thresh->getVisionHorizon(),
+   //                        thresh->field->getTopEdge(),
+   //                        linesDetector->getLines());
 
     // Perform image correction, thresholding, and object recognition
 
@@ -187,7 +166,7 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
 
    // drawEdges(*linesDetector->getEdges());
    // drawHoughLines(linesDetector->getHoughLines());
-	drawVisualLines(linesDetector->getLines(), *linesDetector->getEdges());
+    //drawVisualLines(linesDetector->getLines(), *linesDetector->getEdges());
 //    drawVisualCorners(cornerDetector->getCorners());
 
     thresh->transposeDebugImage();
@@ -248,9 +227,9 @@ void Vision::drawBoxes(void)
     // balls
     // orange
     /*if(ball->getWidth() > 0)
-	  drawRect(ball->getX(), ball->getY(),
-	  NBMath::ROUND(ball->getWidth()),
-	  NBMath::ROUND(ball->getHeight()), PINK);*/
+      drawRect(ball->getX(), ball->getY(),
+      NBMath::ROUND(ball->getWidth()),
+      NBMath::ROUND(ball->getHeight()), PINK);*/
 
     // lines
     drawFieldLines();
@@ -321,29 +300,29 @@ void Vision::drawBox(int left, int right, int bottom, int top, int c)
 
     for (int i = left; i < left + width; i++) {
         if (top >= 0 &&
-			top < IMAGE_HEIGHT &&
-			i >= 0 &&
-			i < IMAGE_WIDTH) {
+            top < IMAGE_HEIGHT &&
+            i >= 0 &&
+            i < IMAGE_WIDTH) {
             thresh->debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
-			(top + height) < IMAGE_HEIGHT &&
-			i >= 0 &&
-			i < IMAGE_WIDTH) {
+            (top + height) < IMAGE_HEIGHT &&
+            i >= 0 &&
+            i < IMAGE_WIDTH) {
             thresh->debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
         if (i >= 0 &&
-			i < IMAGE_HEIGHT &&
-			left >= 0 &&
-			left < IMAGE_WIDTH) {
+            i < IMAGE_HEIGHT &&
+            left >= 0 &&
+            left < IMAGE_WIDTH) {
             thresh->debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
-			i < IMAGE_HEIGHT &&
-			(left+width) >= 0 &&
-			(left+width) < IMAGE_WIDTH) {
+            i < IMAGE_HEIGHT &&
+            (left+width) >= 0 &&
+            (left+width) < IMAGE_WIDTH) {
             thresh->debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
@@ -399,23 +378,23 @@ void Vision::drawRect(int left, int top, int width, int height, int c)
             thresh->debugImage[top][i] = static_cast<unsigned char>(c);
         }
         if ((top + height) >= 0 &&
-			(top + height) < IMAGE_HEIGHT &&
-			i >= 0 &&
-			i < IMAGE_WIDTH) {
+            (top + height) < IMAGE_HEIGHT &&
+            i >= 0 &&
+            i < IMAGE_WIDTH) {
             thresh->debugImage[top + height][i] = static_cast<unsigned char>(c);
         }
     }
     for (int i = top; i < top + height; i++) {
         if (i >= 0 &&
-			i < IMAGE_HEIGHT &&
-			left >= 0 &&
-			left < IMAGE_WIDTH) {
+            i < IMAGE_HEIGHT &&
+            left >= 0 &&
+            left < IMAGE_WIDTH) {
             thresh->debugImage[i][left] = static_cast<unsigned char>(c);
         }
         if (i >= 0 &&
-			i < IMAGE_HEIGHT &&
-			(left+width) >= 0 &&
-			(left+width) < IMAGE_WIDTH) {
+            i < IMAGE_HEIGHT &&
+            (left+width) >= 0 &&
+            (left+width) < IMAGE_WIDTH) {
             thresh->debugImage[i][left + width] = static_cast<unsigned char>(c);
         }
     }
@@ -444,7 +423,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c)
         }
         for (int i = y; i != y1; i += sign) {
             int newx = x +
-				static_cast<int>(slope * static_cast<float>(i - y) );
+                static_cast<int>(slope * static_cast<float>(i - y) );
 
             if (newx >= 0 && newx < IMAGE_WIDTH && i >= 0 && i < IMAGE_HEIGHT) {
                 thresh->debugImage[i][newx] = static_cast<unsigned char>(c);
@@ -457,7 +436,7 @@ void Vision::drawLine(int x, int y, int x1, int y1, int c)
         }
         for (int i = x; i != x1; i += sign) {
             int newy = y +
-				static_cast<int>(slope * static_cast<float>(i - x) );
+                static_cast<int>(slope * static_cast<float>(i - x) );
 
             if (newy >= 0 && newy < IMAGE_HEIGHT && i >= 0 && i < IMAGE_WIDTH) {
                 thresh->debugImage[newy][i] = static_cast<unsigned char>(c);
@@ -511,7 +490,7 @@ void Vision::drawFieldLines()
         drawLine(*i, BLUE);
 
         // Draw all the line points in the line
-		const vector<linePoint> points = (*i)->getPoints();
+        const vector<linePoint> points = (*i)->getPoints();
         for (vector<linePoint>::const_iterator j = points.begin();
              j != points.end(); j++) {
             // Vertically found = black
@@ -615,12 +594,12 @@ void Vision::drawEdges(Gradient& g)
 void Vision::drawHoughLines(const list<HoughLine>& lines)
 {
 #ifdef OFFLINE
-	if (thresh->debugHoughTransform){
-		list<HoughLine>::const_iterator line;
-		for (line = lines.begin() ; line != lines.end(); line++){
-			drawHoughLine(*line, MAROON);
-		}
-	}
+    if (thresh->debugHoughTransform){
+        list<HoughLine>::const_iterator line;
+        for (line = lines.begin() ; line != lines.end(); line++){
+            drawHoughLine(*line, MAROON);
+        }
+    }
 #endif
 }
 
@@ -644,7 +623,7 @@ void Vision::drawHoughLine(const HoughLine& line, int color)
 #endif
 }
 
-	void Vision::drawVisualLines(const vector<HoughVisualLine>& lines, Gradient& g)
+    void Vision::drawVisualLines(const vector<HoughVisualLine>& lines, Gradient& g)
 {
 #ifdef OFFLINE
     if (true){
@@ -653,9 +632,9 @@ void Vision::drawHoughLine(const HoughLine& line, int color)
         for (line = lines.begin(); line != lines.end(); line++){
             pair<HoughLine, HoughLine> lp = line->getHoughLines();
             VisualLine *vl = new VisualLine(lp.first, lp.second, g);
-			drawLine(vl->getStartpoint(), vl->getEndpoint(), color);
+            drawLine(vl->getStartpoint(), vl->getEndpoint(), color);
             color++;
-			cout << "start: " << vl->getStartpoint() << " end: " << vl->getEndpoint() << endl;
+            cout << "start: " << vl->getStartpoint() << " end: " << vl->getEndpoint() << endl;
         }
     }
 #endif

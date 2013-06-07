@@ -13,32 +13,32 @@
 
 namespace man
 {
-    namespace localization
-    {
+namespace localization
+{
 
-    class MotionSystem
-    {
-    public:
-        // add the coord and head range to the constructor!
-        MotionSystem(float xAndYNoise_, float hNoise_);
-        ~MotionSystem();
+class MotionSystem
+{
+public:
+    // add the coord and head range to the constructor!
+    MotionSystem(float xAndYNoise_, float hNoise_);
+    ~MotionSystem();
 
-        void update(ParticleSet& particles,
-                    const messages::RobotLocation& deltaMotionInfo,
-                    bool lost = false);
+    void update(ParticleSet& particles,
+                const messages::RobotLocation& deltaMotionInfo,
+                bool lost = false);
 
-        void randomlyShiftParticle(Particle* particle);
+    void randomlyShiftParticle(Particle* particle);
 
-        void setFallen(bool fallen);
+    void setFallen(bool fallen);
 
-        void resetNoise(float xyNoise_, float hNoise_);
+    void resetNoise(float xyNoise_, float hNoise_);
 
-        boost::mt19937 rng;
-    private:
-        float xAndYNoise;
-        float hNoise;
+    boost::mt19937 rng;
+private:
+    float xAndYNoise;
+    float hNoise;
 
-        bool robotFallen;
-    };
-    } // namespace localization
+    bool robotFallen;
+};
+} // namespace localization
 } // namespace man

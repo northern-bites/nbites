@@ -47,20 +47,17 @@ protected:
 protected:
     FieldViewerPainter* fieldPainter;
 
-    QHBoxLayout* mainLayout;
+    QVBoxLayout* mainLayout;
     QHBoxLayout* field;
-    QVBoxLayout* checkBoxes;
+    QHBoxLayout* checkBoxes;
+    QHBoxLayout* resizeLayout;
 
     QCheckBox* particleViewBox;
     QCheckBox* locationViewBox;
     QCheckBox* robotFieldViewBox;
 
-    QCheckBox* selector4;
-    QCheckBox* selector5;
-    QCheckBox* selector6;
-    QCheckBox* selector7;
-    QCheckBox* selector8;
-
+    QPushButton* zoomInButton;
+    QPushButton* zoomOutButton;
 
     float scaleFactor;
 
