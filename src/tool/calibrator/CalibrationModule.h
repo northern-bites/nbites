@@ -5,6 +5,9 @@
 #include "RoboGrams.h"
 #include "Camera.h"
 #include "image/ImageDisplayModule.h"
+#include "VisionField.pb.h"
+#include "RobotLocation.pb.h"
+#include "PMotion.pb.h"
 
 // from Man
 #include "vision/Vision.h"
@@ -14,14 +17,21 @@ namespace calibrate {
 
 class CalibrationLineWrapperModule : public portals::Module
 {
+public:
+    CalibrationLineWrapperModule();
+
     portals::InPortal<Camera::Type> cameraIn;
+    portals::InPortal<messages::JointAngles> jointsIn;
+    portals::InPortal<messages::InertialState> inertialIn;
+    portals::InPortal<messages::RobotLocation> locationIn;
+
     portals::OutPortal<messages::CalibrateLines> linesOut;
 
 protected:
     virtual void run_();
 
 private:
-    man::vision::VisionModule vision;
+    man::vision::Vision vision;
 };
 
 class CalibrationModule : public QMainWindow,
@@ -41,11 +51,12 @@ protected:
 private:
     portals::RoboGram subdiagram;
 
-    QImage makeOverlay(Camera::Type which);
+    //QImage makeOverlay(Camera::Type which);
 
 	QTabWidget* imageTabs;
 	Camera::Type currentCamera;
 
+    CalibrationLineWrapperModule linesModule;
 	image::OverlayDisplayModule topDisplay;
     image::OverlayDisplayModule bottomDisplay;
 };

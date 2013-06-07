@@ -11,7 +11,7 @@ FLAGS        = -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)
 EXECUTABLE = tool
 LOC_EXECUTABLE = loc_tool
 VISION_EXECUTABLE = vision_tool
-
+CALIBRATE_EXECUTABLE = calibrate_tool
 
 
 .PHONY: build_tool
@@ -51,6 +51,19 @@ vision: build_vision
 	@echo "Running vision_tool executable."
 	@cd $(BUILD_DIR); \
 	./$(VISION_EXECUTABLE)
+
+.PHONY: build_calibrate
+build_calibrate:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(CALIBRATE_EXECUTABLE)
+
+.PHONY: calibrate
+calibrate: build_calibrate
+	@echo "Running vision_tool executable."
+	@cd $(BUILD_DIR); \
+	./$(CALIBRATE_EXECUTABLE)
 
 .PHONY: config
 config:
