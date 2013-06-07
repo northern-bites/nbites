@@ -36,8 +36,17 @@ void LocalizationModule::update()
     lastOdometry.set_y(curOdometry.y());
     lastOdometry.set_h(curOdometry.h());
 
-    curOdometry.set_x(motionInput.message().x());
-    curOdometry.set_y(motionInput.message().y());
+    // Maybe B-Human has a different coordinate frame for odometry...
+    // This is fucking absurd but I'm going to rotate the x and y by the h...
+    float sinH, cosH;
+    sincosf(motionInput.message().h(), &sinH, &cosH);
+    float rotatedX =   cosH*motionInput.message().x()
+                     + sinH*motionInput.message().y();
+    float rotatedY =   cosH*motionInput.message().y()
+                     - sinH*motionInput.message().x();
+
+    curOdometry.set_x(rotatedX);
+    curOdometry.set_y(rotatedY);
     curOdometry.set_h(motionInput.message().h());
 
     deltaOdometry.set_x(curOdometry.x() - lastOdometry.x());
