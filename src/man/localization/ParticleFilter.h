@@ -101,7 +101,7 @@ public:
     Particle getBestParticle();
 
     bool onDefendingSide() {return (poseEstimate.x() < CENTER_FIELD_X);};
-    bool nearMidField() {return (fabs(poseEstimate.x() - CENTER_FIELD_X) < 50);};
+    bool nearMidField() {return (fabs(poseEstimate.x() - CENTER_FIELD_X) < 10);};
 
     /** Reset Functions **/
 
