@@ -5,7 +5,7 @@ cmake_minimum_required( VERSION 2.8.3 )
 # Make sure we can find the shared files
 set( SHARE_DIR "${NBITES_DIR}/src/share/" )
 set( MAN_DIR "${NBITES_DIR}/src/man" )
-include_directories( ${MAN_DIR})
+include_directories( ${MAN_DIR} )
 
 # So that we can use find_package commands
 set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SHARE_DIR}/cmake/" )
@@ -20,6 +20,7 @@ if( BUILD_PROTOBUF )
 endif()
 
 include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
+
 # Configure the debug options
 configure_file(
   "${SHARE_DIR}/cmake/DebugConfig.in"
@@ -30,6 +31,13 @@ configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/PathConfig.in"
   "${PROJECT_BINARY_DIR}/PathConfig.h"
 )
+
+configure_file(
+  "${MAN_DIR}/cmake/RobotConfig.in"
+  "${PROJECT_BINARY_DIR}/RobotConfig.h"
+)
+
+
 include_directories( ${PROJECT_BINARY_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR} )
 
@@ -66,39 +74,128 @@ include_directories( ${MAN_DIR}/support )
 add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
 
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
+add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
 
 # Actual subdirectories!
+add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
 add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
-add_subdirectory( viewer )
+add_subdirectory( vision_offline )
+add_subdirectory( fieldview )
 add_subdirectory( common )
+add_subdirectory( worldview )
 
 
-# Sources
+## SOURCES ##
+
+# QTool Sources
 set( tool_srcs main.cpp
-  Tool.cpp
   ToolDiagram.cpp
   DataSelector.cpp
+  Tool.cpp
+  ${MAN_DIR}/DiagramThread.cpp
   )
 
 set( tool_headers
-  Tool.h
   ToolDiagram.h
   DataSelector.h
+
+  Tool.h
 )
 
-# Qt4 goodness
-Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
+# LocTool Sources
+set( loc_srcs loc_main.cpp
+  EmptyTool.cpp
+  ToolDiagram.cpp
+  DataSelector.cpp
 
-# The main executable
-add_executable( ${TOOL_EXECUTABLE}
+  LocTool.cpp
+  )
+
+set( loc_headers
+  EmptyTool.h
+  ToolDiagram.h
+  DataSelector.h
+
+  LocTool.h
+)
+
+# VisionTool Sources
+set( vision_srcs vision_main.cpp
+  EmptyTool.cpp
+  ToolDiagram.cpp
+  DataSelector.cpp
+
+  VisionTool.cpp
+  )
+
+set( vision_headers
+  EmptyTool.h
+  ToolDiagram.h
+  DataSelector.h
+
+  VisionTool.h
+)
+
+
+# Qt4 goodness (aka moc the headers)
+Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
+Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
+Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
+
+
+## EXECUTABLES ##
+
+# The QTool executable
+add_executable( tool
   ${tool_srcs}
   ${tool_headers_moc} )
 
 target_link_libraries(
-  ${TOOL_EXECUTABLE}
+  tool
+  portals
+  messages
+  unlog
+  logview
+  image_display
+  image # man image
+  vision # man vision
+  comm # man comm
+  fieldview
+  tool_common
+  colorcreator
+  vision_offline
+  worldview
+  ${QT_LIBRARIES}
+  )
+
+# The LocTool executable
+add_executable( loc_tool
+  ${loc_srcs}
+  ${loc_headers_moc} )
+
+target_link_libraries(
+  loc_tool
+  portals
+  messages
+  unlog
+  image_display
+  logview
+  fieldview
+  tool_common
+  worldview
+  ${QT_LIBRARIES}
+  )
+
+# The VisionTool executable
+add_executable( vision_tool
+  ${vision_srcs}
+  ${vision_headers_moc} )
+
+target_link_libraries(
+  vision_tool
   portals
   messages
   unlog
@@ -106,8 +203,10 @@ target_link_libraries(
   image_display
   image # man image
   image_display
-  viewer
+  fieldview
+  image_display
   tool_common
   colorcreator
+  vision_offline
   ${QT_LIBRARIES}
   )

@@ -46,6 +46,9 @@ public:
     portals::OutPortal<messages::VisionRobot> vision_robot;
     portals::OutPortal<messages::VisionObstacle> vision_obstacle;
 
+	portals::OutPortal<messages::ThresholdImage> topOutPic;
+	portals::OutPortal<messages::ThresholdImage> botOutPic;
+
 protected:
     virtual void run_();
     boost::shared_ptr<Vision> vision;
