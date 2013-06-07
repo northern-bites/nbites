@@ -1,5 +1,7 @@
 #include "ParticleFilter.h"
 
+#include "DebugConfig.h"
+
 namespace man {
 namespace localization {
 
@@ -139,64 +141,14 @@ float ParticleFilter::getMagnitudeError()
     return errorMagnitude;
 }
 
-// /**
-//  * @brief  Calculate the standard deviation of the particle swarm
-//  *         NOTE: Best measure of a particle filters uncertainty
-//  */
-//  std::vector<float> ParticleFilter::findParticleSD()
-//  {
-//      man::localization::ParticleSet particles = this->getParticles();
-
-//      std::vector<float> sd(3, 0.0f);
-//      float mean_x = 0.0f, mean_y = 0.0f, mean_h = 0.0f;
-//      man::localization::ParticleIt iter;
-//      for(iter = particles.begin(); iter != particles.end(); ++iter)
-//      {
-//          mean_x += (*iter).getLocation().x();
-//          mean_y += (*iter).getLocation().y();
-//          mean_h += (*iter).getLocation().h();
-//      }
-
-//      if(parameters.numParticles == 0)
-//      {
-//          std::cout << "Invalid number of particles!" << std::endl;
-//          return sd;
-//      }
-
-//      mean_x /= parameters.numParticles;
-//      mean_y /= parameters.numParticles;
-//      mean_h /= parameters.numParticles;
-
-//      // Calculate the standard deviation:
-//      // \sigma_x = \sqrt{\frac{1}{N}\sum_{i=0}^{N-1}(x_i - \bar{x})^2}
-//      // where x_i stands for either the x, y, or heading of
-//      // the ith particle.
-//      for(iter = particles.begin(); iter != particles.end(); ++iter)
-//      {
-//          sd[0] += NBMath::square((*iter).getLocation().x() - mean_x);
-//          sd[1] += NBMath::square((*iter).getLocation().y() - mean_y);
-//          sd[2] += NBMath::square((*iter).getLocation().h() - mean_h);
-//      }
-
-//      sd[0] /= parameters.numParticles;
-//      sd[1] /= parameters.numParticles;
-//      sd[2] /= parameters.numParticles;
-
-//      // Convert variances into standard deviations.
-//      sd[0] = std::sqrt(sd[0]);
-//      sd[1] = std::sqrt(sd[1]);
-//      sd[2] = std::sqrt(sd[2]);
-
-//      return sd;
-//  }
-
 /*
  * @brief The following are all of the resetLoc functions
  */
 void ParticleFilter::resetLoc()
 {
-    //std::cout << "WTF: LOC IS RESETTING! 1" << std::endl;
-
+#ifdef DEBUG_LOC
+    std::cout << "WTF: LOC IS RESETTING!" << std::endl;
+#endif
     // Clear the existing particles.
     particles.clear();
 
@@ -235,7 +187,10 @@ void ParticleFilter::resetLoc()
 void ParticleFilter::resetLocTo(float x, float y, float h,
                                 LocNormalParams params)
 {
-    //std::cout << "WTF: LOC IS RESETTING! 2" << std::endl;
+#ifdef DEBUG_LOC
+    std::cout << "WTF: LOC IS RESETTING to a pose!" << std::endl;
+#endif
+
     // HACK HACK HACK - If told to reset to negative x,y,h then flip
     if (x<0 && y<0 && h<0)
     {
@@ -286,7 +241,10 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
                                 LocNormalParams params1,
                                 LocNormalParams params2)
 {
-    //std::cout << "WTF: LOC IS RESETTING! 3" << std::endl;
+#ifdef DEBUG_LOC
+    std::cout << "WTF: LOC IS RESETTING to two locations!" << std::endl;
+#endif
+
     // Reset the estimates.
     poseEstimate.set_x(x);
     poseEstimate.set_y(y);
@@ -323,7 +281,9 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
 
 void ParticleFilter::resetLocToSide(bool blueSide)
 {
-    //std::cout << "WTF: LOC IS RESETTING! 1" << std::endl;
+#ifdef DEBUG_LOC
+    std::cout << "WTF: LOC IS RESETTING to a SIDE!" << std::endl;
+#endif
     // Clear the existing particles.
     particles.clear();
 
@@ -416,7 +376,9 @@ void ParticleFilter::resample()
             numReconParticlesAdded++;
         }
 
-        //std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
+#ifdef DEBUG_LOC
+        std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
+#endif
     }
 
     // Sample numParticles particles with replacement according to the
