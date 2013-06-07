@@ -15,6 +15,7 @@ ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
 void ThresholdedImageDisplayModule::run_()
 {
     imageIn.latch();
+
     // Note that you have to pass a label a QPixmap, but you can't really edit
     // the pixels of a pixmap, so you have to edit a QImage then make a
     // pixmap from it. *rolls eyes*
@@ -50,7 +51,6 @@ QImage ThresholdedImageDisplayModule::makeImage(byte filter_)
             }
 
             if (threshColor == 0) threshColor = Color_RGB[0];
-
             bitmapLine[i] = threshColor;
         }
     }
@@ -191,9 +191,9 @@ void ImageDisplayListener::mouseReleaseEvent ( QMouseEvent * event )
 
     int mouseX = event->x();
     int mouseY = event->y();
-
+    
     emit mouseClicked((int)((float)mouseX),
-					  (int)((float)mouseY), brushSize, left);
+                      (int)((float)mouseY), brushSize, left);
 }
 
 void ImageDisplayListener::wheelEvent(QWheelEvent* event) {

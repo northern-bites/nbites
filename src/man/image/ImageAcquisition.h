@@ -2,6 +2,7 @@
 #define _IMAGE_ACQUISITION_H_
 
 #include <stdint.h>
+#include <iostream>
 
 class ColorParams;
 extern "C" int _acquire_image(uint8_t *table, ColorParams *params,
