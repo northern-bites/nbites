@@ -12,6 +12,7 @@
 #include "CommDef.h"
 
 #include "DebugConfig.h"
+#include "Profiler.h"
 
 namespace man {
 
@@ -112,6 +113,9 @@ void TeamConnect::send(const messages::WorldModel& model,
 #endif
         return;
     }
+
+PROF_ENTER(P_COMM_BUILD_PACKET);
+
     portals::Message<messages::TeamPacket> teamMessage(0);
 
     messages::TeamPacket* packet = teamMessage.get();
@@ -123,13 +127,19 @@ void TeamConnect::send(const messages::WorldModel& model,
     packet->set_header(UNIQUE_ID);
     packet->set_timestamp(timer->timestamp());
 
+PROF_EXIT(P_COMM_BUILD_PACKET);
+
+PROF_ENTER(P_COMM_SERIALIZE_PACKET);
     char datagram[packet->ByteSize()];
     packet->SerializeToArray(&datagram[0], packet->GetCachedSize());
+PROF_EXIT(P_COMM_SERIALIZE_PACKET);
 
+PROF_ENTER(P_COMM_TO_SOCKET);
     for (int i = 0; i < burst; ++i)
     {
         socket->sendToTarget(&datagram[0], packet->GetCachedSize());
     }
+PROF_EXIT(P_COMM_TO_SOCKET);
 }
 
 void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],

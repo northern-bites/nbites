@@ -31,15 +31,10 @@ void CommTimer::teamPacketSent()
     // once per frame on average, while providing significant randomization.
     // We could send duplicates or skip frames with this method, but we will
     // not send more than one duplicate or skip more than one frame in a row.
-    // NOTE: Since rand() generates a value between 0 and some undefined
-    //       large maximum (at least 32767), to get a truly random distribution,
-    //       we generate random numbers until we get one less than 33,333.
 
     int random;
-    do
-    {
-        random = rand();
-    } while (random > 33333); // Ensure nextSendTime doesn't exceed 50,000
+    random = rand() / RAND_MAX * 33333;
+
     nextSendTime += random + 16667;
 }
 
