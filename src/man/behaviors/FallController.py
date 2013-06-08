@@ -24,6 +24,7 @@ class FallController():
             self.falling = True
             self.brain.player.gainsOff()
             self.brain.player.switchTo('fallen')
+            self.brain.player.tracker.stopHeadMoves()
 
         # Check if we have fallen.
         # HACK Guardian's `fallen` is not actually on the ground
