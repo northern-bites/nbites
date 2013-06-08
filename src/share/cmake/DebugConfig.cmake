@@ -10,6 +10,14 @@
 #
 
 option(
+  USING_LAB_FIELD
+  "Turn on if we are in the lab and not on a full-size field"
+  OFF
+)
+
+if( NOT OFFLINE )
+
+option(
   DEBUG_COMM
   "Toggle comm debug mode."
   OFF
@@ -18,6 +26,12 @@ option(
 option(
   DEBUG_BALLTRACK
   "Toggle balltrack debug mode."
+  OFF
+)
+
+option(
+  DEBUG_LOC
+  "Toggle localization debug mode."
   OFF
 )
 
@@ -118,3 +132,5 @@ else(USE_LOGGING)
   unset(LOG_OBSERVATIONS CACHE)
   unset(LOG_ODOMETRY CACHE)
 endif(USE_LOGGING)
+
+endif( NOT_OFFLINE )
