@@ -62,6 +62,7 @@ protected:
     void updateVisionBall();
     void updateVisionRobot();
     void updateVisionObstacle();
+    int frameCounter;
 };
 
 void updateRobot(messages::Robot* bot_message, VisualRobot* visualRobot);

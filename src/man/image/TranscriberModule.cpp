@@ -452,12 +452,16 @@ messages::YUVImage ImageTranscriber::getNextImage()
 TranscriberModule::TranscriberModule(ImageTranscriber& trans)
     : imageOut(base()), it(trans)
 {
+    frameCounter = 0;
 }
 
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
+    frameCounter++; 
+
     messages::YUVImage image = it.getNextImage();
+    image.setFC(frameCounter);
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);
 }

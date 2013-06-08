@@ -9,6 +9,7 @@ message VisionField
         repeated VisualLine visual_line = 5;
         optional VisualDetection visual_cross = 6;
         optional VisualFieldEdge visual_field_edge = 7;
+        optional float frame_count = 8;
 }
 
 message Point

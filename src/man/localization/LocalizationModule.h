@@ -63,6 +63,7 @@ namespace man
         messages::RobotLocation lastOdometry;
         messages::RobotLocation curOdometry;
         messages::RobotLocation deltaOdometry;
+        int frameCounter;
     };
     } // namespace localization
 } // namespace man

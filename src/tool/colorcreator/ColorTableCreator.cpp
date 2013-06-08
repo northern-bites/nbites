@@ -149,10 +149,15 @@ void ColorTableCreator::run_()
     bottomImageIn.latch();
     topImageIn.latch();
 
+    messages::YUVImage botIn = bottomImageIn.message();
+    messages::YUVImage topIn = topImageIn.message();
+
+    std::cout << "Image counter: " << topIn.getFC() << "\n";
+
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
-                               &bottomImageIn.message()));
+                               &botIn));
     topImage.setMessage(portals::Message<messages::YUVImage>(
-                            &topImageIn.message()));
+                            &topIn));
 
     updateThresholdedImage();
 }

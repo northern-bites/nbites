@@ -60,6 +60,8 @@ namespace man
         portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                              getCurrentEstimate());
 
+        locMessage.get()->set_frame_count(frameCounter);
+
 #ifdef LOG_LOCALIZATION
         portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                                getCurrentSwarm());
@@ -71,6 +73,8 @@ namespace man
 
     void LocalizationModule::run_()
     {
+        frameCounter++;
+
         PROF_ENTER(P_SELF_LOC);
         update();
         PROF_EXIT(P_SELF_LOC);

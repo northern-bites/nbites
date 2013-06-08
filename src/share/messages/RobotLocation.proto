@@ -6,4 +6,5 @@ message RobotLocation
     optional float y = 2;
     optional float h = 3;
     optional int64 timestamp = 4;
+    optional float frame_count = 5;
 }

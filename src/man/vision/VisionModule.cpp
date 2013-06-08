@@ -33,6 +33,7 @@ VisionModule::VisionModule() : Module(),
 
 VisionModule::~VisionModule()
 {
+    frameCounter = 0;
 }
 
 
@@ -50,6 +51,8 @@ void VisionModule::run_()
     inertial_state.latch();
 
     PROF_ENTER(P_VISION);
+
+    frameCounter++;
 
     vision->notifyImage(topThrImage.message(), topYImage.message(),
                         topUImage.message(), topVImage.message(),
@@ -106,6 +109,7 @@ void VisionModule::updateVisionBall() {
     ball_data.get()->set_heat(vision->ball->getHeat());
     ball_data.get()->set_on(vision->ball->isOn());
     ball_data.get()->set_confidence(vision->ball->getConfidence());
+    ball_data.get()->set_frame_count(frameCounter);
 
     vision_ball.setMessage(ball_data);
 }
@@ -324,6 +328,7 @@ void VisionModule::updateVisionField() {
         field_point->set_y((**i).getFieldY());
     }
 
+    field_data.get()->set_frame_count(frameCounter);
     vision_field.setMessage(field_data);
 }
 

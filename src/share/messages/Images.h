@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <string>
 #include <inttypes.h>
+#include <iostream>
 
 // A primary challenge in designing image classes is that the need to support very efficient
 // pixel operations is at odds with a desire to have an elegant, modular, polymorphic set of
@@ -133,7 +134,9 @@ public:
   //          does nothing, so that destroying an object via a pointer or reference to this
   //          base class invokes the correct overriding destructor.
 
-  int width () const { return width_ ;}
+
+  int width () const {
+      return width_ ;}
   int height() const { return height_;}
   // returns  Size of this image
 
@@ -310,13 +313,15 @@ protected:
   // effect   Let the owner know that the buffer is no longer needed.
   // note     Not yet clear what to do here.
 
-  virtual void* address() { return pixels_;}
+  virtual void* address() {
+                            return pixels_;}
   // returns  The address of the first pixel
 
 public:
   VideoPixelBuffer(void* pixels) { pixels_ = pixels;}
   // effect   Construct a video pixel buffer at the specified address
   // note     See above requirements and note for HeapPixelBuffer's constructor.
+  //
 };
 
 // *******************
@@ -466,7 +471,8 @@ public:
   //          releasing any pixels currently being shared.
   // note     Executes in small constant time
 
-  T* pixelAddress(int x, int y) const { return pixels_ + y * rowPitch() + x * pixelPitch();}
+  T* pixelAddress(int x, int y) const { 
+      return pixels_ + y * rowPitch() + x * pixelPitch();}
   // returns  A pointer to the specified pixel.
   // note     You are welcome to get a pointer to a non-existent pixel, just be careful about how
   //          you use it.
@@ -721,26 +727,31 @@ typedef PackedImage<uint16_t> PackedImage16;
 
 class YUVImage : public PackedImage8
 {
-  YUVImage(const PackedImage8& img) : PackedImage8(img) {}
+  YUVImage(const PackedImage8& img) : PackedImage8(img) {frameCount = 1234;}
   // effect   Construct a copy of a PackedImage8
   // requires width is a multiple of 4
   // note     A helper function for this class, the public is not allowed to use it.
+  
+  int frameCount;
 
 public:
   YUVImage() {}
   // effect   Default construct null image
 
-  YUVImage(int wd, int ht) : PackedImage8(wd & ~3, ht) {}
+  YUVImage(int wd, int ht) : PackedImage8(wd & ~3, ht) {frameCount = 1234;}
   // effect   Construct new (not yet shared) image on heap of specified size. The width is forced
   //          to be a multiple of 4 by truncation.
 
-  YUVImage(unsigned char* pixels, int wd, int ht, int rowPitch) : PackedImage8(pixels, wd & ~3, ht, rowPitch) {}
+  YUVImage(unsigned char* pixels, int wd, int ht, int rowPitch) : PackedImage8(pixels, wd & ~3, ht, rowPitch) {frameCount = 1234;}
   // effect   Construct new image at specified address in memory, of specified size and pitch.The
   //          width is forced to be a multiple of 4 by truncation. 
 
-  YUVImage(PixelBuffer* buf, int wd, int ht, int rowPitch) : PackedImage8(buf, wd & ~3, ht, rowPitch) {}
+  YUVImage(PixelBuffer* buf, int wd, int ht, int rowPitch) : PackedImage8(buf, wd & ~3, ht, rowPitch) {frameCount = 1234;}
   // effect   Construct new image at specified address in memory, of specified size and pitch.The
   //          width is forced to be a multiple of 4 by truncation. 
+
+  void setFC(int fc) { frameCount = fc; }
+  int getFC() { return frameCount; }
 
   MemoryImage8 yImage() const;
   MemoryImage8 uImage() const;
