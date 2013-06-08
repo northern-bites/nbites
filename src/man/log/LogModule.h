@@ -347,7 +347,6 @@ protected:
         bytesWritten += size;
 
         // We write width and height as well as size for clarity on unlogging side
-        writeSize(msg.getFC());
         writeSize(size);
         writeSize(msg.width());
         writeSize(msg.height());

@@ -68,7 +68,6 @@ protected:
     messages::RobotLocation lastOdometry;
     messages::RobotLocation curOdometry;
     messages::RobotLocation deltaOdometry;
-    int frameCounter;
-    };
-    } // namespace localization
-    } // namespace man
+};
+} // namespace localization
+} // namespace man

@@ -8,5 +8,4 @@ message RobotLocation
     optional float h = 3;
     optional int64 timestamp = 4;
     optional float uncert = 5;
-    optional float frame_count = 6;
 }

@@ -110,7 +110,6 @@ public :
     portals::OutPortal<messages::YUVImage> imageOut;
 protected :
     virtual void run_();
-    int frameCounter;
 private :
     ImageTranscriber& it;
 };

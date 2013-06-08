@@ -85,7 +85,6 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
 
     // Read in the next message's size
     // @see LogModule.h for why this works
-    int fc = readValue<uint32_t>();
     int size = readValue<uint32_t>();
     int width = readValue<uint32_t>();
     int height = readValue<uint32_t>();
@@ -105,7 +104,6 @@ messages::YUVImage UnlogModule<messages::YUVImage>::readNextMessage()
     // To hold the data read, and the number of bytes read
     uint32_t bytes;
     messages::YUVImage* img = new messages::YUVImage(width, height);
-    img->setFC(fc);
 
     try {
         // Actual file reading call

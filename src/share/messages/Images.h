@@ -727,31 +727,26 @@ typedef PackedImage<uint16_t> PackedImage16;
 
 class YUVImage : public PackedImage8
 {
-  YUVImage(const PackedImage8& img) : PackedImage8(img) {frameCount = 1234;}
+  YUVImage(const PackedImage8& img) : PackedImage8(img) {}
   // effect   Construct a copy of a PackedImage8
   // requires width is a multiple of 4
   // note     A helper function for this class, the public is not allowed to use it.
-  
-  int frameCount;
 
 public:
   YUVImage() {}
   // effect   Default construct null image
 
-  YUVImage(int wd, int ht) : PackedImage8(wd & ~3, ht) {frameCount = 1234;}
+  YUVImage(int wd, int ht) : PackedImage8(wd & ~3, ht) {}
   // effect   Construct new (not yet shared) image on heap of specified size. The width is forced
   //          to be a multiple of 4 by truncation.
 
-  YUVImage(unsigned char* pixels, int wd, int ht, int rowPitch) : PackedImage8(pixels, wd & ~3, ht, rowPitch) {frameCount = 1234;}
+  YUVImage(unsigned char* pixels, int wd, int ht, int rowPitch) : PackedImage8(pixels, wd & ~3, ht, rowPitch) {}
   // effect   Construct new image at specified address in memory, of specified size and pitch.The
   //          width is forced to be a multiple of 4 by truncation. 
 
-  YUVImage(PixelBuffer* buf, int wd, int ht, int rowPitch) : PackedImage8(buf, wd & ~3, ht, rowPitch) {frameCount = 1234;}
+  YUVImage(PixelBuffer* buf, int wd, int ht, int rowPitch) : PackedImage8(buf, wd & ~3, ht, rowPitch) {}
   // effect   Construct new image at specified address in memory, of specified size and pitch.The
   //          width is forced to be a multiple of 4 by truncation. 
-
-  void setFC(int fc) { frameCount = fc; }
-  int getFC() { return frameCount; }
 
   MemoryImage8 yImage() const;
   MemoryImage8 uImage() const;
