@@ -13,7 +13,16 @@ CalibrationTool::CalibrationTool(const char* title) : EmptyTool(title),
 
 void CalibrationTool::setUpModules()
 {
-    // set up stuff
+    diagram.connectToUnlogger<messages::YUVImage>(*calibrator.topImageIn,
+                                                  "top");
+    diagram.connectToUnlogger<messages::YUVImage>(*calibrator.bottomImageIn,
+                                                  "bottom");
+
+    diagram.connectToUnlogger<messages::JointAngles>(calibrator.jointsIn,
+                                                     "joints");
+    diagram.connectToUnlogger<messages::InertialState>(calibrator.inertialIn);
+
+    diagram.addModule(calibrator);
 
     diagram.runForward();
 }

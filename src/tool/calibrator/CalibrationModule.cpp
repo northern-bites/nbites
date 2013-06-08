@@ -6,6 +6,8 @@ namespace calibrate {
 
 CalibrationModule::CalibrationModule(QWidget *parent) :
     QMainWindow(parent),
+    topImageIn(0),
+    bottomImageIn(0),
     central(this),
     goalie("Goalie Postition", this),
     center("Center Field Position", this),
@@ -16,6 +18,12 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
 {
     images.addTab(&topImage, "TOP");
     images.addTab(&bottomImage, "BOTTOM");
+
+    topImageIn = &topImage.imageIn;
+    bottomImageIn = &bottomImage.imageIn;
+
+    connect(&images, SIGNAL(currentChanged(int)),
+            this, SLOT(imageTabSwitched(int)));
 
     layout.addWidget(&images, 0, 0, 4, 1);
     layout.addWidget(&goalie, 0, 1);
@@ -34,12 +42,29 @@ void CalibrationModule::run_()
     jointsIn.latch();
     inertialIn.latch();
 
+    currentX = FIELD_WHITE_LEFT_SIDELINE_X;
+    currentY = CENTER_FIELD_Y;
+    currentH = HEADING_RIGHT;
+
     LineVector lines = vision.getExpectedLines(currentCamera,
                                                jointsIn.message(),
                                                inertialIn.message(),
                                                currentX,
                                                currentY,
                                                currentH);
+
+    if (currentCamera == Camera::TOP)
+    {
+        topImage.setOverlay(makeOverlay(lines));
+        topImage.run();
+        std::cout << "Running TOP" << std::endl;
+    }
+    else
+    {
+        bottomImage.setOverlay(makeOverlay(lines));
+        bottomImage.run();
+        std::cout << "Running BOTTOM" << std::endl;
+    }
 }
 
 void CalibrationModule::imageTabSwitched(int i)
@@ -64,10 +89,10 @@ QImage CalibrationModule::makeOverlay(LineVector expected)
     for(LineVector::iterator i = expected.begin();
         i != expected.end(); i++)
     {
-        painter.drawLine(lines->top_expected_line(i).start_x(),
-                         lines->top_expected_line(i).start_y(),
-                         lines->top_expected_line(i).end_x(),
-                         lines->top_expected_line(i).end_y());
+        painter.drawLine((*i)->getStartpoint().x,
+                         (*i)->getStartpoint().y,
+                         (*i)->getEndpoint().x,
+                         (*i)->getEndpoint().y);
     }
 
     return lineImage;

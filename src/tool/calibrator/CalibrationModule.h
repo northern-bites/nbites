@@ -11,11 +11,12 @@
 
 // from Man
 #include "vision/Vision.h"
+#include "FieldConstants.h"
 
 namespace tool {
 namespace calibrate {
 
-typedef std::vector<boost::shared_ptr<man::vision::VisualLines> > LineVector;
+typedef std::vector<boost::shared_ptr<man::vision::VisualLine> > LineVector;
 
 class CalibrationModule : public QMainWindow,
                           public portals::Module
@@ -27,8 +28,8 @@ public:
 
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::InertialState> inertialIn;
-    portals::InPortal<messages::YUVImage> topImageIn;
-    portals::InPortal<messages::YUVImage> bottomImageIn;
+    portals::InPortal<messages::YUVImage>* topImageIn;
+    portals::InPortal<messages::YUVImage>* bottomImageIn;
 
 protected:
     virtual void run_();
