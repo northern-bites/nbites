@@ -41,6 +41,7 @@ protected slots:
     void useNewYValue(int value);
     void useNewHValue(int value);
     void loadRobotParameters();
+    void updateParameters();
 
 protected:
     virtual void run_();
@@ -55,7 +56,9 @@ private:
 
 	Camera::Type currentCamera;
     int currentX, currentY, currentH;
+    float backupPitch, backupRoll;
 
+    QLabel position, parameters;
     QRadioButton goalie, center, other;
     QSpinBox setX, setY, setH;
     QLabel xLabel, yLabel, hLabel;

@@ -13,6 +13,8 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     currentX(FIELD_WHITE_LEFT_SIDELINE_X),
     currentY(CENTER_FIELD_Y),
     currentH(HEADING_RIGHT),
+    position(tr("Robot Postition Controls")),
+    parameters(tr("Parameter Controls")),
     goalie("Goalie Postition", this),
     center("Center Field Position", this),
     other("Other Position", this),
@@ -37,18 +39,19 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     bottomImageIn = &bottomImage.imageIn;
 
     //image tabs
-    layout.addWidget(&images, 0, 0, 8, 1);
+    layout.addWidget(&images, 0, 0, 15, 1);
 
     // position control
-    layout.addWidget(&goalie, 0, 1);
-    layout.addWidget(&center, 1, 1);
-    layout.addWidget(&other, 2, 1, 3, 1);
-    layout.addWidget(&setX, 2, 2);
-    layout.addWidget(&xLabel, 2, 3);
-    layout.addWidget(&setY, 3, 2);
-    layout.addWidget(&yLabel, 3, 3);
-    layout.addWidget(&setH, 4, 2);
-    layout.addWidget(&hLabel, 4, 3);
+    layout.addWidget(&position, 0, 1);
+    layout.addWidget(&goalie, 1, 1);
+    layout.addWidget(&center, 2, 1);
+    layout.addWidget(&other, 3, 1, 3, 1);
+    layout.addWidget(&setX, 3, 2);
+    layout.addWidget(&xLabel, 3, 3);
+    layout.addWidget(&setY, 4, 2);
+    layout.addWidget(&yLabel, 4, 3);
+    layout.addWidget(&setH, 5, 2);
+    layout.addWidget(&hLabel, 5, 3);
 
     goalie.setChecked(true);
     turnOffOtherPosition();
@@ -61,14 +64,15 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
                   HEADING_LEFT);
 
     // roll/pitch correction control
-    layout.addWidget(&rollBox, 5, 1);
-    layout.addWidget(&rollLabel, 5, 2);
-    layout.addWidget(&pitchBox, 6, 1);
-    layout.addWidget(&pitchLabel, 6, 2);
+    layout.addWidget(&parameters, 6, 1);
+    layout.addWidget(&rollBox, 7, 1);
+    layout.addWidget(&rollLabel, 7, 2);
+    layout.addWidget(&pitchBox, 8, 1);
+    layout.addWidget(&pitchLabel, 8, 2);
 
     // robot selection
-    layout.addWidget(&loadButton, 7, 1);
-    layout.addWidget(&robotNames, 7, 2);
+    layout.addWidget(&loadButton, 9, 1);
+    layout.addWidget(&robotNames, 9, 2);
 
     robotNames.addItem("");
     robotNames.addItem("river");
@@ -99,6 +103,10 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
             this, SLOT(switchCamera()));
     connect(&loadButton, SIGNAL(clicked(bool)),
             this, SLOT(loadRobotParameters()));
+    connect(&pitchBox, SIGNAL(valueChanged(double)),
+            this, SLOT(updateParameters()));
+    connect(&rollBox, SIGNAL(valueChanged(double)),
+            this, SLOT(updateParameters()));
 }
 
 void CalibrationModule::switchCamera()
@@ -111,6 +119,17 @@ void CalibrationModule::switchCamera()
     {
         currentCamera = Camera::BOTTOM;
     }
+
+    float tmpPitch, tmpRoll;
+
+    tmpPitch = pitchBox.value();
+    tmpRoll = rollBox.value();
+
+    pitchBox.setValue(backupPitch);
+    rollBox.setValue(backupRoll);
+
+    backupPitch = tmpPitch;
+    backupRoll = tmpRoll;
 
     updateOverlay();
 }
@@ -186,11 +205,36 @@ void CalibrationModule::loadRobotParameters()
     std::string name = robotNames.currentText().toStdString();
     CameraCalibrate::UpdateByName(name);
 
-    std::cout << "Loading parameters for " << name << std::endl;
+    std::cout << "Loaded parameters for " << name << "!" << std::endl;
 
     float* params = CameraCalibrate::getCurrentParameters(currentCamera);
     rollBox.setValue(params[CameraCalibrate::ROLL]);
     pitchBox.setValue(params[CameraCalibrate::PITCH]);
+
+    updateOverlay();
+}
+
+void CalibrationModule::updateParameters()
+{
+    float paramsTop[CameraCalibrate::NUM_PARAMS];
+    float paramsBottom[CameraCalibrate::NUM_PARAMS];
+
+    if (currentCamera == Camera::TOP)
+    {
+        paramsTop[CameraCalibrate::ROLL] = rollBox.value();
+        paramsTop[CameraCalibrate::PITCH] = pitchBox.value();
+        paramsBottom[CameraCalibrate::ROLL] = backupRoll;
+        paramsBottom[CameraCalibrate::PITCH] = backupPitch;
+    }
+    else
+    {
+        paramsBottom[CameraCalibrate::ROLL] = rollBox.value();
+        paramsBottom[CameraCalibrate::PITCH] = pitchBox.value();
+        paramsTop[CameraCalibrate::ROLL] = backupRoll;
+        paramsTop[CameraCalibrate::PITCH] = backupPitch;
+    }
+
+    CameraCalibrate::UpdateWithParams(paramsTop, paramsBottom);
 
     updateOverlay();
 }
