@@ -5,6 +5,10 @@ namespace man
 {
 namespace localization
 {
+static const float ODOMETRY_HEADING_FRICTION_FACTOR = 2.5;
+static const float ODOMETRY_X_FRICTION_FACTOR = 1.12;
+static const float ODOMETRY_Y_FRICTION_FACTOR = 1;
+
 LocalizationModule::LocalizationModule()
     : portals::Module(),
       output(base()),
@@ -45,9 +49,9 @@ void LocalizationModule::update()
     float rotatedY =   cosH*motionInput.message().y()
                      - sinH*motionInput.message().x();
 
-    curOdometry.set_x(rotatedX);
-    curOdometry.set_y(rotatedY);
-    curOdometry.set_h(motionInput.message().h());
+    curOdometry.set_x(rotatedX * ODOMETRY_X_FRICTION_FACTOR);
+    curOdometry.set_y(rotatedY * ODOMETRY_Y_FRICTION_FACTOR);
+    curOdometry.set_h(motionInput.message().h() * ODOMETRY_HEADING_FRICTION_FACTOR);
 
     deltaOdometry.set_x(curOdometry.x() - lastOdometry.x());
     deltaOdometry.set_y(curOdometry.y() - lastOdometry.y());
