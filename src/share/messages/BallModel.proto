@@ -50,4 +50,3 @@ message FilteredBall
 	optional float speed = 18;
 	optional float rel_y_intersect_dest = 19;
 }
-

@@ -317,7 +317,6 @@ public:
   VideoPixelBuffer(void* pixels) { pixels_ = pixels;}
   // effect   Construct a video pixel buffer at the specified address
   // note     See above requirements and note for HeapPixelBuffer's constructor.
-  //
 };
 
 // *******************
