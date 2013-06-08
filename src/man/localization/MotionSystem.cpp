@@ -26,6 +26,13 @@ void MotionSystem::update(ParticleSet& particles,
                           const messages::RobotLocation& deltaMotionInfo,
                           bool lost)
 {
+    if((fabs(deltaMotionInfo.x()) > 3.f) || (fabs(deltaMotionInfo.y()) > 3.f)) {
+        std::cout << "LOCALIZATION WARNING:\t Sanity check missed an unhelpful odometry frame\n"
+                  << "( Delta X , Delta Y ):\t(" << deltaMotionInfo.x() << " , " << deltaMotionInfo.y()
+                  << ")" << std::endl << std::endl;
+    }
+
+
     ParticleIt iter;
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
