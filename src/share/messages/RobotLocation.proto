@@ -9,3 +9,4 @@ message RobotLocation
     optional int64 timestamp = 4;
     optional float uncert = 5;
 }
+

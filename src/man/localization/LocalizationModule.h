@@ -65,6 +65,7 @@ protected:
     ParticleFilter * particleFilter;
     long long lastReset;
 
+    // Previous information
     messages::RobotLocation lastOdometry;
     messages::RobotLocation curOdometry;
     messages::RobotLocation deltaOdometry;

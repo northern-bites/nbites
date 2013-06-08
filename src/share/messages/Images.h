@@ -9,7 +9,6 @@
 #include <assert.h>
 #include <string>
 #include <inttypes.h>
-#include <iostream>
 
 // A primary challenge in designing image classes is that the need to support very efficient
 // pixel operations is at odds with a desire to have an elegant, modular, polymorphic set of
@@ -134,9 +133,7 @@ public:
   //          does nothing, so that destroying an object via a pointer or reference to this
   //          base class invokes the correct overriding destructor.
 
-
-  int width () const {
-      return width_ ;}
+  int width () const { return width_ ;}
   int height() const { return height_;}
   // returns  Size of this image
 
@@ -313,8 +310,7 @@ protected:
   // effect   Let the owner know that the buffer is no longer needed.
   // note     Not yet clear what to do here.
 
-  virtual void* address() {
-                            return pixels_;}
+  virtual void* address() { return pixels_;}
   // returns  The address of the first pixel
 
 public:
@@ -471,8 +467,7 @@ public:
   //          releasing any pixels currently being shared.
   // note     Executes in small constant time
 
-  T* pixelAddress(int x, int y) const { 
-      return pixels_ + y * rowPitch() + x * pixelPitch();}
+  T* pixelAddress(int x, int y) const { return pixels_ + y * rowPitch() + x * pixelPitch();}
   // returns  A pointer to the specified pixel.
   // note     You are welcome to get a pointer to a non-existent pixel, just be careful about how
   //          you use it.

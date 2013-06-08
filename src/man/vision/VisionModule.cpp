@@ -35,9 +35,7 @@ VisionModule::VisionModule() : Module(),
 
 VisionModule::~VisionModule()
 {
-    frameCounter = 0;
 }
-
 
 void VisionModule::run_()
 {

@@ -51,7 +51,7 @@ public:
      * images are taken at 30 hz, but by passing joint angles thru vision we 
      * get joint angles at 30 hz. */
 #ifdef LOG_VISION
-	portals::OutPortal<messages::JointAngles> joint_angles_out;
+    portals::OutPortal<messages::JointAngles> joint_angles_out;
     portals::OutPortal<messages::InertialState> inertial_state_out;
 #endif
 
@@ -65,7 +65,6 @@ protected:
     void updateVisionBall();
     void updateVisionRobot();
     void updateVisionObstacle();
-    int frameCounter;
 };
 
 void updateRobot(messages::Robot* bot_message, VisualRobot* visualRobot);
