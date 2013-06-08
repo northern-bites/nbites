@@ -127,4 +127,4 @@ else(USE_LOGGING)
   unset(LOG_ODOMETRY CACHE)
 endif(USE_LOGGING)
 
-endif( NOT_OFFLINE )
+endif( NOT OFFLINE )
