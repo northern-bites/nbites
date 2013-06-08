@@ -40,6 +40,7 @@ protected slots:
     void useNewXValue(int value);
     void useNewYValue(int value);
     void useNewHValue(int value);
+    void loadRobotParameters();
 
 protected:
     virtual void run_();
@@ -58,9 +59,10 @@ private:
     QRadioButton goalie, center, other;
     QSpinBox setX, setY, setH;
     QLabel xLabel, yLabel, hLabel;
-    QSpinBox rollBox, pitchBox;
+    QDoubleSpinBox rollBox, pitchBox;
     QLabel rollLabel, pitchLabel;
     QPushButton loadButton;
+    QComboBox robotNames;
 
     image::OverlayDisplayModule topImage, bottomImage;
 

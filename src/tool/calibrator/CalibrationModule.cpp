@@ -27,6 +27,7 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     rollLabel(tr("Roll")),
     pitchLabel(tr("Pitch")),
     loadButton(tr("Load Calibration Values")),
+    robotNames(this),
     central(this)
 {
     images.addTab(&topImage, "TOP");
@@ -36,7 +37,7 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     bottomImageIn = &bottomImage.imageIn;
 
     //image tabs
-    layout.addWidget(&images, 0, 0, 6, 1);
+    layout.addWidget(&images, 0, 0, 8, 1);
 
     // position control
     layout.addWidget(&goalie, 0, 1);
@@ -66,7 +67,19 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     layout.addWidget(&pitchLabel, 6, 2);
 
     // robot selection
-    layout.addWidget(&loadButton, 7, 1, 1, 2);
+    layout.addWidget(&loadButton, 7, 1);
+    layout.addWidget(&robotNames, 7, 2);
+
+    robotNames.addItem("");
+    robotNames.addItem("river");
+    robotNames.addItem("mal");
+    robotNames.addItem("wash");
+    robotNames.addItem("zoe");
+    robotNames.addItem("jayne");
+    robotNames.addItem("inara");
+    robotNames.addItem("vera");
+    robotNames.addItem("simon");
+    robotNames.addItem("kaylee");
 
     rollBox.setSingleStep(0.01);
     pitchBox.setSingleStep(0.01);
@@ -84,6 +97,8 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
             this, SLOT(useOtherPosition(bool)));
     connect(&images, SIGNAL(currentChanged(int)),
             this, SLOT(switchCamera()));
+    connect(&loadButton, SIGNAL(clicked(bool)),
+            this, SLOT(loadRobotParameters()));
 }
 
 void CalibrationModule::switchCamera()
@@ -162,6 +177,20 @@ void CalibrationModule::useNewHValue(int value)
     if (!other.isChecked()) return;
 
     currentH = value;
+
+    updateOverlay();
+}
+
+void CalibrationModule::loadRobotParameters()
+{
+    std::string name = robotNames.currentText().toStdString();
+    CameraCalibrate::UpdateByName(name);
+
+    std::cout << "Loading parameters for " << name << std::endl;
+
+    float* params = CameraCalibrate::getCurrentParameters(currentCamera);
+    rollBox.setValue(params[CameraCalibrate::ROLL]);
+    pitchBox.setValue(params[CameraCalibrate::PITCH]);
 
     updateOverlay();
 }

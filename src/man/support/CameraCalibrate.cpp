@@ -26,10 +26,15 @@ void CameraCalibrate::init() {
     gethostname(getName, 40);
     std::string name(getName);
 
-    float paramsTop[] = {0.0f, 0.0f};
-    float paramsBottom[] = {0.0f, 0.0f};
-
     std::cout << "Setting CameraCalibrate for " << name << std::endl;
+
+    UpdateByName(name);
+}
+
+void CameraCalibrate::UpdateByName(std::string name)
+{
+   float paramsTop[] = {0.0f, 0.0f};
+   float paramsBottom[] = {0.0f, 0.0f};
 
     if (name == "river") {
         paramsTop[PITCH] = -0.06f;
