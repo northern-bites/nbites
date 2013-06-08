@@ -222,12 +222,12 @@ protected:
     virtual void run_()
     {
         /* Only possible to log 1 in every 5 images, do same thing with
-           all unlogers to stay synced with images */
+           all unloggers to stay synced with images */
 #ifdef LOG_EVERY_FIFTH
         frameCounter++;
         // EPIC HACK: 10-second delay
         if (frameCounter < 300) return;
-        // EPIC HACK: don't try to log every image
+        // EPIC HACK: don't try to log every frame
         if (frameCounter%5 != 0) return;
 #endif
 
