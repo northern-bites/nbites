@@ -244,7 +244,6 @@ class KickInformation:
 
             # Assume our heading at the ball will equal our current heading
             # We shouldn't be spinning at this point, so the assumption is valid.
-
             # Note: both headings are in degrees at this point.
             bearingForKick = headingBallToGoal - self.brain.loc.h
 
