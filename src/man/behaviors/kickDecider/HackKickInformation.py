@@ -236,7 +236,7 @@ class KickInformation:
             relLocationBallToGoal = self.brain.ball.loc.relativeLocationOf(Objects.Location(constants.FIELD_WHITE_RIGHT_SIDELINE_X,constants.CENTER_FIELD_Y))
             bearingBallToGoal = relLocationBallToGoal.bearing
             # Assume our bearing at the ball will equal our current bearing
-            relLocationMeToBall = self.brain.my.relativeLocationOf(self.brain.ball.loc)
+            relLocationMeToBall = self.brain.loc.relativeLocationOf(self.brain.ball.loc)
             bearingMeToBall = relLocationMeToBall.bearing
 
             bearingDifference = bearingBallToGoal - bearingMeToBall
