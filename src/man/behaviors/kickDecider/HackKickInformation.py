@@ -244,7 +244,6 @@ class KickInformation:
 
             # Assume our heading at the ball will equal our current heading
             # We shouldn't be spinning at this point, so the assumption is valid.
-
             # Note: both headings are in degrees at this point.
             bearingForKick = headingBallToGoal - self.brain.loc.h
 
@@ -600,7 +599,8 @@ class KickInformation:
 
     def chooseQuickFrontKick(self):
         # If our goalie is inactive, always use short front kicks.
-        if not self.brain.player.penaltyKicking:
+        # If we are using loc-based kicks, ignore the above.
+        if not self.brain.player.penaltyKicking and not USE_LOC:
             for mate in self.brain.teamMembers:
                 if ((mate.playerNumber == 1) and (mate.active is False)):
                     return self.chooseShortFrontKick()

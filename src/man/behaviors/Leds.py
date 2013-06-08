@@ -299,6 +299,7 @@ class Leds():
                         self.executeLeds(OTHER_SUBROLE_LEDS)
         if LOC_LEDS:
             # TODO: show loc uncertainty via LEDS
+            # This may not be applicable to the particle swarm 6/7/13
             pass
 
         if COMM_LEDS:
