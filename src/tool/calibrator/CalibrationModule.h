@@ -31,8 +31,19 @@ public:
     portals::InPortal<messages::YUVImage>* topImageIn;
     portals::InPortal<messages::YUVImage>* bottomImageIn;
 
+protected slots:
+    void useGoaliePosition(bool checked);
+    void useCenterPosition(bool checked);
+    void useOtherPosition(bool checked);
+    void useNewXValue(int value);
+    void useNewYValue(int value);
+    void useNewHValue(int value);
+
 protected:
     virtual void run_();
+    void updateOverlay();
+    void turnOffOtherPosition();
+    void turnOnOtherPosition();
 
 private:
     man::vision::Vision vision;
@@ -42,10 +53,12 @@ private:
 	Camera::Type currentCamera;
     int currentX, currentY, currentH;
 
-    QRadioButton goalie, center;
-    // QRadioButton other;
+    QRadioButton goalie, center, other;
+    QSpinBox setX, setY, setH;
+    QLabel xLabel, yLabel, hLabel;
     QSpinBox rollBox, pitchBox;
     QLabel rollLabel, pitchLabel;
+    QPushButton loadButton;
 
     image::OverlayDisplayModule topImage, bottomImage;
 
