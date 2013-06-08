@@ -19,7 +19,9 @@ message VisionBall {
 	optional float rel_x_variance = 16;
 	optional float rel_y_variance = 17;
 	optional float bearing_deg = 18;
-    optional float frame_count = 19;
+	optional sint32 x = 19;
+	optional sint32 y = 20;
+    optional float frame_count = 21;
 }
 
 message FilteredBall

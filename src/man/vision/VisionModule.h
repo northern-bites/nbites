@@ -55,6 +55,9 @@ public:
     portals::OutPortal<messages::InertialState> inertial_state_out;
 #endif
 
+	portals::OutPortal<messages::ThresholdImage> topOutPic;
+	portals::OutPortal<messages::ThresholdImage> botOutPic;
+
 protected:
     virtual void run_();
     boost::shared_ptr<Vision> vision;

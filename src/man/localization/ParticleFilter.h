@@ -32,103 +32,138 @@
 
 namespace man
 {
-    namespace localization
-    {
+namespace localization
+{
 
-    const float LOST_THRESHOLD = 60;
+const float LOST_THRESHOLD = 50;
+const float ALPHA = .05f; // Impact for ~76 frames
 
-    // Define the default parameters for the Particle Filter
-    static const ParticleFilterParams DEFAULT_PARAMS =
-    {
-        FIELD_GREEN_HEIGHT,         // Field Height
-        FIELD_GREEN_WIDTH,          // Field Width
-        250,                        // Num Particles
-        0.2f,                       // Exponential Filter alpha
-        0.05f,                      //                    beta
-        .5f,                        // Variance in x-y odometry
-        .15f                         // Variance in h odometry
-    };
+// Define the default parameters for the Particle Filter
+static const ParticleFilterParams DEFAULT_PARAMS =
+{
+    FIELD_GREEN_HEIGHT,         // Field Height
+    FIELD_GREEN_WIDTH,          // Field Width
+    200,                        // Num Particles
+    0.2f,                       // Exponential Filter alpha
+    0.05f,                      //                    beta
+    .15f,                        // Variance in x-y odometry
+    .03f                         // Variance in h odometry
+};
 
+/**
+ * @class ParticleFilter
+ * @brief The main particle filter localization class. Handles
+ *        functionality for constructing a posterior belief
+ *        based on a prior belief function as well as latest
+ *        sensor and control data.
+ */
+class ParticleFilter : public LocSystem
+{
+
+public:
+    ParticleFilter(ParticleFilterParams parameters = DEFAULT_PARAMS);
+    ~ParticleFilter();
 
     /**
-     * @class ParticleFilter
-     * @brief The main particle filter localization class. Handles
-     *        functionality for constructing a posterior belief
-     *        based on a prior belief function as well as latest
-     *        sensor and control data.
+     *  @brief Given a new motion and vision input, update the filter
      */
-    class ParticleFilter : public LocSystem
-    {
+    void update(const messages::RobotLocation& motionInput,
+                const messages::VisionField& visionInput);
 
-    public:
-        ParticleFilter(ParticleFilterParams parameters = DEFAULT_PARAMS);
-        ~ParticleFilter();
+    float getMagnitudeError();
 
-        void update(const messages::RobotLocation& motionInput,
-                    const messages::VisionField& visionInput);
+    void resetLocalization();
 
-        ParticleSet getParticles() { return particles; }
+    void updateMotionModel();
 
-        /**
-         * @brief Returns the particle with the highest weight in the set
-         *        (i.e., the "best" particle.)
-         */
-        Particle getBestParticle();
+    /** Accessors **/
+    const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
+    const messages::ParticleSwarm& getCurrentSwarm();
 
-        /**
-         * @brief Find the standard deviation of the particle set. This is
-         *        a useful metric for determining the error in the current
-         *        estimate, or the rate of change of error over time.
-         */
-        std::vector<float> findParticleSD();
+    float getXEst() const {return poseEstimate.x();}
+    float getYEst() const {return poseEstimate.y();}
+    float getHEst() const {return poseEstimate.h();}
+    float getHEstDeg() const {return poseEstimate.h()*TO_DEG;}
 
-        void resetLocalization();
+    ParticleSet getParticles() { return particles; }
 
-        void updateMotionModel();
+    /**
+     * @brief Returns the particle with the highest weight in the set
+     *        (i.e., the "best" particle.)
+     */
+    Particle getBestParticle();
 
-        // Getters
-        const messages::RobotLocation& getCurrentEstimate() const {return poseEstimate;}
-        const messages::ParticleSwarm& getCurrentSwarm();
+    bool onDefendingSide() {return (poseEstimate.x() < CENTER_FIELD_X);};
+    bool nearMidField() {return (fabs(poseEstimate.x() - CENTER_FIELD_X) < 10);};
 
-        float getXEst() const {return poseEstimate.x();}
-        float getYEst() const {return poseEstimate.y();}
-        float getHEst() const {return poseEstimate.h();}
-        float getHEstDeg() const {return poseEstimate.h()*TO_DEG;}
+    /** Reset Functions **/
 
-        void resetLoc();
-        void resetLocTo(float x, float y, float h,
-                        LocNormalParams params = LocNormalParams());
-        void resetLocTo(float x, float y, float h,
-                        float x_, float y_, float h_,
-                        LocNormalParams params1 = LocNormalParams(),
-                        LocNormalParams params2 = LocNormalParams());
-        void resetLocToSide(bool blueSide);
+    /*
+     * @Brief - Reset the system by spreading through environment
+     */
+    void resetLoc();
 
-    private:
-        /**
-         * @brief Resamples (with replacement) the particle population according
-         *        to the normalized weights of the particles.
-         */
-        void resample();
-        void updateEstimate();
+    /*
+     * @Brief - Reset the system by injecting particles around given pose
+     */
+    void resetLocTo(float x, float y, float h,
+                    LocNormalParams params = LocNormalParams());
 
-        ParticleFilterParams parameters;
-        messages::RobotLocation poseEstimate;
-        std::vector<float> estimateUncertainty;
-        ParticleSet particles;
+    /*
+     * @Brief - Reset the system by injecting particles around two given pose
+     */
+    void resetLocTo(float x, float y, float h,
+                    float x_, float y_, float h_,
+                    LocNormalParams params1 = LocNormalParams(),
+                    LocNormalParams params2 = LocNormalParams());
 
-        MotionSystem * motionSystem;
-        VisionSystem * visionSystem;
+    /*
+     * @Brief - Reset the system by injecting particles throughout one side
+     */
+    void resetLocToSide(bool blueSide);
 
-        float lastMotionTimestamp;
-        float lastVisionTimestamp;
+    /*
+     * @Brief - Flip all particles to the other side symmetric location
+     */
+    void flipLoc();
 
-        bool updatedVision;
+private:
+    /**
+     * @brief Resamples (with replacement) the particle population according
+     *        to the normalized weights of the particles.
+     */
+    void resample();
 
-        bool lost;
+    /**
+     * @brief - Update the poseEstimate by avging all particles
+     */
+    void updateEstimate();
 
-        // For use when logging particle swarm
-        messages::ParticleSwarm swarm;
+    /**
+     * @brief - Return symmetric location from given one
+     */
+    messages::RobotLocation getMirrorLocation(messages::RobotLocation loc);
+
+
+    ParticleFilterParams parameters;
+    messages::RobotLocation poseEstimate;
+
+    ParticleSet particles;
+
+    MotionSystem * motionSystem;
+    VisionSystem * visionSystem;
+
+    float lastMotionTimestamp;
+    float lastVisionTimestamp;
+
+    bool updatedVision;
+
+    bool lost;
+    float errorMagnitude;
+
+    // For use when logging particle swarm
+    messages::ParticleSwarm swarm;
+
     };
-    } // namespace localization
+} // namespace localization
 } // namespace man
