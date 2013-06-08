@@ -34,14 +34,11 @@ public:
 protected:
     virtual void run_();
 
-protected slots:
-    void imageTabSwitched(int i);
-
 private:
     man::vision::Vision vision;
     QWidget central;
 
-    QImage makeOverlay(LineVector expected);
+    QImage makeOverlay(LineVector& expected);
 
 	Camera::Type currentCamera;
     int currentX, currentY, currentH;

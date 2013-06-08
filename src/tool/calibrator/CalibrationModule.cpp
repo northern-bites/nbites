@@ -22,9 +22,6 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     topImageIn = &topImage.imageIn;
     bottomImageIn = &bottomImage.imageIn;
 
-    connect(&images, SIGNAL(currentChanged(int)),
-            this, SLOT(imageTabSwitched(int)));
-
     layout.addWidget(&images, 0, 0, 4, 1);
     layout.addWidget(&goalie, 0, 1);
     layout.addWidget(&center, 1, 1);
@@ -42,9 +39,31 @@ void CalibrationModule::run_()
     jointsIn.latch();
     inertialIn.latch();
 
-    currentX = FIELD_WHITE_LEFT_SIDELINE_X;
-    currentY = CENTER_FIELD_Y;
-    currentH = HEADING_RIGHT;
+    if (goalie.isChecked())
+    {
+        currentX = FIELD_WHITE_LEFT_SIDELINE_X;
+        currentY = CENTER_FIELD_Y;
+        currentH = HEADING_RIGHT;
+    }
+    else if (center.isChecked())
+    {
+        currentX = CENTER_FIELD_X;
+        currentY = CENTER_FIELD_Y;
+        currentH = HEADING_RIGHT;
+    }
+    else
+    {
+        // Other
+    }
+
+    if (images.currentWidget() == &topImage)
+    {
+        currentCamera = Camera::TOP;
+    }
+    else
+    {
+        currentCamera = Camera::BOTTOM;
+    }
 
     LineVector lines = vision.getExpectedLines(currentCamera,
                                                jointsIn.message(),
@@ -57,29 +76,19 @@ void CalibrationModule::run_()
     {
         topImage.setOverlay(makeOverlay(lines));
         topImage.run();
+        topImage.reset();
         std::cout << "Running TOP" << std::endl;
     }
     else
     {
         bottomImage.setOverlay(makeOverlay(lines));
         bottomImage.run();
+        bottomImage.reset();
         std::cout << "Running BOTTOM" << std::endl;
     }
 }
 
-void CalibrationModule::imageTabSwitched(int i)
-{
-    if (i == images.indexOf(&topImage))
-    {
-        currentCamera = Camera::TOP;
-    }
-    else
-    {
-        currentCamera = Camera::BOTTOM;
-    }
-}
-
-QImage CalibrationModule::makeOverlay(LineVector expected)
+QImage CalibrationModule::makeOverlay(LineVector& expected)
 {
     QImage lineImage(320, 240, QImage::Format_ARGB32);
     lineImage.fill(qRgba(0, 0, 0, 0));
