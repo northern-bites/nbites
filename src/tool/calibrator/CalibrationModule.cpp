@@ -82,6 +82,22 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
             this, SLOT(useCenterPosition(bool)));
     connect(&other, SIGNAL(toggled(bool)),
             this, SLOT(useOtherPosition(bool)));
+    connect(&images, SIGNAL(currentChanged(int)),
+            this, SLOT(switchCamera()));
+}
+
+void CalibrationModule::switchCamera()
+{
+    if (images.currentWidget() == &topImage)
+    {
+        currentCamera = Camera::TOP;
+    }
+    else
+    {
+        currentCamera = Camera::BOTTOM;
+    }
+
+    updateOverlay();
 }
 
 void CalibrationModule::useGoaliePosition(bool checked)
@@ -182,15 +198,6 @@ void CalibrationModule::run_()
 {
     jointsIn.latch();
     inertialIn.latch();
-
-    if (images.currentWidget() == &topImage)
-    {
-        currentCamera = Camera::TOP;
-    }
-    else
-    {
-        currentCamera = Camera::BOTTOM;
-    }
 
     updateOverlay();
 }

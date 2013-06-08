@@ -4,6 +4,7 @@
 
 #include "RoboGrams.h"
 #include "Camera.h"
+#include "FieldConstants.h"
 #include "image/ImageDisplayModule.h"
 #include "VisionField.pb.h"
 #include "RobotLocation.pb.h"
@@ -11,7 +12,7 @@
 
 // from Man
 #include "vision/Vision.h"
-#include "FieldConstants.h"
+#include "CameraCalibrate.h"
 
 namespace tool {
 namespace calibrate {
@@ -32,6 +33,7 @@ public:
     portals::InPortal<messages::YUVImage>* bottomImageIn;
 
 protected slots:
+    void switchCamera();
     void useGoaliePosition(bool checked);
     void useCenterPosition(bool checked);
     void useOtherPosition(bool checked);
