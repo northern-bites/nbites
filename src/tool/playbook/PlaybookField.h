@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "FieldConstants.h"
+#include "PlaybookModel.h"
 
 #include "common/PaintField.h"
 
@@ -34,8 +35,8 @@ class PlaybookField : public PaintField
     Q_OBJECT;
 
 public:
-    PlaybookField(int b_s, int g_w, int g_h, QWidget* parent = 0,
-                  float scaleFactor_ = 1.f);
+    PlaybookField(int b_s, int g_w, int g_h, PlaybookModel* m,
+                  QWidget* parent = 0, float scaleFactor_ = 1.f);
 
 protected slots:
     void drawGoalie(bool on);
@@ -46,6 +47,7 @@ protected:
     void paintGrid(QPaintEvent*event);
 
     void paintGoalie(QPaintEvent* event);
+    void paintPlayers(QPaintEvent* event);
 
     static const float ROBOT_SIZE_X = 18.0f;
     static const float ROBOT_SIZE_Y = 35.0f;
@@ -57,6 +59,9 @@ protected:
                     float sizeX = 18.0f, float sizeY = 35.0f);
 
 private:
+    PlaybookModel* model;
+    PlaybookPosition** robots;
+
     bool shouldPaintGoalie;
 
     int BOX_SIZE;

@@ -5,20 +5,22 @@
 namespace tool {
 namespace playbook {
 
-PlaybookField::PlaybookField(int b_s, int g_w, int g_h, QWidget* parent,
-                             float scaleFactor_) :
+PlaybookField::PlaybookField(int b_s, int g_w, int g_h, PlaybookModel* m,
+                             QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_),
+    model(m),
     shouldPaintGoalie(true),
     BOX_SIZE(b_s),
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h)
 {
+    robots = model->getRobotPositions();
 }
 
 void PlaybookField::drawGoalie(bool on)
 {
     shouldPaintGoalie = on;
-    qDebug() << "Drawing goalie " << on;
+    //qDebug() << "Drawing goalie " << on;
     update();
 }
 
@@ -27,6 +29,7 @@ void PlaybookField::paintEvent(QPaintEvent* event)
     PaintField::paintEvent(event);
 
     paintGrid(event);
+    paintPlayers(event);
 
     if(shouldPaintGoalie)
     {
@@ -67,8 +70,44 @@ void PlaybookField::paintGoalie(QPaintEvent* event)
     painter.scale(scaleFactor, -scaleFactor);
 
     paintRobot(event, painter,
-               FIELD_WHITE_LEFT_SIDELINE_X + 15, CENTER_FIELD_Y, 0,
+               FIELD_WHITE_LEFT_SIDELINE_X + 15, CENTER_FIELD_Y, 0, //TODO: don't hard code these
                roleColors[GOALIE]);
+}
+
+void PlaybookField::paintPlayers(QPaintEvent* event)
+{
+    QPainter painter(this);
+    //Move origin to bottom left and scale to flip y axis
+    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.scale(scaleFactor, -scaleFactor);
+
+    // Get robot positions.
+    robots = model->getRobotPositions();
+
+    // Paint each robot.
+    for (int i = 0; i < 3; i++) //TODO: use constant, adjust based on number of active field players
+    {
+        char role = robots[i]->role;
+        int roleNum = 0;
+        if (role == 'd')
+        {
+            roleNum = 0;
+        }
+        else if (role == 'm')
+        {
+            roleNum = 1;
+        }
+        else if (role == 'o')
+        {
+            roleNum = 2;
+        }
+
+        paintRobot(event, painter,
+                   robots[i]->x,
+                   robots[i]->y,
+                   robots[i]->h,
+                   roleColors[roleNum]);
+    }
 }
 
 void PlaybookField::paintRobot(QPaintEvent* event,

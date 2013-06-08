@@ -55,7 +55,9 @@ public:
     // and 4th dimensions of the playbook, then, handle where that role should
     // go given where the ball is.
 
-    PlaybookPosition**** playbook; // [2][3+2+1][GRID_WIDTH][GRID_HEIGHT];
+    PlaybookPosition***** playbook; // [2][3+2+1][GRID_WIDTH][GRID_HEIGHT];
+
+    PlaybookPosition** getRobotPositions();
 
 protected slots:
     void toggleGoalie(bool on);

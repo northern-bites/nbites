@@ -17,29 +17,44 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h)
 {
-    playbook = new PlaybookPosition***[2];
+    playbook = new PlaybookPosition****[2];
     for(int goalie = 0; goalie < 2; ++goalie)
     {
-        playbook[goalie] = new PlaybookPosition**[3+2+1];
+        playbook[goalie] = new PlaybookPosition***[3+2+1];
         for(int role = 0; role < 3+2+1; ++role)
         {
-            playbook[goalie][role] = new PlaybookPosition*[GRID_WIDTH];
+            playbook[goalie][role] = new PlaybookPosition**[GRID_WIDTH];
             for(int x = 0; x < GRID_WIDTH; ++x)
             {
-                playbook[goalie][role][x] = new PlaybookPosition(
-                    LANDMARK_BLUE_GOAL_CROSS_X,
-                    LANDMARK_BLUE_GOAL_CROSS_Y + (role%3 - 1) * CENTER_CIRCLE_RADIUS,
-                    0,
-                    roleList[role]);
+                playbook[goalie][role][x] = new PlaybookPosition*[GRID_HEIGHT];
+                for(int y = 0; y < GRID_HEIGHT; ++y)
+                {
+                    PlaybookPosition* p = new PlaybookPosition(
+                        LANDMARK_BLUE_GOAL_CROSS_X,
+                        LANDMARK_BLUE_GOAL_CROSS_Y + (role%3 - 1) * CENTER_CIRCLE_RADIUS,
+                        0,
+                        roleList[role]);
+                    playbook[goalie][role][x][y] = p;
+                }
             }
         }
     }
 }
 
+PlaybookPosition** PlaybookModel::getRobotPositions()
+{
+    PlaybookPosition** positions = new PlaybookPosition*[3];
+    for (int i = 0; i < 3; i++)
+    {
+        positions[i] = playbook[0][i][0][0];
+    }
+    return positions;
+}
+
 void PlaybookModel::toggleGoalie(bool on)
 {
     goalieOn = on ? 1 : 0;
-    qDebug() << "goalieOn is now " << goalieOn;
+    //qDebug() << "goalieOn is now " << goalieOn;
 }
 
 void PlaybookModel::toggleDefender(bool on)
