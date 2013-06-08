@@ -610,13 +610,23 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
 
         // correct if one point is behind image plane
         if (pixel1(Z) < 0 && pixel2(Z) > 0) {
-            pixel1 = ((FOCAL_LENGTH - pixel1(Z)) /
-                    (pixel2(Z) - pixel1(Z)))*
-                    (pixel1-pixel2) + pixel1;
+            // pixel1 = ((FOCAL_LENGTH - pixel1(Z)) /
+            //         (pixel2(Z) - pixel1(Z)))*
+            //         (pixel1-pixel2) + pixel1;
+            pixel1(X) = 0;
+            pixel1(Y) = 0;
+            pixel2(X) = 0;
+            pixel2(Y) = 0;
+
         } else if (pixel2(Z) < 0 && pixel1(Z) > 0) {
             pixel2 = ((FOCAL_LENGTH - pixel2(Z)) /
                     (pixel1(Z) - pixel2(Z))) *
                     (pixel2-pixel1) + pixel2;
+            pixel1(X) = 0;
+            pixel1(Y) = 0;
+            pixel2(X) = 0;
+            pixel2(Y) = 0;
+
         }
 
         linePoint visualLinePoint1;
@@ -648,6 +658,13 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
  **/
 const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> point)
 {
+    return cameraPointToPixel(worldPointToCamera(point));
+}
+
+// The first half of worldPointToPixel
+const ublas::vector <float> NaoPose::worldPointToCamera(ublas::vector <float>
+                                                        point)
+{
 
     ublas::vector <float> pointVectorInWorldFrame =
             CoordFrame4D::vector4D(point(X) * CM_TO_MM, point(Y) * CM_TO_MM, -comHeight);
@@ -663,12 +680,19 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     cameraToWorldRotation(2, 3) = 0;
     pointVectorInWorldFrame = prod(trans(cameraToWorldRotation), pointVectorInWorldFrame);
 
+    return pointVectorInWorldFrame;
+}
+
+// The second half of worldPointToPixel
+const ublas::vector <float> NaoPose::cameraPointToPixel(ublas::vector <float>
+                                                        point)
+{
     float FOCAL_LENGTH = 290.0f;
 
     //scale to image size
-    float t = FOCAL_LENGTH / pointVectorInWorldFrame(X);
-    float x = -(t * pointVectorInWorldFrame(Y)) + IMAGE_CENTER_X;
-    float y = -(t * pointVectorInWorldFrame(Z)) + IMAGE_CENTER_Y;
+    float t = FOCAL_LENGTH / point(X);
+    float x = -(t * point(Y)) + IMAGE_CENTER_X;
+    float y = -(t * point(Z)) + IMAGE_CENTER_Y;
 
     //if t is negatve, then object is behind, cannnot put that in image
 //    if (t < 0) {x = 0;  y = 0;}
