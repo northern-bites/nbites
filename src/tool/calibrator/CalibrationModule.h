@@ -36,22 +36,23 @@ protected:
 
 private:
     man::vision::Vision vision;
-    QWidget central;
 
     QImage makeOverlay(LineVector& expected);
 
 	Camera::Type currentCamera;
     int currentX, currentY, currentH;
 
-    image::OverlayDisplayModule topImage, bottomImage;
-
-    QTabWidget images;
     QRadioButton goalie, center;
     // QRadioButton other;
     QSpinBox rollBox, pitchBox;
     QLabel rollLabel, pitchLabel;
 
+    image::OverlayDisplayModule topImage, bottomImage;
+
+    QTabWidget images;
+
     QGridLayout layout;
+    QWidget central;
 };
 
 }

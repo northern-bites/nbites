@@ -8,13 +8,13 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     QMainWindow(parent),
     topImageIn(0),
     bottomImageIn(0),
-    central(this),
     goalie("Goalie Postition", this),
     center("Center Field Position", this),
     rollBox(this),
     pitchBox(this),
     rollLabel(tr("Roll")),
-    pitchLabel(tr("Pitch"))
+    pitchLabel(tr("Pitch")),
+    central(this)
 {
     images.addTab(&topImage, "TOP");
     images.addTab(&bottomImage, "BOTTOM");
