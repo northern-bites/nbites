@@ -34,9 +34,9 @@ void CalibrationTool::setUpModules()
     }
 
     if (diagram.connectToUnlogger<messages::JointAngles>(calibrator.jointsIn,
-                                                     "joints") &&
+                                                     "vision_joints") &&
         diagram.connectToUnlogger<messages::InertialState>(
-            calibrator.inertialIn))
+            calibrator.inertialIn, "vision_inertials"))
     {
         calibrator.enableCalibration(true);
     }
