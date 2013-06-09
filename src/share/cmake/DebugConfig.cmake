@@ -109,8 +109,8 @@ if(USE_LOGGING)
     OFF
     )
   option(
-    LOG_EVERY_FIFTH
-    "Enable to log every fifth frame in order to stay synced with image logging"
+    LOG_SYNC
+    "Enable to log every tenth frame in order to stay synced with image logging"
     ON
     )
 
@@ -124,7 +124,7 @@ else(USE_LOGGING)
   unset(LOG_LOCALIZATION CACHE)
   unset(LOG_OBSERVATIONS CACHE)
   unset(LOG_ODOMETRY CACHE)
-  unset(LOG_EVERY_FIFTH CACHE)
+  unset(LOG_SYNC CACHE)
 endif(USE_LOGGING)
 
 endif( NOT OFFLINE )

@@ -130,9 +130,9 @@
 #   undef LOG_ODOMETRY
 #endif
 
-#define LOG_EVERY_FIFTH_${LOG_EVERY_FIFTH}
-#ifdef  LOG_EVERY_FIFTH_ON
-#   define LOG_EVERY_FIFTH
+#define LOG_SYNC_${LOG_SYNC}
+#ifdef  LOG_SYNC_ON
+#   define LOG_SYNC
 #else
-#   undef LOG_EVERY_FIFTH
+#   undef LOG_SYNC
 #endif
