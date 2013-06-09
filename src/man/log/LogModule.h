@@ -50,6 +50,9 @@ static const int ALL_PERMISSIONS = S_IRWXU | S_IRWXG | S_IRWXO;
 // for large messages that could take up a lot of memory!
 static const int DEFAULT_MAX_WRITES = 5;
 
+// Log every LOG_SYNC_HOW_OFTEN image and frame when LOG_SYNC flag is on
+static const int LOG_SYNC_HOW_OFTEN = 10;
+
 /*
  * This struct is used to hold together an aiocb (control block) and the
  * buffer it's writing from. These need to stay unchanged while the write
@@ -221,6 +224,16 @@ protected:
     // Implements the Module run_ method
     virtual void run_()
     {
+        /* Only possible to log 1 in every 5 images, do same thing with
+           all unloggers to stay synced with images */
+#ifdef LOG_SYNC
+        frameCounter++;
+        // EPIC HACK: 10-second delay
+        if (frameCounter < 300) return;
+        // EPIC HACK: don't try to log every frame
+        if (frameCounter%LOG_SYNC_HOW_OFTEN != 0) return;
+#endif
+
         input.latch();
 
         // Open the file and write the header if it hasn't been done
@@ -244,6 +257,9 @@ protected:
 
     portals::InPortal<T> input;
     std::list<Write> ongoing;
+#ifdef LOG_SYNC
+    int frameCounter;
+#endif
 };
 
 // Special for Images
@@ -378,7 +394,11 @@ protected:
         if (frameCounter < 300) return;
 
         // EPIC HACK: don't try to log every image
+#ifdef LOG_SYNC
+        if (frameCounter%LOG_SYNC_HOW_OFTEN != 0) return;
+#else
         if (frameCounter%5 != 0) return;
+#endif
 
         input.latch();
 
