@@ -4,12 +4,14 @@ set( PLAYBOOK_SRCS
   PlaybookCreator.cpp
   PlaybookField.cpp
   PlaybookModel.cpp
+  RobotGraphics.cpp
   )
 
 set( PLAYBOOK_HEADERS
   PlaybookCreator.h
   PlaybookField.h
   PlaybookModel.h
+  RobotGraphics.h
   )
 
 Qt4_wrap_cpp( PLAYBOOK_HEADERS_MOC ${PLAYBOOK_HEADERS} )

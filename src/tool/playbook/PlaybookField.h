@@ -14,6 +14,7 @@
 
 #include "FieldConstants.h"
 #include "PlaybookModel.h"
+#include "RobotGraphics.h"
 
 #include "common/PaintField.h"
 
@@ -60,13 +61,16 @@ protected:
 
 private:
     PlaybookModel* model;
-    PlaybookPosition** robots;
 
     bool shouldPaintGoalie;
 
     int BOX_SIZE;
     int GRID_WIDTH;
     int GRID_HEIGHT;
+
+    RobotGraphics* robots[3];
+    void updateRobots(PlaybookPosition** positions);
+    int parseRole(char role);
 };
 
 } // namespace playbook

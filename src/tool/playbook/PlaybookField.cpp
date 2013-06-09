@@ -14,7 +14,11 @@ PlaybookField::PlaybookField(int b_s, int g_w, int g_h, PlaybookModel* m,
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h)
 {
-    robots = model->getRobotPositions();
+    for (int i = 0; i < 3; i++)
+    {
+        robots[i] = new RobotGraphics(0,0,0,'d', new QColor());
+    }
+    updateRobots(model->getRobotPositions());
 }
 
 void PlaybookField::drawGoalie(bool on)
@@ -134,6 +138,41 @@ void PlaybookField::paintRobot(QPaintEvent* event,
     painter.drawLine(center, lineEnd);
 
     painter.restore();
+}
+
+void PlaybookField::updateRobots(PlaybookPosition** positions)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        robots[i].setX(positions[i]->x);
+        robots[i].setY(positions[i]->y);
+        robots[i].setH(positions[i]->h);
+        robots[i].setRole(positions[i]->role);
+        robots[i].setColor(roleColors[parseRole(positions[i]->role)]);
+    }
+}
+
+int PlaybookField::parseRole(char role)
+{
+    if (role == 'd')
+    {
+        return Role.DEFENDER;
+    }
+    else if (role == 'm')
+    {
+        return Role.MIDDIE;
+    }
+    else if (role == 'o')
+    {
+        return Role.OFFENDER;
+    }
+    else if (role == 'g')
+    {
+        return Role.GOALIE;
+    }
+
+    qDebug() << "A bad role char was passed to the view.";
+    return 0;
 }
 
 } // namespace playbook
