@@ -22,8 +22,8 @@ class FallController():
         if (not self.falling and self.brain.interface.fallStatus.falling):
             # Save the player. We are falling
             self.falling = True
-            self.brain.gainsOff()
-            self.brain.switchTo('fallen')
+            self.brain.player.gainsOff()
+            self.brain.player.switchTo('fallen')
             self.brain.tracker.stopHeadMoves()
 
         # Check if we have fallen.
