@@ -86,7 +86,7 @@ add_subdirectory( vision_offline )
 add_subdirectory( fieldview )
 add_subdirectory( common )
 add_subdirectory( worldview )
-
+add_subdirectory( calibrator )
 
 ## SOURCES ##
 
@@ -139,12 +139,28 @@ set( vision_headers
   VisionTool.h
 )
 
+# CalibrationTool Sources
+set( calibrate_srcs calibrate_main.cpp
+  EmptyTool.cpp
+  ToolDiagram.cpp
+  DataSelector.cpp
+
+  CalibrationTool.cpp
+  )
+
+set( calibrate_headers
+  EmptyTool.h
+  ToolDiagram.h
+  DataSelector.h
+
+  CalibrationTool.h
+)
 
 # Qt4 goodness (aka moc the headers)
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
 Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
-
+Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
 
 ## EXECUTABLES ##
 
@@ -210,3 +226,20 @@ target_link_libraries(
   vision_offline
   ${QT_LIBRARIES}
   )
+
+# The CalibrationTool executable
+add_executable( calibrate_tool
+  ${calibrate_srcs}
+  ${calibrate_headers_moc}
+)
+
+target_link_libraries(
+  calibrate_tool
+  portals
+  messages
+  unlog
+  logview
+  image_display
+  calibrator
+  ${QT_LIBRARIES}
+)

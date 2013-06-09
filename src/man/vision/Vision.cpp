@@ -199,6 +199,28 @@ std::string Vision::getThreshColor(int _id) {
     }
 }
 
+std::vector<boost::shared_ptr<VisualLine> > Vision::getExpectedLines(
+    Camera::Type which,
+    const JointAngles& ja,
+    const InertialState& inert,
+    int xPos,
+    int yPos,
+    float heading)
+{
+    // Set pose to use the correct camera
+    if (which == Camera::TOP)
+    {
+        pose->transform(true, ja, inert);
+    }
+    else
+    {
+        pose->transform(false, ja, inert);
+    }
+
+    return pose->getExpectedVisualLinesFromFieldPosition(float(xPos),
+                                                         float(yPos),
+                                                         heading);
+}
 
 /*******************************|
 | Vision visualization methods. |
