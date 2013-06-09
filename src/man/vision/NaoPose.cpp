@@ -353,7 +353,7 @@ estimate NaoPose::pixEstimate(pixels pixelX, pixels pixelY, mms objectHeight) co
 
     // Computed this constant and also checked it experimentally
     // For objects in 320x240-size images ONLY!
-    float FOCAL_LENGTH = 290.f;
+    float FOCAL_LENGTH = 272.4f;
     ufvector4 pixelInCameraFrame =
             vector4D( FOCAL_LENGTH,
                       ((float)IMAGE_CENTER_X - (float)pixelX),
@@ -721,7 +721,7 @@ std::vector<radians> NaoPose::headAnglesToRobotPoint(ublas::vector <float> point
 
 estimate NaoPose::estimateFromObjectSize(pixels pixelX, pixels pixelY, mms objectHeight, float pixelSize, mms realSize) const {
 
-    pixels FOCAL_LENGTH = 290;
+    pixels FOCAL_LENGTH = 272;
 
     if (pixelSize <= 0 || realSize <= 0)
         return NULL_ESTIMATE;
