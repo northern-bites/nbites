@@ -8,6 +8,9 @@
  *
  * @updated Lizzie Mamantov
  * @date April 2013
+ *
+ * @update Benjamin Mende
+ * @date June 2013
  */
 
 #pragma once
@@ -29,6 +32,10 @@
 
 namespace tool {
 namespace color {
+
+struct colorChanges {
+	byte y, u, v, color;
+};
 
 /**
  * @class BrushStroke
@@ -86,12 +93,17 @@ public:
     // needs the two image inputs
     portals::InPortal<messages::YUVImage> bottomImageIn;
     portals::InPortal<messages::YUVImage> topImageIn;
+	portals::InPortal<messages::ThresholdImage> topThrIn;
+	portals::InPortal<messages::ThresholdImage> botThrIn;
+
+
+signals:
+	// Color table manipulation
+	void tableChanges(std::vector<color::colorChanges> tableAdjustments);
+	void tableUnChanges(std::vector<color::colorChanges> tableAdjustments);
+
 
 protected slots:
-    // Color table manipulation
-    void loadColorTable();
-    void saveColorTableAs();
-    void saveColorTable();
 
     // Re-threshold the thresholded image
     void updateThresholdedImage();
@@ -105,9 +117,6 @@ protected slots:
     // Listen to color selection by the user
     void updateColorSelection(int color);
 
-    // Update the stats we keep about tables
-    void updateColorStats();
-
     // Listen if the user switches which image she's working on
     void imageTabSwitched(int);
 
@@ -118,9 +127,6 @@ protected:
     // Called when a click is made
     void paintStroke(const BrushStroke& brushStroke);
 
-    // For keeping track of the last table used
-    void loadLatestTable();
-    void serializeTableName(QString latestTableName);
 
 private:
     // For the tool, we have an actual ColorTable class that does a lot
@@ -128,8 +134,6 @@ private:
     // @see ColorTable.h
     ColorTable colorTable;
 
-    // Display stats, current table name (helpful)
-    QLabel* colorStats;
     QLabel* colorTableName;
 
     // Used to change, store which color user is currently working on
@@ -149,8 +153,6 @@ private:
     portals::RoboGram subdiagram;
 
     // Modules
-    man::image::ImageConverterModule topConverter;
-    man::image::ImageConverterModule bottomConverter;
     image::ImageDisplayListener topDisplay;
     image::ImageDisplayListener bottomDisplay;
     image::ThresholdedImageDisplayModule thrDisplay;
@@ -160,6 +162,8 @@ private:
     // InPortals for Images
     portals::OutPortal<messages::YUVImage> bottomImage;
     portals::OutPortal<messages::YUVImage> topImage;
+	portals::OutPortal<messages::ThresholdImage> topThrImage;
+	portals::OutPortal<messages::ThresholdImage> botThrImage;
 };
 
 }

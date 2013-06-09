@@ -4,6 +4,8 @@
 #include <cmath>
 #include "DebugConfig.h"
 
+
+
 // Nao field constants
 
 #ifdef USING_LAB_FIELD
@@ -148,4 +150,7 @@ static const float HEADING_LEFT = 180.0f;
 static const float HEADING_DOWN = -90.0f;
 
 
+
+
 #endif
+

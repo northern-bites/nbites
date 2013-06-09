@@ -1781,9 +1781,10 @@ int Threshold::getPixelBoundaryUp() {
  */
 void Threshold::initDebugImage(){
 #ifdef OFFLINE
-    for(int x = 0 ; x < IMAGE_WIDTH;x++)
+    for(int x = 0 ; x < IMAGE_WIDTH;x++) 
         for(int y = 0; y < IMAGE_HEIGHT;y++)
             debugImage[y][x] = GREY;
+	
 #endif
 }
 
@@ -1792,12 +1793,18 @@ void Threshold::initDebugImage(){
  */
 void Threshold::transposeDebugImage(){
 #ifdef OFFLINE
+	for(int i = 0; i < IMAGE_HEIGHT * IMAGE_WIDTH; i++)
+		betterDebugImage[i] = GREY;
     for(int x = 0 ; x < IMAGE_WIDTH; x++) {
         for(int y = 0; y < IMAGE_HEIGHT; y++) {
             if(debugImage[y][x] != GREY){
-                setThresholded(y, x, debugImage[y][x]);
+                betterDebugImage[y * IMAGE_WIDTH + x] = debugImage[y][x];
             }
-        }
+			else {
+				usingTopCamera = true;
+				betterDebugImage[y * IMAGE_WIDTH + x] = getThresholded(y, x);
+			}
+		}
     }
 
     initDebugImage();
