@@ -31,9 +31,11 @@ void CameraCalibrate::init() {
 
     std::cout << "Setting CameraCalibrate for " << name << std::endl;
 
+   // These are for river's head on kaylee's body! MAKE SURE TO FIX
     if (name == "river") {
-        paramsTop[PITCH] = -0.06f;
-        paramsBottom[ROLL] = -0.02f;
+        paramsTop[PITCH] = 0.07f;
+        paramsTop[ROLL] = -0.02f;
+        paramsBottom[PITCH] = 0.15f;
     } else if (name == "mal") {
         paramsTop[PITCH] = -.04f;
         paramsBottom[PITCH] = -.12f;
