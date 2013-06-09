@@ -23,6 +23,10 @@ VisionModule::VisionModule() : Module(),
                                vision_ball(base()),
                                vision_robot(base()),
                                vision_obstacle(base()),
+#ifdef LOG_VISION
+                               joint_angles_out(base()),
+                               inertial_state_out(base()),
+#endif
 							   topOutPic(base()),
 							   botOutPic(base()),
                                vision(boost::shared_ptr<Vision>(new Vision()))
@@ -32,7 +36,6 @@ VisionModule::VisionModule() : Module(),
 VisionModule::~VisionModule()
 {
 }
-
 
 void VisionModule::run_()
 {
@@ -62,6 +65,16 @@ void VisionModule::run_()
     updateVisionField();
     updateVisionObstacle();
 
+    /* In order to keep logs synced up, joint angs and inert states are passed 
+     * thru the vision system. Joint angles are taken at around 100 hz, but 
+     * images are taken at 30 hz, but by passing joint angles thru vision we 
+     * get joint angles at 30 hz. */
+#ifdef LOG_VISION
+    joint_angles_out.setMessage(portals::Message<messages::JointAngles>(
+                                &joint_angles.message()));
+    inertial_state_out.setMessage(portals::Message<messages::InertialState>(
+                                  &inertial_state.message()));
+#endif
 	portals::Message<messages::ThresholdImage> top, bot;
 	top = new messages::ThresholdImage(vision->thresh->thresholded, 320, 240, 320);
 	bot = new messages::ThresholdImage(vision->thresh->thresholdedBottom, 320, 240, 320);
@@ -69,8 +82,6 @@ void VisionModule::run_()
 
 	topOutPic.setMessage(top);
 	botOutPic.setMessage(bot);
-		
-
 }
 
 void VisionModule::updateVisionObstacle() {

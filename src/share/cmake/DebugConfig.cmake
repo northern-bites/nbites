@@ -35,7 +35,6 @@ option(
   OFF
 )
 
-
 option(
   DEBUG_THREADS
   "Toggle threads debug mode."
@@ -52,6 +51,12 @@ option(
   PROFILE
   "Enable time profiling for the robot"
   OFF
+)
+
+option(
+  LOG_EVERY_FIFTH
+  "Enable to log every fifth frame in order to stay synced with image logging"
+  ON
 )
 
 option(
