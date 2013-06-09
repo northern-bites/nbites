@@ -13,14 +13,37 @@ CalibrationTool::CalibrationTool(const char* title) : EmptyTool(title),
 
 void CalibrationTool::setUpModules()
 {
-    diagram.connectToUnlogger<messages::YUVImage>(*calibrator.topImageIn,
-                                                  "top");
-    diagram.connectToUnlogger<messages::YUVImage>(*calibrator.bottomImageIn,
-                                                  "bottom");
+    if (diagram.connectToUnlogger<messages::YUVImage>(*calibrator.topImageIn,
+                                                      "top"))
+    {
+        calibrator.enableTopImage(true);
+    }
+    else
+    {
+        calibrator.enableTopImage(false);
+    }
 
-    diagram.connectToUnlogger<messages::JointAngles>(calibrator.jointsIn,
-                                                     "joints");
-    diagram.connectToUnlogger<messages::InertialState>(calibrator.inertialIn);
+    if (diagram.connectToUnlogger<messages::YUVImage>(
+            *calibrator.bottomImageIn, "bottom"))
+    {
+        calibrator.enableBottomImage(true);
+    }
+    else
+    {
+        calibrator.enableBottomImage(false);
+    }
+
+    if (diagram.connectToUnlogger<messages::JointAngles>(calibrator.jointsIn,
+                                                     "joints") &&
+        diagram.connectToUnlogger<messages::InertialState>(
+            calibrator.inertialIn))
+    {
+        calibrator.enableCalibration(true);
+    }
+    else
+    {
+        calibrator.enableCalibration(false);
+    }
 
     diagram.addModule(calibrator);
 

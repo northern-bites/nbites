@@ -32,6 +32,10 @@ public:
     portals::InPortal<messages::YUVImage>* topImageIn;
     portals::InPortal<messages::YUVImage>* bottomImageIn;
 
+    void enableTopImage(bool use);
+    void enableBottomImage(bool use);
+    void enableCalibration(bool use);
+
 protected slots:
     void switchCamera();
     void useGoaliePosition(bool checked);
@@ -58,9 +62,9 @@ private:
     int currentX, currentY, currentH;
     float backupPitch, backupRoll;
 
-    QFrame divider[3];
+    QFrame divider[4];
 
-    QLabel position, parameters;
+    QLabel enabled, position, parameters;
     QRadioButton goalie, center, other;
     QSpinBox setX, setY, setH;
     QLabel xLabel, yLabel, hLabel;

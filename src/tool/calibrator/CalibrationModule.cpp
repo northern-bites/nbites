@@ -13,6 +13,7 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     currentX(FIELD_WHITE_LEFT_SIDELINE_X),
     currentY(CENTER_FIELD_Y),
     currentH(HEADING_RIGHT),
+    enabled(tr("Load A Log!")),
     position(tr("Robot Position Controls")),
     parameters(tr("Parameter Controls")),
     goalie("Goalie Position", this),
@@ -42,24 +43,26 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     //image tabs
     mainLayout.addWidget(&images);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         divider[i].setFrameShape(QFrame::HLine);
         divider[i].setFrameShadow(QFrame::Sunken);
     }
 
     // position control
-    sideLayout.addWidget(&position, 0, 0);
+    sideLayout.addWidget(&enabled, 0, 0);
     sideLayout.addWidget(&divider[0], 1, 0, 1, 3);
-    sideLayout.addWidget(&goalie, 2, 0);
-    sideLayout.addWidget(&center, 3, 0);
-    sideLayout.addWidget(&other, 4, 0, 3, 1);
-    sideLayout.addWidget(&setX, 4, 1);
-    sideLayout.addWidget(&xLabel, 4, 2);
-    sideLayout.addWidget(&setY, 5, 1);
-    sideLayout.addWidget(&yLabel, 5, 2);
-    sideLayout.addWidget(&setH, 6, 1);
-    sideLayout.addWidget(&hLabel, 6, 2);
+    sideLayout.addWidget(&position, 2, 0);
+    sideLayout.addWidget(&divider[1], 3, 0, 1, 3);
+    sideLayout.addWidget(&goalie, 4, 0);
+    sideLayout.addWidget(&center, 5, 0);
+    sideLayout.addWidget(&other, 6, 0, 3, 1);
+    sideLayout.addWidget(&setX, 6, 1);
+    sideLayout.addWidget(&xLabel, 6, 2);
+    sideLayout.addWidget(&setY, 7, 1);
+    sideLayout.addWidget(&yLabel, 7, 2);
+    sideLayout.addWidget(&setH, 8, 1);
+    sideLayout.addWidget(&hLabel, 8, 2);
 
     goalie.setChecked(true);
     turnOffOtherPosition();
@@ -72,17 +75,17 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
                   HEADING_LEFT);
 
     // roll/pitch correction control
-    sideLayout.addWidget(&divider[1], 7, 0, 1, 3);
-    sideLayout.addWidget(&parameters, 8, 0);
     sideLayout.addWidget(&divider[2], 9, 0, 1, 3);
-    sideLayout.addWidget(&rollBox, 10, 0);
-    sideLayout.addWidget(&rollLabel, 10, 1);
-    sideLayout.addWidget(&pitchBox, 11, 0);
-    sideLayout.addWidget(&pitchLabel, 11, 1);
+    sideLayout.addWidget(&parameters, 10, 0);
+    sideLayout.addWidget(&divider[3], 11, 0, 1, 3);
+    sideLayout.addWidget(&rollBox, 12, 0);
+    sideLayout.addWidget(&rollLabel, 12, 1);
+    sideLayout.addWidget(&pitchBox, 13, 0);
+    sideLayout.addWidget(&pitchLabel, 13, 1);
 
     // robot selection
-    sideLayout.addWidget(&loadButton, 12, 0);
-    sideLayout.addWidget(&robotNames, 12, 1);
+    sideLayout.addWidget(&loadButton, 14, 0);
+    sideLayout.addWidget(&robotNames, 14, 1);
 
     robotNames.addItem("");
     robotNames.addItem("river");
@@ -122,6 +125,30 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
             this, SLOT(updateParameters()));
     connect(&rollBox, SIGNAL(valueChanged(double)),
             this, SLOT(updateParameters()));
+}
+
+void CalibrationModule::enableTopImage(bool use)
+{
+    images.setTabEnabled(images.indexOf(&topImage), use);
+}
+
+void CalibrationModule::enableBottomImage(bool use)
+{
+    images.setTabEnabled(images.indexOf(&bottomImage), use);
+}
+
+void CalibrationModule::enableCalibration(bool use)
+{
+    side.setEnabled(use);
+
+    if (use)
+    {
+        enabled.setText(tr("Calibrating!"));
+    }
+    else
+    {
+        enabled.setText(tr("DISABLED - Missing joints or inertials"));
+    }
 }
 
 void CalibrationModule::switchCamera()
@@ -294,20 +321,28 @@ void CalibrationModule::turnOnOtherPosition()
 
 void CalibrationModule::run_()
 {
-    jointsIn.latch();
-    inertialIn.latch();
+    if (side.isEnabled())
+    {
+        jointsIn.latch();
+        inertialIn.latch();
+    }
 
     updateOverlay();
 }
 
 void CalibrationModule::updateOverlay()
 {
-    LineVector lines = vision.getExpectedLines(currentCamera,
-                                               jointsIn.message(),
-                                               inertialIn.message(),
-                                               currentX,
-                                               currentY,
-                                               currentH*TO_RAD);
+    LineVector lines;
+
+    if (side.isEnabled())
+    {
+        lines = vision.getExpectedLines(currentCamera,
+                                        jointsIn.message(),
+                                        inertialIn.message(),
+                                        currentX,
+                                        currentY,
+                                        currentH*TO_RAD);
+    }
 
     if (currentCamera == Camera::TOP)
     {
