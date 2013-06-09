@@ -41,6 +41,7 @@ protected slots:
     void useGoaliePosition(bool checked);
     void useCenterPosition(bool checked);
     void useOtherPosition(bool checked);
+    void useCrossPosition(bool checked);
     void useNewXValue(int value);
     void useNewYValue(int value);
     void useNewHValue(int value);
@@ -65,7 +66,7 @@ private:
     QFrame divider[4];
 
     QLabel enabled, position, parameters;
-    QRadioButton goalie, center, other;
+    QRadioButton goalie, center, cross, other;
     QSpinBox setX, setY, setH;
     QLabel xLabel, yLabel, hLabel;
     QDoubleSpinBox rollBox, pitchBox;

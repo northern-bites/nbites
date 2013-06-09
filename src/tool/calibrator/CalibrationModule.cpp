@@ -18,6 +18,7 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     parameters(tr("Parameter Controls")),
     goalie("Goalie Position", this),
     center("Center Field Position", this),
+    cross("Field Cross Position", this),
     other("Other Position", this),
     setX(this),
     setY(this),
@@ -56,13 +57,14 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     sideLayout.addWidget(&divider[1], 3, 0, 1, 3);
     sideLayout.addWidget(&goalie, 4, 0);
     sideLayout.addWidget(&center, 5, 0);
-    sideLayout.addWidget(&other, 6, 0, 3, 1);
-    sideLayout.addWidget(&setX, 6, 1);
-    sideLayout.addWidget(&xLabel, 6, 2);
-    sideLayout.addWidget(&setY, 7, 1);
-    sideLayout.addWidget(&yLabel, 7, 2);
-    sideLayout.addWidget(&setH, 8, 1);
-    sideLayout.addWidget(&hLabel, 8, 2);
+    sideLayout.addWidget(&cross, 6, 0);
+    sideLayout.addWidget(&other, 7, 0, 3, 1);
+    sideLayout.addWidget(&setX, 7, 1);
+    sideLayout.addWidget(&xLabel, 7, 2);
+    sideLayout.addWidget(&setY, 8, 1);
+    sideLayout.addWidget(&yLabel, 8, 2);
+    sideLayout.addWidget(&setH, 9, 1);
+    sideLayout.addWidget(&hLabel, 9, 2);
 
     goalie.setChecked(true);
     turnOffOtherPosition();
@@ -75,17 +77,17 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
                   HEADING_LEFT);
 
     // roll/pitch correction control
-    sideLayout.addWidget(&divider[2], 9, 0, 1, 3);
-    sideLayout.addWidget(&parameters, 10, 0);
-    sideLayout.addWidget(&divider[3], 11, 0, 1, 3);
-    sideLayout.addWidget(&rollBox, 12, 0);
-    sideLayout.addWidget(&rollLabel, 12, 1);
-    sideLayout.addWidget(&pitchBox, 13, 0);
-    sideLayout.addWidget(&pitchLabel, 13, 1);
+    sideLayout.addWidget(&divider[2], 10, 0, 1, 3);
+    sideLayout.addWidget(&parameters, 11, 0);
+    sideLayout.addWidget(&divider[3], 12, 0, 1, 3);
+    sideLayout.addWidget(&rollBox, 13, 0);
+    sideLayout.addWidget(&rollLabel, 13, 1);
+    sideLayout.addWidget(&pitchBox, 14, 0);
+    sideLayout.addWidget(&pitchLabel, 14, 1);
 
     // robot selection
-    sideLayout.addWidget(&loadButton, 14, 0);
-    sideLayout.addWidget(&robotNames, 14, 1);
+    sideLayout.addWidget(&loadButton, 15, 0);
+    sideLayout.addWidget(&robotNames, 15, 1);
 
     robotNames.addItem("");
     robotNames.addItem("river");
@@ -104,7 +106,7 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     pitchBox.setRange(-2.0, 2.0);
 
     side.setLayout(&sideLayout);
-    side.setMaximumHeight(350);
+    side.setMaximumHeight(380);
 
     mainLayout.addWidget(&side, 0, Qt::AlignTop);
 
@@ -115,6 +117,8 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
             this, SLOT(useGoaliePosition(bool)));
     connect(&center, SIGNAL(toggled(bool)),
             this, SLOT(useCenterPosition(bool)));
+    connect(&cross, SIGNAL(toggled(bool)),
+            this, SLOT(useCrossPosition(bool)));
     connect(&other, SIGNAL(toggled(bool)),
             this, SLOT(useOtherPosition(bool)));
     connect(&images, SIGNAL(currentChanged(int)),
@@ -194,6 +198,19 @@ void CalibrationModule::useCenterPosition(bool checked)
     if (!checked) return;
 
     currentX = CENTER_FIELD_X;
+    currentY = CENTER_FIELD_Y;
+    currentH = HEADING_RIGHT;
+
+    turnOffOtherPosition();
+
+    updateOverlay();
+}
+
+void CalibrationModule::useCrossPosition(bool checked)
+{
+    if (!checked) return;
+
+    currentX = LANDMARK_YELLOW_GOAL_CROSS_X;
     currentY = CENTER_FIELD_Y;
     currentH = HEADING_RIGHT;
 
