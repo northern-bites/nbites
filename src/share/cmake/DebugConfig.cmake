@@ -54,12 +54,6 @@ option(
 )
 
 option(
-  LOG_EVERY_FIFTH
-  "Enable to log every fifth frame in order to stay synced with image logging"
-  ON
-)
-
-option(
   USE_LOGGING
   "Enable logging on the robot."
   OFF
@@ -114,6 +108,11 @@ if(USE_LOGGING)
     "Log the odometry from motion"
     OFF
     )
+  option(
+    LOG_EVERY_FIFTH
+    "Enable to log every fifth frame in order to stay synced with image logging"
+    ON
+    )
 
 else(USE_LOGGING)
   unset(LOG_SENSORS CACHE)
@@ -125,6 +124,7 @@ else(USE_LOGGING)
   unset(LOG_LOCALIZATION CACHE)
   unset(LOG_OBSERVATIONS CACHE)
   unset(LOG_ODOMETRY CACHE)
+  unset(LOG_EVERY_FIFTH CACHE)
 endif(USE_LOGGING)
 
 endif( NOT OFFLINE )
