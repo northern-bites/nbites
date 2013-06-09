@@ -143,7 +143,7 @@ public:
                      const messages::InertialState& inert,
                      int xPos,
                      int yPos,
-                     int heading);
+                     float heading);
 
 public:
     //

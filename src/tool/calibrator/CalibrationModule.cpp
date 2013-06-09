@@ -13,9 +13,9 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     currentX(FIELD_WHITE_LEFT_SIDELINE_X),
     currentY(CENTER_FIELD_Y),
     currentH(HEADING_RIGHT),
-    position(tr("Robot Postition Controls")),
+    position(tr("Robot Position Controls")),
     parameters(tr("Parameter Controls")),
-    goalie("Goalie Postition", this),
+    goalie("Goalie Position", this),
     center("Center Field Position", this),
     other("Other Position", this),
     setX(this),
@@ -282,7 +282,7 @@ void CalibrationModule::updateOverlay()
                                                inertialIn.message(),
                                                currentX,
                                                currentY,
-                                               currentH);
+                                               currentH*TO_RAD);
 
     if (currentCamera == Camera::TOP)
     {

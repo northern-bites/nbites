@@ -603,30 +603,35 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
         linePoint2 = prod(worldOriginToRobotOriginTranslation, linePoint2);
         linePoint2 = prod(worldToRobotRotation, linePoint2);
 
-        ublas::vector <float> pixel1 = worldPointToPixel(linePoint1);
-        ublas::vector <float> pixel2 = worldPointToPixel(linePoint2);
+        ublas::vector <float> cameraPoint1 = worldPointToCamera(linePoint1);
+        ublas::vector <float> cameraPoint2 = worldPointToCamera(linePoint2);
 
-        float FOCAL_LENGTH = 290.0;
+        int INTERSECTION_PLANE_DISTANCE = 300;
 
         // correct if one point is behind image plane
-        if (pixel1(Z) < 0 && pixel2(Z) > 0) {
-            // pixel1 = ((FOCAL_LENGTH - pixel1(Z)) /
-            //         (pixel2(Z) - pixel1(Z)))*
-            //         (pixel1-pixel2) + pixel1;
+        // Note that INTERSECTION_PLANE_DISTANCE is a hack... this should
+        // be a more complicated intersection calculation BUT this looks okay
+        if (cameraPoint1(X) < INTERSECTION_PLANE_DISTANCE &&
+            cameraPoint2(X) > INTERSECTION_PLANE_DISTANCE) {
+            cameraPoint1 = (((INTERSECTION_PLANE_DISTANCE - cameraPoint1(X)) /
+                            (cameraPoint2(X) - cameraPoint1(X))) *
+                            (cameraPoint2-cameraPoint1)) + cameraPoint1;
+
+        } else if (cameraPoint2(X) < INTERSECTION_PLANE_DISTANCE &&
+                   cameraPoint1(X) > INTERSECTION_PLANE_DISTANCE) {
+            cameraPoint2 = (((INTERSECTION_PLANE_DISTANCE - cameraPoint2(X)) /
+                             (cameraPoint1(X) - cameraPoint2(X))) *
+                            (cameraPoint1-cameraPoint2)) + cameraPoint2;
+        }
+
+        ublas::vector <float> pixel1 = cameraPointToPixel(cameraPoint1);
+        ublas::vector <float> pixel2 = cameraPointToPixel(cameraPoint2);
+
+        if (cameraPoint2(X) < 0 && cameraPoint1(X) < 0) {
             pixel1(X) = 0;
             pixel1(Y) = 0;
             pixel2(X) = 0;
             pixel2(Y) = 0;
-
-        } else if (pixel2(Z) < 0 && pixel1(Z) > 0) {
-            pixel2 = ((FOCAL_LENGTH - pixel2(Z)) /
-                    (pixel1(Z) - pixel2(Z))) *
-                    (pixel2-pixel1) + pixel2;
-            pixel1(X) = 0;
-            pixel1(Y) = 0;
-            pixel2(X) = 0;
-            pixel2(Y) = 0;
-
         }
 
         linePoint visualLinePoint1;
@@ -687,7 +692,7 @@ const ublas::vector <float> NaoPose::worldPointToCamera(ublas::vector <float>
 const ublas::vector <float> NaoPose::cameraPointToPixel(ublas::vector <float>
                                                         point)
 {
-    float FOCAL_LENGTH = 290.0f;
+    float FOCAL_LENGTH = 272.4f;
 
     //scale to image size
     float t = FOCAL_LENGTH / point(X);

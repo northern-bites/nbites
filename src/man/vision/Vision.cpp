@@ -205,7 +205,7 @@ std::vector<boost::shared_ptr<VisualLine> > Vision::getExpectedLines(
     const InertialState& inert,
     int xPos,
     int yPos,
-    int heading)
+    float heading)
 {
     // Set pose to use the correct camera
     if (which == Camera::TOP)
