@@ -39,7 +39,7 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     bottomImageIn = &bottomImage.imageIn;
 
     //image tabs
-    layout.addWidget(&images, 0, 0, 15, 1);
+    layout.addWidget(&images, 0, 0, 10, 1);
 
     // position control
     layout.addWidget(&position, 0, 1);
@@ -202,20 +202,30 @@ void CalibrationModule::useNewHValue(int value)
 
 void CalibrationModule::loadRobotParameters()
 {
+    disconnect(&pitchBox, SIGNAL(valueChanged(double)),
+               this, SLOT(updateParameters()));
+    disconnect(&rollBox, SIGNAL(valueChanged(double)),
+               this, SLOT(updateParameters()));
+
     std::string name = robotNames.currentText().toStdString();
     CameraCalibrate::UpdateByName(name);
 
-    std::cout << "Loaded parameters for " << name << "!" << std::endl;
-
     float* params = CameraCalibrate::getCurrentParameters(currentCamera);
+
     rollBox.setValue(params[CameraCalibrate::ROLL]);
     pitchBox.setValue(params[CameraCalibrate::PITCH]);
 
     updateOverlay();
+
+    connect(&pitchBox, SIGNAL(valueChanged(double)),
+            this, SLOT(updateParameters()));
+    connect(&rollBox, SIGNAL(valueChanged(double)),
+            this, SLOT(updateParameters()));
 }
 
 void CalibrationModule::updateParameters()
 {
+    std::cout << "Updateparams." << std::endl;
     float paramsTop[CameraCalibrate::NUM_PARAMS];
     float paramsBottom[CameraCalibrate::NUM_PARAMS];
 
