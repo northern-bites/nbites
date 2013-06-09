@@ -129,3 +129,10 @@
 #else
 #   undef LOG_ODOMETRY
 #endif
+
+#define LOG_SYNC_${LOG_SYNC}
+#ifdef  LOG_SYNC_ON
+#   define LOG_SYNC
+#else
+#   undef LOG_SYNC
+#endif
