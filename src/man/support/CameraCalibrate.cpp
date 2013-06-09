@@ -36,9 +36,11 @@ void CameraCalibrate::UpdateByName(std::string name)
    float paramsTop[] = {0.0f, 0.0f};
    float paramsBottom[] = {0.0f, 0.0f};
 
+   // These are for river's head on kaylee's body! MAKE SURE TO FIX
     if (name == "river") {
-        paramsTop[PITCH] = -0.06f;
-        paramsBottom[ROLL] = -0.02f;
+        paramsTop[PITCH] = 0.07f;
+        paramsTop[ROLL] = -0.02f;
+        paramsBottom[PITCH] = 0.15f;
     } else if (name == "mal") {
         paramsTop[PITCH] = -.04f;
         paramsBottom[PITCH] = -.12f;
