@@ -606,7 +606,7 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
         ublas::vector <float> cameraPoint1 = worldPointToCamera(linePoint1);
         ublas::vector <float> cameraPoint2 = worldPointToCamera(linePoint2);
 
-        int INTERSECTION_PLANE_DISTANCE = 300;
+        float INTERSECTION_PLANE_DISTANCE = 300.f;
 
         // correct if one point is behind image plane
         // Note that INTERSECTION_PLANE_DISTANCE is a hack... this should

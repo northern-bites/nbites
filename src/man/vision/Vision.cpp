@@ -217,7 +217,9 @@ std::vector<boost::shared_ptr<VisualLine> > Vision::getExpectedLines(
         pose->transform(false, ja, inert);
     }
 
-    return pose->getExpectedVisualLinesFromFieldPosition(xPos, yPos, heading);
+    return pose->getExpectedVisualLinesFromFieldPosition(float(xPos),
+                                                         float(yPos),
+                                                         heading);
 }
 
 /*******************************|
