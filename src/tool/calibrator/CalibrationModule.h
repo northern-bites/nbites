@@ -58,6 +58,8 @@ private:
     int currentX, currentY, currentH;
     float backupPitch, backupRoll;
 
+    QFrame divider[3];
+
     QLabel position, parameters;
     QRadioButton goalie, center, other;
     QSpinBox setX, setY, setH;
@@ -71,7 +73,10 @@ private:
 
     QTabWidget images;
 
-    QGridLayout layout;
+    QGridLayout sideLayout;
+    QWidget side;
+
+    QHBoxLayout mainLayout;
     QWidget central;
 };
 

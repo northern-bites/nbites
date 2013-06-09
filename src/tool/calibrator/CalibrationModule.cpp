@@ -30,6 +30,7 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     pitchLabel(tr("Pitch")),
     loadButton(tr("Load Calibration Values")),
     robotNames(this),
+    side(this),
     central(this)
 {
     images.addTab(&topImage, "TOP");
@@ -39,19 +40,26 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     bottomImageIn = &bottomImage.imageIn;
 
     //image tabs
-    layout.addWidget(&images, 0, 0, 10, 1);
+    mainLayout.addWidget(&images);
+
+    for (int i = 0; i < 3; i++)
+    {
+        divider[i].setFrameShape(QFrame::HLine);
+        divider[i].setFrameShadow(QFrame::Sunken);
+    }
 
     // position control
-    layout.addWidget(&position, 0, 1);
-    layout.addWidget(&goalie, 1, 1);
-    layout.addWidget(&center, 2, 1);
-    layout.addWidget(&other, 3, 1, 3, 1);
-    layout.addWidget(&setX, 3, 2);
-    layout.addWidget(&xLabel, 3, 3);
-    layout.addWidget(&setY, 4, 2);
-    layout.addWidget(&yLabel, 4, 3);
-    layout.addWidget(&setH, 5, 2);
-    layout.addWidget(&hLabel, 5, 3);
+    sideLayout.addWidget(&position, 0, 0);
+    sideLayout.addWidget(&divider[0], 1, 0, 1, 3);
+    sideLayout.addWidget(&goalie, 2, 0);
+    sideLayout.addWidget(&center, 3, 0);
+    sideLayout.addWidget(&other, 4, 0, 3, 1);
+    sideLayout.addWidget(&setX, 4, 1);
+    sideLayout.addWidget(&xLabel, 4, 2);
+    sideLayout.addWidget(&setY, 5, 1);
+    sideLayout.addWidget(&yLabel, 5, 2);
+    sideLayout.addWidget(&setH, 6, 1);
+    sideLayout.addWidget(&hLabel, 6, 2);
 
     goalie.setChecked(true);
     turnOffOtherPosition();
@@ -64,15 +72,17 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
                   HEADING_LEFT);
 
     // roll/pitch correction control
-    layout.addWidget(&parameters, 6, 1);
-    layout.addWidget(&rollBox, 7, 1);
-    layout.addWidget(&rollLabel, 7, 2);
-    layout.addWidget(&pitchBox, 8, 1);
-    layout.addWidget(&pitchLabel, 8, 2);
+    sideLayout.addWidget(&divider[1], 7, 0, 1, 3);
+    sideLayout.addWidget(&parameters, 8, 0);
+    sideLayout.addWidget(&divider[2], 9, 0, 1, 3);
+    sideLayout.addWidget(&rollBox, 10, 0);
+    sideLayout.addWidget(&rollLabel, 10, 1);
+    sideLayout.addWidget(&pitchBox, 11, 0);
+    sideLayout.addWidget(&pitchLabel, 11, 1);
 
     // robot selection
-    layout.addWidget(&loadButton, 9, 1);
-    layout.addWidget(&robotNames, 9, 2);
+    sideLayout.addWidget(&loadButton, 12, 0);
+    sideLayout.addWidget(&robotNames, 12, 1);
 
     robotNames.addItem("");
     robotNames.addItem("river");
@@ -90,7 +100,12 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     rollBox.setRange(-2.0, 2.0);
     pitchBox.setRange(-2.0, 2.0);
 
-    central.setLayout(&layout);
+    side.setLayout(&sideLayout);
+    side.setMaximumHeight(350);
+
+    mainLayout.addWidget(&side, 0, Qt::AlignTop);
+
+    central.setLayout(&mainLayout);
     setCentralWidget(&central);
 
     connect(&goalie, SIGNAL(toggled(bool)),
