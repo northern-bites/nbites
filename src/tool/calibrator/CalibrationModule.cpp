@@ -267,7 +267,6 @@ void CalibrationModule::loadRobotParameters()
 
 void CalibrationModule::updateParameters()
 {
-    std::cout << "Updateparams." << std::endl;
     float paramsTop[CameraCalibrate::NUM_PARAMS];
     float paramsBottom[CameraCalibrate::NUM_PARAMS];
 
