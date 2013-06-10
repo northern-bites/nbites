@@ -64,6 +64,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         gcState = self.gameState
 
         if (gcState == 'gamePlaying' and
+            not self.currentState == 'afterPenalty' and
             not self.currentState == 'gamePenalized'):
             if not (self.currentState == 'gamePlaying'
                 and self.counter != 1):
