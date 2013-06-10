@@ -46,7 +46,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
     200,                        // Num Particles
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
-    .15f,                        // Variance in x-y odometry
+    .38f,                        // Variance in x-y odometry
     .03f                         // Variance in h odometry
 };
 
@@ -94,7 +94,7 @@ public:
     Particle getBestParticle();
 
     bool onDefendingSide() {return (poseEstimate.x() < CENTER_FIELD_X);};
-    bool nearMidField() {return (fabs(poseEstimate.x() - CENTER_FIELD_X) < 10);};
+    bool nearMidField() {return (fabs(poseEstimate.x() - CENTER_FIELD_X) < 50);};
 
     /** Reset Functions **/
 
