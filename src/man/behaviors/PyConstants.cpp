@@ -7,6 +7,7 @@
 
 using namespace boost::python;
 using namespace man::behaviors;
+using namespace man;
 
 BOOST_PYTHON_MODULE(noggin_constants)
 {

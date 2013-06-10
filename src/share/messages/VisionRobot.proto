@@ -25,6 +25,8 @@ message Robot
         optional sint32 y = 7;
         optional float elevation_deg = 8;
         optional bool on = 9;
+	optional sint32 height = 10;
+	optional sint32 width = 11;
 }
 
 message VisionObstacle

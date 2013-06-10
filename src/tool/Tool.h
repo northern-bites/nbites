@@ -25,10 +25,10 @@
 #include "fieldview/FieldViewer.h"
 
 #include "image/ImageConverterModule.h"
+
 #include "colorcreator/ColorCalibrate.h"
 
 #include "ParticleSwarm.pb.h"
-
 
 namespace tool {
 
@@ -41,7 +41,11 @@ public:
 
 public slots:
     void setUpModules();
-    void loadColorTable();
+	void loadColorTable();
+	void changeTableValues(std::vector<color::colorChanges> tableAdjustments);
+	void unChangeTableValues(std::vector<color::colorChanges> tableAdjustments);
+	void saveAsGlobalTable();
+	void saveGlobalTable();
 
 protected:
     // For keyboard control
@@ -54,9 +58,9 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
-    color::ColorTableCreator tableCreator;
-    vision::VisionDisplayModule visDispMod;
-    colorcreator::ColorCalibrate colorCalibrate;
+	color::ColorTableCreator tableCreator;
+	vision::VisionDisplayModule visDispMod;
+	colorcreator::ColorCalibrate colorCalibrate;
     viewer::FieldViewer fieldView;
 
     man::image::ImageConverterModule topConverter;
@@ -73,6 +77,7 @@ protected:
     QPushButton* nextButton;
     QPushButton* recordButton;
     QPushButton* scrollButton;
+	QPushButton* loadBtn;
     QScrollArea* scrollArea;
     QSize* scrollBarSize;
     QSize* tabStartSize;
