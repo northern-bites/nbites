@@ -31,6 +31,7 @@ enum ProfiledComponent {
     P_FGHORIZON,
     P_RUNS,
     P_OBJECT,
+    P_OBSTACLES,
     P_ROBOTS,
 
     P_EDGES,

@@ -35,7 +35,6 @@ option(
   OFF
 )
 
-
 option(
   DEBUG_THREADS
   "Toggle threads debug mode."
@@ -109,6 +108,11 @@ if(USE_LOGGING)
     "Log the odometry from motion"
     OFF
     )
+  option(
+    LOG_SYNC
+    "Enable to log every tenth frame in order to stay synced with image logging"
+    ON
+    )
 
 else(USE_LOGGING)
   unset(LOG_SENSORS CACHE)
@@ -120,6 +124,7 @@ else(USE_LOGGING)
   unset(LOG_LOCALIZATION CACHE)
   unset(LOG_OBSERVATIONS CACHE)
   unset(LOG_ODOMETRY CACHE)
+  unset(LOG_SYNC CACHE)
 endif(USE_LOGGING)
 
 endif( NOT OFFLINE )

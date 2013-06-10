@@ -26,17 +26,25 @@ void CameraCalibrate::init() {
     gethostname(getName, 40);
     std::string name(getName);
 
-    float paramsTop[] = {0.0f, 0.0f};
-    float paramsBottom[] = {0.0f, 0.0f};
-
     std::cout << "Setting CameraCalibrate for " << name << std::endl;
 
+    UpdateByName(name);
+}
+
+void CameraCalibrate::UpdateByName(std::string name)
+{
+   float paramsTop[] = {0.0f, 0.0f};
+   float paramsBottom[] = {0.0f, 0.0f};
+
+   // These are for river's head on kaylee's body! MAKE SURE TO FIX
     if (name == "river") {
-        paramsTop[PITCH] = -0.06f;
-        paramsBottom[ROLL] = -0.02f;
+        paramsTop[PITCH] = 0.07f;
+        paramsTop[ROLL] = -0.02f;
+        paramsBottom[PITCH] = 0.15f;
+   // These are for mal's head on simon's body! MAKE SURE TO FIX
     } else if (name == "mal") {
-        paramsTop[PITCH] = -.04f;
-        paramsBottom[PITCH] = -.12f;
+        paramsTop[PITCH] = 0.10f;
+        paramsBottom[PITCH] = 0.11f;
     } else if (name == "zoe") {
         paramsTop[ROLL] = -0.03f;
         paramsTop[PITCH] = -0.01f;
@@ -46,7 +54,10 @@ void CameraCalibrate::init() {
         paramsTop[ROLL] = 0.01f;
         paramsBottom[ROLL] = 0.02f;
     } else if (name == "wash") {
-        paramsTop[ROLL] = -0.01f;
+        paramsTop[ROLL] = -0.05f;
+        paramsTop[PITCH] = -0.06f;
+        paramsBottom[ROLL] = -0.04f;
+        paramsBottom[PITCH] = -0.05f;
     } else if (name == "kaylee") {
         paramsTop[PITCH] = 0.08f;
         paramsTop[ROLL] = 0.02f;

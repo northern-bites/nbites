@@ -37,18 +37,17 @@ def shouldDodgeLeft(nav):
     vision = nav.brain.interface.visionObstacle.on_right
 
     #check feet
-#    footBumperState = nav.brain.interface.footBumperState
-    feet = (False)
-            # Not currently usable: proto cannot be parsed
-            #footBumperState.r_foot_bumper_left or
-            #footBumperState.r_foot_bumper_right)
+    footBumperState = nav.brain.interface.footBumperState
+    feet = (footBumperState.r_foot_bumper_left.pressed or
+            footBumperState.r_foot_bumper_right.pressed)
 
-    if (feet and vision):
+    # FIXME: sonars aren't working!
+    if (feet or vision):
         return True
-    elif (vision and sonars):
-        return True
-    elif (sonars and feet):
-        return True
+    # if (vision and sonars):
+    #     return True
+    # elif (sonars and feet):
+    #     return True
 
     else:
         return False
@@ -65,18 +64,17 @@ def shouldDodgeRight(nav):
     vision = nav.brain.interface.visionObstacle.on_left
 
     #check feet
-#    footBumperState = nav.brain.interface.footBumperState
-    feet = (False)
-            # Not currently usable: proto cannot be parsed
-            #(footBumperState.l_foot_bumper_left or
-            #footBumperState.l_foot_bumper_right)
+    footBumperState = nav.brain.interface.footBumperState
+    feet = (footBumperState.l_foot_bumper_left.pressed or
+            footBumperState.l_foot_bumper_right.pressed)
 
-    if (feet and vision):
+    # FIXME: sonars aren't working!
+    if (feet or vision):
         return True
-    elif (vision and sonars):
-        return True
-    elif (sonars and feet):
-        return True
+    # if (vision and sonars):
+    #     return True
+    # elif (sonars and feet):
+    #     return True
 
     else:
         return False

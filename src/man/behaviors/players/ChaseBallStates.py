@@ -14,6 +14,7 @@ def chase(player):
     """
     Super State to determine what to do from various situations
     """
+
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
 
@@ -32,7 +33,7 @@ def kickoff(player):
         kickoff.ballRelX = player.brain.ball.rel_x
         kickoff.ballRelY = player.brain.ball.rel_y
 
-    if (player.stateTime > 10 or
+    if (player.brain.gameController.timeSincePlaying > 10 or
         fabs(player.brain.ball.rel_x - kickoff.ballRelX) > 5 or
         fabs(player.brain.ball.rel_y - kickoff.ballRelY) > 5):
         return player.goNow('chase')
@@ -72,6 +73,7 @@ def approachBall(player):
             player.brain.nav.chaseBall(fast = True)
 
     if (transitions.shouldFindBall(player)):
+        print "DEBUG_SUIT: In 'approachBall', shouldFindBall is True. Switching to 'chase'."
         return player.goLater('chase')
 
     if (transitions.shouldPrepareForKick(player) or
@@ -86,6 +88,7 @@ def approachBall(player):
             player.shouldKickOff = False
             return player.goNow('positionForKick')
         else:
+            print "DEBUG_SUITE: In 'approachBall', either shouldPrepareForKick or nav.isAtPosition is True. Not a kickoff: switching to 'prepareForKick'."
             return player.goNow('prepareForKick')
 
     else:
@@ -102,6 +105,7 @@ def prepareForKick(player):
     prepareForKick.hackKick.collectData()
 
     if player.brain.ball.distance > 40:
+        print "DEBUG_SUITE: In 'prepareForKick', ball.distance is >40. Switching to 'chase'."
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
@@ -113,6 +117,7 @@ def prepareForKick(player):
     # If hackKickInfo has enough information already, prematurely end pan and kick.
     if player.brain.tracker.isStopped() or \
             prepareForKick.hackKick.hasEnoughInformation():
+        print "DEBUG_SUITE: In 'prepareForKick', either tracker.isStopped or hackKick.hasEnoughInformation. Switching to 'orbitBall'."
         prepareForKick.hackKick.calculateDataAverages()
         if hackKick.DEBUG_KICK_DECISION:
             print str(prepareForKick.hackKick)
@@ -133,8 +138,10 @@ def orbitBall(player):
             print "Orbiting at angle: ",player.kick.h
 
         if player.kick.h == 0:
+            print "DEBUG_SUITE: In 'orbitBall', orbit is zero. Switching to 'positionForKick'."
             return player.goNow('positionForKick')
 
+        print "DEBUG_SUITE: In 'orbitBall', orbiting at non-zero angle."
         # Reset from pre-kick pan to straight, then track the ball.
         player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
@@ -143,13 +150,16 @@ def orbitBall(player):
         player.shouldOrbit = False
         player.kick.h = 0
         if player.kick == kicks.ORBIT_KICK_POSITION:
+            print "DEBUG_SUITE: In 'orbitBall', finished with orbit kick. Switching to 'prepareForKick'."
             return player.goNow('prepareForKick')
         else:
+            print "DEBUG_SUITE: In 'orbitBall', finished with orbit. Switching to 'positionForKick'."
             player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
             return player.goNow('positionForKick')
 
     if (transitions.shouldFindBallKick(player) or
         transitions.shouldCancelOrbit(player)):
+        print "DEBUG_SUITE: In 'orbitBall', either shouldFindBall or shouldCancelOrbit. Switching to 'chase'."
         player.inKickingState = False
         return player.goLater('chase')
 
@@ -161,6 +171,7 @@ def positionForKick(player):
     """
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
+        print "DEBUG_SUITE: In 'positionForKick', either shouldApproachBallAgain or shouldRedecideKick. Switching to 'chase'."
         player.inKickingState = False
         return player.goLater('chase')
 
@@ -185,16 +196,20 @@ def positionForKick(player):
         player.brain.nav.updateDest(positionForKick.kickPose)
 
     if transitions.shouldFindBallKick(player) and player.counter > 15:
+        print "DEBUG_SUITE: In 'positionForKick', both shouldFindBallKick and counter >15. Switching to 'chase'."
         player.inKickingState = False
         return player.goLater('chase')
 
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
+        print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 
     return player.stay()
 
+# Currently not used as of 6/7/13.
+# TODO: implement this again?
 def lookAround(player):
     """
     Nav is stopped. We want to look around to get better loc.
