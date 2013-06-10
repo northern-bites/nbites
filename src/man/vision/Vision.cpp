@@ -162,7 +162,7 @@ void Vision::notifyImage(const ThresholdImage& topThrIm, const PackedImage16& to
     // Perform image correction, thresholding, and object recognition
 
     thresh->visionLoop(ja, inert);
-//    thresh->obstacleLoop(ja, inert);
+    thresh->obstacleLoop(ja, inert);
 
    // drawEdges(*linesDetector->getEdges());
    // drawHoughLines(linesDetector->getHoughLines());
