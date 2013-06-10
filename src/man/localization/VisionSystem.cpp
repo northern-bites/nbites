@@ -165,7 +165,7 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
 {
     //We now hate center circles. so fuck em
     for (int j = 0; j < corner.poss_id_size(); j++) {
-        if (corner.poss_id(j) == 21 || corner.poss_id(j) == 22)
+        if (corner.poss_id(j) == 30 || corner.poss_id(j) == 31)
             return;
     }
 
