@@ -52,7 +52,7 @@ static const float BOX_FUDGE = 10.0f;          // allow for errors
 //here are defined the lower bounds on the sizes of goals, posts, and balls
 //IMPORTANT: they are only guesses right now.
 
-#define MIN_GOAL_HEIGHT	30
+#define MIN_GOAL_HEIGHT	25
 #define MIN_GOAL_WIDTH	4
 
 // ID information on goal post constant
@@ -533,6 +533,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
 {
     const int NUMSCANS = 5;
     const int WHICH = 3;
+	const int MAXSCAN = 16;
     int values[NUMSCANS];
     int spanY = bottom.y - top.y;
     int dir = 1;
@@ -574,7 +575,7 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
 			  tempy = yProject(tempx - 1 * dir, tempy, tempx);
 			  if (tempx < 0 || tempx >= IMAGE_WIDTH || tempy < 0 ||
 															   tempy >= IMAGE_HEIGHT ||
-					  values[i] > 15) {
+					  values[i] >= MAXSCAN) {
 				  found = true;
 			  }
 		  }
@@ -583,6 +584,9 @@ void ObjectFragments::findVerticalEdge(point <int>& top,
 		  qx = xProject(top.x, top.y, qy);
 	  }
 	  qs = pickNth(values, 2, NUMSCANS);
+	  if (qs == MAXSCAN) {
+		  qs = 0;
+	  }
 	  if (qs > 0) {
 		  if (CORRECT) {
 			  cout << "Squeezing " << qs << " " << dir << endl;
@@ -619,6 +623,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 {
     const int NUMSCANS = 4;
     const int WHICH = 2;
+	const int MAXSCAN = 16;
     int values[NUMSCANS];
     int spanX = right.x - left.x;
     int dir = 1;
@@ -661,7 +666,7 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 				tempx = xProject(tempx, tempy - dir, tempy);
 				if (tempx < 0 || tempx >= IMAGE_WIDTH || tempy < 0 ||
 																 tempy >= IMAGE_HEIGHT ||
-						values[i] > 15) {
+						values[i] >= MAXSCAN) {
 					found = true;
 				}
 			}
@@ -670,9 +675,15 @@ void ObjectFragments::findHorizontalEdge(point <int>& left,
 			qy = yProject(left.x, left.y, qx);
 		}
 		qs = pickNth(values, 2, NUMSCANS);
+		if (qs == MAXSCAN) {
+			if (CORRECT) {
+				cout << "Possible bad edge, overdid maxscan" << endl;
+			}
+			qs = 0;
+		}
 		if (qs > 0) {
 			if (CORRECT) {
-				cout << "Squeezing horizontally" << qs << " " << dir << endl;
+				cout << "Squeezing horizontally " << qs << " " << dir << endl;
 			}
 		}
 		dir = -dir;
@@ -728,7 +739,7 @@ float ObjectFragments::correct(Blob & b, unsigned char color) {
         // loop at 1/4 2/4 and 3/4
         for (int i = 1; i < 4; i++) {
             corrections[i-1] = 0;
-            midy = midy + diffy;
+            midy = max(min(midy + diffy, IMAGE_HEIGHT - 1), 0);
             if (k > 0) {
                 midx = b.getLeft();
             } else {
@@ -1938,7 +1949,11 @@ int ObjectFragments::getFrontlineClassification(point<int> post,
 int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 {
     const int HORIZON_TOLERANCE = 10;	   // our other post should be near horizon
-    const int MIN_OTHER_THRESHOLD = 15;  // how big does it have to be?
+    const int MIN_OTHER_THRESHOLD = 10;    // how big does it have to be?
+	int wide = 4;
+	if (right - left < 4) {
+		wide = 3;
+	}
 
     int largel = 0;
     int larger = 0;
@@ -1983,7 +1998,7 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 		for (int i = indexr - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i--) {
 			count++;
 		}
-		if (count > 4) {
+		if (count > wide) {
 			if (POSTLOGIC) {
 				cout << "Larger " << left << " " << right << " " << larger <<
 					" " << count << endl;
@@ -1999,7 +2014,7 @@ int ObjectFragments::classifyByOtherRuns(int left, int right, int height)
 		for (int i = indexl - 1; i >= 0 && runs[i+1].x - runs[i].x < 3; i--) {
 			count++;
 		}
-		if (count > 4) {
+		if (count > wide) {
 			if (POSTLOGIC) {
 				cout << "Largel " << left << " " << right << " " << largel <<
 					" " << count << endl;
@@ -2477,11 +2492,15 @@ bool ObjectFragments::postBigEnough(Blob b) {
     if (b.getLeftTopX() == BADVALUE) {
         return false;
     }
-    if (b.width() <MIN_GOAL_WIDTH) {
-        return false;
+    if (b.width() < MIN_GOAL_WIDTH) {
+		if (thresh->getPixDistance(b.getLeftBottomY()) < 500.0f) {
+			return false;
+		} else if (b.width() < 3) {
+			return false;
+		}
     }
     if (b.height() < MIN_GOAL_HEIGHT) {
-		if (thresh->getPixDistance(b.getLeftTopY()) > 300.0f) {
+		if (thresh->getPixDistance(b.getLeftTopY()) > 400.0f) {
 			if (b.height() > MIN_GOAL_HEIGHT / 2) {
 				return true;
 			}
