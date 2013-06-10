@@ -406,6 +406,8 @@ class Brain(object):
             # Loc is accurate. Abort flip.
             return
 
+        print "According to the Goalie, I need to flip my loc!"
+
         reset_x = (-1*(self.loc.x - Constants.MIDFIELD_X)) + Constants.MIDFIELD_X
         reset_y = (-1*(self.loc.y - Constants.MIDFIELD_Y)) + Constants.MIDFIELD_Y
         reset_h = self.loc.h + 180
