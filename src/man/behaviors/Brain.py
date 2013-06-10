@@ -356,7 +356,7 @@ class Brain(object):
         # Add to the filter for this frame
         for mate in self.teamMembers:
             if mate.playerNumber in [1] and mate.active:
-                if mate.ballOn:
+                if mate.ballOn and mate.ballDist < 350:
                     self.dangerousBallFilter.append(1)
                 else:
                     self.dangerousBallFilter.append(0)
