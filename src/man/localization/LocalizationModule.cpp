@@ -5,7 +5,7 @@ namespace man
 {
 namespace localization
 {
-static const float ODOMETRY_HEADING_FRICTION_FACTOR = 2.3f;
+static const float ODOMETRY_HEADING_FRICTION_FACTOR = 2.f;
 static const float ODOMETRY_X_FRICTION_FACTOR = 1.1f;
 static const float ODOMETRY_Y_FRICTION_FACTOR = 1.f;
 
