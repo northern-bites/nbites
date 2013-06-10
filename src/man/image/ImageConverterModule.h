@@ -28,6 +28,7 @@ public:
 
     // For offline use, allows table to change after construction
     void changeTable(unsigned char *newTable);
+	void loadTable(unsigned char *newTable);
 
 protected:
     virtual void run_();

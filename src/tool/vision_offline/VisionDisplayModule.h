@@ -55,6 +55,9 @@ public:
 	portals::InPortal<messages::PackedImage16> bYImage_in;
 	portals::InPortal<messages::PackedImage16> bUImage_in;
 	portals::InPortal<messages::PackedImage16> bVImage_in;
+
+	portals::InPortal<messages::JointAngles> joints_in;
+	portals::InPortal<messages::InertialState> inerts_in;
 													
 
 protected slots:
@@ -102,6 +105,9 @@ private:
 	portals::OutPortal<messages::PackedImage16> bYImage;
 	portals::OutPortal<messages::PackedImage16> bUImage;
 	portals::OutPortal<messages::PackedImage16> bVImage;
+
+	portals::OutPortal<messages::JointAngles> joints;
+	portals::OutPortal<messages::InertialState> inertials;
 
 
 };

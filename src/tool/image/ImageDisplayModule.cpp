@@ -9,7 +9,8 @@ ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
     : QLabel(parent),
       filter(ALL_COLORS)
 {
-    setText(tr("No image loaded!"));
+	setText(tr("No image loaded!"));
+	setHeight(480); // twice as big as normal
 }
 
 void ThresholdedImageDisplayModule::run_()
@@ -29,33 +30,35 @@ void ThresholdedImageDisplayModule::run_()
  */
 QImage ThresholdedImageDisplayModule::makeImage(byte filter_)
 {
-    QImage image(imageIn.message().width(),
-                 imageIn.message().height(),
-                 QImage::Format_RGB32);
+	QImage image(imageIn.message().width(),
+				 imageIn.message().height(),
+				 QImage::Format_RGB32);
 
-    for (int j = 0; j < image.height(); ++j)
-    {
-        QRgb* bitmapLine = (QRgb*) image.scanLine(j);
-        for (int i = 0; i < image.width(); ++i)
-        {
-            int rawColor = imageIn.message().getPixel(i, j);
-            int threshColor = 0, mix = 1;
-            for (int c = 0; c < Color::NUM_COLORS; c++) {
-                if ((rawColor & Color_bits[c]) > 0 &&
-                    ((Color_bits[c] & filter_) > 0))
-                {
-                    threshColor += Color_RGB[c];
-                    threshColor /= mix;
-                    mix++;
-                }
-            }
+	for (int j = 0; j < image.height(); ++j)
+	{
+		QRgb* bitmapLine = (QRgb*) image.scanLine(j);
+		for (int i = 0; i < image.width(); ++i)
+		{
+			int rawColor = imageIn.message().getPixel(i, j);
+			int threshColor = 0, mix = 1;
+			for (int c = 0; c < Color::NUM_COLORS; c++) {
+				if ((rawColor & Color_bits[c]) > 0 &&
+					((Color_bits[c] & filter_) > 0))
+				{
+					threshColor += Color_RGB[c];
+					threshColor /= mix;
+					mix++;
+				}
+			}
 
-            if (threshColor == 0) threshColor = Color_RGB[0];
-            bitmapLine[i] = threshColor;
-        }
-    }
+			if (threshColor == 0) threshColor = Color_RGB[0];
+			bitmapLine[i] = threshColor;
+		}
+	}
 
-    return image;
+	image = image.scaledToHeight(height);
+
+	return image;
 }
 
 ImageDisplayModule::ImageDisplayModule(QWidget* parent) : QLabel(parent),

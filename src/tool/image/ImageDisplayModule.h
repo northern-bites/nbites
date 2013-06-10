@@ -103,7 +103,8 @@ public:
 
     // The filter tells us which color to show; a class that uses this one
     // to display an image can change the filter using this method
-    void setFilter(byte filter_) { filter = filter; }
+    void setFilter(byte filter_) { filter = filter_; }
+	void setHeight(int newHeight) { height = newHeight; }
 
 protected:
     // Implements Module's run_ method
@@ -115,6 +116,9 @@ protected:
 
     /// Which color are we displaying?
     byte filter;
+
+	/// How big should the display be
+	int height;
 };
 
 /*
@@ -145,6 +149,8 @@ protected:
 
     // Which channel are we currently displaying?
     ChannelType channel;
+
+	int height;
 };
 
 /*
@@ -155,7 +161,7 @@ class OverlayDisplayModule : public ImageDisplayModule
 {
 public:
     OverlayDisplayModule(QWidget* parent = 0) : ImageDisplayModule(parent) {};
-    void setOverlay(QImage overlay_) { overlay = overlay_; }
+    void setOverlay(QImage overlay_) { overlay = overlay_; run_(); }
 
 protected:
     // Replaces ImageDisplayModule's run method to do the overlaying

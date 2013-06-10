@@ -25,6 +25,10 @@ public:
 public slots:
     void setUpModules();
     void loadColorTable();
+	void changeTableValues(std::vector<color::colorChanges> tableAdjustments);
+	void unChangeTableValues(std::vector<color::colorChanges> tableAdjustments);
+	void saveAsGlobalTable();
+	void saveGlobalTable();
 
  protected:
     color::ColorTableCreator tableCreator;
@@ -34,6 +38,8 @@ public slots:
     man::image::ImageConverterModule bottomConverter;
 
     colorcreator::ColorCalibrate colorCalibrate;
+
+	QPushButton* loadBtn;
 
     color::ColorTable globalColorTable;
 
