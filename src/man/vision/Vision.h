@@ -109,8 +109,6 @@ public:
     void drawVisualLines(const std::vector<HoughVisualLine>& lines, Gradient& g);
     void drawX(int x, int y, int c);
 
-
-
     //
     // SETTERS
     //
@@ -138,6 +136,15 @@ public:
 
     // misc
     std::string getThreshColor(int _id);
+
+    // For calibrating cameras; not called online
+    std::vector<boost::shared_ptr<VisualLine> >
+    getExpectedLines(Camera::Type which,
+                     const messages::JointAngles& ja,
+                     const messages::InertialState& inert,
+                     int xPos,
+                     int yPos,
+                     float heading);
 
 public:
     //
