@@ -239,21 +239,21 @@ void VisionModule::updateVisionField() {
     field_data.get()->mutable_goal_post_l()->set_width(vision->yglp->getWidth());
 
     field_data.get()->mutable_goal_post_l()->mutable_left_top()->
-        set_x(vision->yglp->getLeftTopX());
+        set_x((float)vision->yglp->getLeftTopX());
     field_data.get()->mutable_goal_post_l()->mutable_left_top()->
-        set_y(vision->yglp->getLeftTopY());
+        set_y((float)vision->yglp->getLeftTopY());
     field_data.get()->mutable_goal_post_l()->mutable_right_top()->
-        set_x(vision->yglp->getRightTopX());
+        set_x((float)vision->yglp->getRightTopX());
     field_data.get()->mutable_goal_post_l()->mutable_right_top()->
-        set_y(vision->yglp->getRightTopY());
+        set_y((float)vision->yglp->getRightTopY());
     field_data.get()->mutable_goal_post_l()->mutable_left_bot()->
-        set_x(vision->yglp->getLeftBottomX());
+        set_x((float)vision->yglp->getLeftBottomX());
     field_data.get()->mutable_goal_post_l()->mutable_left_bot()->
-        set_y(vision->yglp->getLeftBottomY());
+        set_y((float)vision->yglp->getLeftBottomY());
     field_data.get()->mutable_goal_post_l()->mutable_right_bot()->
-        set_x(vision->yglp->getRightBottomX());
+        set_x((float)vision->yglp->getRightBottomX());
     field_data.get()->mutable_goal_post_l()->mutable_right_bot()->
-        set_y(vision->yglp->getRightBottomY());
+        set_y((float)vision->yglp->getRightBottomY());
 
     field_data.get()->mutable_goal_post_l()->mutable_visual_detection()->
         set_intopcam(vision->yglp->isTopCam());
@@ -307,21 +307,21 @@ void VisionModule::updateVisionField() {
     field_data.get()->mutable_goal_post_r()->set_width(vision->ygrp->getWidth());
 
     field_data.get()->mutable_goal_post_r()->mutable_left_top()->
-        set_x(vision->ygrp->getLeftTopX());
+        set_x((float)vision->ygrp->getLeftTopX());
     field_data.get()->mutable_goal_post_r()->mutable_left_top()->
-        set_y(vision->ygrp->getLeftTopY());
+        set_y((float)vision->ygrp->getLeftTopY());
     field_data.get()->mutable_goal_post_r()->mutable_right_top()->
-        set_x(vision->ygrp->getRightTopX());
+        set_x((float)vision->ygrp->getRightTopX());
     field_data.get()->mutable_goal_post_r()->mutable_right_top()->
-        set_y(vision->ygrp->getRightTopY());
+        set_y((float)vision->ygrp->getRightTopY());
     field_data.get()->mutable_goal_post_r()->mutable_left_bot()->
-        set_x(vision->ygrp->getLeftBottomX());
+        set_x((float)vision->ygrp->getLeftBottomX());
     field_data.get()->mutable_goal_post_r()->mutable_left_bot()->
-        set_y(vision->ygrp->getLeftBottomY());
+        set_y((float)vision->ygrp->getLeftBottomY());
     field_data.get()->mutable_goal_post_r()->mutable_right_bot()->
-        set_x(vision->ygrp->getRightBottomX());
+        set_x((float)vision->ygrp->getRightBottomX());
     field_data.get()->mutable_goal_post_r()->mutable_right_bot()->
-        set_y(vision->ygrp->getRightBottomY());
+        set_y((float)vision->ygrp->getRightBottomY());
 
     field_data.get()->mutable_goal_post_r()->mutable_visual_detection()->
         set_intopcam(vision->ygrp->isTopCam());
