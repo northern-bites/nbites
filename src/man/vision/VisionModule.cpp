@@ -25,8 +25,10 @@ VisionModule::VisionModule() : Module(),
                                vision_obstacle(base()),
                                topOutPic(base()),
                                botOutPic(base()),
+#ifdef LOG_VISION
                                joint_angles_out(base()),
                                inertial_state_out(base()),
+#endif
                                vision(boost::shared_ptr<Vision>(new Vision()))
 {
 }
