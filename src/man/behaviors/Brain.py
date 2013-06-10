@@ -361,8 +361,10 @@ class Brain(object):
                 else:
                     self.dangerousBallFilter.append(0)
 
-        # add to the counter whatever was appended
-        self.dangerousBallFilterCount += self.dangerousBallFilter[len(self.dangerousBallFilter)-1]
+        # If there isn't a goalie, the list will be empty, so don't try to read it.
+        if len(self.dangerousBallFilter) > 0:
+            # add to the counter whatever was appended
+            self.dangerousBallFilterCount += self.dangerousBallFilter[len(self.dangerousBallFilter)-1]
 
         # check if the filter has been populated yet.
         if len(self.dangerousBallFilter) > 20:
