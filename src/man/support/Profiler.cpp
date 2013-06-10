@@ -24,6 +24,7 @@ static const char *PCOMPONENT_NAMES[] = {
     "FGHorizon",
     "Runs",
     "Object",
+    "Obstacles",
     "Robots",
 
     "Edges",
@@ -99,6 +100,7 @@ static const ProfiledComponent PCOMPONENT_SUB_ORDER[] = {
     /*P_FGHORIZON              --> */ P_THRESHRUNS,
     /*P_RUNS                   --> */ P_THRESHRUNS,
     /*P_OBJECT                 --> */ P_VISION,
+    /*P_OBSTACLES              --> */ P_VISION,
     /*P_ROBOTS                 --> */ P_VISION,
 
     /*P_EDGES,                 --> */ P_VISION,

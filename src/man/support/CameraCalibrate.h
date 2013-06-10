@@ -29,12 +29,26 @@ public:
     //hack to get the parameters in
     //we should just update the params once
     static void init();
+    static void UpdateByName(std::string name);
     static void UpdateWithParams(float paramsTop[], float paramsBottom[]);
+
     static ufmatrix4* getTransforms(Camera::Type which) {
         if (which == Camera::TOP) {
             return TransformsTop;
         } else {
             return TransformsBottom;
+        }
+    }
+
+    static float* getCurrentParameters(Camera::Type which)
+    {
+        if (which == Camera::TOP)
+        {
+            return ParamsTop;
+        }
+        else
+        {
+            return ParamsBottom;
         }
     }
 

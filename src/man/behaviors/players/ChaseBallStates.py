@@ -14,6 +14,7 @@ def chase(player):
     """
     Super State to determine what to do from various situations
     """
+
     if transitions.shouldFindBall(player):
         return player.goNow('findBall')
 
@@ -32,7 +33,7 @@ def kickoff(player):
         kickoff.ballRelX = player.brain.ball.rel_x
         kickoff.ballRelY = player.brain.ball.rel_y
 
-    if (player.stateTime > 10 or
+    if (player.brain.gameController.timeSincePlaying > 10 or
         fabs(player.brain.ball.rel_x - kickoff.ballRelX) > 5 or
         fabs(player.brain.ball.rel_y - kickoff.ballRelY) > 5):
         return player.goNow('chase')

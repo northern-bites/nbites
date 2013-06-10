@@ -24,6 +24,7 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
     // Initialize the Aldebaran fast access memory interface
     // to quickly read sensor values from memory.
     initializeSensorFastAccess();
+    initializeSonarValues();
 }
 
 SensorsModule::~SensorsModule()

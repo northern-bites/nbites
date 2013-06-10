@@ -5,9 +5,9 @@ namespace man
 {
 namespace localization
 {
-static const float ODOMETRY_HEADING_FRICTION_FACTOR = 2.5;
-static const float ODOMETRY_X_FRICTION_FACTOR = 1.12;
-static const float ODOMETRY_Y_FRICTION_FACTOR = 1;
+static const float ODOMETRY_HEADING_FRICTION_FACTOR = 2.f;
+static const float ODOMETRY_X_FRICTION_FACTOR = 1.1f;
+static const float ODOMETRY_Y_FRICTION_FACTOR = 1.f;
 
 LocalizationModule::LocalizationModule()
     : portals::Module(),
@@ -40,8 +40,8 @@ void LocalizationModule::update()
     lastOdometry.set_y(curOdometry.y());
     lastOdometry.set_h(curOdometry.h());
 
-    // Maybe B-Human has a different coordinate frame for odometry...
-    // This is fucking absurd but I'm going to rotate the x and y by the h...
+    // Want odometry to give information relative to current robot frame
+    // IE choose to have robot frame change as the robot moves
     float sinH, cosH;
     sincosf(motionInput.message().h(), &sinH, &cosH);
     float rotatedX =   cosH*motionInput.message().x()
@@ -86,12 +86,10 @@ void LocalizationModule::run_()
     // Profiler
     PROF_ENTER(P_SELF_LOC);
 
-    // Get new information
     motionInput.latch();
     visionInput.latch();
     resetInput.latch();
 
-    // Update the filter
     update();
 
     // Profiler

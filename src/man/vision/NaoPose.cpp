@@ -353,7 +353,7 @@ estimate NaoPose::pixEstimate(pixels pixelX, pixels pixelY, mms objectHeight) co
 
     // Computed this constant and also checked it experimentally
     // For objects in 320x240-size images ONLY!
-    float FOCAL_LENGTH = 290.f;
+    float FOCAL_LENGTH = 272.4f;
     ufvector4 pixelInCameraFrame =
             vector4D( FOCAL_LENGTH,
                       ((float)IMAGE_CENTER_X - (float)pixelX),
@@ -603,20 +603,35 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
         linePoint2 = prod(worldOriginToRobotOriginTranslation, linePoint2);
         linePoint2 = prod(worldToRobotRotation, linePoint2);
 
-        ublas::vector <float> pixel1 = worldPointToPixel(linePoint1);
-        ublas::vector <float> pixel2 = worldPointToPixel(linePoint2);
+        ublas::vector <float> cameraPoint1 = worldPointToCamera(linePoint1);
+        ublas::vector <float> cameraPoint2 = worldPointToCamera(linePoint2);
 
-        float FOCAL_LENGTH = 290.0;
+        float INTERSECTION_PLANE_DISTANCE = 300.f;
 
         // correct if one point is behind image plane
-        if (pixel1(Z) < 0 && pixel2(Z) > 0) {
-            pixel1 = ((FOCAL_LENGTH - pixel1(Z)) /
-                    (pixel2(Z) - pixel1(Z)))*
-                    (pixel1-pixel2) + pixel1;
-        } else if (pixel2(Z) < 0 && pixel1(Z) > 0) {
-            pixel2 = ((FOCAL_LENGTH - pixel2(Z)) /
-                    (pixel1(Z) - pixel2(Z))) *
-                    (pixel2-pixel1) + pixel2;
+        // Note that INTERSECTION_PLANE_DISTANCE is a hack... this should
+        // be a more complicated intersection calculation BUT this looks okay
+        if (cameraPoint1(X) < INTERSECTION_PLANE_DISTANCE &&
+            cameraPoint2(X) > INTERSECTION_PLANE_DISTANCE) {
+            cameraPoint1 = (((INTERSECTION_PLANE_DISTANCE - cameraPoint1(X)) /
+                            (cameraPoint2(X) - cameraPoint1(X))) *
+                            (cameraPoint2-cameraPoint1)) + cameraPoint1;
+
+        } else if (cameraPoint2(X) < INTERSECTION_PLANE_DISTANCE &&
+                   cameraPoint1(X) > INTERSECTION_PLANE_DISTANCE) {
+            cameraPoint2 = (((INTERSECTION_PLANE_DISTANCE - cameraPoint2(X)) /
+                             (cameraPoint1(X) - cameraPoint2(X))) *
+                            (cameraPoint1-cameraPoint2)) + cameraPoint2;
+        }
+
+        ublas::vector <float> pixel1 = cameraPointToPixel(cameraPoint1);
+        ublas::vector <float> pixel2 = cameraPointToPixel(cameraPoint2);
+
+        if (cameraPoint2(X) < 0 && cameraPoint1(X) < 0) {
+            pixel1(X) = 0;
+            pixel1(Y) = 0;
+            pixel2(X) = 0;
+            pixel2(Y) = 0;
         }
 
         linePoint visualLinePoint1;
@@ -648,6 +663,13 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
  **/
 const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> point)
 {
+    return cameraPointToPixel(worldPointToCamera(point));
+}
+
+// The first half of worldPointToPixel
+const ublas::vector <float> NaoPose::worldPointToCamera(ublas::vector <float>
+                                                        point)
+{
 
     ublas::vector <float> pointVectorInWorldFrame =
             CoordFrame4D::vector4D(point(X) * CM_TO_MM, point(Y) * CM_TO_MM, -comHeight);
@@ -663,12 +685,19 @@ const ublas::vector <float> NaoPose::worldPointToPixel(ublas::vector <float> poi
     cameraToWorldRotation(2, 3) = 0;
     pointVectorInWorldFrame = prod(trans(cameraToWorldRotation), pointVectorInWorldFrame);
 
-    float FOCAL_LENGTH = 290.0f;
+    return pointVectorInWorldFrame;
+}
+
+// The second half of worldPointToPixel
+const ublas::vector <float> NaoPose::cameraPointToPixel(ublas::vector <float>
+                                                        point)
+{
+    float FOCAL_LENGTH = 272.4f;
 
     //scale to image size
-    float t = FOCAL_LENGTH / pointVectorInWorldFrame(X);
-    float x = -(t * pointVectorInWorldFrame(Y)) + IMAGE_CENTER_X;
-    float y = -(t * pointVectorInWorldFrame(Z)) + IMAGE_CENTER_Y;
+    float t = FOCAL_LENGTH / point(X);
+    float x = -(t * point(Y)) + IMAGE_CENTER_X;
+    float y = -(t * point(Z)) + IMAGE_CENTER_Y;
 
     //if t is negatve, then object is behind, cannnot put that in image
 //    if (t < 0) {x = 0;  y = 0;}
@@ -692,7 +721,7 @@ std::vector<radians> NaoPose::headAnglesToRobotPoint(ublas::vector <float> point
 
 estimate NaoPose::estimateFromObjectSize(pixels pixelX, pixels pixelY, mms objectHeight, float pixelSize, mms realSize) const {
 
-    pixels FOCAL_LENGTH = 290;
+    pixels FOCAL_LENGTH = 272;
 
     if (pixelSize <= 0 || realSize <= 0)
         return NULL_ESTIMATE;

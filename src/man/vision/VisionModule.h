@@ -29,22 +29,25 @@ public:
     virtual ~VisionModule();
 
     portals::InPortal<messages::ThresholdImage> topThrImage;
-	portals::InPortal<messages::PackedImage16> topYImage;
-	portals::InPortal<messages::PackedImage16> topUImage;
-	portals::InPortal<messages::PackedImage16> topVImage;
+    portals::InPortal<messages::PackedImage16> topYImage;
+    portals::InPortal<messages::PackedImage16> topUImage;
+    portals::InPortal<messages::PackedImage16> topVImage;
 
     portals::InPortal<messages::ThresholdImage> botThrImage;
-	portals::InPortal<messages::PackedImage16> botYImage;
-	portals::InPortal<messages::PackedImage16> botUImage;
-	portals::InPortal<messages::PackedImage16> botVImage;
+    portals::InPortal<messages::PackedImage16> botYImage;
+    portals::InPortal<messages::PackedImage16> botUImage;
+    portals::InPortal<messages::PackedImage16> botVImage;
 
-	portals::InPortal<messages::JointAngles> joint_angles;
+    portals::InPortal<messages::JointAngles> joint_angles;
     portals::InPortal<messages::InertialState> inertial_state;
 
     portals::OutPortal<messages::VisionField> vision_field;
     portals::OutPortal<messages::VisionBall> vision_ball;
     portals::OutPortal<messages::VisionRobot> vision_robot;
     portals::OutPortal<messages::VisionObstacle> vision_obstacle;
+
+    portals::OutPortal<messages::ThresholdImage> topOutPic;
+    portals::OutPortal<messages::ThresholdImage> botOutPic;
 
     /* In order to keep logs synced up, joint angs and inert states are passed 
      * thru the vision system. Joint angles are taken at around 100 hz, but 
@@ -54,9 +57,6 @@ public:
     portals::OutPortal<messages::JointAngles> joint_angles_out;
     portals::OutPortal<messages::InertialState> inertial_state_out;
 #endif
-
-	portals::OutPortal<messages::ThresholdImage> topOutPic;
-	portals::OutPortal<messages::ThresholdImage> botOutPic;
 
 protected:
     virtual void run_();

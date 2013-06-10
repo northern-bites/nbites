@@ -4,6 +4,8 @@
 #include <cmath>
 #include "DebugConfig.h"
 
+
+
 // Nao field constants
 
 #ifdef USING_LAB_FIELD
@@ -138,6 +140,10 @@ static const float BLUE_CC_NEAREST_POINT_X = CENTER_FIELD_X -
     CENTER_CIRCLE_RADIUS;
 static const float BLUE_CROSS_CIRCLE_MIDPOINT_X = LANDMARK_BLUE_GOAL_CROSS_X +
     ((BLUE_CC_NEAREST_POINT_X-LANDMARK_BLUE_GOAL_CROSS_X)/2.0);
+static const float BLUE_GOALBOX_MIDPOINT_X = FIELD_WHITE_LEFT_SIDELINE_X +
+    (GOALBOX_DEPTH / 2);
+static const float BLUE_GOALBOX_CROSS_MIDPOINT_X = FIELD_WHITE_LEFT_SIDELINE_X +
+    GOALBOX_DEPTH + ((LINE_CROSS_OFFSET - GOALBOX_DEPTH) / 2);
 
 // Constants for heading
 //  Right is towards opponents' goal.
@@ -148,4 +154,7 @@ static const float HEADING_LEFT = 180.0f;
 static const float HEADING_DOWN = -90.0f;
 
 
+
+
 #endif
+
