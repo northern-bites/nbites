@@ -42,10 +42,13 @@ def shouldDodgeLeft(nav):
             footBumperState.r_foot_bumper_right)
 
     if (feet and vision):
+        print "left feet and vision"
         return True
-    elif (vision and sonars):
+    if (vision and sonars):
+        print "left vision and sonars"
         return True
     elif (sonars and feet):
+        print "left sonars and feet"
         return True
 
     else:
@@ -67,12 +70,15 @@ def shouldDodgeRight(nav):
     feet = (footBumperState.l_foot_bumper_left or
             footBumperState.l_foot_bumper_right)
 
-    if (feet and vision):
+    # if (feet and vision):
+    #     print "right feet and vision"
+    #     return True
+    if (vision and sonars):
+        print "right vision and sonars"
         return True
-    elif (vision and sonars):
-        return True
-    elif (sonars and feet):
-        return True
+    # elif (sonars and feet):
+    #     print "right sonars and feet"
+    #     return True
 
     else:
         return False

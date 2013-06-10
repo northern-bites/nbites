@@ -12,6 +12,7 @@
 #include "Common.h"
 #include "VisionDef.h"
 #include "DebugConfig.h"
+#include "Profiler.h"
 
 // including message types
 #include "PMotion.pb.h"
