@@ -154,7 +154,7 @@ class Brain(object):
         self.nav.run()
 
         # HACK for dangerous ball flipping loc
-        if self.updateDangerousBallFilter() && self.updateOwnBallFilter():
+        if self.updateDangerousBallFilter() and self.updateOwnBallFilter():
             #flip loc!
             self.flipLoc()
 
@@ -354,7 +354,7 @@ class Brain(object):
         @return: true if the goalie has seen a ball 15 times in the last 20 frames.
         """
         # Add to the filter for this frame
-        for mate in self.brain.teamMembers:
+        for mate in self.teamMembers:
             if mate.playerNumber in [1] and mate.active:
                 if mate.ballOn:
                     self.dangerousBallFilter.append(1)
@@ -377,7 +377,7 @@ class Brain(object):
         As above, but for myself.
         """
         # Add to the filter for this frame
-        for mate in self.brain.teamMembers:
+        for mate in self.teamMembers:
             if mate.playerNumber in [self.playerNumber]:
                 if mate.ballOn:
                     self.ownBallFilter.append(1)
