@@ -61,7 +61,9 @@ def gameSet(player):
         player.brain.tracker.trackBall()
 
         if player.lastDiffState == 'gamePenalized':
-            player.brain.resetSetLocalization()
+            pass
+            # This method is broken.
+            #player.brain.resetSetLocalization()
 
     if (player.play.isChaser() and
         player.brain.gameController.ownKickOff):

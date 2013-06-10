@@ -204,7 +204,7 @@ def fKickoff(team, workingPlay):
             Roles.rDefender(team, workingPlay)
         else:
             workingPlay.setRole(PBConstants.OFFENDER)
-            SubRoles.pKickoffStricker(team, workingPlay)
+            SubRoles.pKickoffStriker(team, workingPlay)
     else:
         if team.me.isDefaultChaser():
             Roles.rChaser(team, workingPlay)
