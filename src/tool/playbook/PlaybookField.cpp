@@ -14,9 +14,10 @@ PlaybookField::PlaybookField(int b_s, int g_w, int g_h, PlaybookModel* m,
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h)
 {
+    QColor c = new QColor(.1,.1,.1);
     for (int i = 0; i < 3; i++)
     {
-        robots[i] = new RobotGraphics(0,0,0,'d', new QColor());
+        robots[i] = new RobotGraphics(0,0,0,'d', c);
     }
     updateRobots(model->getRobotPositions());
 }
@@ -107,9 +108,9 @@ void PlaybookField::paintPlayers(QPaintEvent* event)
         }
 
         paintRobot(event, painter,
-                   robots[i]->x,
-                   robots[i]->y,
-                   robots[i]->h,
+                   robots[i]->getX(),
+                   robots[i]->getY(),
+                   robots[i]->getH(),
                    roleColors[roleNum]);
     }
 }

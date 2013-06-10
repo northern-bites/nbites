@@ -6,7 +6,7 @@ namespace tool {
 namespace playbook {
 
 RobotGraphics::RobotGraphics(int x_, int y_, int h_,
-                             char role_, QColor color_) :
+                             char role_, const QColor color_) :
     x(x_),
     y(y_),
     h(h_),
@@ -24,7 +24,7 @@ QRectF RobotGraphics::boundingRect() const
 
 void RobotGraphics::paint(QPainter *painter,
                           const QStyleOptionGraphicsItem *option,
-                          QWidget widget)
+                          QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);

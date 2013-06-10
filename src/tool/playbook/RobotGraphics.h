@@ -7,11 +7,11 @@ namespace playbook {
 class RobotGraphics : public QGraphicsObject
 {
 public:
-    RobotGraphics(int x_, int y_, int h_, char role_, QColor color_);
+    RobotGraphics(int x_, int y_, int h_, char role_, const QColor color_);
     QRectF boundingRect() const;
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option,
-               QWidget widget);
+               QWidget *widget);
 
     void setX(int x_);
     void setY(int y_);
