@@ -40,6 +40,7 @@ import VisionRobot_proto
 import VisionField_proto
 import ButtonState_proto
 import FallStatus_proto
+import StiffnessControl_proto
 
 class Brain(object):
     """

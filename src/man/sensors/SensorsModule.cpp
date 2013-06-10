@@ -15,6 +15,7 @@ SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
       sonarsOutput_(base()),
       fsrOutput_(base()),
       batteryOutput_(base()),
+      stiffStatusOutput_(base()),
       broker_(broker),
       fastMemoryAccess_(new AL::ALMemoryFastAccess()),
       sensorValues_(NUM_SENSOR_VALUES),
@@ -98,6 +99,59 @@ void SensorsModule::initializeSensorFastAccess()
     i++;
     // There is a single chest button.
     sensorKeys_[i] = std::string("Device/SubDeviceList/ChestBoard/Button/Sensor/Value");
+    i++;
+    // All joints have stiffnesses associated with them.
+    sensorKeys_[i] = std::string("Device/SubDeviceList/HeadPitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/HeadYaw/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LAnklePitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LAnkleRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LElbowRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LElbowYaw/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LHand/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LHipPitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LHipRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LHipYawPitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LKneePitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LShoulderPitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LShoulderRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/LWristYaw/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RAnklePitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RAnkleRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RElbowRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RElbowYaw/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RHand/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RHipPitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RHipYawPitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RHipRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RKneePitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RShoulderPitch/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i]= std::string("Device/SubDeviceList/RShoulderRoll/Hardness/Actuator/Value");
+    i++;
+    sensorKeys_[i] = std::string("Device/SubDeviceList/RWristYaw/Hardness/Actuator/Value");
 
     fastMemoryAccess_->ConnectToVariables(broker_, sensorKeys_);
 
@@ -156,6 +210,7 @@ void SensorsModule::updateSensorValues()
     updateSonarsMessage();
     updateFSRMessage();
     updateBatteryMessage();
+    updateStiffMessage();
 
     //std::cout << "SensorsModule : Sensor values " << std::endl;
     // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
@@ -316,6 +371,47 @@ void SensorsModule::updateBatteryMessage()
     batteryMessage.get()->set_charge(sensorValues_[BatteryCharge]);
 
     batteryOutput_.setMessage(batteryMessage);
+}
+
+void SensorsModule::updateStiffMessage()
+{
+    portals::Message<messages::StiffStatus> stiffMessage(0);
+
+    if (sensorValues_[HeadPitchStiff] > 0 ||
+        sensorValues_[HeadYawStiff] > 0 ||
+        sensorValues_[LAnklePitchStiff] > 0 ||
+        sensorValues_[LAnkleRollStiff] > 0 ||
+        sensorValues_[LElbowRollStiff] > 0 ||
+        sensorValues_[LElbowYawStiff] > 0 ||
+        sensorValues_[LHandStiff] > 0 ||
+        sensorValues_[LHipPitchStiff] > 0 ||
+        sensorValues_[LHipRollStiff] > 0 ||
+        sensorValues_[LHipYawPitchStiff] > 0 ||
+        sensorValues_[LKneePitchStiff] > 0 ||
+        sensorValues_[LShoulderPitchStiff] > 0 ||
+        sensorValues_[LShoulderRollStiff] > 0 ||
+        sensorValues_[LWristYawStiff] > 0 ||
+        sensorValues_[RAnklePitchStiff] > 0 ||
+        sensorValues_[RAnkleRollStiff] > 0 ||
+        sensorValues_[RElbowRollStiff] > 0 ||
+        sensorValues_[RElbowYawStiff] > 0 ||
+        sensorValues_[RHandStiff] > 0 ||
+        sensorValues_[RHipPitchStiff] > 0 ||
+        sensorValues_[RHipYawPitchStiff] > 0 ||
+        sensorValues_[RHipRollStiff] > 0 ||
+        sensorValues_[RKneePitchStiff] > 0 ||
+        sensorValues_[RShoulderPitchStiff] > 0 ||
+        sensorValues_[RShoulderRollStiff] > 0 ||
+        sensorValues_[RWristYawStiff] > 0)
+    {
+        stiffMessage.get()->set_on(1);
+    }
+    else
+    {
+        stiffMessage.get()->set_on(0);
+    }
+
+    stiffStatusOutput_.setMessage(stiffMessage);
 }
 
 // Helper method so that we can print out a Sweet Moves joint angle
