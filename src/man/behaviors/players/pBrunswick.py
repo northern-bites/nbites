@@ -64,6 +64,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         gcState = self.gameState
 
         if (gcState == 'gamePlaying' and
+            not self.currentState == 'afterPenalty' and
             not self.currentState == 'gamePenalized'):
             if not (self.currentState == 'gamePlaying'
                 and self.counter != 1):
@@ -108,7 +109,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
-            if self.lastDiffState == 'gameSet':
+            if self.brain.gameController.timeSincePlaying < 10:
                 return 'kickoff'
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):

@@ -196,6 +196,16 @@ def fKickoff(team, workingPlay):
         else:
             Roles.rDefender(team, workingPlay)
     elif team.numActiveFieldPlayers == 3:
+        highNumber = team.highestActivePlayerNumber()
+        lowNumber = team.lowestActivePlayerNumber()
+        if team.me.playerNumber == highNumber:
+            Roles.rChaser(team, workingPlay)
+        elif team.me.playerNumber == lowNumber:
+            Roles.rDefender(team, workingPlay)
+        else:
+            workingPlay.setRole(PBConstants.OFFENDER)
+            SubRoles.pKickoffStricker(team, workingPlay)
+    else:
         if team.me.isDefaultChaser():
             Roles.rChaser(team, workingPlay)
         elif team.me.isDefaultDefender():
