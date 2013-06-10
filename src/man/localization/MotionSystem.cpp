@@ -32,32 +32,22 @@ void MotionSystem::update(ParticleSet& particles,
                   << ")" << std::endl << std::endl;
     }
 
-
     ParticleIt iter;
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);
 
-        /** Should be used if odometry gives global **/
-        /** Should also be TESTED extensively       **/
         float sinh, cosh;
         sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
                 &sinh, &cosh);
-        // float changeX = cosh * deltaMotionInfo.x() + sinh * deltaMotionInfo.y();
-        // float changeY = cosh * deltaMotionInfo.y() - sinh * deltaMotionInfo.x();
         particle->setX(particle->getLocation().x() + cosh*deltaMotionInfo.x() + sinh*deltaMotionInfo.y());
         particle->setY(particle->getLocation().y() + cosh*deltaMotionInfo.y() - sinh*deltaMotionInfo.x());
         particle->setH(NBMath::subPIAngle(particle->getLocation().h() + deltaMotionInfo.h()));
 
-
-        // float changeX = deltaMotionInfo.x()*cosh + sinh*deltaMotionInfo.y();
-        // float changeY = deltaMotionInfo.y()*cosh + sinh*deltaMotionInfo.x();
-        // float changeH = deltaMotionInfo.h();
-
+        // Uncomment to test odometry
         // particle->shift(changeX, changeY, changeH);
         randomlyShiftParticle(particle);
     }
-//            std::cout << "\n\n Updated Particles w/ Motion \n";
 }
 
 void MotionSystem::randomlyShiftParticle(Particle* particle)
@@ -68,12 +58,11 @@ void MotionSystem::randomlyShiftParticle(Particle* particle)
     boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
     boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);
 
-    // Determine random noise
+    // Determine random noise and shift the particle
     messages::RobotLocation noise;
     noise.set_x(coordNoise());
     noise.set_y(coordNoise());
     noise.set_h(NBMath::subPIAngle(headNoise()));
-
     particle->shift(noise);
 }
 

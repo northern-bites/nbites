@@ -96,10 +96,6 @@ bool VisionSystem::update(ParticleSet& particles,
         }
     }
 
-    //std::cout << "Vision System given observations, should resample" << std::endl;
-    //std::cout << "Normalize the weights\n";
-
-
     // normalize the particle weights and calculate the weighted avg error
     weightedAvgError = 0.f;
     for(iter = particles.begin(); iter != particles.end(); iter++)
@@ -167,6 +163,12 @@ float VisionSystem::scoreFromVisDetect(const Particle& particle,
  */
 void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
 {
+    //We now hate center circles. so fuck em
+    for (int j = 0; j < corner.poss_id_size(); j++) {
+        if (corner.poss_id(j) == 21 || corner.poss_id(j) == 22)
+            return;
+    }
+
     int concreteNum = 0;
     // Loop through all concrete coords of the corner
     for (int i=0; i< corner.visual_detection().concrete_coords_size(); i++)
