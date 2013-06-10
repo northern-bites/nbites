@@ -69,6 +69,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	int topGreen = 0;
 	int greenRun = 0;
     float possible = 0.0f;
+	int lastGreen;
     const float BUFFER = 200.0f; // other fields should be farther than this
 	// we need a better criteria for what the top is
 	for (int i = 0; i < HULLS; i++) {
@@ -82,6 +83,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		}
 		topGreen = IMAGE_HEIGHT - 1;
 		greenRun = 0;
+		lastGreen = 0;
 		for (top = max(poseProject, 0);
 				good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
 			// scan until we find a run of green pixels
@@ -92,11 +94,13 @@ void Field::initialScanForTopGreenPoints(int pH) {
 			pixel = thresh->getColor(x, top);
             // watch out for patches of green off the field
             if (topGreen != IMAGE_HEIGHT - 1 &&
+				lastGreen - top >  5 &&
                 possible - thresh->getPixDistance(top) > BUFFER) {
                 topGreen = IMAGE_HEIGHT - 1;
             }
 			//pixel = thresh->thresholded[top][x];
 			if (Utility::isGreen(pixel) || Utility::isOrange(pixel)) {
+				lastGreen = top;
 				good++;
 				greenRun++;
 				if (greenRun > 3 && topGreen == IMAGE_HEIGHT - 1) {
@@ -128,6 +132,10 @@ void Field::initialScanForTopGreenPoints(int pH) {
                             }
                             // if we're a way away, make sure there is more green
                             if (top > start + 5) {
+								if (debugFieldEdge) {
+									cout << "Correcting " << x << std::endl;
+									vision->drawPoint(x, topGreen, BLUE);
+								}
                                 if (greens / (top - start) < 0.30f) {
                                     topGreen = IMAGE_HEIGHT - 1;
                                     good = 0;

@@ -441,8 +441,16 @@ void Threshold::runs() {
     // back when the robots had colored shoulder pads we worried about seeing them
     detectSelf();
 #endif
+	bool far = false;
     for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
-        pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+		if (!far) {
+			pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+			if (pixDistance[i] > 11000.0) {
+				far = true;
+			}
+		} else {
+			pixDistance[i] = 12000.0f;
+		}
     }
     for (int i = 0; i < NUMBLOCKS; i++) {
         block[i] = 0;
@@ -485,12 +493,6 @@ void Threshold::lowerRuns() {
 void Threshold::findGoals(int column, int topEdge) {
     const int BADSIZE = 15;
     const int GAP = BADSIZE * 2;
-	const float BUFFER = 200.0f;
-	// don't scan too high up
-	float horDist = getPixDistance(topEdge);
-	int highTop = topEdge;
-	for ( ; highTop > -1 && getPixDistance(highTop) - horDist < BUFFER; highTop--) {
-	}
     // scan up for goals
     int bad = 0, yellows = 0, pinks = 0, navy = 0;
     int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
@@ -499,13 +501,16 @@ void Threshold::findGoals(int column, int topEdge) {
     int robots = 0;
     bool faceDown2 = pose->getHorizonY(0) < -100;
     int j;
-    for (j = topEdge; bad < BADSIZE && j >= 0 && (yellows > 3 || j >=highTop); j--) {
+    for (j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
         if (Utility::isYellow(pixel)) {
             lastYellow = j;
             yellows++;
             bad--;
+			if (bad < 0) {
+				bad = 0;
+			}
             if (firstYellow == topEdge) {
                 firstYellow = j;
             }
