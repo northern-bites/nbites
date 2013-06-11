@@ -347,7 +347,7 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    if (lost && (errorMagnitude > LOST_THRESHOLD) )
+    if (lost && (errorMagnitude > LOST_THRESHOLD) && visionSystem->getLastNumObsv() > 1)
     {
         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
         std::list<ReconstructedLocation>::const_iterator recLocIt;
