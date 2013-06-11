@@ -43,11 +43,11 @@ static const ParticleFilterParams DEFAULT_PARAMS =
 {
     FIELD_GREEN_HEIGHT,         // Field Height
     FIELD_GREEN_WIDTH,          // Field Width
-    300,                        // Num Particles
+    200,                        // Num Particles
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
-    1.5f,                        // Variance in x-y odometry
-    .07f                         // Variance in h odometry
+    .7f,                        // Variance in x-y odometry
+    .03f                         // Variance in h odometry
 };
 
 /**
