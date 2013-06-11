@@ -20,7 +20,7 @@ def gameSet(player):
 
 def gamePlaying(player):
     if player.firstFrame():
-        player.brain.tracker.repeatBasicPan()
+         player.brain.tracker.repeatWidePan()
 
     return player.stay()
 

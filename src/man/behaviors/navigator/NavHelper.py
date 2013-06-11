@@ -1,4 +1,4 @@
-from math import fabs
+from math import fabs, sqrt
 from ..util import MyMath
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
@@ -53,6 +53,9 @@ def getRelativeDestination(my, dest):
 
     else:
         raise TypeError, "Navigator dest is not a Location type!" + str(dest)
+
+def getDistToDest(my, dest):
+    return sqrt((my.x-dest.x)*(my.x-dest.x) + (my.y-dest.y)*(my.y-dest.y))
 
 def isDestinationRelative(dest):
     #TODO: test if this works for both RelLocation and RelRobotLocation

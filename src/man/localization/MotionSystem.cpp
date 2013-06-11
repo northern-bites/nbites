@@ -24,7 +24,7 @@ void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
  */
 void MotionSystem::update(ParticleSet& particles,
                           const messages::RobotLocation& deltaMotionInfo,
-                          bool lost)
+                          bool nearMid)
 {
     if((fabs(deltaMotionInfo.x()) > 3.f) || (fabs(deltaMotionInfo.y()) > 3.f)) {
         std::cout << "LOCALIZATION WARNING:\t Sanity check missed an unhelpful odometry frame\n"
@@ -46,14 +46,18 @@ void MotionSystem::update(ParticleSet& particles,
 
         // Uncomment to test odometry
         // particle->shift(changeX, changeY, changeH);
-        randomlyShiftParticle(particle);
+        randomlyShiftParticle(particle, nearMid);
     }
 }
 
-void MotionSystem::randomlyShiftParticle(Particle* particle)
+void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)
 {
+    float pumpNoise = 1.f;
+    if (nearMid)
+        pumpNoise = 2.f;
+
     // TODO: This should be experimentally determined
-    boost::uniform_real<float> coordRange(-1.f * xAndYNoise, xAndYNoise);
+    boost::uniform_real<float> coordRange(-1.f * xAndYNoise * pumpNoise, xAndYNoise * pumpNoise);
     boost::uniform_real<float> headRange (-1.f * hNoise    , hNoise);
     boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > coordNoise(rng, coordRange);
     boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > headNoise(rng, headRange);

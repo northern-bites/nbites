@@ -45,8 +45,6 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
 
     QPoint locCenter(loc.my_x(), loc.my_y());
 
-    //std::cout<<"Painting at "<<loc.my_x()<<" "<<loc.my_y()<<std::endl;
-
     //draw myself
     painter.drawEllipse(locCenter,
                         PARTICLE_WIDTH,

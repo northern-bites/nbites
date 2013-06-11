@@ -92,9 +92,10 @@ class Navigator(FSA.FSA):
 
     def positionPlaybook(self):
         """
-        Calls goTo on the playbook position, which should be a RobotLocation.
+        Calls goTo on the playbook position
         """
-        self.goTo(self.brain.play.getPosition(), speed = FAST_SPEED, avoidObstacles = True, fast = False)
+        self.goTo(self.brain.play.getPositionCoord(), precision = GENERAL_AREA,
+                  speed = FAST_SPEED, avoidObstacles = True, fast = True, pb = True)
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):
         """
@@ -104,7 +105,8 @@ class Navigator(FSA.FSA):
         """
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False, fast = False):
+    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
+             avoidObstacles = False, adaptive = False, fast = False, pb = False):
         """
         General go to method.
         Ideal for going to a field position, or for going to a relative location
@@ -140,6 +142,8 @@ class Navigator(FSA.FSA):
 
         @param fast: books it using velocity walk; Best if dest is straight ahead!
         Use it to look like a baller on the field.
+
+        @param pb: Set true if playbook positioning so we switch from fast to odometry walk when in the general area
         """
 
         self.updateDest(dest, speed)
@@ -147,6 +151,7 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.avoidObstacles = avoidObstacles
         NavStates.goToPosition.adaptive = adaptive
         NavStates.goToPosition.fast = fast
+        NavStates.goToPosition.pb = pb
 
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
