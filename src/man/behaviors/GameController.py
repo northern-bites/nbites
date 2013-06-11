@@ -115,3 +115,6 @@ class GameController():
                     self.brain.player.switchTo(convertStateFormat[self.currentState])
                 else:
                     self.brain.player.switchTo(convertStateFormatPenaltyShots[self.currentState])
+                # Update the player's "gamestate" variable now, so it is correct when
+                # playbook runs (since player runs even later).
+                self.brain.player.gameState = self.brain.player.currentState

@@ -29,6 +29,8 @@ PRECISELY = (1.0, 1.0, 5)
 LEFT = 1
 RIGHT = -LEFT
 
+DEBUG_MOTION_STATUS = True
+
 class Navigator(FSA.FSA):
     """it gets you where you want to go"""
 
@@ -145,6 +147,16 @@ class Navigator(FSA.FSA):
 
         @param pb: Set true if playbook positioning so we switch from fast to odometry walk when in the general area
         """
+
+        # Debug prints for motion status (seeking the walking not walking bug)
+        if DEBUG_MOTION_STATUS:
+            status = self.brain.interface.motionStatus
+            print "DEBUG_MOTION_STATUS in nav.goTo():"
+            print "Standing:       " + str(status.standing)
+            print "body_is_active: " + str(status.body_is_active)
+            print "walk_is_active: " + str(status.walk_is_active)
+            print "head_is_active: " + str(status.head_is_active)
+            print "calibrated:     " + str(status.calibrated)
 
         self.updateDest(dest, speed)
         NavStates.goToPosition.precision = precision
