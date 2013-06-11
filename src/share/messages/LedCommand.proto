@@ -2,8 +2,8 @@ package messages;
 
 message LedCommand
 {
-	// LED ID and hex value.
-	// Both fields _must_ have an equal number of entries.
-	repeated int32 led_id = 1;
-	repeated int32 rgb_hex = 2;
+    // LED ID and hex value.
+    // Both fields _must_ have an equal number of entries.
+    repeated int32 led_id = 1;
+    repeated int32 rgb_hex = 2;
 }

@@ -2,5 +2,5 @@ package messages;
 
 message BatteryState
 {
-        optional float charge = 1;
+    optional float charge = 1;
 }
