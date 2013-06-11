@@ -40,6 +40,8 @@ VisionTool::VisionTool(const char* title) :
 	QPushButton* saveAsBtn = new QPushButton(tr("Save As"));
 	connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
 	toolBar->addWidget(saveAsBtn);
+
+    loadLatestTable();
 }
 
 VisionTool::~VisionTool() {
@@ -56,6 +58,7 @@ void VisionTool::saveGlobalTable()
 	
 	QString filename = loadBtn->text();
 	globalColorTable.write(filename.toStdString());
+    serializeTableName(filename);
 }
 void VisionTool::saveAsGlobalTable()
 {
@@ -67,8 +70,10 @@ void VisionTool::saveAsGlobalTable()
 					tr("Color Table files (*.mtb)"));
 	globalColorTable.write(filename.toStdString());
 	
-	if (!filename.isEmpty())
+	if (!filename.isEmpty()) {
 		loadBtn->setText(filename);
+        serializeTableName(filename);
+    }
 }
 
 void VisionTool::loadColorTable()
@@ -84,9 +89,34 @@ void VisionTool::loadColorTable()
 	topConverter.loadTable(globalColorTable.getTable());
     bottomConverter.loadTable(globalColorTable.getTable());
 	
-	if (!filename.isEmpty())
+	if (!filename.isEmpty()) {
 		loadBtn->setText(filename);
+        serializeTableName(filename);
+    }
 
+}
+
+void VisionTool::loadLatestTable()
+{
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    QString filename;
+    in >> filename;
+    if (!filename.isEmpty()) {
+        globalColorTable.read(filename.toStdString());
+        topConverter.loadTable(globalColorTable.getTable());
+        bottomConverter.loadTable(globalColorTable.getTable());
+        loadBtn->setText(filename);
+    }
+}
+
+void VisionTool::serializeTableName(QString latestTableName)
+{
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+    out << latestTableName;
 }
 
 void VisionTool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)

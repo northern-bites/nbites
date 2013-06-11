@@ -97,7 +97,7 @@ Tool::Tool(const char* title) :
 	connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
 	toolBar->addWidget(saveAsBtn);
 
-
+    loadLatestTable();
     //diagram.addModule(worldView);
 }
 
@@ -122,6 +122,7 @@ void Tool::saveGlobalTable()
 	
 	QString filename = loadBtn->text();
 	globalColorTable.write(filename.toStdString());
+    serializeTableName(filename);
 }
 void Tool::saveAsGlobalTable()
 {
@@ -133,8 +134,10 @@ void Tool::saveAsGlobalTable()
 					tr("Color Table files (*.mtb)"));
 	globalColorTable.write(filename.toStdString());
 	
-	if (!filename.isEmpty())
+	if (!filename.isEmpty()) {
 		loadBtn->setText(filename);
+        serializeTableName(filename);
+    }
 }
 
 void Tool::loadColorTable()
@@ -150,9 +153,34 @@ void Tool::loadColorTable()
 	topConverter.loadTable(globalColorTable.getTable());
     bottomConverter.loadTable(globalColorTable.getTable());
 	
-	if (!filename.isEmpty())
+	if (!filename.isEmpty()) {
 		loadBtn->setText(filename);
+        serializeTableName(filename);
+    }
 
+}
+
+void Tool::loadLatestTable()
+{
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    QString filename;
+    in >> filename;
+    if (!filename.isEmpty()) {
+        globalColorTable.read(filename.toStdString());
+        topConverter.loadTable(globalColorTable.getTable());
+        bottomConverter.loadTable(globalColorTable.getTable());
+        loadBtn->setText(filename);
+    }
+}
+
+void Tool::serializeTableName(QString latestTableName)
+{
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+    out << latestTableName;
 }
 
 void Tool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)
