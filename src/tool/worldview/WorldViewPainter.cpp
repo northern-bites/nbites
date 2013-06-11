@@ -1,4 +1,4 @@
-std #include "WorldViewPainter.h"
+#include "WorldViewPainter.h"
 
 namespace tool {
 namespace worldview {
