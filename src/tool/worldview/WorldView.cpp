@@ -5,10 +5,6 @@
 namespace tool {
 namespace worldview {
 
-
-//TODO this is kind of royally screwed
-//SET_POOL_SIZE(messages::WorldModel, 24);
-
 WorldView::WorldView(QWidget* parent)
     : commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
@@ -37,28 +33,21 @@ WorldView::WorldView(QWidget* parent)
 
     connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
 
-    // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-    // {
-    //     commIn[i].wireTo(wviewComm._worldModels[i]);
-    // }
-
-    commIn.wireTo(wviewComm._worldModels[1]);
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        commIn[i].wireTo(wviewComm._worldModels[i]);
+    }
 }
 
 
 void WorldView::run_()
 {
-    //this only works when the pool size is increased by ~4x (24 works)
-    // for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
-    // {
-    //     commIn[i].latch();
-    //  if(!(commIn[i].message().my_x()==0 && commIn[i].message().my_y()==0))
-    //      fieldPainter->updateWithLocationMessage(commIn[i].message());
-    // }
-
-    //proof of concept: latch just one portal
-    commIn.latch();
-    fieldPainter->updateWithLocationMessage(commIn.message());
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        commIn[i].latch();
+        if(!(commIn[i].message().my_x()==0 && commIn[i].message().my_y()==0))
+            fieldPainter->updateWithLocationMessage(commIn[i].message());
+    }
 }
 
 void WorldView::startButtonClicked(){

@@ -7,7 +7,6 @@
 #include "WorldViewPainter.h"
 
 #include "comm/CommModule.h"
-#include "RobotConfig.h"
 #include "RoboGrams.h"
 #include "DiagramThread.h"
 
@@ -21,8 +20,7 @@ Q_OBJECT;
 public:
     WorldView(QWidget* parent = 0);
 
-    //portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
-    portals::InPortal<messages::WorldModel> commIn;
+    portals::InPortal<messages::WorldModel> commIn[NUM_PLAYERS_PER_TEAM];
 
 protected:
     virtual void run_();
