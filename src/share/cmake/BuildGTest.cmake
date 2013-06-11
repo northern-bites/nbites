@@ -36,7 +36,7 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 # testfile is the cpp file containing gtests
 # any other parameters will be linked to the executable
 macro( nbites_add_test testname testfile)
-  add_executable( ${testname} ${testfile} )
+  add_executable( ${testname} ${CMAKE_CURRENT_LIST_DIR}/test/${testfile} )
   target_link_libraries(
     ${testname}
     ${ARGN}
