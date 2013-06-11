@@ -291,7 +291,7 @@ void BehaviorsModule::sendMessages()
         bodyMotionCommandOut.setMessage(bodyMotionCommand);
 
         // HACK debug printlines
-        std::cout << bodyMotionCommand.get()->DebugString << std::endl;
+        std::cout << bodyMotionCommand.get()->DebugString() << std::endl;
     }
     if (headMotionCommand.get()->timestamp() != 0)
     {
