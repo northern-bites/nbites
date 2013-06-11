@@ -441,8 +441,16 @@ void Threshold::runs() {
     // back when the robots had colored shoulder pads we worried about seeing them
     detectSelf();
 #endif
+	bool far = false;
     for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
-        pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+		if (!far) {
+			pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+			if (pixDistance[i] > 11000.0) {
+				far = true;
+			}
+		} else {
+			pixDistance[i] = 12000.0f;
+		}
     }
     for (int i = 0; i < NUMBLOCKS; i++) {
         block[i] = 0;
@@ -500,6 +508,9 @@ void Threshold::findGoals(int column, int topEdge) {
             lastYellow = j;
             yellows++;
             bad--;
+			if (bad < 0) {
+				bad = 0;
+			}
             if (firstYellow == topEdge) {
                 firstYellow = j;
             }
