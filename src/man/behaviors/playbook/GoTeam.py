@@ -130,9 +130,6 @@ class GoTeam:
     ######################################################
     def determineChaser(self, play):
         """return the team member who is the chaser"""
-        if len(self.activeFieldPlayers) == 0:
-            return
-
         chaser_mate = self.activeFieldPlayers[0]
 
         if PBConstants.DEBUG_DET_CHASER:
