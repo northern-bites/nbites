@@ -5,9 +5,6 @@
 PROJECT( VISION )
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8.3 )
 
-
-
-
 ADD_DEFINITIONS( -mmmx )
 
 INCLUDE_DIRECTORIES( geom )
@@ -93,4 +90,20 @@ TARGET_LINK_LIBRARIES(
   support
   messages)
 
+############################ GTESTS
 
+nbites_add_test(CornerDetectorTest CornerDetectorTest.cpp
+  vision
+)
+
+nbites_add_test(EdgeDetectorTest EdgeDetectorTest.cpp
+  vision
+)
+
+nbites_add_test(FieldLinesDetectorTest FieldLinesDetectorTest.cpp
+  vision
+)
+
+nbites_add_test(HoughSpaceTest HoughSpaceTest.cpp
+  vision
+)
