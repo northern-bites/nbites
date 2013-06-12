@@ -360,6 +360,10 @@ void WalkingEngine::updateMotionRequest()
     }
     else instabilityCount = 0;
   }
+  else
+  {
+      instabilityCount = 0;
+  }
 
   // get requested motion state
   requestedMotionType = stand;
