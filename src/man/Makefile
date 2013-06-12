@@ -42,9 +42,8 @@ test: $(BUILD_DIR)/Makefile
 	@if [ -e $(CROSS_FILE) ]; then \
 		echo "You must build straight to run the tests."; \
 	else \
-		$(MAKE) test -C $(BUILD_DIR) --no-print-directory #&& \
-#		cd $(BUILD_DIR) && \
-#		ctest -V; \
+		cd $(BUILD_DIR) && \
+		ctest -V; \
 	fi
 
 .PHONY: cross

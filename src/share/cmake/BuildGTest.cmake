@@ -24,8 +24,6 @@ mark_as_advanced( gtest_build_samples
   gtest_force_shared_crt
 )
 
-
-
 enable_testing()
 set(CTEST_OUTPUT_ON_FAILURE TRUE)
 
@@ -40,7 +38,9 @@ macro( nbites_add_test testname testfile)
   target_link_libraries(
     ${testname}
     ${ARGN}
-    ${GTEST_BOTH_LIBRARIES}
+#    ${GTEST_BOTH_LIBRARIES} Not working... don't know why...
+    gtest
+    gtest_main
     )
   add_test(${testname} ${testname})
 endmacro()
