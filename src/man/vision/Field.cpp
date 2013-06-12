@@ -124,8 +124,8 @@ void Field::initialScanForTopGreenPoints(int pH) {
 						int check2 = top;
 						int whites = 0;
 						bool found = false;
-						while (thresh->getPixDistance(check) > BUFFER ||
-							   check < IMAGE_HEIGHT / 2 && !found) {
+						while ((thresh->getPixDistance(check) > BUFFER ||
+								check < IMAGE_HEIGHT / 2) && !found) {
 							check++;
 							pixel = thresh->getColor(x, check);
 							greens = 0;
