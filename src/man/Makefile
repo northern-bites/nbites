@@ -20,6 +20,7 @@ CROSS_FILE = $(BUILD_DIR)/cross
 # Different flags depending on the type of build
 CMAKE_CROSS_FLAGS = -DCMAKE_TOOLCHAIN_FILE=$(ATOM_TOOLCHAIN) -DCMAKE_INSTALL_PREFIX=install/
 CMAKE_STRAIGHT_FLAGS = -DCMAKE_TOOLCHAIN_FILE=$(STRAIGHT_TOOLCHAIN) -DCMAKE_INSTALL_PREFIX=install/
+CMAKE_SERENITY_FLAGS = -DCMAKE_BUILD_TYPE=release
 
 # Name of the script that copies files to the robot
 UPLOAD_SCRIPT = $(BUILD_DIR)/upload.sh
@@ -63,7 +64,7 @@ $(CROSS_FILE):
 .PHONY: scross
 scross:	$(CROSS_FILE)
 	cd $(BUILD_DIR); \
-	cmake $(CMAKE_CROSS_FLAGS) $(SRC_DIR)
+	cmake $(CMAKE_CROSS_FLAGS) $(CMAKE_SERENITY_FLAGS) $(SRC_DIR)
 
 .PHONY: straight
 straight: $(STRAIGHT_FILE)
@@ -77,6 +78,12 @@ $(STRAIGHT_FILE):
 		rm -rf $(BUILD_DIR)/*; \
 	fi
 	@touch $(STRAIGHT_FILE)
+
+# Target for Serenity to build straight. Relies of default options being valid.
+.PHONY: sstraight
+sstraight: $(STRAIGHT_FILE)
+	cd $(BUILD_DIR); \
+	cmake $(CMAKE_STRAIGHT_FLAGS) $(CMAKE_SERENITY_FLAGS) $(SRC_DIR)
 
 .PHONY: clean
 clean:
