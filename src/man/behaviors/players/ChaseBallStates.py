@@ -167,7 +167,6 @@ def orbitBall(player):
             return player.goNow('positionForKick')
 
     prepareForKick.hackKick.shoot()
-    #if prepareForKick.hackKick.shoot() == kicks.ORBIT_KICK_POSITION:
 #    if player.kick.h != 0:
         #print "Xspeed: ", player.brain.nav.getXSpeed()
         #print "Yspeed: ", player.brain.nav.getYSpeed()
