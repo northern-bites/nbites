@@ -11,6 +11,9 @@
 #include "Camera.h"
 #include "VisionDef.h"
 #include "Images.h"
+#include "PMotion.pb.h"
+#include "InertialState.pb.h"
+#include "Images.h"
 #include "RoboGrams.h"
 
 namespace portals {
@@ -107,7 +110,13 @@ class TranscriberModule : public portals::Module
 {
 public :
     TranscriberModule(ImageTranscriber&);
+
+    portals::InPortal<messages::JointAngles> jointsIn;
+    portals::InPortal<messages::InertialState> inertsIn;
+
     portals::OutPortal<messages::YUVImage> imageOut;
+    portals::OutPortal<messages::JointAngles> jointsOut;
+    portals::OutPortal<messages::InertialState> inertsOut;
 protected :
     virtual void run_();
 private :
