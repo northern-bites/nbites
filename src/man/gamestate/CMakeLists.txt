@@ -19,6 +19,9 @@ target_link_libraries(
   messages
   )
 
-nbites_add_test(GameStateTest GameStateTest.cpp
-  gamestate
-)
+# GTEST
+if (OFFLINE)
+  nbites_add_test(GameStateTest GameStateTest.cpp
+    gamestate
+    )
+endif()

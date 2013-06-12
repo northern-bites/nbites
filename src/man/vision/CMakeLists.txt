@@ -91,19 +91,20 @@ TARGET_LINK_LIBRARIES(
   messages)
 
 ############################ GTESTS
+if (OFFLINE)
+  nbites_add_test(CornerDetectorTest CornerDetectorTest.cpp
+    vision
+    )
 
-nbites_add_test(CornerDetectorTest CornerDetectorTest.cpp
-  vision
-)
+  nbites_add_test(EdgeDetectorTest EdgeDetectorTest.cpp
+    vision
+    )
 
-nbites_add_test(EdgeDetectorTest EdgeDetectorTest.cpp
-  vision
-)
+  nbites_add_test(FieldLinesDetectorTest FieldLinesDetectorTest.cpp
+    vision
+    )
 
-nbites_add_test(FieldLinesDetectorTest FieldLinesDetectorTest.cpp
-  vision
-)
-
-nbites_add_test(HoughSpaceTest HoughSpaceTest.cpp
-  vision
-)
+  nbites_add_test(HoughSpaceTest HoughSpaceTest.cpp
+    vision
+    )
+endif()

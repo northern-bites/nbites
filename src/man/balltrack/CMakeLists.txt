@@ -22,6 +22,10 @@ target_link_libraries(balltrack
 		      messages
 		      )
 
-nbites_add_test(KalmanFilterTest KalmanFilterTest.cpp
-  balltrack
-  )
+# GTEST
+
+if (OFFLINE)
+  nbites_add_test(KalmanFilterTest KalmanFilterTest.cpp
+    balltrack
+    )
+endif()
