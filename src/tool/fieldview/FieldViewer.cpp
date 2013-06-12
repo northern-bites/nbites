@@ -9,7 +9,11 @@ FieldViewer::FieldViewer(QWidget* parent):
     QWidget(parent),
     haveParticleLogs(false),
     haveLocationLogs(false),
-    haveVisionFieldLogs(false)
+    haveVisionFieldLogs(false),
+    haveOdometryLogs(false),
+    locMod(),
+    odometry(base()),
+    observations(base())
 {
     fieldPainter = new FieldViewerPainter(this);
 
@@ -56,6 +60,12 @@ FieldViewer::FieldViewer(QWidget* parent):
     mainLayout->addLayout(field);
 
     this->setLayout(mainLayout);
+
+    //Setup offline localization
+    locMod.motionInput.wireTo(&odometry, true);
+    locMod.visionInput.wireTo(&observations, true);
+
+    subdiagram.addModule(locMod);
 }
 
 void FieldViewer::confirmParticleLogs(bool haveLogs)
@@ -142,6 +152,19 @@ void FieldViewer::run_()
         fieldPainter->updateWithObsvMessage(observationsIn.message());
     }
 
+    if (haveOdometryLogs) {
+        odometryIn.latch();
+    }
+
+    if (haveOdometryLogs && haveVisionFieldLogs) {
+        //set messages to the out portals latched to offline
+        odometry.setMessage(portals::Message<messages::RobotLocation>(&odometryIn.message()));
+        observations.setMessage(portals::Message<messages::VisionField>(&observationsIn.message()));
+        qDebug() << "Have both logs";
+        subdiagram.run();
+//        qDebug() << "Ran loc once";
+//        fieldPainter->updateWithOfflineMessage(locMod.message());
+    }
 }
 
 } // namespace viewer

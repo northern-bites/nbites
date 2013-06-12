@@ -9,7 +9,8 @@ FieldViewerPainter::FieldViewerPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_),
     shouldPaintParticles(false),
     shouldPaintLocation(false),
-    shouldPaintObsv(false)
+    shouldPaintObsv(false),
+    shouldPaintOffline(true)
 {
 }
 
@@ -42,6 +43,9 @@ void FieldViewerPainter::paintEvent(QPaintEvent* event)
 
     if(shouldPaintObsv)
         paintObservations(event, curObsv);
+
+    if(shouldPaintOffline)
+        paintRobotLocation(event, curOffline, true, 15.f);
 }
 
 void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
@@ -226,6 +230,13 @@ void FieldViewerPainter::updateWithObsvMessage(messages::VisionField newObservat
     }
 }
 
+void FieldViewerPainter::updateWithOfflineMessage(messages::RobotLocation newOffline)
+{
+    curOffline = newOffline;
+    if(shouldPaintOffline) {
+        repaint();
+    }
+}
 
 } // namespace viewer
 } // namespace tool

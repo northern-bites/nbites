@@ -35,6 +35,7 @@ public:
     void updateWithLocationMessage(messages::RobotLocation newLoc);
     void updateWithParticleMessage(messages::ParticleSwarm newSwarm);
     void updateWithObsvMessage(messages::VisionField newObservations);
+    void updateWithOfflineMessage(messages::RobotLocation newOffline);
 
 protected slots:
     void paintParticleAction(bool state);
@@ -66,10 +67,12 @@ private:
     bool shouldPaintParticles;
     bool shouldPaintLocation;
     bool shouldPaintObsv;
+    bool shouldPaintOffline;
 
     messages::RobotLocation curLoc;
     messages::ParticleSwarm curSwarm;
     messages::VisionField curObsv;
+    messages::RobotLocation curOffline;
 };
 
 } // namespace viewer

@@ -25,5 +25,6 @@ target_link_libraries(
   portals
   tool_common
   support
+  localization
   ${QT_LIBRARIES}
   )

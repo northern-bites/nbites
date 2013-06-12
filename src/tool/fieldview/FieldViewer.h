@@ -16,6 +16,7 @@
 #include "ParticleSwarm.pb.h"
 
 #include "FieldViewerPainter.h"
+#include "localization/LocalizationModule.h"
 
 namespace tool{
 namespace viewer{
@@ -37,6 +38,10 @@ public:
     portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::ParticleSwarm> particlesIn;
     portals::InPortal<messages::VisionField> observationsIn;
+
+    portals::OutPortal<messages::RobotLocation> odometry;
+    portals::OutPortal<messages::VisionField>   observations;
+    portals::InPortal <messages::RobotLocation> offline;
 
 protected slots:
     void noLogError();
@@ -62,6 +67,9 @@ protected:
     float scaleFactor;
 
 private:
+    man::localization::LocalizationModule locMod;
+    portals::RoboGram subdiagram;
+
     bool haveParticleLogs;
     bool haveLocationLogs;
     bool haveVisionFieldLogs;
