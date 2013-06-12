@@ -50,7 +50,7 @@ static const int NUM_TOTAL_BALL_VALUES = 27;
 static const float OPP_GOAL_HEADING = 0.0;
 static const float MY_GOAL_HEADING = 180.0;
 
-// my left post is the left of goalie defending my goal, facing opponent
+// Both left posts are to the left of goalie defending my goal, facing opponent
 static const float LANDMARK_MY_GOAL_LEFT_POST_X =
     FIELD_WHITE_LEFT_SIDELINE_X + GOAL_POST_RADIUS;
 static const float LANDMARK_MY_GOAL_RIGHT_POST_X =

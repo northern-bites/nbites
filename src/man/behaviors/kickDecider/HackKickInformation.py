@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = True
+DEBUG_KICK_DECISION = False
 USE_LOC = True
 
 class KickInformation:
@@ -237,19 +237,33 @@ class KickInformation:
 
             # Get the bearing for the shot, i.e. from the ball to the goal.
             # Note: currently always aimCenter
-            goalLocation = Objects.Location(constants.FIELD_WHITE_RIGHT_SIDELINE_X,constants.CENTER_FIELD_Y)
+            goalCenter = Objects.Location(constants.FIELD_WHITE_RIGHT_SIDELINE_X,
+                                          constants.CENTER_FIELD_Y)
+            goalLeft   = Objects.Location(constants.LANDMARK_OPP_GOAL_LEFT_POST_X,
+                                          constants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
+            goalRight  = Objects.Location(constants.LANDMARK_OPP_GOAL_RIGHT_POST_X,
+                                          constants.LANDMARK_OPP_GOAL_RIGHT_POST_Y)
+
             ballLocation = Objects.Location(self.brain.ball.x, self.brain.ball.y)
-            relLocationBallToGoal = ballLocation.relativeLocationOf(goalLocation)
-            headingBallToGoal = ballLocation.headingTo(goalLocation)
+
+            headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
+            headingBallToGoalLeft   = ballLocation.headingTo(goalLeft)
+            headingBallToGoalRight  = ballLocation.headingTo(goalRight)
 
             if DEBUG_KICK_DECISION:
-                print "Heading from the ball to the goal: " + str(headingBallToGoal)
+                print "Heading from the ball to the goal center: " + str(headingBallToGoalCenter)
                 print "My global heading on the field: " + str(self.brain.loc.h)
 
             # Assume our heading at the ball will equal our current heading
             # We shouldn't be spinning at this point, so the assumption is valid.
             # Note: both headings are in degrees at this point.
-            bearingForKick = headingBallToGoal - self.brain.loc.h
+            bearingForKick = headingBallToGoalCenter - self.brain.loc.h
+            bearingLimitLeft = headingBallToGoalLeft - headingBallToGoalCenter
+            bearingLimitRight = headingBallToGoalRight - headingBallToGoalCenter
+
+            if DEBUG_KICK_DECISION:
+                print ("Acceptable bearing range for kick: " + str(bearingLimitLeft/2) +
+                       "/" + str(bearingLimitRight/2))
 
             if bearingForKick < 35 and bearingForKick > -35:
                 #choose straight kick!
@@ -270,6 +284,10 @@ class KickInformation:
                     kick.h = -180 - bearingForKick
                 else:
                     kick.h = 180 - bearingForKick
+
+            # If we're already close enough to the correct bearing to score, don't orbit.
+            if bearingForKick < bearingLimitLeft/2 and bearingForKick > bearingLimitRight/2:
+                kick.h = 0
 
             # Make sure heading is an int before passing it to the orbit.
             kick.h = int(kick.h)
