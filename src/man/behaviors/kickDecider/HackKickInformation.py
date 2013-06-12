@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 USE_LOC = True
 
 class KickInformation:
@@ -242,6 +242,10 @@ class KickInformation:
             relLocationBallToGoal = ballLocation.relativeLocationOf(goalLocation)
             headingBallToGoal = ballLocation.headingTo(goalLocation)
 
+            if DEBUG_KICK_DECISION:
+                print "Heading from the ball to the goal: " + str(headingBallToGoal)
+                print "My global heading on the field: " + str(self.brain.loc.h)
+
             # Assume our heading at the ball will equal our current heading
             # We shouldn't be spinning at this point, so the assumption is valid.
             # Note: both headings are in degrees at this point.
@@ -269,6 +273,10 @@ class KickInformation:
 
             # Make sure heading is an int before passing it to the orbit.
             kick.h = int(kick.h)
+
+            if DEBUG_KICK_DECISION:
+                print "Returning a kick with heading: " + str(kick.h)
+
             return kick
 
 
