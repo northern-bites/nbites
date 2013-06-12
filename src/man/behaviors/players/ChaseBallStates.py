@@ -133,7 +133,7 @@ def orbitBall(player):
     State to orbit the ball
     """
     if player.firstFrame():
-
+        orbitBall.counter = 0
         if hackKick.DEBUG_KICK_DECISION:
             print "Orbiting at angle: ",player.kick.h
 
@@ -144,7 +144,16 @@ def orbitBall(player):
         print "DEBUG_SUITE: In 'orbitBall', orbiting at non-zero angle."
         # Reset from pre-kick pan to straight, then track the ball.
         player.brain.tracker.lookStraightThenTrack()
-        player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
+        #player.brain.nav.orbitAngle(player.orbitDistance, player.kick.h)
+        if player.kick.h > 0:
+            #set y vel at 50% speed
+            print "turn to right"
+            player.brain.nav.walk(0, .5, -.15)
+        
+        if player.kick.h < 0:
+            #set y vel at 50% speed in opposite direction
+            print "turn to left"
+            player.brain.nav.walk(0, -.5, .15)
 
     elif player.brain.nav.isStopped():
         player.shouldOrbit = False
@@ -157,13 +166,45 @@ def orbitBall(player):
             player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
             return player.goNow('positionForKick')
 
+    prepareForKick.hackKick.shoot()
+    #if prepareForKick.hackKick.shoot() == kicks.ORBIT_KICK_POSITION:
+#    if player.kick.h != 0:
+        #print "Xspeed: ", player.brain.nav.getXSpeed()
+        #print "Yspeed: ", player.brain.nav.getYSpeed()
+        #print "Hspeed: ", player.brain.nav.getHSpeed()
+ #       pass
+
+    if orbitBall.counter%10 == 0:
+        print "h is: ", player.kick.h
+
+    if player.kick.h == 0:
+        print "I'm not orbiting anymore"
+        player.shouldOrbit = False
+        player.kick.h = 0
+        player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+        return player.goNow('positionForKick')
+
+    if player.orbitDistance < player.brain.ball.distance - 1:
+        #We're too far away
+        player.brain.nav.setXSpeed(.15)
+        
+    if player.orbitDistance > player.brain.ball.distance + 1:
+        #We're too close
+        player.brain.nav.setXSpeed(-.15)
+
+    if player.orbitDistance > player.brain.ball.distance -1 and player.orbitDistance < player.brain.ball.distance +1:
+        #print "We're at a good distance"
+        player.brain.nav.setXSpeed(0)
+
     if (transitions.shouldFindBallKick(player) or
         transitions.shouldCancelOrbit(player)):
         print "DEBUG_SUITE: In 'orbitBall', either shouldFindBall or shouldCancelOrbit. Switching to 'chase'."
         player.inKickingState = False
         return player.goLater('chase')
 
+    orbitBall.counter = orbitBall.counter + 1
     return player.stay()
+
 
 def positionForKick(player):
     """
