@@ -19,9 +19,6 @@ target_link_libraries(
   messages
   )
 
-nbites_add_test(GameState GameStateTest.cpp
+nbites_add_test(GameStateTest GameStateTest.cpp
   gamestate
-  support
-  portals
-  messages
 )
