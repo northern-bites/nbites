@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set( VIEWER_SRCS
    FieldViewer.cpp
    FieldViewerPainter.cpp
+   OfflineLocListener.cpp
     )
 
 set( VIEWER_HEADERS

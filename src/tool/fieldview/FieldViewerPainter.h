@@ -35,12 +35,19 @@ public:
     void updateWithLocationMessage(messages::RobotLocation newLoc);
     void updateWithParticleMessage(messages::ParticleSwarm newSwarm);
     void updateWithObsvMessage(messages::VisionField newObservations);
+
     void updateWithOfflineMessage(messages::RobotLocation newOffline);
+    void updateWithOfflineParticleMessage(messages::ParticleSwarm newOfflineSwarm);
+    void updateWithOfflineObsvMessage(messages::VisionField newObservations);
 
 protected slots:
     void paintParticleAction(bool state);
     void paintLocationAction(bool state);
     void paintObsvAction(bool state);
+
+    void paintOfflineParticleAction(bool state);
+    void paintOfflineLocationAction(bool state);
+    void paintOfflineObsvAction(bool state);
 
     void handleZoomIn();
     void handleZoomOut();
@@ -59,20 +66,24 @@ protected:
                             messages::ParticleSwarm swarm);
     // Paint observations
     void paintObservations(QPaintEvent* event,
-                           messages::VisionField obsv);
+                           messages::VisionField obsv,
+                           messages::RobotLocation loc);
 
-    QPoint getRelLoc(float dist, float bear);
+    QPoint getRelLoc(messages::RobotLocation loc, float dist, float bear);
 
 private:
     bool shouldPaintParticles;
     bool shouldPaintLocation;
     bool shouldPaintObsv;
-    bool shouldPaintOffline;
+    bool shouldPaintParticlesOffline;
+    bool shouldPaintLocationOffline;
+    bool shouldPaintObsvOffline;
 
     messages::RobotLocation curLoc;
     messages::ParticleSwarm curSwarm;
     messages::VisionField curObsv;
     messages::RobotLocation curOffline;
+    messages::ParticleSwarm curOfflineSwarm;
 };
 
 } // namespace viewer
