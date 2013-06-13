@@ -46,7 +46,7 @@ namespace vision{
 // Ball constants
 // EXAMINED: look at this switch - SMALLBALLDIM
 static const int SMALLBALLDIM = 3; // below this size balls are considered small
-static const int SMALLBALL = SMALLBALLDIM * SMALLBALLDIM;
+static const int SMALLBALL = SMALLBALLDIM * (SMALLBALLDIM - 1);
 // ratio of width/height worse than this is a very bad sign
 static const float BALLTOOFAT = 1.5f;
 // ditto
@@ -132,7 +132,7 @@ void Ball::createBall(int h) {
    @return      whether it meets the minimum criteria
  */
 bool Ball::blobIsBigEnoughToBeABall(int w, int h) {
-    const int MIN_SIZE = 3;
+    const int MIN_SIZE = 2;
     return !(w < MIN_SIZE || h < MIN_SIZE);
 }
 
@@ -143,7 +143,7 @@ bool Ball::blobIsBigEnoughToBeABall(int w, int h) {
     no longer be considered.
  */
 void Ball::preScreenBlobsBasedOnSizeAndColor() {
-    const int MIN_AREA = 12;
+    const int MIN_AREA = 6;
     const int MAX_AREA = 1000;
     float minpercent = MINORANGEPERCENT;
 
@@ -187,7 +187,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
                     cout << "Screened one for horizon problems " << endl;
                     drawBlob(blobs->get(i), WHITE);
                 }
-            } else if (ar > MIN_AREA && perc >= minpercent) {
+            } else if (ar >= MIN_AREA && perc >= minpercent) {
                 if (BALLDEBUG) {
                     cout << "Candidate ball " << endl;
                     printBlob(blobs->get(i));
@@ -265,16 +265,6 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
         thisBall->init();
         topBlob->init();
         return false;
-    } else if (w < SMALLBALLDIM || h < SMALLBALLDIM) {
-        // small balls should be near the horizon - this check makes extra sure
-        if (topBlob->getLeftBottomY() > horb + HORIZON_THRESHOLD) {
-            if (BALLDEBUG) {
-                cout << "Screening small ball for horizon" << endl;
-            }
-            thisBall->init();
-            topBlob->init();
-            return false;
-        }
     }
     return true;
 }
@@ -1176,7 +1166,7 @@ void Ball::setFramesOnAndOff(VisualBall *objPtr) {
  */
 bool Ball::blobOk(Blob b) {
     if (b.getLeftTopX() > BAD_VALUE && b.getLeftBottomX() > BAD_VALUE &&
-            b.width() > 2)
+            b.width() > 1)
         return true;
     return false;
 }
