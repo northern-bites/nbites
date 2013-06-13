@@ -311,6 +311,20 @@ class Brain(object):
                                 gameSetResetUncertainties)
             #self.loc.resetLocToSide(False)
 
+    def checkSetLocalization(self):
+        """
+        Use during the first frame of the set state.
+        If we think we are on the opponent's side of the field, either
+            1) We didn't make it back and will be manually positioned or
+            2) Our loc is wrong, and we could be anywhere.
+        Reset to our own field cross. The loc system should be able to
+        recover from there with high probability. 6/13/13
+        """
+        if self.loc.x > Constants.MIDFIELD_X:
+            self.resetLocTo(Constants.LANDMARK_MY_FIELD_CROSS[0],
+                            Constants.LANDMARK_MY_FIELD_CROSS[1],
+                            Constants.HEADING_RIGHT)
+
     def resetLocalizationFromPenalty(self, top):
         """
         Resets localization from penalty.
