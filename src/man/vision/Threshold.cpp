@@ -256,7 +256,7 @@ void Threshold::visionLoop(const messages::JointAngles& ja, const messages::Iner
     PROF_EXIT(P_OBJECT);
 
 
-    vision->fieldLines->afterObjectFragments();
+    //vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
     if (vision->ygCrossbar->getWidth() > 0) {
         setShot(vision->ygCrossbar);
@@ -1235,6 +1235,12 @@ void Threshold::objectRecognition() {
     //unid->findRobots(cross);
     yellow->createObject();
     cross->checkForCrosses();
+	// we need to set the post into before doing context
+	// however we may need to set it again after, as context may change
+	// some IDs
+    setFieldObjectInfo(vision->yglp);
+    setFieldObjectInfo(vision->ygrp);
+	vision->fieldLines->afterObjectFragments();
 
     bool ylp = vision->yglp->getWidth() > 0;
     bool yrp = vision->ygrp->getWidth() > 0;

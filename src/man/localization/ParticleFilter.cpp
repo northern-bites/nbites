@@ -378,7 +378,26 @@ void ParticleFilter::resample()
     // normalized weights, and place them in a new particle set.
     for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
     {
-        rand = (float)gen();
+        /*
+         * 6/2013 - Lizzie
+         * Without this loop...
+         * We were getting a segfault from the push_back line very rarely,
+         * maybe a few times a day, and when playing a game the robots
+         * sometimes had synchronized segfaults.
+         * The issue was that the random number generator sometimes set rand
+         * very high, above all of the weights of the particles in cdf,
+         * so upper_bound gave us cdf.end(), which is NOT a valid
+         * map element. I believe it was synchronized because we seed the
+         * generator with the time.
+         * This loop will reset rand if it's not going to give us a valid
+         * particle.
+         */
+        do
+        {
+            rand = (float)gen();
+        }
+        while(cdf.upper_bound(rand) == cdf.end());
+
         newParticles.push_back(cdf.upper_bound(rand)->second);
     }
 
