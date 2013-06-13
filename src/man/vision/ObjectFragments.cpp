@@ -108,7 +108,7 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
 	POSTDEBUG = false;
 	CORRECT = false;
 	PRINTOBJS = false;
-	POSTLOGIC = false;
+	POSTLOGIC = true;
 	SANITY = false;
 #endif
 }
@@ -1455,6 +1455,25 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 		cout << "Checking outer L corner " << l1 << " " << l2 << " " <<
 			dist << endl;
 	}
+	// Let's try the hardest case first - we are in the corner of the field
+	// looking at the side of the goal
+	if (x > post.getRight() &&
+		corner.getLine1()->getLeftEndpoint().x > post.getRight() &&
+		corner.getLine2()->getLeftEndpoint().x > post.getRight()) {
+		if (POSTLOGIC) {
+			cout << "Corner lines completely to right of post, we are at corner" << endl;
+		}
+		return LEFT;
+	} else if (x < post.getLeft() &&
+		corner.getLine1()->getRightEndpoint().x < post.getLeft() &&
+		corner.getLine2()->getRightEndpoint().x < post.getLeft()) {
+		if (POSTLOGIC) {
+			cout << "Corner lines completely to left of post, we are at corner" << endl;
+		}
+		return RIGHT;
+	}
+
+
 	if (abs(corner.getOrientation()) < 90) {
 		int classification = NOPOST;
 		if (l1 > l2 && l1 > GOALBOX_DEPTH + 40.0f) {
@@ -2235,22 +2254,9 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
 		post = classifyFirstPost(c, pole);
 	}
 
-
-
     dc = checkDist(pole);
     // first characterize the size of the possible post
     int howbig = characterizeSize(pole);
-    // now see if we can figure out whether it is a right or left post
-    //int post = classifyFirstPost(c, pole);
-
-	if (post != LEFT && post != RIGHT && isItAPost) {
-		cout << "Using extra post" << endl;
-		if (pole.getLeftBottomX() < secondPost.getLeftBottomX()) {
-			post = LEFT;
-		} else {
-			post = RIGHT;
-		}
-	}
 
 	// make sure the post is down to the level of the field edge
 	if (pole.getLeftBottomY() < horizonAt(pole.getLeftBottomX())) {
