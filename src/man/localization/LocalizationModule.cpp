@@ -16,7 +16,7 @@ LocalizationModule::LocalizationModule()
 {
     particleFilter = new ParticleFilter();
     // Chooose on the field looking up as a random initial
-    particleFilter->resetLocTo(100,100,0);
+    particleFilter->resetLocTo(110,658,-1.5);
 }
 
 LocalizationModule::~LocalizationModule()
@@ -26,14 +26,16 @@ LocalizationModule::~LocalizationModule()
 
 void LocalizationModule::update()
 {
+#ifndef OFFLINE
     // Modify based on control portal
-    if (lastReset != resetInput.message().timestamp())
-    {
-        lastReset = resetInput.message().timestamp();
-        particleFilter->resetLocTo(resetInput.message().x(),
-                                   resetInput.message().y(),
-                                   resetInput.message().h());
-    }
+    // if (lastReset != resetInput.message().timestamp())
+    // {
+    //     lastReset = resetInput.message().timestamp();
+    //     particleFilter->resetLocTo(resetInput.message().x(),
+    //                                resetInput.message().y(),
+    //                                resetInput.message().h());
+    // }
+#endif
 
     // Calculate the deltaX,Y,H (PF takes increments from robot frame)
     lastOdometry.set_x(curOdometry.x());
@@ -72,7 +74,7 @@ void LocalizationModule::update()
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                          getCurrentEstimate());
 
-#ifdef LOG_LOCALIZATION
+#if defined( LOG_LOCALIZATION) || defined(OFFLINE)
     portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                            getCurrentSwarm());
     particleOutput.setMessage(swarmMessage);
@@ -83,12 +85,15 @@ void LocalizationModule::update()
 
 void LocalizationModule::run_()
 {
+    std::cout << "Loc Run" << std::endl;
     // Profiler
     PROF_ENTER(P_SELF_LOC);
 
     motionInput.latch();
     visionInput.latch();
+#ifndef OFFLINE
     resetInput.latch();
+#endif
 
     update();
 
