@@ -1219,8 +1219,6 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
 	}
 	bool objectIsClose = distToObject < GOALBOX_DEPTH * 2;
 
-	cout << "Distance is " << distToObject << endl;
-
     // make sure we aren't side to circle
     if (realLineDistance(t.getTStem()) > 100.0f && distToObject > MIDFIELD_X - 150) {
         t.setSecondaryShape(SIDE_T);
