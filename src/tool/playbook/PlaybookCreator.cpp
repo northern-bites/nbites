@@ -116,6 +116,13 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
             SLOT(updatePositions()));
     connect(editOffenderY, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
+    // Connect radio buttons for update
+    connect(twoFieldPlayers, SIGNAL(toggled(bool)), this,
+            SLOT(updatePositionsCheck(bool)));
+    connect(threeFieldPlayers, SIGNAL(toggled(bool)), this,
+            SLOT(updatePositionsCheck(bool)));
+    connect(fourFieldPlayers, SIGNAL(toggled(bool)), this,
+            SLOT(updatePositionsCheck(bool)));
 
     mainLayout->addLayout(field);
     mainLayout->addLayout(settings);
@@ -146,7 +153,7 @@ void PlaybookCreator::updateRobotPositions()
 
     for (i; i < max; i++)
     {
-        PlaybookPosition* position = model->playbook[0][i][0][0];
+        PlaybookPosition* position = model->playbook[model->getGoalieOn()][i][0][0];
 
         fieldPainter->setRobot(position,defaultRoleList[i]);
     }
@@ -160,6 +167,15 @@ void PlaybookCreator::updatePositions()
 {
     updateRobotPositions();
     qDebug() << "updating the robot positions now.";
+}
+
+void PlaybookCreator::updatePositionsCheck(bool check)
+{
+    if (check)
+    {
+        updateRobotPositions();
+        qDebug() << "updating the robot positions now.";
+    }
 }
 
 } // namespace playbook

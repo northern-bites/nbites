@@ -103,38 +103,71 @@ void PlaybookModel::setFourFieldPlayers(bool checked)
     }
 }
 
+void PlaybookModel::setPosition(int value, short role, bool x_position)
+{
+    if (numActiveFieldPlayers-1 > role)
+    {
+        short roleIndex = -1;
+        if (numActiveFieldPlayers == 4)
+        {
+            if (role == DEFENDER)
+                roleIndex = 0;
+            else if (role == OFFENDER)
+                roleIndex = 1;
+            else if (role == MIDDIE)
+                roleIndex = 2;
+        }
+        else if (numActiveFieldPlayers == 3)
+        {
+            if (role == DEFENDER)
+                roleIndex = 3;
+            else if (role == OFFENDER)
+                roleIndex = 4;
+        }
+        else if (numActiveFieldPlayers == 2)
+        {
+            if (role == DEFENDER)
+                roleIndex = 5;
+        }
+        // Sanity check
+        if (roleIndex != -1)
+        {
+            if (x_position)
+                playbook[0][roleIndex][0][0]->x = value;
+            else
+                playbook[0][roleIndex][0][0]->y = value;
+
+            qDebug() << "setting role: " << roleIndex << " at x? " << x_position << " to value: " << value;
+        }
+    }
+}
+
 void PlaybookModel::setDefenderXPosition(QString x_)
 {
-    playbook[0][DEFENDER][0][0]->x = x_.toInt();
-    qDebug() << "setting defender's position: x value is now " << x_;
+    setPosition(x_.toInt(), DEFENDER, true);
 }
 
 void PlaybookModel::setDefenderYPosition(QString y_)
 {
-    playbook[0][DEFENDER][0][0]->y = y_.toInt();
-    qDebug() << "setting defender's position: y value is now " << y_;
+    setPosition(y_.toInt(), DEFENDER, false);
 }
 void PlaybookModel::setMiddieXPosition(QString x_)
 {
-    playbook[0][MIDDIE][0][0]->x = x_.toInt();
-    qDebug() << "setting middie's position: x value is now " << x_;
+    setPosition(x_.toInt(), MIDDIE, true);
 }
 
 void PlaybookModel::setMiddieYPosition(QString y_)
 {
-    playbook[0][MIDDIE][0][0]->y = y_.toInt();
-    qDebug() << "setting middie's position: y value is now " << y_;
+    setPosition(y_.toInt(), MIDDIE, false);
 }
 void PlaybookModel::setOffenderXPosition(QString x_)
 {
-    playbook[0][OFFENDER][0][0]->x = x_.toInt();
-    qDebug() << "setting offender's position: x value is now " << x_;
+    setPosition(x_.toInt(), OFFENDER, true);
 }
 
 void PlaybookModel::setOffenderYPosition(QString y_)
 {
-    playbook[0][OFFENDER][0][0]->y = y_.toInt();
-    qDebug() << "setting offender's position: y value is now " << y_;
+    setPosition(y_.toInt(), OFFENDER, false);
 }
 
 }

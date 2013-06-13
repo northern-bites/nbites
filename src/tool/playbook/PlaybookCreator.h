@@ -31,6 +31,7 @@ public:
 
 protected slots:
     void updatePositions();
+    void updatePositionsCheck(bool check);
 
 protected:
     PlaybookField* fieldPainter;

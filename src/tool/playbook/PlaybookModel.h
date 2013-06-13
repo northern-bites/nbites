@@ -46,6 +46,7 @@ public:
 
     PlaybookPosition** getRobotPositions();
     int getNumActiveFieldPlayers(){return numActiveFieldPlayers;};
+    int getGoalieOn(){return goalieOn;};
 
 protected slots:
     void toggleGoalie(bool on);
@@ -66,6 +67,8 @@ protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
                                // that were changed.
     QStack<PlaybookPosition> changedPositions; // The old positions.
+
+    void setPosition(int value, short role, bool x_position);
 
     int goalieOn;
     bool defenderLocked;

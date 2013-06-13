@@ -36,7 +36,7 @@ void PlaybookField::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
 
-    //paintGrid(event);
+    paintGrid(event);
     paintPlayers(event);
 
     if(shouldPaintGoalie)
@@ -92,9 +92,8 @@ void PlaybookField::paintPlayers(QPaintEvent* event)
     // Get robot positions.
 
     // Paint each robot.
-    for (int i = 0; i < 3; i++) //TODO: use constant, adjust based on number of active field players
+    for (int i = 0; i < numActiveFieldPlayers-1; i++)
     {
-        qDebug() << "i is: " << i;
         short role = robots[i]->role;
 
         paintRobot(event, painter,
