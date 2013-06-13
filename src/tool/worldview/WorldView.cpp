@@ -21,13 +21,71 @@ WorldView::WorldView(QWidget* parent)
     QHBoxLayout *field = new QHBoxLayout();
     field->addWidget(fieldPainter);
 
+    QVBoxLayout *rightBar = new QVBoxLayout();
+
     QVBoxLayout *options = new QVBoxLayout();
     options->setAlignment(Qt::AlignTop);
     startButton = new QPushButton(QString("Start World Viewer"));
     options->addWidget(startButton);
 
+    QVBoxLayout *stateLayout = new QVBoxLayout();
+    stateLayout->setAlignment(Qt::AlignBottom);
+
+    QGroupBox *stateBox = new QGroupBox(tr("Robot States"));
+    QVBoxLayout *boxLayout = new QVBoxLayout();
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        roleLabels[i] = new QLabel(tr("Inactive"));
+        subroleLabels[i] = new QLabel(tr("Inactive"));
+    }
+    QHBoxLayout *p1Layout = new QHBoxLayout();
+    QLabel *p1Label = new QLabel(tr("Player 1: "));
+    QHBoxLayout *p2Layout = new QHBoxLayout();
+    QLabel *p2Label = new QLabel(tr("Player 2: "));
+    QHBoxLayout *p3Layout = new QHBoxLayout();
+    QLabel *p3Label = new QLabel(tr("Player 3: "));
+    QHBoxLayout *p4Layout = new QHBoxLayout();
+    QLabel *p4Label = new QLabel(tr("Player 4: "));
+    QHBoxLayout *p5Layout = new QHBoxLayout();
+    QLabel *p5Label = new QLabel(tr("Player 5: "));
+
+    p1Layout->addWidget(p1Label);
+    p1Layout->addWidget(roleLabels[0]);
+    p1Layout->addWidget(subroleLabels[0]);
+
+    p2Layout->addWidget(p2Label);
+    p2Layout->addWidget(roleLabels[0]);
+    p2Layout->addWidget(subroleLabels[0]);
+
+    p3Layout->addWidget(p3Label);
+    p3Layout->addWidget(roleLabels[0]);
+    p3Layout->addWidget(subroleLabels[0]);
+
+    p4Layout->addWidget(p4Label);
+    p4Layout->addWidget(roleLabels[0]);
+    p4Layout->addWidget(subroleLabels[0]);
+
+    p5Layout->addWidget(p5Label);
+    p5Layout->addWidget(roleLabels[0]);
+    p5Layout->addWidget(subroleLabels[0]);
+
+    boxLayout->addLayout(p1Layout);
+    boxLayout->addLayout(p2Layout);
+    boxLayout->addLayout(p3Layout);
+    boxLayout->addLayout(p4Layout);
+    boxLayout->addLayout(p5Layout);
+    boxLayout->setSpacing(20);
+
+    stateBox->setFlat(false);
+
+    stateBox->setLayout(boxLayout);
+    stateLayout->addWidget(stateBox);
+
+    rightBar->addLayout(options);
+    rightBar->addLayout(stateLayout);
+
     mainLayout->addLayout(field);
-    mainLayout->addLayout(options);
+    mainLayout->addLayout(rightBar);
 
     this->setLayout(mainLayout);
 

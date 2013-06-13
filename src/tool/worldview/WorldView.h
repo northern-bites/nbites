@@ -7,6 +7,7 @@
 #include "WorldViewPainter.h"
 
 #include "comm/CommModule.h"
+#include "Common.h"
 #include "RoboGrams.h"
 #include "DiagramThread.h"
 
@@ -29,6 +30,9 @@ protected:
     WorldViewPainter* fieldPainter;
 
     QPushButton* startButton;
+
+    QLabel* roleLabels[NUM_PLAYERS_PER_TEAM];
+    QLabel* subroleLabels[NUM_PLAYERS_PER_TEAM];
 
     man::DiagramThread commThread;
     man::comm::CommModule wviewComm;

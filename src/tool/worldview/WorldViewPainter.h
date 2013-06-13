@@ -5,6 +5,7 @@
  *
  * @author EJ Googins April 2013
  * @modified Brian Jacobel April 2013
+ * @modified Wils Dawson June 2013
  *
  */
 
@@ -55,34 +56,3 @@ private:
 
 } // namespace worldview
 } // namespace tool
-
-
-/*WorldModel proto looks like:
-
-message WorldModel
-{
-        optional float my_x = 1;
-        optional float my_y = 2;
-        optional float my_h = 3;
-
-        optional float my_x_uncert = 4;
-        optional float my_y_uncert = 5;
-        optional float my_h_uncert = 6;
-
-        optional bool  ball_on = 7;
-
-        optional float ball_dist = 8;
-        optional float ball_bearing = 9;
-
-        optional float ball_dist_uncert = 10;
-        optional float ball_bearing_uncert = 11;
-
-        optional float chase_time = 12;
-
-        optional int32 role = 13;
-        optional int32 sub_role = 14;
-
-        optional bool  active = 15;
-}
-
-*/
