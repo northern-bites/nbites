@@ -4,3 +4,8 @@ message StiffnessControl
 {
     optional bool remove = 1;
 }
+
+message StiffStatus
+{
+    optional bool on = 1;
+}
