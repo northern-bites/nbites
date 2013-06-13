@@ -34,7 +34,7 @@ namespace tool {
 namespace color {
 
 struct colorChanges {
-	byte y, u, v, color;
+    byte y, u, v, color;
 };
 
 /**
@@ -93,14 +93,14 @@ public:
     // needs the two image inputs
     portals::InPortal<messages::YUVImage> bottomImageIn;
     portals::InPortal<messages::YUVImage> topImageIn;
-	portals::InPortal<messages::ThresholdImage> topThrIn;
-	portals::InPortal<messages::ThresholdImage> botThrIn;
+    portals::InPortal<messages::ThresholdImage> topThrIn;
+    portals::InPortal<messages::ThresholdImage> botThrIn;
 
 
 signals:
-	// Color table manipulation
-	void tableChanges(std::vector<color::colorChanges> tableAdjustments);
-	void tableUnChanges(std::vector<color::colorChanges> tableAdjustments);
+    // Color table manipulation
+    void tableChanges(std::vector<color::colorChanges> tableAdjustments);
+    void tableUnChanges(std::vector<color::colorChanges> tableAdjustments);
 
 
 protected slots:
@@ -118,7 +118,7 @@ protected slots:
     void updateColorSelection(int color);
 
     // Listen if the user switches which image she's working on
-    void imageTabSwitched(int);
+    void imageTabSwitched(int index);
 
 protected:
     // Implements Module's pure virutal method
@@ -162,8 +162,8 @@ private:
     // InPortals for Images
     portals::OutPortal<messages::YUVImage> bottomImage;
     portals::OutPortal<messages::YUVImage> topImage;
-	portals::OutPortal<messages::ThresholdImage> topThrImage;
-	portals::OutPortal<messages::ThresholdImage> botThrImage;
+    portals::OutPortal<messages::ThresholdImage> topThrImage;
+    portals::OutPortal<messages::ThresholdImage> botThrImage;
 };
 
 }

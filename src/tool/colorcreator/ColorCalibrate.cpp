@@ -305,6 +305,11 @@ void ColorCalibrate::writeColorSpaces(QString filename) {
 }
 
 void ColorCalibrate::imageTabSwitched(int i) {
+    // Check if there is a valid widget yet or not.
+    // We get this signal when we close the tool.
+    if (i == -1)
+        return;
+
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;
     }

@@ -219,9 +219,7 @@ target_link_libraries(
   logview
   image_display
   image # man image
-  image_display
   fieldview
-  image_display
   tool_common
   colorcreator
   vision_offline
