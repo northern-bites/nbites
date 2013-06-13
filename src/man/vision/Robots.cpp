@@ -32,7 +32,7 @@ namespace man {
 namespace vision {
 
 #ifdef OFFLINE
-static const bool ROBOTSDEBUG = true;
+static const bool ROBOTSDEBUG = false;
 #else
 static const bool ROBOTSDEBUG = false;
 #endif
@@ -60,7 +60,7 @@ void Robots::init()
 	numberOfRuns = 0;
 
 #ifdef OFFLINE
-	debugRobots = false;
+	debugRobots = true;
 #endif
 }
 
@@ -450,11 +450,6 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
         if (candidate.height() < blobHeightMin) {
             return false;
         }
-        // uniforms should be wider than they are tall
-        if (candidate.height() > 2*candidate.width()) {
-
-			return false;
-        }
         // there ought to be some white below the uniform
         if (bottom < IMAGE_HEIGHT - 10 &&
 			!cross->checkForRobotBlobs(candidate)) {
@@ -471,13 +466,13 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
 			}
             return false;
         }
-        if (candidate.getTop() > candidate.height() * 2
+        /*if (candidate.getTop() > candidate.height() * 2
             && !whiteAbove(candidate)) {
 			if (debugRobots) {
 				cout << "Got rid for lack of white above" << endl;
 			}
             return false;
-        }
+			}*/
         // for some blobs we check even harder for white
         if (height < 2 * blobHeightMin && noWhite(candidate)) {
 			if (debugRobots) {
@@ -488,6 +483,9 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
 
 		if (color == NAVY_BIT && vision->pose->getHorizonY(0) < 0 &&
 			notGreen(candidate)) {
+			if (debugRobots) {
+				cout << "Scared of a possible navy robot" << endl;
+			}
 			return false;
 		}
         return true;
@@ -845,7 +843,12 @@ bool Robots::noWhite(Blob b) {
 void Robots::updateRobots(int which, int index)
 {
 	if (debugRobots) {
-		cout << "Updating robot " << which << " " << color << endl;
+		cout << "Updating robot " << which;
+		if (color == RED_BIT) {
+			cout << " Red " << endl;
+		} else {
+			cout << " Navy " << endl;
+		}
 	}
 	//printBlob(blobs[index]);
 	if (color == RED_BIT) {
