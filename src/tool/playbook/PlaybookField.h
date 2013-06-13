@@ -18,6 +18,9 @@
 
 #include "common/PaintField.h"
 
+namespace tool {
+namespace playbook {
+
 enum Role {
     DEFENDER = 0,
     MIDDIE,
@@ -28,16 +31,16 @@ enum Role {
 static const Qt::GlobalColor roleColors [] = {Qt::blue, Qt::cyan,
                                               Qt::yellow, Qt::magenta};
 
-namespace tool {
-namespace playbook {
-
 class PlaybookField : public PaintField
 {
     Q_OBJECT;
 
 public:
-    PlaybookField(int b_s, int g_w, int g_h, PlaybookModel* m,
-                  QWidget* parent = 0, float scaleFactor_ = 1.f);
+    PlaybookField(int b_s, int g_w, int g_h, QWidget* parent = 0,
+                  float scaleFactor_ = 1.f);
+
+    RobotGraphics** getRobots();
+    void setRobot(RobotGraphics* robot, int index);
 
 protected slots:
     void drawGoalie(bool on);
@@ -60,8 +63,6 @@ protected:
                     float sizeX = 18.0f, float sizeY = 35.0f);
 
 private:
-    PlaybookModel* model;
-
     bool shouldPaintGoalie;
 
     int BOX_SIZE;
@@ -69,8 +70,6 @@ private:
     int GRID_HEIGHT;
 
     RobotGraphics* robots[3];
-    void updateRobots(PlaybookPosition** positions);
-    int parseRole(char role);
 };
 
 } // namespace playbook

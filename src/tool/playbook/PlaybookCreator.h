@@ -31,6 +31,7 @@ public:
 protected:
     PlaybookField* fieldPainter;
     PlaybookModel* model;
+    QGraphicsScene* graphicsScene;
 
     QHBoxLayout* mainLayout;
     QHBoxLayout* field;

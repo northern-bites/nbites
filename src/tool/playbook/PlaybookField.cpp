@@ -5,21 +5,24 @@
 namespace tool {
 namespace playbook {
 
-PlaybookField::PlaybookField(int b_s, int g_w, int g_h, PlaybookModel* m,
-                             QWidget* parent, float scaleFactor_) :
+PlaybookField::PlaybookField(int b_s, int g_w, int g_h, QWidget* parent,
+                             float scaleFactor_) :
     PaintField(parent, scaleFactor_),
-    model(m),
     shouldPaintGoalie(true),
     BOX_SIZE(b_s),
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h)
 {
-    QColor c = new QColor(.1,.1,.1);
-    for (int i = 0; i < 3; i++)
-    {
-        robots[i] = new RobotGraphics(0,0,0,'d', c);
-    }
-    updateRobots(model->getRobotPositions());
+}
+
+RobotGraphics** PlaybookField::getRobots()
+{
+    return robots;
+}
+
+void PlaybookField::setRobot(RobotGraphics* robot, int index)
+{
+    robots[index] = robot;
 }
 
 void PlaybookField::drawGoalie(bool on)
@@ -33,7 +36,7 @@ void PlaybookField::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
 
-    paintGrid(event);
+    //paintGrid(event);
     paintPlayers(event);
 
     if(shouldPaintGoalie)
@@ -87,31 +90,17 @@ void PlaybookField::paintPlayers(QPaintEvent* event)
     painter.scale(scaleFactor, -scaleFactor);
 
     // Get robot positions.
-    robots = model->getRobotPositions();
 
     // Paint each robot.
     for (int i = 0; i < 3; i++) //TODO: use constant, adjust based on number of active field players
     {
-        char role = robots[i]->role;
-        int roleNum = 0;
-        if (role == 'd')
-        {
-            roleNum = 0;
-        }
-        else if (role == 'm')
-        {
-            roleNum = 1;
-        }
-        else if (role == 'o')
-        {
-            roleNum = 2;
-        }
+        short role = robots[i]->getRole();
 
         paintRobot(event, painter,
                    robots[i]->getX(),
                    robots[i]->getY(),
                    robots[i]->getH(),
-                   roleColors[roleNum]);
+                   roleColors[role]);
     }
 }
 
@@ -130,7 +119,7 @@ void PlaybookField::paintRobot(QPaintEvent* event,
 
     QPoint center(0, 0);
     QRect robot(0, 0, sizeX*scaleFactor, sizeY*scaleFactor);
-    QPoint lineEnd(0.125*x*scaleFactor,
+    QPoint lineEnd(0.5*sizeX*scaleFactor,
                    0);
 
     robot.moveCenter(center);
@@ -140,41 +129,5 @@ void PlaybookField::paintRobot(QPaintEvent* event,
 
     painter.restore();
 }
-
-void PlaybookField::updateRobots(PlaybookPosition** positions)
-{
-    for (int i = 0; i < 3; i++)
-    {
-        robots[i].setX(positions[i]->x);
-        robots[i].setY(positions[i]->y);
-        robots[i].setH(positions[i]->h);
-        robots[i].setRole(positions[i]->role);
-        robots[i].setColor(roleColors[parseRole(positions[i]->role)]);
-    }
-}
-
-int PlaybookField::parseRole(char role)
-{
-    if (role == 'd')
-    {
-        return Role.DEFENDER;
-    }
-    else if (role == 'm')
-    {
-        return Role.MIDDIE;
-    }
-    else if (role == 'o')
-    {
-        return Role.OFFENDER;
-    }
-    else if (role == 'g')
-    {
-        return Role.GOALIE;
-    }
-
-    qDebug() << "A bad role char was passed to the view.";
-    return 0;
-}
-
 } // namespace playbook
 } // namespace tool

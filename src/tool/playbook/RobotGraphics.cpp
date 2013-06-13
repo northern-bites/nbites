@@ -5,8 +5,9 @@
 namespace tool {
 namespace playbook {
 
-RobotGraphics::RobotGraphics(int x_, int y_, int h_,
-                             char role_, const QColor color_) :
+RobotGraphics::RobotGraphics(short x_, short y_, short h_,
+                             short role_, const QColor color_) :
+    QGraphicsObject(),
     x(x_),
     y(y_),
     h(h_),
@@ -36,8 +37,8 @@ void RobotGraphics::paint(QPainter *painter,
     painter->rotate(h);
 
     QPoint center(0,0);
-    QRect robot(0, 0, 18, 35);
-    QPoint lineEnd(0.125*x, 0);
+    QRect robot(0, 0, 18, 35); //TODO: use constants here
+    QPoint lineEnd(0.5*18, 0); //      and here
 
     robot.moveCenter(center);
 
@@ -47,19 +48,43 @@ void RobotGraphics::paint(QPainter *painter,
     painter->restore();
 }
 
-void mousePressEvent(QGraphicsSceneMouseEvent *event)
+void RobotGraphics::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    return;
+    setCursor(Qt::ClosedHandCursor);
 }
 
-void mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+void RobotGraphics::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    return;
+    // If the drag distance is too small, ignore it (elmininates mouse jitters)
+    if (QLineF(event->screenPos(), event->buttonDownScreenPos(Qt::LeftButton))
+        .length() < QApplication::startDragDistance()) {
+        return;
+    }
+
+    QDrag* drag = new QDrag(event->widget());
+    QMimeData *mime = new QMimeData;
+    drag->setMimeData(mime);
+
+    mime->setColorData(color);
+    QPixmap pixmap(18,35); //TODO: use constants here
+    pixmap.fill(Qt::white);
+
+    QPainter painter(&pixmap);
+    painter.translate(9,17.5); // Probably means it draws centered on the mouse
+    paint(&painter,0,0);
+
+    pixmap.setMask(pixmap.createHeuristicMask());
+
+    drag->setPixmap(pixmap);
+    // maybe set a hot spot if needed?
+
+    drag->exec();
+    setCursor(Qt::OpenHandCursor);
 }
 
-void mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void RobotGraphics::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    return;
+    setCursor(Qt::OpenHandCursor);
 }
 
 void RobotGraphics::setX(int x_) { x = x_; }
@@ -68,10 +93,10 @@ void RobotGraphics::setH(int h_) { h = h_; }
 void RobotGraphics::setRole(char role_) { role = role_; }
 void RobotGraphics::setColor(QColor color_) { color = color_; }
 
-int RobotGraphics::getX() { return x; }
-int RobotGraphics::getY() { return y; }
-int RobotGraphics::getH() { return h; }
-char RobotGraphics::getRole() { return role; }
+short RobotGraphics::getX() { return x; }
+short RobotGraphics::getY() { return y; }
+short RobotGraphics::getH() { return h; }
+short RobotGraphics::getRole() { return role; }
 QColor RobotGraphics::getColor() { return color; }
 
 } // namespace playbook

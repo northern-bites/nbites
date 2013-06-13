@@ -11,13 +11,19 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
 {
     model = new PlaybookModel(BOX_SIZE, GRID_WIDTH, GRID_HEIGHT, this);
 
-    fieldPainter = new PlaybookField(BOX_SIZE, GRID_WIDTH, GRID_HEIGHT, model, this);
+    fieldPainter = new PlaybookField(BOX_SIZE, GRID_WIDTH, GRID_HEIGHT, this);
 
     mainLayout = new QHBoxLayout(this);
 
+    graphicsScene = new QGraphicsScene();
+    QGraphicsView graphicsView(graphicsScene);
+
+    graphicsView.setBackgroundBrush(QColor(230, 200, 167));
+
     //GUI
     field = new QHBoxLayout();
-    field->addWidget(fieldPainter);
+    //field->addWidget(fieldPainter);
+    field->addWidget(&graphicsView);
 
     settings = new QVBoxLayout();
     settings->setAlignment(Qt::AlignTop);
@@ -58,6 +64,18 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     mainLayout->addLayout(settings);
 
     this->setLayout(mainLayout);
+
+    // Initialize data from the model to the fieldPainter.
+    for (int i = 0; i < 3; i++)
+    {
+        PlaybookPosition* position = model->playbook[0][i][0][0];
+        RobotGraphics* robot = new RobotGraphics(position->x, position->y,
+                                                position->h, position->role,
+                                                roleColors[position->role]);
+        fieldPainter->setRobot(robot,i);
+        robot->setPos(100,500);
+        graphicsScene->addItem(robot);
+    }
 }
 
 } // namespace playbook

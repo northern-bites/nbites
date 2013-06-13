@@ -33,7 +33,7 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
                         LANDMARK_BLUE_GOAL_CROSS_X,
                         LANDMARK_BLUE_GOAL_CROSS_Y + (role%3 - 1) * CENTER_CIRCLE_RADIUS,
                         0,
-                        roleList[role]);
+                        defaultRoleList[role]);
                     playbook[goalie][role][x][y] = p;
                 }
             }

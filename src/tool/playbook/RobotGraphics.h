@@ -1,5 +1,6 @@
 
 #include <QtGui>
+#include <QGraphicsObject>
 
 namespace tool {
 namespace playbook {
@@ -7,7 +8,8 @@ namespace playbook {
 class RobotGraphics : public QGraphicsObject
 {
 public:
-    RobotGraphics(int x_, int y_, int h_, char role_, const QColor color_);
+    RobotGraphics(short x_, short y_, short h_,
+                  short role_, const QColor color_);
     QRectF boundingRect() const;
     void paint(QPainter *painter,
                const QStyleOptionGraphicsItem *option,
@@ -19,10 +21,10 @@ public:
     void setRole(char role_);
     void setColor(QColor color_);
 
-    int getX();
-    int getY();
-    int getH();
-    char getRole();
+    short getX();
+    short getY();
+    short getH();
+    short getRole();
     QColor getColor();
 
 protected:
@@ -31,8 +33,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    int x,y,h;
-    char role;
+    short x,y,h,role;
     QColor color;
 };
 
