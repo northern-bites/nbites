@@ -191,11 +191,11 @@ def orbitBall(player):
     #ATM that doesn't appear to be the case
     if player.orbitDistance < player.brain.ball.distance - 1:
         #We're too far away
-        player.brain.nav.setXSpeed(.15)
+        player.brain.nav.setXSpeed(.1)
         
     if player.orbitDistance > player.brain.ball.distance + 1:
         #We're too close
-        player.brain.nav.setXSpeed(-.15)
+        player.brain.nav.setXSpeed(-.1)
 
     if player.orbitDistance > player.brain.ball.distance -1 and player.orbitDistance < player.brain.ball.distance +1:
         #print "We're at a good distance"
