@@ -9,7 +9,8 @@
 
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
-SET_POOL_SIZE(messages::JointAngles, 16);
+SET_POOL_SIZE(messages::JointAngles, 24);
+SET_POOL_SIZE(messages::InertialState, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
