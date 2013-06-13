@@ -450,13 +450,26 @@ messages::YUVImage ImageTranscriber::getNextImage()
 }
 
 TranscriberModule::TranscriberModule(ImageTranscriber& trans)
-    : imageOut(base()), it(trans)
+    : imageOut(base()),
+      jointsOut(base()),
+      inertsOut(base()),
+      it(trans)
 {
 }
 
 // Get image from Transcriber and outportal it
 void TranscriberModule::run_()
 {
+    jointsIn.latch();
+    inertsIn.latch();
+
+    /* Pass the most recent joints and inerts thru transcriber and outportal,
+     * so that vision has synced images, joints, and inerts to process. */
+    jointsOut.setMessage(portals::Message<messages::JointAngles>(
+                         &jointsIn.message()));
+    inertsOut.setMessage(portals::Message<messages::InertialState>(
+                         &inertsIn.message()));
+
     messages::YUVImage image = it.getNextImage();
     portals::Message<messages::YUVImage> imageOutMessage(&image);
     imageOut.setMessage(imageOutMessage);

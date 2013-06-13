@@ -146,6 +146,34 @@ namespace man
         // The chest push-button.
         ChestboardButton,
 
+        // Stiffness values
+        HeadPitchStiff,
+        HeadYawStiff,
+        LAnklePitchStiff,
+        LAnkleRollStiff,
+        LElbowRollStiff,
+        LElbowYawStiff,
+        LHandStiff,
+        LHipPitchStiff,
+        LHipRollStiff,
+        LHipYawPitchStiff,
+        LKneePitchStiff,
+        LShoulderPitchStiff,
+        LShoulderRollStiff,
+        LWristYawStiff,
+        RAnklePitchStiff,
+        RAnkleRollStiff,
+        RElbowRollStiff,
+        RElbowYawStiff,
+        RHandStiff,
+        RHipPitchStiff,
+        RHipYawPitchStiff,
+        RHipRollStiff,
+        RKneePitchStiff,
+        RShoulderPitchStiff,
+        RShoulderRollStiff,
+        RWristYawStiff,
+
         NUM_SENSOR_VALUES
     };
 
@@ -246,6 +274,33 @@ namespace man
         "RFootBumperLeft",
         "RFootBumperRight",
         "ChestboardButton",
+        // Stiffness values
+        "HeadPitchStiff",
+        "HeadYawStiff",
+        "LAnklePitchStiff",
+        "LAnkleRollStiff",
+        "LElbowRollStiff",
+        "LElbowYawStiff",
+        "LHandStiff",
+        "LHipPitchStiff",
+        "LHipRollStiff",
+        "LHipYawPitchStiff",
+        "LKneePitchStiff",
+        "LShoulderPitchStiff",
+        "LShoulderRollStiff",
+        "LWristYawStiff",
+        "RAnklePitchStiff",
+        "RAnkleRollStiff",
+        "RElbowRollStiff",
+        "RElbowYawStiff",
+        "RHandStiff",
+        "RHipPitchStiff",
+        "RHipYawPitchStiff",
+        "RHipRollStiff",
+        "RKneePitchStiff",
+        "RShoulderPitchStiff",
+        "RShoulderRollStiff",
+        "RWristYawStiff",
         "!!END!!"
     };
     } // namespace sensors
