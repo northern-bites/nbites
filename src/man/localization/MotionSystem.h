@@ -29,6 +29,8 @@ public:
 
     void randomlyShiftParticle(Particle* particle, bool nearMid);
 
+    void noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH);
+
     void setFallen(bool fallen);
 
     void resetNoise(float xyNoise_, float hNoise_);

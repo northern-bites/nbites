@@ -107,7 +107,6 @@ void ParticleFilter::updateEstimate()
     poseEstimate.set_h(NBMath::subPIAngle(sumH/parameters.numParticles));
 
     poseEstimate.set_uncert(errorMagnitude);
-    std::cout << "(x,y,h):\t("<< poseEstimate.x() << " , " << poseEstimate.y() << " , " << poseEstimate.h() << " )" << std::endl;
 }
 
 /**

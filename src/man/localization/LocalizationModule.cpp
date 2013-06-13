@@ -44,6 +44,7 @@ void LocalizationModule::update()
 
     // Want odometry to give information relative to current robot frame
     // IE choose to have robot frame change as the robot moves
+
     float sinH, cosH;
     sincosf(motionInput.message().h(), &sinH, &cosH);
     float rotatedX =   cosH*motionInput.message().x()
@@ -85,7 +86,6 @@ void LocalizationModule::update()
 
 void LocalizationModule::run_()
 {
-    std::cout << "Loc Run" << std::endl;
     // Profiler
     PROF_ENTER(P_SELF_LOC);
 

@@ -32,6 +32,8 @@ void MotionSystem::update(ParticleSet& particles,
                   << ")" << std::endl << std::endl;
     }
 
+    float dX, dY, dH;
+
     ParticleIt iter;
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
@@ -40,14 +42,73 @@ void MotionSystem::update(ParticleSet& particles,
         float sinh, cosh;
         sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
                 &sinh, &cosh);
-        particle->setX(particle->getLocation().x() + cosh*deltaMotionInfo.x() + sinh*deltaMotionInfo.y());
-        particle->setY(particle->getLocation().y() + cosh*deltaMotionInfo.y() - sinh*deltaMotionInfo.x());
-        particle->setH(NBMath::subPIAngle(particle->getLocation().h() + deltaMotionInfo.h()));
+        dX = cosh*deltaMotionInfo.x() + sinh*deltaMotionInfo.y();
+        dY = cosh*deltaMotionInfo.y() - sinh*deltaMotionInfo.x();
+        dH = NBMath::subPIAngle(deltaMotionInfo.h());
 
-        // Uncomment to test odometry
-        // particle->shift(changeX, changeY, changeH);
-        randomlyShiftParticle(particle, nearMid);
+        particle->shift(dX, dY, dH);
+
+        noiseShiftWithOdo(particle, dX, dY, dH);
+        //randomlyShiftParticle(particle, nearMid);
     }
+}
+
+void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH) {
+    float xF = 5.f;
+    float yF = 5.f;
+    float hF = 2.f;
+
+    float xL, xU, yL, yU, hL, hU;
+
+    if (dX >0) {
+        xL = -1.f * dX * xF;
+        xU = dX * xF;
+    }
+    else if (dX <0) {
+        xL = dX * xF;
+        xU = -1.f * dX * xF;
+    }
+    else {
+        xL = -.1;
+        xU = .1;
+    }
+
+    if (dY >0) {
+        yL = -1.f * dY * yF;
+        yU = dY * yF;
+    }
+    else if (dY <0) {
+        yL = dY * yF;
+        yU = -1.f * dY * yF;
+    }
+    else {
+        yL = -.1;
+        yU = .1;
+    }
+
+    if (dH >0) {
+        hL = -1.f * dH * hF;
+        hU = dH * hF;
+    }
+    else if (dH <0) {
+        hL = dH * hF;
+        hU = -1.f * dH * hF;
+    }
+    else {
+        hL = -.08;
+        hU =  .08;
+    }
+
+    boost::uniform_real<float> xRange(xL, xU);
+    boost::uniform_real<float> yRange(yL, yU);
+    boost::uniform_real<float> hRange(hL, hU);
+
+    boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > xShift(rng, xRange);
+    boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > yShift(rng, yRange);
+    boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > hShift(rng, hRange);
+
+    particle->shift(xShift(), yShift(), hShift());
+
 }
 
 void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)
