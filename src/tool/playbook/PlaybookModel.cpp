@@ -15,7 +15,8 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     middieLocked(false),
     BOX_SIZE(b_s),
     GRID_WIDTH(g_w),
-    GRID_HEIGHT(g_h)
+    GRID_HEIGHT(g_h),
+    numActiveFieldPlayers(4)
 {
     playbook = new PlaybookPosition****[2];
     for(int goalie = 0; goalie < 2; ++goalie)
@@ -54,7 +55,7 @@ PlaybookPosition** PlaybookModel::getRobotPositions()
 void PlaybookModel::toggleGoalie(bool on)
 {
     goalieOn = on ? 1 : 0;
-    //qDebug() << "goalieOn is now " << goalieOn;
+    qDebug() << "goalieOn is now " << goalieOn;
 }
 
 void PlaybookModel::toggleDefender(bool on)
@@ -73,6 +74,67 @@ void PlaybookModel::toggleMiddie(bool on)
 {
     middieLocked = on ? 1 : 0;
     qDebug() << "middieLocked is now " << middieLocked;
+}
+
+void PlaybookModel::setTwoFieldPlayers(bool checked)
+{
+    if (checked)
+    {
+        numActiveFieldPlayers = 2;
+        qDebug() << "number of active field players is now 2";
+    }
+}
+
+void PlaybookModel::setThreeFieldPlayers(bool checked)
+{
+    if (checked)
+    {
+        numActiveFieldPlayers = 3;
+        qDebug() << "number of active field players is now 3";
+    }
+}
+
+void PlaybookModel::setFourFieldPlayers(bool checked)
+{
+    if (checked)
+    {
+        numActiveFieldPlayers = 4;
+        qDebug() << "number of active field players is now 4";
+    }
+}
+
+void PlaybookModel::setDefenderXPosition(QString x_)
+{
+    playbook[0][DEFENDER][0][0]->x = x_.toInt();
+    qDebug() << "setting defender's position: x value is now " << x_;
+}
+
+void PlaybookModel::setDefenderYPosition(QString y_)
+{
+    playbook[0][DEFENDER][0][0]->y = y_.toInt();
+    qDebug() << "setting defender's position: y value is now " << y_;
+}
+void PlaybookModel::setMiddieXPosition(QString x_)
+{
+    playbook[0][MIDDIE][0][0]->x = x_.toInt();
+    qDebug() << "setting middie's position: x value is now " << x_;
+}
+
+void PlaybookModel::setMiddieYPosition(QString y_)
+{
+    playbook[0][MIDDIE][0][0]->y = y_.toInt();
+    qDebug() << "setting middie's position: y value is now " << y_;
+}
+void PlaybookModel::setOffenderXPosition(QString x_)
+{
+    playbook[0][OFFENDER][0][0]->x = x_.toInt();
+    qDebug() << "setting offender's position: x value is now " << x_;
+}
+
+void PlaybookModel::setOffenderYPosition(QString y_)
+{
+    playbook[0][OFFENDER][0][0]->y = y_.toInt();
+    qDebug() << "setting offender's position: y value is now " << y_;
 }
 
 }

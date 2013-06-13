@@ -12,6 +12,7 @@
 
 #include "PlaybookField.h"
 #include "PlaybookModel.h"
+#include "PlaybookConstants.h"
 
 namespace tool{
 namespace playbook{
@@ -28,10 +29,12 @@ class PlaybookCreator : public QWidget
 public:
     PlaybookCreator(QWidget* parent = 0);
 
+protected slots:
+    void updatePositions();
+
 protected:
     PlaybookField* fieldPainter;
     PlaybookModel* model;
-    QGraphicsScene* graphicsScene;
 
     QHBoxLayout* mainLayout;
     QHBoxLayout* field;
@@ -44,9 +47,19 @@ protected:
     QCheckBox* lockMiddie;
     QCheckBox* lockOffender;
     QCheckBox* goalie;
+    QLineEdit* editDefenderX;
+    QLineEdit* editDefenderY;
+    QLineEdit* editMiddieX;
+    QLineEdit* editMiddieY;
+    QLineEdit* editOffenderX;
+    QLineEdit* editOffenderY;
+    QRadioButton* twoFieldPlayers;
+    QRadioButton* threeFieldPlayers;
+    QRadioButton* fourFieldPlayers;
 
 private:
     bool havePlaybook;
+    void updateRobotPositions();
 };
 
 }

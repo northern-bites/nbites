@@ -13,23 +13,12 @@
 #include <vector>
 
 #include "FieldConstants.h"
-#include "PlaybookModel.h"
-#include "RobotGraphics.h"
+#include "PlaybookConstants.h"
 
 #include "common/PaintField.h"
 
 namespace tool {
 namespace playbook {
-
-enum Role {
-    DEFENDER = 0,
-    MIDDIE,
-    OFFENDER,
-    GOALIE
-};
-
-static const Qt::GlobalColor roleColors [] = {Qt::blue, Qt::cyan,
-                                              Qt::yellow, Qt::magenta};
 
 class PlaybookField : public PaintField
 {
@@ -39,8 +28,9 @@ public:
     PlaybookField(int b_s, int g_w, int g_h, QWidget* parent = 0,
                   float scaleFactor_ = 1.f);
 
-    RobotGraphics** getRobots();
-    void setRobot(RobotGraphics* robot, int index);
+    PlaybookPosition** getRobots();
+    void setRobot(PlaybookPosition* robot, int index);
+    void setNumActiveFieldPlayers(int num) {numActiveFieldPlayers = num;};
 
 protected slots:
     void drawGoalie(bool on);
@@ -64,12 +54,13 @@ protected:
 
 private:
     bool shouldPaintGoalie;
+    int numActiveFieldPlayers;
 
     int BOX_SIZE;
     int GRID_WIDTH;
     int GRID_HEIGHT;
 
-    RobotGraphics* robots[3];
+    PlaybookPosition* robots[3];
 };
 
 } // namespace playbook

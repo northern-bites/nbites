@@ -15,15 +15,9 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
 
     mainLayout = new QHBoxLayout(this);
 
-    graphicsScene = new QGraphicsScene();
-    QGraphicsView graphicsView(graphicsScene);
-
-    graphicsView.setBackgroundBrush(QColor(230, 200, 167));
-
     //GUI
     field = new QHBoxLayout();
-    //field->addWidget(fieldPainter);
-    field->addWidget(&graphicsView);
+    field->addWidget(fieldPainter);
 
     settings = new QVBoxLayout();
     settings->setAlignment(Qt::AlignTop);
@@ -36,13 +30,32 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     lockMiddie = new QCheckBox("Lock Middie", this);
     goalie = new QCheckBox("Goalie Active", this);
     goalie->setChecked(true);
+    editDefenderX = new QLineEdit("Edit x", this);
+    editDefenderY = new QLineEdit("Edit y", this);
+    editMiddieX = new QLineEdit("Edit x", this);
+    editMiddieY = new QLineEdit("Edit y", this);
+    editOffenderX = new QLineEdit("Edit x", this);
+    editOffenderY = new QLineEdit("Edit y", this);
+    twoFieldPlayers = new QRadioButton("&2 Active Field Players", this);
+    threeFieldPlayers = new QRadioButton("&3 Active Field Players", this);
+    fourFieldPlayers = new QRadioButton("&4 active Field Players", this);
+    fourFieldPlayers->setChecked(true);
 
     settings->addWidget(undoBtn);
     settings->addWidget(loadBtn);
     settings->addWidget(saveBtn);
+    settings->addWidget(twoFieldPlayers);
+    settings->addWidget(threeFieldPlayers);
+    settings->addWidget(fourFieldPlayers);
     settings->addWidget(lockDefender);
+    settings->addWidget(editDefenderX);
+    settings->addWidget(editDefenderY);
     settings->addWidget(lockMiddie);
+    settings->addWidget(editMiddieX);
+    settings->addWidget(editMiddieY);
     settings->addWidget(lockOffender);
+    settings->addWidget(editOffenderX);
+    settings->addWidget(editOffenderY);
     settings->addWidget(goalie);
 
     // Connect checkbox interface
@@ -57,8 +70,52 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
 
     connect(goalie, SIGNAL(toggled(bool)), model,
             SLOT(toggleGoalie(bool)));
+
     connect(goalie, SIGNAL(toggled(bool)), fieldPainter,
             SLOT(drawGoalie(bool)));
+
+    // Connect radio buttons
+    connect(twoFieldPlayers, SIGNAL(toggled(bool)), model,
+            SLOT(setTwoFieldPlayers(bool)));
+
+    connect(threeFieldPlayers, SIGNAL(toggled(bool)), model,
+            SLOT(setThreeFieldPlayers(bool)));
+
+    connect(fourFieldPlayers, SIGNAL(toggled(bool)), model,
+            SLOT(setFourFieldPlayers(bool)));
+
+    // Connect line edit widgets
+    connect(editDefenderX, SIGNAL(textEdited(QString)), model,
+            SLOT(setDefenderXPosition(QString)));
+
+    connect(editDefenderY, SIGNAL(textEdited(QString)), model,
+            SLOT(setDefenderYPosition(QString)));
+
+    connect(editMiddieX, SIGNAL(textEdited(QString)), model,
+            SLOT(setMiddieXPosition(QString)));
+
+    connect(editMiddieY, SIGNAL(textEdited(QString)), model,
+            SLOT(setMiddieYPosition(QString)));
+
+    connect(editOffenderX, SIGNAL(textEdited(QString)), model,
+            SLOT(setOffenderXPosition(QString)));
+
+    connect(editOffenderY, SIGNAL(textEdited(QString)), model,
+            SLOT(setOffenderYPosition(QString)));
+
+    // Conect line edit widgets for update
+    connect(editDefenderX, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
+    connect(editDefenderY, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
+    connect(editMiddieX, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
+    connect(editMiddieY, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
+    connect(editOffenderX, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
+    connect(editOffenderY, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
 
     mainLayout->addLayout(field);
     mainLayout->addLayout(settings);
@@ -66,16 +123,43 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     this->setLayout(mainLayout);
 
     // Initialize data from the model to the fieldPainter.
-    for (int i = 0; i < 3; i++)
+    updateRobotPositions();
+}
+
+void PlaybookCreator::updateRobotPositions()
+{
+    int fieldPlayers = model->getNumActiveFieldPlayers();
+    int i, max;
+
+    if (fieldPlayers == 4) {
+        i = 0;
+        max = 3;
+    }
+    else if (fieldPlayers == 3) {
+        i = 3;
+        max = 5;
+    }
+    else if (fieldPlayers == 2) {
+        i = 5;
+        max = 6;
+    }
+
+    for (i; i < max; i++)
     {
         PlaybookPosition* position = model->playbook[0][i][0][0];
-        RobotGraphics* robot = new RobotGraphics(position->x, position->y,
-                                                position->h, position->role,
-                                                roleColors[position->role]);
-        fieldPainter->setRobot(robot,i);
-        robot->setPos(100,500);
-        graphicsScene->addItem(robot);
+
+        fieldPainter->setRobot(position,defaultRoleList[i]);
     }
+
+    fieldPainter->setNumActiveFieldPlayers(fieldPlayers);
+
+    fieldPainter->update();
+}
+
+void PlaybookCreator::updatePositions()
+{
+    updateRobotPositions();
+    qDebug() << "updating the robot positions now.";
 }
 
 } // namespace playbook

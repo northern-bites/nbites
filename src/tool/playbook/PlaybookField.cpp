@@ -15,12 +15,12 @@ PlaybookField::PlaybookField(int b_s, int g_w, int g_h, QWidget* parent,
 {
 }
 
-RobotGraphics** PlaybookField::getRobots()
+PlaybookPosition** PlaybookField::getRobots()
 {
     return robots;
 }
 
-void PlaybookField::setRobot(RobotGraphics* robot, int index)
+void PlaybookField::setRobot(PlaybookPosition* robot, int index)
 {
     robots[index] = robot;
 }
@@ -28,7 +28,7 @@ void PlaybookField::setRobot(RobotGraphics* robot, int index)
 void PlaybookField::drawGoalie(bool on)
 {
     shouldPaintGoalie = on;
-    //qDebug() << "Drawing goalie " << on;
+    qDebug() << "Drawing goalie " << on;
     update();
 }
 
@@ -94,12 +94,13 @@ void PlaybookField::paintPlayers(QPaintEvent* event)
     // Paint each robot.
     for (int i = 0; i < 3; i++) //TODO: use constant, adjust based on number of active field players
     {
-        short role = robots[i]->getRole();
+        qDebug() << "i is: " << i;
+        short role = robots[i]->role;
 
         paintRobot(event, painter,
-                   robots[i]->getX(),
-                   robots[i]->getY(),
-                   robots[i]->getH(),
+                   robots[i]->x,
+                   robots[i]->y,
+                   robots[i]->h,
                    roleColors[role]);
     }
 }

@@ -10,22 +10,10 @@
 #include <QObject>
 #include <QStack>
 #include "FieldConstants.h"
+#include "PlaybookConstants.h"
 
 namespace tool {
 namespace playbook {
-
-struct PlaybookPosition
-{
-    short x;
-    short y;
-    short h;
-    short role;
-    PlaybookPosition(int x_, int y_, int h_, char r) :
-        x(x_), y(y_), h(h_), role(r)
-    {}
-};
-
-static const short defaultRoleList [] = {0,2,1,0,2,0};
 
 class PlaybookModel : public QObject
 {
@@ -57,12 +45,22 @@ public:
     PlaybookPosition***** playbook; // [2][3+2+1][GRID_WIDTH][GRID_HEIGHT];
 
     PlaybookPosition** getRobotPositions();
+    int getNumActiveFieldPlayers(){return numActiveFieldPlayers;};
 
 protected slots:
     void toggleGoalie(bool on);
     void toggleDefender(bool on);
     void toggleOffender(bool on);
     void toggleMiddie(bool on);
+    void setDefenderXPosition(QString x_);
+    void setDefenderYPosition(QString y_);
+    void setMiddieXPosition(QString x_);
+    void setMiddieYPosition(QString y_);
+    void setOffenderXPosition(QString x_);
+    void setOffenderYPosition(QString y_);
+    void setTwoFieldPlayers(bool checked);
+    void setThreeFieldPlayers(bool checked);
+    void setFourFieldPlayers(bool checked);
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
@@ -73,6 +71,7 @@ protected:
     bool defenderLocked;
     bool offenderLocked;
     bool middieLocked;
+    int numActiveFieldPlayers;
 
     int BOX_SIZE;
     int GRID_WIDTH;
