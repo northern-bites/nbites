@@ -11,7 +11,7 @@ WorldView::WorldView(QWidget* parent)
     : portals::Module(),
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
-      wviewComm(15,0),
+      wviewComm(16,0),
       newTeam(0)
 {
     commThread.addModule(*this);
@@ -125,6 +125,7 @@ void WorldView::run_()
     {
         commIn[i].latch();
         fieldPainter->updateWithLocationMessage(commIn[i].message());
+        updateStatus(commIn[i].message(), i);
     }
 }
 
@@ -148,6 +149,20 @@ void WorldView::teamChanged()
 {
     // Don't set team directly due to race conditions.
     newTeam = teamSelector->text().toInt();
+}
+
+void WorldView::updateStatus(messages::WorldModel msg, int index)
+{
+    if (!msg.active())
+    {
+        roleLabels[index]->setText(QString("Inactive"));
+        subroleLabels[index]->setText(QString("Inactive"));
+    }
+    else
+    {
+        roleLabels[index]->setText(roles[msg.role()]);
+        subroleLabels[index]->setText(subroles[msg.sub_role()]);
+    }
 }
 
 }
