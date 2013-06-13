@@ -13,27 +13,32 @@ CalibrationModule::CalibrationModule(QWidget *parent) :
     currentX(FIELD_WHITE_LEFT_SIDELINE_X),
     currentY(CENTER_FIELD_Y),
     currentH(HEADING_RIGHT),
-    enabled(tr("Load A Log!")),
-    position(tr("Robot Position Controls")),
-    parameters(tr("Parameter Controls")),
-    goalie("Goalie Position", this),
-    center("Center Field Position", this),
-    cross("Field Cross Position", this),
-    other("Other Position", this),
-    setX(this),
-    setY(this),
-    setH(this),
-    xLabel("X Position", this),
-    yLabel("Y Position", this),
-    hLabel("Heading", this),
-    rollBox(this),
-    pitchBox(this),
-    rollLabel(tr("Roll")),
-    pitchLabel(tr("Pitch")),
-    loadButton(tr("Load Calibration Values")),
-    robotNames(this),
-    side(this),
-    central(this)
+    central(this),
+    mainLayout(&central),
+    images(&central),
+    side(&central),
+    sideLayout(&side),
+    enabled(tr("Load A Log!"), &side),
+    position(tr("Robot Position Controls"), &side),
+    parameters(tr("Parameter Controls"), &side),
+    goalie("Goalie Position", &side),
+    center("Center Field Position", &side),
+    cross("Field Cross Position", &side),
+    other("Other Position", &side),
+    setX(&side),
+    setY(&side),
+    setH(&side),
+    xLabel("X Position", &side),
+    yLabel("Y Position", &side),
+    hLabel("Heading", &side),
+    rollBox(&side),
+    pitchBox(&side),
+    rollLabel(tr("Roll"), &side),
+    pitchLabel(tr("Pitch"), &side),
+    loadButton(tr("Load Calibration Values"), &side),
+    robotNames(&side),
+    topImage(&images),
+    bottomImage(&images)
 {
     images.addTab(&topImage, "TOP");
     images.addTab(&bottomImage, "BOTTOM");
@@ -157,6 +162,8 @@ void CalibrationModule::enableCalibration(bool use)
 
 void CalibrationModule::switchCamera()
 {
+    if (images.currentIndex() == -1) return;
+
     if (images.currentWidget() == &topImage)
     {
         currentCamera = Camera::TOP;
