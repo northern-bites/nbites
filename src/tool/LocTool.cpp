@@ -16,12 +16,6 @@ LocTool::LocTool(const char* title) :
     toolTabs->addTab(&fieldView, tr("FieldView"));
     toolTabs->addTab(&worldView, tr("World View"));
 
-
-    toolTabs->addTab(&offlineVision, tr("Offline Vision"));
-    toolTabs->addTab(&tableCreator, tr("Color Creator"));
-    toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
-
-
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
 }
