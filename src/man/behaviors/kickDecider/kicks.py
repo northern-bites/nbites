@@ -35,9 +35,9 @@ class Kick(object):
     def __ne__(self, other):
         return not self == other
 
+
 # Some standard kicks. x,y and move should not be modified unless you change
 # the sweetMove.  Heading will be modified when the kick is constructed.
-
 LEFT_SIDE_KICK =  Kick("L_Side", x = 15.5, y =  -.5,
                        move=SweetMoves.LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick("R_Side", x = 15.5, y = .5,
@@ -83,6 +83,10 @@ LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
 RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
+# Dribble kick just tells player to run thru the ball, no actual sweet move
+LEFT_DRIBBLE =  Kick("L_Dribble", x = 5, y = 3.5)
+RIGHT_DRIBBLE =  Kick("R_Dribble", x = 5, y = -3.5)
+
 def chooseAlignedKickFromKick(player, kick):
     ballRelY = player.brain.ball.rel_y
     if (kick == LEFT_STRAIGHT_KICK or
@@ -91,6 +95,12 @@ def chooseAlignedKickFromKick(player, kick):
             return LEFT_STRAIGHT_KICK
         else:
             return RIGHT_STRAIGHT_KICK
+    elif (kick == LEFT_DRIBBLE or
+        kick == RIGHT_DRIBBLE):
+        if ballRelY > 0:
+            return LEFT_DRIBBLE
+        else:
+            return RIGHT_DRIBBLE
     elif (kick == LEFT_SHORT_STRAIGHT_KICK or
           kick == RIGHT_SHORT_STRAIGHT_KICK):
         if ballRelY > 0:

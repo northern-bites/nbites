@@ -122,6 +122,9 @@ def prepareForKick(player):
         if hackKick.DEBUG_KICK_DECISION:
             print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
+        # The whole point of dribbling is speed, therefore no orbit ever 
+        if player.kick.name == "L_DRIBBLE" or player.kick.name == "R_DRIBBLE":
+            return player.goNow('positionForKick')
         if hackKick.DEBUG_KICK_DECISION:
             print str(player.kick)
         return player.goNow('orbitBall')
@@ -183,6 +186,7 @@ def positionForKick(player):
 
     #only enque the new goTo destination once
     if player.firstFrame():
+        player.lastBall = ball
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
         #TODO: try getting rid of ADAPTIVE here, if ball estimates are good,
@@ -200,8 +204,17 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
+    # If ball moves, don't just try to kick anyway!
+    if transitions.ballMovedFromLastSpot(player):
+        return player.goLater('prepareForKick')
+
+    player.lastBall = ball
+
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
+        if (player.kick.name == "L_DRIBBLE" or # no actual sweet move
+            player.kick.name == "R DRIBBLE"):
+            player.goLater('chase')
         print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
