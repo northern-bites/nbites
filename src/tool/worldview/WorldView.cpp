@@ -124,7 +124,7 @@ void WorldView::run_()
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         commIn[i].latch();
-        fieldPainter->updateWithLocationMessage(commIn[i].message());
+        fieldPainter->updateWithLocationMessage(commIn[i].message(), i);
         updateStatus(commIn[i].message(), i);
     }
 }

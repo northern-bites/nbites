@@ -15,17 +15,20 @@ void WorldViewPainter::paintEvent(QPaintEvent* event)
     PaintField::paintEvent(event);
 
     // Paint actual location
-    paintRobotLocation(event, curLoc, true);
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        paintRobotLocation(event, curLoc[i], QString::number(i+1), true);
+    }
 }
 
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
-                                            messages::WorldModel loc,
-                                            bool red)
+                                          messages::WorldModel loc,
+                                          QString playerNum,
+                                          bool red)
 {
     if (!loc.active())
     {
-        // Don't paint robots that aren't there.
-        return;
+        return; // Don't paint robots that aren't there.
     }
 
     QPainter painter(this);
@@ -68,9 +71,10 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
     }
 }
 
-void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc)
+void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc,
+                                                 int index)
 {
-    curLoc = newLoc;
+    curLoc[index] = newLoc;
     update();
 }
 

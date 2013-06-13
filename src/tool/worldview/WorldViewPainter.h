@@ -22,6 +22,7 @@
 #include "RobotLocation.pb.h"
 #include "WorldModel.pb.h"
 
+#include "Common.h"
 #include "NBMath.h"
 
 namespace tool {
@@ -34,7 +35,7 @@ class WorldViewPainter : public tool_common::PaintField
 public:
     WorldViewPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
 
-    void updateWithLocationMessage(messages::WorldModel newLoc);
+    void updateWithLocationMessage(messages::WorldModel newLoc, int index);
 
 protected:
     // Paint the field
@@ -43,10 +44,11 @@ protected:
     // Paint a RobotLocation
     void paintRobotLocation(QPaintEvent* event,
                             messages::WorldModel loc,
+                            QString playerNum,
                             bool red = false);
 
 private:
-    messages::WorldModel curLoc;
+    messages::WorldModel curLoc[NUM_PLAYERS_PER_TEAM];
 };
 
 } // namespace worldview
