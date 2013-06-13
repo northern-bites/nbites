@@ -154,6 +154,9 @@ class GoTeam:
                                 % mate.playerNumber)
                 continue
 
+            # If the mate is already at the ball, and will reach it first even if
+            #  another mate is closer and sees the ball next frame, it should be
+            #  chaser.
             elif (mate.hasBall() and
                   mate.chaseTime < TeamMember.BALL_OFF_PENALTY):
                 if PBConstants.DEBUG_DET_CHASER:
