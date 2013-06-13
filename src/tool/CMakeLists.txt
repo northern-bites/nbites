@@ -95,7 +95,7 @@ set( tool_srcs main.cpp
   ToolDiagram.cpp
   DataSelector.cpp
   Tool.cpp
-  ${MAN_DIR}/DiagramThread.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
   )
 
 set( tool_headers
@@ -110,6 +110,7 @@ set( loc_srcs loc_main.cpp
   EmptyTool.cpp
   ToolDiagram.cpp
   DataSelector.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
 
   LocTool.cpp
   )
@@ -200,8 +201,8 @@ target_link_libraries(
   image_display
   logview
   fieldview
-  tool_common
   worldview
+  tool_common
   ${QT_LIBRARIES}
   )
 
