@@ -6,36 +6,28 @@ namespace worldview {
 static const int PARTICLE_WIDTH = 8;
 
 WorldViewPainter::WorldViewPainter(QWidget* parent, float scaleFactor_) :
-    PaintField(parent, scaleFactor_),
-    shouldPaintLocation(true)
+    PaintField(parent, scaleFactor_)
 {
-}
-
-void WorldViewPainter::paintLocationAction(bool state) {
-
-    shouldPaintLocation = state;
-    repaint();
 }
 
 void WorldViewPainter::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
 
-    if(shouldPaintLocation) {
-        // Paint actual location
-        paintRobotLocation(event, curLoc, true);
-    }
-
+    // Paint actual location
+    paintRobotLocation(event, curLoc, true);
 }
 
-/**
- *  NOTE: Comm information is coming from behaviors -> is in degrees
- *
- */
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                                             messages::WorldModel loc,
                                             bool red)
 {
+    if (!loc.active())
+    {
+        // Don't paint robots that aren't there.
+        return;
+    }
+
     QPainter painter(this);
     painter.translate(0, FIELD_GREEN_HEIGHT);
     painter.scale(1, -1);
@@ -74,16 +66,13 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
         //draw how sure I am about where the ball is
         //TODO
     }
-
 }
 
 void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc)
 {
     curLoc = newLoc;
-    if(shouldPaintLocation) {
-        update();
-    }
+    update();
 }
 
-} // namespace viewer
+} // namespace worldview
 } // namespace tool

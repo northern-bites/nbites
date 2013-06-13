@@ -36,9 +36,6 @@ public:
 
     void updateWithLocationMessage(messages::WorldModel newLoc);
 
-protected slots:
-    void paintLocationAction(bool state);
-
 protected:
     // Paint the field
     void paintEvent(QPaintEvent* event);
@@ -49,8 +46,6 @@ protected:
                             bool red = false);
 
 private:
-    bool shouldPaintLocation;
-
     messages::WorldModel curLoc;
 };
 
