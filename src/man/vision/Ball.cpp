@@ -84,8 +84,8 @@ Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con,
     init(0.0);
     allocateColorRuns();
 #ifdef OFFLINE
-    BALLDEBUG = false;
-    BALLDISTDEBUG = false;
+    BALLDEBUG = true;
+    BALLDISTDEBUG = true;
 #endif
 }
 
@@ -181,7 +181,7 @@ void Ball::preScreenBlobsBasedOnSizeAndColor() {
             blobs->init(i);
         } else if (ar > 0) {
             if (blobs->get(i).getBottom() + diam <
-                horizonAt(blobs->get(i).getLeft()) && thresh->usingTopCamera) {//temp hack
+                horizonAt(blobs->get(i).getLeft()) && thresh->usingTopCamera) {
                 blobs->init(i);
                 if (BALLDEBUG) {
                     cout << "Screened one for horizon problems " << endl;
@@ -231,7 +231,7 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
     if (!ballIsReasonablySquare(topBlob->getLeftTopX(), topBlob->getLeftTopY(),
                                 w, h)) {
         if (BALLDEBUG) {
-            drawBlob(*topBlob, BLACK);
+            drawBlob(*topBlob, WHITE);
             float ratio = (float)w / (float) h;
             cout << "Screening for ratios " << ratio << endl;
         }
@@ -247,7 +247,7 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
         return false;
     } else if (badSurround(*topBlob)) {
         if (BALLDEBUG) {
-            drawBlob(*topBlob, BLACK);
+            drawBlob(*topBlob, WHITE);
             cout << "Screening for lack of green and bad surround" << endl;
         }
         topBlob->init();
@@ -256,16 +256,30 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
     } else if (distanceDifference > DISTANCE_MISMATCH &&
                (kinematicsBasedEst.dist *2 <  radiusBasedEst.dist ||
                 radiusBasedEst.dist * 2 < kinematicsBasedEst.dist)
-               && kinematicsBasedEst.dist < PIXACC && kinematicsBasedEst.dist > 0 && w < 12) {
+               && kinematicsBasedEst.dist < PIXACC &&
+											kinematicsBasedEst.dist > 0 && w < 12) {
         if (BALLDEBUG) {
-            cout << "Screening due to distance mismatch " << kinematicsBasedEst.dist <<
+            cout << "Screening due to distance mismatch " <<
+				kinematicsBasedEst.dist <<
                 " " << radiusBasedEst.dist << endl;
-            drawBlob(*topBlob, BLACK);
+            drawBlob(*topBlob, WHITE);
         }
         thisBall->init();
         topBlob->init();
         return false;
-    }
+    } else if (kinematicsBasedEst.dist >  4 * radiusBasedEst.dist) {
+		if (radiusBasedEst.dist < MIDFIELD_X / 2 &&
+								  thresh->getPixDistance(topBlob->getLeftTopY()) > MIDFIELD_X) {
+			if (BALLDEBUG) {
+				cout << "Screening due to a very large ball at a seemingly far distance "
+					 << endl;
+			}
+			drawBlob(*topBlob, WHITE);
+			topBlob->init();
+			thisBall->init();
+			return false;
+		}
+	}
     return true;
 }
 
@@ -325,7 +339,7 @@ int Ball::balls(int horizon, VisualBall *thisBall)
     }
     if (BALLDISTDEBUG) {
         cout << "Distance is " << thisBall->getDistance() << " "
-                << kinematicsBasedEst.dist << endl;
+			 << kinematicsBasedEst.dist << " " << radiusBasedEst.dist << endl;
         cout<< "Radius"<<thisBall->getRadius()<<endl;
     }
     return 0;
@@ -849,7 +863,7 @@ int  Ball::roundness(Blob b)
             cout << "Roundness: Good " << goodPix << " " << badPix << endl;
         }
         badPix = 0;
-        // if more than 20% or so of our pixels tested are bad, then we toss it out
+        // if more than 20% or so of our pixels tested are bad, then we toss it
         if (goodPix < badPix * 5) {
             return BAD_VALUE;
         }
@@ -1118,25 +1132,19 @@ void Ball::setBallInfo(int w, int h, VisualBall *thisBall) {
 
     float radiusBasedDistance = ballDistanceEstFromRadius(thisBall->getRadius());
     radiusBasedEst = vision->pose->estimateWithKnownDistance(
-            thisBall->getCenterX(), thisBall->getCenterY(), 0.0f, radiusBasedDistance);
+            thisBall->getCenterX(), thisBall->getCenterY(), 0.0f,
+			radiusBasedDistance);
 
-    estimate sizeBased = vision->pose->estimateFromObjectSize(thisBall->getCenterX(), thisBall->getCenterY(),
-                                                              ORANGE_BALL_RADIUS,
-                                                              thisBall->getRadius(), ORANGE_BALL_RADIUS);
+    estimate sizeBased = vision->pose->estimateFromObjectSize(
+		thisBall->getCenterX(), thisBall->getCenterY(),
+		ORANGE_BALL_RADIUS,
+		thisBall->getRadius(), ORANGE_BALL_RADIUS);
 
-//  std::cout << "radius-based " << radiusBasedEst << std::endl;
-//  std::cout << "kinematics-based " << kinematicsBasedEst << std::endl;
-//  std::cout << "size-based " << sizeBased << std::endl;
+    // trust radius-based estimates for non-occluded balls that are relatively
+    // big enough to get enough radius information
 
-    //trust radius-based estimates for non-occluded balls that are relatively big enough
-    //to get enough radius information
-
-    //TODO: right now the radius-based function is broken (for small distances at least)
-//  if (occlusion == NOOCCLUSION && thisBall->getRadius() > 6) {
-//      thisBall->setDistanceEst(radiusBasedEst);
-//  } else {
-        thisBall->setDistanceEst(kinematicsBasedEst);
-//  }
+    //TODO: right now the radius-based function is broken (for small distances)
+	thisBall->setDistanceEst(kinematicsBasedEst);
 }
 
 /*
