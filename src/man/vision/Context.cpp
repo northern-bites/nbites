@@ -1360,7 +1360,9 @@ void Context::checkOuterToOuter(VisualCorner & first, VisualCorner & second) {
 		distToObject = min(distToObject, realDistance(second.getX(), second.getY(),
 													  objectRightX, objectRightY));
 	}
-	cout << "Distance " << distToObject << endl;
+    if (debugIdentifyCorners) {
+        cout << "Distance " << distToObject << endl;
+    }
 
     // if the common length is small enough it is a goal T
     if (commonDist < GOALBOX_DEPTH + 20.0f || distToObject < 300) {
