@@ -1,6 +1,8 @@
 #include "WorldView.h"
 #include <iostream>
 #include <string>
+#include <QIntValidator>
+#include <QDebug>
 
 namespace tool {
 namespace worldview {
@@ -9,8 +11,8 @@ WorldView::WorldView(QWidget* parent)
     : portals::Module(),
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
-      wviewComm(16,0)
-
+      wviewComm(15,0),
+      newTeam(0)
 {
     commThread.addModule(*this);
     commThread.addModule(wviewComm);
@@ -27,6 +29,17 @@ WorldView::WorldView(QWidget* parent)
     options->setAlignment(Qt::AlignTop);
     startButton = new QPushButton(QString("Start World Viewer"));
     options->addWidget(startButton);
+
+    QHBoxLayout *teamLayout = new QHBoxLayout();
+    QLabel *teamLabel = new QLabel(tr("Listening to Team: "));
+    teamSelector = new QLineEdit(tr("16"));
+    QValidator *teamVal = new QIntValidator(1, 255);
+    teamSelector->setValidator(teamVal);
+    teamLayout->addWidget(teamLabel);
+    teamLayout->addWidget(teamSelector);
+    options->addLayout(teamLayout);
+
+    connect(teamSelector, SIGNAL(editingFinished()), this, SLOT(teamChanged()));
 
     QVBoxLayout *stateLayout = new QVBoxLayout();
     stateLayout->setAlignment(Qt::AlignBottom);
@@ -100,6 +113,14 @@ WorldView::WorldView(QWidget* parent)
 
 void WorldView::run_()
 {
+    if (newTeam)
+    {
+        wviewComm.setTeamNumber(newTeam);
+        newTeam = 0;
+
+        qDebug() << "World View now listening to team: " << wviewComm.teamNumber();
+    }
+
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         commIn[i].latch();
@@ -107,18 +128,26 @@ void WorldView::run_()
     }
 }
 
-void WorldView::startButtonClicked(){
+void WorldView::startButtonClicked()
+{
     commThread.start();
     startButton->setText(QString("Stop World Viewer"));
     disconnect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
     connect(startButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
 }
 
-void WorldView::stopButtonClicked(){
+void WorldView::stopButtonClicked()
+{
     commThread.stop();
     startButton->setText(QString("Start World Viewer"));
     disconnect(startButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
     connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+}
+
+void WorldView::teamChanged()
+{
+    // Don't set team directly due to race conditions.
+    newTeam = teamSelector->text().toInt();
 }
 
 }

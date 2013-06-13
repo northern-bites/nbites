@@ -31,15 +31,20 @@ protected:
 
     QPushButton* startButton;
 
+    QLineEdit* teamSelector;
+
     QLabel* roleLabels[NUM_PLAYERS_PER_TEAM];
     QLabel* subroleLabels[NUM_PLAYERS_PER_TEAM];
 
     man::DiagramThread commThread;
     man::comm::CommModule wviewComm;
 
+    int newTeam;
+
 protected slots:
     void startButtonClicked();
     void stopButtonClicked();
+    void teamChanged();
 };
 
 }
