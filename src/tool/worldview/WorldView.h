@@ -28,15 +28,10 @@ protected:
 protected:
     WorldViewPainter* fieldPainter;
 
-    QHBoxLayout* mainLayout;
-    QHBoxLayout* field;
-    QVBoxLayout* options;
-
     QPushButton* startButton;
 
-    man::comm::CommModule wviewComm;
-
     man::DiagramThread commThread;
+    man::comm::CommModule wviewComm;
 
 protected slots:
     void startButtonClicked();

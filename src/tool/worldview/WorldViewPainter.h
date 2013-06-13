@@ -53,7 +53,7 @@ private:
     messages::WorldModel curLoc;
 };
 
-} // namespace viewer
+} // namespace worldview
 } // namespace tool
 
 

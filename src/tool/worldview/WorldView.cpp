@@ -6,22 +6,22 @@ namespace tool {
 namespace worldview {
 
 WorldView::WorldView(QWidget* parent)
-    : commThread("comm", COMM_FRAME_LENGTH_uS),
-      wviewComm(16,0),
-      portals::Module(),
-      QWidget(parent)
+    : portals::Module(),
+      QWidget(parent),
+      commThread("comm", COMM_FRAME_LENGTH_uS),
+      wviewComm(16,0)
 
 {
     commThread.addModule(*this);
     commThread.addModule(wviewComm);
 
     fieldPainter = new WorldViewPainter(this);
-    mainLayout = new QHBoxLayout(this);
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
-    field = new QHBoxLayout();
+    QHBoxLayout *field = new QHBoxLayout();
     field->addWidget(fieldPainter);
 
-    options = new QVBoxLayout();
+    QVBoxLayout *options = new QVBoxLayout();
     options->setAlignment(Qt::AlignTop);
     startButton = new QPushButton(QString("Start World Viewer"));
     options->addWidget(startButton);
