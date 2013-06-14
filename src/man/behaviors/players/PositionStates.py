@@ -17,7 +17,7 @@ def playbookPosition(player):
     if nav.isAtPosition():
         brain.tracker.trackBall()
     else:
-        brain.tracker.repeatWidePan()
+        brain.tracker.repeatBasicPan()
 
     #TODO: I think the transition is broken right now!
     #if PositionTransitions.leavingTheField(player):

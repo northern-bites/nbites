@@ -21,6 +21,11 @@ def kickBallExecute(player):
     # wait a second for stability.
     kickBallExecute.preKickDelay -= 1
 
+    # if ball has moved (and we haven't already kicked), don't kick
+    if transitions.ballMoved(player) and kickBallExecute.preKickDelay >= 0:
+        print "DEBUG_SUITE: In 'kickBallExec', ball moved so switching to prepareForKick"
+        return player.goLater('positionForKick')
+
     if kickBallExecute.preKickDelay == 0:
         player.executeMove(kickBallExecute.sweetMove)
         return player.stay()

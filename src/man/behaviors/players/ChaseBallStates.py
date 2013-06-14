@@ -220,6 +220,7 @@ def positionForKick(player):
 
     #only enque the new goTo destination once
     if player.firstFrame():
+        player.ballBeforeApproach = player.brain.ball
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
         #TODO: try getting rid of ADAPTIVE here, if ball estimates are good,

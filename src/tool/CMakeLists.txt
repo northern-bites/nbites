@@ -75,6 +75,7 @@ add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
 
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
+add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
 
 # Actual subdirectories!
 add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
@@ -202,6 +203,7 @@ target_link_libraries(
   fieldview
   tool_common
   worldview
+  localization
   ${QT_LIBRARIES}
   )
 
@@ -218,9 +220,7 @@ target_link_libraries(
   logview
   image_display
   image # man image
-  image_display
   fieldview
-  image_display
   tool_common
   colorcreator
   vision_offline

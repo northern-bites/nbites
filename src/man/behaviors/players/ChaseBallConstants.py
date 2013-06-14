@@ -12,6 +12,7 @@ PREPARE_FOR_KICK_DIST = 35.0
 
 # Should approach ball again
 APPROACH_BALL_AGAIN_DIST = PREPARE_FOR_KICK_DIST + 25.0
+BALL_MOVED_THR = 3
 
 # Should spin to ball
 SHOULD_SPIN_TO_BALL_Y = 40.0

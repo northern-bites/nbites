@@ -7,7 +7,7 @@ from ..playbook.PBConstants import (INIT_STRATEGY,
                                     ROLES,
                                     SUB_ROLES,
                                     CHASER)
-from objects import RobotLocation
+from objects import Location, RobotLocation
 
 class Play:
     def __init__(self,
@@ -60,6 +60,9 @@ class Play:
 
     def getPosition(self):
         return self.position
+
+    def getPositionCoord(self):
+        return Location(self.position.x, self.position.y)
 
     def equals(self, otherPlay):
         '''compares two plays for equality by value'''
