@@ -142,6 +142,7 @@ void DiagramThread::stop()
 {
     running = false;
     cout << "Thread " << diagram.name << " stopping." << endl;
+    cout.flush();
 }
 
 /*
