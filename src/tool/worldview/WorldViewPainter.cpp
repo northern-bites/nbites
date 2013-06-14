@@ -17,7 +17,7 @@ void WorldViewPainter::paintEvent(QPaintEvent* event)
     // Paint actual location
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        paintRobotLocation(event, curLoc[i], QString::number(i+1), false);
+        paintRobotLocation(event, curLoc[i], QString::number(i+1), true);
     }
 }
 
@@ -72,7 +72,7 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                           msg.my_y()+msg.ball_dist()*std::sin(TO_RAD*msg.my_h()+TO_RAD*msg.ball_bearing()));
 
         //draw where I think the ball is
-        painter.setBrush(Qt::darkYellow); //Orange isn't a thing??
+        painter.setBrush(QColor::fromRgb(205,140,0));
         painter.drawEllipse(ballCenter,
                             8,
                             8);
