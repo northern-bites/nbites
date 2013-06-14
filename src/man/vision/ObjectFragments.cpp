@@ -2244,7 +2244,10 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
     //int post = classifyFirstPost(c, pole);
 
 	if (post != LEFT && post != RIGHT && isItAPost) {
-		cout << "Using extra post" << endl;
+        if (POSTDEBUG)
+        {
+            cout << "Using extra post" << endl;
+        }
 		if (pole.getLeftBottomX() < secondPost.getLeftBottomX()) {
 			post = LEFT;
 		} else {

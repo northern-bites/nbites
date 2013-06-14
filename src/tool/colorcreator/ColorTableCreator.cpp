@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QDataStream>
 #include <QIODevice>
+#include <QDebug>
 
 namespace tool {
 namespace color {
@@ -20,8 +21,8 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     thrDisplay(this),
     bottomImage(base()),
     topImage(base()),
-	topThrImage(base()),
-	botThrImage(base())
+    topThrImage(base()),
+    botThrImage(base())
 {
     // BACKEND
     // We need converter modules to threshold both the top and bottom images,
@@ -82,17 +83,17 @@ void ColorTableCreator::run_()
 {
     bottomImageIn.latch();
     topImageIn.latch();
-	topThrIn.latch();
-	botThrIn.latch();
+    topThrIn.latch();
+    botThrIn.latch();
 
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
     topImage.setMessage(portals::Message<messages::YUVImage>(
                             &topImageIn.message()));
-	topThrImage.setMessage(portals::Message<messages::ThresholdImage>(
-							   &topThrIn.message()));
-	botThrImage.setMessage(portals::Message<messages::ThresholdImage>(
-							   &botThrIn.message()));
+    topThrImage.setMessage(portals::Message<messages::ThresholdImage>(
+                               &topThrIn.message()));
+    botThrImage.setMessage(portals::Message<messages::ThresholdImage>(
+                               &botThrIn.message()));
 
     subdiagram.run();
 }
@@ -102,7 +103,7 @@ void ColorTableCreator::run_()
 void ColorTableCreator::updateThresholdedImage()
 {
     // Run all of the modules that are kept in our subdiagram
-	run_();
+    run_();
 }
 
 void ColorTableCreator::canvasClicked(int x, int y, int brushSize, bool leftClick)
@@ -125,7 +126,7 @@ void ColorTableCreator::undo()
 void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
 {
 
-	std::vector<colorChanges> tableAdjustments;
+    std::vector<colorChanges> tableAdjustments;
     // Check the click was on the image
     for (int i = -brushStroke.brushSize; i <= 0; i++)
     {
@@ -152,37 +153,42 @@ void ColorTableCreator::paintStroke(const BrushStroke& brushStroke)
                 byte y = image.yImage().getPixel(brush_x, brush_y);
                 byte u = image.uImage().getPixel(brush_x/2, brush_y);
                 byte v = image.vImage().getPixel(brush_x/2, brush_y);
-				// Change the radius' to determine how 'close' colors must be to get defined
-				const int yRadius = 4, uRadius = 2, vRadius = 2;
-				for (int dy = -yRadius; dy <= yRadius; ++dy) {
-					for (int du = -uRadius; du <= uRadius; ++du) {
-						for (int dv = -vRadius; dv <= vRadius; ++dv) {
-							colorChanges adjustment;
-							adjustment.y = y+dy;
-							adjustment.u = u+du;
-							adjustment.v = v+dv;
-							adjustment.color = image::Color_bits[brushStroke.color];
-							tableAdjustments.push_back(adjustment);
-						}
-					}
-				}
+                // Change the radius' to determine how 'close' colors must be to get defined
+                const int yRadius = 4, uRadius = 2, vRadius = 2;
+                for (int dy = -yRadius; dy <= yRadius; ++dy) {
+                    for (int du = -uRadius; du <= uRadius; ++du) {
+                        for (int dv = -vRadius; dv <= vRadius; ++dv) {
+                            colorChanges adjustment;
+                            adjustment.y = y+dy;
+                            adjustment.u = u+du;
+                            adjustment.v = v+dv;
+                            adjustment.color = image::Color_bits[brushStroke.color];
+                            tableAdjustments.push_back(adjustment);
+                        }
+                    }
+                }
 
             }
         }
     }
-	if (brushStroke.define)
-	{
-		emit tableChanges(tableAdjustments);
-	}
-	else
-	{
-		emit tableUnChanges(tableAdjustments);
-	}
-	updateThresholdedImage();
+    if (brushStroke.define)
+    {
+        emit tableChanges(tableAdjustments);
+    }
+    else
+    {
+        emit tableUnChanges(tableAdjustments);
+    }
+    updateThresholdedImage();
 }
 
-void ColorTableCreator::imageTabSwitched(int)
+void ColorTableCreator::imageTabSwitched(int index)
 {
+    // Check if there is a valid widget yet or not.
+    // We get this signal when we close the tool.
+    if (index == -1)
+        return;
+
     // Rewire the thresholded display's inPortal to get the right thing
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;

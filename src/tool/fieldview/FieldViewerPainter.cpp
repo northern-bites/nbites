@@ -9,7 +9,10 @@ FieldViewerPainter::FieldViewerPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_),
     shouldPaintParticles(false),
     shouldPaintLocation(false),
-    shouldPaintObsv(false)
+    shouldPaintObsv(false),
+    shouldPaintParticlesOffline(false),
+    shouldPaintLocationOffline(false),
+    shouldPaintObsvOffline(false)
 {
 }
 
@@ -30,6 +33,23 @@ void FieldViewerPainter::paintObsvAction(bool state) {
     repaint();
 }
 
+void FieldViewerPainter::paintOfflineParticleAction(bool state) {
+
+    shouldPaintParticlesOffline = state;
+    repaint();
+}
+
+void FieldViewerPainter::paintOfflineLocationAction(bool state) {
+
+    shouldPaintLocationOffline = state;
+    repaint();
+}
+
+void FieldViewerPainter::paintOfflineObsvAction(bool state) {
+    shouldPaintObsvOffline = state;
+    repaint();
+}
+
 void FieldViewerPainter::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
@@ -41,7 +61,16 @@ void FieldViewerPainter::paintEvent(QPaintEvent* event)
         paintRobotLocation(event, curLoc, true);
 
     if(shouldPaintObsv)
-        paintObservations(event, curObsv);
+        paintObservations(event, curObsv, curLoc);
+
+    if(shouldPaintParticlesOffline)
+        paintParticleSwarm(event, curOfflineSwarm);
+
+    if(shouldPaintLocationOffline)
+        paintRobotLocation(event, curOffline, true, 15.f);
+
+    if(shouldPaintObsvOffline)
+        paintObservations(event, curObsv, curOffline);
 }
 
 void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
@@ -61,20 +90,21 @@ void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
     }
 }
 
-QPoint FieldViewerPainter::getRelLoc(float dist, float bear)
+QPoint FieldViewerPainter::getRelLoc(messages::RobotLocation loc, float dist, float bear)
 {
     float sin, cos;
     float ninetyDeg = 1.5707963;
-    sincosf((curLoc.h() + bear), &sin, &cos);
+    sincosf((loc.h() + bear), &sin, &cos);
 
-    float relX = dist*cos + curLoc.x();
-    float relY = dist*sin + curLoc.y();
+    float relX = dist*cos + loc.x();
+    float relY = dist*sin + loc.y();
     QPoint relLoc(relX,relY);
     return relLoc;
 }
 
 void FieldViewerPainter::paintObservations(QPaintEvent* event,
-                                           messages::VisionField obsv)
+                                           messages::VisionField obsv,
+                                           messages::RobotLocation loc)
 {
     QPainter painter(this);
     //Move origin to bottem left and scale to flip the y axis
@@ -88,7 +118,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
     for (int i=0; i<obsv.visual_corner_size(); i++) {
         if(obsv.visual_corner(i).visual_detection().distance() > 0.f){
                 painter.setBrush(Qt::black);
-                QPoint relLoc= getRelLoc(obsv.visual_corner(i).visual_detection().distance(),
+                QPoint relLoc= getRelLoc(loc, obsv.visual_corner(i).visual_detection().distance(),
                                          obsv.visual_corner(i).visual_detection().bearing());
                 painter.drawEllipse(relLoc, 10, 10);
 
@@ -109,7 +139,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
         if (obsv.goal_post_l().visual_detection().on()
            && (obsv.goal_post_l().visual_detection().distance() > 0.f)){
             painter.setBrush(Qt::yellow);
-            QPoint relLoc= getRelLoc(obsv.goal_post_l().visual_detection().distance(),
+            QPoint relLoc= getRelLoc(loc, obsv.goal_post_l().visual_detection().distance(),
                                      obsv.goal_post_l().visual_detection().bearing());
             painter.drawEllipse(relLoc, 10, 10);
 
@@ -128,7 +158,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
         if (obsv.goal_post_r().visual_detection().on()
            && (obsv.goal_post_r().visual_detection().distance() > 0.f)){
             painter.setBrush(Qt::red);
-            QPoint relLoc= getRelLoc(obsv.goal_post_r().visual_detection().distance(),
+            QPoint relLoc= getRelLoc(loc, obsv.goal_post_r().visual_detection().distance(),
                                      obsv.goal_post_r().visual_detection().bearing());
             painter.drawEllipse(relLoc, 10, 10);
             for (int j=0; j<obsv.goal_post_r().visual_detection().concrete_coords_size(); j++)
@@ -145,7 +175,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
     if (obsv.has_visual_cross()) {
         if (obsv.visual_cross().distance() > 0.f){
             painter.setBrush(Qt::black);
-            QPoint relLoc= getRelLoc(obsv.visual_cross().distance(),
+            QPoint relLoc= getRelLoc(loc, obsv.visual_cross().distance(),
                                      obsv.visual_cross().bearing());
             painter.drawEllipse(relLoc, 10, 10);
 
@@ -226,6 +256,29 @@ void FieldViewerPainter::updateWithObsvMessage(messages::VisionField newObservat
     }
 }
 
+void FieldViewerPainter::updateWithOfflineMessage(messages::RobotLocation newOffline)
+{
+    curOffline = newOffline;
+    if(shouldPaintLocationOffline) {
+        repaint();
+    }
+}
+
+void FieldViewerPainter::updateWithOfflineParticleMessage(messages::ParticleSwarm newOfflineSwarm)
+{
+    curOfflineSwarm = newOfflineSwarm;
+    if(shouldPaintParticlesOffline) {
+        repaint();
+    }
+}
+
+void FieldViewerPainter::updateWithOfflineObsvMessage(messages::VisionField newObservations)
+{
+    curObsv = newObservations;
+    if(shouldPaintObsvOffline) {
+        repaint();
+    }
+}
 
 } // namespace viewer
 } // namespace tool

@@ -97,6 +97,14 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     PROF_ENTER(P_WALK);
 
+    // If our calibration became bad (as decided by the walkingEngine,
+    // reset. We will wait until we're recalibrated to walk.
+    if (walkingEngine.shouldReset && calibrated())
+    {
+        std::cout << "We are stuck! Recalibrating." << std::endl;
+        hardReset();
+    }
+
     assert(JointData::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
@@ -127,8 +135,14 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         currentCommand = MotionCommand::ptr();
 
     } else {
+        // If we're not calibrated, wait until we are calibrated to walk
+        if (!calibrated())
+        {
+            MotionRequest motionRequest;
+            motionRequest.motion = MotionRequest::stand;
 
-        if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+            walkingEngine.theMotionRequest = motionRequest;
+        } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
 
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
 
