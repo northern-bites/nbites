@@ -31,6 +31,7 @@ enum ProfiledComponent {
     P_FGHORIZON,
     P_RUNS,
     P_OBJECT,
+    P_OBSTACLES,
     P_ROBOTS,
 
     P_EDGES,
@@ -75,6 +76,12 @@ enum ProfiledComponent {
 
     // COMM THREAD
     P_COMM_THREAD,
+    P_COMM_RECEIVE,
+    P_COMM_SEND,
+    P_COMM_BUILD_PACKET,
+    P_COMM_SERIALIZE_PACKET,
+    P_COMM_TO_SOCKET,
+    P_COMM_TIMER,
 
     // GUARDIAN THREAD
     P_GUARDIAN_THREAD,

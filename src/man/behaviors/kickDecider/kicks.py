@@ -72,12 +72,12 @@ RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 11, y = -3,
 # used when we haven't decided what kick to do yet
 ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
 
-# Not used 04-19-13
-LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 15.8, y =  4.2,
+LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 15.7, y =  4.1,
                             move=SweetMoves.LEFT_LONG_BACK_KICK)
-RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 15.8, y = -4.2,
+RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 15.7, y = -4.1,
                             move=SweetMoves.RIGHT_LONG_BACK_KICK)
 
+# Not used 06-09-13
 LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
 RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,

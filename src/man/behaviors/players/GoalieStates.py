@@ -7,7 +7,7 @@ from .. import SweetMoves
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
-SAVING = True
+SAVING = False
 
 def gameInitial(player):
     if player.firstFrame():
@@ -19,6 +19,13 @@ def gameInitial(player):
         player.zeroHeads()
         player.side = LEFT
         player.isSaving = False
+        player.lastStiffStatus = True
+
+    # If stiffnesses were JUST turned on, then stand up.
+    if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
+        player.stand()
+    # Remember last stiffness.
+    player.lastStiffStatus = player.brain.interface.stiffStatus.on
 
     return player.stay()
 

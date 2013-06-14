@@ -54,6 +54,22 @@ struct ColorParams
     MMXWord uvLimit;            // |  vn-1   |  un-1   |  vn-1   |  un-1   |
     MMXWord uvDim;              // | un * yn |   yn    | un * yn |   yn    |
 
+    // Intended to be bit-identical to ASM code
+    static int index(int z, MMXWord zero, MMXWord slope, MMXWord limit, int adjust)
+        {
+            z -= ((int)zero & 0xFFFF);
+            if (z < 0) return 0;
+            z = z * ((int)slope & 0xFFFF) >> 16 << adjust;
+            if (z > ((int)limit & 0xFFFF)) z = ((int)limit & 0xFFFF);
+            return z;
+        }
+
+    int yIndex(int y) const { return index(y,  yZero      ,  ySlope      ,  yLimit      , 0);}
+    int uIndex(int u) const { return index(u, uvZero      , uvSlope      , uvLimit      , 1);}
+    int vIndex(int v) const { return index(v, uvZero >> 16, uvSlope >> 16, uvLimit >> 16, 1);}
+
+    int offset(int y, int u, int v) const
+        { return y + u * ((int)uvDim & 0xFFFF) + v * ((int)(uvDim >> 16) & 0xFFFF);}
 };
 
 #endif /* _ColorParams_h_DEFINED */

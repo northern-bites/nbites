@@ -15,6 +15,7 @@ message Point
 {
         optional float x = 1;
         optional float y = 2;
+        optional float field_angle = 3; //Used only for corners... HACK
 }
 
 message VisualDetection
@@ -29,10 +30,13 @@ message VisualDetection
         optional int32 frames_on = 8;
         optional int32 frames_off = 9;
         repeated Point concrete_coords = 10;
-	optional float angle_x_deg = 11;
-	optional float angle_y_deg = 12;
+        optional float angle_x_deg = 11;
+        optional float angle_y_deg = 12;
         optional bool red_goalie = 13; // HACK until we have a unified message for goal posts.
         optional bool navy_goalie = 14;
+	optional bool intopcam = 15;
+	optional int32 x = 17;
+	optional int32 y = 18;
 }
 
 message VisualGoalPost
@@ -40,6 +44,10 @@ message VisualGoalPost
         optional VisualDetection visual_detection = 1;
         optional float height = 2;
         optional float width = 3;
+	optional Point left_top = 4;
+	optional Point right_top = 5;
+	optional Point left_bot = 6;
+	optional Point right_bot = 7;
 }
 
 message VisualCorner
@@ -125,6 +133,8 @@ message VisualCorner
         optional shape corner_type = 3;
         optional float physical_orientation = 4;
 	repeated corner_id poss_id = 5;
+	optional sint32 x = 6;
+	optional sint32 y = 7;
 }
 
 message VisualLine
@@ -136,7 +146,7 @@ message VisualLine
        SIDELINE_LINE = 52;
        ENDLINE_LINE = 53;
        GOALBOX_LINE = 54;
-       GOALBOX_SIDE_LINE = 55;			// 55
+       GOALBOX_SIDE_LINE = 55;                  // 55
        GOALBOX_TOP_LINE = 56;
 
        // Distinct lines:

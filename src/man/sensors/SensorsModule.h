@@ -22,6 +22,7 @@
 #include "FSR.pb.h"
 #include "BatteryState.pb.h"
 #include "Toggle.pb.h"
+#include "StiffnessControl.pb.h"
 
 #include <alcommon/albroker.h>
 #include <alproxies/almemoryproxy.h>
@@ -62,6 +63,7 @@ public:
     portals::OutPortal<messages::SonarState>      sonarsOutput_;
     portals::OutPortal<messages::FSR>             fsrOutput_;
     portals::OutPortal<messages::BatteryState>    batteryOutput_;
+    portals::OutPortal<messages::StiffStatus>     stiffStatusOutput_;
 
 private:
     /*
@@ -131,6 +133,11 @@ private:
      * @brief Updates the Battery message.
      */
     void updateBatteryMessage();
+
+    /**
+     * @brief Updates the Stiffness message.
+     */
+    void updateStiffMessage();
 
     /**
      * @brief The main run routine, primarily updates sensor

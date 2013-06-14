@@ -1,9 +1,9 @@
 #include "FieldViewerPainter.h"
 
+#include <cmath>
+
 namespace tool {
 namespace viewer {
-
-
 
 FieldViewerPainter::FieldViewerPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_),
@@ -26,7 +26,6 @@ void FieldViewerPainter::paintLocationAction(bool state) {
 }
 
 void FieldViewerPainter::paintObsvAction(bool state) {
-
     shouldPaintObsv = state;
     repaint();
 }
@@ -35,19 +34,14 @@ void FieldViewerPainter::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
 
-    if(shouldPaintParticles) {
+    if(shouldPaintParticles)
         paintParticleSwarm(event, curSwarm);
-    }
 
-    if(shouldPaintLocation) {
-        // Paint actual location
+    if(shouldPaintLocation)
         paintRobotLocation(event, curLoc, true);
-    }
 
-    if(shouldPaintObsv) {
+    if(shouldPaintObsv)
         paintObservations(event, curObsv);
-    }
-
 }
 
 void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
@@ -55,7 +49,7 @@ void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
 {
     QPainter painter(this);
     //Move origin to bottem left and scale to flip the y axis
-    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.translate(0,FIELD_GREEN_HEIGHT*scaleFactor);
     painter.scale(scaleFactor, -scaleFactor);
 
     for (int i=0; i<swarm.particle_size(); i++)
@@ -84,7 +78,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
 {
     QPainter painter(this);
     //Move origin to bottem left and scale to flip the y axis
-    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.translate(0,FIELD_GREEN_HEIGHT*scaleFactor);
     painter.scale(scaleFactor, -scaleFactor);
     painter.setPen(Qt::black);
 
@@ -178,7 +172,7 @@ void FieldViewerPainter::paintRobotLocation(QPaintEvent* event,
 {
     QPainter painter(this);
     //Move origin to bottem left and scale to flip the y axis
-    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.translate(0,FIELD_GREEN_HEIGHT*scaleFactor);
     painter.scale(scaleFactor, -scaleFactor);
 
     if (red)
@@ -194,6 +188,18 @@ void FieldViewerPainter::paintRobotLocation(QPaintEvent* event,
                      loc.y(),
                      size * std::cos(loc.h()) + loc.x(),
                      size * std::sin(loc.h()) + loc.y());
+}
+
+void FieldViewerPainter::handleZoomIn()
+{
+    scaleFactor += .1;
+    repaint();
+}
+
+void FieldViewerPainter::handleZoomOut()
+{
+    scaleFactor -= .1;
+    repaint();
 }
 
 void FieldViewerPainter::updateWithLocationMessage(messages::RobotLocation newLoc)

@@ -32,7 +32,7 @@ namespace man {
 namespace vision {
 
 #ifdef OFFLINE
-static const bool ROBOTSDEBUG = false;
+static const bool ROBOTSDEBUG = true;
 #else
 static const bool ROBOTSDEBUG = false;
 #endif
@@ -58,6 +58,10 @@ void Robots::init()
 	}
 	blobs->init();
 	numberOfRuns = 0;
+
+#ifdef OFFLINE
+	debugRobots = false;
+#endif
 }
 
 /* Allocate the required amount of memory dependent on the primary color
@@ -448,7 +452,8 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
         }
         // uniforms should be wider than they are tall
         if (candidate.height() > 2*candidate.width()) {
-            return false;
+
+			return false;
         }
         // there ought to be some white below the uniform
         if (bottom < IMAGE_HEIGHT - 10 &&

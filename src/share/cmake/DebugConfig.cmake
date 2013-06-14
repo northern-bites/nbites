@@ -10,6 +10,14 @@
 #
 
 option(
+  USING_LAB_FIELD
+  "Turn on if we are in the lab and not on a full-size field"
+  OFF
+)
+
+if( NOT OFFLINE )
+
+option(
   DEBUG_COMM
   "Toggle comm debug mode."
   OFF
@@ -18,6 +26,12 @@ option(
 option(
   DEBUG_BALLTRACK
   "Toggle balltrack debug mode."
+  OFF
+)
+
+option(
+  DEBUG_LOC
+  "Toggle localization debug mode."
   OFF
 )
 
@@ -36,12 +50,6 @@ option(
 option(
   PROFILE
   "Enable time profiling for the robot"
-  OFF
-)
-
-option(
-  USING_LAB_FIELD
-  "Turn on if we are in the lab and not on a full-size field"
   OFF
 )
 
@@ -100,6 +108,11 @@ if(USE_LOGGING)
     "Log the odometry from motion"
     OFF
     )
+  option(
+    LOG_SYNC
+    "Enable to log every tenth frame in order to stay synced with image logging"
+    ON
+    )
 
 else(USE_LOGGING)
   unset(LOG_SENSORS CACHE)
@@ -111,4 +124,7 @@ else(USE_LOGGING)
   unset(LOG_LOCALIZATION CACHE)
   unset(LOG_OBSERVATIONS CACHE)
   unset(LOG_ODOMETRY CACHE)
+  unset(LOG_SYNC CACHE)
 endif(USE_LOGGING)
+
+endif( NOT OFFLINE )

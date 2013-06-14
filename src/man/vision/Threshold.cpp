@@ -237,9 +237,9 @@ void Threshold::visionLoop(const messages::JointAngles& ja, const messages::Iner
     thresholdAndRuns();
     PROF_EXIT(P_THRESHRUNS);
 
-    PROF_ENTER(P_ROBOTS);
-    newFindRobots();
-    PROF_EXIT(P_ROBOTS);
+    //PROF_ENTER(P_ROBOTS);
+    //   newFindRobots();
+    //PROF_EXIT(P_ROBOTS);
 
     // do line recognition (in FieldLines.cc)
     // This will form all lines and all corners. After this call, fieldLines
@@ -256,7 +256,7 @@ void Threshold::visionLoop(const messages::JointAngles& ja, const messages::Iner
     PROF_EXIT(P_OBJECT);
 
 
-    vision->fieldLines->afterObjectFragments();
+    //vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
     if (vision->ygCrossbar->getWidth() > 0) {
         setShot(vision->ygCrossbar);
@@ -441,8 +441,16 @@ void Threshold::runs() {
     // back when the robots had colored shoulder pads we worried about seeing them
     detectSelf();
 #endif
+	bool far = false;
     for (int i = IMAGE_HEIGHT - 1; i >= 0; i--) {
-        pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+		if (!far) {
+			pixDistance[i] = vision->pose->pixEstimate(IMAGE_WIDTH / 2, i, 0.0).dist;
+			if (pixDistance[i] > 11000.0) {
+				far = true;
+			}
+		} else {
+			pixDistance[i] = 12000.0f;
+		}
     }
     for (int i = 0; i < NUMBLOCKS; i++) {
         block[i] = 0;
@@ -500,6 +508,9 @@ void Threshold::findGoals(int column, int topEdge) {
             lastYellow = j;
             yellows++;
             bad--;
+			if (bad < 0) {
+				bad = 0;
+			}
             if (firstYellow == topEdge) {
                 firstYellow = j;
             }
@@ -1069,8 +1080,8 @@ void Threshold::newFindRobots() {
     //then, in each macro pixel, we count how much red or navy
     //there is in it. Then we determine if there is enough to be interested
     //in that particular macro pixel
-    for (int i = 0; i < IMAGE_WIDTH; i += widthScale) {
-        for (int j = 0; j < IMAGE_HEIGHT; j += heightScale) {
+    for (int i = 0; i < IMAGE_WIDTH; i++) {
+        for (int j = 0; j < IMAGE_HEIGHT; j++) {
             pixel = getThresholded(j, i);
             if (Utility::isNavy(pixel))
                 navyblue->incImageBox(i / widthScale, j / heightScale);
@@ -1087,10 +1098,12 @@ void Threshold::newFindRobots() {
                 //the following line allows us to see which pixel has been activated.
                 //vision->drawRect(i, j, widthScale, heightScale, MAROON);
             }
+			else navyblue->setImageBox(i, j, 0);
             if (redColorCount / totalCellCount >= 0.4) {
                 red->setImageBox(i, j, 1);
                 //vision->drawRect(i, j, widthScale, heightScale, WHITE);
             }
+			else red->setImageBox(i, j, 0);
             navyColorCount = 0;
             redColorCount = 0;
         }
@@ -1222,6 +1235,12 @@ void Threshold::objectRecognition() {
     //unid->findRobots(cross);
     yellow->createObject();
     cross->checkForCrosses();
+	// we need to set the post into before doing context
+	// however we may need to set it again after, as context may change
+	// some IDs
+    setFieldObjectInfo(vision->yglp);
+    setFieldObjectInfo(vision->ygrp);
+	vision->fieldLines->afterObjectFragments();
 
     bool ylp = vision->yglp->getWidth() > 0;
     bool yrp = vision->ygrp->getWidth() > 0;
@@ -1779,9 +1798,10 @@ int Threshold::getPixelBoundaryUp() {
  */
 void Threshold::initDebugImage(){
 #ifdef OFFLINE
-    for(int x = 0 ; x < IMAGE_WIDTH;x++)
+    for(int x = 0 ; x < IMAGE_WIDTH;x++) 
         for(int y = 0; y < IMAGE_HEIGHT;y++)
             debugImage[y][x] = GREY;
+	
 #endif
 }
 
@@ -1790,12 +1810,18 @@ void Threshold::initDebugImage(){
  */
 void Threshold::transposeDebugImage(){
 #ifdef OFFLINE
+	for(int i = 0; i < IMAGE_HEIGHT * IMAGE_WIDTH; i++)
+		betterDebugImage[i] = GREY;
     for(int x = 0 ; x < IMAGE_WIDTH; x++) {
         for(int y = 0; y < IMAGE_HEIGHT; y++) {
             if(debugImage[y][x] != GREY){
-                setThresholded(y, x, debugImage[y][x]);
+                betterDebugImage[y * IMAGE_WIDTH + x] = debugImage[y][x];
             }
-        }
+			else {
+				usingTopCamera = true;
+				betterDebugImage[y * IMAGE_WIDTH + x] = getThresholded(y, x);
+			}
+		}
     }
 
     initDebugImage();
