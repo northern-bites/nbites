@@ -66,6 +66,8 @@ protected slots:
     void setFourFieldPlayers(bool checked);
     void setBallX(QString x_);
     void setBallY(QString y_);
+    void confirmPositionChange();
+    void resetPositionChanges();
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
@@ -73,6 +75,7 @@ protected:
     QStack<PlaybookPosition> changedPositions; // The old positions.
 
     void setPosition(int value, short role, bool x_position);
+    short convertRoleToPlaybookIndex(short role);
 
     int goalieOn;
     bool defenderLocked;
@@ -81,6 +84,13 @@ protected:
     int numActiveFieldPlayers;
     short ball_x;
     short ball_y;
+
+    short tempDefenderX;
+    short tempDefenderY;
+    short tempMiddieX;
+    short tempMiddieY;
+    short tempOffenderX;
+    short tempOffenderY;
 
     int BOX_SIZE;
     int GRID_WIDTH;

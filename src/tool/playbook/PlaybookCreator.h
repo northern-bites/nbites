@@ -32,6 +32,9 @@ public:
 protected slots:
     void updatePositions();
     void updatePositionsCheck(bool check);
+    void refreshTextDefender();
+    void refreshTextOffender();
+    void refreshTextMiddie();
 
 protected:
     PlaybookField* fieldPainter;

@@ -29,6 +29,7 @@ public:
                   float scaleFactor_ = 1.f);
 
     PlaybookPosition** getRobots();
+    PlaybookPosition* getRobot(int index);
 
     void setRobot(PlaybookPosition* robot, int index);
     void setNumActiveFieldPlayers(int num) {numActiveFieldPlayers = num;};

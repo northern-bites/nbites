@@ -22,6 +22,11 @@ PlaybookPosition** PlaybookField::getRobots()
     return robots;
 }
 
+PlaybookPosition* PlaybookField::getRobot(int index)
+{
+    return robots[index];
+}
+
 void PlaybookField::setRobot(PlaybookPosition* robot, int index)
 {
     robots[index] = robot;
