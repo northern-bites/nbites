@@ -358,11 +358,20 @@ void WalkingEngine::updateMotionRequest()
     {
         instabilityCount++;
     }
-    else instabilityCount = 0;
+    else
+    {
+        instabilityCount = 0;
+        shouldReset = false;
+    }
   }
   else
   {
       instabilityCount = 0;
+      shouldReset = false;
+  }
+  if (instabilityCount > INSTABILITY_THRESH)
+  {
+      shouldReset = true;
   }
 
   // get requested motion state
