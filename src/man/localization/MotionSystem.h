@@ -25,9 +25,11 @@ public:
 
     void update(ParticleSet& particles,
                 const messages::RobotLocation& deltaMotionInfo,
-                bool lost = false);
+                bool nearMid = false);
 
-    void randomlyShiftParticle(Particle* particle);
+    void randomlyShiftParticle(Particle* particle, bool nearMid);
+
+    void noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH);
 
     void setFallen(bool fallen);
 

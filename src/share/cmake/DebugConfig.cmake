@@ -111,7 +111,7 @@ if(USE_LOGGING)
   option(
     LOG_SYNC
     "Enable to log every tenth frame in order to stay synced with image logging"
-    ON
+    OFF
     )
 
 else(USE_LOGGING)
