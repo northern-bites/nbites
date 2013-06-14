@@ -9,7 +9,12 @@ FieldViewer::FieldViewer(QWidget* parent):
     QWidget(parent),
     haveParticleLogs(false),
     haveLocationLogs(false),
-    haveVisionFieldLogs(false)
+    haveVisionFieldLogs(false),
+    haveOdometryLogs(false),
+    locMod(),
+    locListen(),
+    odometry(base()),
+    observations(base())
 {
     fieldPainter = new FieldViewerPainter(this);
 
@@ -19,6 +24,9 @@ FieldViewer::FieldViewer(QWidget* parent):
     particleViewBox = new QCheckBox("Particle Viewer",this);
     locationViewBox = new QCheckBox("Location Viewer", this);
     robotFieldViewBox = new QCheckBox("Robot Field Viewer",this);
+    particleViewBoxOffline = new QCheckBox("Offline Particle Viewer",this);
+    locationViewBoxOffline = new QCheckBox("Offline Location Viewer", this);
+    robotFieldViewBoxOffline = new QCheckBox("Offline Robot Field Viewer",this);
 
     zoomInButton = new QPushButton("+", this);
     zoomOutButton = new QPushButton("-", this);
@@ -27,11 +35,15 @@ FieldViewer::FieldViewer(QWidget* parent):
     field->addWidget(fieldPainter);
 
     checkBoxes = new QHBoxLayout();
+    checkBoxesOffline = new QHBoxLayout();
     resizeLayout = new QHBoxLayout();
 
     checkBoxes->addWidget(particleViewBox);
     checkBoxes->addWidget(locationViewBox);
     checkBoxes->addWidget(robotFieldViewBox);
+    checkBoxesOffline->addWidget(particleViewBoxOffline);
+    checkBoxesOffline->addWidget(locationViewBoxOffline);
+    checkBoxesOffline->addWidget(robotFieldViewBoxOffline);
 
     resizeLayout->addWidget(zoomInButton);
     resizeLayout->addWidget(zoomOutButton);
@@ -44,6 +56,12 @@ FieldViewer::FieldViewer(QWidget* parent):
             SLOT(noLogError()));
     connect(robotFieldViewBox, SIGNAL(toggled(bool)), this,
             SLOT(noLogError()));
+    connect(particleViewBoxOffline, SIGNAL(toggled(bool)), this,
+            SLOT(noLogError()));
+    connect(locationViewBoxOffline, SIGNAL(toggled(bool)), this,
+            SLOT(noLogError()));
+    connect(robotFieldViewBoxOffline, SIGNAL(toggled(bool)), this,
+            SLOT(noLogError()));
 
     // Connect the resize paintfield buttons
     connect(zoomInButton, SIGNAL(released()), fieldPainter,
@@ -52,10 +70,21 @@ FieldViewer::FieldViewer(QWidget* parent):
             SLOT(handleZoomOut()));
 
     mainLayout->addLayout(checkBoxes);
+    mainLayout->addLayout(checkBoxesOffline);
     mainLayout->addLayout(resizeLayout);
     mainLayout->addLayout(field);
 
     this->setLayout(mainLayout);
+
+    //Setup offline localization
+    locMod.motionInput.wireTo(&odometry, true);
+    locMod.visionInput.wireTo(&observations, true);
+
+    subdiagram.addModule(locMod);
+    subdiagram.addModule(locListen);
+
+    locListen.locIn.wireTo(&locMod.output, true);
+    locListen.particleIn.wireTo(&locMod.particleOutput, true);
 }
 
 void FieldViewer::confirmParticleLogs(bool haveLogs)
@@ -120,6 +149,38 @@ void FieldViewer::confirmObsvLogs(bool haveLogs)
     }
 }
 
+void FieldViewer::tryOffline()
+{
+    if (haveOdometryLogs && haveVisionFieldLogs) {
+        connect(robotFieldViewBoxOffline, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintOfflineObsvAction(bool)));
+        disconnect(robotFieldViewBoxOffline, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+        connect(locationViewBoxOffline, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintOfflineLocationAction(bool)));
+        disconnect(locationViewBoxOffline, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+        connect(particleViewBoxOffline, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintOfflineParticleAction(bool)));
+        disconnect(particleViewBoxOffline, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+    else {
+        disconnect(robotFieldViewBoxOffline, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintOfflineObsvAction(bool)));
+        connect(robotFieldViewBoxOffline, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+        disconnect(locationViewBoxOffline, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintOfflineLocationAction(bool)));
+        connect(locationViewBoxOffline, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+        disconnect(particleViewBoxOffline, SIGNAL(toggled(bool)), fieldPainter,
+                SLOT(paintOfflineParticleAction(bool)));
+        connect(particleViewBoxOffline, SIGNAL(toggled(bool)), this,
+                   SLOT(noLogError()));
+    }
+}
+
 void FieldViewer::noLogError()
 {
     qDebug() << "Sorry, the opened log file does not include those logs";
@@ -142,6 +203,21 @@ void FieldViewer::run_()
         fieldPainter->updateWithObsvMessage(observationsIn.message());
     }
 
+    if (haveOdometryLogs) {
+        odometryIn.latch();
+    }
+
+    if (haveOdometryLogs && haveVisionFieldLogs) {
+        //set messages to the out portals latched to offline
+        odometry.setMessage(portals::Message<messages::RobotLocation>(&odometryIn.message()));
+        observations.setMessage(portals::Message<messages::VisionField>(&observationsIn.message()));
+
+        subdiagram.run();
+
+        fieldPainter->updateWithOfflineMessage(locListen.locIn.message());
+        fieldPainter->updateWithOfflineParticleMessage(locListen.particleIn.message());
+        fieldPainter->updateWithOfflineObsvMessage(observationsIn.message());
+    }
 }
 
 } // namespace viewer

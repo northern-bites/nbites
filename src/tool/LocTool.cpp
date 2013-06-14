@@ -76,6 +76,7 @@ void LocTool::setUpModules()
     }
     if(shouldAddFieldView)
         diagram.addModule(fieldView);
+    fieldView.tryOffline();
 }
 
 }

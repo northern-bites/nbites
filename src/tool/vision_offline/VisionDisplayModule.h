@@ -39,7 +39,6 @@ class VisionDisplayModule : public QMainWindow,
     Q_OBJECT;
 
 public:
-
     VisionDisplayModule(QWidget *parent = 0);
 
     // These are just pointers to the converter modules' InPortals
@@ -55,28 +54,22 @@ public:
     portals::InPortal<messages::PackedImage16> bYImage_in;
     portals::InPortal<messages::PackedImage16> bUImage_in;
     portals::InPortal<messages::PackedImage16> bVImage_in;
-
     portals::InPortal<messages::JointAngles> joints_in;
     portals::InPortal<messages::InertialState> inerts_in;
 
-
 protected slots:
-
 
 protected:
     virtual void run_();
 
 private:
-
     QImage makeOverlay(Camera::Type which);
-
 
     QTabWidget* imageTabs;
     Camera::Type currentCamera;
 
     // This module contains its own diagram! Trippy.
     portals::RoboGram subdiagram;
-
 
     // Modules
     image::OverlayDisplayModule topDisplay;

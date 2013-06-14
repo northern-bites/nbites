@@ -127,7 +127,6 @@ void VisionDisplayModule::run_()
     joints_in.latch();
     inerts_in.latch();
 
-
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
     topImage.setMessage(portals::Message<messages::YUVImage>(
@@ -183,7 +182,6 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 
         painter.setPen(Qt::magenta);
         for (int i = 0; i < visField->visual_corner_size(); i++) {
-
             painter.drawLine(visField->visual_corner(i).x() - 5,
                              visField->visual_corner(i).y() - 5,
                              visField->visual_corner(i).x() + 5,
@@ -234,7 +232,6 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 
     }
     else { // this is to draw in the bottom camera
-
         if (!visBall->intopcam()) {
             int ball_x = visBall->x();
             int ball_y = visBall->y();
