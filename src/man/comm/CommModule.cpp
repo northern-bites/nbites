@@ -49,7 +49,6 @@ CommModule::~CommModule()
     delete timer;
     delete teamConnect;
     delete gameConnect;
-    std::cout << "Comm Destructed" << std::endl;
 }
 
 void CommModule::run_()
