@@ -69,8 +69,8 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         xU = -1.f * dX * xF;
     }
     else {
-        xL = -.1;
-        xU = .1;
+        xL = -.1f;
+        xU = .1f;
     }
 
     if (dY >0) {
@@ -82,8 +82,8 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         yU = -1.f * dY * yF;
     }
     else {
-        yL = -.1;
-        yU = .1;
+        yL = -.1f;
+        yU = .1f;
     }
 
     if (dH >0) {
@@ -95,8 +95,8 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         hU = -1.f * dH * hF;
     }
     else {
-        hL = -.08;
-        hU =  .08;
+        hL = -.08f;
+        hU =  .08f;
     }
 
     boost::uniform_real<float> xRange(xL, xU);
