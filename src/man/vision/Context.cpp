@@ -268,33 +268,58 @@ void Context::checkForConnectedCorners(list<VisualCorner> &corners) {
 void Context::classifyT(VisualCorner & first) {
     float l1 = realLineDistance(first.getTStem());
     float l2 = realLineDistance(first.getTBar());
-    if (debugIdentifyCorners) {
-        cout << "Checking T " << l1 << " " << l2 << " " <<
-            first.getDistance() << endl;
-        if (objectRightX >= 0) {
-            cout << "Object is at " << objectRightX << " " <<
-                objectRightY << " " << objectDistance << endl;
-        }
-    }
-    // check if this is actually a center circle corner
     int horizon = field->horizonAt(first.getX());
     float dist = realDistance(first.getX(), first.getY(),
                               first.getX(), horizon);
+	float distToObject = realDistance(first.getX(), first.getY(),
+									  objectRightX, objectRightY);
+	bool objectIsClose = distToObject < GOALBOX_DEPTH * 2;
+    if (debugIdentifyCorners) {
+        cout << "Checking T " << l1 << " " << l2 << " " <<
+            first.getDistance() << " " << dist << endl;
+        if (objectRightX >= 0) {
+            cout << "Object is at " << objectRightX << " " <<
+                objectRightY << " " << objectDistance << endl;
+			cout << "dist to object is " << distToObject << endl;
+        }
+    }
+
+    // check if this is actually a center circle corner
+
+	// if we see a T in the middle of nowhere far from the edge
+	if (first.getDistance() > 100 && dist > 375 && !(face == FACING_GOAL &&
+													 distToObject < 250)) {
+		if (debugIdentifyCorners) {
+			cout << "T is too far from horizon, must be a CC" << endl;
+		}
+		first.setShape(CIRCLE);
+		return;
+	}
+
     bool sideT = false;
     // we are generous normally on same half we can be more precise
     // for Ts
-    if (objectDistance > MIDFIELD_X) {
+    if (objectDistance > MIDFIELD_X + 150.0 && distToObject > MIDFIELD_X - 150.0) {
         sameHalf = false;
-    }
+    } else if (objectRightX > 0) {
+		sameHalf = true;
+	}
+
     // check if we are actually seeing a CC for far goals
     if (seeGoalBoxLines && objectDistance > 300 && first.getX() > IMAGE_WIDTH / 4
         && first.getX() < 3 * IMAGE_WIDTH / 4) {
         first.setShape(CIRCLE);
         return;
     }
-    if ((!sameHalf && face != FACING_UNKNOWN) || l1 > 2 * GOALBOX_DEPTH) {
+	// check for side Ts first handle the really obvious case
+	if (l1 > GOALBOX_DEPTH * 4) {
+		sideT = true;
+	} else if ((!sameHalf && face != FACING_UNKNOWN) ||
+			   (l1 > 2.5 * GOALBOX_DEPTH &&
+				(distToObject > MIDFIELD_X - 150 || objectRightX < 0))) {
         // if we are far away and the T stem is long and the T isn't near goal
-        if (l1 > 2 * GOALBOX_DEPTH && objectDistance - first.getDistance() > 200) {
+        if (l1 > 2 * GOALBOX_DEPTH && (distToObject > MIDFIELD_X ||
+									   face == FACING_UNKNOWN)) {
             sideT = true;
         } else {
             // if we are far away then if the T is near the goal
@@ -431,12 +456,26 @@ void Context::classifyOuterLMidAngle(VisualCorner & corner,
     const point<int> top1 = shorty->getTopEndpoint();
     const point<int> top2 = longy->getTopEndpoint();
 
-    if (top1.y > top2.y) {
+
+	if (top1.y > top2.y) {
         // we're at the side of the goal - just check direction
         if (corner.doesItPointRight()) {
             corner.setSecondaryShape(LEFT_GOAL_L);
+			// while we're at it, make sure IDs are correct
+			if (vision->yglp->getDistance() == 0 && vision->ygrp->getDistance() > 0) {
+				if (debugIdentifyCorners) {
+					cout << "Bad post ID had been right" << endl;
+				}
+				//postSwap(vision->yglp, vision->ygrp);
+			}
         } else {
             corner.setSecondaryShape(RIGHT_GOAL_L);
+			if (vision->ygrp->getDistance() == 0 && vision->yglp->getDistance() > 0) {
+				if (debugIdentifyCorners) {
+					cout << "Bad post ID had been left or unknown" << endl;
+				}
+				//postSwap(vision->ygrp, vision->yglp);
+			}
         }
     } else {
         // we're staring towards the goal, again check direction
@@ -462,16 +501,26 @@ void Context::classifyOuterL(VisualCorner & corner) {
     }
     float l1 = realLineDistance(corner.getLine1());
     float l2 = realLineDistance(corner.getLine2());
+	// check distance of t to object if any
+	float distToObject = 1000.0f;
+	if (objectRightX >= 0) {
+		distToObject = realDistance(corner.getX(), corner.getY(),
+					 objectRightX, objectRightY);
+	}
     if (debugIdentifyCorners) {
-        cout << "Lines " << l1 << " " << l2 << endl;
+        cout << "Lines " << l1 << " " << l2 << " " <<
+			corner.getLine1()->getLeftEndpoint().x <<
+			" " << corner.getLine1()->getLeftEndpoint().y << endl;
         if (objectDistance > 0) {
             cout << "Object is " << objectDistance << endl;
         }
+		cout << "Distance to object " << distToObject << endl;
+		cout << "Goalbox info: " << GOALBOX_FUDGE * GOALBOX_DEPTH << endl;
     }
 
     // watch out for a bad CC identify or bad T
     if (face != FACING_UNKNOWN && objectDistance > 300 &&
-        objectDistance - corner.getDistance() > 200) {
+        distToObject > 500) {
         // might be a side T
         if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
             l2 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
@@ -537,10 +586,20 @@ void Context::classifyOuterL(VisualCorner & corner) {
                 if (top.x > top2.x) {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(LEFT_GOAL_L);
+						if (vision->yglp->getDistance() == 0 && vision->ygrp->getDistance() > 0) {
+							if (debugIdentifyCorners) {
+								cout << "Bad post ID needs setting" << endl;
+							}
+						}
                     }
                 } else {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(RIGHT_GOAL_L);
+						if (vision->ygrp->getDistance() == 0 && vision->yglp->getDistance() > 0) {
+							if (debugIdentifyCorners) {
+								cout << "Bad post ID needs setting" << endl;
+							}
+						}
                     }
                 }
             }
@@ -557,10 +616,16 @@ void Context::classifyOuterL(VisualCorner & corner) {
                 if (top2.x > top.x) {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(LEFT_GOAL_L);
+						if (vision->yglp->getDistance() == 0 && vision->ygrp->getDistance() > 0) {
+							cout << "Bad post ID" << endl;
+						}
                     }
                 } else {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(RIGHT_GOAL_L);
+						if (vision->ygrp->getDistance() == 0 && vision->yglp->getDistance() > 0) {
+							cout << "Bad post ID" << endl;
+						}
                     }
                 }
             }
@@ -1146,8 +1211,16 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
         cout << "T connect to an L, should be goal box " <<
             realLineDistance(t.getTStem()) << " " << l1.getX() << endl;
     }
+	// check distance of t to object if any
+	float distToObject = 1000.0f;
+	if (objectRightX >= 0) {
+		distToObject = realDistance(t.getX(), t.getY(),
+					 objectRightX, objectRightY);
+	}
+	bool objectIsClose = distToObject < GOALBOX_DEPTH * 2;
+
     // make sure we aren't side to circle
-    if (realLineDistance(t.getTStem()) > 100.0f) {
+    if (realLineDistance(t.getTStem()) > 100.0f && distToObject > MIDFIELD_X - 150) {
         t.setSecondaryShape(SIDE_T);
         l1.setShape(CIRCLE);
         return;
@@ -1279,8 +1352,18 @@ void Context::checkOuterToOuter(VisualCorner & first, VisualCorner & second) {
         cout << "Checking two outer Ls " << commonDist << endl;
     }
 
+	// check distance of t to object if any
+	float distToObject = 1000.0f;
+	if (objectRightX >= 0) {
+		distToObject = realDistance(first.getX(), first.getY(),
+					 objectRightX, objectRightY);
+		distToObject = min(distToObject, realDistance(second.getX(), second.getY(),
+													  objectRightX, objectRightY));
+	}
+	cout << "Distance " << distToObject << endl;
+
     // if the common length is small enough it is a goal T
-    if (commonDist < GOALBOX_DEPTH + 20.0f) {
+    if (commonDist < GOALBOX_DEPTH + 20.0f || distToObject < 300) {
         // one of them is a T corners - should be further away
         float d1, d2;
         if (second.getLine1() == common) {
@@ -1461,6 +1544,13 @@ void Context::findCornerRelationship(VisualCorner & first,
                     checkConnectedTs(second, first);
                 }
             } else if (second.getShape() == CIRCLE) {
+				if (common == first.getLine2()) {
+					if (debugIdentifyCorners) {
+						cout << "Looks like a fake T" << endl;
+					}
+					first.setShape(CIRCLE);
+					return;
+				}
                 checkTToCenter(first, second);
             }
         }
@@ -1473,6 +1563,13 @@ void Context::findCornerRelationship(VisualCorner & first,
                 checkTToFieldCorner(second, first);
             }
         } else {
+			if (common == second.getLine2()) {
+				if (debugIdentifyCorners) {
+					cout << "Looks like a fake T" << endl;
+				}
+				second.setShape(CIRCLE);
+				return;
+			}
             checkTToCenter(second, first);
         }
     } else {
@@ -1671,6 +1768,34 @@ float Context::getAllowedDistanceError(const VisualFieldObject * obj) const
     return obj->getDistanceSD() * 2;
 }
 
+
+/* We misidentified a post.	 Now that we've figured that out we need to
+ *	switch it to the correct post.	Just transfer the information and reinit the
+ *	previously IDd post.
+ * @param p1	the correct post
+ * @param p2	the wrong one
+ */
+// TODO: Use a copy constructor...
+void Context::postSwap(VisualFieldObject * p1, VisualFieldObject * p2){
+    p1->setLeftTopX(p2->getLeftTopX());
+    p1->setLeftTopY(p2->getLeftTopY());
+    p1->setLeftBottomX(p2->getLeftBottomX());
+    p1->setLeftBottomY(p2->getLeftBottomY());
+    p1->setRightTopX(p2->getRightTopX());
+    p1->setRightTopY(p2->getRightTopY());
+    p1->setRightBottomX(p2->getRightBottomX());
+    p1->setRightBottomY(p2->getRightBottomY());
+    p1->setX(p2->getLeftTopX());
+    p1->setY(p2->getLeftTopY());
+    p1->setWidth(p2->getWidth());
+    p1->setHeight(p2->getHeight());
+    p1->setCenterX(p2->getCenterX());
+    p1->setCenterY(p2->getCenterY());
+    p1->setIDCertainty(_SURE);
+    p1->setDistanceCertainty(p2->getDistanceCertainty());
+    p1->setDistance(1);
+    p2->init();
+}
 
 /* This method should only be called with a VisualFieldObject object that has a
    concrete location on the field (YGLP, YGRP, BGLP, BGRP, BY, and YB).

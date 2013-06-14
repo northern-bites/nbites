@@ -1459,24 +1459,24 @@ int ObjectFragments::classifyByOuterL(Blob post, VisualCorner & corner) {
 		int classification = NOPOST;
 		if (l1 > l2 && l1 > GOALBOX_DEPTH + 40.0f) {
 			if (endl1.y < endl2.y) {
-				if (endl1.x > post.getRight()) {
+				if (endl1.x > post.getLeft()) {
 					classification = RIGHT;
 				} else {
 					classification =  LEFT;
 				}
-			} else if (endl2.x > post.getRight()) {
+			} else if (endl2.x > post.getLeft()) {
 				classification = RIGHT;
 			} else {
 				classification = LEFT;
 			}
 		} else if (l2 > l1 && l2 > GOALBOX_DEPTH + 40.0f) {
 			if (end1.y < end2.y) {
-				if (end1.x > post.getRight()) {
+				if (end1.x > post.getLeft()) {
 					classification =  RIGHT;
 				} else {
 					classification = LEFT;
 				}
-			} else if (end2.x > post.getRight()) {
+			} else if (end2.x > post.getLeft()) {
 				classification = RIGHT;
 			} else {
 				classification = LEFT;
@@ -2164,7 +2164,7 @@ void ObjectFragments::updateRunsAfterFirstPost(Blob pole, int post) {
         }
     }
     // now get rid of all the ones on the wrong side of the post
-    for (int i = 0; i < numberOfRuns; i++) {
+    /*for (int i = 0; i < numberOfRuns; i++) {
         nextX = runs[i].x;
         if ((nextX < trueLeft && post == LEFT) ||
             (nextX > trueRight && post == RIGHT)) {
@@ -2174,7 +2174,7 @@ void ObjectFragments::updateRunsAfterFirstPost(Blob pole, int post) {
              (nextX < trueRight + NEAR_DISTANCE && post == LEFT) ) {
             runs[i].h = 0;
         }
-    }
+		}*/
 }
 
 /* Look for goal posts.
@@ -2217,11 +2217,40 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
         return;
     }
 
+    updateRunsAfterFirstPost(pole, LEFT);
+    Blob secondPost;
+    // ready to grab the potential post
+	int POST_NEAR_DIST = 5;
+    isItAPost = grabPost(c, pole.getLeft() - POST_NEAR_DIST,
+                         pole.getRight() + POST_NEAR_DIST, secondPost);
+
+	int post;
+	if (isPostReasonableSizeShapeAndPlace(secondPost)) {
+		if (pole.getLeftBottomX() < secondPost.getLeftBottomX()) {
+			post = LEFT;
+		} else {
+			post = RIGHT;
+		}
+	} else {
+		post = classifyFirstPost(c, pole);
+	}
+
+
+
     dc = checkDist(pole);
     // first characterize the size of the possible post
     int howbig = characterizeSize(pole);
     // now see if we can figure out whether it is a right or left post
-    int post = classifyFirstPost(c, pole);
+    //int post = classifyFirstPost(c, pole);
+
+	if (post != LEFT && post != RIGHT && isItAPost) {
+		cout << "Using extra post" << endl;
+		if (pole.getLeftBottomX() < secondPost.getLeftBottomX()) {
+			post = LEFT;
+		} else {
+			post = RIGHT;
+		}
+	}
 
 	// make sure the post is down to the level of the field edge
 	if (pole.getLeftBottomY() < horizonAt(pole.getLeftBottomX())) {
@@ -2276,7 +2305,7 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
     const int POST_NEAR_DIST = 5;
     // at this point we have a post and it is normally classified
     // if we feel pretty good about this, then prepare for the next post
-    updateRunsAfterFirstPost(pole, post);
+    //updateRunsAfterFirstPost(pole, post);
     // find the other post if possible - the process is basically identical to
     // the first post
     distanceCertainty dc = checkDist(pole);
@@ -2350,6 +2379,12 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
             // we failed at least one sanity check
             if (SANITY) {
 				cout << "Second post failed sanity check" << endl;
+				if (!ratOk) {
+					cout << "rat was not ok" << endl;
+				}
+				if (!secondPostFarEnough(pole, secondPost, post)) {
+					cout << "Not far enough" << endl;
+				}
                 drawBlob(secondPost, BLUE);
             }
         }
@@ -2723,7 +2758,7 @@ bool ObjectFragments::secondPostFarEnough(Blob post1, Blob post2, int post) {
 		separationNeeded = 40;
 	}
 	if (max(post1.height(), post2.height()) > 50) {
-		separationNeeded = 60;
+		separationNeeded = 40;
 	}
     if (dist(left1.x, left1.y, right2.x, right2.y) > separationNeeded &&
         dist(left2.x, left2.y, right1.x, right1.y) > separationNeeded) {
@@ -2777,11 +2812,14 @@ bool ObjectFragments::relativeSizesOk(Blob post1, Blob post2) {
     int x2 = post2.getMidBottomX();
     int y2 = post2.getMidBottomY();
     // if posts are the same basic shape and size, let's just be done with it
-    if (withinMarginInt(post1.height(), post2.height(), post1.height() / 3) &&
+    if (withinMarginInt(post1.height(), post2.height(), post1.height() / 2) &&
         withinMarginInt(post1.width(), post2.width(), min(post1.width(),
                                                           post2.width()))) {
         return true;
     }
+	if (post1.height() > 100 && post2.height() > 100) {
+		return true;
+	}
     if (!withinVerticalEdgeMargin(post1.getBottom(), 3) &&
         !withinVerticalEdgeMargin(post2.getBottom(), 3)) {
         // both posts are in full view - just check the distance between them
