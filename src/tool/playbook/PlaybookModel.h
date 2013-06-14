@@ -68,6 +68,8 @@ protected slots:
     void setBallY(QString y_);
     void confirmPositionChange();
     void resetPositionChanges();
+    void confirmBallChange();
+    void resetBallChanges();
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
@@ -91,6 +93,8 @@ protected:
     short tempMiddieY;
     short tempOffenderX;
     short tempOffenderY;
+    short tempBallX;
+    short tempBallY;
 
     int BOX_SIZE;
     int GRID_WIDTH;

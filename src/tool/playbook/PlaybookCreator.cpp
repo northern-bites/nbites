@@ -100,6 +100,14 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(fourFieldPlayers, SIGNAL(toggled(bool)), model,
             SLOT(setFourFieldPlayers(bool)));
 
+    // Connect radio buttons for update
+    connect(twoFieldPlayers, SIGNAL(toggled(bool)), this,
+            SLOT(updatePositionsCheck(bool)));
+    connect(threeFieldPlayers, SIGNAL(toggled(bool)), this,
+            SLOT(updatePositionsCheck(bool)));
+    connect(fourFieldPlayers, SIGNAL(toggled(bool)), this,
+            SLOT(updatePositionsCheck(bool)));
+
     // Connect line edit widgets' textEdited signals
     connect(editDefenderX, SIGNAL(textEdited(QString)), model,
             SLOT(setDefenderXPosition(QString)));
@@ -149,49 +157,56 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editOffenderY, SIGNAL(editingFinished()), model,
             SLOT(resetPositionChanges()));
 
+    connect(editBallX, SIGNAL(editingFinished()), this,
+            SLOT(refreshTextBall()));
+    connect(editBallX, SIGNAL(editingFinished()), model,
+            SLOT(resetBallChanges()));
+
+    connect(editBallY, SIGNAL(editingFinished()), this,
+            SLOT(refreshTextBall()));
+    connect(editBallY, SIGNAL(editingFinished()), model,
+            SLOT(resetBallChanges()));
+
     // Conect line edit widgets' returnPressed signals
-    connect(editDefenderX, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
     connect(editDefenderX, SIGNAL(returnPressed()), model,
             SLOT(confirmPositionChange()));
-
-    connect(editDefenderY, SIGNAL(returnPressed()), this,
+    connect(editDefenderX, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
+
     connect(editDefenderY, SIGNAL(returnPressed()), model,
             SLOT(confirmPositionChange()));
-
-    connect(editMiddieX, SIGNAL(returnPressed()), this,
+    connect(editDefenderY, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
+
     connect(editMiddieX, SIGNAL(returnPressed()), model,
             SLOT(confirmPositionChange()));
-
-    connect(editMiddieY, SIGNAL(returnPressed()), this,
+    connect(editMiddieX, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
+
     connect(editMiddieY, SIGNAL(returnPressed()), model,
             SLOT(confirmPositionChange()));
-
-    connect(editOffenderX, SIGNAL(returnPressed()), this,
+    connect(editMiddieY, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
+
     connect(editOffenderX, SIGNAL(returnPressed()), model,
             SLOT(confirmPositionChange()));
-
-    connect(editOffenderY, SIGNAL(returnPressed()), this,
+    connect(editOffenderX, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
+
     connect(editOffenderY, SIGNAL(returnPressed()), model,
             SLOT(confirmPositionChange()));
+    connect(editOffenderY, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
 
+    connect(editBallX, SIGNAL(returnPressed()), model,
+            SLOT(confirmBallChange()));
     connect(editBallX, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
 
+    connect(editBallY, SIGNAL(returnPressed()), model,
+            SLOT(confirmBallChange()));
     connect(editBallY, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
-    // Connect radio buttons for update
-    connect(twoFieldPlayers, SIGNAL(toggled(bool)), this,
-            SLOT(updatePositionsCheck(bool)));
-    connect(threeFieldPlayers, SIGNAL(toggled(bool)), this,
-            SLOT(updatePositionsCheck(bool)));
-    connect(fourFieldPlayers, SIGNAL(toggled(bool)), this,
-            SLOT(updatePositionsCheck(bool)));
 
     mainLayout->addLayout(field);
     mainLayout->addLayout(settings);
@@ -275,6 +290,13 @@ void PlaybookCreator::refreshTextOffender()
     editOffenderX->setText(QString::number(fieldPainter->getRobot(OFFENDER)->x));
     editOffenderY->setText(QString::number(fieldPainter->getRobot(OFFENDER)->y));
     qDebug() << "displaying the offender's true position now.";
+}
+
+void PlaybookCreator::refreshTextBall()
+{
+    editBallX->setText(QString::number(model->getBallX()));
+    editBallY->setText(QString::number(model->getBallY()));
+    qDebug() << "displaying the ball's true position now.";
 }
 
 } // namespace playbook

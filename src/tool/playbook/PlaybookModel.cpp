@@ -198,16 +198,28 @@ void PlaybookModel::resetPositionChanges()
     qDebug() << "resetting position fields.";
 }
 
+void PlaybookModel::confirmBallChange()
+{
+    ball_x = tempBallX;
+    ball_y = tempBallY;
+    qDebug() << "confirming change to ball's position.";
+}
+
+void PlaybookModel::resetBallChanges()
+{
+    tempBallX = ball_x;
+    tempBallY = ball_y;
+    qDebug() << "resetting ball fields.";
+}
+
 void PlaybookModel::setBallX(QString x_)
 {
-    ball_x = x_.toInt();
-    qDebug() << "setting ball's x grid: " << x_;
+    tempBallX = x_.toInt();
 }
 
 void PlaybookModel::setBallY(QString y_)
 {
-    ball_y = y_.toInt();
-    qDebug() << "setting ball's y grid: " << y_;
+    tempBallY = y_.toInt();
 }
 
 }

@@ -35,6 +35,7 @@ protected slots:
     void refreshTextDefender();
     void refreshTextOffender();
     void refreshTextMiddie();
+    void refreshTextBall();
 
 protected:
     PlaybookField* fieldPainter;
