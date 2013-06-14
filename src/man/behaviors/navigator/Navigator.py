@@ -29,7 +29,7 @@ PRECISELY = (1.0, 1.0, 5)
 LEFT = 1
 RIGHT = -LEFT
 
-DEBUG_MOTION_STATUS = True
+DEBUG_MOTION_STATUS = False
 
 class Navigator(FSA.FSA):
     """it gets you where you want to go"""
