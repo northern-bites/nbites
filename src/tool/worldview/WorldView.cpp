@@ -12,7 +12,8 @@ WorldView::WorldView(QWidget* parent)
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
-      newTeam(0)
+      newTeam(0),
+      mutex()
 {
     commThread.addModule(*this);
     commThread.addModule(wviewComm);
@@ -113,6 +114,7 @@ WorldView::WorldView(QWidget* parent)
 
 void WorldView::run_()
 {
+    mutex.lock();
     if (newTeam)
     {
         wviewComm.setTeamNumber(newTeam);
@@ -127,28 +129,34 @@ void WorldView::run_()
         fieldPainter->updateWithLocationMessage(commIn[i].message(), i);
         updateStatus(commIn[i].message(), i);
     }
+    mutex.unlock();
 }
 
 void WorldView::startButtonClicked()
 {
+    mutex.lock();
     commThread.start();
     startButton->setText(QString("Stop World Viewer"));
     disconnect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
     connect(startButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
+    mutex.unlock();
 }
 
 void WorldView::stopButtonClicked()
 {
+    mutex.lock();
     commThread.stop();
     startButton->setText(QString("Start World Viewer"));
     disconnect(startButton, SIGNAL(clicked()), this, SLOT(stopButtonClicked()));
     connect(startButton, SIGNAL(clicked()), this, SLOT(startButtonClicked()));
+    mutex.unlock();
 }
 
 void WorldView::teamChanged()
 {
-    // Don't set team directly due to race conditions.
+    mutex.lock();
     newTeam = teamSelector->text().toInt();
+    mutex.unlock();
 }
 
 void WorldView::updateStatus(messages::WorldModel msg, int index)

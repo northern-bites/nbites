@@ -42,6 +42,7 @@ protected:
     man::comm::CommModule wviewComm;
 
     int newTeam;
+    QMutex mutex;
 
 protected slots:
     void startButtonClicked();
