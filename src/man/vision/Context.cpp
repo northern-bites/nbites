@@ -617,14 +617,18 @@ void Context::classifyOuterL(VisualCorner & corner) {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(LEFT_GOAL_L);
 						if (vision->yglp->getDistance() == 0 && vision->ygrp->getDistance() > 0) {
-							cout << "Bad post ID" << endl;
+                            if (debugIdentifyCorners) {
+                                cout << "Bad post ID" << endl;
+                            }
 						}
                     }
                 } else {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(RIGHT_GOAL_L);
 						if (vision->ygrp->getDistance() == 0 && vision->yglp->getDistance() > 0) {
-							cout << "Bad post ID" << endl;
+                            if (debugIdentifyCorners) {
+                                cout << "Bad post ID" << endl;
+                            }
 						}
                     }
                 }
