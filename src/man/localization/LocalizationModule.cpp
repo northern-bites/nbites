@@ -28,13 +28,13 @@ void LocalizationModule::update()
 {
 #ifndef OFFLINE
     // Modify based on control portal
-    // if (lastReset != resetInput.message().timestamp())
-    // {
-    //     lastReset = resetInput.message().timestamp();
-    //     particleFilter->resetLocTo(resetInput.message().x(),
-    //                                resetInput.message().y(),
-    //                                resetInput.message().h());
-    // }
+    if (lastReset != resetInput.message().timestamp())
+    {
+        lastReset = resetInput.message().timestamp();
+        particleFilter->resetLocTo(resetInput.message().x(),
+                                   resetInput.message().y(),
+                                   resetInput.message().h());
+    }
 #endif
 
     // Calculate the deltaX,Y,H (PF takes increments from robot frame)
