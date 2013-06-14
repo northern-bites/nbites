@@ -13,7 +13,12 @@ GameStateModule::GameStateModule(int team, int player) :
     gameStateOutput(base()),
     gcResponseOutput(base()),
     team_number(team),
-    player_number(player)
+    player_number(player),
+    last_button(false),
+    last_initial(false),
+    last_team(false),
+    last_kickoff(false),
+    response_status(GAMECONTROLLER_RETURN_MSG_ALIVE)
 {
     reset();
 }
@@ -143,6 +148,12 @@ void GameStateModule::reset()
 {
     keep_time = false;
     latest_data.Clear();
+
+    latest_data.set_state(STATE_INITIAL);
+    latest_data.set_kick_off_team(TEAM_BLUE);
+    latest_data.set_secondary_state(STATE2_NORMAL);
+    latest_data.set_drop_in_team(TEAM_BLUE);
+
     messages::TeamInfo* myTeam = latest_data.add_team();
     myTeam->set_team_number(team_number);
     myTeam->set_team_color(TEAM_BLUE);
@@ -154,6 +165,7 @@ void GameStateModule::reset()
     }
 
     messages::TeamInfo* them = latest_data.add_team();
+    them->set_team_number(0);
     them->set_team_color(TEAM_RED);
     them->set_goal_color(GOAL_YELLOW);
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
