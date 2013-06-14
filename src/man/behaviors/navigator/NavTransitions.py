@@ -24,14 +24,15 @@ def atDestination(nav):
     else:
         return relDest.within((x, y, h))
 
+# Should the robot dodge TO THE LEFT? (ie something is on its right)
 def shouldDodgeLeft(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
     # check sonars
     sonarState = nav.brain.interface.sonarState
-    sonars = (sonarState.us_right != -1 and
-              sonarState.us_right < constants.AVOID_OBSTACLE_SIDE_DIST)
+    # sonar values are given to us in meters
+    sonars = (sonarState.us_right*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
 
     #check vision
     vision = nav.brain.interface.visionObstacle.on_right
@@ -41,25 +42,27 @@ def shouldDodgeLeft(nav):
     feet = (footBumperState.r_foot_bumper_left.pressed or
             footBumperState.r_foot_bumper_right.pressed)
 
-    # FIXME: sonars aren't working!
-    if (feet or vision):
+    # Take 2 of 3, indicates that we should dodge
+    if (feet and vision):
         return True
-    # if (vision and sonars):
-    #     return True
-    # elif (sonars and feet):
-    #     return True
+    if (vision and sonars):
+        return True
+    elif (sonars and feet):
+        return True
 
     else:
         return False
 
+# Should the robot dodge TO THE RIGHT? (ie something is on its left)
 def shouldDodgeRight(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
     # check sonars
     sonarState = nav.brain.interface.sonarState
-    sonars = (sonarState.us_left != -1 and
-              sonarState.us_left < constants.AVOID_OBSTACLE_SIDE_DIST)
+    # sonar values are given to us in meters
+    sonars = (sonarState.us_left*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
+
     #check vision
     vision = nav.brain.interface.visionObstacle.on_left
 
@@ -68,13 +71,13 @@ def shouldDodgeRight(nav):
     feet = (footBumperState.l_foot_bumper_left.pressed or
             footBumperState.l_foot_bumper_right.pressed)
 
-    # FIXME: sonars aren't working!
-    if (feet or vision):
+    # If 2 of 3, indicates that we should dodge
+    if (feet and vision):
         return True
-    # if (vision and sonars):
-    #     return True
-    # elif (sonars and feet):
-    #     return True
+    if (vision and sonars):
+        return True
+    elif (sonars and feet):
+        return True
 
     else:
         return False

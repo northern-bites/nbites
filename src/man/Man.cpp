@@ -131,6 +131,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.addModule(behaviors);
     cognitionThread.addModule(leds);
 
+    topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+    bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+
     topConverter.imageIn.wireTo(&topTranscriber.imageOut);
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
@@ -144,8 +149,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     vision.botUImage.wireTo(&bottomConverter.uImage);
     vision.botVImage.wireTo(&bottomConverter.vImage);
 
-    vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-    vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+    vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
+    vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
 
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
@@ -173,6 +178,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.sonarStateIn.wireTo(&sensors.sonarsOutput_, true);
     behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
     behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);

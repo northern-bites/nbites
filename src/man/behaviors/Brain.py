@@ -40,6 +40,7 @@ import VisionRobot_proto
 import VisionField_proto
 import ButtonState_proto
 import FallStatus_proto
+import StiffnessControl_proto
 
 class Brain(object):
     """
@@ -252,24 +253,25 @@ class Brain(object):
         Note: Loc uses truly global coordinates, and the
               blue goalbox constants always match up with our goal.
         """
+        # Does this matter for the goalie? It really shouldn't...
         if self.playerNumber == 1:
-            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+            self.resetLocTo(Constants.MIDFIELD_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 2:
-            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 3:
-            self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 4:
-            self.resetLocTo(Constants.BLUE_CROSS_CIRCLE_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 5:
-            self.resetLocTo(Constants.BLUE_CROSS_CIRCLE_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
 

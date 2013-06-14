@@ -285,3 +285,23 @@ class Navigator(FSA.FSA):
 
     def isSpinningRight(self):
         return self.spinDirection() == RIGHT
+
+    def getXSpeed(self):
+        return NavStates.walking.speeds[0]
+
+    def getYSpeed(self):
+        return NavStates.walking.speeds[1]
+
+    def getHSpeed(self):
+        return NavStates.walking.speeds[2]
+
+    def setXSpeed(self, x):
+        NavStates.walking.speeds = (x, self.getYSpeed(), self.getHSpeed())
+
+    def setYSpeed(self, y):
+        NavStates.walking.speeds = (self.getXSpeed(), y, self.getHSpeed())
+
+    def setHSpeed(self, h):
+        NavStates.walking.speeds[2] = (self.getXSpeed(), self.getYSpeed(), h)
+
+

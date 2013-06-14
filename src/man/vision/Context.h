@@ -163,6 +163,7 @@ namespace vision {
 
 		float getAllowedDistanceError(const VisualFieldObject* obj) const;
 
+		void postSwap(VisualFieldObject * p1, VisualFieldObject * p2);
 		// Uses the actual objects' locations on the field to calculate straight
 		// line distance
 		float getRealDistance(const ConcreteCorner *c,

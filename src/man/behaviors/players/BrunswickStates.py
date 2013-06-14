@@ -22,6 +22,14 @@ def gameInitial(player):
         #Reset localization to proper starting position by player number.
         #Locations are defined in the wiki.
         player.brain.resetInitialLocalization()
+        player.lastStiffStatus = True
+
+    # If stiffnesses were JUST turned on, then stand up.
+    if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
+        player.stand()
+    # Remember last stiffness.
+    player.lastStiffStatus = player.brain.interface.stiffStatus.on
+
     return player.stay()
 
 def gameReady(player):
