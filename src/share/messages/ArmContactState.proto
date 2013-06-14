@@ -1,0 +1,16 @@
+package messages;
+
+message ArmContactState
+{
+    enum PushDirection
+    {
+        NONE = 0;
+	NORTH = 1;
+	EAST = 2;
+	SOUTH = 3;
+	WEST = 4;
+    }
+
+    optional PushDirection right_push_direction = 1;
+    optional PushDirection left_push_direction = 2;
+}
