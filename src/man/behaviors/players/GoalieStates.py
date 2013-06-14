@@ -114,6 +114,9 @@ def gameFinished(player):
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
 
+    if player.brain.nav.isStopped():
+        player.gainsOff()
+
     return player.stay()
 
 ##### EXTRA METHODS
