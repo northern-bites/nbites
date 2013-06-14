@@ -38,7 +38,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       ballTrack(),
       gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-      leds(broker)
+      leds(broker),
+      sharedBall()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -159,6 +160,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
     ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.localizationInput.wireTo(&localization.output);
+
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
+    }
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);

@@ -96,6 +96,7 @@ add_subdirectory( vision )
 add_subdirectory( motion )
 add_subdirectory( jointenactor )
 add_subdirectory( localization )
+add_subdirectory( sharedball )
 
 set( MAN_SRCS main.cpp
   Man.cpp
@@ -128,6 +129,7 @@ target_link_libraries(
   sensors
   vision
   localization
+  sharedball
 )
 
 install( TARGETS man
