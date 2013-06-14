@@ -314,7 +314,7 @@ namespace balltrack
 
     void KalmanFilter::initialize()
     {
-        x = NBMath::vector4D(50.f, 50.f, 50.f, 50.f);
+        x = NBMath::vector4D(0.0f, 0.0f, 1.0f, 0.5f);
         cov = boost::numeric::ublas::identity_matrix <float>(4);
     }
 
