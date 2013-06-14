@@ -39,7 +39,7 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	bottomDisplay.imageIn.wireTo(&bottomImage, true);
 	topThrDisplay.imageIn.wireTo(&visMod.topOutPic);
 	botThrDisplay.imageIn.wireTo(&visMod.botOutPic);
-	
+
 	visMod.topThrImage.wireTo(&tTImage, true);
     visMod.topYImage.wireTo(&tYImage, true);
     visMod.topUImage.wireTo(&tUImage, true);
@@ -66,12 +66,12 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
 	obstacle_viewer = new logview::TypedProtoViewer<messages::VisionObstacle>();
 	obstacle_viewer->input.wireTo(&visMod.vision_obstacle);
 	subdiagram.addModule(*obstacle_viewer);
-	
+
 	QDockWidget* dockWidget = new QDockWidget("Vision Field", this);
 	dockWidget->setMinimumWidth(300);
 	dockWidget->setWidget(field_viewer);
 	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
-	
+
 	dockWidget = new QDockWidget("Vision Robot", this);
 	dockWidget->setMinimumWidth(300);
 	dockWidget->setWidget(robot_viewer);
@@ -123,10 +123,10 @@ void VisionDisplayModule::run_()
 	bYImage_in.latch();
 	bUImage_in.latch();
 	bVImage_in.latch();
-	
+
 	joints_in.latch();
 	inerts_in.latch();
-	
+
 
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
@@ -155,7 +155,7 @@ void VisionDisplayModule::run_()
 	inertials.setMessage(portals::Message<messages::InertialState>(
 							 &inerts_in.message()));
 
-	subdiagram.run();	
+	subdiagram.run();
 
 	topDisplay.setOverlay(makeOverlay(Camera::TOP));
 	bottomDisplay.setOverlay(makeOverlay(Camera::BOTTOM));
@@ -180,10 +180,10 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 							 visField->visual_line(i).end_x(),
 							 visField->visual_line(i).end_y());
 		}
-		
+
 		painter.setPen(Qt::magenta);
 		for (int i = 0; i < visField->visual_corner_size(); i++) {
-			
+
 			painter.drawLine(visField->visual_corner(i).x() - 5,
 							 visField->visual_corner(i).y() - 5,
 							 visField->visual_corner(i).x() + 5,
@@ -193,7 +193,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 							 visField->visual_corner(i).x() - 5,
 							 visField->visual_corner(i).y() + 5);
 		}
-	
+
 		if (visBall->intopcam()) {
 			int ball_x = visBall->x();
 			int ball_y = visBall->y();
@@ -231,15 +231,27 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 			painter.drawConvexPolygon(l_points, 4);
 		}
 
+        painter.setPen(Qt::darkCyan);
+        if (visField->visual_cross().distance() > 0) {
+            painter.drawLine(visField->visual_cross().x() + 15,
+                             visField->visual_cross().y() + 15,
+                             visField->visual_cross().x() + 5,
+                             visField->visual_cross().y() + 5);
+            painter.drawLine(visField->visual_cross().x() + 5,
+                             visField->visual_cross().y() + 15,
+                             visField->visual_cross().x() + 15,
+                             visField->visual_cross().y() + 5);
+        }
+
 
 	}
 	else { // this is to draw in the bottom camera
-		
+
 		if (!visBall->intopcam()) {
 			int ball_x = visBall->x();
 			int ball_y = visBall->y();
 			int ball_radius = visBall->radius();
-			
+
 			painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
 			painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
 			painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
@@ -271,7 +283,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 			painter.drawConvexPolygon(l_points, 4);
 		}
 	}
-	
+
 	return lineImage;
 
 }

@@ -47,6 +47,10 @@ public slots:
 	void saveAsGlobalTable();
 	void saveGlobalTable();
 
+private:
+    void serializeTableName(QString latestTableName);
+    void loadLatestTable();
+
 protected:
     // For keyboard control
     virtual void keyPressEvent(QKeyEvent * event);

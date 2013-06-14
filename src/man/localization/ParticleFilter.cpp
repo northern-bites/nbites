@@ -378,6 +378,12 @@ void ParticleFilter::resample()
     for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
     {
         rand = (float)gen();
+
+        while(cdf.upper_bound(rand) == cdf.end())
+        {
+            rand = (float)gen();
+        }
+
         newParticles.push_back(cdf.upper_bound(rand)->second);
     }
 
