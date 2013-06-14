@@ -34,5 +34,17 @@ message VisionObstacle
         optional bool on_left = 1;
         optional bool on_right = 2;
         optional bool off_field = 3;
+
+	optional sint32 block_left = 4;
+	optional sint32 block_mid = 5;
+	optional sint32 block_right = 6;
+
+	optional float left_dist = 7;
+	optional float mid_dist = 8;
+	optional float right_dist = 9;
+
+	optional float left_bearing = 10;
+	optional float mid_bearing = 11;
+	optional float right_bearing = 12;
 }
 
