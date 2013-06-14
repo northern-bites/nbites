@@ -265,7 +265,15 @@ class KickInformation:
                 print ("Acceptable bearing range for kick: " + str(bearingLimitLeft/2) +
                        "/" + str(bearingLimitRight/2))
 
-            if bearingForKick < 35 and bearingForKick > -35:
+            #if we are in the middle third of the field, are facing the goal,
+            #and there are other robots around
+            if (bearingForKick < 35 and bearingForKick > -35
+                and self.brain.loc.x > (1./3.*constants.FIELD_WIDTH) 
+                and self.brain.loc.x < (2./3.*constants.FIELD_WIDTH)):
+                #choose dribble
+                    kick = self.chooseDribble()
+                    kick.h = 0 - bearingForKick
+            elif bearingForKick < 35 and bearingForKick > -35:
                 #choose straight kick!
                 kick = self.chooseQuickFrontKick()
                 kick.h = 0 - bearingForKick
@@ -296,7 +304,6 @@ class KickInformation:
                 print "Returning a kick with heading: " + str(kick.h)
 
             return kick
-
 
         # Loc is bad- use only visual information to choose a kick.
         if DEBUG_KICK_DECISION:
@@ -622,6 +629,11 @@ class KickInformation:
         if self.kickWithLeftFoot():
             return kicks.LEFT_SHORT_STRAIGHT_KICK
         return kicks.RIGHT_SHORT_STRAIGHT_KICK
+
+    def chooseDribble(self):
+        if self.kickWithLeftFoot():
+            return kicks.LEFT_DRIBBLE
+        return kicks.RIGHT_DRIBBLE
 
     def chooseQuickFrontKick(self):
         # If our goalie is inactive, always use short front kicks.

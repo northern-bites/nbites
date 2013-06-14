@@ -242,8 +242,13 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
+    # If ball moves, don't just try to kick anyway!
+    if transitions.ballMovedFromLastSpot(player):
+        return player.goLater('prepareForKick')
+
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
+        print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 

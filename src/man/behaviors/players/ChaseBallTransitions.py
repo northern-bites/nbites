@@ -146,6 +146,14 @@ def shouldFindBallKick(player):
     """
     return (player.brain.ball.vis.frames_off > constants.BALL_OFF_KICK_THRESH)
 
+def ballMovedFromLastSpot(player):
+    """
+    The ball has moved significantly from where it was a frame ago
+    """
+    return (abs(player.brain.ball.x - player.lastBall.x) > 
+            constants.BALL_MOVED or abs(player.brain.ball.y - 
+            player.lastBall.y) > constants.BALL_MOVED)
+
 def shouldSpinFindBall(player):
     """
     Should spin if we already tried scanning
