@@ -94,9 +94,10 @@ class Navigator(FSA.FSA):
 
     def positionPlaybook(self):
         """
-        Calls goTo on the playbook position, which should be a RobotLocation.
+        Calls goTo on the playbook position
         """
-        self.goTo(self.brain.play.getPosition(), speed = FAST_SPEED, avoidObstacles = True, fast = False)
+        self.goTo(self.brain.play.getPositionCoord(), precision = GENERAL_AREA,
+                  speed = QUICK_SPEED, avoidObstacles = True, fast = True, pb = True)
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):
         """
@@ -106,7 +107,8 @@ class Navigator(FSA.FSA):
         """
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False, fast = False):
+    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
+             avoidObstacles = False, adaptive = False, fast = False, pb = False):
         """
         General go to method.
         Ideal for going to a field position, or for going to a relative location
@@ -142,6 +144,8 @@ class Navigator(FSA.FSA):
 
         @param fast: books it using velocity walk; Best if dest is straight ahead!
         Use it to look like a baller on the field.
+
+        @param pb: Set true if playbook positioning so we switch from fast to odometry walk when in the general area
         """
 
         # Debug prints for motion status (seeking the walking not walking bug)
@@ -159,6 +163,7 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.avoidObstacles = avoidObstacles
         NavStates.goToPosition.adaptive = adaptive
         NavStates.goToPosition.fast = fast
+        NavStates.goToPosition.pb = pb
 
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')
@@ -285,3 +290,23 @@ class Navigator(FSA.FSA):
 
     def isSpinningRight(self):
         return self.spinDirection() == RIGHT
+
+    def getXSpeed(self):
+        return NavStates.walking.speeds[0]
+
+    def getYSpeed(self):
+        return NavStates.walking.speeds[1]
+
+    def getHSpeed(self):
+        return NavStates.walking.speeds[2]
+
+    def setXSpeed(self, x):
+        NavStates.walking.speeds = (x, self.getYSpeed(), self.getHSpeed())
+
+    def setYSpeed(self, y):
+        NavStates.walking.speeds = (self.getXSpeed(), y, self.getHSpeed())
+
+    def setHSpeed(self, h):
+        NavStates.walking.speeds[2] = (self.getXSpeed(), self.getYSpeed(), h)
+
+

@@ -9,7 +9,8 @@
 
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
-SET_POOL_SIZE(messages::JointAngles, 16);
+SET_POOL_SIZE(messages::JointAngles, 24);
+SET_POOL_SIZE(messages::InertialState, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
@@ -131,6 +132,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.addModule(behaviors);
     cognitionThread.addModule(leds);
 
+    topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+    bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+
     topConverter.imageIn.wireTo(&topTranscriber.imageOut);
     bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
 
@@ -144,8 +150,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     vision.botUImage.wireTo(&bottomConverter.uImage);
     vision.botVImage.wireTo(&bottomConverter.vImage);
 
-    vision.joint_angles.wireTo(&sensors.jointsOutput_, true);
-    vision.inertial_state.wireTo(&sensors.inertialsOutput_, true);
+    vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
+    vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
 
     localization.visionInput.wireTo(&vision.vision_field);
     localization.motionInput.wireTo(&motion.odometryOutput_, true);

@@ -68,6 +68,10 @@ def gameSet(player):
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
 
+        # If we think we're on the wrong side, reset to the correct field cross
+        #  and loc will take care of the rest.
+        player.brain.checkSetLocalization()
+
         if player.lastDiffState == 'gamePenalized':
             pass
             # This method is broken.

@@ -41,11 +41,11 @@ public:
 
 public slots:
     void setUpModules();
-	void loadColorTable();
-	void changeTableValues(std::vector<color::colorChanges> tableAdjustments);
-	void unChangeTableValues(std::vector<color::colorChanges> tableAdjustments);
-	void saveAsGlobalTable();
-	void saveGlobalTable();
+    void loadColorTable();
+    void changeTableValues(std::vector<color::colorChanges> tableAdjustments);
+    void unChangeTableValues(std::vector<color::colorChanges> tableAdjustments);
+    void saveAsGlobalTable();
+    void saveGlobalTable();
 
 private:
     void serializeTableName(QString latestTableName);
@@ -62,9 +62,9 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
-	color::ColorTableCreator tableCreator;
-	vision::VisionDisplayModule visDispMod;
-	colorcreator::ColorCalibrate colorCalibrate;
+    color::ColorTableCreator tableCreator;
+    vision::VisionDisplayModule visDispMod;
+    colorcreator::ColorCalibrate colorCalibrate;
     viewer::FieldViewer fieldView;
 
     man::image::ImageConverterModule topConverter;
@@ -79,9 +79,8 @@ protected:
     QToolBar* toolbar;
     QPushButton* prevButton;
     QPushButton* nextButton;
-    QPushButton* recordButton;
     QPushButton* scrollButton;
-	QPushButton* loadBtn;
+    QPushButton* loadBtn;
     QScrollArea* scrollArea;
     QSize* scrollBarSize;
     QSize* tabStartSize;

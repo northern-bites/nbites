@@ -342,6 +342,8 @@ void WalkingEngine::update()
 
 void WalkingEngine::updateMotionRequest()
 {
+    static int instabilityCount = 0;
+
   if(theMotionRequest.motion == MotionRequest::walk)
   {
     if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode)
@@ -351,10 +353,30 @@ void WalkingEngine::updateMotionRequest()
     }
     else
       requestedWalkTarget = theMotionRequest.walkRequest.speed; // just for sgn(requestedWalkTarget.translation.y)
+
+    if (instable)
+    {
+        instabilityCount++;
+    }
+    else
+    {
+        instabilityCount = 0;
+        shouldReset = false;
+    }
+  }
+  else
+  {
+      instabilityCount = 0;
+      shouldReset = false;
+  }
+  if (instabilityCount > INSTABILITY_THRESH)
+  {
+      shouldReset = true;
   }
 
   // get requested motion state
   requestedMotionType = stand;
+
   if((theGroundContactState.contactSafe || !theDamageConfiguration.useGroundContactDetectionForSafeStates) && !walkingEngineOutput.enforceStand && theMotionSelection.ratios[MotionRequest::walk] > 0.999f && !instable)
     if(theMotionRequest.motion == MotionRequest::walk)
     {
@@ -383,8 +405,6 @@ void WalkingEngine::updateMotionRequest()
   } else {
       warned = false;
   }
-
-
 }
 
 void WalkingEngine::updateObservedPendulumPlayer()

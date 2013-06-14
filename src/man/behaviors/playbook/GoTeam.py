@@ -54,10 +54,9 @@ class GoTeam:
 
     def run(self, play):
         """We run this each frame to get the latest info"""
-        if self.brain.interface.gameState.state != 'gamePenalized':
-            self.aPrioriTeammateUpdate()
+        self.aPrioriTeammateUpdate()
 
-        if self.brain.interface.gameState.state == 'gameReady':
+        if self.brain.player.gameState == 'gameReady':
             # Change which wing is forward based on the opponents score
             # TODO: implement this
             pass
@@ -154,6 +153,9 @@ class GoTeam:
                                 % mate.playerNumber)
                 continue
 
+            # If the mate is already at the ball, and will reach it first even if
+            #  another mate is closer and sees the ball next frame, it should be
+            #  chaser.
             elif (mate.hasBall() and
                   mate.chaseTime < TeamMember.BALL_OFF_PENALTY):
                 if PBConstants.DEBUG_DET_CHASER:

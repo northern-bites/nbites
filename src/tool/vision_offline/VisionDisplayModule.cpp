@@ -8,39 +8,39 @@ namespace vision {
 
 
 VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
-	QMainWindow(parent),
-	currentCamera(Camera::TOP),
-	topDisplay(this),
-	bottomDisplay(this),
-	topThrDisplay(this),
-	botThrDisplay(this),
-	bottomImage(base()),
-	topImage(base()),
-	tTImage(base()),
-	tYImage(base()),
-	tUImage(base()),
-	tVImage(base()),
-	bTImage(base()),
-	bYImage(base()),
-	bUImage(base()),
-	bVImage(base()),
-	joints(base()),
-	inertials(base()),
-	visMod()
+    QMainWindow(parent),
+    currentCamera(Camera::TOP),
+    topDisplay(this),
+    bottomDisplay(this),
+    topThrDisplay(this),
+    botThrDisplay(this),
+    bottomImage(base()),
+    topImage(base()),
+    tTImage(base()),
+    tYImage(base()),
+    tUImage(base()),
+    tVImage(base()),
+    bTImage(base()),
+    bYImage(base()),
+    bUImage(base()),
+    bVImage(base()),
+    joints(base()),
+    inertials(base()),
+    visMod()
 {
 
-	subdiagram.addModule(topDisplay);
-	subdiagram.addModule(bottomDisplay);
-	subdiagram.addModule(topThrDisplay);
-	subdiagram.addModule(botThrDisplay);
-	subdiagram.addModule(visMod);
+    subdiagram.addModule(topDisplay);
+    subdiagram.addModule(bottomDisplay);
+    subdiagram.addModule(topThrDisplay);
+    subdiagram.addModule(botThrDisplay);
+    subdiagram.addModule(visMod);
 
-	topDisplay.imageIn.wireTo(&topImage, true);
-	bottomDisplay.imageIn.wireTo(&bottomImage, true);
-	topThrDisplay.imageIn.wireTo(&visMod.topOutPic);
-	botThrDisplay.imageIn.wireTo(&visMod.botOutPic);
+    topDisplay.imageIn.wireTo(&topImage, true);
+    bottomDisplay.imageIn.wireTo(&bottomImage, true);
+    topThrDisplay.imageIn.wireTo(&visMod.topOutPic);
+    botThrDisplay.imageIn.wireTo(&visMod.botOutPic);
 
-	visMod.topThrImage.wireTo(&tTImage, true);
+    visMod.topThrImage.wireTo(&tTImage, true);
     visMod.topYImage.wireTo(&tYImage, true);
     visMod.topUImage.wireTo(&tUImage, true);
     visMod.topVImage.wireTo(&tVImage, true);
@@ -51,43 +51,43 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     visMod.botVImage.wireTo(&bVImage, true);
 
     visMod.joint_angles.wireTo(&joints, true);
-	visMod.inertial_state.wireTo(&inertials, true);
+    visMod.inertial_state.wireTo(&inertials, true);
 
 
-	field_viewer = new logview::TypedProtoViewer<messages::VisionField>();
-	field_viewer->input.wireTo(&visMod.vision_field);
-	subdiagram.addModule(*field_viewer);
-	robot_viewer = new logview::TypedProtoViewer<messages::VisionRobot>();
-	robot_viewer->input.wireTo(&visMod.vision_robot);
-	subdiagram.addModule(*robot_viewer);
-	ball_viewer = new logview::TypedProtoViewer<messages::VisionBall>();
-	ball_viewer->input.wireTo(&visMod.vision_ball);
-	subdiagram.addModule(*ball_viewer);
-	obstacle_viewer = new logview::TypedProtoViewer<messages::VisionObstacle>();
-	obstacle_viewer->input.wireTo(&visMod.vision_obstacle);
-	subdiagram.addModule(*obstacle_viewer);
+    field_viewer = new logview::TypedProtoViewer<messages::VisionField>();
+    field_viewer->input.wireTo(&visMod.vision_field);
+    subdiagram.addModule(*field_viewer);
+    robot_viewer = new logview::TypedProtoViewer<messages::VisionRobot>();
+    robot_viewer->input.wireTo(&visMod.vision_robot);
+    subdiagram.addModule(*robot_viewer);
+    ball_viewer = new logview::TypedProtoViewer<messages::VisionBall>();
+    ball_viewer->input.wireTo(&visMod.vision_ball);
+    subdiagram.addModule(*ball_viewer);
+    obstacle_viewer = new logview::TypedProtoViewer<messages::VisionObstacle>();
+    obstacle_viewer->input.wireTo(&visMod.vision_obstacle);
+    subdiagram.addModule(*obstacle_viewer);
 
-	QDockWidget* dockWidget = new QDockWidget("Vision Field", this);
-	dockWidget->setMinimumWidth(300);
-	dockWidget->setWidget(field_viewer);
-	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    QDockWidget* dockWidget = new QDockWidget("Vision Field", this);
+    dockWidget->setMinimumWidth(300);
+    dockWidget->setWidget(field_viewer);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
-	dockWidget = new QDockWidget("Vision Robot", this);
-	dockWidget->setMinimumWidth(300);
-	dockWidget->setWidget(robot_viewer);
-	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    dockWidget = new QDockWidget("Vision Robot", this);
+    dockWidget->setMinimumWidth(300);
+    dockWidget->setWidget(robot_viewer);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
-	dockWidget = new QDockWidget("Vision Ball", this);
-	dockWidget->setMinimumWidth(300);
-	dockWidget->setWidget(ball_viewer);
-	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    dockWidget = new QDockWidget("Vision Ball", this);
+    dockWidget->setMinimumWidth(300);
+    dockWidget->setWidget(ball_viewer);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
-	dockWidget = new QDockWidget("Vision Obstacle", this);
-	dockWidget->setMinimumWidth(300);
-	dockWidget->setWidget(obstacle_viewer);
-	this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    dockWidget = new QDockWidget("Vision Obstacle", this);
+    dockWidget->setMinimumWidth(300);
+    dockWidget->setWidget(obstacle_viewer);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
-	// GUI
+    // GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
     QWidget* mainWidget = new QWidget;
 
@@ -127,7 +127,6 @@ void VisionDisplayModule::run_()
 	joints_in.latch();
 	inerts_in.latch();
 
-
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
     topImage.setMessage(portals::Message<messages::YUVImage>(
@@ -150,15 +149,15 @@ void VisionDisplayModule::run_()
     bVImage.setMessage(portals::Message<messages::PackedImage16>(
                            &bVImage_in.message()));
 
-	joints.setMessage(portals::Message<messages::JointAngles>(
-						  &joints_in.message()));
-	inertials.setMessage(portals::Message<messages::InertialState>(
-							 &inerts_in.message()));
+    joints.setMessage(portals::Message<messages::JointAngles>(
+                          &joints_in.message()));
+    inertials.setMessage(portals::Message<messages::InertialState>(
+                             &inerts_in.message()));
 
-	subdiagram.run();
+    subdiagram.run();
 
-	topDisplay.setOverlay(makeOverlay(Camera::TOP));
-	bottomDisplay.setOverlay(makeOverlay(Camera::BOTTOM));
+    topDisplay.setOverlay(makeOverlay(Camera::TOP));
+    bottomDisplay.setOverlay(makeOverlay(Camera::BOTTOM));
 
 }
 
@@ -168,6 +167,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
     lineImage.fill(qRgba(0, 0, 0, 0));
     QPainter painter(&lineImage);
     painter.setPen(QColor(246, 15, 15));
+
 	const messages::VisionField *visField = visMod.vision_field.getMessage(true).get();
 	const messages::VisionBall *visBall = visMod.vision_ball.getMessage(true).get();
 

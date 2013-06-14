@@ -35,10 +35,15 @@ def goToPosition(nav):
     #                                             nav.brain.ball.loc.relY,
     #                                             nav.brain.ball.loc.bearing)
 
-    #if goToPosition.lastFast != goToPosition.fast:
-    #    print "Fast changed to " + str(goToPosition.fast)
-
-    goToPosition.lastFast = goToPosition.fast
+    if goToPosition.pb:
+        # Calc dist to dest
+        dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
+        if goToPosition.fast and dist < 150:
+            goToPosition.fast = False
+            goToPosition.dest = nav.brain.play.getPosition()
+        elif not goToPosition.fast and dist > 170:
+            goToPosition.fast = True
+            goToPosition.dest = nav.brain.play.getPositionCoord()
 
     if goToPosition.fast:
         velX, velY, velH = 0, 0, 0
@@ -124,7 +129,6 @@ goToPosition.precision = "how precise we want to be in moving"
 goToPosition.speeds = ''
 goToPosition.lastSpeeds = ''
 goToPosition.bookingIt = False
-goToPosition.lastFast = False
 
 def avoidLeft(nav):
     if nav.firstFrame():

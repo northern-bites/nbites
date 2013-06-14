@@ -101,7 +101,6 @@ class GameController():
         else:
             # I am not penalized.
             if self.penalized:
-                print "DEBUG_SUITE: I am no longer penalized. GameController.py flag is set to False."
                 self.stateChanged = True
                 self.penalized = False
 
@@ -110,11 +109,10 @@ class GameController():
             if self.penalized:
                 self.brain.player.switchTo('gamePenalized')
             else:
-                print "DEBUG_SUITE: Changing my state in GameController.py"
                 if gameState.secondary_state != STATE2_PENALTYSHOOT:
                     self.brain.player.switchTo(convertStateFormat[self.currentState])
                 else:
                     self.brain.player.switchTo(convertStateFormatPenaltyShots[self.currentState])
                 # Update the player's "gamestate" variable now, so it is correct when
                 # playbook runs (since player runs even later).
-                self.brain.player.gameState = self.brain.player.currentState
+            self.brain.player.gameState = self.brain.player.currentState

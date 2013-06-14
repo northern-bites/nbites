@@ -54,7 +54,7 @@ ParticleFilter::~ParticleFilter()
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::VisionField& visionInput)
 {
-    motionSystem->update(particles, odometryInput);
+    motionSystem->update(particles, odometryInput, nearMidField());
 
     // Update the Vision Model
     // set updated vision to determine if resampling necessary
@@ -347,8 +347,7 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    if (lost && (errorMagnitude > LOST_THRESHOLD)
-        && !nearMidField() )//&& visionSystem->getLastNumObsv() > 1 )
+    if (lost && (errorMagnitude > LOST_THRESHOLD) && visionSystem->getLastNumObsv() > 1)
     {
         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
         std::list<ReconstructedLocation>::const_iterator recLocIt;
@@ -356,18 +355,18 @@ void ParticleFilter::resample()
              recLocIt != reconLocs.end();
              recLocIt ++)
         {
-            if ((*recLocIt).defSide == onDefendingSide())
-            {
-                Particle reconstructedParticle((*recLocIt).x,
-                                               (*recLocIt).y,
-                                               (*recLocIt).h,
-                                               1.f/250.f);
+            // If the reconstructions is on the same side and not near midfield
+            if ( ((*recLocIt).defSide == onDefendingSide())
+                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 120)) {
+                     Particle reconstructedParticle((*recLocIt).x,
+                                                    (*recLocIt).y,
+                                                    (*recLocIt).h,
+                                                    1.f/250.f);
 
-                newParticles.push_back(reconstructedParticle);
+                     newParticles.push_back(reconstructedParticle);
+                     numReconParticlesAdded++;
             }
-            numReconParticlesAdded++;
         }
-
 #ifdef DEBUG_LOC
         std::cout << "Injected " << numReconParticlesAdded << " particles" << std::endl;
 #endif
@@ -377,12 +376,25 @@ void ParticleFilter::resample()
     // normalized weights, and place them in a new particle set.
     for(int i = 0; i < (parameters.numParticles - (float)numReconParticlesAdded); ++i)
     {
-        rand = (float)gen();
-
-        while(cdf.upper_bound(rand) == cdf.end())
+        /*
+         * 6/2013 - Lizzie
+         * Without this loop...
+         * We were getting a segfault from the push_back line very rarely,
+         * maybe a few times a day, and when playing a game the robots
+         * sometimes had synchronized segfaults.
+         * The issue was that the random number generator sometimes set rand
+         * very high, above all of the weights of the particles in cdf,
+         * so upper_bound gave us cdf.end(), which is NOT a valid
+         * map element. I believe it was synchronized because we seed the
+         * generator with the time.
+         * This loop will reset rand if it's not going to give us a valid
+         * particle.
+         */
+        do
         {
             rand = (float)gen();
         }
+        while(cdf.upper_bound(rand) == cdf.end());
 
         newParticles.push_back(cdf.upper_bound(rand)->second);
     }

@@ -105,27 +105,27 @@ struct ReconstructedLocation
 
 };
 
-// template <class T>
-// struct RingBuffer
-// {
-//     float bufferLength;
-//     T *buffer;
+template <class T>
+struct RingBuffer
+{
+    int bufferLength;
+    T *buffer;
 
-//     int curEntry;
+    int curEntry;
 
-//     RingBuffer(float bufferLength_)
-//         : bufferLength(bufferLength_)
-//     {
-//         buffer = new T[bufferLength];
-//         curEntry = 0;
-//     }
+    RingBuffer(float bufferLength_)
+        : bufferLength(bufferLength_)
+    {
+        buffer = new T[bufferLength];
+        curEntry = 0;
+    }
 
-//     void add(T newElement) {
-//         curEntry = (curEntry++)%bufferLength;
-//         buffer[curEntry] = newElement;
-//     }
+    void add(T newElement) {
+        curEntry = (curEntry++)%bufferLength;
+        buffer[curEntry] = newElement;
+    }
 
-// };
+};
 
 
 

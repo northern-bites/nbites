@@ -25,10 +25,10 @@ public:
 public slots:
     void setUpModules();
     void loadColorTable();
-	void changeTableValues(std::vector<color::colorChanges> tableAdjustments);
-	void unChangeTableValues(std::vector<color::colorChanges> tableAdjustments);
-	void saveAsGlobalTable();
-	void saveGlobalTable();
+    void changeTableValues(std::vector<color::colorChanges> tableAdjustments);
+    void unChangeTableValues(std::vector<color::colorChanges> tableAdjustments);
+    void saveAsGlobalTable();
+    void saveGlobalTable();
 
 private:
     void serializeTableName(QString latestTableName);
@@ -43,7 +43,7 @@ protected:
 
     colorcreator::ColorCalibrate colorCalibrate;
 
-	QPushButton* loadBtn;
+    QPushButton* loadBtn;
 
     color::ColorTable globalColorTable;
 
