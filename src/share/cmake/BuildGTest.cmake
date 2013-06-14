@@ -24,8 +24,6 @@ mark_as_advanced( gtest_build_samples
   gtest_force_shared_crt
 )
 
-
-
 enable_testing()
 set(CTEST_OUTPUT_ON_FAILURE TRUE)
 
@@ -36,11 +34,13 @@ include_directories( ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} )
 # testfile is the cpp file containing gtests
 # any other parameters will be linked to the executable
 macro( nbites_add_test testname testfile)
-  add_executable( ${testname} ${testfile} )
+  add_executable( ${testname} ${CMAKE_CURRENT_LIST_DIR}/test/${testfile} )
   target_link_libraries(
     ${testname}
     ${ARGN}
-    ${GTEST_BOTH_LIBRARIES}
+#    ${GTEST_BOTH_LIBRARIES} Not working... don't know why...
+    gtest
+    gtest_main
     )
   add_test(${testname} ${testname})
 endmacro()
