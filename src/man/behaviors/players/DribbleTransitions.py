@@ -1,42 +1,57 @@
 import DribbleConstants as constants
-# import noggin_constants as NogginConstants
+import noggin_constants as nogginConstants
+import objects
 from math import fabs
 
 def crowded(player):
     """
     The vision heat map is showing a crowded area in front of me.
     """
-    return (self.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
-            or self.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
-            or self.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST)
+    print "Crowded?"
+    print (player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
+            or player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
+            or player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST)
+    return (player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
+            or player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
+            or player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST)
 
 def centerLaneOpen(player):
     """
     I have an open lane right in front of me.
     """
-    return (self.brain.interface.visionObstacle.mid_dist > 
+    print "Center lane?"
+    print (player.brain.interface.visionObstacle.mid_dist > 
+            constants.OPEN_LANE_DIST) 
+    return (player.brain.interface.visionObstacle.mid_dist > 
             constants.OPEN_LANE_DIST) 
 
 def middleThird(player):
     """
     We are in the middle third of the field.
     """
-    return (self.brain.loc.x > (1./3.*constants.FIELD_WIDTH) 
-            and self.brain.loc.x < (2./3.*constants.FIELD_WIDTH))
+    print "Middle third?"
+    print (player.brain.loc.x > (1./3.*nogginConstants.FIELD_WIDTH) 
+            and player.brain.loc.x < (2./3.*nogginConstants.FIELD_WIDTH))
+    # return (player.brain.loc.x > (1./3.*nogginConstants.FIELD_WIDTH) 
+    #         and player.brain.loc.x < (2./3.*nogginConstants.FIELD_WIDTH))
+    return True
 
 def facingGoal(player):
     """
     We are facing generally towards the goal we want to score on.
     """
-    goalCenter = Objects.Location(constants.FIELD_WHITE_RIGHT_SIDELINE_X,
-                                  constants.CENTER_FIELD_Y)
-    ballLocation = Objects.Location(self.brain.ball.x, self.brain.ball.y)
+    goalCenter = objects.Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,
+                                  nogginConstants.CENTER_FIELD_Y)
+    ballLocation = objects.Location(player.brain.ball.x, player.brain.ball.y)
 
     headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
-    bearingForKick = headingBallToGoalCenter - self.brain.loc.h
+    bearingForKick = headingBallToGoalCenter - player.brain.loc.h
 
-    return (bearingForKick < constants.FACING_FORWARD_DEG and 
-            bearingForKick > -constants.FACING_FORWARD_DEG)
+    print "Facing goal?"
+    print bearingForKick
+    return True
+    # return (bearingForKick < constants.FACING_FORWARD_DEG and 
+    #         bearingForKick > -constants.FACING_FORWARD_DEG)
 
 def seesBall(player):
     """

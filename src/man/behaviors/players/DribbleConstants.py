@@ -14,7 +14,7 @@ FACING_FORWARD_DEG = 35
 
 # Heat map thresholds.
 CROWDED_DIST = 50
-OPEN_LANE_DIST = 40
+OPEN_LANE_DIST = 30
 
 # Spinning to the ball.
 # SHOULD_SPIN_TO_BALL_Y = 40.0

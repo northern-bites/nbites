@@ -42,14 +42,14 @@ def executeDribble(player):
     """
     if player.firstFrame():
         player.brain.nav.goTo(player.brain.ball,
-                              Navigator.CLOSE_ENOUGH,
+                              Navigator.PRECISELY,
                               Navigator.MEDIUM_SPEED,
                               False,
                               False)
     else:
         player.brain.nav.updateDest(player.brain.ball)
 
-    if (transitions.ballLost(player) or transitions.ballGotFarAway(player)
+    if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
         not transitions.facingGoal(player) or 
         not transitions.middleThird(player) 
         or not transitions.crowded(player)):
@@ -64,12 +64,13 @@ def rotateToOpenSpace(player):
     Rotate around ball, so as to find an open lane to dribble thru
     """
     if player.firstFrame():
-        if player.brain.interface.left_dist > player.brain.interface.right_dist:
+        if (player.brain.interface.visionObstacle.left_dist > 
+            player.brain.interface.visionObstacle.right_dist):
             player.setWalk(0, -.5, .15)
         else:
             player.setWalk(0, .5, -.15)
 
-    if (transitions.ballLost(player) or transitions.ballGotFarAway(player)
+    if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
         not transitions.facingGoal(player) or 
         not transitions.middleThird(player) 
         or not transitions.crowded(player)):

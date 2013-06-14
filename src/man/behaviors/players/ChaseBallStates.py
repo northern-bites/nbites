@@ -3,6 +3,7 @@ Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
+import DribbleTransitions as dr_trans
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
@@ -106,6 +107,10 @@ def prepareForKick(player):
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
+
+    if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
+        dr_trans.facingGoal(player)):
+    return player.goNow('dribble')
 
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
