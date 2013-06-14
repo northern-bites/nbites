@@ -57,6 +57,8 @@ protected:
     QRadioButton* twoFieldPlayers;
     QRadioButton* threeFieldPlayers;
     QRadioButton* fourFieldPlayers;
+    QLineEdit* editBallX;
+    QLineEdit* editBallY;
 
 private:
     bool havePlaybook;

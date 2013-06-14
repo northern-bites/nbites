@@ -29,8 +29,11 @@ public:
                   float scaleFactor_ = 1.f);
 
     PlaybookPosition** getRobots();
+
     void setRobot(PlaybookPosition* robot, int index);
     void setNumActiveFieldPlayers(int num) {numActiveFieldPlayers = num;};
+    void setBallX(short x) {ball_x = x;};
+    void setBallY(short y) {ball_y = y;};
 
 protected slots:
     void drawGoalie(bool on);
@@ -42,6 +45,7 @@ protected:
 
     void paintGoalie(QPaintEvent* event);
     void paintPlayers(QPaintEvent* event);
+    void paintBall(QPaintEvent* event);
 
     static const float ROBOT_SIZE_X = 18.0f;
     static const float ROBOT_SIZE_Y = 35.0f;
@@ -55,6 +59,8 @@ protected:
 private:
     bool shouldPaintGoalie;
     int numActiveFieldPlayers;
+    short ball_x;
+    short ball_y;
 
     int BOX_SIZE;
     int GRID_WIDTH;

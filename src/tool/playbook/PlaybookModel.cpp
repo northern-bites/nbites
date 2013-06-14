@@ -16,7 +16,9 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     BOX_SIZE(b_s),
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h),
-    numActiveFieldPlayers(4)
+    numActiveFieldPlayers(4),
+    ball_x(5),
+    ball_y(4)
 {
     playbook = new PlaybookPosition****[2];
     for(int goalie = 0; goalie < 2; ++goalie)
@@ -133,9 +135,9 @@ void PlaybookModel::setPosition(int value, short role, bool x_position)
         if (roleIndex != -1)
         {
             if (x_position)
-                playbook[0][roleIndex][0][0]->x = value;
+                playbook[goalieOn][roleIndex][ball_x][ball_y]->x = value;
             else
-                playbook[0][roleIndex][0][0]->y = value;
+                playbook[goalieOn][roleIndex][ball_x][ball_y]->y = value;
 
             qDebug() << "setting role: " << roleIndex << " at x? " << x_position << " to value: " << value;
         }
@@ -168,6 +170,16 @@ void PlaybookModel::setOffenderXPosition(QString x_)
 void PlaybookModel::setOffenderYPosition(QString y_)
 {
     setPosition(y_.toInt(), OFFENDER, false);
+}
+
+void PlaybookModel::setBallX(QString x_)
+{
+    ball_x = x_.toInt();
+}
+
+void PlaybookModel::setBallY(QString y_)
+{
+    ball_y = y_.toInt();
 }
 
 }

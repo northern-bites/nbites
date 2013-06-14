@@ -11,7 +11,9 @@ PlaybookField::PlaybookField(int b_s, int g_w, int g_h, QWidget* parent,
     shouldPaintGoalie(true),
     BOX_SIZE(b_s),
     GRID_WIDTH(g_w),
-    GRID_HEIGHT(g_h)
+    GRID_HEIGHT(g_h),
+    ball_x(2),
+    ball_y(2)
 {
 }
 
@@ -38,6 +40,7 @@ void PlaybookField::paintEvent(QPaintEvent* event)
 
     paintGrid(event);
     paintPlayers(event);
+    paintBall(event);
 
     if(shouldPaintGoalie)
     {
@@ -68,6 +71,22 @@ void PlaybookField::paintGrid(QPaintEvent* event)
         painter.drawLine(0, i, FIELD_WIDTH, i);
     }
 
+}
+
+void PlaybookField::paintBall(QPaintEvent* even)
+{
+    QPainter painter(this);
+    //Move origin to bottom left and scale to flip y axis
+    painter.translate(0,FIELD_GREEN_HEIGHT);
+    painter.scale(scaleFactor, -scaleFactor);
+
+    painter.setPen(Qt::black);
+    painter.setBrush(Qt::red);
+
+    int x_value = (ball_x) * BOX_SIZE;
+    int y_value = (ball_y) * BOX_SIZE;
+
+    painter.drawEllipse(x_value, y_value, 16, 16);
 }
 
 void PlaybookField::paintGoalie(QPaintEvent* event)

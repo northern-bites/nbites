@@ -40,6 +40,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     threeFieldPlayers = new QRadioButton("&3 Active Field Players", this);
     fourFieldPlayers = new QRadioButton("&4 active Field Players", this);
     fourFieldPlayers->setChecked(true);
+    editBallX = new QLineEdit("Ball x", this);
+    editBallY = new QLineEdit("Ball y", this);
 
     settings->addWidget(undoBtn);
     settings->addWidget(loadBtn);
@@ -57,6 +59,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings->addWidget(editOffenderX);
     settings->addWidget(editOffenderY);
     settings->addWidget(goalie);
+    settings->addWidget(editBallX);
+    settings->addWidget(editBallY);
 
     // Connect checkbox interface
     connect(lockDefender, SIGNAL(toggled(bool)), model,
@@ -103,6 +107,12 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editOffenderY, SIGNAL(textEdited(QString)), model,
             SLOT(setOffenderYPosition(QString)));
 
+    connect(editBallX, SIGNAL(textEdited(QString)), model,
+            SLOT(setBallX(QString)));
+
+    connect(editBallY, SIGNAL(textEdited(QString)), model,
+            SLOT(setBallY(QString)));
+
     // Conect line edit widgets for update
     connect(editDefenderX, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
@@ -115,6 +125,10 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editOffenderX, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
     connect(editOffenderY, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
+    connect(editBallX, SIGNAL(returnPressed()), this,
+            SLOT(updatePositions()));
+    connect(editBallY, SIGNAL(returnPressed()), this,
             SLOT(updatePositions()));
     // Connect radio buttons for update
     connect(twoFieldPlayers, SIGNAL(toggled(bool)), this,
@@ -137,6 +151,8 @@ void PlaybookCreator::updateRobotPositions()
 {
     int fieldPlayers = model->getNumActiveFieldPlayers();
     int i, max;
+    short ballX = model->getBallX();
+    short ballY = model->getBallY();
 
     if (fieldPlayers == 4) {
         i = 0;
@@ -153,12 +169,14 @@ void PlaybookCreator::updateRobotPositions()
 
     for (i; i < max; i++)
     {
-        PlaybookPosition* position = model->playbook[model->getGoalieOn()][i][0][0];
+        PlaybookPosition* position = model->playbook[model->getGoalieOn()][i][ballX][ballY];
 
         fieldPainter->setRobot(position,defaultRoleList[i]);
     }
 
     fieldPainter->setNumActiveFieldPlayers(fieldPlayers);
+    fieldPainter->setBallX(ballX);
+    fieldPainter->setBallY(ballY);
 
     fieldPainter->update();
 }

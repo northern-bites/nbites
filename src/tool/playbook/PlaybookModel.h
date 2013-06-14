@@ -47,6 +47,8 @@ public:
     PlaybookPosition** getRobotPositions();
     int getNumActiveFieldPlayers(){return numActiveFieldPlayers;};
     int getGoalieOn(){return goalieOn;};
+    short getBallX(){return ball_x;};
+    short getBallY(){return ball_y;};
 
 protected slots:
     void toggleGoalie(bool on);
@@ -62,6 +64,8 @@ protected slots:
     void setTwoFieldPlayers(bool checked);
     void setThreeFieldPlayers(bool checked);
     void setFourFieldPlayers(bool checked);
+    void setBallX(QString x_);
+    void setBallY(QString y_);
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
@@ -75,6 +79,8 @@ protected:
     bool offenderLocked;
     bool middieLocked;
     int numActiveFieldPlayers;
+    short ball_x;
+    short ball_y;
 
     int BOX_SIZE;
     int GRID_WIDTH;
