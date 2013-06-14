@@ -22,6 +22,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
       sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
       sensors(broker),
+      arms(),
       jointEnactor(broker),
       motion(),
       guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
@@ -65,6 +66,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
     sensorsThread.addModule(jointEnactor);
     sensorsThread.addModule(motion);
+    sensorsThread.addModule(arms);
 
     sensors.printInput.wireTo(&guardian.printJointsOutput, true);
 
@@ -79,6 +81,9 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
+
+    arms.actualJointsIn.wireTo(&sensors.jointsOutput_);
+    arms.expectedJointsIn.wireTo(&motion.jointsOutput_);
 
     /** Guardian **/
     guardianThread.addModule(guardian);
