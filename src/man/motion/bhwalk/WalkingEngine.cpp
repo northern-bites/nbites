@@ -405,12 +405,6 @@ void WalkingEngine::updateMotionRequest()
   } else {
       warned = false;
   }
-
-  if (instabilityCount > 50 && instabilityCount%100 == 0)
-  {
-      cout << "Unstable for " << instabilityCount << " frames!" << endl;
-  }
-
 }
 
 void WalkingEngine::updateObservedPendulumPlayer()
