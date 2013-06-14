@@ -163,6 +163,9 @@ void* DiagramThread::runDiagram(void* _this)
     while(this_instance->running) this_instance->diagram.run();
 
     cout << "Thread " << this_instance->diagram.name << " exiting." << endl;
+
+    cout.flush();
+
     pthread_exit(NULL);
 }
 
