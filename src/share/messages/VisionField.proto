@@ -2,191 +2,190 @@ package messages;
 
 message VisionField
 {
-        optional int64 timestamp = 1;
-        optional VisualGoalPost goal_post_l = 2;
-        optional VisualGoalPost goal_post_r = 3;
-        repeated VisualCorner visual_corner = 4;
-        repeated VisualLine visual_line = 5;
-        optional VisualDetection visual_cross = 6;
-        optional VisualFieldEdge visual_field_edge = 7;
+    optional int64 timestamp = 1;
+    optional VisualGoalPost goal_post_l = 2;
+    optional VisualGoalPost goal_post_r = 3;
+    repeated VisualCorner visual_corner = 4;
+    repeated VisualLine visual_line = 5;
+    optional VisualDetection visual_cross = 6;
+    optional VisualFieldEdge visual_field_edge = 7;
 }
 
 message Point
 {
-        optional float x = 1;
-        optional float y = 2;
-        optional float field_angle = 3; //Used only for corners... HACK
+    optional float x = 1;
+    optional float y = 2;
+    optional float field_angle = 3; //Used only for corners... HACK
 }
 
 message VisualDetection
 {
-        optional float distance = 1;
-        optional float bearing = 2;
-        optional float bearing_deg = 3;
-        optional float distance_sd = 4;
-        optional float bearing_sd = 5;
-        optional int32 certainty = 6;
-        optional bool  on = 7;
-        optional int32 frames_on = 8;
-        optional int32 frames_off = 9;
-        repeated Point concrete_coords = 10;
-        optional float angle_x_deg = 11;
-        optional float angle_y_deg = 12;
-        optional bool red_goalie = 13; // HACK until we have a unified message for goal posts.
-        optional bool navy_goalie = 14;
-	optional bool intopcam = 15;
-	optional int32 x = 17;
-	optional int32 y = 18;
+    optional float distance = 1;
+    optional float bearing = 2;
+    optional float bearing_deg = 3;
+    optional float distance_sd = 4;
+    optional float bearing_sd = 5;
+    optional int32 certainty = 6;
+    optional bool  on = 7;
+    optional int32 frames_on = 8;
+    optional int32 frames_off = 9;
+    repeated Point concrete_coords = 10;
+    optional float angle_x_deg = 11;
+    optional float angle_y_deg = 12;
+    optional bool red_goalie = 13; // HACK until we have a unified message for goal posts.
+    optional bool navy_goalie = 14;
+    optional bool intopcam = 15;
+    optional int32 x = 17;
+    optional int32 y = 18;
 }
 
 message VisualGoalPost
 {
-        optional VisualDetection visual_detection = 1;
-        optional float height = 2;
-        optional float width = 3;
-	optional Point left_top = 4;
-	optional Point right_top = 5;
-	optional Point left_bot = 6;
-	optional Point right_bot = 7;
+    optional VisualDetection visual_detection = 1;
+    optional float height = 2;
+    optional float width = 3;
+    optional Point left_top = 4;
+    optional Point right_top = 5;
+    optional Point left_bot = 6;
+    optional Point right_bot = 7;
 }
 
 message VisualCorner
 {
-   enum corner_id {
-      L_INNER_CORNER = 0;
-      L_OUTER_CORNER = 1;
-      T_CORNER = 2;
-      CENTER_CIRCLE = 3;
+    enum corner_id {
+        L_INNER_CORNER = 0;
+        L_OUTER_CORNER = 1;
+        T_CORNER = 2;
+        CENTER_CIRCLE = 3;
 
-      // FUZZY/CLEAR CORNER IDS start at = 4
-      BLUE_GOAL_T = 4;
-      YELLOW_GOAL_T = 5;
-      BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L = 6;
-      BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L = 7;
-      BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L = 8;
-      BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L = 9;
-      CORNER_INNER_L = 10;
-      GOAL_BOX_INNER_L = 11;
+        // FUZZY/CLEAR CORNER IDS start at = 4
+        BLUE_GOAL_T = 4;
+        YELLOW_GOAL_T = 5;
+        BLUE_GOAL_RIGHT_L_OR_YELLOW_GOAL_LEFT_L = 6;
+        BLUE_GOAL_LEFT_L_OR_YELLOW_GOAL_RIGHT_L = 7;
+        BLUE_CORNER_TOP_L_OR_YELLOW_CORNER_BOTTOM_L = 8;
+        BLUE_CORNER_BOTTOM_L_OR_YELLOW_CORNER_TOP_L = 9;
+        CORNER_INNER_L = 10;
+        GOAL_BOX_INNER_L = 11;
 
-      // FUZZY/CLEAR CORNER IDS start at = 12
-      BLUE_GOAL_OUTER_L = 12;
-      YELLOW_GOAL_OUTER_L = 13;
-      CENTER_T = 14;
+        // FUZZY/CLEAR CORNER IDS start at = 12
+        BLUE_GOAL_OUTER_L = 12;
+        YELLOW_GOAL_OUTER_L = 13;
+        CENTER_T = 14;
 
-      // SPECIFIC CORNER IDS start at = 15
-      BLUE_CORNER_TOP_L = 15;
-      BLUE_CORNER_BOTTOM_L = 16;
-      BLUE_GOAL_LEFT_T = 17;
-      BLUE_GOAL_RIGHT_T = 18;
-      BLUE_GOAL_LEFT_L = 19;
-      BLUE_GOAL_RIGHT_L = 20; // 20
-      CENTER_BOTTOM_T = 21;
-      CENTER_TOP_T = 22;
-      YELLOW_CORNER_BOTTOM_L = 23;
-      YELLOW_CORNER_TOP_L = 24;
-      YELLOW_GOAL_LEFT_T = 25; // 25
-      YELLOW_GOAL_RIGHT_T = 26;
-      YELLOW_GOAL_LEFT_L = 27;
-      YELLOW_GOAL_RIGHT_L = 28;
-      CORNER_NO_IDEA_ID = 29;
-      TOP_CC = 30; // 30
-      BOTTOM_CC = 31;
+        // SPECIFIC CORNER IDS start at = 15
+        BLUE_CORNER_TOP_L = 15;
+        BLUE_CORNER_BOTTOM_L = 16;
+        BLUE_GOAL_LEFT_T = 17;
+        BLUE_GOAL_RIGHT_T = 18;
+        BLUE_GOAL_LEFT_L = 19;
+        BLUE_GOAL_RIGHT_L = 20; // 20
+        CENTER_BOTTOM_T = 21;
+        CENTER_TOP_T = 22;
+        YELLOW_CORNER_BOTTOM_L = 23;
+        YELLOW_CORNER_TOP_L = 24;
+        YELLOW_GOAL_LEFT_T = 25; // 25
+        YELLOW_GOAL_RIGHT_T = 26;
+        YELLOW_GOAL_LEFT_L = 27;
+        YELLOW_GOAL_RIGHT_L = 28;
+        CORNER_NO_IDEA_ID = 29;
+        TOP_CC = 30; // 30
+        BOTTOM_CC = 31;
     }
 
     enum shape {
-      UNKNOWN = 0;
-      INNER_L = 1;
-      OUTER_L = 2;
-      T = 3;
-      CIRCLE = 4;
-      // secondary shapes - arranged from most general to most specific
-      GOAL_L = 5;   // 5
-      CORNER_L = 6;
-      LEFT_GOAL_L = 7;
-      RIGHT_GOAL_L = 8;
-      RIGHT_GOAL_CORNER = 9; // 9
-      LEFT_GOAL_CORNER = 10;
-      GOAL_T = 11;
-      SIDE_T = 12;
-      LEFT_GOAL_T = 13;      // 13
-      RIGHT_GOAL_T = 14;
-      YELLOW_GOAL_BOTTOM = 15;
-      YELLOW_GOAL_TOP = 16;
-      BLUE_GOAL_BOTTOM = 17; // 17
-      BLUE_GOAL_TOP = 18;
-      LEFT_GOAL_YELLOW_L = 19;
-      LEFT_GOAL_BLUE_L = 20;
-      RIGHT_GOAL_YELLOW_L = 21; // 21
-      RIGHT_GOAL_BLUE_L = 22;
-      RIGHT_GOAL_YELLOW_T = 23;
-      LEFT_GOAL_YELLOW_T = 24;
-      RIGHT_GOAL_BLUE_T = 25; // 25
-      LEFT_GOAL_BLUE_T = 26;
-      CENTER_T_TOP = 27;
-      CENTER_T_BOTTOM = 28;
-      CENTER_CIRCLE_TOP = 29;  // 29
-      CENTER_CIRCLE_BOTTOM = 30;
+        UNKNOWN = 0;
+        INNER_L = 1;
+        OUTER_L = 2;
+        T = 3;
+        CIRCLE = 4;
+        // secondary shapes - arranged from most general to most specific
+        GOAL_L = 5;   // 5
+        CORNER_L = 6;
+        LEFT_GOAL_L = 7;
+        RIGHT_GOAL_L = 8;
+        RIGHT_GOAL_CORNER = 9; // 9
+        LEFT_GOAL_CORNER = 10;
+        GOAL_T = 11;
+        SIDE_T = 12;
+        LEFT_GOAL_T = 13;      // 13
+        RIGHT_GOAL_T = 14;
+        YELLOW_GOAL_BOTTOM = 15;
+        YELLOW_GOAL_TOP = 16;
+        BLUE_GOAL_BOTTOM = 17; // 17
+        BLUE_GOAL_TOP = 18;
+        LEFT_GOAL_YELLOW_L = 19;
+        LEFT_GOAL_BLUE_L = 20;
+        RIGHT_GOAL_YELLOW_L = 21; // 21
+        RIGHT_GOAL_BLUE_L = 22;
+        RIGHT_GOAL_YELLOW_T = 23;
+        LEFT_GOAL_YELLOW_T = 24;
+        RIGHT_GOAL_BLUE_T = 25; // 25
+        LEFT_GOAL_BLUE_T = 26;
+        CENTER_T_TOP = 27;
+        CENTER_T_BOTTOM = 28;
+        CENTER_CIRCLE_TOP = 29;  // 29
+        CENTER_CIRCLE_BOTTOM = 30;
     }
 
-        optional VisualDetection visual_detection = 1;
-        optional float orientation = 2;
-        optional shape corner_type = 3;
-        optional float physical_orientation = 4;
-	repeated corner_id poss_id = 5;
-	optional sint32 x = 6;
-	optional sint32 y = 7;
+    optional VisualDetection visual_detection = 1;
+    optional float orientation = 2;
+    optional shape corner_type = 3;
+    optional float physical_orientation = 4;
+    repeated corner_id poss_id = 5;
+    optional sint32 x = 6;
+    optional sint32 y = 7;
 }
 
 message VisualLine
 {
     enum line_id {
-       // Ambiguous lines
-       UNKNOWN_LINE = 50;
-       SIDE_OR_ENDLINE = 51;
-       SIDELINE_LINE = 52;
-       ENDLINE_LINE = 53;
-       GOALBOX_LINE = 54;
-       GOALBOX_SIDE_LINE = 55;                  // 55
-       GOALBOX_TOP_LINE = 56;
+        // Ambiguous lines
+        UNKNOWN_LINE = 50;
+        SIDE_OR_ENDLINE = 51;
+        SIDELINE_LINE = 52;
+        ENDLINE_LINE = 53;
+        GOALBOX_LINE = 54;
+        GOALBOX_SIDE_LINE = 55;                  // 55
+        GOALBOX_TOP_LINE = 56;
 
-       // Distinct lines:
-       // Named by looking from center field out, left end is at the blue goal
+        // Distinct lines:
+        // Named by looking from center field out, left end is at the blue goal
 
-       // Endlines
-       BLUE_GOAL_ENDLINE = 57;
-       YELLOW_GOAL_ENDLINE = 58;
+        // Endlines
+        BLUE_GOAL_ENDLINE = 57;
+        YELLOW_GOAL_ENDLINE = 58;
 
-       TOP_SIDELINE = 59;
-       BOTTOM_SIDELINE = 60;
-       MIDLINE = 61;
+        TOP_SIDELINE = 59;
+        BOTTOM_SIDELINE = 60;
+        MIDLINE = 61;
 
-       // GOALBOX LINES:
-       // Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
-       BLUE_GOALBOX_TOP_LINE = 62;
-       BLUE_GOALBOX_LEFT_LINE = 63;
-       BLUE_GOALBOX_RIGHT_LINE = 64;
-       YELLOW_GOALBOX_TOP_LINE = 65;
-       YELLOW_GOALBOX_LEFT_LINE = 66;
-       YELLOW_GOALBOX_RIGHT_LINE = 67;
+        // GOALBOX LINES:
+        // Named as if you were the goalie (so the "top of the box" is the TOP_LINE)
+        BLUE_GOALBOX_TOP_LINE = 62;
+        BLUE_GOALBOX_LEFT_LINE = 63;
+        BLUE_GOALBOX_RIGHT_LINE = 64;
+        YELLOW_GOALBOX_TOP_LINE = 65;
+        YELLOW_GOALBOX_LEFT_LINE = 66;
+        YELLOW_GOALBOX_RIGHT_LINE = 67;
     }
 
-        optional VisualDetection visual_detection = 1;
-        optional int32 start_x = 2;
-        optional int32 start_y = 3;
-        optional int32 end_x = 4;
-        optional int32 end_y = 5;
-        optional float angle = 6;
-        optional float avg_width = 7;
-        optional float length = 8;
-        optional float slope = 9;
-        optional float y_int = 10;
-        repeated line_id possibilities = 11;
+    optional VisualDetection visual_detection = 1;
+    optional int32 start_x = 2;
+    optional int32 start_y = 3;
+    optional int32 end_x = 4;
+    optional int32 end_y = 5;
+    optional float angle = 6;
+    optional float avg_width = 7;
+    optional float length = 8;
+    optional float slope = 9;
+    optional float y_int = 10;
+    repeated line_id possibilities = 11;
 }
 
 message VisualFieldEdge
 {
-        optional float distance_l = 1;
-        optional float distance_m = 2;
-        optional float distance_r = 3;
+    optional float distance_l = 1;
+    optional float distance_m = 2;
+    optional float distance_r = 3;
 }
-

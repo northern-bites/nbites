@@ -2,6 +2,6 @@ package messages;
 
 message Toggle
 {
-        // signal when value is changed
-        optional bool toggle = 1;
+    // signal when value is changed
+    optional bool toggle = 1;
 }

@@ -7,6 +7,7 @@
 #include "EmptyTool.h"
 
 #include "fieldview/FieldViewer.h"
+#include "worldview/WorldView.h"
 
 #include "ParticleSwarm.pb.h"
 
@@ -24,5 +25,6 @@ public slots:
 
  protected:
     viewer::FieldViewer fieldView;
+    worldview::WorldView worldView;
 };
 }

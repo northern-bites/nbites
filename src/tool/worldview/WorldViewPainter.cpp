@@ -6,82 +6,95 @@ namespace worldview {
 static const int PARTICLE_WIDTH = 8;
 
 WorldViewPainter::WorldViewPainter(QWidget* parent, float scaleFactor_) :
-    PaintField(parent, scaleFactor_),
-    shouldPaintLocation(true)
+    PaintField(parent, scaleFactor_)
 {
-}
-
-void WorldViewPainter::paintLocationAction(bool state) {
-
-    shouldPaintLocation = state;
-    repaint();
 }
 
 void WorldViewPainter::paintEvent(QPaintEvent* event)
 {
     PaintField::paintEvent(event);
 
-    if(shouldPaintLocation) {
-        // Paint actual location
-        paintRobotLocation(event, curLoc, true);
+    // Paint actual location
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        paintRobotLocation(event, curLoc[i], QString::number(i+1), true);
     }
-
 }
 
-/**
- *  NOTE: Comm information is coming from behaviors -> is in degrees
- *
- */
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
-                                            messages::WorldModel loc,
-                                            bool red)
+                                          messages::WorldModel msg,
+                                          QString playerNum,
+                                          bool red)
 {
+    if (!msg.active())
+    {
+        return; // Don't paint robots that aren't there.
+    }
+
     QPainter painter(this);
     painter.translate(0, FIELD_GREEN_HEIGHT);
     painter.scale(1, -1);
 
+    Qt::GlobalColor brushColor = Qt::cyan;
     if (red)
-        painter.setBrush(Qt::red);
+        brushColor = Qt::red;
 
-    QPoint locCenter(loc.my_x(), loc.my_y());
+    painter.setBrush(brushColor);
 
-    //draw myself
+    QPoint locCenter(msg.my_x(), msg.my_y());
+
+    // Draw myself
     painter.drawEllipse(locCenter,
                         PARTICLE_WIDTH,
                         PARTICLE_WIDTH);
 
-    //draw my heading
-    painter.drawLine(loc.my_x(),
-                     loc.my_y(),
-                     PARTICLE_WIDTH * std::cos(TO_RAD*loc.my_h()) + loc.my_x(),
-                     PARTICLE_WIDTH * std::sin(TO_RAD*loc.my_h()) + loc.my_y());
+    // Draw my heading
+    painter.drawLine(msg.my_x(),
+                     msg.my_y(),
+                     PARTICLE_WIDTH * std::cos(TO_RAD*msg.my_h()) + msg.my_x(),
+                     PARTICLE_WIDTH * std::sin(TO_RAD*msg.my_h()) + msg.my_y());
 
-    //draw my uncertainty
+    // Draw my uncertainty
     painter.drawEllipse(locCenter,
-                        (int)loc.my_x_uncert(),
-                        (int)loc.my_y_uncert());
+                        (int)msg.my_x_uncert(),
+                        (int)msg.my_y_uncert());
 
-    if(loc.ball_on()){
+    // Draw my number
+    painter.setPen(brushColor);
+    painter.scale(1, -1); // Scale y so that the number is right-side up.
+    painter.drawText(locCenter.x() + 15, -locCenter.y(), playerNum);
+    painter.scale(1,-1);
+    painter.setPen(Qt::black);
+
+    // Draw the ball
+    if(msg.ball_on()){
+        QPoint ballCenter(msg.my_x()+msg.ball_dist()*std::cos(TO_RAD*msg.my_h()+TO_RAD*msg.ball_bearing()),
+                          msg.my_y()+msg.ball_dist()*std::sin(TO_RAD*msg.my_h()+TO_RAD*msg.ball_bearing()));
+
         //draw where I think the ball is
-        painter.setBrush(Qt::darkYellow); //Orange isn't a thing??
-        painter.drawEllipse(loc.my_x()+loc.ball_dist()*std::cos(TO_RAD*loc.my_h()+TO_RAD*loc.ball_bearing()),
-                            loc.my_y()+loc.ball_dist()*std::sin(TO_RAD*loc.my_h()+TO_RAD*loc.ball_bearing()),
-                            25,
-                            25);
+        painter.setBrush(QColor::fromRgb(205,140,0));
+        painter.drawEllipse(ballCenter,
+                            8,
+                            8);
 
         //draw how sure I am about where the ball is
         //TODO
-    }
 
+        // Draw my number
+        painter.setPen(brushColor);
+        painter.scale(1, -1); // Scale y so that the number is right-side up.
+        painter.drawText(ballCenter.x() + 15, -ballCenter.y(), playerNum);
+        painter.scale(1,-1);
+        painter.setPen(Qt::black);
+    }
 }
 
-void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc)
+void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc,
+                                                 int index)
 {
-    curLoc = newLoc;
-    if(shouldPaintLocation) {
-        update();
-    }
+    curLoc[index] = newLoc;
+    update();
 }
 
-} // namespace viewer
+} // namespace worldview
 } // namespace tool
