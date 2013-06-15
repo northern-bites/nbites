@@ -186,6 +186,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
     behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
     behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+    behaviors.armContactStateIn.wireTo(&arms.contactOut, true);
+
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);

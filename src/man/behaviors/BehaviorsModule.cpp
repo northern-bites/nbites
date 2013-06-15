@@ -25,6 +25,7 @@ extern "C" void initSonarState_proto();
 extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
 extern "C" void initStiffnessControl_proto();
+extern "C" void initArmContactState_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -100,6 +101,7 @@ void BehaviorsModule::initializePython()
         initButtonState_proto();
         initFallStatus_proto();
         initStiffnessControl_proto();
+        initArmContactState_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -260,6 +262,9 @@ void BehaviorsModule::prepareMessages()
 
     stiffStatusIn.latch();
     pyInterface.setStiffStatus_ptr(&stiffStatusIn.message());
+
+    armContactStateIn.latch();
+    pyInterface.setArmContactState_ptr(&armContactStateIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);
