@@ -12,9 +12,9 @@ BALL_MOVED_THR = 3
 # Bearings towards goal and ball thresholds.
 FACING_FORWARD_DEG = 35
 
-# Heat map thresholds.
-CROWDED_DIST = 50
-OPEN_LANE_DIST = 20
+# Heat map (distance to something blocking open field) thresholds.
+CROWDED_DIST = 300
+OPEN_LANE_DIST = 200
 
 # Spinning to the ball.
 # SHOULD_SPIN_TO_BALL_Y = 40.0

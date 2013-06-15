@@ -8,18 +8,21 @@ def crowded(player):
     The vision heat map is showing a crowded area in front of me.
     """
     print "Crowded?"
+    print player.brain.interface.visionObstacle.left_dist
+    print player.brain.interface.visionObstacle.mid_dist
+    print player.brain.interface.visionObstacle.right_dist
     print ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
-            and not player.brain.interface.visionObstacle.left_dist == 0)
+            and not player.brain.interface.visionObstacle.block_left == 0)
             or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
-            and not player.brain.interface.visionObstacle.mid_dist == 0)
+            and not player.brain.interface.visionObstacle.block_mid == 0)
             or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
-            and not player.brain.interface.visionObstacle.right_dist == 0))
+            and not player.brain.interface.visionObstacle.block_right == 0))
     return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
-            and not player.brain.interface.visionObstacle.left_dist == 0)
+            and not player.brain.interface.visionObstacle.block_left == 0)
             or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
-            and not player.brain.interface.visionObstacle.mid_dist == 0)
+            and not player.brain.interface.visionObstacle.block_mid == 0)
             or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
-            and not player.brain.interface.visionObstacle.right_dist == 0))
+            and not player.brain.interface.visionObstacle.block_right == 0))
 
 def centerLaneOpen(player):
     """
@@ -29,10 +32,21 @@ def centerLaneOpen(player):
     print player.brain.interface.visionObstacle.mid_dist
     print (player.brain.interface.visionObstacle.mid_dist > 
             constants.OPEN_LANE_DIST or 
-            player.brain.interface.visionObstacle.mid_dist == 0) 
+            player.brain.interface.visionObstacle.block_mid == 0) 
     return (player.brain.interface.visionObstacle.mid_dist > 
             constants.OPEN_LANE_DIST or 
-            player.brain.interface.visionObstacle.mid_dist == 0) 
+            player.brain.interface.visionObstacle.block_mid == 0) 
+
+def leftLessCrowdedThanRight(player):
+    print "Left lane?"
+    print (player.brain.visionObstacle.block_left == 0 or
+            (player.brain.visionObstacle.left_dist < 
+            player.brain.visionObstacle.right_dist and
+            not player.brain.visionObstacle.block_right == 0))
+    return (player.brain.visionObstacle.block_left == 0 or
+            (player.brain.visionObstacle.left_dist < 
+            player.brain.visionObstacle.right_dist and
+            not player.brain.visionObstacle.block_right == 0))
 
 def middleThird(player):
     """

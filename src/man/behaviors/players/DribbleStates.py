@@ -15,7 +15,7 @@ def dribble(player):
     Super State to determine what to do from various situations.
     """
     if not transitions.seesBall(player):
-        return player.goNow('backupForBall')
+        return player.goNow('lookForBall')
     elif (transitions.facingGoal(player) and transitions.middleThird(player) 
         and transitions.crowded(player)):
         return player.goNow('decideDribble')
@@ -63,12 +63,8 @@ def executeDribble(player):
     else:
         player.brain.nav.updateDest(player.kickPose)
 
-    # if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
-    #     not transitions.facingGoal(player) or 
-    #     not transitions.middleThird(player) 
-    #     or not transitions.crowded(player)):
-    #     return player.goLater('dribble')
-    if transitions.navDone(player):
+    if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
+        transitions.navDone(player)):
         return player.goLater('dribble')
     elif not transitions.centerLaneOpen(player):
         return player.goLater('rotateToOpenSpace')
@@ -82,26 +78,22 @@ def rotateToOpenSpace(player):
     if player.firstFrame():
         if (player.brain.interface.visionObstacle.left_dist > 
             player.brain.interface.visionObstacle.right_dist):
+            print "Chose left"
             player.setWalk(0, -.5, .15)
         else:
+            print "Chose right"
             player.setWalk(0, .5, -.15)
 
     print "Rotating..."
 
-    # if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
-    #     not transitions.facingGoal(player) or 
-    #     not transitions.middleThird(player) 
-    #     or not transitions.crowded(player)):
-    #     player.stand()
-    #     return player.goLater('dribble')
-    if transitions.centerLaneOpen(player):
+    if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
+        transitions.centerLaneOpen(player)):
         player.stand()
-        # return player.goNow('executeDribble')
-        return player.goNow('dribble')
+        return player.goLater('dribble')
 
     return player.stay()
 
-def backupForBall(player):
+def lookForBall(player):
     """
     Backup and look for ball. If fails, leave the FSA.
     """
