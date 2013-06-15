@@ -91,20 +91,12 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
             SLOT(drawGoalie(bool)));
 
     // Connect radio buttons
-    connect(twoFieldPlayers, SIGNAL(toggled(bool)), model,
-            SLOT(setTwoFieldPlayers(bool)));
-    connect(threeFieldPlayers, SIGNAL(toggled(bool)), model,
-            SLOT(setThreeFieldPlayers(bool)));
-    connect(fourFieldPlayers, SIGNAL(toggled(bool)), model,
-            SLOT(setFourFieldPlayers(bool)));
-
-    // Connect radio buttons for update
     connect(twoFieldPlayers, SIGNAL(toggled(bool)), this,
-            SLOT(updatePositionsCheck(bool)));
+            SLOT(setTwoFieldPlayers(bool)));
     connect(threeFieldPlayers, SIGNAL(toggled(bool)), this,
-            SLOT(updatePositionsCheck(bool)));
+            SLOT(setThreeFieldPlayers(bool)));
     connect(fourFieldPlayers, SIGNAL(toggled(bool)), this,
-            SLOT(updatePositionsCheck(bool)));
+            SLOT(setFourFieldPlayers(bool)));
 
     // Connect line edit widgets' editingFinished signals
     connect(editDefenderX, SIGNAL(editingFinished()), this,
@@ -155,6 +147,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
 
     // Initialize data from the model to the fieldPainter.
     updateRobotPositions();
+    // Refresh all of the text fields.
+    refreshTextAll();
 }
 
 void PlaybookCreator::updateRobotPositions()
@@ -194,7 +188,6 @@ void PlaybookCreator::updateRobotPositions()
 void PlaybookCreator::updatePositions()
 {
     updateRobotPositions();
-    qDebug() << "updating the robot positions now.";
 }
 
 void PlaybookCreator::updatePositionsCheck(bool check)
@@ -238,6 +231,70 @@ void PlaybookCreator::refreshTextBall()
     editBallX->setText(QString::number(model->getBallX()));
     editBallY->setText(QString::number(model->getBallY()));
     qDebug() << "displaying the ball's true position now.";
+}
+
+void PlaybookCreator::refreshTextAll()
+{
+    refreshTextDefender();
+    refreshTextMiddie();
+    refreshTextOffender();
+    refreshTextBall();
+}
+
+void PlaybookCreator::setTwoFieldPlayers(bool checked)
+{
+    if (checked)
+    {
+        model->setNumActiveFieldPlayers(2);
+        qDebug() << "Number of field players is now 2.";
+
+        updateLockedPositions();
+        refreshTextAll();
+    }
+}
+
+void PlaybookCreator::setThreeFieldPlayers(bool checked)
+{
+    if (checked)
+    {
+        model->setNumActiveFieldPlayers(3);
+        qDebug() << "Number of field players is now 3.";
+
+        updateLockedPositions();
+        refreshTextAll();
+    }
+}
+
+void PlaybookCreator::setFourFieldPlayers(bool checked)
+{
+    if (checked)
+    {
+        model->setNumActiveFieldPlayers(4);
+        qDebug() << "Number of field players is now 4.";
+
+        updateLockedPositions();
+        refreshTextAll();
+    }
+}
+
+void PlaybookCreator::updateLockedPositions()
+{
+    // Check if any players are locked
+    if (model->getDefenderLocked())
+    {
+        setDefenderXPosition();
+        setDefenderYPosition();
+    }
+    if (model->getMiddieLocked())
+    {
+        setMiddieXPosition();
+        setMiddieYPosition();
+    }
+    if (model->getOffenderLocked())
+    {
+        setOffenderXPosition();
+        setOffenderYPosition();
+    }
 }
 
 void PlaybookCreator::setDefenderXPosition()

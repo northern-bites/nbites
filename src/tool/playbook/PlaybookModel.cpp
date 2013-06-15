@@ -78,33 +78,6 @@ void PlaybookModel::toggleMiddie(bool on)
     qDebug() << "middieLocked is now " << middieLocked;
 }
 
-void PlaybookModel::setTwoFieldPlayers(bool checked)
-{
-    if (checked)
-    {
-        numActiveFieldPlayers = 2;
-        qDebug() << "number of active field players is now 2";
-    }
-}
-
-void PlaybookModel::setThreeFieldPlayers(bool checked)
-{
-    if (checked)
-    {
-        numActiveFieldPlayers = 3;
-        qDebug() << "number of active field players is now 3";
-    }
-}
-
-void PlaybookModel::setFourFieldPlayers(bool checked)
-{
-    if (checked)
-    {
-        numActiveFieldPlayers = 4;
-        qDebug() << "number of active field players is now 4";
-    }
-}
-
 void PlaybookModel::setPosition(int value, short role, bool x_position)
 {
     short roleIndex = convertRoleToPlaybookIndex(role);

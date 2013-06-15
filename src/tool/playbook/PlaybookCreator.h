@@ -44,6 +44,9 @@ protected slots:
     void setOffenderYPosition();
     void setBallX();
     void setBallY();
+    void setTwoFieldPlayers(bool checked);
+    void setThreeFieldPlayers(bool checked);
+    void setFourFieldPlayers(bool checked);
 
 protected:
     PlaybookField* fieldPainter;
@@ -75,6 +78,8 @@ protected:
 private:
     bool havePlaybook;
     void updateRobotPositions();
+    void updateLockedPositions();
+    void refreshTextAll();
 };
 
 }

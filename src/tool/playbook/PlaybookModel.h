@@ -49,6 +49,9 @@ public:
     int getGoalieOn(){return goalieOn;};
     short getBallX(){return ball_x;};
     short getBallY(){return ball_y;};
+    bool getDefenderLocked() {return defenderLocked;};
+    bool getOffenderLocked() {return offenderLocked;};
+    bool getMiddieLocked() {return middieLocked;};
 
     void setDefenderXPosition(int x_);
     void setDefenderYPosition(int y_);
@@ -58,6 +61,7 @@ public:
     void setOffenderYPosition(int y_);
     void setBallX(int x_);
     void setBallY(int y_);
+    void setNumActiveFieldPlayers(int num) {numActiveFieldPlayers = num;};
 
 
 protected slots:
@@ -65,9 +69,6 @@ protected slots:
     void toggleDefender(bool on);
     void toggleOffender(bool on);
     void toggleMiddie(bool on);
-    void setTwoFieldPlayers(bool checked);
-    void setThreeFieldPlayers(bool checked);
-    void setFourFieldPlayers(bool checked);
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
