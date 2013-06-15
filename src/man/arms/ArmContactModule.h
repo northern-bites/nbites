@@ -6,6 +6,8 @@
 #include "HandSpeeds.pb.h"
 
 #include <queue>
+#include <list>
+#include <vector>
 #include <math.h>
 #include <iostream>
 
@@ -14,6 +16,19 @@ namespace arms {
 
 static const unsigned int FRAMES_DELAY = 5;
 static const float DISPLACEMENT_THRESH = 0.04f;
+static const unsigned int FRAMES_TO_BUFFER = 20;
+static const float SPEED_BASED_ERROR_REDUCTION = 600.f;
+
+enum Joint
+{
+    PITCH = 0,
+    ROLL = 1
+};
+
+typedef std::vector<float> Displacement;
+typedef std::list<Displacement> DisplacementBuffer;
+
+Displacement getAverageDisplacement(DisplacementBuffer& buf);
 
 class ArmContactModule : public portals::Module
 {
@@ -35,6 +50,8 @@ protected:
 
     messages::ArmContactState::PushDirection rightArm;
     messages::ArmContactState::PushDirection leftArm;
+
+    DisplacementBuffer right, left;
 };
 
 }
