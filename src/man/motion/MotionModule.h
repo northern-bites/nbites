@@ -33,7 +33,7 @@
 #include "MotionStatus.pb.h"
 #include "StiffnessControl.pb.h"
 #include "FallStatus.pb.h"
-#include "ArmContactState.pb.h"
+#include "HandSpeeds.pb.h"
 
 #include <vector>
 
@@ -44,12 +44,6 @@ namespace man
 {
 namespace motion
 {
-
-// For arm contact detection
-static const unsigned int FRAMES_DELAY = 5;
-static const float PITCH_DISPLACEMENT_THRESH = 0.05f;
-static const float ROLL_DISPLACEMENT_THRESH = 0.05f;
-static const float SPEED_BASED_ERROR_REDUCTION = 300.f;
 
 /**
  * @class MotionModule
@@ -230,7 +224,7 @@ public:
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
     portals::OutPortal<messages::RobotLocation> odometryOutput_;
     portals::OutPortal<messages::MotionStatus> motionStatusOutput_;
-    portals::OutPortal<messages::ArmContactState> armContactOutput_;
+    portals::OutPortal<messages::HandSpeeds> handSpeedsOutput_;
 
 private:
     void preProcess();
@@ -268,8 +262,8 @@ private:
     // Make a new status proto and set it on the out portal
     void updateStatus();
 
-    // Update the arm contact info
-    void updateArmContact();
+    // Update the hand speeds
+    void updateHandSpeeds();
 
     BHWalkProvider          walkProvider;
     ScriptedProvider        scriptedProvider;
@@ -305,9 +299,6 @@ private:
     // For deciding if requests/commands have been processed already
     bool gainsOn;
     long long lastRequest, lastBodyCommand, lastHeadCommand;
-
-    // For computing arm status
-    std::queue<messages::JointAngles> expectedJoints;
 };
 } // namespace motion
 } // namespace man

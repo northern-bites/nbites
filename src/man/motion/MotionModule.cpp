@@ -12,7 +12,7 @@ MotionModule::MotionModule()
       stiffnessOutput_(base()),
       odometryOutput_(base()),
       motionStatusOutput_(base()),
-      armContactOutput_(base()),
+      handSpeedsOutput_(base()),
       curProvider(&nullBodyProvider),
       nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
@@ -87,7 +87,7 @@ void MotionModule::run_()
         //     the messages that we output.
         updateOdometry();
         updateStatus();
-        updateArmContact();
+        updateHandSpeeds();
 
         newInputJoints = false;
         frameCount++;
@@ -1225,81 +1225,14 @@ void MotionModule::updateStatus()
     motionStatusOutput_.setMessage(status);
 }
 
-void MotionModule::updateArmContact()
+void MotionModule::updateHandSpeeds()
 {
-    expectedJoints.push(*jointsOutput_.getMessage(true).get());
-    messages::JointAngles* jointsWithDelay = &expectedJoints.front();
+    portals::Message<messages::HandSpeeds> current(0);
 
-    if (expectedJoints.size() > FRAMES_DELAY)
-    {
-        expectedJoints.pop();
-    }
+    current.get()->set_left_speed(walkProvider.leftHandSpeed());
+    current.get()->set_right_speed(walkProvider.rightHandSpeed());
 
-    float f_left = std::max(0.f, 1 - (walkProvider.leftHandSpeed() /
-                                      SPEED_BASED_ERROR_REDUCTION));
-    float f_right = std::max(0.f, 1 - (walkProvider.rightHandSpeed() /
-                                       SPEED_BASED_ERROR_REDUCTION));
-
-    float leftPitchD = f_left * (jointsWithDelay->l_shoulder_pitch() -
-                                 jointsInput_.message().l_shoulder_pitch());
-    float leftRollD = f_left * (jointsWithDelay->l_shoulder_roll() -
-                                jointsInput_.message().l_shoulder_roll());
-
-    float rightPitchD = f_right * (jointsWithDelay->r_shoulder_pitch() -
-                                   jointsInput_.message().r_shoulder_pitch());
-    float rightRollD = f_right * (jointsWithDelay->r_shoulder_roll() -
-                                  jointsInput_.message().r_shoulder_roll());
-
-    messages::ArmContactState::PushDirection leftArm, rightArm;
-
-    // LEFT arm
-    if (fabs(leftPitchD) > fabs(leftRollD))
-    {
-        if (fabs(leftPitchD) > PITCH_DISPLACEMENT_THRESH)
-        {
-            if (leftPitchD > 0) leftArm = messages::ArmContactState::NORTH;
-            else leftArm = messages::ArmContactState::SOUTH;
-        }
-        else leftArm = messages::ArmContactState::NONE;
-    }
-    else
-    {
-        if (fabs(leftRollD) > ROLL_DISPLACEMENT_THRESH)
-        {
-            if (leftRollD > 0) leftArm = messages::ArmContactState::EAST;
-            else leftArm = messages::ArmContactState::WEST;
-        }
-        else leftArm = messages::ArmContactState::NONE;
-    }
-
-    // RIGHT arm
-    if (fabs(rightPitchD) > fabs(rightRollD))
-    {
-        if (fabs(rightPitchD) > PITCH_DISPLACEMENT_THRESH)
-        {
-            if (rightPitchD > 0) rightArm = messages::ArmContactState::NORTH;
-            else rightArm = messages::ArmContactState::SOUTH;
-        }
-        else rightArm = messages::ArmContactState::NONE;
-    }
-    else
-    {
-        if (fabs(rightRollD) > ROLL_DISPLACEMENT_THRESH)
-        {
-            if (rightRollD > 0) rightArm = messages::ArmContactState::EAST;
-            else rightArm = messages::ArmContactState::WEST;
-        }
-        else rightArm = messages::ArmContactState::NONE;
-    }
-
-    portals::Message<messages::ArmContactState> current(0);
-
-    current.get()->set_right_push_direction(rightArm);
-    current.get()->set_left_push_direction(leftArm);
-
-    armContactOutput_.setMessage(current);
-
-    //std::cout << current.get()->DebugString() << std::endl;
+    handSpeedsOutput_.setMessage(current);
 }
 
 } // namespace motion
