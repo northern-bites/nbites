@@ -1255,7 +1255,7 @@ void MotionModule::updateArmContact()
     // LEFT arm
     if (fabs(leftPitchD) > fabs(leftRollD))
     {
-        if (fabs(leftPitchD) > DISPLACEMENT_THRESH)
+        if (fabs(leftPitchD) > PITCH_DISPLACEMENT_THRESH)
         {
             if (leftPitchD > 0) leftArm = messages::ArmContactState::NORTH;
             else leftArm = messages::ArmContactState::SOUTH;
@@ -1264,7 +1264,7 @@ void MotionModule::updateArmContact()
     }
     else
     {
-        if (fabs(leftRollD) > DISPLACEMENT_THRESH)
+        if (fabs(leftRollD) > ROLL_DISPLACEMENT_THRESH)
         {
             if (leftRollD > 0) leftArm = messages::ArmContactState::EAST;
             else leftArm = messages::ArmContactState::WEST;
@@ -1275,7 +1275,7 @@ void MotionModule::updateArmContact()
     // RIGHT arm
     if (fabs(rightPitchD) > fabs(rightRollD))
     {
-        if (fabs(rightPitchD) > DISPLACEMENT_THRESH)
+        if (fabs(rightPitchD) > PITCH_DISPLACEMENT_THRESH)
         {
             if (rightPitchD > 0) rightArm = messages::ArmContactState::NORTH;
             else rightArm = messages::ArmContactState::SOUTH;
@@ -1284,7 +1284,7 @@ void MotionModule::updateArmContact()
     }
     else
     {
-        if (fabs(rightRollD) > DISPLACEMENT_THRESH)
+        if (fabs(rightRollD) > ROLL_DISPLACEMENT_THRESH)
         {
             if (rightRollD > 0) rightArm = messages::ArmContactState::EAST;
             else rightArm = messages::ArmContactState::WEST;
