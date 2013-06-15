@@ -36,6 +36,14 @@ protected slots:
     void refreshTextOffender();
     void refreshTextMiddie();
     void refreshTextBall();
+    void setDefenderXPosition();
+    void setDefenderYPosition();
+    void setMiddieXPosition();
+    void setMiddieYPosition();
+    void setOffenderXPosition();
+    void setOffenderYPosition();
+    void setBallX();
+    void setBallY();
 
 protected:
     PlaybookField* fieldPainter;

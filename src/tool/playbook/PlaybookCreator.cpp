@@ -93,10 +93,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     // Connect radio buttons
     connect(twoFieldPlayers, SIGNAL(toggled(bool)), model,
             SLOT(setTwoFieldPlayers(bool)));
-
     connect(threeFieldPlayers, SIGNAL(toggled(bool)), model,
             SLOT(setThreeFieldPlayers(bool)));
-
     connect(fourFieldPlayers, SIGNAL(toggled(bool)), model,
             SLOT(setFourFieldPlayers(bool)));
 
@@ -108,105 +106,47 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(fourFieldPlayers, SIGNAL(toggled(bool)), this,
             SLOT(updatePositionsCheck(bool)));
 
-    // Connect line edit widgets' textEdited signals
-    connect(editDefenderX, SIGNAL(textEdited(QString)), model,
-            SLOT(setDefenderXPosition(QString)));
-    connect(editDefenderY, SIGNAL(textEdited(QString)), model,
-            SLOT(setDefenderYPosition(QString)));
-    connect(editMiddieX, SIGNAL(textEdited(QString)), model,
-            SLOT(setMiddieXPosition(QString)));
-    connect(editMiddieY, SIGNAL(textEdited(QString)), model,
-            SLOT(setMiddieYPosition(QString)));
-    connect(editOffenderX, SIGNAL(textEdited(QString)), model,
-            SLOT(setOffenderXPosition(QString)));
-    connect(editOffenderY, SIGNAL(textEdited(QString)), model,
-            SLOT(setOffenderYPosition(QString)));
-    connect(editBallX, SIGNAL(textEdited(QString)), model,
-            SLOT(setBallX(QString)));
-    connect(editBallY, SIGNAL(textEdited(QString)), model,
-            SLOT(setBallY(QString)));
-
     // Connect line edit widgets' editingFinished signals
     connect(editDefenderX, SIGNAL(editingFinished()), this,
             SLOT(refreshTextDefender()));
-    connect(editDefenderX, SIGNAL(editingFinished()), model,
-            SLOT(resetPositionChanges()));
-
     connect(editDefenderY, SIGNAL(editingFinished()), this,
             SLOT(refreshTextDefender()));
-    connect(editDefenderY, SIGNAL(editingFinished()), model,
-            SLOT(resetPositionChanges()));
 
     connect(editMiddieX, SIGNAL(editingFinished()), this,
             SLOT(refreshTextMiddie()));
-    connect(editMiddieX, SIGNAL(editingFinished()), model,
-            SLOT(resetPositionChanges()));
-
     connect(editMiddieY, SIGNAL(editingFinished()), this,
             SLOT(refreshTextMiddie()));
-    connect(editMiddieY, SIGNAL(editingFinished()), model,
-            SLOT(resetPositionChanges()));
 
     connect(editOffenderX, SIGNAL(editingFinished()), this,
             SLOT(refreshTextOffender()));
-    connect(editOffenderX, SIGNAL(editingFinished()), model,
-            SLOT(resetPositionChanges()));
-
     connect(editOffenderY, SIGNAL(editingFinished()), this,
             SLOT(refreshTextOffender()));
-    connect(editOffenderY, SIGNAL(editingFinished()), model,
-            SLOT(resetPositionChanges()));
 
     connect(editBallX, SIGNAL(editingFinished()), this,
             SLOT(refreshTextBall()));
-    connect(editBallX, SIGNAL(editingFinished()), model,
-            SLOT(resetBallChanges()));
-
     connect(editBallY, SIGNAL(editingFinished()), this,
             SLOT(refreshTextBall()));
-    connect(editBallY, SIGNAL(editingFinished()), model,
-            SLOT(resetBallChanges()));
 
     // Conect line edit widgets' returnPressed signals
-    connect(editDefenderX, SIGNAL(returnPressed()), model,
-            SLOT(confirmPositionChange()));
     connect(editDefenderX, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
-
-    connect(editDefenderY, SIGNAL(returnPressed()), model,
-            SLOT(confirmPositionChange()));
+            SLOT(setDefenderXPosition()));
     connect(editDefenderY, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
+            SLOT(setDefenderYPosition()));
 
-    connect(editMiddieX, SIGNAL(returnPressed()), model,
-            SLOT(confirmPositionChange()));
     connect(editMiddieX, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
-
-    connect(editMiddieY, SIGNAL(returnPressed()), model,
-            SLOT(confirmPositionChange()));
+            SLOT(setMiddieXPosition()));
     connect(editMiddieY, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
+            SLOT(setMiddieYPosition()));
 
-    connect(editOffenderX, SIGNAL(returnPressed()), model,
-            SLOT(confirmPositionChange()));
     connect(editOffenderX, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
-
-    connect(editOffenderY, SIGNAL(returnPressed()), model,
-            SLOT(confirmPositionChange()));
+            SLOT(setOffenderXPosition()));
     connect(editOffenderY, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
+            SLOT(setOffenderYPosition()));
 
-    connect(editBallX, SIGNAL(returnPressed()), model,
-            SLOT(confirmBallChange()));
     connect(editBallX, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
-
-    connect(editBallY, SIGNAL(returnPressed()), model,
-            SLOT(confirmBallChange()));
+            SLOT(setBallX()));
     connect(editBallY, SIGNAL(returnPressed()), this,
-            SLOT(updatePositions()));
+            SLOT(setBallY()));
 
     mainLayout->addLayout(field);
     mainLayout->addLayout(settings);
@@ -294,9 +234,50 @@ void PlaybookCreator::refreshTextOffender()
 
 void PlaybookCreator::refreshTextBall()
 {
+    updatePositions();
     editBallX->setText(QString::number(model->getBallX()));
     editBallY->setText(QString::number(model->getBallY()));
     qDebug() << "displaying the ball's true position now.";
+}
+
+void PlaybookCreator::setDefenderXPosition()
+{
+    model->setDefenderXPosition(editDefenderX->text().toInt());
+}
+
+void PlaybookCreator::setDefenderYPosition()
+{
+    model->setDefenderYPosition(editDefenderY->text().toInt());
+}
+
+void PlaybookCreator::setMiddieXPosition()
+{
+    model->setMiddieXPosition(editMiddieX->text().toInt());
+}
+
+void PlaybookCreator::setMiddieYPosition()
+{
+    model->setMiddieYPosition(editMiddieY->text().toInt());
+}
+
+void PlaybookCreator::setOffenderXPosition()
+{
+    model->setOffenderXPosition(editOffenderX->text().toInt());
+}
+
+void PlaybookCreator::setOffenderYPosition()
+{
+    model->setOffenderYPosition(editOffenderY->text().toInt());
+}
+
+void PlaybookCreator::setBallX()
+{
+    model->setBallX(editBallX->text().toInt());
+}
+
+void PlaybookCreator::setBallY()
+{
+    model->setBallY(editBallY->text().toInt());
 }
 
 } // namespace playbook

@@ -42,7 +42,6 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
             }
         }
     }
-    resetPositionChanges();
 }
 
 PlaybookPosition** PlaybookModel::getRobotPositions()
@@ -149,77 +148,49 @@ short PlaybookModel::convertRoleToPlaybookIndex(short role)
     return roleIndex;
 }
 
-void PlaybookModel::setDefenderXPosition(QString x_)
+void PlaybookModel::setDefenderXPosition(int x_)
 {
-    tempDefenderX = x_.toInt();
+    int roleIndex = convertRoleToPlaybookIndex(DEFENDER);
+    playbook[goalieOn][roleIndex][ball_x][ball_y]->x = x_;
 }
-void PlaybookModel::setDefenderYPosition(QString y_)
+void PlaybookModel::setDefenderYPosition(int y_)
 {
-    tempDefenderY = y_.toInt();
-}
-
-void PlaybookModel::setMiddieXPosition(QString x_)
-{
-    tempMiddieX = x_.toInt();
-}
-void PlaybookModel::setMiddieYPosition(QString y_)
-{
-    tempMiddieY = y_.toInt();
+    int roleIndex = convertRoleToPlaybookIndex(DEFENDER);
+    playbook[goalieOn][roleIndex][ball_x][ball_y]->y = y_;
 }
 
-void PlaybookModel::setOffenderXPosition(QString x_)
+void PlaybookModel::setMiddieXPosition(int x_)
 {
-    tempOffenderX = x_.toInt();
+    int roleIndex = convertRoleToPlaybookIndex(MIDDIE);
+    playbook[goalieOn][roleIndex][ball_x][ball_y]->x = x_;
 }
-void PlaybookModel::setOffenderYPosition(QString y_)
+void PlaybookModel::setMiddieYPosition(int y_)
 {
-    tempOffenderY = y_.toInt();
-}
-
-void PlaybookModel::confirmPositionChange()
-{
-    setPosition(tempDefenderX, DEFENDER, true);
-    setPosition(tempDefenderY, DEFENDER, false);
-    setPosition(tempMiddieX, MIDDIE, true);
-    setPosition(tempMiddieY, MIDDIE, false);
-    setPosition(tempOffenderX, OFFENDER, true);
-    setPosition(tempOffenderY, OFFENDER, false);
-    qDebug() << "confirming change to a position.";
+    int roleIndex = convertRoleToPlaybookIndex(MIDDIE);
+    playbook[goalieOn][roleIndex][ball_x][ball_y]->y = y_;
 }
 
-void PlaybookModel::resetPositionChanges()
+void PlaybookModel::setOffenderXPosition(int x_)
 {
-    tempDefenderX = playbook[goalieOn][convertRoleToPlaybookIndex(DEFENDER)][ball_x][ball_y]->x;
-    tempDefenderY = playbook[goalieOn][convertRoleToPlaybookIndex(DEFENDER)][ball_x][ball_y]->y;
-    tempMiddieX = playbook[goalieOn][convertRoleToPlaybookIndex(MIDDIE)][ball_x][ball_y]->x;
-    tempMiddieY = playbook[goalieOn][convertRoleToPlaybookIndex(MIDDIE)][ball_x][ball_y]->y;
-    tempOffenderX = playbook[goalieOn][convertRoleToPlaybookIndex(OFFENDER)][ball_x][ball_y]->x;
-    tempOffenderY = playbook[goalieOn][convertRoleToPlaybookIndex(OFFENDER)][ball_x][ball_y]->y;
-    qDebug() << "resetting position fields.";
+    int roleIndex = convertRoleToPlaybookIndex(OFFENDER);
+    playbook[goalieOn][roleIndex][ball_x][ball_y]->x = x_;
+}
+void PlaybookModel::setOffenderYPosition(int y_)
+{
+    int roleIndex = convertRoleToPlaybookIndex(OFFENDER);
+    playbook[goalieOn][roleIndex][ball_x][ball_y]->y = y_;
 }
 
-void PlaybookModel::confirmBallChange()
+void PlaybookModel::setBallX(int x_)
 {
-    ball_x = tempBallX;
-    ball_y = tempBallY;
-    qDebug() << "confirming change to ball's position.";
+    ball_x = x_;
+    qDebug() << "setting the ball's x position to: " << x_;
 }
 
-void PlaybookModel::resetBallChanges()
+void PlaybookModel::setBallY(int y_)
 {
-    tempBallX = ball_x;
-    tempBallY = ball_y;
-    qDebug() << "resetting ball fields.";
-}
-
-void PlaybookModel::setBallX(QString x_)
-{
-    tempBallX = x_.toInt();
-}
-
-void PlaybookModel::setBallY(QString y_)
-{
-    tempBallY = y_.toInt();
+    ball_y = y_;
+    qDebug() << "setting the ball's y position to: " << y_;
 }
 
 }

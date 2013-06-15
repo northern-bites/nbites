@@ -50,26 +50,24 @@ public:
     short getBallX(){return ball_x;};
     short getBallY(){return ball_y;};
 
+    void setDefenderXPosition(int x_);
+    void setDefenderYPosition(int y_);
+    void setMiddieXPosition(int x_);
+    void setMiddieYPosition(int y_);
+    void setOffenderXPosition(int x_);
+    void setOffenderYPosition(int y_);
+    void setBallX(int x_);
+    void setBallY(int y_);
+
+
 protected slots:
     void toggleGoalie(bool on);
     void toggleDefender(bool on);
     void toggleOffender(bool on);
     void toggleMiddie(bool on);
-    void setDefenderXPosition(QString x_);
-    void setDefenderYPosition(QString y_);
-    void setMiddieXPosition(QString x_);
-    void setMiddieYPosition(QString y_);
-    void setOffenderXPosition(QString x_);
-    void setOffenderYPosition(QString y_);
     void setTwoFieldPlayers(bool checked);
     void setThreeFieldPlayers(bool checked);
     void setFourFieldPlayers(bool checked);
-    void setBallX(QString x_);
-    void setBallY(QString y_);
-    void confirmPositionChange();
-    void resetPositionChanges();
-    void confirmBallChange();
-    void resetBallChanges();
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
@@ -86,15 +84,6 @@ protected:
     int numActiveFieldPlayers;
     short ball_x;
     short ball_y;
-
-    short tempDefenderX;
-    short tempDefenderY;
-    short tempMiddieX;
-    short tempMiddieY;
-    short tempOffenderX;
-    short tempOffenderY;
-    short tempBallX;
-    short tempBallY;
 
     int BOX_SIZE;
     int GRID_WIDTH;
