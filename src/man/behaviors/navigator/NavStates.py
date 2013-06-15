@@ -132,7 +132,7 @@ goToPosition.bookingIt = False
 
 def avoidLeft(nav):
     if nav.firstFrame():
-        avoidDest = RelRobotLocation(0, 25, 0)
+        avoidDest = RelRobotLocation(-5, 25, 0)
         helper.setOdometryDestination(nav, avoidDest)
         return nav.stay()
 
@@ -140,11 +140,27 @@ def avoidLeft(nav):
 
 def avoidRight(nav):
     if nav.firstFrame():
-        avoidDest = RelRobotLocation(0, -25, 0)
+        avoidDest = RelRobotLocation(-5, -25, 0)
         helper.setOdometryDestination(nav, avoidDest)
         return nav.stay()
 
     return Transition.getNextState(nav, avoidRight)
+
+def avoidBack(nav):
+    if nav.firstFrame():
+        avoidDest = RelRobotLocation(-20, 0, 0)
+        helper.setOdometryDestination(nav, avoidDest)
+        return nav.stay()
+
+    return Transition.getNextState(nav, avoidBack)
+
+def avoidForward(nav):
+    if nav.firstFrame():
+        avoidDest = RelRobotLocation(20, 0, 0)
+        helper.setOdometryDestination(nav, avoidDest)
+        return nav.stay()
+
+    return Transition.getNextState(nav, avoidForward)
 
 def briefStand(nav):
     if nav.firstFrame():

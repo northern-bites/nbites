@@ -61,7 +61,18 @@ class Navigator(FSA.FSA):
             Transition.CountTransition(navTrans.shouldDodgeRight,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : NavStates.avoidRight
+            : NavStates.avoidRight,
+
+            Transition.CountTransition(navTrans.shouldDodgeBack,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidBack,
+
+            Transition.CountTransition(navTrans.shouldDodgeForward,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidForward
+
             }
 
         NavStates.avoidLeft.transitions = {
@@ -72,6 +83,20 @@ class Navigator(FSA.FSA):
             }
 
         NavStates.avoidRight.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.avoidBack.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.avoidForward.transitions = {
             Transition.CountTransition(navTrans.doneDodging,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
