@@ -107,10 +107,10 @@ def prepareForKick(player):
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
-
+ 
     if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
         dr_trans.facingGoal(player)):
-    return player.goNow('dribble')
+        return player.goNow('dribble')
 
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
@@ -241,10 +241,6 @@ def positionForKick(player):
     if transitions.shouldFindBallKick(player) and player.counter > 15:
         player.inKickingState = False
         return player.goLater('chase')
-
-    # If ball moves, don't just try to kick anyway!
-    if transitions.ballMovedFromLastSpot(player):
-        return player.goLater('prepareForKick')
 
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):

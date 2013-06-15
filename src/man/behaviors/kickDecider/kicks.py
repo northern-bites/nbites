@@ -84,8 +84,8 @@ RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
 # Dribble kick just tells player to run thru the ball, no actual sweet move
-LEFT_DRIBBLE =  Kick("L_Dribble", x = 5, y = 3.5)
-RIGHT_DRIBBLE =  Kick("R_Dribble", x = 5, y = -3.5)
+LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.5)
+RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.5)
 
 def chooseAlignedKickFromKick(player, kick):
     ballRelY = player.brain.ball.rel_y

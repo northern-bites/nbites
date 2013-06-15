@@ -8,22 +8,31 @@ def crowded(player):
     The vision heat map is showing a crowded area in front of me.
     """
     print "Crowded?"
-    print (player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
-            or player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
-            or player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST)
-    return (player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
-            or player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
-            or player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST)
+    print ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
+            and not player.brain.interface.visionObstacle.left_dist == 0)
+            or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
+            and not player.brain.interface.visionObstacle.mid_dist == 0)
+            or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
+            and not player.brain.interface.visionObstacle.right_dist == 0))
+    return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
+            and not player.brain.interface.visionObstacle.left_dist == 0)
+            or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
+            and not player.brain.interface.visionObstacle.mid_dist == 0)
+            or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
+            and not player.brain.interface.visionObstacle.right_dist == 0))
 
 def centerLaneOpen(player):
     """
     I have an open lane right in front of me.
     """
     print "Center lane?"
+    print player.brain.interface.visionObstacle.mid_dist
     print (player.brain.interface.visionObstacle.mid_dist > 
-            constants.OPEN_LANE_DIST) 
+            constants.OPEN_LANE_DIST or 
+            player.brain.interface.visionObstacle.mid_dist == 0) 
     return (player.brain.interface.visionObstacle.mid_dist > 
-            constants.OPEN_LANE_DIST) 
+            constants.OPEN_LANE_DIST or 
+            player.brain.interface.visionObstacle.mid_dist == 0) 
 
 def middleThird(player):
     """
@@ -49,9 +58,22 @@ def facingGoal(player):
 
     print "Facing goal?"
     print bearingForKick
-    return True
     # return (bearingForKick < constants.FACING_FORWARD_DEG and 
     #         bearingForKick > -constants.FACING_FORWARD_DEG)
+    return True
+
+def ballToOurLeft(player):
+    """
+    The ball is to our left.
+    """
+    goalCenter = objects.Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,
+                                  nogginConstants.CENTER_FIELD_Y)
+    ballLocation = objects.Location(player.brain.ball.x, player.brain.ball.y)
+
+    headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
+    bearingForKick = headingBallToGoalCenter - player.brain.loc.h
+
+    return (bearingForKick > 0)
 
 def seesBall(player):
     """
@@ -72,6 +94,12 @@ def ballGotFarAway(player):
     """
     ball = player.brain.ball
     return ball.vis.on and ball.distance > constants.BALL_FAR_AWAY
+
+def navDone(player):
+    """
+    Nav is done.
+    """
+    return player.brain.nav.isAtPosition()
 
 # def ballMoved(player):
 #     """
@@ -115,8 +143,3 @@ def ballGotFarAway(player):
 #     """
 #     return player.counter > 200
 # 
-# def navDone(player):
-#     """
-#     Nav is done.
-#     """
-#     return player.brain.nav.isAtPosition()
