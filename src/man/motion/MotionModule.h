@@ -48,6 +48,7 @@ namespace motion
 // For arm contact detection
 static const unsigned int FRAMES_DELAY = 5;
 static const float DISPLACEMENT_THRESH = 0.04f;
+static const float SPEED_BASED_ERROR_REDUCTION = 600.f;
 
 /**
  * @class MotionModule

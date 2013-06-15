@@ -1235,15 +1235,20 @@ void MotionModule::updateArmContact()
         expectedJoints.pop();
     }
 
-    float leftPitchD = (jointsWithDelay->l_shoulder_pitch() -
-                        jointsInput_.message().l_shoulder_pitch());
-    float leftRollD = (jointsWithDelay->l_shoulder_roll() -
-                       jointsInput_.message().l_shoulder_roll());
+    float f_left = std::max(0.f, 1 - (walkProvider.leftHandSpeed() /
+                                      SPEED_BASED_ERROR_REDUCTION));
+    float f_right = std::max(0.f, 1 - (walkProvider.rightHandSpeed() /
+                                       SPEED_BASED_ERROR_REDUCTION));
 
-    float rightPitchD = (jointsWithDelay->r_shoulder_pitch() -
-                        jointsInput_.message().r_shoulder_pitch());
-    float rightRollD = (jointsWithDelay->r_shoulder_roll() -
-                       jointsInput_.message().r_shoulder_roll());
+    float leftPitchD = f_left * (jointsWithDelay->l_shoulder_pitch() -
+                                 jointsInput_.message().l_shoulder_pitch());
+    float leftRollD = f_left * (jointsWithDelay->l_shoulder_roll() -
+                                jointsInput_.message().l_shoulder_roll());
+
+    float rightPitchD = f_right * (jointsWithDelay->r_shoulder_pitch() -
+                                   jointsInput_.message().r_shoulder_pitch());
+    float rightRollD = f_right * (jointsWithDelay->r_shoulder_roll() -
+                                  jointsInput_.message().r_shoulder_roll());
 
     messages::ArmContactState::PushDirection leftArm, rightArm;
 
@@ -1292,11 +1297,9 @@ void MotionModule::updateArmContact()
     current.get()->set_right_push_direction(rightArm);
     current.get()->set_left_push_direction(leftArm);
 
-    std::cout << current.get()->DebugString() << std::endl;
-
     armContactOutput_.setMessage(current);
 
-    std::cout << current.get()->DebugString() << std::endl;
+    //std::cout << current.get()->DebugString() << std::endl;
 }
 
 } // namespace motion
