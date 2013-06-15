@@ -82,7 +82,6 @@ include_directories( support )
 include_directories( motion/bhwalk ) # @todo hack?
 
 # Actual modules
-add_subdirectory( arms )
 add_subdirectory( audio )
 add_subdirectory( balltrack )
 add_subdirectory( behaviors )
@@ -111,7 +110,6 @@ add_library(
 
 target_link_libraries(
   man
-  arms
   audio
   balltrack
   behaviors

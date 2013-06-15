@@ -12,6 +12,7 @@ MotionModule::MotionModule()
       stiffnessOutput_(base()),
       odometryOutput_(base()),
       motionStatusOutput_(base()),
+      armContactOutput_(base()),
       curProvider(&nullBodyProvider),
       nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
@@ -86,6 +87,7 @@ void MotionModule::run_()
         //     the messages that we output.
         updateOdometry();
         updateStatus();
+        updateArmContact();
 
         newInputJoints = false;
         frameCount++;
@@ -1221,6 +1223,80 @@ void MotionModule::updateStatus()
     status.get()->set_calibrated(calibrated());
 
     motionStatusOutput_.setMessage(status);
+}
+
+void MotionModule::updateArmContact()
+{
+    expectedJoints.push(*jointsOutput_.getMessage(true).get());
+    messages::JointAngles* jointsWithDelay = &expectedJoints.front();
+
+    if (expectedJoints.size() > FRAMES_DELAY)
+    {
+        expectedJoints.pop();
+    }
+
+    float leftPitchD = (jointsWithDelay->l_shoulder_pitch() -
+                        jointsInput_.message().l_shoulder_pitch());
+    float leftRollD = (jointsWithDelay->l_shoulder_roll() -
+                       jointsInput_.message().l_shoulder_roll());
+
+    float rightPitchD = (jointsWithDelay->r_shoulder_pitch() -
+                        jointsInput_.message().r_shoulder_pitch());
+    float rightRollD = (jointsWithDelay->r_shoulder_roll() -
+                       jointsInput_.message().r_shoulder_roll());
+
+    messages::ArmContactState::PushDirection leftArm, rightArm;
+
+    // LEFT arm
+    if (fabs(leftPitchD) > fabs(leftRollD))
+    {
+        if (fabs(leftPitchD) > DISPLACEMENT_THRESH)
+        {
+            if (leftPitchD > 0) leftArm = messages::ArmContactState::NORTH;
+            else leftArm = messages::ArmContactState::SOUTH;
+        }
+        else leftArm = messages::ArmContactState::NONE;
+    }
+    else
+    {
+        if (fabs(leftRollD) > DISPLACEMENT_THRESH)
+        {
+            if (leftRollD > 0) leftArm = messages::ArmContactState::EAST;
+            else leftArm = messages::ArmContactState::WEST;
+        }
+        else leftArm = messages::ArmContactState::NONE;
+    }
+
+    // RIGHT arm
+    if (fabs(rightPitchD) > fabs(rightRollD))
+    {
+        if (fabs(rightPitchD) > DISPLACEMENT_THRESH)
+        {
+            if (rightPitchD > 0) rightArm = messages::ArmContactState::NORTH;
+            else rightArm = messages::ArmContactState::SOUTH;
+        }
+        else rightArm = messages::ArmContactState::NONE;
+    }
+    else
+    {
+        if (fabs(rightRollD) > DISPLACEMENT_THRESH)
+        {
+            if (rightRollD > 0) rightArm = messages::ArmContactState::EAST;
+            else rightArm = messages::ArmContactState::WEST;
+        }
+        else rightArm = messages::ArmContactState::NONE;
+    }
+
+    portals::Message<messages::ArmContactState> current(0);
+
+    current.get()->set_right_push_direction(rightArm);
+    current.get()->set_left_push_direction(leftArm);
+
+    std::cout << current.get()->DebugString() << std::endl;
+
+    armContactOutput_.setMessage(current);
+
+    std::cout << current.get()->DebugString() << std::endl;
 }
 
 } // namespace motion
