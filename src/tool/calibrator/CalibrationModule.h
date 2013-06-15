@@ -63,6 +63,14 @@ private:
     int currentX, currentY, currentH;
     float backupPitch, backupRoll;
 
+    QWidget central;
+    QHBoxLayout mainLayout;
+
+    QTabWidget images;
+
+    QWidget side;
+    QGridLayout sideLayout;
+
     QFrame divider[4];
 
     QLabel enabled, position, parameters;
@@ -75,14 +83,6 @@ private:
     QComboBox robotNames;
 
     image::OverlayDisplayModule topImage, bottomImage;
-
-    QTabWidget images;
-
-    QGridLayout sideLayout;
-    QWidget side;
-
-    QHBoxLayout mainLayout;
-    QWidget central;
 };
 
 }

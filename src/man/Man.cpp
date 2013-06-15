@@ -9,7 +9,8 @@
 
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
-SET_POOL_SIZE(messages::JointAngles, 16);
+SET_POOL_SIZE(messages::JointAngles, 24);
+SET_POOL_SIZE(messages::InertialState, 16);
 SET_POOL_SIZE(messages::PackedImage16, 16);
 SET_POOL_SIZE(messages::YUVImage, 16);
 SET_POOL_SIZE(messages::RobotLocation, 16);
@@ -23,6 +24,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       sensors(broker),
       jointEnactor(broker),
       motion(),
+      arms(),
       guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
       guardian(),
       audio(),
@@ -64,6 +66,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
     sensorsThread.addModule(jointEnactor);
     sensorsThread.addModule(motion);
+    sensorsThread.addModule(arms);
 
     sensors.printInput.wireTo(&guardian.printJointsOutput, true);
 
@@ -78,6 +81,10 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
     jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
+
+    arms.actualJointsIn.wireTo(&sensors.jointsOutput_);
+    arms.expectedJointsIn.wireTo(&motion.jointsOutput_);
+    arms.handSpeedsIn.wireTo(&motion.handSpeedsOutput_);
 
     /** Guardian **/
     guardianThread.addModule(guardian);
@@ -179,6 +186,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     behaviors.footBumperStateIn.wireTo(&sensors.footbumperOutput_, true);
     behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
     behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+    behaviors.armContactStateIn.wireTo(&arms.contactOut, true);
+
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);

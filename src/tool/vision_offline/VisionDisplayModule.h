@@ -39,7 +39,6 @@ class VisionDisplayModule : public QMainWindow,
     Q_OBJECT;
 
 public:
-
     VisionDisplayModule(QWidget *parent = 0);
 
     // These are just pointers to the converter modules' InPortals
@@ -62,12 +61,10 @@ public:
 
 protected slots:
 
-
 protected:
     virtual void run_();
 
 private:
-
     QImage makeOverlay(Camera::Type which);
 
 
@@ -77,7 +74,6 @@ private:
     // This module contains its own diagram! Trippy.
     portals::RoboGram subdiagram;
 
-
     // Modules
     image::OverlayDisplayModule topDisplay;
     image::OverlayDisplayModule bottomDisplay;
@@ -85,7 +81,6 @@ private:
     image::ThresholdedImageDisplayModule botThrDisplay;
     man::vision::VisionModule visMod;
     color::ColorTable colorTable;
-
 
     // to view vision data
     logview::TypedProtoViewer<messages::VisionField>* field_viewer;
@@ -108,8 +103,6 @@ private:
 
     portals::OutPortal<messages::JointAngles> joints;
     portals::OutPortal<messages::InertialState> inertials;
-
-
 };
 
 }

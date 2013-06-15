@@ -29,7 +29,7 @@ PRECISELY = (1.0, 1.0, 5)
 LEFT = 1
 RIGHT = -LEFT
 
-DEBUG_MOTION_STATUS = True
+DEBUG_MOTION_STATUS = False
 
 class Navigator(FSA.FSA):
     """it gets you where you want to go"""
@@ -61,7 +61,18 @@ class Navigator(FSA.FSA):
             Transition.CountTransition(navTrans.shouldDodgeRight,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : NavStates.avoidRight
+            : NavStates.avoidRight,
+
+            Transition.CountTransition(navTrans.shouldDodgeBack,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidBack,
+
+            Transition.CountTransition(navTrans.shouldDodgeForward,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : NavStates.avoidForward
+
             }
 
         NavStates.avoidLeft.transitions = {
@@ -72,6 +83,20 @@ class Navigator(FSA.FSA):
             }
 
         NavStates.avoidRight.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.avoidBack.transitions = {
+            Transition.CountTransition(navTrans.doneDodging,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
+            : NavStates.briefStand
+            }
+
+        NavStates.avoidForward.transitions = {
             Transition.CountTransition(navTrans.doneDodging,
                                        Transition.ALL_OF_THE_TIME,
                                        Transition.INSTANT)
@@ -94,9 +119,10 @@ class Navigator(FSA.FSA):
 
     def positionPlaybook(self):
         """
-        Calls goTo on the playbook position, which should be a RobotLocation.
+        Calls goTo on the playbook position
         """
-        self.goTo(self.brain.play.getPosition(), speed = FAST_SPEED, avoidObstacles = True, fast = False)
+        self.goTo(self.brain.play.getPositionCoord(), precision = GENERAL_AREA,
+                  speed = QUICK_SPEED, avoidObstacles = True, fast = True, pb = True)
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):
         """
@@ -106,7 +132,8 @@ class Navigator(FSA.FSA):
         """
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
-    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED, avoidObstacles = False, adaptive = False, fast = False):
+    def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
+             avoidObstacles = False, adaptive = False, fast = False, pb = False):
         """
         General go to method.
         Ideal for going to a field position, or for going to a relative location
@@ -142,6 +169,8 @@ class Navigator(FSA.FSA):
 
         @param fast: books it using velocity walk; Best if dest is straight ahead!
         Use it to look like a baller on the field.
+
+        @param pb: Set true if playbook positioning so we switch from fast to odometry walk when in the general area
         """
 
         # Debug prints for motion status (seeking the walking not walking bug)
@@ -159,6 +188,7 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.avoidObstacles = avoidObstacles
         NavStates.goToPosition.adaptive = adaptive
         NavStates.goToPosition.fast = fast
+        NavStates.goToPosition.pb = pb
 
         if self.currentState is not 'goToPosition':
             self.switchTo('goToPosition')

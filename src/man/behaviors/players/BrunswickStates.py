@@ -73,6 +73,11 @@ def gameSet(player):
             # This method is broken.
             #player.brain.resetSetLocalization()
 
+    # If we think we're on the wrong side, reset to the correct field cross
+    #  and loc will take care of the rest.
+    player.brain.checkSetLocalization()
+
+
     if (player.play.isChaser() and
         player.brain.gameController.ownKickOff):
         player.shouldKickOff = True

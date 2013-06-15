@@ -42,6 +42,8 @@ public:
     int * getTopEdge(){
         return topEdge;
     }
+	int getPeak() {return peak;}
+	int findSlant();
 
     // scan operations
     int yProject(int startx, int starty, int newy);
@@ -70,6 +72,7 @@ private:
 	int horizon;
 	int poseHorizon;
 	float slope;
+	int peak;
 
     bool shoot[IMAGE_WIDTH];
 	int  topEdge[IMAGE_WIDTH+1];
@@ -77,9 +80,11 @@ private:
 #ifdef OFFLINE
     bool debugHorizon;
     bool debugFieldEdge;
+	bool debugDrawFieldEdge;
 #else
     static const bool debugHorizon = false;
     static const bool debugFieldEdge = false;
+	static const bool debugDrawFieldEdge = false;
 #endif
 };
 

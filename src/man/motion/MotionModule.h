@@ -33,6 +33,7 @@
 #include "MotionStatus.pb.h"
 #include "StiffnessControl.pb.h"
 #include "FallStatus.pb.h"
+#include "HandSpeeds.pb.h"
 
 #include <vector>
 
@@ -43,6 +44,7 @@ namespace man
 {
 namespace motion
 {
+
 /**
  * @class MotionModule
  */
@@ -222,6 +224,7 @@ public:
     portals::OutPortal<messages::JointAngles>  stiffnessOutput_;
     portals::OutPortal<messages::RobotLocation> odometryOutput_;
     portals::OutPortal<messages::MotionStatus> motionStatusOutput_;
+    portals::OutPortal<messages::HandSpeeds> handSpeedsOutput_;
 
 private:
     void preProcess();
@@ -258,6 +261,9 @@ private:
 
     // Make a new status proto and set it on the out portal
     void updateStatus();
+
+    // Update the hand speeds
+    void updateHandSpeeds();
 
     BHWalkProvider          walkProvider;
     ScriptedProvider        scriptedProvider;
