@@ -42,6 +42,15 @@ def shouldDodgeLeft(nav):
     feet = (footBumperState.r_foot_bumper_left.pressed or
             footBumperState.r_foot_bumper_right.pressed)
 
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.WEST) or
+            (armState.right_push_direction is armState.WEST))
+
+    # Prioritize arms, experimentally
+    if arms:
+        return True
+
     # Take 2 of 3, indicates that we should dodge
     if (feet and vision):
         return True
@@ -71,12 +80,55 @@ def shouldDodgeRight(nav):
     feet = (footBumperState.l_foot_bumper_left.pressed or
             footBumperState.l_foot_bumper_right.pressed)
 
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.EAST) or
+            (armState.right_push_direction is armState.EAST))
+
+    # Prioritize arms, experimentally
+    if arms:
+        return True
+
     # If 2 of 3, indicates that we should dodge
     if (feet and vision):
         return True
     if (vision and sonars):
         return True
     elif (sonars and feet):
+        return True
+
+    else:
+        return False
+
+# ie should move backwards
+def shouldDodgeBack(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
+
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.SOUTH) or
+            (armState.right_push_direction is armState.SOUTH))
+
+    # Only use arms, experimentally
+    if arms:
+        return True
+
+    else:
+        return False
+
+# ie should move forwards
+def shouldDodgeForward(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
+
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.NORTH) or
+            (armState.right_push_direction is armState.NORTH))
+
+    # Only use arms, experimentally
+    if arms:
         return True
 
     else:

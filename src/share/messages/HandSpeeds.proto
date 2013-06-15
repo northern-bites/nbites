@@ -1,0 +1,7 @@
+package messages;
+
+message HandSpeeds
+{
+   optional float left_speed = 1;
+   optional float right_speed = 2;
+}

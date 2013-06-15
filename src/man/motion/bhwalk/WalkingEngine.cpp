@@ -338,6 +338,24 @@ void WalkingEngine::update()
           joint_hardnesses[i] = float(walkingEngineOutput.jointHardness.hardness[i]) / 100.f;
       }
   }
+
+  // Northern Bites hack to get the hand speeds from BHuman odometry
+  updateHandSpeeds();
+}
+
+void WalkingEngine::updateHandSpeeds()
+{
+    const Vector3<>& leftHandPos3D = theRobotModel.limbs[MassCalibration::foreArmLeft].translation;
+    Vector2<> leftHandPos(leftHandPos3D.x, leftHandPos3D.y);
+    Vector2<> leftHandSpeedVec = (odometryOffset + Pose2D(leftHandPos) - Pose2D(lastLeftHandPos)).translation / theFrameInfo.cycleTime;
+    leftHandSpeed = leftHandSpeedVec.abs();
+    lastLeftHandPos = leftHandPos;
+
+    const Vector3<>& rightHandPos3D = theRobotModel.limbs[MassCalibration::foreArmRight].translation;
+    Vector2<> rightHandPos(rightHandPos3D.x, rightHandPos3D.y);
+    Vector2<> rightHandSpeedVec = (odometryOffset + Pose2D(rightHandPos) - Pose2D(lastRightHandPos)).translation / theFrameInfo.cycleTime;
+    rightHandSpeed = rightHandSpeedVec.abs();
+    lastRightHandPos = rightHandPos;
 }
 
 void WalkingEngine::updateMotionRequest()

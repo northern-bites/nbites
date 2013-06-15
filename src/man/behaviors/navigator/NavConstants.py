@@ -5,7 +5,7 @@ ORBIT_LEFT = -1               # Spin right to orbit left
 ORBIT_RIGHT = 1               # Spin left to orbit right
 MIN_ORBIT_ANGLE = 10
 # @TODO: maybe make this a parameter of goTo?
-ADAPT_DISTANCE = 30.0
+ADAPT_DISTANCE = 60.0
 
 ZERO_SPEEDS = (0.0, 0.0, 0.0)
 

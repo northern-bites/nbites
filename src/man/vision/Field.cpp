@@ -52,6 +52,7 @@ Field::Field(Vision* vis, Threshold * thr)
 	// funding. - chown
 #ifdef OFFLINE
 	debugFieldEdge = false;
+	debugDrawFieldEdge = false;
 	debugHorizon = false;
 #endif
 }
@@ -243,6 +244,8 @@ void Field::findTopEdges(int M) {
     topEdge[0] = convex[0].y;
     float maxPix = 0.0f;
     estimate e;
+	peak = -1;
+	float maxLine = 1000.0f;
     for (int i = 1; i <= M; i++) {
         int diff = convex[i].y - convex[i-1].y;
         float step = 0.0f;
@@ -253,7 +256,11 @@ void Field::findTopEdges(int M) {
         for (int j = convex[i].x; j > convex[i-1].x; j--) {
             cur -= step;
             topEdge[j] = (int)cur;
-            if (debugFieldEdge) {
+			if (cur < maxLine) {
+				peak = j;
+				maxLine = cur;
+			}
+            if (debugDrawFieldEdge) {
                 if (j < convex[i].x - 2) {
                     vision->drawPoint(j, (int)cur, BLUE);
                 } else {
@@ -261,7 +268,7 @@ void Field::findTopEdges(int M) {
                 }
             }
         }
-        if (debugFieldEdge) {
+        if (debugDrawFieldEdge) {
             vision->drawLine(convex[i-1].x, convex[i-1].y, convex[i].x,
                              convex[i].y, ORANGE);
         }
@@ -288,6 +295,18 @@ void Field::findTopEdges(int M) {
                " there are " << M << " points." << endl;
         cout << "Max dist is " << maxPix << endl;
     }
+}
+
+/* Provides a rough guidline to whether the horizon slopes to the right or left
+   or is roughly horizontal;
+ */
+int Field::findSlant() {
+	if (topEdge[0] > topEdge[IMAGE_HEIGHT - 1] + 20) {
+		return 1;
+	} else if (topEdge[IMAGE_HEIGHT - 1] > topEdge[0] + 20) {
+		return -1;
+	}
+	return 0;
 }
 
 /** Find the convex hull of the field.    We've already found the point of maximal
