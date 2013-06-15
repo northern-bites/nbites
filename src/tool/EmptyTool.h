@@ -47,7 +47,6 @@ protected:
     QToolBar* toolbar;
     QPushButton* prevButton;
     QPushButton* nextButton;
-    QPushButton* recordButton;
     QPushButton* scrollButton;
     QScrollArea* scrollArea;
     QSize* scrollBarSize;
