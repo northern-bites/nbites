@@ -14,10 +14,4 @@ FACING_FORWARD_DEG = 35
 
 # Heat map (distance to something blocking open field) thresholds.
 CROWDED_DIST = 300
-OPEN_LANE_DIST = 200
-
-# Spinning to the ball.
-# SHOULD_SPIN_TO_BALL_Y = 40.0
-# SHOULD_SPIN_TO_BALL_DIST = 350.0
-# SHOULD_SPIN_TO_BALL_BEAR = 15.0
-# STOP_SPINNING_TO_BALL_Y = 20.0
+OPEN_LANE_DIST = 100

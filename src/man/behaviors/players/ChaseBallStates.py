@@ -217,6 +217,10 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
+    if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
+        dr_trans.facingGoal(player)):
+        return player.goNow('dribble')
+
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
     positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],

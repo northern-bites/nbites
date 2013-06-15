@@ -10,14 +10,18 @@ from objects import RelRobotLocation, Location
 # from math import fabs
 # import noggin_constants as nogginConstants
 
+### TODO
+# 1. choose direction better, based on loc and heatmap
+# 2. rotate a little longer post open lane found
 def dribble(player):
     """
     Super State to determine what to do from various situations.
     """
-    if not transitions.seesBall(player):
+    if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif (transitions.facingGoal(player) and transitions.middleThird(player) 
-        and transitions.crowded(player)):
+        and transitions.crowded(player) 
+        and not transitions.ballGotFarAway(player)):
         return player.goNow('decideDribble')
     else:
         return player.goLater('chase')
@@ -56,7 +60,7 @@ def executeDribble(player):
         # player.ballBeforeApproach = player.brain.ball
         # player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.goTo(player.kickPose,
-                              Navigator.PRECISELY,
+                              Navigator.CLOSE_ENOUGH,
                               Navigator.MEDIUM_SPEED,
                               False,
                               False)
@@ -64,7 +68,7 @@ def executeDribble(player):
         player.brain.nav.updateDest(player.kickPose)
 
     if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
-        transitions.navDone(player)):
+        transitions.navDone(player)) or not transitions.crowded(player):
         return player.goLater('dribble')
     elif not transitions.centerLaneOpen(player):
         return player.goLater('rotateToOpenSpace')
@@ -76,8 +80,7 @@ def rotateToOpenSpace(player):
     Rotate around ball, so as to find an open lane to dribble thru
     """
     if player.firstFrame():
-        if (player.brain.interface.visionObstacle.left_dist > 
-            player.brain.interface.visionObstacle.right_dist):
+        if transitions.leftLessCrowdedThanRight(player):
             print "Chose left"
             player.setWalk(0, -.5, .15)
         else:

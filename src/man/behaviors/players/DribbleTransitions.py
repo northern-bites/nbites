@@ -39,14 +39,14 @@ def centerLaneOpen(player):
 
 def leftLessCrowdedThanRight(player):
     print "Left lane?"
-    print (player.brain.visionObstacle.block_left == 0 or
-            (player.brain.visionObstacle.left_dist < 
-            player.brain.visionObstacle.right_dist and
-            not player.brain.visionObstacle.block_right == 0))
-    return (player.brain.visionObstacle.block_left == 0 or
-            (player.brain.visionObstacle.left_dist < 
-            player.brain.visionObstacle.right_dist and
-            not player.brain.visionObstacle.block_right == 0))
+    print (player.brain.interface.visionObstacle.block_left == 0 or
+            (player.brain.interface.visionObstacle.left_dist < 
+            player.brain.interface.visionObstacle.right_dist and
+            not player.brain.interface.visionObstacle.block_right == 0))
+    return (player.brain.interface.visionObstacle.block_left == 0 or
+            (player.brain.interface.visionObstacle.left_dist < 
+            player.brain.interface.visionObstacle.right_dist and
+            not player.brain.interface.visionObstacle.block_right == 0))
 
 def middleThird(player):
     """
