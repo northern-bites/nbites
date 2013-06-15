@@ -705,6 +705,13 @@ private:
   StepSize lastStepOffset;
   Pose2D upcomingOdometryOffset;
   bool upcomingOdometryOffsetValid;
+
   // Northern Bites hack for instability issues
   bool shouldReset;
+
+  // Northern Bites hack for hand speed info
+  void updateHandSpeeds();
+  Vector2<> lastLeftHandPos, lastRightHandPos;
+  float leftHandSpeed;
+  float rightHandSpeed;
 };

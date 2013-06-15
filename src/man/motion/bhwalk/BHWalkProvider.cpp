@@ -393,5 +393,13 @@ bool BHWalkProvider::calibrated() const {
     return walkingEngine.theInertiaSensorData.calibrated;
 }
 
+float BHWalkProvider::leftHandSpeed() const {
+    return walkingEngine.leftHandSpeed;
+}
+
+float BHWalkProvider::rightHandSpeed() const {
+    return walkingEngine.rightHandSpeed;
+}
+
 }
 }
