@@ -9,6 +9,7 @@
 #include <string>
 #include <iostream>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 
 #include "RoboCupGameControlData.h"
 
@@ -40,7 +41,7 @@ void GameConnect::setUpSocket()
 
     _socket->bind("", GAMECONTROLLER_PORT); // Listen on the GC port.
 
-    _socket->setTarget("127.0.0.1", GAMECONTROLLER_PORT);
+    _socket->setTarget("255.255.255.255", GAMECONTROLLER_PORT);
 }
 
 void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
@@ -78,7 +79,12 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
 
         out.setMessage(gameMessage);
 
-        _socket->setTarget(from);
+        // Reset the target to the GC that we are getting data from.
+        char destination[INET_ADDRSTRLEN];
+
+        inet_ntop(AF_INET, &((struct sockaddr_in*)&from)->sin_addr,
+                  &destination[0], INET_ADDRSTRLEN);
+        _socket->setTarget(&destination[0], GAMECONTROLLER_PORT);
         _socket->setBroadcast(false);
 
         in.latch();
