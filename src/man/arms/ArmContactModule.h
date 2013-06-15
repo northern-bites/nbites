@@ -15,8 +15,8 @@ namespace man {
 namespace arms {
 
 static const unsigned int FRAMES_DELAY = 5;
-static const float DISPLACEMENT_THRESH = 0.04f;
-static const unsigned int FRAMES_TO_BUFFER = 20;
+static const float DISPLACEMENT_THRESH = 0.02f;
+static const unsigned int FRAMES_TO_BUFFER = 50;
 static const float SPEED_BASED_ERROR_REDUCTION = 600.f;
 
 enum Joint
