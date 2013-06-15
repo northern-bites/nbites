@@ -2823,6 +2823,9 @@ bool ObjectFragments::relativeSizesOk(Blob post1, Blob post2) {
                                                           post2.width()))) {
         return true;
     }
+	if (withinMarginInt(post1.height(), post2.height(), post1.height() / 3)) {
+		return true;
+    }
 	if (post1.height() > 100 && post2.height() > 100) {
 		return true;
 	}
@@ -2841,6 +2844,11 @@ bool ObjectFragments::relativeSizesOk(Blob post1, Blob post2) {
                 return true;
             }
         }
+		// We worry more about posts that are too close than too far
+		if (abs(x1 - x2) > post1.height() / 2 &&
+			withinMargin(dist, CROSSBAR_CM_WIDTH, fudge * 3)) {
+			return true;
+		}
 		if (abs(e.dist - e1.dist) < 100.0f && abs(x1 -x2) > IMAGE_WIDTH / 4 &&
 			dist < CROSSBAR_CM_WIDTH + fudge * 3) {
 			return true;

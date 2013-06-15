@@ -84,8 +84,8 @@ Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con,
     init(0.0);
     allocateColorRuns();
 #ifdef OFFLINE
-    BALLDEBUG = true;
-    BALLDISTDEBUG = true;
+    BALLDEBUG = false;
+    BALLDISTDEBUG = false;
 #endif
 }
 
@@ -1053,6 +1053,14 @@ bool Ball::badSurround(Blob b) {
                     (static_cast<float>(w * h) * GREEN_PERCENT))) {
         if (BALLDEBUG) {
             cout << "Too much real orangered without enough green" << endl;
+        }
+        return true;
+    }
+	if (b.width() * b.height() < 81 &&
+            (static_cast<float>(greens) <
+                    (static_cast<float>(w * h) * GREEN_PERCENT))) {
+        if (BALLDEBUG) {
+            cout << "Nor enough green" << endl;
         }
         return true;
     }
