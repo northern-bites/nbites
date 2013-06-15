@@ -29,6 +29,9 @@ ArmContactModule::ArmContactModule() : Module(),
 
 void ArmContactModule::run_()
 {
+    static int frameCounter = 0;
+    static int numFalsePositives = 0;
+
     actualJointsIn.latch();
     expectedJointsIn.latch();
     handSpeedsIn.latch();
@@ -49,7 +52,18 @@ void ArmContactModule::run_()
     current.get()->set_right_push_direction(rightArm);
     current.get()->set_left_push_direction(leftArm);
 
-    std::cout << current.get()->DebugString() << std::endl;
+    frameCounter++;
+
+    if ((frameCounter > 1000) && (frameCounter%1000 == 0))
+    {
+        std::cout << "## FALSE POSITIVES: " << numFalsePositives << std::endl;
+        numFalsePositives = 0;
+    }
+    if((frameCounter > 1000 && (rightArm != messages::ArmContactState::NONE ||
+                                leftArm != messages::ArmContactState::NONE)))
+    {
+        numFalsePositives++;
+    }
 
     contactOut.setMessage(current);
 }
