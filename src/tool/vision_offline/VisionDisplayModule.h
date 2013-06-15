@@ -33,9 +33,7 @@ namespace vision {
 
 class VisionDisplayModule : public QMainWindow,
                             public portals::Module
-
 {
-
     Q_OBJECT;
 
 public:
@@ -58,7 +56,6 @@ public:
     portals::InPortal<messages::JointAngles> joints_in;
     portals::InPortal<messages::InertialState> inerts_in;
 
-
 protected slots:
 
 protected:
@@ -66,7 +63,6 @@ protected:
 
 private:
     QImage makeOverlay(Camera::Type which);
-
 
     QTabWidget* imageTabs;
     Camera::Type currentCamera;
