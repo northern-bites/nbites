@@ -15,9 +15,10 @@ namespace man {
 namespace arms {
 
 static const unsigned int FRAMES_DELAY = 5;
-static const float DISPLACEMENT_THRESH = 0.02f;
+static const float DISPLACEMENT_THRESH = 0.03f;
 static const unsigned int FRAMES_TO_BUFFER = 50;
 static const float SPEED_BASED_ERROR_REDUCTION = 600.f;
+static const int STUCK_THRESH = 300;
 
 enum Joint
 {
@@ -48,8 +49,10 @@ protected:
     std::queue<messages::JointAngles> expectedJoints;
     messages::JointAngles* jointsWithDelay;
 
-    messages::ArmContactState::PushDirection rightArm;
-    messages::ArmContactState::PushDirection leftArm;
+    messages::ArmContactState::PushDirection rightArm, leftArm;
+    messages::ArmContactState::PushDirection lastDetectedRight,
+                                             lastDetectedLeft;
+    int rightStuckCounter, leftStuckCounter;
 
     DisplacementBuffer right, left;
 };

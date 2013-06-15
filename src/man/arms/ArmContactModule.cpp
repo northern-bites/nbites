@@ -46,10 +46,43 @@ void ArmContactModule::run_()
 
     determineContactState();
 
-    current.get()->set_right_push_direction(rightArm);
-    current.get()->set_left_push_direction(leftArm);
+    if (rightArm != messages::ArmContactState::NONE)
+    {
+        lastDetectedRight = rightArm;
+    }
+    if (leftArm != messages::ArmContactState::NONE)
+    {
+        lastDetectedLeft = leftArm;
+    }
+
+    if (rightArm == lastDetectedRight)  rightStuckCounter++;
+    else rightStuckCounter = 0;
+
+    if (leftArm == lastDetectedLeft)  leftStuckCounter++;
+    else leftStuckCounter = 0;
+
+
+    // If an arm is stuck, override what we just computed for it
+    if (rightStuckCounter < STUCK_THRESH)
+    {
+        current.get()->set_right_push_direction(rightArm);
+    }
+    else
+    {
+        current.get()->set_right_push_direction(messages::ArmContactState::NONE);
+    }
+    if (leftStuckCounter < STUCK_THRESH)
+    {
+        current.get()->set_left_push_direction(leftArm);
+    }
+    else
+    {
+        current.get()->set_left_push_direction(messages::ArmContactState::NONE);
+    }
 
     contactOut.setMessage(current);
+
+    //std::cout << current.get()->DebugString() << std::endl;
 }
 
 void ArmContactModule::determineContactState()
