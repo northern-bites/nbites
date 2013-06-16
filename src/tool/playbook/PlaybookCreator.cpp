@@ -28,6 +28,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     lockDefender = new QCheckBox("Lock Defender", this);
     lockOffender = new QCheckBox("Lock Offender", this);
     lockMiddie = new QCheckBox("Lock Middie", this);
+    lockChaser = new QCheckBox("Lock Chaser", this);
     goalie = new QCheckBox("Goalie Active", this);
     goalie->setChecked(true);
     editDefenderX = new QLineEdit("Edit x", this);
@@ -39,6 +40,9 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     editOffenderX = new QLineEdit("Edit x", this);
     editOffenderY = new QLineEdit("Edit y", this);
     editOffenderH = new QLineEdit("Edit h", this);
+    editChaserX = new QLineEdit("Edit x", this);
+    editChaserY = new QLineEdit("Edit y", this);
+    editChaserH = new QLineEdit("Edit h", this);
     twoFieldPlayers = new QRadioButton("&2 Active Field Players", this);
     threeFieldPlayers = new QRadioButton("&3 Active Field Players", this);
     fourFieldPlayers = new QRadioButton("&4 active Field Players", this);
@@ -49,11 +53,13 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     QGroupBox* defenderBox = new QGroupBox("Defender");
     QGroupBox* middieBox = new QGroupBox("Middie");
     QGroupBox* offenderBox = new QGroupBox("Offender");
+    QGroupBox* chaserBox = new QGroupBox("Chaser");
     QGroupBox* ballBox = new QGroupBox("Ball");
 
     QVBoxLayout* defenderBoxLayout = new QVBoxLayout(defenderBox);
     QVBoxLayout* middieBoxLayout = new QVBoxLayout(middieBox);
     QVBoxLayout* offenderBoxLayout = new QVBoxLayout(offenderBox);
+    QVBoxLayout* chaserBoxLayout = new QVBoxLayout(chaserBox);
     QVBoxLayout* ballBoxLayout = new QVBoxLayout(ballBox);
 
     defenderBoxLayout->addWidget(lockDefender);
@@ -68,6 +74,10 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     offenderBoxLayout->addWidget(editOffenderX);
     offenderBoxLayout->addWidget(editOffenderY);
     offenderBoxLayout->addWidget(editOffenderH);
+    chaserBoxLayout->addWidget(lockChaser);
+    chaserBoxLayout->addWidget(editChaserX);
+    chaserBoxLayout->addWidget(editChaserY);
+    chaserBoxLayout->addWidget(editChaserH);
     ballBoxLayout->addWidget(editBallX);
     ballBoxLayout->addWidget(editBallY);
 
@@ -81,6 +91,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings->addWidget(defenderBox);
     settings->addWidget(middieBox);
     settings->addWidget(offenderBox);
+    settings->addWidget(chaserBox);
     settings->addWidget(ballBox);
 
     // Connect checkbox interface (including disabling lineEdits)
@@ -109,6 +120,15 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(lockMiddie, SIGNAL(toggled(bool)), editMiddieY,
             SLOT(setDisabled(bool)));
     connect(lockMiddie, SIGNAL(toggled(bool)), editMiddieH,
+            SLOT(setDisabled(bool)));
+
+    connect(lockChaser, SIGNAL(toggled(bool)), model,
+            SLOT(toggleChaser(bool)));
+    connect(lockChaser, SIGNAL(toggled(bool)), editChaserX,
+            SLOT(setDisabled(bool)));
+    connect(lockChaser, SIGNAL(toggled(bool)), editChaserY,
+            SLOT(setDisabled(bool)));
+    connect(lockChaser, SIGNAL(toggled(bool)), editChaserH,
             SLOT(setDisabled(bool)));
 
     connect(goalie, SIGNAL(toggled(bool)), model,
@@ -147,6 +167,13 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editOffenderH, SIGNAL(editingFinished()), this,
             SLOT(refreshTextOffender()));
 
+    connect(editChaserX, SIGNAL(editingFinished()), this,
+            SLOT(refreshTextChaser()));
+    connect(editChaserY, SIGNAL(editingFinished()), this,
+            SLOT(refreshTextChaser()));
+    connect(editChaserH, SIGNAL(editingFinished()), this,
+            SLOT(refreshTextChaser()));
+
     connect(editBallX, SIGNAL(editingFinished()), this,
             SLOT(refreshTextBall()));
     connect(editBallY, SIGNAL(editingFinished()), this,
@@ -174,6 +201,13 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editOffenderH, SIGNAL(returnPressed()), this,
             SLOT(setOffenderHPosition()));
 
+    connect(editChaserX, SIGNAL(returnPressed()), this,
+            SLOT(setChaserXPosition()));
+    connect(editChaserY, SIGNAL(returnPressed()), this,
+            SLOT(setChaserYPosition()));
+    connect(editChaserH, SIGNAL(returnPressed()), this,
+            SLOT(setChaserHPosition()));
+
     connect(editBallX, SIGNAL(returnPressed()), this,
             SLOT(setBallX()));
     connect(editBallY, SIGNAL(returnPressed()), this,
@@ -193,26 +227,14 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
 void PlaybookCreator::updateRobotPositions()
 {
     int fieldPlayers = model->getNumActiveFieldPlayers();
-    int i, max;
+    int roleIndex;
     short ballX = model->getBallX();
     short ballY = model->getBallY();
 
-    if (fieldPlayers == 4) {
-        i = 0;
-        max = 3;
-    }
-    else if (fieldPlayers == 3) {
-        i = 3;
-        max = 5;
-    }
-    else if (fieldPlayers == 2) {
-        i = 5;
-        max = 6;
-    }
-
-    for (i; i < max; i++)
+    for (int i = 0; i < fieldPlayers; i++)
     {
-        PlaybookPosition* position = model->playbook[model->getGoalieOn()][ballX][ballY][i];
+        roleIndex = model->convertRoleToPlaybookIndex(i);
+        PlaybookPosition* position = model->playbook[model->getGoalieOn()][ballX][ballY][roleIndex];
 
         fieldPainter->setRobot(position,defaultRoleList[i]);
     }
@@ -237,6 +259,7 @@ void PlaybookCreator::updatePositionsCheck(bool check)
         refreshTextDefender();
         refreshTextMiddie();
         refreshTextOffender();
+        refreshTextChaser();
     }
 }
 
@@ -267,6 +290,15 @@ void PlaybookCreator::refreshTextOffender()
     qDebug() << "displaying the offender's true position now.";
 }
 
+void PlaybookCreator::refreshTextChaser()
+{
+    updatePositions();
+    editChaserX->setText(QString::number(fieldPainter->getRobot(CHASER)->x));
+    editChaserY->setText(QString::number(fieldPainter->getRobot(CHASER)->y));
+    editChaserH->setText(QString::number(fieldPainter->getRobot(CHASER)->h));
+    qDebug() << "displaying the offender's true position now.";
+}
+
 void PlaybookCreator::refreshTextBall()
 {
     updatePositions();
@@ -280,6 +312,7 @@ void PlaybookCreator::refreshTextAll()
     refreshTextDefender();
     refreshTextMiddie();
     refreshTextOffender();
+    refreshTextChaser();
     refreshTextBall();
 }
 
@@ -385,6 +418,21 @@ void PlaybookCreator::setOffenderYPosition()
 void PlaybookCreator::setOffenderHPosition()
 {
     model->setOffenderHPosition(editOffenderH->text().toInt());
+}
+
+void PlaybookCreator::setChaserXPosition()
+{
+    model->setChaserXPosition(editChaserX->text().toInt());
+}
+
+void PlaybookCreator::setChaserYPosition()
+{
+    model->setChaserYPosition(editChaserY->text().toInt());
+}
+
+void PlaybookCreator::setChaserHPosition()
+{
+    model->setChaserHPosition(editChaserH->text().toInt());
 }
 
 void PlaybookCreator::setBallX()

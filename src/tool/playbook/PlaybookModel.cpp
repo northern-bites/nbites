@@ -29,13 +29,13 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
             playbook[goalie][x] = new PlaybookPosition**[GRID_HEIGHT];
             for(int y = 0; y < GRID_HEIGHT; ++y)
             {
-                playbook[goalie][x][y] = new PlaybookPosition*[3+2+1];
-                for(int role = 0; role < 3+2+1; ++role)
+                playbook[goalie][x][y] = new PlaybookPosition*[4+3+2+1];
+                for(int role = 0; role < 4+3+2+1; ++role)
                 {
 
                     PlaybookPosition* p = new PlaybookPosition(
                         LANDMARK_BLUE_GOAL_CROSS_X,
-                        LANDMARK_BLUE_GOAL_CROSS_Y + (role%3 - 1) * CENTER_CIRCLE_RADIUS,
+                        LANDMARK_BLUE_GOAL_CROSS_Y + (role%4 - 1) * CENTER_CIRCLE_RADIUS,
                         0,
                         defaultRoleList[role]);
                     playbook[goalie][x][y][role] = p;
@@ -43,16 +43,6 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
             }
         }
     }
-}
-
-PlaybookPosition** PlaybookModel::getRobotPositions()
-{
-    PlaybookPosition** positions = new PlaybookPosition*[3];
-    for (int i = 0; i < 3; i++)
-    {
-        positions[i] = playbook[0][0][0][i];
-    }
-    return positions;
 }
 
 void PlaybookModel::toggleGoalie(bool on)
@@ -71,6 +61,12 @@ void PlaybookModel::toggleOffender(bool on)
 {
     offenderLocked = on ? 1 : 0;
     qDebug() << "offenderLocked is now " << offenderLocked;
+}
+
+void PlaybookModel::toggleChaser(bool on)
+{
+    chaserLocked = on ? 1 : 0;
+    qDebug() << "chaserLocked is now " << chaserLocked;
 }
 
 void PlaybookModel::toggleMiddie(bool on)
@@ -99,24 +95,35 @@ short PlaybookModel::convertRoleToPlaybookIndex(short role)
     short roleIndex = -1;
     if (numActiveFieldPlayers == 4)
     {
-        if (role == DEFENDER)
+        if (role == CHASER)
             roleIndex = 0;
-        else if (role == OFFENDER)
+        else if (role == DEFENDER)
             roleIndex = 1;
-        else if (role == MIDDIE)
+        else if (role == OFFENDER)
             roleIndex = 2;
+        else if (role == MIDDIE)
+            roleIndex = 3;
     }
     else if (numActiveFieldPlayers == 3)
     {
-        if (role == DEFENDER)
-            roleIndex = 3;
-        else if (role == OFFENDER)
+        if (role == CHASER)
             roleIndex = 4;
+        else if (role == DEFENDER)
+            roleIndex = 5;
+        else if (role == OFFENDER)
+            roleIndex = 6;
     }
     else if (numActiveFieldPlayers == 2)
     {
-        if (role == DEFENDER)
-            roleIndex = 5;
+        if (role == CHASER)
+            roleIndex = 7;
+        else if (role == DEFENDER)
+            roleIndex = 8;
+    }
+    else if (numActiveFieldPlayers == 1)
+    {
+        if (role == CHASER)
+            roleIndex = 9;
     }
 
     return roleIndex;
@@ -167,6 +174,22 @@ void PlaybookModel::setOffenderYPosition(int y_)
 void PlaybookModel::setOffenderHPosition(int h_)
 {
     int roleIndex = convertRoleToPlaybookIndex(OFFENDER);
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->h = h_;
+}
+
+void PlaybookModel::setChaserXPosition(int x_)
+{
+    int roleIndex = convertRoleToPlaybookIndex(CHASER);
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->x = x_;
+}
+void PlaybookModel::setChaserYPosition(int y_)
+{
+    int roleIndex = convertRoleToPlaybookIndex(CHASER);
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->y = y_;
+}
+void PlaybookModel::setChaserHPosition(int h_)
+{
+    int roleIndex = convertRoleToPlaybookIndex(CHASER);
     playbook[goalieOn][ball_x][ball_y][roleIndex]->h = h_;
 }
 

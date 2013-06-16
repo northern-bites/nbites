@@ -8,15 +8,16 @@ namespace tool {
 namespace playbook {
 
 enum Role {
-    //CHASER = 0,
-    DEFENDER = 0,
+    CHASER = 0,
+    DEFENDER,
     OFFENDER,
     MIDDIE,
     GOALIE
 };
 
-static const Qt::GlobalColor roleColors [] = {Qt::blue, Qt::yellow, Qt::cyan,
-                                              Qt::darkMagenta, Qt::magenta};
+static const Qt::GlobalColor roleColors [] = {Qt::white, Qt::blue,
+                                              Qt::yellow, Qt::cyan,
+                                              Qt::magenta};
 
 struct PlaybookPosition
 {
@@ -29,7 +30,7 @@ struct PlaybookPosition
     {}
 };
 
-static const short defaultRoleList [] = {0,1,2,0,1,0,};
+static const short defaultRoleList [] = {0,1,2,3,0,1,2,0,1,0};
 
 } // namespace playbook
 } // namespace tool

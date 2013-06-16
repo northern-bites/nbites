@@ -44,7 +44,8 @@ public:
 
     PlaybookPosition***** playbook; // [2][3+2+1][GRID_WIDTH][GRID_HEIGHT];
 
-    PlaybookPosition** getRobotPositions();
+    short convertRoleToPlaybookIndex(short role);
+
     int getNumActiveFieldPlayers(){return numActiveFieldPlayers;};
     int getGoalieOn(){return goalieOn;};
     short getBallX(){return ball_x;};
@@ -52,6 +53,7 @@ public:
     bool getDefenderLocked() {return defenderLocked;};
     bool getOffenderLocked() {return offenderLocked;};
     bool getMiddieLocked() {return middieLocked;};
+    bool getChaserLocked() {return chaserLocked;};
 
     void setDefenderXPosition(int x_);
     void setDefenderYPosition(int y_);
@@ -62,6 +64,9 @@ public:
     void setOffenderXPosition(int x_);
     void setOffenderYPosition(int y_);
     void setOffenderHPosition(int h_);
+    void setChaserXPosition(int x_);
+    void setChaserYPosition(int y_);
+    void setChaserHPosition(int h_);
     void setBallX(int x_);
     void setBallY(int y_);
     void setNumActiveFieldPlayers(int num) {numActiveFieldPlayers = num;};
@@ -71,6 +76,7 @@ protected slots:
     void toggleGoalie(bool on);
     void toggleDefender(bool on);
     void toggleOffender(bool on);
+    void toggleChaser(bool on);
     void toggleMiddie(bool on);
 
 protected:
@@ -79,12 +85,12 @@ protected:
     QStack<PlaybookPosition> changedPositions; // The old positions.
 
     void setPosition(int value, short role, bool x_position);
-    short convertRoleToPlaybookIndex(short role);
 
     int goalieOn;
     bool defenderLocked;
     bool offenderLocked;
     bool middieLocked;
+    bool chaserLocked;
     int numActiveFieldPlayers;
     short ball_x;
     short ball_y;

@@ -67,7 +67,7 @@ private:
     int GRID_WIDTH;
     int GRID_HEIGHT;
 
-    PlaybookPosition* robots[3];
+    PlaybookPosition* robots[4];
 };
 
 } // namespace playbook

@@ -116,7 +116,7 @@ void PlaybookField::paintPlayers(QPaintEvent* event)
     // Get robot positions.
 
     // Paint each robot.
-    for (int i = 0; i < numActiveFieldPlayers-1; i++)
+    for (int i = 0; i < numActiveFieldPlayers; i++)
     {
         short role = robots[i]->role;
 
