@@ -269,11 +269,11 @@ class KickInformation:
                 #choose straight kick!
                 kick = self.chooseQuickFrontKick()
                 kick.h = 0 - bearingForKick
-            elif bearingForKick > 35: #and bearingForKick < 125:
+            elif bearingForKick > 35 and bearingForKick < 125:
                 #choose a right side kick! (using right foot)
                 kick = kicks.RIGHT_SIDE_KICK
                 kick.h = 70 - bearingForKick
-            elif bearingForKick < -35: #and bearingForKick > -125:
+            elif bearingForKick < -35 and bearingForKick > -125:
                 #choose a left side kick! (using left foot)
                 kick = kicks.LEFT_SIDE_KICK
                 kick.h = -70 - bearingForKick
@@ -296,6 +296,7 @@ class KickInformation:
                 print "Returning a kick with heading: " + str(kick.h)
 
             return kick
+
 
         # Loc is bad- use only visual information to choose a kick.
         if DEBUG_KICK_DECISION:
