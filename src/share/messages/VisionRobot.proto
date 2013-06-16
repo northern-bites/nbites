@@ -2,37 +2,48 @@ package messages;
 
 message VisionRobot
 {
-        optional Robot red1 = 1;
-        optional Robot red2 = 2;
-        optional Robot red3 = 3;
-        optional Robot red4 = 4;
-        optional Robot red5 = 5;
-        optional Robot navy1 = 6;
-        optional Robot navy2 = 7;
-        optional Robot navy3 = 8;
-        optional Robot navy4 = 9;
-        optional Robot navy5 = 10;
+    optional Robot red1 = 1;
+    optional Robot red2 = 2;
+    optional Robot red3 = 3;
+    optional Robot red4 = 4;
+    optional Robot red5 = 5;
+    optional Robot navy1 = 6;
+    optional Robot navy2 = 7;
+    optional Robot navy3 = 8;
+    optional Robot navy4 = 9;
+    optional Robot navy5 = 10;
 }
 
 message Robot
 {
-        optional float distance = 1;
-        optional float bearing  = 2;
-        optional float bearing_deg = 3;
-        optional float angle_x_deg = 4;
-        optional float angle_y_deg = 5;
-        optional sint32 x = 6;
-        optional sint32 y = 7;
-        optional float elevation_deg = 8;
-        optional bool on = 9;
-	optional sint32 height = 10;
-	optional sint32 width = 11;
+    optional float distance = 1;
+    optional float bearing  = 2;
+    optional float bearing_deg = 3;
+    optional float angle_x_deg = 4;
+    optional float angle_y_deg = 5;
+    optional sint32 x = 6;
+    optional sint32 y = 7;
+    optional float elevation_deg = 8;
+    optional bool on = 9;
+    optional sint32 height = 10;
+    optional sint32 width = 11;
 }
 
 message VisionObstacle
 {
-        optional bool on_left = 1;
-        optional bool on_right = 2;
-        optional bool off_field = 3;
-}
+    optional bool on_left = 1;
+    optional bool on_right = 2;
+    optional bool off_field = 3;
 
+    optional sint32 block_left = 4;
+    optional sint32 block_mid = 5;
+    optional sint32 block_right = 6;
+
+    optional float left_dist = 7;
+    optional float mid_dist = 8;
+    optional float right_dist = 9;
+
+    optional float left_bearing = 10;
+    optional float mid_bearing = 11;
+    optional float right_bearing = 12;
+}

@@ -12,7 +12,7 @@ PaintField::PaintField(QWidget* parent, float scaleFactor_) :
 
 void PaintField::run_()
 {
-    repaint();
+    update();
 }
 
 QSize PaintField::minimumSizeHint() const

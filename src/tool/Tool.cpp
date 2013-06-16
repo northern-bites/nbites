@@ -85,8 +85,8 @@ Tool::Tool(const char* title) :
     QToolBar* toolBar = new QToolBar(this);
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
     toolBar->addWidget(loadBtn);
-    this->addToolBar(toolBar); 
-    
+    this->addToolBar(toolBar);
+
     QPushButton* saveBtn = new QPushButton(tr("Save"));
     connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveGlobalTable()));
     toolBar->addWidget(saveBtn);
@@ -117,7 +117,7 @@ void Tool::saveGlobalTable()
         saveAsGlobalTable();
         return;
     }
-    
+
     QString filename = loadBtn->text();
     globalColorTable.write(filename.toStdString());
 }
@@ -130,7 +130,7 @@ void Tool::saveAsGlobalTable()
                                                     base_directory + "/new_table.mtb",
                                                     tr("Color Table files (*.mtb)"));
     globalColorTable.write(filename.toStdString());
-    
+
     if (!filename.isEmpty())
         loadBtn->setText(filename);
 }
@@ -147,7 +147,7 @@ void Tool::loadColorTable()
 
     topConverter.loadTable(globalColorTable.getTable());
     bottomConverter.loadTable(globalColorTable.getTable());
-    
+
     if (!filename.isEmpty())
         loadBtn->setText(filename);
 
@@ -166,7 +166,7 @@ void Tool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)
     bottomConverter.changeTable(globalColorTable.getTable());
 
 }
-    
+
 void Tool::unChangeTableValues(std::vector<color::colorChanges> tableAdjustments)
 {
     for (int i = 0; i < tableAdjustments.size(); i++) {
@@ -216,12 +216,12 @@ void Tool::setUpModules()
     visDispMod.tYImage_in.wireTo(&topConverter.yImage, true);
     visDispMod.tUImage_in.wireTo(&topConverter.uImage, true);
     visDispMod.tVImage_in.wireTo(&topConverter.vImage, true);
-    
+
     visDispMod.bTImage_in.wireTo(&bottomConverter.thrImage, true);
     visDispMod.bYImage_in.wireTo(&bottomConverter.yImage, true);
     visDispMod.bUImage_in.wireTo(&bottomConverter.uImage, true);
     visDispMod.bVImage_in.wireTo(&bottomConverter.vImage, true);
-    
+
     /** Color Table Creator Tab **/
     if (diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
                                                       "top") &&
