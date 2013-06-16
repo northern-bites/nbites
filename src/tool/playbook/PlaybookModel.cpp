@@ -172,5 +172,58 @@ void PlaybookModel::setBallY(int y_)
     qDebug() << "setting the ball's y position to: " << y_;
 }
 
+QString PlaybookModel::getTextPriority()
+{
+    int offset = 0;
+    if (numActiveFieldPlayers == 4) {
+        offset = 0;
+    } else if (numActiveFieldPlayers == 3) {
+        offset = 4;
+    } else if (numActiveFieldPlayers == 2) {
+        offset = 7;
+    } else if (numActiveFieldPlayers == 1) {
+        offset = 9;
+    }
+
+    QString list = "";
+    for (int i = 0; i < numActiveFieldPlayers; i++)
+    {
+        list.append(roleChars.at(playbook[goalieOn][ball_x][ball_y][i+offset]->role));
+    }
+
+    return list;
+}
+
+void PlaybookModel::setPriorityList(QString list)
+{
+    int offset = 0;
+    if (numActiveFieldPlayers == 4) {
+        offset = 0;
+    } else if (numActiveFieldPlayers == 3) {
+        offset = 4;
+    } else if (numActiveFieldPlayers == 2) {
+        offset = 7;
+    } else if (numActiveFieldPlayers == 1) {
+        offset = 9;
+    }
+
+
+    // store the needed pointers
+    PlaybookPosition* tempPositions[numActiveFieldPlayers];
+    PlaybookPosition* temp;
+    for (int i = 0; i < numActiveFieldPlayers; i++)
+    {
+        temp = playbook[goalieOn][ball_x][ball_y][i+offset];
+        tempPositions[temp->role] = temp;
+    }
+
+    // place old positions in new order
+    for (int i = 0; i < numActiveFieldPlayers; i++)
+    {
+        short role = roleChars.indexOf(list.at(i));
+        playbook[goalieOn][ball_x][ball_y][i+offset] = tempPositions[role];
+    }
+}
+
 }
 }

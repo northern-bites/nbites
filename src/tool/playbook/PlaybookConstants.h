@@ -30,7 +30,9 @@ struct PlaybookPosition
     {}
 };
 
-static const short defaultRoleList [] = {0,1,2,3,0,1,2,0,1,0};
+static const short defaultRoleList[] = {0,1,2,3,0,1,2,0,1,0};
+
+static const QString roleChars = "cdomg";
 
 } // namespace playbook
 } // namespace tool

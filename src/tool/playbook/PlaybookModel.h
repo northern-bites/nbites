@@ -70,6 +70,8 @@ public:
     void setBallX(int x_);
     void setBallY(int y_);
     void setNumActiveFieldPlayers(int num) {numActiveFieldPlayers = num;};
+    void setPriorityList(QString list);
+    QString getTextPriority();
 
 
 protected slots:

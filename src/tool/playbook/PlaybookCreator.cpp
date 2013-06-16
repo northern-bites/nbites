@@ -22,6 +22,9 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings = new QVBoxLayout();
     settings->setAlignment(Qt::AlignTop);
 
+    playerSettings = new QVBoxLayout();
+    playerSettings->setAlignment(Qt::AlignTop);
+
     //undoBtn = new QPushButton("Undo", this);
     loadBtn = new QPushButton("Load", this);
     saveBtn = new QPushButton("Save", this);
@@ -50,6 +53,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     fourFieldPlayers->setChecked(true);
     editBallX = new QLineEdit("Ball x", this);
     editBallY = new QLineEdit("Ball y", this);
+    editPriority = new QLineEdit("priorities", this);
 
     QGroupBox* defenderBox = new QGroupBox("Defender");
     QGroupBox* middieBox = new QGroupBox("Middie");
@@ -91,11 +95,13 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings->addWidget(threeFieldPlayers);
     settings->addWidget(fourFieldPlayers);
     settings->addWidget(goalie);
-    settings->addWidget(defenderBox);
-    settings->addWidget(middieBox);
-    settings->addWidget(offenderBox);
-    settings->addWidget(chaserBox);
+    settings->addWidget(editPriority);
     settings->addWidget(ballBox);
+
+    playerSettings->addWidget(defenderBox);
+    playerSettings->addWidget(middieBox);
+    playerSettings->addWidget(offenderBox);
+    playerSettings->addWidget(chaserBox);
 
     // Connect checkbox interface (including disabling lineEdits)
     connect(lockDefender, SIGNAL(toggled(bool)), model,
@@ -184,6 +190,9 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editBallY, SIGNAL(editingFinished()), this,
             SLOT(refreshTextBall()));
 
+    connect(editPriority, SIGNAL(editingFinished()), this,
+            SLOT(refreshTextPriority()));
+
     // Conect line edit widgets' returnPressed signals
     connect(editDefenderX, SIGNAL(returnPressed()), this,
             SLOT(setDefenderXPosition()));
@@ -218,8 +227,12 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editBallY, SIGNAL(returnPressed()), this,
             SLOT(setBallY()));
 
+    connect(editPriority, SIGNAL(returnPressed()), this,
+            SLOT(setPriorityList()));
+
     mainLayout->addLayout(field);
     mainLayout->addLayout(settings);
+    mainLayout->addLayout(playerSettings);
 
     this->setLayout(mainLayout);
 
@@ -311,6 +324,13 @@ void PlaybookCreator::refreshTextBall()
     qDebug() << "displaying the ball's true position now.";
 }
 
+void PlaybookCreator::refreshTextPriority()
+{
+    updatePositions();
+    editPriority->setText(model->getTextPriority());
+    qDebug() << "displaying the true priority list now.";
+}
+
 void PlaybookCreator::refreshTextAll()
 {
     refreshTextDefender();
@@ -318,6 +338,7 @@ void PlaybookCreator::refreshTextAll()
     refreshTextOffender();
     refreshTextChaser();
     refreshTextBall();
+    refreshTextPriority();
 }
 
 void PlaybookCreator::setOneFieldPlayer(bool checked)
@@ -472,6 +493,11 @@ void PlaybookCreator::setBallY()
 
     updateLockedPositions();
     refreshTextAll();
+}
+
+void PlaybookCreator::setPriorityList()
+{
+    model->setPriorityList(editPriority->text());
 }
 
 } // namespace playbook

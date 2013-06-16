@@ -37,6 +37,7 @@ protected slots:
     void refreshTextMiddie();
     void refreshTextChaser();
     void refreshTextBall();
+    void refreshTextPriority();
     void setDefenderXPosition();
     void setDefenderYPosition();
     void setDefenderHPosition();
@@ -55,6 +56,7 @@ protected slots:
     void setTwoFieldPlayers(bool checked);
     void setThreeFieldPlayers(bool checked);
     void setFourFieldPlayers(bool checked);
+    void setPriorityList();
 
 protected:
     PlaybookField* fieldPainter;
@@ -63,6 +65,7 @@ protected:
     QHBoxLayout* mainLayout;
     QHBoxLayout* field;
     QVBoxLayout* settings;
+    QVBoxLayout* playerSettings;
 
     QPushButton* undoBtn;
     QPushButton* loadBtn;
@@ -90,6 +93,7 @@ protected:
     QRadioButton* fourFieldPlayers;
     QLineEdit* editBallX;
     QLineEdit* editBallY;
+    QLineEdit* editPriority;
 
 private:
     bool havePlaybook;
