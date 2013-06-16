@@ -23,21 +23,22 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     playbook = new PlaybookPosition****[2];
     for(int goalie = 0; goalie < 2; ++goalie)
     {
-        playbook[goalie] = new PlaybookPosition***[3+2+1];
-        for(int role = 0; role < 3+2+1; ++role)
+        playbook[goalie][role] = new PlaybookPosition**[GRID_WIDTH];
+        for(int x = 0; x < GRID_WIDTH; ++x)
         {
-            playbook[goalie][role] = new PlaybookPosition**[GRID_WIDTH];
-            for(int x = 0; x < GRID_WIDTH; ++x)
+            playbook[goalie][role][x] = new PlaybookPosition*[GRID_HEIGHT];
+            for(int y = 0; y < GRID_HEIGHT; ++y)
             {
-                playbook[goalie][role][x] = new PlaybookPosition*[GRID_HEIGHT];
-                for(int y = 0; y < GRID_HEIGHT; ++y)
+                playbook[goalie] = new PlaybookPosition***[3+2+1];
+                for(int role = 0; role < 3+2+1; ++role)
                 {
+
                     PlaybookPosition* p = new PlaybookPosition(
                         LANDMARK_BLUE_GOAL_CROSS_X,
                         LANDMARK_BLUE_GOAL_CROSS_Y + (role%3 - 1) * CENTER_CIRCLE_RADIUS,
                         0,
                         defaultRoleList[role]);
-                    playbook[goalie][role][x][y] = p;
+                    playbook[goalie][x][y][role] = p;
                 }
             }
         }
@@ -49,7 +50,7 @@ PlaybookPosition** PlaybookModel::getRobotPositions()
     PlaybookPosition** positions = new PlaybookPosition*[3];
     for (int i = 0; i < 3; i++)
     {
-        positions[i] = playbook[0][i][0][0];
+        positions[i] = playbook[0][0][0][i];
     }
     return positions;
 }
@@ -85,9 +86,9 @@ void PlaybookModel::setPosition(int value, short role, bool x_position)
     if (roleIndex != -1)
     {
         if (x_position)
-            playbook[goalieOn][roleIndex][ball_x][ball_y]->x = value;
+            playbook[goalieOn][ball_x][ball_y][roleIndex]->x = value;
         else
-            playbook[goalieOn][roleIndex][ball_x][ball_y]->y = value;
+            playbook[goalieOn][ball_x][ball_y][roleIndex]->y = value;
 
         qDebug() << "setting role: " << roleIndex << " at x? " << x_position << " to value: " << value;
     }
@@ -124,34 +125,49 @@ short PlaybookModel::convertRoleToPlaybookIndex(short role)
 void PlaybookModel::setDefenderXPosition(int x_)
 {
     int roleIndex = convertRoleToPlaybookIndex(DEFENDER);
-    playbook[goalieOn][roleIndex][ball_x][ball_y]->x = x_;
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->x = x_;
 }
 void PlaybookModel::setDefenderYPosition(int y_)
 {
     int roleIndex = convertRoleToPlaybookIndex(DEFENDER);
-    playbook[goalieOn][roleIndex][ball_x][ball_y]->y = y_;
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->y = y_;
+}
+void PlaybookModel::setDefenderHPosition(int h_)
+{
+    int roleIndex = convertRoleToPlaybookIndex(DEFENDER);
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->h = h_;
 }
 
 void PlaybookModel::setMiddieXPosition(int x_)
 {
     int roleIndex = convertRoleToPlaybookIndex(MIDDIE);
-    playbook[goalieOn][roleIndex][ball_x][ball_y]->x = x_;
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->x = x_;
 }
 void PlaybookModel::setMiddieYPosition(int y_)
 {
     int roleIndex = convertRoleToPlaybookIndex(MIDDIE);
-    playbook[goalieOn][roleIndex][ball_x][ball_y]->y = y_;
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->y = y_;
+}
+void PlaybookModel::setMiddieHPosition(int h_)
+{
+    int roleIndex = convertRoleToPlaybookIndex(MIDDIE);
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->h = h_;
 }
 
 void PlaybookModel::setOffenderXPosition(int x_)
 {
     int roleIndex = convertRoleToPlaybookIndex(OFFENDER);
-    playbook[goalieOn][roleIndex][ball_x][ball_y]->x = x_;
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->x = x_;
 }
 void PlaybookModel::setOffenderYPosition(int y_)
 {
     int roleIndex = convertRoleToPlaybookIndex(OFFENDER);
-    playbook[goalieOn][roleIndex][ball_x][ball_y]->y = y_;
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->y = y_;
+}
+void PlaybookModel::setOffenderHPosition(int h_)
+{
+    int roleIndex = convertRoleToPlaybookIndex(OFFENDER);
+    playbook[goalieOn][ball_x][ball_y][roleIndex]->h = h_;
 }
 
 void PlaybookModel::setBallX(int x_)

@@ -55,10 +55,13 @@ public:
 
     void setDefenderXPosition(int x_);
     void setDefenderYPosition(int y_);
+    void setDefenderHPosition(int h_);
     void setMiddieXPosition(int x_);
     void setMiddieYPosition(int y_);
+    void setMiddieHPosition(int h_);
     void setOffenderXPosition(int x_);
     void setOffenderYPosition(int y_);
+    void setOffenderHPosition(int h_);
     void setBallX(int x_);
     void setBallY(int y_);
     void setNumActiveFieldPlayers(int num) {numActiveFieldPlayers = num;};

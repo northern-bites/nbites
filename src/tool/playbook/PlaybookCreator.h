@@ -38,10 +38,13 @@ protected slots:
     void refreshTextBall();
     void setDefenderXPosition();
     void setDefenderYPosition();
+    void setDefenderHPosition();
     void setMiddieXPosition();
     void setMiddieYPosition();
+    void setMiddieHPosition();
     void setOffenderXPosition();
     void setOffenderYPosition();
+    void setOffenderHPosition();
     void setBallX();
     void setBallY();
     void setTwoFieldPlayers(bool checked);
@@ -65,10 +68,13 @@ protected:
     QCheckBox* goalie;
     QLineEdit* editDefenderX;
     QLineEdit* editDefenderY;
+    QLineEdit* editDefenderH;
     QLineEdit* editMiddieX;
     QLineEdit* editMiddieY;
+    QLineEdit* editMiddieH;
     QLineEdit* editOffenderX;
     QLineEdit* editOffenderY;
+    QLineEdit* editOffenderH;
     QRadioButton* twoFieldPlayers;
     QRadioButton* threeFieldPlayers;
     QRadioButton* fourFieldPlayers;

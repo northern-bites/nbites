@@ -11,11 +11,12 @@ enum Role {
     DEFENDER = 0,
     OFFENDER,
     MIDDIE,
+    CHASER,
     GOALIE
 };
 
-static const Qt::GlobalColor roleColors [] = {Qt::blue, Qt::yellow,
-                                              Qt::cyan, Qt::magenta};
+static const Qt::GlobalColor roleColors [] = {Qt::blue, Qt::yellow, Qt::cyan,
+                                              Qt::darkMagenta, Qt::magenta};
 
 struct PlaybookPosition
 {
