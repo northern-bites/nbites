@@ -35,6 +35,10 @@ namespace man
             // Provide calibration boolean to the rest of the system.
             bool calibrated() const;
 
+            // Provide hand speeds to the rest of the system
+            float leftHandSpeed() const;
+            float rightHandSpeed() const;
+
             void requestStopFirstInstance();
             void calculateNextJointsAndStiffnesses(
                 std::vector<float>&            sensorAngles,

@@ -7,6 +7,7 @@
 
 using namespace boost::python;
 using namespace man::behaviors;
+using namespace man;
 
 BOOST_PYTHON_MODULE(noggin_constants)
 {
@@ -217,6 +218,8 @@ BOOST_PYTHON_MODULE(noggin_constants)
 
     scope().attr("BLUE_CC_NEAREST_POINT_X") = BLUE_CC_NEAREST_POINT_X;
     scope().attr("BLUE_CROSS_CIRCLE_MIDPOINT_X") = BLUE_CROSS_CIRCLE_MIDPOINT_X;
+    scope().attr("BLUE_GOALBOX_MIDPOINT_X") = BLUE_GOALBOX_MIDPOINT_X;
+    scope().attr("BLUE_GOALBOX_CROSS_MIDPOINT_X") = BLUE_GOALBOX_CROSS_MIDPOINT_X;
 
     scope().attr("NUM_LOC_SCORES") = NUM_LOC_SCORES;
 

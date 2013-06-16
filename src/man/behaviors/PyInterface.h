@@ -18,6 +18,8 @@
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
+#include "StiffnessControl.pb.h"
+#include "ArmContactState.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -45,6 +47,8 @@ public:
     messages::RobotLocation     const * resetLocRequest_ptr;
     messages::FallStatus        const * fallStatus_ptr;
     messages::WorldModel        const * myWorldModel_ptr;
+    messages::StiffStatus       const * stiffStatus_ptr;
+    messages::ArmContactState   const * armContactState_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -129,6 +133,14 @@ public:
     void setMyWorldModel_ptr(const messages::WorldModel* msg)
     {
         myWorldModel_ptr = msg;
+    }
+    void setStiffStatus_ptr(const messages::StiffStatus* msg)
+    {
+        stiffStatus_ptr = msg;
+    }
+    void setArmContactState_ptr(const messages::ArmContactState* msg)
+    {
+        armContactState_ptr = msg;
     }
 
 };

@@ -16,14 +16,17 @@ Tool::Tool(const char* title) :
     selector(),
     logView(this),
     tableCreator(this),
-	colorCalibrate(this),
+    visDispMod(this),
     fieldView(this),
     playbookCreator(this),
+    colorCalibrate(this),
+    topConverter(),
+    bottomConverter(),
     toolTabs(new QTabWidget),
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
     prevButton(new QPushButton(tr("<"))),
-    recordButton(new QPushButton(tr("Rec"))),
+    loadBtn(new QPushButton(tr("Load Table"))),
     scrollArea(new QScrollArea),
     scrollBarSize(new QSize(5, 35)),
     tabStartSize(new QSize(toolTabs->size()))
@@ -47,15 +50,21 @@ Tool::Tool(const char* title) :
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
 
+    connect(&tableCreator, SIGNAL(tableChanges(std::vector<color::colorChanges>)),
+            this, SLOT(changeTableValues(std::vector<color::colorChanges>)));
+    connect(&tableCreator, SIGNAL(tableUnChanges(std::vector<color::colorChanges>)),
+            this, SLOT(unChangeTableValues(std::vector<color::colorChanges>)));
+
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
-    toolbar->addWidget(recordButton);
 
     toolTabs->addTab(&selector, tr("Data"));
     toolTabs->addTab(&logView, tr("Log View"));
     toolTabs->addTab(&tableCreator, tr("Color Creator"));
-	toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
+    toolTabs->addTab(&visDispMod, tr("Offline Vision"));
+    toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
     toolTabs->addTab(&fieldView, tr("FieldView"));
+    toolTabs->addTab(&worldView, tr("World Viewer"));
     toolTabs->addTab(&playbookCreator, tr("Playbook Creator"));
 
     this->setCentralWidget(toolTabs);
@@ -63,16 +72,32 @@ Tool::Tool(const char* title) :
 
     // Figure out the appropriate dimensions for the window
     if (file.open(QIODevice::ReadWrite)){
-            QTextStream in(&file);
-            geometry = new QRect(in.readLine().toInt(), in.readLine().toInt(),
-                                 in.readLine().toInt(), in.readLine().toInt());
-            file.close();
+        QTextStream in(&file);
+        geometry = new QRect(in.readLine().toInt(), in.readLine().toInt(),
+                             in.readLine().toInt(), in.readLine().toInt());
+        file.close();
     }
     // If we don't have dimensions, default to hard-coded values
     if((geometry->width() == 0) && (geometry->height() == 0)){
-        geometry = new QRect(75, 75, 1132, 958);
+        geometry = new QRect(75, 75, 1000, 900);
     }
     this->setGeometry(*geometry);
+
+    QToolBar* toolBar = new QToolBar(this);
+    connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
+    toolBar->addWidget(loadBtn);
+    this->addToolBar(toolBar);
+
+    QPushButton* saveBtn = new QPushButton(tr("Save"));
+    connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveGlobalTable()));
+    toolBar->addWidget(saveBtn);
+
+    QPushButton* saveAsBtn = new QPushButton(tr("Save As"));
+    connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
+    toolBar->addWidget(saveAsBtn);
+
+
+    //diagram.addModule(worldView);
 }
 
 Tool::~Tool() {
@@ -86,8 +111,118 @@ Tool::~Tool() {
     }
 }
 
+void Tool::saveGlobalTable()
+{
+
+    if (loadBtn->text() == QString("Load Table")) { // no table loaded yet
+        saveAsGlobalTable();
+        return;
+    }
+
+    QString filename = loadBtn->text();
+    globalColorTable.write(filename.toStdString());
+}
+void Tool::saveAsGlobalTable()
+{
+
+    QString base_directory = QString(NBITES_DIR) + "/data/tables";
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    tr("Save Color Table to File"),
+                                                    base_directory + "/new_table.mtb",
+                                                    tr("Color Table files (*.mtb)"));
+    globalColorTable.write(filename.toStdString());
+
+    if (!filename.isEmpty())
+        loadBtn->setText(filename);
+}
+
+void Tool::loadColorTable()
+{
+
+    QString base_directory = QString(NBITES_DIR) + "/data/tables";
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Load Color Table from File"),
+                                                    base_directory,
+                                                    tr("Color Table files (*.mtb)"));
+    globalColorTable.read(filename.toStdString());
+
+    topConverter.loadTable(globalColorTable.getTable());
+    bottomConverter.loadTable(globalColorTable.getTable());
+
+    if (!filename.isEmpty())
+        loadBtn->setText(filename);
+
+}
+
+void Tool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)
+{
+    for (int i = 0; i < tableAdjustments.size(); i++) {
+        byte y = tableAdjustments[i].y;
+        byte u = tableAdjustments[i].u;
+        byte v = tableAdjustments[i].v;
+        byte col = tableAdjustments[i].color;
+        globalColorTable.setColor(y, u, v, col);
+    }
+    topConverter.changeTable(globalColorTable.getTable());
+    bottomConverter.changeTable(globalColorTable.getTable());
+
+}
+
+void Tool::unChangeTableValues(std::vector<color::colorChanges> tableAdjustments)
+{
+    for (int i = 0; i < tableAdjustments.size(); i++) {
+        byte y = tableAdjustments[i].y;
+        byte u = tableAdjustments[i].u;
+        byte v = tableAdjustments[i].v;
+        byte col = tableAdjustments[i].color;
+        globalColorTable.unSetColor(y, u, v, col);
+    }
+    topConverter.changeTable(globalColorTable.getTable());
+    bottomConverter.changeTable(globalColorTable.getTable());
+}
+
 void Tool::setUpModules()
 {
+    diagram.connectToUnlogger<messages::YUVImage>(topConverter.imageIn, "top");
+    diagram.connectToUnlogger<messages::YUVImage>(bottomConverter.imageIn, "bottom");
+
+    diagram.connectToUnlogger<messages::YUVImage>(topConverter.imageIn, "top");
+    diagram.connectToUnlogger<messages::YUVImage>(bottomConverter.imageIn, "bottom");
+    diagram.addModule(topConverter);
+    diagram.addModule(bottomConverter);
+    topConverter.loadTable(globalColorTable.getTable());
+    bottomConverter.loadTable(globalColorTable.getTable());
+
+
+    diagram.addModule(visDispMod);
+    diagram.connectToUnlogger<messages::YUVImage>(visDispMod.topImageIn,
+                                                  "top");
+    diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
+                                                  "bottom");
+    if (diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
+                                                         "joints") &&
+        diagram.connectToUnlogger<messages::InertialState>(visDispMod.inerts_in,
+                                                           "inertials"))
+    {
+        // All is well
+    }
+    else {
+        std::cout << "Warning: Joints and Inertials not logged in this file.\n";
+        portals::Message<messages::JointAngles> joints(0);
+        portals::Message<messages::InertialState> inertials(0);
+        visDispMod.joints_in.setMessage(joints);
+        visDispMod.inerts_in.setMessage(inertials);
+    }
+    visDispMod.tTImage_in.wireTo(&topConverter.thrImage, true);
+    visDispMod.tYImage_in.wireTo(&topConverter.yImage, true);
+    visDispMod.tUImage_in.wireTo(&topConverter.uImage, true);
+    visDispMod.tVImage_in.wireTo(&topConverter.vImage, true);
+
+    visDispMod.bTImage_in.wireTo(&bottomConverter.thrImage, true);
+    visDispMod.bYImage_in.wireTo(&bottomConverter.yImage, true);
+    visDispMod.bUImage_in.wireTo(&bottomConverter.uImage, true);
+    visDispMod.bVImage_in.wireTo(&bottomConverter.vImage, true);
+
     /** Color Table Creator Tab **/
     if (diagram.connectToUnlogger<messages::YUVImage>(tableCreator.topImageIn,
                                                       "top") &&
@@ -95,6 +230,8 @@ void Tool::setUpModules()
                                                       "bottom"))
     {
         diagram.addModule(tableCreator);
+        tableCreator.topThrIn.wireTo(&topConverter.thrImage, true);
+        tableCreator.botThrIn.wireTo(&bottomConverter.thrImage, true);
     }
     else
     {
@@ -149,7 +286,7 @@ void Tool::setUpModules()
     }
     else
     {
-        std::cout << "Warning: Particles were'nt logged in this file" << std::endl;
+        std::cout << "Warning: Particles weren't logged in this file" << std::endl;
     }
     if(diagram.connectToUnlogger<messages::VisionField>(fieldView.observationsIn,
                                                         "observations"))
@@ -159,7 +296,7 @@ void Tool::setUpModules()
     }
     else
     {
-        std::cout << "Warning: Observations were'nt logged in this file" << std::endl;
+        std::cout << "Warning: Observations weren't logged in this file" << std::endl;
     }
     if(shouldAddFieldView)
         diagram.addModule(fieldView);

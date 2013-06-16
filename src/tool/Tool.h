@@ -18,12 +18,18 @@
 #include "DataSelector.h"
 #include "logview/LogViewer.h"
 #include "colorcreator/ColorTableCreator.h"
+#include "worldview/WorldView.h"
+
+#include "colorcreator/ColorTable.h"
+#include "vision_offline/VisionDisplayModule.h"
+#include "fieldview/FieldViewer.h"
+
+#include "image/ImageConverterModule.h"
+
 #include "colorcreator/ColorCalibrate.h"
-#include "viewer/FieldViewer.h"
 #include "playbook/PlaybookCreator.h"
 
 #include "ParticleSwarm.pb.h"
-
 
 namespace tool {
 
@@ -36,6 +42,11 @@ public:
 
 public slots:
     void setUpModules();
+    void loadColorTable();
+    void changeTableValues(std::vector<color::colorChanges> tableAdjustments);
+    void unChangeTableValues(std::vector<color::colorChanges> tableAdjustments);
+    void saveAsGlobalTable();
+    void saveGlobalTable();
 
 protected:
     // For keyboard control
@@ -49,17 +60,25 @@ protected:
     DataSelector selector;
     logview::LogViewer logView;
     color::ColorTableCreator tableCreator;
-	colorcreator::ColorCalibrate colorCalibrate;
+    vision::VisionDisplayModule visDispMod;
+    colorcreator::ColorCalibrate colorCalibrate;
     viewer::FieldViewer fieldView;
     playbook::PlaybookCreator playbookCreator;
+
+    man::image::ImageConverterModule topConverter;
+    man::image::ImageConverterModule bottomConverter;
+
+    color::ColorTable globalColorTable;
+    worldview::WorldView worldView;
+
 
     // GUI stuff
     QTabWidget* toolTabs;
     QToolBar* toolbar;
     QPushButton* prevButton;
     QPushButton* nextButton;
-    QPushButton* recordButton;
     QPushButton* scrollButton;
+    QPushButton* loadBtn;
     QScrollArea* scrollArea;
     QSize* scrollBarSize;
     QSize* tabStartSize;

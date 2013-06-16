@@ -16,6 +16,8 @@
 #include "ParticleSwarm.pb.h"
 
 #include "FieldViewerPainter.h"
+#include "localization/LocalizationModule.h"
+#include "OfflineLocListener.h"
 
 namespace tool{
 namespace viewer{
@@ -33,10 +35,18 @@ public:
     void confirmObsvLogs(bool haveLogs);
     void confirmOdometryLogs(bool haveLogs);
 
+    void tryOffline();
+
     portals::InPortal<messages::RobotLocation> locationIn;
     portals::InPortal<messages::RobotLocation> odometryIn;
     portals::InPortal<messages::ParticleSwarm> particlesIn;
     portals::InPortal<messages::VisionField> observationsIn;
+
+    portals::OutPortal<messages::RobotLocation> odometry;
+    portals::OutPortal<messages::VisionField>   observations;
+
+    portals::InPortal <messages::RobotLocation> offline;
+    portals::InPortal <messages::ParticleSwarm> offlineSwarm;
 
 protected slots:
     void noLogError();
@@ -47,24 +57,29 @@ protected:
 protected:
     FieldViewerPainter* fieldPainter;
 
-    QHBoxLayout* mainLayout;
+    QVBoxLayout* mainLayout;
     QHBoxLayout* field;
-    QVBoxLayout* checkBoxes;
+    QHBoxLayout* checkBoxes;
+    QHBoxLayout* checkBoxesOffline;
+    QHBoxLayout* resizeLayout;
 
     QCheckBox* particleViewBox;
     QCheckBox* locationViewBox;
     QCheckBox* robotFieldViewBox;
+    QCheckBox* particleViewBoxOffline;
+    QCheckBox* locationViewBoxOffline;
+    QCheckBox* robotFieldViewBoxOffline;
 
-    QCheckBox* selector4;
-    QCheckBox* selector5;
-    QCheckBox* selector6;
-    QCheckBox* selector7;
-    QCheckBox* selector8;
-
+    QPushButton* zoomInButton;
+    QPushButton* zoomOutButton;
 
     float scaleFactor;
 
 private:
+    man::localization::LocalizationModule locMod;
+    tool::OfflineLocListener locListen;
+    portals::RoboGram subdiagram;
+
     bool haveParticleLogs;
     bool haveLocationLogs;
     bool haveVisionFieldLogs;

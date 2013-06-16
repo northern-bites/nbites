@@ -12,6 +12,7 @@ MotionModule::MotionModule()
       stiffnessOutput_(base()),
       odometryOutput_(base()),
       motionStatusOutput_(base()),
+      handSpeedsOutput_(base()),
       curProvider(&nullBodyProvider),
       nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
@@ -86,6 +87,7 @@ void MotionModule::run_()
         //     the messages that we output.
         updateOdometry();
         updateStatus();
+        updateHandSpeeds();
 
         newInputJoints = false;
         frameCount++;
@@ -351,6 +353,12 @@ void MotionModule::processMotionInput()
             messages::MotionCommand::DESTINATION_WALK)
         {
             sendMotionCommand(bodyCommandInput_.message().dest());
+        }
+        else if (bodyCommandInput_.message().type() ==
+            messages::MotionCommand::ODOMETRY_WALK)
+        {
+            sendMotionCommand(bodyCommandInput_.message().odometry_dest());
+
         }
         else if (bodyCommandInput_.message().type() ==
                  messages::MotionCommand::WALK_COMMAND)
@@ -911,6 +919,40 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
         gain = command.gain();
 
     nextProvider = &walkProvider;
+    DestinationCommand::ptr newCommand(
+        new DestinationCommand(
+            relX,
+            relY,
+            relH,
+            gain)
+        );
+    walkProvider.setCommand(newCommand);
+}
+
+// TESTED by EJ, works appropriately. Don't fuck with unless I'm told.
+// Sorry EJ had to fuck with it - Octavian
+/*
+ * Given a OdometryWalk proto,
+ * Rel x and y given in cm, rel h in degrees
+ * If gain is defined in the proto then it also sets the speed
+ * to that gain, else does .5 by default (half speed)
+ */
+void MotionModule::sendMotionCommand(messages::OdometryWalk command)
+{
+    // Message is coming from behaviors in centimeters and degrees
+    // StepCommands take millimeters and radians so Convert!
+    float relX = command.rel_x() * CM_TO_MM;
+    float relY = command.rel_y() * CM_TO_MM;
+    float relH = command.rel_h() * TO_RAD;
+
+    // For now go at half speed for odometry walk
+    // @TODO major refactoring on all dis shit. lets make it hot
+    float DEFAULT_SPEED = .5f;
+    float gain = DEFAULT_SPEED;
+    if(command.gain() > 0.f)
+        gain = command.gain();
+
+    nextProvider = &walkProvider;
     StepCommand::ptr newCommand(
         new StepCommand(
             relX,
@@ -1181,6 +1223,16 @@ void MotionModule::updateStatus()
     status.get()->set_calibrated(calibrated());
 
     motionStatusOutput_.setMessage(status);
+}
+
+void MotionModule::updateHandSpeeds()
+{
+    portals::Message<messages::HandSpeeds> current(0);
+
+    current.get()->set_left_speed(walkProvider.leftHandSpeed());
+    current.get()->set_right_speed(walkProvider.rightHandSpeed());
+
+    handSpeedsOutput_.setMessage(current);
 }
 
 } // namespace motion

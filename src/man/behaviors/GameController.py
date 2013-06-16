@@ -16,16 +16,16 @@ TEAM_RED = Constants.teamColor.TEAM_RED
 # Dictionary for input state:output state
 # @inputs are from gameState messages
 # @outputs are FSA states
-convertStateFormat = { STATE_INITIAL : 'gameInitial',
-                       STATE_READY : 'gameReady',
-                       STATE_SET : 'gameSet',
-                       STATE_PLAYING : 'gamePlaying',
+convertStateFormat = { STATE_INITIAL :  'gameInitial',
+                       STATE_READY :    'gameReady',
+                       STATE_SET :      'gameSet',
+                       STATE_PLAYING :  'gamePlaying',
                        STATE_FINISHED : 'gameFinished'
                        }
-convertStateFormatPenaltyShots = { STATE_INITIAL : 'penaltyShotsGameSet',
-                                   STATE_READY : 'penaltyShotsGameSet',
-                                   STATE_SET : 'penaltyShotsGameSet',
-                                   STATE_PLAYING : 'penaltyShotsGamePlaying',
+convertStateFormatPenaltyShots = { STATE_INITIAL :  'penaltyShotsGameSet',
+                                   STATE_READY :    'penaltyShotsGameSet',
+                                   STATE_SET :      'penaltyShotsGameSet',
+                                   STATE_PLAYING :  'penaltyShotsGamePlaying',
                                    STATE_FINISHED : 'gameFinished'
                                    }
 
@@ -59,7 +59,11 @@ class GameController():
                 self.playingStartTime = self.brain.time
             else:
                 self.playingStartTime = 0
-        self.timeSincePlaying = self.brain.time - self.playingStartTime
+
+        if self.playingStartTime != 0:
+            self.timeSincePlaying = self.brain.time - self.playingStartTime
+        else:
+            self.timeSincePlaying = 0
 
         # reset field for change
         self.teamColorChanged = False
@@ -109,3 +113,6 @@ class GameController():
                     self.brain.player.switchTo(convertStateFormat[self.currentState])
                 else:
                     self.brain.player.switchTo(convertStateFormatPenaltyShots[self.currentState])
+                # Update the player's "gamestate" variable now, so it is correct when
+                # playbook runs (since player runs even later).
+            self.brain.player.gameState = self.brain.player.currentState

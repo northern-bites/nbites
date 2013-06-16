@@ -137,6 +137,15 @@ def shouldFindBallKick(player):
     """
     return (player.brain.ball.vis.frames_off > constants.BALL_OFF_KICK_THRESH)
 
+def ballMoved(player):
+    """
+    Ball has moved away from where it was seen last
+    """
+    ball = player.brain.ball
+    ballBefore = player.ballBeforeApproach
+    return (fabs(ball.x - ballBefore.x) > constants.BALL_MOVED_THR or
+            fabs(ball.y - ballBefore.y) > constants.BALL_MOVED_THR)
+
 def shouldSpinFindBall(player):
     """
     Should spin if we already tried scanning

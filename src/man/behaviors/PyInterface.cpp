@@ -96,6 +96,14 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::myWorldModel_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("stiffStatus",
+                      make_getter(&PyInterface::stiffStatus_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("armContactState",
+                      make_getter(&PyInterface::armContactState_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         ;
     scope().attr("interface") = interface_ptr;
 }

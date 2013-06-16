@@ -20,6 +20,8 @@
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "RobotLocation.pb.h"
+#include "StiffnessControl.pb.h"
+#include "ArmContactState.pb.h"
 
 /**
  *
@@ -89,6 +91,8 @@ public:
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::FallStatus> fallStatusIn;
+    portals::InPortal<messages::StiffStatus> stiffStatusIn;
+    portals::InPortal<messages::ArmContactState> armContactStateIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;

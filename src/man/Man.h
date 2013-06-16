@@ -21,6 +21,7 @@
 #include "motion/MotionModule.h"
 #include "gamestate/GameStateModule.h"
 #include "localization/LocalizationModule.h"
+#include "arms/ArmContactModule.h"
 
 #include <vector>
 
@@ -42,6 +43,7 @@ private:
     sensors::SensorsModule sensors;
     jointenactor::JointEnactorModule jointEnactor;
     motion::MotionModule motion;
+    arms::ArmContactModule arms;
 
     DiagramThread guardianThread;
     guardian::GuardianModule guardian;

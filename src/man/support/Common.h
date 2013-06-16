@@ -7,6 +7,7 @@
 
 #include <math.h> // for PI
 #include "NBMath.h"
+#include "DebugConfig.h"
 #include <time.h>
 #include <assert.h>
 #include <stdint.h>

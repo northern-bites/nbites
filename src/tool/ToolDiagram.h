@@ -1,9 +1,10 @@
 #pragma once
 
 #include <QWidget>
+#include <iostream>
 #include "unlog/UnlogModule.h"
 #include "Header.pb.h"
-#include <iostream>
+
 
 namespace tool{
 
@@ -43,13 +44,18 @@ public:
         {
             if(test.GetTypeName() == (*i)->getType())
             {
-                unlog::UnlogModule<T>* u =
-                    dynamic_cast<unlog::UnlogModule<T>*>(*i);
-                input.wireTo(&u->output);
-                std::cout << "Connected successfully to "
-                          << test.GetTypeName() << " unlogger!"
-                          << std::endl;
-                return true;
+                if(path == getIdFromPath((*i)->getFilePath()) ||
+                   path == "none")
+                {
+                    unlog::UnlogModule<T>* u =
+                        dynamic_cast<unlog::UnlogModule<T>*>(*i);
+                    input.wireTo(&u->output);
+                    std::cout << "Connected successfully to "
+                              << test.GetTypeName() << " unlogger from file "
+                              << (*i)->getFilePath() << "!"
+                              << std::endl;
+                    return true;
+                }
             }
         }
 

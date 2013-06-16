@@ -19,6 +19,13 @@ def gameInitial(player):
         player.zeroHeads()
         player.side = LEFT
         player.isSaving = False
+        player.lastStiffStatus = True
+
+    # If stiffnesses were JUST turned on, then stand up.
+    if player.lastStiffStatus == False and player.brain.interface.stiffStatus.on:
+        player.stand()
+    # Remember last stiffness.
+    player.lastStiffStatus = player.brain.interface.stiffStatus.on
 
     return player.stay()
 
@@ -106,6 +113,9 @@ def gameFinished(player):
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
+
+    if player.brain.nav.isStopped():
+        player.gainsOff()
 
     return player.stay()
 

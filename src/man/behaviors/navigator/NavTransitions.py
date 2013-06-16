@@ -24,28 +24,37 @@ def atDestination(nav):
     else:
         return relDest.within((x, y, h))
 
+# Should the robot dodge TO THE LEFT? (ie something is on its right)
 def shouldDodgeLeft(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
     # check sonars
     sonarState = nav.brain.interface.sonarState
-    sonars = (sonarState.us_right != -1 and
-              sonarState.us_right < constants.AVOID_OBSTACLE_SIDE_DIST)
+    # sonar values are given to us in meters
+    sonars = (sonarState.us_right*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
 
     #check vision
     vision = nav.brain.interface.visionObstacle.on_right
 
     #check feet
-#    footBumperState = nav.brain.interface.footBumperState
-    feet = (False)
-            # Not currently usable: proto cannot be parsed
-            #footBumperState.r_foot_bumper_left or
-            #footBumperState.r_foot_bumper_right)
+    footBumperState = nav.brain.interface.footBumperState
+    feet = (footBumperState.r_foot_bumper_left.pressed or
+            footBumperState.r_foot_bumper_right.pressed)
 
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.WEST) or
+            (armState.right_push_direction is armState.WEST))
+
+    # Prioritize arms, experimentally
+    if arms:
+        return True
+
+    # Take 2 of 3, indicates that we should dodge
     if (feet and vision):
         return True
-    elif (vision and sonars):
+    if (vision and sonars):
         return True
     elif (sonars and feet):
         return True
@@ -53,29 +62,73 @@ def shouldDodgeLeft(nav):
     else:
         return False
 
+# Should the robot dodge TO THE RIGHT? (ie something is on its left)
 def shouldDodgeRight(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
     # check sonars
     sonarState = nav.brain.interface.sonarState
-    sonars = (sonarState.us_left != -1 and
-              sonarState.us_left < constants.AVOID_OBSTACLE_SIDE_DIST)
+    # sonar values are given to us in meters
+    sonars = (sonarState.us_left*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
+
     #check vision
     vision = nav.brain.interface.visionObstacle.on_left
 
     #check feet
-#    footBumperState = nav.brain.interface.footBumperState
-    feet = (False)
-            # Not currently usable: proto cannot be parsed
-            #(footBumperState.l_foot_bumper_left or
-            #footBumperState.l_foot_bumper_right)
+    footBumperState = nav.brain.interface.footBumperState
+    feet = (footBumperState.l_foot_bumper_left.pressed or
+            footBumperState.l_foot_bumper_right.pressed)
 
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.EAST) or
+            (armState.right_push_direction is armState.EAST))
+
+    # Prioritize arms, experimentally
+    if arms:
+        return True
+
+    # If 2 of 3, indicates that we should dodge
     if (feet and vision):
         return True
-    elif (vision and sonars):
+    if (vision and sonars):
         return True
     elif (sonars and feet):
+        return True
+
+    else:
+        return False
+
+# ie should move backwards
+def shouldDodgeBack(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
+
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.SOUTH) or
+            (armState.right_push_direction is armState.SOUTH))
+
+    # Only use arms, experimentally
+    if arms:
+        return True
+
+    else:
+        return False
+
+# ie should move forwards
+def shouldDodgeForward(nav):
+    if not states.goToPosition.avoidObstacles:
+        return False
+
+    #check hands
+    armState = nav.brain.interface.armContactState
+    arms = ((armState.left_push_direction is armState.NORTH) or
+            (armState.right_push_direction is armState.NORTH))
+
+    # Only use arms, experimentally
+    if arms:
         return True
 
     else:
@@ -86,20 +139,6 @@ def doneDodging(nav):
 
 def notAtLocPosition(nav):
     return not atDestination(nav)
-
-def walkedEnough(nav):
-    deltaDest = states.walkingTo.deltaDest
-    dest = states.walkingTo.dest
-    precision = states.walkingTo.precision
-
-    #check if we've "passed" the point we were supposed to go to
-    #with odometry
-    if (dest.relX * deltaDest.relX < 0 and
-        dest.relY * deltaDest.relY < 0 and
-        dest.relH * deltaDest.relH < 0):
-        return True
-
-    return deltaDest.within(precision)
 
 ######### BALL IN BOX ###############
 

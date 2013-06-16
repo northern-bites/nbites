@@ -124,6 +124,12 @@ namespace man
 
         /* Past here, unneccessary to have END_VARS because
            the string keys are too unique to loop over.     */
+        // The battery charge.
+        BatteryCharge,
+        /* IMPORTANT for some reason, battery charge cannot be read correctly unless
+         * battery current is read also, who knows why, bad aldebaran code?
+         * NOT ACTUALLY OUTPORTALED OR USED AT ALL, current is needed for bug fix */
+        BatteryCurrent,
 
         /** Ultrasonic (sonar) sensors **/
         USLeft,
@@ -140,8 +146,33 @@ namespace man
         // The chest push-button.
         ChestboardButton,
 
-        // The battery charge.
-        BatteryCharge,
+        // Stiffness values
+        HeadPitchStiff,
+        HeadYawStiff,
+        LAnklePitchStiff,
+        LAnkleRollStiff,
+        LElbowRollStiff,
+        LElbowYawStiff,
+        LHandStiff,
+        LHipPitchStiff,
+        LHipRollStiff,
+        LHipYawPitchStiff,
+        LKneePitchStiff,
+        LShoulderPitchStiff,
+        LShoulderRollStiff,
+        LWristYawStiff,
+        RAnklePitchStiff,
+        RAnkleRollStiff,
+        RElbowRollStiff,
+        RElbowYawStiff,
+        RHandStiff,
+        RHipPitchStiff,
+        RHipYawPitchStiff,
+        RHipRollStiff,
+        RKneePitchStiff,
+        RShoulderPitchStiff,
+        RShoulderRollStiff,
+        RWristYawStiff,
 
         NUM_SENSOR_VALUES
     };
@@ -231,6 +262,11 @@ namespace man
         "AngleY",
         "!!END!!",
         //OTHERS
+        "BatteryCharge",
+        /* IMPORTANT for some reason, battery charge cannot be read correctly unless
+         * battery current is read also, who knows why, bad aldebaran code?
+         * NOT ACTUALLY OUTPORTALED OR USED AT ALL, current is needed for bug fix */
+        "BatteryCurrent",
         "USLeft",
         "USRight",
         "LFootBumperLeft",
@@ -238,7 +274,33 @@ namespace man
         "RFootBumperLeft",
         "RFootBumperRight",
         "ChestboardButton",
-        "BatteryCharge",
+        // Stiffness values
+        "HeadPitchStiff",
+        "HeadYawStiff",
+        "LAnklePitchStiff",
+        "LAnkleRollStiff",
+        "LElbowRollStiff",
+        "LElbowYawStiff",
+        "LHandStiff",
+        "LHipPitchStiff",
+        "LHipRollStiff",
+        "LHipYawPitchStiff",
+        "LKneePitchStiff",
+        "LShoulderPitchStiff",
+        "LShoulderRollStiff",
+        "LWristYawStiff",
+        "RAnklePitchStiff",
+        "RAnkleRollStiff",
+        "RElbowRollStiff",
+        "RElbowYawStiff",
+        "RHandStiff",
+        "RHipPitchStiff",
+        "RHipYawPitchStiff",
+        "RHipRollStiff",
+        "RKneePitchStiff",
+        "RShoulderPitchStiff",
+        "RShoulderRollStiff",
+        "RWristYawStiff",
         "!!END!!"
     };
     } // namespace sensors

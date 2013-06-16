@@ -100,7 +100,14 @@ void ImageConverterModule::initTable(char *filename)
 void ImageConverterModule::changeTable(unsigned char *newTable)
 {
     table = newTable;
+	run_();
 }
+
+void ImageConverterModule::loadTable(unsigned char *newTable)
+{
+	table = newTable;
+}
+
 
 }
 }

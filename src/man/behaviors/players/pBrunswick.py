@@ -10,6 +10,7 @@ from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
 from . import BrunswickStates
+from . import DribbleStates
 
 import noggin_constants as NogginConstants
 from ..playbook import PBConstants
@@ -30,6 +31,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(KickingStates)
         self.addStates(ChaseBallStates)
         self.addStates(BrunswickStates)
+        self.addStates(DribbleStates)
 
         self.setName('pBrunswick')
 
@@ -64,6 +66,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         gcState = self.gameState
 
         if (gcState == 'gamePlaying' and
+            not self.currentState == 'afterPenalty' and
             not self.currentState == 'gamePenalized'):
             if not (self.currentState == 'gamePlaying'
                 and self.counter != 1):
@@ -108,7 +111,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
-            if self.lastDiffState == 'gameSet':
+            if self.brain.gameController.timeSincePlaying < 10:
                 return 'kickoff'
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):

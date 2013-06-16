@@ -13,38 +13,38 @@
 
 namespace man
 {
-    namespace localization
-    {
+namespace localization
+{
+/**
+ * @class SensorModel
+ * @brief The abstract interface for providing sensor
+ *        (e.g., vision) updates to the particle filter.
+ */
+class SensorModel
+{
+public:
+    SensorModel() { }
+    virtual ~SensorModel() { }
+
     /**
-     * @class SensorModel
-     * @brief The abstract interface for providing sensor
-     *        (e.g., vision) updates to the particle filter.
+     * @brief Update the particles with the latest measurement
+     *        taken by the robot's sensors.
      */
-    class SensorModel
-    {
-    public:
-        SensorModel() { }
-        virtual ~SensorModel() { }
+    virtual ParticleSet update(ParticleSet& particles,
+                               messages::VisionField& visionInput) = 0;
 
-        /**
-         * @brief Update the particles with the latest measurement
-         *        taken by the robot's sensors.
-         */
-        virtual ParticleSet update(ParticleSet& particles,
-                                   messages::VisionField& visionInput) = 0;
+    /*
+     * These methods allow the client to access information as
+     * to whether or not the SensorModel has performed an
+     * update on the latest iteration.
+     */
+    bool hasUpdated() const { return updated; }
+    void setUpdated(bool updated_) { updated = updated_; }
 
-        /*
-         * These methods allow the client to access information as
-         * to whether or not the SensorModel has performed an
-         * update on the latest iteration.
-         */
-        bool hasUpdated() const { return updated; }
-        void setUpdated(bool updated_) { updated = updated_; }
+private:
+    bool updated;    //! Flag indicates whether or not the particles have
+    //! been updated with the latest sensor readings.
+};
 
-    private:
-        bool updated;    //! Flag indicates whether or not the particles have
-                         //! been updated with the latest sensor readings.
-    };
-
-    } // namespace localization
+} // namespace localization
 } // namespace man

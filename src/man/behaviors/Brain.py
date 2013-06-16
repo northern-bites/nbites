@@ -40,6 +40,7 @@ import VisionRobot_proto
 import VisionField_proto
 import ButtonState_proto
 import FallStatus_proto
+import StiffnessControl_proto
 
 class Brain(object):
     """
@@ -90,6 +91,12 @@ class Brain(object):
 
         # Message interface
         self.interface = interface.interface
+
+        # HACK for dangerous ball flipping loc
+        self.dangerousBallFilter = []
+        self.dangerousBallFilterCount = 0
+        self.ownBallFilter = []
+        self.ownBallFilterCount = 0
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -146,6 +153,11 @@ class Brain(object):
         self.player.run()
         self.tracker.run()
         self.nav.run()
+
+        # HACK for dangerous ball flipping loc
+        if self.updateDangerousBallFilter() and self.updateOwnBallFilter():
+            #flip loc!
+            self.flipLoc()
 
         # Set LED message
         self.leds.processLeds()
@@ -241,24 +253,25 @@ class Brain(object):
         Note: Loc uses truly global coordinates, and the
               blue goalbox constants always match up with our goal.
         """
+        # Does this matter for the goalie? It really shouldn't...
         if self.playerNumber == 1:
-            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+            self.resetLocTo(Constants.MIDFIELD_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 2:
-            self.resetLocTo(Constants.BLUE_GOALBOX_RIGHT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 3:
-            self.resetLocTo(Constants.LANDMARK_BLUE_GOAL_CROSS_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
         elif self.playerNumber == 4:
-            self.resetLocTo(Constants.BLUE_CROSS_CIRCLE_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_TOP_SIDELINE_Y,
                             Constants.HEADING_DOWN)
         elif self.playerNumber == 5:
-            self.resetLocTo(Constants.BLUE_CROSS_CIRCLE_MIDPOINT_X,
+            self.resetLocTo(Constants.BLUE_GOALBOX_CROSS_MIDPOINT_X,
                             Constants.FIELD_WHITE_BOTTOM_SIDELINE_Y,
                             Constants.HEADING_UP)
 
@@ -300,6 +313,20 @@ class Brain(object):
                                 gameSetResetUncertainties)
             #self.loc.resetLocToSide(False)
 
+    def checkSetLocalization(self):
+        """
+        Use during the first frame of the set state.
+        If we think we are on the opponent's side of the field, either
+            1) We didn't make it back and will be manually positioned or
+            2) Our loc is wrong, and we could be anywhere.
+        Reset to our own field cross. The loc system should be able to
+        recover from there with high probability. 6/13/13
+        """
+        if self.loc.x > Constants.MIDFIELD_X:
+            self.resetLocTo(Constants.LANDMARK_MY_FIELD_CROSS[0],
+                            Constants.LANDMARK_MY_FIELD_CROSS[1],
+                            Constants.HEADING_RIGHT)
+
     def resetLocalizationFromPenalty(self, top):
         """
         Resets localization from penalty.
@@ -333,3 +360,75 @@ class Brain(object):
     #TODO: write this method!
     def resetPenaltyKickLocalization(self):
         pass
+
+    # THIS IS A HACK!
+    # ... but until we have a world contextor or some such, it's a necessary one.
+
+    def updateDangerousBallFilter(self):
+        """
+        Updates a filter of the last 20 frames for dangerous ball calls from the goalie.
+        @return: true if the goalie has seen a ball 15 times in the last 20 frames.
+        """
+        # Add to the filter for this frame
+        for mate in self.teamMembers:
+            if mate.playerNumber in [1] and mate.active:
+                if mate.ballOn and mate.ballDist < 350:
+                    self.dangerousBallFilter.append(1)
+                else:
+                    self.dangerousBallFilter.append(0)
+
+        # If there isn't a goalie, the list will be empty, so don't try to read it.
+        if len(self.dangerousBallFilter) > 0:
+            # add to the counter whatever was appended
+            self.dangerousBallFilterCount += self.dangerousBallFilter[len(self.dangerousBallFilter)-1]
+
+        # check if the filter has been populated yet.
+        if len(self.dangerousBallFilter) > 20:
+            # Remove from the filter for oldest frame and change the counter
+            self.dangerousBallFilterCount -= self.dangerousBallFilter.pop(0)
+
+        # Is the counter high enough to flip loc?
+        return self.dangerousBallFilterCount > 15
+
+    def updateOwnBallFilter(self):
+        """
+        As above, but for myself.
+        """
+        # Add to the filter for this frame
+        for mate in self.teamMembers:
+            if mate.playerNumber in [self.playerNumber]:
+                if mate.ballOn:
+                    self.ownBallFilter.append(1)
+                else:
+                    self.ownBallFilter.append(0)
+
+        # add to the counter whatever was appended
+        self.ownBallFilterCount += self.ownBallFilter[len(self.ownBallFilter)-1]
+
+        # check if the filter has been populated yet.
+        if len(self.ownBallFilter) > 20:
+            # Remove from the filter for oldest frame and change the counter
+            self.ownBallFilterCount -= self.ownBallFilter.pop(0)
+
+        # Is the counter high enough to flip loc?
+        return self.ownBallFilterCount > 15
+
+
+    def flipLoc(self):
+        """
+        The goalie has a ball nearby.
+        If we are near a ball, but think we're near opposing goal,
+        FLIP LOC.
+        """
+        if self.ball.x < Constants.MIDFIELD_X:
+            # Loc is accurate. Abort flip.
+            return
+
+        print "According to the Goalie, I need to flip my loc!"
+
+        reset_x = (-1*(self.loc.x - Constants.MIDFIELD_X)) + Constants.MIDFIELD_X
+        reset_y = (-1*(self.loc.y - Constants.MIDFIELD_Y)) + Constants.MIDFIELD_Y
+        reset_h = self.loc.h + 180
+        if reset_h > 180:
+            reset_h -= 360
+        self.resetLocTo(reset_x, reset_y, reset_h)

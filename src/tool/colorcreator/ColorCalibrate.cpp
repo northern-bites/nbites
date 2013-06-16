@@ -47,11 +47,11 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
 
     imageTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     topLayout->addWidget(imageTabs);
-	thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
-	topLayout->addWidget(&thresholdedImagePlaceholder);
- 
-	imageTabs->addTab(&topDisplay, "Top Image");
-	imageTabs->addTab(&bottomDisplay, "Bottom Image");
+    thresholdedImagePlaceholder.setAlignment(Qt::AlignCenter);
+    topLayout->addWidget(&thresholdedImagePlaceholder);
+
+    imageTabs->addTab(&topDisplay, "Top Image");
+    imageTabs->addTab(&bottomDisplay, "Bottom Image");
 
     connect(imageTabs, SIGNAL(currentChanged(int)),
             this, SLOT(imageTabSwitched(int)));
@@ -65,7 +65,7 @@ ColorCalibrate::ColorCalibrate(QWidget *parent) :
         colorSelect.addItem(image::Color_label[i].c_str());
     }
 
-	//All of the other Qt stuff
+    //All of the other Qt stuff
     colorSelect.setCurrentIndex(0);
     connect(&colorSelect, SIGNAL(currentIndexChanged(int)),
             this, SLOT(selectColorSpace(int)));
@@ -144,33 +144,33 @@ void ColorCalibrate::updateThresholdedImage() {
     if (thresholdedImage.width() != image.width()
         || thresholdedImage.height() != image.height()) {
         //TODO: should be ARGB premultiplied?
-	  thresholdedImage = QImage(image.width()/2,
+      thresholdedImage = QImage(image.width()/2,
                                   image.height(),
                                   QImage::Format_RGB32);
     }
 
-	// Get the image being thresholded on
+    // Get the image being thresholded on
     if (currentCamera == Camera::TOP) {
         image = topImageIn.message();
     } else {
         image = bottomImageIn.message();
     }
 
-	//Seperates out the 3 parts of the YUV image
+    //Seperates out the 3 parts of the YUV image
     const messages::MemoryImage8 yImage = image.yImage();
     const messages::MemoryImage8 uImage = image.uImage();
     const messages::MemoryImage8 vImage = image.vImage();
 
     //threshold the image
     for (int j = 0; j < thresholdedImage.height(); j++) {
-	    //We threshold an image by grabbing each line and thresholding that line
+        //We threshold an image by grabbing each line and thresholding that line
         QRgb* thresholdedImageLine = (QRgb*) (thresholdedImage.scanLine(j));
-		
+
         for (int i = 0; i < thresholdedImage.width(); i++) {
             image::Color color;
-			//The division by two is because the u and v images are not as wide
-			//as the thresholded image. Due to making the threshodedImage a QImage
-		    color.setYuv((byte)yImage.getPixel(i,j), (byte)uImage.getPixel(i/2,j),
+            //The division by two is because the u and v images are not as wide
+            //as the thresholded image. Due to making the threshodedImage a QImage
+            color.setYuv((byte)yImage.getPixel(i,j), (byte)uImage.getPixel(i/2,j),
                          (byte)vImage.getPixel(i/2,j));
             //default color
             thresholdedImageLine[i] = image::Color::Grey;
@@ -178,8 +178,8 @@ void ColorCalibrate::updateThresholdedImage() {
             int count = 0;
             long long tempColor = 0;
             for (int c = 0; c < image::Color::NUM_COLORS; c++) {
-			  if (colorSpace[c].contains(color) &&
-				  (displayAllColors || currentColorSpace == &colorSpace[c])) {
+              if (colorSpace[c].contains(color) &&
+                  (displayAllColors || currentColorSpace == &colorSpace[c])) {
                     //blend colors in by averaging them
                     tempColor *= count;
                     tempColor += image::Color_RGB[c];
@@ -187,48 +187,48 @@ void ColorCalibrate::updateThresholdedImage() {
                     tempColor /= count;
                 }
             }
-			//We now have a color for this pixel
-			thresholdedImageLine[i] = (QRgb)tempColor;
+            //We now have a color for this pixel
+            thresholdedImageLine[i] = (QRgb)tempColor;
         }
     }
 
     // //set it
-	thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
+    thresholdedImagePlaceholder.setPixmap(QPixmap::fromImage(thresholdedImage));
 
 }
 
   void ColorCalibrate::canvasClicked(int x, int y, int brushSize, bool leftClick)
   {
-	std::cout << "Clicked " << x << " " << y << " " << std::endl;
+    std::cout << "Clicked " << x << " " << y << " " << std::endl;
 
-	messages::YUVImage image;
-	if(currentCamera == Camera::TOP) image = topImageIn.message();
-	else image = bottomImageIn.message();
+    messages::YUVImage image;
+    if(currentCamera == Camera::TOP) image = topImageIn.message();
+    else image = bottomImageIn.message();
 
-	byte yi = image.yImage().getPixel(x, y);
-	byte u = image.uImage().getPixel(x/2, y);
-	byte v = image.vImage().getPixel(x/2, y);
+    byte yi = image.yImage().getPixel(x, y);
+    byte u = image.uImage().getPixel(x/2, y);
+    byte v = image.vImage().getPixel(x/2, y);
 
-	std::cout << "YUV " << (int)yi << " " << (int)u << " " <<
-	  (int)v << std::endl;
+    std::cout << "YUV " << (int)yi << " " << (int)u << " " <<
+      (int)v << std::endl;
 
-	image::Color color;
-	color.setYuv(yi, u, v);
-	std::cout << "HSZ " << color.getH() << " " << color.getS() <<
-	  " " << color.getZ() << std::endl;
-	
-	currentColorSpace->verboseContains(color);
+    image::Color color;
+    color.setYuv(yi, u, v);
+    std::cout << "HSZ " << color.getH() << " " << color.getS() <<
+      " " << color.getZ() << std::endl;
 
-	if (!leftClick) {
-	  std::cout << "Right click " << std::endl;
-	  bool changed = currentColorSpace->expandToFit(color);
-	  if (changed) {
-		colorSpaceWidget.setColorSpace(currentColorSpace);
-	  }
-	}
+    currentColorSpace->verboseContains(color);
 
-	updateThresholdedImage();
-	std::cout << std::endl;
+    if (!leftClick) {
+      std::cout << "Right click " << std::endl;
+      bool changed = currentColorSpace->expandToFit(color);
+      if (changed) {
+        colorSpaceWidget.setColorSpace(currentColorSpace);
+      }
+    }
+
+    updateThresholdedImage();
+    std::cout << std::endl;
   }
 
 void ColorCalibrate::run_()
@@ -241,7 +241,7 @@ void ColorCalibrate::run_()
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
 
-  	subdiagram.run();
+      subdiagram.run();
     updateThresholdedImage();
 }
 
@@ -305,6 +305,11 @@ void ColorCalibrate::writeColorSpaces(QString filename) {
 }
 
 void ColorCalibrate::imageTabSwitched(int i) {
+    // Check if there is a valid widget yet or not.
+    // We get this signal when we close the tool.
+    if (i == -1)
+        return;
+
     if (imageTabs->currentWidget() == &topDisplay) {
         currentCamera = Camera::TOP;
     }

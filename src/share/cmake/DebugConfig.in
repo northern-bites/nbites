@@ -18,6 +18,13 @@
 #   undef DEBUG_BALLTRACK
 #endif
 
+#define DEBUG_LOC_${DEBUG_LOC}
+#ifdef  DEBUG_LOC_ON
+#   define DEBUG_LOC
+#else
+#   undef DEBUG_LOC
+#endif
+
 #define DEBUG_THREADS_${DEBUG_THREADS}
 #ifdef  DEBUG_THREADS_ON
 #   define DEBUG_THREADS
@@ -121,4 +128,11 @@
 #   define LOG_ODOMETRY
 #else
 #   undef LOG_ODOMETRY
+#endif
+
+#define LOG_SYNC_${LOG_SYNC}
+#ifdef  LOG_SYNC_ON
+#   define LOG_SYNC
+#else
+#   undef LOG_SYNC
 #endif

@@ -9,12 +9,14 @@ ThresholdedImageDisplayModule::ThresholdedImageDisplayModule(QWidget* parent)
     : QLabel(parent),
       filter(ALL_COLORS)
 {
-    setText(tr("No image loaded!"));
+	setText(tr("No image loaded!"));
+	setHeight(480); // twice as big as normal
 }
 
 void ThresholdedImageDisplayModule::run_()
 {
     imageIn.latch();
+
     // Note that you have to pass a label a QPixmap, but you can't really edit
     // the pixels of a pixmap, so you have to edit a QImage then make a
     // pixmap from it. *rolls eyes*
@@ -28,34 +30,35 @@ void ThresholdedImageDisplayModule::run_()
  */
 QImage ThresholdedImageDisplayModule::makeImage(byte filter_)
 {
-    QImage image(imageIn.message().width(),
-                 imageIn.message().height(),
-                 QImage::Format_RGB32);
+	QImage image(imageIn.message().width(),
+				 imageIn.message().height(),
+				 QImage::Format_RGB32);
 
-    for (int j = 0; j < image.height(); ++j)
-    {
-        QRgb* bitmapLine = (QRgb*) image.scanLine(j);
-        for (int i = 0; i < image.width(); ++i)
-        {
-            int rawColor = imageIn.message().getPixel(i, j);
-            int threshColor = 0, mix = 1;
-            for (int c = 0; c < Color::NUM_COLORS; c++) {
-                if ((rawColor & Color_bits[c]) > 0 &&
-                    ((Color_bits[c] & filter_) > 0))
-                {
-                    threshColor += Color_RGB[c];
-                    threshColor /= mix;
-                    mix++;
-                }
-            }
+	for (int j = 0; j < image.height(); ++j)
+	{
+		QRgb* bitmapLine = (QRgb*) image.scanLine(j);
+		for (int i = 0; i < image.width(); ++i)
+		{
+			int rawColor = imageIn.message().getPixel(i, j);
+			int threshColor = 0, mix = 1;
+			for (int c = 0; c < Color::NUM_COLORS; c++) {
+				if ((rawColor & Color_bits[c]) > 0 &&
+					((Color_bits[c] & filter_) > 0))
+				{
+					threshColor += Color_RGB[c];
+					threshColor /= mix;
+					mix++;
+				}
+			}
 
-            if (threshColor == 0) threshColor = Color_RGB[0];
+			if (threshColor == 0) threshColor = Color_RGB[0];
+			bitmapLine[i] = threshColor;
+		}
+	}
 
-            bitmapLine[i] = threshColor;
-        }
-    }
+	image = image.scaledToHeight(height);
 
-    return image;
+	return image;
 }
 
 ImageDisplayModule::ImageDisplayModule(QWidget* parent) : QLabel(parent),
@@ -191,9 +194,9 @@ void ImageDisplayListener::mouseReleaseEvent ( QMouseEvent * event )
 
     int mouseX = event->x();
     int mouseY = event->y();
-
+    
     emit mouseClicked((int)((float)mouseX),
-					  (int)((float)mouseY), brushSize, left);
+                      (int)((float)mouseY), brushSize, left);
 }
 
 void ImageDisplayListener::wheelEvent(QWheelEvent* event) {
