@@ -30,11 +30,7 @@ public slots:
     void saveAsGlobalTable();
     void saveGlobalTable();
 
-private:
-    void serializeTableName(QString latestTableName);
-    void loadLatestTable();
-
-protected:
+ protected:
     color::ColorTableCreator tableCreator;
     vision::VisionDisplayModule visDispMod;
 
