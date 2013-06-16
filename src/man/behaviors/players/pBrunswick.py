@@ -10,6 +10,7 @@ from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
 from . import BrunswickStates
+from . import DribbleStates
 
 import noggin_constants as NogginConstants
 from ..playbook import PBConstants
@@ -30,6 +31,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(KickingStates)
         self.addStates(ChaseBallStates)
         self.addStates(BrunswickStates)
+        self.addStates(DribbleStates)
 
         self.setName('pBrunswick')
 

@@ -95,6 +95,18 @@ void VisionModule::updateVisionObstacle() {
     obstacle_data.get()->set_on_right(vision->obstacles->onRight());
     obstacle_data.get()->set_off_field(vision->obstacles->offField());
 
+    obstacle_data.get()->set_block_left(vision->fieldOpenings[0].hard);
+    obstacle_data.get()->set_block_mid(vision->fieldOpenings[1].hard);
+    obstacle_data.get()->set_block_right(vision->fieldOpenings[2].hard);
+
+    obstacle_data.get()->set_left_dist(vision->fieldOpenings[0].dist);
+    obstacle_data.get()->set_mid_dist(vision->fieldOpenings[1].dist);
+    obstacle_data.get()->set_right_dist(vision->fieldOpenings[2].dist);
+
+    obstacle_data.get()->set_left_bearing(vision->fieldOpenings[0].bearing);
+    obstacle_data.get()->set_mid_bearing(vision->fieldOpenings[1].bearing);
+    obstacle_data.get()->set_right_bearing(vision->fieldOpenings[2].bearing);
+
     vision_obstacle.setMessage(obstacle_data);
 
 }
