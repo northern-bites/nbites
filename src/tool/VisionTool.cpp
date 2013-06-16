@@ -165,9 +165,9 @@ void VisionTool::setUpModules()
         diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
                                                       "bottom") &&
         diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
-                                                         "joints") &&
+                                                         "vision_joints") &&
         diagram.connectToUnlogger<messages::InertialState>(visDispMod.inerts_in,
-                                                           "inertials"))
+                                                           "vision_inertials"))
     {
         // All is well
     }
