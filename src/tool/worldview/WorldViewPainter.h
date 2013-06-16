@@ -5,6 +5,7 @@
  *
  * @author EJ Googins April 2013
  * @modified Brian Jacobel April 2013
+ * @modified Wils Dawson June 2013
  *
  */
 
@@ -21,6 +22,7 @@
 #include "RobotLocation.pb.h"
 #include "WorldModel.pb.h"
 
+#include "Common.h"
 #include "NBMath.h"
 
 namespace tool {
@@ -33,10 +35,7 @@ class WorldViewPainter : public tool_common::PaintField
 public:
     WorldViewPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
 
-    void updateWithLocationMessage(messages::WorldModel newLoc);
-
-protected slots:
-    void paintLocationAction(bool state);
+    void updateWithLocationMessage(messages::WorldModel newLoc, int index);
 
 protected:
     // Paint the field
@@ -45,44 +44,12 @@ protected:
     // Paint a RobotLocation
     void paintRobotLocation(QPaintEvent* event,
                             messages::WorldModel loc,
+                            QString playerNum,
                             bool red = false);
 
 private:
-    bool shouldPaintLocation;
-
-    messages::WorldModel curLoc;
+    messages::WorldModel curLoc[NUM_PLAYERS_PER_TEAM];
 };
 
-} // namespace viewer
+} // namespace worldview
 } // namespace tool
-
-
-/*WorldModel proto looks like:
-
-message WorldModel
-{
-        optional float my_x = 1;
-        optional float my_y = 2;
-        optional float my_h = 3;
-
-        optional float my_x_uncert = 4;
-        optional float my_y_uncert = 5;
-        optional float my_h_uncert = 6;
-
-        optional bool  ball_on = 7;
-
-        optional float ball_dist = 8;
-        optional float ball_bearing = 9;
-
-        optional float ball_dist_uncert = 10;
-        optional float ball_bearing_uncert = 11;
-
-        optional float chase_time = 12;
-
-        optional int32 role = 13;
-        optional int32 sub_role = 14;
-
-        optional bool  active = 15;
-}
-
-*/

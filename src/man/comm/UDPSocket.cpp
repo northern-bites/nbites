@@ -63,11 +63,6 @@ bool UDPSocket::setTarget(const char* ip, const int port)
     return resolve(ip, port, addr);
 }
 
-bool UDPSocket::setTarget(const struct sockaddr addr)
-{
-    return memcpy(target, &addr, sizeof(target));
-}
-
 bool UDPSocket::setBroadcast(bool enable)
 {
     int yes = enable ? 1 : 0;

@@ -35,8 +35,8 @@ def kickoff(player):
         kickoff.ballRelY = player.brain.ball.rel_y
 
     if (player.brain.gameController.timeSincePlaying > 10 or
-        fabs(player.brain.ball.rel_x - kickoff.ballRelX) > 5 or
-        fabs(player.brain.ball.rel_y - kickoff.ballRelY) > 5):
+        fabs(player.brain.ball.rel_x - kickoff.ballRelX) > constants.KICKOFF_BALL_MOVE_THRESH or
+        fabs(player.brain.ball.rel_y - kickoff.ballRelY) > constants.KICKOFF_BALL_MOVE_THRESH):
         return player.goNow('chase')
 
     return player.stay()

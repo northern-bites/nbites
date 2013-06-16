@@ -2,5 +2,5 @@ package messages;
 
 message FeetOnGround
 {
-        optional bool on_ground = 1;
+    optional bool on_ground = 1;
 }
