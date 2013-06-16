@@ -100,6 +100,7 @@ private:
     bool havePlaybook;
     void updateRobotPositions();
     void updateLockedPositions();
+    void updateLockedPriority();
     void refreshTextAll();
 };
 

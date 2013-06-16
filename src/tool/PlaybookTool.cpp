@@ -24,7 +24,7 @@ PlaybookTool::PlaybookTool(const char* title) :
     }
     // If we don't have dimensions, default to hard-coded values
     if((geometry->width() == 0) && (geometry->height() == 0)){
-        geometry = new QRect(75, 75, 1132, 958);
+        geometry = new QRect(75, 75, 932, 758);
     }
     this->setGeometry(*geometry);
 }

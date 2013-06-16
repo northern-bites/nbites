@@ -424,6 +424,10 @@ void PlaybookCreator::updateLockedPositions()
         setChaserYPosition();
         setChaserHPosition();
     }
+}
+
+void PlaybookCreator::updateLockedPriority()
+{
     if (model->getPriorityLocked())
     {
         setPriorityList();
@@ -495,6 +499,7 @@ void PlaybookCreator::setBallX()
     model->setBallX(editBallX->text().toInt());
 
     updateLockedPositions();
+    updateLockedPriority();
     refreshTextAll();
 }
 
@@ -503,6 +508,7 @@ void PlaybookCreator::setBallY()
     model->setBallY(editBallY->text().toInt());
 
     updateLockedPositions();
+    updateLockedPriority();
     refreshTextAll();
 }
 
