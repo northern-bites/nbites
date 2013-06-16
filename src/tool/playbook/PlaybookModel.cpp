@@ -13,11 +13,12 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     defenderLocked(false),
     offenderLocked(false),
     middieLocked(false),
+    chaserLocked(false),
     BOX_SIZE(b_s),
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h),
     numActiveFieldPlayers(4),
-    ball_x(5),
+    ball_x(4),
     ball_y(4)
 {
     playbook = new PlaybookPosition****[2];
@@ -32,7 +33,6 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
                 playbook[goalie][x][y] = new PlaybookPosition*[4+3+2+1];
                 for(int role = 0; role < 4+3+2+1; ++role)
                 {
-
                     PlaybookPosition* p = new PlaybookPosition(
                         LANDMARK_BLUE_GOAL_CROSS_X,
                         LANDMARK_BLUE_GOAL_CROSS_Y + (role%4 - 1) * CENTER_CIRCLE_RADIUS,
@@ -75,6 +75,7 @@ void PlaybookModel::toggleMiddie(bool on)
     qDebug() << "middieLocked is now " << middieLocked;
 }
 
+// Not used.
 void PlaybookModel::setPosition(int value, short role, bool x_position)
 {
     short roleIndex = convertRoleToPlaybookIndex(role);

@@ -240,7 +240,7 @@ void PlaybookCreator::updateRobotPositions()
         roleIndex = model->convertRoleToPlaybookIndex(i);
         PlaybookPosition* position = model->playbook[model->getGoalieOn()][ballX][ballY][roleIndex];
 
-        fieldPainter->setRobot(position,defaultRoleList[i]);
+        fieldPainter->setRobot(position,i);
     }
 
     fieldPainter->setNumActiveFieldPlayers(fieldPlayers);
@@ -300,7 +300,7 @@ void PlaybookCreator::refreshTextChaser()
     editChaserX->setText(QString::number(fieldPainter->getRobot(CHASER)->x));
     editChaserY->setText(QString::number(fieldPainter->getRobot(CHASER)->y));
     editChaserH->setText(QString::number(fieldPainter->getRobot(CHASER)->h));
-    qDebug() << "displaying the offender's true position now.";
+    qDebug() << "displaying the chaser's true position now.";
 }
 
 void PlaybookCreator::refreshTextBall()
@@ -370,26 +370,27 @@ void PlaybookCreator::setFourFieldPlayers(bool checked)
 
 void PlaybookCreator::updateLockedPositions()
 {
+    int numPlayers = model->getNumActiveFieldPlayers();
     // Check if any players are locked
-    if (model->getDefenderLocked())
+    if (model->getDefenderLocked() && numPlayers > DEFENDER)
     {
         setDefenderXPosition();
         setDefenderYPosition();
         setDefenderHPosition();
     }
-    if (model->getMiddieLocked())
+    if (model->getMiddieLocked() && numPlayers > MIDDIE)
     {
         setMiddieXPosition();
         setMiddieYPosition();
         setMiddieHPosition();
     }
-    if (model->getOffenderLocked())
+    if (model->getOffenderLocked() && numPlayers > OFFENDER)
     {
         setOffenderXPosition();
         setOffenderYPosition();
         setOffenderHPosition();
     }
-    if (model->getChaserLocked())
+    if (model->getChaserLocked() && numPlayers > CHASER)
     {
         setChaserXPosition();
         setChaserYPosition();
@@ -460,11 +461,17 @@ void PlaybookCreator::setChaserHPosition()
 void PlaybookCreator::setBallX()
 {
     model->setBallX(editBallX->text().toInt());
+
+    updateLockedPositions();
+    refreshTextAll();
 }
 
 void PlaybookCreator::setBallY()
 {
     model->setBallY(editBallY->text().toInt());
+
+    updateLockedPositions();
+    refreshTextAll();
 }
 
 } // namespace playbook
