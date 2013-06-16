@@ -74,6 +74,7 @@ protected:
     QCheckBox* lockMiddie;
     QCheckBox* lockOffender;
     QCheckBox* lockChaser;
+    QCheckBox* lockPriority;
     QCheckBox* goalie;
     QLineEdit* editDefenderX;
     QLineEdit* editDefenderY;

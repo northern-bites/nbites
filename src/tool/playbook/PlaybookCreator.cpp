@@ -32,6 +32,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     lockOffender = new QCheckBox("Lock Offender", this);
     lockMiddie = new QCheckBox("Lock Middie", this);
     lockChaser = new QCheckBox("Lock Chaser", this);
+    lockPriority = new QCheckBox("Lock Priority", this);
     goalie = new QCheckBox("Goalie Active", this);
     goalie->setChecked(true);
     editDefenderX = new QLineEdit("Edit x", this);
@@ -95,6 +96,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings->addWidget(threeFieldPlayers);
     settings->addWidget(fourFieldPlayers);
     settings->addWidget(goalie);
+    settings->addWidget(lockPriority);
     settings->addWidget(editPriority);
     settings->addWidget(ballBox);
 
@@ -145,6 +147,11 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
 
     connect(goalie, SIGNAL(toggled(bool)), fieldPainter,
             SLOT(drawGoalie(bool)));
+
+    connect(lockPriority, SIGNAL(toggled(bool)), model,
+            SLOT(togglePriority(bool)));
+    connect(lockPriority, SIGNAL(toggled(bool)), editPriority,
+            SLOT(setDisabled(bool)));
 
     // Connect radio buttons
     connect(oneFieldPlayer, SIGNAL(toggled(bool)), this,
@@ -416,6 +423,10 @@ void PlaybookCreator::updateLockedPositions()
         setChaserXPosition();
         setChaserYPosition();
         setChaserHPosition();
+    }
+    if (model->getPriorityLocked())
+    {
+        setPriorityList();
     }
 }
 

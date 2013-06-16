@@ -54,6 +54,7 @@ public:
     bool getOffenderLocked() {return offenderLocked;};
     bool getMiddieLocked() {return middieLocked;};
     bool getChaserLocked() {return chaserLocked;};
+    bool getPriorityLocked() {return priorityLocked;};
 
     void setDefenderXPosition(int x_);
     void setDefenderYPosition(int y_);
@@ -80,6 +81,7 @@ protected slots:
     void toggleOffender(bool on);
     void toggleChaser(bool on);
     void toggleMiddie(bool on);
+    void togglePriority(bool on);
 
 protected:
     QStack<int> changedIndex;  // Holds the indecies in the playbook
@@ -93,6 +95,7 @@ protected:
     bool offenderLocked;
     bool middieLocked;
     bool chaserLocked;
+    bool priorityLocked;
     int numActiveFieldPlayers;
     short ball_x;
     short ball_y;

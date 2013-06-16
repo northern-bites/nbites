@@ -14,6 +14,7 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     offenderLocked(false),
     middieLocked(false),
     chaserLocked(false),
+    priorityLocked(false),
     BOX_SIZE(b_s),
     GRID_WIDTH(g_w),
     GRID_HEIGHT(g_h),
@@ -73,6 +74,12 @@ void PlaybookModel::toggleMiddie(bool on)
 {
     middieLocked = on ? 1 : 0;
     qDebug() << "middieLocked is now " << middieLocked;
+}
+
+void PlaybookModel::togglePriority(bool on)
+{
+    priorityLocked = on ? 1 : 0;
+    qDebug() << "priorityLocked is now " << priorityLocked;
 }
 
 // Not used.
