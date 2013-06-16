@@ -22,7 +22,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings = new QVBoxLayout();
     settings->setAlignment(Qt::AlignTop);
 
-    undoBtn = new QPushButton("Undo", this);
+    //undoBtn = new QPushButton("Undo", this);
     loadBtn = new QPushButton("Load", this);
     saveBtn = new QPushButton("Save", this);
     lockDefender = new QCheckBox("Lock Defender", this);
@@ -82,7 +82,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     ballBoxLayout->addWidget(editBallX);
     ballBoxLayout->addWidget(editBallY);
 
-    settings->addWidget(undoBtn);
+    // TODO: implement this.
+    //settings->addWidget(undoBtn);
     settings->addWidget(loadBtn);
     settings->addWidget(saveBtn);
     settings->addWidget(oneFieldPlayer);
@@ -237,8 +238,7 @@ void PlaybookCreator::updateRobotPositions()
 
     for (int i = 0; i < fieldPlayers; i++)
     {
-        roleIndex = model->convertRoleToPlaybookIndex(i);
-        PlaybookPosition* position = model->playbook[model->getGoalieOn()][ballX][ballY][roleIndex];
+        PlaybookPosition* position = model->convertRoleToPlaybookPosition(i);
 
         fieldPainter->setRobot(position,i);
     }
