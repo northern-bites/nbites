@@ -195,6 +195,7 @@ target_link_libraries(
   colorcreator
   vision_offline
   worldview
+  playbook
   ${QT_LIBRARIES}
   )
 
@@ -229,7 +230,6 @@ target_link_libraries(
   unlog
   logview
   image_display
-  playbook
   image # man image
   fieldview
   tool_common

@@ -20,7 +20,7 @@
 namespace tool {
 namespace playbook {
 
-class PlaybookField : public PaintField
+class PlaybookField : public tool_common::PaintField
 {
     Q_OBJECT;
 

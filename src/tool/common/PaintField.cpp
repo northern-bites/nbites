@@ -149,4 +149,5 @@ void PaintField::paintEvent(QPaintEvent* event)
     painter.drawRect(yellowGoal);
 }
 
+} // namespace tool_common
 } // namespace tool
