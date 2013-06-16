@@ -38,6 +38,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       vision(),
       localization(),
       ballTrack(),
+      obstacle(),
       gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       leds(broker)
@@ -134,6 +135,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.addModule(vision);
     cognitionThread.addModule(localization);
     cognitionThread.addModule(ballTrack);
+    cognitionThread.addModule(obstacle);
     cognitionThread.addModule(gamestate);
     cognitionThread.addModule(behaviors);
     cognitionThread.addModule(leds);
@@ -166,6 +168,11 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
     ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.localizationInput.wireTo(&localization.output);
+
+    obstacle.armContactIn.wireTo(&arms.contactOut, true);
+    obstacle.visionIn.wireTo(&vision.vision_obstacle);
+    obstacle.footBumperIn.wireTo(&sensors.footbumperOutput_, true);
+    obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
     gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);

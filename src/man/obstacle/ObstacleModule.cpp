@@ -3,6 +3,8 @@
 namespace man {
 namespace obstacle {
 
+using messages::Obstacle;
+
 ObstacleModule::ObstacleModule() : obstacleOut(base())
 {
 }
@@ -13,6 +15,13 @@ void ObstacleModule::run_()
     visionIn.latch();
     footBumperIn.latch();
     sonarIn.latch();
+
+    std::cout << visionIn.message().DebugString() << std::endl;
+}
+
+Obstacle::ObstaclePosition processArms(messages::ArmContactState& input)
+{
+    return Obstacle::NONE;
 }
 
 }

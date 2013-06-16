@@ -9,6 +9,8 @@
 
 #include "Obstacle.pb.h"
 
+#include <iostream>
+
 namespace man {
 namespace obstacle {
 
@@ -26,6 +28,18 @@ public:
 
 protected:
     virtual void run_();
+
+    messages::Obstacle::ObstaclePosition
+    processArms(messages::ArmContactState& input);
+
+    // messages::Obstacle::ObstaclePosition
+    // processVision(messages::VisionObstacle& input);
+
+    // messages::Obstacle::ObstaclePosition
+    // processFeet(messages::FootBumperState& input);
+
+    // messages::Obstacle::ObstaclePosition
+    // processSonar(messages::Sonartate& input);
 };
 
 }
