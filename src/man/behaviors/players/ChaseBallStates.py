@@ -167,12 +167,14 @@ def orbitBall(player):
             player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
             return player.goNow('positionForKick')
 
+    #all of this is basically the same as in shoot() in hackKickInformation
     goalCenter = Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,
                                   nogginConstants.CENTER_FIELD_Y)
     ballLocation = Location(player.brain.ball.x, player.brain.ball.y)
     headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
     bearingForKick = headingBallToGoalCenter - player.brain.loc.h
 
+    #the kick was chosen before we came into orbitBall()
     if player.kick == kicks.LEFT_STRAIGHT_KICK or player.kick == kicks.RIGHT_STRAIGHT_KICK:
         orbitBall.desiredHeading = 0 - bearingForKick
     elif player.kick == kicks.RIGHT_SIDE_KICK:
