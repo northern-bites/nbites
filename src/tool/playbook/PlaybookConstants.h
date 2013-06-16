@@ -8,10 +8,10 @@ namespace tool {
 namespace playbook {
 
 enum Role {
+    //CHASER = 0,
     DEFENDER = 0,
     OFFENDER,
     MIDDIE,
-    CHASER,
     GOALIE
 };
 
@@ -29,7 +29,7 @@ struct PlaybookPosition
     {}
 };
 
-static const short defaultRoleList [] = {0,1,2,0,1,0};
+static const short defaultRoleList [] = {0,1,2,0,1,0,};
 
 } // namespace playbook
 } // namespace tool

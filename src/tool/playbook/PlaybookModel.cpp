@@ -23,13 +23,13 @@ PlaybookModel::PlaybookModel(int b_s, int g_w, int g_h, QObject* parent) :
     playbook = new PlaybookPosition****[2];
     for(int goalie = 0; goalie < 2; ++goalie)
     {
-        playbook[goalie][role] = new PlaybookPosition**[GRID_WIDTH];
+        playbook[goalie] = new PlaybookPosition***[GRID_WIDTH];
         for(int x = 0; x < GRID_WIDTH; ++x)
         {
-            playbook[goalie][role][x] = new PlaybookPosition*[GRID_HEIGHT];
+            playbook[goalie][x] = new PlaybookPosition**[GRID_HEIGHT];
             for(int y = 0; y < GRID_HEIGHT; ++y)
             {
-                playbook[goalie] = new PlaybookPosition***[3+2+1];
+                playbook[goalie][x][y] = new PlaybookPosition*[3+2+1];
                 for(int role = 0; role < 3+2+1; ++role)
                 {
 
