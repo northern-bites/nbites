@@ -11,6 +11,8 @@
 #include <QStack>
 #include "FieldConstants.h"
 #include "PlaybookConstants.h"
+#include <QFile>
+#include <QTextStream>
 
 namespace tool {
 namespace playbook {

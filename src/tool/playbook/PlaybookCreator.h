@@ -9,6 +9,7 @@
 #include <QtGui>
 #include <QCheckBox>
 #include <vector>
+#include <QPixmap>
 
 #include "PlaybookField.h"
 #include "PlaybookModel.h"
@@ -22,6 +23,9 @@ static const int BOX_SIZE = 100;  // Size in cm for each grid box.
 static const int GRID_WIDTH  = (int(FIELD_WHITE_WIDTH) / BOX_SIZE) + 2;
 static const int GRID_HEIGHT = (int(FIELD_WHITE_HEIGHT)/ BOX_SIZE) + 2;
 
+static const int KEY_LABEL_WIDTH = 50;
+static const int KEY_LABEL_HEIGHT = 10;
+
 class PlaybookCreator : public QWidget
 {
     Q_OBJECT;
@@ -31,6 +35,7 @@ public:
 
 protected slots:
     void updatePositions();
+    void updatePositions(bool noCheck);
     void updatePositionsCheck(bool check);
     void refreshTextDefender();
     void refreshTextOffender();
@@ -57,6 +62,7 @@ protected slots:
     void setThreeFieldPlayers(bool checked);
     void setFourFieldPlayers(bool checked);
     void setPriorityList();
+    void writeToFile(bool checked);
 
 protected:
     PlaybookField* fieldPainter;

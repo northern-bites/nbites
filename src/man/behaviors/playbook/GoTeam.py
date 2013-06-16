@@ -63,8 +63,8 @@ class GoTeam:
         and build a data structure for it.
 
         FORMAT: Each line of x,y,h,r should be ints separated by whitespace.
-                Each entry of 12 lines should be on consecutive lines.
-                    3,2,1 playbook players, repeated for goalie inactive
+                Each entry of 20 lines should be on consecutive lines.
+                    4,3,2,1 playbook players, repeated for goalie inactive
                 Each entry should begin with # on its own line.
                 Each row of entries should end with @ on its own line.
                 All data (after any meta data for the tool) should begin with & on its own line.

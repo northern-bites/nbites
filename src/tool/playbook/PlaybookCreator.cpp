@@ -56,6 +56,26 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     editBallY = new QLineEdit("Ball y", this);
     editPriority = new QLineEdit("priorities", this);
 
+    QLabel* defenderColorLabel = new QLabel("");
+    QPixmap* defenderPixmap = new QPixmap(KEY_LABEL_WIDTH, KEY_LABEL_HEIGHT);
+    defenderPixmap->fill(roleColors[DEFENDER]);
+    defenderColorLabel->setPixmap(*defenderPixmap);
+
+    QLabel* middieColorLabel = new QLabel("");
+    QPixmap* middiePixmap = new QPixmap(KEY_LABEL_WIDTH, KEY_LABEL_HEIGHT);
+    middiePixmap->fill(roleColors[MIDDIE]);
+    middieColorLabel->setPixmap(*middiePixmap);
+
+    QLabel* offenderColorLabel = new QLabel("");
+    QPixmap* offenderPixmap = new QPixmap(KEY_LABEL_WIDTH, KEY_LABEL_HEIGHT);
+    offenderPixmap->fill(roleColors[OFFENDER]);
+    offenderColorLabel->setPixmap(*offenderPixmap);
+
+    QLabel* chaserColorLabel = new QLabel("");
+    QPixmap* chaserPixmap = new QPixmap(KEY_LABEL_WIDTH, KEY_LABEL_HEIGHT);
+    chaserPixmap->fill(roleColors[CHASER]);
+    chaserColorLabel->setPixmap(*chaserPixmap);
+
     QGroupBox* defenderBox = new QGroupBox("Defender");
     QGroupBox* middieBox = new QGroupBox("Middie");
     QGroupBox* offenderBox = new QGroupBox("Offender");
@@ -68,18 +88,22 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     QVBoxLayout* chaserBoxLayout = new QVBoxLayout(chaserBox);
     QVBoxLayout* ballBoxLayout = new QVBoxLayout(ballBox);
 
+    defenderBoxLayout->addWidget(defenderColorLabel);
     defenderBoxLayout->addWidget(lockDefender);
     defenderBoxLayout->addWidget(editDefenderX);
     defenderBoxLayout->addWidget(editDefenderY);
     defenderBoxLayout->addWidget(editDefenderH);
+    middieBoxLayout->addWidget(middieColorLabel);
     middieBoxLayout->addWidget(lockMiddie);
     middieBoxLayout->addWidget(editMiddieX);
     middieBoxLayout->addWidget(editMiddieY);
     middieBoxLayout->addWidget(editMiddieH);
+    offenderBoxLayout->addWidget(offenderColorLabel);
     offenderBoxLayout->addWidget(lockOffender);
     offenderBoxLayout->addWidget(editOffenderX);
     offenderBoxLayout->addWidget(editOffenderY);
     offenderBoxLayout->addWidget(editOffenderH);
+    chaserBoxLayout->addWidget(chaserColorLabel);
     chaserBoxLayout->addWidget(lockChaser);
     chaserBoxLayout->addWidget(editChaserX);
     chaserBoxLayout->addWidget(editChaserY);
@@ -144,9 +168,10 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
 
     connect(goalie, SIGNAL(toggled(bool)), model,
             SLOT(toggleGoalie(bool)));
-
     connect(goalie, SIGNAL(toggled(bool)), fieldPainter,
             SLOT(drawGoalie(bool)));
+    connect(goalie, SIGNAL(toggled(bool)), this,
+            SLOT(updatePositions(bool)));
 
     connect(lockPriority, SIGNAL(toggled(bool)), model,
             SLOT(togglePriority(bool)));
@@ -237,6 +262,10 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(editPriority, SIGNAL(returnPressed()), this,
             SLOT(setPriorityList()));
 
+    // Connect save and load buttons
+    connect(saveBtn, SIGNAL(clicked(bool)), this,
+            SLOT(writeToFile(bool)));
+
     mainLayout->addLayout(field);
     mainLayout->addLayout(settings);
     mainLayout->addLayout(playerSettings);
@@ -271,6 +300,11 @@ void PlaybookCreator::updateRobotPositions()
 }
 
 void PlaybookCreator::updatePositions()
+{
+    updateRobotPositions();
+}
+
+void PlaybookCreator::updatePositions(bool noCheck)
 {
     updateRobotPositions();
 }
@@ -515,6 +549,78 @@ void PlaybookCreator::setBallY()
 void PlaybookCreator::setPriorityList()
 {
     model->setPriorityList(editPriority->text());
+}
+
+void PlaybookCreator::writeToFile(bool checked)
+{
+    // We ignore if the button is checkable
+
+    // Give the user a message if they want to save.
+    QMessageBox warning;
+    warning.setText("Do you want to save the playbook table?");
+    warning.setInformativeText("This will overwrite the table file in behaviors.");
+    warning.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+    int result = warning.exec();
+
+    if (result == QMessageBox::Cancel)
+    {
+        qDebug() << "aborting save.";
+        return;
+    }
+
+
+    QFile file("../../src/man/behaviors/playbook/PlaybookTable.py");
+
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        qDebug() << "failed to open file.";
+        return;
+    }
+
+    QTextStream out(&file);
+
+    out << "playbookTable = ";
+
+    PlaybookPosition* pos;
+
+    out << "(";
+    for (int x = 0; x < GRID_WIDTH; x++)
+    {
+        out << "(";
+        for (int y = 0; y < GRID_HEIGHT; y++)
+        {
+            out << "(";
+            for (int goalie = 0; goalie < 2; goalie++)
+            {
+                out << "(";
+                for (int role = 0; role < 4+3+2+1; role++)
+                {
+                    pos = model->playbook[x][y][goalie][role];
+                    out << "(" << pos->x << "," << pos->y << "," << pos->h
+                        << "," << pos->role << ")";
+
+                    if (role+1 != 4+3+2+1)
+                        out << ",";
+                }
+                out << ")";
+
+                if (goalie+1 != 2)
+                    out << ",";
+            }
+            out << ")";
+
+            if (y+1 != GRID_HEIGHT)
+                out << ",";
+        }
+        out << ")";
+
+        if (x+1 != GRID_WIDTH)
+            out << ",";
+    }
+    out << ")";
+
+    file.close();
+    qDebug() << "Wrote file.";
 }
 
 } // namespace playbook
