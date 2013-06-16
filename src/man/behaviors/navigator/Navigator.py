@@ -304,4 +304,3 @@ class Navigator(FSA.FSA):
     def setHSpeed(self, h):
         NavStates.walking.speeds = (self.getXSpeed(), self.getYSpeed(), h)
 
-
