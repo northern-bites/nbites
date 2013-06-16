@@ -122,8 +122,27 @@ void ArmContactModule::determineContactState()
     r = getAverageDisplacement(right);
     l = getAverageDisplacement(left);
 
-    // Prioritize pitch...
-    if (fabs(r[PITCH]) > DISPLACEMENT_THRESH)
+    if ((fabs(r[PITCH]) > DISPLACEMENT_THRESH) &&
+        (fabs(r[ROLL]) > DISPLACEMENT_THRESH))
+    {
+        if (r[PITCH] < 0 && r[ROLL] < 0)
+        {
+            rightArm = messages::ArmContactState::NORTHEAST;
+        }
+        else if (r[PITCH] < 0 && r[ROLL] > 0)
+        {
+            rightArm = messages::ArmContactState::NORTHWEST;
+        }
+        else if (r[PITCH] > 0 && r[ROLL] < 0)
+        {
+            rightArm = messages::ArmContactState::SOUTHEAST;
+        }
+        else if (r[PITCH] > 0 && r[ROLL] > 0)
+        {
+            rightArm = messages::ArmContactState::SOUTHWEST;
+        }
+    }
+    else if (fabs(r[PITCH]) > DISPLACEMENT_THRESH)
     {
         if (r[PITCH] < 0) rightArm = messages::ArmContactState::NORTH;
         else rightArm = messages::ArmContactState::SOUTH;
@@ -135,7 +154,28 @@ void ArmContactModule::determineContactState()
     }
     else rightArm = messages::ArmContactState::NONE;
 
-    if (fabs(l[PITCH]) > DISPLACEMENT_THRESH)
+
+    if ((fabs(l[PITCH]) > DISPLACEMENT_THRESH) &&
+        (fabs(l[ROLL]) > DISPLACEMENT_THRESH))
+    {
+        if (l[PITCH] < 0 && l[ROLL] < 0)
+        {
+            leftArm = messages::ArmContactState::NORTHEAST;
+        }
+        else if (l[PITCH] < 0 && l[ROLL] > 0)
+        {
+            leftArm = messages::ArmContactState::NORTHWEST;
+        }
+        else if (l[PITCH] > 0 && l[ROLL] < 0)
+        {
+            leftArm = messages::ArmContactState::SOUTHEAST;
+        }
+        else if (l[PITCH] > 0 && l[ROLL] > 0)
+        {
+            leftArm = messages::ArmContactState::SOUTHWEST;
+        }
+    }
+    else if (fabs(l[PITCH]) > DISPLACEMENT_THRESH)
     {
         if (l[PITCH] < 0) leftArm = messages::ArmContactState::NORTH;
         else leftArm = messages::ArmContactState::SOUTH;
