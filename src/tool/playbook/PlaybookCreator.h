@@ -51,6 +51,7 @@ protected slots:
     void setChaserHPosition();
     void setBallX();
     void setBallY();
+    void setOneFieldPlayer(bool checked);
     void setTwoFieldPlayers(bool checked);
     void setThreeFieldPlayers(bool checked);
     void setFourFieldPlayers(bool checked);
@@ -83,6 +84,7 @@ protected:
     QLineEdit* editChaserX;
     QLineEdit* editChaserY;
     QLineEdit* editChaserH;
+    QRadioButton* oneFieldPlayer;
     QRadioButton* twoFieldPlayers;
     QRadioButton* threeFieldPlayers;
     QRadioButton* fourFieldPlayers;

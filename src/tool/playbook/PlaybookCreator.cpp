@@ -43,6 +43,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     editChaserX = new QLineEdit("Edit x", this);
     editChaserY = new QLineEdit("Edit y", this);
     editChaserH = new QLineEdit("Edit h", this);
+    oneFieldPlayer = new QRadioButton("&1 Active Field Players", this);
     twoFieldPlayers = new QRadioButton("&2 Active Field Players", this);
     threeFieldPlayers = new QRadioButton("&3 Active Field Players", this);
     fourFieldPlayers = new QRadioButton("&4 active Field Players", this);
@@ -84,6 +85,7 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     settings->addWidget(undoBtn);
     settings->addWidget(loadBtn);
     settings->addWidget(saveBtn);
+    settings->addWidget(oneFieldPlayer);
     settings->addWidget(twoFieldPlayers);
     settings->addWidget(threeFieldPlayers);
     settings->addWidget(fourFieldPlayers);
@@ -138,6 +140,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
             SLOT(drawGoalie(bool)));
 
     // Connect radio buttons
+    connect(oneFieldPlayer, SIGNAL(toggled(bool)), this,
+            SLOT(setOneFieldPlayer(bool)));
     connect(twoFieldPlayers, SIGNAL(toggled(bool)), this,
             SLOT(setTwoFieldPlayers(bool)));
     connect(threeFieldPlayers, SIGNAL(toggled(bool)), this,
@@ -316,6 +320,18 @@ void PlaybookCreator::refreshTextAll()
     refreshTextBall();
 }
 
+void PlaybookCreator::setOneFieldPlayer(bool checked)
+{
+    if (checked)
+    {
+        model->setNumActiveFieldPlayers(1);
+        qDebug() << "Number of field players is now 1.";
+
+        updateLockedPositions();
+        refreshTextAll();
+    }
+}
+
 void PlaybookCreator::setTwoFieldPlayers(bool checked)
 {
     if (checked)
@@ -372,6 +388,12 @@ void PlaybookCreator::updateLockedPositions()
         setOffenderXPosition();
         setOffenderYPosition();
         setOffenderHPosition();
+    }
+    if (model->getChaserLocked())
+    {
+        setChaserXPosition();
+        setChaserYPosition();
+        setChaserHPosition();
     }
 }
 
