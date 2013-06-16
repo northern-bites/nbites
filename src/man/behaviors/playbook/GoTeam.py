@@ -123,6 +123,7 @@ class GoTeam:
         if play.changed:
             if self.printStateChanges:
                 self.printf("Play switched to " + play.__str__())
+                self.me.updateMe() # make sure roles get set this frame
 
     ######################################################
     ############       Role Switching Stuff     ##########

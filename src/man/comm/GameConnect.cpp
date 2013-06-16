@@ -31,7 +31,6 @@ GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m, int team, int player)
 GameConnect::~GameConnect()
 {
     delete _socket;
-    std::cout << "GameConnect destructor" << std::endl;
 }
 
 void GameConnect::setUpSocket()

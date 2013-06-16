@@ -121,7 +121,7 @@ int DiagramThread::start()
     // Don't let it recreate the same thread!
     if (running) return -1;
 
-    cout << "Thread " << diagram.name << " starting." << endl;
+    cout << "Thread " << getName() << " starting." << endl;
 
     // Since we don't need to join threads, creating them explicitly
     // detached may save resources
@@ -141,7 +141,7 @@ int DiagramThread::start()
 void DiagramThread::stop()
 {
     running = false;
-    cout << "Thread " << diagram.name << " stopping." << endl;
+    cout << "Thread " << getName() << " stopping." << endl;
 }
 
 /*
@@ -153,7 +153,10 @@ void* DiagramThread::runDiagram(void* _this)
 {
     DiagramThread* this_instance = reinterpret_cast<DiagramThread*>(_this);
 
-    cout << "Thread " << this_instance->diagram.name << " running." << endl;
+    // store this on the stack so we don't print garbage.
+    std::string thisName = this_instance->getName();
+
+    cout << "Thread " << thisName << " running." << endl;
 
     this_instance->running = true;
 
@@ -162,7 +165,10 @@ void* DiagramThread::runDiagram(void* _this)
     //       from our main naoqi thread.
     while(this_instance->running) this_instance->diagram.run();
 
-    cout << "Thread " << this_instance->diagram.name << " exiting." << endl;
+    cout << "Thread " << thisName << " exiting." << endl;
+
+    cout.flush();
+
     pthread_exit(NULL);
 }
 
