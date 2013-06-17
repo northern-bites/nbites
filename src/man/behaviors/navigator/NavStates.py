@@ -137,25 +137,25 @@ def dodge(nav):
             dodgeDest = RelRobotLocation(-20, 0, 0)
         elif dodge.position is dodge.position.NORTHEAST:
             print "Dodging NORTHEAST obstacle"
-            dodgeDest = RelRobotLocation(-15, 15, 0)
+            dodgeDest = RelRobotLocation(0, 15, 0)
         elif dodge.position is dodge.position.EAST:
             print "Dodging EAST obstacle"
             dodgeDest = RelRobotLocation(0, 20, 0)
         elif dodge.position is dodge.position.SOUTHEAST:
             print "Dodging SOUTHEAST obstacle"
-            dodgeDest = RelRobotLocation(15, 15, 0)
+            dodgeDest = RelRobotLocation(0, 15, 0)
         elif dodge.position is dodge.position.SOUTH:
             print "Dodging SOUTH obstacle"
             dodgeDest = RelRobotLocation(20, 0, 0)
         elif dodge.position is dodge.position.SOUTHWEST:
             print "Dodging SOUTHWEST obstacle"
-            dodgeDest = RelRobotLocation(15, -15, 0)
+            dodgeDest = RelRobotLocation(0, -15, 0)
         elif dodge.position is dodge.position.WEST:
             print "Dodging WEST obstacle"
             dodgeDest = RelRobotLocation(0, -20, 0)
         elif dodge.position is dodge.position.NORTHWEST:
             print "Dodging NORTHWEST obstacle"
-            dodgeDest = RelRobotLocation(-15, -15, 0)
+            dodgeDest = RelRobotLocation(0, -15, 0)
 
         helper.setOdometryDestination(nav, dodgeDest)
 
