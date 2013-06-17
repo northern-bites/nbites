@@ -19,6 +19,18 @@ float average(std::list<float>& buf)
     return avg;
 }
 
+int numberOutOf(std::list<bool>& buf)
+{
+    int num = 0;
+
+    for (std::list<bool>::iterator i = buf.begin(); i != buf.end(); i++)
+    {
+        if (*i) num++;
+    }
+
+    return num;
+}
+
 ObstacleModule::ObstacleModule() : obstacleOut(base())
 {
 }
@@ -30,18 +42,51 @@ void ObstacleModule::run_()
     footBumperIn.latch();
     sonarIn.latch();
 
+    Obstacle::ObstaclePosition sonars = processSonar(sonarIn.message());
+    //Obstacle::ObstaclePosition feet = processFeet(footBumperIn.message());
+
     portals::Message<messages::Obstacle> current(0);
 
-    current.get()->set_position(processSonar(sonarIn.message()));
+    current.get()->set_position(sonars);
     obstacleOut.setMessage(current);
 }
 
-Obstacle::ObstaclePosition ObstacleModule::processArms(messages::ArmContactState& input)
+Obstacle::ObstaclePosition
+ObstacleModule::processArms(const messages::ArmContactState& input)
 {
     return Obstacle::NONE;
 }
 
-Obstacle::ObstaclePosition ObstacleModule::processSonar(const messages::SonarState& input)
+Obstacle::ObstaclePosition
+ObstacleModule::processFeet(const messages::FootBumperState& input)
+{
+    rightFeet.push_back(footBumperIn.message().r_foot_bumper_left().pressed() ||
+                        footBumperIn.message().r_foot_bumper_right().pressed());
+
+    leftFeet.push_back(footBumperIn.message().l_foot_bumper_left().pressed() ||
+                       footBumperIn.message().l_foot_bumper_right().pressed());
+
+    if (rightFeet.size() > FEET_FRAMES_TO_BUFFER)
+    {
+        rightFeet.pop_front();
+    }
+
+    if (leftFeet.size() > FEET_FRAMES_TO_BUFFER)
+    {
+        leftFeet.pop_front();
+    }
+
+    int numLeftHits = numberOutOf(leftFeet);
+    int numRightHits = numberOutOf(rightFeet);
+
+    std::cout << "LEFT " << numLeftHits << ", RIGHT " << numRightHits
+              << std::endl;
+
+    return Obstacle::NONE;
+}
+
+Obstacle::ObstaclePosition
+ObstacleModule::processSonar(const messages::SonarState& input)
 {
     rightSonars.push_back(sonarIn.message().us_right());
     leftSonars.push_back(sonarIn.message().us_left());
