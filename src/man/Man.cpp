@@ -170,7 +170,6 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     ballTrack.localizationInput.wireTo(&localization.output);
 
     obstacle.armContactIn.wireTo(&arms.contactOut, true);
-    obstacle.visionIn.wireTo(&vision.vision_obstacle);
     obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
 
     gamestate.commInput.wireTo(&comm._gameStateOutput, true);
