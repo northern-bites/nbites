@@ -21,11 +21,10 @@ extern "C" void initRobotLocation_proto();
 extern "C" void initBallModel_proto();
 extern "C" void initPMotion_proto();
 extern "C" void initMotionStatus_proto();
-extern "C" void initSonarState_proto();
 extern "C" void initButtonState_proto();
 extern "C" void initFallStatus_proto();
 extern "C" void initStiffnessControl_proto();
-extern "C" void initArmContactState_proto();
+extern "C" void initObstacle_proto();
 extern "C" void initinterface();
 
 namespace man {
@@ -97,11 +96,10 @@ void BehaviorsModule::initializePython()
         initRobotLocation_proto();
         initPMotion_proto();
         initMotionStatus_proto();
-        initSonarState_proto();
         initButtonState_proto();
         initFallStatus_proto();
         initStiffnessControl_proto();
-        initArmContactState_proto();
+        initObstacle_proto();
         // Init the interface as well
         initinterface();
     } catch (error_already_set) {
@@ -231,9 +229,6 @@ void BehaviorsModule::prepareMessages()
     visionRobotIn.latch();
     pyInterface.setVisionRobot_ptr(&visionRobotIn.message());
 
-    visionObstacleIn.latch();
-    pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
-
     filteredBallIn.latch();
     pyInterface.setFilteredBall_ptr(&filteredBallIn.message());
 
@@ -248,12 +243,6 @@ void BehaviorsModule::prepareMessages()
     odometryIn.latch();
     pyInterface.setOdometry_ptr(&odometryIn.message());
 
-    sonarStateIn.latch();
-    pyInterface.setSonarState_ptr(&sonarStateIn.message());
-
-    footBumperStateIn.latch();
-    pyInterface.setFootBumperState_ptr(&footBumperStateIn.message());
-
     jointsIn.latch();
     pyInterface.setJoints_ptr(&jointsIn.message());
 
@@ -263,8 +252,8 @@ void BehaviorsModule::prepareMessages()
     stiffStatusIn.latch();
     pyInterface.setStiffStatus_ptr(&stiffStatusIn.message());
 
-    armContactStateIn.latch();
-    pyInterface.setArmContactState_ptr(&armContactStateIn.message());
+    obstacleIn.latch();
+    pyInterface.setObstacle_ptr(&obstacleIn.message());
 
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);

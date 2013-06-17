@@ -13,13 +13,12 @@
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
-#include "SonarState.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "StiffnessControl.pb.h"
-#include "ArmContactState.pb.h"
+#include "Obstacle.pb.h"
 
 namespace man {
 namespace behaviors {
@@ -32,7 +31,6 @@ public:
     messages::RobotLocation     const * loc_ptr;
     messages::VisionRobot       const * visionRobot_ptr;
     messages::VisionField       const * visionField_ptr;
-    messages::VisionObstacle    const * visionObstacle_ptr;
     messages::FilteredBall      const * filteredBall_ptr;
     messages::LedCommand        const * ledCommand_ptr;
     messages::WorldModel        const * worldModel_ptr[NUM_PLAYERS_PER_TEAM];
@@ -41,14 +39,12 @@ public:
     messages::MotionStatus      const * motionStatus_ptr;
     messages::MotionRequest     const * motionRequest_ptr;
     messages::RobotLocation     const * odometry_ptr;
-    messages::SonarState        const * sonarState_ptr;
-    messages::FootBumperState   const * footBumperState_ptr;
     messages::JointAngles       const * joints_ptr;
     messages::RobotLocation     const * resetLocRequest_ptr;
     messages::FallStatus        const * fallStatus_ptr;
     messages::WorldModel        const * myWorldModel_ptr;
     messages::StiffStatus       const * stiffStatus_ptr;
-    messages::ArmContactState   const * armContactState_ptr;
+    messages::Obstacle          const * obstacle_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -61,10 +57,6 @@ public:
     void setVisionRobot_ptr(const messages::VisionRobot* msg)
     {
         visionRobot_ptr = msg;
-    }
-    void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
-    {
-        visionObstacle_ptr = msg;
     }
     void setVisionField_ptr(const messages::VisionField* msg)
     {
@@ -110,14 +102,6 @@ public:
     {
         odometry_ptr = msg;
     }
-    void setSonarState_ptr(const messages::SonarState* msg)
-    {
-        sonarState_ptr = msg;
-    }
-    void setFootBumperState_ptr(const messages::FootBumperState* msg)
-    {
-        footBumperState_ptr = msg;
-    }
     void setJoints_ptr(const messages::JointAngles* msg)
     {
         joints_ptr = msg;
@@ -138,9 +122,9 @@ public:
     {
         stiffStatus_ptr = msg;
     }
-    void setArmContactState_ptr(const messages::ArmContactState* msg)
+    void setObstacle_ptr(const messages::Obstacle* msg)
     {
-        armContactState_ptr = msg;
+        obstacle_ptr = msg;
     }
 
 };
