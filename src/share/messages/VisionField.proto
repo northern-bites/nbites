@@ -173,8 +173,12 @@ message VisualLine
     optional VisualDetection visual_detection = 1;
     optional int32 start_x = 2;
     optional int32 start_y = 3;
+    optional float start_dist = 12;
+    optional float start_bearing = 13;
     optional int32 end_x = 4;
     optional int32 end_y = 5;
+    optional float end_dist = 14;
+    optional float end_bearing = 15;
     optional float angle = 6;
     optional float avg_width = 7;
     optional float length = 8;
