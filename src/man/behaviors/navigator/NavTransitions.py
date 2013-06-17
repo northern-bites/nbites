@@ -147,7 +147,9 @@ def shouldDodgeForward(nav):
     #     return False
 
 def doneDodging(nav):
-    return nav.brain.interface.motionStatus.standing
+    return (nav.brain.interface.motionStatus.standing or
+            nav.brain.interface.obstacle.position is
+            nav.brain.interface.obstacle.NONE)
 
 def notAtLocPosition(nav):
     return not atDestination(nav)
