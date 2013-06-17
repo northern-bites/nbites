@@ -273,10 +273,17 @@ struct Line {
     Point shiftDownLine(Point initial, float dist) {
         // Shift in x is dist*cos((tan^-1(slope))
         // Calculated w/o trig w/ identities #wolfram
-        float dX = dist / std::sqrt((slope * slope) + 1.f);
-        float dY = slope * dX;
-        Point shifted(initial.x + dX, initial.y + dY);
-        return shifted;
+        if (vert) {
+            Point vertShift(initial.x, initial.y + dist);
+            return vertShift;
+        }
+
+        else {
+            float dX = dist / std::sqrt((slope * slope) + 1.f);
+            float dY = slope * dX;
+            Point shifted(initial.x + dX, initial.y + dY);
+            return shifted;
+        }
     }
 
     //HACK helper function since won't let me make straight and call NBfunction i want

@@ -99,6 +99,26 @@ TEST (LocalizationTest, ConfirmClosestPointTo) {
 
 }
 
+TEST(LocalizationTest, ProjectionVert)
+{
+    Point a(1.f,-1.f);
+    Point b(1.f, 4.f);
+
+    Line l(a,b);
+
+    Point s(0.f,-1.f);
+
+    Point proj = l.closestPointTo(s);
+
+    ASSERT_EQ( 1.f, proj.x);
+    ASSERT_EQ(-1.f, proj.y);
+
+    Point t(0.f, 0.f);
+    proj = l.closestPointTo(t);
+
+    ASSERT_TRUE( abs(0.f - proj.y) < .001f);
+}
+
 TEST(LocalizationTest, ShiftDownLine)
 {
     Point a(-2.f,-2.f);
@@ -196,8 +216,8 @@ TEST(LocalizationTest, TestLineSystem)
     LineSystem testSystem;
 
     // Give a line segment that matches a line
-    Point bottomLeftCorner(450.f,451.f);
-    Point slightToRight(450.f, 451.f);
+    Point bottomLeftCorner(700.f,300.f);
+    Point slightToRight(705.f, 400.f);
     Line perfectObsv(bottomLeftCorner, slightToRight);
 
     std::cout << "OK score:\t" << testSystem.scoreObservation(perfectObsv) << std::endl;
