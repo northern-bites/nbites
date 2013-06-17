@@ -1,6 +1,7 @@
 #include "PlaybookCreator.h"
 
 #include <QtDebug>
+#include <QIntValidator>
 
 namespace tool{
 namespace playbook{
@@ -52,8 +53,12 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     threeFieldPlayers = new QRadioButton("&3 Active Field Players", this);
     fourFieldPlayers = new QRadioButton("&4 active Field Players", this);
     fourFieldPlayers->setChecked(true);
+    QValidator* ballXVal = new QIntValidator(0, 10);
+    QValidator* ballYVal = new QIntValidator(0, 7);
     editBallX = new QLineEdit("Ball x", this);
     editBallY = new QLineEdit("Ball y", this);
+    editBallX->setValidator(ballXVal);
+    editBallY->setValidator(ballYVal);
     editPriority = new QLineEdit("priorities", this);
 
     QLabel* defenderColorLabel = new QLabel("");
