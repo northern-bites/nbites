@@ -92,6 +92,10 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::obstacle_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
+        .add_property("visionObstacle",
+                      make_getter(&PyInterface::visionObstacle_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
         ;
     scope().attr("interface") = interface_ptr;
 }

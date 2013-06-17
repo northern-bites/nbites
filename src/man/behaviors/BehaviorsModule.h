@@ -89,6 +89,7 @@ public:
     portals::InPortal<messages::FallStatus> fallStatusIn;
     portals::InPortal<messages::StiffStatus> stiffStatusIn;
     portals::InPortal<messages::Obstacle> obstacleIn;
+    portals::InPortal<messages::VisionObstacle> visionObstacleIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;

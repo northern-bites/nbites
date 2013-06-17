@@ -255,6 +255,9 @@ void BehaviorsModule::prepareMessages()
     obstacleIn.latch();
     pyInterface.setObstacle_ptr(&obstacleIn.message());
 
+    visionObstacleIn.latch();
+    pyInterface.setVisionObstacle_ptr(&visionObstacleIn.message());
+
     // Prepare potential out messages for python
     ledCommand = portals::Message<messages::LedCommand>(0);
     pyInterface.setLedCommand_ptr(ledCommand.get());

@@ -45,6 +45,7 @@ public:
     messages::WorldModel        const * myWorldModel_ptr;
     messages::StiffStatus       const * stiffStatus_ptr;
     messages::Obstacle          const * obstacle_ptr;
+    messages::VisionObstacle    const * visionObstacle_ptr;
 
     void setGameState_ptr(const messages::GameState* msg)
     {
@@ -125,6 +126,10 @@ public:
     void setObstacle_ptr(const messages::Obstacle* msg)
     {
         obstacle_ptr = msg;
+    }
+    void setVisionObstacle_ptr(const messages::VisionObstacle* msg)
+    {
+        visionObstacle_ptr = msg;
     }
 
 };
