@@ -10,7 +10,7 @@ BALL_FAR_AWAY = BALL_CLOSE_DISTANCE + 25.0
 BALL_MOVED_THR = 3
 
 # Bearings towards goal and ball thresholds.
-FACING_FORWARD_DEG = 50
+FACING_FORWARD_DEG = 45
 
 # Heat map (distance to something blocking open field) thresholds.
 CROWDED_DIST = 300
