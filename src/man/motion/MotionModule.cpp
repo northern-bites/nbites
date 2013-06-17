@@ -12,6 +12,7 @@ MotionModule::MotionModule()
       stiffnessOutput_(base()),
       odometryOutput_(base()),
       motionStatusOutput_(base()),
+      handSpeedsOutput_(base()),
       curProvider(&nullBodyProvider),
       nextProvider(&nullBodyProvider),
       curHeadProvider(&nullHeadProvider),
@@ -86,6 +87,7 @@ void MotionModule::run_()
         //     the messages that we output.
         updateOdometry();
         updateStatus();
+        updateHandSpeeds();
 
         newInputJoints = false;
         frameCount++;
@@ -1221,6 +1223,16 @@ void MotionModule::updateStatus()
     status.get()->set_calibrated(calibrated());
 
     motionStatusOutput_.setMessage(status);
+}
+
+void MotionModule::updateHandSpeeds()
+{
+    portals::Message<messages::HandSpeeds> current(0);
+
+    current.get()->set_left_speed(walkProvider.leftHandSpeed());
+    current.get()->set_right_speed(walkProvider.rightHandSpeed());
+
+    handSpeedsOutput_.setMessage(current);
 }
 
 } // namespace motion

@@ -2,31 +2,31 @@ package messages;
 
 message GameState
 {
-        optional uint32 state = 1;
-        optional bool   first_half = 2 [default = true];
-        optional uint32 kick_off_team = 3;
-        optional uint32 secondary_state = 4;
-        optional uint32 drop_in_team = 5;
-        optional sint32 drop_in_time = 6 [default = -1];
-        optional uint32 secs_remaining = 7 [default = 600];
+    optional uint32 state = 1;
+    optional bool   first_half = 2 [default = true];
+    optional uint32 kick_off_team = 3;
+    optional uint32 secondary_state = 4;
+    optional uint32 drop_in_team = 5;
+    optional sint32 drop_in_time = 6 [default = -1];
+    optional uint32 secs_remaining = 7 [default = 600];
 
-        optional bool have_remote_gc = 8;
+    optional bool have_remote_gc = 8;
 
-        repeated TeamInfo team = 9;
+    repeated TeamInfo team = 9;
 }
 
 message TeamInfo
 {
-        optional uint32 team_number = 1;
-        optional uint32 team_color = 2;
-        optional uint32 score = 3;
-        optional uint32 goal_color = 4;
+    optional uint32 team_number = 1;
+    optional uint32 team_color = 2;
+    optional uint32 score = 3;
+    optional uint32 goal_color = 4;
 
-        repeated RobotInfo player = 5;
+    repeated RobotInfo player = 5;
 }
 
 message RobotInfo
 {
-        optional uint32 penalty = 1;
-        optional uint32 secs_left = 2;
+    optional uint32 penalty = 1;
+    optional uint32 secs_left = 2;
 }

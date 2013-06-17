@@ -95,7 +95,7 @@ Tool::Tool(const char* title) :
     connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
     toolBar->addWidget(saveAsBtn);
 
-    loadLatestTable();
+
     //diagram.addModule(worldView);
 }
 
@@ -113,30 +113,26 @@ Tool::~Tool() {
 void Tool::saveGlobalTable()
 {
 
-	if (loadBtn->text() == QString("Load Table")) { // no table loaded yet
-		saveAsGlobalTable();
-		return;
-	}
+    if (loadBtn->text() == QString("Load Table")) { // no table loaded yet
+        saveAsGlobalTable();
+        return;
+    }
 
-	QString filename = loadBtn->text();
-	globalColorTable.write(filename.toStdString());
-    serializeTableName(filename);
+    QString filename = loadBtn->text();
+    globalColorTable.write(filename.toStdString());
 }
-
 void Tool::saveAsGlobalTable()
 {
 
     QString base_directory = QString(NBITES_DIR) + "/data/tables";
     QString filename = QFileDialog::getSaveFileName(this,
-					tr("Save Color Table to File"),
-					base_directory + "/new_table.mtb",
-					tr("Color Table files (*.mtb)"));
-	globalColorTable.write(filename.toStdString());
+                                                    tr("Save Color Table to File"),
+                                                    base_directory + "/new_table.mtb",
+                                                    tr("Color Table files (*.mtb)"));
+    globalColorTable.write(filename.toStdString());
 
-	if (!filename.isEmpty()) {
-		loadBtn->setText(filename);
-        serializeTableName(filename);
-    }
+    if (!filename.isEmpty())
+        loadBtn->setText(filename);
 }
 
 void Tool::loadColorTable()
@@ -152,34 +148,9 @@ void Tool::loadColorTable()
     topConverter.loadTable(globalColorTable.getTable());
     bottomConverter.loadTable(globalColorTable.getTable());
 
-	if (!filename.isEmpty()) {
-		loadBtn->setText(filename);
-        serializeTableName(filename);
-    }
-
-}
-
-void Tool::loadLatestTable()
-{
-    QFile file("../../data/tables/latestTable.dat");
-    file.open(QIODevice::ReadOnly);
-    QDataStream in(&file);
-    QString filename;
-    in >> filename;
-    if (!filename.isEmpty()) {
-        globalColorTable.read(filename.toStdString());
-        topConverter.loadTable(globalColorTable.getTable());
-        bottomConverter.loadTable(globalColorTable.getTable());
+    if (!filename.isEmpty())
         loadBtn->setText(filename);
-    }
-}
 
-void Tool::serializeTableName(QString latestTableName)
-{
-    QFile file("../../data/tables/latestTable.dat");
-    file.open(QIODevice::WriteOnly);
-    QDataStream out(&file);
-    out << latestTableName;
 }
 
 void Tool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)

@@ -51,3 +51,6 @@ FIND_BALL_SPIN_SPEED = .7
 WALK_FIND_BALL_FRAMES_THRESH = 720
 
 STOP_PENALTY_DRIBBLE_COUNT = 120
+
+# During kickoff, wait until 10 seconds or ball has moved significantly.
+KICKOFF_BALL_MOVE_THRESH = 10

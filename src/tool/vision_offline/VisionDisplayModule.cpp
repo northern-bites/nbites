@@ -115,17 +115,17 @@ void VisionDisplayModule::run_()
     bottomImageIn.latch();
     topImageIn.latch();
 
-	tTImage_in.latch();
-	tYImage_in.latch();
-	tUImage_in.latch();
-	tVImage_in.latch();
-	bTImage_in.latch();
-	bYImage_in.latch();
-	bUImage_in.latch();
-	bVImage_in.latch();
+    tTImage_in.latch();
+    tYImage_in.latch();
+    tUImage_in.latch();
+    tVImage_in.latch();
+    bTImage_in.latch();
+    bYImage_in.latch();
+    bUImage_in.latch();
+    bVImage_in.latch();
 
-	joints_in.latch();
-	inerts_in.latch();
+    joints_in.latch();
+    inerts_in.latch();
 
     bottomImage.setMessage(portals::Message<messages::YUVImage>(
                                &bottomImageIn.message()));
@@ -167,124 +167,109 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
     lineImage.fill(qRgba(0, 0, 0, 0));
     QPainter painter(&lineImage);
     painter.setPen(QColor(246, 15, 15));
+    const messages::VisionField *visField = visMod.vision_field.getMessage(true).get();
+    const messages::VisionBall *visBall = visMod.vision_ball.getMessage(true).get();
 
-	const messages::VisionField *visField = visMod.vision_field.getMessage(true).get();
-	const messages::VisionBall *visBall = visMod.vision_ball.getMessage(true).get();
+    if (which == Camera::TOP) {
+        std::cout << "there are " << visField->visual_line_size() << " lines in the image\n";
+        for (int i = 0; i < visField->visual_line_size(); i++) {
 
-	if (which == Camera::TOP) {
-		std::cout << "there are " << visField->visual_line_size() << " lines in the image\n";
-		for (int i = 0; i < visField->visual_line_size(); i++) {
+            painter.drawLine(visField->visual_line(i).start_x(),
+                             visField->visual_line(i).start_y(),
+                             visField->visual_line(i).end_x(),
+                             visField->visual_line(i).end_y());
+        }
 
-			painter.drawLine(visField->visual_line(i).start_x(),
-							 visField->visual_line(i).start_y(),
-							 visField->visual_line(i).end_x(),
-							 visField->visual_line(i).end_y());
-		}
+        painter.setPen(Qt::magenta);
+        for (int i = 0; i < visField->visual_corner_size(); i++) {
+            painter.drawLine(visField->visual_corner(i).x() - 5,
+                             visField->visual_corner(i).y() - 5,
+                             visField->visual_corner(i).x() + 5,
+                             visField->visual_corner(i).y() + 5);
+            painter.drawLine(visField->visual_corner(i).x() + 5,
+                             visField->visual_corner(i).y() - 5,
+                             visField->visual_corner(i).x() - 5,
+                             visField->visual_corner(i).y() + 5);
+        }
 
-		painter.setPen(Qt::magenta);
-		for (int i = 0; i < visField->visual_corner_size(); i++) {
+        if (visBall->intopcam()) {
+            int ball_x = visBall->x();
+            int ball_y = visBall->y();
+            int ball_radius = visBall->radius();
 
-			painter.drawLine(visField->visual_corner(i).x() - 5,
-							 visField->visual_corner(i).y() - 5,
-							 visField->visual_corner(i).x() + 5,
-							 visField->visual_corner(i).y() + 5);
-			painter.drawLine(visField->visual_corner(i).x() + 5,
-							 visField->visual_corner(i).y() - 5,
-							 visField->visual_corner(i).x() - 5,
-							 visField->visual_corner(i).y() + 5);
-		}
+            painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
+            painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
+            painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
+        }
 
-		if (visBall->intopcam()) {
-			int ball_x = visBall->x();
-			int ball_y = visBall->y();
-			int ball_radius = visBall->radius();
-
-			painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
-			painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
-			painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
-		}
-
-		const messages::VisualGoalPost yglp = visField->goal_post_l();
-		const messages::VisualGoalPost ygrp = visField->goal_post_r();
-		// Now we are to draw the goal posts
-		painter.setPen(QColor(0,0,0,200));
-		painter.setBrush(QBrush(QColor(255,255,0,80), Qt::SolidPattern));
-		if (ygrp.visual_detection().certainty() == 2)
-			painter.setPen(QColor(0,0,255,200));
-		if (ygrp.visual_detection().on() && ygrp.visual_detection().intopcam()) {
-			QPoint r_points[4] = {
-				QPoint(ygrp.left_top().x(), ygrp.left_top().y()),
-				QPoint(ygrp.right_top().x(), ygrp.right_top().y()),
-				QPoint(ygrp.right_bot().x(), ygrp.right_bot().y()),
-				QPoint(ygrp.left_bot().x(), ygrp.left_bot().y())
-			};
-			painter.drawConvexPolygon(r_points, 4);
-		}
-		if (yglp.visual_detection().on() && yglp.visual_detection().intopcam()) {
-			painter.setPen(QColor(255,0,0,200));
-			QPoint l_points[4] = {
-				QPoint(yglp.left_top().x(), yglp.left_top().y()),
-				QPoint(yglp.right_top().x(), yglp.right_top().y()),
-				QPoint(yglp.right_bot().x(), yglp.right_bot().y()),
-				QPoint(yglp.left_bot().x(), yglp.left_bot().y())
-			};
-			painter.drawConvexPolygon(l_points, 4);
-		}
-
-        painter.setPen(Qt::darkCyan);
-        if (visField->visual_cross().distance() > 0) {
-            painter.drawLine(visField->visual_cross().x() + 15,
-                             visField->visual_cross().y() + 15,
-                             visField->visual_cross().x() + 5,
-                             visField->visual_cross().y() + 5);
-            painter.drawLine(visField->visual_cross().x() + 5,
-                             visField->visual_cross().y() + 15,
-                             visField->visual_cross().x() + 15,
-                             visField->visual_cross().y() + 5);
+        const messages::VisualGoalPost yglp = visField->goal_post_l();
+        const messages::VisualGoalPost ygrp = visField->goal_post_r();
+        // Now we are to draw the goal posts
+        painter.setPen(QColor(0,0,0,200));
+        painter.setBrush(QBrush(QColor(255,255,0,80), Qt::SolidPattern));
+        if (ygrp.visual_detection().certainty() == 2)
+            painter.setPen(QColor(0,0,255,200));
+        if (ygrp.visual_detection().on() && ygrp.visual_detection().intopcam()) {
+            QPoint r_points[4] = {
+                QPoint(ygrp.left_top().x(), ygrp.left_top().y()),
+                QPoint(ygrp.right_top().x(), ygrp.right_top().y()),
+                QPoint(ygrp.right_bot().x(), ygrp.right_bot().y()),
+                QPoint(ygrp.left_bot().x(), ygrp.left_bot().y())
+            };
+            painter.drawConvexPolygon(r_points, 4);
+        }
+        if (yglp.visual_detection().on() && yglp.visual_detection().intopcam()) {
+            painter.setPen(QColor(255,0,0,200));
+            QPoint l_points[4] = {
+                QPoint(yglp.left_top().x(), yglp.left_top().y()),
+                QPoint(yglp.right_top().x(), yglp.right_top().y()),
+                QPoint(yglp.right_bot().x(), yglp.right_bot().y()),
+                QPoint(yglp.left_bot().x(), yglp.left_bot().y())
+            };
+            painter.drawConvexPolygon(l_points, 4);
         }
 
 
-	}
-	else { // this is to draw in the bottom camera
+    }
+    else { // this is to draw in the bottom camera
+        if (!visBall->intopcam()) {
+            int ball_x = visBall->x();
+            int ball_y = visBall->y();
+            int ball_radius = visBall->radius();
 
-		if (!visBall->intopcam()) {
-			int ball_x = visBall->x();
-			int ball_y = visBall->y();
-			int ball_radius = visBall->radius();
+            painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
+            painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
+            painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
+        }
+        const messages::VisualGoalPost yglp = visField->goal_post_l();
+        const messages::VisualGoalPost ygrp = visField->goal_post_r();
+        // Now we are to draw the goal posts
+        painter.setPen(QColor(0,0,0,200));
+        painter.setBrush(QBrush(QColor(255,255,0,80), Qt::SolidPattern));
+        if (ygrp.visual_detection().certainty() == 2)
+            painter.setPen(QColor(0,0,255,200));
+        if (ygrp.visual_detection().on() && !ygrp.visual_detection().intopcam()) {
+            QPoint r_points[4] = {
+                QPoint(ygrp.left_top().x(), ygrp.left_top().y()),
+                QPoint(ygrp.right_top().x(), ygrp.right_top().y()),
+                QPoint(ygrp.right_bot().x(), ygrp.right_bot().y()),
+                QPoint(ygrp.left_bot().x(), ygrp.left_bot().y())
+            };
+            painter.drawConvexPolygon(r_points, 4);
+        }
+        if (yglp.visual_detection().on() && !yglp.visual_detection().intopcam()) {
+            painter.setPen(QColor(255,0,0,200));
+            QPoint l_points[4] = {
+                QPoint(yglp.left_top().x(), yglp.left_top().y()),
+                QPoint(yglp.right_top().x(), yglp.right_top().y()),
+                QPoint(yglp.right_bot().x(), yglp.right_bot().y()),
+                QPoint(yglp.left_bot().x(), yglp.left_bot().y())
+            };
+            painter.drawConvexPolygon(l_points, 4);
+        }
+    }
 
-			painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
-			painter.setBrush(QBrush(QColor(255,0,0,80),Qt::SolidPattern));
-			painter.drawEllipse(ball_x,ball_y,2*ball_radius,2*ball_radius);
-		}
-		const messages::VisualGoalPost yglp = visField->goal_post_l();
-		const messages::VisualGoalPost ygrp = visField->goal_post_r();
-		// Now we are to draw the goal posts
-		painter.setPen(QColor(0,0,0,200));
-		painter.setBrush(QBrush(QColor(255,255,0,80), Qt::SolidPattern));
-		if (ygrp.visual_detection().certainty() == 2)
-			painter.setPen(QColor(0,0,255,200));
-		if (ygrp.visual_detection().on() && !ygrp.visual_detection().intopcam()) {
-			QPoint r_points[4] = {
-				QPoint(ygrp.left_top().x(), ygrp.left_top().y()),
-				QPoint(ygrp.right_top().x(), ygrp.right_top().y()),
-				QPoint(ygrp.right_bot().x(), ygrp.right_bot().y()),
-				QPoint(ygrp.left_bot().x(), ygrp.left_bot().y())
-			};
-			painter.drawConvexPolygon(r_points, 4);
-		}
-		if (yglp.visual_detection().on() && !yglp.visual_detection().intopcam()) {
-			painter.setPen(QColor(255,0,0,200));
-			QPoint l_points[4] = {
-				QPoint(yglp.left_top().x(), yglp.left_top().y()),
-				QPoint(yglp.right_top().x(), yglp.right_top().y()),
-				QPoint(yglp.right_bot().x(), yglp.right_bot().y()),
-				QPoint(yglp.left_bot().x(), yglp.left_bot().y())
-			};
-			painter.drawConvexPolygon(l_points, 4);
-		}
-	}
-
-	return lineImage;
+    return lineImage;
 
 }
 

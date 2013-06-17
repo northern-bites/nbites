@@ -9,16 +9,12 @@ namespace tool {
 
 LocTool::LocTool(const char* title) :
     fieldView(this),
+    worldView(this),
     EmptyTool(title)
 
 {
     toolTabs->addTab(&fieldView, tr("FieldView"));
-
-
-    toolTabs->addTab(&offlineVision, tr("Offline Vision"));
-    toolTabs->addTab(&tableCreator, tr("Color Creator"));
-    toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
-
+    toolTabs->addTab(&worldView, tr("World View"));
 
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));

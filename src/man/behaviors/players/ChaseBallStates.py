@@ -3,6 +3,7 @@ Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
+import DribbleTransitions as dr_trans
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
@@ -34,8 +35,8 @@ def kickoff(player):
         kickoff.ballRelY = player.brain.ball.rel_y
 
     if (player.brain.gameController.timeSincePlaying > 10 or
-        fabs(player.brain.ball.rel_x - kickoff.ballRelX) > 5 or
-        fabs(player.brain.ball.rel_y - kickoff.ballRelY) > 5):
+        fabs(player.brain.ball.rel_x - kickoff.ballRelX) > constants.KICKOFF_BALL_MOVE_THRESH or
+        fabs(player.brain.ball.rel_y - kickoff.ballRelY) > constants.KICKOFF_BALL_MOVE_THRESH):
         return player.goNow('chase')
 
     return player.stay()
@@ -106,6 +107,10 @@ def prepareForKick(player):
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
+ 
+    # if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
+    #     dr_trans.facingGoal(player)):
+    #     return player.goNow('dribble')
 
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
@@ -212,6 +217,10 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
+    if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
+        dr_trans.facingGoal(player)):
+        return player.goNow('dribble')
+
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
     positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
@@ -239,6 +248,7 @@ def positionForKick(player):
 
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
+        print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 
