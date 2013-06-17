@@ -157,7 +157,7 @@ void VisionTool::setUpModules()
         bottomConverter.loadTable(globalColorTable.getTable());
     }
     else
-        std::cout << "Warning: Images not logged in this file. This is the VISION TOOL, DUMMY\n"
+        std::cout << "Warning: Images not logged in this file. This is the VISION TOOL, DUMMY\n";
 
     diagram.addModule(visDispMod);
     if (diagram.connectToUnlogger<messages::YUVImage>(visDispMod.topImageIn,
