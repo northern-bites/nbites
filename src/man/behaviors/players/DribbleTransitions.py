@@ -7,12 +7,13 @@ def crowded(player):
     """
     The vision heat map is showing a crowded area in front of me.
     """
-    return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
-            and not player.brain.interface.visionObstacle.block_left == 0)
-            or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
-            and not player.brain.interface.visionObstacle.block_mid == 0)
-            or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
-            and not player.brain.interface.visionObstacle.block_right == 0))
+    return True
+    # return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
+    #         and not player.brain.interface.visionObstacle.block_left == 0)
+    #         or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
+    #         and not player.brain.interface.visionObstacle.block_mid == 0)
+    #         or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
+    #         and not player.brain.interface.visionObstacle.block_right == 0))
 
 def centerLaneOpen(player):
     """
@@ -21,13 +22,6 @@ def centerLaneOpen(player):
     return (player.brain.interface.visionObstacle.mid_dist > 
             constants.OPEN_LANE_DIST or 
             player.brain.interface.visionObstacle.block_mid == 0) 
-
-def rotateLeft(player):
-    return (player.brain.loc.y < (1./2.*nogginConstants.FIELD_HEIGHT))
-    # return (player.brain.interface.visionObstacle.block_left == 0 or
-    #         (player.brain.interface.visionObstacle.left_dist < 
-    #         player.brain.interface.visionObstacle.right_dist and
-    #         not player.brain.interface.visionObstacle.block_right == 0))
 
 def middleThird(player):
     """
@@ -49,6 +43,23 @@ def facingGoal(player):
 
     return (bearingForKick < constants.FACING_FORWARD_DEG and 
             bearingForKick > -constants.FACING_FORWARD_DEG)
+
+def rotateLeft(player):
+    """
+    The goal is to the left of us, so we should rotate that way away from traffic.
+    """
+    return (player.brain.loc.y < (1./2.*nogginConstants.FIELD_HEIGHT))
+    # return (player.brain.interface.visionObstacle.block_left == 0 or
+    #         (player.brain.interface.visionObstacle.left_dist < 
+    #         player.brain.interface.visionObstacle.right_dist and
+    #         not player.brain.interface.visionObstacle.block_right == 0))
+
+def dribbleGoneBad(player):
+    """
+    We have dribbled the ball too far to the left or right.
+    """
+    return (abs(player.brain.ball.y - player.brain.loc.y) > 
+            constants.BALL_TOO_FAR_TO_SIDE)
 
 def ballToOurLeft(player):
     """
