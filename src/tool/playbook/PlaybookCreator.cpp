@@ -171,6 +171,8 @@ PlaybookCreator::PlaybookCreator(QWidget* parent):
     connect(goalie, SIGNAL(toggled(bool)), fieldPainter,
             SLOT(drawGoalie(bool)));
     connect(goalie, SIGNAL(toggled(bool)), this,
+            SLOT(updateGoalieLock(bool)));
+    connect(goalie, SIGNAL(toggled(bool)), this,
             SLOT(updatePositions(bool)));
 
     connect(lockPriority, SIGNAL(toggled(bool)), model,
@@ -465,6 +467,35 @@ void PlaybookCreator::updateLockedPriority()
     if (model->getPriorityLocked())
     {
         setPriorityList();
+    }
+}
+
+void PlaybookCreator::updateGoalieLock(bool checked)
+{
+    if (model->getDefenderLocked() &&
+        model->getMiddieLocked() &&
+        model->getOffenderLocked() &&
+        model->getChaserLocked() &&
+        model->getPriorityLocked())
+    {
+        qDebug() << "all locks are on. updating new activeGoalie with all of the old one's values.";
+
+        int newGoalie = checked ? 1 : 0;
+        int oldGoalie = checked ? 0 : 1;
+
+        for (int x = 0; x < GRID_WIDTH; x++)
+        {
+            for (int y = 0; y < GRID_HEIGHT; y++)
+            {
+                for (int role = 0; role < 4+3+2+1; role++)
+                {
+                    model->playbook[x][y][newGoalie][role]->x = model->playbook[x][y][oldGoalie][role]->x;
+                    model->playbook[x][y][newGoalie][role]->y = model->playbook[x][y][oldGoalie][role]->y;
+                    model->playbook[x][y][newGoalie][role]->h = model->playbook[x][y][oldGoalie][role]->h;
+                    model->playbook[x][y][newGoalie][role]->role = model->playbook[x][y][oldGoalie][role]->role;
+                }
+            }
+        }
     }
 }
 

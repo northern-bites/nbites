@@ -47,6 +47,7 @@ public:
     PlaybookPosition***** playbook; // [2][3+2+1][GRID_WIDTH][GRID_HEIGHT];
 
     PlaybookPosition* convertRoleToPlaybookPosition(short role);
+    PlaybookPosition* convertRoleToReflectedPosition(short role);
 
     int getNumActiveFieldPlayers(){return numActiveFieldPlayers;};
     int getGoalieOn(){return goalieOn;};

@@ -63,6 +63,7 @@ protected slots:
     void setFourFieldPlayers(bool checked);
     void setPriorityList();
     void writeToFile(bool checked);
+    void updateGoalieLock(bool checked);
 
 protected:
     PlaybookField* fieldPainter;

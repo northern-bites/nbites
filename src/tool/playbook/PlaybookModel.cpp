@@ -177,56 +177,97 @@ PlaybookPosition* PlaybookModel::convertRoleToPlaybookPosition(short role)
     return playbook[0][0][0][0];
 }
 
+PlaybookPosition* PlaybookModel::convertRoleToReflectedPosition(short role)
+{
+    int offset = 0;
+    if (numActiveFieldPlayers == 4) {
+        offset = 0;
+    } else if (numActiveFieldPlayers == 3) {
+        offset = 4;
+    } else if (numActiveFieldPlayers == 2) {
+        offset = 7;
+    } else if (numActiveFieldPlayers == 1) {
+        offset = 9;
+    }
+
+    int refBallY = (GRID_HEIGHT-1) - ball_y;
+
+    PlaybookPosition* position;
+    for (int i = 0; i < numActiveFieldPlayers; i++)
+    {
+        position = playbook[ball_x][refBallY][goalieOn][i+offset];
+        if (position->role == role)
+        {
+            return position;
+        }
+    }
+
+    qDebug() << "gave an invalid role to the reflected conversion method!";
+    return playbook[0][0][0][0];
+}
+
 void PlaybookModel::setDefenderXPosition(int x_)
 {
     convertRoleToPlaybookPosition(DEFENDER)->x = x_;
+    convertRoleToReflectedPosition(DEFENDER)->x = x_;
 }
 void PlaybookModel::setDefenderYPosition(int y_)
 {
     convertRoleToPlaybookPosition(DEFENDER)->y = y_;
+    convertRoleToReflectedPosition(DEFENDER)->y = FIELD_WHITE_HEIGHT - y_;
 }
 void PlaybookModel::setDefenderHPosition(int h_)
 {
     convertRoleToPlaybookPosition(DEFENDER)->h = h_;
+    convertRoleToReflectedPosition(DEFENDER)->h = -h_;
 }
 
 void PlaybookModel::setMiddieXPosition(int x_)
 {
     convertRoleToPlaybookPosition(MIDDIE)->x = x_;
+    convertRoleToReflectedPosition(MIDDIE)->x = x_;
 }
 void PlaybookModel::setMiddieYPosition(int y_)
 {
     convertRoleToPlaybookPosition(MIDDIE)->y = y_;
+    convertRoleToReflectedPosition(MIDDIE)->y = FIELD_WHITE_HEIGHT - y_;
 }
 void PlaybookModel::setMiddieHPosition(int h_)
 {
     convertRoleToPlaybookPosition(MIDDIE)->h = h_;
+    convertRoleToReflectedPosition(MIDDIE)->h = -h_;
 }
 
 void PlaybookModel::setOffenderXPosition(int x_)
 {
     convertRoleToPlaybookPosition(OFFENDER)->x = x_;
+    convertRoleToReflectedPosition(OFFENDER)->x = x_;
 }
 void PlaybookModel::setOffenderYPosition(int y_)
 {
     convertRoleToPlaybookPosition(OFFENDER)->y = y_;
+    convertRoleToReflectedPosition(OFFENDER)->y = FIELD_WHITE_HEIGHT - y_;
 }
 void PlaybookModel::setOffenderHPosition(int h_)
 {
     convertRoleToPlaybookPosition(OFFENDER)->h = h_;
+    convertRoleToReflectedPosition(OFFENDER)->h = -h_;
 }
 
 void PlaybookModel::setChaserXPosition(int x_)
 {
     convertRoleToPlaybookPosition(CHASER)->x = x_;
+    convertRoleToReflectedPosition(CHASER)->x = x_;
 }
 void PlaybookModel::setChaserYPosition(int y_)
 {
     convertRoleToPlaybookPosition(CHASER)->y = y_;
+    convertRoleToReflectedPosition(CHASER)->y = FIELD_WHITE_HEIGHT - y_;
 }
 void PlaybookModel::setChaserHPosition(int h_)
 {
     convertRoleToPlaybookPosition(CHASER)->h = h_;
+    convertRoleToReflectedPosition(CHASER)->h = -h_;
 }
 
 void PlaybookModel::setBallX(int x_)

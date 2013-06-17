@@ -120,9 +120,13 @@ void PlaybookField::paintPlayers(QPaintEvent* event)
     {
         short role = robots[i]->role;
 
+        // Add the green pads so that the numbers saved are all relative
+        // to the white corner. Python will add what the green pad is
+        // back in at that time. This way, when the pad changes at competition,
+        // the same playbook will still work.
         paintRobot(event, painter,
-                   robots[i]->x,
-                   robots[i]->y,
+                   robots[i]->x+GREEN_PAD_X,
+                   robots[i]->y+GREEN_PAD_Y,
                    robots[i]->h,
                    roleColors[role]);
     }
