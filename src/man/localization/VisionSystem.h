@@ -10,6 +10,7 @@
 
 #include "SensorModel.h"
 #include "NBMath.h"
+#include "LineSystem.h"
 
 #include "FieldConstants.h"
 
@@ -23,6 +24,8 @@ namespace man
 {
 namespace localization
 {
+
+static const float MIN_LINE_LENGTH = 10.f;
 
 /**
  * @class Vision System
@@ -60,6 +63,8 @@ private:
 
     void opitmizeReconstructions();
 
+private:
+    LineSystem* lineSystem;
     std::list<ReconstructedLocation> reconstructedLocations;
     float avgError;
     float weightedAvgError;

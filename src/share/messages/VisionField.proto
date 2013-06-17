@@ -187,6 +187,8 @@ message VisualLine
 	optional float end_x_r = 15;
 	optional float end_y_r = 16;
 	optional float end_dist = 17;
+	optional float start_bear = 18;
+	optional float end_bear = 19;
 }
 
 message VisualFieldEdge

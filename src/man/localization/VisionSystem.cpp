@@ -5,7 +5,9 @@ namespace man
 namespace localization
 {
 
-VisionSystem::VisionSystem(){}
+VisionSystem::VisionSystem() {
+    lineSystem = new LineSystem;
+}
 
 VisionSystem::~VisionSystem(){}
 
@@ -43,6 +45,29 @@ bool VisionSystem::update(ParticleSet& particles,
                 curParticleError+= newError;
                 numObsv++;
 
+            }
+        }
+
+        // Use Lines!
+        for (int i=0; i<obsv.visual_line_size(); i++) {
+            if( obsv.visual_line(i).length() > MIN_LINE_LENGTH) {
+                // Create 2 points into the global
+                float sinS, cosS;
+                sincosf((particle->getLocation().h() + obsv.visual_line(i).start_bear()), &sinS, &cosS);
+                float startGlobalX = obsv.visual_line(i).start_dist()*cosS + particle->getLocation().x();
+                float startGlobalY = obsv.visual_line(i).start_dist()*sinS + particle->getLocation().y();
+
+                float sinE, cosE;
+                sincosf((particle->getLocation().h() + obsv.visual_line(i).end_bear()), &sinE, &cosE);
+                float endGlobalX = obsv.visual_line(i).end_dist()*cosE + particle->getLocation().x();
+                float endGlobalY = obsv.visual_line(i).end_dist()*sinE + particle->getLocation().y();
+
+                Point globalS(startGlobalX, startGlobalY);
+                Point globalE(  endGlobalX,   endGlobalY);
+                Line obsv(globalS, globalE);
+                float newError = lineSystem->scoreObservation(obsv);
+                curParticleError+=newError;
+                numObsv++;
             }
         }
 
