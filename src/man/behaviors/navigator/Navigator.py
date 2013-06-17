@@ -62,8 +62,8 @@ class Navigator(FSA.FSA):
 
         NavStates.dodge.transitions = {
             Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
             : NavStates.briefStand
             }
 

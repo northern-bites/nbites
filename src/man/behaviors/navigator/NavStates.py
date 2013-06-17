@@ -158,7 +158,6 @@ def dodge(nav):
             dodgeDest = RelRobotLocation(-15, -15, 0)
 
         helper.setOdometryDestination(nav, dodgeDest)
-        return nav.stay()
 
     return Transition.getNextState(nav, dodge)
 
