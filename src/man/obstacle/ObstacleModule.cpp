@@ -1,4 +1,4 @@
- #include "ObstacleModule.h"
+#include "ObstacleModule.h"
 
 namespace man {
 namespace obstacle {
@@ -6,6 +6,7 @@ namespace obstacle {
 using messages::Obstacle;
 using messages::ArmContactState;
 
+// Helper method, used to get the average of the sonar value buffers
 float average(std::list<float>& buf)
 {
     float avg = 0.f;
@@ -27,25 +28,27 @@ ObstacleModule::ObstacleModule() : obstacleOut(base())
 void ObstacleModule::run_()
 {
     armContactIn.latch();
-    visionIn.latch();
+    //visionIn.latch();
     sonarIn.latch();
 
+    // Decide sonars and arms separately
     Obstacle::ObstaclePosition sonars = processSonar(sonarIn.message());
     Obstacle::ObstaclePosition arms = processArms(armContactIn.message());
 
     portals::Message<messages::Obstacle> current(0);
 
-    // agreement
+    // How do we combine the two decisions?
+    // If they agree, easy
     if (arms == sonars)
     {
         current.get()->set_position(arms);
     }
-    // trust sonars first
+    // Trust sonars before we get any arm input
     else if (arms == Obstacle::NONE)
     {
         current.get()->set_position(sonars);
     }
-    // almost agreement
+    // If they sort of agree, use the value that gives us better dodging info
     else if (sonars == Obstacle::NORTH && (arms == Obstacle::NORTHWEST ||
                                            arms == Obstacle::NORTHEAST))
     {
@@ -56,7 +59,7 @@ void ObstacleModule::run_()
     {
         current.get()->set_position(sonars);
     }
-    // confused, trust arms
+    // If they don't agree or get no sonars, trust the arms
     else
     {
         current.get()->set_position(arms);
@@ -68,6 +71,7 @@ void ObstacleModule::run_()
 Obstacle::ObstaclePosition
 ObstacleModule::processArms(const messages::ArmContactState& input)
 {
+    // Both arms pushed approximately backwards...something is in front
     if ((input.right_push_direction() ==
          ArmContactState::SOUTH ||
          input.right_push_direction() ==
@@ -79,6 +83,7 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
     {
         return Obstacle::NORTH;
     }
+    // Both arms pushed approximately forward... something is behind
     else if ((input.right_push_direction() ==
               ArmContactState::NORTH ||
               input.right_push_direction() ==
@@ -90,6 +95,7 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
     {
         return Obstacle::SOUTH;
     }
+    // Not getting pushed on right arm... decide based on left
     else if (input.right_push_direction() ==
              ArmContactState::NONE)
     {
@@ -126,6 +132,7 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
         }
         else return Obstacle::NONE;
     }
+    // Not getting pushed on left arm... decide based on right
     else if (input.left_push_direction() ==
              ArmContactState::NONE)
     {
@@ -163,15 +170,20 @@ ObstacleModule::processArms(const messages::ArmContactState& input)
         else return Obstacle::NONE;
     }
 
+    // Potential issue: if both arms are pushed in disagreeing directions,
+    // we just decide no obstacle.
+
     return Obstacle::NONE;
 }
 
 Obstacle::ObstaclePosition
 ObstacleModule::processSonar(const messages::SonarState& input)
 {
+    // Buffer the current sonar values
     rightSonars.push_back(input.us_right());
     leftSonars.push_back(input.us_left());
 
+    // Get rid of old values
     if (rightSonars.size() > SONAR_FRAMES_TO_BUFFER)
     {
         rightSonars.pop_front();
@@ -182,21 +194,26 @@ ObstacleModule::processSonar(const messages::SonarState& input)
         leftSonars.pop_front();
     }
 
+    // Use the current average for our decision
     float right = average(rightSonars);
     float left = average(leftSonars);
 
+    // Both sonars picking up an obstacle? It's probably in front
     if (right < SONAR_THRESH && left < SONAR_THRESH)
     {
         return Obstacle::NORTH;
     }
+    // Otherwise to right side...
     else if (right < SONAR_THRESH)
     {
         return Obstacle::NORTHEAST;
     }
+    // ... left side ...
     else if (left < SONAR_THRESH)
     {
         return Obstacle::NORTHWEST;
     }
+    // .. or no obstacle
     else return Obstacle::NONE;
 }
 
