@@ -12,11 +12,13 @@ from objects import RelRobotLocation, Location
 # is in front of the ball, so setting ourselves up for a kick actually
 # results in us running through the ball. (There is no actual dribble sweet
 # move.) If vision sees a crowded area in front of us, we rotate around the 
-# ball and dribble again when we see a clear path.
+# ball and dribble again when we see a clear path. We only dribble if these 
+# conditions are true: 1. We are in the middle third of the field. 2. We are 
+# facing our opponents' goal.
 
 ### TODO
-# 1. choose direction better, based on loc and heatmap
-# 2. goTo loc behind ball post lookForBall
+# 1. dribbleGoneBad should take in to account heading
+# 2. choose direction better, based on loc and heatmap
 # 3. frame counter rotatation?
 # 4. avoid goTo?
 
@@ -76,10 +78,12 @@ def executeDribble(player):
         return player.goNow('lookForBall')
     elif (transitions.ballGotFarAway(player) or executeDribble.counter == 120):
         return player.goLater('dribble')
-    elif not transitions.crowded(player):
-        executeDribble.counter += 1
+    # elif not transitions.crowded(player):
+    #     executeDribble.counter += 1
     elif not transitions.centerLaneOpen(player):
         return player.goNow('rotateToOpenSpace')
+    elif transitions.dribbleGoneBad(player):
+        return player.goNow('positionForDribble')
 
     return player.stay()
 
@@ -109,7 +113,7 @@ def lookForBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.repeatWidePan()
-        backupLoc = RelRobotLocation(-20,0,0)
+        backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
         player.brain.nav.goTo(backupLoc,
                               Navigator.GENERAL_AREA,
                               Navigator.MEDIUM_SPEED,
@@ -118,8 +122,33 @@ def lookForBall(player):
         
     if transitions.seesBall(player):
         player.brain.tracker.trackBall()
-        return player.goLater('dribble')
+        return player.goLater('positionForDribble')
     elif transitions.navDone(player):
         return player.goLater('chase')
+
+    return player.stay()
+
+def positionForDribble(player):
+    """
+    We should position ourselves behind the ball for easy dribbling.
+    """
+    ball = player.brain.ball
+    # kick_pos = player.kick.getPosition()
+    backed_off = constants.BACKED_OFF_WHEN_POSITIONING
+    player.kickPose = RelRobotLocation(ball.rel_x + backed_off, # 20 cm behind ball
+                                       ball.rel_y,
+                                       0)
+
+    if player.firstFrame():
+        player.brain.nav.goTo(player.kickPose,
+                              Navigator.GENERAL_AREA,
+                              Navigator.MEDIUM_SPEED,
+                              False,
+                              False)
+    else:
+        player.brain.nav.updateDest(player.kickPose)
+
+    if transitions.navDone(player):
+        return player.goLater('dribble')
 
     return player.stay()
