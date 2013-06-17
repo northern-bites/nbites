@@ -17,6 +17,7 @@ def gameInitial(player):
         player.inKickingState = False
         player.gameState = player.currentState
         player.brain.fallController.enabled = False
+        player.gainsOn()
         player.stand()
         player.zeroHeads()
         #Reset localization to proper starting position by player number.
