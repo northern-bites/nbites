@@ -19,18 +19,6 @@ float average(std::list<float>& buf)
     return avg;
 }
 
-int numberOutOf(std::list<bool>& buf)
-{
-    int num = 0;
-
-    for (std::list<bool>::iterator i = buf.begin(); i != buf.end(); i++)
-    {
-        if (*i) num++;
-    }
-
-    return num;
-}
-
 ObstacleModule::ObstacleModule() : obstacleOut(base())
 {
 }
@@ -39,7 +27,6 @@ void ObstacleModule::run_()
 {
     armContactIn.latch();
     visionIn.latch();
-    footBumperIn.latch();
     sonarIn.latch();
 
     Obstacle::ObstaclePosition sonars = processSonar(sonarIn.message());
@@ -54,34 +41,6 @@ void ObstacleModule::run_()
 Obstacle::ObstaclePosition
 ObstacleModule::processArms(const messages::ArmContactState& input)
 {
-    return Obstacle::NONE;
-}
-
-Obstacle::ObstaclePosition
-ObstacleModule::processFeet(const messages::FootBumperState& input)
-{
-    rightFeet.push_back(footBumperIn.message().r_foot_bumper_left().pressed() ||
-                        footBumperIn.message().r_foot_bumper_right().pressed());
-
-    leftFeet.push_back(footBumperIn.message().l_foot_bumper_left().pressed() ||
-                       footBumperIn.message().l_foot_bumper_right().pressed());
-
-    if (rightFeet.size() > FEET_FRAMES_TO_BUFFER)
-    {
-        rightFeet.pop_front();
-    }
-
-    if (leftFeet.size() > FEET_FRAMES_TO_BUFFER)
-    {
-        leftFeet.pop_front();
-    }
-
-    int numLeftHits = numberOutOf(leftFeet);
-    int numRightHits = numberOutOf(rightFeet);
-
-    std::cout << "LEFT " << numLeftHits << ", RIGHT " << numRightHits
-              << std::endl;
-
     return Obstacle::NONE;
 }
 
