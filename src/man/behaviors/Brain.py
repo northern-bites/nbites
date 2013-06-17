@@ -359,7 +359,9 @@ class Brain(object):
 
     #TODO: write this method!
     def resetPenaltyKickLocalization(self):
-        pass
+        self.resetLocTo(Constants.LANDMARK_OPP_FIELD_CROSS[0] - 1.0,
+                        Constants.MIDFIELD_Y,
+                        Constants.HEADING_RIGHT)
 
     # THIS IS A HACK!
     # ... but until we have a world contextor or some such, it's a necessary one.
