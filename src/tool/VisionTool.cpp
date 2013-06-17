@@ -30,16 +30,19 @@ VisionTool::VisionTool(const char* title) :
 
     QToolBar* toolBar = new QToolBar(this);
     connect(loadBtn, SIGNAL(clicked()), this, SLOT(loadColorTable()));
-    toolBar->addWidget(loadBtn);
-    this->addToolBar(toolBar);
 
-    QPushButton* saveBtn = new QPushButton(tr("Save"));
-    connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveGlobalTable()));
-    toolBar->addWidget(saveBtn);
+	toolBar->addWidget(loadBtn);
+	this->addToolBar(toolBar);
 
-    QPushButton* saveAsBtn = new QPushButton(tr("Save As"));
-    connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
-    toolBar->addWidget(saveAsBtn);
+	QPushButton* saveBtn = new QPushButton(tr("Save"));
+	connect(saveBtn, SIGNAL(clicked()), this, SLOT(saveGlobalTable()));
+	toolBar->addWidget(saveBtn);
+
+	QPushButton* saveAsBtn = new QPushButton(tr("Save As"));
+	connect(saveAsBtn, SIGNAL(clicked()), this, SLOT(saveAsGlobalTable()));
+	toolBar->addWidget(saveAsBtn);
+
+    loadLatestTable();
 }
 
 VisionTool::~VisionTool() {
@@ -49,13 +52,14 @@ VisionTool::~VisionTool() {
 void VisionTool::saveGlobalTable()
 {
 
-    if (loadBtn->text() == QString("Load Table")) { // no table loaded yet
-        saveAsGlobalTable();
-        return;
-    }
+	if (loadBtn->text() == QString("Load Table")) { // no table loaded yet
+		saveAsGlobalTable();
+		return;
+	}
 
-    QString filename = loadBtn->text();
-    globalColorTable.write(filename.toStdString());
+	QString filename = loadBtn->text();
+	globalColorTable.write(filename.toStdString());
+    serializeTableName(filename);
 }
 void VisionTool::saveAsGlobalTable()
 {
@@ -64,11 +68,13 @@ void VisionTool::saveAsGlobalTable()
     QString filename = QFileDialog::getSaveFileName(this,
                     tr("Save Color Table to File"),
                     base_directory + "/new_table.mtb",
-                    tr("Color Table files (*.mtb)"));
-    globalColorTable.write(filename.toStdString());
+					tr("Color Table files (*.mtb)"));
+	globalColorTable.write(filename.toStdString());
 
-    if (!filename.isEmpty())
-        loadBtn->setText(filename);
+	if (!filename.isEmpty()) {
+		loadBtn->setText(filename);
+        serializeTableName(filename);
+    }
 }
 
 void VisionTool::loadColorTable()
@@ -84,9 +90,34 @@ void VisionTool::loadColorTable()
     topConverter.loadTable(globalColorTable.getTable());
     bottomConverter.loadTable(globalColorTable.getTable());
 
-    if (!filename.isEmpty())
-        loadBtn->setText(filename);
+	if (!filename.isEmpty()) {
+		loadBtn->setText(filename);
+        serializeTableName(filename);
+    }
 
+}
+
+void VisionTool::loadLatestTable()
+{
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::ReadOnly);
+    QDataStream in(&file);
+    QString filename;
+    in >> filename;
+    if (!filename.isEmpty()) {
+        globalColorTable.read(filename.toStdString());
+        topConverter.loadTable(globalColorTable.getTable());
+        bottomConverter.loadTable(globalColorTable.getTable());
+        loadBtn->setText(filename);
+    }
+}
+
+void VisionTool::serializeTableName(QString latestTableName)
+{
+    QFile file("../../data/tables/latestTable.dat");
+    file.open(QIODevice::WriteOnly);
+    QDataStream out(&file);
+    out << latestTableName;
 }
 
 void VisionTool::changeTableValues(std::vector<color::colorChanges> tableAdjustments)
@@ -118,23 +149,22 @@ void VisionTool::unChangeTableValues(std::vector<color::colorChanges> tableAdjus
 
 void VisionTool::setUpModules()
 {
-    diagram.connectToUnlogger<messages::YUVImage>(topConverter.imageIn, "top");
-    diagram.connectToUnlogger<messages::YUVImage>(bottomConverter.imageIn, "bottom");
-
-    diagram.connectToUnlogger<messages::YUVImage>(topConverter.imageIn, "top");
-    diagram.connectToUnlogger<messages::YUVImage>(bottomConverter.imageIn, "bottom");
-    diagram.addModule(topConverter);
-    diagram.addModule(bottomConverter);
-    topConverter.loadTable(globalColorTable.getTable());
-    bottomConverter.loadTable(globalColorTable.getTable());
-
+    if (diagram.connectToUnlogger<messages::YUVImage>(topConverter.imageIn, "top") &&
+        diagram.connectToUnlogger<messages::YUVImage>(bottomConverter.imageIn, "bottom")) {
+        diagram.addModule(topConverter);
+        diagram.addModule(bottomConverter);
+        topConverter.loadTable(globalColorTable.getTable());
+        bottomConverter.loadTable(globalColorTable.getTable());
+    }
+    else
+        std::cout << "Warning: Images not logged in this file. This is the VISION TOOL, DUMMY\n";
 
     diagram.addModule(visDispMod);
-    diagram.connectToUnlogger<messages::YUVImage>(visDispMod.topImageIn,
-                                                  "top");
-    diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
-                                                  "bottom");
-    if (diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
+    if (diagram.connectToUnlogger<messages::YUVImage>(visDispMod.topImageIn,
+                                                  "top") &&
+        diagram.connectToUnlogger<messages::YUVImage>(visDispMod.bottomImageIn,
+                                                      "bottom") &&
+        diagram.connectToUnlogger<messages::JointAngles>(visDispMod.joints_in,
                                                          "vision_joints") &&
         diagram.connectToUnlogger<messages::InertialState>(visDispMod.inerts_in,
                                                            "vision_inertials"))
