@@ -196,6 +196,7 @@ class VisualLine : public VisualLandmark {
 
  private:                        // Member variables
     point <int> start, end;
+    estimate start_est, end_est;
     // left, right x values, bottom, top y values
     int leftBound, rightBound, bottomBound, topBound;
     std::vector <linePoint> points;
@@ -266,6 +267,8 @@ class VisualLine : public VisualLandmark {
     inline const point<int> getTopLeftEndpoint() const;
     inline const point<int> getBottomRightEndpoint() const;
     inline const point<int> getBottomLeftEndpoint() const;
+    inline const estimate getStartEst() const;
+    inline const estimate getEndEst() const;
 
     inline const bool isParallel() const;
 
@@ -284,6 +287,8 @@ class VisualLine : public VisualLandmark {
     inline void setDistance(float _distance);
     inline void setDistanceSD(float _distanceSD);
     inline void setPossibleLines(const ConcreteLine* _possible);
+    inline void setStartEst(estimate _start_est);
+    inline void setEndEst(estimate _end_est);
 
     void setParallel() {parallel = true;}
     void setBearingWithSD(float _bearing);
@@ -459,6 +464,16 @@ const std::list <const ConcreteLine *> VisualLine::getPossibilities() const
     return possibleLines;
 }
 
+inline const estimate VisualLine::getStartEst() const
+{
+    return start_est;
+}
+
+inline const estimate VisualLine::getEndEst() const
+{
+    return end_est;
+}
+
 /**
  * Inline setters
  */
@@ -493,6 +508,15 @@ inline void VisualLine::setDistance(float _distance)
 inline void VisualLine::setDistanceSD(float _distanceSD)
 {
     distanceSD = _distanceSD;
+}
+
+inline void VisualLine::setStartEst(estimate _start_est)
+{
+    start_est = _start_est;
+}
+inline void VisualLine::setEndEst(estimate _end_est)
+{
+    end_est = _end_est;
 }
 
 }

@@ -1342,6 +1342,8 @@ void FieldLines::setLineCoordinates(boost::shared_ptr<VisualLine> aLine)
 
     aLine->setDistanceWithSD( hypotf(x_p, y_p));
     aLine->setBearingWithSD( NBMath::subPIAngle(NBMath::safe_atan2(y_p, x_p)) );
+    aLine->setStartEst(startEst);
+    aLine->setEndEst(endEst);
 }
 
 void FieldLines::drawLinePoints(const list<linePointNode> &toDraw) const

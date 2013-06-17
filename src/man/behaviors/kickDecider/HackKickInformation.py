@@ -266,9 +266,10 @@ class KickInformation:
                        "/" + str(bearingLimitRight/2))
 
             if bearingForKick < 35 and bearingForKick > -35:
-                #choose straight kick!
+                # "choose straight kick!"
                 kick = self.chooseQuickFrontKick()
                 kick.h = 0 - bearingForKick
+
             elif bearingForKick > 35: #and bearingForKick < 125:
                 #choose a right side kick! (using right foot)
                 kick = kicks.RIGHT_SIDE_KICK
@@ -278,7 +279,7 @@ class KickInformation:
                 kick = kicks.LEFT_SIDE_KICK
                 kick.h = -70 - bearingForKick
             else:
-                #choose a back kick!
+                # "choose a back kick!"
                 kick = self.chooseBackKick()
                 if bearingForKick < -125:
                     kick.h = -180 - bearingForKick

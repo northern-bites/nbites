@@ -95,6 +95,18 @@ void VisionModule::updateVisionObstacle() {
     obstacle_data.get()->set_on_right(vision->obstacles->onRight());
     obstacle_data.get()->set_off_field(vision->obstacles->offField());
 
+    obstacle_data.get()->set_block_left(vision->fieldOpenings[0].hard);
+    obstacle_data.get()->set_block_mid(vision->fieldOpenings[1].hard);
+    obstacle_data.get()->set_block_right(vision->fieldOpenings[2].hard);
+
+    obstacle_data.get()->set_left_dist(vision->fieldOpenings[0].dist);
+    obstacle_data.get()->set_mid_dist(vision->fieldOpenings[1].dist);
+    obstacle_data.get()->set_right_dist(vision->fieldOpenings[2].dist);
+
+    obstacle_data.get()->set_left_bearing(vision->fieldOpenings[0].bearing);
+    obstacle_data.get()->set_mid_bearing(vision->fieldOpenings[1].bearing);
+    obstacle_data.get()->set_right_bearing(vision->fieldOpenings[2].bearing);
+
     vision_obstacle.setMessage(obstacle_data);
 
 }
@@ -179,8 +191,12 @@ void VisionModule::updateVisionField() {
         //we wont set concrete coords for the lines, since they are lines
         visLine->set_start_x(i->get()->getStartpoint().x);
         visLine->set_start_y(i->get()->getStartpoint().y);
+        visLine->set_start_dist(i->get()->getStartEst().dist);
+        visLine->set_start_bearing(i->get()->getStartEst().bearing);
         visLine->set_end_x(i->get()->getEndpoint().x);
         visLine->set_end_y(i->get()->getEndpoint().y);
+        visLine->set_end_dist(i->get()->getEndEst().dist);
+        visLine->set_end_bearing(i->get()->getEndEst().bearing);
         visLine->set_angle(i->get()->getAngle());
         visLine->set_avg_width(i->get()->getAvgWidth());
         visLine->set_length(i->get()->getLength());

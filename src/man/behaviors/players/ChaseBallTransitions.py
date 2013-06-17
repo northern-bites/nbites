@@ -75,15 +75,6 @@ def ballNearPosition(player):
               constants.SHOULD_KICK_AGAIN_FAR_X) and
              fabs(ball.rel_y) < constants.SHOULD_KICK_AGAIN_Y)
 
-def ballMoved(player):
-    """
-    Ball has moved away from where it was seen last
-    """
-    ball = player.brain.ball
-    ballBefore = player.ballBeforeApproach
-    return (fabs(ball.x - ballBefore.x) > constants.BALL_MOVED_THR or
-            fabs(ball.y - ballBefore.y) > constants.BALL_MOVED_THR)
-
 def shouldKick(player):
     """
     Ball is in correct position to kick
@@ -145,6 +136,15 @@ def shouldFindBallKick(player):
     We lost the ball while in a kicking state, be more generous before looking
     """
     return (player.brain.ball.vis.frames_off > constants.BALL_OFF_KICK_THRESH)
+
+def ballMoved(player):
+    """
+    Ball has moved away from where it was seen last
+    """
+    ball = player.brain.ball
+    ballBefore = player.ballBeforeApproach
+    return (fabs(ball.x - ballBefore.x) > constants.BALL_MOVED_THR or
+            fabs(ball.y - ballBefore.y) > constants.BALL_MOVED_THR)
 
 def shouldSpinFindBall(player):
     """

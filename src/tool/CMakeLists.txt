@@ -40,6 +40,12 @@ configure_file(
 )
 
 
+if (NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type selected, default to RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+
 include_directories( ${PROJECT_BINARY_DIR} )
 include_directories( ${CMAKE_SOURCE_DIR} )
 
@@ -98,7 +104,7 @@ set( tool_srcs main.cpp
   ToolDiagram.cpp
   DataSelector.cpp
   Tool.cpp
-  ${MAN_DIR}/DiagramThread.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
   )
 
 set( tool_headers
@@ -113,6 +119,7 @@ set( loc_srcs loc_main.cpp
   EmptyTool.cpp
   ToolDiagram.cpp
   DataSelector.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
 
   LocTool.cpp
   )
@@ -203,8 +210,8 @@ target_link_libraries(
   image_display
   logview
   fieldview
-  tool_common
   worldview
+  tool_common
   localization
   ${QT_LIBRARIES}
   )

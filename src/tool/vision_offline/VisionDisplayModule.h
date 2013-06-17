@@ -33,9 +33,7 @@ namespace vision {
 
 class VisionDisplayModule : public QMainWindow,
                             public portals::Module
-
 {
-
     Q_OBJECT;
 
 public:
@@ -54,6 +52,7 @@ public:
     portals::InPortal<messages::PackedImage16> bYImage_in;
     portals::InPortal<messages::PackedImage16> bUImage_in;
     portals::InPortal<messages::PackedImage16> bVImage_in;
+
     portals::InPortal<messages::JointAngles> joints_in;
     portals::InPortal<messages::InertialState> inerts_in;
 
@@ -79,7 +78,6 @@ private:
     man::vision::VisionModule visMod;
     color::ColorTable colorTable;
 
-
     // to view vision data
     logview::TypedProtoViewer<messages::VisionField>* field_viewer;
     logview::TypedProtoViewer<messages::VisionRobot>* robot_viewer;
@@ -101,8 +99,6 @@ private:
 
     portals::OutPortal<messages::JointAngles> joints;
     portals::OutPortal<messages::InertialState> inertials;
-
-
 };
 
 }
