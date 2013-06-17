@@ -33,8 +33,11 @@ void ArmContactModule::run_()
     expectedJointsIn.latch();
     handSpeedsIn.latch();
 
+    // Buffer the current expected joints, will use these FRAMES_DELAY
+    // frames later
     expectedJoints.push(expectedJointsIn.message());
 
+    // Get the delayed joints
     jointsWithDelay = &expectedJoints.front();
 
     if (expectedJoints.size() > FRAMES_DELAY)
@@ -44,8 +47,10 @@ void ArmContactModule::run_()
 
     portals::Message<messages::ArmContactState> current(0);
 
+    // Do the decision work
     determineContactState();
 
+    // Keep track of the last push we detected
     if (rightArm != messages::ArmContactState::NONE)
     {
         lastDetectedRight = rightArm;
@@ -55,6 +60,7 @@ void ArmContactModule::run_()
         lastDetectedLeft = leftArm;
     }
 
+    // Count how long we've been getting the same push
     if (rightArm == lastDetectedRight)  rightStuckCounter++;
     else rightStuckCounter = 0;
 
@@ -62,7 +68,9 @@ void ArmContactModule::run_()
     else leftStuckCounter = 0;
 
 
-    // If an arm is stuck, override what we just computed for it
+    // If an arm is stuck, override what we computed for it and
+    // send out NONE until it becomes unstuck... othewrise send what
+    // was actually computed
     if (rightStuckCounter < STUCK_THRESH)
     {
         current.get()->set_right_push_direction(rightArm);
@@ -81,14 +89,15 @@ void ArmContactModule::run_()
     }
 
     contactOut.setMessage(current);
-
-    //std::cout << current.get()->DebugString() << std::endl;
 }
 
 void ArmContactModule::determineContactState()
 {
     Displacement r, l;
 
+    // Compute the *corrected* displacement based on the hand speed. If the
+    // hand is moving particularly fast this speed, we weight this value
+    // less in the average because it is less reliable.
     float rCorrect = std::max(0.f, 1.f -
                               (handSpeedsIn.message().right_speed() /
                                SPEED_BASED_ERROR_REDUCTION));
@@ -107,6 +116,7 @@ void ArmContactModule::determineContactState()
     l.push_back(lCorrect*(actualJointsIn.message().l_shoulder_roll() -
                           jointsWithDelay->l_shoulder_roll()));
 
+    // Keep track of the corrected values for the averaging
     right.push_back(r);
     left.push_back(l);
 
@@ -119,9 +129,12 @@ void ArmContactModule::determineContactState()
         right.pop_front();
     }
 
+    // Get the average to actually use
     r = getAverageDisplacement(right);
     l = getAverageDisplacement(left);
 
+    // Figure out the right arm
+    // If we have significant pitch AND roll displacement
     if ((fabs(r[PITCH]) > DISPLACEMENT_THRESH) &&
         (fabs(r[ROLL]) > DISPLACEMENT_THRESH))
     {
@@ -142,19 +155,22 @@ void ArmContactModule::determineContactState()
             rightArm = messages::ArmContactState::SOUTHWEST;
         }
     }
+    // Only pitch displacement
     else if (fabs(r[PITCH]) > DISPLACEMENT_THRESH)
     {
         if (r[PITCH] < 0) rightArm = messages::ArmContactState::NORTH;
         else rightArm = messages::ArmContactState::SOUTH;
     }
+    // Only roll displacement
     else if (fabs(r[ROLL]) > DISPLACEMENT_THRESH)
     {
         if (r[ROLL] < 0) rightArm = messages::ArmContactState::EAST;
         else rightArm = messages::ArmContactState::WEST;
     }
+    // No displacement... no pushing!
     else rightArm = messages::ArmContactState::NONE;
 
-
+    // Do the same for the left arm (copy-paste programming bad...)
     if ((fabs(l[PITCH]) > DISPLACEMENT_THRESH) &&
         (fabs(l[ROLL]) > DISPLACEMENT_THRESH))
     {
