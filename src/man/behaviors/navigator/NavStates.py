@@ -5,6 +5,7 @@ from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
+import random
 
 def scriptedMove(nav):
     '''State that we stay in while doing sweet moves'''
@@ -134,7 +135,8 @@ def dodge(nav):
     if nav.firstFrame():
         if dodge.position is dodge.position.NORTH:
             print "Dodging NORTH obstacle"
-            dodgeDest = RelRobotLocation(-20, 0, 0)
+            direction = random.choice([-1, 1])
+            dodgeDest = RelRobotLocation(-15, direction*10, 0)
         elif dodge.position is dodge.position.NORTHEAST:
             print "Dodging NORTHEAST obstacle"
             dodgeDest = RelRobotLocation(0, 15, 0)
@@ -146,7 +148,8 @@ def dodge(nav):
             dodgeDest = RelRobotLocation(0, 15, 0)
         elif dodge.position is dodge.position.SOUTH:
             print "Dodging SOUTH obstacle"
-            dodgeDest = RelRobotLocation(20, 0, 0)
+            direction = random.choice([-1, 1])
+            dodgeDest = RelRobotLocation(15, direction*10, 0)
         elif dodge.position is dodge.position.SOUTHWEST:
             print "Dodging SOUTHWEST obstacle"
             dodgeDest = RelRobotLocation(0, -15, 0)
