@@ -23,12 +23,12 @@ def centerLaneOpen(player):
             constants.OPEN_LANE_DIST or 
             player.brain.interface.visionObstacle.block_mid == 0) 
 
-def middleThird(player):
+def betweenCrosses(player):
     """
-    We are in the middle third of the field.
+    We are between the two field crosses.
     """
-    return (player.brain.loc.x > (1./3.*nogginConstants.FIELD_WIDTH) 
-            and player.brain.loc.x < (2./3.*nogginConstants.FIELD_WIDTH))
+    return (player.brain.loc.x > (1./5.*nogginConstants.FIELD_WIDTH) 
+            and player.brain.loc.x < (4./5.*nogginConstants.FIELD_WIDTH))
 
 def facingGoal(player):
     """
@@ -87,15 +87,24 @@ def ballGotFarAway(player):
     ball = player.brain.ball
     return ball.vis.on and ball.distance > constants.BALL_FAR_AWAY
 
-def navDone(player):
-    """
-    Nav is done.
-    """
-    return player.brain.nav.isAtPosition()
-
 def seesBall(player):
     """
     We see the ball. So go get it.
     """
     ball = player.brain.ball
     return (ball.vis.frames_on > constants.BALL_ON_THRESH)
+
+def navDone(player):
+    """
+    Nav is done.
+    """
+    return player.brain.nav.isAtPosition()
+
+def timeLeft(player):
+    """
+    There is enough time left in the game to dribble. Or there is very little
+    time left but the ball is close enough to the goal to dribble it in.
+    """
+    return (player.brain.game.secs_remaining > 25 or 
+            (player.brain.game.secs_remaining < 10 and 
+             player.brain.loc.x > 9./10.*nogginConstants.FIELD_WIDTH)) 

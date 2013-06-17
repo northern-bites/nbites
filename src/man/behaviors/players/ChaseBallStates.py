@@ -108,10 +108,6 @@ def prepareForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
  
-    # if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
-    #     dr_trans.facingGoal(player)):
-    #     return player.goNow('dribble')
-
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
     #  Might have to do it anyway if comm is always down.
@@ -264,8 +260,10 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
-        dr_trans.facingGoal(player)):
+    if (dr_trans.facingGoal(player) and dr_trans.betweenCrosses(player) 
+        and dr_trans.crowded(player) and dr_trans.timeLeft(player)
+        and not dr_trans.ballGotFarAway(player) and not
+        dr_trans.ballLost(player)):
         return player.goNow('dribble')
 
     ball = player.brain.ball

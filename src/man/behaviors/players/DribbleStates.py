@@ -8,26 +8,35 @@ from ..kickDecider import kicks
 from objects import RelRobotLocation, Location
 
 ### BASIC IDEA 
-# We dribble by setting ourselves up for a dribble sweet move. The sweet spot 
+# We dribble by setting ourselves up for a dribble kick. The sweet spot 
 # is in front of the ball, so setting ourselves up for a kick actually
 # results in us running through the ball. (There is no actual dribble sweet
 # move.) If vision sees a crowded area in front of us, we rotate around the 
 # ball and dribble again when we see a clear path. We only dribble if these 
-# conditions are true: 1. We are in the middle third of the field. 2. We are 
-# facing our opponents' goal.
+# conditions are true: 1. We are between the two field crosses. 2. We are 
+# facing our opponents' goal. 3. We can see the ball close to us.
 
 ### TODO
-# 1. dribbleGoneBad should take in to account heading
-# 2. choose direction better, based on loc and heatmap
-# 3. frame counter rotatation?
-# 4. avoid goTo?
+# test time-left based decision making
+# dribble through if close enough to goal
+# dribbleGoneBad should take in to account heading
+# rotate towards goal when dribbling
+# get rid of 'dribble' state?
+# choose direction better, based on loc and heatmap
+# frame counter rotatation?
+
+### DONE
+# cross to cross dribbling
+# time-left based decision making
+        # kick instead 
+        # dribble through
 
 def dribble(player):
     """
     Super State to determine what to do from various situations.
     """
-    if (transitions.facingGoal(player) and transitions.middleThird(player) 
-        and transitions.crowded(player) 
+    if (transitions.facingGoal(player) and transitions.betweenCrosses(player) 
+        and transitions.crowded(player) and transitions.timeLeft(player)
         and not transitions.ballGotFarAway(player) and not
         transitions.ballLost(player)):
         return player.goNow('decideDribble')
@@ -76,7 +85,7 @@ def executeDribble(player):
 
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
-    elif (transitions.ballGotFarAway(player) or executeDribble.counter == 120):
+    elif (transitions.ballGotFarAway(player) or not transitions.timeLeft(player):
         return player.goLater('dribble')
     # elif not transitions.crowded(player):
     #     executeDribble.counter += 1
@@ -99,7 +108,7 @@ def rotateToOpenSpace(player):
             player.setWalk(0, .5, -.15)
 
     if (transitions.ballLost(player) or transitions.ballGotFarAway(player) or
-        transitions.centerLaneOpen(player)):
+        not transitions.timeLeft(player) or transitions.centerLaneOpen(player)):
         player.stand()
         return player.goLater('dribble')
     # elif transitions.centerLaneOpen(player):
