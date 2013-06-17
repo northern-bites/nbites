@@ -14,14 +14,13 @@
 #include "WorldModel.pb.h"
 #include "PMotion.pb.h"
 #include "MotionStatus.pb.h"
-#include "SonarState.pb.h"
 #include "VisionField.pb.h"
 #include "VisionRobot.pb.h"
 #include "ButtonState.pb.h"
 #include "FallStatus.pb.h"
 #include "RobotLocation.pb.h"
 #include "StiffnessControl.pb.h"
-#include "ArmContactState.pb.h"
+#include "Obstacle.pb.h"
 
 /**
  *
@@ -81,18 +80,16 @@ public:
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
     portals::InPortal<messages::MotionStatus> motionStatusIn;
     portals::InPortal<messages::RobotLocation> odometryIn;
-    portals::InPortal<messages::SonarState> sonarStateIn;
     portals::InPortal<messages::RobotLocation> localizationIn;
     portals::InPortal<messages::VisionBall> visionBallIn;
     portals::InPortal<messages::VisionField> visionFieldIn;
     portals::InPortal<messages::VisionRobot> visionRobotIn;
-    portals::InPortal<messages::VisionObstacle> visionObstacleIn;
-    portals::InPortal<messages::FootBumperState> footBumperStateIn;
     portals::InPortal<messages::FilteredBall> filteredBallIn;
     portals::InPortal<messages::JointAngles> jointsIn;
     portals::InPortal<messages::FallStatus> fallStatusIn;
     portals::InPortal<messages::StiffStatus> stiffStatusIn;
-    portals::InPortal<messages::ArmContactState> armContactStateIn;
+    portals::InPortal<messages::Obstacle> obstacleIn;
+    portals::InPortal<messages::VisionObstacle> visionObstacleIn;
 
     portals::OutPortal<messages::LedCommand> ledCommandOut;
     portals::OutPortal<messages::MotionRequest> motionRequestOut;

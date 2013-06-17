@@ -53,53 +53,17 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition,
 
-            Transition.CountTransition(navTrans.shouldDodgeLeft,
+            Transition.CountTransition(navTrans.shouldDodge,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : NavStates.avoidLeft,
-
-            Transition.CountTransition(navTrans.shouldDodgeRight,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : NavStates.avoidRight,
-
-            Transition.CountTransition(navTrans.shouldDodgeBack,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : NavStates.avoidBack,
-
-            Transition.CountTransition(navTrans.shouldDodgeForward,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : NavStates.avoidForward
+            : NavStates.dodge
 
             }
 
-        NavStates.avoidLeft.transitions = {
+        NavStates.dodge.transitions = {
             Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : NavStates.briefStand
-            }
-
-        NavStates.avoidRight.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : NavStates.briefStand
-            }
-
-        NavStates.avoidBack.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : NavStates.briefStand
-            }
-
-        NavStates.avoidForward.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
             : NavStates.briefStand
             }
 

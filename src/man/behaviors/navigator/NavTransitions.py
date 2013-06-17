@@ -5,6 +5,7 @@ from ..util import MyMath
 import noggin_constants as NogginConstants
 from ..players import ChaseBallTransitions
 from . import NavHelper as helper
+from objects import RelRobotLocation
 
 DEBUG = True
 
@@ -24,118 +25,30 @@ def atDestination(nav):
     else:
         return relDest.within((x, y, h))
 
-# Should the robot dodge TO THE LEFT? (ie something is on its right)
-def shouldDodgeLeft(nav):
+# Transition: Should I perform a dodge? Also sets up the direction.
+def shouldDodge(nav):
+    # If nav isn't avoiding things, just no
     if not states.goToPosition.avoidObstacles:
         return False
 
-    # check sonars
-    sonarState = nav.brain.interface.sonarState
-    # sonar values are given to us in meters
-    sonars = (sonarState.us_right*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
+    # Get the obstacle model
+    pos = nav.brain.interface.obstacle.position
 
-    #check vision
-    vision = nav.brain.interface.visionObstacle.on_right
-
-    #check feet
-    footBumperState = nav.brain.interface.footBumperState
-    feet = (footBumperState.r_foot_bumper_left.pressed or
-            footBumperState.r_foot_bumper_right.pressed)
-
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.WEST) or
-            (armState.right_push_direction is armState.WEST))
-
-    # Prioritize arms, experimentally
-    if arms:
+    # If the obstacle module has decided that there is an obstacle,
+    # tell dodge and doneDodging what it is in case we go into a dodge
+    if pos is not pos.NONE:
+        states.dodge.position = pos
+        doneDodging.position = pos
         return True
 
-    # Take 2 of 3, indicates that we should dodge
-    if (feet and vision):
-        return True
-    if (vision and sonars):
-        return True
-    elif (sonars and feet):
-        return True
+    # Otherwise, nope
+    return False
 
-    else:
-        return False
-
-# Should the robot dodge TO THE RIGHT? (ie something is on its left)
-def shouldDodgeRight(nav):
-    if not states.goToPosition.avoidObstacles:
-        return False
-
-    # check sonars
-    sonarState = nav.brain.interface.sonarState
-    # sonar values are given to us in meters
-    sonars = (sonarState.us_left*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
-
-    #check vision
-    vision = nav.brain.interface.visionObstacle.on_left
-
-    #check feet
-    footBumperState = nav.brain.interface.footBumperState
-    feet = (footBumperState.l_foot_bumper_left.pressed or
-            footBumperState.l_foot_bumper_right.pressed)
-
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.EAST) or
-            (armState.right_push_direction is armState.EAST))
-
-    # Prioritize arms, experimentally
-    if arms:
-        return True
-
-    # If 2 of 3, indicates that we should dodge
-    if (feet and vision):
-        return True
-    if (vision and sonars):
-        return True
-    elif (sonars and feet):
-        return True
-
-    else:
-        return False
-
-# ie should move backwards
-def shouldDodgeBack(nav):
-    if not states.goToPosition.avoidObstacles:
-        return False
-
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.SOUTH) or
-            (armState.right_push_direction is armState.SOUTH))
-
-    # Only use arms, experimentally
-    if arms:
-        return True
-
-    else:
-        return False
-
-# ie should move forwards
-def shouldDodgeForward(nav):
-    if not states.goToPosition.avoidObstacles:
-        return False
-
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.NORTH) or
-            (armState.right_push_direction is armState.NORTH))
-
-    # Only use arms, experimentally
-    if arms:
-        return True
-
-    else:
-        return False
-
+# Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
-    return nav.brain.interface.motionStatus.standing
+    return (nav.brain.interface.motionStatus.standing or
+            (nav.brain.interface.obstacle.position is not
+             doneDodging.position))
 
 def notAtLocPosition(nav):
     return not atDestination(nav)
