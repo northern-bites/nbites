@@ -102,8 +102,12 @@ namespace NBMath {
 
     float getLargestMagRoot(float a, float b, float c);
 
+//    float dotProduct(float x1, float x2, float y1, float y2);
+
     template <class T>
     T square(T x) { return x*x; }
+
+
 
 }
 #endif //NBMath_h

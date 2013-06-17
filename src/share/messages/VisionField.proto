@@ -181,6 +181,12 @@ message VisualLine
         optional float slope = 9;
         optional float y_int = 10;
         repeated line_id possibilities = 11;
+	optional float start_x_r = 12;
+	optional float start_y_r = 13;
+	optional float start_dist = 14;
+	optional float end_x_r = 15;
+	optional float end_y_r = 16;
+	optional float end_dist = 17;
 }
 
 message VisualFieldEdge
