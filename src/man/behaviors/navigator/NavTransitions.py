@@ -25,19 +25,26 @@ def atDestination(nav):
     else:
         return relDest.within((x, y, h))
 
+# Transition: Should I perform a dodge? Also sets up the direction.
 def shouldDodge(nav):
+    # If nav isn't avoiding things, just no
     if not states.goToPosition.avoidObstacles:
         return False
 
+    # Get the obstacle model
     pos = nav.brain.interface.obstacle.position
 
+    # If the obstacle module has decided that there is an obstacle,
+    # tell dodge and doneDodging what it is in case we go into a dodge
     if pos is not pos.NONE:
         states.dodge.position = pos
         doneDodging.position = pos
         return True
 
+    # Otherwise, nope
     return False
 
+# Check if an obstacle is no longer there, or if we've completed the dodge
 def doneDodging(nav):
     return (nav.brain.interface.motionStatus.standing or
             (nav.brain.interface.obstacle.position is not

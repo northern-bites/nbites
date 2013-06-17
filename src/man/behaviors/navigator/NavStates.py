@@ -131,8 +131,11 @@ goToPosition.speeds = ''
 goToPosition.lastSpeeds = ''
 goToPosition.bookingIt = False
 
+# State where we are moving away from an obstacle
 def dodge(nav):
     if nav.firstFrame():
+        ## SET UP the dodge direction based on where the obstacle is
+        # if directly in front of us, move back and *randomly* to one side
         if dodge.position is dodge.position.NORTH:
             print "Dodging NORTH obstacle"
             direction = random.choice([-1, 1])
@@ -146,6 +149,7 @@ def dodge(nav):
         elif dodge.position is dodge.position.SOUTHEAST:
             print "Dodging SOUTHEAST obstacle"
             dodgeDest = RelRobotLocation(0, 15, 0)
+        # if directly behind us, move forward and *randomly* to one side
         elif dodge.position is dodge.position.SOUTH:
             print "Dodging SOUTH obstacle"
             direction = random.choice([-1, 1])
@@ -164,6 +168,7 @@ def dodge(nav):
 
     return Transition.getNextState(nav, dodge)
 
+# Quick stand to stabilize from the dodge.
 def briefStand(nav):
     if nav.firstFrame():
         helper.stand(nav)
