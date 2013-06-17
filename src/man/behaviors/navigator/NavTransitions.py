@@ -40,8 +40,8 @@ def shouldDodge(nav):
 
 def doneDodging(nav):
     return (nav.brain.interface.motionStatus.standing or
-            nav.brain.interface.obstacle.position is
-            nav.brain.interface.obstacle.position.NONE)
+            (nav.brain.interface.obstacle.position is not
+             doneDodging.position))
 
 def notAtLocPosition(nav):
     return not atDestination(nav)
