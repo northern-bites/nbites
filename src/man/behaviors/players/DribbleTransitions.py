@@ -3,17 +3,23 @@ import noggin_constants as nogginConstants
 import objects
 from math import fabs
 
-def crowded(player):
+def shouldDribble(player):
     """
-    The vision heat map is showing a crowded area in front of me.
+    We should be in the dribble FSA.
     """
-    return True
-    # return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
-    #         and not player.brain.interface.visionObstacle.block_left == 0)
-    #         or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
-    #         and not player.brain.interface.visionObstacle.block_mid == 0)
-    #         or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
-    #         and not player.brain.interface.visionObstacle.block_right == 0))
+    return (facingGoal(player) and betweenCrosses(player) and timeLeft(player) 
+            and not ballGotFarAway(player) and not ballLost(player))
+
+# def crowded(player):
+#     """
+#     The vision heat map is showing a crowded area in front of me.
+#     """
+#     return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
+#             and not player.brain.interface.visionObstacle.block_left == 0)
+#             or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
+#             and not player.brain.interface.visionObstacle.block_mid == 0)
+#             or (player.brain.interface.visionObstacle.right_dist < constants.CROWDED_DIST
+#             and not player.brain.interface.visionObstacle.block_right == 0))
 
 def centerLaneOpen(player):
     """
@@ -27,8 +33,8 @@ def betweenCrosses(player):
     """
     We are between the two field crosses.
     """
-    return (player.brain.loc.x > (1./5.*nogginConstants.FIELD_WIDTH) 
-            and player.brain.loc.x < (4./5.*nogginConstants.FIELD_WIDTH))
+    return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
+            player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
 
 def facingGoal(player):
     """
@@ -89,10 +95,20 @@ def ballGotFarAway(player):
 
 def seesBall(player):
     """
-    We see the ball. So go get it.
+    We see the ball.
     """
     ball = player.brain.ball
     return (ball.vis.frames_on > constants.BALL_ON_THRESH)
+
+def ballInGoalBox(player):
+    """
+    The ball is in the goal box (between the posts actually), so we can 
+    dribble it in.
+    """
+    return (player.brain.ball.x > nogginConstants.FIELD_WIDTH - 
+            nogginConstants.GOALBOX_DEPTH and
+            player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
+            player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
 
 def navDone(player):
     """
@@ -107,4 +123,4 @@ def timeLeft(player):
     """
     return (player.brain.game.secs_remaining > 25 or 
             (player.brain.game.secs_remaining < 10 and 
-             player.brain.loc.x > 9./10.*nogginConstants.FIELD_WIDTH)) 
+             ballInGoalBox(player)))

@@ -260,11 +260,8 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if (dr_trans.facingGoal(player) and dr_trans.betweenCrosses(player) 
-        and dr_trans.crowded(player) and dr_trans.timeLeft(player)
-        and not dr_trans.ballGotFarAway(player) and not
-        dr_trans.ballLost(player)):
-        return player.goNow('dribble')
+    if dr_trans.shouldDribble(player):
+        return player.goNow('decideDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
