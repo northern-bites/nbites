@@ -130,37 +130,37 @@ goToPosition.speeds = ''
 goToPosition.lastSpeeds = ''
 goToPosition.bookingIt = False
 
-def avoidLeft(nav):
+def dodge(nav):
     if nav.firstFrame():
-        avoidDest = RelRobotLocation(-5, 25, 0)
-        helper.setOdometryDestination(nav, avoidDest)
+        if dodge.position is dodge.position.NORTH:
+            print "Dodging NORTH obstacle"
+            dodgeDest = RelRobotLocation(-20, 0, 0)
+        elif dodge.position is dodge.position.NORTHEAST:
+            print "Dodging NORTHEAST obstacle"
+            dodgeDest = RelRobotLocation(-15, 15, 0)
+        elif dodge.position is dodge.position.EAST:
+            print "Dodging EAST obstacle"
+            dodgeDest = RelRobotLocation(0, 20, 0)
+        elif dodge.position is dodge.position.SOUTHEAST:
+            print "Dodging SOUTHEAST obstacle"
+            dodgeDest = RelRobotLocation(15, 15, 0)
+        elif dodge.position is dodge.position.SOUTH:
+            print "Dodging SOUTH obstacle"
+            dodgeDest = RelRobotLocation(20, 0, 0)
+        elif dodge.position is dodge.position.SOUTHWEST:
+            print "Dodging SOUTHWEST obstacle"
+            dodgeDest = RelRobotLocation(15, -15, 0)
+        elif dodge.position is dodge.position.WEST:
+            print "Dodging WEST obstacle"
+            dodgeDest = RelRobotLocation(0, -20, 0)
+        elif dodge.position is dodge.position.NORTHWEST:
+            print "Dodging NORTHWEST obstacle"
+            dodgeDest = RelRobotLocation(-15, -15, 0)
+
+        helper.setOdometryDestination(nav, dodgeDest)
         return nav.stay()
 
-    return Transition.getNextState(nav, avoidLeft)
-
-def avoidRight(nav):
-    if nav.firstFrame():
-        avoidDest = RelRobotLocation(-5, -25, 0)
-        helper.setOdometryDestination(nav, avoidDest)
-        return nav.stay()
-
-    return Transition.getNextState(nav, avoidRight)
-
-def avoidBack(nav):
-    if nav.firstFrame():
-        avoidDest = RelRobotLocation(-20, 0, 0)
-        helper.setOdometryDestination(nav, avoidDest)
-        return nav.stay()
-
-    return Transition.getNextState(nav, avoidBack)
-
-def avoidForward(nav):
-    if nav.firstFrame():
-        avoidDest = RelRobotLocation(20, 0, 0)
-        helper.setOdometryDestination(nav, avoidDest)
-        return nav.stay()
-
-    return Transition.getNextState(nav, avoidForward)
+    return Transition.getNextState(nav, dodge)
 
 def briefStand(nav):
     if nav.firstFrame():
