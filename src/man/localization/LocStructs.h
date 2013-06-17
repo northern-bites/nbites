@@ -137,6 +137,10 @@ struct Point {
         x = x_;
         y = y_;
     }
+
+    float distanceTo(Point p) {
+        return std::sqrt((p.x-x)*(p.x-x) + (p.y-y)*(p.y-y));
+    }
 };
 
 struct Line {
@@ -193,14 +197,14 @@ struct Line {
     {
         // l = start + t(end - start) for t = [0,1]
         // projection of p onto l given by:
-        float n = dotProduct(p.x-start.x,
-                             p.y - start.y,
-                             end.x - start.x,
-                             end.y - start.y);
-        float d = dotProduct(end.x - start.x,
-                             end.y - start.y,
-                             end.x - start.x,
-                             end.y - start.y);
+        float n = NBMath::dotProduct(p.x-start.x,
+                                     p.y - start.y,
+                                     end.x - start.x,
+                                     end.y - start.y);
+        float d = NBMath::dotProduct(end.x - start.x,
+                                     end.y - start.y,
+                                     end.x - start.x,
+                                     end.y - start.y);
 
         float t = n /d;
         if (t<0.f)
@@ -242,22 +246,16 @@ struct Line {
         // split into two trianges: obsvstart, start Proj, obsvend and
         //                          obsvEnd, endProj, startProj
         // get side lengths of first triangle
-        float l1 = distance(obsv.start.x, obsv.start.y,
-                            startProj.x , startProj.y );
-        float l2 = distance(startProj.x , startProj.y,
-                            obsv.end.x  , obsv.end.y );
-        float l3 = distance(obsv.end.x  , obsv.end.y,
-                            obsv.start.x, obsv.start.y);
-        float area1 = calcTriangleArea(l1, l2, l3);
+        float l1 = obsv.start.distanceTo     (startProj);
+        float l2 = startProj.distanceTo(obsv.end);
+        float l3 = obsv.end.distanceTo (obsv.start);
+        float area1 = NBMath::calcTriangleArea(l1, l2, l3);
 
         // get side lengths of second triangle
-        l1 = distance(obsv.end.x, obsv.end.y,
-                      endProj.x, endProj.y);
-        l2 = distance(endProj.x  , endProj.y,
-                      startProj.x, startProj.y);
-        l3 = distance(startProj.x, startProj.y,
-                      obsv.end.x, obsv.end.y);
-        float area2 = calcTriangleArea(l1, l2, l3);
+        l1 = obsv.end.distanceTo(endProj);
+        l2 = endProj.distanceTo(startProj);
+        l3 = startProj.distanceTo(obsv.end);
+        float area2 = NBMath::calcTriangleArea(l1, l2, l3);
 
         // Return in units cm, not cm^2
         return std::sqrt(area1 + area2);
@@ -286,21 +284,7 @@ struct Line {
         }
     }
 
-    //HACK helper function since won't let me make straight and call NBfunction i want
-    float dotProduct(float x1, float y1, float x2, float y2) {
-        return (x1*x2) + (y1*y2);
-    }
 
-    float distance(float x1, float y1, float x2, float y2) {
-        return std::sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
-    }
-
-    /*
-     * @brief - Calculate area of a triangle from its side lengths
-     */
-    float calcTriangleArea(float l1, float l2, float l3) {
-        return std::sqrt(((l1+l2+l3)/2)*(((l1+l2+l3)/2)-l1)*(((l1+l2+l3)/2)-l2)*(((l1+l2+l3)/2)-l3));
-    }
 };
 
 } // namespace localization
