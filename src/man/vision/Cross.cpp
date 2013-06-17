@@ -147,6 +147,9 @@ bool Cross::checkSizeAgainstPixEstimate(Blob b) {
     if (e.dist > 200.0f && w > 20) {
         return false;
     }
+	if (e.dist > 400) {
+		return false;
+	}
     return true;
 }
 

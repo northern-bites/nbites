@@ -59,7 +59,7 @@ Context::Context(Vision *vis, Threshold* thr, Field* fie)
     allFieldObjects[2] = vision->ygrp;
     allFieldObjects[3] = vision->yglp;
 #ifdef OFFLINE
-    debugIdentifyCorners = false;
+    debugIdentifyCorners = true;
 	debugDangerousBall = false;
 #endif
 
@@ -277,6 +277,7 @@ void Context::classifyT(VisualCorner & first) {
     if (debugIdentifyCorners) {
         cout << "Checking T " << l1 << " " << l2 << " " <<
             first.getDistance() << " " << dist << endl;
+		cout << "Horizon " << horizon << " " << first.getY() << endl;
         if (objectRightX >= 0) {
             cout << "Object is at " << objectRightX << " " <<
                 objectRightY << " " << objectDistance << endl;
@@ -287,8 +288,9 @@ void Context::classifyT(VisualCorner & first) {
     // check if this is actually a center circle corner
 
 	// if we see a T in the middle of nowhere far from the edge
-	if (first.getDistance() > 100 && dist > 375 && !(face == FACING_GOAL &&
-													 distToObject < 250)) {
+	if (first.getDistance() > 100 && dist > 375 && first.getDistance() < 400 &&
+		(first.getY() - horizon) > 25 &&
+		!(face == FACING_GOAL && distToObject < 250)) {
 		if (debugIdentifyCorners) {
 			cout << "T is too far from horizon, must be a CC" << endl;
 		}
