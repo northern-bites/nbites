@@ -17,8 +17,8 @@ namespace obstacle {
 
 class ObstacleModule : public portals::Module
 {
-    static const float SONAR_THRESH = 0.4f;
-    static const unsigned int SONAR_FRAMES_TO_BUFFER = 50;
+    static const float SONAR_THRESH = 0.5f;
+    static const unsigned int SONAR_FRAMES_TO_BUFFER = 20;
 
 public:
     ObstacleModule();

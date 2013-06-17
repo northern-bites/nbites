@@ -29,110 +29,122 @@ def shouldDodgeLeft(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
-    # check sonars
-    sonarState = nav.brain.interface.sonarState
-    # sonar values are given to us in meters
-    sonars = (sonarState.us_right*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
+    pos = nav.brain.interface.obstacle.position
+    return (pos is pos.NORTHEAST)
 
-    #check vision
-    vision = nav.brain.interface.visionObstacle.on_right
+    # # check sonars
+    # sonarState = nav.brain.interface.sonarState
+    # # sonar values are given to us in meters
+    # sonars = (sonarState.us_right*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
 
-    #check feet
-    footBumperState = nav.brain.interface.footBumperState
-    feet = (footBumperState.r_foot_bumper_left.pressed or
-            footBumperState.r_foot_bumper_right.pressed)
+    # #check vision
+    # vision = nav.brain.interface.visionObstacle.on_right
 
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.WEST) or
-            (armState.right_push_direction is armState.WEST))
+    # #check feet
+    # footBumperState = nav.brain.interface.footBumperState
+    # feet = (footBumperState.r_foot_bumper_left.pressed or
+    #         footBumperState.r_foot_bumper_right.pressed)
 
-    # Prioritize arms, experimentally
-    if arms:
-        return True
+    # #check hands
+    # armState = nav.brain.interface.armContactState
+    # arms = ((armState.left_push_direction is armState.WEST) or
+    #         (armState.right_push_direction is armState.WEST))
 
-    # Take 2 of 3, indicates that we should dodge
-    if (feet and vision):
-        return True
-    if (vision and sonars):
-        return True
-    elif (sonars and feet):
-        return True
+    # # Prioritize arms, experimentally
+    # if arms:
+    #     return True
 
-    else:
-        return False
+    # # Take 2 of 3, indicates that we should dodge
+    # if (feet and vision):
+    #     return True
+    # if (vision and sonars):
+    #     return True
+    # elif (sonars and feet):
+    #     return True
+
+    # else:
+    #     return False
 
 # Should the robot dodge TO THE RIGHT? (ie something is on its left)
 def shouldDodgeRight(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
-    # check sonars
-    sonarState = nav.brain.interface.sonarState
-    # sonar values are given to us in meters
-    sonars = (sonarState.us_left*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
+    pos = nav.brain.interface.obstacle.position
+    return (pos is pos.NORTHWEST)
 
-    #check vision
-    vision = nav.brain.interface.visionObstacle.on_left
+    # # check sonars
+    # sonarState = nav.brain.interface.sonarState
+    # # sonar values are given to us in meters
+    # sonars = (sonarState.us_left*100 < constants.AVOID_OBSTACLE_SIDE_DIST)
 
-    #check feet
-    footBumperState = nav.brain.interface.footBumperState
-    feet = (footBumperState.l_foot_bumper_left.pressed or
-            footBumperState.l_foot_bumper_right.pressed)
+    # #check vision
+    # vision = nav.brain.interface.visionObstacle.on_left
 
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.EAST) or
-            (armState.right_push_direction is armState.EAST))
+    # #check feet
+    # footBumperState = nav.brain.interface.footBumperState
+    # feet = (footBumperState.l_foot_bumper_left.pressed or
+    #         footBumperState.l_foot_bumper_right.pressed)
 
-    # Prioritize arms, experimentally
-    if arms:
-        return True
+    # #check hands
+    # armState = nav.brain.interface.armContactState
+    # arms = ((armState.left_push_direction is armState.EAST) or
+    #         (armState.right_push_direction is armState.EAST))
 
-    # If 2 of 3, indicates that we should dodge
-    if (feet and vision):
-        return True
-    if (vision and sonars):
-        return True
-    elif (sonars and feet):
-        return True
+    # # Prioritize arms, experimentally
+    # if arms:
+    #     return True
 
-    else:
-        return False
+    # # If 2 of 3, indicates that we should dodge
+    # if (feet and vision):
+    #     return True
+    # if (vision and sonars):
+    #     return True
+    # elif (sonars and feet):
+    #     return True
+
+    # else:
+    #     return False
 
 # ie should move backwards
 def shouldDodgeBack(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.SOUTH) or
-            (armState.right_push_direction is armState.SOUTH))
+    pos = nav.brain.interface.obstacle.position
+    return (pos is pos.NORTH)
 
-    # Only use arms, experimentally
-    if arms:
-        return True
+    # if not states.goToPosition.avoidObstacles:
+    #     return False
 
-    else:
-        return False
+    # #check hands
+    # armState = nav.brain.interface.armContactState
+    # arms = ((armState.left_push_direction is armState.SOUTH) or
+    #         (armState.right_push_direction is armState.SOUTH))
+
+    # # Only use arms, experimentally
+    # if arms:
+    #     return True
+
+    # else:
+    #     return False
 
 # ie should move forwards
 def shouldDodgeForward(nav):
     if not states.goToPosition.avoidObstacles:
         return False
 
-    #check hands
-    armState = nav.brain.interface.armContactState
-    arms = ((armState.left_push_direction is armState.NORTH) or
-            (armState.right_push_direction is armState.NORTH))
+    # #check hands
+    # armState = nav.brain.interface.armContactState
+    # arms = ((armState.left_push_direction is armState.NORTH) or
+    #         (armState.right_push_direction is armState.NORTH))
 
-    # Only use arms, experimentally
-    if arms:
-        return True
+    # # Only use arms, experimentally
+    # if arms:
+    #     return True
 
-    else:
-        return False
+    # else:
+    #     return False
 
 def doneDodging(nav):
     return nav.brain.interface.motionStatus.standing
