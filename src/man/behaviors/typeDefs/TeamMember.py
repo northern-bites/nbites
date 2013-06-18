@@ -92,7 +92,9 @@ class TeamMember(RobotLocation):
         self.subRole = self.brain.play.subRole
         self.chaseTime = self.determineChaseTime()
 
-        self.active = (not self.isPenalized())
+        self.active = (not self.isPenalized() and
+                       not (self.brain.playerNumber == 1 and
+                            self.brain.player.returningFromPenalty))
 
         self.dribbling = (self.active and self.ballDist <=
                          BALL_TEAMMATE_DIST_DRIBBLING)
