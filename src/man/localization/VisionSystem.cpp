@@ -238,8 +238,8 @@ Line VisionSystem::prepareVisualLine(const Particle& particle,
         else {
             // There is an issue in processing this line (precision) so make sure it's thrown out
             Point shitEnd = initialSegment.shiftDownLine(start, 1);
-            end.x = newEnd.x;
-            end.y = newEnd.y;
+            end.x = shitEnd.x;
+            end.y = shitEnd.y;
         }
     }
 
