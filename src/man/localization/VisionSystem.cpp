@@ -56,7 +56,7 @@ bool VisionSystem::update(ParticleSet& particles,
                                                   obsv.visual_line(i));
 
                 // Limit by line length (be safe about center circle mistake lines)
-                if (obsvLine.length() > 100.f) {
+                if ((obsvLine.length() > 100.f) && (obsvLine.length() < 500.f)) {
                     madeObsv = true;
                     float newError = lineSystem->scoreObservation(obsvLine);
 //                    std::cout << "Line Error:\t" << newError << std::endl;
