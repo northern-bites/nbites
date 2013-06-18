@@ -647,7 +647,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
         return;
     } else if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
                l2 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
-               objectDistance > 300) {
+               objectDistance > 300 && distToObject > 300) {
         // our "L" is actually a T unfortunately it isn't set up right
         // To Do: use the chageTo method in VisualCorner to get the the
         // set up properly
@@ -1238,7 +1238,9 @@ void Context::checkTToGoal(VisualCorner & t, VisualCorner & l1,
 	bool objectIsClose = distToObject < GOALBOX_DEPTH * 2;
 
     // make sure we aren't side to circle
-    if (realLineDistance(t.getTStem()) > 100.0f && distToObject > MIDFIELD_X - 150) {
+    if (realLineDistance(t.getTStem()) > 130.0f &&
+		distToObject > MIDFIELD_X - 150 &&
+		!seeGoalBoxLines) {
         t.setSecondaryShape(SIDE_T);
         l1.setShape(CIRCLE);
         return;
