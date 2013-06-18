@@ -38,7 +38,7 @@ def gameReady(player):
         player.stand()
         player.brain.tracker.lookToAngle(0)
         if player.lastDiffState != 'gameInitial':
-            player.brain.nav.walkTo(RelRobotLocation(120, 0, 0))
+            player.brain.nav.walkTo(RelRobotLocation(-80, 0, 0))
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):
