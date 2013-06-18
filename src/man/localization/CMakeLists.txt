@@ -15,6 +15,7 @@ set(LOCALIZATION_SRCS LocalizationModule
 #		      FakeLocInputModule
 		      VisionSystem
 		      MotionSystem
+		      LineSystem
 )
 
 # Add project as a library.
@@ -26,6 +27,10 @@ add_library(
 
 # Link project to appropriate libraries.
 target_link_libraries(localization
+  support
   portals
-  messages
-  support)
+  messages)
+
+if ( OFFLINE )
+  nbites_add_test(LocalizationTest LocalizationTest.cpp localization)
+endif ( OFFLINE )

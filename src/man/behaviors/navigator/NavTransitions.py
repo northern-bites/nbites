@@ -21,7 +21,7 @@ def atDestination(nav):
 
     if (not helper.isDestinationRelative(states.goToPosition.dest)):
         # HACK HACK '30's below should be loc uncerts.
-        return relDest.within((x + 30, y + 30, h + 30))
+        return relDest.within((x + 10, y + 10, h + 10))
     else:
         return relDest.within((x, y, h))
 
