@@ -123,8 +123,17 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     QToolBar* toolBar = new QToolBar(this);
     toolBar->addWidget(loadCalButton);
     toolBar->addWidget(robotNames);
+    connect(loadCalButton, SIGNAL(clicked(bool)),
+            this, SLOT(loadRobotParameters));
     this->addToolBar(toolBar);
 
+}
+
+void VisionDisplayModule::loadRobotParameters()
+{
+    std::string name = robotNames->currentText().toStdString();
+    CameraCalibrate::UpdateByName(name);
+    run_();
 }
 
 void VisionDisplayModule::run_()

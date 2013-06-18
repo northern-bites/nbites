@@ -27,6 +27,7 @@
 #include "PathConfig.h"
 
 #include "vision/VisionModule.h"
+#include "CameraCalibrate.h"
 
 namespace tool {
 namespace vision {
@@ -57,7 +58,7 @@ public:
     portals::InPortal<messages::InertialState> inerts_in;
 
 protected slots:
-//    void loadRobotParameters();
+    void loadRobotParameters();
 
 protected:
     virtual void run_();
