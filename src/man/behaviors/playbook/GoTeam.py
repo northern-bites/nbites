@@ -217,7 +217,7 @@ class GoTeam:
         chaser_mate = self.determineChaser(play)
         if chaser_mate.playerNumber == self.brain.playerNumber:
             play.setRole(positions[len(locations)-1][3])
-            play.setPosition(locations[len(locations)])
+            play.setPosition(locations[len(locations)-1])
 
         # Find which active field player should go to each position
         firstPlayer = self.findClosestPlayer(locations[0], [chaser_mate])
