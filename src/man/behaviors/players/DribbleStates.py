@@ -105,6 +105,7 @@ def lookForBall(player):
     Backup and look for ball. If fails, leave the FSA.
     """
     if player.firstFrame():
+        lookForBall.counter = 0
         player.brain.tracker.repeatWidePan()
         backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
         player.brain.nav.goTo(backupLoc,
@@ -112,11 +113,13 @@ def lookForBall(player):
                               Navigator.MEDIUM_SPEED,
                               False,
                               False)
+
+    lookForBall.counter += 1
         
     if transitions.seesBall(player):
         player.brain.tracker.trackBall()
         return player.goNow('positionForDribble')
-    elif transitions.navDone(player):
+    elif lookForBall.counter == constants.LOOK_FOR_BALL_FC:
         return player.goLater('chase')
 
     return player.stay()
