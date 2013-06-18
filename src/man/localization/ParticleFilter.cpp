@@ -378,7 +378,7 @@ void ParticleFilter::resample()
     {
         rand = (float)gen();
         if(cdf.upper_bound(rand) == cdf.end())
-            newParticles.push_back(cdf.lower_bound(rand)->second); //trigger happy on last particle
+            newParticles.push_back(cdf.begin()->second); // Return something that DEF exists
         else
             newParticles.push_back(cdf.upper_bound(rand)->second);
     }
