@@ -17,15 +17,14 @@ from objects import RelRobotLocation, Location
 # 2. We are facing our opponents' goal. 3. We can see the ball close to us.
 
 ### TODO
-# dribbleGoneBad needs tuning
-# ballInGoalBox rotation bug
-# test time-left based decision making
-# goalie detection
+# ballInGoalBox dribbling via goalie detection
 # rotate towards goal when dribbling
+# test time-left based decision making
 # choose direction better, based on loc and heatmap?
 # frame counter rotatation?
 
 ### DONE
+# dribbleGoneBad needs work
 # dribble for the score if close enough to goal
 # get rid of 'dribble' state, reorganize FSA
 # cross to cross dribbling
@@ -63,7 +62,7 @@ def executeDribble(player):
         player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.MEDIUM_SPEED,
+                              Navigator.CAREFUL_SPEED,
                               False,
                               False)
     else:
@@ -75,7 +74,7 @@ def executeDribble(player):
         return player.goLater('chase')
     elif not transitions.centerLaneOpen(player): # reorder CLO and DGB?
         return player.goNow('rotateToOpenSpace')
-    elif transitions.ballMoved(player):
+    elif transitions.dribbleGoneBad(player):
         return player.goNow('positionForDribble')
 
     return player.stay()
