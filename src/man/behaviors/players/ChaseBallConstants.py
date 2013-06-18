@@ -12,6 +12,7 @@ PREPARE_FOR_KICK_DIST = 35.0
 
 # Should approach ball again
 APPROACH_BALL_AGAIN_DIST = PREPARE_FOR_KICK_DIST + 25.0
+BALL_MOVED_THR = 3
 
 # Should spin to ball
 SHOULD_SPIN_TO_BALL_Y = 40.0
@@ -50,3 +51,6 @@ FIND_BALL_SPIN_SPEED = .7
 WALK_FIND_BALL_FRAMES_THRESH = 720
 
 STOP_PENALTY_DRIBBLE_COUNT = 120
+
+# During kickoff, wait until 10 seconds or ball has moved significantly.
+KICKOFF_BALL_MOVE_THRESH = 10

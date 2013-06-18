@@ -7,7 +7,7 @@ from .. import SweetMoves
 from GoalieConstants import RIGHT, LEFT
 import noggin_constants as Constants
 
-SAVING = False
+SAVING = True
 
 def gameInitial(player):
     if player.firstFrame():
@@ -113,6 +113,9 @@ def gameFinished(player):
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
         return player.stay()
+
+    if player.brain.nav.isStopped():
+        player.gainsOff()
 
     return player.stay()
 

@@ -21,3 +21,11 @@ target_link_libraries(balltrack
 		      portals
 		      messages
 		      )
+
+# GTEST
+
+if (OFFLINE)
+  nbites_add_test(KalmanFilterTest KalmanFilterTest.cpp
+    balltrack
+    )
+endif()

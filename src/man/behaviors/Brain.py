@@ -313,6 +313,20 @@ class Brain(object):
                                 gameSetResetUncertainties)
             #self.loc.resetLocToSide(False)
 
+    def checkSetLocalization(self):
+        """
+        Use during the first frame of the set state.
+        If we think we are on the opponent's side of the field, either
+            1) We didn't make it back and will be manually positioned or
+            2) Our loc is wrong, and we could be anywhere.
+        Reset to our own field cross. The loc system should be able to
+        recover from there with high probability. 6/13/13
+        """
+        if self.loc.x > Constants.MIDFIELD_X:
+            self.resetLocTo(Constants.LANDMARK_MY_FIELD_CROSS[0],
+                            Constants.LANDMARK_MY_FIELD_CROSS[1],
+                            Constants.HEADING_RIGHT)
+
     def resetLocalizationFromPenalty(self, top):
         """
         Resets localization from penalty.
@@ -331,21 +345,14 @@ class Brain(object):
         """
         Resets the goalie's localization to the manual position in the goalbox.
         """
-        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
-            self.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
-                                Constants.MIDFIELD_Y,
-                                Constants.HEADING_RIGHT,
-                                _localization.LocNormalParams(15.0, 15.0, 1.0))
-        else:
-            self.resetLocTo(Constants.FIELD_WHITE_RIGHT_SIDELINE_X,
-                                Constants.MIDFIELD_Y,
-                                Constants.HEADING_LEFT,
-                                _localization.LocNormalParams(15.0, 15.0, 1.0))
+        self.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
+                        Constants.MIDFIELD_Y,
+                        Constants.HEADING_RIGHT)
 
-
-    #TODO: write this method!
     def resetPenaltyKickLocalization(self):
-        pass
+        self.resetLocTo(Constants.LANDMARK_OPP_FIELD_CROSS[0] - 1.0,
+                        Constants.MIDFIELD_Y,
+                        Constants.HEADING_RIGHT)
 
     # THIS IS A HACK!
     # ... but until we have a world contextor or some such, it's a necessary one.

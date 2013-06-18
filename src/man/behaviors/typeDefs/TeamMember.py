@@ -191,7 +191,8 @@ class TeamMember(RobotLocation):
         """
         this checks GameController to see if a player is penalized.
         """
-        return self.brain.interface.gameState.team(self.brain.gameController.teamColor).player(self.playerNumber-1).penalty
+        return (self.brain.interface.gameState.team(self.brain.gameController.teamColor).player(self.playerNumber-1).penalty
+                or self.brain.player.currentState == 'afterPenalty')
 
     def __str__(self):
         return "I am player number " + self.playerNumber

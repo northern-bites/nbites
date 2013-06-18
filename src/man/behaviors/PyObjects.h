@@ -11,4 +11,3 @@
 
 // Called in BehaviorsModule.cpp to initialize the python module
 void c_init_objects();
-

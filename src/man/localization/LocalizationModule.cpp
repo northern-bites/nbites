@@ -6,7 +6,7 @@ namespace man
 namespace localization
 {
 static const float ODOMETRY_HEADING_FRICTION_FACTOR = 2.f;
-static const float ODOMETRY_X_FRICTION_FACTOR = 1.1f;
+static const float ODOMETRY_X_FRICTION_FACTOR = 1.f;
 static const float ODOMETRY_Y_FRICTION_FACTOR = 1.f;
 
 LocalizationModule::LocalizationModule()
@@ -16,7 +16,7 @@ LocalizationModule::LocalizationModule()
 {
     particleFilter = new ParticleFilter();
     // Chooose on the field looking up as a random initial
-    particleFilter->resetLocTo(100,100,0);
+    particleFilter->resetLocTo(110,658,-1.5);
 }
 
 LocalizationModule::~LocalizationModule()
@@ -26,6 +26,7 @@ LocalizationModule::~LocalizationModule()
 
 void LocalizationModule::update()
 {
+#ifndef OFFLINE
     // Modify based on control portal
     if (lastReset != resetInput.message().timestamp())
     {
@@ -34,6 +35,7 @@ void LocalizationModule::update()
                                    resetInput.message().y(),
                                    resetInput.message().h());
     }
+#endif
 
     // Calculate the deltaX,Y,H (PF takes increments from robot frame)
     lastOdometry.set_x(curOdometry.x());
@@ -42,6 +44,7 @@ void LocalizationModule::update()
 
     // Want odometry to give information relative to current robot frame
     // IE choose to have robot frame change as the robot moves
+
     float sinH, cosH;
     sincosf(motionInput.message().h(), &sinH, &cosH);
     float rotatedX =   cosH*motionInput.message().x()
@@ -72,7 +75,7 @@ void LocalizationModule::update()
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                          getCurrentEstimate());
 
-#ifdef LOG_LOCALIZATION
+#if defined( LOG_LOCALIZATION) || defined(OFFLINE)
     portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                            getCurrentSwarm());
     particleOutput.setMessage(swarmMessage);
@@ -88,7 +91,9 @@ void LocalizationModule::run_()
 
     motionInput.latch();
     visionInput.latch();
+#ifndef OFFLINE
     resetInput.latch();
+#endif
 
     update();
 

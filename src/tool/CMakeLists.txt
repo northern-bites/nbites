@@ -19,6 +19,8 @@ if( BUILD_PROTOBUF )
   include( ${SHARE_DIR}/cmake/BuildProtobuf.cmake )
 endif()
 
+include ( ${SHARE_DIR}/cmake/BuildGTest.cmake )
+
 include( ${SHARE_DIR}/cmake/DebugConfig.cmake)
 
 # Configure the debug options
@@ -36,6 +38,12 @@ configure_file(
   "${MAN_DIR}/cmake/RobotConfig.in"
   "${PROJECT_BINARY_DIR}/RobotConfig.h"
 )
+
+
+if (NOT CMAKE_BUILD_TYPE)
+  message(STATUS "No build type selected, default to RelWithDebInfo")
+  set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
 
 
 include_directories( ${PROJECT_BINARY_DIR} )
@@ -75,6 +83,7 @@ add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
 
 add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
 add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
+add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
 
 # Actual subdirectories!
 add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
@@ -95,7 +104,7 @@ set( tool_srcs main.cpp
   ToolDiagram.cpp
   DataSelector.cpp
   Tool.cpp
-  ${MAN_DIR}/DiagramThread.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
   )
 
 set( tool_headers
@@ -110,6 +119,7 @@ set( loc_srcs loc_main.cpp
   EmptyTool.cpp
   ToolDiagram.cpp
   DataSelector.cpp
+  ${MAN_DIR}/DiagramThread.cpp # Needed for worldview
 
   LocTool.cpp
   )
@@ -200,8 +210,9 @@ target_link_libraries(
   image_display
   logview
   fieldview
-  tool_common
   worldview
+  tool_common
+  localization
   ${QT_LIBRARIES}
   )
 
@@ -218,9 +229,7 @@ target_link_libraries(
   logview
   image_display
   image # man image
-  image_display
   fieldview
-  image_display
   tool_common
   colorcreator
   vision_offline

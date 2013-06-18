@@ -19,7 +19,6 @@ EmptyTool::EmptyTool(const char* title) :
     toolbar(new QToolBar),
     nextButton(new QPushButton(tr(">"))),
     prevButton(new QPushButton(tr("<"))),
-    recordButton(new QPushButton(tr("Rec"))),
     scrollArea(new QScrollArea),
     scrollBarSize(new QSize(5, 35)),
     tabStartSize(new QSize(toolTabs->size()))
@@ -45,7 +44,6 @@ EmptyTool::EmptyTool(const char* title) :
 
     toolbar->addWidget(prevButton);
     toolbar->addWidget(nextButton);
-    toolbar->addWidget(recordButton);
 
     toolTabs->addTab(&selector, tr("Data"));
     toolTabs->addTab(&logView, tr("Log View"));

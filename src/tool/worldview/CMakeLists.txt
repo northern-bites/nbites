@@ -13,11 +13,6 @@ set(WORLDVIEW_HEADERS
 
 Qt4_wrap_cpp( WORLDVIEW_HEADERS_MOC ${WORLDVIEW_HEADERS} )
 
-configure_file(
-  "${MAN_DIR}/cmake/RobotConfig.in"
-  "${PROJECT_BINARY_DIR}/RobotConfig.h"
-)
-
 # Add project as a library.
 add_library(worldview
   STATIC
@@ -31,6 +26,5 @@ target_link_libraries(worldview
   tool_common
   portals
   messages
-  support
   ${QT_LIBRARIES}
 )

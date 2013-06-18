@@ -9,10 +9,12 @@ namespace tool {
 
 LocTool::LocTool(const char* title) :
     fieldView(this),
+    worldView(this),
     EmptyTool(title)
 
 {
     toolTabs->addTab(&fieldView, tr("FieldView"));
+    toolTabs->addTab(&worldView, tr("World View"));
 
     connect(&diagram, SIGNAL(signalUnloggersReady()),
             this, SLOT(setUpModules()));
@@ -70,8 +72,7 @@ void LocTool::setUpModules()
     }
     if(shouldAddFieldView)
         diagram.addModule(fieldView);
-
-
+    fieldView.tryOffline();
 }
 
 }

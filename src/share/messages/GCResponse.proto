@@ -2,5 +2,5 @@ package messages;
 
 message GCResponse
 {
-        optional uint32 status = 1 [default = 2];
+    optional uint32 status = 1 [default = 2];
 }

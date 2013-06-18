@@ -617,14 +617,18 @@ void Context::classifyOuterL(VisualCorner & corner) {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(LEFT_GOAL_L);
 						if (vision->yglp->getDistance() == 0 && vision->ygrp->getDistance() > 0) {
-							cout << "Bad post ID" << endl;
+                            if (debugIdentifyCorners) {
+                                cout << "Bad post ID" << endl;
+                            }
 						}
                     }
                 } else {
                     if (face == FACING_GOAL) {
                         corner.setSecondaryShape(RIGHT_GOAL_L);
 						if (vision->ygrp->getDistance() == 0 && vision->yglp->getDistance() > 0) {
-							cout << "Bad post ID" << endl;
+                            if (debugIdentifyCorners) {
+                                cout << "Bad post ID" << endl;
+                            }
 						}
                     }
                 }
@@ -931,7 +935,19 @@ void Context::lookForFieldCorner(VisualCorner & corner, float l1, float l2) {
             }
         }
     }
-    if (debugIdentifyCorners) {
+	// the field edge is very useful in this case
+	if (field->findSlant() < 0 && field->getPeak() < IMAGE_WIDTH / 3 &&
+		thresh) {
+		corner.setSecondaryShape(RIGHT_GOAL_L);
+		if (debugIdentifyCorners) {
+			cout << "Setting from field slant info" << endl;
+		}
+	} else if (field->findSlant() > 0 && field->getPeak() > 2 * IMAGE_WIDTH / 3) {
+		corner.setSecondaryShape(LEFT_GOAL_L);
+		if (debugIdentifyCorners) {
+			cout << "Setting from field slant info" << endl;
+		}
+	} else if (debugIdentifyCorners) {
         cout << "Lone InnerL, Distance to horizon is " << dist << endl;
         cout << "      " << horizon << " " << corner.getY() << endl;
         cout << "Lengths: " << l1 << " " << l2 << endl;
@@ -1360,7 +1376,9 @@ void Context::checkOuterToOuter(VisualCorner & first, VisualCorner & second) {
 		distToObject = min(distToObject, realDistance(second.getX(), second.getY(),
 													  objectRightX, objectRightY));
 	}
-	cout << "Distance " << distToObject << endl;
+    if (debugIdentifyCorners) {
+        cout << "Distance " << distToObject << endl;
+    }
 
     // if the common length is small enough it is a goal T
     if (commonDist < GOALBOX_DEPTH + 20.0f || distToObject < 300) {
