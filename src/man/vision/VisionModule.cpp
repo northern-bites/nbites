@@ -170,6 +170,8 @@ void updateRobot(messages::Robot* bot_, VisualRobot* visualRobot) {
     bot_->set_y(visualRobot->getY());
     bot_->set_elevation_deg(visualRobot->getElevationDeg());
     bot_->set_on(visualRobot->isOn());
+    bot_->set_height(visualRobot->getHeight());
+    bot_->set_width(visualRobot->getWidth());
 
 }
 
@@ -191,8 +193,12 @@ void VisionModule::updateVisionField() {
         //we wont set concrete coords for the lines, since they are lines
         visLine->set_start_x(i->get()->getStartpoint().x);
         visLine->set_start_y(i->get()->getStartpoint().y);
+        visLine->set_start_dist(i->get()->getStartEst().dist);
+        visLine->set_start_bearing(i->get()->getStartEst().bearing);
         visLine->set_end_x(i->get()->getEndpoint().x);
         visLine->set_end_y(i->get()->getEndpoint().y);
+        visLine->set_end_dist(i->get()->getEndEst().dist);
+        visLine->set_end_bearing(i->get()->getEndEst().bearing);
         visLine->set_angle(i->get()->getAngle());
         visLine->set_avg_width(i->get()->getAvgWidth());
         visLine->set_length(i->get()->getLength());
