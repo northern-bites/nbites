@@ -22,191 +22,201 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         # All transitions are defined here. Their conditions are in
         # GoalieTransitions
-        VisualGoalieStates.walkToGoal.transitions = {
-            Transition.CountTransition(GoalieTransitions.atGoalArea,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal
-            }
+        # VisualGoalieStates.walkToGoal.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.atGoalArea,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : VisualGoalieStates.spinAtGoal
+        #     }
 
-        VisualGoalieStates.spinAtGoal.transitions = {
-            Transition.CountTransition(GoalieTransitions.facingForward,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : VisualGoalieStates.findGoalboxCorner,
+        # VisualGoalieStates.spinAtGoal.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.facingForward,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : VisualGoalieStates.findGoalboxCorner,
 
-            Transition.CountTransition(GoalieTransitions.ballMoreImportant,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.clearIt
-            }
+        #     Transition.CountTransition(GoalieTransitions.ballMoreImportant,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.clearIt
+        #     }
 
-        VisualGoalieStates.waitToFaceField.transitions = {
-            Transition.CountTransition(GoalieTransitions.notTurnedAround,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.HIGH_PRECISION)
-            : VisualGoalieStates.decideLeftSide
-            }
+        # VisualGoalieStates.waitToFaceField.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.notTurnedAround,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.HIGH_PRECISION)
+        #     : VisualGoalieStates.decideLeftSide
+        #     }
 
-        VisualGoalieStates.decideLeftSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onThisSideline,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.HIGH_PRECISION)
-            : VisualGoalieStates.walkToGoal,
+        # VisualGoalieStates.decideLeftSide.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.onThisSideline,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.HIGH_PRECISION)
+        #     : VisualGoalieStates.walkToGoal,
 
-            Transition.CountTransition(GoalieTransitions.unsure,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.decideRightSide
-            }
+        #     Transition.CountTransition(GoalieTransitions.unsure,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.decideRightSide
+        #     }
 
-        VisualGoalieStates.decideRightSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onThisSideline,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.walkToGoal,
+        # VisualGoalieStates.decideRightSide.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.onThisSideline,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.walkToGoal,
 
-            Transition.CountTransition(GoalieTransitions.unsure,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.decideLeftSide
-            }
+        #     Transition.CountTransition(GoalieTransitions.unsure,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.decideLeftSide
+        #     }
 
         GoalieStates.watch.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveIt,
-
-            Transition.CountTransition(GoalieTransitions.shouldClearBall,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.clearIt,
-
-            Transition.CountTransition(GoalieTransitions.facingSideways,
+            Transition.CountTransition(GoalieTransitions.shouldMoveLeft,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.spinAtGoal
-            }
+            : GoalieStates.repositionLeft,
 
-        VisualGoalieStates.shouldISaveIt.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldPerformSave,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.saveIt,
-
-            Transition.CountTransition(GoalieTransitions.shouldClearBall,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.clearIt,
-
-            Transition.CountTransition(GoalieTransitions.noSave,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : GoalieStates.watch
-            }
-
-        VisualGoalieStates.spinToFaceBall.transitions = {
-            Transition.CountTransition(GoalieTransitions.facingBall,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : VisualGoalieStates.clearIt
-            }
-
-        VisualGoalieStates.clearIt.transitions = {
-            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : GoalieStates.kickBall,
-
-            Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
-                                       Transition.ALL_OF_THE_TIME,
-                                       90)
-            : VisualGoalieStates.returnToGoal,
-
-            Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
+            Transition.CountTransition(GoalieTransitions.shouldMoveRight,
                                        Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.returnToGoal,
-
-            Transition.CountTransition(GoalieTransitions.walkedTooFar,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.returnToGoal
-            }
-
-        VisualGoalieStates.repositionAfterWhiff.transitions = {
-            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : GoalieStates.kickBall
-            }
-
-        VisualGoalieStates.returnToGoal.transitions = {
-            Transition.CountTransition(GoalieTransitions.doneWalking,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.findGoalboxCorner
-            }
-
-        VisualGoalieStates.didIKickIt.transitions = {
-            Transition.CountTransition(GoalieTransitions.whiffed,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.repositionAfterWhiff,
-
-            Transition.CountTransition(GoalieTransitions.successfulKick,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : VisualGoalieStates.returnToGoal
-            }
-
-        VisualGoalieStates.findGoalboxCorner.transitions = {
-            Transition.CountTransition(GoalieTransitions.foundACorner,
-                                       Transition.SOME_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : VisualGoalieStates.centerAtGoalBasedOnCorners,
+            : GoalieStates.repositionRight
 
-            Transition.CountTransition(GoalieTransitions.noCorner,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.HIGH_PRECISION)
-            : GoalieStates.watch,
+            # Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : GoalieStates.saveIt,
 
-            Transition.CountTransition(GoalieTransitions.ballMoreImportant,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.clearIt
+            # Transition.CountTransition(GoalieTransitions.shouldClearBall,
+            #                            Transition.SOME_OF_THE_TIME,
+            #                            Transition.OK_PRECISION)
+            # : VisualGoalieStates.clearIt,
+
+            # Transition.CountTransition(GoalieTransitions.facingSideways,
+            #                            Transition.MOST_OF_THE_TIME,
+            #                            Transition.LOW_PRECISION)
+            # : VisualGoalieStates.spinAtGoal
             }
 
-        VisualGoalieStates.centerAtGoalBasedOnCorners.transitions = {
-            Transition.CountTransition(GoalieTransitions.lostCorner,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.watch,
+        # VisualGoalieStates.shouldISaveIt.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.shouldPerformSave,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : GoalieStates.saveIt,
 
-            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : GoalieStates.watch
-            }
+        #     Transition.CountTransition(GoalieTransitions.shouldClearBall,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.clearIt,
 
-        GoalieStates.waitForPenaltySave.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldDiveRight,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.diveRight,
+        #     Transition.CountTransition(GoalieTransitions.noSave,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                Transition.INSTANT)
+        #     : GoalieStates.watch
+        #     }
 
-            Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.diveLeft,
+        # VisualGoalieStates.spinToFaceBall.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.facingBall,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : VisualGoalieStates.clearIt
+        #     }
 
-            Transition.CountTransition(GoalieTransitions.shouldSquat,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.squat
+        # VisualGoalieStates.clearIt.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.reachedMyDestination,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                Transition.INSTANT)
+        #     : GoalieStates.kickBall,
 
-            }
+        #     Transition.CountTransition(GoalieTransitions.ballLostStopChasing,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                90)
+        #     : VisualGoalieStates.returnToGoal,
+
+        #     Transition.CountTransition(GoalieTransitions.ballMovedStopChasing,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.returnToGoal,
+
+        #     Transition.CountTransition(GoalieTransitions.walkedTooFar,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.returnToGoal
+        #     }
+
+        # VisualGoalieStates.repositionAfterWhiff.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.reachedMyDestination,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                Transition.INSTANT)
+        #     : GoalieStates.kickBall
+        #     }
+
+        # VisualGoalieStates.returnToGoal.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.doneWalking,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.findGoalboxCorner
+        #     }
+
+        # VisualGoalieStates.didIKickIt.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.whiffed,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.repositionAfterWhiff,
+
+        #     Transition.CountTransition(GoalieTransitions.successfulKick,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                Transition.INSTANT)
+        #     : VisualGoalieStates.returnToGoal
+        #     }
+
+        # VisualGoalieStates.findGoalboxCorner.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.foundACorner,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : VisualGoalieStates.centerAtGoalBasedOnCorners,
+
+        #     Transition.CountTransition(GoalieTransitions.noCorner,
+        #                                Transition.MOST_OF_THE_TIME,
+        #                                Transition.HIGH_PRECISION)
+        #     : GoalieStates.watch,
+
+        #     Transition.CountTransition(GoalieTransitions.ballMoreImportant,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : VisualGoalieStates.clearIt
+        #     }
+
+        # VisualGoalieStates.centerAtGoalBasedOnCorners.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.lostCorner,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : GoalieStates.watch,
+
+        #     Transition.CountTransition(GoalieTransitions.reachedMyDestination,
+        #                                Transition.ALL_OF_THE_TIME,
+        #                                Transition.OK_PRECISION)
+        #     : GoalieStates.watch
+        #     }
+
+        # GoalieStates.waitForPenaltySave.transitions = {
+        #     Transition.CountTransition(GoalieTransitions.shouldDiveRight,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : GoalieStates.diveRight,
+
+        #     Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : GoalieStates.diveLeft,
+
+        #     Transition.CountTransition(GoalieTransitions.shouldSquat,
+        #                                Transition.SOME_OF_THE_TIME,
+        #                                Transition.LOW_PRECISION)
+        #     : GoalieStates.squat
+
+        #     }
 
     def run(self):
         gcState = self.brain.gameController.currentState

@@ -4,8 +4,7 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
-from GoalieConstants import RIGHT, LEFT
-import noggin_constants as Constants
+import GoalieConstants as constants
 
 SAVING = True
 
@@ -18,6 +17,7 @@ def gameInitial(player):
         player.stand()
         player.zeroHeads()
         player.side = LEFT
+        player.currentPose = CENTER_POSE
         player.isSaving = False
         player.lastStiffStatus = True
 
@@ -79,10 +79,10 @@ def gamePlaying(player):
 
     if (player.lastDiffState == 'gamePenalized' and
         player.lastStateTime > 10):
-        return player.goLater('waitToFaceField')
+        return player.goLater('watch')
 
     if player.lastDiffState == 'fallen':
-        return player.goLater('spinAtGoal')
+        return player.goLater('watch')
 
     return player.goLater('watch')
 
@@ -133,118 +133,136 @@ def watch(player):
 
     return Transition.getNextState(player, watch)
 
-def kickBall(player):
-    """
-    Kick the ball
-    """
+def repositionLeft(player):
     if player.firstFrame():
-        # save odometry if this was your first kick
-        if player.lastDiffState == 'clearIt':
-            VisualStates.returnToGoal.kickPose = \
-                RelRobotLocation(player.brain.interface.odometry.x,
-                                 player.brain.interface.odometry.y,
-                                 player.brain.interface.odometry.h)
-        #otherwise add to previously saved odo
+        if player.currentPose is constants.RIGHT_POSE:
+            player.currentPose = constants.CENTER_POSE
         else:
-            VisualStates.returnToGoal.kickPose.relX += \
-                player.brain.interface.odometry.x
-            VisualStates.returnToGoal.kickPose.relY += \
-                player.brain.interface.odometry.y
-            VisualStates.returnToGoal.kickPose.relH += \
-                player.brain.interface.odometry.h
-
-        player.brain.tracker.trackBall()
-
-        player.executeMove(player.kick.sweetMove)
-
-    if player.counter > 10 and player.brain.nav.isStopped():
-            return player.goLater('didIKickIt')
+            player.currentPose = constants.LEFT_POSE
 
     return player.stay()
 
-def saveIt(player):
+def repositionRight(player):
     if player.firstFrame():
-        player.brain.tracker.lookToAngle(0)
-        if SAVING:
-            player.executeMove(SweetMoves.GOALIE_SQUAT)
+        if player.currentPose is constants.LEFT_POSE:
+            player.currentPose = constants.CENTER_POSE
         else:
-            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
-        player.isSaving = False
-        #player.brain.fallController.enableFallProtection(False)
-    if (not player.brain.motion.body_is_active and not player.isSaving):
-        player.squatTime = time.time()
-        player.isSaving = True
-        return player.stay()
-    if player.isSaving:
-        stopTime = time.time()
-        # This is to stand up before a penalty is called.
-        if (stopTime - player.squatTime > 2):
-            if SAVING:
-                player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-            return player.goLater('upUpUP')
-    return player.stay()
-
-def upUpUP(player):
-    if player.firstFrame():
-        #player.brain.fallController.enableFallProtection(True)
-        player.upDelay = 0
-
-    if player.brain.nav.isStanding():
-        return player.stay()
-    elif player.upDelay < 10:
-        player.upDelay += 1
-        return player.stay()
-    else:
-        return player.goLater('spinAtGoal')
-    return player.stay()
-
-############# PENALTY SHOOTOUT #############
-
-def penaltyShotsGameSet(player):
-    if player.firstFrame():
-        player.inKickingState = False
-        player.gameState = player.currentState
-        player.returningFromPenalty = False
-        player.brain.fallController.enabled = False
-        player.stand()
-        player.brain.tracker.trackBall()
-        player.side = LEFT
-        player.isSaving = False
-        player.penaltyKicking = True
+            player.currentPose = constants.RIGHT_POSE
 
     return player.stay()
 
-def penaltyShotsGamePlaying(player):
-    if player.firstFrame():
-        player.stand()
-        player.brain.tracker.trackBall()
+# def kickBall(player):
+#     """
+#     Kick the ball
+#     """
+#     if player.firstFrame():
+#         # save odometry if this was your first kick
+#         if player.lastDiffState == 'clearIt':
+#             VisualStates.returnToGoal.kickPose = \
+#                 RelRobotLocation(player.brain.interface.odometry.x,
+#                                  player.brain.interface.odometry.y,
+#                                  player.brain.interface.odometry.h)
+#         #otherwise add to previously saved odo
+#         else:
+#             VisualStates.returnToGoal.kickPose.relX += \
+#                 player.brain.interface.odometry.x
+#             VisualStates.returnToGoal.kickPose.relY += \
+#                 player.brain.interface.odometry.y
+#             VisualStates.returnToGoal.kickPose.relH += \
+#                 player.brain.interface.odometry.h
 
-    return player.goLater('waitForPenaltySave')
+#         player.brain.tracker.trackBall()
 
-def waitForPenaltySave(player):
-    if player.firstFrame():
-        player.brain.tracker.trackBall()
-        player.brain.nav.stop()
+#         player.executeMove(player.kick.sweetMove)
 
-    return Transition.getNextState(player, waitForPenaltySave)
+#     if player.counter > 10 and player.brain.nav.isStopped():
+#             return player.goLater('didIKickIt')
 
-def diveRight(player):
-    if player.firstFrame():
-        player.brain.fallController.enabled = False
-        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+#     return player.stay()
 
-    return player.stay()
+# def saveIt(player):
+#     if player.firstFrame():
+#         player.brain.tracker.lookToAngle(0)
+#         if SAVING:
+#             player.executeMove(SweetMoves.GOALIE_SQUAT)
+#         else:
+#             player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
+#         player.isSaving = False
+#         #player.brain.fallController.enableFallProtection(False)
+#     if (not player.brain.motion.body_is_active and not player.isSaving):
+#         player.squatTime = time.time()
+#         player.isSaving = True
+#         return player.stay()
+#     if player.isSaving:
+#         stopTime = time.time()
+#         # This is to stand up before a penalty is called.
+#         if (stopTime - player.squatTime > 2):
+#             if SAVING:
+#                 player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+#             return player.goLater('upUpUP')
+#     return player.stay()
 
-def diveLeft(player):
-    if player.firstFrame():
-        player.brain.fallController.enabled = False
-        player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+# def upUpUP(player):
+#     if player.firstFrame():
+#         #player.brain.fallController.enableFallProtection(True)
+#         player.upDelay = 0
 
-    return player.stay()
+#     if player.brain.nav.isStanding():
+#         return player.stay()
+#     elif player.upDelay < 10:
+#         player.upDelay += 1
+#         return player.stay()
+#     else:
+#         return player.goLater('spinAtGoal')
+#     return player.stay()
 
-def squat(player):
-    if player.firstFrame():
-        player.brain.fallController.enabled = False
-        player.executeMove(SweetMoves.GOALIE_SQUAT)
+# ############# PENALTY SHOOTOUT #############
 
-    return player.stay()
+# def penaltyShotsGameSet(player):
+#     if player.firstFrame():
+#         player.inKickingState = False
+#         player.gameState = player.currentState
+#         player.returningFromPenalty = False
+#         player.brain.fallController.enabled = False
+#         player.stand()
+#         player.brain.tracker.trackBall()
+#         player.side = LEFT
+#         player.isSaving = False
+#         player.penaltyKicking = True
+
+#     return player.stay()
+
+# def penaltyShotsGamePlaying(player):
+#     if player.firstFrame():
+#         player.stand()
+#         player.brain.tracker.trackBall()
+
+#     return player.goLater('waitForPenaltySave')
+
+# def waitForPenaltySave(player):
+#     if player.firstFrame():
+#         player.brain.tracker.trackBall()
+#         player.brain.nav.stop()
+
+#     return Transition.getNextState(player, waitForPenaltySave)
+
+# def diveRight(player):
+#     if player.firstFrame():
+#         player.brain.fallController.enabled = False
+#         player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+
+#     return player.stay()
+
+# def diveLeft(player):
+#     if player.firstFrame():
+#         player.brain.fallController.enabled = False
+#         player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+
+#     return player.stay()
+
+# def squat(player):
+#     if player.firstFrame():
+#         player.brain.fallController.enabled = False
+#         player.executeMove(SweetMoves.GOALIE_SQUAT)
+
+#     return player.stay()
