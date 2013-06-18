@@ -17,6 +17,7 @@ from objects import RelRobotLocation, Location
 # 2. We are facing our opponents' goal. 3. We can see the ball close to us.
 
 ### TODO
+# test DRIBBLE_ON_KICKOFF
 # ballInGoalBox dribbling via goalie detection
 # rotate towards goal when dribbling
 # test time-left based decision making

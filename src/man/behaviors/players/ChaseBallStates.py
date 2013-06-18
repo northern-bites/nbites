@@ -11,6 +11,8 @@ from objects import RelRobotLocation, Location
 from math import fabs
 import noggin_constants as nogginConstants
 
+DRIBBLE_ON_KICKOFF = False
+
 def chase(player):
     """
     Super State to determine what to do from various situations
@@ -85,7 +87,6 @@ def approachBall(player):
                 player.kick = kicks.LEFT_STRAIGHT_KICK
             else:
                 player.kick = kicks.RIGHT_STRAIGHT_KICK
-            player.shouldKickOff = False
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')
@@ -260,8 +261,9 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if dr_trans.shouldDribble(player):
-        return player.goNow('decideDribble')
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()

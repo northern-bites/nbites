@@ -28,6 +28,7 @@ def kickBallExecute(player):
 
     if kickBallExecute.preKickDelay == 0:
         player.executeMove(kickBallExecute.sweetMove)
+        player.shouldKickOff = False
         return player.stay()
 
     if player.counter > 40 and player.brain.nav.isStopped():
