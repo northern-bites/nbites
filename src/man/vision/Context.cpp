@@ -647,7 +647,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
         return;
     } else if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
                l2 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
-               objectDistance > 300 && distToObject > 300) {
+               objectDistance > 400 && distToObject > 300) {
         // our "L" is actually a T unfortunately it isn't set up right
         // To Do: use the chageTo method in VisualCorner to get the the
         // set up properly
