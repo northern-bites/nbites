@@ -56,6 +56,8 @@ def afterKick(player):
         player.inKickingState = False
         return player.goNow('spinAfterBackKick')
 
+    if player.penaltyKicking:
+        return player.stay()
 
     if (transitions.shouldChaseBall(player) or
         transitions.shouldFindBallKick(player)):

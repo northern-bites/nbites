@@ -68,8 +68,12 @@ kickoff.ballRelY = "the relY position of the ball when we started"
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
+        player.penaltyKicking = True
+        player.shouldKickOff = False
         if player.shouldKickOff:
             player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
+        elif player.penaltyKicking:
+            player.brain.nav.chaseBall(fast = False)
         else:
             player.brain.nav.chaseBall(fast = True)
 
@@ -79,8 +83,7 @@ def approachBall(player):
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
         player.inKickingState = True
-
-        if player.shouldKickOff:
+        if player.shouldKickOff or player.penaltyKicking:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_STRAIGHT_KICK
             else:
@@ -135,7 +138,7 @@ def orbitBall(player):
     """
     if player.firstFrame():
         orbitBall.counter = 0
-        orbitBall.increasedHeadingCount = 0
+        orbitBall.increasedHeadingCounter = 0
         if hackKick.DEBUG_KICK_DECISION:
             print "Orbiting at angle: ",player.kick.h
 
@@ -289,6 +292,9 @@ def positionForKick(player):
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
 
+    if player.penaltyKicking and player.stateTime < 2:
+        return player.stay()
+
     if transitions.shouldFindBallKick(player) and player.counter > 15:
         player.inKickingState = False
         return player.goLater('chase')
@@ -300,6 +306,18 @@ def positionForKick(player):
         return player.goNow('kickBallExecute')
 
     return player.stay()
+
+def positionForPenaltyKick(player):
+    """
+    We're getting ready for a penalty kick
+    """
+    if player.firstFrame():
+        pass
+
+    if player.stateTime < 1:
+        return player.stay()
+    return player.stay()
+
 
 # Currently not used as of 6/7/13.
 # TODO: implement this again?
