@@ -43,7 +43,6 @@ float LineSystem::scoreObservation(Line globalObsv) {
     LineIt iter;
     for(iter = lines.begin(); iter != lines.end(); iter++) {
         float curScore = (*iter).getError(globalObsv);
-        std::cout << "CurScore:\t" << curScore << std::endl;
         bestScore = ((curScore < bestScore) ? curScore : bestScore);
     }
 

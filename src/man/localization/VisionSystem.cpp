@@ -29,73 +29,66 @@ bool VisionSystem::update(ParticleSet& particles,
     float lowestParticleError = 10000000.f;
     float sumParticleError = 0.f;
 
+    std::cout << "Num Lines: " << obsv.visual_line_size() << std::endl;
+
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);
 
         float curParticleError = 0;
         int numObsv = 0;
-        for (int i=0; i<obsv.visual_corner_size(); i++)
-        {
-            if(obsv.visual_corner(i).visual_detection().distance() > 0.f) {
-                madeObsv = true;
+        // for (int i=0; i<obsv.visual_corner_size(); i++)
+        // {
+        //     if(obsv.visual_corner(i).visual_detection().distance() > 0.f) {
+        //         madeObsv = true;
 
-                float newError = scoreFromVisDetect(*particle,
-                                                    obsv.visual_corner(i).visual_detection());
-                curParticleError+= newError;
-                numObsv++;
+        //         float newError = scoreFromVisDetect(*particle,
+        //                                             obsv.visual_corner(i).visual_detection());
+        //         curParticleError+= newError;
+        //         numObsv++;
 
-            }
-        }
+        //     }
+        // }
 
-        // Use Lines!
         for (int i=0; i<obsv.visual_line_size(); i++) {
-            if( obsv.visual_line(i).length() > MIN_LINE_LENGTH) {
-                // Create 2 points into the global
-                float sinS, cosS;
-                sincosf((particle->getLocation().h() + obsv.visual_line(i).start_bearing()), &sinS, &cosS);
-                float startGlobalX = obsv.visual_line(i).start_dist()*cosS + particle->getLocation().x();
-                float startGlobalY = obsv.visual_line(i).start_dist()*sinS + particle->getLocation().y();
+            if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
+                Line obsvLine = prepareVisualLine(*particle,
+                                                  obsv.visual_line(i));
 
-                float sinE, cosE;
-                sincosf((particle->getLocation().h() + obsv.visual_line(i).end_bearing()), &sinE, &cosE);
-                float endGlobalX = obsv.visual_line(i).end_dist()*cosE + particle->getLocation().x();
-                float endGlobalY = obsv.visual_line(i).end_dist()*sinE + particle->getLocation().y();
-
-                Point globalS(startGlobalX, startGlobalY);
-                Point globalE(  endGlobalX,   endGlobalY);
-                Line obsv(globalS, globalE);
-                float newError = lineSystem->scoreObservation(obsv);
-                curParticleError+=newError;
-                numObsv++;
+                // Limit by line length (be safe about center circle mistake lines)
+                if (obsvLine.length() > 100.f) {
+                    madeObsv = true;
+                    curParticleError += lineSystem->scoreObservation(obsvLine);
+                    numObsv++;
+                }
             }
         }
 
-        if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
-            && (obsv.goal_post_l().visual_detection().distance() > 0.f)) {
-            madeObsv = true;
-            float newError = scoreFromVisDetect(*particle,
-                                                obsv.goal_post_l().visual_detection());
-            curParticleError+= newError;
-            numObsv++;
-        }
+        // if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
+        //     && (obsv.goal_post_l().visual_detection().distance() > 0.f)) {
+        //     madeObsv = true;
+        //     float newError = scoreFromVisDetect(*particle,
+        //                                         obsv.goal_post_l().visual_detection());
+        //     curParticleError+= newError;
+        //     numObsv++;
+        // }
 
-        if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
-            && (obsv.goal_post_r().visual_detection().distance() > 0.f)) {
-            madeObsv = true;
-            float newError = scoreFromVisDetect(*particle,
-                                                obsv.goal_post_r().visual_detection());
-            curParticleError+= newError;
-            numObsv++;
-        }
+        // if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
+        //     && (obsv.goal_post_r().visual_detection().distance() > 0.f)) {
+        //     madeObsv = true;
+        //     float newError = scoreFromVisDetect(*particle,
+        //                                         obsv.goal_post_r().visual_detection());
+        //     curParticleError+= newError;
+        //     numObsv++;
+        // }
 
-        if (obsv.visual_cross().distance() > 0.f) {
-            madeObsv = true;
-            float newError = scoreFromVisDetect(*particle,
-                                                obsv.visual_cross());
-            curParticleError+= newError;
-            numObsv++;
-        }
+        // if (obsv.visual_cross().distance() > 0.f) {
+        //     madeObsv = true;
+        //     float newError = scoreFromVisDetect(*particle,
+        //                                         obsv.visual_cross());
+        //     curParticleError+= newError;
+        //     numObsv++;
+        // }
 
         // We never updated the new particle weight, so no observations been made
         if(!madeObsv)
@@ -150,6 +143,91 @@ bool VisionSystem::update(ParticleSet& particles,
     // Succesfully updated particles with Vision!
     return true;
 }
+
+/**
+ * @brief Takes a particle and a Visual line (with one endpoint within thresh dist,
+ *        and returns a Line with the closest endpoint being start,
+ *        and in global coordinates
+ */
+Line VisionSystem::prepareVisualLine(const Particle& particle,
+                                     const messages::VisualLine& line)
+{
+    float startGlobalX, startGlobalY, endGlobalX, endGlobalY;
+    float distToStart, distToEnd;
+
+    // Transform to global (make startGlobal closer than endGlobal)
+    if ( line.start_dist() < line.end_dist() ) {
+        float sinS, cosS;
+        sincosf((particle.getLocation().h() + line.start_bearing()), &sinS, &cosS);
+        startGlobalX = line.start_dist()*cosS + particle.getLocation().x();
+        startGlobalY = line.start_dist()*sinS + particle.getLocation().y();
+
+        float sinE, cosE;
+        sincosf((particle.getLocation().h() + line.end_bearing()), &sinE, &cosE);
+        endGlobalX = line.end_dist()*cosE + particle.getLocation().x();
+        endGlobalY = line.end_dist()*sinE + particle.getLocation().y();
+
+        distToStart = line.start_dist();
+        distToEnd = line.end_dist();
+    }
+    else { // 'end' from vision is closer
+        float sinS, cosS;
+        sincosf((particle.getLocation().h() + line.start_bearing()), &sinS, &cosS);
+        endGlobalX = line.start_dist()*cosS + particle.getLocation().x();
+        endGlobalY = line.start_dist()*sinS + particle.getLocation().y();
+
+        float sinE, cosE;
+        sincosf((particle.getLocation().h() + line.end_bearing()), &sinE, &cosE);
+        startGlobalX = line.end_dist()*cosE + particle.getLocation().x();
+        startGlobalY = line.end_dist()*sinE + particle.getLocation().y();
+
+        distToStart = line.end_dist();
+        distToEnd = line.start_dist();
+    }
+
+    // Safety check
+    if (distToEnd < distToStart)
+        std::cout << "\n\n MASSIVE LOCALIZATION ERROR \n\n" << std::endl;
+
+    Point start(startGlobalX, startGlobalY);
+    Point end  (  endGlobalX,   endGlobalY);
+
+    // Ensure reasonable distance estimates
+    if (distToEnd > 300.f) {
+        Line initialSegment(start,end); // Use to find end point to make shorter segment
+
+        // Project pose onto the line
+        Point pose(particle.getLocation().x(), particle.getLocation().y());
+        Point proj = initialSegment.project(pose);
+
+        //  Calc dists
+        float poseToProj = pose.distanceTo(proj);
+        float projToEnd  = proj.distanceTo(end);
+
+        // Amount to shift for given distance
+        float hyp = 300.f; // thresh
+        float projToNewEnd = std::sqrt(hyp*hyp - poseToProj*poseToProj);
+        float endToNewEnd  = projToEnd - projToNewEnd;
+
+        // Shift (and confirm lands on the line)
+        if (initialSegment.containsPoint(initialSegment.shiftDownLine(end, endToNewEnd))) {
+            Point newEnd = initialSegment.shiftDownLine(end, endToNewEnd);
+            end.x = newEnd.x;
+            end.y = newEnd.y;
+        }
+        else if (initialSegment.containsPoint(initialSegment.shiftDownLine(end, -endToNewEnd))) {
+            Point newEnd = initialSegment.shiftDownLine(end, -endToNewEnd);
+            end.x = newEnd.x;
+            end.y = newEnd.y;
+        }
+        else {
+            std::cout << "There is a bug in line localization\n\n" << std::endl;
+        }
+    }
+
+    return Line(start,end);
+}
+
 
 /**
  * @brief Takes a PVisualObservation and particle & returns the

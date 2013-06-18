@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <iostream>
+#include <cmath>
 
 #include "../LineSystem.h"
 #include "../LocStructs.h"
@@ -116,7 +117,7 @@ TEST(LocalizationTest, ProjectionVert)
     Point t(0.f, 0.f);
     proj = l.closestPointTo(t);
 
-    ASSERT_TRUE( abs(0.f - proj.y) < .001f);
+    ASSERT_TRUE( std::fabs(0.f - proj.y) < .001f);
 }
 
 TEST(LocalizationTest, ShiftDownLine)
@@ -131,15 +132,15 @@ TEST(LocalizationTest, ShiftDownLine)
     float distToOrigin = std::sqrt(8.f);
     Point shifted = l.shiftDownLine(a, distToOrigin);
 
-    bool worked = (abs(shifted.x - origin.x) < .01f);
+    bool worked = (std::fabs(shifted.x - origin.x) < .01f);
 
-    ASSERT_TRUE(abs(shifted.x -origin.x) < .01f);
-    ASSERT_TRUE(abs(shifted.y -origin.y) < .01f);
+    ASSERT_TRUE(std::fabs(shifted.x -origin.x) < .01f);
+    ASSERT_TRUE(std::fabs(shifted.y -origin.y) < .01f);
 
     shifted = l.shiftDownLine(b, -distToOrigin);
 
-    ASSERT_TRUE(abs(shifted.x -origin.x) < .01f);
-    ASSERT_TRUE(abs(shifted.y -origin.y) < .01f);
+    ASSERT_TRUE(std::fabs(shifted.x -origin.x) < .01f);
+    ASSERT_TRUE(std::fabs(shifted.y -origin.y) < .01f);
 }
 
 TEST(LocalizationTest, PartialScoring)
@@ -156,18 +157,18 @@ TEST(LocalizationTest, PartialScoring)
     Point initProj = l.closestPointTo(x);
 
     // Note: High precision error for close projections? Ask Bill...
-    ASSERT_TRUE(abs(initProj.x - a.x) < .2f);
-    ASSERT_TRUE(abs(initProj.y - a.y) < .2f);
+    ASSERT_TRUE(std::fabs(initProj.x - a.x) < .2f);
+    ASSERT_TRUE(std::fabs(initProj.y - a.y) < .2f);
 
     // Shift down line obsvDist and see if on line
     if(x.x < y.x)
-        obsvDist = abs(obsvDist);
+        obsvDist = std::fabs(obsvDist);
     else
-        obsvDist = -abs(obsvDist);
+        obsvDist = -std::fabs(obsvDist);
     Point segmentMatchEnd = l.shiftDownLine(initProj, obsvDist);
 
-    ASSERT_TRUE(abs(segmentMatchEnd.x - 0.f) < 0.2f);
-    ASSERT_TRUE(abs(segmentMatchEnd.y - 2.5f) < 0.2f);
+    ASSERT_TRUE(std::fabs(segmentMatchEnd.x - 0.f) < 0.2f);
+    ASSERT_TRUE(std::fabs(segmentMatchEnd.y - 2.5f) < 0.2f);
 }
 
 TEST(LocalizationTest, TestErrorCalc)
@@ -183,32 +184,32 @@ TEST(LocalizationTest, TestErrorCalc)
 
     float four = top.getError(bot);
 
-    ASSERT_TRUE(abs(four - 4.f) < .2f);
+    ASSERT_TRUE(std::fabs(four - 4.f) < .2f);
 
     // Same line
-    ASSERT_TRUE(abs(top.getError(top)) < .2f);
+    ASSERT_TRUE(std::fabs(top.getError(top)) < .2f);
 
     // Change line defs
     Line top_(c,b);
     Line bot_(a,d);
 
     four = top_.getError(bot);
-    ASSERT_TRUE(abs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
     four = top.getError(bot_);
-    ASSERT_TRUE(abs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
     four = top_.getError(bot_);
-    ASSERT_TRUE(abs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
     four = bot_.getError(top);
-    ASSERT_TRUE(abs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
     four = bot.getError(top_);
-    ASSERT_TRUE(abs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
     four = bot_.getError(top_);
-    ASSERT_TRUE(abs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 }
 
 TEST(LocalizationTest, TestLineSystem)
@@ -219,6 +220,4 @@ TEST(LocalizationTest, TestLineSystem)
     Point bottomLeftCorner(700.f,300.f);
     Point slightToRight(705.f, 400.f);
     Line perfectObsv(bottomLeftCorner, slightToRight);
-
-    std::cout << "OK score:\t" << testSystem.scoreObservation(perfectObsv) << std::endl;
 }

@@ -135,6 +135,21 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
             }
     }
 
+    for (int i=0; i<obsv.visual_line_size(); i++) {
+        if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
+            man::localization::Particle temp(loc, 1.f);
+            man::localization::Line postProcessLine = man::localization::VisionSystem::prepareVisualLine(temp,
+                                                                                                         obsv.visual_line(i));
+            if(postProcessLine.length() > 100.f) {
+                QPoint obsvSt (postProcessLine.start.x, postProcessLine.start.y);
+                QPoint obsvEnd(postProcessLine.end.x, postProcessLine.end.y);
+
+                painter.setBrush(Qt::black);
+                painter.drawLine(obsvSt, obsvEnd);
+            }
+        }
+    }
+
     if (obsv.has_goal_post_l()) {
         if (obsv.goal_post_l().visual_detection().on()
            && (obsv.goal_post_l().visual_detection().distance() > 0.f)){
@@ -190,6 +205,9 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
             }
         }
     }
+
+    // Paint the line segment in global
+
 }
 
 

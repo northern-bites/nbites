@@ -12,6 +12,7 @@
 #include "NBMath.h"
 #include "LineSystem.h"
 
+#include "LocStructs.h"
 #include "FieldConstants.h"
 
 #include <vector>
@@ -25,7 +26,7 @@ namespace man
 namespace localization
 {
 
-static const float MIN_LINE_LENGTH = 10.f;
+static const float MIN_LINE_LENGTH = 100.f;
 
 /**
  * @class Vision System
@@ -44,6 +45,10 @@ public:
 
     float scoreFromVisDetect(const Particle& particle,
                              const messages::VisualDetection& obsv);
+
+    static Line prepareVisualLine(const Particle& particle,
+                           const messages::VisualLine& visualLine);
+
     void setUpdated(bool val);
     float getLowestError(){return currentLowestError;};
     float getAvgError(){return avgError;};
