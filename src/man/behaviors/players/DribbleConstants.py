@@ -7,6 +7,7 @@ BALL_OFF_THRESH = 30
 # Ball distance thresholds.
 BALL_CLOSE_DISTANCE = 35.0
 BALL_FAR_AWAY = BALL_CLOSE_DISTANCE + 25.0
+BALL_TOO_FAR_TO_SIDE = 10
 BALL_MOVED_THR = 3
 
 # Bearings towards goal and ball thresholds.
@@ -15,3 +16,7 @@ FACING_FORWARD_DEG = 45
 # Heat map (distance to something blocking open field) thresholds.
 CROWDED_DIST = 300
 OPEN_LANE_DIST = 100
+
+# Distances to walk
+BACKUP_WHEN_LOST = -20
+BACKED_OFF_WHEN_POSITIONING = -20
