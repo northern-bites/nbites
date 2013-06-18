@@ -213,24 +213,25 @@ class GoTeam:
         """
         locations = map(self.mapPositionToRobotLocation, positions)
 
+        # Set the chaser!
+        chaser_mate = self.determineChaser(play)
+        if chaser_mate == self.brain.playerNumber:
+            play.setRole(positions[len(locations)-1][3])
+            play.setPosition(locations[len(locations)])
+
         # Find which active field player should go to each position
-        firstPlayer = self.findClosestPlayer(locations[0])
+        firstPlayer = self.findClosestPlayer(locations[0], [chaser_mate])
         if firstPlayer == self.brain.playerNumber:
             play.setRole(positions[0][3])
             play.setPosition(locations[0])
         else:
-            secondPlayer = self.findClosestPlayer(locations[1], [firstPlayer])
+            secondPlayer = self.findClosestPlayer(locations[1], [firstPlayer, chaser_mate])
             if secondPlayer == self.brain.playerNumber:
                 play.setRole(positions[1][3])
                 play.setPosition(locations[1])
             else:
-                thirdPlayer = self.findClosestPlayer(locations[2], [firstPlayer, secondPlayer])
-                if thirdPlayer == self.brain.playerNumber:
-                    play.setRole(positions[2][3])
-                    play.setPosition(locations[2])
-                else:
-                    play.setRole(positions[3][3])
-                    play.setPosition(locations[3])
+                play.setRole(positions[2][3])
+                play.setPosition(locations[2])
 
     def mapPositionToRobotLocation(self, position):
         """
