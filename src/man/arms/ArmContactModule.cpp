@@ -69,7 +69,7 @@ void ArmContactModule::run_()
 
 
     // If an arm is stuck, override what we computed for it and
-    // send out NONE until it becomes unstuck... othewrise send what
+    // send out NONE until it becomes unstuck... otherwise send what
     // was actually computed
     if (rightStuckCounter < STUCK_THRESH)
     {
