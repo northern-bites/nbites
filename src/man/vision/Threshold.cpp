@@ -66,6 +66,17 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     for (int i = 0; i < IMAGE_WIDTH; i++) {
         lowerBound[i] = IMAGE_HEIGHT - 1;
     }
+#ifdef OFFLINE
+    visualHorizonDebug = false;
+    debugSelf = false;
+    debugShot = false;
+    debugOpenField = false;
+    debugEdgeDetection = false;
+    debugHoughTransform = false;
+    debugRobots = false;
+    debugVisualLines = false;
+    debugVisualCorners = false;
+#endif
 }
 
 //this loop will perform obstabcle detection, and for now it is seperate from
@@ -1484,8 +1495,8 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // sets focal distance of the field object
         estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
-                                              265.0f);
+                                              objPtr->getY() + objPtr->getHeight(),
+                                              270.0f);
 
         objPtr->setDistanceWithSD(pose_est.dist);
         objPtr->setBearingWithSD(pose_est.bearing);

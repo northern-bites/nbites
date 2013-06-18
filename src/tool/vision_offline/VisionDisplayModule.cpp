@@ -220,7 +220,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 		//painter.setBrush(QBrush(QColor(0, 0, 255, 0, 80), Qt::SolidPattern));
 		painter.setPen(QPen(QColor(0,255,0,200), 1, Qt::SolidLine, Qt::FlatCap));
 		painter.setBrush(QBrush(QColor(0,255,0,80), Qt::SolidPattern));
-		if (red1.distance() > 0) {
+		if (red1.on()) {
             painter.drawLine(red1.x() + 10, red1.y() + 10, red1.x(), red1.y());
             painter.drawLine(red1.x(), red1.y() + 10, red1.x() + 10, red1.y());
 			/*QPoint r_points[4] = {
@@ -234,7 +234,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 		//painter.setBrush(QBrush(QColor(255, 0, 0, 0, 80), Qt::SolidPattern));
 		painter.setPen(QPen(QColor(255,0,0,200), 1, Qt::SolidLine, Qt::FlatCap));
 		painter.setBrush(QBrush(QColor(255,0,0,80), Qt::SolidPattern));
-		if (navy1.distance() > 0) {
+		if (navy1.on()) {
             painter.drawLine(navy1.x() + 10, navy1.y() + 10, navy1.x(), navy1.y());
             painter.drawLine(navy1.x(), navy1.y() + 10, navy1.x() + 10, navy1.y());
 			/*QPoint r_points[4] = {

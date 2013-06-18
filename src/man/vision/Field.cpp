@@ -51,8 +51,8 @@ Field::Field(Vision* vis, Threshold * thr)
 	// NOTE: leave this in please, else I will "git blame" and cut off your
 	// funding. - chown
 #ifdef OFFLINE
-	debugFieldEdge = false;
-	debugDrawFieldEdge = false;
+	debugFieldEdge = true;
+	debugDrawFieldEdge = true;
 	debugHorizon = false;
 #endif
 }
@@ -195,7 +195,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
     }
     // look for odd spikes and quell them
     if (poseHorizon > -100) {
-        for (good = 1; good < HULLS - 1; good++) {
+        for (good = 4; good < HULLS - 4; good++) {
             if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
                 convex[good].y > 15) {
                 if (debugFieldEdge) {
