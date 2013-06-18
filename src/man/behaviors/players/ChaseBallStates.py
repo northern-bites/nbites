@@ -137,6 +137,8 @@ def orbitBall(player):
 
         if player.kick.h == 0:
             return player.goNow('positionForKick')
+        if player.orbitDistance > 25:
+            player.orbitDistance = 25
 
         # Reset from pre-kick pan to straight, then track the ball.
         player.brain.tracker.lookStraightThenTrack()
