@@ -39,8 +39,9 @@ void CameraCalibrate::UpdateByName(std::string name)
     // These are for river's head on kaylee's body! MAKE SURE TO FIX
     if (name == "river") { // Changed 6/11/13
         paramsTop[PITCH] = 0.07f;
-        paramsTop[ROLL] = -0.01f;
-        paramsBottom[PITCH] = 0.11f;
+        paramsTop[ROLL] = -0.02f;
+        paramsBottom[PITCH] = 0.14f;
+        paramsBottom[ROLL] = -0.01f;
     // These are for mal's head on simon's body! MAKE SURE TO FIX
     } else if (name == "mal") { // Changed 6/11/13
         paramsTop[PITCH] = 0.10f;

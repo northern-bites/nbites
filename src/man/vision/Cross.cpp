@@ -71,7 +71,7 @@ void Cross::createObject() {
     }
 
     if (CROSSDEBUG){
-        cout << blobs->number() << " white blobs" << endl;
+        cout << endl << blobs->number() << " white blobs" << endl;
     }
 }
 
@@ -209,6 +209,24 @@ bool Cross::scanAroundPerimeter(Blob b) {
             counter++;
         } else return false;
     }
+	// do extra screening above in case it is a robot foot
+    for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
+        if (y > 10) {
+			for (int j = 3; j < 10; j++) {
+				if (Utility::isGreen(thresh->getThresholded(y - j,i))) {
+					count++;
+				} else if (Utility::isUndefined(thresh->getThresholded(y - j,i))) {
+					count--;
+				} else if (Utility::isWhite(thresh->getThresholded(y - j,i))) {
+					count-=3;
+				}
+				counter++;
+			}
+        }
+
+	}
+
+
     if (count > (float)counter * greenThreshold) {
         if (CROSSDEBUG) {
             cout << "White stats: " << count << " " << counter << endl;
