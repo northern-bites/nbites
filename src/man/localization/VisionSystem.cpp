@@ -124,13 +124,20 @@ bool VisionSystem::update(ParticleSet& particles,
 
     // normalize the particle weights and calculate the weighted avg error
     weightedAvgError = 0.f;
+    float weightSum = 0.f;
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);
         particle->normalizeWeight(totalWeight);
 
+        //sanity check for potential weird bug
+        weightSum += particle->getWeight();
+
         weightedAvgError += particle->getWeight() * particle->getError();
     }
+
+    if (weightSum < .9f)
+        std::cout << "LOC_ERROR: All particle weights do not sum to .9" << std::endl;
 
     // Calc avgError by dividing the total by the num particles
     avgError = sumParticleError / (float)particles.size();
@@ -228,9 +235,12 @@ Line VisionSystem::prepareVisualLine(const Particle& particle,
             end.x = newEnd.x;
             end.y = newEnd.y;
         }
-        // else {
-        //     std::cout << "There is a bug in line localization\n\n" << std::endl;
-        // }
+        else {
+            // There is an issue in processing this line (precision) so make sure it's thrown out
+            Point shitEnd = initialSegment.shiftDownLine(start, 1);
+            end.x = newEnd.x;
+            end.y = newEnd.y;
+        }
     }
 
     return Line(start,end);
