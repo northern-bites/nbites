@@ -254,8 +254,8 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
         thisBall->init();
         return false;
     } else if (distanceDifference > DISTANCE_MISMATCH &&
-               (kinematicsBasedEst.dist *2 <  radiusBasedEst.dist ||
-                radiusBasedEst.dist * 2 < kinematicsBasedEst.dist)
+               (kinematicsBasedEst.dist *3 <  radiusBasedEst.dist ||
+                radiusBasedEst.dist * 3 < kinematicsBasedEst.dist)
                && kinematicsBasedEst.dist < PIXACC &&
 											kinematicsBasedEst.dist > 0 && w < 12) {
         if (BALLDEBUG) {
