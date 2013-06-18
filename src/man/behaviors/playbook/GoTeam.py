@@ -215,7 +215,7 @@ class GoTeam:
 
         # Set the chaser!
         chaser_mate = self.determineChaser(play)
-        if chaser_mate == self.brain.playerNumber:
+        if chaser_mate.playerNumber == self.brain.playerNumber:
             play.setRole(positions[len(locations)-1][3])
             play.setPosition(locations[len(locations)])
 
