@@ -57,53 +57,59 @@ inline static void sincosf(float _x, float * _sinx, float * _cosx) {
 
 namespace NBMath {
 
-    const int ROUND(float x);
+const int ROUND(float x);
 
-    const float clip(const float value, const float minValue,
-                     const float maxValue);
-    const float clip(const float value, const float minMax);
+const float clip(const float value, const float minValue,
+                 const float maxValue);
+const float clip(const float value, const float minMax);
 
-    /**
-     * Given a float return its sign
-     *
-     * @param f the number to examine the sign of
-     * @return -1.0f if f is less than 0.0f, 1.0f if positive, 0.0f otherwise
-     */
-    const float sign(const float f);
-    /**
-     * Given a float return its sign
-     *
-     * @param f the number to examine the sign of
-     * @return -1.0f if f is less than 0.0f, 1.0f otherwise
-     */
-    const float signNoZero(const float f);
+/**
+ * Given a float return its sign
+ *
+ * @param f the number to examine the sign of
+ * @return -1.0f if f is less than 0.0f, 1.0f if positive, 0.0f otherwise
+ */
+const float sign(const float f);
+/**
+ * Given a float return its sign
+ *
+ * @param f the number to examine the sign of
+ * @return -1.0f if f is less than 0.0f, 1.0f otherwise
+ */
+const float signNoZero(const float f);
 
-    /**
-     * Returns an equivalent angle to the one passed in with value between
-     * positive and negative pi.
-     *
-     * @param theta The angle to be simplified
-     *
-     * @return The equivalent angle between -pi and pi.
-     */
-    const  float subPIAngle(float theta);
+/**
+ * Returns an equivalent angle to the one passed in with value between
+ * positive and negative pi.
+ *
+ * @param theta The angle to be simplified
+ *
+ * @return The equivalent angle between -pi and pi.
+ */
+const  float subPIAngle(float theta);
 
-    const float safe_asin(const float input);
-    const float safe_acos(const float input);
-    const float safe_atan2(const float y,
-                           const float x);
+const float safe_asin(const float input);
+const float safe_acos(const float input);
+const float safe_atan2(const float y,
+                       const float x);
 
 
-    const float  cycloidx(const float theta);
+const float  cycloidx(const float theta);
 
-    const float  cycloidy(const float theta);
+const float  cycloidy(const float theta);
 
-    float getHypotenuse(float x, float y);
+float getHypotenuse(float x, float y);
 
-    float getLargestMagRoot(float a, float b, float c);
+float getLargestMagRoot(float a, float b, float c);
 
-    template <class T>
-    T square(T x) { return x*x; }
+float dotProduct(float x1, float x2, float y1, float y2);
 
+/*
+ * @brief - Calculate area of a triangle from its side lengths
+ */
+float calcTriangleArea(float l1, float l2, float l3);
+
+template <class T>
+T square(T x) { return x*x; }
 }
 #endif //NBMath_h

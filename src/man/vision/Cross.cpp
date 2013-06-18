@@ -147,6 +147,9 @@ bool Cross::checkSizeAgainstPixEstimate(Blob b) {
     if (e.dist > 200.0f && w > 20) {
         return false;
     }
+	if (e.dist > 400) {
+		return false;
+	}
     return true;
 }
 
@@ -314,7 +317,7 @@ void Cross::checkForX(Blob b) {
     }
 
     // Is the cross white enough?  At least half the pixels must be white.
-    if (!rightBlobColor(b, 0.5f)) {
+    if (!rightBlobColor(b, 0.6f)) {
         if (CROSSDEBUG) {
             cout << "Tossing a blob for not being white enough " << endl;
         }
@@ -435,6 +438,9 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
     }
 
     float percent = (float)good / (float) (total);
+	if (CROSSDEBUG) {
+		cout << "Percent of white is " << percent << endl;
+	}
     if (percent > minpercent) {
         return true;
     }
