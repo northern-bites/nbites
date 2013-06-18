@@ -18,6 +18,7 @@ from objects import RelRobotLocation, Location
 
 ### TODO
 # dribbleGoneBad needs tuning
+# ballInGoalBox rotation bug
 # test time-left based decision making
 # goalie detection
 # rotate towards goal when dribbling
@@ -59,6 +60,7 @@ def executeDribble(player):
                                        0)
 
     if player.firstFrame():
+        player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
                               Navigator.MEDIUM_SPEED,
@@ -73,7 +75,7 @@ def executeDribble(player):
         return player.goLater('chase')
     elif not transitions.centerLaneOpen(player): # reorder CLO and DGB?
         return player.goNow('rotateToOpenSpace')
-    elif transitions.dribbleGoneBad(player):
+    elif transitions.ballMoved(player):
         return player.goNow('positionForDribble')
 
     return player.stay()
@@ -88,7 +90,9 @@ def rotateToOpenSpace(player):
         else:
             player.setWalk(0, .5, -.15)
 
-    if not transitions.shouldDribble(player):
+    if transitions.ballLost(player):
+        return player.goNow('lookForBall')
+    elif not transitions.shouldDribble(player):
         player.stand()
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
@@ -123,8 +127,8 @@ def positionForDribble(player):
     We should position ourselves behind the ball for easy dribbling.
     """
     ball = player.brain.ball
-    backed_off = constants.BACKED_OFF_WHEN_POSITIONING
-    player.kickPose = RelRobotLocation(ball.rel_x + backed_off, # 20 cm behind ball
+    backed_off = constants.DRIBBLE_SETUP_POSITION
+    player.kickPose = RelRobotLocation(ball.rel_x + backed_off,
                                        ball.rel_y,
                                        0)
 
@@ -137,7 +141,9 @@ def positionForDribble(player):
     else:
         player.brain.nav.updateDest(player.kickPose)
 
-    if transitions.navDone(player):
+    if transitions.ballLost(player):
+        return player.goLater('lookForBall')
+    elif transitions.navDone(player):
         return player.goLater('decideDribble')
 
     return player.stay()

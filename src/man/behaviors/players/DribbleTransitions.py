@@ -66,15 +66,15 @@ def rotateLeft(player):
     #         player.brain.interface.visionObstacle.right_dist and
     #         not player.brain.interface.visionObstacle.block_right == 0))
 
-def dribbleGoneBad(player):
-    """
-    We have dribbled the ball too far to the left or right.
-    """
-    print "Dribble gone bad?" 
-    print (abs(player.brain.ball.y - player.brain.loc.y) > 
-            constants.BALL_TOO_FAR_TO_SIDE)
-    return (abs(player.brain.ball.y - player.brain.loc.y) > 
-            constants.BALL_TOO_FAR_TO_SIDE)
+# def dribbleGoneBad(player):
+#     """
+#     We have dribbled the ball too far to the left or right.
+#     """
+#     print "Dribble gone bad?" 
+#     print (abs(player.brain.ball.y - player.brain.loc.y) > 
+#             constants.BALL_TOO_FAR_TO_SIDE)
+#     return (abs(player.brain.ball.y - player.brain.loc.y) > 
+#             constants.BALL_TOO_FAR_TO_SIDE)
 
 def ballToOurLeft(player):
     """
@@ -102,6 +102,15 @@ def ballGotFarAway(player):
     ball = player.brain.ball
     return ball.vis.on and ball.distance > constants.BALL_FAR_AWAY
 
+def ballMoved(player):
+    """
+    Ball has moved away from where it was seen last
+    """
+    ball = player.brain.ball
+    ballBefore = player.ballBeforeDribble
+    return (abs(ball.x - ballBefore.x) > constants.BALL_MOVED_THR or
+            abs(ball.y - ballBefore.y) > constants.BALL_MOVED_THR)
+
 def seesBall(player):
     """
     We see the ball.
@@ -114,10 +123,11 @@ def ballInGoalBox(player):
     The ball is in the goal box (between the posts actually), so we can 
     dribble it in.
     """
-    return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH - 
-            nogginConstants.GOALBOX_DEPTH and
-            player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
-            player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
+    return False
+    # return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH - 
+    #         nogginConstants.GOALBOX_DEPTH and
+    #         player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
+    #         player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
 
 def navDone(player):
     """
