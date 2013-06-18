@@ -269,10 +269,11 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
         return false;
     } else if (kinematicsBasedEst.dist >  4 * radiusBasedEst.dist) {
 		if (radiusBasedEst.dist < MIDFIELD_X / 2 &&
-								  thresh->getPixDistance(topBlob->getLeftTopY()) > MIDFIELD_X) {
+								  thresh->getPixDistance(topBlob->getLeftTopY()) > MIDFIELD_X &&
+			(w > 20 || h > 20 || kinematicsBasedEst.dist < PIXACC)) {
 			if (BALLDEBUG) {
 				cout << "Screening due to a very large ball at a seemingly far distance "
-					 << endl;
+					 << w << " " << h << " " << kinematicsBasedEst.dist << endl;
 			}
 			drawBlob(*topBlob, WHITE);
 			topBlob->init();
