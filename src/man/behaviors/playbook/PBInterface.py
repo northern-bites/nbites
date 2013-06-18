@@ -25,8 +25,8 @@ class PBInterface:
         self.subRole = play.subRole
         self.role = play.role
 
-    def subRoleUnchanged(self):
-        return (self.subRole == self.lastSubRole)
+    def roleUnchanged(self):
+        return (self.role == self.lastRole)
 
     def roleChanged(self):
         return (self.role!= self.lastRole)

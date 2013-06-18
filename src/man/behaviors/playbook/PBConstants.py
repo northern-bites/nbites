@@ -39,9 +39,9 @@ S_MIDDIE_OFFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 0.5
 S_TWO_ZONE_DEFENDER_THRESH = NogginConstants.CENTER_FIELD_X * 1.2
 
 # Constants for building playbook table
-PLAYBOOK_FILE = '../../../../build/tool/playbook.txt' #placeholder value
-TABLE_GRID_SIZE = 500      #placeholder value
-TABLE_ENTRY_SIZE = 12 # 3,2,1 field players, with and without an active goalie
+TABLE_GRID_SIZE = 100
+TABLE_GRID_WIDTH = int(NogginConstants.FIELD_WHITE_WIDTH / TABLE_GRID_SIZE) + 1
+TABLE_GRID_HEIGHT = int(NogginConstants.FIELD_WHITE_HEIGHT / TABLE_GRID_SIZE) + 1
 
 WALKING_SPEED = 20 # cm/second
 TURNING_RATE = 60  # degrees/second
@@ -160,25 +160,24 @@ FORMATIONS = dict(zip(range(NUM_FORMATIONS), ("INIT_FORMATION",
 #### Information about the roles ####
 ####
 
-NUM_ROLES = 8
+NUM_ROLES = 7
 # dictionary of roles
-ROLES = dict(zip(range(NUM_ROLES), ("INIT_ROLE",
-                                    "PENALTY_ROLE",
-                                    "CHASER",
-                                    "MIDDIE",
-                                    "OFFENDER",
+ROLES = dict(zip(range(NUM_ROLES), ("CHASER",
                                     "DEFENDER",
+                                    "OFFENDER",
+                                    "MIDDIE",
                                     "GOALIE",
-                                    "DEFENDER_DUB_D")))
+                                    "PENALTY_ROLE",
+                                    "INIT_ROLE")))
+
 # tuple of roles
-(INIT_ROLE,
- PENALTY_ROLE,
- CHASER,
- MIDDIE,
- OFFENDER,
+(CHASER,
  DEFENDER,
+ OFFENDER,
+ MIDDIE,
  GOALIE,
- DEFENDER_DUB_D) = range(NUM_ROLES)
+ PENALTY_ROLE,
+ INIT_ROLE) = range(NUM_ROLES)
 
 
 ####

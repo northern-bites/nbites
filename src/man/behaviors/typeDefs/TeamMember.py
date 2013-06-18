@@ -1,4 +1,4 @@
-from objects import (RobotLocation, Location)
+from objects import (RobotLocation, Location, RelRobotLocation)
 from math import fabs, degrees
 import noggin_constants as NogginConstants
 
@@ -14,9 +14,9 @@ DEFAULT_DEFENDER_NUMBER = 2
 DEFAULT_MIDDIE_NUMBER = 3
 DEFAULT_OFFENDER_NUMBER = 4
 DEFAULT_CHASER_NUMBER = 5
-DEBUG_DETERMINE_CHASE_TIME = False
+DEBUG_DETERMINE_DEST_TIME = False
 SEC_TO_MILLIS = 1000.0
-CHASE_SPEED = 20.00 #cm/sec          # How fast we walk
+WALK_SPEED = 20.00 #cm/sec          # How fast we walk
 CHASE_TIME_SCALE = 0.45              # How much new measurement is used in IIR.
 BALL_OFF_PENALTY = 100.              # Big penalty for not seeing the ball.
 
@@ -128,40 +128,49 @@ class TeamMember(RobotLocation):
         Note: Don't give bonuses. It can result in negative chase times
               which can screw up the math later on. --Wils (06/25/11)
         """
-        t = (self.ballDist / CHASE_SPEED)
+        relLocToBall = RelRobotLocation(self.brain.ball.rel_x,
+                                        self.brain.ball.rel_y,
+                                        self.brain.ball.bearing_deg)
 
-        if DEBUG_DETERMINE_CHASE_TIME:
-            print "\tChase time base is " + str(t)
+        time = self.determineTimeToDest(relLocToBall)
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if (self.brain.ball.vis.frames_off > 3 and
+        if (self.brain.ball.vis.frames_off > 30 and # TODO: unify this constant with shouldFindBall
             not self.brain.player.inKickingState):
-            t += BALL_OFF_PENALTY
+            time += BALL_OFF_PENALTY
 
-        if DEBUG_DETERMINE_CHASE_TIME:
-            print "\tChase time after ball on bonus " + str(t)
+        if DEBUG_DETERMINE_DEST_TIME:
+            print "\tChase time after ball on bonus " + str(time)
+
+        return time
+
+    def determineTimeToDest(self, dest):
+        """
+        Returns the approxiamte time in seconds to reach the given destination.
+        @param dest: a relRobotLocation.
+        """
+
+        time = (dest.dist / WALK_SPEED)
+
+        if DEBUG_DETERMINE_DEST_TIME:
+            print "\tDest time base is " + str(time)
 
         # Add a penalty for being fallen over
-        t += 20 * (self.brain.player.currentState == 'fallen')
+        time += 20 * (self.brain.player.currentState == 'fallen')
 
-        if DEBUG_DETERMINE_CHASE_TIME:
-            print "\tChase time after fallen over penalty " + str(t)
+        if DEBUG_DETERMINE_DEST_TIME:
+            print "\tDest time after fallen over penalty " + str(time)
 
-        # Add a penalty for not facing the ball
-        t += fabs(self.brain.ball.bearing_deg) / 60  # 3 seconds to spin 180
+        # Add a penalty for not facing the destination
+        time += fabs(dest.bearing / 60) # 3 seconds to spin 180
 
-        if DEBUG_DETERMINE_CHASE_TIME:
-            print "\tChase time after ball-bearing penalty "+str(t)
+        # Add a penalty for turning once at the destination
+        time += fabs((dest.bearing - dest.relH) / 60) # 3 seconds to spin 180
 
-        # Filter by IIR to reduce noise
-        # Actually this is probably terrible.
-        #t = t * CHASE_TIME_SCALE + (1.0 -CHASE_TIME_SCALE) * self.chaseTime
+        if DEBUG_DETERMINE_DEST_TIME:
+            print "\tDest time after bearing penalty " + str(time)
 
-        if DEBUG_DETERMINE_CHASE_TIME:
-            print "\tChase time after filter " +str(t)
-            print ""
-
-        return t
+        return time
 
     def hasBall(self):
         return self.grabbing

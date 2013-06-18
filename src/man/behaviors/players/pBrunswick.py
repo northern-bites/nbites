@@ -100,7 +100,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if self.brain.playbook.subRoleUnchanged():
+        if self.brain.playbook.roleUnchanged():
             return self.currentState
 
         elif self.inKickingState:

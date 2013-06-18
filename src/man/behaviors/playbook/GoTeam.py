@@ -4,9 +4,10 @@ from ..typeDefs import TeamMember
 from . import PBConstants
 from . import Strategies
 from objects import Location, RobotLocation, RelRobotLocation
-from math import degrees
+from math import degrees, ceil
 import noggin_constants as NogginConstants
 import time
+from PlaybookTable import playbookTable
 
 # ANSI terminal color codes
 # http://pueblo.sourceforge.net/doc/manual/ansi_color_codes.html
@@ -26,9 +27,6 @@ class GoTeam:
         self.printStateChanges = True
         self.time = time.time()
 
-        # Playbook Table
-        self.table = self.readPlaybookTable()
-
         # Information about teammates
         #self.position = []
         self.me = self.brain.teamMembers[self.brain.playerNumber - 1]
@@ -45,6 +43,12 @@ class GoTeam:
                                PBConstants.LARGE_ELLIPSE_CENTER_Y,
                                PBConstants.LARGE_ELLIPSE_HEIGHT,
                                PBConstants.LARGE_ELLIPSE_WIDTH)
+        self.potentialBallX = -1
+        self.potentialBallXFrames = 0
+        self.potentialBallY = -1
+        self.potentialBallYFrames = 0
+        self.lastBallX = -1
+        self.lastBallY = -1
 
 
         # Goalie
@@ -56,55 +60,6 @@ class GoTeam:
         self.shouldChaseCounter = 0
         self.shouldStopChaseCounter = 0
         self.shouldStopSaveCounter = 0
-
-    def readPlaybookTable(self):
-        """
-        Read in the playbook table that was created in the Tool
-        and build a data structure for it.
-
-        FORMAT: Each line of x,y,h,r should be ints separated by whitespace.
-                Each entry of 20 lines should be on consecutive lines.
-                    4,3,2,1 playbook players, repeated for goalie inactive
-                Each entry should begin with # on its own line.
-                Each row of entries should end with @ on its own line.
-                All data (after any meta data for the tool) should begin with & on its own line.
-        """
-        with open(PBConstants.PLAYBOOK_FILE, 'r') as table:
-            playbookTable = []
-            currentRow = []
-
-            # Strip out any meta data at the top of the file.
-            while table.readline().split()[0] != '&':
-                continue
-
-            while True:
-                rawLine = table.readline().split()
-                if rawLine == "":
-                    #end of file
-                    return tuple(playbookTable)
-                elif rawLine == '#':
-                    #new entry
-                    currentRow.append(self.readTableEntry(table))
-                elif rawLine == '@':
-                    #end of row
-                    playbookTable.append(tuple(currentRow))
-                    currentRow = []
-                else:
-                    print "Error reading playbook table."
-                    return tuple(playbookTable)
-
-    def readTableEntry(self, table):
-        """
-        Helper method for reading the playbook table file.
-        """
-        entry = []
-        for i in range(PBConstants.TABLE_ENTRY_SIZE):
-            rawLine = table.readline().split()
-            if len(rawLine) != 4:
-                print "Error reading playbook entry: not x,y,h,r."
-                return entry
-            entry.append(tuple(int(rawLine[0]),int(rawLine[1]),int(rawLine[2])))
-        return tuple(entry)
 
     def run(self, play):
         """We run this each frame to get the latest info"""
@@ -136,22 +91,75 @@ class GoTeam:
                 play.setRole(PBConstants.INIT_ROLE)
                 play.setSubRole(PBConstants.INIT_SUB_ROLE)
 
+            self.lastBallX = -1
+            self.lastBallY = -1
+            return
+
         # Have a separate strategy to easily deal with being penalized
-        elif currentGCState == 'gamePenalized':
+        elif not self.me.active:
             if not play.isSubRole(PBConstants.PENALTY_SUB_ROLE):
                 play.setStrategy(PBConstants.PENALTY_STRATEGY)
                 play.setFormation(PBConstants.PENALTY_FORMATION)
                 play.setRole(PBConstants.PENALTY_ROLE)
                 play.setSubRole(PBConstants.PENALTY_SUB_ROLE)
 
+            self.lastBallX = -1
+            self.lastBallY = -1
+            return
+
+        # Sometimes the ball filter produces infinity values when starting.
+        # HACK: Clip brain.ball.x and brain.ball.y
+        if self.brain.ball.x == float("inf") or self.brain.ball.x == float("-inf"):
+            self.brain.ball.x = NogginConstants.MIDFIELD_X
+        if self.brain.ball.y == float("inf") or self.brain.ball.y == float("-inf"):
+            self.brain.ball.y = NogginConstants.MIDFIELD_Y
+
+        #print "y is: " + str(self.brain.ball.y)
+        #print "pre-ceil: " + str((self.brain.ball.x - NogginConstants.GREEN_PAD_X) / PBConstants.TABLE_GRID_SIZE)
+        #print "post-ceil: " + str(ceil((self.brain.ball.x - NogginConstants.GREEN_PAD_X) / PBConstants.TABLE_GRID_SIZE))
+
+        #Which grid entry is the ball in?
+        newBallX = int(ceil((self.brain.ball.x - NogginConstants.GREEN_PAD_X) / PBConstants.TABLE_GRID_SIZE))
+        newBallY = int(ceil((self.brain.ball.y - NogginConstants.GREEN_PAD_Y) / PBConstants.TABLE_GRID_SIZE))
+
+        # For robustness, clip these values
+        newBallX = MyMath.clip(newBallX, 0, PBConstants.TABLE_GRID_WIDTH)
+        newBallY = MyMath.clip(newBallY, 0, PBConstants.TABLE_GRID_HEIGHT)
+
+        # If lastBallX or lastBallY is -1, our best guess is newBallX and newBallY
+        if (self.lastBallX == -1 and self.lastBallY == -1):
+            self.lastBallX = newBallX
+            self.lastBallY = newBallY
+
+        # Buffer the x coordinate for the grid to avoid rapid oscillations
+        if newBallX != self.lastBallX:
+            if newBallX == self.potentialBallX:
+                self.potentialBallXFrames += 1
+                if self.potentialBallXFrames > 10:
+                    self.lastBallX = self.potentialBallX
+            else:
+                self.potentialBallX = newBallX
+                self.potentialBallXFrames = 1
+
+        # Buffer the y coordinate for the grid to avoid rapid oscillations
+        if newBallY != self.lastBallY:
+            if newBallY == self.potentialBallY:
+                self.potentialBallYFrames += 1
+                if self.potentialBallYFrames > 10:
+                    self.lastBallY = self.potentialBallY
+            else:
+                self.potentialBallY = newBallY
+                self.potentialBallYFrames = 1
+
         # Check for testing stuff
         # Not currently being called as of 6/4/13
-        elif PBConstants.TEST_DEFENDER:
-            Strategies.sTestDefender(self, play)
-        elif PBConstants.TEST_OFFENDER:
-            Strategies.sTestOffender(self, play)
-        elif PBConstants.TEST_CHASER:
-            Strategies.sTestChaser(self, play)
+        # Broken from playbook overhaul 6/17/13
+        #elif PBConstants.TEST_DEFENDER:
+        #    Strategies.sTestDefender(self, play)
+        #elif PBConstants.TEST_OFFENDER:
+        #    Strategies.sTestOffender(self, play)
+        #elif PBConstants.TEST_CHASER:
+        #    Strategies.sTestChaser(self, play)
 
         # Have a separate ready section to make things simpler
         elif (currentGCState == 'gameReady' or
@@ -160,7 +168,7 @@ class GoTeam:
 
         else:
             # Use the playbook table to determine position.
-            self.priorityPositions(self.tableLookup, play)
+            self.priorityPositions(self.tableLookup(self.lastBallX, self.lastBallY), play)
 
         # # Now we look at game strategies
         # elif self.numActiveFieldPlayers == 0:
@@ -174,32 +182,28 @@ class GoTeam:
         # elif self.numActiveFieldPlayers == 4:
         #     Strategies.sWin(self, play)
 
-    def tableLookup(self):
+    def tableLookup(self, ball_x, ball_y):
         """
         Given where we think the ball is on the field (from loc),
         use the playbook table to look up where we should position.
         @return: list of position tuples in order of priority.
         """
-        #Which grid entry is the ball in?
-        #TODO: add thresholding to avoid edge oscillation for the ball.
-        ball_x = int(ceil((self.brain.ball.x - NogginConstants.GREEN_PAD_X) / PBConstants.TABLE_GRID_SIZE))
-        ball_y = int(ceil((self.brain.ball.y - NogginConstants.GREEN_PAD_Y) / PBConstants.TABLE_GRID_SIZE))
-
-        # Currently, assuming x values are first in data structure
-        # TODO: verify this with wils
-        entry = self.table[ball_x][ball_y]
-        index = 0
+        entry = playbookTable[ball_x][ball_y]
+        offset = 0
         positions = []
 
-        if self.activeFieldPlayers == 3:
-            index = index + 3
-        elif self.activeFieldPlayers == 2:
-            index = index + 2
-        if !self.goalieIsActive:
-            index = index + 6
+        if len(self.activeFieldPlayers) == 3:
+            offset = 4
+        elif len(self.activeFieldPlayers) == 2:
+            offset = 7
+        elif len(self.activeFieldPlayers) == 1:
+            offset = 9
 
-        for i in range(self.activeFieldPlayers):
-            positions.append(entry[i])
+        for i in range(len(self.activeFieldPlayers)):
+            if self.goalieIsActive:
+                positions.append(entry[1][i+offset])
+            else:
+                positions.append(entry[0][i+offset])
 
         return positions
 
@@ -212,16 +216,21 @@ class GoTeam:
         # Find which active field player should go to each position
         firstPlayer = self.findClosestPlayer(locations[0])
         if firstPlayer == self.brain.playerNumber:
-            play.setRole(self.parseRoleChar(positions[0][3]))
+            play.setRole(positions[0][3])
             play.setPosition(locations[0])
         else:
             secondPlayer = self.findClosestPlayer(locations[1], [firstPlayer])
             if secondPlayer == self.brain.playerNumber:
-                play.setRole(self.parseRoleChar(positions[1][3]))
+                play.setRole(positions[1][3])
                 play.setPosition(locations[1])
             else:
-                play.setRole(self.parseRoleChar(positions[2][3]))
-                play.setPosition(locations[2])
+                thirdPlayer = self.findClosestPlayer(locations[2], [firstPlayer, secondPlayer])
+                if thirdPlayer == self.brain.playerNumber:
+                    play.setRole(positions[2][3])
+                    play.setPosition(locations[2])
+                else:
+                    play.setRole(positions[3][3])
+                    play.setPosition(locations[3])
 
     def mapPositionToRobotLocation(self, position):
         """
@@ -229,19 +238,6 @@ class GoTeam:
         @return: that position as a Robot Location
         """
         return RobotLocation(position[0], position[1], position[2])
-
-    def parseRoleChar(self, role):
-        """
-        @method: char 'd' -> defender
-                      'm' -> middie
-                      'o' -> offender
-        """
-        if role == 'd':
-            return PBConstants.DEFENDER
-        elif role == 'm':
-            return PBConstants.MIDDIE
-        elif role == 'o':
-            return PBConstants.OFFENDER
 
     def updateStateInfo(self, play):
         """
@@ -414,7 +410,7 @@ class GoTeam:
             return chosenPositions[self.me.playerNumber -1]
 
     #@param location: this is a RobotLocation
-    def findClosestPlayer(location, exceptNumbers = []):
+    def findClosestPlayer(self, location, exceptNumbers = []):
         """
         Using a simple model to determine time to reach the given location,
         find which active team player (not in exceptNumbers) has the
@@ -426,9 +422,9 @@ class GoTeam:
             if mate.playerNumber in exceptNumbers:
                 continue
 
-            time = mate.hackedDistTo(location) / PBConstants.WALKING_SPEED
-            #time += 20 * fallen_status
-            time += degrees((mate - location).h) / PBConstants.TURNING_RATE
+            time = mate.determineTimeToDest(RobotLocation(mate.x,
+                                                          mate.y,
+                                                          mate.h).relativeRobotLocationOf(location))
 
             if time < minimumTime:
                 minimumTime = time
@@ -589,6 +585,7 @@ class GoTeam:
         if self.goalieChaserCount > PBConstants.GOALIE_CHASER_COUNT_THRESH:
             return not self.brain.player.inKickingState
 
+    # Not used as of 6/17/13
     def defenderShouldChase(self):
         ballX = self.brain.ball.rel_x
         goalie = self.brain.teamMembers[0]
