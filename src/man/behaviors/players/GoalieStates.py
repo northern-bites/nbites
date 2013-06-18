@@ -59,6 +59,9 @@ def gameSet(player):
         # The ball will be right in front of us, for sure
         player.brain.tracker.lookToAngle(0)
 
+    # The goalie always gets manually positioned, so reset loc to there.
+    player.brain.resetGoalieLocalization()
+
     # Wait until the sensors are calibrated before moving.
     if (not player.brain.motion.calibrated):
         return player.stay()
