@@ -135,10 +135,16 @@ goToPosition.bookingIt = False
 def dodge(nav):
     if nav.firstFrame():
         ## SET UP the dodge direction based on where the obstacle is
-        # if directly in front of us, move back and *randomly* to one side
+        # if directly in front of us, move back and to one side based on
+        # where the goToPosition dest is
         if dodge.position is dodge.position.NORTH:
             print "Dodging NORTH obstacle"
-            direction = random.choice([-1, 1])
+            relDest = helper.getRelativeDestination(nav.brain.loc,
+                                                    goToPosition.dest)
+            if relDest.relY <= 0:
+                direction = -1
+            else:
+                direction = 1
             dodgeDest = RelRobotLocation(-15, direction*10, 0)
         elif dodge.position is dodge.position.NORTHEAST:
             print "Dodging NORTHEAST obstacle"
@@ -149,10 +155,16 @@ def dodge(nav):
         elif dodge.position is dodge.position.SOUTHEAST:
             print "Dodging SOUTHEAST obstacle"
             dodgeDest = RelRobotLocation(0, 15, 0)
-        # if directly behind us, move forward and *randomly* to one side
+        # if directly behind us, move forward and to one side based on
+        # where the goToPosition dest is
         elif dodge.position is dodge.position.SOUTH:
             print "Dodging SOUTH obstacle"
-            direction = random.choice([-1, 1])
+            relDest = helper.getRelativeDestination(nav.brain.loc,
+                                                    goToPosition.dest)
+            if relDest.relY <= 0:
+                direction = -1
+            else:
+                direction = 1
             dodgeDest = RelRobotLocation(15, direction*10, 0)
         elif dodge.position is dodge.position.SOUTHWEST:
             print "Dodging SOUTHWEST obstacle"
