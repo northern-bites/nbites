@@ -29,26 +29,26 @@ bool VisionSystem::update(ParticleSet& particles,
     float lowestParticleError = 10000000.f;
     float sumParticleError = 0.f;
 
-    std::cout << "Num Lines: " << obsv.visual_line_size() << std::endl;
-
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);
 
         float curParticleError = 0;
         int numObsv = 0;
-        // for (int i=0; i<obsv.visual_corner_size(); i++)
-        // {
-        //     if(obsv.visual_corner(i).visual_detection().distance() > 0.f) {
-        //         madeObsv = true;
+        for (int i=0; i<obsv.visual_corner_size(); i++)
+        {
+            if((obsv.visual_corner(i).visual_detection().distance() > 0.f) &&
+               (obsv.visual_corner(i).visual_detection().distance() < 400.f)) {
+                madeObsv = true;
 
-        //         float newError = scoreFromVisDetect(*particle,
-        //                                             obsv.visual_corner(i).visual_detection());
-        //         curParticleError+= newError;
-        //         numObsv++;
+                float newError = scoreFromVisDetect(*particle,
+                                                    obsv.visual_corner(i).visual_detection());
+//                std::cout << "Corner Error:\t" << newError << std::endl;
+                curParticleError+= newError;
+                numObsv++;
 
-        //     }
-        // }
+            }
+        }
 
         for (int i=0; i<obsv.visual_line_size(); i++) {
             if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
@@ -58,37 +58,45 @@ bool VisionSystem::update(ParticleSet& particles,
                 // Limit by line length (be safe about center circle mistake lines)
                 if (obsvLine.length() > 100.f) {
                     madeObsv = true;
-                    curParticleError += lineSystem->scoreObservation(obsvLine);
+                    float newError = lineSystem->scoreObservation(obsvLine);
+//                    std::cout << "Line Error:\t" << newError << std::endl;
+                    curParticleError += newError;
                     numObsv++;
                 }
             }
         }
 
-        // if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
-        //     && (obsv.goal_post_l().visual_detection().distance() > 0.f)) {
-        //     madeObsv = true;
-        //     float newError = scoreFromVisDetect(*particle,
-        //                                         obsv.goal_post_l().visual_detection());
-        //     curParticleError+= newError;
-        //     numObsv++;
-        // }
+        if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
+            && (obsv.goal_post_l().visual_detection().distance() > 0.f)
+            && (obsv.goal_post_l().visual_detection().distance() < 480.f)) {
+            madeObsv = true;
+            float newError = scoreFromVisDetect(*particle,
+                                                obsv.goal_post_l().visual_detection());
+//            std::cout << "Goalpost Error:\t" << newError << std::endl;
+            curParticleError+= newError;
+            numObsv++;
+        }
 
-        // if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
-        //     && (obsv.goal_post_r().visual_detection().distance() > 0.f)) {
-        //     madeObsv = true;
-        //     float newError = scoreFromVisDetect(*particle,
-        //                                         obsv.goal_post_r().visual_detection());
-        //     curParticleError+= newError;
-        //     numObsv++;
-        // }
+        if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
+            && (obsv.goal_post_r().visual_detection().distance() > 0.f)
+            && (obsv.goal_post_r().visual_detection().distance() < 480.f)) {
+            madeObsv = true;
+            float newError = scoreFromVisDetect(*particle,
+                                                obsv.goal_post_r().visual_detection());
+//            std::cout << "Goalpost Error:\t" << newError << std::endl;
+            curParticleError+= newError;
+            numObsv++;
+        }
 
-        // if (obsv.visual_cross().distance() > 0.f) {
-        //     madeObsv = true;
-        //     float newError = scoreFromVisDetect(*particle,
-        //                                         obsv.visual_cross());
-        //     curParticleError+= newError;
-        //     numObsv++;
-        // }
+        if ((obsv.visual_cross().distance() > 0.f)
+            && (obsv.visual_cross().distance() < 400.f)) {
+            madeObsv = true;
+            float newError = scoreFromVisDetect(*particle,
+                                                obsv.visual_cross());
+//            std::cout << "Cross Error:\t" << newError << std::endl;
+            curParticleError+= newError;
+            numObsv++;
+        }
 
         // We never updated the new particle weight, so no observations been made
         if(!madeObsv)

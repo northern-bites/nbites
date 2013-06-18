@@ -54,14 +54,11 @@ ParticleFilter::~ParticleFilter()
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::VisionField& visionInput)
 {
-    std::cout << "Update Loc" << std::endl;
     motionSystem->update(particles, odometryInput, nearMidField());
 
     // Update the Vision Model
     // set updated vision to determine if resampling necessary
-    std::cout << "Update vision system" << std::endl;
     updatedVision = visionSystem->update(particles, visionInput);
-    std::cout << "Update vision system complete" << std::endl;
 
     // Resample if vision update
     if(updatedVision)
@@ -350,7 +347,7 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    if (lost && (errorMagnitude > LOST_THRESHOLD) && visionSystem->getLastNumObsv() > 1)
+    if (lost && (errorMagnitude > LOST_THRESHOLD)&& visionSystem->getLastNumObsv() > 3)
     {
         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
         std::list<ReconstructedLocation>::const_iterator recLocIt;

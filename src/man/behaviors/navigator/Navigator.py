@@ -121,7 +121,7 @@ class Navigator(FSA.FSA):
         """
         Calls goTo on the playbook position
         """
-        self.goTo(self.brain.play.getPositionCoord(), precision = GENERAL_AREA,
+        self.goTo(self.brain.play.getPositionCoord(), precision = PRECISELY,
                   speed = QUICK_SPEED, avoidObstacles = True, fast = True, pb = True)
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):
