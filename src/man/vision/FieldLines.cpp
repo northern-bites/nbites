@@ -2608,6 +2608,7 @@ const bool FieldLines::isAngleOnFieldOkay(boost::shared_ptr<VisualLine> i,
 {
     const float angleOnField = Utility::getGroundAngle(*i, *j);
 	// BAD_ANGLE signifies the angle could not be computed
+	cout << "Angle is " << angleOnField << endl;
 	if (angleOnField != BAD_ANGLE &&
 		(angleOnField < MIN_ANGLE_ON_FIELD ||
 		 angleOnField > MAX_ANGLE_ON_FIELD)) {
@@ -4158,7 +4159,7 @@ const float FieldLines::percentSurrounding(const int x, const int y,
             // acceptable colors
 			if (Utility::colorsEqual(color, vision->thresh->getThresholded(j,i))) {
 				++numFound;
-				break;
+				//break;
             }
         }
     }
