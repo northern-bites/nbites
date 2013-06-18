@@ -1495,8 +1495,8 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // sets focal distance of the field object
         estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
-                                              objPtr->getY() + objPtr->getHeight(),
-                                              270.0f);
+                                              objPtr->getCenterY(),
+                                              270);
 
         objPtr->setDistanceWithSD(pose_est.dist);
         objPtr->setBearingWithSD(pose_est.bearing);
