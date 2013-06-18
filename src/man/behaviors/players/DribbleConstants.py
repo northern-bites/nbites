@@ -7,7 +7,7 @@ BALL_OFF_THRESH = 30
 # Ball distance thresholds.
 BALL_CLOSE_DISTANCE = 35.0
 BALL_FAR_AWAY = BALL_CLOSE_DISTANCE + 25.0
-BALL_TOO_FAR_TO_SIDE = 10
+BALL_TOO_FAR_TO_SIDE = 15
 BALL_MOVED_THR = 3
 
 # Bearings towards goal and ball thresholds.

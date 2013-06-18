@@ -7,7 +7,7 @@ def shouldDribble(player):
     """
     We should be in the dribble FSA.
     """
-    return (facingGoal(player) and betweenCrosses(player) and timeLeft(player) 
+    return (facingGoal(player) and positionedForDribble(player) and timeLeft(player) 
             and not ballGotFarAway(player) and not ballLost(player))
 
 # def crowded(player):
@@ -28,6 +28,12 @@ def centerLaneOpen(player):
     return (player.brain.interface.visionObstacle.mid_dist > 
             constants.OPEN_LANE_DIST or 
             player.brain.interface.visionObstacle.block_mid == 0) 
+
+def positionedForDribble(player):
+    """
+    We are either between the two field crosses or in the opponents' goal box.
+    """
+    return betweenCrosses(player) or ballInGoalBox(player)
 
 def betweenCrosses(player):
     """
@@ -64,6 +70,9 @@ def dribbleGoneBad(player):
     """
     We have dribbled the ball too far to the left or right.
     """
+    print "Dribble gone bad?" 
+    print (abs(player.brain.ball.y - player.brain.loc.y) > 
+            constants.BALL_TOO_FAR_TO_SIDE)
     return (abs(player.brain.ball.y - player.brain.loc.y) > 
             constants.BALL_TOO_FAR_TO_SIDE)
 
@@ -105,7 +114,7 @@ def ballInGoalBox(player):
     The ball is in the goal box (between the posts actually), so we can 
     dribble it in.
     """
-    return (player.brain.ball.x > nogginConstants.FIELD_WIDTH - 
+    return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH - 
             nogginConstants.GOALBOX_DEPTH and
             player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
             player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)

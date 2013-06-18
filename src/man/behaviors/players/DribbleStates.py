@@ -13,18 +13,19 @@ from objects import RelRobotLocation, Location
 # results in us running through the ball. (There is no actual dribble sweet
 # move.) If vision sees a crowded area in front of us, we rotate around the 
 # ball and dribble again when we see a clear path. We only dribble if these 
-# conditions are true: 1. We are between the two field crosses. 2. We are 
-# facing our opponents' goal. 3. We can see the ball close to us.
+# conditions are true: 1. We are positioned according to positionedForDribble. 
+# 2. We are facing our opponents' goal. 3. We can see the ball close to us.
 
 ### TODO
-# dribble for the score if close enough to goal
 # dribbleGoneBad needs tuning
-# rotate towards goal when dribbling
 # test time-left based decision making
+# goalie detection
+# rotate towards goal when dribbling
 # choose direction better, based on loc and heatmap?
 # frame counter rotatation?
 
 ### DONE
+# dribble for the score if close enough to goal
 # get rid of 'dribble' state, reorganize FSA
 # cross to cross dribbling
 # time-left based decision making
