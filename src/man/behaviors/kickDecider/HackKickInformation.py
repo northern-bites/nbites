@@ -265,16 +265,15 @@ class KickInformation:
                 print ("Acceptable bearing range for kick: " + str(bearingLimitLeft/2) +
                        "/" + str(bearingLimitRight/2))
 
-            if bearingForKick < 35 and bearingForKick > -35:
-                # "choose straight kick!"
+            if bearingForKick < 45 and bearingForKick > -45:
+                #choose straight kick!
                 kick = self.chooseQuickFrontKick()
                 kick.h = 0 - bearingForKick
-
-            elif bearingForKick > 35: #and bearingForKick < 125:
+            elif bearingForKick > 45: #and bearingForKick < 125:
                 #choose a right side kick! (using right foot)
                 kick = kicks.RIGHT_SIDE_KICK
                 kick.h = 70 - bearingForKick
-            elif bearingForKick < -35: #and bearingForKick > -125:
+            elif bearingForKick < -45: #and bearingForKick > -125:
                 #choose a left side kick! (using left foot)
                 kick = kicks.LEFT_SIDE_KICK
                 kick.h = -70 - bearingForKick

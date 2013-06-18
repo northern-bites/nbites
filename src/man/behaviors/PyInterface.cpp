@@ -39,10 +39,6 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::visionField_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("visionObstacle",
-                      make_getter(&PyInterface::visionObstacle_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
         .add_property("filteredBall",
                       make_getter(&PyInterface::filteredBall_ptr,
                                   return_value_policy
@@ -72,14 +68,6 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::odometry_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("sonarState",
-                      make_getter(&PyInterface::sonarState_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
-        .add_property("footBumperState",
-                      make_getter(&PyInterface::footBumperState_ptr,
-                                  return_value_policy
-                                  <reference_existing_object>()))
         .add_property("joints",
                       make_getter(&PyInterface::joints_ptr,
                                   return_value_policy
@@ -100,8 +88,12 @@ BOOST_PYTHON_MODULE(interface)
                       make_getter(&PyInterface::stiffStatus_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
-        .add_property("armContactState",
-                      make_getter(&PyInterface::armContactState_ptr,
+        .add_property("obstacle",
+                      make_getter(&PyInterface::obstacle_ptr,
+                                  return_value_policy
+                                  <reference_existing_object>()))
+        .add_property("visionObstacle",
+                      make_getter(&PyInterface::visionObstacle_ptr,
                                   return_value_policy
                                   <reference_existing_object>()))
         ;
