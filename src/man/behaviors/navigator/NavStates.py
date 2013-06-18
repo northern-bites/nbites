@@ -5,7 +5,6 @@ from collections import deque
 from objects import RobotLocation, RelRobotLocation
 from ..util import Transition
 from math import fabs
-import random
 
 def scriptedMove(nav):
     '''State that we stay in while doing sweet moves'''
