@@ -51,6 +51,7 @@ def gameSet(player):
         player.inKickingState = False
         player.brain.fallController.enabled = False
         player.gameState = player.currentState
+        player.returningFromPenalty = False
         player.penaltyKicking = False
         player.stand()
         player.brain.interface.motionRequest.reset_odometry = True
