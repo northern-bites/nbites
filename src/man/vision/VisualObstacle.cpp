@@ -4,7 +4,7 @@ using namespace std;
 namespace man {
 namespace vision {
 
-VisualObstacle::VisualObstacle() 
+VisualObstacle::VisualObstacle()
 {
   init();
 }

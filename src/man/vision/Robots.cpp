@@ -32,7 +32,7 @@ namespace man {
 namespace vision {
 
 #ifdef OFFLINE
-static const bool ROBOTSDEBUG = false;
+static const bool ROBOTSDEBUG = true;
 #else
 static const bool ROBOTSDEBUG = false;
 #endif

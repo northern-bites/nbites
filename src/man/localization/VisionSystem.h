@@ -10,7 +10,9 @@
 
 #include "SensorModel.h"
 #include "NBMath.h"
+#include "LineSystem.h"
 
+#include "LocStructs.h"
 #include "FieldConstants.h"
 
 #include <vector>
@@ -23,6 +25,8 @@ namespace man
 {
 namespace localization
 {
+
+static const float MIN_LINE_LENGTH = 100.f;
 
 /**
  * @class Vision System
@@ -41,6 +45,10 @@ public:
 
     float scoreFromVisDetect(const Particle& particle,
                              const messages::VisualDetection& obsv);
+
+    static Line prepareVisualLine(const Particle& particle,
+                           const messages::VisualLine& visualLine);
+
     void setUpdated(bool val);
     float getLowestError(){return currentLowestError;};
     float getAvgError(){return avgError;};
@@ -60,6 +68,8 @@ private:
 
     void opitmizeReconstructions();
 
+private:
+    LineSystem* lineSystem;
     std::list<ReconstructedLocation> reconstructedLocations;
     float avgError;
     float weightedAvgError;
