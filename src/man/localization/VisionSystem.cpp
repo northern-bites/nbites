@@ -228,9 +228,9 @@ Line VisionSystem::prepareVisualLine(const Particle& particle,
             end.x = newEnd.x;
             end.y = newEnd.y;
         }
-        else {
-            std::cout << "There is a bug in line localization\n\n" << std::endl;
-        }
+        // else {
+        //     std::cout << "There is a bug in line localization\n\n" << std::endl;
+        // }
     }
 
     return Line(start,end);
