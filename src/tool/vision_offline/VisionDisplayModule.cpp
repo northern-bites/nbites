@@ -242,27 +242,35 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 
 		const messages::Robot red1 = visRobots->red1();
 		const messages::Robot navy1 = visRobots->navy1();
+		const messages::Robot red2 = visRobots->red2();
+		const messages::Robot navy2 = visRobots->navy2();
 
 		painter.setPen(QColor(0,0,0));
 		painter.setBrush(QBrush(QColor(0, 0, 255, 0), Qt::SolidPattern));
-		painter.setPen(QPen(QColor(0,255,0,200), 1, Qt::SolidLine, Qt::FlatCap));
-		painter.setBrush(QBrush(QColor(0,255,0,80), Qt::SolidPattern));
-		if (red1.distance() > 0) {
-            // painter.drawLine(red1.x() + 10, red1.y() + 10, red1.x(), red1.y());
-            // painter.drawLine(red1.x(), red1.y() + 10, red1.x() + 10, red1.y());
+		painter.setPen(QPen(QColor(255,0,0,200), 1, Qt::SolidLine, Qt::FlatCap));
+		painter.setBrush(QBrush(QColor(255,0,0,80), Qt::SolidPattern));
+		if (red1.on()) {
 			QPoint r_points[4] = {
 				QPoint(red1.x(), red1.y()),
 				QPoint(red1.x()+red1.width(), red1.y()),
 				QPoint(red1.x()+red1.width(), red1.y()+red1.height()),
 				QPoint(red1.x(), red1.y()+red1.height())
+			};
+			painter.drawConvexPolygon(r_points, 4);
+			if (red2.on()) {
+				QPoint r_points[4] = {
+					QPoint(red2.x(), red2.y()),
+					QPoint(red2.x()+red2.width(), red2.y()),
+					QPoint(red2.x()+red2.width(), red2.y()+red2.height()),
+					QPoint(red2.x(), red2.y()+red2.height())
 				};
 				painter.drawConvexPolygon(r_points, 4);
+			}
 		}
+		painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
 		painter.setBrush(QBrush(QColor(255, 0, 0, 0), Qt::SolidPattern));
-		painter.setBrush(QBrush(QColor(255,0,0,80), Qt::SolidPattern));
+		painter.setBrush(QBrush(QColor(0,0,255,80), Qt::SolidPattern));
 		if (navy1.on()) {
-            painter.drawLine(navy1.x() + 10, navy1.y() + 10, navy1.x(), navy1.y());
-            painter.drawLine(navy1.x(), navy1.y() + 10, navy1.x() + 10, navy1.y());
 			QPoint r_points[4] = {
 				QPoint(navy1.x(), navy1.y()),
 				QPoint(navy1.x()+navy1.width(), navy1.y()),
@@ -270,6 +278,15 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 				QPoint(navy1.x(), navy1.y()+navy1.height())
 			};
 			painter.drawConvexPolygon(r_points, 4);
+			if (navy2.on()) {
+				QPoint r_points[4] = {
+					QPoint(navy2.x(), navy2.y()),
+					QPoint(navy2.x()+navy2.width(), navy2.y()),
+					QPoint(navy2.x()+navy2.width(), navy2.y()+navy2.height()),
+					QPoint(navy2.x(), navy2.y()+navy2.height())
+				};
+				painter.drawConvexPolygon(r_points, 4);
+			}
 		}
 
 		const messages::VisualGoalPost yglp = visField->goal_post_l();
