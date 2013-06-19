@@ -285,21 +285,39 @@ struct Line {
         Point startProj = closestPointTo(obsv.start);
         float obsvLength = 0.f;
 
-        // see if end fits on line segment
-        if(startProj.x < obsv.end.x)
+        // Need to explain more
+        float obsvEndToStartProj = obsv.end.y - startProj.y;
+        if (((slope<0) && (obsvEndToStartProj<0)) || ((slope<0) && (obsvEndToStartProj > 0))
+            || ((slope == 0.f) && (obsvEndToStartProj > 0))) {
             obsvLength = std::fabs(obsv.length());
-        else if (startProj.x > obsv.end.x)
-            obsvLength = -std::fabs(obsv.length());
+            std::cout << "obsv length  " << obsvLength << std::endl;
+        }
         else {
-            LineErrorMatch shit;
-            shit.error = 1000000.f;
-            shit.startMatch = obsv.start;
-            shit.endMatch   = obsv.end;
-            return shit;
+            obsvLength = -std::fabs(obsv.length());
+            std::cout << "obsv length  " << obsvLength << std::endl;
         }
 
-        std::cout << "Projection:  " << startProj.x << " " << startProj.y << std::endl;
-        std::cout << "Length: " << obsvLength << std::endl;
+
+        // see if end fits on line segment
+        if (vert) {
+            if ( obsv.end.y > startProj.y )
+                obsvLength = std::fabs(obsv.length());
+            else
+                obsvLength = -std::fabs(obsv.length());
+        }
+        else {
+            if(obsv.end.x < startProj.x)
+                obsvLength = std::fabs(obsv.length());
+            else if (startProj.x > obsv.end.x)
+                obsvLength = -std::fabs(obsv.length());
+            else {
+                LineErrorMatch shit;
+                shit.error = 1000000.f;
+                shit.startMatch = obsv.start;
+                shit.endMatch   = obsv.end;
+                return shit;
+            }
+        }
 
         Point endProj = shiftDownLine(startProj, obsvLength);
 
@@ -308,7 +326,6 @@ struct Line {
             startProj = shiftDownLine (endProj, -obsvLength);
 
             if (!containsPoint(startProj)) {
-                std::cout << "fucker" << std::endl;
                 // Failed to match obsv to this line (obsv too long)
                 LineErrorMatch shit;
                 shit.error = 1000000.f;
@@ -343,8 +360,6 @@ struct Line {
             l3 = intersect.distanceTo(obsv.end);
             float area2 = NBMath::calcTriangleArea(l1, l2, l3);
 
-            std::cout << "int areas: " << area1 << "  " << area2 << std::endl;
-
             // Return in units cm, not cm^2
             float error = std::sqrt((area1 + area2));
             //float error = (area1 + area2)/length();
@@ -366,8 +381,6 @@ struct Line {
             l2 = endProj.distanceTo(startProj);
             l3 = startProj.distanceTo(obsv.end);
             float area2 = NBMath::calcTriangleArea(l1, l2, l3);
-
-            std::cout << "areas: " << area1 << "  " << area2 << std::endl;
 
             // Return in units cm, not cm^2
             float error = std::sqrt((area1 + area2));
