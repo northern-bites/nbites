@@ -132,6 +132,11 @@ struct RingBuffer
 struct Point {
     float x,y;
 
+    Point() {
+        x = 0.f;
+        y = 0.f;
+    }
+
     Point(float x_, float y_)
     {
         x = x_;
@@ -141,6 +146,12 @@ struct Point {
     float distanceTo(Point p) {
         return std::sqrt((p.x-x)*(p.x-x) + (p.y-y)*(p.y-y));
     }
+};
+
+struct LineErrorMatch {
+    float error;
+    Point startMatch;
+    Point endMatch;
 };
 
 struct Line {
@@ -170,11 +181,41 @@ struct Line {
 
     Point midpoint() {
         Point midpoint = shiftDownLine(start, length()/2.f);
-        if (!contains(midpoint))
+        if (!containsPoint(midpoint))
             midpoint =   shiftDownLine(start,-length()/2.f);
-        if (!contains(midpoint))
+        if (!containsPoint(midpoint))
             std::cout << "Massive Precision Error in Line Struct" << std::endl;
         return midpoint;
+    }
+
+
+    Point intersect(Line l) {
+        // Determine if parallel
+        float intX, intY;
+
+        if (l.slope == slope)
+            return Point(-1000000.f, -1000000.f); // return crazy value to reject intersect
+         // is one vertical?
+        else if(l.vert) {
+            //intersect at x = l.start.x
+            intX = l.start.x;
+            intY = slope*(intX - start.x) + start.y;
+        } // the other?
+        else if(vert) {
+            intX = start.x;
+            intY = l.slope*(intX - l.start.x) + l.start.y;
+        }
+        else { // no special case, so just intersect them
+            intX = ((slope*start.x)-(l.start.x*l.slope)+(l.start.y - start.y))/(slope-l.slope);
+            intY = slope*(intX - start.x) + l.start.y;
+        }
+
+        //Sanity check on both lines
+        Point intersection(intX, intY);
+        if (l.containsPoint(intersection) && containsPoint(intersection))
+            return intersection;
+        else
+            return Point(-1000000.f, -1000000.f);// return crazy value to reject intersect
     }
 
     bool containsPoint(Point p)
@@ -248,23 +289,41 @@ struct Line {
         return closest;
     }
 
-    float getError(Line obsv) {
+    LineErrorMatch getError(Line obsv) {
+//        std::cout << "\nGet Error" << std::endl;
         // New Strategy: project midpoint onto line and shift both ways equal to half length
         Point midpoint = obsv.midpoint();
-        Point midpointProj = closestPoint(midpoint);
+//        std::cout << "obsv midpoint on line " << obsv.containsPoint(midpoint) << std::endl;
 
-        Point startProj = shiftDownLine(midpoint,  obsv.length()/2);
-        Point endProj   = shiftDownLine(midpoint, -obsv.length()/2);
+        Point midpointProj = closestPointTo(midpoint);
+//        std::cout << "midpoint proj on this " << containsPoint(midpointProj) << std::endl;
+
+        Point startProj = shiftDownLine(midpointProj,  obsv.length()/2);
+        Point endProj   = shiftDownLine(midpointProj, -obsv.length()/2);
+//        std::cout << "startProj on line " << containsPoint(startProj) << std::endl;
+//        std::cout << "endProj on line " << containsPoint(endProj) << std::endl;
 
         // ensure projections are close to the points they're 'projected' from
         if (startProj.distanceTo(obsv.end) < startProj.distanceTo(obsv.start)) {
-            startProj = shiftDownLine(midpoint, -obsv.length()/2);
-            endProj   = shiftDownLine(midpoint,  obsv.length()/2);
+            startProj = shiftDownLine(midpointProj, -obsv.length()/2);
+            endProj   = shiftDownLine(midpointProj,  obsv.length()/2);
         }
 
         // if both arent on line, then return massive error (doesnt fit on line)
-        if(!containsPoint(startProj) && !containsPoint(endProj))
-            return 100000.f;
+        if((!containsPoint(startProj)) && (!containsPoint(endProj))) {
+
+//            std::cout << "start proj " << startProj.x << " " << startProj.y << std::endl;
+//            std::cout << "end proj " << endProj.x << " " << endProj.y << std::endl;
+            Line tooBig(startProj,endProj);
+//            std::cout << "Segment projected length " << tooBig.length() << std::endl;
+
+//            std::cout << "Doesnt fit on line" << std::endl;
+            LineErrorMatch shit;
+            shit.error = 1000000.f;
+            shit.startMatch = obsv.start;
+            shit.endMatch   = obsv.end;
+            return shit;
+        }
 
         // if one isnt on line, shift the whole thing down
         if( !containsPoint(startProj) ) {
@@ -284,57 +343,78 @@ struct Line {
         }
 
         // if one is still not on line then return massive error
-        if(!containsPoint(startProj) || !containsPoint(endProj))
-            return 100000.f;
-
-
-
-        //               if both on line check for intersection before computing errors
-
-
-
-
-        // project obsv start onto current line
-        Point startProj = closestPointTo(obsv.start);
-        float obsvLength = 0.f;
-
-        // see if end fits on line segment
-        if(obsv.start.x < obsv.end.x)
-            obsvLength = std::fabs(obsv.length());
-        else if (obsv.start.x > obsv.end.x)
-            obsvLength = -std::fabs(obsv.length());
-        else
-            return 1000000.f;
-
-        Point endProj = shiftDownLine(startProj, obsvLength);
-
-        if (!containsPoint(endProj)) {
-            endProj   = closestPointTo(obsv.end);
-            startProj = shiftDownLine (endProj, -obsvLength);
-
-            if (!containsPoint(startProj)) {
-                // Failed to match obsv to this line (obsv too long)
-                return 1000000.f;
-            }
+        if(!containsPoint(startProj) || !containsPoint(endProj)) {
+            LineErrorMatch shit;
+            shit.error = 1000000.f;
+            shit.startMatch = obsv.start;
+            shit.endMatch   = obsv.end;
+            return shit;
         }
 
         // matched segment onto this line, calculate area of given polygon
         // split into two trianges: obsvstart, start Proj, obsvend and
         //                          obsvEnd, endProj, startProj
-        // get side lengths of first triangle
-        float l1 = obsv.start.distanceTo     (startProj);
-        float l2 = startProj.distanceTo(obsv.end);
-        float l3 = obsv.end.distanceTo (obsv.start);
-        float area1 = NBMath::calcTriangleArea(l1, l2, l3);
+        // UNLESS the lines intersect, in which case the triangles are:
+        //                          obsvStart, startProj, intersect
+        //                          obsvEnd, endProj, intersect
 
-        // get side lengths of second triangle
-        l1 = obsv.end.distanceTo(endProj);
-        l2 = endProj.distanceTo(startProj);
-        l3 = startProj.distanceTo(obsv.end);
-        float area2 = NBMath::calcTriangleArea(l1, l2, l3);
+        Line segmentMatched(startProj, endProj);
 
-        // Return in units cm, not cm^2
-        return std::sqrt(area1 + area2);
+        // std::cout << "Segment Matched " << segmentMatched.start.x << " " << segmentMatched.start.y << " "
+        //           << segmentMatched.end.x << " " << segmentMatched.end.y << std::endl;
+
+        // std::cout << "Obsv " << obsv.start.x << " " << obsv.start.y << " "
+        //           << obsv.end.x << " " << obsv.end.y << std::endl;
+
+        Point intersect = segmentMatched.intersect(obsv);
+
+        if (obsv.containsPoint(intersect) && containsPoint(intersect))
+        {
+            // obsv segment and matching segment intersect, so triangles are
+            //                          obsvStart, startProj, intersect
+            //                          obsvEnd, endProj, intersect
+
+            float l1 = obsv.start.distanceTo(startProj);
+            float l2 = startProj.distanceTo (intersect);
+            float l3 = intersect.distanceTo (obsv.start);
+            float area1 = NBMath::calcTriangleArea(l1, l2, l3);
+
+            l1 = obsv.end.distanceTo (endProj);
+            l2 = endProj.distanceTo  (intersect);
+            l3 = intersect.distanceTo(obsv.end);
+            float area2 = NBMath::calcTriangleArea(l1, l2, l3);
+
+            // Return in units cm, not cm^2
+            float error = std::sqrt((area1 + area2));
+            //float error = (area1 + area2)/length();
+            LineErrorMatch errorMatch;
+            errorMatch.error = error;
+            errorMatch.startMatch = startProj;
+            errorMatch.endMatch   = endProj;
+            return errorMatch;
+        }
+        else {
+            // get side lengths of first triangle
+            float l1 = obsv.start.distanceTo(startProj);
+            float l2 = startProj.distanceTo (obsv.end);
+            float l3 = obsv.end.distanceTo  (obsv.start);
+            float area1 = NBMath::calcTriangleArea(l1, l2, l3);
+
+            // get side lengths of second triangle
+            l1 = obsv.end.distanceTo(endProj);
+            l2 = endProj.distanceTo(startProj);
+            l3 = startProj.distanceTo(obsv.end);
+            float area2 = NBMath::calcTriangleArea(l1, l2, l3);
+
+            // Return in units cm, not cm^2
+            float error = std::sqrt((area1 + area2));
+            //float error = (area1 + area2)/length();
+            LineErrorMatch errorMatch;
+            errorMatch.error = error;
+            errorMatch.startMatch = startProj;
+            errorMatch.endMatch   = endProj;
+            return errorMatch;
+        }
     }
 
 
@@ -348,7 +428,7 @@ struct Line {
         // Shift in x is dist*cos((tan^-1(slope))
         // Calculated w/o trig w/ identities #wolfram
         if (vert) {
-            Point vertShift(initial.x, initial.y + dist);
+            Point vertShift(initial.x, initial.y - dist);
             return vertShift;
         }
 
@@ -361,6 +441,8 @@ struct Line {
         }
     }
 };
+
+
 
 } // namespace localization
 } // namespace man

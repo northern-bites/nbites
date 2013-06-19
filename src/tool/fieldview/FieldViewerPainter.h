@@ -14,6 +14,7 @@
 
 #include "localization/VisionSystem.h" //keep up to date with how lines are segmented
 #include "localization/Particle.h"
+#include "localization/LineSystem.h"
 
 #include "FieldConstants.h"
 
@@ -88,6 +89,8 @@ private:
     messages::VisionField curObsv;
     messages::RobotLocation curOffline;
     messages::ParticleSwarm curOfflineSwarm;
+
+    man::localization::LineSystem* lineSystem;
 };
 
 } // namespace viewer
