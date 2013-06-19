@@ -191,11 +191,14 @@ class Brain(object):
         output.ball_bearing_uncert = 0
 
         output.chase_time = self.teamMembers[self.playerNumber-1].chaseTime
+        output.defender_time = self.teamMembers[self.playerNumber-1].defenderTime
+        output.offender_time = self.teamMembers[self.playerNumber-1].offenderTime
+        output.middie_time = self.teamMembers[self.playerNumber-1].middieTime
 
         output.role = self.teamMembers[self.playerNumber-1].role
-        output.sub_role = self.teamMembers[self.playerNumber-1].subRole
 
         output.active = self.teamMembers[self.playerNumber-1].active
+        output.in_kicking_state = self.player.inKickingState
 
     def getCommUpdate(self):
         self.game = self.interface.gameState
@@ -212,6 +215,11 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.ball = self.interface.filteredBall
+        if (self.player.gameState == 'gameReady'
+            or self.player.gameState == 'gameSet'):
+            self.ball.x = Constants.CENTER_FIELD_X
+            self.ball.y = Constants.CENTER_FIELD_Y
+
         self.yglp = self.interface.visionField.goal_post_l.visual_detection
         self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 

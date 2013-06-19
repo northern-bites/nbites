@@ -107,7 +107,7 @@ def prepareForKick(player):
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
- 
+
     # if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
     #     dr_trans.facingGoal(player)):
     #     return player.goNow('dribble')
@@ -276,7 +276,6 @@ def positionForKick(player):
 
     #only enque the new goTo destination once
     if player.firstFrame():
-        player.ballBeforeApproach = player.brain.ball
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
         #TODO: try getting rid of ADAPTIVE here, if ball estimates are good,
@@ -297,6 +296,7 @@ def positionForKick(player):
         player.brain.nav.isAtPosition()):
         print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.brain.nav.stand()
+        player.ballBeforeApproach = player.brain.ball
         return player.goNow('kickBallExecute')
 
     return player.stay()

@@ -21,9 +21,12 @@ message WorldModel
     optional float ball_bearing_uncert = 12;
 
     optional float chase_time = 13;
+    optional float defender_time = 14;
+    optional float offender_time = 15;
+    optional float middie_time = 16;
 
-    optional int32 role = 14;
-    optional int32 sub_role = 15;
+    optional int32 role = 17;
+    optional bool  in_kicking_state = 18;
 
-    optional bool  active = 16;
+    optional bool  active = 19;
 }

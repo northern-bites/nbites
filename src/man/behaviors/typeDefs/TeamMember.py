@@ -38,14 +38,15 @@ class TeamMember(RobotLocation):
         self.ballBearing = 0
         self.ballOn = False
         self.role = None
-        self.subRole = None
         self.chaseTime = 0
+        self.defenderTime = 0
+        self.offenderTime = 0
+        self.middieTime = 0
+        self.inKickingState = False
 
         #other info we want stored
         self.brain = tbrain # brain instance
         self.active = True
-        self.grabbing = False
-        self.dribbling = False
 
     # @param info: an instance of a WorldModel protobuf
     def update(self, info):
@@ -59,21 +60,15 @@ class TeamMember(RobotLocation):
         self.ballDist = info.ball_dist
         self.ballBearing = info.ball_bearing
         self.role = info.role
-        self.subRole = info.sub_role
         self.chaseTime = info.chase_time
+        self.defenderTime = info.defender_time
+        self.offenderTime = info.offender_time
+        self.middieTime = info.middie_time
+        self.inKickingState = info.in_kicking_state
         self.active = info.active
 
         # calculates ball localization distance, bearing
         self.bearingToGoal = self.getBearingToGoal()
-        self.grabbing = (self.active and self.ballDist <=
-                         BALL_TEAMMATE_DIST_GRABBING) and \
-                         (fabs(self.ballBearing) <
-                          BALL_TEAMMATE_BEARING_GRABBING)
-
-        #potential problem when goalie is grabbing?
-        #only going to be dribbling or grabbing if you see the ball
-        self.dribbling = (self.active and self.ballDist <=
-                          BALL_TEAMMATE_DIST_DRIBBLING)
 
     def updateMe(self):
         """
@@ -89,18 +84,11 @@ class TeamMember(RobotLocation):
         self.ballDist = ball.distance
         self.ballBearing = ball.bearing_deg
         self.role = self.brain.play.role
-        self.subRole = self.brain.play.subRole
-        self.chaseTime = self.determineChaseTime()
+        if ( not self.brain.player.gameState == 'gameReady'):
+            self.chaseTime = self.determineChaseTime()
+        self.inKickingState = self.brain.player.inKickingState
 
         self.active = (not self.isPenalized())
-
-        self.dribbling = (self.active and self.ballDist <=
-                         BALL_TEAMMATE_DIST_DRIBBLING)
-
-        self.grabbing = (self.active and self.ballDist <=
-                         BALL_TEAMMATE_DIST_GRABBING) and \
-                         (fabs(self.ballBearing) <
-                          BALL_TEAMMATE_BEARING_GRABBING)
 
     def reset(self):
         '''Reset all important Teammate variables'''
@@ -111,10 +99,7 @@ class TeamMember(RobotLocation):
         self.ballDist = 0
         self.ballBearing = 0
         self.role = None
-        self.subRole = None
         self.active = False
-        self.grabbing = False
-        self.dribbling = False
 
     def getBearingToGoal(self):
         """returns bearing to goal"""
@@ -135,7 +120,7 @@ class TeamMember(RobotLocation):
         time = self.determineTimeToDest(relLocToBall)
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if (self.brain.ball.vis.frames_off > 30 and # TODO: unify this constant with shouldFindBall
+        if (self.brain.ball.vis.frames_off > 60 and # TODO: unify this constant with shouldFindBall
             not self.brain.player.inKickingState):
             time += BALL_OFF_PENALTY
 
@@ -147,7 +132,7 @@ class TeamMember(RobotLocation):
     def determineTimeToDest(self, dest):
         """
         Returns the approxiamte time in seconds to reach the given destination.
-        @param dest: a relRobotLocation.
+        @param dest: a RelRobotLocation.
         """
 
         time = (dest.dist / WALK_SPEED)
@@ -172,14 +157,8 @@ class TeamMember(RobotLocation):
 
         return time
 
-    def hasBall(self):
-        return self.grabbing
-
     def isTeammateRole(self, roleToTest):
         return (self.role == roleToTest)
-
-    def isTeammateSubRole(self, subRoleToTest):
-        return (self.subRole == subRoleToTest)
 
     def isDefaultGoalie(self):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)

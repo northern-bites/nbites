@@ -76,15 +76,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                 if roleState != self.currentState:
                     self.switchTo(roleState)
 
-        #Goalie Penalty Kicking
-        if (gcState == 'penaltyShotsGamePlaying'
-                 and self.play.isRole(PBConstants.GOALIE)):
-            self.penaltyKicking = True
-            roleState = self.getNextState()
-
-            if roleState != self.currentState:
-                self.switchTo(roleState)
-
         # takes our average fps over 1000 frames (without profiling)
         if COUNT_FPS:
             if self.counter == 0:

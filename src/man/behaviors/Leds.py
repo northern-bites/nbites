@@ -9,8 +9,6 @@ import GameController
 # brain.gameController, etc.                                      #
 ############################ IMPORTANT ############################
 
-NUM_LED_GROUPS = 31
-
 # LED Related #
 GC_LEDS = True
 FOOT_LEDS = True
@@ -26,6 +24,8 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
+NUM_LED_GROUPS = 30
+
 (LEFT_LOC_ONE_LED,
 LEFT_LOC_TWO_LED,
 LEFT_LOC_THREE_LED,
@@ -46,7 +46,6 @@ RIGHT_COMM_TWO_LED,
 RIGHT_COMM_THREE_LED,
 RIGHT_COMM_FOUR_LED,
 RIGHT_COMM_FIVE_LED,
-SUBROLE_LED,
 ROLE_LED,
 BALL_LED,
 LEFT_GOAL_LED,
@@ -83,19 +82,6 @@ MIDDIE_ON_LEDS =   ((ROLE_LED, CYAN, NOW),)
 DEFENDER_ON_LEDS = ((ROLE_LED, BLUE, NOW),)
 GOALIE_ON_LEDS =   ((ROLE_LED, PURPLE, NOW),)
 ROLE_OFF_LEDS =    ((ROLE_LED, OFF, NOW),)
-
-##### SubRoles #####
-AGGRESSIVE_LEDS = ((SUBROLE_LED, RED, NOW),)
-BOLD_LEDS =       ((SUBROLE_LED, EYE_YELLOW, NOW),)
-CAUTIOUS_LEDS =   ((SUBROLE_LED, GREEN, NOW),)
-GUARDED_LEDS =    ((SUBROLE_LED, BLUE, NOW),)
-
-GOALIE_CHASE_LEDS =  ((SUBROLE_LED, PURPLE, NOW),)
-GOALIE_CENTER_LEDS = ((SUBROLE_LED, BLUE, NOW),)
-GOALIE_LEFT_LEDS =   ((SUBROLE_LED, RED, NOW),)
-GOALIE_RIGHT_LEDS =  ((SUBROLE_LED, GREEN, NOW),)
-
-OTHER_SUBROLE_LEDS= ((SUBROLE_LED, OFF, NOW),)
 
 ##### GOAL ######
 LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, GREEN, NOW),)
@@ -253,49 +239,11 @@ class Leds():
                     self.executeLeds(MIDDIE_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.DEFENDER):
                     self.executeLeds(DEFENDER_ON_LEDS)
-                elif self.brain.play.isRole(PBConstants.DEFENDER_DUB_D):
-                    self.executeLeds(DUB_DEFEND_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.GOALIE):
                     self.executeLeds(GOALIE_ON_LEDS)
                 else:
                     self.executeLeds(ROLE_OFF_LEDS)
 
-            if not self.brain.playbook.subRoleUnchanged():
-                play = self.brain.play
-                if play.isRole(PBConstants.GOALIE):
-                    if (play.isSubRole(PBConstants.GOALIE_CENTER)):
-                        self.executeLeds(GOALIE_CENTER_LEDS)
-                    #elif (play.isSubRole(PBConstants.GOALIE_LEFT)):
-                    #    self.executeLeds(GOALIE_LEFT_LEDS)
-                    #elif (play.isSubRole(PBConstants.GOALIE_RIGHT)):
-                    #    self.executeLeds(GOALIE_RIGHT_LEDS)
-                    elif (play.isSubRole(PBConstants.GOALIE_CHASER)):
-                        self.executeLeds(GOALIE_CHASE_LEDS)
-                    else:
-                        self.executeLeds(OTHER_SUBROLE_LEDS)
-                else:
-                    if (play.isSubRole(PBConstants.CHASE_NORMAL) or
-                        play.isSubRole(PBConstants.PICKER) or
-                        play.isSubRole(PBConstants.DEFENSIVE_MIDDIE) or
-                        play.isSubRole(PBConstants.STOPPER)):
-                        self.executeLeds(AGGRESSIVE_LEDS)
-                    elif (play.isSubRole(PBConstants.LEFT_WING) or
-                          play.isSubRole(PBConstants.RIGHT_WING) or
-                          play.isSubRole(PBConstants.KICKOFF_STRIKER) or
-                          play.isSubRole(PBConstants.CENTER_BACK)):
-                        self.executeLeds(BOLD_LEDS)
-                    elif (play.isSubRole(PBConstants.STRIKER) or
-                          play.isSubRole(PBConstants.OFFENSIVE_MIDDIE) or
-                          play.isSubRole(PBConstants.SWEEPER)):
-                        self.executeLeds(CAUTIOUS_LEDS)
-                    elif (play.isSubRole(PBConstants.FORWARD) or
-                          play.isSubRole(PBConstants.DUB_D_MIDDIE) or
-                          play.isSubRole(PBConstants.KICKOFF_SWEEPER) or
-                          play.isSubRole(PBConstants.LEFT_DEEP_BACK) or
-                          play.isSubRole(PBConstants.RIGHT_DEEP_BACK)):
-                        self.executeLeds(GUARDED_LEDS)
-                    else:
-                        self.executeLeds(OTHER_SUBROLE_LEDS)
         if LOC_LEDS:
             # TODO: show loc uncertainty via LEDS
             # This may not be applicable to the particle swarm 6/7/13
