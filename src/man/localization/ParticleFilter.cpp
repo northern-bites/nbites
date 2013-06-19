@@ -80,10 +80,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // Update filters estimate
     updateEstimate();
 
-    // std::cout << "Est line error:\t"
-    //           << visionSystem->getAvgLineError(poseEstimate,
-    //                                             visionInput)
-    //           << std::endl;
+
 }
 
 /**

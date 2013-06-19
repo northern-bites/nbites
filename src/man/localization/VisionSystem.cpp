@@ -375,11 +375,12 @@ float VisionSystem::getAvgLineError(const messages::RobotLocation& loc,
 
             // Limit by line length (be safe about center circle mistake lines)
             if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
-                sumLineError = lineSystem->scoreObservation(obsvLine);
+                sumLineError += lineSystem->scoreObservation(obsvLine);
                 numValidLines++;
                 lineLength += obsvLine.length();
             }
         }
+
     }
 //    std::cout << "line length:\t" << lineLength << std::endl;
 

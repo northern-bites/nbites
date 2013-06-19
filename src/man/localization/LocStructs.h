@@ -289,8 +289,9 @@ struct Line {
         return closest;
     }
 
-    LineErrorMatch getError(Line obsv) {
-//        std::cout << "\nGet Error" << std::endl;
+    LineErrorMatch getError(Line obsv, bool debug = false) {
+        if (debug)
+            std::cout << "\nGet Error" << std::endl;
         // New Strategy: project midpoint onto line and shift both ways equal to half length
         Point midpoint = obsv.midpoint();
 //        std::cout << "obsv midpoint on line " << obsv.containsPoint(midpoint) << std::endl;
@@ -298,12 +299,13 @@ struct Line {
         Point midpointProj = closestPointTo(midpoint);
 //        std::cout << "midpoint proj on this " << containsPoint(midpointProj) << std::endl;
 
-        Point startProj = shiftDownLine(midpointProj,  obsv.length()/2);
-        Point endProj   = shiftDownLine(midpointProj, -obsv.length()/2);
+        Point startProj = shiftDownLine(midpointProj,  obsv.length()/2); //start
+        Point endProj = shiftDownLine(midpointProj, -obsv.length()/2); // end
 //        std::cout << "startProj on line " << containsPoint(startProj) << std::endl;
 //        std::cout << "endProj on line " << containsPoint(endProj) << std::endl;
 
-        // ensure projections are close to the points they're 'projected' from
+
+        // check projections are close to the points they're 'projected' from
         if (startProj.distanceTo(obsv.end) < startProj.distanceTo(obsv.start)) {
             startProj = shiftDownLine(midpointProj, -obsv.length()/2);
             endProj   = shiftDownLine(midpointProj,  obsv.length()/2);
@@ -311,13 +313,15 @@ struct Line {
 
         // if both arent on line, then return massive error (doesnt fit on line)
         if((!containsPoint(startProj)) && (!containsPoint(endProj))) {
+            if (debug) {
+                std::cout << "start proj " << startProj.x << " " << startProj.y << std::endl;
+                std::cout << "end proj " << endProj.x << " " << endProj.y << std::endl;
+                Line tooBig(startProj,endProj);
+                std::cout << "Segment projected length " << tooBig.length() << std::endl;
 
-//            std::cout << "start proj " << startProj.x << " " << startProj.y << std::endl;
-//            std::cout << "end proj " << endProj.x << " " << endProj.y << std::endl;
-            Line tooBig(startProj,endProj);
-//            std::cout << "Segment projected length " << tooBig.length() << std::endl;
+                std::cout << "Doesnt fit on line" << std::endl;
+            }
 
-//            std::cout << "Doesnt fit on line" << std::endl;
             LineErrorMatch shit;
             shit.error = 1000000.f;
             shit.startMatch = obsv.start;
@@ -328,7 +332,7 @@ struct Line {
         // if one isnt on line, shift the whole thing down
         if( !containsPoint(startProj) ) {
             // get distance off the line by
-            float distOff = startProj.distanceTo(obsv.start);
+            float distOff = startProj.distanceTo(closestPointTo(startProj));
 
             // shift by that amount
             Point newStartProj = shiftDownLine(startProj, distOff);
@@ -341,9 +345,33 @@ struct Line {
                 endProj   = shiftDownLine(  endProj, distOff);
             }
         }
+        else if( !containsPoint(endProj) ) {
+            // get distance off the line by
+            float distOff = endProj.distanceTo(closestPointTo(endProj));
+
+            // shift by that amount
+            Point newEndProj = shiftDownLine(endProj, distOff);
+            if (!containsPoint(newEndProj)) { // need to shift other way
+                startProj = shiftDownLine(startProj, -distOff);
+                endProj   = shiftDownLine(  endProj, -distOff);
+            }
+            else { // got it right
+                startProj = shiftDownLine(startProj, distOff);
+                endProj   = shiftDownLine(  endProj, distOff);
+            }
+        }
 
         // if one is still not on line then return massive error
         if(!containsPoint(startProj) || !containsPoint(endProj)) {
+            if (debug) {
+                std::cout << "start proj " << startProj.x << " " << startProj.y << std::endl;
+                std::cout << "end proj " << endProj.x << " " << endProj.y << std::endl;
+                Line tooBig(startProj,endProj);
+                std::cout << "Segment projected length " << tooBig.length() << std::endl;
+
+                std::cout << "Doesnt fit on line 2" << std::endl;
+            }
+
             LineErrorMatch shit;
             shit.error = 1000000.f;
             shit.startMatch = obsv.start;
@@ -358,13 +386,31 @@ struct Line {
         //                          obsvStart, startProj, intersect
         //                          obsvEnd, endProj, intersect
 
+        //Ensure proper triangles
+        // Whichever combination has the smallest projection distance we want to preserve
+        float sToSP = obsv.start.distanceTo(startProj);
+        float sToEP = obsv.start.distanceTo(endProj);
+        float eToSP = obsv.end.distanceTo(startProj);
+        float eToEP = obsv.end.distanceTo(endProj);
+
+        // If s to end projection or end to start projection are min, switch the projections
+        if (   ((sToEP < sToSP) && (sToEP < eToSP) && (sToEP < eToEP))
+            || ((eToSP < sToSP) && (eToSP < sToEP) && (eToSP < eToEP))) {
+            if(debug)
+               std::cout << "SWITCH!" << std::endl;
+
+            Point temp;
+            temp.x = startProj.x;
+            temp.y = startProj.y;
+
+            startProj.x = endProj.x;
+            startProj.y = endProj.y;
+
+            endProj.x = temp.x;
+            endProj.y = temp.y;
+        }
+
         Line segmentMatched(startProj, endProj);
-
-        // std::cout << "Segment Matched " << segmentMatched.start.x << " " << segmentMatched.start.y << " "
-        //           << segmentMatched.end.x << " " << segmentMatched.end.y << std::endl;
-
-        // std::cout << "Obsv " << obsv.start.x << " " << obsv.start.y << " "
-        //           << obsv.end.x << " " << obsv.end.y << std::endl;
 
         Point intersect = segmentMatched.intersect(obsv);
 
@@ -391,6 +437,16 @@ struct Line {
             errorMatch.error = error;
             errorMatch.startMatch = startProj;
             errorMatch.endMatch   = endProj;
+
+            if(debug) {
+                std::cout << "Segment Matched " << segmentMatched.start.x << " " << segmentMatched.start.y << " "
+                          << segmentMatched.end.x << " " << segmentMatched.end.y << std::endl;
+
+                std::cout << "Obsv " << obsv.start.x << " " << obsv.start.y << " "
+                          << obsv.end.x << " " << obsv.end.y << std::endl;
+                std::cout << "Error " << errorMatch.error << std::endl;
+            }
+
             return errorMatch;
         }
         else {
@@ -413,6 +469,16 @@ struct Line {
             errorMatch.error = error;
             errorMatch.startMatch = startProj;
             errorMatch.endMatch   = endProj;
+
+            if(debug) {
+                std::cout << "Segment Matched " << segmentMatched.start.x << " " << segmentMatched.start.y << " "
+                          << segmentMatched.end.x << " " << segmentMatched.end.y << std::endl;
+
+                std::cout << "Obsv " << obsv.start.x << " " << obsv.start.y << " "
+                          << obsv.end.x << " " << obsv.end.y << std::endl;
+                std::cout << "Error " << errorMatch.error << std::endl;
+            }
+
             return errorMatch;
         }
     }
