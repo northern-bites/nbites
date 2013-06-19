@@ -168,6 +168,15 @@ struct Line {
         return std::sqrt((end.x - start.x)*(end.x - start.x) + (end.y - start.y)*(end.y - start.y));
     }
 
+    Point midpoint() {
+        Point midpoint = shiftDownLine(start, length()/2.f);
+        if (!contains(midpoint))
+            midpoint =   shiftDownLine(start,-length()/2.f);
+        if (!contains(midpoint))
+            std::cout << "Massive Precision Error in Line Struct" << std::endl;
+        return midpoint;
+    }
+
     bool containsPoint(Point p)
     {
         float off = std::fabs((start.y - p.y)*(end.x - p.x) - (end.y - p.y)*(start.x - p.x));
@@ -240,6 +249,51 @@ struct Line {
     }
 
     float getError(Line obsv) {
+        // New Strategy: project midpoint onto line and shift both ways equal to half length
+        Point midpoint = obsv.midpoint();
+        Point midpointProj = closestPoint(midpoint);
+
+        Point startProj = shiftDownLine(midpoint,  obsv.length()/2);
+        Point endProj   = shiftDownLine(midpoint, -obsv.length()/2);
+
+        // ensure projections are close to the points they're 'projected' from
+        if (startProj.distanceTo(obsv.end) < startProj.distanceTo(obsv.start)) {
+            startProj = shiftDownLine(midpoint, -obsv.length()/2);
+            endProj   = shiftDownLine(midpoint,  obsv.length()/2);
+        }
+
+        // if both arent on line, then return massive error (doesnt fit on line)
+        if(!containsPoint(startProj) && !containsPoint(endProj))
+            return 100000.f;
+
+        // if one isnt on line, shift the whole thing down
+        if( !containsPoint(startProj) ) {
+            // get distance off the line by
+            float distOff = startProj.distanceTo(obsv.start);
+
+            // shift by that amount
+            Point newStartProj = shiftDownLine(startProj, distOff);
+            if (!containsPoint(newStartProj)) { // need to shift other way
+                startProj = shiftDownLine(startProj, -distOff);
+                endProj   = shiftDownLine(  endProj, -distOff);
+            }
+            else { // got it right
+                startProj = shiftDownLine(startProj, distOff);
+                endProj   = shiftDownLine(  endProj, distOff);
+            }
+        }
+
+        // if one is still not on line then return massive error
+        if(!containsPoint(startProj) || !containsPoint(endProj))
+            return 100000.f;
+
+
+
+        //               if both on line check for intersection before computing errors
+
+
+
+
         // project obsv start onto current line
         Point startProj = closestPointTo(obsv.start);
         float obsvLength = 0.f;
