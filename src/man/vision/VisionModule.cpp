@@ -223,6 +223,7 @@ void VisionModule::updateVisionField() {
         visCorner->set_physical_orientation(i->getPhysicalOrientation());
         visCorner->mutable_visual_detection()->set_distance(i->getDistance());
         visCorner->mutable_visual_detection()->set_bearing(i->getBearing());
+        visCorner->mutable_visual_detection()->set_bearing_deg(i->getBearingDeg());
         visCorner->mutable_visual_detection()->set_distance_sd(i->getDistanceSD());
         visCorner->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
         visCorner->mutable_visual_detection()->set_angle_x_deg(i->getAngleXDeg());
