@@ -16,16 +16,19 @@ def shouldDribbleForGoal(player):
     We can dribble it into the goal. There is either no goalie in the net or
     there is almost no time left in the game.
     """
-    return (ballInGoalBox(player) and (noGoalieInNet(player) or
-                                       noTimeLeftForKicking(player)))
+    return ((ballInGoalBox(player) and noGoalieInNet(player)) or
+            lastSecondDribbleGoal(player))
 
 def centerLaneOpen(player):
     """
-    I have an open lane right in front of me.
+    I have an open lane right in front of me. We don't worry about this if we
+    are dribbling for a score. (visionObstacle.mid_dist won't give good data in
+    this case.)
     """
     return (player.brain.interface.visionObstacle.mid_dist > 
             constants.OPEN_LANE_DIST or 
-            player.brain.interface.visionObstacle.block_mid == 0) 
+            player.brain.interface.visionObstacle.block_mid == 0 or
+            shouldDribbleForGoal(player))
 
 def noGoalieInNet(player):
     """
@@ -60,7 +63,8 @@ def facingGoal(player):
 
 def rotateLeft(player):
     """
-    The goal is to the left of us, so we should rotate that way away from traffic.
+    The goal is to the left of us, so we should rotate that way when avoiding
+    obstacles.
     """
     return (player.brain.loc.y < (1./2.*nogginConstants.FIELD_HEIGHT))
     # return (player.brain.interface.visionObstacle.block_left == 0 or
@@ -130,9 +134,9 @@ def timeLeft(player):
     """
     enough_time = constants.ENOUGH_TIME_FOR_NORMAL_BEHAVIOR
     return (player.brain.game.secs_remaining > enough_time or 
-            noTimeLeftForKicking(player))
+            lastSecondDribbleGoal(player))
 
-def noTimeLeftForKicking(player):
+def lastSecondDribbleGoal(player):
     """
     There not enough time left for kicking in the goalbox to make sense. 
     Dribble it in. 
