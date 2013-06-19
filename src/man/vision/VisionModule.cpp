@@ -170,6 +170,8 @@ void updateRobot(messages::Robot* bot_, VisualRobot* visualRobot) {
     bot_->set_y(visualRobot->getY());
     bot_->set_elevation_deg(visualRobot->getElevationDeg());
     bot_->set_on(visualRobot->isOn());
+    bot_->set_height(visualRobot->getHeight());
+    bot_->set_width(visualRobot->getWidth());
 
 }
 
@@ -221,10 +223,12 @@ void VisionModule::updateVisionField() {
         visCorner->set_physical_orientation(i->getPhysicalOrientation());
         visCorner->mutable_visual_detection()->set_distance(i->getDistance());
         visCorner->mutable_visual_detection()->set_bearing(i->getBearing());
+        visCorner->mutable_visual_detection()->set_bearing_deg(i->getBearingDeg());
         visCorner->mutable_visual_detection()->set_distance_sd(i->getDistanceSD());
         visCorner->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
         visCorner->mutable_visual_detection()->set_angle_x_deg(i->getAngleXDeg());
         visCorner->mutable_visual_detection()->set_angle_y_deg(i->getAngleYDeg());
+        visCorner->mutable_visual_detection()->set_bearing_deg(i->getBearingDeg());
         visCorner->set_x(i->getX());
         visCorner->set_y(i->getY());
 

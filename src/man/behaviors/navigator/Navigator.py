@@ -134,7 +134,10 @@ class Navigator(FSA.FSA):
         @param fast: books it using velocity walk; Best if dest is straight ahead!
         Use it to look like a baller on the field.
 
-        @param pb: Set true if playbook positioning so we switch from fast to odometry walk when in the general area
+        @param pb: Set true if playbook positioning so we switch from fast to odometry
+        walk when in the general area of our target. This allows us to ignore playbook's
+        requested heading until we are actually close to the (x, y) position, so we can
+        walk fast to the destination then correct heading once we get there.
         """
 
         # Debug prints for motion status (seeking the walking not walking bug)
