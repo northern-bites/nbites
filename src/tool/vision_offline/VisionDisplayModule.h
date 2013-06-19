@@ -27,6 +27,7 @@
 #include "PathConfig.h"
 
 #include "vision/VisionModule.h"
+#include "CameraCalibrate.h"
 
 namespace tool {
 namespace vision {
@@ -57,6 +58,7 @@ public:
     portals::InPortal<messages::InertialState> inerts_in;
 
 protected slots:
+    void loadRobotParameters();
 
 protected:
     virtual void run_();
@@ -65,6 +67,8 @@ private:
     QImage makeOverlay(Camera::Type which);
 
     QTabWidget* imageTabs;
+    QPushButton* loadCalButton;
+    QComboBox* robotNames;
     Camera::Type currentCamera;
 
     // This module contains its own diagram! Trippy.
