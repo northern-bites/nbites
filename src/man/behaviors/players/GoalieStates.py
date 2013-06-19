@@ -16,8 +16,7 @@ def gameInitial(player):
         player.brain.fallController.enabled = False
         player.stand()
         player.zeroHeads()
-        player.side = LEFT
-        player.currentPose = CENTER_POSE
+        player.currentPose = constants.CENTER_POSE
         player.isSaving = False
         player.lastStiffStatus = True
 
@@ -143,6 +142,12 @@ def repositionLeft(player):
             player.currentPose = constants.CENTER_POSE
         else:
             player.currentPose = constants.LEFT_POSE
+        print "Moving to position " + str(player.currentPose)
+
+        player.brain.nav.walkTo(RelRobotLocation(0, 20, 0))
+
+    if player.brain.nav.isStanding():
+        return player.goLater('watch')
 
     return player.stay()
 
@@ -152,6 +157,12 @@ def repositionRight(player):
             player.currentPose = constants.CENTER_POSE
         else:
             player.currentPose = constants.RIGHT_POSE
+        print "Moving to position " + str(player.currentPose)
+
+        player.brain.nav.walkTo(RelRobotLocation(0, -20, 0))
+
+    if player.brain.nav.isStanding():
+        return player.goLater('watch')
 
     return player.stay()
 
