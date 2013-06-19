@@ -1,8 +1,8 @@
 package messages;
 
-message ArmContactState
+message Obstacle
 {
-    enum PushDirection
+    enum ObstaclePosition
     {
         NONE = 0;
 	NORTH = 1;
@@ -15,6 +15,5 @@ message ArmContactState
 	NORTHWEST = 8;
     }
 
-    optional PushDirection right_push_direction = 1;
-    optional PushDirection left_push_direction = 2;
+    optional ObstaclePosition position = 1;
 }

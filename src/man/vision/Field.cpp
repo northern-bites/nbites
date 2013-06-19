@@ -52,7 +52,7 @@ Field::Field(Vision* vis, Threshold * thr)
 	// funding. - chown
 #ifdef OFFLINE
 	debugFieldEdge = false;
-	debugDrawFieldEdge = false;
+	debugDrawFieldEdge = true;
 	debugHorizon = false;
 #endif
 }
@@ -103,7 +103,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
                 topGreen = IMAGE_HEIGHT - 1;
             }
 			//pixel = thresh->thresholded[top][x];
-			if (Utility::isGreen(pixel) || Utility::isOrange(pixel)) {
+			if (Utility::isGreen(pixel)) {
 				lastGreen = top;
 				good++;
 				greenRun++;
@@ -194,8 +194,8 @@ void Field::initialScanForTopGreenPoints(int pH) {
         }
     }
     // look for odd spikes and quell them
-    if (poseHorizon > -100) {
-        for (good = 1; good < HULLS - 1; good++) {
+    /*if (poseHorizon > -100) {
+        for (good = 4; good < HULLS - 4; good++) {
             if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
                 convex[good].y > 15) {
                 if (debugFieldEdge) {
@@ -212,7 +212,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		if (convex[1].y - convex[0].y > 15) {
 			convex[0].y = convex[1].y;
 		}
-    }
+		}*/
     for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
     if (good < HULLS) {
         for (int i = good-1; i > -1; i--) {

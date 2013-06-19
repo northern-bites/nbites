@@ -14,6 +14,7 @@ FieldViewerPainter::FieldViewerPainter(QWidget* parent, float scaleFactor_) :
     shouldPaintLocationOffline(false),
     shouldPaintObsvOffline(false)
 {
+    lineSystem = new man::localization::LineSystem();
 }
 
 void FieldViewerPainter::paintParticleAction(bool state) {
@@ -135,6 +136,30 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
             }
     }
 
+    for (int i=0; i<obsv.visual_line_size(); i++) {
+        if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
+            man::localization::Line postProcessLine = man::localization::VisionSystem::prepareVisualLine(loc,
+                                                                                           obsv.visual_line(i));
+            if(postProcessLine.length() > 70.f) {
+                QPoint obsvSt (postProcessLine.start.x, postProcessLine.start.y);
+                QPoint obsvEnd(postProcessLine.end.x, postProcessLine.end.y);
+
+                painter.setBrush(Qt::black);
+                painter.drawLine(obsvSt, obsvEnd);
+
+                // Get and paint the line it matches to
+                man::localization::LineErrorMatch match = lineSystem->scoreAndMatchObservation(postProcessLine);
+
+                QPoint matchStart(match.startMatch.x, match.startMatch.y);
+                QPoint matchEnd  (match.endMatch.x, match.endMatch.y);
+                painter.setBrush(Qt::magenta);
+                painter.drawLine(matchStart, matchEnd);
+           }
+
+
+        }
+    }
+
     if (obsv.has_goal_post_l()) {
         if (obsv.goal_post_l().visual_detection().on()
            && (obsv.goal_post_l().visual_detection().distance() > 0.f)){
@@ -190,6 +215,9 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
             }
         }
     }
+
+    // Paint the line segment in global
+
 }
 
 

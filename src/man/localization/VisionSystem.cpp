@@ -5,7 +5,9 @@ namespace man
 namespace localization
 {
 
-VisionSystem::VisionSystem(){}
+VisionSystem::VisionSystem() {
+    lineSystem = new LineSystem;
+}
 
 VisionSystem::~VisionSystem(){}
 
@@ -35,39 +37,63 @@ bool VisionSystem::update(ParticleSet& particles,
         int numObsv = 0;
         for (int i=0; i<obsv.visual_corner_size(); i++)
         {
-            if(obsv.visual_corner(i).visual_detection().distance() > 0.f) {
+            if((obsv.visual_corner(i).visual_detection().distance() > 0.f) &&
+               (obsv.visual_corner(i).visual_detection().distance() < 400.f)) {
                 madeObsv = true;
 
                 float newError = scoreFromVisDetect(*particle,
                                                     obsv.visual_corner(i).visual_detection());
+//                std::cout << "Corner Error:\t" << newError << std::endl;
                 curParticleError+= newError;
                 numObsv++;
 
             }
         }
 
+        for (int i=0; i<obsv.visual_line_size(); i++) {
+            if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
+                Line obsvLine = prepareVisualLine(particle->getLocation(),
+                                                  obsv.visual_line(i));
+
+                // Limit by line length (be safe about center circle mistake lines)
+                if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
+                    madeObsv = true;
+                    float newError = lineSystem->scoreObservation(obsvLine);
+                    //std::cout << "Line Error:\t" << newError << std::endl;
+                    curParticleError += newError;
+                    numObsv++;
+                }
+            }
+        }
+
         if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
-            && (obsv.goal_post_l().visual_detection().distance() > 0.f)) {
+            && (obsv.goal_post_l().visual_detection().distance() > 0.f)
+            && (obsv.goal_post_l().visual_detection().distance() < 480.f)) {
             madeObsv = true;
             float newError = scoreFromVisDetect(*particle,
                                                 obsv.goal_post_l().visual_detection());
+//            std::cout << "Goalpost Error:\t" << newError << std::endl;
             curParticleError+= newError;
             numObsv++;
         }
 
         if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
-            && (obsv.goal_post_r().visual_detection().distance() > 0.f)) {
+            && (obsv.goal_post_r().visual_detection().distance() > 0.f)
+            && (obsv.goal_post_r().visual_detection().distance() < 480.f)) {
             madeObsv = true;
             float newError = scoreFromVisDetect(*particle,
                                                 obsv.goal_post_r().visual_detection());
+//            std::cout << "Goalpost Error:\t" << newError << std::endl;
             curParticleError+= newError;
             numObsv++;
         }
 
-        if (obsv.visual_cross().distance() > 0.f) {
+        if ((obsv.visual_cross().distance() > 0.f)
+            && (obsv.visual_cross().distance() < 400.f)) {
             madeObsv = true;
             float newError = scoreFromVisDetect(*particle,
                                                 obsv.visual_cross());
+//            std::cout << "Cross Error:\t" << newError << std::endl;
             curParticleError+= newError;
             numObsv++;
         }
@@ -98,13 +124,20 @@ bool VisionSystem::update(ParticleSet& particles,
 
     // normalize the particle weights and calculate the weighted avg error
     weightedAvgError = 0.f;
+    float weightSum = 0.f;
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);
         particle->normalizeWeight(totalWeight);
 
+        //sanity check for potential weird bug
+        weightSum += particle->getWeight();
+
         weightedAvgError += particle->getWeight() * particle->getError();
     }
+
+    if (weightSum < .9f)
+        std::cout << "LOC_ERROR: All particle weights do not sum to .9" << std::endl;
 
     // Calc avgError by dividing the total by the num particles
     avgError = sumParticleError / (float)particles.size();
@@ -125,6 +158,94 @@ bool VisionSystem::update(ParticleSet& particles,
     // Succesfully updated particles with Vision!
     return true;
 }
+
+/**
+ * @brief Takes a particle and a Visual line (with one endpoint within thresh dist,
+ *        and returns a Line with the closest endpoint being start,
+ *        and in global coordinates
+ */
+Line VisionSystem::prepareVisualLine(const messages::RobotLocation& loc,
+                                     const messages::VisualLine& line)
+{
+    float startGlobalX, startGlobalY, endGlobalX, endGlobalY;
+    float distToStart, distToEnd;
+
+    // Transform to global (make startGlobal closer than endGlobal)
+    if ( line.start_dist() < line.end_dist() ) {
+        float sinS, cosS;
+        sincosf((loc.h() + line.start_bearing()), &sinS, &cosS);
+        startGlobalX = line.start_dist()*cosS + loc.x();
+        startGlobalY = line.start_dist()*sinS + loc.y();
+
+        float sinE, cosE;
+        sincosf((loc.h() + line.end_bearing()), &sinE, &cosE);
+        endGlobalX = line.end_dist()*cosE + loc.x();
+        endGlobalY = line.end_dist()*sinE + loc.y();
+
+        distToStart = line.start_dist();
+        distToEnd = line.end_dist();
+    }
+    else { // 'end' from vision is closer
+        float sinS, cosS;
+        sincosf((loc.h() + line.start_bearing()), &sinS, &cosS);
+        endGlobalX = line.start_dist()*cosS + loc.x();
+        endGlobalY = line.start_dist()*sinS + loc.y();
+
+        float sinE, cosE;
+        sincosf((loc.h() + line.end_bearing()), &sinE, &cosE);
+        startGlobalX = line.end_dist()*cosE + loc.x();
+        startGlobalY = line.end_dist()*sinE + loc.y();
+
+        distToStart = line.end_dist();
+        distToEnd = line.start_dist();
+    }
+
+    // Safety check
+    if (distToEnd < distToStart)
+        std::cout << "\n\n MASSIVE LOCALIZATION ERROR \n\n" << std::endl;
+
+    Point start(startGlobalX, startGlobalY);
+    Point end  (  endGlobalX,   endGlobalY);
+
+    // Ensure reasonable distance estimates
+    if (distToEnd > 300.f) {
+        Line initialSegment(start,end); // Use to find end point to make shorter segment
+
+        // Project pose onto the line
+        Point pose(loc.x(), loc.y());
+        Point proj = initialSegment.project(pose);
+
+        //  Calc dists
+        float poseToProj = pose.distanceTo(proj);
+        float projToEnd  = proj.distanceTo(end);
+
+        // Amount to shift for given distance
+        float hyp = 300.f; // thresh
+        float projToNewEnd = std::sqrt(hyp*hyp - poseToProj*poseToProj);
+        float endToNewEnd  = projToEnd - projToNewEnd;
+
+        // Shift (and confirm lands on the line)
+        if (initialSegment.containsPoint(initialSegment.shiftDownLine(end, endToNewEnd))) {
+            Point newEnd = initialSegment.shiftDownLine(end, endToNewEnd);
+            end.x = newEnd.x;
+            end.y = newEnd.y;
+        }
+        else if (initialSegment.containsPoint(initialSegment.shiftDownLine(end, -endToNewEnd))) {
+            Point newEnd = initialSegment.shiftDownLine(end, -endToNewEnd);
+            end.x = newEnd.x;
+            end.y = newEnd.y;
+        }
+        else {
+            // There is an issue in processing this line (precision) so make sure it's thrown out
+            Point shitEnd = initialSegment.shiftDownLine(start, 1);
+            end.x = shitEnd.x;
+            end.y = shitEnd.y;
+        }
+    }
+
+    return Line(start,end);
+}
+
 
 /**
  * @brief Takes a PVisualObservation and particle & returns the
@@ -237,6 +358,37 @@ void VisionSystem::opitmizeReconstructions()
     for(optIt = optimized.begin(); optIt != optimized.end(); optIt++)
         reconstructedLocations.push_back((*optIt));
 }
+
+float VisionSystem::getAvgLineError(const messages::RobotLocation& loc,
+                                    const messages::VisionField&   obsv)
+{
+    float sumLineError  = 0.f;
+    int   numValidLines = 0;
+    float lineLength    = 0.f;
+
+    std::cout << "line obs " << obsv.visual_line_size()<<std::endl;
+
+    for (int i=0; i<obsv.visual_line_size(); i++) {
+        if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
+            Line obsvLine = prepareVisualLine(loc,
+                                              obsv.visual_line(i));
+
+            // Limit by line length (be safe about center circle mistake lines)
+            if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
+                sumLineError = lineSystem->scoreObservation(obsvLine);
+                numValidLines++;
+                lineLength += obsvLine.length();
+            }
+        }
+    }
+//    std::cout << "line length:\t" << lineLength << std::endl;
+
+    if (numValidLines > 0)
+        return sumLineError/(float)numValidLines;
+    else
+        return -1.f;
+}
+
 
 } // namespace localization
 } // namespace man

@@ -108,7 +108,7 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
 	POSTDEBUG = false;
 	CORRECT = false;
 	PRINTOBJS = false;
-	POSTLOGIC = true;
+	POSTLOGIC = false;
 	SANITY = false;
 #endif
 }
@@ -381,7 +381,7 @@ void ObjectFragments::vertScan(int x, int y, int dir, int stopper,
         if (Utility::colorsEqual(pixel, c)) {
 			// when we're below the horizon ignore bluegreen
 			good++;
-			if (c != BLUE_BIT || dir != 1) {
+			if (dir != 1) {
 				bad--;
 			}
 			run++;
@@ -2208,7 +2208,7 @@ void ObjectFragments::updateRunsAfterFirstPost(Blob pole, int post) {
  * @param right		  the right post
  * @param mid		  the backstop
  * @param c			  the color we're processing
- * @param c2		  the soft color closest to it (e.g. bluegreen for blue)
+ * @param c2		  the soft color closest to it
  */
 // Look for posts and goals given the runs we've collected
 void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
@@ -2302,7 +2302,7 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
  * @param right		  the right post
  * @param mid		  the backstop
  * @param c			  the color we're processing
- * @param c2		  the soft color closest to it (e.g. bluegreen for blue)
+ * @param c2		  the soft color closest to it
  */
 void ObjectFragments::lookForSecondPost(Blob pole, int post,
                                         VisualFieldObject* left,

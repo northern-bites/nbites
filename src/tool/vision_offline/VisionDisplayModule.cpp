@@ -211,7 +211,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 		painter.setPen(Qt::magenta);
 		for (int i = 0; i < visField->visual_corner_size(); i++) {
 			switch(visField->visual_corner(i).corner_type()) {
-			case messages::VisualCorner::INNER_L: painter.setPen(Qt::red);
+			case messages::VisualCorner::INNER_L: painter.setPen(Qt::green);
 				break;
 			case messages::VisualCorner::OUTER_L: painter.setPen(Qt::blue);
 				break;
@@ -260,7 +260,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 		}
 		painter.setBrush(QBrush(QColor(255, 0, 0, 0), Qt::SolidPattern));
 		painter.setBrush(QBrush(QColor(255,0,0,80), Qt::SolidPattern));
-		if (navy1.distance() > 0) {
+		if (navy1.on()) {
             painter.drawLine(navy1.x() + 10, navy1.y() + 10, navy1.x(), navy1.y());
             painter.drawLine(navy1.x(), navy1.y() + 10, navy1.x() + 10, navy1.y());
 			QPoint r_points[4] = {
