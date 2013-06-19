@@ -132,6 +132,11 @@ struct RingBuffer
 struct Point {
     float x,y;
 
+    Point() {
+        x = 0.f;
+        y = 0.f;
+    }
+
     Point(float x_, float y_)
     {
         x = x_;
@@ -141,6 +146,12 @@ struct Point {
     float distanceTo(Point p) {
         return std::sqrt((p.x-x)*(p.x-x) + (p.y-y)*(p.y-y));
     }
+};
+
+struct LineErrorMatch {
+    float error;
+    Point startMatch;
+    Point endMatch;
 };
 
 struct Line {
@@ -239,7 +250,7 @@ struct Line {
         return closest;
     }
 
-    float getError(Line obsv) {
+    LineErrorMatch getError(Line obsv) {
         // project obsv start onto current line
         Point startProj = closestPointTo(obsv.start);
         float obsvLength = 0.f;
@@ -249,8 +260,13 @@ struct Line {
             obsvLength = std::fabs(obsv.length());
         else if (obsv.start.x > obsv.end.x)
             obsvLength = -std::fabs(obsv.length());
-        else
-            return 1000000.f;
+        else {
+            LineErrorMatch shit;
+            shit.error = 1000000.f;
+            shit.startMatch = obsv.start;
+            shit.endMatch   = obsv.end;
+            return shit;
+        }
 
         Point endProj = shiftDownLine(startProj, obsvLength);
 
@@ -260,7 +276,11 @@ struct Line {
 
             if (!containsPoint(startProj)) {
                 // Failed to match obsv to this line (obsv too long)
-                return 1000000.f;
+                LineErrorMatch shit;
+                shit.error = 1000000.f;
+                shit.startMatch = obsv.start;
+                shit.endMatch   = obsv.end;
+                return shit;
             }
         }
 
@@ -280,7 +300,13 @@ struct Line {
         float area2 = NBMath::calcTriangleArea(l1, l2, l3);
 
         // Return in units cm, not cm^2
-        return std::sqrt(area1 + area2);
+//        float error = std::sqrt(area1 + area2);
+        float error = (area1 + area2)/length();
+        LineErrorMatch errorMatch;
+        errorMatch.error = error;
+        errorMatch.startMatch = startProj;
+        errorMatch.endMatch   = endProj;
+        return errorMatch;
     }
 
 
@@ -307,6 +333,8 @@ struct Line {
         }
     }
 };
+
+
 
 } // namespace localization
 } // namespace man

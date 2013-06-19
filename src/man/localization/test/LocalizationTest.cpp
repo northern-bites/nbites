@@ -182,33 +182,33 @@ TEST(LocalizationTest, TestErrorCalc)
     Line top(b,c);
     Line bot(a,d);
 
-    float four = top.getError(bot);
+    float four = top.getError(bot).error;
 
     ASSERT_TRUE(std::fabs(four - 4.f) < .2f);
 
     // Same line
-    ASSERT_TRUE(std::fabs(top.getError(top)) < .2f);
+    ASSERT_TRUE(std::fabs(top.getError(top).error) < .2f);
 
     // Change line defs
     Line top_(c,b);
     Line bot_(a,d);
 
-    four = top_.getError(bot);
+    four = top_.getError(bot).error;
     ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
-    four = top.getError(bot_);
+    four = top.getError(bot_).error;
     ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
-    four = top_.getError(bot_);
+    four = top_.getError(bot_).error;
     ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
-    four = bot_.getError(top);
+    four = bot_.getError(top).error;
     ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
-    four = bot.getError(top_);
+    four = bot.getError(top_).error;
     ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 
-    four = bot_.getError(top_);
+    four = bot_.getError(top_).error;
     ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
 }
 
