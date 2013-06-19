@@ -69,11 +69,11 @@ void BallTrackModule::run_()
     ballMessage.get()->set_bearing_deg(filters->getFilteredBear() * TO_DEG);
 
     float x = localizationInput.message().x() +
-        ballMessage.get()->distance() * cosf(localizationInput.message().h() +
-                                             ballMessage.get()->bearing());
+        filters->getFilteredDist() * cosf(localizationInput.message().h() +
+                                          filters->getFilteredBear());
     float y = localizationInput.message().y() +
-        ballMessage.get()->distance() * sinf(localizationInput.message().h() +
-                                             ballMessage.get()->bearing());
+        filters->getFilteredDist() * sinf(localizationInput.message().h() +
+                                          filters->getFilteredBear());
     ballMessage.get()->set_x(x);
     ballMessage.get()->set_y(y);
 
