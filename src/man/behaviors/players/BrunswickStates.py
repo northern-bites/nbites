@@ -107,9 +107,10 @@ def gamePlaying(player):
     if not player.brain.motion.calibrated:
         return player.stay()
 
+    print "Playing Ran YES!"
+
     roleState = player.getRoleState()
     return player.goNow(roleState)
-
 
 def gamePenalized(player):
     if player.firstFrame():

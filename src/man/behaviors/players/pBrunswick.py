@@ -68,13 +68,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         if (gcState == 'gamePlaying' and
             not self.currentState == 'afterPenalty' and
             not self.currentState == 'gamePenalized'):
-            if not (self.currentState == 'gamePlaying'
-                and self.counter != 1):
-                # Make sure gamePlaying gets run
-                roleState = self.getNextState()
 
-                if roleState != self.currentState:
-                    self.switchTo(roleState)
+            roleState = self.getNextState()
+
+            if roleState != self.currentState:
+                self.switchTo(roleState)
 
         # takes our average fps over 1000 frames (without profiling)
         if COUNT_FPS:
@@ -91,7 +89,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if self.brain.playbook.roleUnchanged():
+        if not self.brain.play.changed:
             return self.currentState
 
         elif self.inKickingState:
@@ -101,7 +99,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return self.getRoleState()
 
     def getRoleState(self):
+        print "Checking Role state"
         if self.play.isRole(PBConstants.CHASER):
+            print "I am the chaser"
             if self.brain.gameController.timeSincePlaying < 10:
                 return 'kickoff'
             return 'chase'

@@ -190,9 +190,7 @@ class GoTeam:
         """
         locations = map(self.mapPositionToRobotLocation, positions)
 
-        roles = []
-        for pos in positions:
-            roles.append(pos[3])
+        roles = [pos[3] for pos in positions]
 
         self.updateMyTimes(locations, roles)
 
@@ -204,12 +202,18 @@ class GoTeam:
             return
 
         # Find which active field player should go to each position
+        if(roles[0] == PBConstants.CHASER):
+            print "Hey. You're an idiot. Priorities are fucked."
+            print positions
         firstPlayer = self.findClosestPlayer(roles[0],
                                              [chaser_mate])
         if firstPlayer.playerNumber == self.brain.playerNumber:
             play.setRole(roles[0])
             play.setPosition(locations[0])
         else:
+            print "MORE THAN 2 PLAYERS"
+            if(roles[1] == PBConstants.CHASER):
+                print "Hey. You're an idiot. Priorities are fucked."
             secondPlayer = self.findClosestPlayer(roles[1],
                                                   [firstPlayer,
                                                    chaser_mate])
@@ -217,6 +221,8 @@ class GoTeam:
                 play.setRole(roles[1])
                 play.setPosition(locations[1])
             else:
+                if(roles[2] == PBConstants.CHASER):
+                    print "Hey. You're an idiot. Priorities are fucked."
                 play.setRole(roles[2])
                 play.setPosition(locations[2])
 
@@ -314,20 +320,20 @@ class GoTeam:
         if PBConstants.DEBUG_DET_CHASER:
             self.printf ("\t ---- MATE %g WINS" % (chaser_mate.playerNumber))
         # returns teammate instance (could be mine)
+
         return chaser_mate
 
-    def determineDefender(self, except_players):
-        defender_mate = self.activeFieldPlayers[0]
+    def determineDefender(self, except_players = []):
+        possible_mates = [mate for mate in self.activeFieldPlayers\
+                          if mate not in except_players]
+
+        defender_mate = possible_mates[0]
 
         # loop through the teammates
-        for mate in self.activeFieldPlayers:
+        for mate in possible_mates:
             # We can skip computation if the mate we are now considering
             # is the chaser_mate.
             if (mate == defender_mate):
-                continue
-
-            # Skip exceptions
-            if (mate in except_players):
                 continue
 
             if self.shouldCallOff(defender_mate.defenderTime, mate.defenderTime,
@@ -336,11 +342,14 @@ class GoTeam:
 
         return defender_mate
 
-    def determineOffender(self, except_players):
-        offender_mate = self.activeFieldPlayers[0]
+    def determineOffender(self, except_players = []):
+        possible_mates = [mate for mate in self.activeFieldPlayers\
+                          if mate not in except_players]
+
+        offender_mate = possible_mates[0]
 
         # loop through the teammates
-        for mate in self.activeFieldPlayers:
+        for mate in possible_mates:
             # We can skip computation if the mate we are now considering
             # is the chaser_mate.
             if (mate == offender_mate):
@@ -356,11 +365,14 @@ class GoTeam:
 
         return offender_mate
 
-    def determineMiddie(self, except_players):
-        middie_mate = self.activeFieldPlayers[0]
+    def determineMiddie(self, except_players = []):
+        possible_mates = [mate for mate in self.activeFieldPlayers\
+                          if mate not in except_players]
+
+        middie_mate = possible_mates[0]
 
         # loop through the teammates
-        for mate in self.activeFieldPlayers:
+        for mate in possible_mates:
             # We can skip computation if the mate we are now considering
             # is the chaser_mate.
             if (mate == middie_mate):
@@ -400,11 +412,11 @@ class GoTeam:
         if (role == PBConstants.CHASER):
             print "BAD NEWS IN PLAYBOOK"
         elif (role == PBConstants.DEFENDER):
-            chosen_mate = determineDefender(exceptPlayers)
+            chosen_mate = self.determineDefender(exceptPlayers)
         elif (role == PBConstants.OFFENDER):
-            chosen_mate = determineOffender(exceptPlayers)
+            chosen_mate = self.determineOffender(exceptPlayers)
         else: # Middie
-            chosen_mate = determineMiddie(exceptPlayers)
+            chosen_mate = self.determineMiddie(exceptPlayers)
 
         return chosen_mate
 
