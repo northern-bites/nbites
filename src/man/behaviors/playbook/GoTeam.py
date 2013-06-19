@@ -81,14 +81,6 @@ class GoTeam:
             h = dest.headingTo(Location(self.brain.ball.x, self.brain.ball.y))
             pos = (PBConstants.GOALIE_HOME_X, PBConstants.GOALIE_HOME_Y, h)
             play.setPosition(pos)
-
-            # Ready Goalie
-            if (self.brain.gameController.currentState == 'gameReady'
-                or self.brain.gameController.currentState =='gameSet'
-                or self.brain.gameController.currentState == 'penaltyShotsGameReady'
-                or self.brain.gameController.currentState == 'penaltyShotsGameSet'):
-                play.setRole(PBConstants.READY_ROLE)
-
             return
 
         # Have a separate ready section to make things simpler

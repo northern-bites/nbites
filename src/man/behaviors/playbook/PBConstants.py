@@ -39,7 +39,7 @@ TURNING_RATE = 60  # degrees/second
 #### Information about the roles ####
 ####
 
-NUM_ROLES = 8
+NUM_ROLES = 7
 # dictionary of roles
 ROLES = dict(zip(range(NUM_ROLES), ("CHASER",
                                     "DEFENDER",
@@ -47,7 +47,6 @@ ROLES = dict(zip(range(NUM_ROLES), ("CHASER",
                                     "MIDDIE",
                                     "GOALIE",
                                     "PENALTY_ROLE",
-                                    "READY_ROLE",
                                     "INIT_ROLE")))
 
 # tuple of roles DO NOT CHANGE THIS ORDER
@@ -57,7 +56,6 @@ ROLES = dict(zip(range(NUM_ROLES), ("CHASER",
  MIDDIE,
  GOALIE,
  PENALTY_ROLE,
- READY_ROLE,
  INIT_ROLE) = range(NUM_ROLES)
 
 

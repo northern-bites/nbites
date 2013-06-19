@@ -55,7 +55,6 @@ static const QString roles[] = {QString("CHASER"),
                                 QString("DEFENDER"),
                                 QString("GOALIE"),
                                 QString("PENALTY_ROLE"),
-                                QString("READY_ROLE"),
                                 QString("INIT_ROLE")};
 
 }
