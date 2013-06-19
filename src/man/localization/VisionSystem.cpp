@@ -56,10 +56,10 @@ bool VisionSystem::update(ParticleSet& particles,
                                                   obsv.visual_line(i));
 
                 // Limit by line length (be safe about center circle mistake lines)
-                if ((obsvLine.length() > 100.f) && (obsvLine.length() < 500.f)) {
+                if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
                     madeObsv = true;
                     float newError = lineSystem->scoreObservation(obsvLine);
-//                    std::cout << "Line Error:\t" << newError << std::endl;
+                    //std::cout << "Line Error:\t" << newError << std::endl;
                     curParticleError += newError;
                     numObsv++;
                 }
@@ -372,14 +372,14 @@ float VisionSystem::getAvgLineError(const messages::RobotLocation& loc,
                                               obsv.visual_line(i));
 
             // Limit by line length (be safe about center circle mistake lines)
-            if ((obsvLine.length() > 100.f) && (obsvLine.length() < 500.f)) {
+            if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
                 sumLineError = lineSystem->scoreObservation(obsvLine);
                 numValidLines++;
                 lineLength += obsvLine.length();
             }
         }
     }
-    std::cout << "line length:\t" << lineLength << std::endl;
+//    std::cout << "line length:\t" << lineLength << std::endl;
 
     if (numValidLines > 0)
         return sumLineError/(float)numValidLines;
