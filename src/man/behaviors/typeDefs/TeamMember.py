@@ -88,7 +88,9 @@ class TeamMember(RobotLocation):
             self.chaseTime = self.determineChaseTime()
         self.inKickingState = self.brain.player.inKickingState
 
-        self.active = (not self.isPenalized())
+        self.active = (not self.isPenalized() and
+                       not (self.brain.playerNumber == 1 and
+                            self.brain.player.returningFromPenalty))
 
     def reset(self):
         '''Reset all important Teammate variables'''
