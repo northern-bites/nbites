@@ -99,9 +99,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return self.getRoleState()
 
     def getRoleState(self):
-        print "Checking Role state"
         if self.play.isRole(PBConstants.CHASER):
-            print "I am the chaser"
             if self.brain.gameController.timeSincePlaying < 10:
                 return 'kickoff'
             return 'chase'

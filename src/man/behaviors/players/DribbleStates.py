@@ -7,13 +7,13 @@ from ..navigator import Navigator
 from ..kickDecider import kicks
 from objects import RelRobotLocation, Location
 
-### BASIC IDEA 
-# We dribble by setting ourselves up for a dribble kick. The sweet spot 
+### BASIC IDEA
+# We dribble by setting ourselves up for a dribble kick. The sweet spot
 # is in front of the ball, so setting ourselves up for a kick actually
 # results in us running through the ball. (There is no actual dribble sweet
-# move.) If vision sees a crowded area in front of us, we rotate around the 
-# ball and dribble again when we see a clear path. We only dribble if these 
-# conditions are true: 1. We are positioned according to positionedForDribble. 
+# move.) If vision sees a crowded area in front of us, we rotate around the
+# ball and dribble again when we see a clear path. We only dribble if these
+# conditions are true: 1. We are positioned according to positionedForDribble.
 # 2. We are facing our opponents' goal. 3. We can see the ball close to us.
 
 ### TODO
@@ -42,6 +42,7 @@ def decideDribble(player):
             player.kick = kicks.RIGHT_DRIBBLE
 
     if not transitions.shouldDribble(player):
+        player.inKickingSate = False
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
         return player.goNow('executeDribble')
@@ -71,6 +72,7 @@ def executeDribble(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
+        player.inKickingSate = False
         return player.goLater('chase')
     elif not transitions.centerLaneOpen(player): # reorder CLO and DGB?
         return player.goNow('rotateToOpenSpace')
@@ -92,6 +94,7 @@ def rotateToOpenSpace(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
+        player.inKickingSate = False
         player.stand()
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
@@ -106,17 +109,20 @@ def lookForBall(player):
     """
     if player.firstFrame():
         player.brain.tracker.repeatWidePan()
-        backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
-        player.brain.nav.goTo(backupLoc,
-                              Navigator.GENERAL_AREA,
-                              Navigator.MEDIUM_SPEED,
-                              False,
-                              False)
-        
-    if transitions.seesBall(player):
+        player.stand()
+
+    if transitions.shouldDribble(player):
         player.brain.tracker.trackBall()
-        return player.goNow('positionForDribble')
+        return player.goLater('decideDribble')
+
+    if player.brain.nav.isStopped():
+        # Avoid "some weird stuff" if other walk is active.
+        backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
+        player.brain.nav.walkTo(backupLoc,
+                                Navigator.MEDIUM_SPEED)
+
     elif transitions.navDone(player):
+        player.inKickingSate = False
         return player.goLater('chase')
 
     return player.stay()

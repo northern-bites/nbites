@@ -7,14 +7,14 @@ def shouldDribble(player):
     """
     We should be in the dribble FSA.
     """
-    return (facingGoal(player) and positionedForDribble(player) and timeLeft(player) 
+    return (facingGoal(player) and positionedForDribble(player) and timeLeft(player)
             and not ballGotFarAway(player) and not ballLost(player))
 
 # def crowded(player):
 #     """
 #     The vision heat map is showing a crowded area in front of me.
 #     """
-#     return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST 
+#     return ((player.brain.interface.visionObstacle.left_dist < constants.CROWDED_DIST
 #             and not player.brain.interface.visionObstacle.block_left == 0)
 #             or (player.brain.interface.visionObstacle.mid_dist < constants.CROWDED_DIST
 #             and not player.brain.interface.visionObstacle.block_mid == 0)
@@ -25,9 +25,9 @@ def centerLaneOpen(player):
     """
     I have an open lane right in front of me.
     """
-    return (player.brain.interface.visionObstacle.mid_dist > 
-            constants.OPEN_LANE_DIST or 
-            player.brain.interface.visionObstacle.block_mid == 0) 
+    return (player.brain.interface.visionObstacle.mid_dist >
+            constants.OPEN_LANE_DIST or
+            player.brain.interface.visionObstacle.block_mid == 0)
 
 def positionedForDribble(player):
     """
@@ -53,7 +53,7 @@ def facingGoal(player):
     headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
     bearingForKick = headingBallToGoalCenter - player.brain.loc.h
 
-    return (bearingForKick < constants.FACING_FORWARD_DEG and 
+    return (bearingForKick < constants.FACING_FORWARD_DEG and
             bearingForKick > -constants.FACING_FORWARD_DEG)
 
 def rotateLeft(player):
@@ -62,7 +62,7 @@ def rotateLeft(player):
     """
     return (player.brain.loc.y < (1./2.*nogginConstants.FIELD_HEIGHT))
     # return (player.brain.interface.visionObstacle.block_left == 0 or
-    #         (player.brain.interface.visionObstacle.left_dist < 
+    #         (player.brain.interface.visionObstacle.left_dist <
     #         player.brain.interface.visionObstacle.right_dist and
     #         not player.brain.interface.visionObstacle.block_right == 0))
 
@@ -116,11 +116,11 @@ def seesBall(player):
 
 def ballInGoalBox(player):
     """
-    The ball is in the goal box (between the posts actually), so we can 
+    The ball is in the goal box (between the posts actually), so we can
     dribble it in.
     """
     return False
-    # return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH - 
+    # return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH -
     #         nogginConstants.GOALBOX_DEPTH and
     #         player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
     #         player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
@@ -136,6 +136,6 @@ def timeLeft(player):
     There is enough time left in the game to dribble. Or there is very little
     time left but the ball is close enough to the goal to dribble it in.
     """
-    return (player.brain.game.secs_remaining > 25 or 
-            (player.brain.game.secs_remaining < 10 and 
+    return (player.brain.game.secs_remaining > 25 or
+            (player.brain.game.secs_remaining < 10 and
              ballInGoalBox(player)))
