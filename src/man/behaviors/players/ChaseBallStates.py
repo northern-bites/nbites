@@ -273,7 +273,6 @@ def positionForKick(player):
 
     #only enque the new goTo destination once
     if player.firstFrame():
-        player.ballBeforeApproach = player.brain.ball
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
         #TODO: try getting rid of ADAPTIVE here, if ball estimates are good,
@@ -293,6 +292,7 @@ def positionForKick(player):
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
         print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
+        player.ballBeforeKick = player.brain.ball
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 
