@@ -320,7 +320,7 @@ struct Line {
         // Shift in x is dist*cos((tan^-1(slope))
         // Calculated w/o trig w/ identities #wolfram
         if (vert) {
-            Point vertShift(initial.x, initial.y + dist);
+            Point vertShift(initial.x, initial.y - dist);
             return vertShift;
         }
 

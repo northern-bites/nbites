@@ -140,7 +140,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
         if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
             man::localization::Line postProcessLine = man::localization::VisionSystem::prepareVisualLine(loc,
                                                                                            obsv.visual_line(i));
-            if(postProcessLine.length() > 100.f) {
+            if(postProcessLine.length() > 70.f) {
                 QPoint obsvSt (postProcessLine.start.x, postProcessLine.start.y);
                 QPoint obsvEnd(postProcessLine.end.x, postProcessLine.end.y);
 
