@@ -17,6 +17,7 @@ from objects import RelRobotLocation, Location
 # 2. We are facing our opponents' goal. 3. We can see the ball close to us.
 
 ### TODO
+# test DRIBBLE_ON_KICKOFF
 # ballInGoalBox dribbling via goalie detection
 # rotate towards goal when dribbling
 # test time-left based decision making
@@ -108,6 +109,7 @@ def lookForBall(player):
     Backup and look for ball. If fails, leave the FSA.
     """
     if player.firstFrame():
+        lookForBall.counter = 0
         player.brain.tracker.repeatWidePan()
         player.stand()
 
