@@ -35,7 +35,6 @@ import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
-import SonarState_proto
 import VisionRobot_proto
 import VisionField_proto
 import ButtonState_proto
@@ -345,21 +344,14 @@ class Brain(object):
         """
         Resets the goalie's localization to the manual position in the goalbox.
         """
-        if self.gameController.teamColor == Constants.teamColor.TEAM_BLUE:
-            self.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
-                                Constants.MIDFIELD_Y,
-                                Constants.HEADING_RIGHT,
-                                _localization.LocNormalParams(15.0, 15.0, 1.0))
-        else:
-            self.resetLocTo(Constants.FIELD_WHITE_RIGHT_SIDELINE_X,
-                                Constants.MIDFIELD_Y,
-                                Constants.HEADING_LEFT,
-                                _localization.LocNormalParams(15.0, 15.0, 1.0))
+        self.resetLocTo(Constants.FIELD_WHITE_LEFT_SIDELINE_X,
+                        Constants.MIDFIELD_Y,
+                        Constants.HEADING_RIGHT)
 
-
-    #TODO: write this method!
     def resetPenaltyKickLocalization(self):
-        pass
+        self.resetLocTo(Constants.LANDMARK_OPP_FIELD_CROSS[0] - 1.0,
+                        Constants.MIDFIELD_Y,
+                        Constants.HEADING_RIGHT)
 
     # THIS IS A HACK!
     # ... but until we have a world contextor or some such, it's a necessary one.

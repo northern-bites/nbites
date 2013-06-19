@@ -53,53 +53,17 @@ class Navigator(FSA.FSA):
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition,
 
-            Transition.CountTransition(navTrans.shouldDodgeLeft,
+            Transition.CountTransition(navTrans.shouldDodge,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : NavStates.avoidLeft,
-
-            Transition.CountTransition(navTrans.shouldDodgeRight,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : NavStates.avoidRight,
-
-            Transition.CountTransition(navTrans.shouldDodgeBack,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : NavStates.avoidBack,
-
-            Transition.CountTransition(navTrans.shouldDodgeForward,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : NavStates.avoidForward
+            : NavStates.dodge
 
             }
 
-        NavStates.avoidLeft.transitions = {
+        NavStates.dodge.transitions = {
             Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : NavStates.briefStand
-            }
-
-        NavStates.avoidRight.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : NavStates.briefStand
-            }
-
-        NavStates.avoidBack.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
-            : NavStates.briefStand
-            }
-
-        NavStates.avoidForward.transitions = {
-            Transition.CountTransition(navTrans.doneDodging,
-                                       Transition.ALL_OF_THE_TIME,
-                                       Transition.INSTANT)
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
             : NavStates.briefStand
             }
 
@@ -121,7 +85,7 @@ class Navigator(FSA.FSA):
         """
         Calls goTo on the playbook position
         """
-        self.goTo(self.brain.play.getPositionCoord(), precision = GENERAL_AREA,
+        self.goTo(self.brain.play.getPositionCoord(), precision = PRECISELY,
                   speed = QUICK_SPEED, avoidObstacles = True, fast = True, pb = True)
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):
@@ -170,7 +134,10 @@ class Navigator(FSA.FSA):
         @param fast: books it using velocity walk; Best if dest is straight ahead!
         Use it to look like a baller on the field.
 
-        @param pb: Set true if playbook positioning so we switch from fast to odometry walk when in the general area
+        @param pb: Set true if playbook positioning so we switch from fast to odometry
+        walk when in the general area of our target. This allows us to ignore playbook's
+        requested heading until we are actually close to the (x, y) position, so we can
+        walk fast to the destination then correct heading once we get there.
         """
 
         # Debug prints for motion status (seeking the walking not walking bug)
