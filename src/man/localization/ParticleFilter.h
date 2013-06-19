@@ -36,6 +36,7 @@ namespace localization
 {
 
 const float LOST_THRESHOLD = 50;
+const float LINE_CONFIDENT = 45.f;
 const float ALPHA = .05f; // Impact for ~76 frames
 
 // Define the default parameters for the Particle Filter

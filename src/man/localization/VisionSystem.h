@@ -47,7 +47,8 @@ public:
                              const messages::VisualDetection& obsv);
 
     static Line prepareVisualLine(const messages::RobotLocation& loc,
-                                  const messages::VisualLine& visualLine);
+                                  const messages::VisualLine& visualLine,
+                                  bool stdLineLength = false);
 
     void setUpdated(bool val);
     float getLowestError(){return currentLowestError;};

@@ -165,7 +165,8 @@ bool VisionSystem::update(ParticleSet& particles,
  *        and in global coordinates
  */
 Line VisionSystem::prepareVisualLine(const messages::RobotLocation& loc,
-                                     const messages::VisualLine& line)
+                                     const messages::VisualLine& line,
+                                     bool stdLineLength)
 {
     float startGlobalX, startGlobalY, endGlobalX, endGlobalY;
     float distToStart, distToEnd;
@@ -240,6 +241,20 @@ Line VisionSystem::prepareVisualLine(const messages::RobotLocation& loc,
             Point shitEnd = initialSegment.shiftDownLine(start, 1);
             end.x = shitEnd.x;
             end.y = shitEnd.y;
+        }
+    }
+
+    Line toReturn(start, end);
+
+    if (stdLineLength) { // want the line to be clipped at 150 cm in length
+        if (toReturn.length() > 120.f) {
+            // We know start is closest so lets trust that endpoint the most
+            Point newEnd = toReturn.shiftDownLine(start, 120.f);
+            if (!toReturn.containsPoint(newEnd)) { // missed the segment
+                newEnd = toReturn.shiftDownLine(start, -120.f);
+                end.x = newEnd.x;
+                end.y = newEnd.y;
+            }
         }
     }
 
@@ -366,15 +381,18 @@ float VisionSystem::getAvgLineError(const messages::RobotLocation& loc,
     int   numValidLines = 0;
     float lineLength    = 0.f;
 
-    std::cout << "line obs " << obsv.visual_line_size()<<std::endl;
-
+    // Go through each observed line
     for (int i=0; i<obsv.visual_line_size(); i++) {
-        if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
+        // Only use lines that start reasonably close
+        if((obsv.visual_line(i).start_dist() < 250.f) || (obsv.visual_line(i).end_dist() < 250.f)) {
+
+            // Prepare an observed line, but no lines longer than 1.2 meters
             Line obsvLine = prepareVisualLine(loc,
-                                              obsv.visual_line(i));
+                                              obsv.visual_line(i),
+                                              true);
 
             // Limit by line length (be safe about center circle mistake lines)
-            if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
+            if (obsvLine.length() > 118.f) {
                 sumLineError += lineSystem->scoreObservation(obsvLine);
                 numValidLines++;
                 lineLength += obsvLine.length();
@@ -382,13 +400,14 @@ float VisionSystem::getAvgLineError(const messages::RobotLocation& loc,
         }
 
     }
-//    std::cout << "line length:\t" << lineLength << std::endl;
 
     if (numValidLines > 0)
         return sumLineError/(float)numValidLines;
     else
         return -1.f;
 }
+
+
 
 
 } // namespace localization
