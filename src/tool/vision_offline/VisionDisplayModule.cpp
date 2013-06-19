@@ -315,6 +315,37 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 	}
 	else { // this is to draw in the bottom camera
 
+		for (int i = 0; i < visField->bottom_line_size(); i++) {
+
+			painter.drawLine(visField->bottom_line(i).start_x(),
+							 visField->bottom_line(i).start_y(),
+							 visField->bottom_line(i).end_x(),
+							 visField->bottom_line(i).end_y());
+		}
+
+
+		painter.setPen(Qt::magenta);
+		for (int i = 0; i < visField->bottom_corner_size(); i++) {
+			switch(visField->bottom_corner(i).corner_type()) {
+			case messages::VisualCorner::INNER_L: painter.setPen(Qt::red);
+				break;
+			case messages::VisualCorner::OUTER_L: painter.setPen(Qt::blue);
+				break;
+			case messages::VisualCorner::T: painter.setPen(Qt::black);
+				break;
+			case messages::VisualCorner::CIRCLE: painter.setPen(Qt::magenta);
+				break;
+			}
+			painter.drawLine(visField->bottom_corner(i).x() - 5,
+							 visField->bottom_corner(i).y() - 5,
+							 visField->bottom_corner(i).x() + 5,
+							 visField->bottom_corner(i).y() + 5);
+			painter.drawLine(visField->bottom_corner(i).x() + 5,
+							 visField->bottom_corner(i).y() - 5,
+							 visField->bottom_corner(i).x() - 5,
+							 visField->bottom_corner(i).y() + 5);
+		}
+
 		if (!visBall->intopcam()) {
 			int ball_x = visBall->x();
 			int ball_y = visBall->y();

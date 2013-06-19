@@ -210,6 +210,34 @@ void VisionModule::updateVisionField() {
         }
 
     }
+
+    const std::vector<boost::shared_ptr<VisualLine> >* bottomLines = vision->bottomLines->getLines();
+    for(std::vector<boost::shared_ptr<VisualLine> >::const_iterator i = bottomLines->begin();
+        i != bottomLines->end(); i++)
+    {
+        messages::VisualLine *botLine = field_data.get()->add_bottom_line();
+        botLine->mutable_visual_detection()->set_distance(i->get()->getDistance());
+        botLine->mutable_visual_detection()->set_bearing(i->get()->getBearing());
+        botLine->mutable_visual_detection()->set_distance_sd(i->get()->getDistanceSD());
+        botLine->mutable_visual_detection()->set_bearing_sd(i->get()->getBearingSD());
+        botLine->set_start_x(i->get()->getStartpoint().x);
+        botLine->set_start_y(i->get()->getStartpoint().y);
+        botLine->set_end_x(i->get()->getEndpoint().x);
+        botLine->set_end_y(i->get()->getEndpoint().y);
+        botLine->set_start_dist(i->get()->getStartEst().dist);
+        botLine->set_start_bearing(i->get()->getStartEst().bearing);
+        botLine->set_end_dist(i->get()->getEndEst().dist);
+        botLine->set_end_bearing(i->get()->getEndEst().bearing);
+        botLine->set_angle(i->get()->getAngle());
+        botLine->set_avg_width(i->get()->getAvgWidth());
+        botLine->set_length(i->get()->getLength());
+        botLine->set_slope(i->get()->getSlope());
+        botLine->set_y_int(i->get()->getYIntercept());
+        const std::vector<lineID> id_for_line = i->get()->getIDs();
+        for (unsigned int k = 0; k < id_for_line.size(); k++) {
+            botLine->add_possibilities(id_for_line[k]);
+        }
+    }
     //end lines info
 
     //setting the corner info
@@ -247,6 +275,45 @@ void VisionModule::updateVisionField() {
         for (unsigned int k = 0; k < p_id.size(); k++)
         {
             visCorner->add_poss_id(p_id[k]);
+        }
+
+
+    }
+
+   std::list<VisualCorner>* bottomCorners = vision->bottomLines->getCorners();
+    for(std::list<VisualCorner>::iterator i = bottomCorners->begin();
+        i != bottomCorners->end(); i++)
+    {
+        messages::VisualCorner *botCorner = field_data.get()->add_bottom_corner();
+        botCorner->set_orientation(i->getOrientation());
+        botCorner->set_corner_type(i->getShape());
+        botCorner->set_physical_orientation(i->getPhysicalOrientation());
+        botCorner->mutable_visual_detection()->set_distance(i->getDistance());
+        botCorner->mutable_visual_detection()->set_bearing(i->getBearing());
+        botCorner->mutable_visual_detection()->set_bearing_deg(i->getBearingDeg());
+        botCorner->mutable_visual_detection()->set_distance_sd(i->getDistanceSD());
+        botCorner->mutable_visual_detection()->set_bearing_sd(i->getBearingSD());
+        botCorner->mutable_visual_detection()->set_angle_x_deg(i->getAngleXDeg());
+        botCorner->mutable_visual_detection()->set_angle_y_deg(i->getAngleYDeg());
+        botCorner->set_x(i->getX());
+        botCorner->set_y(i->getY());
+
+        const std::list<const ConcreteCorner *>* possible = i->getPossibilities();
+        for(std::list<const ConcreteCorner*>::const_iterator j = possible->begin();
+            j != possible->end(); j++)
+        {
+            messages::Point *field_point =
+                botCorner->mutable_visual_detection()->add_concrete_coords();
+
+            field_point->set_x((**j).getFieldX());
+            field_point->set_y((**j).getFieldY());
+            field_point->set_field_angle((**j).getFieldAngle());
+        }
+
+        const std::vector<cornerID> p_id = i->getIDs();
+        for (unsigned int k = 0; k < p_id.size(); k++)
+        {
+            botCorner->add_poss_id(p_id[k]);
         }
 
 

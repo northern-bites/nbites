@@ -165,6 +165,7 @@ public:
     VisualObstacle* obstacles;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<FieldLines> fieldLines;
+    boost::shared_ptr<FieldLines> bottomLines;
 
     fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3

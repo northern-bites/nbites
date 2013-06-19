@@ -6,7 +6,9 @@ message VisionField
     optional VisualGoalPost goal_post_l = 2;
     optional VisualGoalPost goal_post_r = 3;
     repeated VisualCorner visual_corner = 4;
+    repeated VisualCorner bottom_corner = 9;
     repeated VisualLine visual_line = 5;
+    repeated VisualLine bottom_line = 8;
     optional VisualDetection visual_cross = 6;
     optional VisualFieldEdge visual_field_edge = 7;
 }
