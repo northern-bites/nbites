@@ -1208,25 +1208,26 @@ void Threshold::identifyGoalie() {
       cout << "Red " << redTotal << " blue " << navyTotal << endl;
       cout << "Runs red " << redRun << " navy " << navyRun << endl;
       cout << "Red cols " << redCols << " navy cols " << navyCols << endl; */
-    if ((redRobot || (redCols > 2 * navyCols && redCols > 5)) && !navyRobot) {
+    if ((redRobot || (redCols > 2 * navyCols && redCols > 5))) {
         if (debugShot) {
             cout << "Red goalie " << endl;
         }
         vision->yglp->setRedGoalieCertain();
         vision->ygrp->setRedGoalieCertain();
-    } else if ((navyRobot || (navyCols > 2 * redCols && navyCols > 5)) && !redRobot) {
-        if (debugShot) {
-            cout << "Navy goalie " << endl;
-        }
-        vision->yglp->setNavyGoalieCertain();
-        vision->ygrp->setNavyGoalieCertain();
-    } else if (redCols > 1 && navyCols == 0 && redTotal > 30 && !navyRobot) {
+    } else if (redCols > 1 && navyCols == 0 && redTotal > 30) {
         if (debugShot) {
             cout << "Probably a red goalie" << endl;
         }
         vision->yglp->setRedGoalieProbable();
         vision->ygrp->setRedGoalieProbable();
-    } else if (navyCols > 1 && redCols == 0 && navyTotal > 30 && !redRobot) {
+    }
+	if ((navyRobot || (navyCols > 2 * redCols && navyCols > 5))) {
+        if (debugShot) {
+            cout << "Navy goalie " << endl;
+        }
+        vision->yglp->setNavyGoalieCertain();
+        vision->ygrp->setNavyGoalieCertain();
+    } else if (navyCols > 1 && redCols == 0 && navyTotal > 30) {
         if (debugShot) {
             cout << "Probably a navy goalie" << endl;
         }
