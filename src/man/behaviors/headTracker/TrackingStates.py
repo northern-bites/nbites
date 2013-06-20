@@ -1,9 +1,6 @@
 from . import TrackingConstants as constants
 import HeadMoves
-from objects import RelLocation
 import noggin_constants as NogginConstants
-from ..playbook import PBConstants
-from ..players import GoalieConstants
 import BallModel_proto as BallModel
 
 DEBUG = False

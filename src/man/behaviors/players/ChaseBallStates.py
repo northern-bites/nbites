@@ -108,7 +108,7 @@ def prepareForKick(player):
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
- 
+
     # If loc is good, stop pan ASAP and do the kick
     # Loc is currently never accurate enough @summer 2012
     #  Might have to do it anyway if comm is always down.
@@ -148,7 +148,7 @@ def orbitBall(player):
             print "Turn to left, move right"
             player.brain.nav.walk(0, -.5, .15)
             orbitBall.orbitClockwise = False
-        
+
         if player.kick.h > 0:
             #set y vel at 50% speed in opposite direction
             print "Turn to right, move left"
@@ -190,7 +190,7 @@ def orbitBall(player):
     #     print "ball to goal center:| ", headingBallToGoalCenter
     #     print "player heading:     | ", player.brain.loc.h
     #     print "bearing for kick:   | ", bearingForKick
-    #     print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")" 
+    #     print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
     #     print "=====================++++++++++"
 
     #our in-house heading checker is of the opinion that we're pointed in the right direction
@@ -213,7 +213,7 @@ def orbitBall(player):
     if player.orbitDistance < player.brain.ball.distance - 7:
         #We're too far away
         player.brain.nav.setXSpeed(.15)
-        
+
     if player.orbitDistance > player.brain.ball.distance + 1:
         #We're too close
         player.brain.nav.setXSpeed(-.15)
@@ -294,6 +294,7 @@ def positionForKick(player):
         print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.ballBeforeKick = player.brain.ball
         player.brain.nav.stand()
+        player.ballBeforeApproach = player.brain.ball
         return player.goNow('kickBallExecute')
 
     return player.stay()

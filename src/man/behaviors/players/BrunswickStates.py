@@ -1,4 +1,3 @@
-from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_KICKOFF)
 from .. import SweetMoves
 import noggin_constants as nogginConstants
 #import _localization
@@ -110,7 +109,6 @@ def gamePlaying(player):
 
     roleState = player.getRoleState()
     return player.goNow(roleState)
-
 
 def gamePenalized(player):
     if player.firstFrame():

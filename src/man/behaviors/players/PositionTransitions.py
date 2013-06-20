@@ -2,13 +2,6 @@ import PositionConstants as constants
 from math import fabs
 
 ####### POSITIONING STUFF ##############
-def shouldKickAtPosition(player):
-    """
-    Is the ball close enough that we should kick
-    """
-    return (player.brain.ball.vis.on and
-            player.brain.ball.dist < constants.AT_POSITION_KICK_DIST)
-
 def leavingTheField(player):
     """
     I am looking off the field and really close to edge!

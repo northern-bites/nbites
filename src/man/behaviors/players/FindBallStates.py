@@ -21,23 +21,6 @@ def findBall(player):
 
     return player.stay()
 
-
-def scanFindBall(player):
-    """
-    State to move the head to find the ball. If we find the ball, we
-    mppove to align on it. If we don't find it, we spin to keep looking
-    """
-    player.brain.tracker.trackBall()
-
-    if transitions.shouldChaseBall(player):
-        return player.goNow('findBall')
-
-    # a time based check.
-    if transitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBall')
-
-    return player.stay()
-
 def spinFindBall(player):
     """
     State to spin to find the ball. If we find the ball, we
