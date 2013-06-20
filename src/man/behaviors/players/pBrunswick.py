@@ -69,7 +69,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             not self.currentState == 'afterPenalty' and
             not self.currentState == 'gamePenalized'):
 
-            player.shouldKickOff = False
+            self.shouldKickOff = False
 
             roleState = self.getNextState()
 
