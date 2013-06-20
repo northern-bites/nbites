@@ -19,8 +19,6 @@
  *  @date June 2009
  */
 
-
-
 class NaoLights : public Lights{
 public:
     NaoLights(boost::shared_ptr<AL::ALBroker> broker);

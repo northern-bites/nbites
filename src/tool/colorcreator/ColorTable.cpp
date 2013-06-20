@@ -51,7 +51,7 @@ void ColorTable::write(string filename) {
     FILE *tableFile = fopen(filename.c_str(), "w");
 
     if (!tableFile) {
-        cerr << "Could open file for saving a color table " << filename;
+        cerr << "Could open file for saving a color table " << filename << endl;
         return;
     }
 

@@ -7,8 +7,8 @@ from ..navigator import Navigator
 from ..kickDecider import kicks
 from objects import RelRobotLocation, Location
 
-### BASIC IDEA 
-# We dribble by setting ourselves up for a dribble kick. The sweet spot 
+### BASIC IDEA
+# We dribble by setting ourselves up for a dribble kick. The sweet spot
 # is in front of the ball, so setting ourselves up for a kick actually
 # results in us running through the ball. (There is no actual dribble sweet
 # move.) If vision sees a crowded area in front of us, we rotate around the 
@@ -43,6 +43,7 @@ def decideDribble(player):
             player.kick = kicks.RIGHT_DRIBBLE
 
     if not transitions.shouldDribble(player):
+        player.inKickingSate = False
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
         return player.goNow('executeDribble')
@@ -72,6 +73,7 @@ def executeDribble(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
+        player.inKickingSate = False
         return player.goLater('chase')
     elif not transitions.centerLaneOpen(player): # reorder CLO and DGB?
         return player.goNow('rotateToOpenSpace')
@@ -93,6 +95,7 @@ def rotateToOpenSpace(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
+        player.inKickingSate = False
         player.stand()
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):

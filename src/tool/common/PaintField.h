@@ -39,6 +39,5 @@ protected:
     float scaleFactor;
 };
 
-
+} //namespace tool_common
 } //namespace tool
-} //namespace viewer

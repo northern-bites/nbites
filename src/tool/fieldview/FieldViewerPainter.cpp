@@ -15,6 +15,7 @@ FieldViewerPainter::FieldViewerPainter(QWidget* parent, float scaleFactor_) :
     shouldPaintObsvOffline(false)
 {
     lineSystem = new man::localization::LineSystem();
+    visionSystem = new man::localization::VisionSystem();
 }
 
 void FieldViewerPainter::paintParticleAction(bool state) {
@@ -148,7 +149,7 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
                 painter.drawLine(obsvSt, obsvEnd);
 
                 // Get and paint the line it matches to
-                man::localization::LineErrorMatch match = lineSystem->scoreAndMatchObservation(postProcessLine);
+                man::localization::LineErrorMatch match = lineSystem->scoreAndMatchObservation(postProcessLine, false);
 
                 QPoint matchStart(match.startMatch.x, match.startMatch.y);
                 QPoint matchEnd  (match.endMatch.x, match.endMatch.y);
@@ -159,6 +160,11 @@ void FieldViewerPainter::paintObservations(QPaintEvent* event,
 
         }
     }
+
+    // std::cout << "Est line error:\t"
+    //           << visionSystem->getAvgLineError(loc,
+    //                                            obsv)
+    //           << std::endl;
 
     if (obsv.has_goal_post_l()) {
         if (obsv.goal_post_l().visual_detection().on()

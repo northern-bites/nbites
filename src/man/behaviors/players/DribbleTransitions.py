@@ -58,7 +58,7 @@ def facingGoal(player):
     headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
     bearingForKick = headingBallToGoalCenter - player.brain.loc.h
 
-    return (bearingForKick < constants.FACING_FORWARD_DEG and 
+    return (bearingForKick < constants.FACING_FORWARD_DEG and
             bearingForKick > -constants.FACING_FORWARD_DEG)
 
 def rotateLeft(player):
@@ -68,7 +68,7 @@ def rotateLeft(player):
     """
     return (player.brain.loc.y < (1./2.*nogginConstants.FIELD_HEIGHT))
     # return (player.brain.interface.visionObstacle.block_left == 0 or
-    #         (player.brain.interface.visionObstacle.left_dist < 
+    #         (player.brain.interface.visionObstacle.left_dist <
     #         player.brain.interface.visionObstacle.right_dist and
     #         not player.brain.interface.visionObstacle.block_right == 0))
 
@@ -113,7 +113,7 @@ def seesBall(player):
 
 def ballInGoalBox(player):
     """
-    The ball is in the goal box (between the posts actually), so we can 
+    The ball is in the goal box (between the posts actually), so we can
     dribble it in.
     """
     return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH - 
