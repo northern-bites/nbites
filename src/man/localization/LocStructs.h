@@ -183,8 +183,12 @@ struct Line {
         Point midpoint = shiftDownLine(start, length()/2.f);
         if (!containsPoint(midpoint))
             midpoint =   shiftDownLine(start,-length()/2.f);
-        if (!containsPoint(midpoint))
+        if (!containsPoint(midpoint)) {
             std::cout << "Massive Precision Error in Line Struct" << std::endl;
+            std::cout << "start " << start.x << " " << start.y << std::endl;
+            std::cout << "end " << end.x << " " << end.y << std::endl;
+            std::cout << "midpoint " << midpoint.x << " " << midpoint.y << std::endl;
+        }
         return midpoint;
     }
 

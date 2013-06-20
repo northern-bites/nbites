@@ -43,6 +43,7 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
     }
 
     lost = false;
+    lineLost = true;
     errorMagnitude = LINE_CONFIDENT - 10.f;
 }
 
@@ -92,8 +93,17 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         errorMagnitude+= (1.f/10.f);
 
     // FOR TESTING
-    if (errorMagnitude < LINE_CONFIDENT)
-        std::cout << "I know where i am?" << std::endl;
+    if (errorMagnitude < LINE_CONFIDENT) {
+        if(lineLost) {
+            // std::cout << "\nI know where i am" << std::endl;
+        }
+        lineLost = false;
+    }
+    else {
+        if(!lineLost)
+            // std::cout << "\nI am lost" << std::endl;
+        lineLost = true;
+    }
 }
 
 /**

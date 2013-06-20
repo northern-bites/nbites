@@ -70,7 +70,7 @@ private:
     void addGoalPostReconstructionsToList(messages::VisualGoalPost leftPost,
                                           messages::VisualGoalPost rightPost);
 
-    void opitmizeReconstructions();
+    void optimizeReconstructions();
 
 private:
     LineSystem* lineSystem;

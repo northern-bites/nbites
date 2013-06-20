@@ -339,7 +339,7 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
     //std::cout << concreteNum << " particles should be injected" << std::endl;
 }
 
-void VisionSystem::opitmizeReconstructions()
+void VisionSystem::optimizeReconstructions()
 {
     // // The idea here is to go through the list and only keep locations
     // // which are reconstructed more than once.
