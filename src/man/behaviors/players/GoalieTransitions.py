@@ -32,8 +32,7 @@ def getLeftGoalboxCorner(player):
         for j in range(0, vision.visual_corner(i).poss_id_size()):
             if (vision.visual_corner(i).poss_id(j) ==
                 vision.visual_corner(i).corner_id.YELLOW_GOAL_LEFT_L):
-                if (vision.visual_corner(i).orientation < 0 and
-                    vision.visual_corner(i).visual_detection.bearing > 0):
+                if (vision.visual_corner(i).orientation < 0):
                     return vision.visual_corner(i)
 
     return None
@@ -44,8 +43,7 @@ def getRightGoalboxCorner(player):
         for j in range(0, vision.visual_corner(i).poss_id_size()):
             if (vision.visual_corner(i).poss_id(j) ==
                 vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L):
-                if (vision.visual_corner(i).orientation > 0 and
-                    vision.visual_corner(i).visual_detection.bearing < 0):
+                if (vision.visual_corner(i).orientation > 0):
                     return vision.visual_corner(i)
 
     return None
@@ -68,6 +66,8 @@ def badLeftCornerObservation(player):
     corner = getLeftGoalboxCorner(player)
     if not corner:
         return False
+
+    print "Left orientation: " + str(corner.orientation)
 
     dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
                       corner.visual_detection.distance)
@@ -97,6 +97,9 @@ def badRightCornerObservation(player):
     corner = getRightGoalboxCorner(player)
     if not corner:
         return False
+
+    print "Right orientation: " + str(corner.orientation)
+
     dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
                       corner.visual_detection.distance)
     dBear = math.fabs(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER -
