@@ -14,7 +14,7 @@ GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
 GOAL_LEDS = True
-PLAYBOOK_LEDS = False
+PLAYBOOK_LEDS = True
 LOC_LEDS = False
 COMM_LEDS = True
 
@@ -24,7 +24,7 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
-NUM_LED_GROUPS = 30
+NUM_LED_GROUPS = 29
 
 (LEFT_LOC_ONE_LED,
 LEFT_LOC_TWO_LED,
@@ -54,7 +54,6 @@ GOAL_ID_LED,
 CHEST_LED,
 LEFT_FOOT_LED,
 RIGHT_FOOT_LED,
-LEFT_UNUSED_LED,
 RIGHT_UNUSED_LED) = range(NUM_LED_GROUPS)
 
 ###COLORS

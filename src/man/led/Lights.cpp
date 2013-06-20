@@ -5,10 +5,10 @@ const std::string Lights::LED_NAMES[Lights::NUM_LED_NAMES] = {
     "LeftComm1","LeftComm2","LeftComm3","LeftComm4","LeftComm5",
     "RightComm1","RightComm2","RightComm3","RightComm4","RightComm5",
     "Role","Ball",
-    "LeftGoal","RightGoal","GoalID"
+    "LeftGoal","RightGoal","GoalID",
     "Chest",
     "LeftFoot", "RightFoot",
-    "LeftUnused","RightUnused"};
+    "RightUnused"};
 
 
 Lights::Lights(){};

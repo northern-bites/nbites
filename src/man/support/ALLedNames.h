@@ -52,15 +52,15 @@ static const unsigned int NUM_COMM_LEDS = 1;
 static const unsigned int NUM_LOC_LEDS  = 1;
 static const unsigned int NUM_GOAL_LEDS = (NUM_FACE_LEDS >> 2);
 static const unsigned int NUM_GOAL_ID_LEDS = (NUM_FACE_LEDS >> 1) - 1;
-static const unsigned int NUM_ROLE_LEDS = (NUM_FACE_LEDS >> 1) - 1;
 static const unsigned int NUM_BALL_LEDS = (NUM_FACE_LEDS >> 1) - 1;
-static const unsigned int NUM_UNUSED_EYE_LEDS = 1;
+static const unsigned int NUM_ROLE_LEDS = NUM_FACE_LEDS - NUM_BALL_LEDS;
+static const unsigned int NUM_UNUSED_EYE_LEDS = 1; // For right eye
 
 static const unsigned int NUM_LED_COLORS = 3;
 static const unsigned int NUM_LED_ORIENTATIONS = 2;
 static const unsigned int NUM_ONE_EYE_LEDS = NUM_LED_COLORS * NUM_FACE_LEDS;
 
-static const unsigned int NUM_UNIQUE_LEDS = 30;
+static const unsigned int NUM_UNIQUE_LEDS = 29;
 static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,
     NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,NUM_LOC_LEDS,
@@ -70,7 +70,7 @@ static const unsigned int NUM_RGB_LEDS[NUM_UNIQUE_LEDS] ={
     NUM_GOAL_LEDS,NUM_GOAL_LEDS,NUM_GOAL_ID_LEDS,
     NUM_CHEST_LEDS,
     NUM_FOOT_LEDS,NUM_FOOT_LEDS,
-    NUM_UNUSED_EYE_LEDS,NUM_UNUSED_EYE_LEDS};
+    NUM_UNUSED_EYE_LEDS};
 static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED, // Ear fronts
     BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,BLUE_LED,
@@ -80,7 +80,7 @@ static const unsigned int LED_START_COLOR[NUM_UNIQUE_LEDS] ={
     RED_LED,RED_LED,RED_LED,                      // Right Eye
     RED_LED,                                      // Chest
     RED_LED,RED_LED,                              // Feet
-    RED_LED,RED_LED};                             // Unused eyes
+    RED_LED};                                     // Unused eyes
 static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
@@ -90,7 +90,7 @@ static const unsigned int LED_END_COLOR[NUM_UNIQUE_LEDS] ={
     NUM_LED_COLORS,NUM_LED_COLORS,NUM_LED_COLORS,
     NUM_LED_COLORS,
     NUM_LED_COLORS,NUM_LED_COLORS,
-    NUM_LED_COLORS,NUM_LED_COLORS};
+    NUM_LED_COLORS};
 
 static const std::string faceL[NUM_LED_ORIENTATIONS][NUM_LED_COLORS][NUM_FACE_LEDS] ={
 /*  Face Leds Left */
@@ -198,7 +198,10 @@ static const std::string chestL[NUM_LED_COLORS]={
 };
 
 
-// HACK for LED location in eyes
+/* NOTE: EYE LEDS ON NaoV4 ARE ROTATED (RIGHT ALSO BACKWARDS) FROM THE SPECS!!
+   In other words, the specs aren't right so below is a "hack" until
+   the hardware is actually to spec. HACK
+*/
 static const std::string ballL[NUM_LED_COLORS][NUM_BALL_LEDS] ={
 /* Red*/
     {faceL[LEFT_LED][RED_LED][3],
@@ -217,35 +220,25 @@ static const std::string ballL[NUM_LED_COLORS][NUM_BALL_LEDS] ={
 static const std::string roleL[NUM_LED_COLORS][NUM_ROLE_LEDS] ={
 /* Red*/
     {faceL[LEFT_LED][RED_LED][0],
+     faceL[LEFT_LED][RED_LED][2],
+     faceL[LEFT_LED][RED_LED][6],
      faceL[LEFT_LED][RED_LED][1],
      faceL[LEFT_LED][RED_LED][7]},
 /* Green*/
     {faceL[LEFT_LED][GREEN_LED][0],
      faceL[LEFT_LED][GREEN_LED][1],
+     faceL[LEFT_LED][GREEN_LED][2],
+     faceL[LEFT_LED][GREEN_LED][6],
      faceL[LEFT_LED][GREEN_LED][7]},
 /* Blue*/
     {faceL[LEFT_LED][BLUE_LED][0],
      faceL[LEFT_LED][BLUE_LED][1],
+     faceL[LEFT_LED][BLUE_LED][2],
+     faceL[LEFT_LED][BLUE_LED][6],
      faceL[LEFT_LED][BLUE_LED][7]}
 };
 
 /* UNUSED LEDS HACK... stupid aldebaran...*/
-static const std::string leftUnL[NUM_LED_COLORS][2] ={
-    {faceL[LEFT_LED][RED_LED][2],
-     faceL[LEFT_LED][RED_LED][6]},
-
-    {faceL[LEFT_LED][GREEN_LED][2],
-     faceL[LEFT_LED][GREEN_LED][6]},
-
-    {faceL[LEFT_LED][BLUE_LED][2],
-     faceL[LEFT_LED][BLUE_LED][6]}
-};
-
-/* NOTE: RIGHT EYE LED ON NaoV4 IS BACKWARDS AND ROTATED FROM THE SPECS!!
-   In other words, the specs aren't right so below is a "hack" until
-   the hardware is actually to spec.
-*/
-
 static const std::string rightUnL[NUM_LED_COLORS][1] ={
     {faceL[RIGHT_LED][RED_LED][7]},
 
@@ -323,7 +316,6 @@ static const std::string * RGB_LED_STRINGS[NUM_UNIQUE_LEDS] ={
     &chestL[0],
     &footL[LEFT_LED][0],
     &footL[RIGHT_LED][0],
-    &leftUnL[0][0],
     &rightUnL[0][0]
 };
 };
