@@ -25,6 +25,7 @@ public:
     void addLine(float startX, float startY, float endX, float endY);
 
     float scoreObservation(Line globalObsv);
+    LineErrorMatch scoreAndMatchObservation(Line globalObsv);
 
 private:
     LineSet lines;
