@@ -24,6 +24,12 @@ class Kick(object):
                 self is LEFT_SHORT_BACK_KICK or
                 self is RIGHT_SHORT_BACK_KICK)
 
+    def isStraightKick(self):
+        return (self is LEFT_STRAIGHT_KICK or
+                self is RIGHT_STRAIGHT_KICK or
+                self is LEFT_SHORT_STRAIGHT_KICK or
+                self is RIGHT_SHORT_STRAIGHT_KICK)
+
     def __str__(self):
         #return ("%s: \n x_offset: %g y_offset: %g heading: %g ==> dest: %s" %
          #       (self.name, self.x_offset, self.y_offset, self.heading, self.dest))
@@ -56,12 +62,6 @@ LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 16.0, y =  4.9,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 16.0, y = -4.9,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
-
-# Not used 04-19-13
-LEFT_QUICK_STRAIGHT_KICK =  Kick("L_Quick_Straight", x = 15, y = 5.5,
-                                 move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
-RIGHT_QUICK_STRAIGHT_KICK = Kick("R_Quick_Straight", x = 15, y = -5.5,
-                                 move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
 
 # Not used 04-19-13
 LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 11, y =  3,
