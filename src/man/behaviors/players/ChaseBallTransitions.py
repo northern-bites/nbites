@@ -139,12 +139,13 @@ def shouldFindBallKick(player):
 
 def ballMoved(player):
     """
-    Ball has moved away from where it was seen last
+    Ball has moved away from where it was seen when positioning. We probably
+    dribbled through it.
     """
     ball = player.brain.ball
-    ballBefore = player.ballBeforeApproach
-    return (fabs(ball.x - ballBefore.x) > constants.BALL_MOVED_THR or
-            fabs(ball.y - ballBefore.y) > constants.BALL_MOVED_THR)
+    ballBefore = player.ballBeforeKick
+    return (fabs(ball.rel_x - ballBefore.rel_x) > constants.BALL_MOVED_THR or
+            fabs(ball.rel_y - ballBefore.rel_y) > constants.BALL_MOVED_THR)
 
 def shouldSpinFindBall(player):
     """
