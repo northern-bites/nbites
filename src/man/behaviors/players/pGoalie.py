@@ -7,7 +7,7 @@ from . import GoalieTransitions
 import noggin_constants as NogginConstants
 from GoalieConstants import RIGHT, LEFT
 
-from objects import Location
+from objects import Location, RelRobotLocation
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
@@ -20,6 +20,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyKicking = False
         self.aggressive = False
         self.returningFromPenalty = False
+        self.homeDirections = []
 
         # All transitions are defined here. Their conditions are in
         # GoalieTransitions
@@ -74,15 +75,15 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         #     }
 
         GoalieStates.watch.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldMoveLeft,
+            Transition.CountTransition(GoalieTransitions.badLeftCornerObservation,
                                        Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.repositionLeft,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.fixThyself,
 
-            Transition.CountTransition(GoalieTransitions.shouldMoveRight,
+            Transition.CountTransition(GoalieTransitions.badRightCornerObservation,
                                        Transition.MOST_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.repositionRight
+                                       Transition.OK_PRECISION)
+            : GoalieStates.fixThyself
 
             # Transition.CountTransition(GoalieTransitions.shouldPerformSave,
             #                            Transition.SOME_OF_THE_TIME,
@@ -98,6 +99,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             #                            Transition.MOST_OF_THE_TIME,
             #                            Transition.LOW_PRECISION)
             # : VisualGoalieStates.spinAtGoal
+            }
+
+        GoalieStates.fixThyself.transitions = {
+            Transition.CountTransition(GoalieTransitions.doneWalking,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watch
             }
 
         # VisualGoalieStates.shouldISaveIt.transitions = {

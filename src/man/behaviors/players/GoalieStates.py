@@ -5,6 +5,7 @@ from ..util import Transition
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
 import GoalieConstants as constants
+import math
 
 SAVING = True
 
@@ -130,11 +131,49 @@ def fallen(player):
 
 def watch(player):
     if player.firstFrame():
+        player.homeDirections = []
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
     return Transition.getNextState(player, watch)
+
+def average(locations):
+    x = 0.0
+    y = 0.0
+    h = 0.0
+
+    for item in locations:
+        x += item.relX
+        y += item.relY
+        h += item.relH
+
+    return RelRobotLocation(x/len(locations),
+                            y/len(locations),
+                            h/len(locations))
+
+def correct(destination):
+    destination.relX = destination.relX / constants.OVERZEALOUS_ODO
+    destination.relY = destination.relY / constants.OVERZEALOUS_ODO
+    destination.relH = destination.relH / constants.OVERZEALOUS_ODO
+
+    if math.fabs(destination.relX) < 10.0:
+        destination.relX = 0.0
+    if math.fabs(destination.relY) < 10.0:
+        destination.relY = 0.0
+    if math.fabs(destination.relH) < 10.0:
+        destination.relH = 0.0
+
+    return destination
+
+def fixThyself(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        dest = correct(average(player.homeDirections))
+        player.brain.nav.walkTo(dest)
+        print "I need to go to " + str(dest)
+
+    return Transition.getNextState(player, fixThyself)
 
 def repositionLeft(player):
     if player.firstFrame():

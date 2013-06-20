@@ -5,7 +5,8 @@
 #
 
 import GoalieConstants as constants
-from math import fabs
+import noggin_constants as field
+import math
 import VisualGoalieStates
 from objects import RelRobotLocation
 
@@ -25,6 +26,99 @@ def shouldMoveRight(player):
     return (player.brain.ball.vis.on and
             player.brain.ball.bearing_deg < -45)
 
+def getLeftGoalboxCorner(player):
+    vision = player.brain.interface.visionField
+    for i in range(0, vision.visual_corner_size()):
+        for j in range(0, vision.visual_corner(i).poss_id_size()):
+            if (vision.visual_corner(i).poss_id(j) ==
+                vision.visual_corner(i).corner_id.YELLOW_GOAL_LEFT_L):
+                if (vision.visual_corner(i).orientation < 0 and
+                    vision.visual_corner(i).visual_detection.bearing > 0):
+                    return vision.visual_corner(i)
+
+    return None
+
+def getRightGoalboxCorner(player):
+    vision = player.brain.interface.visionField
+    for i in range(0, vision.visual_corner_size()):
+        for j in range(0, vision.visual_corner(i).poss_id_size()):
+            if (vision.visual_corner(i).poss_id(j) ==
+                vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L):
+                if (vision.visual_corner(i).orientation > 0 and
+                    vision.visual_corner(i).visual_detection.bearing < 0):
+                    return vision.visual_corner(i)
+
+    return None
+
+# Rel X of corner from robot
+def getCornerRelX(alpha, corner):
+    return (corner.visual_detection.distance *
+            math.cos(corner.physical_orientation + math.radians(alpha)))
+
+# Rel Y of corner from robot
+def getCornerRelY(alpha, corner):
+    return (corner.visual_detection.distance *
+            math.sin(corner.physical_orientation + math.radians(alpha)))
+
+def getRobotGlobalHeading(alpha, corner):
+    return math.degrees(corner.physical_orientation + math.radians(alpha) -
+                        corner.visual_detection.bearing)
+
+def badLeftCornerObservation(player):
+    corner = getLeftGoalboxCorner(player)
+    if not corner:
+        return False
+
+    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
+                      corner.visual_detection.distance)
+    dBear = math.fabs(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER -
+                      corner.visual_detection.bearing_deg)
+
+    if not (dDist > constants.CORNER_DISTANCE_THRESH or
+            dBear > constants.CORNER_BEARING_THRESH):
+        return False
+
+    homeRelX = -(field.GOALBOX_DEPTH - getCornerRelX(90, corner) -
+                 constants.GOALIE_OFFSET)
+    homeRelY = -(field.GOALBOX_WIDTH/2.0 - getCornerRelY(90, corner))
+    homeRelH = -getRobotGlobalHeading(90, corner)
+
+    player.homeDirections += [RelRobotLocation(homeRelX,
+                                               homeRelY,
+                                               homeRelH)]
+
+
+    if len(player.homeDirections) > constants.BUFFER_THRESH:
+        player.homeDirections = player.homeDirections[1:]
+
+    return True
+
+def badRightCornerObservation(player):
+    corner = getRightGoalboxCorner(player)
+    if not corner:
+        return False
+    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
+                      corner.visual_detection.distance)
+    dBear = math.fabs(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER -
+                      corner.visual_detection.bearing_deg)
+
+    if not (dDist > constants.CORNER_DISTANCE_THRESH or
+            dBear > constants.CORNER_BEARING_THRESH):
+        return False
+
+    homeRelX = -(field.GOALBOX_DEPTH - getCornerRelX(0, corner) -
+                 constants.GOALIE_OFFSET)
+    homeRelY = field.GOALBOX_WIDTH/2.0 + getCornerRelY(0, corner)
+    homeRelH = -getRobotGlobalHeading(0, corner)
+
+    player.homeDirections += [RelRobotLocation(homeRelX,
+                                               homeRelY,
+                                               homeRelH)]
+
+    if len(player.homeDirections) > constants.BUFFER_THRESH:
+        player.homeDirections = player.homeDirections[1:]
+
+    return True
 
 # def atGoalArea(player):
 #     """
@@ -272,11 +366,11 @@ def shouldMoveRight(player):
 #     """
 #     return player.brain.nav.isAtPosition()
 
-# def doneWalking(player):
-#     """
-#     HACK for walkTo from nav, which does not always switch to done.
-#     """
-#     return player.brain.nav.currentState == 'standing'
+def doneWalking(player):
+    """
+    HACK for walkTo from nav, which does not always switch to done.
+    """
+    return player.brain.nav.currentState == 'standing'
 
 # def successfulKick(player):
 #     return player.counter > 80
