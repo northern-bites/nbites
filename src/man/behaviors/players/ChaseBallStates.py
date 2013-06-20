@@ -37,8 +37,10 @@ def kickoff(player):
         kickoff.ballRelY = player.brain.ball.rel_y
 
     if (player.brain.gameController.timeSincePlaying > 10 or
-        fabs(player.brain.ball.rel_x - kickoff.ballRelX) > constants.KICKOFF_BALL_MOVE_THRESH or
-        fabs(player.brain.ball.rel_y - kickoff.ballRelY) > constants.KICKOFF_BALL_MOVE_THRESH):
+        fabs(player.brain.ball.rel_x - kickoff.ballRelX) >
+        constants.KICKOFF_BALL_MOVE_THRESH or
+        fabs(player.brain.ball.rel_y - kickoff.ballRelY) >
+        constants.KICKOFF_BALL_MOVE_THRESH):
         return player.goNow('chase')
 
     return player.stay()
@@ -100,8 +102,6 @@ def orbitBall(player):
 
         if player.kick.h == 0:
             return player.goNow('positionForKick')
-        if player.orbitDistance > 25:
-            player.orbitDistance = 25
 
         elif player.kick.h < 0:
             #set y vel at 50% speed
@@ -150,7 +150,7 @@ def orbitBall(player):
 
     #our in-house heading checker is of the opinion that we're pointed in the right direction
     if orbitBall.desiredHeading > -5 and orbitBall.desiredHeading < 5:
-        player.brain.nav.walk(0, 0, 0)
+        player.stopWalking()
         print "Done orbiting, going to positionForKick"
         player.shouldOrbit = False
         player.kick.h = 0
@@ -160,7 +160,7 @@ def orbitBall(player):
     if player.stateTime > 8:
         print "In state orbitBall for too long, switching to chase"
         player.shouldOrbit = False
-        player.brain.nav.walk(0, 0, 0)
+        player.stopWalking()
         player.inKickingState = False
         return player.goLater('chase')
 
@@ -184,7 +184,7 @@ def orbitBall(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if player.kick.h > 0:
+    if player.kick.h > 0: # Orbiting clockwise
         if player.brain.ball.rel_y > 2:
             player.brain.nav.setHSpeed(0)
             #print "turn clockwise SLOWER"
@@ -194,7 +194,7 @@ def orbitBall(player):
         else:
             player.brain.nav.setHSpeed(-.15)
             #print "turn clockwise NORMAL"
-    else:
+    else: # Orbiting counter-clockwise
         if player.brain.ball.rel_y > 2:
             player.brain.nav.setHSpeed(.2)
             #print "turn counterclockwise FASTER"
