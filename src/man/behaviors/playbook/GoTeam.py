@@ -94,18 +94,15 @@ class GoTeam:
         # Update the current grid square that the ball is.
         self.ballUpdate()
 
-        # Broken from playbook overhaul 6/17/13
-        # TODO: Make these work again.
-        #elif PBConstants.TEST_DEFENDER:
-        #    Strategies.sTestDefender(self, play)
-        #elif PBConstants.TEST_OFFENDER:
-        #    Strategies.sTestOffender(self, play)
-        #elif PBConstants.TEST_CHASER:
-        #    Strategies.sTestChaser(self, play)
+        test = False
+        # Check test cases
+        if (PBConstants.TEST_DEFENDER or PBConstants.TEST_OFFENDER
+            or PBConstants.TEST_MIDDIE or PBConstants.TEST_CHASER):
+            test = True
 
         # Use the playbook table to determine position.
-        self.priorityPositions(self.tableLookup(self.lastBallX,
-                                                self.lastBallY), play)
+        self.priorityPositions(
+            self.tableLookup(self.lastBallX, self.lastBallY, test) , play)
 
     def ballUpdate(self):
         # Sometimes the ball filter produces infinity values when starting.
@@ -151,7 +148,7 @@ class GoTeam:
                 self.potentialBallY = newBallY
                 self.potentialBallYFrames = 1
 
-    def tableLookup(self, ball_x, ball_y):
+    def tableLookup(self, ball_x, ball_y, test = False):
         """
         Given where we think the ball is on the field (from loc),
         use the playbook table to look up where we should position.
@@ -167,6 +164,9 @@ class GoTeam:
             offset = 7
         elif self.numActiveFieldPlayers == 1:
             offset = 9
+
+        if test:
+            offset = 0
 
         for i in range(self.numActiveFieldPlayers):
             if self.goalieIsActive:
@@ -184,6 +184,36 @@ class GoTeam:
 
         roles = [pos[3] for pos in positions]
 
+        # Check test cases
+        if PBConstants.TEST_DEFENDER:
+            for i, role in enumerate(roles):
+                if role == PBConstants.DEFENDER:
+                    play.setRole(role)
+                    play.setPosition(locations[i])
+                    return
+            print "COULD NOT FIND DEFENDER TO TEST"
+        elif PBConstants.TEST_OFFENDER:
+            for i, role in enumerate(roles):
+                if role == PBConstants.OFFENDER:
+                    play.setRole(role)
+                    play.setPosition(locations[i])
+                    return
+            print "COULD NOT FIND OFFENDER TO TEST"
+        elif PBConstants.TEST_MIDDIE:
+            for i, role in enumerate(roles):
+                if role == PBConstants.MIDDIE:
+                    play.setRole(role)
+                    play.setPosition(locations[i])
+                    return
+            print "COULD NOT FIND MIDDIE TO TEST"
+        elif PBConstants.TEST_CHASER:
+            for i, role in enumerate(roles):
+                if role == PBConstants.CHASER:
+                    play.setRole(role)
+                    play.setPosition(locations[i])
+                    return
+            print "COULD NOT FIND CHASER TO TEST"
+
         self.updateMyTimes(locations, roles)
 
         # Set the chaser!
@@ -196,14 +226,12 @@ class GoTeam:
         # Find which active field player should go to each position
         if(roles[0] == PBConstants.CHASER):
             print "Hey. You're an idiot. Priorities are fucked."
-            print positions
         firstPlayer = self.findClosestPlayer(roles[0],
                                              [chaser_mate])
         if firstPlayer.playerNumber == self.brain.playerNumber:
             play.setRole(roles[0])
             play.setPosition(locations[0])
         else:
-            print "MORE THAN 2 PLAYERS"
             print "Chaser is {0}, First is {1}".format(chaser_mate.playerNumber,
                                                        firstPlayer.playerNumber)
             if(roles[1] == PBConstants.CHASER):
@@ -242,6 +270,24 @@ class GoTeam:
                          PBConstants.READY_D_DEFENDER_LOCATION,
                          PBConstants.READY_D_OFFENDER_LOCATION,
                          PBConstants.READY_D_MIDDIE_LOCATION)
+
+        # Check test cases
+        if PBConstants.TEST_DEFENDER:
+            play.setRole(PBConstants.DEFENDER)
+            play.setPosition(locations[1])
+            return
+        elif PBConstants.TEST_OFFENDER:
+            play.setRole(PBConstants.OFFENDER)
+            play.setPosition(locations[2])
+            return
+        elif PBConstants.TEST_MIDDIE:
+            play.setRole(PBConstants.MIDDIE)
+            play.setPosition(locations[3])
+            return
+        elif PBConstants.TEST_CHASER:
+            play.setRole(PBConstants.CHASER)
+            play.setPosition(locations[0])
+            return
 
         self.updateMyTimes(locations, ready = True)
 

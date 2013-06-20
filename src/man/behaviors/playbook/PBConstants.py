@@ -7,6 +7,7 @@ from objects import RobotLocation
 # Test switches to force one role to always be given out
 TEST_DEFENDER = False
 TEST_OFFENDER = False
+TEST_MIDDIE = False
 TEST_CHASER = False
 
 # Print information as to how the chaser is determined
