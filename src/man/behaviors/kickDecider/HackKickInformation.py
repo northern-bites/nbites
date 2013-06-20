@@ -350,7 +350,7 @@ class KickInformation:
                 # the kick bearing that has least magnitude should be chosen
                 kickList = sorted([straightBearing, leftSideBearing, rightSideBearing], key=math.fabs)
                 if (kickList[0] == straightBearing):
-                    kick = self.chooseStraightKick()
+                    kick = self.chooseQuickFrontKick()
                     kick.h = straightBearing
                 elif (kickList[0] == rightSideBearing):
                     kick = kicks.RIGHT_SIDE_KICK
