@@ -34,11 +34,8 @@ def noGoalieInNet(player):
     """
     We see no goalie between the crossbars.
     """
-    vf = player.brain.interface.visionField
-    return (not vf.goal_post_l.visual_detection.red_goalie and 
-            not vf.goal_post_l.visual_detection.navy_goalie and
-            not vf.goal_post_r.visual_detection.red_goalie and
-            not vf.goal_post_r.visual_detection.navy_goalie)
+    vr = player.brain.interface.visionRobot
+    return (not vr.red1.on and not vr.navy1.on)
 
 def betweenCrosses(player):
     """
