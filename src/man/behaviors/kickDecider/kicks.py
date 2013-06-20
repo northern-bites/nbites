@@ -107,12 +107,6 @@ def chooseAlignedKickFromKick(player, kick):
             return LEFT_SHORT_STRAIGHT_KICK
         else:
             return RIGHT_SHORT_STRAIGHT_KICK
-    elif (kick == LEFT_QUICK_STRAIGHT_KICK or
-          kick == RIGHT_QUICK_STRAIGHT_KICK):
-        if ballRelY > 0:
-            return LEFT_QUICK_STRAIGHT_KICK
-        else:
-            return RIGHT_QUICK_STRAIGHT_KICK
     elif (kick == LEFT_BIG_KICK or
           kick == RIGHT_BIG_KICK):
         if ballRelY > 0:
