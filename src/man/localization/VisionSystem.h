@@ -56,8 +56,8 @@ public:
     float getWeightedAvgError(){return weightedAvgError;};
     int getLastNumObsv(){return lastNumObsv;};
 
-    float getAvgLineError(const messages::RobotLocation& loc,
-                          const messages::VisionField& obsv);
+    float getConfidenceError(const messages::RobotLocation& loc,
+                             const messages::VisionField& obsv);
 
     std::list<ReconstructedLocation> getReconstructedLocations(){return reconstructedLocations;};
 

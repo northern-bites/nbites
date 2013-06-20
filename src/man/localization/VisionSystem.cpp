@@ -374,7 +374,7 @@ void VisionSystem::optimizeReconstructions()
         reconstructedLocations.push_back((*optIt));
 }
 
-float VisionSystem::getAvgLineError(const messages::RobotLocation& loc,
+float VisionSystem::getConfidenceError(const messages::RobotLocation& loc,
                                     const messages::VisionField&   obsv)
 {
     float sumLineError  = 0.f;
