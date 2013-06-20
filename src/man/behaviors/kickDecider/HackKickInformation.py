@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 USE_LOC = True
 
 class KickInformation:
@@ -225,15 +225,9 @@ class KickInformation:
         """
         kick = None
 
-        if DEBUG_KICK_DECISION:
-            print "In method shoot."
-
         # Is loc good enough for a kick decision?
         # Need to use aimCenter in decision.
         if USE_LOC:
-
-            if DEBUG_KICK_DECISION:
-                print "Flag is set: using loc for decision."
 
             # Get the bearing for the shot, i.e. from the ball to the goal.
             # Note: currently always aimCenter

@@ -117,8 +117,6 @@ def prepareForKick(player):
     if player.brain.tracker.isStopped() or \
             prepareForKick.hackKick.hasEnoughInformation():
         prepareForKick.hackKick.calculateDataAverages()
-        if hackKick.DEBUG_KICK_DECISION:
-            print str(prepareForKick.hackKick)
         player.kick = prepareForKick.hackKick.shoot()
         if hackKick.DEBUG_KICK_DECISION:
             print str(player.kick)
