@@ -148,6 +148,9 @@ def positionForDribble(player):
 
     if transitions.ballLost(player):
         return player.goLater('lookForBall')
+    elif not transitions.shouldDribble(player):
+        player.inKickingSate = False
+        return player.goLater('chase')
     elif transitions.navDone(player):
         return player.goLater('decideDribble')
 
