@@ -17,7 +17,7 @@ def findBall(player):
         player.brain.tracker.stopHeadMoves()
 
     if player.brain.nav.isStopped():
-        return player.goLater('scanFindBall')
+        return player.goLater('spinFindBall')
 
     return player.stay()
 

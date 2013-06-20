@@ -7,7 +7,7 @@ lib/*
 *.ekf
 *.mcl
 *.obs
-util/GameController/GameController.log
+util/GameController/logs
 util/GameController/*.txt
 *.geometry
 *~

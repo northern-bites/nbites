@@ -4158,13 +4158,13 @@ const float FieldLines::percentSurrounding(const int x, const int y,
         for (int j = startY; j <= endY; ++j) {
             // Search for the color at that pixel within the vector of
             // acceptable colors
-            if (Utility::colorsEqual(color, vision->thresh->getThresholded(j,i))) {
-                ++numFound;
-                break;
+			if (Utility::colorsEqual(color, vision->thresh->getThresholded(j,i))) {
+				++numFound;
+				//break;
             }
-        }
-    }
-    int totalPixels = (endX - startX + 1) * (endY - startY + 1);
+		}
+	}
+	int totalPixels = (endX - startX + 1) * (endY - startY + 1);
     return (static_cast<float> (numFound) /
             static_cast<float> (totalPixels)) * 100.0f;
 }

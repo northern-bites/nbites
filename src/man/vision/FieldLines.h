@@ -162,7 +162,7 @@ namespace vision {
 		////////////////////////////////////////////////////////////
 		// Intersect Lines constants
 		////////////////////////////////////////////////////////////
-		static const int MAX_GREEN_PERCENT_ALLOWED_AT_CORNER = 70;
+		static const int MAX_GREEN_PERCENT_ALLOWED_AT_CORNER = 60;
 
 		// Two many duplicate intersection points indicate we are at the
 		// center circle
