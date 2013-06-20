@@ -98,8 +98,10 @@ void BallTrackModule::run_()
     // Print the observation given, each filter after update, and which filter chosen
 
     if(visionBallInput.message().on()) {
-        std::cout << "See a ball with (dist,bearing):\t( " << visionBallInput.message().distance()
-                  << " , " << visionBallInput.message().bearing() << " )" << std::endl;
+        std::cout << "See a ball with (dist,bearing):\t( "
+                  << visionBallInput.message().distance()
+                  << " , " << visionBallInput.message().bearing() << " )"
+                  << std::endl;
         std::cout << "and a ball with (relX,relY):  \t( " << filters->visRelX
                   << " , " << filters->visRelY << std::endl;
     }
