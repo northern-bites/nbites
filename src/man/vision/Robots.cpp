@@ -60,7 +60,7 @@ void Robots::init()
 	numberOfRuns = 0;
 
 #ifdef OFFLINE
-	debugRobots = false;
+	debugRobots = true;
 #endif
 }
 
@@ -193,12 +193,24 @@ void Robots::robot(Cross* cross)
 					}
 				}
 			}
-            if (debugRobots) {
-                vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-                                 blobs->get(i).width(), blobs->get(i).height(),
-                                 MAROON);
+			// one last sanity check - make sure the "robot" isn't off the field
+			estimate pose_est = vision->pose->pixEstimate(blobs->get(i).getLeft(),
+												  blobs->get(i).getBottom(),
+												  270);
+			if (pose_est.dist > thresh->getPixDistance(blobs->get(i).getLeft()) + 100) {
+				if (debugRobots) {
+					cout << "Robot too far away " << endl;
+				}
+				blobs->init(i);
+			} else {
+
+				if (debugRobots) {
+					vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+									 blobs->get(i).width(), blobs->get(i).height(),
+									 MAROON);
+				}
+				viable++;
 			}
-            viable++;
         }
     }
     // if we have some viable robots then let everyone know

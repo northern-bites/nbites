@@ -513,15 +513,17 @@ void Threshold::findGoals(int column, int topEdge) {
     // scan up for goals
     int bad = 0, yellows = 0, pinks = 0, navy = 0;
     int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
+		lastWhite = topEdge,
         lastYellow = topEdge, firstPink = topEdge, lastPink = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
     bool faceDown2 = pose->getHorizonY(0) < -100;
+	bool yellowOK = true;
     int j;
     for (j = topEdge; bad < BADSIZE && j >= 0; j--) {
         // get the next pixel
         unsigned char pixel = getThresholded(j,column);
-        if (Utility::isYellow(pixel)) {
+        if (yellowOK && Utility::isYellow(pixel)) {
             lastYellow = j;
             yellows++;
             bad--;
@@ -549,13 +551,21 @@ void Threshold::findGoals(int column, int topEdge) {
                 firstPink = j;
             }
         }
-        if (Utility::isUndefined(pixel)) {
+        if (Utility::isUndefined(pixel) || Utility::isGreen(pixel)) {
             bad++;
         }
+		if (Utility::isWhite(pixel)) {
+			lastWhite = j;
+		}
         if (lastYellow - j > GAP) {
-            break;
+			yellowOK = false;
+            //break;
         }
+		if (lastWhite - j > GAP && !yellowOK) {
+			break;
+		}
     }
+	vision->drawPoint(column, j, BLUE);
     // now do the same going down from the horizon
     bad = 0;
     int greens = 0;
