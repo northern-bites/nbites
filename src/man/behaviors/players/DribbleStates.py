@@ -7,24 +7,24 @@ from ..navigator import Navigator
 from ..kickDecider import kicks
 from objects import RelRobotLocation, Location
 
-### BASIC IDEA 
-# We dribble by setting ourselves up for a dribble kick. The sweet spot 
+### BASIC IDEA
+# We dribble by setting ourselves up for a dribble kick. The sweet spot
 # is in front of the ball, so setting ourselves up for a kick actually
 # results in us running through the ball. (There is no actual dribble sweet
-# move.) If vision sees a crowded area in front of us, we rotate around the 
-# ball and dribble again when we see a clear path. We only dribble if these 
-# conditions are true: 1. We are positioned according to positionedForDribble. 
-# 2. We are facing our opponents' goal. 3. We can see the ball close to us.
+# move.) If vision sees a crowded area in front of us, we rotate around the
+# ball and dribble again when we see a clear path. We only dribble if
+# shouldDribble returns true. See DribbleTransitions.py for more info.
 
 ### TODO
-# test DRIBBLE_ON_KICKOFF
-# ballInGoalBox dribbling via goalie detection
+# test goalie-in-net decision making
+# test time-based decision making
 # rotate towards goal when dribbling
-# test time-left based decision making
 # choose direction better, based on loc and heatmap?
 # frame counter rotatation?
 
 ### DONE
+# ballInGoalBox dribbling via goalie detection
+# test DRIBBLE_ON_KICKOFF
 # dribbleGoneBad needs work
 # dribble for the score if close enough to goal
 # get rid of 'dribble' state, reorganize FSA
@@ -43,6 +43,7 @@ def decideDribble(player):
             player.kick = kicks.RIGHT_DRIBBLE
 
     if not transitions.shouldDribble(player):
+        player.inKickingSate = False
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
         return player.goNow('executeDribble')
@@ -63,7 +64,7 @@ def executeDribble(player):
         player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.CAREFUL_SPEED,
+                              Navigator.GRADUAL_SPEED,
                               False,
                               False)
     else:
@@ -72,6 +73,7 @@ def executeDribble(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
+        player.inKickingSate = False
         return player.goLater('chase')
     elif not transitions.centerLaneOpen(player): # reorder CLO and DGB?
         return player.goNow('rotateToOpenSpace')
@@ -93,6 +95,7 @@ def rotateToOpenSpace(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
+        player.inKickingSate = False
         player.stand()
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
@@ -106,22 +109,21 @@ def lookForBall(player):
     Backup and look for ball. If fails, leave the FSA.
     """
     if player.firstFrame():
-        lookForBall.counter = 0
+        lookForBall.setDest = False
         player.brain.tracker.repeatWidePan()
-        backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
-        player.brain.nav.goTo(backupLoc,
-                              Navigator.GENERAL_AREA,
-                              Navigator.MEDIUM_SPEED,
-                              False,
-                              False)
+        player.stand()
 
-    lookForBall.counter += 1
-        
     if transitions.seesBall(player):
         player.brain.tracker.trackBall()
         return player.goNow('positionForDribble')
-    elif lookForBall.counter == constants.LOOK_FOR_BALL_FC:
-        return player.goLater('chase')
+    elif player.brain.nav.isStanding():
+        if not lookForBall.setDest:
+            backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
+            player.brain.nav.walkTo(backupLoc)
+            lookForBall.setDest = True
+        else:
+            player.inKickingState = False
+            return player.goLater('chase')
 
     return player.stay()
 

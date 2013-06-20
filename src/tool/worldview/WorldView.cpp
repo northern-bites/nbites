@@ -50,7 +50,6 @@ WorldView::WorldView(QWidget* parent)
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         roleLabels[i] = new QLabel(tr("Inactive"));
-        subroleLabels[i] = new QLabel(tr("Inactive"));
     }
     QHBoxLayout *p1Layout = new QHBoxLayout();
     QLabel *p1Label = new QLabel(tr("Player 1: "));
@@ -65,23 +64,18 @@ WorldView::WorldView(QWidget* parent)
 
     p1Layout->addWidget(p1Label);
     p1Layout->addWidget(roleLabels[0]);
-    p1Layout->addWidget(subroleLabels[0]);
 
     p2Layout->addWidget(p2Label);
     p2Layout->addWidget(roleLabels[1]);
-    p2Layout->addWidget(subroleLabels[1]);
 
     p3Layout->addWidget(p3Label);
     p3Layout->addWidget(roleLabels[2]);
-    p3Layout->addWidget(subroleLabels[2]);
 
     p4Layout->addWidget(p4Label);
     p4Layout->addWidget(roleLabels[3]);
-    p4Layout->addWidget(subroleLabels[3]);
 
     p5Layout->addWidget(p5Label);
     p5Layout->addWidget(roleLabels[4]);
-    p5Layout->addWidget(subroleLabels[4]);
 
     boxLayout->addLayout(p1Layout);
     boxLayout->addLayout(p2Layout);
@@ -164,12 +158,10 @@ void WorldView::updateStatus(messages::WorldModel msg, int index)
     if (!msg.active())
     {
         roleLabels[index]->setText(QString("Inactive"));
-        subroleLabels[index]->setText(QString("Inactive"));
     }
     else
     {
         roleLabels[index]->setText(roles[msg.role()]);
-        subroleLabels[index]->setText(subroles[msg.sub_role()]);
     }
 }
 

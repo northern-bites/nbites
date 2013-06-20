@@ -18,6 +18,7 @@ Tool::Tool(const char* title) :
     tableCreator(this),
     visDispMod(this),
     fieldView(this),
+    playbookCreator(this),
     colorCalibrate(this),
     topConverter(),
     bottomConverter(),
@@ -64,7 +65,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
     toolTabs->addTab(&fieldView, tr("FieldView"));
     toolTabs->addTab(&worldView, tr("World Viewer"));
-
+    toolTabs->addTab(&playbookCreator, tr("Playbook Creator"));
 
     this->setCentralWidget(toolTabs);
     this->addToolBar(toolbar);

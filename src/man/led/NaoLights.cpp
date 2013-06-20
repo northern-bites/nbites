@@ -14,7 +14,7 @@ NaoLights::NaoLights(boost::shared_ptr<AL::ALBroker> broker)
     try {
         dcmProxy = boost::shared_ptr<AL::DCMProxy>(new AL::DCMProxy(broker));
     } catch(AL::ALError &e) {
-		std::cout << "Failed to initialize proxy to DCM" << std::endl;
+        std::cout << "Failed to initialize proxy to DCM" << std::endl;
     }
 
     generateLeds();

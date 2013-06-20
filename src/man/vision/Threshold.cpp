@@ -70,7 +70,7 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     visualHorizonDebug = false;
     debugSelf = false;
     debugShot = false;
-    debugOpenField = true;
+    debugOpenField = false;
     debugEdgeDetection = false;
     debugHoughTransform = false;
     debugRobots = false;
@@ -1141,18 +1141,26 @@ void Threshold::identifyGoalie() {
     leftX = vision->ygrp->getRightBottomX();
     rightX = vision->yglp->getLeftBottomX();
     topY = min(vision->ygrp->getRightTopY(), vision->yglp->getLeftTopY());
-    bottomY = max(vision->ygrp->getRightBottomY(), vision->yglp->getLeftBottomY());
+    bottomY = max(vision->ygrp->getRightBottomY(),
+				  vision->yglp->getLeftBottomY());
     bool redRobot = false, navyRobot = false;
     // first just check if we already identified any robots
+	float goalDistance = min(vision->yglp->getDistance(),
+							 vision->ygrp->getDistance());
+	if (goalDistance > 500) {
+		return;
+	}
     if (vision->red1->getHeight() > 0) {
         int redX = vision->red1->getCenterX();
-        if (redX > leftX && redX < rightX) {
+        if (redX > leftX && redX < rightX && fabs(goalDistance -
+												  vision->red1->getDistance()) < 200) {
             redRobot = true;
         }
     }
     if (vision->navy1->getHeight() > 0) {
         int navyX = vision->navy1->getCenterX();
-        if (navyX > leftX && navyX < rightX) {
+        if (navyX > leftX && navyX < rightX  && fabs(goalDistance -
+													 vision->navy1->getDistance()) < 200) {
             navyRobot = true;
         }
     }
@@ -1505,7 +1513,8 @@ void Threshold::setVisualRobotInfo(VisualRobot *objPtr) {
 
         // sets focal distance of the field object
         estimate pose_est = pose->pixEstimate(objPtr->getCenterX(),
-                                              objPtr->getCenterY(),
+                                              objPtr->getY() +
+											  static_cast<int>(objPtr->getHeight()),
                                               270);
 
         objPtr->setDistanceWithSD(pose_est.dist);

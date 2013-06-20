@@ -213,7 +213,7 @@ bool Cross::scanAroundPerimeter(Blob b) {
         } else return false;
     }
 	// do extra screening above in case it is a robot foot
-    for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
+    /*for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
         if (y > 10) {
 			for (int j = 3; j < 10; j++) {
 				if (Utility::isGreen(thresh->getThresholded(y - j,i))) {
@@ -227,7 +227,7 @@ bool Cross::scanAroundPerimeter(Blob b) {
 			}
         }
 
-	}
+		}*/
 
 
     if (count > (float)counter * greenThreshold) {

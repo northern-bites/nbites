@@ -24,6 +24,12 @@ class Kick(object):
                 self is LEFT_SHORT_BACK_KICK or
                 self is RIGHT_SHORT_BACK_KICK)
 
+    def isStraightKick(self):
+        return (self is LEFT_STRAIGHT_KICK or
+                self is RIGHT_STRAIGHT_KICK or
+                self is LEFT_SHORT_STRAIGHT_KICK or
+                self is RIGHT_SHORT_STRAIGHT_KICK)
+
     def __str__(self):
         #return ("%s: \n x_offset: %g y_offset: %g heading: %g ==> dest: %s" %
          #       (self.name, self.x_offset, self.y_offset, self.heading, self.dest))
@@ -58,12 +64,6 @@ RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 16.0, y = -4.9,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 # Not used 04-19-13
-LEFT_QUICK_STRAIGHT_KICK =  Kick("L_Quick_Straight", x = 15, y = 5.5,
-                                 move=SweetMoves.LEFT_QUICK_STRAIGHT_KICK)
-RIGHT_QUICK_STRAIGHT_KICK = Kick("R_Quick_Straight", x = 15, y = -5.5,
-                                 move=SweetMoves.RIGHT_QUICK_STRAIGHT_KICK)
-
-# Not used 04-19-13
 LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 11, y =  3,
                       move=SweetMoves.LEFT_BIG_KICK)
 RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 11, y = -3,
@@ -84,8 +84,8 @@ RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
 # Dribble kick just tells player to run thru the ball, no actual sweet move
-LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.5)
-RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.5)
+LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.0)
+RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.0)
 
 def chooseAlignedKickFromKick(player, kick):
     ballRelY = player.brain.ball.rel_y
