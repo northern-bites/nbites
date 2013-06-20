@@ -73,17 +73,24 @@ def approachBall(player):
         if player.shouldKickOff:
             player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
         elif player.penaltyKicking:
-            player.brain.nav.chaseBall(fast = False)
+            return player.goNow('prepareForPenaltyKick')
         else:
             player.brain.nav.chaseBall(fast = True)
 
-    if (transitions.shouldFindBall(player)):
-        return player.goLater('chase')
+    # if (transitions.shouldFindBall(player)):
+    #     return player.goLater('chase')
+
+    # goalCenter = Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,
+    #                               nogginConstants.CENTER_FIELD_Y)
+    # ballLocation = Location(player.brain.ball.x, player.brain.ball.y)
+    # headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
+    # print "headingBallToGoalCenter: ", headingBallToGoalCenter
+    # return player.stay()
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
         player.inKickingState = True
-        if player.shouldKickOff or player.penaltyKicking:
+        if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_STRAIGHT_KICK
             else:
@@ -267,9 +274,9 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
-        dr_trans.facingGoal(player)):
-        return player.goNow('dribble')
+    # if (dr_trans.crowded(player) and dr_trans.middleThird(player) and
+    #     dr_trans.facingGoal(player)):
+    #     return player.goNow('dribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
@@ -292,9 +299,6 @@ def positionForKick(player):
     else:
         player.brain.nav.updateDest(positionForKick.kickPose)
 
-    if player.penaltyKicking and player.stateTime < 2:
-        return player.stay()
-
     if transitions.shouldFindBallKick(player) and player.counter > 15:
         player.inKickingState = False
         return player.goLater('chase')
@@ -307,15 +311,77 @@ def positionForKick(player):
 
     return player.stay()
 
+def prepareForPenaltyKick(player):
+    """
+    We're waiting here for a short time to psych out the opposing goalie,
+    then turn very slightly if the flag is set.
+    """
+    if player.firstFrame():
+        prepareForPenaltyKick.frames = 0
+        prepareForPenaltyKick.chase = True
+        ball = player.brain.ball
+        location = RelRobotLocation(ball.rel_x - 5, ball.rel_y - 3, 0)
+        player.brain.nav.goTo(location, Navigator.CLOSE_ENOUGH, Navigator.MEDIUM_SPEED,
+                              False, True, False, False)
+    prepareForPenaltyKick.frames += 1
+
+
+
+    #player.brain.nav.chaseBall(Navigator.CAREFUL_SPEED, fast = False)
+
+    if (transitions.shouldPrepareForKick(player) or
+        player.brain.nav.isAtPosition()):
+        player.brain.nav.stand()
+        player.inKickingState = True
+        if player.brain.ball.rel_y > 0:
+            player.kick = kicks.LEFT_STRAIGHT_KICK
+            print "Kicking with left"
+        else:
+            player.kick = kicks.RIGHT_STRAIGHT_KICK
+            print "Kicking with right"
+        return player.goNow('positionForPenaltyKick')
+    return player.stay()
+    
+
 def positionForPenaltyKick(player):
     """
     We're getting ready for a penalty kick
     """
     if player.firstFrame():
-        pass
+        positionForPenaltyKick. position = True
+    if (transitions.shouldApproachBallAgain(player) or
+        transitions.shouldRedecideKick(player)):
+        player.inKickingState = False
+        print "Going Back to Chase"
+        return player.goLater('chase')
 
-    if player.stateTime < 1:
+    ball = player.brain.ball
+    kick_pos = player.kick.getPosition()
+    positionForPenaltyKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
+                                                       ball.rel_y - kick_pos[1],
+                                                       0)
+    #So we stand and wait for two seconds before actually positioning
+    if player.stateTime < 2:
         return player.stay()
+    elif positionForPenaltyKick.position:
+        player.ballBeforeApproach = player.brain.ball
+        player.brain.tracker.lookStraightThenTrack()
+        positionForPenaltyKick.position = True
+        player.brain.nav.goTo(positionForPenaltyKick.kickPose,
+                              Navigator.PRECISELY,
+                              Navigator.GRADUAL_SPEED,
+                              False,
+                              Navigator.ADAPTIVE)
+        positionForPenaltyKick.position = False
+    else:
+        player.brain.nav.updateDest(positionForPenaltyKick.kickPose)
+
+    if (transitions.ballInPosition(player, positionForPenaltyKick.kickPose) or
+        player.brain.nav.isAtPosition()):
+        print "DEBUG_SUITE: In 'positionForPenaltyKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
+        player.brain.nav.stand()
+        return player.goNow('kickBallExecute')
+
     return player.stay()
 
 
