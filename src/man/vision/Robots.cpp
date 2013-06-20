@@ -32,7 +32,7 @@ namespace man {
 namespace vision {
 
 #ifdef OFFLINE
-static const bool ROBOTSDEBUG = true;
+static const bool ROBOTSDEBUG = false;
 #else
 static const bool ROBOTSDEBUG = false;
 #endif
@@ -60,7 +60,7 @@ void Robots::init()
 	numberOfRuns = 0;
 
 #ifdef OFFLINE
-	debugRobots = true;
+	debugRobots = false;
 #endif
 }
 
@@ -172,6 +172,27 @@ void Robots::robot(Cross* cross)
             }
             blobs->init(i);
         } else {
+			// improve the bottom
+			int whites = 0;
+			int left = blobs->get(i).getLeft();
+			for (int j = blobs->get(i).getBottom(); j < IMAGE_HEIGHT; j++) {
+				whites = 0;
+				for (int k = 0; k < blobs->get(i).width(); k++) {
+					unsigned char pixel = thresh->getColor(k+left, j);
+					if (Utility::isWhite(pixel)) {
+						whites++;
+						if (whites > blobs->get(i).width() / 4 || whites > 4) {
+							if (debugRobots && j - blobs->get(i).getBottom() > 3) {
+								cout << "Resetting robot bottom, was " << blobs->get(i).getBottom() <<
+									" is " << j << endl;
+							}
+							blobs->setBottom(i, j);
+							k = IMAGE_WIDTH;
+							j = IMAGE_HEIGHT;
+						}
+					}
+				}
+			}
             if (debugRobots) {
                 vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
                                  blobs->get(i).width(), blobs->get(i).height(),
@@ -722,7 +743,7 @@ void Robots::checkMerge(int i, int j) {
 	Blob a = blobs->get(i);
 	Blob b = blobs->get(j);
 	if (debugRobots) {
-		cout << endl << endl << "Checking merge" << endl;
+		cout << endl << endl << "Checking merger" << endl;
 		printBlob(a);
 		printBlob(b);
 	}
@@ -759,7 +780,7 @@ void Robots::checkMerge(int i, int j) {
 	for (int x = left; x < right; x+=3) {
 		for (int y = top; y < bottom; y+=3) {
 			if (debugRobots) {
-				vision->drawPoint(x, y, MAROON);
+				vision->drawPoint(x, y, BLUE);
 			}
 			if (Utility::colorsEqual(thresh->getThresholded(y, x), color)) {
 				col++;
@@ -773,11 +794,23 @@ void Robots::checkMerge(int i, int j) {
 			} else if (Utility::isGreen(thresh->getThresholded(y, x))) {
 				green++;
 				if (green > 5) {
+					if (b.getRight() <= right) {
+						if (debugRobots) {
+							cout << "Y overlap, dropping small one" << endl;
+						}
+						blobs->init(j);
+					}
 					return;
 				}
 			} else if (Utility::isWhite(thresh->getThresholded(y, x))) {
 				miss++;
 				if (miss > area / 9 || miss > stripe) {
+					if (b.getRight() <= right) {
+						if (debugRobots) {
+							cout << "Y overlap, dropping small one" << endl;
+						}
+						blobs->init(j);
+					}
 					return;
 				}
 			}
@@ -788,6 +821,11 @@ void Robots::checkMerge(int i, int j) {
 		if (debugRobots) {
 			cout << "Merge" << endl;
 		}
+	} else if (b.getRight() <= right) {
+		if (debugRobots) {
+			cout << "Y overlap, dropping small one" << endl;
+		}
+		blobs->init(j);
 	}
 }
 

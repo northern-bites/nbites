@@ -100,6 +100,8 @@ def orbitBall(player):
 
         if player.kick.h == 0:
             return player.goNow('positionForKick')
+        if player.orbitDistance > 25:
+            player.orbitDistance = 25
 
         elif player.kick.h < 0:
             #set y vel at 50% speed

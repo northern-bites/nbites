@@ -91,6 +91,7 @@ private:
     messages::ParticleSwarm curOfflineSwarm;
 
     man::localization::LineSystem* lineSystem;
+    man::localization::VisionSystem* visionSystem;
 };
 
 } // namespace viewer
