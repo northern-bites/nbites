@@ -11,9 +11,9 @@ from objects import RelRobotLocation, Location
 # We dribble by setting ourselves up for a dribble kick. The sweet spot
 # is in front of the ball, so setting ourselves up for a kick actually
 # results in us running through the ball. (There is no actual dribble sweet
-# move.) If vision sees a crowded area in front of us, we rotate around the 
-# ball and dribble again when we see a clear path. We only dribble if 
-# shoulDribble returns true. See DribbleTransitions.py for more info.
+# move.) If vision sees a crowded area in front of us, we rotate around the
+# ball and dribble again when we see a clear path. We only dribble if
+# shouldDribble returns true. See DribbleTransitions.py for more info.
 
 ### TODO
 # test goalie-in-net decision making
@@ -64,7 +64,7 @@ def executeDribble(player):
         player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.CAREFUL_SPEED,
+                              Navigator.GRADUAL_SPEED,
                               False,
                               False)
     else:
@@ -122,6 +122,7 @@ def lookForBall(player):
             player.brain.nav.walkTo(backupLoc)
             lookForBall.setDest = True
         else:
+            player.inKickingState = False
             return player.goLater('chase')
 
     return player.stay()

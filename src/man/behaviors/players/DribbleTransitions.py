@@ -7,7 +7,7 @@ def shouldDribble(player):
     """
     We should be in the dribble FSA.
     """
-    return (facingGoal(player) and timeLeft(player) and 
+    return (facingGoal(player) and timeLeft(player) and
             not ballGotFarAway(player) and not ballLost(player) and
             (betweenCrosses(player) or shouldDribbleForGoal(player)))
 
@@ -25,8 +25,8 @@ def centerLaneOpen(player):
     are dribbling for a score. (visionObstacle.mid_dist won't give good data in
     this case.)
     """
-    return (player.brain.interface.visionObstacle.mid_dist > 
-            constants.OPEN_LANE_DIST or 
+    return (player.brain.interface.visionObstacle.mid_dist >
+            constants.OPEN_LANE_DIST or
             player.brain.interface.visionObstacle.block_mid == 0 or
             shouldDribbleForGoal(player))
 
@@ -35,7 +35,7 @@ def noGoalieInNet(player):
     We see no goalie between the crossbars.
     """
     vf = player.brain.interface.visionField
-    return (not vf.goal_post_l.visual_detection.red_goalie and 
+    return (not vf.goal_post_l.visual_detection.red_goalie and
             not vf.goal_post_l.visual_detection.navy_goalie and
             not vf.goal_post_r.visual_detection.red_goalie and
             not vf.goal_post_r.visual_detection.navy_goalie)
@@ -66,7 +66,7 @@ def rotateLeft(player):
     The goal is to the left of us, so we should rotate that way when avoiding
     obstacles.
     """
-    return (player.brain.loc.y < (1./2.*nogginConstants.FIELD_HEIGHT))
+    return (player.brain.loc.y < (0.5*nogginConstants.FIELD_HEIGHT))
     # return (player.brain.interface.visionObstacle.block_left == 0 or
     #         (player.brain.interface.visionObstacle.left_dist <
     #         player.brain.interface.visionObstacle.right_dist and
@@ -116,7 +116,7 @@ def ballInGoalBox(player):
     The ball is in the goal box (between the posts actually), so we can
     dribble it in.
     """
-    return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH - 
+    return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH -
             nogginConstants.GOALBOX_DEPTH and
             player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
             player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
@@ -133,14 +133,14 @@ def timeLeft(player):
     time left but the ball is close enough to the goal to dribble it in.
     """
     enough_time = constants.ENOUGH_TIME_FOR_NORMAL_BEHAVIOR
-    return (player.brain.game.secs_remaining > enough_time or 
+    return (player.brain.game.secs_remaining > enough_time or
             lastSecondDribbleGoal(player))
 
 def lastSecondDribbleGoal(player):
     """
-    There not enough time left for kicking in the goalbox to make sense. 
-    Dribble it in. 
+    There not enough time left for kicking in the goalbox to make sense.
+    Dribble it in.
     """
     switch_to_dribble = constants.SWITCH_TO_DRIBBLE_IF_IN_GOALBOX
-    return (player.brain.game.secs_remaining < switch_to_dribble and 
+    return (player.brain.game.secs_remaining < switch_to_dribble and
             ballInGoalBox(player))
