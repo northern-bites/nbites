@@ -42,11 +42,25 @@ float LineSystem::scoreObservation(Line globalObsv) {
     float bestScore = 10000000.f;
     LineIt iter;
     for(iter = lines.begin(); iter != lines.end(); iter++) {
-        float curScore = (*iter).getError(globalObsv);
+        float curScore = (*iter).getError(globalObsv).error;
         bestScore = ((curScore < bestScore) ? curScore : bestScore);
     }
 
     return bestScore;
+}
+
+LineErrorMatch LineSystem::scoreAndMatchObservation(Line globalObsv) {
+    //For each line score the observation and return the best of them all
+    LineErrorMatch bestMatch;
+    bestMatch.error = 1000000.f;
+    LineIt iter;
+    for(iter = lines.begin(); iter != lines.end(); iter++) {
+        LineErrorMatch curMatch = (*iter).getError(globalObsv);
+        if (bestMatch.error > curMatch.error)
+            bestMatch = curMatch;
+    }
+
+    return bestMatch;
 }
 
 } // namespace localization
