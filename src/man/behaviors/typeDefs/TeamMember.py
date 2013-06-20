@@ -122,7 +122,7 @@ class TeamMember(RobotLocation):
         time = self.determineTimeToDest(relLocToBall)
 
         # Give a penalty for not seeing the ball if we aren't in a kickingState
-        if (self.brain.ball.vis.frames_off > 60 and # TODO: unify this constant with shouldFindBall
+        if (self.brain.ball.vis.frames_off > 45 and # TODO: unify this constant with shouldFindBall
             not self.brain.player.inKickingState):
             time += BALL_OFF_PENALTY
 
