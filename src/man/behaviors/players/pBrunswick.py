@@ -103,8 +103,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
             if self.brain.gameController.timeSincePlaying < 10:
-                if (player.brain.gameController.ownKickOff):
-                    player.shouldKickOff = True
+                if (self.brain.gameController.ownKickOff):
+                    self.shouldKickOff = True
 
                 return 'kickoff'
             return 'chase'
