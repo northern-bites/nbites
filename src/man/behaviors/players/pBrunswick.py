@@ -67,7 +67,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         if (gcState == 'gamePlaying' and
             not self.currentState == 'afterPenalty' and
-            not self.currentState == 'gamePenalized'):
+            not self.currentState == 'gamePenalized' and
+            not self.currentState == 'gamePlaying'):
 
             self.shouldKickOff = False
 
