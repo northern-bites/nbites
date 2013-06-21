@@ -122,7 +122,7 @@ def lookForBall(player):
     if transitions.seesBall(player):
         player.brain.tracker.trackBall()
         return player.goNow('positionForDribble')
-    elif player.brain.nav.isStanding():
+    elif player.brain.nav.isStopped():
         if not lookForBall.setDest:
             backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
             player.brain.nav.walkTo(backupLoc)
