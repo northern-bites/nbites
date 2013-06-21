@@ -31,6 +31,8 @@ class SoccerFSA(FSA.FSA):
         # Kickoff kick
         self.hasKickedOff = True
 
+        self.timeReadyBegan = 0
+
     def run(self):
         # gamePenalized is a good time for a lot of i/o, since we
         # won't be moving

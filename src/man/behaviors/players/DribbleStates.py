@@ -73,7 +73,7 @@ def executeDribble(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
-        player.inKickingSate = False
+        player.inKickingState = False
         return player.goLater('chase')
     elif not transitions.centerLaneOpen(player): # reorder CLO and DGB?
         return player.goNow('rotateToOpenSpace')
@@ -95,7 +95,7 @@ def rotateToOpenSpace(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
-        player.inKickingSate = False
+        player.inKickingState = False
         player.stand()
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
@@ -116,7 +116,7 @@ def lookForBall(player):
     if transitions.seesBall(player):
         player.brain.tracker.trackBall()
         return player.goNow('positionForDribble')
-    elif player.brain.nav.isStanding():
+    elif player.brain.nav.isStopped():
         if not lookForBall.setDest:
             backupLoc = RelRobotLocation(constants.BACKUP_WHEN_LOST,0,0)
             player.brain.nav.walkTo(backupLoc)
@@ -149,7 +149,7 @@ def positionForDribble(player):
     if transitions.ballLost(player):
         return player.goLater('lookForBall')
     elif not transitions.shouldDribble(player):
-        player.inKickingSate = False
+        player.inKickingState = False
         return player.goLater('chase')
     elif transitions.navDone(player):
         return player.goLater('decideDribble')
