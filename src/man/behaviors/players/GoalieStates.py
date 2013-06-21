@@ -131,10 +131,24 @@ def fallen(player):
 
 def watch(player):
     if player.firstFrame():
+        watch.panning = False
         player.homeDirections = []
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
+
+    if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
+        and
+        player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
+        and not watch.panning):
+        watch.panning = True
+        print "Performing a pan!"
+        player.brain.tracker.performWidePan()
+
+    if player.brain.tracker.isStopped():
+        print "Done panning!"
+        watch.panning = False
+        player.brain.tracker.trackBall()
 
     return Transition.getNextState(player, watch)
 
@@ -157,23 +171,23 @@ def correct(destination):
     destination.relY = destination.relY / constants.OVERZEALOUS_ODO
     destination.relH = destination.relH / constants.OVERZEALOUS_ODO
 
-    if math.fabs(destination.relX) < 10.0:
+    if math.fabs(destination.relX) < constants.STOP_NAV_THRESH:
         destination.relX = 0.0
-    if math.fabs(destination.relY) < 10.0:
+    if math.fabs(destination.relY) < constants.STOP_NAV_THRESH:
         destination.relY = 0.0
-    if math.fabs(destination.relH) < 10.0:
+    if math.fabs(destination.relH) < constants.STOP_NAV_THRESH:
         destination.relH = 0.0
 
     return destination
 
-def fixThyself(player):
+def fixMyself(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         dest = correct(average(player.homeDirections))
         player.brain.nav.walkTo(dest)
         print "I need to go to " + str(dest)
 
-    return Transition.getNextState(player, fixThyself)
+    return Transition.getNextState(player, fixMyself)
 
 def repositionLeft(player):
     if player.firstFrame():

@@ -67,8 +67,6 @@ def badLeftCornerObservation(player):
     if not corner:
         return False
 
-    print "Left orientation: " + str(corner.orientation)
-
     dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
                       corner.visual_detection.distance)
     dBear = math.fabs(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER -
@@ -98,8 +96,6 @@ def badRightCornerObservation(player):
     if not corner:
         return False
 
-    print "Right orientation: " + str(corner.orientation)
-
     dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
                       corner.visual_detection.distance)
     dBear = math.fabs(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER -
@@ -122,6 +118,28 @@ def badRightCornerObservation(player):
         player.homeDirections = player.homeDirections[1:]
 
     return True
+
+### ALSO CHECK POSTS...
+# def facingSideways(player):
+#     """
+#     If the robot is facing a post directly, it's probably turned around.
+#     """
+#     if ((player.brain.yglp.on and
+#          fabs(player.brain.yglp.bearing_deg) < 30.0 and
+#          player.brain.yglp.bearing_deg != 0.0 and
+#          player.brain.yglp.distance < 300.0) or
+#         (player.brain.ygrp.on and
+#          fabs(player.brain.ygrp.bearing_deg) < 30.0 and
+#          player.brain.ygrp.bearing_deg != 0.0 and
+#          player.brain.ygrp.distance < 300.0)):
+#         return True
+#     else:
+#         return False
+
+
+def shouldReposition(player):
+    return (badLeftCornerObservation(player) or
+            badRightCornerObservation(player))
 
 # def atGoalArea(player):
 #     """
@@ -278,22 +296,6 @@ def badRightCornerObservation(player):
 #     return (player.brain.ball.vel_x < 0.0 and
 #             player.brain.ball.speed > 30.0 and
 #             abs(player.brain.ball.rel_y_intersect_dest) < 10.0)
-
-# def facingSideways(player):
-#     """
-#     If the robot is facing a post directly, it's probably turned around.
-#     """
-#     if ((player.brain.yglp.on and
-#          fabs(player.brain.yglp.bearing_deg) < 30.0 and
-#          player.brain.yglp.bearing_deg != 0.0 and
-#          player.brain.yglp.distance < 300.0) or
-#         (player.brain.ygrp.on and
-#          fabs(player.brain.ygrp.bearing_deg) < 30.0 and
-#          player.brain.ygrp.bearing_deg != 0.0 and
-#          player.brain.ygrp.distance < 300.0)):
-#         return True
-#     else:
-#         return False
 
 # def shouldClearBall(player):
 #     """
