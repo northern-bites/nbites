@@ -425,6 +425,7 @@ class Brain(object):
             return
 
         print "According to the Goalie, I need to flip my loc!"
+        print "My x position was: " + str(self.loc.x)
 
         reset_x = (-1*(self.loc.x - Constants.MIDFIELD_X)) + Constants.MIDFIELD_X
         reset_y = (-1*(self.loc.y - Constants.MIDFIELD_Y)) + Constants.MIDFIELD_Y
