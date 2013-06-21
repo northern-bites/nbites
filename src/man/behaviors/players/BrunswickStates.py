@@ -67,13 +67,16 @@ def gameSet(player):
         player.brain.fallController.enabled = False
         player.gameState = player.currentState
         player.brain.nav.stand()
-        player.brain.tracker.trackBall()
+        player.brain.tracker.performBasicPan()
 
         if player.lastDiffState == 'gamePenalized':
             # We KNOW that we've been manually positioned.
             pass
             # This method is broken.
             #player.brain.resetSetLocalization()
+
+    elif player.brain.tracker.isStopped():
+        player.brain.tracker.trackBall()
 
     # If we think we're on the wrong side, reset to the correct field cross
     #  and loc will take care of the rest.
