@@ -164,7 +164,7 @@ private:
     bool lost;
     float errorMagnitude;
 
-    bool set;
+    int framesSinceReset;
 
     // For use when logging particle swarm
     messages::ParticleSwarm swarm;

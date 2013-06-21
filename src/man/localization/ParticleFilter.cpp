@@ -57,10 +57,6 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::VisionField& visionInput,
                             bool inSet)
 {
-    if (inSet && !set)
-        std::cout << "I'm in set!" << std::endl;
-    set = inSet;
-
     motionSystem->update(particles, odometryInput, nearMidField());
 
     // Update the Vision Model
@@ -96,6 +92,12 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     }
     else
         errorMagnitude+= (1.f/10.f);
+
+    // in set, lost, lost in current frame, havent reset recently
+    if (inSet && (lost > LOST_THRESHOLD) && (framesSinceReset > 30)
+        && (curLineError > LOST_THRESHOLD)) {
+        std::cout << "I should use the ball!" << std::endl;
+    }
 
     // FOR TESTING
     if (errorMagnitude < FOUND_THRESHOLD) {
@@ -169,6 +171,7 @@ float ParticleFilter::getMagnitudeError()
  */
 void ParticleFilter::resetLoc()
 {
+    framesSinceReset = 0;
 #ifdef DEBUG_LOC
     std::cout << "WTF: LOC IS RESETTING!" << std::endl;
 #endif
@@ -210,6 +213,7 @@ void ParticleFilter::resetLoc()
 void ParticleFilter::resetLocTo(float x, float y, float h,
                                 LocNormalParams params)
 {
+    framesSinceReset = 0;
 #ifdef DEBUG_LOC
     std::cout << "WTF: LOC IS RESETTING to a pose!" << std::endl;
 #endif
@@ -264,6 +268,7 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
                                 LocNormalParams params1,
                                 LocNormalParams params2)
 {
+    framesSinceReset = 0;
 #ifdef DEBUG_LOC
     std::cout << "WTF: LOC IS RESETTING to two locations!" << std::endl;
 #endif
@@ -304,6 +309,7 @@ void ParticleFilter::resetLocTo(float x, float y, float h,
 
 void ParticleFilter::resetLocToSide(bool blueSide)
 {
+    framesSinceReset = 0;
 #ifdef DEBUG_LOC
     std::cout << "WTF: LOC IS RESETTING to a SIDE!" << std::endl;
 #endif
