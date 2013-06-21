@@ -13,13 +13,14 @@ from objects import RelRobotLocation, Location
 # results in us running through the ball. (There is no actual dribble sweet
 # move.) If vision sees a crowded area in front of us, we rotate around the 
 # ball and dribble again to space. We only dribble if shoulDribble returns 
-# true. See DribbleTransitions.py for more info.
+# true, see DribbleTransitions.py for more info.
 
 ### TODO
-# rotate towards goal when dribbling
+# corner dribble
 # test time-based decision making
 
 ### DONE
+# rotate towards goal when dribbling
 # better dodging
 # test goalie-in-net decision making
 # ballInGoalBox dribbling via goalie detection
@@ -64,7 +65,7 @@ def executeDribble(player):
         player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.CAREFUL_SPEED,
+                              Navigator.GRADUAL_SPEED,
                               False,
                               False)
     else:
