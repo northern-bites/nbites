@@ -60,7 +60,7 @@ void Robots::init()
 	numberOfRuns = 0;
 
 #ifdef OFFLINE
-	debugRobots = true;
+	debugRobots = false;
 #endif
 }
 
@@ -179,7 +179,7 @@ void Robots::robot(Cross* cross)
 				whites = 0;
 				for (int k = 0; k < blobs->get(i).width(); k++) {
 					unsigned char pixel = thresh->getColor(k+left, j);
-					if (Utility::isWhite(pixel)) {
+					if (Utility::isWhite(pixel) || Utility::isBlue(pixel)) {
 						whites++;
 						if (whites > blobs->get(i).width() / 4 || whites > 4) {
 							if (debugRobots && j - blobs->get(i).getBottom() > 3) {
@@ -197,16 +197,25 @@ void Robots::robot(Cross* cross)
 			estimate pose_est = vision->pose->pixEstimate(blobs->get(i).getLeft(),
 												  blobs->get(i).getBottom(),
 												  270);
-			float farDistance = max(vision->fieldEdge->getDistanceLeft(),
-									vision->fieldEdge->getDistanceCenter());
-			farDistance = max(farDistance, vision->fieldEdge->getDistanceRight());
+			float farDistance = vision->fieldEdge->getDistanceLeft();
+			if (blobs->get(i).getLeft() > 2 * IMAGE_WIDTH / 3) {
+				farDistance = vision->fieldEdge->getDistanceCenter();
+			} else if (blobs->get(i).getLeft() > IMAGE_WIDTH / 3) {
+				farDistance = vision->fieldEdge->getDistanceRight();
+			}
 			if (debugRobots) {
 				cout << "Distance estimate to perspective robot is " <<
 					pose_est.dist << " " << farDistance << endl;
 			}
-			if (pose_est.dist > farDistance + 100 || pose_est.dist == 0) {
+			if ((pose_est.dist > 200 && pose_est.dist > farDistance && farDistance != 0)
+				|| (pose_est.dist == 0 && !farDistance == 0) || (pose_est.dist > 500)) {
 				if (debugRobots) {
 					cout << "Robot too far away " << endl;
+                    vision->drawRect(blobs->get(i).getLeft(),
+                                     blobs->get(i).getTop(),
+                                     blobs->get(i).width(),
+                                     blobs->get(i).height(),
+                                     BLUE);
 				}
 				blobs->init(i);
 			} else {
@@ -663,21 +672,35 @@ bool Robots::checkWhiteAllignment(Blob candidate) {
 bool Robots::whiteBelow(Blob candidate) {
 	int bottom = candidate.getBottom();
 	int height = candidate.height();
-	int scanline = bottom + height;
+	int scanline = bottom;
 	for (int y = scanline; y < IMAGE_HEIGHT && y < scanline + height; y += 3) {
 		int white = 0;
 		int green = 0;
+		int blue = 0;
 		for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
 			if (Utility::isWhite(thresh->getThresholded(y, x))) {
 				white++;
 			} else if (Utility::isGreen(thresh->getThresholded(y, x))) {
 				green++;
+			} else if (Utility::isBlue(thresh->getThresholded(y, x))) {
+				blue++;
 			}
 		}
 		if (green > candidate.width() / 2 && white == 0) {
+			if (debugRobots) {
+				cout << "Bad white below " << white << " " << blue << " " <<
+					candidate.width() << endl;
+				vision->drawPoint(candidate.getLeft(), y, BLUE);
+			}
 			return false;
 		}
 		if (white > candidate.width() / 4) {
+			return true;
+		}
+		if (blue > candidate.width() / 2) {
+			return true;
+		}
+		if (white + blue / 2 > candidate.width() / 3) {
 			return true;
 		}
 	}

@@ -52,7 +52,7 @@ Field::Field(Vision* vis, Threshold * thr)
 	// funding. - chown
 #ifdef OFFLINE
 	debugFieldEdge = false;
-	debugDrawFieldEdge = true;
+	debugDrawFieldEdge = false;
 	debugHorizon = false;
 #endif
 }
@@ -194,10 +194,13 @@ void Field::initialScanForTopGreenPoints(int pH) {
         }
     }
     // look for odd spikes and quell them
-    /*if (poseHorizon > -100) {
+    if (poseHorizon > -100) {
+		const int BARRIER = 15;
         for (good = 4; good < HULLS - 4; good++) {
-            if (convex[good-1].y - convex[good].y > 15 && convex[good+1].y -
-                convex[good].y > 15) {
+            if (convex[good-1].y - convex[good].y > BARRIER &&
+				convex[good+1].y - convex[good].y > BARRIER &&
+				convex[good-2].y - convex[good].y > BARRIER &&
+				convex[good+2].y - convex[good].y > BARRIER) {
                 if (debugFieldEdge) {
                     cout << "Spike at " << convex[good].x << " " << convex[good].y <<
                         endl;
@@ -206,13 +209,13 @@ void Field::initialScanForTopGreenPoints(int pH) {
             }
         }
 		// special case for the edges
-		if (convex[HULLS - 2].y - convex[HULLS - 1].y > 15) {
+		/*if (convex[HULLS - 2].y - convex[HULLS - 1].y > BARRIER) {
 			convex[HULLS - 1].y = convex[HULLS - 2].y;
 		}
-		if (convex[1].y - convex[0].y > 15) {
+		if (convex[1].y - convex[0].y > BARRIER) {
 			convex[0].y = convex[1].y;
-		}
-		}*/
+			}*/
+	}
     for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
     if (good < HULLS) {
         for (int i = good-1; i > -1; i--) {
