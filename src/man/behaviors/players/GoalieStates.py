@@ -189,39 +189,8 @@ def fixMyself(player):
         player.brain.tracker.trackBall()
         dest = correct(average(player.homeDirections))
         player.brain.nav.walkTo(dest)
-        print "I need to go to " + str(dest)
 
     return Transition.getNextState(player, fixMyself)
-
-def repositionLeft(player):
-    if player.firstFrame():
-        if player.currentPose is constants.RIGHT_POSE:
-            player.currentPose = constants.CENTER_POSE
-        else:
-            player.currentPose = constants.LEFT_POSE
-        print "Moving to position " + str(player.currentPose)
-
-        player.brain.nav.walkTo(RelRobotLocation(0, 20, 0))
-
-    if player.brain.nav.isStanding():
-        return player.goLater('watch')
-
-    return player.stay()
-
-def repositionRight(player):
-    if player.firstFrame():
-        if player.currentPose is constants.LEFT_POSE:
-            player.currentPose = constants.CENTER_POSE
-        else:
-            player.currentPose = constants.RIGHT_POSE
-        print "Moving to position " + str(player.currentPose)
-
-        player.brain.nav.walkTo(RelRobotLocation(0, -20, 0))
-
-    if player.brain.nav.isStanding():
-        return player.goLater('watch')
-
-    return player.stay()
 
 def kickBall(player):
     """

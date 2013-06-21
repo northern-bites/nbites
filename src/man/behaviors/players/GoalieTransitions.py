@@ -12,20 +12,6 @@ from objects import RelRobotLocation
 
 # Visual Goalie
 
-def shouldMoveLeft(player):
-    if player.currentPose is constants.LEFT_POSE:
-        return False
-
-    return (player.brain.ball.vis.on and
-            player.brain.ball.bearing_deg > 45)
-
-def shouldMoveRight(player):
-    if player.currentPose is constants.RIGHT_POSE:
-        return False
-
-    return (player.brain.ball.vis.on and
-            player.brain.ball.bearing_deg < -45)
-
 def getLeftGoalboxCorner(player):
     vision = player.brain.interface.visionField
     for i in range(0, vision.visual_corner_size()):
