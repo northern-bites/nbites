@@ -60,7 +60,11 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
 
     float xL, xU, yL, yU, hL, hU;
 
-    if (dX >0) {
+    if ((std::fabs(dX) - .1f) < 0.1f) {
+        xL = -.1f;
+        xU =  .1f;
+    }
+    else if (dX >0) {
         xL = -1.f * dX * xF;
         xU = dX * xF;
     }
@@ -68,12 +72,12 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         xL = dX * xF;
         xU = -1.f * dX * xF;
     }
-    else {
-        xL = -.1f;
-        xU = .1f;
-    }
 
-    if (dY >0) {
+    if ((std::fabs(dY) - .1f) < 0.1f) {
+        yL = -.1f;
+        yU =  .1f;
+    }
+    else if (dY >0) {
         yL = -1.f * dY * yF;
         yU = dY * yF;
     }
@@ -81,27 +85,18 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         yL = dY * yF;
         yU = -1.f * dY * yF;
     }
-    else {
-        yL = -.1f;
-        yU = .1f;
-    }
 
-    if (dH >0) {
+    if ((std::fabs(dH) - .1f) < 0.1f) {
+        hL = -.1f;
+        hU =  .1f;
+    }
+    else if (dH >0) {
         hL = -1.f * dH * hF;
         hU = dH * hF;
     }
     else if (dH <0) {
         hL = dH * hF;
         hU = -1.f * dH * hF;
-    }
-    else {
-        hL = -.01f;
-        hU =  .01f;
-    }
-
-    if ((std::fabs(dH) - .1f) < 0.1f) {
-        hL = -.1f;
-        hU =  .1f;
     }
 
     boost::uniform_real<float> xRange(xL, xU);
