@@ -223,34 +223,34 @@ def repositionRight(player):
 
     return player.stay()
 
-# def kickBall(player):
-#     """
-#     Kick the ball
-#     """
-#     if player.firstFrame():
-#         # save odometry if this was your first kick
-#         if player.lastDiffState == 'clearIt':
-#             VisualStates.returnToGoal.kickPose = \
-#                 RelRobotLocation(player.brain.interface.odometry.x,
-#                                  player.brain.interface.odometry.y,
-#                                  player.brain.interface.odometry.h)
-#         #otherwise add to previously saved odo
-#         else:
-#             VisualStates.returnToGoal.kickPose.relX += \
-#                 player.brain.interface.odometry.x
-#             VisualStates.returnToGoal.kickPose.relY += \
-#                 player.brain.interface.odometry.y
-#             VisualStates.returnToGoal.kickPose.relH += \
-#                 player.brain.interface.odometry.h
+def kickBall(player):
+    """
+    Kick the ball
+    """
+    if player.firstFrame():
+        # save odometry if this was your first kick
+        if player.lastDiffState == 'clearIt':
+            VisualStates.returnToGoal.kickPose = \
+                RelRobotLocation(player.brain.interface.odometry.x,
+                                 player.brain.interface.odometry.y,
+                                 player.brain.interface.odometry.h)
+        #otherwise add to previously saved odo
+        else:
+            VisualStates.returnToGoal.kickPose.relX += \
+                player.brain.interface.odometry.x
+            VisualStates.returnToGoal.kickPose.relY += \
+                player.brain.interface.odometry.y
+            VisualStates.returnToGoal.kickPose.relH += \
+                player.brain.interface.odometry.h
 
-#         player.brain.tracker.trackBall()
+        player.brain.tracker.trackBall()
 
-#         player.executeMove(player.kick.sweetMove)
+        player.executeMove(player.kick.sweetMove)
 
-#     if player.counter > 10 and player.brain.nav.isStopped():
-#             return player.goLater('didIKickIt')
+    if player.counter > 10 and player.brain.nav.isStopped():
+            return player.goLater('didIKickIt')
 
-#     return player.stay()
+    return player.stay()
 
 # def saveIt(player):
 #     if player.firstFrame():
