@@ -42,7 +42,7 @@ def readyFaceMiddle(player):
     centerField = Location(NogginConstants.CENTER_FIELD_X,
                            NogginConstants.CENTER_FIELD_Y)
 
-    if nav.isStopped() and not readyFaceMiddle.startedSpinning:
+    if player.brain.nav.isStopped() and not readyFaceMiddle.startedSpinning:
         readyFaceMiddle.startedSpinning = True
         spinDir = player.brain.loc.spinDirToPoint(centerField)
         player.setWalk(0,0,spinDir*constants.FIND_BALL_SPIN_SPEED)
@@ -68,7 +68,7 @@ def positionPlaying(player):
         player.brain.nav.positionPlaybook(Navigator.PLAYBOOK)
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
 
-    if player.brain.ball.on and player.brain.ball.distance < 100:
+    if player.brain.ball.vis.on and player.brain.ball.distance < 100:
         player.brain.tracker.trackBall()
     else:
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
