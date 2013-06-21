@@ -42,7 +42,7 @@ def decideDribble(player):
             player.kick = kicks.RIGHT_DRIBBLE
 
     if not transitions.shouldDribble(player):
-        player.inKickingSate = False
+        player.inKickingState = False
         return player.goLater('chase')
     elif transitions.centerLaneOpen(player):
         return player.goNow('executeDribble')
@@ -73,7 +73,7 @@ def executeDribble(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
-        player.inKickingSate = False
+        player.inKickingState = False
         return player.goLater('chase')
     elif not transitions.centerLaneOpen(player):
         player.aboutToRotate = True # we will go from position to rotate
@@ -97,7 +97,7 @@ def rotateToOpenSpace(player):
     if transitions.ballLost(player):
         return player.goNow('lookForBall')
     elif not transitions.shouldDribble(player):
-        player.inKickingSate = False
+        player.inKickingState = False
         player.stand()
         return player.goLater('chase')
     elif rotateToOpenSpace.counter == constants.ROTATE_FC:
@@ -158,7 +158,7 @@ def positionForDribble(player):
     if transitions.ballLost(player):
         return player.goLater('lookForBall')
     elif not transitions.shouldDribble(player):
-        player.inKickingSate = False
+        player.inKickingState = False
         player.stand()
         return player.goLater('chase')
     elif player.aboutToRotate and transitions.navDone(player):
