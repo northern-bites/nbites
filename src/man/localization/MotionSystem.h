@@ -9,6 +9,7 @@
 #pragma once
 
 #include "MotionModel.h"
+#include <cmath>
 
 
 namespace man
