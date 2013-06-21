@@ -24,6 +24,7 @@ bool VisionSystem::update(ParticleSet& particles,
     // Record totalWeight for normalization
     float totalWeight = 0.0f;
     bool madeObsv = false;
+    sawGoal = false;
 
     float times = 0;
     float lowestParticleError = 10000000.f;
@@ -75,6 +76,7 @@ bool VisionSystem::update(ParticleSet& particles,
 //            std::cout << "Goalpost Error:\t" << newError << std::endl;
             curParticleError+= newError;
             numObsv++;
+            sawGoal = true;
         }
 
         if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
@@ -86,6 +88,7 @@ bool VisionSystem::update(ParticleSet& particles,
 //            std::cout << "Goalpost Error:\t" << newError << std::endl;
             curParticleError+= newError;
             numObsv++;
+            sawGoal = true;
         }
 
         if ((obsv.visual_cross().distance() > 0.f)
@@ -304,6 +307,10 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
         if (corner.poss_id(j) == 30 || corner.poss_id(j) == 31)
             return;
     }
+
+    // Only reconstruct if we saw goals (confident in the corner id)
+    if (!sawGoal)
+        return;
 
     int concreteNum = 0;
     // Loop through all concrete coords of the corner

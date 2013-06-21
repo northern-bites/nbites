@@ -80,6 +80,8 @@ private:
     float currentLowestError;
 
     int lastNumObsv;
+
+    bool sawGoal;
 };
 } // namespace localization
 } // namespace man
