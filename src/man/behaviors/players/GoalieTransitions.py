@@ -127,52 +127,42 @@ def shouldReposition(player):
     return (badLeftCornerObservation(player) or
             badRightCornerObservation(player))
 
-# def atGoalArea(player):
-#     """
-#     Checks if robot is close enough to the field edge to be at the goal.
-#     """
-#     #magic number
-#     vision = player.brain.interface.visionField
-#     return ((vision.visual_field_edge.distance_m < 110.0
-#              and vision.visual_field_edge.distance_m != 0.0)
-#             or (player.brain.yglp.distance < 20.0
-#                 and player.brain.yglp.on
-#                 and not player.brain.yglp.distance == 0.0)
-#             or (player.brain.ygrp.distance < 20.0
-#                 and player.brain.ygrp.on
-#                 and not player.brain.ygrp.distance == 0.0))
+def atGoalArea(player):
+    """
+    Checks if robot is close enough to the field edge to be at the goal.
+    """
+    #magic number
+    vision = player.brain.interface.visionField
+    return ((vision.visual_field_edge.distance_m < 110.0
+             and vision.visual_field_edge.distance_m != 0.0)
+            or (player.brain.yglp.distance < 20.0
+                and player.brain.yglp.on
+                and not player.brain.yglp.distance == 0.0)
+            or (player.brain.ygrp.distance < 20.0
+                and player.brain.ygrp.on
+                and not player.brain.ygrp.distance == 0.0))
 
-# def ballIsInMyWay(player):
-#     """
-#     Checks if robot will run into ball while returning from penalty.
-#     """
-#     if not player.brain.ball.vis.on:
-#         return False
+def ballMoreImportant(player):
+    """
+    Goalie needs to chase, not localize itself.
+    """
+    if player.brain.ball.vis.on and player.brain.ball.vis.distance < 100.0:
+        return True
 
-#     return (fabs(player.brain.ball.rel_y < 20.0 and
-#                  player.brain.ball.rel_x < 30.0))
+    if (player.brain.ball.vis.on and player.brain.ball.vis.distance < 150.0
+        and player.aggressive):
+        return True
 
-# def ballMoreImportant(player):
-#     """
-#     Goalie needs to chase, not localize itself.
-#     """
-#     if player.brain.ball.vis.on and player.brain.ball.vis.distance < 100.0:
-#         return True
-
-#     if (player.brain.ball.vis.on and player.brain.ball.vis.distance < 150.0 and
-#         player.aggressive):
-#         return True
-
-# def facingForward(player):
-#     """
-#     Checks if a robot is facing the cross, which is more or less forward
-#     if it is in the goal.
-#     """
-#     #magic numbers
-#     vision = player.brain.interface.visionField
-#     return (vision.visual_field_edge.distance_m > 800.0 or
-#             (fabs(vision.visual_cross.bearing) < 10.0 and
-#              vision.visual_cross.distance > 0.0))
+def facingForward(player):
+    """
+    Checks if a robot is facing the cross, which is more or less forward
+    if it is in the goal.
+    """
+    #magic numbers
+    vision = player.brain.interface.visionField
+    return (vision.visual_field_edge.distance_m > 800.0 or
+            (math.fabs(vision.visual_cross.bearing) < 10.0 and
+             vision.visual_cross.distance > 0.0))
 
 def facingBall(player):
     """
@@ -182,39 +172,28 @@ def facingBall(player):
     return (math.fabs(player.brain.ball.vis.bearing_deg) < 10.0 and
             player.brain.ball.vis.on)
 
-# def notTurnedAround(player):
-#     """
-#     Checks that we are actually facing the field when returning from
-#     penalty.
-#     """
-#     return (player.brain.interface.visionField.visual_field_edge.distance_m
-#             > 400.0)
+def notTurnedAround(player):
+    """
+    Checks that we are actually facing the field when returning from
+    penalty.
+    """
+    return (player.brain.interface.visionField.visual_field_edge.distance_m
+            > 400.0)
 
-# def onThisSideline(player):
-#     """
-#     Looks for a T corner or far goals to determine which sideline it's
-#     standing on.
-#     """
-#     vision = player.brain.interface.visionField
-#     return (vision.visual_field_edge.distance_m < 250.0 and
-#             vision.visual_field_edge.distance_m > 100.0)
+def onThisSideline(player):
+    """
+    Looks for a T corner or far goals to determine which sideline it's
+    standing on.
+    """
+    vision = player.brain.interface.visionField
+    return (vision.visual_field_edge.distance_m < 250.0 and
+            vision.visual_field_edge.distance_m > 100.0)
 
-# def unsure(player):
-#     return (not onThisSideline(player) and
-#             player.counter > 60)
+def unsure(player):
+    return (not onThisSideline(player) and
+            player.counter > 60)
 
-# def shouldPerformSave(player):
-#     """
-#     Checks that the ball is moving toward it and close enough to save.
-#     """
-#     return (player.brain.ball.vel_x < 0.0 and
-#             player.brain.ball.speed > 15.0 and
-#             player.brain.ball.rel_x_dest < 0.0 and
-#             abs(player.brain.ball.rel_y_intersect_dest) < 80.0 and
-#             player.brain.ball.distance < 230.0 and
-#             player.brain.ball.vis.on)
-
-## These three are penalty kick transitions. They need to be tuned.
+# Saving transitions....
 def shouldDiveRight(player):
     return (player.brain.ball.vel_x < 0.0 and
             player.brain.ball.speed > 30.0 and
@@ -309,6 +288,9 @@ def reachedMyDestination(player):
     The robot has reached the ball after walking to it.
     """
     return player.brain.nav.isAtPosition()
+
+def dangerousBall(player):
+    return player.brain.interface.visionField.visual_field_edge.distance_m < 200.0
 
 def doneWalking(player):
     """

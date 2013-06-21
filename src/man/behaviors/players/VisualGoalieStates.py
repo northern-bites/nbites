@@ -15,58 +15,35 @@ from math import fabs, degrees, radians, sin, cos
 from ..kickDecider import kicks
 import noggin_constants as Constants
 
-# def walkToGoal(player):
-#     """
-#     Has the goalie walk in the general direction of the goal.
-#     """
-#     if player.firstFrame():
-#         player.brain.tracker.trackFieldObject(player.brain.ygrp)
-#         player.returningFromPenalty = True
+def walkToGoal(player):
+    """
+    Has the goalie walk in the general direction of the goal.
+    """
+    if player.firstFrame():
+        player.brain.tracker.trackFieldObject(player.brain.ygrp)
+        player.returningFromPenalty = True
 
-#     if player.brain.ygrp.on and not(player.brain.ygrp.distance == 0.0):
-#         relx = player.brain.ygrp.distance * cos(player.brain.ygrp.bearing)
-#         rely = player.brain.ygrp.distance * sin(player.brain.ygrp.bearing)
-#         player.brain.nav.goTo(RelRobotLocation(relx, rely, player.brain.ygrp.bearing_deg))
+    if player.brain.ygrp.on and not(player.brain.ygrp.distance == 0.0):
+        relx = player.brain.ygrp.distance * cos(player.brain.ygrp.bearing)
+        rely = player.brain.ygrp.distance * sin(player.brain.ygrp.bearing)
+        player.brain.nav.goTo(RelRobotLocation(relx, rely, player.brain.ygrp.bearing_deg))
 
-#     return Transition.getNextState(player, walkToGoal)
+    return Transition.getNextState(player, walkToGoal)
 
-# ## NOT USED right now, but is a good idea so that the goalie won't walk the
-# ## ball into the goal
-# def dodgeBall(player):
-#     if player.firstFrame():
-#         if player.brain.ball.rel_y < 0.0:
-#             dodgeDestY = player.brain.ball.rel_y + 20.0
-#         else:
-#             dodgeDestY = player.brain.ball.rel_y - 20.0
-#         player.brain.tracker.trackBall()
-#         dodgeBall.dodgeDest = RelRobotLocation(player.brain.ball.rel_x,
-#                                                dodgeDestY,
-#                                                0.0)
-#         player.brain.nav.goTo(dodgeBall.dodgeDest)
+def spinAtGoal(player):
+    if player.firstFrame():
+        spinAtGoal.home = RelRobotLocation(0, 0, 0)
+        # Decide which way to rotate based on the way we came from
+        if player.side == RIGHT:
+            spinAtGoal.home.relH = -90
+        else:
+            spinAtGoal.home.relH = 90
+        player.brain.nav.goTo(spinAtGoal.home,
+                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
 
-#     # update dest based on ball loc
-#     if player.brain.ball.rel_y < 0.0:
-#         dodgeBall.dodgeDest.relY = player.brain.ball.rel_y + 20.0
-#     else:
-#         dodgeBall.dodgeDest.relY = player.brain.ball.rel_y - 20.0
-#     dodgeBall.dodgeDest.relX = player.brain.ball.rel_x
+        player.brain.tracker.lookToAngle(0.0)
 
-#     return Transition.getNextState(player, dodgeBall)
-
-# def spinAtGoal(player):
-#     if player.firstFrame():
-#         spinAtGoal.home = RelRobotLocation(0, 0, 0)
-#         # Decide which way to rotate based on the way we came from
-#         if player.side == RIGHT:
-#             spinAtGoal.home.relH = -90
-#         else:
-#             spinAtGoal.home.relH = 90
-#         player.brain.nav.goTo(spinAtGoal.home,
-#                               nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
-
-#         player.brain.tracker.lookToAngle(0.0)
-
-#     return Transition.getNextState(player, spinAtGoal)
+    return Transition.getNextState(player, spinAtGoal)
 
 # clearIt->kickBall->didIKickIt->returnToGoal
 def clearIt(player):
@@ -105,6 +82,42 @@ def clearIt(player):
 
     return Transition.getNextState(player, clearIt)
 
+def panic(player):
+    if player.firstFrame():
+        if player.side is LEFT:
+            player.kick = kicks.RIGHT_SIDE_KICK
+        else:
+            player.kick = kicks.LEFT_SIDE_KICK
+
+        kickPose = player.kick.getPosition()
+        panic.ballDest = RelRobotLocation(player.brain.ball.rel_x -
+                                          kickPose[0],
+                                          player.brain.ball.rel_y -
+                                          kickPose[1],
+                                          0.0)
+
+        player.brain.nav.goTo(panic.ballDest,
+                              nav.CLOSE_ENOUGH,
+                              nav.GRADUAL_SPEED,
+                              adaptive = False)
+
+    kickPose = player.kick.getPosition()
+    panic.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
+    panic.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
+
+    return Transition.getNextState(player, panic)
+
+def attemptToNotScoreOnOurselves(player):
+    if player.side is LEFT:
+        player.setWalk(0, -.7, .25)
+    else:
+        player.setWalk(0, .7, -.25)
+
+    if player.counter > 50:
+        return player.goLater('kickBall')
+
+    return player.stay()
+
 def didIKickIt(player):
     if player.firstFrame():
         player.brain.nav.stop()
@@ -122,25 +135,25 @@ def spinToFaceBall(player):
 
     return Transition.getNextState(player, spinToFaceBall)
 
-# def waitToFaceField(player):
-#     if player.firstFrame():
-#         player.brain.tracker.lookToAngle(0)
+def waitToFaceField(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
 
-#     return Transition.getNextState(player, waitToFaceField)
+    return Transition.getNextState(player, waitToFaceField)
 
-# def decideLeftSide(player):
-#     if player.firstFrame():
-#         player.side = LEFT
-#         player.brain.tracker.lookToAngle(-90)
+def decideLeftSide(player):
+    if player.firstFrame():
+        player.side = LEFT
+        player.brain.tracker.lookToAngle(-90)
 
-#     return Transition.getNextState(player, decideLeftSide)
+    return Transition.getNextState(player, decideLeftSide)
 
-# def decideRightSide(player):
-#     if player.firstFrame():
-#         player.side = RIGHT
-#         player.brain.tracker.lookToAngle(90)
+def decideRightSide(player):
+    if player.firstFrame():
+        player.side = RIGHT
+        player.brain.tracker.lookToAngle(90)
 
-#     return Transition.getNextState(player, decideRightSide)
+    return Transition.getNextState(player, decideRightSide)
 
 def returnToGoal(player):
     if player.firstFrame():
@@ -170,7 +183,9 @@ def repositionAfterWhiff(player):
         player.brain.interface.motionRequest.reset_odometry = True
         player.brain.interface.motionRequest.timestamp = int(player.brain.time * 1000)
 
-        if player.brain.ball.rel_y < 0.0:
+        if player.kick in [kicks.RIGHT_SIDE_KICK, kicks.LEFT_SIDE_KICK]:
+            pass
+        elif player.brain.ball.rel_y < 0.0:
             player.kick = kicks.RIGHT_STRAIGHT_KICK
         else:
             player.kick = kicks.LEFT_STRAIGHT_KICK
@@ -183,7 +198,7 @@ def repositionAfterWhiff(player):
                                                          0.0)
         player.brain.nav.goTo(repositionAfterWhiff.ballDest,
                               nav.CLOSE_ENOUGH,
-                              nav.FAST_SPEED)
+                              nav.GRADUAL_SPEED)
 
     # if it took more than 5 seconds, forget it
     if player.counter > 150:
