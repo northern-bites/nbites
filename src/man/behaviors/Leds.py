@@ -15,7 +15,7 @@ FOOT_LEDS = True
 BALL_LEDS = True
 GOAL_LEDS = True
 PLAYBOOK_LEDS = True
-LOC_LEDS = False
+LOC_LEDS = True
 COMM_LEDS = True
 
 ####### LED DEFINITIONS #############
@@ -164,6 +164,7 @@ class Leds():
         self.goalCertainty = 0
         self.facingOpp = -1
         self.numActiveMates = 0
+        self.oldLocScore = 3
 
     def processLeds(self):
 
@@ -209,9 +210,6 @@ class Leds():
 
             self.goalCertainty = newCertainty
 
-
-            # TODO make this part actually tell us if we are looking at our goal or not
-            # via flag in loc (???)
             newFacingOpp = (-90 < self.brain.loc.h < 90)
             if (newFacingOpp != self.facingOpp or
                 self.facingOpp == -1):
@@ -226,7 +224,6 @@ class Leds():
                         self.executeLeds(BLUE_GOAL_LEDS)
                     else:
                         self.executeLeds(PINK_GOAL_LEDS)
-#                self.executeLeds(NO_GOAL_LEDS)
 
         if PLAYBOOK_LEDS:
             if self.brain.playbook.roleChanged():
@@ -244,10 +241,38 @@ class Leds():
                     self.executeLeds(ROLE_OFF_LEDS)
 
         if LOC_LEDS:
-            # TODO: show loc uncertainty via LEDS
-            # This may not be applicable to the particle swarm 6/7/13
-            pass
+            newLocScore = self.locScore(self.brain.locUncert)
+            if (newLocScore != self.oldLocScore):
+                self.oldLocScore = newLocScore
+                if(newLocScore > 0):
+                    self.executeLeds(LEFT_LOC_ONE_LEDS)
+                    self.executeLeds(RIGHT_LOC_ONE_LEDS)
+                else:
+                    self.executeLeds(LEFT_LOC_ONE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_ONE_OFF_LEDS)
+                if(newLocScore > 1):
+                    self.executeLeds(LEFT_LOC_TWO_LEDS)
+                    self.executeLeds(RIGHT_LOC_TWO_LEDS)
+                else:
+                    self.executeLeds(LEFT_LOC_TWO_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_TWO_OFF_LEDS)
+                if(newLocScore > 2):
+                    self.executeLeds(LEFT_LOC_THREE_LEDS)
+                    self.executeLeds(RIGHT_LOC_THREE_LEDS)
+                    self.executeLeds(LEFT_LOC_FOUR_LEDS)
+                    self.executeLeds(RIGHT_LOC_FOUR_LEDS)
+                    self.executeLeds(LEFT_LOC_FIVE_LEDS)
+                    self.executeLeds(RIGHT_LOC_FIVE_LEDS)
+                else:
+                    self.executeLeds(LEFT_LOC_THREE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_THREE_OFF_LEDS)
+                    self.executeLeds(LEFT_LOC_FOUR_OFF_LEDS)
+                    self.executeLeds(LEFT_LOC_FIVE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_FIVE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_FOUR_OFF_LEDS)
 
+        # If more teammates are added, consider making bottom of right
+        # eye into localization uncertainty and using whole ear for comm
         if COMM_LEDS:
             newActiveMates = self.brain.activeTeamMates()
             if (newActiveMates != self.numActiveMates):
@@ -327,3 +352,13 @@ class Leds():
             # Unnecessary check, never triggered
             #if ledTuple[2] != NOW:
                 #print "Invalid timing command in Leds.py"
+
+    def locScore(self, newLoc):
+        if newLoc < 37:
+            return 0
+        elif newLoc < 45:
+            return 1
+        elif newLoc < 70:
+            return 2
+        else:
+            return 3

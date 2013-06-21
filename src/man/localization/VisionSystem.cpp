@@ -274,7 +274,7 @@ float VisionSystem::scoreFromVisDetect(const Particle& particle,
                                        const messages::VisualDetection& obsv)
 {
     float bestScore = 100000;
-    float bearErrOfBest;
+    float bearErrOfBest = 0.f;
 
 
     for (int i=0; i<obsv.concrete_coords_size(); i++)

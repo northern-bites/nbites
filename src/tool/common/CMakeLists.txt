@@ -21,7 +21,5 @@ add_library(tool_common
 
 target_link_libraries(
   tool_common
-  messages
-  portals
   ${QT_LIBRARIES}
   )

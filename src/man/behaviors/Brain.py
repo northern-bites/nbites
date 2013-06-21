@@ -78,6 +78,7 @@ class Brain(object):
         self.initTeamMembers()
         self.motion = None
         self.game = None
+        self.locUncert = 0
 
         self.play = Play.Play()
 
@@ -175,10 +176,7 @@ class Brain(object):
         output.my_y = self.loc.y
         output.my_h = self.loc.h
 
-        #TODO get actual uncertainties
-        output.my_x_uncert = 0
-        output.my_y_uncert = 0
-        output.my_h_uncert = 0
+        output.my_uncert = self.locUncert
 
         output.ball_on = self.ball.vis.on
 
@@ -243,6 +241,7 @@ class Brain(object):
         self.loc = RobotLocation(self.interface.loc.x,
                                  self.interface.loc.y,
                                  self.interface.loc.h * (180. / pi))
+        self.locUncert = self.interface.loc.uncert
 
     def resetLocTo(self, x, y, h):
         """
