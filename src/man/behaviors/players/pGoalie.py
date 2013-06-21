@@ -20,6 +20,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyKicking = False
         self.aggressive = False
         self.returningFromPenalty = False
+        self.side = RIGHT
         self.homeDirections = []
 
         # All transitions are defined here. Their conditions are in
