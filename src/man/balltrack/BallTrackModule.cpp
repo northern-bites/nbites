@@ -3,6 +3,7 @@
 #include <math.h>
 #include "NBMath.h"
 #include "Profiler.h"
+#include "FieldConstants.h"
 
 #include "DebugConfig.h"
 
@@ -74,6 +75,15 @@ void BallTrackModule::run_()
     float y = localizationInput.message().y() +
         filters->getFilteredDist() * sinf(localizationInput.message().h() +
                                           filters->getFilteredBear());
+
+    // HACK!! WHY!!??!?!
+    if (visionBallInput.message().frames_off() > 720 &&
+        x < 70 && y < 70)
+    {
+        x = CENTER_FIELD_X;
+        y = CENTER_FIELD_Y;
+    }
+
     ballMessage.get()->set_x(x);
     ballMessage.get()->set_y(y);
 
