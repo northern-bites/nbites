@@ -7,7 +7,7 @@ from .. import SweetMoves
 import GoalieConstants as constants
 import math
 
-SAVING = False
+SAVING = True
 
 def gameInitial(player):
     if player.firstFrame():
@@ -144,10 +144,10 @@ def watch(player):
         and not watch.looking):
         watch.looking = True
         if watch.lastLook is constants.RIGHT:
-            player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
+            #player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
             watch.lastLook = constants.LEFT
         else:
-            player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
+            #player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
             watch.lastLook = constants.RIGHT
 
     if player.brain.tracker.isStopped():
@@ -262,8 +262,7 @@ def saveRight(player):
     if player.counter > 80:
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
-            player.brain.fallController.enabled = True
-            return player.goLater('fallen')
+            return player.goLater('rollOut')
         else:
             return player.goLater('watch')
 
@@ -282,9 +281,16 @@ def saveLeft(player):
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
             player.brain.fallController.enabled = True
-            return player.goLater('fallen')
+            return player.goLater('rollOut')
         else:
             return player.goLater('watch')
+
+    return player.stay()
+
+def rollOut(player):
+    if player.brain.nav.isStopped():
+        player.brain.fallController.enabled = True
+        return player.goLater('fallen')
 
     return player.stay()
 

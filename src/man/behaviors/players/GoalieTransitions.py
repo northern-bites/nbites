@@ -211,10 +211,10 @@ def shouldDiveLeft(player):
 
 def shouldSquat(player):
     return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 30.0 and
+            player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
-            abs(player.brain.ball.rel_y_intersect_dest) < 10.0 and
-            player.brain.ball.vis.on)
+            abs(player.brain.ball.rel_y_intersect_dest) < 30.0 and
+            player.brain.ball.vis.frames_on > 10)
 
 def shouldClearBall(player):
     """
