@@ -81,6 +81,7 @@ void LocalizationModule::update()
     particleOutput.setMessage(swarmMessage);
 #endif
 
+//    std::cout << "x,y  " << particleFilter->getCurrentEstimate().x() << ", " << particleFilter->getCurrentEstimate().y() << std::endl;
     output.setMessage(locMessage);
 }
 

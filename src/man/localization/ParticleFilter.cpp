@@ -43,8 +43,7 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
     }
 
     lost = false;
-    lineLost = true;
-    errorMagnitude = LINE_CONFIDENT - 10.f;
+    errorMagnitude = FOUND_THRESHOLD + (.5f * LOST_THRESHOLD);
 }
 
 ParticleFilter::~ParticleFilter()
@@ -83,8 +82,8 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     updateEstimate();
 
     //Calculate uncertainty from lines
-    float curLineError = visionSystem->getAvgLineError(poseEstimate,
-                                                       visionInput);
+    float curLineError = visionSystem->getConfidenceError(poseEstimate,
+                                                          visionInput);
     if (curLineError > 0) {
         errorMagnitude = curLineError*ALPHA
                          + errorMagnitude*(1-ALPHA);
@@ -93,16 +92,16 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         errorMagnitude+= (1.f/10.f);
 
     // FOR TESTING
-    if (errorMagnitude < LINE_CONFIDENT) {
-        if(lineLost) {
+    if (errorMagnitude < FOUND_THRESHOLD) {
+        if(lost) {
             // std::cout << "\nI know where i am" << std::endl;
         }
-        lineLost = false;
+        lost = false;
     }
     else {
-        if(!lineLost)
+        if(!lost)
             // std::cout << "\nI am lost" << std::endl;
-        lineLost = true;
+        lost = true;
     }
 }
 
@@ -370,6 +369,8 @@ void ParticleFilter::resample()
     float rand;
     ParticleSet newParticles;
 
+    //std::cout << "Error " << errorMagnitude << std::endl;
+
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
     if (lost && (errorMagnitude > LOST_THRESHOLD)&& visionSystem->getLastNumObsv() > 1)
@@ -383,6 +384,8 @@ void ParticleFilter::resample()
             // If the reconstructions is on the same side and not near midfield
             if ( ((*recLocIt).defSide == onDefendingSide())
                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 120)) {
+//                std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << std::endl;
+
                      Particle reconstructedParticle((*recLocIt).x,
                                                     (*recLocIt).y,
                                                     (*recLocIt).h,
