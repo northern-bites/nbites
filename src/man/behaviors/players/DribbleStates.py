@@ -16,13 +16,12 @@ from objects import RelRobotLocation, Location
 # shouldDribble returns true. See DribbleTransitions.py for more info.
 
 ### TODO
-# test goalie-in-net decision making
 # test time-based decision making
+# better dodging
 # rotate towards goal when dribbling
-# choose direction better, based on loc and heatmap?
-# frame counter rotatation?
 
 ### DONE
+# test goalie-in-net decision making
 # ballInGoalBox dribbling via goalie detection
 # test DRIBBLE_ON_KICKOFF
 # dribbleGoneBad needs work
