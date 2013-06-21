@@ -3,6 +3,7 @@ from . import GoalieStates
 from . import VisualGoalieStates
 from ..util import Transition
 from . import GoalieTransitions
+from . import PenaltyStates
 
 import noggin_constants as NogginConstants
 from GoalieConstants import RIGHT, LEFT
@@ -14,6 +15,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(GoalieStates)
         self.addStates(VisualGoalieStates)
+        self.addStates(PenaltyStates)
         self.setName('pGoalie')
         self.squatTime = 0
         self.frameCounter = 0
@@ -48,7 +50,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.notTurnedAround,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.HIGH_PRECISION)
-            : VisualGoalieStates.decideLeftSide
+            : PenaltyStates.afterPenalty
             }
 
         VisualGoalieStates.decideLeftSide.transitions = {

@@ -83,7 +83,10 @@ def gamePlaying(player):
 
     if (player.lastDiffState == 'gamePenalized' and
         player.lastStateTime > 10):
-        return player.goLater('waitToFaceField')
+        return player.goLater('afterPenalty')
+
+    if player.lastDiffState == 'afterPenalty':
+        return player.goLater('walkToGoal')
 
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')

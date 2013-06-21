@@ -8,8 +8,11 @@ from ..util import Transition
 #import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
 import GoalieTransitions
-from objects import RelRobotLocation, RelLocation, Location
-from noggin_constants import LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH
+from objects import RelRobotLocation, RelLocation, Location, RobotLocation
+from noggin_constants import (LINE_CROSS_OFFSET, GOALBOX_DEPTH, GOALBOX_WIDTH,
+                              FIELD_WHITE_LEFT_SIDELINE_X, CENTER_FIELD_Y,
+                              HEADING_LEFT)
+
 #from vision import cornerID as IDs
 from math import fabs, degrees, radians, sin, cos
 from ..kickDecider import kicks
@@ -20,15 +23,18 @@ def walkToGoal(player):
     Has the goalie walk in the general direction of the goal.
     """
     if player.firstFrame():
-        player.brain.tracker.trackFieldObject(player.brain.ygrp)
+        player.brain.tracker.repeatBasicPan()
         player.returningFromPenalty = True
+        player.brain.nav.goTo(RobotLocation(FIELD_WHITE_LEFT_SIDELINE_X,
+                                            CENTER_FIELD_Y,
+                                            HEADING_LEFT),
+                              avoidObstacles = True,
+                              fast = True)
 
-    if player.brain.ygrp.on and not(player.brain.ygrp.distance == 0.0):
-        relx = player.brain.ygrp.distance * cos(player.brain.ygrp.bearing)
-        rely = player.brain.ygrp.distance * sin(player.brain.ygrp.bearing)
-        player.brain.nav.goTo(RelRobotLocation(relx, rely, player.brain.ygrp.bearing_deg))
+    if player.brain.nav.isAtPosition():
+        return player.goLater('spinAtGoal')
 
-    return Transition.getNextState(player, walkToGoal)
+    return player.stay()
 
 def spinAtGoal(player):
     if player.firstFrame():
