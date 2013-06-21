@@ -60,10 +60,10 @@ def facingGoal(player):
 
 def rotateLeft(player):
     """
-    The goal is to the left of us, so we should rotate that way when avoiding
-    obstacles.
+    We should rotate towards the left.
     """
-    return (player.brain.loc.y < (0.5*nogginConstants.FIELD_HEIGHT))
+    return player.brain.loc.h < 0
+    # return (player.brain.loc.y < (1./2.*nogginConstants.FIELD_HEIGHT))
     # return (player.brain.interface.visionObstacle.block_left == 0 or
     #         (player.brain.interface.visionObstacle.left_dist <
     #         player.brain.interface.visionObstacle.right_dist and
