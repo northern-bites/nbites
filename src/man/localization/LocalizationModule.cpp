@@ -69,14 +69,17 @@ void LocalizationModule::update()
         deltaOdometry.set_h(0.f);
     }
 
+#ifndef OFFLINE
     bool inSet = (STATE_SET == gameStateInput.message().state());
-
     // Update the Particle Filter with the new observations/odometry
 
     if (inSet)
         particleFilter->update(deltaOdometry, visionInput.message(), ballInput.message());
     else
+#endif
         particleFilter->update(deltaOdometry, visionInput.message());
+
+
 
     // Update the locMessage and the swarm (if logging)
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
