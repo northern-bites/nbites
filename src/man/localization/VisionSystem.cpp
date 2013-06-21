@@ -266,7 +266,7 @@ Line VisionSystem::prepareVisualLine(const messages::RobotLocation& loc,
 
 
 /**
- * @brief Takes a PVisualObservation and particle & returns the
+ * @brief Takes a PVisualDetection and particle & returns the
  *        distance between the observations real location and its
  *        expected one
  */
@@ -274,11 +274,12 @@ float VisionSystem::scoreFromVisDetect(const Particle& particle,
                                        const messages::VisualDetection& obsv)
 {
     float bestScore = 100000;
+    float bearErrOfBest;
+
 
     for (int i=0; i<obsv.concrete_coords_size(); i++)
     {
         // Convert from obsv in polar to rep in cartesian
-        // @Todo:  Explain these calculations somewhere!!
         float sin, cos;
         sincosf((particle.getLocation().h() + obsv.bearing()), &sin, &cos);
         float calcX = obsv.distance()*cos + particle.getLocation().x();
@@ -289,11 +290,25 @@ float VisionSystem::scoreFromVisDetect(const Particle& particle,
                                + NBMath::square(calcY - obsv.concrete_coords(i).y()));
 
         float score = dist;
-        if (score < bestScore)
+        if (score < bestScore) {
             bestScore = score;
+
+            // For experiments, record the bearing error
+            // Use Law of Cosines
+            Point c(particle.getLocation().x(), particle.getLocation().y());
+            Point m(obsv.concrete_coords(i).x(),
+                    obsv.concrete_coords(i).y());
+            float b = c.distanceTo(m);
+
+            float toACos = ( NBMath::square(obsv.distance()) + NBMath::square(b)
+                             - NBMath::square(dist) )/(2*obsv.distance()*b);
+            bearErrOfBest = NBMath::safe_acos(toACos);
+        }
     }
     //std::cout <<"Scored a particle\n";
-    return bestScore;
+//    std::cout << "err " << TO_DEG*bearErrOfBest << std::endl;
+    return TO_DEG*bearErrOfBest;
+//    return bestScore;
 }
 
 /**
@@ -340,8 +355,10 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
         // Sanity check the reconstructinos aren't off-field
         // Lets assume if we're off-field then we're already fucked
         if( (newLoc.x >= 0 && newLoc.y <= FIELD_GREEN_WIDTH) &&
-            (newLoc.y >= 0 && newLoc.y <= FIELD_GREEN_HEIGHT)  )
+            (newLoc.y >= 0 && newLoc.y <= FIELD_GREEN_HEIGHT)  ) {
+            std::cout << "Reconstruct " << newLoc.x << " " <<  newLoc.y <<std::endl;
             reconstructedLocations.push_back(newLoc);
+        }
     }
     //std::cout << concreteNum << " particles should be injected" << std::endl;
 }
