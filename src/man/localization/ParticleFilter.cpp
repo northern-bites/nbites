@@ -43,7 +43,6 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
     }
 
     lost = false;
-    set = false;
     errorMagnitude = FOUND_THRESHOLD + (.5f * LOST_THRESHOLD);
 }
 
@@ -96,7 +95,8 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // in set, lost, lost in current frame, havent reset recently
     if (inSet && (lost > LOST_THRESHOLD) && (framesSinceReset > 30)
         && (curLineError > LOST_THRESHOLD)) {
-        std::cout << "I should use the ball!" << std::endl;
+        std::cout << "LOST IN SET!" << std::endl;
+        resetLocToSide(true);
     }
 
     // FOR TESTING

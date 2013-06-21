@@ -95,8 +95,8 @@ void LocalizationModule::run_()
 
     motionInput.latch();
     visionInput.latch();
-    gameStateInput.latch();
 #ifndef OFFLINE
+    gameStateInput.latch();
     resetInput.latch();
 #endif
 
