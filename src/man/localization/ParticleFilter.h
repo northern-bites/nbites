@@ -70,7 +70,8 @@ public:
      *  @brief Given a new motion and vision input, update the filter
      */
     void update(const messages::RobotLocation& motionInput,
-                const messages::VisionField& visionInput);
+                const messages::VisionField&   visionInput,
+                bool inSet = false);
 
     float getMagnitudeError();
 
@@ -162,6 +163,8 @@ private:
 
     bool lost;
     float errorMagnitude;
+
+    bool set;
 
     // For use when logging particle swarm
     messages::ParticleSwarm swarm;

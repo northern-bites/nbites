@@ -43,6 +43,7 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
     }
 
     lost = false;
+    set = false;
     errorMagnitude = FOUND_THRESHOLD + (.5f * LOST_THRESHOLD);
 }
 
@@ -53,8 +54,13 @@ ParticleFilter::~ParticleFilter()
 }
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            const messages::VisionField& visionInput)
+                            const messages::VisionField& visionInput,
+                            bool inSet)
 {
+    if (inSet && !set)
+        std::cout << "I'm in set!" << std::endl;
+    set = inSet;
+
     motionSystem->update(particles, odometryInput, nearMidField());
 
     // Update the Vision Model
