@@ -1,42 +1,89 @@
+import ChaseBallTransitions as transitions
+import ChaseBallConstants as constants
+from ..navigator import Navigator
 import noggin_constants as NogginConstants
-from   ..util import MyMath
-import PositionConstants as constants
-import PositionTransitions
-from math import fabs
+from objects import Location
 
 def playbookPosition(player):
     """
-    Have the robot navigate to the position reported to it from playbook
+    Super State for Non Chasers
     """
-    brain = player.brain
-    nav = brain.nav
-
-    if player.firstFrame():
-        nav.positionPlaybook()
-
-    if nav.isAtPosition():
-        brain.tracker.trackBall()
+    if player.gameState == 'gameReady':
+        return player.goNow('positionReady')
     else:
-        brain.tracker.repeatBasicPan()
+        return player.goNow('positionPlaying')
 
-    #TODO: I think the transition is broken right now!
-    #if PositionTransitions.leavingTheField(player):
-    #    return player.goLater('spinToField')
+def positionReady(player):
+    """
+    Game Ready positioning
+    """
+    if player.firstFrame():
+        player.brain.nav.positionPlaybook()
+        player.brain.tracker.repeatBasicPan() # TODO Landmarks
+
+    if player.brain.nav.isAtPosition():
+        player.brain.tracker.trackBall()
+        return player.stay()
+
+    if player.brain.time - player.timeReadyBegan > 35:
+        return player.goNow('readyFaceMiddle')
 
     return player.stay()
 
-def spinToField(player):
-
-    fieldEdge = player.brain.interface.visualField.visual_field_edge
-
+def readyFaceMiddle(player):
+    """
+    If we didn't make it to our position, find the middle of the field
+    """
     if player.firstFrame():
-        if fieldEdge.distance_l > fieldEdge.distance_r:
-            player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_LEFT)
-            player.brain.tracker.spinPan()
-        else:
-            player.brain.nav.walkTo(0,0,constants.SPIN_AROUND_RIGHT)
-            player.brain.tracker.spinPan()
+        player.brain.tracker.lookToAngle(0)
+        player.stand()
+        readyFaceMiddle.startedSpinning = False
 
-    elif player.brain.nav.isAtPosition():
-        return player.goLater('playbookPosition')
+    centerField = Location(NogginConstants.CENTER_FIELD_X,
+                           NogginConstants.CENTER_FIELD_Y)
+
+    if player.brain.nav.isStopped() and not readyFaceMiddle.startedSpinning:
+        readyFaceMiddle.startedSpinning = True
+        spinDir = player.brain.loc.spinDirToPoint(centerField)
+        player.setWalk(0,0,spinDir*constants.FIND_BALL_SPIN_SPEED)
+
+    targetH = player.brain.loc.headingTo(centerField)
+
+    if ((targetH - 10 < player.brain.loc.h < targetH + 10) or
+        (player.brain.ygrp.on and
+         player.brain.ygrp.distance > 0.5*NogginConstants.MIDFIELD_X) or
+        (player.brain.yglp.on and
+         player.brain.yglp.distance > 0.5*NogginConstants.MIDFIELD_X)):
+        player.stopWalking()
+
+    return player.stay()
+
+readyFaceMiddle.startedSpinning = False
+
+def positionPlaying(player):
+    """
+    Game Playing positioning
+    """
+    if player.firstFrame():
+        player.brain.nav.positionPlaybook(Navigator.PLAYBOOK)
+        player.brain.tracker.repeatBasicPan() # TODO Landmarks
+
+    if player.brain.ball.vis.on and player.brain.ball.distance < 100:
+        player.brain.tracker.trackBall()
+    else:
+        player.brain.tracker.repeatBasicPan() # TODO Landmarks
+
+    if player.brain.nav.isAtPosition():
+        player.brain.tracker.trackBall()
+
+    if player.brain.play.isChaser() and transitions.shouldChaseBall(player):
+        return player.goLater('chase')
+
+    if transitions.shouldFindBallPosition(player):
+        return player.goLater('findBall')
+
+    if player.brain.locUncert > 75:
+        # Find some goalposts (preferably close ones) and walk toward them.
+        pass
+
     return player.stay()

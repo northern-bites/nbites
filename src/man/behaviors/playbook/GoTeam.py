@@ -1,7 +1,7 @@
 from ..util import MyMath
 from ..typeDefs import TeamMember
 from . import PBConstants
-from objects import Location, RobotLocation, RelRobotLocation
+from objects import Location, RobotLocation
 from math import degrees, ceil
 import noggin_constants as NogginConstants
 import time
@@ -232,9 +232,6 @@ class GoTeam:
             play.setRole(roles[0])
             play.setPosition(locations[0])
         else:
-            #print "MORE THAN 2 PLAYERS"
-            #print "Chaser is {0}, First is {1}".format(chaser_mate.playerNumber,
-            #                                           firstPlayer.playerNumber)
             if(roles[1] == PBConstants.CHASER):
                 print "Hey. You're an idiot. Priorities are fucked."
             secondPlayer = self.findClosestPlayer(roles[1],

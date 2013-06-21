@@ -35,8 +35,9 @@ namespace man
 namespace localization
 {
 
-const float LOST_THRESHOLD = 60;
-const float LINE_CONFIDENT = 45.f;
+const float HELP_THRESHOLD  = 70.f;
+const float LOST_THRESHOLD  = 45.f;
+const float FOUND_THRESHOLD = 37.f;
 const float ALPHA = .05f; // Impact for ~76 frames
 
 // Define the default parameters for the Particle Filter
@@ -44,7 +45,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
 {
     FIELD_GREEN_HEIGHT,         // Field Height
     FIELD_GREEN_WIDTH,          // Field Width
-    200,                        // Num Particles
+    250,                        // Num Particles
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
     .1f,                        // Variance in x-y odometry
@@ -160,7 +161,6 @@ private:
     bool updatedVision;
 
     bool lost;
-    bool lineLost;
     float errorMagnitude;
 
     // For use when logging particle swarm

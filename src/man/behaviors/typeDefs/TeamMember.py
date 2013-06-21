@@ -115,9 +115,12 @@ class TeamMember(RobotLocation):
         Note: Don't give bonuses. It can result in negative chase times
               which can screw up the math later on. --Wils (06/25/11)
         """
+        ballLocation = Location(self.brain.ball.x, self.brain.ball.y)
+        headingBallToGoal = ballLocation.headingTo(OPP_GOAL)
+
         relLocToBall = RelRobotLocation(self.brain.ball.rel_x,
                                         self.brain.ball.rel_y,
-                                        self.brain.ball.bearing_deg)
+                                        headingBallToGoal)
 
         time = self.determineTimeToDest(relLocToBall)
 
