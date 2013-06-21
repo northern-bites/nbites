@@ -130,17 +130,10 @@ def onWingDownfield(player):
     The ball is on the wing and downfield according to this transition. Also
     we not facing the goal and therefore leaving this position.
     """
-    print "On wing downfield?"
     if player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y:
-        print (player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
-                player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
-                not player.brain.loc.h > constants.FACING_GOAL_ON_WING)
         return (player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
                 player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
                 not player.brain.loc.h > constants.FACING_GOAL_ON_WING)
-    print (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
-            player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
-            not player.brain.loc.h < -constants.FACING_GOAL_ON_WING)
     return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
             player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
             not player.brain.loc.h < -constants.FACING_GOAL_ON_WING)
