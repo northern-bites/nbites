@@ -143,7 +143,6 @@ def watch(player):
         player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
         and not watch.looking):
         watch.looking = True
-        print "Performing a pan!"
         if watch.lastLook is constants.RIGHT:
             player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
             watch.lastLook = constants.LEFT
@@ -152,7 +151,6 @@ def watch(player):
             watch.lastLook = constants.RIGHT
 
     if player.brain.tracker.isStopped():
-        print "Done looking!"
         watch.looking = False
         player.brain.tracker.trackBall()
 
