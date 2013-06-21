@@ -12,19 +12,18 @@ from objects import RelRobotLocation, Location
 # is in front of the ball, so setting ourselves up for a kick actually
 # results in us running through the ball. (There is no actual dribble sweet
 # move.) If vision sees a crowded area in front of us, we rotate around the
-# ball and dribble again when we see a clear path. We only dribble if these
-# conditions are true: 1. We are positioned according to positionedForDribble.
-# 2. We are facing our opponents' goal. 3. We can see the ball close to us.
+# ball and dribble again when we see a clear path. We only dribble if
+# shouldDribble returns true. See DribbleTransitions.py for more info.
 
 ### TODO
-# test DRIBBLE_ON_KICKOFF
-# ballInGoalBox dribbling via goalie detection
+# test time-based decision making
+# better dodging
 # rotate towards goal when dribbling
-# test time-left based decision making
-# choose direction better, based on loc and heatmap?
-# frame counter rotatation?
 
 ### DONE
+# test goalie-in-net decision making
+# ballInGoalBox dribbling via goalie detection
+# test DRIBBLE_ON_KICKOFF
 # dribbleGoneBad needs work
 # dribble for the score if close enough to goal
 # get rid of 'dribble' state, reorganize FSA
@@ -64,7 +63,7 @@ def executeDribble(player):
         player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.CAREFUL_SPEED,
+                              Navigator.GRADUAL_SPEED,
                               False,
                               False)
     else:
@@ -122,6 +121,7 @@ def lookForBall(player):
             player.brain.nav.walkTo(backupLoc)
             lookForBall.setDest = True
         else:
+            player.inKickingState = False
             return player.goLater('chase')
 
     return player.stay()
