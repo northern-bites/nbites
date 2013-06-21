@@ -298,6 +298,7 @@ private:
 
     // For deciding if requests/commands have been processed already
     bool gainsOn;
+    bool stiff;
     long long lastRequest, lastBodyCommand, lastHeadCommand;
 };
 } // namespace motion

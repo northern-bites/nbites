@@ -11,7 +11,7 @@ from objects import RelRobotLocation, Location
 from math import fabs
 import noggin_constants as nogginConstants
 
-DRIBBLE_ON_KICKOFF = False
+DRIBBLE_ON_KICKOFF = True
 
 def chase(player):
     """

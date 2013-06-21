@@ -42,6 +42,7 @@ def gameReady(player):
         player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePan()
+        player.timeReadyBegan = player.brain.time
 
     # Reset localization to proper starting position by player number.
     # Locations are defined in the wiki.
