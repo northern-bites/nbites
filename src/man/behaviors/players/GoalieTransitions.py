@@ -105,6 +105,38 @@ def badRightCornerObservation(player):
 
     return True
 
+def goodLeftCornerObservation(player):
+    corner = getLeftGoalboxCorner(player)
+    if not corner:
+        return False
+
+    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
+                      corner.visual_detection.distance)
+    dBear = math.fabs(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER -
+                      corner.visual_detection.bearing_deg)
+
+    if (dDist < constants.CORNER_DISTANCE_THRESH and
+        dBear < constants.CORNER_BEARING_THRESH):
+        return True
+
+    return False
+
+def goodRightCornerObservation(player):
+    corner = getRightGoalboxCorner(player)
+    if not corner:
+        return False
+
+    dDist = math.fabs(constants.EXPECTED_CORNER_DIST_FROM_CENTER -
+                      corner.visual_detection.distance)
+    dBear = math.fabs(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER -
+                      corner.visual_detection.bearing_deg)
+
+    if (dDist < constants.CORNER_DISTANCE_THRESH and
+        dBear < constants.CORNER_BEARING_THRESH):
+        return True
+
+    return False
+
 ### ALSO CHECK POSTS...
 # def facingSideways(player):
 #     """
@@ -126,6 +158,10 @@ def badRightCornerObservation(player):
 def shouldReposition(player):
     return (badLeftCornerObservation(player) or
             badRightCornerObservation(player))
+
+def goodPosition(player):
+    return (goodLeftCornerObservation(player) or
+            goodRightCornerObservation(player))
 
 def atGoalArea(player):
     """

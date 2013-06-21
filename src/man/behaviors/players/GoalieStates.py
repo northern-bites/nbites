@@ -129,10 +129,10 @@ def fallen(player):
     player.inKickingState = False
     return player.stay()
 
-def watch(player):
+def watchWithCornerChecks(player):
     if player.firstFrame():
-        watch.looking = False
-        watch.lastLook = constants.RIGHT
+        watchWithCornerChecks.looking = False
+        watchWithCornerChecks.lastLook = constants.RIGHT
         player.homeDirections = []
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
@@ -141,20 +141,29 @@ def watch(player):
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
         and
         player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
-        and not watch.looking):
-        watch.looking = True
-        if watch.lastLook is constants.RIGHT:
-            #player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
-            watch.lastLook = constants.LEFT
+        and not watchWithCornerChecks.looking):
+        watchWithCornerChecks.looking = True
+        if watchWithCornerChecks.lastLook is constants.RIGHT:
+            player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
+            watchWithCornerChecks.lastLook = constants.LEFT
         else:
-            #player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
-            watch.lastLook = constants.RIGHT
+            player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
+            watchWithCornerChecks.lastLook = constants.RIGHT
 
     if player.brain.tracker.isStopped():
-        watch.looking = False
+        watchWithCornerChecks.looking = False
         player.brain.tracker.trackBall()
 
+    return Transition.getNextState(player, watchWithCornerChecks)
+
+def watch(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.brain.nav.stand()
+        player.returningFromPenalty = False
+
     return Transition.getNextState(player, watch)
+
 
 def average(locations):
     x = 0.0
