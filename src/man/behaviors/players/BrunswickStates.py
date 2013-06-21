@@ -78,13 +78,6 @@ def gameSet(player):
     #  and loc will take care of the rest.
     player.brain.checkSetLocalization()
 
-
-    if (player.play.isChaser() and
-        player.brain.gameController.ownKickOff):
-        player.shouldKickOff = True
-    else:
-        player.shouldKickOff = False
-
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()

@@ -4,7 +4,7 @@ from ..navigator import BrunswickSpeeds as speeds
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 2
 BALL_OFF_THRESH = 60
-BALL_OFF_KICK_THRESH = 160
+BALL_OFF_KICK_THRESH = 120
 
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
@@ -21,8 +21,9 @@ SHOULD_SPIN_TO_BALL_BEAR = 15.0
 STOP_SPINNING_TO_BALL_Y = 20.0
 CHANGE_SPEED_THRESH = 25.0 #Degrees
 
-# Should Cancel Orbit
-SHOULD_CANCEL_ORBIT_BALL_DIST = APPROACH_BALL_AGAIN_DIST
+# Orbit
+ORBIT_BALL_DISTANCE = 30
+SHOULD_CANCEL_ORBIT_BALL_DIST = PREPARE_FOR_KICK_DIST
 
 # Should kick again
 SHOULD_KICK_AGAIN_CLOSE_X = 9.5

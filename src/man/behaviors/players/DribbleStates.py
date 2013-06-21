@@ -64,7 +64,7 @@ def executeDribble(player):
         player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.CAREFUL_SPEED,
+                              Navigator.GRADUAL_SPEED,
                               False,
                               False)
     else:
@@ -128,6 +128,7 @@ def lookForBall(player):
             player.brain.nav.walkTo(backupLoc)
             lookForBall.setDest = True
         else:
+            player.inKickingState = False
             return player.goLater('chase')
 
     return player.stay()
