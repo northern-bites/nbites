@@ -1,7 +1,7 @@
 from ..util import MyMath
 from ..typeDefs import TeamMember
 from . import PBConstants
-from objects import Location, RobotLocation, RelRobotLocation
+from objects import Location, RobotLocation
 from math import degrees, ceil
 import noggin_constants as NogginConstants
 import time
