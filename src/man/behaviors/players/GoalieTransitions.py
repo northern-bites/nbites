@@ -214,27 +214,27 @@ def facingBall(player):
 #             player.brain.ball.distance < 230.0 and
 #             player.brain.ball.vis.on)
 
-# ## These three are penalty kick transitions. They need to be tuned.
-# def shouldDiveRight(player):
-#     """
-#     Checks that the ball is moving toward it and close enough to save.
-#     """
-#     return (player.brain.ball.vel_x < 0.0 and
-#             player.brain.ball.speed > 30.0 and
-#             player.brain.ball.rel_y_intersect_dest < -5.0)
+## These three are penalty kick transitions. They need to be tuned.
+def shouldDiveRight(player):
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_x_dest < 0.0 and
+            player.brain.ball.rel_y_intersect_dest < -5.0 and
+            player.brain.ball.vis.on)
 
-# def shouldDiveLeft(player):
-#     """
-#     Checks that the ball is moving toward it and close enough to save.
-#     """
-#     return (player.brain.ball.vel_x < 0.0 and
-#             player.brain.ball.speed > 30.0 and
-#             player.brain.ball.rel_y_intersect_dest > 5.0)
+def shouldDiveLeft(player):
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_x_dest < 0.0 and
+            player.brain.ball.rel_y_intersect_dest > 5.0 and
+            player.brain.ball.vis.on)
 
-# def shouldSquat(player):
-#     return (player.brain.ball.vel_x < 0.0 and
-#             player.brain.ball.speed > 30.0 and
-#             abs(player.brain.ball.rel_y_intersect_dest) < 10.0)
+def shouldSquat(player):
+    return (player.brain.ball.vel_x < 0.0 and
+            player.brain.ball.speed > 30.0 and
+            player.brain.ball.rel_x_dest < 0.0 and
+            abs(player.brain.ball.rel_y_intersect_dest) < 10.0 and
+            player.brain.ball.vis.on)
 
 def shouldClearBall(player):
     """

@@ -7,7 +7,7 @@ from .. import SweetMoves
 import GoalieConstants as constants
 import math
 
-SAVING = True
+SAVING = False
 
 def gameInitial(player):
     if player.firstFrame():
@@ -221,41 +221,70 @@ def kickBall(player):
 
     return player.stay()
 
-# def saveIt(player):
-#     if player.firstFrame():
-#         player.brain.tracker.lookToAngle(0)
-#         if SAVING:
-#             player.executeMove(SweetMoves.GOALIE_SQUAT)
-#         else:
-#             player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
-#         player.isSaving = False
-#         #player.brain.fallController.enableFallProtection(False)
-#     if (not player.brain.motion.body_is_active and not player.isSaving):
-#         player.squatTime = time.time()
-#         player.isSaving = True
-#         return player.stay()
-#     if player.isSaving:
-#         stopTime = time.time()
-#         # This is to stand up before a penalty is called.
-#         if (stopTime - player.squatTime > 2):
-#             if SAVING:
-#                 player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
-#             return player.goLater('upUpUP')
-#     return player.stay()
+def saveCenter(player):
+    if player.firstFrame():
+        player.brain.fallController.enabled = False
+        player.brain.tracker.lookToAngle(0)
+        if SAVING:
+            player.executeMove(SweetMoves.GOALIE_SQUAT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_CENTER_SAVE)
 
-# def upUpUP(player):
-#     if player.firstFrame():
-#         #player.brain.fallController.enableFallProtection(True)
-#         player.upDelay = 0
+    if player.counter > 80:
+        if SAVING:
+            player.executeMove(SweetMoves.GOALIE_SQUAT_STAND_UP)
+            return player.goLater('upUpUP')
+        else:
+            return player.goLater('watch')
 
-#     if player.brain.nav.isStanding():
-#         return player.stay()
-#     elif player.upDelay < 10:
-#         player.upDelay += 1
-#         return player.stay()
-#     else:
-#         return player.goLater('spinAtGoal')
-#     return player.stay()
+    return player.stay()
+
+def upUpUP(player):
+    if player.firstFrame():
+        player.brain.fallController.enabled = True
+        player.upDelay = 0
+
+    if player.brain.nav.isStopped():
+        return player.goLater('spinAtGoal')
+    return player.stay()
+
+def saveRight(player):
+    if player.firstFrame():
+        player.brain.fallController.enabled = False
+        player.brain.tracker.lookToAngle(0)
+        if SAVING:
+            player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
+
+    if player.counter > 80:
+        if SAVING:
+            player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
+            player.brain.fallController.enabled = True
+            return player.goLater('fallen')
+        else:
+            return player.goLater('watch')
+
+    return player.stay()
+
+def saveLeft(player):
+    if player.firstFrame():
+        player.brain.fallController.enabled = False
+        player.brain.tracker.lookToAngle(0)
+        if SAVING:
+            player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
+
+    if player.counter > 80:
+        if SAVING:
+            player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
+            player.brain.fallController.enabled = True
+            return player.goLater('fallen')
+        else:
+            return player.goLater('watch')
+
+    return player.stay()
 
 # ############# PENALTY SHOOTOUT #############
 
