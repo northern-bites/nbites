@@ -106,12 +106,12 @@ def orbitBall(player):
         elif player.kick.h < 0:
             #set y vel at 50% speed
             print "Turn to left, move right"
-            player.brain.nav.walk(0, -.5, .15)
+            player.brain.nav.walk(0, -.7, .25)
 
         elif player.kick.h > 0:
             #set y vel at 50% speed in opposite direction
             print "Turn to right, move left"
-            player.brain.nav.walk(0, .5, -.15)
+            player.brain.nav.walk(0, .7, -.25)
 
     elif player.brain.nav.isStopped():
         player.shouldOrbit = False
@@ -189,20 +189,20 @@ def orbitBall(player):
             player.brain.nav.setHSpeed(0)
             #print "turn clockwise SLOWER"
         elif player.brain.ball.rel_y < 2:
-            player.brain.nav.setHSpeed(-.2)
+            player.brain.nav.setHSpeed(-.35)
             #print "turn clockwise FASTER"
         else:
-            player.brain.nav.setHSpeed(-.15)
+            player.brain.nav.setHSpeed(-.25)
             #print "turn clockwise NORMAL"
     else: # Orbiting counter-clockwise
         if player.brain.ball.rel_y > 2:
-            player.brain.nav.setHSpeed(.2)
+            player.brain.nav.setHSpeed(.35)
             #print "turn counterclockwise FASTER"
         elif player.brain.ball.rel_y < 2:
             player.brain.nav.setHSpeed(0)
             #print "turn counterclockwise SLOWER"
         else:
-            player.brain.nav.setHSpeed(.15)
+            player.brain.nav.setHSpeed(.25)
             #print "turn clockwise NORMAL"
 
     return player.stay()
