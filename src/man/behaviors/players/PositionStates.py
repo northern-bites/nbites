@@ -82,6 +82,8 @@ def positionPlaying(player):
     if transitions.shouldFindBallPosition(player):
         return player.goLater('findBall')
 
-    #TODO if lost, find the closer goal and walk toward it
+    if player.brain.locUncert > 75:
+        # Find some goalposts (preferably close ones) and walk toward them.
+        pass
 
     return player.stay()
