@@ -41,19 +41,23 @@ public:
 
     // updates give particleset by reference, returns true if observations was nonempty
     bool update(ParticleSet& particles,
-                const messages::VisionField& observations);
+                const messages::VisionField& obsv);
 
     float scoreFromVisDetect(const Particle& particle,
                              const messages::VisualDetection& obsv);
 
-    static Line prepareVisualLine(const Particle& particle,
-                           const messages::VisualLine& visualLine);
+    static Line prepareVisualLine(const messages::RobotLocation& loc,
+                                  const messages::VisualLine& visualLine,
+                                  bool stdLineLength = false);
 
     void setUpdated(bool val);
     float getLowestError(){return currentLowestError;};
     float getAvgError(){return avgError;};
     float getWeightedAvgError(){return weightedAvgError;};
     int getLastNumObsv(){return lastNumObsv;};
+
+    float getAvgLineError(const messages::RobotLocation& loc,
+                          const messages::VisionField& obsv);
 
     std::list<ReconstructedLocation> getReconstructedLocations(){return reconstructedLocations;};
 
@@ -66,7 +70,7 @@ private:
     void addGoalPostReconstructionsToList(messages::VisualGoalPost leftPost,
                                           messages::VisualGoalPost rightPost);
 
-    void opitmizeReconstructions();
+    void optimizeReconstructions();
 
 private:
     LineSystem* lineSystem;

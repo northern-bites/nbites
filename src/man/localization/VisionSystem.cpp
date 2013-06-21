@@ -52,14 +52,14 @@ bool VisionSystem::update(ParticleSet& particles,
 
         for (int i=0; i<obsv.visual_line_size(); i++) {
             if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
-                Line obsvLine = prepareVisualLine(*particle,
+                Line obsvLine = prepareVisualLine(particle->getLocation(),
                                                   obsv.visual_line(i));
 
                 // Limit by line length (be safe about center circle mistake lines)
-                if ((obsvLine.length() > 100.f) && (obsvLine.length() < 500.f)) {
+                if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
                     madeObsv = true;
                     float newError = lineSystem->scoreObservation(obsvLine);
-//                    std::cout << "Line Error:\t" << newError << std::endl;
+                    //std::cout << "Line Error:\t" << newError << std::endl;
                     curParticleError += newError;
                     numObsv++;
                 }
@@ -164,8 +164,9 @@ bool VisionSystem::update(ParticleSet& particles,
  *        and returns a Line with the closest endpoint being start,
  *        and in global coordinates
  */
-Line VisionSystem::prepareVisualLine(const Particle& particle,
-                                     const messages::VisualLine& line)
+Line VisionSystem::prepareVisualLine(const messages::RobotLocation& loc,
+                                     const messages::VisualLine& line,
+                                     bool stdLineLength)
 {
     float startGlobalX, startGlobalY, endGlobalX, endGlobalY;
     float distToStart, distToEnd;
@@ -173,28 +174,28 @@ Line VisionSystem::prepareVisualLine(const Particle& particle,
     // Transform to global (make startGlobal closer than endGlobal)
     if ( line.start_dist() < line.end_dist() ) {
         float sinS, cosS;
-        sincosf((particle.getLocation().h() + line.start_bearing()), &sinS, &cosS);
-        startGlobalX = line.start_dist()*cosS + particle.getLocation().x();
-        startGlobalY = line.start_dist()*sinS + particle.getLocation().y();
+        sincosf((loc.h() + line.start_bearing()), &sinS, &cosS);
+        startGlobalX = line.start_dist()*cosS + loc.x();
+        startGlobalY = line.start_dist()*sinS + loc.y();
 
         float sinE, cosE;
-        sincosf((particle.getLocation().h() + line.end_bearing()), &sinE, &cosE);
-        endGlobalX = line.end_dist()*cosE + particle.getLocation().x();
-        endGlobalY = line.end_dist()*sinE + particle.getLocation().y();
+        sincosf((loc.h() + line.end_bearing()), &sinE, &cosE);
+        endGlobalX = line.end_dist()*cosE + loc.x();
+        endGlobalY = line.end_dist()*sinE + loc.y();
 
         distToStart = line.start_dist();
         distToEnd = line.end_dist();
     }
     else { // 'end' from vision is closer
         float sinS, cosS;
-        sincosf((particle.getLocation().h() + line.start_bearing()), &sinS, &cosS);
-        endGlobalX = line.start_dist()*cosS + particle.getLocation().x();
-        endGlobalY = line.start_dist()*sinS + particle.getLocation().y();
+        sincosf((loc.h() + line.start_bearing()), &sinS, &cosS);
+        endGlobalX = line.start_dist()*cosS + loc.x();
+        endGlobalY = line.start_dist()*sinS + loc.y();
 
         float sinE, cosE;
-        sincosf((particle.getLocation().h() + line.end_bearing()), &sinE, &cosE);
-        startGlobalX = line.end_dist()*cosE + particle.getLocation().x();
-        startGlobalY = line.end_dist()*sinE + particle.getLocation().y();
+        sincosf((loc.h() + line.end_bearing()), &sinE, &cosE);
+        startGlobalX = line.end_dist()*cosE + loc.x();
+        startGlobalY = line.end_dist()*sinE + loc.y();
 
         distToStart = line.end_dist();
         distToEnd = line.start_dist();
@@ -212,7 +213,7 @@ Line VisionSystem::prepareVisualLine(const Particle& particle,
         Line initialSegment(start,end); // Use to find end point to make shorter segment
 
         // Project pose onto the line
-        Point pose(particle.getLocation().x(), particle.getLocation().y());
+        Point pose(loc.x(), loc.y());
         Point proj = initialSegment.project(pose);
 
         //  Calc dists
@@ -240,6 +241,20 @@ Line VisionSystem::prepareVisualLine(const Particle& particle,
             Point shitEnd = initialSegment.shiftDownLine(start, 1);
             end.x = shitEnd.x;
             end.y = shitEnd.y;
+        }
+    }
+
+    Line toReturn(start, end);
+
+    if (stdLineLength) { // want the line to be clipped at 150 cm in length
+        if (toReturn.length() > 120.f) {
+            // We know start is closest so lets trust that endpoint the most
+            Point newEnd = toReturn.shiftDownLine(start, 120.f);
+            if (!toReturn.containsPoint(newEnd)) { // missed the segment
+                newEnd = toReturn.shiftDownLine(start, -120.f);
+                end.x = newEnd.x;
+                end.y = newEnd.y;
+            }
         }
     }
 
@@ -324,7 +339,7 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
     //std::cout << concreteNum << " particles should be injected" << std::endl;
 }
 
-void VisionSystem::opitmizeReconstructions()
+void VisionSystem::optimizeReconstructions()
 {
     // // The idea here is to go through the list and only keep locations
     // // which are reconstructed more than once.
@@ -358,6 +373,42 @@ void VisionSystem::opitmizeReconstructions()
     for(optIt = optimized.begin(); optIt != optimized.end(); optIt++)
         reconstructedLocations.push_back((*optIt));
 }
+
+float VisionSystem::getAvgLineError(const messages::RobotLocation& loc,
+                                    const messages::VisionField&   obsv)
+{
+    float sumLineError  = 0.f;
+    int   numValidLines = 0;
+    float lineLength    = 0.f;
+
+    // Go through each observed line
+    for (int i=0; i<obsv.visual_line_size(); i++) {
+        // Only use lines that start reasonably close
+        if((obsv.visual_line(i).start_dist() < 250.f) || (obsv.visual_line(i).end_dist() < 250.f)) {
+
+            // Prepare an observed line, but no lines longer than 1.2 meters
+            Line obsvLine = prepareVisualLine(loc,
+                                              obsv.visual_line(i),
+                                              true);
+
+            // Limit by line length (be safe about center circle mistake lines)
+            if (obsvLine.length() > 118.f) {
+                sumLineError += lineSystem->scoreObservation(obsvLine);
+                numValidLines++;
+                lineLength += obsvLine.length();
+            }
+        }
+
+    }
+
+    if (numValidLines > 0)
+        return sumLineError/(float)numValidLines;
+    else
+        return -1.f;
+}
+
+
+
 
 } // namespace localization
 } // namespace man

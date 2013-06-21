@@ -43,6 +43,8 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
     }
 
     lost = false;
+    lineLost = true;
+    errorMagnitude = LINE_CONFIDENT - 10.f;
 }
 
 ParticleFilter::~ParticleFilter()
@@ -69,8 +71,8 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
         //If shitty swarm according to vision, expand search
         lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
-        errorMagnitude = visionSystem->getLowestError()*ALPHA
-                             + errorMagnitude*(1-ALPHA);
+        // errorMagnitude = visionSystem->getLowestError()*ALPHA
+        //                      + errorMagnitude*(1-ALPHA);
 
         // Upper ceiling on the exponential
         if (errorMagnitude > 300)
@@ -79,6 +81,29 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
 
     // Update filters estimate
     updateEstimate();
+
+    //Calculate uncertainty from lines
+    float curLineError = visionSystem->getAvgLineError(poseEstimate,
+                                                       visionInput);
+    if (curLineError > 0) {
+        errorMagnitude = curLineError*ALPHA
+                         + errorMagnitude*(1-ALPHA);
+    }
+    else
+        errorMagnitude+= (1.f/10.f);
+
+    // FOR TESTING
+    if (errorMagnitude < LINE_CONFIDENT) {
+        if(lineLost) {
+            // std::cout << "\nI know where i am" << std::endl;
+        }
+        lineLost = false;
+    }
+    else {
+        if(!lineLost)
+            // std::cout << "\nI am lost" << std::endl;
+        lineLost = true;
+    }
 }
 
 /**

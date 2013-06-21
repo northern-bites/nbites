@@ -59,7 +59,7 @@ Context::Context(Vision *vis, Threshold* thr, Field* fie)
     allFieldObjects[2] = vision->ygrp;
     allFieldObjects[3] = vision->yglp;
 #ifdef OFFLINE
-    debugIdentifyCorners = true;
+    debugIdentifyCorners = false;
 	debugDangerousBall = false;
 #endif
 

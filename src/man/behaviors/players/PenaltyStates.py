@@ -110,8 +110,7 @@ def afterPenalty(player):
         # Yes, when goal_right is less than 0, our goal is to our right.
         # It seems counter intuitive, but that's how it works. -Josh Z
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
-        return player.goNow(player.gameState)
-
+        return player.goLater(player.gameState)
 
     return player.stay()
 

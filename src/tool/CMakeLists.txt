@@ -91,6 +91,7 @@ add_subdirectory( unlog )
 add_subdirectory( logview )
 add_subdirectory( image )
 add_subdirectory( colorcreator )
+add_subdirectory( playbook )
 add_subdirectory( vision_offline )
 add_subdirectory( fieldview )
 add_subdirectory( common )
@@ -166,11 +167,22 @@ set( calibrate_headers
   CalibrationTool.h
 )
 
+set( playbook_srcs playbook_main.cpp
+
+  PlaybookTool.cpp
+  )
+
+set( playbook_headers
+
+  PlaybookTool.h
+)
+
 # Qt4 goodness (aka moc the headers)
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
 Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
 Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
+Qt4_wrap_cpp( playbook_headers_moc ${playbook_headers} )
 
 ## EXECUTABLES ##
 
@@ -194,6 +206,7 @@ target_link_libraries(
   colorcreator
   vision_offline
   worldview
+  playbook
   ${QT_LIBRARIES}
   )
 
@@ -250,5 +263,17 @@ target_link_libraries(
   logview
   image_display
   calibrator
+  ${QT_LIBRARIES}
+)
+
+# The PlaybookTool executable
+add_executable( playbook_tool
+  ${playbook_srcs}
+  ${playbook_headers_moc}
+)
+
+target_link_libraries(
+  playbook_tool
+  playbook
   ${QT_LIBRARIES}
 )

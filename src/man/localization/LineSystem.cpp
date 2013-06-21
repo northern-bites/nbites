@@ -24,6 +24,7 @@ LineSystem::LineSystem() {
     // Add the two goalbox lines
     addLine(BLUE_GOALBOX_RIGHT_X,  BLUE_GOALBOX_BOTTOM_Y,
             BLUE_GOALBOX_RIGHT_X,  BLUE_GOALBOX_TOP_Y);
+
     addLine(YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_BOTTOM_Y,
             YELLOW_GOALBOX_LEFT_X, YELLOW_GOALBOX_TOP_Y);
 }
@@ -42,11 +43,25 @@ float LineSystem::scoreObservation(Line globalObsv) {
     float bestScore = 10000000.f;
     LineIt iter;
     for(iter = lines.begin(); iter != lines.end(); iter++) {
-        float curScore = (*iter).getError(globalObsv);
+        float curScore = (*iter).getError(globalObsv).error;
         bestScore = ((curScore < bestScore) ? curScore : bestScore);
     }
 
     return bestScore;
+}
+
+LineErrorMatch LineSystem::scoreAndMatchObservation(Line globalObsv, bool debug) {
+    //For each line score the observation and return the best of them all
+    LineErrorMatch bestMatch;
+    bestMatch.error = 1000000.f;
+    LineIt iter;
+    for(iter = lines.begin(); iter != lines.end(); iter++) {
+        LineErrorMatch curMatch = (*iter).getError(globalObsv, debug);
+        if (bestMatch.error > curMatch.error)
+            bestMatch = curMatch;
+    }
+
+    return bestMatch;
 }
 
 } // namespace localization

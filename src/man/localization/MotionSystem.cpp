@@ -56,7 +56,7 @@ void MotionSystem::update(ParticleSet& particles,
 void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH) {
     float xF = 5.f;
     float yF = 5.f;
-    float hF = 2.f;
+    float hF = 4.f;
 
     float xL, xU, yL, yU, hL, hU;
 
@@ -95,8 +95,8 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         hU = -1.f * dH * hF;
     }
     else {
-        hL = -.08f;
-        hU =  .08f;
+        hL = -.03f;
+        hU =  .03f;
     }
 
     boost::uniform_real<float> xRange(xL, xU);
