@@ -164,10 +164,14 @@ void GameStateModule::manual_penalize()
             if (player->penalty())
             {
                 response_status = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
+                if (!commInput.message.have_remote_gc())
+                    player->set_penalty(PENALTY_NONE);
             }
             else
             {
                 response_status = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
+                if (!commInput.message.have_remote_gc())
+                    player->set_penalty(PENALTY_MANUAL);
             }
             break;
         }
