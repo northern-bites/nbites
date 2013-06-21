@@ -70,8 +70,12 @@ public:
      *  @brief Given a new motion and vision input, update the filter
      */
     void update(const messages::RobotLocation& motionInput,
+                const messages::VisionField&   visionInput);
+
+    // Overload to use ball info
+    void update(const messages::RobotLocation& motionInput,
                 const messages::VisionField&   visionInput,
-                bool inSet = false);
+                const messages::FilteredBall&    ballInput);
 
     float getMagnitudeError();
 

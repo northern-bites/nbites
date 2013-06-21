@@ -12,6 +12,8 @@
 #include "NBMath.h"
 #include "LineSystem.h"
 
+#include "BallModel.pb.h"
+
 #include "LocStructs.h"
 #include "FieldConstants.h"
 
@@ -43,8 +45,16 @@ public:
     bool update(ParticleSet& particles,
                 const messages::VisionField& obsv);
 
+    // overloaded to use ball observations
+    bool update(ParticleSet& particles,
+                const messages::VisionField& obsv,
+                const messages::FilteredBall& ballObsv);
+
     float scoreFromVisDetect(const Particle& particle,
                              const messages::VisualDetection& obsv);
+
+    float scoreFromBallObsv(const Particle& particle,
+                            const messages::FilteredBall& obsv);
 
     static Line prepareVisualLine(const messages::RobotLocation& loc,
                                   const messages::VisualLine& visualLine,

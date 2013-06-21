@@ -52,9 +52,10 @@ ParticleFilter::~ParticleFilter()
     delete visionSystem;
 }
 
+
+
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
-                            const messages::VisionField& visionInput,
-                            bool inSet)
+                            const messages::VisionField&     visionInput)
 {
     motionSystem->update(particles, odometryInput, nearMidField());
 
@@ -66,21 +67,8 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     if(updatedVision)
     {
         resample();
-
         updatedVision = false;
-
-        //If shitty swarm according to vision, expand search
-        lost = (visionSystem->getLowestError() > LOST_THRESHOLD);
-        // errorMagnitude = visionSystem->getLowestError()*ALPHA
-        //                      + errorMagnitude*(1-ALPHA);
-
-        // Upper ceiling on the exponential
-        if (errorMagnitude > 300)
-            errorMagnitude = 300;
     }
-
-    // Update filters estimate
-    updateEstimate();
 
     //Calculate uncertainty from lines
     float curLineError = visionSystem->getConfidenceError(poseEstimate,
@@ -92,25 +80,68 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     else
         errorMagnitude+= (1.f/10.f);
 
-    // in set, lost, lost in current frame, havent reset recently
-    if (inSet && (lost > LOST_THRESHOLD) && (framesSinceReset > 30)
-        && (curLineError > LOST_THRESHOLD)) {
+    // Upper ceiling on the exponential
+    if (errorMagnitude > 300)
+        errorMagnitude = 300;
+    lost = (errorMagnitude > LOST_THRESHOLD);
+
+    // Update filters estimate
+    updateEstimate();
+
+    // // FOR TESTING
+    // if (errorMagnitude < FOUND_THRESHOLD) {
+    //     if(lost) {
+    //         // std::cout << "\nI know where i am" << std::endl;
+    //     }
+    //     lost = false;
+    // }
+    // else {
+    //     if(!lost)
+    //         // std::cout << "\nI am lost" << std::endl;
+    //     lost = true;
+    // }
+}
+
+void ParticleFilter::update(const messages::RobotLocation& odometryInput,
+                            const messages::VisionField&     visionInput,
+                            const messages::FilteredBall&      ballInput)
+{
+    // in set, lost, and havent reset recently
+    if (lost && (framesSinceReset > 30)) {
         std::cout << "LOST IN SET!" << std::endl;
         resetLocToSide(true);
     }
 
-    // FOR TESTING
-    if (errorMagnitude < FOUND_THRESHOLD) {
-        if(lost) {
-            // std::cout << "\nI know where i am" << std::endl;
-        }
-        lost = false;
+    motionSystem->update(particles, odometryInput, nearMidField());
+
+    // Update the Vision Model
+    // set updated vision to determine if resampling necessary
+    updatedVision = visionSystem->update(particles, visionInput, ballInput);
+
+    // Resample if vision update
+    if(updatedVision)
+    {
+        resample();
+        updatedVision = false;
     }
-    else {
-        if(!lost)
-            // std::cout << "\nI am lost" << std::endl;
-        lost = true;
+
+    //Calculate uncertainty from lines
+    float curLineError = visionSystem->getConfidenceError(poseEstimate,
+                                                          visionInput);
+    if (curLineError > 0) {
+        errorMagnitude = curLineError*ALPHA
+                         + errorMagnitude*(1-ALPHA);
     }
+    else
+        errorMagnitude+= (1.f/10.f);
+
+    // Upper ceiling on the exponential
+    if (errorMagnitude > 300)
+        errorMagnitude = 300;
+    lost = (errorMagnitude > LOST_THRESHOLD);
+
+    // Update filters estimate
+    updateEstimate();
 }
 
 /**
