@@ -1,5 +1,6 @@
 #include "LocalizationModule.h"
 #include "Profiler.h"
+#include "RoboCupGameControlData.h"
 
 namespace man
 {
@@ -68,8 +69,10 @@ void LocalizationModule::update()
         deltaOdometry.set_h(0.f);
     }
 
+    bool inSet = (STATE_SET == gameStateInput.message().state());
+
     // Update the Particle Filter with the new observations/odometry
-    particleFilter->update(deltaOdometry, visionInput.message());
+    particleFilter->update(deltaOdometry, visionInput.message(), inSet);
 
     // Update the locMessage and the swarm (if logging)
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
@@ -93,6 +96,7 @@ void LocalizationModule::run_()
     motionInput.latch();
     visionInput.latch();
 #ifndef OFFLINE
+    gameStateInput.latch();
     resetInput.latch();
 #endif
 
