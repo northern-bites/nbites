@@ -197,7 +197,14 @@ void Robots::robot(Cross* cross)
 			estimate pose_est = vision->pose->pixEstimate(blobs->get(i).getLeft(),
 												  blobs->get(i).getBottom(),
 												  270);
-			if (pose_est.dist > thresh->getPixDistance(blobs->get(i).getLeft()) + 100) {
+			float farDistance = max(vision->fieldEdge->getDistanceLeft(),
+									vision->fieldEdge->getDistanceCenter());
+			farDistance = max(farDistance, vision->fieldEdge->getDistanceRight());
+			if (debugRobots) {
+				cout << "Distance estimate to perspective robot is " <<
+					pose_est.dist << " " << farDistance << endl;
+			}
+			if (pose_est.dist > farDistance + 100 || pose_est.dist == 0) {
 				if (debugRobots) {
 					cout << "Robot too far away " << endl;
 				}
@@ -920,6 +927,7 @@ void Robots::updateRobots(int which, int index)
 			vision->navy3->updateRobot(blobs->get(index));
 		}
 	}
+	blobs->init(index);
 }
 
 /* Adds a new run to the basic data structure.

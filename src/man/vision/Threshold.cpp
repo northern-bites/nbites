@@ -565,7 +565,6 @@ void Threshold::findGoals(int column, int topEdge) {
 			break;
 		}
     }
-	vision->drawPoint(column, j, BLUE);
     // now do the same going down from the horizon
     bad = 0;
     int greens = 0;
