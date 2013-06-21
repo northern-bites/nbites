@@ -69,8 +69,6 @@ kickoff.ballRelY = "the relY position of the ball when we started"
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        player.penaltyKicking = True
-        player.shouldKickOff = False
         if player.shouldKickOff:
             player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
         elif player.penaltyKicking:
