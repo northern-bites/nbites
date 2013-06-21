@@ -241,7 +241,7 @@ class Brain(object):
         self.loc = RobotLocation(self.interface.loc.x,
                                  self.interface.loc.y,
                                  self.interface.loc.h * (180. / pi))
-        self.locUncert = self.interface.loc.uncertainty
+        self.locUncert = self.interface.loc.uncert
 
     def resetLocTo(self, x, y, h):
         """
