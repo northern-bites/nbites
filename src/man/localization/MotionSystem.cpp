@@ -68,7 +68,7 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         xL = -1.f * dX * xF;
         xU = dX * xF;
     }
-    else if (dX <0) {
+    else {//dX <0
         xL = dX * xF;
         xU = -1.f * dX * xF;
     }
@@ -81,7 +81,7 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         yL = -1.f * dY * yF;
         yU = dY * yF;
     }
-    else if (dY <0) {
+    else { //dY <0
         yL = dY * yF;
         yU = -1.f * dY * yF;
     }
@@ -94,7 +94,7 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         hL = -1.f * dH * hF;
         hU = dH * hF;
     }
-    else if (dH <0) {
+    else { //dH <0
         hL = dH * hF;
         hU = -1.f * dH * hF;
     }
