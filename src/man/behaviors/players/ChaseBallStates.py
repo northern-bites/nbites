@@ -148,13 +148,13 @@ def orbitBall(player):
         if player.kick.h < 0:
             #set y vel at 50% speed
             print "Turn to left, move right"
-            player.brain.nav.walk(0, -.5, .15)
+            player.brain.nav.walk(0, -.7, .25)
             orbitBall.orbitClockwise = False
 
         if player.kick.h > 0:
             #set y vel at 50% speed in opposite direction
             print "Turn to right, move left"
-            player.brain.nav.walk(0, .5, -.15)
+            player.brain.nav.walk(0, .7, -.25)
             orbitBall.orbitClockwise = True
 
     elif player.brain.nav.isStopped():
@@ -197,7 +197,7 @@ def orbitBall(player):
 
     #our in-house heading checker is of the opinion that we're pointed in the right direction
     if orbitBall.desiredHeading > -5 and orbitBall.desiredHeading < 5:
-        player.brain.nav.walk(0, 0, 0)
+        player.brain.nav.stand()
         print "Done orbiting, going to positionForKick"
         player.shouldOrbit = False
         player.kick.h = 0
@@ -207,7 +207,7 @@ def orbitBall(player):
     if player.stateTime > 8:
         print "In state orbitBall for too long, switching to chase"
         player.shouldOrbit = False
-        player.brain.nav.walk(0, 0, 0)
+        player.brain.nav.stand()
         return player.goLater('chase')
 
     #These next three if statements might need some fine tuning
@@ -234,20 +234,20 @@ def orbitBall(player):
             player.brain.nav.setHSpeed(0)
             #print "turn clockwise SLOWER"
         elif player.brain.ball.rel_y < 2:
-            player.brain.nav.setHSpeed(-.2)
+            player.brain.nav.setHSpeed(-.35)
             #print "turn clockwise FASTER"
         else:
-            player.brain.nav.setHSpeed(-.15)
+            player.brain.nav.setHSpeed(-.25)
             #print "turn clockwise NORMAL"
     else:
         if player.brain.ball.rel_y > 2:
-            player.brain.nav.setHSpeed(.2)
+            player.brain.nav.setHSpeed(.35)
             #print "turn counterclockwise FASTER"
         elif player.brain.ball.rel_y < 2:
             player.brain.nav.setHSpeed(0)
             #print "turn counterclockwise SLOWER"
         else:
-            player.brain.nav.setHSpeed(.15)
+            player.brain.nav.setHSpeed(.25)
             #print "turn clockwise NORMAL"
 
     #Keeps track of the number of frames in orbitBall
