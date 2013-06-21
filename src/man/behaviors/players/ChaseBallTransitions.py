@@ -173,4 +173,4 @@ def shouldWalkFindBall(player):
     """
     If we've been spinFindBall-ing too long we should walk
     """
-    return player.stateTime > constants.WALK_FIND_BALL_FRAMES_THRESH
+    return player.stateTime > constants.WALK_FIND_BALL_TIME_THRESH
