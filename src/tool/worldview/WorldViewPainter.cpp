@@ -56,8 +56,8 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
 
     // Draw my uncertainty
     painter.drawEllipse(locCenter,
-                        (int)msg.my_x_uncert(),
-                        (int)msg.my_y_uncert());
+                        (int)msg.my_uncert(),
+                        (int)msg.my_uncert());
 
     // Draw my number
     painter.setPen(brushColor);
