@@ -320,7 +320,7 @@ def prepareForPenaltyKick(player):
         prepareForPenaltyKick.frames = 0
         prepareForPenaltyKick.chase = True
         ball = player.brain.ball
-        location = RelRobotLocation(ball.rel_x - 5, ball.rel_y - 3, 0)
+        location = RelRobotLocation(ball.rel_x - 5, ball.rel_y - 5, 0)
         player.brain.nav.goTo(location, Navigator.CLOSE_ENOUGH, Navigator.MEDIUM_SPEED,
                               False, True, False, False)
     prepareForPenaltyKick.frames += 1
@@ -328,18 +328,47 @@ def prepareForPenaltyKick(player):
 
 
     #player.brain.nav.chaseBall(Navigator.CAREFUL_SPEED, fast = False)
+    if not prepareForPenaltyKick.chase:
+        print "Still Rotating"
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+        if prepareForPenaltyKick.chase:
+            player.brain.nav.stand()
+            # location = RelRobotLocation(0, 0, 15)
+            # player.brain.nav.goTo(location, Navigator.PRECISELY, Navigator.CAREFUL_SPEED,
+            #                       False, True, False, False)
+            prepareForPenaltyKick.chase = False
+            print "Rotating slightly"
+            return player.goNow('penaltyKickSpin')
         player.brain.nav.stand()
-        player.inKickingState = True
-        if player.brain.ball.rel_y > 0:
-            player.kick = kicks.LEFT_STRAIGHT_KICK
-            print "Kicking with left"
-        else:
-            player.kick = kicks.RIGHT_STRAIGHT_KICK
-            print "Kicking with right"
         return player.goNow('positionForPenaltyKick')
+    return player.stay()
+    
+def penaltyKickSpin(player):
+    """
+    Spin so that we change the heading of the kick
+    """
+    if player.firstFrame():
+        penaltyKickSpin.speed = Navigator.SLOW_SPEED
+        if False:#player.kickingRight:
+            penaltyKickSpin.speed = penaltyKickSpin.speed * -1
+        player.brain.nav.walk(0,0, penaltyKickSpin.speed)
+        print "Spinning at speed: ", penaltyKickSpin.speed
+
+    print "Left post: ", hackKick.nearLeftPostBearing
+    print "Right post: ", hackKick.nearRightPostBearing
+    # if player.brain.ball.rel_y > -2 and player.brain.ball.rel_y < 2:
+    #     player.brain.nav.stand()
+    #     print "Done spinning!"
+    #     return player.goNow('positionForPenaltyKick')
+
+    if hackKick.nearLeftPostBearing is None or hackKick.nearRightPostBearing is None:
+        return player.stand()
+    else:
+        player.brain.nav.walk(0,0, penaltyKickSpin.speed)
+        print "Left post: ", hackKick.nearLeftPostBearing
+        print "Right post: ", hackKick.nearRightPostBearing
     return player.stay()
     
 
@@ -348,7 +377,15 @@ def positionForPenaltyKick(player):
     We're getting ready for a penalty kick
     """
     if player.firstFrame():
-        positionForPenaltyKick. position = True
+        positionForPenaltyKick.position = True
+        player.inKickingState = True
+        if player.brain.ball.rel_y > 0:
+            player.kick = kicks.LEFT_STRAIGHT_KICK
+            print "Kicking with left"
+        else:
+            player.kick = kicks.RIGHT_STRAIGHT_KICK
+            print "Kicking with right"
+
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
         player.inKickingState = False
