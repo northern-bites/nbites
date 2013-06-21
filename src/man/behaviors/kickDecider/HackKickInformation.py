@@ -240,6 +240,7 @@ class KickInformation:
 
             ballLocation = Objects.Location(self.brain.ball.x, self.brain.ball.y)
             closeShot = (self.brain.loc.distTo(goalCenter) < 100) # within 1 meter
+            ourHalf = (self.brain.loc.x < constants.MIDFIELD_X) # on our half of the field
 
             headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
             headingBallToGoalLeft   = ballLocation.headingTo(goalLeft)
@@ -253,37 +254,54 @@ class KickInformation:
             # We shouldn't be spinning at this point, so the assumption is valid.
             # Note: all headings are in degrees at this point.
             bearingForKick = headingBallToGoalCenter - self.brain.loc.h
+            bearingKickLeft = headingBallToGoalLeft - self.brain.loc.h
+            bearingKickRight = headingBallToGoalRight - self.brain.loc.h
+
             bearingLimitLeft = headingBallToGoalLeft - headingBallToGoalCenter
             bearingLimitRight = headingBallToGoalRight - headingBallToGoalCenter
 
             if not closeShot:
+
                 if DEBUG_KICK_DECISION:
-                    print ("Acceptable bearing range for kick: " + str(bearingLimitLeft/2) +
-                           "/" + str(bearingLimitRight/2))
+                    print ("Acceptable bearing range for kick: " + str(bearingLimitLeft) +
+                           "/" + str(bearingLimitRight))
 
-                if bearingForKick < 45 and bearingForKick > -45:
-                    #choose straight kick!
+                kickBearings = [[0, 0], [70, 0], [-70, 0]] # straight, right side, left side
+                for b in kickBearings:
+                    adjustedBearingLeft = bearingKickLeft + b[0]
+                    adjustedBearingRight = bearingKickRight + b[0]
+
+                    if adjustedBearingLeft > 0 and adjustedBearingRight < 0:
+                        #goal is in front of us
+                        b[1] = 0
+                    elif adjustedBearingLeft < 0 and adjustedBearingRight > 0:
+                        #goal is behind us
+                        if math.fabs(adjustedBearingLeft) < math.fabs(adjustedBearingRight):
+                            #use the left bearing
+                            b[1] = -adjustedBearingLeft
+                        else:
+                            #use the right bearing
+                            b[1] = -adjustedBearingRight
+                    elif adjustedBearingRight > 0:
+                        #goal is to our left
+                        b[1] = -adjustedBearingRight
+                    elif adjustedBearingLeft < 0:
+                        #goal is to our right
+                        b[1] = -adjustedBearingLeft
+
+                minimumBearing = min(map(math.fabs, [x[1] for x in kickBearings]))
+                if minimumBearing == math.fabs(kickBearings[0][1]):
+                    # choose a straight kick
                     kick = self.chooseQuickFrontKick()
-                    kick.h = 0 - bearingForKick
-                elif bearingForKick > 45: #and bearingForKick < 125:
-                    #choose a right side kick! (using right foot)
+                elif minimumBearing == math.fabs(kickBearings[1][1]):
+                    # choose a right side kick
                     kick = kicks.RIGHT_SIDE_KICK
-                    kick.h = 70 - bearingForKick
-                elif bearingForKick < -45: #and bearingForKick > -125:
-                    #choose a left side kick! (using left foot)
+                elif minimumBearing == math.fabs(kickBearings[2][1]):
+                    # choose a left side kick
                     kick = kicks.LEFT_SIDE_KICK
-                    kick.h = -70 - bearingForKick
                 else:
-                    # "choose a back kick!"
-                    kick = self.chooseBackKick()
-                    if bearingForKick < -125:
-                        kick.h = -180 - bearingForKick
-                    else:
-                        kick.h = 180 - bearingForKick
-
-                # If we're already close enough to the correct bearing to score, don't orbit.
-                if bearingForKick < bearingLimitLeft/2 and bearingForKick > bearingLimitRight/2:
-                    kick.h = 0
+                    # huh?
+                    print "Didn't choose a kick..."
 
                 # If we're defending near our goal box, just kick it: clearing the ball
                 # is more important than being super accurate.
@@ -299,47 +317,47 @@ class KickInformation:
                     print ("Acceptable bearing range for kick: " + str(bearingLimitLeft) +
                            "/" + str(bearingLimitRight))
 
-                if (bearingLimitLeft - bearingLimitRight) > 60:
+                if (bearingKickLeft - bearingKickRight) > 60:
                     # even an inaccurate straight kick will work
-                    if (30 > bearingLimitLeft and -30 < bearingLimitRight):
+                    if (30 > bearingKickLeft and -30 < bearingKickLeft):
                         #choose a straight kick with no orbit NOW!
                         kick = self.chooseQuickFrontKick()
                         kick.h = 0
                         return kick
-                    elif (bearingLimitLeft < 30):
+                    elif (bearingKickLeft < 30):
                         # closer to left limit
-                        straightBearing = 30 - bearingLimitLeft
+                        straightBearing = 30 - bearingKickLeft
                     else: #assert bearingLimitRight > -30
                         # closer to right limit
-                        straightBearing = -30 - bearingLimitRight
+                        straightBearing = -30 - bearingKickRight
                 else:
                     # aim for the center and hope we're accurate enough
                     straightBearing = 0 - bearingForKick
 
-                if (bearingLimitLeft - bearingLimitRight > 35):
+                if (bearingKickLeft - bearingKickRight > 35):
                     # even an inaccurate side kick will work
-                    if (95 > bearingLimitLeft and 60 < bearingLimitRight):
+                    if (95 > bearingKickLeft and 60 < bearingKickRight):
                         #choose a right side kick with no orbit NOW!
                         kick = kicks.RIGHT_SIDE_KICK
                         kick.h = 0
                         return kick
-                    elif (-60 > bearingLimitLeft and -95 < bearingLimitRight):
+                    elif (-60 > bearingKickLeft and -95 < bearingKickRight):
                         #choose a left side kick with no orbit!
                         kick = kicks.LEFT_SIDE_KICK
                         kick.h = 0
                         return kick
 
-                    if (bearingLimitLeft < 95):
+                    if (bearingKickLeft < 95):
                         # right side kick is closer to left limit
-                        rightSideBearing = 95 - bearingLimitLeft
-                    else: #assert bearingLimitRight > 60
-                        rightSideBearing = 60 - bearingLimitRight
+                        rightSideBearing = 95 - bearingKickLeft
+                    else: #assert bearingKickRight > 60
+                        rightSideBearing = 60 - bearingKickRight
 
-                    if (bearingLimitLeft < -60):
+                    if (bearingKickLeft < -60):
                         # left side kick is closer to the left limit
-                        leftSideBearing = -60 - bearingLimitLeft
-                    else: #assert bearingLimitRight > -95
-                        leftSideBearing = -95 - bearingLimitRight
+                        leftSideBearing = -60 - bearingKickLeft
+                    else: #assert bearingKickRight > -95
+                        leftSideBearing = -95 - bearingKickRight
                 else:
                     # aim for the center and hope we're accurate enough
                     rightSideBearing = 70 - bearingForKick
