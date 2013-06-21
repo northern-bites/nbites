@@ -77,7 +77,8 @@ def gameSet(player):
 
     # If we think we're on the wrong side, reset to the correct field cross
     #  and loc will take care of the rest.
-    player.brain.checkSetLocalization()
+    # Removed 6/21/13- loc now does this on its own.
+    #player.brain.checkSetLocalization()
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
