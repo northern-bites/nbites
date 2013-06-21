@@ -8,24 +8,26 @@ namespace man
 namespace motion
 {
 MotionModule::MotionModule()
-    : jointsOutput_(base()),
-      stiffnessOutput_(base()),
-      odometryOutput_(base()),
-      motionStatusOutput_(base()),
-      handSpeedsOutput_(base()),
-      curProvider(&nullBodyProvider),
-      nextProvider(&nullBodyProvider),
-      curHeadProvider(&nullHeadProvider),
-      nextHeadProvider(&nullHeadProvider),
-      nextJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
-      nextStiffnesses(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
-      lastJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
-      frameCount(0),
-      running(true),
-      newJoints(false),
-      newInputJoints(false),
-      readyToSend(false),
-      noWalkTransitionCommand(true)
+  : jointsOutput_(base()),
+    stiffnessOutput_(base()),
+    odometryOutput_(base()),
+    motionStatusOutput_(base()),
+    handSpeedsOutput_(base()),
+    curProvider(&nullBodyProvider),
+    nextProvider(&nullBodyProvider),
+    curHeadProvider(&nullHeadProvider),
+    nextHeadProvider(&nullHeadProvider),
+    nextJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
+    nextStiffnesses(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
+    lastJoints(std::vector<float>(Kinematics::NUM_JOINTS, 0.0f)),
+    frameCount(0),
+    running(true),
+    newJoints(false),
+    newInputJoints(false),
+    readyToSend(false),
+    noWalkTransitionCommand(true),
+    gainsOn(false),
+    stiff(false)
 {
 
 }
@@ -312,6 +314,7 @@ void MotionModule::processMotionInput()
             if (gainsOn)
             {
                 sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
+                stiff = false;
             }
         }
         if (requestInput_.message().enable_stiffness())
@@ -322,26 +325,30 @@ void MotionModule::processMotionInput()
             {
                 sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
                 gainsOn = true;
+                stiff = true;
             }
         }
+        return;
     }
 
     // (2) Guardian checks.
     if(stiffnessInput_.message().remove() && gainsOn)
     {
         gainsOn = false;
+        stiff = false;
         sendMotionCommand(FreezeCommand::ptr(new FreezeCommand()));
         return;
     }
     if(!stiffnessInput_.message().remove() && !gainsOn)
     {
         gainsOn = true;
+        stiff = true;
         sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
         return;
     }
 
     // (3) Disallow further commands if we turned gains off.
-    if (!gainsOn)
+    if (!stiff)
         return;
 
     // (4) Process body commands.
@@ -370,6 +377,7 @@ void MotionModule::processMotionInput()
         {
             // Send an unfreeze command so we can stand up.
             sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+            stiff = true;
             sendMotionCommand(bodyCommandInput_.message().script());
         }
     }
