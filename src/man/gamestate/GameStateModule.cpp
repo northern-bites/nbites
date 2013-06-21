@@ -29,7 +29,6 @@ GameStateModule::~GameStateModule()
 
 void GameStateModule::run_()
 {
-    response_status = GAMECONTROLLER_RETURN_MSG_ALIVE;
     latchInputs();
     update();
 
@@ -93,6 +92,29 @@ void GameStateModule::update()
         {
             keep_time = true;
         }
+        // Did GC get our message yet??
+        for (int i = 0; i < latest_data.team_size(); ++i)
+        {
+            messages::TeamInfo* team = latest_data.mutable_team(i);
+            if (team->team_number() == team_number)
+            {
+                messages::RobotInfo* player = team->mutable_player(player_number-1);
+                if (response_status == GAMECONTROLLER_RETURN_MSG_MAN_PENALISE)
+                {
+                    if(player->penalty())
+                    {
+                        response_status = GAMECONTROLLER_RETURN_MSG_ALIVE;
+                    }
+                }
+                else if (response_status == GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE)
+                {
+                    if(!player->penalty())
+                    {
+                        response_status == GAMECONTROLLER_RETURN_MSG_ALIVE;
+                    }
+                }
+            }
+        }
     }
     if (keep_time)
     {
@@ -122,8 +144,7 @@ void GameStateModule::advanceState()
 
 void GameStateModule::manual_penalize()
 {
-    int i;
-    for (i = 0; i < latest_data.team_size(); ++i)
+    for (int i = 0; i < latest_data.team_size(); ++i)
     {
         messages::TeamInfo* team = latest_data.mutable_team(i);
         if (team->team_number() == team_number)
@@ -131,12 +152,10 @@ void GameStateModule::manual_penalize()
             messages::RobotInfo* player = team->mutable_player(player_number-1);
             if (player->penalty())
             {
-                player->set_penalty(PENALTY_NONE);
                 response_status = GAMECONTROLLER_RETURN_MSG_MAN_UNPENALISE;
             }
             else
             {
-                player->set_penalty(PENALTY_MANUAL);
                 response_status = GAMECONTROLLER_RETURN_MSG_MAN_PENALISE;
             }
             break;
