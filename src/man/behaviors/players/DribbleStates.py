@@ -16,8 +16,8 @@ from objects import RelRobotLocation, Location
 # true. See DribbleTransitions.py for more info.
 
 ### TODO
-# test time-based decision making
 # rotate towards goal when dribbling
+# test time-based decision making
 
 ### DONE
 # better dodging
@@ -64,7 +64,7 @@ def executeDribble(player):
         player.ballBeforeDribble = ball
         player.brain.nav.goTo(player.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.GRADUAL_SPEED,
+                              Navigator.CAREFUL_SPEED,
                               False,
                               False)
     else:

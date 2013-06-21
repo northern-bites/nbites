@@ -12,7 +12,7 @@ from math import fabs
 import noggin_constants as nogginConstants
 import time
 
-DRIBBLE_ON_KICKOFF = True
+DRIBBLE_ON_KICKOFF = False
 
 def chase(player):
     """
