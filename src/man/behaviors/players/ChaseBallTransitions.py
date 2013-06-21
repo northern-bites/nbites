@@ -137,6 +137,15 @@ def shouldFindBallKick(player):
     """
     return (player.brain.ball.vis.frames_off > constants.BALL_OFF_KICK_THRESH)
 
+def shouldFindBallPosition(player):
+    """
+    We lost the ball while playbook positioning. We should have a good heading,
+    so wait a while before spinning.
+    """
+    return (player.brain.ball.vis.frames_off > 30 * 3* constants.SPUN_ONCE_TIME_THRESH
+            and player.brain.nav.isAtPosition() and player.brain.nav.stateTime >
+            3 * constants.SPUN_ONCE_TIME_THRESH)
+
 def ballMoved(player):
     """
     Ball has moved away from where it was seen when positioning. We probably
@@ -154,14 +163,14 @@ def shouldSpinFindBall(player):
     return (player.stateTime >=
             SweetMoves.getMoveTime(HeadMoves.HIGH_SCAN_BALL))
 
-def shouldSpinFindBallAgain(player):
+def spunOnce(player):
     """
-    If we have been walkFindBall-ing too long we should spin.
+    Did we spin once?
     """
-    return player.stateTime > constants.WALK_FIND_BALL_FRAMES_THRESH
+    return player.stateTime > constants.SPUN_ONCE_TIME_THRESH
 
 def shouldWalkFindBall(player):
     """
     If we've been spinFindBall-ing too long we should walk
     """
-    return player.counter > constants.WALK_FIND_BALL_FRAMES_THRESH
+    return player.stateTime > constants.WALK_FIND_BALL_TIME_THRESH
