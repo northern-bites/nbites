@@ -131,7 +131,8 @@ def fallen(player):
 
 def watch(player):
     if player.firstFrame():
-        watch.panning = False
+        watch.looking = False
+        watch.lastLook = constants.RIGHT
         player.homeDirections = []
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
@@ -140,14 +141,19 @@ def watch(player):
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
         and
         player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH
-        and not watch.panning):
-        watch.panning = True
+        and not watch.looking):
+        watch.looking = True
         print "Performing a pan!"
-        player.brain.tracker.performWidePan()
+        if watch.lastLook is constants.RIGHT:
+            player.brain.tracker.lookToAngle(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER)
+            watch.lastLook = constants.LEFT
+        else:
+            player.brain.tracker.lookToAngle(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER)
+            watch.lastLook = constants.RIGHT
 
     if player.brain.tracker.isStopped():
-        print "Done panning!"
-        watch.panning = False
+        print "Done looking!"
+        watch.looking = False
         player.brain.tracker.trackBall()
 
     return Transition.getNextState(player, watch)
