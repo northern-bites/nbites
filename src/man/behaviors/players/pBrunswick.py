@@ -67,19 +67,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         if (gcState == 'gamePlaying' and
             not self.currentState == 'afterPenalty' and
-            not self.currentState == 'gamePenalized'):
-            if not (self.currentState == 'gamePlaying'
-                and self.counter != 1):
-                # Make sure gamePlaying gets run
-                roleState = self.getNextState()
+            not self.currentState == 'gamePenalized' and
+            not self.currentState == 'gamePlaying'):
 
-                if roleState != self.currentState:
-                    self.switchTo(roleState)
+            self.shouldKickOff = False
 
-        #Goalie Penalty Kicking
-        if (gcState == 'penaltyShotsGamePlaying'
-                 and self.play.isRole(PBConstants.GOALIE)):
-            self.penaltyKicking = True
             roleState = self.getNextState()
 
             if roleState != self.currentState:
@@ -100,7 +92,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.run(self)
 
     def getNextState(self):
-        if self.brain.playbook.subRoleUnchanged():
+        if not self.brain.play.changed:
             return self.currentState
 
         elif self.inKickingState:
@@ -112,6 +104,9 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
     def getRoleState(self):
         if self.play.isRole(PBConstants.CHASER):
             if self.brain.gameController.timeSincePlaying < 10:
+                if (self.brain.gameController.ownKickOff):
+                    self.shouldKickOff = True
+
                 return 'kickoff'
             return 'chase'
         elif self.play.isRole(PBConstants.PENALTY_ROLE):

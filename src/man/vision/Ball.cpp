@@ -269,10 +269,11 @@ bool Ball::sanityChecks(int w, int h, VisualBall * thisBall) {
         return false;
     } else if (kinematicsBasedEst.dist >  4 * radiusBasedEst.dist) {
 		if (radiusBasedEst.dist < MIDFIELD_X / 2 &&
-								  thresh->getPixDistance(topBlob->getLeftTopY()) > MIDFIELD_X) {
+								  thresh->getPixDistance(topBlob->getLeftTopY()) > MIDFIELD_X &&
+			(w > 20 || h > 20 || kinematicsBasedEst.dist < PIXACC)) {
 			if (BALLDEBUG) {
 				cout << "Screening due to a very large ball at a seemingly far distance "
-					 << endl;
+					 << w << " " << h << " " << kinematicsBasedEst.dist << endl;
 			}
 			drawBlob(*topBlob, WHITE);
 			topBlob->init();
@@ -459,9 +460,9 @@ void Ball::adjustBallDimensions() {
     if (w > h) {
         int x = topBlob->getLeft() + w / 2;
         int y = topBlob->getTop() + h / 5;
-        int newtop = findBallEdgeY(x, y, -1);
+        int newtop = max(0, findBallEdgeY(x, y, -1));
         y = topBlob->getBottom() - h / 5;
-        int newbottom = findBallEdgeY(x, y, 1);
+        int newbottom = min(findBallEdgeY(x, y, 1), IMAGE_HEIGHT - 1);
         int change = topBlob->getTop() - newtop +
             newbottom - topBlob->getBottom();
         if (abs(change - (w - h)) < DIAMETERMISMATCH) {
@@ -474,9 +475,9 @@ void Ball::adjustBallDimensions() {
     } else {
         int x = topBlob->getLeft() + w / 5;
         int y = topBlob->getTop() + h / 2;
-        int newleft = findBallEdgeX(x, y, -1);
+        int newleft = max(0, findBallEdgeX(x, y, -1));
         x = topBlob->getRight() - w / 5;
-        int newright = findBallEdgeX(x, y, 1);
+        int newright = min(IMAGE_WIDTH - 1, findBallEdgeX(x, y, 1));
         int change = newright - topBlob->getRight() +
             topBlob->getLeft() - newleft;
         if (abs(change - (h - w)) < DIAMETERMISMATCH) {
@@ -513,7 +514,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall) {
             for (int i = topBlob->getRightTopX() - h; i < IMAGE_WIDTH - 1;
                  i++) {
                 for (int j = topBlob->getLeftTopY();
-                     j < topBlob->getLeftBottomY(); j++) {
+                     j < topBlob->getLeftBottomY() && j < IMAGE_HEIGHT; j++) {
                     if (Utility::isOrange(thresh->getThresholded(j,i))) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;
@@ -526,7 +527,7 @@ void Ball::checkForReflections(int h, int w, VisualBall * thisBall) {
         if (topBlob->getLeftTopX() + h < IMAGE_WIDTH) {
             for (int i = topBlob->getLeftTopX() + h; i > -1; i--) {
                 for (int j = topBlob->getLeftTopY();
-                     j < topBlob->getLeftBottomY(); j++) {
+                     j < topBlob->getLeftBottomY() && j < IMAGE_HEIGHT; j++) {
                     if (Utility::isOrange(thresh->getThresholded(j,i))) {
                         topBlob->setRightTopX(i);
                         j = IMAGE_HEIGHT;

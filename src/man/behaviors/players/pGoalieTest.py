@@ -9,7 +9,6 @@ from . import GoalieChanges
 from . import GoalieTransitions
 
 import noggin_constants as  NogginConstants
-from ..playbook import PBConstants
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):

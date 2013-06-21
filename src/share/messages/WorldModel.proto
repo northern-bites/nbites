@@ -8,22 +8,23 @@ message WorldModel
     optional float my_y = 3;
     optional float my_h = 4;
 
-    optional float my_x_uncert = 5;
-    optional float my_y_uncert = 6;
-    optional float my_h_uncert = 7;
+    optional float my_uncert = 5;
 
-    optional bool  ball_on = 8;
+    optional bool  ball_on = 6;
 
-    optional float ball_dist = 9;
-    optional float ball_bearing = 10;
+    optional float ball_dist = 7;
+    optional float ball_bearing = 8;
 
-    optional float ball_dist_uncert = 11;
-    optional float ball_bearing_uncert = 12;
+    optional float ball_dist_uncert = 9;
+    optional float ball_bearing_uncert = 10;
 
-    optional float chase_time = 13;
+    optional float chase_time = 11;
+    optional float defender_time = 12;
+    optional float offender_time = 13;
+    optional float middie_time = 14;
 
-    optional int32 role = 14;
-    optional int32 sub_role = 15;
+    optional int32 role = 15;
+    optional bool  in_kicking_state = 16;
 
-    optional bool  active = 16;
+    optional bool  active = 17;
 }

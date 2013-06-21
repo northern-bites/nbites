@@ -35,7 +35,6 @@ import RobotLocation_proto
 import BallModel_proto
 import PMotion_proto
 import MotionStatus_proto
-import SonarState_proto
 import VisionRobot_proto
 import VisionField_proto
 import ButtonState_proto
@@ -79,6 +78,7 @@ class Brain(object):
         self.initTeamMembers()
         self.motion = None
         self.game = None
+        self.locUncert = 0
 
         self.play = Play.Play()
 
@@ -176,10 +176,7 @@ class Brain(object):
         output.my_y = self.loc.y
         output.my_h = self.loc.h
 
-        #TODO get actual uncertainties
-        output.my_x_uncert = 0
-        output.my_y_uncert = 0
-        output.my_h_uncert = 0
+        output.my_uncert = self.locUncert
 
         output.ball_on = self.ball.vis.on
 
@@ -191,11 +188,14 @@ class Brain(object):
         output.ball_bearing_uncert = 0
 
         output.chase_time = self.teamMembers[self.playerNumber-1].chaseTime
+        output.defender_time = self.teamMembers[self.playerNumber-1].defenderTime
+        output.offender_time = self.teamMembers[self.playerNumber-1].offenderTime
+        output.middie_time = self.teamMembers[self.playerNumber-1].middieTime
 
         output.role = self.teamMembers[self.playerNumber-1].role
-        output.sub_role = self.teamMembers[self.playerNumber-1].subRole
 
         output.active = self.teamMembers[self.playerNumber-1].active
+        output.in_kicking_state = self.player.inKickingState
 
     def getCommUpdate(self):
         self.game = self.interface.gameState
@@ -212,6 +212,11 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.ball = self.interface.filteredBall
+        if (self.player.gameState == 'gameReady'
+            or self.player.gameState == 'gameSet'):
+            self.ball.x = Constants.CENTER_FIELD_X
+            self.ball.y = Constants.CENTER_FIELD_Y
+
         self.yglp = self.interface.visionField.goal_post_l.visual_detection
         self.ygrp = self.interface.visionField.goal_post_r.visual_detection
 
@@ -236,6 +241,7 @@ class Brain(object):
         self.loc = RobotLocation(self.interface.loc.x,
                                  self.interface.loc.y,
                                  self.interface.loc.h * (180. / pi))
+        self.locUncert = self.interface.loc.uncert
 
     def resetLocTo(self, x, y, h):
         """

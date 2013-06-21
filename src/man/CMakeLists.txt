@@ -95,6 +95,7 @@ add_subdirectory( led )
 add_subdirectory( localization )
 add_subdirectory( log )
 add_subdirectory( motion )
+add_subdirectory( obstacle )
 add_subdirectory( sensors )
 add_subdirectory( vision )
 
@@ -126,6 +127,7 @@ target_link_libraries(
   log
   messages
   motion
+  obstacle
   portals
   sensors
   support

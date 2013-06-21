@@ -39,9 +39,16 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
     if (red)
         brushColor = Qt::red;
 
-    painter.setBrush(brushColor);
-
     QPoint locCenter(msg.my_x(), msg.my_y());
+
+    painter.setBrush(Qt::Dense7Pattern);
+
+    // Draw my uncertainty
+    painter.drawEllipse(locCenter,
+                        (int)msg.my_uncert(),
+                        (int)msg.my_uncert());
+
+    painter.setBrush(brushColor);
 
     // Draw myself
     painter.drawEllipse(locCenter,
@@ -54,10 +61,6 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                      PARTICLE_WIDTH * std::cos(TO_RAD*msg.my_h()) + msg.my_x(),
                      PARTICLE_WIDTH * std::sin(TO_RAD*msg.my_h()) + msg.my_y());
 
-    // Draw my uncertainty
-    painter.drawEllipse(locCenter,
-                        (int)msg.my_x_uncert(),
-                        (int)msg.my_y_uncert());
 
     // Draw my number
     painter.setPen(brushColor);

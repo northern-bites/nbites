@@ -12,31 +12,7 @@ def findBall(player):
         else:
             return player.goLater('chase')
 
-    if player.firstFrame():
-        player.stand()
-        player.brain.tracker.stopHeadMoves()
-
-    if player.brain.nav.isStopped():
-        return player.goLater('scanFindBall')
-
-    return player.stay()
-
-
-def scanFindBall(player):
-    """
-    State to move the head to find the ball. If we find the ball, we
-    mppove to align on it. If we don't find it, we spin to keep looking
-    """
-    player.brain.tracker.trackBall()
-
-    if transitions.shouldChaseBall(player):
-        return player.goNow('findBall')
-
-    # a time based check.
-    if transitions.shouldSpinFindBall(player):
-        return player.goLater('spinFindBall')
-
-    return player.stay()
+    return player.goNow('spinFindBall')
 
 def spinFindBall(player):
     """
@@ -46,10 +22,11 @@ def spinFindBall(player):
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
-        return player.goNow('findBall')
+        return player.goLater('findBall')
 
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
+        player.stopWalking()
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
         my = player.brain.loc
@@ -59,29 +36,8 @@ def spinFindBall(player):
 
         player.brain.tracker.spinPan()
 
-    if transitions.shouldWalkFindBall(player):
-        return player.goLater('walkFindBall')
-
-    return player.stay()
-
-def walkFindBall(player):
-    """
-    State to walk to find the ball. If we find the ball we chase it.
-    """
-    if player.firstFrame():
-        player.stopWalking()
-        # Do a slow pan
-        player.brain.tracker.repeatWidePan()
-
-    if transitions.shouldChaseBall(player):
-        player.stopWalking()
-        player.brain.tracker.trackBall()
-        return player.goNow('findBall')
-
-    if player.brain.nav.isStopped():
-        player.brain.nav.chaseBall()
-
-    if transitions.shouldSpinFindBallAgain(player):
-        return player.goLater('spinFindBall')
+    if ((player.brain.play.isChaser() and transitions.shouldWalkFindBall(player))
+        or (not player.brain.play.isChaser() and transitions.spunOnce())):
+        return player.goLater('playbookPosition')
 
     return player.stay()

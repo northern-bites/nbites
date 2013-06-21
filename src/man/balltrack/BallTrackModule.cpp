@@ -3,6 +3,7 @@
 #include <math.h>
 #include "NBMath.h"
 #include "Profiler.h"
+#include "FieldConstants.h"
 
 #include "DebugConfig.h"
 
@@ -69,11 +70,20 @@ void BallTrackModule::run_()
     ballMessage.get()->set_bearing_deg(filters->getFilteredBear() * TO_DEG);
 
     float x = localizationInput.message().x() +
-        ballMessage.get()->distance() * cosf(localizationInput.message().h() +
-                                             ballMessage.get()->bearing());
+        filters->getFilteredDist() * cosf(localizationInput.message().h() +
+                                          filters->getFilteredBear());
     float y = localizationInput.message().y() +
-        ballMessage.get()->distance() * sinf(localizationInput.message().h() +
-                                             ballMessage.get()->bearing());
+        filters->getFilteredDist() * sinf(localizationInput.message().h() +
+                                          filters->getFilteredBear());
+
+    // HACK!! WHY!!??!?!
+    if (visionBallInput.message().frames_off() > 720 &&
+        x < 70 && y < 70)
+    {
+        x = CENTER_FIELD_X;
+        y = CENTER_FIELD_Y;
+    }
+
     ballMessage.get()->set_x(x);
     ballMessage.get()->set_y(y);
 
@@ -98,8 +108,10 @@ void BallTrackModule::run_()
     // Print the observation given, each filter after update, and which filter chosen
 
     if(visionBallInput.message().on()) {
-        std::cout << "See a ball with (dist,bearing):\t( " << visionBallInput.message().distance()
-                  << " , " << visionBallInput.message().bearing() << " )" << std::endl;
+        std::cout << "See a ball with (dist,bearing):\t( "
+                  << visionBallInput.message().distance()
+                  << " , " << visionBallInput.message().bearing() << " )"
+                  << std::endl;
         std::cout << "and a ball with (relX,relY):  \t( " << filters->visRelX
                   << " , " << filters->visRelY << std::endl;
     }

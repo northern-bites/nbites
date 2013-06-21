@@ -9,15 +9,13 @@ import GameController
 # brain.gameController, etc.                                      #
 ############################ IMPORTANT ############################
 
-NUM_LED_GROUPS = 31
-
 # LED Related #
 GC_LEDS = True
 FOOT_LEDS = True
 BALL_LEDS = True
 GOAL_LEDS = True
-PLAYBOOK_LEDS = False
-LOC_LEDS = False
+PLAYBOOK_LEDS = True
+LOC_LEDS = True
 COMM_LEDS = True
 
 ####### LED DEFINITIONS #############
@@ -26,6 +24,8 @@ LED_ON = 1
 
 #The order here must match the order of the string defined in Lights.h
 # and in ALLedNames.h
+NUM_LED_GROUPS = 29
+
 (LEFT_LOC_ONE_LED,
 LEFT_LOC_TWO_LED,
 LEFT_LOC_THREE_LED,
@@ -46,7 +46,6 @@ RIGHT_COMM_TWO_LED,
 RIGHT_COMM_THREE_LED,
 RIGHT_COMM_FOUR_LED,
 RIGHT_COMM_FIVE_LED,
-SUBROLE_LED,
 ROLE_LED,
 BALL_LED,
 LEFT_GOAL_LED,
@@ -55,7 +54,6 @@ GOAL_ID_LED,
 CHEST_LED,
 LEFT_FOOT_LED,
 RIGHT_FOOT_LED,
-LEFT_UNUSED_LED,
 RIGHT_UNUSED_LED) = range(NUM_LED_GROUPS)
 
 ###COLORS
@@ -68,7 +66,7 @@ CYAN  = 0x00FFFF
 WHITE = 0xFFFFFF
 OFF   = 0x000000
 PINK  = 0xFF1493
-EYE_YELLOW= 0xFF4400
+EYE_YELLOW= 0xFF4400  # Need special hex for eye yellow display.
 
 NOW = 0.0
 
@@ -79,24 +77,10 @@ BALL_OFF_LEDS = ((BALL_LED, BLUE, NOW),)
 ##### Roles #####
 CHASER_ON_LEDS =   ((ROLE_LED, RED, NOW),)
 OFFENDER_ON_LEDS = ((ROLE_LED, EYE_YELLOW, NOW),)
-MIDDIE_ON_LEDS =   ((ROLE_LED, GREEN, NOW),)
+MIDDIE_ON_LEDS =   ((ROLE_LED, CYAN, NOW),)
 DEFENDER_ON_LEDS = ((ROLE_LED, BLUE, NOW),)
-DUB_DEFEND_ON_LEDS=((ROLE_LED, CYAN, NOW),)
 GOALIE_ON_LEDS =   ((ROLE_LED, PURPLE, NOW),)
 ROLE_OFF_LEDS =    ((ROLE_LED, OFF, NOW),)
-
-##### SubRoles #####
-AGGRESSIVE_LEDS = ((SUBROLE_LED, RED, NOW),)
-BOLD_LEDS =       ((SUBROLE_LED, EYE_YELLOW, NOW),)
-CAUTIOUS_LEDS =   ((SUBROLE_LED, GREEN, NOW),)
-GUARDED_LEDS =    ((SUBROLE_LED, BLUE, NOW),)
-
-GOALIE_CHASE_LEDS =  ((SUBROLE_LED, PURPLE, NOW),)
-GOALIE_CENTER_LEDS = ((SUBROLE_LED, BLUE, NOW),)
-GOALIE_LEFT_LEDS =   ((SUBROLE_LED, RED, NOW),)
-GOALIE_RIGHT_LEDS =  ((SUBROLE_LED, GREEN, NOW),)
-
-OTHER_SUBROLE_LEDS= ((SUBROLE_LED, OFF, NOW),)
 
 ##### GOAL ######
 LEFT_POST_ON_LEDS =   ((RIGHT_GOAL_LED, GREEN, NOW),)
@@ -180,6 +164,7 @@ class Leds():
         self.goalCertainty = 0
         self.facingOpp = -1
         self.numActiveMates = 0
+        self.oldLocScore = 3
 
     def processLeds(self):
 
@@ -225,9 +210,6 @@ class Leds():
 
             self.goalCertainty = newCertainty
 
-
-            # TODO make this part actually tell us if we are looking at our goal or not
-            # via flag in loc (???)
             newFacingOpp = (-90 < self.brain.loc.h < 90)
             if (newFacingOpp != self.facingOpp or
                 self.facingOpp == -1):
@@ -242,7 +224,6 @@ class Leds():
                         self.executeLeds(BLUE_GOAL_LEDS)
                     else:
                         self.executeLeds(PINK_GOAL_LEDS)
-#                self.executeLeds(NO_GOAL_LEDS)
 
         if PLAYBOOK_LEDS:
             if self.brain.playbook.roleChanged():
@@ -254,54 +235,44 @@ class Leds():
                     self.executeLeds(MIDDIE_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.DEFENDER):
                     self.executeLeds(DEFENDER_ON_LEDS)
-                elif self.brain.play.isRole(PBConstants.DEFENDER_DUB_D):
-                    self.executeLeds(DUB_DEFEND_ON_LEDS)
                 elif self.brain.play.isRole(PBConstants.GOALIE):
                     self.executeLeds(GOALIE_ON_LEDS)
                 else:
                     self.executeLeds(ROLE_OFF_LEDS)
 
-            if not self.brain.playbook.subRoleUnchanged():
-                play = self.brain.play
-                if play.isRole(PBConstants.GOALIE):
-                    if (play.isSubRole(PBConstants.GOALIE_CENTER)):
-                        self.executeLeds(GOALIE_CENTER_LEDS)
-                    #elif (play.isSubRole(PBConstants.GOALIE_LEFT)):
-                    #    self.executeLeds(GOALIE_LEFT_LEDS)
-                    #elif (play.isSubRole(PBConstants.GOALIE_RIGHT)):
-                    #    self.executeLeds(GOALIE_RIGHT_LEDS)
-                    elif (play.isSubRole(PBConstants.GOALIE_CHASER)):
-                        self.executeLeds(GOALIE_CHASE_LEDS)
-                    else:
-                        self.executeLeds(OTHER_SUBROLE_LEDS)
-                else:
-                    if (play.isSubRole(PBConstants.CHASE_NORMAL) or
-                        play.isSubRole(PBConstants.PICKER) or
-                        play.isSubRole(PBConstants.DEFENSIVE_MIDDIE) or
-                        play.isSubRole(PBConstants.STOPPER)):
-                        self.executeLeds(AGGRESSIVE_LEDS)
-                    elif (play.isSubRole(PBConstants.LEFT_WING) or
-                          play.isSubRole(PBConstants.RIGHT_WING) or
-                          play.isSubRole(PBConstants.KICKOFF_STRIKER) or
-                          play.isSubRole(PBConstants.CENTER_BACK)):
-                        self.executeLeds(BOLD_LEDS)
-                    elif (play.isSubRole(PBConstants.STRIKER) or
-                          play.isSubRole(PBConstants.OFFENSIVE_MIDDIE) or
-                          play.isSubRole(PBConstants.SWEEPER)):
-                        self.executeLeds(CAUTIOUS_LEDS)
-                    elif (play.isSubRole(PBConstants.FORWARD) or
-                          play.isSubRole(PBConstants.DUB_D_MIDDIE) or
-                          play.isSubRole(PBConstants.KICKOFF_SWEEPER) or
-                          play.isSubRole(PBConstants.LEFT_DEEP_BACK) or
-                          play.isSubRole(PBConstants.RIGHT_DEEP_BACK)):
-                        self.executeLeds(GUARDED_LEDS)
-                    else:
-                        self.executeLeds(OTHER_SUBROLE_LEDS)
         if LOC_LEDS:
-            # TODO: show loc uncertainty via LEDS
-            # This may not be applicable to the particle swarm 6/7/13
-            pass
+            newLocScore = self.locScore(self.brain.locUncert)
+            if (newLocScore != self.oldLocScore):
+                self.oldLocScore = newLocScore
+                if(newLocScore > 0):
+                    self.executeLeds(LEFT_LOC_ONE_LEDS)
+                    self.executeLeds(RIGHT_LOC_ONE_LEDS)
+                else:
+                    self.executeLeds(LEFT_LOC_ONE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_ONE_OFF_LEDS)
+                if(newLocScore > 1):
+                    self.executeLeds(LEFT_LOC_TWO_LEDS)
+                    self.executeLeds(RIGHT_LOC_TWO_LEDS)
+                else:
+                    self.executeLeds(LEFT_LOC_TWO_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_TWO_OFF_LEDS)
+                if(newLocScore > 2):
+                    self.executeLeds(LEFT_LOC_THREE_LEDS)
+                    self.executeLeds(RIGHT_LOC_THREE_LEDS)
+                    self.executeLeds(LEFT_LOC_FOUR_LEDS)
+                    self.executeLeds(RIGHT_LOC_FOUR_LEDS)
+                    self.executeLeds(LEFT_LOC_FIVE_LEDS)
+                    self.executeLeds(RIGHT_LOC_FIVE_LEDS)
+                else:
+                    self.executeLeds(LEFT_LOC_THREE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_THREE_OFF_LEDS)
+                    self.executeLeds(LEFT_LOC_FOUR_OFF_LEDS)
+                    self.executeLeds(LEFT_LOC_FIVE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_FIVE_OFF_LEDS)
+                    self.executeLeds(RIGHT_LOC_FOUR_OFF_LEDS)
 
+        # If more teammates are added, consider making bottom of right
+        # eye into localization uncertainty and using whole ear for comm
         if COMM_LEDS:
             newActiveMates = self.brain.activeTeamMates()
             if (newActiveMates != self.numActiveMates):
@@ -381,3 +352,13 @@ class Leds():
             # Unnecessary check, never triggered
             #if ledTuple[2] != NOW:
                 #print "Invalid timing command in Leds.py"
+
+    def locScore(self, newLoc):
+        if newLoc < 37:
+            return 0
+        elif newLoc < 45:
+            return 1
+        elif newLoc < 70:
+            return 2
+        else:
+            return 3

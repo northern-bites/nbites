@@ -12,6 +12,10 @@
 #include <QtGui>
 #include <vector>
 
+#include "localization/VisionSystem.h" //keep up to date with how lines are segmented
+#include "localization/Particle.h"
+#include "localization/LineSystem.h"
+
 #include "FieldConstants.h"
 
 #include "common/PaintField.h"
@@ -23,6 +27,7 @@
 namespace tool {
 namespace viewer {
 
+static const float MIN_LINE_LENGTH = 100.f;
 static const int PARTICLE_WIDTH = 8;
 
 class FieldViewerPainter : public tool_common::PaintField
@@ -84,6 +89,9 @@ private:
     messages::VisionField curObsv;
     messages::RobotLocation curOffline;
     messages::ParticleSwarm curOfflineSwarm;
+
+    man::localization::LineSystem* lineSystem;
+    man::localization::VisionSystem* visionSystem;
 };
 
 } // namespace viewer

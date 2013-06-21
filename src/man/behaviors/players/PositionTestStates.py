@@ -1,6 +1,4 @@
 from .. import SweetMoves
-from ..playbook import PBConstants
-from objects import RelRobotLocation
 
 def gameInitial(player):
     return player.stay()

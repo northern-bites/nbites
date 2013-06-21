@@ -1,4 +1,3 @@
-from ..playbook.PBConstants import (GOALIE, CHASER, GOALIE_KICKOFF)
 from .. import SweetMoves
 import noggin_constants as nogginConstants
 #import _localization
@@ -43,6 +42,7 @@ def gameReady(player):
         player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePan()
+        player.timeReadyBegan = player.brain.time
 
     # Reset localization to proper starting position by player number.
     # Locations are defined in the wiki.
@@ -79,13 +79,6 @@ def gameSet(player):
     #  and loc will take care of the rest.
     player.brain.checkSetLocalization()
 
-
-    if (player.play.isChaser() and
-        player.brain.gameController.ownKickOff):
-        player.shouldKickOff = True
-    else:
-        player.shouldKickOff = False
-
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
@@ -110,7 +103,6 @@ def gamePlaying(player):
 
     roleState = player.getRoleState()
     return player.goNow(roleState)
-
 
 def gamePenalized(player):
     if player.firstFrame():

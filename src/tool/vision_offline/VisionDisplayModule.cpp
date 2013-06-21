@@ -9,6 +9,8 @@ namespace vision {
 
 VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     QMainWindow(parent),
+    loadCalButton(new QPushButton(tr("Load Calibration Values"))),
+    robotNames(new QComboBox()),
     currentCamera(Camera::TOP),
     topDisplay(this),
     bottomDisplay(this),
@@ -107,6 +109,31 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     this->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
     this->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
+    robotNames->addItem("");
+    robotNames->addItem("river");
+    robotNames->addItem("mal");
+    robotNames->addItem("wash");
+    robotNames->addItem("zoe");
+    robotNames->addItem("jayne");
+    robotNames->addItem("inara");
+    robotNames->addItem("vera");
+    robotNames->addItem("simon");
+    robotNames->addItem("kaylee");
+
+    QToolBar* toolBar = new QToolBar(this);
+    toolBar->addWidget(loadCalButton);
+    toolBar->addWidget(robotNames);
+    connect(loadCalButton, SIGNAL(clicked(bool)),
+            this, SLOT(loadRobotParameters()));
+    this->addToolBar(toolBar);
+
+}
+
+void VisionDisplayModule::loadRobotParameters()
+{
+    std::string name = robotNames->currentText().toStdString();
+    CameraCalibrate::UpdateByName(name);
+    subdiagram.run();
 }
 
 void VisionDisplayModule::run_()
@@ -184,7 +211,7 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 		painter.setPen(Qt::magenta);
 		for (int i = 0; i < visField->visual_corner_size(); i++) {
 			switch(visField->visual_corner(i).corner_type()) {
-			case messages::VisualCorner::INNER_L: painter.setPen(Qt::red);
+			case messages::VisualCorner::INNER_L: painter.setPen(Qt::green);
 				break;
 			case messages::VisualCorner::OUTER_L: painter.setPen(Qt::blue);
 				break;
@@ -215,34 +242,51 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 
 		const messages::Robot red1 = visRobots->red1();
 		const messages::Robot navy1 = visRobots->navy1();
+		const messages::Robot red2 = visRobots->red2();
+		const messages::Robot navy2 = visRobots->navy2();
 
-		//painter.setPen(QColor(0,0,0));
-		//painter.setBrush(QBrush(QColor(0, 0, 255, 0, 80), Qt::SolidPattern));
-		painter.setPen(QPen(QColor(0,255,0,200), 1, Qt::SolidLine, Qt::FlatCap));
-		painter.setBrush(QBrush(QColor(0,255,0,80), Qt::SolidPattern));
-		if (red1.distance() > 0) {
-            painter.drawLine(red1.x() + 10, red1.y() + 10, red1.x(), red1.y());
-            painter.drawLine(red1.x(), red1.y() + 10, red1.x() + 10, red1.y());
-			/*QPoint r_points[4] = {
+		painter.setPen(QColor(0,0,0));
+		painter.setBrush(QBrush(QColor(0, 0, 255, 0), Qt::SolidPattern));
+		painter.setPen(QPen(QColor(255,0,0,200), 1, Qt::SolidLine, Qt::FlatCap));
+		painter.setBrush(QBrush(QColor(255,0,0,80), Qt::SolidPattern));
+		if (red1.on()) {
+			QPoint r_points[4] = {
 				QPoint(red1.x(), red1.y()),
 				QPoint(red1.x()+red1.width(), red1.y()),
-				QPoint(red1.x(), red1.y()+red1.height()),
-				QPoint(red1.x()+red1.width(), red1.y()+red1.height())
+				QPoint(red1.x()+red1.width(), red1.y()+red1.height()),
+				QPoint(red1.x(), red1.y()+red1.height())
+			};
+			painter.drawConvexPolygon(r_points, 4);
+			if (red2.on()) {
+				QPoint r_points[4] = {
+					QPoint(red2.x(), red2.y()),
+					QPoint(red2.x()+red2.width(), red2.y()),
+					QPoint(red2.x()+red2.width(), red2.y()+red2.height()),
+					QPoint(red2.x(), red2.y()+red2.height())
 				};
-				painter.drawConvexPolygon(r_points, 4);*/
+				painter.drawConvexPolygon(r_points, 4);
+			}
 		}
-		//painter.setBrush(QBrush(QColor(255, 0, 0, 0, 80), Qt::SolidPattern));
-		painter.setBrush(QBrush(QColor(255,0,0,80), Qt::SolidPattern));
-		if (navy1.distance() > 0) {
-            painter.drawLine(navy1.x() + 10, navy1.y() + 10, navy1.x(), navy1.y());
-            painter.drawLine(navy1.x(), navy1.y() + 10, navy1.x() + 10, navy1.y());
-			/*QPoint r_points[4] = {
+		painter.setPen(QPen(QColor(0,0,255,200), 1, Qt::SolidLine, Qt::FlatCap));
+		painter.setBrush(QBrush(QColor(255, 0, 0, 0), Qt::SolidPattern));
+		painter.setBrush(QBrush(QColor(0,0,255,80), Qt::SolidPattern));
+		if (navy1.on()) {
+			QPoint r_points[4] = {
 				QPoint(navy1.x(), navy1.y()),
 				QPoint(navy1.x()+navy1.width(), navy1.y()),
-				QPoint(navy1.x(), navy1.y()+navy1.height()),
-				QPoint(navy1.x()+navy1.width(), navy1.y()+navy1.height())
+				QPoint(navy1.x()+navy1.width(), navy1.y()+navy1.height()),
+				QPoint(navy1.x(), navy1.y()+navy1.height())
 			};
-			painter.drawConvexPolygon(r_points, 4);*/
+			painter.drawConvexPolygon(r_points, 4);
+			if (navy2.on()) {
+				QPoint r_points[4] = {
+					QPoint(navy2.x(), navy2.y()),
+					QPoint(navy2.x()+navy2.width(), navy2.y()),
+					QPoint(navy2.x()+navy2.width(), navy2.y()+navy2.height()),
+					QPoint(navy2.x(), navy2.y()+navy2.height())
+				};
+				painter.drawConvexPolygon(r_points, 4);
+			}
 		}
 
 		const messages::VisualGoalPost yglp = visField->goal_post_l();
