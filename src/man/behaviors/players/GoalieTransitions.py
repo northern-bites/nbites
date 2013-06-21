@@ -160,7 +160,8 @@ def facingForward(player):
     """
     #magic numbers
     vision = player.brain.interface.visionField
-    return (vision.visual_field_edge.distance_m > 800.0 or
+    return ((vision.visual_field_edge.distance_m > 800.0 and
+             vision.visual_field_edge.distance_m != 1000.0) or
             (math.fabs(vision.visual_cross.bearing) < 10.0 and
              vision.visual_cross.distance > 0.0))
 
