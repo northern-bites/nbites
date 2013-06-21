@@ -369,6 +369,8 @@ void ParticleFilter::resample()
     float rand;
     ParticleSet newParticles;
 
+    //std::cout << "Error " << errorMagnitude << std::endl;
+
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
     if (lost && (errorMagnitude > LOST_THRESHOLD)&& visionSystem->getLastNumObsv() > 1)
@@ -382,6 +384,8 @@ void ParticleFilter::resample()
             // If the reconstructions is on the same side and not near midfield
             if ( ((*recLocIt).defSide == onDefendingSide())
                  && (fabs((*recLocIt).x - CENTER_FIELD_X) > 120)) {
+//                std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << std::endl;
+
                      Particle reconstructedParticle((*recLocIt).x,
                                                     (*recLocIt).y,
                                                     (*recLocIt).h,

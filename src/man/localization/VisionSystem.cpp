@@ -356,7 +356,7 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
         // Lets assume if we're off-field then we're already fucked
         if( (newLoc.x >= 0 && newLoc.y <= FIELD_GREEN_WIDTH) &&
             (newLoc.y >= 0 && newLoc.y <= FIELD_GREEN_HEIGHT)  ) {
-            std::cout << "Reconstruct " << newLoc.x << " " <<  newLoc.y <<std::endl;
+//            std::cout << "Reconstruct " << newLoc.x << " " <<  newLoc.y <<std::endl;
             reconstructedLocations.push_back(newLoc);
         }
     }
