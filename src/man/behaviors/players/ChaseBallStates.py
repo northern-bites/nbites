@@ -318,29 +318,42 @@ def prepareForPenaltyKick(player):
     then turn very slightly if the flag is set.
     """
     if player.firstFrame():
-        prepareForPenaltyKick.chase = True
+        prepareForPenaltyKick.chase = False
         ball = player.brain.ball
         print "player.stateTime: ", player.stateTime
         #pseudo-random spin decision on which direction to kick
-        if (int(time.time()) % 2) == 0:
+        now = time.time()
+        if (int(now) % 2) == 0:
             player.penaltyKickRight = True
         else:
             player.penaltyKickRight = False
-        
+
+        print now
+        print "Kicking Right? ", player.penaltyKickRight
+        ball = player.brain.ball
         if player.penaltyKickRight:
-            location = RelRobotLocation(ball.rel_x - 5, ball.rel_y + 5, 0)
+            location = RelRobotLocation(ball.rel_x - 10, ball.rel_y + 5, 0)
         else:
-            location = RelRobotLocation(ball.rel_x - 5, ball.rel_y - 5, 0)
-
-        player.brain.nav.goTo(location, Navigator.CLOSE_ENOUGH, Navigator.MEDIUM_SPEED,
+            location = RelRobotLocation(ball.rel_x - 10, ball.rel_y - 5, 0)
+        player.brain.nav.goTo(location, Navigator.PRECISELY, Navigator.MEDIUM_SPEED,
                               False, True, False, False)
+    else:
+        ball = player.brain.ball
+        if player.penaltyKickRight:
+            location = RelRobotLocation(ball.rel_x - 10, ball.rel_y + 5, 0)
+        else:
+            location = RelRobotLocation(ball.rel_x - 10, ball.rel_y - 5, 0)
+        player.brain.nav.updateDest(location)
 
-    # if not prepareForPenaltyKick.chase:
-    #     print "Still Rotating"
+    if prepareForPenaltyKick.chase:
+        return player.stay()
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+        print "X: ", player.brain.ball.rel_x
+        print "Y: ", player.brain.ball.rel_y
         player.brain.nav.stand()
+        # prepareForPenaltyKick.chase = True
         return player.goNow('penaltyKickSpin')
     return player.stay()
     
@@ -357,6 +370,8 @@ def penaltyKickSpin(player):
         player.brain.nav.walk(0,0, penaltyKickSpin.speed)
         print "Spinning at speed: ", penaltyKickSpin.speed
     if penaltyKickSpin.done:
+        print "X: ", player.brain.ball.rel_x
+        print "Y: ", player.brain.ball.rel_y
         return player.stay()
 
     postBearing = player.brain.yglp.bearing_deg
@@ -372,8 +387,8 @@ def penaltyKickSpin(player):
             if penaltyKickSpin.threshCount == 3:
                 player.brain.nav.stand()
                 print "stopped because right post: ", postBearing
-                # penaltyKickSpin.done = True
-                # return player.stay()
+                penaltyKickSpin.done = True
+                #return player.stay()
                 return player.goNow('positionForPenaltyKick')
         else:
             penaltyKickSpin.threshCount = 0
@@ -383,15 +398,15 @@ def penaltyKickSpin(player):
             if penaltyKickSpin.threshCount == 3:
                 player.brain.nav.stand()
                 print "stopped because left post: ", postBearing
-                # penaltyKickSpin.done = True
-                # return player.stay()
+                penaltyKickSpin.done = True
+                #return player.stay()
                 return player.goNow('positionForPenaltyKick')
         else:
             penaltyKickSpin.threshCount = 0
 
-    print "Left post: ", player.brain.ygrp.bearing_deg
-    print "Right post: ", player.brain.yglp.bearing_deg
-    print "-----------------------------"
+    # print "Left post: ", player.brain.ygrp.bearing_deg
+    # print "Right post: ", player.brain.yglp.bearing_deg
+    # print "-----------------------------"
 
     return player.stay()
     
@@ -442,7 +457,7 @@ def positionForPenaltyKick(player):
         player.brain.nav.isAtPosition()):
         print "DEBUG_SUITE: In 'positionForPenaltyKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         positionForPenaltyKick.yes = True
-        return player.stay()
+        #return player.stay()
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
 
