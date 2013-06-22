@@ -24,17 +24,11 @@ def walkToGoal(player):
     """
     if player.firstFrame():
         player.brain.tracker.repeatBasicPan()
-        player.returningFromPenalty = True
-        player.brain.nav.goTo(RobotLocation(FIELD_WHITE_LEFT_SIDELINE_X,
-                                            CENTER_FIELD_Y,
-                                            HEADING_LEFT),
-                              avoidObstacles = True,
-                              fast = True)
+        player.returningFromPenalty = False
+        player.brain.nav.goTo(Location(FIELD_WHITE_LEFT_SIDELINE_X,
+                                       CENTER_FIELD_Y))
 
-    if player.brain.nav.isAtPosition():
-        return player.goLater('spinAtGoal')
-
-    return player.stay()
+    return Transition.getNextState(player, walkToGoal)
 
 def spinAtGoal(player):
     if player.firstFrame():

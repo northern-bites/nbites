@@ -31,7 +31,13 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
+            : VisualGoalieStates.spinAtGoal,
+
+            Transition.CountTransition(GoalieTransitions.reachedMyDestination,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.INSTANT)
             : VisualGoalieStates.spinAtGoal
+
             }
 
         VisualGoalieStates.spinAtGoal.transitions = {
