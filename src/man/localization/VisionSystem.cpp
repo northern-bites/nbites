@@ -335,12 +335,19 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
 {
     //We now hate center circles. so fuck em
     for (int j = 0; j < corner.poss_id_size(); j++) {
-        if (corner.poss_id(j) == 30 || corner.poss_id(j) == 31)
+        if (corner.poss_id(j) == 30 || corner.poss_id(j) == 29)
             return;
     }
 
-    // Only reconstruct if we saw goals (confident in the corner id)
-    if (!sawGoal)
+    //could it be a middle T?
+    bool midT;
+    for (int j = 0; j < corner.poss_id_size(); j++) {
+        if (corner.poss_id(j) == 27 || corner.poss_id(j) == 28)
+            midT = true;
+    }
+
+    // Only reconstruct if we saw goals (confident in the corner id) or around mid and desperate
+    if (!sawGoal && !midT)
         return;
 
     int concreteNum = 0;
