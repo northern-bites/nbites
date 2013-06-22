@@ -356,6 +356,14 @@ void Threshold::visionLoop(const messages::JointAngles& ja,
             //cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
         }
     }
+
+    // now to do Field Lines in the bottom camera
+    usingTopCamera = false;
+    pose->transform(usingTopCamera, ja, inert);
+    PROF_ENTER(P_LINES)
+    vision->bottomLines->lineLoop();
+    vision->bottomLines->afterObjectFragments();
+    PROF_EXIT(P_LINES)
 }
 
 /*
@@ -1906,7 +1914,10 @@ const char* Threshold::getShortColor(int _id) {
  *  @return       the Y value at point j, i
  */
 int Threshold::getY(int j, int i) const {
-    return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
+    if (usingTopCamera)
+        return static_cast<int>(vision->yImg[i * IMAGE_WIDTH + j]);
+    else
+        return static_cast<int>(vision->yImg_bot[i * IMAGE_WIDTH + j]);
 }
 
 
