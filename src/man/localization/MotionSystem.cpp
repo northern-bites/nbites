@@ -56,48 +56,51 @@ void MotionSystem::update(ParticleSet& particles,
 void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH) {
     float xF = 5.f;
     float yF = 5.f;
-    float hF = 4.f;
+    float hF = 20.f;
 
     float xL, xU, yL, yU, hL, hU;
 
-    if (dX >0) {
+    if ((std::fabs(dX) - .1f) < 0.1f) {
+        xL = -.1f;
+        xU =  .1f;
+    }
+    else if (dX >0) {
         xL = -1.f * dX * xF;
         xU = dX * xF;
     }
-    else if (dX <0) {
+    else {//dX <0
         xL = dX * xF;
         xU = -1.f * dX * xF;
     }
-    else {
-        xL = -.1f;
-        xU = .1f;
-    }
 
-    if (dY >0) {
+    if ((std::fabs(dY) - .1f) < 0.1f) {
+        yL = -.1f;
+        yU =  .1f;
+    }
+    else if (dY >0) {
         yL = -1.f * dY * yF;
         yU = dY * yF;
     }
-    else if (dY <0) {
+    else { //dY <0
         yL = dY * yF;
         yU = -1.f * dY * yF;
     }
-    else {
-        yL = -.1f;
-        yU = .1f;
-    }
 
-    if (dH >0) {
-        hL = -1.f * dH * hF;
-        hU = dH * hF;
-    }
-    else if (dH <0) {
-        hL = dH * hF;
-        hU = -1.f * dH * hF;
-    }
-    else {
-        hL = -.03f;
-        hU =  .03f;
-    }
+    hL = -.07f;
+    hU =  .07f;
+    // seems experimentally ineffecive
+    // if ((std::fabs(dH) - .05f) < 0.1f) {
+    //     hL = -.05f;
+    //     hU =  .05f;
+    // }
+    // else if (dH >0) {
+    //     hL = -1.f * dH * hF;
+    //     hU = dH * hF;
+    // }
+    // else { //dH <0
+    //     hL = dH * hF;
+    //     hU = -1.f * dH * hF;
+    // }
 
     boost::uniform_real<float> xRange(xL, xU);
     boost::uniform_real<float> yRange(yL, yU);
@@ -108,7 +111,6 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
     boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > hShift(rng, hRange);
 
     particle->shift(xShift(), yShift(), hShift());
-
 }
 
 void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)
