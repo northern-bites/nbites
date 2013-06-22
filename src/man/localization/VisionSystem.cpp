@@ -67,6 +67,22 @@ bool VisionSystem::update(ParticleSet& particles,
             }
         }
 
+        for (int i=0; i<obsv.bottom_line_size(); i++) {
+            if((obsv.bottom_line(i).start_dist() < 300.f) || (obsv.bottom_line(i).end_dist() < 300.f)) {
+                Line obsvLine = prepareVisualLine(particle->getLocation(),
+                                                  obsv.bottom_line(i));
+
+                // Limit by line length (be safe about center circle mistake lines)
+                if ((obsvLine.length() > 40.f) && (obsvLine.length() < 500.f)) {
+                    madeObsv = true;
+                    float newError = lineSystem->scoreObservation(obsvLine);
+                    //std::cout << "Line Error:\t" << newError << std::endl;
+                    curParticleError += newError;
+                    numObsv++;
+                }
+            }
+        }
+
         if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
             && (obsv.goal_post_l().visual_detection().distance() > 0.f)
             && (obsv.goal_post_l().visual_detection().distance() < 480.f)) {
@@ -319,12 +335,19 @@ void VisionSystem::addCornerReconstructionsToList(messages::VisualCorner corner)
 {
     //We now hate center circles. so fuck em
     for (int j = 0; j < corner.poss_id_size(); j++) {
-        if (corner.poss_id(j) == 30 || corner.poss_id(j) == 31)
+        if (corner.poss_id(j) == 30 || corner.poss_id(j) == 29)
             return;
     }
 
-    // Only reconstruct if we saw goals (confident in the corner id)
-    if (!sawGoal)
+    //could it be a middle T?
+    bool midT;
+    for (int j = 0; j < corner.poss_id_size(); j++) {
+        if (corner.poss_id(j) == 27 || corner.poss_id(j) == 28)
+            midT = true;
+    }
+
+    // Only reconstruct if we saw goals (confident in the corner id) or around mid and desperate
+    if (!sawGoal && !midT)
         return;
 
     int concreteNum = 0;

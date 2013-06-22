@@ -23,6 +23,7 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <cmath>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/random.hpp>
