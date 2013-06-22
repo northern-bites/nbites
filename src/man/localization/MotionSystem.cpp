@@ -86,8 +86,8 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         yU = -1.f * dY * yF;
     }
 
-    hL = -.07f;
-    hU =  .07f;
+    hL = -.04f;
+    hU =  .04f;
     // seems experimentally ineffecive
     // if ((std::fabs(dH) - .05f) < 0.1f) {
     //     hL = -.05f;
