@@ -324,7 +324,7 @@ float VisionSystem::scoreFromVisDetect(const Particle& particle,
     //std::cout <<"Scored a particle\n";
 //    std::cout << "err " << TO_DEG*bearErrOfBest << std::endl;
     return TO_DEG*bearErrOfBest;
-//    return bestScore;
+    return bestScore;
 }
 
 /**
