@@ -268,8 +268,8 @@ class KickInformation:
 
                 kickBearings = [[0, 0], [70, 0], [-70, 0]] # straight, right side, left side
                 for b in kickBearings:
-                    adjustedBearingLeft = bearingKickLeft + b[0]
-                    adjustedBearingRight = bearingKickRight + b[0]
+                    adjustedBearingLeft = bearingKickLeft - b[0]
+                    adjustedBearingRight = bearingKickRight - b[0]
 
                     if adjustedBearingLeft > 0 and adjustedBearingRight < 0:
                         #goal is in front of us
