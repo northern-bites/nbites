@@ -106,8 +106,13 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::VisionField&     visionInput,
                             const messages::FilteredBall&      ballInput)
 {
-    // in set, lost, and havent reset recently
-    if (lost && (framesSinceReset > 30)) {
+    framesSinceReset++;
+    Point ballGuess(ballInput.x(), ballInput.y());
+    Point ballLoc(MIDFIELD_X, MIDFIELD_Y); // in set
+    bool distBallOff = ballLoc.distanceTo(ballGuess);
+
+    // in set, lost or see ball wrong, and havent reset recently
+    if (((lost || (distBallOff > 50.f))) && (framesSinceReset > 30)) {
         std::cout << "LOST IN SET!" << std::endl;
         resetLocToSide(true);
     }
