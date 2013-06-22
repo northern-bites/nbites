@@ -3,10 +3,14 @@
 namespace man {
 namespace context {
 
-SharedBallModule::SharedBallModule()
+SharedBallModule::SharedBallModule() :
+    portals::Module(),
+    sharedBallOutput(base())
 {
     x = CENTER_FIELD_X;
     y = CENTER_FIELD_Y;
+
+    framesSinceUpdate = 0;
 }
 
 SharedBallModule::~SharedBallModule()
@@ -14,6 +18,8 @@ SharedBallModule::~SharedBallModule()
 }
 
 void SharedBallModule::run_() {
+    updatedThisFrame = false;
+
     for (int i=0; i<NUM_PLAYERS_PER_TEAM; i++) {
         worldModelIn[i].latch();
         if(i == 0)
@@ -21,6 +27,19 @@ void SharedBallModule::run_() {
         // else
         //     incorporateWorldModel(worldModelIn[i].message());
     }
+
+    if(updatedThisFrame)
+        framesSinceUpdate = 0;
+    else
+        framesSinceUpdate++;
+
+    portals::Message<messages::SharedBall> sharedBallMessage(0);
+
+    sharedBallMessage.get()->set_x(x);
+    sharedBallMessage.get()->set_y(y);
+    sharedBallMessage.get()->set_age(framesSinceUpdate);
+
+    sharedBallOutput.setMessage(sharedBallMessage);
 }
 
 void SharedBallModule::incorporateWorldModel(messages::WorldModel newModel) {
@@ -35,6 +54,7 @@ void SharedBallModule::incorporateWorldModel(messages::WorldModel newModel) {
 
         x = ALPHA*globalX + (1-ALPHA)*x;
         y = ALPHA*globalY + (1-ALPHA)*y;
+        updatedThisFrame = true;
     }
 }
 
@@ -55,6 +75,7 @@ void SharedBallModule::incorporateGoalieWorldModel(messages::WorldModel newModel
 
         x = ALPHA*globalX + (1-ALPHA)*x;
         y = ALPHA*globalY + (1-ALPHA)*y;
+        updatedThisFrame = true;
     }
 }
 

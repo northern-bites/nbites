@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "WorldModel.pb.h"
+#include "BallModel.pb.h"
 
 /**
  *
@@ -34,11 +35,15 @@ private:
 
 public:
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    portals::OutPortal<messages::SharedBall> sharedBallOutput;
 
 private:
     // Exponential filter on global x,y
     float x;
     float y;
+
+    int framesSinceUpdate;
+    bool updatedThisFrame;
 };
 
 } // namespace man
