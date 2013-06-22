@@ -302,6 +302,7 @@ class KickInformation:
                 else:
                     # huh?
                     print "Didn't choose a kick..."
+                kick.h = minimumBearing
 
                 # If we're defending near our goal box, just kick it: clearing the ball
                 # is more important than being super accurate.
