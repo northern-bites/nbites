@@ -59,30 +59,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : PenaltyStates.afterPenalty
             }
 
-        VisualGoalieStates.decideLeftSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onThisSideline,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.HIGH_PRECISION)
-            : VisualGoalieStates.walkToGoal,
-
-            Transition.CountTransition(GoalieTransitions.unsure,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.decideRightSide
-            }
-
-        VisualGoalieStates.decideRightSide.transitions = {
-            Transition.CountTransition(GoalieTransitions.onThisSideline,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.walkToGoal,
-
-            Transition.CountTransition(GoalieTransitions.unsure,
-                                       Transition.MOST_OF_THE_TIME,
-                                       Transition.OK_PRECISION)
-            : VisualGoalieStates.decideLeftSide
-            }
-
         GoalieStates.watchWithCornerChecks.transitions = {
             Transition.CountTransition(GoalieTransitions.shouldReposition,
                                        Transition.MOST_OF_THE_TIME,
@@ -99,6 +75,16 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.saveCenter,
 
+            Transition.CountTransition(GoalieTransitions.facingSideways,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.spinAtGoal,
+
+            Transition.CountTransition(GoalieTransitions.facingBackwards,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : VisualGoalieStates.spinAtGoal,
+
             # NOT diving for now... can't get back up!
             # Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
             #                            Transition.SOME_OF_THE_TIME,
@@ -114,12 +100,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.spinToFaceBall
-
-            #### MORE POSITIONING STUFF FIX FIX FIX ###
-            # Transition.CountTransition(GoalieTransitions.facingSideways,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.LOW_PRECISION)
-            # : VisualGoalieStates.spinAtGoal
             }
 
         GoalieStates.watch.transitions = {
@@ -143,12 +123,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.spinToFaceBall
-
-            #### MORE POSITIONING STUFF FIX FIX FIX ###
-            # Transition.CountTransition(GoalieTransitions.facingSideways,
-            #                            Transition.MOST_OF_THE_TIME,
-            #                            Transition.LOW_PRECISION)
-            # : VisualGoalieStates.spinAtGoal
             }
 
         GoalieStates.fixMyself.transitions = {

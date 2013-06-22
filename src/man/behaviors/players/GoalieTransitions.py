@@ -137,23 +137,24 @@ def goodRightCornerObservation(player):
 
     return False
 
-### ALSO CHECK POSTS...
-# def facingSideways(player):
-#     """
-#     If the robot is facing a post directly, it's probably turned around.
-#     """
-#     if ((player.brain.yglp.on and
-#          fabs(player.brain.yglp.bearing_deg) < 30.0 and
-#          player.brain.yglp.bearing_deg != 0.0 and
-#          player.brain.yglp.distance < 300.0) or
-#         (player.brain.ygrp.on and
-#          fabs(player.brain.ygrp.bearing_deg) < 30.0 and
-#          player.brain.ygrp.bearing_deg != 0.0 and
-#          player.brain.ygrp.distance < 300.0)):
-#         return True
-#     else:
-#         return False
+def facingSideways(player):
+    """
+    If the robot is facing a post directly, it's probably turned around.
+    """
+    if ((player.brain.yglp.on and
+         math.fabs(player.brain.yglp.bearing_deg) < 20.0 and
+         player.brain.yglp.bearing_deg != 0.0 and
+         player.brain.yglp.distance < 300.0) or
+        (player.brain.ygrp.on and
+         math.fabs(player.brain.ygrp.bearing_deg) < 20.0 and
+         player.brain.ygrp.bearing_deg != 0.0 and
+         player.brain.ygrp.distance < 300.0)):
+        return True
+    else:
+        return False
 
+def facingBackwards(player):
+    return player.brain.interface.visionField.visual_field_edge.distance_m < 110.0
 
 def shouldReposition(player):
     return (badLeftCornerObservation(player) or
@@ -216,19 +217,6 @@ def notTurnedAround(player):
     """
     return (player.brain.interface.visionField.visual_field_edge.distance_m
             > 400.0)
-
-def onThisSideline(player):
-    """
-    Looks for a T corner or far goals to determine which sideline it's
-    standing on.
-    """
-    vision = player.brain.interface.visionField
-    return (vision.visual_field_edge.distance_m < 250.0 and
-            vision.visual_field_edge.distance_m > 100.0)
-
-def unsure(player):
-    return (not onThisSideline(player) and
-            player.counter > 60)
 
 # Saving transitions....
 def shouldDiveRight(player):

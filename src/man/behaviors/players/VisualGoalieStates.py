@@ -146,20 +146,6 @@ def waitToFaceField(player):
 
     return Transition.getNextState(player, waitToFaceField)
 
-def decideLeftSide(player):
-    if player.firstFrame():
-        player.side = LEFT
-        player.brain.tracker.lookToAngle(-90)
-
-    return Transition.getNextState(player, decideLeftSide)
-
-def decideRightSide(player):
-    if player.firstFrame():
-        player.side = RIGHT
-        player.brain.tracker.lookToAngle(90)
-
-    return Transition.getNextState(player, decideRightSide)
-
 def returnToGoal(player):
     if player.firstFrame():
         if player.lastDiffState == 'didIKickIt':
