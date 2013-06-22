@@ -3,6 +3,8 @@
 #include "RoboGrams.h"
 #include "Common.h"
 
+#include "FieldConstants.h"
+
 #include <iostream>
 
 #include "WorldModel.pb.h"
@@ -16,6 +18,8 @@
 namespace man {
 namespace context {
 
+const float ALPHA = .7f; // For exponential filter
+
 class SharedBallModule : public portals::Module
 {
 public:
@@ -26,12 +30,13 @@ public:
 
 private:
     void incorporateWorldModel(messages::WorldModel newModel);
+    void incorporateGoalieWorldModel(messages::WorldModel newModel);
 
 public:
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
 
 private:
-    //Dumb filter, easier to make then KF to start
+    // Exponential filter on global x,y
     float x;
     float y;
 };
