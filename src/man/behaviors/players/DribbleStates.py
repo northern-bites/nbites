@@ -20,6 +20,7 @@ from objects import RelRobotLocation, Location
 # test time-based decision making
 
 ### DONE
+# would score query
 # rotate towards goal when dribbling
 # better dodging
 # test goalie-in-net decision making
@@ -37,10 +38,6 @@ def decideDribble(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if transitions.ballToOurLeft(player):
-            player.kick = kicks.LEFT_DRIBBLE
-        else:
-            player.kick = kicks.RIGHT_DRIBBLE
 
     if not transitions.shouldDribble(player):
         player.inKickingState = False
@@ -54,6 +51,11 @@ def executeDribble(player):
     """
     Move through the ball, so as to execute a dribble.
     """
+    if transitions.ballToOurLeft(player):
+        player.kick = kicks.LEFT_DRIBBLE
+    else:
+        player.kick = kicks.RIGHT_DRIBBLE
+
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
     player.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
@@ -138,13 +140,15 @@ def positionForDribble(player):
     """
     We should position ourselves behind the ball for easy dribbling.
     """
-    ball = player.brain.ball
-    if player.aboutToRotate:
-        backed_off = constants.ROTATE_SETUP_POSITION
+    if transitions.ballToOurLeft(player):
+        player.kick = kicks.LEFT_DRIBBLE
     else:
-        backed_off = constants.DRIBBLE_SETUP_POSITION
-    player.kickPose = RelRobotLocation(ball.rel_x + backed_off,
-                                       ball.rel_y,
+        player.kick = kicks.RIGHT_DRIBBLE
+
+    ball = player.brain.ball
+    kick_pos = player.kick.getPosition()
+    player.kickPose = RelRobotLocation(ball.rel_x + constants.SETUP_POSITION,
+                                       ball.rel_y - kick_pos[1],
                                        0)
 
     if player.firstFrame():
