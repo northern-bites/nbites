@@ -621,17 +621,21 @@ void Field::bestShot(VisualFieldObject* left,
  */
 
 int Field::horizonAt(int x) {
-    if (x < 0 || x >= IMAGE_WIDTH) {
-        if (debugHorizon) {
-            cout << "Problem in horizon " << x << endl;
+    if (thresh->usingTopCamera) {
+        if (x < 0 || x >= IMAGE_WIDTH) {
+            if (debugHorizon) {
+                cout << "Problem in horizon " << x << endl;
+            }
+            if (x < 0) {
+                return topEdge[0];
+            } else {
+                return topEdge[IMAGE_WIDTH - 1];
+            }
         }
-        if (x < 0) {
-            return topEdge[0];
-        } else {
-            return topEdge[IMAGE_WIDTH - 1];
-        }
+        return topEdge[x];
     }
-    return topEdge[x];
+    else
+        return 0;
 }
 
 /* Project a line given a start coord and a new y value - note that this is
