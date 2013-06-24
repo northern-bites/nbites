@@ -97,6 +97,7 @@ add_subdirectory( log )
 add_subdirectory( motion )
 add_subdirectory( obstacle )
 add_subdirectory( sensors )
+add_subdirectory( sharedball )
 add_subdirectory( vision )
 
 set( MAN_SRCS main.cpp
@@ -130,6 +131,7 @@ target_link_libraries(
   obstacle
   portals
   sensors
+  sharedball
   support
   vision
 )
