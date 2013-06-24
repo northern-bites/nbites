@@ -114,37 +114,37 @@ public:
 //     static const int BOTTOM_WHITE_BALANCE = -100;
 
 
-// Watson Camera parameters
+// Robocup 2013 Camera parameters
 // TOP SETTINGS
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
-    static const int TOP_BRIGHTNESS = 160;
+    static const int TOP_BRIGHTNESS = 156;
     static const int TOP_CONTRAST = 63;
-    static const int TOP_SATURATION = 119;
+    static const int TOP_SATURATION = 160;
     static const int TOP_HUE = 0;
     static const int TOP_SHARPNESS = 3;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    static const int TOP_EXPOSURE = 43;
-    static const int TOP_GAIN = 88;
-    static const int TOP_WHITE_BALANCE = 3000;
+    static const int TOP_EXPOSURE = 24;
+    static const int TOP_GAIN = 40;
+    static const int TOP_WHITE_BALANCE = 3500;
     static const bool TOP_FADE_TO_BLACK = 0;
 
     // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 140;
+    static const int BOTTOM_BRIGHTNESS = 168;
     static const int BOTTOM_CONTRAST = 59;
-    static const int BOTTOM_SATURATION = 98;
+    static const int BOTTOM_SATURATION = 131;
     static const int BOTTOM_HUE = 0;
     static const int BOTTOM_SHARPNESS = 3;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 43;
-    static const int BOTTOM_GAIN = 85;
-    static const int BOTTOM_WHITE_BALANCE = 3000;
+    static const int BOTTOM_EXPOSURE = 24;
+    static const int BOTTOM_GAIN = 40;
+    static const int BOTTOM_WHITE_BALANCE = 3500;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
 
 
