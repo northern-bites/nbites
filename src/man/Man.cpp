@@ -171,7 +171,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
     ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
-    ballTrack.localizationInput.wireTo(&localization.output);
+    ballTrack.localizationInput.wireTo(&localization.output, true);
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
