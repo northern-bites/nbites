@@ -23,28 +23,36 @@ void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
  * @return the updated ParticleSet.
  */
 void MotionSystem::update(ParticleSet& particles,
-                          const messages::RobotLocation& deltaMotionInfo,
+                          const messages::RobotLocation& odometry,
                           bool nearMid)
 {
-    if((fabs(deltaMotionInfo.x()) > 3.f) || (fabs(deltaMotionInfo.y()) > 3.f)) {
-        std::cout << "LOCALIZATION WARNING:\t Sanity check missed an unhelpful odometry frame\n"
-                  << "( Delta X , Delta Y ):\t(" << deltaMotionInfo.x() << " , " << deltaMotionInfo.y()
-                  << ")" << std::endl << std::endl;
-    }
+    // Store the last odometry and set the current one
+    lastOdometry.set_x(curOdometry.x());
+    lastOdometry.set_y(curOdometry.y());
+    lastOdometry.set_h(curOdometry.h());
+    curOdometry.set_x(odometry.x());
+    curOdometry.set_y(odometry.y());
+    curOdometry.set_h(odometry.h());
+
+    // change in the robot frame
+    float dX_R = curOdometry.x() - lastOdometry.x();
+    float dY_R = curOdometry.y() - lastOdometry.y();
+    float dH_R = curOdometry.h() - lastOdometry.h();
 
     float dX, dY, dH;
-
     ParticleIt iter;
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);
 
+        // Rotate from the robot frame to the global to add the translation
         float sinh, cosh;
-        sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
+        sincosf(curOdometry.h() - particle->getLocation().h(),
                 &sinh, &cosh);
-        dX = cosh*deltaMotionInfo.x() + sinh*deltaMotionInfo.y();
-        dY = cosh*deltaMotionInfo.y() - sinh*deltaMotionInfo.x();
-        dH = NBMath::subPIAngle(deltaMotionInfo.h());
+
+        dX = cosh*dX_R + sinh*dY_R;
+        dY = cosh*dY_R - sinh*dX_R;
+        dH = dH_R * 2.4; // just add the rotation
 
         particle->shift(dX, dY, dH);
 
@@ -86,8 +94,8 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         yU = -1.f * dY * yF;
     }
 
-    hL = -.07f;
-    hU =  .07f;
+    hL = -.04f;
+    hU =  .04f;
     // seems experimentally ineffecive
     // if ((std::fabs(dH) - .05f) < 0.1f) {
     //     hL = -.05f;

@@ -11,6 +11,7 @@
 #include "MotionModel.h"
 #include <cmath>
 
+#include "RobotLocation.pb.h"
 
 namespace man
 {
@@ -42,6 +43,9 @@ private:
     float hNoise;
 
     bool robotFallen;
+
+    messages::RobotLocation curOdometry;
+    messages::RobotLocation lastOdometry;
 };
 } // namespace localization
 } // namespace man

@@ -1,13 +1,9 @@
 #include "LocalizationModule.h"
 #include "Profiler.h"
+#include "RoboCupGameControlData.h"
 
-namespace man
-{
-namespace localization
-{
-static const float ODOMETRY_HEADING_FRICTION_FACTOR = 3.f;
-static const float ODOMETRY_X_FRICTION_FACTOR = 1.f;
-static const float ODOMETRY_Y_FRICTION_FACTOR = 1.f;
+namespace man {
+namespace localization {
 
 LocalizationModule::LocalizationModule()
     : portals::Module(),
@@ -37,51 +33,29 @@ void LocalizationModule::update()
     }
 #endif
 
-    // Calculate the deltaX,Y,H (PF takes increments from robot frame)
-    lastOdometry.set_x(curOdometry.x());
-    lastOdometry.set_y(curOdometry.y());
-    lastOdometry.set_h(curOdometry.h());
+    curOdometry.set_x(motionInput.message().x());
+    curOdometry.set_y(motionInput.message().y());
+    curOdometry.set_h(motionInput.message().h());
 
-    // Want odometry to give information relative to current robot frame
-    // IE choose to have robot frame change as the robot moves
-
-    float sinH, cosH;
-    sincosf(motionInput.message().h(), &sinH, &cosH);
-    float rotatedX =   cosH*motionInput.message().x()
-                     + sinH*motionInput.message().y();
-    float rotatedY =   cosH*motionInput.message().y()
-                     - sinH*motionInput.message().x();
-
-    curOdometry.set_x(rotatedX * ODOMETRY_X_FRICTION_FACTOR);
-    curOdometry.set_y(rotatedY * ODOMETRY_Y_FRICTION_FACTOR);
-    curOdometry.set_h(motionInput.message().h() * ODOMETRY_HEADING_FRICTION_FACTOR);
-
-    deltaOdometry.set_x(curOdometry.x() - lastOdometry.x());
-    deltaOdometry.set_y(curOdometry.y() - lastOdometry.y());
-    deltaOdometry.set_h(curOdometry.h() - lastOdometry.h());
-
-    // Ensure deltaOdometry is reasonable (initial fix lost in git?)
-    if((fabs(deltaOdometry.x()) > 3.f) || (fabs(deltaOdometry.y()) > 3.f))
-    {
-        deltaOdometry.set_x(0.f);
-        deltaOdometry.set_y(0.f);
-        deltaOdometry.set_h(0.f);
-    }
-
+#ifndef OFFLINE
+    bool inSet = (STATE_SET == gameStateInput.message().state());
     // Update the Particle Filter with the new observations/odometry
-    particleFilter->update(deltaOdometry, visionInput.message());
+
+    if (inSet)
+        particleFilter->update(curOdometry, visionInput.message(), ballInput.message());
+    else
+#endif
+        particleFilter->update(curOdometry, visionInput.message());
 
     // Update the locMessage and the swarm (if logging)
     portals::Message<messages::RobotLocation> locMessage(&particleFilter->
                                                          getCurrentEstimate());
-
 #if defined( LOG_LOCALIZATION) || defined(OFFLINE)
     portals::Message<messages::ParticleSwarm> swarmMessage(&particleFilter->
                                                            getCurrentSwarm());
     particleOutput.setMessage(swarmMessage);
 #endif
 
-//    std::cout << "x,y  " << particleFilter->getCurrentEstimate().x() << ", " << particleFilter->getCurrentEstimate().y() << std::endl;
     output.setMessage(locMessage);
 }
 
@@ -93,6 +67,8 @@ void LocalizationModule::run_()
     motionInput.latch();
     visionInput.latch();
 #ifndef OFFLINE
+    gameStateInput.latch();
+    ballInput.latch();
     resetInput.latch();
 #endif
 

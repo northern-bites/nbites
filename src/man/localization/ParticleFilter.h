@@ -46,7 +46,7 @@ static const ParticleFilterParams DEFAULT_PARAMS =
 {
     FIELD_GREEN_HEIGHT,         // Field Height
     FIELD_GREEN_WIDTH,          // Field Width
-    250,                        // Num Particles
+    300,                        // Num Particles
     0.2f,                       // Exponential Filter alpha
     0.05f,                      //                    beta
     .1f,                        // Variance in x-y odometry
@@ -71,7 +71,12 @@ public:
      *  @brief Given a new motion and vision input, update the filter
      */
     void update(const messages::RobotLocation& motionInput,
-                const messages::VisionField& visionInput);
+                const messages::VisionField&   visionInput);
+
+    // Overload to use ball info
+    void update(const messages::RobotLocation& motionInput,
+                const messages::VisionField&   visionInput,
+                const messages::FilteredBall&    ballInput);
 
     float getMagnitudeError();
 
@@ -163,6 +168,8 @@ private:
 
     bool lost;
     float errorMagnitude;
+
+    int framesSinceReset;
 
     // For use when logging particle swarm
     messages::ParticleSwarm swarm;
