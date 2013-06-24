@@ -59,38 +59,46 @@ namespace balltrack
 
     void KalmanFilter::predict(messages::RobotLocation odometry, float deltaT)
     {
-        // std::cout<<"Ball X Est\t" << x(0)
-        //          <<"\nBall Y Est\t" << x(1) << std::endl;
-        // std::cout<<"Cov X\t" << cov(0,0)
-        //          <<"\nCov Y\t" << cov(1,1) << std::endl;
+        float diffX = odometry.x() - lastOdometry.x();
+        lastOdometry.set_x(odometry.x());
+        float diffY = odometry.y() - lastOdometry.y();
+        lastOdometry.set_y(odometry.y());
+        float diffH = odometry.h() - lastOdometry.h();
+        lastOdometry.set_h(odometry.h());
+
+        float sinh, cosh;
+        sincosf(odometry.h(), &sinh, &cosh);
+
+        // change into the robot frame
+        float dX = cosh*diffX + sinh*diffY;
+        float dY = cosh*diffY - sinh*diffX;
+        float dH = diffH;// * 2.4f;
 
         //Calculate A = rotation matrix * trajectory matrix
         //First calc rotation matrix
-        float deltaH = odometry.h();
         float sinDeltaH, cosDeltaH;
-        sincosf(deltaH,&sinDeltaH, &cosDeltaH);
+        sincosf(dH,&sinDeltaH, &cosDeltaH);
 
         // Keep track of the deviation
-        float rotationDeviation = odometry.h() * params.rotationDeviation;
+        float rotationDeviation = dH * params.rotationDeviation;
         float sinRotDev, cosRotDev;
         sincosf(rotationDeviation, &sinRotDev, &cosRotDev);
 
         // Generate the rotation and rotationDeviationRotation matrices
-        // Note: our heading change is positive going clockwise, so the rotation
-        //       matrix is confusing...
-
+        // We rotate counterclockwise for positive dH
+        // So everything rotates clockwise around us
         ufmatrix4 rotation = boost::numeric::ublas::identity_matrix <float>(4);
         ufmatrix4 rotationDeviationRotation = boost::numeric::ublas::identity_matrix <float>(4);
 
         // nxm matrix is n rows, m columns
         rotation(0,0) = cosDeltaH;
-        rotation(1,0) = sinDeltaH;
-        rotation(0,1) = -sinDeltaH;
+        rotation(1,0) = -sinDeltaH;
+        rotation(0,1) = sinDeltaH;
         rotation(1,1) = cosDeltaH;
 
         rotationDeviationRotation(0,0) = cosRotDev;
-        rotationDeviationRotation(1,0) = sinRotDev;
-        rotationDeviationRotation(0,1) = -sinRotDev;
+        rotationDeviationRotation(1,0) = -sinRotDev;
+        rotationDeviationRotation(0,1) = sinRotDev;
         rotationDeviationRotation(1,1) = cosRotDev;
 
         if (stationary){
@@ -120,19 +128,20 @@ namespace balltrack
         }
 
         // Calculate the translation from odometry
+        // If we go left (positive y, everything else shifts down
         // NOTE: Using notation from Probabilistic Robotics, B = Identity
         //       so no need to compute it or calculate anything with it
-        ufvector4 translation = NBMath::vector4D(-odometry.x(), -odometry.y(), 0.f, 0.f);
+        ufvector4 translation = NBMath::vector4D(-dX, -dY, 0.f, 0.f);
         // And deviation
-        float xTransDev = odometry.x() * params.transXDeviation;
+        float xTransDev = dX * params.transXDeviation;
         xTransDev *= xTransDev;
 
-        float yTransDev = odometry.y() * params.transYDeviation;
+        float yTransDev = dY * params.transYDeviation;
         yTransDev *= yTransDev;
 
         ufvector4 translationDeviation = NBMath::vector4D(xTransDev,
-                                                  yTransDev,
-                                                  0.f, 0.f);
+                                                          yTransDev,
+                                                          0.f, 0.f);
 
         // Incorporate Friction
         // Have params.ballFriction in cm/sec^2
@@ -157,30 +166,10 @@ namespace balltrack
             }
         }
 
-
         // Calculate the expected state
         ufmatrix4 A = prod(rotation,trajectory);
-
-        // std::cout << "A = prod rotation, trajectory" << std::endl;
-        // for(int i=0; i<4; i++)
-        // {
-        //     for (int j=0; j<4; j++)
-        //     {
-        //         std::cout << A(i,j) << "\t";
-        //     }
-        //     std::cout << std::endl;
-        // }
-        // std::cout << std::endl;
-
         ufmatrix4 ATranspose = trans(A);
-
-        // std::cout << "X:\n";
-        // for (int i=0; i<4; i++)
-        //     std::cout << x(i) << "\t";
-        // std::cout << std::endl;
-
         ufvector4 p = prod(A,x);
-
         x = p + translation;
 
         // Calculate the covariance Cov = A*Cov*ATranspose
@@ -220,11 +209,6 @@ namespace balltrack
         // Housekeep
         filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
         filteredBear = NBMath::safe_atan2(x(1),x(0));
-
-        // std::cout<<"Ball X Est\t" << x(0)
-        //          <<"\nBall Y Est\t" << x(1) << std::endl;
-        // std::cout<<"Cov X\t" << cov(0,0)
-        //          <<"\nCov Y\t" << cov(1,1) << std::endl;
     }
 
     void KalmanFilter::updateWithObservation(messages::VisionBall visionBall)
@@ -254,9 +238,6 @@ namespace balltrack
         cCovCTranspose(0,0) += params.obsvRelXVariance;
         cCovCTranspose(1,1) += params.obsvRelYVariance;
 
-        // cCovCTranspose(0,0) += visionBall.rel_x_variance();
-        // cCovCTranspose(1,1) += visionBall.rel_y_variance();
-
         // gain = cov*c^t*(c*cov*c^t + var)^-1
         ufmatrix kalmanGain(2,2);
 
@@ -274,20 +255,13 @@ namespace balltrack
         measurement(0) = visionBall.distance()*cosB;
         measurement(1) = visionBall.distance()*sinB;
 
-        // std::cout << "See a ball at x:\t" << measurement(0)
-        //           <<"\nand at        y:\t" << measurement(1) << std::endl;
-
         ufvector innovation(2);
         innovation = measurement - posEstimates;
 
-        // std::cout << "Innovation\t" << innovation(0) << " , " << innovation(1) << std::endl;
-
         ufvector correction(4);
         correction = prod(kalmanGain,innovation);
-        // std::cout << "Correction\t" << correction(0) << " , " << correction(1) << std::endl;
 
         x += correction;
-
 
         //cov = cov - k*c*cov
         ufmatrix4 identity;
@@ -296,25 +270,17 @@ namespace balltrack
         modifyCov = identity - prod(kalmanGain,c);
         cov = prod(modifyCov,cov);
 
-        // uncertainty = (std::sqrt((double)cov(0,0)*cov(0,0) + cov(1,1)*cov(1,1)));
-        // std::cout << "Uncertainty:\t" << uncertainty << std::endl;
-
         weight *= 1 / (std::sqrt(cov(0,0)*cov(0,0)
                                  + cov(1,1)*cov(1,1)));
 
         // Housekeep
         filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
         filteredBear = NBMath::safe_atan2(x(1),x(0));
-
-        // std::cout<<"Ball X Est\t" << x(0)
-        //          <<"\nBall Y Est\t" << x(1) << std::endl;
-        // std::cout<<"Cov X\t" << cov(0,0)
-        //          <<"\nCov Y\t" << cov(1,1) << std::endl;
     }
 
     void KalmanFilter::initialize()
     {
-        x = NBMath::vector4D(0.0f, 0.0f, 1.0f, 0.5f);
+        x = NBMath::vector4D(10.0f, 0.0f, 0.f, 0.f);
         cov = boost::numeric::ublas::identity_matrix <float>(4);
     }
 

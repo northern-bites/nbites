@@ -52,7 +52,7 @@ void MotionSystem::update(ParticleSet& particles,
 
         dX = cosh*dX_R + sinh*dY_R;
         dY = cosh*dY_R - sinh*dX_R;
-        dH = dH_R * 2.4; // just add the rotation
+        dH = dH_R * 2.4f; // just add the rotation
 
         particle->shift(dX, dY, dH);
 
