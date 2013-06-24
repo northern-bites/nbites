@@ -15,6 +15,7 @@
 #include "RobotLocation.pb.h"
 #include "ParticleSwarm.pb.h"
 #include "GameState.pb.h"
+#include "BallModel.pb.h"
 
 /** Filter Headers **/
 #include "SensorModel.h"
@@ -43,6 +44,7 @@ public:
     portals::InPortal<messages::VisionField>   visionInput;
     portals::InPortal<messages::RobotLocation> resetInput;
     portals::InPortal<messages::GameState>     gameStateInput;
+    portals::InPortal<messages::FilteredBall>  ballInput;
 
     /** Out Portals **/
     portals::OutPortal<messages::RobotLocation> output;
@@ -66,11 +68,7 @@ protected:
 
     ParticleFilter * particleFilter;
     long long lastReset;
-
-    // Previous information
-    messages::RobotLocation lastOdometry;
     messages::RobotLocation curOdometry;
-    messages::RobotLocation deltaOdometry;
 };
 } // namespace localization
 } // namespace man

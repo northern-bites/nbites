@@ -41,7 +41,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       obstacle(),
       gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
       behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-      leds(broker)
+      leds(broker),
+      sharedBall()
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
@@ -139,6 +140,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.addModule(gamestate);
     cognitionThread.addModule(behaviors);
     cognitionThread.addModule(leds);
+    cognitionThread.addModule(sharedBall);
 
     topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
     topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
@@ -165,10 +167,16 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     localization.motionInput.wireTo(&motion.odometryOutput_, true);
     localization.resetInput.wireTo(&behaviors.resetLocOut, true);
     localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
+    localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
 
     ballTrack.visionBallInput.wireTo(&vision.vision_ball);
     ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
     ballTrack.localizationInput.wireTo(&localization.output);
+
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
+    }
 
     obstacle.armContactIn.wireTo(&arms.contactOut, true);
     obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
