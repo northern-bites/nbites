@@ -52,7 +52,7 @@ Field::Field(Vision* vis, Threshold * thr)
 	// funding. - chown
 #ifdef OFFLINE
 	debugFieldEdge = false;
-	debugDrawFieldEdge = false;
+	debugDrawFieldEdge = true;
 	debugHorizon = false;
 #endif
 }
