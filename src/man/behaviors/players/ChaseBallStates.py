@@ -149,7 +149,7 @@ def orbitBall(player):
     #     print "=====================++++++++++"
 
     #our in-house heading checker is of the opinion that we're pointed in the right direction
-    if orbitBall.desiredHeading > -5 and orbitBall.desiredHeading < 5:
+    if orbitBall.desiredHeading > -10 and orbitBall.desiredHeading < 10:
         player.stopWalking()
         print "Done orbiting, going to positionForKick"
         player.shouldOrbit = False
