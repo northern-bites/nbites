@@ -349,27 +349,32 @@ void Context::classifyT(VisualCorner & first) {
         }
     } else {
         if (face == FACING_GOAL) {
-            // This could be made more robust
-            if (first.doesItPointUp()) {
-                // check if the T is above or below the post
-                if (first.getY() > objectRightY) {
-                    if (first.doesItPointLeft()) {
-                        first.setSecondaryShape(LEFT_GOAL_T);
-                    } else {
-                        first.setSecondaryShape(RIGHT_GOAL_T);
-                    }
-                } else {
-                    if (first.doesItPointLeft()) {
-                        first.setSecondaryShape(RIGHT_GOAL_T);
-                    } else {
-                        first.setSecondaryShape(LEFT_GOAL_T);
-                    }
-                }
-            } else if (first.getX() > objectRightX) {
-                first.setSecondaryShape(LEFT_GOAL_T);
-            } else {
-                first.setSecondaryShape(RIGHT_GOAL_T);
-            }
+			// make sure we're actually close to the goal
+			if (distToObject > 350) {
+				// don't do anything for now
+			} else {
+				// This could be made more robust
+				if (first.doesItPointUp()) {
+					// check if the T is above or below the post
+					if (first.getY() > objectRightY) {
+						if (first.doesItPointLeft()) {
+							first.setSecondaryShape(LEFT_GOAL_T);
+						} else {
+							first.setSecondaryShape(RIGHT_GOAL_T);
+						}
+					} else {
+						if (first.doesItPointLeft()) {
+							first.setSecondaryShape(RIGHT_GOAL_T);
+						} else {
+							first.setSecondaryShape(LEFT_GOAL_T);
+						}
+					}
+				} else if (first.getX() > objectRightX) {
+					first.setSecondaryShape(LEFT_GOAL_T);
+				} else {
+					first.setSecondaryShape(RIGHT_GOAL_T);
+				}
+			}
         } else if (l2 * 2 > FIELD_HEIGHT) {
             first.setSecondaryShape(SIDE_T);
             face = FACING_SIDELINE;
@@ -522,7 +527,7 @@ void Context::classifyOuterL(VisualCorner & corner) {
 
     // watch out for a bad CC identify or bad T
     if (face != FACING_UNKNOWN && objectDistance > 300 &&
-        distToObject > 500) {
+        distToObject > 400) {
         // might be a side T
         if (l1 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
             l2 > GOALBOX_FUDGE * GOALBOX_DEPTH &&
@@ -972,7 +977,7 @@ void Context::classifyInnerL(VisualCorner & corner) {
     float cornerDist = corner.getDistance();
 
     // try and throw away bad CC corners - goal is far, corner is close
-    if (face != FACING_UNKNOWN && objectDistance > MIDFIELD_X &&
+    if (face != FACING_UNKNOWN && objectDistance > MIDFIELD_X - 100 &&
                                    corner.getDistance() < 250) {
         corner.setShape(CIRCLE);
         return;
