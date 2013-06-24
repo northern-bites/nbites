@@ -55,6 +55,7 @@ Vision::Vision()
     pose = boost::shared_ptr<NaoPose>(new NaoPose());
     thresh = new Threshold(this, pose);
     fieldLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
+    bottomLines = boost::shared_ptr<FieldLines>(new FieldLines(this, pose));
     // thresh->setIm(&global_8_image[0]);
 }
 
