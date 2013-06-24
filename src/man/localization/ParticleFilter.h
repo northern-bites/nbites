@@ -36,9 +36,8 @@ namespace man
 namespace localization
 {
 
-const float HELP_THRESHOLD  = 70.f;
-const float LOST_THRESHOLD  = 45.f;
-const float FOUND_THRESHOLD = 37.f;
+const float LOST_THRESHOLD  = 10.f;
+//const float FOUND_THRESHOLD = 5.f;
 const float ALPHA = .05f; // Impact for ~76 frames
 
 // Define the default parameters for the Particle Filter

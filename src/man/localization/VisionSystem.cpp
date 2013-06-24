@@ -1,9 +1,7 @@
 #include "VisionSystem.h"
 
-namespace man
-{
-namespace localization
-{
+namespace man {
+namespace localization {
 
 VisionSystem::VisionSystem() {
     lineSystem = new LineSystem;
@@ -36,6 +34,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
         float curParticleError = 0;
         int numObsv = 0;
+
         for (int i=0; i<obsv.visual_corner_size(); i++)
         {
             if((obsv.visual_corner(i).visual_detection().distance() > 0.f) &&
@@ -54,13 +53,14 @@ bool VisionSystem::update(ParticleSet& particles,
         for (int i=0; i<obsv.visual_line_size(); i++) {
             if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
                 Line obsvLine = prepareVisualLine(particle->getLocation(),
-                                                  obsv.visual_line(i));
+                                                  obsv.visual_line(i),
+                                                  true);
 
                 // Limit by line length (be safe about center circle mistake lines)
                 if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
                     madeObsv = true;
                     float newError = lineSystem->scoreObservation(obsvLine);
-                    //std::cout << "Line Error:\t" << newError << std::endl;
+//                    std::cout << "Line Error:\t" << newError << std::endl;
                     curParticleError += newError;
                     numObsv++;
                 }
@@ -73,10 +73,10 @@ bool VisionSystem::update(ParticleSet& particles,
                                                   obsv.bottom_line(i));
 
                 // Limit by line length (be safe about center circle mistake lines)
-                if ((obsvLine.length() > 40.f) && (obsvLine.length() < 500.f)) {
+                if ((obsvLine.length() > 40.f) && (obsvLine.length() < 100.f)) {
                     madeObsv = true;
                     float newError = lineSystem->scoreObservation(obsvLine);
-                    //std::cout << "Line Error:\t" << newError << std::endl;
+//                    std::cout << "Line Error:\t" << newError << std::endl;
                     curParticleError += newError;
                     numObsv++;
                 }
@@ -216,7 +216,8 @@ bool VisionSystem::update(ParticleSet& particles,
         for (int i=0; i<obsv.visual_line_size(); i++) {
             if((obsv.visual_line(i).start_dist() < 300.f) || (obsv.visual_line(i).end_dist() < 300.f)) {
                 Line obsvLine = prepareVisualLine(particle->getLocation(),
-                                                  obsv.visual_line(i));
+                                                  obsv.visual_line(i),
+                                                  true);
 
                 // Limit by line length (be safe about center circle mistake lines)
                 if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
@@ -228,6 +229,23 @@ bool VisionSystem::update(ParticleSet& particles,
                 }
             }
         }
+
+        for (int i=0; i<obsv.bottom_line_size(); i++) {
+            if((obsv.bottom_line(i).start_dist() < 300.f) || (obsv.bottom_line(i).end_dist() < 300.f)) {
+                Line obsvLine = prepareVisualLine(particle->getLocation(),
+                                                  obsv.bottom_line(i));
+
+                // Limit by line length (be safe about center circle mistake lines)
+                if ((obsvLine.length() > 40.f) && (obsvLine.length() < 100.f)) {
+                    madeObsv = true;
+                    float newError = lineSystem->scoreObservation(obsvLine);
+//                    std::cout << "Line Error:\t" << newError << std::endl;
+                    curParticleError += newError;
+                    numObsv++;
+                }
+            }
+        }
+
 
         if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
             && (obsv.goal_post_l().visual_detection().distance() > 0.f)
@@ -497,8 +515,8 @@ float VisionSystem::scoreFromVisDetect(const Particle& particle,
     }
     //std::cout <<"Scored a particle\n";
 //    std::cout << "err " << TO_DEG*bearErrOfBest << std::endl;
-//    return TO_DEG*bearErrOfBest;
-    return bestScore;
+    return TO_DEG*bearErrOfBest;
+//    return bestScore;
 }
 
 /**
