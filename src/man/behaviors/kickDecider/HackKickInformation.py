@@ -703,8 +703,8 @@ class KickInformation:
                     return self.chooseShortFrontKick()
 
         if self.kickWithLeftFoot():
-            return kicks.LEFT_STRAIGHT_KICK
-        return kicks.RIGHT_STRAIGHT_KICK
+            return kicks.LEFT_SHORT_STRAIGHT_KICK
+        return kicks.RIGHT_SHORT_STRAIGHT_KICK
 
     def chooseBackKick(self):
         """
