@@ -1,9 +1,12 @@
 #include "MotionSystem.h"
 
-namespace man
-{
-namespace localization
-{
+namespace man {
+namespace localization {
+
+static const float FRICTION_FACTOR_X = 1.1f;
+static const float FRICTION_FACTOR_Y = 1.f;
+static const float FRICTION_FACTOR_H = 2.4f;
+
 MotionSystem::MotionSystem(float xAndYNoise_, float hNoise_)
 {
     xAndYNoise = xAndYNoise_;
@@ -50,9 +53,9 @@ void MotionSystem::update(ParticleSet& particles,
         sincosf(curOdometry.h() - particle->getLocation().h(),
                 &sinh, &cosh);
 
-        dX = cosh*dX_R + sinh*dY_R;
-        dY = cosh*dY_R - sinh*dX_R;
-        dH = dH_R * 2.4; // just add the rotation
+        dX = (cosh*dX_R + sinh*dY_R) * FRICTION_FACTOR_X;
+        dY = (cosh*dY_R - sinh*dX_R) * FRICTION_FACTOR_Y;
+        dH = dH_R                    * FRICTION_FACTOR_H; // just add the rotation
 
         particle->shift(dX, dY, dH);
 
@@ -62,15 +65,16 @@ void MotionSystem::update(ParticleSet& particles,
 }
 
 void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH) {
+    // How x,y,h factors when deciding ranges
     float xF = 5.f;
     float yF = 5.f;
-    float hF = 20.f;
+    float hF = 5.f;
 
     float xL, xU, yL, yU, hL, hU;
 
-    if ((std::fabs(dX) - .1f) < 0.1f) {
-        xL = -.1f;
-        xU =  .1f;
+    if ((std::fabs(dX * xF) - .2f) < 0.001f) {
+        xL = -.2f;
+        xU =  .2f;
     }
     else if (dX >0) {
         xL = -1.f * dX * xF;
@@ -81,9 +85,9 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         xU = -1.f * dX * xF;
     }
 
-    if ((std::fabs(dY) - .1f) < 0.1f) {
-        yL = -.1f;
-        yU =  .1f;
+    if ((std::fabs(dY * yF) - .2f) < 0.001f) {
+        yL = -.2f;
+        yU =  .2f;
     }
     else if (dY >0) {
         yL = -1.f * dY * yF;
@@ -94,21 +98,18 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         yU = -1.f * dY * yF;
     }
 
-    hL = -.04f;
-    hU =  .04f;
-    // seems experimentally ineffecive
-    // if ((std::fabs(dH) - .05f) < 0.1f) {
-    //     hL = -.05f;
-    //     hU =  .05f;
-    // }
-    // else if (dH >0) {
-    //     hL = -1.f * dH * hF;
-    //     hU = dH * hF;
-    // }
-    // else { //dH <0
-    //     hL = dH * hF;
-    //     hU = -1.f * dH * hF;
-    // }
+    if ((std::fabs(dH * hF) - .025f) < 0.001f) {
+        hL = -.025f;
+        hU =  .025f;
+    }
+    else if (dH >0) {
+        hL = -1.f * dH * hF;
+        hU = dH * hF;
+    }
+    else { //dH <0
+        hL = dH * hF;
+        hU = -1.f * dH * hF;
+    }
 
     boost::uniform_real<float> xRange(xL, xU);
     boost::uniform_real<float> yRange(yL, yU);
