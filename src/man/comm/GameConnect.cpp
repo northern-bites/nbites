@@ -22,7 +22,8 @@ namespace man {
 namespace comm {
 
 GameConnect::GameConnect(CommTimer* t, NetworkMonitor* m, int team, int player)
-    : _timer(t), _monitor(m), _myTeamNumber(team)
+    : _timer(t), _monitor(m), _myTeamNumber(team),
+      _haveRemoteGC(false), _gcTimestamp(0)
 {
     _socket = new UDPSocket();
     setUpSocket();
@@ -60,12 +61,16 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
         result = _socket->receiveFrom(&packet[0], sizeof(packet),
                                       &from, &addrlen);
 
+        if (_timer->timestamp() - _gcTimestamp > TEAMMATE_DEAD_THRESHOLD)
+            _haveRemoteGC = false;
+
         if (result <= 0)
             break;
 
         if (!verify(&packet[0]))
             continue;  // Bad Packet.
         _haveRemoteGC = true;
+        _gcTimestamp = _timer->timestamp();
 
         memcpy(&control, &packet[0], sizeof(RoboCupGameControlData));
         fillMessage(gameMessage.get(), control);

@@ -38,10 +38,10 @@ def goToPosition(nav):
     if goToPosition.pb:
         # Calc dist to dest
         dist = helper.getDistToDest(nav.brain.loc, goToPosition.dest)
-        if goToPosition.fast and dist < 150:
+        if goToPosition.fast and dist < 140:
             goToPosition.fast = False
             goToPosition.dest = nav.brain.play.getPosition()
-        elif not goToPosition.fast and dist > 170:
+        elif not goToPosition.fast and dist > 160:
             goToPosition.fast = True
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
