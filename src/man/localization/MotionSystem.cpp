@@ -23,28 +23,36 @@ void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
  * @return the updated ParticleSet.
  */
 void MotionSystem::update(ParticleSet& particles,
-                          const messages::RobotLocation& deltaMotionInfo,
+                          const messages::RobotLocation& odometry,
                           bool nearMid)
 {
-    if((fabs(deltaMotionInfo.x()) > 3.f) || (fabs(deltaMotionInfo.y()) > 3.f)) {
-        std::cout << "LOCALIZATION WARNING:\t Sanity check missed an unhelpful odometry frame\n"
-                  << "( Delta X , Delta Y ):\t(" << deltaMotionInfo.x() << " , " << deltaMotionInfo.y()
-                  << ")" << std::endl << std::endl;
-    }
+    // Store the last odometry and set the current one
+    lastOdometry.set_x(curOdometry.x());
+    lastOdometry.set_y(curOdometry.y());
+    lastOdometry.set_h(curOdometry.h());
+    curOdometry.set_x(odometry.x());
+    curOdometry.set_y(odometry.y());
+    curOdometry.set_h(odometry.h());
+
+    // change in the robot frame
+    float dX_R = curOdometry.x() - lastOdometry.x();
+    float dY_R = curOdometry.y() - lastOdometry.y();
+    float dH_R = curOdometry.h() - lastOdometry.h();
 
     float dX, dY, dH;
-
     ParticleIt iter;
     for(iter = particles.begin(); iter != particles.end(); iter++)
     {
         Particle* particle = &(*iter);
 
+        // Rotate from the robot frame to the global to add the translation
         float sinh, cosh;
-        sincosf(deltaMotionInfo.h() - particle->getLocation().h(),
+        sincosf(curOdometry.h() - particle->getLocation().h(),
                 &sinh, &cosh);
-        dX = cosh*deltaMotionInfo.x() + sinh*deltaMotionInfo.y();
-        dY = cosh*deltaMotionInfo.y() - sinh*deltaMotionInfo.x();
-        dH = NBMath::subPIAngle(deltaMotionInfo.h());
+
+        dX = cosh*dX_R + sinh*dY_R;
+        dY = cosh*dY_R - sinh*dX_R;
+        dH = dH_R * 2.4; // just add the rotation
 
         particle->shift(dX, dY, dH);
 
@@ -56,48 +64,51 @@ void MotionSystem::update(ParticleSet& particles,
 void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH) {
     float xF = 5.f;
     float yF = 5.f;
-    float hF = 4.f;
+    float hF = 20.f;
 
     float xL, xU, yL, yU, hL, hU;
 
-    if (dX >0) {
+    if ((std::fabs(dX) - .1f) < 0.1f) {
+        xL = -.1f;
+        xU =  .1f;
+    }
+    else if (dX >0) {
         xL = -1.f * dX * xF;
         xU = dX * xF;
     }
-    else if (dX <0) {
+    else {//dX <0
         xL = dX * xF;
         xU = -1.f * dX * xF;
     }
-    else {
-        xL = -.1f;
-        xU = .1f;
-    }
 
-    if (dY >0) {
+    if ((std::fabs(dY) - .1f) < 0.1f) {
+        yL = -.1f;
+        yU =  .1f;
+    }
+    else if (dY >0) {
         yL = -1.f * dY * yF;
         yU = dY * yF;
     }
-    else if (dY <0) {
+    else { //dY <0
         yL = dY * yF;
         yU = -1.f * dY * yF;
     }
-    else {
-        yL = -.1f;
-        yU = .1f;
-    }
 
-    if (dH >0) {
-        hL = -1.f * dH * hF;
-        hU = dH * hF;
-    }
-    else if (dH <0) {
-        hL = dH * hF;
-        hU = -1.f * dH * hF;
-    }
-    else {
-        hL = -.03f;
-        hU =  .03f;
-    }
+    hL = -.04f;
+    hU =  .04f;
+    // seems experimentally ineffecive
+    // if ((std::fabs(dH) - .05f) < 0.1f) {
+    //     hL = -.05f;
+    //     hU =  .05f;
+    // }
+    // else if (dH >0) {
+    //     hL = -1.f * dH * hF;
+    //     hU = dH * hF;
+    // }
+    // else { //dH <0
+    //     hL = dH * hF;
+    //     hU = -1.f * dH * hF;
+    // }
 
     boost::uniform_real<float> xRange(xL, xU);
     boost::uniform_real<float> yRange(yL, yU);
@@ -108,7 +119,6 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
     boost::variate_generator<boost::mt19937&, boost::uniform_real<float> > hShift(rng, hRange);
 
     particle->shift(xShift(), yShift(), hShift());
-
 }
 
 void MotionSystem::randomlyShiftParticle(Particle* particle, bool nearMid)

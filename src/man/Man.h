@@ -21,6 +21,7 @@
 #include "motion/MotionModule.h"
 #include "gamestate/GameStateModule.h"
 #include "localization/LocalizationModule.h"
+#include "sharedball/SharedBall.h"
 #include "arms/ArmContactModule.h"
 #include "obstacle/ObstacleModule.h"
 
@@ -65,6 +66,7 @@ private:
     gamestate::GameStateModule gamestate;
     behaviors::BehaviorsModule behaviors;
     led::LedEnactorModule leds;
+    context::SharedBallModule sharedBall;
 };
 
 }

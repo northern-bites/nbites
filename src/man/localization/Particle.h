@@ -55,7 +55,7 @@ public:
         {
             location.set_x(location.x() + shiftAmount.x());
             location.set_y(location.y() + shiftAmount.y());
-            location.set_h(location.h() + shiftAmount.h());
+            location.set_h(NBMath::subPIAngle(location.h() + shiftAmount.h()));
         }
 
     void shift(float shiftX, float shiftY, float shiftH)
