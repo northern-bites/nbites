@@ -160,6 +160,37 @@ void Robots::robot(Cross* cross)
     // called a piece of a robot
 	int viable = 0;
     for (int i = 0; i < blobs->number(); i++) {
+		// see if we can tighten the blob up
+		int x = blobs->get(i).getLeft();
+		int y = blobs->get(i).getTop();
+		int w = blobs->get(i).width();
+		int h = blobs->get(i).height();
+		for (int j = y; j < y + h && j < IMAGE_HEIGHT; j++) {
+			int count = 0;
+			for (int k = x; k < x + w && k < IMAGE_WIDTH; k++) {
+				if (Utility::colorsEqual(thresh->getThresholded(j, k), color)) {
+					count++;
+					if (count > w / 3) {
+						blobs->setTop(i, j);
+						j = 1000;
+						k = 1000;
+					}
+				}
+			}
+		}
+		for (int j = y + h; j > y  && j > 0; j--) {
+			int count = 0;
+			for (int k = x; k < x + w && k < IMAGE_WIDTH; k++) {
+				if (Utility::colorsEqual(thresh->getThresholded(j, k), color)) {
+					count++;
+					if (count > w / 3) {
+						blobs->setBottom(i, j);
+						j = -1;
+						k = 1000;
+					}
+				}
+			}
+		}
         if (!sanityChecks(blobs->get(i), cross)) {
             if (blobs->get(i).getRight() > 0) {
                 if (debugRobots) {
@@ -173,7 +204,7 @@ void Robots::robot(Cross* cross)
             blobs->init(i);
         } else {
 			// improve the bottom
-			int whites = 0;
+			/*int whites = 0;
 			int left = blobs->get(i).getLeft();
 			for (int j = blobs->get(i).getBottom(); j < IMAGE_HEIGHT; j++) {
 				whites = 0;
@@ -192,7 +223,7 @@ void Robots::robot(Cross* cross)
 						}
 					}
 				}
-			}
+				}*/
 			// one last sanity check - make sure the "robot" isn't off the field
 			estimate pose_est = vision->pose->pixEstimate(blobs->get(i).getLeft(),
 												  blobs->get(i).getBottom(),
@@ -499,8 +530,29 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
         //}
         // blobs must be big enough
         if (height < blobHeightMin || width < blobWidthMin) {
+			if (debugRobots) {
+				cout << "RObot is too small " << height << " " << width << endl;
+			}
             return false;
         }
+		// blob must be reasonably of the right color
+		int x = candidate.getLeft();
+		int y = candidate.getTop();
+		int count = 0;
+		for ( ; x < candidate.getRight() && x < IMAGE_WIDTH; x++) {
+			for (y = candidate.getTop(); y < candidate.getBottom() && y < IMAGE_HEIGHT;
+				 y++) {
+				if (Utility::colorsEqual(thresh->getThresholded(y, x), color)) {
+					count++;
+				}
+			}
+		}
+		if (count < width * height / 3) {
+			if (debugRobots) {
+				cout << "Not enough of the color " << endl;
+			}
+			return false;
+		}
         // there ought to be some white below the uniform
         if (bottom < IMAGE_HEIGHT - 10 &&
 			!cross->checkForRobotBlobs(candidate)) {
