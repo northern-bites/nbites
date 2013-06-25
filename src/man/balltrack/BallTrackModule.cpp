@@ -33,33 +33,15 @@ void BallTrackModule::run_()
     odometryInput.latch();
     localizationInput.latch();
 
-
-    // NOTE: Kalman Filter wants to get deltaX, deltaY, etc...
-    lastOdometry.set_x(curOdometry.x());
-    lastOdometry.set_y(curOdometry.y());
-    lastOdometry.set_h(curOdometry.h());
-
     curOdometry.set_x(odometryInput.message().x());
     curOdometry.set_y(odometryInput.message().y());
     curOdometry.set_h(odometryInput.message().h());
-
-    deltaOdometry.set_x(curOdometry.x() - lastOdometry.x());
-    deltaOdometry.set_y(curOdometry.y() - lastOdometry.y());
-    deltaOdometry.set_h(curOdometry.h() - lastOdometry.h());
-
-    // Ensure deltaOdometry is reasonable (initial fix lost in git?)
-    if(std::abs(deltaOdometry.x()) > 1.f || std::abs(deltaOdometry.y()) > 1.f)
-    {
-        deltaOdometry.set_x(0.f);
-        deltaOdometry.set_y(0.f);
-        deltaOdometry.set_h(0.f);
-    }
 
     // Update the Ball filter
     // NOTE: Should be tested but having the same observation twice will be damaging
     //       should try and avoid a const cast, but may need same hack as motion...
     filters->update(visionBallInput.message(),
-                    deltaOdometry);
+                    curOdometry);
 
     // Fill the ballMessage with the filters representation
     portals::Message<messages::FilteredBall> ballMessage(0);
@@ -103,6 +85,11 @@ void BallTrackModule::run_()
     ballMessage.get()->set_rel_y_dest(filters->getRelYDest());
     ballMessage.get()->set_rel_y_intersect_dest(filters->getRelYIntersectDest());
     ballMessage.get()->set_speed(filters->getSpeed());
+
+    ballMessage.get()->set_stationary_x(filters->getStationaryRelX());
+    ballMessage.get()->set_stationary_y(filters->getStationaryRelY());
+    ballMessage.get()->set_moving_x(filters->getMovingRelX());
+    ballMessage.get()->set_moving_y(filters->getMovingRelY());
 
 #ifdef DEBUG_BALLTRACK
     // Print the observation given, each filter after update, and which filter chosen

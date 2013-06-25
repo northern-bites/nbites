@@ -79,6 +79,12 @@ public:
     float getRelYDest(){return filters.at((unsigned)bestFilter)->getRelYDest();};
     float getRelYIntersectDest(){return filters.at((unsigned)bestFilter)->getRelYIntersectDest();};
 
+    float getStationaryRelX(){return filters.at((unsigned) 0)->getRelXPosEst();};
+    float getStationaryRelY(){return filters.at((unsigned) 0)->getRelYPosEst();};
+    float getMovingRelX(){return filters.at((unsigned) 1)->getRelXPosEst();};
+    float getMovingRelY(){return filters.at((unsigned) 1)->getRelYPosEst();};
+
+
     bool isStationary(){return stationary;};
 
     void printBothFilters();

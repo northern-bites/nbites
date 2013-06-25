@@ -162,7 +162,6 @@ private:
     float weight;
     float uncertainty;
 
-    messages::RobotLocation curOdometry;
     messages::RobotLocation lastOdometry;
 };
 

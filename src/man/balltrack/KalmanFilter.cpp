@@ -74,6 +74,12 @@ namespace balltrack
         float dY = cosh*diffY - sinh*diffX;
         float dH = diffH;// * 2.4f;
 
+	if ((dX > 3.f) || (dY > 3.f)) {
+	  dX = 0.f;
+	  dY = 0.f;
+	  dH = 0.f;
+	}
+
         //Calculate A = rotation matrix * trajectory matrix
         //First calc rotation matrix
         float sinDeltaH, cosDeltaH;
