@@ -96,6 +96,12 @@ const bool Location::inBottomOfField()
     return (BOTTOM_LIMIT > y);
 }
 
+const bool Location::inCenterCenter()
+{
+    return (std::fabs(x - MIDFIELD_X) < CENTER_LIMIT &&
+            std::fabs(y - MIDFIELD_Y) < CENTER_LIMIT);
+}
+
 bool Location::hasattr(boost::python::object obj,
                        std::string const &attrName) {
     return PyObject_HasAttrString(obj.ptr(), attrName.c_str());

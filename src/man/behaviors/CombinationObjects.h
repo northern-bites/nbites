@@ -80,6 +80,7 @@ namespace behaviors {
         virtual const bool inOppGoalBox();
         virtual const bool inMyGoalBox();
         virtual const bool inCenterOfField();
+        virtual const bool inCenterCenter();
         virtual const bool inTopOfField();
         virtual const bool inBottomOfField();
         virtual RelLocation getRelLocationOf(const Location& other) const;
