@@ -183,16 +183,16 @@ def average(locations):
                             h/len(locations))
 
 def correct(destination):
-    destination.relX = destination.relX / constants.OVERZEALOUS_ODO
-    destination.relY = destination.relY / constants.OVERZEALOUS_ODO
-    destination.relH = destination.relH / constants.OVERZEALOUS_ODO
-
     if math.fabs(destination.relX) < constants.STOP_NAV_THRESH:
         destination.relX = 0.0
     if math.fabs(destination.relY) < constants.STOP_NAV_THRESH:
         destination.relY = 0.0
     if math.fabs(destination.relH) < constants.STOP_NAV_THRESH:
         destination.relH = 0.0
+
+    destination.relX = destination.relX / constants.OVERZEALOUS_ODO
+    destination.relY = destination.relY / constants.OVERZEALOUS_ODO
+    destination.relH = destination.relH / constants.OVERZEALOUS_ODO
 
     return destination
 
@@ -292,7 +292,6 @@ def saveLeft(player):
     if player.counter > 80:
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_ROLL_OUT_LEFT)
-            player.brain.fallController.enabled = True
             return player.goLater('rollOut')
         else:
             return player.goLater('watch')

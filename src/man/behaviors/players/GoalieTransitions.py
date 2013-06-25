@@ -106,6 +106,9 @@ def badRightCornerObservation(player):
     return True
 
 def goodLeftCornerObservation(player):
+    if player.counter < 60:
+        return False
+
     corner = getLeftGoalboxCorner(player)
     if not corner:
         return False
@@ -115,13 +118,16 @@ def goodLeftCornerObservation(player):
     dBear = math.fabs(constants.EXPECTED_LEFT_CORNER_BEARING_FROM_CENTER -
                       corner.visual_detection.bearing_deg)
 
-    if (dDist < constants.CORNER_DISTANCE_THRESH and
-        dBear < constants.CORNER_BEARING_THRESH):
+    if (dDist < constants.CORNER_DISTANCE_THRESH + 10.0 and
+        dBear < constants.CORNER_BEARING_THRESH + 10.0):
         return True
 
     return False
 
 def goodRightCornerObservation(player):
+    if player.counter < 60:
+        return False
+
     corner = getRightGoalboxCorner(player)
     if not corner:
         return False
@@ -131,8 +137,8 @@ def goodRightCornerObservation(player):
     dBear = math.fabs(constants.EXPECTED_RIGHT_CORNER_BEARING_FROM_CENTER -
                       corner.visual_detection.bearing_deg)
 
-    if (dDist < constants.CORNER_DISTANCE_THRESH and
-        dBear < constants.CORNER_BEARING_THRESH):
+    if (dDist < constants.CORNER_DISTANCE_THRESH + 10.0 and
+        dBear < constants.CORNER_BEARING_THRESH + 10.0):
         return True
 
     return False
@@ -221,19 +227,27 @@ def notTurnedAround(player):
 # Saving transitions....
 def shouldDiveRight(player):
     return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 30.0 and
+            player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
             player.brain.ball.rel_y_intersect_dest < -5.0 and
-            player.brain.ball.vis.on)
+            player.brain.ball.vis.frames_on > 10)
 
 def shouldDiveLeft(player):
     return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 30.0 and
+            player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
             player.brain.ball.rel_y_intersect_dest > 5.0 and
-            player.brain.ball.vis.on)
+            player.brain.ball.vis.frames_on > 10)
 
 def shouldSquat(player):
+    corner = getLeftGoalboxCorner(player)
+    if corner:
+        print "Left distance: " + str(corner.visual_detection.distance)
+    else:
+        corner = getRightGoalboxCorner(player)
+        if corner:
+            print "Right distance: " + str(corner.visual_detection.distance)
+
     return (player.brain.ball.vel_x < 0.0 and
             player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
@@ -262,21 +276,29 @@ def shouldClearBall(player):
 
     # if definitely within goal box
     if (player.brain.ball.vis.distance < 80.0):
+        walkedTooFar.xThresh = 130.0
+        walkedTooFar.yThresh = 130.0
         return True
 
     # farther out but being aggressive
     if (player.brain.ball.vis.distance < 120 and
         player.aggressive):
+        walkedTooFar.xThresh = 170.0
+        walkedTooFar.yThresh = 170.0
         return True
 
     # if to sides of box
     if (player.brain.ball.vis.distance < 120.0 and
         math.fabs(player.brain.ball.vis.bearing_deg) > 40.0):
+        walkedTooFar.xThresh = 130.0
+        walkedTooFar.yThresh = 170.0
         return True
 
     # to goalie's sides, being aggressive
     if (math.fabs(player.brain.ball.vis.bearing_deg) > 50.0 and
         player.aggressive):
+        walkedTooFar.xThresh = 170.0
+        walkedTooFar.yThresh = 300.0
         return True
 
     return False
@@ -286,7 +308,7 @@ def ballLostStopChasing(player):
     If the robot does not see the ball while chasing, it is lost. Delay
     in case our shoulder pads are just hiding it.
     """
-    if not player.brain.ball.vis.on and player.counter > 150:
+    if player.brain.ball.vis.frames_off > 100:
         return True
 
 def ballMovedStopChasing(player):
@@ -294,8 +316,8 @@ def ballMovedStopChasing(player):
     If the robot has been chasing for a while and it is far away, it should
     stop chasing.
     """
-    return (player.brain.ball.vis.distance > 100.0 and
-            player.counter > 200.0)
+    return (player.brain.ball.distance > 100.0 and
+            player.counter > 100.0)
 
 def walkedTooFar(player):
     # for the odometry reset delay
@@ -305,8 +327,8 @@ def walkedTooFar(player):
     if player.aggressive:
         return False
 
-    return (player.brain.interface.odometry.x > 90.0 or
-            math.fabs(player.brain.interface.odometry.y) > 140.0)
+    return (player.brain.interface.odometry.x > walkedTooFar.xThresh or
+            math.fabs(player.brain.interface.odometry.y) > walkedTooFar.yThresh)
 
 def reachedMyDestination(player):
     """
