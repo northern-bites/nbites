@@ -298,8 +298,8 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 			painter.setPen(QColor(0,0,255,200));
 		if (ygrp.visual_detection().on() && ygrp.visual_detection().intopcam()) {
 			QPoint r_points[4] = {
-				QPoint(ygrp.left_top().x(), ygrp.left_top().y()),
-				QPoint(ygrp.right_top().x(), ygrp.right_top().y()),
+				QPoint(ygrp.left_top().x(), std::max(1.0f, ygrp.left_top().y())),
+				QPoint(ygrp.right_top().x(), std::max(1.0f, ygrp.right_top().y())),
 				QPoint(ygrp.right_bot().x(), ygrp.right_bot().y()),
 				QPoint(ygrp.left_bot().x(), ygrp.left_bot().y())
 			};
@@ -308,8 +308,8 @@ QImage VisionDisplayModule::makeOverlay(Camera::Type which)
 		if (yglp.visual_detection().on() && yglp.visual_detection().intopcam()) {
 			painter.setPen(QColor(255,0,0,200));
 			QPoint l_points[4] = {
-				QPoint(yglp.left_top().x(), yglp.left_top().y()),
-				QPoint(yglp.right_top().x(), yglp.right_top().y()),
+				QPoint(yglp.left_top().x(), std::max(1.0f, yglp.left_top().y())),
+				QPoint(yglp.right_top().x(), std::max(1.0f, yglp.right_top().y())),
 				QPoint(yglp.right_bot().x(), yglp.right_bot().y()),
 				QPoint(yglp.left_bot().x(), yglp.left_bot().y())
 			};
