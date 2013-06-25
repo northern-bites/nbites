@@ -818,10 +818,9 @@ void FieldLines::createLines(list <linePoint> &linePoints)
 			int horizon2 = vision->thresh->field->horizonAt(bottomPt.x);
 			float dist2 = vision->thresh->realDistance(bottomPt.x, bottomPt.y,
 									  bottomPt.x, horizon2);
-			if (dist < 50 || dist2 < 50) {
-				//cout << "Got it" << endl;
+			if (horizon > 0 && horizon2 > 0 && (dist < 50 || dist2 < 50)) {
+				//cout << "Got a scary line. Will ignore it." << endl;
 			} else {
-
 				lines.push_back(aLine);
 			}
 
@@ -2074,7 +2073,7 @@ list< VisualCorner > FieldLines::intersectLines()
 			int horizon = vision->thresh->field->horizonAt(intersection.x);
 			float dist = vision->thresh->context->realDistance(intersection.x, intersection.y,
                               intersection.x, horizon);
-			if (dist < 50) {
+			if (dist < 50 && horizon > 0) {
 				continue;
 			}
 
