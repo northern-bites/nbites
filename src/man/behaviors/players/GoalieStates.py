@@ -212,6 +212,13 @@ def moveForward(player):
 
     return Transition.getNextState(player, moveForward)
 
+def moveBackwards(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.brain.nav.walkTo(RelRobotLocation(-30, 0, 0))
+
+    return Transition.getNextState(player, moveBackwards)
+
 def kickBall(player):
     """
     Kick the ball

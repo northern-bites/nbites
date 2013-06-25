@@ -14,6 +14,8 @@ from objects import RelRobotLocation
 
 def getLeftGoalboxCorner(player):
     vision = player.brain.interface.visionField
+
+    # check top corners first
     for i in range(0, vision.visual_corner_size()):
         for j in range(0, vision.visual_corner(i).poss_id_size()):
             if (vision.visual_corner(i).poss_id(j) ==
@@ -21,16 +23,36 @@ def getLeftGoalboxCorner(player):
                 if (vision.visual_corner(i).orientation < 0):
                     return vision.visual_corner(i)
 
+    # also look in bottom camera
+    for i in range(0, vision.bottom_corner_size()):
+        for j in range(0, vision.bottom_corner(i).poss_id_size()):
+            if (vision.bottom_corner(i).poss_id(j) ==
+                vision.bottom_corner(i).corner_id.YELLOW_GOAL_LEFT_L):
+                # HACK
+                if (vision.bottom_corner(i).orientation > 0):
+                    return vision.bottom_corner(i)
+
     return None
 
 def getRightGoalboxCorner(player):
     vision = player.brain.interface.visionField
+
+    # check top corners first
     for i in range(0, vision.visual_corner_size()):
         for j in range(0, vision.visual_corner(i).poss_id_size()):
             if (vision.visual_corner(i).poss_id(j) ==
                 vision.visual_corner(i).corner_id.YELLOW_GOAL_RIGHT_L):
                 if (vision.visual_corner(i).orientation > 0):
                     return vision.visual_corner(i)
+
+    # also look in bottom camera
+    for i in range(0, vision.bottom_corner_size()):
+        for j in range(0, vision.bottom_corner(i).poss_id_size()):
+            if (vision.bottom_corner(i).poss_id(j) ==
+                vision.bottom_corner(i).corner_id.YELLOW_GOAL_RIGHT_L):
+                # HACK
+                if (vision.bottom_corner(i).orientation < 0):
+                    return vision.bottom_corner(i)
 
     return None
 
@@ -144,39 +166,60 @@ def goodRightCornerObservation(player):
     return False
 
 def shouldMoveForward(player):
-    print "*** Should I move forward? ***"
     vision = player.brain.interface.visionField
 
     foundGoalBoxTop = 0
+    orienataion = 0
 
     for i in range(0, vision.visual_line_size()):
         if vision.visual_line(i).visual_detection.distance < 200.0:
             foundGoalBoxTop = vision.visual_line(i).visual_detection.distance
-            print "Got the goal box top at: " + str(foundGoalBoxTop)
+            orientation = vision.visual_line(i).angle
             break
 
     if not foundGoalBoxTop:
-        print "Didn't find the goal box top. Done."
         return False
 
-    print "There are " + str(vision.bottom_line_size()) + " bottom lines to look at"
     for i in range(0, vision.bottom_line_size()):
-        print "Got a bottom line at " + str(vision.visual_line(i).visual_detection.distance)
-        if (vision.visual_line(i).visual_detection.distance > 70.0):
-            print "  Threw it out because of distance."
-        if (vision.visual_field_edge.distance_m < 150.0):
-            print "  Threw it out because of field edge."
-        if (math.fabs(vision.visual_line(i).visual_detection.distance -
-                      foundGoalBoxTop) < 30.0):
-            print "  Threw it out because it was the same line."
-
-        if (vision.visual_line(i).visual_detection.distance < 70.0 and
+        if (vision.bottom_line(i).visual_detection.distance < 70.0 and
             vision.visual_field_edge.distance_m > 150.0 and
-            math.fabs(vision.visual_line(i).visual_detection.distance -
-                      foundGoalBoxTop) > 30.0):
+            math.fabs(vision.bottom_line(i).visual_detection.distance -
+                      foundGoalBoxTop) > 30.0 and
+            math.fabs(math.degrees(vision.bottom_line(i).angle -
+                                   orientation)) < 45.0):
             return True
 
     return False
+
+def shouldMoveBackwards(player):
+    vision = player.brain.interface.visionField
+
+    if (vision.bottom_line_size() == 0 and
+        vision.visual_line_size() == 0):
+        return True
+
+    foundGoalBoxTop = 0
+    orientation = 0
+
+    for i in range(0, vision.bottom_line_size()):
+        if vision.bottom_line(i).visual_detection.distance < 40.0:
+            foundGoalBoxTop = vision.bottom_line(i).visual_detection.distance
+            orientation = vision.bottom_line(i).angle
+            break
+
+    if not foundGoalBoxTop:
+        return False
+
+    for i in range(0, vision.visual_line_size()):
+        if (vision.visual_line(i).visual_detection.distance < 130.0 and
+            vision.visual_field_edge.distance_m > 150.0 and
+            math.fabs(vision.visual_line(i).visual_detection.distance -
+                      foundGoalBoxTop) > 30.0 and
+            math.fabs(math.degrees(vision.visual_line(i).angle -
+                                   orientation)) < 45.0):
+            return False
+
+    return True
 
 def facingSideways(player):
     """
