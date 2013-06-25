@@ -25,7 +25,8 @@ def positionReady(player):
         player.brain.tracker.trackBall()
         return player.stay()
 
-    if player.brain.time - player.timeReadyBegan > 35:
+    if (not player.brain.nav.isAtPosition() and
+        player.brain.time - player.timeReadyBegan > 38):
         return player.goNow('readyFaceMiddle')
 
     return player.stay()
@@ -38,6 +39,7 @@ def readyFaceMiddle(player):
         player.brain.tracker.lookToAngle(0)
         player.stand()
         readyFaceMiddle.startedSpinning = False
+        readyFaceMiddle.done = False
 
     centerField = Location(NogginConstants.CENTER_FIELD_X,
                            NogginConstants.CENTER_FIELD_Y)
@@ -45,19 +47,22 @@ def readyFaceMiddle(player):
     if player.brain.nav.isStopped() and not readyFaceMiddle.startedSpinning:
         readyFaceMiddle.startedSpinning = True
         spinDir = player.brain.loc.spinDirToPoint(centerField)
-        player.setWalk(0,0,spinDir*constants.FIND_BALL_SPIN_SPEED)
+        player.setWalk(0,0,spinDir*0.3)
 
-    targetH = player.brain.loc.headingTo(centerField)
-
-    if ((targetH - 10 < player.brain.loc.h < targetH + 10) or
-        (player.brain.ygrp.on and
-         player.brain.ygrp.distance > 0.5*NogginConstants.MIDFIELD_X) or
+    elif (not readyFaceMiddle.done and readyFaceMiddle.startedSpinning and
+        ((player.brain.ygrp.on and
+          player.brain.ygrp.distance > NogginConstants.MIDFIELD_X + 200) or
         (player.brain.yglp.on and
-         player.brain.yglp.distance > 0.5*NogginConstants.MIDFIELD_X)):
+         player.brain.yglp.distance > NogginConstants.MIDFIELD_X + 200))):
+        print "Found a post at {0} or {1}".format(player.brain.ygrp.distance,
+                                                  player.brain.yglp.distance)
+        readyFaceMiddle.done = True
+        player.brain.tracker.repeatBasicPan()
         player.stopWalking()
 
     return player.stay()
 
+readyFaceMiddle.done = False
 readyFaceMiddle.startedSpinning = False
 
 def positionPlaying(player):
@@ -65,7 +70,7 @@ def positionPlaying(player):
     Game Playing positioning
     """
     if player.firstFrame():
-        player.brain.nav.positionPlaybook(Navigator.PLAYBOOK)
+        player.brain.nav.positionPlaybook()
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
 
     if player.brain.ball.vis.on and player.brain.ball.distance < 100:

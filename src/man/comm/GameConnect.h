@@ -87,6 +87,7 @@ private:
     int             _myTeamNumber;
 
     bool            _haveRemoteGC;
+    long long       _gcTimestamp;
 };
 
 }

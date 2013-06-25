@@ -12,14 +12,15 @@ BALL_MOVED_THR = 3
 
 # Bearings towards goal and ball thresholds.
 FACING_FORWARD_DEG = 50
+FACING_GOAL_ON_WING = 10
 
 # Heat map (distance to something blocking open field) thresholds.
-OPEN_LANE_DIST = 120
+OPEN_LANE_DIST = 100
 
-# Distances to walk.
+# Distances and setups.
 BACKUP_WHEN_LOST = -30
-DRIBBLE_SETUP_POSITION = -15
-ROTATE_SETUP_POSITION = -20
+SETUP_POSITION = -15
+# ROTATE_SETUP_POSITION = -20
 
 # Time.
 ROTATE_FC = 20
