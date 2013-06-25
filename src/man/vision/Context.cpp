@@ -734,7 +734,8 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
     shape leftCorner = LEFT_GOAL_CORNER;
     shape rightCorner = RIGHT_GOAL_CORNER;
     if (debugIdentifyCorners) {
-        cout << "In checkGoalCornerWithPost " << dist << endl;
+        cout << "In checkGoalCornerWithPost " << l1y << " " << l2y <<
+			" " << dist << " " << corner.getDistance() << endl;
     }
     // sometimes we see field corners far away
     if (corner.getDistance() > MIDFIELD_X || !sameHalf) {
@@ -758,6 +759,9 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
         distant > corner.getLine2()->getDistance()) {
         isInner = true;
     }
+	if (corner.getDistance() < 150) {
+		isInner = true;
+	}
 
     // "Right" in this case means in the visual frame
     bool cornerIsRight = false;
