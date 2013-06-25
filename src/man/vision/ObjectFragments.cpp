@@ -108,7 +108,7 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
 	POSTDEBUG = false;
 	CORRECT = false;
 	PRINTOBJS = false;
-	POSTLOGIC = false;
+	POSTLOGIC = true;
 	SANITY = false;
 #endif
 }
@@ -2244,7 +2244,13 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
                          pole.getRight() + POST_NEAR_DIST, secondPost);
 
 	int post;
-	if (isPostReasonableSizeShapeAndPlace(secondPost)) {
+	if (isPostReasonableSizeShapeAndPlace(secondPost) && secondPost.width() > 2) {
+		if (POSTLOGIC) {
+			cout << "Second post " << endl;
+			drawBlob(secondPost, BLUE);
+			printBlob(secondPost);
+			printBlob(pole);
+		}
 		if (pole.getLeftBottomX() < secondPost.getLeftBottomX()) {
 			post = LEFT;
 		} else {
@@ -2330,10 +2336,12 @@ void ObjectFragments::lookForSecondPost(Blob pole, int post,
         if (questions) {
             if (post == LEFT) {
                 if (right->getIDCertainty() != _SURE) {
+					printBlob(pole);
                     right->init();
                 }
             } else {
                 if (left->getIDCertainty() != _SURE) {
+					printBlob(pole);
                     left->init();
                 }
             }
@@ -2654,7 +2662,7 @@ bool ObjectFragments::locationOk(Blob b)
 		}
 		return false;
 	}
-    if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom,
+    /*if (!horizonBottomOk(spanX, spanY, mh, trueLeft, trueRight, trueBottom,
                          trueTop)) {
         if (!greenCheck(b) || mh - trueBottom > spanY || spanX < MIN_WIDTH ||
             mh - trueBottom > ALLOWABLE_HORIZON_DIFF) {
@@ -2670,7 +2678,7 @@ bool ObjectFragments::locationOk(Blob b)
             }
         } else {
         }
-    }
+		}*/
     return true;
 }
 
