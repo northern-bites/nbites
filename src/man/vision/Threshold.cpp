@@ -243,6 +243,29 @@ void Threshold::obstacleLoop(const messages::JointAngles& ja, const messages::In
  */
 void Threshold::visionLoop(const messages::JointAngles& ja,
 						   const messages::InertialState& inert) {
+
+    usingTopCamera = false;
+
+    pose->transform(usingTopCamera, ja, inert);
+
+
+    orange->init(pose->getHorizonSlope());
+    lowerRuns();
+
+    vision->ball->init();
+    vision->ball->setTopCam(usingTopCamera);
+
+    if (horizon < IMAGE_HEIGHT) {
+        orange->createBall(horizon);
+    } else {
+        orange->createBall(pose->getHorizonY(0));
+    }
+    VisualBall temp;
+    if (vision->ball->getRadius() > 0) {
+        temp = *vision->ball;
+    }
+
+
     usingTopCamera = true;
 
     PROF_ENTER(P_TRANSFORM);
@@ -272,6 +295,8 @@ void Threshold::visionLoop(const messages::JointAngles& ja,
     objectRecognition();
     PROF_EXIT(P_OBJECT);
 
+    if (temp.getRadius() > 0)
+        *vision->ball = temp;
 
     //vision->fieldLines->afterObjectFragments();
     // For now we don't set shooting information
@@ -287,26 +312,6 @@ void Threshold::visionLoop(const messages::JointAngles& ja,
     }
 #endif
 
-    if (vision->ball->getRadius() == 0) {
-
-        usingTopCamera = false;
-
-
-        /**************************/pose->transform(usingTopCamera, ja, inert);
-
-
-        orange->init(pose->getHorizonSlope());
-        lowerRuns();
-
-        vision->ball->init();
-        vision->ball->setTopCam(usingTopCamera);
-
-        if (horizon < IMAGE_HEIGHT) {
-            orange->createBall(horizon);
-        } else {
-            orange->createBall(pose->getHorizonY(0));
-        }
-    }
     bool left = vision->yglp->getWidth() > 0;
     bool right = vision->ygrp->getWidth() > 0;
     bool ylp = left &&
