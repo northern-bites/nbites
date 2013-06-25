@@ -521,7 +521,7 @@ void Threshold::findGoals(int column, int topEdge) {
     // scan up for goals
     int bad = 0, yellows = 0, pinks = 0, navy = 0;
     int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
-		lastWhite = topEdge,
+		lastWhite = topEdge, blue = 0,
         lastYellow = topEdge, firstPink = topEdge, lastPink = topEdge;
     topEdge = min(topEdge, lowerBound[column]);
     int robots = 0;
@@ -559,6 +559,12 @@ void Threshold::findGoals(int column, int topEdge) {
                 firstPink = j;
             }
         }
+		if (Utility::isBlue(pixel)) {
+			blue++;
+			if (blue > 5) {
+				yellowOK = false;
+			}
+		}
         if (Utility::isUndefined(pixel) || Utility::isGreen(pixel)) {
             bad++;
         }
