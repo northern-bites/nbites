@@ -171,6 +171,15 @@ def shouldMoveForward(player):
     foundGoalBoxTop = 0
     orienataion = 0
 
+    if (player.counter > 150 and
+        ((player.brain.yglp.on and
+          math.fabs(player.brain.yglp.bearing) < 80 and
+          player.brain.yglp.distance < 300.0) or
+         (player.brain.ygrp.on and
+          math.fabs(player.brain.ygrp.bearing) < 80 and
+          player.brain.yglp.distance < 300.0))):
+        return True
+
     for i in range(0, vision.visual_line_size()):
         if vision.visual_line(i).visual_detection.distance < 200.0:
             foundGoalBoxTop = vision.visual_line(i).visual_detection.distance
@@ -198,28 +207,7 @@ def shouldMoveBackwards(player):
         vision.visual_line_size() == 0):
         return True
 
-    foundGoalBoxTop = 0
-    orientation = 0
-
-    for i in range(0, vision.bottom_line_size()):
-        if vision.bottom_line(i).visual_detection.distance < 40.0:
-            foundGoalBoxTop = vision.bottom_line(i).visual_detection.distance
-            orientation = vision.bottom_line(i).angle
-            break
-
-    if not foundGoalBoxTop:
-        return False
-
-    for i in range(0, vision.visual_line_size()):
-        if (vision.visual_line(i).visual_detection.distance < 130.0 and
-            vision.visual_field_edge.distance_m > 150.0 and
-            math.fabs(vision.visual_line(i).visual_detection.distance -
-                      foundGoalBoxTop) > 30.0 and
-            math.fabs(math.degrees(vision.visual_line(i).angle -
-                                   orientation)) < 45.0):
-            return False
-
-    return True
+    return False
 
 def facingSideways(player):
     """
@@ -263,17 +251,6 @@ def atGoalArea(player):
                 and player.brain.ygrp.on
                 and not player.brain.ygrp.distance == 0.0))
 
-def ballMoreImportant(player):
-    """
-    Goalie needs to chase, not localize itself.
-    """
-    if player.brain.ball.vis.on and player.brain.ball.vis.distance < 100.0:
-        return True
-
-    if (player.brain.ball.vis.on and player.brain.ball.vis.distance < 150.0
-        and player.aggressive):
-        return True
-
 def facingForward(player):
     """
     Checks if a robot is facing the cross, which is more or less forward
@@ -291,7 +268,7 @@ def facingBall(player):
     Checks if the ball is right in front of it.
     """
     #magic numbers
-    return (math.fabs(player.brain.ball.vis.bearing_deg) < 10.0 and
+    return (math.fabs(player.brain.ball.bearing_deg) < 10.0 and
             player.brain.ball.vis.on)
 
 def notTurnedAround(player):
@@ -324,6 +301,20 @@ def shouldSquat(player):
             abs(player.brain.ball.rel_y_intersect_dest) < 30.0 and
             player.brain.ball.vis.frames_on > 30)
 
+def shouldClearDangerousBall(player):
+    # ball must be visible
+    if player.brain.ball.vis.frames_off > 10:
+        return False
+
+    if (math.fabs(player.brain.ball.bearing_deg) > 60.0 and
+        player.brain.ball.distance < 60.0):
+        return True
+
+    return False
+
+def ballSafe(player):
+    return math.fabs(player.brain.ball.bearing_deg) < 50.0
+
 def shouldClearBall(player):
     """
     Checks that the ball is more or less in the goal box.
@@ -345,27 +336,27 @@ def shouldClearBall(player):
         return False
 
     # if definitely within goal box
-    if (player.brain.ball.vis.distance < 80.0):
+    if (player.brain.ball.distance < 80.0):
         walkedTooFar.xThresh = 130.0
         walkedTooFar.yThresh = 130.0
         return True
 
     # farther out but being aggressive
-    if (player.brain.ball.vis.distance < 120 and
+    if (player.brain.ball.distance < 120 and
         player.aggressive):
         walkedTooFar.xThresh = 170.0
         walkedTooFar.yThresh = 170.0
         return True
 
     # if to sides of box
-    if (player.brain.ball.vis.distance < 120.0 and
-        math.fabs(player.brain.ball.vis.bearing_deg) > 40.0):
+    if (player.brain.ball.distance < 120.0 and
+        math.fabs(player.brain.ball.bearing_deg) > 40.0):
         walkedTooFar.xThresh = 130.0
         walkedTooFar.yThresh = 170.0
         return True
 
     # to goalie's sides, being aggressive
-    if (math.fabs(player.brain.ball.vis.bearing_deg) > 50.0 and
+    if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
         player.aggressive):
         walkedTooFar.xThresh = 170.0
         walkedTooFar.yThresh = 300.0
@@ -405,9 +396,6 @@ def reachedMyDestination(player):
     The robot has reached the ball after walking to it.
     """
     return player.brain.nav.isAtPosition()
-
-def dangerousBall(player):
-    return player.brain.interface.visionField.visual_field_edge.distance_m < 200.0
 
 def doneWalking(player):
     """

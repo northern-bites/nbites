@@ -8,7 +8,7 @@ from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
-SAVING = True
+SAVING = False
 
 def gameInitial(player):
     if player.firstFrame():
@@ -92,7 +92,7 @@ def gamePlaying(player):
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
 
-    return player.goLater('watchWithCornerChecks')
+    return player.goLater('watch')
 
 def gamePenalized(player):
     if player.firstFrame():
@@ -225,7 +225,7 @@ def kickBall(player):
     """
     if player.firstFrame():
         # save odometry if this was your first kick
-        if player.lastDiffState in ['clearIt', 'attemptToNotScoreOnOurselves']:
+        if player.lastDiffState == 'clearIt':
             VisualStates.returnToGoal.kickPose = \
                 RelRobotLocation(player.brain.interface.odometry.x,
                                  player.brain.interface.odometry.y,
