@@ -2244,7 +2244,8 @@ void ObjectFragments::lookForFirstPost(VisualFieldObject* left,
                          pole.getRight() + POST_NEAR_DIST, secondPost);
 
 	int post;
-	if (isPostReasonableSizeShapeAndPlace(secondPost) && secondPost.width() > 2) {
+	if (vision->thresh->usingTopCamera &&
+		isPostReasonableSizeShapeAndPlace(secondPost) && secondPost.width() > 2) {
 		if (POSTLOGIC) {
 			cout << "Second post " << endl;
 			drawBlob(secondPost, BLUE);
