@@ -810,7 +810,20 @@ void FieldLines::createLines(list <linePoint> &linePoints)
             }
 
             aLine->setColor(static_cast<int>(lines.size()) + BLUEGREEN);
-            lines.push_back(aLine);
+			const point<int> topPt = aLine->getTopEndpoint();
+			const point<int> bottomPt = aLine->getBottomEndpoint();
+			int horizon = vision->thresh->field->horizonAt(topPt.x);
+			float dist = vision->thresh->realDistance(topPt.x, topPt.y,
+									  topPt.x, horizon);
+			int horizon2 = vision->thresh->field->horizonAt(bottomPt.x);
+			float dist2 = vision->thresh->realDistance(bottomPt.x, bottomPt.y,
+									  bottomPt.x, horizon2);
+			if (dist < 50 || dist2 < 50) {
+				//cout << "Got it" << endl;
+			} else {
+
+				lines.push_back(aLine);
+			}
 
             // Now we need to delete the linePoints that went into the newly
             // found line from the list of all linePoints.
@@ -2057,6 +2070,13 @@ list< VisualCorner > FieldLines::intersectLines()
             bool isCCIntersection = false, isDupe = false;;
 
             dupeCorners.push_back(intersection);
+
+			int horizon = vision->thresh->field->horizonAt(intersection.x);
+			float dist = vision->thresh->context->realDistance(intersection.x, intersection.y,
+                              intersection.x, horizon);
+			if (dist < 50) {
+				continue;
+			}
 
             if (isAngleTooSmall(*i, *j, numChecksPassed))
                 continue;
