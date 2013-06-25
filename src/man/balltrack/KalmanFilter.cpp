@@ -74,11 +74,12 @@ namespace balltrack
         float dY = cosh*diffY - sinh*diffX;
         float dH = diffH;// * 2.4f;
 
-	if ((dX > 3.f) || (dY > 3.f)) {
-	  dX = 0.f;
-	  dY = 0.f;
-	  dH = 0.f;
-	}
+        if( (std::fabs(dX) > 3.f) || (std::fabs(dY) > 3.f) ) {
+            //Probably reset odometry somewhere so skip a frame
+            dX = 0.f;
+            dY = 0.f;
+            dH = 0.f;
+        }
 
         //Calculate A = rotation matrix * trajectory matrix
         //First calc rotation matrix
