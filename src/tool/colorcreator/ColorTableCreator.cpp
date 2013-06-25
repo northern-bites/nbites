@@ -69,12 +69,27 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     connect(undoBtn, SIGNAL(clicked()), this, SLOT(undo()));
     rightLayout->addWidget(undoBtn);
 
+    QCheckBox* filter = new QCheckBox(tr("All colors"));
+    filter->setChecked(true);
+    connect(filter, SIGNAL(toggled(bool)), this, SLOT(setFiltering(bool)));
+    rightLayout->addWidget(filter);
+
     rightLayout->addWidget(&thrDisplay);
 
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
     setLayout(mainLayout);
+}
+
+void ColorTableCreator::setFiltering(bool doFiltering)
+{
+    if (!doFiltering) {
+        thrDisplay.setFilter(image::Color_bits[currentColor]);
+    }
+    else
+        thrDisplay.setFilter(image::ALL_COLORS);
+    run_();
 }
 
 // This gets called every time the logs are advanced, ie every time the
