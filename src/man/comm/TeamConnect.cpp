@@ -32,7 +32,7 @@ TeamConnect::~TeamConnect()
 
 void TeamConnect::setUpSocket()
 {
-    std::string ipTarget = "255.255.255.255";
+    std::string ipTarget = "10.0.255.255";
     static char buf[100] = {0};
 
     bool BROADCAST = true;
