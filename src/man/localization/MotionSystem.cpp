@@ -118,7 +118,7 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
         hU = -1.f * dH * hF;
     }
 
-    if (error > 17) {
+    if (error > 23) {
         xL = -.3f;
         xU =  .3f;
         yL = -.3f;

@@ -75,10 +75,6 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
         avgErr = visionSystem->getAvgError();
     }
 
-    //Calculate uncertainty from lines
-    // float curLineError = visionSystem->getConfidenceError(poseEstimate,
-    //                                                       visionInput);
-
     if (avgErr > 0) {
         if (avgErr > 3*errorMagnitude)
             avgErr = 3*errorMagnitude;
@@ -91,27 +87,12 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // std::cout << "Cur Error " << avgErr << std::endl;
     // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
 
-    // Upper ceiling on the exponential
-    if (errorMagnitude > 300)
-        errorMagnitude = 300;
+    // Determine if lost in frame or general
     lost = (errorMagnitude > LOST_THRESHOLD);
     badFrame = (avgErr > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();
-
-    // // FOR TESTING
-    // if (errorMagnitude < FOUND_THRESHOLD) {
-    //     if(lost) {
-    //         // std::cout << "\nI know where i am" << std::endl;
-    //     }
-    //     lost = false;
-    // }
-    // else {
-    //     if(!lost)
-    //         // std::cout << "\nI am lost" << std::endl;
-    //     lost = true;
-    // }
 }
 
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
@@ -135,28 +116,28 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // set updated vision to determine if resampling necessary
     updatedVision = visionSystem->update(particles, visionInput, ballInput);
 
+    float avgErr = -1;
     // Resample if vision update
     if(updatedVision)
     {
         resample();
         updatedVision = false;
+
+        avgErr = visionSystem->getAvgError();
     }
 
-    //Calculate uncertainty from lines
-    float curLineError = visionSystem->getConfidenceError(poseEstimate,
-                                                          visionInput);
-    if (curLineError > 0) {
-        errorMagnitude = curLineError*ALPHA
+    if (avgErr > 0) {
+        if (avgErr > 3*errorMagnitude)
+            avgErr = 3*errorMagnitude;
+        errorMagnitude = avgErr*ALPHA
                          + errorMagnitude*(1-ALPHA);
     }
     else
-        errorMagnitude+= (1.f/10.f);
+        errorMagnitude+= (1.f/100.f);
 
-    // Upper ceiling on the exponential
-    if (errorMagnitude > 300)
-        errorMagnitude = 300;
+    // Determine if lost in frame and/or general
     lost = (errorMagnitude > LOST_THRESHOLD);
-    badFrame = (curLineError > LOST_THRESHOLD);
+    badFrame = (avgErr > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();
