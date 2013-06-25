@@ -161,6 +161,9 @@ private:
     // For the MMKalman
     float weight;
     float uncertainty;
+
+    messages::RobotLocation curOdometry;
+    messages::RobotLocation lastOdometry;
 };
 
 
