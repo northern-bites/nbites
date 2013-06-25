@@ -136,7 +136,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 								greens++;
 								pixel = thresh->getColor(x, check);
 							}
-							if (greens >= 6) {
+							if (greens >= 15) {
 								check2 = check;
 								found = true;
 							} else if (greens > 2) {
@@ -152,8 +152,6 @@ void Field::initialScanForTopGreenPoints(int pH) {
 								}
 								pixel = thresh->getColor(x, check);
 							}
-							cout << "Checking " << (check - check2) << " " << whites <<
-								" " << blues << endl;
 							if (thresh->getPixDistance(check2) - thresh->getPixDistance(check)
 								> BUFFER / 2 && check - check2 > 5 &&
 								(check - check2 - whites > 4 || blues > 6)) {
