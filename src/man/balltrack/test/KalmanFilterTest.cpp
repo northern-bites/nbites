@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
 
+#include <iostream>
+#include <cmath>
+
 #include "../KalmanFilter.h"
 #include "../MMKalmanFilter.h"
 #include "../NaiveBallFilter.h"
@@ -25,37 +28,62 @@ TEST (KalmanFilterTest, FilterCanUpdate) {
     ASSERT_EQ(a,b);
 }
 
-/** Now with a variable friction coeficient, this test is hard to write **//*
+/** Now with a variable friction coeficient, this test is hard to write for moving filer */
 TEST (KalmanFilterTest, FilterCanPredict) {
     KalmanFilter *kf = new KalmanFilter(false);
-    kf->initialize();
-    float initX = 0.f;
-    float initY = 0.f;
-    float initXVel = 1.f;
-    float initYVel = 0.5f;
-    float finalX = 4.f;
-    float finalY = 2.f;
-    ASSERT_EQ(initX, kf->getRelXPosEst());
-    ASSERT_EQ(initY, kf->getRelYPosEst());
+    kf->initialize(); // pos = 10,0, vel = 0,0
 
+    // Move to the left 10 cm
     messages::RobotLocation odometry;
     odometry.set_x(0.f);
-    odometry.set_y(0.f);
+    odometry.set_y(10.f);
     odometry.set_h(0.f);
-    kf->predict(odometry, 4.f);
+    kf->predict(odometry, 1.f);
+    ASSERT_TRUE(std::fabs(10.f - kf->getRelXPosEst()) < .001f);
+    ASSERT_TRUE(std::fabs(-10.f - kf->getRelYPosEst()) < .001f);
 
-    ASSERT_EQ(finalX, kf->getRelXPosEst());
-    ASSERT_EQ(finalY, kf->getRelYPosEst());
+    // Move back to the origin
+    odometry.set_y(0.f);
+    kf->predict(odometry, 1.f);
+    ASSERT_TRUE(std::fabs(10.f - kf->getRelXPosEst()) < .001f);
+    std::cout << "should be at origin" << kf->getRelYPosEst();
+    ASSERT_TRUE(std::fabs(kf->getRelYPosEst()) < .001f);
+
+    //Rotate 90 deg
+    odometry.set_y(0.f);
+    odometry.set_h(1.57f); // 90 deg
+    kf->predict(odometry, 1.f);
+    ASSERT_TRUE(std::fabs(kf->getRelXPosEst()) < .01f);
+    ASSERT_TRUE(std::fabs(-10 - kf->getRelYPosEst()) < .01f);
+
+    //Walk forward
+    odometry.set_y(10.f);
+    kf->predict(odometry, 1.f);
+    ASSERT_TRUE(std::fabs(-10 - kf->getRelXPosEst()) < .01f);
+    ASSERT_TRUE(std::fabs(-10 - kf->getRelYPosEst()) < .01f);
+
+
+    // float initX = 0.f;
+    // float initY = 0.f;
+    // float initXVel = 1.f;
+    // float initYVel = 0.5f;
+    // float finalX = 4.f;
+    // float finalY = 2.f;
+    // ASSERT_EQ(initX, kf->getRelXPosEst());
+    // ASSERT_EQ(initY, kf->getRelYPosEst());
+
+    // messages::RobotLocation odometry;
+    // odometry.set_x(0.f);
+    // odometry.set_y(0.f);
+    // odometry.set_h(0.f);
+    // kf->predict(odometry, 4.f);
+
+    // ASSERT_EQ(finalX, kf->getRelXPosEst());
+    // ASSERT_EQ(finalY, kf->getRelYPosEst());
 }
-*/
 
 TEST (KalmanFilterTest, KalmanFilterCanInitialize) {
     KalmanFilter *kf = new KalmanFilter();
-    kf->initialize();
-    ASSERT_EQ(kf->getRelXPosEst(), 0.f);
-    ASSERT_EQ(kf->getRelYPosEst(), 0.f);
-    ASSERT_EQ(kf->getRelXVelEst(), 1.f);
-    ASSERT_EQ(kf->getRelYVelEst(), 0.5f);
 
     ufvector4 initX = boost::numeric::ublas::zero_vector<float> (4);
     initX(0) = 10.f;

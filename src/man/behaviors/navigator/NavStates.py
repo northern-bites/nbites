@@ -109,7 +109,7 @@ def goToPosition(nav):
         goToPosition.lastSpeeds = goToPosition.speeds
 
     else:
-        if goToPosition.adaptive and relDest.relX >= 0:
+        if goToPosition.adaptive:
             #reduce the speed if we're close to the target
             speed = helper.adaptSpeed(relDest.dist,
                                     constants.ADAPT_DISTANCE,

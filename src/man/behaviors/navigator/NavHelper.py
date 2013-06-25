@@ -63,7 +63,7 @@ def isDestinationRelative(dest):
     return isinstance(dest, RelLocation)
 
 def adaptSpeed(distance, cutoffDistance, maxSpeed):
-    return (distance / cutoffDistance) * maxSpeed
+    return min(maxSpeed, (distance/cutoffDistance)*maxSpeed)
 #    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
 def setDestination(nav, dest, gain = 1.0):

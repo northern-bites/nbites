@@ -90,7 +90,7 @@ def prepareForKick(player):
         player.brain.nav.stand()
         return player.stay()
 
-    if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
+    if player.brain.ball.stat_distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
@@ -100,9 +100,9 @@ def prepareForKick(player):
     if hackKick.DEBUG_KICK_DECISION:
         print str(player.kick)
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -163,7 +163,7 @@ def orbitBall(player):
     #     print "=====================++++++++++"
 
     #our in-house heading checker is of the opinion that we're pointed in the right direction
-    if orbitBall.desiredHeading > -5 and orbitBall.desiredHeading < 5:
+    if orbitBall.desiredHeading > -10 and orbitBall.desiredHeading < 10:
         player.stopWalking()
         print "Done orbiting, going to positionForKick"
         player.shouldOrbit = False
@@ -230,14 +230,14 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
-    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
-                                                ball.rel_y - kick_pos[1],
+    positionForKick.kickPose = RelRobotLocation(ball.stat_rel_x - kick_pos[0],
+                                                ball.stat_rel_y - kick_pos[1],
                                                 0)
 
     if player.firstFrame():
@@ -246,7 +246,7 @@ def positionForKick(player):
         #only enque the new goTo destination once and update it afterwards
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.GRADUAL_SPEED,
+                              Navigator.SLOW_SPEED,
                               False,
                               Navigator.ADAPTIVE)
     else:

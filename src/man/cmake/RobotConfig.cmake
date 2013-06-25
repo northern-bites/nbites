@@ -9,7 +9,7 @@ set( @ROBOT_PLAYER_NUMBER@
 )
 
 set( @ROBOT_TEAM_NUMBER@
-  "16"
+  "14"
   CACHE STRING
   "The team number for the robot."
 )
