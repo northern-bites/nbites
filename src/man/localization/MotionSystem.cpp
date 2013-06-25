@@ -44,9 +44,7 @@ void MotionSystem::update(ParticleSet& particles,
 
     if( (std::fabs(dX_R) > 3.f) || (std::fabs(dY_R) > 3.f) ) {
         //Probably reset odometry somewhere so skip a frame
-        dX_R = 0.f;
-        dY_R = 0.f;
-        dH_R = 0.f;
+        return;
     }
 
     float dX, dY, dH;

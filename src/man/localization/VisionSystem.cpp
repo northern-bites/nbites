@@ -57,7 +57,7 @@ bool VisionSystem::update(ParticleSet& particles,
                                                   true);
 
                 // Limit by line length (be safe about center circle mistake lines)
-                if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
+                if ((obsvLine.length() > 90.f) && (obsvLine.length() < 500.f)) {
                     madeObsv = true;
                     float newError = lineSystem->scoreObservation(obsvLine);
 //                    std::cout << "Line Error:\t" << newError << std::endl;
@@ -85,7 +85,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
         if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
             && (obsv.goal_post_l().visual_detection().distance() > 0.f)
-            && (obsv.goal_post_l().visual_detection().distance() < 480.f)) {
+            && (obsv.goal_post_l().visual_detection().distance() < 600.f)) {
             madeObsv = true;
             float newError = scoreFromVisDetect(*particle,
                                                 obsv.goal_post_l().visual_detection());
@@ -97,7 +97,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
         if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
             && (obsv.goal_post_r().visual_detection().distance() > 0.f)
-            && (obsv.goal_post_r().visual_detection().distance() < 480.f)) {
+            && (obsv.goal_post_r().visual_detection().distance() < 600.f)) {
             madeObsv = true;
             float newError = scoreFromVisDetect(*particle,
                                                 obsv.goal_post_r().visual_detection());
@@ -220,7 +220,7 @@ bool VisionSystem::update(ParticleSet& particles,
                                                   true);
 
                 // Limit by line length (be safe about center circle mistake lines)
-                if ((obsvLine.length() > 70.f) && (obsvLine.length() < 500.f)) {
+                if ((obsvLine.length() > 90.f) && (obsvLine.length() < 500.f)) {
                     madeObsv = true;
                     float newError = lineSystem->scoreObservation(obsvLine);
                     //std::cout << "Line Error:\t" << newError << std::endl;
