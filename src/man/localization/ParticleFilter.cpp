@@ -43,7 +43,8 @@ ParticleFilter::ParticleFilter(ParticleFilterParams params)
     }
 
     lost = false;
-    errorMagnitude = FOUND_THRESHOLD + (.5f * LOST_THRESHOLD);
+    badFrame = false;
+    errorMagnitude = .8f * LOST_THRESHOLD;
 }
 
 ParticleFilter::~ParticleFilter()
@@ -63,27 +64,38 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     // set updated vision to determine if resampling necessary
     updatedVision = visionSystem->update(particles, visionInput);
 
+
+    float avgErr = -1;
     // Resample if vision update
     if(updatedVision)
     {
         resample();
         updatedVision = false;
+
+        avgErr = visionSystem->getAvgError();
     }
 
     //Calculate uncertainty from lines
-    float curLineError = visionSystem->getConfidenceError(poseEstimate,
-                                                          visionInput);
-    if (curLineError > 0) {
-        errorMagnitude = curLineError*ALPHA
+    // float curLineError = visionSystem->getConfidenceError(poseEstimate,
+    //                                                       visionInput);
+
+    if (avgErr > 0) {
+        if (avgErr > 3*errorMagnitude)
+            avgErr = 3*errorMagnitude;
+        errorMagnitude = avgErr*ALPHA
                          + errorMagnitude*(1-ALPHA);
     }
     else
-        errorMagnitude+= (1.f/10.f);
+        errorMagnitude+= (1.f/100.f);
+
+    // std::cout << "Cur Error " << avgErr << std::endl;
+    // std::cout << "Filtered Error:  " << errorMagnitude << std::endl;
 
     // Upper ceiling on the exponential
     if (errorMagnitude > 300)
         errorMagnitude = 300;
     lost = (errorMagnitude > LOST_THRESHOLD);
+    badFrame = (avgErr > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();
@@ -111,11 +123,11 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     Point ballLoc(MIDFIELD_X, MIDFIELD_Y); // in set
     bool distBallOff = ballLoc.distanceTo(ballGuess);
 
-    // in set, lost or see ball wrong, and havent reset recently
-    if (((lost || (distBallOff > 50.f))) && (framesSinceReset > 30)) {
-        std::cout << "LOST IN SET!" << std::endl;
-        resetLocToSide(true);
-    }
+    // // in set, lost or see ball wrong, and havent reset recently
+    // if (lost && (ballInput.vis().frames_on() > 5) && (framesSinceReset > 30)) {
+    //     std::cout << "LOST IN SET!" << std::endl;
+    //     resetLocToSide(true);
+    // }
 
     motionSystem->update(particles, odometryInput, nearMidField());
 
@@ -144,6 +156,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     if (errorMagnitude > 300)
         errorMagnitude = 300;
     lost = (errorMagnitude > LOST_THRESHOLD);
+    badFrame = (curLineError > LOST_THRESHOLD);
 
     // Update filters estimate
     updateEstimate();
@@ -421,7 +434,7 @@ void ParticleFilter::resample()
 
     // First add reconstructed particles from corner observations
     int numReconParticlesAdded = 0;
-    if (lost)
+    if (lost && badFrame)
     {
         std::list<ReconstructedLocation> reconLocs = visionSystem->getReconstructedLocations();
         std::list<ReconstructedLocation>::const_iterator recLocIt;
@@ -431,7 +444,7 @@ void ParticleFilter::resample()
         {
             // If the reconstructions is on the same side and not near midfield
             if ( ((*recLocIt).defSide == onDefendingSide())
-                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 60)) {
+                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 120)) {
 //                std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << std::endl;
 
                      Particle reconstructedParticle((*recLocIt).x,

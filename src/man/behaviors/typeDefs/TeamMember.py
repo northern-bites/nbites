@@ -89,6 +89,7 @@ class TeamMember(RobotLocation):
         self.inKickingState = self.brain.player.inKickingState
 
         self.active = (not self.isPenalized() and
+                       not self.brain.player.currentState == 'afterPenalty' and
                        not (self.brain.playerNumber == 1 and
                             self.brain.player.returningFromPenalty))
 
@@ -184,8 +185,7 @@ class TeamMember(RobotLocation):
         """
         this checks GameController to see if a player is penalized.
         """
-        return (self.brain.interface.gameState.team(self.brain.gameController.teamColor).player(self.playerNumber-1).penalty
-                or self.brain.player.currentState == 'afterPenalty')
+        return (self.brain.gameController.penalized)
 
     def __str__(self):
         return "I am player number " + self.playerNumber

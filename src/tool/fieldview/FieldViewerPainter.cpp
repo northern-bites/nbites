@@ -88,7 +88,7 @@ void FieldViewerPainter::paintParticleSwarm(QPaintEvent* event,
         float size = swarm.particle(i).weight() * 50 *PARTICLE_WIDTH;
         //Idea:Update scale factor based on weight? @Todo
         paintRobotLocation(event,swarm.particle(i).loc(),
-                           false, size);
+                           false, 7);//size);
     }
 }
 

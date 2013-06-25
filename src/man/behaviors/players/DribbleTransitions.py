@@ -1,14 +1,15 @@
 import DribbleConstants as constants
 import noggin_constants as nogginConstants
 import objects
-from math import fabs
+from math import fabs, tan, radians
 
 def shouldDribble(player):
     """
     We should be in the dribble FSA.
     """
-    return (facingGoal(player) and timeLeft(player) and
-            not ballGotFarAway(player) and not ballLost(player) and
+    return ((facingGoal(player) or wouldScoreIfDribbledStraight(player)) 
+            and timeLeft(player) and not onWingDownfield(player) and 
+            not ballGotFarAway(player) and not ballLost(player) and 
             (betweenCrosses(player) or shouldDribbleForGoal(player)))
 
 def shouldDribbleForGoal(player):
@@ -111,18 +112,45 @@ def seesBall(player):
 def ballInGoalBox(player):
     """
     The ball is in the goal box (between the posts actually), so we can
-    dribble it in.
+    dribble it in. We are also lined up well enough to dribble it in via going
+    straight.
     """
     return (player.brain.ball.x > nogginConstants.FIELD_WHITE_WIDTH -
             nogginConstants.GOALBOX_DEPTH and
             player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
-            player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
+            player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
+            wouldScoreIfDribbledStraight(player))
+
+def wouldScoreIfDribbledStraight(player):
+    """
+    If we were to just dribble straight from our current location, would we 
+    score a goal?
+    """
+    tanOfHeading = tan(radians(90-player.brain.loc.h))
+    yChange = (nogginConstants.FIELD_WHITE_WIDTH - player.brain.loc.x) / tanOfHeading
+    yWhereWouldLeaveField = player.brain.loc.y - yChange
+    
+    return (yWhereWouldLeaveField > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
+            yWhereWouldLeaveField < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y)
 
 def navDone(player):
     """
     Nav is done.
     """
     return player.brain.nav.isAtPosition()
+
+def onWingDownfield(player):
+    """
+    The ball is on the wing and downfield according to this transition. Also
+    we not facing the goal and therefore leaving this position.
+    """
+    if player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y:
+        return (player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
+                player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+                not player.brain.loc.h > constants.FACING_GOAL_ON_WING)
+    return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
+            player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+            not player.brain.loc.h < -constants.FACING_GOAL_ON_WING)
 
 def timeLeft(player):
     """
