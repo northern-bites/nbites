@@ -73,9 +73,9 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
     int lostShiftFactor = (int) (error / 10.f);
 
     // How x,y,h factors when deciding ranges
-    float xF = 5.f + lostShiftFactor;
-    float yF = 5.f + lostShiftFactor;
-    float hF = 5.f + lostShiftFactor;
+    float xF = 5.f + (float) lostShiftFactor;
+    float yF = 5.f + (float) lostShiftFactor;
+    float hF = 5.f + (float) lostShiftFactor;
 
     float xL, xU, yL, yU, hL, hU;
 
