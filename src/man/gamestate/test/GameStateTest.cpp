@@ -165,9 +165,5 @@ TEST_F(GameStateTest, Reset)
     testData.SerializeToString(&expected);
     gameState.latest_data.SerializeToString(&actual);
 
-    std::cout << testData.DebugString() << std::endl;
-
-    std::cout << gameState.latest_data.DebugString() << std::endl;
-
     EXPECT_EQ(expected, actual);
 }
