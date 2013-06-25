@@ -27,7 +27,7 @@ void MotionSystem::resetNoise(float xyNoise_, float hNoise_)
  */
 void MotionSystem::update(ParticleSet& particles,
                           const messages::RobotLocation& odometry,
-                          bool nearMid)
+                          float error)
 {
     // Store the last odometry and set the current one
     lastOdometry.set_x(curOdometry.x());
@@ -64,16 +64,18 @@ void MotionSystem::update(ParticleSet& particles,
 
         particle->shift(dX, dY, dH);
 
-        noiseShiftWithOdo(particle, dX, dY, dH);
-        //randomlyShiftParticle(particle, nearMid);
+        noiseShiftWithOdo(particle, dX, dY, dH, error);
     }
 }
 
-void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH) {
+void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, float dH, float error) {
+
+    int lostShiftFactor = (int) (error / 10.f);
+
     // How x,y,h factors when deciding ranges
-    float xF = 5.f;
-    float yF = 5.f;
-    float hF = 5.f;
+    float xF = 5.f + lostShiftFactor;
+    float yF = 5.f + lostShiftFactor;
+    float hF = 5.f + lostShiftFactor;
 
     float xL, xU, yL, yU, hL, hU;
 
@@ -114,6 +116,15 @@ void MotionSystem::noiseShiftWithOdo(Particle* particle, float dX, float dY, flo
     else { //dH <0
         hL = dH * hF;
         hU = -1.f * dH * hF;
+    }
+
+    if (error > 23) {
+        xL = -.3f;
+        xU =  .3f;
+        yL = -.3f;
+        yU =  .3f;
+        hL = -.07f;
+        hU =  .07f;
     }
 
     boost::uniform_real<float> xRange(xL, xU);
