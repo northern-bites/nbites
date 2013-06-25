@@ -81,7 +81,7 @@ def prepareForKick(player):
         player.brain.nav.stand()
         return player.stay()
 
-    if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
+    if player.brain.ball.stat_distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
@@ -91,9 +91,9 @@ def prepareForKick(player):
     if hackKick.DEBUG_KICK_DECISION:
         print str(player.kick)
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -221,14 +221,14 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
-    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
-                                                ball.rel_y - kick_pos[1] - constants.SETUP_DISTANCE_X,
+    positionForKick.kickPose = RelRobotLocation(ball.stat_rel_x - kick_pos[0],
+                                                ball.stat_rel_y - kick_pos[1],
                                                 0)
 
     if player.firstFrame():
@@ -237,44 +237,7 @@ def positionForKick(player):
         #only enque the new goTo destination once and update it afterwards
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
-                              Navigator.GRADUAL_SPEED,
-                              False,
-                              Navigator.ADAPTIVE)
-    else:
-        player.brain.nav.updateDest(positionForKick.kickPose)
-
-    if transitions.shouldFindBallKick(player):
-        player.inKickingState = False
-        return player.goLater('chase')
-
-    if (transitions.ballInPosition(player, positionForKick.kickPose) or
-        player.brain.nav.isAtPosition()):
-        print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
-        player.ballBeforeKick = player.brain.ball
-        player.brain.nav.stand()
-        return player.goNow('precisePositionForKick')
-
-    return player.stay()
-
-def precisePositionForKick(player):
-    if (transitions.shouldApproachBallAgain(player) or
-        transitions.shouldRedecideKick(player)):
-        player.inKickingState = False
-        return player.goLater('chase')
-
-    ball = player.brain.ball
-    kick_pos = player.kick.getPosition()
-    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
-                                                ball.rel_y - kick_pos[1],
-                                                0)
-
-    if player.firstFrame():
-        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
-        player.brain.tracker.lookStraightThenTrack()
-        #only enque the new goTo destination once and update it afterwards
-        player.brain.nav.goTo(positionForKick.kickPose,
-                              Navigator.PRECISELY,
-                              Navigator.SLUGGISH_SPEED,
+                              Navigator.SLOW_SPEED,
                               False,
                               Navigator.ADAPTIVE)
     else:
@@ -292,3 +255,40 @@ def precisePositionForKick(player):
         return player.goNow('kickBallExecute')
 
     return player.stay()
+
+# def precisePositionForKick(player):
+#     if (transitions.shouldApproachBallAgain(player) or
+#         transitions.shouldRedecideKick(player)):
+#         player.inKickingState = False
+#         return player.goLater('chase')
+# 
+#     ball = player.brain.ball
+#     kick_pos = player.kick.getPosition()
+#     positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
+#                                                 ball.rel_y - kick_pos[1],
+#                                                 0)
+# 
+#     if player.firstFrame():
+#         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
+#         player.brain.tracker.lookStraightThenTrack()
+#         #only enque the new goTo destination once and update it afterwards
+#         player.brain.nav.goTo(positionForKick.kickPose,
+#                               Navigator.PRECISELY,
+#                               Navigator.SLUGGISH_SPEED,
+#                               False,
+#                               Navigator.ADAPTIVE)
+#     else:
+#         player.brain.nav.updateDest(positionForKick.kickPose)
+# 
+#     if transitions.shouldFindBallKick(player):
+#         player.inKickingState = False
+#         return player.goLater('chase')
+# 
+#     if (transitions.ballInPosition(player, positionForKick.kickPose) or
+#         player.brain.nav.isAtPosition()):
+#         print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
+#         player.ballBeforeKick = player.brain.ball
+#         player.brain.nav.stand()
+#         return player.goNow('kickBallExecute')
+# 
+#     return player.stay()

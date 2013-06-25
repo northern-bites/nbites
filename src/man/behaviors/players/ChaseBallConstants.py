@@ -4,11 +4,11 @@ from ..navigator import BrunswickSpeeds as speeds
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 2
 BALL_OFF_THRESH = 60
-BALL_OFF_KICK_THRESH = 120
+BALL_OFF_KICK_THRESH = 4
 
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
-PREPARE_FOR_KICK_DIST = 35.0
+PREPARE_FOR_KICK_DIST = 45.0
 SETUP_DISTANCE_X = 5
 
 # Should approach ball again

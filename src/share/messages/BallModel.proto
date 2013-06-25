@@ -49,6 +49,16 @@ message FilteredBall
     // For Goalie, know where the ball is going to intersect y-axis
     optional float speed = 18;
     optional float rel_y_intersect_dest = 19;
+
+    optional float stat_rel_x = 20;
+    optional float stat_rel_y = 21;
+    optional float stat_distance = 22;
+    optional float stat_bearing = 23;
+    optional float mov_rel_x = 24;
+    optional float mov_rel_y = 25;
+    optional float mov_distance= 26;
+    optional float mov_bearing = 27;
+
 }
 
 message SharedBall {

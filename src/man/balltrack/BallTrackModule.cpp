@@ -86,10 +86,15 @@ void BallTrackModule::run_()
     ballMessage.get()->set_rel_y_intersect_dest(filters->getRelYIntersectDest());
     ballMessage.get()->set_speed(filters->getSpeed());
 
-    ballMessage.get()->set_stationary_x(filters->getStationaryRelX());
-    ballMessage.get()->set_stationary_y(filters->getStationaryRelY());
-    ballMessage.get()->set_moving_x(filters->getMovingRelX());
-    ballMessage.get()->set_moving_y(filters->getMovingRelY());
+    ballMessage.get()->set_stat_rel_x(filters->getStationaryRelX());
+    ballMessage.get()->set_stat_rel_y(filters->getStationaryRelY());
+    ballMessage.get()->set_stat_distance(filters->getStationaryRelX());
+    ballMessage.get()->set_stat_bearing(filters->getStationaryRelY());
+
+    ballMessage.get()->set_mov_rel_x(filters->getMovingRelX());
+    ballMessage.get()->set_mov_rel_y(filters->getMovingRelY());
+    ballMessage.get()->set_mov_distance(filters->getMovingRelX());
+    ballMessage.get()->set_mov_bearing(filters->getMovingRelY());
 
 #ifdef DEBUG_BALLTRACK
     // Print the observation given, each filter after update, and which filter chosen

@@ -4,6 +4,7 @@ from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelRobotLocation
+from math import pi
 from ..kickDecider import kicks
 from ..util import Transition
 

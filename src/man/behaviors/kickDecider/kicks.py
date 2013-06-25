@@ -58,9 +58,9 @@ LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
 RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 19.0, y =  4.8,
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 19.0, y =  4.7,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 19.0, y = -4.8,
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 19.0, y = -4.7,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 # Not used 04-19-13
@@ -88,7 +88,7 @@ LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.0)
 RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.0)
 
 def chooseAlignedKickFromKick(player, kick):
-    ballRelY = player.brain.ball.rel_y
+    ballRelY = player.brain.ball.stat_rel_y
     if (kick == LEFT_STRAIGHT_KICK or
         kick == RIGHT_STRAIGHT_KICK):
         if ballRelY > 0:

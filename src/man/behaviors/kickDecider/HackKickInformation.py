@@ -728,8 +728,7 @@ class KickInformation:
         How we choose which kick to do when we're facing the ball. For now,
         simply pick the foot that's closer to the ball.
         """
-        if self.brain.ball.bearing_deg > 0: # TODO should be relY but
-            # no message for it yet.
+        if self.brain.ball.stat_rel_y > 0:
             return True
         else:
             return False
