@@ -184,7 +184,7 @@ TEST(LocalizationTest, TestErrorCalc)
 
     float four = top.getError(bot).error;
 
-    ASSERT_EQ(std::fabs(four - 4.f), 0.f);
+    ASSERT_EQ(std::fabs(four - std::sqrt(4.f)), 0.f);
 
     // Same line
     ASSERT_TRUE(std::fabs(top.getError(top).error) < .2f);
@@ -194,22 +194,22 @@ TEST(LocalizationTest, TestErrorCalc)
     Line bot_(a,d);
 
     four = top_.getError(bot).error;
-    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - std::sqrt(4.f)) < .0001f);
 
     four = top.getError(bot_).error;
-    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - std::sqrt(4.f)) < .0001f);
 
     four = top_.getError(bot_).error;
-    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - std::sqrt(4.f)) < .0001f);
 
     four = bot_.getError(top).error;
-    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - std::sqrt(4.f)) < .0001f);
 
     four = bot.getError(top_).error;
-    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - std::sqrt(4.f)) < .0001f);
 
     four = bot_.getError(top_).error;
-    ASSERT_TRUE(std::fabs(four - 4.f) < .0001f);
+    ASSERT_TRUE(std::fabs(four - std::sqrt(4.f)) < .0001f);
 
 
     //Try intersecting lines
@@ -218,7 +218,7 @@ TEST(LocalizationTest, TestErrorCalc)
     Line posSlope(a,c);
 
 //    ASSERT_TRUE(std::fabs(negSlope.getError(posSlope).error - std::sqrt(8.f)) < .0001f);
-    ASSERT_EQ(negSlope.getError(posSlope).error, std::sqrt(8.f));
+    ASSERT_EQ(negSlope.getError(posSlope).error, std::sqrt(std::sqrt(8.f)));
 
     Point a_(-2.f, 0.f);
     Point b_(2.f, 0.f);
@@ -228,7 +228,7 @@ TEST(LocalizationTest, TestErrorCalc)
     Line horiz(a_,b_);
     Line vert(c_,d_);
 
-    ASSERT_TRUE(std::fabs(horiz.getError(vert).error - std::sqrt(8.f)) < .0001f);
+    ASSERT_TRUE(std::fabs(horiz.getError(vert).error - std::sqrt(std::sqrt(8.f))) < .0001f);
 }
 
 TEST(LocalizationTest, TestLineSystem)
