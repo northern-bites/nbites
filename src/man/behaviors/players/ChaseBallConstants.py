@@ -47,7 +47,7 @@ STOP_DRIBBLE_BEARING = 40.0
 
 # States' constants
 # turnToBall
-FIND_BALL_SPIN_SPEED = .7
+FIND_BALL_SPIN_SPEED = .5
 
 # find ball
 SPUN_ONCE_TIME_THRESH = 7
