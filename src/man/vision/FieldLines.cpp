@@ -815,10 +815,14 @@ void FieldLines::createLines(list <linePoint> &linePoints)
 			int horizon = vision->thresh->field->horizonAt(topPt.x);
 			float dist = vision->thresh->realDistance(topPt.x, topPt.y,
 									  topPt.x, horizon);
+			estimate endEst1 = pose->pixEstimate(topPt.x, topPt.y, 0.0f);
+
 			int horizon2 = vision->thresh->field->horizonAt(bottomPt.x);
 			float dist2 = vision->thresh->realDistance(bottomPt.x, bottomPt.y,
 									  bottomPt.x, horizon2);
-			if (horizon > 0 && horizon2 > 0 && (dist < 50 || dist2 < 50)) {
+			estimate endEst2 = pose->pixEstimate(bottomPt.x, bottomPt.y, 0.0f);
+			if (horizon > 0 && horizon2 > 0 &&
+				((dist < 50 && endEst1.dist < 300) || (dist2 < 50 && endEst1.dist < 300))) {
 				//cout << "Got a scary line. Will ignore it." << endl;
 			} else {
 				lines.push_back(aLine);

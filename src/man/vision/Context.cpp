@@ -290,6 +290,8 @@ void Context::classifyT(VisualCorner & first) {
 	// if we see a T in the middle of nowhere far from the edge
 	if (first.getDistance() > 100 && dist > 375 && first.getDistance() < 400 &&
 		(first.getY() - horizon) > 25 &&
+		l1 < 200 && l2 < 200 &&
+		first.getX() > IMAGE_WIDTH / 3 && first.getX() < 2 * IMAGE_WIDTH / 3 &&
 		!(face == FACING_GOAL && distToObject < 250)) {
 		if (debugIdentifyCorners) {
 			cout << "T is too far from horizon, must be a CC" << endl;
@@ -313,8 +315,10 @@ void Context::classifyT(VisualCorner & first) {
         first.setShape(CIRCLE);
         return;
     }
-	// check for side Ts first handle the really obvious case
+	// check for side Ts first handle the really obvious cases
 	if (l1 > GOALBOX_DEPTH * 4) {
+		sideT = true;
+	} else if (distToObject > 250) {
 		sideT = true;
 	} else if ((!sameHalf && face != FACING_UNKNOWN) ||
 			   (l1 > 2.5 * GOALBOX_DEPTH &&
@@ -334,12 +338,16 @@ void Context::classifyT(VisualCorner & first) {
                 sideT = true;
             } else if (first.getDistance() < FIELD_WHITE_WIDTH / 3) {
                 sideT = true;
-            }
+            } else if (distToObject > 250) {
+				sideT = true;
+			}
         }
     }
     if (debugIdentifyCorners && sideT) {
         cout << "Side T is true" << endl;
-    }
+    } else if (debugIdentifyCorners) {
+		cout << "Not a side T" << endl;
+	}
     if (sideT || (l1 > 3 * GOALBOX_DEPTH && objectDistance > 250) ||
         (face == FACING_UNKNOWN &&
          l1 > 2 * GOALBOX_DEPTH)) {
