@@ -117,7 +117,7 @@ def afterPenalty(player):
 
 def postPenaltyChaser(player):
     """
-    If we come out of penatly directly into chaser, we'll waste
+    If we come out of penalty directly into chaser, we'll waste
     time spinning on the side of the field. Instead, if we didn't
     see the ball during afterPenalty, odometry walk onto the field
     before spinning.
@@ -131,7 +131,7 @@ def postPenaltyChaser(player):
 
     if not player.brain.play.isChaser():
         # We've role switched out naturally. Go to appropriate state.
-        player.brain.nav.stop # walkTo is a bit dangerous. do this to be careful.
+        player.stopWalking() # walkTo is a bit dangerous. do this to be careful.
         return player.goLater('playbookPosition')
 
     return player.stay()
