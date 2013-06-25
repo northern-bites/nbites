@@ -292,7 +292,7 @@ class KickInformation:
                 minimumBearing = min(map(math.fabs, [x[1] for x in kickBearings]))
                 if minimumBearing == math.fabs(kickBearings[0][1]):
                     # choose a straight kick
-                    kick = self.chooseQuickFrontKick()
+                    kick = self.chooseShortFrontKick()
                 elif minimumBearing == math.fabs(kickBearings[1][1]):
                     # choose a right side kick
                     kick = kicks.RIGHT_SIDE_KICK
@@ -322,7 +322,7 @@ class KickInformation:
                     # even an inaccurate straight kick will work
                     if (30 > bearingKickLeft and -30 < bearingKickLeft):
                         #choose a straight kick with no orbit NOW!
-                        kick = self.chooseQuickFrontKick()
+                        kick = self.chooseShortFrontKick()
                         kick.h = 0
                         return kick
                     elif (bearingKickLeft < 30):
@@ -369,7 +369,7 @@ class KickInformation:
                 # the kick bearing that has least magnitude should be chosen
                 kickList = sorted([straightBearing, leftSideBearing, rightSideBearing], key=math.fabs)
                 if (kickList[0] == straightBearing):
-                    kick = self.chooseQuickFrontKick()
+                    kick = self.chooseShortFrontKick()
                     kick.h = straightBearing
                 elif (kickList[0] == rightSideBearing):
                     kick = kicks.RIGHT_SIDE_KICK
