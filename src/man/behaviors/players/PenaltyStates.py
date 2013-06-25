@@ -123,15 +123,15 @@ def postPenaltyChaser(player):
     before spinning.
     """
     if player.firstFrame():
-        player.nav.walkTo(RelRobotLocation(200,0,0))
+        player.brain.nav.walkTo(RelRobotLocation(200,0,0))
         player.brain.tracker.trackBall()
-    elif (player.nav.isStopped() or
-          transitions.shouldChaseBall()):
+    elif (player.brain.nav.isStopped() or
+          transitions.shouldChaseBall(player)):
         return player.goLater('chase')
 
     if not player.brain.play.isChaser():
         # We've role switched out naturally. Go to appropriate state.
-        player.nav.stop # walkTo is a bit dangerous. do this to be careful.
+        player.brain.nav.stop # walkTo is a bit dangerous. do this to be careful.
         return player.goLater('playbookPosition')
 
     return player.stay()
