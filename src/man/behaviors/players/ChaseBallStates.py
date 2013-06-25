@@ -228,7 +228,7 @@ def positionForKick(player):
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
     positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
-                                                ball.rel_y - kick_pos[1],
+                                                ball.rel_y - kick_pos[1] - constants.SETUP_DISTANCE_X,
                                                 0)
 
     if player.firstFrame():
@@ -238,6 +238,43 @@ def positionForKick(player):
         player.brain.nav.goTo(positionForKick.kickPose,
                               Navigator.PRECISELY,
                               Navigator.GRADUAL_SPEED,
+                              False,
+                              Navigator.ADAPTIVE)
+    else:
+        player.brain.nav.updateDest(positionForKick.kickPose)
+
+    if transitions.shouldFindBallKick(player):
+        player.inKickingState = False
+        return player.goLater('chase')
+
+    if (transitions.ballInPosition(player, positionForKick.kickPose) or
+        player.brain.nav.isAtPosition()):
+        print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
+        player.ballBeforeKick = player.brain.ball
+        player.brain.nav.stand()
+        return player.goNow('precisePositionForKick')
+
+    return player.stay()
+
+def precisePositionForKick(player):
+    if (transitions.shouldApproachBallAgain(player) or
+        transitions.shouldRedecideKick(player)):
+        player.inKickingState = False
+        return player.goLater('chase')
+
+    ball = player.brain.ball
+    kick_pos = player.kick.getPosition()
+    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
+                                                ball.rel_y - kick_pos[1],
+                                                0)
+
+    if player.firstFrame():
+        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
+        player.brain.tracker.lookStraightThenTrack()
+        #only enque the new goTo destination once and update it afterwards
+        player.brain.nav.goTo(positionForKick.kickPose,
+                              Navigator.PRECISELY,
+                              Navigator.SLUGGISH_SPEED,
                               False,
                               Navigator.ADAPTIVE)
     else:
