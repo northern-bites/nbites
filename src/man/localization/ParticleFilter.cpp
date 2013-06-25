@@ -58,7 +58,7 @@ ParticleFilter::~ParticleFilter()
 void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::VisionField&     visionInput)
 {
-    motionSystem->update(particles, odometryInput, nearMidField());
+    motionSystem->update(particles, odometryInput, errorMagnitude);
 
     // Update the Vision Model
     // set updated vision to determine if resampling necessary
@@ -129,7 +129,7 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
     //     resetLocToSide(true);
     // }
 
-    motionSystem->update(particles, odometryInput, nearMidField());
+    motionSystem->update(particles, odometryInput, errorMagnitude);
 
     // Update the Vision Model
     // set updated vision to determine if resampling necessary
@@ -444,7 +444,7 @@ void ParticleFilter::resample()
         {
             // If the reconstructions is on the same side and not near midfield
             if ( ((*recLocIt).defSide == onDefendingSide())
-                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 120)) {
+                 && (fabs((*recLocIt).x - CENTER_FIELD_X) > 50)) {
 //                std::cout << "Use reconstruction " << (*recLocIt).x << " " << (*recLocIt).y << std::endl;
 
                      Particle reconstructedParticle((*recLocIt).x,
