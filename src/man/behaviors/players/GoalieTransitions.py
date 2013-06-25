@@ -143,6 +143,41 @@ def goodRightCornerObservation(player):
 
     return False
 
+def shouldMoveForward(player):
+    print "*** Should I move forward? ***"
+    vision = player.brain.interface.visionField
+
+    foundGoalBoxTop = 0
+
+    for i in range(0, vision.visual_line_size()):
+        if vision.visual_line(i).visual_detection.distance < 200.0:
+            foundGoalBoxTop = vision.visual_line(i).visual_detection.distance
+            print "Got the goal box top at: " + str(foundGoalBoxTop)
+            break
+
+    if not foundGoalBoxTop:
+        print "Didn't find the goal box top. Done."
+        return False
+
+    print "There are " + str(vision.bottom_line_size()) + " bottom lines to look at"
+    for i in range(0, vision.bottom_line_size()):
+        print "Got a bottom line at " + str(vision.visual_line(i).visual_detection.distance)
+        if (vision.visual_line(i).visual_detection.distance > 70.0):
+            print "  Threw it out because of distance."
+        if (vision.visual_field_edge.distance_m < 150.0):
+            print "  Threw it out because of field edge."
+        if (math.fabs(vision.visual_line(i).visual_detection.distance -
+                      foundGoalBoxTop) < 30.0):
+            print "  Threw it out because it was the same line."
+
+        if (vision.visual_line(i).visual_detection.distance < 70.0 and
+            vision.visual_field_edge.distance_m > 150.0 and
+            math.fabs(vision.visual_line(i).visual_detection.distance -
+                      foundGoalBoxTop) > 30.0):
+            return True
+
+    return False
+
 def facingSideways(player):
     """
     If the robot is facing a post directly, it's probably turned around.

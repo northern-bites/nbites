@@ -92,7 +92,7 @@ def gamePlaying(player):
     if player.lastDiffState == 'fallen':
         return player.goLater('spinAtGoal')
 
-    return player.goLater('watch')
+    return player.goLater('watchWithCornerChecks')
 
 def gamePenalized(player):
     if player.firstFrame():
@@ -204,6 +204,13 @@ def fixMyself(player):
         player.brain.nav.walkTo(dest)
 
     return Transition.getNextState(player, fixMyself)
+
+def moveForward(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.brain.nav.walkTo(RelRobotLocation(30, 0, 0))
+
+    return Transition.getNextState(player, moveForward)
 
 def kickBall(player):
     """

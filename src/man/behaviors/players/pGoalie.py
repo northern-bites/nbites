@@ -65,6 +65,11 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.OK_PRECISION)
             : GoalieStates.fixMyself,
 
+            Transition.CountTransition(GoalieTransitions.shouldMoveForward,
+                                       Transition.MOST_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.moveForward,
+
             Transition.CountTransition(GoalieTransitions.goodPosition,
                                        Transition.MOST_OF_THE_TIME,
                                        Transition.OK_PRECISION)
@@ -119,6 +124,18 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             # : GoalieStates.saveRight,
 
             Transition.CountTransition(GoalieTransitions.shouldClearBall,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : VisualGoalieStates.clearIt
+            }
+
+        GoalieStates.moveForward.transitions = {
+            Transition.CountTransition(GoalieTransitions.doneWalking,
+                                       Transition.ALL_OF_THE_TIME,
+                                       Transition.LOW_PRECISION)
+            : GoalieStates.watchWithCornerChecks,
+
+            Transition.CountTransition(GoalieTransitions.ballMoreImportant,
                                        Transition.SOME_OF_THE_TIME,
                                        Transition.OK_PRECISION)
             : VisualGoalieStates.clearIt
