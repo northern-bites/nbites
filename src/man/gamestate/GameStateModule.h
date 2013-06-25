@@ -53,6 +53,7 @@ private:
     int  response_status;
 
     bool keep_time;
+    long long start_time;
 };
 
 }

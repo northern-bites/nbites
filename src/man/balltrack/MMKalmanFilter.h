@@ -44,7 +44,7 @@ static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
     10.f,               // initCovY
     25.f,               // initCovVelX
     25.f,               // initCovVelY
-    15.f,                 // threshold for ball is moving!
+    35.f,                 // threshold for ball is moving!
     4,                   // buffer size
     30.f                 // badStationaryThresh
 };
@@ -78,6 +78,17 @@ public:
     float getRelXDest(){return filters.at((unsigned)bestFilter)->getRelXDest();};
     float getRelYDest(){return filters.at((unsigned)bestFilter)->getRelYDest();};
     float getRelYIntersectDest(){return filters.at((unsigned)bestFilter)->getRelYIntersectDest();};
+
+    float getStationaryRelX(){return filters.at((unsigned) 0)->getRelXPosEst();};
+    float getStationaryRelY(){return filters.at((unsigned) 0)->getRelYPosEst();};
+    float getStationaryDistance(){return filters.at((unsigned) 0)->getFilteredDist();};
+    float getStationaryBearing() {return filters.at((unsigned) 0)->getFilteredBear();};
+
+    float getMovingRelX(){return filters.at((unsigned) 1)->getRelXPosEst();};
+    float getMovingRelY(){return filters.at((unsigned) 1)->getRelYPosEst();};
+    float getMovingDistance(){return filters.at((unsigned) 1)->getFilteredDist();};
+    float getMovingBearing() {return filters.at((unsigned) 1)->getFilteredBear();};
+
 
     bool isStationary(){return stationary;};
 

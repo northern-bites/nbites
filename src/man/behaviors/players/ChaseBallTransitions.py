@@ -19,7 +19,7 @@ def shouldPrepareForKick(player):
     """
     ball = player.brain.ball
     return (ball.vis.frames_on > 4 and
-            ball.distance < constants.PREPARE_FOR_KICK_DIST)
+            ball.stat_distance < constants.PREPARE_FOR_KICK_DIST)
 
 def shouldSpinToBall(player):
     """
@@ -44,7 +44,7 @@ def shouldApproachBallAgain(player):
     The ball got really far away somehow
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST
+    return ball.vis.on and ball.stat_distance > constants.APPROACH_BALL_AGAIN_DIST
 
 def shouldRedecideKick(player):
     """
@@ -135,7 +135,7 @@ def shouldFindBallKick(player):
     """
     We lost the ball while in a kicking state, be more generous before looking
     """
-    return (player.brain.ball.vis.frames_off > constants.BALL_OFF_KICK_THRESH)
+    return (player.stateTime > constants.BALL_OFF_KICK_THRESH)
 
 def shouldFindBallPosition(player):
     """
