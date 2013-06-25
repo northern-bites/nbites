@@ -50,3 +50,10 @@ message FilteredBall
     optional float speed = 18;
     optional float rel_y_intersect_dest = 19;
 }
+
+message SharedBall {
+    optional float x = 1;
+    optional float y = 2;
+
+    optional uint32 age = 3;
+}
