@@ -155,7 +155,8 @@ class Brain(object):
         self.nav.run()
 
         # HACK for dangerous ball flipping loc
-        if self.updateDangerousBallFilter() and self.updateOwnBallFilter():
+        if (self.updateDangerousBallFilter() and self.updateOwnBallFilter() and
+            self.playerNumber != 1: # HACK: if I'm the goalie, don't flip my loc!
             #flip loc!
             self.flipLoc()
 
