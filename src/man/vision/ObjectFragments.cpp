@@ -108,7 +108,7 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
 	POSTDEBUG = false;
 	CORRECT = false;
 	PRINTOBJS = false;
-	POSTLOGIC = true;
+	POSTLOGIC = false;
 	SANITY = false;
 #endif
 }
