@@ -1386,7 +1386,7 @@ void Threshold::setFramesOnAndOff(VisualDetection *objPtr) {
  */
 void Threshold::setFieldObjectInfo(VisualFieldObject *objPtr) {
     // if the object is on screen, basically
-    if (objPtr->getHeight() > 0) {
+    if (objPtr->getWidth() > 0) {
         // set center x,y
         objPtr->setCenterX(objPtr->getX() + ROUND(objPtr->getWidth()/2));
         objPtr->setCenterY(objPtr->getY() + ROUND(objPtr->getHeight()/2));
