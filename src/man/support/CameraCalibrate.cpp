@@ -4,7 +4,7 @@
 // order is Y, X because when we when we multiply a vector to the right the order
 // in which the vector is multiplied with the transforms is X, Y (since it goes right
 // to left; e.g. for M = ROT_Y * ROT_X, we have Mv = ROT_Y * ROT_X * v, so v gets multiplied
-// with ROT_X first, which is the proper order 
+// with ROT_X first, which is the proper order
 // WARNING: matrix multiplication not commutative
 
 //default parameters/transforms
@@ -36,12 +36,11 @@ void CameraCalibrate::UpdateByName(std::string name)
     float paramsTop[] = {0.0f, 0.0f};
     float paramsBottom[] = {0.0f, 0.0f};
 
-    // These are for river's head on kaylee's body! MAKE SURE TO FIX
-    if (name == "river") { // Changed 6/11/13
-        paramsTop[PITCH] = 0.07f;
+    if (name == "river") {
+        paramsTop[PITCH] = -0.06f;
         paramsTop[ROLL] = -0.02f;
-        paramsBottom[PITCH] = 0.14f;
-        paramsBottom[ROLL] = -0.01f;
+        paramsBottom[PITCH] = 0.0f;
+        paramsBottom[ROLL] = -0.02f;
     // These are for mal's head on simon's body! MAKE SURE TO FIX
     } else if (name == "mal") { // Changed 6/11/13
         paramsTop[PITCH] = 0.10f;
