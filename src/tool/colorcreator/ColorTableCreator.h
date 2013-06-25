@@ -104,6 +104,7 @@ signals:
     void tableChanges(std::vector<color::colorChanges> tableAdjustments);
     void tableUnChanges(std::vector<color::colorChanges> tableAdjustments);
 
+    void filtSig(bool doFilter);
 
 protected slots:
 
@@ -143,6 +144,7 @@ private:
 
     // Used to change, store which color user is currently working on
     QComboBox colorSelect;
+    QCheckBox* filter;
     int currentColor;
 
     // Keep track of top vs bottom camera
