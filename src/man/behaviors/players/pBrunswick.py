@@ -109,7 +109,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
                 return 'kickoff'
             return 'chase'
-        elif self.play.isRole(PBConstants.PENALTY_ROLE):
+        elif self.brain.gameController.penalized:
             return 'gamePenalized'
         else:
             return 'playbookPosition'

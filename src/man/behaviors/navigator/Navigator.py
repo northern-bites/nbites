@@ -4,6 +4,7 @@ from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelRobotLocation
+from math import pi
 from ..kickDecider import kicks
 from ..util import Transition
 
@@ -22,7 +23,7 @@ KEEP_SAME_SPEED = -1
 #walk speed adapt
 ADAPTIVE = True
 #goTo precision
-PLAYBOOK = (5.0, 5.0, 10)
+PLAYBOOK = (10.0, 10.0, 10)
 GENERAL_AREA = (5.0, 5.0, 20)
 CLOSE_ENOUGH = (3.5, 3.5, 10)
 PRECISELY = (1.0, 1.0, 5)
@@ -46,10 +47,12 @@ class Navigator(FSA.FSA):
 
         #transitions
         #@todo: move this to the actual transitions file?
-        self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination)
-        self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition,
+        self.atLocPositionTransition = Transition.CountTransition(navTrans.atDestination,
                                                                   Transition.SOME_OF_THE_TIME,
-                                                                  Transition.LOW_PRECISION)
+                                                                  Transition.OK_PRECISION)
+        self.locRepositionTransition = Transition.CountTransition(navTrans.notAtLocPosition,
+                                                                  Transition.MOST_OF_THE_TIME,
+                                                                  Transition.HIGH_PRECISION)
 
         NavStates.goToPosition.transitions = {
             self.atLocPositionTransition : NavStates.atPosition,
@@ -82,11 +85,11 @@ class Navigator(FSA.FSA):
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
 
-    def positionPlaybook(self, prec = PRECISELY):
+    def positionPlaybook(self):
         """
         Calls goTo on the playbook position
         """
-        self.goTo(self.brain.play.getPositionCoord(), precision = prec,
+        self.goTo(self.brain.play.getPositionCoord(), precision = PLAYBOOK,
                   speed = QUICK_SPEED, avoidObstacles = True, fast = True, pb = True)
 
     def chaseBall(self, speed = FAST_SPEED, fast = False):

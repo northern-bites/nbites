@@ -19,11 +19,7 @@ def atDestination(nav):
     my = nav.brain.loc
     (x, y, h) = states.goToPosition.precision
 
-    if (not helper.isDestinationRelative(states.goToPosition.dest)):
-        # HACK HACK '30's below should be loc uncerts.
-        return relDest.within((x + 10, y + 10, h + 10))
-    else:
-        return relDest.within((x, y, h))
+    return relDest.within((x, y, h))
 
 # Transition: Should I perform a dodge? Also sets up the direction.
 def shouldDodge(nav):

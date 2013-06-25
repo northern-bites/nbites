@@ -1165,7 +1165,7 @@ void Ball::setFramesOnAndOff(VisualBall *objPtr) {
         objPtr->setFramesOff(0);
     }
     else {
-      if (!thresh->usingTopCamera){
+      if (thresh->usingTopCamera){
         objPtr->setFramesOff(objPtr->getFramesOff()+1);
         objPtr->setFramesOn(0);
       }

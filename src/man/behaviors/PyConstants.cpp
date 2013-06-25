@@ -248,6 +248,7 @@ BOOST_PYTHON_MODULE(noggin_constants)
     scope().attr("HEADING_UP") = HEADING_UP;
     scope().attr("HEADING_DOWN") = HEADING_DOWN;
     scope().attr("HEADING_RIGHT") = HEADING_RIGHT;
+    scope().attr("HEADING_LEFT") = HEADING_LEFT;
 
 	// Messages
 	scope().attr("GAME_STATE_IN") = GAME_STATE_IN;

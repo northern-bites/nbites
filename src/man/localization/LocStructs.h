@@ -434,8 +434,8 @@ struct Line {
             l3 = intersect.distanceTo(obsv.end);
             float area2 = NBMath::calcTriangleArea(l1, l2, l3);
 
-            // Return in units cm, not cm^2
-            float error = std::sqrt((area1 + area2));
+            // Return in units sqrt(cm), not cm^2 to scale it
+            float error = std::sqrt(std::sqrt((area1 + area2)));
             //float error = (area1 + area2)/length();
             LineErrorMatch errorMatch;
             errorMatch.error = error;
@@ -466,8 +466,8 @@ struct Line {
             l3 = startProj.distanceTo(obsv.end);
             float area2 = NBMath::calcTriangleArea(l1, l2, l3);
 
-            // Return in units cm, not cm^2
-            float error = std::sqrt((area1 + area2));
+            // Return in units sqrt(cm), not cm^2
+            float error = std::sqrt(std::sqrt((area1 + area2)));
             //float error = (area1 + area2)/length();
             LineErrorMatch errorMatch;
             errorMatch.error = error;
