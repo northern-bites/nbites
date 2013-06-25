@@ -230,29 +230,21 @@ def shouldDiveRight(player):
             player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
             player.brain.ball.rel_y_intersect_dest < -5.0 and
-            player.brain.ball.vis.frames_on > 10)
+            player.brain.ball.vis.frames_on > 30)
 
 def shouldDiveLeft(player):
     return (player.brain.ball.vel_x < 0.0 and
             player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
             player.brain.ball.rel_y_intersect_dest > 5.0 and
-            player.brain.ball.vis.frames_on > 10)
+            player.brain.ball.vis.frames_on > 30)
 
 def shouldSquat(player):
-    corner = getLeftGoalboxCorner(player)
-    if corner:
-        print "Left distance: " + str(corner.visual_detection.distance)
-    else:
-        corner = getRightGoalboxCorner(player)
-        if corner:
-            print "Right distance: " + str(corner.visual_detection.distance)
-
     return (player.brain.ball.vel_x < 0.0 and
             player.brain.ball.speed > 15.0 and
             player.brain.ball.rel_x_dest < 0.0 and
             abs(player.brain.ball.rel_y_intersect_dest) < 30.0 and
-            player.brain.ball.vis.frames_on > 10)
+            player.brain.ball.vis.frames_on > 30)
 
 def shouldClearBall(player):
     """

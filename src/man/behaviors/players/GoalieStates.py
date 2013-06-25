@@ -4,6 +4,7 @@ from ..navigator import Navigator as nav
 from ..util import Transition
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
+from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
@@ -268,6 +269,7 @@ def saveRight(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+            player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
         else:
             player.executeMove(SweetMoves.GOALIE_TEST_DIVE_RIGHT)
 
@@ -286,6 +288,7 @@ def saveLeft(player):
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+            player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
         else:
             player.executeMove(SweetMoves.GOALIE_TEST_DIVE_LEFT)
 
@@ -338,6 +341,7 @@ def waitForPenaltySave(player):
 def diveRight(player):
     if player.firstFrame():
         player.brain.fallController.enabled = False
+        player.performHeadMove
         player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
 
     return player.stay()
