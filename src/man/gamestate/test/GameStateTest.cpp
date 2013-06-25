@@ -55,6 +55,7 @@ protected:
             bot = red->add_player();
             bot->set_penalty(PENALTY_NONE);
         }
+        testData.set_have_remote_gc(false);
     }
 };
 
@@ -83,12 +84,15 @@ TEST_F(GameStateTest, AdvanceState)
 
     gameState.advanceState();
     EXPECT_EQ(STATE_PLAYING, gameState.latest_data.state());
+    EXPECT_EQ(true, gameState.keep_time);
 }
 
 TEST_F(GameStateTest, PenaltyTest)
 {
     testData.set_state(STATE_PLAYING);
     gameState.latest_data = testData;
+    portals::Message<messages::GameState> gs = (&testData);
+    gameState.commInput.setMessage(gs);
 
     gameState.advanceState();
     EXPECT_EQ(GAMECONTROLLER_RETURN_MSG_MAN_PENALISE,
