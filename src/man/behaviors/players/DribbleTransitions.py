@@ -7,10 +7,11 @@ def shouldDribble(player):
     """
     We should be in the dribble FSA.
     """
-    return ((facingGoal(player) or wouldScoreIfDribbledStraight(player)) 
+    return (DRIBBLE_TOGGLE and
+            (facingGoal(player) or wouldScoreIfDribbledStraight(player)) 
             and timeLeft(player) and not onWingDownfield(player) and 
             not ballGotFarAway(player) and not ballLost(player) and 
-            (betweenCrosses(player) or shouldDribbleForGoal(player)))
+            (inPosition(player) or shouldDribbleForGoal(player)))
 
 def shouldDribbleForGoal(player):
     """
@@ -38,11 +39,41 @@ def noGoalieInNet(player):
     vr = player.brain.interface.visionRobot
     return (not vr.red1.on and not vr.navy1.on)
 
+def inPosition(player):
+    """
+    We are positioned well on the field for dribbling.
+    """
+    return betweenCrosses(player)
+
 def betweenCrosses(player):
     """
     We are between the two field crosses.
     """
     return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
+            player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
+
+def middleThird(player):
+    """
+    We are in the middle third of the field.
+    """
+    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
+    return (player.brain.loc.x > field_len / 3. and
+            player.brain.loc.x < 2. * field_len / 3.)
+
+def firstHalf(player):
+    """
+    We are between our field cross and midfield.
+    """
+    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
+    return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
+            player.brain.locl.x < field_len / 2.)
+
+def secondHalf(player):
+    """
+    We are between midfield and our opponent's field cross.
+    """
+    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
+    return (player.brain.loc.x > field_len / 2. and
             player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
 
 def facingGoal(player):
