@@ -100,6 +100,10 @@ def gamePlaying(player):
             print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
             if player.lastStateTime > 5:
                 return player.goNow('afterPenalty')
+        if (player.lastDiffState == 'afterPenalty' and
+            player.brain.play.isChaser()):
+            # special behavior case
+            return player.goNow('postPenaltyChaser')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
