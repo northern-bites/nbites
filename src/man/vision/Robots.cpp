@@ -60,7 +60,7 @@ void Robots::init()
 	numberOfRuns = 0;
 
 #ifdef OFFLINE
-	debugRobots = false;
+	debugRobots = true;
 #endif
 }
 

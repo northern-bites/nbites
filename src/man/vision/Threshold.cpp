@@ -522,7 +522,7 @@ void Threshold::lowerRuns() {
 
 void Threshold::findGoals(int column, int topEdge) {
     const int BADSIZE = 15;
-    const int GAP = BADSIZE * 2;
+    const int GAP = BADSIZE;
     // scan up for goals
     int bad = 0, yellows = 0, pinks = 0, navy = 0;
     int firstYellow = topEdge, lastNavy = topEdge, firstNavy = topEdge,
