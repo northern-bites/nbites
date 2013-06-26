@@ -89,9 +89,9 @@ def prepareForKick(player):
     if hackKick.DEBUG_KICK_DECISION:
         print str(player.kick)
 
-    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-    #     if dr_trans.shouldDribble(player):
-    #         return player.goNow('decideDribble')
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -199,9 +199,9 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-    #     if dr_trans.shouldDribble(player):
-    #         return player.goNow('decideDribble')
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
