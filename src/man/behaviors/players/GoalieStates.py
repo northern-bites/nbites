@@ -354,7 +354,7 @@ def penaltyShotsGameSet(player):
         player.brain.fallController.enabled = False
         player.stand()
         player.brain.tracker.trackBall()
-        player.side = LEFT
+        player.side = constants.LEFT
         player.isSaving = False
         player.penaltyKicking = True
 
