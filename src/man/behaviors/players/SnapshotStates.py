@@ -15,6 +15,7 @@ def gameReady(player):
 def gameSet(player):
     if player.firstFrame():
         player.stand()
+        player.brain.tracker.lookToAngle(0)
 
     return player.stay()
 
