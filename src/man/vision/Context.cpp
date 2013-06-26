@@ -132,7 +132,20 @@ void Context::identifyCorners(list <VisualCorner> &corners)
             classifyOuterL(*one);
         } else if (one->getShape() == T) {
             classifyT(*one);
-        }
+        } else if (one->getShape() == CIRCLE) {
+			// EINDHOVEN - we sometimes see goal Ts as CCs
+			if (objectRightX > -1) {
+				float distToObject = realDistance(one->getX(), one->getY(),
+												  objectRightX, objectRightY);
+				if (distToObject < 150.0f) {
+					if (debugIdentifyCorners) {
+						cout << "Converting CC to a T because it is very near goal" << endl;
+					}
+					one->setShape(T);
+					classifyT(*one);
+				}
+			}
+		}
     }
 
     // We might later use uncertain objects, but they cause problems. e.g. if you
@@ -1623,6 +1636,31 @@ void Context::findCornerRelationship(VisualCorner & first,
             cout << "Two non T corners with common length " <<
                 commonDist << endl;
         }
+		// EINDHOVEN: we can see a CC on a goal T because of the white frame
+		if (first.getShape() == CIRCLE || second.getShape() == CIRCLE) {
+			// check if either of them are really close to the goal
+			// check distance of t to object if any
+			float distToObject = 1000.0f;
+			float distToObject2 = 1000.0f;
+			if (objectRightX >= 0) {
+				distToObject = realDistance(first.getX(), first.getY(),
+											objectRightX, objectRightY);
+				distToObject2 = realDistance(second.getX(), second.getY(),
+											objectRightX, objectRightY);
+				if (distToObject < 150 || distToObject2 < 150) {
+					if (first.getShape() == CIRCLE) {
+						first.setShape(T);
+						checkTToGoal(first, second, common);
+						return;
+					} else {
+						second.setShape(T);
+						checkTToGoal(second, first, common);
+						return;
+					}
+				}
+			}
+
+		}
         if (first.getShape() == INNER_L && second.getShape() == OUTER_L) {
             checkInnerToOuter(first, second);
         } else if (first.getShape() == OUTER_L && second.getShape() == INNER_L) {
