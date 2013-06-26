@@ -115,7 +115,7 @@ def orbitBall(player):
     # Taken from shoot in hackKickInformation
     goalCenter = Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,
                                   nogginConstants.CENTER_FIELD_Y)
-    ballLocation = Location(player.brain.loc.x + player.brain.ball.stat_rel_x, 
+    ballLocation = Location(player.brain.loc.x + player.brain.ball.stat_rel_x,
                             player.brain.loc.y + player.brain.ball.stat_rel_y)
     headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
     bearingForKick = headingBallToGoalCenter - player.brain.loc.h
@@ -143,7 +143,7 @@ def orbitBall(player):
     #     print "==============================="
 
     # Are we pointed in the right direction?
-    if (orbitBall.desiredHeading > -constants.ORBIT_GOOD_BEARING and 
+    if (orbitBall.desiredHeading > -constants.ORBIT_GOOD_BEARING and
         orbitBall.desiredHeading < constants.ORBIT_GOOD_BEARING):
         player.stopWalking()
         player.shouldOrbit = False
@@ -157,10 +157,10 @@ def orbitBall(player):
         return player.goLater('chase')
 
     # Are we at a good distance from the ball to orbit?
-    if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR < 
+    if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
         player.brain.ball.stat_distance): # Too far away
         player.brain.nav.setXSpeed(.15)
-    elif (constants.ORBIT_BALL_DISTANCE - constants.ORBIT_DISTANCE_CLOSE > 
+    elif (constants.ORBIT_BALL_DISTANCE - constants.ORBIT_DISTANCE_CLOSE >
        player.brain.ball.stat_distance): # Too close
         player.brain.nav.setXSpeed(-.15)
     elif (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_GOOD >
