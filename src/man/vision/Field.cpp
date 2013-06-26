@@ -308,9 +308,9 @@ void Field::findTopEdges(int M) {
    or is roughly horizontal;
  */
 int Field::findSlant() {
-	if (topEdge[0] > topEdge[IMAGE_HEIGHT - 1] + 20) {
+	if (topEdge[0] > topEdge[IMAGE_HEIGHT - 1] + 30) {
 		return 1;
-	} else if (topEdge[IMAGE_HEIGHT - 1] > topEdge[0] + 20) {
+	} else if (topEdge[IMAGE_HEIGHT - 1] > topEdge[0] + 30) {
 		return -1;
 	}
 	return 0;
