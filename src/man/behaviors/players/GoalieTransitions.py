@@ -308,14 +308,18 @@ def shouldClearDangerousBall(player):
     if player.brain.ball.vis.frames_off > 10:
         return False
 
-    if (math.fabs(player.brain.ball.bearing_deg) > 60.0 and
-        player.brain.ball.distance < 60.0):
+    if (math.fabs(player.brain.ball.bearing_deg) > 70.0 and
+        player.brain.ball.distance < 50.0):
+        if player.brain.ball.bearing_deg < 0:
+            VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
+        else:
+            VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
         return True
 
     return False
 
 def ballSafe(player):
-    return math.fabs(player.brain.ball.bearing_deg) < 50.0
+    return math.fabs(player.brain.ball.bearing_deg) < 60.0
 
 def shouldClearBall(player):
     """
@@ -337,34 +341,44 @@ def shouldClearBall(player):
     if not player.brain.ball.vis.on:
         return False
 
+    shouldGo = False
+
     # if definitely within goal box
     if (player.brain.ball.distance < 80.0):
         walkedTooFar.xThresh = 130.0
         walkedTooFar.yThresh = 130.0
-        return True
+        shouldGo = True
 
     # farther out but being aggressive
     if (player.brain.ball.distance < 120 and
         player.aggressive):
         walkedTooFar.xThresh = 170.0
         walkedTooFar.yThresh = 170.0
-        return True
+        shouldGo = True
 
     # if to sides of box
     if (player.brain.ball.distance < 120.0 and
         math.fabs(player.brain.ball.bearing_deg) > 40.0):
         walkedTooFar.xThresh = 130.0
         walkedTooFar.yThresh = 170.0
-        return True
+        shouldGo = True
 
     # to goalie's sides, being aggressive
     if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
         player.aggressive):
         walkedTooFar.xThresh = 170.0
         walkedTooFar.yThresh = 300.0
-        return True
+        shouldGo = True
 
-    return False
+    if shouldGo:
+        if player.brain.ball.bearing_deg < -50.0:
+            VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
+        elif player.brain.ball.bearing_deg > 50.0:
+            VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
+        else:
+            VisualGoalieStates.clearIt.dangerousSide = -1
+
+    return shouldGo
 
 def ballLostStopChasing(player):
     """
