@@ -227,7 +227,6 @@ def positionForKick(player):
 
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
-        print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.ballBeforeKick = player.brain.ball
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
@@ -377,7 +376,6 @@ def positionForPenaltyKick(player):
 
     if (transitions.ballInPosition(player, positionForPenaltyKick.kickPose) or
         player.brain.nav.isAtPosition()):
-        print "DEBUG_SUITE: In 'positionForPenaltyKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         positionForPenaltyKick.yes = True
         #return player.stay()
         player.brain.nav.stand()
@@ -386,7 +384,7 @@ def positionForPenaltyKick(player):
     if positionForPenaltyKick.yes:
         print "ball relX: ", ball.rel_x
         print "ball relY: ", ball.rel_y
-    
+
     return player.stay()
 
 
