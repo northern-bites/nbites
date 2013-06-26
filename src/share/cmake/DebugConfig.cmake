@@ -89,6 +89,11 @@ if(USE_LOGGING)
     OFF
     )
   option(
+    LOG_BALLTRACK
+    "Log the ball filter"
+    OFF
+    )
+  option(
     LOG_LOCATION
     "Log the robots location belief"
     OFF
@@ -124,6 +129,7 @@ else(USE_LOGGING)
   unset(LOG_LOCALIZATION CACHE)
   unset(LOG_OBSERVATIONS CACHE)
   unset(LOG_ODOMETRY CACHE)
+  unset(LOG_BALLTRACK CACHE)
   unset(LOG_SYNC CACHE)
 endif(USE_LOGGING)
 
