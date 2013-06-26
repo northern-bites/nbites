@@ -1,6 +1,6 @@
 import time
 import sys
-from math import pi
+import math
 
 # Redirect standard error to standard out
 _stderr = sys.stderr
@@ -10,7 +10,7 @@ sys.stderr = sys.stdout
 
 # Packages and modules from super-directories
 import noggin_constants as Constants
-from objects import RobotLocation
+from objects import Location, RobotLocation
 
 # Modules from this directory
 from . import Leds
@@ -93,10 +93,8 @@ class Brain(object):
         self.interface = interface.interface
 
         # HACK for dangerous ball flipping loc
-        self.dangerousBallFilter = []
-        self.dangerousBallFilterCount = 0
-        self.ownBallFilter = []
-        self.ownBallFilterCount = 0
+        self.noFlipFilter = []
+        self.flipFilter = []
 
     def initTeamMembers(self):
         self.teamMembers = []
@@ -155,9 +153,7 @@ class Brain(object):
         self.nav.run()
 
         # HACK for dangerous ball flipping loc
-        if (self.updateDangerousBallFilter() and self.updateOwnBallFilter()):
-            #flip loc!
-            self.flipLoc()
+        self.flipLocFilter()
 
         # Set LED message
         self.leds.processLeds()
@@ -240,7 +236,7 @@ class Brain(object):
         """
         self.loc = RobotLocation(self.interface.loc.x,
                                  self.interface.loc.y,
-                                 self.interface.loc.h * (180. / pi))
+                                 self.interface.loc.h * (180. / math.pi))
         self.locUncert = self.interface.loc.uncert
 
     def resetLocTo(self, x, y, h):
@@ -249,7 +245,7 @@ class Brain(object):
         """
         self.interface.resetLocRequest.x = x
         self.interface.resetLocRequest.y = y
-        self.interface.resetLocRequest.h = h * (pi / 180.)
+        self.interface.resetLocRequest.h = h * (math.pi / 180.)
         self.interface.resetLocRequest.timestamp = int(self.time * 1000)
 
     def resetInitialLocalization(self):
@@ -363,68 +359,87 @@ class Brain(object):
     # THIS IS A HACK!
     # ... but until we have a world contextor or some such, it's a necessary one.
 
-    def updateDangerousBallFilter(self):
+    def flipLocFilter(self):
         """
-        Updates a filter of the last 20 frames for dangerous ball calls from the goalie.
-        @return: true if the goalie has seen a ball 15 times in the last 20 frames.
+        Check where the goalie sees the ball and where we do.
+        Record if we're generally correct, or if our flipped location
+        is generally correct, or if neither one agrees with the goalie.
+        NOTE: ignore whenever the ball is in the middle 2x2 meter box.
         """
-        # Add to the filter for this frame
+        # Get goalie data
         for mate in self.teamMembers:
-            if mate.playerNumber in [1] and mate.active:
-                if mate.ballOn and mate.ballDist < 350:
-                    self.dangerousBallFilter.append(1)
-                else:
-                    self.dangerousBallFilter.append(0)
-
-        # If there isn't a goalie, the list will be empty, so don't try to read it.
-        if len(self.dangerousBallFilter) > 0:
-            # add to the counter whatever was appended
-            self.dangerousBallFilterCount += self.dangerousBallFilter[len(self.dangerousBallFilter)-1]
-
-        # check if the filter has been populated yet.
-        if len(self.dangerousBallFilter) > 20:
-            # Remove from the filter for oldest frame and change the counter
-            self.dangerousBallFilterCount -= self.dangerousBallFilter.pop(0)
-
-        # Is the counter high enough to flip loc?
-        return self.dangerousBallFilterCount > 15
-
-    def updateOwnBallFilter(self):
-        """
-        As above, but for myself.
-        """
-        # Add to the filter for this frame
-        for mate in self.teamMembers:
-            if mate.playerNumber in [self.playerNumber]:
+            if mate.isDefaultGoalie() and mate.active:
                 if mate.ballOn:
-                    self.ownBallFilter.append(1)
-                else:
-                    self.ownBallFilter.append(0)
+                    # calculate global ball coordinates
+                    # note: assume goalie is in center of goal.
+                    goalie_x = Constants.FIELD_WHITE_LEFT_SIDELINE_X
+                    goalie_y = Constants.MIDFIELD_Y
 
-        # add to the counter whatever was appended
-        self.ownBallFilterCount += self.ownBallFilter[len(self.ownBallFilter)-1]
+                    ball_x = goalie_x + (mate.ballDist * math.cos(mate.ballBearing))
+                    ball_y = goalie_y + (mate.ballDist * math.sin(mate.ballBearing))
+                    goalie_ball_location = Location(ball_x, ball_y)
 
-        # check if the filter has been populated yet.
-        if len(self.ownBallFilter) > 20:
-            # Remove from the filter for oldest frame and change the counter
-            self.ownBallFilterCount -= self.ownBallFilter.pop(0)
+                    # check against my data
+                    my_ball_location = Location(self.ball.x, self.ball.y)
+                    flipped_ball_location = Location(Constants.FIELD_GREEN_WIDTH - self.ball.x,
+                                                     Constants.FIELD_GREEN_HEIGHT - self.ball.y)
 
-        # Is the counter high enough to flip loc?
-        return self.ownBallFilterCount > 15
+                    if (goalie_ball_location.inCenterCenter() or
+                        my_ball_location.inCenterCenter()):
+                        # Ball is too close to the middle of the field. Risky.
+                        self.updateFlipFilters(0)
+                        return
+
+                    if my_ball_location.distTo(goalie_ball_location) < 100:
+                        # I'm probably in the right place!
+                        self.updateFlipFilters(1)
+                    elif flipped_ball_location.distTo(goalie_ball_location) < 100:
+                        # I'm probably flipped!
+                        self.updateFlipFilters(-1)
+                    else:
+                        # I don't agree with the goalie. Ignore.
+                        self.updateFlipFilters(0)
+
+        # If I've decided I should flip enough times, actually do it.
+        if (len(self.flipFilter) > 0 and
+            sum(self.flipFilter) > 6):
+            self.flipLoc()
+            # Reset filters! Don't want to flip again next frame.
+            self.noFlipFilter = []
+            self.flipFilter = []
+
+    def updateFlipFilters(self, value):
+        if value > 0:
+            # I think I shouldn't flip
+            self.noFlipFilter.append(1)
+            self.flipFilter.append(0)
+        elif value < 0:
+            # I think I should flip
+            self.noFlipFilter.append(0)
+            self.flipFilter.append(1)
+        else:
+            # Neither option agrees with the goalie.
+            self.noFlipFilter.append(0)
+            self.flipFilter.append(0)
+
+        # If filters are too long, pop oldest value.
+        if len(self.noFlipFilter) > 10:
+            self.noFlipFilter.pop(0)
+        if len(self.flipFilter) > 10:
+            self.flipFilter.pop(0)
 
 
     def flipLoc(self):
         """
-        The goalie has a ball nearby.
-        If we are near a ball, but think we're near opposing goal,
-        FLIP LOC.
+        The goalie sees a ball.
+        Check our current estimate of the ball against a flip.
+        If the flip is much better, flip our loc.
         """
-        if self.ball.x < Constants.MIDFIELD_X:
-            # Loc is accurate. Abort flip.
-            return
 
         print "According to the Goalie, I need to flip my loc!"
-        print "My x position was: " + str(self.loc.x)
+
+        print ("My position was (" + str(self.loc.x) + ", " + str(self.loc.y) + ", " + str(self.loc.h) +
+               ") and the ball's position was " + str(self.ball.x) + ", " + str(self.ball.y) + ")")
 
         if (self.playerNumber == TeamMember.DEFAULT_GOALIE_NUMBER):
             # I am a goalie. Reset to the penatly box.

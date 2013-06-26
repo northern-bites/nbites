@@ -58,9 +58,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Kickoff kick
         self.shouldKickOff = False
 
-        # Orbiting
-        self.shouldOrbit = False
-
     def run(self):
         self.play = self.brain.play
         gcState = self.gameState

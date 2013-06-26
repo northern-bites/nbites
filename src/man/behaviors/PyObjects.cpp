@@ -25,6 +25,7 @@ BOOST_PYTHON_MODULE(objects)
         .def("inTopOfField", &Location::inTopOfField)
         .def("inBottomOfField", &Location::inBottomOfField)
         .def("inCenterOfField", &Location::inCenterOfField)
+        .def("inCenterCenter", &Location::inCenterCenter)
         .def("__hasattr__", &Location::hasattr)
         .def("__str__", &Location::toString)
         ;
