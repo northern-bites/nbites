@@ -22,12 +22,10 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     bottomImage(base()),
     topImage(base()),
     topThrImage(base()),
-    botThrImage(base())
+    botThrImage(base()),
+    filter(new QCheckBox(tr("All Colors")))
 {
-    // BACKEND
-    // We need converter modules to threshold both the top and bottom images,
-    // and ImageDisplayModule for each image, and a ThresholdedDisplayModule
-    // for whichever image is currently being workied on
+
     subdiagram.addModule(topDisplay);
     subdiagram.addModule(bottomDisplay);
     subdiagram.addModule(thrDisplay);
@@ -69,12 +67,27 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     connect(undoBtn, SIGNAL(clicked()), this, SLOT(undo()));
     rightLayout->addWidget(undoBtn);
 
+    filter->setChecked(true);
+    connect(filter, SIGNAL(toggled(bool)), this, SLOT(setFiltering(bool)));
+    connect(this, SIGNAL(filtSig(bool)), this, SLOT(setFiltering(bool)));
+    rightLayout->addWidget(filter);
+
     rightLayout->addWidget(&thrDisplay);
 
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
     setLayout(mainLayout);
+}
+
+void ColorTableCreator::setFiltering(bool doFiltering)
+{
+    if (!doFiltering) {
+        thrDisplay.setFilter(image::Color_bits[currentColor]);
+    }
+    else
+        thrDisplay.setFilter(image::ALL_COLORS);
+    run_();
 }
 
 // This gets called every time the logs are advanced, ie every time the
@@ -206,6 +219,8 @@ void ColorTableCreator::updateColorSelection(int color)
     currentColor = color;
     topDisplay.setBrushColor(QColor(image::Color_RGB[color]));
     bottomDisplay.setBrushColor(QColor(image::Color_RGB[color]));
+
+    emit filtSig(filter->isChecked());
 }
 
 }
