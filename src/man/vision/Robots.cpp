@@ -755,7 +755,7 @@ bool Robots::whiteBelow(Blob candidate) {
 		if (white > candidate.width() / 4) {
 			return true;
 		}
-		if (blue > candidate.width() / 2) {
+		if (blue > candidate.width() / 2 && white > 2) {
 			return true;
 		}
 		if (white + blue / 2 > candidate.width() / 3) {
