@@ -761,6 +761,12 @@ void Context::checkGoalCornerWithPost(VisualCorner & corner,
     }
 	if (corner.getDistance() < 150) {
 		isInner = true;
+	} else if (objectRightX > -1) {
+		if (objectRightX > corner.getX() && corner.doesItPointRight()) {
+			isInner = true;
+		} else if (objectRightX < corner.getX() && corner.doesItPointLeft()) {
+			isInner = true;
+		}
 	}
 
     // "Right" in this case means in the visual frame
