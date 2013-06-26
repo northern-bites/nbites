@@ -168,35 +168,16 @@ def goodRightCornerObservation(player):
 def shouldMoveForward(player):
     vision = player.brain.interface.visionField
 
-    foundGoalBoxTop = 0
-    orienataion = 0
-
     if (player.counter > 150 and
         ((player.brain.yglp.on and
           math.fabs(player.brain.yglp.bearing) < 80 and
-          player.brain.yglp.distance < 300.0) or
+          player.brain.yglp.distance < 300.0 and
+          player.brain.yglp.distance != 0.0) or
          (player.brain.ygrp.on and
           math.fabs(player.brain.ygrp.bearing) < 80 and
-          player.brain.yglp.distance < 300.0))):
+          player.brain.yglp.distance < 300.0 and
+          player.brain.yglp.distance != 0.0))):
         return True
-
-    for i in range(0, vision.visual_line_size()):
-        if vision.visual_line(i).visual_detection.distance < 200.0:
-            foundGoalBoxTop = vision.visual_line(i).visual_detection.distance
-            orientation = vision.visual_line(i).angle
-            break
-
-    if not foundGoalBoxTop:
-        return False
-
-    for i in range(0, vision.bottom_line_size()):
-        if (vision.bottom_line(i).visual_detection.distance < 70.0 and
-            vision.visual_field_edge.distance_m > 150.0 and
-            math.fabs(vision.bottom_line(i).visual_detection.distance -
-                      foundGoalBoxTop) > 30.0 and
-            math.fabs(math.degrees(vision.bottom_line(i).angle -
-                                   orientation)) < 45.0):
-            return True
 
     return False
 

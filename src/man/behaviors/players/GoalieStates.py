@@ -8,7 +8,7 @@ from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
-SAVING = False
+SAVING = True
 
 def gameInitial(player):
     if player.firstFrame():
