@@ -45,6 +45,13 @@ def spinAtGoal(player):
 
     return Transition.getNextState(player, spinAtGoal)
 
+def backUpForDangerousBall(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        player.brain.nav.goTo(RelRobotLocation(-10, 0, 0))
+
+    return Transition.getNextState(player, backUpForDangerousBall)
+
 # clearIt->kickBall->didIKickIt->returnToGoal
 def clearIt(player):
     if player.firstFrame():
@@ -81,42 +88,6 @@ def clearIt(player):
     clearIt.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
 
     return Transition.getNextState(player, clearIt)
-
-def panic(player):
-    if player.firstFrame():
-        if player.side is LEFT:
-            player.kick = kicks.RIGHT_SIDE_KICK
-        else:
-            player.kick = kicks.LEFT_SIDE_KICK
-
-        kickPose = player.kick.getPosition()
-        panic.ballDest = RelRobotLocation(player.brain.ball.rel_x -
-                                          kickPose[0],
-                                          player.brain.ball.rel_y -
-                                          kickPose[1],
-                                          0.0)
-
-        player.brain.nav.goTo(panic.ballDest,
-                              nav.CLOSE_ENOUGH,
-                              nav.GRADUAL_SPEED,
-                              adaptive = False)
-
-    kickPose = player.kick.getPosition()
-    panic.ballDest.relX = player.brain.ball.rel_x - kickPose[0]
-    panic.ballDest.relY = player.brain.ball.rel_y - kickPose[1]
-
-    return Transition.getNextState(player, panic)
-
-def attemptToNotScoreOnOurselves(player):
-    if player.side is LEFT:
-        player.setWalk(0, -.7, .25)
-    else:
-        player.setWalk(0, .7, -.25)
-
-    if player.counter > 50:
-        return player.goLater('kickBall')
-
-    return player.stay()
 
 def didIKickIt(player):
     if player.firstFrame():

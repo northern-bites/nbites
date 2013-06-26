@@ -19,7 +19,7 @@ def shouldPrepareForKick(player):
     """
     ball = player.brain.ball
     return (ball.vis.frames_on > 4 and
-            ball.stat_distance < constants.PREPARE_FOR_KICK_DIST)
+            ball.distance < constants.PREPARE_FOR_KICK_DIST)
 
 def shouldSpinToBall(player):
     """
@@ -93,12 +93,18 @@ def shouldOrbit(player):
     """
     return player.brain.kickDecider.getSweetMove() is None
 
-def shouldCancelOrbit(player):
+def orbitBallTooFar(player):
     """
     Ball is far away. Don't want to finish slow orbit.
     """
     return (player.brain.ball.vis.frames_on > 4 and
             player.brain.ball.distance > constants.SHOULD_CANCEL_ORBIT_BALL_DIST)
+
+def orbitTooLong(player):
+    """
+    We have been in orbit too long, try again.
+    """
+    return (player.stateTime > constants.ORBIT_TOO_LONG_THR)
 
 ####### PENALTY KICK STUFF ###########
 
@@ -133,7 +139,7 @@ def shouldFindBall(player):
 
 def shouldFindBallKick(player):
     """
-    We lost the ball while in a kicking state, be more generous before looking
+    We have been in a kicking state too long, try again.
     """
     return (player.stateTime > constants.BALL_OFF_KICK_THRESH)
 

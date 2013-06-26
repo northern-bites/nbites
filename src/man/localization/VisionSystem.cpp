@@ -85,7 +85,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
         if (obsv.has_goal_post_l() && obsv.goal_post_l().visual_detection().on()
             && (obsv.goal_post_l().visual_detection().distance() > 0.f)
-            && (obsv.goal_post_l().visual_detection().distance() < 600.f)) {
+            && (obsv.goal_post_l().visual_detection().distance() < 800.f)) {
             madeObsv = true;
             float newError = scoreFromVisDetect(*particle,
                                                 obsv.goal_post_l().visual_detection());
@@ -97,7 +97,7 @@ bool VisionSystem::update(ParticleSet& particles,
 
         if (obsv.has_goal_post_r() && obsv.goal_post_r().visual_detection().on()
             && (obsv.goal_post_r().visual_detection().distance() > 0.f)
-            && (obsv.goal_post_r().visual_detection().distance() < 600.f)) {
+            && (obsv.goal_post_r().visual_detection().distance() < 800.f)) {
             madeObsv = true;
             float newError = scoreFromVisDetect(*particle,
                                                 obsv.goal_post_r().visual_detection());
@@ -106,6 +106,17 @@ bool VisionSystem::update(ParticleSet& particles,
             numObsv++;
             sawGoal = true;
         }
+
+        // if (obsv.has_goal_post_l()) {
+        //     std::cout << "Left Goal " << obsv.goal_post_l().visual_detection().on()
+        //               << " " << obsv.goal_post_l().visual_detection().distance()
+        //               << std::endl;
+        // }
+        // if (obsv.has_goal_post_r()) {
+        //     std::cout << "Right Goal " << obsv.goal_post_r().visual_detection().on()
+        //               << " " << obsv.goal_post_r().visual_detection().distance()
+        //               << std::endl;
+        //         }
 
         if ((obsv.visual_cross().distance() > 0.f)
             && (obsv.visual_cross().distance() < 400.f)) {
