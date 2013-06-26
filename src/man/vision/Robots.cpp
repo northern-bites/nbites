@@ -155,7 +155,7 @@ void Robots::robot(Cross* cross)
 		// set the current as the last
         lastrunx = runs[i].x; lastruny = runs[i].y; lastrunh = runs[i].h;
     }
-    mergeBigBlobs();
+    //mergeBigBlobs();
     // check each of the candidate blobs to see if it might reasonably be
     // called a piece of a robot
 	int viable = 0;
@@ -535,7 +535,7 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
 			}
             return false;
         }
-		if (width > 1.3 * height) {
+		if (width > 2 * height) {
 			if (debugRobots) {
 				cout << "Too wide" << endl;
 			}
@@ -875,7 +875,7 @@ void Robots::checkMerge(int i, int j) {
 	}
 	int width = right - left + 1;
 	int height = bottom - top + 1;
-	int area = max(10, width * height / 27);
+	int area = max(10, width * height / 10);
 	int stripe = max(width, height);
 	for (int x = left; x < right; x+=3) {
 		for (int y = top; y < bottom; y+=3) {
@@ -884,7 +884,7 @@ void Robots::checkMerge(int i, int j) {
 			}
 			if (Utility::colorsEqual(thresh->getThresholded(y, x), color)) {
 				col++;
-				if (col > area || col > stripe) {
+				if (col > area || col > stripe * 2) {
 					blobs->mergeBlobs(i, j);
 					if (debugRobots) {
 						cout << "Merge" << endl;
