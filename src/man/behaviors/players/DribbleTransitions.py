@@ -46,6 +46,9 @@ def inPosition(player):
     We are positioned well on the field for dribbling.
     """
     return betweenCrosses(player)
+    # return middleThird(player)
+    # return firstHalf(player)
+    # return secondHalf(player)
 
 def betweenCrosses(player):
     """
@@ -68,7 +71,7 @@ def firstHalf(player):
     """
     field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
     return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
-            player.brain.locl.x < field_len / 2.)
+            player.brain.loc.x < field_len / 2.)
 
 def secondHalf(player):
     """
@@ -177,13 +180,19 @@ def onWingDownfield(player):
     The ball is on the wing and downfield according to this transition. Also
     we not facing the goal and therefore leaving this position.
     """
-    if player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y:
-        return (player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
-                player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+    if player.brain.ball.y < nogginConstants.FIELD_WHITE_HEIGHT / 4.:
+        return (player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
                 not player.brain.loc.h > constants.FACING_GOAL_ON_WING)
-    return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
+    return (player.brain.ball.y > 3. * nogginConstants.FIELD_WHITE_HEIGHT / 4. and
             player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
             not player.brain.loc.h < -constants.FACING_GOAL_ON_WING)
+    # if player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y:
+    #     return (player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
+    #             player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+    #             not player.brain.loc.h > constants.FACING_GOAL_ON_WING)
+    # return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
+    #         player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+    #         not player.brain.loc.h < -constants.FACING_GOAL_ON_WING)
 
 def timeLeft(player):
     """
