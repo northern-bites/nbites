@@ -438,3 +438,8 @@ class Brain(object):
         if reset_h > 180:
             reset_h -= 360
         self.resetLocTo(reset_x, reset_y, reset_h)
+
+        self.ownBallFilter = []
+        self.ownBallFilterCount = 0
+        self.dangerousBallFilter = []
+        self.dangerousBallFilterCount = 0
