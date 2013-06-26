@@ -371,9 +371,9 @@ def shouldClearBall(player):
         shouldGo = True
 
     if shouldGo:
-        if player.brain.ball.bearing_deg < -50.0:
+        if player.brain.ball.bearing_deg < -60.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
-        elif player.brain.ball.bearing_deg > 50.0:
+        elif player.brain.ball.bearing_deg > 60.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
         else:
             VisualGoalieStates.clearIt.dangerousSide = -1
