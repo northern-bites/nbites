@@ -86,6 +86,8 @@ public:
 
     float getMovingRelX(){return filters.at((unsigned) 1)->getRelXPosEst();};
     float getMovingRelY(){return filters.at((unsigned) 1)->getRelYPosEst();};
+    float getMovingVelX(){return filters.at((unsigned) 1)->getRelXVelEst();};
+    float getMovingVelY(){return filters.at((unsigned) 1)->getRelYVelEst();};
     float getMovingDistance(){return filters.at((unsigned) 1)->getFilteredDist();};
     float getMovingBearing() {return filters.at((unsigned) 1)->getFilteredBear();};
 

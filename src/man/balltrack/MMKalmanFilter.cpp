@@ -49,18 +49,11 @@ MMKalmanFilter::~MMKalmanFilter()
 void MMKalmanFilter::update(messages::VisionBall    visionBall,
                             messages::RobotLocation odometry)
 {
-    // Predict the filters!
-    // for(unsigned i=0; i<filters.size(); i++)
-    //     filters.at(i)->printEst();
     predictFilters(odometry);
-    // std::cout << "Predicted Filters" << std::endl;
-    // for(unsigned i=0; i<filters.size(); i++)
-    //     filters.at(i)->printEst();
 
     // Update with sensor if we have made an observation
     if(visionBall.on()) // We see the ball
     {
-        // std::cout << "BALL SEEN ----------------------------------------" << std::endl;
         //Before we mess with anything, decide if we saw the ball twice in a row
         consecutiveObservation = (framesWithoutBall == 0) ? true : false;
 

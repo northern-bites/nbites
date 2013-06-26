@@ -24,7 +24,19 @@ void BallTool::setUpModules()
         std::cout << "WARNING: no odometry logs for ball tool :(" << std::endl;
 
     if(diagram.connectToUnlogger<messages::FilteredBall>(ballView.ballIn,
-                                                          "balltrack"))
+                                                          "filtered_ball"))
+        std::cout << "Connected ballfilter logs" << std::endl;
+    else
+        std::cout << "WARNING: no filtered ball logs for ball tool :(" << std::endl;
+
+    if(diagram.connectToUnlogger<messages::VisionBall>(ballView.visionBallIn,
+                                                       "vision_ball"))
+        std::cout << "Connected vision ball filter logs" << std::endl;
+    else
+        std::cout << "WARNING: no vision ball logs for ball tool :(" << std::endl;
+
+    if(diagram.connectToUnlogger<messages::RobotLocation>(ballView.localizationIn,
+                                                          "location"))
         std::cout << "Connected ballfilter logs" << std::endl;
     else
         std::cout << "WARNING: no filtered ball logs for ball tool :(" << std::endl;

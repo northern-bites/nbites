@@ -224,7 +224,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 #endif
 
 #ifdef LOG_BALLTRACK
-    cognitionThread.log<messages::FilteredBall>(&ballTrack.ballLocationOutput, "balltrack");
+    cognitionThread.log<messages::FilteredBall>(&ballTrack.ballLocationOutput, "filtered_ball");
+    cognitionThread.log<messages::VisionBall>(&vision.vision_ball, "vision_ball");
 #endif
 
 #ifdef LOG_IMAGES
