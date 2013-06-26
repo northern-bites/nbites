@@ -142,6 +142,9 @@ def watchWithCornerChecks(player):
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
+    if player.counter > 150:
+        return player.goLater('watch')
+
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
         and
         player.brain.ball.distance > constants.BALL_SAFE_DISTANCE_THRESH

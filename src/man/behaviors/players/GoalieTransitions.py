@@ -179,6 +179,27 @@ def shouldMoveForward(player):
           player.brain.yglp.distance != 0.0))):
         return True
 
+    foundGoalBoxTop = 0
+    orientation = 0
+
+    for i in range(0, vision.visual_line_size()):
+        if vision.visual_line(i).visual_detection.distance < 200.0:
+            foundGoalBoxTop = vision.visual_line(i).visual_detection.distance
+            orientation = vision.visual_line(i).angle
+            break
+
+    if not foundGoalBoxTop:
+        return False
+
+    for i in range(0, vision.bottom_line_size()):
+        if (vision.bottom_line(i).visual_detection.distance < 70.0 and
+            vision.visual_field_edge.distance_m > 150.0 and
+            math.fabs(vision.bottom_line(i).visual_detection.distance -
+                      foundGoalBoxTop) > 30.0 and
+            math.fabs(math.degrees(vision.bottom_line(i).angle -
+                                   orientation)) < 45.0):
+            return True
+
     return False
 
 def shouldMoveBackwards(player):
@@ -277,7 +298,7 @@ def shouldDiveLeft(player):
 
 def shouldSquat(player):
     return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
+            player.brain.ball.speed > 5.0 and
             player.brain.ball.rel_x_dest < 0.0 and
             abs(player.brain.ball.rel_y_intersect_dest) < 30.0 and
             player.brain.ball.vis.frames_on > 30)
