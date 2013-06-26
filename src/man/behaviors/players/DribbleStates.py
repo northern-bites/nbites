@@ -15,23 +15,6 @@ from objects import RelRobotLocation, Location
 # ball and dribble again to space. We only dribble if shoulDribble returns 
 # true, see DribbleTransitions.py for more info.
 
-### TODO
-# corner dribble
-# test time-based decision making
-
-### DONE
-# would score query
-# rotate towards goal when dribbling
-# better dodging
-# test goalie-in-net decision making
-# ballInGoalBox dribbling via goalie detection
-# test DRIBBLE_ON_KICKOFF
-# dribbleGoneBad needs work
-# dribble for the score if close enough to goal
-# get rid of 'dribble' state, reorganize FSA
-# cross to cross dribbling
-# time-left based decision making
-
 def decideDribble(player):
     """
     Decide to dribble straight ahead or rotate to avoid other robots.
