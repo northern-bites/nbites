@@ -215,13 +215,16 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     cognitionThread.log<messages::RobotLocation>(&motion.odometryOutput_, "odometry");
 #endif
 
-
 #ifdef LOG_OBSERVATIONS
     cognitionThread.log<messages::VisionField>(&vision.vision_field, "observations");
 #endif
 
 #ifdef LOG_LOCALIZATION
     cognitionThread.log<messages::ParticleSwarm>(&localization.particleOutput, "particleSwarm");
+#endif
+
+#ifdef LOG_BALLTRACK
+    cognitionThread.log<messages::FilteredBall>(&ballTrack.ballLocationOutput, "balltrack");
 #endif
 
 #ifdef LOG_IMAGES
