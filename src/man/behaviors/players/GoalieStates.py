@@ -39,7 +39,7 @@ def gameReady(player):
         player.stand()
         player.brain.tracker.lookToAngle(0)
         if player.lastDiffState != 'gameInitial':
-            player.brain.nav.walkTo(RelRobotLocation(-80, 0, 0))
+            return player.goLater('spinToWalkOffField')
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):
@@ -131,6 +131,25 @@ def gameFinished(player):
 
 def fallen(player):
     player.inKickingState = False
+    return player.stay()
+
+def spinToWalkOffField(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
+        player.brain.nav.goTo(RelRobotLocation(0, 0, 90))
+
+    return Transition.getNextState(player, spinToWalkOffField)
+
+def bookIt(player):
+    if player.firstFrame():
+        player.brain.nav.goTo(RelRobotLocation(100, 0, 0), avoidObstacles = True)
+
+    return Transition.getNextState(player, bookIt)
+
+def standStill(player):
+    if player.firstFrame():
+        player.brain.nav.stop()
+
     return player.stay()
 
 def watchWithCornerChecks(player):

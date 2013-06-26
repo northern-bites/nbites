@@ -273,6 +273,18 @@ def facingBall(player):
     return (math.fabs(player.brain.ball.bearing_deg) < 10.0 and
             player.brain.ball.vis.on)
 
+def goodToBookIt(player):
+    vision = player.brain.interface.visionField
+
+    return (vision.visual_field_edge.distance_m < 300.0 and
+            ((not player.brain.yglp.on) or
+             math.fabs(player.brain.yglp.bearing_deg) > 40.0) and
+            ((not player.brain.ygrp.on) or
+             math.fabs(player.brain.ygrp.bearing_deg) > 40.0))
+
+def safelyIllegal(player):
+    return player.brain.interface.visionField.visual_field_edge.distance_m < 30.0
+
 def notTurnedAround(player):
     """
     Checks that we are actually facing the field when returning from

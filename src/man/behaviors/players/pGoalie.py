@@ -274,6 +274,20 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             : VisualGoalieStates.returnToGoal
             }
 
+        GoalieStates.spinToWalkOffField.transitions = {
+            Transition.CountTransition(GoalieTransitions.goodToBookIt,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.bookIt
+            }
+
+        GoalieStates.bookIt.transitions = {
+            Transition.CountTransition(GoalieTransitions.safelyIllegal,
+                                       Transition.SOME_OF_THE_TIME,
+                                       Transition.OK_PRECISION)
+            : GoalieStates.standStill
+            }
+
         GoalieStates.waitForPenaltySave.transitions = {
             Transition.CountTransition(GoalieTransitions.shouldDiveRight,
                                        Transition.SOME_OF_THE_TIME,
