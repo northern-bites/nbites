@@ -89,9 +89,9 @@ def prepareForKick(player):
     if hackKick.DEBUG_KICK_DECISION:
         print str(player.kick)
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -123,7 +123,7 @@ def orbitBall(player):
 
     # # DEBUGGING PRINT OUTS
     if player.counter%20 == 0:
-        print "desiredHeading is:  | ", kick.h
+        print "desiredHeading is:  | ", player.kick.h
         print "player heading:     | ", player.brain.loc.h
         print "orbit heading:      | ", relH
         print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
@@ -168,9 +168,9 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
