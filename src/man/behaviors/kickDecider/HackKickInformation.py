@@ -378,6 +378,9 @@ class KickInformation:
                     kick = kicks.LEFT_SIDE_KICK
                     kick.h = leftSideBearing
 
+            # Convert kick.h to be a desired global heading for the orbit.
+            kick.h = self.brain.loc.h - kick.h
+
             # Make sure heading is an int before passing it to the orbit.
             kick.h = int(kick.h)
 
