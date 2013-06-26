@@ -71,7 +71,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 	int greenRun = 0;
     float possible = 0.0f;
 	int lastGreen;
-    const float BUFFER = 200.0f; // other fields should be farther than this
+    const float BUFFER = 100.0f; // other fields should be farther than this
 	// we need a better criteria for what the top is
 	for (int i = 0; i < HULLS; i++) {
 		good = 0;
@@ -124,19 +124,19 @@ void Field::initialScanForTopGreenPoints(int pH) {
 						int greens = 0;
 						int check2 = top;
 						int whites = 0;
+						int blues = 0;
 						bool found = false;
 						while ((thresh->getPixDistance(check) > BUFFER ||
 								check < IMAGE_HEIGHT / 2) && !found && check < IMAGE_HEIGHT - 1) {
 							check++;
 							pixel = thresh->getColor(x, check);
 							greens = 0;
-							while (Utility::isGreen(pixel) && check < IMAGE_HEIGHT - 1 &&
-								   greens < 6) {
+							while (Utility::isGreen(pixel) && check < IMAGE_HEIGHT - 1) {
 								check++;
 								greens++;
 								pixel = thresh->getColor(x, check);
 							}
-							if (greens >= 6) {
+							if (greens >= 15) {
 								check2 = check;
 								found = true;
 							} else if (greens > 2) {
@@ -147,10 +147,14 @@ void Field::initialScanForTopGreenPoints(int pH) {
 								if (Utility::isWhite(pixel)) {
 									whites++;
 								}
+								if (Utility::isBlue(pixel)) {
+									blues++;
+								}
 								pixel = thresh->getColor(x, check);
 							}
 							if (thresh->getPixDistance(check2) - thresh->getPixDistance(check)
-								> BUFFER / 2 && check - check2 > 5 && check - check2 - whites > 4) {
+								> BUFFER / 2 && check - check2 > 5 &&
+								(check - check2 - whites > 4 || blues > 6)) {
 								if (debugFieldEdge) {
 									cout << "Unsetting top green " <<
 										(thresh->getPixDistance(check2) - thresh->getPixDistance(check))
