@@ -61,6 +61,14 @@ def approachBall(player):
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+
+        if player.brain.nav.isAtPosition():
+            print "isAtPosition() is causing the bug!"
+        else:
+            print "shouldPrepareForKick() is causing the bug!"
+            print player.brain.ball.distance
+            print player.brain.ball.vis.distance
+
         player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
