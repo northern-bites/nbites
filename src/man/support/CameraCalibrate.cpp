@@ -71,9 +71,9 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[PITCH] = 0.1f;
     } else if (name == "vera") { // Changed 6/11/13
         paramsTop[ROLL] = -0.02f;
-        paramsTop[PITCH] = 0.06f;
-        paramsBottom[ROLL] = -0.02f;
-        paramsBottom[PITCH] = 0.05f;
+        paramsTop[PITCH] = 0.07f;
+        paramsBottom[ROLL] = -0.01f;
+        paramsBottom[PITCH] = 0.09f;
     } else if (name == "inara") { // Changed 6/11/13
         paramsTop[ROLL] = -0.01f;
         paramsTop[PITCH] = 0.10f;
