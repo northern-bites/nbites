@@ -309,7 +309,7 @@ def prepareForPenaltyKick(player):
         # prepareForPenaltyKick.chase = True
         return player.goNow('penaltyKickSpin')
     return player.stay()
-    
+
 def penaltyKickSpin(player):
     """
     Spin so that we change the heading of the kick

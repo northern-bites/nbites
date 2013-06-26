@@ -402,7 +402,7 @@ class Brain(object):
 
         # If I've decided I should flip enough times, actually do it.
         if (len(self.flipFilter) > 0 and
-            sum(self.flipFilter) > 6:
+            sum(self.flipFilter) > 6):
             self.flipLoc()
             # Reset filters! Don't want to flip again next frame.
             self.noFlipFilter = []
@@ -437,6 +437,9 @@ class Brain(object):
         """
 
         print "According to the Goalie, I need to flip my loc!"
+
+        print ("My position was (" + str(self.loc.x) + ", " + str(self.loc.y) + ", " + str(self.loc.h) +
+               ") and the ball's position was " + str(self.ball.x) + ", " + str(self.ball.y) + ")")
 
         if (self.playerNumber == TeamMember.DEFAULT_GOALIE_NUMBER):
             # I am a goalie. Reset to the penatly box.
