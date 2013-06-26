@@ -41,12 +41,11 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsTop[PITCH] = -0.06f;
         paramsBottom[ROLL] = -0.02f;
         paramsBottom[PITCH] = 0.0f;
-    // These are for mal's head on simon's body! MAKE SURE TO FIX
-    } else if (name == "mal") { // Changed 6/11/13
+    } else if (name == "mal") { // Changed 6/26/13
         paramsTop[ROLL] = -0.01f;
-        paramsTop[PITCH] = 0.10f;
-        paramsBottom[ROLL] = -0.01f;
-        paramsBottom[PITCH] = 0.07f;
+        paramsTop[PITCH] = -0.06f;
+        paramsBottom[ROLL] = -0.03f;
+        paramsBottom[PITCH] = -0.07f;
     } else if (name == "zoe") {
         paramsTop[ROLL] = -0.01f;
         paramsTop[PITCH] = -0.01f;
