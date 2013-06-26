@@ -36,17 +36,16 @@ TEST (KalmanFilterTest, FilterCanPredict) {
     // Move to the left 10 cm
     messages::RobotLocation odometry;
     odometry.set_x(0.f);
-    odometry.set_y(10.f);
+    odometry.set_y(1.f);
     odometry.set_h(0.f);
     kf->predict(odometry, 1.f);
-    ASSERT_TRUE(std::fabs(10.f - kf->getRelXPosEst()) < .001f);
-    ASSERT_TRUE(std::fabs(-10.f - kf->getRelYPosEst()) < .001f);
+    ASSERT_TRUE(std::fabs( 10.f - kf->getRelXPosEst()) < .001f);
+    ASSERT_TRUE(std::fabs(-1.f - kf->getRelYPosEst()) < .001f);
 
     // Move back to the origin
     odometry.set_y(0.f);
     kf->predict(odometry, 1.f);
     ASSERT_TRUE(std::fabs(10.f - kf->getRelXPosEst()) < .001f);
-    std::cout << "should be at origin" << kf->getRelYPosEst();
     ASSERT_TRUE(std::fabs(kf->getRelYPosEst()) < .001f);
 
     //Rotate 90 deg
@@ -57,9 +56,9 @@ TEST (KalmanFilterTest, FilterCanPredict) {
     ASSERT_TRUE(std::fabs(-10 - kf->getRelYPosEst()) < .01f);
 
     //Walk forward
-    odometry.set_y(10.f);
+    odometry.set_y(1.f);
     kf->predict(odometry, 1.f);
-    ASSERT_TRUE(std::fabs(-10 - kf->getRelXPosEst()) < .01f);
+    ASSERT_TRUE(std::fabs(-1 - kf->getRelXPosEst()) < .01f);
     ASSERT_TRUE(std::fabs(-10 - kf->getRelYPosEst()) < .01f);
 
 

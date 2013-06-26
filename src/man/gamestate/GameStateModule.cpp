@@ -188,6 +188,8 @@ void GameStateModule::reset()
     latest_data.set_secondary_state(STATE2_NORMAL);
     latest_data.set_drop_in_team(TEAM_BLUE);
 
+    latest_data.set_have_remote_gc(false);
+
     messages::TeamInfo* myTeam = latest_data.add_team();
     myTeam->set_team_number(team_number);
     myTeam->set_team_color(TEAM_BLUE);
