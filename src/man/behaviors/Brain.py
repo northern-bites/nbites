@@ -381,8 +381,8 @@ class Brain(object):
 
                     # check against my data
                     my_ball_location = Location(self.ball.x, self.ball.y)
-                    flipped_ball_location = Location(Constants.GREEN_FIELD_WIDTH - self.ball.x,
-                                                     Constants.GREEN_FIELD_HEIGHT - self.ball.y)
+                    flipped_ball_location = Location(Constants.FIELD_GREEN_WIDTH - self.ball.x,
+                                                     Constants.FIELD_GREEN_HEIGHT - self.ball.y)
 
                     if (goalie_ball_location.inCenterCenter() or
                         my_ball_location.inCenterCenter()):
