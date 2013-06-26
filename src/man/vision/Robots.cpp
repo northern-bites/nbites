@@ -60,7 +60,7 @@ void Robots::init()
 	numberOfRuns = 0;
 
 #ifdef OFFLINE
-	debugRobots = true;
+	debugRobots = false;
 #endif
 }
 
@@ -535,6 +535,12 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
 			}
             return false;
         }
+		if (width > 1.3 * height) {
+			if (debugRobots) {
+				cout << "Too wide" << endl;
+			}
+			return false;
+		}
 		// blob must be reasonably of the right color
 		int x = candidate.getLeft();
 		int y = candidate.getTop();

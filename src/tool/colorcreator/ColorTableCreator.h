@@ -20,12 +20,14 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QBoxLayout>
+#include <QCheckBox>
 
 #include "RoboGrams.h"
 #include "image/ImageConverterModule.h"
 #include "image/ImageDisplayModule.h"
 #include "Camera.h"
 #include "Images.h"
+#include "image/Color.h"
 #include "PathConfig.h"
 
 #include "ColorTable.h"
@@ -102,6 +104,7 @@ signals:
     void tableChanges(std::vector<color::colorChanges> tableAdjustments);
     void tableUnChanges(std::vector<color::colorChanges> tableAdjustments);
 
+    void filtSig(bool doFilter);
 
 protected slots:
 
@@ -119,6 +122,9 @@ protected slots:
 
     // Listen if the user switches which image she's working on
     void imageTabSwitched(int index);
+
+    // View only one color at a time
+    void setFiltering(bool doFilter);
 
 protected:
     // Implements Module's pure virutal method
@@ -138,6 +144,7 @@ private:
 
     // Used to change, store which color user is currently working on
     QComboBox colorSelect;
+    QCheckBox* filter;
     int currentColor;
 
     // Keep track of top vs bottom camera

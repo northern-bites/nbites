@@ -426,9 +426,20 @@ class Brain(object):
         print "According to the Goalie, I need to flip my loc!"
         print "My x position was: " + str(self.loc.x)
 
+        if (self.playerNumber == TeamMember.DEFAULT_GOALIE_NUMBER):
+            # I am a goalie. Reset to the penatly box.
+            print "I am a goalie. Resetting loc to the goalbox."
+            self.resetGoalieLocalization()
+            return
+
         reset_x = (-1*(self.loc.x - Constants.MIDFIELD_X)) + Constants.MIDFIELD_X
         reset_y = (-1*(self.loc.y - Constants.MIDFIELD_Y)) + Constants.MIDFIELD_Y
         reset_h = self.loc.h + 180
         if reset_h > 180:
             reset_h -= 360
         self.resetLocTo(reset_x, reset_y, reset_h)
+
+        self.ownBallFilter = []
+        self.ownBallFilterCount = 0
+        self.dangerousBallFilter = []
+        self.dangerousBallFilterCount = 0
