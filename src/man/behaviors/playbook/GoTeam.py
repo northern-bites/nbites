@@ -222,7 +222,6 @@ class GoTeam:
             and ((not PBConstants.HACK_D1 and not PBConstants.HACK_D2)
                  or((PBConstants.HACK_D1 or PBConstants.HACK_D2)
                   and self.brain.ball.distance < 100))):
-            print "Chasing because the ball is at ", self.brain.ball.distance
             play.setRole(roles[-1])
             play.setPosition(locations[-1])
             return
@@ -348,7 +347,6 @@ class GoTeam:
         # HACK for RoboCup 2013
         if ((PBConstants.HACK_D1 or PBConstants.HACK_D2)
             and (self.brain.ball.distance < 100)):
-            print "Determining me because the ball is at ", self.brain.ball.distance
             return self.me
 
         # loop through the teammates

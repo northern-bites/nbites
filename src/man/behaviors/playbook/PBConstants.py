@@ -11,7 +11,7 @@ TEST_MIDDIE = False
 TEST_CHASER = False
 
 HACK_D1 = False
-HACK_D2 = True
+HACK_D2 = False
 
 HACK_D1_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
                             NogginConstants.GREEN_PAD_Y + 100,
