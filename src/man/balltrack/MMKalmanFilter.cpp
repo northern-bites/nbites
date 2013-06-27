@@ -13,12 +13,7 @@ namespace balltrack{
  */
 MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
 {
-
-
     params = params_;
-
-    for(int i=0; i< params.numFilters; i++)
-        filters.push_back(new KalmanFilter());
 
     framesWithoutBall = params.framesTillReset;
     consecutiveObservation = false;
@@ -26,6 +21,12 @@ MMKalmanFilter::MMKalmanFilter(MMKalmanFilterParams params_)
     obsvBuffer = new CartesianObservation[params.bufferSize];
     curEntry = 0;
     fullBuffer = false;
+
+    prevStateEst = boost::numeric::ublas::zero_vector<float> (4);
+    prevCovEst   = boost::numeric::ublas::identity_matrix <float>(4);
+    stateEst     = boost::numeric::ublas::zero_vector<float> (4);
+    covEst       = boost::numeric::ublas::identity_matrix <float>(4);
+
     initialize();
 }
 
@@ -49,18 +50,11 @@ MMKalmanFilter::~MMKalmanFilter()
 void MMKalmanFilter::update(messages::VisionBall    visionBall,
                             messages::RobotLocation odometry)
 {
-    // Predict the filters!
-    // for(unsigned i=0; i<filters.size(); i++)
-    //     filters.at(i)->printEst();
     predictFilters(odometry);
-    // std::cout << "Predicted Filters" << std::endl;
-    // for(unsigned i=0; i<filters.size(); i++)
-    //     filters.at(i)->printEst();
 
     // Update with sensor if we have made an observation
     if(visionBall.on()) // We see the ball
     {
-        // std::cout << "BALL SEEN ----------------------------------------" << std::endl;
         //Before we mess with anything, decide if we saw the ball twice in a row
         consecutiveObservation = (framesWithoutBall == 0) ? true : false;
 
@@ -130,7 +124,6 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
             }
         }
 
-
         // Now correct our filters with the vision observation
         updateWithVision(visionBall);
 
@@ -139,7 +132,6 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
 
         updatePredictions();
     }
-
     else {
         consecutiveObservation = false;
 
@@ -148,12 +140,15 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
         curEntry = 0;
     }
 
-    // #HACK - shouldnt know how many filters there are but... US OPEN!
-        //Determine if we are using the stationary
-    // std::cout << "Velocity Mag:\t" << filters.at((unsigned)1)->getSpeed() << std::endl;
-    if (filters.at((unsigned)1)->getSpeed() > params.movingThresh)
-    { // consider the ball to be moving
-        bestFilter = 1;
+    // Determine filter
+    if(TRACK_MOVEMENT) {
+        if (filters.at((unsigned)1)->getSpeed() > params.movingThresh)
+        { // consider the ball to be moving
+            bestFilter = 1;
+        }
+        else {
+            bestFilter = 0;
+        }
     }
     else {
         bestFilter = 0;
@@ -166,17 +161,9 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
     stateEst = filters.at((unsigned)bestFilter)->getStateEst();
     covEst   = filters.at((unsigned)bestFilter)->getCovEst();
 
-    /** commented out due to using only 2 filters **/
-    // Kill the two worst estimates and re-init them if we made an observation
-    // if(visionBall.on())
-    //     cycleFilters();
-
     // Housekeep
     framesWithoutBall = (visionBall.on()) ? (0) : (framesWithoutBall+1);
     stationary = filters.at((unsigned)bestFilter)->isStationary();
-    // std::cout << "Frames w/o Ball\t" << framesWithoutBall << std::endl;
-    // std::cout << "Consecutive\t" << consecutiveObservation << std::endl;
-
 }
 
 /**
@@ -275,9 +262,6 @@ void MMKalmanFilter::printBothFilters() {
  */
 void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
 {
-    // std::cout << "Initialize the MMKalmanFilter" << std::endl;
-    // std::cout << "RelX, RelY, CovX, CovY\t" << relX << "\t" << relY << "\t" << covX << "\t" << covY << std::endl;
-
     // clear the filters
     filters.clear();
 
@@ -334,7 +318,6 @@ void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
         movingFilter->initialize(x, cov);
         filters.push_back(movingFilter);
     }
-
 }
 
 // for offline testing, need to be able to specify the time which passed
@@ -394,9 +377,12 @@ void MMKalmanFilter::updateDeltaTime()
         1000000.0f; // u_s to sec
 
     // Guard against a zero dt (maybe possible?)
-    if (deltaTime == 0.0){
+    if (deltaTime <= 0.0){
         deltaTime = 0.0001f;
     }
+    if (deltaTime > 1)
+        deltaTime = .03f; // Guard against first frame issues
+
     lastUpdateTime = time;
 }
 

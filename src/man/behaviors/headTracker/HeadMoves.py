@@ -403,6 +403,28 @@ FIXED_PITCH_PAN_NARROW = (
     ((55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES),
     ((-55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~37 degrees per second
 
+def BALLTRACK_PAN(dist, bear):
+    #Note: Camera sees 60 degrees
+    #      Want to keep the ball within 40 (+/- 20)
+    deg_per_sec = 18.3
+
+    # stay looking forward so pan from -45 to 45
+    max_left =   45.0
+    max_right = -45.0
+
+    # keep the ball within 10 degrees of outside our sight
+    left_see_ball_max = bear + 20
+    right_see_ball_max = bear - 20
+
+    left_side_final  = min(max_left, left_see_ball_max)
+    right_side_final = max(max_right, right_see_ball_max)
+    left_pan_time  =  left_side_final / deg_per_sec
+    right_pan_time = right_side_final / deg_per_sec
+
+    return ( ((left_side_final, 17.0),  left_pan_time, 1, stiff.LOW_HEAD_STIFFNESSES),
+             ((right_side_final,17.0), right_pan_time, 1, stiff.LOW_HEAD_STIFFNESSES))
+
+
 # Needs some alteration re: pitch for the given yaw
 FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 # Needs some alteration re: pitch for the given yaw
