@@ -376,6 +376,11 @@ class KickInformation:
 
                 # Currently, we ignore the possibility of doing a back kick here.
 
+                # make sure all the kick bearings are sub-180 angles
+                straightBearing = MyMath.sub180Angle(straightBearing)
+                rightSideBearing = MyMath.sub180Angle(rightSideBearing)
+                leftSideBearing = MyMath.sub180Angle(leftSideBearing)
+
                 # the kick bearing that has least magnitude should be chosen
                 kickList = sorted([straightBearing, leftSideBearing, rightSideBearing], key=math.fabs)
                 if (kickList[0] == straightBearing):
