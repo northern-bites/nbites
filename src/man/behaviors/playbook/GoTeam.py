@@ -218,9 +218,23 @@ class GoTeam:
 
         # Set the chaser!
         chaser_mate = self.determineChaser()
-        if chaser_mate.playerNumber == self.brain.playerNumber:
+        if (chaser_mate.playerNumber == self.brain.playerNumber
+            and ((not PBConstants.HACK_D1 and not PBConstants.HACK_D2)
+                 or((PBConstants.HACK_D1 or PBConstants.HACK_D2)
+                  and self.brain.ball.distance < 100))):
+            print "Chasing because the ball is at ", self.brain.ball.distance
             play.setRole(roles[-1])
             play.setPosition(locations[-1])
+            return
+
+        #HACK RoboCup 2013
+        if PBConstants.HACK_D1:
+            play.setRole(PBConstants.DEFENDER)
+            play.setPosition(PBConstants.HACK_D1_LOC)
+            return
+        if PBConstants.HACK_D2:
+            play.setRole(PBConstants.OFFENDER)
+            play.setPosition(PBConstants.HACK_D2_LOC)
             return
 
         # Find which active field player should go to each position
@@ -257,6 +271,16 @@ class GoTeam:
     def readyPosition(self, play):
         kickoff = self.brain.gameController.ownKickOff
         locations = None
+
+        if PBConstants.HACK_D1:
+            play.setRole(PBConstants.DEFENDER)
+            play.setPosition(PBConstants.HACK_D1_LOC)
+            return
+
+        if PBConstants.HACK_D2:
+            play.setRole(PBConstants.OFFENDER)
+            play.setPosition(PBConstants.HACK_D2_LOC)
+            return
 
         if kickoff:
             locations = (PBConstants.READY_O_CHASER_LOCATION,
@@ -319,6 +343,12 @@ class GoTeam:
         if self.brain.player.inKickingState:
             if PBConstants.DEBUG_DET_CHASER:
                 self.printf("I should Chase")
+            return self.me
+
+        # HACK for RoboCup 2013
+        if ((PBConstants.HACK_D1 or PBConstants.HACK_D2)
+            and (self.brain.ball.distance < 100)):
+            print "Determining me because the ball is at ", self.brain.ball.distance
             return self.me
 
         # loop through the teammates

@@ -10,6 +10,16 @@ TEST_OFFENDER = False
 TEST_MIDDIE = False
 TEST_CHASER = False
 
+HACK_D1 = False
+HACK_D2 = True
+
+HACK_D1_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
+                            NogginConstants.GREEN_PAD_Y + 100,
+                            20)
+HACK_D2_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
+                            NogginConstants.FIELD_GREEN_HEIGHT - 170,
+                            -20)
+
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False
 DEBUG_DET_SUPPORTER = False
