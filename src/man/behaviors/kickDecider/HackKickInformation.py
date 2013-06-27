@@ -229,6 +229,15 @@ class KickInformation:
         # Is loc good enough for a kick decision?
         # Need to use aimCenter in decision.
         if USE_LOC:
+            # COMPETITION HACK -- dribbling from the corner
+            if (self.brain.ball.x > constants.FIELD_WHITE_RIGHT_SIDELINE_X - 65 and
+                (self.brain.ball.y < constants.LANDMARK_OPP_GOAL_RIGHT_POST_Y or
+                 self.brain.ball.y > constants.LANDMARK_OPP_GOAL_LEFT_POST_Y)):
+                self.brain.player.corner_dribble = True
+                kick = self.chooseShortFrontKick()
+                kick.h = self.brain.loc.headingTo(Objects.Location(constants.YELLOW_GOALBOX_LEFT_X - 100,
+                                                                   constants.MIDFIELD_Y))
+                return kick
 
             # Get the bearing for the shot, i.e. from the ball to the goal.
             # Note: currently always aimCenter

@@ -12,7 +12,7 @@ from math import fabs
 import noggin_constants as nogginConstants
 import time
 
-DRIBBLE_ON_KICKOFF = True
+DRIBBLE_ON_KICKOFF = False
 
 def chase(player):
     """
@@ -89,6 +89,7 @@ def prepareForKick(player):
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
         player.brain.nav.stand()
         return player.stay()
+
 
     if player.brain.ball.stat_distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
@@ -182,6 +183,9 @@ def positionForKick(player):
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
             return player.goNow('decideDribble')
+
+    if player.corner_dribble:
+        return player.goNow('executeDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()

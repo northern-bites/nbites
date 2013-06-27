@@ -56,16 +56,29 @@ def executeDribble(player):
     else:
         player.brain.nav.updateDest(player.kickPose)
 
-    if transitions.ballLost(player):
-        return player.goNow('lookForBall')
-    elif not transitions.shouldDribble(player):
-        player.inKickingState = False
-        return player.goLater('chase')
-    elif not transitions.centerLaneOpen(player):
-        player.aboutToRotate = True # we will go from position to rotate
-        return player.goNow('positionForDribble')
-    elif transitions.dribbleGoneBad(player):
-        return player.goNow('positionForDribble')
+    if player.corner_dribble:
+        if transitions.ballLost(player) or transitions.ballGotFarAway(player):
+            player.corner_dribble = False
+            print "1"
+            return player.goLater('chase')
+        elif transitions.dribbleGoneBad(player):
+            print "2"
+            return player.goNow('positionForDribble')
+        elif transitions.centerField(player):
+            player.corner_dribble = False
+            print "3"
+            return player.goLater('chase')
+    else:
+        if transitions.ballLost(player):
+            return player.goNow('lookForBall')
+        elif not transitions.shouldDribble(player):
+            player.inKickingState = False
+            return player.goLater('chase')
+        elif not transitions.centerLaneOpen(player):
+            player.aboutToRotate = True # we will go from position to rotate
+            return player.goNow('positionForDribble')
+        elif transitions.dribbleGoneBad(player):
+            return player.goNow('positionForDribble')
 
     return player.stay()
 
@@ -143,16 +156,25 @@ def positionForDribble(player):
     else:
         player.brain.nav.updateDest(player.kickPose)
 
-    if transitions.ballLost(player):
-        return player.goLater('lookForBall')
-    elif not transitions.shouldDribble(player):
-        player.inKickingState = False
-        player.stand()
-        return player.goLater('chase')
-    elif player.aboutToRotate and transitions.navDone(player):
-        player.aboutToRotate = False
-        return player.goLater('rotateToOpenSpace')
-    elif transitions.navDone(player):
-        return player.goLater('decideDribble')
+    if player.corner_dribble:
+        if transitions.ballLost(player) or transitions.ballGotFarAway(player):
+            player.corner_dribble = False
+            print "4"
+            return player.goLater('chase')
+        elif transitions.navDone(player):
+            print "5"
+            return player.goLater('executeDribble')
+    else:
+        if transitions.ballLost(player):
+            return player.goLater('lookForBall')
+        elif not transitions.shouldDribble(player):
+            player.inKickingState = False
+            player.stand()
+            return player.goLater('chase')
+        elif player.aboutToRotate and transitions.navDone(player):
+            player.aboutToRotate = False
+            return player.goLater('rotateToOpenSpace')
+        elif transitions.navDone(player):
+            return player.goLater('decideDribble')
 
     return player.stay()
