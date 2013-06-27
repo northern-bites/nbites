@@ -159,7 +159,8 @@ def ballMoved(player):
     """
     ball = player.brain.ball
     ballBefore = player.ballBeforeKick
-    return (fabs(ball.rel_x - ballBefore.rel_x) > constants.BALL_MOVED_THR or
+    return (ball.vis.frames_off > 15 or
+            fabs(ball.rel_x - ballBefore.rel_x) > constants.BALL_MOVED_THR or
             fabs(ball.rel_y - ballBefore.rel_y) > constants.BALL_MOVED_THR)
 
 def shouldSpinFindBall(player):
