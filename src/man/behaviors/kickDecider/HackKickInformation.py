@@ -2,6 +2,7 @@ import kicks
 import objects as Objects
 import noggin_constants as constants
 import math
+from ..util import MyMath
 
 DEBUG_KICK_DECISION = True
 USE_LOC = True
@@ -263,8 +264,8 @@ class KickInformation:
             if not closeShot:
 
                 if DEBUG_KICK_DECISION:
-                    print ("Acceptable bearing range for kick: " + str(bearingLimitLeft) +
-                           "/" + str(bearingLimitRight))
+                    print ("Acceptable bearing range for kick: " + str(headingBallToGoalLeft) +
+                           "/" + str(headingBallToGoalRight))
 
                 kickBearings = [[0, 0], [70, 0], [-70, 0]] # straight, right side, left side
                 for b in kickBearings:
@@ -315,8 +316,8 @@ class KickInformation:
                     print "I am shooting very close to the opponent's goal."
 
                 if DEBUG_KICK_DECISION:
-                    print ("Acceptable bearing range for kick: " + str(bearingLimitLeft) +
-                           "/" + str(bearingLimitRight))
+                    print ("Acceptable bearing range for kick: " + str(headingBallToGoalLeft) +
+                           "/" + str(headingBallToGoalRight))
 
                 if (bearingKickLeft - bearingKickRight) > 60:
                     # even an inaccurate straight kick will work
@@ -382,7 +383,7 @@ class KickInformation:
             kick.h = self.brain.loc.h - kick.h
 
             # Make sure heading is an int before passing it to the orbit.
-            kick.h = int(kick.h)
+            kick.h = int(MyMath.sub180Angle(kick.h))
 
             if DEBUG_KICK_DECISION:
                 print "Returning a kick with heading: " + str(kick.h)
