@@ -102,6 +102,13 @@
 #   undef LOG_IMAGES
 #endif
 
+#define LOG_BALLTRACK_${LOG_BALLTRACK}
+#ifdef  LOG_BALLTRACK_ON
+#   define LOG_BALLTRACK
+#else
+#   undef LOG_BALLTRACK
+#endif
+
 #define LOG_LOCATION_${LOG_LOCATION}
 #ifdef  LOG_LOCATION_ON
 #   define LOG_LOCATION

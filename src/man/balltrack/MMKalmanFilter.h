@@ -36,17 +36,19 @@ using namespace NBMath;
 namespace man{
 namespace balltrack{
 
+static const bool TRACK_MOVEMENT = false;
+
 static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
 {
-    2,                 // numFilters
+    2,                  // numFilters
     500,                // framesTillReset
     10.f,               // initCovX
     10.f,               // initCovY
     25.f,               // initCovVelX
     25.f,               // initCovVelY
-    35.f,                 // threshold for ball is moving!
-    4,                   // buffer size
-    30.f                 // badStationaryThresh
+    35.f,               // threshold for ball is moving!
+    4,                  // buffer size
+    30.f                // badStationaryThresh
 };
 
 class MMKalmanFilter
@@ -86,6 +88,8 @@ public:
 
     float getMovingRelX(){return filters.at((unsigned) 1)->getRelXPosEst();};
     float getMovingRelY(){return filters.at((unsigned) 1)->getRelYPosEst();};
+    float getMovingVelX(){return filters.at((unsigned) 1)->getRelXVelEst();};
+    float getMovingVelY(){return filters.at((unsigned) 1)->getRelYVelEst();};
     float getMovingDistance(){return filters.at((unsigned) 1)->getFilteredDist();};
     float getMovingBearing() {return filters.at((unsigned) 1)->getFilteredBear();};
 
