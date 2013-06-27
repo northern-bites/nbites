@@ -64,7 +64,7 @@ static const long PACKETS_PER_SECOND = 6;
 // The minimum delay between sending and receiving a packet (packet "travel time").
 static const long long MIN_PACKET_DELAY = 0;
 
-static const long long TEAMMATE_DEAD_THRESHOLD = 5 * MICROS_PER_SECOND;
+static const long long TEAMMATE_DEAD_THRESHOLD = 4 * MICROS_PER_SECOND;
 // Number of sequence numbers before we consider old ones still valid.
 // should be at least    MAX PING_TIME(s) * packets per second (~15)
 static const int       RESET_SEQ_NUM_THRESHOLD = 180;
