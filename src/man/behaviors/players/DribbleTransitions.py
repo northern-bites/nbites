@@ -157,9 +157,9 @@ def ballInGoalBox(player):
             player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
             wouldScoreIfDribbledStraight(player))
 
-# def centerField(player):
-#     return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y - 30 and
-#             player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y + 30)
+def centerField(player):
+    return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y - 30 and
+            player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y + 30)
 
 def wouldScoreIfDribbledStraight(player):
     """
