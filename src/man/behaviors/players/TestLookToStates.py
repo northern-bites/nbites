@@ -1,4 +1,3 @@
-import man.noggin.kickDecider.HackKickInformation as hackKick
 
 def gameInitial(player):
     if player.firstFrame():
@@ -36,13 +35,13 @@ def standup(player):
     #player.brain.tracker.repeatBasicPan()
 
     # if ball in sight, track it. otherwise, pan:
-    player.brain.tracker.trackBall()
+    # player.brain.tracker.trackBall()
 
     # for debugging, will print pitch and yaw every frame
-    #player.brain.tracker.helper.printHeadAngles()
+    player.brain.tracker.helper.printHeadAngles()
 
     # for debugging, will print ball's distance
-    print "Ball dist: ",player.brain.ball.loc.dist
+    # print "Ball dist: ",player.brain.ball.loc.dist
 
     return player.stay()
 

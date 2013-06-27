@@ -391,7 +391,7 @@ class Brain(object):
                         self.updateFlipFilters(-1)
 
                         print "Goalie saw the ball close, and I think I and it are far."
-                        print "Goalie sees ball at: " + goalie_ball_location
+                        print "Goalie sees ball at: " + str(goalie_ball_location)
 
                         break
 
