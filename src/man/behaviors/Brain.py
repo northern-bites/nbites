@@ -369,7 +369,7 @@ class Brain(object):
         # Get goalie data
         for mate in self.teamMembers:
             if mate.isDefaultGoalie() and mate.active:
-                if mate.ballOn:
+                if mate.ballOn and self.ball.vis.on:
                     # calculate global ball coordinates
                     # note: assume goalie is in center of goal.
                     goalie_x = Constants.FIELD_WHITE_LEFT_SIDELINE_X
