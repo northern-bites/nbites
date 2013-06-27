@@ -59,14 +59,11 @@ def executeDribble(player):
     if player.corner_dribble:
         if transitions.ballLost(player) or transitions.ballGotFarAway(player):
             player.corner_dribble = False
-            print "1"
             return player.goLater('chase')
         elif transitions.dribbleGoneBad(player):
-            print "2"
             return player.goNow('positionForDribble')
         elif transitions.centerField(player):
             player.corner_dribble = False
-            print "3"
             return player.goLater('chase')
     else:
         if transitions.ballLost(player):
@@ -159,10 +156,8 @@ def positionForDribble(player):
     if player.corner_dribble:
         if transitions.ballLost(player) or transitions.ballGotFarAway(player):
             player.corner_dribble = False
-            print "4"
             return player.goLater('chase')
         elif transitions.navDone(player):
-            print "5"
             return player.goLater('executeDribble')
     else:
         if transitions.ballLost(player):
