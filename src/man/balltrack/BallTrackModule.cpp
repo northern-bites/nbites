@@ -7,10 +7,8 @@
 
 #include "DebugConfig.h"
 
-namespace man
-{
-namespace balltrack
-{
+namespace man {
+namespace balltrack {
 
 BallTrackModule::BallTrackModule() :
     portals::Module(),

@@ -65,6 +65,10 @@ protected:
     QCheckBox* paintLogBox;
     QCheckBox* paintOfflineBox;
 
+    QHBoxLayout* ballStateLayout;
+    QLabel* logState;
+    QLabel* offState;
+
     float scaleFactor;
 };
 

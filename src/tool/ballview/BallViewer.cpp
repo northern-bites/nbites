@@ -33,6 +33,14 @@ BallViewer::BallViewer(QWidget* parent):
     checkBoxes->addWidget(paintLogBox);
     checkBoxes->addWidget(paintOfflineBox);
 
+    ballStateLayout = new QHBoxLayout();
+    logState = new QLabel(this);
+    logState->setText("?");
+    offState = new QLabel(this);
+    offState->setText("?");
+    ballStateLayout->addWidget(logState);
+    ballStateLayout->addWidget(offState);
+
     // Connect the resize paintfield buttons
     connect(zoomInButton, SIGNAL(released()), ballPainter,
             SLOT(handleZoomIn()));
@@ -48,6 +56,7 @@ BallViewer::BallViewer(QWidget* parent):
     mainLayout->addLayout(checkBoxes);
     mainLayout->addLayout(resizeLayout);
     mainLayout->addLayout(field);
+    mainLayout->addLayout(ballStateLayout);
 
     this->setLayout(mainLayout);
 
@@ -80,6 +89,20 @@ void BallViewer::run_()
     subdiagram.run();
 
     ballPainter->updateOfflineFilteredBall(ballListen.ballIn.message());
+
+    // Update the labels
+    if(ballIn.message().is_stationary())
+        logState->setText("STATIONARY  ");
+    else {
+        logState->setText("MOVING ");
+//        std::cout << "log speed " << ballIn.message().speed() << std::endl;
+    }
+    if(ballListen.ballIn.message().is_stationary())
+        offState->setText("STATIONARY  ");
+    else {
+        offState->setText("MOVING ");
+//        std::cout<< "off speed " << ballListen.ballIn.message().speed() << std::endl;
+    }
 }
 
 } // namespace viewer
