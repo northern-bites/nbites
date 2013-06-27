@@ -12,7 +12,7 @@ from math import fabs
 import noggin_constants as nogginConstants
 import time
 
-DRIBBLE_ON_KICKOFF = False
+DRIBBLE_ON_KICKOFF = True
 
 def chase(player):
     """
@@ -61,6 +61,14 @@ def approachBall(player):
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+
+        if player.brain.nav.isAtPosition():
+            print "isAtPosition() is causing the bug!"
+        else:
+            print "shouldPrepareForKick() is causing the bug!"
+            print player.brain.ball.distance
+            print player.brain.ball.vis.distance
+
         player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
@@ -99,91 +107,60 @@ def orbitBall(player):
     """
     State to orbit the ball
     """
-    if player.firstFrame():
-        if hackKick.DEBUG_KICK_DECISION:
-            print "Orbiting at angle: ",player.kick.h
+    # Calculate relative heading every frame
+    relH = player.kick.h - player.brain.loc.h
 
-        if player.kick.h == 0:
-            return player.goNow('positionForKick')
-        elif player.kick.h < 0:
-            # Set y vel at 50% speed
-            player.brain.nav.walk(0, -.7, .25)
-        elif player.kick.h > 0:
-            # Set y vel at 50% speed in opposite direction
-            player.brain.nav.walk(0, .7, -.25)
-
-    # Taken from shoot in hackKickInformation
-    goalCenter = Location(nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X,
-                                  nogginConstants.CENTER_FIELD_Y)
-    ballLocation = Location(player.brain.loc.x + player.brain.ball.stat_rel_x, 
-                            player.brain.loc.y + player.brain.ball.stat_rel_y)
-    headingBallToGoalCenter = ballLocation.headingTo(goalCenter)
-    bearingForKick = headingBallToGoalCenter - player.brain.loc.h
-
-    # We chose a kick
-    if (player.kick.isStraightKick()):
-        orbitBall.desiredHeading = 0 - bearingForKick
-    elif player.kick == kicks.RIGHT_SIDE_KICK:
-        orbitBall.desiredHeading = 70 - bearingForKick
-    elif player.kick == kicks.LEFT_SIDE_KICK:
-        orbitBall.desiredHeading = -70 -bearingForKick
-    elif (player.kick.isBackKick()):
-        if bearingForKick < -125:
-            orbitBall.desiredHeading = -180 - bearingForKick
-        else:
-            orbitBall.desiredHeading = 180 - bearingForKick
-
-    # # DEBUGGING PRINT OUTS
-    # if player.counter%20 == 0:
-    #     print "desiredHeading is:  | ", orbitBall.desiredHeading
-    #     print "ball to goal center:| ", headingBallToGoalCenter
-    #     print "player heading:     | ", player.brain.loc.h
-    #     print "bearing for kick:   | ", bearingForKick
-    #     print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
-    #     print "==============================="
-
-    # Are we pointed in the right direction?
-    if (orbitBall.desiredHeading > -constants.ORBIT_GOOD_BEARING and 
-        orbitBall.desiredHeading < constants.ORBIT_GOOD_BEARING):
+    # Are we within the acceptable heading range?
+    if (relH > -constants.ORBIT_GOOD_BEARING and
+        relH < constants.ORBIT_GOOD_BEARING):
         player.stopWalking()
-        player.shouldOrbit = False
-        player.kick.h = 0
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         return player.goNow('positionForKick')
-    elif player.stateTime > 8:
-        player.shouldOrbit = False
+
+    if (transitions.orbitTooLong(player) or
+        transitions.orbitBallTooFar(player)):
         player.stopWalking()
         player.inKickingState = False
         return player.goLater('chase')
 
-    # Are we at a good distance from the ball to orbit?
-    if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR < 
+    # Set our walk. Nav will make sure that we don't set duplicate speeds.
+    if relH < 0:
+        player.setWalk(0,  0.7, -0.25)
+    elif relH > 0:
+        player.setWalk(0, -0.7,  0.25)
+
+    # # DEBUGGING PRINT OUTS
+    if player.counter%20 == 0:
+        print "desiredHeading is:  | ", player.kick.h
+        print "player heading:     | ", player.brain.loc.h
+        print "orbit heading:      | ", relH
+        print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
+        print "==============================="
+
+    # X correction
+    if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
         player.brain.ball.stat_distance): # Too far away
         player.brain.nav.setXSpeed(.15)
-    elif (constants.ORBIT_BALL_DISTANCE - constants.ORBIT_DISTANCE_CLOSE > 
-       player.brain.ball.stat_distance): # Too close
+    elif (constants.ORBIT_BALL_DISTANCE - constants.ORBIT_DISTANCE_CLOSE >
+          player.brain.ball.stat_distance): # Too close
         player.brain.nav.setXSpeed(-.15)
     elif (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_GOOD >
           player.brain.ball.stat_distance and constants.ORBIT_BALL_DISTANCE -
           constants.ORBIT_DISTANCE_GOOD < player.brain.ball.stat_distance):
         player.brain.nav.setXSpeed(0)
 
-    if (transitions.orbitTooLong(player) or
-        transitions.orbitBallTooFar(player)):
-        player.inKickingState = False
-        return player.goLater('chase')
-
-    if player.kick.h > 0: # Orbiting clockwise
+    # H correction
+    if relH < 0: # Orbiting clockwise
         if player.brain.ball.stat_rel_y > 2:
             player.brain.nav.setHSpeed(0)
-        elif player.brain.ball.stat_rel_y < 2:
+        elif player.brain.ball.stat_rel_y < -2:
             player.brain.nav.setHSpeed(-.35)
         else:
             player.brain.nav.setHSpeed(-.25)
     else: # Orbiting counter-clockwise
         if player.brain.ball.stat_rel_y > 2:
             player.brain.nav.setHSpeed(.35)
-        elif player.brain.ball.stat_rel_y < 2:
+        elif player.brain.ball.stat_rel_y < -2:
             player.brain.nav.setHSpeed(0)
         else:
             player.brain.nav.setHSpeed(.25)
@@ -227,7 +204,6 @@ def positionForKick(player):
 
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
-        print "DEBUG_SUITE: In 'positionForKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         player.ballBeforeKick = player.brain.ball
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
@@ -278,7 +254,7 @@ def prepareForPenaltyKick(player):
         # prepareForPenaltyKick.chase = True
         return player.goNow('penaltyKickSpin')
     return player.stay()
-    
+
 def penaltyKickSpin(player):
     """
     Spin so that we change the heading of the kick
@@ -331,7 +307,7 @@ def penaltyKickSpin(player):
     # print "-----------------------------"
 
     return player.stay()
-    
+
 
 def positionForPenaltyKick(player):
     """
@@ -377,7 +353,6 @@ def positionForPenaltyKick(player):
 
     if (transitions.ballInPosition(player, positionForPenaltyKick.kickPose) or
         player.brain.nav.isAtPosition()):
-        print "DEBUG_SUITE: In 'positionForPenaltyKick', either ballInPosition or nav.isAtPosition. Switching to 'kickBallExecute'."
         positionForPenaltyKick.yes = True
         #return player.stay()
         player.brain.nav.stand()
@@ -386,7 +361,7 @@ def positionForPenaltyKick(player):
     if positionForPenaltyKick.yes:
         print "ball relX: ", ball.rel_x
         print "ball relY: ", ball.rel_y
-    
+
     return player.stay()
 
 

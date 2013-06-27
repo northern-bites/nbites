@@ -3,7 +3,7 @@ import objects as Objects
 import noggin_constants as constants
 import math
 
-DEBUG_KICK_DECISION = False
+DEBUG_KICK_DECISION = True
 USE_LOC = True
 
 class KickInformation:
@@ -320,7 +320,7 @@ class KickInformation:
 
                 if (bearingKickLeft - bearingKickRight) > 60:
                     # even an inaccurate straight kick will work
-                    if (30 > bearingKickLeft and -30 < bearingKickLeft):
+                    if (30 < bearingKickLeft and -30 > bearingKickLeft):
                         #choose a straight kick with no orbit NOW!
                         kick = self.chooseShortFrontKick()
                         kick.h = 0
@@ -337,12 +337,12 @@ class KickInformation:
 
                 if (bearingKickLeft - bearingKickRight > 35):
                     # even an inaccurate side kick will work
-                    if (95 > bearingKickLeft and 60 < bearingKickRight):
+                    if (95 < bearingKickLeft and 60 > bearingKickRight):
                         #choose a right side kick with no orbit NOW!
                         kick = kicks.RIGHT_SIDE_KICK
                         kick.h = 0
                         return kick
-                    elif (-60 > bearingKickLeft and -95 < bearingKickRight):
+                    elif (-60 < bearingKickLeft and -95 > bearingKickRight):
                         #choose a left side kick with no orbit!
                         kick = kicks.LEFT_SIDE_KICK
                         kick.h = 0
@@ -377,6 +377,9 @@ class KickInformation:
                 elif (kickList[0] == leftSideBearing):
                     kick = kicks.LEFT_SIDE_KICK
                     kick.h = leftSideBearing
+
+            # Convert kick.h to be a desired global heading for the orbit.
+            kick.h = self.brain.loc.h - kick.h
 
             # Make sure heading is an int before passing it to the orbit.
             kick.h = int(kick.h)
