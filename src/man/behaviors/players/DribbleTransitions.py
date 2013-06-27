@@ -45,8 +45,8 @@ def inPosition(player):
     """
     We are positioned well on the field for dribbling.
     """
-    return betweenCrosses(player)
-    # return middleThird(player)
+    # return betweenCrosses(player)
+    return middleThird(player)
     # return firstHalf(player)
     # return secondHalf(player)
 
