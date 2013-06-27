@@ -102,16 +102,16 @@ def didIKickIt(player):
     return Transition.getNextState(player, didIKickIt)
 
 def spinToFaceBall(player):
-    if player.firstFrame():
-        facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if player.brain.ball.bearing_deg < 0.0:
-            player.side = RIGHT
-            facingDest.relH = -90
-        else:
-            player.side = LEFT
-            facingDest.relH = 90
-        player.brain.nav.goTo(facingDest,
-                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
+    facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+    if player.brain.ball.bearing_deg < 0.0:
+        player.side = RIGHT
+        facingDest.relH = -90
+    else:
+        player.side = LEFT
+        facingDest.relH = 90
+    player.brain.nav.goTo(facingDest,
+                          nav.CLOSE_ENOUGH,
+                          nav.CAREFUL_SPEED)
 
     if player.counter > 180:
         return player.goLater('spinAtGoal')

@@ -369,7 +369,7 @@ class Brain(object):
         # Get goalie data
         for mate in self.teamMembers:
             if mate.isDefaultGoalie() and mate.active:
-                if mate.ballOn:
+                if mate.ballOn and self.ball.vis.on:
                     # calculate global ball coordinates
                     # note: assume goalie is in center of goal.
                     goalie_x = Constants.FIELD_WHITE_LEFT_SIDELINE_X
@@ -384,16 +384,27 @@ class Brain(object):
                     flipped_ball_location = Location(Constants.FIELD_GREEN_WIDTH - self.ball.x,
                                                      Constants.FIELD_GREEN_HEIGHT - self.ball.y)
 
+                    if (mate.ballDist < 250 and
+                        self.loc.x > Constants.MIDFIELD_X and
+                        self.ball.x > Constants.MIDFIELD_X):
+                        # I'm probably flipped!
+                        self.updateFlipFilters(-1)
+
+                        print "Goalie saw the ball close, and I think I and it are far."
+                        print "Goalie sees ball at: " + str(goalie_ball_location)
+
+                        break
+
                     if (goalie_ball_location.inCenterCenter() or
                         my_ball_location.inCenterCenter()):
                         # Ball is too close to the middle of the field. Risky.
                         self.updateFlipFilters(0)
-                        return
+                        break
 
-                    if my_ball_location.distTo(goalie_ball_location) < 100:
+                    if my_ball_location.distTo(goalie_ball_location) < 70:
                         # I'm probably in the right place!
                         self.updateFlipFilters(1)
-                    elif flipped_ball_location.distTo(goalie_ball_location) < 100:
+                    elif flipped_ball_location.distTo(goalie_ball_location) < 70:
                         # I'm probably flipped!
                         self.updateFlipFilters(-1)
                     else:
@@ -401,7 +412,7 @@ class Brain(object):
                         self.updateFlipFilters(0)
 
         # If I've decided I should flip enough times, actually do it.
-        if (len(self.flipFilter) > 0 and
+        if (len(self.flipFilter) == 10 and
             sum(self.flipFilter) > 6):
             self.flipLoc()
             # Reset filters! Don't want to flip again next frame.

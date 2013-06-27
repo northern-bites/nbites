@@ -32,6 +32,7 @@ ToolDiagram::ToolDiagram(QWidget* parent) : QObject(parent)
     ADD_MAPPED_TYPE(ButtonState);
     ADD_MAPPED_TYPE(FallStatus);
     ADD_MAPPED_TYPE(FeetOnGround);
+    ADD_MAPPED_TYPE(FilteredBall);
     ADD_MAPPED_TYPE(FootBumperState);
     ADD_MAPPED_TYPE(FSR);
     ADD_MAPPED_TYPE(GameState);

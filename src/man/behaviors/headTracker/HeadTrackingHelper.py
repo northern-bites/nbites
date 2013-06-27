@@ -162,7 +162,7 @@ class HeadTrackingHelper(object):
         command.type = command.CommandType.POS_HEAD_COMMAND
 
         command.pos_command.head_yaw = newYaw
-        command.pos_command.head_pitch = 25.0 # TODO: MAKE A CONSTANT FOR THIS
+        command.pos_command.head_pitch = constants.FIXED_PITCH_VALUE
         command.pos_command.max_speed_yaw = maxSpeed
         command.pos_command.max_speed_pitch = maxSpeed
 
@@ -195,7 +195,7 @@ class HeadTrackingHelper(object):
         command.type = command.CommandType.POS_HEAD_COMMAND
 
         command.pos_command.head_yaw = newYaw
-        command.pos_command.head_pitch = 20.0 # TODO: MAKE A CONSTANT FOR THIS
+        command.pos_command.head_pitch = constants.FIXED_PITCH_VALUE
         command.pos_command.max_speed_yaw = maxSpeed
         command.pos_command.max_speed_pitch = maxSpeed
 
@@ -278,3 +278,7 @@ class HeadTrackingHelper(object):
                 bestPost = p
                 minDiff = diff
         return bestPost
+
+    def printHeadAngles(self):
+        print "Current yaw is: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
+        print "Current pitch is: " + str(degrees(self.tracker.brain.interface.joints.head_pitch))

@@ -7,10 +7,8 @@
 
 #include "DebugConfig.h"
 
-namespace man
-{
-namespace balltrack
-{
+namespace man {
+namespace balltrack {
 
 BallTrackModule::BallTrackModule() :
     portals::Module(),
@@ -88,13 +86,15 @@ void BallTrackModule::run_()
 
     ballMessage.get()->set_stat_rel_x(filters->getStationaryRelX());
     ballMessage.get()->set_stat_rel_y(filters->getStationaryRelY());
-    ballMessage.get()->set_stat_distance(filters->getStationaryRelX());
-    ballMessage.get()->set_stat_bearing(filters->getStationaryRelY());
+    ballMessage.get()->set_stat_distance(filters->getStationaryDistance());
+    ballMessage.get()->set_stat_bearing(filters->getStationaryBearing());
 
     ballMessage.get()->set_mov_rel_x(filters->getMovingRelX());
     ballMessage.get()->set_mov_rel_y(filters->getMovingRelY());
-    ballMessage.get()->set_mov_distance(filters->getMovingRelX());
-    ballMessage.get()->set_mov_bearing(filters->getMovingRelY());
+    ballMessage.get()->set_mov_vel_x(filters->getMovingVelX());
+    ballMessage.get()->set_mov_vel_y(filters->getMovingVelY());
+    ballMessage.get()->set_mov_distance(filters->getMovingDistance());
+    ballMessage.get()->set_mov_bearing(filters->getMovingBearing());
 
 #ifdef DEBUG_BALLTRACK
     // Print the observation given, each filter after update, and which filter chosen

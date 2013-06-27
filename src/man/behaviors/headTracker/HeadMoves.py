@@ -371,8 +371,9 @@ DATA_PAN = (
 
 ################### FIXED PITCH PANS #################
 FIXED_PITCH_PAN = (
-    ((57.0,17.0), 2.5, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-57.0,17.0), 2.5, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((57.0,17.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-57.0,17.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES)) # was ~46 degrees per second
+#                                                         now ~38 degrees per second
 
 FIXED_PITCH_LEFT_SIDE_PAN = (
     ((60.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
@@ -386,7 +387,7 @@ FIXED_PITCH_RIGHT_SIDE_PAN = (
 # Time is set for localization while moving.
 FIXED_PITCH_PAN_WIDE = (
     ((115.0,11.0), 3.7, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,11.0), 3.7, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((-115.0,11.0), 3.7, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~62 degrees per second
 
 # Same as above, but timed for a stationary kick decision.
 FIXED_PITCH_KICK_PAN = (
@@ -400,7 +401,7 @@ FIXED_PITCH_SLOW_GOALIE_PAN = (
 # Bottom camera is never significantly blocked by shoulders or arms.
 FIXED_PITCH_PAN_NARROW = (
     ((55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((-55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~37 degrees per second
 
 # Needs some alteration re: pitch for the given yaw
 FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
