@@ -7,10 +7,8 @@
 
 #include "DebugConfig.h"
 
-namespace man
-{
-namespace balltrack
-{
+namespace man {
+namespace balltrack {
 
 BallTrackModule::BallTrackModule() :
     portals::Module(),
@@ -93,6 +91,8 @@ void BallTrackModule::run_()
 
     ballMessage.get()->set_mov_rel_x(filters->getMovingRelX());
     ballMessage.get()->set_mov_rel_y(filters->getMovingRelY());
+    ballMessage.get()->set_mov_vel_x(filters->getMovingVelX());
+    ballMessage.get()->set_mov_vel_y(filters->getMovingVelY());
     ballMessage.get()->set_mov_distance(filters->getMovingDistance());
     ballMessage.get()->set_mov_bearing(filters->getMovingBearing());
 

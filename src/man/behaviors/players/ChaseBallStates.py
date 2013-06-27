@@ -12,7 +12,7 @@ from math import fabs
 import noggin_constants as nogginConstants
 import time
 
-DRIBBLE_ON_KICKOFF = False
+DRIBBLE_ON_KICKOFF = True
 
 def chase(player):
     """
@@ -59,8 +59,19 @@ def approachBall(player):
         else:
             player.brain.nav.chaseBall(fast = True)
 
+    if transitions.shouldFindBall(player):
+        return player.goLater('chase')
+
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+
+        if player.brain.nav.isAtPosition():
+            print "isAtPosition() is causing the bug!"
+        else:
+            print "shouldPrepareForKick() is causing the bug!"
+            print player.brain.ball.distance
+            print player.brain.ball.vis.distance
+
         player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
@@ -89,9 +100,9 @@ def prepareForKick(player):
     if hackKick.DEBUG_KICK_DECISION:
         print str(player.kick)
 
-    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-    #     if dr_trans.shouldDribble(player):
-    #         return player.goNow('decideDribble')
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -168,9 +179,9 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-    #     if dr_trans.shouldDribble(player):
-    #         return player.goNow('decideDribble')
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()

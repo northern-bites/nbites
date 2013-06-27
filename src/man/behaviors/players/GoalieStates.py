@@ -8,7 +8,7 @@ from ..headTracker import HeadMoves
 import GoalieConstants as constants
 import math
 
-SAVING = False
+SAVING = True
 
 def gameInitial(player):
     if player.firstFrame():
@@ -39,7 +39,7 @@ def gameReady(player):
         player.stand()
         player.brain.tracker.lookToAngle(0)
         if player.lastDiffState != 'gameInitial':
-            player.brain.nav.walkTo(RelRobotLocation(-80, 0, 0))
+            return player.goLater('spinToWalkOffField')
 
     # Wait until the sensors are calibrated before moving.
     if(not player.brain.motion.calibrated):
@@ -133,6 +133,25 @@ def fallen(player):
     player.inKickingState = False
     return player.stay()
 
+def spinToWalkOffField(player):
+    if player.firstFrame():
+        player.brain.tracker.lookToAngle(0)
+        player.brain.nav.goTo(RelRobotLocation(0, 0, 90))
+
+    return Transition.getNextState(player, spinToWalkOffField)
+
+def bookIt(player):
+    if player.firstFrame():
+        player.brain.nav.goTo(RelRobotLocation(100, 0, 0), avoidObstacles = True)
+
+    return Transition.getNextState(player, bookIt)
+
+def standStill(player):
+    if player.firstFrame():
+        player.brain.nav.stop()
+
+    return player.stay()
+
 def watchWithCornerChecks(player):
     if player.firstFrame():
         watchWithCornerChecks.looking = False
@@ -141,6 +160,9 @@ def watchWithCornerChecks(player):
         player.brain.tracker.trackBall()
         player.brain.nav.stand()
         player.returningFromPenalty = False
+
+    if player.counter > 150:
+        return player.goLater('watch')
 
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
         and
@@ -332,7 +354,7 @@ def penaltyShotsGameSet(player):
         player.brain.fallController.enabled = False
         player.stand()
         player.brain.tracker.trackBall()
-        player.side = LEFT
+        player.side = constants.LEFT
         player.isSaving = False
         player.penaltyKicking = True
 

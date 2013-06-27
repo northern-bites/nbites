@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 set( BALL_VIEW_SRCS
    BallViewer.cpp
    BallViewerPainter.cpp
+   OfflineBallListener.cpp
     )
 
 set( BALL_VIEW_HEADERS
@@ -25,5 +26,6 @@ target_link_libraries(
   portals
   tool_common
   support
+  balltrack
   ${QT_LIBRARIES}
   )

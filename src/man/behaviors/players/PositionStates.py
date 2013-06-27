@@ -73,7 +73,7 @@ def positionPlaying(player):
         player.brain.nav.positionPlaybook()
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
 
-    if player.brain.ball.vis.on and player.brain.ball.distance < 100:
+    if player.brain.ball.vis.on:
         player.brain.tracker.trackBall()
     else:
         player.brain.tracker.repeatBasicPan() # TODO Landmarks

@@ -31,10 +31,13 @@ public:
     BallViewerPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
     void updateOdometry(messages::RobotLocation odometry);
     void updateFilteredBall(messages::FilteredBall ball);
+    void updateOfflineFilteredBall(messages::FilteredBall ball);
 
 protected slots:
     void handleZoomIn();
     void handleZoomOut();
+    void paintLogAction(bool state);
+    void paintOfflineAction(bool state);
 
 protected:
     // Paint the field
@@ -49,8 +52,18 @@ private:
 
     messages::RobotLocation curLocation;
 
-    QPoint curGlobalFiltered;
+    bool stationary;
+    QPoint curGlobalStationary;
+    QPoint curGlobalMoving;
     QPoint curGlobalVision;
+
+    bool offStationary;
+    QPoint offCurGlobalStationary;
+    QPoint offCurGlobalMoving;
+    QPoint offCurGlobalVision;
+
+    bool paintLog;
+    bool paintOffline;
 };
 
 } // namespace ballview
