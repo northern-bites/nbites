@@ -41,7 +41,7 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsTop[PITCH] = -0.06f;
         paramsBottom[ROLL] = -0.02f;
         paramsBottom[PITCH] = 0.0f;
-    } else if (name == "mal") { // Changed 6/26/13
+    } else if (name == "mal") {
         paramsTop[ROLL] = -0.01f;
         paramsTop[PITCH] = -0.06f;
         paramsBottom[ROLL] = -0.03f;
@@ -51,34 +51,31 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsTop[PITCH] = -0.01f;
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = -0.01f;
-    } else if (name == "jayne") { // Changed 6/11/13
+    } else if (name == "jayne") {
         paramsTop[ROLL] = 0.01f;
         paramsTop[PITCH] = 0.03f;
         paramsBottom[ROLL] = 0.02f;
         paramsBottom[PITCH] = 0.0f;
     } else if (name == "wash") {
-        //paramsTop[ROLL] = -0.01f;
-        //paramsBottom[ROLL] = -0.01f;
-        //paramsTop[ROLL] = -0.01f;
-        paramsTop[ROLL] = 0.00f;
-        paramsTop[PITCH] = -0.05f;
-        paramsBottom[ROLL] = 0.00f;
-        paramsBottom[PITCH] = -0.15f;
+        paramsTop[ROLL] = -0.02f;
+        paramsTop[PITCH] = 0.02f;
+        paramsBottom[ROLL] = -0.03f;
+        paramsBottom[PITCH] = 0.03f;
     } else if (name == "kaylee") {
         paramsTop[ROLL] = 0.02f;
-        paramsTop[PITCH] = 0.08f;
+        paramsTop[PITCH] = 0.10f;
         paramsBottom[ROLL] = 0.0f;
-        paramsBottom[PITCH] = 0.1f;
-    } else if (name == "vera") { // Changed 6/11/13
+        paramsBottom[PITCH] = 0.10f;
+    } else if (name == "vera") {
         paramsTop[ROLL] = -0.02f;
         paramsTop[PITCH] = 0.07f;
         paramsBottom[ROLL] = -0.01f;
         paramsBottom[PITCH] = 0.09f;
-    } else if (name == "inara") { // Changed 6/11/13
+    } else if (name == "inara") {
         paramsTop[ROLL] = -0.01f;
-        paramsTop[PITCH] = 0.10f;
-        paramsBottom[ROLL] = -0.02f;
-        paramsBottom[PITCH] = 0.06f;
+        paramsTop[PITCH] = 0.09f;
+        paramsBottom[ROLL] = -0.04f;
+        paramsBottom[PITCH] = 0.07f;
     } else if (name == "simon") {
         paramsTop[ROLL] = 0.01f;
         paramsTop[PITCH] = 0.10f;
