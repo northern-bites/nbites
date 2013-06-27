@@ -71,14 +71,6 @@ def positionPlaying(player):
     """
     if player.firstFrame():
         player.brain.nav.positionPlaybook()
-        player.brain.tracker.repeatBasicPan() # TODO Landmarks
-
-    if player.brain.ball.vis.on:
-        player.brain.tracker.trackBall()
-    else:
-        player.brain.tracker.repeatBasicPan() # TODO Landmarks
-
-    if player.brain.nav.isAtPosition():
         player.brain.tracker.trackBall()
 
     if player.brain.play.isChaser() and transitions.shouldChaseBall(player):
