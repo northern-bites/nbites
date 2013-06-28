@@ -325,6 +325,13 @@ void Threshold::visionLoop(const messages::JointAngles& ja,
         usingTopCamera = false;
 
         /***********************/pose->transform(usingTopCamera, ja, inert);
+
+		// before we toss the old one we need to save it in case we do not
+		// actually see it in the bottom camera
+		VisualFieldObject tempLeft, tempRight;
+		tempLeft = *vision->yglp;
+		tempRight = *vision->ygrp;
+
         yellow->init(pose->getHorizonSlope());
         if (ylp) {
             vision->yglp->init();
@@ -344,21 +351,29 @@ void Threshold::visionLoop(const messages::JointAngles& ja,
         //cout << "Low yellow is " << lowYellow << endl;
         yellow->createObject();
         if (ylp) {
-            vision->yglp->setLeftTopY(0);
-            vision->yglp->setRightTopY(0);
-            // make sure we use pix estimate
-            vision->yglp->setDistanceCertainty(BOTH_UNSURE);
-            vision->yglp->setTopCam(usingTopCamera);
-            setFieldObjectInfo(vision->yglp);
-            //cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
+			if (vision->yglp->getWidth() == 0) {
+				*vision->yglp = tempLeft;
+			} else {
+				vision->yglp->setLeftTopY(0);
+				vision->yglp->setRightTopY(0);
+				// make sure we use pix estimate
+				vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+				vision->yglp->setTopCam(usingTopCamera);
+				setFieldObjectInfo(vision->yglp);
+				//cout << "Bottom is " << vision->yglp->getLeftBottomY() << endl;
+			}
         }
         if (yrp) {
-            vision->ygrp->setLeftTopY(0);
-            vision->ygrp->setRightTopY(0);
-            vision->yglp->setDistanceCertainty(BOTH_UNSURE);
-            vision->ygrp->setTopCam(usingTopCamera);
-            setFieldObjectInfo(vision->ygrp);
-            //cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
+			if (vision->ygrp->getWidth() == 0) {
+				*vision->ygrp = tempRight;
+			} else {
+				vision->ygrp->setLeftTopY(0);
+				vision->ygrp->setRightTopY(0);
+				vision->yglp->setDistanceCertainty(BOTH_UNSURE);
+				vision->ygrp->setTopCam(usingTopCamera);
+				setFieldObjectInfo(vision->ygrp);
+				//cout << "Bottom is " << vision->ygrp->getLeftBottomY() << endl;
+			}
         }
     }
 
