@@ -116,6 +116,7 @@ def orbitBall(player):
     # Are we within the acceptable heading range?
     if (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
+        print "STOPPED! Because relH is: ", relH
         player.stopWalking()
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         return player.goNow('positionForKick')
@@ -128,9 +129,15 @@ def orbitBall(player):
 
     # Set our walk. Nav will make sure that we don't set duplicate speeds.
     if relH < 0:
-        player.setWalk(0,  0.7, -0.25)
+        if relH < -20:
+            player.setWalk(0, 0.7, -0.25)
+        else:
+            player.setWalk(0, 0.5, -0.15)
     elif relH > 0:
-        player.setWalk(0, -0.7,  0.25)
+        if relH > 20:
+            player.setWalk(0, -0.7, 0.25)
+        else:
+            player.setWalk(0, -0.5, 0.15)
 
     # # DEBUGGING PRINT OUTS
     if player.counter%20 == 0:
@@ -157,16 +164,28 @@ def orbitBall(player):
         if player.brain.ball.stat_rel_y > 2:
             player.brain.nav.setHSpeed(0)
         elif player.brain.ball.stat_rel_y < -2:
-            player.brain.nav.setHSpeed(-.35)
+            if relH < -20:
+                player.brain.nav.setHSpeed(-0.35)
+            else:
+                player.brain.nav.setHSpeed(-0.2)
         else:
-            player.brain.nav.setHSpeed(-.25)
+            if relH < -20:
+                player.brain.nav.setHSpeed(-0.25)
+            else:
+                player.brain.nav.setHSpeed(-0.15)
     else: # Orbiting counter-clockwise
         if player.brain.ball.stat_rel_y > 2:
-            player.brain.nav.setHSpeed(.35)
+            if relH > 20:
+                player.brain.nav.setHSpeed(0.35)
+            else:
+                player.brain.nav.setHSpeed(0.2)
         elif player.brain.ball.stat_rel_y < -2:
             player.brain.nav.setHSpeed(0)
         else:
-            player.brain.nav.setHSpeed(.25)
+            if relH > 20:
+                player.brain.nav.setHSpeed(0.25)
+            else:
+                player.brain.nav.setHSpeed(0.15)
 
     return player.stay()
 
