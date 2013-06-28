@@ -209,7 +209,15 @@ def shouldMoveBackwards(player):
         vision.visual_line_size() == 0):
         return True
 
-    return False
+    for i in range(0, vision.visual_line_size()):
+        if vision.visual_line(i).visual_detection.distance < 120.0:
+            return False
+
+    for i in range(0, vision.bottom_line_size()):
+        if vision.bottom_line(i).visual_detection.distance < 120.0:
+            return False
+
+    return True
 
 def facingSideways(player):
     """
