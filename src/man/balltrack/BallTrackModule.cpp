@@ -95,6 +95,7 @@ void BallTrackModule::run_()
     ballMessage.get()->set_mov_vel_y(filters->getMovingVelY());
     ballMessage.get()->set_mov_distance(filters->getMovingDistance());
     ballMessage.get()->set_mov_bearing(filters->getMovingBearing());
+    ballMessage.get()->set_mov_speed(filters->getMovingSpeed());
 
 #ifdef DEBUG_BALLTRACK
     // Print the observation given, each filter after update, and which filter chosen

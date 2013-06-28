@@ -92,7 +92,7 @@ public:
     float getMovingVelY(){return filters.at((unsigned) 1)->getRelYVelEst();};
     float getMovingDistance(){return filters.at((unsigned) 1)->getFilteredDist();};
     float getMovingBearing() {return filters.at((unsigned) 1)->getFilteredBear();};
-
+    float getMovingSpeed() {return calcSpeed(getMovingVelX(), getMovingVelY());};
 
     bool isStationary(){return stationary;};
 
