@@ -391,25 +391,28 @@ def shouldClearBall(player):
 
     shouldGo = False
 
-    # if definitely within goal box
+    # if definitely within good chasing area
     if (player.brain.ball.distance < 120.0):
+        walkedTooFar.xThresh = 150.0
+        walkedTooFar.yThresh = 150.0
         shouldGo = True
 
     # farther out but being aggressive
     if (player.brain.ball.distance < 150.0 and
         player.brain.ball.is_stationary and
         player.aggressive):
+        walkedTooFar.xThresh = 180.0
+        walkedTooFar.yThresh = 180.0
         shouldGo = True
 
     # to goalie's sides, being aggressive
     if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
         player.aggressive):
+        walkedTooFar.xThresh = 300.0
+        walkedTooFar.yThresh = 300.0
         shouldGo = True
 
     if shouldGo:
-        walkedTooFar.xThresh = player.brain.ball.rel_x + 50.0
-        walkedTooFar.yThresh = player.brain.ball.rel_y + 50.0
-
         if player.brain.ball.bearing_deg < -60.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
         elif player.brain.ball.bearing_deg > 60.0:
@@ -432,7 +435,7 @@ def ballMovedStopChasing(player):
     If the robot has been chasing for a while and it is far away, it should
     stop chasing.
     """
-    return (player.brain.ball.distance > 100.0 and
+    return (player.brain.ball.distance > 130.0 and
             player.counter > 100.0)
 
 def walkedTooFar(player):

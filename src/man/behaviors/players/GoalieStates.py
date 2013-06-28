@@ -154,6 +154,17 @@ def standStill(player):
 
 def watchWithCornerChecks(player):
     if player.firstFrame():
+        # This is dumb, but...
+        if player.lastDiffState not in ['fixMyself',
+                                        'moveForward',
+                                        'moveBackwards']:
+            watchWithCornerChecks.numFixes = 0
+        else:
+            watchWithCornerChecks.numFixes += 1
+
+        if watchWithCornerChecks.numFixes > 6:
+            return player.goLater('watch')
+
         watchWithCornerChecks.looking = False
         watchWithCornerChecks.lastLook = constants.RIGHT
         player.homeDirections = []
@@ -161,7 +172,7 @@ def watchWithCornerChecks(player):
         player.brain.nav.stand()
         player.returningFromPenalty = False
 
-    if player.counter > 150:
+    if player.counter > 200:
         return player.goLater('watch')
 
     if (player.brain.ball.vis.frames_on > constants.BALL_ON_SAFE_THRESH
@@ -189,7 +200,6 @@ def watch(player):
         player.returningFromPenalty = False
 
     return Transition.getNextState(player, watch)
-
 
 def average(locations):
     x = 0.0
