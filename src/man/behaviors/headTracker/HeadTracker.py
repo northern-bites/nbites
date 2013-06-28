@@ -2,6 +2,7 @@ from . import TrackingStates
 from . import BasicStates
 from . import HeadTrackingHelper as helper
 from . import HeadMoves
+from . import TrackingConstants
 from ..util import FSA
 
 from .. import StiffnessModes as stiff
@@ -110,6 +111,11 @@ class HeadTracker(FSA.FSA):
         When ball is in view, tracks via vision values.
         Once ball is gone for some time, switch to wide pans.
         """
+        # Check if we're using bounceTracking
+        if TrackingConstants.USE_BOUNCE_TRACKING:
+            self.bounceTrackBall()
+            return
+
         self.target = self.brain.ball
         if (self.currentState is not 'fullPan' and
             self.currentState is not 'tracking'):

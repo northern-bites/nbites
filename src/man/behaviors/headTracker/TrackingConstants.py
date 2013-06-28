@@ -1,5 +1,7 @@
 import HeadMoves
 
+USE_BOUNCE_TRACKING = False
+
 MAX_PAN_SPEED = 125.0              # deg/sec
 
 TRACKER_FRAMES_ON_TRACK_THRESH = 2
