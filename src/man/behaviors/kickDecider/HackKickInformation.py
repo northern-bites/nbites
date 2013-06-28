@@ -6,6 +6,7 @@ from ..util import MyMath
 
 DEBUG_KICK_DECISION = True
 USE_LOC = True
+STRAIGHT_KICK_BIAS = 10
 
 class KickInformation:
     """
@@ -299,20 +300,21 @@ class KickInformation:
                         #goal is to our right
                         b[1] = -adjustedBearingLeft
 
-                minimumBearing = min(map(math.fabs, [x[1] for x in kickBearings]))
-                if minimumBearing == math.fabs(kickBearings[0][1]):
+                sortedBearings = sorted(map(math.fabs, [x[1] for x in kickBearings]))
+
+                if sortedBearings[0] < math.fabs(kickBearings[0][1]) - STRAIGHT_KICK_BIAS:
+                    # side kicks must beat straight kick by more than ~10 degrees
+                    if sortedBearings[0] == math.fabs(kickBearings[1][1]):
+                        # choose a right side kick
+                        kick = kicks.RIGHT_SIDE_KICK
+                    elif sortedBearings[0] == math.fabs(kickBearings[2][1]):
+                        # choose a left side kick
+                        kick = kicks.LEFT_SIDE_KICK
+                else:
                     # choose a straight kick
                     kick = self.chooseShortFrontKick()
-                elif minimumBearing == math.fabs(kickBearings[1][1]):
-                    # choose a right side kick
-                    kick = kicks.RIGHT_SIDE_KICK
-                elif minimumBearing == math.fabs(kickBearings[2][1]):
-                    # choose a left side kick
-                    kick = kicks.LEFT_SIDE_KICK
-                else:
-                    # huh?
-                    print "Didn't choose a kick..."
-                kick.h = minimumBearing
+
+                kick.h = sortedBearings[0]
 
                 # If we're defending near our goal box, just kick it: clearing the ball
                 # is more important than being super accurate.
@@ -383,15 +385,20 @@ class KickInformation:
 
                 # the kick bearing that has least magnitude should be chosen
                 kickList = sorted([straightBearing, leftSideBearing, rightSideBearing], key=math.fabs)
-                if (kickList[0] == straightBearing):
+
+                if kickList[0] < math.fabs(straightBearing) - STRAIGHT_KICK_BIAS:
+                    # side kicks must beat straight kicks by more than ~10 degrees
+                    if (kickList[0] == rightSideBearing):
+                        kick = kicks.RIGHT_SIDE_KICK
+                        kick.h = rightSideBearing
+                    elif (kickList[0] == leftSideBearing):
+                        kick = kicks.LEFT_SIDE_KICK
+                        kick.h = leftSideBearing
+                else:
+                    # choose a straight kick
                     kick = self.chooseShortFrontKick()
                     kick.h = straightBearing
-                elif (kickList[0] == rightSideBearing):
-                    kick = kicks.RIGHT_SIDE_KICK
-                    kick.h = rightSideBearing
-                elif (kickList[0] == leftSideBearing):
-                    kick = kicks.LEFT_SIDE_KICK
-                    kick.h = leftSideBearing
+
 
             # Convert kick.h to be a desired global heading for the orbit.
             kick.h = self.brain.loc.h - kick.h
