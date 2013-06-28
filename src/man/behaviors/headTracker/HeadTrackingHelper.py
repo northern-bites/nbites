@@ -290,3 +290,7 @@ class HeadTrackingHelper(object):
     def printHeadAngles(self):
         print "Current yaw is: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
         print "Current pitch is: " + str(degrees(self.tracker.brain.interface.joints.head_pitch))
+
+    # Regardless of state, is the head moving?
+    def isActive(self):
+        return self.tracker.brain.motion.head_is_active
