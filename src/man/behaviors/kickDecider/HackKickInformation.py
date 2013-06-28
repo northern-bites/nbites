@@ -349,28 +349,28 @@ class KickInformation:
 
                 if (bearingKickLeft - bearingKickRight > 35):
                     # even an inaccurate side kick will work
-                    if (95 < bearingKickLeft and 60 > bearingKickRight):
+                    if (90 < bearingKickLeft and 60 > bearingKickRight):
                         #choose a right side kick with no orbit NOW!
                         kick = kicks.RIGHT_SIDE_KICK
                         kick.h = 0
                         return kick
-                    elif (-60 < bearingKickLeft and -95 > bearingKickRight):
+                    elif (-60 < bearingKickLeft and -90 > bearingKickRight):
                         #choose a left side kick with no orbit!
                         kick = kicks.LEFT_SIDE_KICK
                         kick.h = 0
                         return kick
 
-                    if (bearingKickLeft < 95):
+                    if (bearingKickLeft < 90):
                         # right side kick is closer to left limit
-                        rightSideBearing = 95 - bearingKickLeft
+                        rightSideBearing = 90 - bearingKickLeft
                     else: #assert bearingKickRight > 60
                         rightSideBearing = 60 - bearingKickRight
 
                     if (bearingKickLeft < -60):
                         # left side kick is closer to the left limit
                         leftSideBearing = -60 - bearingKickLeft
-                    else: #assert bearingKickRight > -95
-                        leftSideBearing = -95 - bearingKickRight
+                    else: #assert bearingKickRight > -90
+                        leftSideBearing = -90 - bearingKickRight
                 else:
                     # aim for the center and hope we're accurate enough
                     rightSideBearing = 70 - bearingForKick
