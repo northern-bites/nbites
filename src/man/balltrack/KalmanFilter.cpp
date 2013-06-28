@@ -314,7 +314,6 @@ void KalmanFilter::initialize()
 void KalmanFilter::initialize(ufvector4 x_,
                               ufmatrix4 cov_)
 {
-    std::cout << "initialize" << std::endl;
     // references, not pointers so will copy values
     x = x_;
     cov = cov_;

@@ -295,18 +295,42 @@ def notTurnedAround(player):
 
 # Saving transitions....
 def shouldDiveRight(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            player.brain.ball.rel_y_intersect_dest < -5.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldSquat.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldSquat.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest < -20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldDiveLeft(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            player.brain.ball.rel_y_intersect_dest > 5.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldSquat.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldSquat.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest > 20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldSquat(player):
     if player.firstFrame():
@@ -315,23 +339,15 @@ def shouldSquat(player):
     sightOk = True
     ball = player.brain.ball
 
-    print "## Should I save the ball? ##"
-    print "Last frames off: " + str(shouldSquat.lastFramesOff) + " frames on: " + str(ball.vis.frames_on)
     if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
-        print "  *NOT OK to save.*"
         sightOk = False
 
     if not ball.vis.on:
         shouldSquat.lastFramesOff = ball.vis.frames_off
 
-    print "Got vel_x " + str(ball.mov_vel_x) + ", " + str(ball.mov_vel_x < -6.0)
-    print "    speed " + str(ball.mov_speed) + ", " + str(ball.mov_speed > 8.0)
-    #print "    rel_y_intersect_dest " + str(ball.rel_y_intersect_dest) + ", " + str(abs(ball.rel_y_intersect_dest) < 40.0)
-    print "    dist " + str(ball.distance) + ", " + str(ball.distance < 150.0)
-
     return (ball.mov_vel_x < -6.0 and
             ball.mov_speed > 8.0 and
-            #abs(ball.rel_y_intersect_dest) < 40.0 and
+            abs(ball.rel_y_intersect_dest) < 40.0 and
             ball.distance < 150.0 and
             sightOk)
 
