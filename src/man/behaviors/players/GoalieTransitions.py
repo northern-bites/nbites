@@ -296,16 +296,16 @@ def notTurnedAround(player):
 # Saving transitions....
 def shouldDiveRight(player):
     if player.firstFrame():
-        shouldSquat.lastFramesOff = 21
+        shouldDiveRight.lastFramesOff = 21
 
     sightOk = True
     ball = player.brain.ball
 
-    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 20:
         sightOk = False
 
     if not ball.vis.on:
-        shouldSquat.lastFramesOff = ball.vis.frames_off
+        shouldDiveRight.lastFramesOff = ball.vis.frames_off
 
     return (ball.mov_vel_x < -6.0 and
             ball.mov_speed > 8.0 and
@@ -315,16 +315,16 @@ def shouldDiveRight(player):
 
 def shouldDiveLeft(player):
     if player.firstFrame():
-        shouldSquat.lastFramesOff = 21
+        shouldDiveLeft.lastFramesOff = 21
 
     sightOk = True
     ball = player.brain.ball
 
-    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+    if shouldDiveLeft.lastFramesOff > 20 and ball.vis.frames_on < 20:
         sightOk = False
 
     if not ball.vis.on:
-        shouldSquat.lastFramesOff = ball.vis.frames_off
+        shouldDiveLeft.lastFramesOff = ball.vis.frames_off
 
     return (ball.mov_vel_x < -6.0 and
             ball.mov_speed > 8.0 and
@@ -345,7 +345,7 @@ def shouldSquat(player):
     if not ball.vis.on:
         shouldSquat.lastFramesOff = ball.vis.frames_off
 
-    return (ball.mov_vel_x < -6.0 and
+    return (ball.mov_vel_x < -4.0 and
             ball.mov_speed > 8.0 and
             abs(ball.rel_y_intersect_dest) < 40.0 and
             ball.distance < 150.0 and
@@ -392,33 +392,24 @@ def shouldClearBall(player):
     shouldGo = False
 
     # if definitely within goal box
-    if (player.brain.ball.distance < 80.0):
-        walkedTooFar.xThresh = 130.0
-        walkedTooFar.yThresh = 130.0
+    if (player.brain.ball.distance < 120.0):
         shouldGo = True
 
     # farther out but being aggressive
-    if (player.brain.ball.distance < 120 and
+    if (player.brain.ball.distance < 150.0 and
+        player.brain.ball.is_stationary and
         player.aggressive):
-        walkedTooFar.xThresh = 170.0
-        walkedTooFar.yThresh = 170.0
-        shouldGo = True
-
-    # if to sides of box
-    if (player.brain.ball.distance < 120.0 and
-        math.fabs(player.brain.ball.bearing_deg) > 40.0):
-        walkedTooFar.xThresh = 130.0
-        walkedTooFar.yThresh = 170.0
         shouldGo = True
 
     # to goalie's sides, being aggressive
     if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
         player.aggressive):
-        walkedTooFar.xThresh = 170.0
-        walkedTooFar.yThresh = 300.0
         shouldGo = True
 
     if shouldGo:
+        walkedTooFar.xThresh = player.brain.ball.rel_x + 50.0
+        walkedTooFar.yThresh = player.brain.ball.rel_y + 50.0
+
         if player.brain.ball.bearing_deg < -60.0:
             VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
         elif player.brain.ball.bearing_deg > 60.0:
