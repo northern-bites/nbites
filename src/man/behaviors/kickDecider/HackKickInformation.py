@@ -232,8 +232,8 @@ class KickInformation:
         if USE_LOC:
             # COMPETITION HACK -- dribbling from the corner
             if (self.brain.ball.x > constants.FIELD_WHITE_RIGHT_SIDELINE_X - 65 and
-                (self.brain.ball.y < constants.LANDMARK_OPP_GOAL_RIGHT_POST_Y or
-                 self.brain.ball.y > constants.LANDMARK_OPP_GOAL_LEFT_POST_Y)):
+                (self.brain.ball.y < constants.LANDMARK_OPP_GOAL_RIGHT_POST_Y - 30 or
+                 self.brain.ball.y > constants.LANDMARK_OPP_GOAL_LEFT_POST_Y + 30)):
                 self.brain.player.corner_dribble = True
                 kick = self.chooseShortFrontKick()
                 kick.h = self.brain.loc.headingTo(Objects.Location(constants.YELLOW_GOALBOX_LEFT_X - 100,
