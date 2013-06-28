@@ -37,7 +37,7 @@ def spinFindBall(player):
         player.brain.tracker.spinPan()
 
     if ((player.brain.play.isChaser() and transitions.shouldWalkFindBall(player))
-        or (not player.brain.play.isChaser() and transitions.spunOnce())):
+        or (not player.brain.play.isChaser() and transitions.spunOnce(player))):
         return player.goLater('playbookPosition')
 
     return player.stay()
