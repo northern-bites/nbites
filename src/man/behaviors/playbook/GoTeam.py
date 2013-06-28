@@ -219,8 +219,8 @@ class GoTeam:
         # Set the chaser!
         chaser_mate = self.determineChaser()
         if (chaser_mate.playerNumber == self.brain.playerNumber
-            and ((not PBConstants.HACK_D1 and not PBConstants.HACK_D2)
-                 or((PBConstants.HACK_D1 or PBConstants.HACK_D2)
+            and ((not PBConstants.HACK_D1 and not PBConstants.HACK_D2 and not PBConstants.HACK_O)
+                 or((PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O)
                   and self.brain.ball.distance < 100))):
             play.setRole(roles[-1])
             play.setPosition(locations[-1])
@@ -232,14 +232,18 @@ class GoTeam:
             play.setPosition(PBConstants.HACK_D1_LOC)
             return
         if PBConstants.HACK_D2:
-            play.setRole(PBConstants.OFFENDER)
+            play.setRole(PBConstants.DEFENDER)
             play.setPosition(PBConstants.HACK_D2_LOC)
+            return
+        if PBConstants.HACK_O:
+            play.setRole(PBConstants.OFFENDER)
+            play.setPosition(PBConstants.HACK_O_LOC)
             return
 
         # Find which active field player should go to each position
         if(roles[0] == PBConstants.CHASER):
             print "Hey. You're an idiot. Priorities are fucked."
-        firstPlayer = self.findClosestPlayer(roles[0],
+        firstPlayer = seplf.findClosestPlayer(roles[0],
                                              [chaser_mate])
         if firstPlayer.playerNumber == self.brain.playerNumber:
             play.setRole(roles[0])
@@ -259,6 +263,22 @@ class GoTeam:
                 play.setRole(roles[2])
                 play.setPosition(locations[2])
 
+    def ballInleftBox(self):
+        """
+        Defines the box the ball must be in for the hack defender to chase it.
+        """
+        ball = self.brain.ball
+        return (ball.x < NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X + 100 and
+                ball.y > NogginConstants.MIDFIELD_Y)
+
+    def ballInRightBox(self):
+        """
+        Defines the box the ball must be in for the hack defender to chase it.
+        """
+        ball = self.brain.ball
+        return (ball.x < NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X + 100 and
+                ball.y < NogginConstants.MIDFIELD_Y
+
     def mapPositionToRobotLocation(self, position):
         """
         Position must be a tuple with x, y, heading, role.
@@ -277,8 +297,13 @@ class GoTeam:
             return
 
         if PBConstants.HACK_D2:
-            play.setRole(PBConstants.OFFENDER)
+            play.setRole(PBConstants.DEFENDER)
             play.setPosition(PBConstants.HACK_D2_LOC)
+            return
+
+        if PBConstants.HACK_O:
+            play.setRole(PBConstants.OFFENDER)
+            play.setPosition(PBConstants.HACK_O_READY_LOC)
             return
 
         if kickoff:
@@ -317,6 +342,11 @@ class GoTeam:
             play.setRole(PBConstants.CHASER)
             play.setPosition(locations[0])
         else:
+
+            # HACK RoboCup 2013
+            play.setRole(PBConstants.MIDDIE)
+            play.setPosition(PBConstants.HACK_BACKUP_READY_LOC)
+
             defender = self.determineDefender([chaser])
             if defender.playerNumber == self.brain.playerNumber:
                 play.setRole(PBConstants.DEFENDER)
@@ -345,7 +375,7 @@ class GoTeam:
             return self.me
 
         # HACK for RoboCup 2013
-        if ((PBConstants.HACK_D1 or PBConstants.HACK_D2)
+        if ((PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O)
             and (self.brain.ball.distance < 100)):
             return self.me
 

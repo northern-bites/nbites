@@ -135,7 +135,7 @@ class TeamMember(RobotLocation):
             print "\tChase time after ball on bonus " + str(time)
 
         # HACK RoboCup 2013
-        if PBConstants.HACK_D1 or PBConstants.HACK_D2:
+        if PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O:
             if self.brain.ball.distance > 100:
                 time += 15000
 
