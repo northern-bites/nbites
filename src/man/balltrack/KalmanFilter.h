@@ -23,6 +23,8 @@ using namespace NBMath;
 namespace man{
 namespace balltrack{
 
+static const int BUFF_LENGTH = 10;
+
 // HACK HACK HACK - Currently completely made up and untested
 // @TODO test this and determine correct values
 static const KalmanFilterParams DEFAULT_PARAMS =
@@ -37,7 +39,7 @@ static const KalmanFilterParams DEFAULT_PARAMS =
     .1f,
     .1f,
     .1f,
-    -29.f                     // ballFriction?
+    -20.f                     // ballFriction?
 };
 
 class KalmanFilter
@@ -105,9 +107,6 @@ public:
     float getRelYDest(){return relYDest;};
     float getRelYIntersectDest(){return relYIntersectDest;};
 
-    float getWeight(){return weight;};
-    void setWeight(float weight_){weight=weight_;};
-
     bool isStationary(){return stationary;};
 
     float getSpeed(){return std::sqrt(x(2)*x(2) + x(3)*x(3));};
@@ -120,6 +119,8 @@ public:
                               << "\n\t"
                               << "Uncertainty x:\t" << cov(0,0) << "\t,\t"
                               << "y:\t" << cov(1,1) << std::endl;};
+
+    float getScore(){return score;};
 
 private:
     KalmanFilterParams params;
@@ -159,7 +160,9 @@ private:
     float relYIntersectDest;
 
     // For the MMKalman
-    float weight;
+    float score;
+    float *correctionMagBuffer;
+    int curEntry;
     float uncertainty;
 
     messages::RobotLocation lastOdometry;

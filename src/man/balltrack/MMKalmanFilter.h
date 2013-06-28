@@ -36,7 +36,7 @@ using namespace NBMath;
 namespace man{
 namespace balltrack{
 
-static const bool TRACK_MOVEMENT = false;
+static const bool TRACK_MOVEMENT = true;
 
 static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
 {
@@ -47,7 +47,7 @@ static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
     25.f,               // initCovVelX
     25.f,               // initCovVelY
     35.f,               // threshold for ball is moving!
-    4,                  // buffer size
+    7,                  // buffer size
     30.f                // badStationaryThresh
 };
 
@@ -118,9 +118,6 @@ private:
 
     void updatePredictions();
 
-    void cycleFilters();
-
-    unsigned normalizeFilterWeights();
     void updateDeltaTime();
 
     CartesianObservation calcVelocityOfBuffer();
