@@ -1,6 +1,7 @@
 from objects import (RobotLocation, Location, RelRobotLocation)
 from math import fabs, degrees
 import noggin_constants as NogginConstants
+from ..playbook import PBConstants
 
 OPP_GOAL = Location(NogginConstants.OPP_GOALBOX_RIGHT_X,
                     NogginConstants.OPP_GOALBOX_MIDDLE_Y)
@@ -132,6 +133,12 @@ class TeamMember(RobotLocation):
 
         if DEBUG_DETERMINE_DEST_TIME:
             print "\tChase time after ball on bonus " + str(time)
+
+        # HACK RoboCup 2013
+        if PBConstants.HACK_D1 or PBConstants.HACK_D2:
+            if self.brain.ball.distance > 100:
+                time += 15000
+
 
         return time
 

@@ -15,11 +15,16 @@ KalmanFilter::KalmanFilter(bool stationary_,
        relXDest(0.f),
        relYDest(0.f)
 {
+    score = 0.f;
+    curEntry = 0.f;
+    correctionMagBuffer = new float[BUFF_LENGTH];
     stationary = stationary_;
     initialize();
 }
 
-KalmanFilter::~KalmanFilter(){}
+KalmanFilter::~KalmanFilter() {
+    delete correctionMagBuffer;
+}
 
 void KalmanFilter::updateDeltaTime()
 {
@@ -274,7 +279,6 @@ void KalmanFilter::updateWithObservation(messages::VisionBall visionBall)
 
     ufvector correction(4);
     correction = prod(kalmanGain,innovation);
-
     x += correction;
 
     //cov = cov - k*c*cov
@@ -284,12 +288,21 @@ void KalmanFilter::updateWithObservation(messages::VisionBall visionBall)
     modifyCov = identity - prod(kalmanGain,c);
     cov = prod(modifyCov,cov);
 
-    weight *= 1 / (std::sqrt(cov(0,0)*cov(0,0)
-                             + cov(1,1)*cov(1,1)));
-
     // Housekeep
     filteredDist = std::sqrt(x(0)*x(0) + x(1)*x(1));
     filteredBear = NBMath::safe_atan2(x(1),x(0));
+
+    float curErr = std::sqrt(correction(0)*correction(0) + correction(1)*correction(1));
+    correctionMagBuffer[curEntry] = curErr;
+
+    score = 0.f;
+    for(int i=0; i<BUFF_LENGTH; i++)
+        score+= correctionMagBuffer[i];
+    score = score/10; // avg correction over 10 frames
+
+    //get magnitude of correction
+    // std::cout << "Is moving filter " << isStationary() << std::endl;
+    // std::cout << "Score: " << score << "  cur error " << curErr << std::endl;
 }
 
 void KalmanFilter::initialize()
@@ -332,7 +345,9 @@ void KalmanFilter::predictBallDest()
         //Calculate the time until intersects with robots y axis
         float timeToIntersect = NBMath::getLargestMagRoot(x(0),x(2),.5f*decelX);
         // Use quadratic :(
-        relYIntersectDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;    }
+        relYIntersectDest = x(1) + x(3)*timeToStop + .5f*decelY*timeToStop*timeToStop;
+    }
+
 }
 
 } // namespace balltrack

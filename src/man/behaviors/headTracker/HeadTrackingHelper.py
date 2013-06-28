@@ -259,6 +259,14 @@ class HeadTrackingHelper(object):
                  2.0, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
         # TODO: use constants above
 
+    def bounceTrackball(self):
+        """
+        Repeat a dynamic pan around the ball. Should keep the ball
+        in sight at all times, but we need careful escape clauses.
+        """
+        ball = self.tracker.brain.ball
+        self.executeHeadMove(self.convertKickPan(HeadMoves.BALLTRACK_PAN(ball.distance, ball.bearing)))
+
     # Consider updating this for new loc and vision systems (summer 2012)
     # Currently broken in Portals system.
     # TODO: scrap this or make it work.
@@ -282,3 +290,7 @@ class HeadTrackingHelper(object):
     def printHeadAngles(self):
         print "Current yaw is: " + str(degrees(self.tracker.brain.interface.joints.head_yaw))
         print "Current pitch is: " + str(degrees(self.tracker.brain.interface.joints.head_pitch))
+
+    # Regardless of state, is the head moving?
+    def isActive(self):
+        return self.tracker.brain.motion.head_is_active

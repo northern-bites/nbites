@@ -53,7 +53,8 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
     predictFilters(odometry);
 
     // Update with sensor if we have made an observation
-    if(visionBall.on()) // We see the ball
+    // sometimes get weird ball observatoins so check for valid dist (indicator)
+    if(visionBall.on() && (visionBall.distance() > 5) && (visionBall.distance() < 800)) // We see the ball
     {
         //Before we mess with anything, decide if we saw the ball twice in a row
         consecutiveObservation = (framesWithoutBall == 0) ? true : false;
@@ -91,44 +92,41 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
             initialize(visRelX, visRelY, params.initCovX, params.initCovY);
         }
 
-        else if (fullBuffer) {
-            // Calc velocity through these frames, if high reset moving filter
-            CartesianObservation vel = calcVelocityOfBuffer();
+        // else if (fullBuffer) {
+        //     // Calc velocity through these frames, if high reset moving filter
+        //     CartesianObservation vel = calcVelocityOfBuffer();
 
-            float speedThroughFrames = calcSpeed(vel.relX, vel.relY);
+        //     float speedThroughFrames = calcSpeed(vel.relX, vel.relY);
 
-            // Calc diff between observation and estimata
-            float estDiff = calcSpeed(visRelX - filters.at((unsigned)0)->getRelXPosEst(),
-                                      visRelY - filters.at((unsigned)0)->getRelYPosEst());
+        //     // Calc diff between observation and estimata
+        //     float estDiff = calcSpeed(visRelX - filters.at((unsigned)0)->getRelXPosEst(),
+        //                               visRelY - filters.at((unsigned)0)->getRelYPosEst());
 
-            // Much higher than our current estimate
-            // if ((speedThroughFrames > filters.at((unsigned)1)->getSpeed() + 60.f)
-            //     && (estDiff > params.badStationaryThresh))
-            //if(estDiff > params.badStationaryThresh)
+        //     // Much higher than our current estimate
+        //     // if ((speedThroughFrames > filters.at((unsigned)1)->getSpeed() + 60.f)
+        //     //     && (estDiff > params.badStationaryThresh))
+        //     //if(estDiff > params.badStationaryThresh)
 
-            // If moving velocity <10, give this a try
-            if (std::abs(filters.at((unsigned)1)->getSpeed()) < 10.f
-                && speedThroughFrames > 10.f)
-            {
-                //std::cout << "\nBall Kicked!" << std::endl;
-                ufvector4 newMovingX = filters.at((unsigned)0)->getStateEst();
-                newMovingX(2) = vel.relX;
-                newMovingX(3) = vel.relY;
-                ufmatrix4 newMovingCov = boost::numeric::ublas::identity_matrix <float>(4);
-                newMovingCov(0,0) = 10.f;
-                newMovingCov(1,1) = 10.f;
-                newMovingCov(2,2) = 20.f;
-                newMovingCov(3,3) = 20.f;
+        //     // If moving velocity <10, give this a try
+        //     if (std::abs(filters.at((unsigned)1)->getSpeed()) < 10.f
+        //         && speedThroughFrames > 10.f)
+        //     {
+        //         //std::cout << "\nBall Kicked!" << std::endl;
+        //         ufvector4 newMovingX = filters.at((unsigned)0)->getStateEst();
+        //         newMovingX(2) = vel.relX;
+        //         newMovingX(3) = vel.relY;
+        //         ufmatrix4 newMovingCov = boost::numeric::ublas::identity_matrix <float>(4);
+        //         newMovingCov(0,0) = 10.f;
+        //         newMovingCov(1,1) = 10.f;
+        //         newMovingCov(2,2) = 20.f;
+        //         newMovingCov(3,3) = 20.f;
 
-                filters.at((unsigned)1)->initialize(newMovingX, newMovingCov);
-            }
-        }
+        //         filters.at((unsigned)1)->initialize(newMovingX, newMovingCov);
+        //     }
+        // }
 
         // Now correct our filters with the vision observation
         updateWithVision(visionBall);
-
-        //Normalize all of the filter weights, currently ignore 'best' weight
-        normalizeFilterWeights();
 
         updatePredictions();
     }
@@ -142,7 +140,9 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
 
     // Determine filter
     if(TRACK_MOVEMENT) {
-        if (filters.at((unsigned)1)->getSpeed() > params.movingThresh)
+        float movingScore = filters.at((unsigned)1)->getScore();
+        float stationaryScore = filters.at((unsigned)0)->getScore();
+        if( (movingScore < stationaryScore))
         { // consider the ball to be moving
             bestFilter = 1;
         }
@@ -171,79 +171,79 @@ void MMKalmanFilter::update(messages::VisionBall    visionBall,
  *           and replacing it with a new init filter. Also re-inits a new moving filter
  *            if we have had two consecutive observations and can calculate velocity
  */
-void MMKalmanFilter::cycleFilters()
-{
-    //Find the two worst filters
-    int worstStationary = -1;
-    int worstMoving = -1;
-    for(unsigned i=0; i<filters.size(); i++)
-    {
-        if (filters.at(i)->isStationary()){
-            if(worstStationary<0)
-                worstStationary = (int)i;
-            else if (filters.at(i)->getWeight() < filters.at((unsigned) worstStationary)->getWeight())
-                worstStationary = (int)i;
-        }
-        else
-            if(worstMoving<0)
-                worstMoving = (int)i;
-            else if (filters.at(i)->getWeight() < filters.at((unsigned) worstMoving)->getWeight())
-                worstMoving = (int)i;
-    }
+// void MMKalmanFilter::cycleFilters()
+// {
+//     //Find the two worst filters
+//     int worstStationary = -1;
+//     int worstMoving = -1;
+//     for(unsigned i=0; i<filters.size(); i++)
+//     {
+//         if (filters.at(i)->isStationary()){
+//             if(worstStationary<0)
+//                 worstStationary = (int)i;
+//             else if (filters.at(i)->getWeight() < filters.at((unsigned) worstStationary)->getWeight())
+//                 worstStationary = (int)i;
+//         }
+//         else
+//             if(worstMoving<0)
+//                 worstMoving = (int)i;
+//             else if (filters.at(i)->getWeight() < filters.at((unsigned) worstMoving)->getWeight())
+//                 worstMoving = (int)i;
+//     }
 
-    // Re-init the worst stationary filter
-    ufvector4 newX = boost::numeric::ublas::zero_vector<float>(4);
-    newX(0) = visRelX;
-    newX(1) = visRelY;
-    ufmatrix4 newCov = boost::numeric::ublas::zero_matrix<float>(4);
-    newCov(0,0) = .5f;//params.initCovX;
-    newCov(1,1) = .5f;//params.initCovY;
-    filters.at((unsigned) worstStationary)->initialize(newX, newCov);
+//     // Re-init the worst stationary filter
+//     ufvector4 newX = boost::numeric::ublas::zero_vector<float>(4);
+//     newX(0) = visRelX;
+//     newX(1) = visRelY;
+//     ufmatrix4 newCov = boost::numeric::ublas::zero_matrix<float>(4);
+//     newCov(0,0) = .5f;//params.initCovX;
+//     newCov(1,1) = .5f;//params.initCovY;
+//     filters.at((unsigned) worstStationary)->initialize(newX, newCov);
 
-    // Re-init the worst moving filter if we can calc a velocity
-    if (consecutiveObservation){
-        newX(2) = (visRelX - lastVisRelX) / deltaTime;
-        newX(3) = (visRelY - lastVisRelY) / deltaTime;
+//     // Re-init the worst moving filter if we can calc a velocity
+//     if (consecutiveObservation){
+//         newX(2) = (visRelX - lastVisRelX) / deltaTime;
+//         newX(3) = (visRelY - lastVisRelY) / deltaTime;
 
-        // HACK - magic number. need this in master asap though
-        newCov(2,2) = 30.f;
-        newCov(3,3) = 30.f;
+//         // HACK - magic number. need this in master asap though
+//         newCov(2,2) = 30.f;
+//         newCov(3,3) = 30.f;
 
-        filters.at((unsigned) worstMoving)->initialize(newX, newCov);
-    }
-}
+//         filters.at((unsigned) worstMoving)->initialize(newX, newCov);
+//     }
+// }
 
 /*
  * @brief - Normalize the filter weights, pretty standard
  */
-unsigned MMKalmanFilter::normalizeFilterWeights(){
-    // Calc sum of the weights to normalize
-    float totalWeights = 0;
-    for(unsigned i=0; i<filters.size(); i++)
-    {
-        float curWeight = filters.at(i)->getWeight();
-        // Don't want approx zero or =0 weights
-        if (curWeight < .000001)
-            filters.at(i)->setWeight(.000001f);
-        totalWeights += (curWeight);
-    }
+// unsigned MMKalmanFilter::normalizeFilterWeights(){
+//     // Calc sum of the weights to normalize
+//     float totalWeights = 0;
+//     for(unsigned i=0; i<filters.size(); i++)
+//     {
+//         float curWeight = filters.at(i)->getWeight();
+//         // Don't want approx zero or =0 weights
+//         if (curWeight < .000001)
+//             filters.at(i)->setWeight(.000001f);
+//         totalWeights += (curWeight);
+//     }
 
-    // Normalize and choose the best one
-    unsigned tempBestFilter = 0;
-    float bestWeight = filters.at(0)->getWeight();
-    for(unsigned i=1; i<filters.size(); i++)
-    {
-        float curWeight = filters.at(i)->getWeight();
-        if (curWeight > bestWeight)
-        {
-            tempBestFilter = i;
-            bestWeight = curWeight;
-        }
-        filters.at(i)->setWeight(curWeight/totalWeights);
-    }
+//     // Normalize and choose the best one
+//     unsigned tempBestFilter = 0;
+//     float bestWeight = filters.at(0)->getWeight();
+//     for(unsigned i=1; i<filters.size(); i++)
+//     {
+//         float curWeight = filters.at(i)->getWeight();
+//         if (curWeight > bestWeight)
+//         {
+//             tempBestFilter = i;
+//             bestWeight = curWeight;
+//         }
+//         filters.at(i)->setWeight(curWeight/totalWeights);
+//     }
 
-    return tempBestFilter;
-}
+//     return tempBestFilter;
+// }
 
 void MMKalmanFilter::printBothFilters() {
     std::cout << "-------Stationary Filter---------" << std::endl;
@@ -305,8 +305,8 @@ void MMKalmanFilter::initialize(float relX, float relY, float covX, float covY)
         ufvector4 x = boost::numeric::ublas::zero_vector<float>(4);
         x(0)= relX;
         x(1)= relY;
-        x(2) = 10.f;
-        x(3) = 10.f;
+        x(2) = 0.f;
+        x(3) = 0.f;
 
         // Choose to assum obsv mean is perfect and just have noisy velocity
         ufmatrix4 cov = boost::numeric::ublas::zero_matrix<float>(4);

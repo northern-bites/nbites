@@ -295,25 +295,61 @@ def notTurnedAround(player):
 
 # Saving transitions....
 def shouldDiveRight(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            player.brain.ball.rel_y_intersect_dest < -5.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldDiveRight.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldDiveRight.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldDiveRight.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest < -20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldDiveLeft(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            player.brain.ball.rel_y_intersect_dest > 5.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldDiveLeft.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldDiveLeft.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldDiveLeft.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest > 20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldSquat(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 5.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            abs(player.brain.ball.rel_y_intersect_dest) < 30.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldSquat.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldSquat.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -4.0 and
+            ball.mov_speed > 8.0 and
+            abs(ball.rel_y_intersect_dest) < 40.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldClearDangerousBall(player):
     # ball must be visible
@@ -355,30 +391,24 @@ def shouldClearBall(player):
 
     shouldGo = False
 
-    # if definitely within goal box
-    if (player.brain.ball.distance < 80.0):
-        walkedTooFar.xThresh = 130.0
-        walkedTooFar.yThresh = 130.0
+    # if definitely within good chasing area
+    if (player.brain.ball.distance < 120.0):
+        walkedTooFar.xThresh = 150.0
+        walkedTooFar.yThresh = 150.0
         shouldGo = True
 
     # farther out but being aggressive
-    if (player.brain.ball.distance < 120 and
+    if (player.brain.ball.distance < 150.0 and
+        player.brain.ball.is_stationary and
         player.aggressive):
-        walkedTooFar.xThresh = 170.0
-        walkedTooFar.yThresh = 170.0
-        shouldGo = True
-
-    # if to sides of box
-    if (player.brain.ball.distance < 120.0 and
-        math.fabs(player.brain.ball.bearing_deg) > 40.0):
-        walkedTooFar.xThresh = 130.0
-        walkedTooFar.yThresh = 170.0
+        walkedTooFar.xThresh = 180.0
+        walkedTooFar.yThresh = 180.0
         shouldGo = True
 
     # to goalie's sides, being aggressive
     if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
         player.aggressive):
-        walkedTooFar.xThresh = 170.0
+        walkedTooFar.xThresh = 300.0
         walkedTooFar.yThresh = 300.0
         shouldGo = True
 
@@ -405,7 +435,7 @@ def ballMovedStopChasing(player):
     If the robot has been chasing for a while and it is far away, it should
     stop chasing.
     """
-    return (player.brain.ball.distance > 100.0 and
+    return (player.brain.ball.distance > 130.0 and
             player.counter > 100.0)
 
 def walkedTooFar(player):

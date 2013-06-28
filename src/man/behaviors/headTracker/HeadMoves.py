@@ -371,41 +371,63 @@ DATA_PAN = (
 
 ################### FIXED PITCH PANS #################
 FIXED_PITCH_PAN = (
-    ((57.0,17.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-57.0,17.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES)) # was ~46 degrees per second
+    ((57.0,25.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-57.0,25.0), 3, 1, stiff.LOW_HEAD_STIFFNESSES)) # was ~46 degrees per second
 #                                                         now ~38 degrees per second
 
 FIXED_PITCH_LEFT_SIDE_PAN = (
-    ((60.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((10,17.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((60.0,25.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((10,25.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 FIXED_PITCH_RIGHT_SIDE_PAN = (
-    ((-60.0,11.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-10,17.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((-60.0,25.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-10,25.0), 1.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Maximum search angle for top camera.
 # Time is set for localization while moving.
 FIXED_PITCH_PAN_WIDE = (
-    ((115.0,11.0), 3.7, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,11.0), 3.7, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~62 degrees per second
+    ((115.0,25.0), 3.7, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,25.0), 3.7, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~62 degrees per second
 
 # Same as above, but timed for a stationary kick decision.
 FIXED_PITCH_KICK_PAN = (
-    ((115.0,11.0), 3.2, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,11.0), 3.2, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((115.0,25.0), 3.2, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,25.0), 3.2, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 FIXED_PITCH_SLOW_GOALIE_PAN = (
-    ((115.0,11.0), 5.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-115.0,11.0), 5.0, 1, stiff.LOW_HEAD_STIFFNESSES))
+    ((115.0,25.0), 5.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-115.0,25.0), 5.0, 1, stiff.LOW_HEAD_STIFFNESSES))
 
 # Bottom camera is never significantly blocked by shoulders or arms.
 FIXED_PITCH_PAN_NARROW = (
-    ((55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES),
-    ((-55.0,17.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~37 degrees per second
+    ((55.0,25.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES),
+    ((-55.0,25.0), 3.0, 1, stiff.LOW_HEAD_STIFFNESSES)) # ~37 degrees per second
+
+def BALLTRACK_PAN(dist, bear):
+    #Note: Camera sees 60 degrees
+    #      Want to keep the ball within 40 (+/- 20)
+    deg_per_sec = 30.0
+
+    # stay looking forward so pan from -45 to 45
+    max_left =   45.0
+    max_right = -45.0
+
+    # keep the ball within 10 degrees of outside our sight
+    left_see_ball_max = bear + 20
+    right_see_ball_max = bear - 20
+
+    left_side_final  = min(max_left, left_see_ball_max)
+    right_side_final = max(max_right, right_see_ball_max)
+
+    pan_time = (left_side_final + right_side_final) / deg_per_sec
+
+    return ( ((left_side_final, 25.0), pan_time, 1, stiff.LOW_HEAD_STIFFNESSES),
+             ((right_side_final,25.0), pan_time, 1, stiff.LOW_HEAD_STIFFNESSES))
+
 
 # Needs some alteration re: pitch for the given yaw
-FIXED_PITCH_LOOK_LEFT = ( ((70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+FIXED_PITCH_LOOK_LEFT = ( ((70.0,25.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 # Needs some alteration re: pitch for the given yaw
-FIXED_PITCH_LOOK_RIGHT = ( ((-70.0,18.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+FIXED_PITCH_LOOK_RIGHT = ( ((-70.0,25.0), 2.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
 
-FIXED_PITCH_LOOK_STRAIGHT = ( ((0.0,17.0), 1.0, 1, stiff.LOW_HEAD_STIFFNESSES), )
+FIXED_PITCH_LOOK_STRAIGHT = ( ((0.0,25.0), 1.0, 1, stiff.LOW_HEAD_STIFFNESSES), )

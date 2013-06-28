@@ -12,30 +12,26 @@ def kickBallExecute(player):
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-
         kickBallExecute.sweetMove = player.kick.sweetMove
-
-        kickBallExecute.preKickDelay = 30
         return player.stay()
 
-    # wait a second for stability.
-    kickBallExecute.preKickDelay -= 1
-
     # if ball has moved (and we haven't already kicked), don't kick
-    if transitions.ballMoved(player) and kickBallExecute.preKickDelay >= 0:
+    if transitions.ballMoved(player) and player.counter < 30:
+        player.inKickingState = False
         return player.goLater('chase')
 
-    if kickBallExecute.preKickDelay == 0:
+    if player.counter == 30:
         player.executeMove(kickBallExecute.sweetMove)
         player.shouldKickOff = False
+        player.inKickingState = False
         return player.stay()
 
     if player.counter > 40 and player.brain.nav.isStopped():
+        player.inKickingState = False
         return player.goNow('afterKick')
 
     return player.stay()
 
-kickBallExecute.preKickDelay = 0
 kickBallExecute.sweetMove = None
 
 def afterKick(player):
@@ -53,7 +49,6 @@ def afterKick(player):
         return player.goNow('positionForKick')
 
     if player.kick.isBackKick() and player.counter > 10:
-        player.inKickingState = False
         return player.goNow('spinAfterBackKick')
 
     if player.penaltyKicking:
@@ -61,7 +56,6 @@ def afterKick(player):
 
     if (transitions.shouldChaseBall(player) or
         transitions.shouldFindBallKick(player)):
-        player.inKickingState = False
         return player.goLater('chase')
 
     return player.stay()
