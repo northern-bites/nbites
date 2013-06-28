@@ -76,10 +76,10 @@ public:
     float getFilteredDist(){return filters.at((unsigned)bestFilter)->getFilteredDist();};
     float getFilteredBear(){return filters.at((unsigned)bestFilter)->getFilteredBear();};
 
-    float getSpeed(){return filters.at((unsigned)bestFilter)->getSpeed();};
-    float getRelXDest(){return filters.at((unsigned)bestFilter)->getRelXDest();};
-    float getRelYDest(){return filters.at((unsigned)bestFilter)->getRelYDest();};
-    float getRelYIntersectDest(){return filters.at((unsigned)bestFilter)->getRelYIntersectDest();};
+    float getSpeed(){return filters.at((unsigned)1)->getSpeed();};
+    float getRelXDest(){return filters.at((unsigned)1)->getRelXDest();};
+    float getRelYDest(){return filters.at((unsigned)1)->getRelYDest();};
+    float getRelYIntersectDest(){return filters.at((unsigned)1)->getRelYIntersectDest();};
 
     float getStationaryRelX(){return filters.at((unsigned) 0)->getRelXPosEst();};
     float getStationaryRelY(){return filters.at((unsigned) 0)->getRelYPosEst();};

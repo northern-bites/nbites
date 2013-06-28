@@ -60,6 +60,8 @@ message FilteredBall
     optional float mov_bearing = 27;
     optional float mov_vel_x = 28;
     optional float mov_vel_y = 29;
+    optional float mov_speed = 30;
+
 }
 
 message SharedBall {
