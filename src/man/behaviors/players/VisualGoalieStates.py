@@ -56,12 +56,19 @@ def backUpForDangerousBall(player):
 def clearIt(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        if player.brain.ball.rel_y < 0.0:
+        if clearIt.dangerousSide == -1:
+            if player.brain.ball.rel_y < 0.0:
+                player.side = RIGHT
+                player.kick = kicks.RIGHT_STRAIGHT_KICK
+            else:
+                player.side = LEFT
+                player.kick = kicks.LEFT_STRAIGHT_KICK
+        elif clearIt.dangerousSide == RIGHT:
             player.side = RIGHT
-            player.kick = kicks.RIGHT_STRAIGHT_KICK
+            player.kick = kicks.RIGHT_SIDE_KICK
         else:
             player.side = LEFT
-            player.kick = kicks.LEFT_STRAIGHT_KICK
+            player.kick = kicks.LEFT_SIDE_KICK
 
         kickPose = player.kick.getPosition()
         clearIt.ballDest = RelRobotLocation(player.brain.ball.rel_x -
@@ -95,16 +102,16 @@ def didIKickIt(player):
     return Transition.getNextState(player, didIKickIt)
 
 def spinToFaceBall(player):
-    if player.firstFrame():
-        facingDest = RelRobotLocation(0.0, 0.0, 0.0)
-        if player.brain.ball.bearing_deg < 0.0:
-            player.side = RIGHT
-            facingDest.relH = -90
-        else:
-            player.side = LEFT
-            facingDest.relH = 90
-        player.brain.nav.goTo(facingDest,
-                              nav.CLOSE_ENOUGH, nav.CAREFUL_SPEED)
+    facingDest = RelRobotLocation(0.0, 0.0, 0.0)
+    if player.brain.ball.bearing_deg < 0.0:
+        player.side = RIGHT
+        facingDest.relH = -90
+    else:
+        player.side = LEFT
+        facingDest.relH = 90
+    player.brain.nav.goTo(facingDest,
+                          nav.CLOSE_ENOUGH,
+                          nav.CAREFUL_SPEED)
 
     if player.counter > 180:
         return player.goLater('spinAtGoal')

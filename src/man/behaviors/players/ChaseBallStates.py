@@ -59,8 +59,19 @@ def approachBall(player):
         else:
             player.brain.nav.chaseBall(fast = True)
 
+    if transitions.shouldFindBall(player):
+        return player.goLater('chase')
+
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
+
+        if player.brain.nav.isAtPosition():
+            print "isAtPosition() is causing the bug!"
+        else:
+            print "shouldPrepareForKick() is causing the bug!"
+            print player.brain.ball.distance
+            print player.brain.ball.vis.distance
+
         player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
@@ -79,6 +90,7 @@ def prepareForKick(player):
         player.brain.nav.stand()
         return player.stay()
 
+
     if player.brain.ball.stat_distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
         player.inKickingState = False
@@ -89,9 +101,9 @@ def prepareForKick(player):
     if hackKick.DEBUG_KICK_DECISION:
         print str(player.kick)
 
-    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-    #     if dr_trans.shouldDribble(player):
-    #         return player.goNow('decideDribble')
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -105,6 +117,7 @@ def orbitBall(player):
     # Are we within the acceptable heading range?
     if (relH > -constants.ORBIT_GOOD_BEARING and
         relH < constants.ORBIT_GOOD_BEARING):
+        print "STOPPED! Because relH is: ", relH
         player.stopWalking()
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         return player.goNow('positionForKick')
@@ -117,9 +130,15 @@ def orbitBall(player):
 
     # Set our walk. Nav will make sure that we don't set duplicate speeds.
     if relH < 0:
-        player.setWalk(0,  0.7, -0.25)
+        if relH < -20:
+            player.setWalk(0, 0.7, -0.25)
+        else:
+            player.setWalk(0, 0.5, -0.15)
     elif relH > 0:
-        player.setWalk(0, -0.7,  0.25)
+        if relH > 20:
+            player.setWalk(0, -0.7, 0.25)
+        else:
+            player.setWalk(0, -0.5, 0.15)
 
     # # DEBUGGING PRINT OUTS
     if player.counter%20 == 0:
@@ -146,16 +165,28 @@ def orbitBall(player):
         if player.brain.ball.stat_rel_y > 2:
             player.brain.nav.setHSpeed(0)
         elif player.brain.ball.stat_rel_y < -2:
-            player.brain.nav.setHSpeed(-.35)
+            if relH < -20:
+                player.brain.nav.setHSpeed(-0.35)
+            else:
+                player.brain.nav.setHSpeed(-0.2)
         else:
-            player.brain.nav.setHSpeed(-.25)
+            if relH < -20:
+                player.brain.nav.setHSpeed(-0.25)
+            else:
+                player.brain.nav.setHSpeed(-0.15)
     else: # Orbiting counter-clockwise
         if player.brain.ball.stat_rel_y > 2:
-            player.brain.nav.setHSpeed(.35)
+            if relH > 20:
+                player.brain.nav.setHSpeed(0.35)
+            else:
+                player.brain.nav.setHSpeed(0.2)
         elif player.brain.ball.stat_rel_y < -2:
             player.brain.nav.setHSpeed(0)
         else:
-            player.brain.nav.setHSpeed(.25)
+            if relH > 20:
+                player.brain.nav.setHSpeed(0.25)
+            else:
+                player.brain.nav.setHSpeed(0.15)
 
     return player.stay()
 
@@ -168,9 +199,12 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-    #     if dr_trans.shouldDribble(player):
-    #         return player.goNow('decideDribble')
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
+
+    if player.corner_dribble:
+        return player.goNow('executeDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()

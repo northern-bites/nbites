@@ -84,6 +84,7 @@ class Brain(object):
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
+        self.player.corner_dribble = False
         self.tracker = HeadTracker.HeadTracker(self)
         self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)

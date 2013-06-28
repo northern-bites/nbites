@@ -3,14 +3,17 @@ import noggin_constants as nogginConstants
 import objects
 from math import fabs, tan, radians
 
+DRIBBLE_TOGGLE = True
+
 def shouldDribble(player):
     """
     We should be in the dribble FSA.
     """
-    return ((facingGoal(player) or wouldScoreIfDribbledStraight(player)) 
+    return (DRIBBLE_TOGGLE and
+            (facingGoal(player) or wouldScoreIfDribbledStraight(player)) 
             and timeLeft(player) and not onWingDownfield(player) and 
             not ballGotFarAway(player) and not ballLost(player) and 
-            (betweenCrosses(player) or shouldDribbleForGoal(player)))
+            (inPosition(player) or shouldDribbleForGoal(player)))
 
 def shouldDribbleForGoal(player):
     """
@@ -38,11 +41,44 @@ def noGoalieInNet(player):
     vr = player.brain.interface.visionRobot
     return (not vr.red1.on and not vr.navy1.on)
 
+def inPosition(player):
+    """
+    We are positioned well on the field for dribbling.
+    """
+    # return betweenCrosses(player)
+    return middleThird(player)
+    # return firstHalf(player)
+    # return secondHalf(player)
+
 def betweenCrosses(player):
     """
     We are between the two field crosses.
     """
     return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
+            player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
+
+def middleThird(player):
+    """
+    We are in the middle third of the field.
+    """
+    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
+    return (player.brain.loc.x > field_len / 3. and
+            player.brain.loc.x < 2. * field_len / 3.)
+
+def firstHalf(player):
+    """
+    We are between our field cross and midfield.
+    """
+    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
+    return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
+            player.brain.loc.x < field_len / 2.)
+
+def secondHalf(player):
+    """
+    We are between midfield and our opponent's field cross.
+    """
+    field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
+    return (player.brain.loc.x > field_len / 2. and
             player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
 
 def facingGoal(player):
@@ -121,6 +157,10 @@ def ballInGoalBox(player):
             player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
             wouldScoreIfDribbledStraight(player))
 
+def centerField(player):
+    return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y - 30 and
+            player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y + 30)
+
 def wouldScoreIfDribbledStraight(player):
     """
     If we were to just dribble straight from our current location, would we 
@@ -144,13 +184,19 @@ def onWingDownfield(player):
     The ball is on the wing and downfield according to this transition. Also
     we not facing the goal and therefore leaving this position.
     """
-    if player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y:
-        return (player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
-                player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+    if player.brain.ball.y < nogginConstants.FIELD_WHITE_HEIGHT / 4.:
+        return (player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
                 not player.brain.loc.h > constants.FACING_GOAL_ON_WING)
-    return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
+    return (player.brain.ball.y > 3. * nogginConstants.FIELD_WHITE_HEIGHT / 4. and
             player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
             not player.brain.loc.h < -constants.FACING_GOAL_ON_WING)
+    # if player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y:
+    #     return (player.brain.ball.y < nogginConstants.LANDMARK_OPP_GOAL_RIGHT_POST_Y and
+    #             player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+    #             not player.brain.loc.h > constants.FACING_GOAL_ON_WING)
+    # return (player.brain.ball.y > nogginConstants.LANDMARK_OPP_GOAL_LEFT_POST_Y and
+    #         player.brain.ball.x > 2./3.*nogginConstants.FIELD_WHITE_WIDTH and
+    #         not player.brain.loc.h < -constants.FACING_GOAL_ON_WING)
 
 def timeLeft(player):
     """

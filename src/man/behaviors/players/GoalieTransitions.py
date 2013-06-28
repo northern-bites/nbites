@@ -168,17 +168,19 @@ def goodRightCornerObservation(player):
 def shouldMoveForward(player):
     vision = player.brain.interface.visionField
 
-    foundGoalBoxTop = 0
-    orienataion = 0
-
     if (player.counter > 150 and
         ((player.brain.yglp.on and
           math.fabs(player.brain.yglp.bearing) < 80 and
-          player.brain.yglp.distance < 300.0) or
+          player.brain.yglp.distance < 300.0 and
+          player.brain.yglp.distance != 0.0) or
          (player.brain.ygrp.on and
           math.fabs(player.brain.ygrp.bearing) < 80 and
-          player.brain.yglp.distance < 300.0))):
+          player.brain.yglp.distance < 300.0 and
+          player.brain.yglp.distance != 0.0))):
         return True
+
+    foundGoalBoxTop = 0
+    orientation = 0
 
     for i in range(0, vision.visual_line_size()):
         if vision.visual_line(i).visual_detection.distance < 200.0:
@@ -271,6 +273,18 @@ def facingBall(player):
     return (math.fabs(player.brain.ball.bearing_deg) < 10.0 and
             player.brain.ball.vis.on)
 
+def goodToBookIt(player):
+    vision = player.brain.interface.visionField
+
+    return (vision.visual_field_edge.distance_m < 300.0 and
+            ((not player.brain.yglp.on) or
+             math.fabs(player.brain.yglp.bearing_deg) > 40.0) and
+            ((not player.brain.ygrp.on) or
+             math.fabs(player.brain.ygrp.bearing_deg) > 40.0))
+
+def safelyIllegal(player):
+    return player.brain.interface.visionField.visual_field_edge.distance_m < 30.0
+
 def notTurnedAround(player):
     """
     Checks that we are actually facing the field when returning from
@@ -281,39 +295,79 @@ def notTurnedAround(player):
 
 # Saving transitions....
 def shouldDiveRight(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            player.brain.ball.rel_y_intersect_dest < -5.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldSquat.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldSquat.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest < -20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldDiveLeft(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            player.brain.ball.rel_y_intersect_dest > 5.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldSquat.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldSquat.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            ball.rel_y_intersect_dest > 20.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldSquat(player):
-    return (player.brain.ball.vel_x < 0.0 and
-            player.brain.ball.speed > 15.0 and
-            player.brain.ball.rel_x_dest < 0.0 and
-            abs(player.brain.ball.rel_y_intersect_dest) < 30.0 and
-            player.brain.ball.vis.frames_on > 30)
+    if player.firstFrame():
+        shouldSquat.lastFramesOff = 21
+
+    sightOk = True
+    ball = player.brain.ball
+
+    if shouldSquat.lastFramesOff > 20 and ball.vis.frames_on < 20:
+        sightOk = False
+
+    if not ball.vis.on:
+        shouldSquat.lastFramesOff = ball.vis.frames_off
+
+    return (ball.mov_vel_x < -6.0 and
+            ball.mov_speed > 8.0 and
+            abs(ball.rel_y_intersect_dest) < 40.0 and
+            ball.distance < 150.0 and
+            sightOk)
 
 def shouldClearDangerousBall(player):
     # ball must be visible
     if player.brain.ball.vis.frames_off > 10:
         return False
 
-    if (math.fabs(player.brain.ball.bearing_deg) > 60.0 and
-        player.brain.ball.distance < 60.0):
+    if (math.fabs(player.brain.ball.bearing_deg) > 70.0 and
+        player.brain.ball.distance < 50.0):
+        if player.brain.ball.bearing_deg < 0:
+            VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
+        else:
+            VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
         return True
 
     return False
 
 def ballSafe(player):
-    return math.fabs(player.brain.ball.bearing_deg) < 50.0
+    return math.fabs(player.brain.ball.bearing_deg) < 60.0
 
 def shouldClearBall(player):
     """
@@ -335,34 +389,44 @@ def shouldClearBall(player):
     if not player.brain.ball.vis.on:
         return False
 
+    shouldGo = False
+
     # if definitely within goal box
     if (player.brain.ball.distance < 80.0):
         walkedTooFar.xThresh = 130.0
         walkedTooFar.yThresh = 130.0
-        return True
+        shouldGo = True
 
     # farther out but being aggressive
     if (player.brain.ball.distance < 120 and
         player.aggressive):
         walkedTooFar.xThresh = 170.0
         walkedTooFar.yThresh = 170.0
-        return True
+        shouldGo = True
 
     # if to sides of box
     if (player.brain.ball.distance < 120.0 and
         math.fabs(player.brain.ball.bearing_deg) > 40.0):
         walkedTooFar.xThresh = 130.0
         walkedTooFar.yThresh = 170.0
-        return True
+        shouldGo = True
 
     # to goalie's sides, being aggressive
     if (math.fabs(player.brain.ball.bearing_deg) > 50.0 and
         player.aggressive):
         walkedTooFar.xThresh = 170.0
         walkedTooFar.yThresh = 300.0
-        return True
+        shouldGo = True
 
-    return False
+    if shouldGo:
+        if player.brain.ball.bearing_deg < -60.0:
+            VisualGoalieStates.clearIt.dangerousSide = constants.RIGHT
+        elif player.brain.ball.bearing_deg > 60.0:
+            VisualGoalieStates.clearIt.dangerousSide = constants.LEFT
+        else:
+            VisualGoalieStates.clearIt.dangerousSide = -1
+
+    return shouldGo
 
 def ballLostStopChasing(player):
     """
