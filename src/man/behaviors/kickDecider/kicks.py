@@ -44,9 +44,9 @@ class Kick(object):
 
 # Some standard kicks. x,y and move should not be modified unless you change
 # the sweetMove.  Heading will be modified when the kick is constructed.
-LEFT_SIDE_KICK =  Kick("L_Side", x = 16.9, y =  -.5,
+LEFT_SIDE_KICK =  Kick("L_Side", x = 17.1, y =  -.7,
                        move=SweetMoves.LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick("R_Side", x = 16.9, y = .5,
+RIGHT_SIDE_KICK = Kick("R_Side", x = 17.1, y = .7,
                        move=SweetMoves.RIGHT_SIDE_KICK)
 # Not used 04-19-13
 LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
@@ -58,9 +58,9 @@ LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
 RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 19.0, y =  4.7,
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 19.0, y =  4.6,
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 19.0, y = -4.7,
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 19.0, y = -4.6,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 # Not used 04-19-13

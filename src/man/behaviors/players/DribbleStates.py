@@ -48,11 +48,18 @@ def executeDribble(player):
     if player.firstFrame():
         player.aboutToRotate = False
         player.ballBeforeDribble = ball
-        player.brain.nav.goTo(player.kickPose,
-                              Navigator.PRECISELY,
-                              Navigator.GRADUAL_SPEED,
-                              False,
-                              False)
+        if player.corner_dribble:
+            player.brain.nav.goTo(player.kickPose,
+                                  Navigator.PRECISELY,
+                                  Navigator.CAREFUL_SPEED,
+                                  False,
+                                  False)
+        else:
+            player.brain.nav.goTo(player.kickPose,
+                                  Navigator.PRECISELY,
+                                  Navigator.GRADUAL_SPEED,
+                                  False,
+                                  False)
     else:
         player.brain.nav.updateDest(player.kickPose)
 
