@@ -259,6 +259,14 @@ class HeadTrackingHelper(object):
                  2.0, 1, StiffnessModes.LOW_HEAD_STIFFNESSES),)
         # TODO: use constants above
 
+    def bounceTrackball(self):
+        """
+        Repeat a dynamic pan around the ball. Should keep the ball
+        in sight at all times, but we need careful escape clauses.
+        """
+        ball = self.tracker.brain.ball
+        self.executeHeadMove(self.convertKickPan(HeadMoves.BALLTRACK_PAN(ball.distance, ball.bearing)))
+
     # Consider updating this for new loc and vision systems (summer 2012)
     # Currently broken in Portals system.
     # TODO: scrap this or make it work.
