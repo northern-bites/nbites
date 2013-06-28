@@ -36,7 +36,7 @@ using namespace NBMath;
 namespace man{
 namespace balltrack{
 
-static const bool TRACK_MOVEMENT = true;
+static const bool TRACK_MOVEMENT = false;
 
 static const MMKalmanFilterParams DEFAULT_MM_PARAMS =
 {
