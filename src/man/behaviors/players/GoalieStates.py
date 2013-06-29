@@ -305,7 +305,7 @@ def upUpUP(player):
         player.upDelay = 0
 
     if player.brain.nav.isStopped():
-        return player.goLater('spinAtGoal')
+        return player.goLater('watchWithCornerChecks')
     return player.stay()
 
 def saveRight(player):
