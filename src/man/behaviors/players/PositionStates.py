@@ -2,7 +2,7 @@ import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 from ..navigator import Navigator
 import noggin_constants as NogginConstants
-from objects import Location
+from objects import Location, RelRobotLocation
 from ..playbook import PBConstants
 
 def playbookPosition(player):
@@ -94,7 +94,7 @@ def positionPlaying(player):
 def hackWalkForward(player):
     if player.firstFrame():
         player.brain.nav.walkTo(RelRobotLocation(200, 0, 0))
-        player.brain.tracker.lookToAngle(30)
+        player.brain.tracker.lookToAngle(-30)
         return player.stay()
     elif player.brain.nav.isStanding():
         return player.goNow('positionPlaying')
