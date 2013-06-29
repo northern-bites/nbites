@@ -10,8 +10,9 @@ TEST_OFFENDER = False
 TEST_MIDDIE = False
 TEST_CHASER = False
 
-HACK_D1 = False
-HACK_D2 = False
+HACK_D1 = False # odd numbered defender
+HACK_D2 = False # even number defender
+HACK_O = False # change + or - sign below for odd or even
 
 HACK_D1_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
                             NogginConstants.GREEN_PAD_Y + 100,
@@ -19,6 +20,21 @@ HACK_D1_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
 HACK_D2_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
                             NogginConstants.FIELD_GREEN_HEIGHT - 170,
                             -20)
+HACK_O_LOC = RobotLocation(NogginConstants.OPP_GOALBOX_LEFT_X - 60,
+                           NogginConstants.MIDFIELD_Y,
+                           0)
+HACK_O_READY_LOC = RobotLocation(NogginConstants.MIDFIELD_X - 30,
+                                 NogginConstants.MIDFIELD_Y + 200, # Change to - for odd number
+                                 0)
+
+HACK_BACKUP_READY_LOC = RobotLocation(NogginConstants.LANDMARK_MY_FIELD_CROSS[0],
+                                      NogginConstants.LANDMARK_MY_FIELD_CROSS[1],
+                                      0)
+
+HACK_BACKUP_LOC = RobotLocation(NogginConstants.LANDMARK_MY_FIELD_CROSS[0] + 100,
+                                NogginConstants.MIDFIELD_Y - 30,
+                                0)
+
 
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False

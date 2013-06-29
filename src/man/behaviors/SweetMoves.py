@@ -681,6 +681,13 @@ LEFT_SIDE_KICK = (
 RIGHT_SIDE_KICK = mirrorMove(LEFT_SIDE_KICK)
 
 GOOGZ_LEFT_SIDE_KICK = (
+    #pause for dramatic effect
+    ((90., 10.0, -90., -10.),
+     (0.0,  0.0,  -22.3, 43.5, -21.2, 0.0),
+     (0.0,  0.0,  -22.3, 43.5, -21.2, 0.0),
+     (90.0,-10., 82, 13.2),
+     .6,0,stiff.NORMAL_STIFFNESSES),
+
     # lean right
     ((80.,40.,-50.,-70.),
      (0.,0.,-35.,65.,-28.,-14.),
