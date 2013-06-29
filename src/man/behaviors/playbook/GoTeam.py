@@ -239,6 +239,10 @@ class GoTeam:
             play.setRole(PBConstants.OFFENDER)
             play.setPosition(PBConstants.HACK_O_LOC)
             return
+        else: # HACK BACK_UP
+            play.setRole(PBConstants.MIDDIE)
+            play.setPosition(PBConstants.HACK_BACKUP_LOC)
+            return
 
         # Find which active field player should go to each position
         if(roles[0] == PBConstants.CHASER):

@@ -31,6 +31,10 @@ HACK_BACKUP_READY_LOC = RobotLocation(NogginConstants.LANDMARK_MY_FIELD_CROSS[0]
                                       NogginConstants.LANDMARK_MY_FIELD_CROSS[1],
                                       0)
 
+HACK_BACKUP_LOC = RobotLocation(NogginConstants.LANDMARK_MY_FIELD_CROSS[0] + 100,
+                                NogginConstants.MIDFIELD_Y - 30,
+                                0)
+
 
 # Print information as to how the chaser is determined
 DEBUG_DET_CHASER = False
