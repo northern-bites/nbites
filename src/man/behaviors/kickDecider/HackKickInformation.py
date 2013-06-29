@@ -346,7 +346,8 @@ class KickInformation:
                 else:
                     # aim for the center and hope we're accurate enough
                     straightBearing = 0 - bearingForKick
-
+my h is -19.5, ball center is 17, left 58, right -43
+straight = -7, left = -67, right = 12
                 if (bearingKickLeft - bearingKickRight > 35):
                     # even an inaccurate side kick will work
                     if (90 < bearingKickLeft and 60 > bearingKickRight):
@@ -382,11 +383,11 @@ class KickInformation:
                 straightBearing = MyMath.sub180Angle(straightBearing)
                 rightSideBearing = MyMath.sub180Angle(rightSideBearing)
                 leftSideBearing = MyMath.sub180Angle(leftSideBearing)
-
+straight = -7, left = -67, right = 12
                 # the kick bearing that has least magnitude should be chosen
                 kickList = sorted([straightBearing, leftSideBearing, rightSideBearing], key=math.fabs)
 
-                if kickList[0] < math.fabs(straightBearing) - STRAIGHT_KICK_BIAS:
+                if math.fabs(kickList[0]) < math.fabs(straightBearing) - STRAIGHT_KICK_BIAS:
                     # side kicks must beat straight kicks by more than ~10 degrees
                     if (kickList[0] == rightSideBearing):
                         kick = kicks.RIGHT_SIDE_KICK
