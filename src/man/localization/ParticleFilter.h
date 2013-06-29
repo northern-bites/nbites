@@ -169,6 +169,7 @@ private:
     float errorMagnitude;
 
     int framesSinceReset;
+    int setResetTransition;
 
     // For use when logging particle swarm
     messages::ParticleSwarm swarm;

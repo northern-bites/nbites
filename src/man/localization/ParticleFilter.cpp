@@ -6,7 +6,8 @@ namespace man {
 namespace localization {
 
 ParticleFilter::ParticleFilter(ParticleFilterParams params)
-    : parameters(params)
+    : parameters(params),
+      setResetTransition(0)
 {
     motionSystem = new MotionSystem(params.odometryXYNoise,
                                     params.odometryHNoise);
@@ -100,15 +101,25 @@ void ParticleFilter::update(const messages::RobotLocation& odometryInput,
                             const messages::FilteredBall&      ballInput)
 {
     framesSinceReset++;
+
     Point ballGuess(ballInput.x(), ballInput.y());
     Point ballLoc(MIDFIELD_X, MIDFIELD_Y); // in set
-    bool distBallOff = ballLoc.distanceTo(ballGuess);
+    float distBallOff = ballLoc.distanceTo(ballGuess);
 
-    // // in set, lost or see ball wrong, and havent reset recently
-    // if (lost && (ballInput.vis().frames_on() > 5) && (framesSinceReset > 30)) {
-    //     std::cout << "LOST IN SET!" << std::endl;
-    //     resetLocToSide(true);
-    // }
+    // Determine if we think we should reset
+    if (((errorMagnitude > 20) || (distBallOff > 150))
+        && (ballInput.vis().frames_on() > 5)&& (framesSinceReset > 30)){
+        setResetTransition++;
+    }
+    else {
+        setResetTransition = 0;
+    }
+
+   if(setResetTransition > 5){
+        std::cout << "LOST IN SET!" << std::endl;
+        setResetTransition = 0;
+        resetLocToSide(true);
+    }
 
     motionSystem->update(particles, odometryInput, errorMagnitude);
 
