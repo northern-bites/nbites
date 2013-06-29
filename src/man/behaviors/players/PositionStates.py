@@ -2,7 +2,8 @@ import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 from ..navigator import Navigator
 import noggin_constants as NogginConstants
-from objects import Location
+from objects import Location, RelRobotLocation
+from ..playbook import PBConstants
 
 def playbookPosition(player):
     """
@@ -11,6 +12,10 @@ def playbookPosition(player):
     if player.gameState == 'gameReady':
         return player.goNow('positionReady')
     else:
+        if (player.brain.gameController.timeSincePlaying < 10 and
+            PBConstants.HACK_O):
+            return player.goNow('hackWalkForward')
+
         return player.goNow('positionPlaying')
 
 def positionReady(player):
@@ -83,5 +88,15 @@ def positionPlaying(player):
     if player.brain.locUncert > 75:
         # Find some goalposts (preferably close ones) and walk toward them.
         pass
+
+    return player.stay()
+
+def hackWalkForward(player):
+    if player.firstFrame():
+        player.brain.nav.walkTo(RelRobotLocation(200, 0, 0))
+        player.brain.tracker.lookToAngle(-30)
+        return player.stay()
+    elif player.brain.nav.isStanding():
+        return player.goNow('positionPlaying')
 
     return player.stay()
