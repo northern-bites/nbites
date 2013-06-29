@@ -261,7 +261,8 @@ void Threshold::visionLoop(const messages::JointAngles& ja,
         orange->createBall(pose->getHorizonY(0));
     }
     VisualBall temp;
-    if (vision->ball->getRadius() > 0) {
+	const int min_ball_radius_in_lower = 5; // extra check for self uniform balls
+    if (vision->ball->getRadius() > min_ball_radius_in_lower) {
         temp = *vision->ball;
     }
 
