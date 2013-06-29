@@ -10,7 +10,7 @@ TEST_OFFENDER = False
 TEST_MIDDIE = False
 TEST_CHASER = False
 
-HACK_D1 = True # odd numbered defender
+HACK_D1 = False # odd numbered defender
 HACK_D2 = False # even number defender
 HACK_O = False # change + or - sign below for odd or even
 
