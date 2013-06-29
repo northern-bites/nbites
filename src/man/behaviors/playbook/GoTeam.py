@@ -221,7 +221,7 @@ class GoTeam:
         if (chaser_mate.playerNumber == self.brain.playerNumber
             and ((not PBConstants.HACK_D1 and not PBConstants.HACK_D2 and not PBConstants.HACK_O)
                  or((PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O)
-                  and self.brain.ball.distance < 100))):
+                  and self.ballInBox()))):
             play.setRole(roles[-1])
             play.setPosition(locations[-1])
             return
@@ -267,12 +267,16 @@ class GoTeam:
                 play.setRole(roles[2])
                 play.setPosition(locations[2])
 
+    def ballInBox(self):
+        ball = self.brain.ball
+        return (ball.x < NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X +100)
+
     def ballInleftBox(self):
         """
         Defines the box the ball must be in for the hack defender to chase it.
         """
         ball = self.brain.ball
-        return (ball.x < NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X + 100 and
+        return (ball.x < NogginConstants.LANDMARK_BLUE_GOAL_CROSS_X + 150 and
                 ball.y > NogginConstants.MIDFIELD_Y)
 
     def ballInRightBox(self):
@@ -380,7 +384,7 @@ class GoTeam:
 
         # HACK for RoboCup 2013
         if ((PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O)
-            and (self.brain.ball.distance < 100)):
+            and (self.ballInBox())):
             return self.me
 
         # loop through the teammates
