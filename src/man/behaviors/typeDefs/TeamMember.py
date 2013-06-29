@@ -136,7 +136,7 @@ class TeamMember(RobotLocation):
 
         # HACK RoboCup 2013
         if PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O:
-            if self.brain.ball.distance > 100:
+            if self.brain.ball.x < 350:
                 time += 15000
 
 

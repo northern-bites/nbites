@@ -10,9 +10,9 @@ TEST_OFFENDER = False
 TEST_MIDDIE = False
 TEST_CHASER = False
 
-HACK_D1 = False # odd numbered defender
+HACK_D1 = True # odd numbered defender
 HACK_D2 = False # even number defender
-HACK_O = True # change + or - sign below for odd or even
+HACK_O = False # change + or - sign below for odd or even
 
 HACK_D1_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
                             NogginConstants.GREEN_PAD_Y + 100,
