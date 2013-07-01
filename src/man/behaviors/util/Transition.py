@@ -14,7 +14,7 @@ DEBUG = True
 
 def resetTransitions(state):
     """
-    resets the transitions of a state
+    Resets the transitions of a state
     """
     for transition, targetState in state.transitions.iteritems():
         transition.reset()
@@ -41,6 +41,75 @@ def getNextState(fsa, state):
 
     return fsa.stay()
 
+def ifSwitch(predicate, state, nextFrame=False):
+    """
+    Function that returns a Python decorator that allows cleaner use of 
+    transitions in an FSA.
+    See the following website for an explanation of how decorators work:
+        http://stackoverflow.com/questions/739654/how-can-i-make-a-chain-of-
+        function-decorators-in-python/1594484#1594484
+
+    Example usage: 
+        @transition(Transitions.ballMoved, chase, True)
+        def dribble(player):
+            doStuffHere()
+            
+    This would transition to the chase state if Transitions.ballMoved(player)
+    returned True. It would transition to the chase state in the next frame. If
+    ballMoved returned False, then the FSA would stay in dribble.
+
+    @param predicate, truth value returning function, in FSA-speak, a transition
+    @param state, the name of a state to switch to AS A STRING
+    @param nextFrame, a boolean deciding whether we transition now or next frame
+
+    IMPORTANT: 
+    (1) If in the state itself a call to goNow or goLater is made, that
+        transition will be made without checking the decorated transitions.
+    (2) Decorated transitions are checked after the state is run.
+    (3) Order of the decorators decides order of the checks. THE FIRST DECORATOR
+        IS ACTUALLY THE LAST ONE CHECKED, REVERSE ORDER!
+    """
+    def decorator(fn):
+        def decoratedFunction(player):
+            newState = fn(player)
+            if newState:
+                return newState
+
+            if predicate(player):
+                if nextFrame:
+                    return player.goLater(state)
+                else:
+                    return player.goNow(state)
+
+        return decoratedFunction
+    return decorator
+
+def switch(state, nextFrame=False):
+    """
+    Overloaded ifSwitch, see above for complete documentation.
+
+    Like ifSwitch decorator but predicate is assumed to be True.
+    """
+    def alwaysTrue(player):
+        return True
+
+    return ifSwitch(alwaysTrue, state, nextFrame)
+
+def stay(fn):
+    """
+    Like ifSwitch, see above for complete documentation.
+
+    Return player.stay() at the end of function call if nothing else is
+    returned. 
+    """
+    def decoratedFunction(player):
+        newState = fn(player)
+        if newState:
+            return newState
+
+        return player.stay()
+
+    return decoratedFunction
 
 class CountTransition:
     """

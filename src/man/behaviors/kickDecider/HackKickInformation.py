@@ -386,7 +386,7 @@ class KickInformation:
                 # the kick bearing that has least magnitude should be chosen
                 kickList = sorted([straightBearing, leftSideBearing, rightSideBearing], key=math.fabs)
 
-                if kickList[0] < math.fabs(straightBearing) - STRAIGHT_KICK_BIAS:
+                if math.fabs(kickList[0]) < math.fabs(straightBearing) - STRAIGHT_KICK_BIAS:
                     # side kicks must beat straight kicks by more than ~10 degrees
                     if (kickList[0] == rightSideBearing):
                         kick = kicks.RIGHT_SIDE_KICK

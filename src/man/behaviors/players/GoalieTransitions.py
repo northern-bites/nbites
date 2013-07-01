@@ -8,6 +8,7 @@ import GoalieConstants as constants
 import noggin_constants as field
 import math
 import VisualGoalieStates
+import GoalieStates
 from objects import RelRobotLocation
 
 # Visual Goalie
@@ -209,7 +210,15 @@ def shouldMoveBackwards(player):
         vision.visual_line_size() == 0):
         return True
 
-    return False
+    for i in range(0, vision.visual_line_size()):
+        if vision.visual_line(i).visual_detection.distance < 120.0:
+            return False
+
+    for i in range(0, vision.bottom_line_size()):
+        if vision.bottom_line(i).visual_detection.distance < 120.0:
+            return False
+
+    return True
 
 def facingSideways(player):
     """
@@ -472,3 +481,13 @@ def whiffed(player):
     return (player.brain.ball.rel_x < 40.0 and
             math.fabs(player.brain.ball.rel_y) < 25.0 and
             player.brain.ball.vis.on)
+
+def saveNow(player):
+    if player.brain.ball.mov_rel_y < -6.0:
+        GoalieStates.doDive.side = constants.RIGHT
+    elif player.brain.ball.mov_rel_y > 6.0:
+        GoalieStates.doDive.side = constants.LEFT
+    else:
+        GoalieStates.doDive.side = 3
+
+    return player.brain.ball.mov_speed > 8.0
