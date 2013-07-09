@@ -1,7 +1,9 @@
 #include "MotionModule.h"
 #include "Profiler.h"
-
 #include <fstream>
+
+// Default speed for destination and odometry walk
+#define DEFAULT_SPEED .5f
 
 namespace man
 {
@@ -189,13 +191,6 @@ bool MotionModule::postProcess()
         swapHeadProvider();
     }
 
-    // Update sensors with the correct support foot because it may have
-    // changed this frame.
-    // TODO: This can be improved by keeping a local copy of the SupportFoot
-    //       so that we only update sensors when there has been a change.
-    //       The overhead of the mutex shouldn't be that high though.
-    //sensors->setSupportFoot(curProvider->getSupportFoot());
-
     //return if one of the enactors is active
     return curProvider->isActive()  || curHeadProvider->isActive();
 }
@@ -377,6 +372,7 @@ void MotionModule::processMotionInput()
         {
             // Send an unfreeze command so we can stand up.
             sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+            gainsOn = true;
             stiff = true;
             sendMotionCommand(bodyCommandInput_.message().script());
         }
@@ -914,17 +910,16 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
 void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 {
     // Message is coming from behaviors in centimeters and degrees
-    // StepCommands take millimeters and radians so Convert!
+    // StepCommands take millimeters and radians so convert!
     float relX = command.rel_x() * CM_TO_MM;
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
 
-    // For now go at half speed for odometry walk
-    // @TODO major refactoring on all dis shit. lets make it hot
-    float DEFAULT_SPEED = .5f;
-    float gain = DEFAULT_SPEED;
+    float gain; 
     if(command.gain() > 0.f)
         gain = command.gain();
+    else
+        gain = DEFAULT_SPEED;
 
     nextProvider = &walkProvider;
     DestinationCommand::ptr newCommand(
@@ -932,7 +927,8 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
             relX,
             relY,
             relH,
-            gain)
+            gain,
+            command.pedantic())
         );
     walkProvider.setCommand(newCommand);
 }
@@ -948,17 +944,16 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 {
     // Message is coming from behaviors in centimeters and degrees
-    // StepCommands take millimeters and radians so Convert!
+    // StepCommands take millimeters and radians so convert!
     float relX = command.rel_x() * CM_TO_MM;
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
 
-    // For now go at half speed for odometry walk
-    // @TODO major refactoring on all dis shit. lets make it hot
-    float DEFAULT_SPEED = .5f;
-    float gain = DEFAULT_SPEED;
+    float gain; 
     if(command.gain() > 0.f)
         gain = command.gain();
+    else
+        gain = DEFAULT_SPEED;
 
     nextProvider = &walkProvider;
     StepCommand::ptr newCommand(

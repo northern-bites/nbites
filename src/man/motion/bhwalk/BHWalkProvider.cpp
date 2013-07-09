@@ -204,7 +204,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.target.translation.x = command->x_mm;
             motionRequest.walkRequest.target.translation.y = command->y_mm;
 
-            //motionRequest.walkRequest.pedantic = true;
+            motionRequest.walkRequest.pedantic = command->pedantic;
 
             walkingEngine.theMotionRequest = motionRequest;
         }
@@ -379,14 +379,6 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
     currentCommand = command;
 
     active();
-}
-
-const SupportFoot BHWalkProvider::getSupportFoot() const {
-    if (walkingEngine.getSupportLeg() == 0) {//TODO: WalkingEngine::left) {
-        return LEFT_SUPPORT;
-    } else {
-        return RIGHT_SUPPORT;
-    }
 }
 
 bool BHWalkProvider::calibrated() const {

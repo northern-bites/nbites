@@ -16,9 +16,12 @@ class DestinationCommand : public MotionCommand
 public:
     typedef boost::shared_ptr<DestinationCommand> ptr;
 
-    DestinationCommand(float _x_mm, float _y_mm, float _theta_rads, float _gain=1.0f)
+    DestinationCommand(float _x_mm, float _y_mm, float _theta_rads, 
+                       float _gain=1.0f, bool ped=false)
         : MotionCommand (MotionConstants::DESTINATION),
-          x_mm(_x_mm),y_mm(_y_mm),theta_rads(_theta_rads), gain(_gain) {
+          x_mm(_x_mm),y_mm(_y_mm),theta_rads(_theta_rads),
+          gain(_gain),pedantic(ped) 
+    {
         setChainList();
     }
 
@@ -30,6 +33,7 @@ public:
     const float y_mm;
     const float theta_rads;
     const float gain;
+    const bool pedantic;
 protected:
     virtual void setChainList() {
         chainList.assign(MotionConstants::WALK_CHAINS,
@@ -42,7 +46,8 @@ public:
         {
             return o << "DestinationCommand("
                      << w.x_mm << "," << w.y_mm << "," << w.theta_rads
-                     << ") at: " << w.gain*100 << "%";
+                     << ") at: " << w.gain*100 << "% with pedantic set to: " 
+                     << w.pedantic;
         }
 
 };
