@@ -15,13 +15,13 @@ set( @ROBOT_TEAM_NUMBER@
 )
 
 set( @REMOTE_ADDRESS@
-  "river.local"
+  "vera.local"
   CACHE STRING
   "The address to which the code will be installed."
 )
 
 set ( @PYTHON_PLAYER@
-  pNone
+  pBrunswick
   CACHE STRING
   "Choose the player to be imported in Switch.py"
   )
@@ -29,14 +29,14 @@ set ( @PYTHON_PLAYER@
 # COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
-  "../../data/tables/120-top.mtb"
+  "../../data/tables/chown-223-12-2.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
   )
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/120-bottom.mtb"
+  "../../data/tables/chown-223-12-2.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )

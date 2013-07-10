@@ -263,7 +263,7 @@ def motionKickExecute(player):
                                  player.brain.ball.rel_y)
 
     if (transitions.shouldFindBallKick(player) or
-        transitions.shouldApproachBallAgain(player):
+        transitions.shouldApproachBallAgain(player)):
         player.inKickingState = False
         return player.goLater('chase')
 
