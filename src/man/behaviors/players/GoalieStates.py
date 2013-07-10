@@ -18,7 +18,6 @@ def gameInitial(player):
         player.brain.fallController.enabled = False
         player.stand()
         player.zeroHeads()
-        player.currentPose = constants.CENTER_POSE
         player.isSaving = False
         player.lastStiffStatus = True
 
@@ -306,7 +305,7 @@ def upUpUP(player):
         player.upDelay = 0
 
     if player.brain.nav.isStopped():
-        return player.goLater('spinAtGoal')
+        return player.goLater('watchWithCornerChecks')
     return player.stay()
 
 def saveRight(player):
@@ -372,8 +371,14 @@ def penaltyShotsGameSet(player):
 
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
+        player.inKickingState = False
+        player.gameState = player.currentState
+        player.returningFromPenalty = False
+        player.brain.fallController.enabled = False
         player.stand()
-        player.brain.tracker.trackBall()
+        player.zeroHeads()
+        player.isSaving = False
+        player.lastStiffStatus = True
 
     return player.goLater('waitForPenaltySave')
 
@@ -384,19 +389,16 @@ def waitForPenaltySave(player):
 
     return Transition.getNextState(player, waitForPenaltySave)
 
-def diveRight(player):
+def doDive(player):
     if player.firstFrame():
         player.brain.fallController.enabled = False
-        player.performHeadMove
-        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
-
-    return player.stay()
-
-def diveLeft(player):
-    if player.firstFrame():
-        player.brain.fallController.enabled = False
-        player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
-
+        player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
+        if doDive.side == constants.RIGHT:
+            player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
+        elif doDive.side == constants.LEFT:
+            player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
+        else:
+            player.executeMove(SweetMoves.GOALIE_SQUAT)
     return player.stay()
 
 def squat(player):

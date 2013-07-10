@@ -23,7 +23,7 @@ HACK_D2_LOC = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
 HACK_O_LOC = RobotLocation(NogginConstants.OPP_GOALBOX_LEFT_X - 60,
                            NogginConstants.MIDFIELD_Y,
                            0)
-HACK_O_READY_LOC = RobotLocation(NogginConstants.MIDFIELD_X - 30,
+HACK_O_READY_LOC = RobotLocation(NogginConstants.MIDFIELD_X - 80,
                                  NogginConstants.MIDFIELD_Y + 200, # Change to - for odd number
                                  0)
 
@@ -34,6 +34,9 @@ HACK_BACKUP_READY_LOC = RobotLocation(NogginConstants.LANDMARK_MY_FIELD_CROSS[0]
 HACK_BACKUP_LOC = RobotLocation(NogginConstants.LANDMARK_MY_FIELD_CROSS[0] + 100,
                                 NogginConstants.MIDFIELD_Y - 30,
                                 0)
+
+DEFENDER_BOX_LIMIT_X = 350
+OFFENDER_DISTANCE_LIMIT = 100
 
 
 # Print information as to how the chaser is determined

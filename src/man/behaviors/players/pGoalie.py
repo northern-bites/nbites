@@ -289,21 +289,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             }
 
         GoalieStates.waitForPenaltySave.transitions = {
-            Transition.CountTransition(GoalieTransitions.shouldDiveRight,
-                                       Transition.SOME_OF_THE_TIME,
+            Transition.CountTransition(GoalieTransitions.saveNow,
+                                       Transition.MOST_OF_THE_TIME,
                                        Transition.LOW_PRECISION)
-            : GoalieStates.diveRight,
-
-            Transition.CountTransition(GoalieTransitions.shouldDiveLeft,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.diveLeft,
-
-            Transition.CountTransition(GoalieTransitions.shouldSquat,
-                                       Transition.SOME_OF_THE_TIME,
-                                       Transition.LOW_PRECISION)
-            : GoalieStates.squat
-
+            : GoalieStates.doDive,
             }
 
     def run(self):

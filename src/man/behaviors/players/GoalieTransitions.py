@@ -8,6 +8,7 @@ import GoalieConstants as constants
 import noggin_constants as field
 import math
 import VisualGoalieStates
+import GoalieStates
 from objects import RelRobotLocation
 
 # Visual Goalie
@@ -480,3 +481,13 @@ def whiffed(player):
     return (player.brain.ball.rel_x < 40.0 and
             math.fabs(player.brain.ball.rel_y) < 25.0 and
             player.brain.ball.vis.on)
+
+def saveNow(player):
+    if player.brain.ball.mov_rel_y < -6.0:
+        GoalieStates.doDive.side = constants.RIGHT
+    elif player.brain.ball.mov_rel_y > 6.0:
+        GoalieStates.doDive.side = constants.LEFT
+    else:
+        GoalieStates.doDive.side = 3
+
+    return player.brain.ball.mov_speed > 8.0
