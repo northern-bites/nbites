@@ -115,6 +115,13 @@ def createAndSendWalkVector(nav, x, y, theta):
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
+def createAndSendMotionKickVector(nav, x, y, theta, ball_rel_x, ball_rel_y):
+    createAndSendWalkVector(nav, x, y, theta)
+    command = nav.brain.interface.bodyMotionCommand
+    command.perform_motion_kick = True
+    command.ball_rel_x = ball_rel_x
+    command.ball_rel_y = ball_rel_y
+
 def executeMove(nav, sweetMove):
     """
     Method to enqueue a SweetMove

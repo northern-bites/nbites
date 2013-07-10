@@ -3,7 +3,7 @@ import noggin_constants as nogginConstants
 import objects
 from math import fabs, tan, radians
 
-DRIBBLE_TOGGLE = True
+DRIBBLE_TOGGLE = False
 
 def shouldDribble(player):
     """

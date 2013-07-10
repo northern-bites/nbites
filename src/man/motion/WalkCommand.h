@@ -18,17 +18,26 @@ class WalkCommand : public MotionCommand
 public:
     typedef boost::shared_ptr<WalkCommand> ptr;
 
-    WalkCommand(float x_percent, float y_percent, float theta_percent)
+    WalkCommand(float x_percent, float y_percent, float theta_percent,
+                bool perform_kick, float ball_rel_x, float ball_rel_y)
         : MotionCommand(MotionConstants::WALK),
-          x_percent(x_percent),y_percent(y_percent),theta_percent(theta_percent)
+          x_percent(x_percent) ,y_percent(y_percent),
+          theta_percent(theta_percent), motionKick(perform_kick), 
+          kickBallRelX(ball_rel_x), kickBallRelY(ball_rel_y)
         { setChainList(); }
 
     virtual ~WalkCommand() {}
 public:
-//    WalkParameters params;
+    // Params for speed walking
     const float x_percent;    //0 - 1 magnitude
     const float y_percent;    //0 - 1 magnitude
     const float theta_percent; //0 - 1 magnitude
+
+    // Params for motion kicking
+    bool motionKick;
+    float kickBallRelX;
+    float kickBallRelY;
+
 protected:
 	virtual void setChainList() {
         chainList.assign(MotionConstants::WALK_CHAINS,

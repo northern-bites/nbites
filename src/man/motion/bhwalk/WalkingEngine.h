@@ -77,14 +77,6 @@ public:
   */
   ~WalkingEngine() {}//theInstance = 0;}
 
-  /**
-  * Called from a MessageQueue to distribute messages
-  * @param message The message that can be read
-  * @return True if the message was handled
-  */
-  //this sends a kick message to the robot -- we don't use it
-//  static bool handleMessage(InMessage& message);
-
 private:
 
   static const int INSTABILITY_THRESH = 500;

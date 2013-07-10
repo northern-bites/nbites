@@ -1956,26 +1956,3 @@ void WalkingEngine::KickPlayer::setParameters(const Vector2<>& ballPosition, con
   else
     kick->setParameters(ballPosition, target);
 }
-
-//bool WalkingEngine::KickPlayer::handleMessage(InMessage& message)
-//{
-//  if(message.getMessageID() == idWalkingEngineKick)
-//  {
-//    unsigned int id, size;
-//    message.bin >> id >> size;
-//    ASSERT(id < WalkRequest::numOfKickTypes);
-//    char* buffer = new char[size + 1];
-//    message.bin.read(buffer, size);
-//    buffer[size] = '\0';
-//    char filePath[256];
-//    sprintf(filePath, "Kicks/%s.cfg", WalkRequest::getName(WalkRequest::KickType(id)));
-//    if(kicks[(id - 1) / 2].load(filePath, buffer))
-//    {
-////      OUTPUT(idText, text, filePath << ": ok");
-//    }
-//    delete[] buffer;
-//    return true;
-//  }
-//  else
-//    return false;
-//}

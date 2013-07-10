@@ -185,6 +185,16 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.speed.translation.x = command->x_percent;
             motionRequest.walkRequest.speed.translation.y = command->y_percent;
 
+            // Let's do some motion kicking!
+            if (command->motionKick) {
+                if (command->kickBallRelY > 0)
+                    motionRequest.walkRequest.kickType = WalkRequest::left;
+                else
+                    motionRequest.walkRequest.kickType = WalkRequest::right;
+                motionRequest.walkRequest.kickBallPosition.x = command->kickBallRelX;
+                motionRequest.walkRequest.kickBallPosition.y = command->kickBallRelY;
+            }
+
             walkingEngine.theMotionRequest = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {

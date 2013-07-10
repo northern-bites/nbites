@@ -120,7 +120,7 @@ def orbitBall(player):
         print "STOPPED! Because relH is: ", relH
         player.stopWalking()
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-        return player.goNow('positionForKick')
+        return player.goNow('motionKickExecute')
 
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
@@ -233,6 +233,39 @@ def positionForKick(player):
         player.ballBeforeKick = player.brain.ball
         player.brain.nav.stand()
         return player.goNow('kickBallExecute')
+
+    return player.stay()
+
+def motionKickExecute(player):
+    """
+    Do a motion kick.
+    """
+    if (transitions.shouldApproachBallAgain(player) or
+        transitions.shouldRedecideKick(player)):
+        player.inKickingState = False
+        return player.goLater('chase')
+
+    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+        if dr_trans.shouldDribble(player):
+            return player.goNow('decideDribble')
+
+    if player.corner_dribble:
+        return player.goNow('executeDribble')
+
+    if player.firstFrame():
+        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
+        player.brain.tracker.lookStraightThenTrack()
+
+    player.brain.nav.walkAndKick(player.brain.ball.rel_x,
+                                 player.brain.ball.rel_y,
+                                 0,
+                                 player.brain.ball.rel_x,
+                                 player.brain.ball.rel_y)
+
+    if (transitions.shouldFindBallKick(player) or
+        transitions.shouldApproachBallAgain(player):
+        player.inKickingState = False
+        return player.goLater('chase')
 
     return player.stay()
 

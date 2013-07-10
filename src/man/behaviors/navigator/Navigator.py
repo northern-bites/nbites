@@ -235,6 +235,14 @@ class Navigator(FSA.FSA):
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
+    def walkAndKick(self, x, y, theta, ball_rel_x, ball_rel_y):
+        """
+        Starts a new velocity walk command and enques a motion kick.
+        Does nothing if it the velocities the same as the current velocities.
+        """
+        NavStates.walking.speeds = (x, y, theta, ball_rel_x, ball_rel_y)
+        self.switchTo('walkingAndKicking')
+
     def stand(self):
         """
         Make the robot stand. Standing should be the default action when we're not
