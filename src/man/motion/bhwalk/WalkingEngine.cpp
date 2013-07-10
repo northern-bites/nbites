@@ -1816,7 +1816,7 @@ WalkingEngine::KickPlayer::KickPlayer() : kick(0)
   {
     char filePath[256];
     sprintf(filePath, "Kicks/%s.cfg", WalkRequest::getName(WalkRequest::KickType(i * 2 + 1)));
-    kicks[i].load(filePath);
+    kicks[i].load((common::paths::NAO_CONFIG_DIR + filePath).c_str());
   }
 }
 

@@ -118,9 +118,9 @@ def createAndSendWalkVector(nav, x, y, theta):
 def createAndSendMotionKickVector(nav, x, y, theta, ball_rel_x, ball_rel_y):
     createAndSendWalkVector(nav, x, y, theta)
     command = nav.brain.interface.bodyMotionCommand
-    command.perform_motion_kick = True
-    command.ball_rel_x = ball_rel_x
-    command.ball_rel_y = ball_rel_y
+    command.speed.perform_motion_kick = True
+    command.speed.ball_rel_x = ball_rel_x
+    command.speed.ball_rel_y = ball_rel_y
 
 def executeMove(nav, sweetMove):
     """
