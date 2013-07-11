@@ -12,7 +12,7 @@
 option(
   USING_LAB_FIELD
   "Turn on if we are in the lab and not on a full-size field"
-  OFF
+  ON
 )
 
 if( NOT OFFLINE )
@@ -116,7 +116,7 @@ if(USE_LOGGING)
   option(
     LOG_SYNC
     "Enable to log every tenth frame in order to stay synced with image logging"
-    OFF
+    ON
     )
 
 else(USE_LOGGING)
