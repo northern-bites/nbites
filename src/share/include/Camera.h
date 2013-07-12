@@ -82,71 +82,38 @@ public:
      * Camera Parameters Go Here
      */
 
-// // SEARLES CAMERA PARAMETERS
-//     // TOP SETTINGS
-//     static const bool TOP_H_FLIP = 1;
-//     static const bool TOP_V_FLIP = 1;
-//     static const bool TOP_AUTO_EXPOSURE = 0;
-//     static const int TOP_BRIGHTNESS = 36;
-//     static const int TOP_CONTRAST = 58;
-//     static const int TOP_SATURATION = 106;
-//     static const int TOP_HUE = 0;
-//     static const int TOP_SHARPNESS = 3;
-//     static const bool TOP_AUTO_WHITEBALANCE = 0;
-//     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-//     static const int TOP_EXPOSURE = 30;
-//     static const int TOP_GAIN = 58;
-//     static const int TOP_WHITE_BALANCE = -110;
-
-//     // BOTTOM SETTINGS
-//     static const bool BOTTOM_H_FLIP = 0;
-//     static const bool BOTTOM_V_FLIP = 0;
-//     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-//     static const int BOTTOM_BRIGHTNESS = 80;
-//     static const int BOTTOM_CONTRAST = 64;
-//     static const int BOTTOM_SATURATION = 90;
-//     static const int BOTTOM_HUE = 0;
-//     static const int BOTTOM_SHARPNESS = 3;
-//     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
-//     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-//     static const int BOTTOM_EXPOSURE = 35;
-//     static const int BOTTOM_GAIN = 62;
-//     static const int BOTTOM_WHITE_BALANCE = -100;
-
-
-// Robocup 2013 Camera parameters
-// TOP SETTINGS
+    // SEARLES CAMERA PARAMETERS
+    // TOP SETTINGS
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
-    static const int TOP_BRIGHTNESS = 156;
-    static const int TOP_CONTRAST = 63;
-    static const int TOP_SATURATION = 160;
+    static const int TOP_BRIGHTNESS = 128;
+    static const int TOP_CONTRAST = 58;
+    static const int TOP_SATURATION = 134;
     static const int TOP_HUE = 0;
     static const int TOP_SHARPNESS = 3;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    static const int TOP_EXPOSURE = 24;
-    static const int TOP_GAIN = 40;
-    static const int TOP_WHITE_BALANCE = 3500;
+    static const int TOP_EXPOSURE = 36;
+    static const int TOP_GAIN = 53;
+    static const int TOP_WHITE_BALANCE = 3300;
     static const bool TOP_FADE_TO_BLACK = 0;
 
     // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 168;
-    static const int BOTTOM_CONTRAST = 59;
-    static const int BOTTOM_SATURATION = 131;
+    static const int BOTTOM_BRIGHTNESS = 124;
+    static const int BOTTOM_CONTRAST = 56;
+    static const int BOTTOM_SATURATION = 122;
     static const int BOTTOM_HUE = 0;
     static const int BOTTOM_SHARPNESS = 3;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 24;
-    static const int BOTTOM_GAIN = 40;
-    static const int BOTTOM_WHITE_BALANCE = 3500;
+    static const int BOTTOM_EXPOSURE = 35;
+    static const int BOTTOM_GAIN = 62;
+    static const int BOTTOM_WHITE_BALANCE = 3200;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
-
 
     static const Type getOtherCameraType(Type type) {
         if (type == TOP) {
