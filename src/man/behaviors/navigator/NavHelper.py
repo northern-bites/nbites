@@ -66,16 +66,17 @@ def adaptSpeed(distance, cutoffDistance, maxSpeed):
     return min(maxSpeed, (distance/cutoffDistance)*maxSpeed)
 #    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
-def setDestination(nav, dest, gain = 1.0):
+def setDestination(nav, dest, gain = 1.0, pedantic = False):
     """
     Method to set the next destination walk command
-    See MotionModule.h for more info on the odometry walk command
+    See MotionModule.h for more info on the destination walk command
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK #Destination Walk
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
+    command.dest.pedantic = pedantic
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 

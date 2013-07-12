@@ -120,7 +120,7 @@ def orbitBall(player):
         print "STOPPED! Because relH is: ", relH
         player.stopWalking()
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
-        return player.goNow('motionKickExecute')
+        return player.goNow('positionForKick')
 
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
@@ -213,18 +213,12 @@ def positionForKick(player):
                                                 0)
 
     if player.firstFrame():
-        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
-        #only enque the new goTo destination once and update it afterwards
-        player.brain.nav.goTo(positionForKick.kickPose,
-                              Navigator.PRECISELY,
-                              Navigator.SLOW_SPEED,
-                              False,
-                              Navigator.ADAPTIVE)
-    else:
-        player.brain.nav.updateDest(positionForKick.kickPose)
+        player.brain.nav.walkTo(positionForKick.kickPose,
+                                Navigator.SLOW_SPEED,
+                                True)
 
-    if transitions.shouldFindBallKick(player):
+    if transitions.shouldFindBall(player):
         player.inKickingState = False
         return player.goLater('chase')
 
