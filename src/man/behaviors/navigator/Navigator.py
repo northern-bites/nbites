@@ -4,7 +4,7 @@ from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelRobotLocation
-from math import pi
+from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
 
@@ -235,11 +235,15 @@ class Navigator(FSA.FSA):
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
-    def walkAndKick(self, x, y, theta, ball_rel_x, ball_rel_y):
+    def walkAndKick(self, ball_rel_x, ball_rel_y, theta, speed):
         """
         Starts a new velocity walk command and enques a motion kick.
         Does nothing if it the velocities the same as the current velocities.
         """
+        # We will walk in the direction of the ball with a speed equal to speed 
+        x = sqrt(speed**2/(ball_rel_y**2/ball_rel_x**2 + 1))
+        y = sqrt(speed**2/(ball_rel_x**2/ball_rel_y**2 + 1))
+
         NavStates.walking.speeds = (x, y, theta, ball_rel_x, ball_rel_y)
         self.switchTo('walkingAndKicking')
 

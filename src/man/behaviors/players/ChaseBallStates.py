@@ -215,8 +215,7 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.walkTo(positionForKick.kickPose,
-                                Navigator.SLOW_SPEED,
-                                True)
+                                Navigator.SLOW_SPEED)
 
     if transitions.shouldFindBall(player):
         player.inKickingState = False
