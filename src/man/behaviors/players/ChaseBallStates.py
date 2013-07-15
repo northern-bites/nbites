@@ -13,6 +13,7 @@ import noggin_constants as nogginConstants
 import time
 
 DRIBBLE_ON_KICKOFF = False
+NO_ORBITING = True
 
 def chase(player):
     """
@@ -111,6 +112,9 @@ def orbitBall(player):
     """
     State to orbit the ball
     """
+    if NO_ORBITING:
+        return player.goNow('positionForKick')
+
     # Calculate relative heading every frame
     relH = player.kick.h - player.brain.loc.h
 
@@ -211,11 +215,17 @@ def positionForKick(player):
     positionForKick.kickPose = RelRobotLocation(ball.stat_rel_x - kick_pos[0],
                                                 ball.stat_rel_y - kick_pos[1],
                                                 0)
-
     if player.firstFrame():
+        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
-        player.brain.nav.walkTo(positionForKick.kickPose,
-                                Navigator.SLOW_SPEED)
+        #only enque the new goTo destination once and update it afterwards
+        player.brain.nav.goTo(positionForKick.kickPose,
+                              Navigator.PRECISELY,
+                              Navigator.SLOW_SPEED,
+                              False,
+                              Navigator.ADAPTIVE)
+    else:
+        player.brain.nav.updateDest(positionForKick.kickPose)
 
     if transitions.shouldFindBall(player):
         player.inKickingState = False
@@ -225,40 +235,10 @@ def positionForKick(player):
         player.brain.nav.isAtPosition()):
         player.ballBeforeKick = player.brain.ball
         player.brain.nav.stand()
-        return player.goNow('kickBallExecute')
-
-    return player.stay()
-
-def motionKickExecute(player):
-    """
-    Do a motion kick.
-    """
-    if (transitions.shouldApproachBallAgain(player) or
-        transitions.shouldRedecideKick(player)):
-        player.inKickingState = False
-        return player.goLater('chase')
-
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
-
-    if player.corner_dribble:
-        return player.goNow('executeDribble')
-
-    if player.firstFrame():
-        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
-        player.brain.tracker.lookStraightThenTrack()
-
-    player.brain.nav.walkAndKick(player.brain.ball.rel_x,
-                                 player.brain.ball.rel_y,
-                                 0,
-                                 player.brain.ball.rel_x,
-                                 player.brain.ball.rel_y)
-
-    if (transitions.shouldFindBallKick(player) or
-        transitions.shouldApproachBallAgain(player)):
-        player.inKickingState = False
-        return player.goLater('chase')
+        if False:
+            return player.goNow('kickBallExecute')
+        else:
+            return player.goNow('motionKickExecute')
 
     return player.stay()
 

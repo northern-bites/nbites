@@ -671,6 +671,9 @@ void MotionModule::sendMotionCommand(const WalkCommand::ptr command)
  */
 void MotionModule::sendMotionCommand(messages::WalkCommand command)
 {
+    float ballRelX = command.ball_rel_x() * CM_TO_MM;
+    float ballRelY = command.ball_rel_y() * CM_TO_MM;
+
     nextProvider = &walkProvider;
     WalkCommand::ptr walkCommand(
         new WalkCommand(
@@ -678,8 +681,8 @@ void MotionModule::sendMotionCommand(messages::WalkCommand command)
             command.y_percent(),
             command.h_percent(),
             command.perform_motion_kick(),
-            command.ball_rel_x(),
-            command.ball_rel_y()
+            ballRelX,
+            ballRelY
             )
     );
     walkProvider.setCommand(walkCommand);

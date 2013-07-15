@@ -244,6 +244,11 @@ class Navigator(FSA.FSA):
         x = sqrt(speed**2/(ball_rel_y**2/ball_rel_x**2 + 1))
         y = sqrt(speed**2/(ball_rel_x**2/ball_rel_y**2 + 1))
 
+        if ball_rel_x < 0:
+            x = -x
+        if ball_rel_y < 0:
+            y = -y
+
         NavStates.walking.speeds = (x, y, theta, ball_rel_x, ball_rel_y)
         self.switchTo('walkingAndKicking')
 
