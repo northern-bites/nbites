@@ -19,11 +19,12 @@ public:
     typedef boost::shared_ptr<WalkCommand> ptr;
 
     WalkCommand(float x_percent, float y_percent, float theta_percent,
-                bool perform_kick, float ball_rel_x, float ball_rel_y)
+                bool perform_kick, float ball_rel_x, float ball_rel_y,
+                int kick_type)
         : MotionCommand(MotionConstants::WALK),
           x_percent(x_percent) ,y_percent(y_percent),
           theta_percent(theta_percent), motionKick(perform_kick), 
-          kickBallRelX(ball_rel_x), kickBallRelY(ball_rel_y)
+          kickBallRelX(ball_rel_x), kickBallRelY(ball_rel_y), kickType(kick_type)
         { setChainList(); }
 
     virtual ~WalkCommand() {}
@@ -37,6 +38,7 @@ public:
     bool motionKick;
     float kickBallRelX;
     float kickBallRelY;
+    int kickType;
 
 protected:
 	virtual void setChainList() {

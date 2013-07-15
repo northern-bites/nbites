@@ -1,9 +1,9 @@
 from math import fabs, sqrt
 from ..util import MyMath
+from ..kickDecider import kicks
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
-# TODO: Import CommandType properly.
-#import PMotion_proto
+# TODO import CommandType properly
 
 def stand(nav):
     """
@@ -116,12 +116,22 @@ def createAndSendWalkVector(nav, x, y, theta):
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
-def createAndSendMotionKickVector(nav, x, y, theta, ball_rel_x, ball_rel_y):
+def createAndSendMotionKickVector(nav, x, y, theta, ball_rel_x, ball_rel_y, kick):
     createAndSendWalkVector(nav, x, y, theta)
     command = nav.brain.interface.bodyMotionCommand
+
     command.speed.perform_motion_kick = True
     command.speed.ball_rel_x = ball_rel_x
     command.speed.ball_rel_y = ball_rel_y
+
+    if kick == M_LEFT_SIDE:
+        command.speed.kick_type = 0
+    elif kick == M_RIGHT_SIDE:
+        command.speed.kick_type = 1
+    elif kick == M_LEFT_STRAIGHT:
+        command.speed.kick_type = 2
+    elif kick == M_RIGHT_STRAIGHT:
+        command.speed.kick_type = 3
 
 def executeMove(nav, sweetMove):
     """

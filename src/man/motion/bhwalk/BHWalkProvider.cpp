@@ -187,7 +187,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             // Let's do some motion kicking!
             if (command->motionKick) {
-                if (command->kickBallRelY > 0) {
+                if (command->kickType == 0) {
+                    motionRequest.walkRequest.kickType = WalkRequest::left;
+                }
+                else if (command->kickType == 1) {
+                    motionRequest.walkRequest.kickType = WalkRequest::right;
+                }
+                else if (command->kickType == 2) {
                     motionRequest.walkRequest.kickType = WalkRequest::sidewardsLeft;
                 }
                 else {

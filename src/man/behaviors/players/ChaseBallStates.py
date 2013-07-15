@@ -13,7 +13,6 @@ import noggin_constants as nogginConstants
 import time
 
 DRIBBLE_ON_KICKOFF = False
-NO_ORBITING = True
 
 def chase(player):
     """
@@ -112,8 +111,7 @@ def orbitBall(player):
     """
     State to orbit the ball
     """
-    if NO_ORBITING:
-        return player.goNow('positionForKick')
+    return player.goNow('positionForKick')
 
     # Calculate relative heading every frame
     relH = player.kick.h - player.brain.loc.h
@@ -235,10 +233,10 @@ def positionForKick(player):
         player.brain.nav.isAtPosition()):
         player.ballBeforeKick = player.brain.ball
         player.brain.nav.stand()
-        if False:
-            return player.goNow('kickBallExecute')
-        else:
+        if player.motionKick:
             return player.goNow('motionKickExecute')
+        else:
+            return player.goNow('kickBallExecute')
 
     return player.stay()
 

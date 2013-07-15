@@ -682,7 +682,8 @@ void MotionModule::sendMotionCommand(messages::WalkCommand command)
             command.h_percent(),
             command.perform_motion_kick(),
             ballRelX,
-            ballRelY
+            ballRelY,
+            command.kick_type()
             )
     );
     walkProvider.setCommand(walkCommand);

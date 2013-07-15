@@ -330,6 +330,25 @@ class KickInformation:
                     print ("Acceptable bearing range for kick: " + str(headingBallToGoalLeft) +
                            "/" + str(headingBallToGoalRight))
 
+                # Motion kicking conditions
+                # (1) Something is blocking where we're looking (50 cm away)
+                # (2) We are behind our opponent's cross
+                # (3) We are facing towards our opponent's side
+                if (self.brain.interface.visionObstacle.mid_dist < 50 and
+                    self.brain.loc.x < constants.LANDMARK_YELLOW_GOAL_CROSS_X and
+                    self.brain.loc.h < 90 and self.brain.loc.h > -90):
+                    # Right side kick
+                    if player.brain.loc.y < 1./2.*nogginConstants.FIELD_HEIGHT:
+                        kick = kicks.M_RIGHT_SIDE
+                        kick.h = 0
+                        return kick
+                    # Left side kick
+                    else:
+                        kick = kicks.M_LEFT_SIDE
+                        kick.h = 0
+                        return kick
+
+                # Sweetmove kicking
                 if (bearingKickLeft - bearingKickRight) > 60:
                     # even an inaccurate straight kick will work
                     if (30 < bearingKickLeft and -30 > bearingKickLeft):

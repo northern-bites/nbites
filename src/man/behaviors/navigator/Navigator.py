@@ -235,7 +235,7 @@ class Navigator(FSA.FSA):
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
-    def walkAndKick(self, ball_rel_x, ball_rel_y, theta, speed):
+    def walkAndKick(self, ball_rel_x, ball_rel_y, theta, speed, kick):
         """
         Starts a new velocity walk command and enques a motion kick.
         Does nothing if it the velocities the same as the current velocities.
@@ -249,7 +249,7 @@ class Navigator(FSA.FSA):
         if ball_rel_y < 0:
             y = -y
 
-        NavStates.walking.speeds = (x, y, theta, ball_rel_x, ball_rel_y)
+        NavStates.walking.speeds = (x, y, theta, ball_rel_x, ball_rel_y, kick)
         self.switchTo('walkingAndKicking')
 
     def stand(self):

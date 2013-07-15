@@ -87,6 +87,13 @@ RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
 LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.0)
 RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.0)
 
+# Motion kicks
+M_LEFT_SIDE =  Kick("M_Left_Side", x = 11, y = 1.5)
+M_RIGHT_SIDE =  Kick("M_Right_Side", x = 11, y = -1.5)
+
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 15, y = 5.0)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 15, y = -5.0)
+
 def chooseAlignedKickFromKick(player, kick):
     ballRelY = player.brain.ball.stat_rel_y
     if (kick == LEFT_STRAIGHT_KICK or

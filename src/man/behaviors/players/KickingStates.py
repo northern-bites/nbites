@@ -20,7 +20,8 @@ def motionKickExecute(player):
     player.brain.nav.walkAndKick(player.brain.ball.rel_x,
                                  player.brain.ball.rel_y,
                                  0,
-                                 Navigator.SLOW_SPEED)
+                                 Navigator.SLOW_SPEED,
+                                 player.kick)
 
     return player.stay()
 
