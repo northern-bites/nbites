@@ -7,7 +7,7 @@ import DribbleTransitions as dr_trans
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
-from ..util import ifSwitch, switch
+from ..util import *
 from objects import RelRobotLocation, Location
 from math import fabs
 import noggin_constants as nogginConstants

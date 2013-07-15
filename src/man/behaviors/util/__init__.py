@@ -1,1 +1,1 @@
-from Transition import ifSwitch, switch
+from Transition import ifSwitch, switch, stay

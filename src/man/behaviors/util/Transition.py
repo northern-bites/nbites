@@ -43,7 +43,8 @@ def getNextState(fsa, state):
 
 def ifSwitch(predicate, state, nextFrame=False):
     """
-    Python decorator that allows cleaner use of transitions in an FSA.
+    Function that returns a Python decorator that allows cleaner use of 
+    transitions in an FSA.
     See the following website for an explanation of how decorators work:
         http://stackoverflow.com/questions/739654/how-can-i-make-a-chain-of-
         function-decorators-in-python/1594484#1594484
@@ -67,7 +68,6 @@ def ifSwitch(predicate, state, nextFrame=False):
     (2) Decorated transitions are checked after the state is run.
     (3) Order of the decorators decides order of the checks. THE FIRST DECORATOR
         IS ACTUALLY THE LAST ONE CHECKED, REVERSE ORDER!
-    (4) If none of the transitions return True, the FSA stays in the same state.
     """
     def decorator(fn):
         def decoratedFunction(player):
@@ -80,30 +80,37 @@ def ifSwitch(predicate, state, nextFrame=False):
                     return player.goLater(state)
                 else:
                     return player.goNow(state)
-            return player.stay()
 
         return decoratedFunction
     return decorator
 
 def switch(state, nextFrame=False):
     """
-    Overloaded transition decorator, see ifSwitch for complete documentation.
+    Overloaded ifSwitch, see above for complete documentation.
+
     Like ifSwitch decorator but predicate is assumed to be True.
     """
-    def decorator(fn):
-        def decoratedFunction(player):
-            newState = fn(player)
-            if newState:
-                return newState
+    def alwaysTrue(player):
+        return True
 
-            if nextFrame:
-                return player.goLater(state)
-            else:
-                return player.goNow(state)
-            return player.stay()
+    return ifSwitch(alwaysTrue, state, nextFrame)
 
-        return decoratedFunction
-    return decorator
+def stay(fn):
+    """
+    Like ifSwitch, see above for complete documentation.
+
+    Return player.stay() at the end of function call if nothing else is
+    returned. 
+    """
+    def decoratedFunction(player):
+        newState = fn(player)
+        if newState:
+            return newState
+
+        return player.stay()
+
+    return decoratedFunction
+
 class CountTransition:
     """
     Class that represents a transition to a different state based
