@@ -36,7 +36,7 @@ SET( @TABLE_TOP@
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/lab13-bot.mtb"
+  "../../data/tables/lab13.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )

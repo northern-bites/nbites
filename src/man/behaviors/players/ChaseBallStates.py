@@ -7,6 +7,7 @@ import DribbleTransitions as dr_trans
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
+from ..util import *
 from objects import RelRobotLocation, Location
 from math import fabs
 import noggin_constants as nogginConstants
@@ -14,16 +15,13 @@ import time
 
 DRIBBLE_ON_KICKOFF = False
 
+@switch('approachBall')
+@ifSwitch(transitions.shouldFindBall, 'findBall')
 def chase(player):
     """
     Super State to determine what to do from various situations
     """
-
-    if transitions.shouldFindBall(player):
-        return player.goNow('findBall')
-
-    else:
-        return player.goNow('approachBall')
+    pass
 
 def kickoff(player):
     """
