@@ -170,6 +170,29 @@ class Navigator(FSA.FSA):
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
 
+    def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, pedantic = False):
+        """
+        Walks to a RelRobotLocation via B-Human destination walking.
+        Great for close destinations (since odometry gets bad over time) in
+        case loc is bad.
+        Doesn't avoid obstacles! (that would make it very confused and odometry
+        very bad, especially if we're being pushed).
+        Switches to standing at the end.
+        @todo: Calling this again before the other walk is done does some weird stuff
+        """
+        if not isinstance(walkToDest, RelRobotLocation):
+            raise TypeError, "walkToDest must be a RelRobotLocation"
+
+        NavStates.destinationWalkingTo.destQueue.clear()
+
+        NavStates.destinationWalkingTo.destQueue.append(walkToDest)
+        NavStates.destinationWalkingTo.speed = speed
+        NavStates.destinationWalkingTo.pedantic = pedantic
+
+        #reset the counter to make sure walkingTo.firstFrame() is true on entrance
+        #in case we were in walkingTo before as well
+        self.switchTo('destinationWalkingTo')
+
     def walkTo(self, walkToDest, speed = FULL_SPEED):
         """
         Walks to a RelRobotLocation while checking odometry to see if

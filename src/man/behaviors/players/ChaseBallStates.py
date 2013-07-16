@@ -25,6 +25,18 @@ def chase(player):
     else:
         return player.goNow('approachBall')
 
+def walkingTest(player):
+    desty = RelRobotLocation(30,0,0)
+    if player.firstFrame():
+        player.brain.nav.destinationWalkTo(desty,
+                                           Navigator.SLOW_SPEED,
+                                           True)
+
+    if transitions.shouldFindBall(player):
+        return player.goLater('chase')
+
+    return player.stay()
+
 def kickoff(player):
     """
     Have the robot kickoff if it needs to kick it.
@@ -213,17 +225,20 @@ def positionForKick(player):
     positionForKick.kickPose = RelRobotLocation(ball.stat_rel_x - kick_pos[0],
                                                 ball.stat_rel_y - kick_pos[1],
                                                 0)
+
     if player.firstFrame():
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
-        #only enque the new goTo destination once and update it afterwards
-        player.brain.nav.goTo(positionForKick.kickPose,
-                              Navigator.PRECISELY,
-                              Navigator.SLOW_SPEED,
-                              False,
-                              Navigator.ADAPTIVE)
-    else:
-        player.brain.nav.updateDest(positionForKick.kickPose)
+        player.brain.nav.destinationWalkTo(positionForKick.kickPose,
+                                           Navigator.SLOW_SPEED,
+                                           True)
+        # player.brain.nav.goTo(positionForKick.kickPose,
+        #                       Navigator.PRECISELY,
+        #                       Navigator.SLOW_SPEED,
+        #                       False,
+        #                       Navigator.ADAPTIVE)
+    # else:
+    #     player.brain.nav.updateDest(positionForKick.kickPose)
 
     if transitions.shouldFindBall(player):
         player.inKickingState = False
@@ -232,11 +247,11 @@ def positionForKick(player):
     if (transitions.ballInPosition(player, positionForKick.kickPose) or
         player.brain.nav.isAtPosition()):
         player.ballBeforeKick = player.brain.ball
+        # if player.motionKick:
+        #     return player.goNow('motionKickExecute')
+        # else:
         player.brain.nav.stand()
-        if player.motionKick:
-            return player.goNow('motionKickExecute')
-        else:
-            return player.goNow('kickBallExecute')
+        return player.goNow('kickBallExecute')
 
     return player.stay()
 

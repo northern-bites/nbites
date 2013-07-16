@@ -15,6 +15,7 @@
 //#include "Tools/Settings.h"
 #include "Tools/Math/Matrix.h"
 //#include "Platform/SoundPlayer.h"
+#include <iostream>
 
 #include "NaoPaths.h"
 
@@ -366,8 +367,10 @@ void WalkingEngine::updateMotionRequest()
   {
     if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode)
     {
-      if(theMotionRequest.walkRequest.target != Pose2D())
+      if(theMotionRequest.walkRequest.target != Pose2D()) {
+        // std::cout << "Not equal to Pose2D()\n";
         requestedWalkTarget = theMotionRequest.walkRequest.target;
+      }
     }
     else
       requestedWalkTarget = theMotionRequest.walkRequest.speed; // just for sgn(requestedWalkTarget.translation.y)
@@ -1289,8 +1292,15 @@ void WalkingEngine::computeOdometryOffset()
   upcomingOdometryOffset.translation.y *= p.odometryUpcomingScale.translation.y;
   upcomingOdometryOffset.rotation *= p.odometryUpcomingScale.rotation;
 
-  if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode)
+  if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode) {
+    // std::cout << "Pre odom target according to b-human: " << requestedWalkTarget.rotation << "\n";
+    // std::cout << "Pre odom target according to b-human: " << requestedWalkTarget.translation.x << "\n";
+    // std::cout << "Pre odom target according to b-human: " << requestedWalkTarget.translation.y << "\n";
     requestedWalkTarget -= odometryOffset;
+    // std::cout << "Post odom target according to b-human: " << requestedWalkTarget.rotation << "\n";
+    // std::cout << "Post odom target according to b-human: " << requestedWalkTarget.translation.x << "\n";
+    // std::cout << "Post odom target according to b-human: " << requestedWalkTarget.translation.y << "\n";
+  }
 }
 
 //bool WalkingEngine::handleMessage(InMessage& message)

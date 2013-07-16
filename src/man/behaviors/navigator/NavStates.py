@@ -189,6 +189,39 @@ def briefStand(nav):
 
     return nav.stay()
 
+def destinationWalkingTo(nav):
+    """
+    State to be used for destination walking.
+    """
+    if nav.firstFrame():
+        helper.stand(nav)
+        destinationWalkingTo.enqueAZeroVector = False
+        return nav.stay()
+
+    if nav.stateTime > 1 and destinationWalkingTo.enqueAZeroVector:
+        # print "Zero vector"
+        helper.setDestination(nav, RelRobotLocation(0,0,0), 
+                              destinationWalkingTo.speed, 
+                              destinationWalkingTo.pedantic)
+        destinationWalkingTo.enqueAZeroVector = False
+
+    if nav.brain.interface.motionStatus.standing:
+        if len(destinationWalkingTo.destQueue) > 0:
+            dest = destinationWalkingTo.destQueue.popleft()
+            # print "Actual vector"
+            helper.setDestination(nav, dest, 
+                                  destinationWalkingTo.speed, 
+                                  destinationWalkingTo.pedantic)
+            destinationWalkingTo.enqueAZeroVector = True
+            return nav.stay()
+        else:
+            return nav.goNow('standing')
+
+    return nav.stay()
+
+destinationWalkingTo.destQueue = deque()
+destinationWalkingTo.speed = 0
+
 def walkingTo(nav):
     """
     State to be used for odometry walking.
