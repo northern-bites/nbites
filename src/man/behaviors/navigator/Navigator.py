@@ -178,7 +178,6 @@ class Navigator(FSA.FSA):
         Doesn't avoid obstacles! (that would make it very confused and odometry
         very bad, especially if we're being pushed).
         Switches to standing at the end.
-        @todo: Calling this again before the other walk is done does some weird stuff
         """
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
@@ -190,7 +189,8 @@ class Navigator(FSA.FSA):
         NavStates.destinationWalkingTo.pedantic = pedantic
 
         #reset the counter to make sure walkingTo.firstFrame() is true on entrance
-        #in case we were in walkingTo before as well
+        #in case we were in destinationWalkingTo before as well
+        self.counter = 0
         self.switchTo('destinationWalkingTo')
 
     def walkTo(self, walkToDest, speed = FULL_SPEED):

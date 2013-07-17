@@ -199,7 +199,6 @@ def destinationWalkingTo(nav):
         return nav.stay()
 
     if nav.stateTime > 1 and destinationWalkingTo.enqueAZeroVector:
-        # print "Zero vector"
         helper.setDestination(nav, RelRobotLocation(0,0,0), 
                               destinationWalkingTo.speed, 
                               destinationWalkingTo.pedantic)
@@ -208,7 +207,6 @@ def destinationWalkingTo(nav):
     if nav.brain.interface.motionStatus.standing:
         if len(destinationWalkingTo.destQueue) > 0:
             dest = destinationWalkingTo.destQueue.popleft()
-            # print "Actual vector"
             helper.setDestination(nav, dest, 
                                   destinationWalkingTo.speed, 
                                   destinationWalkingTo.pedantic)

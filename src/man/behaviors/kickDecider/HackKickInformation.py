@@ -226,6 +226,9 @@ class KickInformation:
         returns the kick we should do in a shooting situation
         """
         kick = None
+        kick = self.chooseShortFrontKick()
+        kick.h = 0
+        return kick
 
         # Is loc good enough for a kick decision?
         # Need to use aimCenter in decision.
@@ -754,8 +757,8 @@ class KickInformation:
 
     def chooseShortFrontKick(self):
         if self.kickWithLeftFoot():
-            return kicks.LEFT_SHORT_STRAIGHT_KICK
-        return kicks.RIGHT_SHORT_STRAIGHT_KICK
+            return kicks.LEFT_STRAIGHT_KICK
+        return kicks.RIGHT_STRAIGHT_KICK
 
     def chooseQuickFrontKick(self):
         # If our goalie is inactive, always use short front kicks.

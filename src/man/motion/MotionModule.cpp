@@ -2,9 +2,6 @@
 #include "Profiler.h"
 #include <fstream>
 
-// Default speed for destination and odometry walk
-#define DEFAULT_SPEED .5f
-
 namespace man
 {
 namespace motion

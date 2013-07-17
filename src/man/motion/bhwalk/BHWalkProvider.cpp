@@ -215,39 +215,20 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             motionRequest.walkRequest.mode = WalkRequest::targetMode;
 
-            motionRequest.walkRequest.speed.rotation = 1.0;
-            motionRequest.walkRequest.speed.translation.x = 1.0;
-            motionRequest.walkRequest.speed.translation.y = 1.0;
+            motionRequest.walkRequest.speed.rotation = command->gain;
+            motionRequest.walkRequest.speed.translation.x = command->gain;
+            motionRequest.walkRequest.speed.translation.y = command->gain;
 
-            if (command->theta_rads == 0. && command->x_mm == 0. && 
-                command->y_mm == 0.) {
-                // std::cout << "Setting target to zero\n";
-                motionRequest.walkRequest.target = Pose2D();
-
-                // TODO add heading
-                if (walkingEngine.requestedWalkTarget.translation.x < 5. && 
-                    walkingEngine.requestedWalkTarget.translation.x > -5. && 
-                    walkingEngine.requestedWalkTarget.translation.y < 5. &&
-                    walkingEngine.requestedWalkTarget.translation.y > -5. &&
-                    walkingEngine.requestedWalkTarget.translation.x != 0. && 
-                    walkingEngine.requestedWalkTarget.translation.y != 0.) {
-
-                    // std::cout << "Stopping!!!\n";
-                    motionRequest.motion = MotionRequest::stand;
-                    walkingEngine.theMotionRequest = motionRequest;
-                    return;
-                }
-            }
-            else {
-                motionRequest.walkRequest.target.rotation = command->theta_rads;
-                motionRequest.walkRequest.target.translation.x = command->x_mm;
-                motionRequest.walkRequest.target.translation.y = command->y_mm;
-            }
-
-            // std::cout << "Check it:\n";
-            // std::cout << motionRequest.walkRequest.target.rotation << "\n";
-            // std::cout << motionRequest.walkRequest.target.translation.x << "\n";
-            // std::cout << motionRequest.walkRequest.target.translation.y << "\n";
+            // if (command->theta_rads == 0. && command->x_mm == 0. && 
+            //     command->y_mm == 0.) {
+            //     // std::cout << "Setting target to zero\n";
+            //     motionRequest.walkRequest.target = Pose2D();
+            // }
+            // else {
+            motionRequest.walkRequest.target.rotation = command->theta_rads;
+            motionRequest.walkRequest.target.translation.x = command->x_mm;
+            motionRequest.walkRequest.target.translation.y = command->y_mm;
+            // }
 
             motionRequest.walkRequest.pedantic = command->pedantic;
 

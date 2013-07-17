@@ -698,6 +698,9 @@ private:
   Pose2D upcomingOdometryOffset;
   bool upcomingOdometryOffsetValid;
 
+  // Northern Bites hack for a destination walk that stops itself
+  bool shouldStand;
+
   // Northern Bites hack for instability issues
   bool shouldReset;
 

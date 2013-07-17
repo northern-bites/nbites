@@ -40,6 +40,9 @@
 // For Conversions
 #include "NBMath.h"
 
+// Default speed for destination and odometry walk
+#define DEFAULT_SPEED .5f
+
 namespace man
 {
 namespace motion
@@ -113,8 +116,6 @@ public:
      *
      * Good for walking into a specific (x, y, h) position for the robot.
      *
-     * TODO: make turning on pedantic (stable, but less fast mode)
-     * as an option in the command
      */
     void sendMotionCommand(const DestinationCommand::ptr command);
     void sendMotionCommand(messages::DestinationWalk command);

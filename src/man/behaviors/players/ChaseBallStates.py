@@ -24,7 +24,7 @@ def chase(player):
     pass
 
 def walkingTest(player):
-    desty = RelRobotLocation(30,0,0)
+    desty = RelRobotLocation(20,0,0)
     if player.firstFrame():
         player.brain.nav.destinationWalkTo(desty,
                                            Navigator.SLOW_SPEED,
@@ -63,7 +63,7 @@ def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
+            player.brain.nav.chaseBall(Navigator.BRISK_SPEED, fast = True)
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
@@ -227,16 +227,11 @@ def positionForKick(player):
     if player.firstFrame():
         # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
+
+    if positionForKick.kickPose.dist > 20:
         player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.SLOW_SPEED,
                                            True)
-        # player.brain.nav.goTo(positionForKick.kickPose,
-        #                       Navigator.PRECISELY,
-        #                       Navigator.SLOW_SPEED,
-        #                       False,
-        #                       Navigator.ADAPTIVE)
-    # else:
-    #     player.brain.nav.updateDest(positionForKick.kickPose)
 
     if transitions.shouldFindBall(player):
         player.inKickingState = False

@@ -62,7 +62,8 @@ inline float saveAcosh(float xf)
 WalkingEngine::WalkingEngine() : emergencyShutOff(false), currentMotionType(stand),
   testing(false), testingNextParameterSet(0),
 //  optimizeStarted(false), optimizeStartTime(0),
-  instable(true), beginOfStable(0), lastExecutedWalkingKick(WalkRequest::none)
+  instable(true), beginOfStable(0), lastExecutedWalkingKick(WalkRequest::none),
+  shouldStand(false)
 {
 //  theInstance = this;
   observedPendulumPlayer.walkingEngine = this;
@@ -361,16 +362,19 @@ void WalkingEngine::updateHandSpeeds()
 
 void WalkingEngine::updateMotionRequest()
 {
-    static int instabilityCount = 0;
+  static int instabilityCount = 0;
+  bool haveReachedDestination = false;
 
   if(theMotionRequest.motion == MotionRequest::walk)
   {
     if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode)
     {
       if(theMotionRequest.walkRequest.target != Pose2D()) {
-        // std::cout << "Not equal to Pose2D()\n";
+        shouldStand = false;
         requestedWalkTarget = theMotionRequest.walkRequest.target;
       }
+      else if(shouldStand)
+        haveReachedDestination = true;
     }
     else
       requestedWalkTarget = theMotionRequest.walkRequest.speed; // just for sgn(requestedWalkTarget.translation.y)
@@ -407,7 +411,7 @@ void WalkingEngine::updateMotionRequest()
         bool mirrored = kickPlayer.isKickMirrored(theMotionRequest.walkRequest.kickType);
         requestedMotionType = mirrored ? standLeft : standRight;
       }
-      else
+      else if(!haveReachedDestination)
         requestedMotionType = stepping;
     }
 
@@ -1165,15 +1169,32 @@ void WalkingEngine::generateNextStepSize(SupportLeg nextSupportLeg, StepType las
           if((next.s.rotation < 0.f && nextSupportLeg == left) || (next.s.rotation > 0.f && nextSupportLeg != left))
             next.s.rotation = 0.f;
 
-          // clip to walk target
           if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode)
           {
+            // clip to walk target
             if((next.s.translation.x > 0.f && walkTarget.translation.x > 0.f && next.s.translation.x * p.odometryUpcomingScale.translation.x > walkTarget.translation.x) || (next.s.translation.x < 0.f && walkTarget.translation.x < 0.f && next.s.translation.x * p.odometryUpcomingScale.translation.x < walkTarget.translation.x))
               next.s.translation.x = walkTarget.translation.x / p.odometryUpcomingScale.translation.x;
             if((next.s.translation.y > 0.f && walkTarget.translation.y > 0.f && next.s.translation.y * p.odometryUpcomingScale.translation.y > walkTarget.translation.y) || (next.s.translation.y < 0.f && walkTarget.translation.y < 0.f && next.s.translation.y * p.odometryUpcomingScale.translation.y < walkTarget.translation.y))
               next.s.translation.y = walkTarget.translation.y / p.odometryUpcomingScale.translation.y;
             if((next.s.rotation > 0.f && walkTarget.rotation > 0.f && next.s.rotation * p.odometryUpcomingScale.rotation > walkTarget.rotation) || (next.s.rotation < 0.f && walkTarget.rotation < 0.f && next.s.rotation * p.odometryUpcomingScale.rotation < walkTarget.rotation))
               next.s.rotation = walkTarget.rotation / p.odometryUpcomingScale.rotation;
+
+            // go to stand if close to destination
+            Pose2D targetAfterStep = Pose2D(walkTarget.rotation - (next.s.rotation * p.odometryUpcomingScale.rotation),
+                                            walkTarget.translation.x - (next.s.translation.x * p.odometryUpcomingScale.translation.x),
+                                            walkTarget.translation.y - (next.s.translation.y * p.odometryUpcomingScale.translation.y));
+
+            // std::cout << "Target according to b-human: " << walkTarget.rotation << "\n";
+            // std::cout << "Target according to b-human: " << walkTarget.translation.x << "\n";
+            // std::cout << "Target according to b-human: " << walkTarget.translation.y << "\n\n";
+            // std::cout << "Target after step: " << targetAfterStep.rotation << "\n";
+            // std::cout << "Target after step: " << targetAfterStep.translation.x << "\n";
+            // std::cout << "Target after step: " << targetAfterStep.translation.y << "\n\n";
+
+            // TODO add rotation check
+            if(targetAfterStep.translation.x < 5. && targetAfterStep.translation.x > -5. && 
+               targetAfterStep.translation.y < 5. && targetAfterStep.translation.y > -5.)
+              shouldStand = true;
           }
         }
 
@@ -1503,7 +1524,7 @@ void WalkingEngine::PendulumPlayer::computeSwapTimes(float t, float xt, float xv
 
   Parameters& p = walkingEngine->p;
 
-  if(errory != 0.f && walkingEngine->balanceStepSize.y != 0.f && kickType == WalkRequest::none /*&& !walkingEngine->theMotionRequest.walkRequest.pedantic*/)
+  if(errory != 0.f && walkingEngine->balanceStepSize.y != 0.f && kickType == WalkRequest::none && !walkingEngine->theMotionRequest.walkRequest.pedantic)
   {
     ASSERT(next.xv0.y == 0.f);
     float sy = next.xtb.y * -2.f;
