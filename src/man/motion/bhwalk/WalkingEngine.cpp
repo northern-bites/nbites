@@ -196,12 +196,10 @@ void WalkingEngine::init()
   }
   p.computeContants();
 
-  //TODO: make the ground contact detector work
-  //right now the ground contact detection is off - trick motion into thinking it's broken
-  theDamageConfiguration.useGroundContactDetection = false;
+  theDamageConfiguration.useGroundContactDetection = true;
   theDamageConfiguration.useGroundContactDetectionForLEDs = false;
   theDamageConfiguration.useGroundContactDetectionForSafeStates = false;
-  theDamageConfiguration.useGroundContactDetectionForSensorCalibration = false;
+  theDamageConfiguration.useGroundContactDetectionForSensorCalibration = true;
 
 #ifdef TARGET_SIM
   p.observerMeasurementDelay = 60.f;
@@ -215,7 +213,7 @@ void WalkingEngine::update()
 {
 
     //set the motion selection
-//    theMotionRequest.walkRequest.pedantic = false;
+    //    theMotionRequest.walkRequest.pedantic = false;
 
     //get new joint, sensor and frame info data
     theFrameInfo.cycleTime = 0.01f;
@@ -225,6 +223,7 @@ void WalkingEngine::update()
     for(int i = 0; i < JointData::numOfJoints; ++i) {
         theJointData.angles[i] = theJointData.angles[i] * (float)theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
     }
+
     //calibrate sensors
     theSensorData.data[SensorData::gyroX] *= theSensorCalibration.gyroXGain / 1600;
     theSensorData.data[SensorData::gyroY] *= theSensorCalibration.gyroYGain / 1600;
@@ -249,6 +248,14 @@ void WalkingEngine::update()
     //update the robot model - this computes the CoM
     robotModelProvider.update(theRobotModel, theFilteredJointData,
                               theRobotDimensions, theMassCalibration);
+    groundContactDetector.update(theGroundContactState, theSensorData,
+                                 theFrameInfo, theMotionRequest, theMotionInfo);
+
+    // std::cout << "Ground contact detector:\n";
+    // std::cout << theGroundContactState.contact << "\n";
+    // std::cout << theGroundContactState.contactSafe << "\n";
+    // std::cout << theGroundContactState.noContactSafe << "\n";
+
     inertiaSensorInspector.update(theInspectedInertiaSensorData, theSensorData);
     inertiaSensorCalibrator.update(theInertiaSensorData, theInspectedInertiaSensorData,
             theFrameInfo, theRobotModel, theGroundContactState, theMotionSelection, theMotionInfo,
@@ -1314,13 +1321,7 @@ void WalkingEngine::computeOdometryOffset()
   upcomingOdometryOffset.rotation *= p.odometryUpcomingScale.rotation;
 
   if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode) {
-    // std::cout << "Pre odom target according to b-human: " << requestedWalkTarget.rotation << "\n";
-    // std::cout << "Pre odom target according to b-human: " << requestedWalkTarget.translation.x << "\n";
-    // std::cout << "Pre odom target according to b-human: " << requestedWalkTarget.translation.y << "\n";
     requestedWalkTarget -= odometryOffset;
-    // std::cout << "Post odom target according to b-human: " << requestedWalkTarget.rotation << "\n";
-    // std::cout << "Post odom target according to b-human: " << requestedWalkTarget.translation.x << "\n";
-    // std::cout << "Post odom target according to b-human: " << requestedWalkTarget.translation.y << "\n";
   }
 }
 

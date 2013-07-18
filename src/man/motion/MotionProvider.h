@@ -73,6 +73,7 @@ namespace motion
 
         virtual void calculateNextJointsAndStiffnesses(
             std::vector<float>&            sensorAngles,
+            std::vector<float>&            sensorCurrents,
             const messages::InertialState& sensorInertials,
             const messages::FSR&           sensorFSRs
             ) = 0;

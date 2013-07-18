@@ -51,6 +51,7 @@ void MotionModule::run_()
     // (1) Before anything else happens, it is important to
     //     retrieve the correct current joint angles.
     jointsInput_.latch();
+    currentsInput_.latch();
     inertialsInput_.latch();
     fsrInput_.latch();
     stiffnessInput_.latch();
@@ -59,7 +60,8 @@ void MotionModule::run_()
     requestInput_.latch();
     fallInput_.latch();
 
-    sensorAngles    = toJointAngles(jointsInput_.message());
+    sensorAngles   = toJointAngles(jointsInput_.message());
+    sensorCurrents = toJointAngles(currentsInput_.message());
 
     newInputJoints = false;
 
@@ -203,15 +205,18 @@ void MotionModule::processBodyJoints()
             walkProvider.setStandby(true);
             //"fake" calculate - this is just for the sensor computation
             walkProvider.calculateNextJointsAndStiffnesses(
-                sensorAngles, inertialsInput_.message(), fsrInput_.message());
+                sensorAngles, sensorCurrents,
+                inertialsInput_.message(), fsrInput_.message());
             curProvider->calculateNextJointsAndStiffnesses(
-                sensorAngles, inertialsInput_.message(), fsrInput_.message());
+                sensorAngles, sensorCurrents,
+                inertialsInput_.message(), fsrInput_.message());
         }
         else
         {
             walkProvider.setStandby(false);
             walkProvider.calculateNextJointsAndStiffnesses(
-                sensorAngles, inertialsInput_.message(), fsrInput_.message());
+                sensorAngles, sensorCurrents, 
+                inertialsInput_.message(), fsrInput_.message());
         }
 
         const std::vector<float> llegJoints =
@@ -257,7 +262,7 @@ void MotionModule::processHeadJoints()
     if (curHeadProvider->isActive())
     {
         curHeadProvider->calculateNextJointsAndStiffnesses(
-            sensorAngles,
+            sensorAngles, sensorCurrents,
             inertialsInput_.message(),
             fsrInput_.message());
         std::vector<float> headJoints =

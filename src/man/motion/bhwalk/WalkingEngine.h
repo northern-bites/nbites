@@ -17,7 +17,7 @@
 #include "Modules/Sensing/InertiaSensorFilter.h"
 #include "Modules/Sensing/SensorFilter.h"
 #include "Modules/Sensing/FallDownStateDetector.h"
-//#include "Modules/Sensing/GroundContactDetector.h"
+#include "Modules/Sensing/GroundContactDetector.h"
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Configuration/MassCalibration.h"
 #include "Representations/Configuration/JointCalibration.h"
@@ -567,8 +567,7 @@ private:
   RobotModel theRobotModel;
   RobotModelProvider robotModelProvider;
 
-  //not using this ATM - assume we're contacting the ground safely
-//  GroundContactDetector groundContactDetector;
+  GroundContactDetector groundContactDetector;
   GroundContactState theGroundContactState;
 
   //removes faulty deviant sensor data

@@ -213,6 +213,7 @@ public:
 
     /* Input/Output related to executing motion commands. */
     portals::InPortal<messages::JointAngles>       jointsInput_;
+    portals::InPortal<messages::JointAngles>       currentsInput_;
     portals::InPortal<messages::InertialState>     inertialsInput_;
     portals::InPortal<messages::FSR>               fsrInput_;
     portals::InPortal<messages::MotionCommand>     bodyCommandInput_;
@@ -280,6 +281,7 @@ private:
 
     // Last information retrieved from the sensors.
     std::vector<float>      sensorAngles;
+    std::vector<float>      sensorCurrents;
     std::vector<float>      sensorStiffnesses;
 
     std::vector<float>      nextJoints;

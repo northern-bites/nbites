@@ -46,6 +46,48 @@ namespace man
 
         END_JOINTS,
 
+        /** Currents **/
+
+        // Head joints
+        HeadYawCurrent,
+        HeadPitchCurrent,
+
+        // Left Arm joints
+        LShoulderPitchCurrent,
+        LShoulderRollCurrent,
+        LElbowYawCurrent,
+        LElbowRollCurrent,
+
+        // Left Leg joints
+        LHipYawPitchCurrent,
+        LHipRollCurrent,
+        LHipPitchCurrent,
+        LKneePitchCurrent,
+        LAnklePitchCurrent,
+        LAnkleRollCurrent,
+
+        // Right Leg joints
+        RHipYawPitchCurrent,
+        RHipRollCurrent,
+        RHipPitchCurrent,
+        RKneePitchCurrent,
+        RAnklePitchCurrent,
+        RAnkleRollCurrent,
+
+        // Right Arm joints
+        RShoulderPitchCurrent,
+        RShoulderRollCurrent,
+        RElbowYawCurrent,
+        RElbowRollCurrent,
+
+        // Hand joints
+        LWristYawCurrent,
+        LHandCurrent,
+        RWristYawCurrent,
+        RHandCurrent,
+
+        END_CURRENTS,
+
         /** Temperatures **/
 
         // Head joints
@@ -57,22 +99,9 @@ namespace man
         LShoulderRollTemp,
         LElbowYawTemp,
         LElbowRollTemp,
-        LWristYawTemp,
-        LHandTemp,
-
-        // Right Arm joints
-        RShoulderPitchTemp,
-        RShoulderRollTemp,
-        RElbowYawTemp,
-        RElbowRollTemp,
-        RWristYawTemp,
-        RHandTemp,
-
-        // Pelvis joints
-        LHipYawPitchTemp,
-        RHipYawPitchTemp,
 
         // Left Leg joints
+        LHipYawPitchTemp,
         LHipRollTemp,
         LHipPitchTemp,
         LKneePitchTemp,
@@ -80,11 +109,24 @@ namespace man
         LAnkleRollTemp,
 
         // Right Leg joints
+        RHipYawPitchTemp,
         RHipRollTemp,
         RHipPitchTemp,
         RKneePitchTemp,
         RAnklePitchTemp,
         RAnkleRollTemp,
+
+        // Right Arm joints
+        RShoulderPitchTemp,
+        RShoulderRollTemp,
+        RElbowYawTemp,
+        RElbowRollTemp,
+
+        // Hand joints
+        LWristYawTemp,
+        LHandTemp,
+        RWristYawTemp,
+        RHandTemp,
 
         END_TEMPERATURES,
 
@@ -126,9 +168,6 @@ namespace man
            the string keys are too unique to loop over.     */
         // The battery charge.
         BatteryCharge,
-        /* IMPORTANT for some reason, battery charge cannot be read correctly unless
-         * battery current is read also, who knows why, bad aldebaran code?
-         * NOT ACTUALLY OUTPORTALED OR USED AT ALL, current is needed for bug fix */
         BatteryCurrent,
 
         /** Ultrasonic (sonar) sensors **/
@@ -211,6 +250,34 @@ namespace man
         "RWristYaw",
         "RHand",
         "!!END!!",
+        // CURRENTS
+        "HeadYawCurrent",
+        "HeadPitchCurrent",
+        "LShoulderPitchCurrent",
+        "LShoulderRollCurrent",
+        "LElbowYawCurrent",
+        "LElbowRollCurrent",
+        "LHipYawPitchCurrent",
+        "LHipRollCurrent",
+        "LHipPitchCurrent",
+        "LKneePitchCurrent",
+        "LAnklePitchCurrent",
+        "LAnkleRollCurrent",
+        "RHipYawPitchCurrent",
+        "RHipRollCurrent",
+        "RHipPitchCurrent",
+        "RKneePitchCurrent",
+        "RAnklePitchCurrent",
+        "RAnkleRollCurrent",
+        "RShoulderPitchCurrent",
+        "RShoulderRollCurrent",
+        "RElbowYawCurrent",
+        "RElbowRollCurrent",
+        "LWristYawCurrent",
+        "LHandCurrent",
+        "RWristYawCurrent",
+        "RHandCurrent",
+        "!!END!!",
         // TEMPS
         "HeadYawTemp",
         "HeadPitchTemp",
@@ -218,39 +285,39 @@ namespace man
         "LShoulderRollTemp",
         "LElbowYawTemp",
         "LElbowRollTemp",
-        "LWristYawTemp",
-        "LHandTemp",
-        "RShoulderPitchTemp",
-        "RShoulderRollTemp",
-        "RElbowYawTemp",
-        "RElbowRollTemp",
-        "RWristYawTemp",
-        "RHandTemp",
         "LHipYawPitchTemp",
-        "RHipYawPitchTemp",
         "LHipRollTemp",
         "LHipPitchTemp",
         "LKneePitchTemp",
         "LAnklePitchTemp",
         "LAnkleRollTemp",
+        "RHipYawPitchTemp",
         "RHipRollTemp",
         "RHipPitchTemp",
         "RKneePitchTemp",
         "RAnklePitchTemp",
         "RAnkleRollTemp",
+        "RShoulderPitchTemp",
+        "RShoulderRollTemp",
+        "RElbowYawTemp",
+        "RElbowRollTemp",
+        "LWristYawTemp",
+        "LHandTemp",
+        "RWristYawTemp",
+        "RHandTemp",
         "!!END!!",
         //FSRS
         // left
-        "LFsrFL",
-        "LFsrFR",
-        "LFsrRL",
-        "LFsrRR",
+        "FrontLeft",
+        "FrontRight",
+        "RearLeft",
+        "RearRight",
         "!!END!!",
         // right
-        "RFsrFL",
-        "RFsrFR",
-        "RFsrRL",
-        "RFsrRR",
+        "FrontLeft",
+        "FrontRight",
+        "RearLeft",
+        "RearRight",
         "!!END!!",
         //INERTIALS
         "AccX",
@@ -263,9 +330,6 @@ namespace man
         "!!END!!",
         //OTHERS
         "BatteryCharge",
-        /* IMPORTANT for some reason, battery charge cannot be read correctly unless
-         * battery current is read also, who knows why, bad aldebaran code?
-         * NOT ACTUALLY OUTPORTALED OR USED AT ALL, current is needed for bug fix */
         "BatteryCurrent",
         "USLeft",
         "USRight",
@@ -274,7 +338,7 @@ namespace man
         "RFootBumperLeft",
         "RFootBumperRight",
         "ChestboardButton",
-        // Stiffness values
+        // STIFFNESSES
         "HeadPitchStiff",
         "HeadYawStiff",
         "LAnklePitchStiff",
