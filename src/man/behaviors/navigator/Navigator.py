@@ -193,6 +193,10 @@ class Navigator(FSA.FSA):
         self.counter = 0
         self.switchTo('destinationWalkingTo')
 
+    def updateDestinationWalkDest(self, dest):
+        """  Update the destination we're headed to   """
+        NavStates.destinationWalkingTo.destQueue.append(dest)
+
     def walkTo(self, walkToDest, speed = FULL_SPEED):
         """
         Walks to a RelRobotLocation while checking odometry to see if

@@ -23,18 +23,6 @@ def chase(player):
     """
     pass
 
-def walkingTest(player):
-    desty = RelRobotLocation(20,0,0)
-    if player.firstFrame():
-        player.brain.nav.destinationWalkTo(desty,
-                                           Navigator.SLOW_SPEED,
-                                           True)
-
-    if transitions.shouldFindBall(player):
-        return player.goLater('chase')
-
-    return player.stay()
-
 def kickoff(player):
     """
     Have the robot kickoff if it needs to kick it.
@@ -101,7 +89,7 @@ def prepareForKick(player):
         return player.stay()
 
 
-    if player.brain.ball.stat_distance > constants.APPROACH_BALL_AGAIN_DIST:
+    if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
@@ -111,9 +99,9 @@ def prepareForKick(player):
     if hackKick.DEBUG_KICK_DECISION:
         print str(player.kick)
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -162,21 +150,21 @@ def orbitBall(player):
 
     # X correction
     if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
-        player.brain.ball.stat_distance): # Too far away
+        player.brain.ball.distance): # Too far away
         player.brain.nav.setXSpeed(.15)
     elif (constants.ORBIT_BALL_DISTANCE - constants.ORBIT_DISTANCE_CLOSE >
-          player.brain.ball.stat_distance): # Too close
+          player.brain.ball.distance): # Too close
         player.brain.nav.setXSpeed(-.15)
     elif (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_GOOD >
-          player.brain.ball.stat_distance and constants.ORBIT_BALL_DISTANCE -
-          constants.ORBIT_DISTANCE_GOOD < player.brain.ball.stat_distance):
+          player.brain.ball.distance and constants.ORBIT_BALL_DISTANCE -
+          constants.ORBIT_DISTANCE_GOOD < player.brain.ball.distance):
         player.brain.nav.setXSpeed(0)
 
     # H correction
     if relH < 0: # Orbiting clockwise
-        if player.brain.ball.stat_rel_y > 2:
+        if player.brain.ball.rel_y > 2:
             player.brain.nav.setHSpeed(0)
-        elif player.brain.ball.stat_rel_y < -2:
+        elif player.brain.ball.rel_y < -2:
             if relH < -20:
                 player.brain.nav.setHSpeed(-0.35)
             else:
@@ -187,12 +175,12 @@ def orbitBall(player):
             else:
                 player.brain.nav.setHSpeed(-0.15)
     else: # Orbiting counter-clockwise
-        if player.brain.ball.stat_rel_y > 2:
+        if player.brain.ball.rel_y > 2:
             if relH > 20:
                 player.brain.nav.setHSpeed(0.35)
             else:
                 player.brain.nav.setHSpeed(0.2)
-        elif player.brain.ball.stat_rel_y < -2:
+        elif player.brain.ball.rel_y < -2:
             player.brain.nav.setHSpeed(0)
         else:
             if relH > 20:
@@ -211,34 +199,32 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
+    # if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
+    #     if dr_trans.shouldDribble(player):
+    #         return player.goNow('decideDribble')
 
-    if player.corner_dribble:
-        return player.goNow('executeDribble')
+    # if player.corner_dribble:
+    #     return player.goNow('executeDribble')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
-    positionForKick.kickPose = RelRobotLocation(ball.stat_rel_x - kick_pos[0],
-                                                ball.stat_rel_y - kick_pos[1],
+    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
+                                                ball.rel_y - kick_pos[1],
                                                 0)
 
     if player.firstFrame():
-        # Safer when coming from orbit in 1 frame. Still works otherwise, too.
         player.brain.tracker.lookStraightThenTrack()
-
-    if positionForKick.kickPose.dist > 20:
         player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.SLOW_SPEED,
                                            True)
+    elif player.brain.ball.vis.on: # don't update if we don't see the ball
+        player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
     if transitions.shouldFindBall(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if (transitions.ballInPosition(player, positionForKick.kickPose) or
-        player.brain.nav.isAtPosition()):
+    if transitions.ballInPosition(player, positionForKick.kickPose):
         player.ballBeforeKick = player.brain.ball
         # if player.motionKick:
         #     return player.goNow('motionKickExecute')

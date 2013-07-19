@@ -221,16 +221,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.speed.translation.x = command->gain;
             motionRequest.walkRequest.speed.translation.y = command->gain;
 
-            // if (command->theta_rads == 0. && command->x_mm == 0. && 
-            //     command->y_mm == 0.) {
-            //     // std::cout << "Setting target to zero\n";
-            //     motionRequest.walkRequest.target = Pose2D();
-            // }
-            // else {
             motionRequest.walkRequest.target.rotation = command->theta_rads;
             motionRequest.walkRequest.target.translation.x = command->x_mm;
             motionRequest.walkRequest.target.translation.y = command->y_mm;
-            // }
 
             motionRequest.walkRequest.pedantic = command->pedantic;
 

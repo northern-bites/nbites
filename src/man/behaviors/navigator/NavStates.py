@@ -194,26 +194,21 @@ def destinationWalkingTo(nav):
     State to be used for destination walking.
     """
     if nav.firstFrame():
-        helper.stand(nav)
         destinationWalkingTo.enqueAZeroVector = False
         return nav.stay()
 
-    if nav.stateTime > 1 and destinationWalkingTo.enqueAZeroVector:
+    if len(destinationWalkingTo.destQueue) > 0:
+        dest = destinationWalkingTo.destQueue.popleft()
+        helper.setDestination(nav, dest, 
+                              destinationWalkingTo.speed, 
+                              destinationWalkingTo.pedantic)
+        destinationWalkingTo.enqueAZeroVector = True
+        return nav.stay()
+    elif destinationWalkingTo.enqueAZeroVector:
         helper.setDestination(nav, RelRobotLocation(0,0,0), 
                               destinationWalkingTo.speed, 
                               destinationWalkingTo.pedantic)
         destinationWalkingTo.enqueAZeroVector = False
-
-    if nav.brain.interface.motionStatus.standing:
-        if len(destinationWalkingTo.destQueue) > 0:
-            dest = destinationWalkingTo.destQueue.popleft()
-            helper.setDestination(nav, dest, 
-                                  destinationWalkingTo.speed, 
-                                  destinationWalkingTo.pedantic)
-            destinationWalkingTo.enqueAZeroVector = True
-            return nav.stay()
-        else:
-            return nav.goNow('standing')
 
     return nav.stay()
 
