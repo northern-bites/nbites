@@ -574,8 +574,6 @@ private:
   InspectedInertiaSensorData theInspectedInertiaSensorData;
   InertiaSensorInspector inertiaSensorInspector;
 
-  //damage configuration should say we don't trust the ground contact state
-  //that's because the ground contact detector is not in use currently;
   DamageConfiguration theDamageConfiguration;
   InertiaSensorData theInertiaSensorData;
   InertiaSensorCalibrator inertiaSensorCalibrator;
