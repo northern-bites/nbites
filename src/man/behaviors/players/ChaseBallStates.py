@@ -109,8 +109,6 @@ def orbitBall(player):
     """
     State to orbit the ball
     """
-    return player.goNow('positionForKick')
-
     # Calculate relative heading every frame
     relH = player.kick.h - player.brain.loc.h
 
@@ -224,13 +222,13 @@ def positionForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
+    player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
-        player.ballBeforeKick = player.brain.ball
-        # if player.motionKick:
-        #     return player.goNow('motionKickExecute')
-        # else:
-        player.brain.nav.stand()
-        return player.goNow('kickBallExecute')
+        if player.motionKick:
+            return player.goNow('motionKickExecute')
+        else:
+            player.brain.nav.stand()
+            return player.goNow('kickBallExecute')
 
     return player.stay()
 

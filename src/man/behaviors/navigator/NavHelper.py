@@ -116,22 +116,21 @@ def createAndSendWalkVector(nav, x, y, theta):
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
-def createAndSendMotionKickVector(nav, x, y, theta, ball_rel_x, ball_rel_y, kick):
-    createAndSendWalkVector(nav, x, y, theta)
+def createAndSendMotionKickVector(nav, ball_rel_x, ball_rel_y, kick):
     command = nav.brain.interface.bodyMotionCommand
 
-    command.speed.perform_motion_kick = True
-    command.speed.ball_rel_x = ball_rel_x
-    command.speed.ball_rel_y = ball_rel_y
+    command.dest.kick.perform_motion_kick = True
+    command.dest.kick.ball_rel_x = ball_rel_x
+    command.dest.kick.ball_rel_y = ball_rel_y
 
-    if kick == M_LEFT_SIDE:
-        command.speed.kick_type = 0
-    elif kick == M_RIGHT_SIDE:
-        command.speed.kick_type = 1
-    elif kick == M_LEFT_STRAIGHT:
-        command.speed.kick_type = 2
-    elif kick == M_RIGHT_STRAIGHT:
-        command.speed.kick_type = 3
+    if kick == kicks.M_LEFT_SIDE:
+        command.dest.kick.kick_type = 0
+    elif kick == kicks.M_RIGHT_SIDE:
+        command.dest.kick.kick_type = 1
+    elif kick == kicks.M_LEFT_STRAIGHT:
+        command.dest.kick.kick_type = 2
+    elif kick == kicks.M_RIGHT_STRAIGHT:
+        command.dest.kick.kick_type = 3
 
 def executeMove(nav, sweetMove):
     """

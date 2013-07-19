@@ -262,22 +262,12 @@ class Navigator(FSA.FSA):
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
-    def walkAndKick(self, ball_rel_x, ball_rel_y, theta, speed, kick):
+    def doMotionKick(self, player, ball_rel_x, ball_rel_y, kick):
         """
-        Starts a new velocity walk command and enques a motion kick.
-        Does nothing if it the velocities the same as the current velocities.
+        Enques a motion kick. Does not transition to an FSA state, so that
+        motion kicking can be done with any of our walks.
         """
-        # We will walk in the direction of the ball with a speed equal to speed 
-        x = sqrt(speed**2/(ball_rel_y**2/ball_rel_x**2 + 1))
-        y = sqrt(speed**2/(ball_rel_x**2/ball_rel_y**2 + 1))
-
-        if ball_rel_x < 0:
-            x = -x
-        if ball_rel_y < 0:
-            y = -y
-
-        NavStates.walking.speeds = (x, y, theta, ball_rel_x, ball_rel_y, kick)
-        self.switchTo('walkingAndKicking')
+        helper.createAndSendMotionKickVector(player, ball_rel_x, ball_rel_y, kick)
 
     def stand(self):
         """

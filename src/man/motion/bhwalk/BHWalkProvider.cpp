@@ -188,24 +188,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.speed.translation.x = command->x_percent;
             motionRequest.walkRequest.speed.translation.y = command->y_percent;
 
-            // Let's do some motion kicking!
-            if (command->motionKick) {
-                if (command->kickType == 0) {
-                    motionRequest.walkRequest.kickType = WalkRequest::left;
-                }
-                else if (command->kickType == 1) {
-                    motionRequest.walkRequest.kickType = WalkRequest::right;
-                }
-                else if (command->kickType == 2) {
-                    motionRequest.walkRequest.kickType = WalkRequest::sidewardsLeft;
-                }
-                else {
-                    motionRequest.walkRequest.kickType = WalkRequest::sidewardsRight;
-                }
-                motionRequest.walkRequest.kickBallPosition.x = command->kickBallRelX;
-                motionRequest.walkRequest.kickBallPosition.y = command->kickBallRelY;
-            }
-
             walkingEngine.theMotionRequest = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
@@ -226,6 +208,24 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.target.translation.y = command->y_mm;
 
             motionRequest.walkRequest.pedantic = command->pedantic;
+
+            // Let's do some motion kicking!
+            if (command->motionKick) {
+                if (command->kickType == 0) {
+                    motionRequest.walkRequest.kickType = WalkRequest::sidewardsLeft;
+                }
+                else if (command->kickType == 1) {
+                    motionRequest.walkRequest.kickType = WalkRequest::sidewardsRight;
+                }
+                else if (command->kickType == 2) {
+                    motionRequest.walkRequest.kickType = WalkRequest::left;
+                }
+                else {
+                    motionRequest.walkRequest.kickType = WalkRequest::right;
+                }
+                motionRequest.walkRequest.kickBallPosition.x = command->kickBallRelX;
+                motionRequest.walkRequest.kickBallPosition.y = command->kickBallRelY;
+            }
 
             walkingEngine.theMotionRequest = motionRequest;
         }

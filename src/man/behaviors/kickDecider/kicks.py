@@ -102,6 +102,12 @@ def chooseAlignedKickFromKick(player, kick):
             return LEFT_STRAIGHT_KICK
         else:
             return RIGHT_STRAIGHT_KICK
+    elif (kick == M_LEFT_STRAIGHT or
+        kick == M_RIGHT_STRAIGHT):
+        if ballRelY > 0:
+            return M_LEFT_STRAIGHT
+        else:
+            return M_RIGHT_STRAIGHT
     elif (kick == LEFT_DRIBBLE or
         kick == RIGHT_DRIBBLE):
         if ballRelY > 0:

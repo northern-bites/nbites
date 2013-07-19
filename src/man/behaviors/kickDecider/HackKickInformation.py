@@ -226,9 +226,6 @@ class KickInformation:
         returns the kick we should do in a shooting situation
         """
         kick = None
-        kick = self.chooseShortFrontKick()
-        kick.h = 0
-        return kick
 
         # Is loc good enough for a kick decision?
         # Need to use aimCenter in decision.
@@ -333,30 +330,11 @@ class KickInformation:
                     print ("Acceptable bearing range for kick: " + str(headingBallToGoalLeft) +
                            "/" + str(headingBallToGoalRight))
 
-                # Motion kicking conditions
-                # (1) Something is blocking where we're looking (50 cm away)
-                # (2) We are behind our opponent's cross
-                # (3) We are facing towards our opponent's side
-                if (self.brain.interface.visionObstacle.mid_dist < 50 and
-                    self.brain.loc.x < constants.LANDMARK_YELLOW_GOAL_CROSS_X and
-                    self.brain.loc.h < 90 and self.brain.loc.h > -90):
-                    # Right side kick
-                    if player.brain.loc.y < 1./2.*nogginConstants.FIELD_HEIGHT:
-                        kick = kicks.M_RIGHT_SIDE
-                        kick.h = 0
-                        return kick
-                    # Left side kick
-                    else:
-                        kick = kicks.M_LEFT_SIDE
-                        kick.h = 0
-                        return kick
-
-                # Sweetmove kicking
                 if (bearingKickLeft - bearingKickRight) > 60:
                     # even an inaccurate straight kick will work
                     if (30 < bearingKickLeft and -30 > bearingKickLeft):
-                        #choose a straight kick with no orbit NOW!
-                        kick = self.chooseShortFrontKick()
+                        #choose a straight motion kick with no orbit NOW!
+                        kick = self.chooseFrontMotionKick()
                         kick.h = 0
                         return kick
                     elif (bearingKickLeft < 30):
@@ -372,13 +350,15 @@ class KickInformation:
                 if (bearingKickLeft - bearingKickRight > 35):
                     # even an inaccurate side kick will work
                     if (90 < bearingKickLeft and 60 > bearingKickRight):
-                        #choose a right side kick with no orbit NOW!
-                        kick = kicks.RIGHT_SIDE_KICK
+                        #choose a right side motion kick with no orbit NOW!
+                        self.brain.player.motionKick = True
+                        kick = kicks.M_RIGHT_SIDE
                         kick.h = 0
                         return kick
                     elif (-60 < bearingKickLeft and -90 > bearingKickRight):
                         #choose a left side kick with no orbit!
-                        kick = kicks.LEFT_SIDE_KICK
+                        self.brain.player.motionKick = True
+                        kick = kicks.M_LEFT_SIDE
                         kick.h = 0
                         return kick
 
@@ -757,8 +737,14 @@ class KickInformation:
 
     def chooseShortFrontKick(self):
         if self.kickWithLeftFoot():
-            return kicks.LEFT_STRAIGHT_KICK
-        return kicks.RIGHT_STRAIGHT_KICK
+            return kicks.LEFT_SHORT_STRAIGHT_KICK
+        return kicks.RIGHT_SHORT_STRAIGHT_KICK
+
+    def chooseFrontMotionKick(self):
+        self.brain.player.motionKick = True
+        if self.kickWithLeftFoot():
+            return kicks.M_LEFT_STRAIGHT
+        return kicks.M_RIGHT_STRAIGHT
 
     def chooseQuickFrontKick(self):
         # If our goalie is inactive, always use short front kicks.

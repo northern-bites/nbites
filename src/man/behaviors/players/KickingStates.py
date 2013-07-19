@@ -11,23 +11,25 @@ def motionKickExecute(player):
     """
     Do a motion kick.
     """
+    if player.firstFrame():
+        player.motionKick = False
+
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player) or
         transitions.shouldFindBallKick(player)):
         player.inKickingState = False
         return player.goLater('chase')
 
-    player.brain.nav.walkAndKick(player.brain.ball.rel_x,
-                                 player.brain.ball.rel_y,
-                                 0,
-                                 Navigator.SLOW_SPEED,
-                                 player.kick)
+    player.brain.nav.doMotionKick(player, # kind of a hack, nav is going to change soon anyway
+                                  player.brain.ball.rel_x,
+                                  player.brain.ball.rel_y,
+                                  player.kick)
 
     return player.stay()
 
 def kickBallExecute(player):
     """
-    Kick the ball
+    Kick the ball.
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()

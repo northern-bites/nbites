@@ -673,19 +673,12 @@ void MotionModule::sendMotionCommand(const WalkCommand::ptr command)
  */
 void MotionModule::sendMotionCommand(messages::WalkCommand command)
 {
-    float ballRelX = command.ball_rel_x() * CM_TO_MM;
-    float ballRelY = command.ball_rel_y() * CM_TO_MM;
-
     nextProvider = &walkProvider;
     WalkCommand::ptr walkCommand(
         new WalkCommand(
             command.x_percent(),
             command.y_percent(),
-            command.h_percent(),
-            command.perform_motion_kick(),
-            ballRelX,
-            ballRelY,
-            command.kick_type()
+            command.h_percent()
             )
     );
     walkProvider.setCommand(walkCommand);
@@ -925,6 +918,9 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
 
+    float ballRelX = command.kick().ball_rel_x() * CM_TO_MM;
+    float ballRelY = command.kick().ball_rel_y() * CM_TO_MM;
+
     float gain; 
     if(command.gain() > 0.f)
         gain = command.gain();
@@ -938,7 +934,11 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
             relY,
             relH,
             gain,
-            command.pedantic())
+            command.pedantic(),
+            command.kick().perform_motion_kick(),
+            ballRelX,
+            ballRelY,
+            command.kick().kick_type())
         );
     walkProvider.setCommand(newCommand);
 }
