@@ -398,7 +398,7 @@ class KickInformation:
                         kick.h = leftSideBearing
                 else:
                     # choose a straight kick
-                    kick = self.chooseShortFrontKick()
+                    kick = self.chooseFrontMotionKick()
                     kick.h = straightBearing
 
 

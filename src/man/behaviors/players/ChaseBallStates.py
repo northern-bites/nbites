@@ -51,7 +51,7 @@ def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.BRISK_SPEED, fast = True)
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
