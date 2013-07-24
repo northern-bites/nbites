@@ -49,14 +49,17 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             if brain.playerNumber == 2:
                 self.homePosition = BPConstants.evenDefenderHome
                 self.kickoffPosition = self.homePosition
+                self.box = BPConstants.evenDefenderBox
                 self.isDefender = True
             elif brain.playerNumber == 3:
                 self.homePosition = BPConstants.oddDefenderHome
                 self.kickoffPosition = self.homePosition
+                self.box = BPConstants.oddDefenderBox
                 self.isDefender = True
             elif brain.playerNumber == 4:
                 self.homePosition = BPConstants.evenChaserHome
                 self.kickoffPosition = BPConstants.theirKickoff
+                self.box = BPConstants.chaserBox
                 self.isDefender = False
 
         #GOALIE COUNTERS AND BOOLEANS

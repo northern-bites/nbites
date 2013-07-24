@@ -14,7 +14,7 @@ def positionAtHome(player):
     if player.firstFrame():
         player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True, 
-                              fast = True, pb = False)
+                              fast = False, pb = False)
 
 @stay
 @ifSwitch(BoxTransitions.ballInBox, 'chase')

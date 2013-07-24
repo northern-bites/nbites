@@ -7,8 +7,8 @@ def ballInBox(player):
     ball = player.brain.ball
     
     if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
-            ball.x < player.box[0][0] + player.box[2] and \
-            ball.y < player.box[0][1] + player.box[3]:
+            ball.x < player.box[0][0] + player.box[1] and \
+            ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 2:
         return True
     return False
 

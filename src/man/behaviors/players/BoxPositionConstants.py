@@ -20,7 +20,7 @@ evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                                NogginConstants.FIELD_GREEN_HEIGHT - 10,
                                -90)
 
-ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 30,
+ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X,
                            NogginConstants.CENTER_FIELD_Y,
                            0)
 

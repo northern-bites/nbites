@@ -5,6 +5,7 @@ import noggin_constants as NogginConstants
 from objects import Location, RelRobotLocation
 from ..playbook import PBConstants
 from . import BoxPositionConstants as BPConstants
+from . import SharedTransitions
 
 def playbookPosition(player):
     """
@@ -28,23 +29,26 @@ def positionReady(player):
                 player.kickoffPosition = BPConstants.theirKickoff
 
             player.brain.nav.goTo(player.kickoffPosition, 
-                                  precision = Navigator.GENERAL_AREA,
+                                  precision = Navigator.PLAYBOOK,
                                   speed = Navigator.QUICK_SPEED, 
                                   avoidObstacles = True, 
-                                  fast = True, pb = False)
+                                  fast = False, pb = False)
         else:
             player.brain.nav.positionPlaybook()
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
-
-    if player.brain.nav.isAtPosition():
+    print "loc says we are at X: ", player.brain.loc.x, " Y: ", player.brain.loc.y, " H: ", player.brain.loc.h
+    print "we want to go to   X: ", BPConstants.ourKickoff.x, " Y: ", BPConstants.ourKickoff.y
+    if (player.brain.nav.isAtPosition()): #or
+#        SharedTransitions.atRobotLocation(player.kickoffPosition, 
+#                                          Navigator.GENERAL_AREA)):
         player.brain.tracker.trackBall()
-        print "IM AT POSITION!"
+        #player.brain.nav.stand()
         return player.stay()
 
     if (not player.brain.nav.isAtPosition() and
         player.brain.time - player.timeReadyBegan > 38):
         print "IT'S BEEN TOO LONG!"
-    #     return player.goNow('readyFaceMiddle')
+        return player.goNow('readyFaceMiddle')
 
     return player.stay()
 

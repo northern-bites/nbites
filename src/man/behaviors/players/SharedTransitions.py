@@ -96,6 +96,21 @@ def noTimeLeft(seconds):
     return transition
 
 ### FIELD POSITION
+def atRobotLocation(robotLocation, precision):
+    """
+    Checks against loc to see if you are at the specified location within
+    the specified precision. I created this transition because goTo didn't
+    seem to be stopping correctly. -DZ
+    """
+    def transition(player):
+        return (player.brain.loc.x > robotLocation.getX() - precision[0] and
+                player.brain.loc.x < robotLocation.getX() + precision[0] and
+                player.brain.loc.y > robotLocation.getY() - precision[1] and
+                player.brain.loc.y < robotLocation.getY() + precision[1] and
+                player.brain.loc.h > robotLocation.getH() - precision[2] and
+                player.brain.loc.h < robotLocation.getH() + precision[2])
+    return transition
+
 def betweenCrosses(player):
     """
     We are between the two field crosses.
@@ -124,3 +139,9 @@ def secondHalf(player):
     """
     field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
     return (player.brain.loc.x > field_len / 2.)
+
+def navAtPosition(player):
+    """
+    Does nav think that it's at position?
+    """
+    return player.brain.nav.isAtPosition()
