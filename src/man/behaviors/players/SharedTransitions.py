@@ -1,90 +1,99 @@
 import noggin_constants as nogginConstants
 from math import fabs
 
+# Many of these functions are higher order functions, meaning that they return
+# transitions (a kind of function) that takes player as an argument!
+# e.g. to check if the ball has been seen for 4 frames do the following:
+#      ballOnForNFrames(4)(player) because ballOnForNFrames is NOT a transition
+#      it RETURNS a transition
+
 ### THE BALL
-def ballOnForNFrames(player, atleastThisManyFrames):
+def ballOnForNFrames(atleastThisManyFrames):
     """
     We have seen the ball for N frames.
     """
-    ball = player.brain.ball
-    return (ball.vis.frames_on > atleastThisManyFrames)
+    def transition(player):
+        ball = player.brain.ball
+        return (ball.vis.frames_on > atleastThisManyFrames)
+    return transition
 
-def ballOffForNFrames(player, atleastThisManyFrames):
+def ballOffForNFrames(atleastThisManyFrames):
     """
     We have not seen the ball for N frames.
     """
-    ball = player.brain.ball
-    return (ball.vis.frames_off > atleastThisManyFrames)
+    def transition(player):
+        ball = player.brain.ball
+        return (ball.vis.frames_off > atleastThisManyFrames)
+    return transition
 
-def ballForNFramesAndMClose(player, atleastThisManyFrames, atleastThisClose):
+def ballForNFramesAndMClose(atleastThisManyFrames, atleastThisClose):
     """
     We have seen the ball for N frames and it is M centimeters away or closer.
 
     NOTE: This is not a CountTransition, see util/Transitions.py if you want
     a rolling fiter of predicate checks.
     """
-    ball = player.brain.ball
-    return (ballOnForNFrames(player, atleastThisManyFrames) and
-            ball.distance < atleastThisClose)
+    def transition(player):
+        ball = player.brain.ball
+        return (ballOnForNFrames(atleastThisManyFrames)(player) and
+                ball.distance < atleastThisClose)
+    return transition
 
-def ballForNFramesAndMFar(player, atleastThisManyFrames, atleastThisFar):
+def ballForNFramesAndMFar(atleastThisManyFrames, atleastThisFar):
     """
     We have seen the ball for N frames and it is M centimeters away or further.
 
     NOTE: This is not a CountTransition, see util/Transitions.py if you want
     a rolling fiter of predicate checks.
     """
-    ball = player.brain.ball
-    return (ballOnForNFrames(player, atleastThisManyFrames) and
-            ball.distance > atleastThisFar)
+    def transition(player):
+        ball = player.brain.ball
+        return (ballOnForNFrames(atleastThisManyFrames)(player) and
+                ball.distance > atleastThisFar)
+    return transition
 
-def ballMovedNCMsFromWhereSeenLast(player, ballMovedTolerance):
+def ballMovedNCMsFromWhereSeenLast(ballMovedTolerance):
     """
-    The ball has moved from where it was last seen by at least N centimeters.
+    The ball is atleast N cms from where it was seen when ballBeforeCheck was set.
 
-    @requires player.ballBeforeCheck to be set for comparision
+    @requires player.ballBeforeCheck to be set to a tuple of filtered ball
+              relative coordinates for comparision,
+    e.g. player.ballBeforeCheck = (player.brain.ball.rel_x, player.brain.ball.rel_y)
     """
-    ball = player.brain.ball
-    ballBefore = player.ballBeforeCheck
-    return (fabs(ball.rel_x - ballBefore.rel_x) > ballMovedTolerance or
-            fabs(ball.rel_y - ballBefore.rel_y) > ballMovedTolerance)
+    def transition(player):
+        ball = player.brain.ball
+        ballBefore = player.ballBeforeCheck
+        return (fabs(ball.rel_x - ballBefore[0]) > ballMovedTolerance or
+                fabs(ball.rel_y - ballBefore[1]) > ballMovedTolerance)
+    return transition
 
 ### STATE-TIME/FRAME-COUNT
-def sameStateForNFrames(player, numFrames):
+def sameStateForNFrames(numFrames):
     """
     We have been in the same state for N frames.
 
     NOTE: ~30 frames = 1 second, probably better to use sameStateForNSeconds
     """
-    return (player.counter > numFrames)
+    def transition(player):
+        return (player.counter > numFrames)
+    return transition
 
-def sameStateForNSeconds(player, numFrames):
+def sameStateForNSeconds(numFrames):
     """
     We have been in the same state for N seconds.
     """
-    return (player.stateTime > numFrames)
+    def transition(player):
+        return (player.stateTime > numFrames)
+    return transition
 
-def noTimeLeft(player, seconds):
+# NOTE could be tested more
+def noTimeLeft(seconds):
     """
     There are not more than N seconds left in the game.
     """
-    return (player.brain.game.secs_remaining > seconds)
-
-### ROBOT DETECTION
-def centerLaneOpenForNCMs(player, atleastThisMuchGreen):
-    """
-    We have an open lane for N cms where I am looking.
-    """
-    return (player.brain.interface.visionObstacle.mid_dist > 
-            atleastThisMuchGreen or
-            player.brain.interface.visionObstacle.block_mid == 0)
-
-def seesZeroRobots(player):
-    """
-    Vision sees zero robots in this frame.
-    """
-    vr = player.brain.interface.visionRobot
-    return (not vr.red1.on and not vr.navy1.on)
+    def transition(player):
+        return (player.brain.game.secs_remaining < seconds)
+    return transition
 
 ### FIELD POSITION
 def betweenCrosses(player):
@@ -104,16 +113,14 @@ def middleThird(player):
 
 def firstHalf(player):
     """
-    We are between our field cross and midfield.
+    We are on our half.
     """
     field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
-    return (player.brain.loc.x > nogginConstants.LANDMARK_BLUE_GOAL_CROSS_X and
-            player.brain.loc.x < field_len / 2.)
+    return (player.brain.loc.x < field_len / 2.)
 
 def secondHalf(player):
     """
-    We are between midfield and our opponent's field cross.
+    We are on the opponent's half.
     """
     field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
-    return (player.brain.loc.x > field_len / 2. and
-            player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
+    return (player.brain.loc.x > field_len / 2.)
