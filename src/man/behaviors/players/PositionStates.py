@@ -4,6 +4,7 @@ from ..navigator import Navigator
 import noggin_constants as NogginConstants
 from objects import Location, RelRobotLocation
 from ..playbook import PBConstants
+from . import BoxPositionConstants as BPConstants
 
 def playbookPosition(player):
     """
@@ -12,10 +13,6 @@ def playbookPosition(player):
     if player.gameState == 'gameReady':
         return player.goNow('positionReady')
     else:
-        if (player.brain.gameController.timeSincePlaying < 10 and
-            PBConstants.HACK_O):
-            return player.goNow('hackWalkForward')
-
         return player.goNow('positionPlaying')
 
 def positionReady(player):
@@ -23,16 +20,31 @@ def positionReady(player):
     Game Ready positioning
     """
     if player.firstFrame():
-        player.brain.nav.positionPlaybook()
+        if player.usingBoxPositions:
+            if(player.brain.gameController.ownKickOff 
+               and not player.isDefender):
+                player.kickoffPosition = BPConstants.ourKickoff
+            elif not player.isDefender:
+                player.kickoffPosition = BPConstants.theirKickoff
+
+            player.brain.nav.goTo(player.kickoffPosition, 
+                                  precision = Navigator.GENERAL_AREA,
+                                  speed = Navigator.QUICK_SPEED, 
+                                  avoidObstacles = True, 
+                                  fast = True, pb = False)
+        else:
+            player.brain.nav.positionPlaybook()
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
 
     if player.brain.nav.isAtPosition():
         player.brain.tracker.trackBall()
+        print "IM AT POSITION!"
         return player.stay()
 
     if (not player.brain.nav.isAtPosition() and
         player.brain.time - player.timeReadyBegan > 38):
-        return player.goNow('readyFaceMiddle')
+        print "IT'S BEEN TOO LONG!"
+    #     return player.goNow('readyFaceMiddle')
 
     return player.stay()
 
@@ -75,8 +87,9 @@ def positionPlaying(player):
     Game Playing positioning
     """
     if player.firstFrame():
-        player.brain.nav.positionPlaybook()
         player.brain.tracker.trackBall()
+        if player.usingBoxPositions:
+            return player.goLater('positionAtHome')
 
     if player.brain.play.isChaser() and transitions.shouldChaseBall(player):
         return player.goLater('chase')

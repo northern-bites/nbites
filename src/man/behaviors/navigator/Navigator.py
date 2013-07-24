@@ -201,32 +201,6 @@ class Navigator(FSA.FSA):
         if self.currentState not in ['stopped', 'stand', 'standing']:
             self.stand()
 
-    def orbitAngle(self, radius, angle):
-        """
-        Orbits a point at a certain radius for a certain angle using walkTo commands.
-        Splits the command into multiple smaller commands
-        Don't rely on it too much since it depends on the odometry of strafes
-        and turns which slips a lot
-        It will orbit in steps, each orbit taking ~30 degrees (more like 45
-        when I test it out)
-        TODO: please change this to just use a velocity walk -Octavian
-        """
-
-        NavStates.walkingTo.destQueue.clear()
-
-        #@todo: make this a bit nicer or figure out a better way to do it
-        # split it up in 15 degree moves; good enough approximation for small radii
-        for k in range(0, abs(angle) / 15):
-            if angle > 0:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 6, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -15))
-            else:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 6, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 15))
-
-        NavStates.walkingTo.speed = FAST_SPEED
-        self.switchTo('walkingTo')
-
     def walk(self, x, y, theta):
         """
         Starts a new velocity walk command.

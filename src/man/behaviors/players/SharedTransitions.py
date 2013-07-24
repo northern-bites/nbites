@@ -58,11 +58,11 @@ def sameStateForNFrames(player, numFrames):
     """
     return (player.counter > numFrames)
 
-def sameStateForNSeconds(player, numFrames):
+def sameStateForNSeconds(player, numSeconds):
     """
     We have been in the same state for N seconds.
     """
-    return (player.stateTime > numFrames)
+    return (player.stateTime > numSeconds)
 
 def noTimeLeft(player, seconds):
     """
@@ -117,3 +117,9 @@ def secondHalf(player):
     field_len = nogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X
     return (player.brain.loc.x > field_len / 2. and
             player.brain.loc.x < nogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X)
+
+def navAtPosition(player):
+    """
+    Nav says we are at position
+    """
+    return player.brain.nav.isAtPosition()
