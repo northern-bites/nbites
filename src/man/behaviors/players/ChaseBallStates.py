@@ -12,11 +12,13 @@ from ..util import *
 from objects import RelRobotLocation, Location
 from math import fabs
 import noggin_constants as nogginConstants
+import BoxTransitions
 import time
 
 DRIBBLE_ON_KICKOFF = False
 
 @switch('approachBall')
+@ifSwitch(BoxTransitions.ballNotInBox, 'positionAtHome')
 @ifSwitch(transitions.shouldFindBall, 'findBall')
 def chase(player):
     """
@@ -48,7 +50,11 @@ def kickoff(player):
 kickoff.ballRelX = "the relX position of the ball when we started"
 kickoff.ballRelY = "the relY position of the ball when we started"
 
+
 def approachBall(player):
+    if BoxTransitions.ballNotInBox(player):
+        return player.goLater('positionAtHome')
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
