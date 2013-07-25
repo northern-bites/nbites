@@ -80,9 +80,9 @@ def approachBall(player):
         player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
-                player.kick = kicks.LEFT_STRAIGHT_KICK
+                player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
             else:
-                player.kick = kicks.RIGHT_STRAIGHT_KICK
+                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')

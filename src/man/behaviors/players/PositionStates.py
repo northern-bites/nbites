@@ -36,8 +36,7 @@ def positionReady(player):
         else:
             player.brain.nav.positionPlaybook()
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
-    print "loc says we are at X: ", player.brain.loc.x, " Y: ", player.brain.loc.y, " H: ", player.brain.loc.h
-    print "we want to go to   X: ", BPConstants.ourKickoff.x, " Y: ", BPConstants.ourKickoff.y
+
     if (player.brain.nav.isAtPosition()): #or
 #        SharedTransitions.atRobotLocation(player.kickoffPosition, 
 #                                          Navigator.GENERAL_AREA)):

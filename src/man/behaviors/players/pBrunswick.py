@@ -41,7 +41,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.inKickingState = False
 
-        self.usingBoxPositions = True
+        self.usingBoxPositions = False
 
         if self.usingBoxPositions:
             #Figure out home & kickoff, even/odd player.
