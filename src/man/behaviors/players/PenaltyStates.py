@@ -132,6 +132,8 @@ def postPenaltyChaser(player):
     if not player.brain.play.isChaser():
         # We've role switched out naturally. Go to appropriate state.
         player.stopWalking() # walkTo is a bit dangerous. do this to be careful.
+        if player.usingBoxPositions:
+            return player.goLater('positionAtHome')
         return player.goLater('playbookPosition')
 
     return player.stay()

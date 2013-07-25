@@ -11,8 +11,11 @@ from . import GoaliePositionStates
 from . import GoalieSaveStates
 from . import BrunswickStates
 from . import DribbleStates
+from . import BoxPositionStates
 
 import noggin_constants as NogginConstants
+
+from . import BoxPositionConstants as BPConstants
 from ..playbook import PBConstants
 
 from objects import Location
@@ -32,10 +35,32 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(ChaseBallStates)
         self.addStates(BrunswickStates)
         self.addStates(DribbleStates)
+        self.addStates(BoxPositionStates)
 
         self.setName('pBrunswick')
 
         self.inKickingState = False
+
+        self.usingBoxPositions = True
+
+        if self.usingBoxPositions:
+            #Figure out home & kickoff, even/odd player.
+            #All that good stuff...
+            if brain.playerNumber == 2:
+                self.homePosition = BPConstants.evenDefenderHome
+                self.kickoffPosition = self.homePosition
+                self.box = BPConstants.evenDefenderBox
+                self.isDefender = True
+            elif brain.playerNumber == 3:
+                self.homePosition = BPConstants.oddDefenderHome
+                self.kickoffPosition = self.homePosition
+                self.box = BPConstants.oddDefenderBox
+                self.isDefender = True
+            elif brain.playerNumber == 4:
+                self.homePosition = BPConstants.evenChaserHome
+                self.kickoffPosition = BPConstants.theirKickoff
+                self.box = BPConstants.chaserBox
+                self.isDefender = False
 
         #GOALIE COUNTERS AND BOOLEANS
         # Counters for goalie dive decision making
@@ -99,7 +124,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return self.getRoleState()
 
     def getRoleState(self):
-        if self.play.isRole(PBConstants.CHASER):
+        if(self.play.isRole(PBConstants.CHASER) and
+           not BPConstants.isDefender):
             if self.brain.gameController.timeSincePlaying < 10:
                 if (self.brain.gameController.ownKickOff):
                     self.shouldKickOff = True
@@ -110,3 +136,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
             return 'gamePenalized'
         else:
             return 'playbookPosition'
+

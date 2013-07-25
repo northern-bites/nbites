@@ -4,6 +4,7 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import DribbleTransitions as dr_trans
+import BoxTransitions as box_trans
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
@@ -11,11 +12,13 @@ from ..util import *
 from objects import RelRobotLocation, Location
 from math import fabs
 import noggin_constants as nogginConstants
+import BoxTransitions
 import time
 
 DRIBBLE_ON_KICKOFF = False
 
 @switch('approachBall')
+@ifSwitch(BoxTransitions.ballNotInBox, 'positionAtHome')
 @ifSwitch(transitions.shouldFindBall, 'findBall')
 def chase(player):
     """
@@ -47,7 +50,11 @@ def kickoff(player):
 kickoff.ballRelX = "the relX position of the ball when we started"
 kickoff.ballRelY = "the relY position of the ball when we started"
 
+
 def approachBall(player):
+    if BoxTransitions.ballNotInBox(player):
+        return player.goLater('positionAtHome')
+
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
@@ -138,8 +145,8 @@ def orbitBall(player):
         else:
             player.setWalk(0, -0.5, 0.15)
 
-    # # DEBUGGING PRINT OUTS
-    if player.counter%20 == 0:
+    # DEBUGGING PRINT OUTS
+    if constants.DEBUG_ORBIT and player.counter%20 == 0:
         print "desiredHeading is:  | ", player.kick.h
         print "player heading:     | ", player.brain.loc.h
         print "orbit heading:      | ", relH
