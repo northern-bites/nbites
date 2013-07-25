@@ -145,13 +145,13 @@ def orbitBall(player):
         else:
             player.setWalk(0, -0.5, 0.15)
 
-    # # DEBUGGING PRINT OUTS
-    # if player.counter%20 == 0:
-    #     print "desiredHeading is:  | ", player.kick.h
-    #     print "player heading:     | ", player.brain.loc.h
-    #     print "orbit heading:      | ", relH
-    #     print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
-    #     print "==============================="
+    # DEBUGGING PRINT OUTS
+    if constants.DEBUG_ORBIT and player.counter%20 == 0:
+        print "desiredHeading is:  | ", player.kick.h
+        print "player heading:     | ", player.brain.loc.h
+        print "orbit heading:      | ", relH
+        print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
+        print "==============================="
 
     # X correction
     if (constants.ORBIT_BALL_DISTANCE + constants.ORBIT_DISTANCE_FAR <
