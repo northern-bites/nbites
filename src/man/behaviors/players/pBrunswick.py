@@ -41,6 +41,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         self.inKickingState = False
 
+        # If true, robots will use a simpler positioning system than playbook,
+        # based on boxes on the field robots are responsible for, and a more static
+        # sense of positions (defender, chaser, etc.)
+        # NOT COMPLETE AS OF SUMMER 2013 SO STAY OFF!
         self.usingBoxPositions = False
 
         if self.usingBoxPositions:
