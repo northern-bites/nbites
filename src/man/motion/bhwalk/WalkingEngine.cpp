@@ -194,12 +194,10 @@ void WalkingEngine::init()
   }
   p.computeContants();
 
-  //TODO: make the ground contact detector work
-  //right now the ground contact detection is off - trick motion into thinking it's broken
-  theDamageConfiguration.useGroundContactDetection = false;
+  theDamageConfiguration.useGroundContactDetection = true;
   theDamageConfiguration.useGroundContactDetectionForLEDs = false;
   theDamageConfiguration.useGroundContactDetectionForSafeStates = false;
-  theDamageConfiguration.useGroundContactDetectionForSensorCalibration = false;
+  theDamageConfiguration.useGroundContactDetectionForSensorCalibration = true;
 
 #ifdef TARGET_SIM
   p.observerMeasurementDelay = 60.f;
@@ -213,7 +211,7 @@ void WalkingEngine::update()
 {
 
     //set the motion selection
-//    theMotionRequest.walkRequest.pedantic = false;
+    //    theMotionRequest.walkRequest.pedantic = false;
 
     //get new joint, sensor and frame info data
     theFrameInfo.cycleTime = 0.01f;
@@ -223,6 +221,7 @@ void WalkingEngine::update()
     for(int i = 0; i < JointData::numOfJoints; ++i) {
         theJointData.angles[i] = theJointData.angles[i] * (float)theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
     }
+
     //calibrate sensors
     theSensorData.data[SensorData::gyroX] *= theSensorCalibration.gyroXGain / 1600;
     theSensorData.data[SensorData::gyroY] *= theSensorCalibration.gyroYGain / 1600;
@@ -247,6 +246,14 @@ void WalkingEngine::update()
     //update the robot model - this computes the CoM
     robotModelProvider.update(theRobotModel, theFilteredJointData,
                               theRobotDimensions, theMassCalibration);
+    groundContactDetector.update(theGroundContactState, theSensorData,
+                                 theFrameInfo, theMotionRequest, theMotionInfo);
+
+    // std::cout << "Ground contact detector:\n";
+    // std::cout << theGroundContactState.contact << "\n";
+    // std::cout << theGroundContactState.contactSafe << "\n";
+    // std::cout << theGroundContactState.noContactSafe << "\n";
+
     inertiaSensorInspector.update(theInspectedInertiaSensorData, theSensorData);
     inertiaSensorCalibrator.update(theInertiaSensorData, theInspectedInertiaSensorData,
             theFrameInfo, theRobotModel, theGroundContactState, theMotionSelection, theMotionInfo,
@@ -360,14 +367,15 @@ void WalkingEngine::updateHandSpeeds()
 
 void WalkingEngine::updateMotionRequest()
 {
-    static int instabilityCount = 0;
+  static int instabilityCount = 0;
 
   if(theMotionRequest.motion == MotionRequest::walk)
   {
     if(theMotionRequest.walkRequest.mode == WalkRequest::targetMode)
     {
-      if(theMotionRequest.walkRequest.target != Pose2D())
+      if(theMotionRequest.walkRequest.target != Pose2D()) {
         requestedWalkTarget = theMotionRequest.walkRequest.target;
+      }
     }
     else
       requestedWalkTarget = theMotionRequest.walkRequest.speed; // just for sgn(requestedWalkTarget.translation.y)
@@ -1493,7 +1501,7 @@ void WalkingEngine::PendulumPlayer::computeSwapTimes(float t, float xt, float xv
 
   Parameters& p = walkingEngine->p;
 
-  if(errory != 0.f && walkingEngine->balanceStepSize.y != 0.f && kickType == WalkRequest::none /*&& !walkingEngine->theMotionRequest.walkRequest.pedantic*/)
+  if(errory != 0.f && walkingEngine->balanceStepSize.y != 0.f && kickType == WalkRequest::none && !walkingEngine->theMotionRequest.walkRequest.pedantic)
   {
     ASSERT(next.xv0.y == 0.f);
     float sy = next.xtb.y * -2.f;
@@ -1816,7 +1824,7 @@ WalkingEngine::KickPlayer::KickPlayer() : kick(0)
   {
     char filePath[256];
     sprintf(filePath, "Kicks/%s.cfg", WalkRequest::getName(WalkRequest::KickType(i * 2 + 1)));
-    kicks[i].load(filePath);
+    kicks[i].load((common::paths::NAO_CONFIG_DIR + filePath).c_str());
   }
 }
 
@@ -1956,26 +1964,3 @@ void WalkingEngine::KickPlayer::setParameters(const Vector2<>& ballPosition, con
   else
     kick->setParameters(ballPosition, target);
 }
-
-//bool WalkingEngine::KickPlayer::handleMessage(InMessage& message)
-//{
-//  if(message.getMessageID() == idWalkingEngineKick)
-//  {
-//    unsigned int id, size;
-//    message.bin >> id >> size;
-//    ASSERT(id < WalkRequest::numOfKickTypes);
-//    char* buffer = new char[size + 1];
-//    message.bin.read(buffer, size);
-//    buffer[size] = '\0';
-//    char filePath[256];
-//    sprintf(filePath, "Kicks/%s.cfg", WalkRequest::getName(WalkRequest::KickType(id)));
-//    if(kicks[(id - 1) / 2].load(filePath, buffer))
-//    {
-////      OUTPUT(idText, text, filePath << ": ok");
-//    }
-//    delete[] buffer;
-//    return true;
-//  }
-//  else
-//    return false;
-//}

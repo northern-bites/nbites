@@ -26,9 +26,9 @@ message MotionCommand
     optional ScriptedMove script = 2;
     optional DestinationWalk dest = 3;
     optional WalkCommand speed = 4;
-    optional OdometryWalk odometry_dest = 6;
+    optional OdometryWalk odometry_dest = 5;
 
-    optional int64 timestamp = 5;
+    optional int64 timestamp = 6;
 }
 
 message ScriptedMove
@@ -55,6 +55,8 @@ message DestinationWalk
     optional float rel_y = 2;
     optional float rel_h = 3;
     optional float gain  = 4;
+    optional bool pedantic = 5;
+    optional MotionKick kick = 6;
 }
 
 message OdometryWalk
@@ -70,6 +72,14 @@ message WalkCommand
     optional float x_percent = 1;
     optional float y_percent = 2;
     optional float h_percent = 3;
+}
+
+message MotionKick
+{
+    optional bool  perform_motion_kick = 1;
+    optional float ball_rel_x = 2;
+    optional float ball_rel_y = 3;
+    optional int32 kick_type = 4;
 }
 
 message HeadMotionCommand

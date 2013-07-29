@@ -20,15 +20,17 @@ public:
 
     WalkCommand(float x_percent, float y_percent, float theta_percent)
         : MotionCommand(MotionConstants::WALK),
-          x_percent(x_percent),y_percent(y_percent),theta_percent(theta_percent)
+          x_percent(x_percent) ,y_percent(y_percent),
+          theta_percent(theta_percent)
         { setChainList(); }
 
     virtual ~WalkCommand() {}
 public:
-//    WalkParameters params;
+    // Params for speed walking
     const float x_percent;    //0 - 1 magnitude
     const float y_percent;    //0 - 1 magnitude
     const float theta_percent; //0 - 1 magnitude
+
 protected:
 	virtual void setChainList() {
         chainList.assign(MotionConstants::WALK_CHAINS,

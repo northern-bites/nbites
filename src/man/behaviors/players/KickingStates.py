@@ -1,14 +1,35 @@
-from . import ChaseBallTransitions as transitions
-from . import ChaseBallConstants as constants
-from ..kickDecider import kicks
-
 """
 Here we house all of the state methods used for kicking the ball
 """
 
+from . import ChaseBallTransitions as transitions
+from . import ChaseBallConstants as constants
+from ..kickDecider import kicks
+from ..navigator import Navigator
+
+def motionKickExecute(player):
+    """
+    Do a motion kick.
+    """
+    if player.firstFrame():
+        player.motionKick = False
+
+    if (transitions.shouldApproachBallAgain(player) or
+        transitions.shouldRedecideKick(player) or
+        transitions.shouldFindBallKick(player)):
+        player.inKickingState = False
+        return player.goLater('chase')
+
+    player.brain.nav.doMotionKick(player, # kind of a hack, nav is going to change soon anyway
+                                  player.brain.ball.rel_x,
+                                  player.brain.ball.rel_y,
+                                  player.kick)
+
+    return player.stay()
+
 def kickBallExecute(player):
     """
-    Kick the ball
+    Kick the ball.
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()

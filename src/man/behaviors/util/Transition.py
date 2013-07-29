@@ -50,7 +50,7 @@ def ifSwitch(predicate, state, nextFrame=False):
         function-decorators-in-python/1594484#1594484
 
     Example usage: 
-        @transition(Transitions.ballMoved, chase, True)
+        @ifSwitch(Transitions.ballMoved, chase, True)
         def dribble(player):
             doStuffHere()
             
@@ -88,7 +88,7 @@ def switch(state, nextFrame=False):
     """
     Overloaded ifSwitch, see above for complete documentation.
 
-    Like ifSwitch decorator but predicate is assumed to be True.
+    Like ifSwitch but predicate is assumed to be True.
     """
     def alwaysTrue(player):
         return True

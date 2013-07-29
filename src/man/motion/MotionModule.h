@@ -40,6 +40,9 @@
 // For Conversions
 #include "NBMath.h"
 
+// Default speed for destination and odometry walk
+#define DEFAULT_SPEED .5f
+
 namespace man
 {
 namespace motion
@@ -113,8 +116,6 @@ public:
      *
      * Good for walking into a specific (x, y, h) position for the robot.
      *
-     * TODO: make turning on pedantic (stable, but less fast mode)
-     * as an option in the command
      */
     void sendMotionCommand(const DestinationCommand::ptr command);
     void sendMotionCommand(messages::DestinationWalk command);
@@ -212,6 +213,7 @@ public:
 
     /* Input/Output related to executing motion commands. */
     portals::InPortal<messages::JointAngles>       jointsInput_;
+    portals::InPortal<messages::JointAngles>       currentsInput_;
     portals::InPortal<messages::InertialState>     inertialsInput_;
     portals::InPortal<messages::FSR>               fsrInput_;
     portals::InPortal<messages::MotionCommand>     bodyCommandInput_;
@@ -279,6 +281,7 @@ private:
 
     // Last information retrieved from the sensors.
     std::vector<float>      sensorAngles;
+    std::vector<float>      sensorCurrents;
     std::vector<float>      sensorStiffnesses;
 
     std::vector<float>      nextJoints;
