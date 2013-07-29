@@ -32,12 +32,10 @@ void CommTimer::teamPacketSent()
     // We could send duplicates or skip frames with this method, but we will
     // not send more than one duplicate or skip more than one frame in a row.
 
-
-    // *2 for competition June 2013
     int random;
-    random = (rand() / RAND_MAX) * 33333*2;
+    random = (rand() / RAND_MAX) * 33333*5;
 
-    nextSendTime += random + 16667*2;
+    nextSendTime += random + 16667*5;
 }
 
 }
