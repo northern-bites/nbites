@@ -4,7 +4,7 @@ from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
 from objects import RobotLocation, RelRobotLocation
-from math import pi
+from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
 
@@ -170,6 +170,33 @@ class Navigator(FSA.FSA):
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
 
+    def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, pedantic = False):
+        """
+        Walks to a RelRobotLocation via B-Human destination walking.
+        Great for close destinations (since odometry gets bad over time) in
+        case loc is bad.
+        Doesn't avoid obstacles! (that would make it very confused and odometry
+        very bad, especially if we're being pushed).
+        Switches to standing at the end.
+        """
+        if not isinstance(walkToDest, RelRobotLocation):
+            raise TypeError, "walkToDest must be a RelRobotLocation"
+
+        NavStates.destinationWalkingTo.destQueue.clear()
+
+        NavStates.destinationWalkingTo.destQueue.append(walkToDest)
+        NavStates.destinationWalkingTo.speed = speed
+        NavStates.destinationWalkingTo.pedantic = pedantic
+
+        #reset the counter to make sure walkingTo.firstFrame() is true on entrance
+        #in case we were in destinationWalkingTo before as well
+        self.counter = 0
+        self.switchTo('destinationWalkingTo')
+
+    def updateDestinationWalkDest(self, dest):
+        """  Update the destination we're headed to   """
+        NavStates.destinationWalkingTo.destQueue.append(dest)
+
     def walkTo(self, walkToDest, speed = FULL_SPEED):
         """
         Walks to a RelRobotLocation while checking odometry to see if
@@ -234,6 +261,13 @@ class Navigator(FSA.FSA):
         """
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
+
+    def doMotionKick(self, player, ball_rel_x, ball_rel_y, kick):
+        """
+        Enques a motion kick. Does not transition to an FSA state, so that
+        motion kicking can be done with any of our walks.
+        """
+        helper.createAndSendMotionKickVector(player, ball_rel_x, ball_rel_y, kick)
 
     def stand(self):
         """

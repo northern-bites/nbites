@@ -11,22 +11,32 @@
 #include "Tools/Streams/InStreams.h"
 //#include "Tools/Settings.h"
 //#include "Platform/SoundPlayer.h"
+#include <algorithm>
+#include <iostream>
+
+#include "NaoPaths.h"
 
 //MAKE_MODULE(GroundContactDetector, Sensing)
 
 GroundContactDetector::GroundContactDetector() :
   contact(true), lastContact(true), contactStartTime(0), noContactStartTime(0)
 {
+    this->init();
 }
 
 void GroundContactDetector::init()
 {
-  InConfigMap stream(Global::getSettings().expandRobotFilename("groundContact.cfg"));
-  ASSERT(stream.exists());
-  stream >> p;
+  InConfigMap stream(common::paths::NAO_CONFIG_DIR + "groundContact.cfg");
+  if(stream.exists())
+    stream >> p;
+  else
+  {
+      std::cout << "Could not find groundContact.cfg!" << std::endl;
+  }
 }
 
-struct GroundContactDetector::ContactState GroundContactDetector::checkFsr(bool left)
+struct GroundContactDetector::ContactState GroundContactDetector::checkFsr(bool left,
+                                                                           const SensorData& theSensorData)
 {
   ContactState state;
   float fsrValues[4] =
@@ -63,7 +73,7 @@ struct GroundContactDetector::ContactState GroundContactDetector::checkFsr(bool 
   }
   state.contact = fsrSum > p.fsrThreshold;
 
-  float fsrMean = fsrSum / fsrs;
+  float fsrMean = fsrSum / (float)fsrs;
   float fsrMSE = 0.f;
   for(int i = 0; i < 4; ++i)
   {
@@ -72,7 +82,7 @@ struct GroundContactDetector::ContactState GroundContactDetector::checkFsr(bool 
   }
 
   // conforms: 1 * (mean - sum)^2 + (fsrs - 1) * mean^2
-  float fsrMaxMSE = fsrs* fsrMean* fsrMean - 2 * fsrMean* fsrSum + fsrSum* fsrSum;
+  float fsrMaxMSE = (float)fsrs* fsrMean* fsrMean - 2 * fsrMean* fsrSum + fsrSum* fsrSum;
 
   // contact: confidence = deviation from fsrMean
   // no contact: confidence = deviation from zero
@@ -82,7 +92,7 @@ struct GroundContactDetector::ContactState GroundContactDetector::checkFsr(bool 
   return state;
 }
 
-struct GroundContactDetector::ContactState GroundContactDetector::checkLoad()
+struct GroundContactDetector::ContactState GroundContactDetector::checkLoad(const SensorData& theSensorData)
 {
   ContactState state;
 
@@ -98,24 +108,26 @@ struct GroundContactDetector::ContactState GroundContactDetector::checkLoad()
   loadSum += theSensorData.currents[JointData::RHipRoll];
   loadSum += theSensorData.currents[JointData::RHipYawPitch];
   loadSum += theSensorData.currents[JointData::RAnkleRoll];
-  PLOT("module:GroundContactDetector:contactLoadSum", loadSum);
+  // PLOT("module:GroundContactDetector:contactLoadSum", loadSum);
 
   state.contact = loadSum > p.loadThreshold;
   //max angleY: pi_4 (45�)
-  state.confidence = 1 - min(abs(theSensorData.data[SensorData::angleY]), pi_4) / pi_4;
+  state.confidence = 1 - std::min((float)fabs(theSensorData.data[SensorData::angleY]), pi_4) / pi_4;
   return state;
 }
 
-void GroundContactDetector::update(GroundContactState& groundContactState)
+void GroundContactDetector::update(GroundContactState& groundContactState,
+                                   const SensorData& theSensorData,
+                                   const FrameInfo& theFrameInfo,
+                                   const MotionRequest& theMotionRequest,
+                                   const MotionInfo& theMotionInfo)
 {
 //  MODIFY("module:GroundContactDetector:parameters", p);
 //  PLOT("module:GroundContactDetector:groundContact", groundContactState.contact ? 0.75 : 0.25);
 //  PLOT("module:GroundContactDetector:groundContactSafe", groundContactState.contactSafe ? 0.75 : 0.25);
 //  PLOT("module:GroundContactDetector:noGroundContactSafe", groundContactState.noContactSafe ? 0.75 : 0.25);
 
-#ifdef TARGET_ROBOT
   if(p.forceContact)
-#endif
   {
     groundContactState.contact = true;
     groundContactState.contactSafe = true;
@@ -124,9 +136,9 @@ void GroundContactDetector::update(GroundContactState& groundContactState)
   }
 
   // states
-  ContactState stateFsrLeft = checkFsr(true);
-  ContactState stateFsrRight = checkFsr(false);
-  ContactState stateLoad = checkLoad();
+  ContactState stateFsrLeft = checkFsr(true, theSensorData);
+  ContactState stateFsrRight = checkFsr(false, theSensorData);
+  ContactState stateLoad = checkLoad(theSensorData);
   // contact plots
 //  PLOT("module:GroundContactDetector:contactLoad", stateLoad.contact ? 0.75 : 0.25);
 //  PLOT("module:GroundContactDetector:contactFsrLeft", stateFsrLeft.contact ? 0.75 : 0.25);
@@ -165,8 +177,8 @@ void GroundContactDetector::update(GroundContactState& groundContactState)
   {
     noContactStartTime = theFrameInfo.time;
 #ifndef TARGET_SIM
-    if(contactStartTime != 0 && theMotionInfo.motion == MotionRequest::walk)
-      SoundPlayer::play("high.wav");
+    // if(contactStartTime != 0 && theMotionInfo.motion == MotionRequest::walk)
+    //   SoundPlayer::play("high.wav");
 #endif
   }
   groundContactState.noContactSafe = !contact && theFrameInfo.getTimeSince(noContactStartTime) >= p.safeNoContactTime;

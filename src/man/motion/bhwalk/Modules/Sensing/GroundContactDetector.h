@@ -12,7 +12,7 @@
 #include "Tools/RingBufferWithSum.h"
 #include "Representations/Infrastructure/SensorData.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-#include "Representations/Infrastructure/RobotInfo.h"
+// #include "Representations/Infrastructure/RobotInfo.h"
 #include "Representations/Sensing/GroundContactState.h"
 #include "Representations/MotionControl/MotionInfo.h"
 #include "Representations/MotionControl/MotionRequest.h"
@@ -34,6 +34,17 @@ class GroundContactDetector //: public GroundContactDetectorBase
 public:
   /** Default constructor. */
   GroundContactDetector();
+
+  /**
+  * Updates the GroundContactState representation.
+  * @param groundContactState The ground contact representation which is updated by this module.
+  */
+  void update(GroundContactState& groundContactState,
+              const SensorData& theSensorData,
+              const FrameInfo& theFrameInfo,
+              const MotionRequest& theMotionRequest,
+              const MotionInfo& theMotionInfo 
+              );
 
 private:
   /**
@@ -93,17 +104,11 @@ private:
   /**
   * Checks the loads in respect of the ground contact.
   */
-  struct ContactState checkLoad();
+  struct ContactState checkLoad(const SensorData& theSensorData);
 
   /**
   * Checks the FSRs in respect of the ground contact.
   * @param left Check the FSRs of the left or right foot?
   */
-  struct ContactState checkFsr(bool left);
-
-  /**
-  * Updates the GroundContactState representation.
-  * @param groundContactState The ground contact representation which is updated by this module.
-  */
-  void update(GroundContactState& groundContactState);
+  struct ContactState checkFsr(bool left, const SensorData& theSensorData);
 };

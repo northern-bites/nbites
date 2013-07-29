@@ -8,6 +8,7 @@ namespace sensors {
 SensorsModule::SensorsModule(boost::shared_ptr<AL::ALBroker> broker)
     : portals::Module(),
       jointsOutput_(base()),
+      currentsOutput_(base()),
       temperatureOutput_(base()),
       chestboardButtonOutput_(base()),
       footbumperOutput_(base()),
@@ -43,12 +44,21 @@ void SensorsModule::initializeSensorFastAccess()
     }
     i++;
 
-    // Temperatures
-    for(; i < END_TEMPERATURES; ++i)
+    // Joint Currents
+    for(; i < END_CURRENTS; ++i)
     {
         // Subtract 27 from index in SensorsNames[] to get correct value.
         sensorKeys_[i] = std::string("Device/SubDeviceList/") +
-            SensorNames[i-27] + std::string("/Temperature/Sensor/Value");
+            SensorNames[i-27] + std::string("/ElectricCurrent/Sensor/Value");
+    }
+    i++;
+
+    // Temperatures
+    for(; i < END_TEMPERATURES; ++i)
+    {
+        // Subtract 2*27 from index in SensorsNames[] to get correct value.
+        sensorKeys_[i] = std::string("Device/SubDeviceList/") +
+            SensorNames[i-2*27] + std::string("/Temperature/Sensor/Value");
     }
     i++;
 
@@ -204,6 +214,7 @@ void SensorsModule::updateSensorValues()
     fastMemoryAccess_->GetValues(sensorValues_);
 
     updateJointsMessage();
+    updateCurrentsMessage();
     updateTemperatureMessage();
     updateChestboardButtonMessage();
     updateFootbumperMessage();
@@ -213,7 +224,7 @@ void SensorsModule::updateSensorValues()
     updateBatteryMessage();
     updateStiffMessage();
 
-    //std::cout << "SensorsModule : Sensor values " << std::endl;
+    // std::cout << "SensorsModule : Sensor values " << std::endl;
     // for(int i = 0; i < NUM_SENSOR_VALUES; ++i)
     // {
     //  std::cout << SensorNames[i] << " = " << sensorValues_[i] << std::endl;
@@ -252,6 +263,40 @@ void SensorsModule::updateJointsMessage()
     jointsMessage.get()->set_r_ankle_roll(sensorValues_[RAnkleRoll]);
 
     jointsOutput_.setMessage(jointsMessage);
+}
+
+void SensorsModule::updateCurrentsMessage()
+{
+    portals::Message<messages::JointAngles> jointsMessage(0);
+
+    jointsMessage.get()->set_head_yaw(sensorValues_[HeadYawCurrent]);
+    jointsMessage.get()->set_head_pitch(sensorValues_[HeadPitchCurrent]);
+    jointsMessage.get()->set_l_shoulder_pitch(sensorValues_[LShoulderPitchCurrent]);
+    jointsMessage.get()->set_l_shoulder_roll(sensorValues_[LShoulderRollCurrent]);
+    jointsMessage.get()->set_l_elbow_yaw(sensorValues_[LElbowYawCurrent]);
+    jointsMessage.get()->set_l_elbow_roll(sensorValues_[LElbowRollCurrent]);
+    jointsMessage.get()->set_l_wrist_yaw(sensorValues_[LWristYawCurrent]);
+    jointsMessage.get()->set_l_hand(sensorValues_[LHandCurrent]);
+    jointsMessage.get()->set_r_shoulder_pitch(sensorValues_[RShoulderPitchCurrent]);
+    jointsMessage.get()->set_r_shoulder_roll(sensorValues_[RShoulderRollCurrent]);
+    jointsMessage.get()->set_r_elbow_yaw(sensorValues_[RElbowYawCurrent]);
+    jointsMessage.get()->set_r_elbow_roll(sensorValues_[RElbowRollCurrent]);
+    jointsMessage.get()->set_r_wrist_yaw(sensorValues_[RWristYawCurrent]);
+    jointsMessage.get()->set_r_hand(sensorValues_[RHandCurrent]);
+    jointsMessage.get()->set_l_hip_yaw_pitch(sensorValues_[LHipYawPitchCurrent]);
+    jointsMessage.get()->set_r_hip_yaw_pitch(sensorValues_[RHipYawPitchCurrent]);
+    jointsMessage.get()->set_l_hip_roll(sensorValues_[LHipRollCurrent]);
+    jointsMessage.get()->set_l_hip_pitch(sensorValues_[LHipPitchCurrent]);
+    jointsMessage.get()->set_l_knee_pitch(sensorValues_[LKneePitchCurrent]);
+    jointsMessage.get()->set_l_ankle_pitch(sensorValues_[LAnklePitchCurrent]);
+    jointsMessage.get()->set_l_ankle_roll(sensorValues_[LAnkleRollCurrent]);
+    jointsMessage.get()->set_r_hip_roll(sensorValues_[RHipRollCurrent]);
+    jointsMessage.get()->set_r_hip_pitch(sensorValues_[RHipPitchCurrent]);
+    jointsMessage.get()->set_r_knee_pitch(sensorValues_[RKneePitchCurrent]);
+    jointsMessage.get()->set_r_ankle_pitch(sensorValues_[RAnklePitchCurrent]);
+    jointsMessage.get()->set_r_ankle_roll(sensorValues_[RAnkleRollCurrent]);
+
+    currentsOutput_.setMessage(jointsMessage);
 }
 
 void SensorsModule::updateTemperatureMessage()

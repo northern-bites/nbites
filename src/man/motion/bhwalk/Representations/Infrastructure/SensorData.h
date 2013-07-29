@@ -52,7 +52,7 @@ public:
   );
 
   float data[numOfSensors]; /**< The data of all sensors. */
-  short currents[JointData::numOfJoints]; /**< The currents of all motors. */
+  float currents[JointData::numOfJoints]; /**< The currents of all motors. */
   unsigned char temperatures[JointData::numOfJoints]; /**< The temperature of all motors. */
   unsigned timeStamp; /**< The time when the sensor data was received. */
 

@@ -1,6 +1,5 @@
 #include "MotionModule.h"
 #include "Profiler.h"
-
 #include <fstream>
 
 namespace man
@@ -52,6 +51,7 @@ void MotionModule::run_()
     // (1) Before anything else happens, it is important to
     //     retrieve the correct current joint angles.
     jointsInput_.latch();
+    currentsInput_.latch();
     inertialsInput_.latch();
     fsrInput_.latch();
     stiffnessInput_.latch();
@@ -60,7 +60,8 @@ void MotionModule::run_()
     requestInput_.latch();
     fallInput_.latch();
 
-    sensorAngles    = toJointAngles(jointsInput_.message());
+    sensorAngles   = toJointAngles(jointsInput_.message());
+    sensorCurrents = toJointAngles(currentsInput_.message());
 
     newInputJoints = false;
 
@@ -189,13 +190,6 @@ bool MotionModule::postProcess()
         swapHeadProvider();
     }
 
-    // Update sensors with the correct support foot because it may have
-    // changed this frame.
-    // TODO: This can be improved by keeping a local copy of the SupportFoot
-    //       so that we only update sensors when there has been a change.
-    //       The overhead of the mutex shouldn't be that high though.
-    //sensors->setSupportFoot(curProvider->getSupportFoot());
-
     //return if one of the enactors is active
     return curProvider->isActive()  || curHeadProvider->isActive();
 }
@@ -211,15 +205,18 @@ void MotionModule::processBodyJoints()
             walkProvider.setStandby(true);
             //"fake" calculate - this is just for the sensor computation
             walkProvider.calculateNextJointsAndStiffnesses(
-                sensorAngles, inertialsInput_.message(), fsrInput_.message());
+                sensorAngles, sensorCurrents,
+                inertialsInput_.message(), fsrInput_.message());
             curProvider->calculateNextJointsAndStiffnesses(
-                sensorAngles, inertialsInput_.message(), fsrInput_.message());
+                sensorAngles, sensorCurrents,
+                inertialsInput_.message(), fsrInput_.message());
         }
         else
         {
             walkProvider.setStandby(false);
             walkProvider.calculateNextJointsAndStiffnesses(
-                sensorAngles, inertialsInput_.message(), fsrInput_.message());
+                sensorAngles, sensorCurrents, 
+                inertialsInput_.message(), fsrInput_.message());
         }
 
         const std::vector<float> llegJoints =
@@ -265,7 +262,7 @@ void MotionModule::processHeadJoints()
     if (curHeadProvider->isActive())
     {
         curHeadProvider->calculateNextJointsAndStiffnesses(
-            sensorAngles,
+            sensorAngles, sensorCurrents,
             inertialsInput_.message(),
             fsrInput_.message());
         std::vector<float> headJoints =
@@ -377,6 +374,7 @@ void MotionModule::processMotionInput()
         {
             // Send an unfreeze command so we can stand up.
             sendMotionCommand(UnfreezeCommand::ptr(new UnfreezeCommand()));
+            gainsOn = true;
             stiff = true;
             sendMotionCommand(bodyCommandInput_.message().script());
         }
@@ -680,8 +678,9 @@ void MotionModule::sendMotionCommand(messages::WalkCommand command)
         new WalkCommand(
             command.x_percent(),
             command.y_percent(),
-            command.h_percent())
-        );
+            command.h_percent()
+            )
+    );
     walkProvider.setCommand(walkCommand);
 }
 
@@ -914,17 +913,19 @@ void MotionModule::sendMotionCommand(const DestinationCommand::ptr command)
 void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 {
     // Message is coming from behaviors in centimeters and degrees
-    // StepCommands take millimeters and radians so Convert!
+    // StepCommands take millimeters and radians so convert!
     float relX = command.rel_x() * CM_TO_MM;
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
 
-    // For now go at half speed for odometry walk
-    // @TODO major refactoring on all dis shit. lets make it hot
-    float DEFAULT_SPEED = .5f;
-    float gain = DEFAULT_SPEED;
+    float ballRelX = command.kick().ball_rel_x() * CM_TO_MM;
+    float ballRelY = command.kick().ball_rel_y() * CM_TO_MM;
+
+    float gain; 
     if(command.gain() > 0.f)
         gain = command.gain();
+    else
+        gain = DEFAULT_SPEED;
 
     nextProvider = &walkProvider;
     DestinationCommand::ptr newCommand(
@@ -932,7 +933,12 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
             relX,
             relY,
             relH,
-            gain)
+            gain,
+            command.pedantic(),
+            command.kick().perform_motion_kick(),
+            ballRelX,
+            ballRelY,
+            command.kick().kick_type())
         );
     walkProvider.setCommand(newCommand);
 }
@@ -948,17 +954,16 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
 void MotionModule::sendMotionCommand(messages::OdometryWalk command)
 {
     // Message is coming from behaviors in centimeters and degrees
-    // StepCommands take millimeters and radians so Convert!
+    // StepCommands take millimeters and radians so convert!
     float relX = command.rel_x() * CM_TO_MM;
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
 
-    // For now go at half speed for odometry walk
-    // @TODO major refactoring on all dis shit. lets make it hot
-    float DEFAULT_SPEED = .5f;
-    float gain = DEFAULT_SPEED;
+    float gain; 
     if(command.gain() > 0.f)
         gain = command.gain();
+    else
+        gain = DEFAULT_SPEED;
 
     nextProvider = &walkProvider;
     StepCommand::ptr newCommand(
