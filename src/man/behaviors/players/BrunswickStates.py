@@ -110,6 +110,10 @@ def gamePlaying(player):
     if not player.brain.motion.calibrated:
         return player.stay()
 
+    ##################
+    if player.usingBoxPositions:
+        return player.goNow('positionAtHome')
+
     roleState = player.getRoleState()
     return player.goNow(roleState)
 

@@ -34,6 +34,7 @@ def kickBallExecute(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         kickBallExecute.sweetMove = player.kick.sweetMove
+        player.shouldKickOff = False
         return player.stay()
 
     # if ball has moved (and we haven't already kicked), don't kick

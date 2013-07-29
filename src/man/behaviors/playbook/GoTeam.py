@@ -218,36 +218,33 @@ class GoTeam:
 
         # Set the chaser!
         chaser_mate = self.determineChaser()
-        if (chaser_mate.playerNumber == self.brain.playerNumber
-            and ((not PBConstants.HACK_D1 and not PBConstants.HACK_D2 and not PBConstants.HACK_O)
-                 or((PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O)
-                  and self.ballInRange()))):
+        if (chaser_mate.playerNumber == self.brain.playerNumber):
             play.setRole(roles[-1])
             play.setPosition(locations[-1])
             return
 
-        #HACK RoboCup 2013
-        if PBConstants.HACK_D1:
-            play.setRole(PBConstants.DEFENDER)
-            play.setPosition(PBConstants.HACK_D1_LOC)
-            return
-        if PBConstants.HACK_D2:
-            play.setRole(PBConstants.DEFENDER)
-            play.setPosition(PBConstants.HACK_D2_LOC)
-            return
-        if PBConstants.HACK_O:
-            play.setRole(PBConstants.OFFENDER)
-            play.setPosition(PBConstants.HACK_O_LOC)
-            return
-        else: # HACK BACK_UP
-            play.setRole(PBConstants.MIDDIE)
-            play.setPosition(PBConstants.HACK_BACKUP_LOC)
-            return
+        # #HACK RoboCup 2013
+        # if PBConstants.HACK_D1:
+        #     play.setRole(PBConstants.DEFENDER)
+        #     play.setPosition(PBConstants.HACK_D1_LOC)
+        #     return
+        # if PBConstants.HACK_D2:
+        #     play.setRole(PBConstants.DEFENDER)
+        #     play.setPosition(PBConstants.HACK_D2_LOC)
+        #     return
+        # if PBConstants.HACK_O:
+        #     play.setRole(PBConstants.OFFENDER)
+        #     play.setPosition(PBConstants.HACK_O_LOC)
+        #     return
+        # else: # HACK BACK_UP
+        #     play.setRole(PBConstants.MIDDIE)
+        #     play.setPosition(PBConstants.HACK_BACKUP_LOC)
+        #     return
 
         # Find which active field player should go to each position
         if(roles[0] == PBConstants.CHASER):
             print "Hey. You're an idiot. Priorities are fucked."
-        firstPlayer = seplf.findClosestPlayer(roles[0],
+        firstPlayer = self.findClosestPlayer(roles[0],
                                              [chaser_mate])
         if firstPlayer.playerNumber == self.brain.playerNumber:
             play.setRole(roles[0])
@@ -302,20 +299,20 @@ class GoTeam:
         kickoff = self.brain.gameController.ownKickOff
         locations = None
 
-        if PBConstants.HACK_D1:
-            play.setRole(PBConstants.DEFENDER)
-            play.setPosition(PBConstants.HACK_D1_LOC)
-            return
+        # if PBConstants.HACK_D1:
+        #     play.setRole(PBConstants.DEFENDER)
+        #     play.setPosition(PBConstants.HACK_D1_LOC)
+        #     return
 
-        if PBConstants.HACK_D2:
-            play.setRole(PBConstants.DEFENDER)
-            play.setPosition(PBConstants.HACK_D2_LOC)
-            return
+        # if PBConstants.HACK_D2:
+        #     play.setRole(PBConstants.DEFENDER)
+        #     play.setPosition(PBConstants.HACK_D2_LOC)
+        #     return
 
-        if PBConstants.HACK_O:
-            play.setRole(PBConstants.OFFENDER)
-            play.setPosition(PBConstants.HACK_O_READY_LOC)
-            return
+        # if PBConstants.HACK_O:
+        #     play.setRole(PBConstants.OFFENDER)
+        #     play.setPosition(PBConstants.HACK_O_READY_LOC)
+        #     return
 
         if kickoff:
             locations = (PBConstants.READY_O_CHASER_LOCATION,
@@ -352,24 +349,24 @@ class GoTeam:
         if chaser.playerNumber == self.brain.playerNumber:
             play.setRole(PBConstants.CHASER)
             play.setPosition(locations[0])
-        else:
+        # else:
 
-            # HACK RoboCup 2013
-            play.setRole(PBConstants.MIDDIE)
-            play.setPosition(PBConstants.HACK_BACKUP_READY_LOC)
+        #     # HACK RoboCup 2013
+        #     play.setRole(PBConstants.MIDDIE)
+        #     play.setPosition(PBConstants.HACK_BACKUP_READY_LOC)
 
-            defender = self.determineDefender([chaser])
-            if defender.playerNumber == self.brain.playerNumber:
-                play.setRole(PBConstants.DEFENDER)
-                play.setPosition(locations[1])
-            else:
-                offender = self.determineOffender([chaser, defender])
-                if offender.playerNumber == self.brain.playerNumber:
-                    play.setRole(PBConstants.OFFENDER)
-                    play.setPosition(locations[2])
-                else: # Middie
-                    play.setRole(PBConstants.MIDDIE)
-                    play.setPosition(locations[3])
+        #     defender = self.determineDefender([chaser])
+        #     if defender.playerNumber == self.brain.playerNumber:
+        #         play.setRole(PBConstants.DEFENDER)
+        #         play.setPosition(locations[1])
+        #     else:
+        #         offender = self.determineOffender([chaser, defender])
+        #         if offender.playerNumber == self.brain.playerNumber:
+        #             play.setRole(PBConstants.OFFENDER)
+        #             play.setPosition(locations[2])
+        #         else: # Middie
+        #             play.setRole(PBConstants.MIDDIE)
+        #             play.setPosition(locations[3])
 
 
     def determineChaser(self):
@@ -385,10 +382,10 @@ class GoTeam:
                 self.printf("I should Chase")
             return self.me
 
-        # HACK for RoboCup 2013
-        if ((PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O)
-            and (self.ballInRange())):
-            return self.me
+        # # HACK for RoboCup 2013
+        # if ((PBConstants.HACK_D1 or PBConstants.HACK_D2 or PBConstants.HACK_O)
+        #     and (self.ballInRange())):
+        #     return self.me
 
         # loop through the teammates
         for mate in self.activeFieldPlayers:
