@@ -5,9 +5,7 @@
 
 #include "Common.h"
 
-// Bowdoin port
-//#define TEAM_PORT 4000
-#define TEAM_PORT 11450
+#define TEAM_PORT 4500
 
 #define UDP_BUF_SIZE 1024
 #define TCP_BUF_SIZE 1048576 // 1MB for the Nao's
