@@ -28,31 +28,16 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.brain.fallController.enabled = False
-    return player.goLater('wait')
+    return player.goLater('kick')
 
 def gamePenalized(player):
     if player.firstFrame():
         player.brain.fallController.enabled = False
 
-    return player.goLater('restore')
-
-def wait(player):
-    if player.firstFrame():
-        player.brain.nav.stand()
-
-    if player.counter == 100:
-        return player.goLater('dive')
     return player.stay()
 
-def dive(player):
+def kick(player):
     if player.firstFrame():
-        player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
-
-    return player.stay()
-
-def restore(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
+        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
 
     return player.stay()
