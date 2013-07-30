@@ -8,6 +8,8 @@ def findBall(player):
     """
     if transitions.shouldChaseBall(player):
         if not player.brain.play.isChaser():
+            if player.usingBoxPositions:
+                return player.goLater('positionAtHome')
             return player.goLater('playbookPosition')
         else:
             return player.goLater('chase')
@@ -38,6 +40,8 @@ def spinFindBall(player):
 
     if ((player.brain.play.isChaser() and transitions.shouldWalkFindBall(player))
         or (not player.brain.play.isChaser() and transitions.spunOnce(player))):
+        if player.usingBoxPositions:
+            return player.goLater('positionAtHome')
         return player.goLater('playbookPosition')
 
     return player.stay()
