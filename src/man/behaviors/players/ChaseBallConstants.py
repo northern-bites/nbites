@@ -1,5 +1,7 @@
 from ..navigator import BrunswickSpeeds as speeds
 
+DEBUG_ORBIT = False
+
 # Transitions' Constants
 # Ball on and off frame thresholds
 BALL_ON_THRESH = 2
