@@ -12,6 +12,7 @@
 #undef private
 #undef protected
 
+using namespace man::vision;
 namespace HC = HoughConstants;
 
 /**

@@ -1,6 +1,9 @@
 #include "VisualFieldObject.h"
 using namespace std;
 
+namespace man {
+namespace vision {
+
 const float VisualFieldObject::BOTH_UNSURE_DISTANCE_SD = 2500;
 
 VisualFieldObject::VisualFieldObject(const fieldObjectID _id)
@@ -212,4 +215,7 @@ void VisualFieldObject::updateObject(Blob * b, certainty _certainty,
 const bool VisualFieldObject::hasPositiveID()
 {
 	return possibleFieldObjects->size() == 2 || possibleFieldObjects->size() == 1;
+}
+
+}
 }

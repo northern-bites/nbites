@@ -2,7 +2,7 @@
  * Specified in http://www.aldebaran-robotics.com/documentation/dev/cpp/tutos/create_module.html#how-to-create-a-local-module
  **/
 
-#include "NewMan.h"
+#include "Man.h"
 
 #include <alcommon/albrokermanager.h>
 

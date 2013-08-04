@@ -4,6 +4,9 @@
 #include "Utility.h"
 using namespace std;
 
+namespace man{
+namespace vision{
+
 // We often deal with an estimated value in comparison with a known value and
 // its necessity of being within a certain amount in order to be acceptable.
 bool CLOSE_ENOUGH(float arg1, float arg2, float errorAllowed) {
@@ -890,4 +893,8 @@ point<int> Utility::getClosestLinePoint(const VisualLine& line,
         }
     }
     return closest;
+}
+
+
+}
 }

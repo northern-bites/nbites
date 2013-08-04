@@ -5,8 +5,12 @@
 
 typedef unsigned char uchar;
 
-class Threshold;  // forward reference
-class Gradient;
+namespace man {
+namespace vision {
+	class Threshold;  // forward reference
+	class Gradient;
+}
+}
 
 #include "Vision.h"
 
@@ -17,9 +21,10 @@ class Gradient;
 #include "Cross.h"
 #include "Robots.h"
 #include "Context.h"
-#include "Profiler.h"
 #include "NaoPose.h"
 
+namespace man {
+namespace vision {
 //#define SOFTCOLORS
 
 //
@@ -120,8 +125,8 @@ public:
 
 
     // main methods
-    void visionLoop();
-    void obstacleLoop();
+    void visionLoop(const messages::JointAngles& ja, const messages::InertialState& inert);
+    void obstacleLoop(const messages::JointAngles& ja, const messages::InertialState& inert);
     // inline void threshold();
     void thresholdOldImage(const uint8_t *oldImg, uint16_t* newImg);
     inline void runs();
@@ -177,8 +182,8 @@ public:
     int getRobotBottom(int x, int c);
     int postCheck(bool which, int left, int right);
     point <int> backStopCheck(bool which, int left, int right);
-    void setYUV(const uint16_t* newyuv);
-    void setYUV_bot(const uint16_t* newyuv);
+    void setIm(const uint16_t* thrIm);
+    void setIm_bot(const uint16_t* thrIm);
     const uint16_t* getYUV();
     static const char * getShortColor(int _id);
 
@@ -245,6 +250,7 @@ public:
 #ifdef OFFLINE
     //write lines, points, boxes to this array to avoid changing the real image
     uint8_t debugImage[IMAGE_HEIGHT][IMAGE_WIDTH];
+	uint8_t betterDebugImage[IMAGE_HEIGHT * IMAGE_WIDTH];
 #endif
 
     bool usingTopCamera;
@@ -315,5 +321,8 @@ private:
     static const bool debugVisualLines = false;
 #endif
 };
+
+}
+}
 
 #endif // RLE_h_DEFINED

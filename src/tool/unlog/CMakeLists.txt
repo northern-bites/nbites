@@ -11,4 +11,6 @@ add_library(
 target_link_libraries(
   unlog
   portals
+  messages
+  ${PROTOBUF_LIBRARY}
 )

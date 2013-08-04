@@ -4,6 +4,9 @@
 #include "VisualDetection.h"
 #include "VisualLandmark.h"
 
+namespace man {
+namespace vision {
+
 class VisualObject : public VisualLandmark, public VisualDetection
 {
 public:
@@ -19,5 +22,8 @@ public:
 
     virtual ~VisualObject(){ }
 };
+
+}
+}
 
 #endif /* _VisualObject_h_DEFINED */

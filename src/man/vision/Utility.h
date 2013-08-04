@@ -3,7 +3,12 @@
 
 #include <cmath>          // Uses fabs, trig functions like atan
 
-class Utility;
+namespace man {
+namespace vision {
+	class Utility;
+}
+}
+
 #include "Common.h"
 #include "Structs.h"
 #include "VisualLine.h"
@@ -15,6 +20,9 @@ class Utility;
 // This class contains static utility functions which are used in many different
 // parts of our code.
 //
+
+namespace man {
+namespace vision {
 
 class Utility {
 
@@ -381,5 +389,7 @@ public:
 
 };
 
+}
+}
 
 #endif

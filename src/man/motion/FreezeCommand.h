@@ -3,7 +3,12 @@
 
 #include "BaseFreezeCommand.h"
 
-class FreezeCommand : public BaseFreezeCommand {
+namespace man
+{
+namespace motion
+{
+class FreezeCommand : public BaseFreezeCommand 
+{
 public:
     typedef boost::shared_ptr<FreezeCommand> ptr;
 
@@ -11,5 +16,7 @@ public:
     ~FreezeCommand(){};
 
 };
+} // namespace motion
+} // namespace man
 
 #endif

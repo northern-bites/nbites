@@ -1,51 +1,35 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
 #include "LinearChoppedCommand.h"
 #include "MotionConstants.h"
 
-using namespace std;
 using namespace Kinematics;
 
+namespace man
+{
+namespace motion
+{
+
 LinearChoppedCommand::LinearChoppedCommand(const JointCommand::ptr command,
-					   vector<float> currentJoints,
+					   std::vector<float> currentJoints,
 					   int chops )
     : ChoppedCommand(command, chops)
 {
     buildCurrentChains(currentJoints);
 
-    vector<float> finalJoints = ChoppedCommand::getFinalJoints(command,
+    std::vector<float> finalJoints = ChoppedCommand::getFinalJoints(command,
 							       currentJoints);
-    vector<float> diffPerChop = getDiffPerChop(currentJoints,
+    std::vector<float> diffPerChop = getDiffPerChop(currentJoints,
 					       finalJoints,
 					       numChops );
 
     buildDiffChains( diffPerChop );
 }
 
-void LinearChoppedCommand::buildCurrentChains( vector<float> currentJoints ) {
-    vector<float>::iterator firstCurrentJoint = currentJoints.begin();
-    vector<float>::iterator chainStart, chainEnd;
+    void LinearChoppedCommand::buildCurrentChains( std::vector<float> currentJoints ) {
+	std::vector<float>::iterator firstCurrentJoint = currentJoints.begin();
+	std::vector<float>::iterator chainStart, chainEnd;
 
     for (unsigned int chain = 0; chain < NUM_CHAINS ; ++chain) {
-	vector<float> *currentChain = getCurrentChain(chain);
+	std::vector<float> *currentChain = getCurrentChain(chain);
 
 	chainStart = firstCurrentJoint + chain_first_joint[chain];
 	chainEnd = firstCurrentJoint + chain_last_joint[chain] + 1;
@@ -53,12 +37,12 @@ void LinearChoppedCommand::buildCurrentChains( vector<float> currentJoints ) {
     }
 }
 
-void LinearChoppedCommand::buildDiffChains( vector<float>diffPerChop ) {
-    vector<float>::iterator firstDiffJoint = diffPerChop.begin();
-    vector<float>::iterator chainStart,chainEnd;
+    void LinearChoppedCommand::buildDiffChains( std::vector<float>diffPerChop ) {
+	std::vector<float>::iterator firstDiffJoint = diffPerChop.begin();
+	std::vector<float>::iterator chainStart,chainEnd;
 
     for (unsigned int chain = 0; chain < NUM_CHAINS ; ++chain) {
-	vector<float> *diffChain = getDiffChain(chain);
+	std::vector<float> *diffChain = getDiffChain(chain);
 
 	chainStart = firstDiffJoint + chain_first_joint[chain];
 	chainEnd = firstDiffJoint + chain_last_joint[chain] + 1;
@@ -68,7 +52,7 @@ void LinearChoppedCommand::buildDiffChains( vector<float>diffPerChop ) {
 }
 
 
-vector<float>* LinearChoppedCommand::getDiffChain(int id) {
+    std::vector<float>* LinearChoppedCommand::getDiffChain(int id) {
     switch (id) {
     case HEAD_CHAIN:
 	return &diffHead;
@@ -82,11 +66,11 @@ vector<float>* LinearChoppedCommand::getDiffChain(int id) {
 	return &diffRArm;
     default:
 	std::cout << "INVALID CHAINID" << std::endl;
-	return new vector<float>(0);
+	return new std::vector<float>(0);
     }
 }
 
-vector<float> LinearChoppedCommand::getNextJoints(int id) {
+    std::vector<float> LinearChoppedCommand::getNextJoints(int id) {
     if (numChopped.at(id) <= numChops) {
 	// Increment the current chain
 	incrCurrChain(id);
@@ -103,7 +87,7 @@ vector<float> LinearChoppedCommand::getNextJoints(int id) {
 	return *getCurrentChain(id);
     }
 }
-vector<float>* LinearChoppedCommand::getCurrentChain(int id) {
+    std::vector<float>* LinearChoppedCommand::getCurrentChain(int id) {
     switch (id) {
     case HEAD_CHAIN:
 	return &currentHead;
@@ -117,17 +101,17 @@ vector<float>* LinearChoppedCommand::getCurrentChain(int id) {
 	return &currentRArm;
     default:
 	std::cout << "INVALID CHAINID" << std::endl;
-	return new vector<float>(0);
+	return new std::vector<float>(0);
     }
 }
 
 void LinearChoppedCommand::incrCurrChain(int id) {
-    vector<float> * currentChain = getCurrentChain(id);
-    vector<float> * diffChain = getDiffChain(id);
+    std::vector<float> * currentChain = getCurrentChain(id);
+    std::vector<float> * diffChain = getDiffChain(id);
 
     // Set iterators to diff and current vectors
-    vector<float>::iterator curr = currentChain->begin();
-    vector<float>::iterator diff = diffChain->begin();
+    std::vector<float>::iterator curr = currentChain->begin();
+    std::vector<float>::iterator diff = diffChain->begin();
 
     numChopped.at(id)++;
     while (curr != currentChain->end() && diff != diffChain->end() ) {
@@ -137,10 +121,10 @@ void LinearChoppedCommand::incrCurrChain(int id) {
     }
 }
 
-vector<float> LinearChoppedCommand::getDiffPerChop( vector<float> current,
-						    vector<float> final,
+    std::vector<float> LinearChoppedCommand::getDiffPerChop( std::vector<float> current,
+							     std::vector<float> final,
 						    int numChops ) {
-    vector<float> diffPerChop;
+	std::vector<float> diffPerChop;
 
     for (unsigned int joint_id=0; joint_id < NUM_JOINTS ;++joint_id) {
 	diffPerChop.push_back( (final.at(joint_id) -
@@ -149,3 +133,6 @@ vector<float> LinearChoppedCommand::getDiffPerChop( vector<float> current,
 
     return diffPerChop;
 }
+
+} // namespace motion
+} // namespace man

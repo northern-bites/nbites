@@ -12,6 +12,9 @@
 #include "FieldConstants.h"
 #include "ConcreteLandmark.h"
 
+namespace man {
+namespace vision {
+
 #define CONCRETE_CROSS_START_ID 80
 enum crossID {
     BLUE_GOAL_CROSS = CONCRETE_CROSS_START_ID,
@@ -79,5 +82,8 @@ static const point <float> BLUE_GOAL_CROSS_LOC =
 static const point <float> YELLOW_GOAL_CROSS_LOC =
     point<float>(LANDMARK_YELLOW_GOAL_CROSS_X,
                   LANDMARK_YELLOW_GOAL_CROSS_Y);
+
+}
+}
 
 #endif // ConcreteCross_h_defined

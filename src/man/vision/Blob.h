@@ -6,6 +6,9 @@
 #include "VisionHelpers.h"
 #include <stdlib.h>
 
+namespace man {
+namespace vision {
+
 class Blob {
 public:
     Blob();
@@ -80,4 +83,6 @@ private:
     int area;
 };
 
+}
+}
 #endif // Blob_h_defined

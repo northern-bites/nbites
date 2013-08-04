@@ -1,0 +1,14 @@
+package messages;
+
+import "RobotLocation.proto";
+
+message ParticleSwarm
+{
+    repeated Particle particle = 1;
+}
+
+message Particle
+{
+    optional float weight = 1;
+    optional RobotLocation loc = 2;
+}

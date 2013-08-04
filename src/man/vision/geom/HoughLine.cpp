@@ -9,6 +9,9 @@
 using namespace std;
 using namespace VisionDef;
 
+namespace man {
+namespace vision {
+
 HoughLine::HoughLine() :
     rIndex(0), tIndex(0), r(0), t(0), score(0),
     sinT(0), cosT(0), didSin(false), didCos(false)
@@ -122,4 +125,7 @@ void HoughLine::findLineImageIntersects(const HoughLine& line,
     if (u1 > u2){
         swap(u1,u2);
     }
+}
+
+}
 }

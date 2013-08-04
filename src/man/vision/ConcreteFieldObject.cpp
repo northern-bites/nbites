@@ -1,6 +1,9 @@
 #include "ConcreteFieldObject.h"
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // Constructors
 ConcreteFieldObject::ConcreteFieldObject(const float _fieldX,
                                          const float _fieldY,
@@ -153,3 +156,5 @@ const float ConcreteFieldObject::getHeightFromGround(const int _id)
     return 0;
 }
 
+}
+}

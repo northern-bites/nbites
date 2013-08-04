@@ -11,6 +11,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 VisualFieldEdge::VisualFieldEdge() {
 	distances.left = UNKNOWN_DISTANCE;
 	distances.center = UNKNOWN_DISTANCE;
@@ -34,3 +37,5 @@ Basic_Shape VisualFieldEdge::getShape() {
 	return FLAT;
 }
 
+}
+}

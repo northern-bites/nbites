@@ -1,40 +1,22 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
 #include "BodyJointCommand.h"
-using namespace std;
-using namespace MotionConstants;
 using namespace Kinematics;
 
+namespace man
+{
+namespace motion
+{
 BodyJointCommand::BodyJointCommand
 (const float time,
- const vector<float>& bodyJoints,
- const vector<float>& body_stiffness,
+ const std::vector<float>& bodyJoints,
+ const std::vector<float>& body_stiffness,
  const InterpolationType _type)
-    : JointCommand(BODY_JOINT, time, _type, body_stiffness),
+    : JointCommand(MotionConstants::BODY_JOINT, time, _type, body_stiffness),
       larm_joints(0), lleg_joints(0), rleg_joints(0), rarm_joints(0)
 {
     setChainList();
     // bodyJoints must contain joints for the _entire_ body
-    vector<float> *joints;
-    vector<float>::const_iterator firstMark, endMark;
+    std::vector<float> *joints;
+    std::vector<float>::const_iterator firstMark, endMark;
 
     // Both iterators start at the beginning
     // then bump them to the end of the head_chain,
@@ -43,7 +25,7 @@ BodyJointCommand::BodyJointCommand
 
     // Build joint vectors for each chain
     // from the bodyJoint vector
-    list<int>::iterator chainID = chainList.begin();
+    std::list<int>::iterator chainID = chainList.begin();
     for ( ; chainID != chainList.end() ; chainID++ ) {
 
         joints = getJoints(static_cast<ChainID>(*chainID));
@@ -58,10 +40,10 @@ BodyJointCommand::BodyJointCommand
 
 BodyJointCommand::BodyJointCommand(const float time,
                                    ChainID chainID,
-                                   const vector<float>& joints,
-                                   const vector<float>& body_stiffness,
+                                   const std::vector<float>& joints,
+                                   const std::vector<float>& body_stiffness,
                                    const InterpolationType _type)
-    : JointCommand(BODY_JOINT, time, _type, body_stiffness), larm_joints(0),
+    : JointCommand(MotionConstants::BODY_JOINT, time, _type, body_stiffness), larm_joints(0),
       lleg_joints(0), rleg_joints(0), rarm_joints(0)
 {
     setChainList();
@@ -84,13 +66,13 @@ BodyJointCommand::BodyJointCommand(const float time,
 }
 
 BodyJointCommand::BodyJointCommand(const float time,
-                                   const vector<float>& larm,
-                                   const vector<float>& lleg,
-                                   const vector<float>& rleg,
-                                   const vector<float>& rarm,
-                                   const vector<float>& body_stiffness,
+                                   const std::vector<float>& larm,
+                                   const std::vector<float>& lleg,
+                                   const std::vector<float>& rleg,
+                                   const std::vector<float>& rarm,
+                                   const std::vector<float>& body_stiffness,
                                    const InterpolationType _type)
-    : JointCommand(BODY_JOINT, time, _type, body_stiffness), larm_joints(larm),
+    : JointCommand(MotionConstants::BODY_JOINT, time, _type, body_stiffness), larm_joints(larm),
       lleg_joints(lleg), rleg_joints(rleg), rarm_joints(rarm)
 {
     setChainList();
@@ -100,7 +82,7 @@ BodyJointCommand::~BodyJointCommand (void)
 {
 }
 
-const vector<float>&
+    const std::vector<float>&
 BodyJointCommand::getJoints (ChainID chainID) const
 {
     switch (chainID) {
@@ -113,14 +95,12 @@ BodyJointCommand::getJoints (ChainID chainID) const
     case RARM_CHAIN:
         return rarm_joints;
     default:
-        cout << "SHOULD NOT ASK FOR THIS TYPE OF CHAIN FROM BODYJOINTCOMMAND"
-             << endl;
-        static vector<float> empty;
+        static std::vector<float> empty;
         return empty;
     }
 }
 
-vector<float>*
+    std::vector<float>*
 BodyJointCommand::getJoints (ChainID chainID)
 {
     switch (chainID) {
@@ -156,6 +136,10 @@ BodyJointCommand::conflicts (const float chainTimeRemaining[NUM_CHAINS]) const {
 void
 BodyJointCommand::setChainList() {
     chainList.insert(chainList.end(),
-                     BODY_JOINT_CHAINS,
-                     BODY_JOINT_CHAINS + BODY_JOINT_NUM_CHAINS);
+                     MotionConstants::BODY_JOINT_CHAINS,
+                     MotionConstants::BODY_JOINT_CHAINS +
+		     MotionConstants::BODY_JOINT_NUM_CHAINS);
 }
+
+} // namespace motion
+} // namespace man

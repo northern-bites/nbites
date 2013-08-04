@@ -23,13 +23,21 @@
 
 #include <stdlib.h>
 
-class Cross; // forward reference
+namespace man {
+namespace vision {
+	class Cross; // forward reference
+}
+}
+
 #include "Threshold.h"
 #include "Context.h"
 #include "VisionStructs.h"
 #include "VisualLine.h"
 #include "Blob.h"
 #include "Blobs.h"
+
+namespace man {
+namespace vision {
 
 static const int NOISE = 4;
 
@@ -71,4 +79,8 @@ private:
     static const bool CROSSDEBUG = false;
 #endif
 };
+
+}
+}
+
 #endif

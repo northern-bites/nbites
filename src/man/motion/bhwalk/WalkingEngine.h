@@ -17,7 +17,7 @@
 #include "Modules/Sensing/InertiaSensorFilter.h"
 #include "Modules/Sensing/SensorFilter.h"
 #include "Modules/Sensing/FallDownStateDetector.h"
-//#include "Modules/Sensing/GroundContactDetector.h"
+#include "Modules/Sensing/GroundContactDetector.h"
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Configuration/MassCalibration.h"
 #include "Representations/Configuration/JointCalibration.h"
@@ -77,15 +77,9 @@ public:
   */
   ~WalkingEngine() {}//theInstance = 0;}
 
-  /**
-  * Called from a MessageQueue to distribute messages
-  * @param message The message that can be read
-  * @return True if the message was handled
-  */
-  //this sends a kick message to the robot -- we don't use it
-//  static bool handleMessage(InMessage& message);
-
 private:
+
+  static const int INSTABILITY_THRESH = 500;
 
   class PIDCorrector
   {
@@ -573,16 +567,13 @@ private:
   RobotModel theRobotModel;
   RobotModelProvider robotModelProvider;
 
-  //not using this ATM - assume we're contacting the ground safely
-//  GroundContactDetector groundContactDetector;
+  GroundContactDetector groundContactDetector;
   GroundContactState theGroundContactState;
 
   //removes faulty deviant sensor data
   InspectedInertiaSensorData theInspectedInertiaSensorData;
   InertiaSensorInspector inertiaSensorInspector;
 
-  //damage configuration should say we don't trust the ground contact state
-  //that's because the ground contact detector is not in use currently;
   DamageConfiguration theDamageConfiguration;
   InertiaSensorData theInertiaSensorData;
   InertiaSensorCalibrator inertiaSensorCalibrator;
@@ -703,4 +694,13 @@ private:
   StepSize lastStepOffset;
   Pose2D upcomingOdometryOffset;
   bool upcomingOdometryOffsetValid;
+
+  // Northern Bites hack for instability issues
+  bool shouldReset;
+
+  // Northern Bites hack for hand speed info
+  void updateHandSpeeds();
+  Vector2<> lastLeftHandPos, lastRightHandPos;
+  float leftHandSpeed;
+  float rightHandSpeed;
 };

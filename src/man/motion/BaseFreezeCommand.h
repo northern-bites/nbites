@@ -1,9 +1,13 @@
-#ifndef BaseFreezeCommand_h
-#define BaseFreezeCommand_h
+#pragma once
 
 #include "MotionCommand.h"
 
-class BaseFreezeCommand : public MotionCommand {
+namespace man
+{
+namespace motion
+{
+class BaseFreezeCommand : public MotionCommand 
+{
 public:
     BaseFreezeCommand(float stiffness);
     virtual ~BaseFreezeCommand();
@@ -13,5 +17,7 @@ private:
     void setChainList();
     float targetStiffness;
 };
+} // namespace motion
+} // namespace man
 
-#endif
+

@@ -28,6 +28,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 #ifdef OFFLINE
 static const bool ROBOTSDEBUG = false;
 #else
@@ -55,6 +58,10 @@ void Robots::init()
 	}
 	blobs->init();
 	numberOfRuns = 0;
+
+#ifdef OFFLINE
+	debugRobots = true;
+#endif
 }
 
 /* Allocate the required amount of memory dependent on the primary color
@@ -148,11 +155,42 @@ void Robots::robot(Cross* cross)
 		// set the current as the last
         lastrunx = runs[i].x; lastruny = runs[i].y; lastrunh = runs[i].h;
     }
-    mergeBigBlobs();
+    //mergeBigBlobs();
     // check each of the candidate blobs to see if it might reasonably be
     // called a piece of a robot
 	int viable = 0;
     for (int i = 0; i < blobs->number(); i++) {
+		// see if we can tighten the blob up
+		int x = blobs->get(i).getLeft();
+		int y = blobs->get(i).getTop();
+		int w = blobs->get(i).width();
+		int h = blobs->get(i).height();
+		for (int j = y; j < y + h && j < IMAGE_HEIGHT; j++) {
+			int count = 0;
+			for (int k = x; k < x + w && k < IMAGE_WIDTH; k++) {
+				if (Utility::colorsEqual(thresh->getThresholded(j, k), color)) {
+					count++;
+					if (count > w / 3) {
+						blobs->setTop(i, j);
+						j = 1000;
+						k = 1000;
+					}
+				}
+			}
+		}
+		for (int j = y + h; j > y  && j > 0; j--) {
+			int count = 0;
+			for (int k = x; k < x + w && k < IMAGE_WIDTH; k++) {
+				if (Utility::colorsEqual(thresh->getThresholded(j, k), color)) {
+					count++;
+					if (count > w / 3) {
+						blobs->setBottom(i, j);
+						j = -1;
+						k = 1000;
+					}
+				}
+			}
+		}
         if (!sanityChecks(blobs->get(i), cross)) {
             if (blobs->get(i).getRight() > 0) {
                 if (debugRobots) {
@@ -165,12 +203,61 @@ void Robots::robot(Cross* cross)
             }
             blobs->init(i);
         } else {
-            if (debugRobots) {
-                vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
-                                 blobs->get(i).width(), blobs->get(i).height(),
-                                 MAROON);
+			// improve the bottom
+			/*int whites = 0;
+			int left = blobs->get(i).getLeft();
+			for (int j = blobs->get(i).getBottom(); j < IMAGE_HEIGHT; j++) {
+				whites = 0;
+				for (int k = 0; k < blobs->get(i).width(); k++) {
+					unsigned char pixel = thresh->getColor(k+left, j);
+					if (Utility::isWhite(pixel) || Utility::isBlue(pixel)) {
+						whites++;
+						if (whites > blobs->get(i).width() / 4 || whites > 4) {
+							if (debugRobots && j - blobs->get(i).getBottom() > 3) {
+								cout << "Resetting robot bottom, was " << blobs->get(i).getBottom() <<
+									" is " << j << endl;
+							}
+							blobs->setBottom(i, j);
+							k = IMAGE_WIDTH;
+							j = IMAGE_HEIGHT;
+						}
+					}
+				}
+				}*/
+			// one last sanity check - make sure the "robot" isn't off the field
+			estimate pose_est = vision->pose->pixEstimate(blobs->get(i).getLeft(),
+												  blobs->get(i).getBottom(),
+												  270);
+			float farDistance = vision->fieldEdge->getDistanceLeft();
+			if (blobs->get(i).getLeft() > 2 * IMAGE_WIDTH / 3) {
+				farDistance = vision->fieldEdge->getDistanceCenter();
+			} else if (blobs->get(i).getLeft() > IMAGE_WIDTH / 3) {
+				farDistance = vision->fieldEdge->getDistanceRight();
 			}
-            viable++;
+			if (debugRobots) {
+				cout << "Distance estimate to perspective robot is " <<
+					pose_est.dist << " " << farDistance << endl;
+			}
+			if ((pose_est.dist > 200 && pose_est.dist > farDistance && farDistance != 0)
+				|| (pose_est.dist == 0 && !farDistance == 0) || (pose_est.dist > 500)) {
+				if (debugRobots) {
+					cout << "Robot too far away " << endl;
+                    vision->drawRect(blobs->get(i).getLeft(),
+                                     blobs->get(i).getTop(),
+                                     blobs->get(i).width(),
+                                     blobs->get(i).height(),
+                                     BLUE);
+				}
+				blobs->init(i);
+			} else {
+
+				if (debugRobots) {
+					vision->drawRect(blobs->get(i).getLeft(), blobs->get(i).getTop(),
+									 blobs->get(i).width(), blobs->get(i).height(),
+									 MAROON);
+				}
+				viable++;
+			}
         }
     }
     // if we have some viable robots then let everyone know
@@ -432,7 +519,9 @@ Blob Robots::correctBlob(Blob area){
 
 bool Robots::sanityChecks(Blob candidate, Cross* cross) {
     const int blobHeightMin = 8;
+	const int blobWidthMin = 6;
     int height = candidate.height();
+	int width = candidate.width();
 	int bottom = candidate.getBottom();
     if (candidate.getRight() > 0) {
         // the bottom of the uniform shouldn't be above field horizon
@@ -440,13 +529,36 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
 		//  return false;
         //}
         // blobs must be big enough
-        if (candidate.height() < blobHeightMin) {
+        if (height < blobHeightMin || width < blobWidthMin) {
+			if (debugRobots) {
+				cout << "RObot is too small " << height << " " << width << endl;
+			}
             return false;
         }
-        // uniforms should be wider than they are tall
-        if (candidate.height() > candidate.width()) {
-            return false;
-        }
+		if (width > 2 * height) {
+			if (debugRobots) {
+				cout << "Too wide" << endl;
+			}
+			return false;
+		}
+		// blob must be reasonably of the right color
+		int x = candidate.getLeft();
+		int y = candidate.getTop();
+		int count = 0;
+		for ( ; x < candidate.getRight() && x < IMAGE_WIDTH; x++) {
+			for (y = candidate.getTop(); y < candidate.getBottom() && y < IMAGE_HEIGHT;
+				 y++) {
+				if (Utility::colorsEqual(thresh->getThresholded(y, x), color)) {
+					count++;
+				}
+			}
+		}
+		if (count < width * height / 3) {
+			if (debugRobots) {
+				cout << "Not enough of the color " << endl;
+			}
+			return false;
+		}
         // there ought to be some white below the uniform
         if (bottom < IMAGE_HEIGHT - 10 &&
 			!cross->checkForRobotBlobs(candidate)) {
@@ -463,13 +575,13 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
 			}
             return false;
         }
-        if (candidate.getTop() > candidate.height() * 2
+        /*if (candidate.getTop() > candidate.height() * 2
             && !whiteAbove(candidate)) {
 			if (debugRobots) {
 				cout << "Got rid for lack of white above" << endl;
 			}
             return false;
-        }
+			}*/
         // for some blobs we check even harder for white
         if (height < 2 * blobHeightMin && noWhite(candidate)) {
 			if (debugRobots) {
@@ -480,6 +592,9 @@ bool Robots::sanityChecks(Blob candidate, Cross* cross) {
 
 		if (color == NAVY_BIT && vision->pose->getHorizonY(0) < 0 &&
 			notGreen(candidate)) {
+			if (debugRobots) {
+				cout << "Scared of a possible navy robot" << endl;
+			}
 			return false;
 		}
         return true;
@@ -615,21 +730,35 @@ bool Robots::checkWhiteAllignment(Blob candidate) {
 bool Robots::whiteBelow(Blob candidate) {
 	int bottom = candidate.getBottom();
 	int height = candidate.height();
-	int scanline = bottom + height;
+	int scanline = bottom;
 	for (int y = scanline; y < IMAGE_HEIGHT && y < scanline + height; y += 3) {
 		int white = 0;
 		int green = 0;
+		int blue = 0;
 		for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
 			if (Utility::isWhite(thresh->getThresholded(y, x))) {
 				white++;
 			} else if (Utility::isGreen(thresh->getThresholded(y, x))) {
 				green++;
+			} else if (Utility::isBlue(thresh->getThresholded(y, x))) {
+				blue++;
 			}
 		}
 		if (green > candidate.width() / 2 && white == 0) {
+			if (debugRobots) {
+				cout << "Bad white below " << white << " " << blue << " " <<
+					candidate.width() << endl;
+				vision->drawPoint(candidate.getLeft(), y, BLUE);
+			}
 			return false;
 		}
 		if (white > candidate.width() / 4) {
+			return true;
+		}
+		if (blue > candidate.width() / 2 && white > 2) {
+			return true;
+		}
+		if (white + blue / 2 > candidate.width() / 3) {
 			return true;
 		}
 	}
@@ -714,7 +843,7 @@ void Robots::checkMerge(int i, int j) {
 	Blob a = blobs->get(i);
 	Blob b = blobs->get(j);
 	if (debugRobots) {
-		cout << endl << endl << "Checking merge" << endl;
+		cout << endl << endl << "Checking merger" << endl;
 		printBlob(a);
 		printBlob(b);
 	}
@@ -746,16 +875,16 @@ void Robots::checkMerge(int i, int j) {
 	}
 	int width = right - left + 1;
 	int height = bottom - top + 1;
-	int area = max(10, width * height / 27);
+	int area = max(10, width * height / 10);
 	int stripe = max(width, height);
 	for (int x = left; x < right; x+=3) {
 		for (int y = top; y < bottom; y+=3) {
 			if (debugRobots) {
-				vision->drawPoint(x, y, MAROON);
+				vision->drawPoint(x, y, BLUE);
 			}
 			if (Utility::colorsEqual(thresh->getThresholded(y, x), color)) {
 				col++;
-				if (col > area || col > stripe) {
+				if (col > area || col > stripe * 2) {
 					blobs->mergeBlobs(i, j);
 					if (debugRobots) {
 						cout << "Merge" << endl;
@@ -765,11 +894,23 @@ void Robots::checkMerge(int i, int j) {
 			} else if (Utility::isGreen(thresh->getThresholded(y, x))) {
 				green++;
 				if (green > 5) {
+					if (b.getRight() <= right) {
+						if (debugRobots) {
+							cout << "Y overlap, dropping small one" << endl;
+						}
+						blobs->init(j);
+					}
 					return;
 				}
 			} else if (Utility::isWhite(thresh->getThresholded(y, x))) {
 				miss++;
 				if (miss > area / 9 || miss > stripe) {
+					if (b.getRight() <= right) {
+						if (debugRobots) {
+							cout << "Y overlap, dropping small one" << endl;
+						}
+						blobs->init(j);
+					}
 					return;
 				}
 			}
@@ -780,6 +921,11 @@ void Robots::checkMerge(int i, int j) {
 		if (debugRobots) {
 			cout << "Merge" << endl;
 		}
+	} else if (b.getRight() <= right) {
+		if (debugRobots) {
+			cout << "Y overlap, dropping small one" << endl;
+		}
+		blobs->init(j);
 	}
 }
 
@@ -837,7 +983,12 @@ bool Robots::noWhite(Blob b) {
 void Robots::updateRobots(int which, int index)
 {
 	if (debugRobots) {
-		cout << "Updating robot " << which << " " << color << endl;
+		cout << "Updating robot " << which;
+		if (color == RED_BIT) {
+			cout << " Red " << endl;
+		} else {
+			cout << " Navy " << endl;
+		}
 	}
 	//printBlob(blobs[index]);
 	if (color == RED_BIT) {
@@ -857,6 +1008,7 @@ void Robots::updateRobots(int which, int index)
 			vision->navy3->updateRobot(blobs->get(index));
 		}
 	}
+	blobs->init(index);
 }
 
 /* Adds a new run to the basic data structure.
@@ -912,3 +1064,5 @@ void Robots::printBlob(Blob b) {
 #endif
 }
 
+}
+}

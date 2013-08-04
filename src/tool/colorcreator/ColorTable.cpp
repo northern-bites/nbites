@@ -9,9 +9,11 @@
 #include "ColorTable.h"
 
 #include <iostream>
+#include <assert.h>
+#include <stdlib.h>
 
-namespace qtool {
-namespace colorcreator {
+namespace tool {
+namespace color {
 
 using namespace image;
 using namespace std;
@@ -30,14 +32,16 @@ void ColorTable::read(string filename) {
     FILE *tableFile = fopen(filename.c_str(), "r");   //open table for reading
 
     if (!tableFile) {
-        cerr << "Could not open color table " << filename;
+        cerr << "Could not open color table " << filename << std::endl;
         return;
     }
 
     size_t bytesRead = fread(table, sizeof(byte), TABLE_SIZE, tableFile);
     if (bytesRead == 0) {
-        cerr << "Error reading color table " << filename;
+        cerr << "Error reading color table " << filename << std::endl;
     }
+    else
+        std::cout << "Succeed: Read " << filename << std::endl;
 
     fclose(tableFile);
 }
@@ -47,7 +51,7 @@ void ColorTable::write(string filename) {
     FILE *tableFile = fopen(filename.c_str(), "w");
 
     if (!tableFile) {
-        cerr << "Could open file for saving a color table " << filename;
+        cerr << "Could open file for saving a color table " << filename << endl;
         return;
     }
 
@@ -57,7 +61,6 @@ void ColorTable::write(string filename) {
 }
 
 int ColorTable::countColor(byte color) {
-
     int count = 0;
 
     for (int i = 0; i < TABLE_SIZE; i++) {
@@ -69,6 +72,14 @@ int ColorTable::countColor(byte color) {
     return count;
 }
 
+void ColorTable::copyTable(byte *newTable)
+{
+
+	for (int i = 0; i < TABLE_SIZE; i++) {
+		table[i] = newTable[i];
+	}
+
+}
 /* Write out a color table using bitwise definitions
  * using information from a set of NUM_COLORS colorSpace
  */
@@ -96,7 +107,7 @@ void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
                 Color color;
                 assert(2*y >=y && 2*x >= x && 2*z >= z); //overflow
                 color.setYuv((byte) (2*y), (byte) (2*x), (byte) (2*z));
-                for (int c = 0; c < image::NUM_COLORS; c++)
+                for (int c = 0; c < image::Color::NUM_COLORS; c++)
                 {
                     if (colorSpaces[c].contains(color)) {
                         temp = temp | image::Color_bits[c];
@@ -109,6 +120,40 @@ void ColorTable::writeFromSliders(QString filename, ColorSpace* colorSpaces) {
     file.write(table);
     file.close();
 }
+
+
+// /* Return a color table using bitwise definitions
+//  * using information from a set of NUM_COLORS colorSpace
+//  */
+// static byte* ColorTable::getTableFromSliders(ColorSpace* colorSpaces) {
+
+//     byte V_MAX = 128, U_MAX = 128, Y_MAX = 128;
+//     QByteArray table;
+
+//     // loop through all possible table values - our tables are v-u-y
+//     int count = 0;
+//     for (int z = 0; z < V_MAX; z++)
+//     {
+//         for (int x = 0; x < U_MAX; x++)
+//         {
+//             for (int y = 0; y < Y_MAX; y++)
+//             {
+//                 byte temp = 0;
+//                 Color color;
+//                 assert(2*y >=y && 2*x >= x && 2*z >= z); //overflow
+//                 color.setYuv((byte) (2*y), (byte) (2*x), (byte) (2*z));
+//                 for (int c = 0; c < image::Color::NUM_COLORS; c++)
+//                 {
+//                     if (colorSpaces[c].contains(color)) {
+//                         temp = temp | image::Color_bits[c];
+//                     }
+//                 }
+//                 table.append(temp);
+//             }
+//         }
+//     }
+//     return table;
+// }
 
 }
 }

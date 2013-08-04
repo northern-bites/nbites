@@ -18,6 +18,7 @@
 
 using namespace std;
 using boost::shared_ptr;
+using namespace man::vision;
 namespace HC = HoughConstants;
 
 class HoughSpaceTest : public ::testing::Test

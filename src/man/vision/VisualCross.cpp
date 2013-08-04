@@ -1,4 +1,8 @@
 #include "VisualCross.h"
+
+namespace man {
+namespace vision {
+
 VisualCross::VisualCross() :
     VisualObject(ABSTRACT_CROSS)
 {
@@ -121,4 +125,7 @@ void VisualCross::setBearingWithSD(float _bearing, float _distance)
 const bool VisualCross::hasPositiveID()
 {
 	return possibleCrosses->size() == 1 || possibleCrosses->size() == 2;
+}
+
+}
 }

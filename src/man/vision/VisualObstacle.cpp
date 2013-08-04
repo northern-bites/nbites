@@ -1,8 +1,10 @@
 #include "VisualObstacle.h"
 using namespace std;
 
+namespace man {
+namespace vision {
 
-VisualObstacle::VisualObstacle() 
+VisualObstacle::VisualObstacle()
 {
   init();
 }
@@ -39,3 +41,5 @@ void VisualObstacle::setOffField(bool _offField) {
   isOffField = _offField;
 }
 
+}
+}

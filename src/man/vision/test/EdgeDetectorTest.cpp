@@ -1,6 +1,4 @@
 #include <gtest/gtest.h>
-#include "Profiler.h"
-#include "visionconfig.h"
 
 #include <cmath>
 #include <iostream>
@@ -19,6 +17,7 @@
 #define DEFAULT_EDGE_VALUE 30
 
 using namespace std;
+using namespace man::vision;
 using boost::shared_ptr;
 
 class EdgeDetectorTest : public ::testing::Test

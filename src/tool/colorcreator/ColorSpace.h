@@ -13,10 +13,9 @@
 #include <QObject>
 #include <QTextStream>
 #include "image/Color.h"
-#include "ClassHelper.h"
 
-namespace qtool {
-namespace colorcreator {
+namespace tool {
+namespace color {
 
 static const std::string fltChannel_names[] = {
         "hMin", "hMax",
@@ -26,10 +25,9 @@ static const std::string fltChannel_names[] = {
         "vMin", "vMax"
 };
 
-class ColorSpace : public QObject {
-
+class ColorSpace : public QObject
+{
     Q_OBJECT;
-    ADD_NULL_INSTANCE(ColorSpace)
 
 public:
     enum Channel {
@@ -54,10 +52,10 @@ public:
         float s = color.getS();
         float z = color.getZ();
 
-		// we sometimes get bad values of Z
-		if (z > 1.0f) {
-			z = 1.0f;
-		}
+        // we sometimes get bad values of Z
+        if (z > 1.0f) {
+            z = 1.0f;
+        }
         if (params[hMin] > params[hMax]) {
             if (params[hMax] < h && h < params[hMin]) {
                 return false;
@@ -85,7 +83,7 @@ public:
     }
 
     bool verboseContains(image::Color color) const {
-		QTextStream cout(stdout);
+        QTextStream cout(stdout);
 
         // the circle can wrap around
         float h = color.getH();

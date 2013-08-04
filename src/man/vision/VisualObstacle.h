@@ -1,6 +1,8 @@
 #ifndef VISUAL_OBSTACLE_H
 #define VISUAL_OBSTACLE_H
 
+namespace man {
+namespace vision {
 
 class VisualObstacle {
 
@@ -35,5 +37,8 @@ class VisualObstacle {
 
 
 };
+
+}
+}
 
 #endif

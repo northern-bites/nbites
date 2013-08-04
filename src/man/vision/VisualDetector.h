@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-
+namespace man {
+namespace vision {
 /**
  * Base class for visual object detectors.
  *
@@ -29,5 +30,8 @@ public:
     // @TODO: Implement!
     // virtual void identify(Context *context) = 0;
 };
+
+}
+}
 
 #endif /* _VisualDetector_h_DEFINED */

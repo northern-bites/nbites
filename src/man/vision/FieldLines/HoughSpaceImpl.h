@@ -1,5 +1,8 @@
 #include "HoughSpace.h"
 
+namespace man {
+namespace vision {
+
 class HoughSpaceImpl : public HoughSpace
 {
 public:
@@ -119,3 +122,6 @@ private:       // Member variables
 
     int numPeaks;
 };
+
+}
+}

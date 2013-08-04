@@ -1,55 +1,120 @@
 #include "LogModule.h"
-#include "VisionDef.h"
-#include <iostream>
-
-using namespace portals;
-using namespace std;
 
 namespace man {
 namespace log {
 
-LogModule::LogModule() : Module(),
-                         saved_frames(1),
-                         topFile((FILEPATH+"TopImage"+EXT).c_str(),
-                                 fstream::out),
-                         bottomFile((FILEPATH+"BottomImage"+EXT).c_str(),
-                                 fstream::out)
+LogBase::LogBase(std::string name) : fileOpen(false),
+                                     fileName(PATH+name+LOG_EXTENSION),
+                                     maxWrites(DEFAULT_MAX_WRITES),
+                                     bytesWritten(0)
 {
-    topFile.write(HEADER.c_str(), HEADER.size());
-    bottomFile.write(HEADER.c_str(), HEADER.size());
-    topFile.flush();
-    bottomFile.flush();
 }
 
-LogModule::~LogModule()
+LogBase::~LogBase()
 {
-    topFile.close();
-    bottomFile.close();
+    closeFile();
 }
 
-void LogModule::run_()
+// Opens the file that we'll write to and gets its FD
+void LogBase::openFile() throw (file_exception)
 {
-    topImageIn.latch();
-    bottomImageIn.latch();
-    writeCurrentFrames();
+    fileDescriptor = open(fileName.c_str(), NEW_FLAG, ALL_PERMISSIONS);
+
+    if (fileDescriptor < 0) {
+        throw file_exception(file_exception::CREATE_ERR);
+    }
+
+    fileOpen = true;
 }
 
-void LogModule::writeCurrentFrames()
+// Close the file
+void LogBase::closeFile()
 {
-    int MAX_FRAMES = 5000;
-    if (saved_frames > MAX_FRAMES)
-        return;
+    close(fileDescriptor);
+    fileDescriptor = -1;
+    fileOpen = false;
+}
 
-    topFile.write(reinterpret_cast<char*>(topImageIn.message().get_image()),
-                  NAO_IMAGE_BYTE_SIZE);
+// Takes any char buffer, copies it into a Write struct, and
+// enqueues the IO
+void LogBase::writeCharBuffer(const char* buffer, uint32_t size)
+{
+    if (bytesWritten < FILE_MAX_SIZE) bytesWritten += size;
 
-    bottomFile.write(reinterpret_cast<char*>(bottomImageIn.message().get_image()),
-                     NAO_IMAGE_BYTE_SIZE);
+    // Add a new Write struct
+    ongoingSizes.push_back(Write());
+    Write* current = &ongoingSizes.back();
 
-    topFile.flush();
-    bottomFile.flush();
+    // Copy in the buffer
+    current->buffer = std::string(buffer, size);
 
-    cout << "Saved frame #" << saved_frames++ << endl;
+    // Recommended by aio--zeroes the CB
+    memset(&current->control, 0, sizeof(current->control));
+
+    // Set up the CB
+    current->control.aio_fildes = fileDescriptor;
+    current->control.aio_buf = const_cast<char *>(current->buffer.data());
+    current->control.aio_nbytes = size;
+    current->control.aio_sigevent.sigev_notify = SIGEV_NONE;
+
+    // Enqueue the write
+    int result = aio_write(&current->control);
+
+    // Make sure the write didn't immediately fail
+    if (result == -1)
+    {
+        std::cout<< "AIO write enqueue failed with error " << strerror(errno)
+                 << std::endl;
+    }
+
+#ifdef DEBUG_LOGGING
+        std::cout << "Enqueued a char buffer for writing."
+                  << std::endl;
+#endif
+}
+
+// The Predicate for remove_if
+// See http://www.cplusplus.com/reference/list/list/remove_if/
+bool LogBase::finished(Write& write)
+{
+    // Check on the write
+    int busy = aio_error(&(write.control));
+
+    // If it's still going, let it do its thing
+    if(busy == EINPROGRESS) return false;
+
+    // If it's done, check for an error
+    if(busy != 0)
+    {
+        std::cout<< "AIO write failed with error " << strerror(errno)
+                 << std::endl;
+    }
+    // And let the list know it's done
+    return true;
+}
+
+bool LogBase::imageFinished(ImageWrite& write)
+{
+    // Check on the write
+    int busy = aio_error(&(write.control));
+
+    // If it's still going, let it do its thing
+    if(busy == EINPROGRESS) return false;
+
+    // If it's done, check for an error
+    if(busy != 0)
+    {
+        std::cout<< "AIO write failed with error " << strerror(errno)
+                 << std::endl;
+    }
+    // And let the list know it's done
+    return true;
+}
+
+// Removes all finished writes from the list of ongoing writes
+void LogBase::checkSizeWrites()
+{
+    ongoingSizes.remove_if(finished);
 }
 
 }

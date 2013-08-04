@@ -3,11 +3,18 @@
 
 #include "NullProvider.h"
 
-class NullBodyProvider : public NullProvider {
+namespace man
+{
+namespace motion
+{
+class NullBodyProvider : public NullProvider 
+{
 public:
-    NullBodyProvider(boost::shared_ptr<Sensors> s) :
-        NullProvider(s, MotionConstants::null_body_mask){}
+    NullBodyProvider() :
+        NullProvider(MotionConstants::null_body_mask){}
     virtual ~NullBodyProvider(){};
 };
+} // namespace motion
+} // namespace man
 
 #endif

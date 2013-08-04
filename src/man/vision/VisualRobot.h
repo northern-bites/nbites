@@ -4,7 +4,11 @@
 #include <iomanip>
 #include <cstdlib>
 
-class VisualRobot;
+namespace man {
+namespace vision {
+	class VisualRobot;
+}
+}
 
 #include "VisualLandmark.h"
 #include "VisualDetection.h"
@@ -14,6 +18,9 @@ class VisualRobot;
 #include "VisionStructs.h"
 #include "VisionHelpers.h"
 #include "Blob.h"
+
+namespace man {
+namespace vision {
 
 // Values for the Standard Deviation calculations
 
@@ -86,5 +93,8 @@ private: // Class Variables
     }
 
 };
+
+}
+}
 
 #endif // VisualRobot_hpp_defined

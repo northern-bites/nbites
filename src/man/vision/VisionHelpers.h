@@ -1,5 +1,9 @@
 #ifndef VisionHelpers_h_defined
 #include <cstdlib>
+
+namespace man {
+namespace vision {
+
 inline int ROUND2(float x) {
 	return static_cast<int>( std::floor(x + 0.5f) );
 }
@@ -23,6 +27,9 @@ inline float dist(int x, int y, int x1, int y1) {
  */
 inline int midPoint(int a, int b) {
     return a + (b - a) / 2;
+}
+
+}
 }
 
 #define VisionHelpers_h_defined

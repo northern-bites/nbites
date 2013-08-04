@@ -3,7 +3,7 @@
 #include <QLayout>
 #include "ColorSpaceWidget.h"
 
-namespace qtool {
+namespace tool {
 namespace colorcreator {
 
 ColorSpaceWidget::ColorSpaceWidget(ColorSpace* colorSpace, QWidget* parent)
@@ -16,7 +16,7 @@ ColorSpaceWidget::ColorSpaceWidget(ColorSpace* colorSpace, QWidget* parent)
 
         QHBoxLayout* inlineLayout = new QHBoxLayout;
 
-        inlineLayout->addWidget(new QLabel(QString(fltChannel_names[i].c_str()), this));
+        inlineLayout->addWidget(new QLabel(QString(color::fltChannel_names[i].c_str()), this));
 
         QSlider* slider = new QSlider(Qt::Horizontal, this);
         slider->setRange(0, (int) FLOAT_SLIDER_SCALE);

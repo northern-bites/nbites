@@ -28,6 +28,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 Cross::Cross(Vision* vis, Threshold* thr, Field* fie, Context* con)
 : vision(vis), thresh(thr), field(fie), context(con)
 {
@@ -68,7 +71,7 @@ void Cross::createObject() {
     }
 
     if (CROSSDEBUG){
-        cout << blobs->number() << " white blobs" << endl;
+        cout << endl << blobs->number() << " white blobs" << endl;
     }
 }
 
@@ -144,6 +147,9 @@ bool Cross::checkSizeAgainstPixEstimate(Blob b) {
     if (e.dist > 200.0f && w > 20) {
         return false;
     }
+	if (e.dist > 400) {
+		return false;
+	}
     return true;
 }
 
@@ -206,6 +212,24 @@ bool Cross::scanAroundPerimeter(Blob b) {
             counter++;
         } else return false;
     }
+	// do extra screening above in case it is a robot foot
+    /*for (int i = max(0, x - 2); i < min(IMAGE_WIDTH - 1, x + w + 2); i++) {
+        if (y > 10) {
+			for (int j = 3; j < 10; j++) {
+				if (Utility::isGreen(thresh->getThresholded(y - j,i))) {
+					count++;
+				} else if (Utility::isUndefined(thresh->getThresholded(y - j,i))) {
+					count--;
+				} else if (Utility::isWhite(thresh->getThresholded(y - j,i))) {
+					count-=3;
+				}
+				counter++;
+			}
+        }
+
+		}*/
+
+
     if (count > (float)counter * greenThreshold) {
         if (CROSSDEBUG) {
             cout << "White stats: " << count << " " << counter << endl;
@@ -293,7 +317,7 @@ void Cross::checkForX(Blob b) {
     }
 
     // Is the cross white enough?  At least half the pixels must be white.
-    if (!rightBlobColor(b, 0.5f)) {
+    if (!rightBlobColor(b, 0.6f)) {
         if (CROSSDEBUG) {
             cout << "Tossing a blob for not being white enough " << endl;
         }
@@ -414,11 +438,14 @@ bool Cross::rightBlobColor(Blob tempobj, float minpercent) {
     }
 
     float percent = (float)good / (float) (total);
+	if (CROSSDEBUG) {
+		cout << "Percent of white is " << percent << endl;
+	}
     if (percent > minpercent) {
         return true;
     }
     return false;
 }
 
-
-
+}
+}

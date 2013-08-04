@@ -5,6 +5,9 @@
 
 #include <string>
 
+namespace man {
+namespace vision {
+
 class ConcreteLandmark {
 public:
     ConcreteLandmark(const float& _fieldX, const float& _fieldY);
@@ -20,5 +23,8 @@ private:
     //  point <const float> fieldLocation;
     const float fieldX, fieldY;
 };
+
+}
+}
 
 #endif

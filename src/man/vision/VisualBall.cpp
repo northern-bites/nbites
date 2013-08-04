@@ -5,6 +5,9 @@
 #include "VisualBall.h"
 #include "math.h"
 
+namespace man {
+namespace vision {
+
 VisualBall::VisualBall()
 {
     init();
@@ -50,4 +53,7 @@ void VisualBall::setBearingWithSD(float _bearing)
 {
     bearing = _bearing;
     setBearingSD(ballBearingToSD(_bearing));
+}
+
+}
 }

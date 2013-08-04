@@ -31,6 +31,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 Blob::Blob() {
     init();
 }
@@ -131,6 +134,5 @@ void Blob::printBlob() const {
 #endif
 }
 
-
-
-
+}
+}

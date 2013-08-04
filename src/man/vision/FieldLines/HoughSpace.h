@@ -6,11 +6,11 @@
 
 #include "Gradient.h"
 #include "geom/HoughLine.h"
-#include "Profiler.h"
-#include "visionconfig.h"
 #include "ActiveArray.h"
 #include "HoughConstants.h"
 
+namespace man {
+namespace vision {
 /**
  * The accumulator space and associated functions for performing
  * the Hough Transform on a given set of gradient edge points.
@@ -43,5 +43,8 @@ protected:
 private:
     int acceptThreshold, angleSpread;
 };
+
+}
+}
 
 #endif /* HoughSpace_h_DEFINED */

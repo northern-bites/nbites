@@ -6,6 +6,9 @@
 #include "VisionDef.h"
 #include "VisualDetection.h"
 
+namespace man {
+namespace vision {
+
 class VisualBall : public VisualDetection
 {
 public:
@@ -52,5 +55,7 @@ public:
     
 };
 
+}
+}
 
 #endif // VisualBall_h_DEFINED

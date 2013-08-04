@@ -1,6 +1,9 @@
 // VisualDetection.cpp
 #include "VisualDetection.h"
 
+namespace man {
+namespace vision {
+
 VisualDetection::VisualDetection(int _x, int _y, float _distance,
                                  float _bearing) : x(_x), y(_y),
                                                    distance(_distance),
@@ -15,3 +18,6 @@ VisualDetection::VisualDetection(const VisualDetection& other)
       distanceSD(other.distanceSD), bearingSD(other.bearingSD) {}
 
 VisualDetection::~VisualDetection() {}
+
+}
+}

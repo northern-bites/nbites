@@ -10,10 +10,10 @@
 #include "image/Color.h"
 #include "ColorSpace.h"
 
-#include "VisionDef.h"
+namespace tool {
+namespace color {
 
-namespace qtool {
-namespace colorcreator {
+typedef unsigned char byte;
 
 class ColorTable
 {
@@ -32,6 +32,7 @@ public:
     int offset(byte y, byte u, byte v) {
         return ((int) v/2)*Y_SIZE*U_SIZE + ((int) u/2)*Y_SIZE + ((int) y/2); }
 
+	void copyTable(byte* newTable);
     byte getColor(byte y, byte u, byte v) { return table[offset(y, u, v)]; }
     void setColor(byte y, byte u, byte v, byte col) { table[offset(y, u, v)] |= col; }
     void unSetColor(byte y, byte u, byte v, byte col) {
@@ -47,6 +48,7 @@ public:
 
     //     NOTE: Left this in for Octavians stuff to work, he should verify
     static void writeFromSliders(QString filename, ColorSpace* colorSpaces);
+    //static byte* getTableFromSliders(ColorSpace* colorSpaces);
 
 private:
     byte* table;
@@ -54,4 +56,3 @@ private:
 
 }
 }
-

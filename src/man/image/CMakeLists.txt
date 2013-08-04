@@ -1,19 +1,27 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
-set( IMAGE_SRCS ColorParams.cpp
+set( IMAGE_SRCS
+  TranscriberModule.cpp
+  ImageConverterModule.cpp
   ImageAcquisition.cpp
-  ImageTranscriberModule.cpp
-  V4L2ImageTranscriber.cpp
-  ImageAcquisition.s
   ImageAcquisitionFast.s
-  CopyImage.s
+  ImageAcquisition.s
 )
 
 set_property(SOURCE
   ImageAcquisition.s
   ImageAcquisitionFast.s
-  CopyImage.s
   PROPERTY LANGUAGE C )
+
+# When we compile this dir for the tool
+if( OFFLINE )
+set( IMAGE_SRCS
+  ImageConverterModule.cpp
+  ImageAcquisition.cpp
+  ImageAcquisitionFast.s
+  ImageAcquisition.s
+)
+endif( OFFLINE )
 
 add_library(
   image
@@ -23,6 +31,7 @@ add_library(
 
 target_link_libraries(
   image
-  common
+  support
   messages
+  portals
 )

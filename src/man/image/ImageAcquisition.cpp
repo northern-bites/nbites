@@ -1,18 +1,20 @@
 #include "ImageAcquisition.h"
 #include "VisionDef.h"
+#include "ColorParams.h"
 
 /**
  * The same as _acquire_image_fast, but in C++ for the sake of
  * portability. I blame Mac OS X and its non GNU assembler. --Jack
  */
+#define CPP_ACQUIRE 0
 int ImageAcquisition::acquire_image_fast(uint8_t *table,
                                          const ColorParams &params,
                                          const uint8_t *yuv, uint16_t *out )
 {
-#ifdef __linux__
-    _acquire_image_fast(table, const_cast<ColorParams*>(&params), yuv, out);
-#else //TODO: I don't think this accurately reflects the ASM image acquisition
-
+#if defined( __linux__) && !CPP_ACQUIRE
+   _acquire_image_fast(table, const_cast<ColorParams*>(&params), yuv, out);
+#else
+    // This should be bit-identical to the ASM code
     uint16_t *yOut = out;
     uint16_t *uvOut = out + AVERAGED_IMAGE_SIZE;
     uint8_t *color = reinterpret_cast<uint8_t*>(out + AVERAGED_IMAGE_SIZE*3);
@@ -26,22 +28,23 @@ int ImageAcquisition::acquire_image_fast(uint8_t *table,
              ++j, yuv+=4, yOut++, uvOut+=2, color++) {
 
             // Sum every 2 Y pixels and write back out
+#if 0
+            // full average version, not currently used
             uint16_t yAvg = *(yOut) =
-                static_cast<uint16_t>(static_cast<uint16_t>(*(yuv+YOFFSET1)) +
-                                      static_cast<uint16_t>(*(yuv+YOFFSET2)));
-            uint16_t uAvg = *(uvOut) = static_cast<uint16_t>(*(yuv+UOFFSET));
-            uint16_t vAvg = *(uvOut+1) = static_cast<uint16_t>(*(yuv+VOFFSET));
+                yuv[YOFFSET1] + yuv[NAO_IMAGE_ROW_OFFSET + YOFFSET1] +
+                yuv[YOFFSET2] + yuv[NAO_IMAGE_ROW_OFFSET + YOFFSET2];
+            uint16_t uAvg = *(uvOut    ) = yuv[UOFFSET] + yuv[NAO_IMAGE_ROW_OFFSET + UOFFSET];
+            uint16_t vAvg = *(uvOut + 1) = yuv[VOFFSET] + yuv[NAO_IMAGE_ROW_OFFSET + VOFFSET];
+#else
+            // half average version (faster)
+            uint16_t yAvg = *(yOut) = yuv[YOFFSET1] + yuv[YOFFSET2];
+            uint16_t uAvg = *(uvOut    ) = yuv[UOFFSET];
+            uint16_t vAvg = *(uvOut + 1) = yuv[VOFFSET];
+#endif
+           // Table offset (table is in VUY order)
 
-            // HACK. THIS ONLY WORKS FOR 0-256, 128 byte color tables.
-            // I hope that we have moved to a more sensible
-            // (i.e. single) dev platform before we need to change this part
-
-            // Table offset (table is in VUY order)
-
-            // *2 is to remove lowest bit, so it is bit compatible with
-            //     ASM version.
-            int offset = 128*128*(vAvg>>2)*2 + 128*(uAvg>>2)*2 + (yAvg>>2);
-            *color = *(table + offset);
+            int offset = params.offset(params.yIndex(yAvg), params.uIndex(uAvg), params.vIndex(vAvg));
+            *color = table[offset];
         }
     }
 #endif

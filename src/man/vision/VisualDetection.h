@@ -13,6 +13,10 @@
 
 #include "Structs.h"
 #include "NBMath.h"
+
+namespace man {
+namespace vision {
+
 class VisualDetection {
 public:
     // Constructor
@@ -93,5 +97,8 @@ protected:
     int framesOn, framesOff;
 
 };
+
+}
+}
 
 #endif // VisualDetection_h_defined

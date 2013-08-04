@@ -5,6 +5,9 @@
 #include <math.h>
 #include <boost/shared_ptr.hpp>
 
+namespace man {
+namespace vision {
+
 #define UNKNOWN_DISTANCE  -1.0f
 
 class VisualFieldEdge;
@@ -22,9 +25,14 @@ struct fieldEdgeDistances {
 	float right;
 };
 
+}
+}
 
 #include "Structs.h"
 #include "Utility.h"
+
+namespace man {
+namespace vision {
 
 class VisualFieldEdge  {
 
@@ -54,4 +62,8 @@ public:
     void setDistances(float d1, float d2, float d3) { distances.left = d1;
 		distances.center = d2; distances.right = d3;}
 };
+
+}
+}
+
 #endif

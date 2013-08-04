@@ -7,6 +7,7 @@
 #include "../FieldLines/HoughConstants.h"
 
 using namespace std;
+using namespace man::vision;
 namespace HC = HoughConstants;
 
 TEST(CornerDetector, Good)

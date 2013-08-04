@@ -1,176 +1,282 @@
-#include <iostream>
-#include <boost/shared_ptr.hpp>
-
 #include "Man.h"
-#include "manconfig.h"
-#include "synchro/synchro.h"
-#include "VisionDef.h"
+
+#include <iostream>
+
 #include "Common.h"
+#include "Profiler.h"
 #include "Camera.h"
-#include "PyRoboGuardian.h"
-#include "PySensors.h"
-#include "PyLights.h"
-#include "PySpeech.h"
-#include "memory/log/OutputProviderFactory.h"
+#include "RobotConfig.h"
 
-//#include <valgrind/callgrind.h>
+#ifndef OFFLINE
+SET_POOL_SIZE(messages::WorldModel,  24);
+SET_POOL_SIZE(messages::JointAngles, 24);
+SET_POOL_SIZE(messages::InertialState, 16);
+SET_POOL_SIZE(messages::PackedImage16, 16);
+SET_POOL_SIZE(messages::YUVImage, 16);
+SET_POOL_SIZE(messages::RobotLocation, 16);
+#endif
 
-using namespace std;
-using boost::shared_ptr;
-using namespace man::corpus;
-using namespace man::memory;
-using namespace man::memory::log;
+namespace man {
 
-/////////////////////////////////////////
-//                                     //
-//  Module class function definitions  //
-//                                     //
-/////////////////////////////////////////
-
-Man::Man (RobotMemory::ptr memory,
-          boost::shared_ptr<Sensors> _sensors,
-          boost::shared_ptr<Transcriber> _transcriber,
-          boost::shared_ptr<ImageTranscriber> _imageTranscriber,
-          boost::shared_ptr<MotionEnactor> _enactor,
-          boost::shared_ptr<Lights> _lights,
-          boost::shared_ptr<Speech> _speech)
-    :     memory(memory),
-          sensors(_sensors),
-          transcriber(_transcriber),
-          imageTranscriber(_imageTranscriber),
-          enactor(_enactor),
-          lights(_lights),
-          speech(_speech)
+Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
+    : AL::ALModule(broker, name),
+      sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
+      sensors(broker),
+      jointEnactor(broker),
+      motion(),
+      arms(),
+      guardianThread("guardian", GUARDIAN_FRAME_LENGTH_uS),
+      guardian(),
+      audio(),
+      commThread("comm", COMM_FRAME_LENGTH_uS),
+      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
+      topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
+      bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
+      topConverter(TOP_TABLE_PATHNAME),
+      bottomConverter(BOTTOM_TABLE_PATHNAME),
+      vision(),
+      localization(),
+      ballTrack(),
+      obstacle(),
+      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      leds(broker),
+      sharedBall()
 {
+    setModuleDescription("The Northern Bites' soccer player.");
+
+    /** Sensors **/
+    sensorsThread.addModule(sensors);
+#ifdef LOG_SENSORS
+    sensorsThread.log<messages::JointAngles>(&sensors.jointsOutput_,
+                                             "joints");
+    sensorsThread.log<messages::JointAngles>(&sensors.temperatureOutput_,
+                                             "temperatures");
+    sensorsThread.log<messages::ButtonState>(&sensors.chestboardButtonOutput_,
+                                             "chestbutton");
+    sensorsThread.log<messages::FootBumperState>(&sensors.footbumperOutput_,
+                                                 "footbumper");
+    sensorsThread.log<messages::InertialState>(&sensors.inertialsOutput_,
+                                               "inertials");
+    sensorsThread.log<messages::SonarState>(&sensors.sonarsOutput_,
+                                            "sonars");
+    sensorsThread.log<messages::FSR>(&sensors.fsrOutput_,
+                                     "fsrs");
+    sensorsThread.log<messages::BatteryState>(&sensors.batteryOutput_,
+                                              "battery");
+#endif
+    sensorsThread.addModule(jointEnactor);
+    sensorsThread.addModule(motion);
+    sensorsThread.addModule(arms);
+
+    sensors.printInput.wireTo(&guardian.printJointsOutput, true);
+
+    motion.jointsInput_.wireTo(&sensors.jointsOutput_);
+    motion.currentsInput_.wireTo(&sensors.currentsOutput_);
+    motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
+    motion.fsrInput_.wireTo(&sensors.fsrOutput_);
+    motion.stiffnessInput_.wireTo(&guardian.stiffnessControlOutput, true);
+    motion.bodyCommandInput_.wireTo(&behaviors.bodyMotionCommandOut, true);
+    motion.headCommandInput_.wireTo(&behaviors.headMotionCommandOut, true);
+    motion.requestInput_.wireTo(&behaviors.motionRequestOut, true);
+    motion.fallInput_.wireTo(&guardian.fallStatusOutput, true);
+
+    jointEnactor.jointsInput_.wireTo(&motion.jointsOutput_);
+    jointEnactor.stiffnessInput_.wireTo(&motion.stiffnessOutput_);
+
+    arms.actualJointsIn.wireTo(&sensors.jointsOutput_);
+    arms.expectedJointsIn.wireTo(&motion.jointsOutput_);
+    arms.handSpeedsIn.wireTo(&motion.handSpeedsOutput_);
+
+    /** Guardian **/
+    guardianThread.addModule(guardian);
+    guardianThread.addModule(audio);
+    guardian.temperaturesInput.wireTo(&sensors.temperatureOutput_, true);
+    guardian.chestButtonInput.wireTo(&sensors.chestboardButtonOutput_, true);
+    guardian.footBumperInput.wireTo(&sensors.footbumperOutput_, true);
+    guardian.inertialInput.wireTo(&sensors.inertialsOutput_, true);
+    guardian.fsrInput.wireTo(&sensors.fsrOutput_, true);
+    guardian.batteryInput.wireTo(&sensors.batteryOutput_, true);
+    audio.audioIn.wireTo(&guardian.audioOutput);
+#ifdef LOG_GUARDIAN
+    guardianThread.log<messages::StiffnessControl>(
+        &guardian.stiffnessControlOutput,
+        "stiffness");
+    guardianThread.log<messages::FeetOnGround>(
+        &guardian.feetOnGroundOutput,
+        "feetground");
+    guardianThread.log<messages::FallStatus>(
+        &guardian.fallStatusOutput,
+        "fall");
+    guardianThread.log<messages::AudioCommand>(
+        &guardian.audioOutput,
+        "audio");
+#endif
+
+    /** Comm **/
+    commThread.addModule(comm);
+    comm._worldModelInput.wireTo(&behaviors.myWorldModelOut, true);
+    comm._gcResponseInput.wireTo(&gamestate.gcResponseOutput, true);
+#ifdef LOG_COMM
+    commThread.log<messages::GameState>(&comm._gameStateOutput, "gamestate");
+#endif
+
+    /** Cognition **/
+
+    // Turn ON the finalize method for images, which we've specialized
+    portals::Message<messages::YUVImage>::setFinalize(true);
+    portals::Message<messages::ThresholdImage>::setFinalize(true);
+    portals::Message<messages::PackedImage16>::setFinalize(true);
+    portals::Message<messages::PackedImage8>::setFinalize(true);
+
+    cognitionThread.addModule(topTranscriber);
+    cognitionThread.addModule(bottomTranscriber);
+    cognitionThread.addModule(topConverter);
+    cognitionThread.addModule(bottomConverter);
+    cognitionThread.addModule(vision);
+    cognitionThread.addModule(localization);
+    cognitionThread.addModule(ballTrack);
+    cognitionThread.addModule(obstacle);
+    cognitionThread.addModule(gamestate);
+    cognitionThread.addModule(behaviors);
+    cognitionThread.addModule(leds);
+    cognitionThread.addModule(sharedBall);
+
+    topTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    topTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+    bottomTranscriber.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    bottomTranscriber.inertsIn.wireTo(&sensors.inertialsOutput_, true);
+
+    topConverter.imageIn.wireTo(&topTranscriber.imageOut);
+    bottomConverter.imageIn.wireTo(&bottomTranscriber.imageOut);
+
+    vision.topThrImage.wireTo(&topConverter.thrImage);
+    vision.topYImage.wireTo(&topConverter.yImage);
+    vision.topUImage.wireTo(&topConverter.uImage);
+    vision.topVImage.wireTo(&topConverter.vImage);
+
+    vision.botThrImage.wireTo(&bottomConverter.thrImage);
+    vision.botYImage.wireTo(&bottomConverter.yImage);
+    vision.botUImage.wireTo(&bottomConverter.uImage);
+    vision.botVImage.wireTo(&bottomConverter.vImage);
+
+    vision.joint_angles.wireTo(&topTranscriber.jointsOut, true);
+    vision.inertial_state.wireTo(&topTranscriber.inertsOut, true);
+
+    localization.visionInput.wireTo(&vision.vision_field);
+    localization.motionInput.wireTo(&motion.odometryOutput_, true);
+    localization.resetInput.wireTo(&behaviors.resetLocOut, true);
+    localization.gameStateInput.wireTo(&gamestate.gameStateOutput);
+    localization.ballInput.wireTo(&ballTrack.ballLocationOutput);
+
+    ballTrack.visionBallInput.wireTo(&vision.vision_ball);
+    ballTrack.odometryInput.wireTo(&motion.odometryOutput_, true);
+    ballTrack.localizationInput.wireTo(&localization.output, true);
+
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
+    }
+
+    obstacle.armContactIn.wireTo(&arms.contactOut, true);
+    obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
+
+    gamestate.commInput.wireTo(&comm._gameStateOutput, true);
+    gamestate.buttonPressInput.wireTo(&guardian.advanceStateOutput, true);
+    gamestate.initialStateInput.wireTo(&guardian.initialStateOutput, true);
+    gamestate.switchTeamInput.wireTo(&guardian.switchTeamOutput, true);
+    gamestate.switchKickOffInput.wireTo(&guardian.switchKickOffOutput, true);
+
+    behaviors.localizationIn.wireTo(&localization.output);
+    behaviors.filteredBallIn.wireTo(&ballTrack.ballLocationOutput);
+    behaviors.gameStateIn.wireTo(&gamestate.gameStateOutput);
+    behaviors.visionFieldIn.wireTo(&vision.vision_field);
+    behaviors.visionRobotIn.wireTo(&vision.vision_robot);
+    behaviors.visionObstacleIn.wireTo(&vision.vision_obstacle);
+    behaviors.fallStatusIn.wireTo(&guardian.fallStatusOutput, true);
+    behaviors.motionStatusIn.wireTo(&motion.motionStatusOutput_, true);
+    behaviors.odometryIn.wireTo(&motion.odometryOutput_, true);
+    behaviors.jointsIn.wireTo(&sensors.jointsOutput_, true);
+    behaviors.stiffStatusIn.wireTo(&sensors.stiffStatusOutput_, true);
+    behaviors.obstacleIn.wireTo(&obstacle.obstacleOut);
+
+    for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
+    {
+        behaviors.worldModelIn[i].wireTo(comm._worldModels[i], true);
+    }
+
+    leds.ledCommandsIn.wireTo(&behaviors.ledCommandOut);
+
+#ifdef LOG_LOCATION
+    cognitionThread.log<messages::RobotLocation>(&localization.output, "location");
+#endif
+
+#ifdef LOG_ODOMETRY
+    cognitionThread.log<messages::RobotLocation>(&motion.odometryOutput_, "odometry");
+#endif
+
+#ifdef LOG_OBSERVATIONS
+    cognitionThread.log<messages::VisionField>(&vision.vision_field, "observations");
+#endif
+
+#ifdef LOG_LOCALIZATION
+    cognitionThread.log<messages::ParticleSwarm>(&localization.particleOutput, "particleSwarm");
+#endif
+
+#ifdef LOG_BALLTRACK
+    cognitionThread.log<messages::FilteredBall>(&ballTrack.ballLocationOutput, "filtered_ball");
+    cognitionThread.log<messages::VisionBall>(&vision.vision_ball, "vision_ball");
+#endif
+
+#ifdef LOG_IMAGES
+    cognitionThread.logImage<messages::YUVImage>(&topTranscriber.imageOut,
+                                                 "top");
+    cognitionThread.logImage<messages::YUVImage>(&bottomTranscriber.imageOut,
+                                                 "bottom");
+#endif
+
+#ifdef LOG_VISION
+    cognitionThread.log<messages::VisionField>(&vision.vision_field,
+                                               "field");
+    cognitionThread.log<messages::VisionBall>(&vision.vision_ball,
+                                              "ball");
+    cognitionThread.log<messages::VisionRobot>(&vision.vision_robot,
+                                               "robot");
+    cognitionThread.log<messages::VisionObstacle>(&vision.vision_obstacle,
+                                                  "obstacle");
+    cognitionThread.log<messages::JointAngles>(&vision.joint_angles_out,
+                                               "vision_joints");
+    cognitionThread.log<messages::InertialState>(&vision.inertial_state_out,
+                                                 "vision_inertials");
+#endif
+
 #ifdef USE_TIME_PROFILING
     Profiler::getInstance()->profileFrames(1400);
 #endif
 
-    Kinematics::CameraCalibrate::init(RoboGuardian::getHostName());
+    startSubThreads();
+}
 
-    // give python a pointer to the sensors structure. Method defined in
-    // Sensors.h
-    set_sensors_pointer(sensors);
+Man::~Man()
+{
+}
 
-    imageTranscriber->setSubscriber(this);
+void Man::startSubThreads()
+{
+    startAndCheckThread(sensorsThread);
+    startAndCheckThread(guardianThread);
+    startAndCheckThread(commThread);
+    startAndCheckThread(cognitionThread);
+}
 
-    guardian = boost::shared_ptr<RoboGuardian>(new RoboGuardian(sensors));
-
-    pose = boost::shared_ptr<NaoPose> (new NaoPose(sensors));
-
-    // initialize core processing modules
-#ifdef USE_MOTION
-    motion = boost::shared_ptr<Motion> (new Motion(enactor, sensors, pose, memory->get<MMotion>()));
-    guardian->setMotionInterface(motion->getInterface());
-#endif
-    // initialize python roboguardian module.
-    // give python a pointer to the guardian. Method defined in PyRoboguardian.h
-    set_guardian_pointer(guardian);
-    set_lights_pointer(_lights);
-    set_speech_pointer(_speech);
-
-    try {
-        vision = boost::shared_ptr<Vision> (new Vision(pose, memory->get<MVision>()));
-
-    set_vision_pointer(vision);
-
-    comm = boost::shared_ptr<Comm> (new Comm(sensors, vision));
-
-    loggingBoard = boost::shared_ptr<LoggingBoard> (new LoggingBoard(memory));
-    set_logging_board_pointer(loggingBoard);
-
-    noggin = boost::shared_ptr<Noggin> (new Noggin(vision, comm, guardian, sensors,
-                                            loggingBoard,
-                                            motion->getInterface(), memory));
-
-    } catch(std::exception &e) {
-        std::cerr << e.what() << std::endl;
+void Man::startAndCheckThread(DiagramThread& thread)
+{
+    if(thread.start())
+    {
+        std::cout << thread.getName() << "thread failed to start." <<
+            std::endl;
     }
-
-    loggingBoard->setMemory(memory);
-
-
-#if defined USE_MEMORY && !defined OFFLINE
-    OutputProviderFactory::AllSocketOutput(memory.get(), loggingBoard.get());
-#endif
-    PROF_ENTER(P_GETIMAGE);
 }
 
-Man::~Man ()
-{
-  cout << "Man destructed." << endl;
-}
-
-void Man::startSubThreads() {
-    cout << "Man starting!" << endl;
-
-    if (guardian->start() != 0)
-        cout << "Guardian failed to start." << endl;
-
-    if (comm->start() != 0)
-        cout << "Comm failed to start." << endl;
-
-#ifdef USE_MOTION
-    // Start Motion thread (it handles its own threading
-    if (motion->start() != 0)
-        cout << "Motion failed to start." << endl;
-#endif
-
-    //  CALLGRIND_START_INSTRUMENTATION;
-    //  CALLGRIND_TOGGLE_COLLECT;
-}
-
-void Man::stopSubThreads() {
-    cout << "Man stopping!" << endl;
-
-    //remove stiffnesses
-    cout << "Killing stiffnesses." << endl;
-    motion->getInterface()->sendFreezeCommand(FreezeCommand::ptr(new FreezeCommand()));
-
-    loggingBoard->reset();
-
-    guardian->stop();
-    guardian->waitForThreadToFinish();
-
-#ifdef USE_MOTION
-    motion->stop();
-    motion->waitForThreadToFinish();
-#endif
-
-    //TODO: fix this from hanging
-    comm->stop();
-    comm->waitForThreadToFinish();
-    // @jfishman - tool will not exit, due to socket blocking
-    //comm->getTOOLTrigger()->await_off();
-}
-
-void
-Man::processFrame ()
-{
-    // Need to lock image and vision angles for duration of
-    // vision processing to ensure consistency.
-    sensors->lockImage();
-    PROF_ENTER(P_VISION);
-    vision->notifyImage(sensors->getImage(Camera::TOP), sensors->getImage(Camera::BOTTOM));
-    PROF_EXIT(P_VISION);
-    sensors->releaseImage();
-//    cout<<vision->ball->getDistance() << endl;
-
-    noggin->runStep();
-
-    PROF_ENTER(P_LIGHTS);
-    lights->sendLights();
-    PROF_EXIT(P_LIGHTS);
-}
-
-
-void Man::notifyNextVisionImage() {
-
-  transcriber->postVisionSensors();
-
-  // Process current frame
-  processFrame();
-
-  // Make sure messages are printed
-  fflush(stdout);
 }

@@ -1,0 +1,9 @@
+/* -*- C++ -*- Tell editors this is a C++ file (despite it's .in extension) */
+
+#pragma once
+
+// :::::::::::::::::::::::::: Options variables :::..
+
+#define MY_PLAYER_NUMBER @PLAYER_NUMBER@
+
+#define MY_TEAM_NUMBER @TEAM_NUMBER@

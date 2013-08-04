@@ -26,15 +26,13 @@ public:
     RobotFinder();
     ~RobotFinder() {}
 
-    void broadcastDiscoveryMessage();
-
     void addRemoteRobot(RemoteRobot& robot);
 
     RemoteRobot::list getRemoteRobots() { return remoteRobots; }
 
 public slots:
     void refresh();
-    void checkForAnswerMessage();
+    void checkForMessages();
 
 signals:
     void refreshedRemoteRobotList();

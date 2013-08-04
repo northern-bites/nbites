@@ -4,7 +4,11 @@
 #include <iomanip>
 #include <cstdlib>
 
-class VisualFieldObject;
+namespace man {
+namespace vision {
+	class VisualFieldObject;
+}
+}
 
 #include "VisualObject.h"
 #include "VisualDetection.h"
@@ -15,6 +19,9 @@ class VisualFieldObject;
 #include "VisionHelpers.h"
 #include "Blob.h"
 #include "stdio.h"
+
+namespace man {
+namespace vision {
 
 class VisualFieldObject : public VisualObject {
 
@@ -134,5 +141,8 @@ private: // Class Variables
     }
     const static float BOTH_UNSURE_DISTANCE_SD;
 };
+
+}
+}
 
 #endif

@@ -1,30 +1,13 @@
-
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
 #include "ChoppedCommand.h"
 #include "MotionConstants.h"
 #include "JointCommand.h"
 
-using namespace std;
-
 using namespace Kinematics;
+
+namespace man
+{
+namespace motion
+{
 
 ChoppedCommand::ChoppedCommand(const JointCommand::ptr command, int chops )
     : numChops(chops),
@@ -38,22 +21,25 @@ ChoppedCommand::ChoppedCommand(const JointCommand::ptr command, int chops )
     sourceCommand->framesRemaining(chops);
 }
 
-void ChoppedCommand::constructStiffness(const JointCommand::ptr command) {
+void ChoppedCommand::constructStiffness(const JointCommand::ptr command) 
+{
 
-    const list<int>* chainList = command->getChainList();
-    list<int>::const_iterator i = chainList->begin();
-    for( ; i != chainList->end() ; ++i){
+    const std::list<int>* chainList = command->getChainList();
+    std::list<int>::const_iterator i = chainList->begin();
+    for( ; i != chainList->end() ; ++i)
+    {
         constructChainStiffness(static_cast<ChainID>(*i),
                                 command);
     }
 }
 
-void ChoppedCommand::constructChainStiffness(ChainID id,
-                                             const JointCommand::ptr command) {
-    const vector<float> body_stiff = command->getStiffness();
-    vector<float>::const_iterator bodyStart = body_stiff.begin();
+void ChoppedCommand::constructChainStiffness(
+    ChainID id,
+    const JointCommand::ptr command) {
+    const std::vector<float> body_stiff = command->getStiffness();
+    std::vector<float>::const_iterator bodyStart = body_stiff.begin();
 
-    vector<float> *chain = getStiffnessRef(id);
+    std::vector<float> *chain = getStiffnessRef(id);
 
     chain->assign(bodyStart + chain_first_joint[id],
                   bodyStart + chain_last_joint[id] + 1);
@@ -72,7 +58,6 @@ void ChoppedCommand::checkDone() {
                 break;
             }
         }
-
         // Head command only needs to check head chain
     } else if (motionType == MotionConstants::HEAD_JOINT) {
         if (numChopped.at(HEAD_CHAIN) < numChops){
@@ -86,15 +71,17 @@ void ChoppedCommand::checkDone() {
 	sourceCommand->finishedExecuting();
 }
 
-vector<float> ChoppedCommand::getFinalJoints(const JointCommand::ptr command,
-                                             vector<float> currentJoints) {
-    vector<float> finalJoints(0);
-    vector<float>::iterator currentStart = currentJoints.begin();
-    vector<float>::iterator currentEnd = currentJoints.begin();
+std::vector<float> ChoppedCommand::getFinalJoints(
+    const JointCommand::ptr command,
+    std::vector<float> currentJoints) 
+{
+    std::vector<float> finalJoints(0);
+    std::vector<float>::iterator currentStart = currentJoints.begin();
+    std::vector<float>::iterator currentEnd = currentJoints.begin();
 
     for (uint chain=0; chain < NUM_CHAINS; ++chain){
         // First, get chain joints from command
-        const vector<float> nextChain =
+        const std::vector<float> nextChain =
             command->getJoints(static_cast<ChainID>(chain));
 
         // Set the end iterator
@@ -115,10 +102,9 @@ vector<float> ChoppedCommand::getFinalJoints(const JointCommand::ptr command,
     }
 
     return finalJoints;
-
 }
 
-const vector<float>
+const std::vector<float>
 ChoppedCommand::getStiffness( ChainID chainID ) const
 {
     switch (chainID) {
@@ -136,11 +122,11 @@ ChoppedCommand::getStiffness( ChainID chainID ) const
     case LANKLE_CHAIN:
         break;
     }
-    cout << "ChoppedCommand-Should not have reached this point! ERROR!" << endl;
+    std::cout << "ChoppedCommand-Should not have reached this point! ERROR!" << std::endl;
     return larm_stiff;
 }
 
-vector<float>*
+std::vector<float>*
 ChoppedCommand::getStiffnessRef( ChainID chainID )
 {
     switch (chainID) {
@@ -158,6 +144,9 @@ ChoppedCommand::getStiffnessRef( ChainID chainID )
     case LANKLE_CHAIN:
         break;
     }
-    cout << "ChoppedCommand-Should not have reached this point! ERROR!" << endl;
+    std::cout << "ChoppedCommand-Should not have reached this point! ERROR!" << std::endl;
     return &larm_stiff;
 }
+
+} // namespace motion
+} // namespace man

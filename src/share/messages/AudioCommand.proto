@@ -1,0 +1,7 @@
+package messages;
+
+message AudioCommand
+{
+    //path to wav file (look at SoundPaths.h)
+    optional string audio_file = 1;
+}

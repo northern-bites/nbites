@@ -1,22 +1,3 @@
-// This file is part of Man, a robotic perception, locomotion, and
-// team strategy application created by the Northern Bites RoboCup
-// team of Bowdoin College in Brunswick, Maine, for the Aldebaran
-// Nao robot.
-//
-// Man is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Man is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// and the GNU Lesser Public License along with Man.  If not, see
-// <http://www.gnu.org/licenses/>.
-
 #ifndef _Vision_h_DEFINED
 #define _Vision_h_DEFINED
 
@@ -27,18 +8,27 @@
 #include <boost/shared_ptr.hpp>
 #include <stdint.h>
 
-#include  "visionconfig.h"
 // including info header files
 #include "Common.h"
-#include "ClassHelper.h"
 #include "VisionDef.h"
+#include "DebugConfig.h"
 #include "Profiler.h"
 
+// including message types
+#include "PMotion.pb.h"
+#include "InertialState.pb.h"
+#include "Images.h"
+
+namespace man {
+namespace vision {
 class Vision;   // forward reference
 class FieldLinesDetector;
 class CornerDetector;
 class HoughVisualLine;
 class HoughVisualCorner;
+}
+}
+
 
 // including Class header files
 #include "VisualCrossbar.h"
@@ -53,19 +43,20 @@ class HoughVisualCorner;
 #include "FieldLines.h"
 #include "VisualCorner.h"
 #include "VisualObstacle.h"
-//memory
-#include "memory/MObjects.h"
-#include "memory/MemoryProvider.h"
+
+namespace man {
+namespace vision {
 
 class Vision
 {
     friend class Threshold;
 
-    ADD_SHARED_PTR(Vision)
+public:
+    typedef boost::shared_ptr<Vision> ptr;
+    typedef boost::shared_ptr<const Vision> const_ptr;
 
 public:
-    Vision(boost::shared_ptr<NaoPose> _pose,
-           man::memory::MVision::ptr mVision = man::memory::MVision::ptr());
+    Vision();
     ~Vision();
 
 private:
@@ -83,13 +74,19 @@ public:
     void copyImage(const byte *image);
     // utilize the given image pointer for vision processing
     //   equivalent to setImage(image), followed by notifyImage()
-    void notifyImage(const uint16_t *image);
+//  void notifyImage(const uint16_t *image);
     // for when we have two cameras
-    void notifyImage(const uint16_t *top, const uint16_t *bot);
+//    void notifyImage(const uint16_t *top, const uint16_t *bot);
+    // for use with modules
+    void notifyImage(const messages::ThresholdImage& topThrIm, const messages::PackedImage16& topYIm,
+                     const messages::PackedImage16& topUIm, const messages::PackedImage16& topVIm,
+                     const messages::ThresholdImage& botThrIm, const messages::PackedImage16& botYIm,
+                     const messages::PackedImage16& botUIm, const messages::PackedImage16& botVIm,
+                     const messages::JointAngles& ja, const messages::InertialState& inert);
     // utilize the current image pointer for vision processing
-    void notifyImage();
+//    void notifyImage();
     // set the current image pointer to the given pointer
-    void setImage(const uint16_t* image);
+    void setImage(uint8_t* image);
 
     // visualization methods
     void drawBox(int left, int right, int bottom, int top, int c);
@@ -109,11 +106,8 @@ public:
     void drawLine(int x, int y, int x1, int y1, int c);
     void drawPoint(int x, int y, int c);
     void drawRect(int left, int top, int width, int height, int c);
-    void drawVisualLines(const std::vector<HoughVisualLine>& lines);
+    void drawVisualLines(const std::vector<HoughVisualLine>& lines, Gradient& g);
     void drawX(int x, int y, int c);
-
-    // Memory update
-    void updateMVision(man::memory::MVision::ptr) const;
 
     //
     // SETTERS
@@ -143,6 +137,15 @@ public:
     // misc
     std::string getThreshColor(int _id);
 
+    // For calibrating cameras; not called online
+    std::vector<boost::shared_ptr<VisualLine> >
+    getExpectedLines(Camera::Type which,
+                     const messages::JointAngles& ja,
+                     const messages::InertialState& inert,
+                     int xPos,
+                     int yPos,
+                     float heading);
+
 public:
     //
     // Public Variables
@@ -162,6 +165,7 @@ public:
     VisualObstacle* obstacles;
     boost::shared_ptr<NaoPose> pose;
     boost::shared_ptr<FieldLines> fieldLines;
+    boost::shared_ptr<FieldLines> bottomLines;
 
     fieldOpening fieldOpenings[3];
 #define NUM_OPEN_FIELD_SEGMENTS 3
@@ -213,9 +217,11 @@ private:
 
     // information
     std::string colorTable;
-    man::memory::MemoryProvider<man::memory::MVision, Vision> memoryProvider;
 
 
 };
+
+}
+}
 
 #endif // _Vision_h_DEFINED

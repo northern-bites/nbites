@@ -9,6 +9,9 @@
 
 using namespace std;
 
+namespace man {
+namespace vision {
+
 // Return true if y is higher in the image (towards 0)
 const bool YOrder::operator() (const linePoint& first, const linePoint& second)
  const
@@ -167,6 +170,12 @@ void VisualLine::trimEndpoints()
     } else {
         tl = Utility::getClosestPointOnLine(bl, tl, tr);
     }
+	
+	start.x = (tl.x + bl.x) / 2;
+	start.y = (tl.y + bl.y) / 2;
+	
+	end.x = (tr.x + br.x) / 2;
+	end.y = (tr.y + br.y) / 2;
 }
 
 /**
@@ -674,4 +683,7 @@ const std::vector<lineID> VisualLine::getIDs() {
   }
 
   return poss;
+}
+
+}
 }

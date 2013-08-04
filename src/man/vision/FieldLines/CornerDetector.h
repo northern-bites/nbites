@@ -4,6 +4,9 @@
 #include <vector>
 #include "HoughVisualCorner.h"
 
+namespace man {
+namespace vision {
+
 class HoughVisualLine;
 
 class CornerDetector
@@ -21,5 +24,8 @@ public:
 private:
     std::vector<HoughVisualCorner> mCorners;
 };
+
+}
+}
 
 #endif /* _CORNERDETECTOR_H_ */
