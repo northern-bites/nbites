@@ -7,7 +7,7 @@ fi
 
 PACKAGES="build-essential cmake git-core \
 python2.7-dev emacs cmake-curses-gui ccache aptitude \
-qt4-dev-tools python-pyparsing libboost-dev"
+qt4-dev-tools python-pyparsing libboost-dev libeigen3-dev"
 
 echo "Are you on 64-bit linux? (y/n)"
 read IS64BIT
