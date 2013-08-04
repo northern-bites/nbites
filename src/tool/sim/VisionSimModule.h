@@ -17,22 +17,19 @@
 #include "VisionSimGUI.h"
 
 namespace tool{
-
-// Forward declaration for friending
-class Tool;
-
 namespace visionsim{
 
 class VisionSimModule :  public QObject,
                          public portals::Module
 {
     Q_OBJECT;
-    // The tool needs to be able to access the gui part
-    friend class ::tool::Tool;
 
 public:
     VisionSimModule();
     virtual ~VisionSimModule() {}
+
+    // Fix this hack at some point
+    VisionSimGUI* getGUI() { return &gui; }
 
 public slots:
     // Allow the GUI to update the world model
