@@ -1,7 +1,0 @@
-package messages;
-
-message SonarState
-{
-    required float USLeft = 1;
-    required float USRight = 2;
-}
