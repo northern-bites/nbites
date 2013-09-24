@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include "WorldConstants.h"
 
 namespace tool{

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include "RobotPosition.h"
 
 namespace tool{

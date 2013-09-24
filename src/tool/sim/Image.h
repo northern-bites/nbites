@@ -17,7 +17,7 @@
 #include "VisionObjects.h"
 #include "World.h"
 #include "ImageConstants.h"
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include <vector>
 
 namespace tool{
