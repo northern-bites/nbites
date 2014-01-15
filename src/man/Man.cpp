@@ -46,6 +46,30 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
 {
     setModuleDescription("The Northern Bites' soccer player.");
 
+    //For copying the old file to the second .txt file
+    std::cout << "starting the copy..." <<  std::endl;
+    std::ifstream copier("bug1.txt", std::ifstream::in);
+
+    copier.seekg(0, copier.end);
+    long size = copier.tellg();
+    copier.seekg(0);
+
+    std::cout << "buffer issue? size is: " << size << " huh?" << std::endl;
+    if(size > -1){
+        char* buffer = new char[size];
+        copier.read(buffer, size);
+        copier.close();
+
+        std::cout << "I dont think so..." << std::endl;
+        std::ofstream writer("bug2.txt", std::ofstream::out | std::ofstream::trunc);
+        writer.write(buffer, size);
+        writer.close();
+
+        delete[] buffer;
+    }
+    bugfile.open("bug1.txt", std::ofstream::out | std::ofstream::trunc);
+    bugfile.put('a');
+
     /** Sensors **/
     sensorsThread.addModule(sensors);
 #ifdef LOG_SENSORS
@@ -255,6 +279,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     Profiler::getInstance()->profileFrames(1400);
 #endif
 
+    bugfile.put('b');
     startSubThreads();
 }
 
@@ -264,10 +289,16 @@ Man::~Man()
 
 void Man::startSubThreads()
 {
+    bugfile.put('c');
     startAndCheckThread(sensorsThread);
+    bugfile.put('d');
     startAndCheckThread(guardianThread);
+    bugfile.put('e');
     startAndCheckThread(commThread);
+    bugfile.put('f');
     startAndCheckThread(cognitionThread);
+    bugfile.put('g');
+    bugfile.close();
 }
 
 void Man::startAndCheckThread(DiagramThread& thread)
