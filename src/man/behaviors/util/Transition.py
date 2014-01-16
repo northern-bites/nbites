@@ -12,6 +12,10 @@ HIGH_PRECISION = 50
 
 DEBUG = True
 
+#######################################
+# OLD METHOD OF CHECKING TRANSITIONS #
+# Store transitions in state itself  #
+######################################
 def resetTransitions(state):
     """
     Resets the transitions of a state
@@ -41,6 +45,17 @@ def getNextState(fsa, state):
 
     return fsa.stay()
 
+#############################################################
+# NEW METHOD OF CHECKING TRANSITIONS                        # 
+# Python generators used for describing transitional logic  #
+# See the following for more info:                          #
+# For info on Python decorators:                            #
+# http://stackoverflow.com/questions/739654/how-can-i-make-a-chain-of-function-decorators-in-python/1594484#1594484 
+# For info on hierarchical state machines:                  #
+# "Statecharts: A Visual Formalism for Complex Systems"     #
+#############################################################
+
+### FOR FLAT STATE MACHINES
 def ifSwitch(predicate, state, nextFrame=False):
     """
     Function that returns a Python decorator that allows cleaner use of 
@@ -111,6 +126,64 @@ def stay(fn):
 
     return decoratedFunction
 
+### FOR HIERARCHICAL STATE MACHINES (STATECHARTS)
+def superState(state):
+    """
+    A child state must mark its parent state with this decorator-returning 
+    function. This way the children inherit all the conditional logic of the 
+    parent.
+
+    See paper titled "Statecharts: A Visual Formalism for Complex Systems" for
+    more detailed information.
+
+    @param state, the function representing the parent state, NOT THE STRING
+
+    IMPORTANT: Must be the first decorator applied to the state, before all
+    the state-specific conditions and switches.
+    """
+    def decorator(fn):
+        def decoratedFunction(player):
+            newState1 = fn(player) 
+
+            player.skip = True
+            newState2 = state(player)
+            player.skip = False
+
+            if newState2:
+                return newState2
+            return newState1
+
+        return decoratedFunction
+    return decorator
+
+def defaultState(state):
+    """
+    A parent state can have a default state that is switched to automatically 
+    if control switches to the parent.
+
+    See paper titled "Statecharts: A Visual Formalism for Complex Systems" for
+    more detailed information.
+
+    @param state, the name of the default state AS A STRING
+
+    IMPORTANT: Must be the last decorator applied to the state, after
+    all the conditions that the children inherit.
+    """
+    def decorator(fn):
+        def decoratedFunction(player):
+            newState = fn(player)
+
+            if newState:
+                return newState
+            elif player.skip:
+                return False
+            return player.goNow(state)
+        return decoratedFunction
+    return decorator
+
+###########################
+# STATISTICAL TRANSITIONS #
+###########################
 class CountTransition:
     """
     Class that represents a transition to a different state based

@@ -54,6 +54,10 @@ class FSA:
 
         self.getTime = time.time
 
+        #used in the defaultState decorator-returning function to create
+        #hierarchical state machines, see util/Transition.py
+        self.skip = False
+
         #debug switches
         self.stateChangeColor = ''
         self.printStateChanges = False
