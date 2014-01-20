@@ -45,7 +45,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # based on boxes on the field robots are responsible for, and a more static
         # sense of positions (defender, chaser, etc.)
         # NOT COMPLETE AS OF SUMMER 2013 SO STAY OFF!
-        self.usingBoxPositions = False
+        self.usingBoxPositions = True
 
         if self.usingBoxPositions:
             #Figure out home & kickoff, even/odd player.

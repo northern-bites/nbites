@@ -22,23 +22,24 @@ def positionReady(player):
     """
     if player.firstFrame():
         if player.usingBoxPositions:
-            if(player.brain.gameController.ownKickOff 
+            print "usingBox Positions!!!!!!!!!!!!!!!!!!!!!!!"
+            if(player.brain.gameController.ownKickOff
                and not player.isDefender):
                 player.kickoffPosition = BPConstants.ourKickoff
             elif not player.isDefender:
                 player.kickoffPosition = BPConstants.theirKickoff
 
-            player.brain.nav.goTo(player.kickoffPosition, 
+            player.brain.nav.goTo(player.kickoffPosition,
                                   precision = Navigator.PLAYBOOK,
-                                  speed = Navigator.QUICK_SPEED, 
-                                  avoidObstacles = True, 
+                                  speed = Navigator.QUICK_SPEED,
+                                  avoidObstacles = True,
                                   fast = False, pb = False)
         else:
             player.brain.nav.positionPlaybook()
         player.brain.tracker.repeatBasicPan() # TODO Landmarks
 
     if (player.brain.nav.isAtPosition()): #or
-#        SharedTransitions.atRobotLocation(player.kickoffPosition, 
+#        SharedTransitions.atRobotLocation(player.kickoffPosition,
 #                                          Navigator.GENERAL_AREA)):
         player.brain.tracker.trackBall()
         #player.brain.nav.stand()

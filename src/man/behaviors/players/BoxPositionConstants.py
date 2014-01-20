@@ -4,12 +4,12 @@ from objects import RobotLocation
 isDefender = False # default is false, changed by pBrunswick or some other if
                    # this is not the case
 
-oddDefenderHome = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
-                                NogginConstants.GREEN_PAD_Y + 50,
+oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 20)
 
-evenDefenderHome = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
-                                 NogginConstants.FIELD_GREEN_HEIGHT - 170,
+evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+                                 NogginConstants.MY_GOALBOX_TOP_Y,
                                  -20)
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
@@ -20,7 +20,7 @@ evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
                                NogginConstants.FIELD_GREEN_HEIGHT - 10,
                                -90)
 
-ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X,
+ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 10,
                            NogginConstants.CENTER_FIELD_Y,
                            0)
 
@@ -39,15 +39,16 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #   |                   |
 #   |                   |
 #   |______o=====o______| <--origin
-#
+#          our goal
 #          <-------Y-axis
 
 # A BOX is defined as:
-# ((lower-LEFT X, lower-LEFT Y), Height (X value), Width (Y value))
+# ((lower-RIGHT X, lower-RIGHT Y), Height (X value), Width (Y value))
 
-oddDefenderBox = ((0, 0), 350, 300)
+oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y)
 
-evenDefenderBox = ((0, 300), 350, 300)
+evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y), NogginConstants.CENTER_FIELD_X, \
+                   NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
 chaserBox = ((0, 0), 900, 600)
 
