@@ -1,11 +1,11 @@
-from .. import SweetMoves
+"""
+The game controller, implemented as a hierarchical FSA.
+The second to top level in player FSA.
+"""
+
 import noggin_constants as nogginConstants
-#import _localization
 
-###
-# Reimplementation of Game Controller States for pBrunswick
-###
-
+@superState(notFalling)
 def gameInitial(player):
     """
     Ensure we are sitting down and head is snapped forward.
@@ -15,7 +15,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.gameState = player.currentState
-        player.brain.fallController.enabled = False
+        player.runfallController = False
         player.gainsOn()
         player.stand()
         player.zeroHeads()
@@ -32,13 +32,14 @@ def gameInitial(player):
 
     return player.stay()
 
+@superState(notFalling)
 def gameReady(player):
     """
     Stand up, and pan for localization
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = True
+        player.runFallController = True
         player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePan()
@@ -58,13 +59,14 @@ def gameReady(player):
 
     return player.goLater('playbookPosition')
 
+@superState(notFalling)
 def gameSet(player):
     """
     Fixate on the ball, or scan to look for it
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
@@ -89,10 +91,11 @@ def gameSet(player):
 
     return player.stay()
 
+@superState(notFalling)
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = True
+        player.runFallController = True
         player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
@@ -117,23 +120,7 @@ def gamePlaying(player):
     roleState = player.getRoleState()
     return player.goNow(roleState)
 
-def gamePenalized(player):
-    if player.firstFrame():
-        player.inKickingState = False
-        player.brain.fallController.enabled = False
-        player.gameState = player.currentState
-        player.stand()
-        player.penalizeHeads()
-
-    return player.stay()
-
-def fallen(player):
-    """
-    Stops the player when the robot has fallen
-    """
-    player.inKickingState = False
-    return player.stay()
-
+@superState(notFalling)
 def gameFinished(player):
     """
     Ensure we are sitting down and head is snapped forward.
@@ -141,7 +128,7 @@ def gameFinished(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.gameState = player.currentState
         player.stopWalking()
         player.zeroHeads()
@@ -153,14 +140,25 @@ def gameFinished(player):
 
     return player.stay()
 
-########### PENALTY SHOTS STATES ############
+@superState(notFalling)
+def gamePenalized(player):
+    if player.firstFrame():
+        player.inKickingState = False
+        player.runFallController = False
+        player.gameState = player.currentState
+        player.stand()
+        player.penalizeHeads()
 
+    return player.stay()
+
+### PENALTY SHOTS STATES ###
+@superState(notFalling)
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stand()
         player.gameState = player.currentState
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.brain.tracker.trackBall()
 
     # Wait until the sensors are calibrated before moving.
@@ -172,11 +170,12 @@ def penaltyShotsGameSet(player):
 
     return player.stay()
 
+@superState(notFalling)
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.stand()
         player.gameState = player.currentState
-        player.brain.fallController.enabled = True
+        player.runFallController = True
         player.inKickingState = False
         player.shouldKickOff = False
         player.penaltyKicking = True

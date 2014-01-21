@@ -1,6 +1,8 @@
 import time
 
 from . import SoccerFSA
+from . import FallControllerStates
+from . import GameControllerStates
 from . import ChaseBallStates
 from . import PositionStates
 from . import PenaltyStates
@@ -9,7 +11,6 @@ from . import KickingStates
 from . import PenaltyKickStates
 from . import GoaliePositionStates
 from . import GoalieSaveStates
-from . import BrunswickStates
 from . import DribbleStates
 from . import BoxPositionStates
 
@@ -25,6 +26,8 @@ COUNT_FPS = False
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(FallControllerStates)
+        self.addStates(GameControllerStates)
         self.addStates(PenaltyKickStates)
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieSaveStates)
@@ -33,7 +36,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
         self.addStates(ChaseBallStates)
-        self.addStates(BrunswickStates)
         self.addStates(DribbleStates)
         self.addStates(BoxPositionStates)
 

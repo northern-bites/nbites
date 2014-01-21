@@ -136,7 +136,7 @@ def superState(state):
     See paper titled "Statecharts: A Visual Formalism for Complex Systems" for
     more detailed information.
 
-    @param state, the function representing the parent state, NOT THE STRING
+    @param state, the function representing the parent state AS A STRING
 
     IMPORTANT: Must be the first decorator applied to the state, before all
     the state-specific conditions and switches.
@@ -146,7 +146,9 @@ def superState(state):
             newState1 = fn(player) 
 
             player.skip = True
-            newState2 = state(player)
+            # NOTE: A bit of black magic, eval returns the function that its 
+            # argument (a string) identifies.
+            newState2 = eval(state)(player)
             player.skip = False
 
             if newState2:
