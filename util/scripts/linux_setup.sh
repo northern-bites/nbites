@@ -25,7 +25,7 @@ echo ""
 echo "What version of Ubuntu are you on? (example: 12.04)"
 read VERSION
 
-if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
+if [[ $VERSION != '12.04' && $VERSION != '13.10' ]]; then
 
     echo ""
     echo "That version is NOT SUPPORTED."
