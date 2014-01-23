@@ -60,9 +60,7 @@ class Brain(object):
 
         # Initalize the leds and game controller
         self.leds = Leds.Leds(self)
-        self.gameController = GameController.GameController(self)
-
-        # Initialize fallController
+        # self.gameController = GameController.GameController(self)
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
@@ -152,7 +150,7 @@ class Brain(object):
 
         # Behavior stuff
         # Order here is very important
-        self.gameController.run()
+        # self.gameController.run()
         self.updatePlaybook()
         # self.fallController.run()
         self.player.run()

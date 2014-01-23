@@ -76,7 +76,7 @@ def gamePlaying(player):
 
       # we don't want to auto-stand after falling
       player.brain.fallController.executeStandup = False
-      player.brain.fallController.enabled = False
+      player.runFallController= False
 
       # robots that talk are annoying
       player.brain.speech.disable()

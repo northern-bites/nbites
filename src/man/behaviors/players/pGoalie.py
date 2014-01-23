@@ -1,9 +1,11 @@
 from . import SoccerFSA
+from . import FallControllerStates
+from . import GameControllerStates
 from . import GoalieStates
 from . import VisualGoalieStates
-from ..util import Transition
 from . import GoalieTransitions
 from . import PenaltyStates
+from ..util import Transition
 
 import noggin_constants as NogginConstants
 from GoalieConstants import RIGHT, LEFT
@@ -13,6 +15,8 @@ from objects import Location, RelRobotLocation
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(FallControllerStates)
+        self.addStates(GameControllerStates)
         self.addStates(GoalieStates)
         self.addStates(VisualGoalieStates)
         self.addStates(PenaltyStates)

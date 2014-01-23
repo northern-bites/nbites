@@ -6,17 +6,19 @@ The top level in player FSA.
 from .. import SweetMoves
 from SharedTransitions import sameStateForNSeconds
 import noggin_constants as nogginConstants
+import FallControllerTransitions as transitions
+from ..util import *
 
-@defaultState('gameInitial')
-@ifSwitch(currentlyFalling, 'falling', False)
-def notFalling(player):
+@defaultState('gameController')
+@ifSwitch(transitions.currentlyFalling, 'falling', False)
+def fallController(player):
     """
-    Superstate for all the times we are not falling or fallen.
+    Superstate for checking if we are falling.
     """
     pass
 
 @stay
-@ifSwitch(fallenAndWaited, 'standingUp', False)
+@ifSwitch(transitions.fallenAndWaited, 'standingUp', False)
 def falling(player):
     """
     Protects robot as he falls. Stops him and kills stiffness.

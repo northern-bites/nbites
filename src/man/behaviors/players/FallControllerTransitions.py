@@ -18,4 +18,4 @@ def fallenAndWaited(player):
     """
     We have fallen and rested on the ground for more than a second.
     """
-    return (fallen(player) and sameStateForNSeconds(1)(player)) #TODO constant
+    return (fallen(player) and sameStateForNSeconds(1)(player)) # TODO constant

@@ -8,10 +8,14 @@
 #
 
 from . import SoccerFSA
+from . import FallControllerStates
+from . import GameControllerStates
 from . import KickerStates
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
         SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(FallControllerStates)
+        self.addStates(GameControllerStates)
         self.addStates(KickerStates)
         self.setName('pKicker')
