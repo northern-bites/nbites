@@ -9,6 +9,8 @@ PACKAGES="build-essential cmake git-core \
 python2.7-dev emacs cmake-curses-gui ccache aptitude \
 qt4-dev-tools python-pyparsing libboost-dev libeigen3-dev"
 
+OLDPACKAGES="libboost1.48-dev"
+
 BITS=`uname -m`
 
 if [ $BITS == 'x86_64' ]; then
@@ -44,6 +46,18 @@ echo ""
 echo "Downloading and installing software!"
 echo "..."
 sudo apt-get install $PACKAGES
+
+# Certain packages have to be installed from the 12.04 repo and frozen at that version
+# First add the precise main repo to sources.list & update
+sudo mkdir /etc/apt/sources.list.d 2>/dev/null
+sudo touch /etc/apt/sources.list.d/precise.list
+echo -e "deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe" | sudo tee -a /etc/apt/sources.list.d/precise.list 1>/dev/null
+echo -e "deb-src http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe" | sudo tee -a /etc/apt/sources.list.d/precise.list 1>/dev/null
+sudo apt-get update
+
+# then install specifically from that repo and freeze the packages
+sudo apt-get -t=precise install $OLDPACKAGES
+sudo apt-mark hold $OLDPACKAGES
 
 naoqi_version=$1
 robocup=robocup.bowdoin.edu:/mnt/research/robocup
