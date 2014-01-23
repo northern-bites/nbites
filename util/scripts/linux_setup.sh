@@ -21,9 +21,7 @@ if [ $IS64BIT == 'y' ]; then
     exit 1
 fi
 
-echo ""
-echo "What version of Ubuntu are you on? (example: 12.04)"
-read VERSION
+VERSION=`lsb_release -a 2>/dev/null | grep 'Release:' | grep -o '[0-9]\+.[0-9]\+'`
 
 if [[ $VERSION != '12.04' && $VERSION != '13.10' ]]; then
 
