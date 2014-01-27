@@ -81,28 +81,29 @@ endif()
 include_directories( ${MAN_DIR}/support )
 add_subdirectory( ${MAN_DIR}/support ${CMAKE_CURRENT_BINARY_DIR}/man/support)
 
-add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
-add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
-add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
 add_subdirectory( ${MAN_DIR}/balltrack ${CMAKE_CURRENT_BINARY_DIR}/man/balltrack)
+add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
+add_subdirectory( ${MAN_DIR}/image ${CMAKE_CURRENT_BINARY_DIR}/man/image)
+add_subdirectory( ${MAN_DIR}/localization ${CMAKE_CURRENT_BINARY_DIR}/man/localization)
+add_subdirectory( ${MAN_DIR}/vision ${CMAKE_CURRENT_BINARY_DIR}/man/vision)
 
 # Actual subdirectories!
-add_subdirectory( ${MAN_DIR}/comm ${CMAKE_CURRENT_BINARY_DIR}/man/comm)
-add_subdirectory( unlog )
-add_subdirectory( logview )
-add_subdirectory( image )
-add_subdirectory( colorcreator )
-add_subdirectory( playbook )
-add_subdirectory( vision_offline )
-add_subdirectory( fieldview )
 add_subdirectory( ballview )
-add_subdirectory( common )
-add_subdirectory( worldview )
 add_subdirectory( calibrator )
+add_subdirectory( colorcreator )
+add_subdirectory( common )
+add_subdirectory( fieldview )
+add_subdirectory( image )
+add_subdirectory( logview )
+add_subdirectory( playbook )
+add_subdirectory( sim )
+add_subdirectory( unlog )
+add_subdirectory( vision_offline )
+add_subdirectory( worldview )
 
 ## SOURCES ##
 
-# QTool Sources
+# Full QTool
 set( tool_srcs main.cpp
   ToolDiagram.cpp
   DataSelector.cpp
@@ -117,7 +118,7 @@ set( tool_headers
   Tool.h
 )
 
-# LocTool Sources
+# LocTool
 set( loc_srcs loc_main.cpp
   EmptyTool.cpp
   ToolDiagram.cpp
@@ -135,6 +136,7 @@ set( loc_headers
   LocTool.h
 )
 
+#BallTool
 set( ball_srcs ball_main.cpp
   EmptyTool.cpp
   ToolDiagram.cpp
@@ -151,7 +153,7 @@ set( ball_headers
   BallTool.h
 )
 
-# VisionTool Sources
+# VisionTool
 set( vision_srcs vision_main.cpp
   EmptyTool.cpp
   ToolDiagram.cpp
@@ -168,7 +170,7 @@ set( vision_headers
   VisionTool.h
 )
 
-# CalibrationTool Sources
+# CalibrationTool
 set( calibrate_srcs calibrate_main.cpp
   EmptyTool.cpp
   ToolDiagram.cpp
@@ -185,6 +187,7 @@ set( calibrate_headers
   CalibrationTool.h
 )
 
+# Playbook
 set( playbook_srcs playbook_main.cpp
 
   PlaybookTool.cpp
@@ -195,6 +198,23 @@ set( playbook_headers
   PlaybookTool.h
 )
 
+# SimTool
+set( sim_srcs sim_main.cpp
+  EmptyTool.cpp
+  ToolDiagram.cpp
+  DataSelector.cpp
+
+  SimTool.cpp
+  )
+
+set( sim_headers
+  EmptyTool.h
+  ToolDiagram.h
+  DataSelector.h
+
+  SimTool.h
+)
+
 # Qt4 goodness (aka moc the headers)
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
@@ -202,6 +222,7 @@ Qt4_wrap_cpp( ball_headers_moc ${ball_headers} )
 Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
 Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
 Qt4_wrap_cpp( playbook_headers_moc ${playbook_headers} )
+Qt4_wrap_cpp( sim_headers_moc ${sim_headers} )
 
 ## EXECUTABLES ##
 
@@ -312,5 +333,22 @@ add_executable( playbook_tool
 target_link_libraries(
   playbook_tool
   playbook
+  ${QT_LIBRARIES}
+)
+
+# The SimTool executable
+add_executable( sim_tool
+  ${sim_srcs}
+  ${sim_headers_moc}
+)
+
+target_link_libraries(
+  sim_tool
+  unlog
+  logview
+  image_display
+  portals
+  messages
+  visionsim
   ${QT_LIBRARIES}
 )
