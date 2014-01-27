@@ -36,6 +36,8 @@
 #include <iostream>
 #include <list>
 
+#include <fcntl.h>
+
 namespace man {
 namespace log {
 
