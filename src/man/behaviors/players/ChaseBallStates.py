@@ -17,8 +17,8 @@ import time
 
 DRIBBLE_ON_KICKOFF = False
 
-@switch('approachBall')
-@ifSwitch(BoxTransitions.ballNotInBox, 'positionAtHome')
+@switch('positionAtHome')
+@ifSwitch(BoxTransitions.ballInBufferedBox, 'approachBall')
 @ifSwitch(transitions.shouldFindBall, 'findBall')
 def chase(player):
     """
@@ -50,11 +50,9 @@ def kickoff(player):
 kickoff.ballRelX = "the relX position of the ball when we started"
 kickoff.ballRelY = "the relY position of the ball when we started"
 
-
+@stay
+@ifSwitch(BoxTransitions.ballNotInBufferedBox, 'positionAtHome')
 def approachBall(player):
-    if BoxTransitions.ballNotInBox(player):
-        return player.goLater('positionAtHome')
-
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
@@ -86,8 +84,8 @@ def approachBall(player):
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')
-    else:
-        return player.stay()
+   # else:
+   #     return player.stay()
 
 def prepareForKick(player):
     if player.firstFrame():

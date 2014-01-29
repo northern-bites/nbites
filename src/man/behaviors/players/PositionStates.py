@@ -24,9 +24,9 @@ def positionReady(player):
         if player.usingBoxPositions:
             print "usingBox Positions!!!!!!!!!!!!!!!!!!!!!!!"
             if(player.brain.gameController.ownKickOff
-               and not player.isDefender):
+               and  player.isKickingOff):
                 player.kickoffPosition = BPConstants.ourKickoff
-            elif not player.isDefender:
+            elif player.isKickingOff:
                 player.kickoffPosition = BPConstants.theirKickoff
 
             player.brain.nav.goTo(player.kickoffPosition,

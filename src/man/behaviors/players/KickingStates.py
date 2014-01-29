@@ -21,7 +21,7 @@ def motionKickExecute(player):
         return player.goLater('chase')
 
     player.brain.nav.doMotionKick(player, # kind of a hack, nav is going to change soon anyway
-                                  player.brain.ball.rel_x,
+                                  player.brain.ball.rel_x, #LOL
                                   player.brain.ball.rel_y,
                                   player.kick)
 

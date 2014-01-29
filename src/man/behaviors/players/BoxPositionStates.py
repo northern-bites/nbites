@@ -16,7 +16,8 @@ def positionAtHome(player):
         player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = False, pb = False)
-        player.brain.tracker.stopHeadMoves() # HACK so that tracker goes back to stopped.
+        #HACK so that tracker goes back to stopped.
+        player.brain.tracker.stopHeadMoves()
         player.brain.tracker.repeatWidePan()
         print "I'm going home!"
 
@@ -24,7 +25,7 @@ def positionAtHome(player):
     loc = player.brain.loc
     ballDistance = ((loc.x - ball.x)**2 + (loc.y - ball.y)**2)**.5
 
-    if ballDistance < 70 and ball.vis.frames_on >2:
+    if ballDistance < 70 and ball.vis.frames_on > 2:
         player.brain.tracker.trackBall()
     else:
         player.brain.tracker.repeatWidePan()

@@ -26,7 +26,6 @@
 #include "obstacle/ObstacleModule.h"
 
 #include <vector>
-#include <fstream>
 
 namespace man {
 
@@ -40,8 +39,6 @@ public:
 private:
     void startSubThreads();
     void startAndCheckThread(DiagramThread& thread);
-
-    std::ofstream bugfile;
 
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
