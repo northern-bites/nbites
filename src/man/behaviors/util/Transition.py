@@ -85,16 +85,16 @@ def ifSwitch(predicate, state, nextFrame=False):
         IS ACTUALLY THE LAST ONE CHECKED, REVERSE ORDER!
     """
     def decorator(fn):
-        def decoratedFunction(player):
-            newState = fn(player)
+        def decoratedFunction(fsa):
+            newState = fn(fsa)
             if newState:
                 return newState
 
-            if predicate(player):
+            if predicate(fsa):
                 if nextFrame:
-                    return player.goLater(state)
+                    return fsa.goLater(state)
                 else:
-                    return player.goNow(state)
+                    return fsa.goNow(state)
 
         return decoratedFunction
     return decorator
@@ -105,7 +105,7 @@ def switch(state, nextFrame=False):
 
     Like ifSwitch but predicate is assumed to be True.
     """
-    def alwaysTrue(player):
+    def alwaysTrue(fsa):
         return True
 
     return ifSwitch(alwaysTrue, state, nextFrame)
@@ -114,15 +114,15 @@ def stay(fn):
     """
     Like ifSwitch, see above for complete documentation.
 
-    Return player.stay() at the end of function call if nothing else is
+    Return fsa.stay() at the end of function call if nothing else is
     returned. 
     """
-    def decoratedFunction(player):
-        newState = fn(player)
+    def decoratedFunction(fsa):
+        newState = fn(fsa)
         if newState:
             return newState
 
-        return player.stay()
+        return fsa.stay()
 
     return decoratedFunction
 
@@ -142,18 +142,18 @@ def superState(state):
     the state-specific conditions and switches.
     """
     def decorator(fn):
-        def decoratedFunction(player):
+        def decoratedFunction(fsa):
             # (1) Child states run before super states run, BUT WE PREFER switching
             #     to states switched to by super states
-            stateSwitchedToByChildState = fn(player)
+            stateSwitchedToByChildState = fn(fsa)
 
             # (2) Super states run AFTER child states, BUT WE PREFER switching
             #     to states switched to by super states
-            player.skip = True
-            stateSwitchedToBySuperState = player.states[state](player)
-            player.skip = False
+            fsa.ignoreDefaultState = True
+            stateSwitchedToBySuperState = fsa.states[state](fsa)
+            fsa.ignoreDefaultState = False
 
-            # (3) Switch to state switched to by super
+            # (3) Switch to state switched to by super first
             if stateSwitchedToBySuperState:
                 return stateSwitchedToBySuperState
 
@@ -178,13 +178,13 @@ def defaultState(state):
     all the conditions that the children inherit.
     """
     def decorator(fn):
-        def decoratedFunction(player):
-            if player.skip:
-                newState = fn(player)
+        def decoratedFunction(fsa):
+            if fsa.ignoreDefaultState:
+                newState = fn(fsa)
                 if newState:
                     return newState
             else:
-                return player.goNow(state)
+                return fsa.goNow(state)
         return decoratedFunction
     return decorator
 
