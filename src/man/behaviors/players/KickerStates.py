@@ -7,7 +7,7 @@ from ..headTracker import HeadMoves
 from .. import SweetMoves
 from ..util import *
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
@@ -15,24 +15,25 @@ def gameInitial(player):
         player.runfallController = False
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameReady(player):
     if player.firstFrame():
         player.brain.nav.stand()
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameSet(player):
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gamePlaying(player):
     return player.goNow('kick')
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gamePenalized(player):
     return player.stay()
 
+@superState('gameControllerResponder')
 def kick(player):
     if player.firstFrame():
         player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)

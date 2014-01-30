@@ -1,5 +1,6 @@
 import noggin_constants as Constants
 
+# TODO unify these constants!
 STATE_INITIAL = 0
 STATE_READY = 1
 STATE_SET = 2
@@ -9,7 +10,6 @@ PENALTY_NONE = 0
 STATE2_PENALTYSHOOT = 1
 STATE2_NORMAL = 0
 STATE2_OVERTIME = 2
-# @TODO: unify these constants!
 TEAM_BLUE = Constants.teamColor.TEAM_BLUE
 TEAM_RED = Constants.teamColor.TEAM_RED
 
@@ -30,6 +30,12 @@ convertStateFormatPenaltyShots = { STATE_INITIAL :  'penaltyShotsGameSet',
                                    }
 
 class GameController():
+    """
+    The GameController's job is to update its own state to reflect the current
+    gameState according to self.brain.interface.gameState. It should only 
+    report the gameState, not do anything with that information. It is left up
+    to the player FSA how to respond, for example see GameControllerStates.py.
+    """
     def __init__(self, brain):
         self.brain = brain
         self.currentState = -1
@@ -41,7 +47,6 @@ class GameController():
         self.kickOffChanged = False
         self.penaltyShots = False
         self.penalized = False
-        self.penalizedChanged = False
         self.timeSincePlaying = 0
         self.playingStartTime = 0
 
@@ -104,15 +109,18 @@ class GameController():
                 self.stateChanged = True
                 self.penalized = False
 
-        # If state has changed, tell player FSA to switch to new state
+        # Update the player's "gamestate" variable now, so it is correct when
+        # playbook runs (since player runs even later).
+        # TODO eliminate the need for this break in encapsulation, possibly
+        # less of an issue after new positioning system is in place
         if self.stateChanged:
             if self.penalized:
                 self.brain.player.switchTo('gamePenalized')
             else:
                 if gameState.secondary_state != STATE2_PENALTYSHOOT:
+                    self.penaltyShots = False
                     self.brain.player.switchTo(convertStateFormat[self.currentState])
                 else:
+                    self.penaltyShots = True
                     self.brain.player.switchTo(convertStateFormatPenaltyShots[self.currentState])
-            # Update the player's "gamestate" variable now, so it is correct when
-            # playbook runs (since player runs even later).
             self.brain.player.gameState = self.brain.player.currentState

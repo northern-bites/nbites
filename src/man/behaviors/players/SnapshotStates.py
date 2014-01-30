@@ -10,15 +10,15 @@ from ..util import *
 FRAME_SAVE_RATE = 1
 NUM_FRAMES_TO_SAVE = 150
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameInitial(player):
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameReady(player):
      return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameSet(player):
     if player.firstFrame():
         player.stand()
@@ -26,13 +26,13 @@ def gameSet(player):
 
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
          player.brain.tracker.repeatWidePan()
 
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gamePenalized(player):
     return player.stay()

@@ -1,7 +1,9 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..util import *
 from objects import Location
 
+@superState('gameControllerResponder')
 def findBall(player):
     """
     State to stop all activity and begin finding the ball
@@ -16,6 +18,7 @@ def findBall(player):
 
     return player.goNow('spinFindBall')
 
+@superState('gameControllerResponder')
 def spinFindBall(player):
     """
     State to spin to find the ball. If we find the ball, we

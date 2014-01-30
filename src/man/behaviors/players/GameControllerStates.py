@@ -1,29 +1,29 @@
 """
-The game controller, implemented as a hierarchical FSA.
+An FSA for responding to changes in the gameState according to gameController, 
+implemented as a hierarchical FSA. 
+
 The second to top level in player FSA.
 """
 
 import noggin_constants as nogginConstants
-import GameControllerTransitions as transitions
-from GameControllertransitions import convertStateFormat
-from GameControllertransitions import convertStateFormatPenaltyShots
+from ..GameController import convertStateFormat, convertStateFormatPenaltyShots
 from ..util import *
 
-@default('gameInitial')
-@ifSwitch(transitions.penalized, 'gamePenalized', False)
-@ifSwitch(transitions.gcChangedStatePKs, 
-          convertStateFormatPenaltyShots[player.brain.interface.gameState], 
-          False)
-@ifSwitch(transitions.gcChangedStateNoPKs, 
-          convertStateFormat[player.brain.interface.gameState], 
-          False)
+@defaultState('gameInitial')
 @superState('fallController')
-def gameController(player):
+def gameControllerResponder(player):
     """
-    Superstate for checking gameState switches and penalties.
-    (1) gcChangedStateNoPKs changes between GI, GR, GS, GP automatically.
-    (2) gcChangedStatePKs changes between penalty kick states (set, playing) 
-    automatically.
-    (3) penalized puts the player in 'gamePenalized' state.
+    Superstate for responding to gameState switches and penalties.
+    See GameController.py for more information.
     """
     pass
+    # TODO commented out until new positioning system is pulled
+    # GC = player.brain.gameController
+    # if GC.stateChanged:
+    #     if GC.penalized:
+    #         return player.goLater('gamePenalized')
+    #     else:
+    #         if GC.penaltyShots:
+    #             return player.goLater(convertStateFormatPenaltyShots[GC.currentState])
+    #         else:
+    #             return player.goLater(convertStateFormat[GC.currentState])

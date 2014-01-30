@@ -24,26 +24,29 @@ def falling(player):
     Protects robot as he falls. Stops him and kills stiffness.
     """
     if player.firstFrame():
-        self.brain.player.gainsOff()
-        self.brain.tracker.stopHeadMoves()
+        player.brain.player.gainsOff()
+        player.brain.tracker.stopHeadMoves()
         player.inKickingState = False
 
 @stay
-@ifSwitch(sameStateForNSeconds(SweetMoves.getMoveTime(move)), 
-                               player.gameState, True)
 def standingUp(player):
     """
     Attempts a standup. If fails, tries again!
     """
     if player.firstFrame():
-        self.brain.interface.motionRequest.reset_providers = True
-        self.brain.interface.motionRequest.timestamp = int(self.brain.time*1000)
-        self.brain.player.gainsOn()
-        self.brain.tracker.setNeutralHead()
+        player.brain.interface.motionRequest.reset_providers = True
+        player.brain.interface.motionRequest.timestamp = int(player.brain.time*1000)
+        player.brain.player.gainsOn()
+        player.brain.tracker.setNeutralHead()
 
-        if (self.brain.interface.fallStatus.on_front):
-            move = SweetMoves.STAND_UP_FRONT
+        if (player.brain.interface.fallStatus.on_front):
+            standingUp.move = SweetMoves.STAND_UP_FRONT
         else:
-            move = SweetMoves.STAND_UP_BACK
+            standingUp.move = SweetMoves.STAND_UP_BACK
 
-        self.brain.player.executeMove(move)
+        player.brain.player.executeMove(standingUp.move)
+
+    # Does not use ifSwitch because we need access to 'move' and 
+    # 'player.currentState'
+    if sameStateForNSeconds(SweetMoves.getMoveTime(standingUp.move))(player): 
+        return player.goLater(player.gameState)

@@ -20,12 +20,14 @@ DRIBBLE_ON_KICKOFF = False
 @switch('approachBall')
 @ifSwitch(BoxTransitions.ballNotInBox, 'positionAtHome')
 @ifSwitch(transitions.shouldFindBall, 'findBall')
+@superState('gameControllerResponder')
 def chase(player):
     """
     Super State to determine what to do from various situations
     """
     pass
 
+@superState('gameControllerResponder')
 def kickoff(player):
     """
     Have the robot kickoff if it needs to kick it.
@@ -51,6 +53,7 @@ kickoff.ballRelX = "the relX position of the ball when we started"
 kickoff.ballRelY = "the relY position of the ball when we started"
 
 
+@superState('gameControllerResponder')
 def approachBall(player):
     if BoxTransitions.ballNotInBox(player):
         return player.goLater('positionAtHome')
@@ -89,6 +92,7 @@ def approachBall(player):
     else:
         return player.stay()
 
+@superState('gameControllerResponder')
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
@@ -112,6 +116,7 @@ def prepareForKick(player):
 
     return player.goNow('orbitBall')
 
+@superState('gameControllerResponder')
 def orbitBall(player):
     """
     State to orbit the ball
@@ -195,6 +200,7 @@ def orbitBall(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def positionForKick(player):
     """
     Get the ball in the sweet spot
@@ -239,6 +245,7 @@ def positionForKick(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def prepareForPenaltyKick(player):
     """
     We're waiting here for a short time to psych out the opposing goalie,
@@ -284,6 +291,7 @@ def prepareForPenaltyKick(player):
         return player.goNow('penaltyKickSpin')
     return player.stay()
 
+@superState('gameControllerResponder')
 def penaltyKickSpin(player):
     """
     Spin so that we change the heading of the kick
@@ -338,6 +346,7 @@ def penaltyKickSpin(player):
     return player.stay()
 
 
+@superState('gameControllerResponder')
 def positionForPenaltyKick(player):
     """
     We're getting ready for a penalty kick

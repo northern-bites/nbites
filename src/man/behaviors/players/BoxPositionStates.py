@@ -6,6 +6,7 @@ from ..util import *
 @stay
 @ifSwitch(SharedTransitions.navAtPosition, 'watchForBall')
 @ifSwitch(BoxTransitions.ballInBox, 'chase')
+@superState('gameControllerResponder')
 def positionAtHome(player):
     """
     Go to the player's home position
@@ -18,6 +19,7 @@ def positionAtHome(player):
 
 @stay
 @ifSwitch(BoxTransitions.ballInBox, 'chase')
+@superState('gameControllerResponder')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)

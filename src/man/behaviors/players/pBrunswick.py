@@ -29,7 +29,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
-        self.addStates(BrunswickState)
+        self.addStates(BrunswickStates)
         self.addStates(PenaltyKickStates)
         self.addStates(GoaliePositionStates)
         self.addStates(GoalieSaveStates)

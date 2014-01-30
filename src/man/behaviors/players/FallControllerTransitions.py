@@ -1,12 +1,14 @@
 import noggin_constants as nogginConstants
+import FallControllerConstants as constants
 from SharedTransitions import sameStateForNSeconds
 
 def currentlyFalling(player):
     """
-    We are currently in the process of falling, not yet at rest on ground.
+    We are currently in the process of falling or have fallen.
     """
     return (player.runFallController and
-            player.brain.interface.fallStatus.falling)
+            (player.brain.interface.fallStatus.falling or
+             fallen(player)))
 
 def fallen(player):
     """
@@ -18,4 +20,5 @@ def fallenAndWaited(player):
     """
     We have fallen and rested on the ground for more than a second.
     """
-    return (fallen(player) and sameStateForNSeconds(1)(player)) # TODO constant
+    return (fallen(player) and 
+            sameStateForNSeconds(constants.WAIT_BEFORE_STANDUP)(player))

@@ -6,7 +6,7 @@ import noggin_constants as nogginConstants
 from ..util import *
 
 ### NORMAL PLAY ###
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameInitial(player):
     """
     Ensure we are sitting down and head is snapped forward.
@@ -16,7 +16,7 @@ def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.gameState = player.currentState
-        player.runfallController = False
+        player.runFallController = False
         player.gainsOn()
         player.stand()
         player.zeroHeads()
@@ -33,7 +33,7 @@ def gameInitial(player):
 
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameReady(player):
     """
     Stand up, and pan for localization
@@ -60,7 +60,7 @@ def gameReady(player):
 
     return player.goLater('playbookPosition')
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameSet(player):
     """
     Fixate on the ball, or scan to look for it
@@ -87,7 +87,7 @@ def gameSet(player):
 
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
@@ -116,7 +116,7 @@ def gamePlaying(player):
     roleState = player.getRoleState()
     return player.goNow(roleState)
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gameFinished(player):
     """
     Ensure we are sitting down and head is snapped forward.
@@ -135,7 +135,7 @@ def gameFinished(player):
 
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
@@ -147,7 +147,7 @@ def gamePenalized(player):
     return player.stay()
 
 ### PENALTY KICK PLAY ###
-@superState('gameController')
+@superState('gameControllerResponder')
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stand()
@@ -165,7 +165,7 @@ def penaltyShotsGameSet(player):
 
     return player.stay()
 
-@superState('gameController')
+@superState('gameControllerResponder')
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.stand()

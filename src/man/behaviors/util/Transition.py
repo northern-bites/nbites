@@ -143,17 +143,23 @@ def superState(state):
     """
     def decorator(fn):
         def decoratedFunction(player):
-            newState1 = fn(player) 
+            # (1) Child states run before super states run, BUT WE PREFER switching
+            #     to states switched to by super states
+            stateSwitchedToByChildState = fn(player)
 
+            # (2) Super states run AFTER child states, BUT WE PREFER switching
+            #     to states switched to by super states
             player.skip = True
-            # NOTE: A bit of black magic, eval returns the function that its 
-            # argument (a string) identifies.
-            newState2 = eval(state)(player)
+            stateSwitchedToBySuperState = player.states[state](player)
             player.skip = False
 
-            if newState2:
-                return newState2
-            return newState1
+            # (3) Switch to state switched to by super
+            if stateSwitchedToBySuperState:
+                return stateSwitchedToBySuperState
+
+            # (4) Switch to state switched to by child
+            if stateSwitchedToByChildState:
+                return stateSwitchedToByChildState
 
         return decoratedFunction
     return decorator
@@ -173,13 +179,12 @@ def defaultState(state):
     """
     def decorator(fn):
         def decoratedFunction(player):
-            newState = fn(player)
-
-            if newState:
-                return newState
-            elif player.skip:
-                return False
-            return player.goNow(state)
+            if player.skip:
+                newState = fn(player)
+                if newState:
+                    return newState
+            else:
+                return player.goNow(state)
         return decoratedFunction
     return decorator
 

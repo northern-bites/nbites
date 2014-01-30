@@ -1,12 +1,14 @@
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 from ..navigator import Navigator
+from ..util import *
 import noggin_constants as NogginConstants
 from objects import Location, RelRobotLocation
 from ..playbook import PBConstants
 from . import BoxPositionConstants as BPConstants
 from . import SharedTransitions
 
+@superState('gameControllerResponder')
 def playbookPosition(player):
     """
     Super State for Non Chasers
@@ -16,6 +18,7 @@ def playbookPosition(player):
     else:
         return player.goNow('positionPlaying')
 
+@superState('gameControllerResponder')
 def positionReady(player):
     """
     Game Ready positioning
@@ -51,6 +54,7 @@ def positionReady(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def readyFaceMiddle(player):
     """
     If we didn't make it to our position, find the middle of the field
@@ -85,6 +89,7 @@ def readyFaceMiddle(player):
 readyFaceMiddle.done = False
 readyFaceMiddle.startedSpinning = False
 
+@superState('gameControllerResponder')
 def positionPlaying(player):
     """
     Game Playing positioning
@@ -107,6 +112,7 @@ def positionPlaying(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def hackWalkForward(player):
     if player.firstFrame():
         player.brain.nav.walkTo(RelRobotLocation(200, 0, 0))
