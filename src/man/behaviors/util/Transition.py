@@ -96,6 +96,7 @@ def ifSwitch(predicate, state, nextFrame=False):
                 else:
                     return fsa.goNow(state)
 
+        decoratedFunction.__name__ = fn.__name__
         return decoratedFunction
     return decorator
 
@@ -124,6 +125,7 @@ def stay(fn):
 
         return fsa.stay()
 
+    decoratedFunction.__name__ = fn.__name__
     return decoratedFunction
 
 ### FOR HIERARCHICAL STATE MACHINES (STATECHARTS)
@@ -161,6 +163,7 @@ def superState(state):
             if stateSwitchedToByChildState:
                 return stateSwitchedToByChildState
 
+        decoratedFunction.__name__ = fn.__name__
         return decoratedFunction
     return decorator
 
@@ -185,6 +188,7 @@ def defaultState(state):
                     return newState
             else:
                 return fsa.goNow(state)
+        decoratedFunction.__name__ = fn.__name__
         return decoratedFunction
     return decorator
 
