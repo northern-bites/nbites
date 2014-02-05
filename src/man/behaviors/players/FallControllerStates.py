@@ -10,7 +10,7 @@ import FallControllerTransitions as transitions
 from ..util import *
 
 @defaultState('gameController')
-@ifSwitch(transitions.currentlyFalling, 'falling', False)
+@ifSwitch(transitions.falling, 'falling', True)
 def fallController(player):
     """
     Superstate for checking if we are falling.
@@ -18,7 +18,7 @@ def fallController(player):
     pass
 
 @stay
-@ifSwitch(transitions.fallenAndWaited, 'standingUp', False)
+@ifSwitch(transitions.atRest, 'standingUp', True)
 def falling(player):
     """
     Protects robot as he falls. Stops him and kills stiffness.
@@ -31,7 +31,7 @@ def falling(player):
 @stay
 def standingUp(player):
     """
-    Attempts a standup. If fails, tries again!
+    Attempts a standup.
     """
     if player.firstFrame():
         player.brain.interface.motionRequest.reset_providers = True
