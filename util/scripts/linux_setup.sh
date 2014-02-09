@@ -45,7 +45,7 @@ fi
 echo ""
 echo "Downloading and installing software!"
 echo "..."
-sudo apt-get install $PACKAGES
+sudo apt-get -y install $PACKAGES
 
 # Certain packages have to be installed from the 12.04 repo and frozen at that version
 # First add the precise main repo to sources.list & update
@@ -56,7 +56,7 @@ echo -e "deb-src http://us.archive.ubuntu.com/ubuntu/ precise main restricted un
 sudo apt-get update
 
 # then install specifically from that repo and freeze the packages
-sudo apt-get -t=precise install $OLDPACKAGES
+sudo apt-get -y -t=precise install $OLDPACKAGES
 sudo apt-mark hold $OLDPACKAGES
 
 naoqi_version=$1
