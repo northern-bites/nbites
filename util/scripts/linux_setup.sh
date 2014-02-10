@@ -5,11 +5,11 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
-PACKAGES="build-essential cmake git-core \
-python2.7-dev emacs cmake-curses-gui ccache aptitude \
-qt4-dev-tools python-pyparsing libboost-dev libeigen3-dev"
+OLDPACKAGES="python2.7.5-dev libboost1.48-dev libboost-python1.48-dev"
 
-OLDPACKAGES="libboost1.48-dev libboost-python1.48-dev"
+PACKAGES="build-essential cmake git-core \
+emacs cmake-curses-gui ccache aptitude \
+qt4-dev-tools python-pyparsing libeigen3-dev"
 
 BITS=`uname -m`
 
@@ -32,7 +32,7 @@ if [[ $VERSION != '12.04' && $VERSION != '13.10' ]]; then
     echo "--------------------------------------------------------------"
     echo "If you are very sure of what you are doing, you may continue and"
     echo "configure broken packages manually."
-    echo "Otherwise, please switch to Ubuntu 11.10 or 12.04."
+    echo "Otherwise, please switch to Ubuntu 13.10 or 12.04."
     echo ""
     echo "Abort? (y/n)"
     read ABORT
@@ -45,7 +45,6 @@ fi
 echo ""
 echo "Downloading and installing software!"
 echo "..."
-sudo apt-get -y install $PACKAGES
 
 # Certain packages have to be installed from the 12.04 repo and frozen at that version
 # First add the precise main repo to sources.list & update
@@ -58,6 +57,8 @@ sudo apt-get update
 # then install specifically from that repo and freeze the packages
 sudo apt-get -y -t=precise install $OLDPACKAGES
 sudo apt-mark hold $OLDPACKAGES
+
+sudo apt-get -y install $PACKAGES
 
 naoqi_version=$1
 robocup=robocup.bowdoin.edu:/mnt/research/robocup
