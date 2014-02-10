@@ -12,6 +12,12 @@ set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SHARE_DIR}/cmake/" )
 mark_as_advanced( CMAKE_INSTALL_PREFIX )
 mark_as_advanced( CMAKE_TOOLCHAIN_FILE )
 
+set( CMAKE_CXX_FLAGS
+  "${CMAKE_CXX_FLAGS} -pthread" )
+
+set( CMAKE_C_FLAGS
+  "${CMAKE_CXX_FLAGS}" )
+
 # Option to turn rebuilding our protobuf libs on/off
 option( BUILD_PROTOBUF "Rebuild the protobuf libraries." OFF )
 if( BUILD_PROTOBUF )
