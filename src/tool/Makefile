@@ -14,6 +14,7 @@ BALL_EXECUTABLE = ball_tool
 VISION_EXECUTABLE = vision_tool
 CALIBRATE_EXECUTABLE = calibrate_tool
 PLAYBOOK_EXECUTABLE = playbook_tool
+SIM_EXECUTABLE = sim_tool
 
 .PHONY: build_tool
 build_tool:
@@ -91,6 +92,19 @@ playbook: build_playbook
 	@echo "Running playbook_tool executable."
 	@cd $(BUILD_DIR); \
 	./$(PLAYBOOK_EXECUTABLE)
+
+.PHONY: build_sim
+build_sim:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(SIM_EXECUTABLE)
+
+.PHONY: sim
+sim: build_sim
+	@echo "Running sim_tool executable."
+	@cd $(BUILD_DIR); \
+	./$(SIM_EXECUTABLE)
 
 .PHONY: config
 config:

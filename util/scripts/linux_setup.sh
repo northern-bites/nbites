@@ -7,7 +7,7 @@ fi
 
 PACKAGES="build-essential cmake git-core \
 python2.7-dev emacs cmake-curses-gui ccache aptitude \
-qt4-dev-tools python-pyparsing libboost-dev"
+qt4-dev-tools python-pyparsing libboost-dev libeigen3-dev"
 
 echo "Are you on 64-bit linux? (y/n)"
 read IS64BIT
@@ -99,8 +99,6 @@ nbites_bash=$nbites_dir/util/scripts/nbites.bash
 
 echo "export NBITES_DIR=$nbites_dir" >> $nbites_bash
 echo "export AL_DIR=$naoqi_local" >> $nbites_bash
-echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$nbites_dir/ext/lib" >> $nbites_bash
-echo "export PATH=$nbites_dir/ext/bin:$PATH" >> $nbites_bash
 
 echo ""
 echo "Done! The last step is just to add the following line:"
