@@ -1,4 +1,5 @@
 from .. import SweetMoves
+from objects import Location, RobotLocation
 from KickingConstants import DEFAULT_KICK_X_OFFSET
 
 class Kick(object):
@@ -6,17 +7,17 @@ class Kick(object):
     stores everything we need to know for a given kick
     """
     def __init__(self, _name, x=DEFAULT_KICK_X_OFFSET, y=0, h=0,
-                 move=None, dest = None):
+                 move=None, dest=Location(), maxDist=0):
         self.name = _name
-        self.x_offset = x
-        self.y_offset = y
-        self.heading = h           # set manually.
         self.sweetMove = move
-        self.dest = dest           # set manually.
+        self.maxDist = maxDist           # upper limit of the range of the kick
+
+        self.setup = RobotLocation(x,y,h)
+        self.destination = dest          # set by kickDecider
 
     def getPosition(self):
-        """returns all position info as a tuple"""
-        return (self.x_offset, self.y_offset, self.heading)
+        """ Returns position as a RobotLocation object """
+        return setup
 
     def isBackKick(self):
         return (self is LEFT_LONG_BACK_KICK or
