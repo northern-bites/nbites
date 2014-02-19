@@ -43,17 +43,17 @@ def getNextState(fsa, state):
 
 def ifSwitch(predicate, state, nextFrame=False):
     """
-    Function that returns a Python decorator that allows cleaner use of 
+    Function that returns a Python decorator that allows cleaner use of
     transitions in an FSA.
     See the following website for an explanation of how decorators work:
         http://stackoverflow.com/questions/739654/how-can-i-make-a-chain-of-
         function-decorators-in-python/1594484#1594484
 
-    Example usage: 
+    Example usage:
         @ifSwitch(Transitions.ballMoved, chase, True)
         def dribble(player):
             doStuffHere()
-            
+
     This would transition to the chase state if Transitions.ballMoved(player)
     returned True. It would transition to the chase state in the next frame. If
     ballMoved returned False, then the FSA would stay in dribble.
@@ -62,7 +62,7 @@ def ifSwitch(predicate, state, nextFrame=False):
     @param state, the name of a state to switch to AS A STRING
     @param nextFrame, a boolean deciding whether we transition now or next frame
 
-    IMPORTANT: 
+    IMPORTANT:
     (1) If in the state itself a call to goNow or goLater is made, that
         transition will be made without checking the decorated transitions.
     (2) Decorated transitions are checked after the state is run.
@@ -100,7 +100,7 @@ def stay(fn):
     Like ifSwitch, see above for complete documentation.
 
     Return player.stay() at the end of function call if nothing else is
-    returned. 
+    returned.
     """
     def decoratedFunction(player):
         newState = fn(player)

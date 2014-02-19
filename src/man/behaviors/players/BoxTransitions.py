@@ -1,3 +1,4 @@
+import BoxPositionConstants as boxConstants
 #The transitions file for transitions exclusive to the Box-based positioning
 
 def ballInBox(player):
@@ -7,25 +8,61 @@ def ballInBox(player):
     if not player.usingBoxPositions:
         return True
     ball = player.brain.ball
-    
+
     if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
             ball.x < player.box[0][0] + player.box[1] and \
             ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 2:
+        print "Ball is in my box!"
         return True
     return False
 
 
 def ballNotInBox(player):
     """
-    A transition which returns true if the ball is in the player's box
+    A transition which returns true if the ball isn't in the player's box
+    """
+    return not ballInBox(player)
+
+def ballInBufferedBox(player):
+    """
+    A transition which allows a stretching of a box so that the box isn't
+    so ridged. Intended use is for in approachBall, ensuring that we don't loop
+    between approachBall and positionAtHome if the ball is close to the edge of the box.
     """
     if not player.usingBoxPositions:
-        return False
-
+        return True
     ball = player.brain.ball
-    
-    if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
-            ball.x < player.box[0][0] + player.box[1] and \
-            ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 2:
+    buf = boxConstants.boxBuffer
+
+    if ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
+            ball.x < player.box[0][0] + player.box[1] + buf and \
+            ball.y < player.box[0][1] + player.box[2] + buf and ball.vis.frames_on > 2:
+        print "Ball is in my buffered box!"
+        return True
+    return False
+
+
+def ballNotInBufferedBox(player):
+    """
+    Simple negation of ballInBufferedBox
+    """
+    return not ballInBufferedBox(player)
+
+def tooFarFromHome(threshold):
+    """
+    Returns true if LOC thinks we're more than *distance* away from our home
+    position
+    """
+    def transition(player):
+        if not player.usingBoxPositions:
+            return False
+
+        loc = player.brain.loc
+        home = player.homePosition
+
+        distance = ((loc.x - home.x)**2 + (loc.y - home.y)**2)**.5
+
+        if distance > threshold:
+            return True
         return False
-    return True
+    return transition
