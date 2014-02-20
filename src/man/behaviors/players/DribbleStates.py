@@ -5,6 +5,7 @@ import DribbleTransitions as transitions
 import DribbleConstants as constants
 from ..navigator import Navigator
 from ..kickDecider import kicks
+from ..util import *
 from objects import RelRobotLocation, Location
 
 ### BASIC IDEA
@@ -15,6 +16,7 @@ from objects import RelRobotLocation, Location
 # ball and dribble again to space. We only dribble if shoulDribble returns 
 # true, see DribbleTransitions.py for more info.
 
+@superState('gameControllerResponder')
 def decideDribble(player):
     """
     Decide to dribble straight ahead or rotate to avoid other robots.
@@ -30,6 +32,7 @@ def decideDribble(player):
     else:
         return player.goNow('rotateToOpenSpace')
 
+@superState('gameControllerResponder')
 def executeDribble(player):
     """
     Move through the ball, so as to execute a dribble.
@@ -86,6 +89,7 @@ def executeDribble(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def rotateToOpenSpace(player):
     """
     Rotate around ball, so as to find an open lane to dribble thru
@@ -113,6 +117,7 @@ def rotateToOpenSpace(player):
     rotateToOpenSpace.counter = 0
     return player.stay()
 
+@superState('gameControllerResponder')
 def lookForBall(player):
     """
     Backup and look for ball. If fails, leave the FSA.
@@ -136,6 +141,7 @@ def lookForBall(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def positionForDribble(player):
     """
     We should position ourselves behind the ball for easy dribbling.

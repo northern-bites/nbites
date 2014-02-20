@@ -17,22 +17,14 @@ import time
 
 DRIBBLE_ON_KICKOFF = False
 
-@switch('positionAtHome')
-@ifSwitch(BoxTransitions.ballInBufferedBox, 'approachBall')
-@ifSwitch(transitions.shouldFindBall, 'findBall')
-def chase(player):
-    """
-    Super State to determine what to do from various situations
-    """
-    pass
-
+@superState('gameControllerResponder')
 def kickoff(player):
     """
     Have the robot kickoff if it needs to kick it.
     Otherwise wait 10 seconds or wait for the ball to move.
     """
     if player.shouldKickOff:
-        return player.goNow('chase')
+        return player.goNow('approachBall')
 
     if player.firstFrame():
         kickoff.ballRelX = player.brain.ball.rel_x
@@ -43,7 +35,7 @@ def kickoff(player):
         constants.KICKOFF_BALL_MOVE_THRESH or
         fabs(player.brain.ball.rel_y - kickoff.ballRelY) >
         constants.KICKOFF_BALL_MOVE_THRESH):
-        return player.goNow('chase')
+        return player.goNow('approachBall')
 
     return player.stay()
 
@@ -51,7 +43,7 @@ kickoff.ballRelX = "the relX position of the ball when we started"
 kickoff.ballRelY = "the relY position of the ball when we started"
 
 @stay
-@ifSwitch(BoxTransitions.ballNotInBufferedBox, 'positionAtHome')
+@superState('planner')
 def approachBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -61,9 +53,6 @@ def approachBall(player):
             return player.goNow('prepareForPenaltyKick')
         else:
             player.brain.nav.chaseBall(fast = True)
-
-    if transitions.shouldFindBall(player):
-        return player.goLater('chase')
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
@@ -84,9 +73,8 @@ def approachBall(player):
             return player.goNow('positionForKick')
         else:
             return player.goNow('prepareForKick')
-   # else:
-   #     return player.stay()
 
+@superState('gameControllerResponder')
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
@@ -97,7 +85,7 @@ def prepareForKick(player):
     if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goLater('approachBall')
 
     player.kick = prepareForKick.hackKick.shoot()
 
@@ -110,6 +98,7 @@ def prepareForKick(player):
 
     return player.goNow('orbitBall')
 
+@superState('gameControllerResponder')
 def orbitBall(player):
     """
     State to orbit the ball
@@ -129,7 +118,7 @@ def orbitBall(player):
         transitions.orbitBallTooFar(player)):
         player.stopWalking()
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goLater('approachBall')
 
     # Set our walk. Nav will make sure that we don't set duplicate speeds.
     if relH < 0:
@@ -193,6 +182,7 @@ def orbitBall(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def positionForKick(player):
     """
     Get the ball in the sweet spot
@@ -200,7 +190,7 @@ def positionForKick(player):
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goLater('approachBall')
 
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
@@ -225,7 +215,7 @@ def positionForKick(player):
 
     if transitions.shouldFindBall(player):
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goLater('findBall')
 
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
@@ -237,6 +227,7 @@ def positionForKick(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def prepareForPenaltyKick(player):
     """
     We're waiting here for a short time to psych out the opposing goalie,
@@ -282,6 +273,7 @@ def prepareForPenaltyKick(player):
         return player.goNow('penaltyKickSpin')
     return player.stay()
 
+@superState('gameControllerResponder')
 def penaltyKickSpin(player):
     """
     Spin so that we change the heading of the kick
@@ -336,6 +328,7 @@ def penaltyKickSpin(player):
     return player.stay()
 
 
+@superState('gameControllerResponder')
 def positionForPenaltyKick(player):
     """
     We're getting ready for a penalty kick

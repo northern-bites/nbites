@@ -1,6 +1,7 @@
 import ChaseBallTransitions as transitions
 from math import copysign, fabs
 from objects import RelRobotLocation
+from ..util import *
 
 DEBUG_PENALTY_STATES = False
 OBJ_SEEN_THRESH = 6
@@ -8,6 +9,7 @@ OBJ_SEEN_THRESH = 6
 # @Summer 2012: This entire state appears to be a hack for localization.
 # @Summer 2013: This entire state is an aid for localization, since we can only
 #               hard reset to one of the two possible post-penalty positions.
+@superState('gameControllerResponder')
 def afterPenalty(player):
 
     if player.firstFrame():
@@ -115,6 +117,7 @@ def afterPenalty(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def postPenaltyChaser(player):
     """
     If we come out of penalty directly into chaser, we'll waste

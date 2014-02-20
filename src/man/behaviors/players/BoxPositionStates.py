@@ -4,9 +4,20 @@ import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from ..util import *
 
+@defaultState('positionAtHome')
+@ifSwitch(boxTransitions.ballNotInBufferedBox, 'positionAtHome')
+@ifSwitch(boxTransitions.shouldFindBall, 'findBall')
+@superState('gameControllerResponder')
+def planner(player):
+    """
+    Superstate for deciding what to do as a player.
+    """
+    pass
+
 @stay
 @ifSwitch(SharedTransitions.navAtPosition, 'watchForBall')
-@ifSwitch(BoxTransitions.ballInBox, 'chase')
+@ifSwitch(BoxTransitions.ballInBox, 'approachBall')
+@superState('gameControllerResponder')
 def positionAtHome(player):
     """
     Go to the player's home position
@@ -16,10 +27,10 @@ def positionAtHome(player):
         player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = False, pb = False)
+        # TODO check if this is necessary!
         #HACK so that tracker goes back to stopped.
         player.brain.tracker.stopHeadMoves()
         player.brain.tracker.repeatWidePan()
-        print "I'm going home!"
 
     ball = player.brain.ball
     loc = player.brain.loc
@@ -33,7 +44,8 @@ def positionAtHome(player):
 
 @stay
 @ifSwitch(BoxTransitions.tooFarFromHome(20), 'positionAtHome')
-@ifSwitch(BoxTransitions.ballInBox, 'chase')
+@ifSwitch(BoxTransitions.ballInBox, 'approachBall')
+@superState('gameControllerResponder')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)

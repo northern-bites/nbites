@@ -18,7 +18,6 @@ from . import robots
 from . import GameController
 
 # Packages and modules from sub-directories
-from . import FallController
 from .headTracker import HeadTracker
 from .typeDefs import (Play, TeamMember)
 from .navigator import Navigator
@@ -62,9 +61,6 @@ class Brain(object):
         self.leds = Leds.Leds(self)
         self.gameController = GameController.GameController(self)
 
-        # Initialize fallController
-        self.fallController = FallController.FallController(self)
-
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
 
@@ -84,12 +80,18 @@ class Brain(object):
 
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
-        self.player.corner_dribble = False
-        self.player.motionKick = False
         self.tracker = HeadTracker.HeadTracker(self)
         self.nav = Navigator.Navigator(self)
         self.playbook = PBInterface.PBInterface(self)
         self.kickDecider = KickDecider.KickDecider(self)
+
+        # Booleans used by the player FSA
+        # Controls whether we want to dribble it from the corner
+        self.player.corner_dribble = False
+        # Controls whether we do a motion kick
+        self.player.motionKick = False
+        # Controls whether we check for a falling/fallen robot
+        self.player.runFallController = True 
 
         # Message interface
         self.interface = interface.interface
@@ -149,7 +151,6 @@ class Brain(object):
         # Order here is very important
         self.gameController.run()
         self.updatePlaybook()
-        self.fallController.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()

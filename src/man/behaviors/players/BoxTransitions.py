@@ -5,8 +5,6 @@ def ballInBox(player):
     """
     A transition which returns true if the ball is in the player's box
     """
-    if not player.usingBoxPositions:
-        return True
     ball = player.brain.ball
 
     if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
@@ -29,8 +27,6 @@ def ballInBufferedBox(player):
     so ridged. Intended use is for in approachBall, ensuring that we don't loop
     between approachBall and positionAtHome if the ball is close to the edge of the box.
     """
-    if not player.usingBoxPositions:
-        return True
     ball = player.brain.ball
     buf = boxConstants.boxBuffer
 
@@ -54,9 +50,6 @@ def tooFarFromHome(threshold):
     position
     """
     def transition(player):
-        if not player.usingBoxPositions:
-            return False
-
         loc = player.brain.loc
         home = player.homePosition
 

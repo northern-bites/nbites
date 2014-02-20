@@ -4,9 +4,11 @@ Here we house all of the state methods used for kicking the ball
 
 from . import ChaseBallTransitions as transitions
 from . import ChaseBallConstants as constants
+from ..util import *
 from ..kickDecider import kicks
 from ..navigator import Navigator
 
+@superState('gameControllerResponder')
 def motionKickExecute(player):
     """
     Do a motion kick.
@@ -27,6 +29,7 @@ def motionKickExecute(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def kickBallExecute(player):
     """
     Kick the ball.
@@ -56,6 +59,7 @@ def kickBallExecute(player):
 
 kickBallExecute.sweetMove = None
 
+@superState('gameControllerResponder')
 def afterKick(player):
     """
     State to follow up after a kick.
@@ -82,6 +86,7 @@ def afterKick(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def spinAfterBackKick(player):
     """
     State to spin to the ball after we kick it behind us.

@@ -1,7 +1,7 @@
 import time
 from objects import RelRobotLocation
 from ..navigator import Navigator as nav
-from ..util import Transition
+from ..util import *
 import VisualGoalieStates as VisualStates
 from .. import SweetMoves
 from ..headTracker import HeadMoves
@@ -10,12 +10,13 @@ import math
 
 SAVING = True
 
+@superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
         player.gameState = player.currentState
         player.returningFromPenalty = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.stand()
         player.zeroHeads()
         player.isSaving = False
@@ -29,10 +30,11 @@ def gameInitial(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = True
+        player.runFallController = True
         player.gameState = player.currentState
         player.penaltyKicking = False
         player.stand()
@@ -46,10 +48,11 @@ def gameReady(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def gameSet(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.gameState = player.currentState
         player.returningFromPenalty = False
         player.penaltyKicking = False
@@ -69,10 +72,11 @@ def gameSet(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = True
+        player.runFallController = True
         player.gameState = player.currentState
         player.penaltyKicking = False
         player.brain.nav.stand()
@@ -93,10 +97,11 @@ def gamePlaying(player):
 
     return player.goLater('watch')
 
+@superState('gameControllerResponder')
 def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.gameState = player.currentState
         player.stopWalking()
         player.penalizeHeads()
@@ -111,10 +116,11 @@ def gamePenalized(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def gameFinished(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.gameState = player.currentState
         player.stopWalking()
         player.zeroHeads()
@@ -128,10 +134,12 @@ def gameFinished(player):
 
 ##### EXTRA METHODS
 
+@superState('gameControllerResponder')
 def fallen(player):
     player.inKickingState = False
     return player.stay()
 
+@superState('gameControllerResponder')
 def spinToWalkOffField(player):
     if player.firstFrame():
         player.brain.tracker.lookToAngle(0)
@@ -139,18 +147,21 @@ def spinToWalkOffField(player):
 
     return Transition.getNextState(player, spinToWalkOffField)
 
+@superState('gameControllerResponder')
 def bookIt(player):
     if player.firstFrame():
         player.brain.nav.goTo(RelRobotLocation(100, 0, 0), avoidObstacles = True)
 
     return Transition.getNextState(player, bookIt)
 
+@superState('gameControllerResponder')
 def standStill(player):
     if player.firstFrame():
         player.brain.nav.stop()
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def watchWithCornerChecks(player):
     if player.firstFrame():
         # This is dumb, but...
@@ -192,6 +203,7 @@ def watchWithCornerChecks(player):
 
     return Transition.getNextState(player, watchWithCornerChecks)
 
+@superState('gameControllerResponder')
 def watch(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -228,6 +240,7 @@ def correct(destination):
 
     return destination
 
+@superState('gameControllerResponder')
 def fixMyself(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -236,6 +249,7 @@ def fixMyself(player):
 
     return Transition.getNextState(player, fixMyself)
 
+@superState('gameControllerResponder')
 def moveForward(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -243,6 +257,7 @@ def moveForward(player):
 
     return Transition.getNextState(player, moveForward)
 
+@superState('gameControllerResponder')
 def moveBackwards(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -250,6 +265,7 @@ def moveBackwards(player):
 
     return Transition.getNextState(player, moveBackwards)
 
+@superState('gameControllerResponder')
 def kickBall(player):
     """
     Kick the ball
@@ -281,9 +297,10 @@ def kickBall(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def saveCenter(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_SQUAT)
@@ -299,18 +316,20 @@ def saveCenter(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def upUpUP(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = True
+        player.runFallController = True
         player.upDelay = 0
 
     if player.brain.nav.isStopped():
         return player.goLater('watchWithCornerChecks')
     return player.stay()
 
+@superState('gameControllerResponder')
 def saveRight(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
@@ -327,9 +346,10 @@ def saveRight(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def saveLeft(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.brain.tracker.lookToAngle(0)
         if SAVING:
             player.executeMove(SweetMoves.GOALIE_DIVE_LEFT)
@@ -346,21 +366,23 @@ def saveLeft(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def rollOut(player):
     if player.brain.nav.isStopped():
-        player.brain.fallController.enabled = True
+        player.runFallController = True
         return player.goLater('fallen')
 
     return player.stay()
 
 # ############# PENALTY SHOOTOUT #############
 
+@superState('gameControllerResponder')
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.inKickingState = False
         player.gameState = player.currentState
         player.returningFromPenalty = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.stand()
         player.brain.tracker.trackBall()
         player.side = constants.LEFT
@@ -369,12 +391,13 @@ def penaltyShotsGameSet(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
         player.gameState = player.currentState
         player.returningFromPenalty = False
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.stand()
         player.zeroHeads()
         player.isSaving = False
@@ -382,6 +405,7 @@ def penaltyShotsGamePlaying(player):
 
     return player.goLater('waitForPenaltySave')
 
+@superState('gameControllerResponder')
 def waitForPenaltySave(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -389,9 +413,10 @@ def waitForPenaltySave(player):
 
     return Transition.getNextState(player, waitForPenaltySave)
 
+@superState('gameControllerResponder')
 def doDive(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
         if doDive.side == constants.RIGHT:
             player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
@@ -401,9 +426,10 @@ def doDive(player):
             player.executeMove(SweetMoves.GOALIE_SQUAT)
     return player.stay()
 
+@superState('gameControllerResponder')
 def squat(player):
     if player.firstFrame():
-        player.brain.fallController.enabled = False
+        player.runFallController = False
         player.executeMove(SweetMoves.GOALIE_SQUAT)
 
     return player.stay()
