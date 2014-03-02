@@ -14,7 +14,6 @@ SAVING = True
 def gameInitial(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.gameState = player.currentState
         player.returningFromPenalty = False
         player.runFallController = False
         player.stand()
@@ -35,7 +34,6 @@ def gameReady(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = True
-        player.gameState = player.currentState
         player.penaltyKicking = False
         player.stand()
         player.brain.tracker.lookToAngle(0)
@@ -53,7 +51,6 @@ def gameSet(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = False
-        player.gameState = player.currentState
         player.returningFromPenalty = False
         player.penaltyKicking = False
         player.stand()
@@ -77,7 +74,6 @@ def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = True
-        player.gameState = player.currentState
         player.penaltyKicking = False
         player.brain.nav.stand()
 
@@ -102,7 +98,6 @@ def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = False
-        player.gameState = player.currentState
         player.stopWalking()
         player.penalizeHeads()
 
@@ -121,7 +116,6 @@ def gameFinished(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = False
-        player.gameState = player.currentState
         player.stopWalking()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
@@ -380,7 +374,6 @@ def rollOut(player):
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.gameState = player.currentState
         player.returningFromPenalty = False
         player.runFallController = False
         player.stand()
@@ -395,7 +388,6 @@ def penaltyShotsGameSet(player):
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.gameState = player.currentState
         player.returningFromPenalty = False
         player.runFallController = False
         player.stand()

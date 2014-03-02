@@ -8,19 +8,16 @@ from ..util import *
 from ..kickDecider import kicks
 from ..navigator import Navigator
 
-@superState('gameControllerResponder')
-def motionKickExecute(player):
+@superState('positionAndKickBall')
+def executeMotionKick(player):
     """
     Do a motion kick.
     """
     if player.firstFrame():
         player.motionKick = False
 
-    if (transitions.shouldApproachBallAgain(player) or
-        transitions.shouldRedecideKick(player) or
-        transitions.shouldFindBallKick(player)):
-        player.inKickingState = False
-        return player.goLater('chase')
+    if transitions.shouldRedecideKick(player):
+        return player.goLater('approachBall')
 
     player.brain.nav.doMotionKick(player, # kind of a hack, nav is going to change soon anyway
                                   player.brain.ball.rel_x, #LOL
@@ -29,35 +26,32 @@ def motionKickExecute(player):
 
     return player.stay()
 
-@superState('gameControllerResponder')
-def kickBallExecute(player):
+@superState('positionAndKickBall')
+@ifSwitchLater(transitions.ballMoved, 'approachBall')
+def executeKick(player):
     """
     Kick the ball.
     """
     if player.firstFrame():
         player.brain.tracker.trackBall()
-        kickBallExecute.sweetMove = player.kick.sweetMove
+        executeKick.sweetMove = player.kick.sweetMove
         player.shouldKickOff = False
         return player.stay()
-
-    # if ball has moved (and we haven't already kicked), don't kick
-    if transitions.ballMoved(player) and player.counter < 30:
-        player.inKickingState = False
-        return player.goLater('chase')
 
     if player.counter == 30:
-        player.executeMove(kickBallExecute.sweetMove)
+        player.executeMove(executeKick.sweetMove)
         player.shouldKickOff = False
         player.inKickingState = False
         return player.stay()
 
+    # TODO not ideal at all!
     if player.counter > 40 and player.brain.nav.isStopped():
         player.inKickingState = False
         return player.goNow('afterKick')
 
     return player.stay()
 
-kickBallExecute.sweetMove = None
+executeKick.sweetMove = None
 
 @superState('gameControllerResponder')
 def afterKick(player):
@@ -80,11 +74,7 @@ def afterKick(player):
     if player.penaltyKicking:
         return player.stay()
 
-    if (transitions.shouldChaseBall(player) or
-        transitions.shouldFindBallKick(player)):
-        return player.goLater('chase')
-
-    return player.stay()
+    return player.goLater('approachBall')
 
 @superState('gameControllerResponder')
 def spinAfterBackKick(player):
@@ -96,7 +86,7 @@ def spinAfterBackKick(player):
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
-        return player.goLater('chase')
+        return player.goLater('approachBall')
 
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()

@@ -4,13 +4,12 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import DribbleTransitions as dr_trans
-import BoxTransitions as box_trans
+import BoxTransitions as boxTransitions
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location
-from math import fabs
 import noggin_constants as nogginConstants
 import BoxTransitions
 import time
@@ -18,34 +17,12 @@ import time
 DRIBBLE_ON_KICKOFF = False
 
 @superState('gameControllerResponder')
-def kickoff(player):
-    """
-    Have the robot kickoff if it needs to kick it.
-    Otherwise wait 10 seconds or wait for the ball to move.
-    """
-    if player.shouldKickOff:
-        return player.goNow('approachBall')
-
-    if player.firstFrame():
-        kickoff.ballRelX = player.brain.ball.rel_x
-        kickoff.ballRelY = player.brain.ball.rel_y
-
-    if (player.brain.gameController.timeSincePlaying > 10 or
-        fabs(player.brain.ball.rel_x - kickoff.ballRelX) >
-        constants.KICKOFF_BALL_MOVE_THRESH or
-        fabs(player.brain.ball.rel_y - kickoff.ballRelY) >
-        constants.KICKOFF_BALL_MOVE_THRESH):
-        return player.goNow('approachBall')
-
-    return player.stay()
-
-kickoff.ballRelX = "the relX position of the ball when we started"
-kickoff.ballRelY = "the relY position of the ball when we started"
-
 @stay
-@superState('planner')
+@ifSwitchNow(boxTransitions.ballNotInBufferedBox, 'positionAtHome')
+@ifSwitchNow(CountTransition(transitions.shouldFindBall, 0.625, 8), 'findBall')
 def approachBall(player):
     if player.firstFrame():
+        player.inKickingState = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
             player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
@@ -72,20 +49,24 @@ def approachBall(player):
                 player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             return player.goNow('positionForKick')
         else:
-            return player.goNow('prepareForKick')
+            return player.goNow('positionAndKickBall')
 
+@defaultState('prepareForKick')
 @superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
+@ifSwitchLater(transitions.shouldFindBall, 'findBall')
+def positionAndKickBall(player):
+    """
+    Superstate used to position for kick and kick the ball when close enough.
+    """
+    pass
+
+@superState('positionAndKickBall')
 def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.hackKick = hackKick.KickInformation(player.brain)
         player.brain.nav.stand()
         return player.stay()
-
-
-    if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
-        # Ball has moved away. Go get it!
-        player.inKickingState = False
-        return player.goLater('approachBall')
 
     player.kick = prepareForKick.hackKick.shoot()
 
@@ -117,7 +98,6 @@ def orbitBall(player):
     if (transitions.orbitTooLong(player) or
         transitions.orbitBallTooFar(player)):
         player.stopWalking()
-        player.inKickingState = False
         return player.goLater('approachBall')
 
     # Set our walk. Nav will make sure that we don't set duplicate speeds.
@@ -182,14 +162,12 @@ def orbitBall(player):
 
     return player.stay()
 
-@superState('gameControllerResponder')
+@superState('positionAndKickBall')
 def positionForKick(player):
     """
     Get the ball in the sweet spot
     """
-    if (transitions.shouldApproachBallAgain(player) or
-        transitions.shouldRedecideKick(player)):
-        player.inKickingState = False
+    if transitions.shouldRedecideKick(player):
         return player.goLater('approachBall')
 
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
@@ -213,20 +191,17 @@ def positionForKick(player):
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
-    if transitions.shouldFindBall(player):
-        player.inKickingState = False
-        return player.goLater('findBall')
-
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
         if player.motionKick:
-            return player.goNow('motionKickExecute')
+            return player.goNow('executeMotionKick')
         else:
             player.brain.nav.stand()
-            return player.goNow('kickBallExecute')
+            return player.goNow('executeKick')
 
     return player.stay()
 
+# TODO make hierarchical and put in its own states file
 @superState('gameControllerResponder')
 def prepareForPenaltyKick(player):
     """
@@ -348,7 +323,7 @@ def positionForPenaltyKick(player):
         transitions.shouldRedecideKick(player)):
         player.inKickingState = False
         print "Going Back to Chase"
-        return player.goLater('chase')
+        return player.goLater('approachBall')
 
     ball = player.brain.ball
     kick_pos = player.kick.getPosition()
@@ -376,37 +351,10 @@ def positionForPenaltyKick(player):
         positionForPenaltyKick.yes = True
         #return player.stay()
         player.brain.nav.stand()
-        return player.goNow('kickBallExecute')
+        return player.goNow('executeKick')
 
     if positionForPenaltyKick.yes:
         print "ball relX: ", ball.rel_x
         print "ball relY: ", ball.rel_y
-
-    return player.stay()
-
-
-# Currently not used as of 6/7/13.
-# TODO: implement this again?
-def lookAround(player):
-    """
-    Nav is stopped. We want to look around to get better loc.
-    """
-    if player.firstFrame():
-        player.stopWalking()
-        player.brain.tracker.stopHeadMoves() # HACK so that tracker goes back to stopped.
-        player.brain.tracker.repeatBasicPan()
-
-    # Make sure we leave this state...
-    if player.brain.ball.vis.frames_off > 200:
-        return player.goLater('chase')
-
-    if player.brain.tracker.isStopped() and player.counter > 2:
-            player.brain.tracker.trackBall()
-            player.brain.kickDecider.decideKick()
-            if transitions.shouldOrbit(player) and not player.penaltyKicking:
-                print "Don't have a kick, orbitting"
-                return player.goNow('orbitBall')
-            else:
-                return player.goLater('chase')
 
     return player.stay()

@@ -10,10 +10,8 @@ def ballInBox(player):
     if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
             ball.x < player.box[0][0] + player.box[1] and \
             ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 2:
-        print "Ball is in my box!"
         return True
     return False
-
 
 def ballNotInBox(player):
     """
@@ -33,15 +31,14 @@ def ballInBufferedBox(player):
     if ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
             ball.x < player.box[0][0] + player.box[1] + buf and \
             ball.y < player.box[0][1] + player.box[2] + buf and ball.vis.frames_on > 2:
-        print "Ball is in my buffered box!"
         return True
     return False
-
 
 def ballNotInBufferedBox(player):
     """
     Simple negation of ballInBufferedBox
     """
+    print not ballInBufferedBox(player)
     return not ballInBufferedBox(player)
 
 def tooFarFromHome(threshold):

@@ -16,14 +16,15 @@ def gameControllerResponder(player):
     Superstate for responding to gameState switches and penalties.
     See GameController.py for more information.
     """
-    pass
-    # TODO commented out until new positioning system is pulled
-    # GC = player.brain.gameController
-    # if GC.stateChanged:
-    #     if GC.penalized:
-    #         return player.goLater('gamePenalized')
-    #     else:
-    #         if GC.penaltyShots:
-    #             return player.goLater(convertStateFormatPenaltyShots[GC.currentState])
-    #         else:
-    #             return player.goLater(convertStateFormat[GC.currentState])
+    GC = player.brain.gameController
+    if GC.stateChanged:
+        if GC.penalized:
+            player.gameState = 'gamePenalized'
+            return player.goLater('gamePenalized')
+        else:
+            if GC.penaltyShots:
+                player.gameState = convertStateFormatPenaltyShots[GC.currentState]
+                return player.goLater(convertStateFormatPenaltyShots[GC.currentState])
+            else:
+                player.gameState = convertStateFormat[GC.currentState]
+                return player.goLater(convertStateFormat[GC.currentState])

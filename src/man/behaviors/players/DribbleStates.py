@@ -16,6 +16,7 @@ from objects import RelRobotLocation, Location
 # ball and dribble again to space. We only dribble if shoulDribble returns 
 # true, see DribbleTransitions.py for more info.
 
+# TODO hierarchy
 @superState('gameControllerResponder')
 def decideDribble(player):
     """
@@ -26,7 +27,7 @@ def decideDribble(player):
 
     if not transitions.shouldDribble(player):
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goLater('approachBall')
     elif transitions.centerLaneOpen(player):
         return player.goNow('executeDribble')
     else:
@@ -69,18 +70,18 @@ def executeDribble(player):
     if player.corner_dribble:
         if transitions.ballLost(player) or transitions.ballGotFarAway(player):
             player.corner_dribble = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif transitions.dribbleGoneBad(player):
             return player.goNow('positionForDribble')
         elif transitions.centerField(player):
             player.corner_dribble = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
     else:
         if transitions.ballLost(player):
             return player.goNow('lookForBall')
         elif not transitions.shouldDribble(player):
             player.inKickingState = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif not transitions.centerLaneOpen(player):
             player.aboutToRotate = True # we will go from position to rotate
             return player.goNow('positionForDribble')
@@ -106,7 +107,7 @@ def rotateToOpenSpace(player):
     elif not transitions.shouldDribble(player):
         player.inKickingState = False
         player.stand()
-        return player.goLater('chase')
+        return player.goLater('approachBall')
     elif rotateToOpenSpace.counter == constants.ROTATE_FC:
         player.stand()
         return player.goLater('decideDribble')
@@ -137,7 +138,7 @@ def lookForBall(player):
             lookForBall.setDest = True
         else:
             player.inKickingState = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
 
     return player.stay()
 
@@ -169,7 +170,7 @@ def positionForDribble(player):
     if player.corner_dribble:
         if transitions.ballLost(player) or transitions.ballGotFarAway(player):
             player.corner_dribble = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif transitions.navDone(player):
             return player.goLater('executeDribble')
     else:
@@ -178,7 +179,7 @@ def positionForDribble(player):
         elif not transitions.shouldDribble(player):
             player.inKickingState = False
             player.stand()
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif player.aboutToRotate and transitions.navDone(player):
             player.aboutToRotate = False
             return player.goLater('rotateToOpenSpace')

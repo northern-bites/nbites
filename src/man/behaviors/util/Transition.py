@@ -100,6 +100,22 @@ def ifSwitch(predicate, state, nextFrame=False):
         return decoratedFunction
     return decorator
 
+def ifSwitchNow(predicate, state):
+    """
+    Overloaded ifSwitch, see above for complete documentation.
+
+    Like ifSwitch but nextFrame is false (goNow).
+    """
+    return ifSwitch(predicate, state, False)
+
+def ifSwitchLater(predicate, state):
+    """
+    Overloaded ifSwitch, see above for complete documentation.
+
+    Like ifSwitch but nextFrame is true (goLater).
+    """
+    return ifSwitch(predicate, state, True)
+
 def switch(state, nextFrame=False):
     """
     Overloaded ifSwitch, see above for complete documentation.
@@ -110,6 +126,22 @@ def switch(state, nextFrame=False):
         return True
 
     return ifSwitch(alwaysTrue, state, nextFrame)
+
+def switchNow(state):
+    """
+    Overloaded switch, see above for complete documentation.
+
+    Like switch but nextFrame is false (goNow).
+    """
+    return switch(state, False)
+
+def switchLater(state):
+    """
+    Overloaded switch, see above for complete documentation.
+
+    Like switch but nextFrame is true (goLater).
+    """
+    return switch(state, True)
 
 def stay(fn):
     """
@@ -238,6 +270,9 @@ class CountTransition:
         else:
             return False
 
+    def __call__(self, fsa):
+        return self.checkCondition(fsa)
+    
     def __str__(self):
         return (self.condition.__name__ + " happened " +
                 str(self.count) + " out of " + str(self.frameWindow) + " frames")

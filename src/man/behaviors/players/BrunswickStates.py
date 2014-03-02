@@ -3,6 +3,7 @@ Game controller states for pBrunswick, our soccer player.
 """
 
 import noggin_constants as nogginConstants
+from math import fabs
 from ..util import *
 
 ### NORMAL PLAY ###
@@ -10,12 +11,10 @@ from ..util import *
 def gameInitial(player):
     """
     Ensure we are sitting down and head is snapped forward.
-    In the future, we may wish to make the head move a bit slower here
-    Also, in the future, gameInitial may be responsible for turning off the gains
+    In the future, we may wish to make the head move a bit slower here.
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.gameState = player.currentState
         player.runFallController = False
         player.gainsOn()
         player.stand()
@@ -36,12 +35,11 @@ def gameInitial(player):
 @superState('gameControllerResponder')
 def gameReady(player):
     """
-    Stand up, and pan for localization
+    Stand up, and pan for localization, and walk to kicking off positions.
     """
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = True
-        player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
@@ -58,7 +56,7 @@ def gameReady(player):
     if not player.brain.motion.calibrated:
         return player.stay()
 
-    return player.goLater('positionReady')
+    return player.goNow('positionReady')
 
 @superState('gameControllerResponder')
 def gameSet(player):
@@ -68,7 +66,6 @@ def gameSet(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = False
-        player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
 
@@ -86,24 +83,28 @@ def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = True
-        player.gameState = player.currentState
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
-        # TODO clean up
-        if player.lastDiffState == 'gamePenalized':
-            print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
-            if player.lastStateTime > 5:
-                return player.goNow('afterPenalty')
-        # TODO move this check into postPenaltyChaser and have that come back here for non-chasers.
-        if (player.lastDiffState == 'afterPenalty' and
-            player.brain.play.isChaser()):
-            # special behavior case
-            return player.goNow('postPenaltyChaser')
 
     # Wait until the sensors are calibrated before moving.
     if not player.brain.motion.calibrated:
         return player.stay()
+    if player.lastDiffState == 'gamePenalized':
+        print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
+        if player.lastStateTime > 5:
+            return player.goNow('afterPenalty')
+    # TODO without pb, is this an issue?
+    # if (player.lastDiffState == 'afterPenalty' and
+    #     player.brain.play.isChaser()):
+    #     # special behavior case
+    #     return player.goNow('postPenaltyChaser')
 
+    if (player.isKickingOff and player.brain.gameController.ownKickOff and 
+        player.brain.gameController.timeSincePlaying < 10):
+        player.shouldKickOff = True
+        return player.goNow('approachBall')
+    elif player.brain.gameController.timeSincePlaying < 10:
+        return player.goNow('waitForKickoff')
     return player.goNow('positionAtHome')
 
 @superState('gameControllerResponder')
@@ -115,7 +116,6 @@ def gameFinished(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = False
-        player.gameState = player.currentState
         player.stopWalking()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
@@ -130,18 +130,32 @@ def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
         player.runFallController = False
-        player.gameState = player.currentState
         player.stand()
         player.penalizeHeads()
 
     return player.stay()
+
+@superState('gameControllerResponder')
+def waitForKickoff(player):
+    if player.firstFrame():
+        waitForKickoff.ballRelX = player.brain.ball.rel_x
+        waitForKickoff.ballRelY = player.brain.ball.rel_y
+
+    if (player.brain.gameController.timeSincePlaying > 10 or
+        fabs(player.brain.ball.rel_x - waitForKickoff.ballRelX) > 10 or
+        fabs(player.brain.ball.rel_y - waitForKickoff.ballRelY) > 10):
+        return player.goNow('watchForBall')
+
+    return player.stay()
+
+waitForKickoff.ballRelX = "the relX position of the ball when we started"
+waitForKickoff.ballRelY = "the relY position of the ball when we started"
 
 ### PENALTY KICK PLAY ###
 @superState('gameControllerResponder')
 def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stand()
-        player.gameState = player.currentState
         player.inKickingState = False
         player.runFallController = False
         player.brain.tracker.trackBall()
@@ -159,7 +173,6 @@ def penaltyShotsGameSet(player):
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.stand()
-        player.gameState = player.currentState
         player.runFallController = True
         player.inKickingState = False
         player.shouldKickOff = False

@@ -9,8 +9,8 @@ import noggin_constants as nogginConstants
 import FallControllerTransitions as transitions
 from ..util import *
 
-@defaultState('gameController')
-@ifSwitch(transitions.falling, 'falling', True)
+@defaultState('gameControllerResponder')
+@ifSwitchNow(transitions.falling, 'falling')
 def fallController(player):
     """
     Superstate for checking if we are falling.
@@ -18,7 +18,7 @@ def fallController(player):
     pass
 
 @stay
-@ifSwitch(transitions.atRest, 'standingUp', True)
+@ifSwitchNow(transitions.atRest, 'standingUp')
 def falling(player):
     """
     Protects robot as he falls. Stops him and kills stiffness.

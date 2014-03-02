@@ -109,18 +109,8 @@ class GameController():
                 self.stateChanged = True
                 self.penalized = False
 
-        # Update the player's "gamestate" variable now, so it is correct when
-        # playbook runs (since player runs even later).
-        # TODO eliminate the need for this break in encapsulation, possibly
-        # less of an issue after new positioning system is in place
         if self.stateChanged:
-            if self.penalized:
-                self.brain.player.switchTo('gamePenalized')
+            if gameState.secondary_state != STATE2_PENALTYSHOOT:
+                self.penaltyShots = False
             else:
-                if gameState.secondary_state != STATE2_PENALTYSHOOT:
-                    self.penaltyShots = False
-                    self.brain.player.switchTo(convertStateFormat[self.currentState])
-                else:
-                    self.penaltyShots = True
-                    self.brain.player.switchTo(convertStateFormatPenaltyShots[self.currentState])
-            self.brain.player.gameState = self.brain.player.currentState
+                self.penaltyShots = True

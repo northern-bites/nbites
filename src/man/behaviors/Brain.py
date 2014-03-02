@@ -5,8 +5,6 @@ import math
 # Redirect standard error to standard out
 _stderr = sys.stderr
 sys.stderr = sys.stdout
-## import cProfile
-## import pstats
 
 # Packages and modules from super-directories
 import noggin_constants as Constants
@@ -21,7 +19,6 @@ from . import GameController
 from .headTracker import HeadTracker
 from .typeDefs import (Play, TeamMember)
 from .navigator import Navigator
-from .playbook import PBInterface
 from .players import Switch
 from .kickDecider import KickDecider
 
@@ -59,7 +56,6 @@ class Brain(object):
 
         # Initalize the leds and game controller
         self.leds = Leds.Leds(self)
-        self.gameController = GameController.GameController(self)
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
@@ -76,22 +72,15 @@ class Brain(object):
         self.game = None
         self.locUncert = 0
 
-        self.play = Play.Play()
-
         # FSAs
         self.player = Switch.selectedPlayer.SoccerPlayer(self)
         self.tracker = HeadTracker.HeadTracker(self)
         self.nav = Navigator.Navigator(self)
-        self.playbook = PBInterface.PBInterface(self)
-        self.kickDecider = KickDecider.KickDecider(self)
 
-        # Booleans used by the player FSA
-        # Controls whether we want to dribble it from the corner
-        self.player.corner_dribble = False
-        # Controls whether we do a motion kick
-        self.player.motionKick = False
-        # Controls whether we check for a falling/fallen robot
-        self.player.runFallController = True 
+        # Not FSAs
+        self.gameController = GameController.GameController(self)
+        self.kickDecider = KickDecider.KickDecider(self)
+        self.play = Play.Play()
 
         # Message interface
         self.interface = interface.interface
@@ -150,7 +139,6 @@ class Brain(object):
         # Behavior stuff
         # Order here is very important
         self.gameController.run()
-        self.updatePlaybook()
         self.player.run()
         self.tracker.run()
         self.nav.run()
@@ -186,11 +174,6 @@ class Brain(object):
         output.ball_dist_uncert = 0
         output.ball_bearing_uncert = 0
 
-        output.chase_time = self.teamMembers[self.playerNumber-1].chaseTime
-        output.defender_time = self.teamMembers[self.playerNumber-1].defenderTime
-        output.offender_time = self.teamMembers[self.playerNumber-1].offenderTime
-        output.middie_time = self.teamMembers[self.playerNumber-1].middieTime
-
         output.role = self.teamMembers[self.playerNumber-1].role
 
         output.active = self.teamMembers[self.playerNumber-1].active
@@ -218,12 +201,6 @@ class Brain(object):
 
         self.yglp = self.interface.visionField.goal_post_l.visual_detection
         self.ygrp = self.interface.visionField.goal_post_r.visual_detection
-
-    def updatePlaybook(self):
-        """
-        updates self.play to the new play
-        """
-        self.playbook.update(self.play)
 
     def activeTeamMates(self):
         activeMates = 0

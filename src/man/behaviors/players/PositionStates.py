@@ -4,7 +4,6 @@ from ..navigator import Navigator
 from ..util import *
 import noggin_constants as NogginConstants
 from objects import Location, RelRobotLocation
-from ..playbook import PBConstants
 from . import BoxPositionConstants as BPConstants
 from . import SharedTransitions
 
@@ -14,11 +13,10 @@ def positionReady(player):
     Game Ready positioning
     """
     if player.firstFrame():
-        if(player.brain.gameController.ownKickOff
-           and  player.isKickingOff):
+        if player.brain.gameController.ownKickOff and player.isKickingOff:
             player.kickoffPosition = BPConstants.ourKickoff
-        # elif player.isKickingOff:
-        #     player.kickoffPosition = BPConstants.theirKickoff
+        elif player.isKickingOff:
+            player.kickoffPosition = BPConstants.theirKickoff
 
         player.brain.nav.goTo(player.kickoffPosition,
                               precision = Navigator.PLAYBOOK,
@@ -26,17 +24,13 @@ def positionReady(player):
                               avoidObstacles = True,
                               fast = False, pb = False)
 
-        player.brain.tracker.repeatBasicPan() # TODO Landmarks
+        player.brain.tracker.repeatBasicPan()
 
-    if (player.brain.nav.isAtPosition()): #or
-#        SharedTransitions.atRobotLocation(player.kickoffPosition,
-#                                          Navigator.GENERAL_AREA)):
+    if player.brain.nav.isAtPosition():
         player.brain.tracker.trackBall()
-        #player.brain.nav.stand()
         return player.stay()
 
-    if (not player.brain.nav.isAtPosition() and
-        player.brain.time - player.timeReadyBegan > 38):
+    if player.brain.time - player.timeReadyBegan > 38:
         print "IT'S BEEN TOO LONG!"
         return player.goNow('readyFaceMiddle')
 

@@ -4,20 +4,10 @@ import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from ..util import *
 
-@defaultState('positionAtHome')
-@ifSwitch(boxTransitions.ballNotInBufferedBox, 'positionAtHome')
-@ifSwitch(boxTransitions.shouldFindBall, 'findBall')
 @superState('gameControllerResponder')
-def planner(player):
-    """
-    Superstate for deciding what to do as a player.
-    """
-    pass
-
 @stay
-@ifSwitch(SharedTransitions.navAtPosition, 'watchForBall')
-@ifSwitch(BoxTransitions.ballInBox, 'approachBall')
-@superState('gameControllerResponder')
+@ifSwitchNow(SharedTransitions.navAtPosition, 'watchForBall')
+@ifSwitchNow(BoxTransitions.ballInBox, 'approachBall')
 def positionAtHome(player):
     """
     Go to the player's home position
@@ -42,10 +32,10 @@ def positionAtHome(player):
         player.brain.tracker.repeatWidePan()
 
 
-@stay
-@ifSwitch(BoxTransitions.tooFarFromHome(20), 'positionAtHome')
-@ifSwitch(BoxTransitions.ballInBox, 'approachBall')
 @superState('gameControllerResponder')
+@stay
+@ifSwitchNow(BoxTransitions.tooFarFromHome(20), 'positionAtHome')
+@ifSwitchNow(BoxTransitions.ballInBox, 'approachBall')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)
