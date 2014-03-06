@@ -19,3 +19,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(GameControllerStates)
         self.addStates(KickerStates)
         self.setName('pKicker')
+        self.currentState = 'fallController' # initial state
+
+        # Controls whether we check for a falling/fallen robot
+        self.runFallController = True 

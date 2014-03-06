@@ -1,5 +1,5 @@
 import SharedTransitions
-import BoxTransitions
+import BoxPositionTransitions as transitions
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from ..util import *
@@ -7,7 +7,7 @@ from ..util import *
 @superState('gameControllerResponder')
 @stay
 @ifSwitchNow(SharedTransitions.navAtPosition, 'watchForBall')
-@ifSwitchNow(BoxTransitions.ballInBox, 'approachBall')
+@ifSwitchNow(transitions.ballInBox, 'approachBall')
 def positionAtHome(player):
     """
     Go to the player's home position
@@ -31,11 +31,10 @@ def positionAtHome(player):
     else:
         player.brain.tracker.repeatWidePan()
 
-
 @superState('gameControllerResponder')
 @stay
-@ifSwitchNow(BoxTransitions.tooFarFromHome(20), 'positionAtHome')
-@ifSwitchNow(BoxTransitions.ballInBox, 'approachBall')
+@ifSwitchNow(transitions.tooFarFromHome(20), 'positionAtHome')
+@ifSwitchNow(transitions.ballInBox, 'approachBall')
 def watchForBall(player):
     """
     The player is at home, waiting for the ball to be within it's box (range)
