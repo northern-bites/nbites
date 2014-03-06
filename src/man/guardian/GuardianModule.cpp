@@ -301,6 +301,10 @@ void GuardianModule::checkBatteryLevels()
     static const float EMPTY_BATTERY_VALUE = 10.0f; //start nagging below 10%
 
     const float newBatteryCharge = batteryInput.message().charge();
+    if (newBatteryCharge == 0)
+    {
+        return;
+    }
     if(newBatteryCharge < 0 || newBatteryCharge > 1.0)
     {
         std::cout << "Guardian:: Somehow getting battery current instead..."

@@ -26,7 +26,7 @@ def positionAtHome(player):
     loc = player.brain.loc
     ballDistance = ((loc.x - ball.x)**2 + (loc.y - ball.y)**2)**.5
 
-    if ballDistance < 70 and ball.vis.frames_on > 2:
+    if ballDistance < 100 and ball.vis.frames_on > 2:
         player.brain.tracker.trackBall()
     else:
         player.brain.tracker.repeatWidePan()

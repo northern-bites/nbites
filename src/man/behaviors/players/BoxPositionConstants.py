@@ -4,8 +4,8 @@ from objects import RobotLocation
 isKickingOff = False # default is false, changed by pBrunswick or some other if
                      # this is not the case
 
-boxBuffer = 15 # Used for the buffered box when approach ball is potentially
-               # going to transition out and into 'positionAtHome'
+boxBuffer = 100 # Used for the buffered box when approach ball is potentially
+                # going to transition out and into 'positionAtHome'
 
 oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,

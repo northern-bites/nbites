@@ -4,7 +4,7 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import DribbleTransitions as dr_trans
-import BoxTransitions as boxTransitions
+import BoxPositionTransitions as boxTransitions
 from ..navigator import Navigator
 from ..kickDecider import HackKickInformation as hackKick
 from ..kickDecider import kicks
@@ -18,10 +18,12 @@ DRIBBLE_ON_KICKOFF = False
 
 @superState('gameControllerResponder')
 @stay
-@ifSwitchNow(boxTransitions.ballNotInBufferedBox, 'positionAtHome')
-@ifSwitchNow(CountTransition(transitions.shouldFindBall, 0.625, 8), 'findBall')
+@ifSwitchNow(transitions.shouldReturnHome, 'positionAtHome')
+@ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
     if player.firstFrame():
+        player.buffBoxFiltered = CountTransition(boxTransitions.ballNotInBufferedBox,
+                                                 0.8, 10)
         player.inKickingState = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:

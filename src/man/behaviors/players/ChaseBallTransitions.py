@@ -13,6 +13,13 @@ def shouldChaseBall(player):
     ball = player.brain.ball
     return (ball.vis.frames_on > constants.BALL_ON_THRESH)
 
+def shouldReturnHome(player):
+    """
+    The ball is no longer our responsibility. Go home.
+    player.buffBoxFiltered is a CountTransition, see approachBall.
+    """
+    return player.buffBoxFiltered.checkCondition(player)
+
 def shouldPrepareForKick(player):
     """
     We're close enough to prepare for a kick
