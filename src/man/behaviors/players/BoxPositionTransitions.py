@@ -38,7 +38,6 @@ def ballNotInBufferedBox(player):
     """
     Simple negation of ballInBufferedBox
     """
-    print not ballInBufferedBox(player)
     return not ballInBufferedBox(player)
 
 def tooFarFromHome(threshold):
