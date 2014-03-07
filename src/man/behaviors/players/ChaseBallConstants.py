@@ -62,5 +62,3 @@ WALK_FIND_BALL_TIME_THRESH = SPUN_ONCE_TIME_THRESH * 3 # Roughly 3 spins
 
 STOP_PENALTY_DRIBBLE_COUNT = 120
 
-# During kickoff, wait until 10 seconds or ball has moved significantly.
-KICKOFF_BALL_MOVE_THRESH = 10

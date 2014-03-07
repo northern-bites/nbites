@@ -33,6 +33,7 @@ GuardianModule::GuardianModule()
       feetOnGroundOutput(base()),
       fallStatusOutput(base()),
       audioOutput(base()),
+      lastBatteryCharge(1.0),
       chestButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       leftFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
       rightFootButton( new ClickableButton(GUARDIAN_FRAME_RATE) ),
@@ -300,6 +301,10 @@ void GuardianModule::checkBatteryLevels()
     static const float EMPTY_BATTERY_VALUE = 10.0f; //start nagging below 10%
 
     const float newBatteryCharge = batteryInput.message().charge();
+    if (newBatteryCharge == 0)
+    {
+        return;
+    }
     if(newBatteryCharge < 0 || newBatteryCharge > 1.0)
     {
         std::cout << "Guardian:: Somehow getting battery current instead..."
@@ -316,7 +321,7 @@ void GuardianModule::checkBatteryLevels()
            oldLevel - newLevel >= 10.0f)
         {
             std::cout << "Guardian:: Battery charge is now at "
-                      << 10.0f * newBatteryCharge
+                      << 100.0f * newBatteryCharge
                       << " (was "<< oldLevel <<")"<< std::endl;
 
             if (newLevel <= EMPTY_BATTERY_VALUE)

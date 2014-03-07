@@ -5,6 +5,7 @@ import DribbleTransitions as transitions
 import DribbleConstants as constants
 from ..navigator import Navigator
 from ..kickDecider import kicks
+from ..util import *
 from objects import RelRobotLocation, Location
 
 ### BASIC IDEA
@@ -15,6 +16,8 @@ from objects import RelRobotLocation, Location
 # ball and dribble again to space. We only dribble if shoulDribble returns 
 # true, see DribbleTransitions.py for more info.
 
+# TODO hierarchy
+@superState('gameControllerResponder')
 def decideDribble(player):
     """
     Decide to dribble straight ahead or rotate to avoid other robots.
@@ -24,12 +27,13 @@ def decideDribble(player):
 
     if not transitions.shouldDribble(player):
         player.inKickingState = False
-        return player.goLater('chase')
+        return player.goLater('approachBall')
     elif transitions.centerLaneOpen(player):
         return player.goNow('executeDribble')
     else:
         return player.goNow('rotateToOpenSpace')
 
+@superState('gameControllerResponder')
 def executeDribble(player):
     """
     Move through the ball, so as to execute a dribble.
@@ -66,18 +70,18 @@ def executeDribble(player):
     if player.corner_dribble:
         if transitions.ballLost(player) or transitions.ballGotFarAway(player):
             player.corner_dribble = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif transitions.dribbleGoneBad(player):
             return player.goNow('positionForDribble')
         elif transitions.centerField(player):
             player.corner_dribble = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
     else:
         if transitions.ballLost(player):
             return player.goNow('lookForBall')
         elif not transitions.shouldDribble(player):
             player.inKickingState = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif not transitions.centerLaneOpen(player):
             player.aboutToRotate = True # we will go from position to rotate
             return player.goNow('positionForDribble')
@@ -86,6 +90,7 @@ def executeDribble(player):
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def rotateToOpenSpace(player):
     """
     Rotate around ball, so as to find an open lane to dribble thru
@@ -102,7 +107,7 @@ def rotateToOpenSpace(player):
     elif not transitions.shouldDribble(player):
         player.inKickingState = False
         player.stand()
-        return player.goLater('chase')
+        return player.goLater('approachBall')
     elif rotateToOpenSpace.counter == constants.ROTATE_FC:
         player.stand()
         return player.goLater('decideDribble')
@@ -113,6 +118,7 @@ def rotateToOpenSpace(player):
     rotateToOpenSpace.counter = 0
     return player.stay()
 
+@superState('gameControllerResponder')
 def lookForBall(player):
     """
     Backup and look for ball. If fails, leave the FSA.
@@ -132,10 +138,11 @@ def lookForBall(player):
             lookForBall.setDest = True
         else:
             player.inKickingState = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
 
     return player.stay()
 
+@superState('gameControllerResponder')
 def positionForDribble(player):
     """
     We should position ourselves behind the ball for easy dribbling.
@@ -163,7 +170,7 @@ def positionForDribble(player):
     if player.corner_dribble:
         if transitions.ballLost(player) or transitions.ballGotFarAway(player):
             player.corner_dribble = False
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif transitions.navDone(player):
             return player.goLater('executeDribble')
     else:
@@ -172,7 +179,7 @@ def positionForDribble(player):
         elif not transitions.shouldDribble(player):
             player.inKickingState = False
             player.stand()
-            return player.goLater('chase')
+            return player.goLater('approachBall')
         elif player.aboutToRotate and transitions.navDone(player):
             player.aboutToRotate = False
             return player.goLater('rotateToOpenSpace')

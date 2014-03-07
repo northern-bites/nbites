@@ -333,8 +333,8 @@ class KickInformation:
                 if (bearingKickLeft - bearingKickRight) > 60:
                     # even an inaccurate straight kick will work
                     if (30 < bearingKickLeft and -30 > bearingKickLeft):
-                        #choose a straight motion kick with no orbit NOW!
-                        kick = self.chooseFrontMotionKick()
+                        #choose a straight kick with no orbit NOW!
+                        kick = self.chooseShortFrontKick()
                         kick.h = 0
                         return kick
                     elif (bearingKickLeft < 30):
@@ -350,15 +350,13 @@ class KickInformation:
                 if (bearingKickLeft - bearingKickRight > 35):
                     # even an inaccurate side kick will work
                     if (90 < bearingKickLeft and 60 > bearingKickRight):
-                        #choose a right side motion kick with no orbit NOW!
-                        self.brain.player.motionKick = True
-                        kick = kicks.M_RIGHT_SIDE
+                        #choose a right side kick with no orbit NOW!
+                        kick = kicks.RIGHT_SIDE_KICK
                         kick.h = 0
                         return kick
                     elif (-60 < bearingKickLeft and -90 > bearingKickRight):
                         #choose a left side kick with no orbit!
-                        self.brain.player.motionKick = True
-                        kick = kicks.M_LEFT_SIDE
+                        kick = kicks.LEFT_SIDE_KICK
                         kick.h = 0
                         return kick
 
@@ -398,7 +396,7 @@ class KickInformation:
                         kick.h = leftSideBearing
                 else:
                     # choose a straight kick
-                    kick = self.chooseFrontMotionKick()
+                    kick = self.chooseShortFrontKick()
                     kick.h = straightBearing
 
 

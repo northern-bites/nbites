@@ -24,11 +24,10 @@ set( BEHAVIORS_SRCS BehaviorsModule
 set( BEHAVIORS_PYTHON_SRCS __init__.py
                         Brain.py
                         GameController.py
-                        FallController.py
-			Stability.py
+                        Stability.py
                         Leds.py
-			StiffnessModes.py
-			SweetMoves.py
+                        StiffnessModes.py
+                        SweetMoves.py
                         )
 
 # The switch file
@@ -36,9 +35,8 @@ set ( BEHAVIORS_SWITCH ${CMAKE_CURRENT_BINARY_DIR}/players/Switch.py)
 
 # Python subdirectories
 set( BEHAVIORS_PYTHON_SUBDIRS headTracker
-     			   kickDecider
+                           kickDecider
                            navigator
-                           playbook
                            players
                            robots
                            typeDefs
