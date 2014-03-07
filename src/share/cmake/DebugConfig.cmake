@@ -10,7 +10,7 @@
 #
 
 option(
-  USING_LAB_FIELD
+  USE_LAB_FIELD
   "Turn on if we are in the lab and not on a full-size field"
   OFF
 )
@@ -50,6 +50,12 @@ option(
 option(
   PROFILE
   "Enable time profiling for the robot"
+  OFF
+)
+
+option(
+  USE_SPL_COMM
+  "Use the SPL's Standard Message rather than protobufs for comm"
   OFF
 )
 
