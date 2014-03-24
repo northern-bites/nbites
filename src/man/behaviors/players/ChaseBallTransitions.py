@@ -2,6 +2,7 @@ from .. import SweetMoves
 from ..headTracker import HeadMoves
 import ChaseBallConstants as constants
 import noggin_constants as NogginConstants
+import ClaimTransitions as claimTrans
 from math import fabs
 
 ####### CHASING STUFF ##############
@@ -17,8 +18,14 @@ def shouldReturnHome(player):
     """
     The ball is no longer our responsibility. Go home.
     player.buffBoxFiltered is a CountTransition, see approachBall.
+
+    If the ball IS in our box, check the claims for a higher priority claim
     """
-    return player.buffBoxFiltered.checkCondition(player)
+    if player.buffBoxFiltered.checkCondition(player):
+        player.brain.claimedBall = False
+        return True;
+
+    return claimTrans.shouldCedeClaim(player)
 
 def shouldPrepareForKick(player):
     """
