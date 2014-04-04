@@ -29,9 +29,7 @@ CommModule::CommModule(int team, int player) :
     monitor = new NetworkMonitor(timer->timestamp());
 
 
-#ifindef USE_SPL_COMM
-    teamConnect = new TeamConnect(timer, monitor);
-#endif    
+    teamConnect = new TeamConnect(timer, monitor);  
     gameConnect = new GameConnect(timer, monitor, team, player);
 
     portals::Message<messages::WorldModel> model(0);

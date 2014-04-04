@@ -8,11 +8,14 @@
 #include <unistd.h>
 #include <iostream>
 #include <string>
+#include <math.h>
 
 #include "CommDef.h"
 
 #include "DebugConfig.h"
 #include "Profiler.h"
+
+#include "SPLStandardMessage.h"
 
 namespace man {
 
@@ -114,30 +117,65 @@ void TeamConnect::send(const messages::WorldModel& model,
         return;
     }
 
+    // create instance SPLStandardMessage
+    struct SPLStandardMessage splMessage;
+
 PROF_ENTER(P_COMM_BUILD_PACKET);
 
     portals::Message<messages::TeamPacket> teamMessage(0);
 
-    messages::TeamPacket* packet = teamMessage.get();
+    messages::TeamPacket* arbData = teamMessage.get();
 
-    packet->mutable_payload()->CopyFrom(model);
-    packet->set_sequence_number(myLastSeqNum++); // ONE LINE INCREMENT!!
-    packet->set_player_number(player);
-    packet->set_team_number(team);
-    packet->set_header(UNIQUE_ID);
-    packet->set_timestamp(timer->timestamp());
+    // greate packet from message fields
+
+    arbData->mutable_payload()->CopyFrom(model);
+    arbData->set_sequence_number(myLastSeqNum++); // ONE LINE INCREMENT!!
+    arbData->set_player_number(player);
+    arbData->set_team_number(team);
+    arbData->set_header(UNIQUE_ID);
+    arbData->set_timestamp(timer->timestamp());
+
+    // build packet the regular way, using arbData
+    strcpy(splMessage.header, SPL_STANDARD_MESSAGE_STRUCT_HEADER);
+    splMessage.version = SPL_STANDARD_MESSAGE_STRUCT_VERSION;
+    splMessage.playerNum = (uint8_t)arbData->player_number();
+    splMessage.team = (uint8_t)arbData->team_number();
+    splMessage.fallen = 0;  // @TODO
+    
+    splMessage.pose[0] = model.my_x()*10;
+    splMessage.pose[1] = model.my_y()*10;
+    splMessage.pose[2] = model.my_h(); // @TODO: check this assumption
+    
+    splMessage.walkingTo[0] = model.my_x()*10;
+    splMessage.walkingTo[0] = model.my_y()*10;
+    
+    splMessage.shootingTo[0] = model.my_x()*10;
+    splMessage.shootingTo[0] = model.my_y()*10;
+    
+    splMessage.ballAge = -!model.ball_on(); // @TODO: not totally correct
+    splMessage.ball[0] = model.my_x()*10 + model.ball_dist()*10 * (float)asin(model.ball_bearing());
+    splMessage.ball[1] = model.my_x()*10 + model.ball_dist()*10 * (float)acos(model.ball_bearing());
+    
+    splMessage.ballVel[0] = 0;  // @TODO
+    splMessage.ballVel[1] = 0;
 
 PROF_EXIT(P_COMM_BUILD_PACKET);
 
 PROF_ENTER(P_COMM_SERIALIZE_PACKET);
-    char datagram[packet->ByteSize()];
-    packet->SerializeToArray(&datagram[0], packet->GetCachedSize());
+
+    char datagram[arbData->ByteSize()];
+    arbData->SerializeToArray(&datagram[0], arbData->GetCachedSize());
+
+    // also put arbData in the packet
+    strcpy(splMessage.data, datagram);
+    splMessage.numOfDataBytes = (uint16_t)arbData->ByteSize();
+
 PROF_EXIT(P_COMM_SERIALIZE_PACKET);
 
 PROF_ENTER(P_COMM_TO_SOCKET);
     for (int i = 0; i < burst; ++i)
     {
-        socket->sendToTarget(&datagram[0], packet->GetCachedSize());
+        socket->sendToTarget(&datagram[0], arbData->GetCachedSize());
     }
 PROF_EXIT(P_COMM_TO_SOCKET);
 }
