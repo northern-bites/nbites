@@ -163,19 +163,24 @@ PROF_EXIT(P_COMM_BUILD_PACKET);
 
 PROF_ENTER(P_COMM_SERIALIZE_PACKET);
 
-    char datagram[arbData->ByteSize()];
-    arbData->SerializeToArray(&datagram[0], arbData->GetCachedSize());
+    // serialize the teamMessage for putting into the final field of the packet
+    char datagram_arbdata[arbData->ByteSize()];
+    arbData->SerializeToArray(&datagram_arbdata[0], arbData->GetCachedSize());
 
-    // also put arbData in the packet
-    strcpy(splMessage.data, datagram);
+    // put it into the packet, along with its size
+    strcpy(splMessage.data, datagram_arbdata);
     splMessage.numOfDataBytes = (uint16_t)arbData->ByteSize();
+
+    // serialize everything
+    char datagram_all[SPL_STANDARD_MESSAGE_DATA_SIZE];
+    memcpy(datagram_all, &splMessage, SPL_STANDARD_MESSAGE_DATA_SIZE);
 
 PROF_EXIT(P_COMM_SERIALIZE_PACKET);
 
 PROF_ENTER(P_COMM_TO_SOCKET);
     for (int i = 0; i < burst; ++i)
     {
-        socket->sendToTarget(&datagram[0], arbData->GetCachedSize());
+        socket->sendToTarget(&datagram_all[0], sizeof(SPLStandardMessage));
     }
 PROF_EXIT(P_COMM_TO_SOCKET);
 }
@@ -183,62 +188,91 @@ PROF_EXIT(P_COMM_TO_SOCKET);
 void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],
                           int player, int team)
 {
-    char packet[250];
+    char packet[SPL_STANDARD_MESSAGE_DATA_SIZE];
     int result;
     int playerNum;
 
     do
     {
         //initial setup
-        portals::Message<messages::TeamPacket> teamMessage(0);
-        *teamMessage.get() = messages::TeamPacket();
-        memset(&packet[0], 0, sizeof(packet));
+        struct SPLStandardMessage splMessage;
+        //memset(&packet[0], 0, sizeof(packet)); // @TODO: neccessary??
 
         //actually check socket
         result = socket->receive(&packet[0], sizeof(packet));
 
-        // Save the current time for later.
-        llong currtime = timer->timestamp();
+        llong recvdtime = timer->timestamp();
 
         if (result <= 0)
             break; //leave on error or nothing to receive.
 
-        if (!teamMessage.get()->ParseFromArray(&packet[0], result))
-        {
-            std::cerr << "Failed to parse GPB from socket in TeamConnect. "
-                      << "Got a packet of size " << result << std::endl;
-        }
+        // deserialize the packet into an SPLMessage
+        memcpy(&splMessage, packet, SPL_STANDARD_MESSAGE_DATA_SIZE);
 
-        if (!verify(teamMessage.get(), currtime, player, team))
+        // deserialize the SPLMessage's arbData field into a TeamPacket
+        portals::Message<messages::TeamPacket> teamMessage(0);
+        messages::TeamPacket* arbData = teamMessage.get();
+        memcpy(arbData, splMessage.data, SPL_STANDARD_MESSAGE_DATA_SIZE);
+
+        if (!verify(&splMessage, arbData->sequence_number(), arbData->timestamp(), recvdtime, player, team))
         {
             continue;  // Bad Packet.
         }
 
 #ifdef DEBUG_COMM
-        std::cout << "Recieved a packet:\n\n"
-                  << teamMessage.get()->DebugString()
+        std::cout << "Recieved a packet"
+                  /*<< teamMessage.get()->DebugString()*/
                   << std::endl;
 #endif
 
-        playerNum = teamMessage.get()->player_number();
-        portals::Message<messages::WorldModel> model(&teamMessage.get()->payload());
+        playerNum = splMessage.playerNum;
+
+        // create a WorldModel with data from splMessage
+        portals::Message<messages::WorldModel> model(0);
+
+        model.get()->set_timestamp(arbData->payload().timestamp());
+        model.get()->set_my_x(splMessage.pose[0]/10);
+        model.get()->set_my_y(splMessage.pose[1]/10);
+        model.get()->set_my_h(splMessage.pose[2]);
+
+        model.get()->set_my_uncert(arbData->payload().my_uncert());
+
+        model.get()->set_ball_on(-!splMessage.ballAge);
+
+        model.get()->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
+        model.get()->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
+
+        model.get()->set_ball_dist_uncert(arbData->payload().ball_dist_uncert());
+        model.get()->set_ball_bearing_uncert(arbData->payload().ball_bearing_uncert());
+
+        model.get()->set_chase_time(arbData->payload().chase_time());
+        model.get()->set_defender_time(arbData->payload().defender_time());
+        model.get()->set_offender_time(arbData->payload().offender_time());
+        model.get()->set_middie_time(arbData->payload().middie_time());
+
+        model.get()->set_role(arbData->payload().role());
+        model.get()->set_in_kicking_state(arbData->payload().in_kicking_state());
+        model.get()->set_active(arbData->payload().active());
+
+        // @TODO: add in some of the stuff we get in the SPLStandardMessage to our model, like ballVel
+        
         modelOuts[playerNum-1]->setMessage(model);
     } while (result > 0);
 }
 
-bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
+bool TeamConnect::verify(SPLStandardMessage* splMessage, int seqNumber, int64_t timestamp, llong recvdtime,
                         int player, int team)
 {
-    if (memcmp(packet->header().c_str(), UNIQUE_ID, sizeof(UNIQUE_ID)))
+    if (memcmp(splMessage->header, SPL_STANDARD_MESSAGE_STRUCT_HEADER, sizeof(SPL_STANDARD_MESSAGE_STRUCT_HEADER)))
     {
 #ifdef DEBUG_COMM
-        std::cout << "Received packet with bad ID"
+        std::cout << "Received packet with bad header"
                   << " in TeamConnect::verifyHeader()" << std::endl;
 #endif
         return false;
     }
 
-    if (packet->team_number() != team)
+    if (splMessage->team != team)
     {
 #ifdef DEBUG_COMM
         std::cout << "Received packet with bad teamNumber"
@@ -247,7 +281,7 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
         return false;
     }
 
-    int playerNum = packet->player_number();
+    int playerNum = splMessage->playerNum;
 
     if (playerNum < 0 || playerNum > NUM_PLAYERS_PER_TEAM)
     {
@@ -268,8 +302,6 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
         return false;
     }
 
-    int seqNumber = packet->sequence_number();
-
     if (seqNumber <= teamMates[playerNum-1].seqNum)
     {
         if (teamMates[playerNum-1].seqNum - seqNumber < RESET_SEQ_NUM_THRESHOLD)
@@ -287,9 +319,7 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
     int lastSeqNum = teamMates[playerNum-1].seqNum;
     int delayed = seqNumber - lastSeqNum - 1;
     teamMates[playerNum-1].seqNum = seqNumber;
-
-    llong ts = packet->timestamp();
-
+    
     // Now attempt to syncronize the clocks of this robot and
     // the robot from which we just received. Eventually the
     // two clocks will reach an equilibrium point (within a
@@ -297,20 +327,22 @@ bool TeamConnect::verify(messages::TeamPacket* packet, llong currtime,
     // based clock syncronizing (don't need outside world).
     llong newOffset = 0;
 
-    if (ts + MIN_PACKET_DELAY > currtime)
+    if (timestamp + MIN_PACKET_DELAY > recvdtime)
     {
-        newOffset = ts + MIN_PACKET_DELAY - currtime;
+        newOffset = timestamp + MIN_PACKET_DELAY - recvdtime;
         timer->addToOffset(newOffset);
     }
-    teamMates[playerNum-1].timestamp = timer->timestamp();
+    teamMates[playerNum-1].timestamp = timer->timestamp(); // @TODO: why is this not recvdtime (the time when the packet was recieved)?
 
     // Update the monitor
     monitor->packetsDropped(delayed);
-    monitor->packetReceived(ts, currtime + newOffset);
+    monitor->packetReceived(timestamp, recvdtime + newOffset);
 
     return true;
 }
 
+
+// @TODO: Actually use this
 void TeamConnect::checkDeadTeammates(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],
                                      llong time, int player)
 {
