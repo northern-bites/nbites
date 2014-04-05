@@ -11,11 +11,10 @@
 #include <math.h>
 
 #include "CommDef.h"
-
 #include "DebugConfig.h"
 #include "Profiler.h"
-
 #include "SPLStandardMessage.h"
+#include "NBMath.h"
 
 namespace man {
 
@@ -140,11 +139,11 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     splMessage.version = SPL_STANDARD_MESSAGE_STRUCT_VERSION;
     splMessage.playerNum = (uint8_t)arbData->player_number();
     splMessage.team = (uint8_t)arbData->team_number();
-    splMessage.fallen = 0;  // @TODO
+    splMessage.fallen = 0;  // @TODO pull this out of Python
     
     splMessage.pose[0] = model.my_x()*10;
     splMessage.pose[1] = model.my_y()*10;
-    splMessage.pose[2] = model.my_h(); // @TODO: check this assumption
+    splMessage.pose[2] = model.my_h()*TO_DEG;
     
     splMessage.walkingTo[0] = model.my_x()*10;
     splMessage.walkingTo[0] = model.my_y()*10;
@@ -156,7 +155,7 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     splMessage.ball[0] = model.my_x()*10 + model.ball_dist()*10 * (float)asin(model.ball_bearing());
     splMessage.ball[1] = model.my_x()*10 + model.ball_dist()*10 * (float)acos(model.ball_bearing());
     
-    splMessage.ballVel[0] = 0;  // @TODO
+    splMessage.ballVel[0] = 0;  // @TODO pull this out of Python
     splMessage.ballVel[1] = 0;
 
 PROF_EXIT(P_COMM_BUILD_PACKET);
@@ -165,10 +164,10 @@ PROF_ENTER(P_COMM_SERIALIZE_PACKET);
 
     // serialize the teamMessage for putting into the final field of the packet
     char datagram_arbdata[arbData->ByteSize()];
-    arbData->SerializeToArray(&datagram_arbdata[0], arbData->GetCachedSize());
+    arbData->SerializeToArray(reinterpret_cast<uint8_t*&>(datagram_arbdata), arbData->GetCachedSize());
 
     // put it into the packet, along with its size
-    strcpy(splMessage.data, datagram_arbdata);
+    strcpy(reinterpret_cast<char*&>(splMessage.data), datagram_arbdata); // @TODO is this cast correct?
     splMessage.numOfDataBytes = (uint16_t)arbData->ByteSize();
 
     // serialize everything
