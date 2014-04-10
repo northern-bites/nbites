@@ -129,6 +129,7 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
 
     arbData->mutable_payload()->CopyFrom(model);
     arbData->set_sequence_number(myLastSeqNum++); // ONE LINE INCREMENT!!
+    std::cout<<player<<" in Send"<<std::endl;
     arbData->set_player_number(player);
     arbData->set_team_number(team);
     arbData->set_header(UNIQUE_ID);
@@ -164,15 +165,15 @@ PROF_ENTER(P_COMM_SERIALIZE_PACKET);
 
     // serialize the teamMessage for putting into the final field of the packet
     char datagram_arbdata[arbData->ByteSize()];
-    arbData->SerializeToArray(reinterpret_cast<uint8_t*&>(datagram_arbdata), arbData->GetCachedSize());
+    arbData->SerializeToArray(datagram_arbdata, arbData->GetCachedSize());
 
     // put it into the packet, along with its size
-    strcpy(reinterpret_cast<char*&>(splMessage.data), datagram_arbdata); // @TODO is this cast correct?
+    memcpy(splMessage.data, datagram_arbdata, SPL_STANDARD_MESSAGE_DATA_SIZE);
     splMessage.numOfDataBytes = (uint16_t)arbData->ByteSize();
 
     // serialize everything
-    char datagram_all[SPL_STANDARD_MESSAGE_DATA_SIZE];
-    memcpy(datagram_all, &splMessage, SPL_STANDARD_MESSAGE_DATA_SIZE);
+    char datagram_all[sizeof(SPLStandardMessage)];
+    memcpy(datagram_all, &splMessage, sizeof(SPLStandardMessage));
 
 PROF_EXIT(P_COMM_SERIALIZE_PACKET);
 
@@ -187,15 +188,16 @@ PROF_EXIT(P_COMM_TO_SOCKET);
 void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [NUM_PLAYERS_PER_TEAM],
                           int player, int team)
 {
-    char packet[SPL_STANDARD_MESSAGE_DATA_SIZE];
+    char packet[sizeof(SPLStandardMessage)];
     int result;
     int playerNum;
 
     do
     {
+        std::cout<<"entering loop"<<std::endl;
         //initial setup
         struct SPLStandardMessage splMessage;
-        //memset(&packet[0], 0, sizeof(packet)); // @TODO: neccessary??
+        memset(&packet[0], 0, sizeof(packet)); // @TODO: neccessary??
 
         //actually check socket
         result = socket->receive(&packet[0], sizeof(packet));
@@ -205,13 +207,17 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         if (result <= 0)
             break; //leave on error or nothing to receive.
 
+        std::cout<<"Going to deserialize"<<std::endl;
+
         // deserialize the packet into an SPLMessage
-        memcpy(&splMessage, packet, SPL_STANDARD_MESSAGE_DATA_SIZE);
+        memcpy(&splMessage, packet, sizeof(SPLStandardMessage));
 
         // deserialize the SPLMessage's arbData field into a TeamPacket
         portals::Message<messages::TeamPacket> teamMessage(0);
         messages::TeamPacket* arbData = teamMessage.get();
-        memcpy(arbData, splMessage.data, SPL_STANDARD_MESSAGE_DATA_SIZE);
+        arbData->ParseFromArray(splMessage.data, result); // @TODO: Include error checking a la https://github.com/bjacobel/nbites/blob/6013f48cdfbf9f21c6a9242f8113fbc29b658205/src/man/comm/TeamConnect.cpp#L168
+
+        std::cout<<"Going to verify"<<std::endl;
 
         if (!verify(&splMessage, arbData->sequence_number(), arbData->timestamp(), recvdtime, player, team))
         {
@@ -258,21 +264,18 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         // @TODO: add in some of the stuff we get in the SPLStandardMessage to our model, like ballVel
 
 #else
-
         playerNum = arbData->player_number();
         portals::Message<messages::WorldModel> model(&arbData->payload());
 
 #endif
-
         modelOuts[playerNum-1]->setMessage(model);
-
     } while (result > 0);
 }
 
 bool TeamConnect::verify(SPLStandardMessage* splMessage, int seqNumber, int64_t timestamp, llong recvdtime,
                         int player, int team)
 {
-    if (memcmp(splMessage->header, SPL_STANDARD_MESSAGE_STRUCT_HEADER, sizeof(SPL_STANDARD_MESSAGE_STRUCT_HEADER)))
+    if (!memcmp(splMessage->header, SPL_STANDARD_MESSAGE_STRUCT_HEADER, sizeof(SPL_STANDARD_MESSAGE_STRUCT_HEADER)))
     {
 #ifdef DEBUG_COMM
         std::cout << "Received packet with bad header"
@@ -311,41 +314,43 @@ bool TeamConnect::verify(SPLStandardMessage* splMessage, int seqNumber, int64_t 
         return false;
     }
 
-    if (seqNumber <= teamMates[playerNum-1].seqNum)
-    {
-        if (teamMates[playerNum-1].seqNum - seqNumber < RESET_SEQ_NUM_THRESHOLD)
-        {
-#ifdef DEBUG_COMM
-            std::cout << "Received packet with old sequenceNumber"
-                      << " in TeamConnect::verify()" << std::endl;
-#endif
-            return false;
-        }
-        // Else we've restarted a robot, so consider it's packets new.
-    }
+// @TODO: reimplement this
 
-    // Success! Update seqNum and timeStamp and parse!
-    int lastSeqNum = teamMates[playerNum-1].seqNum;
-    int delayed = seqNumber - lastSeqNum - 1;
-    teamMates[playerNum-1].seqNum = seqNumber;
+//     if (seqNumber <= teamMates[playerNum-1].seqNum)
+//     {
+//         if (teamMates[playerNum-1].seqNum - seqNumber < RESET_SEQ_NUM_THRESHOLD)
+//         {
+// #ifdef DEBUG_COMM
+//             std::cout << "Received packet with old sequenceNumber"
+//                       << " in TeamConnect::verify()" << std::endl;
+// #endif
+//             return false;
+//         }
+//         // Else we've restarted a robot, so consider it's packets new.
+//     }
+
+    // // Success! Update seqNum and timeStamp and parse!
+    // int lastSeqNum = teamMates[playerNum-1].seqNum;
+    // int delayed = seqNumber - lastSeqNum - 1;
+    // teamMates[playerNum-1].seqNum = seqNumber;
     
-    // Now attempt to syncronize the clocks of this robot and
-    // the robot from which we just received. Eventually the
-    // two clocks will reach an equilibrium point (within a
-    // reasonable margin of error) without the use of internet
-    // based clock syncronizing (don't need outside world).
-    llong newOffset = 0;
+    // // Now attempt to syncronize the clocks of this robot and
+    // // the robot from which we just received. Eventually the
+    // // two clocks will reach an equilibrium point (within a
+    // // reasonable margin of error) without the use of internet
+    // // based clock syncronizing (don't need outside world).
+    // llong newOffset = 0;
 
-    if (timestamp + MIN_PACKET_DELAY > recvdtime)
-    {
-        newOffset = timestamp + MIN_PACKET_DELAY - recvdtime;
-        timer->addToOffset(newOffset);
-    }
-    teamMates[playerNum-1].timestamp = timer->timestamp(); // @TODO: why is this not recvdtime (the time when the packet was recieved)?
+    // if (timestamp + MIN_PACKET_DELAY > recvdtime)
+    // {
+    //     newOffset = timestamp + MIN_PACKET_DELAY - recvdtime;
+    //     timer->addToOffset(newOffset);
+    // }
+    // teamMates[playerNum-1].timestamp = timer->timestamp(); // @TODO: why is this not recvdtime (the time when the packet was recieved)?
 
-    // Update the monitor
-    monitor->packetsDropped(delayed);
-    monitor->packetReceived(timestamp, recvdtime + newOffset);
+    // // Update the monitor
+    // monitor->packetsDropped(delayed);
+    // monitor->packetReceived(timestamp, recvdtime + newOffset);
 
     return true;
 }

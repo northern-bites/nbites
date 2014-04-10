@@ -50,7 +50,7 @@ struct SPLStandardMessage
   uint16_t numOfDataBytes;
 
   // buffer for arbitrary data
-  uint8_t data[SPL_STANDARD_MESSAGE_DATA_SIZE];
+  char data[SPL_STANDARD_MESSAGE_DATA_SIZE]; // @TODO: this used to be a uint8_t
 
 #ifdef __cplusplus
   // constructor

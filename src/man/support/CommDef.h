@@ -36,11 +36,11 @@ typedef struct robot_ip_pair_t
 }robot_ip_pair;
 
 // Bowdoin IPs.
-static const robot_ip_pair wash    = {"wash"   , "139.140.192.9" };
+static const robot_ip_pair wash    = {"wash"   , "192.168.1.113" };
 static const robot_ip_pair river   = {"river"  , "139.140.192.10"};
 static const robot_ip_pair jayne   = {"jayne"  , "139.140.192.11"};
 static const robot_ip_pair simon   = {"simon"  , "139.140.192.12"};
-static const robot_ip_pair inara   = {"inara"  , "139.140.192.13"};
+static const robot_ip_pair inara   = {"inara"  , "192.168.1.101"};
 static const robot_ip_pair kaylee  = {"kaylee" , "139.140.192.14"};
 static const robot_ip_pair vera    = {"vera"   , "139.140.192.15"};
 static const robot_ip_pair mal     = {"mal"    , "139.140.192.16"};
