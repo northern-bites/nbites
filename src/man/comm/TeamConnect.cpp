@@ -224,6 +224,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
                   << std::endl;
 #endif
 
+#ifdef USE_SPL_COMM
+
         playerNum = splMessage.playerNum;
 
         // create a WorldModel with data from splMessage
@@ -254,8 +256,16 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         model.get()->set_active(arbData->payload().active());
 
         // @TODO: add in some of the stuff we get in the SPLStandardMessage to our model, like ballVel
-        
+
+#else
+
+        playerNum = arbData->player_number();
+        portals::Message<messages::WorldModel> model(&arbData->payload());
+
+#endif
+
         modelOuts[playerNum-1]->setMessage(model);
+
     } while (result > 0);
 }
 
