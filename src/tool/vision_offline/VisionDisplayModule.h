@@ -67,6 +67,7 @@ private:
     QImage makeOverlay(Camera::Type which);
 
     QTabWidget* imageTabs;
+    QTabWidget* moreImageTabs;
     QPushButton* loadCalButton;
     QComboBox* robotNames;
     Camera::Type currentCamera;

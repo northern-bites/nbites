@@ -72,22 +72,22 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     QDockWidget* dockWidget = new QDockWidget("Vision Field", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(field_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Vision Robot", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(robot_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Vision Ball", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(ball_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Vision Obstacle", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(obstacle_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     // GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
@@ -96,10 +96,18 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     imageTabs = new QTabWidget(this);
     mainLayout->addWidget(imageTabs);
 
+    moreImageTabs = new QTabWidget(this);
+    mainLayout->addWidget(moreImageTabs);
+
     imageTabs->addTab(&topDisplay, "Top Image");
     imageTabs->addTab(&bottomDisplay, "Bottom Image");
-    imageTabs->addTab(&topThrDisplay, "Top Thresh");
-    imageTabs->addTab(&botThrDisplay, "Bottom Thresh");
+    //imageTabs->addTab(&topThrDisplay, "Top Thresh");
+    //imageTabs->addTab(&botThrDisplay, "Bottom Thresh");
+
+    //moreImageTabs->addTab(&topDisplay, "Top Image");
+    //moreImageTabs->addTab(&bottomDisplay, "Bottom Image");
+    moreImageTabs->addTab(&topThrDisplay, "Top Thresh");
+    moreImageTabs->addTab(&botThrDisplay, "Bottom Thresh");
 
     mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     mainWidget->setLayout(mainLayout);
