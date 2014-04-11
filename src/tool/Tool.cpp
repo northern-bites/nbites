@@ -343,6 +343,30 @@ void Tool::keyPressEvent(QKeyEvent * event)
     case Qt::Key_P:
         diagram.runBackward();
         break;
+    case Qt::Key_M:
+        for(int i = 0; i < 5; i++)
+        {
+            diagram.runForward();
+        }
+        break;
+    case Qt::Key_T:
+        for(int i = 0; i < 10; i++)
+        {
+            diagram.runForward();
+        }
+        break;
+    case Qt::Key_F:
+        for(int i = 0; i < 50; i++)
+        {
+            diagram.runForward();
+        }
+        break;
+    case Qt::Key_BracketLeft:
+        for(int i = 0; i < 5; i++)
+        {
+            diagram.runBackward();
+        }
+        break;
     default:
         QWidget::keyPressEvent(event);
     }
