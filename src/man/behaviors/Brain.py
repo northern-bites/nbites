@@ -195,6 +195,13 @@ class Brain(object):
             if (i == self.playerNumber - 1):
                 continue
             self.teamMembers[i].update(self.interface.worldModelList()[i])
+            print "In behaviors,"
+            print self.teamMembers[i]
+            print self.teamMembers[i].x
+            print self.teamMembers[i].y
+            print self.teamMembers[i].ballOn
+            print self.teamMembers[i].ballDist
+            print self.teamMembers[i].ballBearing
 
     def updateMotion(self):
         self.motion = self.interface.motionStatus

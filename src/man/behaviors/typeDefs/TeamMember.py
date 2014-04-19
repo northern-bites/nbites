@@ -161,7 +161,7 @@ class TeamMember(RobotLocation):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
 
     def __str__(self):
-        return "I am player number " + self.playerNumber
+        return "I am player number " + str(self.playerNumber)
 
     def __eq__(self, other):
         return self.playerNumber == other.playerNumber
