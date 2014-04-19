@@ -129,7 +129,6 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
 
     arbData->mutable_payload()->CopyFrom(model);
     arbData->set_sequence_number(myLastSeqNum++); // ONE LINE INCREMENT!!
-    std::cout<<player<<" in Send"<<std::endl;
     arbData->set_player_number(player);
     arbData->set_team_number(team);
     arbData->set_header(UNIQUE_ID);
@@ -194,7 +193,6 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
 
     do
     {
-        std::cout<<"entering loop"<<std::endl;
         //initial setup
         struct SPLStandardMessage splMessage;
         memset(&packet[0], 0, sizeof(packet)); // @TODO: neccessary??
@@ -207,7 +205,6 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         if (result <= 0)
             break; //leave on error or nothing to receive.
 
-        std::cout<<"Going to deserialize"<<std::endl;
 
         // deserialize the packet into an SPLMessage
         memcpy(&splMessage, packet, sizeof(SPLStandardMessage));
@@ -217,7 +214,6 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         messages::TeamPacket* arbData = teamMessage.get();
         arbData->ParseFromArray(splMessage.data, result); // @TODO: Include error checking a la https://github.com/bjacobel/nbites/blob/6013f48cdfbf9f21c6a9242f8113fbc29b658205/src/man/comm/TeamConnect.cpp#L168
 
-        std::cout<<"Going to verify"<<std::endl;
 
         if (!verify(&splMessage, arbData->sequence_number(), arbData->timestamp(), recvdtime, player, team))
         {
