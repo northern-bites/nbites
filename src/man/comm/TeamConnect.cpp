@@ -209,20 +209,22 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         // deserialize the packet into an SPLMessage
         memcpy(&splMessage, packet, sizeof(SPLStandardMessage));
 
-        // deserialize the SPLMessage's arbData field into a TeamPacket
+        // deserialize the SPLMessage's teamMessage.get() field into a TeamPacket
         portals::Message<messages::TeamPacket> teamMessage(0);
-        messages::TeamPacket* arbData = teamMessage.get();
-        arbData->ParseFromArray(splMessage.data, result); // @TODO: Include error checking a la https://github.com/bjacobel/nbites/blob/6013f48cdfbf9f21c6a9242f8113fbc29b658205/src/man/comm/TeamConnect.cpp#L168
+        if (!teamMessage.get()->ParseFromArray(splMessage.data, splMessage.numOfDataBytes))
+        {
+            std::cerr << "Failed to parse GPB from packet in TeamConnect. "
+                      << "Got a packet of size " << sizeof(splMessage.data) << std::endl;
+        }
 
-
-        if (!verify(&splMessage, arbData->sequence_number(), arbData->timestamp(), recvdtime, player, team))
+        if (!verify(&splMessage, teamMessage.get()->sequence_number(), teamMessage.get()->timestamp(), recvdtime, player, team))
         {
             continue;  // Bad Packet.
         }
 
 #ifdef DEBUG_COMM
-        std::cout << "Recieved a packet"
-                  /*<< teamMessage.get()->DebugString()*/
+        std::cout << "Recieved a packet\n"
+                  << teamMessage.get()->DebugString()
                   << std::endl;
 #endif
 
@@ -233,35 +235,35 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         // create a WorldModel with data from splMessage
         portals::Message<messages::WorldModel> model(0);
 
-        model.get()->set_timestamp(arbData->payload().timestamp());
+        model.get()->set_timestamp(teamMessage.get()->payload().timestamp());
         model.get()->set_my_x(splMessage.pose[0]/10);
         model.get()->set_my_y(splMessage.pose[1]/10);
         model.get()->set_my_h(splMessage.pose[2]);
 
-        model.get()->set_my_uncert(arbData->payload().my_uncert());
+        model.get()->set_my_uncert(teamMessage.get()->payload().my_uncert());
 
         model.get()->set_ball_on(-!splMessage.ballAge);
 
         model.get()->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
         model.get()->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
 
-        model.get()->set_ball_dist_uncert(arbData->payload().ball_dist_uncert());
-        model.get()->set_ball_bearing_uncert(arbData->payload().ball_bearing_uncert());
+        model.get()->set_ball_dist_uncert(teamMessage.get()->payload().ball_dist_uncert());
+        model.get()->set_ball_bearing_uncert(teamMessage.get()->payload().ball_bearing_uncert());
 
-        model.get()->set_chase_time(arbData->payload().chase_time());
-        model.get()->set_defender_time(arbData->payload().defender_time());
-        model.get()->set_offender_time(arbData->payload().offender_time());
-        model.get()->set_middie_time(arbData->payload().middie_time());
+        model.get()->set_chase_time(teamMessage.get()->payload().chase_time());
+        model.get()->set_defender_time(teamMessage.get()->payload().defender_time());
+        model.get()->set_offender_time(teamMessage.get()->payload().offender_time());
+        model.get()->set_middie_time(teamMessage.get()->payload().middie_time());
 
-        model.get()->set_role(arbData->payload().role());
-        model.get()->set_in_kicking_state(arbData->payload().in_kicking_state());
-        model.get()->set_active(arbData->payload().active());
+        model.get()->set_role(teamMessage.get()->payload().role());
+        model.get()->set_in_kicking_state(teamMessage.get()->payload().in_kicking_state());
+        model.get()->set_active(teamMessage.get()->payload().active());
 
         // @TODO: add in some of the stuff we get in the SPLStandardMessage to our model, like ballVel
 
 #else
-        playerNum = arbData->player_number();
-        portals::Message<messages::WorldModel> model(&arbData->payload());
+        playerNum = teamMessage.get()->player_number();
+        portals::Message<messages::WorldModel> model(&teamMessage.get()->payload());
 
 #endif
         modelOuts[playerNum-1]->setMessage(model);
