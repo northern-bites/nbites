@@ -5,14 +5,15 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
+OLDPACKAGES="python2.7.5-dev libboost1.48-dev libboost-python1.48-dev"
+
 PACKAGES="build-essential cmake git-core \
-python2.7-dev emacs cmake-curses-gui ccache aptitude \
-qt4-dev-tools python-pyparsing libboost-dev libeigen3-dev"
+emacs cmake-curses-gui ccache aptitude \
+qt4-dev-tools python-pyparsing libeigen3-dev"
 
-echo "Are you on 64-bit linux? (y/n)"
-read IS64BIT
+BITS=`uname -m`
 
-if [ $IS64BIT == 'y' ]; then
+if [ $BITS == 'x86_64' ]; then
     echo ""
     echo "64 bit Linux is NOT SUPPORTED!"
     echo "The Northern Bites code base depends on too many 32-bit libraries."
@@ -21,11 +22,9 @@ if [ $IS64BIT == 'y' ]; then
     exit 1
 fi
 
-echo ""
-echo "What version of Ubuntu are you on? (example: 12.04)"
-read VERSION
+VERSION=`lsb_release -a 2>/dev/null | grep 'Release:' | grep -o '[0-9]\+.[0-9]\+'`
 
-if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
+if [[ $VERSION != '12.04' && $VERSION != '13.10' ]]; then
 
     echo ""
     echo "That version is NOT SUPPORTED."
@@ -33,7 +32,7 @@ if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
     echo "--------------------------------------------------------------"
     echo "If you are very sure of what you are doing, you may continue and"
     echo "configure broken packages manually."
-    echo "Otherwise, please switch to Ubuntu 11.10 or 12.04."
+    echo "Otherwise, please switch to Ubuntu 13.10 or 12.04."
     echo ""
     echo "Abort? (y/n)"
     read ABORT
@@ -46,7 +45,20 @@ fi
 echo ""
 echo "Downloading and installing software!"
 echo "..."
-sudo apt-get install $PACKAGES
+
+# Certain packages have to be installed from the 12.04 repo and frozen at that version
+# First add the precise main repo to sources.list & update
+sudo mkdir /etc/apt/sources.list.d 2>/dev/null
+sudo touch /etc/apt/sources.list.d/precise.list
+echo -e "deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe" | sudo tee -a /etc/apt/sources.list.d/precise.list 1>/dev/null
+echo -e "deb-src http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe" | sudo tee -a /etc/apt/sources.list.d/precise.list 1>/dev/null
+sudo apt-get update
+
+# then install specifically from that repo and freeze the packages
+sudo apt-get -y -t=precise install $OLDPACKAGES
+sudo apt-mark hold $OLDPACKAGES
+
+sudo apt-get -y install $PACKAGES
 
 naoqi_version=$1
 robocup=robocup.bowdoin.edu:/mnt/research/robocup
