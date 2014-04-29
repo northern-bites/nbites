@@ -19,6 +19,7 @@ class TeamMember(RobotLocation):
         self.ballOn = False
         self.role = 1 # TODO update roles to work with new positioning sys
         self.inKickingState = False
+        self.claimedBall = False
 
         #other info we want stored
         self.brain = tbrain # brain instance
@@ -38,6 +39,9 @@ class TeamMember(RobotLocation):
         self.role = info.role
         self.inKickingState = info.in_kicking_state
         self.active = info.active
+        self.claimedBall = info.claimed_ball
+        if self.claimedBall:
+            print "player number ", self.playerNumber, " claimed the ball"
 
         # calculates ball localization distance, bearing
         self.bearingToGoal = self.getBearingToGoal()
@@ -57,6 +61,7 @@ class TeamMember(RobotLocation):
         self.ballBearing = ball.bearing_deg
         self.role = self.brain.play.role
         self.inKickingState = self.brain.player.inKickingState
+        self.claimedBall = self.brain.player.claimedBall
 
         self.active = (not self.isPenalized() and
                        not self.brain.player.currentState == 'afterPenalty' and

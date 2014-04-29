@@ -10,6 +10,7 @@ def shouldCedeClaim(player):
         if not mate.claimedBall or not mate.active:
             continue
 
+        print "mate number: ", mate.playerNumber, " has claimed the ball"
         # Now we get into actual claims
         if (int(player.brain.time * 1000) - mate.timestamp > claimExpiration):
             continue # That claim has expired (Comm is probably lagging)

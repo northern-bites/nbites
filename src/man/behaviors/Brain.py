@@ -179,6 +179,8 @@ class Brain(object):
         output.active = self.teamMembers[self.playerNumber-1].active
         output.in_kicking_state = self.player.inKickingState
 
+        output.claimed_ball = True
+
     def getCommUpdate(self):
         self.game = self.interface.gameState
         for i in range(len(self.teamMembers)):
