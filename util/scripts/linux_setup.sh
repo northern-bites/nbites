@@ -24,7 +24,7 @@ fi
 
 VERSION=`lsb_release -a 2>/dev/null | grep 'Release:' | grep -o '[0-9]\+.[0-9]\+'`
 
-if [[ $VERSION != '12.04' && $VERSION != '13.10' ]]; then
+if [[ $VERSION != '12.04' && $VERSION != '14.04' ]]; then
 
     echo ""
     echo "That version is NOT SUPPORTED."
@@ -32,7 +32,7 @@ if [[ $VERSION != '12.04' && $VERSION != '13.10' ]]; then
     echo "--------------------------------------------------------------"
     echo "If you are very sure of what you are doing, you may continue and"
     echo "configure broken packages manually."
-    echo "Otherwise, please switch to Ubuntu 13.10 or 12.04."
+    echo "Otherwise, please switch to Ubuntu 14.04 or 12.04."
     echo ""
     echo "Abort? (y/n)"
     read ABORT
@@ -42,8 +42,7 @@ if [[ $VERSION != '12.04' && $VERSION != '13.10' ]]; then
     fi
 fi
 
-echo ""
-echo "Downloading and installing software!"
+echo "\nDownloading and installing software!"
 echo "..."
 
 # Certain packages have to be installed from the 12.04 repo and frozen at that version
@@ -61,7 +60,7 @@ sudo apt-mark hold $OLDPACKAGES
 sudo apt-get -y install $PACKAGES
 
 naoqi_version=$1
-robocup=robocup.bowdoin.edu:/mnt/research/robocup
+robocup=http://robocup.bowdoin.edu/public
 nbites_dir=$PWD/../..
 lib_dir=$nbites_dir/lib
 
@@ -74,19 +73,14 @@ atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
 
-echo ""
-echo "What's your Bowdoin username?"
-read USER_NAME
-
-echo ""
-echo "Downloading and unpacking NBites files."
+echo "\nDownloading and unpacking NBites files."
 
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
-rsync -v $USER_NAME@$naoqi_robocup $lib_dir/
+wget $naoqi_robocup $lib_dir/
 
 echo "Downloading Atom toolchain"
-rsync -v $USER_NAME@$atom_robocup $lib_dir/
+wget $atom_robocup $lib_dir/
 
 echo "Unpacking NaoQi"
 
