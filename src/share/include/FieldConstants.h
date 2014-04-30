@@ -115,7 +115,7 @@ static const float YELLOW_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
 #ifdef USING_LAB_FIELD
 static const float LINE_CROSS_OFFSET = 130.0f;
 #else
-static const float LINE_CROSS_OFFSET = 180.0f;
+static const float LINE_CROSS_OFFSET = 130.0f;
 #endif // USING_LAB_FIELD
 
 static const float LANDMARK_BLUE_GOAL_CROSS_X = FIELD_WHITE_LEFT_SIDELINE_X +
