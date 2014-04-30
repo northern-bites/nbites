@@ -153,7 +153,6 @@ enum vis_landmark {
     VISION_YG_CROSSBAR
 };
 
-
 static const int LANDMARK_MY_FIELD_CROSS[2] =
 {(int) (FIELD_WHITE_LEFT_SIDELINE_X + LINE_CROSS_OFFSET),
  (int) MIDFIELD_Y};

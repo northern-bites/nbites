@@ -1,9 +1,11 @@
 from . import SoccerFSA
+from . import FallControllerStates
+from . import GameControllerStates
 from . import GoalieStates
 from . import VisualGoalieStates
-from ..util import Transition
 from . import GoalieTransitions
 from . import PenaltyStates
+from ..util import Transition
 
 import noggin_constants as NogginConstants
 from GoalieConstants import RIGHT, LEFT
@@ -12,11 +14,17 @@ from objects import Location, RelRobotLocation
 
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
+        ### ADD STATES AND NAME FSA ###
         SoccerFSA.SoccerFSA.__init__(self,brain)
+        self.addStates(FallControllerStates)
+        self.addStates(GameControllerStates)
         self.addStates(GoalieStates)
         self.addStates(VisualGoalieStates)
         self.addStates(PenaltyStates)
         self.setName('pGoalie')
+        self.currentState = 'fallController' # initial state
+
+        ### THE STATE OF THE PLAYER ###
         self.squatTime = 0
         self.frameCounter = 0
         self.penaltyKicking = False
@@ -24,9 +32,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.returningFromPenalty = False
         self.side = RIGHT
         self.homeDirections = []
+        self.runFallController = True # should the FC run?
 
-        # All transitions are defined here. Their conditions are in
-        # GoalieTransitions
+        ### ALL TRANSITIONS ARE DEFINED HERE ############
+        ### Their conditions are in GoalieTransitions ###
         VisualGoalieStates.walkToGoal.transitions = {
             Transition.CountTransition(GoalieTransitions.atGoalArea,
                                        Transition.MOST_OF_THE_TIME,
@@ -294,7 +303,3 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
                                        Transition.LOW_PRECISION)
             : GoalieStates.doDive,
             }
-
-    def run(self):
-        gcState = self.brain.gameController.currentState
-        SoccerFSA.SoccerFSA.run(self)

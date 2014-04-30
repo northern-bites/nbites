@@ -13,6 +13,13 @@ def shouldChaseBall(player):
     ball = player.brain.ball
     return (ball.vis.frames_on > constants.BALL_ON_THRESH)
 
+def shouldReturnHome(player):
+    """
+    The ball is no longer our responsibility. Go home.
+    player.buffBoxFiltered is a CountTransition, see approachBall.
+    """
+    return player.buffBoxFiltered.checkCondition(player)
+
 def shouldPrepareForKick(player):
     """
     We're close enough to prepare for a kick
@@ -154,14 +161,14 @@ def shouldFindBallPosition(player):
 
 def ballMoved(player):
     """
-    Ball has moved away from where it was seen when positioning. We probably
-    dribbled through it.
+    Ball has moved away from where it was seen when positioning and we haven't
+    yet kicked it (we kick at counter == 30). We probably walked into it.
     """
     ball = player.brain.ball
     ballBefore = player.ballBeforeKick
-    return (ball.vis.frames_off > 15 or
+    return (player.counter < 30 and (ball.vis.frames_off > 15 or
             fabs(ball.rel_x - ballBefore.rel_x) > constants.BALL_MOVED_THR or
-            fabs(ball.rel_y - ballBefore.rel_y) > constants.BALL_MOVED_THR)
+            fabs(ball.rel_y - ballBefore.rel_y) > constants.BALL_MOVED_THR))
 
 def shouldSpinFindBall(player):
     """

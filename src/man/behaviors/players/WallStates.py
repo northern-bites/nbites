@@ -1,3 +1,8 @@
+"""
+Left in for historical purposes. (Do not ever ever use!)
+    - Josh Imhoff and Daniel Zeller
+"""
+
 from .. import SweetMoves
 from objects import RelRobotLocation
 from ..navigator import Navigator
