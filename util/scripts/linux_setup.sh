@@ -42,7 +42,8 @@ if [[ $VERSION != '12.04' && $VERSION != '14.04' ]]; then
     fi
 fi
 
-echo "\nDownloading and installing software!"
+echo ""
+echo "Downloading and installing software!"
 echo "..."
 
 # Certain packages have to be installed from the 12.04 repo and frozen at that version
@@ -73,7 +74,8 @@ atom_robocup=$robocup/software/nao/NaoQi/$naoqi_version/$atom
 naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
 
-echo "\nDownloading and unpacking NBites files."
+echo ""
+echo "Downloading and unpacking NBites files."
 
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
@@ -111,4 +113,5 @@ echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
 echo "source $nbites_bash" >> ~/.bashrc
 echo ""
 
-echo "\nOne last IMPORTANT step: Restart your terminal. Then you're good to go!"
+echo ""
+echo "One last IMPORTANT step: Restart your terminal. Then you're good to go!"
