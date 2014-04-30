@@ -5,7 +5,7 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
-OLDPACKAGES="python2.7.5-dev libboost1.48-dev libboost-python1.48-dev"
+OLDPACKAGES="libboost1.48-dev libboost-python1.48-dev"
 
 PACKAGES="build-essential cmake git-core \
 emacs cmake-curses-gui ccache aptitude \
