@@ -77,10 +77,10 @@ echo "\nDownloading and unpacking NBites files."
 
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
-wget $naoqi_robocup $lib_dir/
+wget $naoqi_robocup -P $lib_dir/
 
 echo "Downloading Atom toolchain"
-wget $atom_robocup $lib_dir/
+wget $atom_robocup -P $lib_dir/
 
 echo "Unpacking NaoQi"
 
@@ -106,23 +106,9 @@ nbites_bash=$nbites_dir/util/scripts/nbites.bash
 echo "export NBITES_DIR=$nbites_dir" >> $nbites_bash
 echo "export AL_DIR=$naoqi_local" >> $nbites_bash
 
+echo "" >> ~/.bashrc
+echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
+echo "source $nbites_bash" >> ~/.bashrc
 echo ""
-echo "Done! The last step is just to add the following line:"
-echo "source $nbites_bash"
-echo "to your .bashrc (which is in your home directory)"
 
-echo "Would you like this to be done automatically? (y/n)"
-read AUTO
-
-if [ $AUTO == 'y' ]; then
-    echo "" >> ~/.bashrc
-    echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
-    echo "source $nbites_bash" >> ~/.bashrc
-    echo ""
-    echo "You're good to go!"
-else
-    echo ""
-    echo "Add the line manually, and you'll be all set up!"
-fi
-
-echo "NOW RESTART THE TERMINAL SO THAT .bashrc GETS RUN!"
+echo "\nOne last IMPORTANT step: Restart your terminal. Then you're good to go!"
