@@ -7,17 +7,13 @@ class Kick(object):
     stores everything we need to know for a given kick
     """
     def __init__(self, _name, x=DEFAULT_KICK_X_OFFSET, y=0, h=0,
-                 move=None, dest=Location(), maxDist=0):
+                 move=None, dest=Location(0,0), maxDist=300):
         self.name = _name
         self.sweetMove = move
         self.maxDist = maxDist           # upper limit of the range of the kick
 
         self.setup = RobotLocation(x,y,h)
         self.destination = dest          # set by kickDecider
-
-    def getPosition(self):
-        """ Returns position as a RobotLocation object """
-        return setup
 
     def isBackKick(self):
         return (self is LEFT_LONG_BACK_KICK or
@@ -32,8 +28,6 @@ class Kick(object):
                 self is RIGHT_SHORT_STRAIGHT_KICK)
 
     def __str__(self):
-        #return ("%s: \n x_offset: %g y_offset: %g heading: %g ==> dest: %s" %
-         #       (self.name, self.x_offset, self.y_offset, self.heading, self.dest))
         return self.name
 
     def __eq__(self, other):

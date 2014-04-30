@@ -6,7 +6,7 @@ import ChaseBallConstants as constants
 import DribbleTransitions as dr_trans
 import BoxTransitions as box_trans
 from ..navigator import Navigator
-from ..kickDecider import HackKickInformation as hackKick
+from ..kickDecider import KickDecider2
 from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location
@@ -91,20 +91,23 @@ def approachBall(player):
 
 def prepareForKick(player):
     if player.firstFrame():
-        prepareForKick.hackKick = hackKick.KickInformation(player.brain)
+        prepareForKick.decider = KickDecider2.KickDecider2(player.brain)
         player.brain.nav.stand()
         return player.stay()
-
 
     if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
         player.inKickingState = False
         return player.goLater('chase')
 
-    player.kick = prepareForKick.hackKick.shoot()
+    player.kick = prepareForKick.decider.pBrunswick()
 
-    if hackKick.DEBUG_KICK_DECISION:
-        print str(player.kick)
+    print "What kick was returned?"
+    print str(player.kick)
+    print player.kick.setup
+    print player.brain.ball.x
+    print player.brain.ball.y
+    print player.kick.destination
 
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
@@ -117,7 +120,7 @@ def orbitBall(player):
     State to orbit the ball
     """
     # Calculate relative heading every frame
-    relH = player.kick.h - player.brain.loc.h
+    relH = player.kick.setup.h - player.brain.loc.h
 
     # Are we within the acceptable heading range?
     if (relH > -constants.ORBIT_GOOD_BEARING and
@@ -147,7 +150,7 @@ def orbitBall(player):
 
     # DEBUGGING PRINT OUTS
     if constants.DEBUG_ORBIT and player.counter%20 == 0:
-        print "desiredHeading is:  | ", player.kick.h
+        print "desiredHeading is:  | ", player.kick.setup.h
         print "player heading:     | ", player.brain.loc.h
         print "orbit heading:      | ", relH
         print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
@@ -212,9 +215,9 @@ def positionForKick(player):
         return player.goNow('executeDribble')
 
     ball = player.brain.ball
-    kick_pos = player.kick.getPosition()
-    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
-                                                ball.rel_y - kick_pos[1],
+    kick_pos = player.kick.setup
+    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos.x,
+                                                ball.rel_y - kick_pos.y,
                                                 0)
 
     if player.firstFrame():
@@ -360,7 +363,7 @@ def positionForPenaltyKick(player):
         return player.goLater('chase')
 
     ball = player.brain.ball
-    kick_pos = player.kick.getPosition()
+    kick_pos = player.kick.setup
     positionForPenaltyKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
                                                        ball.rel_y - kick_pos[1],
                                                        0)

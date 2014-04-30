@@ -6,8 +6,8 @@ BETA = 1
 
 # Controls how we weight the cost function that we minimize to balance
 # kicking accuracy with kicking speed
-GAMMA = 1 # Higher gamma -> kick accuracy is more important  
-DELTA = 1 # Higher delta -> speed of setting up for kick is more important
+GAMMA = 0  # Higher gamma -> kick accuracy is more important  
+DELTA = -1 # Lower delta -> speed of setting up for kick is more important
 
 # How finely should we search over possible kick setups?
 # NOTE NUM_OF_SAMPLES should be an odd number, so that a perfectly-aimed kick 
