@@ -1,6 +1,6 @@
 # Time elapsed between packets before we deem a claim to be expired
 # TODO: determine a reasonable amount of time for this
-claimExpiration = 10
+claimExpiration = 5
 
 
 def shouldCedeClaim(player):
@@ -11,15 +11,16 @@ def shouldCedeClaim(player):
             continue
 
         # Now we get into actual claims
-        if (int(player.brain.time * 1000) - mate.timestamp > claimExpiration):
+        if ((player.brain.time - mate.claimTime) > claimExpiration):
+            print "claim expired"
             continue # That claim has expired (Comm is probably lagging)
 
         # TODO: make weighted function that uses both distance and heading
-        if (mate.ball_dist < player.brain.ball.distance):
+        if (mate.ballDist < player.brain.ball.distance):
             player.claimedBall = False
             return True
 
-        if mate.in_kicking_state:
+        if mate.inKickingState:
             player.claimedBall = False
             return True
 

@@ -1,5 +1,6 @@
 from objects import (RobotLocation, Location, RelRobotLocation)
 from math import fabs, degrees
+import time
 import noggin_constants as NogginConstants
 
 DEFAULT_GOALIE_NUMBER = 1
@@ -41,7 +42,7 @@ class TeamMember(RobotLocation):
         self.active = info.active
         self.claimedBall = info.claimed_ball
         if self.claimedBall:
-            print "player number ", self.playerNumber, " claimed the ball"
+            self.claimTime = time.time()
 
         # calculates ball localization distance, bearing
         self.bearingToGoal = self.getBearingToGoal()
