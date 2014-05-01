@@ -22,7 +22,7 @@ def shouldReturnHome(player):
     If the ball IS in our box, check the claims for a higher priority claim
     """
     if player.buffBoxFiltered.checkCondition(player):
-        player.brain.claimedBall = False
+        player.claimedBall = False
         return True;
 
     return claimTrans.shouldCedeClaim(player)
