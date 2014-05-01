@@ -10,8 +10,14 @@ def falling(player):
             (player.brain.interface.fallStatus.falling or
              player.brain.interface.fallStatus.fallen))
 
+def fallen(player):
+    """
+    We have fallen according to guardian.
+    """
+    return player.brain.interface.fallStatus.fallen
+
 def atRest(player):
     """
-    We have fallen and rested on the ground for more than a second.
+    We have rested on the ground, so as not to attempt standing up too quickly.
     """
     return sameStateForNSeconds(constants.WAIT_BEFORE_STANDUP)(player)
