@@ -2,8 +2,8 @@ import time
 
 from . import SoccerFSA
 from . import FallControllerStates
-from . import GameControllerStates
 from . import RoleSwitchingStates
+from . import GameControllerStates
 from . import BrunswickStates
 from . import ChaseBallStates
 from . import PositionStates

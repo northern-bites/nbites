@@ -21,6 +21,9 @@ class Kick(object):
         self.destinationY = 0          # set by kickDecider
         self.destinationH = 0          # set by kickDecider
 
+    def getPosition(self):
+        return (self.setupX, self.setupY, self.setupH)
+
     def isBackKick(self):
         return (self is LEFT_LONG_BACK_KICK or
                 self is RIGHT_LONG_BACK_KICK or
