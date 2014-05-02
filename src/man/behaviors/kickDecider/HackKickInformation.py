@@ -226,6 +226,9 @@ class KickInformation:
         returns the kick we should do in a shooting situation
         """
         kick = None
+	kick = kicks.LEFT_BIG_KICK
+	kick.h = 0
+	return kick
 
         # Is loc good enough for a kick decision?
         # Need to use aimCenter in decision.

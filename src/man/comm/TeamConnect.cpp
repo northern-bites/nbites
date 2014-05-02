@@ -167,8 +167,8 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
 
         if (!teamMessage.get()->ParseFromArray(&packet[0], result))
         {
-            std::cerr << "Failed to parse GPB from socket in TeamConnect. "
-                      << "Got a packet of size " << result << std::endl;
+            //std::cerr << "Failed to parse GPB from socket in TeamConnect. "
+            //          << "Got a packet of size " << result << std::endl;
         }
 
         if (!verify(teamMessage.get(), currtime, player, team))

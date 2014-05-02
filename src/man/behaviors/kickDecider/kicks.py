@@ -64,9 +64,9 @@ RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 18.7, y = -4.4,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 # Not used 04-19-13
-LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 11, y =  3,
+LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 15.5, y =  4.5,
                       move=SweetMoves.LEFT_BIG_KICK)
-RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 11, y = -3,
+RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 15.5, y = -4.5,
                       move=SweetMoves.RIGHT_BIG_KICK)
 
 # used when we haven't decided what kick to do yet
