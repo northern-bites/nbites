@@ -17,18 +17,16 @@ def positionAtHome(player):
         player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
                               fast = False, pb = False)
-        # TODO check if this is necessary!
-        #HACK so that tracker goes back to stopped.
         player.brain.tracker.stopHeadMoves()
-        player.brain.tracker.repeatWidePan()
+        player.brain.tracker.trackBall()
 
     ball = player.brain.ball
     loc = player.brain.loc
     ballDistance = ((loc.x - ball.x)**2 + (loc.y - ball.y)**2)**.5
 
-    if ballDistance < 100 and ball.vis.frames_on > 2:
+    if ballDistance < 200 and ball.vis.frames_on > 2:
         player.brain.tracker.trackBall()
-    else:
+    elif player.brain.playerNumber != 4:
         player.brain.tracker.repeatWidePan()
 
 @superState('gameControllerResponder')
