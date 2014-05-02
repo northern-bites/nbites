@@ -62,7 +62,7 @@
 
 #define USE_SPL_COMM_${USE_SPL_COMM}
 #ifdef  USE_SPL_COMM_ON
-#   define USE_LOGGING
+#   define USE_SPL_COMM
 #else
 #   undef USE_SPL_COMM
 #endif
