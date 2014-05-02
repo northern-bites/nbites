@@ -79,3 +79,5 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.corner_dribble = False
         # Controls whether we do a motion kick
         self.motionKick = False
+        # Controls whether we will role switch
+        self.roleSwitching = True

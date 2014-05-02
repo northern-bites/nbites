@@ -7,6 +7,7 @@ The second to top level in player FSA.
 
 import RoleSwitchingTransitions as transitions
 import BoxPositionConstants as BPConstants
+from ..util import *
 
 @defaultState('gameControllerResponder')
 @ifSwitchNow(transitions.chaserIsOut, 'switchRoles')
@@ -23,9 +24,10 @@ def switchRoles(player):
     """
     # Should I become the chaser?
     for mate in player.brain.teamMembers:
-        if (mate.active and mate.role != 1 and 
+        if (mate.active and mate.role != 1 and
            mate.role < player.role):
             # No, another player will do it, continue playing...
+            print "We're not gonna switch!!!!"
             return player.goLater(player.gameState)
 
     # Yes, become the chaser...
@@ -34,6 +36,6 @@ def switchRoles(player):
     player.kickoffPosition = BPConstants.theirKickoff
     player.box = BPConstants.chaserBox
     player.isKickingOff = True
-
+    print "We are the chaser!"
     # And continue playing...
     return player.goLater(player.gameState)

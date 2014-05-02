@@ -31,7 +31,7 @@ cherryPickerKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 10,
                                     NogginConstants.OPP_GOALBOX_BOTTOM_Y,
                                     0)
 
-ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 10,
+ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 20,
                            NogginConstants.CENTER_FIELD_Y,
                            0)
 

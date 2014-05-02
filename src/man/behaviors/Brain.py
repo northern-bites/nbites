@@ -180,6 +180,7 @@ class Brain(object):
         output.in_kicking_state = self.player.inKickingState
 
     def getCommUpdate(self):
+        self.teamMembers[self.playerNumber - 1].updateMe()
         self.game = self.interface.gameState
         for i in range(len(self.teamMembers)):
             if (i == self.playerNumber - 1):

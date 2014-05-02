@@ -4,7 +4,7 @@ hard reset to one of the two possible post-penalty positions.
 """
 
 import ChaseBallTransitions as transitions
-import BPConstants
+import BoxPositionConstants as BPConstants
 from math import copysign, fabs
 from objects import RelRobotLocation
 from ..util import *
@@ -144,36 +144,39 @@ def afterPenalty(player):
 #         return player.goLater('playbookPosition')
 #
 #     return player.stay()
-@superstate('gameControllerResponder')
+@superState('gameControllerResponder')
 def determineRole(player):
-    role = 0
+    if not player.roleSwitching:
+        return player.goLater(player.gameState)
+
+    openSpaces = [True, True, True, True]
     for mate in player.brain.teamMembers:
-        if not mate.active:
-            if mate.role > role:
-                role = mate.role
-            if mate.role == 4:
-                role = mate.role
-                break
-    if role == 0:
-        print "there's a big issue in role switching after penalty"
-    if role == 2:
-        player.homePosition = BPConstants.evenDefenderHome
-        player.kickoffPosition = player.homePosition
-        player.box = BPConstants.evenDefenderBox
-        player.isKickingOff = False
-    elif role == 3:
-        player.homePosition = BPConstants.oddDefenderHome
-        player.kickoffPosition = player.homePosition
-        player.box = BPConstants.oddDefenderBox
-        player.isKickingOff = False
-    elif role == 4:
+        if mate.active:
+            openSpaces[mate.role - 2] = False
+
+    if openSpaces[2]:
+        player.role = 4
         player.homePosition = BPConstants.evenChaserHome
         player.kickoffPosition = BPConstants.theirKickoff
         player.box = BPConstants.chaserBox
         player.isKickingOff = True
-    elif role == 5:
+    elif openSpaces[0]:
+        player.role = 2
+        player.homePosition = BPConstants.evenDefenderHome
+        player.kickoffPosition = player.homePosition
+        player.box = BPConstants.evenDefenderBox
+        player.isKickingOff = False
+    elif openSpaces[1]:
+        player.role = 3
+        player.homePosition = BPConstants.oddDefenderHome
+        player.kickoffPosition = player.homePosition
+        player.box = BPConstants.oddDefenderBox
+        player.isKickingOff = False
+    elif openSpaces[3]:
+        player.role = 5
         player.homePosition = BPConstants.cherryPickerHome
         player.kickoffPosition = BPConstants.cherryPickerKickoff
         player.box = BPConstants.cherryPickerBox
         player.isKickingOff = False
+
     return player.goLater(player.gameState)

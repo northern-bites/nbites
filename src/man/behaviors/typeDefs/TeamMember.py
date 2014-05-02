@@ -17,7 +17,7 @@ class TeamMember(RobotLocation):
         self.ballDist = 0
         self.ballBearing = 0
         self.ballOn = False
-        self.role = 1 # TODO update roles to work with new positioning sys
+        self.role = 1
         self.inKickingState = False
 
         #other info we want stored
