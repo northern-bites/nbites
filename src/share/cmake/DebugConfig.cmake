@@ -15,13 +15,21 @@ option(
   ON
 )
 
-if( NOT OFFLINE )
+# spl_comm and debug_comm have to be allowed even in offline for worldview. etc
+
+option(
+  USE_SPL_COMM
+  "Use the SPL's Standard Message rather than protobufs for comm"
+  OFF
+)
 
 option(
   DEBUG_COMM
   "Toggle comm debug mode."
   OFF
 )
+
+if( NOT OFFLINE )
 
 option(
   DEBUG_BALLTRACK
@@ -50,12 +58,6 @@ option(
 option(
   PROFILE
   "Enable time profiling for the robot"
-  OFF
-)
-
-option(
-  USE_SPL_COMM
-  "Use the SPL's Standard Message rather than protobufs for comm"
   OFF
 )
 
