@@ -3,6 +3,7 @@ import time
 from . import SoccerFSA
 from . import FallControllerStates
 from . import GameControllerStates
+from . import RoleSwitchingStates
 from . import BrunswickStates
 from . import ChaseBallStates
 from . import PositionStates
@@ -28,6 +29,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
+        self.addStates(RoleSwitchingStates)
         self.addStates(BrunswickStates)
         self.addStates(BoxPositionStates)
         self.addStates(PositionStates)

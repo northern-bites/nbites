@@ -9,7 +9,7 @@ import noggin_constants as nogginConstants
 import FallControllerTransitions as transitions
 from ..util import *
 
-@defaultState('gameControllerResponder')
+@defaultState('roleSwitcher')
 @ifSwitchNow(transitions.falling, 'falling')
 def fallController(player):
     """

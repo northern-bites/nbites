@@ -2,7 +2,7 @@
 An FSA for responding to changes in the gameState according to gameController, 
 implemented as a hierarchical FSA. 
 
-The second to top level in player FSA.
+The third to top level in player FSA.
 """
 
 import noggin_constants as nogginConstants
@@ -10,7 +10,7 @@ from ..GameController import convertStateFormat, convertStateFormatPenaltyShots
 from ..util import *
 
 @defaultState('gameInitial')
-@superState('fallController')
+@superState('roleSwitcher')
 def gameControllerResponder(player):
     """
     Superstate for responding to gameState switches and penalties.
