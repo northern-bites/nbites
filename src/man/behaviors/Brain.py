@@ -14,6 +14,7 @@ from objects import Location, RobotLocation
 from . import Leds
 from . import robots
 from . import GameController
+from . import FallController
 
 # Packages and modules from sub-directories
 from .headTracker import HeadTracker
@@ -56,6 +57,9 @@ class Brain(object):
 
         # Initalize the leds and game controller
         self.leds = Leds.Leds(self)
+
+        # Initialize fallController
+        self.fallController = FallController.FallController(self)
 
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
@@ -141,6 +145,7 @@ class Brain(object):
         # Behavior stuff
         # Order here is very important
         self.gameController.run()
+        self.fallController.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()

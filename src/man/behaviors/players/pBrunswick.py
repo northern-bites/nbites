@@ -74,7 +74,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Kickoff kick
         self.shouldKickOff = False
         # Controls whether we check for a falling/fallen robot
-        self.runFallController = True
+        self.brain.fallController.enabled = True
         # Controls whether we want to dribble it from the corner
         self.corner_dribble = False
         # Controls whether we do a motion kick

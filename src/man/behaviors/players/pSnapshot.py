@@ -14,4 +14,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentState = 'fallController' # initial state
 
         # Controls whether we check for a falling/fallen robot
-        self.runFallController = True 
+        self.brain.fallController.enabled = True 

@@ -33,7 +33,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.returningFromPenalty = False
         self.side = RIGHT
         self.homeDirections = []
-        self.runFallController = True # should the FC run?
+        self.brain.fallController.enabled = True
 
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###

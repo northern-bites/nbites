@@ -16,7 +16,7 @@ def gameInitial(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.runFallController = False
+        player.brain.fallController.enabled = False
         player.gainsOn()
         player.stand()
         player.zeroHeads()
@@ -40,7 +40,7 @@ def gameReady(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.runFallController = True
+        player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
@@ -66,7 +66,7 @@ def gameSet(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.runFallController = False
+        player.brain.fallController.enabled = False
         player.brain.nav.stand()
         player.brain.tracker.performBasicPan()
 
@@ -83,7 +83,7 @@ def gameSet(player):
 def gamePlaying(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.runFallController = True
+        player.brain.fallController.enabled = True
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
 
@@ -116,7 +116,7 @@ def gameFinished(player):
     """
     if player.firstFrame():
         player.inKickingState = False
-        player.runFallController = False
+        player.brain.fallController.enabled = False
         player.stopWalking()
         player.zeroHeads()
         player.executeMove(SweetMoves.SIT_POS)
@@ -130,7 +130,7 @@ def gameFinished(player):
 def gamePenalized(player):
     if player.firstFrame():
         player.inKickingState = False
-        player.runFallController = False
+        player.brain.fallController.enabled = False
         player.stand()
         player.penalizeHeads()
 
@@ -158,7 +158,7 @@ def penaltyShotsGameSet(player):
     if player.firstFrame():
         player.stand()
         player.inKickingState = False
-        player.runFallController = False
+        player.brain.fallController.enabled = False
         player.brain.tracker.trackBall()
 
     # Wait until the sensors are calibrated before moving.
@@ -174,7 +174,7 @@ def penaltyShotsGameSet(player):
 def penaltyShotsGamePlaying(player):
     if player.firstFrame():
         player.stand()
-        player.runFallController = True
+        player.brain.fallController.enabled = True
         player.inKickingState = False
         player.shouldKickOff = False
         player.penaltyKicking = True
