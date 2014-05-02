@@ -55,7 +55,7 @@ class TeamMember(RobotLocation):
         self.ballOn = ball.vis.frames_on > 0
         self.ballDist = ball.distance
         self.ballBearing = ball.bearing_deg
-        self.role = self.brain.play.role
+        self.role = self.brain.player.role
         self.inKickingState = self.brain.player.inKickingState
 
         self.active = (not self.isPenalized() and
