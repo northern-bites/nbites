@@ -184,6 +184,7 @@ class Brain(object):
         output.claimed_ball = self.player.claimedBall
 
     def getCommUpdate(self):
+        self.teamMembers[self.playerNumber - 1].updateMe()
         self.game = self.interface.gameState
         for i in range(len(self.teamMembers)):
             if (i == self.playerNumber - 1):

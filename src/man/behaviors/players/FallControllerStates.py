@@ -9,7 +9,7 @@ import noggin_constants as nogginConstants
 import FallControllerTransitions as transitions
 from ..util import *
 
-@defaultState('gameControllerResponder')
+@defaultState('roleSwitcher')
 @ifSwitchNow(transitions.falling, 'falling')
 def fallController(player):
     """
@@ -18,7 +18,7 @@ def fallController(player):
     pass
 
 @stay
-@ifSwitchNow(transitions.atRest, 'standingUp')
+@ifSwitchNow(transitions.atRest, 'prepareForStandUp')
 def falling(player):
     """
     Protects robot as he falls. Stops him and kills stiffness.
@@ -28,10 +28,10 @@ def falling(player):
         player.brain.tracker.stopHeadMoves()
         player.inKickingState = False
 
-@stay
-def standingUp(player):
+@switchLater('standingUp')
+def prepareForStandUp(player):
     """
-    Attempts a standup.
+    Reset motion providers and turn on stiffness before attempting stand up.
     """
     if player.firstFrame():
         player.brain.interface.motionRequest.reset_providers = True
@@ -39,6 +39,12 @@ def standingUp(player):
         player.brain.player.gainsOn()
         player.brain.tracker.setNeutralHead()
 
+@stay
+def standingUp(player):
+    """
+    Attempts a standup.
+    """
+    if player.firstFrame():
         if (player.brain.interface.fallStatus.on_front):
             standingUp.move = SweetMoves.STAND_UP_FRONT
         else:

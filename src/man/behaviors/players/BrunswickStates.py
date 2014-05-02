@@ -5,6 +5,7 @@ Game controller states for pBrunswick, our soccer player.
 import noggin_constants as nogginConstants
 from math import fabs
 from ..util import *
+from .. import SweetMoves
 
 ### NORMAL PLAY ###
 @superState('gameControllerResponder')

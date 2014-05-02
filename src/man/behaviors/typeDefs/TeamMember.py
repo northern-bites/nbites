@@ -18,7 +18,7 @@ class TeamMember(RobotLocation):
         self.ballDist = 0
         self.ballBearing = 0
         self.ballOn = False
-        self.role = 1 # TODO update roles to work with new positioning sys
+        self.role = 1
         self.inKickingState = False
         self.claimedBall = False
 
@@ -60,7 +60,7 @@ class TeamMember(RobotLocation):
         self.ballOn = ball.vis.frames_on > 0
         self.ballDist = ball.distance
         self.ballBearing = ball.bearing_deg
-        self.role = self.brain.play.role
+        self.role = self.brain.player.role
         self.inKickingState = self.brain.player.inKickingState
         self.claimedBall = self.brain.player.claimedBall
 
