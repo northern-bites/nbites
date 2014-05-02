@@ -1,5 +1,6 @@
 from .. import SweetMoves
 from objects import Location, RobotLocation
+import math
 from KickingConstants import DEFAULT_KICK_X_OFFSET
 
 class Kick(object):
@@ -7,13 +8,18 @@ class Kick(object):
     stores everything we need to know for a given kick
     """
     def __init__(self, _name, x=DEFAULT_KICK_X_OFFSET, y=0, h=0,
-                 move=None, dest=Location(0,0), maxDist=300):
+                 move=None, maxDist=300):
         self.name = _name
         self.sweetMove = move
         self.maxDist = maxDist           # upper limit of the range of the kick
 
-        self.setup = RobotLocation(x,y,h)
-        self.destination = dest          # set by kickDecider
+        self.setupX = x
+        self.setupY = y
+        self.setupH = h
+
+        self.destinationX = 0          # set by kickDecider
+        self.destinationY = 0          # set by kickDecider
+        self.destinationH = 0          # set by kickDecider
 
     def isBackKick(self):
         return (self is LEFT_LONG_BACK_KICK or
@@ -38,22 +44,29 @@ class Kick(object):
 
 
 # Some standard kicks. x,y and move should not be modified unless you change
-# the sweetMove.  Heading will be modified when the kick is constructed.
+# the sweetMove. Here heading indicates where one should setup to kick in a
+# particular direction, but it will be modified later on to indicate where the
+# robot needs to orbit to.
 LEFT_SIDE_KICK =  Kick("L_Side", x = 17.5, y =  2,
+                       h = 90,
                        move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
 RIGHT_SIDE_KICK = Kick("R_Side", x = 17.5, y = -2,
+                       h = -90,
                        move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
 # Not used 04-19-13
 LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
+                             h = 90,
                              move=SweetMoves.LEFT_SHORT_SIDE_KICK)
 RIGHT_SHORT_SIDE_KICK = Kick("R_Short_Side", x = 15.5, y = .5,
+                             h = -90,
                              move=SweetMoves.RIGHT_SHORT_SIDE_KICK)
+
 LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
                            move=SweetMoves.LEFT_STRAIGHT_KICK)
 RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 18.7, y =  4.4,
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 18.7, y =  4.4, 
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
 RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 18.7, y = -4.4,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)

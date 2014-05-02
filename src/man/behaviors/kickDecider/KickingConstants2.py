@@ -12,7 +12,7 @@ DELTA = -1 # Lower delta -> speed of setting up for kick is more important
 # How finely should we search over possible kick setups?
 # NOTE NUM_OF_SAMPLES should be an odd number, so that a perfectly-aimed kick 
 #      is chosen as one of the sampled kicks, see sampleKickSetups for more info
-NUM_OF_SAMPLES = 7
+NUM_OF_SAMPLES = 5
 
 # What is the highest error (in cm) in y dir that we tolerate while kicking?
 SHOT_PRECISION = 30

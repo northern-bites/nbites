@@ -77,13 +77,6 @@ def prepareForKick(player):
 
     player.kick = prepareForKick.decider.pBrunswick()
 
-    print "What kick was returned?"
-    print str(player.kick)
-    print player.kick.setup
-    print player.brain.ball.x
-    print player.brain.ball.y
-    print player.kick.destination
-
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
             return player.goNow('decideDribble')
@@ -96,7 +89,7 @@ def orbitBall(player):
     State to orbit the ball
     """
     # Calculate relative heading every frame
-    relH = player.kick.setup.h - player.brain.loc.h
+    relH = player.kick.setupH - player.brain.loc.h
 
     # Are we within the acceptable heading range?
     if (relH > -constants.ORBIT_GOOD_BEARING and
@@ -125,7 +118,7 @@ def orbitBall(player):
 
     # DEBUGGING PRINT OUTS
     if constants.DEBUG_ORBIT and player.counter%20 == 0:
-        print "desiredHeading is:  | ", player.kick.setup.h
+        print "desiredHeading is:  | ", player.kick.setupH
         print "player heading:     | ", player.brain.loc.h
         print "orbit heading:      | ", relH
         print "walk is:            |  (",player.brain.nav.getXSpeed(),",",player.brain.nav.getYSpeed(),",",player.brain.nav.getHSpeed(),")"
@@ -189,9 +182,8 @@ def positionForKick(player):
         return player.goNow('executeDribble')
 
     ball = player.brain.ball
-    kick_pos = player.kick.setup
-    positionForKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos.x,
-                                                ball.rel_y - kick_pos.y,
+    positionForKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
+                                                ball.rel_y - player.kick.setupY,
                                                 0)
 
     if player.firstFrame():
@@ -337,9 +329,8 @@ def positionForPenaltyKick(player):
         return player.goLater('approachBall')
 
     ball = player.brain.ball
-    kick_pos = player.kick.setup
-    positionForPenaltyKick.kickPose = RelRobotLocation(ball.rel_x - kick_pos[0],
-                                                       ball.rel_y - kick_pos[1],
+    positionForPenaltyKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
+                                                       ball.rel_y - player.kick.setupY,
                                                        0)
     #So we stand and wait for two seconds before actually positioning
     if player.stateTime < 2:

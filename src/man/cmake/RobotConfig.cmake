@@ -3,7 +3,7 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
 set( @ROBOT_PLAYER_NUMBER@
-  "2"
+  "4"
   CACHE STRING
   "The player number for the robot."
 )
