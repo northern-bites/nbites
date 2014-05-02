@@ -1,4 +1,5 @@
 import BoxPositionConstants as boxConstants
+import ClaimTransitions as claimTransitions
 #The transitions file for transitions exclusive to the Box-based positioning
 
 def ballInBox(player):
@@ -55,3 +56,12 @@ def tooFarFromHome(threshold):
             return True
         return False
     return transition
+
+def shouldApproachBall(player):
+    if ballNotInBox(player):
+        return False
+
+    if claimTransitions.shouldCedeClaim(player):
+        return False
+
+    return True

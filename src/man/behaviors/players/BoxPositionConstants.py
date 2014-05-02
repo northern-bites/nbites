@@ -67,7 +67,7 @@ oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER
 evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y), NogginConstants.CENTER_FIELD_X, \
                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
-chaserBox = ((0, 0), 900, 600)
+chaserBox = ((0, 0), 1100, 800)
 
 cherryPickerBox = ((NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X, 0), \
                     NogginConstants.LINE_CROSS_OFFSET, NogginConstants.FIELD_WHITE_HEIGHT)

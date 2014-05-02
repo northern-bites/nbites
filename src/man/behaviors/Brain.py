@@ -82,6 +82,8 @@ class Brain(object):
         self.kickDecider = KickDecider.KickDecider(self)
         self.play = Play.Play()
 
+        self.player.claimedBall = False
+
         # Message interface
         self.interface = interface.interface
 
@@ -178,6 +180,8 @@ class Brain(object):
 
         output.active = self.teamMembers[self.playerNumber-1].active
         output.in_kicking_state = self.player.inKickingState
+
+        output.claimed_ball = self.player.claimedBall
 
     def getCommUpdate(self):
         self.game = self.interface.gameState
