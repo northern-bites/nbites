@@ -25,6 +25,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentState = 'fallController' # initial state
 
         ### THE STATE OF THE PLAYER ###
+        self.role = 1
         self.squatTime = 0
         self.frameCounter = 0
         self.penaltyKicking = False

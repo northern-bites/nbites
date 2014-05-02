@@ -26,7 +26,7 @@ def positionAtHome(player):
 
     if ballDistance < 200 and ball.vis.frames_on > 2:
         player.brain.tracker.trackBall()
-    elif player.brain.playerNumber != 4:
+    elif player.role != 4:
         player.brain.tracker.repeatWidePan()
 
 @superState('gameControllerResponder')
