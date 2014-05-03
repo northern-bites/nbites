@@ -3,7 +3,7 @@
 cmake_minimum_required( VERSION 2.8.3 )
 
 set( @ROBOT_PLAYER_NUMBER@
-  "2"
+  "4"
   CACHE STRING
   "The player number for the robot."
 )
@@ -29,14 +29,14 @@ set ( @PYTHON_PLAYER@
 # COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
-  "../../data/tables/lab13.mtb"
+  "../../data/tables/watson14-top.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
   )
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/lab13.mtb"
+  "../../data/tables/watson14-bot.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )
