@@ -45,28 +45,12 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         ### THE STATE OF THE PLAYER ###
         self.inKickingState = False
         self.role = brain.playerNumber
+        # Initialized for the sake of those who aren't
+        self.isKickingOff = False
         #Figure out home & kickoff, even/odd player.
         #All that good stuff...
-        if brain.playerNumber == 2:
-            self.homePosition = BPConstants.evenDefenderHome
-            self.kickoffPosition = self.homePosition
-            self.box = BPConstants.evenDefenderBox
-            self.isKickingOff = False
-        elif brain.playerNumber == 3:
-            self.homePosition = BPConstants.oddDefenderHome
-            self.kickoffPosition = self.homePosition
-            self.box = BPConstants.oddDefenderBox
-            self.isKickingOff = False
-        elif brain.playerNumber == 4:
-            self.homePosition = BPConstants.evenChaserHome
-            self.kickoffPosition = BPConstants.theirKickoff
-            self.box = BPConstants.chaserBox
-            self.isKickingOff = True
-        elif brain.playerNumber == 5:
-            self.homePosition = BPConstants.cherryPickerHome
-            self.kickoffPosition = BPConstants.cherryPickerKickoff
-            self.box = BPConstants.cherryPickerBox
-            self.isKickingOff = False
+        BPConstants.setRoleConstants(self, self.role)
+
         self.frameCounter = 0
         self.shouldRelocalizeCounter = 0
         # Penalty kick player variables

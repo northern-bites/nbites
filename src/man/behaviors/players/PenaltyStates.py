@@ -154,29 +154,13 @@ def determineRole(player):
         if mate.active:
             openSpaces[mate.role - 2] = False
 
+    if openSpaces[3]:
+        BPConstants.setRoleConstants(player, 5)
     if openSpaces[2]:
-        player.role = 4
-        player.homePosition = BPConstants.evenChaserHome
-        player.kickoffPosition = BPConstants.theirKickoff
-        player.box = BPConstants.chaserBox
-        player.isKickingOff = True
-    elif openSpaces[0]:
-        player.role = 2
-        player.homePosition = BPConstants.evenDefenderHome
-        player.kickoffPosition = player.homePosition
-        player.box = BPConstants.evenDefenderBox
-        player.isKickingOff = False
+        BPConstants.setRoleConstants(player, 4)
     elif openSpaces[1]:
-        player.role = 3
-        player.homePosition = BPConstants.oddDefenderHome
-        player.kickoffPosition = player.homePosition
-        player.box = BPConstants.oddDefenderBox
-        player.isKickingOff = False
-    elif openSpaces[3]:
-        player.role = 5
-        player.homePosition = BPConstants.cherryPickerHome
-        player.kickoffPosition = BPConstants.cherryPickerKickoff
-        player.box = BPConstants.cherryPickerBox
-        player.isKickingOff = False
+        BPConstants.setRoleConstants(player, 3)
+    elif openSpaces[0]:
+        BPConstants.setRoleConstants(player, 2)
 
     return player.goLater(player.gameState)
