@@ -21,12 +21,12 @@ def shouldCedeClaim(player):
         mateWeight = weightedDistAndHeading(mate.ballDist, mate.h, mate.ballBearing)
         # TODO: think more about comm lag/check comm lag
         if (mateWeight < playerWeight):
-            if mate.ballDist < 100:
+            if mate.ballDist < 150:
                 player.claimedBall = False
                 return True
 
         if mate.inKickingState:
-            if mate.ballDist < 100:
+            if mate.ballDist < 150:
                 player.claimedBall = False
                 return True
 

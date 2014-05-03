@@ -10,9 +10,6 @@ from . import PositionStates
 from . import PenaltyStates
 from . import FindBallStates
 from . import KickingStates
-from . import PenaltyKickStates
-from . import GoaliePositionStates
-from . import GoalieSaveStates
 from . import DribbleStates
 from . import BoxPositionStates
 
@@ -37,7 +34,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(DribbleStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
-        self.addStates(PenaltyKickStates)
         self.setName('pBrunswick')
         self.currentState = 'fallController' # initial state
 

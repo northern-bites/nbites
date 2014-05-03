@@ -11,7 +11,6 @@ from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location
 import noggin_constants as nogginConstants
-import BoxTransitions
 import time
 
 DRIBBLE_ON_KICKOFF = False
