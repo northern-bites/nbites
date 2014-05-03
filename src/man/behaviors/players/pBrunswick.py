@@ -2,6 +2,7 @@ import time
 
 from . import SoccerFSA
 from . import FallControllerStates
+from . import RoleSwitchingStates
 from . import GameControllerStates
 from . import BrunswickStates
 from . import ChaseBallStates
@@ -28,6 +29,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
         self.addStates(GameControllerStates)
+        self.addStates(RoleSwitchingStates)
         self.addStates(BrunswickStates)
         self.addStates(BoxPositionStates)
         self.addStates(PositionStates)
@@ -42,6 +44,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
 
         ### THE STATE OF THE PLAYER ###
         self.inKickingState = False
+        self.role = brain.playerNumber
         #Figure out home & kickoff, even/odd player.
         #All that good stuff...
         if brain.playerNumber == 2:
@@ -71,8 +74,10 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Kickoff kick
         self.shouldKickOff = False
         # Controls whether we check for a falling/fallen robot
-        self.runFallController = True 
+        self.brain.fallController.enabled = True
         # Controls whether we want to dribble it from the corner
         self.corner_dribble = False
         # Controls whether we do a motion kick
         self.motionKick = False
+        # Controls whether we will role switch
+        self.roleSwitching = True

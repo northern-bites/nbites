@@ -22,4 +22,6 @@ message WorldModel
     optional bool  in_kicking_state = 12;
 
     optional bool  active = 13;
+
+    optional bool  claimed_ball = 14;
 }

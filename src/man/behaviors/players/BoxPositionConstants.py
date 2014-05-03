@@ -11,7 +11,7 @@ oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 20)
 
-evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
                                  NogginConstants.MY_GOALBOX_TOP_Y,
                                  -20)
 
@@ -31,7 +31,7 @@ cherryPickerKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 10,
                                     NogginConstants.OPP_GOALBOX_BOTTOM_Y,
                                     0)
 
-ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 10,
+ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 20,
                            NogginConstants.CENTER_FIELD_Y,
                            0)
 
@@ -67,8 +67,8 @@ oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER
 evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y), NogginConstants.CENTER_FIELD_X, \
                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
-chaserBox = ((0, 0), 900, 600)
+chaserBox = ((0, 0), 1100, 800)
 
-cherryPickerBox = ((NogginConstants.LANDMARK_YELLOW_GOAL_CROSS_X, 0), \
-                    NogginConstants.LINE_CROSS_OFFSET, NogginConstants.FIELD_WHITE_HEIGHT)
+cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.CENTER_FIELD_X)/2, 0), \
+                    NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X, NogginConstants.FIELD_WHITE_HEIGHT)
 

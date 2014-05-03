@@ -24,6 +24,7 @@ set( BEHAVIORS_SRCS BehaviorsModule
 set( BEHAVIORS_PYTHON_SRCS __init__.py
                         Brain.py
                         GameController.py
+                        FallController.py
                         Stability.py
                         Leds.py
                         StiffnessModes.py
