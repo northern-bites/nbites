@@ -74,10 +74,7 @@ def prepareForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    if player.brain.ball.x > nogginConstants.CENTER_FIELD_X + 100:
-        player.kick = prepareForKick.decider.closeToGoal()
-    else:
-        player.kick = prepareForKick.decider.farFromGoal()
+    player.kick = prepareForKick.decider.closeToGoal()
 
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
