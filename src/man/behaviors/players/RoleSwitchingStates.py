@@ -31,11 +31,18 @@ def switchRoles(player):
             return player.goLater(player.gameState)
 
     # Yes, become the chaser...
-    player.role = 4
-    player.homePosition = BPConstants.evenChaserHome
-    player.kickoffPosition = BPConstants.theirKickoff
-    player.box = BPConstants.chaserBox
-    player.isKickingOff = True
+    if player.openChaser == 4:
+        player.role = 4
+        player.homePosition = BPConstants.evenChaserHome
+        player.kickoffPosition = BPConstants.theirKickoff
+        player.box = BPConstants.chaserBox
+        player.isKickingOff = True
+    if player.openChaser == 5: # TODO
+        player.role = 5
+        player.homePosition = BPConstants.evenChaserHome
+        player.kickoffPosition = BPConstants.theirKickoff
+        player.box = BPConstants.chaserBox
+        player.isKickingOff = True
     print "We are the chaser!"
     # And continue playing...
     return player.goLater(player.gameState)
