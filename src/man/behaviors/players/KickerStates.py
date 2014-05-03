@@ -38,6 +38,6 @@ def gamePenalized(player):
 
 def kick(player):
     if player.firstFrame():
-        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
+        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_MEGAN)
 
     return player.stay()
