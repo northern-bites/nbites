@@ -152,7 +152,6 @@ def determineRole(player):
     openSpaces = [True, True, True, True]
     for mate in player.brain.teamMembers:
         if mate.role != 1 and mate.active:
-            print "we see player number ", mate.playerNumber, " in role ", mate.role
             openSpaces[mate.role - 2] = False
 
     if openSpaces[3]:

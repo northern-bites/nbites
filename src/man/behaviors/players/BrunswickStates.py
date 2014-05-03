@@ -99,7 +99,6 @@ def gamePlaying(player):
 
     if player.wasPenalized:
         player.wasPenalized = False
-        print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
         return player.goNow('afterPenalty')
 
     if (player.isKickingOff and player.brain.gameController.ownKickOff and 
