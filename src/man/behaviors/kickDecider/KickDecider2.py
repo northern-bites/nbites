@@ -18,8 +18,8 @@ class KickDecider2(object):
     """
     def __init__(self, brain):
         self.brain = brain
-        self.kicks = [kicks.LEFT_SHORT_STRAIGHT_KICK, 
-                      kicks.RIGHT_SHORT_STRAIGHT_KICK,
+        self.kicks = [kicks.LEFT_BIG_KICK, 
+                      kicks.RIGHT_BIG_KICK,
                       kicks.LEFT_SIDE_KICK,
                       kicks.RIGHT_SIDE_KICK]
         self.possibleKicks = self.generateNothing()
