@@ -22,6 +22,8 @@ def positionAtHome(player):
             player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                                   speed = nav.QUICK_SPEED, avoidObstacles = True,
                                   fast = False, pb = False)
+        elif player.brain.ball.vis.frames_on > 0:
+            player.brain.nav.stand()
     else:
         player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
