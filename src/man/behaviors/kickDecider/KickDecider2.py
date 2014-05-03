@@ -18,14 +18,27 @@ class KickDecider2(object):
     """
     def __init__(self, brain):
         self.brain = brain
-        self.kicks = [kicks.LEFT_BIG_KICK, 
-                      kicks.RIGHT_BIG_KICK,
+        self.kicks = [kicks.LEFT_SHORT_STRAIGHT_KICK,
+                      kicks.RIGHT_SHORT_STRAIGHT_KICK,
                       kicks.LEFT_SIDE_KICK,
                       kicks.RIGHT_SIDE_KICK]
         self.possibleKicks = self.generateNothing()
     
     ### PLANNERS ###
-    def pBrunswick(self):
+    def closeToGoal(self):
+        self.kicks[0] = kicks.LEFT_SHORT_STRAIGHT_KICK
+        self.kicks[1] = kicks.RIGHT_SHORT_STRAIGHT_KICK
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+        self.addPassesToFieldCross()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def farFromGoal(self):
+        self.kicks[0] = kicks.LEFT_BIG_KICK
+        self.kicks[1] = kicks.RIGHT_BIG_KICK
+
         self.clearPossibleKicks()
         self.addShotsOnGoal()
         self.addPassesToFieldCross()
