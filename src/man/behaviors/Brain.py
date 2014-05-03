@@ -18,7 +18,7 @@ from . import FallController
 
 # Packages and modules from sub-directories
 from .headTracker import HeadTracker
-from .typeDefs import (Play, TeamMember)
+from .typeDefs import TeamMember
 from .navigator import Navigator
 from .players import Switch
 from .kickDecider import KickDecider
@@ -84,7 +84,6 @@ class Brain(object):
         # Not FSAs
         self.gameController = GameController.GameController(self)
         self.kickDecider = KickDecider.KickDecider(self)
-        self.play = Play.Play()
 
         self.player.claimedBall = False
 

@@ -19,7 +19,6 @@ from . import BoxPositionStates
 import noggin_constants as NogginConstants
 
 from . import BoxPositionConstants as BPConstants
-from ..playbook import PBConstants
 
 from objects import Location
 

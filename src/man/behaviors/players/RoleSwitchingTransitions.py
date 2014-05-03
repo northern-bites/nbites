@@ -1,6 +1,6 @@
 def chaserIsOut(player):
     """
-    There is no chaser currently in the game and we are ready to fill the spot.
+    There is a chaser spot ready to be filled.
     """
     if not player.roleSwitching:
         return False
@@ -8,8 +8,15 @@ def chaserIsOut(player):
     if not player.gameState == "gamePlaying":
         return False
 
-    for mate in player.brain.teamMembers:
-        if mate.role == 4 and mate.active:
-            return False
-    return True
+    if player.role == 4 or player.role == 5:
+        return False
 
+    oneChaser = False
+    for mate in player.brain.teamMembers:
+        if (mate.role == 4 or mate.role == 5) and mate.active:
+            player.openChaser = mate.role
+            if oneChaser:
+                return False
+            oneChaser = True
+
+    return True
