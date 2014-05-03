@@ -56,6 +56,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyKicking = False
         # Kickoff kick
         self.shouldKickOff = False
+        # To keep track of when we are coming out of penalty
+        self.wasPenalized = False
         # Controls whether we check for a falling/fallen robot
         self.brain.fallController.enabled = True
         # Controls whether we want to dribble it from the corner

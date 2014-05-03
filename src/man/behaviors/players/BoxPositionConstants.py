@@ -73,7 +73,7 @@ cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.CENTER
                     NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X, NogginConstants.FIELD_WHITE_HEIGHT)
 
 def setRoleConstants(player, role):
-    player.role = 3
+    player.role = role
     if role == 2:
         player.homePosition = evenDefenderHome
         player.kickoffPosition = evenDefenderHome

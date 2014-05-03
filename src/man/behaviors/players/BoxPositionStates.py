@@ -17,7 +17,7 @@ def positionAtHome(player):
         player.brain.tracker.stopHeadMoves()
         player.brain.tracker.trackBall()
 
-    if player.role == 4:
+    if player.role == 4 or player.role == 5:
         if player.brain.ball.vis.frames_off > 30:
             player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                                   speed = nav.QUICK_SPEED, avoidObstacles = True,

@@ -159,6 +159,9 @@ class Brain(object):
         self.updateComm()
         # Flush the output
         sys.stdout.flush()
+        print "What role?"
+        print self.player.role
+        print self.teamMembers[self.playerNumber - 1].active
 
     def updateComm(self):
         output = self.interface.myWorldModel
