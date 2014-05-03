@@ -7,7 +7,7 @@ isKickingOff = False # default is false, changed by pBrunswick or some other if
 boxBuffer = 100 # Used for the buffered box when approach ball is potentially
                 # going to transition out and into 'positionAtHome'
 
-oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 20)
 
