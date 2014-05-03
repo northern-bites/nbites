@@ -187,3 +187,9 @@ def penaltyShotsGamePlaying(player):
         return player.stay()
 
     return player.goNow('chase')
+
+
+@superState('gameControllerResponder')
+def fallen(player):
+    player.inKickingState = False
+    return player.stay()
