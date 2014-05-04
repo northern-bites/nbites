@@ -53,12 +53,20 @@
 #   undef  USE_TIME_PROFILING
 #endif
 
-#define USING_LAB_FIELD_${USING_LAB_FIELD}
-#ifdef  USING_LAB_FIELD_ON
-#   define USING_LAB_FIELD
+#define USE_LAB_FIELD_${USE_LAB_FIELD}
+#ifdef  USE_LAB_FIELD_ON
+#   define USE_LAB_FIELD
 #else
-#   undef USING_LAB_FIELD
+#   undef USE_LAB_FIELD
 #endif
+
+#define USE_SPL_COMM_${USE_SPL_COMM}
+#ifdef  USE_SPL_COMM_ON
+#   define USE_SPL_COMM
+#else
+#   undef USE_SPL_COMM
+#endif
+
 
 #define USE_LOGGING_${USE_LOGGING}
 #ifdef  USE_LOGGING_ON
