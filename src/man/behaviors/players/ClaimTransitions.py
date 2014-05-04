@@ -3,9 +3,11 @@
 import math
 claimExpiration = 5
 headingWeight = .5
+claimDistance = 50
 
 def shouldCedeClaim(player):
-    return False
+    if not useClaims:
+        return False
     playerWeight = weightedDistAndHeading(player.brain.ball.distance, \
                                               player.brain.loc.h, player.brain.ball.bearing_deg)
     for mate in player.brain.teamMembers:
@@ -22,12 +24,12 @@ def shouldCedeClaim(player):
         mateWeight = weightedDistAndHeading(mate.ballDist, mate.h, mate.ballBearing)
         # TODO: think more about comm lag/check comm lag
         if (mateWeight < playerWeight):
-            if mate.ballDist < 150:
+            if mate.ballDist < claimDistance:
                 player.claimedBall = False
                 return True
 
         if mate.inKickingState:
-            if mate.ballDist < 150:
+            if mate.ballDist < claimDistance:
                 player.claimedBall = False
                 return True
 
@@ -37,7 +39,11 @@ def shouldCedeClaim(player):
 
 #TODO: make this make use of amount of orbit necessary
 def weightedDistAndHeading(distance, heading, ballBearing):
-# TODO normalize heading
+    if heading > 180:
+        heading -= 360
+    if heading < -180:
+        heading += 360
+
     ballHeading = heading + ballBearing
     if math.fabs(ballHeading) > 90:
         distance += distance * headingWeight * math.fabs(math.cos(math.radians(ballHeading)))
