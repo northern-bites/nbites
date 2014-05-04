@@ -88,7 +88,7 @@ def setRoleConstants(player, role):
         player.homePosition = evenChaserHome
         player.kickoffPosition = theirKickoff
         player.box = chaserBox
-        isKickingOff = True
+        player.isKickingOff = True
     elif role == 5:
         player.homePosition = oddChaserHome
         player.kickoffPosition = cherryPickerKickoff
