@@ -135,7 +135,7 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     arbData->set_timestamp(timer->timestamp());
 
     // build packet the regular way, using arbData
-    strcpy(splMessage.header, SPL_STANDARD_MESSAGE_STRUCT_HEADER);
+    strncpy(splMessage.header, SPL_STANDARD_MESSAGE_STRUCT_HEADER, sizeof(splMessage.header));
     splMessage.version = SPL_STANDARD_MESSAGE_STRUCT_VERSION;
     splMessage.playerNum = (uint8_t)arbData->player_number();
     splMessage.team = (uint8_t)arbData->team_number();
@@ -163,23 +163,20 @@ PROF_EXIT(P_COMM_BUILD_PACKET);
 PROF_ENTER(P_COMM_SERIALIZE_PACKET);
 
     // serialize the teamMessage for putting into the final field of the packet
-    char datagram_arbdata[arbData->ByteSize()];
-    arbData->SerializeToArray(datagram_arbdata, arbData->GetCachedSize());
+    int dataByteSize = arbData->ByteSize();
+    char datagram_arbdata[dataByteSize];
+    arbData->SerializeToArray(datagram_arbdata, dataByteSize);
 
     // put it into the packet, along with its size
-    memcpy(splMessage.data, datagram_arbdata, SPL_STANDARD_MESSAGE_DATA_SIZE);
-    splMessage.numOfDataBytes = (uint16_t)arbData->ByteSize();
-
-    // serialize everything
-    char datagram_all[sizeof(SPLStandardMessage)];
-    memcpy(datagram_all, &splMessage, sizeof(SPLStandardMessage));
+    memcpy(splMessage.data, datagram_arbdata, dataByteSize);
+    splMessage.numOfDataBytes = (uint16_t) dataByteSize;
 
 PROF_EXIT(P_COMM_SERIALIZE_PACKET);
 
 PROF_ENTER(P_COMM_TO_SOCKET);
     for (int i = 0; i < burst; ++i)
     {
-        socket->sendToTarget(&datagram_all[0], sizeof(SPLStandardMessage));
+        socket->sendToTarget((char*) &splMessage, sizeof(SPLStandardMessage));
     }
 PROF_EXIT(P_COMM_TO_SOCKET);
 }
@@ -195,26 +192,23 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
     {
         //initial setup
         struct SPLStandardMessage splMessage;
-        memset(&packet[0], 0, sizeof(packet)); // @TODO: neccessary??
+        memset(&splMessage, 0, sizeof(SPLStandardMessage)); // @TODO: neccessary??
 
         //actually check socket
-        result = socket->receive(&packet[0], sizeof(packet));
+        result = socket->receive((char*) &splMessage, sizeof(SPLStandardMessage));
 
         llong recvdtime = timer->timestamp();
 
-        if (result <= 0)
-            break; //leave on error or nothing to receive.
-
-
-        // deserialize the packet into an SPLMessage
-        memcpy(&splMessage, packet, sizeof(SPLStandardMessage));
+        if (result <= 0 || result != sizeof(SPLStandardMessage)) {
+            break; //leave on error or nothing to receive
+        }
 
         // deserialize the SPLMessage's teamMessage.get() field into a TeamPacket
         portals::Message<messages::TeamPacket> teamMessage(0);
         if (!teamMessage.get()->ParseFromArray(splMessage.data, splMessage.numOfDataBytes))
         {
-            //std::cerr << "Failed to parse GPB from socket in TeamConnect. "
-            //          << "Got a packet of size " << result << std::endl;
+            std::cerr << "Failed to parse GPB from socket in TeamConnect. "
+                     << "numOfDataBytes" << splMessage.numOfDataBytes << std::endl;
         }
 
         if (!verify(&splMessage, teamMessage.get()->sequence_number(), teamMessage.get()->timestamp(), recvdtime, player, team))
@@ -244,16 +238,19 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
 
         model.get()->set_ball_on(-!splMessage.ballAge);
 
+	// @TODO: these seem to be nan at this point; also this logic is somewhere else in the code (maybe the math module?), use that
+	// also using bad is bad (mostly for performance reasons) mmmkay
         model.get()->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
         model.get()->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
 
         model.get()->set_ball_dist_uncert(teamMessage.get()->payload().ball_dist_uncert());
         model.get()->set_ball_bearing_uncert(teamMessage.get()->payload().ball_bearing_uncert());
 
-        model.get()->set_chase_time(teamMessage.get()->payload().chase_time());
-        model.get()->set_defender_time(teamMessage.get()->payload().defender_time());
-        model.get()->set_offender_time(teamMessage.get()->payload().offender_time());
-        model.get()->set_middie_time(teamMessage.get()->payload().middie_time());
+        // @TODO: this is not in the proto message yet
+        // model.get()->set_chase_time(teamMessage.get()->payload().chase_time());
+        // model.get()->set_defender_time(teamMessage.get()->payload().defender_time());
+        // model.get()->set_offender_time(teamMessage.get()->payload().offender_time());
+        // model.get()->set_middie_time(teamMessage.get()->payload().middie_time());
 
         model.get()->set_role(teamMessage.get()->payload().role());
         model.get()->set_in_kicking_state(teamMessage.get()->payload().in_kicking_state());
