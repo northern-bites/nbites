@@ -159,6 +159,7 @@ waitForKickoff.ballRelY = "the relY position of the ball when we started"
 @superState('gameControllerResponder')
 def penaltyShotsGameSet(player):
     if player.firstFrame():
+        player.gainsOn()
         player.stand()
         player.inKickingState = False
         player.brain.fallController.enabled = False
@@ -187,7 +188,7 @@ def penaltyShotsGamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    return player.goNow('chase')
+    return player.goNow('prepareForPenaltyKick')
 
 
 @superState('gameControllerResponder')

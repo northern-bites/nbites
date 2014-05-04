@@ -315,10 +315,10 @@ def positionForPenaltyKick(player):
         player.inKickingState = True
         positionForPenaltyKick.yes = False
         if player.brain.ball.rel_y > 0:
-            player.kick = kicks.LEFT_STRAIGHT_KICK
+            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
             print "Kicking with left"
         else:
-            player.kick = kicks.RIGHT_STRAIGHT_KICK
+            player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             print "Kicking with right"
 
     if (transitions.shouldApproachBallAgain(player) or
