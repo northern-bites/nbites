@@ -24,27 +24,27 @@ def positionAtHome(player):
                                   speed = nav.QUICK_SPEED, avoidObstacles = True,
                                   fast = False, pb = False)
         elif player.brain.ball.vis.frames_on > 0:
-            if (player.brain.ball.x > player.brain.loc.x and 
+            if (player.brain.ball.x > player.brain.loc.x and
                 player.brain.ball.y > player.brain.loc.y):
-                print "1"
+                print "chaser quad is 1"
                 waitForBallPosition = RobotLocation(player.brain.ball.x - 60,
                                                     player.brain.ball.y - 60,
                                                     player.brain.ball.bearing_deg + player.brain.loc.h)
-            elif (player.brain.ball.x > player.brain.loc.x and 
+            elif (player.brain.ball.x > player.brain.loc.x and
                 player.brain.ball.y < player.brain.loc.y):
-                print "2"
+                print "chaser quad is 2"
                 waitForBallPosition = RobotLocation(player.brain.ball.x - 60,
                                                     player.brain.ball.y + 60,
                                                     player.brain.ball.bearing_deg + player.brain.loc.h)
-            elif (player.brain.ball.x < player.brain.loc.x and 
+            elif (player.brain.ball.x < player.brain.loc.x and
                 player.brain.ball.y > player.brain.loc.y):
-                print "3"
+                print "chaser quad is 3"
                 waitForBallPosition = RobotLocation(player.brain.ball.x + 60,
                                                     player.brain.ball.y - 60,
                                                     90)
-            elif (player.brain.ball.x < player.brain.loc.x and 
+            elif (player.brain.ball.x < player.brain.loc.x and
                 player.brain.ball.y < player.brain.loc.y):
-                print "4"
+                print "chaser quad is 4"
                 waitForBallPosition = RobotLocation(player.brain.ball.x + 60,
                                                     player.brain.ball.y + 60,
                                                     -90)

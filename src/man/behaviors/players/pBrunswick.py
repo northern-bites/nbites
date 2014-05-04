@@ -61,4 +61,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we do a motion kick
         self.motionKick = False
         # Controls whether we will role switch
-        self.roleSwitching = False
+        self.roleSwitching = True
+        # Controls whether we use claims
+        self.useClaims = True

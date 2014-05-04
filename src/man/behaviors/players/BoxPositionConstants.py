@@ -62,10 +62,15 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #
 # Useful constants can be found in src/share/include/FieldConstants.h
 
-oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
+defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
-evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
-                   NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+oddDefenderBox = defenderBox
+evenDefenderBox = defenderBox
+
+# oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
+
+# evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
+#                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
 chaserBox = ((0, 0), 1100, 800)
 
