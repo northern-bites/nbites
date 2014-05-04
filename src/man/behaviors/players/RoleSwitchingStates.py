@@ -22,8 +22,7 @@ def switchRoles(player):
     """
     State to decide who on the team should become the new chaser and switch accordingly.
     """
-    if player.openChaser - 2  == player.role:
-        BPConstants.setRoleConstants(player, player.openChaser)
+    BPConstants.setRoleConstants(player, player.openChaser)
 
     return player.goLater(player.gameState)
 

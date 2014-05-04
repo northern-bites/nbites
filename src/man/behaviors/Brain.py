@@ -158,7 +158,6 @@ class Brain(object):
         # Set myWorldModel for Comm
         self.updateComm()
 
-        print self.player.role
         # Flush the output
         sys.stdout.flush()
 

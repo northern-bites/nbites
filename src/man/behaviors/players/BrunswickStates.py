@@ -94,14 +94,15 @@ def gamePlaying(player):
     #     # special behavior case
     #     return player.goNow('postPenaltyChaser')
     # Wait until the sensors are calibrated before moving.
-    if not player.brain.motion.calibrated:
-        return player.stay()
 
     if player.wasPenalized:
         player.wasPenalized = False
         return player.goNow('afterPenalty')
 
-    if (player.isKickingOff and player.brain.gameController.ownKickOff and 
+    if not player.brain.motion.calibrated:
+        return player.stay()
+
+    if (player.isKickingOff and player.brain.gameController.ownKickOff and
         player.brain.gameController.timeSincePlaying < 10):
         player.shouldKickOff = True
         return player.goNow('approachBall')

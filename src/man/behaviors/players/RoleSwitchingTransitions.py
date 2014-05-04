@@ -14,6 +14,7 @@ def chaserIsOut(player):
     for mate in player.brain.teamMembers:
         if (mate.role == 4 or mate.role == 5) and not mate.active:
             player.openChaser = mate.role
-            return True
+            if player.openChaser - 2  == player.role:
+                return True
 
     return False
