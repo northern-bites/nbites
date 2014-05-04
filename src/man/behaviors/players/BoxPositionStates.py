@@ -2,6 +2,7 @@ import SharedTransitions
 import BoxPositionTransitions as transitions
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
+from objects import RobotLocation
 from ..util import *
 
 @superState('gameControllerResponder')
@@ -18,12 +19,38 @@ def positionAtHome(player):
         player.brain.tracker.trackBall()
 
     if player.role == 4 or player.role == 5:
-        if player.brain.ball.vis.frames_off > 30:
+        if player.brain.ball.vis.frames_off > 90:
             player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                                   speed = nav.QUICK_SPEED, avoidObstacles = True,
                                   fast = False, pb = False)
         elif player.brain.ball.vis.frames_on > 0:
-            player.brain.nav.stand()
+            if (player.brain.ball.x > player.brain.loc.x and 
+                player.brain.ball.y > player.brain.loc.y):
+                print "1"
+                waitForBallPosition = RobotLocation(player.brain.ball.x - 60,
+                                                    player.brain.ball.y - 60,
+                                                    player.brain.ball.bearing_deg + player.brain.loc.h)
+            elif (player.brain.ball.x > player.brain.loc.x and 
+                player.brain.ball.y < player.brain.loc.y):
+                print "2"
+                waitForBallPosition = RobotLocation(player.brain.ball.x - 60,
+                                                    player.brain.ball.y + 60,
+                                                    player.brain.ball.bearing_deg + player.brain.loc.h)
+            elif (player.brain.ball.x < player.brain.loc.x and 
+                player.brain.ball.y > player.brain.loc.y):
+                print "3"
+                waitForBallPosition = RobotLocation(player.brain.ball.x + 60,
+                                                    player.brain.ball.y - 60,
+                                                    90)
+            elif (player.brain.ball.x < player.brain.loc.x and 
+                player.brain.ball.y < player.brain.loc.y):
+                print "4"
+                waitForBallPosition = RobotLocation(player.brain.ball.x + 60,
+                                                    player.brain.ball.y + 60,
+                                                    -90)
+            player.brain.nav.goTo(waitForBallPosition, precision = nav.GENERAL_AREA,
+                                  speed = nav.QUICK_SPEED, avoidObstacles = True,
+                                  fast = False, pb = False)
     else:
         player.brain.nav.goTo(player.homePosition, precision = nav.GENERAL_AREA,
                               speed = nav.QUICK_SPEED, avoidObstacles = True,
