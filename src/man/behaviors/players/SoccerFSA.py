@@ -4,13 +4,13 @@
 #
 from ..headTracker import HeadMoves
 from ..util import FSA
-from . import CoreSoccerStates
+# from . import CoreSoccerStates
 
 class SoccerFSA(FSA.FSA):
     def __init__(self, brain):
         FSA.FSA.__init__(self, brain)
         #self.setTimeFunction(self.brain.nao.getSimulatedTime)
-        self.addStates(CoreSoccerStates)
+        # self.addStates(CoreSoccerStates)
         self.brain = brain
 
         #set default behavior for soccer players - override it if you want

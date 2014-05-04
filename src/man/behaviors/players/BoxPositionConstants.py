@@ -7,7 +7,7 @@ isKickingOff = False # default is false, changed by pBrunswick or some other if
 boxBuffer = 100 # Used for the buffered box when approach ball is potentially
                 # going to transition out and into 'positionAtHome'
 
-oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 20)
 
@@ -16,11 +16,11 @@ evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
                                  -20)
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
-                              NogginConstants.GREEN_PAD_Y + 10,
+                              NogginConstants.GREEN_PAD_Y + 100,
                               90)
 
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
-                               NogginConstants.FIELD_GREEN_HEIGHT - 10,
+                               NogginConstants.FIELD_GREEN_HEIGHT - 100,
                                -90)
 
 cherryPickerHome = RobotLocation(NogginConstants.OPP_GOALBOX_LEFT_X,
@@ -62,9 +62,9 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #
 # Useful constants can be found in src/share/include/FieldConstants.h
 
-oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y)
+oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
 
-evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y), NogginConstants.CENTER_FIELD_X, \
+evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
 chaserBox = ((0, 0), 1100, 800)
@@ -72,3 +72,25 @@ chaserBox = ((0, 0), 1100, 800)
 cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.CENTER_FIELD_X)/2, 0), \
                     NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X, NogginConstants.FIELD_WHITE_HEIGHT)
 
+def setRoleConstants(player, role):
+    player.role = role
+    if role == 2:
+        player.homePosition = evenDefenderHome
+        player.kickoffPosition = evenDefenderHome
+        player.box = evenDefenderBox
+        player.isKickingOff = False
+    elif role == 3:
+        player.homePosition = oddDefenderHome
+        player.kickoffPosition = oddDefenderHome
+        player.box = oddDefenderBox
+        player.kickingOff = False
+    elif role == 4:
+        player.homePosition = evenChaserHome
+        player.kickoffPosition = theirKickoff
+        player.box = chaserBox
+        isKickingOff = True
+    elif role == 5:
+        player.homePosition = oddChaserHome
+        player.kickoffPosition = cherryPickerKickoff
+        player.box = chaserBox
+        isKickingOff = False

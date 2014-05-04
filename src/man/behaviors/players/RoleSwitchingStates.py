@@ -1,6 +1,6 @@
 """
 An FSA for monitoring teammates and switching between roles on the field
-implemented as a hierarchical FSA. 
+implemented as a hierarchical FSA.
 
 The second to top level in player FSA.
 """
@@ -31,11 +31,8 @@ def switchRoles(player):
             return player.goLater(player.gameState)
 
     # Yes, become the chaser...
-    player.role = 4
-    player.homePosition = BPConstants.evenChaserHome
-    player.kickoffPosition = BPConstants.theirKickoff
-    player.box = BPConstants.chaserBox
-    player.isKickingOff = True
+    BPConstants.setRoleConstants(player, player.openChaser)
+
     print "We are the chaser!"
     # And continue playing...
     return player.goLater(player.gameState)

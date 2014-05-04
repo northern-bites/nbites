@@ -10,16 +10,12 @@ from . import PositionStates
 from . import PenaltyStates
 from . import FindBallStates
 from . import KickingStates
-from . import PenaltyKickStates
-from . import GoaliePositionStates
-from . import GoalieSaveStates
 from . import DribbleStates
 from . import BoxPositionStates
 
 import noggin_constants as NogginConstants
 
 from . import BoxPositionConstants as BPConstants
-from ..playbook import PBConstants
 
 from objects import Location
 
@@ -38,41 +34,26 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(DribbleStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
-        self.addStates(PenaltyKickStates)
         self.setName('pBrunswick')
         self.currentState = 'fallController' # initial state
 
         ### THE STATE OF THE PLAYER ###
         self.inKickingState = False
         self.role = brain.playerNumber
+        # Initialized for the sake of those who aren't
+        self.isKickingOff = False
         #Figure out home & kickoff, even/odd player.
         #All that good stuff...
-        if brain.playerNumber == 2:
-            self.homePosition = BPConstants.evenDefenderHome
-            self.kickoffPosition = self.homePosition
-            self.box = BPConstants.evenDefenderBox
-            self.isKickingOff = False
-        elif brain.playerNumber == 3:
-            self.homePosition = BPConstants.oddDefenderHome
-            self.kickoffPosition = self.homePosition
-            self.box = BPConstants.oddDefenderBox
-            self.isKickingOff = False
-        elif brain.playerNumber == 4:
-            self.homePosition = BPConstants.evenChaserHome
-            self.kickoffPosition = BPConstants.theirKickoff
-            self.box = BPConstants.chaserBox
-            self.isKickingOff = True
-        elif brain.playerNumber == 5:
-            self.homePosition = BPConstants.cherryPickerHome
-            self.kickoffPosition = BPConstants.cherryPickerKickoff
-            self.box = BPConstants.cherryPickerBox
-            self.isKickingOff = False
+        BPConstants.setRoleConstants(self, self.role)
+
         self.frameCounter = 0
         self.shouldRelocalizeCounter = 0
         # Penalty kick player variables
         self.penaltyKicking = False
         # Kickoff kick
         self.shouldKickOff = False
+        # To keep track of when we are coming out of penalty
+        self.wasPenalized = False
         # Controls whether we check for a falling/fallen robot
         self.brain.fallController.enabled = True
         # Controls whether we want to dribble it from the corner
@@ -80,4 +61,4 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we do a motion kick
         self.motionKick = False
         # Controls whether we will role switch
-        self.roleSwitching = True
+        self.roleSwitching = False
