@@ -19,7 +19,6 @@ class Kick(object):
 
         self.destinationX = 0          # set by kickDecider
         self.destinationY = 0          # set by kickDecider
-        self.destinationH = 0          # set by kickDecider
 
     def getPosition(self):
         return (self.setupX, self.setupY, self.setupH)
