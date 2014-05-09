@@ -10,7 +10,7 @@ PENALTY_NONE = 0
 STATE2_PENALTYSHOOT = 1
 STATE2_NORMAL = 0
 STATE2_OVERTIME = 2
-TEAM_BLUE = Constants.teamColor.TEAM_RED
+TEAM_BLUE = Constants.teamColor.TEAM_BLUE
 TEAM_RED = Constants.teamColor.TEAM_RED
 
 # Dictionary for input state:output state
@@ -73,13 +73,13 @@ class GameController():
         # reset field for change
         self.teamColorChanged = False
 
-        # if (gameState.team(self.teamColor).team_number != self.brain.teamNumber):
-        #     # We have the wrong team color
-        #     self.teamColorChanged = True
-        #     # This function might look weird, but!
-        #     #   0 -> 1 so team blue switches to team red
-        #     #   1 -> 0 so team red  switches to team blue
-        #     self.teamColor = -1*(self.teamColor)+1
+        if (gameState.team(self.teamColor).team_number != self.brain.teamNumber):
+            # We have the wrong team color
+            self.teamColorChanged = True
+            # This function might look weird, but!
+            #   0 -> 1 so team blue switches to team red
+            #   1 -> 0 so team red  switches to team blue
+            self.teamColor = -1*(self.teamColor)+1
 
         # reset field for change
         self.kickOffChanged = False
