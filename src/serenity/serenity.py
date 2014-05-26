@@ -5,9 +5,6 @@ from github import Github, GithubException
 
 username = os.environ['GITHUB_USERNAME']
 password = os.environ['GITHUB_PASSWORD']
-cl_id = os.environ['GITHUB_CLIENT_ID']
-cl_secret = os.environ['GITHUB_CLIENT_SECRET']
-
 
 repo_name = 'northern-bites/nbites'
 org_name, repo_short_name = repo_name.split('/')
@@ -38,7 +35,7 @@ def handle(commit, head):
 #                       #
 #########################
 
-g = Github(username, password, client_id = cl_id, client_secret = cl_secret, user_agent = username)
+g = Github(username, password, user_agent = username)
 
 org = g.get_organization(org_name)
 repo = org.get_repo(repo_short_name)
