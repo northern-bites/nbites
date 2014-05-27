@@ -13,18 +13,28 @@ class TeamMember(RobotLocation):
     """class for keeping track of teammates' info """
 
     def __init__(self, tbrain=None):
-        RobotLocation.__init__(self, 0.0, 0.0, 0.0)
         self.playerNumber = 0
+
+        RobotLocation.__init__(self, 0.0, 0.0, 0.0)
+        self.locUncert = 0
+        self.walkingToX = 0
+        self.walkingToY = 0
+        self.ballOn = False
+        self.ballAge = 0
         self.ballDist = 0
         self.ballBearing = 0
-        self.ballOn = False
+        self.ballVelX = 0
+        self.ballVelY = 0
+        self.ballUncert = 0
         self.role = 1
         self.inKickingState = False
+        self.kickingToX = 0
+        self.kickingToY = 0
+        self.fallen = False
+        self.active = True
         self.claimedBall = False
 
-        #other info we want stored
         self.brain = tbrain # brain instance
-        self.active = True
 
     # @param info: an instance of a WorldModel protobuf
     def update(self, info):
@@ -34,17 +44,27 @@ class TeamMember(RobotLocation):
         self.x = info.my_x
         self.y = info.my_y
         self.h = info.my_h
+        self.locUncert = info.my_uncert
+        self.walkingToX = info.walking_to_x
+        self.walkingToY = info.walking_to_y
         self.ballOn = info.ball_on
+        self.ballAge = info.ball_age
         self.ballDist = info.ball_dist
         self.ballBearing = info.ball_bearing
+        self.ballVelX = info.ball_vel_x
+        self.ballVelY = info.ball_vel_y
+        self.ballUncert = info.ball_uncert
         self.role = info.role
         self.inKickingState = info.in_kicking_state
+        self.kickingToX = info.kicking_to_x
+        self.kickingToY = info.kicking_to_y
         self.active = info.active
+        self.fallen = info.fallen
         self.claimedBall = info.claimed_ball
+
+        # Calculated from protobuf
         if self.claimedBall:
             self.claimTime = time.time()
-
-        # calculates ball localization distance, bearing
         self.bearingToGoal = self.getBearingToGoal()
 
     def updateMe(self):
@@ -57,28 +77,61 @@ class TeamMember(RobotLocation):
         self.y = self.brain.loc.y
         self.h = self.brain.loc.h
 
+        self.locUncert = self.brain.locUncert
+
+        self.walkingToX = self.brain.nav.walkingToX
+        self.walkingToY = self.brain.nav.walkingToX
+
         self.ballOn = ball.vis.frames_on > 0
+        # TODO -1 when ball has not been seen
+        self.ballAge = ball.vis.frames_off*30
         self.ballDist = ball.distance
         self.ballBearing = ball.bearing_deg
+
+        self.ballVelX = ball.vel_x
+        self.ballVelY = ball.vel_y
+
+        # TODO when EJ comes back
+        self.ballUncert = 0
+
         self.role = self.brain.player.role
+
         self.inKickingState = self.brain.player.inKickingState
-        self.claimedBall = self.brain.player.claimedBall
+        if self.inKickingState:
+            self.kickingToX = self.brain.player.kick.destinationX
+            self.kickingToY = self.brain.player.kick.destinationY
 
         self.active = (not self.isPenalized() and
                        not self.brain.player.currentState == 'afterPenalty' and
                        not (self.brain.playerNumber == 1 and
                             self.brain.player.returningFromPenalty))
+        self.fallen = self.brain.fallController.falling or self.brain.fallController.fell
+
+        self.claimedBall = self.brain.player.claimedBall
 
     def reset(self):
         '''Reset all important Teammate variables'''
         self.x = 0
         self.y = 0
         self.h = 0
-        self.ballOn = 0
+        self.locUncert = 0
+        self.walkingToX = 0
+        self.walkingToY = 0
+        self.ballOn = False
+        self.ballAge = 0
         self.ballDist = 0
         self.ballBearing = 0
+        self.ballVelX = 0
+        self.ballVelY = 0
+        self.ballUncert = 0
         self.role = None
+        self.inKickingState = False
+        if self.inKickingState:
+            self.kickingToX = 0
+            self.kickingToY = 0
         self.active = False
+        self.fallen = False
+        self.claimedBall = self.brain.player.claimedBall
 
     def getBearingToGoal(self):
         """returns bearing to goal"""
@@ -97,18 +150,6 @@ class TeamMember(RobotLocation):
 
     def isDefaultGoalie(self):
         return (self.playerNumber == DEFAULT_GOALIE_NUMBER)
-
-    def isDefaultChaser(self):
-        return (self.playerNumber == DEFAULT_CHASER_NUMBER)
-
-    def isDefaultOffender(self):
-        return (self.playerNumber == DEFAULT_OFFENDER_NUMBER)
-
-    def isDefaultDefender(self):
-        return (self.playerNumber == DEFAULT_DEFENDER_NUMBER)
-
-    def isDefaultMiddie(self):
-        return (self.playerNumber == DEFAULT_MIDDIE_NUMBER)
 
     def __str__(self):
         return "I am player number " + self.playerNumber

@@ -161,7 +161,7 @@ void WorldView::updateStatus(messages::WorldModel msg, int index)
     }
     else
     {
-        roleLabels[index]->setText(roles[msg.role()]);
+        roleLabels[index]->setText(roles[msg.role() - 1]);
     }
 }
 

@@ -162,30 +162,30 @@ class Brain(object):
         sys.stdout.flush()
 
     def updateComm(self):
+        me = self.teamMembers[self.playerNumber - 1]
         output = self.interface.myWorldModel
 
         output.timestamp = int(self.time * 1000)
-
         output.my_x = self.loc.x
         output.my_y = self.loc.y
         output.my_h = self.loc.h
-
         output.my_uncert = self.locUncert
-
-        output.ball_on = self.ball.vis.on
-
+        output.walking_to_x = self.nav.walkingToX
+        output.walking_to_y = self.nav.walkingToY
+        output.ball_on = self.ball.vis.frames_on > 0
+        output.ball_age = self.ball.vis.frames_off*30
         output.ball_dist = self.ball.distance
         output.ball_bearing = self.ball.bearing_deg
-
-        #TODO get actual uncertainties, or transition to rel_x
-        output.ball_dist_uncert = 0
-        output.ball_bearing_uncert = 0
-
-        output.role = self.teamMembers[self.playerNumber-1].role
-
-        output.active = self.teamMembers[self.playerNumber-1].active
+        output.ball_vel_x = self.ball.vel_x
+        output.ball_vel_y = self.ball.vel_y
+        output.ball_uncert = 0
+        output.role = me.role
         output.in_kicking_state = self.player.inKickingState
-
+        if self.player.inKickingState:
+            output.kicking_to_x = self.player.kick.destinationX
+            output.kicking_to_y = self.player.kick.destinationY
+        output.active = me.active
+        output.fallen = self.fallController.falling or self.fallController.fell
         output.claimed_ball = self.player.claimedBall
 
     def getCommUpdate(self):

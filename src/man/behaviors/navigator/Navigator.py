@@ -3,7 +3,7 @@ from . import NavStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from objects import RobotLocation, RelRobotLocation
+from objects import RobotLocation, RelLocation, RelRobotLocation
 from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
@@ -44,6 +44,8 @@ class Navigator(FSA.FSA):
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
+        self.walkingToX = 0
+        self.walkingToY = 0
 
         #transitions
         #@todo: move this to the actual transitions file?
@@ -85,19 +87,15 @@ class Navigator(FSA.FSA):
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
 
-    def positionPlaybook(self):
-        """
-        Calls goTo on the playbook position
-        """
-        self.goTo(self.brain.play.getPositionCoord(), precision = PLAYBOOK,
-                  speed = QUICK_SPEED, avoidObstacles = True, fast = True, pb = True)
-
     def chaseBall(self, speed = FAST_SPEED, fast = False):
         """
         Calls goTo on ball, which should be a RobotLocation.
 
         Theoretically walks into the ball, so make sure to switch the behavior beforehand.
         """
+        self.walkingToX = self.brain.ball.x
+        self.walkingToY = self.brain.ball.y
+
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
@@ -143,6 +141,12 @@ class Navigator(FSA.FSA):
         requested heading until we are actually close to the (x, y) position, so we can
         walk fast to the destination then correct heading once we get there.
         """
+        if isinstance(dest,RelLocation) or isinstance(dest,RelRobotLocation):
+            self.walkingToX = self.brain.loc.x + dest.relX
+            self.walkingToY = self.brain.loc.y + dest.relY
+        else:
+            self.walkingToX = dest.x
+            self.walkingToY = dest.y
 
         # Debug prints for motion status (seeking the walking not walking bug)
         if DEBUG_MOTION_STATUS:
@@ -166,6 +170,13 @@ class Navigator(FSA.FSA):
 
     def updateDest(self, dest, speed = KEEP_SAME_SPEED):
         """  Update the destination we're headed to   """
+        if isinstance(dest,RelLocation) or isinstance(dest,RelRobotLocation):
+            self.walkingToX = self.brain.loc.x + dest.relX
+            self.walkingToY = self.brain.loc.y + dest.relY
+        else:
+            self.walkingToX = dest.x
+            self.walkingToY = dest.y
+
         NavStates.goToPosition.dest = dest
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
@@ -182,6 +193,9 @@ class Navigator(FSA.FSA):
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
 
+        self.walkingToX = self.brain.loc.x + walkToDest.relX
+        self.walkingToY = self.brain.loc.y + walkToDest.relY
+
         NavStates.destinationWalkingTo.destQueue.clear()
 
         NavStates.destinationWalkingTo.destQueue.append(walkToDest)
@@ -195,6 +209,9 @@ class Navigator(FSA.FSA):
 
     def updateDestinationWalkDest(self, dest):
         """  Update the destination we're headed to   """
+        self.walkingToX = self.brain.loc.x + dest.relX
+        self.walkingToY = self.brain.loc.y + dest.relY
+
         NavStates.destinationWalkingTo.destQueue.append(dest)
 
     def walkTo(self, walkToDest, speed = FULL_SPEED):
@@ -211,6 +228,9 @@ class Navigator(FSA.FSA):
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
 
+        self.walkingToX = self.brain.loc.x + dest.relX
+        self.walkingToY = self.brain.loc.y + dest.relY
+
         NavStates.walkingTo.destQueue.clear()
 
         NavStates.walkingTo.destQueue.append(walkToDest)
@@ -225,6 +245,9 @@ class Navigator(FSA.FSA):
         This is the same as standing because to end a walk
         we just make it stand
         """
+        self.walkingToX = self.brain.loc.x
+        self.walkingToY = self.brain.loc.y
+
         if self.currentState not in ['stopped', 'stand', 'standing']:
             self.stand()
 
@@ -233,6 +256,9 @@ class Navigator(FSA.FSA):
         Starts a new velocity walk command.
         Does nothing if it the velocities the same as the current velocities.
         """
+        self.walkingToX = self.brain.loc.x + x
+        self.walkingToY = self.brain.loc.y + y
+
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
 
@@ -241,6 +267,9 @@ class Navigator(FSA.FSA):
         Enques a motion kick. Does not transition to an FSA state, so that
         motion kicking can be done with any of our walks.
         """
+        self.walkingToX = self.brain.loc.x + ball_rel_x
+        self.walkingToY = self.brain.loc.y + ball_rel_y
+
         helper.createAndSendMotionKickVector(player, ball_rel_x, ball_rel_y, kick)
 
     def stand(self):
@@ -248,6 +277,9 @@ class Navigator(FSA.FSA):
         Make the robot stand. Standing should be the default action when we're not
         walking/executing a sweet move.
         """
+        self.walkingToX = self.brain.loc.x
+        self.walkingToY = self.brain.loc.y
+
         self.switchTo('stand')
 
     # informative methods

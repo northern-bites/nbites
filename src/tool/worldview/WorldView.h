@@ -49,13 +49,10 @@ protected slots:
     void teamChanged();
 };
 
-static const QString roles[] = {QString("CHASER"),
-                                QString("MIDDIE"),
-                                QString("OFFENDER"),
-                                QString("DEFENDER"),
-                                QString("GOALIE"),
-                                QString("PENALTY_ROLE"),
-                                QString("INIT_ROLE")};
-
+static const QString roles[] = {QString("GOALIE"),
+                                QString("LEFT DEFENDER"),
+                                QString("RIGHT DEFENDER"),
+                                QString("CHASER #1"),
+                                QString("CHASER #2")};
 }
 }
