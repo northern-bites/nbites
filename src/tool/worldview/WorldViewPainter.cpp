@@ -38,7 +38,7 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
 
     QPainter painter(this);
     painter.translate(0, FIELD_GREEN_HEIGHT);
-    painter.scale(1, -1);
+    painter.scale(scaleFactor, -scaleFactor);
 
     Qt::GlobalColor brushColor = Qt::cyan;
     if (msg.fallen())

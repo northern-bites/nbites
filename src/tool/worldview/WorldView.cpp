@@ -18,7 +18,12 @@ WorldView::WorldView(QWidget* parent)
     commThread.addModule(*this);
     commThread.addModule(wviewComm);
 
-    fieldPainter = new WorldViewPainter(this);
+#ifdef USING_LAB_FIELD
+    fieldPainter = new WorldViewPainter(this, 2.);
+#else
+    fieldPainter = new WorldViewPainter(this, 1.);
+#endif
+
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
     QHBoxLayout *field = new QHBoxLayout();
