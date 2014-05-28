@@ -50,7 +50,8 @@ def gameReady(player):
         if player.lastDiffState == 'gameInitial':
             player.brain.resetInitialLocalization()
 
-        if player.lastDiffState == 'gamePenalized':
+        if player.wasPenalized:
+            player.wasPenalized = False
             return player.goNow('afterPenalty')
 
     # Wait until the sensors are calibrated before moving.
@@ -87,20 +88,21 @@ def gamePlaying(player):
         player.brain.nav.stand()
         player.brain.tracker.trackBall()
 
-    # Wait until the sensors are calibrated before moving.
-    if not player.brain.motion.calibrated:
-        return player.stay()
-    if player.lastDiffState == 'gamePenalized':
-        print 'Player coming out of penalized state after ' + str(player.lastStateTime) + ' seconds in last state'
-        if player.lastStateTime > 5:
-            return player.goNow('afterPenalty')
     # TODO without pb, is this an issue?
     # if (player.lastDiffState == 'afterPenalty' and
     #     player.brain.play.isChaser()):
     #     # special behavior case
     #     return player.goNow('postPenaltyChaser')
+    # Wait until the sensors are calibrated before moving.
 
-    if (player.isKickingOff and player.brain.gameController.ownKickOff and 
+    if player.wasPenalized:
+        player.wasPenalized = False
+        return player.goNow('afterPenalty')
+
+    if not player.brain.motion.calibrated:
+        return player.stay()
+
+    if (player.isKickingOff and player.brain.gameController.ownKickOff and
         player.brain.gameController.timeSincePlaying < 10):
         player.shouldKickOff = True
         return player.goNow('approachBall')
@@ -133,6 +135,7 @@ def gamePenalized(player):
         player.brain.fallController.enabled = False
         player.stand()
         player.penalizeHeads()
+        player.wasPenalized = True
 
     return player.stay()
 
@@ -156,6 +159,7 @@ waitForKickoff.ballRelY = "the relY position of the ball when we started"
 @superState('gameControllerResponder')
 def penaltyShotsGameSet(player):
     if player.firstFrame():
+        player.gainsOn()
         player.stand()
         player.inKickingState = False
         player.brain.fallController.enabled = False
@@ -184,4 +188,10 @@ def penaltyShotsGamePlaying(player):
     if (not player.brain.motion.calibrated):
         return player.stay()
 
-    return player.goNow('chase')
+    return player.goNow('prepareForPenaltyKick')
+
+
+@superState('gameControllerResponder')
+def fallen(player):
+    player.inKickingState = False
+    return player.stay()

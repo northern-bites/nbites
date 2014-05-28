@@ -11,7 +11,6 @@ from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location
 import noggin_constants as nogginConstants
-import BoxTransitions
 import time
 
 DRIBBLE_ON_KICKOFF = False
@@ -75,7 +74,7 @@ def prepareForKick(player):
         player.inKickingState = False
         return player.goLater('chase')
 
-    player.kick = prepareForKick.decider.pBrunswick()
+    player.kick = prepareForKick.decider.closeToGoal()
 
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
@@ -316,10 +315,10 @@ def positionForPenaltyKick(player):
         player.inKickingState = True
         positionForPenaltyKick.yes = False
         if player.brain.ball.rel_y > 0:
-            player.kick = kicks.LEFT_STRAIGHT_KICK
+            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
             print "Kicking with left"
         else:
-            player.kick = kicks.RIGHT_STRAIGHT_KICK
+            player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             print "Kicking with right"
 
     if (transitions.shouldApproachBallAgain(player) or

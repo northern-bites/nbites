@@ -7,7 +7,7 @@ isKickingOff = False # default is false, changed by pBrunswick or some other if
 boxBuffer = 100 # Used for the buffered box when approach ball is potentially
                 # going to transition out and into 'positionAtHome'
 
-oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 20,
+oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
                                 NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 20)
 
@@ -62,10 +62,15 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
 #
 # Useful constants can be found in src/share/include/FieldConstants.h
 
-oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
+defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
-evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
-                   NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+oddDefenderBox = defenderBox
+evenDefenderBox = defenderBox
+
+# oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
+
+# evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
+#                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
 chaserBox = ((0, 0), 1100, 800)
 
@@ -73,7 +78,7 @@ cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.CENTER
                     NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X, NogginConstants.FIELD_WHITE_HEIGHT)
 
 def setRoleConstants(player, role):
-    player.role = 3
+    player.role = role
     if role == 2:
         player.homePosition = evenDefenderHome
         player.kickoffPosition = evenDefenderHome
@@ -83,14 +88,14 @@ def setRoleConstants(player, role):
         player.homePosition = oddDefenderHome
         player.kickoffPosition = oddDefenderHome
         player.box = oddDefenderBox
-        player.kickingOff = False
+        player.isKickingOff = False
     elif role == 4:
         player.homePosition = evenChaserHome
         player.kickoffPosition = theirKickoff
         player.box = chaserBox
-        isKickingOff = True
+        player.isKickingOff = True
     elif role == 5:
         player.homePosition = oddChaserHome
         player.kickoffPosition = cherryPickerKickoff
         player.box = chaserBox
-        isKickingOff = False
+        player.isKickingOff = False

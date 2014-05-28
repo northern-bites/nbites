@@ -10,16 +10,12 @@ from . import PositionStates
 from . import PenaltyStates
 from . import FindBallStates
 from . import KickingStates
-from . import PenaltyKickStates
-from . import GoaliePositionStates
-from . import GoalieSaveStates
 from . import DribbleStates
 from . import BoxPositionStates
 
 import noggin_constants as NogginConstants
 
 from . import BoxPositionConstants as BPConstants
-from ..playbook import PBConstants
 
 from objects import Location
 
@@ -38,7 +34,6 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(DribbleStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
-        self.addStates(PenaltyKickStates)
         self.setName('pBrunswick')
         self.currentState = 'fallController' # initial state
 
@@ -57,6 +52,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.penaltyKicking = False
         # Kickoff kick
         self.shouldKickOff = False
+        # To keep track of when we are coming out of penalty
+        self.wasPenalized = False
         # Controls whether we check for a falling/fallen robot
         self.brain.fallController.enabled = True
         # Controls whether we want to dribble it from the corner
@@ -64,4 +61,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         # Controls whether we do a motion kick
         self.motionKick = False
         # Controls whether we will role switch
-        self.roleSwitching = True
+        self.roleSwitching = False
+        # Controls whether we use claims
+        self.useClaims = True
+        self.returningFromPenalty = False

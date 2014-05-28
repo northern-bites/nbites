@@ -1225,32 +1225,33 @@ LEFT_SHORT_BACK_KICK = (
 RIGHT_SHORT_BACK_KICK =  mirrorMove(LEFT_SHORT_BACK_KICK)
 
 LEFT_BIG_KICK = (
+
     #Raise stable arms
     ((80.,40.,-50.,-70.),
      (0.,0.,-15.,20.,-10.,0.),
      (0.,0.,-15.,20.,-10.,0.),
      (80.,-40.,50.,70.),
-     0.6,1, stiff.NORMAL_STIFFNESSES),
+     0.7,1, stiff.NORMAL_STIFFNESSES),
 
     #Lean right
-    ((80.,40.,-50.,-70.),
+     ((65.2, 70.8, -52.5, -44.3),
      (0.,15.,-20.,20.,-10.,-20.),
      (0.,12.,-20.,20.,-8.,-18.),
      (80.,-40.,50.,70.),
-     1,1, stiff.NORMAL_STIFFNESSES),
+     0.6,1, stiff.NORMAL_STIFFNESSES),
 
     #Lift left leg
-    ((80.,40.,-50.,-70.),
+    ((65.2, 70.8, -52.5, -44.3),
      (0.,15.,-55.,85.,0,-20.),
      (0.,11,-20.,16.,-8.,-18.),
      (80.,-40.,50.,70.),
-     1,0, stiff.NORMAL_STIFFNESSES),
+     0.5,0, stiff.NORMAL_STIFFNESSES),
 
     #Cock left leg
     ((20.,40.,0.,0.),
-     (0.,15.,-32.,120.,0.,-20.),
-     (0.,11.,-22.,16.,-8.,-18.),
-     (100.,-40.,0.,0.),
+    (0.,15.,-32.,120.,0.,-20.),
+    (0.,11.,-22.,16.,-8.,-18.),
+    (100.,-40.,0.,0.),
      0.6,0, stiff.NORMAL_STIFFNESSES),
 
     #Kick left leg
@@ -1260,19 +1261,19 @@ LEFT_BIG_KICK = (
      (20.,-40.,0.,0.),
      0.2,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
 
-    #Back to lifting leg
-    ((80.,40.,-50.,-70.),
-     (0.,15.,-55.,85.,0,-20.),
-     (0.,11,-20.,16.,-8.,-18.),
-     (80.,-40.,50.,70.),
-     0.8,0, stiff.NORMAL_STIFFNESSES),
+     # move foot down
+     ((65.2, 8.9, -0.2, -1.5),
+      (-4.5, 4.6, -36.2, 34.0, -7.8, -6.1),
+      (0.0, 6.2, -35.3, 37.6, -12.9, -6.0),
+      (62.4, -6.6, 0.2, 2.5),
+      0.6,0, stiff.NORMAL_STIFFNESSES),
 
-    #Put foot down
-    ((80.,40.,-50.,-70.),
-     (0.,15.,-32,42.,-20,-10.),
-     (0.,13.,-20.,20.,-10.,-19.),
-     (80.,-40.,50.,70.),
-     0.8,0, stiff.LEFT_FAR_KICK_STIFFNESSES),
+     #stand up close to initial pos
+     ((89.5, 8.3, -88.9, -9.4),
+      (0.0, -0.1, -22.1, 43.5, -21.4, 0.0),
+      (0.0, 0.0, -22.3, 43.5, -21.2, 0.2),
+      (89.5, -8.2, 81.5, 12.7),
+      0.8,0, stiff.NORMAL_STIFFNESSES),
 
     INITIAL_POS_KEYFRAME,
     )
