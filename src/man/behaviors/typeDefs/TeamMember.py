@@ -1,4 +1,4 @@
-from objects import (RobotLocation, Location, RelRobotLocation)
+from objects import (RobotLocation, Location, RelLocation, RelRobotLocation)
 from math import fabs, degrees
 import time
 import noggin_constants as NogginConstants
@@ -79,8 +79,17 @@ class TeamMember(RobotLocation):
 
         self.locUncert = self.brain.locUncert
 
-        self.walkingToX = self.brain.nav.walkingToX
-        self.walkingToY = self.brain.nav.walkingToX
+        if self.brain.nav.destination:
+            if (isinstance(self.brain.nav.destination,RelLocation) or 
+                isinstance(self.brain.nav.destination,RelRobotLocation)):
+                self.walkingToX = self.brain.loc.x + self.brain.nav.destination.relX
+                self.walkingToY = self.brain.loc.y + self.brain.nav.destination.relY
+            else:
+                self.walkingToX = self.brain.nav.destination.x
+                self.walkingToY = self.brain.nav.destination.y
+        else:
+            self.walkingToX = self.brain.loc.x
+            self.walkingToY = self.brain.loc.y
 
         self.ballOn = ball.vis.frames_on > 0
         # TODO -1 when ball has not been seen
