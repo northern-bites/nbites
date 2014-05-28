@@ -3,7 +3,7 @@
  * @class UnlogBase
  *
  * The UnlogModule is a templated class that can read from a file and parse
-n * the contents of that file into a protobuf of its template type. It is
+ * the contents of that file into a protobuf of its template type. It is
  * only passed a filename, so another piece of code needs to try to match
  * the file with the correct type of protobuf in order to create the unlogger
  * appropriately.
