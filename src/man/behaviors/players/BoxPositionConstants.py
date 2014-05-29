@@ -1,26 +1,37 @@
 import noggin_constants as NogginConstants
 from objects import RobotLocation
 
-isDefender = False # default is false, changed by pBrunswick or some other if
-                   # this is not the case
+isKickingOff = False # default is false, changed by pBrunswick or some other if
+                     # this is not the case
 
-oddDefenderHome = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
-                                NogginConstants.GREEN_PAD_Y + 50,
+boxBuffer = 100 # Used for the buffered box when approach ball is potentially
+                # going to transition out and into 'positionAtHome'
+
+oddDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 50,
+                                NogginConstants.MY_GOALBOX_BOTTOM_Y,
                                 20)
 
-evenDefenderHome = RobotLocation(NogginConstants.MY_GOALBOX_RIGHT_X,
-                                 NogginConstants.FIELD_GREEN_HEIGHT - 170,
+evenDefenderHome = RobotLocation(NogginConstants.BLUE_GOALBOX_RIGHT_X + 100,
+                                 NogginConstants.MY_GOALBOX_TOP_Y,
                                  -20)
 
 oddChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
-                              NogginConstants.GREEN_PAD_Y + 10,
+                              NogginConstants.GREEN_PAD_Y + 100,
                               90)
 
 evenChaserHome = RobotLocation(NogginConstants.CENTER_FIELD_X,
-                               NogginConstants.FIELD_GREEN_HEIGHT - 10,
+                               NogginConstants.FIELD_GREEN_HEIGHT - 100,
                                -90)
 
-ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X,
+cherryPickerHome = RobotLocation(NogginConstants.OPP_GOALBOX_LEFT_X,
+                                 NogginConstants.OPP_GOALBOX_BOTTOM_Y,
+                                 90)
+
+cherryPickerKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 10,
+                                    NogginConstants.OPP_GOALBOX_BOTTOM_Y,
+                                    0)
+
+ourKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - 20,
                            NogginConstants.CENTER_FIELD_Y,
                            0)
 
@@ -29,25 +40,62 @@ theirKickoff = RobotLocation(NogginConstants.CENTER_FIELD_X - \
                              NogginConstants.CENTER_FIELD_Y,
                              0)
 
-# These values are in cm, with the origin defined as the right corner of the
-# field closest to your own goal
-
-#   |                   |   ^
-#   |                   |   |
-#   |                   |   | X-axis
-#   |                   |   |
-#   |                   |
-#   |                   |
-#   |______o=====o______| <--origin
+# These values are in cm, with the origin defined as the bottom corner of the
+# field closest to your own goal (when you have your goal to your left)
 #
-#          <-------Y-axis
-
+#           ______________________________________
+#           |
+#           |
+#           |
+#           o
+#           \
+# our goal  \ ^
+#     --->  \ |
+#           o | Y-axis
+#           | |
+#           | |
+#           | -------------> X-axis
+# origin--> _______________________________________
+#
 # A BOX is defined as:
-# ((lower-LEFT X, lower-LEFT Y), Height (X value), Width (Y value))
+# ((lower-LEFT X, lower-LEFT Y), Width (X value), Height (Y value))
+#
+# Useful constants can be found in src/share/include/FieldConstants.h
 
-oddDefenderBox = ((0, 0), 350, 300)
+defenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
 
-evenDefenderBox = ((0, 300), 350, 300)
+oddDefenderBox = defenderBox
+evenDefenderBox = defenderBox
 
-chaserBox = ((0, 0), 900, 600)
+# oddDefenderBox = ((0, 0), NogginConstants.CENTER_FIELD_X, NogginConstants.CENTER_FIELD_Y + 75)
 
+# evenDefenderBox = ((0, NogginConstants.CENTER_FIELD_Y - 75), NogginConstants.CENTER_FIELD_X, \
+#                    NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.GREEN_PAD_Y)
+
+chaserBox = ((0, 0), 1100, 800)
+
+cherryPickerBox = (((NogginConstants.FIELD_WHITE_HEIGHT + NogginConstants.CENTER_FIELD_X)/2, 0), \
+                    NogginConstants.FIELD_WHITE_RIGHT_SIDELINE_X, NogginConstants.FIELD_WHITE_HEIGHT)
+
+def setRoleConstants(player, role):
+    player.role = role
+    if role == 2:
+        player.homePosition = evenDefenderHome
+        player.kickoffPosition = evenDefenderHome
+        player.box = evenDefenderBox
+        player.isKickingOff = False
+    elif role == 3:
+        player.homePosition = oddDefenderHome
+        player.kickoffPosition = oddDefenderHome
+        player.box = oddDefenderBox
+        player.isKickingOff = False
+    elif role == 4:
+        player.homePosition = evenChaserHome
+        player.kickoffPosition = theirKickoff
+        player.box = chaserBox
+        player.isKickingOff = True
+    elif role == 5:
+        player.homePosition = oddChaserHome
+        player.kickoffPosition = cherryPickerKickoff
+        player.box = chaserBox
+        player.isKickingOff = False

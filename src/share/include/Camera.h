@@ -81,41 +81,74 @@ public:
     /*
      * Camera Parameters Go Here
      */
+    // // SEARLES CAMERA PARAMETERS
+    // // TOP SETTINGS
+    // static const bool TOP_H_FLIP = 1;
+    // static const bool TOP_V_FLIP = 1;
+    // static const bool TOP_AUTO_EXPOSURE = 0;
+    // static const int TOP_BRIGHTNESS = 128;
+    // static const int TOP_CONTRAST = 58;
+    // static const int TOP_SATURATION = 134;
+    // static const int TOP_HUE = 0;
+    // static const int TOP_SHARPNESS = 3;
+    // static const bool TOP_AUTO_WHITEBALANCE = 0;
+    // static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
+    // static const int TOP_EXPOSURE = 36;
+    // static const int TOP_GAIN = 53;
+    // static const int TOP_WHITE_BALANCE = 3300;
+    // static const bool TOP_FADE_TO_BLACK = 0;
 
-    // SEARLES CAMERA PARAMETERS
+    // // BOTTOM SETTINGS
+    // static const bool BOTTOM_H_FLIP = 0;
+    // static const bool BOTTOM_V_FLIP = 0;
+    // static const bool BOTTOM_AUTO_EXPOSURE = 0;
+    // static const int BOTTOM_BRIGHTNESS = 124;
+    // static const int BOTTOM_CONTRAST = 56;
+    // static const int BOTTOM_SATURATION = 122;
+    // static const int BOTTOM_HUE = 0;
+    // static const int BOTTOM_SHARPNESS = 3;
+    // static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
+    // static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
+    // static const int BOTTOM_EXPOSURE = 35;
+    // static const int BOTTOM_GAIN = 62;
+    // static const int BOTTOM_WHITE_BALANCE = 3200;
+    // static const bool BOTTOM_FADE_TO_BLACK = 0;
+
+    // WATSON 2014 CAMERA PARAMETERS
     // TOP SETTINGS
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
-    static const int TOP_BRIGHTNESS = 128;
-    static const int TOP_CONTRAST = 58;
-    static const int TOP_SATURATION = 134;
+    static const int TOP_BRIGHTNESS = 84;
+    static const int TOP_CONTRAST = 45;
+    static const int TOP_SATURATION = 120;
     static const int TOP_HUE = 0;
     static const int TOP_SHARPNESS = 3;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    static const int TOP_EXPOSURE = 36;
-    static const int TOP_GAIN = 53;
-    static const int TOP_WHITE_BALANCE = 3300;
+    static const int TOP_EXPOSURE = 43;
+    static const int TOP_GAIN = 62;
+    static const int TOP_WHITE_BALANCE = 5500;
     static const bool TOP_FADE_TO_BLACK = 0;
 
     // BOTTOM SETTINGS
     static const bool BOTTOM_H_FLIP = 0;
     static const bool BOTTOM_V_FLIP = 0;
     static const bool BOTTOM_AUTO_EXPOSURE = 0;
-    static const int BOTTOM_BRIGHTNESS = 124;
-    static const int BOTTOM_CONTRAST = 56;
-    static const int BOTTOM_SATURATION = 122;
+    static const int BOTTOM_BRIGHTNESS = 96;
+    static const int BOTTOM_CONTRAST = 45;
+    static const int BOTTOM_SATURATION = 124;
     static const int BOTTOM_HUE = 0;
     static const int BOTTOM_SHARPNESS = 3;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 35;
-    static const int BOTTOM_GAIN = 62;
-    static const int BOTTOM_WHITE_BALANCE = 3200;
+    static const int BOTTOM_EXPOSURE = 43;
+    static const int BOTTOM_GAIN = 65;
+    static const int BOTTOM_WHITE_BALANCE = 5500;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
 
     static const Type getOtherCameraType(Type type) {
+
         if (type == TOP) {
             return BOTTOM;
         } else {

@@ -37,10 +37,10 @@ void CameraCalibrate::UpdateByName(std::string name)
     float paramsBottom[] = {0.0f, 0.0f};
 
     if (name == "river") {
-        paramsTop[ROLL] = -0.02f;
-        paramsTop[PITCH] = -0.06f;
-        paramsBottom[ROLL] = -0.02f;
-        paramsBottom[PITCH] = 0.0f;
+        paramsTop[ROLL] = -0.03f;
+        paramsTop[PITCH] = -0.04f;
+        paramsBottom[ROLL] = -0.03f;
+        paramsBottom[PITCH] = 0.03f;
     } else if (name == "mal") {
         paramsTop[ROLL] = -0.01f;
         paramsTop[PITCH] = -0.06f;
@@ -52,30 +52,30 @@ void CameraCalibrate::UpdateByName(std::string name)
         paramsBottom[ROLL] = 0.0f;
         paramsBottom[PITCH] = -0.01f;
     } else if (name == "jayne") {
-        paramsTop[ROLL] = 0.01f;
+        paramsTop[ROLL] = 0.03f;
         paramsTop[PITCH] = 0.03f;
         paramsBottom[ROLL] = 0.02f;
         paramsBottom[PITCH] = 0.0f;
     } else if (name == "wash") {
         paramsTop[ROLL] = -0.02f;
         paramsTop[PITCH] = 0.01f;
-        paramsBottom[ROLL] = -0.01f;
+        paramsBottom[ROLL] = -0.04f;
         paramsBottom[PITCH] = 0.02f;
     } else if (name == "kaylee") {
-        paramsTop[ROLL] = 0.02f;
-        paramsTop[PITCH] = 0.10f;
-        paramsBottom[ROLL] = 0.0f;
-        paramsBottom[PITCH] = 0.10f;
+        paramsTop[ROLL] = 0.01f;
+        paramsTop[PITCH] = 0.15f;
+        paramsBottom[ROLL] = -0.03f;
+        paramsBottom[PITCH] = 0.12f;
     } else if (name == "vera") {
-        paramsTop[ROLL] = -0.02f;
-        paramsTop[PITCH] = 0.07f;
-        paramsBottom[ROLL] = -0.01f;
+        paramsTop[ROLL] = -0.03f;
+        paramsTop[PITCH] = 0.06f;
+        paramsBottom[ROLL] = -0.03f;
         paramsBottom[PITCH] = 0.09f;
     } else if (name == "inara") {
         paramsTop[ROLL] = -0.01f;
-        paramsTop[PITCH] = 0.09f;
-        paramsBottom[ROLL] = -0.04f;
-        paramsBottom[PITCH] = 0.07f;
+        paramsTop[PITCH] = 0.10f;
+        paramsBottom[ROLL] = 0.0f;
+        paramsBottom[PITCH] = 0.08f;
     } else if (name == "simon") {
         paramsTop[ROLL] = 0.01f;
         paramsTop[PITCH] = 0.10f;

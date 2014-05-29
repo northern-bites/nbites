@@ -1,13 +1,18 @@
+"""
+@Summer 2013: This entire state is an aid for localization, since we can only
+hard reset to one of the two possible post-penalty positions.
+"""
+
 import ChaseBallTransitions as transitions
+import BoxPositionConstants as BPConstants
 from math import copysign, fabs
 from objects import RelRobotLocation
+from ..util import *
 
 DEBUG_PENALTY_STATES = False
 OBJ_SEEN_THRESH = 6
 
-# @Summer 2012: This entire state appears to be a hack for localization.
-# @Summer 2013: This entire state is an aid for localization, since we can only
-#               hard reset to one of the two possible post-penalty positions.
+@superState('gameControllerResponder')
 def afterPenalty(player):
 
     if player.firstFrame():
@@ -111,29 +116,51 @@ def afterPenalty(player):
         # Yes, when goal_right is less than 0, our goal is to our right.
         # It seems counter intuitive, but that's how it works. -Josh Z
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
+        return player.goNow('determineRole')
+
+
+    return player.stay()
+
+# @superState('gameControllerResponder')
+# def postPenaltyChaser(player):
+#     """
+#     If we come out of penalty directly into chaser, we'll waste
+#     time spinning on the side of the field. Instead, if we didn't
+#     see the ball during afterPenalty, odometry walk onto the field
+#     before spinning.
+#     """
+#     if player.firstFrame():
+#         player.brain.nav.walkTo(RelRobotLocation(200,0,0))
+#         player.brain.tracker.trackBall()
+#     elif (player.brain.nav.isStopped() or
+#           transitions.shouldChaseBall(player)):
+#         return player.goLater('chase')
+#
+#     if not player.brain.play.isChaser():
+#         # We've role switched out naturally. Go to appropriate state.
+#         player.stopWalking() # walkTo is a bit dangerous. do this to be careful.
+#         if player.usingBoxPositions:
+#             return player.goLater('positionAtHome')
+#         return player.goLater('playbookPosition')
+#
+#     return player.stay()
+@superState('gameControllerResponder')
+def determineRole(player):
+    if not player.roleSwitching:
         return player.goLater(player.gameState)
 
-    return player.stay()
+    openSpaces = [True, True, True, True]
+    for mate in player.brain.teamMembers:
+        if mate.role != 1 and mate.active:
+            openSpaces[mate.role - 2] = False
 
-def postPenaltyChaser(player):
-    """
-    If we come out of penalty directly into chaser, we'll waste
-    time spinning on the side of the field. Instead, if we didn't
-    see the ball during afterPenalty, odometry walk onto the field
-    before spinning.
-    """
-    if player.firstFrame():
-        player.brain.nav.walkTo(RelRobotLocation(200,0,0))
-        player.brain.tracker.trackBall()
-    elif (player.brain.nav.isStopped() or
-          transitions.shouldChaseBall(player)):
-        return player.goLater('chase')
+    if openSpaces[3]:
+        BPConstants.setRoleConstants(player, 5)
+    if openSpaces[2]:
+        BPConstants.setRoleConstants(player, 4)
+    elif openSpaces[1]:
+        BPConstants.setRoleConstants(player, 3)
+    elif openSpaces[0]:
+        BPConstants.setRoleConstants(player, 2)
 
-    if not player.brain.play.isChaser():
-        # We've role switched out naturally. Go to appropriate state.
-        player.stopWalking() # walkTo is a bit dangerous. do this to be careful.
-        if player.usingBoxPositions:
-            return player.goLater('positionAtHome')
-        return player.goLater('playbookPosition')
-
-    return player.stay()
+    return player.goLater(player.gameState)

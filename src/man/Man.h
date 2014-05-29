@@ -27,7 +27,6 @@
 
 #include <vector>
 
-
 namespace man {
 
 class Man : public AL::ALModule

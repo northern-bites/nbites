@@ -193,7 +193,7 @@ void GameStateModule::reset()
     messages::TeamInfo* myTeam = latest_data.add_team();
     myTeam->set_team_number(team_number);
     myTeam->set_team_color(TEAM_BLUE);
-    myTeam->set_goal_color(GOAL_YELLOW);
+    myTeam->set_goal_color(1); // TODO eliminate goal color
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         messages::RobotInfo* player = myTeam->add_player();
@@ -203,7 +203,7 @@ void GameStateModule::reset()
     messages::TeamInfo* them = latest_data.add_team();
     them->set_team_number(0);
     them->set_team_color(TEAM_RED);
-    them->set_goal_color(GOAL_YELLOW);
+    them->set_goal_color(1); // TODO eliminate goal color
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         messages::RobotInfo* player = them->add_player();
