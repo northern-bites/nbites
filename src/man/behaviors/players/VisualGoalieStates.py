@@ -63,10 +63,10 @@ def clearIt(player):
         if clearIt.dangerousSide == -1:
             if player.brain.ball.rel_y < 0.0:
                 player.side = RIGHT
-                player.kick = kicks.RIGHT_STRAIGHT_KICK
+                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             else:
                 player.side = LEFT
-                player.kick = kicks.LEFT_STRAIGHT_KICK
+                player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
         elif clearIt.dangerousSide == RIGHT:
             player.side = RIGHT
             player.kick = kicks.RIGHT_SIDE_KICK
@@ -164,9 +164,9 @@ def repositionAfterWhiff(player):
         if player.kick in [kicks.RIGHT_SIDE_KICK, kicks.LEFT_SIDE_KICK]:
             pass
         elif player.brain.ball.rel_y < 0.0:
-            player.kick = kicks.RIGHT_STRAIGHT_KICK
+            player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
         else:
-            player.kick = kicks.LEFT_STRAIGHT_KICK
+            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
 
         kickPose = player.kick.getPosition()
         repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.rel_x -

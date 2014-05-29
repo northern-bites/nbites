@@ -1,5 +1,6 @@
 from . import SoccerFSA
 from . import FallControllerStates
+from . import RoleSwitchingStates
 from . import GameControllerStates
 from . import GoalieStates
 from . import VisualGoalieStates
@@ -17,6 +18,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         ### ADD STATES AND NAME FSA ###
         SoccerFSA.SoccerFSA.__init__(self,brain)
         self.addStates(FallControllerStates)
+        self.addStates(RoleSwitchingStates)
         self.addStates(GameControllerStates)
         self.addStates(GoalieStates)
         self.addStates(VisualGoalieStates)
@@ -25,6 +27,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.currentState = 'fallController' # initial state
 
         ### THE STATE OF THE PLAYER ###
+        self.role = 1
         self.squatTime = 0
         self.frameCounter = 0
         self.penaltyKicking = False
@@ -32,7 +35,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.returningFromPenalty = False
         self.side = RIGHT
         self.homeDirections = []
-        self.runFallController = True # should the FC run?
+        self.brain.fallController.enabled = True
+        self.roleSwitching = False
 
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###

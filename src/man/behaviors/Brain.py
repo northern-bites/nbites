@@ -14,10 +14,11 @@ from objects import Location, RobotLocation
 from . import Leds
 from . import robots
 from . import GameController
+from . import FallController
 
 # Packages and modules from sub-directories
 from .headTracker import HeadTracker
-from .typeDefs import (Play, TeamMember)
+from .typeDefs import TeamMember
 from .navigator import Navigator
 from .players import Switch
 from .kickDecider import KickDecider
@@ -57,6 +58,9 @@ class Brain(object):
         # Initalize the leds and game controller
         self.leds = Leds.Leds(self)
 
+        # Initialize fallController
+        self.fallController = FallController.FallController(self)
+
         # Retrieve our robot identification and set per-robot parameters
         self.CoA = robots.get_certificate()
 
@@ -80,7 +84,8 @@ class Brain(object):
         # Not FSAs
         self.gameController = GameController.GameController(self)
         self.kickDecider = KickDecider.KickDecider(self)
-        self.play = Play.Play()
+
+        self.player.claimedBall = False
 
         # Message interface
         self.interface = interface.interface
@@ -139,6 +144,7 @@ class Brain(object):
         # Behavior stuff
         # Order here is very important
         self.gameController.run()
+        self.fallController.run()
         self.player.run()
         self.tracker.run()
         self.nav.run()
@@ -151,6 +157,7 @@ class Brain(object):
 
         # Set myWorldModel for Comm
         self.updateComm()
+
         # Flush the output
         sys.stdout.flush()
 
@@ -179,7 +186,10 @@ class Brain(object):
         output.active = self.teamMembers[self.playerNumber-1].active
         output.in_kicking_state = self.player.inKickingState
 
+        output.claimed_ball = self.player.claimedBall
+
     def getCommUpdate(self):
+        self.teamMembers[self.playerNumber - 1].updateMe()
         self.game = self.interface.gameState
         for i in range(len(self.teamMembers)):
             if (i == self.playerNumber - 1):

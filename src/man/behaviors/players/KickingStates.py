@@ -6,7 +6,8 @@ from . import ChaseBallTransitions as transitions
 from . import ChaseBallConstants as constants
 from ..util import *
 from ..kickDecider import kicks
-from ..navigator import Navigator
+from ..navigator import Navigator as nav
+from objects import Location
 
 @superState('positionAndKickBall')
 def executeMotionKick(player):
@@ -67,14 +68,22 @@ def afterKick(player):
     if transitions.shouldKickAgain(player):
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
         return player.goNow('positionForKick')
-
-    if player.kick.isBackKick() and player.counter > 10:
-        return player.goNow('spinAfterBackKick')
+    elif transitions.shouldChaseBall(player):
+        return player.goLater('approachBall')
+    else:
+        destinationOfKick = Location(player.kick.destinationX,
+                                     player.kick.destinationY)
+        player.brain.nav.goTo(destinationOfKick, precision = nav.GENERAL_AREA,
+                              speed = nav.QUICK_SPEED, avoidObstacles = True,
+                              fast = True, pb = False)
 
     if player.penaltyKicking:
         return player.stay()
 
-    return player.goLater('approachBall')
+    if player.stateTime > 2:
+        return player.goLater('approachBall')
+
+    return player.stay()
 
 @superState('gameControllerResponder')
 def spinAfterBackKick(player):
