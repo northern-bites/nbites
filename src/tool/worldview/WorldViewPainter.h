@@ -21,6 +21,8 @@
 
 #include "RobotLocation.pb.h"
 #include "WorldModel.pb.h"
+#include "sharedball/SharedBall.h"
+#include "BallModel.pb.h"
 
 #include "Common.h"
 #include "NBMath.h"
@@ -36,6 +38,7 @@ public:
     WorldViewPainter(QWidget* parent = 0, float scaleFactor_ = 1.f);
 
     void updateWithLocationMessage(messages::WorldModel newLoc, int index);
+    void updateWithSharedBallMessage(messages::SharedBall sharedLoc);
 
 protected:
     // Paint the field
@@ -46,9 +49,12 @@ protected:
                             messages::WorldModel loc,
                             QString playerNum,
                             bool red = false);
+    void paintSharedBallLocation(QPaintEvent* event, messages::SharedBall msg);
 
 private:
     messages::WorldModel curLoc[NUM_PLAYERS_PER_TEAM];
+    messages::SharedBall sharedballLoc;
+
 };
 
 } // namespace worldview

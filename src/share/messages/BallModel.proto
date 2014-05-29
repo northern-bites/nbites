@@ -67,5 +67,5 @@ message SharedBall {
     optional float x = 1;
     optional float y = 2;
 
-    optional uint32 age = 3;
+    optional bool ball_on  = 3;
 }

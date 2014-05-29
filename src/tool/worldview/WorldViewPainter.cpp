@@ -19,6 +19,30 @@ void WorldViewPainter::paintEvent(QPaintEvent* event)
     {
         paintRobotLocation(event, curLoc[i], QString::number(i+1), true);
     }
+
+        paintSharedBallLocation(event, sharedballLoc);
+}
+
+void WorldViewPainter::paintSharedBallLocation(QPaintEvent* event,
+                                               messages::SharedBall msg)
+{
+
+    if (msg.ball_on()) {
+         QPainter painter(this);
+         painter.translate(0, FIELD_GREEN_HEIGHT);
+         painter.scale(1, -1);
+         QPoint ballCenter(msg.x(),
+                           msg.y());
+
+         //draw the weighted averaged location of the ball
+         painter.setBrush(QColor::fromRgb(153,0,153));
+         painter.drawEllipse(ballCenter,
+                             8,
+                             8);
+    }
+
+    return;
+
 }
 
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
@@ -98,6 +122,13 @@ void WorldViewPainter::updateWithLocationMessage(messages::WorldModel newLoc,
     curLoc[index] = newLoc;
     update();
 }
+
+void WorldViewPainter::updateWithSharedBallMessage(messages::SharedBall sharedLoc) {
+    sharedballLoc = sharedLoc;
+    update();
+
+}
+
 
 } // namespace worldview
 } // namespace tool
