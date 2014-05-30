@@ -995,6 +995,8 @@ LEFT_BIG_KICK = (
 
 RIGHT_BIG_KICK = mirrorMove(LEFT_BIG_KICK)
 
+
+
 LEFT_STRAIGHT_KICK = (
     #swing to the right
     ((20.,30.,0.,0.),
