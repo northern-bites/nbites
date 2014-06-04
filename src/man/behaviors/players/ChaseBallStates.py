@@ -42,7 +42,6 @@ def approachBall(player):
             print player.brain.ball.distance
             print player.brain.ball.vis.distance
 
-        # player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -96,7 +95,11 @@ def orbitBall(player):
         relH < constants.ORBIT_GOOD_BEARING):
         print "STOPPED! Because relH is: ", relH
         player.stopWalking()
-        # player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+        destinationX = player.kick.destinationX
+        destinationY = player.kick.destinationY
+        player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+        player.kick.destinationX = destinationX
+        player.kick.destinationY = destinationY
         return player.goNow('positionForKick')
 
     if (transitions.orbitTooLong(player) or
