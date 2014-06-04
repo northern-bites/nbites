@@ -120,7 +120,7 @@ void FieldDimensionsBH::drawLines() const
   });
 }
 
-void FieldDimensionsBH::drawPolygons(RoboCup::uint32 ownColor) const
+void FieldDimensionsBH::drawPolygons(uint32 ownColor) const
 {
   DECLARE_DEBUG_DRAWING("field polygons", "drawingOnField");
   COMPLEX_DRAWING("field polygons",

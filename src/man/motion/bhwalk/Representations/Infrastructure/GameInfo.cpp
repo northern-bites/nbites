@@ -12,7 +12,7 @@
 
 GameInfoBH::GameInfoBH() : timeLastPackageReceived(0)
 {
-  memset((RoboCup::RoboCupGameControlData*) this, 0, sizeof(RoboCup::RoboCupGameControlData));
+  memset((RoboCupGameControlData*) this, 0, sizeof(RoboCupGameControlData));
 }
 
 void GameInfoBH::serialize(In* in, Out* out)

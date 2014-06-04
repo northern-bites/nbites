@@ -45,7 +45,7 @@ public:
   float* getSensors();
 
   /** Accesses the lastst data from the GameController. */
-  const RoboCup::RoboCupGameControlData& getGameControlData() const;
+  const RoboCupGameControlData& getGameControlData() const;
 
   /** Accesses temperature sensors */
   void getTemperature(float& cpu, float& mb);

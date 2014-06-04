@@ -47,7 +47,7 @@ class NaoProvider : public NaoProviderBase
 private:
   NaoBody naoBody;
   KeyStatesBH keyStates; /**< The last key states received. */
-  RoboCup::RoboCupGameControlData gameControlData; /**< The last game control data received. */
+  RoboCupGameControlData gameControlData; /**< The last game control data received. */
   unsigned gameControlTimeStamp; /**< The time when the last gameControlData was received (kind of). */
 
 #ifndef RELEASE

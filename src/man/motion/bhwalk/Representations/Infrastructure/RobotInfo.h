@@ -13,7 +13,7 @@
 #include "RoboCupGameControlData.h"
 #include "Tools/Streams/Streamable.h"
 
-class RobotInfoBH : public RoboCup::RobotInfo, public Streamable
+class RobotInfoBH : public RobotInfo, public Streamable
 {
 private:
   /**

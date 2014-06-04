@@ -238,24 +238,24 @@ void NaoProvider::finishFrame()
 
 void NaoProvider::update(RobotInfoBH& robotInfo)
 {
-  RoboCup::TeamInfo& team = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
-  (RoboCup::RobotInfo&) robotInfo = team.players[Global::getSettings().playerNumber - 1];
+  TeamInfo& team = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
+  (RobotInfo&) robotInfo = team.players[Global::getSettings().playerNumber - 1];
   robotInfo.number = Global::getSettings().playerNumber;
 }
 
 void NaoProvider::update(OwnTeamInfoBH& ownTeamInfo)
 {
-  (RoboCup::TeamInfo&) ownTeamInfo = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
+  (TeamInfo&) ownTeamInfo = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
 }
 
 void NaoProvider::update(OpponentTeamInfoBH& opponentTeamInfo)
 {
-  (RoboCup::TeamInfo&) opponentTeamInfo = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 1 : 0];
+  (TeamInfo&) opponentTeamInfo = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 1 : 0];
 }
 
 void NaoProvider::update(GameInfoBH& gameInfo)
 {
-  memcpy(&(RoboCup::RoboCupGameControlData&) gameInfo, &gameControlData, (char*) gameControlData.teams - (char*) &gameControlData);
+  memcpy(&(RoboCupGameControlData&) gameInfo, &gameControlData, (char*) gameControlData.teams - (char*) &gameControlData);
   gameInfo.timeLastPackageReceived = gameControlTimeStamp;
 }
 

@@ -300,7 +300,7 @@ struct LBHData
   char robotName[24]; /* Device/DeviceList/ChestBoard/BodyNickName */
   float sensors[3][lbhNumOfSensorIds];
   float actuators[3][lbhNumOfActuatorIds];
-  RoboCup::RoboCupGameControlData gameControlData[3];
+  RoboCupGameControlData gameControlData[3];
 
   BHState state;
   int teamInfo[lbhNumOfTeamInfoIds];

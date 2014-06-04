@@ -10,7 +10,7 @@
 #include "RoboCupGameControlData.h"
 #include "Tools/Streams/Streamable.h"
 
-class TeamInfo : public RoboCup::TeamInfo, public Streamable
+class TeamInfoBH : public TeamInfo, public Streamable
 {
 private:
   /**
@@ -22,13 +22,13 @@ private:
 
 public:
   /** Default constructor. */
-  TeamInfo();
+  TeamInfoBH();
 
   /** Draws the score in the scene view. */
   virtual void draw() const;
 };
 
-class OwnTeamInfoBH : public TeamInfo
+class OwnTeamInfoBH : public TeamInfoBH
 {
 public:
   OwnTeamInfoBH();
@@ -36,7 +36,7 @@ public:
 
 };
 
-class OpponentTeamInfoBH : public TeamInfo
+class OpponentTeamInfoBH : public TeamInfoBH
 {
 public:
   OpponentTeamInfoBH();

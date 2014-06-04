@@ -4,7 +4,7 @@ project( BHWALK )
 # Include  the basic definitions accross all projects
 #include( ../../cmake/base_definitions.cmake )
 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "" FORCE)
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "" FORCE)
 add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 
 set( bhwalk_srcs 

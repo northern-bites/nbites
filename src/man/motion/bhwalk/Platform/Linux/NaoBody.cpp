@@ -157,7 +157,7 @@ float* NaoBody::getSensors()
   return naoBodyAccess.lbhData->sensors[naoBodyAccess.lbhData->readingSensors];
 }
 
-const RoboCup::RoboCupGameControlData& NaoBody::getGameControlData() const
+const RoboCupGameControlData& NaoBody::getGameControlData() const
 {
   ASSERT(naoBodyAccess.lbhData != (LBHData*)MAP_FAILED);
   return naoBodyAccess.lbhData->gameControlData[naoBodyAccess.lbhData->readingSensors];

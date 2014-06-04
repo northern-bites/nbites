@@ -10,7 +10,7 @@
 #include "RoboCupGameControlData.h"
 #include "Tools/Streams/Streamable.h"
 
-class GameInfoBH : public RoboCup::RoboCupGameControlData, public Streamable
+class GameInfoBH : public RoboCupGameControlData, public Streamable
 {
 private:
   /**
@@ -20,7 +20,7 @@ private:
   */
   virtual void serialize(In* in, Out* out);
 
-  using RoboCup::RoboCupGameControlData::teams; // Make teams private, the information is provided in other representations.
+  using RoboCupGameControlData::teams; // Make teams private, the information is provided in other representations.
 
 public:
   unsigned timeLastPackageReceived;

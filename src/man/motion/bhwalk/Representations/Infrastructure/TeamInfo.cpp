@@ -15,7 +15,7 @@
  * The class is a helper to be able to stream the players.
  * The global RobotInfoBH cannot be used, because it has an additional attribute.
  */
-class PlayerInfo : public RoboCup::RobotInfo, public ImplicitlyStreamable {};
+class PlayerInfo : public RobotInfo, public ImplicitlyStreamable {};
 
 /**
  * Write a player info to a stream.
@@ -47,12 +47,12 @@ In& operator>>(In& stream, PlayerInfo& playerInfo)
   return stream;
 }
 
-TeamInfo::TeamInfo()
+TeamInfoBH::TeamInfoBH()
 {
-  memset((RoboCup::TeamInfo*) this, 0, sizeof(RoboCup::TeamInfo));
+  memset((TeamInfo*) this, 0, sizeof(TeamInfo));
 }
 
-void TeamInfo::serialize(In* in, Out* out)
+void TeamInfoBH::serialize(In* in, Out* out)
 {
   PlayerInfo(&players)[4] = reinterpret_cast<PlayerInfo(&)[4]>(this->players);
 
@@ -101,7 +101,7 @@ static void drawDigit(int digit, const Vector3BH<>& pos, float size, int teamCol
     }
 }
 
-void TeamInfo::draw() const
+void TeamInfoBH::draw() const
 {
   DECLARE_DEBUG_DRAWING3D("representation:TeamInfo", "field");
   {
@@ -119,7 +119,7 @@ OwnTeamInfoBH::OwnTeamInfoBH()
 void OwnTeamInfoBH::draw() const
 {
   //do base class drawing first.
-  TeamInfo::draw();
+  TeamInfoBH::draw();
 
   DECLARE_DEBUG_DRAWING("representation:OwnTeamInfoBH", "drawingOnField",
   {

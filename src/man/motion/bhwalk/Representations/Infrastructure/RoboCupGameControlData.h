@@ -7,10 +7,10 @@
 
 #pragma once
 
-namespace RoboCup
-{
+// namespace RoboCup
+// {
 #define teamColour teamColor
 #define TEAM_NONE 2
-// #include "../../../../support/RoboCupGameControlData.h"
-#include <Util/GameController/RoboCupGameControlData.h>
-}
+#include "../../../../support/RoboCupGameControlData.h"
+// #include <Util/GameController/RoboCupGameControlData.h>
+// }
