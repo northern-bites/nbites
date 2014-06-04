@@ -31,6 +31,7 @@ class HeadTracker(FSA.FSA):
         self.headMove = None
         self.lookDirection = None
         self.kickName = ""
+        self.timeCounter = 0
 
         # Set object variables
         self.target = self.brain.ball #default
@@ -111,6 +112,7 @@ class HeadTracker(FSA.FSA):
         When ball is in view, tracks via vision values.
         Once ball is gone for some time, switch to wide pans.
         """
+
         # Check if we're using bounceTracking
         if TrackingConstants.USE_BOUNCE_TRACKING:
             self.bounceTrackBall()

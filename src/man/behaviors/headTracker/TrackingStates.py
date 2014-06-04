@@ -2,6 +2,10 @@ from . import TrackingConstants as constants
 import HeadMoves
 import noggin_constants as NogginConstants
 import BallModel_proto as BallModel
+import math
+
+#TODO: if targets are messed up, insert 'target = tracker.brain.ball'
+#in every function
 
 DEBUG = False
 
@@ -10,6 +14,10 @@ def tracking(tracker):
     While the target is visible, track it via vision values.
     If the target is lost, switches to fullPan.
     """
+
+    #TODO remove ASAP
+    return tracker.goNow('snapToCorner')
+
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
     tracker.helper.trackObject()
 
@@ -46,6 +54,48 @@ def lookAtTarget(tracker):
     """Look to the localization coords of the stored target."""
     tracker.helper.lookAtTarget(tracker.target)
     return tracker.stay()
+
+#TODO use constants
+def snapToCorner(tracker):
+    """ Snap to a corner to help localization """
+    lookTime = 5
+
+    if tracker.timeCounter >= 0 and tracker.timeCounter < lookTime:
+        tracker.target.x = NogginConstants.FIELD_WHITE_WIDTH
+        tracker.target.y = 0.0
+    if tracker.timeCounter >= lookTime and tracker.timeCounter < 2*lookTime:
+        tracker.target.x = 0.0
+        tracker.target.y = NogginConstants.FIELD_WHITE_HEIGHT
+    if tracker.timeCounter >= 2*lookTime and tracker.timeCounter < 3*lookTime:
+        tracker.target.x = NogginConstants.FIELD_WHITE_WIDTH
+        tracker.target.y = NogginConstants.FIELD_WHITE_HEIGHT
+    if tracker.timeCounter >= 3*lookTime and tracker.timeCounter < 4*lookTime:
+        tracker.target.x = 0.0
+        tracker.target.y = 0.0
+
+    heading = tracker.brain.loc.h
+    robx = tracker.brain.loc.x
+    roby = tracker.brain.loc.y
+    yaw = math.degrees(math.atan((tracker.target.y-roby)/(tracker.target.x-robx)))
+    if robx > tracker.target.x:
+        if roby < tracker.target.y:
+            yaw = 180 + yaw
+        else:
+            yaw = -180 + yaw
+    yaw = yaw - heading
+
+    # only look to corner if head is finished moving and corner is not behind robot
+    if not tracker.brain.motion.head_is_active and yaw < 110 and yaw > -110:
+        tracker.helper.lookToAngle(yaw)
+
+    if not tracker.brain.motion.head_is_active:
+        tracker.timeCounter = tracker.timeCounter + 1
+        if tracker.timeCounter > 4*lookTime:
+            tracker.timeCounter = 1
+
+    return tracker.stay()
+
+
 
 def lookStraightThenTrack(tracker):
     """

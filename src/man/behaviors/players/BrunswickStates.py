@@ -110,6 +110,7 @@ def gamePlaying(player):
         return player.goNow('waitForKickoff')
     return player.goNow('positionAtHome')
 
+
 @superState('gameControllerResponder')
 def gameFinished(player):
     """
