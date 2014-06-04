@@ -580,7 +580,7 @@ NBMath::ufvector3 intersection(ufvector3 a1, ufvector3 a2, ufvector3 b1, ufvecto
 std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromFieldPosition(
         float x, float y, float robotAngle) {
 
-    std::vector<shared_ptr<VisualLine> > visualLines;
+    std::vector<boost::shared_ptr<VisualLine> > visualLines;
     //translation from the world origin to the robot origin
     ublas::matrix <float> worldOriginToRobotOriginTranslation =
             CoordFrame3D::translation3D(-x, -y);
@@ -648,7 +648,7 @@ std::vector<boost::shared_ptr<VisualLine> > NaoPose::getExpectedVisualLinesFromF
         if (pixel2(X) != 0 && pixel2(Y) != 0)
             visualLinePoints.push_back(visualLinePoint2);
         if (visualLinePoints.size() > 0){
-            visualLines.push_back(shared_ptr<VisualLine>(new VisualLine(visualLinePoints)));}
+            visualLines.push_back(boost::shared_ptr<VisualLine>(new VisualLine(visualLinePoints)));}
     }
 
     return visualLines;

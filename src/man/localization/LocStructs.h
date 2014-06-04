@@ -155,7 +155,7 @@ struct LineErrorMatch {
 };
 
 struct Line {
-    static const float ERROR = .1f;
+    static constexpr float ERROR = .1f;
 
     Point start, end;
     float slope;

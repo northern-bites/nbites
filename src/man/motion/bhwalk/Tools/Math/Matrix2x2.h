@@ -1,6 +1,6 @@
 /**
  * @file Matrix2x2.h
- * Contains template class Matrix2x2 of type V
+ * Contains template class Matrix2x2BH of type V
  *
  * @author <a href="mailto:Kai_Engel@gmx.de">Kai Engel</a>
  * @author <a href="mailto:timlaue@informatik.uni-bremen.de">Tim Laue</a>
@@ -12,31 +12,31 @@
 #include <limits>
 
 /** This class represents a 2x2-matrix */
-template <class V = float> class Matrix2x2  : public Streamable
+template <class V = float> class Matrix2x2BH  : public Streamable
 {
 private:
   virtual void serialize(In* in, Out* out)
   {
-    STREAM_REGISTER_BEGIN();
+    STREAM_REGISTER_BEGIN;
     STREAM(c);
-    STREAM_REGISTER_FINISH();
+    STREAM_REGISTER_FINISH;
   }
 
 public:
   /** The columns of the matrix */
-  Vector2<V> c[2];
+  Vector2BH<V> c[2];
 
   /** Default constructor. */
-  Matrix2x2<V>()
+  Matrix2x2BH<V>()
   {
-    c[0] = Vector2<V>(1, 0);
-    c[1] = Vector2<V>(0, 1);
+    c[0] = Vector2BH<V>(1, 0);
+    c[1] = Vector2BH<V>(0, 1);
   }
 
   /**
    * Anti-lateral thinking constructor.
    */
-  Matrix2x2<V>(
+  Matrix2x2BH<V>(
     const V& a11, const V& a12,
     const V& a21, const V& a22)
   {
@@ -51,7 +51,7 @@ public:
   \param c0 the first column of the matrix.
   \param c1 the second column of the matrix.
   */
-  Matrix2x2<V>(const Vector2<V>& c0, const Vector2<V>& c1)
+  Matrix2x2BH<V>(const Vector2BH<V>& c0, const Vector2BH<V>& c1)
   {
     c[0] = c0;
     c[1] = c1;
@@ -62,7 +62,7 @@ public:
   \param other The other matrix that is assigned to this one
   \return A reference to this object after the assignment.
   */
-  Matrix2x2<V>& operator=(const Matrix2x2<V>& other)
+  Matrix2x2BH<V>& operator=(const Matrix2x2BH<V>& other)
   {
     c[0] = other.c[0];
     c[1] = other.c[1];
@@ -73,7 +73,7 @@ public:
   /*!
   \param other The other matrix that is copied to this one
    */
-  Matrix2x2<V>(const Matrix2x2<V>& other)
+  Matrix2x2BH<V>(const Matrix2x2BH<V>& other)
   {
     *this = other;
   }
@@ -83,7 +83,7 @@ public:
    * \param  i index
    * \return reference to column
    */
-  Vector2<V>& operator[](int i)
+  Vector2BH<V>& operator[](int i)
   {
     return c[i];
   }
@@ -93,7 +93,7 @@ public:
    * \param  i index
    * \return reference to column
    */
-  const Vector2<V>& operator[](int i) const
+  const Vector2BH<V>& operator[](int i) const
   {
     return c[i];
   }
@@ -104,7 +104,7 @@ public:
   \return A reference to a new vector containing the result
     of the calculation.
   */
-  Vector2<V> operator*(const Vector2<V>& vector) const
+  Vector2BH<V> operator*(const Vector2BH<V>& vector) const
   {
     return (c[0] * vector.x + c[1] * vector.y);
   }
@@ -114,9 +114,9 @@ public:
   \param other The other matrix this one is multiplied by
   \return An object containing the result of the calculation.
   */
-  Matrix2x2<V> operator*(const Matrix2x2<V>& other) const
+  Matrix2x2BH<V> operator*(const Matrix2x2BH<V>& other) const
   {
-    Matrix2x2<V> returnMatrix;
+    Matrix2x2BH<V> returnMatrix;
     returnMatrix.c[0].x = c[0].x * other.c[0].x + c[1].x * other.c[0].y;
     returnMatrix.c[0].y = c[0].y * other.c[0].x + c[1].y * other.c[0].y;
     returnMatrix.c[1].x = c[0].x * other.c[1].x + c[1].x * other.c[1].y;
@@ -129,7 +129,7 @@ public:
   \param other The other matrix this one is multiplied by
   \return A reference this object after the calculation.
   */
-  Matrix2x2<V> operator*=(const Matrix2x2<V>& other)
+  Matrix2x2BH<V> operator*=(const Matrix2x2BH<V>& other)
   {
     return *this = *this * other;
   }
@@ -139,7 +139,7 @@ public:
   \param factor The factor this matrix is multiplied by
   \return A reference to this object after the calculation.
   */
-  Matrix2x2<V>& operator*=(const V& factor)
+  Matrix2x2BH<V>& operator*=(const V& factor)
   {
     c[0] *= factor;
     c[1] *= factor;
@@ -151,7 +151,7 @@ public:
   \param factor The factor this matrix is divided by
   \return A reference to this object after the calculation.
    */
-  Matrix2x2<V>& operator/=(const V& factor)
+  Matrix2x2BH<V>& operator/=(const V& factor)
   {
     c[0] /= factor;
     c[1] /= factor;
@@ -163,9 +163,9 @@ public:
   \param factor The factor this matrix is multiplied by
   \return A new object that contains the result of the calculation.
   */
-  Matrix2x2<V> operator*(const V& factor) const
+  Matrix2x2BH<V> operator*(const V& factor) const
   {
-    return Matrix2x2<V>(*this) *= factor;
+    return Matrix2x2BH<V>(*this) *= factor;
   }
 
   //! Division of this matrix by a factor.
@@ -173,9 +173,9 @@ public:
   \param factor The factor this matrix is divided by
   \return A new object that contains the result of the calculation.
   */
-  Matrix2x2<V> operator/(const V& factor) const
+  Matrix2x2BH<V> operator/(const V& factor) const
   {
-    return Matrix2x2<V>(*this) /= factor;
+    return Matrix2x2BH<V>(*this) /= factor;
   }
 
   //! Computes the sum of two matrices
@@ -183,10 +183,10 @@ public:
   \param other Another matrix
   \return The sum
   */
-  Matrix2x2<V> operator+(const Matrix2x2<V>& other) const
+  Matrix2x2BH<V> operator+(const Matrix2x2BH<V>& other) const
   {
-    return Matrix2x2<V>(Vector2<V>(c[0].x + other.c[0].x, c[0].y + other.c[0].y),
-                        Vector2<V>(c[1].x + other.c[1].x, c[1].y + other.c[1].y));
+    return Matrix2x2BH<V>(Vector2BH<V>(c[0].x + other.c[0].x, c[0].y + other.c[0].y),
+                        Vector2BH<V>(c[1].x + other.c[1].x, c[1].y + other.c[1].y));
   }
 
   //! Computes the difference of two matrices
@@ -194,10 +194,10 @@ public:
   \param other Another matrix
   \return The difference
   */
-  Matrix2x2<V> operator-(const Matrix2x2<V>& other) const
+  Matrix2x2BH<V> operator-(const Matrix2x2BH<V>& other) const
   {
-    return Matrix2x2<V>(Vector2<V>(c[0].x - other.c[0].x, c[0].y - other.c[0].y),
-                        Vector2<V>(c[1].x - other.c[1].x, c[1].y - other.c[1].y));
+    return Matrix2x2BH<V>(Vector2BH<V>(c[0].x - other.c[0].x, c[0].y - other.c[0].y),
+                        Vector2BH<V>(c[1].x - other.c[1].x, c[1].y - other.c[1].y));
   }
 
   /**
@@ -206,7 +206,7 @@ public:
    * \param  other  The other matrix that is added to this one
    * \return        A reference to this object after the calculation.
   */
-  Matrix2x2<V>& operator+=(const Matrix2x2<V>& other)
+  Matrix2x2BH<V>& operator+=(const Matrix2x2BH<V>& other)
   {
     c[0] += other.c[0];
     c[1] += other.c[1];
@@ -219,7 +219,7 @@ public:
    * \param  other  The other matrix that is subtracted from this one
    * \return        A reference to this object after the calculation.
   */
-  Matrix2x2<V>& operator-=(const Matrix2x2<V>& other)
+  Matrix2x2BH<V>& operator-=(const Matrix2x2BH<V>& other)
   {
     c[0] -= other.c[0];
     c[1] -= other.c[1];
@@ -230,15 +230,15 @@ public:
   /*!
   \return An inverted matrix.
   */
-  Matrix2x2<V> invert() const
+  Matrix2x2BH<V> invert() const
   {
     V factor(det());
-    if(abs(factor) < std::numeric_limits<V>::min())
+    if(std::abs(factor) < std::numeric_limits<V>::min())
       factor = std::numeric_limits<V>::min();
     else
       factor = 1.f / factor;
-    return Matrix2x2<V>(Vector2<V>(factor * c[1].y, -factor * c[0].y),
-                        Vector2<V>(-factor * c[1].x, factor * c[0].x));
+    return Matrix2x2BH<V>(Vector2BH<V>(factor * c[1].y, -factor * c[0].y),
+                        Vector2BH<V>(-factor * c[1].x, factor * c[0].x));
   }
 
   //! Comparison of another matrix with this one.
@@ -246,7 +246,7 @@ public:
   \param other The other matrix that will be compared to this one
   \return Whether the two matrices are equal.
   */
-  bool operator==(const Matrix2x2<V>& other) const
+  bool operator==(const Matrix2x2BH<V>& other) const
   {
     return (c[0] == other.c[0] && c[1] == other.c[1]);
   }
@@ -256,7 +256,7 @@ public:
   \param other The other matrix that will be compared to this one
   \return Whether the two matrixs are unequal.
   */
-  bool operator!=(const Matrix2x2<V>& other) const
+  bool operator!=(const Matrix2x2BH<V>& other) const
   {
     return !(*this == other);
   }
@@ -264,10 +264,10 @@ public:
   /*! Transpose the matrix
   \return A new object containing transposed matrix
   */
-  Matrix2x2<V> transpose() const
+  Matrix2x2BH<V> transpose() const
   {
-    return Matrix2x2<V>(Vector2<V>(c[0].x, c[1].x),
-                        Vector2<V>(c[0].y, c[1].y));
+    return Matrix2x2BH<V>(Vector2BH<V>(c[0].x, c[1].x),
+                        Vector2BH<V>(c[0].y, c[1].y));
   }
 
   //! Calculation of the determinant of this matrix.

@@ -3,7 +3,8 @@
 
 #include <vector>
 #include <stack>
-#include <tr1/unordered_map>
+#include <typeinfo>
+#include <unordered_map>
 #include "Tools/Streams/OutStreams.h"
 
 class StreamHandler;
@@ -13,7 +14,9 @@ Out& operator<<(Out& out, const StreamHandler& streamHandler);
 
 class ConsoleRoboCupCtrl;
 class RobotConsole;
+class DebugDataStreamer;
 class Framework;
+class Settings;
 
 /**
 * singleton stream handler class
@@ -46,17 +49,17 @@ private:
     bool externalOperator;
   };
 
-  typedef std::tr1::unordered_map<const char*, const char*> BasicTypeSpecification;
+  typedef std::unordered_map<const char*, const char*> BasicTypeSpecification;
   BasicTypeSpecification basicTypeSpecification;
 
   typedef std::pair< std::string, const char*> TypeNamePair;
-  typedef std::tr1::unordered_map<const char*, std::vector<TypeNamePair> > Specification;
+  typedef std::unordered_map<const char*, std::vector<TypeNamePair> > Specification;
   Specification specification;
 
-  typedef std::tr1::unordered_map<const char*, std::vector<const char*> > EnumSpecification;
+  typedef std::unordered_map<const char*, std::vector<const char*> > EnumSpecification;
   EnumSpecification enumSpecification;
 
-  typedef std::tr1::unordered_map<std::string, int> StringTable;
+  typedef std::unordered_map<std::string, int> StringTable;
   StringTable stringTable;
 
   typedef std::pair<Specification::iterator, RegisteringAttributes> RegisteringEntry;
@@ -80,8 +83,10 @@ public:
 private:
   friend In& operator>>(In&, StreamHandler&);
   friend Out& operator<<(Out&, const StreamHandler&);
-  friend class ConsoleRoboCupCtrl;
-  friend class RobotConsole;
-  friend class TeamComm3DCtrl;
+  friend class ConsoleRoboCupCtrl; // constructs a StreamHandler used when outside process contexts.
+  friend class RobotConsole; // constructs a StreamHandler storing the information received.
+  friend class TeamComm3DCtrl; // constructs a StreamHandler used by all serialize methods.
   friend class Framework;
+  friend class Settings; // construct a default StreamHandler when they are first loaded.
+  friend class DebugDataStreamer; // needs access to internal data types.
 };

@@ -21,6 +21,8 @@
 
 //BH
 #include "WalkingEngine.h"
+#include "Tools/Math/Pose2D.h"
+// #include "Representations/Blackboard.h"
 
 namespace man
 {
@@ -88,9 +90,20 @@ namespace man
         private:
             bool requestedToStop;
             bool standby;
-            WalkingEngine walkingEngine;
             MotionCommand::ptr currentCommand;
-            Pose2D startOdometry;
+            Pose2DBH startOdometry;
+
+            WalkingEngine walkingEngine;
+            // Blackboard blackboard;
+            // MotionSelector motionSelector;
+            // InertiaSensorCalibrator inertiaSensorCalibrator;
+            // JointFilter jointFilter;
+            // RobotModelProvider robotModelProvider;
+            // InertiaSensorFilter inertiaSensorFilter;
+            // SensorFilter sensorFilter;
+            // FallDownStateDetector fallDownStateDetector;
+            // TorsoMatrixProvider torsoMatrixProvider;
+            // NaoProvider naoProvider;
         };
     } // namespace motion
 } // namespace man

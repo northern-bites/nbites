@@ -3,8 +3,8 @@
 *
 * Implementation of out stream classes.
 *
-* @author Thomas Röfer
-* @author Martin Lötzsch
+* @author Thomas RÃ¶fer
+* @author Martin LÃ¶tzsch
 */
 
 #include <cstdio>
@@ -18,6 +18,13 @@
 void OutBinary::writeString(const char* d, PhysicalOutStream& stream)
 { int size = (int)strlen(d); stream.writeToStream(&size, sizeof(size)); stream.writeToStream(d, size);}
 
+void OutText::writeBool(bool value, PhysicalOutStream& stream)
+{
+  if(value)
+    stream.writeToStream(" true", 5);
+  else
+    stream.writeToStream(" false", 6);
+}
 
 void OutText::writeString(const char* value, PhysicalOutStream& stream)
 {
@@ -65,12 +72,19 @@ void OutText::writeFloat(float d, PhysicalOutStream& stream)
 void OutText::writeDouble(double d, PhysicalOutStream& stream)
 { sprintf(buf, " %g", d); stream.writeToStream(buf, (int)strlen(buf)); }
 void OutText::writeEndL(PhysicalOutStream& stream)
-{ sprintf(buf, "\r\n"); stream.writeToStream(buf, (int)strlen(buf)); }
+{ sprintf(buf, "\n"); stream.writeToStream(buf, (int)strlen(buf)); }
 
+void OutTextRaw::writeBool(bool value, PhysicalOutStream& stream)
+{
+  if(value)
+    stream.writeToStream("true", 4);
+  else
+    stream.writeToStream("false", 5);
+}
 
 void OutTextRaw::writeString(const char* value, PhysicalOutStream& stream)
 {
-  stream.writeToStream(value, (int)strlen(value));
+  stream.writeToStream(value, (int) strlen(value));
 }
 
 void OutTextRaw::writeData(const void* p, int size, PhysicalOutStream& stream)
@@ -96,7 +110,7 @@ void OutTextRaw::writeFloat(float d, PhysicalOutStream& stream)
 void OutTextRaw::writeDouble(double d, PhysicalOutStream& stream)
 { sprintf(buf, "%g", d); stream.writeToStream(buf, (int)strlen(buf)); }
 void OutTextRaw::writeEndL(PhysicalOutStream& stream)
-{ sprintf(buf, "\r\n"); stream.writeToStream(buf, (int)strlen(buf)); }
+{ sprintf(buf, "\n"); stream.writeToStream(buf, (int)strlen(buf)); }
 
 
 OutFile::~OutFile()
@@ -104,182 +118,119 @@ OutFile::~OutFile()
 bool OutFile::exists() const
 {return (stream != 0 ? stream->exists() : false);}
 void OutFile::open(const std::string& name)
-{ stream = new File(name, "wb"); }
+{ stream = new File(name, "wb", false); }
 void OutFile::open(const std::string& name, bool append)
-{ stream = append ? new File(name, "ab") : new File(name, "wb");}
+{ stream = append ? new File(name, "ab", false) : new File(name, "wb", false);}
 void OutFile::writeToStream(const void* p, int size)
 { if(stream != 0) stream->write(p, size); }
 
 void OutMemory::writeToStream(const void* p, int size)
 { if(memory != 0) { memcpy(memory, p, size); memory += size; length += size; } }
 
-OutConfigMap::OutConfigMap(ConfigMap& map)
-  : name(0),
-    map(&map)
-{ }
+OutMap::OutMap(Out& stream, bool singleLine) :
+  stream(stream),
+  singleLine(singleLine)
+{}
 
-OutConfigMap::OutConfigMap(const std::string& filename)
-  : name(new std::string(filename)),
-    map(new ConfigMap())
-{ }
-
-OutConfigMap::~OutConfigMap()
+void OutMap::writeLn()
 {
-  if(name)
-  {
-    delete name;
-    delete map;
-  }
+  if(singleLine)
+    stream << " ";
+  else
+    stream << endl;
 }
 
-void OutConfigMap::outChar(char value)
+void OutMap::outUChar(unsigned char value)
 {
-  try
-  {
-    Entry e = stack.back();
-    if(e.type > -3)
-    {
-      int i = static_cast<int>(value);
-      (*map)[e.key] << i;
-    }
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    printError(e.what());
-  }
+  Entry& e = stack.back();
+  if(e.enumToString)
+    stream << e.enumToString(value);
+  else
+    stream << (unsigned) value;
 }
 
-void OutConfigMap::outUChar(unsigned char value)
+void OutMap::outUInt(unsigned int value)
 {
-  try
-  {
-    Entry e = stack.back();
-    if(e.type > -3)
-    {
-      unsigned i = static_cast<unsigned>(value);
-      (*map)[e.key] << i;
-    }
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    printError(e.what());
-  }
+  if(stack.back().type != -1)
+    stream << value;
 }
 
-void OutConfigMap::outInt(int value)
+void OutMap::select(const char* name, int type, const char * (*enumToString)(int))
 {
-  try
-  {
-    Entry e = stack.back();
-    if(e.type > -3)
-    {
-      if(e.enumToString)
-        (*map)[e.key] << std::string(e.enumToString(value));
-      else
-        (*map)[e.key] << value;
-    }
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    printError(e.what());
-  }
-}
-
-void OutConfigMap::outUInt(unsigned int value)
-{
-  try
-  {
-    Entry e = stack.back();
-    if(e.type > -3)
-    {
-      if(e.type == -1)
-        (*map)[e.key] = ListConfigValue();
-      else
-        (*map)[e.key] << value;
-    }
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    printError(e.what());
-  }
-}
-
-void OutConfigMap::select(const char* name, int type, const char * (*enumToString)(int))
-{
-  try
+  Streaming::trimName(name);
+  if(!stack.empty())
   {
     ASSERT(name || type >= 0);
-    std::stringstream buf;
-    if(!stack.empty())
+    Entry& e = stack.back();
+    if(!e.hasSubEntries)
     {
-      Entry e = stack.back();
-      if(e.type < -2)  // invalid
+      if(e.type == -1) // array
       {
-        stack.push_back(Entry(name, -3, enumToString));
-        return;
+        stream << "[";
+        writeLn();
       }
-      buf << e.key << ".";
+      else // other attribute or array element
+      {
+        stream << "{";
+        writeLn();
+      }
+      if(!singleLine)
+        indentation += "  ";
+      e.hasSubEntries = true;
     }
+  }
 
-    if(type >= 0)
-      buf << type;
-    else
-      buf << name;
-#ifdef WIN32
-    stack.push_back(Entry(_strdup(buf.str().c_str()), type, enumToString));
-#else
-    stack.push_back(Entry(strdup(buf.str().c_str()), type, enumToString));
-#endif // WIN32
-  }
-  catch(std::invalid_argument& e)
+  if(type < 0) // attribute
   {
-    printError(e.what());
-    stack.push_back(Entry(name, -3, enumToString)); // add invalid
+    stream << indentation;
+    if(name)
+      stream << name << " = ";
   }
-  catch(invalid_key& e)
+  else if(type == 0) // first array element
+    stream << indentation;
+  else if(type > 0) // further array elements
   {
-    printError(e.what());
-    stack.push_back(Entry(name, -3, enumToString)); // add invalid
+    stream << ",";
+    writeLn();
+    stream << indentation;
   }
+
+  stack.push_back(Entry(type, enumToString));
 }
-void OutConfigMap::deselect()
+
+void OutMap::deselect()
 {
+  Entry& e = stack.back();
+  if(e.hasSubEntries)
+  {
+    if(!singleLine)
+      indentation = indentation.substr(2);
+    if(e.type == -1) // array
+    {
+      writeLn();
+      stream << indentation << "]";
+    }
+    else // other attribute or array element
+      stream << indentation << "}";
+  }
+  else if(e.type == -1) // empty array
+    stream << "[]";
+
+  if(e.type < 0) // attribute
+  {
+    stream << ";";
+    writeLn();
+  }
   stack.pop_back();
 }
 
-void OutConfigMap::write()
+void OutMap::write(const void *p, int size)
 {
-  map->write(name);
+  ASSERT(false);
 }
 
-void OutConfigMap::printError(const std::string& msg)
-{
-  if(name)
-    OUTPUT_ERROR(*name << ", " << stack.back().key << ": " << msg);
-  else
-    OUTPUT_ERROR(stack.back().key << ": " << msg);
-}
+OutMapFile::OutMapFile(const std::string& name, bool singleLine) : OutMap(stream, singleLine), stream(name) {}
 
-bool OutConfigMap::exists() const
-{
-  if(!name)
-    return true;
-  File f(*name, "w");
-  return f.exists();
-}
+OutMapMemory::OutMapMemory(void* memory, bool singleLine) : OutMap(stream, singleLine), stream(memory) {}
+
+OutMapSize::OutMapSize(bool singleLine) : OutMap(stream, singleLine) {}

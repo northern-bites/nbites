@@ -1,7 +1,7 @@
 /**
  * @file RingBuffer.h
  *
- * Declaration of class RingBuffer
+ * Declaration of class RingBufferBH
  *
  * @author Max Risler
  */
@@ -9,15 +9,15 @@
 #pragma once
 
 /**
- * @class RingBuffer
+ * @class RingBufferBH
  *
  * template class for cyclic buffering of the last n values of Type V
  */
-template <class V, int n> class RingBuffer
+template <class V, int n> class RingBufferBH
 {
 public:
   /** Constructor */
-  RingBuffer() {init();}
+  RingBufferBH() {init();}
 
   /**
    * initializes the Ringbuffer
@@ -108,6 +108,24 @@ public:
   inline int getMaxEntries() const
   {
     return n;
+  }
+
+  /**
+  * Determines whether maximum entry count equals actual number of entries.
+  * @return true iff getMaxEntries == getNumberOfEntries.
+  */
+  inline bool isFilled() const
+  {
+    return getMaxEntries() == getNumberOfEntries();
+  }
+
+  /**
+   * Determines whether the buffer is empty.
+   * \return True, if the number of entries is 0.
+   */
+  inline bool isEmpty() const
+  {
+    return !numberOfEntries;
   }
 
 private:

@@ -13,7 +13,7 @@
 /**
 * Some tools for low level debugging
 */
-class Assert
+class AssertBH
 {
 public:
 #ifndef NDEBUG
@@ -74,9 +74,9 @@ public:
 #ifdef NDEBUG
 #define ASSERT(cond) ((void)0)
 #elif defined(WITH_TRACEASSERTIONS) && defined(TARGET_ROBOT)
-#define ASSERT(cond) ((void)((cond) ? 0 : (Assert::logPrint(1, __FILE__, __LINE__, "ASSERT(%s) failed", #cond), 0)))
+#define ASSERT(cond) ((void)((cond) ? 0 : (AssertBH::logPrint(1, __FILE__, __LINE__, "ASSERT(%s) failed", #cond), 0)))
 #else
-#define ASSERT(cond) ((void)((cond) ? 0 : (Assert::print(__FILE__, __LINE__, "ASSERT(%s) failed", #cond), Assert::abort(), 0)))
+#define ASSERT(cond) ((void)((cond) ? 0 : (AssertBH::print(__FILE__, __LINE__, "ASSERT(%s) failed", #cond), AssertBH::abort(), 0)))
 #endif
 
 /**
@@ -87,9 +87,9 @@ public:
 #ifdef NDEBUG
 #define VERIFY(cond) ((void)(cond))
 #elif defined(WITH_TRACEASSERTIONS) && defined(TARGET_ROBOT)
-#define VERIFY(cond) ((void)((cond) ? 0 : (Assert::logPrint(1, __FILE__, __LINE__, "VERIFY(%s) failed", #cond), 0)))
+#define VERIFY(cond) ((void)((cond) ? 0 : (AssertBH::logPrint(1, __FILE__, __LINE__, "VERIFY(%s) failed", #cond), 0)))
 #else
-#define VERIFY(cond) ((void)((cond) ? 0 : (Assert::print(__FILE__, __LINE__, "VERIFY(%s) failed", #cond), Assert::abort(), 0)))
+#define VERIFY(cond) ((void)((cond) ? 0 : (AssertBH::print(__FILE__, __LINE__, "VERIFY(%s) failed", #cond), AssertBH::abort(), 0)))
 #endif
 
 /**
@@ -100,7 +100,7 @@ public:
 #elif defined(WITH_TRACEASSERTIONS) && defined(TARGET_ROBOT)
 #define TRACE(...) Trace::logPrint(1, __FILE__, __LINE__, __VA_ARGS__)
 #else
-#define TRACE(...) Assert::print(__FILE__, __LINE__, __VA_ARGS__)
+#define TRACE(...) AssertBH::print(__FILE__, __LINE__, __VA_ARGS__)
 #endif
 
 /**
@@ -111,7 +111,7 @@ public:
 #if defined(NDEBUG) || !defined(TARGET_ROBOT)
 #define BH_TRACE_INIT(name) ((void)0)
 #else
-#define BH_TRACE_INIT(name) VERIFY(Assert::logInit(name))
+#define BH_TRACE_INIT(name) VERIFY(AssertBH::logInit(name))
 #endif
 
 /**
@@ -121,7 +121,7 @@ public:
 #if defined(NDEBUG) || !defined(TARGET_ROBOT)
 #define BH_TRACE_MSG(message) ((void)0)
 #else
-#define BH_TRACE_MSG(message) Assert::logAdd(0, __FILE__, __LINE__, message)
+#define BH_TRACE_MSG(message) AssertBH::logAdd(0, __FILE__, __LINE__, message)
 #endif
 
 /**
@@ -130,5 +130,5 @@ public:
 #if defined(NDEBUG) || !defined(TARGET_ROBOT)
 #define BH_TRACE ((void)0)
 #else
-#define BH_TRACE Assert::logAdd(0, __FILE__, __LINE__, "")
+#define BH_TRACE AssertBH::logAdd(0, __FILE__, __LINE__, "")
 #endif

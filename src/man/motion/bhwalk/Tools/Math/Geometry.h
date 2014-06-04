@@ -2,15 +2,17 @@
 * @file Tools/Math/Geometry.h
 * Declares class Geometry
 *
-* @author <A href=mailto:juengel@informatik.hu-berlin.de>Matthias Jüngel</A>
+* @author <A href=mailto:juengel@informatik.hu-berlin.de>Matthias JÃ¼ngel</A>
 * @author <a href="mailto:walter.nistico@uni-dortmund.de">Walter Nistico</a>
 */
 
 #pragma once
 
 #include "Tools/Math/Pose2D.h"
-#include "Representations/Perception/CameraMatrix.h"
-#include "Representations/Infrastructure/CameraInfo.h"
+#include "Tools/Math/Vector3.h"
+
+class CameraMatrixBH;
+class CameraInfoBH;
 
 /**
 * The class Geometry defines representations for geometric objects and Methods
@@ -25,35 +27,35 @@ public:
   struct Circle
   {
     Circle(): radius(0) {}
-    Circle(const Vector2<>& c, float r)
+    Circle(const Vector2BH<>& c, float r)
     {
       center = c;
       radius = r;
     }
-    Vector2<> center;
+    Vector2BH<> center;
     float radius;
   };
 
   /** Defines a line by two vectors*/
   struct Line
   {
-    Vector2<> base;
-    Vector2<> direction;
+    Vector2BH<> base;
+    Vector2BH<> direction;
 
     Line() {};
-    Line(const Vector2<>& base, const Vector2<>& direction) :
+    Line(const Vector2BH<>& base, const Vector2BH<>& direction) :
       base(base),
       direction(direction)
     {};
 
-    Line(const Vector2<int>& base, const Vector2<>& direction) :
+    Line(const Vector2BH<int>& base, const Vector2BH<>& direction) :
       direction(direction)
     {
       this->base.x = (float) base.x;
       this->base.y = (float) base.y;
     };
 
-    Line(const Vector2<int>& base, const Vector2<int>& direction)
+    Line(const Vector2BH<int>& base, const Vector2BH<int>& direction)
     {
       this->base.x = (float) base.x;
       this->base.y = (float) base.y;
@@ -61,10 +63,10 @@ public:
       this->direction.y = (float) direction.y;
     };
 
-    Line(const Pose2D& base, float length = 1.f)
+    Line(const Pose2DBH& base, float length = 1.f)
     {
       this->base = base.translation;
-      this->direction = (Pose2D(base.rotation) + Pose2D(Vector2<>(length, 0))).translation;
+      this->direction = (Pose2DBH(base.rotation) + Pose2DBH(Vector2BH<>(length, 0))).translation;
     }
 
     Line(float baseX, float baseY, float directionX, float directionY)
@@ -85,7 +87,7 @@ public:
       calculatePixels();
     };
 
-    PixeledLine(const Vector2<int>& start, const Vector2<int>& end): x1(start.x), y1(start.y), x2(end.x), y2(end.y)
+    PixeledLine(const Vector2BH<int>& start, const Vector2BH<int>& end): x1(start.x), y1(start.y), x2(end.x), y2(end.y)
     {
       calculatePixels();
     };
@@ -161,7 +163,7 @@ public:
       points[numberOfPoints].y = y;
       numberOfPoints++;
     }
-    void add(const Vector2<V>& newPoint)
+    void add(const Vector2BH<V>& newPoint)
     {
       if(numberOfPoints >= maxNumberOfPoints) return;
       points[numberOfPoints] = newPoint;
@@ -217,10 +219,10 @@ public:
       line.direction.y = m;
 
       // reliability:
-      return abs(c3sum / sqrt(c4sum * c5sum));
+      return std::abs(c3sum / std::sqrt(c4sum * c5sum));
     }
   private:
-    Vector2<V> points[maxNumberOfPoints];
+    Vector2BH<V> points[maxNumberOfPoints];
     int numberOfPoints;
   };
 
@@ -230,8 +232,8 @@ public:
   * @param to The other position.
   * @return the angle from the pose to the position.
   */
-  static float angleTo(const Pose2D& from,
-                       const Vector2<>& to);
+  static float angleTo(const Pose2DBH& from,
+                       const Vector2BH<>& to);
 
   /**
   * Calculates the distance from a pose to a position
@@ -239,8 +241,8 @@ public:
   * @param to The other position.
   * @return the distance from the pose to the position.
   */
-  static float distanceTo(const Pose2D& from,
-                          const Vector2<>& to);
+  static float distanceTo(const Pose2DBH& from,
+                          const Vector2BH<>& to);
 
   /**
   * Calculates the relative vector from a pose to a position
@@ -248,24 +250,8 @@ public:
   * @param to The other position.
   * @return the vector from the pose to the position.
   */
-  static Vector2<> vectorTo(const Pose2D& from,
-                            const Vector2<>& to);
-
-  /**
-  * Rotates a vector
-  * @param v The vector
-  * @param a The angle
-  * @return The rotated vector
-  */
-  static Vector2<> rotate(const Vector2<>& v, float a);
-
-  /**
-  * Rotates a vector
-  * @param v The vector
-  * @param a The angle
-  * @return The rotated vector
-  */
-  static Vector2<int> rotate(const Vector2<int>& v, float a);
+  static Vector2BH<> vectorTo(const Pose2DBH& from,
+                            const Vector2BH<>& to);
 
   /**
   * Returns the circle defined by the three points.
@@ -275,16 +261,16 @@ public:
   * @return The circle defined by point1, point2 and point3.
   */
   static Circle getCircle(
-    const Vector2<int>& point1,
-    const Vector2<int>& point2,
-    const Vector2<int>& point3
+    const Vector2BH<int>& point1,
+    const Vector2BH<int>& point2,
+    const Vector2BH<int>& point3
   );
 
   static int getIntersectionOfCircles(
     const Circle& c1,
     const Circle& c2,
-    Vector2<> &p1,
-    Vector2<> &p2
+    Vector2BH<> &p1,
+    Vector2BH<> &p2
   );
 
   /**
@@ -298,27 +284,27 @@ public:
   static int getIntersectionOfLineAndCircle(
     const Line& line,
     const Circle& circle,
-    Vector2<>& firstIntersection,
-    Vector2<>& secondIntersection
+    Vector2BH<>& firstIntersection,
+    Vector2BH<>& secondIntersection
   );
 
   static bool checkIntersectionOfLines(
-    const Vector2<>& l1p1,
-    const Vector2<>& l1p2,
-    const Vector2<>& l2p1,
-    const Vector2<>& l2p2
+    const Vector2BH<>& l1p1,
+    const Vector2BH<>& l1p2,
+    const Vector2BH<>& l2p1,
+    const Vector2BH<>& l2p2
   );
 
   static bool getIntersectionOfLines(
     const Line& line1,
     const Line& line2,
-    Vector2<>& intersection
+    Vector2BH<>& intersection
   );
 
   static bool getIntersectionOfLines(
     const Line& line1,
     const Line& line2,
-    Vector2<int>& intersection
+    Vector2BH<int>& intersection
   );
 
   static bool getIntersectionOfRaysFactor(
@@ -329,93 +315,99 @@ public:
 
   static float getDistanceToLine(
     const Line& line,
-    const Vector2<>& point
+    const Vector2BH<>& point
   );
 
   static float getDistanceToEdge(
     const Line& line,
-    const Vector2<>& point
+    const Vector2BH<>& point
   );
 
   static float distance(
-    const Vector2<>& point1,
-    const Vector2<>& point2
+    const Vector2BH<>& point1,
+    const Vector2BH<>& point2
   );
 
   static float distance(
-    const Vector2<int>& point1,
-    const Vector2<int>& point2
+    const Vector2BH<int>& point1,
+    const Vector2BH<int>& point2
   );
 
 private:
   static int ccw(
-    const Vector2<>& p0,
-    const Vector2<>& p1,
-    const Vector2<>& p2);
+    const Vector2BH<>& p0,
+    const Vector2BH<>& p1,
+    const Vector2BH<>& p2);
 
 public:
   static void calculateAnglesForPoint(
-    const Vector2<>& point,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<>& angles
+    const Vector2BH<>& point,
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<>& angles
   );
 
   static bool calculatePointByAngles(
-    const Vector2<>& angles,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<int>& point
+    const Vector2BH<>& angles,
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<int>& point
   );
 
   static bool clipLineWithQuadrangle(
     const Line& lineToClip,
-    const Vector2<>& corner0,
-    const Vector2<>& corner1,
-    const Vector2<>& corner2,
-    const Vector2<>& corner3,
-    Vector2<>& clipPoint1,
-    Vector2<>& clipPoint2
+    const Vector2BH<>& corner0,
+    const Vector2BH<>& corner1,
+    const Vector2BH<>& corner2,
+    const Vector2BH<>& corner3,
+    Vector2BH<>& clipPoint1,
+    Vector2BH<>& clipPoint2
   );
 
   static bool clipLineWithQuadrangle(
     const Line& lineToClip,
-    const Vector2<>& corner0,
-    const Vector2<>& corner1,
-    const Vector2<>& corner2,
-    const Vector2<>& corner3,
-    Vector2<int>& clipPoint1,
-    Vector2<int>& clipPoint2
+    const Vector2BH<>& corner0,
+    const Vector2BH<>& corner1,
+    const Vector2BH<>& corner2,
+    const Vector2BH<>& corner3,
+    Vector2BH<int>& clipPoint1,
+    Vector2BH<int>& clipPoint2
   );
 
   static bool isPointInsideRectangle(
-    const Vector2<>& bottomLeftCorner,
-    const Vector2<>& topRightCorner,
-    const Vector2<>& point
+    const Vector2BH<>& bottomLeftCorner,
+    const Vector2BH<>& topRightCorner,
+    const Vector2BH<>& point
+  );
+
+  static bool isPointInsideRectangle2(
+    const Vector2BH<>& corner1,
+    const Vector2BH<>& corner2,
+    const Vector2BH<>& point
   );
 
   static bool isPointInsideRectangle(
-    const Vector2<int>& bottomLeftCorner,
-    const Vector2<int>& topRightCorner,
-    const Vector2<int>& point
+    const Vector2BH<int>& bottomLeftCorner,
+    const Vector2BH<int>& topRightCorner,
+    const Vector2BH<int>& point
   );
 
   static bool isPointInsideConvexPolygon(
-    const Vector2<> polygon[],
+    const Vector2BH<> polygon[],
     const int numberOfPoints,
-    const Vector2<>& point
+    const Vector2BH<>& point
   );
 
   static bool clipPointInsideRectangle(
-    const Vector2<int>& bottomLeftCorner,
-    const Vector2<int>& topRightCorner,
-    Vector2<int>& point
+    const Vector2BH<int>& bottomLeftCorner,
+    const Vector2BH<int>& topRightCorner,
+    Vector2BH<int>& point
   );
 
   static bool clipPointInsideRectangle(
-    const Vector2<int>& bottomLeftCorner,
-    const Vector2<int>& topRightCorner,
-    Vector2<>& point
+    const Vector2BH<int>& bottomLeftCorner,
+    const Vector2BH<int>& topRightCorner,
+    Vector2BH<>& point
   );
 
   /**
@@ -429,20 +421,20 @@ public:
   static bool calculatePointOnField(
     const int x,
     const int y,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<>& pointOnField
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<>& pointOnField
   );
   static bool calculatePointOnFieldHacked(
     const int x,
     const int y,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<>& pointOnField
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<>& pointOnField
   );
-  static bool calculatePointOnField(const Vector2<>& image, const float& fieldZ, const CameraMatrix& cameraMatrix, const CameraInfo& cameraInfo,
-                                    Vector3<>& field);
-  static bool calculatePointOnField(const Vector2<>& point, const CameraMatrix& cameraMatrix, const CameraInfo& cameraInfo, Vector2<>& pointOnField);
+  static bool calculatePointOnField(const Vector2BH<>& image, const float& fieldZ, const CameraMatrixBH& cameraMatrix, const CameraInfoBH& cameraInfo,
+                                    Vector3BH<>& field);
+  static bool calculatePointOnField(const Vector2BH<>& point, const CameraMatrixBH& cameraMatrix, const CameraInfoBH& cameraInfo, Vector2BH<>& pointOnField);
 
 
 
@@ -457,12 +449,12 @@ public:
   static bool calculatePointOnField(
     const int x,
     const int y,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<int>& pointOnField
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<int>& pointOnField
   )
   {
-    Vector2<> pointOnFieldDouble;
+    Vector2BH<> pointOnFieldDouble;
     bool onField = calculatePointOnField(x, y, cameraMatrix, cameraInfo, pointOnFieldDouble);
     pointOnField.x = (int)pointOnFieldDouble.x;
     pointOnField.y = (int)pointOnFieldDouble.y;
@@ -478,11 +470,11 @@ public:
   * @param pointOnPlane The resulting point.
   */
   static bool calculatePointOnHorizontalPlane(
-    const Vector2<int>& pointInImage,
+    const Vector2BH<int>& pointInImage,
     float z,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<>& pointOnPlane);
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<>& pointOnPlane);
 
   /**
   * Calculates where a relative point on the ground appears in an image.
@@ -494,10 +486,25 @@ public:
   *         still does not mean that the point is within the bounds of the image.
   */
   static bool calculatePointInImage(
-    const Vector2<int>& point,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<int>& pointInImage);
+    const Vector2BH<>& point,
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<int>& pointInImage);
+
+  /**
+  * Calculates where a relative point on the ground appears in an image.
+  * @param point The coordinates of the point relative to the robot's origin.
+  * @param cameraMatrix The camera matrix of the image.
+  * @param cameraInfo The camera info of the image.
+  * @param pointInImage The resulting point.
+  * @return The result is valid, i.e. the point is in front of the camera. That
+  *         still does not mean that the point is within the bounds of the image.
+  */
+  static bool calculatePointInImage(
+    const Vector3BH<>& point,
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<>& pointInImage);
 
   /**
   * Calculates where a relative 3-D point appears in an image.
@@ -509,10 +516,10 @@ public:
   *         still does not mean that the point is within the bounds of the image.
   */
   static bool calculatePointInImage(
-    const Vector3<>& pointInWorld,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
-    Vector2<int>& pointInImage);
+    const Vector3BH<>& pointInWorld,
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
+    Vector2BH<int>& pointInImage);
 
   /**
   * Clips a line with a rectangle
@@ -524,19 +531,19 @@ public:
   * @return states whether clipping was necessary (and done)
   */
   static bool getIntersectionPointsOfLineAndRectangle(
-    const Vector2<int>& bottomLeft,
-    const Vector2<int>& topRight,
+    const Vector2BH<int>& bottomLeft,
+    const Vector2BH<int>& topRight,
     const Geometry::Line line,
-    Vector2<int>& point1,
-    Vector2<int>& point2
+    Vector2BH<int>& point1,
+    Vector2BH<int>& point2
   );
 
   static bool getIntersectionPointsOfLineAndRectangle(
-    const Vector2<>& bottomLeft,
-    const Vector2<>& topRight,
+    const Vector2BH<>& bottomLeft,
+    const Vector2BH<>& topRight,
     const Geometry::Line line,
-    Vector2<>& point1,
-    Vector2<>& point2
+    Vector2BH<>& point1,
+    Vector2BH<>& point2
   );
 
   /**
@@ -549,10 +556,10 @@ public:
   * @see http://de.wikipedia.org/wiki/Algorithmus_von_Cohen-Sutherland
   */
   static bool clipLineWithRectangleCohenSutherland(
-    const Vector2<int>& bottomLeft,
-    const Vector2<int>& topRight,
-    Vector2<int>& point1,
-    Vector2<int>& point2
+    const Vector2BH<int>& bottomLeft,
+    const Vector2BH<int>& topRight,
+    Vector2BH<int>& point1,
+    Vector2BH<int>& point2
   );
 
   /**
@@ -568,7 +575,7 @@ public:
   * @param y relative y-coordinate of ball (relative to robot)
   * @return Returns the ball positon in absolute coordinates
   */
-  static Vector2<> relative2FieldCoord(const Pose2D& rp, float x, float y);
+  static Vector2BH<> relative2FieldCoord(const Pose2DBH& rp, float x, float y);
 
   /**
   * Function does the transformation from 2d relative robot coordinates
@@ -577,7 +584,7 @@ public:
   * @param relPosOnField relative position on the field (relative to robot)
   * @return Returns the ball positon in absolute coordinates
   */
-  static Vector2<> relative2FieldCoord(const Pose2D& rp, const Vector2<>& relPosOnField);
+  static Vector2BH<> relative2FieldCoord(const Pose2DBH& rp, const Vector2BH<>& relPosOnField);
 
 
   /**
@@ -587,7 +594,7 @@ public:
   * @param fieldCoord
   * @return Returns the positon in relative
   */
-  static Vector2<> fieldCoord2Relative(const Pose2D& robotPose, const Vector2<>& fieldCoord);
+  static Vector2BH<> fieldCoord2Relative(const Pose2DBH& robotPose, const Vector2BH<>& fieldCoord);
 
   /**
   * The function approximates the shape of a ball in the camera image.
@@ -599,9 +606,9 @@ public:
   * @param circle The approximated shape generated by the function.
   * @return If false, only the center of the circle is valid, not the radius.
   */
-  static bool calculateBallInImage(const Vector2<>& ballOffset,
-                                   const CameraMatrix& cameraMatrix,
-                                   const CameraInfo& cameraInfo,
+  static bool calculateBallInImage(const Vector2BH<>& ballOffset,
+                                   const CameraMatrixBH& cameraMatrix,
+                                   const CameraInfoBH& cameraInfo,
                                    float ballRadius,
                                    Circle& circle);
 
@@ -614,7 +621,7 @@ public:
   */
   static float getDistanceBySize
   (
-    const CameraInfo& cameraInfo,
+    const CameraInfoBH& cameraInfo,
     float sizeInReality,
     float sizeInPixels
   );
@@ -630,7 +637,7 @@ public:
   * @return The distance between camera and object.
   */
   static float getDistanceBySize(
-    const CameraInfo& cameraInfo,
+    const CameraInfoBH& cameraInfo,
     float sizeInReality,
     float sizeInPixels,
     float centerX,
@@ -683,7 +690,7 @@ public:
   */
   static float getSizeByDistance
   (
-    const CameraInfo& cameraInfo,
+    const CameraInfoBH& cameraInfo,
     float sizeInReality,
     float distance
   );
@@ -695,8 +702,8 @@ public:
   * @return The line of the horizon in the image.
   */
   static Geometry::Line calculateHorizon(
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo
   );
 
   /**
@@ -708,19 +715,30 @@ public:
   * @return The size of a line pixel.
   */
   static int calculateLineSize(
-    const Vector2<int>& pointInImage,
-    const CameraMatrix& cameraMatrix,
-    const CameraInfo& cameraInfo,
+    const Vector2BH<int>& pointInImage,
+    const CameraMatrixBH& cameraMatrix,
+    const CameraInfoBH& cameraInfo,
     float fieldLinesWidth
   );
+
+  static int calculateLineSize
+  (
+  const int xImg,
+  const int yImg,
+  const CameraMatrixBH& cameraMatrix,
+  const CameraInfoBH& cameraInfo,
+  float fieldLinesWidth
+  );
+
+
 
   /**
   * Calculates the angle size for a given pixel size.
   */
-  static float pixelSizeToAngleSize(float pixelSize, const CameraInfo& cameraInfo);
+  static float pixelSizeToAngleSize(float pixelSize, const CameraInfoBH& cameraInfo);
 
   /**
   * Calculates the pixel size for a given angle size.
   */
-  static float angleSizeToPixelSize(float angleSize, const CameraInfo& cameraInfo);
+  static float angleSizeToPixelSize(float angleSize, const CameraInfoBH& cameraInfo);
 };
