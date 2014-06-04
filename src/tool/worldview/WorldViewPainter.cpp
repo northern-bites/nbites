@@ -3,7 +3,13 @@
 namespace tool {
 namespace worldview {
 
-static const int PARTICLE_WIDTH = 8;
+static const int ROBOT_WIDTH = 8;
+
+// Degree of field of vision
+static const int VISION_SPAN = 70;
+
+// Distance of robot vision, for testing
+static const int VISION_DISTANCE = 50;
 
 WorldViewPainter::WorldViewPainter(QWidget* parent, float scaleFactor_) :
     PaintField(parent, scaleFactor_)
@@ -17,14 +23,13 @@ void WorldViewPainter::paintEvent(QPaintEvent* event)
     // Paint actual location
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
-        paintRobotLocation(event, curLoc[i], QString::number(i+1), true);
+        paintRobotLocation(event, curLoc[i], QString::number(i+1));
     }
 }
 
 void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                                           messages::WorldModel msg,
-                                          QString playerNum,
-                                          bool red)
+                                          QString playerNum)
 {
     if (!msg.active())
     {
@@ -32,14 +37,16 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
     }
 
     QPainter painter(this);
-    painter.translate(0, FIELD_GREEN_HEIGHT);
-    painter.scale(1, -1);
+    painter.translate(0, FIELD_GREEN_HEIGHT*scaleFactor);
+    painter.scale(scaleFactor, -scaleFactor);
 
     Qt::GlobalColor brushColor = Qt::cyan;
-    if (red)
+    if (msg.fallen())
         brushColor = Qt::red;
+    else if (msg.in_kicking_state())
+        brushColor = Qt::blue;
 
-    QPoint locCenter(msg.my_x(), msg.my_y());
+    const QPoint locCenter(msg.my_x(), msg.my_y());
 
     painter.setBrush(Qt::Dense7Pattern);
 
@@ -48,19 +55,39 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                         (int)msg.my_uncert(),
                         (int)msg.my_uncert());
 
+
+    if (!msg.fallen()){
+        // Draw boundaries of my field of vision
+        painter.setPen(QPen(Qt::cyan, 3));
+        painter.drawLine(msg.my_x(),
+                         msg.my_y(),
+                         VISION_DISTANCE * std::cos(TO_RAD*(msg.my_h()+VISION_SPAN/2)) + msg.my_x(),
+                         VISION_DISTANCE * std::sin(TO_RAD*(msg.my_h()+VISION_SPAN/2)) + msg.my_y());
+        painter.drawLine(msg.my_x(),
+                         msg.my_y(),
+                         VISION_DISTANCE * std::cos(TO_RAD*(msg.my_h()-VISION_SPAN/2)) + msg.my_x(),
+                         VISION_DISTANCE * std::sin(TO_RAD*(msg.my_h()-VISION_SPAN/2)) + msg.my_y());
+
+        // Draw where I'm walking to
+        painter.setPen(QPen(Qt::black, 2));
+        const QPoint walkingEnd(msg.walking_to_x(), msg.walking_to_y());
+        painter.drawLine(locCenter, walkingEnd);
+    }
+    
     painter.setBrush(brushColor);
+    painter.setPen(brushColor);
 
     // Draw myself
     painter.drawEllipse(locCenter,
-                        PARTICLE_WIDTH,
-                        PARTICLE_WIDTH);
+                        ROBOT_WIDTH,
+                        ROBOT_WIDTH);
 
+    painter.setPen(Qt::black);
     // Draw my heading
     painter.drawLine(msg.my_x(),
                      msg.my_y(),
-                     PARTICLE_WIDTH * std::cos(TO_RAD*msg.my_h()) + msg.my_x(),
-                     PARTICLE_WIDTH * std::sin(TO_RAD*msg.my_h()) + msg.my_y());
-
+                     ROBOT_WIDTH * std::cos(TO_RAD*msg.my_h()) + msg.my_x(),
+                     ROBOT_WIDTH * std::sin(TO_RAD*msg.my_h()) + msg.my_y());
 
     // Draw my number
     painter.setPen(brushColor);
@@ -80,15 +107,23 @@ void WorldViewPainter::paintRobotLocation(QPaintEvent* event,
                             8,
                             8);
 
-        //draw how sure I am about where the ball is
-        //TODO
-
         // Draw my number
         painter.setPen(brushColor);
         painter.scale(1, -1); // Scale y so that the number is right-side up.
         painter.drawText(ballCenter.x() + 15, -ballCenter.y(), playerNum);
         painter.scale(1,-1);
         painter.setPen(Qt::black);
+    }
+
+    // Draw where I am kicking
+    if(msg.in_kicking_state()){
+        const QPoint ballCenter(msg.my_x()+msg.ball_dist()*std::cos(TO_RAD*msg.my_h()+TO_RAD*msg.ball_bearing()),
+                                msg.my_y()+msg.ball_dist()*std::sin(TO_RAD*msg.my_h()+TO_RAD*msg.ball_bearing()));
+        const QPoint kickingEnd(msg.kicking_to_x(), msg.kicking_to_y());
+
+        // Draw line to where I am kicking
+        painter.setPen(QPen(Qt::blue, 2));
+        painter.drawLine(ballCenter, kickingEnd);
     }
 }
 
