@@ -652,8 +652,8 @@ void loadModuleParameters(Streamable& parameters, const char* moduleName, const 
   protected: void serialize(In* in, Out* out) \
   { \
     STREAM_REGISTER_BEGIN \
-    for(PSTREAMPROC& p : _parameters) \
-    { \
+    for(auto iter = _parameters.begin(); iter != _parameters.end(); iter++) { \
+      PSTREAMPROC& p = *iter; \
       (this->*p)(in, out); /* pointer to member function invocation */ \
     } \
     STREAM_REGISTER_FINISH \

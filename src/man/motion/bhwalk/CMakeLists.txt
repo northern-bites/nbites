@@ -67,9 +67,9 @@ set( bhwalk_srcs
 
 #install configs
 if( NOT OFFLINE )
-set( BHWALK_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/config )
-install( DIRECTORY ${BHWALK_CONFIG_DIR} 
-         DESTINATION ${CMAKE_INSTALL_PREFIX} )
+    set( BHWALK_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Config )
+    install( DIRECTORY ${BHWALK_CONFIG_DIR}
+    DESTINATION ${CMAKE_INSTALL_PREFIX} )
 endif()
 
 add_library(

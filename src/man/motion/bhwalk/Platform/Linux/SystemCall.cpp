@@ -128,7 +128,7 @@ void* SystemCall::alignedMalloc(size_t size, size_t alignment)
   }
   else
   {
-    return nullptr;
+    return 0;
   }
 }
 

@@ -43,8 +43,9 @@ public:
     for(unsigned i = 0; i < obstacles.size(); ++i)
     {
       const Obstacle& c = obstacles[i];
-      for(const Spot& s : c.spots)
+      for(auto iter = c.spots.begin(); iter != c.spots.end(); iter++)
       {
+        const Spot& s = *iter;
         CROSS("representation:ObstacleSpotsBH:spots", s.x, s.y, 3, 3, Drawings::ps_solid, ColorClasses::white);
       }
       RECTANGLE("representation:ObstacleSpotsBH:banZones", c.banZoneTopLeft.x, c.banZoneTopLeft.y,
