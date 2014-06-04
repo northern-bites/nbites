@@ -80,7 +80,7 @@ def afterKick(player):
     if player.penaltyKicking:
         return player.stay()
 
-    if player.stateTime > 2:
+    if player.stateTime > 4:
         return player.goLater('approachBall')
 
     return player.stay()
