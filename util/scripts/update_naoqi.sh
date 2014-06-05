@@ -49,5 +49,5 @@ sed "2 c\export AL_DIR=$naoqi_local" bashBackup >> nbites.bash
 
 rm $scripts/bashBackup
 
-echo "Now delete \"oldAtom\" directory from nbites/lib/ it will require sudo"
+echo "Now delete \"oldAtom\" directory from nbites/lib/ It WILL require sudo"
 echo "Restart terminal for changes to take effect"
