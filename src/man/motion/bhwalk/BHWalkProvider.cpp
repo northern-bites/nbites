@@ -66,6 +66,9 @@ static const JointDataBH::Joint nb_joint_order[] = {
 BHWalkProvider::BHWalkProvider()
     : MotionProvider(WALK_PROVIDER), requestedToStop(false)
 {
+	// Setup Walk Engine Configuation Parameters
+	ModuleBase::config_path = "~/nbites/Config/";
+
 	// Setup static variables
 	Blackboard::theInstance = new Blackboard();
 	MotionSelector::theInstance = new MotionSelector();
