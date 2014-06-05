@@ -5,7 +5,16 @@
 #include <string>
 #include <iostream>
 
+// BH
 #include "bhuman.h"
+#include "Modules/Sensing/JointFilter.h"
+#include "Modules/Sensing/RobotModelProvider.h"
+#include "Modules/Sensing/InertiaSensorCalibrator.h"
+#include "Modules/Sensing/InertiaSensorFilter.h"
+#include "Modules/Sensing/SensorFilter.h"
+#include "Modules/Sensing/FallDownStateDetector.h"
+#include "Modules/Sensing/TorsoMatrixProvider.h"
+#include "Modules/Infrastructure/NaoProvider.h"
 
 namespace man
 {
@@ -57,6 +66,26 @@ static const JointDataBH::Joint nb_joint_order[] = {
 BHWalkProvider::BHWalkProvider()
     : MotionProvider(WALK_PROVIDER), requestedToStop(false)
 {
+	// Setup static variables
+	Blackboard::theInstance = new Blackboard();
+	MotionSelector::theInstance = new MotionSelector();
+	InertiaSensorCalibrator::theInstance = new InertiaSensorCalibrator();
+	JointFilter::theInstance = new JointFilter();
+	RobotModelProvider::theInstance = new RobotModelProvider();
+	InertiaSensorFilter::theInstance = new InertiaSensorFilter();
+	SensorFilter::theInstance = new SensorFilter();
+	FallDownStateDetector::theInstance = new FallDownStateDetector();
+	TorsoMatrixProvider::theInstance = new TorsoMatrixProvider();
+	NaoProvider::theInstance = new NaoProvider();
+
+    // Setup the walk engine
+	walkingEngine = new WalkingEngine();
+	walkingEngine->theFrameInfoBH.cycleTime = 0.01f;
+	walkingEngine->currentMotionType = WalkingEngine::stand;
+	walkingEngine->theMotionRequestBH.motion = MotionRequestBH::specialAction;
+	for (int i = 0; i < MotionRequestBH::numOfMotions; i++)
+		walkingEngine->theMotionSelectionBH.ratios[i] = 0;
+	walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::specialAction] = 1.0;
     hardReset();
 }
 
@@ -103,7 +132,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     // TODO reimplement or not necessary any more?
     // If our calibration became bad (as decided by the walkingEngine,
     // reset. We will wait until we're recalibrated to walk.
-    // if (walkingEngine.shouldReset && calibrated())
+    // if (walkingEngine->shouldReset && calibrated())
     // {
     //     std::cout << "We are stuck! Recalibrating." << std::endl;
     //     hardReset();
@@ -118,11 +147,11 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         //TODO: maybe check what kind of special move we're switching to and change this
         //accordingly
         motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
-        walkingEngine.theMotionRequestBH = motionRequest;
+        walkingEngine->theMotionRequestBH = motionRequest;
 
         //anything that's not in the walk is marked as unstable
-        walkingEngine.theMotionInfoBH = MotionInfoBH();
-        walkingEngine.theMotionInfoBH.isMotionStable = false;
+        walkingEngine->theMotionInfoBH = MotionInfoBH();
+        walkingEngine->theMotionInfoBH.isMotionStable = false;
 
     } else {
     // Figure out the motion request
@@ -134,7 +163,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         //TODO: maybe check what kind of special move we're switching to and change this
         //accordingly
         motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
-        walkingEngine.theMotionRequestBH = motionRequest;
+        walkingEngine->theMotionRequestBH = motionRequest;
 
         currentCommand = MotionCommand::ptr();
 
@@ -145,17 +174,17 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
-            walkingEngine.theMotionRequestBH = motionRequest;
+            walkingEngine->theMotionRequestBH = motionRequest;
         } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
 
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
 
-            Pose2DBH deltaOdometry = walkingEngine.theOdometryDataBH - startOdometry;
+            Pose2DBH deltaOdometry = walkingEngine->theOdometryDataBH - startOdometry;
             Pose2DBH absoluteTarget(command->theta_rads, command->x_mms, command->y_mms);
 
-            Pose2DBH relativeTarget = absoluteTarget - (deltaOdometry + walkingEngine.upcomingOdometryOffset);
+            Pose2DBH relativeTarget = absoluteTarget - (deltaOdometry + walkingEngine->upcomingOdometryOffset);
 
-            if (!hasPassed(deltaOdometry + walkingEngine.upcomingOdometryOffset, absoluteTarget)) {
+            if (!hasPassed(deltaOdometry + walkingEngine->upcomingOdometryOffset, absoluteTarget)) {
 
                 MotionRequestBH motionRequest;
                 motionRequest.motion = MotionRequestBH::walk;
@@ -169,7 +198,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 // motionRequest.walkRequest.pedantic = true;
                 motionRequest.walkRequest.target = relativeTarget;
 
-                walkingEngine.theMotionRequestBH = motionRequest;
+                walkingEngine->theMotionRequestBH = motionRequest;
 
             } else {
                 currentCommand = MotionCommand::ptr();
@@ -189,7 +218,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.speed.translation.x = command->x_percent;
             motionRequest.walkRequest.speed.translation.y = command->y_percent;
 
-            walkingEngine.theMotionRequestBH = motionRequest;
+            walkingEngine->theMotionRequestBH = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
 
@@ -228,14 +257,14 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 // motionRequest.walkRequest.kickBallPosition.y = command->kickBallRelY;
             }
 
-            walkingEngine.theMotionRequestBH = motionRequest;
+            walkingEngine->theMotionRequestBH = motionRequest;
         }
         //TODO: make special command for stand
         if (!currentCommand.get()) {
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
-            walkingEngine.theMotionRequestBH = motionRequest;
+            walkingEngine->theMotionRequestBH = motionRequest;
         }
         }
         }
@@ -243,14 +272,14 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     }
 
     //We do not copy temperatures because they are unused
-    JointDataBH& bh_joint_data = walkingEngine.theJointDataBH;
+    JointDataBH& bh_joint_data = walkingEngine->theJointDataBH;
 
     for (int i = 0; i < JointDataBH::numOfJoints; i++)
     {
         bh_joint_data.angles[nb_joint_order[i]] = sensorAngles[i];
     }
 
-    SensorDataBH& bh_sensors = walkingEngine.theSensorDataBH;
+    SensorDataBH& bh_sensors = walkingEngine->theSensorDataBH;
 
     for (int i = 0; i < JointDataBH::numOfJoints; i++)
     {
@@ -278,7 +307,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
 
     WalkingEngineOutputBH output;
-    walkingEngine.update(output);
+    walkingEngine->update(output);
 
     //ignore the first chain since it's the head one
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
@@ -301,21 +330,21 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     }
 
     //we only really leave when we do a sweet move, so request a special action
-    if (walkingEngine.theMotionSelectionBH.targetMotion == MotionRequestBH::specialAction
+    if (walkingEngine->theMotionSelectionBH.targetMotion == MotionRequestBH::specialAction
             && requestedToStop) {
 
         inactive();
         requestedToStop = false;
         //reset odometry - this allows the walk to not "freak out" when we come back
         //from other providers
-        walkingEngine.theOdometryDataBH = OdometryDataBH();
+        walkingEngine->theOdometryDataBH = OdometryDataBH();
     }
 
     PROF_EXIT(P_WALK);
 }
 
 bool BHWalkProvider::isStanding() const {
-    return walkingEngine.theMotionRequestBH.motion == MotionRequestBH::stand;
+    return walkingEngine->theMotionRequestBH.motion == MotionRequestBH::stand;
 }
 
 bool BHWalkProvider::isWalkActive() const {
@@ -334,11 +363,11 @@ void BHWalkProvider::stand() {
 void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const
 {
     portals::Message<messages::RobotLocation> odometryData(0);
-    odometryData.get()->set_x(walkingEngine.theOdometryDataBH.translation.x
+    odometryData.get()->set_x(walkingEngine->theOdometryDataBH.translation.x
                               * MM_TO_CM);
-    odometryData.get()->set_y(walkingEngine.theOdometryDataBH.translation.y
+    odometryData.get()->set_y(walkingEngine->theOdometryDataBH.translation.y
                               * MM_TO_CM);
-    odometryData.get()->set_h(walkingEngine.theOdometryDataBH.rotation);
+    odometryData.get()->set_h(walkingEngine->theOdometryDataBH.rotation);
 
     out.setMessage(odometryData);
 }
@@ -347,7 +376,7 @@ void BHWalkProvider::hardReset() {
 
     inactive();
     //reset odometry
-    walkingEngine.theOdometryDataBH = OdometryDataBH();
+    walkingEngine->theOdometryDataBH = OdometryDataBH();
 
     MotionRequestBH motionRequest;
     motionRequest.motion = MotionRequestBH::specialAction;
@@ -357,7 +386,7 @@ void BHWalkProvider::hardReset() {
     currentCommand = MotionCommand::ptr();
 
     // TODO what does this do?
-    // walkingEngine.inertiaSensorCalibrator.reset();
+    // walkingEngine->inertiaSensorCalibrator.reset();
 
     requestedToStop = false;
 }
@@ -372,7 +401,7 @@ void BHWalkProvider::hardReset() {
 //}
 
 void BHWalkProvider::resetOdometry() {
-    walkingEngine.theOdometryDataBH = OdometryDataBH();
+    walkingEngine->theOdometryDataBH = OdometryDataBH();
 }
 
 void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
@@ -393,9 +422,9 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 void BHWalkProvider::setCommand(const StepCommand::ptr command) {
     MotionRequestBH motionRequest;
     motionRequest.motion = MotionRequestBH::walk;
-    walkingEngine.theMotionRequestBH = motionRequest;
+    walkingEngine->theMotionRequestBH = motionRequest;
 
-    startOdometry = walkingEngine.theOdometryDataBH;
+    startOdometry = walkingEngine->theOdometryDataBH;
     currentCommand = command;
 
 //    bhwalk_out << "BHWalk step walk requested with command ";
@@ -412,16 +441,16 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 }
 
 bool BHWalkProvider::calibrated() const {
-    return walkingEngine.theInertiaSensorDataBH.calibrated;
+    return walkingEngine->theInertiaSensorDataBH.calibrated;
 }
 
 float BHWalkProvider::leftHandSpeed() const {
-    // return walkingEngine.leftHandSpeed;
+    // return walkingEngine->leftHandSpeed;
     return 0;
 }
 
 float BHWalkProvider::rightHandSpeed() const {
-    // return walkingEngine.rightHandSpeed;
+    // return walkingEngine->rightHandSpeed;
     return 0;
 }
 

@@ -1,15 +1,10 @@
 cmake_minimum_required( VERSION 2.8.0 )
 project( BHWALK )
 
-# Include  the basic definitions accross all projects
-#include( ../../cmake/base_definitions.cmake )
-
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x" CACHE STRING "" FORCE)
 add_definitions(-DLINUX -DRELEASE -DTARGET_ROBOT)
 
 set( bhwalk_srcs 
   BHWalkProvider.cpp
-  #BHWalkModule.cpp
   MotionSelector.cpp
   WalkingEngine.cpp
   WalkingEngineKicks.cpp
@@ -63,9 +58,13 @@ set( bhwalk_srcs
   Tools/MessageQueue/MessageQueue.cpp
   Tools/MessageQueue/OutMessage.cpp
   Tools/MessageQueue/InMessage.cpp
+  Util/snappy/lib-source/snappy.cc
+  Util/snappy/lib-source/snappy-c.cc
+  Util/snappy/lib-source/snappy-sinksource.cc
+  Util/snappy/lib-source/snappy-stubs-internal.cc
 )
 
-#install configs
+# Install configs
 if( NOT OFFLINE )
     set( BHWALK_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Config )
     install( DIRECTORY ${BHWALK_CONFIG_DIR}
@@ -77,3 +76,6 @@ add_library(
 	STATIC
 	${bhwalk_srcs} )
 
+# # Link project to snappy libraries
+# target_link_libraries(bhwalk
+#                       ${CMAKE_CURRENT_SOURCE_DIR}/Util/snappy/lib/linux_x86/libsnappy.a)
