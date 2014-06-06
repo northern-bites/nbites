@@ -7,14 +7,6 @@
 
 // BH
 #include "bhuman.h"
-#include "Modules/Sensing/JointFilter.h"
-#include "Modules/Sensing/RobotModelProvider.h"
-#include "Modules/Sensing/InertiaSensorCalibrator.h"
-#include "Modules/Sensing/InertiaSensorFilter.h"
-#include "Modules/Sensing/SensorFilter.h"
-#include "Modules/Sensing/FallDownStateDetector.h"
-#include "Modules/Sensing/TorsoMatrixProvider.h"
-#include "Modules/Infrastructure/NaoProvider.h"
 
 namespace man
 {
@@ -67,22 +59,14 @@ BHWalkProvider::BHWalkProvider()
     : MotionProvider(WALK_PROVIDER), requestedToStop(false)
 {
 	// Setup Walk Engine Configuation Parameters
-	ModuleBase::config_path = "~/nbites/Config/";
+    // TODO use NaoPaths.h
+	ModuleBase::config_path = "/home/nao/nbites/Config/";
 
 	// Setup static variables
-	Blackboard::theInstance = new Blackboard();
-	MotionSelector::theInstance = new MotionSelector();
-	InertiaSensorCalibrator::theInstance = new InertiaSensorCalibrator();
-	JointFilter::theInstance = new JointFilter();
-	RobotModelProvider::theInstance = new RobotModelProvider();
-	InertiaSensorFilter::theInstance = new InertiaSensorFilter();
-	SensorFilter::theInstance = new SensorFilter();
-	FallDownStateDetector::theInstance = new FallDownStateDetector();
-	TorsoMatrixProvider::theInstance = new TorsoMatrixProvider();
-	NaoProvider::theInstance = new NaoProvider();
+	Blackboard::theInstance = new Blackboard;
 
     // Setup the walk engine
-	walkingEngine = new WalkingEngine();
+	walkingEngine = new WalkingEngine;
 	walkingEngine->theFrameInfoBH.cycleTime = 0.01f;
 	walkingEngine->currentMotionType = WalkingEngine::stand;
 	walkingEngine->theMotionRequestBH.motion = MotionRequestBH::specialAction;
@@ -309,6 +293,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLBL] = sensorFSRs.lrl();
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
 
+    // TODO this might not be the best way, think about the blackboard...
     WalkingEngineOutputBH output;
     walkingEngine->update(output);
 

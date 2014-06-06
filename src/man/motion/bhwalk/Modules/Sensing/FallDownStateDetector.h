@@ -23,12 +23,12 @@ MODULE(FallDownStateDetector)
   USES(MotionInfoBH)
   REQUIRES(FrameInfoBH)
   PROVIDES_WITH_MODIFY_AND_DRAW(FallDownStateBH)
-  LOADS_PARAMETER(int, fallTime) /**< The time (in ms) to remain in state 'falling' after a detected fall */
-  LOADS_PARAMETER(float, staggeringAngleX) /**< The threshold angle which is used to detect the robot is staggering to the back or front*/
-  LOADS_PARAMETER(float, staggeringAngleY) /**< The threshold angle which is used to detect the robot is staggering sidewards*/
-  LOADS_PARAMETER(float, fallDownAngleY) /**< The threshold angle which is used to detect a fall to the back or front*/
-  LOADS_PARAMETER(float, fallDownAngleX) /**< The threshold angle which is used to detect a sidewards fall */
-  LOADS_PARAMETER(float, onGroundAngle) /**< The threshold angle which is used to detect the robot lying on the ground */
+  DEFINES_PARAMETER(int, fallTime, 1000) /**< The time (in ms) to remain in state 'falling' after a detected fall */
+  DEFINES_PARAMETER(float, staggeringAngleX, 40) /**< The threshold angle which is used to detect the robot is staggering to the back or front*/
+  DEFINES_PARAMETER(float, staggeringAngleY, 30) /**< The threshold angle which is used to detect the robot is staggering sidewards*/
+  DEFINES_PARAMETER(float, fallDownAngleY, 45) /**< The threshold angle which is used to detect a fall to the back or front*/
+  DEFINES_PARAMETER(float, fallDownAngleX, 55) /**< The threshold angle which is used to detect a sidewards fall */
+  DEFINES_PARAMETER(float, onGroundAngle, 75) /**< The threshold angle which is used to detect the robot lying on the ground */
 END_MODULE
 
 

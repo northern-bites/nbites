@@ -29,11 +29,11 @@ public:
     left, /**< kick using the left foot */
     right, /**< kick using the right foot */
     sidewardsLeft,
-    sidewardsRight,
-    angleLeft,
-    angleRight,
-    stepForLeftKick,
-    stepForRightKick
+    sidewardsRight
+    // angleLeft,
+    // angleRight,
+    // stepForLeftKick,
+    // stepForRightKick
   );
 
   bool isValid() const

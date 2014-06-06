@@ -24,6 +24,16 @@ WalkingEngine::WalkingEngine() : WalkingEngineBase(), optimizeStarted(false)
 {
 	theInstance = this;
 
+    naoProvider = new NaoProvider();
+    jointFilter = new JointFilter();
+    robotModelProvider = new RobotModelProvider();
+    inertiaSensorCalibrator = new InertiaSensorCalibrator();
+    inertiaSensorFilter = new InertiaSensorFilter();
+    sensorFilter = new SensorFilter();
+    fallDownStateDetector = new FallDownStateDetector();
+    torsoMatrixProvider = new TorsoMatrixProvider();
+    motionSelector = new MotionSelector();
+
 	init();
 
 #ifdef TARGET_SIM
@@ -168,18 +178,16 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 
 	theMotionInfoBH.motion = theMotionRequestBH.motion;
 
-	NaoProvider::theInstance->update(theJointDataBH, theSensorDataBH);
-	JointFilter::theInstance->update(theFilteredJointDataBH);
-	RobotModelProvider::theInstance->update(theRobotModelBH);
-	InertiaSensorCalibrator::theInstance->update(theInertiaSensorDataBH);
-	InertiaSensorFilter::theInstance->update(theOrientationDataBH);
-	SensorFilter::theInstance->update(theFilteredSensorDataBH);
-	FallDownStateDetector::theInstance->update(theFallDownStateBH);
-	TorsoMatrixProvider::theInstance->update(theOdometryDataBH);
-	TorsoMatrixProvider::theInstance->update(theTorsoMatrixBH);
-
-	MotionSelector::theInstance->update(theMotionSelectionBH);
-
+	naoProvider->update(theJointDataBH, theSensorDataBH);
+	jointFilter->update(theFilteredJointDataBH);
+	robotModelProvider->update(theRobotModelBH);
+	inertiaSensorCalibrator->update(theInertiaSensorDataBH);
+	inertiaSensorFilter->update(theOrientationDataBH);
+	sensorFilter->update(theFilteredSensorDataBH);
+	fallDownStateDetector->update(theFallDownStateBH);
+	torsoMatrixProvider->update(theOdometryDataBH);
+	torsoMatrixProvider->update(theTorsoMatrixBH);
+	motionSelector->update(theMotionSelectionBH);
 
 	DEBUG_RESPONSE("module:WalkingEngine:optimize",
 			{

@@ -70,58 +70,58 @@ MODULE(WalkingEngine)
   REQUIRES(WalkingEngineOutputBH)
   PROVIDES_WITH_MODIFY(WalkingEngineStandOutputBH)
 
-  LOADS_PARAMETER(VectorYZ, standComPosition) /**< The position of the center of mass relative to the right foot when standing */
-  LOADS_PARAMETER(float, standBodyTilt) /**< The tilt of the torso when standing */
-  LOADS_PARAMETER(Vector2BH<>, standArmJointAngles) /**< The joint angles of the left arm when standing */
-  LOADS_PARAMETER(int, standHardnessAnklePitch) /**< The hardness of the ankle pitch joint for standing and walking */
-  LOADS_PARAMETER(int, standHardnessAnkleRoll) /**< The hardness of the ankle roll joint for standing and walking */
+  DEFINES_PARAMETER(VectorYZ, standComPosition, VectorYZ(50.f, 262.0f)) /**< The position of the center of mass relative to the right foot when standing */
+  DEFINES_PARAMETER(float, standBodyTilt, 0.f) /**< The tilt of the torso when standing */
+  DEFINES_PARAMETER(Vector2BH<>, standArmJointAngles, Vector2BH<>(0.2f, 0.f)) /**< The joint angles of the left arm when standing */
+  DEFINES_PARAMETER(int, standHardnessAnklePitch, 85) /**< The hardness of the ankle pitch joint for standing and walking */
+  DEFINES_PARAMETER(int, standHardnessAnkleRoll, 85) /**< The hardness of the ankle roll joint for standing and walking */
 
-  LOADS_PARAMETER(Vector2BH<>, walkRef) /**< The position of the pendulum pivot point in Q */
-  LOADS_PARAMETER(Vector2BH<>, walkRefAtFullSpeedX) /**< The position of the pendulum pivot point when walking forwards with maximum speed */
-  LOADS_PARAMETER(RangeBH<>, walkRefXPlanningLimit) /**< The limit for shifting the pendulum pivot point towards the x-axis when planning the next step size */
-  LOADS_PARAMETER(RangeBH<>, walkRefXLimit) /**< The limit for shifting the pendulum pivot point towards the x-axis when balancing */
-  LOADS_PARAMETER(RangeBH<>, walkRefYLimit) /**< The limit for shifting the pendulum pivot point towards the y-axis when balancing */
-  LOADS_PARAMETER(RangeBH<>, walkStepSizeXPlanningLimit) /**< The minimum and maximum step size used to plan the next step size */
-  LOADS_PARAMETER(RangeBH<>, walkStepSizeXLimit) /**< The minimum and maximum step size when balancing */
-  LOADS_PARAMETER(float, walkStepDuration) /**< the duration of a full step cycle (two half steps) */
-  LOADS_PARAMETER(float, walkStepDurationAtFullSpeedX) /**< the duration of a full step cycle when walking forwards with maximum speed */
-  LOADS_PARAMETER(float, walkStepDurationAtFullSpeedY) /**< the duration of a full step cycle when walking sidewards with maximum speed */
-  LOADS_PARAMETER(Vector2BH<>, walkHeight) /**< the height of the 3d linear inverted pendulum plane (for the pendulum motion towards the x-axis and the pendulum motion towards the y-axis) */
-  LOADS_PARAMETER(float, walkArmRotationAtFullSpeedX) /**< The maximum deflection for the arm swinging motion */
-  LOADS_PARAMETER(SubPhaseParameters, walkMovePhase) /**< The beginning and length of the trajectory used to move the swinging foot to its new position */
-  LOADS_PARAMETER(SubPhaseParameters, walkLiftPhase) /**< The beginning and length of the trajectory used to lift the swinging foot */
-  LOADS_PARAMETER(Vector3BH<>, walkLiftOffset) /**< The height the swinging foot is lifted */
-  LOADS_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX) /**< The height the swinging foot is lifted when walking full speed in x-direction */
-  LOADS_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedY) /**< The height the swinging foot is lifted when walking full speed in y-direction */
-  LOADS_PARAMETER(Vector3BH<>, walkLiftRotation) /**< The amount the swinging foot is rotated while getting lifted */
-  LOADS_PARAMETER(float, walkSupportRotation) /**< A rotation added to the supporting foot to boost the com acceleration */
-  LOADS_PARAMETER(Vector3BH<>, walkComLiftOffset) /**< The height the center of mass is lifted within a single support phase */
-  LOADS_PARAMETER(float, walkComBodyRotation) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */
+  DEFINES_PARAMETER(Vector2BH<>, walkRef, Vector2BH<>(16.f, 50.f)) /**< The position of the pendulum pivot point in Q */
+  DEFINES_PARAMETER(Vector2BH<>, walkRefAtFullSpeedX, Vector2BH<>(9.5f, 40.f)) /**< The position of the pendulum pivot point when walking forwards with maximum speed */
+  DEFINES_PARAMETER(RangeBH<>, walkRefXPlanningLimit, RangeBH<>(-2.f, 3.f)) /**< The limit for shifting the pendulum pivot point towards the x-axis when planning the next step size */
+  DEFINES_PARAMETER(RangeBH<>, walkRefXLimit, RangeBH<>(-30.f, 30.f)) /**< The limit for shifting the pendulum pivot point towards the x-axis when balancing */
+  DEFINES_PARAMETER(RangeBH<>, walkRefYLimit, RangeBH<>(-30.f, 30.f)) /**< The limit for shifting the pendulum pivot point towards the y-axis when balancing */
+  DEFINES_PARAMETER(RangeBH<>, walkStepSizeXPlanningLimit, RangeBH<>(-50.f, 60.f)) /**< The minimum and maximum step size used to plan the next step size */
+  DEFINES_PARAMETER(RangeBH<>, walkStepSizeXLimit, RangeBH<>(-55.f, 66.f)) /**< The minimum and maximum step size when balancing */
+  DEFINES_PARAMETER(float, walkStepDuration, 525.f) /**< the duration of a full step cycle (two half steps) */
+  DEFINES_PARAMETER(float, walkStepDurationAtFullSpeedX, 525.f) /**< the duration of a full step cycle when walking forwards with maximum speed */
+  DEFINES_PARAMETER(float, walkStepDurationAtFullSpeedY, 180.f) /**< the duration of a full step cycle when walking sidewards with maximum speed */
+  DEFINES_PARAMETER(Vector2BH<>, walkHeight, Vector2BH<>(262.f, 262.f)) /**< the height of the 3d linear inverted pendulum plane (for the pendulum motion towards the x-axis and the pendulum motion towards the y-axis) */
+  DEFINES_PARAMETER(float, walkArmRotationAtFullSpeedX, 0.1f) /**< The maximum deflection for the arm swinging motion */
+  DEFINES_PARAMETER(SubPhaseParameters, walkMovePhase, SubPhaseParameters(0.f, 1.f)) /**< The beginning and length of the trajectory used to move the swinging foot to its new position */
+  DEFINES_PARAMETER(SubPhaseParameters, walkLiftPhase, SubPhaseParameters(0.f, 1.f)) /**< The beginning and length of the trajectory used to lift the swinging foot */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffset, Vector3BH<>(0.f, 5.f, 17.f)) /**< The height the swinging foot is lifted */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedX, Vector3BH<>(0.f, 5.f, 17.f)) /**< The height the swinging foot is lifted when walking full speed in x-direction */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftOffsetAtFullSpeedY, Vector3BH<>(0.f, 20.f, 25.f)) /**< The height the swinging foot is lifted when walking full speed in y-direction */
+  DEFINES_PARAMETER(Vector3BH<>, walkLiftRotation, Vector3BH<>(-0.05f, -0.1f, 0.f)) /**< The amount the swinging foot is rotated while getting lifted */
+  DEFINES_PARAMETER(float, walkSupportRotation, 0.f) /**< A rotation added to the supporting foot to boost the com acceleration */
+  DEFINES_PARAMETER(Vector3BH<>, walkComLiftOffset, Vector3BH<>(0.f, 0.f, 2.3f)) /**< The height the center of mass is lifted within a single support phase */
+  DEFINES_PARAMETER(float, walkComBodyRotation, 0.05f) /**< How much the torso is rotated to achieve the center of mass shift along the y-axis */
 
-  LOADS_PARAMETER(Pose2DBH, speedMax) /**< The maximum walking speed (in "size of two steps") */
-  LOADS_PARAMETER(float, speedMaxBackwards) /**< The maximum walking speed for backwards walking (in "size of two steps") */
-  LOADS_PARAMETER(Pose2DBH, speedMaxChange) /**< The maximum walking speed deceleration that is used to avoid overshooting of the walking target */
+  DEFINES_PARAMETER(Pose2DBH, speedMax, Pose2DBH(0.5f, Vector2BH<>(120.f, 50.f))) /**< The maximum walking speed (in "size of two steps") */
+  DEFINES_PARAMETER(float, speedMaxBackwards, 80.f) /**< The maximum walking speed for backwards walking (in "size of two steps") */
+  DEFINES_PARAMETER(Pose2DBH, speedMaxChange, Pose2DBH(0.1f, Vector2BH<>(8.f, 20.f))) /**< The maximum walking speed deceleration that is used to avoid overshooting of the walking target */
 
-  LOADS_PARAMETER(bool, balance) /**< Whether sensory feedback should be used or not */
-  LOADS_PARAMETER(Vector2BH<>, balanceBodyRotation) /**< A  torso rotation p-control factor */
-  LOADS_PARAMETER(Vector2BH<>, balanceCom) /**< A measured center of mass position adoption factor */
-  LOADS_PARAMETER(Vector2BH<>, balanceComVelocity)  /**< A measured center of mass velocity adoption factor */
-  LOADS_PARAMETER(Vector2BH<>, balanceRef) /**< A pendulum pivot point p-control factor */
-  LOADS_PARAMETER(Vector2BH<>, balanceNextRef) /**< A pendulum pivot point of the upcoming single support phase p-control factor */
-  LOADS_PARAMETER(Vector2BH<>, balanceStepSize) /**< A step size i-control factor */
+  DEFINES_PARAMETER(bool, balance, true) /**< Whether sensory feedback should be used or not */
+  DEFINES_PARAMETER(Vector2BH<>, balanceBodyRotation, Vector2BH<>(0.8f, 0.f)) /**< A  torso rotation p-control factor */
+  DEFINES_PARAMETER(Vector2BH<>, balanceCom, Vector2BH<>(0.054f, 0.054f)) /**< A measured center of mass position adoption factor */
+  DEFINES_PARAMETER(Vector2BH<>, balanceComVelocity, Vector2BH<>(0.14f, 0.14f))  /**< A measured center of mass velocity adoption factor */
+  DEFINES_PARAMETER(Vector2BH<>, balanceRef, Vector2BH<>(0.f, 0.08f)) /**< A pendulum pivot point p-control factor */
+  DEFINES_PARAMETER(Vector2BH<>, balanceNextRef, Vector2BH<>(0.2f, 0.f)) /**< A pendulum pivot point of the upcoming single support phase p-control factor */
+  DEFINES_PARAMETER(Vector2BH<>, balanceStepSize, Vector2BH<>(0.1f, -0.04f)) /**< A step size i-control factor */
 
-  LOADS_PARAMETER(float, observerMeasurementDelay) /**< The delay between setting a joint angle and the ability of measuring the result */
-  LOADS_PARAMETER(Vector2f, observerMeasurementDeviation) /**< The measurement uncertainty of the computed "measured" center of mass position */
-  LOADS_PARAMETER(Vector4f, observerProcessDeviation)  /**< The noise of the filtering process that estimates the position of the center of mass */
+  DEFINES_PARAMETER(float, observerMeasurementDelay, 40.f) /**< The delay between setting a joint angle and the ability of measuring the result */
+  DEFINES_PARAMETER(Vector2f, observerMeasurementDeviation, Vector2f(2.f, 2.f)) /**< The measurement uncertainty of the computed "measured" center of mass position */
+  DEFINES_PARAMETER(Vector4f, observerProcessDeviation, Vector4f(0.1f, 0.1f, 3.f, 3.f))  /**< The noise of the filtering process that estimates the position of the center of mass */
 
-  LOADS_PARAMETER(Pose2DBH, odometryScale) /**< A scaling factor for computed odometry data */
+  DEFINES_PARAMETER(Pose2DBH, odometryScale, Pose2DBH(1.f, Vector2BH<>(1.f, 1.f))) /**< A scaling factor for computed odometry data */
 
   /* Parameters to calculate the correction of the torso's angular velocity. */
-  LOADS_PARAMETER(float, gyroStateGain) /**< Control weight (P) of the torso's angular velocity error. */
-  LOADS_PARAMETER(float, gyroDerivativeGain) /**< Control weight (D) of the approximated rate of change of the angular velocity error. */
-  LOADS_PARAMETER(float, gyroSmoothing) /**< Smoothing (between 0 and 1!) to calculate the moving average of the y-axis gyro measurements. */
+  DEFINES_PARAMETER(float, gyroStateGain, 0.01f) /**< Control weight (P) of the torso's angular velocity error. */
+  DEFINES_PARAMETER(float, gyroDerivativeGain, 0.0001f) /**< Control weight (D) of the approximated rate of change of the angular velocity error. */
+  DEFINES_PARAMETER(float, gyroSmoothing, 0.5f) /**< Smoothing (between 0 and 1!) to calculate the moving average of the y-axis gyro measurements. */
 
-  LOADS_PARAMETER(float, minRotationToReduceStepSize) /** I have no idea what im doing! Colin pls fix this! **/
+  DEFINES_PARAMETER(float, minRotationToReduceStepSize, 1.3f) /** I have no idea what im doing! Colin pls fix this! **/
 END_MODULE
 
 /**
@@ -258,6 +258,16 @@ public:
   float walkPhaseDurationAtFullSpeedY; /**< The duration of single support phase when walking full with full speed in y-direction */
   RangeBH<> walkXvdXPlanningLimit; /**< A limit of the center of mass velocity used to plan the center of mass trajectory */
   RangeBH<> walkXvdXLimit; /**< A limit of the center of mass to protect the walking engine from executing steps that are too large */
+
+  NaoProvider *naoProvider;
+  JointFilter *jointFilter;
+  RobotModelProvider *robotModelProvider;
+  InertiaSensorCalibrator *inertiaSensorCalibrator;
+  InertiaSensorFilter *inertiaSensorFilter;
+  SensorFilter *sensorFilter;
+  FallDownStateDetector *fallDownStateDetector;
+  TorsoMatrixProvider *torsoMatrixProvider;
+  MotionSelector *motionSelector;
 
   /**
   * Intercept parameter streaming to compute derived paramaters.
