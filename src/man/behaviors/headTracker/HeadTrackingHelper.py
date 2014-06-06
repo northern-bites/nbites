@@ -274,7 +274,19 @@ class HeadTrackingHelper(object):
             else:
                 yaw = -180 + yaw
         yaw = yaw - heading
-        self.lookToAngle(yaw)
+        curYaw  = degrees(self.tracker.brain.interface.joints.head_yaw)
+        maxSpeed = 2.0
+
+        # Set motion message fields
+        command = self.tracker.brain.interface.headMotionCommand
+        command.type = command.CommandType.POS_HEAD_COMMAND
+
+        command.pos_command.head_yaw = yaw
+        command.pos_command.head_pitch = constants.FIXED_PITCH_VALUE
+        command.pos_command.max_speed_yaw = maxSpeed
+        command.pos_command.max_speed_pitch = maxSpeed
+
+        command.timestamp = int(self.tracker.brain.time * 1000)
 
     def bounceTrackball(self):
         """

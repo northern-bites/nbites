@@ -31,7 +31,6 @@ class HeadTracker(FSA.FSA):
         self.headMove = None
         self.lookDirection = None
         self.kickName = ""
-        self.timeCounter = 0
 
         # Set object variables
         self.target = self.brain.ball #default
@@ -118,7 +117,6 @@ class HeadTracker(FSA.FSA):
             self.bounceTrackBall()
             return
 
-        self.target = self.brain.ball
         if (self.currentState is not 'fullPan' and
             self.currentState is not 'tracking'):
             self.switchTo('tracking')
