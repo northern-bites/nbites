@@ -39,6 +39,8 @@ mv $atom_local oldAtom
 mkdir $atom_local
 tar -xzf $atom -C $atom_local --strip-components 1
 rm $atom
+echo "Sudo privileges required to remove old atomtoolchain"
+sudo rm -rf oldAtom
 
 popd
 
@@ -49,5 +51,4 @@ sed "2 c\export AL_DIR=$naoqi_local" bashBackup >> nbites.bash
 
 rm $scripts/bashBackup
 
-echo "Now delete \"oldAtom\" directory from nbites/lib/ It WILL require sudo"
 echo "Restart terminal for changes to take effect"
