@@ -21,6 +21,7 @@
 
 //BH
 #include "WalkingEngine.h"
+#include "Representations/Blackboard.h"
 #include "Tools/Math/Pose2D.h"
 
 namespace man
@@ -91,6 +92,7 @@ namespace man
             Pose2DBH startOdometry;
 
             WalkingEngine *walkingEngine;
+            Blackboard *blackboard;
         };
     } // namespace motion
 } // namespace man

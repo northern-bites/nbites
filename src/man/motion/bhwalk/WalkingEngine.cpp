@@ -176,12 +176,32 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 	DECLARE_PLOT("module:WalkingEngine:smoothedGyroY");
 	MODIFY("module:WalkingEngine:optimizeBestParameters", optimizeBestParameters);
 
+    // if (theMotionRequestBH.motion == MotionRequestBH::stand)
+    //     cout << "Requested stand command!" << endl;
+
 	theMotionInfoBH.motion = theMotionRequestBH.motion;
 
+    // for (int i = 0; i < JointDataBH::numOfJoints; i++)
+    //     std::cout << "1In walking engine update: " << theJointDataBH.angles[i] << std::endl;
+
 	naoProvider->update(theJointDataBH, theSensorDataBH);
+    // for (int i = 0; i < JointDataBH::numOfJoints; i++)
+    //     std::cout << "2In walking engine update: " << theJointDataBH.angles[i] << std::endl;
 	jointFilter->update(theFilteredJointDataBH);
+    // for (int i = 0; i < JointDataBH::numOfJoints; i++)
+    //     std::cout << "3In walking engine update: " << theFilteredJointDataBH.angles[i] << std::endl;
 	robotModelProvider->update(theRobotModelBH);
+    // std::cout << "Robot model: " << theRobotModelBH.centerOfMass.x << std::endl;
+    // std::cout << "Robot model: " << theRobotModelBH.centerOfMass.y << std::endl;
+    // std::cout << "Robot model: " << theRobotModelBH.centerOfMass.z << std::endl;
+    // std::cout << "Robot model: " << theRobotModelBH.totalMass << std::endl;
+    // std::cout << "Time: " << theFrameInfoBH.time << std::endl;
 	inertiaSensorCalibrator->update(theInertiaSensorDataBH);
+    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.gyro.x << std::endl;
+    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.gyro.y << std::endl;
+    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.acc.x << std::endl;
+    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.acc.y << std::endl;
+    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.acc.z << std::endl;
 	inertiaSensorFilter->update(theOrientationDataBH);
 	sensorFilter->update(theFilteredSensorDataBH);
 	fallDownStateDetector->update(theFallDownStateBH);
@@ -250,9 +270,12 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 		generateJointRequest();
 		computeOdometryOffset();
 		generateOutput(walkingEngineOutput);
+        // for (int i = 0; i < JointDataBH::numOfJoints; i++)
+        //     std::cout << "OUTPUT FROM WALK ENGINE: " << walkingEngineOutput.angles[i] << std::endl;
 	}
 	else
 	{
+        // std::cout << "MOTION SELECTOR NOT WORKING!" << std::endl;
 		reset();
 		generateDummyOutput(walkingEngineOutput);
 	}
@@ -459,14 +482,14 @@ void WalkingEngine::updatePredictedPendulumPlayer()
 void WalkingEngine::generateTargetPosture()
 {
 	predictedPendulumPlayer.getPosture(targetPosture);
-  	targetPosture.leftArmJointAngles[0] = theJointDataBH.angles[JointDataBH::LShoulderPitch];
-  	targetPosture.leftArmJointAngles[1] = theJointDataBH.angles[JointDataBH::LShoulderRoll];
-  	targetPosture.leftArmJointAngles[2] = theJointDataBH.angles[JointDataBH::LElbowYaw];
-  	targetPosture.leftArmJointAngles[3] = theJointDataBH.angles[JointDataBH::LElbowRoll];
-  	targetPosture.rightArmJointAngles[0] = theJointDataBH.angles[JointDataBH::RShoulderPitch];
-  	targetPosture.rightArmJointAngles[1] = theJointDataBH.angles[JointDataBH::RShoulderRoll];
-  	targetPosture.rightArmJointAngles[2] = theJointDataBH.angles[JointDataBH::RElbowYaw];
-  	targetPosture.rightArmJointAngles[3] = theJointDataBH.angles[JointDataBH::RElbowRoll];
+  	// targetPosture.leftArmJointAngles[0] = theJointDataBH.angles[JointDataBH::LShoulderPitch];
+  	// targetPosture.leftArmJointAngles[1] = theJointDataBH.angles[JointDataBH::LShoulderRoll];
+  	// targetPosture.leftArmJointAngles[2] = theJointDataBH.angles[JointDataBH::LElbowYaw];
+  	// targetPosture.leftArmJointAngles[3] = theJointDataBH.angles[JointDataBH::LElbowRoll];
+  	// targetPosture.rightArmJointAngles[0] = theJointDataBH.angles[JointDataBH::RShoulderPitch];
+  	// targetPosture.rightArmJointAngles[1] = theJointDataBH.angles[JointDataBH::RShoulderRoll];
+  	// targetPosture.rightArmJointAngles[2] = theJointDataBH.angles[JointDataBH::RElbowYaw];
+  	// targetPosture.rightArmJointAngles[3] = theJointDataBH.angles[JointDataBH::RElbowRoll];
 }
 
 void WalkingEngine::generateJointRequest()
@@ -490,9 +513,6 @@ void WalkingEngine::generateJointRequest()
 	additionalBodyRotation *= walkComBodyRotation;
 	RotationMatrixBH bodyRotation(Vector3BH<>(additionalBodyRotation, 0.0f, 0.0f));
 	bodyRotation *= standBodyRotation;
-
-	//cout << "targetPosture.leftOriginToFoot: " << targetPosture.leftOriginToFoot.translation.x << " " << targetPosture.leftOriginToFoot.translation.y << " " << targetPosture.leftOriginToFoot.translation.z << endl;
-	//cout << "targetPosture.rightOriginToFoot: " << targetPosture.rightOriginToFoot.translation.x << " " << targetPosture.rightOriginToFoot.translation.y << " " << targetPosture.rightOriginToFoot.translation.z << endl;
 
 	float angularVelocityCorrection = 0.0f;
 	if(!transition && theGroundContactStateBH.contact && theInertiaSensorDataBH.calibrated && theInertiaSensorDataBH.gyro.y != InertiaSensorDataBH::off)
@@ -592,9 +612,6 @@ void WalkingEngine::generateOutput(WalkingEngineOutputBH& walkingEngineOutput)
 		const float stepDuration = (pendulumPlayer.phase.td - pendulumPlayer.nextPhase.tu) * 2.f;
 		walkingEngineOutput.speed.translation = Vector2BH<>(pendulumPlayer.phase.s.translation.x + pendulumPlayer.nextPhase.s.translation.x, pendulumPlayer.phase.s.translation.y + pendulumPlayer.nextPhase.s.translation.y) / stepDuration;
 		walkingEngineOutput.speed.rotation = (pendulumPlayer.phase.s.rotation + pendulumPlayer.nextPhase.s.rotation) / stepDuration;
-		//std::cout << "WalkEngine translate-x: " << walkingEngineOutput.speed.translation.x << std::endl;
-		//std::cout << "WalkEngine translate-y: " << walkingEngineOutput.speed.translation.y << std::endl;
-		//std::cout << "WalkEngine rotation: " << walkingEngineOutput.speed.rotation << std::endl;
 	}
 	else
 		walkingEngineOutput.speed = Pose2DBH();
@@ -727,7 +744,6 @@ void WalkingEngine::generateNextPendulumPhase(const WalkingEngine::PendulumPhase
 		}
 		else if(phase.kickType != WalkRequest::none)
 		{
-			std::cout << "Execute Walk Kick" << std::endl;
 			//if(theMotionRequestBH.walkRequest.mode == WalkRequest::targetMode)
 			//generateNextStepSize(nextPhase.type, nextPhase.s);
 			//else
@@ -741,7 +757,6 @@ void WalkingEngine::generateNextPendulumPhase(const WalkingEngine::PendulumPhase
 		}
 		else if(theMotionRequestBH.walkRequest.kickType != WalkRequest::none && kicks.isKickMirrored(theMotionRequestBH.walkRequest.kickType) == (nextPhase.type == leftSupportPhase))
 		{
-			std::cout << "Execute Walk Kick1" << std::endl;
 			nextPhase.kickType = theMotionRequestBH.walkRequest.kickType;
 			kickPhaseDuration = kicks.getKickStepDuration(nextPhase.kickType) * 0.5f;
 
@@ -1451,22 +1466,6 @@ void WalkingEngine::PendulumPlayer::getPosture(LegPosture& stance, float* leftAr
 								*leftArmAngle = (nextPhase.s.translation.x * swingMoveFadeIn - phase.s.translation.x * swingMoveFadeOut) / p.speedMax.translation.x * p.walkArmRotationAtFullSpeedX;
 							if(rightArmAngle)
 								*rightArmAngle = (phase.s.translation.x * swingMoveFadeOut - nextPhase.s.translation.x * swingMoveFadeIn) / p.speedMax.translation.x * p.walkArmRotationAtFullSpeedX;
-
-							//cout << "swing lift: " << swingLift << endl;
-							//cout << "right lift: " << nextPhase.l.x << " " << nextPhase.l.y << " " << nextPhase.l.z << endl;
-
-
-							//cout << "left phase.r.x: " << phase.r.x << endl;
-							//cout << "left phase.x0.x: " << phase.x0.x << endl;
-							//cout << "left phase.r.y: " << phase.r.y << endl;
-							//cout << "left phase.y0.y: " << phase.x0.y << endl;
-							//cout << "nextPhase step size: " << nextPhase.s.translation.x << " " << nextPhase.s.translation.y << endl;
-							//cout << "prev step size: " << phase.s.translation.x << " " << phase.s.translation.y << endl;
-							//cout << "targetPosture.leftOriginToCom: " << stance.leftOriginToCom.x << " " << stance.leftOriginToCom.y << " " << stance.leftOriginToCom.z << endl;
-							//cout << "targetPosture.rightOriginToCom: " << stance.rightOriginToCom.x << " " << stance.rightOriginToCom.y << " " << stance.rightOriginToCom.z << endl;
-							//cout << "targetPosture.leftOriginToFoot: " << stance.leftOriginToFoot.translation.x << " " << stance.leftOriginToFoot.translation.y << " " << stance.leftOriginToFoot.translation.z << endl;
-							//cout << "targetPosture.rightOriginToFoot: " << stance.rightOriginToFoot.translation.x << " " << stance.rightOriginToFoot.translation.y << " " << stance.rightOriginToFoot.translation.z << endl;
-
 						}
 						break;
 
@@ -1495,22 +1494,6 @@ void WalkingEngine::PendulumPlayer::getPosture(LegPosture& stance, float* leftAr
 								*rightArmAngle = (nextPhase.s.translation.x * swingMoveFadeIn - phase.s.translation.x * swingMoveFadeOut) / p.speedMax.translation.x * p.walkArmRotationAtFullSpeedX;
 							if(leftArmAngle)
 								*leftArmAngle = (phase.s.translation.x * swingMoveFadeOut - nextPhase.s.translation.x * swingMoveFadeIn) / p.speedMax.translation.x * p.walkArmRotationAtFullSpeedX;
-
-							//cout << "swing lift: " << swingLift << endl;
-							//cout << "left lift: " << nextPhase.l.x << " " << nextPhase.l.y << " " << nextPhase.l.z << endl;
-
-
-							//cout << "right phase.r.x: " << phase.r.x << endl;
-							//cout << "right phase.x0.x: " << phase.x0.x << endl;
-							//cout << "right phase.r.y: " << phase.r.y << endl;
-							//cout << "right phase.y0.y: " << phase.x0.y << endl;
-							//cout << "nextPhase step size: " << nextPhase.s.translation.x << " " << nextPhase.s.translation.y << endl;
-							//cout << "prev step size: " << phase.s.translation.x << " " << phase.s.translation.y << endl;
-							//cout << "targetPosture.leftOriginToCom: " << stance.leftOriginToCom.x << " " << stance.leftOriginToCom.y << " " << stance.leftOriginToCom.z << endl;
-							//cout << "targetPosture.rightOriginToCom: " << stance.rightOriginToCom.x << " " << stance.rightOriginToCom.y << " " << stance.rightOriginToCom.z << endl;
-							//cout << "targetPosture.leftOriginToFoot: " << stance.leftOriginToFoot.translation.x << " " << stance.leftOriginToFoot.translation.y << " " << stance.leftOriginToFoot.translation.z << endl;
-							//cout << "targetPosture.rightOriginToFoot: " << stance.rightOriginToFoot.translation.x << " " << stance.rightOriginToFoot.translation.y << " " << stance.rightOriginToFoot.translation.z << endl;
-
 						}
 						break;
 
@@ -1545,7 +1528,6 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	getPosture((LegPosture&)stance, &leftArmAngle, &rightArmAngle, 0);
 
 	// arms
-	/*
 	float halfArmRotation = p.walkArmRotationAtFullSpeedX * 0.5f;
 
 	if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::left].move)
@@ -1573,7 +1555,6 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 		stance.rightArmJointAngles[2] = -pi_2;
 		stance.rightArmJointAngles[3] = -p.standArmJointAngles.y - rightArmAngle - halfArmRotation;
 	}
-	*/
 
 	// kick mutations
 	if(kickPlayer.isActive())
@@ -1872,23 +1853,8 @@ void WalkingEngine::updatePendulumParametersY(PendulumPhase& phase, PendulumPhas
 
 void WalkingEngine::updatePendulumParametersX(PendulumPhase& phase, PendulumPhase& nextPhase, bool init) const
 {
-	//cout << "------------------------------------------------------------------------" << endl;
-	//cout << "k: " << phase.k.x << " " << phase.k.y << endl;
-	//cout << "pos com: " << phase.x0.x << " " << phase.x0.y << endl;
-	//cout << "velocity com: " << phase.xv0.x << " " << phase.xv0.y << endl;
-	//cout << "td: " << phase.td << endl;
-	//cout << "tu: " << phase.tu << endl;
-	//cout << "------------------------------------------------------------------------" << endl;
-	//cout << "k: " << nextPhase.k.x << " " << nextPhase.k.y << endl;
-	//cout << "pos com: " << nextPhase.x0.x << " " << nextPhase.x0.y << endl;
-	//cout << "velocity com: " << nextPhase.xv0.x << " " << nextPhase.xv0.y << endl;
-	//cout << "td: " << nextPhase.td << endl;
-	//cout << "tu: " << nextPhase.tu << endl;
-	//cout << "------------------------------------------------------------------------" << endl;
-
 	if(phase.toStand)
 	{
-		//cout << "Phase: TO STAND------------------" << endl;
 		ASSERT(nextPhase.x0.x == 0);
 		ASSERT(nextPhase.xv0.x == 0);
 		ASSERT(nextPhase.r.x == walkRef.x);

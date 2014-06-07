@@ -31,6 +31,7 @@ void InertiaSensorCalibrator::reset()
 void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
 {
   DEBUG_RESPONSE_ONCE("module:InertiaSensorCalibrator:reset", reset(););
+// std::cout << "Beginning of inertia!" << std::endl;
 
   // frame time check
   if(theFrameInfoBH.time <= lastTime)
@@ -40,6 +41,7 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
     reset();
   }
 
+// std::cout << "No return of inertia!" << std::endl;
   // update timeLastPenalty
   if(theRobotInfoBH.penalty != PENALTY_NONE && lastPenalty == PENALTY_NONE)
     timeWhenPenalized = theFrameInfoBH.time;
@@ -113,8 +115,10 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
   const bool standing = currentMotion == MotionRequestBH::stand || (currentMotion == MotionRequestBH::walk && theWalkingEngineOutputBH.standing);
   const bool walking = currentMotion == MotionRequestBH::walk && !theWalkingEngineOutputBH.standing;
 
+    // std::cout << "Before if in inertia!" << std::endl;
   if(unstable || (walking && theWalkingEngineOutputBH.positionInWalkCycle < lastPositionInWalkCycle) || (standing && theFrameInfoBH.time - collectionStartTime > 1000))
   {
+    // std::cout << "After if in inertia!" << std::endl;
     // add collection within the time frame to the collection buffer
     ASSERT(accValues.getNumberOfEntries() == gyroValues.getNumberOfEntries());
     if(cleanCollectionStartTime && theFrameInfoBH.time - cleanCollectionStartTime > timeFrame &&
@@ -139,7 +143,7 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
         break;
       if(cleanCollectionStartTime && cleanCollectionStartTime < collection.timeStamp)
       {
-	std::cout << "Updating calibration" << std::endl;
+	// std::cout << "Updating calibration" << std::endl;
         // use this collection
         Vector3BH<>& accBiasMeasurementNoise = collection.standing ? accBiasStandMeasurementNoise : accBiasWalkMeasurementNoise;
         Vector2BH<>& gyroBiasMeasurementNoise = collection.standing ? gyroBiasStandMeasurementNoise : gyroBiasWalkMeasurementNoise;
@@ -161,21 +165,21 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
           gyroYBias.update(collection.gyroAvg.y, sqrBH(gyroBiasMeasurementNoise.y));
         }        
 
-	std::cout << "Collection values: "
-          << collection.accAvg.x << "(" << sqrBH(accBiasMeasurementNoise.x) << ") "
-          << collection.accAvg.y << "(" << sqrBH(accBiasMeasurementNoise.y) << ") "
-          << collection.accAvg.z << "(" << sqrBH(accBiasMeasurementNoise.z) << ") "
-          << collection.gyroAvg.x << "(" << sqrBH(gyroBiasMeasurementNoise.x) << ") "
-          << collection.gyroAvg.y << "(" << sqrBH(gyroBiasMeasurementNoise.y) << ") "
-          << std::endl;
+	// std::cout << "Collection values: "
+        //   << collection.accAvg.x << "(" << sqrBH(accBiasMeasurementNoise.x) << ") "
+        //   << collection.accAvg.y << "(" << sqrBH(accBiasMeasurementNoise.y) << ") "
+        //   << collection.accAvg.z << "(" << sqrBH(accBiasMeasurementNoise.z) << ") "
+        //   << collection.gyroAvg.x << "(" << sqrBH(gyroBiasMeasurementNoise.x) << ") "
+        //   << collection.gyroAvg.y << "(" << sqrBH(gyroBiasMeasurementNoise.y) << ") "
+        //   << std::endl;
 
-        std::cout << "new BIASES: "
-          << accXBias.value << "(" << accXBias.variance << ") "
-          << accYBias.value << "(" << accYBias.variance << ") "
-          << accZBias.value << "(" << accZBias.variance << ") "
-          << gyroXBias.value << "(" << gyroXBias.variance << ") "
-          << gyroYBias.value << "(" << gyroYBias.variance << ") "
-          << std::endl;
+        // std::cout << "new BIASES: "
+        //   << accXBias.value << "(" << accXBias.variance << ") "
+        //   << accYBias.value << "(" << accYBias.variance << ") "
+        //   << accZBias.value << "(" << accZBias.variance << ") "
+        //   << gyroXBias.value << "(" << gyroXBias.variance << ") "
+        //   << gyroYBias.value << "(" << gyroYBias.variance << ") "
+        //   << std::endl;
       }
       collections.removeFirst();
     }
@@ -227,11 +231,13 @@ void InertiaSensorCalibrator::update(InertiaSensorDataBH& inertiaSensorData)
   inertiaSensorData.calibrated = calibrated;
   if(!calibrated)
   {
+    // std::cout << "NOT CALIBRATED in inertiaSensorCal!" << std::endl;
     inertiaSensorData.gyro.x = inertiaSensorData.gyro.y = InertiaSensorDataBH::off;
     inertiaSensorData.acc.x = inertiaSensorData.acc.y = inertiaSensorData.acc.z = InertiaSensorDataBH::off;
   }
   else
   {
+    // std::cout << "CALIBRATED in inertiaSensorCal!" << std::endl;
     inertiaSensorData.gyro.x = gyro.x - gyroXBias.value;
     inertiaSensorData.gyro.y = gyro.y - gyroYBias.value;
     inertiaSensorData.acc.x = acc.x - accXBias.value;

@@ -1,5 +1,6 @@
 #include "BHWalkProvider.h"
 #include "Profiler.h"
+#include "Common.h"
 
 #include <cassert>
 #include <string>
@@ -63,7 +64,7 @@ BHWalkProvider::BHWalkProvider()
 	ModuleBase::config_path = "/home/nao/nbites/Config/";
 
 	// Setup static variables
-	Blackboard::theInstance = new Blackboard;
+	blackboard = new Blackboard;
 
     // Setup the walk engine
 	walkingEngine = new WalkingEngine;
@@ -120,6 +121,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     // If our calibration became bad (as decided by the walkingEngine,
     // reset. We will wait until we're recalibrated to walk.
     // if (walkingEngine->shouldReset && calibrated())
+    // if (calibrated())
     // {
     //     std::cout << "We are stuck! Recalibrating." << std::endl;
     //     hardReset();
@@ -128,6 +130,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     assert(JointDataBH::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
+        // std::cout << "In standby!" << std::endl;
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::specialAction;
 
@@ -144,12 +147,14 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     // Figure out the motion request
     // VERY UGLY! re-factor this please TODO TODO TODO
     if (requestedToStop || !isActive()) {
+        // std::cout << "Special action!" << std::endl;
         MotionRequestBH motionRequest;
-        motionRequest.motion = MotionRequestBH::specialAction;
+        // motionRequest.motion = MotionRequestBH::specialAction;
+        motionRequest.motion = MotionRequestBH::stand;
 
         //TODO: maybe check what kind of special move we're switching to and change this
         //accordingly
-        motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
+        // motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
         walkingEngine->theMotionRequestBH = motionRequest;
 
         currentCommand = MotionCommand::ptr();
@@ -158,11 +163,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         // If we're not calibrated, wait until we are calibrated to walk
         if (!calibrated())
         {
+            // std::cout << "Not yet calibrated!" << std::endl;
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
+            // std::cout << "Step command!" << std::endl;
 
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
 
@@ -172,6 +179,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             Pose2DBH relativeTarget = absoluteTarget - (deltaOdometry + walkingEngine->upcomingOdometryOffset);
 
             if (!hasPassed(deltaOdometry + walkingEngine->upcomingOdometryOffset, absoluteTarget)) {
+                // std::cout << "Odometry!" << std::endl;
 
                 MotionRequestBH motionRequest;
                 motionRequest.motion = MotionRequestBH::walk;
@@ -188,11 +196,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 walkingEngine->theMotionRequestBH = motionRequest;
 
             } else {
+                // std::cout << "Else!" << std::endl;
                 currentCommand = MotionCommand::ptr();
             }
 
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
+            // std::cout << "Walk command!" << std::endl;
 
             WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 
@@ -208,6 +218,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             walkingEngine->theMotionRequestBH = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
+            // std::cout << "Destination command!" << std::endl;
 
             DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
 
@@ -248,6 +259,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         }
         //TODO: make special command for stand
         if (!currentCommand.get()) {
+            // std::cout << "Empty stand!" << std::endl;
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
@@ -293,6 +305,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLBL] = sensorFSRs.lrl();
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
 
+    // Bhuman needs time information for diffs
+    walkingEngine->theFrameInfoBH.time = walkingEngine->theFilteredJointDataBH.timeStamp = walkingEngine->theFilteredSensorDataBH.timeStamp = monotonic_micro_time();
+
     // TODO this might not be the best way, think about the blackboard...
     WalkingEngineOutputBH output;
     walkingEngine->update(output);
@@ -305,6 +320,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                      j <= Kinematics::chain_last_joint[i]; j++) {
             //position angle
             chain_angles.push_back(output.angles[nb_joint_order[j]]);
+            // std::cout << "OUTPUT: Nbites order: " << output.angles[nb_joint_order[j]] << std::endl;
             //hardness
             if (output.jointHardness.hardness[nb_joint_order[j]] == 0) {
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
@@ -429,7 +445,7 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 }
 
 bool BHWalkProvider::calibrated() const {
-    return walkingEngine->theInertiaSensorDataBH.calibrated;
+    return blackboard->theInertiaSensorDataBH.calibrated;
 }
 
 float BHWalkProvider::leftHandSpeed() const {

@@ -215,6 +215,7 @@ Blackboard::Blackboard() :
   theBallTakingOutputBH(*new BallTakingOutputBH),
   theIndykickEngineOutputBH(*new IndykickEngineOutputBH)
 {
+    theInstance = this;
 }
 
 void Blackboard::operator=(const Blackboard& other)
