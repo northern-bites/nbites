@@ -106,6 +106,20 @@ sim: build_sim
 	@cd $(BUILD_DIR); \
 	./$(SIM_EXECUTABLE)
 
+.PHONY: build_installer
+build_installer:
+	mkdir -p $(BUILD_DIR)
+	cd $(BUILD_DIR); \
+	cmake $(FLAGS) $(SRC_DIR); \
+	$(MAKE) --no-print-directory $(INSTALLER_EXECUTABLE)
+
+.PHONY: installer
+installer: build_installer
+	@echo "Running installer_tool executable."
+	@cd $(BUILD_DIR); \
+	./$(INSTALLER_EXECUTABLE)
+
+
 .PHONY: config
 config:
 	mkdir -p $(BUILD_DIR)

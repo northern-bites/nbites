@@ -20,6 +20,9 @@ namespace man {
 
 Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     : AL::ALModule(broker, name),
+      param("/home/nao/nbites/lib/parameters.json"),
+      playerNum(param.getParam<int>("playerNumber")),
+      teamNum(param.getParam<int>("teamNumber")),
       sensorsThread("sensors", SENSORS_FRAME_LENGTH_uS),
       sensors(broker),
       jointEnactor(broker),
@@ -29,7 +32,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       guardian(),
       audio(),
       commThread("comm", COMM_FRAME_LENGTH_uS),
-      comm(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      comm(teamNum, playerNum),
       cognitionThread("cognition", COGNITION_FRAME_LENGTH_uS),
       topTranscriber(*new image::ImageTranscriber(Camera::TOP)),
       bottomTranscriber(*new image::ImageTranscriber(Camera::BOTTOM)),
@@ -39,8 +42,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
       localization(),
       ballTrack(),
       obstacle(),
-      gamestate(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
-      behaviors(MY_TEAM_NUMBER, MY_PLAYER_NUMBER),
+      gamestate(teamNum, playerNum),
+      behaviors(teamNum, playerNum),
       leds(broker),
       sharedBall()
 {

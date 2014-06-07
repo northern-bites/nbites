@@ -77,8 +77,8 @@ add_dependencies(messages protobuf_libs)
 endif()
 
 # Actual subdirectories
-add_subdirectory( support )
 include_directories( support )
+add_subdirectory( support )
 include_directories( motion/bhwalk ) # @todo hack?
 
 # Actual modules
@@ -103,6 +103,7 @@ add_subdirectory( vision )
 set( MAN_SRCS main.cpp
   Man.cpp
   DiagramThread.cpp
+  ParamReader.cpp
 )
 
 add_library(

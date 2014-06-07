@@ -106,6 +106,7 @@ add_subdirectory( sim )
 add_subdirectory( unlog )
 add_subdirectory( vision_offline )
 add_subdirectory( worldview )
+#add_subdirectory( installer ) #BAH
 
 ## SOURCES ##
 
@@ -221,6 +222,15 @@ set( sim_headers
   SimTool.h
 )
 
+set( installer_srcs
+  installer_main.cpp
+  Installer.cpp
+  )
+
+set( installer_headers
+  Installer.h
+  )
+
 # Qt4 goodness (aka moc the headers)
 Qt4_wrap_cpp( tool_headers_moc ${tool_headers} )
 Qt4_wrap_cpp( loc_headers_moc ${loc_headers} )
@@ -229,6 +239,7 @@ Qt4_wrap_cpp( vision_headers_moc ${vision_headers} )
 Qt4_wrap_cpp( calibrate_headers_moc ${calibrate_headers} )
 Qt4_wrap_cpp( playbook_headers_moc ${playbook_headers} )
 Qt4_wrap_cpp( sim_headers_moc ${sim_headers} )
+Qt4_wrap_cpp( installer_headers_moc ${installer_headers} )
 
 ## EXECUTABLES ##
 
@@ -356,5 +367,26 @@ target_link_libraries(
   portals
   messages
   visionsim
+  ${QT_LIBRARIES}
+)
+
+# Installer tool stuff:
+# add_library(installer
+#   STATIC
+#   Installer.cpp
+#   ${INSTALLER_HEADERS_MOC}
+# )
+# target_link_libraries(installer
+#   tool_common
+#   ${QT_LIBRARIES}
+# )
+# The InstallerTool executable
+add_executable( installer_tool
+  ${installer_srcs}
+  ${installer_headers_moc}
+)
+
+target_link_libraries(
+  installer_tool
   ${QT_LIBRARIES}
 )
