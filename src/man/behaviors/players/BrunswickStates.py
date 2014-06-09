@@ -103,7 +103,7 @@ def gamePlaying(player):
         return player.goNow('approachBall')
     elif player.brain.gameController.timeSincePlaying < 10:
         return player.goNow('waitForKickoff')
-    return player.goNow('positionAtHome')
+    return player.goNow('playerOffBall')
 
 @superState('gameControllerResponder')
 def gameFinished(player):

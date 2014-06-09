@@ -42,12 +42,10 @@ def executeKick(player):
     if player.counter == 30:
         player.executeMove(executeKick.sweetMove)
         player.shouldKickOff = False
-        player.inKickingState = False
         return player.stay()
 
     # TODO not ideal at all!
     if player.counter > 40 and player.brain.nav.isStopped():
-        player.inKickingState = False
         return player.goNow('afterKick')
 
     return player.stay()

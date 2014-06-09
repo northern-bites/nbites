@@ -1,6 +1,5 @@
 import BoxPositionConstants as boxConstants
 import ClaimTransitions as claimTransitions
-#The transitions file for transitions exclusive to the Box-based positioning
 
 def ballInBox(player):
     """
@@ -10,7 +9,7 @@ def ballInBox(player):
 
     if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
             ball.x < player.box[0][0] + player.box[1] and \
-            ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 2:
+            ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 0:
         return True
     return False
 
