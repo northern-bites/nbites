@@ -116,34 +116,12 @@ def afterPenalty(player):
         # Yes, when goal_right is less than 0, our goal is to our right.
         # It seems counter intuitive, but that's how it works. -Josh Z
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
-        return player.goNow('determineRole')
-
+        if player.role != 1:
+            return player.goNow('determineRole')
+        return player.goLater(player.gameState)
 
     return player.stay()
 
-# @superState('gameControllerResponder')
-# def postPenaltyChaser(player):
-#     """
-#     If we come out of penalty directly into chaser, we'll waste
-#     time spinning on the side of the field. Instead, if we didn't
-#     see the ball during afterPenalty, odometry walk onto the field
-#     before spinning.
-#     """
-#     if player.firstFrame():
-#         player.brain.nav.walkTo(RelRobotLocation(200,0,0))
-#         player.brain.tracker.trackBall()
-#     elif (player.brain.nav.isStopped() or
-#           transitions.shouldChaseBall(player)):
-#         return player.goLater('chase')
-#
-#     if not player.brain.play.isChaser():
-#         # We've role switched out naturally. Go to appropriate state.
-#         player.stopWalking() # walkTo is a bit dangerous. do this to be careful.
-#         if player.usingBoxPositions:
-#             return player.goLater('positionAtHome')
-#         return player.goLater('playbookPosition')
-#
-#     return player.stay()
 @superState('gameControllerResponder')
 def determineRole(player):
     if not player.roleSwitching:

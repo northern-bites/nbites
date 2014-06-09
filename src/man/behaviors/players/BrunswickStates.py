@@ -45,11 +45,6 @@ def gameReady(player):
         player.brain.tracker.repeatWidePan()
         player.timeReadyBegan = player.brain.time
 
-    # Reset localization to proper starting position by player number.
-    # Locations are defined in the wiki.
-        if player.lastDiffState == 'gameInitial':
-            player.brain.resetInitialLocalization()
-
         if player.wasPenalized:
             player.wasPenalized = False
             return player.goNow('afterPenalty')
@@ -108,7 +103,7 @@ def gamePlaying(player):
         return player.goNow('approachBall')
     elif player.brain.gameController.timeSincePlaying < 10:
         return player.goNow('waitForKickoff')
-    return player.goNow('positionAtHome')
+    return player.goNow('playerOffBall')
 
 
 @superState('gameControllerResponder')

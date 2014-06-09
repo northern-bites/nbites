@@ -17,14 +17,14 @@ DRIBBLE_ON_KICKOFF = False
 
 @superState('gameControllerResponder')
 @stay
-@ifSwitchNow(transitions.shouldReturnHome, 'positionAtHome')
+@ifSwitchNow(transitions.shouldReturnHome, 'playOffBall')
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
     if player.firstFrame():
         player.buffBoxFiltered = CountTransition(boxTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
-        player.inKickingState = False
         player.brain.tracker.trackBall()
+        player.inKickingState = False
         if player.shouldKickOff:
             player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
         elif player.penaltyKicking:
@@ -42,7 +42,6 @@ def approachBall(player):
             print player.brain.ball.distance
             print player.brain.ball.vis.distance
 
-        player.inKickingState = True
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -60,7 +59,7 @@ def positionAndKickBall(player):
     """
     Superstate used to position for kick and kick the ball when close enough.
     """
-    pass
+    player.inKickingState = True
 
 @superState('positionAndKickBall')
 def prepareForKick(player):
@@ -71,7 +70,6 @@ def prepareForKick(player):
 
     if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!
-        player.inKickingState = False
         return player.goLater('chase')
 
     player.kick = prepareForKick.decider.closeToGoal()
@@ -95,7 +93,11 @@ def orbitBall(player):
         relH < constants.ORBIT_GOOD_BEARING):
         print "STOPPED! Because relH is: ", relH
         player.stopWalking()
+        destinationX = player.kick.destinationX
+        destinationY = player.kick.destinationY
         player.kick = kicks.chooseAlignedKickFromKick(player, player.kick)
+        player.kick.destinationX = destinationX
+        player.kick.destinationY = destinationY
         return player.goNow('positionForKick')
 
     if (transitions.orbitTooLong(player) or
@@ -312,7 +314,6 @@ def positionForPenaltyKick(player):
     """
     if player.firstFrame():
         positionForPenaltyKick.position = True
-        player.inKickingState = True
         positionForPenaltyKick.yes = False
         if player.brain.ball.rel_y > 0:
             player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -323,7 +324,6 @@ def positionForPenaltyKick(player):
 
     if (transitions.shouldApproachBallAgain(player) or
         transitions.shouldRedecideKick(player)):
-        player.inKickingState = False
         print "Going Back to Chase"
         return player.goLater('approachBall')
 

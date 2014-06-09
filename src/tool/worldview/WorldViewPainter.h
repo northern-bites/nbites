@@ -47,8 +47,8 @@ protected:
     // Paint a RobotLocation
     void paintRobotLocation(QPaintEvent* event,
                             messages::WorldModel loc,
-                            QString playerNum,
-                            bool red = false);
+                            QString playerNum);
+
     void paintSharedBallLocation(QPaintEvent* event, messages::SharedBall msg);
 
 private:

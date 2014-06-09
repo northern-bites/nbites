@@ -77,12 +77,11 @@ public:
         };
         return bottomSettings;
     }
-
     /*
      * Camera Parameters Go Here
      */
-    // // SEARLES CAMERA PARAMETERS
-    // // TOP SETTINGS
+    // SEARLES CAMERA PARAMETERS
+    // TOP SETTINGS
     static const bool TOP_H_FLIP = 1;
     static const bool TOP_V_FLIP = 1;
     static const bool TOP_AUTO_EXPOSURE = 0;
@@ -114,9 +113,9 @@ public:
     static const int BOTTOM_WHITE_BALANCE = 3200;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
 
-    // WATSON 2014 CAMERA PARAMETERS
-    // TOP SETTINGS
-    //s tatic const bool TOP_H_FLIP = 1;
+    // // WATSON 2014 CAMERA PARAMETERS
+    // // TOP SETTINGS
+    // static const bool TOP_H_FLIP = 1;
     // static const bool TOP_V_FLIP = 1;
     // static const bool TOP_AUTO_EXPOSURE = 0;
     // static const int TOP_BRIGHTNESS = 84;
@@ -131,7 +130,7 @@ public:
     // static const int TOP_WHITE_BALANCE = 5500;
     // static const bool TOP_FADE_TO_BLACK = 0;
 
-    // BOTTOM SETTINGS
+    // // BOTTOM SETTINGS
     // static const bool BOTTOM_H_FLIP = 0;
     // static const bool BOTTOM_V_FLIP = 0;
     // static const bool BOTTOM_AUTO_EXPOSURE = 0;

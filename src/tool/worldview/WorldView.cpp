@@ -20,7 +20,12 @@ WorldView::WorldView(QWidget* parent)
     commThread.addModule(wviewComm);
     commThread.addModule(wviewShared);
 
-    fieldPainter = new WorldViewPainter(this);
+#ifdef USING_LAB_FIELD
+    fieldPainter = new WorldViewPainter(this, 2.);
+#else
+    fieldPainter = new WorldViewPainter(this, 1.);
+#endif
+
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
 
     QHBoxLayout *field = new QHBoxLayout();
@@ -173,7 +178,7 @@ void WorldView::updateStatus(messages::WorldModel msg, int index)
     }
     else
     {
-        roleLabels[index]->setText(roles[msg.role()]);
+        roleLabels[index]->setText(roles[msg.role() - 1]);
     }
 }
 

@@ -12,6 +12,7 @@ def findBall(player):
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
         player.stopWalking()
+        player.inKickingState = False
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
         my = player.brain.loc
