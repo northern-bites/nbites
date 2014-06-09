@@ -17,6 +17,8 @@ def tracking(tracker):
     # makes sure ball is default target when entering tracking
     tracker.target = tracker.brain.ball
 
+    return tracker.goLater('altTrackSharedBallAndPan')
+
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
     tracker.helper.trackObject()
 
@@ -102,8 +104,6 @@ snapToCorner.count = 0
 
 def altTrackSharedBallAndPan(tracker):
     # Alternates between track shared ball and a full pan
-    lookTime = 40 # Editable constant: how long it should stay looking at sharedball
-    panTime = 1   # Editable constant: how many times it should repeat these motions
     altTrackSharedBallAndPan.currentlyOn # 0 for look at shared ball, 1 for full pan
     altTrackSharedBallAndPan.timeCounter
     tracker.target = tracker.brain.sharedBall
@@ -123,11 +123,11 @@ def altTrackSharedBallAndPan(tracker):
             tracker.helper.executeHeadMove(HeadMoves.FIXED_PITCH_PAN)
             altTrackSharedBallAndPan.timeCounter = altTrackSharedBallAndPan.timeCounter + 1
 
-    if altTrackSharedBallAndPan.timeCounter >= 0 and altTrackSharedBallAndPan.timeCounter < lookTime:
+    if altTrackSharedBallAndPan.timeCounter >= 0 and altTrackSharedBallAndPan.timeCounter < constants.LOOKTIME:
         altTrackSharedBallAndPan.currentlyOn = 0
-    if altTrackSharedBallAndPan.timeCounter >= lookTime:
+    if altTrackSharedBallAndPan.timeCounter >= constants.LOOKTIME:
         altTrackSharedBallAndPan.currentlyOn = 1
-    if altTrackSharedBallAndPan.timeCounter >= panTime + lookTime:
+    if altTrackSharedBallAndPan.timeCounter >= constants.PANTIME + constants.LOOKTIME:
         altTrackSharedBallAndPan.timeCounter = 0
 
     #If ever see the ball, immediately go to back to tracking
