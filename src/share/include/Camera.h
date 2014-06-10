@@ -93,7 +93,7 @@ public:
     static const int TOP_SHARPNESS = 3;
     static const bool TOP_AUTO_WHITEBALANCE = 0;
     static const int TOP_BACKLIGHT_COMPENSATION = 0x00;
-    static const int TOP_EXPOSURE = 83;
+    static const int TOP_EXPOSURE = 50;
     static const int TOP_GAIN = 53;
     static const int TOP_WHITE_BALANCE = 3300;
     static const bool TOP_FADE_TO_BLACK = 0;
@@ -109,7 +109,7 @@ public:
     static const int BOTTOM_SHARPNESS = 3;
     static const bool BOTTOM_AUTO_WHITEBALANCE = 0;
     static const int BOTTOM_BACKLIGHT_COMPENSATION = 0x00;
-    static const int BOTTOM_EXPOSURE = 83;
+    static const int BOTTOM_EXPOSURE = 50;
     static const int BOTTOM_GAIN = 62;
     static const int BOTTOM_WHITE_BALANCE = 3200;
     static const bool BOTTOM_FADE_TO_BLACK = 0;
