@@ -202,7 +202,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
-            // std::cout << "Walk command!" << std::endl;
 
             WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 
@@ -319,13 +318,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
             //position angle
-            chain_angles.push_back(output.angles[nb_joint_order[j]]);
+            chain_angles.push_back(output.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign);
             // std::cout << "OUTPUT: Nbites order: " << output.angles[nb_joint_order[j]] << std::endl;
             //hardness
             if (output.jointHardness.hardness[nb_joint_order[j]] == 0) {
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
             } else {
-                chain_hardness.push_back(output.jointHardness.hardness[nb_joint_order[j]]);
+                chain_hardness.push_back(output.jointHardness.hardness[nb_joint_order[j]] / 100.f);
             }
 
         }
