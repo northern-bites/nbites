@@ -1,12 +1,15 @@
 #pragma once
 
-//#include "EmptyTool.h"
+//#include "EmptyTool.h"ostream/ostream/write/
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QString>
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
 
 //#include ROBOT_CONFIG_FILE
 namespace tool{
@@ -21,7 +24,12 @@ protected:
     QLineEdit* pyPlayers; // TODO
     QLineEdit* playerNum; // TODO
     QPushButton* install; // TODO
+    //std::fstream* findLine(std::fstream* stream, std::string lineStart);
+    void writePlayerNums(int player, int team);
+    void writePyPlayer(std::string pyPlayer);
+    int validateInput();
 protected slots:
     void installPlayer();
+//private:
 };
 }
