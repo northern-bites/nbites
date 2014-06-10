@@ -63,8 +63,8 @@ void GroundContactDetector::update(GroundContactStateBH& groundContactState)
         gyroValues.clear();
         angleNoises.clear();
 #ifndef TARGET_SIM
-        if(contactStartTime != 0)
-          SystemCall::playSound("high.wav");
+        // if(contactStartTime != 0)
+        //   SystemCall::playSound("high.wav");
 #endif
       }
     }

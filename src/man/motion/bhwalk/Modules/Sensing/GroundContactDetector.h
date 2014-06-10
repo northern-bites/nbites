@@ -40,6 +40,12 @@ public:
   /** Default constructor. */
   GroundContactDetector();
 
+  /**
+  * Updates the GroundContactStateBH representation .
+  * @param groundContactState The ground contact representation which is updated by this module.
+  */
+  void update(GroundContactStateBH& groundContactState);
+
 private:
   bool contact; /**< Whether the robot has ground contact or not */
   unsigned int contactStartTime; /**< Time when the robot started having ground contact */
@@ -94,10 +100,4 @@ private:
   Averager<Vector3BH<>, 60> accValues;
   Averager<Vector2BH<>, 60> gyroValues;
   Averager<float, 5> calibratedAccZValues;
-
-  /**
-  * Updates the GroundContactStateBH representation .
-  * @param groundContactState The ground contact representation which is updated by this module.
-  */
-  void update(GroundContactStateBH& groundContactState);
 };

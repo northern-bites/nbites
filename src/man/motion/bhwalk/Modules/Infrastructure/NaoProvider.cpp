@@ -173,9 +173,6 @@ void NaoProvider::update(JointDataBH& jointData, SensorDataBH& sensorData)
     }
   }
 
-  // for (int i = 0; i < JointDataBH::numOfJoints; i++)
-  //       std::cout << "In nao provider: " << jointData.angles[i] << std::endl;
-
 #ifdef MEASURE_DELAY
   OutTextFile stream("delay.log", true);
   stream << "timestamp" << SystemCall::getCurrentSystemTime();

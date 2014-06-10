@@ -15,6 +15,7 @@
 #include "Modules/Sensing/SensorFilter.h"
 #include "Modules/Sensing/FallDownStateDetector.h"
 #include "Modules/Sensing/TorsoMatrixProvider.h"
+#include "Modules/Sensing/GroundContactDetector.h"
 #include "Modules/Infrastructure/NaoProvider.h"
 #include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Configuration/MassCalibration.h"
@@ -267,6 +268,7 @@ public:
   SensorFilter *sensorFilter;
   FallDownStateDetector *fallDownStateDetector;
   TorsoMatrixProvider *torsoMatrixProvider;
+  GroundContactDetector *groundContactDetector;
   MotionSelector *motionSelector;
 
   /**

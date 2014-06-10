@@ -68,12 +68,12 @@ BHWalkProvider::BHWalkProvider()
 
     // Setup the walk engine
 	walkingEngine = new WalkingEngine;
-	walkingEngine->theFrameInfoBH.cycleTime = 0.01f;
-	walkingEngine->currentMotionType = WalkingEngine::stand;
-	walkingEngine->theMotionRequestBH.motion = MotionRequestBH::specialAction;
-	for (int i = 0; i < MotionRequestBH::numOfMotions; i++)
-		walkingEngine->theMotionSelectionBH.ratios[i] = 0;
-	walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::specialAction] = 1.0;
+	walkingEngine->theFrameInfoBH.cycleTime = 0.01;
+	// walkingEngine->currentMotionType = WalkingEngine::stand;
+	// walkingEngine->theMotionRequestBH.motion = MotionRequestBH::specialAction;
+	// for (int i = 0; i < MotionRequestBH::numOfMotions; i++)
+	// 	walkingEngine->theMotionSelectionBH.ratios[i] = 0;
+	// walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::specialAction] = 1.0;
     hardReset();
 }
 
@@ -211,9 +211,9 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             motionRequest.walkRequest.mode = WalkRequest::percentageSpeedMode;
 
-            motionRequest.walkRequest.speed.rotation = command->theta_percent;
-            motionRequest.walkRequest.speed.translation.x = command->x_percent;
-            motionRequest.walkRequest.speed.translation.y = command->y_percent;
+            motionRequest.walkRequest.speed.rotation = 0;
+            motionRequest.walkRequest.speed.translation.x = 0.5;
+            motionRequest.walkRequest.speed.translation.y = 0;
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else {

@@ -32,6 +32,7 @@ WalkingEngine::WalkingEngine() : WalkingEngineBase(), optimizeStarted(false)
     sensorFilter = new SensorFilter();
     fallDownStateDetector = new FallDownStateDetector();
     torsoMatrixProvider = new TorsoMatrixProvider();
+    groundContactDetector = new GroundContactDetector();
     motionSelector = new MotionSelector();
 
 	init();
@@ -84,6 +85,13 @@ void WalkingEngine::init()
 		cout << "Could not find hardnessSettings.cfg!" << endl;
 	}
 
+	InMapFile sensorStream(ModuleBase::config_path + "sensorCalibration.cfg");
+	if (sensorStream.exists()) {
+		sensorStream >> theSensorCalibrationBH;
+	} else {
+		cout << "Could not find sensorCalibration.cfg!" << endl;
+	}
+
 	InMapFile jointCalibrateStream(ModuleBase::config_path + "jointCalibration.cfg");
 	if (jointCalibrateStream.exists()) {
 		jointCalibrateStream >> theJointCalibrationBH;
@@ -103,6 +111,13 @@ void WalkingEngine::init()
 		robotDimensionsStream >> theRobotDimensionsBH;
 	} else {
 		cout << "Could not find robotDimensions.cfg!" << endl;
+	}
+
+	InMapFile damageStream(ModuleBase::config_path + "damageConfiguration.cfg");
+	if (damageStream.exists()) {
+		damageStream >> theDamageConfigurationBH;
+	} else {
+		cout << "Could not find damageConfiguration.cfg!" << endl;
 	}
 
 	// pre compute constants
@@ -176,37 +191,24 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 	DECLARE_PLOT("module:WalkingEngine:smoothedGyroY");
 	MODIFY("module:WalkingEngine:optimizeBestParameters", optimizeBestParameters);
 
-    // if (theMotionRequestBH.motion == MotionRequestBH::stand)
-    //     cout << "Requested stand command!" << endl;
-
 	theMotionInfoBH.motion = theMotionRequestBH.motion;
-
-    // for (int i = 0; i < JointDataBH::numOfJoints; i++)
-    //     std::cout << "1In walking engine update: " << theJointDataBH.angles[i] << std::endl;
+	theMotionInfoBH.specialActionRequest = theMotionRequestBH.specialActionRequest;
+	theMotionInfoBH.walkRequest = theMotionRequestBH.walkRequest;
+	theMotionInfoBH.bikeRequest = theMotionRequestBH.bikeRequest;
+	theMotionInfoBH.indykickRequest = theMotionRequestBH.indykickRequest;
+	theMotionInfoBH.isMotionStable = true;
 
 	naoProvider->update(theJointDataBH, theSensorDataBH);
-    // for (int i = 0; i < JointDataBH::numOfJoints; i++)
-    //     std::cout << "2In walking engine update: " << theJointDataBH.angles[i] << std::endl;
+	naoProvider->update(theFrameInfoBH);
 	jointFilter->update(theFilteredJointDataBH);
-    // for (int i = 0; i < JointDataBH::numOfJoints; i++)
-    //     std::cout << "3In walking engine update: " << theFilteredJointDataBH.angles[i] << std::endl;
 	robotModelProvider->update(theRobotModelBH);
-    // std::cout << "Robot model: " << theRobotModelBH.centerOfMass.x << std::endl;
-    // std::cout << "Robot model: " << theRobotModelBH.centerOfMass.y << std::endl;
-    // std::cout << "Robot model: " << theRobotModelBH.centerOfMass.z << std::endl;
-    // std::cout << "Robot model: " << theRobotModelBH.totalMass << std::endl;
-    // std::cout << "Time: " << theFrameInfoBH.time << std::endl;
 	inertiaSensorCalibrator->update(theInertiaSensorDataBH);
-    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.gyro.x << std::endl;
-    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.gyro.y << std::endl;
-    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.acc.x << std::endl;
-    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.acc.y << std::endl;
-    // std::cout << "Inertia sensor data: " << theInertiaSensorDataBH.acc.z << std::endl;
 	inertiaSensorFilter->update(theOrientationDataBH);
 	sensorFilter->update(theFilteredSensorDataBH);
 	fallDownStateDetector->update(theFallDownStateBH);
 	torsoMatrixProvider->update(theOdometryDataBH);
 	torsoMatrixProvider->update(theTorsoMatrixBH);
+    groundContactDetector->update(theGroundContactStateBH);
 	motionSelector->update(theMotionSelectionBH);
 
 	DEBUG_RESPONSE("module:WalkingEngine:optimize",
@@ -482,14 +484,14 @@ void WalkingEngine::updatePredictedPendulumPlayer()
 void WalkingEngine::generateTargetPosture()
 {
 	predictedPendulumPlayer.getPosture(targetPosture);
-  	// targetPosture.leftArmJointAngles[0] = theJointDataBH.angles[JointDataBH::LShoulderPitch];
-  	// targetPosture.leftArmJointAngles[1] = theJointDataBH.angles[JointDataBH::LShoulderRoll];
-  	// targetPosture.leftArmJointAngles[2] = theJointDataBH.angles[JointDataBH::LElbowYaw];
-  	// targetPosture.leftArmJointAngles[3] = theJointDataBH.angles[JointDataBH::LElbowRoll];
-  	// targetPosture.rightArmJointAngles[0] = theJointDataBH.angles[JointDataBH::RShoulderPitch];
-  	// targetPosture.rightArmJointAngles[1] = theJointDataBH.angles[JointDataBH::RShoulderRoll];
-  	// targetPosture.rightArmJointAngles[2] = theJointDataBH.angles[JointDataBH::RElbowYaw];
-  	// targetPosture.rightArmJointAngles[3] = theJointDataBH.angles[JointDataBH::RElbowRoll];
+  	targetPosture.leftArmJointAngles[0] = theJointDataBH.angles[JointDataBH::LShoulderPitch];
+  	targetPosture.leftArmJointAngles[1] = theJointDataBH.angles[JointDataBH::LShoulderRoll];
+  	targetPosture.leftArmJointAngles[2] = theJointDataBH.angles[JointDataBH::LElbowYaw];
+  	targetPosture.leftArmJointAngles[3] = theJointDataBH.angles[JointDataBH::LElbowRoll];
+  	targetPosture.rightArmJointAngles[0] = theJointDataBH.angles[JointDataBH::RShoulderPitch];
+  	targetPosture.rightArmJointAngles[1] = theJointDataBH.angles[JointDataBH::RShoulderRoll];
+  	targetPosture.rightArmJointAngles[2] = theJointDataBH.angles[JointDataBH::RElbowYaw];
+  	targetPosture.rightArmJointAngles[3] = theJointDataBH.angles[JointDataBH::RElbowRoll];
 }
 
 void WalkingEngine::generateJointRequest()
@@ -1530,31 +1532,31 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	// arms
 	float halfArmRotation = p.walkArmRotationAtFullSpeedX * 0.5f;
 
-	if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::left].move)
-	{ // ARME arm movement
-		for(int i = 0; i < 4; ++i)
-			stance.leftArmJointAngles[i] = engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::left].angles[i];
-	}
-	else
-	{ // normal WalkingEngine arm movement
-		stance.leftArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + leftArmAngle;
+	// if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::left].move)
+	// { // ARME arm movement
+	// 	for(int i = 0; i < 4; ++i)
+	// 		stance.leftArmJointAngles[i] = engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::left].angles[i];
+	// }
+	// else
+	// { // normal WalkingEngine arm movement
+		stance.leftArmJointAngles[0] = pi_2 + p.standArmJointAngles.y + leftArmAngle;
 		stance.leftArmJointAngles[1] = p.standArmJointAngles.x;
 		stance.leftArmJointAngles[2] = -pi_2;
 		stance.leftArmJointAngles[3] = -p.standArmJointAngles.y - leftArmAngle - halfArmRotation;
-	}
+	// }
 
-	if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::right].move)
-	{ // ARME arm movement
-		for(int i = 0; i < 4; ++i)
-			stance.rightArmJointAngles[i] = engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::right].angles[i];
-	}
-	else
-	{ // normal WalkingEngine arm movement
+	// if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::right].move)
+	// { // ARME arm movement
+	// 	for(int i = 0; i < 4; ++i)
+	// 		stance.rightArmJointAngles[i] = engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::right].angles[i];
+	// }
+	// else
+	// { // normal WalkingEngine arm movement
 		stance.rightArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + rightArmAngle;
 		stance.rightArmJointAngles[1] = p.standArmJointAngles.x;
 		stance.rightArmJointAngles[2] = -pi_2;
 		stance.rightArmJointAngles[3] = -p.standArmJointAngles.y - rightArmAngle - halfArmRotation;
-	}
+	// }
 
 	// kick mutations
 	if(kickPlayer.isActive())
