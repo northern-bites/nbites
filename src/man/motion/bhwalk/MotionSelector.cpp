@@ -113,8 +113,6 @@ void MotionSelector::update(MotionSelectionBH& motionSelection)
     prevMotion = lastMotion;
   lastMotion = motionSelection.targetMotion;
 
-  // std::cout << "Stand ratio: " << motionSelection.ratios[MotionRequestBH::stand] << std::endl;
-
   PLOT("module:MotionSelector:ratios:walk", motionSelection.ratios[MotionRequestBH::walk]);
   PLOT("module:MotionSelector:ratios:stand", motionSelection.ratios[MotionRequestBH::stand]);
   PLOT("module:MotionSelector:ratios:specialAction", motionSelection.ratios[MotionRequestBH::specialAction]);

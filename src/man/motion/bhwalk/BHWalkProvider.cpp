@@ -1,6 +1,7 @@
 #include "BHWalkProvider.h"
 #include "Profiler.h"
 #include "Common.h"
+#include "NaoPaths.h"
 
 #include <cassert>
 #include <string>
@@ -16,6 +17,7 @@ namespace motion
 
 using namespace boost;
 
+// TODO make this consistent with new walk
 const float BHWalkProvider::INITIAL_BODY_POSE_ANGLES[] =
 {
         1.57f, 0.18f, -1.56f, -0.18f,
@@ -60,21 +62,20 @@ BHWalkProvider::BHWalkProvider()
     : MotionProvider(WALK_PROVIDER), requestedToStop(false)
 {
 	// Setup Walk Engine Configuation Parameters
-    // TODO use NaoPaths.h
-	ModuleBase::config_path = "/home/nao/nbites/Config/";
+	ModuleBase::config_path = common::paths::NAO_CONFIG_DIR;
 
-	// Setup static variables
+    // Setup the blackboard (used by bhuman to pass data around modules)
 	blackboard = new Blackboard;
 
     // Setup the walk engine
 	walkingEngine = new WalkingEngine;
-	walkingEngine->theFrameInfoBH.cycleTime = 0.01;
-	// walkingEngine->currentMotionType = WalkingEngine::stand;
-	// walkingEngine->theMotionRequestBH.motion = MotionRequestBH::specialAction;
-	// for (int i = 0; i < MotionRequestBH::numOfMotions; i++)
-	// 	walkingEngine->theMotionSelectionBH.ratios[i] = 0;
-	// walkingEngine->theMotionSelectionBH.ratios[MotionRequestBH::specialAction] = 1.0;
     hardReset();
+}
+
+BHWalkProvider::~BHWalkProvider()
+{
+    delete blackboard;
+    delete walkingEngine;
 }
 
 void BHWalkProvider::requestStopFirstInstance()
@@ -87,10 +88,10 @@ bool hasLargerMagnitude(float x, float y) {
         return x > y;
     if (y < 0.0f)
         return x < y;
-    return true; // considers values of 0.0f as always smaller in magnitude than anything
+    return true; // Considers values of 0.0f as always smaller in magnitude than anything
 }
 
-// return true if p1 has "passed" p2 (has components values that either have a magnitude
+// Return true if p1 has "passed" p2 (has components values that either have a magnitude
 // larger than the corresponding magnitude p2 within the same sign)
 bool hasPassed(const Pose2DBH& p1, const Pose2DBH& p2) {
 
@@ -105,7 +106,8 @@ bool hasPassed(const Pose2DBH& p1, const Pose2DBH& p2) {
  * and then interprets the walk engine output
  *
  * Main differences:
- * * The BH joint data is in a different order;
+ * * The BH joint data is in a different order and is transformed by sign and
+ * * offset to make calculation easier
  */
 void BHWalkProvider::calculateNextJointsAndStiffnesses(
     std::vector<float>&            sensorAngles,
@@ -130,31 +132,26 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     assert(JointDataBH::numOfJoints == Kinematics::NUM_JOINTS);
 
     if (standby) {
-        // std::cout << "In standby!" << std::endl;
         MotionRequestBH motionRequest;
         motionRequest.motion = MotionRequestBH::specialAction;
 
-        //TODO: maybe check what kind of special move we're switching to and change this
-        //accordingly
+        // TODO why are we sitting and what does standby mean?
         motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
         walkingEngine->theMotionRequestBH = motionRequest;
 
-        //anything that's not in the walk is marked as unstable
+        // TODO anything that's not in the walk is marked as unstable
         walkingEngine->theMotionInfoBH = MotionInfoBH();
         walkingEngine->theMotionInfoBH.isMotionStable = false;
 
     } else {
-    // Figure out the motion request
-    // VERY UGLY! re-factor this please TODO TODO TODO
+    // TODO VERY UGLY -- refactor this please
     if (requestedToStop || !isActive()) {
-        // std::cout << "Special action!" << std::endl;
         MotionRequestBH motionRequest;
-        // motionRequest.motion = MotionRequestBH::specialAction;
-        motionRequest.motion = MotionRequestBH::stand;
 
-        //TODO: maybe check what kind of special move we're switching to and change this
-        //accordingly
-        // motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
+        // TODO why are we sitting?
+        motionRequest.motion = MotionRequestBH::specialAction;
+        motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
+
         walkingEngine->theMotionRequestBH = motionRequest;
 
         currentCommand = MotionCommand::ptr();
@@ -163,14 +160,11 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         // If we're not calibrated, wait until we are calibrated to walk
         if (!calibrated())
         {
-            // std::cout << "Not yet calibrated!" << std::endl;
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else if (currentCommand.get() && currentCommand->getType() == MotionConstants::STEP) {
-            // std::cout << "Step command!" << std::endl;
-
             StepCommand::ptr command = boost::shared_static_cast<StepCommand>(currentCommand);
 
             Pose2DBH deltaOdometry = walkingEngine->theOdometryDataBH - startOdometry;
@@ -179,8 +173,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             Pose2DBH relativeTarget = absoluteTarget - (deltaOdometry + walkingEngine->upcomingOdometryOffset);
 
             if (!hasPassed(deltaOdometry + walkingEngine->upcomingOdometryOffset, absoluteTarget)) {
-                // std::cout << "Odometry!" << std::endl;
-
                 MotionRequestBH motionRequest;
                 motionRequest.motion = MotionRequestBH::walk;
 
@@ -190,19 +182,16 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 motionRequest.walkRequest.speed.translation.x = command->gain;
                 motionRequest.walkRequest.speed.translation.y = command->gain;
 
-                // motionRequest.walkRequest.pedantic = true;
                 motionRequest.walkRequest.target = relativeTarget;
 
                 walkingEngine->theMotionRequestBH = motionRequest;
 
             } else {
-                // std::cout << "Else!" << std::endl;
                 currentCommand = MotionCommand::ptr();
             }
 
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::WALK) {
-
             WalkCommand::ptr command = boost::shared_static_cast<WalkCommand>(currentCommand);
 
             MotionRequestBH motionRequest;
@@ -210,15 +199,13 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
             motionRequest.walkRequest.mode = WalkRequest::percentageSpeedMode;
 
-            motionRequest.walkRequest.speed.rotation = 0;
-            motionRequest.walkRequest.speed.translation.x = 0.5;
-            motionRequest.walkRequest.speed.translation.y = 0;
+            motionRequest.walkRequest.speed.rotation = command->theta_percent;
+            motionRequest.walkRequest.speed.translation.x = command->x_percent;
+            motionRequest.walkRequest.speed.translation.y = command->y_percent;
 
             walkingEngine->theMotionRequestBH = motionRequest;
         } else {
         if (currentCommand.get() && currentCommand->getType() == MotionConstants::DESTINATION) {
-            // std::cout << "Destination command!" << std::endl;
-
             DestinationCommand::ptr command = boost::shared_static_cast<DestinationCommand>(currentCommand);
 
             MotionRequestBH motionRequest;
@@ -234,8 +221,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.target.translation.x = command->x_mm;
             motionRequest.walkRequest.target.translation.y = command->y_mm;
 
-            // motionRequest.walkRequest.pedantic = command->pedantic;
-
             // Let's do some motion kicking!
             if (command->motionKick) {
                 if (command->kickType == 0) {
@@ -250,15 +235,12 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                 else {
                     motionRequest.walkRequest.kickType = WalkRequest::right;
                 }
-                // motionRequest.walkRequest.kickBallPosition.x = command->kickBallRelX;
-                // motionRequest.walkRequest.kickBallPosition.y = command->kickBallRelY;
             }
 
             walkingEngine->theMotionRequestBH = motionRequest;
         }
-        //TODO: make special command for stand
+        //TODO make special command for stand
         if (!currentCommand.get()) {
-            // std::cout << "Empty stand!" << std::endl;
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 
@@ -269,7 +251,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     }
     }
 
-    //We do not copy temperatures because they are unused
+    // We do not copy temperatures because they are unused
     JointDataBH& bh_joint_data = walkingEngine->theJointDataBH;
 
     for (int i = 0; i < JointDataBH::numOfJoints; i++)
@@ -304,23 +286,20 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLBL] = sensorFSRs.lrl();
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
 
+    // TODO doesn't NaoProvider do this for us? 
     // Bhuman needs time information for diffs
     walkingEngine->theFrameInfoBH.time = walkingEngine->theFilteredJointDataBH.timeStamp = walkingEngine->theFilteredSensorDataBH.timeStamp = monotonic_micro_time();
 
-    // TODO this might not be the best way, think about the blackboard...
     WalkingEngineOutputBH output;
     walkingEngine->update(output);
 
-    //ignore the first chain since it's the head one
+    // Ignore the first chain since it's the head
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
         std::vector<float> chain_angles;
         std::vector<float> chain_hardness;
         for (unsigned j = Kinematics::chain_first_joint[i];
                      j <= Kinematics::chain_last_joint[i]; j++) {
-            //position angle
-            chain_angles.push_back(output.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign);
-            // std::cout << "OUTPUT: Nbites order: " << output.angles[nb_joint_order[j]] << std::endl;
-            //hardness
+            chain_angles.push_back(output.angles[nb_joint_order[j]] * walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].sign - walkingEngine->theJointCalibrationBH.joints[nb_joint_order[j]].offset);
             if (output.jointHardness.hardness[nb_joint_order[j]] == 0) {
                 chain_hardness.push_back(MotionConstants::NO_STIFFNESS);
             } else {
@@ -332,14 +311,14 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         this->setNextChainStiffnesses((Kinematics::ChainID) i, chain_hardness);
     }
 
-    //we only really leave when we do a sweet move, so request a special action
+    // We only really leave when we do a sweet move, so request a special action
     if (walkingEngine->theMotionSelectionBH.targetMotion == MotionRequestBH::specialAction
             && requestedToStop) {
 
         inactive();
         requestedToStop = false;
-        //reset odometry - this allows the walk to not "freak out" when we come back
-        //from other providers
+        // Reset odometry - this allows the walk to not "freak out" when we come back
+        // from other providers
         walkingEngine->theOdometryDataBH = OdometryDataBH();
     }
 
@@ -351,14 +330,10 @@ bool BHWalkProvider::isStanding() const {
 }
 
 bool BHWalkProvider::isWalkActive() const {
-    // TODO is this okay?
-    // return !(isStanding() && walkingEngineOutput.isLeavingPossible) && isActive();
-    return !isStanding() && isActive();
+    return !(isStanding() && walkingEngine->theWalkingEngineOutputBH.isLeavingPossible) && isActive();
 }
 
 void BHWalkProvider::stand() {
-//    bhwalk_out << "BHWalk stand requested" << endl;
-
     currentCommand = MotionCommand::ptr();
     active();
 }
@@ -378,7 +353,8 @@ void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocatio
 void BHWalkProvider::hardReset() {
 
     inactive();
-    //reset odometry
+
+    // Reset odometry
     walkingEngine->theOdometryDataBH = OdometryDataBH();
 
     MotionRequestBH motionRequest;
@@ -388,20 +364,10 @@ void BHWalkProvider::hardReset() {
     motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
     currentCommand = MotionCommand::ptr();
 
-    // TODO what does this do?
-    // walkingEngine->inertiaSensorCalibrator.reset();
+    walkingEngine->inertiaSensorCalibrator->reset();
 
     requestedToStop = false;
 }
-
-//void BHWalkProvider::playDead() {
-//    MotionRequestBH motionRequest;
-//    motionRequest.motion = MotionRequestBH::specialAction;
-//
-//    motionRequest.specialActionRequest.specialAction = SpecialActionRequest::playDead;
-//
-//    currentCommand = MotionCommand::ptr();
-//}
 
 void BHWalkProvider::resetOdometry() {
     walkingEngine->theOdometryDataBH = OdometryDataBH();
@@ -416,9 +382,6 @@ void BHWalkProvider::setCommand(const WalkCommand::ptr command) {
 
     currentCommand = command;
 
-//    bhwalk_out << "BHWalk speed walk requested with command ";
-//    bhwalk_out << *(command.get());
-
     active();
 }
 
@@ -429,9 +392,6 @@ void BHWalkProvider::setCommand(const StepCommand::ptr command) {
 
     startOdometry = walkingEngine->theOdometryDataBH;
     currentCommand = command;
-
-//    bhwalk_out << "BHWalk step walk requested with command ";
-//    bhwalk_out << *(command.get()) << endl;
 
     active();
 }
@@ -448,11 +408,13 @@ bool BHWalkProvider::calibrated() const {
 }
 
 float BHWalkProvider::leftHandSpeed() const {
+    // TODO reimplement?
     // return walkingEngine->leftHandSpeed;
     return 0;
 }
 
 float BHWalkProvider::rightHandSpeed() const {
+    // TODO reimplement?
     // return walkingEngine->rightHandSpeed;
     return 0;
 }

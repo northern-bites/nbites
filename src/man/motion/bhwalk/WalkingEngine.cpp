@@ -48,6 +48,22 @@ WalkingEngine::WalkingEngine() : WalkingEngineBase(), optimizeStarted(false)
 	reset();
 }
 
+WalkingEngine::~WalkingEngine()
+{
+    delete naoProvider;
+    delete jointFilter;
+    delete robotModelProvider;
+    delete inertiaSensorCalibrator;
+    delete inertiaSensorFilter;
+    delete sensorFilter;
+    delete fallDownStateDetector;
+    delete torsoMatrixProvider;
+    delete groundContactDetector;
+    delete motionSelector;
+
+    theInstance = 0;
+}
+
 bool WalkingEngine::handleMessage(InMessage& message)
 {
 	WalkingEngine* engine = theInstance;
@@ -272,12 +288,9 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 		generateJointRequest();
 		computeOdometryOffset();
 		generateOutput(walkingEngineOutput);
-        // for (int i = 0; i < JointDataBH::numOfJoints; i++)
-        //     std::cout << "OUTPUT FROM WALK ENGINE: " << walkingEngineOutput.angles[i] << std::endl;
 	}
 	else
 	{
-        // std::cout << "MOTION SELECTOR NOT WORKING!" << std::endl;
 		reset();
 		generateDummyOutput(walkingEngineOutput);
 	}
@@ -484,6 +497,7 @@ void WalkingEngine::updatePredictedPendulumPlayer()
 void WalkingEngine::generateTargetPosture()
 {
 	predictedPendulumPlayer.getPosture(targetPosture);
+    // TODO: is this necessary?
   	targetPosture.leftArmJointAngles[0] = theJointDataBH.angles[JointDataBH::LShoulderPitch];
   	targetPosture.leftArmJointAngles[1] = theJointDataBH.angles[JointDataBH::LShoulderRoll];
   	targetPosture.leftArmJointAngles[2] = theJointDataBH.angles[JointDataBH::LElbowYaw];
@@ -1539,10 +1553,11 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	// }
 	// else
 	// { // normal WalkingEngine arm movement
-		stance.leftArmJointAngles[0] = pi_2 + p.standArmJointAngles.y + leftArmAngle;
-		stance.leftArmJointAngles[1] = p.standArmJointAngles.x;
-		stance.leftArmJointAngles[2] = -pi_2;
-		stance.leftArmJointAngles[3] = -p.standArmJointAngles.y - leftArmAngle - halfArmRotation;
+    // Northern Bites don't use BH's ArmMotionEngine
+    stance.leftArmJointAngles[0] = pi_2 + p.standArmJointAngles.y + leftArmAngle;
+    stance.leftArmJointAngles[1] = p.standArmJointAngles.x;
+    stance.leftArmJointAngles[2] = -pi_2;
+    stance.leftArmJointAngles[3] = -p.standArmJointAngles.y - leftArmAngle - halfArmRotation;
 	// }
 
 	// if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::right].move)
@@ -1552,10 +1567,11 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	// }
 	// else
 	// { // normal WalkingEngine arm movement
-		stance.rightArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + rightArmAngle;
-		stance.rightArmJointAngles[1] = p.standArmJointAngles.x;
-		stance.rightArmJointAngles[2] = -pi_2;
-		stance.rightArmJointAngles[3] = -p.standArmJointAngles.y - rightArmAngle - halfArmRotation;
+    // Northern Bites don't use BH's ArmMotionEngine
+    stance.rightArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + rightArmAngle;
+    stance.rightArmJointAngles[1] = p.standArmJointAngles.x;
+    stance.rightArmJointAngles[2] = -pi_2;
+    stance.rightArmJointAngles[3] = -p.standArmJointAngles.y - rightArmAngle - halfArmRotation;
 	// }
 
 	// kick mutations

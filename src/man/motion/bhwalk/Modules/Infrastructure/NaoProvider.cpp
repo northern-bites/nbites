@@ -159,6 +159,7 @@ void NaoProvider::update(JointDataBH& jointData, SensorDataBH& sensorData)
 {
   jointData.timeStamp = sensorData.timeStamp = std::max(jointData.timeStamp + 1, SystemCall::getCurrentSystemTime());
 
+  // Northern Bites pass sensors in via bhwalkprovider instead
   //float* sensors = naoBody.getSensors();
 
   for(int i = 0; i < JointDataBH::numOfJoints; ++i)
@@ -169,6 +170,7 @@ void NaoProvider::update(JointDataBH& jointData, SensorDataBH& sensorData)
     }
     else
     {
+      // Northern Bites undo this transformation after bhwalk executes
       jointData.angles[i] = jointData.angles[i] * theJointCalibrationBH.joints[i].sign - theJointCalibrationBH.joints[i].offset;
     }
   }

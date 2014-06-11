@@ -76,7 +76,3 @@ add_library(
 	bhwalk
 	STATIC
 	${bhwalk_srcs} )
-
-# # Link project to snappy libraries
-# target_link_libraries(bhwalk
-#                       ${CMAKE_CURRENT_SOURCE_DIR}/Util/snappy/lib/linux_x86/libsnappy.a)

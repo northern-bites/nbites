@@ -146,7 +146,7 @@ public:
   /**
   * Destructor
   */
-  ~WalkingEngine() {theInstance = 0;}
+  ~WalkingEngine();
 
   /** Helper for optimizer. */
   class Parameters : public WalkingEngineBase
