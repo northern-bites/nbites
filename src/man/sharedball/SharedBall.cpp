@@ -12,6 +12,8 @@ SharedBallModule::SharedBallModule() :
     numy = 0;
     sumweight = 0;
     weight = 0;
+    frames_on = 0;
+    frames_off = 0;
 }
 
 SharedBallModule::~SharedBallModule()
@@ -32,6 +34,8 @@ void SharedBallModule::run_() {
     sharedBallMessage.get()->set_x(x);
     sharedBallMessage.get()->set_y(y);
     sharedBallMessage.get()->set_ball_on(ball_on);
+    sharedBallMessage.get()->set_frames_on(frames_on);
+    sharedBallMessage.get()->set_frames_off(frames_off)
 
     sharedBallOutput.setMessage(sharedBallMessage);
 }
@@ -67,6 +71,8 @@ void SharedBallModule::weightedavg() {
     if (sumweight != 0) {
         x = numx / sumweight;
         y = numy / sumweight;
+        frames_on++;
+        frames_off = 0;
         ball_on = true;
     }
     //no one sees the ball
@@ -74,6 +80,8 @@ void SharedBallModule::weightedavg() {
         // if none of the robots see the ball
         x = -100;
         y = -100;
+        frames_off++;
+        frames_on = 0;
         ball_on = false;
     }
 

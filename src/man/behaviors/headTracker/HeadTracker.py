@@ -148,6 +148,12 @@ class HeadTracker(FSA.FSA):
         """
         self.performHeadMove(self.helper.lookToAngle(yaw))
 
+    def trackSharedBall(self):
+        self.switchTo('trackSharedBall')
+
+    def snapToCorner(self):
+        self.switchTo('snapToCorner')
+
     def lookStraightThenTrack(self):
         """
         Look straight. Once the ball is seen, begin tracking it.
