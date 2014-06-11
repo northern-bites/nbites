@@ -1,6 +1,6 @@
 import SharedTransitions as shared
 import PlayOffBallTransitions as transitions
-import PlayOffBallConstants as constants
+import RoleConstants as role
 import ChaseBallTransitions as chase
 import ChaseBallConstants as chaseConstants
 import ClaimTransitions as claims
@@ -27,8 +27,7 @@ def branchOnRole(player):
     Chasers have different behavior than defenders, so we branch on
     role here.
     """
-    # TODO abstract role number properly
-    if player.role == 4 or player.role == 5:
+    if role.isChaser(player.role):
         player.goNow('searchFieldForBall')
     else:
         player.goNow('positionAtHome')
@@ -65,13 +64,7 @@ def watchForBall(player):
 def positionAsSupporter(player):
     # TODO Nikki -- defenders should position between ball and goal
     # defenders position at midpoint between ball and goal
-    if player.role == 2:
-        waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X) * .5,
-                                  (player.brain.ball.y + NogginConstants.MIDFIELD_Y) * .5,
-                                  player.brain.ball.bearing_deg + player.brain.loc.h)
-    # other defender will position between ball and midpoint between closest goalpost to ball
-    # and middle of goal
-    elif player.role == 3:
+    if role.isLeftDefender(player.role):
         if player.brain.ball.y < NogginConstants.MIDFIELD_Y:
             waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)
                                                 * .5, (player.brain.ball.y +
@@ -79,8 +72,15 @@ def positionAsSupporter(player):
                                                        NogginConstants.BLUE_GOALBOX_BOTTOM_Y)
                                                 * .5, player.brain.ball.bearing_deg +
                                                 player.brain.loc.h)
+        else:
+            waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)*.5,
+                                                (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
+                                                player.brain.ball.bearing_deg + player.brain.loc.h)
 
-        elif player.brain.ball.y >=  NogginConstants.MIDFIELD_Y:
+    # other defender will position between ball and midpoint between closest goalpost to ball
+    # and middle of goal
+    elif role.isRightDefender(player.role):
+        if player.brain.ball.y >=  NogginConstants.MIDFIELD_Y:
             waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)
                                                 * .5, (player.brain.ball.y +
                                                        NogginConstants.GOALBOX_WIDTH * .75 +
@@ -88,7 +88,12 @@ def positionAsSupporter(player):
                                                 * .5, player.brain.ball.bearing_deg +
                                                 player.brain.loc.h)
 
-    elif player.role == 4 or player.role == 5:
+        else:
+            waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)*.5,
+                                                (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
+                                                player.brain.ball.bearing_deg + player.brain.loc.h)
+
+    elif role.isChaser(player.role):
         if (player.brain.ball.x > player.brain.loc.x and
             player.brain.ball.y > player.brain.loc.y):
             waitForBallPosition = RobotLocation(player.brain.ball.x - 60,
@@ -134,6 +139,12 @@ def searchFieldForBall(player):
 @ifSwitchNow(transitions.shouldFindSharedBall, 'searchFieldForBall')
 def walkSearchFieldForBall(player):
 # Walk and search for ball, randomly walking to the center of each field quadrant
+
+
+    quad1Center = Location(NogginConstants.CENTER_FIELD_X * .5, NogginConstants.CENTER_FIELD_Y * .5)
+    quad2Center = Location(NogginConstants.CENTER_FIELD_X * .5, NogginConstants.CENTER_FIELD_Y * 1.5)
+    quad3Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * 1.5)
+    quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * .5)
 
     if player.firstFrame():
         dest = constants.quad1Center

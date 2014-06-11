@@ -15,7 +15,7 @@ from . import BoxPositionStates
 
 import noggin_constants as NogginConstants
 
-from . import BoxPositionConstants as BPConstants
+from . import RoleConstants as roleConstants
 
 from objects import Location
 
@@ -42,9 +42,8 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.role = brain.playerNumber
         # Initialized for the sake of those who aren't
         self.isKickingOff = False
-        #Figure out home & kickoff, even/odd player.
-        #All that good stuff...
-        BPConstants.setRoleConstants(self, self.role)
+        # Set home position, box, kickoff vars, etc. based on role number
+        roleConstants.setRoleConstants(self, self.role)
 
         self.frameCounter = 0
         self.shouldRelocalizeCounter = 0

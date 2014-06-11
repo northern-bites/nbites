@@ -4,7 +4,7 @@ hard reset to one of the two possible post-penalty positions.
 """
 
 import ChaseBallTransitions as transitions
-import BoxPositionConstants as BPConstants
+import RoleConstants as roleConstants
 from math import copysign, fabs
 from objects import RelRobotLocation
 from ..util import *
@@ -116,7 +116,7 @@ def afterPenalty(player):
         # Yes, when goal_right is less than 0, our goal is to our right.
         # It seems counter intuitive, but that's how it works. -Josh Z
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
-        if player.role != 1:
+        if not roleConstants.isGoalie(player.role):
             return player.goNow('determineRole')
         return player.goLater(player.gameState)
 
@@ -129,16 +129,16 @@ def determineRole(player):
 
     openSpaces = [True, True, True, True]
     for mate in player.brain.teamMembers:
-        if mate.role != 1 and mate.active:
+        if not roleConstants.isGoalie(mate.role) and mate.active:
             openSpaces[mate.role - 2] = False
 
     if openSpaces[3]:
-        BPConstants.setRoleConstants(player, 5)
+        RoleConstants.setRoleConstants(player, 5)
     if openSpaces[2]:
-        BPConstants.setRoleConstants(player, 4)
+        RoleConstants.setRoleConstants(player, 4)
     elif openSpaces[1]:
-        BPConstants.setRoleConstants(player, 3)
+        RoleConstants.setRoleConstants(player, 3)
     elif openSpaces[0]:
-        BPConstants.setRoleConstants(player, 2)
+        RoleConstants.setRoleConstants(player, 2)
 
     return player.goLater(player.gameState)

@@ -6,7 +6,7 @@ The second to top level in player FSA.
 """
 
 import RoleSwitchingTransitions as transitions
-import BoxPositionConstants as BPConstants
+import RoleConstants as roleConstants
 from ..util import *
 
 @defaultState('gameControllerResponder')
@@ -22,7 +22,7 @@ def switchRoles(player):
     """
     State to decide who on the team should become the new chaser and switch accordingly.
     """
-    BPConstants.setRoleConstants(player, player.openChaser)
+    roleConstants.setRoleConstants(player, player.openChaser)
 
     return player.goLater(player.gameState)
 
@@ -35,7 +35,7 @@ def switchRoles(player):
     #         return player.goLater(player.gameState)
 
     # # Yes, become the chaser...
-    # BPConstants.setRoleConstants(player, player.openChaser)
+    # roleConstants.setRoleConstants(player, player.openChaser)
 
     # print "We are the chaser!"
     # # And continue playing...
