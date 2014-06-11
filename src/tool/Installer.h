@@ -27,6 +27,7 @@ protected:
     //std::fstream* findLine(std::fstream* stream, std::string lineStart);
     void writePlayerNums(int player, int team);
     void writePyPlayer(std::string pyPlayer);
+    void writeAddress(std::string address);
     int validateInput();
 protected slots:
     void installPlayer();

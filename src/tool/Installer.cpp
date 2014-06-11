@@ -2,8 +2,9 @@
 
 namespace tool{
 
-#define ROBOT_CONFIG "../man/test.h"
+#define ROBOT_CONFIG "../man/RobotConfig.h"
 #define PY_SWITCH "../man/behaviors/players/test.py"
+#define UPLOAD "../man/up.sh"
 
 Installer::Installer(const char* title):
     teamNumber(new QLineEdit(this)),
@@ -42,19 +43,13 @@ void Installer::installPlayer()
         //return;
     }
 
-    std::fstream* line = new std::fstream("test.h",
-                                          std::fstream::in | std::fstream::out);
-    std::vector<std::string> list;
-    //list.push_back("TEAM");
-    list.push_back("PLAYER");
-    //std::fstream* f = findLine(line, std::string("he"));
-    //for(int i=0; i<list.size(); i++) std::cout << list.at(i) << std::endl;
-    //int result = findLine(line, "PLAYER");
-    writePlayerNums(55,62);
-    writePyPlayer("pBruk2");
-    //for(int i=0; i<list.size(); i++) std::cout << list.at(i) << std::endl;
-    //f->write(temp.c_str(),1);
+    writePlayerNums(3,3);
+    writePyPlayer("pBrunswick");
+    writeAddress("mal.local");
     // TODO delete these
+
+    int result = system(UPLOAD);
+    std::cout << result << std::endl;
 }
 
 void Installer::writePlayerNums(int player, int team)
@@ -90,6 +85,36 @@ void Installer::writePyPlayer(std::string pyPlayer)
     std::ofstream fileOut(file.c_str(), std::ofstream::out);
     fileOut << std::endl << "from . import " << pyPlayer
             << " as selectedPlayer" << std::endl;
+}
+
+void Installer::writeAddress(std::string address)
+{
+    std::string file = UPLOAD;
+    std::ifstream fileIn(file.c_str(), std::ifstream::in);
+    std::string temp;
+    std::vector<std::string> fileHolder;
+
+    // The two while loops are necessary to preserve file permissions on
+    // upload.sh since it needs to be executable
+    while(getline(fileIn, temp))
+    {
+        fileHolder.push_back(temp);
+    }
+
+    std::ofstream fileOut((file).c_str(), std::ofstream::out);
+    for(std::vector<std::string>::iterator it = fileHolder.begin(); it != fileHolder.end(); it++)
+    {
+        if(-1 != it->find("ADDRESS="))
+        {
+            fileOut << "ADDRESS=" << address << std::endl;
+        }
+        else
+        {
+            fileOut << *it << std::endl;
+        }
+    }
+    //remove(file.c_str());
+    //rename((file+".tmp").c_str(), file.c_str());
 }
 
 int Installer::validateInput()
