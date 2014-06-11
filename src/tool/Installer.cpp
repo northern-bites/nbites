@@ -7,45 +7,64 @@ namespace tool{
 #define UPLOAD "../man/up.sh"
 
 Installer::Installer(const char* title):
-    teamNumber(new QLineEdit(this)),
-    playerNames(new QLineEdit(this)),
-    pyPlayers(new QLineEdit(this)),
-    playerNum(new QLineEdit(this)),
-    install(new QPushButton(tr("Install")))
+    teamNumber(new QLineEdit("Team Number", this)),
+    playerNames(),
+    pyPlayers(),
+    playerNums(),
+    installButtons()
+
 {
     this->setWindowTitle(tr(title));
 
-    QHBoxLayout *player = new QHBoxLayout(this);
+    QGridLayout *main = new QGridLayout(this);
+    main->setSpacing(2);
+    main->addWidget(teamNumber, 0, 0);
+    main->addWidget(new QLabel("Host"),1,0);
+    main->addWidget(new QLabel("Python Player"),1,1);
+    main->addWidget(new QLabel("Player Number"),1,2);
 
-    player->addWidget(teamNumber);
-    player->addWidget(playerNames);
-    player->addWidget(pyPlayers);
-    player->addWidget(playerNum);
-    player->addWidget(install);
+    QSignalMapper *signalMapper = new QSignalMapper(this);
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(installPlayer(int)));
 
-    connect(install, SIGNAL(clicked()), this, SLOT(installPlayer()));
+
+    for(int i=2; i<7; i++){
+        QLineEdit* name = new QLineEdit(this);
+        QLineEdit* pyPlay = new QLineEdit(this);
+        QLineEdit* playNum = new QLineEdit(this);
+        QPushButton* install = new QPushButton(tr("Install"));
+
+        signalMapper->setMapping(install, i-2);
+        connect(install, SIGNAL(clicked()), signalMapper, SLOT(map()));
+
+        main->addWidget(name, i, 0);
+        main->addWidget(pyPlay, i, 1);
+        main->addWidget(playNum, i, 2);
+        main->addWidget(install, i, 3);
+
+        playerNames.push_back(name);
+        pyPlayers.push_back(pyPlay);
+        playerNums.push_back(playNum);
+        installButtons.push_back(install);
+    }
 }
 
-void Installer::installPlayer()
+void Installer::installPlayer(int index)
 {
     QString team = teamNumber->text();
-    QString number = playerNum->text();
-    QString host = playerNames->text();
-    QString player = pyPlayers->text();
-    std::vector<std::string> searchFor;
+    QString pnum = playerNums.at(index)->text();
+    QString host = playerNames.at(index)->text();
+    QString player = pyPlayers.at(index)->text();
 
-    searchFor.push_back(team.toStdString());
-    searchFor.push_back(number.toStdString());
-
+    // TODO: implement
     if(!validateInput())
     {
         std::cout<<"you done fucked up!" << std::endl;
         //return;
     }
 
-    writePlayerNums(3,3);
-    writePyPlayer("pBrunswick");
-    writeAddress("mal.local");
+    writePlayerNums(pnum.toInt(),team.toInt());
+    writePyPlayer(player.toStdString());
+    writeAddress(host.toStdString());
     // TODO delete these
 
     int result = system(UPLOAD);
@@ -120,7 +139,7 @@ void Installer::writeAddress(std::string address)
 int Installer::validateInput()
 {
     if(!teamNumber->text().toInt()) return 0;
-    if(!playerNum->text().toInt()) return 0;
+    //if(!playerNum->text().toInt()) return 0;
     //TODO finish this;
     else return 1;
 }

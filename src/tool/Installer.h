@@ -6,6 +6,8 @@
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QString>
+#include <QLabel>
+#include <QSignalMapper>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -19,18 +21,22 @@ class Installer : public QWidget {
 public:
     Installer(const char* title = "The Installer");
 protected:
+    std::vector<QLineEdit*> playerNames;
+    std::vector<QLineEdit*> pyPlayers;
+    std::vector<QLineEdit*> playerNums;
+    std::vector<QPushButton*> installButtons;
     QLineEdit* teamNumber;
-    QLineEdit* playerNames; // TODO: Think about this, NUM_PLAYERS_PER_TEAM?
-    QLineEdit* pyPlayers; // TODO
-    QLineEdit* playerNum; // TODO
-    QPushButton* install; // TODO
+    //QLineEdit* playerNames; // TODO: Think about this, NUM_PLAYERS_PER_TEAM?
+    //QLineEdit* pyPlayers; // TODO
+    //QLineEdit* playerNum; // TODO
+    //QPushButton* install; // TODO
     //std::fstream* findLine(std::fstream* stream, std::string lineStart);
     void writePlayerNums(int player, int team);
     void writePyPlayer(std::string pyPlayer);
     void writeAddress(std::string address);
     int validateInput();
 protected slots:
-    void installPlayer();
+    void installPlayer(int index);
 //private:
 };
 }
