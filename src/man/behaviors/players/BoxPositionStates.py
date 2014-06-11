@@ -2,6 +2,7 @@ import SharedTransitions as shared
 import BoxPositionTransitions as transitions
 import ChaseBallTransitions as chase
 import ClaimTransitions as claims
+import RoleConstants as role
 import noggin_constants as NogginConstants
 from ..navigator import Navigator as nav
 from objects import RobotLocation
@@ -25,8 +26,7 @@ def branchOnRole(player):
     Chasers have different behavior than defenders, so we branch on
     role here.
     """
-    # TODO abstract role number properly
-    if player.role == 4 or player.role == 5:
+    if role.isChaser(player.role):
         player.goNow('searchFieldForBall')
     else:
         player.goNow('positionAtHome')
@@ -62,9 +62,9 @@ def watchForBall(player):
 @ifSwitchLater(shared.ballOffForNFrames(30), 'branchOnRole')
 def positionAsSupporter(player):
     # TODO Nikki -- defenders should position between ball and goal
-    if player.role == 2 or player.role == 3:
+    if role.isDefender(player.role):
         pass
-    elif player.role == 4 or player.role == 5:
+    elif role.isChaser(player.role):
         if (player.brain.ball.x > player.brain.loc.x and
             player.brain.ball.y > player.brain.loc.y):
             waitForBallPosition = RobotLocation(player.brain.ball.x - 60,
@@ -85,6 +85,9 @@ def positionAsSupporter(player):
             waitForBallPosition = RobotLocation(player.brain.ball.x + 60,
                                                 player.brain.ball.y + 60,
                                                 -90)
+    # TODO cherry picker needs supporter position
+    elif role.isCherryPicker(player.role):
+        pass
 
     player.brain.nav.goTo(waitForBallPosition, precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
