@@ -12,7 +12,7 @@
 option(
   USING_LAB_FIELD
   "Turn on if we are in the lab and not on a full-size field"
-  ON
+  OFF
 )
 
 if( NOT OFFLINE )

@@ -9,13 +9,13 @@ set( @ROBOT_PLAYER_NUMBER@
 )
 
 set( @ROBOT_TEAM_NUMBER@
-  "14"
+  "16"
   CACHE STRING
   "The team number for the robot."
 )
 
 set( @REMOTE_ADDRESS@
-  "vera"
+  "zoe"
   CACHE STRING
   "The address to which the code will be installed."
 )
@@ -29,14 +29,14 @@ set ( @PYTHON_PLAYER@
 # COLOR TABLE SELECTION
 # Set the path to the color table you wish to be loaded into install/etc
 SET( @TABLE_TOP@
-  "../../data/tables/lab13.mtb"
+  "../../data/tables/fort50.mtb"
   CACHE STRING
   "Path relative to man directory for the desired top camera color table"
   )
 SET( TABLE_TOP ${@TABLE_TOP@})
 
 SET( @TABLE_BOTTOM@
-  "../../data/tables/lab13.mtb"
+  "../../data/tables/fort50.mtb"
   CACHE STRING
   "Path relative to man directory for the desired bottom camera color table"
   )
