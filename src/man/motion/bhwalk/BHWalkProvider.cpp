@@ -404,7 +404,7 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
 }
 
 bool BHWalkProvider::calibrated() const {
-    return blackboard->theInertiaSensorDataBH.calibrated;
+    return walkingEngine->theInertiaSensorDataBH.calibrated;
 }
 
 float BHWalkProvider::leftHandSpeed() const {
