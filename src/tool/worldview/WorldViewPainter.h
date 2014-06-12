@@ -44,8 +44,7 @@ protected:
     // Paint a RobotLocation
     void paintRobotLocation(QPaintEvent* event,
                             messages::WorldModel loc,
-                            QString playerNum,
-                            bool red = false);
+                            QString playerNum);
 
 private:
     messages::WorldModel curLoc[NUM_PLAYERS_PER_TEAM];
