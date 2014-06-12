@@ -49,6 +49,8 @@ private:
     float numx;         //numerator of weighted average of x
     float numy;         //numerator of weighted average of y
     float sumweight;    //denominator of weighted average is sum of weights
+    int frames_on;
+    int frames_off;
 
     bool ball_on;
 };

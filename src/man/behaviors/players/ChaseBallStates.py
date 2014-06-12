@@ -4,7 +4,7 @@ Here we house all of the state methods used for chasing the ball
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import DribbleTransitions as dr_trans
-import BoxPositionTransitions as boxTransitions
+import PlayOffBallTransitions as playOffTransitions
 from ..navigator import Navigator
 from ..kickDecider import KickDecider2
 from ..kickDecider import kicks
@@ -21,7 +21,7 @@ DRIBBLE_ON_KICKOFF = False
 @ifSwitchNow(transitions.shouldFindBall, 'findBall')
 def approachBall(player):
     if player.firstFrame():
-        player.buffBoxFiltered = CountTransition(boxTransitions.ballNotInBufferedBox,
+        player.buffBoxFiltered = CountTransition(playOffTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
         player.brain.tracker.trackBall()
         player.inKickingState = False

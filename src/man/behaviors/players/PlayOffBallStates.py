@@ -28,9 +28,9 @@ def branchOnRole(player):
     role here.
     """
     if role.isChaser(player.role):
-        player.goNow('searchFieldForBall')
+        return player.goNow('searchFieldForBall')
     else:
-        player.goNow('positionAtHome')
+        return player.goNow('positionAtHome')
 
 @superState('playOffBall')
 @stay
@@ -121,12 +121,13 @@ def positionAsSupporter(player):
 
 @superState('playOffBall')
 @stay
-@ifSwitchNow(chase.shouldStopLookingForSharedBall, 'walkSearchFieldForBall')
+@ifSwitchNow(transitions.shouldStopLookingForSharedBall, 'walkSearchFieldForBall')
 def searchFieldForBall(player):
     """
     State used by chasers to search the field. Uses the shared ball if it is
     on. Moves to different quads of the field somewhat randomly.
     """
+    sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
     player.brain.tracker.trackSharedBall()
     player.brain.nav.goTo(sharedball,
                           precision = nav.GENERAL_AREA,
@@ -147,21 +148,21 @@ def walkSearchFieldForBall(player):
     quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * .5)
 
     if player.firstFrame():
-        dest = constants.quad1Center
+        walkSearchFieldForBall.dest = quad1Center
 
     player.brain.tracker.trackBall()
-    player.brain.nav.goTo(dest, precision = nav.GENERAL_AREA,
+    player.brain.nav.goTo(walkSearchFieldForBall.dest, precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)
 
     # update destination to send it to a new quadrant on the field
     # prearranged order; change or ranndomize?
-    if shared.navAtPosition():
-        if dest == constants.quad1Center:
-            dest = constants.quad3Center
-        elif dest == constants.quad3Center:
-            dest = constants.quad2Center
-        elif dest == constants.quad2Center:
-            dest = constants.quad4Center
-        elif dest == constants.quad4Center:
-            dest = constants.quad1Center
+    if shared.navAtPosition(player):
+        if walkSearchFieldForBall.dest == quad1Center:
+            walkSearchFieldForBall.dest = quad3Center
+        elif walkSearchFieldForBall.dest == quad3Center:
+            walkSearchFieldForBall.dest = quad2Center
+        elif walkSearchFieldForBall.dest == quad2Center:
+            walkSearchFieldForBall.dest = quad4Center
+        elif walkSearchFieldForBall.dest == quad4Center:
+            walkSearchFieldForBall.dest = quad1Center

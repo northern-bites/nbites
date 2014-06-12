@@ -103,7 +103,7 @@ def gamePlaying(player):
         return player.goNow('approachBall')
     elif player.brain.gameController.timeSincePlaying < 10:
         return player.goNow('waitForKickoff')
-    return player.goNow('playerOffBall')
+    return player.goNow('playOffBall')
 
 
 @superState('gameControllerResponder')
@@ -144,7 +144,7 @@ def waitForKickoff(player):
     if (player.brain.gameController.timeSincePlaying > 10 or
         fabs(player.brain.ball.rel_x - waitForKickoff.ballRelX) > 10 or
         fabs(player.brain.ball.rel_y - waitForKickoff.ballRelY) > 10):
-        return player.goNow('watchForBall')
+        return player.goNow('playOffBall')
 
     return player.stay()
 

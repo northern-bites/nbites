@@ -11,7 +11,7 @@ from . import PenaltyStates
 from . import FindBallStates
 from . import KickingStates
 from . import DribbleStates
-from . import BoxPositionStates
+from . import PlayOffBallStates
 
 import noggin_constants as NogginConstants
 
@@ -27,7 +27,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.addStates(GameControllerStates)
         self.addStates(RoleSwitchingStates)
         self.addStates(BrunswickStates)
-        self.addStates(BoxPositionStates)
+        self.addStates(PlayOffBallStates)
         self.addStates(PositionStates)
         self.addStates(PenaltyStates)
         self.addStates(ChaseBallStates)

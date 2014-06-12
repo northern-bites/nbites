@@ -17,8 +17,6 @@ def tracking(tracker):
     # makes sure ball is default target when entering tracking
     tracker.target = tracker.brain.ball
 
-    return tracker.goLater('altTrackSharedBallAndPan')
-
     # If the target is not in vision, trackObjectFixedPitch will track via loc.
     tracker.helper.trackObject()
 

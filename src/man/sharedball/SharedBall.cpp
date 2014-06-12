@@ -35,7 +35,7 @@ void SharedBallModule::run_() {
     sharedBallMessage.get()->set_y(y);
     sharedBallMessage.get()->set_ball_on(ball_on);
     sharedBallMessage.get()->set_frames_on(frames_on);
-    sharedBallMessage.get()->set_frames_off(frames_off)
+    sharedBallMessage.get()->set_frames_off(frames_off);
 
     sharedBallOutput.setMessage(sharedBallMessage);
 }

@@ -1,4 +1,4 @@
-import BoxPositionConstants as boxConstants
+import RoleConstants as role
 import ClaimTransitions as claimTransitions
 import SharedTransitions as shared
 
@@ -27,7 +27,7 @@ def ballInBufferedBox(player):
     between approachBall and positionAtHome if the ball is close to the edge of the box.
     """
     ball = player.brain.ball
-    buf = boxConstants.boxBuffer
+    buf = role.boxBuffer
 
     if ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
             ball.x < player.box[0][0] + player.box[1] + buf and \

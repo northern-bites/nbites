@@ -128,7 +128,7 @@ def setRoleConstants(player, role):
         player.kickoffPosition = evenDefenderHome
         player.box = evenDefenderBox
         player.isKickingOff = False
-    elif isRightDefender(role)
+    elif isRightDefender(role):
         player.homePosition = oddDefenderHome
         player.kickoffPosition = oddDefenderHome
         player.box = oddDefenderBox
