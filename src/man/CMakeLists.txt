@@ -17,8 +17,8 @@ include( cmake/Flags.cmake )
 
 # Configure the robot options
 configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/RobotConfig.in"
-  "${PROJECT_BINARY_DIR}/RobotConfig.h"
+  "${CMAKE_CURRENT_LIST_DIR}/cmake/parameters.in"
+  "${PROJECT_BINARY_DIR}/install/lib/parameters.json"
 )
 
 # Configure the debug options

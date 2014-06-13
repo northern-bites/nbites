@@ -2,9 +2,9 @@
 
 namespace tool{
 
-#define ROBOT_CONFIG "../man/RobotConfig.h"
+#define PARAMETERS "../man/install/lib/parameters.json"
 #define PY_SWITCH "../man/behaviors/players/test.py"
-#define UPLOAD "../man/up.sh"
+#define UPLOAD "../man/upload.sh"
 
 Installer::Installer(const char* title):
     teamNumber(new QLineEdit("Team Number", this)),
@@ -73,29 +73,14 @@ void Installer::installPlayer(int index)
 
 void Installer::writePlayerNums(int player, int team)
 {
-    std::string file = ROBOT_CONFIG;
-    std::ifstream fileIn(file.c_str(), std::ifstream::in);
-    std::ofstream fileOut((file+".tmp").c_str(), std::ofstream::out);
-    std::string temp;
-
-    while(getline(fileIn, temp))
-    {
-        if(-1 != temp.find("PLAYER"))
-        {
-            fileOut << "#define MY_PLAYER_NUMBER " << player << std::endl;
-        }
-        else if(-1 != temp.find("TEAM"))
-        {
-            fileOut << "#define MY_TEAM_NUMBER " << team << std::endl;
-        }
-        else
-        {
-            fileOut << temp << std::endl;
-        }
-    }
+    std::string file = PARAMETERS;
     remove(file.c_str());
-    rename((file + ".tmp").c_str(), file.c_str());
-    remove((file + ".tmp").c_str());
+    std::ofstream fileOut((file).c_str(), std::ofstream::out);
+
+    fileOut << "{" << std::endl;
+    fileOut << "        \"playerNumber\": " <<  player << "," << std::endl;
+    fileOut << "        \"teamNumber\": " <<  team << std::endl;
+    fileOut << "}" << std::endl;
 }
 
 void Installer::writePyPlayer(std::string pyPlayer)

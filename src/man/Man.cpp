@@ -5,7 +5,6 @@
 #include "Common.h"
 #include "Profiler.h"
 #include "Camera.h"
-#include "RobotConfig.h"
 
 #ifndef OFFLINE
 SET_POOL_SIZE(messages::WorldModel,  24);
