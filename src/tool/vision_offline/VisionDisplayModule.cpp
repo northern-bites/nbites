@@ -108,8 +108,11 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     //moreImageTabs->addTab(&bottomDisplay, "Bottom Image");
     moreImageTabs->addTab(&topThrDisplay, "Top Thresh");
     moreImageTabs->addTab(&botThrDisplay, "Bottom Thresh");
+	topThrDisplay.setAlignment(Qt::AlignTop);
+	botThrDisplay.setAlignment(Qt::AlignTop);
 
-    mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	mainWidget->setFixedHeight(600);
     mainWidget->setLayout(mainLayout);
     this->setCentralWidget(mainWidget);
 
@@ -133,6 +136,11 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     toolBar->addWidget(robotNames);
     connect(loadCalButton, SIGNAL(clicked(bool)),
             this, SLOT(loadRobotParameters()));
+
+	QPalette Pal(palette());
+	Pal.setColor(QPalette::Background, Qt::black);
+	this->setAutoFillBackground(true);
+	this->setPalette(Pal);
     this->addToolBar(toolBar);
 
 }

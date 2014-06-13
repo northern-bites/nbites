@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QBoxLayout>
 #include <QToolBar>
+#include <QPalette>
 #include <math.h>
 
 #include "RoboGrams.h"

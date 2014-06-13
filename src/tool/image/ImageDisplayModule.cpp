@@ -194,7 +194,7 @@ void ImageDisplayListener::mouseReleaseEvent ( QMouseEvent * event )
 
     int mouseX = event->x();
     int mouseY = event->y();
-    
+
     emit mouseClicked((int)((float)mouseX),
                       (int)((float)mouseY), brushSize, left);
 }
