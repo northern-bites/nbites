@@ -31,6 +31,7 @@ configure_file(
 configure_file(
   "${CMAKE_CURRENT_LIST_DIR}/cmake/upload.sh.in"
   "${PROJECT_BINARY_DIR}/upload.sh"
+  @ONLY # So cmake doesn't complaing about using ${VAR} in bash
 )
 
 include_directories( ${PROJECT_BINARY_DIR} )
