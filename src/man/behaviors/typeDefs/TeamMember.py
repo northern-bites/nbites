@@ -33,6 +33,8 @@ class TeamMember(RobotLocation):
         self.fallen = False
         self.active = True
         self.claimedBall = False
+        self.oldTimestamp = 0
+        self.newPacket = False
 
         self.brain = tbrain # brain instance
 
@@ -66,6 +68,11 @@ class TeamMember(RobotLocation):
         if self.claimedBall:
             self.claimTime = time.time()
         self.bearingToGoal = self.getBearingToGoal()
+        if info.timestamp != self.oldTimestamp:
+            self.newPacket = True
+            self.oldTimestamp = info.timestamp
+        else:
+            self.newPacket = False
 
     def updateMe(self):
         """
