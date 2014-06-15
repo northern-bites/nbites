@@ -271,6 +271,12 @@ public:
   GroundContactDetector *groundContactDetector;
   MotionSelector *motionSelector;
 
+  // Northern Bites hack for hand speed info
+  void updateHandSpeeds();
+  Vector2BH<> lastLeftHandPos, lastRightHandPos;
+  float leftHandSpeed;
+  float rightHandSpeed;
+
   /**
   * Intercept parameter streaming to compute derived paramaters.
   * Note that this does not work during the construction of the module.

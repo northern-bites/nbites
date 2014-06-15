@@ -313,6 +313,9 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 #ifdef TARGET_SIM
 	declareDrawings(walkingEngineOutput);
 #endif
+    
+    // Northern Bites hack for hand speed info
+    updateHandSpeeds();
 }
 
 void WalkingEngine::updateMotionRequest()
@@ -497,15 +500,6 @@ void WalkingEngine::updatePredictedPendulumPlayer()
 void WalkingEngine::generateTargetPosture()
 {
 	predictedPendulumPlayer.getPosture(targetPosture);
-    // TODO: is this necessary?
-  	targetPosture.leftArmJointAngles[0] = theJointDataBH.angles[JointDataBH::LShoulderPitch];
-  	targetPosture.leftArmJointAngles[1] = theJointDataBH.angles[JointDataBH::LShoulderRoll];
-  	targetPosture.leftArmJointAngles[2] = theJointDataBH.angles[JointDataBH::LElbowYaw];
-  	targetPosture.leftArmJointAngles[3] = theJointDataBH.angles[JointDataBH::LElbowRoll];
-  	targetPosture.rightArmJointAngles[0] = theJointDataBH.angles[JointDataBH::RShoulderPitch];
-  	targetPosture.rightArmJointAngles[1] = theJointDataBH.angles[JointDataBH::RShoulderRoll];
-  	targetPosture.rightArmJointAngles[2] = theJointDataBH.angles[JointDataBH::RElbowYaw];
-  	targetPosture.rightArmJointAngles[3] = theJointDataBH.angles[JointDataBH::RElbowRoll];
 }
 
 void WalkingEngine::generateJointRequest()
@@ -1546,6 +1540,7 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	// arms
 	float halfArmRotation = p.walkArmRotationAtFullSpeedX * 0.5f;
 
+    // northern bites don't use BH's ArmMotionEngine
 	// if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::left].move)
 	// { // ARME arm movement
 	// 	for(int i = 0; i < 4; ++i)
@@ -1553,13 +1548,13 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	// }
 	// else
 	// { // normal WalkingEngine arm movement
-    // Northern Bites don't use BH's ArmMotionEngine
-    stance.leftArmJointAngles[0] = pi_2 + p.standArmJointAngles.y + leftArmAngle;
+    stance.leftArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + leftArmAngle;
     stance.leftArmJointAngles[1] = p.standArmJointAngles.x;
     stance.leftArmJointAngles[2] = -pi_2;
     stance.leftArmJointAngles[3] = -p.standArmJointAngles.y - leftArmAngle - halfArmRotation;
 	// }
 
+    // northern bites don't use BH's ArmMotionEngine
 	// if(engine->theArmMotionEngineOutputBH.arms[ArmMotionRequestBH::right].move)
 	// { // ARME arm movement
 	// 	for(int i = 0; i < 4; ++i)
@@ -1567,7 +1562,6 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	// }
 	// else
 	// { // normal WalkingEngine arm movement
-    // Northern Bites don't use BH's ArmMotionEngine
     stance.rightArmJointAngles[0] = -pi_2 + p.standArmJointAngles.y + rightArmAngle;
     stance.rightArmJointAngles[1] = p.standArmJointAngles.x;
     stance.rightArmJointAngles[2] = -pi_2;
@@ -1577,6 +1571,21 @@ void WalkingEngine::PendulumPlayer::getPosture(Posture& stance)
 	// kick mutations
 	if(kickPlayer.isActive())
 		kickPlayer.applyHeadAndArms(stance.headJointAngles, stance.leftArmJointAngles, stance.rightArmJointAngles);
+}
+
+void WalkingEngine::updateHandSpeeds()
+{
+    const Vector3BH<>& leftHandPos3D = theRobotModelBH.limbs[MassCalibrationBH::foreArmLeft].translation;
+    Vector2BH<> leftHandPos(leftHandPos3D.x, leftHandPos3D.y);
+    Vector2BH<> leftHandSpeedVec = (odometryOffset + Pose2DBH(leftHandPos) - Pose2DBH(lastLeftHandPos)).translation / theFrameInfoBH.cycleTime;
+    leftHandSpeed = leftHandSpeedVec.abs();
+    lastLeftHandPos = leftHandPos;
+
+    const Vector3BH<>& rightHandPos3D = theRobotModelBH.limbs[MassCalibrationBH::foreArmRight].translation;
+    Vector2BH<> rightHandPos(rightHandPos3D.x, rightHandPos3D.y);
+    Vector2BH<> rightHandSpeedVec = (odometryOffset + Pose2DBH(rightHandPos) - Pose2DBH(lastRightHandPos)).translation / theFrameInfoBH.cycleTime;
+    rightHandSpeed = rightHandSpeedVec.abs();
+    lastRightHandPos = rightHandPos;
 }
 
 float WalkingEngine::asinh(float xf)

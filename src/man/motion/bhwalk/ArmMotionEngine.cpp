@@ -4,6 +4,25 @@ MAKE_MODULE(ArmMotionEngine, Motion Control)
 
 ArmMotionEngine::ArmMotionEngine() : ArmMotionEngineBase()
 {
+  // initialize allMotions with default arm motion
+  allMotions.push_back(ArmMotion());
+  allMotions[0].id = ArmMotionRequestBH::useDefault;
+  allMotions[0].states.push_back(ArmMotion::ArmAngles());
+
+  allMotions[0].states[0].angles = std::vector<float>(4);
+  allMotions[0].states[0].hardness = std::vector<int>(4);
+  allMotions[0].states[0].steps = 40;
+
+  allMotions[0].states[0].angles[0] = -1.5707f;
+  allMotions[0].states[0].angles[1] = 0.2007f;
+  allMotions[0].states[0].angles[2] = -1.5707f;
+  allMotions[0].states[0].angles[3] = -0.2007f;
+
+  allMotions[0].states[0].hardness[0] = 80;
+  allMotions[0].states[0].hardness[1] = 80;
+  allMotions[0].states[0].hardness[2] = 80;
+  allMotions[0].states[0].hardness[3] = 80;
+
   arms[ArmMotionRequestBH::left] = Arm(ArmMotionRequestBH::left, JointDataBH::LShoulderPitch);
   arms[ArmMotionRequestBH::right] = Arm(ArmMotionRequestBH::right, JointDataBH::RShoulderPitch);
 
@@ -162,7 +181,7 @@ void ArmMotionEngine::createOutput(Arm& arm, ArmMotion::ArmAngles target, int& t
       const float speed = (float) time / (float) target.steps;
       result.angles[i] = (from.angles[i] + offset * speed);
       result.hardness[i] = target.hardness[i] == HardnessData::useDefault
-        ? theHardnessSettings.hardness[arm.firstJoint + i]
+        ? theHardnessSettingsBH.hardness[arm.firstJoint + i]
         : target.hardness[i];
   }
   ++time;

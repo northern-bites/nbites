@@ -106,8 +106,8 @@ bool hasPassed(const Pose2DBH& p1, const Pose2DBH& p2) {
  * and then interprets the walk engine output
  *
  * Main differences:
- * * The BH joint data is in a different order and is transformed by sign and
- * * offset to make calculation easier
+ * The BH joint data is in a different order and is transformed by sign and
+ * offset to make calculation easier
  */
 void BHWalkProvider::calculateNextJointsAndStiffnesses(
     std::vector<float>&            sensorAngles,
@@ -136,6 +136,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         motionRequest.motion = MotionRequestBH::specialAction;
 
         // TODO why are we sitting and what does standby mean?
+        // Special action requests keep bhwalk from recalibrating
         motionRequest.specialActionRequest.specialAction = SpecialActionRequest::sitDown;
         walkingEngine->theMotionRequestBH = motionRequest;
 
@@ -236,6 +237,10 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                     motionRequest.walkRequest.kickType = WalkRequest::right;
                 }
             }
+            // TODO test motion kicking
+            // else {
+            //     motionRequest.walkRequest.kickType = WalkRequest::none;
+            // }
 
             walkingEngine->theMotionRequestBH = motionRequest;
         }
@@ -285,10 +290,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     bh_sensors.data[SensorDataBH::fsrLFR] = sensorFSRs.lfr();
     bh_sensors.data[SensorDataBH::fsrLBL] = sensorFSRs.lrl();
     bh_sensors.data[SensorDataBH::fsrLBR] = sensorFSRs.lrr();
-
-    // TODO doesn't NaoProvider do this for us? 
-    // Bhuman needs time information for diffs
-    walkingEngine->theFrameInfoBH.time = walkingEngine->theFilteredJointDataBH.timeStamp = walkingEngine->theFilteredSensorDataBH.timeStamp = monotonic_micro_time();
 
     WalkingEngineOutputBH output;
     walkingEngine->update(output);
@@ -408,15 +409,11 @@ bool BHWalkProvider::calibrated() const {
 }
 
 float BHWalkProvider::leftHandSpeed() const {
-    // TODO reimplement?
-    // return walkingEngine->leftHandSpeed;
-    return 0;
+    return walkingEngine->leftHandSpeed;
 }
 
 float BHWalkProvider::rightHandSpeed() const {
-    // TODO reimplement?
-    // return walkingEngine->rightHandSpeed;
-    return 0;
+    return walkingEngine->rightHandSpeed;
 }
 
 }

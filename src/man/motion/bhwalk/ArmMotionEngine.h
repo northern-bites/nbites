@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Tools/ModuleBH/Module.h"
+#include "Tools/Module/Module.h"
 #include "Representations/MotionControl/ArmMotionEngineOutput.h"
 #include "Representations/MotionControl/ArmMotionRequest.h"
 #include "Representations/MotionControl/MotionSelection.h"
@@ -29,9 +29,9 @@ MODULE(ArmMotionEngine)
   REQUIRES(FallDownStateBH)
   REQUIRES(GroundContactStateBH)
   PROVIDES_WITH_MODIFY(ArmMotionEngineOutputBH)
-  LOADS_PARAMETER(int, actionDelay);                    /**< delay in ms after which arm contact triggered motions can be started again. */
-  LOADS_PARAMETER(int, targetTime);                     /**< time of how long arm stays in target position for contact triggered motions */
-  LOADS_PARAMETER(std::vector<ArmMotion>, allMotions);  /**< contains the existing arm motions */
+  DEFINES_PARAMETER(int, actionDelay, 3000);                    /**< delay in ms after which arm contact triggered motions can be started again. */
+  DEFINES_PARAMETER(int, targetTime , 1000);                     /**< time of how long arm stays in target position for contact triggered motions */
+  DEFINES_PARAMETER(std::vector<ArmMotion>, allMotions, std::vector<ArmMotion>());  /**< contains the existing arm motions */
 END_MODULE
 
 /**
