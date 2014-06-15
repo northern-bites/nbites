@@ -188,9 +188,9 @@ void GameConnect::respond(int player, unsigned int msg)
     memcpy(&response.header, GAMECONTROLLER_RETURN_STRUCT_HEADER,
            sizeof(response.header));
     response.version = GAMECONTROLLER_RETURN_STRUCT_VERSION;
-    response.team = (uint16)_myTeamNumber;
-    response.player = (uint16)player;
-    response.message = msg;
+    response.team = (uint8_t)_myTeamNumber;
+    response.player = (uint8_t)player;
+    response.message = (uint8_t)msg;
 
     char packet[sizeof(RoboCupGameControlReturnData)];
     memcpy(&packet[0], &response, sizeof(RoboCupGameControlReturnData));
