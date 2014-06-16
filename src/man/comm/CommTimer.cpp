@@ -26,16 +26,17 @@ void CommTimer::teamPacketSent()
     nextSendTime = timestamp();
 
     // Now randomize the delay such that is between
-    // 16,667 us and 50,000 us away from now.
+    // 190000 us and 220000 us away from now.
     // This means that (if we run at 30 frames/sec) we will send data
-    // once per frame on average, while providing significant randomization.
-    // We could send duplicates or skip frames with this method, but we will
-    // not send more than one duplicate or skip more than one frame in a row.
+    // around once every six frames on average, while providing significant
+    // randomization. We will not send duplicates, and may skip more or less
+    // than 5 frames. This is necessary to ensure we comply with the 2014 rule
+    // that robots send no more than 5 messages per robot per second.
 
     int random;
-    random = rand() / RAND_MAX * 33333;
+    random = rand() / RAND_MAX * 30000;
 
-    nextSendTime += random + 16667;
+    nextSendTime += random + 190000;
 }
 
 }
