@@ -17,6 +17,7 @@ class TeamMember(RobotLocation):
 
         RobotLocation.__init__(self, 0.0, 0.0, 0.0)
         self.locUncert = 0
+        # TODO use location objects
         self.walkingToX = 0
         self.walkingToY = 0
         self.ballOn = False
@@ -100,7 +101,7 @@ class TeamMember(RobotLocation):
         self.ballVelX = ball.vel_x
         self.ballVelY = ball.vel_y
 
-        # TODO when EJ comes back
+        # TODO use covariance matrices
         self.ballUncert = 0
 
         self.role = self.brain.player.role

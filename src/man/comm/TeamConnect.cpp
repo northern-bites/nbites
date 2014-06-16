@@ -140,22 +140,25 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     splMessage.team = (uint8_t)arbData->team_number();
     splMessage.fallen = (uint8_t)model.fallen();
     
-    splMessage.pose[0] = model.my_x()*10.f;
-    splMessage.pose[1] = model.my_y()*10.f;
+    splMessage.pose[0] = model.my_x()*CM_TO_MM;
+    splMessage.pose[1] = model.my_y()*CM_TO_MM;
     splMessage.pose[2] = model.my_h()*TO_DEG;
     
-    splMessage.walkingTo[0] = model.walking_to_x()*10.f;
-    splMessage.walkingTo[0] = model.walking_to_y()*10.f;
+    splMessage.walkingTo[0] = model.walking_to_x()*CM_TO_MM;
+    splMessage.walkingTo[0] = model.walking_to_y()*CM_TO_MM;
     
-    splMessage.shootingTo[0] = model.kicking_to_x()*10.f;
-    splMessage.shootingTo[0] = model.kicking_to_y()*10.f;
+    splMessage.shootingTo[0] = model.kicking_to_x()*CM_TO_MM;
+    splMessage.shootingTo[0] = model.kicking_to_y()*CM_TO_MM;
     
     splMessage.ballAge = model.ball_age();
-    splMessage.ball[0] = model.my_x()*10.f + model.ball_dist()*10.f * (float)asin(model.ball_bearing());
-    splMessage.ball[1] = model.my_x()*10.f + model.ball_dist()*10.f * (float)acos(model.ball_bearing());
+
+    // @TODO: these seem to be nan at this point; also this logic is somewhere else in the code (maybe the math module?), use that
+    // also using bad is bad (mostly for performance reasons) mmmkay
+    // splMessage.ball[0] = model.my_x()*CM_TO_MM + model.ball_dist()*CM_TO_MM * (float)asin(model.ball_bearing());
+    // splMessage.ball[1] = model.my_x()*CM_TO_MM + model.ball_dist()*CM_TO_MM * (float)acos(model.ball_bearing());
     
-    splMessage.ballVel[0] = model.ball_vel_x()*10.f;
-    splMessage.ballVel[1] = model.ball_vel_y()*10.f;
+    splMessage.ballVel[0] = model.ball_vel_x()*CM_TO_MM;
+    splMessage.ballVel[1] = model.ball_vel_y()*CM_TO_MM;
 
 PROF_EXIT(P_COMM_BUILD_PACKET);
 
@@ -222,6 +225,7 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
 
 #ifdef USE_SPL_COMM
         // create a WorldModel with data from splMessage
+        // @TODO: check that all the fields are correct
         portals::Message<messages::WorldModel> model(0);
 
         model.get()->set_timestamp(teamMessage.get()->payload().timestamp());
@@ -229,25 +233,25 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         playerNum = splMessage.playerNum;
         model.get()->set_fallen(splMessage.fallen);
 
-        model.get()->set_my_x(splMessage.pose[0]/10.f);
-        model.get()->set_my_y(splMessage.pose[1]/10.f);
+        model.get()->set_my_x(splMessage.pose[0]*MM_TO_CM);
+        model.get()->set_my_y(splMessage.pose[1]*MM_TO_CM);
         model.get()->set_my_h(splMessage.pose[2]*TO_RAD);
 
-        model.get()->set_walking_to_x(splMessage.walkingTo[0]/10.f);
-        model.get()->set_walking_to_y(splMessage.walkingTo[1]/10.f);
+        model.get()->set_walking_to_x(splMessage.walkingTo[0]*MM_TO_CM);
+        model.get()->set_walking_to_y(splMessage.walkingTo[1]*MM_TO_CM);
 
-        model.get()->set_kicking_to_x(splMessage.shootingTo[0]/10.f);
-        model.get()->set_kicking_to_y(splMessage.shootingTo[1]/10.f);
+        model.get()->set_kicking_to_x(splMessage.shootingTo[0]*MM_TO_CM);
+        model.get()->set_kicking_to_y(splMessage.shootingTo[1]*MM_TO_CM);
 
-        model.get()->set_ball_age(splMessage.ballAge); // @TODO: is this right? in milliseconds?
+        model.get()->set_ball_age(splMessage.ballAge*1000); // seconds to milliseconds
 
         // @TODO: these seem to be nan at this point; also this logic is somewhere else in the code (maybe the math module?), use that
         // also using bad is bad (mostly for performance reasons) mmmkay
-        model.get()->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
-        model.get()->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
+        // model.get()->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
+        // model.get()->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
 
-        model.get()->set_ball_vel_x(splMessage.ballVel[0]/10.f);
-        model.get()->set_ball_vel_y(splMessage.ballVel[1]/10.f);
+        model.get()->set_ball_vel_x(splMessage.ballVel[0]*MM_TO_CM);
+        model.get()->set_ball_vel_y(splMessage.ballVel[1]*MM_TO_CM);
 #else
         playerNum = teamMessage.get()->player_number();
         portals::Message<messages::WorldModel> model(&teamMessage.get()->payload());
