@@ -10,6 +10,8 @@
 #include <QSignalMapper>
 #include <iostream>
 #include <fstream>
+#include <sys/types.h>
+#include <dirent.h>
 #include <string>
 #include <vector>
 
@@ -34,7 +36,7 @@ protected:
     void writePlayerNums(int player, int team);
     void writePyPlayer(std::string pyPlayer);
     void writeAddress(std::string address);
-    int validateInput();
+    int validateInput(int index);
 protected slots:
     void installPlayer(int index);
 //private:

@@ -55,11 +55,10 @@ void Installer::installPlayer(int index)
     QString host = playerNames.at(index)->text();
     QString player = pyPlayers.at(index)->text();
 
-    // TODO: implement
-    if(!validateInput())
+    if(!validateInput(index))
     {
-        std::cout<<"you done fucked up!" << std::endl;
-        //return;
+        std::cout<<"Did not install." << std::endl;
+        return;
     }
 
     writePlayerNums(pnum.toInt(),team.toInt());
@@ -68,7 +67,7 @@ void Installer::installPlayer(int index)
     // TODO delete these
 
     int result = system(UPLOAD);
-    std::cout << result << std::endl;
+    std::cout << "Upload exited, returning: " << result << std::endl;
 }
 
 void Installer::writePlayerNums(int player, int team)
@@ -117,16 +116,48 @@ void Installer::writeAddress(std::string address)
             fileOut << *it << std::endl;
         }
     }
-    //remove(file.c_str());
-    //rename((file+".tmp").c_str(), file.c_str());
 }
 
-int Installer::validateInput()
+int Installer::validateInput(int index)
 {
-    if(!teamNumber->text().toInt()) return 0;
-    //if(!playerNum->text().toInt()) return 0;
-    //TODO finish this;
-    else return 1;
+    if(teamNumber->text().toInt() <= 0)
+    {
+        std::cout << "Bad teamnumber" << std::endl;
+        return 0;
+    }
+
+    int playerNumber = playerNums.at(index)->text().toInt();
+    if(playerNumber < 0 || playerNumber > 6)
+    {
+        std::cout << "Bad player number" << std::endl;
+        return 0;
+    }
+
+    std::string requestedPlayer = pyPlayers.at(index)->text().toStdString();
+    int size = requestedPlayer.size();
+
+    DIR *dp = NULL;
+    struct dirent *dirp = NULL;
+    dp = opendir("../../src/man/behaviors/players/");
+
+    bool result = false;
+    while((dirp = readdir(dp)) != NULL)
+    {
+        // This fails if the given pyPlayer is a valid player with some
+        // characters trimmed.
+        // TODO: fix
+        if(!requestedPlayer.compare(std::string(dirp->d_name, size)))
+        {
+            result = true;
+        }
+    }
+    closedir(dp);
+    if(!result)
+    {
+        std::cout << "Bad python player" << std::endl;
+        return 0;
+    }
+    return 1;
 }
 
 }
