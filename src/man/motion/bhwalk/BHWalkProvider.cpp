@@ -161,8 +161,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
         // If we're not calibrated, wait until we are calibrated to walk
         if (!calibrated())
         {
-            std::cout << "We are stuck! Recalibrating." << std::endl;
-
             MotionRequestBH motionRequest;
             motionRequest.motion = MotionRequestBH::stand;
 

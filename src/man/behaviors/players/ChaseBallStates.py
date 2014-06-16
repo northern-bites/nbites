@@ -14,6 +14,7 @@ import noggin_constants as nogginConstants
 import time
 
 DRIBBLE_ON_KICKOFF = False
+USE_MOTION_KICKS = True
 
 @superState('gameControllerResponder')
 @stay
@@ -24,6 +25,7 @@ def approachBall(player):
         player.buffBoxFiltered = CountTransition(boxTransitions.ballNotInBufferedBox,
                                                  0.8, 10)
         player.inKickingState = False
+        player.motionKick = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
             player.brain.nav.chaseBall(Navigator.MEDIUM_SPEED, fast = True)
@@ -74,7 +76,10 @@ def prepareForKick(player):
         return player.goLater('chase')
 
     player.inKickingState = True
-    player.kick = prepareForKick.decider.motionKicks()
+    if USE_MOTION_KICKS:
+        player.kick = prepareForKick.decider.motionKicks()
+    else:
+        player.kick = prepareForKick.decider.normalKicks()
 
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
@@ -192,8 +197,7 @@ def positionForKick(player):
     if player.firstFrame():
         player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.destinationWalkTo(positionForKick.kickPose,
-                                           Navigator.SLOW_SPEED,
-                                           True)
+                                           Navigator.GRADUAL_SPEED)
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
         player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 

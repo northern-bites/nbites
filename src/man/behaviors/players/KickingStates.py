@@ -17,20 +17,17 @@ def executeMotionKick(player):
     """
     Do a motion kick.
     """
-    if player.firstFrame():
-        player.motionKick = False
-
     ball = player.brain.ball
     executeMotionKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
                                                   ball.rel_y - player.kick.setupY,
                                                   0)
 
-    # TODO try doing this after a second or so
-    # TODO refactor nav a little, the motion kicking API is horrible...
-    player.brain.nav.doMotionKick(player,
-                                  executeMotionKick.kickPose.relX,
-                                  executeMotionKick.kickPose.relY,
-                                  player.kick)
+    if player.firstFrame():
+        player.brain.nav.destinationWalkTo(executeMotionKick.kickPose,
+                                           nav.CAREFUL_SPEED,
+                                           player.kick)
+    elif player.brain.ball.vis.on: # don't update if we don't see the ball
+        player.brain.nav.updateDestinationWalkDest(executeMotionKick.kickPose)
 
     # TODO not ideal at all!
     if player.counter > 40:
