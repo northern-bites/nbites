@@ -7,9 +7,12 @@ from . import ChaseBallConstants as constants
 from ..util import *
 from ..kickDecider import kicks
 from ..navigator import Navigator as nav
-from objects import Location
+from objects import Location, RelRobotLocation
+
+# TODO refactor, super state?
 
 @superState('positionAndKickBall')
+@ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
 def executeMotionKick(player):
     """
     Do a motion kick.
@@ -17,13 +20,22 @@ def executeMotionKick(player):
     if player.firstFrame():
         player.motionKick = False
 
-    if transitions.shouldRedecideKick(player):
-        return player.goLater('approachBall')
+    ball = player.brain.ball
+    executeMotionKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
+                                                  ball.rel_y - player.kick.setupY,
+                                                  0)
 
-    player.brain.nav.doMotionKick(player, # kind of a hack, nav is going to change soon anyway
-                                  player.brain.ball.rel_x, #LOL
-                                  player.brain.ball.rel_y,
+    # TODO try doing this after a second or so
+    # TODO refactor nav a little, the motion kicking API is horrible...
+    player.brain.nav.doMotionKick(player,
+                                  executeMotionKick.kickPose.relX,
+                                  executeMotionKick.kickPose.relY,
                                   player.kick)
+
+    # TODO not ideal at all!
+    if player.counter > 40:
+        player.inKickingState = False
+        return player.goNow('afterKick')
 
     return player.stay()
 
@@ -39,6 +51,7 @@ def executeKick(player):
         player.shouldKickOff = False
         return player.stay()
 
+    # TODO consider lowering this
     if player.counter == 30:
         player.executeMove(executeKick.sweetMove)
         player.shouldKickOff = False
@@ -58,7 +71,6 @@ executeKick.sweetMove = None
 def afterKick(player):
     """
     State to follow up after a kick.
-    Currently exits after one frame.
     """
     if player.firstFrame():
         player.stand()        # stand up right, ready to walk

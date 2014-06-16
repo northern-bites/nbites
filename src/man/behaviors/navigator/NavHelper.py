@@ -64,7 +64,6 @@ def isDestinationRelative(dest):
 
 def adaptSpeed(distance, cutoffDistance, maxSpeed):
     return min(maxSpeed, (distance/cutoffDistance)*maxSpeed)
-#    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
 def setDestination(nav, dest, gain = 1.0, pedantic = False):
     """
@@ -73,14 +72,21 @@ def setDestination(nav, dest, gain = 1.0, pedantic = False):
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK #Destination Walk
+
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
-    command.dest.pedantic = pedantic
+
+    command.speed.x_percent = gain
+    command.speed.y_percent = gain
+    command.speed.h_percent = gain
+
+    command.dest.pedantic = pedantic # TODO not used anymore
+
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
-def setOdometryDestination(nav, dest, gain = 1.0):
+def setOdometryDestination(nav, dest, gain = 1.0): # TODO use gain or get rid of it
     """
     Method to set the next walk command
     See MotionModule.h for more info on the odometry walk command
@@ -118,9 +124,18 @@ def createAndSendWalkVector(nav, x, y, theta):
 
 def createAndSendMotionKickVector(nav, ball_rel_x, ball_rel_y, kick):
     command = nav.brain.interface.bodyMotionCommand
+    command.type = command.CommandType.DESTINATION_WALK #Destination Walk
+
+    command.dest.rel_x = ball_rel_x
+    command.dest.rel_y = ball_rel_y
+    command.dest.rel_h = 0
+
+    command.speed.x_percent = 0.1 # TODO hard coded = bad
+    command.speed.y_percent = 0.1
+    command.speed.h_percent = 0.1
 
     command.dest.kick.perform_motion_kick = True
-    command.dest.kick.ball_rel_x = ball_rel_x
+    command.dest.kick.ball_rel_x = ball_rel_x # TODO not used anymore
     command.dest.kick.ball_rel_y = ball_rel_y
 
     if kick == kicks.M_LEFT_SIDE:
@@ -131,6 +146,8 @@ def createAndSendMotionKickVector(nav, ball_rel_x, ball_rel_y, kick):
         command.dest.kick.kick_type = 2
     elif kick == kicks.M_RIGHT_STRAIGHT:
         command.dest.kick.kick_type = 3
+
+    command.timestamp = int(nav.brain.time * 1000)
 
 def executeMove(nav, sweetMove):
     """

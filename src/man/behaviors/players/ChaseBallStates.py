@@ -26,11 +26,11 @@ def approachBall(player):
         player.inKickingState = False
         player.brain.tracker.trackBall()
         if player.shouldKickOff:
-            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
+            player.brain.nav.chaseBall(Navigator.MEDIUM_SPEED, fast = True)
         elif player.penaltyKicking:
             return player.goNow('prepareForPenaltyKick')
         else:
-            player.brain.nav.chaseBall(fast = True)
+            player.brain.nav.chaseBall(Navigator.QUICK_SPEED, fast = True)
 
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
@@ -74,7 +74,7 @@ def prepareForKick(player):
         return player.goLater('chase')
 
     player.inKickingState = True
-    player.kick = prepareForKick.decider.closeToGoal()
+    player.kick = prepareForKick.decider.motionKicks()
 
     if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
         if dr_trans.shouldDribble(player):
