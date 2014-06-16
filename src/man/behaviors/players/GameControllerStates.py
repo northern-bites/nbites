@@ -20,6 +20,8 @@ def gameControllerResponder(player):
     if GC.stateChanged:
         if GC.penalized:
             player.gameState = 'gamePenalized'
+            if player.roleSwitching:
+                player.role = -1 * player.role
             return player.goLater('gamePenalized')
         else:
             if GC.penaltyShots:

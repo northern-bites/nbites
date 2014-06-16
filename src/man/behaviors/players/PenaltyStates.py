@@ -118,7 +118,6 @@ def afterPenalty(player):
         player.brain.resetLocalizationFromPenalty(player.goal_right < 0)
         return player.goNow('determineRole')
 
-
     return player.stay()
 
 # @superState('gameControllerResponder')
@@ -151,7 +150,7 @@ def determineRole(player):
 
     openSpaces = [True, True, True, True]
     for mate in player.brain.teamMembers:
-        if mate.role != 1 and mate.active:
+        if (mate.role > 1) and (mate.frameSinceActive < 30):
             openSpaces[mate.role - 2] = False
 
     if openSpaces[3]:
