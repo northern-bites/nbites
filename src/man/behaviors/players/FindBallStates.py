@@ -2,6 +2,7 @@ import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from ..util import *
 from objects import Location
+from ..navigator import Navigator
 
 @superState('gameControllerResponder')
 def findBall(player):
@@ -27,6 +28,6 @@ def findBall(player):
         return player.goLater('approachBall')
 
     if transitions.spunOnce(player):
-        return player.goLater('positionAtHome')
+        return player.goLater('playOffBall')
 
     return player.stay()

@@ -37,6 +37,7 @@ class SoccerPlayer(SoccerFSA.SoccerFSA):
         self.homeDirections = []
         self.brain.fallController.enabled = True
         self.roleSwitching = False
+        self.penalized = False
 
         ### ALL TRANSITIONS ARE DEFINED HERE ############
         ### Their conditions are in GoalieTransitions ###

@@ -180,7 +180,7 @@ class Navigator(FSA.FSA):
         """
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
-        
+
         self.destination = walkToDest
 
         NavStates.destinationWalkingTo.destQueue.clear()

@@ -71,6 +71,7 @@ class Brain(object):
 
         # Information about the environment
         self.ball = None
+        self.sharedBall = None
         self.initTeamMembers()
         self.motion = None
         self.game = None
@@ -204,6 +205,7 @@ class Brain(object):
         Update estimates of robot and ball positions on the field
         """
         self.ball = self.interface.filteredBall
+        self.sharedBall = self.interface.sharedBall
         if (self.player.gameState == 'gameReady'
             or self.player.gameState == 'gameSet'):
             self.ball.x = Constants.CENTER_FIELD_X

@@ -111,12 +111,12 @@ class HeadTracker(FSA.FSA):
         When ball is in view, tracks via vision values.
         Once ball is gone for some time, switch to wide pans.
         """
+
         # Check if we're using bounceTracking
         if TrackingConstants.USE_BOUNCE_TRACKING:
             self.bounceTrackBall()
             return
 
-        self.target = self.brain.ball
         if (self.currentState is not 'fullPan' and
             self.currentState is not 'tracking'):
             self.switchTo('tracking')
@@ -147,6 +147,12 @@ class HeadTracker(FSA.FSA):
         Look to the given yaw at an appropriate (fixed) pitch.
         """
         self.performHeadMove(self.helper.lookToAngle(yaw))
+
+    def trackSharedBall(self):
+        self.switchTo('trackSharedBall')
+
+    def snapToCorner(self):
+        self.switchTo('snapToCorner')
 
     def lookStraightThenTrack(self):
         """
