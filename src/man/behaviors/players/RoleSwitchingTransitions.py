@@ -38,10 +38,10 @@ def chaserIsOut(player):
             return False # Right defender will take care of it
         else:
             player.openChaser = opening
-            return True
+            return True # We're the one who needs to deal with it!
     else:
         player.openChaser = opening
-        return True
+        return True # We're right defender, will switch
 
     return False
 

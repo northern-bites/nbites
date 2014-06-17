@@ -11,6 +11,8 @@ ROLE_CONFIGURATION = {1: "Goalie",
                       5: "SecondChaser"}
 
 def getRole(role):
+    if role < 1:
+        return None
     return ROLE_CONFIGURATION[role]
 
 def isGoalie(role):
