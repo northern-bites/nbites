@@ -15,7 +15,7 @@ namespace guardian{
 
 static const float FALL_SPEED_THRESH = 0.03f; //rads/20ms
 static const float NOFALL_SPEED_THRESH = 0.01f; //rads/20ms
-static const int FALLING_FRAMES_THRESH = 3;
+static const int FALLING_FRAMES_THRESH = 5;
 static const int FALLING_RESET_FRAMES_THRESH = 10;
 static const float FALLING_ANGLE_THRESH = M_PI_FLOAT/5.0f; //36.0 degrees
 static const float FALLEN_ANGLE_THRESH = M_PI_FLOAT/3.0f; //72 degrees
@@ -145,7 +145,6 @@ void GuardianModule::checkFalling()
         // When falling, execute the fall protection method.
         //std::cout << "GuardianModule::checkFalling() : FALLING!" << std::endl;
         falling = true;
-        //processFallingProtection(); // Should be called later in run_()
     }
     else if(notFallingFrames > FALLING_FRAMES_THRESH)
     {
@@ -169,6 +168,8 @@ bool GuardianModule::isFalling(float angle_pos, float angle_vel)
     }
     else if(angle_vel > FALL_SPEED_THRESH)
     {
+        // std::cout << "GuardianModule::isFalling() : angle_vel == " << angle_pos
+        //           << ", angle_vel == " << angle_vel << std::endl;
             return true;
     }
     return false;
