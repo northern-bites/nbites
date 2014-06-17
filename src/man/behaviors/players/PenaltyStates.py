@@ -120,6 +120,7 @@ def afterPenalty(player):
             return player.goNow('determineRole')
         return player.goLater(player.gameState)
 
+    return player.goNow('determineRole')
     return player.stay()
 
 @superState('gameControllerResponder')
@@ -133,13 +134,27 @@ def determineRole(player):
         if not roleConstants.isGoalie(mate.role) and mate.active:
             openSpaces[mate.role - 2] = False
 
-    if openSpaces[3]:
-        RoleConstants.setRoleConstants(player, 5)
-    if openSpaces[2]:
-        RoleConstants.setRoleConstants(player, 4)
-    elif openSpaces[1]:
-        RoleConstants.setRoleConstants(player, 3)
-    elif openSpaces[0]:
-        RoleConstants.setRoleConstants(player, 2)
+    position = 0
 
+    for i in range(3):
+        if openSpaces[i] and roleConstants.canRoleSwitchTo(i+2):
+            roleConstants.setRoleConstants(player, i+2)
+            return player.goLater(player.gameState)
+        elif openSpaces[i]:
+            position = i+2
+
+    if position == 0:
+        print "Came out of penalty and found no open spaces!!!"
+    roleConstants.setRoleConstants(player, position)
     return player.goLater(player.gameState)
+# #-------------------------------------------------------
+#     if openSpaces[3]:
+#         roleConstants.setRoleConstants(player, 5)
+#     if openSpaces[2]:
+#         roleConstants.setRoleConstants(player, 4)
+#     elif openSpaces[1]:
+#         roleConstants.setRoleConstants(player, 3)
+#     elif openSpaces[0]:
+#         roleConstants.setRoleConstants(player, 2)
+
+#     return player.goLater(player.gameState)

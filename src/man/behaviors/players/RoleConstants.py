@@ -39,6 +39,14 @@ def isChaser(role):
 def isCherryPicker(role):
     return getRole(role) == "CherryPicker"
 
+# Could be useful if we decide that the CherryPicker doesn't roleswitch
+def willRoleSwitch(role):
+    return not isChaser(role) and not isGoalie(role) #and not isCherryPicker(role)
+
+# Makes it easy for arbitrary roleswitching
+def canRoleSwitchTo(role):
+    return isChaser(role)
+
 ### RANDOM STUFF
 isKickingOff = False # Default is false, changed by pBrunswick or some other if
                      # this is not the case, TODO this is ugly
