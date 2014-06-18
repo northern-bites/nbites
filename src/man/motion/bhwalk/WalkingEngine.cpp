@@ -27,12 +27,12 @@ WalkingEngine::WalkingEngine() : WalkingEngineBase(), optimizeStarted(false)
     naoProvider = new NaoProvider();
     jointFilter = new JointFilter();
     robotModelProvider = new RobotModelProvider();
+    groundContactDetector = new GroundContactDetector();
     inertiaSensorCalibrator = new InertiaSensorCalibrator();
     inertiaSensorFilter = new InertiaSensorFilter();
     sensorFilter = new SensorFilter();
     fallDownStateDetector = new FallDownStateDetector();
     torsoMatrixProvider = new TorsoMatrixProvider();
-    groundContactDetector = new GroundContactDetector();
     motionSelector = new MotionSelector();
 
 	init();
@@ -53,12 +53,12 @@ WalkingEngine::~WalkingEngine()
     delete naoProvider;
     delete jointFilter;
     delete robotModelProvider;
+    delete groundContactDetector;
     delete inertiaSensorCalibrator;
     delete inertiaSensorFilter;
     delete sensorFilter;
     delete fallDownStateDetector;
     delete torsoMatrixProvider;
-    delete groundContactDetector;
     delete motionSelector;
 
     theInstance = 0;
@@ -215,16 +215,16 @@ void WalkingEngine::update(WalkingEngineOutputBH& walkingEngineOutput)
 	theMotionInfoBH.isMotionStable = true;
 
 	naoProvider->update(theJointDataBH, theSensorDataBH);
-	naoProvider->update(theFrameInfoBH);
+    naoProvider->update(theFrameInfoBH);
 	jointFilter->update(theFilteredJointDataBH);
 	robotModelProvider->update(theRobotModelBH);
+    groundContactDetector->update(theGroundContactStateBH);
 	inertiaSensorCalibrator->update(theInertiaSensorDataBH);
 	inertiaSensorFilter->update(theOrientationDataBH);
 	sensorFilter->update(theFilteredSensorDataBH);
 	fallDownStateDetector->update(theFallDownStateBH);
 	torsoMatrixProvider->update(theOdometryDataBH);
 	torsoMatrixProvider->update(theTorsoMatrixBH);
-    groundContactDetector->update(theGroundContactStateBH);
 	motionSelector->update(theMotionSelectionBH);
 
 	DEBUG_RESPONSE("module:WalkingEngine:optimize",
