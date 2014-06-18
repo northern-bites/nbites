@@ -37,7 +37,7 @@ def executeMotionKick(player):
     return player.stay()
 
 @superState('positionAndKickBall')
-@ifSwitchLater(transitions.ballMoved, 'approachBall')
+@ifSwitchLater(transitions.ballMoved, 'approachBall') # TODO this doesn't work
 def executeKick(player):
     """
     Kick the ball.
