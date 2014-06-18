@@ -333,7 +333,7 @@ void WalkingEngine::updateMotionRequest()
 
 	// get requested motion state
 	requestedMotionType = stand;
-	if(theInertiaSensorDataBH.calibrated && theGroundContactStateBH.contact && theMotionSelectionBH.ratios[MotionRequestBH::walk] >= 1.f)
+	if(theInertiaSensorDataBH.calibrated && /*theGroundContactStateBH.contact &&*/ theMotionSelectionBH.ratios[MotionRequestBH::walk] >= 1.f)
 	{
 		if(theMotionRequestBH.motion == MotionRequestBH::walk)
 		{
@@ -525,7 +525,7 @@ void WalkingEngine::generateJointRequest()
 	bodyRotation *= standBodyRotation;
 
 	float angularVelocityCorrection = 0.0f;
-	if(!transition && theGroundContactStateBH.contact && theInertiaSensorDataBH.calibrated && theInertiaSensorDataBH.gyro.y != InertiaSensorDataBH::off)
+	if(!transition && /*theGroundContactStateBH.contact &&*/ theInertiaSensorDataBH.calibrated && theInertiaSensorDataBH.gyro.y != InertiaSensorDataBH::off)
 	{
 		// Buffer the relative rotations of the torso around its y-axis.
 		const RotationMatrixBH relativeRotation = bodyRotation.invert() * lastBodyRotationMatrix;
