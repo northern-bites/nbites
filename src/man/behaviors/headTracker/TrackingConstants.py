@@ -33,6 +33,11 @@ KICK_DICT = {"L_Side"           : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
              "L_Long_Back"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
              "R_Long_Back"      : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
              "L_Short_Back"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
-             "R_Short_Back"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT}
+             "R_Short_Back"     : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+
+             "M_Left_Straight"  : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "M_Right_Straight" : HeadMoves.FIXED_PITCH_LOOK_STRAIGHT,
+             "M_Left_Side"      : HeadMoves.FIXED_PITCH_LOOK_RIGHT,
+             "M_Right_Side"     : HeadMoves.FIXED_PITCH_LOOK_LEFT}
 # TODO: Test and improve these pans.
 

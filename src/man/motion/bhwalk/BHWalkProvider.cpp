@@ -223,7 +223,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.target.translation.y = command->y_mm;
 
             // Let's do some motion kicking!
-            if (command->motionKick) {
+            if (command->motionKick && !justMotionKicked) {
                 if (command->kickType == 0) {
                     motionRequest.walkRequest.kickType = WalkRequest::sidewardsLeft;
                 }
@@ -237,10 +237,6 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
                     motionRequest.walkRequest.kickType = WalkRequest::right;
                 }
             }
-            // TODO test motion kicking
-            // else {
-            //     motionRequest.walkRequest.kickType = WalkRequest::none;
-            // }
 
             walkingEngine->theMotionRequestBH = motionRequest;
         }
@@ -293,6 +289,15 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
 
     WalkingEngineOutputBH output;
     walkingEngine->update(output);
+
+    // Update justMotionKicked so that we do not motion kick multiple times in a row
+    if (output.executedWalk.kickType != WalkRequest::none) { // if we succesfully motion kicked
+        justMotionKicked = true;
+    }
+    else if (walkingEngine->theMotionRequestBH.walkRequest.mode != WalkRequest::targetMode || // else if we are no longer attempting to motion kick
+             !boost::shared_static_cast<DestinationCommand>(currentCommand)->motionKick) {
+        justMotionKicked = false;
+    }
 
     // Ignore the first chain since it's the head
     for (unsigned i = 1; i < Kinematics::NUM_CHAINS; i++) {
@@ -352,7 +357,6 @@ void BHWalkProvider::getOdometryUpdate(portals::OutPortal<messages::RobotLocatio
 }
 
 void BHWalkProvider::hardReset() {
-
     inactive();
 
     // Reset odometry

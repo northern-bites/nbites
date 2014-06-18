@@ -55,8 +55,7 @@ message DestinationWalk
     optional float rel_y = 2;
     optional float rel_h = 3;
     optional float gain  = 4;
-    optional bool pedantic = 5;
-    optional MotionKick kick = 6;
+    optional MotionKick kick = 5;
 }
 
 message OdometryWalk
@@ -77,9 +76,7 @@ message WalkCommand
 message MotionKick
 {
     optional bool  perform_motion_kick = 1;
-    optional float ball_rel_x = 2;
-    optional float ball_rel_y = 3;
-    optional int32 kick_type = 4;
+    optional int32 kick_type = 2;
 }
 
 message HeadMotionCommand

@@ -87,6 +87,7 @@ protected:
 private:
     bool requestedToStop;
     bool standby;
+    bool justMotionKicked;
     MotionCommand::ptr currentCommand;
     Pose2DBH startOdometry;
 

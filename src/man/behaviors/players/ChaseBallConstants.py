@@ -10,7 +10,7 @@ BALL_OFF_KICK_THRESH = 4 # 4 seconds, time threshold!
 
 # Should position for kick
 BALL_PFK_LEFT_Y = 16.0
-PREPARE_FOR_KICK_DIST = 45.0
+PREPARE_FOR_KICK_DIST = 50.0
 SETUP_DISTANCE_X = 5
 
 # Should approach ball again
