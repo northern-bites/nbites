@@ -51,7 +51,6 @@ def goToPosition(nav):
 
         MAX_TURN = .5
 
-        BOOK_IT_DISTANCE_THRESHOLD = 60
         BOOK_IT_TURN_THRESHOLD = 23
 
         if relDest.relH >= HEADING_ADAPT_CUTOFF:
@@ -81,18 +80,15 @@ def goToPosition(nav):
                                     DISTANCE_ADAPT_CUTOFF,
                                     goToPosition.speed)
 
-        if fabs(relDest.dist) > BOOK_IT_DISTANCE_THRESHOLD:
-            if fabs(relDest.relH) > BOOK_IT_TURN_THRESHOLD:
-                if relDest.relH > 0: velH = MAX_TURN
-                if relDest.relH < 0: velH = -MAX_TURN
-                velX = 0
-                velY = 0
-                goToPosition.bookingIt = False
-            else:
-                velY = 0
-                goToPosition.bookingIt = True
-        else:
+        if fabs(relDest.relH) > BOOK_IT_TURN_THRESHOLD:
+            if relDest.relH > 0: velH = MAX_TURN
+            if relDest.relH < 0: velH = -MAX_TURN
+            velX = 0
+            velY = 0
             goToPosition.bookingIt = False
+        else:
+            velY = 0
+            goToPosition.bookingIt = True
 
         goToPosition.speeds = (velX, velY, velH)
 
