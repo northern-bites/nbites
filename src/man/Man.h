@@ -24,6 +24,7 @@
 #include "sharedball/SharedBall.h"
 #include "arms/ArmContactModule.h"
 #include "obstacle/ObstacleModule.h"
+#include "ParamReader.h"
 
 #include <vector>
 
@@ -40,6 +41,8 @@ private:
     void startSubThreads();
     void startAndCheckThread(DiagramThread& thread);
 
+    ParamReader param;
+    int playerNum, teamNum;
     DiagramThread sensorsThread;
     sensors::SensorsModule sensors;
     jointenactor::JointEnactorModule jointEnactor;

@@ -17,14 +17,15 @@ def chaserIsOut(player):
     openPosition = 0
 
     for mate in player.brain.teamMembers:
-        print mate.role
+        if mate.playerNumber == player.brain.playerNumber:
+            continue
         if constants.canRoleSwitchTo(mate.role) and mate.frameSinceActive > 30:
             print "position's open!"
             openPositions = mate.role
         if constants.willRoleSwitch(mate.role) \
                 and mate.playerNumber > player.brain.playerNumber \
                 and mate.frameSinceActive < 30:
-            print "mate's got it", mate.playerNumber, " ", mate.role
+            #print "mate's got it", mate.playerNumber, " ", mate.role
             return False # Active, higher numbered player takes precedence
 
     if openPosition > 0:

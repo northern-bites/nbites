@@ -41,7 +41,6 @@ protected:
 
     DataSelector selector;
     logview::LogViewer logView;
-
     // GUI stuff
     QTabWidget* toolTabs;
     QToolBar* toolbar;
