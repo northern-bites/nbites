@@ -11,7 +11,7 @@ WorldView::WorldView(QWidget* parent)
     : portals::Module(),
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
-      wviewComm(14,0),
+      wviewComm(16,0),
       newTeam(0),
       mutex()
 {
@@ -38,7 +38,7 @@ WorldView::WorldView(QWidget* parent)
 
     QHBoxLayout *teamLayout = new QHBoxLayout();
     QLabel *teamLabel = new QLabel(tr("Listening to Team: "));
-    teamSelector = new QLineEdit(tr("14"));
+    teamSelector = new QLineEdit(tr("16"));
     QValidator *teamVal = new QIntValidator(1, 255);
     teamSelector->setValidator(teamVal);
     teamLayout->addWidget(teamLabel);
