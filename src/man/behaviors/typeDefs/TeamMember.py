@@ -26,7 +26,7 @@ class TeamMember(RobotLocation):
         self.ballVelX = 0
         self.ballVelY = 0
         self.ballUncert = 0
-        self.role = 1
+        self.role = 0
         self.inKickingState = False
         self.kickingToX = 0
         self.kickingToY = 0

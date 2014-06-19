@@ -130,8 +130,9 @@ def determineRole(player):
 
     openSpaces = [True, True, True, True]
     for mate in player.brain.teamMembers:
-        print mate.role
-        if not roleConstants.isGoalie(mate.role) and mate.active:
+        print "Choosing role: ", mate.role
+        if not roleConstants.isGoalie(mate.role) \
+                and mate.frameSinceActive < 30:
             openSpaces[mate.role - 2] = False
 
     position = 0

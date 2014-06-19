@@ -25,7 +25,7 @@ def isRightDefender(role):
     return getRole(role) == "RightDefender"
 
 def isDefender(role):
-    return isLeftDefender(role) or self.isRightDefender(role)
+    return isLeftDefender(role) or isRightDefender(role)
 
 def isFirstChaser(role):
     return getRole(role) == "FirstChaser"
@@ -41,7 +41,7 @@ def isCherryPicker(role):
 
 # Could be useful if we decide that the CherryPicker doesn't roleswitch
 def willRoleSwitch(role):
-    return not isChaser(role) and not isGoalie(role) #and not isCherryPicker(role)
+    return isDefender(role) or isCherryPicker(role)
 
 # Makes it easy for arbitrary roleswitching
 def canRoleSwitchTo(role):
