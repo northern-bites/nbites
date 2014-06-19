@@ -25,6 +25,10 @@ void GroundContactDetector::update(GroundContactStateBH& groundContactState)
   DECLARE_PLOT("module:GroundContactDetector:gyroNoiseY");
 
   MODIFY("module:GroundContactDetector:contact", contact);
+
+  groundContactState.contact = true;
+  return;
+
   bool ignoreSensors = (theMotionInfoBH.motion != MotionRequestBH::walk && theMotionInfoBH.motion != MotionRequestBH::stand &&
                         theMotionInfoBH.motion != MotionRequestBH::specialAction && theMotionInfoBH.motion != MotionRequestBH::getUp) ||
                        (theMotionRequestBH.motion != MotionRequestBH::walk && theMotionRequestBH.motion != MotionRequestBH::stand &&
