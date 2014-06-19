@@ -1,7 +1,7 @@
 /**
 * @file Representations/MotionControl/WalkRequest.h
 * This file declares a class that represents a walk request.
-* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas Röfer</A>
+* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas RÃ¶fer</A>
 * @author Colin Graf
 */
 
@@ -9,12 +9,13 @@
 
 #include "Tools/Math/Pose2D.h"
 #include "Tools/Enum.h"
+#include "Tools/Streams/AutoStreamable.h"
 
 /**
 * @class WalkRequest
 * A class that represents a walk request.
 */
-class WalkRequest : public Streamable
+STREAMABLE(WalkRequest,
 {
 public:
   ENUM(Mode,
@@ -23,68 +24,26 @@ public:
     targetMode /**< Use \c target as walking target relative to the current position of the robot and interpret \c speed as percentage walking speed. */
   );
 
-  Mode mode; /**< The walking mode. */
-  Pose2D speed; /**< Walking speeds, in percentage or mm/s and radian/s. */
-  Pose2D target; /**< Walking target, in mm and radians, relative to the robot. Use either a speed or a target. */
-  bool pedantic; /**< Allows to disable the step size stabilization. set it when precision is indispensable. */
-  bool dribbling;
-
-  class DribbleTarget : public Streamable
-  {
-  public:
-    DribbleTarget() : left(false) {}
-
-    Vector2<> target;
-    Vector2<> dribbleSpeed;
-    Pose2D ballPosition;
-    bool left;
-  private:
-    virtual void serialize(In* in, Out* out)
-    {
-      STREAM_REGISTER_BEGIN();
-      STREAM(target);
-      STREAM(dribbleSpeed);
-      STREAM(ballPosition);
-      STREAM(left);
-      STREAM_REGISTER_FINISH();
-    }
-
-    friend class WalkRequest;
-  } dribbleTarget;
-
   ENUM(KickType,
     none, /**< do not kick */
     left, /**< kick using the left foot */
     right, /**< kick using the right foot */
-    sidewardsLeft, /**<kick sideways using the left foot */
-    sidewardsRight /**<kick sideways using the right foot */
+    sidewardsLeft,
+    sidewardsRight
+    // angleLeft,
+    // angleRight,
+    // stepForLeftKick,
+    // stepForRightKick
   );
 
-  KickType kickType;
-  Vector2<> kickBallPosition;
-  Vector2<> kickTarget;
-
-  /** Default constructor. */
-  WalkRequest() : mode(speedMode), pedantic(false), dribbling(false), kickType(none) {}
-
-private:
-  /**
-  * The method makes the object streamable.
-  * @param in The stream from which the object is read
-  * @param out The stream to which the object is written
-  */
-  virtual void serialize(In* in, Out* out)
+  bool isValid() const
   {
-    STREAM_REGISTER_BEGIN();
-    STREAM(mode);
-    STREAM(speed);
-    STREAM(target);
-    STREAM(pedantic);
-    STREAM(dribbling);
-    STREAM(dribbleTarget);
-    STREAM(kickType);
-    STREAM(kickBallPosition);
-    STREAM(kickTarget);
-    STREAM_REGISTER_FINISH();
-  }
-};
+    return !isnan(speed.rotation) && !isnan(speed.translation.x) && !isnan(speed.translation.y)
+           && (mode != targetMode || (!isnan(target.rotation) && !isnan(target.translation.x) && !isnan(target.translation.y)));
+  },
+
+  (Mode)(speedMode) mode, /**< The walking mode. */
+  (Pose2DBH) speed, /**< Walking speeds, in percentage or mm/s and radian/s. */
+  (Pose2DBH) target, /**< Walking target, in mm and radians, relative to the robot. Use either a speed or a target. */
+  (KickType)(none) kickType,
+});

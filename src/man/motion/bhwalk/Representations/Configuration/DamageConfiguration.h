@@ -7,30 +7,14 @@
 
 #pragma once
 
-#include <string>
-#include "Tools/Streams/Streamable.h"
+#include "Tools/Streams/AutoStreamable.h"
 
-class DamageConfiguration : public Streamable
-{
-public:
-  DamageConfiguration() :
-    useGroundContactDetection(true),
-    useGroundContactDetectionForLEDs(true),
-    useGroundContactDetectionForSafeStates(true),
-    useGroundContactDetectionForSensorCalibration(true) {}
-
-  bool useGroundContactDetection;
-  bool useGroundContactDetectionForLEDs;
-  bool useGroundContactDetectionForSafeStates;
-  bool useGroundContactDetectionForSensorCalibration;
-
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM(useGroundContactDetection);
-    STREAM(useGroundContactDetectionForLEDs);
-    STREAM(useGroundContactDetectionForSafeStates);
-    STREAM(useGroundContactDetectionForSensorCalibration);
-    STREAM_REGISTER_FINISH();
-  }
-};
+STREAMABLE(DamageConfigurationBH,
+{,
+  (bool)(false) weakLeftLeg,
+  (bool)(false) weakRightLeg,
+  (bool)(false) usLDefect,
+  (bool)(false) usRDefect,
+  (bool)(false) leftFootBumperDefect,
+  (bool)(false) rightFootBumperDefect,
+});

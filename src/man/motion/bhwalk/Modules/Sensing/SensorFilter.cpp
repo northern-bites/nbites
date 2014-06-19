@@ -5,78 +5,90 @@
 */
 
 #include "SensorFilter.h"
-//#include "Tools/Debugging/DebugDrawings.h"
+#include "Tools/Debugging/DebugDrawings.h"
 
-//MAKE_MODULE(SensorFilter, Sensing)
+MAKE_MODULE(SensorFilter, Sensing)
 
-void SensorFilter::update(FilteredSensorData& filteredSensorData,
-        const InertiaSensorData& theInertiaSensorData,
-        const SensorData& theSensorData,
-        const OrientationData& theOrientationData)
+PROCESS_WIDE_STORAGE(SensorFilter) SensorFilter::theInstance = 0;
+
+void SensorFilter::update(FilteredSensorDataBH& filteredSensorData)
 {
-  // copy sensor data (except gyro and acc)
-  Vector2<> gyro(filteredSensorData.data[SensorData::gyroX], filteredSensorData.data[SensorData::gyroY]);
-  Vector3<> acc(filteredSensorData.data[SensorData::accX], filteredSensorData.data[SensorData::accY], filteredSensorData.data[SensorData::accZ]);
-  (SensorData&)filteredSensorData = theSensorData;
-  filteredSensorData.data[SensorData::gyroX] = gyro.x;
-  filteredSensorData.data[SensorData::gyroY] = gyro.y;
-  filteredSensorData.data[SensorData::accX] = acc.x;
-  filteredSensorData.data[SensorData::accY] = acc.y;
-  filteredSensorData.data[SensorData::accZ] = acc.z;
+  // copy sensor data from representation SensorDataBH to representation FilteredSensorDataBH,
+  // but keep values from gyro and acc
+  Vector2BH<> gyro(filteredSensorData.data[SensorDataBH::gyroX], filteredSensorData.data[SensorDataBH::gyroY]);
+  Vector3BH<> acc(filteredSensorData.data[SensorDataBH::accX], filteredSensorData.data[SensorDataBH::accY], filteredSensorData.data[SensorDataBH::accZ]);
+  (SensorDataBH&)filteredSensorData = theSensorDataBH;
+  filteredSensorData.data[SensorDataBH::gyroX] = gyro.x;
+  filteredSensorData.data[SensorDataBH::gyroY] = gyro.y;
+  filteredSensorData.data[SensorDataBH::accX] = acc.x;
+  filteredSensorData.data[SensorDataBH::accY] = acc.y;
+  filteredSensorData.data[SensorDataBH::accZ] = acc.z;
+
+  if(theDamageConfigurationBH.usLDefect)
+  {
+    for(int i = SensorDataBH::usL; i < SensorDataBH::usLEnd; ++i)
+      filteredSensorData.data[i] = 2550.0f;
+  }
+
+  if(theDamageConfigurationBH.usRDefect)
+  {
+    for(int i = SensorDataBH::usR; i < SensorDataBH::usREnd; ++i)
+      filteredSensorData.data[i] = 2550.0f;
+  }
 
   // take calibrated inertia sensor data
   for(int i = 0; i < 2; ++i)
   {
-    if(theInertiaSensorData.gyro[i] != InertiaSensorData::off)
-      filteredSensorData.data[SensorData::gyroX + i] = theInertiaSensorData.gyro[i];
-    else if(filteredSensorData.data[SensorData::gyroX + i] == SensorData::off)
-      filteredSensorData.data[SensorData::gyroX + i] = 0.f;
+    if(theInertiaSensorDataBH.gyro[i] != InertiaSensorDataBH::off)
+      filteredSensorData.data[SensorDataBH::gyroX + i] = theInertiaSensorDataBH.gyro[i];
+    else if(filteredSensorData.data[SensorDataBH::gyroX + i] == SensorDataBH::off)
+      filteredSensorData.data[SensorDataBH::gyroX + i] = 0.f;
   }
-  filteredSensorData.data[SensorData::gyroZ] = 0.f;
+  filteredSensorData.data[SensorDataBH::gyroZ] = 0.f;
   for(int i = 0; i < 3; ++i)
   {
-    if(theInertiaSensorData.acc[i] != InertiaSensorData::off)
-      filteredSensorData.data[SensorData::accX + i] = theInertiaSensorData.acc[i] / 9.80665f;
-    else if(filteredSensorData.data[SensorData::accX + i] == SensorData::off)
-      filteredSensorData.data[SensorData::accX + i] = 0.f;
+    if(theInertiaSensorDataBH.acc[i] != InertiaSensorDataBH::off)
+      filteredSensorData.data[SensorDataBH::accX + i] = theInertiaSensorDataBH.acc[i];
+    else if(filteredSensorData.data[SensorDataBH::accX + i] == SensorDataBH::off)
+      filteredSensorData.data[SensorDataBH::accX + i] = 0.f;
   }
 
   // take orientation data
-  filteredSensorData.data[SensorData::angleX] = theOrientationData.orientation.x;
-  filteredSensorData.data[SensorData::angleY] = theOrientationData.orientation.y;
+  filteredSensorData.data[SensorDataBH::angleX] = std::atan2(theOrientationDataBH.rotation.c1.z, theOrientationDataBH.rotation.c2.z);
+  filteredSensorData.data[SensorDataBH::angleY] = std::atan2(-theOrientationDataBH.rotation.c0.z, theOrientationDataBH.rotation.c2.z);
 
+  // some code for calibrating the gain of the gyro sensors:
 #ifndef RELEASE
-  if(filteredSensorData.data[SensorData::gyroX] != SensorData::off)
+  if(filteredSensorData.data[SensorDataBH::gyroX] != SensorDataBH::off)
   {
-    gyroAngleXSum += filteredSensorData.data[SensorData::gyroX] * (theSensorData.timeStamp - lastIteration) * 0.001f;
-    gyroAngleXSum = normalize(gyroAngleXSum);
-    lastIteration = theSensorData.timeStamp;
+    gyroAngleXSum += filteredSensorData.data[SensorDataBH::gyroX] * (theSensorDataBH.timeStamp - lastIteration) * 0.001f;
+    gyroAngleXSum = normalizeBH(gyroAngleXSum);
+    lastIteration = theSensorDataBH.timeStamp;
   }
   PLOT("module:SensorFilter:gyroAngleXSum", gyroAngleXSum);
+  DEBUG_RESPONSE_ONCE("module:SensorFilter:gyroAngleXSum:reset", gyroAngleXSum = 0.f;);
 #endif
 
-  //
-//  PLOT("module:SensorFilter:rawAngleX", theSensorData.data[SensorData::angleX]);
-//  PLOT("module:SensorFilter:rawAngleY", theSensorData.data[SensorData::angleY]);
-//
-//  PLOT("module:SensorFilter:rawAccX", theSensorData.data[SensorData::accX]);
-//  PLOT("module:SensorFilter:rawAccY", theSensorData.data[SensorData::accY]);
-//  PLOT("module:SensorFilter:rawAccZ", theSensorData.data[SensorData::accZ]);
-//
-//  PLOT("module:SensorFilter:rawGyroX", theSensorData.data[SensorData::gyroX]);
-//  PLOT("module:SensorFilter:rawGyroY", theSensorData.data[SensorData::gyroY]);
-//  PLOT("module:SensorFilter:rawGyroZ", theSensorData.data[SensorData::gyroZ]);
-//
-//  PLOT("module:SensorFilter:angleX", filteredSensorData.data[SensorData::angleX]);
-//  PLOT("module:SensorFilter:angleY", filteredSensorData.data[SensorData::angleY]);
-//
-//  PLOT("module:SensorFilter:accX", filteredSensorData.data[SensorData::accX]);
-//  PLOT("module:SensorFilter:accY", filteredSensorData.data[SensorData::accY]);
-//  PLOT("module:SensorFilter:accZ", filteredSensorData.data[SensorData::accZ]);
-//
-//  PLOT("module:SensorFilter:gyroX", filteredSensorData.data[SensorData::gyroX] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroX] : 0);
-//  PLOT("module:SensorFilter:gyroY", filteredSensorData.data[SensorData::gyroY] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroY] : 0);
-//  PLOT("module:SensorFilter:gyroZ", filteredSensorData.data[SensorData::gyroZ] != float(SensorData::off) ? filteredSensorData.data[SensorData::gyroZ] : 0);
+  PLOT("module:SensorFilter:rawAngleX", theSensorDataBH.data[SensorDataBH::angleX]);
+  PLOT("module:SensorFilter:rawAngleY", theSensorDataBH.data[SensorDataBH::angleY]);
 
-  //PLOT("module:SensorFilter:us", filteredSensorData.data[SensorData::us]);
+  PLOT("module:SensorFilter:rawAccX", theSensorDataBH.data[SensorDataBH::accX]);
+  PLOT("module:SensorFilter:rawAccY", theSensorDataBH.data[SensorDataBH::accY]);
+  PLOT("module:SensorFilter:rawAccZ", theSensorDataBH.data[SensorDataBH::accZ]);
+
+  PLOT("module:SensorFilter:rawGyroX", theSensorDataBH.data[SensorDataBH::gyroX]);
+  PLOT("module:SensorFilter:rawGyroY", theSensorDataBH.data[SensorDataBH::gyroY]);
+  PLOT("module:SensorFilter:rawGyroZ", theSensorDataBH.data[SensorDataBH::gyroZ]);
+
+  PLOT("module:SensorFilter:angleX", filteredSensorData.data[SensorDataBH::angleX]);
+  PLOT("module:SensorFilter:angleY", filteredSensorData.data[SensorDataBH::angleY]);
+
+  PLOT("module:SensorFilter:accX", filteredSensorData.data[SensorDataBH::accX]);
+  PLOT("module:SensorFilter:accY", filteredSensorData.data[SensorDataBH::accY]);
+  PLOT("module:SensorFilter:accZ", filteredSensorData.data[SensorDataBH::accZ]);
+
+  PLOT("module:SensorFilter:gyroX", filteredSensorData.data[SensorDataBH::gyroX] != float(SensorDataBH::off) ? filteredSensorData.data[SensorDataBH::gyroX] : 0);
+  PLOT("module:SensorFilter:gyroY", filteredSensorData.data[SensorDataBH::gyroY] != float(SensorDataBH::off) ? filteredSensorData.data[SensorDataBH::gyroY] : 0);
+  PLOT("module:SensorFilter:gyroZ", filteredSensorData.data[SensorDataBH::gyroZ] != float(SensorDataBH::off) ? filteredSensorData.data[SensorDataBH::gyroZ] : 0);
 }
+

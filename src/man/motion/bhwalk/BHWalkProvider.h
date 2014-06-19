@@ -3,7 +3,8 @@
  *
  * A MotionProvider that uses the B-Human walk engine to compute the next body joints
  *
- * @author Octavian Neamtu
+ * @author Octavian Neamtu (port of 2011 BH walk engine)
+ * @author Josh Imhoff (port of the 2013 BH walk engine)
  */
 
 #pragma once
@@ -21,76 +22,76 @@
 
 //BH
 #include "WalkingEngine.h"
+#include "Representations/Blackboard.h"
+#include "Tools/Math/Pose2D.h"
 
 namespace man
 {
-    namespace motion
-    {
-        class BHWalkProvider : public MotionProvider
-        {
-        public:
-            BHWalkProvider();
-            virtual ~BHWalkProvider() {}
+namespace motion
+{
 
-            // Provide calibration boolean to the rest of the system.
-            bool calibrated() const;
+class BHWalkProvider : public MotionProvider
+{
+public:
+    BHWalkProvider();
+    virtual ~BHWalkProvider();
 
-            // Provide hand speeds to the rest of the system
-            float leftHandSpeed() const;
-            float rightHandSpeed() const;
+    // Provide calibration boolean to the rest of the system
+    bool calibrated() const;
 
-            void requestStopFirstInstance();
-            void calculateNextJointsAndStiffnesses(
-                std::vector<float>&            sensorAngles,
-                std::vector<float>&            sensorCurrents,
-                const messages::InertialState& sensorInertials,
-                const messages::FSR&           sensorFSRs
-                );
+    // Provide hand speeds to the rest of the system
+    float leftHandSpeed() const;
+    float rightHandSpeed() const;
 
-            void hardReset();
-            void resetOdometry();
+    void requestStopFirstInstance();
+    void calculateNextJointsAndStiffnesses(
+        std::vector<float>&            sensorAngles,
+        std::vector<float>&            sensorCurrents,
+        const messages::InertialState& sensorInertials,
+        const messages::FSR&           sensorFSRs
+        );
 
-            void setCommand(const WalkCommand::ptr command);
-            void setCommand(const DestinationCommand::ptr command);
-            //TODO: I'm taking over StepCommand (currently not used) and making
-            //it an odometry destination walk
-            void setCommand(const StepCommand::ptr command);
+    void hardReset();
+    void resetOdometry();
 
-            std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
-                return std::vector<BodyJointCommand::ptr>();
-            }
+    void setCommand(const WalkCommand::ptr command);
+    void setCommand(const DestinationCommand::ptr command);
+    // StepCommand (currently not used) is actually an odometry destination walk
+    void setCommand(const StepCommand::ptr command);
 
-            void getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const;
+    std::vector<BodyJointCommand::ptr> getGaitTransitionCommand() {
+        return std::vector<BodyJointCommand::ptr>();
+    }
 
-            static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
-            //returns only body angles
-            //TODO: this is in nature due to the fact that we don't separate head providers
-            //from body providers - if we did we could separate the methods for each
-            std::vector<float> getInitialStance() {
-                return std::vector<float>(INITIAL_BODY_POSE_ANGLES,
-                                          INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
-            }
+    void getOdometryUpdate(portals::OutPortal<messages::RobotLocation>& out) const;
 
-            //TODO: rename this to isGoingToStand since it flags whether we are going to
-            //a stand rather than be at a complete standstill
-            bool isStanding() const;
-            // !isWalkActive() means we're at a complete standstill. everything else is walking.
-            bool isWalkActive() const;
+    static const float INITIAL_BODY_POSE_ANGLES[Kinematics::NUM_JOINTS];
 
-            void setStandby(bool value) { standby = value; }
+    std::vector<float> getInitialStance() {
+        return std::vector<float>(INITIAL_BODY_POSE_ANGLES,
+                                  INITIAL_BODY_POSE_ANGLES + Kinematics::NUM_BODY_JOINTS);
+    }
 
-        protected:
-            void stand();
-            void setActive() {}
+    // TODO rename this to isGoingToStand since it flags whether we are going to
+    // a stand rather than be at a complete standstill
+    bool isStanding() const;
+    // !isWalkActive() means we're at a complete standstill, everything else is walking
+    bool isWalkActive() const;
 
-//    void playDead();
+    void setStandby(bool value) { standby = value; }
 
-        private:
-            bool requestedToStop;
-            bool standby;
-            WalkingEngine walkingEngine;
-            MotionCommand::ptr currentCommand;
-            Pose2D startOdometry;
-        };
-    } // namespace motion
+protected:
+    void stand();
+    void setActive() {}
+
+private:
+    bool requestedToStop;
+    bool standby;
+    MotionCommand::ptr currentCommand;
+    Pose2DBH startOdometry;
+
+    WalkingEngine *walkingEngine;
+    Blackboard *blackboard;
+    };
+} // namespace motion
 } // namespace man

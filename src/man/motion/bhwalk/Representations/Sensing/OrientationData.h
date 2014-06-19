@@ -1,40 +1,22 @@
 /**
 * @file OrientationData.h
-* Declaration of class OrientationData.
+* Declaration of class OrientationDataBH.
 * @author Colin Graf
 */
 
 #pragma once
 
-#include "Tools/Math/Vector2.h"
-#include "Tools/Math/Vector3.h"
+#include "Tools/Math/RotationMatrix.h"
+#include "Tools/Streams/AutoStreamable.h"
 
 /**
-* @class OrientationData
+* @class OrientationDataBH
 * Encapsulates the orientation and velocity of the torso.
 */
-class OrientationData : public Streamable
-{
-public:
-  Vector2<float> orientation; /**< The rotation around the x- and y-axis relative to an orthognal position to the ground. (in radians) */
-  Vector3<float> velocity; /**< The velocity along the x-, y- and z-axis relative to the toros. (in m/s) */
+STREAMABLE(OrientationDataBH,
+{,
+  (RotationMatrixBH) rotation, /**< The rotation of the torso. */
+  (Vector3BH<>) velocity, /**< The velocity along the x-, y- and z-axis relative to the torso. (in m/s) */
+});
 
-  /** Default constructor. */
-  OrientationData() {}
-
-private:
-  /**
-  * The method makes the object streamable.
-  * @param in The stream from which the object is read
-  * @param out The stream to which the object is written
-  */
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM(orientation);
-    STREAM(velocity);
-    STREAM_REGISTER_FINISH();
-  }
-};
-
-class GroundTruthOrientationData  : public OrientationData {};
+class GroundTruthOrientationDataBH  : public OrientationDataBH {};

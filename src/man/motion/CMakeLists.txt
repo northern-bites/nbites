@@ -13,8 +13,6 @@ set(MOTION_SRCS MotionModule
 		HeadJointCommand
 		HeadProvider)
 
-include_directories( bhwalk )
-
 add_subdirectory( bhwalk )
 
 # Add project as a library.

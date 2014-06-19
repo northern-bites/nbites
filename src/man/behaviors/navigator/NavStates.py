@@ -46,10 +46,8 @@ def goToPosition(nav):
             goToPosition.dest = nav.brain.play.getPositionCoord()
 
     if goToPosition.fast:
-        velX, velY, velH = 0, 0, 0
-
         HEADING_ADAPT_CUTOFF = 103
-        DISTANCE_ADAPT_CUTOFF = 60
+        DISTANCE_ADAPT_CUTOFF = 10
 
         MAX_TURN = .5
 
@@ -64,7 +62,6 @@ def goToPosition(nav):
             velH = helper.adaptSpeed(relDest.relH,
                                     HEADING_ADAPT_CUTOFF,
                                     MAX_TURN)
-            #print "velH = " + str(velH)
 
         if relDest.relX >= DISTANCE_ADAPT_CUTOFF:
             velX = goToPosition.speed
@@ -74,7 +71,6 @@ def goToPosition(nav):
             velX = helper.adaptSpeed(relDest.relX,
                                     DISTANCE_ADAPT_CUTOFF,
                                     goToPosition.speed)
-            #print "velX = " + str(velX)
 
         if relDest.relY >= DISTANCE_ADAPT_CUTOFF:
             velY = goToPosition.speed
@@ -84,11 +80,11 @@ def goToPosition(nav):
             velY = helper.adaptSpeed(relDest.relY,
                                     DISTANCE_ADAPT_CUTOFF,
                                     goToPosition.speed)
-            #print "velY = " + str(velY)
 
-        lastBookingIt = goToPosition.bookingIt
         if fabs(relDest.dist) > BOOK_IT_DISTANCE_THRESHOLD:
             if fabs(relDest.relH) > BOOK_IT_TURN_THRESHOLD:
+                if relDest.relH > 0: velH = MAX_TURN
+                if relDest.relH < 0: velH = -MAX_TURN
                 velX = 0
                 velY = 0
                 goToPosition.bookingIt = False
@@ -97,9 +93,6 @@ def goToPosition(nav):
                 goToPosition.bookingIt = True
         else:
             goToPosition.bookingIt = False
-
-        #if goToPosition.bookingIt != lastBookingIt:
-        #    print "Booking it turned to " + str(goToPosition.bookingIt)
 
         goToPosition.speeds = (velX, velY, velH)
 

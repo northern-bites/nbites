@@ -17,7 +17,7 @@
 const float e = 2.71828182845902353602874713527f;
 
 /** constant for triangular distribution*/
-const float sqrt6dividedBy2 = sqrt(6.0f) / 2.0f;
+const float sqrt6dividedBy2 = std::sqrt(6.0f) / 2.0f;
 
 /**
 * Returns a gaussian random deviate
@@ -33,7 +33,7 @@ inline float randomGauss()
     r = v1 * v1 + v2 * v2;
   }
   while(r >= 1.0f || r == 0);
-  const float fac(sqrt(-2.0f * logf(r) / r));
+  const float fac(std::sqrt(-2.0f * std::log(r) / r));
   return v1 * fac;
 }
 
@@ -45,7 +45,7 @@ inline float randomGauss()
 */
 inline float gaussianProbability(float x, float s)
 {
-  return std::max(1.0f / (s * sqrt2pi) * exp(-0.5f * sqr(x / s)), 0.000001f);
+  return std::max(1.0f / (s * sqrt2pi) * std::exp(-0.5f * sqrBH(x / s)), 0.000001f);
 }
 
 /**

@@ -133,7 +133,7 @@ ConfigMapLexer::Token ConfigMapLexer::nextToken()
   while(true)
   {
     ++column;
-    char c = static_cast<char>(input->get());
+    char c = input->get();
 
     switch(c)
     {

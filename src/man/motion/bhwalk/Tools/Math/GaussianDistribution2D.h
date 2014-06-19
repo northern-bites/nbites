@@ -19,9 +19,9 @@ class GaussianDistribution2D
 {
 public:
   /** The mean value of the distribution*/
-  Vector2<> mean;
+  Vector2BH<> mean;
   /** The variance of the distribution*/
-  Matrix2x2<> covariance;
+  Matrix2x2BH<> covariance;
 
   /** Empty standard constructor*/
   GaussianDistribution2D() {}
@@ -43,7 +43,7 @@ public:
   * @param pos The position
   * @return The probability at pos.
   */
-  virtual float probabilityAt(const Vector2<>& pos) const;
+  virtual float probabilityAt(const Vector2BH<>& pos) const;
 
   /** Computes the probability density at the center of the distribution
   * @return The probability
@@ -88,7 +88,7 @@ public:
    *  based on the covariance of the distribution
    * @return A tuple
    */
-  Vector2<> rand() const;
+  Vector2BH<> rand() const;
 
   /** Computes eigenvectors and eigenvalues of covariance matrix
   * @param eVec1 Returns the first eigenvector
@@ -96,7 +96,7 @@ public:
   * @param eValue1 Returns the first eigenvalue
   * @param eValue2 Returns the second eigenvalue
   */
-  void getEigenVectorsAndEigenValues(Vector2<>& eVec1, Vector2<>& eVec2,
+  void getEigenVectorsAndEigenValues(Vector2BH<>& eVec1, Vector2BH<>& eVec2,
                                      float& eValue1, float& eValue2) const;
 
 private:
@@ -106,5 +106,5 @@ private:
    * decomposition. Even diagonal entries infinity are allowed.
    * @author Udo Frese
    */
-  bool choleskyDecomposition(const Matrix2x2<float>& A, Matrix2x2<float>& L, float eps = 0) const;
+  bool choleskyDecomposition(const Matrix2x2BH<float>& A, Matrix2x2BH<float>& L, float eps = 0) const;
 };
