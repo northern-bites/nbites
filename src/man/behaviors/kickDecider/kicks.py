@@ -51,9 +51,9 @@ class Kick(object):
 # robot needs to orbit to.
 
 # Sweet move-based kicks
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 18.2, y =  4.4, 
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 18.0, y =  4.3, 
                                  move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 18.2, y = -4.4,
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 18.0, y = -4.3,
                                  move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
 
 LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 15.5, y =  4.5,
