@@ -27,22 +27,20 @@ public:
 
     virtual void run_();
 
+    portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
+    portals::OutPortal<messages::SharedBall> sharedBallOutput;
+
 private:
 //determines where a robot thinks the ball is and gives it a weight
     void incorporateWorldModel(messages::WorldModel newModel);
 
-//Not being used but same as previous method but assumes goalie's fixed position
-    // void incorporateGoalieWorldModel(messages::WorldModel newModel);
+//not used, but assumes goalie is in fixed position
+    //void incorporateGoalieWorldModel(messages::WorldModel newModel);
 
 //calculates a weighted average of the robot's ball locations
 //weight is determined by distance to ball and uncertainty
     void weightedavg();
 
-public:
-    portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
-    portals::OutPortal<messages::SharedBall> sharedBallOutput;
-
-private:
     float x;            //ball x location for a given robot
     float y;            //ball y location for a given robot
     float weight;       //determined by distance to ball and uncertainty

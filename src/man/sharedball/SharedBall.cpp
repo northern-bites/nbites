@@ -19,7 +19,8 @@ SharedBallModule::~SharedBallModule()
 }
 
 
-void SharedBallModule::run_() {
+void SharedBallModule::run_()
+{
 
     // makes a weighted average of the ball locations from each robot that
     //sees the ball
@@ -38,7 +39,8 @@ void SharedBallModule::run_() {
 
 // makes a weighted average of the locations from
 // each robot that sees the ball
-void SharedBallModule::weightedavg() {
+void SharedBallModule::weightedavg()
+{
     numx = 0;
     numy = 0;
     sumweight = 0;
@@ -46,32 +48,31 @@ void SharedBallModule::weightedavg() {
 
         worldModelIn[i].latch();
 
-        //the goalie
-        // if(i == 0){
-        //     incorporateGoalieWorldModel(worldModelIn[i].message());
-        //      }
+        // the goalie
+        //if(i == 0){
+            // assumes goalie in home location: won't use at the moment
+            // incorporateGoalieWorldModel(worldModelIn[i].message());
+        //}
+
         // the other players
-
-        // else{
-
+        //else{
+            // want all of this info to be weighted evenly
         incorporateWorldModel(worldModelIn[i].message());
-
-            // }
+            //}
 
         numx = numx + x*weight;
         numy = numy + y*weight;
         sumweight = sumweight + weight;
     }
 
-    //at least one robot sees the ball
+    // at least one robot sees the ball
     if (sumweight != 0) {
         x = numx / sumweight;
         y = numy / sumweight;
         ball_on = true;
     }
-    //no one sees the ball
+    // none of the robots see the ball
     else {
-        // if none of the robots see the ball
         x = -100;
         y = -100;
         ball_on = false;
@@ -79,7 +80,8 @@ void SharedBallModule::weightedavg() {
 
 }
 
-void SharedBallModule::incorporateWorldModel(messages::WorldModel newModel) {
+void SharedBallModule::incorporateWorldModel(messages::WorldModel newModel)
+{
     if(newModel.ball_on()) {
         float uncert = newModel.my_uncert();
         float dist = newModel.ball_dist();
@@ -104,9 +106,9 @@ void SharedBallModule::incorporateWorldModel(messages::WorldModel newModel) {
 // As of now we are not calling this method but if we decide the goalie should
 // assume a fixed postition, call this in weightedAvg if i = 0
 /*
-void SharedBallModule::incorporateGoalieWorldModel(messages::WorldModel newModel) {
+void SharedBallModule::incorporateGoalieWorldModel(messages::WorldModel newModel)
+{
     if(newModel.ball_on()) {
-
         float uncert = newModel.my_uncert();
         float dist = newModel.ball_dist();
         weight = 1/(dist * uncert);
@@ -126,8 +128,6 @@ void SharedBallModule::incorporateGoalieWorldModel(messages::WorldModel newModel
     }
 }
 */
-
-
 
 } // namespace man
 } // namespace context

@@ -5,14 +5,15 @@ if [ $# -ne 1 ]; then
 	exit 1
 fi
 
+OLDPACKAGES="libboost1.48-dev libboost-python1.48-dev"
+
 PACKAGES="build-essential cmake git-core \
-python2.7-dev emacs cmake-curses-gui ccache aptitude \
-qt4-dev-tools python-pyparsing libboost-dev libeigen3-dev"
+emacs cmake-curses-gui ccache aptitude \
+qt4-dev-tools python-pyparsing libeigen3-dev"
 
-echo "Are you on 64-bit linux? (y/n)"
-read IS64BIT
+BITS=`uname -m`
 
-if [ $IS64BIT == 'y' ]; then
+if [ $BITS == 'x86_64' ]; then
     echo ""
     echo "64 bit Linux is NOT SUPPORTED!"
     echo "The Northern Bites code base depends on too many 32-bit libraries."
@@ -21,11 +22,9 @@ if [ $IS64BIT == 'y' ]; then
     exit 1
 fi
 
-echo ""
-echo "What version of Ubuntu are you on? (example: 12.04)"
-read VERSION
+VERSION=`lsb_release -a 2>/dev/null | grep 'Release:' | grep -o '[0-9]\+.[0-9]\+'`
 
-if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
+if [[ $VERSION != '12.04' && $VERSION != '14.04' ]]; then
 
     echo ""
     echo "That version is NOT SUPPORTED."
@@ -33,7 +32,7 @@ if [[ $VERSION != '11.10' && $VERSION != '12.04' ]]; then
     echo "--------------------------------------------------------------"
     echo "If you are very sure of what you are doing, you may continue and"
     echo "configure broken packages manually."
-    echo "Otherwise, please switch to Ubuntu 11.10 or 12.04."
+    echo "Otherwise, please switch to Ubuntu 14.04 or 12.04."
     echo ""
     echo "Abort? (y/n)"
     read ABORT
@@ -46,10 +45,23 @@ fi
 echo ""
 echo "Downloading and installing software!"
 echo "..."
-sudo apt-get install $PACKAGES
+
+# Certain packages have to be installed from the 12.04 repo and frozen at that version
+# First add the precise main repo to sources.list & update
+sudo mkdir /etc/apt/sources.list.d 2>/dev/null
+sudo touch /etc/apt/sources.list.d/precise.list
+echo -e "deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe" | sudo tee -a /etc/apt/sources.list.d/precise.list 1>/dev/null
+echo -e "deb-src http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe" | sudo tee -a /etc/apt/sources.list.d/precise.list 1>/dev/null
+sudo apt-get update
+
+# then install specifically from that repo and freeze the packages
+sudo apt-get -y -t=precise install $OLDPACKAGES
+sudo apt-mark hold $OLDPACKAGES
+
+sudo apt-get -y install $PACKAGES
 
 naoqi_version=$1
-robocup=robocup.bowdoin.edu:/mnt/research/robocup
+robocup=http://robocup.bowdoin.edu/public
 nbites_dir=$PWD/../..
 lib_dir=$nbites_dir/lib
 
@@ -63,18 +75,14 @@ naoqi_local=$lib_dir/naoqi-sdk-$naoqi_version-linux32
 atom_local=$lib_dir/atomtoolchain
 
 echo ""
-echo "What's your Bowdoin username?"
-read USER_NAME
-
-echo ""
 echo "Downloading and unpacking NBites files."
 
 echo "Downloading NaoQi"
 mkdir -p $lib_dir
-rsync -v $USER_NAME@$naoqi_robocup $lib_dir/
+wget $naoqi_robocup -P $lib_dir/
 
 echo "Downloading Atom toolchain"
-rsync -v $USER_NAME@$atom_robocup $lib_dir/
+wget $atom_robocup -P $lib_dir/
 
 echo "Unpacking NaoQi"
 
@@ -100,23 +108,10 @@ nbites_bash=$nbites_dir/util/scripts/nbites.bash
 echo "export NBITES_DIR=$nbites_dir" >> $nbites_bash
 echo "export AL_DIR=$naoqi_local" >> $nbites_bash
 
+echo "" >> ~/.bashrc
+echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
+echo "source $nbites_bash" >> ~/.bashrc
 echo ""
-echo "Done! The last step is just to add the following line:"
-echo "source $nbites_bash"
-echo "to your .bashrc (which is in your home directory)"
 
-echo "Would you like this to be done automatically? (y/n)"
-read AUTO
-
-if [ $AUTO == 'y' ]; then
-    echo "" >> ~/.bashrc
-    echo "#added by linux-setup.sh for RoboCup purposes" >> ~/.bashrc
-    echo "source $nbites_bash" >> ~/.bashrc
-    echo ""
-    echo "You're good to go!"
-else
-    echo ""
-    echo "Add the line manually, and you'll be all set up!"
-fi
-
-echo "NOW RESTART THE TERMINAL SO THAT .bashrc GETS RUN!"
+echo ""
+echo "One last IMPORTANT step: Restart your terminal. Then you're good to go!"
