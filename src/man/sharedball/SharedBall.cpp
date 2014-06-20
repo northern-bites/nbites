@@ -49,16 +49,19 @@ void SharedBallModule::weightedavg()
         worldModelIn[i].latch();
 
         // the goalie
-        //if(i == 0){
+        if(i == 0){
             // assumes goalie in home location: won't use at the moment
             // incorporateGoalieWorldModel(worldModelIn[i].message());
-        //}
+
+            // call function for goalie with heavier weight: 2
+            incorporateWorldModel(worldModelIn[i].message(), 2);
+        }
 
         // the other players
-        //else{
+        else{
             // want all of this info to be weighted evenly
-        incorporateWorldModel(worldModelIn[i].message());
-            //}
+            incorporateWorldModel(worldModelIn[i].message(), 1);
+        }
 
         numx = numx + x*weight;
         numy = numy + y*weight;
@@ -80,12 +83,12 @@ void SharedBallModule::weightedavg()
 
 }
 
-void SharedBallModule::incorporateWorldModel(messages::WorldModel newModel)
+void SharedBallModule::incorporateWorldModel(messages::WorldModel newModel, int weightFactor)
 {
     if(newModel.ball_on()) {
         float uncert = newModel.my_uncert();
         float dist = newModel.ball_dist();
-        weight = 1/(dist * uncert);
+        weight = weightFactor/(dist * uncert);
 
 
         float hb = TO_RAD*newModel.my_h() + TO_RAD*newModel.ball_bearing();

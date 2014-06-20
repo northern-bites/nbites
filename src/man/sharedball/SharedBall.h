@@ -32,7 +32,7 @@ public:
 
 private:
 //determines where a robot thinks the ball is and gives it a weight
-    void incorporateWorldModel(messages::WorldModel newModel);
+    void incorporateWorldModel(messages::WorldModel newModel, int weightFactor);
 
 //not used, but assumes goalie is in fixed position
     //void incorporateGoalieWorldModel(messages::WorldModel newModel);
