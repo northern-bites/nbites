@@ -105,11 +105,11 @@ ObjectFragments::ObjectFragments(Vision* vis, Threshold* thr, Field* fie,
 	// unless you get Chown's approval.  These make running the tool
 	// offline bearable
 #ifdef OFFLINE
-	POSTDEBUG = false;
+	POSTDEBUG = true;
 	CORRECT = false;
 	PRINTOBJS = false;
 	POSTLOGIC = false;
-	SANITY = false;
+	SANITY = true;
 #endif
 }
 

@@ -32,7 +32,7 @@ namespace man {
 namespace vision {
 
 #ifdef OFFLINE
-static const bool ROBOTSDEBUG = false;
+static const bool ROBOTSDEBUG = true;
 #else
 static const bool ROBOTSDEBUG = false;
 #endif
@@ -731,7 +731,20 @@ bool Robots::whiteBelow(Blob candidate) {
 	int bottom = candidate.getBottom();
 	int height = candidate.height();
 	int scanline = bottom;
-	for (int y = scanline; y < IMAGE_HEIGHT && y < scanline + height; y += 3) {
+	// first cut - if we're occluded where the robot is then this is a great sign
+	// that we have a robot - may need more work for cases where robot is far off
+	for (int x = candidate.getLeft(); x < candidate.getRight(); x++) {
+		if (field->occludingHorizonAt(x) > bottom) {
+			return true;
+		}
+	}
+	if (bottom > -1) {
+		if (debugRobots) {
+			cout << "Bad white below " << endl;
+		}
+		return false;
+	}
+	/*for (int y = scanline; y < IMAGE_HEIGHT && y < scanline + height; y += 3) {
 		int white = 0;
 		int green = 0;
 		int blue = 0;
@@ -761,7 +774,7 @@ bool Robots::whiteBelow(Blob candidate) {
 		if (white + blue / 2 > candidate.width() / 3) {
 			return true;
 		}
-	}
+		}*/
 	return false;
 }
 

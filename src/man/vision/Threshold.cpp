@@ -70,7 +70,7 @@ Threshold::Threshold(Vision* vis, boost::shared_ptr<NaoPose> posPtr)
     visualHorizonDebug = false;
     debugSelf = false;
     debugShot = false;
-    debugOpenField = false;
+    debugOpenField = true;
     debugEdgeDetection = false;
     debugHoughTransform = false;
     debugRobots = false;
@@ -899,10 +899,24 @@ void Threshold::setOpenFieldInformation() {
     // All distance estimates are to the HARD values
     estimate e;
     int start = IMAGE_WIDTH / (NUMBLOCKS * 2);
+	int edge = 0;
     for (int i = 0; i < NUMBLOCKS; i++) {
-        e = pose->pixEstimate(start, block[i], 0.0);
+		int blockpoint = edge;
+		int blockdist = field->occludingHorizonAt(edge);
+		block[i] = field->occludingHorizonAt(edge);
+		for (int j = edge; j < edge + (IMAGE_WIDTH / NUMBLOCKS); j++) {
+			if (field->occludingHorizonAt(j) > blockdist) {
+				blockdist = field->occludingHorizonAt(j);
+				blockpoint = j;
+				block[i] = blockdist;
+			}
+		}
+        /*e = pose->pixEstimate(start, block[i], 0.0);
         vision->fieldOpenings[i].hard = block[i];
-        vision->fieldOpenings[i].horizonDiffHard = block[i] - horizon;
+        vision->fieldOpenings[i].horizonDiffHard = block[i] - horizon; */
+		e = pose->pixEstimate(blockpoint, blockdist, 0.0);
+		vision->fieldOpenings[i].hard = blockdist;
+		vision->fieldOpenings[i].horizonDiffHard = blockdist - horizon;
         vision->fieldOpenings[i].dist = e.dist;
         vision->fieldOpenings[i].bearing = e.bearing;
         vision->fieldOpenings[i].elevation = e.elevation;
@@ -910,14 +924,19 @@ void Threshold::setOpenFieldInformation() {
             vision->drawPoint(start, block[i], RED);
         }
         start+= IMAGE_WIDTH / NUMBLOCKS;
+		edge+= IMAGE_WIDTH / NUMBLOCKS;
     }
 
     if (debugOpenField) {
         int chunk = IMAGE_WIDTH / NUMBLOCKS, start = 0;
         for (int i = 0; i < NUMBLOCKS; i++) {
             if (block[i] > 0) {
-                vision->drawLine(start, block[i], start + chunk, block[i], BLUE);
-                vision->drawLine(start, block[i]+1, start + chunk, block[i]+1, BLUE);
+				int blocker = block[i];
+				if (blocker > IMAGE_HEIGHT - 2) {
+					blocker = IMAGE_HEIGHT - 2;
+				}
+                vision->drawLine(start, blocker, start + chunk, blocker, BLUE);
+                vision->drawLine(start, blocker+1, start + chunk, blocker+1, BLUE);
             }
             start += chunk;
         }
