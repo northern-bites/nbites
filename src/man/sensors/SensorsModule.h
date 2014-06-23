@@ -56,6 +56,7 @@ public:
     portals::InPortal<messages::Toggle>           printInput;
 
     portals::OutPortal<messages::JointAngles>     jointsOutput_;
+    portals::OutPortal<messages::JointAngles>     currentsOutput_;
     portals::OutPortal<messages::JointAngles>     temperatureOutput_;
     portals::OutPortal<messages::ButtonState>     chestboardButtonOutput_;
     portals::OutPortal<messages::FootBumperState> footbumperOutput_;
@@ -98,6 +99,11 @@ private:
      * @brief Updates the joint angles message.
      */
     void updateJointsMessage();
+
+    /**
+     * @brief Updates the joint currents message.
+     */
+    void updateCurrentsMessage();
 
     /**
      * @brief Updates the temperatures message.

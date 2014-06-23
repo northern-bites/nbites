@@ -18,6 +18,10 @@ read SERVER_UNAME
 
 rsync -vr $SERVER_UNAME@$ROBOCUP/$FOLDER .
 
+# Must remove previous known_host for nao.local otherwise scp 
+# will fail with alert that SOMEONE IS DOING SOMETHING NASTY
+ssh-keygen -f "/home/$(whoami)/.ssh/known_hosts" -R nao.local
+
 # Copy important libraries to home folder
 echo "Copying necessary files TO THE ROBOT!"
 scp -r $FOLDER setup-robot.sh $ROBOT_UNAME@$ROBOT:

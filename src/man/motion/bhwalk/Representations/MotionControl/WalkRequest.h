@@ -56,8 +56,8 @@ public:
     none, /**< do not kick */
     left, /**< kick using the left foot */
     right, /**< kick using the right foot */
-    sidewardsLeft,
-    sidewardsRight
+    sidewardsLeft, /**<kick sideways using the left foot */
+    sidewardsRight /**<kick sideways using the right foot */
   );
 
   KickType kickType;

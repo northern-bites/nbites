@@ -3,8 +3,8 @@ from . import NavStates
 from . import NavConstants as constants
 from . import NavTransitions as navTrans
 from . import NavHelper as helper
-from objects import RobotLocation, RelRobotLocation
-from math import pi
+from objects import RobotLocation, RelLocation, RelRobotLocation
+from math import pi, sqrt
 from ..kickDecider import kicks
 from ..util import Transition
 
@@ -44,6 +44,7 @@ class Navigator(FSA.FSA):
         self.setName('Navigator')
         self.setPrintStateChanges(True)
         self.stateChangeColor = 'cyan'
+        self.destination = None # Used to set walking_to in world model proto
 
         #transitions
         #@todo: move this to the actual transitions file?
@@ -85,19 +86,14 @@ class Navigator(FSA.FSA):
         NavStates.scriptedMove.sweetMove = move
         self.switchTo('scriptedMove')
 
-    def positionPlaybook(self):
-        """
-        Calls goTo on the playbook position
-        """
-        self.goTo(self.brain.play.getPositionCoord(), precision = PLAYBOOK,
-                  speed = QUICK_SPEED, avoidObstacles = True, fast = True, pb = True)
-
     def chaseBall(self, speed = FAST_SPEED, fast = False):
         """
         Calls goTo on ball, which should be a RobotLocation.
 
         Theoretically walks into the ball, so make sure to switch the behavior beforehand.
         """
+        self.destination = self.brain.ball
+
         self.goTo(self.brain.ball, CLOSE_ENOUGH, speed, True, fast = fast)
 
     def goTo(self, dest, precision = GENERAL_AREA, speed = FULL_SPEED,
@@ -143,6 +139,7 @@ class Navigator(FSA.FSA):
         requested heading until we are actually close to the (x, y) position, so we can
         walk fast to the destination then correct heading once we get there.
         """
+        self.destination = dest
 
         # Debug prints for motion status (seeking the walking not walking bug)
         if DEBUG_MOTION_STATUS:
@@ -166,9 +163,42 @@ class Navigator(FSA.FSA):
 
     def updateDest(self, dest, speed = KEEP_SAME_SPEED):
         """  Update the destination we're headed to   """
+        self.destination = dest
+
         NavStates.goToPosition.dest = dest
         if speed is not KEEP_SAME_SPEED:
             NavStates.goToPosition.speed = speed
+
+    def destinationWalkTo(self, walkToDest, speed = FULL_SPEED, pedantic = False):
+        """
+        Walks to a RelRobotLocation via B-Human destination walking.
+        Great for close destinations (since odometry gets bad over time) in
+        case loc is bad.
+        Doesn't avoid obstacles! (that would make it very confused and odometry
+        very bad, especially if we're being pushed).
+        Switches to standing at the end.
+        """
+        if not isinstance(walkToDest, RelRobotLocation):
+            raise TypeError, "walkToDest must be a RelRobotLocation"
+        
+        self.destination = walkToDest
+
+        NavStates.destinationWalkingTo.destQueue.clear()
+
+        NavStates.destinationWalkingTo.destQueue.append(walkToDest)
+        NavStates.destinationWalkingTo.speed = speed
+        NavStates.destinationWalkingTo.pedantic = pedantic
+
+        #reset the counter to make sure walkingTo.firstFrame() is true on entrance
+        #in case we were in destinationWalkingTo before as well
+        self.counter = 0
+        self.switchTo('destinationWalkingTo')
+
+    def updateDestinationWalkDest(self, dest):
+        """  Update the destination we're headed to   """
+        self.destination = dest
+
+        NavStates.destinationWalkingTo.destQueue.append(dest)
 
     def walkTo(self, walkToDest, speed = FULL_SPEED):
         """
@@ -184,6 +214,8 @@ class Navigator(FSA.FSA):
         if not isinstance(walkToDest, RelRobotLocation):
             raise TypeError, "walkToDest must be a RelRobotLocation"
 
+        self.destination = walkToDest
+
         NavStates.walkingTo.destQueue.clear()
 
         NavStates.walkingTo.destQueue.append(walkToDest)
@@ -198,48 +230,37 @@ class Navigator(FSA.FSA):
         This is the same as standing because to end a walk
         we just make it stand
         """
+        self.destination = None
+
         if self.currentState not in ['stopped', 'stand', 'standing']:
             self.stand()
-
-    def orbitAngle(self, radius, angle):
-        """
-        Orbits a point at a certain radius for a certain angle using walkTo commands.
-        Splits the command into multiple smaller commands
-        Don't rely on it too much since it depends on the odometry of strafes
-        and turns which slips a lot
-        It will orbit in steps, each orbit taking ~30 degrees (more like 45
-        when I test it out)
-        TODO: please change this to just use a velocity walk -Octavian
-        """
-
-        NavStates.walkingTo.destQueue.clear()
-
-        #@todo: make this a bit nicer or figure out a better way to do it
-        # split it up in 15 degree moves; good enough approximation for small radii
-        for k in range(0, abs(angle) / 15):
-            if angle > 0:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, radius / 6, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, -15))
-            else:
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, -radius / 6, 0.0))
-                NavStates.walkingTo.destQueue.append(RelRobotLocation(0.0, 0.0, 15))
-
-        NavStates.walkingTo.speed = FAST_SPEED
-        self.switchTo('walkingTo')
 
     def walk(self, x, y, theta):
         """
         Starts a new velocity walk command.
         Does nothing if it the velocities the same as the current velocities.
         """
+        self.destination = RelLocation(x, y)
+
         NavStates.walking.speeds = (x, y, theta)
         self.switchTo('walking')
+
+    def doMotionKick(self, player, ball_rel_x, ball_rel_y, kick):
+        """
+        Enques a motion kick. Does not transition to an FSA state, so that
+        motion kicking can be done with any of our walks.
+        """
+        self.destination = RelLocation(ball_rel_x, ball_rel_y)
+
+        helper.createAndSendMotionKickVector(player, ball_rel_x, ball_rel_y, kick)
 
     def stand(self):
         """
         Make the robot stand. Standing should be the default action when we're not
         walking/executing a sweet move.
         """
+        self.destination = None
+
         self.switchTo('stand')
 
     # informative methods

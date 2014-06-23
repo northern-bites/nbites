@@ -35,6 +35,8 @@
 #include <stdint.h>
 #include <iostream>
 #include <list>
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace man {
 namespace log {

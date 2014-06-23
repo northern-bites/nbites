@@ -73,6 +73,7 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
     sensors.printInput.wireTo(&guardian.printJointsOutput, true);
 
     motion.jointsInput_.wireTo(&sensors.jointsOutput_);
+    motion.currentsInput_.wireTo(&sensors.currentsOutput_);
     motion.inertialsInput_.wireTo(&sensors.inertialsOutput_);
     motion.fsrInput_.wireTo(&sensors.fsrOutput_);
     motion.stiffnessInput_.wireTo(&guardian.stiffnessControlOutput, true);

@@ -73,6 +73,7 @@ namespace motion
 
         virtual void calculateNextJointsAndStiffnesses(
             std::vector<float>&            sensorAngles,
+            std::vector<float>&            sensorCurrents,
             const messages::InertialState& sensorInertials,
             const messages::FSR&           sensorFSRs
             ) = 0;
@@ -98,17 +99,6 @@ namespace motion
 
         const std::string getName() const {return provider_name;}
         const ProviderType getType() const {return provider_type;}
-
-        virtual const SupportFoot getSupportFoot() const {
-            // the default return value for all providers is left foot
-            // some providers which can supply more meaningful info, like the
-            // walk engine, override this method.
-            // TODO: technically, the head provider (which extends this class)
-            //       should have no idea what the current support foot is.
-            //       As a consolation, you should know that it will never be asked
-            //       about it anyway.
-            return LEFT_SUPPORT;
-        }
 
     protected:
         void setNextChainJoints(const Kinematics::ChainID id,

@@ -189,6 +189,32 @@ def briefStand(nav):
 
     return nav.stay()
 
+def destinationWalkingTo(nav):
+    """
+    State to be used for destination walking.
+    """
+    if nav.firstFrame():
+        destinationWalkingTo.enqueAZeroVector = False
+        return nav.stay()
+
+    if len(destinationWalkingTo.destQueue) > 0:
+        dest = destinationWalkingTo.destQueue.popleft()
+        helper.setDestination(nav, dest, 
+                              destinationWalkingTo.speed, 
+                              destinationWalkingTo.pedantic)
+        destinationWalkingTo.enqueAZeroVector = True
+        return nav.stay()
+    elif destinationWalkingTo.enqueAZeroVector:
+        helper.setDestination(nav, RelRobotLocation(0,0,0), 
+                              destinationWalkingTo.speed, 
+                              destinationWalkingTo.pedantic)
+        destinationWalkingTo.enqueAZeroVector = False
+
+    return nav.stay()
+
+destinationWalkingTo.destQueue = deque()
+destinationWalkingTo.speed = 0
+
 def walkingTo(nav):
     """
     State to be used for odometry walking.
@@ -226,6 +252,19 @@ def walking(nav):
 walking.speeds = constants.ZERO_SPEEDS     # current walking speeds
 walking.lastSpeeds = constants.ZERO_SPEEDS # useful for knowing if speeds changed
 walking.transitions = {}
+
+# State to be called by walkAndKick in navigator.py
+def walkingAndKicking(nav):
+    """
+    State to be used for velocity walking AND motion kicking.
+    """
+
+    if ((walking.speeds != walking.lastSpeeds)
+        or not nav.brain.interface.motionStatus.walk_is_active):
+        helper.createAndSendMotionKickVector(nav, *walking.speeds)
+    walking.lastSpeeds = walking.speeds
+
+    return Transition.getNextState(nav, walking)
 
 ### Stopping States ###
 def stopped(nav):

@@ -13,6 +13,7 @@ set( bhwalk_srcs
     Modules/Sensing/TorsoMatrixProvider.cpp
     Modules/Sensing/RobotModelProvider.cpp
     Modules/Sensing/FallDownStateDetector.cpp
+    Modules/Sensing/GroundContactDetector.cpp
     Modules/Sensing/InertiaSensorCalibrator.cpp
     Modules/Sensing/InertiaSensorFilter.cpp
     Modules/Sensing/InertiaSensorInspector.cpp

@@ -2,6 +2,7 @@ from .. import SweetMoves
 from ..headTracker import HeadMoves
 import ChaseBallConstants as constants
 import noggin_constants as NogginConstants
+import ClaimTransitions as claimTrans
 from math import fabs
 
 ####### CHASING STUFF ##############
@@ -12,6 +13,19 @@ def shouldChaseBall(player):
     """
     ball = player.brain.ball
     return (ball.vis.frames_on > constants.BALL_ON_THRESH)
+
+def shouldReturnHome(player):
+    """
+    The ball is no longer our responsibility. Go home.
+    player.buffBoxFiltered is a CountTransition, see approachBall.
+
+    If the ball IS in our box, check the claims for a higher priority claim
+    """
+    if player.buffBoxFiltered.checkCondition(player):
+        player.claimedBall = False
+        return True;
+
+    return claimTrans.shouldCedeClaim(player)
 
 def shouldPrepareForKick(player):
     """
@@ -44,7 +58,7 @@ def shouldApproachBallAgain(player):
     The ball got really far away somehow
     """
     ball = player.brain.ball
-    return ball.vis.on and ball.stat_distance > constants.APPROACH_BALL_AGAIN_DIST
+    return ball.vis.on and ball.distance > constants.APPROACH_BALL_AGAIN_DIST
 
 def shouldRedecideKick(player):
     """
@@ -57,12 +71,12 @@ def ballInPosition(player, kickPose):
     Make sure ball is somewhere we will kick it. Also makes sure we're looking
     at the ball.
     """
-    if player.brain.ball.vis.frames_on < 4:
+    if not player.brain.ball.vis.on:
         return False
 
-    #Get the current kick sweet spot information
-
-    return (fabs(kickPose.relX) < constants.BALL_X_OFFSET and
+    # NOTE don't take the absolute value of kickPose.relX because being too
+    # close to the ball is not a problem for kicking
+    return (kickPose.relX < constants.BALL_X_OFFSET and
             fabs(kickPose.relY) < constants.BALL_Y_OFFSET and
             fabs(kickPose.relH) < constants.GOOD_ENOUGH_H)
 
@@ -154,14 +168,14 @@ def shouldFindBallPosition(player):
 
 def ballMoved(player):
     """
-    Ball has moved away from where it was seen when positioning. We probably
-    dribbled through it.
+    Ball has moved away from where it was seen when positioning and we haven't
+    yet kicked it (we kick at counter == 30). We probably walked into it.
     """
     ball = player.brain.ball
     ballBefore = player.ballBeforeKick
-    return (ball.vis.frames_off > 15 or
+    return (player.counter < 30 and (ball.vis.frames_off > 15 or
             fabs(ball.rel_x - ballBefore.rel_x) > constants.BALL_MOVED_THR or
-            fabs(ball.rel_y - ballBefore.rel_y) > constants.BALL_MOVED_THR)
+            fabs(ball.rel_y - ballBefore.rel_y) > constants.BALL_MOVED_THR))
 
 def shouldSpinFindBall(player):
     """

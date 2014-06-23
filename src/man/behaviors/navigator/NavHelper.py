@@ -1,9 +1,9 @@
 from math import fabs, sqrt
 from ..util import MyMath
+from ..kickDecider import kicks
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
-# TODO: Import CommandType properly.
-#import PMotion_proto
+# TODO import CommandType properly
 
 def stand(nav):
     """
@@ -66,16 +66,17 @@ def adaptSpeed(distance, cutoffDistance, maxSpeed):
     return min(maxSpeed, (distance/cutoffDistance)*maxSpeed)
 #    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
-def setDestination(nav, dest, gain = 1.0):
+def setDestination(nav, dest, gain = 1.0, pedantic = False):
     """
     Method to set the next destination walk command
-    See MotionModule.h for more info on the odometry walk command
+    See MotionModule.h for more info on the destination walk command
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.DESTINATION_WALK #Destination Walk
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
+    command.dest.pedantic = pedantic
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
@@ -114,6 +115,22 @@ def createAndSendWalkVector(nav, x, y, theta):
     command.speed.h_percent = theta
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
+
+def createAndSendMotionKickVector(nav, ball_rel_x, ball_rel_y, kick):
+    command = nav.brain.interface.bodyMotionCommand
+
+    command.dest.kick.perform_motion_kick = True
+    command.dest.kick.ball_rel_x = ball_rel_x
+    command.dest.kick.ball_rel_y = ball_rel_y
+
+    if kick == kicks.M_LEFT_SIDE:
+        command.dest.kick.kick_type = 0
+    elif kick == kicks.M_RIGHT_SIDE:
+        command.dest.kick.kick_type = 1
+    elif kick == kicks.M_LEFT_STRAIGHT:
+        command.dest.kick.kick_type = 2
+    elif kick == kicks.M_RIGHT_STRAIGHT:
+        command.dest.kick.kick_type = 3
 
 def executeMove(nav, sweetMove):
     """

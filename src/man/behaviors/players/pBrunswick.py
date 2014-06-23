@@ -1,112 +1,67 @@
 import time
 
 from . import SoccerFSA
+from . import FallControllerStates
+from . import RoleSwitchingStates
+from . import GameControllerStates
+from . import BrunswickStates
 from . import ChaseBallStates
 from . import PositionStates
 from . import PenaltyStates
 from . import FindBallStates
 from . import KickingStates
-from . import PenaltyKickStates
-from . import GoaliePositionStates
-from . import GoalieSaveStates
-from . import BrunswickStates
 from . import DribbleStates
+from . import BoxPositionStates
 
 import noggin_constants as NogginConstants
-from ..playbook import PBConstants
+
+from . import BoxPositionConstants as BPConstants
 
 from objects import Location
 
-COUNT_FPS = False
-
 class SoccerPlayer(SoccerFSA.SoccerFSA):
     def __init__(self, brain):
+        ### ADD STATES AND NAME FSA ###
         SoccerFSA.SoccerFSA.__init__(self,brain)
-        self.addStates(PenaltyKickStates)
-        self.addStates(GoaliePositionStates)
-        self.addStates(GoalieSaveStates)
+        self.addStates(FallControllerStates)
+        self.addStates(GameControllerStates)
+        self.addStates(RoleSwitchingStates)
+        self.addStates(BrunswickStates)
+        self.addStates(BoxPositionStates)
         self.addStates(PositionStates)
         self.addStates(PenaltyStates)
+        self.addStates(ChaseBallStates)
+        self.addStates(DribbleStates)
         self.addStates(FindBallStates)
         self.addStates(KickingStates)
-        self.addStates(ChaseBallStates)
-        self.addStates(BrunswickStates)
-        self.addStates(DribbleStates)
-
         self.setName('pBrunswick')
+        self.currentState = 'fallController' # initial state
 
+        ### THE STATE OF THE PLAYER ###
         self.inKickingState = False
-
-        #GOALIE COUNTERS AND BOOLEANS
-        # Counters for goalie dive decision making
-        self.counterRightSave = 0
-        self.counterLeftSave = 0
-        self.counterCenterSave = 0
-
-        self.isSaving = False
-        self.shouldSaveCounter = 0
-
-        #END GOALIE COUNTERS AND BOOLEANS
+        self.role = brain.playerNumber
+        # Initialized for the sake of those who aren't
+        self.isKickingOff = False
+        #Figure out home & kickoff, even/odd player.
+        #All that good stuff...
+        BPConstants.setRoleConstants(self, self.role)
 
         self.frameCounter = 0
-
         self.shouldRelocalizeCounter = 0
-
         # Penalty kick player variables
         self.penaltyKicking = False
-
         # Kickoff kick
         self.shouldKickOff = False
-
-    def run(self):
-        self.play = self.brain.play
-        gcState = self.gameState
-
-        if (gcState == 'gamePlaying' and
-            not self.currentState == 'afterPenalty' and
-            not self.currentState == 'gamePenalized' and
-            not self.currentState == 'gamePlaying'):
-
-            self.shouldKickOff = False
-
-            roleState = self.getNextState()
-
-            if roleState != self.currentState:
-                self.switchTo(roleState)
-
-        # takes our average fps over 1000 frames (without profiling)
-        if COUNT_FPS:
-            if self.counter == 0:
-                self.startTime = time.time()
-                print "time at start: {0}".format(self.startTime)
-            if self.counter == 1000:
-                self.stopTime = time.time()
-                print "time at end: {0}".format(self.stopTime)
-                print "{0} s for 1000 frames = {1} fps" \
-                      .format(self.stopTime - self.startTime,
-                              1000/(self.stopTime - self.startTime))
-
-        SoccerFSA.SoccerFSA.run(self)
-
-    def getNextState(self):
-        if not self.brain.play.changed:
-            return self.currentState
-
-        elif self.inKickingState:
-            return self.currentState
-
-        else:
-            return self.getRoleState()
-
-    def getRoleState(self):
-        if self.play.isRole(PBConstants.CHASER):
-            if self.brain.gameController.timeSincePlaying < 10:
-                if (self.brain.gameController.ownKickOff):
-                    self.shouldKickOff = True
-
-                return 'kickoff'
-            return 'chase'
-        elif self.brain.gameController.penalized:
-            return 'gamePenalized'
-        else:
-            return 'playbookPosition'
+        # To keep track of when we are coming out of penalty
+        self.wasPenalized = False
+        # Controls whether we check for a falling/fallen robot
+        self.brain.fallController.enabled = True
+        # Controls whether we want to dribble it from the corner
+        self.corner_dribble = False
+        # Controls whether we do a motion kick
+        self.motionKick = False
+        # Controls whether we will role switch
+        self.roleSwitching = False
+        # Controls whether we use claims
+        self.useClaims = True
+        self.returningFromPenalty = False

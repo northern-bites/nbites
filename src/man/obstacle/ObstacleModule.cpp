@@ -37,6 +37,10 @@ void ObstacleModule::run_()
 
     portals::Message<messages::Obstacle> current(0);
 
+// #ifdef USING_LAB_FIELD // Walls are too close to field for sonar use
+    sonars = Obstacle::NONE;
+// #endif
+
     // How do we combine the two decisions?
     // If they agree, easy
     if (arms == sonars)
