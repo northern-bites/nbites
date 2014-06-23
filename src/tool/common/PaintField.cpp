@@ -7,7 +7,6 @@ PaintField::PaintField(QWidget* parent, float scaleFactor_) :
     QWidget(parent),
     scaleFactor(scaleFactor_)
 {
-
 }
 
 void PaintField::run_()

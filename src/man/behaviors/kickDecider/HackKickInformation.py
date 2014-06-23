@@ -738,6 +738,12 @@ class KickInformation:
             return kicks.LEFT_SHORT_STRAIGHT_KICK
         return kicks.RIGHT_SHORT_STRAIGHT_KICK
 
+    def chooseFrontMotionKick(self):
+        self.brain.player.motionKick = True
+        if self.kickWithLeftFoot():
+            return kicks.M_LEFT_STRAIGHT
+        return kicks.M_RIGHT_STRAIGHT
+
     def chooseQuickFrontKick(self):
         # If our goalie is inactive, always use short front kicks.
         # If we are using loc-based kicks, ignore the above.

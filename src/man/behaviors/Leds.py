@@ -1,4 +1,3 @@
-from playbook import PBConstants
 import noggin_constants as NogginConstants
 import GameController
 
@@ -225,20 +224,21 @@ class Leds():
                     else:
                         self.executeLeds(PINK_GOAL_LEDS)
 
-        if PLAYBOOK_LEDS:
-            if self.brain.playbook.roleChanged():
-                if self.brain.play.isRole(PBConstants.CHASER):
-                    self.executeLeds(CHASER_ON_LEDS)
-                elif self.brain.play.isRole(PBConstants.OFFENDER):
-                    self.executeLeds(OFFENDER_ON_LEDS)
-                elif self.brain.play.isRole(PBConstants.MIDDIE):
-                    self.executeLeds(MIDDIE_ON_LEDS)
-                elif self.brain.play.isRole(PBConstants.DEFENDER):
-                    self.executeLeds(DEFENDER_ON_LEDS)
-                elif self.brain.play.isRole(PBConstants.GOALIE):
-                    self.executeLeds(GOALIE_ON_LEDS)
-                else:
-                    self.executeLeds(ROLE_OFF_LEDS)
+        # TODO when roleswitching happens, this should be set up again
+        # if PLAYBOOK_LEDS:
+        #     if self.brain.playbook.roleChanged():
+        #         if self.brain.play.isRole(PBConstants.CHASER):
+        #             self.executeLeds(CHASER_ON_LEDS)
+        #         elif self.brain.play.isRole(PBConstants.OFFENDER):
+        #             self.executeLeds(OFFENDER_ON_LEDS)
+        #         elif self.brain.play.isRole(PBConstants.MIDDIE):
+        #             self.executeLeds(MIDDIE_ON_LEDS)
+        #         elif self.brain.play.isRole(PBConstants.DEFENDER):
+        #             self.executeLeds(DEFENDER_ON_LEDS)
+        #         elif self.brain.play.isRole(PBConstants.GOALIE):
+        #             self.executeLeds(GOALIE_ON_LEDS)
+        #         else:
+        #             self.executeLeds(ROLE_OFF_LEDS)
 
         if LOC_LEDS:
             newLocScore = self.locScore(self.brain.locUncert)

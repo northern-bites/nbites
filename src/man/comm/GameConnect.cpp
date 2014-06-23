@@ -146,7 +146,7 @@ void GameConnect::fillMessage(messages::GameState* msg,
     msg->set_state(control.state);
     msg->set_first_half(control.firstHalf);
     msg->set_kick_off_team(control.kickOffTeam);
-    msg->set_secondary_state(control.secondaryState);
+    msg->set_secondary_state(control.secondaryState); // TODO timeouts
     msg->set_drop_in_team(control.dropInTeam);
     msg->set_drop_in_time(control.dropInTime);
     msg->set_secs_remaining(control.secsRemaining);
@@ -166,7 +166,7 @@ void GameConnect::fillTeam(messages::TeamInfo* msg,
     msg->set_team_number(team.teamNumber);
     msg->set_team_color(team.teamColour);
     msg->set_score(team.score);
-    msg->set_goal_color(team.goalColour);
+    msg->set_goal_color(0); // TODO get rid of this
 
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {

@@ -5,54 +5,37 @@
 
 from ..headTracker import HeadMoves
 from .. import SweetMoves
+from ..util import *
 
+@superState('gameControllerResponder')
 def gameInitial(player):
     if player.firstFrame():
         player.gainsOn()
         player.brain.nav.stand()
-        player.brain.fallController.enabled = False
+        player.runfallController = False
     return player.stay()
 
+@superState('gameControllerResponder')
 def gameReady(player):
     if player.firstFrame():
         player.brain.nav.stand()
-        player.brain.fallController.enabled = False
     return player.stay()
 
+@superState('gameControllerResponder')
 def gameSet(player):
-    if player.firstFrame():
-        player.brain.nav.stand()
-        player.brain.fallController.enabled = False
     return player.stay()
 
+@superState('gameControllerResponder')
 def gamePlaying(player):
-    if player.firstFrame():
-        player.brain.fallController.enabled = False
-    return player.goLater('wait')
+    return player.goNow('kick')
 
+@superState('gameControllerResponder')
 def gamePenalized(player):
-    if player.firstFrame():
-        player.brain.fallController.enabled = False
-
-    return player.goLater('restore')
-
-def wait(player):
-    if player.firstFrame():
-        player.brain.nav.stand()
-
-    if player.counter == 100:
-        return player.goLater('dive')
     return player.stay()
 
-def dive(player):
+@superState('gameControllerResponder')
+def kick(player):
     if player.firstFrame():
-        player.brain.tracker.performHeadMove(HeadMoves.OFF_HEADS)
-        player.executeMove(SweetMoves.GOALIE_DIVE_RIGHT)
-
-    return player.stay()
-
-def restore(player):
-    if player.firstFrame():
-        player.executeMove(SweetMoves.GOALIE_ROLL_OUT_RIGHT)
+        player.executeMove(SweetMoves.LEFT_STRAIGHT_KICK)
 
     return player.stay()

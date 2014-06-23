@@ -4,7 +4,7 @@ from ..headTracker.HeadMoves import (FIXED_PITCH_LEFT_SIDE_PAN,
                                       FIXED_PITCH_SLOW_GOALIE_PAN)
 #from vision import certainty
 from ..navigator import Navigator as nav
-from ..util import Transition
+from ..util import *
 #import goalie
 from GoalieConstants import RIGHT, LEFT, UNKNOWN
 import GoalieTransitions
@@ -18,6 +18,7 @@ from math import fabs, degrees, radians, sin, cos
 from ..kickDecider import kicks
 import noggin_constants as Constants
 
+@superState('gameControllerResponder')
 def walkToGoal(player):
     """
     Has the goalie walk in the general direction of the goal.
@@ -30,6 +31,7 @@ def walkToGoal(player):
 
     return Transition.getNextState(player, walkToGoal)
 
+@superState('gameControllerResponder')
 def spinAtGoal(player):
     if player.firstFrame():
         spinAtGoal.home = RelRobotLocation(0, 0, 0)
@@ -45,6 +47,7 @@ def spinAtGoal(player):
 
     return Transition.getNextState(player, spinAtGoal)
 
+@superState('gameControllerResponder')
 def backUpForDangerousBall(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
@@ -53,16 +56,17 @@ def backUpForDangerousBall(player):
     return Transition.getNextState(player, backUpForDangerousBall)
 
 # clearIt->kickBall->didIKickIt->returnToGoal
+@superState('gameControllerResponder')
 def clearIt(player):
     if player.firstFrame():
         player.brain.tracker.trackBall()
         if clearIt.dangerousSide == -1:
             if player.brain.ball.rel_y < 0.0:
                 player.side = RIGHT
-                player.kick = kicks.RIGHT_STRAIGHT_KICK
+                player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
             else:
                 player.side = LEFT
-                player.kick = kicks.LEFT_STRAIGHT_KICK
+                player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
         elif clearIt.dangerousSide == RIGHT:
             player.side = RIGHT
             player.kick = kicks.RIGHT_SIDE_KICK
@@ -96,11 +100,13 @@ def clearIt(player):
 
     return Transition.getNextState(player, clearIt)
 
+@superState('gameControllerResponder')
 def didIKickIt(player):
     if player.firstFrame():
         player.brain.nav.stop()
     return Transition.getNextState(player, didIKickIt)
 
+@superState('gameControllerResponder')
 def spinToFaceBall(player):
     facingDest = RelRobotLocation(0.0, 0.0, 0.0)
     if player.brain.ball.bearing_deg < 0.0:
@@ -118,12 +124,14 @@ def spinToFaceBall(player):
 
     return Transition.getNextState(player, spinToFaceBall)
 
+@superState('gameControllerResponder')
 def waitToFaceField(player):
     if player.firstFrame():
         player.brain.tracker.lookToAngle(0)
 
     return Transition.getNextState(player, waitToFaceField)
 
+@superState('gameControllerResponder')
 def returnToGoal(player):
     if player.firstFrame():
         if player.lastDiffState == 'didIKickIt':
@@ -146,6 +154,7 @@ def returnToGoal(player):
 
     return Transition.getNextState(player, returnToGoal)
 
+@superState('gameControllerResponder')
 def repositionAfterWhiff(player):
     if player.firstFrame():
         # reset odometry
@@ -155,9 +164,9 @@ def repositionAfterWhiff(player):
         if player.kick in [kicks.RIGHT_SIDE_KICK, kicks.LEFT_SIDE_KICK]:
             pass
         elif player.brain.ball.rel_y < 0.0:
-            player.kick = kicks.RIGHT_STRAIGHT_KICK
+            player.kick = kicks.RIGHT_SHORT_STRAIGHT_KICK
         else:
-            player.kick = kicks.LEFT_STRAIGHT_KICK
+            player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
 
         kickPose = player.kick.getPosition()
         repositionAfterWhiff.ballDest = RelRobotLocation(player.brain.ball.rel_x -

@@ -4,6 +4,7 @@ This file contains an implementation of a finite state automaton.
 import time
 
 DEBUG = False
+COUNT_FPS = False
 
 # Should I stay? Or should I go?
 THIS_FRAME = True
@@ -54,6 +55,10 @@ class FSA:
 
         self.getTime = time.time
 
+        # Used in the defaultState decorator-returning function to create
+        # hierarchical state machines, see util/Transition.py
+        self.ignoreDefaultState = False
+
         #debug switches
         self.stateChangeColor = ''
         self.printStateChanges = False
@@ -75,6 +80,18 @@ class FSA:
     def run(self):
         """ Called once every frame by Brain.
         Controls the flow of states for the current frame."""
+
+        # takes our average fps over 1000 frames (without profiling)
+        if COUNT_FPS:
+            if self.counter == 0:
+                self.startTime = time.time()
+                print "time at start: {0}".format(self.startTime)
+            if self.counter == 1000:
+                self.stopTime = time.time()
+                print "time at end: {0}".format(self.stopTime)
+                print "{0} s for 1000 frames = {1} fps" \
+                      .format(self.stopTime - self.startTime,
+                              1000/(self.stopTime - self.startTime))
 
         stayInFrame = True
         # Switches through states until one relinquishes control of the frame

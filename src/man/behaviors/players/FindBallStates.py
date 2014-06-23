@@ -1,32 +1,17 @@
 import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
+from ..util import *
 from objects import Location
 
+@superState('gameControllerResponder')
 def findBall(player):
     """
-    State to stop all activity and begin finding the ball
+    State to spin to find the ball.
     """
-    if transitions.shouldChaseBall(player):
-        if not player.brain.play.isChaser():
-            return player.goLater('playbookPosition')
-        else:
-            return player.goLater('chase')
-
-    return player.goNow('spinFindBall')
-
-def spinFindBall(player):
-    """
-    State to spin to find the ball. If we find the ball, we
-    move to align on it. If we don't find it, we walk to look for it
-    """
-    if transitions.shouldChaseBall(player):
-        player.stopWalking()
-        player.brain.tracker.trackBall()
-        return player.goLater('findBall')
-
     if player.firstFrame():
         player.brain.tracker.stopHeadMoves()
         player.stopWalking()
+        player.inKickingState = False
 
     if player.brain.nav.isStopped() and player.brain.tracker.isStopped():
         my = player.brain.loc
@@ -36,8 +21,12 @@ def spinFindBall(player):
 
         player.brain.tracker.spinPan()
 
-    if ((player.brain.play.isChaser() and transitions.shouldWalkFindBall(player))
-        or (not player.brain.play.isChaser() and transitions.spunOnce(player))):
-        return player.goLater('playbookPosition')
+    if transitions.shouldChaseBall(player):
+        player.stopWalking()
+        player.brain.tracker.trackBall()
+        return player.goLater('approachBall')
+
+    if transitions.spunOnce(player):
+        return player.goLater('positionAtHome')
 
     return player.stay()

@@ -36,7 +36,7 @@ protected:
         messages::TeamInfo *blue = testData.add_team();
         blue->set_team_number(16);
         blue->set_team_color(TEAM_BLUE);
-        blue->set_goal_color(GOAL_YELLOW);
+        blue->set_goal_color(1); // TODO eliminate goal color
 
         messages::RobotInfo *bot;
         for(int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
@@ -48,7 +48,7 @@ protected:
         messages::TeamInfo *red = testData.add_team();
         red->set_team_number(15);
         red->set_team_color(TEAM_RED);
-        red->set_goal_color(GOAL_YELLOW);
+        red->set_goal_color(1); // TODO eliminate goal color
 
         for(int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
         {

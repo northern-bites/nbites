@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <string>
+#include <iostream>
 
 #include "bhuman.h"
 
@@ -91,9 +92,11 @@ bool hasPassed(const Pose2D& p1, const Pose2D& p2) {
  */
 void BHWalkProvider::calculateNextJointsAndStiffnesses(
     std::vector<float>&            sensorAngles,
+    std::vector<float>&            sensorCurrents,
     const messages::InertialState& sensorInertials,
     const messages::FSR&           sensorFSRs
-    ) {
+    ) 
+{
 
     PROF_ENTER(P_WALK);
 
@@ -204,7 +207,25 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
             motionRequest.walkRequest.target.translation.x = command->x_mm;
             motionRequest.walkRequest.target.translation.y = command->y_mm;
 
-            //motionRequest.walkRequest.pedantic = true;
+            motionRequest.walkRequest.pedantic = command->pedantic;
+
+            // Let's do some motion kicking!
+            if (command->motionKick) {
+                if (command->kickType == 0) {
+                    motionRequest.walkRequest.kickType = WalkRequest::sidewardsLeft;
+                }
+                else if (command->kickType == 1) {
+                    motionRequest.walkRequest.kickType = WalkRequest::sidewardsRight;
+                }
+                else if (command->kickType == 2) {
+                    motionRequest.walkRequest.kickType = WalkRequest::left;
+                }
+                else {
+                    motionRequest.walkRequest.kickType = WalkRequest::right;
+                }
+                motionRequest.walkRequest.kickBallPosition.x = command->kickBallRelX;
+                motionRequest.walkRequest.kickBallPosition.y = command->kickBallRelY;
+            }
 
             walkingEngine.theMotionRequest = motionRequest;
         }
@@ -220,9 +241,7 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     }
     }
 
-    //We only copy joint position, and not temperatures or currents
-    //Note: temperatures are unused, and currents are used by the GroundContactDetector
-    //which is not used right now
+    //We do not copy temperatures because they are unused
     JointData& bh_joint_data = walkingEngine.theJointData;
 
     for (int i = 0; i < JointData::numOfJoints; i++)
@@ -231,6 +250,11 @@ void BHWalkProvider::calculateNextJointsAndStiffnesses(
     }
 
     SensorData& bh_sensors = walkingEngine.theSensorData;
+
+    for (int i = 0; i < JointData::numOfJoints; i++)
+    {
+        bh_sensors.currents[nb_joint_order[i]] = sensorCurrents[i];
+    }
 
     bh_sensors.data[SensorData::gyroX] = sensorInertials.gyr_x();
     bh_sensors.data[SensorData::gyroY] = sensorInertials.gyr_y();
@@ -379,14 +403,6 @@ void BHWalkProvider::setCommand(const DestinationCommand::ptr command) {
     currentCommand = command;
 
     active();
-}
-
-const SupportFoot BHWalkProvider::getSupportFoot() const {
-    if (walkingEngine.getSupportLeg() == 0) {//TODO: WalkingEngine::left) {
-        return LEFT_SUPPORT;
-    } else {
-        return RIGHT_SUPPORT;
-    }
 }
 
 bool BHWalkProvider::calibrated() const {

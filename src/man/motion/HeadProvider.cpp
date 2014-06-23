@@ -48,6 +48,7 @@ void HeadProvider::hardReset()
 
 void HeadProvider::calculateNextJointsAndStiffnesses(
     std::vector<float>&            sensorAngles,
+    std::vector<float>&            sensorCurrents,
     const messages::InertialState& sensorInertials,
     const messages::FSR&           sensorFSRs
     )
