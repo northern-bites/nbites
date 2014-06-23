@@ -227,31 +227,35 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         // create a WorldModel with data from splMessage
         // @TODO: check that all the fields are correct
         portals::Message<messages::WorldModel> model(0);
+        messages::WorldModel *message = model.get();
 
-        model.get()->set_timestamp(teamMessage.get()->payload().timestamp());
+        message->set_timestamp(teamMessage.get()->payload().timestamp());
 
         playerNum = splMessage.playerNum;
-        model.get()->set_fallen(splMessage.fallen);
+        message->set_fallen(splMessage.fallen);
 
-        model.get()->set_my_x(splMessage.pose[0]*MM_TO_CM);
-        model.get()->set_my_y(splMessage.pose[1]*MM_TO_CM);
-        model.get()->set_my_h(splMessage.pose[2]*TO_RAD);
+        message->set_my_x(splMessage.pose[0]*MM_TO_CM);
+        message->set_my_y(splMessage.pose[1]*MM_TO_CM);
+        message->set_my_h(splMessage.pose[2]*TO_RAD);
 
-        model.get()->set_walking_to_x(splMessage.walkingTo[0]*MM_TO_CM);
-        model.get()->set_walking_to_y(splMessage.walkingTo[1]*MM_TO_CM);
+        message->set_walking_to_x(splMessage.walkingTo[0]*MM_TO_CM);
+        message->set_walking_to_y(splMessage.walkingTo[1]*MM_TO_CM);
 
-        model.get()->set_kicking_to_x(splMessage.shootingTo[0]*MM_TO_CM);
-        model.get()->set_kicking_to_y(splMessage.shootingTo[1]*MM_TO_CM);
+        message->set_kicking_to_x(splMessage.shootingTo[0]*MM_TO_CM);
+        message->set_kicking_to_y(splMessage.shootingTo[1]*MM_TO_CM);
 
-        model.get()->set_ball_age(splMessage.ballAge*1000); // seconds to milliseconds
+        message->set_ball_age(splMessage.ballAge*1000); // seconds to milliseconds
 
         // @TODO: these seem to be nan at this point; also this logic is somewhere else in the code (maybe the math module?), use that
         // also using bad is bad (mostly for performance reasons) mmmkay
-        // model.get()->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
-        // model.get()->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
+        // message->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
+        // message->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
 
-        model.get()->set_ball_vel_x(splMessage.ballVel[0]*MM_TO_CM);
-        model.get()->set_ball_vel_y(splMessage.ballVel[1]*MM_TO_CM);
+        message->set_ball_vel_x(splMessage.ballVel[0]*MM_TO_CM);
+        message->set_ball_vel_y(splMessage.ballVel[1]*MM_TO_CM);
+
+        message->set_role(6); // so that world view displays drop-in players
+        message->set_active(true);
 #else
         playerNum = teamMessage.get()->player_number();
         portals::Message<messages::WorldModel> model(&teamMessage.get()->payload());
