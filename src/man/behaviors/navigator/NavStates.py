@@ -91,11 +91,7 @@ def goToPosition(nav):
             goToPosition.bookingIt = True
 
         goToPosition.speeds = (velX, velY, velH)
-
-        if ((goToPosition.speeds != goToPosition.lastSpeeds)
-            or not nav.brain.interface.motionStatus.walk_is_active):
-            helper.setSpeed(nav, goToPosition.speeds)
-        goToPosition.lastSpeeds = goToPosition.speeds
+        helper.setSpeed(nav, goToPosition.speeds)
 
     else:
         if goToPosition.adaptive:
