@@ -32,7 +32,7 @@ namespace man {
 namespace vision {
 
 #ifdef OFFLINE
-static const bool ROBOTSDEBUG = true;
+static const bool ROBOTSDEBUG = false;
 #else
 static const bool ROBOTSDEBUG = false;
 #endif
@@ -60,7 +60,7 @@ void Robots::init()
 	numberOfRuns = 0;
 
 #ifdef OFFLINE
-	debugRobots = true;
+	debugRobots = false;
 #endif
 }
 

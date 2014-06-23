@@ -52,7 +52,7 @@ Field::Field(Vision* vis, Threshold * thr)
 	// funding. - chown
 #ifdef OFFLINE
 	debugFieldEdge = false;
-	debugDrawFieldEdge = true;
+	debugDrawFieldEdge = false;
 	debugHorizon = false;
 #endif
 }
@@ -318,6 +318,9 @@ void Field::findTopEdges(int M) {
         if (blockages[i].x != blockages[i-1].x) {
             step = (float)diff / (float)(blockages[i].x - blockages[i-1].x);
         }
+		/*if (blockages[i].y > blockages[i-1].y + 10 && blockages[i].y - topEdge[blockages[i].x] > 5) {
+			cout << "Possible item of interest at " << blockages[i].x << endl;
+			}*/
         float cur = static_cast<float>(blockages[i].y);
         for (int j = blockages[i].x; j > blockages[i-1].x; j--) {
             cur -= step;
