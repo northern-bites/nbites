@@ -42,7 +42,7 @@ public:
     /** In Portals **/
     portals::InPortal<messages::RobotLocation> motionInput;
     portals::InPortal<messages::VisionField>   visionInput;
-    portals::InPortal<messages::RobotLocation> resetInput;
+    portals::InPortal<messages::RobotLocation> resetInput[2];
     portals::InPortal<messages::GameState>     gameStateInput;
     portals::InPortal<messages::FilteredBall>  ballInput;
 
@@ -67,7 +67,7 @@ protected:
     void update();
 
     ParticleFilter * particleFilter;
-    long long lastReset;
+    long long lastReset[2];
     messages::RobotLocation curOdometry;
 };
 } // namespace localization

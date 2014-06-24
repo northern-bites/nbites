@@ -18,6 +18,7 @@ Tool::Tool(const char* title) :
     tableCreator(this),
     visDispMod(this),
     fieldView(this),
+    sharedView(this),
     playbookCreator(this),
     colorCalibrate(this),
     topConverter(),
@@ -65,6 +66,7 @@ Tool::Tool(const char* title) :
     toolTabs->addTab(&colorCalibrate, tr("Color Calibrator"));
     toolTabs->addTab(&fieldView, tr("FieldView"));
     toolTabs->addTab(&worldView, tr("World Viewer"));
+    toolTabs->addTab(&sharedView, tr("SharedView"));
     toolTabs->addTab(&playbookCreator, tr("Playbook Creator"));
 
     this->setCentralWidget(toolTabs);
@@ -329,6 +331,57 @@ void Tool::setUpModules()
     }
     if(shouldAddFieldView)
         diagram.addModule(fieldView);
+
+
+
+
+    /** Shared Viewer Tab **/
+    // Should add shared view
+    bool shouldAddSharedView = false;
+    if(diagram.connectToUnlogger<messages::RobotLocation>(sharedView.locationIn,
+                                                          "location"))
+    {
+        sharedView.confirmLocationLogs(true);
+        shouldAddSharedView = true;
+    }
+    else
+    {
+        std::cout << "Warning: location wasn't logged in this file" << std::endl;
+    }
+    if(diagram.connectToUnlogger<messages::RobotLocation>(sharedView.odometryIn,
+                                                          "odometry"))
+    {
+        sharedView.confirmOdometryLogs(true);
+        shouldAddSharedView = true;
+    }
+    else
+    {
+        std::cout << "Warning: odometry wasn't logged in this file" << std::endl;
+    }
+
+    if(diagram.connectToUnlogger<messages::ParticleSwarm>(sharedView.particlesIn,
+                                                          "particleSwarm"))
+    {
+        sharedView.confirmParticleLogs(true);
+        shouldAddSharedView = true;
+    }
+    else
+    {
+        std::cout << "Warning: Particles weren't logged in this file" << std::endl;
+    }
+    if(diagram.connectToUnlogger<messages::VisionField>(sharedView.observationsIn,
+                                                        "observations"))
+    {
+        sharedView.confirmObsvLogs(true);
+        shouldAddSharedView = true;
+    }
+    else
+    {
+        std::cout << "Warning: Observations weren't logged in this file" << std::endl;
+    }
+    if(shouldAddSharedView)
+        diagram.addModule(sharedView);
+
 
 
 }

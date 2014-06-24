@@ -9,6 +9,7 @@
 
 #include "WorldModel.pb.h"
 #include "BallModel.pb.h"
+#include "RobotLocation.pb.h"
 
 /**
  *
@@ -18,6 +19,10 @@
 
 namespace man {
 namespace context {
+
+const float DISTANCE_TOO_FAR = 20.f;
+const float DISTANCE_SQUARED = DISTANCE_TOO_FAR * DISTANCE_TOO_FAR;
+const float DISTANCE_FOR_FLIP = 5.f;
 
 class SharedBallModule : public portals::Module
 {
@@ -29,26 +34,35 @@ public:
 
     portals::InPortal<messages::WorldModel> worldModelIn[NUM_PLAYERS_PER_TEAM];
     portals::OutPortal<messages::SharedBall> sharedBallOutput;
+    portals::OutPortal<messages::RobotLocation> sharedBallReset;
 
 private:
-//determines where a robot thinks the ball is and gives it a weight
-    void incorporateWorldModel(messages::WorldModel newModel, int weightFactor);
-
 //not used, but assumes goalie is in fixed position
     //void incorporateGoalieWorldModel(messages::WorldModel newModel);
 
-//calculates a weighted average of the robot's ball locations
-//weight is determined by distance to ball and uncertainty
+    void eliminateBadRobots();
     void weightedavg();
+    void checkForPlayerFlip();
+    void calculateBallCoords(int i);
+    float getBallDistanceSquared(int i, int j);
+
+    messages::WorldModel messages[NUM_PLAYERS_PER_TEAM];
 
     float x;            //ball x location for a given robot
     float y;            //ball y location for a given robot
-    float weight;       //determined by distance to ball and uncertainty
-    float numx;         //numerator of weighted average of x
-    float numy;         //numerator of weighted average of y
-    float sumweight;    //denominator of weighted average is sum of weights
 
-    bool ball_on;
+    // used for flipping robots
+    float resetx;
+    float resety;
+    float reseth;
+    int timestamp;
+
+    int numRobotsOn;    // number of robots that see the ball
+    int robotToIgnore;  // will be bad robot
+    float ballX[NUM_PLAYERS_PER_TEAM];
+    float ballY[NUM_PLAYERS_PER_TEAM];
+
+    bool ballOn;       //set to true if at least one robot sees the ball
 };
 
 } // namespace man
