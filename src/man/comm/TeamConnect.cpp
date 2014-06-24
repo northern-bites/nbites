@@ -32,75 +32,15 @@ TeamConnect::~TeamConnect()
 
 void TeamConnect::setUpSocket()
 {
-    std::string ipTarget = "255.255.255.255";
-    static char buf[100] = {0};
-
-    bool BROADCAST = true;
-
     socket->setBlocking(false);
-
-    if (BROADCAST)
-    {
-#ifdef DEBUG_COMM
-        std::cout << "Comm set to Broadcast" << std::endl;
-#endif
-        socket->setBroadcast(true);
-        goto end;
-    }
-
-    socket->setBroadcast(false);
-    socket->setMulticastLoopback(false);
-    socket->setMulticastInterface();
-    socket->setMulticastTTL((char)1); // should be 1 to keep on subnet
-
-    if (!buf[0])
-    {
-        std::string name;
-
-        if (gethostname(buf, sizeof(buf)) < 0)
-        {
-            std::cerr << "\nError getting hostname in "
-                      << "TeamConnect::setUpSocket()"
-                      << std::endl;
-            goto end;
-        }
-        else
-            name = buf;
-
-        for (int i = 0; i < NUM_ROBOTS; ++i)
-        {
-            if (robotIPs[i].name.compare(name) == 0)
-            {
-                ipTarget = robotIPs[i].ip;
-                socket->setBroadcast(false);
-                break;
-            }
-            if (i == NUM_ROBOTS-1)
-            {
-                std::cerr << "\nError finding IP for hostname in "
-                          << "TeamConnect::setUpSocket()" << std::endl;
-                goto end;
-            }
-        }
-        ipTarget = "239" + ipTarget.substr(ipTarget.find('.'));
-    }
-
-end:
+    socket->setBroadcast(true);
 
 #ifdef DEBUG_COMM
     std::cout << "Target ip is set to: " << ipTarget.c_str() << std::endl;
 #endif
 
-    socket->setTarget(ipTarget.c_str(), TEAM_PORT);
-    socket->bind("", TEAM_PORT); // listen for anything on our port.
-
-    //join team's multicast...
-    for (int i = 0; i < NUM_ROBOTS; ++i)
-    {
-        ipTarget = robotIPs[i].ip;
-        ipTarget = "239" + ipTarget.substr(ipTarget.find('.'));
-        socket->joinMulticast(ipTarget.c_str());
-    }
+    socket->setTarget(IP_TARGET, TEAM_PORT);
+    socket->bind("", TEAM_PORT); // listen for anything on our port
 }
 
 void TeamConnect::send(const messages::WorldModel& model,
