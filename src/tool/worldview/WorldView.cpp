@@ -12,11 +12,13 @@ WorldView::WorldView(QWidget* parent)
       QWidget(parent),
       commThread("comm", COMM_FRAME_LENGTH_uS),
       wviewComm(16,0),
+      wviewShared(),
       newTeam(0),
       mutex()
 {
     commThread.addModule(*this);
     commThread.addModule(wviewComm);
+    commThread.addModule(wviewShared);
 
 #ifdef USING_LAB_FIELD
     fieldPainter = new WorldViewPainter(this, 2.);
@@ -107,7 +109,10 @@ WorldView::WorldView(QWidget* parent)
     for (int i = 0; i < NUM_PLAYERS_PER_TEAM; ++i)
     {
         commIn[i].wireTo(wviewComm._worldModels[i]);
+        wviewShared.worldModelIn[i].wireTo(wviewComm._worldModels[i]);
     }
+
+    sharedIn.wireTo(&wviewShared.sharedBallOutput);
 }
 
 
@@ -127,7 +132,11 @@ void WorldView::run_()
         commIn[i].latch();
         fieldPainter->updateWithLocationMessage(commIn[i].message(), i);
         updateStatus(commIn[i].message(), i);
+
     }
+    sharedIn.latch();
+    fieldPainter->updateWithSharedBallMessage(sharedIn.message());
+
     mutex.unlock();
 }
 
@@ -170,5 +179,5 @@ void WorldView::updateStatus(messages::WorldModel msg, int index)
     }
 }
 
-}
-}
+} //namespace worldview
+} //namespace tool
