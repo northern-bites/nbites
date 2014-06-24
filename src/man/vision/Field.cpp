@@ -62,20 +62,28 @@ Field::Field(Vision* vis, Threshold * thr)
    here.  Just start at the horizon in each scanline and scan
    down until we find enough green.  Then store the result in
    the convex array.
+   Note: I (Chown) have long wanted to change this to use the results
+   of the last vision frame.
+   Note: While this works very well, it seems absurdly complicated for
+   what ought to be a reasonably easy thing to do. The main problems that
+   complicate it are: other fields in the distance, misc. green stuff,
+   dark portions of the field that aren't "green", and occluding robots.
    @param pH    the horizon found by findGreenHorizon
 */
 void Field::initialScanForTopGreenPoints(int pH) {
 	int good, ok, top;
 	unsigned char pixel;
-	int topGreen = 0;
-	int greenRun = 0;
+	int topGreen = 0;         // topmost green Y value
+	int greenRun = 0;         // connected green pixels
     float possible = 0.0f;
-	int lastGreen;
+	int lastGreen;            // y value of last seen green pixel
     const float BUFFER = 100.0f; // other fields should be farther than this
 	// we need a better criteria for what the top is
 	for (int i = 0; i < HULLS; i++) {
-		good = 0;
-		ok = 0;
+		good = 0;      // good == # of green pixels
+		ok = 0;        // ok == # of pixels that could be green (e.g. orange, white)
+
+		// based on our pose we scan differently (tilt) - determine highest pixel
 		int poseProject = thresh->yellow->yProject(0, pH, i * SCANSIZE);
 		if (poseProject <= 0) {
 			poseProject = 0;
@@ -85,15 +93,18 @@ void Field::initialScanForTopGreenPoints(int pH) {
 		topGreen = IMAGE_HEIGHT - 1;
 		greenRun = 0;
 		lastGreen = 0;
+		// scan from the top point down
 		for (top = max(poseProject, 0);
 				good < RUNSIZE && top < IMAGE_HEIGHT; top++) {
 			// scan until we find a run of green pixels
-			int x = i * SCANSIZE;
+			int x = i * SCANSIZE;           // scan column
 			if (i == HULLS - 1) {
 				x--;
 			}
-			if (top == max(poseProject, 0)) {
-				vision->drawPoint(x, top, BLUE);
+			if (debugFieldEdge) {
+				if (top == max(poseProject, 0)) {
+					vision->drawPoint(x, top, BLUE);
+				}
 			}
 			pixel = thresh->getColor(x, top);
             // watch out for patches of green off the field
@@ -107,6 +118,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
             }
 			//pixel = thresh->thresholded[top][x];
 			if (Utility::isGreen(pixel)) {
+				// we're looking at a good pixel, figure out if we have enough evidence
 				lastGreen = top;
 				good++;
 				greenRun++;
@@ -203,7 +215,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
             vision->drawPoint(i * SCANSIZE, convex[i].y, MAROON);
         }
     }
-    // look for odd spikes and quell them
+    // look for odd spikes and quell them - e.g. someone wearing green shirt
     if (poseHorizon > -100) {
 		const int BARRIER = 15;
         for (good = 4; good < HULLS - 4; good++) {
@@ -228,14 +240,8 @@ void Field::initialScanForTopGreenPoints(int pH) {
                 convex[good].y = convex[good-1].y;
             }
         }
-		// special case for the edges
-		/*if (convex[HULLS - 2].y - convex[HULLS - 1].y > BARRIER) {
-			convex[HULLS - 1].y = convex[HULLS - 2].y;
-		}
-		if (convex[1].y - convex[0].y > BARRIER) {
-			convex[0].y = convex[1].y;
-			}*/
 	}
+	// prepare for the convex hull algorithm
     for (good = 0; convex[good].y == IMAGE_HEIGHT && good < HULLS; good++) {}
     if (good < HULLS) {
         for (int i = good-1; i > -1; i--) {
@@ -259,7 +265,7 @@ void Field::initialScanForTopGreenPoints(int pH) {
 /* At this point we have found our convex hull as defined for the scanlines.
    We want to extend this information to all possible x values.  So here we
    calculate all of those values, doing some simple interpolating to find
-   most of them.
+   most of them. Now we also determine where the field edge is occluded
    @param M     the number of sides of the convex hull
 */
 void Field::findTopEdges(int M) {
@@ -270,6 +276,7 @@ void Field::findTopEdges(int M) {
     estimate e;
 	peak = -1;
 	float maxLine = 1000.0f;
+	// This loop does the horizon calculations given the convex hull info
     for (int i = 1; i <= M; i++) {
         int diff = convex[i].y - convex[i-1].y;
         float step = 0.0f;
@@ -297,15 +304,16 @@ void Field::findTopEdges(int M) {
                              convex[i].y, ORANGE);
         }
     }
+	// this loop determines where the field edge is occluded - or where there are obstacles
     for (int i = 1; i < HULLS; i++) {
 		int greens = 0;
+		// do a little extra checking to be sure a robot arm didn't partially occlude it
 		for (int j = topEdge[blockages[i].x]; j < blockages[i].y; j++) {
             unsigned char pixel = thresh->getColor(blockages[i].x, j);
             // project the line to get the next y value
             if (Utility::isGreen(pixel) && !Utility::isNavy(pixel)) {
 				greens++;
 				if (greens > 4) {
-					//cout << "Changing " << blockages[i].x << " from " << blockages[i].y << " to " << j << endl;
 					blockages[i].y = j;
 					break;
 				}
@@ -318,9 +326,6 @@ void Field::findTopEdges(int M) {
         if (blockages[i].x != blockages[i-1].x) {
             step = (float)diff / (float)(blockages[i].x - blockages[i-1].x);
         }
-		/*if (blockages[i].y > blockages[i-1].y + 10 && blockages[i].y - topEdge[blockages[i].x] > 5) {
-			cout << "Possible item of interest at " << blockages[i].x << endl;
-			}*/
         float cur = static_cast<float>(blockages[i].y);
         for (int j = blockages[i].x; j > blockages[i-1].x; j--) {
             cur -= step;
@@ -466,13 +471,7 @@ int Field::getInitialHorizonEstimate(int pH) {
     greenPixels = 0;         // count for any given line
     scanY = 0;                 // which line are we scanning
     int firstpix = 0;
-	/*int find = IMAGE_HEIGHT - 1;
-	// see if there are any gaps that are relatively far away
-	while (thresh->getPixDistance(find) < 250 && find > 0) {
-		find--;
-	}
-	if (find > 0) {
-	}*/
+
     // we're going to do this backwards of how we used to - we start at the pose
     // horizon and scan down.  This will provide an initial estimate
     for (j = max(0, pH); j < IMAGE_HEIGHT && horizon == -1; j+=SCAN_INTERVAL_Y) {
@@ -627,19 +626,7 @@ int Field::findGreenHorizon(int pH, float sl) {
     }
     // store field pose
     poseHorizon = pH;
-    /*if (pH < -100) {
-      horizon = 0;
-      return 0;
-      }*/
-    /*estimate e = vision->pose->pixEstimate(IMAGE_WIDTH / 2, pH, 0.0f);
-      cout << "Dist is " << e.dist << " " << pH << endl;
-      if (e.dist > 1000.0) {
-      while (e.dist > 1000.0) {
-      pH = pH + 5;
-      e = vision->pose->pixEstimate(IMAGE_WIDTH / 2, pH, 0.0f);
-      }
-      cout << "new Ph is " << pH << endl;
-      }*/
+
     // get an initial estimate
     int initialEstimate = getInitialHorizonEstimate(pH);
     if (debugHorizon) {
