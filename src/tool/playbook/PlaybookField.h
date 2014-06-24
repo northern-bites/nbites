@@ -48,8 +48,8 @@ protected:
     void paintPlayers(QPaintEvent* event);
     void paintBall(QPaintEvent* event);
 
-    static const float ROBOT_SIZE_X = 18.0f;
-    static const float ROBOT_SIZE_Y = 35.0f;
+    static constexpr float ROBOT_SIZE_X = 18.0f;
+    static constexpr float ROBOT_SIZE_Y = 35.0f;
 
     void paintRobot(QPaintEvent* event,
                     QPainter& painter,

@@ -79,15 +79,6 @@ namespace Streaming
     return Global::getStreamHandler().dummyStream;
   }
 
-  char angleToChar(float angle)
-  {
-    float normalizedAngle = normalize(angle);
-    int discretizedAngle = (int)(normalizedAngle * 128.0f / pi);
-    if(discretizedAngle > 127)
-      discretizedAngle = -128;
-    return (char) discretizedAngle;
-  }
-
   const char* skipDot(const char* name)
   {
     return strchr(name, '.') + 1;

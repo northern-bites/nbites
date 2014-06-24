@@ -1,6 +1,6 @@
 /**
 * @file Representations/MotionControl/BikeRequest.cpp
-* @author <a href="mailto:judy@informatik.uni-bremen.de">Judith Müller</a>
+* @author <a href="mailto:judy@informatik.uni-bremen.de">Judith MÃ¼ller</a>
 */
 
 #include <cstring>

@@ -22,7 +22,7 @@ float GaussianDistribution::probabilityAt(float p) const
   float diff(p - mean);
   float invVariance = 1.0f / variance;
   float exponent(diff * invVariance * diff);
-  float probability(1.0f / (sqrt(pi2) * sqrt(variance)));
+  float probability(1.0f / (std::sqrt(pi2) * std::sqrt(variance)));
   probability *= exp(-0.5f * exponent);
   return std::max(probability, 0.000001f);
 }

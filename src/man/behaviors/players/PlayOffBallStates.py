@@ -66,14 +66,14 @@ def positionAsSupporter(player):
     # defenders position at midpoint between ball and goal
     if role.isLeftDefender(player.role):
         if player.brain.ball.y < NogginConstants.MIDFIELD_Y:
-            waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)
+            waitForBallPosition = RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)
                                                 * .5, (player.brain.ball.y +
                                                        NogginConstants.GOALBOX_WIDTH * .25 +
                                                        NogginConstants.BLUE_GOALBOX_BOTTOM_Y)
                                                 * .5, player.brain.ball.bearing_deg +
                                                 player.brain.loc.h)
         else:
-            waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)*.5,
+            waitForBallPosition = RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
                                                 (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
                                                 player.brain.ball.bearing_deg + player.brain.loc.h)
 
@@ -81,7 +81,7 @@ def positionAsSupporter(player):
     # and middle of goal
     elif role.isRightDefender(player.role):
         if player.brain.ball.y >=  NogginConstants.MIDFIELD_Y:
-            waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)
+            waitForBallPosition = RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)
                                                 * .5, (player.brain.ball.y +
                                                        NogginConstants.GOALBOX_WIDTH * .75 +
                                                        NogginConstants.BLUE_GOALBOX_BOTTOM_Y)
@@ -89,7 +89,7 @@ def positionAsSupporter(player):
                                                 player.brain.loc.h)
 
         else:
-            waitForBallPosition = RobotLocation((player.brain.ball.x + BLUE_GOALBOX_RIGHT_X)*.5,
+            waitForBallPosition = RobotLocation((player.brain.ball.x + NogginConstants.BLUE_GOALBOX_RIGHT_X)*.5,
                                                 (player.brain.ball.y + NogginConstants.MIDFIELD_Y)*.5,
                                                 player.brain.ball.bearing_deg + player.brain.loc.h)
 
@@ -148,21 +148,22 @@ def walkSearchFieldForBall(player):
     quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * .5)
 
     if player.firstFrame():
-        walkSearchFieldForBall.dest = quad1Center
-
-    player.brain.tracker.trackBall()
-    player.brain.nav.goTo(walkSearchFieldForBall.dest, precision = nav.GENERAL_AREA,
-                          speed = nav.QUICK_SPEED, avoidObstacles = True,
-                          fast = True, pb = False)
+        walkSearchFieldForBall.dest = quad3Center
 
     # update destination to send it to a new quadrant on the field
     # prearranged order; change or ranndomize?
     if shared.navAtPosition(player):
+        print "I think I'm at my position"
         if walkSearchFieldForBall.dest == quad1Center:
-            walkSearchFieldForBall.dest = quad3Center
-        elif walkSearchFieldForBall.dest == quad3Center:
             walkSearchFieldForBall.dest = quad2Center
+        elif walkSearchFieldForBall.dest == quad3Center:
+            walkSearchFieldForBall.dest = quad1Center
         elif walkSearchFieldForBall.dest == quad2Center:
             walkSearchFieldForBall.dest = quad4Center
         elif walkSearchFieldForBall.dest == quad4Center:
-            walkSearchFieldForBall.dest = quad1Center
+            walkSearchFieldForBall.dest = quad3Center
+
+    player.brain.tracker.trackBall()
+    player.brain.nav.goTo(walkSearchFieldForBall.dest, precision = nav.GRAINY,
+                          speed = nav.QUICK_SPEED, avoidObstacles = True,
+                          fast = True, pb = False)

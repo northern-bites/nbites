@@ -66,7 +66,6 @@ def prepareForKick(player):
     if player.firstFrame():
         prepareForKick.decider = KickDecider2.KickDecider2(player.brain)
         player.brain.nav.stand()
-        return player.stay()
 
     if player.brain.ball.distance > constants.APPROACH_BALL_AGAIN_DIST:
         # Ball has moved away. Go get it!

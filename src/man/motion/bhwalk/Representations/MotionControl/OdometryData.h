@@ -1,6 +1,6 @@
 /**
 * @file OdometryData.h
-* Contains the OdometryData class.
+* Contains the OdometryDataBH class.
 * @author Max Risler
 */
 
@@ -9,15 +9,15 @@
 #include "Tools/Math/Pose2D.h"
 
 /**
-* @class OdometryData
-* OdometryData contains an approximation of overall movement the robot has done.
-* @attention Only use differences of OdometryData at different times.
+* @class OdometryDataBH
+* OdometryDataBH contains an approximation of overall movement the robot has done.
+* @attention Only use differences of OdometryDataBH at different times.
 * Position in mm
 */
-class OdometryData : public Pose2D {};
+class OdometryDataBH : public Pose2DBH {};
 
 /**
-* @class GroundTruthOdometryData
+* @class GroundTruthOdometryDataBH
 * Contains an observed overall movement the robot has done.
 */
-class GroundTruthOdometryData : public OdometryData {};
+class GroundTruthOdometryDataBH : public OdometryDataBH {};

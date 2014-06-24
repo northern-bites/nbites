@@ -1,7 +1,7 @@
 /**
 * @file Representations/MotionControl/SpecialActionsOutput.h
 * This file declares a class that represents the output of the special actions module.
-* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas Röfer</A>
+* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas RÃ¶fer</A>
 */
 
 #pragma once
@@ -11,33 +11,13 @@
 #include "Tools/Math/Pose2D.h"
 
 /**
-* @class SpecialActionsOutput
+* @class SpecialActionsOutputBH
 * A class that represents the output of the special actions module.
 */
-class SpecialActionsOutput : public JointRequest
-{
-protected:
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM_BASE(JointRequest);
-    STREAM(odometryOffset);
-    STREAM(isLeavingPossible);
-    STREAM(isMotionStable);
-    STREAM(executedSpecialAction);
-    STREAM_REGISTER_FINISH();
-  }
-
-public:
-  Pose2D odometryOffset; /**< The body motion performed in this step. */
-  bool isLeavingPossible, /**< Is leaving the motion module possible now? */
-       isMotionStable; /**< Is the position of the camera directly related to the kinematic chain of joint angles? */
-  SpecialActionRequest executedSpecialAction; /**< The special action currently executed. */
-
-  /**
-  * Default constructor.
-  */
-  SpecialActionsOutput() :
-    isLeavingPossible(true),
-    isMotionStable(false) {}
-};
+STREAMABLE_WITH_BASE(SpecialActionsOutputBH, JointRequestBH,
+{,
+  (Pose2DBH) odometryOffset, /**< The body motion performed in this step. */
+  (bool)(true) isLeavingPossible, /**< Is leaving the motion module possible now? */
+  (bool)(false) isMotionStable, /**< Is the position of the camera directly related to the kinematic chain of joint angles? */
+  (SpecialActionRequest) executedSpecialAction, /**< The special action currently executed. */
+});

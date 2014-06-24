@@ -25,7 +25,7 @@ class ColorWheel : public QWidget {
     //public:
     static const int DEFAULT_SIZE = 200;
     static const int DEFAULT_RADIUS = 100;
-    static const float ZSLICE_RANGE = 256.0f;
+    static constexpr float ZSLICE_RANGE = 256.0f;
 
 public:
     ColorWheel(ColorSpace* _colorSpace, QWidget* parent = NULL);

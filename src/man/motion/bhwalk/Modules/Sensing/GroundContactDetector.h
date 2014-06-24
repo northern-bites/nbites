@@ -1,114 +1,103 @@
 /**
 * @file GroundContactDetector.h
-*
 * Declaration of module GroundContactDetector.
-*
-* @author <a href="mailto:fynn@informatik.uni-bremen.de">Fynn Feldpausch</a>
+* @author Colin Graf
 */
 
 #pragma once
 
-//#include "Tools/Module/Module.h"
-#include "Tools/RingBufferWithSum.h"
+#include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/SensorData.h"
+#include "Representations/Infrastructure/JointData.h"
 #include "Representations/Infrastructure/FrameInfo.h"
-// #include "Representations/Infrastructure/RobotInfo.h"
 #include "Representations/Sensing/GroundContactState.h"
+#include "Representations/Sensing/RobotModel.h"
+#include "Representations/Sensing/TorsoMatrix.h"
 #include "Representations/MotionControl/MotionInfo.h"
-#include "Representations/MotionControl/MotionRequest.h"
 
-//MODULE(GroundContactDetector)
-//  REQUIRES(SensorData)
-//  REQUIRES(FrameInfo)
-//  REQUIRES(MotionRequest)
-//  USES(MotionInfo)
-//  PROVIDES_WITH_MODIFY(GroundContactState)
-//END_MODULE
+MODULE(GroundContactDetector)
+  REQUIRES(RobotModelBH)
+  REQUIRES(FrameInfoBH)
+  REQUIRES(MotionRequestBH)
+  REQUIRES(SensorDataBH)
+  USES(TorsoMatrixBH)
+  USES(MotionInfoBH)
+  PROVIDES_WITH_MODIFY(GroundContactStateBH)
+  DEFINES_PARAMETER(float, noContactMinAccNoise, 0.08f)
+  DEFINES_PARAMETER(float, noContactMinGyroNoise, 0.04f)
+  DEFINES_PARAMETER(float, contactMaxAngleNoise, 0.01f)
+  DEFINES_PARAMETER(float, contactAngleActivationNoise, 0.007f)
+  DEFINES_PARAMETER(float, contactMaxAccZ, 10.f) // deactivate
+END_MODULE
 
 /**
 * @class GroundContactDetector
 * A module for sensor data filtering.
 */
-class GroundContactDetector //: public GroundContactDetectorBase
+class GroundContactDetector : public GroundContactDetectorBase
 {
 public:
   /** Default constructor. */
   GroundContactDetector();
 
   /**
-  * Updates the GroundContactState representation.
+  * Updates the GroundContactStateBH representation .
   * @param groundContactState The ground contact representation which is updated by this module.
   */
-  void update(GroundContactState& groundContactState,
-              const SensorData& theSensorData,
-              const FrameInfo& theFrameInfo,
-              const MotionRequest& theMotionRequest,
-              const MotionInfo& theMotionInfo 
-              );
+  void update(GroundContactStateBH& groundContactState);
 
 private:
+  bool contact; /**< Whether the robot has ground contact or not */
+  unsigned int contactStartTime; /**< Time when the robot started having ground contact */
+  bool useAngle; /**< Whether the estimated angle will be used to detect ground contact loss */
+
+  RotationMatrixBH expectedRotationInv;
+
   /**
-  * A collection of parameters for the ground contact detector.
+  * An averager for computing the average of up to \c n entries.
+  * Accumulating an error will be avoided by gradually recounting the sum of all added entries.
   */
-  class Parameters : public Streamable
+  template <typename C, int n, typename T = float> class Averager
   {
   public:
-    bool forceContact;         // true -> always ground contact
-    float fsrLimit;            // higher fsr values will be ignored
-    float fsrThreshold;        // threshold for fsr contact
-    float loadThreshold;       // threshold for load contact
-    float contactThreshold;    // threshold for safe ground contact
-    float noContactThreshold;  // threshold for safe no ground contact
-    int safeContactTime;       // minimum continuous contact to be safe in ms
-    int safeNoContactTime;     // minimum continuous non-contact to be safely lifted up in ms
+    Averager() {clear();}
+
+    void clear() {oldSum = newSum = C();pos = count = 0;}
+
+    void add(const C& val)
+    {
+      unsigned int posRaw = pos + 1;
+      pos = posRaw % n;
+      if(count == n)
+      {
+        if(posRaw == n)
+        {
+          oldSum = newSum;
+          newSum = C();
+        }
+        oldSum -= data[pos];
+      }
+      else
+        ++count;
+      data[pos] = val;
+      newSum += val;
+    }
+
+    bool isFull() const {return count == n;}
+    C getAverage() const {return (oldSum + newSum) / T(count);}
 
   private:
-    /**
-    * The method makes the object streamable.
-    * @param in The stream from which the object is read.
-    * @param out The stream to which the object is written.
-    */
-    virtual void serialize(In* in, Out* out)
-    {
-      STREAM_REGISTER_BEGIN();
-      STREAM(forceContact);
-      STREAM(fsrLimit);
-      STREAM(fsrThreshold);
-      STREAM(loadThreshold);
-      STREAM(contactThreshold);
-      STREAM(noContactThreshold);
-      STREAM(safeContactTime);
-      STREAM(safeNoContactTime);
-      STREAM_REGISTER_FINISH();
-    }
+    C data[n];
+    C oldSum;
+    C newSum;
+    unsigned int pos;
+    unsigned int count;
   };
 
-  Parameters p;
-
-  bool contact;
-  bool lastContact;
-  unsigned int contactStartTime;
-  unsigned int noContactStartTime;
-  static const int BUFFER_SIZE = 25;
-  RingBufferWithSum<float, BUFFER_SIZE> confidenceContactBuffer;
-  RingBufferWithSum<float, BUFFER_SIZE> confidenceNoContactBuffer;
-
-  struct ContactState
-  {
-    bool contact;
-    float confidence;
-  };
-
-  void init();
-
-  /**
-  * Checks the loads in respect of the ground contact.
-  */
-  struct ContactState checkLoad(const SensorData& theSensorData);
-
-  /**
-  * Checks the FSRs in respect of the ground contact.
-  * @param left Check the FSRs of the left or right foot?
-  */
-  struct ContactState checkFsr(bool left, const SensorData& theSensorData);
+  Averager<Vector2BH<>, 60> angleNoises;
+  Averager<Vector3BH<>, 60> accNoises;
+  Averager<Vector2BH<>, 60> gyroNoises;
+  Averager<Vector3BH<>, 60> accValues;
+  Averager<Vector2BH<>, 60> gyroValues;
+  Averager<float, 5> calibratedAccZValues;
 };
