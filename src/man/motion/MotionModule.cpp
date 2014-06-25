@@ -918,9 +918,6 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
     float relY = command.rel_y() * CM_TO_MM;
     float relH = command.rel_h() * TO_RAD;
 
-    float ballRelX = command.kick().ball_rel_x() * CM_TO_MM;
-    float ballRelY = command.kick().ball_rel_y() * CM_TO_MM;
-
     float gain; 
     if(command.gain() > 0.f)
         gain = command.gain();
@@ -934,10 +931,7 @@ void MotionModule::sendMotionCommand(messages::DestinationWalk command)
             relY,
             relH,
             gain,
-            command.pedantic(),
             command.kick().perform_motion_kick(),
-            ballRelX,
-            ballRelY,
             command.kick().kick_type())
         );
     walkProvider.setCommand(newCommand);

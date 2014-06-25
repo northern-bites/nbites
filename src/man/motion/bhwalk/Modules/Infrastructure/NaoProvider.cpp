@@ -1,198 +1,177 @@
 /**
 * @file Modules/Infrastructure/NaoProvider.cpp
 * The file declares a module that provides information from the Nao via DCM.
-* @author <a href="mailto:Thomas.Roefer@dfki.de">Thomas R�fer</a>
+* @author <a href="mailto:Thomas.Roefer@dfki.de">Thomas Röfer</a>
 */
 
 //#define MEASURE_DELAY
 
 #include <cstdio>
+#include <cstring>
 
 #include "NaoProvider.h"
-#include "Platform/SystemCall.h"
+
+#ifdef TARGET_ROBOT
 
 #ifdef MEASURE_DELAY
 #include "Tools/Streams/InStreams.h"
 #endif
-//#include "Tools/Debugging/DebugDrawings.h"
-//#include "Tools/Settings.h"
+#include "Representations/Infrastructure/JointDataDeg.h"
+#include "Tools/Debugging/DebugDrawings.h"
+#include "Tools/Settings.h"
 
-//#include "libbhuman/bhuman.h"
+#include "libbhuman/bhuman.h"
 
-//PROCESS_WIDE_STORAGE(NaoProvider) NaoProvider::theInstance = 0;
+PROCESS_WIDE_STORAGE(NaoProvider) NaoProvider::theInstance = 0;
 
-NaoProvider::NaoProvider()// : lastUsSendTime(0), lastUsSwitchTime(0), lastUsReadTime(0), currentUsMode(0)
+NaoProvider::NaoProvider() : gameControlTimeStamp(0)
 {
-//  NaoProvider::theInstance = this;
+  NaoProvider::theInstance = this;
 
-//  OUTPUT(idText, text, "Hi, I am " << Global::getSettings().robot << ".");
-//  OUTPUT(idRobotname, bin, Global::getSettings().robot);
+  OUTPUT(idText, text, "Hi, I am " << Global::getSettings().robot << ".");
+  OUTPUT(idRobotname, bin, Global::getSettings().robot);
 
 #ifndef RELEASE
-  for(int i = 0; i < JointData::numOfJoints; ++i)
-    clippedLastFrame[i] = JointData::off;
+  for(int i = 0; i < JointDataBH::numOfJoints; ++i)
+    clippedLastFrame[i] = JointDataBH::off;
 #endif
-//  for(int i = 0; i < BoardInfo::numOfBoards; ++i)
-//  {
-//    lastAck[i] = 0;
-//    lastTimeWhenAck[i] = 0;
-//  }
-//
-//  usSettings.sendInterval = 70;
-//  usSettings.switchInterval = 250;
-//  usSettings.ignoreAfterSwitchInterval = 150;
-//  usSettings.modes.resize(4);
-//  usSettings.modes[0] = 0.f;
-//  usSettings.modes[1] = 2.f;
-//  usSettings.modes[2] = 3.f;
-//  usSettings.modes[3] = 1.f;
 }
 
 NaoProvider::~NaoProvider()
 {
-//  NaoProvider::theInstance = 0;
+  NaoProvider::theInstance = 0;
 }
 
-//bool NaoProvider::isFrameDataComplete()
-//{
-//  return true;
-//}
-//
-//void NaoProvider::waitForFrameData()
-//{
-//  if(theInstance)
-//    theInstance->naoBody.wait();
-//}
-
-void NaoProvider::send(JointRequest &theJointRequest, JointCalibration &theJointCalibration)
+bool NaoProvider::isFrameDataComplete()
 {
-//  DEBUG_RESPONSE("module:NaoProvider:lag100", SystemCall::sleep(100););
-//  DEBUG_RESPONSE("module:NaoProvider:lag200", SystemCall::sleep(200););
-//  DEBUG_RESPONSE("module:NaoProvider:lag300", SystemCall::sleep(200););
-//  DEBUG_RESPONSE("module:NaoProvider:lag1000", SystemCall::sleep(1000););
-//  DEBUG_RESPONSE("module:NaoProvider:lag3000", SystemCall::sleep(3000););
-//  DEBUG_RESPONSE("module:NaoProvider:lag6000", SystemCall::sleep(6000););
-//  DEBUG_RESPONSE("module:NaoProvider:segfault", *(char*)0 = 0;);
-//
-//  DEBUG_RESPONSE("module:NaoProvider:ClippingInfo",
-//  {
-//    for(int i = 0; i < JointData::numOfJoints; ++i)
-//    {
-//      if(i == JointData::RHipYawPitch) // missing on Nao
-//        ++i;
-//
-//      if(theJointRequest.angles[i] != JointData::off)
-//      {
-//        if(theJointRequest.angles[i] > theJointCalibration.joints[i].maxAngle)
-//        {
-//          if(clippedLastFrame[i] != theJointCalibration.joints[i].maxAngle)
-//          {
-//            char tmp[64];
-//            sprintf(tmp, "warning: clipped joint %s at %.03f, requested %.03f.", JointData::getName((JointData::Joint)i), toDegrees(theJointCalibration.joints[i].maxAngle), toDegrees(theJointRequest.angles[i]));
-//            OUTPUT(idText, text, tmp);
-//            clippedLastFrame[i] = theJointCalibration.joints[i].maxAngle;
-//          }
-//        }
-//        else if(theJointRequest.angles[i] < theJointCalibration.joints[i].minAngle)
-//        {
-//          if(clippedLastFrame[i] != theJointCalibration.joints[i].minAngle)
-//          {
-//            char tmp[64];
-//            sprintf(tmp, "warning: clipped joint %s at %.04f, requested %.03f.", JointData::getName((JointData::Joint)i), toDegrees(theJointCalibration.joints[i].minAngle), toDegrees(theJointRequest.angles[i]));
-//            OUTPUT(idText, text, tmp);
-//            clippedLastFrame[i] = theJointCalibration.joints[i].minAngle;
-//          }
-//        }
-//        else
-//          clippedLastFrame[i] = JointData::off;
-//      }
-//    }
-//  });
-//
-//#ifdef MEASURE_DELAY
-//  OutTextFile stream("delay.log", true);
-//  stream << "jointRequest";
-//  stream << theJointRequest.angles[JointData::LHipPitch];
-//  stream << theJointRequest.angles[JointData::LKneePitch];
-//  stream << theJointRequest.angles[JointData::LAnklePitch];
-//  stream << endl;
-//#endif
+  return true;
+}
 
-//  naoBody.openActuators(actuators);
-  int j = 0;
-  int headYawPositionActuator = 0;
-  int headYawHardnessActuator = int(JointData::numOfJoints) - 1;
+void NaoProvider::waitForFrameData()
+{
+  if(theInstance)
+    theInstance->naoBody.wait();
+}
 
-  for(int i = 0; i < JointData::numOfJoints; ++i)
+void NaoProvider::send()
+{
+  DEBUG_RESPONSE("module:NaoProvider:lag100", SystemCall::sleep(100););
+  DEBUG_RESPONSE("module:NaoProvider:lag200", SystemCall::sleep(200););
+  DEBUG_RESPONSE("module:NaoProvider:lag300", SystemCall::sleep(300););
+  DEBUG_RESPONSE("module:NaoProvider:lag1000", SystemCall::sleep(1000););
+  DEBUG_RESPONSE("module:NaoProvider:lag3000", SystemCall::sleep(3000););
+  DEBUG_RESPONSE("module:NaoProvider:lag6000", SystemCall::sleep(6000););
+  DEBUG_RESPONSE("module:NaoProvider:segfault", *(volatile char*)0 = 0;);
+
+  DEBUG_RESPONSE("module:NaoProvider:ClippingInfo",
   {
-    if(i == JointData::RHipYawPitch) // missing on Nao
+    for(int i = 0; i < JointDataBH::numOfJoints; ++i)
+    {
+      if(i == JointDataBH::RHipYawPitch) // missing on Nao
+        ++i;
+
+      if(theJointRequestBH.angles[i] != JointDataBH::off)
+      {
+        if(theJointRequestBH.angles[i] > theJointCalibrationBH.joints[i].maxAngle)
+        {
+          if(clippedLastFrame[i] != theJointCalibrationBH.joints[i].maxAngle)
+          {
+            char tmp[64];
+            sprintf(tmp, "warning: clipped joint %s at %.03f, requested %.03f.", JointDataBH::getName((JointDataBH::Joint)i), toDegrees(theJointCalibrationBH.joints[i].maxAngle), toDegrees(theJointRequestBH.angles[i]));
+            OUTPUT(idText, text, tmp);
+            clippedLastFrame[i] = theJointCalibrationBH.joints[i].maxAngle;
+          }
+        }
+        else if(theJointRequestBH.angles[i] < theJointCalibrationBH.joints[i].minAngle)
+        {
+          if(clippedLastFrame[i] != theJointCalibrationBH.joints[i].minAngle)
+          {
+            char tmp[64];
+            sprintf(tmp, "warning: clipped joint %s at %.04f, requested %.03f.", JointDataBH::getName((JointDataBH::Joint)i), toDegrees(theJointCalibrationBH.joints[i].minAngle), toDegrees(theJointRequestBH.angles[i]));
+            OUTPUT(idText, text, tmp);
+            clippedLastFrame[i] = theJointCalibrationBH.joints[i].minAngle;
+          }
+        }
+        else
+          clippedLastFrame[i] = JointDataBH::off;
+      }
+    }
+  });
+
+#ifdef MEASURE_DELAY
+  OutTextFile stream("delay.log", true);
+  stream << "jointRequest";
+  stream << theJointRequestBH.angles[JointDataBH::LHipPitch];
+  stream << theJointRequestBH.angles[JointDataBH::LKneePitch];
+  stream << theJointRequestBH.angles[JointDataBH::LAnklePitch];
+  stream << endl;
+#endif
+
+  float* actuators;
+  naoBody.openActuators(actuators);
+  int j = 0;
+  ASSERT(headYawPositionActuator == 0);
+  ASSERT(int(JointDataBH::numOfJoints) + 1 == headYawHardnessActuator);
+
+  for(int i = 0; i < JointDataBH::numOfJoints; ++i)
+  {
+    if(i == JointDataBH::RHipYawPitch) // missing on Nao
       ++i;
 
-    if(theJointRequest.angles[i] == JointData::off)
+    if(theJointRequestBH.angles[i] == JointDataBH::off)
     {
       actuators[j] = 0.0f;
       actuators[j + headYawHardnessActuator] = 0.0f; // hardness
     }
     else
     {
-      actuators[j] = (theJointRequest.angles[i] + theJointCalibration.joints[i].offset) * float(theJointCalibration.joints[i].sign);
-      actuators[j + headYawHardnessActuator] = float(theJointRequest.jointHardness.hardness[i]) / 100.f;
+      actuators[j] = (theJointRequestBH.angles[i] + theJointCalibrationBH.joints[i].offset) * float(theJointCalibrationBH.joints[i].sign);
+      actuators[j + headYawHardnessActuator] = float(theJointRequestBH.jointHardness.hardness[i]) / 100.f;
     }
     ++j;
   }
+
+  actuators[j] = 0.f;
+  actuators[j + headYawHardnessActuator] = float(theJointRequestBH.jointHardness.hardness[0]) / 100.f;
+  ++j;
+  actuators[j] = 0.f;
+  actuators[j + headYawHardnessActuator] = float(theJointRequestBH.jointHardness.hardness[0]) / 100.f;
+  ++j;
   j += headYawHardnessActuator;
-//  ASSERT(j == faceLedRedLeft0DegActuator);
+  ASSERT(j == faceLedRedLeft0DegActuator);
 
-//  const LEDRequest& ledRequest(theLEDRequest);
-  //checkBoardState(ledRequest);
+  const LEDRequestBH& ledRequest(theLEDRequestBH);
+  bool on = (theJointDataBH.timeStamp / 50 & 8) != 0;
+  bool fastOn = (theJointDataBH.timeStamp / 10 & 8) != 0;
+  for(int i = 0; i < LEDRequestBH::numOfLEDs; ++i)
+    actuators[j++] = (ledRequest.ledStates[i] == LEDRequestBH::on ||
+                      (ledRequest.ledStates[i] == LEDRequestBH::blinking && on) ||
+                      (ledRequest.ledStates[i] == LEDRequestBH::fastBlinking && fastOn))
+                     ? 1.0f : (ledRequest.ledStates[i] == LEDRequestBH::half ? 0.5f : 0.0f);
 
-//  bool on = (theJointData.timeStamp / 50 & 8) != 0;
-//  bool fastOn = (theJointData.timeStamp / 10 & 8) != 0;
-//  for(int i = 0; i < LEDRequest::numOfLEDs; ++i)
-//    actuators[j++] = (ledRequest.ledStates[i] == LEDRequest::on ||
-//                      (ledRequest.ledStates[i] == LEDRequest::blinking && on) ||
-//                      (ledRequest.ledStates[i] == LEDRequest::fastBlinking && fastOn))
-//                     ? 1.0f : (ledRequest.ledStates[i] == LEDRequest::half ? 0.5f : 0.0f);
+  actuators[usActuator] = (float) theUSRequestBH.sendMode;
 
-  // set ultrasound mode
-//  MODIFY("module:NaoProvider:usSettings", usSettings);
-//  if(theJointData.timeStamp - lastUsSendTime >= usSettings.sendInterval - 5)
-//  {
-//    if(theJointData.timeStamp - lastUsSwitchTime >= usSettings.switchInterval - 5)
-//    {
-//      currentUsMode = (currentUsMode + 1) % usSettings.modes.size();
-//      lastUsSwitchTime = theJointData.timeStamp;
-//    }
-//    actuators[usActuator] = usSettings.modes[currentUsMode] + 4.f;
-//    lastUsSendTime = theJointData.timeStamp;
-//  }
-//  else
-//    actuators[usActuator] = -1.f;
-
-
-//  naoBody.closeActuators();
+  naoBody.closeActuators();
+  naoBody.setTeamInfo(Global::getSettings().teamNumber, Global::getSettings().teamColor, Global::getSettings().playerNumber);
 }
 
-void NaoProvider::update(JointData& jointData, const JointCalibration &theJointCalibration,
-        SensorData& sensorData, const SensorCalibration &theSensorCalibration, FrameInfo& frameInfo)
+void NaoProvider::update(JointDataBH& jointData, SensorDataBH& sensorData)
 {
-  frameInfo.cycleTime = 0.01f;
-  frameInfo.time = jointData.timeStamp = sensorData.timeStamp = SystemCall::getCurrentSystemTime();
+  jointData.timeStamp = sensorData.timeStamp = std::max(jointData.timeStamp + 1, SystemCall::getCurrentSystemTime());
 
-  int j = 0;
-  for(int i = 0; i < JointData::numOfJoints; ++i)
+  // Northern Bites pass sensors in via bhwalkprovider instead
+  //float* sensors = naoBody.getSensors();
+
+  for(int i = 0; i < JointDataBH::numOfJoints; ++i)
   {
-    if(i == JointData::RHipYawPitch)
+    if(i == JointDataBH::RHipYawPitch)
     {
-      jointData.angles[i] = jointData.angles[JointData::LHipYawPitch];
-      sensorData.currents[i] = sensorData.currents[JointData::LHipYawPitch];
-      sensorData.temperatures[i] = sensorData.temperatures[JointData::LHipYawPitch];
+      jointData.angles[i] = jointData.angles[JointDataBH::LHipYawPitch];
     }
     else
     {
-      jointData.angles[i] = sensors[j++] * (float)theJointCalibration.joints[i].sign - theJointCalibration.joints[i].offset;
-      sensorData.currents[i] = short(1000 * sensors[j++]);
-      sensorData.temperatures[i] = (unsigned char) sensors[j++];
+      // Northern Bites undo this transformation after bhwalk executes
+      jointData.angles[i] = jointData.angles[i] * theJointCalibrationBH.joints[i].sign - theJointCalibrationBH.joints[i].offset;
     }
   }
 
@@ -200,148 +179,88 @@ void NaoProvider::update(JointData& jointData, const JointCalibration &theJointC
   OutTextFile stream("delay.log", true);
   stream << "timestamp" << SystemCall::getCurrentSystemTime();
   stream << "jointData";
-  stream << jointData.angles[JointData::LHipPitch];
-  stream << jointData.angles[JointData::LKneePitch];
-  stream << jointData.angles[JointData::LAnklePitch];
+  stream << jointData.angles[JointDataBH::LHipPitch];
+  stream << jointData.angles[JointDataBH::LKneePitch];
+  stream << jointData.angles[JointDataBH::LAnklePitch];
 #endif
 
-  float currentGyroRef = 0.f;
-  for(int i = 0; i < SensorData::numOfSensors; ++i)
-  {
-    if(i == SensorData::gyroZ)
-      currentGyroRef = sensors[j++];
-    else
-      sensorData.data[i] = sensors[j++];
-  }
+  sensorData.data[SensorDataBH::gyroX] *= 12.f / 1600.f;
+  sensorData.data[SensorDataBH::gyroY] *= 12.f / 1600.f;
 
-  sensorData.data[SensorData::gyroX] *= theSensorCalibration.gyroXGain / 1600;
-  sensorData.data[SensorData::gyroY] *= theSensorCalibration.gyroYGain / 1600;
-  sensorData.data[SensorData::accX] *= theSensorCalibration.accXGain;
-  sensorData.data[SensorData::accX] += theSensorCalibration.accXOffset;
-  sensorData.data[SensorData::accY] *= theSensorCalibration.accYGain;
-  sensorData.data[SensorData::accY] += theSensorCalibration.accYOffset;
-  sensorData.data[SensorData::accZ] *= theSensorCalibration.accZGain;
-  sensorData.data[SensorData::accZ] += theSensorCalibration.accZOffset;
-
-  sensorData.data[SensorData::fsrLFL] = /*sensorData.data[SensorData::fsrLFL] != 0.f ?*/ ((sensorData.data[SensorData::fsrLFL] + theSensorCalibration.fsrLFLOffset) * theSensorCalibration.fsrLFLGain) /*: SensorData::off*/;
-  sensorData.data[SensorData::fsrLFR] = /*sensorData.data[SensorData::fsrLFR] != 0.f ?*/ ((sensorData.data[SensorData::fsrLFR] + theSensorCalibration.fsrLFROffset) * theSensorCalibration.fsrLFRGain) /*: SensorData::off*/;
-  sensorData.data[SensorData::fsrLBL] = /*sensorData.data[SensorData::fsrLBL] != 0.f ?*/ ((sensorData.data[SensorData::fsrLBL] + theSensorCalibration.fsrLBLOffset) * theSensorCalibration.fsrLBLGain) /*: SensorData::off*/;
-  sensorData.data[SensorData::fsrLBR] = /*sensorData.data[SensorData::fsrLBR] != 0.f ?*/ ((sensorData.data[SensorData::fsrLBR] + theSensorCalibration.fsrLBROffset) * theSensorCalibration.fsrLBRGain) /*: SensorData::off*/;
-  sensorData.data[SensorData::fsrRFL] = /*sensorData.data[SensorData::fsrRFL] != 0.f ?*/ ((sensorData.data[SensorData::fsrRFL] + theSensorCalibration.fsrRFLOffset) * theSensorCalibration.fsrRFLGain) /*: SensorData::off*/;
-  sensorData.data[SensorData::fsrRFR] = /*sensorData.data[SensorData::fsrRFR] != 0.f ?*/ ((sensorData.data[SensorData::fsrRFR] + theSensorCalibration.fsrRFROffset) * theSensorCalibration.fsrRFRGain) /*: SensorData::off*/;
-  sensorData.data[SensorData::fsrRBL] = /*sensorData.data[SensorData::fsrRBL] != 0.f ?*/ ((sensorData.data[SensorData::fsrRBL] + theSensorCalibration.fsrRBLOffset) * theSensorCalibration.fsrRBLGain) /*: SensorData::off*/;
-  sensorData.data[SensorData::fsrRBR] = /*sensorData.data[SensorData::fsrRBR] != 0.f ?*/ ((sensorData.data[SensorData::fsrRBR] + theSensorCalibration.fsrRBROffset) * theSensorCalibration.fsrRBRGain) /*: SensorData::off*/;
+  sensorData.data[SensorDataBH::fsrLFL] = (sensorData.data[SensorDataBH::fsrLFL] + theSensorCalibrationBH.fsrLFLOffset) * theSensorCalibrationBH.fsrLFLGain;
+  sensorData.data[SensorDataBH::fsrLFR] = (sensorData.data[SensorDataBH::fsrLFR] + theSensorCalibrationBH.fsrLFROffset) * theSensorCalibrationBH.fsrLFRGain;
+  sensorData.data[SensorDataBH::fsrLBL] = (sensorData.data[SensorDataBH::fsrLBL] + theSensorCalibrationBH.fsrLBLOffset) * theSensorCalibrationBH.fsrLBLGain;
+  sensorData.data[SensorDataBH::fsrLBR] = (sensorData.data[SensorDataBH::fsrLBR] + theSensorCalibrationBH.fsrLBROffset) * theSensorCalibrationBH.fsrLBRGain;
+  sensorData.data[SensorDataBH::fsrRFL] = (sensorData.data[SensorDataBH::fsrRFL] + theSensorCalibrationBH.fsrRFLOffset) * theSensorCalibrationBH.fsrRFLGain;
+  sensorData.data[SensorDataBH::fsrRFR] = (sensorData.data[SensorDataBH::fsrRFR] + theSensorCalibrationBH.fsrRFROffset) * theSensorCalibrationBH.fsrRFRGain;
+  sensorData.data[SensorDataBH::fsrRBL] = (sensorData.data[SensorDataBH::fsrRBL] + theSensorCalibrationBH.fsrRBLOffset) * theSensorCalibrationBH.fsrRBLGain;
+  sensorData.data[SensorDataBH::fsrRBR] = (sensorData.data[SensorDataBH::fsrRBR] + theSensorCalibrationBH.fsrRBROffset) * theSensorCalibrationBH.fsrRBRGain;
 
 #ifdef MEASURE_DELAY
   stream << "sensorData";
-  stream << sensorData.data[SensorData::gyroX] << sensorData.data[SensorData::gyroY] << sensorData.data[SensorData::accX] << sensorData.data[SensorData::accY] << sensorData.data[SensorData::accZ];
+  stream << sensorData.data[SensorDataBH::gyroX] << sensorData.data[SensorDataBH::gyroY] << sensorData.data[SensorDataBH::accX] << sensorData.data[SensorDataBH::accY] << sensorData.data[SensorDataBH::accZ];
 #endif
 
-//  for(int i = 0; i < KeyStates::numOfKeys; ++i)
-//    keyStates.pressed[i] = sensors[j++] != 0;
-//
-//  for(int i = 0; i < BoardInfo::numOfBoards; ++i)
-//  {
-//    boardInfo.ack[i] = (int) sensors[j++];
-//    boardInfo.nack[i] = (int) sensors[j++];
-//    boardInfo.error[i] = (int) sensors[j++];
-//  }
-//
-//  // modify internal data structure, so checkBoardState is influenced as well
-//  MODIFY("representation:BoardInfo", boardInfo);
+  //for(int i = 0; i < KeyStatesBH::numOfKeys; ++i)
+    //keyStates.pressed[i] = sensors[j++] != 0;
 
   // ultasound
-//  if(theJointData.timeStamp - lastUsSwitchTime >= usSettings.ignoreAfterSwitchInterval - 5)
-//  {
-//    if(theJointData.timeStamp - lastUsReadTime >= usSettings.sendInterval - 5)
-//    {
-//      lastUsReadTime = theJointData.timeStamp;
-//      leftUsSensor = sensors[lUsSensor];
-//      rightUsSensor = sensors[rUsSensor];
-//      leftUsSensor = leftUsSensor == 0.f ? 3000.f : (leftUsSensor * 1000.f);
-//      rightUsSensor = rightUsSensor == 0.f ? 3000.f : (rightUsSensor * 1000.f);
-//      usActuatorMode = SensorData::UsActuatorMode(int(usSettings.modes[currentUsMode]));
-//    }
-//  }
-//  sensorData.data[SensorData::usL] = leftUsSensor;
-//  sensorData.data[SensorData::usR] = rightUsSensor;
-//  sensorData.usTimeStamp = lastUsReadTime;
-//  sensorData.usActuatorMode = usActuatorMode;
 
-//  PLOT("module:NaoProvider:usLeft", leftUsSensor);
-//  PLOT("module:NaoProvider:usRight", rightUsSensor);
-//  PLOT("module:NaoProvider:usLeft2", sensors[lUsSensor] * 1000.f);
-//  PLOT("module:NaoProvider:usRight2", sensors[rUsSensor] * 1000.f);
-//
-//#ifndef RELEASE
-//  JointDataDeg jointDataDeg(jointData);
-//#endif
-//  MODIFY("representation:JointDataDeg", jointDataDeg);
+  //if(theUSRequestBH.receiveMode != -1)
+  //{
+    //for(int i = SensorDataBH::usL; i < SensorDataBH::usREnd; ++i)
+    //{
+      //float data = sensors[i - SensorDataBH::usL + lUsSensor];
+      //sensorData.data[i] = data != 0.f ? data * 1000.f : 2550.f;
+    //}
+    //sensorData.usTimeStamp = theJointDataBH.timeStamp;
+    //sensorData.usActuatorMode = (SensorDataBH::UsActuatorMode) theUSRequestBH.receiveMode;
+  //}
+
+  PLOT("module:NaoProvider:usLeft", sensorData.data[SensorDataBH::usL]);
+  PLOT("module:NaoProvider:usRight", sensorData.data[SensorDataBH::usR]);
+
+  //if(memcmp(&gameControlData, &naoBody.getGameControlData(), sizeof(RoboCupGameControlData)))
+  //{
+    //gameControlData = naoBody.getGameControlData();
+    //gameControlTimeStamp = theJointDataBH.timeStamp;
+  //}
+
+#ifndef RELEASE
+  JointDataDeg jointDataDeg(jointData);
+#endif
+  MODIFY("representation:JointDataDeg", jointDataDeg);
 }
 
-//void NaoProvider::checkBoardState(LEDRequest& ledRequest)
-//{
-//  const static LEDRequest::LED leds[BoardInfo::numOfBoards] =
-//  {
-//    LEDRequest::earsLeft72Deg, // chestBoard
-//    LEDRequest::earsRight72Deg, // battery
-//    LEDRequest::earsLeft108Deg, // usBoard
-//    LEDRequest::earsRight108Deg, // inertialSensor
-//    LEDRequest::earsLeft324Deg, // headBoard
-//    LEDRequest::faceRightBlue0Deg, // earLeds
-//    LEDRequest::earsRight324Deg, // faceBoard
-//    LEDRequest::earsLeft0Deg, // leftShoulderBoard
-//    LEDRequest::earsLeft36Deg, //leftArmBoard
-//    LEDRequest::earsRight0Deg, // rightShoulderBoard
-//    LEDRequest::earsRight36Deg, // rightArmBoard
-//    LEDRequest::earsLeft288Deg, // leftHipBoard
-//    LEDRequest::earsLeft252Deg, //leftThighBoard
-//    LEDRequest::earsLeft216Deg, // leftShinBoard
-//    LEDRequest::earsLeft180Deg, // leftFootBoard
-//    LEDRequest::earsRight288Deg, // rightHipBoard
-//    LEDRequest::earsRight252Deg, // rightThighBoard
-//    LEDRequest::earsRight216Deg, // rightShinBoard
-//    LEDRequest::earsRight180Deg // rightFootBoard
-//  };
-//
-//  unsigned now = SystemCall::getCurrentSystemTime();
-//  bool camera = now - theCognitionFrameInfo.time < 2000,
-//       error = !camera;
-//
-//  int i;
-//  for(i = 0; i < BoardInfo::numOfBoards; ++i)
-//  {
-//    if(lastAck[i] != boardInfo.ack[i])
-//    {
-//      lastTimeWhenAck[i] = now;
-//      lastAck[i] = boardInfo.ack[i];
-//    }
-//    if(now - lastTimeWhenAck[i] > 2000 || (boardInfo.error[i] && (boardInfo.error[i] & 0xf0) != 0xd0))
-//      error = true;
-//  }
-//
-//  if(error)
-//  {
-//    for(i = 0; i < LEDRequest::chestRed; ++i)
-//      ledRequest.ledStates[i] = LEDRequest::off;
-//
-//    for(i = 0; i < BoardInfo::numOfBoards; ++i)
-//      if(now - lastTimeWhenAck[i] > 2000 || (boardInfo.error[i] && (boardInfo.error[i] & 0xf0) != 0xd0))
-//        ledRequest.ledStates[leds[i]] = LEDRequest::on;
-//      else
-//        ledRequest.ledStates[leds[i]] = LEDRequest::blinking;
-//
-//    for(i = LEDRequest::faceLeftBlue0Deg; i < LEDRequest::faceRightRed0Deg; ++i)
-//      ledRequest.ledStates[i] = camera ? LEDRequest::off : LEDRequest::blinking;
-//
-//    bool ear = ledRequest.ledStates[LEDRequest::faceRightBlue0Deg] != LEDRequest::on;
-//    for(i = LEDRequest::faceRightBlue0Deg; i < LEDRequest::LEDRequest::earsLeft0Deg; ++i)
-//      ledRequest.ledStates[i] = ear ? LEDRequest::off : LEDRequest::blinking;
-//  }
-//}
+void NaoProvider::finishFrame()
+{
+  if(theInstance)
+    theInstance->send();
+}
 
-//void NaoProvider::finishFrame()
-//{
-//  if(theInstance)
-//    theInstance->send();
-//}
+void NaoProvider::update(RobotInfoBH& robotInfo)
+{
+  TeamInfo& team = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
+  (RobotInfo&) robotInfo = team.players[Global::getSettings().playerNumber - 1];
+  robotInfo.number = Global::getSettings().playerNumber;
+}
+
+void NaoProvider::update(OwnTeamInfoBH& ownTeamInfo)
+{
+  (TeamInfo&) ownTeamInfo = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 0 : 1];
+}
+
+void NaoProvider::update(OpponentTeamInfoBH& opponentTeamInfo)
+{
+  (TeamInfo&) opponentTeamInfo = gameControlData.teams[gameControlData.teams[0].teamNumber == Global::getSettings().teamNumber ? 1 : 0];
+}
+
+void NaoProvider::update(GameInfoBH& gameInfo)
+{
+  memcpy(&(RoboCupGameControlData&) gameInfo, &gameControlData, (char*) gameControlData.teams - (char*) &gameControlData);
+  gameInfo.timeLastPackageReceived = gameControlTimeStamp;
+}
+
+#endif // TARGET_ROBOT
+
+MAKE_MODULE(NaoProvider, Motion Infrastructure)

@@ -1,7 +1,7 @@
 /**
  * @file FallDownState.h
  *
- * Declaration of class FallDownState
+ * Declaration of class FallDownStateBH
  *
  * @author <A href="mailto:timlaue@informatik.uni-bremen.de">Tim Laue</A>
  */
@@ -12,11 +12,11 @@
 #include "Tools/Enum.h"
 
 /**
- * @class FallDownState
+ * @class FallDownStateBH
  *
  * A class that represents the current state of the robot's body
  */
-class FallDownState : public Streamable
+class FallDownStateBH : public Streamable
 {
 private:
   /**
@@ -26,11 +26,11 @@ private:
    */
   void serialize(In* in, Out* out)
   {
-    STREAM_REGISTER_BEGIN();
+    STREAM_REGISTER_BEGIN;
     STREAM(state);
     STREAM(direction);
     STREAM(sidewards);
-    STREAM_REGISTER_FINISH();
+    STREAM_REGISTER_FINISH;
   }
 
 public:
@@ -66,7 +66,7 @@ public:
   float odometryRotationOffset;
 
   /** Default constructor. */
-  FallDownState(): state(undefined), direction(none), sidewards(noot), odometryRotationOffset(0) {}
+  FallDownStateBH(): state(undefined), direction(none), sidewards(noot), odometryRotationOffset(0) {}
 
   /** Debug drawing. */
   void draw();

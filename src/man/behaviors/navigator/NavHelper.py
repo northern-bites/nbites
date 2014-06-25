@@ -3,13 +3,11 @@ from ..util import MyMath
 from ..kickDecider import kicks
 import NavConstants as constants
 from objects import RelLocation, RelRobotLocation, RobotLocation, Location
-# TODO import CommandType properly
 
 def stand(nav):
     """
-    Makes the motion engine stand
-    Right now this is done by sending a (0, 0, 0) velocity vector
-    TODO: make a command for stand
+    Makes the motion engine stand.
+    Right now this is done by sending a (0, 0, 0) velocity vector.
     """
     createAndSendWalkVector(nav, 0, 0, 0)
 
@@ -24,7 +22,6 @@ def getRelativeDestination(my, dest):
     If dest doesn't have a heading (Location, RelLocation), then it will
     use the bearing to the point.
     """
-
     field_dest = dest
 
     if isinstance(field_dest, RelRobotLocation):
@@ -58,25 +55,41 @@ def getDistToDest(my, dest):
     return sqrt((my.x-dest.x)*(my.x-dest.x) + (my.y-dest.y)*(my.y-dest.y))
 
 def isDestinationRelative(dest):
-    #TODO: test if this works for both RelLocation and RelRobotLocation
-    # I think it does, but someone should try it and then note the result -O
+    # TODO test if this works for both RelLocation and RelRobotLocation
     return isinstance(dest, RelLocation)
 
 def adaptSpeed(distance, cutoffDistance, maxSpeed):
     return min(maxSpeed, (distance/cutoffDistance)*maxSpeed)
-#    return MyMath.mapRange(distance, 0, cutoffDistance, 0, maxSpeed)
 
-def setDestination(nav, dest, gain = 1.0, pedantic = False):
+def setDestination(nav, dest, gain = 1.0, kick = None):
     """
-    Method to set the next destination walk command
-    See MotionModule.h for more info on the destination walk command
+    Method to set the next destination walk command.
+    See MotionModule.h for more info on the destination walk command.
+    Also supports motion kicking by passing a motion kick in as an argument.
     """
     command = nav.brain.interface.bodyMotionCommand
-    command.type = command.CommandType.DESTINATION_WALK #Destination Walk
+    command.type = command.CommandType.DESTINATION_WALK
+
     command.dest.rel_x = dest.relX
     command.dest.rel_y = dest.relY
     command.dest.rel_h = dest.relH
-    command.dest.pedantic = pedantic
+
+    command.dest.gain = gain
+
+    if kick:
+        command.dest.kick.perform_motion_kick = True
+
+        if kick == kicks.M_LEFT_SIDE:
+            command.dest.kick.kick_type = 0
+        elif kick == kicks.M_RIGHT_SIDE:
+            command.dest.kick.kick_type = 1
+        elif kick == kicks.M_LEFT_STRAIGHT:
+            command.dest.kick.kick_type = 2
+        elif kick == kicks.M_RIGHT_STRAIGHT:
+            command.dest.kick.kick_type = 3
+        else:
+            raise TypeError, "Kick passed in is not a registered motion kick."
+
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
@@ -87,9 +100,13 @@ def setOdometryDestination(nav, dest, gain = 1.0):
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.ODOMETRY_WALK #Destination Walk
+
     command.odometry_dest.rel_x = dest.relX
     command.odometry_dest.rel_y = dest.relY
     command.odometry_dest.rel_h = dest.relH
+
+    command.odometry_dest.gain = gain
+
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
 
@@ -110,27 +127,13 @@ def createAndSendWalkVector(nav, x, y, theta):
     """
     command = nav.brain.interface.bodyMotionCommand
     command.type = command.CommandType.WALK_COMMAND #Walk Command
+
     command.speed.x_percent = x
     command.speed.y_percent = y
     command.speed.h_percent = theta
+
     # Mark this message for sending
     command.timestamp = int(nav.brain.time * 1000)
-
-def createAndSendMotionKickVector(nav, ball_rel_x, ball_rel_y, kick):
-    command = nav.brain.interface.bodyMotionCommand
-
-    command.dest.kick.perform_motion_kick = True
-    command.dest.kick.ball_rel_x = ball_rel_x
-    command.dest.kick.ball_rel_y = ball_rel_y
-
-    if kick == kicks.M_LEFT_SIDE:
-        command.dest.kick.kick_type = 0
-    elif kick == kicks.M_RIGHT_SIDE:
-        command.dest.kick.kick_type = 1
-    elif kick == kicks.M_LEFT_STRAIGHT:
-        command.dest.kick.kick_type = 2
-    elif kick == kicks.M_RIGHT_STRAIGHT:
-        command.dest.kick.kick_type = 3
 
 def executeMove(nav, sweetMove):
     """

@@ -189,6 +189,7 @@ void StreamHandler::registerWithSpecification(const char* name, const std::type_
 {
   if(registering && registeringEntryStack.top().second.registering)
   {
+    Streaming::trimName(name);
     std::string nameString = name;
     if(registeringEntryStack.top().second.externalOperator)
     {

@@ -1,6 +1,6 @@
 /**
 * @file Pose3D.h
-* Contains class Pose3D
+* Contains class Pose3DBH
 * @author <a href="mailto:martin.kallnik@gmx.de">Martin Kallnik</a>
 * @author Max Risler
 */
@@ -10,61 +10,61 @@
 #include "RotationMatrix.h"
 
 /** representation for 3D Transformation (Location + Orientation)*/
-class Pose3D : public Streamable
+class Pose3DBH : public Streamable
 {
 protected:
   virtual void serialize(In* in, Out* out)
   {
-    STREAM_REGISTER_BEGIN();
+    STREAM_REGISTER_BEGIN;
     STREAM(rotation);
     STREAM(translation);
-    STREAM_REGISTER_FINISH();
+    STREAM_REGISTER_FINISH;
   }
 
 public:
 
-  /** rotation as a RotationMatrix*/
-  RotationMatrix rotation;
+  /** rotation as a RotationMatrixBH*/
+  RotationMatrixBH rotation;
 
-  /** translation as a Vector3*/
-  Vector3<> translation;
+  /** translation as a Vector3BH*/
+  Vector3BH<> translation;
 
   /** constructor*/
-  inline Pose3D() {}
+  inline Pose3DBH() {}
 
   /** constructor from rotation and translation
    * \param rot Rotation
    * \param trans Translation
    */
-  inline Pose3D(const RotationMatrix& rot, const Vector3<>& trans) : rotation(rot), translation(trans) {}
+  inline Pose3DBH(const RotationMatrixBH& rot, const Vector3BH<>& trans) : rotation(rot), translation(trans) {}
 
   /** constructor from rotation
    * \param rot Rotation
    */
-  inline Pose3D(const RotationMatrix& rot) : rotation(rot) {}
+  inline Pose3DBH(const RotationMatrixBH& rot) : rotation(rot) {}
 
   /** constructor from translation
    * \param trans Translation
    */
-  inline Pose3D(const Vector3<>& trans) : translation(trans) {}
+  inline Pose3DBH(const Vector3BH<>& trans) : translation(trans) {}
 
   /** constructor from three translation values
    * \param x translation x component
    * \param y translation y component
    * \param z translation z component
    */
-  inline Pose3D(const float x, const float y, const float z) : translation(x, y, z) {}
+  inline Pose3DBH(const float x, const float y, const float z) : translation(x, y, z) {}
 
   /** Copy constructor
   *\param other The other vector that is copied to this one
   */
-  inline Pose3D(const Pose3D& other) : rotation(other.rotation), translation(other.translation) {}
+  inline Pose3DBH(const Pose3DBH& other) : rotation(other.rotation), translation(other.translation) {}
 
   /** Assignment operator
-  *\param other The other Pose3D that is assigned to this one
+  *\param other The other Pose3DBH that is assigned to this one
   *\return A reference to this object after the assignment.
   */
-  inline Pose3D& operator=(const Pose3D& other)
+  inline Pose3DBH& operator=(const Pose3DBH& other)
   {
     rotation = other.rotation;
     translation = other.translation;
@@ -72,9 +72,9 @@ public:
   }
 
   /** Multiplication with Point
-  *\param point (Vector3&lt;float&gt;)
+  *\param point (Vector3BH&lt;float&gt;)
   */
-  inline Vector3<> operator*(const Vector3<>& point) const
+  inline Vector3BH<> operator*(const Vector3BH<>& point) const
   {
     return rotation * point + translation;
   }
@@ -83,7 +83,7 @@ public:
   *\param other The other vector that will be compared to this one
   *\return Whether the two vectors are equal.
   */
-  inline bool operator==(const Pose3D& other) const
+  inline bool operator==(const Pose3DBH& other) const
   {
     return translation == other.translation && rotation == other.rotation;
   }
@@ -92,7 +92,7 @@ public:
   *\param other The other vector that will be compared to this one
   *\return Whether the two vectors are unequal.
   */
-  inline bool operator!=(const Pose3D& other) const
+  inline bool operator!=(const Pose3DBH& other) const
   {
     return translation != other.translation || rotation != other.rotation;
   }
@@ -101,7 +101,7 @@ public:
   *\param other The other pose that will be concatenated to this one.
   *\return A reference to this pose after concatenation
   */
-  inline Pose3D& conc(const Pose3D& other)
+  inline Pose3DBH& conc(const Pose3DBH& other)
   {
     translation = *this * other.translation;
     rotation *= other.rotation;
@@ -111,9 +111,9 @@ public:
   /** Calculates the inverse transformation from the current pose
   * @return The inverse transformation pose.
   */
-  inline Pose3D invert() const
+  inline Pose3DBH invert() const
   {
-    Pose3D result;
+    Pose3DBH result;
     result.rotation = rotation.invert();
     result.translation = result.rotation * (-translation);
     return result;
@@ -123,7 +123,7 @@ public:
   *\param trans Vector to translate with
   *\return A reference to this pose after translation
   */
-  inline Pose3D& translate(const Vector3<>& trans)
+  inline Pose3DBH& translate(const Vector3BH<>& trans)
   {
     translation = *this * trans;
     return *this;
@@ -135,9 +135,9 @@ public:
   *\param z z component of vector to translate with
   *\return A reference to this pose after translation
   */
-  inline Pose3D& translate(const float x, const float y, const float z)
+  inline Pose3DBH& translate(const float x, const float y, const float z)
   {
-    translation = *this * Vector3<>(x, y, z);
+    translation = *this * Vector3BH<>(x, y, z);
     return *this;
   }
 
@@ -145,7 +145,7 @@ public:
   *\param rot Rotationmatrix to rotate with
   *\return A reference to this pose after rotation
   */
-  inline Pose3D& rotate(const RotationMatrix& rot)
+  inline Pose3DBH& rotate(const RotationMatrixBH& rot)
   {
     rotation *= rot;
     return *this;
@@ -155,7 +155,7 @@ public:
   *\param angle angle to rotate with
   *\return A reference to this pose after rotation
   */
-  inline Pose3D& rotateX(const float angle)
+  inline Pose3DBH& rotateX(const float angle)
   {
     rotation.rotateX(angle);
     return *this;
@@ -165,7 +165,7 @@ public:
   *\param angle angle to rotate with
   *\return A reference to this pose after rotation
   */
-  inline Pose3D& rotateY(const float angle)
+  inline Pose3DBH& rotateY(const float angle)
   {
     rotation.rotateY(angle);
     return *this;
@@ -175,7 +175,7 @@ public:
   *\param angle angle to rotate with
   *\return A reference to this pose after rotation
   */
-  inline Pose3D& rotateZ(const float angle)
+  inline Pose3DBH& rotateZ(const float angle)
   {
     rotation.rotateZ(angle);
     return *this;

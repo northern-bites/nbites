@@ -14,52 +14,52 @@
 class ForwardKinematic
 {
 public:
-  static void calculateArmChain(bool left, const JointData& joints, const RobotDimensions& robotDimensions, const MassCalibration& massCalibration, Pose3D limbs[MassCalibration::numOfLimbs])
+  static void calculateArmChain(bool left, const JointDataBH& joints, const RobotDimensionsBH& robotDimensions, const MassCalibrationBH& massCalibration, Pose3DBH limbs[MassCalibrationBH::numOfLimbs])
   {
-    const float sign = left ? -1.0f : 1.0f;
-    MassCalibration::Limb shoulder = left ? MassCalibration::shoulderLeft : MassCalibration::shoulderRight;
-    JointData::Joint arm0 = left ? JointData::LShoulderPitch : JointData::RShoulderPitch;
+    int sign = left ? -1 : 1;
+    MassCalibrationBH::Limb shoulder = left ? MassCalibrationBH::shoulderLeft : MassCalibrationBH::shoulderRight;
+    JointDataBH::Joint arm0 = left ? JointDataBH::LShoulderPitch : JointDataBH::RShoulderPitch;
 
-    limbs[shoulder + 0] = Pose3D(robotDimensions.armOffset.x, robotDimensions.armOffset.y * -sign, robotDimensions.armOffset.z)
+    limbs[shoulder + 0] = Pose3DBH(robotDimensions.armOffset.x, robotDimensions.armOffset.y * -sign, robotDimensions.armOffset.z)
                           .rotateY(-joints.angles[arm0 + 0]);
-    limbs[shoulder + 1] = Pose3D(limbs[shoulder + 0])
+    limbs[shoulder + 1] = Pose3DBH(limbs[shoulder + 0])
                           .rotateZ(joints.angles[arm0 + 1] * -sign);
-    limbs[shoulder + 2] = Pose3D(limbs[shoulder + 1])
+    limbs[shoulder + 2] = Pose3DBH(limbs[shoulder + 1])
                           .translate(robotDimensions.upperArmLength, robotDimensions.yElbowShoulder * -sign, 0)
                           .rotateX(joints.angles[arm0 + 2] * -sign);
-    limbs[shoulder + 3] = Pose3D(limbs[shoulder + 2])
+    limbs[shoulder + 3] = Pose3DBH(limbs[shoulder + 2])
                           .rotateZ(joints.angles[arm0 + 3] * -sign);
   }
 
-  static void calculateLegChain(bool left, const JointData& joints, const RobotDimensions& robotDimensions, const MassCalibration& massCalibration, Pose3D limbs[MassCalibration::numOfLimbs])
+  static void calculateLegChain(bool left, const JointDataBH& joints, const RobotDimensionsBH& robotDimensions, const MassCalibrationBH& massCalibration, Pose3DBH limbs[MassCalibrationBH::numOfLimbs])
   {
-    const float sign = left ? -1.0f : 1.0f;
-    MassCalibration::Limb pelvis = left ? MassCalibration::pelvisLeft : MassCalibration::pelvisRight;
-    JointData::Joint leg0 = left ? JointData::LHipYawPitch : JointData::RHipYawPitch;
+    int sign = left ? -1 : 1;
+    MassCalibrationBH::Limb pelvis = left ? MassCalibrationBH::pelvisLeft : MassCalibrationBH::pelvisRight;
+    JointDataBH::Joint leg0 = left ? JointDataBH::LHipYawPitch : JointDataBH::RHipYawPitch;
 
-    limbs[pelvis + 0] =  Pose3D(0, robotDimensions.lengthBetweenLegs / 2.0f * -sign, 0)
+    limbs[pelvis + 0] =  Pose3DBH(0, robotDimensions.lengthBetweenLegs / 2.0f * -sign, 0)
                          .rotateX(-pi_4 * sign)
                          .rotateZ(joints.angles[leg0 + 0] * sign)
                          .rotateX(pi_4 * sign);
-    limbs[pelvis + 1] = Pose3D(limbs[pelvis + 0])
+    limbs[pelvis + 1] = Pose3DBH(limbs[pelvis + 0])
                         .rotateX(joints.angles[leg0 + 1] * sign);
-    limbs[pelvis + 2] = Pose3D(limbs[pelvis + 1])
+    limbs[pelvis + 2] = Pose3DBH(limbs[pelvis + 1])
                         .rotateY(joints.angles[leg0 + 2]);
-    limbs[pelvis + 3] = Pose3D(limbs[pelvis + 2])
+    limbs[pelvis + 3] = Pose3DBH(limbs[pelvis + 2])
                         .translate(0, 0, -robotDimensions.upperLegLength)
                         .rotateY(joints.angles[leg0 + 3]);
-    limbs[pelvis + 4] = Pose3D(limbs[pelvis + 3])
+    limbs[pelvis + 4] = Pose3DBH(limbs[pelvis + 3])
                         .translate(0, 0, -robotDimensions.lowerLegLength)
                         .rotateY(joints.angles[leg0 + 4]);
-    limbs[pelvis + 5] = Pose3D(limbs[pelvis + 4])
+    limbs[pelvis + 5] = Pose3DBH(limbs[pelvis + 4])
                         .rotateX(joints.angles[leg0 + 5] * sign);
   }
 
-  static void calculateHeadChain(const JointData& joints, const RobotDimensions& robotDimensions, const MassCalibration& massCalibration, Pose3D limbs[MassCalibration::numOfLimbs])
+  static void calculateHeadChain(const JointDataBH& joints, const RobotDimensionsBH& robotDimensions, const MassCalibrationBH& massCalibration, Pose3DBH limbs[MassCalibrationBH::numOfLimbs])
   {
-    limbs[MassCalibration::neck] = Pose3D(0, 0, robotDimensions.zLegJoint1ToHeadPan)
-                                   .rotateZ(joints.angles[JointData::HeadYaw]);
-    limbs[MassCalibration::head] = Pose3D(limbs[MassCalibration::neck])
-                                   .rotateY(-joints.angles[JointData::HeadPitch]);
+    limbs[MassCalibrationBH::neck] = Pose3DBH(0, 0, robotDimensions.zLegJoint1ToHeadPan)
+                                   .rotateZ(joints.angles[JointDataBH::HeadYaw]);
+    limbs[MassCalibrationBH::head] = Pose3DBH(limbs[MassCalibrationBH::neck])
+                                   .rotateY(-joints.angles[JointDataBH::HeadPitch]);
   }
 };

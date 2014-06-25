@@ -6,84 +6,53 @@
 
 #pragma once
 
-//#include "Tools/Module/Module.h"
+#include "Tools/Module/Module.h"
 #include "Representations/Infrastructure/FrameInfo.h"
+#include "Representations/Configuration/RobotDimensions.h"
 #include "Representations/Sensing/InertiaSensorData.h"
 #include "Representations/Sensing/OrientationData.h"
 #include "Representations/Sensing/RobotModel.h"
-#include "Representations/MotionControl/MotionInfo.h"
-#include "Representations/MotionControl/WalkingEngineOutput.h"
-#include "Tools/Math/Pose3D.h"
-#include "Tools/Math/Matrix3x3.h"
+#include "Tools/Math/Matrix.h"
 
-//MODULE(InertiaSensorFilter)
-//  REQUIRES(FrameInfo)
-//  REQUIRES(InertiaSensorData)
-//  REQUIRES(RobotModel)
-//  REQUIRES(SensorData)
-//  USES(MotionInfo)
-//  USES(WalkingEngineOutput)
-//  PROVIDES_WITH_MODIFY(OrientationData)
-//END_MODULE
+MODULE(InertiaSensorFilter)
+  REQUIRES(FrameInfoBH)
+  REQUIRES(InertiaSensorDataBH)
+  REQUIRES(RobotModelBH)
+  REQUIRES(SensorDataBH)
+  REQUIRES(RobotDimensionsBH)
+  USES(MotionInfoBH)
+  USES(WalkingEngineOutputBH)
+  PROVIDES_WITH_MODIFY(OrientationDataBH)
+  DEFINES_PARAMETER(Vector2f, processNoise, Vector2f(0.004f, 0.004f)) /**< The standard deviation of the process. */
+  DEFINES_PARAMETER(Vector3f, accNoise, Vector3f(1.f, 1.f, 1.f)) /**< The standard deviation of the inertia sensor. */
+  DEFINES_PARAMETER(Vector2f, calculatedAccLimit, Vector2f(fromDegrees(20.f), fromDegrees(30.f))) /**< Use a calculated angle up to this angle (in rad). (We use the acceleration sensors otherwise.) */
+END_MODULE
 
 /**
 * @class InertiaSensorFilter
 * A module for estimating velocity and orientation of the torso.
 */
-class InertiaSensorFilter //: public InertiaSensorFilterBase
+class InertiaSensorFilter : public InertiaSensorFilterBase
 {
 public:
+  static PROCESS_WIDE_STORAGE(InertiaSensorFilter) theInstance;
   /** Default constructor. */
   InertiaSensorFilter();
 
-private:
   /**
-  * A collection of parameters for this module.
+  * Updates the OrientationDataBH representation.
+  * @param orientationData The orientation data representation which is updated by this module.
   */
-  class Parameters : public Streamable
-  {
-  public:
-    Vector2<> processNoise; /**< The standard deviation of the process. */
-    Vector3<> accNoise; /**< The standard deviation of the inertia sensor. */
-    Vector2<> calculatedAccLimit; /**< Use a calculated angle up to this angle (in rad). (We use the acceleration sensors otherwise.) */
+  void update(OrientationDataBH& orientationData);
 
-    Matrix2x2<> processCov; /**< The covariance matrix for process noise. */
-    Matrix3x3<> sensorCov; /**< The covariance matrix for sensor noise. */
-
-    /** Default constructor. */
-    Parameters() {};
-
-    /**
-    * Calculates parameter dependent constants used to speed up some calculations.
-    */
-    void calculateConstants();
-
-  private:
-    /**
-    * The method makes the object streamable.
-    * @param in The stream from which the object is read.
-    * @param out The stream to which the object is written.
-    */
-    virtual void serialize(In* in, Out* out)
-    {
-      STREAM_REGISTER_BEGIN();
-      STREAM(processNoise);
-      STREAM(accNoise);
-      STREAM(calculatedAccLimit);
-      STREAM_REGISTER_FINISH();
-
-      if(in)
-        calculateConstants();
-    }
-  };
-
+private:
   /**
   * Represents the state to be estimated.
   */
-  template <class V = float> class State
+  class State
   {
   public:
-    RotationMatrix rotation; /** The rotation of the torso. */
+    RotationMatrixBH rotation; /** The rotation of the torso. */
 
     /** Default constructor. */
     State() {}
@@ -93,87 +62,80 @@ private:
     * @param value The flat vector to add.
     * @return A new object after the calculation.
     */
-    State operator+(const Vector2<V>& value) const;
+    State operator+(const Vector2f& value) const;
 
     /**
     * Adds some world rotation given as angle axis.
     * @param value The flat vector to add.
     * @return A reference this object after the calculation.
     */
-    State& operator+=(const Vector2<V>& value);
+    State& operator+=(const Vector2f& value);
 
     /**
     * Calculates a flat difference vector of two states.
     * @return The difference.
     */
-    Vector2<V> operator-(const State& other) const;
+    Vector2f operator-(const State& other) const;
   };
 
-  Parameters p; /**< The parameters of this module. */
+  Matrix2x2f processCov; /**< The covariance matrix for process noise. */
+  Matrix3x3f sensorCov; /**< The covariance matrix for sensor noise. */
 
-  Pose3D lastLeftFoot; /**< The pose of the left foot of the previous iteration. */
-  Pose3D lastRightFoot; /**< The pose of the right foot of the previous iteration. */
+  Pose3DBH lastLeftFoot; /**< The pose of the left foot of the previous iteration. */
+  Pose3DBH lastRightFoot; /**< The pose of the right foot of the previous iteration. */
   unsigned int lastTime; /**< The frame time of the previous iteration. */
-  Vector2<> safeRawAngle; /**< The last not corrupted angle from aldebarans angle estimation algorithm. */
+  Vector2f safeRawAngle; /**< The last not corrupted angle from aldebarans angle estimation algorithm. */
 
-  State<> x; /**< The estimate */
-  Matrix2x2<> cov; /**< The covariance of the estimate. */
-  Matrix2x2<> l; /**< The last caculated cholesky decomposition of \c cov. */
-  State<> sigmaPoints[5]; /**< The last calculated sigma points. */
+  State x; /**< The estimate */
+  Matrix2x2f cov; /**< The covariance of the estimate. */
+  Matrix2x2f l; /**< The last caculated cholesky decomposition of \c cov. */
+  State sigmaPoints[5]; /**< The last calculated sigma points. */
 
-  Vector3<> sigmaReadings[5]; /**< The expected sensor values at the sigma points. */
-  Vector3<> readingMean; /**< The mean of the expected sensor values which was determined by using the sigma velocities. */
-  Matrix3x3<> readingsCov;
-  Matrix3x2<> readingsSigmaPointsCov;
+  Vector3f sigmaReadings[5]; /**< The expected sensor values at the sigma points. */
+  Vector3f readingMean; /**< The mean of the expected sensor values which was determined by using the sigma velocities. */
+  Matrix3x3f readingsCov;
+  Matrix3x2f readingsSigmaPointsCov;
 
-  public:
   /**
-  * Updates the OrientationData representation.
-  * @param orientationData The orientation data representation which is updated by this module.
-  */
-  void update(OrientationData& orientationData,
-          const InertiaSensorData& theInertiaSensorData,
-          const SensorData& theSensorData,
-          const RobotModel& theRobotModel,
-          const FrameInfo& theFrameInfo,
-          const MotionInfo& theMotionInfo,
-          const WalkingEngineOutput& theWalkingEngineOutput);
+   * Calculates parameter dependent constants used to speed up some calculations.
+   */
+  void calculateConstants();
 
   /**
   * Restores the initial state.
   */
   void reset();
 
-  void predict(const RotationMatrix& rotationOffset);
-  void readingUpdate(const Vector3<>& reading);
+  void predict(const RotationMatrixBH& rotationOffset);
+  void readingUpdate(const Vector3f& reading);
 
   void cholOfCov();
   void generateSigmaPoints();
   void meanOfSigmaPoints();
   void covOfSigmaPoints();
 
-  void readingModel(const State<>& sigmaPoint, Vector3<>& reading);
+  void readingModel(const State& sigmaPoint, Vector3f& reading);
   void meanOfSigmaReadings();
   void covOfSigmaReadingsAndSigmaPoints();
   void covOfSigmaReadings();
 
-  inline Matrix2x2<> tensor(const Vector2<>& a, const Vector2<>& b) const
+  inline Matrix2x2f tensor(const Vector2f& a, const Vector2f& b) const
   {
-    return Matrix2x2<>(a * b.x, a * b.y);
+    return Matrix2x2f(a * b.x, a * b.y);
   }
 
-  inline Matrix2x2<> tensor(const Vector2<>& a) const
+  inline Matrix2x2f tensor(const Vector2f& a) const
   {
-    return Matrix2x2<>(a * a.x, a * a.y);
+    return Matrix2x2f(a * a.x, a * a.y);
   }
 
-  inline Matrix3x2<> tensor(const Vector3<>& a, const Vector2<>& b)
+  inline Matrix3x2f tensor(const Vector3f& a, const Vector2f& b)
   {
-    return Matrix3x2<>(a * b.x, a * b.y);
+    return Matrix3x2f(a * b.x, a * b.y);
   }
 
-  inline Matrix3x3<> tensor(const Vector3<>& a)
+  inline Matrix3x3f tensor(const Vector3f& a)
   {
-    return Matrix3x3<>(a * a.x, a * a.y, a * a.z);
+    return Matrix3x3f(a * a.x, a * a.y, a * a.z);
   }
 };

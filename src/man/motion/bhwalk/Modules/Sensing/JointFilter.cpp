@@ -6,19 +6,16 @@
 
 #include "JointFilter.h"
 
-//MAKE_MODULE(JointFilter, Sensing)
-//
-//void JointFilter::update(FilteredJointDataPrev& filteredJointDataPrev)
-//{
-//  (FilteredJointData&) filteredJointDataPrev = theFilteredJointData;
-//}
+MAKE_MODULE(JointFilter, Sensing)
 
-void JointFilter::update(FilteredJointData& filteredJointData, const JointData& theJointData)
+PROCESS_WIDE_STORAGE(JointFilter) JointFilter::theInstance = 0;
+
+void JointFilter::update(FilteredJointDataBH& filteredJointData)
 {
-  for(int i = 0; i < JointData::numOfJoints; ++i)
-    if(theJointData.angles[i] != JointData::off)
-      filteredJointData.angles[i] = theJointData.angles[i];
-    else if(filteredJointData.angles[i] == JointData::off)
+  for(int i = 0; i < JointDataBH::numOfJoints; ++i)
+    if(theJointDataBH.angles[i] != JointDataBH::off)
+      filteredJointData.angles[i] = theJointDataBH.angles[i];
+    else if(filteredJointData.angles[i] == JointDataBH::off)
       filteredJointData.angles[i] = 0;
-  filteredJointData.timeStamp = theJointData.timeStamp;
+  filteredJointData.timeStamp = theJointDataBH.timeStamp;
 }

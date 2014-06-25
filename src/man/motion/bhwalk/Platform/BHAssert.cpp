@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <cstdarg>
 
-void Assert::print(const char* file, int line, const char* format, ...)
+void AssertBH::print(const char* file, int line, const char* format, ...)
 {
   char data[320];
   int length = snprintf(data, sizeof(data) - 2, "%s:%d: ", file, line);
@@ -32,7 +32,7 @@ void Assert::print(const char* file, int line, const char* format, ...)
   fflush(stderr);
 }
 
-void Assert::abort()
+void AssertBH::abort()
 {
   ::abort();
 }
@@ -122,7 +122,7 @@ public:
 pthread_mutex_t AssertFramework::mutex = PTHREAD_MUTEX_INITIALIZER;
 __thread AssertFramework::Thread* AssertFramework::threadData = 0;
 
-bool Assert::logInit(const char* name)
+bool AssertBH::logInit(const char* name)
 {
   int thread = -1;
   pthread_mutex_lock(&AssertFramework::mutex);
@@ -137,7 +137,7 @@ bool Assert::logInit(const char* name)
   return true;
 }
 
-void Assert::logAdd(int trackId, const char* file, int lineNum, const char* message)
+void AssertBH::logAdd(int trackId, const char* file, int lineNum, const char* message)
 {
   ASSERT(AssertFramework::threadData);
   ASSERT(trackId >= 0 && trackId < int(sizeof(AssertFramework::threadData->track) / sizeof(*AssertFramework::threadData->track)));
@@ -151,7 +151,7 @@ void Assert::logAdd(int trackId, const char* file, int lineNum, const char* mess
   track->active = true;
 }
 
-void Assert::logDump(bool toStderr, int termSignal)
+void AssertBH::logDump(bool toStderr, int termSignal)
 {
   assertFramework.init(false);
 
