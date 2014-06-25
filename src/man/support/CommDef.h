@@ -5,6 +5,7 @@
 
 #include "Common.h"
 
+#define IP_TARGET "255.255.255.255"
 #define TEAM_PORT 4500
 
 #define UDP_BUF_SIZE 1024
@@ -21,11 +22,6 @@ typedef unsigned char byte;
 #define ERROR_NO_OUTPUT "Output unavailable on socket."
 #define ERROR_DATATYPE "Unexpected data type read from socket connection."
 #define ERROR_DATASIZE "Unexpected amount of data read from socket connection."
-
-
-//
-// Multicast information
-//
 
 static const int NUM_ROBOTS = 9;    // Total number of robots we have
 
