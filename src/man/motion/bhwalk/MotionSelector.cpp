@@ -1,97 +1,83 @@
 /**
 * @file Modules/MotionControl/MotionSelector.cpp
 * This file implements a module that is responsible for controlling the motion.
-* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas R�fer</A>
-* @author <A href="mailto:allli@tzi.de">Alexander H�rtl</A>
+* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas Röfer</A>
+* @author <A href="mailto:allli@tzi.de">Alexander Härtl</A>
 */
 
+#include <algorithm>
 #include "MotionSelector.h"
+#include "Tools/Debugging/DebugDrawings.h"
 
-#include <math.h>
+MAKE_MODULE(MotionSelector, Motion Control)
 
-//#include "Tools/Debugging/DebugDrawings.h"
-
-//MAKE_MODULE(MotionSelector, Motion Control)
-//
-//PROCESS_WIDE_STORAGE(MotionSelector) MotionSelector::theInstance = 0;
+PROCESS_WIDE_STORAGE(MotionSelector) MotionSelector::theInstance = 0;
 
 void MotionSelector::stand()
 {
-//  if(theInstance)
-//  {
-//    theInstance->forceStand = true;
-//  }
+  if(theInstance)
+  {
+#ifdef TARGET_ROBOT
+    theInstance->forceStand = true;
+#endif
+  }
 }
 
-void MotionSelector::update(MotionSelection& motionSelection,
-        const MotionRequest& theMotionRequest,
-        const WalkingEngineOutput& theWalkingEngineOutput,
-        const GroundContactState& theGroundContactState,
-        const DamageConfiguration& theDamageConfiguration,
-        const FrameInfo& theFrameInfo)
+void MotionSelector::update(MotionSelectionBH& motionSelection)
 {
-  static const int interpolationTimes[MotionRequest::numOfMotions] =
-  {
-    790, // to walk
-    600, // to Bike, (could be 0)
-    200, // to specialAction
-    600, // to stand
-  };
+  static int interpolationTimes[MotionRequestBH::numOfMotions];
+  interpolationTimes[MotionRequestBH::walk] = 10;
+  interpolationTimes[MotionRequestBH::bike] = 200;
+  interpolationTimes[MotionRequestBH::indykick] = 10;
+  interpolationTimes[MotionRequestBH::specialAction] = 10;
+  interpolationTimes[MotionRequestBH::stand] = 10;
+  interpolationTimes[MotionRequestBH::getUp] = 600;
+  interpolationTimes[MotionRequestBH::takeBall] = 600;
   static const int playDeadDelay(2000);
 
   if(lastExecution)
   {
-    MotionRequest::Motion requestedMotion = theMotionRequest.motion;
-    if(theMotionRequest.motion == MotionRequest::walk && ((!theGroundContactState.contactSafe && theDamageConfiguration.useGroundContactDetectionForSafeStates) || theWalkingEngineOutput.enforceStand))
-      requestedMotion = MotionRequest::stand;
+    MotionRequestBH::Motion requestedMotion = theMotionRequestBH.motion;
+    if(theMotionRequestBH.motion == MotionRequestBH::walk && !theGroundContactStateBH.contact)
+      requestedMotion = MotionRequestBH::stand;
 
-    if(forceStand && (lastMotion == MotionRequest::walk || lastMotion == MotionRequest::stand))
+    if(forceStand && (lastMotion == MotionRequestBH::walk || lastMotion == MotionRequestBH::stand))
     {
-      requestedMotion = MotionRequest::stand;
+      requestedMotion = MotionRequestBH::stand;
       forceStand = false;
     }
 
     // check if the target motion can be the requested motion (mainly if leaving is possible)
-    if((lastMotion == MotionRequest::walk && (!&theWalkingEngineOutput || theWalkingEngineOutput.isLeavingPossible || (!theGroundContactState.contactSafe && theDamageConfiguration.useGroundContactDetectionForSafeStates))) ||
-       lastMotion == MotionRequest::stand || // stand can always be left
-       (lastMotion == MotionRequest::specialAction) || //&& (!&theSpecialActionsOutput || theSpecialActionsOutput.isLeavingPossible)) ||
-//       (lastMotion == MotionRequest::bike && (!&theBikeEngineOutput || theBikeEngineOutput.isLeavingPossible)) ||
-       (requestedMotion == MotionRequest::specialAction &&
-        (theMotionRequest.specialActionRequest.specialAction == SpecialActionRequest::standUpBackNao ||
-         theMotionRequest.specialActionRequest.specialAction == SpecialActionRequest::standUpFrontNao/* ||
-                                                                                                  theMotionRequest.specialActionRequest.specialAction == SpecialActionRequest::layDownKeeper*/)))
+    if((lastMotion == MotionRequestBH::walk && (!&theWalkingEngineOutputBH || theWalkingEngineOutputBH.isLeavingPossible || !theGroundContactStateBH.contact)) ||
+       lastMotion == MotionRequestBH::stand || // stand can always be left
+       (lastMotion == MotionRequestBH::specialAction) ||
+       (lastMotion == MotionRequestBH::bike && (!&theBikeEngineOutputBH || theBikeEngineOutputBH.isLeavingPossible)) ||
+       (lastMotion == MotionRequestBH::indykick && (!&theIndykickEngineOutputBH || theIndykickEngineOutputBH.isLeavingPossible)) ||
+       (lastMotion == MotionRequestBH::getUp && (!&theGetUpEngineOutputBH || theGetUpEngineOutputBH.isLeavingPossible)) ||
+       (lastMotion == MotionRequestBH::takeBall && (!&theBallTakingOutputBH || theBallTakingOutputBH.isLeavingPossible)) ||
+       (requestedMotion == MotionRequestBH::takeBall && &theBallTakingOutputBH && lastMotion == MotionRequestBH::walk)) 
     {
       motionSelection.targetMotion = requestedMotion;
     }
 
-    if(requestedMotion == MotionRequest::bike)
-      motionSelection.bikeRequest = theMotionRequest.bikeRequest;
-    else
-      motionSelection.bikeRequest = BikeRequest();
-
-    if(requestedMotion == MotionRequest::walk)
-      motionSelection.walkRequest = theMotionRequest.walkRequest;
-    else
-      motionSelection.walkRequest = WalkRequest();
-
-    if(requestedMotion == MotionRequest::specialAction)
+    if(requestedMotion == MotionRequestBH::specialAction)
     {
-      motionSelection.specialActionRequest = theMotionRequest.specialActionRequest;
+      motionSelection.specialActionRequest = theMotionRequestBH.specialActionRequest;
     }
     else
     {
       motionSelection.specialActionRequest = SpecialActionRequest();
-      if(motionSelection.targetMotion == MotionRequest::specialAction)
+      if(motionSelection.targetMotion == MotionRequestBH::specialAction)
         motionSelection.specialActionRequest.specialAction = SpecialActionRequest::numOfSpecialActionIDs;
     }
 
     // increase / decrease all ratios according to target motion
-    const unsigned deltaTime(theFrameInfo.getTimeSince(lastExecution));
-    const int interpolationTime = prevMotion == MotionRequest::specialAction && lastActiveSpecialAction == SpecialActionRequest::playDead ? playDeadDelay : interpolationTimes[motionSelection.targetMotion];
-    float delta((float)deltaTime / (float)interpolationTime);
-//    ASSERT(SystemCall::getMode() == SystemCall::logfileReplay || delta > 0.00001f);
+    const unsigned deltaTime(theFrameInfoBH.getTimeSince(lastExecution));
+    const int interpolationTime = prevMotion == MotionRequestBH::specialAction && lastActiveSpecialAction == SpecialActionRequest::playDead ? playDeadDelay : interpolationTimes[motionSelection.targetMotion];
+    float delta((float)deltaTime / interpolationTime);
+    ASSERT(SystemCall::getMode() == SystemCall::logfileReplay || delta > 0.00001f);
     float sum(0);
-    for(int i = 0; i < MotionRequest::numOfMotions; i++)
+    for(int i = 0; i < MotionRequestBH::numOfMotions; i++)
     {
       if(i == motionSelection.targetMotion)
         motionSelection.ratios[i] += delta;
@@ -101,39 +87,36 @@ void MotionSelector::update(MotionSelection& motionSelection,
       sum += motionSelection.ratios[i];
     }
     ASSERT(sum != 0);
-    // normalize ratios
-    for(int i = 0; i < MotionRequest::numOfMotions; i++)
+    // normalizeBH ratios
+    for(int i = 0; i < MotionRequestBH::numOfMotions; i++)
     {
       motionSelection.ratios[i] /= sum;
-      if(fabs(motionSelection.ratios[i] - 1.f) < 0.00001f)
+      if(std::abs(motionSelection.ratios[i] - 1.f) < 0.00001f)
         motionSelection.ratios[i] = 1.f; // this should fix a "motionSelection.ratios[motionSelection.targetMotion] remains smaller than 1.f" bug
     }
 
-    if(motionSelection.ratios[MotionRequest::specialAction] < 1.f)
+    if(motionSelection.ratios[MotionRequestBH::specialAction] < 1.f)
     {
-      if(motionSelection.targetMotion == MotionRequest::specialAction)
-        motionSelection.specialActionMode = MotionSelection::first;
+      if(motionSelection.targetMotion == MotionRequestBH::specialAction)
+        motionSelection.specialActionMode = MotionSelectionBH::first;
       else
-        motionSelection.specialActionMode = MotionSelection::deactive;
+        motionSelection.specialActionMode = MotionSelectionBH::deactive;
     }
     else
-      motionSelection.specialActionMode = MotionSelection::active;
+      motionSelection.specialActionMode = MotionSelectionBH::active;
 
-    if(motionSelection.specialActionMode == MotionSelection::active && motionSelection.specialActionRequest.specialAction != SpecialActionRequest::numOfSpecialActionIDs)
+    if(motionSelection.specialActionMode == MotionSelectionBH::active && motionSelection.specialActionRequest.specialAction != SpecialActionRequest::numOfSpecialActionIDs)
       lastActiveSpecialAction = motionSelection.specialActionRequest.specialAction;
-
-    if(motionSelection.ratios[MotionRequest::walk] < 1.f)
-      motionSelection.walkRequest = WalkRequest();
   }
-  lastExecution = theFrameInfo.time;
+  lastExecution = theFrameInfoBH.time;
   if(lastMotion != motionSelection.targetMotion)
     prevMotion = lastMotion;
   lastMotion = motionSelection.targetMotion;
 
-//  PLOT("module:MotionSelector:ratios:walk", motionSelection.ratios[MotionRequest::walk]);
-//  PLOT("module:MotionSelector:ratios:stand", motionSelection.ratios[MotionRequest::stand]);
-//  PLOT("module:MotionSelector:ratios:specialAction", motionSelection.ratios[MotionRequest::specialAction]);
-//  PLOT("module:MotionSelector:lastMotion", lastMotion);
-//  PLOT("module:MotionSelector:prevMotion", prevMotion);
-//  PLOT("module:MotionSelector:targetMotion", motionSelection.targetMotion);
+  PLOT("module:MotionSelector:ratios:walk", motionSelection.ratios[MotionRequestBH::walk]);
+  PLOT("module:MotionSelector:ratios:stand", motionSelection.ratios[MotionRequestBH::stand]);
+  PLOT("module:MotionSelector:ratios:specialAction", motionSelection.ratios[MotionRequestBH::specialAction]);
+  PLOT("module:MotionSelector:lastMotion", lastMotion);
+  PLOT("module:MotionSelector:prevMotion", prevMotion);
+  PLOT("module:MotionSelector:targetMotion", motionSelection.targetMotion);
 }

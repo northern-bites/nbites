@@ -23,6 +23,8 @@
 // Motion commands
 #include "BodyJointCommand.h"
 #include "WalkCommand.h"
+#include "DestinationCommand.h"
+#include "StepCommand.h"
 #include "FreezeCommand.h"
 #include "UnfreezeCommand.h"
 

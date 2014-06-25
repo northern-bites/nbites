@@ -18,9 +18,9 @@
 #define ASSERT_INDEX_WITHIN(i, begin, end) \
   ASSERT((i) >= begin); ASSERT((i) < end);
 
-#define ASSERT_COORDINATES_WITHIN_IMAGE(x, y, cameraInfo) \
-  ASSERT_INDEX_WITHIN(x, 0, (cameraInfo).resolutionWidth); \
-  ASSERT_INDEX_WITHIN(y, 0, (cameraInfo).resolutionHeight);
+#define ASSERT_COORDINATES_WITHIN_IMAGE(x, y, image) \
+  ASSERT_INDEX_WITHIN(x, 0, (image).width); \
+  ASSERT_INDEX_WITHIN(y, 0, (image).height);
 
-#define ASSERT_POINT_WITHIN_IMAGE(p, cameraInfo) \
-  ASSERT_COORDINATES_WITHIN_IMAGE((p).x, (p).y, cameraInfo)
+#define ASSERT_POINT_WITHIN_IMAGE(p, image) \
+  ASSERT_COORDINATES_WITHIN_IMAGE((p).x, (p).y, image)

@@ -58,7 +58,7 @@ class ObstacleModule : public portals::Module
 {
     // Parameters
     // How close do our sonar readings need to get for us to decide obstacle?
-    static const float SONAR_THRESH = 0.4f;
+    static constexpr float SONAR_THRESH = 0.4f;
     // How many frames do we consider in our average of sonar values?
     static const unsigned int SONAR_FRAMES_TO_BUFFER = 20;
 

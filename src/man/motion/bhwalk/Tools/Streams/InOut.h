@@ -4,8 +4,8 @@
 * Definition of the abstract base classes In and Out for streams.
 * Include this header file for declaring streaming operators.
 *
-* @author Thomas Röfer
-* @author Martin Lötzsch
+* @author Thomas RÃ¶fer
+* @author Martin LÃ¶tzsch
 */
 
 #pragma once
@@ -14,51 +14,6 @@
 
 namespace EnumHelpers
 {
-  /**
-  * A template class the sole purpose of which is not execute user
-  * defined conversion operators during the type check done below.
-  * gcc does not support returning arrays. Therefore the conversion
-  * is only defined for non-array return types. In that case,
-  * an EnumConsumeUDC object will be returned, which also cannot
-  * be converted to int. Note that the operator is actually never 
-  * implemented, because it is never executed.
-  * @param T The type that is returned during type checking.
-  */
-  template<typename T> struct ConsumeUDC
-  { 
-    operator T() const; 
-  };
-
-  template<typename T> struct ConsumeUDC<T[]> {};
-  template<typename T, size_t N> struct ConsumeUDC<T[N]> {};
-
-  /**
-  * A function signature that accepts an integer as parameter.
-  * Note that the function is actually never implemented, because it
-  * is never executed.
-  * @return A two byte value.
-  */
-  short canBeConvertedToInt(int);
-
-  /**
-  * Function signatures that accept an integer as parameter but are not integers.
-  * Note that the function is actually never implemented, because it
-  * is never executed.
-  * @return A two byte value.
-  */
-  char canBeConvertedToInt(long);
-  char canBeConvertedToInt(unsigned long);
-  char canBeConvertedToInt(long long);
-  char canBeConvertedToInt(unsigned long long);
-  
-  /**
-  * A function signature that accepts anything (but an integer) as 
-  * parameter. Note that the function is actually never implemented, 
-  * because it is never executed.
-  * @return A one byte value.
-  */
-  char canBeConvertedToInt(...);
-
   template<class T, bool isEnum> struct EnumOrClass;
 }
 
@@ -110,6 +65,11 @@ protected:
   virtual void outDouble(double) = 0;
 
   /**
+   * Virtual redirection for operator<<(const bool& value).
+   */
+  virtual void outBool(bool) = 0;
+
+  /**
   * Virtual redirection for operator<<(const char* value).
   */
   virtual void outString(const char*) = 0;
@@ -121,6 +81,9 @@ protected:
   virtual void outEndL() = 0;
 
 public:
+  /** Virtual destructor for derived classes. */
+  virtual ~Out() {}
+
   /**
   * The function writes a number of bytes into a stream.
   * @param p The address the data is located at.
@@ -148,9 +111,9 @@ public:
   */
   template<class T> Out& operator<<(const T& t)
   {
-    return EnumHelpers::EnumOrClass<T, sizeof(EnumHelpers::canBeConvertedToInt(EnumHelpers::ConsumeUDC<T>())) == sizeof(short)>::write(*this, t);
+    return EnumHelpers::EnumOrClass<T, std::is_enum<T>::value>::write(*this, t);
   }
-  
+
   friend Out& operator<<(Out& out, const char value);
   friend Out& operator<<(Out& out, const unsigned char value);
   friend Out& operator<<(Out& out, const short value);
@@ -252,7 +215,7 @@ inline Out& operator<<(Out& out, const std::string& value) {out.outString(value.
 * @param value The value that is written.
 * @return The stream.
 */
-inline Out& operator<<(Out& out, const bool value) {return out << (unsigned char) value;}
+inline Out& operator<<(Out& out, const bool value) {out.outBool(value); return out;}
 
 /**
 * Operator that calls the function pointed to by f.
@@ -318,20 +281,14 @@ protected:
   virtual void inDouble(double&) = 0;
 
   /**
+   * Virtual redirection for operator>>(bool& value).
+   */
+  virtual void inBool(bool&) = 0;
+
+  /**
   * Virtual redirection for operator>>(std::string& value).
   */
   virtual void inString(std::string&) = 0;
-
-  /**
-  * Virtual redirection for operator>>(bool& value).
-  * Default implementation expects bool as 0 / != 1.
-  */
-  virtual void inBool(bool& value)
-  {
-    unsigned char temp;
-    inUChar(temp);
-    value = temp != 0;
-  }
 
   /**
   * Virtual redirection for operator>>(In& (*f)(In&)) that reads
@@ -340,6 +297,9 @@ protected:
   virtual void inEndL() = 0;
 
 public:
+  /** Virtual destructor for derived classes. */
+  virtual ~In() {}
+
   /**
   * The function reads a number of bytes from a stream.
   * @param p The address the data is written to. Note that p
@@ -368,7 +328,7 @@ public:
 
   /**
   * Select an entry for reading.
-  * Will only be implemented by class InConfigMap.
+  * Will only be implemented by class InMapFile.
   * @param name The name of the entry if type == -2, otherwise 0.
   * @param type The type of the entry.
   *             -2: value or record,
@@ -380,7 +340,7 @@ public:
 
   /**
   * Deselects a field for reading.
-  * Will only be implemented by class InConfigMap.
+  * Will only be implemented by class InMapFile.
   */
   virtual void deselect() {}
 
@@ -395,9 +355,9 @@ public:
   */
   template<class T> In& operator>>(T& t)
   {
-    return EnumHelpers::EnumOrClass<T, sizeof(EnumHelpers::canBeConvertedToInt(EnumHelpers::ConsumeUDC<T>())) == sizeof(short)>::read(*this, t);
+    return EnumHelpers::EnumOrClass<T, std::is_enum<T>::value>::read(*this, t);
   }
-  
+
   friend In& operator>>(In& in, char& value);
   friend In& operator>>(In& in, unsigned char& value);
   friend In& operator>>(In& in, short& value);
@@ -510,7 +470,7 @@ In& endl(In& in);
 namespace EnumHelpers
 {
   /**
-  * Two classes that simply hide the template versions of the streaming 
+  * Two classes that simply hide the template versions of the streaming
   * operators by versions that will never be called. They aren't even
   * implemented.
   */
@@ -530,7 +490,7 @@ namespace EnumHelpers
   * @param T The type of the value to stream.
   * @param isEnum Is T an enum type? For this version, this is always false.
   */
-  template<class T, bool isEnum> struct EnumOrClass 
+  template<class T, bool isEnum> struct EnumOrClass
   {
     static Out& write(Out& out, const T& t) {return (Out2&) out << t;}
     static In& read(In& in, T& t) {return (In2&) in >> t;}
@@ -545,13 +505,31 @@ namespace EnumHelpers
    */
   template<class T> struct EnumOrClass<T, true>
   {
-    static Out& write(Out& out, const T& t) {return out << (int) t;}
+    static Out& write(Out& out, const T& t)
+    {
+      return sizeof(t) == 1 ? out << (unsigned char) t : out << (int) t;
+    }
+
     static In& read(In& in, T& t)
     {
-      int i = (int) t; // keep old value in case streaming does nothing
-      in >> i;
-      t = (T) i;
+      if(sizeof(t) == 1)
+      {
+        unsigned char c = (unsigned char) t; // keep old value in case streaming does nothing
+        in >> c;
+        t = (T) c;
+      }
+      else
+      {
+        int i = (int) t; // keep old value in case streaming does nothing
+        in >> i;
+        t = (T) i;
+      }
       return in;
     }
   };
+}
+
+namespace Streaming
+{
+  void trimName(const char*& name);
 }

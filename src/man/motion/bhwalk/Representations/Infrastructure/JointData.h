@@ -1,35 +1,23 @@
 /**
 * @file Representations/Infrastructure/JointData.h
 *
-* This file declares a class to represent the joint angles sent to the robot.
+* This file declares a classes to represent the joint angles.
 *
-* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas Röfer</A>
+* @author <A href="mailto:Thomas.Roefer@dfki.de">Thomas RÃ¶fer</A>
 */
 
 #pragma once
 
-#include "Tools/Streams/Streamable.h"
 #include "Tools/Math/Common.h"
-#include "Tools/Debugging/Debugging.h"
-#include "Platform/BHAssert.h"
+#include "Tools/Streams/AutoStreamable.h"
 #include "Tools/Enum.h"
 
 /**
-* @class JointData
+* @class JointDataBH
 * A class to represent the joint angles sent to the robot.
 */
-class JointData : public Streamable
+STREAMABLE(JointDataBH,
 {
-protected:
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM(angles);
-    STREAM(timeStamp);
-    STREAM(cycleTime);
-    STREAM_REGISTER_FINISH();
-  }
-
 public:
   ENUM(Joint,
     HeadYaw,
@@ -56,26 +44,9 @@ public:
     RAnkleRoll
   );
 
-
   // If you change those values be sure to change them in MofCompiler.cpp too. (Line ~280)
-  enum
-  {
-    off    = 1000, /**< Special angle for switching off a joint. */
-    ignore = 2000  /**< Special angle for not overwriting the previous setting. */
-  };
-  float angles[numOfJoints]; /**< The angles of all joints. */
-  unsigned timeStamp; /**< The time when these angles were received. */
-  float cycleTime; /**< Length of one cycle in seconds. */
-
-  /**
-  * Default constructor.
-  * Switches off all joints.
-  */
-  JointData() : timeStamp(0)
-  {
-    for(int i = 0; i < numOfJoints; ++i)
-      angles[i] = off;
-  }
+  enum {off = 1000}; /**< Special angle for switching off a joint. */
+  enum {ignore = 2000}; /**< Special angle for not overwriting the previous setting. */
 
   /**
   * The method returns the angle of the mirror (left/right) of the given joint.
@@ -138,146 +109,83 @@ public:
   * The method initializes the joint angles as a mirror of a set of other joint angles.
   * @param other The set of joint angles that are mirrored.
   */
-  virtual void mirror(const JointData& other)
+  void mirror(const JointDataBH& other)
   {
     for(int i = 0; i < numOfJoints; ++i)
       angles[i] = other.mirror((Joint) i);
     timeStamp = other.timeStamp;
-  }
-};
+  },
 
-/**
-* @class JointDataDeg
-* A class that wraps joint data to be transmitted in degrees.
-*/
-class JointDataDeg : public JointData
-{
-private:
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    if(jointData)
-    {
-      ASSERT(out);
-      for(int i = 0; i < JointData::numOfJoints; ++i)
-        angles[i] = jointData->angles[i] == JointData::off ? JointData::off
-                    : floorf(toDegrees(jointData->angles[i]) * 10.0f + 0.5f) / 10.0f;
-      timeStamp = jointData->timeStamp;
+  (float[numOfJoints]) angles, /**< The angles of all joints. */
+  (unsigned)(0) timeStamp, /**< The time when these angles were received. */
 
-      STREAM(angles);
-      STREAM(timeStamp);
-      STREAM(cycleTime);
-    }
-    else
-    {
-      STREAM_BASE(JointData);
-    }
-    STREAM_REGISTER_FINISH();
-  }
+  // Initialization
+  for(int i = 0; i < numOfJoints; ++i)
+    angles[i] = off;
+});
 
-  JointData* jointData; /**< The joint data that is wrapped. */
-
-public:
-  /**
-  * Default constructor.
-  */
-  JointDataDeg() : jointData(0) {}
-
-  /**
-  * Constructor.
-  * @param jointData The joint data that is wrapped.
-  */
-  JointDataDeg(JointData& jointData) : jointData(&jointData) {}
-
-  /**
-  * Assignment operator.
-  */
-  JointDataDeg& operator=(const JointDataDeg& other)
-  {
-    if(jointData)
-      for(int i = 0; i < JointData::numOfJoints; ++i)
-        jointData->angles[i] = other.angles[i] == JointData::off ? JointData::off
-                               : fromDegrees(other.angles[i]);
-    else
-      *((JointData*) this) = other;
-    return *this;
-  }
-};
 
 /**
  * @class HardnessData
  * This class represents the joint hardness in a jointRequest.
- * It loads the default hardness values from jointHardness.cfg.
+ * It loads the default hardness values from hardnessSettings.cfg.
  */
-class HardnessData : public Streamable
+STREAMABLE(HardnessData,
 {
 public:
-  enum Hardness
-  {
-    useDefault = -1,
-  };
-
-  int hardness[JointData::numOfJoints]; /**< the custom hardness for each joint */
-
-  /**
-   * Default Constructor
-   */
-  HardnessData()
-  {
-    resetToDefault();
-  }
+  enum {useDefault = -1};
 
   /**
   * The method returns the hardness of the mirror (left/right) of the given joint.
   * @param joint The joint the mirror of which is returned.
   * @return The output hardness of the mirrored joint.
   */
-  int mirror(const JointData::Joint joint) const
+  int mirror(const JointDataBH::Joint joint) const
   {
     switch(joint)
     {
-    case JointData::HeadYaw:
-      return hardness[JointData::HeadYaw];
-    case JointData::LShoulderPitch:
-      return hardness[JointData::RShoulderPitch];
-    case JointData::LShoulderRoll:
-      return hardness[JointData::RShoulderRoll];
-    case JointData::LElbowYaw:
-      return hardness[JointData::RElbowYaw];
-    case JointData::LElbowRoll:
-      return hardness[JointData::RElbowRoll];
-    case JointData::RShoulderPitch:
-      return hardness[JointData::LShoulderPitch];
-    case JointData::RShoulderRoll:
-      return hardness[JointData::LShoulderRoll];
-    case JointData::RElbowYaw:
-      return hardness[JointData::LElbowYaw];
-    case JointData::RElbowRoll:
-      return hardness[JointData::LElbowRoll];
-    case JointData::LHipYawPitch:
-      return hardness[JointData::RHipYawPitch];
-    case JointData::LHipRoll:
-      return hardness[JointData::RHipRoll];
-    case JointData::LHipPitch:
-      return hardness[JointData::RHipPitch];
-    case JointData::LKneePitch:
-      return hardness[JointData::RKneePitch];
-    case JointData::LAnklePitch:
-      return hardness[JointData::RAnklePitch];
-    case JointData::LAnkleRoll:
-      return hardness[JointData::RAnkleRoll];
-    case JointData::RHipYawPitch:
-      return hardness[JointData::LHipYawPitch];
-    case JointData::RHipRoll:
-      return hardness[JointData::LHipRoll];
-    case JointData::RHipPitch:
-      return hardness[JointData::LHipPitch];
-    case JointData::RKneePitch:
-      return hardness[JointData::LKneePitch];
-    case JointData::RAnklePitch:
-      return hardness[JointData::LAnklePitch];
-    case JointData::RAnkleRoll:
-      return hardness[JointData::LAnkleRoll];
+    case JointDataBH::HeadYaw:
+      return hardness[JointDataBH::HeadYaw];
+    case JointDataBH::LShoulderPitch:
+      return hardness[JointDataBH::RShoulderPitch];
+    case JointDataBH::LShoulderRoll:
+      return hardness[JointDataBH::RShoulderRoll];
+    case JointDataBH::LElbowYaw:
+      return hardness[JointDataBH::RElbowYaw];
+    case JointDataBH::LElbowRoll:
+      return hardness[JointDataBH::RElbowRoll];
+    case JointDataBH::RShoulderPitch:
+      return hardness[JointDataBH::LShoulderPitch];
+    case JointDataBH::RShoulderRoll:
+      return hardness[JointDataBH::LShoulderRoll];
+    case JointDataBH::RElbowYaw:
+      return hardness[JointDataBH::LElbowYaw];
+    case JointDataBH::RElbowRoll:
+      return hardness[JointDataBH::LElbowRoll];
+    case JointDataBH::LHipYawPitch:
+      return hardness[JointDataBH::RHipYawPitch];
+    case JointDataBH::LHipRoll:
+      return hardness[JointDataBH::RHipRoll];
+    case JointDataBH::LHipPitch:
+      return hardness[JointDataBH::RHipPitch];
+    case JointDataBH::LKneePitch:
+      return hardness[JointDataBH::RKneePitch];
+    case JointDataBH::LAnklePitch:
+      return hardness[JointDataBH::RAnklePitch];
+    case JointDataBH::LAnkleRoll:
+      return hardness[JointDataBH::RAnkleRoll];
+    case JointDataBH::RHipYawPitch:
+      return hardness[JointDataBH::LHipYawPitch];
+    case JointDataBH::RHipRoll:
+      return hardness[JointDataBH::LHipRoll];
+    case JointDataBH::RHipPitch:
+      return hardness[JointDataBH::LHipPitch];
+    case JointDataBH::RKneePitch:
+      return hardness[JointDataBH::LKneePitch];
+    case JointDataBH::RAnklePitch:
+      return hardness[JointDataBH::LAnklePitch];
+    case JointDataBH::RAnkleRoll:
+      return hardness[JointDataBH::LAnkleRoll];
     default:
       return hardness[joint];
     }
@@ -289,8 +197,8 @@ public:
    */
   void mirror(const HardnessData& other)
   {
-    for(int i = 0; i < JointData::numOfJoints; ++i)
-      hardness[i] = other.mirror((JointData::Joint)i);
+    for(int i = 0; i < JointDataBH::numOfJoints; ++i)
+      hardness[i] = other.mirror((JointDataBH::Joint)i);
   }
 
   /**
@@ -298,36 +206,31 @@ public:
    */
   inline void resetToDefault()
   {
-    for(int i = 0; i < JointData::numOfJoints; ++i)
+    for(int i = 0; i < JointDataBH::numOfJoints; ++i)
       hardness[i] = useDefault;
-  }
+  },
 
-private:
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM(hardness);
-    STREAM_REGISTER_FINISH();
-  }
-};
+  (int[JointDataBH::numOfJoints]) hardness, /**< the custom hardness for each joint */
 
-class HardnessSettings : public HardnessData {};
+  // Initialization
+  resetToDefault();
+});
+
+class HardnessSettingsBH : public HardnessData {};
 
 /**
- * @class JointRequest
+ * @class JointRequestBH
  */
-class JointRequest : public JointData
+STREAMABLE_WITH_BASE(JointRequestBH, JointDataBH,
 {
 public:
-  HardnessData jointHardness; /**< the hardness for all joints*/
-
   /**
-   * Initializes this instance with the mirrored data from a other JointRequest
-   * @param other the JointRequest to be mirrored
+   * Initializes this instance with the mirrored data from a other JointRequestBH
+   * @param other the JointRequestBH to be mirrored
    */
-  void mirror(const JointRequest& other)
+  void mirror(const JointRequestBH& other)
   {
-    JointData::mirror(other);
+    JointDataBH::mirror(other);
     jointHardness.mirror(other.jointHardness);
   }
 
@@ -335,21 +238,20 @@ public:
    * Returns the mirrored angle of joint
    * @param joint the joint to be mirrored
    */
-  float mirror(const JointData::Joint joint)
+  float mirror(const JointDataBH::Joint joint)
   {
-    return JointData::mirror(joint);
+    return JointDataBH::mirror(joint);
   }
 
-protected:
-  virtual void serialize(In* in, Out* out)
+  bool isValid() const
   {
-    STREAM_REGISTER_BEGIN();
-    STREAM_BASE(JointData);
-    STREAM(jointHardness);
-    STREAM_REGISTER_FINISH();
-  }
-};
+    for(int i = 0; i < numOfJoints; ++i)
+      if(isnan(angles[i]) || jointHardness.hardness[i] < 0 || jointHardness.hardness[i] > 100)
+        return false;
+    return true;
+  },
 
-class FilteredJointData : public JointData {};
-class FilteredJointDataPrev : public FilteredJointData {};
-class UnstableJointRequest : public JointRequest {};
+  (HardnessData) jointHardness, /**< the hardness for all joints */
+});
+
+class FilteredJointDataBH : public JointDataBH {};

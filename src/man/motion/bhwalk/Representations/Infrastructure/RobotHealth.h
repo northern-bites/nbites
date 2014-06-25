@@ -6,91 +6,63 @@
 
 #pragma once
 
-#include "Tools/Streams/Streamable.h"
-
+#include "Tools/Streams/AutoStreamable.h"
+#include "Tools/Debugging/DebugDrawings.h"
 
 /**
-* @class MotionRobotHealth
+* @class MotionRobotHealthBH
 * All information collected within motion process.
 */
-class MotionRobotHealth : public Streamable
-{
-public:
-  /**
-  * The method makes the object streamable.
-  * @param in The stream from which the object is read (if in != 0).
-  * @param out The stream to which the object is written (if out != 0).
-  */
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM(motionFrameRate);
-    STREAM_REGISTER_FINISH();
-  }
-
-  /** Constructor */
-  MotionRobotHealth(): motionFrameRate(0.0f) {}
-
-  float motionFrameRate;       /*< Frames per second within process "Motion" */
-};
-
+STREAMABLE(MotionRobotHealthBH,
+{,
+  (float)(0) motionFrameRate, /*< Frames per second within process "Motion" */
+  (float) avgMotionTime, /**< average execution time */
+  (float) maxMotionTime, /**< Maximum execution time */
+  (float) minMotionTime, /**< Minimum execution time */
+});
 
 /**
-* @class RobotHealth
+* @class RobotHealthBH
 * Full information about the robot.
 */
-class RobotHealth : public MotionRobotHealth
+STREAMABLE_WITH_BASE(RobotHealthBH, MotionRobotHealthBH,
 {
-private:
-  /**
-  * The method makes the object streamable.
-  * @param in The stream from which the object is read (if in != 0).
-  * @param out The stream to which the object is written (if out != 0).
-  */
-  virtual void serialize(In* in, Out* out)
-  {
-    STREAM_REGISTER_BEGIN();
-    STREAM_BASE(MotionRobotHealth);
-    STREAM(cognitionFrameRate);
-    STREAM(batteryLevel);
-    STREAM(maxJointTemperature);
-    STREAM(cpuTemperature);
-    STREAM(boardTemperature);
-    STREAM(load);
-    STREAM(memoryUsage);
-    STREAM(robotName);
-    STREAM(ballPercepts);
-    STREAM(linePercepts);
-    STREAM(goalPercepts);
-    STREAM(wlan);
-    STREAM_REGISTER_FINISH();
-  }
-
 public:
-  /** Constructor */
-  RobotHealth() : cognitionFrameRate(0.0f), batteryLevel(0), maxJointTemperature(0), cpuTemperature(0), boardTemperature(0), memoryUsage(0), ballPercepts(0), linePercepts(0), goalPercepts(0), wlan(true)
-  {
-    load[0] = load[1] = load[2] = 0;
-  }
-
-  /** Assigning MotionRobotHealth
+  /** Assigning MotionRobotHealthBH
   * @param motionRobotHealth Information from the motion process
   */
-  void operator=(const MotionRobotHealth& motionRobotHealth)
+  void operator=(const MotionRobotHealthBH& motionRobotHealth)
   {
     motionFrameRate = motionRobotHealth.motionFrameRate;
+    minMotionTime = motionRobotHealth.minMotionTime;
+    maxMotionTime = motionRobotHealth.maxMotionTime;
+    avgMotionTime = motionRobotHealth.avgMotionTime;
   }
 
-  float cognitionFrameRate;    /*< Frames per second within process "Cognition" */
-  unsigned char batteryLevel;               /*< Current batteryLevel of robot battery */
-  unsigned char maxJointTemperature;        /*< Highest temperature of a robot actuator */
-  unsigned char cpuTemperature; /**< The temperature of the cpu */
-  unsigned char boardTemperature; /**< The temperature of the mainboard or northbridge, dunno */
-  unsigned char load[3]; /*< load averages */
-  unsigned char memoryUsage;    /*< Percentage of used memory */
-  std::string robotName;       /*< For fancier drawing :-) */
-  unsigned int ballPercepts; /**< A ball percept counter used to determine ball percepts per hour */
-  unsigned int linePercepts; /**< A line percept counter used to determine line percepts per hour */
-  unsigned int goalPercepts; /**< A goal percept counter used to determine goal percepts per hour */
-  bool wlan; /**< Status of the wlan hardware. true: wlan hardware is ok. false: wlan hardware is (probably physically) broken. */
-};
+  void draw() const
+  {
+    DECLARE_PLOT("representation:RobotHealthBH:batteryLevel");
+    PLOT("representation:RobotHealthBH:batteryLevel", batteryLevel);
+    DECLARE_PLOT("representation:RobotHealthBH:maxJointTemperature");
+    PLOT("representation:RobotHealthBH:maxJointTemperature", maxJointTemperature);
+    DECLARE_PLOT("representation:RobotHealthBH:totalCurrent");
+    PLOT("representation:RobotHealthBH:totalCurrent", totalCurrent);
+  },
+
+  (float)(0) cognitionFrameRate, /*< Frames per second within process "Cognition" */
+  (unsigned char)(0) batteryLevel, /*< Current batteryLevel of robot battery in percent */
+  (float)(0) totalCurrent, /*< Sum of all motor currents ( as a measure for the robot's current load) */
+  (unsigned char)(0) maxJointTemperature, /*< Highest temperature of a robot actuator */
+  (unsigned char)(0) cpuTemperature, /**< The temperature of the cpu */
+  (unsigned char)(0) boardTemperature, /**< The temperature of the mainboard or northbridge, dunno */
+  (unsigned char[3]) load, /*< load averages */
+  (unsigned char) memoryUsage, /*< Percentage of used memory */
+  (std::string) robotName, /*< For fancier drawing :-) */
+  (unsigned int) ballPercepts, /**< A ball percept counter used to determine ball percepts per hour */
+  (unsigned int) linePercepts, /**< A line percept counter used to determine line percepts per hour */
+  (unsigned int) goalPercepts, /**< A goal percept counter used to determine goal percepts per hour */
+  (bool) wlan, /**< Status of the wlan hardware. true: wlan hardware is ok. false: wlan hardware is (probably physically) broken. */
+
+  // Initialization
+  load[0] = load[1] = load[2] = 0;
+});
