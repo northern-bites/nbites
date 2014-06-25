@@ -10,25 +10,24 @@
 #pragma once
 
 #ifdef _MSC_VER
-class type_info;
-#elif defined(__clang__)
-namespace std {class type_info;}
+class type_ininfo;
 #else
 #include <typeinfo>
 #endif
 
+#include <iostream>
 #include <vector>
 #include "InOut.h"
 
 #ifdef RELEASE
 
 /** Must be used at the end of any streaming operator or serialize(In*, Out*) function */
-#define STREAM_REGISTER_FINISH()
+#define STREAM_REGISTER_FINISH
 
 // Macros dedicated for the use within the serialize(In*, Out*) of data types derived from Streamable function
 
 /** Must be used at the beginning of the serialize(In*, Out*) function. */
-#define STREAM_REGISTER_BEGIN()
+#define STREAM_REGISTER_BEGIN
 
 /**
 * Registers and streams a base class
@@ -50,9 +49,9 @@ namespace std {class type_info;}
 
 #else
 
-#define STREAM_REGISTER_FINISH() Streaming::finishRegistration();
+#define STREAM_REGISTER_FINISH Streaming::finishRegistration();
 
-#define STREAM_REGISTER_BEGIN() Streaming::startRegistration(typeid(*this), false);
+#define STREAM_REGISTER_BEGIN Streaming::startRegistration(typeid(*this), false);
 #define STREAM_BASE(s) _STREAM_BASE(s, Streaming::registerBase();)
 
 #define STREAM_REGISTER_BEGIN_EXT(s) Streaming::startRegistration(typeid(s), true);
@@ -72,94 +71,35 @@ namespace std {class type_info;}
 * Registration and streaming of a member.
 * The first parameter is the attribute to be registered and streamed.
 * If the type of that attribute is an enumeration and it is not defined
-* in the current class, the name of the class in which it is defined 
+* in the current class, the name of the class in which it is defined
 * has to be specified as second parameter.
 */
 #define STREAM(...) \
-  STREAM_EXPAND(STREAM_EXPAND(STREAM_THIRD(__VA_ARGS__, STREAM_WITH_CLASS, STREAM_WITHOUT_CLASS))(__VA_ARGS__))
+  _STREAM_EXPAND(_STREAM_EXPAND(_STREAM_THIRD(__VA_ARGS__, _STREAM_WITH_CLASS, _STREAM_WITHOUT_CLASS))(__VA_ARGS__))
 
-#define STREAM_THIRD(first, second, third, ...) third
-#define STREAM_EXPAND(s) s // needed for Visual Studio
+#define _STREAM_THIRD(first, second, third, ...) third
+#define _STREAM_EXPAND(s) s // needed for Visual Studio
 
-#define STREAM_WITHOUT_CLASS(s) \
-  Streaming::streamIt(in, out, #s, s, Streaming::Casting<sizeof(Streaming::canBeConvertedToInt(Streaming::unwrap(s))) == sizeof(short)>::getNameFunction(*this, s));
+#define _STREAM_WITHOUT_CLASS(s) \
+  Streaming::streamIt(in, out, #s, s, Streaming::Casting<std::is_enum<decltype(Streaming::unwrap(s))>::value>::getNameFunction(*this, s));
 
-#define STREAM_WITH_CLASS(s, class) \
+#define _STREAM_WITH_CLASS(s, class) \
   Streaming::streamIt(in, out, #s, s, Streaming::castFunction(s, class::getName));
 
 /**
 * Registration and streaming of a member in an external streaming operator
 * (<< or >>).
 * The second parameter is the attribute to be registered and streamed.
-* If the type of that attribute is an enumeration, the name of the class 
+* If the type of that attribute is an enumeration, the name of the class
 * in which it is defined has to be specified as third parameter.
 * @param stream Reference to the stream, that should be streamed to.
 */
 #define STREAM_EXT(stream, ...) \
-  STREAM_EXPAND(STREAM_EXPAND(STREAM_THIRD(__VA_ARGS__, STREAM_EXT_ENUM, STREAM_EXT_NORMAL))(stream, __VA_ARGS__))
+  _STREAM_EXPAND(_STREAM_EXPAND(_STREAM_THIRD(__VA_ARGS__, _STREAM_EXT_ENUM, _STREAM_EXT_NORMAL))(stream, __VA_ARGS__))
 
-#define STREAM_EXT_NORMAL(stream, s) Streaming::streamIt(stream, #s, s, Streaming::Casting<sizeof(Streaming::canBeConvertedToInt(Streaming::unwrap(s))) == sizeof(short)>::getNameFunction(stream, s));
+#define _STREAM_EXT_NORMAL(stream, s) Streaming::streamIt(stream, #s, s, Streaming::Casting<std::is_enum<decltype(Streaming::unwrap(s))>::value>::getNameFunction(stream, s));
 
-#define STREAM_EXT_ENUM(stream, s, class) Streaming::streamIt(stream, #s, s, Streaming::castFunction(s, class::getName));
-
-/**
-* Streams a Vector2<float> as Vector2<short>.
-* @param s The member to be streamed.
-*/
-#define STREAM_COMPRESSED_POSITION(s) \
-  { \
-    Vector2<short> _c(static_cast<short>(s.x), static_cast<short>(s.y)); \
-    { \
-      Vector2<short>& s(_c); \
-      STREAM(s) \
-    } \
-    if(in) \
-      s = Vector2<float>(static_cast<float>(_c.x), static_cast<float>(_c.y)); \
-  }
-
-/**
-* Streams a float that is normalized to the interval [0:1] as a char.
-*/
-#define STREAM_COMPRESSED_NORMALIZED_FLOAT(s) \
-  { \
-    unsigned char _c = (unsigned char) (s * 255.0f); \
-    { \
-      unsigned char& s(_c); \
-      STREAM(s) \
-    } \
-    if(in) \
-      s = (float) _c / 255.0f; \
-  }
-
-/**
-* Streams an angle discretized as a char.
-*/
-#define STREAM_COMPRESSED_ANGLE(s) \
-  { \
-    char _c = out ? Streaming::angleToChar(s) : 0; \
-    { \
-      char& s(_c); \
-      STREAM(s) \
-    } \
-    if(in) \
-      s = (float) _c * 3.1415926535897f / 128.0f; \
-  }
-
-/**
-* Streams a member as an unsigned character. This is especially useful for
-* small enums.
-*/
-#define STREAM_AS_UCHAR(s) \
-  { \
-    ASSERT(s >= 0 && s <= 255); \
-    unsigned char _c(static_cast<unsigned char>(s)); \
-    { \
-      unsigned char& s(_c); \
-      STREAM(s); \
-    } \
-    if(in) \
-      Streaming::cast(s, _c); \
-  }
+#define _STREAM_EXT_ENUM(stream, s, class) Streaming::streamIt(stream, #s, s, Streaming::castFunction(s, class::getName));
 
 /**
 * Base class for all classes using the STREAM or STREAM_EXT macros (see Tools/Debugging/
@@ -179,7 +119,8 @@ class Streamable : public ImplicitlyStreamable
 protected:
   virtual void serialize(In*, Out*) = 0;
 public:
-  void streamOut(Out&)const;
+  virtual ~Streamable() {}
+  void streamOut(Out&) const;
   void streamIn(In&);
 };
 
@@ -195,13 +136,6 @@ namespace Streaming
 
   template<class T>
   static void registerDefaultElement(const std::vector<T>&)
-  {
-    static T dummy;
-    dummyStream() << dummy;
-  }
-
-  template<class T>
-  static void registerDefaultElement(const T*)
   {
     static T dummy;
     dummyStream() << dummy;
@@ -292,8 +226,6 @@ namespace Streaming
 
   std::string demangle(const char* name);
 
-  char angleToChar(float angle);
-
   const char* skipDot(const char* name);
 
   template<typename S> struct Streamer
@@ -305,6 +237,7 @@ namespace Streaming
       if(enumToString)
         Streaming::registerEnum(typeid(s), (const char* (*)(int)) enumToString);
 #endif
+      //std::cout << "Streamable: " << name << std::endl;
       if(in)
       {
         in->select(name, -2, enumToString);
@@ -376,14 +309,35 @@ namespace Streaming
       }
     }
   };
-  
+
+  /**
+  * The following three functions are helpers for streaming data. (in == 0) != (out == 0).
+  * @param S The type of the variable to be streamed.
+  * @param in The stream to read from.
+  * @param out The stream to write to.
+  * @param name The name of the variable to be streamed.
+  * @param s The variable to be streamed.
+  * @param enumToString A function that provides a string representation for each enum value or 0 if
+  *                     its parameter is outside the enum's range. If the variable to be streamed is not of enum
+  *                     type, this parameter is 0.
+  * This is the version for using inside of serialize methods.
+  */
   template<typename S> void streamIt(In* in, Out* out, const char* name, S& s, const char* (*enumToString)(int) = 0)
     {Streamer<S>::stream(in, out, name, s, enumToString);}
+
+  /** This is the version for using inside operator>>. */
   template<typename S> void streamIt(In& in, const char* name, S& s, const char* (*enumToString)(int) = 0)
     {Streamer<S>::stream(&in, 0, skipDot(name), s, enumToString);}
+
+  /** This is the version for using inside operator<<. */
   template<typename S> void streamIt(Out& out, const char* name, const S& s, const char* (*enumToString)(int) = 0)
     {Streamer<S>::stream(0, &out, skipDot(name), const_cast<S&>(s), enumToString);}
 
+  /**
+  * The function for returning a string representation for each enum value is internally handled as
+  * a function with an int parameter. However, the only method of the following template struct ensures that the
+  * correct overloaded version is picked, i.e. the one that accepts the enum T.
+  */
   template<typename T> struct Function
   {
     inline static const char* (*cast(const char* (*enumToString)(T)))(int)
@@ -391,55 +345,81 @@ namespace Streaming
       return (const char* (*)(int)) enumToString;
     }
   };
-  
+
+  /**
+  * The function for returning a string representation for each enum value is internally handled as
+  * a function with an int parameter. However, the the following template functions ensure that the
+  * correct overloaded version is picked, i.e. the one that accepts the enum T. These functions are
+  * used in the case it is known that a type is an enum.
+  * This is the implementation for plain enums.
+  */
   template<typename T> inline const char* (*castFunction(const T&, const char* (*enumToString)(T)))(int)
   {
     return (const char* (*)(int)) enumToString;
   }
-  
+
+  /** Implementation for fixed-size arrays of enums. */
   template<typename T, size_t N> inline const char* (*castFunction(const T(&)[N], const char* (*enumToString)(T)))(int)
   {
     return (const char* (*)(int)) enumToString;
   }
-  
+
+  /** Implementation for vectors of enums. */
   template<typename T> inline const char* (*castFunction(const std::vector<T>&, const char* (*enumToString)(T)))(int)
   {
     return (const char* (*)(int)) enumToString;
   }
-  
+
+  /**
+  * The template struct Casting distinguishes between types that are enums and types that are not.
+  * Each method returns the address of a function that can translate enum constants to string representations
+  * of those constants, i.e. their names. The ruturned function will return 0 if it is parameterized with a
+  * value outside the enums range.
+  * Here, the versions for enums is implemented.
+  */
   template<bool isEnum = true> struct Casting
   {
+    /** Implementation for plain enums. */
     template<typename T, typename E> inline static const char* (*getNameFunction(const T&, const E&))(int)
     {
       return Function<E>::cast(T::getName);
     }
-    
+
+    /** Implementation for fixed-size arrays of enums. */
     template<typename T, typename E, size_t N> inline static const char* (*getNameFunction(const T&, const E(&)[N]))(int)
     {
       return Function<E>::cast(T::getName);
     }
-    
+
+    /** Implementation for vectors of enums. */
     template<typename T, typename E> inline static const char* (*getNameFunction(const T&, const std::vector<E>&))(int)
     {
       return Function<E>::cast(T::getName);
     }
 	
+    /** Plain ints are misclassified as enums. Do not return a function in this case. */
     template<typename T> inline static const char* (*getNameFunction(const T&, const int&))(int)
     {
       return 0;
     }
-    
+
+    /** int arrays are misclassified as enum arrays. Do not return a function in this case. */
     template<typename T, size_t N> inline static const char* (*getNameFunction(const T&, const int(&)[N]))(int)
     {
       return 0;
     }
-    
+
+    /** int vectors are misclassified as enum vectors. Do not return a function in this case. */
     template<typename T> inline static const char* (*getNameFunction(const T&, const std::vector<int>&))(int)
     {
       return 0;
     }
   };
-  
+
+  /**
+  * Specialization of template struct Casting for the case that a type is not an enum type.
+  * In that case, there is no function that can return names for enum elements.
+  */
   template<> struct Casting<false>
   {
     template<typename T, typename E> inline static const char* (*getNameFunction(const T&, const E&))(int)
@@ -448,23 +428,22 @@ namespace Streaming
     }
   };
 
-  short canBeConvertedToInt(int);
-  char canBeConvertedToInt(char);
-  char canBeConvertedToInt(unsigned char);
-  char canBeConvertedToInt(short);
-  char canBeConvertedToInt(unsigned short);
-  char canBeConvertedToInt(unsigned int);
-  char canBeConvertedToInt(long);
-  char canBeConvertedToInt(unsigned long);
-  char canBeConvertedToInt(long long);
-  char canBeConvertedToInt(unsigned long long);
-  char canBeConvertedToInt(float);
-  char canBeConvertedToInt(double);
-  char canBeConvertedToInt(bool);
-  char canBeConvertedToInt(...);
-  
+  /**
+  * The following three function signatures assure that in the process of determining whether a variable
+  * is of an enum type, automatic type conversion operators of objects are not applied. Otherwise,
+  * classes that implement an operator int () might be classified as enums.
+  * The functions will only be used for resolving types. They are never called. Therefore, they are not
+  * implemented.
+  */
   template<typename T> const T unwrap(const T&);
-  template<typename T, size_t N> const T unwrap(const T(&)[N]);;
-  template<typename T> const T unwrap(const std::vector<T>&);;
-}
+  template<typename T, size_t N> const T unwrap(const T(&)[N]);
+  template<typename T> const T unwrap(const std::vector<T>&);
 
+  /**
+   * Together with decltype, the following template allows to use any type
+   * for declarations, even array types such as int[4]. It also works with
+   * template parameters without the use of typename.
+   * decltype(Streaming::TypeWrapper<myType>::type) myVar;
+   */
+  template<typename T> struct TypeWrapper {static T type;};
+}

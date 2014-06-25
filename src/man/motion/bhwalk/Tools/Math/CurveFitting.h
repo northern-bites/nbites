@@ -27,7 +27,7 @@ T pow(T base, unsigned int exponent)
  * p(points[i][0]) equals points[i][1].
  */
 template <class V>
-YaMatrix<V> fitLinear(const std::vector<Vector2<V> >& points, const YaMatrix<V>& covariance, unsigned int degree = 2)
+YaMatrix<V> fitLinear(const std::vector<Vector2BH<V> >& points, const YaMatrix<V>& covariance, unsigned int degree = 2)
 {
   int numberOfSamples = points.size();
   ASSERT(numberOfSamples == covariance.M && numberOfSamples == covariance.N);

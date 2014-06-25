@@ -2,15 +2,13 @@
  * @file Matrix.h
  *
  * Yet another Matrix implementation.
- * A general dynamic YaMatrix implementation.
+ * A general dynamic Matrix implementation.
  *
  * @author <a href="mailto:afabisch@tzi.de">Alexander Fabisch</a>
  */
 
 #pragma once
-#include "Tools/Debugging/Asserts.h"
 #include "MVTools.h"
-#include <iostream>
 #include <cstdarg>
 #include <cmath>
 #include <vector>
@@ -94,6 +92,13 @@ public:
    */
   std::vector<YaVector<V> > v;
 
+  /**
+   * Allocates and initializes the memory for a dynamic matrix.
+   * \param M Number of rows.
+   * \param N Number of columns.
+   * \param diagonal Value of the main diagonal. All other values are
+   *                 initialized as 0.
+   */
   YaMatrix(int M, int N, V diagonal = V()) : M(M), N(N), v(M, YaVector<V>(N, V()))
   {
     if(diagonal != V())
@@ -107,8 +112,12 @@ public:
   YaMatrix<V> transpose() const
   {
     YaMatrix<V> t(N, M);
-    for(int m = 0; m < M; m++) for(int n = 0; n < N; n++)
-        t.v[n][m] = v[m][n];
+    for(int m = 0; m < M; m++)
+    {
+      const YaVector<V>& rowM = v[m];
+      for(int n = 0; n < N; n++)
+        t.v[n][m] = rowM[n];
+    }
     return t;
   }
 
@@ -152,7 +161,7 @@ public:
     {
       ranking[i][0] = i;
     }
-    V zero = V();
+    const V zero = V();
     int r, r2, maxrow;
     for(r = 0; r < (N - 1); ++r)
     {
@@ -301,15 +310,17 @@ public:
   YaMatrix<V> rowVector(int m) const
   {
     YaMatrix<V> vector(1, N);
+    const YaVector<V>& rowM = v[m];
     for(int n = 0; n < N; n++)
-      vector[0][n] = v[m][n];
+      vector[0][n] = rowM[n];
     return vector;
   }
 
   YaMatrix<V>& setRowVector(int m, const YaMatrix<V>& vector)
   {
+    YaVector<V>& rowM = v[m];
     for(int n = 0; n < N; n++)
-      v[m][n] = vector[0][n];
+      rowM[n] = vector[0][n];
     return *this;
   }
 
@@ -470,32 +481,6 @@ YaMatrix<V>& operator/=(YaMatrix<V>& a, const V f)
   return a = a / f;
 }
 
-template<class V>
-std::ostream& operator<<(std::ostream& stream, const YaMatrix<V>& matrix)
-{
-  for(int m = 0; m < matrix.M; m++)
-  {
-    for(int n = 0; n < matrix.N; n++)
-    {
-      stream << matrix.v[m][n];
-      if(n != matrix.N - 1)
-        stream << " ";
-    }
-    if(m != matrix.M - 1)
-      stream << "\n";
-  }
-  return stream;
-}
-
-template<class V>
-std::istream& operator>>(std::istream& stream, YaMatrix<V>& matrix)
-{
-  for(int m = 0; m < matrix.M; m++)
-    for(int n = 0; n < matrix.N; n++)
-      stream >> matrix.v[m][n];
-  return stream;
-}
-
 template<class T>
 bool isNaN(const YaMatrix<T>& value)
 {
@@ -530,16 +515,6 @@ bool equals(const YaMatrix<T>& a, const YaMatrix<T>& b, T delta)
         return false;
 
   return true;
-}
-
-template<class V>
-YaMatrix<V> sqrt(const YaMatrix<V>& matrix)
-{
-  YaMatrix<V> result(matrix.M, matrix.N);
-  for(int m = 0; m < matrix.M; m++)
-    for(int n = 0; n < matrix.N; n++)
-      result[m][n] = sqrt(matrix[m][n]);
-  return result;
 }
 
 template<class T>

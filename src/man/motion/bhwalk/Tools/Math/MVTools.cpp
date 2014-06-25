@@ -8,7 +8,7 @@
 #include "MVTools.h"
 #include <limits>
 #include <cstring>
-#include <math.h>
+#include "Common.h"
 //------------------------------------------------------------------------------
 const char* MVException::getDescription() const
 {
@@ -174,9 +174,6 @@ int getMinPosInt()
   return minPosInt;
 }
 //------------------------------------------------------------------------------
-#ifndef isnan // gcc defines isnan, msc defines _isnan
-#define isnan(x) _isnan(x)
-#endif
 bool isNaN(float value)
 {
   return isnan(value) != 0;

@@ -1,6 +1,6 @@
 /**
-* @file Pose2D.cpp
-* Contains class Pose2D
+* @file Pose2DBH.cpp
+* Contains class Pose2DBH
 * @author <a href="mailto:martin.kallnik@gmx.de">Martin Kallnik</a>
 * @author Max Risler
 */
@@ -9,12 +9,12 @@
 #include "Tools/Range.h"
 #include "Tools/Math/Random.h"
 
-Pose2D Pose2D::random(const Range<>& x,
-                      const Range<>& y,
-                      const Range<>& angle)
+Pose2DBH Pose2DBH::random(const RangeBH<float>& x,
+                      const RangeBH<float>& y,
+                      const RangeBH<float>& angle)
 {
   // angle should even work in wrap around case!
-  return Pose2D(float(::randomFloat() * (angle.max - angle.min) + angle.min),
-                Vector2<>(float(::randomFloat() * (x.max - x.min) + x.min),
+  return Pose2DBH(float(::randomFloat() * (angle.max - angle.min) + angle.min),
+                Vector2BH<>(float(::randomFloat() * (x.max - x.min) + x.min),
                           float(::randomFloat() * (y.max - y.min) + y.min)));
 }

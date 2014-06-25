@@ -3,12 +3,13 @@
 *
 * Implementation of in stream classes.
 *
-* @author Thomas Rfer
-* @author Martin Ltzsch
+* @author Thomas Röfer
+* @author Martin Lötzsch
 */
 
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 
 #include "InStreams.h"
 #include "Platform/BHAssert.h"
@@ -77,22 +78,134 @@ void InText::skipWhitespace(PhysicalInStream& stream)
 }
 
 void InText::readChar(char& d, PhysicalInStream& stream)
-{ readString(buf, stream); d = (char)strtol(buf.c_str(), (char**)NULL, 0); }
-void InText::readUChar(unsigned char& d, PhysicalInStream& stream)
-{ readString(buf, stream); d = (unsigned char)strtoul(buf.c_str(), (char**)NULL, 0); }
-void InText::readShort(short& d, PhysicalInStream& stream)
-{ readString(buf, stream); d = (short)strtol(buf.c_str(), (char**)NULL, 0); }
-void InText::readUShort(unsigned short& d, PhysicalInStream& stream)
-{readString(buf, stream); d = (unsigned short)strtoul(buf.c_str(), (char**)NULL, 0);}
-void InText::readInt(int& d, PhysicalInStream& stream)
-{readString(buf, stream); d = (int)strtol(buf.c_str(), (char**)NULL, 0);}
-void InText::readUInt(unsigned int& d, PhysicalInStream& stream)
-{readString(buf, stream); d = (unsigned int)strtoul(buf.c_str(), (char**)NULL, 0);}
-void InText::readFloat(float& d, PhysicalInStream& stream)
-{readString(buf, stream); d = float(atof(buf.c_str()));}
-void InText::readDouble(double& d, PhysicalInStream& stream)
-{readString(buf, stream); d = atof(buf.c_str());}
+{
+  int i;
+  readInt(i, stream);
+  d = (char) i;
+}
 
+void InText::readUChar(unsigned char& d, PhysicalInStream& stream)
+{
+  unsigned u;
+  readUInt(u, stream);
+  d = (unsigned char) u;
+}
+
+void InText::readShort(short& d, PhysicalInStream& stream)
+{
+  int i;
+  readInt(i, stream);
+  d = (short) i;
+}
+
+void InText::readUShort(unsigned short& d, PhysicalInStream& stream)
+{
+  unsigned u;
+  readUInt(u, stream);
+  d = (unsigned short) u;
+}
+
+void InText::readInt(int& d, PhysicalInStream& stream)
+{
+  skipWhitespace(stream);
+  int sign = 1;
+  if(!isEof(stream) && theChar == '-')
+  {
+    sign = -1;
+    nextChar(stream);
+  }
+  unsigned u;
+  readUInt(u, stream);
+  d = sign * (int) u;
+}
+
+void InText::readUInt(unsigned int& d, PhysicalInStream& stream)
+{
+  buf = "";
+  skipWhitespace(stream);
+  while(!isEof(stream) && isdigit(theChar))
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  d = (unsigned) strtoul(buf.c_str(), (char**)NULL, 0);
+  skipWhitespace(stream);
+}
+
+void InText::readFloat(float& d, PhysicalInStream& stream)
+{
+  double f;
+  readDouble(f, stream);
+  d = (float) f;
+}
+
+void InText::readDouble(double& d, PhysicalInStream& stream)
+{
+  buf = "";
+  skipWhitespace(stream);
+  if(!isEof(stream) && theChar == '-')
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  while(!isEof(stream) && isdigit(theChar))
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  if(!isEof(stream) && theChar == '.')
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  while(!isEof(stream) && isdigit(theChar))
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  if(!isEof(stream) && (theChar == 'e' || theChar == 'E'))
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  if(!isEof(stream) && theChar == '-')
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  while(!isEof(stream) && isdigit(theChar))
+  {
+    buf += theChar;
+    nextChar(stream);
+  }
+  d = atof(buf.c_str());
+  skipWhitespace(stream);
+}
+
+void InText::readBool(bool& value, PhysicalInStream& stream)
+{
+  skipWhitespace(stream);
+  if(!isEof(stream))
+  {
+    if(theChar == '0' || theChar == '1')
+    {
+      value = theChar != '0';
+      nextChar(stream);
+    }
+    else
+    {
+      value = theChar != 'f';
+      static const char* falseString = "false";
+      static const char* trueString = "true";
+      const char* p = value ? trueString : falseString;
+      while(!isEof(stream) && *p && theChar == *p)
+      {
+        ++p;
+        nextChar(stream);
+      }
+    }
+  }
+}
 
 void InConfig::create(const std::string& sectionName, PhysicalInStream& stream)
 {
@@ -197,36 +310,15 @@ void InMemory::readFromStream(void* p, int size)
   }
 }
 
-void onError(const std::string& msg) {OUTPUT_ERROR(msg);}
-
-InConfigMap::InConfigMap(const std::string& name, unsigned int flags) :
-  flags(flags),
-  name(name),
-  map()
+void InMap::parse(In& stream, const std::string& name)
 {
+  map = new SimpleMap(stream, name);
+  this->name = name;
   stack.reserve(20);
-  if(isVerbose())
-  {
-    status = map.read(name, true, &onError);
-  }
-  else
-    status = map.read(name);
-  map.setFlags(map.getFlags() | ConfigMap::READONLY);
 }
 
-InConfigMap::InConfigMap(const ConfigMap& map) :
-  flags(OUTPUT_ERRORS),
-  map(map)
+void InMap::printError(const std::string& msg)
 {
-  stack.reserve(20);
-  status = 1;
-}
-
-void InConfigMap::printError(const std::string& msg)
-{
-  if(!doOutputErrors())
-    return;
-
   std::string path = "";
   for(std::vector<Entry>::const_iterator i = stack.begin(); i != stack.end(); ++i)
   {
@@ -242,229 +334,193 @@ void InConfigMap::printError(const std::string& msg)
       sprintf(buf, "[%d]", i->type);
       path += buf;
     }
-
   }
-  if(name == "")
-    OUTPUT_ERROR(path << ": " << msg);
-  else
-    OUTPUT_ERROR(name << ", " << path << ": " << msg);
+  OUTPUT_ERROR(name << (name == "" || path == "" ? "" : ", ") <<
+               path << (name == "" && path == "" ? "" : ": ") << msg);
 }
 
-void InConfigMap::printWarning(const std::string& msg)
+void InMap::inChar(char& value)
 {
-  if(!isVerbose())
-    return;
-
-  std::string path = "";
-  for(std::vector<Entry>::const_iterator i = stack.begin(); i != stack.end(); ++i)
+  Entry& e = stack.back();
+  if(e.value)
   {
-    if(i->key)
+    const SimpleMap::Literal* literal = dynamic_cast<const SimpleMap::Literal*>(e.value);
+    if(literal)
     {
-      if(path != "")
-        path += '.';
-      path += i->key;
-    }
-    else
-    {
-      char buf[20];
-      sprintf(buf, "[%d]", i->type);
-      path += buf;
-    }
-
-  }
-  if(name == "")
-    OUTPUT_WARNING(path << ": " << msg);
-  else
-    OUTPUT_WARNING(name << ", " << path << ": " << msg);
-}
-
-void InConfigMap::inChar(char& value)
-{
-  try
-  {
-    Entry& e = stack.back();
-    if(e.value)
-    {
+      In& stream = *literal;
       int i;
-      *e.value >> i;
+      stream >> i;
       value = (char) i;
+      if(!stream.eof())
+        printError("wrong format");
     }
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    if(!isTolerant())
-      printError(e.what());
-    else if(isVerbose())
-      printWarning(e.what());
+    else
+      printError("literal expected");
   }
 }
 
-void InConfigMap::inUChar(unsigned char& value)
+void InMap::inUChar(unsigned char& value)
 {
-  try
+  Entry& e = stack.back();
+  if(e.value)
   {
-    Entry& e = stack.back();
-    if(e.value)
+    const SimpleMap::Literal* literal = dynamic_cast<const SimpleMap::Literal*>(e.value);
+    if(literal)
     {
-      unsigned i;
-      *e.value >> i;
-      value = (unsigned char) i;
-    }
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    if(!isTolerant())
-      printError(e.what());
-    else if(isVerbose())
-      printWarning(e.what());
-  }
-}
-
-void InConfigMap::inInt(int& value)
-{
-  try
-  {
-    Entry& e = stack.back();
-    if(e.value)
-    {
+      In& stream = *literal;
       if(e.enumToString)
       {
         std::string s;
-        *e.value >> s;
+        stream >> s;
         for(int i = 0; e.enumToString(i); ++i)
           if(s == e.enumToString(i))
           {
-            value = i;
+            value = (unsigned char) i;
             return;
           }
         std::string t;
         for(int i = 0; e.enumToString(i); ++i)
           t += std::string("'") + e.enumToString(i) + "', ";
         printError("expected one of " + t + "found '" + s + "'");
+        return;
       }
       else
-        *e.value >> value;
+      {
+        unsigned i;
+        stream >> i;
+        value = (unsigned char) i;
+        if(!stream.eof())
+          printError("wrong format");
+      }
     }
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    if(!isTolerant())
-      printError(e.what());
-    else if(isVerbose())
-      printWarning(e.what());
+    else
+      printError("literal expected");
   }
 }
 
-void InConfigMap::inUInt(unsigned int& value)
+void InMap::inInt(int& value)
 {
-  try
+  Entry& e = stack.back();
+  if(e.value)
   {
-    Entry& e = stack.back();
-    if(e.type == -1)
-      value = e.value ? e.value->length() : 0;
-    else if(e.value)
-      *e.value >> value;
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    if(!isTolerant())
-      printError(e.what());
-    else if(isVerbose())
-      printWarning(e.what());
+    const SimpleMap::Literal* literal = dynamic_cast<const SimpleMap::Literal*>(e.value);
+    if(literal)
+    {
+      In& stream = *literal;
+      stream >> value;
+      if(!stream.eof())
+        printError("wrong format");
+    }
+    else
+      printError("literal expected");
   }
 }
 
-void InConfigMap::inBool(bool& value)
+void InMap::inUInt(unsigned int& value)
 {
-  try
+  Entry& e = stack.back();
+  if(e.type == -1)
   {
-    Entry& e = stack.back();
     if(e.value)
     {
-      std::string s;
-      *e.value >> s;
-      if(s == "false")
-        value = false;
-      else if(s == "true")
-        value = true;
+      const SimpleMap::Array* array = dynamic_cast<const SimpleMap::Array*>(e.value);
+      if(array)
+        value = array->size();
       else
-        printError("expected 'true' or 'false', found '" + s + "'");
+        printError("array expected");
+    }
+    else
+      value = 0;
+  }
+  else if(e.value)
+  {
+    const SimpleMap::Literal* literal = dynamic_cast<const SimpleMap::Literal*>(e.value);
+    if(literal)
+    {
+      In& stream = *literal;
+      stream >> value;
+      if(!stream.eof())
+        printError("wrong format");
+    }
+    else
+      printError("literal expected");
+  }
+}
+
+void InMap::read(void* p, int size)
+{
+  ASSERT(false);
+}
+
+void InMap::skip(int size)
+{
+  ASSERT(false);
+}
+
+void InMap::select(const char* name, int type, const char * (*enumToString)(int))
+{
+  ASSERT(map);
+  ASSERT(name || type >= 0);
+
+  Streaming::trimName(name);
+  const SimpleMap::Value* value = stack.empty() ? (const SimpleMap::Value*) *map : stack.back().value;
+  if(!value) // invalid
+    stack.push_back(Entry(name, 0, type, enumToString)); // add more invalid
+  else if(type >= 0) // array element
+  {
+    const SimpleMap::Array* array = dynamic_cast<const SimpleMap::Array*>(value);
+    if(array)
+    {
+      if(type < (int) array->size())
+        stack.push_back(Entry(name, (*array)[type], type, enumToString));
+      else
+      {
+        printError("array index out of range");
+        stack.push_back(Entry(name, 0, type, enumToString)); // add invalid
+      }
+    }
+    else
+    {
+      printError("array expected");
+      stack.push_back(Entry(name, 0, type, enumToString)); // add invalid
     }
   }
-  catch(std::invalid_argument& e)
+  else // record element
   {
-    printError(e.what());
-  }
-  catch(invalid_key& e)
-  {
-    if(!isTolerant())
-      printError(e.what());
-    else if(isVerbose())
-      printWarning(e.what());
-  }
-}
-
-void InConfigMap::read(void* p, int size)
-{
-  ASSERT(false);
-}
-
-void InConfigMap::skip(int size)
-{
-  ASSERT(false);
-}
-
-void InConfigMap::select(const char* name, int type, const char * (*enumToString)(int))
-{
-  try
-  {
-    ASSERT(name || type >= 0);
-    if(stack.empty())
-      stack.push_back(Entry(name, &map[std::string(name)], type, enumToString));
-    else if(!stack.back().value) // invalid
-      stack.push_back(Entry(name, 0, type, enumToString)); // add more invalid
-    else if(type >= 0)
-      stack.push_back(Entry(name, &(*stack.back().value)[type], type, enumToString));
+    const SimpleMap::Record* record = dynamic_cast<const SimpleMap::Record*>(value);
+    if(record)
+    {
+      SimpleMap::Record::const_iterator i = record->find(name);
+      if(i != record->end())
+        stack.push_back(Entry(name, i->second, type, enumToString));
+      else
+      {
+        printError(std::string("attribute '") + name + "' not found");
+        stack.push_back(Entry(name, 0, type, enumToString)); // add invalid
+      }
+    }
     else
-      stack.push_back(Entry(name, &(*stack.back().value)[std::string(name)], type, enumToString));
-  }
-  catch(std::invalid_argument& e)
-  {
-    printError(e.what());
-    stack.push_back(Entry(name, 0, type, enumToString)); // add invalid
-  }
-  catch(invalid_key& e)
-  {
-    if(isTolerant())
-      printWarning(e.what());
-    else
-      printError(e.what());
-    stack.push_back(Entry(name, 0, type, enumToString)); // add invalid
-  }
-  catch(bad_cm_cast& e)
-  {
-    printError(e.what());
-    stack.push_back(Entry(name, 0, type, enumToString)); // add invalid
+    {
+      printError("record expected");
+      stack.push_back(Entry(name, 0, type, enumToString)); // add invalid
+    }
   }
 }
 
-void InConfigMap::deselect()
+void InMap::deselect()
 {
   stack.pop_back();
+}
+
+InMapFile::InMapFile(const std::string& name) :
+  stream(name)
+{
+  if(stream.exists())
+    parse(stream, name);
+}
+
+InMapMemory::InMapMemory(const void* memory, unsigned size) :
+  stream(memory, size)
+{
+  parse(stream);
 }

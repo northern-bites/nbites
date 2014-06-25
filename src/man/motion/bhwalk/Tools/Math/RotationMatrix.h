@@ -1,6 +1,6 @@
 /**
 * \file RotationMatrix.h
-* Delcaration of class RotationMatrix
+* Delcaration of class RotationMatrixBH
 * \author <a href="mailto:martin.kallnik@gmx.de">Martin Kallnik</a>
 * \author <a href="mailto:thomas.kindler@gmx.de">Thomas Kindler</a>
 * \author Max Risler
@@ -13,21 +13,21 @@
 /**
  * Representation for 3x3 RotationMatrices
  */
-class RotationMatrix : public Matrix3x3<>
+class RotationMatrixBH : public Matrix3x3BH<>
 {
 protected:
   virtual void serialize(In* in, Out* out)
   {
-    STREAM_REGISTER_BEGIN();
-    STREAM_BASE(Matrix3x3<>);
-    STREAM_REGISTER_FINISH();
+    STREAM_REGISTER_BEGIN;
+    STREAM_BASE(Matrix3x3BH<>);
+    STREAM_REGISTER_FINISH;
   }
 
 public:
   /**
    * Default constructor.
    */
-  RotationMatrix() {}
+  RotationMatrixBH() {}
 
   /**
    * Constructor.
@@ -36,17 +36,17 @@ public:
    * \param  c1  the second column of the matrix.
    * \param  c2  the third column of the matrix.
    */
-  RotationMatrix(
-    const Vector3<>& c0,
-    const Vector3<>& c1,
-    const Vector3<>& c2) : Matrix3x3<>(c0, c1, c2) {}
+  RotationMatrixBH(
+    const Vector3BH<>& c0,
+    const Vector3BH<>& c1,
+    const Vector3BH<>& c2) : Matrix3x3BH<>(c0, c1, c2) {}
 
   /**
    * Copy constructor.
    *
    * \param  other  The other matrix that is copied to this one
    */
-  explicit RotationMatrix(const Matrix3x3<>& other) : Matrix3x3<>(other) {}
+  explicit RotationMatrixBH(const Matrix3x3BH<>& other) : Matrix3x3BH<>(other) {}
 
   /**
    * Assignment operator.
@@ -54,7 +54,7 @@ public:
    * \param  other  The other matrix that is assigned to this one
    * \return        A reference to this object after the assignment.
    */
-  RotationMatrix& operator=(const Matrix3x3<>& other)
+  RotationMatrixBH& operator=(const Matrix3x3BH<>& other)
   {
     c0 = other.c0;
     c1 = other.c1;
@@ -63,42 +63,42 @@ public:
   }
 
   /**
-   * RotationMatrix from rotation around any axis.
+   * RotationMatrixBH from rotation around any axis.
   * \param axis The axis.
    * \param angle The angle to rotate around the axis.
    */
-  RotationMatrix(const Vector3<>& axis, float angle);
+  RotationMatrixBH(const Vector3BH<>& axis, float angle);
 
   /**
-   * RotationMatrix from rotation around any axis with an angle given as the length of the axis.
+   * RotationMatrixBH from rotation around any axis with an angle given as the length of the axis.
    * \param axis The axis.
    */
-  RotationMatrix(const Vector3<>& axis);
+  RotationMatrixBH(const Vector3BH<>& axis);
 
   /**
    * Invert the matrix.
    *
    * \note: Inverted rotation matrix is transposed matrix.
    */
-  inline RotationMatrix invert() const
+  inline RotationMatrixBH invert() const
   {
-    return RotationMatrix(
-             Vector3<>(c0.x, c1.x, c2.x),
-             Vector3<>(c0.y, c1.y, c2.y),
-             Vector3<>(c0.z, c1.z, c2.z)
+    return RotationMatrixBH(
+             Vector3BH<>(c0.x, c1.x, c2.x),
+             Vector3BH<>(c0.y, c1.y, c2.y),
+             Vector3BH<>(c0.z, c1.z, c2.z)
            );
   }
 
   /**
    * Multiplication of this rotation matrix by another matrix.
-   * This function is reimplemented here to avoid hidden Matrix3x3<> to RotationMatrix (copy) casts.
+   * This function is reimplemented here to avoid hidden Matrix3x3BH<> to RotationMatrixBH (copy) casts.
    * \param  other  The other matrix this one is multiplied by
    * \return        A new matrix containing the result
    *                of the calculation.
   */
-  RotationMatrix operator*(const Matrix3x3<>& other) const
+  RotationMatrixBH operator*(const Matrix3x3BH<>& other) const
   {
-    RotationMatrix result;
+    RotationMatrixBH result;
     result.c0.x = c0.x * other.c0.x + c1.x * other.c0.y + c2.x * other.c0.z;
     result.c0.y = c0.y * other.c0.x + c1.y * other.c0.y + c2.y * other.c0.z;
     result.c0.z = c0.z * other.c0.x + c1.z * other.c0.y + c2.z * other.c0.z;
@@ -113,14 +113,14 @@ public:
 
   /**
   * Multiplication of this matrix by vector.
-  * This function is reimpletened here since the RotationMatrix * Matrix3x3<> reimplementation makes Matrix3x3<> * Vector3<> inaccessible
+  * This function is reimpletened here since the RotationMatrixBH * Matrix3x3BH<> reimplementation makes Matrix3x3BH<> * Vector3BH<> inaccessible
   * \param  vector  The vector this one is multiplied by
   * \return         A new vector containing the result
   *                 of the calculation.
   */
-  Vector3<> operator*(const Vector3<>& vector) const
+  Vector3BH<> operator*(const Vector3BH<>& vector) const
   {
-    return Vector3<>(
+    return Vector3BH<>(
              c0.x * vector.x + c1.x * vector.y + c2.x * vector.z,
              c0.y * vector.x + c1.y * vector.y + c2.y * vector.z,
              c0.z * vector.x + c1.z * vector.y + c2.z * vector.z);
@@ -132,7 +132,7 @@ public:
    * \param   angle  The angle this pose will be rotated by
    * \return  A reference to this object after the calculation.
    */
-  RotationMatrix& rotateX(const float angle);
+  RotationMatrixBH& rotateX(const float angle);
 
   /**
    * Rotation around the y-axis.
@@ -140,7 +140,7 @@ public:
    * \param   angle  The angle this pose will be rotated by
    * \return  A reference to this object after the calculation.
    */
-  RotationMatrix& rotateY(const float angle);
+  RotationMatrixBH& rotateY(const float angle);
 
   /**
    * Rotation around the z-axis.
@@ -148,10 +148,10 @@ public:
    * \param   angle  The angle this pose will be rotated by
    * \return  A reference to this object after the calculation.
    */
-  RotationMatrix& rotateZ(const float angle);
+  RotationMatrixBH& rotateZ(const float angle);
 
   /**
-   * Get the x-angle of a RotationMatrix.
+   * Get the x-angle of a RotationMatrixBH.
    *
    * \return  The angle around the x-axis between the original
    *          and the rotated z-axis projected on the y-z-plane
@@ -159,7 +159,7 @@ public:
   float getXAngle() const;
 
   /**
-   * Get the y-angle of a RotationMatrix.
+   * Get the y-angle of a RotationMatrixBH.
    *
    * \return  The angle around the y-axis between the original
    *          and the rotated x-axis projected on the x-z-plane
@@ -167,7 +167,7 @@ public:
   float getYAngle() const;
 
   /**
-   * Get the z-angle of a RotationMatrix.
+   * Get the z-angle of a RotationMatrixBH.
    *
    * \return  The angle around the z-axis between the original
    *          and the rotated x-axis projected on the x-y-plane
@@ -175,32 +175,32 @@ public:
   float getZAngle() const;
 
   /**
-   * Create and return a RotationMatrix, rotated around x-axis
+   * Create and return a RotationMatrixBH, rotated around x-axis
    *
    * \param   angle
-   * \return  rotated RotationMatrix
+   * \return  rotated RotationMatrixBH
    */
-  static RotationMatrix fromRotationX(const float angle);
+  static RotationMatrixBH fromRotationX(const float angle);
 
   /**
-   * Create and return a RotationMatrix, rotated around y-axis
+   * Create and return a RotationMatrixBH, rotated around y-axis
    *
    * \param   angle
-   * \return  rotated RotationMatrix
+   * \return  rotated RotationMatrixBH
    */
-  static RotationMatrix fromRotationY(const float angle);
+  static RotationMatrixBH fromRotationY(const float angle);
 
   /**
-   * Create and return a RotationMatrix, rotated around z-axis
+   * Create and return a RotationMatrixBH, rotated around z-axis
    *
    * \param   angle
-   * \return  rotated RotationMatrix
+   * \return  rotated RotationMatrixBH
    */
-  static RotationMatrix fromRotationZ(const float angle);
+  static RotationMatrixBH fromRotationZ(const float angle);
 
   /**
   * Converts the rotation matrix into the single vector format.
   * @return The rotation matrix as angleAxis.
   */
-  Vector3<> getAngleAxis() const;
+  Vector3BH<> getAngleAxis() const;
 };

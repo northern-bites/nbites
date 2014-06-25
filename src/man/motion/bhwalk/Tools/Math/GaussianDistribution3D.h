@@ -18,9 +18,9 @@ class GaussianDistribution3D
 {
 public:
   /** The mean value of the distribution*/
-  Vector3<> mean;
+  Vector3BH<> mean;
   /** The variance of the distribution*/
-  Matrix3x3<> covariance;
+  Matrix3x3BH<> covariance;
 
   /** Empty standard constructor*/
   GaussianDistribution3D() {}
@@ -42,7 +42,7 @@ public:
   * @param pos The position
   * @return The probability at pos.
   */
-  virtual float probabilityAt(const Vector3<>& pos) const;
+  virtual float probabilityAt(const Vector3BH<>& pos) const;
 
   /** Computes the probability density at the center of the distribution
   * @return The probability
