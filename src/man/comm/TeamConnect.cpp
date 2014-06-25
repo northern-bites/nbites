@@ -38,10 +38,6 @@ void TeamConnect::setUpSocket()
     socket->setBlocking(false);
     socket->setBroadcast(true);
 
-#ifdef DEBUG_COMM
-    std::cout << "Target ip is set to: " << ipTarget.c_str() << std::endl;
-#endif
-
     socket->setTarget(IP_TARGET, TEAM_PORT);
     socket->bind("", TEAM_PORT); // listen for anything on our port
 }
