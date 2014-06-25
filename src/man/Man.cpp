@@ -179,6 +179,8 @@ Man::Man(boost::shared_ptr<AL::ALBroker> broker, const std::string &name)
         sharedBall.worldModelIn[i].wireTo(comm._worldModels[i], true);
     }
 
+    behaviors.sharedBallIn.wireTo(&sharedBall.sharedBallOutput);
+
     obstacle.armContactIn.wireTo(&arms.contactOut, true);
     obstacle.sonarIn.wireTo(&sensors.sonarsOutput_, true);
 
