@@ -188,7 +188,7 @@ def superState(state):
             fsa.ignoreDefaultState = False
 
             # (3) Switch to state switched to by super first
-            if stateSwitchedToBySuperState:
+            if stateSwitchedToBySuperState and stateSwitchedToBySuperState[1] != fsa.currentState:
                 return stateSwitchedToBySuperState
 
             # (4) Switch to state switched to by child

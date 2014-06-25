@@ -130,10 +130,10 @@ class FSA:
 
     def goNow(self,newState):
         """ Use this method to switch to a new state immediately. """
-        if newState == self.currentState:
-            print "State was: ", newState
-            raise Exception("Calling goNow on the current state causes an "+
-                            "infinite loop. Use stay()")
+        # if newState == self.currentState:
+        #     print "Loop in: ", newState
+        #     raise Exception("Calling goNow on the current state causes an "+
+        #                     "infinite loop. Use stay()")
         return (THIS_FRAME, newState)
 
     def goLater(self,newState):
