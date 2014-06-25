@@ -6,12 +6,10 @@ import math
 import copy
 import itertools
 
+# TODO use robot detection and open field info to decide kicks
 # TODO cleaning and documentation
-# TODO rethink planner part?
+# TODO delete old kick decider files
 # TODO make completely functional?
-
-# TODO integrate with approach ball
-# TODO integrate with motion kicking
 class KickDecider2(object):
     """
     The new kick decider.
@@ -25,9 +23,13 @@ class KickDecider2(object):
         self.possibleKicks = self.generateNothing()
     
     ### PLANNERS ###
-    def closeToGoal(self):
-        self.kicks[0] = kicks.LEFT_SHORT_STRAIGHT_KICK
-        self.kicks[1] = kicks.RIGHT_SHORT_STRAIGHT_KICK
+    def motionKicks(self):
+        self.brain.player.motionKick = True
+
+        self.kicks[0] = kicks.M_LEFT_STRAIGHT
+        self.kicks[1] = kicks.M_RIGHT_STRAIGHT
+        self.kicks[2] = kicks.M_LEFT_SIDE
+        self.kicks[3] = kicks.M_RIGHT_SIDE
 
         self.clearPossibleKicks()
         self.addShotsOnGoal()
@@ -35,9 +37,23 @@ class KickDecider2(object):
 
         return (kick for kick in self.possibleKicks).next().next()
 
-    def farFromGoal(self):
+    def normalKicks(self):
+        self.kicks[0] = kicks.LEFT_SHORT_STRAIGHT_KICK
+        self.kicks[1] = kicks.RIGHT_SHORT_STRAIGHT_KICK
+        self.kicks[2] = kicks.LEFT_SIDE_KICK
+        self.kicks[3] = kicks.RIGHT_SIDE_KICK
+
+        self.clearPossibleKicks()
+        self.addShotsOnGoal()
+        self.addPassesToFieldCross()
+
+        return (kick for kick in self.possibleKicks).next().next()
+
+    def bigKicks(self):
         self.kicks[0] = kicks.LEFT_BIG_KICK
         self.kicks[1] = kicks.RIGHT_BIG_KICK
+        self.kicks[2] = kicks.LEFT_SIDE_KICK
+        self.kicks[3] = kicks.RIGHT_SIDE_KICK
 
         self.clearPossibleKicks()
         self.addShotsOnGoal()

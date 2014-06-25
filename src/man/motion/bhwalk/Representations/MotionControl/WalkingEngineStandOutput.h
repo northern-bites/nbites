@@ -9,16 +9,16 @@
 #include "Representations/Infrastructure/JointData.h"
 
 /**
-* @class WalkingEngineOutput
+* @class WalkingEngineOutputBH
 * A class that represents the output of the walking engine.
 */
-class WalkingEngineStandOutput : public JointRequest
+class WalkingEngineStandOutputBH : public JointRequestBH
 {
 protected:
   virtual void serialize(In* in, Out* out)
   {
     STREAM_REGISTER_BEGIN();
-    STREAM_BASE(JointRequest);
+    STREAM_BASE(JointRequestBH);
     STREAM_REGISTER_FINISH();
   }
 
@@ -26,5 +26,5 @@ public:
   /**
   * Default constructor.
   */
-  WalkingEngineStandOutput() {}
+  WalkingEngineStandOutputBH() {}
 };

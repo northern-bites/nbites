@@ -11,18 +11,21 @@
 #include "Tools/Streams/Streamable.h"
 #include "Platform/BHAssert.h"
 
+namespace vec {
+using namespace std;
+
 template <int n, class V> struct VectorData : public ImplicitlyStreamable
 {
   V v[n];
 };
 
-template <class V> struct VectorData<2, V>
+template <class V> struct VectorData<2, V> : public ImplicitlyStreamable
 {
   V x;
   V y;
 };
 
-template <class V> struct VectorData<3, V>
+template <class V> struct VectorData<3, V> : public ImplicitlyStreamable
 {
   V x;
   V y;
@@ -38,6 +41,13 @@ public:
   {
     for(int i = 0; i < n; ++i)
       (*this)[i] = V();
+  }
+
+  /** constructor for a 1-dimensional vector. */
+  Vector<n, V>(V x)
+  {
+    ASSERT(n == 1);
+    (*this)[0] = x;
   }
 
   /** constructor for a 2-dimensional vector. */
@@ -66,21 +76,6 @@ public:
     (*this)[2] = z;
     (*this)[3] = w;
   }
-  /** constructor for a n-dimensional vector. */
-  /*
-  Vector<n, V>(V x, V y, V z, V w, ...)
-  {
-    (*this)[0] = x;
-    (*this)[1] = y;
-    (*this)[2] = z;
-    (*this)[3] = w;
-    va_list vl;
-    va_start(vl, w);
-    for(int i = 4; i < n; ++i)
-      (*this)[i] = va_arg(vl, V);
-    va_end(vl);
-  }
-  */
 
   /**
   * Copy constructor
@@ -264,7 +259,7 @@ public:
   * Calculation of the square length of this vector.
   * @return length*length.
   */
-  V sqr() const
+  V sqrBH() const
   {
     V result = (*this)[0] * (*this)[0];
     for(int i = 1; i < n; ++i)
@@ -278,9 +273,19 @@ public:
   */
   V abs() const
   {
-    return sqrt(sqr());
+    return sqrt(sqrBH());
   }
 
+  /**
+  * normalizeBH this vector.
+  * @return the normalized vector.
+  */
+  Vector<n, V>& normalizeBH()
+  {
+    const V length = abs();
+    if(length == V()) return *this;
+    return *this /= length;
+  }
 };
 
 /**
@@ -294,7 +299,7 @@ template <class V> In& operator>>(In& stream, Vector<2, V>& vector)
   STREAM_REGISTER_BEGIN_EXT(vector);
   STREAM_EXT(stream, vector.x);
   STREAM_EXT(stream, vector.y);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
@@ -310,7 +315,7 @@ template <class V> In& operator>>(In& stream, Vector<3, V>& vector)
   STREAM_EXT(stream, vector.x);
   STREAM_EXT(stream, vector.y);
   STREAM_EXT(stream, vector.z);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
@@ -324,7 +329,7 @@ template <int n, class V> In& operator>>(In& stream, Vector<n, V>& vector)
 {
   STREAM_REGISTER_BEGIN_EXT(vector);
   STREAM_EXT(stream, vector.v);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
@@ -339,7 +344,7 @@ template <class V> Out& operator<<(Out& stream, const Vector<2, V>& vector)
   STREAM_REGISTER_BEGIN_EXT(vector);
   STREAM_EXT(stream, vector.x);
   STREAM_EXT(stream, vector.y);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
@@ -355,7 +360,7 @@ template <class V> Out& operator<<(Out& stream, const Vector<3, V>& vector)
   STREAM_EXT(stream, vector.x);
   STREAM_EXT(stream, vector.y);
   STREAM_EXT(stream, vector.z);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
@@ -376,11 +381,15 @@ template <int n, class V> Out& operator<<(Out& stream, const Vector<n, V>& vecto
   STREAM_REGISTER_BEGIN_EXT(vector);
   Vector<4, float>& vector2(const_cast<Vector<4, float>&>(vector)); // Hack to make it compile with Visual Studio
   STREAM_EXT(stream, vector2.v);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
+};
 
+using vec::Vector;
+
+typedef Vector<1, float> Vector1f;
 typedef Vector<2, float> Vector2f;
 typedef Vector<3, float> Vector3f;
 typedef Vector<4, float> Vector4f;

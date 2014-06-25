@@ -20,12 +20,23 @@ public:
   /** Default constructor. */
   Matrix<m, n, V>() {}
 
+  /**
+  * Constructor that initializes the diagonal of nxn matrices with a value
+  * @param v The value
+  */
   Matrix<m, n, V>(V v)
   {
     ASSERT(m == n);
     const int mnm = n < m ? n : m;
     for(int i = 0; i < mnm; ++i)
       c[i][i] = v;
+  }
+
+  /** Constructor */
+  Matrix<m, n, V>(const Vector<m, V>& c0)
+  {
+    ASSERT(n == 1);
+    c[0] = c0;
   }
 
   /** Constructor */
@@ -54,22 +65,6 @@ public:
     c[2] = c2;
     c[3] = c3;
   }
-
-  /** Constructor */
-  /*
-  Matrix<m, n, V>(const Vector<m, V>& c0, const Vector<m, V>& c1, const Vector<m, V>& c2, const Vector<m, V>& c3, ...)
-  {
-    c[0] = c0;
-    c[1] = c1;
-    c[2] = c2;
-    c[3] = c3;
-    va_list vl;
-    va_start(vl, c3);
-    for(int i = 4; i < n; ++i)
-      (*this)[i] = va_arg(vl, const Vector<m, V>&);
-    va_end(vl);
-  }
-  */
 
   /**
   * Assignment operator
@@ -305,7 +300,7 @@ template <int m, int n, class V> In& operator>>(In& stream, Matrix<m, n, V>& mat
 {
   STREAM_REGISTER_BEGIN_EXT(matrix);
   STREAM_EXT(stream, matrix.c);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
@@ -319,13 +314,23 @@ template <int m, int n, class V> Out& operator<<(Out& stream, const Matrix<m, n,
 {
   STREAM_REGISTER_BEGIN_EXT(matrix);
   STREAM_EXT(stream, matrix.c);
-  STREAM_REGISTER_FINISH();
+  STREAM_REGISTER_FINISH;
   return stream;
 }
 
-
+typedef Matrix<1, 1, float> Matrix1x1f;
 typedef Matrix<2, 2, float> Matrix2x2f;
+typedef Matrix<2, 1, float> Matrix2x1f;
+typedef Matrix<1, 2, float> Matrix1x2f;
 typedef Matrix<3, 3, float> Matrix3x3f;
+typedef Matrix<3, 2, float> Matrix3x2f;
+typedef Matrix<3, 1, float> Matrix3x1f;
+typedef Matrix<2, 3, float> Matrix2x3f;
+typedef Matrix<1, 3, float> Matrix1x3f;
 typedef Matrix<4, 4, float> Matrix4x4f;
+typedef Matrix<4, 3, float> Matrix4x3f;
 typedef Matrix<4, 2, float> Matrix4x2f;
+typedef Matrix<4, 1, float> Matrix4x1f;
+typedef Matrix<3, 4, float> Matrix3x4f;
 typedef Matrix<2, 4, float> Matrix2x4f;
+typedef Matrix<1, 4, float> Matrix1x4f;

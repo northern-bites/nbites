@@ -13,6 +13,7 @@ class Kick(object):
         self.sweetMove = move
         self.maxDist = maxDist           # upper limit of the range of the kick
 
+        # TODO use destination objects
         self.setupX = x
         self.setupY = y
         self.setupH = h
@@ -44,17 +45,34 @@ class Kick(object):
     def __ne__(self, other):
         return not self == other
 
-
 # Some standard kicks. x,y and move should not be modified unless you change
 # the sweetMove. Here heading indicates where one should setup to kick in a
 # particular direction, but it will be modified later on to indicate where the
 # robot needs to orbit to.
-LEFT_SIDE_KICK =  Kick("L_Side", x = 17.5, y =  2,
-                       h = 90,
+
+# Sweet move-based kicks
+LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 18.0, y =  4.3, 
+                                 move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
+RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 18.0, y = -4.3,
+                                 move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
+
+LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 15.5, y =  4.5,
+                      move=SweetMoves.LEFT_BIG_KICK)
+RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 15.5, y = -4.5,
+                      move=SweetMoves.RIGHT_BIG_KICK)
+
+LEFT_SIDE_KICK =  Kick("L_Side", x = 17.5, y =  2, h = 90,
                        move=SweetMoves.GOOGZ_LEFT_SIDE_KICK)
-RIGHT_SIDE_KICK = Kick("R_Side", x = 17.5, y = -2,
-                       h = -90,
+RIGHT_SIDE_KICK = Kick("R_Side", x = 17.5, y = -2, h = -90,
                        move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
+
+# Motion kicks
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 16, y = 4.3)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 16, y = -4.3)
+
+M_LEFT_SIDE =  Kick("M_Left_Side", x = 11, y = 1.5, h = 90)
+M_RIGHT_SIDE =  Kick("M_Right_Side", x = 11, y = -1.5, h = -90)
+
 # Not used 04-19-13
 LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,
                              h = 90,
@@ -69,41 +87,27 @@ LEFT_STRAIGHT_KICK =  Kick("L_Straight", x = 16.5, y = 5.0,
 RIGHT_STRAIGHT_KICK = Kick("R_Straight", x = 16.5, y = -5.0,
                            move=SweetMoves.RIGHT_STRAIGHT_KICK)
 
-LEFT_SHORT_STRAIGHT_KICK =  Kick("L_Short_Straight", x = 18.2, y =  4.4, 
-                                 move=SweetMoves.LEFT_SHORT_STRAIGHT_KICK)
-RIGHT_SHORT_STRAIGHT_KICK = Kick("R_Short_Straight", x = 18.2, y = -4.4,
-                                 move=SweetMoves.RIGHT_SHORT_STRAIGHT_KICK)
-
-LEFT_BIG_KICK =  Kick("L_Big_Straight", x = 15.5, y =  4.5,
-                      move=SweetMoves.LEFT_BIG_KICK)
-RIGHT_BIG_KICK = Kick("R_Big_Straight", x = 15.5, y = -4.5,
-                      move=SweetMoves.RIGHT_BIG_KICK)
-
-# used when we haven't decided what kick to do yet
-ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
-
+# Not used 05-02-14
 LEFT_LONG_BACK_KICK =  Kick("L_Long_Back", x = 15.7, y =  4.1,
                             move=SweetMoves.LEFT_LONG_BACK_KICK)
 RIGHT_LONG_BACK_KICK = Kick("R_Long_Back", x = 15.7, y = -4.1,
                             move=SweetMoves.RIGHT_LONG_BACK_KICK)
 
-# Not used 06-09-13
+# Not used 05-02-14
 LEFT_SHORT_BACK_KICK =  Kick("L_Short_Back", x = 16.8, y =  4,
                              move=SweetMoves.LEFT_SHORT_BACK_KICK)
 RIGHT_SHORT_BACK_KICK = Kick("R_Short_Back", x = 16.8, y = -4,
                              move=SweetMoves.RIGHT_SHORT_BACK_KICK)
 
+# Not used 05-02-14
 # Dribble kick just tells player to run thru the ball, no actual sweet move
 LEFT_DRIBBLE =  Kick("L_Dribble", x = 0, y = 3.0)
 RIGHT_DRIBBLE =  Kick("R_Dribble", x = 0, y = -3.0)
 
-# Motion kicks
-M_LEFT_SIDE =  Kick("M_Left_Side", x = 11, y = 1.5)
-M_RIGHT_SIDE =  Kick("M_Right_Side", x = 11, y = -1.5)
+# Used when we haven't decided what kick to do yet
+ORBIT_KICK_POSITION = Kick("NULL_KICK", x = 12, y = 0)
 
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 15, y = 5.0)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 15, y = -5.0)
-
+# TODO automate/generalize this?
 def chooseAlignedKickFromKick(player, kick):
     ballRelY = player.brain.ball.stat_rel_y
     if (kick == LEFT_STRAIGHT_KICK or

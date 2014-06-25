@@ -70,7 +70,7 @@ private:
     std::vector<float> getCurrentHeads(std::vector<float>&);
     void setNextHeadCommand(std::vector<float>&);
 
-    static const float SPEED_CLIP_FACTOR = 0.1f;
+    static constexpr float SPEED_CLIP_FACTOR = 0.1f;
 };
 
 } // namespace motion

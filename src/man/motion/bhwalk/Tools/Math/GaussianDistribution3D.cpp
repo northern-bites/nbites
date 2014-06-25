@@ -12,16 +12,16 @@
 
 float GaussianDistribution3D::distanceTo(const GaussianDistribution3D& other) const
 {
-  Vector3<> diff(mean - other.mean);
-  Matrix3x3<> cov(covariance + other.covariance);
+  Vector3BH<> diff(mean - other.mean);
+  Matrix3x3BH<> cov(covariance + other.covariance);
   return diff * (cov.invert() * diff);
 }
 
-float GaussianDistribution3D::probabilityAt(const Vector3<>& pos) const
+float GaussianDistribution3D::probabilityAt(const Vector3BH<>& pos) const
 {
-  Vector3<> diff(pos - mean);
+  Vector3BH<> diff(pos - mean);
   float exponent(diff * (covariance.invert()*diff));
-  float probability(1.0f / (pi2 * sqrt(covariance.det())));
+  float probability(1.0f / (pi2 * std::sqrt(covariance.det())));
   probability *= exp(-0.5f * exponent);
   return std::max(probability, 0.000001f);
 }
@@ -78,7 +78,7 @@ void GaussianDistribution3D::generateDistributionFromMeasurements(
 
 GaussianDistribution3D& GaussianDistribution3D::fuse(const GaussianDistribution3D& other)
 {
-  Matrix3x3<> K(covariance);
+  Matrix3x3BH<> K(covariance);
   K *= (covariance + other.covariance).invert();
   mean += K * (other.mean - mean);
   covariance -= K * covariance;
@@ -93,9 +93,9 @@ void GaussianDistribution3D::merge(const GaussianDistribution3D& other)
   float pSum(p1 + p2);
   float w1(p1 / pSum);
   float w2(p2 / pSum);
-  Vector3<> newMean(mean * w1 + other.mean * w2);
-  Vector3<> diffMean(mean - other.mean);
-  Matrix3x3<> meanMatrix;
+  Vector3BH<> newMean(mean * w1 + other.mean * w2);
+  Vector3BH<> diffMean(mean - other.mean);
+  Matrix3x3BH<> meanMatrix;
   meanMatrix.c0.x = diffMean.x * diffMean.x;
   meanMatrix.c0.y = diffMean.x * diffMean.y;
   meanMatrix.c0.z = diffMean.x * diffMean.z;

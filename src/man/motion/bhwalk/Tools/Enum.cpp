@@ -1,43 +1,47 @@
 /*
 * @file Tools/Enum.h
-* Implements a class converts a single comma-separated string 
-* of enum names into single entries that can be accessed in 
+* Implements a function that converts a single comma-separated string
+* of enum names into single entries that can be accessed in
 * constant time.
 * @author Thomas Röfer
 */
 
 #include "Enum.h"
 #include "Platform/BHAssert.h"
+#include <cstring>
 
-std::string EnumName::trim(const std::string& s)
+static char* trim(char* pBegin, char* pEnd)
 {
-  std::string::size_type pos = s.find_first_not_of(' ');
-  if(pos != std::string::npos)
-    return s.substr(pos, s.find_last_not_of(' ') + 1);
-  else 
-    return s;
+  while(*pBegin == ' ')
+    ++pBegin;
+  while(pEnd > pBegin && pEnd[-1] == ' ')
+    --pEnd;
+  *pEnd = 0;
+  return pBegin;
 }
 
-EnumName::EnumName(const std::string& enums, size_t numOfEnums) : names(numOfEnums) 
+void enumInit(char* enums, const char** names, int numOfEnums)
 {
-  std::string::size_type pBegin = 0;
-  std::string::size_type pEnd = enums.find(',');
-  size_t index = 0;
-  for(;;)
+  char* pEnd = enums - 1;
+  int index = 0;
+  bool end;
+  do
   {
-    std::string name = trim(pEnd == std::string::npos ? enums.substr(pBegin) :enums.substr(pBegin, pEnd - pBegin));
-    std::string::size_type p = name.find('=');
-    if(p != std::string::npos)
+    char* pBegin = pEnd + 1;
+    pEnd = strchr(pBegin, ',');
+    end = !pEnd;
+    if(end)
+      pEnd = pBegin + strlen(pBegin);
+    char* name = trim(pBegin, pEnd);
+    char* p = strchr(name, '=');
+    if(p)
     {
-      ASSERT(trim(name.substr(p + 1)) == names[index - 1]);
-      name = trim(name.substr(0, p));
+      ASSERT(index && !strcmp(trim(p + 1, pEnd), names[index - 1]));
+      name = trim(name, p);
       --index;
     }
+    ASSERT(index < numOfEnums);
     names[index++] = name;
-    if(pEnd == std::string::npos)
-      break;
-    pBegin = pEnd + 1;
-    pEnd = enums.find(',', pBegin);
   }
-  ASSERT(index == numOfEnums);
+  while(!end);
 }

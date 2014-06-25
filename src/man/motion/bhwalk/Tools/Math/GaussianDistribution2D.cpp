@@ -12,16 +12,16 @@
 
 float GaussianDistribution2D::distanceTo(const GaussianDistribution2D& other) const
 {
-  Vector2<> diff(mean - other.mean);
-  Matrix2x2<> cov(covariance + other.covariance);
+  Vector2BH<> diff(mean - other.mean);
+  Matrix2x2BH<> cov(covariance + other.covariance);
   return diff * (cov.invert() * diff);
 }
 
-float GaussianDistribution2D::probabilityAt(const Vector2<>& pos) const
+float GaussianDistribution2D::probabilityAt(const Vector2BH<>& pos) const
 {
-  Vector2<> diff(pos - mean);
+  Vector2BH<> diff(pos - mean);
   float exponent(diff * (covariance.invert()*diff));
-  float probability(1.0f / (pi2 * sqrt(covariance.det())));
+  float probability(1.0f / (pi2 * std::sqrt(covariance.det())));
   probability *= exp(-0.5f * exponent);
   return std::max(probability, 0.000001f);
 }
@@ -58,7 +58,7 @@ void GaussianDistribution2D::generateDistributionFromMeasurements(
 
 GaussianDistribution2D& GaussianDistribution2D::operator +=(const GaussianDistribution2D& other)
 {
-  Matrix2x2<float> K(covariance);
+  Matrix2x2BH<float> K(covariance);
   K *= (covariance + other.covariance).invert();
   mean += K * (other.mean - mean);
   covariance -= K * covariance;
@@ -73,9 +73,9 @@ void GaussianDistribution2D::merge(const GaussianDistribution2D& other)
   float pSum(p1 + p2);
   float w1(p1 / pSum);
   float w2(p2 / pSum);
-  Vector2<> newMean(mean * w1 + other.mean * w2);
-  Vector2<> diffMean(mean - other.mean);
-  Matrix2x2<float> meanMatrix;
+  Vector2BH<> newMean(mean * w1 + other.mean * w2);
+  Vector2BH<> diffMean(mean - other.mean);
+  Matrix2x2BH<float> meanMatrix;
   meanMatrix.c[0].x = diffMean.x * diffMean.x;
   meanMatrix.c[0].y = meanMatrix.c[1].x = diffMean.x * diffMean.y;
   meanMatrix.c[1].y = diffMean.y * diffMean.y;
@@ -84,16 +84,16 @@ void GaussianDistribution2D::merge(const GaussianDistribution2D& other)
   covariance = (covariance * w1 + other.covariance * w2 + meanMatrix * w1 * w2);
 }
 
-Vector2<> GaussianDistribution2D::rand() const
+Vector2BH<> GaussianDistribution2D::rand() const
 {
-  Matrix2x2<float> L;
+  Matrix2x2BH<float> L;
   choleskyDecomposition(covariance, L, 1E-9f * (covariance.trace()));
-  Vector2<> xRaw(randomGauss(), randomGauss());
+  Vector2BH<> xRaw(randomGauss(), randomGauss());
   return L * xRaw;
 }
 
-bool GaussianDistribution2D::choleskyDecomposition(const Matrix2x2<float>& A, 
-                                                   Matrix2x2<float>& L, float eps) const
+bool GaussianDistribution2D::choleskyDecomposition(const Matrix2x2BH<float>& A,
+                                                   Matrix2x2BH<float>& L, float eps) const
 {
   float sum(A.c[0].x);
   if(sum < -eps)
@@ -101,7 +101,7 @@ bool GaussianDistribution2D::choleskyDecomposition(const Matrix2x2<float>& A,
   if(sum > 0)
   {
     // (0,0)
-    L[0][0] = sqrt(sum);
+    L[0][0] = std::sqrt(sum);
     // (1,0)
     sum = A.c[1].x;
     L[1][0] = sum / L[0][0];
@@ -116,20 +116,20 @@ bool GaussianDistribution2D::choleskyDecomposition(const Matrix2x2<float>& A,
   if(sum < -eps)
     return false;
   if(sum > 0)
-    L[1][1] = sqrt(sum);
+    L[1][1] = std::sqrt(sum);
   else
     L[1][1] = 0;
 
   return true;
 }
 
-void GaussianDistribution2D::getEigenVectorsAndEigenValues(Vector2<>& eVec1, Vector2<>& eVec2, 
+void GaussianDistribution2D::getEigenVectorsAndEigenValues(Vector2BH<>& eVec1, Vector2BH<>& eVec2,
                                                            float& eValue1, float& eValue2) const
 {
   // Compute eigenvalues
   float cmTrace(covariance.trace());
   float cmDet(covariance.det());
-  float sqrtExpression(sqrt(cmTrace * cmTrace - 4 * cmDet));
+  float sqrtExpression(std::sqrt(cmTrace * cmTrace - 4 * cmDet));
   eValue1 = 0.5f * (cmTrace + sqrtExpression);
   eValue2 = 0.5f * (cmTrace - sqrtExpression);
   // Compute eigenvectors, general fomula:
@@ -138,9 +138,9 @@ void GaussianDistribution2D::getEigenVectorsAndEigenValues(Vector2<>& eVec1, Vec
   // First eigenvector (x set to 1):
   eVec1.x = 1.0f;
   eVec1.y = -covariance.c[0].y / (covariance.c[1].y - eValue1);
-  eVec1.normalize();
+  eVec1.normalizeBH();
   // Second eigenvector (y set to 1):
   eVec2.x = -covariance.c[1].x / (covariance.c[0].x - eValue2);
   eVec2.y = 1.0f;
-  eVec2.normalize();
+  eVec2.normalizeBH();
 }
