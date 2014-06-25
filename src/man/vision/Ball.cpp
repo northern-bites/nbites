@@ -84,8 +84,8 @@ Ball::Ball(Vision* vis, Threshold* thr, Field* fie, Context* con,
     init(0.0);
     allocateColorRuns();
 #ifdef OFFLINE
-    BALLDEBUG = true;
-    BALLDISTDEBUG = true;
+    BALLDEBUG = false;
+    BALLDISTDEBUG = false;
 #endif
 }
 
