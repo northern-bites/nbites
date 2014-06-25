@@ -236,6 +236,23 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
 
         message->set_timestamp(teamMessage.get()->payload().timestamp());
 
+#ifdef DEBUG_COMM
+        std::cout << "Debugging SPL comm" << std::endl;
+        std::cout << "Fallen: " << splMessage.fallen << std::endl;
+        std::cout << "Pose: " << splMessage.pose[0] << std::endl;
+        std::cout << "Pose: " << splMessage.pose[1] << std::endl;
+        std::cout << "Pose: " << splMessage.pose[2] << std::endl;
+        std::cout << "Walking to: " << splMessage.walkingTo[0] << std::endl;
+        std::cout << "Walking to: " << splMessage.walkingTo[1] << std::endl;
+        std::cout << "Shooting to: " << splMessage.shootingTo[0] << std::endl;
+        std::cout << "Shooting to: " << splMessage.shootingTo[1] << std::endl;
+        std::cout << "Ball age: " << splMessage.ballAge << std::endl;
+        std::cout << "Ball: " << splMessage.ball[0] << std::endl;
+        std::cout << "Ball: " << splMessage.ball[1] << std::endl;
+        std::cout << "Ball vel: " << splMessage.ballVel[0] << std::endl;
+        std::cout << "Ball vel: " << splMessage.ballVel[1] << std::endl;
+#endif
+
         playerNum = splMessage.playerNum;
         message->set_fallen(splMessage.fallen);
 
