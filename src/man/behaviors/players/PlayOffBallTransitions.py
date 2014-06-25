@@ -77,3 +77,6 @@ def shouldStopLookingForSharedBall(player):
     if player.brain.sharedBall.frames_off > 60:
         return True
     return False
+
+def shouldBeSupporter(player):
+    return ballInBox(player) and claimTransitions.shouldCedeClaim(player)
