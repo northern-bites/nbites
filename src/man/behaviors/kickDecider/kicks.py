@@ -67,11 +67,11 @@ RIGHT_SIDE_KICK = Kick("R_Side", x = 17.5, y = -2, h = -90,
                        move=SweetMoves.GOOGZ_RIGHT_SIDE_KICK)
 
 # Motion kicks
-M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 16, y = 4.3)
-M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 16, y = -4.3)
+M_LEFT_STRAIGHT =  Kick("M_Left_Straight", x = 15, y = 4.)
+M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 15, y = -4.)
 
-M_LEFT_SIDE =  Kick("M_Left_Side", x = 11, y = 1.5, h = 90)
-M_RIGHT_SIDE =  Kick("M_Right_Side", x = 11, y = -1.5, h = -90)
+M_LEFT_SIDE =  Kick("M_Left_Side", x = 12.5, y = 1.5, h = 90)
+M_RIGHT_SIDE =  Kick("M_Right_Side", x = 12.5, y = -1.5, h = -90)
 
 # Not used 04-19-13
 LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,

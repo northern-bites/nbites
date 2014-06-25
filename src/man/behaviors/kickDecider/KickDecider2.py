@@ -17,9 +17,7 @@ class KickDecider2(object):
     def __init__(self, brain):
         self.brain = brain
         self.kicks = [kicks.LEFT_SHORT_STRAIGHT_KICK,
-                      kicks.RIGHT_SHORT_STRAIGHT_KICK,
-                      kicks.LEFT_SIDE_KICK,
-                      kicks.RIGHT_SIDE_KICK]
+                      kicks.RIGHT_SHORT_STRAIGHT_KICK,]
         self.possibleKicks = self.generateNothing()
     
     ### PLANNERS ###
@@ -28,8 +26,8 @@ class KickDecider2(object):
 
         self.kicks[0] = kicks.M_LEFT_STRAIGHT
         self.kicks[1] = kicks.M_RIGHT_STRAIGHT
-        self.kicks[2] = kicks.M_LEFT_SIDE
-        self.kicks[3] = kicks.M_RIGHT_SIDE
+        #self.kicks[2] = kicks.M_LEFT_SIDE
+        #self.kicks[3] = kicks.M_RIGHT_SIDE
 
         self.clearPossibleKicks()
         self.addShotsOnGoal()

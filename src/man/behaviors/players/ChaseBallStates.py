@@ -14,7 +14,7 @@ import noggin_constants as nogginConstants
 import time
 
 DRIBBLE_ON_KICKOFF = False
-USE_MOTION_KICKS = False
+USE_MOTION_KICKS = True
 
 @superState('gameControllerResponder')
 @stay
@@ -198,13 +198,28 @@ def positionForKick(player):
         player.brain.tracker.lookStraightThenTrack()
         player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.GRADUAL_SPEED)
+        positionForKick.counter = 0
+        positionForKick.slowDown = False
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
-        player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
+        if not positionForKick.slowDown and player.brain.ball.distance < 30.:
+            positionForKick.slowDown = True
+            player.brain.nav.destinationWalkTo(positionForKick.kickPose,
+                                           Navigator.SLOW_SPEED)
+        elif positionForKick.slowDown and player.brain.ball.distance >= 30.:
+            positionForKick.slowDown = False
+            player.brain.nav.destinationWalkTo(positionForKick.kickPose,
+                                           Navigator.GRADUAL_SPEED)
+        else:
+            player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
 
     player.ballBeforeKick = player.brain.ball
     if transitions.ballInPosition(player, positionForKick.kickPose):
         if player.motionKick:
-            return player.goNow('executeMotionKick')
+            positionForKick.counter = positionForKick.counter + 1
+            if positionForKick.counter <= 15:
+                return player.stay()
+            else:
+                return player.goNow('executeMotionKick')
         else:
             player.brain.nav.stand()
             return player.goNow('executeKick')
