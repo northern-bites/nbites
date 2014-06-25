@@ -186,9 +186,10 @@ def superState(state):
             fsa.ignoreDefaultState = True
             stateSwitchedToBySuperState = fsa.states[state](fsa)
             fsa.ignoreDefaultState = False
-
+            #print stateSwitchedToBySuperState
+            #print fsa.currentState
             # (3) Switch to state switched to by super first
-            if stateSwitchedToBySuperState and stateSwitchedToBySuperState != fsa.currentState:
+            if stateSwitchedToBySuperState and stateSwitchedToBySuperState[1] != fsa.currentState:
                 return stateSwitchedToBySuperState
 
             # (4) Switch to state switched to by child
