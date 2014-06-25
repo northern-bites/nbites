@@ -15,6 +15,7 @@
 #include "Profiler.h"
 #include "SPLStandardMessage.h"
 #include "NBMath.h"
+#include "FieldConstants.h"
 
 namespace man {
 
@@ -140,23 +141,28 @@ PROF_ENTER(P_COMM_BUILD_PACKET);
     splMessage.team = (uint8_t)arbData->team_number();
     splMessage.fallen = (uint8_t)model.fallen();
     
-    splMessage.pose[0] = model.my_x()*CM_TO_MM;
-    splMessage.pose[1] = model.my_y()*CM_TO_MM;
-    splMessage.pose[2] = model.my_h()*TO_DEG;
+    splMessage.pose[0] = (model.my_x()-CENTER_FIELD_X)*CM_TO_MM;
+    splMessage.pose[1] = (model.my_y()-CENTER_FIELD_Y)*CM_TO_MM;
+    splMessage.pose[2] = model.my_h();
+   
+    splMessage.walkingTo[0] = (model.walking_to_x()-CENTER_FIELD_X)*CM_TO_MM;
+    splMessage.walkingTo[1] = (model.walking_to_y()-CENTER_FIELD_Y)*CM_TO_MM;
     
-    splMessage.walkingTo[0] = model.walking_to_x()*CM_TO_MM;
-    splMessage.walkingTo[0] = model.walking_to_y()*CM_TO_MM;
+    if (model.in_kicking_state()) {
+        splMessage.shootingTo[0] = (model.kicking_to_x()-CENTER_FIELD_X)*CM_TO_MM;
+        splMessage.shootingTo[1] = (model.kicking_to_y()-CENTER_FIELD_Y)*CM_TO_MM;
+    }
+    else {
+        splMessage.shootingTo[0] = splMessage.pose[0];
+        splMessage.shootingTo[1] = splMessage.pose[1];
+    }
     
-    splMessage.shootingTo[0] = model.kicking_to_x()*CM_TO_MM;
-    splMessage.shootingTo[0] = model.kicking_to_y()*CM_TO_MM;
-    
-    splMessage.ballAge = model.ball_age();
+    splMessage.ballAge = model.ball_age()*1000; // seconds to milliseconds
 
-    // @TODO: these seem to be nan at this point; also this logic is somewhere else in the code (maybe the math module?), use that
-    // also using bad is bad (mostly for performance reasons) mmmkay
-    // splMessage.ball[0] = model.my_x()*CM_TO_MM + model.ball_dist()*CM_TO_MM * (float)asin(model.ball_bearing());
-    // splMessage.ball[1] = model.my_x()*CM_TO_MM + model.ball_dist()*CM_TO_MM * (float)acos(model.ball_bearing());
-    
+    // @TODO: the logic for this conversion is somewhere else in the code, use it
+    splMessage.ball[0] = model.ball_dist()*CM_TO_MM * (float)cos(model.ball_bearing()*TO_RAD);
+    splMessage.ball[1] = model.ball_dist()*CM_TO_MM * (float)sin(model.ball_bearing()*TO_RAD);
+
     splMessage.ballVel[0] = model.ball_vel_x()*CM_TO_MM;
     splMessage.ballVel[1] = model.ball_vel_y()*CM_TO_MM;
 
@@ -225,7 +231,6 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
 
 #ifdef USE_SPL_COMM
         // create a WorldModel with data from splMessage
-        // @TODO: check that all the fields are correct
         portals::Message<messages::WorldModel> model(0);
         messages::WorldModel *message = model.get();
 
@@ -234,27 +239,33 @@ void TeamConnect::receive(portals::OutPortal<messages::WorldModel>* modelOuts [N
         playerNum = splMessage.playerNum;
         message->set_fallen(splMessage.fallen);
 
-        message->set_my_x(splMessage.pose[0]*MM_TO_CM);
-        message->set_my_y(splMessage.pose[1]*MM_TO_CM);
-        message->set_my_h(splMessage.pose[2]*TO_RAD);
+        message->set_my_x(splMessage.pose[0]*MM_TO_CM + CENTER_FIELD_X);
+        message->set_my_y(splMessage.pose[1]*MM_TO_CM + CENTER_FIELD_Y);
+        message->set_my_h(splMessage.pose[2]);
 
-        message->set_walking_to_x(splMessage.walkingTo[0]*MM_TO_CM);
-        message->set_walking_to_y(splMessage.walkingTo[1]*MM_TO_CM);
+        message->set_walking_to_x(splMessage.walkingTo[0]*MM_TO_CM + CENTER_FIELD_X);
+        message->set_walking_to_y(splMessage.walkingTo[1]*MM_TO_CM + CENTER_FIELD_Y);
 
-        message->set_kicking_to_x(splMessage.shootingTo[0]*MM_TO_CM);
-        message->set_kicking_to_y(splMessage.shootingTo[1]*MM_TO_CM);
+        message->set_kicking_to_x(splMessage.shootingTo[0]*MM_TO_CM + CENTER_FIELD_X);
+        message->set_kicking_to_y(splMessage.shootingTo[1]*MM_TO_CM + CENTER_FIELD_Y);
 
-        message->set_ball_age(splMessage.ballAge*1000); // seconds to milliseconds
+        message->set_ball_age(splMessage.ballAge/1000); // milliseconds to seconds
 
-        // @TODO: these seem to be nan at this point; also this logic is somewhere else in the code (maybe the math module?), use that
-        // also using bad is bad (mostly for performance reasons) mmmkay
-        // message->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0]/10, 2) + (float)pow(splMessage.ball[1]/10, 2)));
-        // message->set_ball_bearing((float)atan((splMessage.ball[1]/10)/(splMessage.ball[0]/10)));
+        // @TODO: the logic for this conversion is somewhere else in the code, use it
+        message->set_ball_dist((float)sqrt((float)pow(splMessage.ball[0], 2) + 
+                                           (float)pow(splMessage.ball[1], 2))*MM_TO_CM);
+        message->set_ball_bearing((float)atan(splMessage.ball[1]/splMessage.ball[0])*TO_DEG);
 
         message->set_ball_vel_x(splMessage.ballVel[0]*MM_TO_CM);
         message->set_ball_vel_y(splMessage.ballVel[1]*MM_TO_CM);
 
-        message->set_role(6); // so that world view displays drop-in players
+        // so that world view displays drop-in players correctly
+        message->set_ball_on(!splMessage.ballAge);
+        message->set_in_kicking_state(splMessage.pose[0] != splMessage.shootingTo[0] ||
+                                      splMessage.pose[1] != splMessage.shootingTo[1]);
+        message->set_role(6);
+
+        // so that behaviors actually processes world model
         message->set_active(true);
 #else
         playerNum = teamMessage.get()->player_number();
