@@ -89,7 +89,7 @@ def snapToCorner(tracker):
 
     # only look to corner if head is finished moving and corner is not behind robot
     if not tracker.brain.motion.head_is_active and yaw < 110 and yaw > -110:
-        tracker.helper.lookToAngle(yaw)
+        tracker.helper.executeHeadMove(lookToAngle(yaw))
 
     if not tracker.brain.motion.head_is_active:
         snapToCorner.count = snapToCorner.count + 1
