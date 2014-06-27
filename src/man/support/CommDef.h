@@ -53,7 +53,7 @@ static const robot_ip_pair robotIPs[NUM_ROBOTS] = {wash, river, jayne,
 #define UNIQUE_ID "B" // keep this as define so it stays 2 bytes, not 4.
 static const int NUM_HEADER_BYTES = 16;
 
-static const long PACKETS_PER_SECOND = 6;
+static const long PACKETS_PER_SECOND = 5;
 static const long SLEEP_MILLIS = 5000;
 //static const long long MICROS_PER_SECOND = 1000000; // defined in Common.h
 static const long long MICROS_PER_PACKET = MICROS_PER_SECOND /
@@ -67,11 +67,7 @@ static const long long SOS_TIMESTAMP = -666;
 static const long long USE_TEAMMATE_BALL_REPORT_FRAMES_OFF = 2;
 // The minimum delay between sending and receiving a packet (packet "travel time").
 static const long long MIN_PACKET_DELAY = 0;
-// The minimum and maximum number of packets we can send per second.
-static const long long MAX_PACKETS_PER_SECOND = 10;  // 10 packets per second.
-static const long long MIN_PACKETS_PER_SECOND = 4;   // 4 packets pers second.
 static const long long TEAMMATE_DEAD_THRESHOLD = 10 * MICROS_PER_SECOND;
 static const int       RESET_SEQ_NUM_THRESHOLD = 30 * PACKETS_PER_SECOND;
-
 
 static const unsigned int MAX_MESSAGE_MEMORY = 20;
