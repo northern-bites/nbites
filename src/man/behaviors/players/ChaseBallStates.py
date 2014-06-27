@@ -14,7 +14,7 @@ import noggin_constants as nogginConstants
 import time
 
 DRIBBLE_ON_KICKOFF = False
-USE_MOTION_KICKS = False
+USE_MOTION_KICKS = True
 
 @superState('gameControllerResponder')
 @stay
