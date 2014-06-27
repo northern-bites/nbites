@@ -73,8 +73,21 @@ M_RIGHT_STRAIGHT =  Kick("M_Right_Straight", x = 14.1, y = -3.6)
 M_LEFT_SIDE =  Kick("M_Left_Side", x = 12.2, y = -.2, h = 45)
 M_RIGHT_SIDE =  Kick("M_Right_Side", x = 12.2, y = .2, h = -45)
 
-M_LEFT_SIDE_OUT = Kick("M_Left_Side_Out", x = 11.5, y = 9.3, h = -90)
-M_RIGHT_SIDE_OUT = Kick("M_Right_Side_Out", x = 11.5, y = -9.3, h = 90)
+M_LEFT_SIDE_OUT = Kick("M_Left_Side_Out", x = 13.1, y = -2.6, h = 0)
+M_RIGHT_SIDE_OUT = Kick("M_Right_Side_Out", x = 13.1, y = 2.6, h = 0)
+
+# M_LEFT_SIDE_OUT = Kick("M_Left_Side_Out", x = 11.5, y = 9.3, h = -90)
+# M_RIGHT_SIDE_OUT = Kick("M_Right_Side_Out", x = 11.5, y = -9.3, h = 90)
+# outwardSideKickLeft.cfg
+# proceed 800
+# setLeg 10 -10 5 0 0 0
+# proceed 100
+# setLeg 20 -15 10 0 0 0
+# proceed 1
+# setLeg 20 100 15 0 0 0
+# proceed 200
+# setLeg 20 40 15 0 0 0
+# proceed 800
 
 # Not used 04-19-13
 LEFT_SHORT_SIDE_KICK =  Kick("L_Short_Side", x = 15.5, y = -.5,

@@ -21,8 +21,8 @@ class KickDecider2(object):
                         kicks.M_RIGHT_STRAIGHT,
                         kicks.M_LEFT_SIDE,
                         kicks.M_RIGHT_SIDE,
-                        #kicks.M_LEFT_SIDE_OUT,
-                        #kicks.M_RIGHT_SIDE_OUT
+                        kicks.M_LEFT_SIDE_OUT,
+                        kicks.M_RIGHT_SIDE_OUT
                     ]
         self.possibleKicks = self.generateNothing()
     
@@ -34,8 +34,8 @@ class KickDecider2(object):
         self.kicks[1] = kicks.M_RIGHT_STRAIGHT
         self.kicks[2] = kicks.M_LEFT_SIDE
         self.kicks[3] = kicks.M_RIGHT_SIDE
-        #self.kicks[4] = kicks.M_LEFT_SIDE_OUT
-        #self.kicks[5] = kicks.M_RIGHT_SIDE_OUT
+        self.kicks[4] = kicks.M_LEFT_SIDE_OUT
+        self.kicks[5] = kicks.M_RIGHT_SIDE_OUT
 
         self.clearPossibleKicks()
         self.addShotsOnGoal()
