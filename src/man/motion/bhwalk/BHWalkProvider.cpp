@@ -412,6 +412,10 @@ bool BHWalkProvider::calibrated() const {
     return walkingEngine->theInertiaSensorDataBH.calibrated;
 }
 
+bool BHWalkProvider::upright() const {
+    return walkingEngine->theFallDownStateBH.state == FallDownStateBH::upright;
+}
+
 float BHWalkProvider::leftHandSpeed() const {
     return walkingEngine->leftHandSpeed;
 }
