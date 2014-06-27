@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QBoxLayout>
 #include <QToolBar>
+#include <QPalette>
 #include <math.h>
 
 #include "RoboGrams.h"
@@ -67,6 +68,7 @@ private:
     QImage makeOverlay(Camera::Type which);
 
     QTabWidget* imageTabs;
+    QTabWidget* moreImageTabs;
     QPushButton* loadCalButton;
     QComboBox* robotNames;
     Camera::Type currentCamera;

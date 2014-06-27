@@ -72,22 +72,22 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     QDockWidget* dockWidget = new QDockWidget("Vision Field", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(field_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Vision Robot", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(robot_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Vision Ball", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(ball_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     dockWidget = new QDockWidget("Vision Obstacle", this);
     dockWidget->setMinimumWidth(300);
     dockWidget->setWidget(obstacle_viewer);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, dockWidget);
 
     // GUI
     QHBoxLayout* mainLayout = new QHBoxLayout;
@@ -96,12 +96,23 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     imageTabs = new QTabWidget(this);
     mainLayout->addWidget(imageTabs);
 
+    moreImageTabs = new QTabWidget(this);
+    mainLayout->addWidget(moreImageTabs);
+
     imageTabs->addTab(&topDisplay, "Top Image");
     imageTabs->addTab(&bottomDisplay, "Bottom Image");
-    imageTabs->addTab(&topThrDisplay, "Top Thresh");
-    imageTabs->addTab(&botThrDisplay, "Bottom Thresh");
+    //imageTabs->addTab(&topThrDisplay, "Top Thresh");
+    //imageTabs->addTab(&botThrDisplay, "Bottom Thresh");
 
-    mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //moreImageTabs->addTab(&topDisplay, "Top Image");
+    //moreImageTabs->addTab(&bottomDisplay, "Bottom Image");
+    moreImageTabs->addTab(&topThrDisplay, "Top Thresh");
+    moreImageTabs->addTab(&botThrDisplay, "Bottom Thresh");
+	topThrDisplay.setAlignment(Qt::AlignTop);
+	botThrDisplay.setAlignment(Qt::AlignTop);
+
+    //mainWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	mainWidget->setFixedHeight(600);
     mainWidget->setLayout(mainLayout);
     this->setCentralWidget(mainWidget);
 
@@ -125,6 +136,11 @@ VisionDisplayModule::VisionDisplayModule(QWidget *parent) :
     toolBar->addWidget(robotNames);
     connect(loadCalButton, SIGNAL(clicked(bool)),
             this, SLOT(loadRobotParameters()));
+
+	QPalette Pal(palette());
+	Pal.setColor(QPalette::Background, Qt::black);
+	this->setAutoFillBackground(true);
+	this->setPalette(Pal);
     this->addToolBar(toolBar);
 
 }
