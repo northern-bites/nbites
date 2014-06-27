@@ -126,8 +126,10 @@ def searchFieldForBall(player):
     State used by chasers to search the field. Uses the shared ball if it is
     on. Moves to different quads of the field somewhat randomly.
     """
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+
     sharedball = Location(player.brain.sharedBall.x, player.brain.sharedBall.y)
-    player.brain.tracker.trackBall()
     player.brain.nav.goTo(sharedball,
                           precision = nav.GENERAL_AREA,
                           speed = nav.QUICK_SPEED,
@@ -148,6 +150,7 @@ def walkSearchFieldForBall(player):
     quad4Center = Location(NogginConstants.CENTER_FIELD_X * 1.5, NogginConstants.CENTER_FIELD_Y * .5)
 
     if player.firstFrame():
+        player.brain.tracker.trackBall()
         walkSearchFieldForBall.dest = quad3Center
 
     # update destination to send it to a new quadrant on the field
@@ -162,7 +165,6 @@ def walkSearchFieldForBall(player):
         elif walkSearchFieldForBall.dest == quad4Center:
             walkSearchFieldForBall.dest = quad3Center
 
-    player.brain.tracker.trackBall()
     player.brain.nav.goTo(walkSearchFieldForBall.dest, precision = nav.GRAINY,
                           speed = nav.QUICK_SPEED, avoidObstacles = True,
                           fast = True, pb = False)

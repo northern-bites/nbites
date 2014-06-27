@@ -21,7 +21,7 @@ def tracking(tracker):
     tracker.helper.trackObject()
 
     # If cannot see ball and sharedball is on, look at sharedball and pan
-    if tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on:
+    if tracker.target.vis.frames_off > 15  and tracker.brain.sharedBall.ball_on and tracker.counter > 15:
         return tracker.goLater('altTrackSharedBallAndPan')
 
     if not tracker.target.vis.on and tracker.counter > 15:
