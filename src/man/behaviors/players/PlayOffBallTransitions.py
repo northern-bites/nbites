@@ -8,11 +8,12 @@ def ballInBox(player):
     """
     ball = player.brain.ball
 
-    if ball.x > player.box[0][0] and ball.y > player.box[0][1] and \
-            ball.x < player.box[0][0] + player.box[1] and \
-            ball.y < player.box[0][1] + player.box[2] and ball.vis.frames_on > 0:
-        return True
-    return False
+    if ball.vis.frames_on > 0:
+        if role.isChaser(player.role):
+            return True
+        return (ball.x > player.box[0][0] and ball.y > player.box[0][1] and
+                ball.x < player.box[0][0] + player.box[1] and
+                ball.y < player.box[0][1] + player.box[2])
 
 def ballNotInBox(player):
     """
@@ -29,11 +30,12 @@ def ballInBufferedBox(player):
     ball = player.brain.ball
     buf = role.boxBuffer
 
-    if ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
-            ball.x < player.box[0][0] + player.box[1] + buf and \
-            ball.y < player.box[0][1] + player.box[2] + buf and ball.vis.frames_on > 2:
-        return True
-    return False
+    if ball.vis.frames_on > 0:
+        if role.isChaser(player.role):
+            return True
+        return (ball.x > player.box[0][0] - buf and ball.y > player.box[0][1] - buf and \
+                ball.x < player.box[0][0] + player.box[1] + buf and \
+                ball.y < player.box[0][1] + player.box[2] + buf)
 
 def ballNotInBufferedBox(player):
     """
