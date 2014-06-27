@@ -29,7 +29,9 @@ public:
     left, /**< kick using the left foot */
     right, /**< kick using the right foot */
     sidewardsLeft,
-    sidewardsRight
+    sidewardsRight,
+    outwardSideKickLeft,
+    outwardSideKickRight
     // angleLeft,
     // angleRight,
     // stepForLeftKick,
