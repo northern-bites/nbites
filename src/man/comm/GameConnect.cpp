@@ -61,14 +61,19 @@ void GameConnect::handle(portals::OutPortal<messages::GameState>& out,
         result = _socket->receiveFrom(&packet[0], sizeof(packet),
                                       &from, &addrlen);
 
-        if (_timer->timestamp() - _gcTimestamp > TEAMMATE_DEAD_THRESHOLD)
+        if (_timer->timestamp() - _gcTimestamp > TEAMMATE_DEAD_THRESHOLD) {
             _haveRemoteGC = false;
+
+            fillMessage(gameMessage.get(), control);
+            out.setMessage(gameMessage);
+        }
 
         if (result <= 0)
             break;
 
         if (!verify(&packet[0]))
             continue;  // Bad Packet.
+
         _haveRemoteGC = true;
         _gcTimestamp = _timer->timestamp();
 
@@ -156,7 +161,6 @@ void GameConnect::fillMessage(messages::GameState* msg,
     messages::TeamInfo* red  = msg->add_team();
     fillTeam(blue, control.teams[TEAM_BLUE]);
     fillTeam(red , control.teams[TEAM_RED ]);
-
 }
 
 
