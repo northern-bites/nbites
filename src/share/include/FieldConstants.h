@@ -8,7 +8,7 @@
 
 // Nao field constants
 
-#ifdef USING_LAB_FIELD
+#ifdef USE_LAB_FIELD
 static const float FIELD_WHITE_WIDTH = 500.f;
 static const float FIELD_WHITE_HEIGHT = 330.f;
 static const float GREEN_PAD_X = 20.f;
@@ -18,7 +18,7 @@ static const float FIELD_WHITE_WIDTH = 900.f;
 static const float FIELD_WHITE_HEIGHT = 600.f;
 static const float GREEN_PAD_X = 69.5f;
 static const float GREEN_PAD_Y = 69.5f;
-#endif // USING_LAB_FIELD
+#endif // USE_LAB_FIELD
 
 static const float LINE_WIDTH = 5.0f;
 
@@ -75,13 +75,13 @@ static const float LANDMARK_YELLOW_GOAL_TOP_POST_Y =
 
 static const float CENTER_CIRCLE_RADIUS = 75.0f; // Not scaled
 
-#ifdef USING_LAB_FIELD
+#ifdef USE_LAB_FIELD
 static const float GOALBOX_DEPTH = 60.f;
 static const float GOALBOX_WIDTH = 200.f;
 #else
 static const float GOALBOX_DEPTH = 60.f;
 static const float GOALBOX_WIDTH = 220.f;
-#endif // USING_LAB_FIELD
+#endif // USE_LAB_FIELD
 
 
 // These are used by the vision system
@@ -112,11 +112,11 @@ static const float YELLOW_GOALBOX_LEFT_X =
 static const float YELLOW_GOALBOX_RIGHT_X = FIELD_WHITE_RIGHT_SIDELINE_X;
 
 // Crosses on the Field
-#ifdef USING_LAB_FIELD
+#ifdef USE_LAB_FIELD
 static const float LINE_CROSS_OFFSET = 130.0f;
 #else
 static const float LINE_CROSS_OFFSET = 130.0f;
-#endif // USING_LAB_FIELD
+#endif // USE_LAB_FIELD
 
 static const float LANDMARK_BLUE_GOAL_CROSS_X = FIELD_WHITE_LEFT_SIDELINE_X +
     LINE_CROSS_OFFSET;
