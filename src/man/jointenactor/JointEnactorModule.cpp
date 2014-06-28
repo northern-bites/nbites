@@ -34,7 +34,7 @@ void JointEnactorModule::start()
     try
     {
         // Get the DCM proxy.
-        dcmProxy_ = broker_->getDcmProxy();
+        dcmProxy_ = broker_->getSpecialisedProxy<AL::DCMProxy>("DCM");
     }
     catch (AL::ALError& e)
     {

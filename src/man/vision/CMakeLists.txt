@@ -1,5 +1,3 @@
-
-
 ############################ PROJECT NAME
 # The name of this cmake project
 PROJECT( VISION )
@@ -10,7 +8,6 @@ ADD_DEFINITIONS( -mmmx )
 INCLUDE_DIRECTORIES( geom )
 INCLUDE_DIRECTORIES( fieldlines )
 INCLUDE_DIRECTORIES( . )
-
 
 ############################ PROJECT SOURCES FILES
 # Add here source files needed to compile this project

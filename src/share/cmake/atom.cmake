@@ -8,7 +8,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/FindNBITES_DIR.cmake)
 # Cross compilation!
 # Set the variable for the cross-compilation directory, cmake variables
 set( TOOLCHAIN_DIR "${NBITES_DIR}/lib/atomtoolchain" )
-set( OE_SYSROOT "${TOOLCHAIN_DIR}/sysroot/" )
+set( OE_SYSROOT "${TOOLCHAIN_DIR}/libnaoqi-sysroot/" )
 
 set( CMAKE_CROSSCOMPILING   TRUE  )
 set( CMAKE_SYSTEM_NAME      Linux )
