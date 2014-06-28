@@ -12,6 +12,7 @@ from ..util import *
 from objects import RelRobotLocation, Location
 import noggin_constants as nogginConstants
 import time
+import math
 
 DRIBBLE_ON_KICKOFF = False
 USE_MOTION_KICKS = True
@@ -171,6 +172,27 @@ def orbitBall(player):
                 player.brain.nav.setHSpeed(0.25)
             else:
                 player.brain.nav.setHSpeed(0.15)
+
+    return player.stay()
+
+@superState('positionAndKickBall')
+def spinToBall(player):
+    if player.firstFrame():
+        player.brain.tracker.trackBall()
+        print "spinning to ball"
+
+    theta = math.degrees(player.brain.ball.bearing)
+    spinToBall.isFacingBall = math.fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
+
+    if spinToBall.isFacingBall:
+        print "facing ball"
+        return player.goLater('positionForKick')
+
+    # spins the appropriate direction
+    if theta < 0:
+        player.brain.nav.walk(0., 0., -1*constants.FIND_BALL_SPIN_SPEED)
+    else:
+        player.brain.nav.walk(0., 0., constants.FIND_BALL_SPIN_SPEED)
 
     return player.stay()
 

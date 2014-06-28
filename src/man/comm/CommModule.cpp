@@ -28,7 +28,7 @@ CommModule::CommModule(int team, int player) :
     timer = new CommTimer(&monotonic_micro_time);
     monitor = new NetworkMonitor(timer->timestamp());
 
-    teamConnect = new TeamConnect(timer, monitor);
+    teamConnect = new TeamConnect(timer, monitor);  
     gameConnect = new GameConnect(timer, monitor, team, player);
 
     portals::Message<messages::WorldModel> model(0);
@@ -92,7 +92,7 @@ void CommModule::send()
     _worldModelInput.latch();
 
     teamConnect->send(_worldModelInput.message(), myPlayerNumber(),
-                      gameConnect->myTeamNumber(), burstRate);
+                      gameConnect->myTeamNumber(), 1);
     PROF_ENTER(P_COMM_TIMER);
     timer->teamPacketSent();
     PROF_EXIT(P_COMM_TIMER);

@@ -53,6 +53,7 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
             this, SLOT(canvasClicked(int, int, int, bool)));
 
     QVBoxLayout* rightLayout = new QVBoxLayout;
+	//rightLayout->setContentsMargins(QMargins(0, 0, 0, 0));
 
     //set up the color selection combo box
     for (int i = 0; i < image::Color::NUM_COLORS; i++) {
@@ -72,12 +73,13 @@ ColorTableCreator::ColorTableCreator(QWidget *parent) :
     connect(this, SIGNAL(filtSig(bool)), this, SLOT(setFiltering(bool)));
     rightLayout->addWidget(filter);
 
+	thrDisplay.setAlignment(Qt::AlignTop);
     rightLayout->addWidget(&thrDisplay);
-
     mainLayout->addLayout(leftLayout);
     mainLayout->addLayout(rightLayout);
 
     setLayout(mainLayout);
+	this->setFixedHeight(600);
 }
 
 void ColorTableCreator::setFiltering(bool doFiltering)

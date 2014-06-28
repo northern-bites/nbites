@@ -37,6 +37,7 @@ public:
     int getInitialHorizonEstimate(int pH);
     int getImprovedEstimate(int pH);
 	int horizonAt(int x);
+	int occludingHorizonAt(int x);
 	float distanceToHorizon(int x, int y);
 	int ccw(point<int> p1, point<int> p2, point<int> p3);
     int * getTopEdge(){
@@ -76,7 +77,9 @@ private:
 
     bool shoot[IMAGE_WIDTH];
 	int  topEdge[IMAGE_WIDTH+1];
+	int topBlock[IMAGE_WIDTH+1];
     point<int> convex[HULLS];
+	point<int> blockages[HULLS];
 #ifdef OFFLINE
     bool debugHorizon;
     bool debugFieldEdge;
