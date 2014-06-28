@@ -15,6 +15,8 @@
 
 #include "Common.h"
 
+#include "SPLStandardMessage.h"
+
 namespace man {
 
 namespace comm {
@@ -84,7 +86,7 @@ private:
      * @param team    : The team we want packets from.
      * @return        : True on success, false on fail.
      */
-    bool verify(messages::TeamPacket* packet, llong currtime, int player, int team);
+    bool verify(SPLStandardMessage* splMessage, int seqnum, int64_t timestamp, llong recvdtime, int player, int team);
 
     CommTimer*      timer;
     NetworkMonitor* monitor;

@@ -17,7 +17,7 @@ class KickInformation:
         self.brain = brain
 
         # Set goal distance depending on type of field being used
-        if constants.USING_LAB_FIELD:
+        if constants.USE_LAB_FIELD:
             self.closeGoalThresh = 250
         else:
             self.closeGoalThresh = 450
