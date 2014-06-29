@@ -3,7 +3,6 @@ Here we house all of the state methods used for chasing the ball
 """
 import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
-import DribbleTransitions as dr_trans
 import BoxPositionTransitions as boxTransitions
 from ..navigator import Navigator
 from ..kickDecider import KickDecider2
@@ -14,7 +13,6 @@ import noggin_constants as nogginConstants
 import time
 import math
 
-DRIBBLE_ON_KICKOFF = False
 USE_MOTION_KICKS = True
 
 @superState('gameControllerResponder')
@@ -81,10 +79,6 @@ def prepareForKick(player):
         player.kick = prepareForKick.decider.motionKicks()
     else:
         player.kick = prepareForKick.decider.normalKicks()
-
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
 
     return player.goNow('orbitBall')
 
@@ -177,6 +171,9 @@ def orbitBall(player):
 
 @superState('positionAndKickBall')
 def spinToBall(player):
+    """
+    spins to the ball until it is facing the ball 
+    """
     if player.firstFrame():
         player.brain.tracker.trackBall()
         print "spinning to ball"
@@ -204,13 +201,6 @@ def positionForKick(player):
     if transitions.shouldRedecideKick(player):
         return player.goLater('approachBall')
 
-    if not player.shouldKickOff or DRIBBLE_ON_KICKOFF:
-        if dr_trans.shouldDribble(player):
-            return player.goNow('decideDribble')
-
-    if player.corner_dribble:
-        return player.goNow('executeDribble')
-
     ball = player.brain.ball
     positionForKick.kickPose = RelRobotLocation(ball.rel_x - player.kick.setupX,
                                                 ball.rel_y - player.kick.setupY,
@@ -223,13 +213,15 @@ def positionForKick(player):
         positionForKick.counter = 0
         positionForKick.slowDown = False
     elif player.brain.ball.vis.on: # don't update if we don't see the ball
-        if not positionForKick.slowDown and player.brain.ball.distance < constants.SLOW_DOWN_TO_BALL_DIST:
-            positionForKick.slowDown = True
-            player.brain.nav.destinationWalkTo(positionForKick.kickPose,
+        # slows down the walk when very close to the ball to stabalize motion kicking and to not walk over the ball
+        if player.motionKick:
+            if not positionForKick.slowDown and player.brain.ball.distance < constants.SLOW_DOWN_TO_BALL_DIST:
+                positionForKick.slowDown = True
+                player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.SLOW_SPEED)
-        elif positionForKick.slowDown and player.brain.ball.distance >= constants.SLOW_DOWN_TO_BALL_DIST:
-            positionForKick.slowDown = False
-            player.brain.nav.destinationWalkTo(positionForKick.kickPose,
+            elif positionForKick.slowDown and player.brain.ball.distance >= constants.SLOW_DOWN_TO_BALL_DIST:
+                positionForKick.slowDown = False
+                player.brain.nav.destinationWalkTo(positionForKick.kickPose,
                                            Navigator.GRADUAL_SPEED)
         else:
             player.brain.nav.updateDestinationWalkDest(positionForKick.kickPose)
@@ -238,6 +230,7 @@ def positionForKick(player):
     if transitions.ballInPosition(player, positionForKick.kickPose):
         if player.motionKick:
             positionForKick.counter = positionForKick.counter + 1
+            # stay at position for a short amount of time. stabalizes motion kicking by slowing down forward motion
             if positionForKick.counter <= constants.WAIT_COUNT:
                 return player.stay()
             else:

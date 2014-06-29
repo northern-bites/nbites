@@ -122,20 +122,6 @@ def orbitTooLong(player):
 
 ####### PENALTY KICK STUFF ###########
 
-def shouldStopPenaltyKickDribbling(player):
-    """
-    While dribbling we should stop
-    """
-    my = player.brain.loc
-    # helpers is no longer used. Find a different way.
-    dribbleAimPoint = helpers.getShotCloseAimPoint(player)
-    goalBearing = my.getRelativeBearing(dribbleAimPoint)
-    return (inPenaltyKickStrikezone(player) or
-            player.brain.ball.rel_x > constants.STOP_DRIBBLE_X or
-            fabs(player.brain.ball.rel_y) > constants.STOP_DRIBBLE_Y or
-            fabs(goalBearing) > constants.STOP_DRIBBLE_BEARING or
-            player.counter > constants.STOP_PENALTY_DRIBBLE_COUNT)
-
 def inPenaltyKickStrikezone(player):
     """
     If we are in a good place to kick
