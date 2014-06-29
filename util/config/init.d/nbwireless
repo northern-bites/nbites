@@ -9,7 +9,7 @@ depend() {
 
 start() {
   ifconfig wlan0 up
-  wpa_supplicant -iwlan0 -Dwext -c/etc/wpa_supplicant/wpa_supplicant.conf -B
+  wpa_supplicant -iwlan0 -Dnl80211 -c/etc/wpa_supplicant/wpa_supplicant.conf -B
   sleep 1
   dhclient wlan0
 }

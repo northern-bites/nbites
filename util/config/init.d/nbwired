@@ -8,8 +8,8 @@ depend() {
 }
 
 start() {
-  ifconfig eth0 11.0.1.5 netmask 255.255.255.0
-  route add -net default gw 11.0.1.1
+  ifconfig eth0 169.254.75.194 netmask 255.255.0.0
+  route add -net default gw 169.254.0.0
   #dhclient eth0
   ifconfig eth0 up
 }
