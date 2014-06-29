@@ -20,12 +20,12 @@ def findBall(player):
         spinDir = my.spinDirToPoint(ball)
         player.setWalk(0, 0, spinDir*constants.FIND_BALL_SPIN_SPEED)
 
-        player.brain.tracker.spinPan()
+        player.brain.tracker.lookToSpinDirection(spinDir)
 
     if transitions.shouldChaseBall(player):
         player.stopWalking()
         player.brain.tracker.trackBall()
-        return player.goLater('approachBall')
+        return player.goLater('spinToBall')
 
     if transitions.spunOnce(player):
         return player.goLater('playOffBall')

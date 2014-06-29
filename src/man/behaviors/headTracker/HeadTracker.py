@@ -135,12 +135,14 @@ class HeadTracker(FSA.FSA):
         if self.currentState is not 'trackingFieldObject':
             self.switchTo('trackingFieldObject')
 
-    def spinPan(self):
+    def lookToSpinDirection(self, direction):
         """
-        Regardless of which direction we are spinning, look directly ahead.
-        This should result in the robot facing the ball when it sees it.
+        Look to the direction we are spinning.
         """
-        self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_STRAIGHT)
+        if direction < 0:
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_RIGHT)
+        else:
+            self.repeatHeadMove(HeadMoves.FIXED_PITCH_LOOK_LESS_LEFT)
 
     def lookToAngle(self, yaw):
         """
