@@ -50,6 +50,21 @@ echo "Moving autoload.ini files into place..."
 mv $FOLDER/sys_autoload.ini /etc/naoqi/autoload.ini
 mv $FOLDER/usr_autoload.ini naoqi/preferences/autoload.ini
 
+# Move the config files for wpa supplicant
+echo "Moving config files for wpa_supplicant"
+mv $FOLDER/wpa_supplicant.conf /etc/wpa_supplicant
+mv $FOLDER/nbwired /etc/init.d
+mv $FOLDER/nbwireless /etc/init.d
+chmod +x /etc/init.d/nbwired
+chmod +x /etc/init.d/nbwireless
+
+# Removing connman and web interface
+rc-config delete connman boot
+rc-config delete naopathe default
+rc-config delete lighttpd default
+rc-config add utwired boot
+rc-config add utwireless boot
+
 # Change the password
 echo "Change the password..."
 passwd nao
