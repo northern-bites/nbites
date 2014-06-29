@@ -36,13 +36,6 @@ def approachBall(player):
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
 
-        if player.brain.nav.isAtPosition():
-            print "isAtPosition() is causing the bug!"
-        else:
-            print "shouldPrepareForKick() is causing the bug!"
-            print player.brain.ball.distance
-            print player.brain.ball.vis.distance
-
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -82,7 +75,7 @@ def prepareForKick(player):
 
     return player.goNow('orbitBall')
 
-@superState('gameControllerResponder')
+@superState('positionAndKickBall')
 def orbitBall(player):
     """
     State to orbit the ball
@@ -183,7 +176,7 @@ def spinToBall(player):
 
     if spinToBall.isFacingBall:
         print "facing ball"
-        return player.goLater('positionForKick')
+        return player.goLater('approachBall')
 
     # spins the appropriate direction
     if theta < 0:
