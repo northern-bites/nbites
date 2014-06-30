@@ -176,7 +176,7 @@ def spinToBall(player):
 
     if spinToBall.isFacingBall:
         print "facing ball"
-        return player.goLater('approachBall')
+        return player.goNow('approachBall')
 
     # spins the appropriate direction
     if theta < 0:
