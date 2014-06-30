@@ -5,7 +5,7 @@ import ChaseBallTransitions as transitions
 import ChaseBallConstants as constants
 import BoxPositionTransitions as boxTransitions
 from ..navigator import Navigator
-from ..kickDecider import KickDecider2
+from ..kickDecider import KickDecider
 from ..kickDecider import kicks
 from ..util import *
 from objects import RelRobotLocation, Location
@@ -65,7 +65,7 @@ def positionAndKickBall(player):
 @superState('positionAndKickBall')
 def prepareForKick(player):
     if player.firstFrame():
-        prepareForKick.decider = KickDecider2.KickDecider2(player.brain)
+        prepareForKick.decider = KickDecider.KickDecider(player.brain)
         player.brain.nav.stand()
         return player.stay()
 
@@ -76,9 +76,9 @@ def prepareForKick(player):
 
     player.inKickingState = True
     if USE_MOTION_KICKS:
-        player.kick = prepareForKick.decider.motionKicks()
+        player.kick = prepareForKick.decider.motionKicksAsap()
     else:
-        player.kick = prepareForKick.decider.normalKicks()
+        player.kick = prepareForKick.decider.sweetMovesOnGoal()
 
     return player.goNow('orbitBall')
 
