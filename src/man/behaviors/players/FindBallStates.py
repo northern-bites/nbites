@@ -2,7 +2,7 @@ import ChaseBallConstants as constants
 import ChaseBallTransitions as transitions
 from ..util import *
 from objects import Location
-import math
+from math import fabs, degrees
 
 @superState('gameControllerResponder')
 def findBall(player):
@@ -41,8 +41,8 @@ def spinToFoundBall(player):
         player.brain.tracker.trackBall()
         print "spinning to found ball"
 
-    theta = math.degrees(player.brain.ball.bearing)
-    spinToFoundBall.isFacingBall = math.fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
+    theta = degrees(player.brain.ball.bearing)
+    spinToFoundBall.isFacingBall = fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
 
     if spinToFoundBall.isFacingBall:
         print "facing ball"

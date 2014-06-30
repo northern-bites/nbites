@@ -3,7 +3,7 @@ from ..headTracker import HeadMoves
 import ChaseBallConstants as constants
 import noggin_constants as NogginConstants
 import ClaimTransitions as claimTrans
-from math import fabs
+from math import fabs, degrees
 
 ####### CHASING STUFF ##############
 
@@ -37,21 +37,9 @@ def shouldPrepareForKick(player):
 
 def shouldSpinToBall(player):
     """
-    We're not facing the ball well enough yet
+    We're not facing the ball well enough
     """
-    ball = player.brain.ball
-    return (ball.vis.on and
-            fabs(ball.rel_y) > constants.SHOULD_SPIN_TO_BALL_Y and
-            not (ball.distance > constants.SHOULD_SPIN_TO_BALL_DIST and
-                 fabs(ball.bearing_deg) < constants.SHOULD_SPIN_TO_BALL_BEAR))
-
-def shouldStopSpinningToBall(player):
-    """
-    We're done spinning
-    """
-    ball = player.brain.ball
-    return (ball.vis.on and
-            fabs(ball.rel_y) < constants.STOP_SPINNING_TO_BALL_Y)
+    return fabs(degrees(player.brain.ball.bearing)) > constants.SHOULD_SPIN_TO_BALL_BEARING
 
 def shouldApproachBallAgain(player):
     """

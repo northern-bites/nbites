@@ -11,7 +11,7 @@ from ..util import *
 from objects import RelRobotLocation, Location
 import noggin_constants as nogginConstants
 import time
-import math
+from math import fabs, degrees
 
 USE_MOTION_KICKS = True
 
@@ -47,6 +47,7 @@ def approachBall(player):
 
 @defaultState('prepareForKick')
 @superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldSpinToBall, 'spinToBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def positionAndKickBall(player):
@@ -171,12 +172,12 @@ def spinToBall(player):
         player.brain.tracker.trackBall()
         print "spinning to ball"
 
-    theta = math.degrees(player.brain.ball.bearing)
-    spinToBall.isFacingBall = math.fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
+    theta = degrees(player.brain.ball.bearing)
+    spinToBall.isFacingBall = fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
 
     if spinToBall.isFacingBall:
         print "facing ball"
-        return player.goNow('approachBall')
+        return player.goNow('positionAndKickBall')
 
     # spins the appropriate direction
     if theta < 0:
