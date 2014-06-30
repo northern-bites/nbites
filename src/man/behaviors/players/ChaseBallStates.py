@@ -11,7 +11,7 @@ from ..util import *
 from objects import RelRobotLocation, Location
 import noggin_constants as nogginConstants
 import time
-import math
+from math import fabs, degrees
 
 USE_MOTION_KICKS = True
 
@@ -36,13 +36,6 @@ def approachBall(player):
     if (transitions.shouldPrepareForKick(player) or
         player.brain.nav.isAtPosition()):
 
-        if player.brain.nav.isAtPosition():
-            print "isAtPosition() is causing the bug!"
-        else:
-            print "shouldPrepareForKick() is causing the bug!"
-            print player.brain.ball.distance
-            print player.brain.ball.vis.distance
-
         if player.shouldKickOff:
             if player.brain.ball.rel_y > 0:
                 player.kick = kicks.LEFT_SHORT_STRAIGHT_KICK
@@ -54,6 +47,7 @@ def approachBall(player):
 
 @defaultState('prepareForKick')
 @superState('gameControllerResponder')
+@ifSwitchLater(transitions.shouldSpinToBall, 'spinToBall')
 @ifSwitchLater(transitions.shouldApproachBallAgain, 'approachBall')
 @ifSwitchLater(transitions.shouldFindBall, 'findBall')
 def positionAndKickBall(player):
@@ -82,7 +76,7 @@ def prepareForKick(player):
 
     return player.goNow('orbitBall')
 
-@superState('gameControllerResponder')
+@superState('positionAndKickBall')
 def orbitBall(player):
     """
     State to orbit the ball
@@ -178,12 +172,12 @@ def spinToBall(player):
         player.brain.tracker.trackBall()
         print "spinning to ball"
 
-    theta = math.degrees(player.brain.ball.bearing)
-    spinToBall.isFacingBall = math.fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
+    theta = degrees(player.brain.ball.bearing)
+    spinToBall.isFacingBall = fabs(theta) <= constants.FACING_BALL_ACCEPTABLE_BEARING
 
     if spinToBall.isFacingBall:
         print "facing ball"
-        return player.goLater('positionForKick')
+        return player.goNow('positionAndKickBall')
 
     # spins the appropriate direction
     if theta < 0:
