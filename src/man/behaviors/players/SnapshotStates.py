@@ -36,3 +36,8 @@ def gamePlaying(player):
 @superState('gameControllerResponder')
 def gamePenalized(player):
     return player.stay()
+
+@superState('gameControllerResponder')
+def fallen(player):
+    player.inKickingState = False
+    return player.stay()
